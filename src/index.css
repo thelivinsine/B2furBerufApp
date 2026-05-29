@@ -73,6 +73,20 @@
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11", "ss01";
     text-rendering: optimizeLegibility;
+    /* Never allow a stray wide element to introduce horizontal scrolling.
+       `clip` (vs `hidden`) does not create a scroll container, so it leaves
+       the sticky header untouched. */
+    overflow-x: clip;
+  }
+
+  /* iOS zooms the viewport when focusing a form control whose font is < 16px.
+     Keep form controls at 16px on small screens to avoid that jump. */
+  @media (max-width: 640px) {
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
   }
 
   ::selection {

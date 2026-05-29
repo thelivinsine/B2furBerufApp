@@ -36,7 +36,7 @@ export function VocabularyTrainer() {
         description="Lerne mit Karteikarten, aktivem Abrufen und intelligenter Wiederholung (Spaced Repetition)."
         action={
           <Select value={theme} onValueChange={setTheme}>
-            <SelectTrigger className="w-56">
+            <SelectTrigger className="w-full sm:w-56">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

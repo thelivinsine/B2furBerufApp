@@ -33,7 +33,7 @@ export function AppShell() {
 
       {/* Mobile drawer */}
       <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
-        <DialogContent className="left-0 top-0 h-full max-w-[16rem] translate-x-0 translate-y-0 rounded-none border-y-0 border-l-0 p-0 sm:max-w-[16rem]">
+        <DialogContent className="left-0 top-0 h-full max-h-none w-64 max-w-[16rem] translate-x-0 translate-y-0 overflow-y-auto rounded-none border-y-0 border-l-0 p-0 sm:max-w-[16rem]">
           <DialogTitle className="sr-only">Navigation</DialogTitle>
           <Sidebar onNavigate={() => setMobileOpen(false)} />
         </DialogContent>
