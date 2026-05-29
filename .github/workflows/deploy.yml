@@ -1,10 +1,12 @@
 name: Deploy to GitHub Pages
 
+# Fallback deployment to the gh-pages branch. Kept as a safety net while the
+# official GitHub Actions Pages deploy (pages.yml) is verified. Runs only on the
+# feature branch so it does not create a gh-pages branch from main.
 on:
   push:
     branches:
       - claude/determined-euler-xUDrh
-      - main
   workflow_dispatch:
 
 permissions:
