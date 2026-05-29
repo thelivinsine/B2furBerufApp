@@ -34,3 +34,11 @@ React + TypeScript + Vite SPA, deployed to GitHub Pages.
 
 ## Workflow notes
 - Development branch for this work: **`claude/determined-euler-xUDrh`**. Ship to production by opening a PR into `main` and merging (squash) — the merge triggers `pages.yml`.
+
+## Roadmap & status (read these when resuming)
+- **`docs/PROJECT_STATUS.md`** — current status, all locked decisions, research findings, and the
+  "resume here" pointer. Start here.
+- **`docs/EXPANSION_PLAN.md`** — approved phased plan (Phase 1: grammar/collocations/leveled
+  quizzes, client-side; Phase 2: Supabase auth + cloud sync + AI writing coach). Next work = Phase 1.
+- **`docs/IMPLEMENTATION_PLAN.md`** — original from-scratch build plan (historical reference).
+- Founder is **non-technical**; act as a decisive CTO who minimizes their ops burden and caps costs.
