@@ -1080,6 +1080,8 @@ export const vocabulary: VocabItem[] = [
   { id: "v_sobald", de: "sobald", en: "as soon as", pron: "zo-BALT", pos: "connector", themeId: "scheduling", context: "Temporal subordinating conjunction; sends the verb to the end.", related: ["sowie", "wenn"], examples: [{ de: "Ich melde mich, sobald der Termin feststeht.", en: "I'll get in touch as soon as the date is fixed." }, { de: "Sobald die Software läuft, schulen wir das Team.", en: "As soon as the software runs, we train the team." }] },
   { id: "v_dadurch", de: "dadurch", en: "thereby / as a result", pron: "da-DURCH", pos: "connector", themeId: "technology", context: "Connector expressing means or result of an action.", related: ["damit", "infolgedessen"], examples: [{ de: "Wir digitalisieren die Abläufe; dadurch sparen wir Zeit.", en: "We digitise the processes; as a result we save time." }, { de: "Dadurch wird die Arbeit deutlich einfacher.", en: "Thereby the work becomes much easier." }] },
   { id: "v_einerseits", de: "einerseits … andererseits", en: "on one hand … on the other hand", pron: "EYE-ner-zaits", pos: "connector", themeId: "project", context: "Paired connector for weighing two sides of an argument.", related: ["zum einen … zum anderen", "zwar … aber"], examples: [{ de: "Einerseits ist es günstiger, andererseits dauert es länger.", en: "On one hand it's cheaper, on the other hand it takes longer." }, { de: "Einerseits will das Team flexibel sein, andererseits braucht es Struktur.", en: "On one hand the team wants flexibility, on the other it needs structure." }] },
+=======
+>>>>>>> origin/main
 ];
 
 export const vocabByTheme = (themeId: string) =>
