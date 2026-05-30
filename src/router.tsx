@@ -5,6 +5,8 @@ import { Onboarding } from "@/features/onboarding/Onboarding";
 import { Dashboard } from "@/features/dashboard/Dashboard";
 import { VocabularyTrainer } from "@/features/vocabulary/VocabularyTrainer";
 import { RedemittelTrainer } from "@/features/redemittel/RedemittelTrainer";
+import { GrammarHub } from "@/features/grammar/GrammarHub";
+import { QuizHub } from "@/features/quiz/QuizHub";
 import { SimulationHub } from "@/features/simulation/SimulationHub";
 import { ExamHub } from "@/features/exam/ExamHub";
 import { QuickRevision } from "@/features/revision/QuickRevision";
@@ -47,6 +49,22 @@ export const router = createHashRouter([
         element: (
           <RequireOnboarding>
             <RedemittelTrainer />
+          </RequireOnboarding>
+        ),
+      },
+      {
+        path: "/grammar",
+        element: (
+          <RequireOnboarding>
+            <GrammarHub />
+          </RequireOnboarding>
+        ),
+      },
+      {
+        path: "/quiz",
+        element: (
+          <RequireOnboarding>
+            <QuizHub />
           </RequireOnboarding>
         ),
       },

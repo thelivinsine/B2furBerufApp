@@ -151,12 +151,153 @@ export interface ExamSet {
 
 /* ---------------- Grammar support ---------------- */
 
-export interface GrammarSnippet {
+/** Thematic buckets used to group grammar topics in the Grammar hub. */
+export type GrammarGroup =
+  | "connectors"
+  | "relativeClauses"
+  | "prepositionalPronouns"
+  | "collocations"
+  | "verbPosition"
+  | "konjunktiv2"
+  | "modals"
+  | "passive"
+  | "subordinate"
+  | "cases";
+
+export interface GrammarExample {
+  de: string;
+  en: string;
+}
+
+/** An inline practice item attached to a grammar topic. */
+export interface GrammarDrill {
   id: string;
+  /** Prompt sentence; a gap is marked with `___`. */
+  prompt: string;
+  /** The accepted answer (gap filler). */
+  answer: string;
+  /** Optional multiple-choice options (includes the answer). Free text if absent. */
+  options?: string[];
+  /** Short explanation revealed after answering. */
+  explain?: string;
+  /** English gloss of the full sentence for support. */
+  gloss?: string;
+}
+
+/** A rich grammar topic: explanation, examples, pitfalls and inline drills. */
+export interface GrammarTopic {
+  id: string;
+  group: GrammarGroup;
   title: string;
+  titleDe: string;
   purpose: string;
+  explanation: string;
   pattern: string;
-  examples: string[];
+  examples: GrammarExample[];
+  pitfalls?: string[];
+  drills: GrammarDrill[];
+}
+
+/* ---------------- Collocations (Nomen-Verb-Verbindungen) ---------------- */
+
+export interface Collocation {
+  id: string;
+  /** The noun part, with article where natural (e.g. "eine Entscheidung"). */
+  noun: string;
+  /** The verb part (e.g. "treffen"). */
+  verb: string;
+  /** The full collocation (e.g. "eine Entscheidung treffen"). */
+  full: string;
+  en: string;
+  register?: "neutral" | "formal";
+  themeId?: ThemeId;
+  example: { de: string; en: string };
+}
+
+/* ---------------- Leveled quizzes ---------------- */
+
+export type Difficulty = 1 | 2 | 3;
+
+export type QuizKind =
+  | "translation"
+  | "article"
+  | "plural"
+  | "cloze"
+  | "wordOrder"
+  | "matching"
+  | "collocationFill"
+  | "connectorChoice"
+  | "relativePronoun"
+  | "daWord";
+
+interface QuizQuestionBase {
+  id: string;
+  difficulty: Difficulty;
+  /** Theme the question belongs to, or "general" for grammar-only items. */
+  themeId: ThemeId | "general";
+  /** The question prompt shown to the learner. */
+  prompt: string;
+  /** Source vocab/collocation id so a correct answer can feed SRS. */
+  sourceId?: string;
+  /** English gloss / supportive hint. */
+  hint?: string;
+  /** Explanation revealed after answering. */
+  explain?: string;
+}
+
+/** Single-answer multiple-choice question (the most common kind). */
+export interface MCQQuestion extends QuizQuestionBase {
+  kind:
+    | "translation"
+    | "article"
+    | "plural"
+    | "cloze"
+    | "collocationFill"
+    | "connectorChoice"
+    | "relativePronoun"
+    | "daWord";
+  answer: string;
+  options: string[];
+}
+
+/** Arrange shuffled tokens into the correct sentence. */
+export interface WordOrderQuestion extends QuizQuestionBase {
+  kind: "wordOrder";
+  /** The correct full sentence. */
+  answer: string;
+  /** Shuffled word tokens to arrange. */
+  tokens: string[];
+}
+
+/** Match German terms to their English equivalents. */
+export interface MatchingQuestion extends QuizQuestionBase {
+  kind: "matching";
+  pairs: { left: string; right: string }[];
+}
+
+export type QuizQuestion = MCQQuestion | WordOrderQuestion | MatchingQuestion;
+
+/* ---------------- Practice-area registry (weakness → deep-link) ---------------- */
+
+/** Weakness buckets the writing coach (Phase 2) maps onto practice deep-links. */
+export type WeaknessCategory =
+  | "verbPosition"
+  | "cases"
+  | "vocabularyRange"
+  | "cohesion"
+  | "relativeClauses"
+  | "daWords"
+  | "collocations"
+  | "register"
+  | "spelling";
+
+export interface PracticeArea {
+  id: WeaknessCategory;
+  label: string;
+  labelDe: string;
+  /** In-app route + query the "Üben" deep-link should open. */
+  route: string;
+  description: string;
 }
 
 /* ---------------- Spaced repetition ---------------- */

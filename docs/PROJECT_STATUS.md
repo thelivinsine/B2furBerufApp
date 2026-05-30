@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-05-29. Branch: `claude/determined-euler-xUDrh`._
+_Last updated: 2026-05-30. Branch: `claude/determined-euler-xUDrh`._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -21,8 +21,26 @@ This file is the single place to re-orient when resuming work. For the full desi
 - Content: **293 vocab**, **36 redemittel**, **5 grammar snippets** (NOT surfaced in any UI yet),
   **3 simulation scenarios**, **2 exam sets**, 10 workplace themes.
 
+### Phase 1 — DONE (client-side, on `claude/determined-euler-xUDrh`, not yet merged to `main`)
+- **Types (1A):** `GrammarTopic`/`GrammarDrill`/`GrammarGroup`, `Collocation`, leveled
+  `QuizQuestion` union (`MCQQuestion`/`WordOrderQuestion`/`MatchingQuestion`), `PracticeArea`
+  + `WeaknessCategory` — all in `src/types/index.ts`.
+- **Engine (1B):** `src/engine/quiz.ts` `buildThemeQuiz(themeId, difficulty, count)` generates
+  mixed sets from vocab/collocations/grammar banks; reuses SRS (`reviewVocab`) + scoring.
+  Added `XP.quizEasy/quizMedium/quizHard/grammarDrill`.
+- **Content (1C):** `src/data/collocations.ts` (**68** Nomen-Verb pairs, ~6–8/theme);
+  `src/data/grammar.ts` rewritten to **11 `GrammarTopic`s** w/ drills (Konnektoren, Relativsätze,
+  da-/wo-Wörter, Verbstellung/TeKaMoLo, Nebensätze, Kasus, Nomen-Verb, K-II, Modal, Passiv);
+  `redemittel.ts` grown to **72**; **10 connectors** added to vocab (now **303** words);
+  `src/data/practiceAreas.ts` weakness→deep-link registry.
+- **UI (1D):** `/grammar` (`features/grammar/GrammarHub` + `GrammarDrillCard`) and `/quiz`
+  (`features/quiz/QuizHub` + `QuizRunner`), both query-param driven (`?topic=`, `?theme=&level=`).
+  Wired into Sidebar, router (guarded), and Dashboard daily-module tiles.
+- **Verify:** `npm run build` green; no duplicate ids. Live verification (Pages) handed to founder.
+- **Ship:** open squash-merge PR into `main` when ready (triggers `pages.yml`).
+
 ### Approved, NOT yet implemented
-- The full expansion in `docs/EXPANSION_PLAN.md`. **Next action = start Phase 1.**
+- **Phase 2** in `docs/EXPANSION_PLAN.md` (Supabase auth + cloud sync + AI writing eval).
 
 ## Decisions locked this session
 1. **Sequencing:** phase it, **content first**. Phase 1 = content + grammar + leveled quizzes
@@ -72,5 +90,11 @@ This file is the single place to re-orient when resuming work. For the full desi
   here) — those steps are handed to the founder, same as the Pages deploy.
 
 ## Resume here (next session)
-Start **Phase 1, step 1A**: extend `src/types/index.ts` (`GrammarTopic`, `Collocation`,
-`QuizQuestion`, `PracticeArea`). Then 1B engine, 1C data, 1D UI — per `docs/EXPANSION_PLAN.md`.
+**Phase 1 is complete and builds green** on `claude/determined-euler-xUDrh`. Next options:
+1. **Ship Phase 1:** open a squash-merge PR into `main` (only when the user asks for a PR).
+2. **Start Phase 2** per `docs/EXPANSION_PLAN.md` §2A–2D (Supabase project + schema, auth + cloud
+   sync, `/writing` route, evaluate-writing Edge Function). Founder action items above are Phase-2
+   prerequisites. The `PracticeArea` registry (`src/data/practiceAreas.ts`) is ready for the
+   writing-coach "Üben" deep-links.
+3. **Polish Phase 1:** more collocations/theme, surface a Collocations browser tab, code-split to
+   shrink the 1.18 MB JS bundle.

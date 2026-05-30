@@ -5,6 +5,8 @@ import {
   Zap,
   Target,
   BookOpen,
+  BookMarked,
+  ListChecks,
   Mic,
   MessagesSquare,
   GraduationCap,
@@ -32,6 +34,8 @@ import { SectionHeading } from "@/components/shared/misc";
 
 const dailyModules = [
   { to: "/vocabulary", label: "Wortschatz-Drill", desc: "Karteikarten mit Wiederholung", icon: BookOpen, mins: "5 Min" },
+  { to: "/quiz", label: "Themen-Quiz", desc: "Drei Stufen pro Thema", icon: ListChecks, mins: "5 Min" },
+  { to: "/grammar", label: "Grammatik-Werkstatt", desc: "Strukturen üben mit Feedback", icon: BookMarked, mins: "6 Min" },
   { to: "/redemittel", label: "Redemittel-Übung", desc: "Wendungen aktiv anwenden", icon: MessagesSquare, mins: "5 Min" },
   { to: "/simulation", label: "Sprechsimulation", desc: "Dialog mit Partner:in", icon: Mic, mins: "8 Min" },
   { to: "/exam", label: "Prüfungssimulation", desc: "Unter realen Bedingungen", icon: GraduationCap, mins: "10 Min" },
