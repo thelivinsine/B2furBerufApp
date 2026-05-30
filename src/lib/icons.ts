@@ -17,6 +17,15 @@ import {
   MessageSquare,
   ListChecks,
   Sparkles,
+  Link2,
+  GitBranch,
+  Combine,
+  MoveHorizontal,
+  CornerDownRight,
+  Layers,
+  KeyRound,
+  ArrowRightLeft,
+  Boxes,
   type LucideIcon,
 } from "lucide-react";
 
@@ -39,6 +48,15 @@ const map: Record<string, LucideIcon> = {
   MessageSquare,
   ListChecks,
   Sparkles,
+  Link2,
+  GitBranch,
+  Combine,
+  MoveHorizontal,
+  CornerDownRight,
+  Layers,
+  KeyRound,
+  ArrowRightLeft,
+  Boxes,
 };
 
 export function iconByName(name: string): LucideIcon {
