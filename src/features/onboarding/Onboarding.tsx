@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Mic,
 } from "lucide-react";
+import { Logo } from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
