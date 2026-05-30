@@ -12,7 +12,6 @@ import {
   ArrowRight,
   Mic,
 } from "lucide-react";
-import { Logo } from "@/components/shared/Logo";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -79,7 +78,7 @@ export function Onboarding() {
       >
         <div className="mb-6 flex items-center justify-center gap-2.5">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-gradient text-white shadow-glow">
-            <Logo className="h-5 w-5" />
+            <Sparkles className="h-5 w-5" />
           </div>
           <span className="text-lg font-semibold tracking-tight">Sprechfit · Deutsch im Beruf</span>
         </div>
