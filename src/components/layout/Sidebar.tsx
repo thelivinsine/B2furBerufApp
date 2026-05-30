@@ -10,8 +10,8 @@ import {
   Zap,
   LineChart,
   Settings,
+  Sparkles,
 } from "lucide-react";
-import { Logo } from "@/components/shared/Logo";
 import { cn } from "@/lib/utils";
 
 const nav = [
@@ -32,7 +32,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex h-full flex-col gap-1 p-4">
       <div className="mb-4 flex items-center gap-2.5 px-2 py-2">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-gradient text-white shadow-glow">
-          <Logo className="h-5 w-5" />
+          <Sparkles className="h-5 w-5" />
         </div>
         <div className="leading-tight">
           <p className="text-sm font-semibold tracking-tight">Sprechfit</p>
