@@ -2,9 +2,16 @@ import { useEffect } from "react";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export function App() {
   const themeMode = useSettingsStore((s) => s.themeMode);
+  const initAuth = useAuthStore((s) => s.init);
+
+  // Restore the Supabase session and start cloud sync (offline-first).
+  useEffect(() => {
+    initAuth();
+  }, [initAuth]);
 
   useEffect(() => {
     const root = document.documentElement;
