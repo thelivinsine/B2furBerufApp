@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SectionHeading } from "@/components/shared/misc";
+import { AccountPanel } from "@/features/auth/AccountPanel";
 import { cn } from "@/lib/utils";
 
 const themeModes: { id: ThemeMode; label: string; icon: typeof Sun }[] = [
@@ -47,6 +48,9 @@ export function Settings() {
       />
 
       <div className="mx-auto max-w-2xl space-y-5">
+        {/* Account & cloud sync */}
+        <AccountPanel />
+
         {/* Profile */}
         <Card>
           <CardContent className="space-y-4 p-5">
