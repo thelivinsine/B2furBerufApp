@@ -7,6 +7,7 @@ import {
   BookOpen,
   BookMarked,
   ListChecks,
+  PenLine,
   Mic,
   MessagesSquare,
   GraduationCap,
@@ -37,6 +38,7 @@ const dailyModules = [
   { to: "/quiz", label: "Themen-Quiz", desc: "Drei Stufen pro Thema", icon: ListChecks, mins: "5 Min" },
   { to: "/grammar", label: "Grammatik-Werkstatt", desc: "Strukturen üben mit Feedback", icon: BookMarked, mins: "6 Min" },
   { to: "/redemittel", label: "Redemittel-Übung", desc: "Wendungen aktiv anwenden", icon: MessagesSquare, mins: "5 Min" },
+  { to: "/writing", label: "Schreibtraining", desc: "KI nennt deine größte Schwachstelle", icon: PenLine, mins: "7 Min" },
   { to: "/simulation", label: "Sprechsimulation", desc: "Dialog mit Partner:in", icon: Mic, mins: "8 Min" },
   { to: "/exam", label: "Prüfungssimulation", desc: "Unter realen Bedingungen", icon: GraduationCap, mins: "10 Min" },
 ];
