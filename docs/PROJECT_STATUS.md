@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-05-31. Branch: `claude/determined-euler-xUDrh`. Product name: **Sprechfit**._
+_Last updated: 2026-05-31 (session 2). Branch: `claude/determined-euler-xUDrh`. Product name: **Sprechfit**._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -130,10 +130,30 @@ This file is the single place to re-orient when resuming work. For the full desi
 - Email magic-links on Supabase free plan are rate-limited (~2/hour). Fix: add Resend (free tier)
   as custom SMTP in Auth → SMTP settings. Guest sign-in has no such limit and is the primary path.
 
+### UX polish — Quiz answer-reflect flow (PR #14, pending merge)
+- **Problem:** `VocabQuiz` and `RedemittelPractice` auto-advanced to the next question after
+  selecting an answer (900ms / 700–1100ms timeouts), giving no time to reflect.
+- **Fix (branch `claude/determined-euler-xUDrh`, PR #14):**
+  - Removed all `setTimeout` auto-advances from both components.
+  - After selecting an answer the question stays on screen with instant colour feedback.
+  - A `Weiter` / `Quiz beenden` button appears, plus a "tap anywhere" affordance (taps on
+    interactive controls are ignored to avoid double-advance).
+  - `VocabQuiz` feedback panel also shows the word's translation and an example sentence.
+  - `RedemittelPractice`: split `advance()` into `recordResult()` + `next()`; the parent
+    now owns the single `Weiter` button for all three task types (choose / construct / respond);
+    the `RespondTask` inner advance button was removed.
+  - All other quiz surfaces (`QuizRunner`, grammar drills, flashcards, quick revision)
+    already required explicit action — so the whole app is now consistent.
+  - `npm run build` passes. Deploy pending founder squash-merge of PR #14.
+
 ## Resume here (next session)
 **Both Phase 1 and Phase 2 are SHIPPED and LIVE on `main`.** The full platform is working:
 vocabulary/grammar/quiz/simulation/exam (Phase 1) + guest auth + cloud sync + AI writing coach
 (Phase 2). All founder-verified.
+
+**PR #14 open** — "Quiz: keep feedback on screen, advance via Next button or tap." Merge it to
+ship the answer-reflect UX polish. `npm run build` is green. Sandbox can't verify the live site
+so the founder confirms post-merge.
 
 **Pending housekeeping (low urgency):**
 - Rotate the Anthropic key (was pasted in chat) — 2 min at console.anthropic.com.
