@@ -52,6 +52,7 @@ export function RedemittelPractice({ phrases }: { phrases: RedemittelPhrase[] })
   const [tasks, setTasks] = useState<Task[]>(() => buildTasks(phrases, 9));
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
+  const [answered, setAnswered] = useState(false);
   const [done, setDone] = useState(false);
 
   const total = tasks.length;
@@ -61,24 +62,38 @@ export function RedemittelPractice({ phrases }: { phrases: RedemittelPhrase[] })
     setTasks(buildTasks(phrases, 9));
     setIndex(0);
     setScore(0);
+    setAnswered(false);
     setDone(false);
   };
 
-  const advance = (correct: boolean) => {
+  // Record the result and reveal feedback — but stay on the question so the
+  // learner can reflect before tapping "Weiter" (or anywhere) to continue.
+  const recordResult = (correct: boolean) => {
+    if (answered) return;
     practiceRedemittel(task.phrase.id);
     if (correct) {
       setScore((s) => s + 1);
       addXp(XP.redemittel);
     }
-    setTimeout(() => {
-      if (index + 1 >= total) {
-        registerSession();
-        showToast("Übung abgeschlossen!", "success");
-        setDone(true);
-      } else {
-        setIndex((i) => i + 1);
-      }
-    }, correct ? 700 : 1100);
+    setAnswered(true);
+  };
+
+  const next = () => {
+    if (!answered) return;
+    if (index + 1 >= total) {
+      registerSession();
+      showToast("Übung abgeschlossen!", "success");
+      setDone(true);
+    } else {
+      setIndex((i) => i + 1);
+      setAnswered(false);
+    }
+  };
+
+  const handleTapAnywhere = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!answered) return;
+    if ((e.target as HTMLElement).closest("button, a, input")) return;
+    next();
   };
 
   if (phrases.length < 4) {
@@ -98,7 +113,7 @@ export function RedemittelPractice({ phrases }: { phrases: RedemittelPhrase[] })
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-5">
+    <div className="mx-auto max-w-2xl space-y-5" onClick={handleTapAnywhere}>
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Aufgabe {index + 1} von {total}</span>
@@ -114,11 +129,20 @@ export function RedemittelPractice({ phrases }: { phrases: RedemittelPhrase[] })
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
         >
-          {task.type === "choose" && <ChooseTask task={task} onResult={advance} />}
-          {task.type === "construct" && <ConstructTask task={task} onResult={advance} />}
-          {task.type === "respond" && <RespondTask task={task} onResult={advance} />}
+          {task.type === "choose" && <ChooseTask task={task} onResult={recordResult} />}
+          {task.type === "construct" && <ConstructTask task={task} onResult={recordResult} />}
+          {task.type === "respond" && <RespondTask task={task} onResult={recordResult} />}
         </motion.div>
       </AnimatePresence>
+
+      {answered && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-2">
+          <Button variant="gradient" className="w-full" onClick={next}>
+            {index + 1 >= total ? "Übung beenden" : "Weiter"} <ArrowRight className="h-4 w-4" />
+          </Button>
+          <p className="text-center text-xs text-muted-foreground">Tippe irgendwo, um fortzufahren</p>
+        </motion.div>
+      )}
     </div>
   );
 }
@@ -268,7 +292,14 @@ function RespondTask({ task, onResult }: { task: Task; onResult: (correct: boole
       />
 
       {!revealed ? (
-        <Button variant="outline" className="w-full" onClick={() => setRevealed(true)}>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            setRevealed(true);
+            onResult(true);
+          }}
+        >
           <Eye className="h-4 w-4" /> Musterlösung zeigen
         </Button>
       ) : (
@@ -281,9 +312,6 @@ function RespondTask({ task, onResult }: { task: Task; onResult: (correct: boole
             <p className="mt-1 text-sm italic text-muted-foreground">„{task.phrase.example.de}"</p>
             {close && <Badge variant="success" className="mt-2">Deine Antwort passt! 🎯</Badge>}
           </div>
-          <Button variant="gradient" className="w-full" onClick={() => onResult(true)}>
-            Weiter <ArrowRight className="h-4 w-4" />
-          </Button>
         </motion.div>
       )}
     </div>
