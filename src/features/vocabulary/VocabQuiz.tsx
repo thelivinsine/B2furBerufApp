@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, X, Sparkles, RotateCw, Trophy } from "lucide-react";
+import { Check, X, Sparkles, RotateCw, Trophy, ArrowRight } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -79,20 +79,32 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
       setScore((s) => s + 1);
       addXp(XP.quizCorrect);
     }
-    setTimeout(() => {
-      if (index + 1 >= total) {
-        registerSession();
-        showToast(`Quiz beendet: ${correct ? score + 1 : score}/${total}`, "success");
-        setDone(true);
-      } else {
-        setIndex((i) => i + 1);
-        setPicked(null);
-      }
-    }, 900);
   };
 
+  const next = () => {
+    if (!picked) return;
+    if (index + 1 >= total) {
+      registerSession();
+      showToast(`Quiz beendet: ${score}/${total}`, "success");
+      setDone(true);
+    } else {
+      setIndex((i) => i + 1);
+      setPicked(null);
+    }
+  };
+
+  // Allow advancing by tapping anywhere once the question has been answered —
+  // but ignore taps that land on an interactive control (choices, speak button).
+  const handleTapAnywhere = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!picked) return;
+    if ((e.target as HTMLElement).closest("button, a, input")) return;
+    next();
+  };
+
+  const wasCorrect = picked === q.item.en;
+
   return (
-    <div className="mx-auto max-w-2xl space-y-5">
+    <div className="mx-auto max-w-2xl space-y-5" onClick={handleTapAnywhere}>
       <div className="space-y-1.5">
         <div className="flex justify-between text-xs text-muted-foreground">
           <span>Frage {index + 1} von {total}</span>
@@ -139,6 +151,37 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
           );
         })}
       </div>
+
+      {picked && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-3"
+        >
+          <div
+            className={cn(
+              "rounded-xl border p-4 text-sm",
+              wasCorrect ? "border-success/40 bg-success/5" : "border-danger/40 bg-danger/5",
+            )}
+          >
+            <div className="flex items-center gap-2 font-medium">
+              {wasCorrect ? <Check className="h-4 w-4 text-success" /> : <X className="h-4 w-4 text-danger" />}
+              <span>{q.item.de} → {q.item.en}</span>
+              <SpeakButton text={q.item.de} className="ml-auto" />
+            </div>
+            {q.item.examples[0] && (
+              <p className="mt-2 text-muted-foreground">
+                <span className="italic">„{q.item.examples[0].de}"</span>
+                <span className="mt-0.5 block text-xs">{q.item.examples[0].en}</span>
+              </p>
+            )}
+          </div>
+          <Button variant="gradient" className="w-full" onClick={next}>
+            {index + 1 >= total ? "Quiz beenden" : "Weiter"} <ArrowRight className="h-4 w-4" />
+          </Button>
+          <p className="text-center text-xs text-muted-foreground">Tippe irgendwo, um fortzufahren</p>
+        </motion.div>
+      )}
     </div>
   );
 }
