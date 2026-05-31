@@ -43,10 +43,27 @@ This file is the single place to re-orient when resuming work. For the full desi
 - **Logo: reverted to placeholder** (Sparkles icon + original gradient speech-bubble favicon).
   A custom mark was tried and rolled back; founder will choose a logo later.
 
-### Phase 2 — Approved, NOT yet started (next milestone)
-- Supabase auth + cloud sync + AI writing eval, per `docs/EXPANSION_PLAN.md` §2A–2D.
-- **Blocked on founder action items below** (Supabase project + keys). Sandbox can't run Docker or
-  reach the live site, so final `supabase` CLI migration/deploy steps are handed to the founder.
+### Phase 2 — CODE COMPLETE, awaiting founder deploy steps ⏳ (on `claude/determined-euler-xUDrh`)
+- Supabase auth + cloud sync + AI writing eval, per `docs/EXPANSION_PLAN.md` §2A–2D — all written,
+  `npm run build` green. **Founder provided** the Supabase project (`stkfdavpjflpqoxjunnj`) +
+  publishable key (committed in `src/lib/supabaseConfig.ts`, safe — RLS) and an Anthropic key
+  (⚠️ pasted in chat → must be **rotated**; goes only into Supabase secrets, never the repo).
+- **2A schema (`supabase/`):** `config.toml` + migrations `0001_init.sql` (profiles/progress/
+  writing_evaluations/ai_usage, owner-only RLS, auto-provision trigger) and `0002_ai_usage_rpc.sql`
+  (atomic monthly counter). `profiles.tier` flag present (monetization-ready).
+- **2B auth + sync:** `@supabase/supabase-js` added; `src/lib/supabase.ts`, `useAuthStore`
+  (guest anon + email magic-link, guest→account upgrade via `updateUser`), `src/lib/cloudSync.ts`
+  (offline-first: localStorage stays cache, pull+MERGE on login, debounced write-through). Wired
+  into `App.tsx`; `features/auth/AccountPanel` shown in Settings.
+- **2C writing UI:** `/writing` route (`features/writing/WritingHub`), `data/writingPrompts.ts`
+  (short/long per theme), `lib/writing.ts` client; result shows ONE insight + "Üben" deep-link via
+  the `practiceAreas` registry. Added to Sidebar + Dashboard daily modules.
+- **2D edge function:** `supabase/functions/evaluate-writing/` — daily limit + monthly auto-shutoff
+  ($5 cap) + input-hash cache + LanguageTool pre-check (templated spelling path = no LLM) + ONE
+  Haiku call (Gemini/OpenAI fallback on hard fail only). Secrets via `supabase secrets set`.
+- **Remaining (founder, ~20 min):** run the CLI steps in **`docs/PHASE2_SETUP.md`** (link, db push,
+  enable anon sign-in + Turnstile, set secrets with the ROTATED key, deploy function), then verify.
+- Bundle is now ~1.41 MB (supabase-js); code-splitting still deferred.
 
 ## Decisions locked
 1. **Sequencing:** phase it, **content first**. Phase 1 = content + grammar + leveled quizzes
@@ -76,12 +93,15 @@ This file is the single place to re-orient when resuming work. For the full desi
   overkill for a single-insight output. Supabase supports anonymous sign-in, pgvector (unused),
   Edge Functions for secret-safe LLM calls from a static GitHub Pages SPA.
 
-## Founder action items (Phase 2 only — nothing needed for Phase 1)
-- [ ] Create a free Supabase project; share project URL + anon key.
-- [ ] Provide Anthropic (Claude) API key; optionally Gemini + OpenAI keys.
-- [ ] Get a hosted LanguageTool API key (free tier).
-- [ ] Decide the monthly AI spend ceiling.
-- [ ] Run the 2–3 `supabase` CLI commands I'll provide; confirm the live deploy.
+## Founder action items (Phase 2 deploy — full click-by-click in `docs/PHASE2_SETUP.md`)
+- [x] Create a Supabase project; share URL + publishable key. (`stkfdavpjflpqoxjunnj`, committed)
+- [x] Provide Anthropic (Claude) API key. (provided — ⚠️ **rotate it**, was pasted in chat)
+- [x] Decide the monthly AI spend ceiling. (**$5/month**, default in the function)
+- [ ] **Rotate the Anthropic key**, then `supabase secrets set ANTHROPIC_API_KEY=<new>`.
+- [ ] Run `supabase link` + `supabase db push` to apply the schema.
+- [ ] Enable Anonymous sign-in + Turnstile CAPTCHA; set the Site URL.
+- [ ] (Optional) Get a hosted LanguageTool key (free tier) + set it as a secret.
+- [ ] `supabase functions deploy evaluate-writing`; smoke-test per the setup doc.
 
 ## Deploy / workflow reminders
 - `main` is production; merging to it triggers `pages.yml`. Develop on
@@ -91,10 +111,10 @@ This file is the single place to re-orient when resuming work. For the full desi
   here) — those steps are handed to the founder, same as the Pages deploy.
 
 ## Resume here (next session)
-**Phase 1 is shipped, live, and founder-verified.** Next milestone = **Phase 2** per
-`docs/EXPANSION_PLAN.md` §2A–2D (Supabase project + schema → auth + cloud sync → `/writing` route →
-evaluate-writing Edge Function). Phase 2 is **gated on the founder action items above**; until those
-land, options are: (a) scaffold Phase 2 code + write the founder setup checklist, or (b) polish
-Phase 1 — more collocations/theme, a Collocations browser tab, code-split the ~1.18 MB JS bundle.
-The `PracticeArea` registry (`src/data/practiceAreas.ts`) is already wired for the writing-coach
-"Üben" deep-links. Logo still TBD by founder.
+**Phase 2 is CODE COMPLETE on `claude/determined-euler-xUDrh`** (build green) and waiting on the
+founder to run the deploy steps in **`docs/PHASE2_SETUP.md`** (link → db push → enable anon+CAPTCHA
+→ set the ROTATED Anthropic key → deploy function → smoke-test). Nothing else is blocked on code.
+Once the founder confirms the function works end-to-end, ship via squash-merge PR into `main`.
+After that, candidate next work: (a) Turnstile token wiring on the client guest button if abuse
+shows up, (b) writing history view from `writing_evaluations`, (c) code-split the ~1.41 MB bundle,
+(d) more collocations/theme + a Collocations browser tab. Logo still TBD by founder.
