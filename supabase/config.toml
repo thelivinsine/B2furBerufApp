@@ -1,0 +1,35 @@
+# Supabase local/project config for Sprechfit.
+# Project ref is set when you run `supabase link --project-ref stkfdavpjflpqoxjunnj`.
+project_id = "sprechfit"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+# Update to your live site once deployed (used for email/OAuth redirects).
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173"]
+jwt_expiry = 3600
+enable_signup = true
+
+# Anonymous (guest) sign-in. CAPTCHA/Turnstile should be enabled in the
+# hosted dashboard (Auth → Settings) before going public to deter bot abuse.
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[functions.evaluate-writing]
+verify_jwt = true
