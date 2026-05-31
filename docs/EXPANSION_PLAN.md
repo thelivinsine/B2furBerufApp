@@ -1,7 +1,7 @@
 # B2 Beruf App — Feature Expansion Plan (Grammar, Quizzes, Auth + AI Writing)
 
-> Status: **APPROVED, not yet implemented.** Phase 1 is the next work to start.
-> Working branch: `claude/determined-euler-xUDrh`. See `docs/PROJECT_STATUS.md` for live status.
+> Status: **FULLY SHIPPED** — Phase 1 live 2026-05-30, Phase 2 live 2026-05-31, both founder-verified.
+> Working branch: `claude/determined-euler-xUDrh`. See `docs/PROJECT_STATUS.md` for live status and next steps.
 
 ## Context
 The original app shipped and is live: a polished client-side SPA (onboarding, dashboard,
