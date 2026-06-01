@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Flame, Zap } from "lucide-react";
+import { Menu, Flame, Zap, Sparkles } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,17 @@ export function AppShell() {
               >
                 <Menu className="h-5 w-5" />
               </Button>
-              <p className="hidden text-sm text-muted-foreground sm:block">
+              <Link
+                to="/welcome"
+                className="flex items-center gap-2 lg:hidden"
+                aria-label="Zur Startseite"
+              >
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-gradient text-white shadow-glow">
+                  <Sparkles className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-semibold tracking-tight">Sprechfit</span>
+              </Link>
+              <p className="hidden text-sm text-muted-foreground lg:block">
                 Willkommen zurück 👋
               </p>
             </div>
