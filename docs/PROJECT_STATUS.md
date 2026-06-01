@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-05-30. Branch: `claude/determined-euler-xUDrh`. Product name: **Sprechfit**._
+_Last updated: 2026-05-31 (session 2). Branch: `claude/determined-euler-xUDrh`. Product name: **Sprechfit**._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -43,26 +43,30 @@ This file is the single place to re-orient when resuming work. For the full desi
 - **Logo: reverted to placeholder** (Sparkles icon + original gradient speech-bubble favicon).
   A custom mark was tried and rolled back; founder will choose a logo later.
 
-### Phase 2 — CODE COMPLETE, awaiting founder deploy steps ⏳ (on `claude/determined-euler-xUDrh`)
-- Supabase auth + cloud sync + AI writing eval, per `docs/EXPANSION_PLAN.md` §2A–2D — all written,
-  `npm run build` green. **Founder provided** the Supabase project (`stkfdavpjflpqoxjunnj`) +
-  publishable key (committed in `src/lib/supabaseConfig.ts`, safe — RLS) and an Anthropic key
-  (⚠️ pasted in chat → must be **rotated**; goes only into Supabase secrets, never the repo).
-- **2A schema (`supabase/`):** `config.toml` + migrations `0001_init.sql` (profiles/progress/
-  writing_evaluations/ai_usage, owner-only RLS, auto-provision trigger) and `0002_ai_usage_rpc.sql`
-  (atomic monthly counter). `profiles.tier` flag present (monetization-ready).
-- **2B auth + sync:** `@supabase/supabase-js` added; `src/lib/supabase.ts`, `useAuthStore`
-  (guest anon + email magic-link, guest→account upgrade via `updateUser`), `src/lib/cloudSync.ts`
-  (offline-first: localStorage stays cache, pull+MERGE on login, debounced write-through). Wired
-  into `App.tsx`; `features/auth/AccountPanel` shown in Settings.
-- **2C writing UI:** `/writing` route (`features/writing/WritingHub`), `data/writingPrompts.ts`
-  (short/long per theme), `lib/writing.ts` client; result shows ONE insight + "Üben" deep-link via
-  the `practiceAreas` registry. Added to Sidebar + Dashboard daily modules.
-- **2D edge function:** `supabase/functions/evaluate-writing/` — daily limit + monthly auto-shutoff
-  ($5 cap) + input-hash cache + LanguageTool pre-check (templated spelling path = no LLM) + ONE
-  Haiku call (Gemini/OpenAI fallback on hard fail only). Secrets via `supabase secrets set`.
-- **Remaining (founder, ~20 min):** run the CLI steps in **`docs/PHASE2_SETUP.md`** (link, db push,
-  enable anon sign-in + Turnstile, set secrets with the ROTATED key, deploy function), then verify.
+### Phase 2 — SHIPPED & LIVE ✅ (squash-merged to `main` 2026-05-31, founder-verified)
+- Supabase auth + cloud sync + AI writing eval fully deployed and smoke-tested by founder.
+- **Supabase project:** `stkfdavpjflpqoxjunnj`. Publishable key committed in
+  `src/lib/supabaseConfig.ts` (safe — all tables owner-only RLS). Service-role key and Anthropic
+  key live only in Supabase Edge Function secrets (never in the repo or browser).
+- **2A schema:** applied via Supabase dashboard SQL editor — `profiles`, `progress`,
+  `writing_evaluations`, `ai_usage`, owner-only RLS, auto-provision trigger on auth.users,
+  `bump_ai_usage` atomic RPC. `profiles.tier` flag present (monetization-ready).
+- **2B auth + sync:** `useAuthStore` (guest anon sign-in + email magic-link); `cloudSync.ts`
+  (offline-first: localStorage stays cache, pull+MERGE on login, debounced write-through).
+  `AccountPanel` shown in Settings. **Guest sign-in works and is the primary path.**
+  Email sign-in works when clicked through but has rate-limit issues on Supabase's free SMTP
+  (fix: add Resend SMTP in Auth settings — deferred).
+- **2C writing UI:** `/writing` route live; short/long tasks per theme; one insight card + "Üben"
+  deep-link via `practiceAreas` registry. Added to Sidebar + Dashboard daily modules.
+- **2D edge function:** `evaluate-writing` deployed via Supabase dashboard code editor (NOT CLI —
+  sandbox network blocks `api.supabase.com`). Daily limit (5/day) + monthly auto-shutoff ($5 cap)
+  + input-hash cache + LanguageTool pre-check (templated spelling path = no LLM cost) + one Haiku
+  call fallback chain. **Verified working end-to-end** — founder test returned correct spelling
+  insight with "Rechtschreibung üben" deep-link.
+- **Known deployment quirk:** the Supabase dashboard pre-fills a "Hello [name]!" boilerplate when
+  creating a function. Must select-all-delete before pasting the real code. Caught and fixed.
+- **Anthropic key:** ⚠️ the original key was pasted in chat — founder should rotate it at
+  console.anthropic.com and update the secret in Supabase Edge Functions → Secrets.
 - Bundle is now ~1.41 MB (supabase-js); code-splitting still deferred.
 
 ## Decisions locked
@@ -93,15 +97,20 @@ This file is the single place to re-orient when resuming work. For the full desi
   overkill for a single-insight output. Supabase supports anonymous sign-in, pgvector (unused),
   Edge Functions for secret-safe LLM calls from a static GitHub Pages SPA.
 
-## Founder action items (Phase 2 deploy — full click-by-click in `docs/PHASE2_SETUP.md`)
+## Founder action items
 - [x] Create a Supabase project; share URL + publishable key. (`stkfdavpjflpqoxjunnj`, committed)
-- [x] Provide Anthropic (Claude) API key. (provided — ⚠️ **rotate it**, was pasted in chat)
-- [x] Decide the monthly AI spend ceiling. (**$5/month**, default in the function)
-- [ ] **Rotate the Anthropic key**, then `supabase secrets set ANTHROPIC_API_KEY=<new>`.
-- [ ] Run `supabase link` + `supabase db push` to apply the schema.
-- [ ] Enable Anonymous sign-in + Turnstile CAPTCHA; set the Site URL.
-- [ ] (Optional) Get a hosted LanguageTool key (free tier) + set it as a secret.
-- [ ] `supabase functions deploy evaluate-writing`; smoke-test per the setup doc.
+- [x] Provide Anthropic (Claude) API key. (set in Supabase secrets as `ANTHROPIC_API_KEY`)
+- [x] Decide the monthly AI spend ceiling. (**$5/month**, enforced in the function)
+- [x] Apply schema via SQL editor. (done 2026-05-31)
+- [x] Enable Anonymous sign-in. (done; email also enabled)
+- [x] Set Site URL in Auth settings. (done)
+- [x] Deploy `evaluate-writing` function via dashboard code editor. (done 2026-05-31)
+- [x] Smoke-test end-to-end. (✅ working — spelling insight returned correctly)
+- [ ] **Rotate the Anthropic key** (was pasted in chat) — generate new key at console.anthropic.com,
+      update in Supabase Edge Functions → Secrets → `ANTHROPIC_API_KEY`.
+- [ ] (Optional) Add Resend SMTP to fix email magic-link rate-limit. Auth → SMTP settings.
+- [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
+- [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 
 ## Deploy / workflow reminders
 - `main` is production; merging to it triggers `pages.yml`. Develop on
@@ -110,11 +119,56 @@ This file is the single place to re-orient when resuming work. For the full desi
 - Sandbox can't reach the live site or run Docker (so no local Supabase / no live verification
   here) — those steps are handed to the founder, same as the Pages deploy.
 
+## Deploy / ops notes (accumulated)
+- `main` is production; merging triggers `pages.yml`. Develop on `claude/determined-euler-xUDrh`;
+  ship via squash-merge PR. **Always verify `npm run build` green before merging.**
+- Sandbox cannot reach `api.supabase.com` or `db.*.supabase.co:5432` — CLI migrations and function
+  deploys must be done by the founder (dashboard SQL editor + dashboard function code editor work
+  fine as alternatives).
+- Edge Function deployment via dashboard: create function → dashboard pre-fills boilerplate →
+  **select-all-delete first**, then paste code → Deploy.
+- Email magic-links on Supabase free plan are rate-limited (~2/hour). Fix: add Resend (free tier)
+  as custom SMTP in Auth → SMTP settings. Guest sign-in has no such limit and is the primary path.
+
+### UX polish — Quiz answer-reflect flow (PR #14, pending merge)
+- **Problem:** `VocabQuiz` and `RedemittelPractice` auto-advanced to the next question after
+  selecting an answer (900ms / 700–1100ms timeouts), giving no time to reflect.
+- **Fix (branch `claude/determined-euler-xUDrh`, PR #14):**
+  - Removed all `setTimeout` auto-advances from both components.
+  - After selecting an answer the question stays on screen with instant colour feedback.
+  - A `Weiter` / `Quiz beenden` button appears, plus a "tap anywhere" affordance (taps on
+    interactive controls are ignored to avoid double-advance).
+  - `VocabQuiz` feedback panel also shows the word's translation and an example sentence.
+  - `RedemittelPractice`: split `advance()` into `recordResult()` + `next()`; the parent
+    now owns the single `Weiter` button for all three task types (choose / construct / respond);
+    the `RespondTask` inner advance button was removed.
+  - All other quiz surfaces (`QuizRunner`, grammar drills, flashcards, quick revision)
+    already required explicit action — so the whole app is now consistent.
+  - `npm run build` passes. Deploy pending founder squash-merge of PR #14.
+
 ## Resume here (next session)
-**Phase 2 is CODE COMPLETE on `claude/determined-euler-xUDrh`** (build green) and waiting on the
-founder to run the deploy steps in **`docs/PHASE2_SETUP.md`** (link → db push → enable anon+CAPTCHA
-→ set the ROTATED Anthropic key → deploy function → smoke-test). Nothing else is blocked on code.
-Once the founder confirms the function works end-to-end, ship via squash-merge PR into `main`.
-After that, candidate next work: (a) Turnstile token wiring on the client guest button if abuse
-shows up, (b) writing history view from `writing_evaluations`, (c) code-split the ~1.41 MB bundle,
-(d) more collocations/theme + a Collocations browser tab. Logo still TBD by founder.
+**Both Phase 1 and Phase 2 are SHIPPED and LIVE on `main`.** The full platform is working:
+vocabulary/grammar/quiz/simulation/exam (Phase 1) + guest auth + cloud sync + AI writing coach
+(Phase 2). All founder-verified.
+
+**PR #14 open** — "Quiz: keep feedback on screen, advance via Next button or tap." Merge it to
+ship the answer-reflect UX polish. `npm run build` is green. Sandbox can't verify the live site
+so the founder confirms post-merge.
+
+**Pending housekeeping (low urgency):**
+- Rotate the Anthropic key (was pasted in chat) — 2 min at console.anthropic.com.
+- Add Resend SMTP to fix email magic-link rate-limit.
+- Enable Turnstile CAPTCHA before public launch.
+
+**Candidate next features (pick one):**
+- (a) **Writing history view** — surface past evaluations from `writing_evaluations` table; show
+  streak of weaknesses so learner sees their improvement over time.
+- (b) **Collocations browser tab** — dedicated browse/filter UI for the 68 Nomen-Verb pairs,
+  accessible from Vocabulary or Grammar.
+- (c) **Code-split the bundle** — dynamic imports for heavy routes (exam, simulation) to cut the
+  ~1.41 MB initial load.
+- (d) **More content** — expand collocations (~6→10/theme), add more grammar drills, grow vocab
+  toward 350 words.
+- (e) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
+- (f) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
+  AI evaluations (currently 5/day free for all).
