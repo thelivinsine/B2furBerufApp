@@ -36,6 +36,16 @@ React + TypeScript + Vite SPA, deployed to GitHub Pages.
 - Development branch for this work: **`claude/determined-euler-xUDrh`**. Ship to production by opening a PR into `main` and merging (squash) — the merge triggers `pages.yml`.
 - **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `npm run build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.
 
+### Post-deploy GitHub housekeeping (REQUIRED after every squash-merge)
+Squash-merging rewrites history: `main` gets one new commit while the long-lived dev branch still holds the original unsquashed commits, so they diverge and the **next** PR conflicts (this bit us on PR #23). Run this realignment **every time** right after a merge:
+1. `git fetch origin main`
+2. `git checkout claude/determined-euler-xUDrh`
+3. `git reset --hard origin/main` — make the dev branch identical to production.
+4. `git push --force-with-lease origin claude/determined-euler-xUDrh` — `--force-with-lease` (never plain `--force`); safe because this is the sole dedicated automation branch with no other contributors.
+5. Confirm `git status` shows the branch level with `origin/main` and the working tree clean.
+
+Also: don't pre-write the next PR's `_Last updated`/log entry against a stale branch — realign first, then make new edits. The founder still verifies the live result; the sandbox can't reach the `*.github.io` site or the Actions tab.
+
 ## Roadmap & status (read these when resuming)
 - **`docs/PROJECT_STATUS.md`** — current status, all locked decisions, research findings, and the
   "resume here" pointer. Start here.
