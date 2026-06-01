@@ -11,6 +11,11 @@ export const supabase: SupabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
+    // PKCE returns the OAuth result as a `?code=` query param. The default
+    // implicit flow returns tokens in the URL *hash*, which collides with our
+    // HashRouter (it rewrites the hash to a route on load and wipes the tokens
+    // before they can be read) — so Google sign-in never establishes a session.
+    flowType: "pkce",
   },
 });
 
