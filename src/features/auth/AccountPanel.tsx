@@ -1,35 +1,27 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
-import { Cloud, CloudOff, LogOut, Mail, UserCircle2, Check } from "lucide-react";
+import { Cloud, CloudOff, LogOut, UserCircle2 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useSessionStore } from "@/store/useSessionStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { AuthDialog, type AuthIntent } from "@/features/auth/AuthDialog";
 
 /**
- * Account / cloud-sync panel. Guest-first: the learner can keep using the app
- * with no account (local only). Signing in as a guest or adding an email turns
- * on cross-device cloud sync. Adding an email to a guest upgrades the SAME
- * account, so progress is preserved.
+ * Account / cloud-sync panel in Settings. Guest-first: the learner can keep
+ * using the app with no account (local only). Creating an account (email +
+ * password, or Google) turns on cross-device cloud sync; upgrading a guest
+ * preserves progress.
  */
 export function AccountPanel() {
-  const { status, user, busy, signInAsGuest, sendMagicLink, signOut } = useAuthStore();
-  const showToast = useSessionStore((s) => s.showToast);
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-
-  const handleMagicLink = async () => {
-    if (!email.trim()) return;
-    const { ok } = await sendMagicLink(email.trim());
-    if (ok) {
-      setSent(true);
-      showToast("Link gesendet – prüfe dein E-Mail-Postfach.", "success");
-    } else {
-      showToast("E-Mail konnte nicht gesendet werden.", "warning");
-    }
-  };
+  const { status, user, busy, signInAsGuest, signOut } = useAuthStore();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [intent, setIntent] = useState<AuthIntent>("signup");
 
   const syncing = status === "anonymous" || status === "signedIn";
+
+  const openAuth = (i: AuthIntent) => {
+    setIntent(i);
+    setAuthOpen(true);
+  };
 
   return (
     <Card>
@@ -39,9 +31,7 @@ export function AccountPanel() {
           <span
             className={
               "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium " +
-              (syncing
-                ? "bg-success/10 text-success"
-                : "bg-muted text-muted-foreground")
+              (syncing ? "bg-success/10 text-success" : "bg-muted text-muted-foreground")
             }
           >
             {syncing ? <Cloud className="h-3.5 w-3.5" /> : <CloudOff className="h-3.5 w-3.5" />}
@@ -58,47 +48,25 @@ export function AccountPanel() {
         ) : (
           <p className="text-sm text-muted-foreground">
             {status === "anonymous"
-              ? "Du bist als Gast angemeldet – dein Fortschritt wird in der Cloud gesichert. Füge eine E-Mail hinzu, um dich auf weiteren Geräten anzumelden."
-              : "Melde dich an, um deinen Fortschritt geräteübergreifend zu sichern. Kein Konto nötig – starte als Gast."}
+              ? "Du bist als Gast unterwegs – dein Fortschritt liegt in der Cloud. Erstelle ein Konto, um dich auf weiteren Geräten anzumelden."
+              : "Erstelle ein Konto, um deinen Fortschritt geräteübergreifend zu sichern. Kein Konto nötig – du kannst auch als Gast weitermachen."}
           </p>
         )}
 
-        {/* Email upgrade / sign-in */}
-        {status !== "signedIn" && (
-          <div className="space-y-2">
-            <label className="text-sm font-medium">E-Mail</label>
-            <div className="flex gap-2">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setSent(false);
-                }}
-                placeholder="du@beispiel.de"
-                className="h-10 flex-1 rounded-lg border border-input bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
-              />
-              <Button onClick={handleMagicLink} disabled={busy || !email.trim()}>
-                {sent ? <Check className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
-                {sent ? "Gesendet" : "Link senden"}
+        <div className="flex flex-wrap gap-2 border-t border-border pt-3">
+          {status !== "signedIn" && (
+            <>
+              <Button variant="gradient" onClick={() => openAuth("signup")} disabled={busy}>
+                Konto erstellen
               </Button>
-            </div>
-            {sent && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-xs text-muted-foreground"
-              >
-                Wir haben dir einen Anmeldelink geschickt. Öffne ihn auf diesem Gerät.
-              </motion.p>
-            )}
-          </div>
-        )}
-
-        <div className="flex gap-2 border-t border-border pt-3">
+              <Button variant="outline" onClick={() => openAuth("login")} disabled={busy}>
+                Anmelden
+              </Button>
+            </>
+          )}
           {status === "signedOut" && (
-            <Button variant="outline" onClick={signInAsGuest} disabled={busy}>
-              Als Gast starten
+            <Button variant="ghost" onClick={signInAsGuest} disabled={busy}>
+              Als Gast fortfahren
             </Button>
           )}
           {syncing && (
@@ -109,6 +77,8 @@ export function AccountPanel() {
           )}
         </div>
       </CardContent>
+
+      <AuthDialog open={authOpen} onOpenChange={setAuthOpen} intent={intent} />
     </Card>
   );
 }

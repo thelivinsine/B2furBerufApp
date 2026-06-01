@@ -1,6 +1,7 @@
 import React from "react";
 import { createHashRouter, Navigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
+import { LandingPage } from "@/features/landing/LandingPage";
 import { Onboarding } from "@/features/onboarding/Onboarding";
 import { Dashboard } from "@/features/dashboard/Dashboard";
 import { VocabularyTrainer } from "@/features/vocabulary/VocabularyTrainer";
@@ -24,6 +25,10 @@ function RequireOnboarding({ children }: { children: React.ReactNode }) {
 export const router = createHashRouter([
   {
     path: "/welcome",
+    element: <LandingPage />,
+  },
+  {
+    path: "/start",
     element: <Onboarding />,
   },
   {

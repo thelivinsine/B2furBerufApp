@@ -11,6 +11,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { levelFromXp } from "@/engine/scoring";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { Toaster } from "./Toaster";
+import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { cn } from "@/lib/utils";
 
 export function AppShell() {
@@ -76,6 +77,7 @@ export function AppShell() {
         </header>
 
         <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+          <SaveProgressBanner />
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}>
               <Outlet />

@@ -15,8 +15,13 @@ interface AuthState {
 
   init: () => void;
   signInAsGuest: () => Promise<void>;
-  /** Send a magic-link / OTP to the given email. */
-  sendMagicLink: (email: string) => Promise<{ ok: boolean }>;
+  /** Create an account with email + password (instant, no email round-trip
+   *  when "Confirm email" is disabled in Supabase). Upgrades a guest in place. */
+  signUp: (email: string, password: string) => Promise<{ ok: boolean }>;
+  /** Sign in with an existing email + password. */
+  signIn: (email: string, password: string) => Promise<{ ok: boolean }>;
+  /** One-click sign-in via Google OAuth (redirect flow). */
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
 }
@@ -24,6 +29,18 @@ interface AuthState {
 function statusFor(user: User | null): AuthStatus {
   if (!user) return "signedOut";
   return user.is_anonymous ? "anonymous" : "signedIn";
+}
+
+/** Turn common Supabase auth errors into friendly German copy. */
+function friendlyError(message: string): string {
+  const m = message.toLowerCase();
+  if (m.includes("invalid login credentials")) return "E-Mail oder Passwort ist falsch.";
+  if (m.includes("already registered") || m.includes("already been registered"))
+    return "Diese E-Mail ist bereits registriert. Melde dich an.";
+  if (m.includes("email not confirmed")) return "Bitte bestätige zuerst deine E-Mail.";
+  if (m.includes("password")) return "Das Passwort muss mindestens 6 Zeichen haben.";
+  if (m.includes("rate limit") || m.includes("too many")) return "Zu viele Versuche. Bitte warte kurz.";
+  return message;
 }
 
 let initialised = false;
@@ -64,22 +81,35 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ busy: false });
   },
 
-  sendMagicLink: async (email) => {
+  signUp: async (email, password) => {
     set({ busy: true, error: null });
-    // If a guest is signed in, link the email to the SAME uid so progress
-    // survives the guest→account upgrade.
+    // If a guest is signed in, attach email + password to the SAME uid so the
+    // guest's progress is preserved as a permanent account.
     const current = get().user;
     let error;
     if (current?.is_anonymous) {
-      ({ error } = await supabase.auth.updateUser({ email }));
+      ({ error } = await supabase.auth.updateUser({ email, password }));
     } else {
-      ({ error } = await supabase.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: window.location.origin + window.location.pathname },
-      }));
+      ({ error } = await supabase.auth.signUp({ email, password }));
     }
-    set({ busy: false, error: error ? error.message : null });
+    set({ busy: false, error: error ? friendlyError(error.message) : null });
     return { ok: !error };
+  },
+
+  signIn: async (email, password) => {
+    set({ busy: true, error: null });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    set({ busy: false, error: error ? friendlyError(error.message) : null });
+    return { ok: !error };
+  },
+
+  signInWithGoogle: async () => {
+    set({ busy: true, error: null });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: window.location.origin + window.location.pathname },
+    });
+    if (error) set({ error: friendlyError(error.message), busy: false });
   },
 
   signOut: async () => {
