@@ -14,11 +14,12 @@ import { useSessionStore } from "@/store/useSessionStore";
 export type AuthIntent = "signup" | "login";
 
 /**
- * Toggle for the "Weiter mit Google" button. Off until the Google OAuth
- * provider is configured in Supabase + Google Cloud — flip to `true` once
- * the Client ID / Secret are saved in the Supabase Google provider settings.
+ * Toggle for the "Weiter mit Google" button. Turned on once the Google OAuth
+ * provider is configured in Supabase + Google Cloud (Client ID / Secret saved
+ * in the Supabase Google provider settings). See docs/PHASE2_SETUP.md §8 for
+ * the exact setup steps and redirect URLs.
  */
-const GOOGLE_ENABLED = false;
+const GOOGLE_ENABLED = true;
 
 /**
  * Email + password sign-up / log-in dialog. Instant and in-app (no email
