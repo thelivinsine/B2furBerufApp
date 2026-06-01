@@ -124,6 +124,10 @@ This file is the single place to re-orient when resuming work. For the full desi
   "I don't see any change" because the dark-mode commits were pushed to the branch but never merged.
   **Auto-ship preference (founder approved 2026-06-01): when a change is done and the build is green,
   open + squash-merge the PR yourself without asking** — see CLAUDE.md.
+- **REQUIRED post-deploy housekeeping (after every squash-merge):** realign the dev branch so it
+  doesn't drift and conflict on the next PR — `git fetch origin main` → `git reset --hard origin/main`
+  → `git push --force-with-lease origin claude/determined-euler-xUDrh`. (Forgetting this caused the
+  PR #23 merge conflict.) Full checklist in CLAUDE.md → "Post-deploy GitHub housekeeping".
 - Sandbox can't reach the live site or run Docker (so no local Supabase / no live verification
   here) — those steps are handed to the founder, same as the Pages deploy.
 
