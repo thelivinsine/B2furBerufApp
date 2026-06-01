@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import {
   LayoutDashboard,
   BookOpen,
@@ -32,7 +32,12 @@ const nav = [
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col gap-1 p-4">
-      <div className="mb-4 flex items-center gap-2.5 px-2 py-2">
+      <Link
+        to="/welcome"
+        onClick={onNavigate}
+        className="mb-4 flex items-center gap-2.5 rounded-xl px-2 py-2 transition-colors hover:bg-muted/60"
+        aria-label="Zur Startseite"
+      >
         <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-gradient text-white shadow-glow">
           <Sparkles className="h-5 w-5" />
         </div>
@@ -40,7 +45,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           <p className="text-sm font-semibold tracking-tight">Sprechfit</p>
           <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
         </div>
-      </div>
+      </Link>
 
       <nav className="flex flex-col gap-0.5">
         {nav.map(({ to, label, icon: Icon, end }) => (
