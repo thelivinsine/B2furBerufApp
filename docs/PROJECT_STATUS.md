@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-05-31 (session 2). Branch: `claude/determined-euler-xUDrh`. Product name: **Sprechfit**._
+_Last updated: 2026-05-31 (session 2). Branch: `claude/determined-euler-xUDrh`. Product name: **Deutschfit**._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -38,7 +38,7 @@ This file is the single place to re-orient when resuming work. For the full desi
   Pages site; `npm run build` green; no duplicate ids.
 
 ### Branding — DONE (live)
-- App renamed to **Sprechfit**, tagline **"Deutsch im Beruf · B2 Prüfung"** (sidebar, onboarding,
+- App renamed to **Deutschfit**, tagline **"Deutsch im Beruf · B2 Prüfung"** (sidebar, onboarding,
   `<title>`/meta, `package.json` name `sprechfit`).
 - **Logo: reverted to placeholder** (Sparkles icon + original gradient speech-bubble favicon).
   A custom mark was tried and rolled back; founder will choose a logo later.

@@ -1,6 +1,6 @@
 // Supabase Edge Function: evaluate-writing
 // ---------------------------------------------------------------------------
-// Cost-guarded AI writing evaluator for Sprechfit.
+// Cost-guarded AI writing evaluator for Deutschfit.
 //
 //   1. Auth + per-user daily limit + global monthly spend auto-shutoff.
 //   2. Cache lookup by input_hash of the normalized text (free on hit).

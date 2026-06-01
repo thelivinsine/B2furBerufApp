@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Sprechfit — Deutsch im Beruf. Premium interactive prep platform for the Goethe/telc Deutsch B2 Beruf speaking exam.",
+  "description": "Deutschfit — Deutsch im Beruf. Premium interactive prep platform for the Goethe/telc Deutsch B2 Beruf speaking exam.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
