@@ -42,7 +42,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           <Sparkles className="h-5 w-5" />
         </div>
         <div className="leading-tight">
-          <p className="text-sm font-semibold tracking-tight">Sprechfit</p>
+          <p className="text-sm font-semibold tracking-tight">Deutschfit</p>
           <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
         </div>
       </Link>

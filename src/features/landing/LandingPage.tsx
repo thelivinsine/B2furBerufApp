@@ -75,7 +75,7 @@ export function LandingPage() {
             <Sparkles className="h-5 w-5" />
           </div>
           <div className="leading-tight">
-            <p className="text-lg font-semibold tracking-tight">Sprechfit</p>
+            <p className="text-lg font-semibold tracking-tight">Deutschfit</p>
             <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
           </div>
         </div>
@@ -208,7 +208,7 @@ export function LandingPage() {
       </section>
 
       <footer className="relative z-10 border-t border-border py-6 text-center text-xs text-muted-foreground">
-        Sprechfit · Deutsch im Beruf · B2 Prüfung
+        Deutschfit · Deutsch im Beruf · B2 Prüfung
       </footer>
 
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} intent={intent} />
