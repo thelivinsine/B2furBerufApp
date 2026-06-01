@@ -14,10 +14,18 @@ import { useSessionStore } from "@/store/useSessionStore";
 export type AuthIntent = "signup" | "login";
 
 /**
+ * Toggle for the "Weiter mit Google" button. Off until the Google OAuth
+ * provider is configured in Supabase + Google Cloud — flip to `true` once
+ * the Client ID / Secret are saved in the Supabase Google provider settings.
+ */
+const GOOGLE_ENABLED = false;
+
+/**
  * Email + password sign-up / log-in dialog. Instant and in-app (no email
  * round-trip) as long as "Confirm email" is disabled in Supabase. A guest's
  * progress is preserved when they upgrade (the email is attached to the same
- * account). Google one-click sign-in is offered as an alternative.
+ * account). Google one-click sign-in is offered as an alternative once
+ * `GOOGLE_ENABLED` is turned on.
  */
 export function AuthDialog({
   open,
@@ -72,18 +80,22 @@ export function AuthDialog({
         </DialogHeader>
 
         <div className="space-y-3">
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={signInWithGoogle}
-            disabled={busy}
-          >
-            <GoogleIcon /> Weiter mit Google
-          </Button>
+          {GOOGLE_ENABLED && (
+            <>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={signInWithGoogle}
+                disabled={busy}
+              >
+                <GoogleIcon /> Weiter mit Google
+              </Button>
 
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span className="h-px flex-1 bg-border" /> oder <span className="h-px flex-1 bg-border" />
-          </div>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="h-px flex-1 bg-border" /> oder <span className="h-px flex-1 bg-border" />
+              </div>
+            </>
+          )}
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium">E-Mail</label>
