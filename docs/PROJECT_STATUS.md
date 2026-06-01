@@ -204,6 +204,13 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
     now bright semibold `text-foreground` on `bg-primary/20`. Light mode untouched.
 - **Process lesson:** founder "saw no change" because the work was on the feature branch, not `main`.
   Going forward, **auto-ship**: open + squash-merge the PR once the build is green (see CLAUDE.md).
+- **Flashcard rating colors (PR #22, merged & live):** the SRS rating buttons in
+  `features/vocabulary/Flashcards.tsx` had the two middle options ("Schwer", "Gut") in grey, which
+  read as disabled next to red "Nochmal" / green "Einfach". Added reusable **`warning` (amber)** and
+  **`info` (teal)** variants to the shared `Button` (`components/ui/button.tsx`), using the existing
+  `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
+  Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
+  was already fine.)
 
 ## Resume here (next session)
 **Both Phase 1 and Phase 2 are SHIPPED and LIVE on `main`**, plus the session-3 auth-honesty fix and
