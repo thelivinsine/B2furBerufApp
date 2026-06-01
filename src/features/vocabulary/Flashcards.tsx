@@ -13,10 +13,10 @@ import { isDue, masteryLabel, mastery } from "@/engine/srs";
 import { XP } from "@/engine/scoring";
 import { shuffle } from "@/lib/utils";
 
-const grades: { grade: Grade; label: string; variant: "danger" | "outline" | "secondary" | "success" }[] = [
+const grades: { grade: Grade; label: string; variant: "danger" | "warning" | "info" | "success" }[] = [
   { grade: 0, label: "Nochmal", variant: "danger" },
-  { grade: 3, label: "Schwer", variant: "outline" },
-  { grade: 4, label: "Gut", variant: "secondary" },
+  { grade: 3, label: "Schwer", variant: "warning" },
+  { grade: 4, label: "Gut", variant: "info" },
   { grade: 5, label: "Einfach", variant: "success" },
 ];
 
