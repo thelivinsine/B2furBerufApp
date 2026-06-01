@@ -130,6 +130,24 @@ This file is the single place to re-orient when resuming work. For the full desi
 - Email magic-links on Supabase free plan are rate-limited (~2/hour). Fix: add Resend (free tier)
   as custom SMTP in Auth → SMTP settings. Guest sign-in has no such limit and is the primary path.
 
+### Landing page + visible auth (branch `claude/determined-euler-xUDrh`)
+- **Why:** auth was fully built but invisible (Settings-only, no login UI), so it "seemed not in
+  place." Founder asked for a real marketing landing page with top-right Login / Sign-up, guest
+  use still allowed, and an active nudge to save progress.
+- **What shipped (all client-side, passwordless magic-link backend already live):**
+  - `features/landing/LandingPage.tsx` — hero + feature grid + closing CTA; top-right
+    `Anmelden` (login) and `Kostenlos starten`. Redirects onboarded users to `/`.
+  - **Routing:** `/welcome` now = LandingPage; onboarding moved to `/start`. `RequireOnboarding`
+    still redirects un-onboarded users to `/welcome`.
+  - `features/auth/AuthDialog.tsx` — reusable sign-up/login modal (email magic-link; links email
+    to an existing guest uid to preserve progress). Used by landing + nudge.
+  - `features/auth/SaveProgressBanner.tsx` — dismissible in-app nudge (shown to guests /
+    signed-out) inviting sign-in; wired into `AppShell` above the page outlet.
+  - Existing `AccountPanel` in Settings retained for account management / sign-out.
+  - Auth remains **passwordless** (email magic-link), matching the deployed Supabase backend.
+    Switching to password auth would be a backend change (deferred unless founder asks).
+  - `npm run build` green.
+
 ### UX polish — Quiz answer-reflect flow (PR #14, pending merge)
 - **Problem:** `VocabQuiz` and `RedemittelPractice` auto-advanced to the next question after
   selecting an answer (900ms / 700–1100ms timeouts), giving no time to reflect.
