@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Sparkles,
@@ -56,15 +56,13 @@ export function LandingPage() {
   const [authOpen, setAuthOpen] = useState(false);
   const [intent, setIntent] = useState<AuthIntent>("signup");
 
-  // Returning learners already set up → straight to the app.
-  if (onboarded) return <Navigate to="/" replace />;
-
   const openAuth = (i: AuthIntent) => {
     setIntent(i);
     setAuthOpen(true);
   };
 
   const start = () => navigate("/start");
+  const goDashboard = () => navigate("/");
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background bg-mesh">
@@ -82,12 +80,20 @@ export function LandingPage() {
           </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
-          <Button variant="ghost" onClick={() => openAuth("login")}>
-            Anmelden
-          </Button>
-          <Button variant="gradient" onClick={start} className="gap-1.5">
-            Kostenlos starten <ArrowRight className="h-4 w-4" />
-          </Button>
+          {onboarded ? (
+            <Button variant="gradient" onClick={goDashboard} className="gap-1.5">
+              Zum Dashboard <ArrowRight className="h-4 w-4" />
+            </Button>
+          ) : (
+            <>
+              <Button variant="ghost" onClick={() => openAuth("login")}>
+                Anmelden
+              </Button>
+              <Button variant="gradient" onClick={start} className="gap-1.5">
+                Kostenlos starten <ArrowRight className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
@@ -111,18 +117,28 @@ export function LandingPage() {
             Wortschatz, Grammatik und ein KI-Schreibcoach. Üben in Minuten, nicht Stunden.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button variant="gradient" size="lg" onClick={start} className="gap-1.5">
-              Kostenlos testen <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="lg" onClick={() => openAuth("login")}>
-              Ich habe ein Konto
-            </Button>
+            {onboarded ? (
+              <Button variant="gradient" size="lg" onClick={goDashboard} className="gap-1.5">
+                Zum Dashboard <ArrowRight className="h-4 w-4" />
+              </Button>
+            ) : (
+              <>
+                <Button variant="gradient" size="lg" onClick={start} className="gap-1.5">
+                  Kostenlos testen <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => openAuth("login")}>
+                  Ich habe ein Konto
+                </Button>
+              </>
+            )}
           </div>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Keine Kreditkarte</span>
-            <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Sofort loslegen</span>
-            <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Ohne Anmeldung nutzbar</span>
-          </div>
+          {!onboarded && (
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Keine Kreditkarte</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Sofort loslegen</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Ohne Anmeldung nutzbar</span>
+            </div>
+          )}
         </motion.div>
       </section>
 
@@ -152,27 +168,41 @@ export function LandingPage() {
         <div className="overflow-hidden rounded-3xl border border-border bg-accent-gradient p-8 text-center text-white shadow-elevated sm:p-12">
           <BrainCircuit className="mx-auto h-9 w-9 opacity-90" />
           <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-            Bereit für deine Prüfung?
+            {onboarded ? "Weiter geht's!" : "Bereit für deine Prüfung?"}
           </h2>
           <p className="mx-auto mt-2 max-w-md text-white/85">
-            Starte kostenlos und sichere deinen Fortschritt mit einem Konto – auf allen Geräten.
+            {onboarded
+              ? "Setze dein Training dort fort, wo du aufgehört hast."
+              : "Starte kostenlos und sichere deinen Fortschritt mit einem Konto – auf allen Geräten."}
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button
-              size="lg"
-              onClick={start}
-              className="bg-white text-foreground hover:bg-white/90"
-            >
-              Kostenlos starten <ArrowRight className="h-4 w-4" />
-            </Button>
-            <Button
-              size="lg"
-              variant="ghost"
-              onClick={() => openAuth("signup")}
-              className="text-white hover:bg-white/15"
-            >
-              Konto erstellen
-            </Button>
+            {onboarded ? (
+              <Button
+                size="lg"
+                onClick={goDashboard}
+                className="bg-white text-foreground hover:bg-white/90"
+              >
+                Zum Dashboard <ArrowRight className="h-4 w-4" />
+              </Button>
+            ) : (
+              <>
+                <Button
+                  size="lg"
+                  onClick={start}
+                  className="bg-white text-foreground hover:bg-white/90"
+                >
+                  Kostenlos starten <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="lg"
+                  variant="ghost"
+                  onClick={() => openAuth("signup")}
+                  className="text-white hover:bg-white/15"
+                >
+                  Konto erstellen
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </section>
