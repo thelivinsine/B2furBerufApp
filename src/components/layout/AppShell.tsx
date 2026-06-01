@@ -12,6 +12,7 @@ import { levelFromXp } from "@/engine/scoring";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { Toaster } from "./Toaster";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
+import { AccountMenu } from "@/features/auth/AccountMenu";
 import { cn } from "@/lib/utils";
 
 export function AppShell() {
@@ -82,6 +83,7 @@ export function AppShell() {
                 <span className="text-[9px] font-bold tabular-nums">{todayXp}</span>
               </ProgressRing>
               <ThemeToggle />
+              <AccountMenu />
             </div>
           </div>
         </header>
