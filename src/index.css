@@ -33,16 +33,16 @@
   }
 
   .dark {
-    --background: 240 16% 6%;
-    --foreground: 240 18% 95%;
-    --surface: 240 14% 9%;
-    --elevated: 240 14% 12%;
+    --background: 223 38% 11%;
+    --foreground: 220 24% 94%;
+    --surface: 223 34% 15%;
+    --elevated: 223 32% 19%;
 
-    --muted: 240 10% 16%;
-    --muted-foreground: 240 8% 62%;
+    --muted: 223 26% 23%;
+    --muted-foreground: 220 16% 70%;
 
-    --border: 240 10% 18%;
-    --input: 240 10% 20%;
+    --border: 223 24% 27%;
+    --input: 223 24% 29%;
     --ring: 245 80% 68%;
 
     --primary: 245 80% 68%;
