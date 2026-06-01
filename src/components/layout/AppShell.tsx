@@ -63,7 +63,7 @@ export function AppShell() {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-gradient text-white shadow-glow">
                   <Sparkles className="h-4 w-4" />
                 </div>
-                <span className="text-sm font-semibold tracking-tight">Deutschfit</span>
+                <span className="text-sm font-semibold tracking-tight">Genauly</span>
               </Link>
               <p className="hidden text-sm text-muted-foreground lg:block">
                 Willkommen zurück 👋
