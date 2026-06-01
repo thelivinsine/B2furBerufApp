@@ -110,6 +110,56 @@ supabase functions deploy evaluate-writing
 
 ---
 
+## 8. Enable "Weiter mit Google" (one-click sign-in)
+
+The Google button is **already built and turned on in the app**. It will only
+work once Google + Supabase are connected. Two consoles, ~10 minutes. You need
+nothing from a developer — just click through these.
+
+**The two magic URLs you'll paste (copy them now):**
+
+| What | Value |
+|---|---|
+| **Supabase callback** (goes into Google) | `https://stkfdavpjflpqoxjunnj.supabase.co/auth/v1/callback` |
+| **Live app URL** (goes into Supabase redirect list) | `https://thelivinsine.github.io/B2furBerufApp/` |
+
+### 8a. Create the Google OAuth client (Google Cloud Console)
+
+1. Go to <https://console.cloud.google.com> and pick or create any project
+   (name it e.g. "B2 Beruf App").
+2. **APIs & Services → OAuth consent screen**: choose **External**, fill in app
+   name ("B2 Beruf Speaking Prep"), your support email, and the developer email.
+   Save. (You can leave it in "Testing" — add your own Google address under
+   **Test users** — or click **Publish app** so anyone can sign in.)
+3. **APIs & Services → Credentials → + Create credentials → OAuth client ID**:
+   - Application type: **Web application**.
+   - **Authorized redirect URIs → Add URI**: paste the **Supabase callback**
+     from the table above: `https://stkfdavpjflpqoxjunnj.supabase.co/auth/v1/callback`
+   - Create. Copy the **Client ID** and **Client secret** it shows you.
+
+### 8b. Turn on the Google provider (Supabase dashboard)
+
+1. **Authentication → Providers → Google** → toggle **ON**.
+2. Paste the **Client ID** and **Client secret** from step 8a. **Save**.
+3. **Authentication → URL Configuration**: make sure the **Site URL** is
+   `https://thelivinsine.github.io/B2furBerufApp/`, and under **Redirect URLs**
+   add `https://thelivinsine.github.io/B2furBerufApp/**` (the `**` wildcard
+   covers the hash routes). For local testing you can also add
+   `http://localhost:5173/**`. **Save**.
+
+### 8c. Tell Claude it's done
+
+Reply "Google is configured" and the change deploys (one squash-merge). Then
+smoke-test: open the live site → **Anmelden** → **Weiter mit Google** → it
+should bounce to Google, then back, and land you signed in with your
+guest progress preserved.
+
+> If the button errors with "provider is not enabled", step 8b isn't saved yet.
+> If Google shows "redirect_uri_mismatch", the URI in 8a doesn't exactly match
+> the Supabase callback (check for a stray space or missing `https://`).
+
+---
+
 ## How the cost guardrails work (so you sleep at night)
 
 - **Claude Haiku only** in production (cheapest capable model). Gemini Flash /
