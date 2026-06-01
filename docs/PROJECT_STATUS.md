@@ -130,6 +130,10 @@ This file is the single place to re-orient when resuming work. For the full desi
 - Email magic-links on Supabase free plan are rate-limited (~2/hour). Fix: add Resend (free tier)
   as custom SMTP in Auth → SMTP settings. Guest sign-in has no such limit and is the primary path.
 
+### Email+password / Google auth (branch `claude/determined-euler-xUDrh`)
+See the "REQUIRES two Supabase dashboard settings" note below — sign-up needs **"Confirm email"
+OFF** to be instant, and the Google button needs the **Google provider** configured.
+
 ### Landing page + visible auth (branch `claude/determined-euler-xUDrh`)
 - **Why:** auth was fully built but invisible (Settings-only, no login UI), so it "seemed not in
   place." Founder asked for a real marketing landing page with top-right Login / Sign-up, guest
@@ -143,10 +147,21 @@ This file is the single place to re-orient when resuming work. For the full desi
     to an existing guest uid to preserve progress). Used by landing + nudge.
   - `features/auth/SaveProgressBanner.tsx` — dismissible in-app nudge (shown to guests /
     signed-out) inviting sign-in; wired into `AppShell` above the page outlet.
-  - Existing `AccountPanel` in Settings retained for account management / sign-out.
-  - Auth remains **passwordless** (email magic-link), matching the deployed Supabase backend.
-    Switching to password auth would be a backend change (deferred unless founder asks).
+  - Existing `AccountPanel` in Settings reworked to reuse `AuthDialog` (email+password / Google).
+  - **Auth method = classic email + password** (`signUp`/`signInWithPassword`) plus **Google OAuth**
+    — chosen over magic-link because the founder disliked the email round-trip and the generic
+    Supabase email. `AuthDialog` has email+password fields, a sign-up/login toggle, friendly German
+    error copy, and a "Weiter mit Google" button. Guest→account upgrade uses `updateUser` to attach
+    email+password to the same uid (progress preserved).
   - `npm run build` green.
+  - **⚠️ REQUIRES two Supabase dashboard settings (founder, non-technical click-paths):**
+    1. **Disable "Confirm email"** so sign-up logs in instantly with no email round-trip:
+       Supabase dashboard → Authentication → Providers → **Email** → turn **"Confirm email" OFF** → Save.
+       (Trade-off: users can sign up with an unverified email — fine for a free progress-sync app.)
+    2. **(Optional, for the Google button) enable Google provider:** Authentication → Providers →
+       **Google** → ON, paste a Google OAuth Client ID + Secret from Google Cloud Console
+       (APIs & Services → Credentials → OAuth client → Web), with the Supabase callback URL as the
+       authorized redirect. Until this is done the "Weiter mit Google" button will error.
 
 ### UX polish — Quiz answer-reflect flow (PR #14, pending merge)
 - **Problem:** `VocabQuiz` and `RedemittelPractice` auto-advanced to the next question after
