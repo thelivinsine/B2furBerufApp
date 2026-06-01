@@ -35,7 +35,10 @@ export function SpeakButton({
       aria-label={label}
       title={label}
       className={cn(speaking && "text-primary", className)}
-      onClick={() => {
+      onClick={(e) => {
+        // Prevent the click from bubbling up to a parent (e.g. a flashcard
+        // flip handler), so tapping the speaker only plays audio.
+        e.stopPropagation();
         setSpeaking(true);
         speak(text, { rate, voiceURI: voiceURI ?? undefined, onEnd: () => setSpeaking(false) });
       }}
