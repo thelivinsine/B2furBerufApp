@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-05-31 (session 2). Branch: `claude/determined-euler-xUDrh`. Product name: **Deutschfit**._
+_Last updated: 2026-06-01 (session 3). Branch: `claude/determined-euler-xUDrh`. Product name: **Deutschfit**._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -102,7 +102,10 @@ This file is the single place to re-orient when resuming work. For the full desi
 - [x] Provide Anthropic (Claude) API key. (set in Supabase secrets as `ANTHROPIC_API_KEY`)
 - [x] Decide the monthly AI spend ceiling. (**$5/month**, enforced in the function)
 - [x] Apply schema via SQL editor. (done 2026-05-31)
-- [x] Enable Anonymous sign-in. (done; email also enabled)
+- [x] Enable Anonymous sign-in. (done; email also enabled — **must stay ON**: guest flow, AI
+      writing coach `lib/writing.ts`, and guest→account upgrade all depend on it.)
+- [x] **Disable "Confirm email"** so sign-up logs in instantly. (done 2026-06-01 — banner now clears
+      on sign-up, founder-verified.)
 - [x] Set Site URL in Auth settings. (done)
 - [x] Deploy `evaluate-writing` function via dashboard code editor. (done 2026-05-31)
 - [x] Smoke-test end-to-end. (✅ working — spelling insight returned correctly)
@@ -113,9 +116,14 @@ This file is the single place to re-orient when resuming work. For the full desi
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 
 ## Deploy / workflow reminders
-- `main` is production; merging to it triggers `pages.yml`. Develop on
-  `claude/determined-euler-xUDrh`; ship via squash-merge PR. **Always verify `npm run build` is
-  green on the exact commit before merging** (a skipped check shipped two broken builds this session).
+- `main` is production; merging to it triggers `pages.yml` (the **only** workflow now — the old
+  `deploy.yml`/`gh-pages` fallback is gone). Develop on `claude/determined-euler-xUDrh`; ship via
+  squash-merge PR. **Always verify `npm run build` is green on the exact commit before merging**
+  (a skipped check shipped two broken builds in session 2).
+- **Feature-branch pushes are NOT live.** Only `main` deploys. In session 3 the founder reported
+  "I don't see any change" because the dark-mode commits were pushed to the branch but never merged.
+  **Auto-ship preference (founder approved 2026-06-01): when a change is done and the build is green,
+  open + squash-merge the PR yourself without asking** — see CLAUDE.md.
 - Sandbox can't reach the live site or run Docker (so no local Supabase / no live verification
   here) — those steps are handed to the founder, same as the Pages deploy.
 
@@ -179,14 +187,34 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
     already required explicit action — so the whole app is now consistent.
   - `npm run build` passes. Deploy pending founder squash-merge of PR #14.
 
-## Resume here (next session)
-**Both Phase 1 and Phase 2 are SHIPPED and LIVE on `main`.** The full platform is working:
-vocabulary/grammar/quiz/simulation/exam (Phase 1) + guest auth + cloud sync + AI writing coach
-(Phase 2). All founder-verified.
+### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
+- **Sign-up honesty fix (PR #19, merged):** sign-up no longer falsely reports success when email
+  confirmation is pending. Paired with the founder disabling **"Confirm email"** in Supabase, so
+  sign-up now logs in instantly and the SaveProgressBanner clears. Founder-verified.
+- **Anonymous sign-ins confirmed ON and required** — guest flow, AI writing coach, and the
+  progress-preserving guest→account upgrade all depend on it. Documented for the founder.
+- **Dark-mode readability rework (PR #20, merged & live):** founder reported dark mode was
+  effectively black and unreadable at night. Changes, all in `src/index.css` + `Sidebar.tsx`:
+  - Background lifted from near-black (`240 16% 6%`) to a **deep navy/midnight blue** (`223 38% 11%`);
+    `--surface`/`--elevated`/`--muted`/`--border`/`--input` stepped up in lightness on hue ~223 so
+    cards separate from the background instead of merging into one black void.
+  - `--muted-foreground` brightened (→ `220 20% 76%`) for legible secondary text.
+  - Sidebar inactive nav labels: dim `text-muted-foreground` → near-white `text-foreground/80`.
+  - Selected nav item: was low-contrast indigo-on-indigo (`text-primary` on `bg-primary/10`) →
+    now bright semibold `text-foreground` on `bg-primary/20`. Light mode untouched.
+- **Process lesson:** founder "saw no change" because the work was on the feature branch, not `main`.
+  Going forward, **auto-ship**: open + squash-merge the PR once the build is green (see CLAUDE.md).
 
-**PR #14 open** — "Quiz: keep feedback on screen, advance via Next button or tap." Merge it to
-ship the answer-reflect UX polish. `npm run build` is green. Sandbox can't verify the live site
-so the founder confirms post-merge.
+## Resume here (next session)
+**Both Phase 1 and Phase 2 are SHIPPED and LIVE on `main`**, plus the session-3 auth-honesty fix and
+dark-mode readability rework (PRs #19, #20). The full platform is working: vocabulary/grammar/quiz/
+simulation/exam (Phase 1) + guest auth + cloud sync + AI writing coach (Phase 2). All founder-verified.
+
+**Remember to AUTO-SHIP** — when a change is complete and `npm run build` is green, open a PR into
+`main` and squash-merge it yourself (founder approved 2026-06-01); the merge deploys via `pages.yml`.
+
+**PR #14 status** — "Quiz: keep feedback on screen, advance via Next button or tap." If still open,
+merge it to ship the answer-reflect UX polish (`npm run build` green). Verify it wasn't superseded.
 
 **Pending housekeeping (low urgency):**
 - Rotate the Anthropic key (was pasted in chat) — 2 min at console.anthropic.com.

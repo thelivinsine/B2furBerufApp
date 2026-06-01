@@ -28,12 +28,13 @@ React + TypeScript + Vite SPA, deployed to GitHub Pages.
 - **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article, plural, pronunciation hint, two example sentences, and related terms. Currently **293 words** (~25–33 per theme). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `npm run build`.
 
 ## Deployment (GitHub Pages)
-- **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the canonical deploy path.
-- `.github/workflows/deploy.yml` is a **fallback** that publishes to the `gh-pages` branch; it runs only on the feature branch `claude/determined-euler-xUDrh`, not `main`.
+- **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
+- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on `claude/determined-euler-xUDrh`.
 - The remote sandbox cannot reach the live `*.github.io` site — verifying the deploy (Actions tab green + live site) is left to the user.
 
 ## Workflow notes
 - Development branch for this work: **`claude/determined-euler-xUDrh`**. Ship to production by opening a PR into `main` and merging (squash) — the merge triggers `pages.yml`.
+- **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `npm run build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.
 
 ## Roadmap & status (read these when resuming)
 - **`docs/PROJECT_STATUS.md`** — current status, all locked decisions, research findings, and the
