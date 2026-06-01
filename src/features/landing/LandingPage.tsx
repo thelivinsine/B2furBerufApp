@@ -73,10 +73,13 @@ export function LandingPage() {
       {/* Top nav */}
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-gradient text-white shadow-glow">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-gradient text-white shadow-glow">
             <Sparkles className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold tracking-tight">Sprechfit</span>
+          <div className="leading-tight">
+            <p className="text-lg font-semibold tracking-tight">Sprechfit</p>
+            <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
+          </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           <Button variant="ghost" onClick={() => openAuth("login")}>
