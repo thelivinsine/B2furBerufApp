@@ -16,10 +16,12 @@ interface AuthState {
   init: () => void;
   signInAsGuest: () => Promise<void>;
   /** Create an account with email + password (instant, no email round-trip
-   *  when "Confirm email" is disabled in Supabase). Upgrades a guest in place. */
-  signUp: (email: string, password: string) => Promise<{ ok: boolean }>;
+   *  when "Confirm email" is disabled in Supabase). Upgrades a guest in place.
+   *  `needsConfirmation` is true when Supabase requires the user to click a
+   *  confirmation link before a session is created. */
+  signUp: (email: string, password: string) => Promise<{ ok: boolean; needsConfirmation: boolean }>;
   /** Sign in with an existing email + password. */
-  signIn: (email: string, password: string) => Promise<{ ok: boolean }>;
+  signIn: (email: string, password: string) => Promise<{ ok: boolean; needsConfirmation: boolean }>;
   /** One-click sign-in via Google OAuth (redirect flow). */
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -87,20 +89,30 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // guest's progress is preserved as a permanent account.
     const current = get().user;
     let error;
+    // Whether the account exists but isn't logged in yet (Supabase "Confirm
+    // email" is on → a confirmation link must be clicked first).
+    let needsConfirmation = false;
     if (current?.is_anonymous) {
-      ({ error } = await supabase.auth.updateUser({ email, password }));
+      const { data, error: e } = await supabase.auth.updateUser({ email, password });
+      error = e;
+      // With email confirmation on, the email change is pending and the user
+      // stays anonymous until the link is clicked.
+      needsConfirmation = !e && (data.user?.is_anonymous ?? false);
     } else {
-      ({ error } = await supabase.auth.signUp({ email, password }));
+      const { data, error: e } = await supabase.auth.signUp({ email, password });
+      error = e;
+      // No session returned → email confirmation is required before login.
+      needsConfirmation = !e && !data.session;
     }
     set({ busy: false, error: error ? friendlyError(error.message) : null });
-    return { ok: !error };
+    return { ok: !error, needsConfirmation };
   },
 
   signIn: async (email, password) => {
     set({ busy: true, error: null });
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     set({ busy: false, error: error ? friendlyError(error.message) : null });
-    return { ok: !error };
+    return { ok: !error, needsConfirmation: !error && !data.session };
   },
 
   signInWithGoogle: async () => {

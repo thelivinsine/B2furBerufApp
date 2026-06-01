@@ -56,12 +56,20 @@ export function AuthDialog({
   const submit = async () => {
     if (!canSubmit) return;
     const fn = isSignup ? signUp : signIn;
-    const { ok } = await fn(email.trim(), password);
-    if (ok) {
+    const { ok, needsConfirmation } = await fn(email.trim(), password);
+    if (!ok) return;
+    if (needsConfirmation) {
+      // Account created but not logged in yet — Supabase requires email
+      // confirmation. Tell the user honestly instead of a false "welcome".
+      showToast(
+        "Fast geschafft! Bestätige deine E-Mail über den Link, den wir dir geschickt haben.",
+        "default",
+      );
+    } else {
       showToast(isSignup ? "Konto erstellt – willkommen!" : "Willkommen zurück!", "success");
-      onOpenChange(false);
-      setPassword("");
     }
+    onOpenChange(false);
+    setPassword("");
   };
 
   return (
