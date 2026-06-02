@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-02 (session 3). Branch: `claude/determined-euler-xUDrh`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-02 (session 5). Branch: `claude/determined-euler-xUDrh`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,31 +216,89 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### UI/UX Overhaul — IN PROGRESS (session 5, branch not yet merged to `main`)
+
+A 4-phase plan to add visual hierarchy, element variety, and shared components across all screens.
+See the locked plan at `/root/.claude/plans/can-you-brainstorm-with-dapper-haven.md`.
+
+**Phase 1 — Dashboard redesign ✅ DONE (PRs merged)**
+- Replaced the 7-tile "Tägliche Übungen" grid (nav duplicate) with a focal "Heute" hero block
+  (gradient CTA + ProgressRing), an inline stat strip (Serie / Level+XPBar / Gemeistert /
+  Tage bis Prüfung), and a themes grid with a featured (lowest-mastery) col-span card.
+- New `src/features/dashboard/recommend.ts` — `recommendedNext()` pure helper (priority:
+  due > 0 → Schnellwiederholung; todayXp < goal → Weiter lernen; else → celebratory).
+- New `src/engine/srs.ts` `dueCount(srs)` selector (counts only started cards that are due).
+
+**Phase 2 — Section hubs redesigned ✅ DONE (PRs #44, #45, #46 merged)**
+- All 5 section hubs (Quiz, Writing, Simulation, Exam, Grammar) given distinct identities via
+  shared `HubHero` component (`src/components/shared/HubHero.tsx`): per-section gradient icon
+  tile + eyebrow + title + description. No more interchangeable grey grids.
+  - Quiz: `from-violet-500 to-indigo-500`, `ListChecks`
+  - Writing: `from-rose-500 to-pink-500`, `PenLine`
+  - Simulation: `from-cyan-500 to-sky-500`, `Mic`
+  - Exam: `from-amber-500 to-orange-500`, `GraduationCap`
+  - Grammar: `from-emerald-500 to-teal-500`, `BookMarked`
+- SimulationHub: scenarios now grouped by level (Einsteiger/Mittelstufe/Fortgeschritten) with
+  sub-headings + counts; first uncompleted scenario flagged as "Empfohlen" (primary ring +
+  shadow-glow badge).
+- GrammarHub: flattened from per-group sections into a single dense grid; group shown as a small
+  tag only when it differs from the card title.
+
+**Phase 3 — In-session screens ✅ DONE (committed, not yet pushed to remote or merged)**
+Extracted 3 duplicated patterns into `src/components/shared/`:
+
+| Component | Props | Consumers |
+|-----------|-------|-----------|
+| `ChoiceButton` | `state?: idle/correct/wrong/dim`, `asOption?`, `disabled`, `onClick` | VocabQuiz, RedemittelPractice, QuizRunner (MCQView), ExamRunner, SimulationRunner |
+| `SpeakerLine` | `speaker: Speaker`, `line`, `gloss?` | ExamRunner, SimulationRunner |
+| `SessionProgress` | `value`, `label?`, `right?`, `below?` | VocabQuiz, RedemittelPractice, QuizRunner |
+
+Removed 14 inline duplicates. Build green (`npm run build`). **Commit: `dd34048`.**
+Not yet pushed to remote (`git push` needed) or opened as a PR.
+
+**Phase 4 — Analytics (PENDING)**
+- One hero KPI band → secondary charts; vary card types; use Badge variants (`warning`/`danger`/
+  `outline`) for mastery legend. Not started.
+
+---
+
 ## Resume here (next session)
-**Both Phase 1 and Phase 2 are SHIPPED and LIVE on `main`**, plus the session-3 auth-honesty fix and
-dark-mode readability rework (PRs #19, #20). The full platform is working: vocabulary/grammar/quiz/
-simulation/exam (Phase 1) + guest auth + cloud sync + AI writing coach (Phase 2). All founder-verified.
 
-**Remember to AUTO-SHIP** — when a change is complete and `npm run build` is green, open a PR into
-`main` and squash-merge it yourself (founder approved 2026-06-01); the merge deploys via `pages.yml`.
+### Immediate: push Phase 3 + ship it
+```bash
+git push -u origin claude/determined-euler-xUDrh
+```
+Then open a PR into `main` via GitHub MCP tools and squash-merge it (auto-ship policy). After
+the merge, run the post-deploy branch realignment (see CLAUDE.md).
 
-**PR #14 status** — "Quiz: keep feedback on screen, advance via Next button or tap." If still open,
-merge it to ship the answer-reflect UX polish (`npm run build` green). Verify it wasn't superseded.
+### Next work: Phase 4 — Analytics
+File: `src/features/analytics/Analytics.tsx`. Current state: 4 equal `StatCard`s + repeated
+`Card>CardContent p-5` chart blocks; no KPI hierarchy.
 
-**Pending housekeeping (low urgency):**
+Target:
+1. **Hero KPI strip** — one horizontal panel with Gesamt-XP / Level / Streak / Wortschatz
+   gemeistert as the primary focal element (one panel with dividers, not 4 equal tiles).
+2. **Secondary charts** — existing recharts blocks kept but laid out with size hierarchy
+   (larger "important" chart, smaller secondary charts).
+3. **Badge variants** — use `warning`/`danger`/`outline` for mastery legend; color-code the
+   difficulty breakdown.
+
+Then after Phase 4, consider:
+- **WordTile** extraction (ConstructTask in RedemittelPractice + WordOrderView in QuizRunner)
+  — deliberately deferred from Phase 3 due to tight state coupling.
+- **Grade button reconciliation** — Flashcards 4-grade vs QuickRevision 2-grade; deliberate
+  pedagogical difference, but visual consistency can be improved.
+
+### Pending low-urgency housekeeping
+- `git push` Phase 3 commit and open PR (immediate — see above).
 - Rotate the Anthropic key (was pasted in chat) — 2 min at console.anthropic.com.
 - Add Resend SMTP to fix email magic-link rate-limit.
 - Enable Turnstile CAPTCHA before public launch.
 
-**Candidate next features (pick one):**
-- (a) **Writing history view** — surface past evaluations from `writing_evaluations` table; show
-  streak of weaknesses so learner sees their improvement over time.
-- (b) **Collocations browser tab** — dedicated browse/filter UI for the 68 Nomen-Verb pairs,
-  accessible from Vocabulary or Grammar.
-- (c) **Code-split the bundle** — dynamic imports for heavy routes (exam, simulation) to cut the
-  ~1.41 MB initial load.
-- (d) **More content** — expand collocations (~6→10/theme), add more grammar drills, grow vocab
-  toward 350 words.
-- (e) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
-- (f) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
-  AI evaluations (currently 5/day free for all).
+### Candidate features after UI overhaul
+- **Writing history view** — surface past evaluations from `writing_evaluations` table.
+- **Collocations browser tab** — dedicated browse/filter UI for the 68 Nomen-Verb pairs.
+- **Code-split the bundle** — dynamic `import()` for heavy routes to cut the ~1.41 MB load.
+- **More content** — grow collocations to ~10/theme, add grammar drills, vocab toward 350 words.
+- **Logo** — founder to decide; `Sparkles` icon placeholder still in use.
+- **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around AI evaluations.

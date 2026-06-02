@@ -1,7 +1,7 @@
 # B2 Beruf App — Feature Expansion Plan (Grammar, Quizzes, Auth + AI Writing)
 
-> Status: **APPROVED, not yet implemented.** Phase 1 is the next work to start.
-> Working branch: `claude/determined-euler-xUDrh`. See `docs/PROJECT_STATUS.md` for live status.
+> Status: **Phase 1 and Phase 2 SHIPPED & LIVE ✅ (founder-verified 2026-05-31).** See `docs/PROJECT_STATUS.md` for the live resume-here pointer.
+> Working branch: `claude/determined-euler-xUDrh`.
 
 ## Context
 The original app shipped and is live: a polished client-side SPA (onboarding, dashboard,
@@ -215,3 +215,65 @@ and do everything else. **None of this is needed for Phase 1 — it ships withou
 - Work on branch `claude/determined-euler-xUDrh`; commit in logical chunks; **no PR unless asked**.
 - Phase 1 stays 100% client-side (no secrets) so it can ship to GitHub Pages unchanged.
 - All authored content original; only CC-/open-licensed external data (with attribution) ingested.
+
+---
+
+## PHASE 3 — UI/UX Overhaul (approved session 5, in progress)
+
+A 4-phase plan to add visual hierarchy, element variety, and code deduplication. The design system
+already has the right tokens (Badge `warning`/`danger`/`outline`, `shadow-glow`, `glass`, `bg-mesh`)
+but they were under-used. The plan exploits what already exists — no new dependencies.
+
+### Overarching levers
+- **One focal element per screen:** larger, `shadow-glow` or accent border, the *only* `gradient`
+  primary button. Everything else uses `shadow-soft`.
+- **Element variety:** horizontal stat strips, list-rows, featured `col-span` cards, `bg-mesh`/
+  `glass` panels — not just the same `Card p-4/p-5` grid everywhere.
+- **Use the unused Badge variants:** `warning` (due/attention), `danger` (overdue/hard), `outline`
+  (neutral meta), plus level/difficulty color-coding.
+
+### Phase 3-A — Dashboard redesign ✅ DONE (PRs merged)
+New top-to-bottom structure:
+1. **Focal "Heute" block** (PRIMARY) — two-column grid (`md:grid-cols-[1.5fr_1fr]`, seamless,
+   no divider). Left: greeting, dynamic headline, days-to-exam, one gradient CTA (`recommendedNext`)
+   + one secondary CTA. Right: 132px `ProgressRing` (today XP / goal).
+   - `recommendedNext()` helper in `src/features/dashboard/recommend.ts`: (1) due > 0 →
+     Schnellwiederholung + `warning` badge; (2) todayXp < goal → Weiter lernen; (3) else →
+     celebratory / Theme erkunden.
+   - `dueCount(srs)` added to `src/engine/srs.ts` — counts only started cards that are due.
+2. **Status strip** (SUPPORTING) — one `Card` with `grid grid-cols-2 divide-x divide-y sm:flex
+   sm:divide-y-0` inline panel: Serie (StreakBadge) / Level+inline XPBar / Gemeistert vocab /
+   Tage bis Prüfung. Desktop = row with dividers; mobile = 2×2.
+3. **Themes browse** (SECONDARY) — themes grid with the featured lowest-mastery theme as
+   `sm:col-span-2`; the rest standard. `SectionHeading` + action slot.
+- **Removed:** 7-tile "Tägliche Übungen" grid (nav duplicate).
+
+### Phase 3-B — Section hubs ✅ DONE (PRs #44, #45, #46 merged)
+All 5 hubs given distinct identities via `HubHero` (`src/components/shared/HubHero.tsx`):
+per-section gradient color + icon + eyebrow + title + description. SimulationHub scenarios
+grouped by level with sub-headings; first uncompleted = "Empfohlen". GrammarHub flattened to
+a single dense grid with group tags.
+
+### Phase 3-C — In-session screens ✅ DONE (committed `dd34048`, not yet pushed)
+Three duplicated patterns extracted to `src/components/shared/`:
+- `ChoiceButton` — `state: idle/correct/wrong/dim` + `asOption` variant (leading ChevronRight
+  for dialogue options). Used in VocabQuiz, RedemittelPractice, QuizRunner, ExamRunner,
+  SimulationRunner. Removed 14 inline copies.
+- `SpeakerLine` — `speaker: Speaker`, `line`, `gloss?`. Used in ExamRunner, SimulationRunner.
+- `SessionProgress` — `value`, `label?`, `right?`, `below?`. Used in VocabQuiz,
+  RedemittelPractice, QuizRunner.
+
+**Still deferred from Phase 3-C (intentional):**
+- `WordTile` (ConstructTask + WordOrderView) — tightly coupled to per-component state; minor
+  dedup vs. complexity cost. Can extract later if a third use emerges.
+- Grade button reconciliation (Flashcards 4-grade vs QuickRevision 2-grade) — deliberate
+  pedagogical difference; visual consistency improvement is low-priority.
+
+### Phase 3-D — Analytics (PENDING, next up)
+File: `src/features/analytics/Analytics.tsx`.
+Current: 4 equal `StatCard`s + repeated `Card>CardContent p-5` chart blocks; no KPI hierarchy.
+Target:
+1. **Hero KPI strip** — one horizontal panel (Serie / Level / Streak / Gemeistert) as the primary
+   focal element, replacing the 4 equal tiles.
+2. **Secondary charts** — recharts blocks kept, laid out with size hierarchy.
+3. **Badge variants** — `warning`/`danger`/`outline` for mastery legend; difficulty color-coding.
