@@ -20,33 +20,33 @@ import { AuthDialog, type AuthIntent } from "@/features/auth/AuthDialog";
 const features = [
   {
     icon: MessagesSquare,
-    title: "Dialog-Simulationen",
-    desc: "Übe das Prüfungsmodul „Gemeinsam eine Lösung finden\" mit realistischen, verzweigten Gesprächen.",
+    title: "Real Gespräche, zero pressure",
+    desc: "Rehearse the exam's „Gemeinsam eine Lösung finden“ module with branching, lifelike dialogues — practise until it feels natural.",
   },
   {
     icon: GraduationCap,
-    title: "Wortschatz & Grammatik",
-    desc: "300+ Berufs-Vokabeln, Redemittel und gezielte Grammatik-Drills – mit Spaced-Repetition.",
+    title: "Wortschatz that sticks",
+    desc: "300+ workplace words, Redemittel and targeted Grammatik drills — with spaced repetition, so you actually remember them.",
   },
   {
     icon: Target,
-    title: "Leveled Quizze",
-    desc: "Themenbezogene Quizze in drei Schwierigkeitsstufen mit sofortigem Feedback.",
+    title: "Quizzes for every Niveau",
+    desc: "Topic quizzes in three levels (leicht → schwer) with instant feedback. Start where you're comfy and level up.",
   },
   {
     icon: PenLine,
-    title: "KI-Schreibcoach",
-    desc: "Schreibaufgaben mit einer klaren, priorisierten Rückmeldung zu deiner größten Schwäche.",
+    title: "Your AI Schreibcoach",
+    desc: "Write a short text, get one clear, prioritised tip on your biggest Schwäche — like a tutor who never gets tired.",
   },
   {
     icon: Mic,
-    title: "Sprechen & Aussprache",
-    desc: "Text-to-Speech und Spracherkennung helfen dir, frei und natürlich zu sprechen.",
+    title: "Speak without Angst",
+    desc: "Text-to-speech and speech recognition help you find your voice and nail your Aussprache — out loud, judgement-free.",
   },
   {
     icon: Cloud,
-    title: "Fortschritt überall",
-    desc: "Melde dich an und lerne nahtlos auf Handy, Tablet und Laptop weiter.",
+    title: "Your Fortschritt, everywhere",
+    desc: "Sign in and continue right where you stopped — on Handy, Tablet or Laptop. Dein Fortschritt reist mit.",
   },
 ];
 
@@ -87,7 +87,7 @@ export function LandingPage() {
           ) : (
             <>
               <Button variant="ghost" onClick={() => openAuth("login")}>
-                Anmelden
+                Log in
               </Button>
               <Button variant="gradient" onClick={start} className="gap-1.5">
                 Kostenlos starten <ArrowRight className="h-4 w-4" />
@@ -108,13 +108,16 @@ export function LandingPage() {
             <GraduationCap className="h-3.5 w-3.5 text-primary" /> Goethe / telc · Deutsch B2 Beruf
           </span>
           <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
-            Bestehe die{" "}
-            <span className="bg-accent-gradient bg-clip-text text-transparent">B2-Beruf-Prüfung</span>{" "}
-            mit Selbstvertrauen
+            From „Wie bitte?“ to{" "}
+            <span className="bg-accent-gradient bg-clip-text text-transparent">fließend</span>
+            <span className="mt-1 block text-2xl font-semibold text-muted-foreground sm:text-3xl">
+              Workplace German that finally clicks.
+            </span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Dein interaktiver Trainer für Deutsch im Beruf – Wortschatz, Grammatik,
-            Schreiben mit KI-Coach und Sprech-Simulationen. Üben in Minuten, nicht Stunden.
+            Practise the Deutsch you actually need at work — Wortschatz, Grammatik,
+            writing and speaking — in sessions short enough for your Mittagspause.
+            Confidence first, B2-Prüfung sorted.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {onboarded ? (
@@ -127,16 +130,16 @@ export function LandingPage() {
                   Kostenlos testen <ArrowRight className="h-4 w-4" />
                 </Button>
                 <Button variant="outline" size="lg" onClick={() => openAuth("login")}>
-                  Ich habe ein Konto
+                  I already have an account
                 </Button>
               </>
             )}
           </div>
           {!onboarded && (
             <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Keine Kreditkarte</span>
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Sofort loslegen</span>
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Ohne Anmeldung nutzbar</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Free to start</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Kein Konto nötig</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Sofort loslegen — in seconds</span>
             </div>
           )}
         </motion.div>
@@ -168,12 +171,12 @@ export function LandingPage() {
         <div className="overflow-hidden rounded-3xl border border-border bg-accent-gradient p-8 text-center text-white shadow-elevated sm:p-12">
           <BrainCircuit className="mx-auto h-9 w-9 opacity-90" />
           <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-            {onboarded ? "Weiter geht's!" : "Bereit für deine Prüfung?"}
+            {onboarded ? "Weiter geht's — keep the Schwung!" : "Bereit? Let's get you Prüfung-ready."}
           </h2>
           <p className="mx-auto mt-2 max-w-md text-white/85">
             {onboarded
-              ? "Setze dein Training dort fort, wo du aufgehört hast."
-              : "Starte kostenlos und sichere deinen Fortschritt mit einem Konto – auf allen Geräten."}
+              ? "Pick up your Training right where you left off — du schaffst das."
+              : "Start free, save your Fortschritt with an account, and learn on every device. Dein Deutsch wartet — let's go."}
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {onboarded ? (
