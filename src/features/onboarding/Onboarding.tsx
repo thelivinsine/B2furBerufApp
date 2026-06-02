@@ -10,7 +10,6 @@ import {
   MessagesSquare,
   Check,
   ArrowRight,
-  Mic,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -22,22 +21,22 @@ import {
 } from "@/store/useSettingsStore";
 
 const goals: { id: LearningGoal; label: string; desc: string; icon: typeof Target }[] = [
-  { id: "exam", label: "Prüfung bestehen", desc: "Gezielt für die B2-Beruf-Prüfung üben", icon: GraduationCap },
-  { id: "work", label: "Im Job sicherer werden", desc: "Kommunikation am Arbeitsplatz stärken", icon: Briefcase },
-  { id: "fluency", label: "Flüssiger sprechen", desc: "Spontan und natürlich reagieren", icon: MessagesSquare },
+  { id: "exam", label: "Ace the Prüfung", desc: "Train laser-focused for the B2-Beruf exam.", icon: GraduationCap },
+  { id: "work", label: "Shine im Job", desc: "Handle everyday Kommunikation at work with ease.", icon: Briefcase },
+  { id: "fluency", label: "Speak flüssiger", desc: "React spontan and sound natural.", icon: MessagesSquare },
 ];
 
 const levels: { id: CefrLevel; label: string; desc: string }[] = [
-  { id: "A2", label: "A2", desc: "Grundlagen" },
+  { id: "A2", label: "A2", desc: "Just starting" },
   { id: "B1", label: "B1", desc: "Mittelstufe" },
-  { id: "B2", label: "B2", desc: "Gutes Mittelniveau" },
+  { id: "B2", label: "B2", desc: "Getting there" },
   { id: "C1", label: "C1", desc: "Fortgeschritten" },
 ];
 
 const goalsXp = [
-  { value: 50, label: "Entspannt", desc: "≈ 5 Min / Tag" },
-  { value: 80, label: "Stetig", desc: "≈ 10 Min / Tag" },
-  { value: 120, label: "Ehrgeizig", desc: "≈ 15 Min / Tag" },
+  { value: 50, label: "Easy does it", desc: "≈ 5 Min / Tag" },
+  { value: 80, label: "Steady — stetig", desc: "≈ 10 min a day" },
+  { value: 120, label: "Ehrgeizig", desc: "≈ 15 min a day" },
 ];
 
 const TOTAL = 4;
@@ -109,18 +108,18 @@ export function Onboarding() {
                 {step === 0 && (
                   <div className="space-y-5">
                     <Header
-                      icon={Mic}
+                      icon={Sparkles}
                       title="Willkommen!"
-                      subtitle="Dein persönlicher Trainer für die mündliche B2-Beruf-Prüfung – besonders das Modul „Lösung finden mit einem/einer Partner:in“."
+                      subtitle="Your personal coach for Deutsch im Beruf — from Wortschatz and Grammatik to writing and speaking. Let's get you set up."
                     />
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium">Wie heißt du?</label>
+                      <label className="mb-1.5 block text-sm font-medium">Wie heißt du? — what should we call you?</label>
                       <input
                         autoFocus
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         onKeyDown={(e) => e.key === "Enter" && next()}
-                        placeholder="Dein Name"
+                        placeholder="Your name / dein Name"
                         className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring"
                       />
                     </div>
@@ -129,7 +128,7 @@ export function Onboarding() {
 
                 {step === 1 && (
                   <div className="space-y-4">
-                    <Header icon={Target} title="Was ist dein Ziel?" subtitle="So passen wir die Inhalte an dich an." />
+                    <Header icon={Target} title="Was ist dein Ziel?" subtitle="Tell us your goal — so we can tailor everything to you." />
                     <div className="space-y-2.5">
                       {goals.map((g) => (
                         <SelectRow
@@ -147,7 +146,7 @@ export function Onboarding() {
 
                 {step === 2 && (
                   <div className="space-y-4">
-                    <Header icon={GraduationCap} title="Dein aktuelles Niveau" subtitle="Eine grobe Einschätzung genügt." />
+                    <Header icon={GraduationCap} title="Dein aktuelles Niveau" subtitle="Your current level — a rough guess is totally fine." />
                     <div className="grid grid-cols-2 gap-2.5">
                       {levels.map((l) => (
                         <button
@@ -168,7 +167,7 @@ export function Onboarding() {
                     <div>
                       <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
                         <CalendarClock className="h-4 w-4 text-muted-foreground" />
-                        Prüfungstermin (optional)
+                        Prüfungstermin / exam date (optional)
                       </label>
                       <input
                         type="date"
@@ -182,7 +181,7 @@ export function Onboarding() {
 
                 {step === 3 && (
                   <div className="space-y-4">
-                    <Header icon={Sparkles} title="Tägliches Ziel" subtitle="Konsequenz schlägt Intensität. Wähle ein Ziel, das du halten kannst." />
+                    <Header icon={Sparkles} title="Dein tägliches Ziel" subtitle="Consistency beats intensity — pick a Ziel you can actually keep." />
                     <div className="space-y-2.5">
                       {goalsXp.map((g) => (
                         <SelectRow
