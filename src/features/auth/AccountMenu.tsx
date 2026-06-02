@@ -60,12 +60,12 @@ export function AccountMenu() {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
-        className="relative"
+        className="relative h-9 w-9"
       >
         <UserCircle2 className="h-5 w-5" />
         <span
           className={cn(
-            "absolute bottom-1 right-1 h-2 w-2 rounded-full ring-2 ring-surface",
+            "absolute bottom-0.5 right-0.5 h-2 w-2 rounded-full ring-2 ring-surface",
             synced ? "bg-success" : "bg-muted-foreground",
           )}
         />
