@@ -180,7 +180,7 @@ export function LandingPage() {
               <Button
                 size="lg"
                 onClick={goDashboard}
-                className="bg-white text-foreground hover:bg-white/90"
+                className="bg-white text-[#0f172a] hover:bg-white/90"
               >
                 Zum Dashboard <ArrowRight className="h-4 w-4" />
               </Button>
@@ -189,7 +189,7 @@ export function LandingPage() {
                 <Button
                   size="lg"
                   onClick={start}
-                  className="bg-white text-foreground hover:bg-white/90"
+                  className="bg-white text-[#0f172a] hover:bg-white/90"
                 >
                   Kostenlos starten <ArrowRight className="h-4 w-4" />
                 </Button>
