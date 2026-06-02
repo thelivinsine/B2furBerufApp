@@ -34,6 +34,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { EmptyState } from "@/components/shared/misc";
+import { ChoiceButton } from "@/components/shared/ChoiceButton";
+import { SpeakerLine } from "@/components/shared/SpeakerLine";
 import { cn } from "@/lib/utils";
 
 type Action =
@@ -268,34 +270,8 @@ export function SimulationRunner({
           exit={{ opacity: 0, y: -8 }}
           className="space-y-4"
         >
-          {/* Partner/examiner/narrator line */}
           {!isFreeSpeakNode && (
-            <Card className={cn(
-              "border",
-              node.speaker === "examiner" && "border-accent/40 bg-accent/5",
-              node.speaker === "narrator" && "border-dashed border-border bg-surface/40",
-              node.speaker === "partner" && "border-border",
-            )}>
-              <CardContent className="p-5">
-                <div className="flex items-start gap-2.5">
-                  <div className={cn(
-                    "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                    node.speaker === "examiner" ? "bg-accent/12 text-accent" : "bg-primary/12 text-primary"
-                  )}>
-                    {node.speaker === "examiner" ? <Users className="h-4 w-4" /> : <User className="h-4 w-4" />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                      {node.speaker === "partner" ? "Partner:in" : node.speaker === "examiner" ? "Prüfer:in" : "Erzähler"}
-                    </p>
-                    <p className="mt-0.5 font-medium">{node.line}</p>
-                    {node.gloss && (
-                      <p className="mt-1 text-xs italic text-muted-foreground">{node.gloss}</p>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <SpeakerLine speaker={node.speaker} line={node.line} gloss={node.gloss} />
           )}
 
           {/* Free speak node */}
@@ -375,13 +351,13 @@ export function SimulationRunner({
             </div>
           )}
 
-          {/* Choice options */}
           {isChoiceNode && !feedback && (
             <div className="space-y-2">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Deine Antwort</p>
               {node.options!.map((opt) => (
-                <button
+                <ChoiceButton
                   key={opt.id}
+                  asOption
                   onClick={() => {
                     dispatch({ type: "choose", optionId: opt.id });
                     addXp(XP.simulationTurn);
@@ -390,11 +366,9 @@ export function SimulationRunner({
                       setTimeout(() => setFeedback(null), 3500);
                     }
                   }}
-                  className="flex w-full items-center gap-2 rounded-xl border border-border bg-surface px-4 py-3.5 text-left text-sm font-medium transition-colors hover:border-primary/40 hover:bg-muted/40"
                 >
-                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
                   {opt.text}
-                </button>
+                </ChoiceButton>
               ))}
             </div>
           )}

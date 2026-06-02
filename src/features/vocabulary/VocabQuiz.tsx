@@ -3,10 +3,11 @@ import { motion } from "framer-motion";
 import { Check, X, Sparkles, RotateCw, Trophy, ArrowRight } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/misc";
 import { SpeakButton } from "@/components/shared/SpeakButton";
+import { ChoiceButton } from "@/components/shared/ChoiceButton";
+import { SessionProgress } from "@/components/shared/SessionProgress";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { XP } from "@/engine/scoring";
@@ -105,13 +106,11 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
 
   return (
     <div className="mx-auto max-w-2xl space-y-5" onClick={handleTapAnywhere}>
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Frage {index + 1} von {total}</span>
-          <span className="tabular-nums">{score} richtig</span>
-        </div>
-        <Progress value={(index / total) * 100} />
-      </div>
+      <SessionProgress
+        value={(index / total) * 100}
+        label={`Frage ${index + 1} von ${total}`}
+        right={<span className="tabular-nums">{score} richtig</span>}
+      />
 
       <Card>
         <CardContent className="p-6">
@@ -131,23 +130,14 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
           const isPicked = picked === choice;
           const state = !picked ? "idle" : isCorrect ? "correct" : isPicked ? "wrong" : "dim";
           return (
-            <motion.button
+            <ChoiceButton
               key={choice}
-              whileTap={{ scale: 0.99 }}
+              state={state}
               disabled={!!picked}
               onClick={() => choose(choice)}
-              className={cn(
-                "flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors",
-                state === "idle" && "border-border bg-surface hover:border-primary/40 hover:bg-muted/40",
-                state === "correct" && "border-success bg-success/10 text-success",
-                state === "wrong" && "border-danger bg-danger/10 text-danger",
-                state === "dim" && "border-border opacity-50",
-              )}
             >
               {choice}
-              {state === "correct" && <Check className="h-4 w-4" />}
-              {state === "wrong" && <X className="h-4 w-4" />}
-            </motion.button>
+            </ChoiceButton>
           );
         })}
       </div>
