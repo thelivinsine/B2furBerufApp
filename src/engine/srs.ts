@@ -53,3 +53,17 @@ export function masteryLabel(score: number): "new" | "learning" | "review" | "ma
   if (score < 0.8) return "review";
   return "mastered";
 }
+
+/**
+ * Review backlog: how many *started* cards in the SRS store are due today.
+ * Never-studied words aren't in the store, so they're intentionally excluded
+ * here — this is the "to review" count, not the "new to learn" queue (which is
+ * what QuickRevision's deck builder adds on top).
+ */
+export function dueCount(srs: Record<string, SrsCard>, today: string = todayKey()): number {
+  let n = 0;
+  for (const id in srs) {
+    if (isDue(srs[id], today)) n += 1;
+  }
+  return n;
+}
