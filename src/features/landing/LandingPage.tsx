@@ -81,7 +81,7 @@ export function LandingPage() {
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
           {onboarded ? (
-            <Button variant="gradient" onClick={goDashboard} className="gap-1.5">
+            <Button variant="gradient" onClick={goDashboard} className="hidden gap-1.5 sm:inline-flex">
               Zum Dashboard <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
@@ -89,7 +89,7 @@ export function LandingPage() {
               <Button variant="ghost" onClick={() => openAuth("login")}>
                 Log in
               </Button>
-              <Button variant="gradient" onClick={start} className="gap-1.5">
+              <Button variant="gradient" onClick={start} className="hidden gap-1.5 sm:inline-flex">
                 Kostenlos starten <ArrowRight className="h-4 w-4" />
               </Button>
             </>
