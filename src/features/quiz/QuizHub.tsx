@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, ListChecks } from "lucide-react";
 import type { Difficulty, ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { vocabByTheme } from "@/data/vocabulary";
@@ -10,7 +10,7 @@ import { iconByName } from "@/lib/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SectionHeading } from "@/components/shared/misc";
+import { HubHero } from "@/components/shared/HubHero";
 import { QuizRunner } from "./QuizRunner";
 
 const levels: { value: Difficulty; labelDe: string; desc: string; accent: string }[] = [
@@ -123,7 +123,9 @@ export function QuizHub() {
   // Pick a theme
   return (
     <div className="space-y-6">
-      <SectionHeading
+      <HubHero
+        icon={ListChecks}
+        gradient="from-violet-500 to-indigo-500"
         eyebrow="Quiz"
         title="Themen-Quiz"
         description="Teste dein Wissen pro Thema in drei Stufen – Vokabeln, Nomen-Verb-Verbindungen und Grammatik gemischt, mit XP und Wiederholung (SRS)."

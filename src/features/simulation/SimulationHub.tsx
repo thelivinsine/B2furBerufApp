@@ -6,7 +6,7 @@ import type { Scenario } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SectionHeading } from "@/components/shared/misc";
+import { HubHero } from "@/components/shared/HubHero";
 import { useProgressStore } from "@/store/useProgressStore";
 import { SimulationRunner } from "./SimulationRunner";
 import { cn } from "@/lib/utils";
@@ -29,7 +29,9 @@ export function SimulationHub() {
 
   return (
     <div className="space-y-6">
-      <SectionHeading
+      <HubHero
+        icon={Mic}
+        gradient="from-cyan-500 to-sky-500"
         eyebrow="Sprechsimulation"
         title="Lösung finden"
         description={'Simuliere das Prüfungsmodul „Lösung finden mit einer/einem Partner:in“ – mit branching Dialogen, Hinweisen und Coaching-Feedback.'}
