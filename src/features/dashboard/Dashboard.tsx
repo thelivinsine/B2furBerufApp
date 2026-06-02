@@ -72,6 +72,7 @@ export function Dashboard() {
   const info = levelFromXp(xp);
   const tier = tierForLevel(info.level);
   const goalProgress = Math.min(todayXp / goal, 1);
+  const goalPercent = Math.round(goalProgress * 100);
 
   const masteredCount = vocabulary.filter((v) => mastery(srs[v.id]) >= 0.8).length;
   const daysToExam = examDate ? Math.max(0, daysBetween(todayKey(), examDate)) : null;
@@ -106,24 +107,27 @@ export function Dashboard() {
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-primary/20 bg-surface p-6 shadow-glow sm:p-8"
+        className="relative overflow-hidden rounded-2xl border border-primary/15 bg-surface shadow-glow"
       >
-        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary/15 blur-3xl" />
-        <div className="relative flex flex-wrap items-center justify-between gap-6">
-          <div className="max-w-md">
-            <p className="text-sm font-medium text-primary">
-              {greeting}, {name || "Lernende:r"} 👋
-            </p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{rec.headline}</h1>
-            <p className="mt-2 text-sm text-muted-foreground">{rec.subline}</p>
-            <div className="mt-4 flex flex-wrap items-center gap-2">
-              <Button asChild variant="gradient">
+        <div className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+        <div className="relative grid md:grid-cols-[1fr_auto]">
+          {/* Content */}
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <p className="text-sm font-medium text-primary">
+                {greeting}, {name || "Lernende:r"} 👋
+              </p>
+              {rec.badge && <Badge variant="warning">{rec.badge}</Badge>}
+            </div>
+            <h1 className="mt-2.5 text-2xl font-bold tracking-tight sm:text-3xl">{rec.headline}</h1>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">{rec.subline}</p>
+            <div className="mt-6 flex flex-wrap gap-2.5">
+              <Button asChild variant="gradient" size="lg">
                 <Link to={rec.to}>
                   <rec.icon className="h-4 w-4" /> {rec.label}
                 </Link>
               </Button>
-              {rec.badge && <Badge variant="warning">{rec.badge}</Badge>}
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" size="lg">
                 <Link to={secondary.to}>
                   <secondary.icon className="h-4 w-4" /> {secondary.label}
                 </Link>
@@ -131,10 +135,15 @@ export function Dashboard() {
             </div>
           </div>
 
-          <ProgressRing value={goalProgress} size={132} stroke={11}>
-            <span className="text-2xl font-semibold tabular-nums">{todayXp}</span>
-            <span className="text-xs text-muted-foreground">/ {goal} XP</span>
-          </ProgressRing>
+          {/* Today's progress panel — fills the right side intentionally. */}
+          <div className="flex flex-col items-center justify-center gap-3 border-t border-border bg-muted/30 p-6 sm:p-8 md:border-l md:border-t-0">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Heute</p>
+            <ProgressRing value={goalProgress} size={124} stroke={10}>
+              <span className="text-2xl font-semibold tabular-nums">{todayXp}</span>
+              <span className="text-xs text-muted-foreground">/ {goal} XP</span>
+            </ProgressRing>
+            <p className="text-xs text-muted-foreground">{goalPercent}% des Tagesziels</p>
+          </div>
         </div>
       </motion.div>
 
