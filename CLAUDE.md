@@ -1,4 +1,4 @@
-# B2 Beruf Speaking Prep
+# Genauly — B2 Beruf Speaking Prep
 
 Interactive prep platform for the **Goethe / telc Deutsch B2 Beruf** speaking exam.
 React + TypeScript + Vite SPA, deployed to GitHub Pages.

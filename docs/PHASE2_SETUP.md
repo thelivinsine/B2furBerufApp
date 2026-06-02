@@ -128,7 +128,7 @@ nothing from a developer — just click through these.
 1. Go to <https://console.cloud.google.com> and pick or create any project
    (name it e.g. "B2 Beruf App").
 2. **APIs & Services → OAuth consent screen**: choose **External**, fill in app
-   name ("B2 Beruf Speaking Prep"), your support email, and the developer email.
+   name ("Genauly"), your support email, and the developer email.
    Save. (You can leave it in "Testing" — add your own Google address under
    **Test users** — or click **Publish app** so anyone can sign in.)
 3. **APIs & Services → Credentials → + Create credentials → OAuth client ID**:

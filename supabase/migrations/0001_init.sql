@@ -1,4 +1,4 @@
--- Sprechfit Phase 2 — initial schema
+-- Genauly Phase 2 — initial schema
 -- Auth + cloud sync + AI writing evaluation.
 -- All user tables are RLS owner-only. The ai_usage table is global and
 -- writable only by the service role (the Edge Function).
