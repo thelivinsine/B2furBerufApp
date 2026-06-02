@@ -108,13 +108,13 @@ export function LandingPage() {
             <GraduationCap className="h-3.5 w-3.5 text-primary" /> Goethe / telc · Deutsch B2 Beruf
           </span>
           <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
-            Bestehe die mündliche{" "}
+            Bestehe die{" "}
             <span className="bg-accent-gradient bg-clip-text text-transparent">B2-Beruf-Prüfung</span>{" "}
             mit Selbstvertrauen
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Dein interaktiver Trainer fürs Sprechen am Arbeitsplatz – Dialog-Simulationen,
-            Wortschatz, Grammatik und ein KI-Schreibcoach. Üben in Minuten, nicht Stunden.
+            Dein interaktiver Trainer für Deutsch im Beruf – Wortschatz, Grammatik,
+            Schreiben mit KI-Coach und Sprech-Simulationen. Üben in Minuten, nicht Stunden.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {onboarded ? (
