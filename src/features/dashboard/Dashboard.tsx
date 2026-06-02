@@ -110,9 +110,9 @@ export function Dashboard() {
         className="relative overflow-hidden rounded-2xl border border-primary/15 bg-surface shadow-glow"
       >
         <div className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative grid md:grid-cols-[1fr_auto]">
+        <div className="relative grid items-center gap-6 p-6 sm:p-8 md:grid-cols-[1.5fr_1fr] md:gap-8">
           {/* Content */}
-          <div className="p-6 sm:p-8">
+          <div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
               <p className="text-sm font-medium text-primary">
                 {greeting}, {name || "Lernende:r"} 👋
@@ -135,10 +135,10 @@ export function Dashboard() {
             </div>
           </div>
 
-          {/* Today's progress panel — fills the right side intentionally. */}
-          <div className="flex flex-col items-center justify-center gap-3 border-t border-border bg-muted/30 p-6 sm:p-8 md:border-l md:border-t-0">
+          {/* Today's progress — blended into the tile, centered in its column. */}
+          <div className="flex flex-col items-center gap-2.5">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Heute</p>
-            <ProgressRing value={goalProgress} size={124} stroke={10}>
+            <ProgressRing value={goalProgress} size={128} stroke={10}>
               <span className="text-2xl font-semibold tabular-nums">{todayXp}</span>
               <span className="text-xs text-muted-foreground">/ {goal} XP</span>
             </ProgressRing>
