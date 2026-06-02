@@ -82,7 +82,12 @@ export function AccountMenu() {
               <p className="truncate text-sm font-medium">
                 {signedIn ? user?.email : status === "anonymous" ? "Gast" : "Nicht angemeldet"}
               </p>
-              <p className="flex items-center gap-1 text-xs text-muted-foreground">
+              <p
+                className={cn(
+                  "flex items-center gap-1 text-xs font-medium",
+                  synced ? "text-success" : "text-muted-foreground",
+                )}
+              >
                 {synced ? <Cloud className="h-3 w-3" /> : <CloudOff className="h-3 w-3" />}
                 {synced ? "Synchronisiert" : "Nur lokal"}
               </p>
