@@ -2,46 +2,62 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Flame,
-  Zap,
-  Target,
-  BookOpen,
-  BookMarked,
-  ListChecks,
-  PenLine,
-  Mic,
-  MessagesSquare,
-  GraduationCap,
-  ArrowRight,
   Trophy,
+  BookOpen,
+  Zap,
+  ArrowRight,
   CalendarDays,
+  Activity,
+  type LucideIcon,
 } from "lucide-react";
 import { themes } from "@/data/themes";
-import { vocabByTheme } from "@/data/vocabulary";
+import { vocabByTheme, vocabulary } from "@/data/vocabulary";
 import { scenariosByTheme } from "@/data/dialogues";
 import { iconByName } from "@/lib/icons";
 import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { mastery } from "@/engine/srs";
+import { mastery, dueCount } from "@/engine/srs";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
-import { vocabulary } from "@/data/vocabulary";
-import { daysBetween, pct, todayKey } from "@/lib/utils";
+import { daysBetween, pct, todayKey, cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { StatCard } from "@/components/shared/StatCard";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { SectionHeading } from "@/components/shared/misc";
+import { recommendedNext } from "./recommend";
 
-const dailyModules = [
-  { to: "/vocabulary", label: "Wortschatz-Drill", desc: "Karteikarten mit Wiederholung", icon: BookOpen, mins: "5 Min" },
-  { to: "/quiz", label: "Themen-Quiz", desc: "Drei Stufen pro Thema", icon: ListChecks, mins: "5 Min" },
-  { to: "/grammar", label: "Grammatik-Werkstatt", desc: "Strukturen üben mit Feedback", icon: BookMarked, mins: "6 Min" },
-  { to: "/redemittel", label: "Redemittel-Übung", desc: "Wendungen aktiv anwenden", icon: MessagesSquare, mins: "5 Min" },
-  { to: "/writing", label: "Schreibtraining", desc: "KI nennt deine größte Schwachstelle", icon: PenLine, mins: "7 Min" },
-  { to: "/simulation", label: "Sprechsimulation", desc: "Dialog mit Partner:in", icon: Mic, mins: "8 Min" },
-  { to: "/exam", label: "Prüfungssimulation", desc: "Unter realen Bedingungen", icon: GraduationCap, mins: "10 Min" },
-];
+type Accent = "primary" | "accent" | "success" | "warning";
+const accentText: Record<Accent, string> = {
+  primary: "text-primary",
+  accent: "text-accent",
+  success: "text-success",
+  warning: "text-warning",
+};
+
+/** One inline segment of the status strip — deliberately NOT a card, so the
+ *  strip reads as a single panel rather than four competing tiles. */
+function StatItem({
+  icon: Icon,
+  accent,
+  value,
+  label,
+}: {
+  icon: LucideIcon;
+  accent: Accent;
+  value: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <div className="flex items-center gap-3 px-4 py-3.5 sm:flex-1">
+      <Icon className={cn("h-5 w-5 shrink-0", accentText[accent])} />
+      <div className="min-w-0">
+        <p className="text-lg font-semibold leading-tight tracking-tight tabular-nums">{value}</p>
+        <p className="truncate text-xs text-muted-foreground">{label}</p>
+      </div>
+    </div>
+  );
+}
 
 export function Dashboard() {
   const name = useSettingsStore((s) => s.name);
@@ -50,6 +66,7 @@ export function Dashboard() {
   const xp = useProgressStore((s) => s.xp);
   const streak = useProgressStore((s) => s.streak);
   const srs = useProgressStore((s) => s.srs);
+  const totalSessions = useProgressStore((s) => s.totalSessions);
   const todayXp = useTodayXp();
 
   const info = levelFromXp(xp);
@@ -58,17 +75,38 @@ export function Dashboard() {
 
   const masteredCount = vocabulary.filter((v) => mastery(srs[v.id]) >= 0.8).length;
   const daysToExam = examDate ? Math.max(0, daysBetween(todayKey(), examDate)) : null;
+  const due = dueCount(srs);
 
   const hour = new Date().getHours();
   const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
 
+  const rec = recommendedNext({ due, todayXp, goal, daysToExam });
+  const secondary =
+    rec.to === "/revision"
+      ? { to: "/vocabulary", label: "Weiter lernen", icon: BookOpen }
+      : { to: "/revision", label: "Schnellwiederholung", icon: Zap };
+
+  // Theme stats; feature the least-mastered theme (most room to grow) to give
+  // the browse grid a clear focal point and some size variety.
+  const themeStats = themes.map((t) => {
+    const words = vocabByTheme(t.id);
+    const sims = scenariosByTheme(t.id);
+    const mastered = words.filter((w) => mastery(srs[w.id]) >= 0.8).length;
+    const ratio = words.length ? mastered / words.length : 1;
+    return { theme: t, words, sims, mastered, ratio };
+  });
+  const featured = themeStats.reduce((a, b) =>
+    b.ratio < a.ratio || (b.ratio === a.ratio && b.words.length > a.words.length) ? b : a,
+  );
+  const ordered = [featured, ...themeStats.filter((s) => s.theme.id !== featured.theme.id)];
+
   return (
     <div className="space-y-8">
-      {/* Hero */}
+      {/* Focal block — the one primary action for today. */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-soft sm:p-8"
+        className="relative overflow-hidden rounded-2xl border border-primary/20 bg-surface p-6 shadow-glow sm:p-8"
       >
         <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-primary/15 blur-3xl" />
         <div className="relative flex flex-wrap items-center justify-between gap-6">
@@ -76,138 +114,130 @@ export function Dashboard() {
             <p className="text-sm font-medium text-primary">
               {greeting}, {name || "Lernende:r"} 👋
             </p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">
-              Bereit für dein tägliches Training?
-            </h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              {daysToExam !== null
-                ? `Noch ${daysToExam} Tage bis zur Prüfung. Jeder Tag zählt.`
-                : "Übe heute 10 Minuten und halte deine Serie am Leben."}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{rec.headline}</h1>
+            <p className="mt-2 text-sm text-muted-foreground">{rec.subline}</p>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
               <Button asChild variant="gradient">
-                <Link to="/simulation">
-                  <Mic className="h-4 w-4" /> Simulation starten
+                <Link to={rec.to}>
+                  <rec.icon className="h-4 w-4" /> {rec.label}
                 </Link>
               </Button>
+              {rec.badge && <Badge variant="warning">{rec.badge}</Badge>}
               <Button asChild variant="outline">
-                <Link to="/revision">
-                  <Zap className="h-4 w-4" /> Schnellwiederholung
+                <Link to={secondary.to}>
+                  <secondary.icon className="h-4 w-4" /> {secondary.label}
                 </Link>
               </Button>
             </div>
           </div>
 
-          <div className="flex items-center gap-5">
-            <ProgressRing value={goalProgress} size={132} stroke={11}>
-              <span className="text-2xl font-semibold tabular-nums">{todayXp}</span>
-              <span className="text-xs text-muted-foreground">/ {goal} XP</span>
-            </ProgressRing>
-          </div>
+          <ProgressRing value={goalProgress} size={132} stroke={11}>
+            <span className="text-2xl font-semibold tabular-nums">{todayXp}</span>
+            <span className="text-xs text-muted-foreground">/ {goal} XP</span>
+          </ProgressRing>
         </div>
       </motion.div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard icon={Flame} label="Serie" value={`${streak} ${streak === 1 ? "Tag" : "Tage"}`} accent="warning" hint="Tägliches Lernen" />
-        <StatCard icon={Trophy} label="Level" value={info.level} accent="primary" hint={tier.name} />
-        <StatCard icon={Target} label="Heute" value={`${todayXp} XP`} accent="accent" hint={`Ziel: ${goal} XP`} />
-        <StatCard icon={BookOpen} label="Gemeistert" value={`${masteredCount}/${vocabulary.length}`} accent="success" hint="Vokabeln" />
-      </div>
-
-      {/* Level progress */}
-      <Card>
-        <CardContent className="flex flex-wrap items-center justify-between gap-4 p-5">
-          <div className="min-w-[200px] flex-1">
-            <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="font-semibold">
-                Level {info.level} · <span className="text-muted-foreground">{tier.name}</span>
-              </span>
-              <span className="tabular-nums text-muted-foreground">{info.intoLevel} / {info.forLevel} XP</span>
-            </div>
-            <Progress value={info.progress * 100} />
-          </div>
-          {daysToExam !== null && (
-            <Badge variant="accent" className="gap-1.5 py-1.5">
-              <CalendarDays className="h-3.5 w-3.5" /> {daysToExam} Tage bis zur Prüfung
-            </Badge>
+      {/* Status strip — one panel of inline stats + embedded level progress. */}
+      <Card className="overflow-hidden">
+        <div className="grid grid-cols-2 divide-x divide-y divide-border sm:flex sm:divide-y-0">
+          <StatItem icon={Flame} accent="warning" value={streak} label={streak === 1 ? "Tag Serie" : "Tage Serie"} />
+          <StatItem icon={Trophy} accent="primary" value={`Lvl ${info.level}`} label={tier.name} />
+          <StatItem icon={BookOpen} accent="success" value={`${masteredCount}/${vocabulary.length}`} label="Gemeistert" />
+          {daysToExam !== null ? (
+            <StatItem icon={CalendarDays} accent="accent" value={daysToExam} label="Tage bis Prüfung" />
+          ) : (
+            <StatItem icon={Activity} accent="accent" value={totalSessions} label="Sitzungen" />
           )}
-        </CardContent>
+        </div>
+        <div className="border-t border-border px-4 py-3">
+          <div className="mb-1.5 flex items-center justify-between text-xs">
+            <span className="font-medium">
+              Level {info.level} · <span className="text-muted-foreground">{tier.name}</span>
+            </span>
+            <span className="tabular-nums text-muted-foreground">
+              {info.intoLevel} / {info.forLevel} XP
+            </span>
+          </div>
+          <Progress value={info.progress * 100} className="h-1.5" />
+        </div>
       </Card>
 
-      {/* Daily modules */}
+      {/* Themes — the main browse surface, with one featured (larger) card. */}
       <section>
-        <SectionHeading eyebrow="Heute" title="Tägliche Übungen" description="Kurze Einheiten für aktives Erinnern und flüssiges Sprechen." />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {dailyModules.map((m, i) => (
-            <motion.div
-              key={m.to}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <Link to={m.to}>
-                <Card className="card-hover group h-full">
-                  <CardContent className="flex h-full flex-col gap-3 p-5">
-                    <div className="flex items-center justify-between">
-                      <div className="rounded-lg bg-primary/12 p-2.5 text-primary">
-                        <m.icon className="h-5 w-5" />
-                      </div>
-                      <Badge variant="muted">{m.mins}</Badge>
-                    </div>
-                    <div className="mt-auto">
-                      <p className="font-semibold">{m.label}</p>
-                      <p className="text-sm text-muted-foreground">{m.desc}</p>
-                    </div>
-                    <span className="flex items-center gap-1 text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
-                      Starten <ArrowRight className="h-3.5 w-3.5" />
-                    </span>
-                  </CardContent>
-                </Card>
+        <SectionHeading
+          eyebrow="Themen"
+          title="Prüfungsthemen"
+          description="Realistische Situationen aus dem Berufsalltag mit Wortschatz, Redemitteln und Simulationen."
+          action={
+            <Button asChild variant="ghost" size="sm">
+              <Link to="/vocabulary">
+                Wortschatz ansehen <ArrowRight className="h-3.5 w-3.5" />
               </Link>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Themes */}
-      <section>
-        <SectionHeading eyebrow="Themen" title="Prüfungsthemen" description="Realistische Situationen aus dem Berufsalltag mit Wortschatz, Redemitteln und Simulationen." />
+            </Button>
+          }
+        />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {themes.map((theme, i) => {
-            const words = vocabByTheme(theme.id);
-            const sims = scenariosByTheme(theme.id);
-            const mastered = words.filter((w) => mastery(srs[w.id]) >= 0.8).length;
+          {ordered.map(({ theme, words, sims, mastered }, i) => {
             const Icon = iconByName(theme.icon);
+            const masteredPct = pct(mastered, words.length);
+            const isFeatured = theme.id === featured.theme.id;
             return (
               <motion.div
                 key={theme.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
+                className={cn(isFeatured && "sm:col-span-2")}
               >
                 <Link to={`/vocabulary?theme=${theme.id}`}>
                   <Card className="card-hover group h-full overflow-hidden">
                     <div className={`h-1.5 w-full bg-gradient-to-r ${theme.accent}`} />
-                    <CardContent className="space-y-3 p-5">
-                      <div className="flex items-start justify-between">
-                        <div className={`rounded-xl bg-gradient-to-br ${theme.accent} p-2.5 text-white shadow-soft`}>
-                          <Icon className="h-5 w-5" />
+                    {isFeatured ? (
+                      <CardContent className="p-5 sm:p-6">
+                        <div className="flex items-start justify-between">
+                          <div className={`rounded-xl bg-gradient-to-br ${theme.accent} p-3 text-white shadow-soft`}>
+                            <Icon className="h-6 w-6" />
+                          </div>
+                          <Badge variant="accent">Empfohlen</Badge>
                         </div>
-                        {sims.length > 0 && <Badge variant="muted">{sims.length} Sim.</Badge>}
-                      </div>
-                      <div>
-                        <p className="font-semibold">{theme.titleDe}</p>
-                        <p className="line-clamp-2 text-sm text-muted-foreground">{theme.blurb}</p>
-                      </div>
-                      <div className="space-y-1.5">
-                        <div className="flex justify-between text-xs text-muted-foreground">
-                          <span>{mastered} / {words.length} Wörter</span>
-                          <span>{pct(mastered, words.length)}%</span>
+                        <p className="mt-3 text-lg font-semibold">{theme.titleDe}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{theme.blurb}</p>
+                        <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                          <span className="rounded-full bg-muted px-2.5 py-1">{words.length} Wörter</span>
+                          {sims.length > 0 && (
+                            <span className="rounded-full bg-muted px-2.5 py-1">{sims.length} Simulationen</span>
+                          )}
                         </div>
-                        <Progress value={pct(mastered, words.length)} className="h-1.5" />
-                      </div>
-                    </CardContent>
+                        <div className="mt-3 space-y-1.5">
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>{mastered} / {words.length} gemeistert</span>
+                            <span>{masteredPct}%</span>
+                          </div>
+                          <Progress value={masteredPct} className="h-1.5" />
+                        </div>
+                      </CardContent>
+                    ) : (
+                      <CardContent className="space-y-3 p-5">
+                        <div className="flex items-start justify-between">
+                          <div className={`rounded-xl bg-gradient-to-br ${theme.accent} p-2.5 text-white shadow-soft`}>
+                            <Icon className="h-5 w-5" />
+                          </div>
+                          {sims.length > 0 && <Badge variant="muted">{sims.length} Sim.</Badge>}
+                        </div>
+                        <div>
+                          <p className="font-semibold">{theme.titleDe}</p>
+                          <p className="line-clamp-2 text-sm text-muted-foreground">{theme.blurb}</p>
+                        </div>
+                        <div className="space-y-1.5">
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>{mastered} / {words.length} Wörter</span>
+                            <span>{masteredPct}%</span>
+                          </div>
+                          <Progress value={masteredPct} className="h-1.5" />
+                        </div>
+                      </CardContent>
+                    )}
                   </Card>
                 </Link>
               </motion.div>
