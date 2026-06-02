@@ -2,6 +2,16 @@ import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/useAuthStore";
 import type { ThemeId, WeaknessCategory } from "@/types";
 
+export interface WritingHistoryEntry {
+  id: string;
+  created_at: string;
+  theme: ThemeId;
+  length: WritingLength;
+  weakness: WeaknessCategory;
+  insight: string;
+  cached: boolean;
+}
+
 export type WritingLength = "short" | "long";
 
 export interface WritingEvalResult {
@@ -19,6 +29,21 @@ export interface WritingEvalResult {
   limitReached?: boolean;
   /** Graceful, user-facing message (e.g. limit reached). */
   message?: string;
+}
+
+/** Fetch the current user's past writing evaluations, newest first. */
+export async function getWritingHistory(limit = 30): Promise<WritingHistoryEntry[]> {
+  try {
+    const { data, error } = await supabase
+      .from("writing_evaluations")
+      .select("id, created_at, theme, length, weakness, insight, cached")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+    if (error || !data) return [];
+    return data as WritingHistoryEntry[];
+  } catch {
+    return [];
+  }
 }
 
 /**

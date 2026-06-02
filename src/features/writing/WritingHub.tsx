@@ -1,18 +1,21 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock } from "lucide-react";
+import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock, History } from "lucide-react";
 import type { ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { writingPrompts } from "@/data/writingPrompts";
 import { practiceAreaById } from "@/data/practiceAreas";
 import { iconByName } from "@/lib/icons";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
+import { WritingHistory } from "./WritingHistory";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { cn } from "@/lib/utils";
+
+type HubView = "write" | "history";
 
 const lengthMeta: Record<WritingLength, { labelDe: string; words: string; range: [number, number] }> = {
   short: { labelDe: "Kurz", words: "ca. 40–60 Wörter", range: [40, 60] },
@@ -34,6 +37,7 @@ export function WritingHub() {
   const themeParam = params.get("theme");
   const theme = isThemeId(themeParam) ? themeParam : null;
 
+  const [hubView, setHubView] = useState<HubView>("write");
   const [length, setLength] = useState<WritingLength>("short");
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -41,7 +45,7 @@ export function WritingHub() {
 
   const words = useMemo(() => countWords(text), [text]);
 
-  // Theme picker
+  // Theme picker / history toggle
   if (!theme) {
     return (
       <div className="space-y-6">
@@ -52,36 +56,67 @@ export function WritingHub() {
           title="Schreibtraining"
           description="Schreibe einen kurzen oder langen Text zu einem Berufsthema. Die KI nennt dir deine wichtigste Schwachstelle – und einen Knopf, der dich direkt zur passenden Übung bringt."
         />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {themes.map((t, i) => {
-            const Icon = iconByName(t.icon);
-            return (
-              <motion.button
-                key={t.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-                onClick={() => setParams({ theme: t.id })}
-                className="text-left"
-              >
-                <Card className="card-hover group h-full overflow-hidden">
-                  <div className={`h-1.5 w-full bg-gradient-to-r ${t.accent}`} />
-                  <CardContent className="space-y-3 p-5">
-                    <div className="flex items-start justify-between">
-                      <div className={`rounded-xl bg-gradient-to-br ${t.accent} p-2.5 text-white shadow-soft`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <Badge variant="muted" className="gap-1">
-                        <PenLine className="h-3 w-3" /> Schreiben
-                      </Badge>
-                    </div>
-                    <p className="font-semibold">{t.titleDe}</p>
-                  </CardContent>
-                </Card>
-              </motion.button>
-            );
-          })}
+
+        {/* Tab switcher */}
+        <div className="flex gap-1 rounded-xl border border-border bg-muted/30 p-1 w-fit">
+          <button
+            onClick={() => setHubView("write")}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors",
+              hubView === "write"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <PenLine className="h-3.5 w-3.5" /> Neuer Text
+          </button>
+          <button
+            onClick={() => setHubView("history")}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors",
+              hubView === "history"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <History className="h-3.5 w-3.5" /> Verlauf
+          </button>
         </div>
+
+        {hubView === "history" ? (
+          <WritingHistory />
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {themes.map((t, i) => {
+              const Icon = iconByName(t.icon);
+              return (
+                <motion.button
+                  key={t.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                  onClick={() => setParams({ theme: t.id })}
+                  className="text-left"
+                >
+                  <Card className="card-hover group h-full overflow-hidden">
+                    <div className={`h-1.5 w-full bg-gradient-to-r ${t.accent}`} />
+                    <CardContent className="space-y-3 p-5">
+                      <div className="flex items-start justify-between">
+                        <div className={`rounded-xl bg-gradient-to-br ${t.accent} p-2.5 text-white shadow-soft`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <Badge variant="muted" className="gap-1">
+                          <PenLine className="h-3 w-3" /> Schreiben
+                        </Badge>
+                      </div>
+                      <p className="font-semibold">{t.titleDe}</p>
+                    </CardContent>
+                  </Card>
+                </motion.button>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
