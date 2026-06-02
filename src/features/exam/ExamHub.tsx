@@ -7,7 +7,7 @@ import type { ExamSet } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { SectionHeading } from "@/components/shared/misc";
+import { HubHero } from "@/components/shared/HubHero";
 import { useProgressStore } from "@/store/useProgressStore";
 import { ExamRunner } from "./ExamRunner";
 
@@ -23,7 +23,9 @@ export function ExamHub() {
 
   return (
     <div className="space-y-6">
-      <SectionHeading
+      <HubHero
+        icon={GraduationCap}
+        gradient="from-amber-500 to-orange-500"
         eyebrow="Prüfungsmodus"
         title="Prüfungssimulation"
         description="Vollständige Simulation des B2-Beruf-Prüfungsmoduls unter realistischen Bedingungen – mit Aufgabenblatt, Zeitlimit und Bewertungsraster."

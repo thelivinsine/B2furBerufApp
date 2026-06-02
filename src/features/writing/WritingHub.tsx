@@ -11,7 +11,7 @@ import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/l
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SectionHeading } from "@/components/shared/misc";
+import { HubHero } from "@/components/shared/HubHero";
 import { cn } from "@/lib/utils";
 
 const lengthMeta: Record<WritingLength, { labelDe: string; words: string; range: [number, number] }> = {
@@ -45,7 +45,9 @@ export function WritingHub() {
   if (!theme) {
     return (
       <div className="space-y-6">
-        <SectionHeading
+        <HubHero
+          icon={PenLine}
+          gradient="from-rose-500 to-pink-500"
           eyebrow="KI-Schreibcoach"
           title="Schreibtraining"
           description="Schreibe einen kurzen oder langen Text zu einem Berufsthema. Die KI nennt dir deine wichtigste Schwachstelle – und einen Knopf, der dich direkt zur passenden Übung bringt."
