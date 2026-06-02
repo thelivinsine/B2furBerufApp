@@ -9,7 +9,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
-import { SectionHeading, EmptyState } from "@/components/shared/misc";
+import { EmptyState } from "@/components/shared/misc";
+import { HubHero } from "@/components/shared/HubHero";
 import { GrammarDrillCard } from "./GrammarDrillCard";
 
 /** Display metadata for each grammar group. */
@@ -58,51 +59,54 @@ export function GrammarHub() {
   const open = (id: string) => setParams({ topic: id });
 
   return (
-    <div className="space-y-8">
-      <SectionHeading
+    <div className="space-y-6">
+      <HubHero
+        icon={BookMarked}
+        gradient="from-emerald-500 to-teal-500"
         eyebrow="Grammatik"
         title="Grammatik-Werkstatt"
         description="Die wichtigsten B2-Strukturen verständlich erklärt – mit Mustern, Beispielen, typischen Fehlern und Mini-Übungen mit sofortigem Feedback."
       />
 
-      {grouped.map(({ group, topics }) => {
-        const meta = groupMeta[group];
-        const Icon = iconByName(meta.icon);
-        return (
-          <section key={group} className="space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="rounded-lg bg-primary/12 p-2 text-primary">
-                <Icon className="h-4 w-4" />
-              </div>
-              <h3 className="font-semibold leading-tight">{meta.labelDe}</h3>
-              <Badge variant="muted" className="ml-auto">{topics.length}</Badge>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {topics.map((t, i) => (
-                <motion.button
-                  key={t.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: Math.min(i * 0.03, 0.2) }}
-                  onClick={() => open(t.id)}
-                  className="text-left"
-                >
-                  <Card className="card-hover h-full">
-                    <CardContent className="space-y-2 p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="font-semibold leading-snug">{t.titleDe}</p>
-                        <Badge variant="muted">{t.drills.length} Übg.</Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{t.purpose}</p>
-                      <p className="rounded-md bg-muted/50 px-2 py-1 font-mono text-xs text-muted-foreground">{t.pattern}</p>
-                    </CardContent>
-                  </Card>
-                </motion.button>
-              ))}
-            </div>
-          </section>
-        );
-      })}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {grouped
+          .flatMap(({ group, topics }) => topics.map((topic) => ({ topic, group })))
+          .map(({ topic, group }, i) => {
+            const meta = groupMeta[group];
+            const Icon = iconByName(meta.icon);
+            const showGroupTag = meta.labelDe !== topic.titleDe;
+            return (
+              <motion.button
+                key={topic.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: Math.min(i * 0.025, 0.2) }}
+                onClick={() => open(topic.id)}
+                className="text-left"
+              >
+                <Card className="card-hover h-full">
+                  <CardContent className="flex h-full flex-col gap-2 p-4">
+                    <div className="flex items-center justify-between gap-2">
+                      {showGroupTag ? (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                          <Icon className="h-3.5 w-3.5 text-emerald-500" /> {meta.labelDe}
+                        </span>
+                      ) : (
+                        <Icon className="h-4 w-4 text-emerald-500" />
+                      )}
+                      <Badge variant="muted">{topic.drills.length} Übg.</Badge>
+                    </div>
+                    <p className="font-semibold leading-snug">{topic.titleDe}</p>
+                    <p className="text-sm text-muted-foreground">{topic.purpose}</p>
+                    <p className="mt-auto line-clamp-2 rounded-md bg-muted/50 px-2 py-1 font-mono text-xs text-muted-foreground">
+                      {topic.pattern}
+                    </p>
+                  </CardContent>
+                </Card>
+              </motion.button>
+            );
+          })}
+      </div>
     </div>
   );
 }
