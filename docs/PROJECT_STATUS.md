@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-01 (session 3). Branch: `claude/determined-euler-xUDrh`. Product name: **Deutschfit**._
+_Last updated: 2026-06-02 (session 3). Branch: `claude/determined-euler-xUDrh`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -38,8 +38,8 @@ This file is the single place to re-orient when resuming work. For the full desi
   Pages site; `npm run build` green; no duplicate ids.
 
 ### Branding — DONE (live)
-- App renamed to **Deutschfit**, tagline **"Deutsch im Beruf · B2 Prüfung"** (sidebar, onboarding,
-  `<title>`/meta, `package.json` name `sprechfit`).
+- App named **Genauly**, tagline **"German that clicks"** (header, sidebar, onboarding,
+  `<title>`/meta, `package.json` name `genauly`). Custom domain **genauly.de** (CNAME shipped).
 - **Logo: reverted to placeholder** (Sparkles icon + original gradient speech-bubble favicon).
   A custom mark was tried and rolled back; founder will choose a logo later.
 
