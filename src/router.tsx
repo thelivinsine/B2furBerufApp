@@ -42,6 +42,11 @@ const Analytics = React.lazy(() =>
 const Settings = React.lazy(() =>
   import("@/features/settings/Settings").then((m) => ({ default: m.Settings })),
 );
+const CollocationsBrowser = React.lazy(() =>
+  import("@/features/collocations/CollocationsBrowser").then((m) => ({
+    default: m.CollocationsBrowser,
+  })),
+);
 
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
@@ -97,6 +102,14 @@ export const router = createHashRouter([
         element: (
           <RequireOnboarding>
             <GrammarHub />
+          </RequireOnboarding>
+        ),
+      },
+      {
+        path: "/collocations",
+        element: (
+          <RequireOnboarding>
+            <CollocationsBrowser />
           </RequireOnboarding>
         ),
       },
