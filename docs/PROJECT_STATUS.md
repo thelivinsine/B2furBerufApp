@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-02 (session 3). Branch: `claude/determined-euler-xUDrh`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-03 (session 4). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -117,7 +117,7 @@ This file is the single place to re-orient when resuming work. For the full desi
 
 ## Deploy / workflow reminders
 - `main` is production; merging to it triggers `pages.yml` (the **only** workflow now — the old
-  `deploy.yml`/`gh-pages` fallback is gone). Develop on `claude/determined-euler-xUDrh`; ship via
+  `deploy.yml`/`gh-pages` fallback is gone). Develop on `claude/loving-cray-lMLj3`; ship via
   squash-merge PR. **Always verify `npm run build` is green on the exact commit before merging**
   (a skipped check shipped two broken builds in session 2).
 - **Feature-branch pushes are NOT live.** Only `main` deploys. In session 3 the founder reported
@@ -126,13 +126,13 @@ This file is the single place to re-orient when resuming work. For the full desi
   open + squash-merge the PR yourself without asking** — see CLAUDE.md.
 - **REQUIRED post-deploy housekeeping (after every squash-merge):** realign the dev branch so it
   doesn't drift and conflict on the next PR — `git fetch origin main` → `git reset --hard origin/main`
-  → `git push --force-with-lease origin claude/determined-euler-xUDrh`. (Forgetting this caused the
+  → `git push --force-with-lease origin claude/loving-cray-lMLj3`. (Forgetting this caused the
   PR #23 merge conflict.) Full checklist in CLAUDE.md → "Post-deploy GitHub housekeeping".
 - Sandbox can't reach the live site or run Docker (so no local Supabase / no live verification
   here) — those steps are handed to the founder, same as the Pages deploy.
 
 ## Deploy / ops notes (accumulated)
-- `main` is production; merging triggers `pages.yml`. Develop on `claude/determined-euler-xUDrh`;
+- `main` is production; merging triggers `pages.yml`. Develop on `claude/loving-cray-lMLj3`;
   ship via squash-merge PR. **Always verify `npm run build` green before merging.**
 - Sandbox cannot reach `api.supabase.com` or `db.*.supabase.co:5432` — CLI migrations and function
   deploys must be done by the founder (dashboard SQL editor + dashboard function code editor work
@@ -142,11 +142,11 @@ This file is the single place to re-orient when resuming work. For the full desi
 - Email magic-links on Supabase free plan are rate-limited (~2/hour). Fix: add Resend (free tier)
   as custom SMTP in Auth → SMTP settings. Guest sign-in has no such limit and is the primary path.
 
-### Email+password / Google auth (branch `claude/determined-euler-xUDrh`)
+### Email+password / Google auth (branch `claude/loving-cray-lMLj3`)
 See the "REQUIRES two Supabase dashboard settings" note below — sign-up needs **"Confirm email"
 OFF** to be instant, and the Google button needs the **Google provider** configured.
 
-### Landing page + visible auth (branch `claude/determined-euler-xUDrh`)
+### Landing page + visible auth (branch `claude/loving-cray-lMLj3`)
 - **Why:** auth was fully built but invisible (Settings-only, no login UI), so it "seemed not in
   place." Founder asked for a real marketing landing page with top-right Login / Sign-up, guest
   use still allowed, and an active nudge to save progress.
@@ -178,7 +178,7 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
 ### UX polish — Quiz answer-reflect flow (PR #14, pending merge)
 - **Problem:** `VocabQuiz` and `RedemittelPractice` auto-advanced to the next question after
   selecting an answer (900ms / 700–1100ms timeouts), giving no time to reflect.
-- **Fix (branch `claude/determined-euler-xUDrh`, PR #14):**
+- **Fix (branch `claude/loving-cray-lMLj3`, PR #14):**
   - Removed all `setTimeout` auto-advances from both components.
   - After selecting an answer the question stays on screen with instant colour feedback.
   - A `Weiter` / `Quiz beenden` button appears, plus a "tap anywhere" affordance (taps on
@@ -216,16 +216,45 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 4 (2026-06-03) — Writing History + Collocations Browser + UX polish (SHIPPED & LIVE)
+
+- **Writing History (PRs #52–#53, live):** `src/features/writing/WritingHistory.tsx` — loads past
+  AI evaluations from `writing_evaluations` Supabase table; shows weakness-frequency bar chart (top 5
+  weaknesses, horizontal progress bars, "Jetzt üben" CTA for the top weakness) + chronological list of
+  past entries with badges, insight text, and deep-link to practice. Wired into `WritingHub` as a
+  tab-switched "Verlauf" view alongside the existing "Neuer Text" prompt picker. `src/lib/writing.ts`
+  got `WritingHistoryEntry` type + `getWritingHistory(limit)` async query.
+- **Collocations Browser (PR #51→#56, live):** dedicated `/collocations` route — `CollocationsBrowser`
+  browsing all 98 Nomen-Verb pairs. Features: theme Select dropdown, text search with clear button,
+  scrollable verb-chip row with ChevronLeft/Right + ChevronDown expand-all, "Alle Verben" default chip,
+  register color-coding (indigo pastel for formal), neutral/formal legend, result count, quiz CTA when
+  theme active. Linked from Sidebar (Combine icon) and from a GrammarHub banner.
+- **Content fix:** `src/data/collocations.ts` had two duplicate IDs (`c_beschwerde_bearbeiten` ×2 and
+  `c_daten_sichern` ×2) that caused React to silently drop cards. Renamed second occurrences `_2`.
+  Total unique collocations: 98.
+- **App-wide card polish:** removed `h-1.5` top-border accent stripe from ALL card styles across
+  Dashboard, QuizHub, GrammarHub, WritingHub — it served no semantic purpose. Collocation cards refined
+  iteratively: English translation closer to German (`-mt-2`), divider line removed, German example
+  sentence bolded (`font-semibold`).
+- **Stuck-card animation bug fixed (PR #54):** per-card `motion.div` with `delay: i * 0.025` caused
+  cards to freeze at `opacity:0` when verb filters changed their list position. Fixed by removing per-
+  card animation and keying a single grid-level `motion.div` on `${themeParam}__${verbFilter}` —
+  forces a full grid remount + quick fade-in on every filter change.
+- **TypeScript 6 compatibility fix:** environment had TS 6.0.2 vs expected 5.7. Added
+  `"ignoreDeprecations": "5.0"` to both `tsconfig.app.json` + `tsconfig.node.json`, and installed
+  `@types/node` as a dev dependency. Build now green.
+- **Dev branch note:** session 4 work was developed on `claude/loving-cray-lMLj3` (previous branch
+  `claude/loving-cray-lMLj3` became stale after PR history rewrite).
+
 ## Resume here (next session)
-**Both Phase 1 and Phase 2 are SHIPPED and LIVE on `main`**, plus the session-3 auth-honesty fix and
-dark-mode readability rework (PRs #19, #20). The full platform is working: vocabulary/grammar/quiz/
-simulation/exam (Phase 1) + guest auth + cloud sync + AI writing coach (Phase 2). All founder-verified.
+**All phases SHIPPED and LIVE on `main`** including the full session-4 feature set. The platform now
+has: vocabulary/grammar/quiz/simulation/exam + guest auth + cloud sync + AI writing coach + writing
+history + collocations browser.
+
+**Dev branch:** `claude/loving-cray-lMLj3` (realigned to `origin/main` after PR #56 squash-merge).
 
 **Remember to AUTO-SHIP** — when a change is complete and `npm run build` is green, open a PR into
 `main` and squash-merge it yourself (founder approved 2026-06-01); the merge deploys via `pages.yml`.
-
-**PR #14 status** — "Quiz: keep feedback on screen, advance via Next button or tap." If still open,
-merge it to ship the answer-reflect UX polish (`npm run build` green). Verify it wasn't superseded.
 
 **Pending housekeeping (low urgency):**
 - Rotate the Anthropic key (was pasted in chat) — 2 min at console.anthropic.com.
@@ -233,14 +262,12 @@ merge it to ship the answer-reflect UX polish (`npm run build` green). Verify it
 - Enable Turnstile CAPTCHA before public launch.
 
 **Candidate next features (pick one):**
-- (a) **Writing history view** — surface past evaluations from `writing_evaluations` table; show
-  streak of weaknesses so learner sees their improvement over time.
-- (b) **Collocations browser tab** — dedicated browse/filter UI for the 68 Nomen-Verb pairs,
-  accessible from Vocabulary or Grammar.
-- (c) **Code-split the bundle** — dynamic imports for heavy routes (exam, simulation) to cut the
-  ~1.41 MB initial load.
-- (d) **More content** — expand collocations (~6→10/theme), add more grammar drills, grow vocab
-  toward 350 words.
-- (e) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
-- (f) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
+- (a) **Code-split the bundle** — dynamic imports for heavy routes (exam, simulation) to cut the
+  initial load (currently ~1.41 MB from supabase-js alone).
+- (b) **More content** — expand collocations (currently 98, target ~120), add more grammar drills,
+  grow vocab toward 350 words.
+- (c) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
+- (d) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
   AI evaluations (currently 5/day free for all).
+- (e) **Progress analytics screen** — charts of XP over time, mastered-word trend, weakness history;
+  could leverage `writing_evaluations` + SRS data already in Supabase.
