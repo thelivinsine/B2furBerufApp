@@ -99,7 +99,6 @@ export function WritingHub() {
                   className="text-left"
                 >
                   <Card className="card-hover group h-full overflow-hidden">
-                    <div className={`h-1.5 w-full bg-gradient-to-r ${t.accent}`} />
                     <CardContent className="space-y-3 p-5">
                       <div className="flex items-start justify-between">
                         <div className={`rounded-xl bg-gradient-to-br ${t.accent} p-2.5 text-white shadow-soft`}>

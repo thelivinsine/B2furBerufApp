@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Combine, ListChecks, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Combine, ListChecks, Search, X } from "lucide-react";
 import { collocations } from "@/data/collocations";
 import { themes, themeById } from "@/data/themes";
 import { Card, CardContent } from "@/components/ui/card";
@@ -21,6 +21,12 @@ function normalise(s: string) {
   return s.toLowerCase().replace(/[äöü]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue" }[c] ?? c));
 }
 
+const pillBase =
+  "shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors border";
+const pillIdle =
+  "bg-white text-foreground border-border/60 hover:border-primary/40 hover:text-primary dark:bg-white/8 dark:border-white/15 dark:hover:border-primary/50";
+const pillActive = "bg-primary text-primary-foreground border-primary";
+
 export function CollocationsBrowser() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -28,8 +34,9 @@ export function CollocationsBrowser() {
   const themeParam = params.get("theme") ?? "all";
   const [search, setSearch] = useState("");
   const [verbFilter, setVerbFilter] = useState("all");
+  const [expanded, setExpanded] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Unique verbs for the current theme — drives the chip row.
   const availableVerbs = useMemo(() => {
     const base =
       themeParam === "all" ? collocations : collocations.filter((c) => c.themeId === themeParam);
@@ -65,6 +72,10 @@ export function CollocationsBrowser() {
 
   const toggleVerb = (verb: string) =>
     setVerbFilter((prev) => (prev === verb ? "all" : verb));
+
+  const scrollBy = (dir: "left" | "right") => {
+    scrollRef.current?.scrollBy({ left: dir === "left" ? -220 : 220, behavior: "smooth" });
+  };
 
   return (
     <div className="space-y-5">
@@ -111,36 +122,70 @@ export function CollocationsBrowser() {
         </div>
       </div>
 
-      {/* Verb chips — "Alle Verben" pinned, rest scrollable */}
-      <div className="flex items-center gap-0">
-        {/* Pinned "Alle Verben" chip */}
+      {/* Verb chips */}
+      <div className="flex items-center gap-1">
+        {/* Pinned "Alle Verben" */}
         <button
           onClick={() => setVerbFilter("all")}
-          className={cn(
-            "shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors mr-2",
-            verbFilter === "all"
-              ? "bg-primary text-primary-foreground"
-              : "bg-muted text-muted-foreground hover:text-foreground",
-          )}
+          className={cn(pillBase, verbFilter === "all" ? pillActive : pillIdle, "mr-1")}
         >
           Alle Verben
         </button>
-        {/* Scrollable verb list */}
-        <div className="flex gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+
+        {/* Left arrow */}
+        {!expanded && (
+          <button
+            onClick={() => scrollBy("left")}
+            className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/8 dark:border-white/15"
+            aria-label="Nach links scrollen"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        {/* Chips row — scrollable or expanded */}
+        <div
+          ref={expanded ? undefined : scrollRef}
+          className={cn(
+            "flex gap-1.5 flex-1 min-w-0",
+            expanded
+              ? "flex-wrap"
+              : "overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          )}
+        >
           {availableVerbs.map((verb) => (
             <button
               key={verb}
               onClick={() => toggleVerb(verb)}
               className={cn(
-                "shrink-0 rounded-full px-3 py-1 font-mono text-xs font-medium transition-colors",
-                verbFilter === verb
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground",
+                pillBase,
+                "font-mono",
+                verbFilter === verb ? pillActive : pillIdle,
               )}
             >
               {verb}
             </button>
           ))}
+        </div>
+
+        {/* Right arrow + expand toggle */}
+        <div className="flex shrink-0 items-center gap-0.5 ml-1">
+          {!expanded && (
+            <button
+              onClick={() => scrollBy("right")}
+              className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/8 dark:border-white/15"
+              aria-label="Nach rechts scrollen"
+            >
+              <ChevronRight className="h-3.5 w-3.5" />
+            </button>
+          )}
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/8 dark:border-white/15"
+            aria-label={expanded ? "Weniger anzeigen" : "Alle anzeigen"}
+          >
+            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
+          </button>
         </div>
       </div>
 
@@ -156,7 +201,7 @@ export function CollocationsBrowser() {
               Neutral
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-sm bg-amber-400/50" />
+              <span className="h-2.5 w-2.5 rounded-sm bg-indigo-300/70 dark:bg-indigo-400/40" />
               Formal
             </span>
           </div>
@@ -179,7 +224,6 @@ export function CollocationsBrowser() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((c, i) => {
-            const theme = c.themeId ? themeById(c.themeId) : null;
             const isFormal = c.register === "formal";
             return (
               <motion.div
@@ -190,22 +234,20 @@ export function CollocationsBrowser() {
               >
                 <Card
                   className={cn(
-                    "h-full overflow-hidden",
-                    isFormal && "bg-amber-500/5 dark:bg-amber-500/10",
+                    "h-full",
+                    isFormal
+                      ? "bg-indigo-50 dark:bg-indigo-950/25 border-indigo-200/60 dark:border-indigo-800/40"
+                      : "",
                   )}
                 >
-                  {theme && <div className={`h-1 w-full bg-gradient-to-r ${theme.accent}`} />}
                   <CardContent className="space-y-3 p-4">
-                    {/* Phrase + TTS */}
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-base font-bold leading-snug">{c.full}</p>
                       <SpeakButton text={c.full} className="mt-0.5 shrink-0" />
                     </div>
 
-                    {/* Translation */}
                     <p className="text-sm italic text-muted-foreground">{c.en}</p>
 
-                    {/* Example */}
                     <div className="space-y-0.5 border-t border-border pt-2.5">
                       <div className="flex items-start gap-1.5">
                         <p className="flex-1 text-sm leading-relaxed">{c.example.de}</p>
