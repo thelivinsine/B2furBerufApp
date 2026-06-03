@@ -5,7 +5,6 @@ import { Combine, ListChecks, Search, X } from "lucide-react";
 import { collocations } from "@/data/collocations";
 import { themes, themeById } from "@/data/themes";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
@@ -28,10 +27,19 @@ export function CollocationsBrowser() {
 
   const themeParam = params.get("theme") ?? "all";
   const [search, setSearch] = useState("");
+  const [verbFilter, setVerbFilter] = useState("all");
+
+  // Unique verbs for the current theme — drives the chip row.
+  const availableVerbs = useMemo(() => {
+    const base =
+      themeParam === "all" ? collocations : collocations.filter((c) => c.themeId === themeParam);
+    return [...new Set(base.map((c) => c.verb))].sort();
+  }, [themeParam]);
 
   const filtered = useMemo(() => {
     let list =
       themeParam === "all" ? collocations : collocations.filter((c) => c.themeId === themeParam);
+    if (verbFilter !== "all") list = list.filter((c) => c.verb === verbFilter);
     if (search.trim()) {
       const q = normalise(search.trim());
       list = list.filter(
@@ -43,19 +51,23 @@ export function CollocationsBrowser() {
       );
     }
     return list;
-  }, [themeParam, search]);
+  }, [themeParam, verbFilter, search]);
 
   const activeTheme = themeParam !== "all" ? themeById(themeParam) : null;
 
   const setTheme = (val: string) => {
+    setVerbFilter("all");
     const p = new URLSearchParams(params);
     if (val === "all") p.delete("theme");
     else p.set("theme", val);
     setParams(p, { replace: true });
   };
 
+  const toggleVerb = (verb: string) =>
+    setVerbFilter((prev) => (prev === verb ? "all" : verb));
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <HubHero
         icon={Combine}
         gradient="from-violet-500 to-purple-500"
@@ -64,7 +76,7 @@ export function CollocationsBrowser() {
         description="Feste Verbindungen aus Nomen und Verb – lerne sie als Einheit und klinge natürlich und präzise im B2-Beruf-Gespräch."
       />
 
-      {/* Filters */}
+      {/* Theme + search */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <Select value={themeParam} onValueChange={setTheme}>
           <SelectTrigger className="w-full sm:w-56">
@@ -85,7 +97,7 @@ export function CollocationsBrowser() {
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Suche nach Verb, Nomen, Übersetzung …"
+            placeholder="Suche nach Nomen, Übersetzung …"
             className="w-full rounded-lg border border-input bg-surface py-2 pl-9 pr-9 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
           {search && (
@@ -99,12 +111,56 @@ export function CollocationsBrowser() {
         </div>
       </div>
 
-      {/* Result count + quiz CTA */}
+      {/* Verb chips — "Alle Verben" pinned, rest scrollable */}
+      <div className="flex items-center gap-0">
+        {/* Pinned "Alle Verben" chip */}
+        <button
+          onClick={() => setVerbFilter("all")}
+          className={cn(
+            "shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors mr-2",
+            verbFilter === "all"
+              ? "bg-primary text-primary-foreground"
+              : "bg-muted text-muted-foreground hover:text-foreground",
+          )}
+        >
+          Alle Verben
+        </button>
+        {/* Scrollable verb list */}
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {availableVerbs.map((verb) => (
+            <button
+              key={verb}
+              onClick={() => toggleVerb(verb)}
+              className={cn(
+                "shrink-0 rounded-full px-3 py-1 font-mono text-xs font-medium transition-colors",
+                verbFilter === verb
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {verb}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Count + register legend + quiz CTA */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-muted-foreground">
-          {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
-          {themeParam !== "all" && activeTheme ? ` · ${activeTheme.titleDe}` : ""}
-        </p>
+        <div className="flex flex-wrap items-center gap-4">
+          <p className="text-sm text-muted-foreground">
+            {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
+          </p>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-sm border border-border bg-card" />
+              Neutral
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-sm bg-amber-400/50" />
+              Formal
+            </span>
+          </div>
+        </div>
         {activeTheme && (
           <Button
             size="sm"
@@ -118,12 +174,13 @@ export function CollocationsBrowser() {
 
       {filtered.length === 0 ? (
         <div className="py-16 text-center text-muted-foreground">
-          Keine Ergebnisse für „{search}" — versuche einen anderen Begriff.
+          Keine Ergebnisse — versuche einen anderen Filter oder Begriff.
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((c, i) => {
             const theme = c.themeId ? themeById(c.themeId) : null;
+            const isFormal = c.register === "formal";
             return (
               <motion.div
                 key={c.id}
@@ -131,25 +188,18 @@ export function CollocationsBrowser() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(i * 0.025, 0.4) }}
               >
-                <Card className={cn("h-full overflow-hidden")}>
+                <Card
+                  className={cn(
+                    "h-full overflow-hidden",
+                    isFormal && "bg-amber-500/5 dark:bg-amber-500/10",
+                  )}
+                >
                   {theme && <div className={`h-1 w-full bg-gradient-to-r ${theme.accent}`} />}
                   <CardContent className="space-y-3 p-4">
                     {/* Phrase + TTS */}
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-base font-bold leading-snug">{c.full}</p>
                       <SpeakButton text={c.full} className="mt-0.5 shrink-0" />
-                    </div>
-
-                    {/* Badges */}
-                    <div className="flex flex-wrap gap-1.5">
-                      <Badge variant="muted" className="font-mono text-xs">
-                        + {c.verb}
-                      </Badge>
-                      {c.register === "formal" && (
-                        <Badge variant="muted" className="text-xs">
-                          formal
-                        </Badge>
-                      )}
                     </div>
 
                     {/* Translation */}
