@@ -249,11 +249,11 @@ export function CollocationsBrowser() {
                     <SpeakButton text={c.full} className="mt-0.5 shrink-0" />
                   </div>
 
-                  <p className="text-sm italic text-muted-foreground">{c.en}</p>
+                  <p className="-mt-2 text-sm italic text-muted-foreground">{c.en}</p>
 
-                  <div className="space-y-0.5 border-t border-border pt-2.5">
+                  <div className="space-y-0.5">
                     <div className="flex items-start gap-1.5">
-                      <p className="flex-1 text-sm leading-relaxed">{c.example.de}</p>
+                      <p className="flex-1 text-sm font-semibold leading-relaxed">{c.example.de}</p>
                       <SpeakButton text={c.example.de} className="mt-0.5 shrink-0" />
                     </div>
                     <p className="text-xs text-muted-foreground">{c.example.en}</p>
