@@ -150,11 +150,6 @@ export function CollocationsBrowser() {
                           formal
                         </Badge>
                       )}
-                      {theme && (
-                        <Badge variant="muted" className="text-xs">
-                          {theme.titleDe}
-                        </Badge>
-                      )}
                     </div>
 
                     {/* Translation */}
