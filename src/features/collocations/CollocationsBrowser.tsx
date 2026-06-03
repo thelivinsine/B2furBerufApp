@@ -243,15 +243,15 @@ export function CollocationsBrowser() {
                     : "",
                 )}
               >
-                <CardContent className="space-y-3 p-4">
+                <CardContent className="p-4">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-base font-bold leading-snug">{c.full}</p>
                     <SpeakButton text={c.full} className="mt-0.5 shrink-0" />
                   </div>
 
-                  <p className="-mt-2 text-sm italic text-muted-foreground">{c.en}</p>
+                  <p className="mt-1 text-sm italic text-muted-foreground">{c.en}</p>
 
-                  <div className="space-y-0.5">
+                  <div className="mt-3 space-y-1">
                     <div className="flex items-start gap-1.5">
                       <p className="flex-1 text-sm font-semibold leading-relaxed">{c.example.de}</p>
                       <SpeakButton text={c.example.de} className="mt-0.5 shrink-0" />
