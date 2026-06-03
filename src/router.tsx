@@ -1,26 +1,60 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { createHashRouter, Navigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { LandingPage } from "@/features/landing/LandingPage";
-import { Onboarding } from "@/features/onboarding/Onboarding";
 import { Dashboard } from "@/features/dashboard/Dashboard";
-import { VocabularyTrainer } from "@/features/vocabulary/VocabularyTrainer";
-import { RedemittelTrainer } from "@/features/redemittel/RedemittelTrainer";
-import { GrammarHub } from "@/features/grammar/GrammarHub";
-import { QuizHub } from "@/features/quiz/QuizHub";
-import { WritingHub } from "@/features/writing/WritingHub";
-import { SimulationHub } from "@/features/simulation/SimulationHub";
-import { ExamHub } from "@/features/exam/ExamHub";
-import { QuickRevision } from "@/features/revision/QuickRevision";
-import { Analytics } from "@/features/analytics/Analytics";
-import { Settings } from "@/features/settings/Settings";
 import { useSettingsStore } from "@/store/useSettingsStore";
+
+const Onboarding = React.lazy(() =>
+  import("@/features/onboarding/Onboarding").then((m) => ({ default: m.Onboarding })),
+);
+const VocabularyTrainer = React.lazy(() =>
+  import("@/features/vocabulary/VocabularyTrainer").then((m) => ({
+    default: m.VocabularyTrainer,
+  })),
+);
+const RedemittelTrainer = React.lazy(() =>
+  import("@/features/redemittel/RedemittelTrainer").then((m) => ({
+    default: m.RedemittelTrainer,
+  })),
+);
+const GrammarHub = React.lazy(() =>
+  import("@/features/grammar/GrammarHub").then((m) => ({ default: m.GrammarHub })),
+);
+const QuizHub = React.lazy(() =>
+  import("@/features/quiz/QuizHub").then((m) => ({ default: m.QuizHub })),
+);
+const WritingHub = React.lazy(() =>
+  import("@/features/writing/WritingHub").then((m) => ({ default: m.WritingHub })),
+);
+const SimulationHub = React.lazy(() =>
+  import("@/features/simulation/SimulationHub").then((m) => ({ default: m.SimulationHub })),
+);
+const ExamHub = React.lazy(() =>
+  import("@/features/exam/ExamHub").then((m) => ({ default: m.ExamHub })),
+);
+const QuickRevision = React.lazy(() =>
+  import("@/features/revision/QuickRevision").then((m) => ({ default: m.QuickRevision })),
+);
+const Analytics = React.lazy(() =>
+  import("@/features/analytics/Analytics").then((m) => ({ default: m.Analytics })),
+);
+const Settings = React.lazy(() =>
+  import("@/features/settings/Settings").then((m) => ({ default: m.Settings })),
+);
 
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
   if (!onboarded) return <Navigate to="/welcome" replace />;
   return <>{children}</>;
 }
+
+// Onboarding has its own Suspense boundary since it renders outside AppShell.
+const OnboardingRoute = (
+  <Suspense fallback={null}>
+    <Onboarding />
+  </Suspense>
+);
 
 export const router = createHashRouter([
   {
@@ -29,7 +63,7 @@ export const router = createHashRouter([
   },
   {
     path: "/start",
-    element: <Onboarding />,
+    element: OnboardingRoute,
   },
   {
     element: <AppShell />,

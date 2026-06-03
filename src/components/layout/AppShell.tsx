@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, Flame, Zap, Sparkles } from "lucide-react";
@@ -92,7 +92,15 @@ export function AppShell() {
           <SaveProgressBanner />
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}>
-              <Outlet />
+              <Suspense
+                fallback={
+                  <div className="flex h-64 items-center justify-center">
+                    <div className="h-8 w-8 animate-spin rounded-full border-2 border-border border-t-primary" />
+                  </div>
+                }
+              >
+                <Outlet />
+              </Suspense>
             </motion.div>
           </AnimatePresence>
         </main>
