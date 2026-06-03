@@ -201,7 +201,6 @@ export function Dashboard() {
               >
                 <Link to={`/vocabulary?theme=${theme.id}`}>
                   <Card className="card-hover group h-full overflow-hidden">
-                    <div className={`h-1.5 w-full bg-gradient-to-r ${theme.accent}`} />
                     {isFeatured ? (
                       <CardContent className="p-5 sm:p-6">
                         <div className="flex items-start justify-between">

@@ -105,7 +105,6 @@ function HistoryEntry({
       transition={{ delay: index * 0.03 }}
     >
       <Card className="overflow-hidden">
-        {theme && <div className={`h-1 w-full bg-gradient-to-r ${theme.accent}`} />}
         <CardContent className="space-y-2.5 p-4">
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-muted-foreground">{formatDate(entry.created_at)}</span>
