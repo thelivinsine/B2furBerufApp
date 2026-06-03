@@ -60,10 +60,10 @@ function CollocationCard({ c }: { c: Collocation }) {
             )}
           />
         </div>
-        <p className="mt-0.5 text-sm italic text-muted-foreground">{c.en}</p>
+        <p className="text-sm italic text-muted-foreground">{c.en}</p>
 
         {/* Line 3 + 4: example — larger gap from line 2, same tight gap within */}
-        <div className="mt-5 space-y-0.5">
+        <div className="mt-5 space-y-1.5">
           <div className="flex items-start gap-1.5">
             <p className="flex-1 text-sm font-semibold leading-relaxed">{c.example.de}</p>
             <SpeakButton
