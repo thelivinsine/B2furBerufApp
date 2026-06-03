@@ -27,6 +27,61 @@ const pillIdle =
   "bg-white text-foreground border-border/60 hover:border-primary/40 hover:text-primary dark:bg-white/8 dark:border-white/15 dark:hover:border-primary/50";
 const pillActive = "bg-primary text-primary-foreground border-primary";
 
+type Collocation = (typeof collocations)[number];
+
+function CollocationCard({ c }: { c: Collocation }) {
+  const [hoverHalf, setHoverHalf] = useState<"top" | "bottom" | null>(null);
+  const isFormal = c.register === "formal";
+
+  return (
+    <Card
+      className={cn(
+        "h-full",
+        isFormal
+          ? "bg-indigo-50 dark:bg-indigo-950/25 border-indigo-200/60 dark:border-indigo-800/40"
+          : "",
+      )}
+      onMouseMove={(e) => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        setHoverHalf(e.clientY < rect.top + rect.height / 2 ? "top" : "bottom");
+      }}
+      onMouseLeave={() => setHoverHalf(null)}
+    >
+      <CardContent className="p-4">
+        {/* Line 1 + 2: phrase and translation — tight gap */}
+        <div className="flex items-start justify-between gap-2">
+          <p className="text-base font-bold leading-snug">{c.full}</p>
+          <SpeakButton
+            text={c.full}
+            className={cn(
+              "mt-0.5 shrink-0 transition-opacity duration-150",
+              "[@media(hover:hover)]:opacity-0",
+              hoverHalf === "top" ? "[@media(hover:hover)]:opacity-100" : "",
+            )}
+          />
+        </div>
+        <p className="mt-0.5 text-sm italic text-muted-foreground">{c.en}</p>
+
+        {/* Line 3 + 4: example — larger gap from line 2, same tight gap within */}
+        <div className="mt-5 space-y-0.5">
+          <div className="flex items-start gap-1.5">
+            <p className="flex-1 text-sm font-semibold leading-relaxed">{c.example.de}</p>
+            <SpeakButton
+              text={c.example.de}
+              className={cn(
+                "mt-0.5 shrink-0 transition-opacity duration-150",
+                "[@media(hover:hover)]:opacity-0",
+                hoverHalf === "bottom" ? "[@media(hover:hover)]:opacity-100" : "",
+              )}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">{c.example.en}</p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export function CollocationsBrowser() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -231,37 +286,9 @@ export function CollocationsBrowser() {
           transition={{ duration: 0.15 }}
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
-          {filtered.map((c) => {
-            const isFormal = c.register === "formal";
-            return (
-              <Card
-                key={c.id}
-                className={cn(
-                  "h-full",
-                  isFormal
-                    ? "bg-indigo-50 dark:bg-indigo-950/25 border-indigo-200/60 dark:border-indigo-800/40"
-                    : "",
-                )}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="text-base font-bold leading-snug">{c.full}</p>
-                    <SpeakButton text={c.full} className="mt-0.5 shrink-0" />
-                  </div>
-
-                  <p className="mt-1 text-sm italic text-muted-foreground">{c.en}</p>
-
-                  <div className="mt-3 space-y-1">
-                    <div className="flex items-start gap-1.5">
-                      <p className="flex-1 text-sm font-semibold leading-relaxed">{c.example.de}</p>
-                      <SpeakButton text={c.example.de} className="mt-0.5 shrink-0" />
-                    </div>
-                    <p className="text-xs text-muted-foreground">{c.example.en}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {filtered.map((c) => (
+            <CollocationCard key={c.id} c={c} />
+          ))}
         </motion.div>
       )}
     </div>
