@@ -820,7 +820,7 @@ export const collocations: Collocation[] = [
     example: { de: "Wir möchten Ihnen ein attraktives Angebot unterbreiten.", en: "We would like to put forward an attractive offer to you." },
   },
   {
-    id: "c_beschwerde_bearbeiten",
+    id: "c_beschwerde_bearbeiten_2",
     noun: "eine Beschwerde",
     verb: "bearbeiten",
     full: "eine Beschwerde bearbeiten",
@@ -916,7 +916,7 @@ export const collocations: Collocation[] = [
     example: { de: "Nächsten Monat führen wir ein neues CRM-System ein.", en: "Next month we are implementing a new CRM system." },
   },
   {
-    id: "c_daten_sichern",
+    id: "c_daten_sichern_2",
     noun: "Daten",
     verb: "sichern",
     full: "Daten sichern",

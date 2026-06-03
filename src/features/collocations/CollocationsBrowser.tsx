@@ -222,45 +222,47 @@ export function CollocationsBrowser() {
           Keine Ergebnisse — versuche einen anderen Filter oder Begriff.
         </div>
       ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((c, i) => {
+        // key forces a full remount + fade whenever the filter set changes,
+        // eliminating stuck-card states from index-based animation delays.
+        <motion.div
+          key={`${themeParam}__${verbFilter}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.15 }}
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {filtered.map((c) => {
             const isFormal = c.register === "formal";
             return (
-              <motion.div
+              <Card
                 key={c.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(i * 0.025, 0.4) }}
+                className={cn(
+                  "h-full",
+                  isFormal
+                    ? "bg-indigo-50 dark:bg-indigo-950/25 border-indigo-200/60 dark:border-indigo-800/40"
+                    : "",
+                )}
               >
-                <Card
-                  className={cn(
-                    "h-full",
-                    isFormal
-                      ? "bg-indigo-50 dark:bg-indigo-950/25 border-indigo-200/60 dark:border-indigo-800/40"
-                      : "",
-                  )}
-                >
-                  <CardContent className="space-y-3 p-4">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-base font-bold leading-snug">{c.full}</p>
-                      <SpeakButton text={c.full} className="mt-0.5 shrink-0" />
-                    </div>
+                <CardContent className="space-y-3 p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-base font-bold leading-snug">{c.full}</p>
+                    <SpeakButton text={c.full} className="mt-0.5 shrink-0" />
+                  </div>
 
-                    <p className="text-sm italic text-muted-foreground">{c.en}</p>
+                  <p className="text-sm italic text-muted-foreground">{c.en}</p>
 
-                    <div className="space-y-0.5 border-t border-border pt-2.5">
-                      <div className="flex items-start gap-1.5">
-                        <p className="flex-1 text-sm leading-relaxed">{c.example.de}</p>
-                        <SpeakButton text={c.example.de} className="mt-0.5 shrink-0" />
-                      </div>
-                      <p className="text-xs text-muted-foreground">{c.example.en}</p>
+                  <div className="space-y-0.5 border-t border-border pt-2.5">
+                    <div className="flex items-start gap-1.5">
+                      <p className="flex-1 text-sm leading-relaxed">{c.example.de}</p>
+                      <SpeakButton text={c.example.de} className="mt-0.5 shrink-0" />
                     </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+                    <p className="text-xs text-muted-foreground">{c.example.en}</p>
+                  </div>
+                </CardContent>
+              </Card>
             );
           })}
-        </div>
+        </motion.div>
       )}
     </div>
   );
