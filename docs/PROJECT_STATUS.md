@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-03 (session 4). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-03 (session 5). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,6 +216,33 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 5 (2026-06-03) — Content expansion + Collocation card UX (SHIPPED & LIVE)
+
+- **Collocation card spacing (PRs #57–#59, live):** iteratively fixed spacing hierarchy so
+  lines 1→2 (phrase → translation) and 3→4 (example German → example English) are equally tight,
+  with a clearly larger section break between them (final values: no added margin for 1→2, `mt-5`
+  for 2→3, `space-y-0.5` for 3→4).
+- **Hover-reveal speak buttons (PR #58, live):** on mouse/pointer devices (`@media(hover:hover)`)
+  both speak buttons are hidden by default. Moving into the card's top half reveals the phrase
+  button; bottom half reveals the example button. Always visible on touch devices. Implemented by
+  extracting a `CollocationCard` component with per-card `hoverHalf` state and `onMouseMove`.
+- **Content expansion — Collocations (PR #60, live):** added 22 new Nomen-Verb pairs, bringing
+  all 10 themes from 9–11 entries to exactly 12 each. Total: **120 collocations**.
+  New entries span all themes: tagesordnung festlegen, kapazitäten prüfen, urlaub beantragen,
+  ware prüfen, versand vorbereiten, erwartungen erfüllen, feedback einholen, mediation einleiten,
+  fehler eingestehen, meilenstein erreichen, budget einhalten, update einspielen,
+  sicherheitslücke schließen, abrechnung einreichen, anschluss verpassen, aufenthalt verlängern,
+  abfall trennen, nachhaltigkeit verankern, zertifizierung anstreben, schutzausrüstung tragen,
+  sicherheitsbegehung durchführen, notfallplan erstellen.
+- **Content expansion — Grammar drills (PR #60, live):** added 2 new drills per grammar topic
+  across all 10 topics (27 → **47 total**). Topics previously with only 2 drills (Konjunktiv II,
+  Modalverben, Passiv) now have 4; the rest have 5. New drills cover: dennoch/indem connectors,
+  genitive relatives (dessen), dative plural (denen), da-/wo-words in context (daran, darauf),
+  full TeKaMoLo word order, obwohl/wenn subordinate clauses, two-way preposition pairs
+  (wohin/wo), Konjunktiv II direct forms (hätte/wäre), darf-nicht vs muss-nicht distinction,
+  and Passiv Präteritum (wurde).
+- **Vocabulary:** already at **354 words** (34–39 per theme, well-balanced) — no expansion needed.
+
 ### Session 4 (2026-06-03) — Writing History + Collocations Browser + UX polish (SHIPPED & LIVE)
 
 - **Writing History (PRs #52–#53, live):** `src/features/writing/WritingHistory.tsx` — loads past
@@ -247,11 +274,12 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `claude/loving-cray-lMLj3` became stale after PR history rewrite).
 
 ## Resume here (next session)
-**All phases SHIPPED and LIVE on `main`** including the full session-4 feature set. The platform now
-has: vocabulary/grammar/quiz/simulation/exam + guest auth + cloud sync + AI writing coach + writing
-history + collocations browser.
+**All phases SHIPPED and LIVE on `main`** through session 5. The platform has:
+vocabulary (354 words) / grammar (47 drills, 10 topics) / collocations (120, 12/theme) /
+quiz / simulation / exam + guest auth + cloud sync + AI writing coach + writing history +
+collocations browser.
 
-**Dev branch:** `claude/loving-cray-lMLj3` (realigned to `origin/main` after PR #56 squash-merge).
+**Dev branch:** `claude/loving-cray-lMLj3` (realigned to `origin/main` after PR #60 squash-merge).
 
 **Remember to AUTO-SHIP** — when a change is complete and `npm run build` is green, open a PR into
 `main` and squash-merge it yourself (founder approved 2026-06-01); the merge deploys via `pages.yml`.
@@ -263,11 +291,10 @@ history + collocations browser.
 
 **Candidate next features (pick one):**
 - (a) **Code-split the bundle** — dynamic imports for heavy routes (exam, simulation) to cut the
-  initial load (currently ~1.41 MB from supabase-js alone).
-- (b) **More content** — expand collocations (currently 98, target ~120), add more grammar drills,
-  grow vocab toward 350 words.
-- (c) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
-- (d) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
+  initial load (currently ~1.41 MB from supabase-js alone). Pure engineering, no new features.
+- (b) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
+- (c) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
   AI evaluations (currently 5/day free for all).
-- (e) **Progress analytics screen** — charts of XP over time, mastered-word trend, weakness history;
-  could leverage `writing_evaluations` + SRS data already in Supabase.
+- (d) **Progress analytics screen** — charts of XP over time, mastered-word trend, weakness history;
+  leverages `writing_evaluations` + SRS data already in Supabase.
+- (e) **More dialogues / exam sets** — expand the branching simulations or timed exam content.
