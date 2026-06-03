@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Layers, Sparkles } from "lucide-react";
+import { BookOpen, Layers, Link2, Sparkles } from "lucide-react";
 import { themes } from "@/data/themes";
 import { vocabulary, vocabByTheme } from "@/data/vocabulary";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -10,6 +10,7 @@ import { SectionHeading } from "@/components/shared/misc";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
 import { VocabList } from "./VocabList";
+import { CollocationsList } from "./CollocationsList";
 
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
@@ -62,6 +63,9 @@ export function VocabularyTrainer() {
           <TabsTrigger value="list">
             <BookOpen className="h-4 w-4" /> Übersicht
           </TabsTrigger>
+          <TabsTrigger value="collocations">
+            <Link2 className="h-4 w-4" /> Kollokationen
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="flashcards">
@@ -74,6 +78,9 @@ export function VocabularyTrainer() {
         </TabsContent>
         <TabsContent value="list">
           <VocabList items={items} />
+        </TabsContent>
+        <TabsContent value="collocations">
+          <CollocationsList theme={theme} />
         </TabsContent>
       </Tabs>
     </div>
