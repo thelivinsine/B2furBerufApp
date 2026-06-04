@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-04 (session 7). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-04 (session 8). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,6 +216,31 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 8 (2026-06-04) — Blank page bug investigation (UNRESOLVED ⚠️)
+
+**Symptom:** Site shows a completely black blank page (dark background from CSS, no React content). Reported by founder on mobile. Persists across multiple deploys.
+
+**What was shipped in this session (PRs #64–#66, all merged to main):**
+- PR #64: Analytics page enhancement (30-day XP chart, per-theme mastery, writing weaknesses panel)
+- PR #65: Added `RootErrorBoundary` in `main.tsx` to catch and display render errors
+- PR #66: Reverted `LandingPage` and `Dashboard` to static imports (removed `React.lazy` + `fallback={null}` which caused a blank-page window during chunk loading on slow mobile connections)
+
+**Diagnosis so far:**
+- Dark background shows HTML + CSS load correctly; only JavaScript fails to render
+- `RootErrorBoundary` is deployed and would show an error message if React mounts — but page remains blank, suggesting React never mounts at all
+- All CI builds pass; `npm run build` and `npm run typecheck` are both green
+- No obvious crash-inducing code found via static analysis
+- The issue may be: browser/CDN cache serving old `index.html` (referencing old chunk hashes that no longer exist) → JS fails to load → blank page. GitHub Pages CDN caches HTML for ~10 min.
+- Founder was on mobile and couldn't check browser console (F12)
+
+**Most likely next steps for the new session:**
+1. **First thing:** Ask founder to open genauly.de on a desktop browser and check the Console tab (F12 → Console). The error message will be there even if React didn't mount.
+2. **If blank on desktop too:** The issue is in the production JS. Console will show either a 404 for a chunk file, or a JS runtime error.
+3. **If works on desktop:** It's a mobile-specific browser cache issue. Ask founder to clear site data in their mobile browser settings for genauly.de, or try incognito/private tab.
+4. **Fallback:** If a specific error is found in the console, fix it directly. If it's a chunk 404, consider adding a version query string to force cache-busting or investigate if GitHub Pages is serving stale files.
+
+**What NOT to try again:** Blind deploys without knowing the specific error. The error boundary is in place — the next session MUST get the actual console error first.
+
 ### Session 7 (2026-06-04) — Analytics screen enhancement (SHIPPED & LIVE)
 
 - **Analytics page rewrite (`src/features/analytics/Analytics.tsx`):**
@@ -292,25 +317,21 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `claude/loving-cray-lMLj3` became stale after PR history rewrite).
 
 ## Resume here (next session)
-**All phases SHIPPED and LIVE on `main`** through session 7. The platform has:
-vocabulary (354 words) / grammar (47 drills, 10 topics) / collocations (120, 12/theme) /
-quiz / simulation / exam + guest auth + cloud sync + AI writing coach + writing history +
-collocations browser + enhanced analytics (30-day XP chart, per-theme mastery, weakness panel).
-Bundle is properly split with no chunk > 500 KB.
 
-**Dev branch:** `claude/loving-cray-lMLj3` — realign after each squash-merge per CLAUDE.md.
+⚠️ **UNRESOLVED BUG: Site shows blank page — investigate first before any new features.**
 
-**Remember to AUTO-SHIP** — when a change is complete and `npm run build` is green, open a PR into
-`main` and squash-merge it yourself (founder approved 2026-06-01); the merge deploys via `pages.yml`.
+**Immediate first action:** Ask the founder to open genauly.de in a desktop browser (Chrome/Firefox/Safari) and check the browser console (F12 → Console tab). The exact error will be there. Share it and fix it before doing anything else.
 
-**Pending housekeeping (low urgency):**
+**What's deployed on `main`:**
+- `RootErrorBoundary` in `main.tsx` — any React render error now shows an error message instead of blank
+- `LandingPage` and `Dashboard` statically bundled (not lazy-loaded) to eliminate blank-flash on slow connections
+- Analytics page enhanced (30-day XP chart, per-theme mastery, writing weaknesses panel)
+- All content: vocabulary (354 words) / grammar (47 drills, 10 topics) / collocations (120, 12/theme)
+- Full Phase 2: auth + cloud sync + AI writing coach
+
+**Dev branch:** `claude/loving-cray-lMLj3` — already realigned to `origin/main`. Clean, nothing to commit.
+
+**After the bug is fixed:**
 - Rotate the Anthropic key (was pasted in chat) — 2 min at console.anthropic.com.
 - Add Resend SMTP to fix email magic-link rate-limit.
-- Enable Turnstile CAPTCHA before public launch.
-
-**Candidate next features (pick one):**
-- (a) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
-- (b) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
-  AI evaluations (currently 5/day free for all). Requires Stripe integration.
-- (c) **More dialogues / exam sets** — expand branching simulations or timed exam content.
-- (d) **Mobile UX audit** — test on small screens; collocation grid + analytics charts may need responsive tweaks.
+- Candidate features: logo, monetization tier, more dialogues/exam sets, mobile UX audit.
