@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AreaChart,
   Area,
@@ -10,23 +11,29 @@ import {
   Bar,
   Cell,
 } from "recharts";
-import { Flame, Zap, Trophy, BookOpen } from "lucide-react";
+import { Flame, Zap, Trophy, BookOpen, TrendingUp, Target } from "lucide-react";
 import { vocabulary } from "@/data/vocabulary";
+import { themes } from "@/data/themes";
+import { vocabByTheme } from "@/data/vocabulary";
 import { scenarios } from "@/data/dialogues";
 import { redemittel } from "@/data/redemittel";
+import { practiceAreaById } from "@/data/practiceAreas";
 import { useProgressStore } from "@/store/useProgressStore";
 import { mastery, masteryLabel } from "@/engine/srs";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
-import { pct } from "@/lib/utils";
+import { pct, cn } from "@/lib/utils";
+import { getWritingHistory, type WritingHistoryEntry } from "@/lib/writing";
+import type { WeaknessCategory } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { SectionHeading, StreakBadge, XPBar } from "@/components/shared/misc";
 import { StatCard } from "@/components/shared/StatCard";
 
-function last7Days(): string[] {
+function lastNDays(n: number): string[] {
   const days: string[] = [];
-  for (let i = 6; i >= 0; i--) {
+  for (let i = n - 1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     days.push(
@@ -34,6 +41,74 @@ function last7Days(): string[] {
     );
   }
   return days;
+}
+
+function WeaknessPanel({ entries }: { entries: WritingHistoryEntry[] }) {
+  const navigate = useNavigate();
+
+  const freq = entries.reduce(
+    (acc, e) => {
+      if (e.weakness) acc[e.weakness] = (acc[e.weakness] ?? 0) + 1;
+      return acc;
+    },
+    {} as Partial<Record<WeaknessCategory, number>>,
+  );
+
+  const sorted = (Object.entries(freq) as [WeaknessCategory, number][]).sort(
+    ([, a], [, b]) => b - a,
+  );
+
+  if (sorted.length === 0) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Noch keine Auswertungen — reiche einen Text ein, um Schwachstellen zu sehen.
+      </p>
+    );
+  }
+
+  const maxCount = sorted[0][1];
+  const topArea = practiceAreaById(sorted[0][0]);
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2.5">
+        {sorted.slice(0, 5).map(([weakness, count], i) => {
+          const area = practiceAreaById(weakness);
+          const widthPct = Math.round((count / maxCount) * 100);
+          return (
+            <div key={weakness} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span className={cn("font-medium", i === 0 && "text-primary")}>
+                  {area?.labelDe ?? weakness}
+                </span>
+                <span className="tabular-nums text-muted-foreground">{count}×</span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted/50">
+                <div
+                  className={cn(
+                    "h-full rounded-full transition-all",
+                    i === 0 ? "bg-primary" : "bg-muted-foreground/40",
+                  )}
+                  style={{ width: `${widthPct}%` }}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {topArea && (
+        <div className="flex items-center justify-between border-t border-border pt-3">
+          <p className="text-sm text-muted-foreground">
+            Top-Schwachstelle:{" "}
+            <span className="font-medium text-foreground">{topArea.labelDe}</span>
+          </p>
+          <Button size="sm" onClick={() => navigate(topArea.route)}>
+            <Target className="h-3.5 w-3.5" /> Jetzt üben
+          </Button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function Analytics() {
@@ -47,11 +122,22 @@ export function Analytics() {
   const examsDone = useProgressStore((s) => s.examsDone);
   const totalSessions = useProgressStore((s) => s.totalSessions);
 
+  const [writingEntries, setWritingEntries] = useState<WritingHistoryEntry[]>([]);
+  const [writingLoaded, setWritingLoaded] = useState(false);
+
+  useEffect(() => {
+    getWritingHistory(60).then((data) => {
+      setWritingEntries(data);
+      setWritingLoaded(true);
+    });
+  }, []);
+
   const info = levelFromXp(xp);
   const tier = tierForLevel(info.level);
 
-  const days = useMemo(() => last7Days(), []);
-  const xpChartData = days.map((d) => ({
+  // 30-day XP chart
+  const days30 = useMemo(() => lastNDays(30), []);
+  const xpChartData = days30.map((d) => ({
     label: d.slice(5), // MM-DD
     xp: dailyXp[d] ?? 0,
   }));
@@ -70,6 +156,18 @@ export function Analytics() {
     { label: "Wiederholen", value: masteryGroups.review, fill: "var(--color-primary)" },
     { label: "Gemeistert", value: masteryGroups.mastered, fill: "var(--color-success)" },
   ];
+
+  // Per-theme mastery — sorted least mastered first
+  const themeStats = useMemo(() => {
+    return themes
+      .map((t) => {
+        const words = vocabByTheme(t.id);
+        const mastered = words.filter((w) => mastery(srs[w.id]) >= 0.8).length;
+        const ratio = words.length ? mastered / words.length : 0;
+        return { theme: t, total: words.length, mastered, ratio };
+      })
+      .sort((a, b) => a.ratio - b.ratio);
+  }, [srs]);
 
   const redemittelPractised = Object.keys(redemittelSeen).length;
 
@@ -102,10 +200,10 @@ export function Analytics() {
         </CardContent>
       </Card>
 
-      {/* XP last 7 days */}
+      {/* XP last 30 days */}
       <Card>
         <CardContent className="p-5">
-          <p className="mb-4 font-semibold">XP – letzte 7 Tage</p>
+          <p className="mb-4 font-semibold">XP – letzte 30 Tage</p>
           <ResponsiveContainer width="100%" height={160}>
             <AreaChart data={xpChartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
               <defs>
@@ -114,7 +212,13 @@ export function Analytics() {
                   <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+              <XAxis
+                dataKey="label"
+                tick={{ fontSize: 10 }}
+                axisLine={false}
+                tickLine={false}
+                interval={4}
+              />
               <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
@@ -122,6 +226,27 @@ export function Analytics() {
               <Area type="monotone" dataKey="xp" stroke="var(--color-primary)" strokeWidth={2} fill="url(#xpGrad)" />
             </AreaChart>
           </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      {/* Per-theme mastery */}
+      <Card>
+        <CardContent className="p-5">
+          <p className="mb-1 font-semibold">Beherrschung nach Thema</p>
+          <p className="mb-4 text-xs text-muted-foreground">Sortiert nach Lernbedarf — oben = meiste Lücken</p>
+          <div className="space-y-3">
+            {themeStats.map(({ theme, total, mastered, ratio }) => (
+              <div key={theme.id} className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="font-medium">{theme.titleDe}</span>
+                  <span className="tabular-nums text-muted-foreground">
+                    {mastered}/{total} · {Math.round(ratio * 100)}%
+                  </span>
+                </div>
+                <Progress value={ratio * 100} className="h-1.5" />
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
@@ -148,6 +273,23 @@ export function Analytics() {
               <Badge key={d.label} variant="muted">{d.label}: {d.value}</Badge>
             ))}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Writing weaknesses */}
+      <Card>
+        <CardContent className="p-5">
+          <p className="mb-1 flex items-center gap-2 font-semibold">
+            <TrendingUp className="h-4 w-4 text-primary" /> Schwachstellen (Schreiben)
+          </p>
+          <p className="mb-4 text-xs text-muted-foreground">
+            Aus deinen letzten KI-Auswertungen — letzte 60 Einträge
+          </p>
+          {writingLoaded ? (
+            <WeaknessPanel entries={writingEntries} />
+          ) : (
+            <div className="h-20 animate-pulse rounded-lg bg-muted/40" />
+          )}
         </CardContent>
       </Card>
 

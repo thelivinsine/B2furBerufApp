@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-04 (session 6). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-04 (session 7). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,6 +216,14 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 7 (2026-06-04) — Analytics screen enhancement (SHIPPED & LIVE)
+
+- **Analytics page rewrite (`src/features/analytics/Analytics.tsx`):**
+  - **30-day XP chart:** extended from 7 to 30 days; X-axis uses `interval={4}` to avoid label crowding.
+  - **Per-theme mastery breakdown:** all 10 themes displayed in a card, sorted least-mastered first (most gaps at top). Each row shows theme name, mastered/total word count, percentage, and a progress bar.
+  - **Writing weaknesses panel:** async-loads the last 60 writing evaluations via `getWritingHistory(60)`. Shows top 5 weakness categories with frequency bars (widths relative to most-frequent), and a "Jetzt üben" button linking to the relevant practice area for the top weakness. Skeleton loader shown while data is loading.
+  - No new dependencies — reuses existing recharts, practiceAreas, writing lib, and shared components.
+
 ### Session 6 (2026-06-04) — Performance: vendor code-splitting (SHIPPED & LIVE, PR #62)
 
 - **Bundle split (`vite.config.ts`):** added `manualChunks` separating all `node_modules` into
@@ -284,12 +292,13 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `claude/loving-cray-lMLj3` became stale after PR history rewrite).
 
 ## Resume here (next session)
-**All phases SHIPPED and LIVE on `main`** through session 6. The platform has:
+**All phases SHIPPED and LIVE on `main`** through session 7. The platform has:
 vocabulary (354 words) / grammar (47 drills, 10 topics) / collocations (120, 12/theme) /
 quiz / simulation / exam + guest auth + cloud sync + AI writing coach + writing history +
-collocations browser. Bundle is now properly split with no chunk > 500 KB.
+collocations browser + enhanced analytics (30-day XP chart, per-theme mastery, weakness panel).
+Bundle is properly split with no chunk > 500 KB.
 
-**Dev branch:** `claude/loving-cray-lMLj3` (realigned to `origin/main` after PR #62 squash-merge).
+**Dev branch:** `claude/loving-cray-lMLj3` — realign after each squash-merge per CLAUDE.md.
 
 **Remember to AUTO-SHIP** — when a change is complete and `npm run build` is green, open a PR into
 `main` and squash-merge it yourself (founder approved 2026-06-01); the merge deploys via `pages.yml`.
@@ -300,9 +309,8 @@ collocations browser. Bundle is now properly split with no chunk > 500 KB.
 - Enable Turnstile CAPTCHA before public launch.
 
 **Candidate next features (pick one):**
-- (a) **Progress analytics screen** — charts of XP over time, mastered-word trend, weakness history;
-  leverages `writing_evaluations` + SRS data already in Supabase. High retention value.
-- (b) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
-- (c) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
+- (a) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
+- (b) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
   AI evaluations (currently 5/day free for all). Requires Stripe integration.
-- (d) **More dialogues / exam sets** — expand branching simulations or timed exam content.
+- (c) **More dialogues / exam sets** — expand branching simulations or timed exam content.
+- (d) **Mobile UX audit** — test on small screens; collocation grid + analytics charts may need responsive tweaks.
