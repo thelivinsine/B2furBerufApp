@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-03 (session 5). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-04 (session 6). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,6 +216,16 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 6 (2026-06-04) — Performance: vendor code-splitting (SHIPPED & LIVE, PR #62)
+
+- **Bundle split (`vite.config.ts`):** added `manualChunks` separating all `node_modules` into
+  six independently-cached vendor chunks: `vendor-react` (161 KB), `vendor-supabase` (204 KB),
+  `vendor-motion` (109 KB), `vendor-ui` (68 KB), `vendor-charts` (303 KB), `vendor-misc` (237 KB).
+- **Lazy-loaded `LandingPage` and `Dashboard`** in `router.tsx` to keep the bootstrap chunk lean.
+- **Results:** main bundle 836 KB → **34 KB** (96% reduction); Analytics chunk 392 KB → **6 KB**;
+  no chunk exceeds 500 KB; build warnings gone. Vendor chunks are cached separately — deploys
+  only force re-download of changed app chunks, not the full vendor stack.
+
 ### Session 5 (2026-06-03) — Content expansion + Collocation card UX (SHIPPED & LIVE)
 
 - **Collocation card spacing (PRs #57–#59, live):** iteratively fixed spacing hierarchy so
@@ -274,12 +284,12 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `claude/loving-cray-lMLj3` became stale after PR history rewrite).
 
 ## Resume here (next session)
-**All phases SHIPPED and LIVE on `main`** through session 5. The platform has:
+**All phases SHIPPED and LIVE on `main`** through session 6. The platform has:
 vocabulary (354 words) / grammar (47 drills, 10 topics) / collocations (120, 12/theme) /
 quiz / simulation / exam + guest auth + cloud sync + AI writing coach + writing history +
-collocations browser.
+collocations browser. Bundle is now properly split with no chunk > 500 KB.
 
-**Dev branch:** `claude/loving-cray-lMLj3` (realigned to `origin/main` after PR #60 squash-merge).
+**Dev branch:** `claude/loving-cray-lMLj3` (realigned to `origin/main` after PR #62 squash-merge).
 
 **Remember to AUTO-SHIP** — when a change is complete and `npm run build` is green, open a PR into
 `main` and squash-merge it yourself (founder approved 2026-06-01); the merge deploys via `pages.yml`.
@@ -290,11 +300,9 @@ collocations browser.
 - Enable Turnstile CAPTCHA before public launch.
 
 **Candidate next features (pick one):**
-- (a) **Code-split the bundle** — dynamic imports for heavy routes (exam, simulation) to cut the
-  initial load (currently ~1.41 MB from supabase-js alone). Pure engineering, no new features.
+- (a) **Progress analytics screen** — charts of XP over time, mastered-word trend, weakness history;
+  leverages `writing_evaluations` + SRS data already in Supabase. High retention value.
 - (b) **Logo** — founder to decide; placeholder (Sparkles icon) still in use.
 - (c) **Monetization tier** — `profiles.tier` flag is ready; wire a Pro gate around e.g. unlimited
-  AI evaluations (currently 5/day free for all).
-- (d) **Progress analytics screen** — charts of XP over time, mastered-word trend, weakness history;
-  leverages `writing_evaluations` + SRS data already in Supabase.
-- (e) **More dialogues / exam sets** — expand the branching simulations or timed exam content.
+  AI evaluations (currently 5/day free for all). Requires Stripe integration.
+- (d) **More dialogues / exam sets** — expand branching simulations or timed exam content.
