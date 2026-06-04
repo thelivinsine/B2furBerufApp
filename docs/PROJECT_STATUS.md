@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-04 (session 11). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-04 (session 12). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,6 +216,16 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 12 (2026-06-04) — Mobile-app redesign planned (deferred) 📋
+
+Founder installed the PWA to their iPhone home screen — it works, but still shows Safari's
+address bar and the UI feels like the website (desktop sidebar + hamburger drawer). Researched and
+wrote a full, approved implementation plan to make it feel native: **`docs/MOBILE_APP_PLAN.md`**.
+Scope = app chrome + navigation only (bottom tab bar Start · Wortschatz · Quiz · Fortschritt ·
+Mehr; iOS standalone meta tags to launch full-screen; desktop stays pixel-identical). **Founder
+chose to defer the build to a later session — no code shipped this session.** Resume from the plan
+doc. Note: Step 1 (iOS meta tags) is an independent quick win that fixes the address bar on its own.
+
 ### Session 11 (2026-06-04) — Installable PWA ✅
 
 Added full Progressive Web App support so Genauly can be installed to the home screen on any
@@ -419,7 +429,12 @@ genauly.de, and confirm the Actions "pages" deploy went green for the merge comm
 **Dev branch:** `claude/genauly-blank-page-9biDi` — realign to `origin/main` after the squash-merge.
 
 **Next:**
+- **Mobile-app redesign — PLANNED & APPROVED, not yet built.** Full plan in
+  **`docs/MOBILE_APP_PLAN.md`** (bottom tab bar + iOS standalone meta tags so the home-screen app
+  launches full-screen with no address bar; scope = app chrome + nav only, desktop untouched).
+  Founder deferred implementation to a later session — resume there.
 - (Optional) Add Resend SMTP to fix email magic-link rate-limit.
 - Candidate features: logo, monetization tier, more dialogues/exam sets.
 
-_(Anthropic key rotation: ✅ done. Mobile UX audit: ✅ done. Installable PWA: ✅ done.)_
+_(Anthropic key rotation: ✅ done. Mobile UX audit: ✅ done. Installable PWA: ✅ done.
+Mobile-app redesign: 📋 planned — see `docs/MOBILE_APP_PLAN.md`.)_
