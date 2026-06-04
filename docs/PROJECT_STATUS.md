@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-04 (session 12). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-04 (session 13). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,6 +216,20 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 13 (2026-06-04) — iOS standalone fix: no more address bar ✅
+
+Shipped **Step 1** of the mobile-app plan (`docs/MOBILE_APP_PLAN.md`) independently: added the iOS/
+Android standalone meta tags to `index.html` so the home-screen icon launches **full-screen with no
+Safari address bar**. iOS Safari ignores the manifest's `display: standalone` for home-screen
+launch and requires `apple-mobile-web-app-capable` — that was the missing piece causing the "shows
+browser version" symptom. Tags added: `apple-mobile-web-app-capable=yes`, `mobile-web-app-capable=yes`,
+`apple-mobile-web-app-status-bar-style=black-translucent` (matches dark theme + viewport-fit=cover;
+`.pt-safe` already compensates), `apple-mobile-web-app-title=Genauly`, `theme-color=#0f1729`.
+`npm run build` green, no circular warning, all five tags verified in `dist/index.html`. The
+bottom-tab-bar redesign (Steps 2–6) remains planned/deferred. **Founder must re-add the app to the
+home screen** (iOS caches the old web-clip — delete the existing icon and Add-to-Home-Screen again
+after the deploy) to pick up the change.
+
 ### Session 12 (2026-06-04) — Mobile-app redesign planned (deferred) 📋
 
 Founder installed the PWA to their iPhone home screen — it works, but still shows Safari's
@@ -429,12 +443,12 @@ genauly.de, and confirm the Actions "pages" deploy went green for the merge comm
 **Dev branch:** `claude/genauly-blank-page-9biDi` — realign to `origin/main` after the squash-merge.
 
 **Next:**
-- **Mobile-app redesign — PLANNED & APPROVED, not yet built.** Full plan in
-  **`docs/MOBILE_APP_PLAN.md`** (bottom tab bar + iOS standalone meta tags so the home-screen app
-  launches full-screen with no address bar; scope = app chrome + nav only, desktop untouched).
-  Founder deferred implementation to a later session — resume there.
+- **Mobile-app redesign — Step 1 (address-bar fix) SHIPPED ✅; bottom tab bar (Steps 2–6) still
+  PLANNED.** Full plan in **`docs/MOBILE_APP_PLAN.md`**. Resume from Step 2 (bottom tab bar +
+  "Mehr" sheet; scope = app chrome + nav only, desktop untouched).
 - (Optional) Add Resend SMTP to fix email magic-link rate-limit.
 - Candidate features: logo, monetization tier, more dialogues/exam sets.
 
 _(Anthropic key rotation: ✅ done. Mobile UX audit: ✅ done. Installable PWA: ✅ done.
-Mobile-app redesign: 📋 planned — see `docs/MOBILE_APP_PLAN.md`.)_
+Address-bar / iOS standalone fix: ✅ done. Bottom-tab-bar redesign: 📋 planned — see
+`docs/MOBILE_APP_PLAN.md`.)_

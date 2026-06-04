@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <!-- iOS/Android standalone: launch full-screen (no browser address bar) when
+         added to the home screen. iOS Safari ignores the manifest `display`
+         field for home-screen launch and requires `apple-mobile-web-app-capable`.
+         `black-translucent` suits the dark theme + viewport-fit=cover (content
+         draws under a transparent status bar; `.pt-safe` already compensates).
+         `theme-color` matches the manifest background for a seamless edge. -->
+    <meta name="theme-color" content="#0f1729" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Genauly" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"

@@ -1,7 +1,8 @@
 # Mobile-App Redesign Plan (deferred — pick up here)
 
-_Status: **PLANNED, not yet implemented.** Approved by founder 2026-06-04, deferred for a later
-session. Branch when resuming: `claude/genauly-blank-page-9biDi`._
+_Status: **Step 1 (iOS meta tags) SHIPPED 2026-06-04** — see session 13 in PROJECT_STATUS. The
+bottom-tab-bar work (Steps 2–6) is **PLANNED, not yet implemented** (approved 2026-06-04, deferred).
+Branch when resuming: `claude/genauly-blank-page-9biDi`._
 
 ## Why
 
@@ -30,8 +31,8 @@ Two root causes, both fixable:
 
 ## Approach
 
-### 1. iOS standalone meta tags — `index.html`
-Add inside `<head>` (after the existing `apple-touch-icon` link):
+### 1. iOS standalone meta tags — `index.html` ✅ SHIPPED (session 13, 2026-06-04)
+Added inside `<head>` (after the existing `apple-touch-icon` link):
 ```html
 <meta name="theme-color" content="#0f1729" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
