@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-04 (session 9). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-04 (session 10). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,6 +216,25 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 10 (2026-06-04) — Mobile UX audit ✅
+
+Code-level audit of every layout + interactive surface for mobile hazards (horizontal overflow,
+sub-16px form fields → iOS zoom, fixed widths, tap targets, notch/home-indicator). **Verdict: the
+app is already mobile-solid** — responsive grids throughout, `100dvh` dialogs, `overflow-x: clip`
+on body, and the iOS input-zoom fix (form controls forced to 16px ≤640px) was already in place.
+
+**One real gap found & fixed — safe-area insets.** `index.html` opts into `viewport-fit=cover`
+(content extends under the notch / home indicator / side cutouts) but nothing consumed
+`env(safe-area-inset-*)`, so on notched iPhones — especially landscape and home-screen/standalone —
+the sticky header could sit under the status bar and the last controls could hide behind the home
+indicator. Added `.pt-safe` / `.pb-safe-8` utilities (`src/index.css`) and applied them to the
+`AppShell` header (top inset) and `<main>` (bottom inset). **Zero desktop risk:** `env()` insets
+resolve to 0 on desktop and normal portrait Safari, so it's a no-op everywhere except notched/
+standalone contexts. `npm run build` + `npm run typecheck` green.
+
+**Natural follow-on (not done):** make the app an installable PWA (manifest + service worker) —
+that's where safe-area insets fully pay off and where mobile users get an app-like, offline launch.
+
 ### Session 9 (2026-06-04) — Blank page bug ROOT-CAUSED & FIXED ✅
 
 **Root cause (proven, not speculative): a circular ESM *chunk* dependency introduced by the
@@ -375,6 +394,9 @@ genauly.de, and confirm the Actions "pages" deploy went green for the merge comm
 
 **Next:**
 - (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-- Candidate features: logo, monetization tier, more dialogues/exam sets, mobile UX audit.
+- Candidate features: **installable PWA** (manifest + service worker — natural follow-on to the
+  mobile audit; makes safe-area insets fully matter + offline launch), logo, monetization tier,
+  more dialogues/exam sets.
 
-_(Anthropic key rotation: ✅ done — founder rotated it.)_
+_(Anthropic key rotation: ✅ done. Mobile UX audit: ✅ done — app was already mobile-solid; added
+safe-area insets for notch/home-indicator devices.)_

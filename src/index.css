@@ -148,4 +148,16 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  /* Safe-area helpers for notch / home-indicator devices. We opt into
+     `viewport-fit=cover` in index.html, which extends content under the
+     status bar, home indicator and side cutouts — these honour the OS insets
+     so chrome and controls stay clear of them. `env()` resolves to 0 on
+     desktop and normal portrait Safari, so they are no-ops everywhere else. */
+  .pt-safe {
+    padding-top: env(safe-area-inset-top);
+  }
+  .pb-safe-8 {
+    padding-bottom: calc(2rem + env(safe-area-inset-bottom));
+  }
 }
