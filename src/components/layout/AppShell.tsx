@@ -43,7 +43,7 @@ export function AppShell() {
 
       <div className="lg:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-20 border-b border-border bg-surface/70 backdrop-blur-xl">
+        <header className="sticky top-0 z-20 border-b border-border bg-surface/70 pt-safe backdrop-blur-xl">
           <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-2">
               <Button
@@ -88,7 +88,7 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-safe-8 sm:px-6 sm:pt-8">
           <SaveProgressBanner />
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}>
