@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-04 (session 10). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-04 (session 11). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,6 +216,32 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 11 (2026-06-04) — Installable PWA ✅
+
+Added full Progressive Web App support so Genauly can be installed to the home screen on any
+device and launches app-like (full-screen, no browser chrome, offline-first).
+
+**What was shipped:**
+- `vite-plugin-pwa` (v1.3.0) added as a devDependency — generates a service worker via Workbox
+  and injects the manifest automatically at build time; no hand-written SW code needed.
+- **Web App Manifest** (`dist/manifest.webmanifest`): name, short_name, description, `display:
+  standalone`, `theme_color: #6366f1`, `background_color: #0f1729`, `lang: de`,
+  `orientation: portrait-primary`, `start_url: ./`, three icon sizes.
+- **Service worker** (`dist/sw.js` + `dist/workbox-*.js`): precaches all 40 build artifacts
+  (~1.57 MB); `navigateFallback: index.html` so hash-routes survive offline reload; `autoUpdate`
+  strategy so returning users silently get the latest version in the background.
+- **Icons** generated from `public/favicon.svg`:
+  - `pwa-192x192.png` — standard PWA icon (Android Chrome)
+  - `pwa-512x512.png` — full-res PWA icon / splash screen
+  - `pwa-maskable-512x512.png` — maskable icon (safe zone = inner 80%) for adaptive icon shapes
+  - `apple-touch-icon.png` (180×180) — iOS Safari "Add to Home Screen"
+- `index.html` — added `<link rel="apple-touch-icon">` for iOS.
+- **Works with the session-10 safe-area insets:** in standalone mode, `env(safe-area-inset-*)`
+  is now non-zero, so the header and content bottom clearance are correct.
+
+`npm run build` green · no circular-chunk warning · `npm run typecheck` green · 40 entries
+precached. Founder to test "Add to Home Screen" on their phone once the Pages deploy completes.
+
 ### Session 10 (2026-06-04) — Mobile UX audit ✅
 
 Code-level audit of every layout + interactive surface for mobile hazards (horizontal overflow,
@@ -394,9 +420,6 @@ genauly.de, and confirm the Actions "pages" deploy went green for the merge comm
 
 **Next:**
 - (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-- Candidate features: **installable PWA** (manifest + service worker — natural follow-on to the
-  mobile audit; makes safe-area insets fully matter + offline launch), logo, monetization tier,
-  more dialogues/exam sets.
+- Candidate features: logo, monetization tier, more dialogues/exam sets.
 
-_(Anthropic key rotation: ✅ done. Mobile UX audit: ✅ done — app was already mobile-solid; added
-safe-area insets for notch/home-indicator devices.)_
+_(Anthropic key rotation: ✅ done. Mobile UX audit: ✅ done. Installable PWA: ✅ done.)_
