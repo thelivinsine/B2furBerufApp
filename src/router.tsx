@@ -1,9 +1,14 @@
 import React, { Suspense } from "react";
 import { createHashRouter, Navigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
-import { LandingPage } from "@/features/landing/LandingPage";
-import { Dashboard } from "@/features/dashboard/Dashboard";
 import { useSettingsStore } from "@/store/useSettingsStore";
+
+const LandingPage = React.lazy(() =>
+  import("@/features/landing/LandingPage").then((m) => ({ default: m.LandingPage })),
+);
+const Dashboard = React.lazy(() =>
+  import("@/features/dashboard/Dashboard").then((m) => ({ default: m.Dashboard })),
+);
 
 const Onboarding = React.lazy(() =>
   import("@/features/onboarding/Onboarding").then((m) => ({ default: m.Onboarding })),
@@ -64,7 +69,11 @@ const OnboardingRoute = (
 export const router = createHashRouter([
   {
     path: "/welcome",
-    element: <LandingPage />,
+    element: (
+      <Suspense fallback={null}>
+        <LandingPage />
+      </Suspense>
+    ),
   },
   {
     path: "/start",
