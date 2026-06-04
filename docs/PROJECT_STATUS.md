@@ -65,8 +65,8 @@ This file is the single place to re-orient when resuming work. For the full desi
   insight with "Rechtschreibung üben" deep-link.
 - **Known deployment quirk:** the Supabase dashboard pre-fills a "Hello [name]!" boilerplate when
   creating a function. Must select-all-delete before pasting the real code. Caught and fixed.
-- **Anthropic key:** ⚠️ the original key was pasted in chat — founder should rotate it at
-  console.anthropic.com and update the secret in Supabase Edge Functions → Secrets.
+- **Anthropic key:** ✅ rotated by the founder (the original, once pasted in chat, is dead). The
+  live secret lives only in Supabase Edge Functions → Secrets → `ANTHROPIC_API_KEY`.
 - Bundle is now ~1.41 MB (supabase-js); code-splitting still deferred.
 
 ## Decisions locked
@@ -109,8 +109,8 @@ This file is the single place to re-orient when resuming work. For the full desi
 - [x] Set Site URL in Auth settings. (done)
 - [x] Deploy `evaluate-writing` function via dashboard code editor. (done 2026-05-31)
 - [x] Smoke-test end-to-end. (✅ working — spelling insight returned correctly)
-- [ ] **Rotate the Anthropic key** (was pasted in chat) — generate new key at console.anthropic.com,
-      update in Supabase Edge Functions → Secrets → `ANTHROPIC_API_KEY`.
+- [x] **Rotate the Anthropic key** (the one pasted in chat) — done; new key set in Supabase Edge
+      Functions → Secrets → `ANTHROPIC_API_KEY`.
 - [ ] (Optional) Add Resend SMTP to fix email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
@@ -374,6 +374,7 @@ genauly.de, and confirm the Actions "pages" deploy went green for the merge comm
 **Dev branch:** `claude/genauly-blank-page-9biDi` — realign to `origin/main` after the squash-merge.
 
 **Next:**
-- Rotate the Anthropic key (was pasted in chat) — 2 min at console.anthropic.com.
-- Add Resend SMTP to fix email magic-link rate-limit.
+- (Optional) Add Resend SMTP to fix email magic-link rate-limit.
 - Candidate features: logo, monetization tier, more dialogues/exam sets, mobile UX audit.
+
+_(Anthropic key rotation: ✅ done — founder rotated it.)_
