@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-04 (session 8). Branch: `claude/loving-cray-lMLj3`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-04 (session 9). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -216,7 +216,40 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
-### Session 8 (2026-06-04) — Blank page bug investigation (UNRESOLVED ⚠️)
+### Session 9 (2026-06-04) — Blank page bug ROOT-CAUSED & FIXED ✅
+
+**Root cause (proven, not speculative): a circular ESM *chunk* dependency introduced by the
+session-6 `manualChunks` config.**
+
+- `react-router` / `react-router-dom` matched the `node_modules/react-router` rule → `vendor-react`.
+- Their dependency **`@remix-run/router`** matched **no** rule → fell through to the catch-all
+  `vendor-misc`.
+- Result: `vendor-react` imported `@remix-run/router` **from** `vendor-misc`, while `vendor-misc`
+  imported React **from** `vendor-react` → **`Circular chunk: vendor-misc -> vendor-react ->
+  vendor-misc`** (this warning was printed on *every* build since session 6 but was ignored).
+- With circular ES modules the browser can evaluate a binding while it is still in its **temporal
+  dead zone**, throwing `ReferenceError: Cannot access 'X' before initialization` **synchronously
+  during module evaluation — before `createRoot()` runs**. Because it's a `type="module"` script
+  throwing *pre-React*, the `RootErrorBoundary` can't catch it and nothing renders → blank dark
+  page. Worked in `vite dev` because dev serves unbundled modules in correct order. This matches
+  every symptom and every previously ruled-out item.
+
+**The fix (`vite.config.ts`):** add `node_modules/@remix-run/router` to the `vendor-react` rule so
+the entire React + router graph lives in one chunk. After rebuild: the circular-chunk warning is
+gone, `vendor-react` imports from **no** other chunk, and a pairwise scan of all emitted chunks
+shows **zero** cycles. `npm run build` + `npm run typecheck` both green.
+
+**Permanent safety net (`src/main.tsx`):** added a framework-free `paintFatal()` that writes the
+error straight into `#root` via the DOM, plus `window.onerror` / `unhandledrejection` listeners and
+a `try/catch` around `createRoot()`. Any *future* pre-React/module-level crash (TDZ, chunk 404,
+unsupported browser API) is now visible on screen instead of a silent blank page — important since
+the founder is usually on mobile and can't open a console. Kept as a permanent net.
+
+**Verification done in sandbox:** built fresh, confirmed every chunk hash referenced by
+`dist/index.html` exists on disk, confirmed no cross-chunk import cycle remains, typecheck clean.
+The sandbox can't reach the live `*.github.io` site — founder confirms the live result.
+
+### Session 8 (2026-06-04) — Blank page bug investigation (root cause was the circular chunk above)
 
 **Symptom:** Site shows a completely black blank page (dark background from CSS, no React content). Reported by founder on mobile. Persists across multiple deploys.
 
@@ -318,20 +351,29 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
 
 ## Resume here (next session)
 
-⚠️ **UNRESOLVED BUG: Site shows blank page — investigate first before any new features.**
+✅ **Blank-page bug is FIXED (session 9).** Root cause was a circular ESM *chunk* dependency from
+the session-6 `manualChunks` (`@remix-run/router` fell into `vendor-misc` while `react-router` was
+in `vendor-react`), causing a pre-React temporal-dead-zone `ReferenceError`. Fixed by grouping
+`@remix-run/router` into `vendor-react`; added a permanent framework-free crash painter in
+`main.tsx`. **Founder to confirm the live site now renders** (sandbox can't reach `*.github.io`).
+If it's *still* blank after the deploy completes, the most likely remaining cause is a stale
+GitHub Pages / browser CDN cache serving an old `index.html` — hard-refresh / clear site data for
+genauly.de, and confirm the Actions "pages" deploy went green for the merge commit.
 
-**Immediate first action:** Ask the founder to open genauly.de in a desktop browser (Chrome/Firefox/Safari) and check the browser console (F12 → Console tab). The exact error will be there. Share it and fix it before doing anything else.
+**What's deployed on `main` (after session 9 merge):**
+- **Fixed chunking** (`vite.config.ts`) — no circular chunk; React + full router graph in one chunk.
+- **Permanent pre-React error catcher** (`main.tsx`) — `paintFatal()` + `window.onerror` /
+  `unhandledrejection` + `try/catch` around `createRoot()`; any future module-level crash is
+  painted into `#root` instead of a silent blank page.
+- `RootErrorBoundary` in `main.tsx` — catches React render errors once mounted.
+- `LandingPage` and `Dashboard` statically bundled (not lazy-loaded).
+- Analytics page enhanced (30-day XP chart, per-theme mastery, writing weaknesses panel).
+- All content: vocabulary (354 words) / grammar (47 drills, 10 topics) / collocations (120, 12/theme).
+- Full Phase 2: auth + cloud sync + AI writing coach.
 
-**What's deployed on `main`:**
-- `RootErrorBoundary` in `main.tsx` — any React render error now shows an error message instead of blank
-- `LandingPage` and `Dashboard` statically bundled (not lazy-loaded) to eliminate blank-flash on slow connections
-- Analytics page enhanced (30-day XP chart, per-theme mastery, writing weaknesses panel)
-- All content: vocabulary (354 words) / grammar (47 drills, 10 topics) / collocations (120, 12/theme)
-- Full Phase 2: auth + cloud sync + AI writing coach
+**Dev branch:** `claude/genauly-blank-page-9biDi` — realign to `origin/main` after the squash-merge.
 
-**Dev branch:** `claude/loving-cray-lMLj3` — already realigned to `origin/main`. Clean, nothing to commit.
-
-**After the bug is fixed:**
+**Next:**
 - Rotate the Anthropic key (was pasted in chat) — 2 min at console.anthropic.com.
 - Add Resend SMTP to fix email magic-link rate-limit.
 - Candidate features: logo, monetization tier, more dialogues/exam sets, mobile UX audit.
