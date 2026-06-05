@@ -494,6 +494,16 @@ session continues from here; the active automation branch is `claude/todo-invent
 **Dev branch:** `claude/todo-inventory-BUHq0` — realign to `origin/main` after each squash-merge.
 
 **Next candidates:**
+- **(Plan needed) Content quality control & technical validation pipeline** — as content grows
+  (vocabulary, dialogues, exam sets, grammar drills) there is no systematic process to catch
+  errors, inconsistencies, or pedagogical drift. Need to plan:
+  - **Technical QC:** automated checks for duplicate IDs, missing required fields, article/plural
+    consistency, broken next-node references in dialogue trees, unreachable dialogue nodes.
+  - **Pedagogical QC:** human or AI-assisted review of German accuracy (grammar, register, B2
+    level-appropriateness), example sentence authenticity, pronunciation hints, and exam-task
+    alignment to actual Goethe/telc B2 Beruf rubrics.
+  - **Process:** decide where checks live (CI lint script, separate QC doc, periodic review
+    session) and who signs off (founder spot-check vs. native-speaker review).
 - (Optional) Add Resend SMTP to fix email magic-link rate-limit.
 - (Optional) Logo for app icon / branding.
 - (Optional) Monetization tier + paywall feature flags.
