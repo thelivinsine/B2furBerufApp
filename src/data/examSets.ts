@@ -141,6 +141,54 @@ export const examSets: ExamSet[] = [
     ],
     rubric: sharedRubric,
   },
+  {
+    id: "ex_teambesprechung",
+    title: "Prüfungssimulation: Teambesprechung",
+    themeId: "meetings",
+    scenarioId: "sc_teambesprechung",
+    totalMinutes: 6,
+    taskSheet:
+      "Sie sollen gemeinsam mit einer Kollegin / einem Kollegen eine Teambesprechung vorbereiten. Einigen Sie sich auf Tagesordnung, Zeitplan und Aufgaben.",
+    aspects: [
+      "Welche Themen kommen auf die Tagesordnung?",
+      "Wie viel Zeit planen Sie für jeden Punkt ein?",
+      "Wer leitet die Besprechung, wer schreibt das Protokoll?",
+      "Wie stellen Sie sicher, dass Beschlüsse umgesetzt werden?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_lieferproblem",
+    title: "Prüfungssimulation: Lieferverzögerung",
+    themeId: "logistics",
+    scenarioId: "sc_lieferproblem",
+    totalMinutes: 7,
+    taskSheet:
+      "Ihr wichtigster Rohstofflieferant kann nicht pünktlich liefern. Finden Sie gemeinsam Maßnahmen, um die Produktion zu sichern und die Kunden zu informieren.",
+    aspects: [
+      "Wie bewerten Sie die Auswirkungen der Verzögerung?",
+      "Wie nutzen Sie die mögliche Teillieferung?",
+      "Wie sichern Sie die Versorgung langfristig ab?",
+      "Wie kommunizieren Sie mit den betroffenen Kunden?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_dienstreise",
+    title: "Prüfungssimulation: Dienstreise planen",
+    themeId: "travel",
+    scenarioId: "sc_dienstreise",
+    totalMinutes: 6,
+    taskSheet:
+      "Sie und eine Kollegin / ein Kollege sollen zu einem wichtigen Kundengespräch in eine andere Stadt reisen. Planen Sie gemeinsam alle Details der Dienstreise.",
+    aspects: [
+      "Wie reisen Sie an – Zug oder Auto?",
+      "Wann reisen Sie an?",
+      "Welches Hotel buchen Sie?",
+      "Welche Unterlagen und Materialien nehmen Sie mit?",
+    ],
+    rubric: sharedRubric,
+  },
 ];
 
 export const examById = (id: string) => examSets.find((e) => e.id === id);
