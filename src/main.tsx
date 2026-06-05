@@ -2,6 +2,9 @@ import { Component, StrictMode } from "react";
 import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+// Self-hosted Inter (variable). Replaces the third-party rsms.me stylesheet —
+// no external font dependency, no IP leak, and a tighter CSP.
+import "@fontsource-variable/inter";
 import "./index.css";
 
 /**
