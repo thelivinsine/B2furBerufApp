@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-05 (session 16). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-05 (session 17). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -242,6 +242,34 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 17 (2026-06-05) — Security audit, documentation, and sourcing research
+
+**Security audit completed (no critical findings).** Full architectural review of all security
+surfaces. The app is fundamentally well-built: secrets stay server-side, all tables have
+owner-only RLS, no client-side secret exposure, no `dangerouslySetInnerHTML` or `eval`. The
+service worker precaches only static build assets.
+
+**Gaps found and a remediation plan created & approved:**
+- 2 moderate npm vulns (react-router open redirect, fixed by bumping to `^6.30.4`).
+- Edge Function CORS wide-open (`Access-Control-Allow-Origin: *`) — needs allowlist.
+- No Content-Security-Policy header/meta anywhere.
+- Third-party font from `rsms.me` (privacy + supply-chain risk) — needs self-hosting.
+- AI function has no input *maximum* size cap — denial-of-wallet risk.
+- No per-user monthly AI call cap — one account can exhaust the global budget.
+- CI actions pinned to floating tags (`@v4`) rather than commit SHAs.
+- npm → pnpm migration planned (supply-chain: content-addressable store + release-age cooldown).
+
+**Plan document:** `docs/SECURITY_AUDIT_PLAN.pdf` (4-page PDF, committed to dev branch).
+Implementation will be rolled out in 4 PRs (pnpm migration → Edge Function hardening →
+Frontend hardening / CSP → CI SHA-pinning). CSP ships in report-only mode first.
+
+**Documentation updates (PRs #82–#83, live on `main`):**
+- Added content QC & technical validation planning to-do.
+- Expanded "Research findings" section with full open-licensed sourcing guide: licensing
+  guardrails (CC0/BY/BY-SA = ok; NC/ND = blocked), table of 7 approved commercial-safe sources
+  (Tatoeba, Wikibooks, Wikimedia Commons, Project Gutenberg, LibriVox, DWDS/Leipzig), and
+  sources to avoid (DW, Goethe/Klett/Routledge). Also noted Anki/LARA open-source infra.
+
 ### Session 16 (2026-06-05) — Content expansion SHIPPED ✅ (10 scenarios · 10 exam sets · ~504 words)
 
 Added 7 new branching scenarios (all remaining themes: meetings, logistics, travel, project,
@@ -482,56 +510,62 @@ The sandbox can't reach the live `*.github.io` site — founder confirms the liv
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–16 (2026-06-04 → 06-05).** Everything below is merged to `main`. A new
-session continues from here; the active automation branch is `claude/todo-inventory-BUHq0`
-(`main` is the source of truth).
+**Handoff after sessions 9–17 (2026-06-04 → 06-05).** Everything noted ✅ is merged to `main`.
+Active automation branch: `claude/todo-inventory-BUHq0` (realign to `origin/main` after each
+squash-merge — see CLAUDE.md).
 
-**Shipped & live this run (all on `main`):**
-- **Blank-page bug FIXED (s9):** circular ESM chunk → pre-React TDZ crash. Fixed + permanent crash
-  painter in `main.tsx`. Founder confirmed live.
-- **Mobile UX safe-area insets (s10):** `.pt-safe`/`.pb-safe-8` for notch/home-indicator devices.
-- **Installable PWA (s11):** `vite-plugin-pwa`, web manifest, icons (192/512/maskable/apple-touch).
-- **iOS standalone fix / no address bar (s13):** `apple-mobile-web-app-capable` meta tags. ⚠️ iOS
-  caches old web-clips — delete icon + re-add to home screen after deploy to pick up changes.
-- **Mobile bottom tab bar (s15, PR #76):** native bottom nav replacing hamburger drawer. Bar = Start
-  · Wortschatz · Quiz · Fortschritt · Mehr; Mehr-sheet holds remaining 8 items. Desktop untouched.
-- **Mobile density & fit (s15, PRs #77–#78):** `sm:`-gated tightening of all shared components
-  (`HubHero`, `SectionHeading`, `EmptyState`, `StatCard`), all 11 page roots, flashcard grade grid,
-  Dashboard stat strip, progress ring (responsive 104→128 px), exam + sim timer headers.
-- **Content expansion (s16, PR #80):** 7 new branching scenarios (3→10, all 10 themes), 8 new exam
-  sets (2→10), ~150 new vocabulary words (354→~504).
+**Shipped & live (all on `main`):**
+- **Blank-page bug FIXED (s9):** circular ESM chunk → pre-React TDZ crash + permanent crash painter.
+- **Mobile UX safe-area insets (s10):** `.pt-safe`/`.pb-safe-8` for notched iPhones.
+- **Installable PWA (s11):** service worker, web manifest, icons, offline-first.
+- **iOS standalone / no address bar (s13):** `apple-mobile-web-app-capable` meta tags.
+- **Mobile bottom tab bar (s15, PR #76):** native bottom nav. Desktop sidebar untouched.
+- **Mobile density & fit (s15, PRs #77–#78):** `sm:`-gated tightening across all components/pages.
+- **Content expansion (s16, PR #80):** 10 scenarios · 10 exam sets · ~504 vocabulary words.
+- **Docs: content QC & sourcing research (s17, PRs #82–#83):** to-do + licensing guide in status doc.
+
+**In-progress / planned (not yet on `main`):**
+- **Security hardening** — plan approved (s17), implementation pending (4 PRs):
+  1. **PR: pnpm migration + vuln fix** — `react-router-dom ^6.30.4`; pnpm lockfile; `.npmrc`
+     with `minimum-release-age`; update CI and `CLAUDE.md`. 2 npm moderate vulns → 0.
+  2. **PR: Edge Function hardening** — CORS allowlist (replace `*`); max input size cap
+     (~3 000 chars); per-user monthly AI call ceiling; `docs/SECURITY.md` with founder checklist.
+  3. **PR: Frontend hardening** — CSP `report-only` meta in `index.html`; self-host Inter font
+     via `@fontsource/inter` (removes rsms.me third-party dependency).
+  4. **PR: CI SHA-pinning** — pin GitHub Actions to commit SHAs; `docs/PROJECT_STATUS.md` update.
+  - Full plan: `docs/SECURITY_AUDIT_PLAN.pdf` (on dev branch, not yet merged to main).
+  - After the 4 PRs a **5th PR** flips CSP from report-only → enforcing (founder confirms first).
+
+**Founder dashboard checklist (security — do after PR 2 is deployed):**
+1. Supabase → Authentication → Bot & Abuse Protection → **enable Turnstile CAPTCHA**.
+2. Edge Functions → evaluate-writing → Secrets → set `ALLOWED_ORIGINS` (and optionally
+   `MAX_TEXT_LEN`, `USER_MONTHLY_LIMIT`).
+3. **Redeploy `evaluate-writing`** via dashboard code editor (paste updated `index.ts`).
 
 **Decisions locked:**
-- Bottom tab bar = **Start · Wortschatz · Quiz · Fortschritt · Mehr** (Mehr-sheet holds the other 8).
-- Mobile redesign scope = **Layer 2 (nav) ✅ · Layer 3 (density) ✅ — both DONE**.
+- Bottom tab bar = **Start · Wortschatz · Quiz · Fortschritt · Mehr** (Mehr-sheet = other 8).
+- Mobile redesign = **Layer 2 ✅ · Layer 3 ✅ — DONE**.
 - Keep `src/components/ui/card.tsx` **untouched**.
 - Pre-React crash painter is a **permanent** safety net (do not remove).
+- CSP ships **report-only first**; founder confirms live site clean before enforcing.
 
 **Content counts (live):**
-- Vocabulary: **~504 words** (~50/theme, 10 themes)
+- Vocabulary: **~504 words** (~50/theme · 10 themes)
 - Collocations: **120 Nomen-Verb pairs** (12/theme)
-- Grammar: **47 drills** across **10 topics**
-- Dialogues (branching scenarios): **10 scenarios** (1 per theme)
-- Exam sets: **10 sets** (1 per theme, 6–7 min each)
+- Grammar: **47 drills** · **10 topics**
+- Dialogues (branching scenarios): **10** (1 per theme)
+- Exam sets: **10** (1 per theme · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
 
 **Dev branch:** `claude/todo-inventory-BUHq0` — realign to `origin/main` after each squash-merge.
 
-**Next candidates:**
-- **(Plan needed) Content quality control & technical validation pipeline** — as content grows
-  (vocabulary, dialogues, exam sets, grammar drills) there is no systematic process to catch
-  errors, inconsistencies, or pedagogical drift. Need to plan:
-  - **Technical QC:** automated checks for duplicate IDs, missing required fields, article/plural
-    consistency, broken next-node references in dialogue trees, unreachable dialogue nodes.
-  - **Pedagogical QC:** human or AI-assisted review of German accuracy (grammar, register, B2
-    level-appropriateness), example sentence authenticity, pronunciation hints, and exam-task
-    alignment to actual Goethe/telc B2 Beruf rubrics.
-  - **Process:** decide where checks live (CI lint script, separate QC doc, periodic review
-    session) and who signs off (founder spot-check vs. native-speaker review).
-- (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-- (Optional) Logo for app icon / branding.
-- (Optional) Monetization tier + paywall feature flags.
-- (Optional) More grammar drills (currently 47; target ~80).
-- (Optional) Additional redemittel categories or phrases.
+**Next (priority order):**
+1. **Implement security hardening** — 4 PRs as described above (plan in `docs/SECURITY_AUDIT_PLAN.pdf`).
+2. **Content QC pipeline** — CI lint script for duplicate IDs, broken dialogue nodes, missing fields;
+   plus a pedagogical review process for German accuracy and B2 level-appropriateness.
+3. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
+4. (Optional) Logo / branding for app icon.
+5. (Optional) Monetization tier + paywall feature flags.
+6. (Optional) More grammar drills (47 → ~80 target).
 
-_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content fully covers all 10 themes ✅)_
+_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: plan approved, implementation next)_
