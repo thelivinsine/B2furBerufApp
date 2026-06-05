@@ -31,20 +31,20 @@ React + TypeScript + Vite SPA, deployed to GitHub Pages.
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
-- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on `claude/loving-cray-lMLj3`.
+- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/genauly-blank-page-9biDi`).
 - The remote sandbox cannot reach the live `*.github.io` site — verifying the deploy (Actions tab green + live site) is left to the user.
 
 ## Workflow notes
-- Development branch for this work: **`claude/loving-cray-lMLj3`**. Ship to production by opening a PR into `main` and merging (squash) — the merge triggers `pages.yml`.
+- Development branch for this work: **`claude/genauly-blank-page-9biDi`** (the active automation branch since session 9; `claude/loving-cray-lMLj3` was used through session 8 and is now stale). The branch name may be reassigned per session — **`main` is always the source of truth**; whatever branch a session is assigned, ship to production by opening a PR into `main` and merging (squash) — the merge triggers `pages.yml`.
 - **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `npm run build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.
 - **Documentation (REQUIRED after every significant task or series of tasks):** after shipping a feature, a content expansion, or a batch of UX fixes, update `docs/PROJECT_STATUS.md` — the session log, content counts, and "Resume here" section. Commit and push the doc update on the dev branch, then merge it to `main` like any other change. This keeps the status doc accurate for future sessions.
 
 ### Post-deploy GitHub housekeeping (REQUIRED after every squash-merge)
 Squash-merging rewrites history: `main` gets one new commit while the long-lived dev branch still holds the original unsquashed commits, so they diverge and the **next** PR conflicts (this bit us on PR #23). Run this realignment **every time** right after a merge:
 1. `git fetch origin main`
-2. `git checkout claude/loving-cray-lMLj3`
+2. `git checkout claude/genauly-blank-page-9biDi`
 3. `git reset --hard origin/main` — make the dev branch identical to production.
-4. `git push --force-with-lease origin claude/loving-cray-lMLj3` — `--force-with-lease` (never plain `--force`); safe because this is the sole dedicated automation branch with no other contributors.
+4. `git push --force-with-lease origin claude/genauly-blank-page-9biDi` — `--force-with-lease` (never plain `--force`); safe because this is the sole dedicated automation branch with no other contributors. (Substitute the session's actual assigned branch if different.)
 5. Confirm `git status` shows the branch level with `origin/main` and the working tree clean.
 
 Also: don't pre-write the next PR's `_Last updated`/log entry against a stale branch — realign first, then make new edits. The founder still verifies the live result; the sandbox can't reach the `*.github.io` site or the Actions tab.

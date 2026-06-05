@@ -117,7 +117,8 @@ This file is the single place to re-orient when resuming work. For the full desi
 
 ## Deploy / workflow reminders
 - `main` is production; merging to it triggers `pages.yml` (the **only** workflow now — the old
-  `deploy.yml`/`gh-pages` fallback is gone). Develop on `claude/loving-cray-lMLj3`; ship via
+  `deploy.yml`/`gh-pages` fallback is gone). Develop on the active automation branch (currently
+  `claude/genauly-blank-page-9biDi`; `main` is the source of truth); ship via
   squash-merge PR. **Always verify `npm run build` is green on the exact commit before merging**
   (a skipped check shipped two broken builds in session 2).
 - **Feature-branch pushes are NOT live.** Only `main` deploys. In session 3 the founder reported
@@ -126,14 +127,15 @@ This file is the single place to re-orient when resuming work. For the full desi
   open + squash-merge the PR yourself without asking** — see CLAUDE.md.
 - **REQUIRED post-deploy housekeeping (after every squash-merge):** realign the dev branch so it
   doesn't drift and conflict on the next PR — `git fetch origin main` → `git reset --hard origin/main`
-  → `git push --force-with-lease origin claude/loving-cray-lMLj3`. (Forgetting this caused the
+  → `git push --force-with-lease origin claude/genauly-blank-page-9biDi`. (Forgetting this caused the
   PR #23 merge conflict.) Full checklist in CLAUDE.md → "Post-deploy GitHub housekeeping".
 - Sandbox can't reach the live site or run Docker (so no local Supabase / no live verification
   here) — those steps are handed to the founder, same as the Pages deploy.
 
 ## Deploy / ops notes (accumulated)
-- `main` is production; merging triggers `pages.yml`. Develop on `claude/loving-cray-lMLj3`;
-  ship via squash-merge PR. **Always verify `npm run build` green before merging.**
+- `main` is production; merging triggers `pages.yml`. Develop on the active automation branch
+  (currently `claude/genauly-blank-page-9biDi`); ship via squash-merge PR. **Always verify
+  `npm run build` green before merging.**
 - Sandbox cannot reach `api.supabase.com` or `db.*.supabase.co:5432` — CLI migrations and function
   deploys must be done by the founder (dashboard SQL editor + dashboard function code editor work
   fine as alternatives).
@@ -226,8 +228,12 @@ page rhythm, plus targeted fixes to flashcard buttons, the Dashboard stat strip,
 and exam/simulation timer headers). Plan was pressure-tested: found & documented a real Toaster vs
 bottom-bar collision fix, guaranteed ≥44px touch targets, a `card.tsx` de-risk (leave it untouched —
 all callers override padding), a multi-branch-hub scope guard, and a collision audit. Desktop stays
-pixel-identical throughout. **No app code shipped this session — documentation only.** Resume from
-Layer 2.
+pixel-identical throughout. Also reconciled stale branch references for handoff: the active
+automation branch has been `claude/genauly-blank-page-9biDi` since session 9
+(`claude/loving-cray-lMLj3` was used through session 8); updated the forward-looking references in
+`CLAUDE.md` + this doc's deploy reminders (historical session entries left as-is) and noted
+**`main` is the source of truth** (branch may be reassigned per session). **No app code shipped
+this session — documentation only.** Resume from Layer 2.
 
 ### Session 13 (2026-06-04) — iOS standalone fix: no more address bar ✅
 
@@ -433,25 +439,42 @@ The sandbox can't reach the live `*.github.io` site — founder confirms the liv
 
 ## Resume here (next session)
 
-✅ **Blank-page bug is FIXED (session 9).** Root cause was a circular ESM *chunk* dependency from
-the session-6 `manualChunks` (`@remix-run/router` fell into `vendor-misc` while `react-router` was
-in `vendor-react`), causing a pre-React temporal-dead-zone `ReferenceError`. Fixed by grouping
-`@remix-run/router` into `vendor-react`; added a permanent framework-free crash painter in
-`main.tsx`. **Founder to confirm the live site now renders** (sandbox can't reach `*.github.io`).
-If it's *still* blank after the deploy completes, the most likely remaining cause is a stale
-GitHub Pages / browser CDN cache serving an old `index.html` — hard-refresh / clear site data for
-genauly.de, and confirm the Actions "pages" deploy went green for the merge commit.
+**Handoff after sessions 9–14 (2026-06-04 → 06-05).** Everything below is merged to `main`. A new
+session continues from here; the active automation branch is `claude/genauly-blank-page-9biDi`
+(`main` is the source of truth). The headline next task is the **mobile-app redesign** — fully
+planned and approved in `docs/MOBILE_APP_PLAN.md`, not yet built.
 
-**What's deployed on `main` (after session 9 merge):**
-- **Fixed chunking** (`vite.config.ts`) — no circular chunk; React + full router graph in one chunk.
-- **Permanent pre-React error catcher** (`main.tsx`) — `paintFatal()` + `window.onerror` /
-  `unhandledrejection` + `try/catch` around `createRoot()`; any future module-level crash is
-  painted into `#root` instead of a silent blank page.
-- `RootErrorBoundary` in `main.tsx` — catches React render errors once mounted.
-- `LandingPage` and `Dashboard` statically bundled (not lazy-loaded).
-- Analytics page enhanced (30-day XP chart, per-theme mastery, writing weaknesses panel).
-- All content: vocabulary (354 words) / grammar (47 drills, 10 topics) / collocations (120, 12/theme).
-- Full Phase 2: auth + cloud sync + AI writing coach.
+**Shipped & live this run (all on `main`):**
+- **Blank-page bug FIXED (s9):** root cause was a circular ESM *chunk* dependency from the session-6
+  `manualChunks` (`@remix-run/router` fell into `vendor-misc` while `react-router` was in
+  `vendor-react`) → pre-React temporal-dead-zone `ReferenceError`. Fixed by grouping
+  `@remix-run/router` into `vendor-react`. **Permanent framework-free crash painter** added in
+  `main.tsx` (`paintFatal()` + `window.onerror`/`unhandledrejection` + `try/catch` around
+  `createRoot()`) so any future pre-React crash is painted into `#root` instead of a silent blank
+  page. Founder confirmed the live site renders. ⚠️ If it ever blanks again, suspect a stale
+  GitHub Pages/browser CDN cache of `index.html` first.
+- **Mobile UX safe-area insets (s10):** `.pt-safe`/`.pb-safe-8` on the header + main for
+  notch/home-indicator devices. App was already otherwise mobile-solid (responsive grids, 100dvh
+  dialogs, iOS input-zoom fix).
+- **Installable PWA (s11):** `vite-plugin-pwa` (service worker precaches 40 entries, autoUpdate),
+  web manifest (standalone, dark theme), icons (192/512/maskable/apple-touch). `sharp` was used
+  once to generate icons then removed.
+- **iOS standalone fix / no address bar (s13):** added the `apple-mobile-web-app-capable` family of
+  meta tags to `index.html` so the home-screen app launches full-screen. ⚠️ iOS caches the old
+  web-clip — re-add the home-screen icon to pick it up.
+- **Docs (s12/s14):** the full mobile redesign plan now lives in `docs/MOBILE_APP_PLAN.md`.
+
+**Decisions locked this run:**
+- Bottom tab bar = **Start · Wortschatz · Quiz · Fortschritt · Mehr** (Mehr-sheet holds the other 8).
+- Mobile redesign scope = **app chrome + nav (Point 2) AND mobile density/fit (Point 3)** — both
+  approved; desktop must stay **pixel-identical** (`lg:`/`sm:` gating).
+- Keep `src/components/ui/card.tsx` **untouched** (all callers override padding — editing it is
+  invisible + risky).
+- Pre-React crash painter is a **permanent** safety net (do not remove).
+
+**Earlier baseline still live:** `RootErrorBoundary`; `LandingPage`/`Dashboard` statically bundled;
+Analytics (30-day XP chart, per-theme mastery, writing weaknesses); content = vocabulary 354 /
+grammar 47 drills·10 topics / collocations 120; full Phase 2 (auth + cloud sync + AI writing coach).
 
 **Dev branch:** `claude/genauly-blank-page-9biDi` — realign to `origin/main` after the squash-merge.
 
