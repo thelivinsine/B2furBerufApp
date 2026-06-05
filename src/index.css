@@ -160,4 +160,10 @@
   .pb-safe-8 {
     padding-bottom: calc(2rem + env(safe-area-inset-bottom));
   }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .pb-nav {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom) + 2rem);
+  }
 }

@@ -1,35 +1,7 @@
 import { NavLink, Link } from "react-router-dom";
-import {
-  LayoutDashboard,
-  BookOpen,
-  MessagesSquare,
-  BookMarked,
-  Combine,
-  ListChecks,
-  PenLine,
-  Mic,
-  GraduationCap,
-  Zap,
-  LineChart,
-  Settings,
-  Sparkles,
-} from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const nav = [
-  { to: "/", label: "Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/vocabulary", label: "Wortschatz", icon: BookOpen },
-  { to: "/redemittel", label: "Redemittel", icon: MessagesSquare },
-  { to: "/grammar", label: "Grammatik", icon: BookMarked },
-  { to: "/collocations", label: "Kollokationen", icon: Combine },
-  { to: "/quiz", label: "Quiz", icon: ListChecks },
-  { to: "/writing", label: "Schreibtraining", icon: PenLine },
-  { to: "/simulation", label: "Sprechsimulation", icon: Mic },
-  { to: "/exam", label: "Prüfungsmodus", icon: GraduationCap },
-  { to: "/revision", label: "Schnellwiederholung", icon: Zap },
-  { to: "/analytics", label: "Fortschritt", icon: LineChart },
-  { to: "/settings", label: "Einstellungen", icon: Settings },
-];
+import { navItems } from "./nav-items";
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -50,7 +22,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
 
       <nav className="flex flex-col gap-0.5">
-        {nav.map(({ to, label, icon: Icon, end }) => (
+        {navItems.map(({ to, label, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
