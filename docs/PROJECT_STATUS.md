@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-05 (session 14). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-05 (session 15). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -217,6 +217,15 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
+
+### Session 15 (2026-06-05) — Mobile bottom tab bar SHIPPED ✅ (Layer 2)
+
+Replaced the hamburger drawer on mobile with a native-feeling bottom tab bar + "Mehr" sheet.
+Files: `nav-items.ts` (shared nav), `BottomTabBar.tsx` (fixed bar, `lg:hidden`, safe-area aware),
+`MoreSheet.tsx` (Radix bottom sheet, grab handle, 8 non-primary nav items), `AppShell.tsx`
+(removes hamburger/drawer, mounts bar + sheet, `pb-nav` on main), `Toaster.tsx` (lifted above
+bar on mobile), `index.css` (`.pb-safe` + `.pb-nav` utilities). Desktop sidebar untouched.
+`npm run build` green, PR #76 squash-merged to `main`. Active branch: `claude/todo-inventory-BUHq0`.
 
 ### Session 14 (2026-06-05) — Mobile-app redesign plan expanded (Layer 2 + Point 3) 📋
 
@@ -439,54 +448,39 @@ The sandbox can't reach the live `*.github.io` site — founder confirms the liv
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–14 (2026-06-04 → 06-05).** Everything below is merged to `main`. A new
-session continues from here; the active automation branch is `claude/genauly-blank-page-9biDi`
-(`main` is the source of truth). The headline next task is the **mobile-app redesign** — fully
-planned and approved in `docs/MOBILE_APP_PLAN.md`, not yet built.
+**Handoff after sessions 9–15 (2026-06-04 → 06-05).** Everything below is merged to `main`. A new
+session continues from here; the active automation branch is `claude/todo-inventory-BUHq0`
+(`main` is the source of truth).
 
 **Shipped & live this run (all on `main`):**
-- **Blank-page bug FIXED (s9):** root cause was a circular ESM *chunk* dependency from the session-6
-  `manualChunks` (`@remix-run/router` fell into `vendor-misc` while `react-router` was in
-  `vendor-react`) → pre-React temporal-dead-zone `ReferenceError`. Fixed by grouping
-  `@remix-run/router` into `vendor-react`. **Permanent framework-free crash painter** added in
-  `main.tsx` (`paintFatal()` + `window.onerror`/`unhandledrejection` + `try/catch` around
-  `createRoot()`) so any future pre-React crash is painted into `#root` instead of a silent blank
-  page. Founder confirmed the live site renders. ⚠️ If it ever blanks again, suspect a stale
-  GitHub Pages/browser CDN cache of `index.html` first.
-- **Mobile UX safe-area insets (s10):** `.pt-safe`/`.pb-safe-8` on the header + main for
-  notch/home-indicator devices. App was already otherwise mobile-solid (responsive grids, 100dvh
-  dialogs, iOS input-zoom fix).
-- **Installable PWA (s11):** `vite-plugin-pwa` (service worker precaches 40 entries, autoUpdate),
-  web manifest (standalone, dark theme), icons (192/512/maskable/apple-touch). `sharp` was used
-  once to generate icons then removed.
-- **iOS standalone fix / no address bar (s13):** added the `apple-mobile-web-app-capable` family of
-  meta tags to `index.html` so the home-screen app launches full-screen. ⚠️ iOS caches the old
-  web-clip — re-add the home-screen icon to pick it up.
-- **Docs (s12/s14):** the full mobile redesign plan now lives in `docs/MOBILE_APP_PLAN.md`.
+- **Blank-page bug FIXED (s9):** circular ESM chunk → pre-React TDZ crash. Fixed + permanent crash
+  painter in `main.tsx`. Founder confirmed live.
+- **Mobile UX safe-area insets (s10):** `.pt-safe`/`.pb-safe-8` for notch/home-indicator devices.
+- **Installable PWA (s11):** `vite-plugin-pwa`, web manifest, icons (192/512/maskable/apple-touch).
+- **iOS standalone fix / no address bar (s13):** `apple-mobile-web-app-capable` meta tags. ⚠️ iOS
+  caches old web-clips — delete icon + re-add to home screen after deploy to pick up changes.
+- **Mobile bottom tab bar (s15, PR #76):** native bottom nav replacing hamburger drawer. Bar = Start
+  · Wortschatz · Quiz · Fortschritt · Mehr; Mehr-sheet holds remaining 8 items. Desktop untouched.
 
-**Decisions locked this run:**
+**Decisions locked:**
 - Bottom tab bar = **Start · Wortschatz · Quiz · Fortschritt · Mehr** (Mehr-sheet holds the other 8).
-- Mobile redesign scope = **app chrome + nav (Point 2) AND mobile density/fit (Point 3)** — both
-  approved; desktop must stay **pixel-identical** (`lg:`/`sm:` gating).
-- Keep `src/components/ui/card.tsx` **untouched** (all callers override padding — editing it is
-  invisible + risky).
+- Mobile redesign scope = **Layer 2 (nav) DONE ✅ + Layer 3 / Point 3 (density) NEXT**.
+- Keep `src/components/ui/card.tsx` **untouched**.
 - Pre-React crash painter is a **permanent** safety net (do not remove).
 
-**Earlier baseline still live:** `RootErrorBoundary`; `LandingPage`/`Dashboard` statically bundled;
-Analytics (30-day XP chart, per-theme mastery, writing weaknesses); content = vocabulary 354 /
-grammar 47 drills·10 topics / collocations 120; full Phase 2 (auth + cloud sync + AI writing coach).
+**Baseline live:** `RootErrorBoundary`; Analytics (30-day XP, per-theme mastery, writing weaknesses);
+content = vocabulary 354 / grammar 47 drills·10 topics / collocations 120; Phase 2 (auth + cloud
+sync + AI writing coach).
 
-**Dev branch:** `claude/genauly-blank-page-9biDi` — realign to `origin/main` after the squash-merge.
+**Dev branch:** `claude/todo-inventory-BUHq0` — realign to `origin/main` after each squash-merge.
 
 **Next:**
-- **Mobile-app redesign — Layer 1 (address-bar fix) SHIPPED ✅; Layer 2 (bottom tab bar) + Point 3
-  (mobile density & fit) PLANNED & APPROVED, not yet built.** Full combined plan (exact `sm:`-gated
-  className transforms, Toaster collision fix, touch-target guarantees, de-risk notes, verification)
-  in **`docs/MOBILE_APP_PLAN.md`**. Resume from Layer 2 → Point 3 Phase A → Phase B (each
-  independently shippable; desktop stays pixel-identical).
+- **Layer 3 / Point 3 — mobile density & fit.** Full plan in `docs/MOBILE_APP_PLAN.md`.
+  - **Phase A (shared components):** `HubHero`, `SectionHeading`, `EmptyState`, `StatCard`,
+    page-level `space-y-*` across all 11 pages. All gated `sm:`, desktop untouched.
+  - **Phase B (targeted fixes):** flashcard height, Dashboard stat strip, progress ring,
+    exam/sim timer headers. Each independently shippable.
 - (Optional) Add Resend SMTP to fix email magic-link rate-limit.
 - Candidate features: logo, monetization tier, more dialogues/exam sets.
 
-_(Anthropic key rotation: ✅ done. Mobile UX audit: ✅ done. Installable PWA: ✅ done.
-Address-bar / iOS standalone fix: ✅ done. Bottom-tab-bar + mobile density redesign: 📋 planned &
-approved — see `docs/MOBILE_APP_PLAN.md`.)_
+_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 📋 planned — see `docs/MOBILE_APP_PLAN.md`.)_
