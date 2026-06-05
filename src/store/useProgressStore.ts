@@ -114,6 +114,19 @@ export function useTodayXp(): number {
   return useProgressStore((s) => s.dailyXp[todayKey()] ?? 0);
 }
 
+/**
+ * Effective streak: returns the stored streak only when it's still alive
+ * (lastActiveDay is today or yesterday). Returns 0 once the streak is broken
+ * so the dashboard never shows a stale high value that then drops on next activity.
+ */
+export function useEffectiveStreak(): number {
+  return useProgressStore((s) => {
+    if (!s.lastActiveDay) return 0;
+    const gap = daysBetween(s.lastActiveDay, todayKey());
+    return gap <= 1 ? s.streak : 0;
+  });
+}
+
 /** Non-hook accessor for one-off reads. */
 export function getProgress() {
   return useProgressStore.getState();
