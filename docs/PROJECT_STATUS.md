@@ -523,24 +523,31 @@ squash-merge — see CLAUDE.md).
 - **Mobile density & fit (s15, PRs #77–#78):** `sm:`-gated tightening across all components/pages.
 - **Content expansion (s16, PR #80):** 10 scenarios · 10 exam sets · ~504 vocabulary words.
 - **Docs: content QC & sourcing research (s17, PRs #82–#83):** to-do + licensing guide in status doc.
+- **Security hardening — 4 PRs SHIPPED ✅ (s17, PRs #85–#88):**
+  1. **PR #85 — pnpm migration + vuln fix:** `react-router-dom ^6.30.4`; pnpm lockfile; `.npmrc`
+     supply-chain guardrails. `pnpm audit` 2 moderate → **0**. CI build verified green on `main`.
+  2. **PR #86 — Edge Function hardening:** CORS allowlist (replaced `*`); max input cap
+     (`MAX_TEXT_LEN`=3000); per-user monthly cap (`USER_MONTHLY_LIMIT`=50); `docs/SECURITY.md`.
+     ⚠️ Takes effect only after the founder **redeploys the function** (see checklist below).
+  3. **PR #87 — Frontend hardening:** CSP **report-only** meta in `index.html`; self-hosted Inter
+     via `@fontsource-variable/inter` (removed third-party rsms.me). Build-verified: dist has no
+     rsms.me refs, fonts self-hosted, both scripts external same-origin (CSP-clean).
+  4. **PR #88 — CI SHA-pinning:** all GitHub Actions pinned to commit SHAs (tag-hijack defense).
+  - Full plan: `docs/SECURITY_AUDIT_PLAN.pdf`; details in `docs/SECURITY.md`.
 
 **In-progress / planned (not yet on `main`):**
-- **Security hardening** — plan approved (s17), implementation pending (4 PRs):
-  1. **PR: pnpm migration + vuln fix** — `react-router-dom ^6.30.4`; pnpm lockfile; `.npmrc`
-     with `minimum-release-age`; update CI and `CLAUDE.md`. 2 npm moderate vulns → 0.
-  2. **PR: Edge Function hardening** — CORS allowlist (replace `*`); max input size cap
-     (~3 000 chars); per-user monthly AI call ceiling; `docs/SECURITY.md` with founder checklist.
-  3. **PR: Frontend hardening** — CSP `report-only` meta in `index.html`; self-host Inter font
-     via `@fontsource/inter` (removes rsms.me third-party dependency).
-  4. **PR: CI SHA-pinning** — pin GitHub Actions to commit SHAs; `docs/PROJECT_STATUS.md` update.
-  - Full plan: `docs/SECURITY_AUDIT_PLAN.pdf` (on dev branch, not yet merged to main).
-  - After the 4 PRs a **5th PR** flips CSP from report-only → enforcing (founder confirms first).
+- **CSP enforce flip** — once the founder confirms the live site loads with no CSP violations in
+  the browser console (report-only logs them, blocks nothing), a follow-up PR changes
+  `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `index.html` to enforce.
 
-**Founder dashboard checklist (security — do after PR 2 is deployed):**
+**Founder dashboard checklist (security — do now that PRs are merged):**
 1. Supabase → Authentication → Bot & Abuse Protection → **enable Turnstile CAPTCHA**.
-2. Edge Functions → evaluate-writing → Secrets → set `ALLOWED_ORIGINS` (and optionally
-   `MAX_TEXT_LEN`, `USER_MONTHLY_LIMIT`).
-3. **Redeploy `evaluate-writing`** via dashboard code editor (paste updated `index.ts`).
+2. Edge Functions → evaluate-writing → Secrets → optionally set `ALLOWED_ORIGINS`,
+   `MAX_TEXT_LEN`, `USER_MONTHLY_LIMIT` (safe defaults already baked in).
+3. **Redeploy `evaluate-writing`** via dashboard code editor (paste updated `index.ts`) — the
+   CORS + cap changes only go live after this.
+4. Open genauly.de → F12 → Console; if no red CSP violation messages, tell me and I'll flip CSP
+   to enforcing.
 
 **Decisions locked:**
 - Bottom tab bar = **Start · Wortschatz · Quiz · Fortschritt · Mehr** (Mehr-sheet = other 8).
@@ -560,7 +567,8 @@ squash-merge — see CLAUDE.md).
 **Dev branch:** `claude/todo-inventory-BUHq0` — realign to `origin/main` after each squash-merge.
 
 **Next (priority order):**
-1. **Implement security hardening** — 4 PRs as described above (plan in `docs/SECURITY_AUDIT_PLAN.pdf`).
+1. **Founder security steps** — Turnstile CAPTCHA, redeploy the Edge Function, confirm CSP-clean
+   console (see checklist above). Then I flip CSP report-only → enforcing.
 2. **Content QC pipeline** — CI lint script for duplicate IDs, broken dialogue nodes, missing fields;
    plus a pedagogical review process for German accuracy and B2 level-appropriateness.
 3. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
@@ -568,4 +576,4 @@ squash-merge — see CLAUDE.md).
 5. (Optional) Monetization tier + paywall feature flags.
 6. (Optional) More grammar drills (47 → ~80 target).
 
-_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: plan approved, implementation next)_
+_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 4 PRs shipped, CSP-enforce + founder steps pending)_
