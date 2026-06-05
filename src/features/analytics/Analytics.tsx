@@ -18,7 +18,7 @@ import { vocabByTheme } from "@/data/vocabulary";
 import { scenarios } from "@/data/dialogues";
 import { redemittel } from "@/data/redemittel";
 import { practiceAreaById } from "@/data/practiceAreas";
-import { useProgressStore } from "@/store/useProgressStore";
+import { useProgressStore, useEffectiveStreak } from "@/store/useProgressStore";
 import { mastery, masteryLabel } from "@/engine/srs";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
 import { pct, cn } from "@/lib/utils";
@@ -113,7 +113,7 @@ function WeaknessPanel({ entries }: { entries: WritingHistoryEntry[] }) {
 
 export function Analytics() {
   const xp = useProgressStore((s) => s.xp);
-  const streak = useProgressStore((s) => s.streak);
+  const streak = useEffectiveStreak();
   const longestStreak = useProgressStore((s) => s.longestStreak);
   const dailyXp = useProgressStore((s) => s.dailyXp);
   const srs = useProgressStore((s) => s.srs);

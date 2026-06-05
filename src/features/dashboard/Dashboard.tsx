@@ -14,7 +14,7 @@ import { themes } from "@/data/themes";
 import { vocabByTheme, vocabulary } from "@/data/vocabulary";
 import { scenariosByTheme } from "@/data/dialogues";
 import { iconByName } from "@/lib/icons";
-import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
+import { useProgressStore, useTodayXp, useEffectiveStreak } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { mastery, dueCount } from "@/engine/srs";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
@@ -65,7 +65,7 @@ export function Dashboard() {
   const examDate = useSettingsStore((s) => s.examDate);
   const goal = useSettingsStore((s) => s.dailyGoalXp);
   const xp = useProgressStore((s) => s.xp);
-  const streak = useProgressStore((s) => s.streak);
+  const streak = useEffectiveStreak();
   const srs = useProgressStore((s) => s.srs);
   const totalSessions = useProgressStore((s) => s.totalSessions);
   const todayXp = useTodayXp();
