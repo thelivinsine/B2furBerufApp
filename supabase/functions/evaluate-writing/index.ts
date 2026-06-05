@@ -24,12 +24,43 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+// CORS is locked to an allowlist. Previously this was "*", which let ANY
+// website invoke the function with a user's forwarded token. Origins can be
+// overridden via the ALLOWED_ORIGINS secret (comma-separated); any *.github.io
+// host is always allowed as the GitHub Pages fallback.
+const DEFAULT_ALLOWED_ORIGINS = [
+  "https://genauly.de",
+  "https://www.genauly.de",
+  "http://localhost:5173",
+];
+
+function isAllowedOrigin(origin: string): boolean {
+  if (!origin) return false;
+  const env = Deno.env.get("ALLOWED_ORIGINS");
+  const list = env
+    ? env.split(",").map((s) => s.trim()).filter(Boolean)
+    : DEFAULT_ALLOWED_ORIGINS;
+  if (list.includes(origin)) return true;
+  try {
+    const u = new URL(origin);
+    if (u.protocol === "https:" && u.hostname.endsWith(".github.io")) return true;
+  } catch {
+    /* malformed origin → not allowed */
+  }
+  return false;
+}
+
+/** Build CORS headers, reflecting the request Origin only if it's allowlisted. */
+function corsHeaders(origin: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Headers":
+      "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    Vary: "Origin",
+  };
+  if (isAllowedOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin;
+  return headers;
+}
 
 type Weakness =
   | "verbPosition"
@@ -49,14 +80,15 @@ const VALID_WEAKNESS: Weakness[] = [
 
 const DAILY_LIMIT = Number(Deno.env.get("DAILY_LIMIT") ?? "5");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
+// Per-user monthly call ceiling so a single account (or bot-farmed guest)
+// can't drain the shared global $ budget and lock everyone else out.
+const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "50");
+// Hard upper bound on submitted text length — bounds token cost per call.
+const MAX_TEXT_LEN = Number(Deno.env.get("MAX_TEXT_LEN") ?? "3000");
 const HAIKU_MODEL = "claude-haiku-4-5";
 
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...CORS, "Content-Type": "application/json" },
-  });
-}
+// `json` is defined inside the request handler (see Deno.serve) so every
+// response carries the correct per-request CORS headers.
 
 /** Stable hash of normalized text for the dedup cache. */
 async function hashText(text: string): Promise<string> {
@@ -251,7 +283,15 @@ async function callOpenAI(text: string, lt: LtBuckets | null): Promise<LlmOut | 
 /* --------------------------------- handler -------------------------------- */
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: CORS });
+  const origin = req.headers.get("Origin") ?? "";
+  const cors = corsHeaders(origin);
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), {
+      status,
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
+
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ ok: false, message: "Method not allowed" }, 405);
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -277,6 +317,11 @@ Deno.serve(async (req) => {
   }
   const text = (body.text ?? "").trim();
   if (text.length < 10) return json({ ok: false, message: "Text zu kurz." }, 400);
+  if (text.length > MAX_TEXT_LEN)
+    return json(
+      { ok: false, message: `Text zu lang (max. ${MAX_TEXT_LEN} Zeichen).` },
+      400,
+    );
   const length = body.length === "long" ? "long" : "short";
   const theme = body.theme ?? null;
 
@@ -306,6 +351,24 @@ Deno.serve(async (req) => {
       ok: false,
       limitReached: true,
       message: `Du hast heute schon ${DAILY_LIMIT} Texte ausgewertet. Komm morgen wieder!`,
+    });
+  }
+
+  // (1c) Per-user monthly cap — one account can't drain the shared budget.
+  const startOfMonth = new Date();
+  startOfMonth.setUTCDate(1);
+  startOfMonth.setUTCHours(0, 0, 0, 0);
+  const { count: userMonthCount } = await admin
+    .from("writing_evaluations")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", user.id)
+    .gte("created_at", startOfMonth.toISOString());
+  if ((userMonthCount ?? 0) >= USER_MONTHLY_LIMIT) {
+    return json({
+      ok: false,
+      limitReached: true,
+      message:
+        "Du hast dein KI-Kontingent für diesen Monat erreicht. Komm nächsten Monat wieder!",
     });
   }
 
