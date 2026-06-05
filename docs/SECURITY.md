@@ -30,37 +30,51 @@ The full audit and remediation plan is in `docs/SECURITY_AUDIT_PLAN.pdf`.
 | Supply chain | Migrated to **pnpm** with `minimum-release-age` (24h cooldown), integrity verification, and a default-deny on dependency build scripts. | ✅ shipped (PR 1) |
 | Edge Function CORS | Replaced `Access-Control-Allow-Origin: *` with an **allowlist** (genauly.de, localhost, `*.github.io`; override via `ALLOWED_ORIGINS`). | ✅ shipped (PR 2) |
 | AI abuse | Added a **max input length** (`MAX_TEXT_LEN`, default 3000) and a **per-user monthly cap** (`USER_MONTHLY_LIMIT`, default 50). | ✅ shipped (PR 2) |
-| Frontend | Content-Security-Policy (report-only first); self-hosted fonts (no third-party `rsms.me`). | PR 3 |
-| CI | GitHub Actions pinned to commit SHAs; minimal workflow permissions. | PR 4 |
+| Frontend | Content-Security-Policy (report-only first); self-hosted fonts (no third-party `rsms.me`). | ✅ shipped (PR 3) |
+| CI | GitHub Actions pinned to commit SHAs; minimal workflow permissions. | ✅ shipped (PR 4) |
 
-_Note: the Edge Function changes are live in this repo but take effect only after the
-founder redeploys the function (see action item 3 below)._
+_The Edge Function redeploy is **done** (founder, 2026-06-05) — the CORS lock and caps are
+live. Remaining: flip CSP report-only → enforcing once the live console is confirmed clean,
+and the Turnstile frontend work (see Open to-do)._
 
 ## Founder action items (Supabase dashboard — only you can do these)
 
-Do these **after** the Edge Function hardening PR is merged:
+1. **✅ DONE (2026-06-05) — Redeploy `evaluate-writing`.**
+   The founder pasted the hardened `index.ts` into the dashboard code editor and deployed.
+   The CORS allowlist, input cap, and per-user monthly cap are now **live**.
 
-1. **Enable Turnstile CAPTCHA on sign-in.**
-   Supabase dashboard → **Authentication** → **Settings** → **Bot & Abuse Protection** →
-   enable **Turnstile**. This deters bots from farming anonymous guest accounts to drain
-   the shared AI budget.
+2. **⚠️ DO NOT enable Turnstile CAPTCHA yet — needs frontend work first.**
+   Enabling CAPTCHA in Supabase (Authentication → Attack Protection / Bot & Abuse Protection)
+   makes Supabase **reject every sign-in that doesn't include a CAPTCHA token**. The app's
+   auth calls in `src/store/useAuthStore.ts` (`signInAnonymously`, `signUp`,
+   `signInWithPassword`, `signInWithOAuth`) currently send **no** `captchaToken`, so turning
+   CAPTCHA on now would lock out **all** sign-in (guest, register, login).
+   **Required order:**
+   1. (code) Render a Cloudflare Turnstile widget on the auth UI and pass its token via
+      `options: { captchaToken }` into every auth call. → see "Open to-do" below.
+   2. (founder) Create a Turnstile widget at Cloudflare (free) to get a **site key** +
+      **secret key**; enable CAPTCHA in Supabase and paste the **secret key**; put the
+      **site key** in the app (env/config). Then deploy.
 
-2. **(Optional) Set the Edge Function secrets** to override the safe defaults.
+3. **(Optional) Set the Edge Function secrets** to override the safe defaults.
    Dashboard → **Edge Functions** → **evaluate-writing** → **Secrets**:
-   - `ALLOWED_ORIGINS` — comma-separated list of your live origins (e.g.
-     `https://genauly.de,https://www.genauly.de`). The function already defaults to these,
-     so this is only needed if your domain changes.
+   - `ALLOWED_ORIGINS` — comma-separated live origins (defaults already cover genauly.de).
    - `MAX_TEXT_LEN` — max characters per submission (default `3000`).
    - `USER_MONTHLY_LIMIT` — max AI evaluations per user per month (default `50`).
 
-3. **Redeploy `evaluate-writing`.**
-   Dashboard → **Edge Functions** → **evaluate-writing** → open the code editor →
-   **select-all-delete**, paste the latest `supabase/functions/evaluate-writing/index.ts`
-   from this repo → **Deploy**. (The sandbox can't reach `api.supabase.com`, so this step
-   is manual.)
-
 4. **(Optional, pre-existing) Add Resend SMTP** to fix the email magic-link rate limit:
    Authentication → SMTP settings.
+
+## Open to-do (code) — Turnstile frontend integration
+
+Before CAPTCHA can be safely enabled, the app needs:
+- A Turnstile widget component rendered in `AuthDialog` (and wherever guest sign-in is
+  triggered), reading a public **site key** from config (e.g. `VITE_TURNSTILE_SITE_KEY`).
+- Each `supabase.auth.*` sign-in call in `useAuthStore.ts` updated to pass
+  `options: { captchaToken: <token> }`.
+- Graceful handling when the widget hasn't solved yet (disable the submit button).
+This is a small, self-contained PR — do it next session, then hand the founder the
+Cloudflare + Supabase enable steps.
 
 ## Known low-severity items (documented, not blocking)
 
