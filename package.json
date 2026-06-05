@@ -3,6 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.33.0",
   "description": "Genauly — German that clicks. Premium interactive prep platform for workplace German and the Goethe/telc Deutsch B2 Beruf speaking exam.",
   "scripts": {
     "dev": "vite",
@@ -26,7 +27,7 @@
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.28.1",
+    "react-router-dom": "^6.30.4",
     "recharts": "^2.15.0",
     "tailwind-merge": "^2.6.0",
     "zustand": "^5.0.2"
@@ -42,5 +43,10 @@
     "typescript": "^5.7.2",
     "vite": "^6.0.7",
     "vite-plugin-pwa": "^1.3.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "react-router": "^6.30.4"
+    }
   }
 }

@@ -10,10 +10,17 @@ React + TypeScript + Vite SPA, deployed to GitHub Pages.
 - No test framework configured yet.
 
 ## Commands
-- `npm run dev` — local dev server
-- `npm run build` — `tsc -b && vite build` (run this to verify before pushing)
-- `npm run typecheck` — `tsc -b --noEmit`
-- `npm run preview` — preview the production build
+**Package manager is `pnpm`** (pinned via the `packageManager` field; lockfile is `pnpm-lock.yaml`).
+Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` after pulling.
+- `pnpm dev` — local dev server
+- `pnpm build` — `tsc -b && vite build` (run this to verify before pushing)
+- `pnpm typecheck` — `tsc -b --noEmit`
+- `pnpm preview` — preview the production build
+- `pnpm audit` — check for dependency vulnerabilities (CI/security gate)
+
+Notes: `.npmrc` sets `minimum-release-age` (24h supply-chain cooldown) and
+`package-manager-strict`. pnpm blocks dependency build scripts by default (a supply-chain
+protection); the build does NOT need any allowlisted scripts — keep it that way.
 
 ## Layout (`src/`)
 - `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`
@@ -25,7 +32,7 @@ React + TypeScript + Vite SPA, deployed to GitHub Pages.
 
 ## Content conventions
 - **Themes**: ten workplace topics — meetings, scheduling, logistics, customer, conflict, project, technology, sustainability, safety, travel.
-- **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article, plural, pronunciation hint, two example sentences, and related terms. Currently **354 words** (~34–39 per theme). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `npm run build`.
+- **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article, plural, pronunciation hint, two example sentences, and related terms. Currently **354 words** (~34–39 per theme). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build`.
 - **Collocations** (`src/data/collocations.ts`): currently **120 Nomen-Verb pairs** (12 per theme). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`, `example {de, en}`. Keep ids unique (`c_` prefix + snake_case).
 - **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.
 
@@ -36,7 +43,7 @@ React + TypeScript + Vite SPA, deployed to GitHub Pages.
 
 ## Workflow notes
 - Development branch for this work: **`claude/genauly-blank-page-9biDi`** (the active automation branch since session 9; `claude/loving-cray-lMLj3` was used through session 8 and is now stale). The branch name may be reassigned per session — **`main` is always the source of truth**; whatever branch a session is assigned, ship to production by opening a PR into `main` and merging (squash) — the merge triggers `pages.yml`.
-- **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `npm run build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.
+- **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `pnpm build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.
 - **Documentation (REQUIRED after every significant task or series of tasks):** after shipping a feature, a content expansion, or a batch of UX fixes, update `docs/PROJECT_STATUS.md` — the session log, content counts, and "Resume here" section. Commit and push the doc update on the dev branch, then merge it to `main` like any other change. This keeps the status doc accurate for future sessions.
 
 ### Post-deploy GitHub housekeeping (REQUIRED after every squash-merge)
