@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-05 (session 15). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-05 (session 16). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -217,6 +217,16 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
+
+### Session 16 (2026-06-05) — Content expansion SHIPPED ✅ (10 scenarios · 10 exam sets · ~504 words)
+
+Added 7 new branching scenarios (all remaining themes: meetings, logistics, travel, project,
+homeoffice, conflict, safety) bringing the total to **10 scenarios across all 10 themes**.
+Added 8 matching exam sets (total **10**, one per theme, 6–7 min, sharedRubric). Appended
+~150 new vocabulary words across all themes (**354 → ~504**). Fixed 6 TypeScript errors where
+dual-gender `article` values (`"der/die"`, `"die/der"`, `"das/die"`) violated the strict union
+type — resolved by using the primary form's article. `npm run build` green; PR #80 squash-merged;
+branch realigned to `origin/main`.
 
 ### Session 15 (2026-06-05) — Mobile bottom tab bar SHIPPED ✅ (Layer 2)
 
@@ -448,7 +458,7 @@ The sandbox can't reach the live `*.github.io` site — founder confirms the liv
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–15 (2026-06-04 → 06-05).** Everything below is merged to `main`. A new
+**Handoff after sessions 9–16 (2026-06-04 → 06-05).** Everything below is merged to `main`. A new
 session continues from here; the active automation branch is `claude/todo-inventory-BUHq0`
 (`main` is the source of truth).
 
@@ -461,26 +471,33 @@ session continues from here; the active automation branch is `claude/todo-invent
   caches old web-clips — delete icon + re-add to home screen after deploy to pick up changes.
 - **Mobile bottom tab bar (s15, PR #76):** native bottom nav replacing hamburger drawer. Bar = Start
   · Wortschatz · Quiz · Fortschritt · Mehr; Mehr-sheet holds remaining 8 items. Desktop untouched.
+- **Mobile density & fit (s15, PRs #77–#78):** `sm:`-gated tightening of all shared components
+  (`HubHero`, `SectionHeading`, `EmptyState`, `StatCard`), all 11 page roots, flashcard grade grid,
+  Dashboard stat strip, progress ring (responsive 104→128 px), exam + sim timer headers.
+- **Content expansion (s16, PR #80):** 7 new branching scenarios (3→10, all 10 themes), 8 new exam
+  sets (2→10), ~150 new vocabulary words (354→~504).
 
 **Decisions locked:**
 - Bottom tab bar = **Start · Wortschatz · Quiz · Fortschritt · Mehr** (Mehr-sheet holds the other 8).
-- Mobile redesign scope = **Layer 2 (nav) DONE ✅ + Layer 3 / Point 3 (density) NEXT**.
+- Mobile redesign scope = **Layer 2 (nav) ✅ · Layer 3 (density) ✅ — both DONE**.
 - Keep `src/components/ui/card.tsx` **untouched**.
 - Pre-React crash painter is a **permanent** safety net (do not remove).
 
-**Baseline live:** `RootErrorBoundary`; Analytics (30-day XP, per-theme mastery, writing weaknesses);
-content = vocabulary 354 / grammar 47 drills·10 topics / collocations 120; Phase 2 (auth + cloud
-sync + AI writing coach).
+**Content counts (live):**
+- Vocabulary: **~504 words** (~50/theme, 10 themes)
+- Collocations: **120 Nomen-Verb pairs** (12/theme)
+- Grammar: **47 drills** across **10 topics**
+- Dialogues (branching scenarios): **10 scenarios** (1 per theme)
+- Exam sets: **10 sets** (1 per theme, 6–7 min each)
+- Redemittel: **72** entries
 
 **Dev branch:** `claude/todo-inventory-BUHq0` — realign to `origin/main` after each squash-merge.
 
-**Next:**
-- **Layer 3 / Point 3 — mobile density & fit.** Full plan in `docs/MOBILE_APP_PLAN.md`.
-  - **Phase A (shared components):** `HubHero`, `SectionHeading`, `EmptyState`, `StatCard`,
-    page-level `space-y-*` across all 11 pages. All gated `sm:`, desktop untouched.
-  - **Phase B (targeted fixes):** flashcard height, Dashboard stat strip, progress ring,
-    exam/sim timer headers. Each independently shippable.
+**Next candidates:**
 - (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-- Candidate features: logo, monetization tier, more dialogues/exam sets.
+- (Optional) Logo for app icon / branding.
+- (Optional) Monetization tier + paywall feature flags.
+- (Optional) More grammar drills (currently 47; target ~80).
+- (Optional) Additional redemittel categories or phrases.
 
-_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 📋 planned — see `docs/MOBILE_APP_PLAN.md`.)_
+_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content fully covers all 10 themes ✅)_
