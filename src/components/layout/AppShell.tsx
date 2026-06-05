@@ -1,11 +1,11 @@
 import { Suspense, useState } from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Flame, Zap, Sparkles } from "lucide-react";
+import { Flame, Zap, Sparkles } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { BottomTabBar } from "./BottomTabBar";
+import { MoreSheet } from "./MoreSheet";
 import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { levelFromXp } from "@/engine/scoring";
@@ -16,7 +16,7 @@ import { AccountMenu } from "@/features/auth/AccountMenu";
 import { cn } from "@/lib/utils";
 
 export function AppShell() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const location = useLocation();
   const xp = useProgressStore((s) => s.xp);
   const streak = useProgressStore((s) => s.streak);
@@ -28,33 +28,21 @@ export function AppShell() {
   return (
     <div className="min-h-screen bg-background bg-mesh">
       <Toaster />
+
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border bg-surface/60 backdrop-blur-xl lg:block">
         <Sidebar />
       </aside>
 
-      {/* Mobile drawer */}
-      <Dialog open={mobileOpen} onOpenChange={setMobileOpen}>
-        <DialogContent className="left-0 top-0 h-full max-h-none w-64 max-w-[16rem] translate-x-0 translate-y-0 overflow-y-auto rounded-none border-y-0 border-l-0 p-0 sm:max-w-[16rem]">
-          <DialogTitle className="sr-only">Navigation</DialogTitle>
-          <Sidebar onNavigate={() => setMobileOpen(false)} />
-        </DialogContent>
-      </Dialog>
+      {/* Mobile bottom tab bar + "Mehr" sheet */}
+      <BottomTabBar onMore={() => setMoreOpen(true)} />
+      <MoreSheet open={moreOpen} onOpenChange={setMoreOpen} />
 
       <div className="lg:pl-64">
         {/* Top bar */}
         <header className="sticky top-0 z-20 border-b border-border bg-surface/70 pt-safe backdrop-blur-xl">
           <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={() => setMobileOpen(true)}
-                aria-label="Open menu"
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
               <Link
                 to="/welcome"
                 className="flex items-center gap-2 lg:hidden"
@@ -88,7 +76,7 @@ export function AppShell() {
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-safe-8 sm:px-6 sm:pt-8">
+        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8">
           <SaveProgressBanner />
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}>

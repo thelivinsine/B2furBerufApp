@@ -23,7 +23,7 @@ export function Toaster() {
   const Icon = toast ? icons[toast.tone] : Info;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-[calc(4rem+env(safe-area-inset-bottom)+1rem)] z-50 flex justify-center px-4 lg:bottom-6">
       <AnimatePresence>
         {toast && (
           <motion.div
