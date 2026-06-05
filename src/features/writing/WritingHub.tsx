@@ -48,7 +48,7 @@ export function WritingHub() {
   // Theme picker / history toggle
   if (!theme) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <HubHero
           icon={PenLine}
           gradient="from-rose-500 to-pink-500"
@@ -143,7 +143,7 @@ export function WritingHub() {
   const area = result?.practiceArea ? practiceAreaById(result.practiceArea) : undefined;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={reset}>
           <ArrowLeft className="h-4 w-4" /> Themen

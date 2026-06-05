@@ -22,11 +22,11 @@ export function HubHero({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-4">
-      <div className="flex items-start gap-4">
+    <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
+      <div className="flex items-start gap-3 sm:gap-4">
         <div
           className={cn(
-            "flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br p-3 text-white shadow-soft",
+            "flex shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br p-2.5 sm:p-3 text-white shadow-soft",
             gradient,
           )}
         >

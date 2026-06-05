@@ -20,7 +20,7 @@ export function RedemittelTrainer() {
   const [tab, setTab] = useState("browse");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <SectionHeading
         eyebrow="Redemittel"
         title="Redemittel-Training"

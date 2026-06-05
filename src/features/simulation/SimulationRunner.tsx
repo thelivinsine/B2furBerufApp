@@ -251,10 +251,10 @@ export function SimulationRunner({
         <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <div className="flex-1 space-y-1">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{scenario.title}</span>
-            <span>{state.turns} Züge</span>
+        <div className="flex-1 min-w-0 space-y-1">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span className="truncate min-w-0">{scenario.title}</span>
+            <span className="shrink-0">{state.turns} Züge</span>
           </div>
           <Progress value={Math.min(progressVal, 95)} />
         </div>

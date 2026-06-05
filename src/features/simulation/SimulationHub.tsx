@@ -33,7 +33,7 @@ export function SimulationHub() {
     .filter((x) => x.items.length > 0);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5 sm:space-y-8">
       <HubHero
         icon={Mic}
         gradient="from-cyan-500 to-sky-500"

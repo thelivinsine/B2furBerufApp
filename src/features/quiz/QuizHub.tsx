@@ -59,7 +59,7 @@ export function QuizHub() {
   if (theme && level) {
     const t = themeById(theme)!;
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={backToLevels}>
             <ArrowLeft className="h-4 w-4" /> Stufe wählen
@@ -81,7 +81,7 @@ export function QuizHub() {
     const t = themeById(theme)!;
     const Icon = iconByName(t.icon);
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="sm" onClick={reset}>
             <ArrowLeft className="h-4 w-4" /> Themen
@@ -122,7 +122,7 @@ export function QuizHub() {
 
   // Pick a theme
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <HubHero
         icon={ListChecks}
         gradient="from-violet-500 to-indigo-500"
