@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-04 (session 13). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-05 (session 14). Branch: `claude/genauly-blank-page-9biDi`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -215,6 +215,19 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
+
+### Session 14 (2026-06-05) — Mobile-app redesign plan expanded (Layer 2 + Point 3) 📋
+
+Founder confirmed the home-screen app launches full-screen now (Layer 1 ✅) but still feels
+desktop-sized with loose dimensions. Expanded **`docs/MOBILE_APP_PLAN.md`** into the full approved
+plan: **Layer 2** (bottom tab bar + "Mehr" sheet) and **Point 3** (mobile density & fit — a
+`sm:`-gated tightening of shared components `HubHero`/`SectionHeading`/`EmptyState`/`StatCard` +
+page rhythm, plus targeted fixes to flashcard buttons, the Dashboard stat strip, the progress ring,
+and exam/simulation timer headers). Plan was pressure-tested: found & documented a real Toaster vs
+bottom-bar collision fix, guaranteed ≥44px touch targets, a `card.tsx` de-risk (leave it untouched —
+all callers override padding), a multi-branch-hub scope guard, and a collision audit. Desktop stays
+pixel-identical throughout. **No app code shipped this session — documentation only.** Resume from
+Layer 2.
 
 ### Session 13 (2026-06-04) — iOS standalone fix: no more address bar ✅
 
@@ -443,12 +456,14 @@ genauly.de, and confirm the Actions "pages" deploy went green for the merge comm
 **Dev branch:** `claude/genauly-blank-page-9biDi` — realign to `origin/main` after the squash-merge.
 
 **Next:**
-- **Mobile-app redesign — Step 1 (address-bar fix) SHIPPED ✅; bottom tab bar (Steps 2–6) still
-  PLANNED.** Full plan in **`docs/MOBILE_APP_PLAN.md`**. Resume from Step 2 (bottom tab bar +
-  "Mehr" sheet; scope = app chrome + nav only, desktop untouched).
+- **Mobile-app redesign — Layer 1 (address-bar fix) SHIPPED ✅; Layer 2 (bottom tab bar) + Point 3
+  (mobile density & fit) PLANNED & APPROVED, not yet built.** Full combined plan (exact `sm:`-gated
+  className transforms, Toaster collision fix, touch-target guarantees, de-risk notes, verification)
+  in **`docs/MOBILE_APP_PLAN.md`**. Resume from Layer 2 → Point 3 Phase A → Phase B (each
+  independently shippable; desktop stays pixel-identical).
 - (Optional) Add Resend SMTP to fix email magic-link rate-limit.
 - Candidate features: logo, monetization tier, more dialogues/exam sets.
 
 _(Anthropic key rotation: ✅ done. Mobile UX audit: ✅ done. Installable PWA: ✅ done.
-Address-bar / iOS standalone fix: ✅ done. Bottom-tab-bar redesign: 📋 planned — see
-`docs/MOBILE_APP_PLAN.md`.)_
+Address-bar / iOS standalone fix: ✅ done. Bottom-tab-bar + mobile density redesign: 📋 planned &
+approved — see `docs/MOBILE_APP_PLAN.md`.)_
