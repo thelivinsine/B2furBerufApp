@@ -61,6 +61,86 @@ export const examSets: ExamSet[] = [
     ],
     rubric: sharedRubric,
   },
+  {
+    id: "ex_nachhaltigkeit",
+    title: "Prüfungssimulation: Büro nachhaltiger machen",
+    themeId: "sustainability",
+    scenarioId: "sc_nachhaltigkeit",
+    totalMinutes: 7,
+    taskSheet:
+      "Ihre Geschäftsleitung möchte das Büro umweltfreundlicher gestalten. Sammeln Sie gemeinsam Maßnahmenvorschläge, priorisieren Sie diese und einigen Sie sich auf einen umsetzbaren Plan.",
+    aspects: [
+      "Welche Maßnahmen schlagen Sie vor?",
+      "Wie priorisieren Sie angesichts des begrenzten Budgets?",
+      "Wie lösen Sie den Konflikt zwischen Wunsch und Budget?",
+      "Wie stellen Sie das Ergebnis der Geschäftsleitung vor?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_projektplanung",
+    title: "Prüfungssimulation: Projekt in Verzug",
+    themeId: "project",
+    scenarioId: "sc_projektplanung",
+    totalMinutes: 7,
+    taskSheet:
+      "Ihr Projekt für einen Großkunden ist zwei Wochen in Verzug. Finden Sie gemeinsam Maßnahmen, um die Deadline einzuhalten, und klären Sie die Kundenkommunikation.",
+    aspects: [
+      "Welche Maßnahmen helfen, den Rückstand aufzuholen?",
+      "Wie priorisieren Sie die verbleibenden Aufgaben?",
+      "Wie und wann informieren Sie den Kunden?",
+      "Wer übernimmt welche Aufgaben?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_homeoffice",
+    title: "Prüfungssimulation: Homeoffice-Regelung",
+    themeId: "technology",
+    scenarioId: "sc_homeoffice",
+    totalMinutes: 6,
+    taskSheet:
+      "Ihr Unternehmen führt Homeoffice ein. Erarbeiten Sie gemeinsam mit Ihrer Kollegin / Ihrem Kollegen eine faire und praktikable Regelung für alle Mitarbeitenden.",
+    aspects: [
+      "Wie viele Homeoffice-Tage empfehlen Sie und warum?",
+      "Wie gehen Sie mit Stellen um, die Präsenz erfordern?",
+      "Wie sichern Sie Erreichbarkeit und Produktivität?",
+      "Was passiert bei Nichteinhaltung der Regelung?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_konflikt",
+    title: "Prüfungssimulation: Konflikt im Team",
+    themeId: "conflict",
+    scenarioId: "sc_konflikt",
+    totalMinutes: 7,
+    taskSheet:
+      "Zwei Mitarbeitende in Ihrem Team haben einen Konflikt, der die Zusammenarbeit belastet. Entwickeln Sie gemeinsam mit der Teamleitung einen Plan zur Vermittlung und langfristigen Lösung.",
+    aspects: [
+      "Wie gehen Sie als Erstes vor?",
+      "Wie gestalten Sie das Vermittlungsgespräch?",
+      "Welche Maßnahmen sichern eine langfristige Lösung?",
+      "Wie kommunizieren Sie das Ergebnis an das Team?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_sicherheit",
+    title: "Prüfungssimulation: Sicherheitsmängel beheben",
+    themeId: "safety",
+    scenarioId: "sc_sicherheit",
+    totalMinutes: 6,
+    taskSheet:
+      "Eine Sicherheitsbegehung hat drei Mängel in Ihrem Betrieb festgestellt. Einigen Sie sich mit der Sicherheitsbeauftragten Person auf Prioritäten, Maßnahmen und Zuständigkeiten.",
+    aspects: [
+      "Wie priorisieren Sie die drei Mängel?",
+      "Was tun Sie, wenn das Budget fehlt?",
+      "Wie informieren Sie die Belegschaft?",
+      "Wer ist für welche Maßnahme zuständig, und bis wann?",
+    ],
+    rubric: sharedRubric,
+  },
 ];
 
 export const examById = (id: string) => examSets.find((e) => e.id === id);
