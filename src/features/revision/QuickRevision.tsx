@@ -71,7 +71,7 @@ export function QuickRevision() {
 
   if (deck.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <SectionHeading eyebrow="Schnellwiederholung" title="Alles auf dem neuesten Stand" />
         <EmptyState
           icon={Zap}
@@ -85,7 +85,7 @@ export function QuickRevision() {
   if (done) {
     const pctScore = Math.round((correct / total) * 100);
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <SectionHeading eyebrow="Schnellwiederholung" title="Erledigt!" />
         <EmptyState
           icon={Trophy}
@@ -102,7 +102,7 @@ export function QuickRevision() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <SectionHeading
         eyebrow="Schnellwiederholung"
         title="Quick Review"

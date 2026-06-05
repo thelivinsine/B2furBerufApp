@@ -247,10 +247,10 @@ export function ExamRunner({
         <button onClick={() => setPhase("debrief")} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" />
         </button>
-        <div className="flex-1">
-          <div className="flex justify-between text-xs text-muted-foreground mb-1">
-            <span>{examSet.title}</span>
-            <span className={cn("tabular-nums font-semibold", timeLeft < 60 && "text-danger")}>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground mb-1">
+            <span className="truncate min-w-0">{examSet.title}</span>
+            <span className={cn("shrink-0 tabular-nums font-semibold", timeLeft < 60 && "text-danger")}>
               <Clock className="inline h-3 w-3 mr-0.5" />
               {formatSeconds(timeLeft)}
             </span>

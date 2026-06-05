@@ -59,7 +59,7 @@ export function GrammarHub() {
   const open = (id: string) => setParams({ topic: id });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <HubHero
         icon={BookMarked}
         gradient="from-emerald-500 to-teal-500"
@@ -125,7 +125,7 @@ export function GrammarHub() {
 
 function GrammarTopicView({ topic, onBack }: { topic: GrammarTopic; onBack: () => void }) {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" /> Übersicht

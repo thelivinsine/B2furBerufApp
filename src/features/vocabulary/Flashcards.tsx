@@ -111,7 +111,7 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
             <motion.div
               animate={{ rotateY: flipped ? 180 : 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="relative h-72 w-full [transform-style:preserve-3d]"
+              className="relative h-64 sm:h-72 w-full [transform-style:preserve-3d]"
             >
               {/* Front */}
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-surface p-8 shadow-soft [backface-visibility:hidden]">
@@ -154,9 +154,9 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
           Antwort zeigen <ChevronRight className="h-4 w-4" />
         </Button>
       ) : (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-4 gap-2">
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {grades.map((g) => (
-            <Button key={g.grade} variant={g.variant} onClick={() => grade(g.grade)} className="flex-col gap-0 py-2 h-auto sm:h-10 sm:flex-row">
+            <Button key={g.grade} variant={g.variant} onClick={() => grade(g.grade)} className="flex-col gap-0 py-2 min-h-[44px] h-auto sm:min-h-0 sm:h-10 sm:flex-row">
               {g.label}
             </Button>
           ))}

@@ -54,9 +54,9 @@ export function EmptyState({
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-surface/40 px-6 py-16 text-center"
+      className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border bg-surface/40 px-6 py-12 sm:py-16 text-center"
     >
-      <div className="rounded-full bg-muted p-3 text-muted-foreground">
+      <div className="rounded-full bg-muted p-2.5 sm:p-3 text-muted-foreground">
         <Icon className="h-6 w-6" />
       </div>
       <div>
@@ -90,7 +90,7 @@ export function SectionHeading({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-4 sm:mb-6 flex flex-wrap items-end justify-between gap-4">
       <div>
         {eyebrow && (
           <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary">

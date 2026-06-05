@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { SectionHeading } from "@/components/shared/misc";
+import { useMediaQuery } from "@/lib/hooks";
 import { recommendedNext } from "./recommend";
 
 type Accent = "primary" | "accent" | "success" | "warning";
@@ -49,7 +50,7 @@ function StatItem({
   label: string;
 }) {
   return (
-    <div className="flex items-center gap-3 px-4 py-3.5 sm:flex-1">
+    <div className="flex items-center gap-2.5 px-3 py-3 sm:gap-3 sm:px-4 sm:py-3.5 sm:flex-1">
       <Icon className={cn("h-5 w-5 shrink-0", accentText[accent])} />
       <div className="min-w-0">
         <p className="text-lg font-semibold leading-tight tracking-tight tabular-nums">{value}</p>
@@ -68,6 +69,7 @@ export function Dashboard() {
   const srs = useProgressStore((s) => s.srs);
   const totalSessions = useProgressStore((s) => s.totalSessions);
   const todayXp = useTodayXp();
+  const isSm = useMediaQuery("(min-width: 640px)");
 
   const info = levelFromXp(xp);
   const tier = tierForLevel(info.level);
@@ -102,7 +104,7 @@ export function Dashboard() {
   const ordered = [featured, ...themeStats.filter((s) => s.theme.id !== featured.theme.id)];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-5 sm:space-y-8">
       {/* Focal block — the one primary action for today. */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
@@ -138,7 +140,7 @@ export function Dashboard() {
           {/* Today's progress — blended into the tile, centered in its column. */}
           <div className="flex flex-col items-center gap-2.5">
             <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Heute</p>
-            <ProgressRing value={goalProgress} size={128} stroke={10}>
+            <ProgressRing value={goalProgress} size={isSm ? 128 : 104} stroke={10}>
               <span className="text-2xl font-semibold tabular-nums">{todayXp}</span>
               <span className="text-xs text-muted-foreground">/ {goal} XP</span>
             </ProgressRing>

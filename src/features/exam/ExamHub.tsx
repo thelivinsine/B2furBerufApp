@@ -22,7 +22,7 @@ export function ExamHub() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <HubHero
         icon={GraduationCap}
         gradient="from-amber-500 to-orange-500"

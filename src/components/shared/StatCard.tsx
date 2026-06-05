@@ -34,14 +34,14 @@ export function StatCard({
       transition={{ duration: 0.35 }}
       className="h-full"
     >
-      <Card className={cn("card-hover h-full p-5", className)}>
+      <Card className={cn("card-hover h-full p-4 sm:p-5", className)}>
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-sm font-medium text-muted-foreground">{label}</p>
             <p className="mt-1 text-2xl font-semibold tracking-tight">{value}</p>
             {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
           </div>
-          <div className={cn("rounded-lg p-2.5", accentMap[accent])}>
+          <div className={cn("rounded-lg p-2 sm:p-2.5", accentMap[accent])}>
             <Icon className="h-5 w-5" />
           </div>
         </div>
