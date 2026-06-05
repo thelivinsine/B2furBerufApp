@@ -89,13 +89,37 @@ This file is the single place to re-orient when resuming work. For the full desi
    Edge Function secrets, never in the browser.
 
 ## Research findings to reuse (don't re-research)
-- **Open/usable content sources:** Tatoeba (CC-BY, example sentences, bulk download), Wiktionary/
-  Wikidata (CC-BY-SA, genders/inflections), DWDS + Leipzig Wortschatz (frequency, APIs).
-- **Off-limits (copyright):** Goethe Wortlisten, Routledge Frequency Dictionary, all Klett books
-  (Netzwerk, Aspekte, Sicher!, Linie 1 Beruf).
-- **Writing eval:** LanguageTool (LGPL, hosted API w/ free tier) for error categories; RAG is
-  overkill for a single-insight output. Supabase supports anonymous sign-in, pgvector (unused),
-  Edge Functions for secret-safe LLM calls from a static GitHub Pages SPA.
+
+### Licensing guardrails for commercial use
+Only use content under these licenses — anything else blocks monetization:
+- **CC0** — public domain, no restrictions whatsoever.
+- **CC BY** — free commercially; must credit the source.
+- **CC BY-SA** — free commercially; modified versions must carry the same license.
+- **CC BY 2.0 Fr** (Tatoeba's licence) — commercial-friendly; attribute the platform.
+- ⚠️ **Never use CC BY-NC or CC BY-ND** — NC = non-commercial, ND = no derivatives; both block a paid app.
+
+### Approved open-licensed sources (commercial-safe)
+| Source | What it provides | Licence | Notes |
+|---|---|---|---|
+| **Tatoeba** | Hundreds of thousands of DE↔EN sentence pairs; community audio | CC BY 2.0 Fr | Best source for authentic example sentences; bulk download available |
+| **Wiktionary / Wikidata** | Genders, plurals, inflections, definitions | CC BY-SA 4.0 | Good for vocab schema fields (article, plural) |
+| **DWDS / Leipzig Wortschatz** | Word frequency, collocations, usage examples | Various (check per dataset) | APIs available; great for B2-level frequency filtering |
+| **Wikibooks: German** | Structured grammar tables, vocabulary modules, A1→advanced | CC BY-SA 4.0 | Can integrate text into app; must keep project open-source under same licence if distributing modified version |
+| **Wikimedia Commons** | Isolated German audio pronunciations by native speakers, illustrations | Mostly CC0 / CC BY / CC BY-SA (filter on-site) | Filter search to commercial-only before downloading any asset |
+| **Project Gutenberg** | Original German texts (Kafka, Goethe, Brothers Grimm) | Public Domain | Copyright expired; freely slice, remix, sell as reading modules |
+| **LibriVox** | Audiobook recordings of public-domain German texts | Public Domain | Volunteer-recorded; pairs with Gutenberg texts |
+
+### Sources to avoid / handle with care
+- **Goethe Wortlisten, Routledge Frequency Dictionary, all Klett books** (Netzwerk, Aspekte, Sicher!, Linie 1 Beruf) — fully copyrighted, no commercial reuse.
+- **Deutsche Welle (DW)** — free for personal/educational use only; *not* universally CC-licensed for commercial redistribution. Check specific file metadata before using any DW asset; contact their distribution team if in doubt.
+
+### Open-source infrastructure worth evaluating
+- **AnkiDroid / AnkiCore ecosystem** — underlying SRS algorithm and app variants are open-source. Could inform future SRS improvements (the current `engine/srs.ts` implements SM-2 independently).
+- **LARA (Learning and Reading Assistant)** — open-source platform for building interactive reading materials with audio + translation. Relevant if we add a reading-comprehension module later.
+
+### Writing eval infrastructure
+- LanguageTool (LGPL, hosted API w/ free tier) for error categories; RAG is overkill for a single-insight output.
+- Supabase supports anonymous sign-in, pgvector (unused), Edge Functions for secret-safe LLM calls from a static GitHub Pages SPA.
 
 ## Founder action items
 - [x] Create a Supabase project; share URL + publishable key. (`stkfdavpjflpqoxjunnj`, committed)
