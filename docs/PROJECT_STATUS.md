@@ -242,7 +242,7 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
-### Session 17 (2026-06-05) — Security audit, documentation, and sourcing research
+### Session 17 (2026-06-05) — Security audit + full hardening SHIPPED ✅ + sourcing research
 
 **Security audit completed (no critical findings).** Full architectural review of all security
 surfaces. The app is fundamentally well-built: secrets stay server-side, all tables have
@@ -259,9 +259,18 @@ service worker precaches only static build assets.
 - CI actions pinned to floating tags (`@v4`) rather than commit SHAs.
 - npm → pnpm migration planned (supply-chain: content-addressable store + release-age cooldown).
 
-**Plan document:** `docs/SECURITY_AUDIT_PLAN.pdf` (4-page PDF, committed to dev branch).
-Implementation will be rolled out in 4 PRs (pnpm migration → Edge Function hardening →
-Frontend hardening / CSP → CI SHA-pinning). CSP ships in report-only mode first.
+**Plan document:** `docs/SECURITY_AUDIT_PLAN.pdf` (4-page PDF, on `main`).
+
+**Implementation — all 4 PRs SHIPPED this session (PRs #85–#88, on `main`):**
+- PR #85: npm → pnpm migration + react-router vuln fix + `.npmrc` supply-chain guardrails.
+  `pnpm audit` 2 moderate → **0**. CI build verified green on `main` (pnpm + cache all pass).
+- PR #86: Edge Function hardening — CORS allowlist, `MAX_TEXT_LEN`=3000, `USER_MONTHLY_LIMIT`=50,
+  plus `docs/SECURITY.md`. **Founder redeployed the function (2026-06-05) → now live.**
+- PR #87: report-only CSP meta + self-hosted Inter (`@fontsource-variable/inter`); removed rsms.me.
+- PR #88: all 6 GitHub Actions pinned to commit SHAs (resolved via `git ls-remote`); CI verified.
+- **Remaining:** (a) Turnstile **frontend** integration is required before CAPTCHA can be enabled
+  (turning it on now would break sign-in — the app sends no captcha token); (b) flip CSP
+  report-only → enforcing after the founder confirms a clean live console. See `docs/SECURITY.md`.
 
 **Documentation updates (PRs #82–#83, live on `main`):**
 - Added content QC & technical validation planning to-do.
@@ -535,19 +544,16 @@ squash-merge — see CLAUDE.md).
   4. **PR #88 — CI SHA-pinning:** all GitHub Actions pinned to commit SHAs (tag-hijack defense).
   - Full plan: `docs/SECURITY_AUDIT_PLAN.pdf`; details in `docs/SECURITY.md`.
 
-**In-progress / planned (not yet on `main`):**
-- **CSP enforce flip** — once the founder confirms the live site loads with no CSP violations in
-  the browser console (report-only logs them, blocks nothing), a follow-up PR changes
-  `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `index.html` to enforce.
-
-**Founder dashboard checklist (security — do now that PRs are merged):**
-1. Supabase → Authentication → Bot & Abuse Protection → **enable Turnstile CAPTCHA**.
-2. Edge Functions → evaluate-writing → Secrets → optionally set `ALLOWED_ORIGINS`,
-   `MAX_TEXT_LEN`, `USER_MONTHLY_LIMIT` (safe defaults already baked in).
-3. **Redeploy `evaluate-writing`** via dashboard code editor (paste updated `index.ts`) — the
-   CORS + cap changes only go live after this.
-4. Open genauly.de → F12 → Console; if no red CSP violation messages, tell me and I'll flip CSP
-   to enforcing.
+**Founder steps — status:**
+- ✅ **Edge Function redeployed (2026-06-05).** Founder pasted the hardened `index.ts` into the
+  Supabase dashboard and deployed. CORS allowlist + input cap + per-user monthly cap are **live**.
+- ⏸️ **Turnstile CAPTCHA — BLOCKED on code, do NOT enable yet.** Enabling it would make Supabase
+  reject every sign-in, because the app's auth calls (`useAuthStore.ts`) don't send a captcha
+  token. Needs a frontend PR first (render Turnstile widget + pass `captchaToken` into each
+  `supabase.auth.*` call). See `docs/SECURITY.md` → "Open to-do".
+- ⏳ **CSP enforce flip — pending founder console check.** Open genauly.de → F12 → Console; if no
+  red "Content-Security-Policy" messages appear, a one-line PR flips
+  `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `index.html`.
 
 **Decisions locked:**
 - Bottom tab bar = **Start · Wortschatz · Quiz · Fortschritt · Mehr** (Mehr-sheet = other 8).
@@ -567,13 +573,18 @@ squash-merge — see CLAUDE.md).
 **Dev branch:** `claude/todo-inventory-BUHq0` — realign to `origin/main` after each squash-merge.
 
 **Next (priority order):**
-1. **Founder security steps** — Turnstile CAPTCHA, redeploy the Edge Function, confirm CSP-clean
-   console (see checklist above). Then I flip CSP report-only → enforcing.
-2. **Content QC pipeline** — CI lint script for duplicate IDs, broken dialogue nodes, missing fields;
+1. **Turnstile frontend integration** (small PR) — render a Cloudflare Turnstile widget in the
+   auth UI and pass `options: { captchaToken }` into every `supabase.auth.*` call in
+   `useAuthStore.ts`; read a public `VITE_TURNSTILE_SITE_KEY`. THEN the founder can safely enable
+   CAPTCHA in Supabase (with a Cloudflare secret key). Details in `docs/SECURITY.md` → "Open to-do".
+2. **CSP enforce flip** — after the founder confirms genauly.de's console shows no CSP violations,
+   change `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `index.html`.
+3. **Content QC pipeline** — CI lint script for duplicate IDs, broken dialogue nodes, missing fields;
    plus a pedagogical review process for German accuracy and B2 level-appropriateness.
-3. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-4. (Optional) Logo / branding for app icon.
-5. (Optional) Monetization tier + paywall feature flags.
-6. (Optional) More grammar drills (47 → ~80 target).
+4. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
+5. (Optional) Logo / branding for app icon.
+6. (Optional) Monetization tier + paywall feature flags.
+7. (Optional) More grammar drills (47 → ~80 target).
 
-_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 4 PRs shipped, CSP-enforce + founder steps pending)_
+_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 4 PRs shipped + Edge Fn
+deployed; Turnstile-frontend + CSP-enforce pending)_
