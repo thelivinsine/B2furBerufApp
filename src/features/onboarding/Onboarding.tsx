@@ -53,7 +53,12 @@ export function Onboarding() {
   const [dailyGoalXp, setDailyGoalXp] = useState(80);
 
   const next = () => setStep((s) => Math.min(s + 1, TOTAL - 1));
-  const back = () => setStep((s) => Math.max(s - 1, 0));
+  // On the first step there's no previous step — go back to the landing page
+  // instead of leaving a dead, disabled button.
+  const back = () => {
+    if (step === 0) navigate("/welcome");
+    else setStep((s) => Math.max(s - 1, 0));
+  };
 
   const finish = () => {
     completeOnboarding({
@@ -199,7 +204,7 @@ export function Onboarding() {
             </AnimatePresence>
 
             <div className="mt-6 flex items-center justify-between">
-              <Button variant="ghost" onClick={back} disabled={step === 0}>
+              <Button variant="ghost" onClick={back}>
                 Zurück
               </Button>
               {step < TOTAL - 1 ? (
