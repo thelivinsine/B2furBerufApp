@@ -2,6 +2,7 @@ import { Component, StrictMode } from "react";
 import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { recoverFromStaleAssets, isChunkLoadError } from "./lib/recover";
 // Self-hosted Inter (variable). Replaces the third-party rsms.me stylesheet —
 // no external font dependency, no IP leak, and a tighter CSP.
 import "@fontsource-variable/inter";
@@ -41,10 +42,25 @@ function paintFatal(label: string, detail: unknown): void {
   root.appendChild(wrap);
 }
 
-window.addEventListener("error", (e) => paintFatal("App failed to load", e.error ?? e.message));
-window.addEventListener("unhandledrejection", (e) =>
-  paintFatal("App failed to load", (e as PromiseRejectionEvent).reason),
-);
+// A failed dynamic-chunk import (stale SW after a deploy) surfaces as a window
+// error / unhandled rejection — and react-router shows its own "Unexpected
+// Application Error" before our React boundary can. Catch it here too and
+// self-heal by clearing the SW caches and reloading.
+window.addEventListener("error", (e) => {
+  if (isChunkLoadError(e.error ?? e.message)) {
+    void recoverFromStaleAssets();
+    return;
+  }
+  paintFatal("App failed to load", e.error ?? e.message);
+});
+window.addEventListener("unhandledrejection", (e) => {
+  const reason = (e as PromiseRejectionEvent).reason;
+  if (isChunkLoadError(reason)) {
+    void recoverFromStaleAssets();
+    return;
+  }
+  paintFatal("App failed to load", reason);
+});
 
 class RootErrorBoundary extends Component<
   { children: ReactNode },
@@ -58,12 +74,10 @@ class RootErrorBoundary extends Component<
     const { error } = this.state;
     if (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      const isChunkError =
-        error instanceof Error &&
-        (msg.includes("Failed to fetch dynamically imported module") ||
-          msg.includes("Importing a module script failed") ||
-          msg.includes("error loading dynamically imported module"));
-      if (isChunkError) {
+      if (isChunkLoadError(error)) {
+        // Attempt a silent self-heal; the prompt below is the fallback if the
+        // recovery is rate-limited (already tried in the last few seconds).
+        void recoverFromStaleAssets();
         return (
           <div style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: 480, margin: "4rem auto", textAlign: "center" }}>
             <h2 style={{ color: "#e53e3e", marginBottom: "0.5rem" }}>Neue Version verfügbar</h2>
