@@ -5,44 +5,61 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { Dashboard } from "@/features/dashboard/Dashboard";
 
-const Onboarding = React.lazy(() =>
+// When a dynamic import fails (stale SW cached old chunk hashes after a deploy),
+// reload once to pick up the fresh asset manifest. Guard with sessionStorage so
+// a genuine network outage doesn't loop forever.
+function lazyWithReload<T extends React.ComponentType<unknown>>(
+  factory: () => Promise<{ default: T }>,
+): React.LazyExoticComponent<T> {
+  return React.lazy(() =>
+    factory().catch((err: unknown) => {
+      if (!sessionStorage.getItem("_chunkReload")) {
+        sessionStorage.setItem("_chunkReload", "1");
+        window.location.reload();
+      }
+      return Promise.reject(err) as never;
+    }),
+  );
+}
+
+const Onboarding = lazyWithReload(() =>
   import("@/features/onboarding/Onboarding").then((m) => ({ default: m.Onboarding })),
 );
-const VocabularyTrainer = React.lazy(() =>
+const VocabularyTrainer = lazyWithReload(() =>
   import("@/features/vocabulary/VocabularyTrainer").then((m) => ({
     default: m.VocabularyTrainer,
   })),
 );
-const RedemittelTrainer = React.lazy(() =>
+const RedemittelTrainer = lazyWithReload(() =>
   import("@/features/redemittel/RedemittelTrainer").then((m) => ({
     default: m.RedemittelTrainer,
   })),
 );
-const GrammarHub = React.lazy(() =>
+const GrammarHub = lazyWithReload(() =>
   import("@/features/grammar/GrammarHub").then((m) => ({ default: m.GrammarHub })),
 );
-const QuizHub = React.lazy(() =>
+const QuizHub = lazyWithReload(() =>
   import("@/features/quiz/QuizHub").then((m) => ({ default: m.QuizHub })),
 );
-const WritingHub = React.lazy(() =>
+const WritingHub = lazyWithReload(() =>
   import("@/features/writing/WritingHub").then((m) => ({ default: m.WritingHub })),
 );
-const SimulationHub = React.lazy(() =>
+const SimulationHub = lazyWithReload(() =>
   import("@/features/simulation/SimulationHub").then((m) => ({ default: m.SimulationHub })),
 );
-const ExamHub = React.lazy(() =>
+const ExamHub = lazyWithReload(() =>
   import("@/features/exam/ExamHub").then((m) => ({ default: m.ExamHub })),
 );
-const QuickRevision = React.lazy(() =>
+const QuickRevision = lazyWithReload(() =>
   import("@/features/revision/QuickRevision").then((m) => ({ default: m.QuickRevision })),
 );
-const Analytics = React.lazy(() =>
+const Analytics = lazyWithReload(() =>
   import("@/features/analytics/Analytics").then((m) => ({ default: m.Analytics })),
 );
-const Settings = React.lazy(() =>
+const Settings = lazyWithReload(() =>
   import("@/features/settings/Settings").then((m) => ({ default: m.Settings })),
 );
-const CollocationsBrowser = React.lazy(() =>
+const CollocationsBrowser = lazyWithReload(() =>
   import("@/features/collocations/CollocationsBrowser").then((m) => ({
     default: m.CollocationsBrowser,
   })),
