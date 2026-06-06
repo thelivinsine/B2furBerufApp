@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-06 (session 18). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-06 (session 18 cont.). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -269,6 +269,14 @@ actually been broken. Dashboard and Analytics both updated.
   tags. Founder confirmed the console is now clean — no CSP errors.
 
 **Full security checklist is now 100% complete.** See `docs/SECURITY.md`.
+
+**Stale SW chunk-fetch crash fixed (PR #95):** Intermittent "Failed to fetch dynamically imported
+module" errors on Windows desktop and Android — caused by the PWA Service Worker serving a cached
+`index.html` that still references old content-hashed chunk filenames after a deploy. Fixed by
+wrapping all 12 lazy route imports with `lazyWithReload()`: on chunk fetch failure it reloads once
+automatically (guarded by `sessionStorage` so genuine network outages don't loop). Error boundary
+updated to detect chunk errors and show a friendly German "Neue Version verfügbar — Neu laden"
+prompt instead of a raw JS stack trace.
 
 ### Session 17 (2026-06-05) — Security audit + full hardening SHIPPED ✅ + sourcing research
 
@@ -565,6 +573,8 @@ squash-merge — see CLAUDE.md).
   - See `docs/SECURITY.md` for full details. No open security items remain.
 - **Streak display bug fixed (s18, PR #90):** `useEffectiveStreak()` — no more stale values
   after missed days.
+- **Stale SW chunk crash fixed (s18, PR #95):** `lazyWithReload()` — auto-reloads once on
+  chunk fetch failure (stale SW after deploy); friendly "Neue Version" prompt as fallback.
 
 **Security — 100% complete. No open items.**
 
