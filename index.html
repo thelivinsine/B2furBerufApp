@@ -2,21 +2,20 @@
 <html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
-    <!-- Content-Security-Policy in REPORT-ONLY mode: violations are logged to
-         the browser console but nothing is blocked. Once the live site is
-         confirmed clean, this flips to an enforcing `Content-Security-Policy`.
-         GitHub Pages can't set HTTP headers, so a meta tag is the mechanism.
-         - connect-src: Supabase REST/auth/functions (+ wss for realtime).
-           LanguageTool/LLM providers are called server-side, never from the browser.
-           Cloudflare Turnstile (challenges.cloudflare.com) added for CAPTCHA.
-         - script-src: Cloudflare Turnstile script added alongside self.
+    <!-- Content-Security-Policy (enforcing). GitHub Pages can't set HTTP
+         headers so a meta tag is the only mechanism. Note: frame-ancestors
+         is ignored in meta tags (HTTP-header-only directive) — that's fine,
+         it's a defence-in-depth measure only.
+         - connect-src: Supabase REST/auth/functions + realtime websocket;
+           Cloudflare Turnstile CAPTCHA. LLM providers are server-side only.
+         - script-src: Cloudflare Turnstile script alongside self.
          - frame-src: Turnstile renders its challenge in a sandboxed iframe.
-         - style-src 'unsafe-inline': required for React inline style props
-           (framer-motion, charts, progress ring).
-         - fonts are now self-hosted ('self'); no third-party origins. -->
+         - style-src 'unsafe-inline': required for React inline styles
+           (framer-motion, recharts, progress ring).
+         - fonts are self-hosted; no third-party font origins. -->
     <meta
-      http-equiv="Content-Security-Policy-Report-Only"
-      content="default-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'"
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; base-uri 'self'; form-action 'self'; object-src 'none'"
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
