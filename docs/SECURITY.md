@@ -22,7 +22,7 @@ The full audit and remediation plan is in `docs/SECURITY_AUDIT_PLAN.pdf`.
 - **AI cost is guarded** by a per-user daily limit, a per-user monthly limit, a global
   monthly spend auto-shutoff, an input-size cap, and an input-hash cache.
 
-## Hardening (security series, rolled out in 4 PRs)
+## Hardening (security series, rolled out in 4 PRs + Turnstile)
 
 | Area | Change | Status |
 |---|---|---|
@@ -32,29 +32,21 @@ The full audit and remediation plan is in `docs/SECURITY_AUDIT_PLAN.pdf`.
 | AI abuse | Added a **max input length** (`MAX_TEXT_LEN`, default 3000) and a **per-user monthly cap** (`USER_MONTHLY_LIMIT`, default 50). | ✅ shipped (PR 2) |
 | Frontend | Content-Security-Policy (report-only first); self-hosted fonts (no third-party `rsms.me`). | ✅ shipped (PR 3) |
 | CI | GitHub Actions pinned to commit SHAs; minimal workflow permissions. | ✅ shipped (PR 4) |
+| Bot protection | Cloudflare Turnstile CAPTCHA on all auth flows (guest, sign-up, login, Google). | ✅ shipped (PR 5, 2026-06-06) |
 
-_The Edge Function redeploy is **done** (founder, 2026-06-05) — the CORS lock and caps are
-live. Remaining: flip CSP report-only → enforcing once the live console is confirmed clean,
-and the Turnstile frontend work (see Open to-do)._
+_All hardening is complete and live. Remaining: flip CSP report-only → enforcing once the
+live console is confirmed clean (one-line change in `index.html`)._
 
 ## Founder action items (Supabase dashboard — only you can do these)
 
 1. **✅ DONE (2026-06-05) — Redeploy `evaluate-writing`.**
-   The founder pasted the hardened `index.ts` into the dashboard code editor and deployed.
    The CORS allowlist, input cap, and per-user monthly cap are now **live**.
 
-2. **⚠️ DO NOT enable Turnstile CAPTCHA yet — needs frontend work first.**
-   Enabling CAPTCHA in Supabase (Authentication → Attack Protection / Bot & Abuse Protection)
-   makes Supabase **reject every sign-in that doesn't include a CAPTCHA token**. The app's
-   auth calls in `src/store/useAuthStore.ts` (`signInAnonymously`, `signUp`,
-   `signInWithPassword`, `signInWithOAuth`) currently send **no** `captchaToken`, so turning
-   CAPTCHA on now would lock out **all** sign-in (guest, register, login).
-   **Required order:**
-   1. (code) Render a Cloudflare Turnstile widget on the auth UI and pass its token via
-      `options: { captchaToken }` into every auth call. → see "Open to-do" below.
-   2. (founder) Create a Turnstile widget at Cloudflare (free) to get a **site key** +
-      **secret key**; enable CAPTCHA in Supabase and paste the **secret key**; put the
-      **site key** in the app (env/config). Then deploy.
+2. **✅ DONE (2026-06-06) — Cloudflare Turnstile CAPTCHA enabled.**
+   - Cloudflare Turnstile widget created for `genauly.de`.
+   - `VITE_TURNSTILE_SITE_KEY` GitHub Actions secret set → baked into the build.
+   - Supabase Authentication → Attack Protection → Turnstile enabled with the secret key.
+   - All sign-in flows (guest, sign-up, email login, Google OAuth) are now CAPTCHA-protected.
 
 3. **(Optional) Set the Edge Function secrets** to override the safe defaults.
    Dashboard → **Edge Functions** → **evaluate-writing** → **Secrets**:
@@ -64,17 +56,6 @@ and the Turnstile frontend work (see Open to-do)._
 
 4. **(Optional, pre-existing) Add Resend SMTP** to fix the email magic-link rate limit:
    Authentication → SMTP settings.
-
-## Open to-do (code) — Turnstile frontend integration
-
-Before CAPTCHA can be safely enabled, the app needs:
-- A Turnstile widget component rendered in `AuthDialog` (and wherever guest sign-in is
-  triggered), reading a public **site key** from config (e.g. `VITE_TURNSTILE_SITE_KEY`).
-- Each `supabase.auth.*` sign-in call in `useAuthStore.ts` updated to pass
-  `options: { captchaToken: <token> }`.
-- Graceful handling when the widget hasn't solved yet (disable the submit button).
-This is a small, self-contained PR — do it next session, then hand the founder the
-Cloudflare + Supabase enable steps.
 
 ## Known low-severity items (documented, not blocking)
 
