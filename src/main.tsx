@@ -58,6 +58,27 @@ class RootErrorBoundary extends Component<
     const { error } = this.state;
     if (error) {
       const msg = error instanceof Error ? error.message : String(error);
+      const isChunkError =
+        error instanceof Error &&
+        (msg.includes("Failed to fetch dynamically imported module") ||
+          msg.includes("Importing a module script failed") ||
+          msg.includes("error loading dynamically imported module"));
+      if (isChunkError) {
+        return (
+          <div style={{ padding: "2rem", fontFamily: "sans-serif", maxWidth: 480, margin: "4rem auto", textAlign: "center" }}>
+            <h2 style={{ color: "#e53e3e", marginBottom: "0.5rem" }}>Neue Version verfügbar</h2>
+            <p style={{ color: "#4a5568", marginBottom: "1.5rem" }}>
+              Die App wurde aktualisiert. Bitte neu laden, um die aktuelle Version zu verwenden.
+            </p>
+            <button
+              style={{ padding: "0.625rem 1.5rem", background: "#3b82f6", color: "#fff", border: "none", borderRadius: 8, fontSize: 16, cursor: "pointer" }}
+              onClick={() => window.location.reload()}
+            >
+              Neu laden
+            </button>
+          </div>
+        );
+      }
       const stack = error instanceof Error ? error.stack : "";
       return (
         <div style={{ padding: "2rem", fontFamily: "monospace", maxWidth: 600, margin: "0 auto" }}>
