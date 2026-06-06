@@ -66,7 +66,7 @@ export const grammar: GrammarTopic[] = [
         prompt: "Wir sparen Zeit, ___ wir Meetings online abhalten.",
         answer: "indem",
         options: ["indem", "damit", "weil", "obwohl"],
-        explain: "'indem' (by doing) is subordinating — verb goes to the end of that clause.",
+        explain: "'indem' (by doing) is subordinating, so the verb goes to the end of that clause.",
         gloss: "We save time by holding meetings online.",
       },
     ],
@@ -205,7 +205,7 @@ export const grammar: GrammarTopic[] = [
     group: "verbPosition",
     title: "Verb position & sentence bracket",
     titleDe: "Verbstellung & Verbklammer (TeKaMoLo)",
-    purpose: "Build correct, natural word order — a top marker of B2 accuracy.",
+    purpose: "Build correct, natural word order, a top marker of B2 accuracy.",
     explanation:
       "In a main clause the conjugated verb is always second; any second verb part (Infinitiv/Partizip) goes to the very end, forming the 'Verbklammer' (sentence bracket). Mid-field adverbials follow TeKaMoLo order: Temporal – Kausal – Modal – Lokal (when – why – how – where).",
     pattern: "Pos.1 + Verb(2) + … Te-Ka-Mo-Lo … + Verbteil(Ende)",
@@ -268,7 +268,7 @@ export const grammar: GrammarTopic[] = [
     group: "subordinate",
     title: "Subordinate clauses: dass / weil / damit",
     titleDe: "Nebensätze: dass / weil / damit",
-    purpose: "Justify opinions and explain reasons — the verb goes to the end.",
+    purpose: "Justify opinions and explain reasons. The verb goes to the end.",
     explanation:
       "Subordinating conjunctions (dass, weil, damit, obwohl, wenn, dass) push the conjugated verb to the end of their clause. If the subordinate clause comes first, the main clause starts with its verb (because position 1 is filled by the whole clause).",
     pattern: "Ich denke, dass … (Verb am Ende) · …, weil … · …, damit …",
@@ -279,7 +279,7 @@ export const grammar: GrammarTopic[] = [
     ],
     pitfalls: [
       "Verb to the very end after dass/weil/damit: „…, weil es Zeit spart.\"",
-      "'weil' + verb-final vs. 'denn' + normal order — don't mix them.",
+      "'weil' + verb-final vs. 'denn' + normal order. Don't mix them.",
       "Fronted subordinate clause → main clause is verb-first: „Weil … regnet, fahren wir …\".",
     ],
     drills: [
@@ -293,7 +293,7 @@ export const grammar: GrammarTopic[] = [
       },
       {
         id: "g_neb_d2",
-        prompt: "Ordne: dass / wir / können / einhalten / die Frist — Ich denke, …",
+        prompt: "Ordne nach „Ich denke, …“: dass / wir / können / einhalten / die Frist",
         answer: "Ich denke, dass wir die Frist einhalten können.",
         explain: "After 'dass', the verbs go to the end; modal 'können' last.",
         gloss: "I think that we can meet the deadline.",
@@ -319,7 +319,7 @@ export const grammar: GrammarTopic[] = [
         prompt: "___ wir mehr Mitarbeiter einstellen, können wir schneller liefern.",
         answer: "Wenn",
         options: ["Wenn", "Weil", "Dass", "Damit"],
-        explain: "'Wenn' (if/when) is subordinating — verb at end; the whole clause fills position 1, so the main clause starts with its verb.",
+        explain: "'Wenn' (if/when) is subordinating, so the verb goes to the end; the whole clause fills position 1, so the main clause starts with its verb.",
         gloss: "If we hire more employees, we can deliver faster.",
       },
     ],
@@ -331,7 +331,7 @@ export const grammar: GrammarTopic[] = [
     group: "cases",
     title: "Cases & two-way prepositions",
     titleDe: "Kasus & Wechselpräpositionen",
-    purpose: "Pick the right article ending — the backbone of accurate German.",
+    purpose: "Pick the right article ending, the backbone of accurate German.",
     explanation:
       "Cases mark a noun's role: Nominativ (subject), Akkusativ (direct object), Dativ (indirect object), Genitiv (possession). Two-way prepositions (in, an, auf, über, unter, vor, hinter, neben, zwischen) take the accusative for movement/direction (wohin?) and the dative for location (wo?).",
     pattern: "wohin? → Akkusativ (in den Raum) · wo? → Dativ (in dem Raum)",
@@ -396,7 +396,7 @@ export const grammar: GrammarTopic[] = [
     titleDe: "Nomen-Verb-Verbindungen (Funktionsverbgefüge)",
     purpose: "Sound natural and precise by learning verbs and nouns as fixed chunks.",
     explanation:
-      "Many ideas are expressed by a fixed noun + verb pair where the verb carries little meaning on its own: eine Entscheidung treffen, Maßnahmen ergreifen, Rücksicht nehmen. Learn them as units — the wrong verb sounds foreign even if each word is correct.",
+      "Many ideas are expressed by a fixed noun + verb pair where the verb carries little meaning on its own: eine Entscheidung treffen, Maßnahmen ergreifen, Rücksicht nehmen. Learn them as units; the wrong verb sounds foreign even if each word is correct.",
     pattern: "Nomen + festes Verb → eine Entscheidung treffen · in Frage stellen · zur Verfügung stehen",
     examples: [
       { de: "Wir müssen eine Entscheidung treffen.", en: "We have to make a decision." },
@@ -493,7 +493,7 @@ export const grammar: GrammarTopic[] = [
         answer: "hätte",
         options: ["hätte", "habe", "hatte", "haben"],
         explain: "'hätte' is used directly (without würde) for polite requests: 'Ich hätte eine Frage.'",
-        gloss: "I would have a question. (= I have a question — politely)",
+        gloss: "I would have a question. (= I have a question, politely)",
       },
       {
         id: "g_k2_d4",
@@ -568,7 +568,7 @@ export const grammar: GrammarTopic[] = [
     titleDe: "Passiv",
     purpose: "Describe workplace procedures neutrally, without naming an actor.",
     explanation:
-      "The passive (werden + Partizip II) focuses on the action or process rather than who does it — ideal for describing procedures. The agent is often omitted or added with 'von'. With modals: modal + Partizip II + werden.",
+      "The passive (werden + Partizip II) focuses on the action or process rather than who does it, which is ideal for describing procedures. The agent is often omitted or added with 'von'. With modals: modal + Partizip II + werden.",
     pattern: "werden + Partizip II · (Modal) … + Partizip II + werden",
     examples: [
       { de: "Die Lieferung wird morgen verschickt.", en: "The delivery will be sent tomorrow." },

@@ -30,8 +30,18 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - `types/index.ts` — shared types
 - `router.tsx`, `App.tsx`, `main.tsx`
 
+## Writing style (applies to ALL user-facing copy)
+- **Avoid em dashes (`—`).** The founder dislikes them; they are an overused "AI" tell. Use them
+  only when genuinely essential (and that is rare). For everything else, **rewrite or paraphrase**
+  the sentence: split it into two with a period, or use a comma, colon, parentheses, or "so"/"and".
+  Examples: "Build natural word order — a B2 marker." → "Build natural word order, a B2 marker.";
+  "Noch keine Daten — reiche Text ein." → "Noch keine Daten. Reiche Text ein." This applies to
+  every visible string: UI labels, onboarding/landing copy, content data (`src/data/*`), grammar
+  explanations/glosses, toasts, and meta/manifest text. (The en dash `–` and bullet `·` are fine.)
+- This rule is for all AI tools building this app. Prefer plain, natural punctuation over dashes.
+
 ## Content conventions
-- **Themes**: ten workplace topics — meetings, scheduling, logistics, customer, conflict, project, technology, sustainability, safety, travel.
+- **Themes**: ten workplace topics: meetings, scheduling, logistics, customer, conflict, project, technology, sustainability, safety, travel.
 - **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article, plural, pronunciation hint, two example sentences, and related terms. Currently **354 words** (~34–39 per theme). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build`.
 - **Collocations** (`src/data/collocations.ts`): currently **120 Nomen-Verb pairs** (12 per theme). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`, `example {de, en}`. Keep ids unique (`c_` prefix + snake_case).
 - **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.

@@ -23,7 +23,7 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/404\.html$/],
       },
       manifest: {
-        name: "Genauly — German that clicks",
+        name: "Genauly: German that clicks",
         short_name: "Genauly",
         description:
           "Interactive prep platform for the Goethe / telc Deutsch B2 Beruf speaking exam.",

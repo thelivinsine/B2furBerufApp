@@ -61,7 +61,7 @@ function WeaknessPanel({ entries }: { entries: WritingHistoryEntry[] }) {
   if (sorted.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        Noch keine Auswertungen — reiche einen Text ein, um Schwachstellen zu sehen.
+        Noch keine Auswertungen. Reiche einen Text ein, um Schwachstellen zu sehen.
       </p>
     );
   }
@@ -233,7 +233,7 @@ export function Analytics() {
       <Card>
         <CardContent className="p-5">
           <p className="mb-1 font-semibold">Beherrschung nach Thema</p>
-          <p className="mb-4 text-xs text-muted-foreground">Sortiert nach Lernbedarf — oben = meiste Lücken</p>
+          <p className="mb-4 text-xs text-muted-foreground">Sortiert nach Lernbedarf (oben = meiste Lücken)</p>
           <div className="space-y-3">
             {themeStats.map(({ theme, total, mastered, ratio }) => (
               <div key={theme.id} className="space-y-1">
@@ -283,7 +283,7 @@ export function Analytics() {
             <TrendingUp className="h-4 w-4 text-primary" /> Schwachstellen (Schreiben)
           </p>
           <p className="mb-4 text-xs text-muted-foreground">
-            Aus deinen letzten KI-Auswertungen — letzte 60 Einträge
+            Aus deinen letzten KI-Auswertungen (letzte 60 Einträge)
           </p>
           {writingLoaded ? (
             <WeaknessPanel entries={writingEntries} />

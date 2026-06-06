@@ -21,12 +21,12 @@ const features = [
   {
     icon: MessagesSquare,
     title: "Real Gespräche, zero pressure",
-    desc: "Rehearse the exam's „Gemeinsam eine Lösung finden“ module with branching, lifelike dialogues — practise until it feels natural.",
+    desc: "Rehearse the exam's „Gemeinsam eine Lösung finden“ module with branching, lifelike dialogues. Practise until it feels natural.",
   },
   {
     icon: GraduationCap,
     title: "Wortschatz that sticks",
-    desc: "300+ workplace words, Redemittel and targeted Grammatik drills — with spaced repetition, so you actually remember them.",
+    desc: "300+ workplace words, Redemittel and targeted Grammatik drills, with spaced repetition so you actually remember them.",
   },
   {
     icon: Target,
@@ -36,17 +36,17 @@ const features = [
   {
     icon: PenLine,
     title: "Your AI Schreibcoach",
-    desc: "Write a short text, get one clear, prioritised tip on your biggest Schwäche — like a tutor who never gets tired.",
+    desc: "Write a short text, get one clear, prioritised tip on your biggest Schwäche, like a tutor who never gets tired.",
   },
   {
     icon: Mic,
     title: "Speak without Angst",
-    desc: "Text-to-speech and speech recognition help you find your voice and nail your Aussprache — out loud, judgement-free.",
+    desc: "Text-to-speech and speech recognition help you find your voice and nail your Aussprache, out loud and judgement-free.",
   },
   {
     icon: Cloud,
     title: "Your Fortschritt, everywhere",
-    desc: "Sign in and continue right where you stopped — on Handy, Tablet or Laptop. Dein Fortschritt reist mit.",
+    desc: "Sign in and continue right where you stopped, on Handy, Tablet or Laptop. Dein Fortschritt reist mit.",
   },
 ];
 
@@ -115,8 +115,8 @@ export function LandingPage() {
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Practise the Deutsch you actually need at work — Wortschatz, Grammatik,
-            writing and speaking — in sessions short enough for your Mittagspause.
+            Practise the Deutsch you actually need at work: Wortschatz, Grammatik,
+            writing and speaking, all in sessions short enough for your Mittagspause.
             Confidence first, B2-Prüfung sorted.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -139,7 +139,7 @@ export function LandingPage() {
             <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Free to start</span>
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Kein Konto nötig</span>
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Sofort loslegen — in seconds</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-success" /> Sofort loslegen, in seconds</span>
             </div>
           )}
         </motion.div>
@@ -171,12 +171,12 @@ export function LandingPage() {
         <div className="overflow-hidden rounded-3xl border border-border bg-accent-gradient p-8 text-center text-white shadow-elevated sm:p-12">
           <BrainCircuit className="mx-auto h-9 w-9 opacity-90" />
           <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-            {onboarded ? "Weiter geht's — keep the Schwung!" : "Bereit? Let's get you Prüfung-ready."}
+            {onboarded ? "Weiter geht's, keep the Schwung!" : "Bereit? Let's get you Prüfung-ready."}
           </h2>
           <p className="mx-auto mt-2 max-w-md text-white/85">
             {onboarded
-              ? "Pick up your Training right where you left off — du schaffst das."
-              : "Start free, save your Fortschritt with an account, and learn on every device. Dein Deutsch wartet — let's go."}
+              ? "Pick up your Training right where you left off. Du schaffst das."
+              : "Start free, save your Fortschritt with an account, and learn on every device. Dein Deutsch wartet, let's go."}
           </p>
           <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {onboarded ? (
@@ -211,7 +211,7 @@ export function LandingPage() {
       </section>
 
       <footer className="relative z-10 border-t border-border py-6 text-center text-xs text-muted-foreground">
-        Genauly — German that clicks · Deutsch im Beruf · B2 Prüfung
+        Genauly · German that clicks · Deutsch im Beruf · B2 Prüfung
       </footer>
 
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} intent={intent} />
