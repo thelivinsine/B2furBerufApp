@@ -90,7 +90,7 @@ export function QuickRevision() {
         <EmptyState
           icon={Trophy}
           title={`${correct} von ${total} · ${pctScore}%`}
-          description={pctScore >= 70 ? "Super! Du erinnerst dich gut." : "Gut gemacht — wiederhole morgen nochmal."}
+          description={pctScore >= 70 ? "Super! Du erinnerst dich gut." : "Gut gemacht. Wiederhole morgen nochmal."}
           action={
             <Button variant="gradient" onClick={() => window.location.reload()}>
               <RotateCw className="h-4 w-4" /> Neue Runde

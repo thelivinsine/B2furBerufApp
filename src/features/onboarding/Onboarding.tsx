@@ -35,7 +35,7 @@ const levels: { id: CefrLevel; label: string; desc: string }[] = [
 
 const goalsXp = [
   { value: 50, label: "Easy does it", desc: "≈ 5 Min / Tag" },
-  { value: 80, label: "Steady — stetig", desc: "≈ 10 min a day" },
+  { value: 80, label: "Steady, stetig", desc: "≈ 10 min a day" },
   { value: 120, label: "Ehrgeizig", desc: "≈ 15 min a day" },
 ];
 
@@ -84,7 +84,7 @@ export function Onboarding() {
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent-gradient text-white shadow-glow">
             <Sparkles className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold tracking-tight">Genauly — German that clicks</span>
+          <span className="text-lg font-semibold tracking-tight">Genauly: German that clicks</span>
         </div>
 
         <Card className="overflow-hidden p-0 shadow-elevated">
@@ -115,10 +115,10 @@ export function Onboarding() {
                     <Header
                       icon={Sparkles}
                       title="Willkommen!"
-                      subtitle="Your personal coach for Deutsch im Beruf — from Wortschatz and Grammatik to writing and speaking. Let's get you set up."
+                      subtitle="Your personal coach for Deutsch im Beruf, from Wortschatz and Grammatik to writing and speaking. Let's get you set up."
                     />
                     <div>
-                      <label className="mb-1.5 block text-sm font-medium">Wie heißt du? — what should we call you?</label>
+                      <label className="mb-1.5 block text-sm font-medium">Wie heißt du? What should we call you?</label>
                       <input
                         autoFocus
                         value={name}
@@ -133,7 +133,7 @@ export function Onboarding() {
 
                 {step === 1 && (
                   <div className="space-y-4">
-                    <Header icon={Target} title="Was ist dein Ziel?" subtitle="Tell us your goal — so we can tailor everything to you." />
+                    <Header icon={Target} title="Was ist dein Ziel?" subtitle="Tell us your goal, so we can tailor everything to you." />
                     <div className="space-y-2.5">
                       {goals.map((g) => (
                         <SelectRow
@@ -151,7 +151,7 @@ export function Onboarding() {
 
                 {step === 2 && (
                   <div className="space-y-4">
-                    <Header icon={GraduationCap} title="Dein aktuelles Niveau" subtitle="Your current level — a rough guess is totally fine." />
+                    <Header icon={GraduationCap} title="Dein aktuelles Niveau" subtitle="Your current level. A rough guess is totally fine." />
                     <div className="grid grid-cols-2 gap-2.5">
                       {levels.map((l) => (
                         <button
@@ -186,7 +186,7 @@ export function Onboarding() {
 
                 {step === 3 && (
                   <div className="space-y-4">
-                    <Header icon={Sparkles} title="Dein tägliches Ziel" subtitle="Consistency beats intensity — pick a Ziel you can actually keep." />
+                    <Header icon={Sparkles} title="Dein tägliches Ziel" subtitle="Consistency beats intensity, so pick a Ziel you can actually keep." />
                     <div className="space-y-2.5">
                       {goalsXp.map((g) => (
                         <SelectRow

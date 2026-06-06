@@ -34,7 +34,7 @@ export function recommendedNext(opts: {
   const { due, todayXp, goal, daysToExam } = opts;
   const examLine =
     daysToExam !== null
-      ? `Noch ${daysToExam} ${daysToExam === 1 ? "Tag" : "Tage"} bis zur Prüfung — jeder Tag zählt.`
+      ? `Noch ${daysToExam} ${daysToExam === 1 ? "Tag" : "Tage"} bis zur Prüfung. Jeder Tag zählt.`
       : null;
 
   if (due > 0) {

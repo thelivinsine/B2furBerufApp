@@ -274,7 +274,7 @@ export function CollocationsBrowser() {
 
       {filtered.length === 0 ? (
         <div className="py-16 text-center text-muted-foreground">
-          Keine Ergebnisse — versuche einen anderen Filter oder Begriff.
+          Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
         </div>
       ) : (
         // key forces a full remount + fade whenever the filter set changes,

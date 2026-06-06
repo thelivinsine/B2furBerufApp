@@ -182,7 +182,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That may be, but …",
     category: "disagree",
     register: "diplomatic",
-    note: "Acknowledge first, then object — a key B2 strategy.",
+    note: "Acknowledge first, then object. A key B2 strategy.",
     example: { de: "Das mag sein, aber wir müssen die Kosten bedenken.", en: "That may be, but we have to consider the costs." },
   },
 
@@ -461,7 +461,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I see your point, but …",
     category: "disagree",
     register: "diplomatic",
-    note: "Acknowledge before objecting — a key B2 strategy.",
+    note: "Acknowledge before objecting. A key B2 strategy.",
     example: { de: "Ich verstehe Ihren Punkt, aber das passt nicht ins Budget.", en: "I see your point, but it doesn't fit the budget." },
   },
   {

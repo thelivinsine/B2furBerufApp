@@ -112,7 +112,7 @@ export function SimulationHub() {
           <p className="text-sm font-semibold">Tipps für die Simulation</p>
           <ul className="mt-2 space-y-1 text-sm text-muted-foreground">
             <li>• Lies den Kontext sorgfältig durch, bevor du startest.</li>
-            <li>• Nutze die Hinweis-Funktion nur wenn nötig — Hinweise reduzieren die Punktzahl leicht.</li>
+            <li>• Nutze die Hinweis-Funktion nur wenn nötig. Hinweise reduzieren die Punktzahl leicht.</li>
             <li>• Beim freien Sprechen: Tippe deine Antwort oder sprich laut und bestätige dann.</li>
             <li>• Schaue dir das Coaching-Feedback nach jeder Option an.</li>
           </ul>
