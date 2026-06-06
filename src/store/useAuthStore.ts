@@ -14,16 +14,16 @@ interface AuthState {
   error: string | null;
 
   init: () => void;
-  signInAsGuest: () => Promise<void>;
+  signInAsGuest: (captchaToken?: string) => Promise<void>;
   /** Create an account with email + password (instant, no email round-trip
    *  when "Confirm email" is disabled in Supabase). Upgrades a guest in place.
    *  `needsConfirmation` is true when Supabase requires the user to click a
    *  confirmation link before a session is created. */
-  signUp: (email: string, password: string) => Promise<{ ok: boolean; needsConfirmation: boolean }>;
+  signUp: (email: string, password: string, captchaToken?: string) => Promise<{ ok: boolean; needsConfirmation: boolean }>;
   /** Sign in with an existing email + password. */
-  signIn: (email: string, password: string) => Promise<{ ok: boolean; needsConfirmation: boolean }>;
+  signIn: (email: string, password: string, captchaToken?: string) => Promise<{ ok: boolean; needsConfirmation: boolean }>;
   /** One-click sign-in via Google OAuth (redirect flow). */
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: (captchaToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
   clearError: () => void;
 }
@@ -76,14 +76,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     });
   },
 
-  signInAsGuest: async () => {
+  signInAsGuest: async (captchaToken) => {
     set({ busy: true, error: null });
-    const { error } = await supabase.auth.signInAnonymously();
+    const { error } = await supabase.auth.signInAnonymously(
+      captchaToken ? { options: { captchaToken } } : undefined,
+    );
     if (error) set({ error: error.message });
     set({ busy: false });
   },
 
-  signUp: async (email, password) => {
+  signUp: async (email, password, captchaToken) => {
     set({ busy: true, error: null });
     // If a guest is signed in, attach email + password to the SAME uid so the
     // guest's progress is preserved as a permanent account.
@@ -93,13 +95,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // email" is on → a confirmation link must be clicked first).
     let needsConfirmation = false;
     if (current?.is_anonymous) {
+      // updateUser upgrades an existing authenticated session — no captchaToken needed.
       const { data, error: e } = await supabase.auth.updateUser({ email, password });
       error = e;
       // With email confirmation on, the email change is pending and the user
       // stays anonymous until the link is clicked.
       needsConfirmation = !e && (data.user?.is_anonymous ?? false);
     } else {
-      const { data, error: e } = await supabase.auth.signUp({ email, password });
+      const { data, error: e } = await supabase.auth.signUp({
+        email,
+        password,
+        options: captchaToken ? { captchaToken } : undefined,
+      });
       error = e;
       // No session returned → email confirmation is required before login.
       needsConfirmation = !e && !data.session;
@@ -108,18 +115,25 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     return { ok: !error, needsConfirmation };
   },
 
-  signIn: async (email, password) => {
+  signIn: async (email, password, captchaToken) => {
     set({ busy: true, error: null });
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+      options: captchaToken ? { captchaToken } : undefined,
+    });
     set({ busy: false, error: error ? friendlyError(error.message) : null });
     return { ok: !error, needsConfirmation: !error && !data.session };
   },
 
-  signInWithGoogle: async () => {
+  signInWithGoogle: async (captchaToken) => {
     set({ busy: true, error: null });
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + window.location.pathname },
+      options: {
+        redirectTo: window.location.origin + window.location.pathname,
+        ...(captchaToken ? { captchaToken } : {}),
+      },
     });
     if (error) set({ error: friendlyError(error.message), busy: false });
   },

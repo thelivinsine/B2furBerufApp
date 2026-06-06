@@ -40,6 +40,10 @@ jobs:
 
       - name: Build
         run: pnpm run build
+        env:
+          # Turnstile site key is public (safe to embed in the JS bundle).
+          # Set this secret in GitHub → Settings → Secrets → Actions.
+          VITE_TURNSTILE_SITE_KEY: ${{ secrets.VITE_TURNSTILE_SITE_KEY }}
 
       - name: Setup Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
