@@ -8,8 +8,11 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { TurnstileWidget } from "@/components/shared/TurnstileWidget";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSessionStore } from "@/store/useSessionStore";
+
+const TURNSTILE_ENABLED = !!import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
 export type AuthIntent = "signup" | "login";
 
@@ -42,22 +45,25 @@ export function AuthDialog({
   const [mode, setMode] = useState<AuthIntent>(intent);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   // Sync to the requested intent each time the dialog is opened.
   useEffect(() => {
     if (open) {
       setMode(intent);
       clearError();
+      setCaptchaToken(null); // widget re-renders and re-solves on each open
     }
   }, [open, intent, clearError]);
 
   const isSignup = mode === "signup";
-  const canSubmit = email.trim().length > 3 && password.length >= 6 && !busy;
+  const captchaReady = !TURNSTILE_ENABLED || captchaToken !== null;
+  const canSubmit = email.trim().length > 3 && password.length >= 6 && !busy && captchaReady;
 
   const submit = async () => {
     if (!canSubmit) return;
     const fn = isSignup ? signUp : signIn;
-    const { ok, needsConfirmation } = await fn(email.trim(), password);
+    const { ok, needsConfirmation } = await fn(email.trim(), password, captchaToken ?? undefined);
     if (!ok) return;
     if (needsConfirmation) {
       // Account created but not logged in yet — Supabase requires email
@@ -94,8 +100,8 @@ export function AuthDialog({
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={signInWithGoogle}
-                disabled={busy}
+                onClick={() => signInWithGoogle(captchaToken ?? undefined)}
+                disabled={busy || !captchaReady}
               >
                 <GoogleIcon /> Weiter mit Google
               </Button>
@@ -135,6 +141,8 @@ export function AuthDialog({
               />
             </div>
           </div>
+
+          <TurnstileWidget onToken={setCaptchaToken} />
 
           {error && <p className="text-sm font-medium text-danger">{error}</p>}
 

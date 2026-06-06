@@ -3,7 +3,10 @@ import { Cloud, CloudOff, LogOut, UserCircle2 } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { TurnstileWidget } from "@/components/shared/TurnstileWidget";
 import { AuthDialog, type AuthIntent } from "@/features/auth/AuthDialog";
+
+const TURNSTILE_ENABLED = !!import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
 /**
  * Account / cloud-sync panel in Settings. Guest-first: the learner can keep
@@ -15,6 +18,7 @@ export function AccountPanel() {
   const { status, user, busy, signInAsGuest, signOut } = useAuthStore();
   const [authOpen, setAuthOpen] = useState(false);
   const [intent, setIntent] = useState<AuthIntent>("signup");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   const syncing = status === "anonymous" || status === "signedIn";
 
@@ -65,9 +69,16 @@ export function AccountPanel() {
             </>
           )}
           {status === "signedOut" && (
-            <Button variant="ghost" onClick={signInAsGuest} disabled={busy}>
-              Als Gast fortfahren
-            </Button>
+            <>
+              <TurnstileWidget onToken={setCaptchaToken} />
+              <Button
+                variant="ghost"
+                onClick={() => signInAsGuest(captchaToken ?? undefined)}
+                disabled={busy || (TURNSTILE_ENABLED && !captchaToken)}
+              >
+                Als Gast fortfahren
+              </Button>
+            </>
           )}
           {syncing && (
             <Button variant="ghost" onClick={signOut} disabled={busy}>
