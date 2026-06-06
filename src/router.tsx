@@ -4,19 +4,18 @@ import { AppShell } from "@/components/layout/AppShell";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { Dashboard } from "@/features/dashboard/Dashboard";
+import { recoverFromStaleAssets, isChunkLoadError } from "@/lib/recover";
 
-// When a dynamic import fails (stale SW cached old chunk hashes after a deploy),
-// reload once to pick up the fresh asset manifest. Guard with sessionStorage so
-// a genuine network outage doesn't loop forever.
+// When a dynamic import fails (stale SW cached an old index.html that points at
+// chunk hashes which no longer exist after a deploy), clear the SW caches and
+// reload to pick up the fresh asset manifest. recoverFromStaleAssets() guards
+// against reload loops; we re-reject so the error boundary shows if it can't.
 function lazyWithReload<T extends React.ComponentType<unknown>>(
   factory: () => Promise<{ default: T }>,
 ): React.LazyExoticComponent<T> {
   return React.lazy(() =>
     factory().catch((err: unknown) => {
-      if (!sessionStorage.getItem("_chunkReload")) {
-        sessionStorage.setItem("_chunkReload", "1");
-        window.location.reload();
-      }
+      if (isChunkLoadError(err)) void recoverFromStaleAssets();
       return Promise.reject(err) as never;
     }),
   );
