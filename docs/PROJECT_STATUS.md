@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-05 (session 17). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-06 (session 18). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -241,6 +241,34 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
+
+### Session 18 (2026-06-06) — Security complete + streak bug fix SHIPPED ✅
+
+**Streak display bug fixed (PR #90):** The streak counter was showing a stale persisted value
+after missed days (e.g. showing "5 Tage Serie" after 2 missed days, then dropping to 1 on the
+next activity — looked like a reset). Added `useEffectiveStreak()` hook that returns the stored
+streak only when `lastActiveDay` is today or yesterday (still alive), and 0 when the streak has
+actually been broken. Dashboard and Analytics both updated.
+
+**Cloudflare Turnstile CAPTCHA — fully live (PRs #91–#92):**
+- `TurnstileWidget` component: lazy-loads Cloudflare Turnstile script, auto-solves in <1 s for
+  real users, no-op when `VITE_TURNSTILE_SITE_KEY` is unset (dev/CI unchanged).
+- `useAuthStore`: all four auth calls (`signInAsGuest`, `signUp`, `signIn`, `signInWithGoogle`)
+  now accept and pass `captchaToken` to Supabase.
+- `AuthDialog` and `AccountPanel` render the widget and gate submission on a valid token.
+- `pages.yml`: `VITE_TURNSTILE_SITE_KEY` secret piped into the build step.
+- CSP extended for `challenges.cloudflare.com` (script + frame + connect).
+- **Founder steps done:** Cloudflare widget created for `genauly.de` → site key added as GitHub
+  Actions secret → Supabase Authentication → Attack Protection → Turnstile enabled with secret
+  key. All sign-in flows (guest, sign-up, email login, Google OAuth) are now CAPTCHA-protected.
+
+**CSP switched from report-only to enforcing (PR #93):**
+- Discovered that `Content-Security-Policy-Report-Only` via `<meta>` tag is **rejected by all
+  browsers** (HTTP-header-only; GitHub Pages cannot set headers). The policy was silently ignored
+  since it was added. Switched to enforcing `Content-Security-Policy` which does work in meta
+  tags. Founder confirmed the console is now clean — no CSP errors.
+
+**Full security checklist is now 100% complete.** See `docs/SECURITY.md`.
 
 ### Session 17 (2026-06-05) — Security audit + full hardening SHIPPED ✅ + sourcing research
 
@@ -519,7 +547,7 @@ The sandbox can't reach the live `*.github.io` site — founder confirms the liv
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–17 (2026-06-04 → 06-05).** Everything noted ✅ is merged to `main`.
+**Handoff after sessions 9–18 (2026-06-04 → 06-06).** Everything noted ✅ is merged to `main`.
 Active automation branch: `claude/todo-inventory-BUHq0` (realign to `origin/main` after each
 squash-merge — see CLAUDE.md).
 
@@ -531,36 +559,20 @@ squash-merge — see CLAUDE.md).
 - **Mobile bottom tab bar (s15, PR #76):** native bottom nav. Desktop sidebar untouched.
 - **Mobile density & fit (s15, PRs #77–#78):** `sm:`-gated tightening across all components/pages.
 - **Content expansion (s16, PR #80):** 10 scenarios · 10 exam sets · ~504 vocabulary words.
-- **Docs: content QC & sourcing research (s17, PRs #82–#83):** to-do + licensing guide in status doc.
-- **Security hardening — 4 PRs SHIPPED ✅ (s17, PRs #85–#88):**
-  1. **PR #85 — pnpm migration + vuln fix:** `react-router-dom ^6.30.4`; pnpm lockfile; `.npmrc`
-     supply-chain guardrails. `pnpm audit` 2 moderate → **0**. CI build verified green on `main`.
-  2. **PR #86 — Edge Function hardening:** CORS allowlist (replaced `*`); max input cap
-     (`MAX_TEXT_LEN`=3000); per-user monthly cap (`USER_MONTHLY_LIMIT`=50); `docs/SECURITY.md`.
-     ⚠️ Takes effect only after the founder **redeploys the function** (see checklist below).
-  3. **PR #87 — Frontend hardening:** CSP **report-only** meta in `index.html`; self-hosted Inter
-     via `@fontsource-variable/inter` (removed third-party rsms.me). Build-verified: dist has no
-     rsms.me refs, fonts self-hosted, both scripts external same-origin (CSP-clean).
-  4. **PR #88 — CI SHA-pinning:** all GitHub Actions pinned to commit SHAs (tag-hijack defense).
-  - Full plan: `docs/SECURITY_AUDIT_PLAN.pdf`; details in `docs/SECURITY.md`.
+- **Security hardening — ALL COMPLETE ✅ (s17–18, PRs #85–#93):**
+  - pnpm migration + react-router vuln fix · Edge Function CORS/caps · self-hosted fonts ·
+    CI SHA-pinning · Turnstile CAPTCHA (frontend + Cloudflare + Supabase) · CSP enforcing.
+  - See `docs/SECURITY.md` for full details. No open security items remain.
+- **Streak display bug fixed (s18, PR #90):** `useEffectiveStreak()` — no more stale values
+  after missed days.
 
-**Founder steps — status:**
-- ✅ **Edge Function redeployed (2026-06-05).** Founder pasted the hardened `index.ts` into the
-  Supabase dashboard and deployed. CORS allowlist + input cap + per-user monthly cap are **live**.
-- ⏸️ **Turnstile CAPTCHA — BLOCKED on code, do NOT enable yet.** Enabling it would make Supabase
-  reject every sign-in, because the app's auth calls (`useAuthStore.ts`) don't send a captcha
-  token. Needs a frontend PR first (render Turnstile widget + pass `captchaToken` into each
-  `supabase.auth.*` call). See `docs/SECURITY.md` → "Open to-do".
-- ⏳ **CSP enforce flip — pending founder console check.** Open genauly.de → F12 → Console; if no
-  red "Content-Security-Policy" messages appear, a one-line PR flips
-  `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `index.html`.
+**Security — 100% complete. No open items.**
 
 **Decisions locked:**
 - Bottom tab bar = **Start · Wortschatz · Quiz · Fortschritt · Mehr** (Mehr-sheet = other 8).
 - Mobile redesign = **Layer 2 ✅ · Layer 3 ✅ — DONE**.
 - Keep `src/components/ui/card.tsx` **untouched**.
 - Pre-React crash painter is a **permanent** safety net (do not remove).
-- CSP ships **report-only first**; founder confirms live site clean before enforcing.
 
 **Content counts (live):**
 - Vocabulary: **~504 words** (~50/theme · 10 themes)
@@ -573,18 +585,12 @@ squash-merge — see CLAUDE.md).
 **Dev branch:** `claude/todo-inventory-BUHq0` — realign to `origin/main` after each squash-merge.
 
 **Next (priority order):**
-1. **Turnstile frontend integration** (small PR) — render a Cloudflare Turnstile widget in the
-   auth UI and pass `options: { captchaToken }` into every `supabase.auth.*` call in
-   `useAuthStore.ts`; read a public `VITE_TURNSTILE_SITE_KEY`. THEN the founder can safely enable
-   CAPTCHA in Supabase (with a Cloudflare secret key). Details in `docs/SECURITY.md` → "Open to-do".
-2. **CSP enforce flip** — after the founder confirms genauly.de's console shows no CSP violations,
-   change `Content-Security-Policy-Report-Only` → `Content-Security-Policy` in `index.html`.
-3. **Content QC pipeline** — CI lint script for duplicate IDs, broken dialogue nodes, missing fields;
-   plus a pedagogical review process for German accuracy and B2 level-appropriateness.
-4. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-5. (Optional) Logo / branding for app icon.
-6. (Optional) Monetization tier + paywall feature flags.
-7. (Optional) More grammar drills (47 → ~80 target).
+1. **Content QC pipeline** — CI lint script for duplicate IDs, broken dialogue nodes, missing
+   required fields; plus a pedagogical review process for German accuracy and B2 level-appropriateness.
+2. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
+3. (Optional) Logo / branding for app icon.
+4. (Optional) Monetization tier + paywall feature flags.
+5. (Optional) More grammar drills (47 → ~80 target).
+6. (Optional) More vocabulary content expansion (504 → ~600+ target).
 
-_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 4 PRs shipped + Edge Fn
-deployed; Turnstile-frontend + CSP-enforce pending)_
+_(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 100% complete ✅)_
