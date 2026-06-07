@@ -78,6 +78,12 @@ const config: Config = {
           "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)",
         "mesh":
           "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.12) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.1) 0px, transparent 50%)",
+        // Dialog backdrop: a brand-tinted radial that's lighter directly behind
+        // the card and deepens toward the screen edges (a subtle spotlight). Uses
+        // the cool-slate `--shadow` token instead of flat black, so it adapts to
+        // dark mode automatically. No blur.
+        "dialog-overlay":
+          "radial-gradient(120% 120% at 50% 45%, hsl(var(--shadow) / 0.30), hsl(var(--shadow) / 0.62))",
       },
       keyframes: {
         "fade-in": {
