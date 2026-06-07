@@ -647,6 +647,14 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     notices, data-processing records, DSR/export-and-delete flows, etc. — beyond the existing
     `/privacy` Datenschutzerklärung page, which covers disclosure but not the full compliance
     posture).
+    - **Email-usage note (2026-06-07):** when doing this, make the privacy policy explicitly
+      cover *every* way email is used — auth/login, password reset + account recovery, and any
+      future transactional mail (payment receipts/billing) and marketing mail — and add proper
+      opt-in consent for anything marketing-related. Context: we removed the "Wir nutzen deine
+      E-Mail nur für die Anmeldung" line from the sign-in dialog (PR #114) because that promise
+      was already a stretch (reset/recovery) and would be broken outright once the marketing
+      campaign (#13) and payment gateway (#9) ship. So the policy must not repeat that narrow
+      "only for sign-in" claim.
 
 ## Resume here (next session)
 
