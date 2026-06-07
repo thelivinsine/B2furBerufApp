@@ -46,6 +46,22 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - **Collocations** (`src/data/collocations.ts`): currently **120 Nomen-Verb pairs** (12 per theme). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`, `example {de, en}`. Keep ids unique (`c_` prefix + snake_case).
 - **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.
 
+## UI conventions — modal / popup overlays (locked 2026-06-07)
+The founder reviewed the sign-in dialog's backdrop and **locked this as the standard look for
+all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` or heavy
+`backdrop-blur` on new overlays):
+- **Backdrop**: `bg-dialog-overlay` (defined in `tailwind.config.ts` → `backgroundImage`), a
+  brand-tinted radial spotlight using the cool-slate `--shadow` token — lighter directly behind
+  the card (`hsl(var(--shadow)/0.30)`), deepening toward the screen edges (`hsl(var(--shadow)/0.62)`).
+  Adapts to dark mode automatically via the token. **No `backdrop-blur`.**
+- **Card shadow**: `shadow-elevated-soft` (in `tailwind.config.ts` → `boxShadow`), a ~50%-strength
+  version of `shadow-elevated` so the halo around the card stays gentle and doesn't bleed far
+  past the border.
+- Both are already wired into the shared `DialogContent`/`DialogPrimitive.Overlay` in
+  `src/components/ui/dialog.tsx`, so any new dialog built on that primitive inherits this for
+  free. Reuse those tokens (don't hand-roll a new overlay style) for sheets, drawers, and other
+  popups too, adjusting only the radial center/stops if a different focal point is needed.
+
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
 - **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/genauly-blank-page-9biDi`).
