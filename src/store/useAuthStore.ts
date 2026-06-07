@@ -131,7 +131,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + window.location.pathname,
+        // Always return to the root, regardless of where sign-in was opened
+        // from. This matches the URL registered in Supabase's redirect
+        // allowlist and avoids GitHub Pages 404ing on a deep path mid-flow.
+        redirectTo: window.location.origin + "/",
         ...(captchaToken ? { captchaToken } : {}),
       },
     });

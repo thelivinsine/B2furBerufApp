@@ -17,8 +17,8 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://challenges.cloudflare.com; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self' https://challenges.cloudflare.com; frame-src 'self' https://challenges.cloudflare.com; base-uri 'self'; form-action 'self'; object-src 'none'"
     />
-    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
-    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <!-- iOS/Android standalone: launch full-screen (no browser address bar) when
          added to the home screen. iOS Safari ignores the manifest `display`
          field for home-screen launch and requires `apple-mobile-web-app-capable`.
@@ -39,6 +39,13 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- GitHub Pages has no server-side router: a direct visit to e.g.
+         /settings 404s. This script (loaded from public/, see public/404.html
+         for the matching redirect) restores the real URL via history.replaceState
+         BEFORE the app boots, so React Router renders the right route on first
+         load. Must run before the module script below (classic scripts block
+         parsing and run first; module scripts are deferred). -->
+    <script src="/spa-redirect.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
