@@ -648,6 +648,11 @@ squash-merge — see CLAUDE.md).
 - Mobile redesign = **Layer 2 ✅ · Layer 3 ✅ — DONE**.
 - Keep `src/components/ui/card.tsx` **untouched**.
 - Pre-React crash painter is a **permanent** safety net (do not remove).
+- **Modal/popup overlay design (locked 2026-06-07, PR #108):** brand-tinted radial spotlight
+  via `bg-dialog-overlay` + `shadow-elevated-soft` (no flat black, no backdrop-blur) — the
+  standard for ALL popups/dialogs/sheets going forward. Already wired into the shared
+  `DialogContent`/`DialogPrimitive.Overlay` in `src/components/ui/dialog.tsx`. Full spec in
+  `CLAUDE.md` → "UI conventions — modal / popup overlays".
 
 **Content counts (live):**
 - Vocabulary: **~504 words** (~50/theme · 10 themes)
