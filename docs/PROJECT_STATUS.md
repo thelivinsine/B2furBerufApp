@@ -138,6 +138,14 @@ Only use content under these licenses — anything else blocks monetization:
 - [ ] (Optional) Add Resend SMTP to fix email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
+- [ ] **Google sign-in branding (parked 2026-06-07):** the Google consent screen still shows the
+      raw Supabase domain (`stkfdavpjflpqoxjunnj.supabase.co`) instead of "Genauly". The blocking
+      prerequisite (a Privacy Policy URL) is done and live at `https://genauly.de/privacy`. Founder
+      tried the Google Cloud Console steps (OAuth consent screen → App name "Genauly" + logo +
+      home page/privacy policy links + authorized domain `genauly.de`, then verify domain
+      ownership in Google Search Console, then Publish App) but couldn't get it done in one sitting
+      — needs a guided follow-up session walking through the actual console screens together
+      (likely via screen-sharing/screenshots since the sandbox can't reach Google's console).
 
 ## Deploy / workflow reminders
 - `main` is production; merging to it triggers `pages.yml` (the **only** workflow now — the old
@@ -667,10 +675,14 @@ squash-merge — see CLAUDE.md).
 **Next (priority order):**
 1. **Content QC pipeline** — CI lint script for duplicate IDs, broken dialogue nodes, missing
    required fields; plus a pedagogical review process for German accuracy and B2 level-appropriateness.
-2. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-3. (Optional) Logo / branding for app icon.
-4. (Optional) Monetization tier + paywall feature flags.
-5. (Optional) More grammar drills (47 → ~80 target).
+2. **Google sign-in branding (parked 2026-06-07)** — consent screen still shows the raw Supabase
+   domain instead of "Genauly". Privacy policy prerequisite is live; founder attempted the Google
+   Cloud Console steps but didn't finish. Needs a guided walkthrough next session — see "Founder
+   action items" for the exact checklist and where it got stuck.
+3. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
+4. (Optional) Logo / branding for app icon.
+5. (Optional) Monetization tier + paywall feature flags.
+6. (Optional) More grammar drills (47 → ~80 target).
 6. (Optional) More vocabulary content expansion (504 → ~600+ target).
 
 _(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 100% complete ✅)_
