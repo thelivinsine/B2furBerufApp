@@ -118,7 +118,7 @@ export function AuthDialog({
               <Mail className="h-4 w-4 text-muted-foreground" />
               <input
                 type="email"
-                autoFocus
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="du@beispiel.de"
@@ -133,6 +133,7 @@ export function AuthDialog({
               <Lock className="h-4 w-4 text-muted-foreground" />
               <input
                 type="password"
+                autoComplete={isSignup ? "new-password" : "current-password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && submit()}

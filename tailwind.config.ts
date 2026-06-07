@@ -83,6 +83,16 @@ const config: Config = {
           from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
+        // Like slide-up, but composed with the -translate-x-1/2 -translate-y-1/2
+        // centering transform that <DialogContent> uses to sit at exactly
+        // 50%/50%. A bare `transform: translateY()` keyframe would replace
+        // (not add to) that centering offset for the animation's duration,
+        // making the dialog render off-center and then visibly snap into
+        // place the instant the animation ends.
+        "dialog-in": {
+          from: { opacity: "0", transform: "translate(-50%, -50%) translateY(8px)" },
+          to: { opacity: "1", transform: "translate(-50%, -50%) translateY(0)" },
+        },
         shimmer: {
           "100%": { transform: "translateX(100%)" },
         },
@@ -90,6 +100,7 @@ const config: Config = {
       animation: {
         "fade-in": "fade-in 0.3s ease-out",
         "slide-up": "slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+        "dialog-in": "dialog-in 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
       },
     },
   },
