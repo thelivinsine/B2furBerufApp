@@ -81,7 +81,16 @@ export function AuthDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent
+        className="max-w-md"
+        // Radix focuses the first focusable element on open. That's normally
+        // the Google button, but it's `disabled` while Turnstile is still
+        // resolving, so focus would land on the email input instead, popping
+        // the on-screen keyboard open and lighting up its focus ring (plus
+        // the browser/password-manager's own autofill highlight) before the
+        // user has tapped anything. Keep focus on the dialog itself instead.
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <div className="mb-1 inline-flex w-fit rounded-xl bg-accent-gradient p-2.5 text-white shadow-glow">
             <Sparkles className="h-5 w-5" />
