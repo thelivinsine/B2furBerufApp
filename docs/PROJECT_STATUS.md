@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-06 (session 18 cont.). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-07 (session 18 cont.). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -270,13 +270,65 @@ actually been broken. Dashboard and Analytics both updated.
 
 **Full security checklist is now 100% complete.** See `docs/SECURITY.md`.
 
-**Stale SW chunk-fetch crash fixed (PR #95):** Intermittent "Failed to fetch dynamically imported
-module" errors on Windows desktop and Android — caused by the PWA Service Worker serving a cached
-`index.html` that still references old content-hashed chunk filenames after a deploy. Fixed by
-wrapping all 12 lazy route imports with `lazyWithReload()`: on chunk fetch failure it reloads once
-automatically (guarded by `sessionStorage` so genuine network outages don't loop). Error boundary
-updated to detect chunk errors and show a friendly German "Neue Version verfügbar — Neu laden"
-prompt instead of a raw JS stack trace.
+**Stale SW chunk-fetch crash fixed, two rounds (PRs #95, #97):** Intermittent "Failed to fetch
+dynamically imported module" errors on Windows desktop and Android. Round 1 (`lazyWithReload()`,
+PR #95) just reloaded once on failure, insufficient: the Service Worker kept re-serving the same
+stale cached `index.html`, so the reload hit the identical error with a new chunk hash. Round 2
+(PR #97) added `src/lib/recover.ts` → `recoverFromStaleAssets()`, which explicitly clears all
+`caches` and unregisters the service worker *before* reloading (rate-limited via `sessionStorage`
+timestamp so genuine outages don't loop). Wired into `lazyWithReload()`, the global
+`error`/`unhandledrejection` handlers, and the `RootErrorBoundary` in `main.tsx`. This is the
+architecturally correct fix: a plain reload can't out-run a Service Worker that intercepts the
+fetch and hands back the same cached HTML.
+
+**Onboarding "Zurück" button fixed (PR #98):** On Step 1 ("Willkommen!") the back button was
+`disabled={step === 0}`, a dead button that read as broken. Now it navigates to `/welcome`
+(landing page) when there's no previous onboarding step.
+
+**Em dashes removed app-wide + style rule documented (PR #99):** Founder dislikes `—` as an
+overused "AI tell". Rewrote ~30 user-facing strings across `index.html`, `LandingPage`,
+`Onboarding`, `QuickRevision`, `CollocationsBrowser`, `dashboard/recommend.ts`, `SimulationHub`,
+`Analytics`, `redemittel.ts`, `grammar.ts`, and `package.json`'s tagline, replacing `—` with a
+period, comma, colon, or "and"/"so" as natural. Code comments were left untouched (not
+user-visible). **New "Writing style" section added to `CLAUDE.md`** so future AI sessions follow
+this rule by default; the en dash `–` and bullet `·` remain fine.
+
+**Real `/privacy` page shipped (PR #100):** Founder asked about the Google sign-in consent screen
+showing the raw Supabase project domain instead of "Genauly", which requires Google brand
+verification, which requires a Privacy Policy URL. Wrote `src/features/legal/PrivacyPolicy.tsx`,
+a plain-language Datenschutzerklärung grounded in the actual schema/Edge Function/CSP (account
+data, profile, learning progress sync, AI writing submissions and where they go, Turnstile,
+hosting providers, retention, GDPR rights). Routed at `/privacy` (top-level, outside `AppShell`,
+reachable signed-out), linked from the landing footer and Settings. Live at
+`https://genauly.de/privacy` — ready to paste into the Google Cloud Console verification form.
+
+**Clean URLs: migrated off hash routing (`/#/...` → `/...`):** The founder asked why URLs had a
+`#` and whether "normal" clean URLs were possible. They are, via the well-known GitHub Pages SPA
+redirect trick (https://github.com/rafgraph/spa-github-pages):
+- `router.tsx`: `createHashRouter` → `createBrowserRouter`.
+- `vite.config.ts`: `base: "./"` → `base: "/"` (required so asset URLs resolve correctly from any
+  path, not just `/`; safe because the custom domain `genauly.de` serves from the root). PWA
+  manifest `start_url`/`scope` updated to `"/"` to match. `index.html` icon `href`s made absolute.
+- **New `public/404.html`**: GitHub Pages serves this for any unknown path (e.g. a direct visit to
+  `/privacy`). It encodes the requested path/query/hash into `/?/privacy&...` and redirects to the
+  app root.
+- **New `public/spa-redirect.js`**: loaded as a classic (blocking, pre-module) `<script>` in
+  `index.html`. Decodes that `/?/...` shape and calls `history.replaceState` to restore the exact
+  original URL *before* React Router mounts, so the correct route renders on first load. Loaded
+  via `<script src>` (not inline) to satisfy the `script-src 'self'` CSP.
+- **`useAuthStore.signInWithGoogle`**: `redirectTo` simplified from
+  `window.location.origin + window.location.pathname` to `window.location.origin + "/"` — always
+  return to the root after OAuth regardless of where sign-in was opened, matching Supabase's
+  redirect allowlist exactly and sidestepping the 404 dance mid-auth-flow. (Behaviorally identical
+  to the old hash-router setup, where `pathname` was always `/` anyway.)
+- **Verified locally** with a custom Python static server that mimics GitHub Pages' exact
+  behavior (serves `404.html` with a 404 status for unknown paths) plus Playwright: confirmed the
+  full chain — fresh visit to `/privacy?ref=test#section` → 404 → redirect → `history.replaceState`
+  restore → React Router renders the right page — preserves query strings and hash fragments
+  byte-for-byte, for both gated and ungated routes; confirmed reloads on deep routes are instant
+  once the Service Worker's `navigateFallback` takes over; confirmed in-app `<Link>` clicks update
+  the URL cleanly with no page reload. **Cannot test the live Google OAuth round-trip from the
+  sandbox** — founder should verify "Sign in with Google" still works right after this deploys.
 
 ### Session 17 (2026-06-05) — Security audit + full hardening SHIPPED ✅ + sourcing research
 
@@ -573,8 +625,21 @@ squash-merge — see CLAUDE.md).
   - See `docs/SECURITY.md` for full details. No open security items remain.
 - **Streak display bug fixed (s18, PR #90):** `useEffectiveStreak()` — no more stale values
   after missed days.
-- **Stale SW chunk crash fixed (s18, PR #95):** `lazyWithReload()` — auto-reloads once on
-  chunk fetch failure (stale SW after deploy); friendly "Neue Version" prompt as fallback.
+- **Stale SW chunk crash fixed for real (s18, PRs #95, #97):** `recoverFromStaleAssets()` in
+  `src/lib/recover.ts` clears caches + unregisters the SW before reloading (round 1's
+  reload-only fix wasn't enough, the SW kept re-serving stale `index.html`).
+- **Onboarding Zurück button fixed (s18, PR #98):** navigates to `/welcome` on step 1 instead
+  of being a dead disabled button.
+- **Em dashes removed app-wide (s18, PR #99):** ~30 strings rewritten; rule documented in
+  `CLAUDE.md` "Writing style" section for future AI sessions.
+- **Real `/privacy` page shipped (s18, PR #100):** `https://genauly.de/privacy` — plain-language
+  Datenschutzerklärung, linked from landing footer + Settings; gives the founder a URL for the
+  Google OAuth brand-verification form.
+- **Clean URLs shipped (s18 cont.):** migrated `/#/...` hash routing to real `/...` paths via
+  `createBrowserRouter` + the GitHub Pages SPA redirect trick (`public/404.html` +
+  `public/spa-redirect.js`). Verified locally end-to-end with a GitHub-Pages-accurate static
+  server + Playwright. **Founder must verify Google sign-in still works live** (the one part
+  that can't be tested from the sandbox — see Session 18 log for why).
 
 **Security — 100% complete. No open items.**
 

@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { createHashRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
@@ -78,7 +78,7 @@ const OnboardingRoute = (
   </Suspense>
 );
 
-export const router = createHashRouter([
+export const router = createBrowserRouter([
   {
     path: "/welcome",
     element: <LandingPage />,

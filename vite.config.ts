@@ -4,9 +4,10 @@ import { VitePWA } from "vite-plugin-pwa";
 import path from "node:path";
 
 export default defineConfig({
-  // Relative base so the built app works under any path
-  // (e.g. GitHub Pages project subpaths) without further config.
-  base: "./",
+  // Absolute base: the app is served from the root of a custom domain
+  // (genauly.de, via public/CNAME). Clean (non-hash) routing needs asset
+  // URLs to resolve correctly from any path, e.g. /settings, not just /.
+  base: "/",
   plugins: [
     react(),
     VitePWA({
@@ -17,7 +18,10 @@ export default defineConfig({
         // Cache everything vite emits. The glob must cover hashed asset
         // filenames (js/css/html) as well as the root index.html.
         globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
-        // Navigate fallback so direct hash-route URLs don't 404 on reload.
+        // Navigate fallback so direct clean-URL routes (e.g. /settings) are
+        // served index.html by the SW instead of 404ing on reload, once the
+        // SW is installed. (First-ever visits are handled by 404.html, see
+        // public/404.html and public/spa-redirect.js.)
         navigateFallback: "index.html",
         // Exclude the GitHub Pages redirect page from the fallback.
         navigateFallbackDenylist: [/^\/404\.html$/],
@@ -30,8 +34,8 @@ export default defineConfig({
         theme_color: "#6366f1",
         background_color: "#0f1729",
         display: "standalone",
-        scope: "./",
-        start_url: "./",
+        scope: "/",
+        start_url: "/",
         orientation: "portrait-primary",
         lang: "de",
         icons: [
