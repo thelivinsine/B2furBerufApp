@@ -3,6 +3,7 @@ import { createHashRouter, Navigate } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
+import { PrivacyPolicy } from "@/features/legal/PrivacyPolicy";
 import { Dashboard } from "@/features/dashboard/Dashboard";
 import { recoverFromStaleAssets, isChunkLoadError } from "@/lib/recover";
 
@@ -81,6 +82,10 @@ export const router = createHashRouter([
   {
     path: "/welcome",
     element: <LandingPage />,
+  },
+  {
+    path: "/privacy",
+    element: <PrivacyPolicy />,
   },
   {
     path: "/start",

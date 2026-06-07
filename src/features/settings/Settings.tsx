@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sun, Moon, Monitor, Volume2, VolumeX, Mic, MicOff, AlertTriangle } from "lucide-react";
 import { useSettingsStore, type ThemeMode } from "@/store/useSettingsStore";
@@ -21,6 +22,7 @@ const themeModes: { id: ThemeMode; label: string; icon: typeof Sun }[] = [
 ];
 
 export function Settings() {
+  const navigate = useNavigate();
   const settings = useSettingsStore();
   const resetProgress = useProgressStore((s) => s.resetProgress);
   const showToast = useSessionStore((s) => s.showToast);
@@ -231,6 +233,15 @@ export function Settings() {
             </div>
           </CardContent>
         </Card>
+
+        <p className="text-center text-xs text-muted-foreground">
+          <button
+            onClick={() => navigate("/privacy")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            Datenschutzerklärung
+          </button>
+        </p>
       </div>
     </div>
   );

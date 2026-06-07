@@ -211,7 +211,13 @@ export function LandingPage() {
       </section>
 
       <footer className="relative z-10 border-t border-border py-6 text-center text-xs text-muted-foreground">
-        Genauly · German that clicks · Deutsch im Beruf · B2 Prüfung
+        <p>Genauly · German that clicks · Deutsch im Beruf · B2 Prüfung</p>
+        <button
+          onClick={() => navigate("/privacy")}
+          className="mt-1.5 underline-offset-2 hover:text-foreground hover:underline"
+        >
+          Datenschutz
+        </button>
       </footer>
 
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} intent={intent} />
