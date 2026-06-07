@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,6 +15,17 @@ const CONTACT_EMAIL = "thelivinsine@gmail.com";
  */
 export function PrivacyPolicy() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // "Zurück" goes back one step in history, but when /privacy is opened
+  // directly (typed URL, "Open in app" launching fresh) there's no prior
+  // in-app entry, so navigate(-1) is a no-op. react-router marks that initial
+  // entry with key "default" — in that case fall back to "/" (which routes to
+  // the dashboard, or to /welcome for a not-yet-onboarded user).
+  const handleBack = () => {
+    if (location.key !== "default") navigate(-1);
+    else navigate("/");
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background bg-mesh">
@@ -30,7 +41,7 @@ export function PrivacyPolicy() {
           </div>
           <span className="text-lg font-semibold tracking-tight">Genauly</span>
         </button>
-        <Button variant="ghost" onClick={() => navigate(-1)} className="gap-1.5">
+        <Button variant="ghost" onClick={handleBack} className="gap-1.5">
           <ArrowLeft className="h-4 w-4" />
           Zurück
         </Button>
