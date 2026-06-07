@@ -633,6 +633,20 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
    a clear, audit-ready human-verification workflow. Every data point in the app should carry
    a clear source, verified status, and other metadata, tracked in an Excel/CSV in the project
    folder (not just inline in the TS files) so it's reviewable independent of the code.
+8. **Pricing page + plan design:** create a pricing page and design the various paid plans/tiers
+   to offer (ties into the "monetize later" decision and the planned `tier` flag).
+9. **Payment gateway integration:** add a payment provider so the plans in #8 can actually be
+   purchased/billed.
+10. **FAQ section on the landing page.**
+11. **Expand landing page copy:** the landing page's body copy needs more substance/depth overall
+    (beyond just adding an FAQ).
+12. **SEO:** make the whole app + landing page SEO-friendly and take concrete measures so it
+    surfaces in Google search results (meta tags, structured data, sitemap, performance, etc.).
+13. **Marketing campaign:** plan and run a marketing campaign to drive signups/awareness.
+14. **GDPR compliance:** audit and bring the whole app into GDPR compliance (consent banners/cookie
+    notices, data-processing records, DSR/export-and-delete flows, etc. — beyond the existing
+    `/privacy` Datenschutzerklärung page, which covers disclosure but not the full compliance
+    posture).
 
 ## Resume here (next session)
 
@@ -705,10 +719,12 @@ squash-merge — see CLAUDE.md).
 5. (Optional) Monetization tier + paywall feature flags.
 6. (Optional) More grammar drills (47 → ~80 target).
 7. (Optional) More vocabulary content expansion (504 → ~600+ target).
-8. **Founder ideas backlog (added 2026-06-07)** — 7 raw feature ideas (Dashboard redesign,
-   gating Schreibtraining behind sign-in, animated-character scenario simulations, vocabulary
-   visual mnemonics, domain/sector-based content filtering, Schreibtraining redesign, and a
-   sourced/audit-ready content data pipeline). None scoped yet — see "Backlog — founder ideas"
-   above for the full list; a future session should help prioritize and break these into phases.
+8. **Founder ideas backlog (added 2026-06-07)** — 14 raw feature ideas spanning product (Dashboard
+   redesign, gating Schreibtraining behind sign-in, animated scenario simulations, vocabulary
+   visual mnemonics, domain/sector content filtering, Schreibtraining redesign, sourced/audit-ready
+   content pipeline), monetization (pricing page + plans, payment gateway), growth (FAQ + landing
+   copy expansion, SEO, marketing campaign), and compliance (full GDPR compliance beyond the
+   `/privacy` page). None scoped yet — see "Backlog — founder ideas" above for the full list; a
+   future session should help prioritize and break these into phases.
 
 _(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 100% complete ✅)_
