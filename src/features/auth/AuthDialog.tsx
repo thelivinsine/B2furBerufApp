@@ -8,6 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { TurnstileWidget } from "@/components/shared/TurnstileWidget";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSessionStore } from "@/store/useSessionStore";
@@ -103,6 +104,49 @@ export function AuthDialog({
           </DialogDescription>
         </DialogHeader>
 
+        {/* Segmented toggle: makes "Anmelden" for returning users obvious right
+            next to "Konto erstellen", instead of a buried link at the bottom. */}
+        <div
+          role="tablist"
+          aria-label="Konto erstellen oder anmelden"
+          className="grid grid-cols-2 gap-1 rounded-lg bg-muted p-1"
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={isSignup}
+            onClick={() => {
+              setMode("signup");
+              clearError();
+            }}
+            className={cn(
+              "h-9 rounded-md text-sm font-medium transition-colors",
+              isSignup
+                ? "bg-surface text-foreground shadow-soft"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Konto erstellen
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!isSignup}
+            onClick={() => {
+              setMode("login");
+              clearError();
+            }}
+            className={cn(
+              "h-9 rounded-md text-sm font-medium transition-colors",
+              !isSignup
+                ? "bg-surface text-foreground shadow-soft"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            Anmelden
+          </button>
+        </div>
+
         <div className="space-y-3">
           {GOOGLE_ENABLED && (
             <>
@@ -167,19 +211,6 @@ export function AuthDialog({
           )}
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <ShieldCheck className="h-3.5 w-3.5" /> Wir nutzen deine E-Mail nur für die Anmeldung.
-          </p>
-
-          <p className="pt-1 text-center text-sm text-muted-foreground">
-            {isSignup ? "Schon ein Konto?" : "Noch kein Konto?"}{" "}
-            <button
-              onClick={() => {
-                setMode(isSignup ? "login" : "signup");
-                clearError();
-              }}
-              className="font-semibold text-primary hover:underline"
-            >
-              {isSignup ? "Anmelden" : "Registrieren"}
-            </button>
           </p>
         </div>
       </DialogContent>
