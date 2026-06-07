@@ -66,6 +66,11 @@ const config: Config = {
         soft: "0 1px 2px hsl(var(--shadow) / 0.04), 0 4px 12px hsl(var(--shadow) / 0.06)",
         elevated:
           "0 2px 4px hsl(var(--shadow) / 0.05), 0 12px 32px hsl(var(--shadow) / 0.12)",
+        // Toned-down (~50%) version of `elevated` for the sign-in dialog, so the
+        // soft halo around the card is less intense and spreads about half as
+        // far past the border.
+        "elevated-soft":
+          "0 1px 2px hsl(var(--shadow) / 0.025), 0 6px 16px hsl(var(--shadow) / 0.06)",
         glow: "0 0 0 1px hsl(var(--primary) / 0.12), 0 8px 30px hsl(var(--primary) / 0.18)",
       },
       backgroundImage: {
