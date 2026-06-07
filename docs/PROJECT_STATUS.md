@@ -613,6 +613,27 @@ The sandbox can't reach the live `*.github.io` site — founder confirms the liv
 - **Dev branch note:** session 4 work was developed on `claude/loving-cray-lMLj3` (previous branch
   `claude/loving-cray-lMLj3` became stale after PR history rewrite).
 
+## Backlog — founder ideas (not yet scoped, added 2026-06-07)
+Raw list from the founder, for future planning sessions to scope, sequence, and break into
+phases. None of these are started; treat as candidates for the next `EXPANSION_PLAN.md` revision.
+
+1. **Redesign the Dashboard** (the home/progress screen).
+2. **Gate Schreibtraining behind sign-in:** show the login/sign-up popup (`AuthDialog`) when a
+   signed-out guest tries to use Schreibtraining, instead of letting them in freely.
+3. **Animated-character scenario simulations:** visual, contextual practice — simulate real
+   workplace scenarios with animated characters (beyond today's text-based branching dialogues).
+4. **Visual mnemonics for vocabulary:** icons/illustrations per noun gender — e.g. man, woman,
+   baby/neutral or non-living-thing — to aid visual memory of `der`/`die`/`das`.
+5. **Domain-based filtering for Vocabulary, Collocations, and scenario-based learning:**
+   split content into "Bürokratie / bureaucratic work" vs. "office work," and within office
+   work, further filter by industry/sector.
+6. **Redesign the Schreibtraining section.**
+7. **Sourcing/audit infrastructure for content data:** build a data structure + pipeline to
+   scrape from reliable open-licensed sources (see "Approved open-licensed sources" above), with
+   a clear, audit-ready human-verification workflow. Every data point in the app should carry
+   a clear source, verified status, and other metadata, tracked in an Excel/CSV in the project
+   folder (not just inline in the TS files) so it's reviewable independent of the code.
+
 ## Resume here (next session)
 
 **Handoff after sessions 9–18 (2026-06-04 → 06-06).** Everything noted ✅ is merged to `main`.
@@ -683,6 +704,11 @@ squash-merge — see CLAUDE.md).
 4. (Optional) Logo / branding for app icon.
 5. (Optional) Monetization tier + paywall feature flags.
 6. (Optional) More grammar drills (47 → ~80 target).
-6. (Optional) More vocabulary content expansion (504 → ~600+ target).
+7. (Optional) More vocabulary content expansion (504 → ~600+ target).
+8. **Founder ideas backlog (added 2026-06-07)** — 7 raw feature ideas (Dashboard redesign,
+   gating Schreibtraining behind sign-in, animated-character scenario simulations, vocabulary
+   visual mnemonics, domain/sector-based content filtering, Schreibtraining redesign, and a
+   sourced/audit-ready content data pipeline). None scoped yet — see "Backlog — founder ideas"
+   above for the full list; a future session should help prioritize and break these into phases.
 
 _(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 100% complete ✅)_
