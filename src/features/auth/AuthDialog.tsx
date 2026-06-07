@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Lock, Mail, Sparkles, ShieldCheck, Cloud } from "lucide-react";
+import { Lock, Mail, Sparkles, Cloud } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -209,9 +209,6 @@ export function AuthDialog({
               <Cloud className="h-3.5 w-3.5" /> Dein bisheriger Fortschritt wird übernommen.
             </p>
           )}
-          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            <ShieldCheck className="h-3.5 w-3.5" /> Wir nutzen deine E-Mail nur für die Anmeldung.
-          </p>
         </div>
       </DialogContent>
     </Dialog>
