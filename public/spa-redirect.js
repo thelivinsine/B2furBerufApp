@@ -12,5 +12,11 @@
       return s.replace(/~and~/g, "&");
     })
     .join("?");
-  window.history.replaceState(null, "", l.pathname.slice(0, -1) + decoded + l.hash);
+  try {
+    window.history.replaceState(null, "", l.pathname.slice(0, -1) + decoded + l.hash);
+  } catch {
+    // best-effort: a malformed/cross-origin restore target makes the browser
+    // throw SecurityError; the page still loads fine, just on the redirected
+    // URL instead of the restored one, so failing quietly is the right call.
+  }
 })(window.location);
