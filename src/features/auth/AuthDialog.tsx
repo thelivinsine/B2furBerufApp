@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Lock, Mail, Sparkles, Cloud } from "lucide-react";
+import { Lock, Mail, Cloud } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -93,9 +93,7 @@ export function AuthDialog({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <div className="mb-1 inline-flex w-fit rounded-xl bg-accent-gradient p-2.5 text-white shadow-glow">
-            <Sparkles className="h-5 w-5" />
-          </div>
+          <img src="/favicon.svg" alt="" className="mb-1 h-10 w-10 rounded-xl shadow-glow" />
           <DialogTitle>{isSignup ? "Konto erstellen" : "Anmelden"}</DialogTitle>
           <DialogDescription>
             {isSignup
