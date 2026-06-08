@@ -58,7 +58,7 @@ export function ThemeToggle() {
       {/* pt-2 acts as an invisible hover bridge so the panel stays reachable */}
       <div
         className={cn(
-          "absolute right-0 top-full z-50 pt-2 group-hover:block",
+          "absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2 group-hover:block",
           open ? "block" : "hidden",
         )}
       >
