@@ -221,3 +221,9 @@ the Supabase dashboard. Do these once after the GDPR PR is live:
 4. **Fill the placeholders.** Replace the `[...]` legal name + address in
    `src/features/legal/Impressum.tsx`, and the `[fill in region]` data-location
    note in `PrivacyPolicy.tsx` (both DE and EN), before public launch.
+   - **Note (2026-06-08): the Impressum is currently HIDDEN** (route commented out
+     in `router.tsx`, all links removed) because the real name/address aren't set
+     yet. An Impressum is public by law, so use a business/service address (a
+     "ladungsfähige Anschrift", not a P.O. box) rather than a home address. To
+     re-enable: fill the placeholders, then uncomment the import + `/impressum`
+     route in `router.tsx` and restore the footer/Settings/privacy/terms links.

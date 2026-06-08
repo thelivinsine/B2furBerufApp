@@ -369,13 +369,6 @@ export function Settings() {
           >
             AGB
           </button>
-          <span aria-hidden className="text-border">·</span>
-          <button
-            onClick={() => navigate("/impressum")}
-            className="underline-offset-2 hover:text-foreground hover:underline"
-          >
-            Impressum
-          </button>
         </p>
       </div>
     </div>

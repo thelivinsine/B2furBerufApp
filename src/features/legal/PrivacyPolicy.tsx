@@ -248,12 +248,7 @@ function PrivacyDe() {
       <Section title="Kontakt">
         <p>
           Fragen, Anliegen oder Bedenken zu deinen Daten? Schreib uns an <MailLink />. Wir bemühen
-          uns, innerhalb weniger Werktage zu antworten. Unsere vollständige Anbieterkennzeichnung
-          findest du im{" "}
-          <a className="text-primary underline underline-offset-2" href="/impressum" target="_blank" rel="noreferrer">
-            Impressum
-          </a>
-          .
+          uns, innerhalb weniger Werktage zu antworten.
         </p>
       </Section>
     </>
@@ -457,11 +452,7 @@ function PrivacyEn() {
       <Section title="Contact us">
         <p>
           Questions, requests, or concerns about your data? Email us at <MailLink />. We aim to
-          respond within a few business days. Our full operator details are in the{" "}
-          <a className="text-primary underline underline-offset-2" href="/impressum" target="_blank" rel="noreferrer">
-            Impressum
-          </a>
-          .
+          respond within a few business days.
         </p>
       </Section>
     </>

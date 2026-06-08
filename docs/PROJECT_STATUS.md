@@ -718,6 +718,12 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     migration 0003, optionally enable pg_cron retention, fill Impressum + region placeholders).
     Still open: lawyer review (#15), real Impressum details, optional auto-retention, marketing
     opt-in UI once a campaign (#13) is built.
+    - **Impressum TEMPORARILY HIDDEN (founder, 2026-06-08):** the founder prefers not to put a home
+      name/address in the public Impressum yet (an Impressum is public by law; a GitHub secret can't
+      hide it since the page renders it to everyone). So `/impressum` is built but unrouted and all
+      links removed; `Impressum.tsx` stays in the repo. Re-enable with a business/service address
+      (a "ladungsfähige Anschrift", not a P.O. box) during the lawyer/launch pass: uncomment the
+      import + route in `router.tsx` and restore the footer/Settings/privacy/terms links.
     - **Email-usage note (2026-06-07):** when doing this, make the privacy policy explicitly
       cover *every* way email is used — auth/login, password reset + account recovery, and any
       future transactional mail (payment receipts/billing) and marketing mail — and add proper

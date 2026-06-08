@@ -77,10 +77,15 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   rounded transparent logo.
 
 ## Legal pages & consent (GDPR)
-- `/privacy`, `/terms`, and `/impressum` are bilingual (DE/EN) via the shared `LegalChrome` +
-  `Section` in `src/features/legal/`. **German is the legally binding version** (English is a
-  convenience translation, stated on each page). Every legal-copy edit MUST be mirrored in BOTH the
-  `*De` and `*En` bodies, and follow the no-em-dash writing rule.
+- `/privacy` and `/terms` are bilingual (DE/EN) via the shared `LegalChrome` + `Section` in
+  `src/features/legal/`. **German is the legally binding version** (English is a convenience
+  translation, stated on each page). Every legal-copy edit MUST be mirrored in BOTH the `*De` and
+  `*En` bodies, and follow the no-em-dash writing rule.
+- **`/impressum` is built but TEMPORARILY HIDDEN** (`src/features/legal/Impressum.tsx` exists, but
+  the route in `router.tsx` is commented out and all links, footer/Settings/privacy/terms, are
+  removed) because the founder hasn't filled the real name/address yet and prefers not to. Re-enable
+  once a business/service address is ready: uncomment the import + route, and restore the footer +
+  Settings + privacy/terms Impressum links. A commercial public launch legally needs this live.
 - Sign-up (`AuthDialog`) and the final onboarding step require an "I agree to AGB + Datenschutz"
   checkbox; consent is recorded via `recordConsent()` (`src/lib/consent.ts`) into the settings
   store, which rides into `profiles.settings` jsonb through `cloudSync`. **Keep `CONSENT_VERSION`
