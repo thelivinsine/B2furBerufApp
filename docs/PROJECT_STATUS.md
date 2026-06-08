@@ -720,6 +720,18 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       was already a stretch (reset/recovery) and would be broken outright once the marketing
       campaign (#13) and payment gateway (#9) ship. So the policy must not repeat that narrow
       "only for sign-in" claim.
+15. **Legal review with a lawyer (founder, 2026-06-08):** the live `/privacy` and `/terms` (AGB)
+    pages were written in plain language by the team, not a lawyer. Before any paid plans (#8/#9)
+    or a marketing campaign (#13) launch, have a qualified lawyer review both for German/EU
+    enforceability. Likely additions a lawyer will want: a proper **Impressum (§5 TMG)** with the
+    operator's real name + address, a clause on **which language version prevails** if DE and EN
+    differ, withdrawal/cancellation rights for paid plans (Widerrufsrecht), and tightened
+    liability wording. Ties into the GDPR-compliance item (#14).
+    - **Disclaimer-banner question (2026-06-08):** founder asked whether the live pages should say
+      the terms are "in development / under review." Recommendation: **no.** Calling your own terms
+      provisional weakens their enforceability and looks unfinished; the "Zuletzt aktualisiert" date
+      already signals they evolve. Keep the internal "needs lawyer review" caveat in this backlog,
+      not user-facing. (Pending founder's final say.)
 
 ## Resume here (next session)
 
