@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-07 (session 18 cont.). Branch: `claude/todo-inventory-BUHq0`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-08 (session 20). Branch: `claude/admiring-galileo-9E0Fi`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -257,6 +257,48 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
+
+### Session 20 (2026-06-08) — Logo lock, Terms page, GDPR pass, writing-history record SHIPPED ✅
+Branch `claude/admiring-galileo-9E0Fi`. All items squash-merged to `main` (PRs #120–#129).
+
+**Logo (PRs #120–#122):** brief detour where the app logo was made full-bleed (#120) then reverted
+(#121) because the founder prefers the rounded mark with transparent corners. Settled: the canonical
+default logo is **`public/genauly-default-logo-transparent-corners.png`**, used in all 6 in-app spots;
+`favicon.svg` + `pwa-*.png` keep their conventional names and render the same mark (#122). The
+full-bleed square variant exists ONLY for Google's circular OAuth consent crop, NOT for the app. Rule
+documented in `CLAUDE.md` → "Brand logo" so future sessions don't flip it again.
+
+**Terms of Service + bilingual legal toggle (PR #123):** new `/terms` (AGB) page; both `/privacy` and
+`/terms` now share `LegalChrome` with a **Deutsch/English toggle** (default German, German is binding).
+Fixed em dashes in the privacy copy. Footer + Settings link to both.
+
+**Legal review backlog (#15, PRs #124–#125):** recorded the need for a lawyer pass before paid
+plans/marketing; decided (founder-confirmed) **no "under review" banner** on the live legal pages.
+
+**GDPR pass (PR #126, the big one):** audit done (3-agent), then a robust first implementation.
+Shipped: consent checkbox at sign-up (`AuthDialog`, incl. Google) + final onboarding step, recorded via
+`recordConsent()`/`CONSENT_VERSION` (`src/lib/consent.ts`) into `profiles.settings` jsonb; in-app data
+export (`src/lib/dataExport.ts`); in-app account deletion (`supabase/functions/delete-account` +
+`useAuthStore.deleteAccount`, two-step + type-LÖSCHEN confirm); per-submission writing delete
+(`deleteWritingEvaluation` + `writing_delete_own` RLS policy, migration `0003`); honest reset that also
+clears cloud progress when signed in (`cloudSync.pushProgressNow`). **Decision: no cookie banner**
+(functional-only storage is consent-exempt under GDPR/§25(2) TTDSG). **Founder did the two Supabase
+steps live** (ran migration 0003, deployed delete-account), so deletion + per-item delete are active.
+
+**Impressum (PRs created in #126, hidden in #127):** built a bilingual `/impressum`, then **temporarily
+hid it** (route commented out, all links removed; file kept) because the founder doesn't want to publish
+a home name/address yet. An Impressum is public by law (a GitHub secret can't hide it). Re-enable with a
+business/service address ("ladungsfähige Anschrift", not a P.O. box) during the lawyer/launch pass.
+
+**Writing history record + redesign (PRs #128–#129):** the Verlauf only showed the AI tip, with no record
+of the task or the user's own text. Now each entry has an expandable section showing the **Aufgabe**
+(from `writingPrompts[theme][length]`) and **Dein Text** (the submitted text, already stored in
+`writing_evaluations.text`, now fetched). Then redesigned the entry for clear hierarchy: tip in a
+highlighted box (Lightbulb + label + weakness badge), Aufgabe/Dein Text in labeled bordered boxes, a
+proper "üben" button.
+
+**Also confirmed live:** the Google OAuth consent screen branding (app name "Genauly" + logo, domain
+verified via Namecheap DNS, app published) was completed by the founder this session.
 
 ### Session 19 (2026-06-07) — Sign-in dialog UX overhaul + brand identity unification SHIPPED ✅
 
@@ -748,9 +790,9 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–19 (2026-06-04 → 06-07).** Everything noted ✅ is merged to `main`.
-Active automation branch: `claude/todo-inventory-BUHq0` (realign to `origin/main` after each
-squash-merge — see CLAUDE.md).
+**Handoff after sessions 9–20 (2026-06-04 → 06-08).** Everything noted ✅ is merged to `main`.
+Active automation branch: `claude/admiring-galileo-9E0Fi` (realign to `origin/main` after each
+squash-merge — see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
 **Shipped & live (all on `main`):**
 - **Blank-page bug FIXED (s9):** circular ESM chunk → pre-React TDZ crash + permanent crash painter.
@@ -794,12 +836,23 @@ squash-merge — see CLAUDE.md).
   and the `/privacy` page header. Sparkles remains as a content/decorative icon elsewhere
   (onboarding step headers, guest-progress notes) per the founder's "keep it for later".
 
-- **Legal pages — bilingual + Terms added (s20, 2026-06-08):** `/privacy` and a new `/terms`
-  (Terms of Service / AGB) now share a `LegalChrome` shell with a **Deutsch / English toggle**
-  at the top (default German). Both pages have full DE + EN content; the privacy copy's em dashes
-  were fixed to satisfy the writing-style rule. Footer of the landing page and the Settings page
-  link to both (Datenschutz · AGB). The Terms page is plain-language and matches the current
-  free-tool/optional-account/AI-feedback reality; revisit before paid plans launch.
+- **Legal pages — bilingual + Terms added (s20, PR #123):** `/privacy` and a new `/terms`
+  (Terms of Service / AGB) share a `LegalChrome` shell with a **Deutsch / English toggle** (default
+  German, German is binding). Full DE + EN content; em dashes fixed. Footer + Settings link to both.
+- **Default logo locked (s20, PRs #120–#122):** rounded gradient "G" with transparent corners,
+  canonical file `public/genauly-default-logo-transparent-corners.png`, used in all 6 in-app spots.
+  Full-bleed square is for Google's OAuth consent crop only, never the app. (`CLAUDE.md` → "Brand logo".)
+- **GDPR pass shipped (s20, PR #126):** consent capture at sign-up + onboarding (`CONSENT_VERSION`),
+  in-app data export, in-app account deletion (`delete-account` Edge Function), per-submission writing
+  delete (`writing_delete_own` policy, migration 0003), honest reset (also clears cloud when signed in).
+  Founder ran the migration + deployed the function live, so all are active. No cookie banner needed.
+- **Impressum built but HIDDEN (s20, PR #127):** `/impressum` exists but is unrouted with all links
+  removed until the founder provides a business/service address (it is public by law). Re-enable steps
+  in `CLAUDE.md`, `docs/PHASE2_SETUP.md`.
+- **Writing history records task + text (s20, PRs #128–#129):** the Verlauf now shows the Aufgabe and
+  the learner's own submitted text in an expandable, well-structured entry (tip box + labeled sections).
+- **Google OAuth consent branding DONE (s20):** founder completed the Google Cloud Console steps
+  (app name "Genauly" + logo, domain `genauly.de` verified via Namecheap DNS TXT, app published).
 
 **Security — 100% complete. No open items.**
 
@@ -813,6 +866,11 @@ squash-merge — see CLAUDE.md).
   standard for ALL popups/dialogs/sheets going forward. Already wired into the shared
   `DialogContent`/`DialogPrimitive.Overlay` in `src/components/ui/dialog.tsx`. Full spec in
   `CLAUDE.md` → "UI conventions — modal / popup overlays".
+- **Default logo (locked 2026-06-08):** rounded "G" with transparent corners
+  (`public/genauly-default-logo-transparent-corners.png`); never full-bleed in the app. `CLAUDE.md` → "Brand logo".
+- **Legal/GDPR (locked 2026-06-08):** German is the binding legal-language version; **no cookie
+  banner** (functional-only storage is consent-exempt); GDPR rights are in-app self-service. Keep
+  `CONSENT_VERSION` (`src/lib/consent.ts`) in lockstep with the legal `LAST_UPDATED`. `CLAUDE.md` → "Legal pages & consent".
 
 **Content counts (live):**
 - Vocabulary: **~504 words** (~50/theme · 10 themes)
@@ -822,18 +880,18 @@ squash-merge — see CLAUDE.md).
 - Exam sets: **10** (1 per theme · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
 
-**Dev branch:** `claude/todo-inventory-BUHq0` — realign to `origin/main` after each squash-merge.
+**Dev branch:** `claude/admiring-galileo-9E0Fi` — realign to `origin/main` after each squash-merge.
 
 **Next (priority order):**
-1. **Content QC pipeline** — CI lint script for duplicate IDs, broken dialogue nodes, missing
-   required fields; plus a pedagogical review process for German accuracy and B2 level-appropriateness.
-2. **Google sign-in branding (parked 2026-06-07)** — consent screen still shows the raw Supabase
-   domain instead of "Genauly". Privacy policy prerequisite is live; founder attempted the Google
-   Cloud Console steps but didn't finish. Needs a guided walkthrough next session — see "Founder
-   action items" for the exact checklist and where it got stuck.
-3. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-4. (Optional) Logo / branding for app icon.
-5. (Optional) Monetization tier + paywall feature flags.
+1. **GDPR follow-ups (from s20 pass):** fill the **Impressum** name/address (then re-enable the page
+   per `CLAUDE.md`/`PHASE2_SETUP.md`) and the **data-location region** placeholder in the privacy
+   policy; optionally enable the **pg_cron auto-retention** for writing text (SQL in `PHASE2_SETUP.md`).
+2. **Lawyer review of `/privacy` + `/terms` (backlog #15)** before paid plans / marketing. Likely adds
+   the real Impressum, Widerrufsrecht for paid plans, tighter liability.
+3. **Content QC pipeline** — CI lint for duplicate IDs, broken dialogue nodes, missing fields; plus a
+   pedagogical review process for German accuracy and B2 level-appropriateness.
+4. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
+5. (Optional) Monetization tier + paywall feature flags (the `tier` column already exists).
 6. (Optional) More grammar drills (47 → ~80 target).
 7. (Optional) More vocabulary content expansion (504 → ~600+ target).
 8. **Founder ideas backlog (added 2026-06-07)** — 14 raw feature ideas spanning product (Dashboard
