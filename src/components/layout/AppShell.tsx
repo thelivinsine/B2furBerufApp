@@ -48,7 +48,7 @@ export function AppShell() {
                 className="flex items-center gap-2 lg:hidden"
                 aria-label="Zur Startseite"
               >
-                <img src="/favicon.svg" alt="" className="h-8 w-8 rounded-lg shadow-glow" />
+                <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-8 w-8 rounded-lg shadow-glow" />
                 <span className="text-sm font-semibold tracking-tight">Genauly</span>
               </Link>
               <p className="hidden text-sm text-muted-foreground lg:block">

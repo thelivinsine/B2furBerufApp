@@ -36,7 +36,7 @@ export function PrivacyPolicy() {
           onClick={() => navigate("/welcome")}
           className="flex items-center gap-2.5 text-left"
         >
-          <img src="/favicon.svg" alt="" className="h-9 w-9 rounded-lg shadow-glow" />
+          <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-9 w-9 rounded-lg shadow-glow" />
           <span className="text-lg font-semibold tracking-tight">Genauly</span>
         </button>
         <Button variant="ghost" onClick={handleBack} className="gap-1.5">

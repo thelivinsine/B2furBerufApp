@@ -40,8 +40,16 @@ This file is the single place to re-orient when resuming work. For the full desi
 ### Branding — DONE (live)
 - App named **Genauly**, tagline **"German that clicks"** (header, sidebar, onboarding,
   `<title>`/meta, `package.json` name `genauly`). Custom domain **genauly.de** (CNAME shipped).
-- **Logo: reverted to placeholder** (Sparkles icon + original gradient speech-bubble favicon).
-  A custom mark was tried and rolled back; founder will choose a logo later.
+- **Default logo (locked 2026-06-08):** the **rounded gradient "G" with transparent corners**.
+  The canonical file is **`public/genauly-default-logo-transparent-corners.png`** and it is the
+  default logo in every in-app spot (sign-in dialog, mobile header, desktop sidebar, landing,
+  onboarding, `/privacy`). `public/favicon.svg` (the rounded vector source) and the
+  `public/pwa-*.png` / `apple-touch-icon.png` icons render the **same** logo under their
+  conventional names (the browser tab + PWA install/home-screen icons need those exact filenames).
+  - **Do NOT make the app logo full-bleed.** A full-bleed square variant exists **only** for
+    Google's OAuth consent screen (its circular crop shows white through transparent corners). It
+    is not committed to the repo and must not replace the app logo. (Full-bleed-everywhere was
+    shipped then reverted in PRs #120/#121 — keep the app on the rounded transparent logo.)
 
 ### Phase 2 — SHIPPED & LIVE ✅ (squash-merged to `main` 2026-05-31, founder-verified)
 - Supabase auth + cloud sync + AI writing eval fully deployed and smoke-tested by founder.

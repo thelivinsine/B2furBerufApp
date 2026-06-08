@@ -62,6 +62,20 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   free. Reuse those tokens (don't hand-roll a new overlay style) for sheets, drawers, and other
   popups too, adjusting only the radial center/stops if a different focal point is needed.
 
+## Brand logo (locked 2026-06-08)
+- The **default logo is the rounded gradient "G" with transparent corners.** The canonical asset
+  is **`public/genauly-default-logo-transparent-corners.png`**; every in-app logo `<img>` points
+  at it (sign-in dialog, mobile header `AppShell`, desktop `Sidebar`, landing, onboarding,
+  `/privacy`). When adding a new logo spot, reuse this file (keep the CSS `rounded-lg`/`rounded-xl`
+  + `shadow-glow` styling).
+- `public/favicon.svg` is the rounded **vector source** of the same mark (used for the browser
+  tab); `public/pwa-*.png` + `apple-touch-icon.png` are the PWA install / home-screen icons. They
+  all show the **same** logo under their conventional, tooling-required filenames. Don't rename them.
+- **Never make the app logo full-bleed.** A full-bleed square variant exists **only** for Google's
+  OAuth consent screen (its circular crop reveals white through transparent corners). It is not in
+  the repo. Full-bleed-everywhere was shipped then reverted (PRs #120/#121); keep the app on the
+  rounded transparent logo.
+
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
 - **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/genauly-blank-page-9biDi`).

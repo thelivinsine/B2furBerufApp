@@ -93,7 +93,7 @@ export function AuthDialog({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <img src="/favicon.svg" alt="" className="mb-1 h-10 w-10 rounded-xl shadow-glow" />
+          <img src="/genauly-default-logo-transparent-corners.png" alt="" className="mb-1 h-10 w-10 rounded-xl shadow-glow" />
           <DialogTitle>{isSignup ? "Konto erstellen" : "Anmelden"}</DialogTitle>
           <DialogDescription>
             {isSignup
