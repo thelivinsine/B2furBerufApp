@@ -1,7 +1,7 @@
 import { Suspense, useState } from "react";
 import { Outlet, useLocation, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Zap, Sparkles } from "lucide-react";
+import { Flame, Zap } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { BottomTabBar } from "./BottomTabBar";
@@ -48,9 +48,7 @@ export function AppShell() {
                 className="flex items-center gap-2 lg:hidden"
                 aria-label="Zur Startseite"
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent-gradient text-white shadow-glow">
-                  <Sparkles className="h-4 w-4" />
-                </div>
+                <img src="/favicon.svg" alt="" className="h-8 w-8 rounded-lg shadow-glow" />
                 <span className="text-sm font-semibold tracking-tight">Genauly</span>
               </Link>
               <p className="hidden text-sm text-muted-foreground lg:block">
