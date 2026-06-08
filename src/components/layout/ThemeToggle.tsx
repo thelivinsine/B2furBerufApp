@@ -80,7 +80,7 @@ export function ThemeToggle() {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground",
               )}
             >
-              <Icon className="h-3.5 w-3.5" />
+              <Icon className="h-4 w-4" />
             </button>
           ))}
         </div>
