@@ -34,8 +34,18 @@ export function ThemeToggle() {
     };
   }, [open]);
 
-  const active = options.find((o) => o.value === themeMode) ?? options[1];
+  const activeIndex = Math.max(
+    0,
+    options.findIndex((o) => o.value === themeMode),
+  );
+  const active = options[activeIndex];
   const ActiveIcon = active.icon;
+
+  // The collapsed trigger shows the active option's icon, so the panel has to
+  // line up that option (not the middle one) under the trigger. Each option is
+  // 34px wide (w-8 button + gap-0.5), so shift the centered panel by the
+  // active option's distance from the middle.
+  const panelOffsetX = (1 - activeIndex) * 34;
 
   const choose = (value: ThemeMode) => {
     setSettings({ themeMode: value });
@@ -57,8 +67,9 @@ export function ThemeToggle() {
 
       {/* pt-2 acts as an invisible hover bridge so the panel stays reachable */}
       <div
+        style={{ transform: `translateX(calc(-50% + ${panelOffsetX}px))` }}
         className={cn(
-          "absolute left-1/2 top-full z-50 -translate-x-1/2 pt-2 group-hover:block",
+          "absolute left-1/2 top-full z-50 pt-2 group-hover:block",
           open ? "block" : "hidden",
         )}
       >
