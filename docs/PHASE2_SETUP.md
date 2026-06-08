@@ -182,3 +182,42 @@ Target spend: low single-digit dollars per month even at hundreds of users.
 | Anthropic / Gemini / OpenAI keys | Supabase Edge Function secrets | ❌ secret |
 | LanguageTool key | Supabase Edge Function secrets | ❌ secret |
 | Service-role key | injected into the function by Supabase | ❌ secret |
+
+## GDPR features: founder setup steps
+
+The in-app GDPR features (data export, account deletion, per-submission delete,
+honest reset) ship in the frontend, but three of them need a one-time action in
+the Supabase dashboard. Do these once after the GDPR PR is live:
+
+1. **Per-submission delete policy (required for the writing-history delete button).**
+   Run the migration `supabase/migrations/0003_writing_delete_policy.sql` in the
+   Supabase SQL editor. Without it the delete button fails loudly (it never
+   silently pretends to work). Verify: the policy `writing_delete_own` appears
+   under Authentication → Policies for `writing_evaluations`.
+
+2. **Account-deletion Edge Function (required for the "Konto löschen" button).**
+   Deploy it: `supabase functions deploy delete-account`. No new secrets are
+   needed (`SUPABASE_SERVICE_ROLE_KEY` is injected automatically). If you set the
+   `ALLOWED_ORIGINS` secret for `evaluate-writing`, it applies here too; make sure
+   it includes `https://genauly.de`. The function only ever deletes the caller's
+   own account (it derives the user id from their login token, never from the
+   request), and the delete cascades to all of that user's rows.
+
+3. **Optional: auto-retention for writing text.** Writing submissions are kept
+   until the user deletes them (per-item or by deleting the account). If you also
+   want an automatic time limit, enable `pg_cron` and schedule a daily purge in
+   the SQL editor:
+   ```sql
+   create extension if not exists pg_cron;
+   select cron.schedule(
+     'purge-old-writing', '0 3 * * *',
+     $$ delete from public.writing_evaluations where created_at < now() - interval '12 months' $$
+   );
+   ```
+   Default suggestion: 12 months. If you enable this, make the retention wording
+   in `PrivacyPolicy.tsx` match. To change the window: `select cron.unschedule('purge-old-writing');`
+   then reschedule. Verify jobs with `select * from cron.job;`.
+
+4. **Fill the placeholders.** Replace the `[...]` legal name + address in
+   `src/features/legal/Impressum.tsx`, and the `[fill in region]` data-location
+   note in `PrivacyPolicy.tsx` (both DE and EN), before public launch.

@@ -173,6 +173,24 @@ async function pushSettings() {
   }
 }
 
+/**
+ * Push the current local progress to the cloud immediately (no debounce) and
+ * report success. Used by the Settings "reset" flow so a signed-in user's
+ * zeroed progress actually overwrites the cloud row; otherwise the next login
+ * merge (which takes Math.max/union) would silently restore the old values.
+ */
+export async function pushProgressNow(): Promise<boolean> {
+  if (!userId) return false;
+  try {
+    const { error } = await supabase
+      .from("progress")
+      .upsert(progressRow(useProgressStore.getState()));
+    return !error;
+  } catch {
+    return false;
+  }
+}
+
 function scheduleProgressPush() {
   if (applyingRemote || !userId) return;
   if (progressTimer) clearTimeout(progressTimer);

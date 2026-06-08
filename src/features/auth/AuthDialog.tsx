@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { TurnstileWidget } from "@/components/shared/TurnstileWidget";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSessionStore } from "@/store/useSessionStore";
+import { recordConsent, hasConsented } from "@/lib/consent";
 
 const TURNSTILE_ENABLED = !!import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -47,6 +48,7 @@ export function AuthDialog({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [consent, setConsent] = useState(false);
 
   // Sync to the requested intent each time the dialog is opened.
   useEffect(() => {
@@ -54,15 +56,24 @@ export function AuthDialog({
       setMode(intent);
       clearError();
       setCaptchaToken(null); // widget re-renders and re-solves on each open
+      // Pre-check if the user already accepted the current terms (e.g. a guest
+      // who consented during onboarding upgrading to a full account).
+      setConsent(hasConsented());
     }
   }, [open, intent, clearError]);
 
   const isSignup = mode === "signup";
   const captchaReady = !TURNSTILE_ENABLED || captchaToken !== null;
-  const canSubmit = email.trim().length > 3 && password.length >= 6 && !busy && captchaReady;
+  // Sign-up requires accepting the AGB + Datenschutzerklärung; log-in does not.
+  const consentReady = !isSignup || consent;
+  const canSubmit =
+    email.trim().length > 3 && password.length >= 6 && !busy && captchaReady && consentReady;
 
   const submit = async () => {
     if (!canSubmit) return;
+    // Record consent before the call so it persists locally and syncs to the
+    // cloud once the session resolves (covers the email + guest-upgrade paths).
+    if (isSignup) recordConsent();
     const fn = isSignup ? signUp : signIn;
     const { ok, needsConfirmation } = await fn(email.trim(), password, captchaToken ?? undefined);
     if (!ok) return;
@@ -151,8 +162,12 @@ export function AuthDialog({
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => signInWithGoogle(captchaToken ?? undefined)}
-                disabled={busy || !captchaReady}
+                onClick={() => {
+                  // OAuth redirects away immediately, so record consent first.
+                  if (isSignup) recordConsent();
+                  signInWithGoogle(captchaToken ?? undefined);
+                }}
+                disabled={busy || !captchaReady || !consentReady}
               >
                 <GoogleIcon /> Weiter mit Google
               </Button>
@@ -195,6 +210,38 @@ export function AuthDialog({
           </div>
 
           <TurnstileWidget onToken={setCaptchaToken} />
+
+          {isSignup && (
+            <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
+              />
+              <span>
+                Ich stimme den{" "}
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
+                  AGB
+                </a>{" "}
+                und der{" "}
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
+                  Datenschutzerklärung
+                </a>{" "}
+                zu.
+              </span>
+            </label>
+          )}
 
           {error && <p className="text-sm font-medium text-danger">{error}</p>}
 

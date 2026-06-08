@@ -129,6 +129,12 @@ function PrivacyDe() {
       <Section title="Wie wir deine Informationen verwenden">
         <ul className="list-disc space-y-2 pl-5">
           <li>Um dein Konto zu erstellen und zu sichern und dir die geräteübergreifende Anmeldung zu ermöglichen.</li>
+          <li>
+            Um dir wichtige servicebezogene E-Mails zu senden: Anmeldung, Passwort-Zurücksetzen und
+            Kontowiederherstellung. Falls wir künftig kostenpflichtige Pläne anbieten, auch
+            Zahlungs- und Rechnungs-E-Mails. Marketing- oder Werbe-E-Mails senden wir nur mit deiner
+            gesonderten Einwilligung (Opt-in); derzeit versenden wir keine.
+          </li>
           <li>Um deinen Lernfortschritt in die Cloud zu synchronisieren und zu sichern.</li>
           <li>Um das KI-Schreibfeedback zu erzeugen, das du ausdrücklich anforderst.</li>
           <li>Um Spam und automatisierten Missbrauch zu verhindern (CAPTCHA, Ratenbegrenzung).</li>
@@ -156,16 +162,21 @@ function PrivacyDe() {
           liegen ausschließlich in gesichertem serverseitigem Speicher und werden nie in der App
           oder im Browser offengelegt.
         </p>
+        <p className="mt-2">
+          Datenstandort: Unsere Supabase-Datenbank wird in der Region [Region eintragen, z. B. EU]
+          gehostet. Die KI-Anbieter können Anfragen auch außerhalb der EU verarbeiten; dabei gelten
+          deren eigene Schutzmaßnahmen und Vertragsklauseln.
+        </p>
       </Section>
 
       <Section title="Wie lange wir deine Daten speichern">
         <p>
           Konto-, Profil- und Fortschrittsdaten werden so lange gespeichert, wie dein Konto
-          besteht. Schreibeinreichungen und ihr KI-Feedback werden derzeit unbegrenzt aufbewahrt,
-          damit dein Analyseverlauf vollständig bleibt; dies bleibt privat für dich (wieder
-          Row-Level-Security) und wird nie für einen Zweck verwendet, der über das Anzeigen deines
-          eigenen Verlaufs hinausgeht. Wenn du deinen Schreibverlauf löschen möchtest, ohne dein
-          ganzes Konto zu löschen, kontaktiere uns und wir erledigen das manuell.
+          besteht. Schreibeinreichungen und ihr KI-Feedback bleiben gespeichert, damit dein
+          Analyseverlauf vollständig bleibt. Du kannst einzelne Auswertungen jederzeit selbst im
+          Schreibverlauf löschen oder mit deinem Konto alle auf einmal entfernen. Diese Daten
+          bleiben privat für dich (wieder Row-Level-Security) und werden nie für einen Zweck
+          verwendet, der über das Anzeigen deines eigenen Verlaufs hinausgeht.
         </p>
       </Section>
 
@@ -177,14 +188,15 @@ function PrivacyDe() {
             Einstellungen → Gefahrenzone („Fortschritt zurücksetzen“).
           </li>
           <li>
-            <strong>Eine Kopie deiner gespeicherten Daten exportieren oder anfordern</strong>,
-            per E-Mail an uns.
+            <strong>Deine Daten exportieren</strong>, direkt in Einstellungen → „Daten
+            exportieren“ (lädt eine JSON-Kopie deines Profils, deines Fortschritts und deiner
+            Schreib-Auswertungen herunter). Auf Wunsch auch per E-Mail an uns.
           </li>
           <li>
-            <strong>Dein Konto vollständig löschen</strong> (wodurch dein Profil, Fortschritt und
-            Schreibverlauf dauerhaft aus unserer Datenbank entfernt werden), per E-Mail an{" "}
-            <MailLink />. Wir setzen das in angemessener Zeit um und bestätigen, sobald es erledigt
-            ist.
+            <strong>Einzelne Schreib-Auswertungen löschen</strong> im Schreibverlauf, oder{" "}
+            <strong>dein Konto vollständig löschen</strong> in Einstellungen → „Konto löschen“.
+            Dies entfernt dein Profil, deinen Fortschritt und deinen Schreibverlauf endgültig aus
+            der Cloud. Alternativ per E-Mail an <MailLink />.
           </li>
           <li>
             <strong>Der Verarbeitung widersprechen oder sie einschränken</strong>, mit der du
@@ -226,10 +238,22 @@ function PrivacyDe() {
         </p>
       </Section>
 
+      <Section title="Maßgebliche Sprachfassung">
+        <p>
+          Diese Datenschutzerklärung wird in Deutsch und Englisch bereitgestellt. Bei Abweichungen
+          zwischen den Fassungen ist die deutsche Fassung maßgeblich.
+        </p>
+      </Section>
+
       <Section title="Kontakt">
         <p>
           Fragen, Anliegen oder Bedenken zu deinen Daten? Schreib uns an <MailLink />. Wir bemühen
-          uns, innerhalb weniger Werktage zu antworten.
+          uns, innerhalb weniger Werktage zu antworten. Unsere vollständige Anbieterkennzeichnung
+          findest du im{" "}
+          <a className="text-primary underline underline-offset-2" href="/impressum" target="_blank" rel="noreferrer">
+            Impressum
+          </a>
+          .
         </p>
       </Section>
     </>
@@ -320,6 +344,11 @@ function PrivacyEn() {
       <Section title="How we use your information">
         <ul className="list-disc space-y-2 pl-5">
           <li>To create and secure your account, and let you sign in across devices.</li>
+          <li>
+            To send you essential service emails: sign-in, password reset, and account recovery.
+            If we add paid plans later, also payment and billing emails. We send marketing or
+            promotional email only with your separate opt-in consent, and we currently send none.
+          </li>
           <li>To sync and back up your learning progress to the cloud.</li>
           <li>To generate the AI writing feedback you explicitly request.</li>
           <li>To prevent spam and automated abuse (CAPTCHA, rate limits).</li>
@@ -346,15 +375,21 @@ function PrivacyEn() {
           OpenAI, Gemini, and Supabase admin keys live only in secured server-side storage and are
           never exposed in the app or browser.
         </p>
+        <p className="mt-2">
+          Data location: our Supabase database is hosted in the [fill in region, e.g. EU] region.
+          The AI providers may process requests outside the EU under their own safeguards and
+          contractual terms.
+        </p>
       </Section>
 
       <Section title="How long we keep your data">
         <p>
           Account, profile, and progress data are kept for as long as your account exists. Writing
-          submissions and their AI feedback are currently retained indefinitely so your Analytics
-          history stays complete; this stays private to you (row-level security again) and is never
-          used for any purpose beyond showing you your own history. If you would like your writing
-          history cleared without deleting your whole account, contact us and we'll do it manually.
+          submissions and their AI feedback are retained so your Analytics history stays complete.
+          You can delete individual evaluations yourself in your writing history at any time, or
+          remove them all at once by deleting your account. This data stays private to you
+          (row-level security again) and is never used for any purpose beyond showing you your own
+          history.
         </p>
       </Section>
 
@@ -366,12 +401,15 @@ function PrivacyEn() {
             ("Fortschritt zurücksetzen").
           </li>
           <li>
-            <strong>Export or request a copy</strong> of your stored data by emailing us.
+            <strong>Export your data</strong> directly in Settings → "Daten exportieren"
+            (downloads a JSON copy of your profile, progress, and writing evaluations). You can
+            also request it by email.
           </li>
           <li>
-            <strong>Delete your account entirely</strong> (which permanently removes your profile,
-            progress, and writing history from our database) by emailing us at <MailLink />. We
-            will action this within a reasonable time and confirm once it's done.
+            <strong>Delete individual writing evaluations</strong> in your writing history, or{" "}
+            <strong>delete your account entirely</strong> in Settings → "Konto löschen". This
+            permanently removes your profile, progress, and writing history from the cloud.
+            Alternatively, email us at <MailLink />.
           </li>
           <li>
             <strong>Object to or restrict</strong> any processing you're not comfortable with.
@@ -409,10 +447,21 @@ function PrivacyEn() {
         </p>
       </Section>
 
+      <Section title="Governing language">
+        <p>
+          This privacy policy is provided in German and English. In case of any discrepancy between
+          the versions, the German version prevails.
+        </p>
+      </Section>
+
       <Section title="Contact us">
         <p>
           Questions, requests, or concerns about your data? Email us at <MailLink />. We aim to
-          respond within a few business days.
+          respond within a few business days. Our full operator details are in the{" "}
+          <a className="text-primary underline underline-offset-2" href="/impressum" target="_blank" rel="noreferrer">
+            Impressum
+          </a>
+          .
         </p>
       </Section>
     </>

@@ -708,10 +708,16 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 12. **SEO:** make the whole app + landing page SEO-friendly and take concrete measures so it
     surfaces in Google search results (meta tags, structured data, sitemap, performance, etc.).
 13. **Marketing campaign:** plan and run a marketing campaign to drive signups/awareness.
-14. **GDPR compliance:** audit and bring the whole app into GDPR compliance (consent banners/cookie
-    notices, data-processing records, DSR/export-and-delete flows, etc. — beyond the existing
-    `/privacy` Datenschutzerklärung page, which covers disclosure but not the full compliance
-    posture).
+14. **GDPR compliance (IN PROGRESS, s20 2026-06-08):** audit done + first robust pass shipped.
+    Delivered: sign-up/onboarding consent checkbox with recorded consent (`CONSENT_VERSION`),
+    in-app data export, in-app account deletion (`delete-account` Edge Function), per-submission
+    writing delete (+ `writing_delete_own` RLS policy), honest reset that also clears cloud, a
+    bilingual `/impressum` page, and privacy/terms copy updates (email usage, language-precedence,
+    data-location, self-service rights). Decision: **no cookie banner** (functional-only storage is
+    consent-exempt). Founder one-time steps in `docs/PHASE2_SETUP.md` (deploy function, run
+    migration 0003, optionally enable pg_cron retention, fill Impressum + region placeholders).
+    Still open: lawyer review (#15), real Impressum details, optional auto-retention, marketing
+    opt-in UI once a campaign (#13) is built.
     - **Email-usage note (2026-06-07):** when doing this, make the privacy policy explicitly
       cover *every* way email is used — auth/login, password reset + account recovery, and any
       future transactional mail (payment receipts/billing) and marketing mail — and add proper

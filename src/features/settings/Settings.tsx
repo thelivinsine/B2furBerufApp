@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sun, Moon, Monitor, Volume2, VolumeX, Mic, MicOff, AlertTriangle } from "lucide-react";
+import { Sun, Moon, Monitor, Volume2, VolumeX, Mic, MicOff, AlertTriangle, Download, Loader2, Trash2 } from "lucide-react";
 import { useSettingsStore, type ThemeMode } from "@/store/useSettingsStore";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { getGermanVoices } from "@/engine/speech";
+import { exportUserData } from "@/lib/dataExport";
+import { pushProgressNow } from "@/lib/cloudSync";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
@@ -14,6 +17,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SectionHeading } from "@/components/shared/misc";
 import { AccountPanel } from "@/features/auth/AccountPanel";
 import { cn } from "@/lib/utils";
+
+const DELETE_CONFIRM_WORD = "LÖSCHEN";
 
 const themeModes: { id: ThemeMode; label: string; icon: typeof Sun }[] = [
   { id: "light", label: "Hell", icon: Sun },
@@ -26,19 +31,60 @@ export function Settings() {
   const settings = useSettingsStore();
   const resetProgress = useProgressStore((s) => s.resetProgress);
   const showToast = useSessionStore((s) => s.showToast);
+  const status = useAuthStore((s) => s.status);
+  const deleteAccount = useAuthStore((s) => s.deleteAccount);
+  const busy = useAuthStore((s) => s.busy);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteWord, setDeleteWord] = useState("");
 
+  const signedIn = status === "signedIn" || status === "anonymous";
   const voices = getGermanVoices();
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!confirmReset) {
       setConfirmReset(true);
       return;
     }
     resetProgress();
     settings.resetSettings();
-    showToast("Fortschritt zurückgesetzt.", "warning");
+    // Local-only reset would be undone by the next cloud merge (it takes the
+    // max of local/remote), so when signed in push the zeroed state up too.
+    if (signedIn) {
+      const ok = await pushProgressNow();
+      showToast(
+        ok
+          ? "Fortschritt zurückgesetzt (auch in der Cloud)."
+          : "Lokal zurückgesetzt. Die Cloud wird synchronisiert, sobald du online bist.",
+        "warning",
+      );
+    } else {
+      showToast("Lokaler Fortschritt zurückgesetzt.", "warning");
+    }
     setConfirmReset(false);
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportUserData();
+      showToast("Datenexport heruntergeladen.", "success");
+    } catch {
+      showToast("Export fehlgeschlagen. Bitte versuche es erneut.", "warning");
+    }
+    setExporting(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteWord.trim().toUpperCase() !== DELETE_CONFIRM_WORD) return;
+    const ok = await deleteAccount();
+    if (ok) {
+      showToast("Dein Konto wurde gelöscht.", "default");
+      navigate("/welcome", { replace: true });
+    } else {
+      showToast("Konto konnte nicht gelöscht werden. Bitte versuche es erneut.", "warning");
+    }
   };
 
   return (
@@ -206,12 +252,32 @@ export function Settings() {
           </CardContent>
         </Card>
 
-        {/* Danger zone */}
+        {/* Your data */}
+        <Card>
+          <CardContent className="space-y-3 p-5">
+            <p className="font-semibold">Deine Daten</p>
+            <p className="text-sm text-muted-foreground">
+              Lade eine Kopie deiner Daten als JSON herunter: dein Profil, dein Lernfortschritt und
+              (wenn du angemeldet bist) deine gespeicherten Schreib-Auswertungen.
+            </p>
+            <Button variant="outline" onClick={handleExport} disabled={exporting} className="gap-2">
+              {exporting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              Daten exportieren
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Danger zone: reset progress */}
         <Card className="border-danger/30">
           <CardContent className="space-y-3 p-5">
             <p className="font-semibold text-danger">Gefahrenzone</p>
+            <p className="text-sm font-medium">Fortschritt zurücksetzen</p>
             <p className="text-sm text-muted-foreground">
-              Alle Lernfortschritte (XP, Karteikarten, Serien, Prüfungsdaten) werden dauerhaft gelöscht.
+              Setzt deinen Lernfortschritt (XP, Karteikarten, Serien, Prüfungsdaten) zurück.
+              {signedIn
+                ? " Da du angemeldet bist, wird auch die Cloud-Kopie gelöscht."
+                : " Dies betrifft nur dieses Gerät."}{" "}
+              Dein Konto bleibt bestehen.
             </p>
             {confirmReset && (
               <motion.div
@@ -228,13 +294,68 @@ export function Settings() {
                 <Button variant="outline" onClick={() => setConfirmReset(false)}>Abbrechen</Button>
               )}
               <Button variant={confirmReset ? "danger" : "outline"} onClick={handleReset}>
-                {confirmReset ? "Ja, alles löschen" : "Fortschritt zurücksetzen"}
+                {confirmReset ? "Ja, Fortschritt löschen" : "Fortschritt zurücksetzen"}
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        <p className="flex items-center justify-center gap-4 text-center text-xs text-muted-foreground">
+        {/* Danger zone: delete account (only when there's an account to delete) */}
+        {signedIn && (
+          <Card className="border-danger/30">
+            <CardContent className="space-y-3 p-5">
+              <p className="flex items-center gap-2 font-semibold text-danger">
+                <Trash2 className="h-4 w-4" /> Konto löschen
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Löscht dein Konto und alle damit verbundenen Daten (Profil, Fortschritt,
+                Schreib-Auswertungen) endgültig aus der Cloud. Diese Aktion kann nicht rückgängig
+                gemacht werden. Tipp: exportiere vorher deine Daten.
+              </p>
+              {!confirmDelete ? (
+                <Button variant="outline" onClick={() => setConfirmDelete(true)}>
+                  Konto löschen
+                </Button>
+              ) : (
+                <div className="space-y-3 rounded-lg bg-danger/10 p-3">
+                  <p className="flex items-start gap-2 text-sm text-danger">
+                    <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                    Gib zur Bestätigung <strong>{DELETE_CONFIRM_WORD}</strong> ein.
+                  </p>
+                  <input
+                    value={deleteWord}
+                    onChange={(e) => setDeleteWord(e.target.value)}
+                    placeholder={DELETE_CONFIRM_WORD}
+                    className="h-10 w-full rounded-lg border border-danger/40 bg-surface px-3 text-sm outline-none focus:ring-2 focus:ring-danger/40"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setConfirmDelete(false);
+                        setDeleteWord("");
+                      }}
+                      disabled={busy}
+                    >
+                      Abbrechen
+                    </Button>
+                    <Button
+                      variant="danger"
+                      onClick={handleDeleteAccount}
+                      disabled={busy || deleteWord.trim().toUpperCase() !== DELETE_CONFIRM_WORD}
+                      className="gap-2"
+                    >
+                      {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                      Konto endgültig löschen
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-xs text-muted-foreground">
           <button
             onClick={() => navigate("/privacy")}
             className="underline-offset-2 hover:text-foreground hover:underline"
@@ -247,6 +368,13 @@ export function Settings() {
             className="underline-offset-2 hover:text-foreground hover:underline"
           >
             AGB
+          </button>
+          <span aria-hidden className="text-border">·</span>
+          <button
+            onClick={() => navigate("/impressum")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            Impressum
           </button>
         </p>
       </div>

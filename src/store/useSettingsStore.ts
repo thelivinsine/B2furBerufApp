@@ -13,6 +13,10 @@ interface SettingsState {
   dailyGoalXp: number;
   onboarded: boolean;
 
+  // GDPR consent record (rides into profiles.settings jsonb via cloudSync).
+  consentedAt: string | null; // ISO timestamp of when the user accepted AGB + Datenschutz
+  consentVersion: string | null; // CONSENT_VERSION accepted, for future re-consent prompts
+
   themeMode: ThemeMode;
   speechEnabled: boolean;
   speechRate: number;
@@ -32,6 +36,8 @@ const defaults = {
   examDate: null,
   dailyGoalXp: 80,
   onboarded: false,
+  consentedAt: null,
+  consentVersion: null,
   themeMode: "system" as ThemeMode,
   speechEnabled: true,
   speechRate: 0.95,
