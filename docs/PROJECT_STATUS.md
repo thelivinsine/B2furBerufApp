@@ -769,6 +769,13 @@ squash-merge — see CLAUDE.md).
   and the `/privacy` page header. Sparkles remains as a content/decorative icon elsewhere
   (onboarding step headers, guest-progress notes) per the founder's "keep it for later".
 
+- **Legal pages — bilingual + Terms added (s20, 2026-06-08):** `/privacy` and a new `/terms`
+  (Terms of Service / AGB) now share a `LegalChrome` shell with a **Deutsch / English toggle**
+  at the top (default German). Both pages have full DE + EN content; the privacy copy's em dashes
+  were fixed to satisfy the writing-style rule. Footer of the landing page and the Settings page
+  link to both (Datenschutz · AGB). The Terms page is plain-language and matches the current
+  free-tool/optional-account/AI-feedback reality; revisit before paid plans launch.
+
 **Security — 100% complete. No open items.**
 
 **Decisions locked:**
