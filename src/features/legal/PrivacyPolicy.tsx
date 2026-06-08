@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -36,9 +36,7 @@ export function PrivacyPolicy() {
           onClick={() => navigate("/welcome")}
           className="flex items-center gap-2.5 text-left"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-gradient text-white shadow-glow">
-            <Sparkles className="h-5 w-5" />
-          </div>
+          <img src="/favicon.svg" alt="" className="h-9 w-9 rounded-lg shadow-glow" />
           <span className="text-lg font-semibold tracking-tight">Genauly</span>
         </button>
         <Button variant="ghost" onClick={handleBack} className="gap-1.5">
