@@ -250,6 +250,63 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 19 (2026-06-07) — Sign-in dialog UX overhaul + brand identity unification SHIPPED ✅
+
+**Dialog overlay redesign, iterated and locked (PRs #106–#109):** The founder felt the sign-in
+dialog's backdrop blur looked stale/cached, and didn't like the flat black overlay underneath it.
+Iterated through several rounds with rendered mockups approved before merging:
+- PR #106 dropped the `backdrop-blur` entirely.
+- PR #107 toned down the card's `shadow-elevated` halo by ~50% (new `shadow-elevated-soft` token
+  in `tailwind.config.ts`, ~half the opacity/spread of the original).
+- PR #108 replaced the flat `bg-black/50` overlay with a brand-tinted radial spotlight
+  (`bg-dialog-overlay`, a `radial-gradient` using the `--shadow` HSL token, lighter behind the
+  card and deepening toward the edges, dark-mode-aware). Generated a 5-variant comparison mockup,
+  the founder picked this one ("looks perfect").
+- PR #109 **locked this as the standard convention** for all popups/dialogs/sheets going forward
+  ("remember this design choice... for future reference") — documented in `CLAUDE.md` as a new
+  "UI conventions — modal / popup overlays" section and in "Decisions locked" below. Both tokens
+  are already wired into the shared `DialogContent`/`DialogPrimitive.Overlay` in
+  `src/components/ui/dialog.tsx`, so any dialog built on that primitive inherits this for free.
+
+**Sign-in dialog UX fixes (PRs #113–#114):**
+- PR #113 added a top **segmented toggle** ("Konto erstellen" / "Anmelden", `role="tablist"`)
+  right under the dialog header. The founder pointed out that the "Anmelden" link for existing
+  users was buried at the bottom and easy to miss; now both modes sit side by side at the top,
+  with "Konto erstellen" as the default and "Anmelden" equally prominent. The old buried bottom
+  toggle link was removed.
+- PR #114 removed the "Wir nutzen deine E-Mail nur für die Anmeldung" microcopy line. The founder
+  asked whether that was actually true; it wasn't (password reset/recovery already uses it, and
+  future billing/marketing mail would break the promise outright) — so the line was deleted along
+  with its now-unused `ShieldCheck` import rather than rewritten into something narrower.
+
+**Brand identity unified: G-logo wordmark replaces the Sparkles brand mark everywhere (PRs
+#116–#118):** The founder liked the gradient "Sparkles" icon used as the app's brand mark, but
+asked to swap it for the actual "G" wordmark logo (`/favicon.svg` — gradient rounded square with
+a white "G", already the favicon and PWA app icon) so the brand mark is consistent with the icon
+users see on their home screen. Swapped in **all five** places the Sparkles-in-a-gradient-box
+brand mark appeared:
+- `AuthDialog.tsx` (sign-in dialog header, PR #116)
+- `AppShell.tsx` (mobile header logo)
+- `Sidebar.tsx` (desktop sidebar logo)
+- `LandingPage.tsx` (landing page header logo)
+- `Onboarding.tsx` (onboarding top brand mark)
+- `PrivacyPolicy.tsx` (the **/privacy** page's back-to-home header logo, PR #118 — the one
+  initially missed; caught on a careful final re-sweep after the founder asked "why isn't the
+  logo changed here?" about the in-app header following the first round of swaps)
+
+Each spot now renders `<img src="/favicon.svg" alt="" className="h-{n} w-{n} rounded-{lg|xl}
+shadow-glow" />` at its existing size, keeping the `shadow-glow` halo. Sparkles remains as a
+**content/decorative icon** (onboarding step headers, guest-progress notes) per the founder's
+explicit "keep it for something else for later" — it was only removed from brand-mark usage, not
+from the codebase or from non-brand UI. Verified with Playwright screenshots at every location
+(desktop + mobile viewports, light + dark mode): the G mark renders crisply at every size with no
+cropping/stretching and the `shadow-glow` halo intact.
+
+**Founder backlog captured (PRs #110–#112, #115):** Recorded a Google sign-in branding to-do that
+the founder attempted but couldn't finish in one sitting (PR #110, see "Founder action items"),
+and a 14-item raw feature-idea backlog spanning product, monetization, growth, and GDPR
+compliance (PRs #111–#112, #115) — see "Backlog — founder ideas" below for the full list.
+
 ### Session 18 (2026-06-06) — Security complete + streak bug fix SHIPPED ✅
 
 **Streak display bug fixed (PR #90):** The streak counter was showing a stale persisted value
@@ -658,7 +715,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–18 (2026-06-04 → 06-06).** Everything noted ✅ is merged to `main`.
+**Handoff after sessions 9–19 (2026-06-04 → 06-07).** Everything noted ✅ is merged to `main`.
 Active automation branch: `claude/todo-inventory-BUHq0` (realign to `origin/main` after each
 squash-merge — see CLAUDE.md).
 
@@ -691,6 +748,18 @@ squash-merge — see CLAUDE.md).
   `public/spa-redirect.js`). Verified locally end-to-end with a GitHub-Pages-accurate static
   server + Playwright. **Founder must verify Google sign-in still works live** (the one part
   that can't be tested from the sandbox — see Session 18 log for why).
+- **Dialog overlay redesign locked (s19, PRs #106–#109):** dropped backdrop-blur, toned the card
+  shadow down ~50% (`shadow-elevated-soft`), replaced the flat black overlay with a brand-tinted
+  radial spotlight (`bg-dialog-overlay`) — now the **standard convention for all popups/dialogs**
+  going forward (see "Decisions locked" and `CLAUDE.md` → "UI conventions — modal / popup overlays").
+- **Sign-in dialog UX fixes (s19, PRs #113–#114):** added a top segmented "Konto erstellen /
+  Anmelden" toggle (the old bottom link was easy to miss); removed the inaccurate "we only use
+  your email for sign-in" microcopy line.
+- **Brand identity unified (s19, PRs #116–#118):** the gradient-Sparkles brand mark was replaced
+  app-wide with the actual G-wordmark logo (`/favicon.svg`, also the favicon/PWA icon) in all 6
+  spots it appeared — sign-in dialog, mobile header, desktop sidebar, landing page, onboarding,
+  and the `/privacy` page header. Sparkles remains as a content/decorative icon elsewhere
+  (onboarding step headers, guest-progress notes) per the founder's "keep it for later".
 
 **Security — 100% complete. No open items.**
 
