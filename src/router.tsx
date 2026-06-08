@@ -5,7 +5,11 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { PrivacyPolicy } from "@/features/legal/PrivacyPolicy";
 import { TermsOfService } from "@/features/legal/TermsOfService";
-import { Impressum } from "@/features/legal/Impressum";
+// Impressum is built but TEMPORARILY HIDDEN until the founder fills the real
+// name/address placeholders (deferred to the lawyer/launch pass). To re-enable:
+// restore this import, the /impressum route below, and the footer/Settings +
+// privacy/terms links. See docs/PROJECT_STATUS.md.
+// import { Impressum } from "@/features/legal/Impressum";
 import { Dashboard } from "@/features/dashboard/Dashboard";
 import { recoverFromStaleAssets, isChunkLoadError } from "@/lib/recover";
 
@@ -93,10 +97,8 @@ export const router = createBrowserRouter([
     path: "/terms",
     element: <TermsOfService />,
   },
-  {
-    path: "/impressum",
-    element: <Impressum />,
-  },
+  // Impressum route temporarily disabled (see import note above). /impressum
+  // falls through to the catch-all redirect until re-enabled.
   {
     path: "/start",
     element: OnboardingRoute,

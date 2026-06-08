@@ -223,13 +223,6 @@ export function LandingPage() {
           >
             AGB
           </button>
-          <span aria-hidden className="text-border">·</span>
-          <button
-            onClick={() => navigate("/impressum")}
-            className="underline-offset-2 hover:text-foreground hover:underline"
-          >
-            Impressum
-          </button>
         </nav>
       </footer>
 

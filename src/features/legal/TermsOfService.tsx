@@ -178,12 +178,7 @@ function TermsDe() {
 
       <Section title="Kontakt">
         <p>
-          Fragen zu diesen AGB? Schreib uns an <MailLink />. Unsere Anbieterkennzeichnung findest du
-          im{" "}
-          <a className="text-primary underline underline-offset-2" href="/impressum" target="_blank" rel="noreferrer">
-            Impressum
-          </a>
-          .
+          Fragen zu diesen AGB? Schreib uns an <MailLink />.
         </p>
       </Section>
     </>
@@ -322,11 +317,7 @@ function TermsEn() {
 
       <Section title="Contact">
         <p>
-          Questions about these Terms? Email us at <MailLink />. Our operator details are in the{" "}
-          <a className="text-primary underline underline-offset-2" href="/impressum" target="_blank" rel="noreferrer">
-            Impressum
-          </a>
-          .
+          Questions about these Terms? Email us at <MailLink />.
         </p>
       </Section>
     </>
