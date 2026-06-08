@@ -11,8 +11,10 @@ const options: { value: ThemeMode; icon: typeof Sun; label: string }[] = [
 
 /**
  * Collapsed theme switcher: shows only the active theme's icon to save space in
- * the top bar. The full set of options is revealed on hover (pointer devices)
- * or on tap (touch) — and closes on selection, outside click, or Escape.
+ * the top bar. The full set of options is revealed on hover (pointer devices
+ * only) or on tap, and closes on a second tap, selection, outside click, or
+ * Escape. The hover reveal is gated behind `@media (hover: hover)` so touch
+ * devices, where `:hover` sticks after a tap, can close it with a second tap.
  */
 export function ThemeToggle() {
   const themeMode = useSettingsStore((s) => s.themeMode);
@@ -69,7 +71,7 @@ export function ThemeToggle() {
       <div
         style={{ transform: `translateX(calc(-50% + ${panelOffsetX}px))` }}
         className={cn(
-          "absolute left-1/2 top-full z-50 pt-2 group-hover:block",
+          "absolute left-1/2 top-full z-50 pt-2 [@media(hover:hover)]:group-hover:block",
           open ? "block" : "hidden",
         )}
       >
