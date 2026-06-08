@@ -720,6 +720,12 @@ The sandbox can't reach the live `*.github.io` site — founder confirms the liv
 - **Dev branch note:** session 4 work was developed on `claude/loving-cray-lMLj3` (previous branch
   `claude/loving-cray-lMLj3` became stale after PR history rewrite).
 
+### Sessions 1–2 (initial build — dates not recorded)
+The initial from-scratch build predates this session-logging convention, so there are no dedicated
+entries and no reliable dates to backfill. Only trace: session 2 shipped two broken builds because a
+build check was skipped (see the Deploy/workflow reminders above). Kept here so the numbering is
+visibly complete.
+
 ## Backlog — founder ideas (not yet scoped, added 2026-06-07)
 Raw list from the founder, for future planning sessions to scope, sequence, and break into
 phases. None of these are started; treat as candidates for the next `EXPANSION_PLAN.md` revision.
