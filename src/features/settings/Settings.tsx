@@ -234,12 +234,19 @@ export function Settings() {
           </CardContent>
         </Card>
 
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="flex items-center justify-center gap-4 text-center text-xs text-muted-foreground">
           <button
             onClick={() => navigate("/privacy")}
             className="underline-offset-2 hover:text-foreground hover:underline"
           >
             Datenschutzerklärung
+          </button>
+          <span aria-hidden className="text-border">·</span>
+          <button
+            onClick={() => navigate("/terms")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            AGB
           </button>
         </p>
       </div>

@@ -209,12 +209,21 @@ export function LandingPage() {
 
       <footer className="relative z-10 border-t border-border py-6 text-center text-xs text-muted-foreground">
         <p>Genauly · German that clicks · Deutsch im Beruf · B2 Prüfung</p>
-        <button
-          onClick={() => navigate("/privacy")}
-          className="mt-1.5 underline-offset-2 hover:text-foreground hover:underline"
-        >
-          Datenschutz
-        </button>
+        <nav className="mt-1.5 flex items-center justify-center gap-4">
+          <button
+            onClick={() => navigate("/privacy")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            Datenschutz
+          </button>
+          <span aria-hidden className="text-border">·</span>
+          <button
+            onClick={() => navigate("/terms")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            AGB
+          </button>
+        </nav>
       </footer>
 
       <AuthDialog open={authOpen} onOpenChange={setAuthOpen} intent={intent} />
