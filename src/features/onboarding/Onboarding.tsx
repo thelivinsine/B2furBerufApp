@@ -19,6 +19,7 @@ import {
   type CefrLevel,
   type LearningGoal,
 } from "@/store/useSettingsStore";
+import { recordConsent, hasConsented } from "@/lib/consent";
 
 const goals: { id: LearningGoal; label: string; desc: string; icon: typeof Target }[] = [
   { id: "exam", label: "Ace the Prüfung", desc: "Train laser-focused for the B2-Beruf exam.", icon: GraduationCap },
@@ -51,6 +52,9 @@ export function Onboarding() {
   const [level, setLevel] = useState<CefrLevel>("B2");
   const [examDate, setExamDate] = useState("");
   const [dailyGoalXp, setDailyGoalXp] = useState(80);
+  // Guests never open AuthDialog, so the final step gates on accepting the
+  // terms here. Pre-check if already accepted (e.g. returning to onboarding).
+  const [consent, setConsent] = useState(hasConsented());
 
   const next = () => setStep((s) => Math.min(s + 1, TOTAL - 1));
   // On the first step there's no previous step — go back to the landing page
@@ -61,6 +65,8 @@ export function Onboarding() {
   };
 
   const finish = () => {
+    if (!consent) return;
+    recordConsent();
     completeOnboarding({
       name: name.trim() || "Lernende:r",
       goal,
@@ -196,6 +202,25 @@ export function Onboarding() {
                         />
                       ))}
                     </div>
+                    <label className="flex items-start gap-2.5 pt-1 text-sm text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        checked={consent}
+                        onChange={(e) => setConsent(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
+                      />
+                      <span>
+                        Ich stimme den{" "}
+                        <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                          AGB
+                        </a>{" "}
+                        und der{" "}
+                        <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                          Datenschutzerklärung
+                        </a>{" "}
+                        zu.
+                      </span>
+                    </label>
                   </div>
                 )}
               </motion.div>
@@ -210,7 +235,7 @@ export function Onboarding() {
                   Weiter <ArrowRight className="h-4 w-4" />
                 </Button>
               ) : (
-                <Button variant="gradient" onClick={finish} className="gap-1.5">
+                <Button variant="gradient" onClick={finish} disabled={!consent} className="gap-1.5">
                   Los geht's <Check className="h-4 w-4" />
                 </Button>
               )}

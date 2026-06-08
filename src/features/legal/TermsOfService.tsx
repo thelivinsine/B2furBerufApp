@@ -169,9 +169,21 @@ function TermsDe() {
         </p>
       </Section>
 
+      <Section title="Maßgebliche Sprachfassung">
+        <p>
+          Diese AGB werden in Deutsch und Englisch bereitgestellt. Bei Abweichungen zwischen den
+          Fassungen ist die deutsche Fassung maßgeblich.
+        </p>
+      </Section>
+
       <Section title="Kontakt">
         <p>
-          Fragen zu diesen AGB? Schreib uns an <MailLink />.
+          Fragen zu diesen AGB? Schreib uns an <MailLink />. Unsere Anbieterkennzeichnung findest du
+          im{" "}
+          <a className="text-primary underline underline-offset-2" href="/impressum" target="_blank" rel="noreferrer">
+            Impressum
+          </a>
+          .
         </p>
       </Section>
     </>
@@ -301,9 +313,20 @@ function TermsEn() {
         </p>
       </Section>
 
+      <Section title="Governing language">
+        <p>
+          These Terms are provided in German and English. In case of any discrepancy between the
+          versions, the German version prevails.
+        </p>
+      </Section>
+
       <Section title="Contact">
         <p>
-          Questions about these Terms? Email us at <MailLink />.
+          Questions about these Terms? Email us at <MailLink />. Our operator details are in the{" "}
+          <a className="text-primary underline underline-offset-2" href="/impressum" target="_blank" rel="noreferrer">
+            Impressum
+          </a>
+          .
         </p>
       </Section>
     </>

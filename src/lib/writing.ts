@@ -47,6 +47,26 @@ export async function getWritingHistory(limit = 30): Promise<WritingHistoryEntry
 }
 
 /**
+ * Delete one of the user's writing submissions (GDPR per-item erasure). Returns
+ * true only when a row was actually removed. RLS (policy `writing_delete_own`,
+ * migration 0003) restricts this to the caller's own rows; if that policy is
+ * missing the delete affects 0 rows and this returns false (a loud failure,
+ * never a silent no-op).
+ */
+export async function deleteWritingEvaluation(id: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from("writing_evaluations")
+      .delete()
+      .eq("id", id)
+      .select("id");
+    return !error && !!data && data.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Submit a piece of writing for evaluation. Calls the `evaluate-writing` Edge
  * Function (which holds all secrets). Writing requires an authenticated user,
  * so if the learner is fully signed out we transparently create a guest

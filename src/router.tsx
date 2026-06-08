@@ -5,6 +5,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { PrivacyPolicy } from "@/features/legal/PrivacyPolicy";
 import { TermsOfService } from "@/features/legal/TermsOfService";
+import { Impressum } from "@/features/legal/Impressum";
 import { Dashboard } from "@/features/dashboard/Dashboard";
 import { recoverFromStaleAssets, isChunkLoadError } from "@/lib/recover";
 
@@ -91,6 +92,10 @@ export const router = createBrowserRouter([
   {
     path: "/terms",
     element: <TermsOfService />,
+  },
+  {
+    path: "/impressum",
+    element: <Impressum />,
   },
   {
     path: "/start",

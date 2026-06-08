@@ -76,6 +76,25 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   the repo. Full-bleed-everywhere was shipped then reverted (PRs #120/#121); keep the app on the
   rounded transparent logo.
 
+## Legal pages & consent (GDPR)
+- `/privacy`, `/terms`, and `/impressum` are bilingual (DE/EN) via the shared `LegalChrome` +
+  `Section` in `src/features/legal/`. **German is the legally binding version** (English is a
+  convenience translation, stated on each page). Every legal-copy edit MUST be mirrored in BOTH the
+  `*De` and `*En` bodies, and follow the no-em-dash writing rule.
+- Sign-up (`AuthDialog`) and the final onboarding step require an "I agree to AGB + Datenschutz"
+  checkbox; consent is recorded via `recordConsent()` (`src/lib/consent.ts`) into the settings
+  store, which rides into `profiles.settings` jsonb through `cloudSync`. **Keep `CONSENT_VERSION`
+  in `src/lib/consent.ts` in lockstep with the `LAST_UPDATED` date on the legal pages**: when you
+  materially change Terms/Privacy, bump both so a future re-consent prompt can detect the change.
+- GDPR self-service lives in Settings: data export (`src/lib/dataExport.ts`), account deletion
+  (`delete-account` Edge Function + `useAuthStore.deleteAccount`), per-submission delete
+  (`WritingHistory` + `writing_delete_own` RLS policy, migration 0003). See `docs/PHASE2_SETUP.md`
+  for the founder's one-time Supabase steps (deploy the function, run the migration, fill the
+  Impressum + data-location placeholders).
+- **No cookie-consent banner**: storage is functional-only (auth session + `b2beruf.*` settings/
+  progress + PWA cache), which is consent-exempt under GDPR/§25(2) TTDSG. Only revisit if
+  analytics/marketing storage is ever added.
+
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
 - **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/genauly-blank-page-9biDi`).

@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Loader2, PenLine, Target, TrendingUp, AlertCircle } from "lucide-react";
+import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2 } from "lucide-react";
 import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
-import { getWritingHistory, type WritingHistoryEntry } from "@/lib/writing";
+import { getWritingHistory, deleteWritingEvaluation, type WritingHistoryEntry } from "@/lib/writing";
+import { useSessionStore } from "@/store/useSessionStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -90,13 +91,25 @@ function WeaknessFrequency({ entries }: { entries: WritingHistoryEntry[] }) {
 function HistoryEntry({
   entry,
   index,
+  onDelete,
 }: {
   entry: WritingHistoryEntry;
   index: number;
+  onDelete: (id: string) => Promise<void>;
 }) {
   const navigate = useNavigate();
   const theme = themeById(entry.theme);
   const area = practiceAreaById(entry.weakness);
+  const [confirming, setConfirming] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const remove = async () => {
+    setDeleting(true);
+    await onDelete(entry.id);
+    // On failure the parent keeps the row and toasts; reset so the user can retry.
+    setDeleting(false);
+    setConfirming(false);
+  };
 
   return (
     <motion.div
@@ -116,9 +129,38 @@ function HistoryEntry({
             <Badge variant="muted" className="text-xs">
               {entry.length === "short" ? "Kurz" : "Lang"}
             </Badge>
-            {area && (
-              <Badge className="ml-auto bg-primary/10 text-primary text-xs">{area.labelDe}</Badge>
-            )}
+            <div className="ml-auto flex items-center gap-2">
+              {area && (
+                <Badge className="bg-primary/10 text-primary text-xs">{area.labelDe}</Badge>
+              )}
+              {confirming ? (
+                <span className="flex items-center gap-2">
+                  <button
+                    onClick={() => setConfirming(false)}
+                    disabled={deleting}
+                    className="text-xs text-muted-foreground hover:underline"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    onClick={remove}
+                    disabled={deleting}
+                    className="flex items-center gap-1 text-xs font-medium text-danger hover:underline"
+                  >
+                    {deleting ? <Loader2 className="h-3 w-3 animate-spin" /> : null}
+                    Löschen
+                  </button>
+                </span>
+              ) : (
+                <button
+                  onClick={() => setConfirming(true)}
+                  aria-label="Auswertung löschen"
+                  className="text-muted-foreground transition-colors hover:text-danger"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
+            </div>
           </div>
 
           <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
@@ -141,6 +183,18 @@ export function WritingHistory() {
   const [entries, setEntries] = useState<WritingHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const showToast = useSessionStore((s) => s.showToast);
+
+  const handleDelete = async (id: string) => {
+    const ok = await deleteWritingEvaluation(id);
+    if (ok) {
+      setEntries((prev) => prev.filter((e) => e.id !== id));
+      showToast("Auswertung gelöscht.", "success");
+    } else {
+      // Loud failure (e.g. the DELETE RLS policy isn't live yet), never a silent no-op.
+      showToast("Löschen fehlgeschlagen. Bitte versuche es erneut.", "warning");
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -207,7 +261,7 @@ export function WritingHistory() {
           Letzte Auswertungen · {entries.length}
         </p>
         {entries.map((e, i) => (
-          <HistoryEntry key={e.id} entry={e} index={i} />
+          <HistoryEntry key={e.id} entry={e} index={i} onDelete={handleDelete} />
         ))}
       </div>
     </div>

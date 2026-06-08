@@ -2,6 +2,8 @@ import { create } from "zustand";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 import { startCloudSync, stopCloudSync } from "@/lib/cloudSync";
+import { useProgressStore } from "@/store/useProgressStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 type AuthStatus = "loading" | "anonymous" | "signedIn" | "signedOut";
 
@@ -25,6 +27,10 @@ interface AuthState {
   /** One-click sign-in via Google OAuth (redirect flow). */
   signInWithGoogle: (captchaToken?: string) => Promise<void>;
   signOut: () => Promise<void>;
+  /** Permanently delete the account + all cloud data (GDPR erasure). Calls the
+   *  `delete-account` Edge Function (which removes the auth user, cascading to
+   *  all rows), then clears local caches and signs out. Irreversible. */
+  deleteAccount: () => Promise<boolean>;
   clearError: () => void;
 }
 
@@ -146,6 +152,42 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     stopCloudSync();
     await supabase.auth.signOut();
     set({ busy: false, session: null, user: null, status: "signedOut" });
+  },
+
+  deleteAccount: async () => {
+    set({ busy: true, error: null });
+    // The browser cannot delete an auth user (needs the service role), so this
+    // goes through the delete-account Edge Function. supabase.functions.invoke
+    // forwards the current session's JWT, which the function uses to identify
+    // (and only delete) the caller.
+    const { data, error } = await supabase.functions.invoke("delete-account", {
+      method: "POST",
+    });
+    const ok = !error && (data?.ok ?? false);
+    if (!ok) {
+      set({
+        busy: false,
+        error: friendlyError(error?.message ?? data?.message ?? "Konto konnte nicht gelöscht werden."),
+      });
+      return false;
+    }
+    // Teardown: stop sync, wipe local caches, sign out the (now invalid) session.
+    stopCloudSync();
+    try {
+      localStorage.removeItem("b2beruf.progress.v1");
+      localStorage.removeItem("b2beruf.settings.v1");
+    } catch {
+      /* ignore storage errors */
+    }
+    useProgressStore.getState().resetProgress();
+    useSettingsStore.getState().resetSettings();
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      /* token is already invalid post-deletion; ignore */
+    }
+    set({ busy: false, session: null, user: null, status: "signedOut" });
+    return true;
   },
 
   clearError: () => set({ error: null }),
