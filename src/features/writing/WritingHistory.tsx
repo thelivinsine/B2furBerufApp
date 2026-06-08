@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2 } from "lucide-react";
+import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2, ChevronDown } from "lucide-react";
 import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
+import { writingPrompts } from "@/data/writingPrompts";
 import { getWritingHistory, deleteWritingEvaluation, type WritingHistoryEntry } from "@/lib/writing";
 import { useSessionStore } from "@/store/useSessionStore";
 import { Card, CardContent } from "@/components/ui/card";
@@ -100,8 +101,10 @@ function HistoryEntry({
   const navigate = useNavigate();
   const theme = themeById(entry.theme);
   const area = practiceAreaById(entry.weakness);
+  const task = writingPrompts[entry.theme]?.[entry.length];
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   const remove = async () => {
     setDeleting(true);
@@ -164,6 +167,36 @@ function HistoryEntry({
           </div>
 
           <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
+
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+            className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+          >
+            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
+            {expanded ? "Aufgabe & deinen Text ausblenden" : "Aufgabe & deinen Text anzeigen"}
+          </button>
+
+          {expanded && (
+            <div className="space-y-3 border-t border-border pt-3">
+              {task && (
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Aufgabe
+                  </p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{task}</p>
+                </div>
+              )}
+              <div className="space-y-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Dein Text
+                </p>
+                <p className="whitespace-pre-wrap rounded-lg bg-muted/40 p-3 text-sm leading-relaxed text-foreground/90">
+                  {entry.text?.trim() ? entry.text : "Kein Text gespeichert."}
+                </p>
+              </div>
+            </div>
+          )}
 
           {area && (
             <button

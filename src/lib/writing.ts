@@ -7,6 +7,8 @@ export interface WritingHistoryEntry {
   created_at: string;
   theme: ThemeId;
   length: WritingLength;
+  /** The text the learner actually submitted, so the history shows their work. */
+  text: string;
   weakness: WeaknessCategory;
   insight: string;
   cached: boolean;
@@ -36,7 +38,7 @@ export async function getWritingHistory(limit = 30): Promise<WritingHistoryEntry
   try {
     const { data, error } = await supabase
       .from("writing_evaluations")
-      .select("id, created_at, theme, length, weakness, insight, cached")
+      .select("id, created_at, theme, length, text, weakness, insight, cached")
       .order("created_at", { ascending: false })
       .limit(limit);
     if (error || !data) return [];
