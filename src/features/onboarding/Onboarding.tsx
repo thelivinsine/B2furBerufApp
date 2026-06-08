@@ -81,7 +81,7 @@ export function Onboarding() {
         className="relative w-full max-w-lg"
       >
         <div className="mb-6 flex items-center justify-center gap-2.5">
-          <img src="/favicon.svg" alt="" className="h-10 w-10 rounded-xl shadow-glow" />
+          <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-10 w-10 rounded-xl shadow-glow" />
           <span className="text-lg font-semibold tracking-tight">Genauly: German that clicks</span>
         </div>
 
