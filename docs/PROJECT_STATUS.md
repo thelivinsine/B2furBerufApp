@@ -731,7 +731,8 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       the terms are "in development / under review." Recommendation: **no.** Calling your own terms
       provisional weakens their enforceability and looks unfinished; the "Zuletzt aktualisiert" date
       already signals they evolve. Keep the internal "needs lawyer review" caveat in this backlog,
-      not user-facing. (Pending founder's final say.)
+      not user-facing. **Founder confirmed 2026-06-08: no banner.** (Revisit only the
+      language-precedence line + Impressum during the lawyer pass.)
 
 ## Resume here (next session)
 
