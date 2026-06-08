@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2, ChevronDown } from "lucide-react";
+import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2, ChevronDown, Lightbulb } from "lucide-react";
 import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
@@ -121,9 +121,10 @@ function HistoryEntry({
       transition={{ delay: index * 0.03 }}
     >
       <Card className="overflow-hidden">
-        <CardContent className="space-y-2.5 p-4">
+        <CardContent className="space-y-3 p-4">
+          {/* Meta row: when + what */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-muted-foreground">{formatDate(entry.created_at)}</span>
+            <span className="text-xs font-medium text-muted-foreground">{formatDate(entry.created_at)}</span>
             {theme && (
               <Badge variant="muted" className="text-xs">
                 {theme.titleDe}
@@ -133,9 +134,6 @@ function HistoryEntry({
               {entry.length === "short" ? "Kurz" : "Lang"}
             </Badge>
             <div className="ml-auto flex items-center gap-2">
-              {area && (
-                <Badge className="bg-primary/10 text-primary text-xs">{area.labelDe}</Badge>
-              )}
               {confirming ? (
                 <span className="flex items-center gap-2">
                   <button
@@ -166,45 +164,58 @@ function HistoryEntry({
             </div>
           </div>
 
-          <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
+          {/* Feedback: the headline result, visually emphasised */}
+          <div className="space-y-2 rounded-xl border border-primary/15 bg-primary/5 p-3.5">
+            <div className="flex items-center gap-2">
+              <Lightbulb className="h-4 w-4 shrink-0 text-primary" />
+              <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                Wichtigster Tipp
+              </p>
+              {area && (
+                <Badge className="ml-auto bg-primary/10 text-primary text-xs">{area.labelDe}</Badge>
+              )}
+            </div>
+            <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
+          </div>
 
+          {/* Disclosure for the original task + the learner's own text */}
           <button
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
-            className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+            className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
           >
             <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
             {expanded ? "Aufgabe & deinen Text ausblenden" : "Aufgabe & deinen Text anzeigen"}
           </button>
 
           {expanded && (
-            <div className="space-y-3 border-t border-border pt-3">
+            <div className="space-y-3">
               {task && (
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Aufgabe
+                <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    <Target className="h-3.5 w-3.5" /> Aufgabe
                   </p>
-                  <p className="text-sm leading-relaxed text-muted-foreground">{task}</p>
+                  <p className="text-sm leading-relaxed text-foreground/80">{task}</p>
                 </div>
               )}
-              <div className="space-y-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Dein Text
+              <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
+                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  <PenLine className="h-3.5 w-3.5" /> Dein Text
                 </p>
-                <p className="whitespace-pre-wrap rounded-lg bg-muted/40 p-3 text-sm leading-relaxed text-foreground/90">
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
                   {entry.text?.trim() ? entry.text : "Kein Text gespeichert."}
                 </p>
               </div>
             </div>
           )}
 
+          {/* Practice CTA */}
           {area && (
-            <button
-              onClick={() => navigate(area.route)}
-              className="text-xs font-medium text-primary hover:underline"
-            >
-              {area.labelDe} üben →
-            </button>
+            <div className="flex justify-end border-t border-border pt-3">
+              <Button size="sm" variant="outline" onClick={() => navigate(area.route)} className="gap-1.5">
+                <Target className="h-3.5 w-3.5" /> {area.labelDe} üben
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>
