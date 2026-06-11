@@ -780,6 +780,16 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       was already a stretch (reset/recovery) and would be broken outright once the marketing
       campaign (#13) and payment gateway (#9) ship. So the policy must not repeat that narrow
       "only for sign-in" claim.
+16. **Business plan + case study (added 2026-06-11):** produce a well-researched business plan
+    and case study for Genauly — covering market sizing (B2 Beruf / workplace German learners),
+    competitive landscape, product-led growth model, unit economics, and traction narrative.
+    Intended as a foundation for investor conversations and pre-seed fundraising (#17). Recommended
+    model: **Fable** (research-heavy strategy work).
+17. **Pre-seed funding (added 2026-06-11):** plan and execute a pre-seed fundraising round.
+    Scope includes identifying suitable investors (edtech / language-learning / EU-focused), preparing
+    pitch materials (deck, one-pager, data room), and deciding on instrument (SAFE, convertible note,
+    or priced round). Depends on #16 (business plan) being substantially complete. Recommended
+    model: **Fable** for strategy/pitch drafting.
 15. **Legal review with a lawyer (founder, 2026-06-08):** the live `/privacy` and `/terms` (AGB)
     pages were written in plain language by the team, not a lawyer. Before any paid plans (#8/#9)
     or a marketing campaign (#13) launch, have a qualified lawyer review both for German/EU
@@ -844,6 +854,8 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 | Content sourcing/audit pipeline | **Fable** | Research-heavy design + verification workflow |
 | SEO optimization (meta, sitemap, structured data) | **Sonnet** | Largely mechanical |
 | Marketing campaign | **Fable** | Planning + creative |
+| Business plan + case study (#16) | **Fable** | Market sizing, competitive research, unit economics, traction narrative |
+| Pre-seed fundraising (#17) | **Fable** | Investor targeting, pitch deck, data room, instrument strategy |
 | Routine bugfixes (e.g. UI tweaks) | **Sonnet** | Step up to Opus only when a fix turns gnarly or spans many files |
 
 ## Resume here (next session)
