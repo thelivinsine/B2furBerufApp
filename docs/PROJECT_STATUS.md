@@ -794,6 +794,58 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       not user-facing. **Founder confirmed 2026-06-08: no banner.** (Revisit only the
       language-precedence line + Impressum during the lawyer pass.)
 
+## Model guidance — which Claude model to set per session (added 2026-06-11)
+
+We now have **Fable 5** as the frontier model alongside the Claude 4.X family. Claude Code does
+**not** auto-pick a model per task: whatever you set in `/model` runs the whole session, and the
+assistant can't reassign itself mid-task. So set the model at the **start of each session** based
+on the dominant work. (Subagents the assistant spawns can run on a cheaper model on their own, but
+that's separate from the main session model.)
+
+Rule of thumb: **design/decide with Fable, build with Opus/Sonnet, fill-in with Haiku.** Step up a
+tier for ambiguous or high-stakes work (legal, payments). `opusplan` is a useful hybrid: Opus while
+planning, then auto-switches to Sonnet for execution.
+
+| Model | Best for | Cost |
+| --- | --- | --- |
+| **Fable 5** (frontier) | Architecture/system design, legal nuance, pricing/monetization strategy, persuasive marketing copy, research-heavy planning | Highest |
+| **Opus 4.8** | Heavy cross-cutting implementation: multi-file features, careful refactors, security-sensitive integrations | High |
+| **Sonnet 4.6** | Standard build work: well-specified features, UI from an approved plan, structured content authoring, doc-following integrations | Medium |
+| **Haiku 4.5** | Mechanical, well-bounded edits: placeholder fills, config flips, single-file copy tweaks | Low |
+
+Backlog items mapped to a recommended model (see "Backlog — founder ideas" and "Resume here"):
+
+| Task | Recommended | Why |
+| --- | --- | --- |
+| Fill data-location placeholder (privacy DE/EN) | **Haiku** | One mirrored line, no judgment |
+| Fill Impressum address + re-enable route/links | **Sonnet** | Mechanical but multi-file; must not break build |
+| Enable pg_cron writing-text retention | **Sonnet** | Apply provided SQL with light care |
+| Draft legal enforceability additions (Widerrufsrecht, liability, language-precedence) | **Fable** | German/EU legal reasoning, binding DE version |
+| Content QC pipeline — CI lint (dup IDs, broken nodes) | **Sonnet** | Bounded script + CI wiring |
+| Content QC — pedagogical / German accuracy review | **Fable** | B2-level correctness judgment |
+| Grammar drills 47 → 80 | **Sonnet** | Follows established schema; Fable for a final accuracy pass |
+| Vocabulary 504 → 600+ | **Sonnet** | Bulk schema-following content |
+| FAQ section (landing) | **Sonnet** | Straightforward copy + UI |
+| Expand landing copy | **Fable** | Persuasive, on-voice copy; Sonnet if budget-conscious |
+| Visual mnemonics for vocab (der/die/das) | **Sonnet** | Asset wiring against existing schema |
+| Bottom tab bar redesign (Layer 2) | **Sonnet** | Plan already detailed & approved |
+| Mobile density + targeted fixes (Layer 3) | **Sonnet** | Well-specified, low ambiguity |
+| Dashboard redesign | **Opus** | Many components; Fable for design direction first |
+| Schreibtraining redesign | **Opus** | Cross-section rework |
+| Animated-character scenarios | **Fable → Opus** | Design with Fable, implement with Opus |
+| Resend SMTP / LanguageTool key | **Haiku** | Config-level, follow docs |
+| Turnstile CAPTCHA on guest sign-in | **Sonnet** | Follows provider docs, some care |
+| Google sign-in branding completion | **Sonnet** | Mostly console steps + guidance, little code |
+| Gate Schreibtraining behind sign-in | **Sonnet** | Reuse existing `AuthDialog` |
+| Pricing page + plan/tier design | **Fable → Sonnet** | Strategy with Fable, build page with Sonnet |
+| Monetization tier + paywall feature flags | **Opus** | Backend + UI + careful gating logic |
+| Payment gateway integration | **Opus** | Money-handling; Fable for architecture/security design |
+| Domain-based content filtering (by sector) | **Fable → Opus** | Data-model design with Fable, implement with Opus |
+| Content sourcing/audit pipeline | **Fable** | Research-heavy design + verification workflow |
+| SEO optimization (meta, sitemap, structured data) | **Sonnet** | Largely mechanical |
+| Marketing campaign | **Fable** | Planning + creative |
+| Routine bugfixes (e.g. UI tweaks) | **Sonnet** | Step up to Opus only when a fix turns gnarly or spans many files |
+
 ## Resume here (next session)
 
 **Handoff after sessions 9–20 (2026-06-04 → 06-08).** Everything noted ✅ is merged to `main`.
