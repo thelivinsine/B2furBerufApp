@@ -102,7 +102,7 @@ export function LandingPage() {
           transition={{ duration: 0.5 }}
         >
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
-            <GraduationCap className="h-3.5 w-3.5 text-primary" /> Goethe / telc · Deutsch B2 Beruf
+            <GraduationCap className="h-3.5 w-3.5 text-primary" /> telc Deutsch B2 Beruf · Goethe-Zertifikat B2
           </span>
           <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
             From „Wie bitte?“ to{" "}
@@ -112,9 +112,9 @@ export function LandingPage() {
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Practise the Deutsch you actually need at work: Wortschatz, Grammatik,
-            writing and speaking, all in sessions short enough for your Mittagspause.
-            Confidence first, B2-Prüfung sorted.
+            Practise the Deutsch you actually need at work: Wortschatz, Grammatik, writing and
+            speaking, all in sessions short enough for your Mittagspause. Confidence first,
+            telc B2 Beruf and Goethe-Zertifikat B2 sorted.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {onboarded ? (
@@ -148,8 +148,8 @@ export function LandingPage() {
           <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Was ist Genauly?</h2>
           <p className="mt-3 text-sm text-muted-foreground sm:text-base">
             Genauly is a learning app for the{" "}
-            <span className="font-medium text-foreground">Goethe-Zertifikat B2 Beruf</span> and{" "}
-            <span className="font-medium text-foreground">telc Deutsch B2+ Beruf</span> exams. It helps
+            <span className="font-medium text-foreground">telc Deutsch B2 Beruf</span> and{" "}
+            <span className="font-medium text-foreground">Goethe-Zertifikat B2</span> exams. It helps
             adults who work, or want to work, in German build the workplace German they actually need:
             Wortschatz, Grammatik, writing and speaking.
           </p>

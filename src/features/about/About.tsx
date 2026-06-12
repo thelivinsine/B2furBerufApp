@@ -65,7 +65,7 @@ const copy: Record<Lang, {
     title: "Über Genauly",
     whatTitle: "Was ist Genauly?",
     whatBody1:
-      "Genauly ist eine Lern-App für die Prüfungen Goethe-Zertifikat B2 Beruf und telc Deutsch B2+ Beruf. Sie hilft Erwachsenen, die auf Deutsch arbeiten oder arbeiten möchten, das Deutsch für den Berufsalltag aufzubauen: Wortschatz, Grammatik, Schreiben und Sprechen.",
+      "Genauly ist eine Lern-App für die Prüfungen telc Deutsch B2 Beruf und Goethe-Zertifikat B2. Sie hilft Erwachsenen, die auf Deutsch arbeiten oder arbeiten möchten, das Deutsch für den Berufsalltag aufzubauen: Wortschatz, Grammatik, Schreiben und Sprechen.",
     whatBody2:
       "Du übst realistische Gespräche aus dem Arbeitsalltag, lernst Prüfungswortschatz mit einem Wiederholungssystem, machst Quizze auf drei Niveaustufen mit sofortigem Feedback und bekommst KI-Feedback zu deinen Texten und deiner Aussprache.",
     whoTitle: "Für wen ist Genauly?",
@@ -89,7 +89,7 @@ const copy: Record<Lang, {
     title: "About Genauly",
     whatTitle: "What is Genauly?",
     whatBody1:
-      "Genauly is a learning app for the Goethe-Zertifikat B2 Beruf and telc Deutsch B2+ Beruf exams. It helps adults who work, or want to work, in German build the workplace German they actually need: vocabulary, grammar, writing and speaking.",
+      "Genauly is a learning app for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams. It helps adults who work, or want to work, in German build the workplace German they actually need: vocabulary, grammar, writing and speaking.",
     whatBody2:
       "You practise realistic workplace dialogues, drill exam vocabulary with a spaced-repetition system, take leveled quizzes with instant feedback, and get AI feedback on your writing and pronunciation.",
     whoTitle: "Who is it for?",
