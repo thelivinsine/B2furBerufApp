@@ -142,6 +142,32 @@ export function LandingPage() {
         </motion.div>
       </section>
 
+      {/* What is Genauly — plain-language purpose (also satisfies OAuth homepage review) */}
+      <section className="relative z-10 mx-auto max-w-3xl px-4 pb-12 sm:px-6">
+        <div className="rounded-2xl border border-border bg-surface/70 p-6 shadow-soft backdrop-blur sm:p-8">
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Was ist Genauly?</h2>
+          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+            Genauly is a learning app for the{" "}
+            <span className="font-medium text-foreground">Goethe-Zertifikat B2 Beruf</span> and{" "}
+            <span className="font-medium text-foreground">telc Deutsch B2+ Beruf</span> exams. It helps
+            adults who work, or want to work, in German build the workplace German they actually need:
+            Wortschatz, Grammatik, writing and speaking.
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+            You practise realistic workplace dialogues, drill exam vocabulary with spaced repetition,
+            take leveled quizzes with instant feedback, and get AI feedback on your writing and
+            Aussprache. Sign in with Google to save your Fortschritt and continue on any device. It is
+            free to start, and kein Konto is required to try it.
+          </p>
+          <button
+            onClick={() => navigate("/about")}
+            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-2 hover:underline"
+          >
+            Mehr über Genauly <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </section>
+
       {/* Feature grid */}
       <section className="relative z-10 mx-auto max-w-6xl px-4 pb-16 sm:px-6">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -210,6 +236,13 @@ export function LandingPage() {
       <footer className="relative z-10 border-t border-border py-6 text-center text-xs text-muted-foreground">
         <p>Genauly · German that clicks · Deutsch im Beruf · B2 Prüfung</p>
         <nav className="mt-1.5 flex items-center justify-center gap-4">
+          <button
+            onClick={() => navigate("/about")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            Über uns
+          </button>
+          <span aria-hidden className="text-border">·</span>
           <button
             onClick={() => navigate("/privacy")}
             className="underline-offset-2 hover:text-foreground hover:underline"

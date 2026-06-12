@@ -5,6 +5,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
 import { PrivacyPolicy } from "@/features/legal/PrivacyPolicy";
 import { TermsOfService } from "@/features/legal/TermsOfService";
+import { About } from "@/features/about/About";
 // Impressum is built but TEMPORARILY HIDDEN until the founder fills the real
 // name/address placeholders (deferred to the lawyer/launch pass). To re-enable:
 // restore this import, the /impressum route below, and the footer/Settings +
@@ -88,6 +89,10 @@ export const router = createBrowserRouter([
   {
     path: "/welcome",
     element: <LandingPage />,
+  },
+  {
+    path: "/about",
+    element: <About />,
   },
   {
     path: "/privacy",
