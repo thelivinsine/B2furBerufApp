@@ -1,26 +1,28 @@
 # Genauly: Business Plan and Case Study
 
-_Version 1.0 · June 2026 · Confidential_
+_Version 1.1 · June 2026 · Confidential_
 
 ---
 
 ## 1. Executive Summary
 
-Genauly is a mobile-first web app that prepares adult learners for the **telc Deutsch B2+ Beruf** and **Deutsch-Test für den Beruf B2** exams, as well as the general **Goethe-Zertifikat B2**, in short daily sessions. It combines 350+ workplace vocabulary items with spaced repetition, branching exam-format speaking dialogues, leveled quizzes, and an AI writing coach, all calibrated to the exam types that gate professional licensing and skilled-worker visa recognition in German-speaking countries. The German skilled-immigration pipeline is structurally large and growing: ~172,000 work visas were issued in 2024 ([BAMF MoBeMi 2024](https://www.bamf.de/SharedDocs/Anlagen/DE/Forschung/BerichtsreihenMigrationIntegration/MonitoringBildungsErwerbsmigration/mobemi-jahresbericht-2024.pdf)), ~190,000 people enrolled in state-funded Berufssprachkurse ([BAMF BSK 2024](https://www.bamf.de/SharedDocs/Anlagen/DE/Integration/Berufsbezsprachf-ESF-BAMF/BSK-Jahresberichte/bsk-jahresbericht-2024.pdf)), and Germany requires a steady net influx of ~400,000 migrants per year to sustain its labor force ([IAB](https://iab.de/warum-braucht-deutschland-400-000-migrantinnen-und-migranten-pro-jahr/)). No mainstream language app serves this niche with exam-specific, workplace-context, AI-assisted practice. Genauly is built to fill that gap, starting free to maximize reach, with a paid tier ready to activate.
+Genauly is a mobile-first web app that helps adult learners break through the intermediate German plateau, the common stall at B1-B2 where people know the basics but cannot yet hold a real conversation with confidence. It builds practical fluency through the situations that actually matter in daily life: a presentation at work, navigating a Behörde appointment, a doctor visit, a job interview, or a difficult conversation with a colleague. It also supports direct preparation for the **telc Deutsch B2 Beruf** and **Goethe-Zertifikat B2** exams, the certificates that gate professional licensing and skilled-worker visa recognition in German-speaking countries. The app is in its early stage and growing: content, scenarios, and features expand continuously toward an ambitious long-term roadmap. The German skilled-immigration pipeline creates a structurally large and motivated user base: ~172,000 work visas were issued in 2024 ([BAMF MoBeMi 2024](https://www.bamf.de/SharedDocs/Anlagen/DE/Forschung/BerichtsreihenMigrationIntegration/MonitoringBildungsErwerbsmigration/mobemi-jahresbericht-2024.pdf)), ~190,000 people enrolled in state-funded Berufssprachkurse ([BAMF BSK 2024](https://www.bamf.de/SharedDocs/Anlagen/DE/Integration/Berufsbezsprachf-ESF-BAMF/BSK-Jahresberichte/bsk-jahresbericht-2024.pdf)), and Germany needs a net influx of ~400,000 migrants per year to sustain its labor force ([IAB](https://iab.de/warum-braucht-deutschland-400-000-migrantinnen-und-migranten-pro-jahr/)). No mainstream language app addresses this audience with situation-based, context-rich, AI-assisted practice at the intermediate level. Genauly starts free to maximize reach, with a paid tier ready to activate.
 
 ---
 
 ## 2. Problem and Purpose
 
-### The pain
+### The intermediate plateau
 
-Hundreds of thousands of adults each year need to reach B2 German to unlock a German work visa, have a foreign qualification recognized, or complete a state-funded Berufssprachkurs. The stakes are high: the telc B2 exam costs €150-229 per attempt ([exam center prices](https://ibz-essen.de/telc-deutsch-b2-termine-preise/)), and nurses and doctors need B2 certification as a legal prerequisite for their license to practice ([Make it in Germany](https://www.make-it-in-germany.com/de/arbeiten-in-deutschland/gefragte-berufe/pflegefachkraefte)). Mainstream apps like Duolingo and Babbel top out at general B2 content with no exam-format practice and no workplace context. State-funded prep courses provide the right level but no on-demand speaking or writing feedback. A failed attempt means another €150-229 fee and weeks of delay.
+The most common dropout point in language learning is not the beginning. It is the intermediate plateau: learners who can introduce themselves, order a coffee, and understand slow speech, but cannot handle a real-world conversation under pressure. Research on foreign-language acquisition consistently identifies the B1-B2 boundary as the point where progress stalls most frequently, because generic vocabulary and grammar no longer build the contextual fluency needed for real situations ([Common European Framework of Reference, Council of Europe](https://www.coe.int/en/web/common-european-framework-reference-languages)). For German learners in particular, this stall has high practical stakes.
+
+For those in the German immigration pipeline, B2 is not optional. The telc B2 exam costs €150-229 per attempt ([exam center prices](https://ibz-essen.de/telc-deutsch-b2-termine-preise/)), and nurses and doctors need B2 certification as a legal prerequisite for their license to practice ([Make it in Germany](https://www.make-it-in-germany.com/de/arbeiten-in-deutschland/gefragte-berufe/pflegefachkraefte)). Mainstream apps like Duolingo and Babbel offer general B2 content but no situation-specific practice, no exam-format dialogues, and no on-demand writing or speaking feedback. A failed exam attempt means another fee and weeks of delay.
 
 ### What Genauly does
 
-Genauly is a free learning app for adults preparing for the **telc Deutsch B2 Beruf** and **Goethe-Zertifikat B2** exams. It delivers the workplace vocabulary, grammar drills, speaking practice, and AI writing feedback that learners need to pass, in sessions short enough for a lunch break. No tutor, no commute, no wasted time on general-language content that will not appear in the exam.
+Genauly is a free learning app for adults who already know some German (around B1) and want to reach genuine, usable fluency in real-life situations. It builds that fluency through contextual practice across everyday scenarios: work presentations, Behörde visits, doctor appointments, job interviews, and more. It also supports preparation for the **telc Deutsch B2 Beruf** and **Goethe-Zertifikat B2** exams. The app is in early-stage development with a long and ambitious content and feature roadmap ahead.
 
-**Auf Deutsch:** Genauly ist eine kostenlose Lern-App für Erwachsene, die sich auf die Prüfungen telc Deutsch B2 Beruf und Goethe-Zertifikat B2 vorbereiten. Sie bietet Berufswortschatz, Grammatikübungen, Sprechtraining und KI-Feedback zum Schreiben, abgestimmt auf die Prüfungsformate, in kurzen Einheiten für den Alltag.
+**Auf Deutsch:** Genauly ist eine kostenlose Lern-App für Erwachsene, die schon Grundkenntnisse in Deutsch haben und echte Alltagssituationen meistern wollen: Präsentationen, Behördentermine, Arztgespräche, Vorstellungsgespräche und mehr. Die App befindet sich in einem frühen Entwicklungsstadium mit einem langen und ambitionierten Fahrplan für neue Inhalte und Funktionen.
 
 ---
 
@@ -45,11 +47,16 @@ B2 is the **legal gateway level** for nursing recognition in most Bundesländer 
 
 ### TAM / SAM / SOM (illustrative)
 
-**TAM (Total Addressable Market):** the global language-learning app market is estimated at ~$6-12B in 2024 and growing at ~14-16% CAGR ([Straits Research](https://straitsresearch.com/report/language-learning-apps-market); [Grand View Research online language learning](https://www.grandviewresearch.com/industry-analysis/online-language-learning-market-report)). Applying a rough German-specific share (Duolingo reports ~7.9M German learners on its platform, one of its top 5 languages, [Duolingo 2024 Language Report](https://blog.duolingo.com/2024-duolingo-language-report/)) gives a German-learning slice of perhaps $300-600M. _Confidence: low; top-down estimates from analyst firms disagree 2x._
+**TAM (Total Addressable Market):** the global language-learning app market is estimated at ~$6-12B in 2024 and growing at ~14-16% CAGR ([Straits Research](https://straitsresearch.com/report/language-learning-apps-market); [Grand View Research online language learning](https://www.grandviewresearch.com/industry-analysis/online-language-learning-market-report)). The last published global total for German learners was ~15.4 million (2020), with the 2025 Auswärtiges Amt analysis explicitly noting demand rising fastest in countries targeting Germany for work ([Goethe-Institut press release, July 2025](https://www.goethe.de/de/uun/prs/pma/26859595.html)). Duolingo alone reports ~7.9M German learners ([Duolingo 2024 Language Report](https://blog.duolingo.com/2024-duolingo-language-report/)), all potential B1-B2 plateau candidates who receive no real-life situation-based or AI-assisted practice. _Confidence: low on precise dollar figures; top-down analyst estimates disagree 2x._
 
-**SAM (Serviceable Addressable Market):** adult learners specifically targeting B2/workplace-German certification in DACH + the global immigration pipeline. A conservative bottom-up estimate: ~500,000 people per year in the BAMF/immigration pipeline alone are motivated to reach B2 (BSK entrants + work-visa holders + recognition applicants). At 2-5% willingness to pay €5-10/month, SAM is ~€6-25M ARR. _Explicitly an estimate with wide range._
+**SAM (Serviceable Addressable Market):** adult German learners at the B1-B2 plateau in DACH and the global immigration pipeline. Two partially overlapping pools:
 
-**SOM (Serviceable Obtainable Market, 3 years):** targeting 1-2% of the SAM with a free-first, SEO-driven approach. That is ~€60,000-500,000 ARR at the low end of willingness-to-pay assumptions, growing as brand builds. _Conservative; labeled as assumption._
+1. The motivated exam/immigration pipeline (BSK entrants + work-visa holders + recognition applicants): ~500,000/year in Germany alone. High motivation to pay.
+2. The broader intermediate-plateau segment: Duolingo's ~7.9M German learners represent only active app users; the real plateau population including classroom learners is multiples larger. This is the long-term TAM, addressable as Genauly expands its situation library beyond workplace German.
+
+At 2-5% willingness to pay €5-10/month from the motivated pipeline alone: SAM is ~€6-25M ARR. _Explicitly an estimate with wide range._
+
+**SOM (Serviceable Obtainable Market, 3 years):** targeting 1-2% of the SAM with a free-first, SEO-driven approach yields ~€60,000-500,000 ARR at conservative assumptions. The broader plateau framing enlarges the eventual SOM significantly as content expands to cover more life situations (healthcare, bureaucracy, social contexts). _Conservative; labeled as assumption._
 
 ---
 
@@ -218,10 +225,12 @@ The cooperative problem-solving speaking task the app drills ("Gemeinsam eine L�
 
 ## PURPOSE STATEMENTS
 
+_For use on the public website, /about page, and Google OAuth consent-screen review._
+
 **English (plain-language, 2-3 sentences):**
 
-Genauly is a free learning app for adults preparing for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams. It provides workplace vocabulary, grammar drills, speaking practice, and AI writing feedback in short daily sessions, so learners can build the workplace German they need for a job, a visa, or a professional licence in Germany. No account is required to start, and progress is saved across devices when you sign in with Google.
+Genauly is a free German-learning app for adults who already know the basics and want to reach genuine confidence in real-life situations: at work, at the Behörde, at the doctor, in a job interview, and beyond. It helps learners break through the intermediate plateau (B1-B2) through contextual practice, spaced-repetition vocabulary, AI writing feedback, and speaking exercises, with a growing library of everyday scenarios and an ambitious long-term roadmap. No account is required to start, and progress is saved across devices when you sign in with Google.
 
 **Deutsch (klare Sprache, 2-3 Sätze):**
 
-Genauly ist eine kostenlose Lern-App für Erwachsene, die sich auf die Prüfungen telc Deutsch B2 Beruf und Goethe-Zertifikat B2 vorbereiten. Sie bietet Berufswortschatz, Grammatikübungen, Sprechtraining und KI-Feedback zum Schreiben, damit Lernende das Deutsch bekommen, das sie für Job, Visum oder Berufsanerkennung in Deutschland brauchen. Kein Konto nötig für den Start, und mit Google-Anmeldung wird der Fortschritt auf allen Geräten gespeichert.
+Genauly ist eine kostenlose Lern-App für Erwachsene, die schon Grundkenntnisse in Deutsch haben und im echten Alltag sicher kommunizieren wollen: bei der Arbeit, bei der Behörde, beim Arzt, im Vorstellungsgespräch und mehr. Die App hilft dabei, das Zwischenniveau (B1-B2) zu überwinden, durch situationsbasiertes Üben, Wortschatz mit verteilter Wiederholung, KI-Feedback zum Schreiben und Sprechübungen, mit einer wachsenden Auswahl an Alltagssituationen und einem langen Entwicklungsfahrplan. Kein Konto nötig für den Start, und mit Google-Anmeldung wird der Fortschritt auf allen Geräten gespeichert.

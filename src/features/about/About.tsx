@@ -65,16 +65,16 @@ const copy: Record<Lang, {
     title: "Über Genauly",
     whatTitle: "Was ist Genauly?",
     whatBody1:
-      "Genauly ist eine Lern-App für die Prüfungen telc Deutsch B2 Beruf und Goethe-Zertifikat B2. Sie hilft Erwachsenen, die auf Deutsch arbeiten oder arbeiten möchten, das Deutsch für den Berufsalltag aufzubauen: Wortschatz, Grammatik, Schreiben und Sprechen.",
+      "Genauly ist eine Lern-App für Erwachsene, die schon Grundkenntnisse in Deutsch haben, aber auf der Stelle treten: nicht mehr Anfänger, aber noch nicht wirklich sicher. Die App hilft, dieses Zwischenniveau zu überwinden, indem du Deutsch in echten Alltagssituationen übst statt im Lehrbuch.",
     whatBody2:
-      "Du übst realistische Gespräche aus dem Arbeitsalltag, lernst Prüfungswortschatz mit einem Wiederholungssystem, machst Quizze auf drei Niveaustufen mit sofortigem Feedback und bekommst KI-Feedback zu deinen Texten und deiner Aussprache.",
+      "Du lernst durch Situationen, die im echten Leben auftauchen: eine Präsentation bei der Arbeit, ein Gespräch bei der Behörde, ein Arztbesuch, ein Vorstellungsgespräch, schwierige Gespräche mit Kollegen. Die App unterstützt außerdem gezielt die Vorbereitung auf die Prüfungen telc Deutsch B2 Beruf und Goethe-Zertifikat B2.",
     whoTitle: "Für wen ist Genauly?",
     whoBody:
-      "Für Fachkräfte, Auszubildende und Zugewanderte, die sich auf die B2-Beruf-Prüfung vorbereiten oder einfach im Job sicherer auf Deutsch kommunizieren wollen. Der Einstieg ist kostenlos und ein Konto ist nicht nötig, um die App auszuprobieren.",
+      "Für alle, die Deutsch bereits auf Grundniveau kennen (ungefähr B1) und endlich sicher und natürlich sprechen wollen, ob im Job, bei Behördengängen, beim Arzt oder im Alltag. Auch für Fachkräfte und Zugewanderte, die auf eine B2-Prüfung hinarbeiten. Der Einstieg ist kostenlos und ein Konto ist nicht nötig.",
     doTitle: "Was kannst du damit tun?",
     doItems: [
-      "Verzweigte, lebensnahe Dialoge für das Prüfungsmodul „Gemeinsam eine Lösung finden“ üben.",
-      "Über 350 Wörter aus dem Berufsleben plus Kollokationen und Redemittel mit verteilter Wiederholung lernen.",
+      "Verzweigte, lebensnahe Dialoge üben: Präsentation im Büro, Behördentermin, Arztgespräch, Vorstellungsgespräch und mehr.",
+      "Wortschatz, Kollokationen und Redemittel mit verteilter Wiederholung lernen und behalten.",
       "Grammatik gezielt mit kurzen Übungen trainieren.",
       "Themen-Quizze auf drei Niveaustufen mit sofortigem Feedback lösen.",
       "Kurze Texte schreiben und einen klaren, priorisierten KI-Tipp erhalten.",
@@ -89,16 +89,16 @@ const copy: Record<Lang, {
     title: "About Genauly",
     whatTitle: "What is Genauly?",
     whatBody1:
-      "Genauly is a learning app for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams. It helps adults who work, or want to work, in German build the workplace German they actually need: vocabulary, grammar, writing and speaking.",
+      "Genauly is a German-learning app for adults who already know the basics but feel stuck at the intermediate level, somewhere around B1. Instead of more grammar tables, it builds confidence through the real situations you actually face in everyday life.",
     whatBody2:
-      "You practise realistic workplace dialogues, drill exam vocabulary with a spaced-repetition system, take leveled quizzes with instant feedback, and get AI feedback on your writing and pronunciation.",
+      "You practise through situations that come up in real life: a presentation at work, a visit to the Behörde, talking to a doctor, a job interview, a difficult conversation with a colleague. The app also supports preparation for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams.",
     whoTitle: "Who is it for?",
     whoBody:
-      "For skilled workers, trainees and newcomers preparing for the B2 Beruf exam, or anyone who wants to communicate more confidently in German at work. It is free to start, and no account is required to try it.",
+      "For anyone who has learned some German (around B1 level) and wants to finally feel confident and natural in the situations that matter: at work, at government offices, at the doctor, or in daily life. Also for skilled workers and newcomers working toward a B2 certificate. Free to start, no account required.",
     doTitle: "What can you do with it?",
     doItems: [
-      "Practise branching, lifelike dialogues for the exam's „Gemeinsam eine Lösung finden“ speaking module.",
-      "Learn 350+ workplace words plus collocations and Redemittel with spaced repetition.",
+      "Practise branching, lifelike dialogues: an office presentation, a Behörde appointment, a doctor visit, a job interview, and more.",
+      "Learn vocabulary, collocations, and Redemittel with spaced repetition so they stick.",
       "Drill grammar with short, targeted exercises.",
       "Take topic quizzes across three levels with instant feedback.",
       "Write short texts and receive one clear, prioritised AI tip.",
