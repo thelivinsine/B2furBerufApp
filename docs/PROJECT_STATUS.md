@@ -780,9 +780,10 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       was already a stretch (reset/recovery) and would be broken outright once the marketing
       campaign (#13) and payment gateway (#9) ship. So the policy must not repeat that narrow
       "only for sign-in" claim.
-16. **Business plan + case study (added 2026-06-11):** produce a well-researched business plan
-    and case study for Genauly — covering market sizing (B2 Beruf / workplace German learners),
-    competitive landscape, product-led growth model, unit economics, and traction narrative.
+16. **Business plan + case study (added 2026-06-11, v1.1 shipped 2026-06-12):** produce a
+    well-researched business plan and case study for Genauly — covering market sizing, competitive
+    landscape, product-led growth model, unit economics, and traction narrative. Delivered in
+    `docs/BUSINESS_PLAN.md`. Updated in v1.1 to reflect the broader positioning (see #18).
     Intended as a foundation for investor conversations and pre-seed fundraising (#17). Recommended
     model: **Fable** (research-heavy strategy work).
 17. **Pre-seed funding (added 2026-06-11):** plan and execute a pre-seed fundraising round.
@@ -790,6 +791,34 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     pitch materials (deck, one-pager, data room), and deciding on instrument (SAFE, convertible note,
     or priced round). Depends on #16 (business plan) being substantially complete. Recommended
     model: **Fable** for strategy/pitch drafting.
+18. **Reposition and redesign for the broader B1-B2 real-life purpose (added 2026-06-12):**
+    The founder confirmed that Genauly's purpose is broader than exam prep. The primary audience is
+    anyone who has learned basic German (around B1) and is stuck at the intermediate plateau: they
+    can manage simple exchanges but lack confidence in real-life situations. The app should help them
+    practise the situations that actually matter — presentations at work, visits to the Behörde,
+    doctor appointments, job interviews, difficult conversations with colleagues — not just the
+    ten current workplace/meeting themes.
+
+    **What this backlog item covers (to be scoped and phased):**
+    - Content expansion: add new scenario themes beyond the current workplace focus.
+      Priority candidates: Behörde/bureaucracy, healthcare/doctor, job-hunting/interviews,
+      social/housing, and public-transport/daily-life. Each theme needs dialogues, vocabulary,
+      collocations, Redemittel, grammar drills, and quizzes at three levels.
+    - Navigation and UI redesign: the current topic structure ("Meetings", "Logistics", etc.)
+      maps to the old workplace-only framing. Redesign the topic browser, Dashboard, and
+      onboarding flow to present the app as a situation-based real-life German tool, with
+      workplace as one of several life domains.
+    - Branding and copy alignment: update app shell labels, onboarding copy, and in-app
+      descriptions to match the "German for real life, B1-B2" positioning (not "B2 Beruf exam
+      prep"). Public-facing copy (landing, /about) was updated in the 2026-06-12 session;
+      in-app copy still reflects the old framing.
+    - Exam prep preserved but repositioned: the telc B2 Beruf and Goethe B2 exam-prep value is
+      real and should remain, positioned as one benefit of the broader real-life practice, not
+      the primary hook.
+    - Do NOT hard-code specific content counts (word counts, scenario counts) in UI copy or
+      marketing; the library is growing and numbers will be outdated quickly.
+    - Recommended model for the design/planning phase: **Fable** (creative + strategic).
+      Implementation: **Opus** for cross-section rework, **Sonnet** for mechanical content work.
 15. **Legal review with a lawyer (founder, 2026-06-08):** the live `/privacy` and `/terms` (AGB)
     pages were written in plain language by the team, not a lawyer. Before any paid plans (#8/#9)
     or a marketing campaign (#13) launch, have a qualified lawyer review both for German/EU

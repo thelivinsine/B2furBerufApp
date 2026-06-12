@@ -19,13 +19,13 @@ import { AuthDialog, type AuthIntent } from "@/features/auth/AuthDialog";
 const features = [
   {
     icon: MessagesSquare,
-    title: "Real Gespräche, zero pressure",
-    desc: "Rehearse the exam's „Gemeinsam eine Lösung finden“ module with branching, lifelike dialogues. Practise until it feels natural.",
+    title: "Real situations, zero pressure",
+    desc: "Practise branching dialogues set in real-life situations: a job presentation, a Behörde appointment, a Arztbesuch, a job interview. Repeat until it feels natural.",
   },
   {
     icon: GraduationCap,
     title: "Wortschatz that sticks",
-    desc: "300+ workplace words, Redemittel and targeted Grammatik drills, with spaced repetition so you actually remember them.",
+    desc: "Workplace words, Redemittel and Grammatik drills across a growing range of everyday topics, with spaced repetition so you actually remember them.",
   },
   {
     icon: Target,
@@ -73,7 +73,7 @@ export function LandingPage() {
           <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-9 w-9 rounded-lg shadow-glow" />
           <div className="leading-tight">
             <p className="text-lg font-semibold tracking-tight">Genauly</p>
-            <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
+            <p className="text-xs text-muted-foreground">German for real life · B1–B2</p>
           </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
@@ -102,19 +102,19 @@ export function LandingPage() {
           transition={{ duration: 0.5 }}
         >
           <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/70 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur">
-            <GraduationCap className="h-3.5 w-3.5 text-primary" /> Goethe / telc · Deutsch B2 Beruf
+            <GraduationCap className="h-3.5 w-3.5 text-primary" /> German for real life · B1–B2
           </span>
           <h1 className="mt-5 text-4xl font-bold tracking-tight sm:text-5xl">
-            From „Wie bitte?“ to{" "}
-            <span className="bg-accent-gradient bg-clip-text text-transparent">fließend</span>
+            Break through the{" "}
+            <span className="bg-accent-gradient bg-clip-text text-transparent">plateau.</span>
             <span className="mt-1 block text-2xl font-semibold text-muted-foreground sm:text-3xl">
-              Workplace German that finally clicks.
+              German for the situations that actually matter.
             </span>
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground sm:text-lg">
-            Practise the Deutsch you actually need at work: Wortschatz, Grammatik,
-            writing and speaking, all in sessions short enough for your Mittagspause.
-            Confidence first, B2-Prüfung sorted.
+            Already past the basics but stuck? Genauly helps you move from textbook German to
+            confident, real-world use: at work, at the Behörde, at the Arzt, and in every
+            conversation that used to make you nervous.
           </p>
           <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {onboarded ? (
@@ -140,6 +140,35 @@ export function LandingPage() {
             </div>
           )}
         </motion.div>
+      </section>
+
+      {/* What is Genauly — plain-language purpose (also satisfies OAuth homepage review) */}
+      <section className="relative z-10 mx-auto max-w-3xl px-4 pb-12 sm:px-6">
+        <div className="rounded-2xl border border-border bg-surface/70 p-6 shadow-soft backdrop-blur sm:p-8">
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Was ist Genauly?</h2>
+          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+            Genauly is a German-learning app for adults who already know the basics but feel stuck
+            at the intermediate level, typically somewhere between B1 and B2. Instead of more
+            grammar tables, it builds confidence through the real situations you actually face:
+            a presentation at work, filling in a Behörde form, talking to a doctor, preparing for
+            a job interview, or navigating a difficult conversation with a colleague.
+          </p>
+          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
+            You practise branching dialogues, drill vocabulary with spaced repetition, take leveled
+            quizzes, and get AI feedback on your writing and Aussprache. The app also helps with
+            preparation for the{" "}
+            <span className="font-medium text-foreground">telc Deutsch B2 Beruf</span> and{" "}
+            <span className="font-medium text-foreground">Goethe-Zertifikat B2</span> exams.
+            Sign in with Google to save your Fortschritt across devices. Free to start, kein Konto
+            nötig.
+          </p>
+          <button
+            onClick={() => navigate("/about")}
+            className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary underline-offset-2 hover:underline"
+          >
+            Mehr über Genauly <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </section>
 
       {/* Feature grid */}
@@ -168,7 +197,7 @@ export function LandingPage() {
         <div className="overflow-hidden rounded-3xl border border-border bg-accent-gradient p-8 text-center text-white shadow-elevated sm:p-12">
           <BrainCircuit className="mx-auto h-9 w-9 opacity-90" />
           <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
-            {onboarded ? "Weiter geht's, keep the Schwung!" : "Bereit? Let's get you Prüfung-ready."}
+            {onboarded ? "Weiter geht's, keep the Schwung!" : "Bereit? Let's break through that plateau."}
           </h2>
           <p className="mx-auto mt-2 max-w-md text-white/85">
             {onboarded
@@ -208,8 +237,15 @@ export function LandingPage() {
       </section>
 
       <footer className="relative z-10 border-t border-border py-6 text-center text-xs text-muted-foreground">
-        <p>Genauly · German that clicks · Deutsch im Beruf · B2 Prüfung</p>
+        <p>Genauly · German that clicks · Deutsch für das echte Leben · B1–B2</p>
         <nav className="mt-1.5 flex items-center justify-center gap-4">
+          <button
+            onClick={() => navigate("/about")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            Über uns
+          </button>
+          <span aria-hidden className="text-border">·</span>
           <button
             onClick={() => navigate("/privacy")}
             className="underline-offset-2 hover:text-foreground hover:underline"
