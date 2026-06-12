@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 import { TurnstileWidget } from "@/components/shared/TurnstileWidget";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSessionStore } from "@/store/useSessionStore";
-import { recordConsent, hasConsented } from "@/lib/consent";
+import { recordConsent } from "@/lib/consent";
 
 const TURNSTILE_ENABLED = !!import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -56,9 +56,10 @@ export function AuthDialog({
       setMode(intent);
       clearError();
       setCaptchaToken(null); // widget re-renders and re-solves on each open
-      // Pre-check if the user already accepted the current terms (e.g. a guest
-      // who consented during onboarding upgrading to a full account).
-      setConsent(hasConsented());
+      // Always start unchecked on sign-up so a new user must actively agree to
+      // the AGB + Datenschutz in this dialog before the sign-up buttons (incl.
+      // "Weiter mit Google") become clickable. Log-in does not require it.
+      setConsent(false);
     }
   }, [open, intent, clearError]);
 
@@ -157,6 +158,41 @@ export function AuthDialog({
         </div>
 
         <div className="space-y-3">
+          {/* Sign-up requires agreeing to the AGB + Datenschutz before any
+              sign-up method (Google or email) becomes available. Placed above
+              the buttons so the dependency is obvious. Log-in skips this. */}
+          {isSignup && (
+            <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={consent}
+                onChange={(e) => setConsent(e.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
+              />
+              <span>
+                Ich stimme den{" "}
+                <a
+                  href="/terms"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
+                  AGB
+                </a>{" "}
+                und der{" "}
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-primary underline underline-offset-2"
+                >
+                  Datenschutzerklärung
+                </a>{" "}
+                zu.
+              </span>
+            </label>
+          )}
+
           {GOOGLE_ENABLED && (
             <>
               <Button
@@ -210,38 +246,6 @@ export function AuthDialog({
           </div>
 
           <TurnstileWidget onToken={setCaptchaToken} />
-
-          {isSignup && (
-            <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={consent}
-                onChange={(e) => setConsent(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
-              />
-              <span>
-                Ich stimme den{" "}
-                <a
-                  href="/terms"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline underline-offset-2"
-                >
-                  AGB
-                </a>{" "}
-                und der{" "}
-                <a
-                  href="/privacy"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline underline-offset-2"
-                >
-                  Datenschutzerklärung
-                </a>{" "}
-                zu.
-              </span>
-            </label>
-          )}
 
           {error && <p className="text-sm font-medium text-danger">{error}</p>}
 
