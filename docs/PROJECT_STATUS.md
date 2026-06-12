@@ -838,11 +838,10 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 | FAQ section (landing) | **Sonnet** | Straightforward copy + UI |
 | Expand landing copy | **Fable** | Persuasive, on-voice copy; Sonnet if budget-conscious |
 | Visual mnemonics for vocab (der/die/das) | **Sonnet** | Asset wiring against existing schema |
-| Bottom tab bar redesign (Layer 2) | **Sonnet** | Plan already detailed & approved |
-| Mobile density + targeted fixes (Layer 3) | **Sonnet** | Well-specified, low ambiguity |
 | Dashboard redesign | **Opus** | Many components; Fable for design direction first |
 | Schreibtraining redesign | **Opus** | Cross-section rework |
 | Animated-character scenarios | **Fable → Opus** | Design with Fable, implement with Opus |
+| Legal review with a lawyer (#15) | **Fable** | Engage/brief a lawyer; German/EU legal judgment, not code |
 | Resend SMTP / LanguageTool key | **Haiku** | Config-level, follow docs |
 | Turnstile CAPTCHA on guest sign-in | **Sonnet** | Follows provider docs, some care |
 | Google sign-in branding completion | **Sonnet** | Mostly console steps + guidance, little code |
