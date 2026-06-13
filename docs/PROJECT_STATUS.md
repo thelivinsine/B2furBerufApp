@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-08 (session 20). Branch: `claude/admiring-galileo-9E0Fi`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-13 (session 21). Branch: `claude/vibrant-meitner-mfl9xk`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -158,8 +158,8 @@ Only use content under these licenses — anything else blocks monetization:
 ## Deploy / workflow reminders
 - `main` is production; merging to it triggers `pages.yml` (the **only** workflow now — the old
   `deploy.yml`/`gh-pages` fallback is gone). Develop on the active automation branch (currently
-  `claude/genauly-blank-page-9biDi`; `main` is the source of truth); ship via
-  squash-merge PR. **Always verify `npm run build` is green on the exact commit before merging**
+  `claude/vibrant-meitner-mfl9xk`; `main` is the source of truth); ship via
+  squash-merge PR. **Always verify `pnpm build` is green on the exact commit before merging**
   (a skipped check shipped two broken builds in session 2).
 - **Feature-branch pushes are NOT live.** Only `main` deploys. In session 3 the founder reported
   "I don't see any change" because the dark-mode commits were pushed to the branch but never merged.
@@ -167,15 +167,15 @@ Only use content under these licenses — anything else blocks monetization:
   open + squash-merge the PR yourself without asking** — see CLAUDE.md.
 - **REQUIRED post-deploy housekeeping (after every squash-merge):** realign the dev branch so it
   doesn't drift and conflict on the next PR — `git fetch origin main` → `git reset --hard origin/main`
-  → `git push --force-with-lease origin claude/genauly-blank-page-9biDi`. (Forgetting this caused the
+  → `git push --force-with-lease origin claude/vibrant-meitner-mfl9xk`. (Forgetting this caused the
   PR #23 merge conflict.) Full checklist in CLAUDE.md → "Post-deploy GitHub housekeeping".
 - Sandbox can't reach the live site or run Docker (so no local Supabase / no live verification
   here) — those steps are handed to the founder, same as the Pages deploy.
 
 ## Deploy / ops notes (accumulated)
 - `main` is production; merging triggers `pages.yml`. Develop on the active automation branch
-  (currently `claude/genauly-blank-page-9biDi`); ship via squash-merge PR. **Always verify
-  `npm run build` green before merging.**
+  (currently `claude/vibrant-meitner-mfl9xk`); ship via squash-merge PR. **Always verify
+  `pnpm build` green before merging.**
 - Sandbox cannot reach `api.supabase.com` or `db.*.supabase.co:5432` — CLI migrations and function
   deploys must be done by the founder (dashboard SQL editor + dashboard function code editor work
   fine as alternatives).
@@ -257,6 +257,52 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
+
+### Session 21 (2026-06-12) — Broader B1-B2 positioning, About page, business plan, consent gating SHIPPED ✅
+Branch `claude/vibrant-meitner-mfl9xk`. All items squash-merged to `main` (PRs #140–#141).
+
+**Broader app purpose repositioned (PR #140):** The founder confirmed Genauly's purpose is not
+exam-prep-only: it is for anyone stuck at the intermediate plateau (roughly B1-B2), not just people
+preparing for one specific exam. Two deliverables:
+
+1. **Landing page re-copy** (`src/features/landing/LandingPage.tsx`): hero, badge, sub-label, feature
+   cards, footer, and CTAs all updated to reflect the broader B1-B2 real-life framing. Highlights:
+   badge = "German for real life · B1-B2"; hero = "Break through the plateau. German for the
+   situations that actually matter."; feature cards describe real situations (Behörde, Arztbesuch,
+   job interview); content counts removed from public copy. "Über uns" footer link added.
+
+2. **New `/about` page** (`src/features/about/About.tsx`): bilingual (DE/EN) purpose page reusing
+   `LegalChrome` + `Section`. Explains in plain language what Genauly is, who it is for, what you
+   can do with it, and — critically for Google's OAuth branding review — exactly how Google sign-in
+   data is used (account creation + cross-device progress sync only, no ads, no selling). Routed at
+   `/about` (`src/router.tsx`). Both landing and /about were updated to correct exam naming:
+   "telc Deutsch B2 Beruf" and "Goethe-Zertifikat B2" (no "Goethe-Zertifikat B2 Beruf" exists).
+
+3. **Business plan `docs/BUSINESS_PLAN.md`** (v1.1): investor-grade plan covering market sizing
+   (TAM/SAM/SOM from BAMF, Destatis, Goethe-Institut, Duolingo shareholder letters), competitive
+   landscape, product differentiation, business model, unit economics, GTM, risks, pre-seed framing.
+   Includes PURPOSE STATEMENTS section (EN + DE) for Google OAuth verification. v1.1 reflects the
+   broader B1-B2 plateau positioning.
+
+4. **Backlog #18 added**: "Reposition and redesign for the broader B1-B2 real-life purpose" —
+   new scenario themes (Behörde, healthcare, job-hunting, social), nav/UI redesign, in-app copy
+   alignment. Documented scope + recommended model guidance.
+
+**Consent gating for sign-up (PR #141):** The "Weiter mit Google" button was available immediately
+on sign-up, even before accepting the AGB + Datenschutz — defeating the consent requirement.
+Moreover, `hasConsented()` was pre-checking the checkbox for anyone who had previously consented
+(e.g. during onboarding), bypassing the requirement entirely. Two fixes in `AuthDialog.tsx`:
+- `setConsent(hasConsented())` → `setConsent(false)`: sign-up ALWAYS starts unchecked,
+  regardless of prior consent history.
+- Consent checkbox moved from below the form to ABOVE the Google button so the "agree first"
+  dependency is visually obvious to users.
+- Login tab unchanged: no checkbox shown, Google button available immediately.
+- `hasConsented` import removed (unused).
+
+**Also corrected this session:** `CLAUDE.md` still uses the INCORRECT exam name "Goethe-Zertifikat
+B2 Beruf" in the header. The existing telc exam names in the file body were already correct.
+Note: in-app copy (authenticated app shell) still reflects the old "B2 Beruf exam prep" framing;
+only public-facing copy (landing, /about) was updated. In-app copy alignment is part of backlog #18.
 
 ### Session 20 (2026-06-08) — Logo lock, Terms page, GDPR pass, writing-history record SHIPPED ✅
 Branch `claude/admiring-galileo-9E0Fi`. All items squash-merged to `main` (PRs #120–#129).
@@ -888,8 +934,8 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–20 (2026-06-04 → 06-08).** Everything noted ✅ is merged to `main`.
-Active automation branch: `claude/admiring-galileo-9E0Fi` (realign to `origin/main` after each
+**Handoff after sessions 9–21 (2026-06-04 → 06-13).** Everything noted ✅ is merged to `main`.
+Active automation branch: `claude/vibrant-meitner-mfl9xk` (realign to `origin/main` after each
 squash-merge — see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
 **Shipped & live (all on `main`):**
@@ -952,6 +998,17 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
 - **Google OAuth consent branding DONE (s20):** founder completed the Google Cloud Console steps
   (app name "Genauly" + logo, domain `genauly.de` verified via Namecheap DNS TXT, app published).
 
+- **Broader B1-B2 positioning (s21, PR #140):** landing page re-copied for "German for real life,
+  B1-B2 plateau" framing (exam prep repositioned as secondary); new `/about` page with plain-language
+  purpose + Google sign-in data explanation; business plan `docs/BUSINESS_PLAN.md` v1.1; backlog
+  #18 documented. Exam naming corrected throughout public copy.
+- **Consent gating fix (s21, PR #141):** sign-up always starts with consent unchecked (previous
+  `hasConsented()` pre-check removed); checkbox moved above the Google button so the dependency
+  is visually clear. Login tab unchanged.
+- **Founder still needs to do:** re-submit Google OAuth branding verification in Google Cloud
+  Console (Google Cloud Console → OAuth consent screen → View issues → "I have fixed the issues"
+  → re-submit). The homepage and /about now plainly explain the app purpose.
+
 **Security — 100% complete. No open items.**
 
 **Decisions locked:**
@@ -978,7 +1035,7 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
 - Exam sets: **10** (1 per theme · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
 
-**Dev branch:** `claude/admiring-galileo-9E0Fi` — realign to `origin/main` after each squash-merge.
+**Dev branch:** `claude/vibrant-meitner-mfl9xk` — realign to `origin/main` after each squash-merge.
 
 **Next (priority order):**
 1. **GDPR follow-ups (from s20 pass):** fill the **Impressum** name/address (then re-enable the page
