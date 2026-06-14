@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-13 (session 21). Branch: `claude/vibrant-meitner-mfl9xk`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-14 (session 22). Branch: `claude/vibrant-meitner-mfl9xk`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -38,15 +38,17 @@ This file is the single place to re-orient when resuming work. For the full desi
   Pages site; `npm run build` green; no duplicate ids.
 
 ### Branding — DONE (live)
-- App named **Genauly**, tagline **"German that clicks"** (header, sidebar, onboarding,
-  `<title>`/meta, `package.json` name `genauly`). Custom domain **genauly.de** (CNAME shipped).
+- App named **Genauly**, tagline **"German for real life"** (header, sidebar, onboarding,
+  `<title>`/meta, `package.json` description, PWA manifest). Custom domain **genauly.de** (CNAME shipped).
+  Tagline was updated from the old "German that clicks" across all six surfaces in session 22 (PR #145).
 - **Default logo (locked 2026-06-08):** the **rounded gradient "G" with transparent corners**.
   The canonical file is **`public/genauly-default-logo-transparent-corners.png`** and it is the
   default logo in every in-app spot (sign-in dialog, mobile header, desktop sidebar, landing,
-  onboarding, `/privacy`). `public/favicon.svg` (the rounded vector source) and the
-  `public/pwa-*.png` / `apple-touch-icon.png` icons render the **same** logo under their
-  conventional names (the browser tab + PWA install/home-screen icons need those exact filenames).
-  - **Do NOT make the app logo full-bleed.** A full-bleed square variant exists **only** for
+  onboarding, `/privacy`). Favicon uses PNG files (`public/favicon-32.png`, `public/favicon-16.png`)
+  generated from the real logo (replacing the old `favicon.svg` which rendered a plain system-font "G").
+  `public/pwa-*.png` and `apple-touch-icon.png` are **full-bleed opaque** (no transparent corners)
+  so iOS home-screen icons don't show dark corners on the OS rounding mask.
+  - **Do NOT make the in-app logo full-bleed.** A full-bleed square variant exists **only** for
     Google's OAuth consent screen (its circular crop shows white through transparent corners). It
     is not committed to the repo and must not replace the app logo. (Full-bleed-everywhere was
     shipped then reverted in PRs #120/#121 — keep the app on the rounded transparent logo.)
@@ -146,14 +148,16 @@ Only use content under these licenses — anything else blocks monetization:
 - [ ] (Optional) Add Resend SMTP to fix email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
-- [ ] **Google sign-in branding (parked 2026-06-07):** the Google consent screen still shows the
-      raw Supabase domain (`stkfdavpjflpqoxjunnj.supabase.co`) instead of "Genauly". The blocking
-      prerequisite (a Privacy Policy URL) is done and live at `https://genauly.de/privacy`. Founder
-      tried the Google Cloud Console steps (OAuth consent screen → App name "Genauly" + logo +
-      home page/privacy policy links + authorized domain `genauly.de`, then verify domain
-      ownership in Google Search Console, then Publish App) but couldn't get it done in one sitting
-      — needs a guided follow-up session walking through the actual console screens together
-      (likely via screen-sharing/screenshots since the sandbox can't reach Google's console).
+- [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
+      The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
+      now contains a full static pre-render inside `#root` that Google's no-JS HTML crawler can read.
+      Founder re-submitted via Google Cloud Console → OAuth consent screen → "I have fixed the issues."
+      The cached dialog still shows the old failure (that is the previous attempt's result, not a new
+      evaluation). Google's async re-review takes hours to days; the founder should wait for an email
+      from Google's Trust and Safety team. **Do NOT re-click "I have fixed the issues" again while
+      waiting.** If the email says issues remain, escalate via the Google Developer forums or reply
+      to the Trust and Safety email with the raw-HTML evidence (the static text is visible in
+      `view-source:https://genauly.de`).
 
 ## Deploy / workflow reminders
 - `main` is production; merging to it triggers `pages.yml` (the **only** workflow now — the old
@@ -257,6 +261,74 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
+
+### Session 22 (2026-06-14) — Google OAuth branding fix, tagline unification, icon/favicon overhaul SHIPPED ✅
+Branch `claude/vibrant-meitner-mfl9xk`. All items squash-merged to `main` (PRs #142–#146).
+
+**PROJECT_STATUS.md updated for session 21 (PR #142):** standard end-of-session doc update covering
+all session 21 work.
+
+**Google OAuth branding: static pre-render fallback added to `index.html` (PR #143):**
+Google's OAuth branding reviewer fetches raw HTML without executing JavaScript, so all React-rendered
+content is invisible to it. The reviewer was seeing an empty `<div id="root"></div>`, triggering
+"Your home page does not explain the purpose of your app." Fixed by embedding a full static pre-render
+of the purpose text directly inside `#root` in `index.html`. `createRoot().render()` clears it on boot,
+so real users never see it. The static fallback contains a plain-language description of what Genauly
+is, who it is for, how Google sign-in data is used, links to About/Privacy/Terms, and the
+"Die App wird geladen" loading notice. Also updated `<title>` to "Genauly: German for real life" and
+`<meta name="description">` to match the B1-B2 real-life positioning.
+
+**Tagline unified: "German for real life" across all surfaces (PR #145):**
+The old tagline "German that clicks" was still present on several surfaces post-session-21. Updated all
+remaining occurrences:
+- `src/features/onboarding/Onboarding.tsx` (onboarding header)
+- `src/features/landing/LandingPage.tsx` (footer)
+- `package.json` (description)
+- `vite.config.ts` (PWA manifest `name` and `description`)
+
+**PWA manifest description also updated** from "Interactive prep platform for the Goethe / telc Deutsch
+B2 Beruf speaking exam." to reflect the broader B1-B2 real-life positioning.
+
+**Home-screen icons regenerated as full-bleed opaque (PR #146):**
+The existing `apple-touch-icon.png` and `pwa-*.png` had transparent corners (alpha = 0 at corners)
+inherited from the rounded-logo source. iOS fills transparent areas with black when applying the OS
+rounding mask, producing dark corners on the home-screen icon. Fixed by regenerating all four files
+using a Python/Pillow BFS flood-fill approach that extends the gradient from opaque edge pixels into
+the transparent corners:
+- `public/apple-touch-icon.png` (180x180, full-bleed opaque)
+- `public/pwa-192x192.png` (192x192, full-bleed opaque)
+- `public/pwa-512x512.png` (512x512, full-bleed opaque)
+- `public/pwa-maskable-512x512.png` (512x512, full-bleed bg + logo centered in 80% safe zone)
+
+**Favicon replaced with real logo PNGs (PR #146):**
+`public/favicon.svg` rendered a plain system-font "G" via SVG `<text>`, not the actual styled logo.
+Generated `public/favicon-32.png` and `public/favicon-16.png` from the canonical logo (with rounded
+transparent corners, appropriate for the browser tab where transparency looks good). `public/favicon-48.png`
+also generated. Updated `index.html` favicon links from SVG to the new PNGs:
+```html
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+```
+The filename change also busts browser favicon cache (no hard-refresh needed on next visit).
+
+**Google OAuth branding re-submission status:** the founder re-submitted verification via Google Cloud
+Console → OAuth consent screen → "I have fixed the issues." The cached result still showed the old
+failure ("issues found from previous verification attempt") but that is normal: Google caches the prior
+result and the new review is asynchronous. Confirmed that the static pre-render fix is technically
+correct and complete. The founder should wait for an email from Google's Trust and Safety team
+(hours to days) rather than re-clicking, which may reset the queue.
+
+**GitHub repo safety confirmed:** public repo confirmed clean. Supabase anon (publishable) key is
+intentionally public per Supabase's design (RLS is the security layer). No other secrets in tracked
+files or git history. Only exposure is business IP (code/content). Founder enabled GitHub secret
+scanning + push protection.
+
+**Hosting migration decision: Cloudflare Pages (deferred):**
+Founder chose to migrate from GitHub Pages to Cloudflare Pages after OAuth branding is resolved.
+Cloudflare Pages advantages over GitHub Pages: free private-repo deploys, native SPA routing (no
+404.html hack needed), real HTTP headers (CSP via header rather than meta tag, `frame-ancestors`
+works), superior cache purge control, and zero extra cost. Migration prep will happen in a future
+session once Google OAuth verification clears.
 
 ### Session 21 (2026-06-12) — Broader B1-B2 positioning, About page, business plan, consent gating SHIPPED ✅
 Branch `claude/vibrant-meitner-mfl9xk`. All items squash-merged to `main` (PRs #140–#141).
@@ -934,7 +1006,7 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–21 (2026-06-04 → 06-13).** Everything noted ✅ is merged to `main`.
+**Handoff after sessions 9–22 (2026-06-04 → 06-14).** Everything noted ✅ is merged to `main`.
 Active automation branch: `claude/vibrant-meitner-mfl9xk` (realign to `origin/main` after each
 squash-merge — see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
@@ -1005,9 +1077,23 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
 - **Consent gating fix (s21, PR #141):** sign-up always starts with consent unchecked (previous
   `hasConsented()` pre-check removed); checkbox moved above the Google button so the dependency
   is visually clear. Login tab unchanged.
-- **Founder still needs to do:** re-submit Google OAuth branding verification in Google Cloud
-  Console (Google Cloud Console → OAuth consent screen → View issues → "I have fixed the issues"
-  → re-submit). The homepage and /about now plainly explain the app purpose.
+
+- **Static pre-render fallback in `index.html` (s22, PR #143):** full purpose text embedded
+  directly in `#root` so Google's OAuth branding reviewer (a no-JS HTML crawler) sees the app
+  description. React clears it on boot; real users never see it.
+- **Tagline unified: "German for real life" (s22, PR #145):** updated all six surfaces that still
+  showed the old "German that clicks" tagline (onboarding, landing footer, `package.json`,
+  `vite.config.ts` PWA manifest name + description).
+- **Home-screen icons full-bleed opaque (s22, PR #146):** `apple-touch-icon.png` + `pwa-*.png`
+  regenerated without transparent corners so iOS home-screen icon has no dark corner artifacts.
+- **Favicon replaced with real logo PNGs (s22, PR #146):** `favicon-32.png` + `favicon-16.png`
+  generated from the actual logo (replacing `favicon.svg` which used a plain system-font "G").
+  `index.html` updated to link to the new PNGs; filename change busts browser favicon cache.
+- **Google OAuth branding verification re-submitted (s22):** static pre-render fix is technically
+  complete. Founder re-submitted via Google Cloud Console. Async review pending (email from Google
+  expected; hours to days). Do NOT re-click "I have fixed the issues" again while waiting.
+- **Cloudflare Pages migration decided (s22):** founder confirmed migration from GitHub Pages to
+  Cloudflare Pages after OAuth branding clears. Migration prep will be done in a future session.
 
 **Security — 100% complete. No open items.**
 
@@ -1038,18 +1124,25 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
 **Dev branch:** `claude/vibrant-meitner-mfl9xk` — realign to `origin/main` after each squash-merge.
 
 **Next (priority order):**
-1. **GDPR follow-ups (from s20 pass):** fill the **Impressum** name/address (then re-enable the page
+1. **Cloudflare Pages migration (decided s22, deferred until OAuth clears):** after Google confirms
+   OAuth branding approval via email, migrate from GitHub Pages. Steps for the migration session:
+   - Add a `_redirects` file for Cloudflare Pages SPA routing (replaces `public/404.html` + `spa-redirect.js`).
+   - Connect GitHub repo to Cloudflare Pages (build: `pnpm build`, output: `dist`).
+   - Move `genauly.de` DNS from Namecheap to Cloudflare nameservers.
+   - Verify Google OAuth redirect URI still works post-DNS change.
+   - Update `pages.yml` or remove it if GitHub Pages deploy is retired.
+2. **GDPR follow-ups (from s20 pass):** fill the **Impressum** name/address (then re-enable the page
    per `CLAUDE.md`/`PHASE2_SETUP.md`) and the **data-location region** placeholder in the privacy
    policy; optionally enable the **pg_cron auto-retention** for writing text (SQL in `PHASE2_SETUP.md`).
-2. **Lawyer review of `/privacy` + `/terms` (backlog #15)** before paid plans / marketing. Likely adds
+3. **Lawyer review of `/privacy` + `/terms` (backlog #15)** before paid plans / marketing. Likely adds
    the real Impressum, Widerrufsrecht for paid plans, tighter liability.
-3. **Content QC pipeline** — CI lint for duplicate IDs, broken dialogue nodes, missing fields; plus a
+4. **Content QC pipeline** — CI lint for duplicate IDs, broken dialogue nodes, missing fields; plus a
    pedagogical review process for German accuracy and B2 level-appropriateness.
-4. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
-5. (Optional) Monetization tier + paywall feature flags (the `tier` column already exists).
-6. (Optional) More grammar drills (47 → ~80 target).
-7. (Optional) More vocabulary content expansion (504 → ~600+ target).
-8. **Founder ideas backlog (added 2026-06-07)** — 14 raw feature ideas spanning product (Dashboard
+5. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
+6. (Optional) Monetization tier + paywall feature flags (the `tier` column already exists).
+7. (Optional) More grammar drills (47 → ~80 target).
+8. (Optional) More vocabulary content expansion (504 → ~600+ target).
+9. **Founder ideas backlog (added 2026-06-07)** — 14 raw feature ideas spanning product (Dashboard
    redesign, gating Schreibtraining behind sign-in, animated scenario simulations, vocabulary
    visual mnemonics, domain/sector content filtering, Schreibtraining redesign, sourced/audit-ready
    content pipeline), monetization (pricing page + plans, payment gateway), growth (FAQ + landing
