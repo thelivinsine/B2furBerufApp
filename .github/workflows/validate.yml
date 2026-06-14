@@ -1,0 +1,38 @@
+name: Validate content
+
+# Gate that blocks broken content from reaching main. Runs the content
+# linter (duplicate ids, broken dialogue branches, missing fields, dangling
+# cross-references, em dashes in copy) on every PR and on pushes to main.
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint-content:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions pinned to commit SHAs (not floating tags) to remove the
+      # tag-hijack supply-chain risk, matching pages.yml.
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint content
+        run: pnpm lint:content
