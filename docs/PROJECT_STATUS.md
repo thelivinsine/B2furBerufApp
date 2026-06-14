@@ -262,6 +262,26 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 22 cont. (2026-06-14) — Data governance roadmap drafted 📋
+Founder brainstormed making content ingestion **audit-ready** for eventual certification (TÜV
+Rheinland / EY-style) and guaranteeing all content is under commercial-safe Creative Commons
+licenses. Drivers: enterprise/gov edtech sales, legal/copyright safety, investor credibility, brand.
+
+Key framing established: certification bodies certify the **process/management system**, not the data;
+TÜV certifies against standards (**ISO/IEC 42001** for AI, ISO 27001), EY does **assurance** (SOC 2 /
+ISAE 3000), and the concrete near-term legal driver is the **EU AI Act Article 10** (data governance +
+provenance). The certificate is downstream of having the right system in place.
+
+Shipped: **`docs/DATA_GOVERNANCE.md` (v0.1)** covering the provenance-register schema, a commercial-safe
+license allowlist (SPDX, with the CC-BY-SA share-alike trap flagged), the four-eyes workflow, a planned
+machine **license gate** (extend the new content linter so every content id must declare an allowlisted
+license or the build fails), a risk register, a standards-mapping table, and a phased roadmap. **CTO
+call: build Phases 1-3 now (cheap, mechanical, satisfies EU AI Act); defer paid certification (Phase 4)
+until revenue or a customer demands it.** Most existing content is `OWNED` (authored in-house), the
+cleanest status. Backlog #7 cross-referenced to the doc; **new backlog #19** added for a certification
+deep-research pass to validate the v0.1 assumptions (cost, body, EU AI Act risk class) into a v0.2.
+No app code changed.
+
 ### Session 22 cont. (2026-06-14) — Content QC linter + CI gate SHIPPED ✅
 Branch `claude/vibrant-meitner-mfl9xk`. Backlog "Content QC pipeline" (mechanical half).
 
@@ -895,6 +915,10 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
    a clear, audit-ready human-verification workflow. Every data point in the app should carry
    a clear source, verified status, and other metadata, tracked in an Excel/CSV in the project
    folder (not just inline in the TS files) so it's reviewable independent of the code.
+   - **Now elaborated in `docs/DATA_GOVERNANCE.md` (v0.1, added 2026-06-14):** the full governance
+     roadmap, provenance-register schema, commercial-safe license allowlist (SPDX) + planned machine
+     gate, four-eyes workflow, and a phased path mapping to ISO/IEC 42001 + EU AI Act Article 10.
+     Phase 1 (provenance register + license gate in the linter) is the recommended next build step.
 8. **Pricing page + plan design:** create a pricing page and design the various paid plans/tiers
    to offer (ties into the "monetize later" decision and the planned `tier` flag).
 9. **Payment gateway integration:** add a payment provider so the plans in #8 can actually be
@@ -981,6 +1005,15 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       already signals they evolve. Keep the internal "needs lawyer review" caveat in this backlog,
       not user-facing. **Founder confirmed 2026-06-08: no banner.** (Revisit only the
       language-precedence line + Impressum during the lawyer pass.)
+19. **Certification landscape deep-research (added 2026-06-14):** run a thorough, cited research pass
+    to validate the assumptions in `docs/DATA_GOVERNANCE.md`. Questions to answer with real sources:
+    ISO/IEC 42001 vs SOC 2 vs ISAE 3000 vs ISO/IEC 27001 for an EU edtech AI product (what each
+    actually certifies, which fits us); realistic cost and timeline for each, and which body (TÜV
+    Rheinland / SÜD / NORD, EY, others); Genauly's **EU AI Act risk classification** (is AI writing/
+    pronunciation feedback "high-risk" under Annex III education, or limited-risk?) and the concrete
+    Article 10 data-governance obligations that follow; and any edtech-specific schemes worth
+    pursuing. Output feeds a v0.2 of `DATA_GOVERNANCE.md`. Recommended model: **Fable** (or the
+    deep-research harness). This is research only, no code.
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
