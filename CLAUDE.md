@@ -17,6 +17,7 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
 - `pnpm typecheck` — `tsc -b --noEmit`
 - `pnpm preview` — preview the production build
 - `pnpm audit` — check for dependency vulnerabilities (CI/security gate)
+- `pnpm lint:content` — validate the `src/data/*` content banks (CI gate, see below)
 
 Notes: `.npmrc` sets `minimum-release-age` (24h supply-chain cooldown) and
 `package-manager-strict`. pnpm blocks dependency build scripts by default (a supply-chain
@@ -45,6 +46,14 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article, plural, pronunciation hint, two example sentences, and related terms. Currently **354 words** (~34–39 per theme). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build`.
 - **Collocations** (`src/data/collocations.ts`): currently **120 Nomen-Verb pairs** (12 per theme). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`, `example {de, en}`. Keep ids unique (`c_` prefix + snake_case).
 - **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.
+- **Content linter (`pnpm lint:content`, gate added 2026-06-14):** `scripts/lint-content.mjs`
+  loads every `src/data/*` bank through Vite's `ssrLoadModule` (no extra dependency) and checks for
+  duplicate ids, broken dialogue branches (bad `next` targets, orphan/dead-end nodes, `start`
+  integrity), missing/empty required fields, dangling cross-references (`themeId`, `scenarioId`,
+  Redemittel/grammar/weakness categories), and em dashes in copy. It runs in CI on every PR and on
+  pushes to `main` (`.github/workflows/validate.yml`), failing the build on any error. **Run it after
+  any content edit**, not just `pnpm build` (TypeScript does not catch duplicate ids, which silently
+  drop React-keyed cards). Plural is intentionally NOT required on nouns (uncountable/plural-only).
 
 ## UI conventions — modal / popup overlays (locked 2026-06-07)
 The founder reviewed the sign-in dialog's backdrop and **locked this as the standard look for

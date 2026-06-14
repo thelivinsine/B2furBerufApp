@@ -262,6 +262,37 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
 
+### Session 22 cont. (2026-06-14) — Content QC linter + CI gate SHIPPED ✅
+Branch `claude/vibrant-meitner-mfl9xk`. Backlog "Content QC pipeline" (mechanical half).
+
+**New content linter `scripts/lint-content.mjs` (`pnpm lint:content`):** validates every `src/data/*`
+bank. It loads the real `.ts` modules through Vite's `ssrLoadModule` (zero new dependencies, exact
+project transform + `@/` alias) and checks:
+- **Duplicate ids** within every dataset (vocab, collocations, grammar topics + drills globally,
+  dialogues, exam sets, redemittel, practice areas, themes).
+- **Dialogue node integrity:** `start` resolves, each node's `id` matches its Record key, every
+  option `next` / node `next` points to a real node, option ids unique per node, no dead-end nodes
+  (must have options, a `next`, or `end: true`), and no orphan/unreachable nodes (BFS from `start`).
+- **Missing/empty required fields** per schema (e.g. vocab de/en/pron/examples, collocation
+  full/en/example, grammar drill prompt/answer, exam rubric criteria).
+- **Cross-references:** `themeId`, exam `scenarioId`, Redemittel categories, grammar groups,
+  weakness categories, and `option.uses` all resolve to known values.
+- **Em-dash sweep** (CLAUDE.md writing rule) recursively over all copy strings.
+Errors fail the process; a small advisory warning channel exists but is currently empty.
+
+**Wired as a CI gate (`.github/workflows/validate.yml`):** runs `pnpm lint:content` on every PR and
+on pushes to `main`, actions SHA-pinned to match `pages.yml`. Blocks broken content from merging.
+
+**Real bugs the linter caught and fixed (PR #148):**
+- **8 duplicate vocabulary ids** (`v_nachhaltig`, `v_schutzausruestung`, `v_unterkunft`,
+  `v_dienstreise`, `v_engpass`, `v_missverstaendnis`, `v_einigung`, `v_abnahme`) introduced by the
+  session-16 bulk append. React silently rendered only the first of each, so 8 cards were dead data.
+  Removed the redundant later copies (498 → **490** real entries).
+- **4 plural-only nouns missing their article** (`v_stakeholder`, `v_zugriffsrechte`,
+  `v_erneuerbare_energie`, `v_treibhausgasemissionen`); added `article: "die"`.
+After fixes: linter green (0 errors, 0 warnings), `pnpm build` green. Documented in CLAUDE.md
+(Commands + Content conventions). **The pedagogical/German-accuracy review half remains backlogged.**
+
 ### Session 22 (2026-06-14) — Google OAuth branding fix, tagline unification, icon/favicon overhaul SHIPPED ✅
 Branch `claude/vibrant-meitner-mfl9xk`. All items squash-merged to `main` (PRs #142–#146).
 
@@ -1113,8 +1144,8 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
   banner** (functional-only storage is consent-exempt); GDPR rights are in-app self-service. Keep
   `CONSENT_VERSION` (`src/lib/consent.ts`) in lockstep with the legal `LAST_UPDATED`. `CLAUDE.md` → "Legal pages & consent".
 
-**Content counts (live):**
-- Vocabulary: **~504 words** (~50/theme · 10 themes)
+**Content counts (live, verified by `pnpm lint:content` 2026-06-14):**
+- Vocabulary: **490 words** (was 498; 8 duplicate ids removed s22)
 - Collocations: **120 Nomen-Verb pairs** (12/theme)
 - Grammar: **47 drills** · **10 topics**
 - Dialogues (branching scenarios): **10** (1 per theme)
@@ -1136,8 +1167,10 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
    policy; optionally enable the **pg_cron auto-retention** for writing text (SQL in `PHASE2_SETUP.md`).
 3. **Lawyer review of `/privacy` + `/terms` (backlog #15)** before paid plans / marketing. Likely adds
    the real Impressum, Widerrufsrecht for paid plans, tighter liability.
-4. **Content QC pipeline** — CI lint for duplicate IDs, broken dialogue nodes, missing fields; plus a
-   pedagogical review process for German accuracy and B2 level-appropriateness.
+4. **Content QC pipeline** — mechanical half **DONE (s22)**: `pnpm lint:content` + CI gate
+   (`validate.yml`) for duplicate ids, broken dialogue nodes, missing fields, dangling cross-refs,
+   em dashes. Remaining: the **pedagogical review process** for German accuracy and B2
+   level-appropriateness (process/LLM-judgment, not code; recommended model **Fable**).
 5. (Optional) Add Resend SMTP to fix email magic-link rate-limit.
 6. (Optional) Monetization tier + paywall feature flags (the `tier` column already exists).
 7. (Optional) More grammar drills (47 → ~80 target).
