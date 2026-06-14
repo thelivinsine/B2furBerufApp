@@ -27,10 +27,10 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/404\.html$/],
       },
       manifest: {
-        name: "Genauly: German that clicks",
+        name: "Genauly: German for real life",
         short_name: "Genauly",
         description:
-          "Interactive prep platform for the Goethe / telc Deutsch B2 Beruf speaking exam.",
+          "Practise real-life German for the B1 to B2 plateau: work, Behörde, doctor visits and job interviews, plus telc Deutsch B2 Beruf exam prep.",
         theme_color: "#6366f1",
         background_color: "#0f1729",
         display: "standalone",

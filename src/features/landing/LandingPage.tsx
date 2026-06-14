@@ -237,7 +237,7 @@ export function LandingPage() {
       </section>
 
       <footer className="relative z-10 border-t border-border py-6 text-center text-xs text-muted-foreground">
-        <p>Genauly · German that clicks · Deutsch für das echte Leben · B1–B2</p>
+        <p>Genauly · German for real life · Deutsch für das echte Leben · B1–B2</p>
         <nav className="mt-1.5 flex items-center justify-center gap-4">
           <button
             onClick={() => navigate("/about")}

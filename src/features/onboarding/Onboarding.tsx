@@ -88,7 +88,7 @@ export function Onboarding() {
       >
         <div className="mb-6 flex items-center justify-center gap-2.5">
           <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-10 w-10 rounded-xl shadow-glow" />
-          <span className="text-lg font-semibold tracking-tight">Genauly: German that clicks</span>
+          <span className="text-lg font-semibold tracking-tight">Genauly: German for real life</span>
         </div>
 
         <Card className="overflow-hidden p-0 shadow-elevated">
