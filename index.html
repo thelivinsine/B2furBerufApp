@@ -33,12 +33,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
-      content="Genauly: German that clicks. Master workplace German and ace the Goethe/telc Deutsch B2 Beruf speaking exam."
+      content="Genauly is a German learning app for adults who already know the basics but feel stuck between B1 and B2. Practise the real-life situations that actually matter: presentations at work, Behörde appointments, doctor visits and job interviews. It also helps you prepare for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams."
     />
     <title>Genauly: German that clicks</title>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Static pre-render fallback inside #root. It is shown before the React
+         bundle boots and, crucially, it is the only content that clients which
+         do NOT run JavaScript can see: link-preview crawlers, search engines,
+         and Google's OAuth branding reviewer (which fetches this page's RAW
+         HTML to check that the home page explains the app's purpose). Because
+         the app mounts with createRoot(#root).render(), React clears ALL of
+         this on boot, so real users never see it once the bundle loads. Keep a
+         plain-language description of what Genauly is here so the home page
+         always explains its purpose, even with JavaScript disabled. Follows the
+         no-em-dash writing rule (CLAUDE.md). -->
+    <div id="root">
+      <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:#0f1729;color:#e2e8f0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;">
+        <div style="max-width:42rem;text-align:center;">
+          <img src="/genauly-default-logo-transparent-corners.png" alt="Genauly" width="64" height="64" style="display:block;margin:0 auto 1.25rem;border-radius:14px;" />
+          <h1 style="margin:0 0 .5rem;font-size:1.875rem;font-weight:700;">Genauly</h1>
+          <p style="margin:0 0 1.25rem;font-size:1.125rem;font-weight:600;color:#a5b4fc;">German for real life. Break through the B1 to B2 plateau.</p>
+          <p style="margin:0 0 1rem;font-size:1rem;line-height:1.6;color:#cbd5e1;">
+            Genauly is a German learning app for adults who already know the
+            basics but feel stuck at the intermediate level, typically somewhere
+            between B1 and B2. Instead of more grammar tables, it builds real
+            confidence through the situations you actually face: a presentation
+            at work, an appointment at the Behörde, a visit to the doctor, a job
+            interview, or a difficult conversation with a colleague.
+          </p>
+          <p style="margin:0 0 1.5rem;font-size:1rem;line-height:1.6;color:#cbd5e1;">
+            You practise branching dialogues, build vocabulary with spaced
+            repetition, take leveled quizzes, and get AI feedback on your writing
+            and pronunciation. The app also helps you prepare for the telc
+            Deutsch B2 Beruf and Goethe-Zertifikat B2 exams. Signing in with
+            Google is optional and is used only to create your account and save
+            your learning progress across your devices. We do not sell your data
+            or use it for advertising.
+          </p>
+          <p style="margin:0;font-size:.95rem;color:#94a3b8;">
+            <a href="/about" style="color:#a5b4fc;">About Genauly</a> ·
+            <a href="/privacy" style="color:#a5b4fc;">Privacy</a> ·
+            <a href="/terms" style="color:#a5b4fc;">Terms</a>
+          </p>
+          <p style="margin:1.5rem 0 0;font-size:.9rem;color:#64748b;">Die App wird geladen …</p>
+        </div>
+      </main>
+    </div>
     <!-- GitHub Pages has no server-side router: a direct visit to e.g.
          /settings 404s. This script (loaded from public/, see public/404.html
          for the matching redirect) restores the real URL via history.replaceState
