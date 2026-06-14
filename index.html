@@ -37,26 +37,25 @@
       content="Genauly is a German learning app for adults who already know the basics but feel stuck between B1 and B2. Practise the real-life situations that actually matter: presentations at work, Behörde appointments, doctor visits and job interviews. It also helps you prepare for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams."
     />
     <title>Genauly: German for real life</title>
-    <!-- Boot splash control. This inline script runs synchronously before the
-         body paints, so it can mark the document as JavaScript-capable BEFORE
-         the static #root fallback is ever shown. The CSS below then hides the
-         verbose marketing copy (kept in the raw HTML purely for no-JS crawlers
-         and Google's OAuth reviewer) and shows a clean branded loading splash
-         instead. This stops real users from seeing a flash of the full
-         description text in the brief gap before React mounts. -->
-    <script>
-      document.documentElement.classList.add("js");
-    </script>
+    <!-- Boot splash control. The page CSP intentionally has no inline-script
+         allowance (script-src 'self' only), so we must NOT rely on JavaScript
+         to swap the boot fallback. Instead we default to the branded splash for
+         everyone and use <noscript> to reveal the verbose description ONLY when
+         scripting is disabled. The <noscript><style> override is CSP-safe
+         because style-src allows 'unsafe-inline'.
+         - Normal (JS) browsers: see only #boot-splash, so the brief moment
+           before React mounts reads as an intentional loading screen, never the
+           marketing wall.
+         - No-JS clients (link-preview crawlers, search engines, Google's OAuth
+           reviewer): the description text stays in the raw HTML AND is made
+           visible by the noscript override, so the home page still explains its
+           purpose. -->
     <style>
-      /* No-JS clients see #boot-seo (the full description). JS browsers see a
-         minimal splash (#boot-splash) and never the marketing wall. */
+      /* Default for everyone: show the splash, hide the verbose description. */
+      #boot-seo {
+        display: none;
+      }
       #boot-splash {
-        display: none;
-      }
-      .js #boot-seo {
-        display: none;
-      }
-      .js #boot-splash {
         display: block;
       }
       .boot-spinner {
@@ -79,6 +78,18 @@
         }
       }
     </style>
+    <!-- Scripting disabled: hide the splash (its spinner would never resolve)
+         and reveal the full description so crawlers/OAuth review see it. -->
+    <noscript>
+      <style>
+        #boot-seo {
+          display: block;
+        }
+        #boot-splash {
+          display: none;
+        }
+      </style>
+    </noscript>
   </head>
   <body>
     <!-- Static pre-render fallback inside #root. It is shown before the React
@@ -89,7 +100,8 @@
          the app mounts with createRoot(#root).render(), React clears ALL of
          this on boot, so real users never see it once the bundle loads.
 
-         Two variants share this block (toggled by the .js rule in <head>):
+         Two variants share this block (toggled by the <noscript> rule in
+         <head>, which is CSP-safe since inline scripts are disallowed):
          - #boot-seo: the full plain-language description, kept so the home page
            always explains its purpose even with JavaScript disabled. Shown ONLY
            to no-JS clients (crawlers / OAuth reviewer).
