@@ -37,6 +37,48 @@
       content="Genauly is a German learning app for adults who already know the basics but feel stuck between B1 and B2. Practise the real-life situations that actually matter: presentations at work, Behörde appointments, doctor visits and job interviews. It also helps you prepare for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams."
     />
     <title>Genauly: German for real life</title>
+    <!-- Boot splash control. This inline script runs synchronously before the
+         body paints, so it can mark the document as JavaScript-capable BEFORE
+         the static #root fallback is ever shown. The CSS below then hides the
+         verbose marketing copy (kept in the raw HTML purely for no-JS crawlers
+         and Google's OAuth reviewer) and shows a clean branded loading splash
+         instead. This stops real users from seeing a flash of the full
+         description text in the brief gap before React mounts. -->
+    <script>
+      document.documentElement.classList.add("js");
+    </script>
+    <style>
+      /* No-JS clients see #boot-seo (the full description). JS browsers see a
+         minimal splash (#boot-splash) and never the marketing wall. */
+      #boot-splash {
+        display: none;
+      }
+      .js #boot-seo {
+        display: none;
+      }
+      .js #boot-splash {
+        display: block;
+      }
+      .boot-spinner {
+        width: 28px;
+        height: 28px;
+        margin: 0 auto;
+        border-radius: 9999px;
+        border: 3px solid rgba(165, 180, 252, 0.25);
+        border-top-color: #a5b4fc;
+        animation: boot-spin 0.8s linear infinite;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-spinner {
+          animation-duration: 1.6s;
+        }
+      }
+    </style>
   </head>
   <body>
     <!-- Static pre-render fallback inside #root. It is shown before the React
@@ -45,39 +87,49 @@
          and Google's OAuth branding reviewer (which fetches this page's RAW
          HTML to check that the home page explains the app's purpose). Because
          the app mounts with createRoot(#root).render(), React clears ALL of
-         this on boot, so real users never see it once the bundle loads. Keep a
-         plain-language description of what Genauly is here so the home page
-         always explains its purpose, even with JavaScript disabled. Follows the
-         no-em-dash writing rule (CLAUDE.md). -->
+         this on boot, so real users never see it once the bundle loads.
+
+         Two variants share this block (toggled by the .js rule in <head>):
+         - #boot-seo: the full plain-language description, kept so the home page
+           always explains its purpose even with JavaScript disabled. Shown ONLY
+           to no-JS clients (crawlers / OAuth reviewer).
+         - #boot-splash: a minimal branded loading splash shown to real (JS)
+           browsers so the brief pre-React moment reads as an intentional
+           loading screen rather than a flash of marketing copy.
+         Follows the no-em-dash writing rule (CLAUDE.md). -->
     <div id="root">
       <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;background:#0f1729;color:#e2e8f0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;">
         <div style="max-width:42rem;text-align:center;">
           <img src="/genauly-default-logo-transparent-corners.png" alt="Genauly" width="64" height="64" style="display:block;margin:0 auto 1.25rem;border-radius:14px;" />
           <h1 style="margin:0 0 .5rem;font-size:1.875rem;font-weight:700;">Genauly</h1>
           <p style="margin:0 0 1.25rem;font-size:1.125rem;font-weight:600;color:#a5b4fc;">German for real life. Break through the B1 to B2 plateau.</p>
-          <p style="margin:0 0 1rem;font-size:1rem;line-height:1.6;color:#cbd5e1;">
-            Genauly is a German learning app for adults who already know the
-            basics but feel stuck at the intermediate level, typically somewhere
-            between B1 and B2. Instead of more grammar tables, it builds real
-            confidence through the situations you actually face: a presentation
-            at work, an appointment at the Behörde, a visit to the doctor, a job
-            interview, or a difficult conversation with a colleague.
-          </p>
-          <p style="margin:0 0 1.5rem;font-size:1rem;line-height:1.6;color:#cbd5e1;">
-            You practise branching dialogues, build vocabulary with spaced
-            repetition, take leveled quizzes, and get AI feedback on your writing
-            and pronunciation. The app also helps you prepare for the telc
-            Deutsch B2 Beruf and Goethe-Zertifikat B2 exams. Signing in with
-            Google is optional and is used only to create your account and save
-            your learning progress across your devices. We do not sell your data
-            or use it for advertising.
-          </p>
-          <p style="margin:0;font-size:.95rem;color:#94a3b8;">
-            <a href="https://genauly.de/about" style="color:#a5b4fc;">About Genauly</a> ·
-            <a href="https://genauly.de/privacy" style="color:#a5b4fc;">Privacy Policy</a> ·
-            <a href="https://genauly.de/terms" style="color:#a5b4fc;">Terms of Service</a>
-          </p>
-          <p style="margin:1.5rem 0 0;font-size:.9rem;color:#64748b;">Die App wird geladen …</p>
+          <div id="boot-seo">
+            <p style="margin:0 0 1rem;font-size:1rem;line-height:1.6;color:#cbd5e1;">
+              Genauly is a German learning app for adults who already know the
+              basics but feel stuck at the intermediate level, typically somewhere
+              between B1 and B2. Instead of more grammar tables, it builds real
+              confidence through the situations you actually face: a presentation
+              at work, an appointment at the Behörde, a visit to the doctor, a job
+              interview, or a difficult conversation with a colleague.
+            </p>
+            <p style="margin:0 0 1.5rem;font-size:1rem;line-height:1.6;color:#cbd5e1;">
+              You practise branching dialogues, build vocabulary with spaced
+              repetition, take leveled quizzes, and get AI feedback on your writing
+              and pronunciation. The app also helps you prepare for the telc
+              Deutsch B2 Beruf and Goethe-Zertifikat B2 exams. Signing in with
+              Google is optional and is used only to create your account and save
+              your learning progress across your devices. We do not sell your data
+              or use it for advertising.
+            </p>
+            <p style="margin:0;font-size:.95rem;color:#94a3b8;">
+              <a href="https://genauly.de/about" style="color:#a5b4fc;">About Genauly</a> ·
+              <a href="https://genauly.de/privacy" style="color:#a5b4fc;">Privacy Policy</a> ·
+              <a href="https://genauly.de/terms" style="color:#a5b4fc;">Terms of Service</a>
+            </p>
+          </div>
+          <div id="boot-splash" aria-hidden="true">
+            <div class="boot-spinner"></div>
+          </div>
         </div>
       </main>
     </div>
