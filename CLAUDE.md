@@ -43,7 +43,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 
 ## Content conventions
 - **Themes**: ten workplace topics: meetings, scheduling, logistics, customer, conflict, project, technology, sustainability, safety, travel.
-- **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article, plural, pronunciation hint, two example sentences, and related terms. Currently **354 words** (~34–39 per theme). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build`.
+- **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article (nouns), plural (countable nouns), pronunciation hint, two example sentences, and related terms. Currently **490 words** (~49 per theme; verified by `pnpm lint:content`). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build` + `pnpm lint:content`.
 - **Collocations** (`src/data/collocations.ts`): currently **120 Nomen-Verb pairs** (12 per theme). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`, `example {de, en}`. Keep ids unique (`c_` prefix + snake_case).
 - **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.
 - **Content linter (`pnpm lint:content`, gate added 2026-06-14):** `scripts/lint-content.mjs`
@@ -77,13 +77,24 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   at it (sign-in dialog, mobile header `AppShell`, desktop `Sidebar`, landing, onboarding,
   `/privacy`). When adding a new logo spot, reuse this file (keep the CSS `rounded-lg`/`rounded-xl`
   + `shadow-glow` styling).
-- `public/favicon.svg` is the rounded **vector source** of the same mark (used for the browser
-  tab); `public/pwa-*.png` + `apple-touch-icon.png` are the PWA install / home-screen icons. They
-  all show the **same** logo under their conventional, tooling-required filenames. Don't rename them.
-- **Never make the app logo full-bleed.** A full-bleed square variant exists **only** for Google's
-  OAuth consent screen (its circular crop reveals white through transparent corners). It is not in
-  the repo. Full-bleed-everywhere was shipped then reverted (PRs #120/#121); keep the app on the
-  rounded transparent logo.
+- **Browser-tab favicon (updated 2026-06-14, s22):** `public/favicon-32.png` + `public/favicon-16.png`,
+  generated from the canonical logo with **rounded transparent corners** (transparency looks right in a
+  browser tab). `index.html` links these PNGs. They replaced the old `public/favicon.svg`, which drew a
+  plain system-font "G" rather than the real mark (`favicon.svg` may still exist in the repo but is no
+  longer referenced; don't reintroduce it as the favicon).
+- **Home-screen / PWA icons are intentionally FULL-BLEED OPAQUE (updated 2026-06-14, s22):**
+  `public/apple-touch-icon.png` and `public/pwa-192x192.png` / `pwa-512x512.png` are full-bleed with
+  **no transparent corners** (corner alpha 255). iOS fills transparent areas with black when it applies
+  its own rounding mask, so transparent corners showed up as dark corners on the home screen. The
+  maskable `pwa-maskable-512x512.png` keeps the logo within the inner 80% safe zone on a full-bleed
+  background. **Do not "fix" these back to transparent corners.** This full-bleed treatment is correct
+  and required for OS-masked icons, and is the one exception to the rounded-transparent rule below.
+- **The in-app `<img>` logo is NEVER full-bleed.** Every in-app logo spot uses the rounded
+  transparent-corner asset. A full-bleed square variant also exists **only** for Google's OAuth consent
+  screen (its circular crop reveals white through transparent corners); that one is not in the repo.
+  Full-bleed-everywhere across the in-app UI was shipped then reverted (PRs #120/#121); keep in-app
+  logos on the rounded transparent mark. (This is distinct from the OS home-screen icons above, which
+  are correctly full-bleed.)
 
 ## Legal pages & consent (GDPR)
 - `/privacy` and `/terms` are bilingual (DE/EN) via the shared `LegalChrome` + `Section` in
