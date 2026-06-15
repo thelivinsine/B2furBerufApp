@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Zap } from "lucide-react";
+import { Flame, Zap, Loader2 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { BottomTabBar } from "./BottomTabBar";
@@ -41,6 +41,22 @@ export function AppShell() {
       navigate(`/writing?theme=${draft.theme}`, { replace: true });
     }
   }, [authStatus, location.pathname, navigate]);
+
+  // While the redirect above is pending, show a brief resume screen instead of
+  // flashing the dashboard for a frame before the hop to /writing.
+  const resuming =
+    authStatus === "signedIn" &&
+    !location.pathname.startsWith("/writing") &&
+    loadWritingDraft()?.resume === true;
+
+  if (resuming) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background bg-mesh text-muted-foreground">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+        <p className="text-sm">Schreibtraining wird fortgesetzt …</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background bg-mesh">
