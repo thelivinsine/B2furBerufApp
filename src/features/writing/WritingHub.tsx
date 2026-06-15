@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock, History } from "lucide-react";
@@ -9,6 +9,9 @@ import { practiceAreaById } from "@/data/practiceAreas";
 import { iconByName } from "@/lib/icons";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
 import { WritingHistory } from "./WritingHistory";
+import { loadWritingDraft, saveWritingDraft, clearWritingDraft } from "./resumeDraft";
+import { AuthDialog } from "@/features/auth/AuthDialog";
+import { useAuthStore } from "@/store/useAuthStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +47,51 @@ export function WritingHub() {
   const [result, setResult] = useState<WritingEvalResult | null>(null);
 
   const words = useMemo(() => countWords(text), [text]);
+
+  // Writing requires a real (non-guest) account. Guests get a normal-looking
+  // button that opens a sign-in nudge instead of evaluating.
+  const status = useAuthStore((s) => s.status);
+  const isSignedIn = status === "signedIn";
+  const [authOpen, setAuthOpen] = useState(false);
+  const restoredRef = useRef(false);
+  const resumedRef = useRef(false);
+
+  // Submit the current draft for AI evaluation. Defined before the early return
+  // below so the resume effect can call it (rules of hooks).
+  const submit = async () => {
+    if (!theme) return;
+    setSubmitting(true);
+    setResult(null);
+    const res = await evaluateWriting({ theme, length, text: text.trim() });
+    setResult(res);
+    setSubmitting(false);
+  };
+
+  // Restore an in-progress draft (e.g. after returning from sign-in) so the
+  // learner's text is exactly where they left it. Runs once per mount and only
+  // for the matching theme; never clobbers text the user is already editing.
+  useEffect(() => {
+    if (restoredRef.current || !theme) return;
+    const draft = loadWritingDraft();
+    if (draft && draft.theme === theme) {
+      restoredRef.current = true;
+      setLength(draft.length);
+      setText((prev) => (prev ? prev : draft.text));
+    }
+  }, [theme]);
+
+  // After the learner signs in, automatically resume the evaluation they were
+  // blocked on at the login wall, once, if there is enough text.
+  useEffect(() => {
+    if (resumedRef.current || !isSignedIn || !theme) return;
+    const draft = loadWritingDraft();
+    if (!draft || !draft.resume || draft.theme !== theme || words < 5) return;
+    resumedRef.current = true;
+    clearWritingDraft();
+    void submit();
+    // submit closes over the just-restored text; deps kept minimal on purpose.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn, theme, words]);
 
   // Theme picker / history toggle
   if (!theme) {
@@ -132,12 +180,24 @@ export function WritingHub() {
     setText("");
   };
 
-  const submit = async () => {
-    setSubmitting(true);
-    setResult(null);
-    const res = await evaluateWriting({ theme, length, text: text.trim() });
-    setResult(res);
-    setSubmitting(false);
+  // Guests hit a login wall here: stash the draft (survives the Google OAuth
+  // full-page redirect) and nudge sign-in instead of evaluating.
+  const handleEvaluate = () => {
+    if (!isSignedIn) {
+      saveWritingDraft({ theme, length, text, resume: true });
+      setAuthOpen(true);
+      return;
+    }
+    void submit();
+  };
+
+  const handleAuthOpenChange = (open: boolean) => {
+    setAuthOpen(open);
+    // Dismissed without signing in: drop the pending resume so the learner is
+    // not unexpectedly pulled back into an evaluation on a later sign-in.
+    if (!open && useAuthStore.getState().status !== "signedIn") {
+      clearWritingDraft();
+    }
   };
 
   const area = result?.practiceArea ? practiceAreaById(result.practiceArea) : undefined;
@@ -216,7 +276,7 @@ export function WritingHub() {
                   Neu schreiben
                 </Button>
               )}
-              <Button onClick={submit} disabled={submitting || words < 5} variant="gradient">
+              <Button onClick={handleEvaluate} disabled={submitting || words < 5} variant="gradient">
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" /> Wird geprüft …
@@ -281,6 +341,10 @@ export function WritingHub() {
           )}
         </motion.div>
       )}
+
+      {/* Login wall: writing requires a real account. The button looks normal;
+          clicking it as a guest opens this nudge and stashes the draft. */}
+      <AuthDialog open={authOpen} onOpenChange={handleAuthOpenChange} intent="signup" />
     </div>
   );
 }

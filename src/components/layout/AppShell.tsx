@@ -1,5 +1,5 @@
-import { Suspense, useState } from "react";
-import { Outlet, useLocation, Link } from "react-router-dom";
+import { Suspense, useEffect, useState } from "react";
+import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Flame, Zap } from "lucide-react";
 import { Sidebar } from "./Sidebar";
@@ -8,22 +8,39 @@ import { BottomTabBar } from "./BottomTabBar";
 import { MoreSheet } from "./MoreSheet";
 import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useAuthStore } from "@/store/useAuthStore";
 import { levelFromXp } from "@/engine/scoring";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { Toaster } from "./Toaster";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { AccountMenu } from "@/features/auth/AccountMenu";
+import { loadWritingDraft } from "@/features/writing/resumeDraft";
 import { cn } from "@/lib/utils";
 
 export function AppShell() {
   const [moreOpen, setMoreOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const authStatus = useAuthStore((s) => s.status);
   const xp = useProgressStore((s) => s.xp);
   const streak = useProgressStore((s) => s.streak);
   const todayXp = useTodayXp();
   const goal = useSettingsStore((s) => s.dailyGoalXp);
   const level = levelFromXp(xp).level;
   const goalProgress = Math.min(todayXp / goal, 1);
+
+  // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
+  // the app root, so when a learner signs in with a pending writing draft we
+  // send them back to /writing, where WritingHub restores the text and resumes
+  // the evaluation they were blocked on.
+  useEffect(() => {
+    if (authStatus !== "signedIn") return;
+    if (location.pathname.startsWith("/writing")) return;
+    const draft = loadWritingDraft();
+    if (draft?.resume) {
+      navigate(`/writing?theme=${draft.theme}`, { replace: true });
+    }
+  }, [authStatus, location.pathname, navigate]);
 
   return (
     <div className="min-h-screen bg-background bg-mesh">
