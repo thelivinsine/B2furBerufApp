@@ -249,6 +249,10 @@ export function WritingHub() {
                   </div>
                 </div>
                 <p className="text-sm leading-relaxed">{result.insight}</p>
+                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Sparkles className="h-3 w-3 shrink-0" />
+                  KI-generierte Rückmeldung
+                </p>
                 {area && (
                   <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
                     <p className="text-sm text-muted-foreground">{area.description}</p>
