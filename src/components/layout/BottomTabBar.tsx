@@ -10,7 +10,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 const MORE_COLOR = "#5b5be6";
 const MORE_BG    = "rgba(91,91,230,.08)";
 
-// Icon glyph size (~20% larger than the original h-5 w-5 for Duolingo-style readability).
+// Icon glyph size (~20% larger than the original for readability).
 const IZ = 29;
 
 // ── Context strip metadata for any path ───────────────────────
@@ -89,7 +89,6 @@ function IcoMore({ active }: { active: boolean }) {
   );
 }
 
-// Tabs with a hand-crafted SVG icon — others fall back to the lucide icon.
 const CUSTOM_ICON: Record<string, (active: boolean) => React.ReactNode> = {
   "/":           a => <IcoDashboard active={a} />,
   "/vocabulary": a => <IcoBook      active={a} />,
@@ -113,10 +112,9 @@ function TabIcon({ path, active, color }: { path: string; active: boolean; color
 // ── Component ──────────────────────────────────────────────────
 interface Props {
   onMore: () => void;
-  onMoreAdd: () => void;
 }
 
-export function BottomTabBar({ onMore, onMoreAdd }: Props) {
+export function BottomTabBar({ onMore }: Props) {
   const location      = useLocation();
   const pathname      = location.pathname;
   const pinnedRaw     = useSettingsStore(s => s.pinnedTabs);
@@ -127,15 +125,13 @@ export function BottomTabBar({ onMore, onMoreAdd }: Props) {
   const [localOrder, setLocalOrder] = useState<string[]>(pinnedTabs);
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Keep localOrder in sync with store when we're not currently editing.
   useEffect(() => {
     if (!editMode) setLocalOrder(pinnedTabs);
   }, [pinnedTabs, editMode]);
 
-  const moreActive   = !pinnedTabs.includes(pathname);
-  const ctx          = getContextMeta(pathname, pinnedTabs);
+  const moreActive  = !pinnedTabs.includes(pathname);
+  const ctx         = getContextMeta(pathname, pinnedTabs);
 
-  // Ordered display list — respects user-set order.
   const displayOrder = editMode ? localOrder : pinnedTabs;
   const displayTabs  = displayOrder
     .map(path => navItems.find(i => i.to === path))
@@ -144,7 +140,7 @@ export function BottomTabBar({ onMore, onMoreAdd }: Props) {
   function enterEditMode() {
     setLocalOrder([...pinnedTabs]);
     setEditMode(true);
-    try { navigator.vibrate(40); } catch { /* vibrate not available */ }
+    try { navigator.vibrate(40); } catch { /* not available */ }
   }
 
   function exitEditMode() { setEditMode(false); }
@@ -161,8 +157,6 @@ export function BottomTabBar({ onMore, onMoreAdd }: Props) {
     setPinnedTabs(next);
   }
 
-  // Long-press detection — attaches to the rail container so it fires regardless
-  // of which child the user presses.
   function startLongPress() {
     if (editMode) return;
     longPressRef.current = setTimeout(enterEditMode, 600);
@@ -174,11 +168,24 @@ export function BottomTabBar({ onMore, onMoreAdd }: Props) {
     }
   }
 
+  // Shared handler to block the native browser link context menu that iOS
+  // shows on long-press of <a> elements, which competes with our edit mode.
+  function blockContextMenu(e: React.MouseEvent | React.TouchEvent) {
+    e.preventDefault();
+  }
+
   return (
     <nav
       className="fixed bottom-0 inset-x-0 z-[60] flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
-      // iOS Safari compositing-layer fix: keeps the bar painted when a sibling uses preserve-3d.
-      style={{ transform: "translateZ(0)", willChange: "transform" }}
+      onContextMenu={blockContextMenu}
+      // iOS Safari compositing-layer fix for flashcard siblings using preserve-3d.
+      // -webkit-touch-callout:none suppresses the native link long-press popup.
+      style={{
+        transform: "translateZ(0)",
+        willChange: "transform",
+        WebkitTouchCallout: "none" as React.CSSProperties["WebkitTouchCallout"],
+        userSelect: "none",
+      }}
     >
 
       {/* ── Context / edit-mode strip ── */}
@@ -241,22 +248,14 @@ export function BottomTabBar({ onMore, onMoreAdd }: Props) {
                     value={path}
                     as="div"
                     className="flex flex-1 p-1"
-                    // Disable browser scroll interference while dragging horizontally.
                     style={{ touchAction: "none" }}
                   >
                     <motion.div
                       className="relative flex flex-1 items-center justify-center rounded-xl"
                       animate={{ rotate: [-1.5, 1.5, -1.5] }}
-                      transition={{
-                        repeat: Infinity,
-                        duration: 0.5,
-                        delay: idx * 0.08,
-                        ease: "easeInOut",
-                      }}
+                      transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.08, ease: "easeInOut" }}
                     >
                       <TabIcon path={path} active={false} color={color} />
-
-                      {/* Remove badge — hidden when only 2 tabs remain */}
                       {localOrder.length > 2 && (
                         <button
                           onPointerDown={e => { e.stopPropagation(); removeTab(path); }}
@@ -272,10 +271,9 @@ export function BottomTabBar({ onMore, onMoreAdd }: Props) {
               })}
             </Reorder.Group>
 
-            {/* Add slot — appears when fewer than 4 tabs are pinned */}
             {localOrder.length < 4 && (
               <button
-                onClick={onMoreAdd}
+                onClick={onMore}
                 aria-label="Tab hinzufügen"
                 className="flex flex-1 p-1"
               >
@@ -301,6 +299,7 @@ export function BottomTabBar({ onMore, onMoreAdd }: Props) {
                 end={end}
                 aria-label={label}
                 className="flex flex-1 p-1"
+                onContextMenu={blockContextMenu}
               >
                 {({ isActive }) => (
                   <div
@@ -319,7 +318,6 @@ export function BottomTabBar({ onMore, onMoreAdd }: Props) {
               </NavLink>
             ))}
 
-            {/* Mehr — always shown as the last item in normal mode */}
             <button
               onClick={onMore}
               aria-label="Mehr"

@@ -18,8 +18,7 @@ import { loadWritingDraft } from "@/features/writing/resumeDraft";
 import { cn } from "@/lib/utils";
 
 export function AppShell() {
-  const [moreOpen,    setMoreOpen]    = useState(false);
-  const [moreAddMode, setMoreAddMode] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const authStatus = useAuthStore((s) => s.status);
@@ -69,15 +68,8 @@ export function AppShell() {
       </aside>
 
       {/* Mobile bottom tab bar + "Mehr" sheet */}
-      <BottomTabBar
-        onMore={() => { setMoreAddMode(false); setMoreOpen(true); }}
-        onMoreAdd={() => { setMoreAddMode(true); setMoreOpen(true); }}
-      />
-      <MoreSheet
-        open={moreOpen}
-        onOpenChange={o => { setMoreOpen(o); if (!o) setMoreAddMode(false); }}
-        addMode={moreAddMode}
-      />
+      <BottomTabBar onMore={() => setMoreOpen(true)} />
+      <MoreSheet open={moreOpen} onOpenChange={setMoreOpen} />
 
       <div className="lg:pl-64">
         {/* Top bar */}
