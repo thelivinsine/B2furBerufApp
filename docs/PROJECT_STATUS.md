@@ -294,15 +294,26 @@ TÜV certifies against standards (**ISO/IEC 42001** for AI, ISO 27001), EY does 
 ISAE 3000), and the concrete near-term legal driver is the **EU AI Act Article 10** (data governance +
 provenance). The certificate is downstream of having the right system in place.
 
-Shipped: **`docs/DATA_GOVERNANCE.md` (v0.1)** covering the provenance-register schema, a commercial-safe
+Shipped: **`docs/DATA_GOVERNANCE.md`** covering the provenance-register schema, a commercial-safe
 license allowlist (SPDX, with the CC-BY-SA share-alike trap flagged), the four-eyes workflow, a planned
 machine **license gate** (extend the new content linter so every content id must declare an allowlisted
 license or the build fails), a risk register, a standards-mapping table, and a phased roadmap. **CTO
 call: build Phases 1-3 now (cheap, mechanical, satisfies EU AI Act); defer paid certification (Phase 4)
-until revenue or a customer demands it.** Most existing content is `OWNED` (authored in-house), the
-cleanest status. Backlog #7 cross-referenced to the doc; **new backlog #19** added for a certification
-deep-research pass to validate the v0.1 assumptions (cost, body, EU AI Act risk class) into a v0.2.
-No app code changed.
+until revenue or a customer demands it.** Backlog #7 cross-referenced to the doc; **new backlog #19**
+added for a certification deep-research pass to validate the assumptions (cost, body, EU AI Act risk
+class). No app code changed.
+
+**Update (v0.2, 2026-06-15, founder decision): traceability over ownership.** The founder rejected
+leaning on "we wrote it in-house, so we own it." New policy: every item must trace to an authoritative
+reference or a commercial-safe source. Much of today's library is **AI-assisted drafting** (legally
+safe to ship, since AI text has no rights holder, but a weak provenance answer), so AI drafting is now
+a *first step only* that must be **verified against a free reference and cited** (or rewritten /
+discarded). Added: a facts-vs-creative-text distinction (German words / genders / plurals are facts,
+not copyrightable, so we verify them against Wiktionary / DWDS rather than copying a protected list);
+an approved open-source table (**Tatoeba CC-BY** for example sentences, Wiktionary / DWDS as
+references); a required `reference` field on the register; and a linter requirement that authored items
+carry a reference. Existing content is **re-verified and provenance-tagged, not rebuilt from scratch**
+(founder chose "re-verify + backfill" over a hard replace).
 
 ### Session 22 cont. (2026-06-14) — Content QC linter + CI gate SHIPPED ✅
 Branch `claude/vibrant-meitner-mfl9xk`. Backlog "Content QC pipeline" (mechanical half).
@@ -937,10 +948,14 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
    a clear, audit-ready human-verification workflow. Every data point in the app should carry
    a clear source, verified status, and other metadata, tracked in an Excel/CSV in the project
    folder (not just inline in the TS files) so it's reviewable independent of the code.
-   - **Now elaborated in `docs/DATA_GOVERNANCE.md` (v0.1, added 2026-06-14):** the full governance
-     roadmap, provenance-register schema, commercial-safe license allowlist (SPDX) + planned machine
-     gate, four-eyes workflow, and a phased path mapping to ISO/IEC 42001 + EU AI Act Article 10.
-     Phase 1 (provenance register + license gate in the linter) is the recommended next build step.
+   - **Now elaborated in `docs/DATA_GOVERNANCE.md` (v0.2, added 2026-06-14, revised 2026-06-15):** the
+     full governance roadmap, provenance-register schema, commercial-safe license allowlist (SPDX) +
+     planned machine gate, four-eyes workflow, and a phased path mapping to ISO/IEC 42001 + EU AI Act
+     Article 10. **Founder policy (v0.2): traceability over ownership** — every item traces to an
+     authoritative reference (Wiktionary / DWDS for word facts) or a commercial-safe source (Tatoeba
+     CC-BY for example sentences); AI-assisted drafting must be verified and cited, not claimed as
+     `OWNED`. Phase 1 (provenance register + reference/license gate in the linter + back-fill existing
+     content) is the recommended next build step.
 8. **Pricing page + plan design:** create a pricing page and design the various paid plans/tiers
    to offer (ties into the "monetize later" decision and the planned `tier` flag).
 9. **Payment gateway integration:** add a payment provider so the plans in #8 can actually be
