@@ -1,9 +1,14 @@
 # Data Governance & Content Provenance
 
-_Status: **v0.1 draft (2026-06-14)**. This roadmap is intentionally provisional. The specific
+_Status: **v0.2 draft (2026-06-15)**. This roadmap is intentionally provisional. The specific
 certification claims (which standard, which body, cost, timeline, and our EU AI Act risk class) are
 estimates and MUST be validated by the certification deep-research pass (backlog #19) before we act
 on them or quote them externally. Update this doc once that research lands._
+
+_v0.2 change (founder decision, 2026-06-15): the content strategy is **traceability over ownership**.
+We do not lean on a blanket "we wrote it in-house, so we own it." Every item must trace to an
+authoritative reference or a commercial-safe source. AI-assisted drafting is only a first step that
+must then be verified and cited. Existing content is re-verified and provenance-tagged, not discarded._
 
 This document describes how Genauly sources, licenses, verifies, and records the content in its
 learning library so that the process is **audit-ready**: an outside examiner (an investor's technical
@@ -55,8 +60,10 @@ documentation) or the AI model providers (handled by the security and vendor doc
 
 ## Core principles
 
-1. **Every data point has a known origin.** No content enters the library without a recorded source
-   and license.
+1. **Every data point is traceable to an authoritative reference.** Nothing is "just made up." Each
+   item records either the external source it came from or, for content we write ourselves, the free
+   authoritative reference it was verified against (Wiktionary, DWDS, Tatoeba). AI-assisted drafting
+   is allowed only as a first step. An unverifiable, uncited item does not stay in the library.
 2. **Commercial-safe by construction.** Only an approved allowlist of licenses is permitted, and a
    machine checks this so it cannot be bypassed by oversight.
 3. **Four eyes.** The person who adds content is not the person who approves it.
@@ -64,6 +71,40 @@ documentation) or the AI model providers (handled by the security and vendor doc
    the provenance register), so the history is reconstructable.
 5. **Evidence at acquisition time.** We snapshot a source's license as it was the day we used it,
    because sources change their terms.
+
+## What counts as "traceable" (facts vs. creative content)
+
+Traceability means different things for different content, and the distinction is also what keeps us
+copyright-clean:
+
+- **Facts are not copyrightable.** A German word, its article (der/die/das), and its plural are facts.
+  Nobody owns "der Engpass." We can use any word, as long as we verify it against a free authoritative
+  reference (**Wiktionary**, **DWDS**) rather than copying somebody's curated *list*. A specific
+  published word list (Goethe Wortliste, telc, Klett) can carry compilation / EU database rights in
+  its selection and arrangement, so we never copy a protected list wholesale. We verify individual
+  entries against open references instead.
+- **Creative text is where licensing bites.** Example sentences, dialogues, and grammar explanations
+  are authored expression. For these we either source from a commercial-safe corpus, or author and
+  cite the reference we checked against.
+
+**Approved open sources (commercial-safe):**
+
+| Source | Use | License / basis |
+|---|---|---|
+| **Tatoeba** | Example sentences (the workhorse) | CC-BY 2.0 (credit required) |
+| **Wiktionary** | Reference for word facts: gender, plural, meaning | CC-BY-SA 4.0 (we cite facts, which are not copyrightable, rather than copying its prose) |
+| **DWDS** | Reference for usage and frequency | Reference only (cite; do not copy protected example text) |
+| **Public-domain texts** (e.g. Project Gutenberg) | Reading / source passages | Public domain |
+
+**Sources we do NOT use** (copyrighted, on the avoid list): Goethe Wortlisten, telc materials, Klett /
+Routledge textbooks, most Deutsche Welle assets. See the "Sources to avoid" table in
+`PROJECT_STATUS.md`.
+
+**On AI-assisted drafting (important).** AI-generated text carries no third-party copyright (there is
+no rights holder to infringe), so it is legally safe to ship. But "an assistant wrote it" is a weak
+provenance answer for an auditor, and unverified AI text risks accuracy errors. So AI drafting is a
+*first step only*: every AI-drafted item must then be verified against one of the references above and
+have that reference recorded, or be rewritten or discarded. We do not claim a blanket `OWNED`.
 
 ## The content provenance register
 
@@ -79,9 +120,10 @@ Proposed fields per item:
 | `content_id` | Matches the `id` in the data files (e.g. `v_engpass`). |
 | `content_type` | vocabulary / collocation / grammar_drill / dialogue / exam_set / redemittel. |
 | `label` | Human-readable headword or summary, for reviewers. |
-| `origin` | `authored` (written in-house), `sourced` (from an external source), or `adapted`. |
+| `origin` | `sourced` (taken from an external source), `adapted` (remixed from a source), or `authored` (written by us, AI-assisted then verified). |
 | `source_name` | The source, if any (e.g. "Tatoeba", "Wiktionary"). Blank for `authored`. |
 | `source_url` | Direct link to the source item. |
+| `reference` | Authoritative reference the item was verified against (Wiktionary / DWDS / Tatoeba URL). **Required for `authored` and `adapted`**, so even our own writing is traceable, not "just made up." |
 | `license` | SPDX identifier (see license policy). For `authored`, `OWNED`. |
 | `license_url` | Link to the license text. |
 | `license_snapshot` | Path to archived evidence of the license at acquisition time. |
@@ -94,9 +136,13 @@ Proposed fields per item:
 | `review_status` | `draft` / `verified` / `published` / `retired`. |
 | `notes` | Anything an auditor should know (e.g. "translation adapted from X"). |
 
-Note: most existing content was **written in-house** by the team, which is the cleanest possible
-status (`origin: authored`, `license: OWNED`). We own it outright. The register makes that explicit
-and provable rather than merely assumed.
+Note on existing content (honest accounting): much of today's library was **AI-assisted drafting**,
+not sourced from an external corpus. That is legally safe to ship (AI text has no rights holder), but
+"an assistant wrote it" is not a strong provenance answer on its own. So the policy is **not** to
+claim a blanket `OWNED`. Instead we back-fill a verifying `reference` for each item (the word checked
+against Wiktionary / DWDS, the example sentence sourced from or matched against Tatoeba), tag its true
+`origin`, and rewrite or discard the small tail of items that cannot be verified. **Traceable beats
+"owned."**
 
 ## License policy (commercial-safe by construction)
 
@@ -144,8 +190,9 @@ register. Snapshots protect us if a source later changes its terms.
 
 CC-BY and CC-BY-SA require visible credit. The plan is an **auto-generated "Sources & Licenses"
 page** in the app, built from the `attribution_required` / `attribution_text` fields in the register,
-so compliance is both real and demonstrable. For an all-`OWNED` library this page is short, but the
-mechanism must exist before we ingest any externally licensed content.
+so compliance is both real and demonstrable. Because the plan leans on **Tatoeba (CC-BY)** for example
+sentences and cites Wiktionary / DWDS as references, this page carries real attribution rather than
+being a formality. The mechanism must exist before we ingest any externally licensed content.
 
 ## Automated controls
 
@@ -173,7 +220,8 @@ procedures to write (short, practical SOPs, drafted in a later phase):
 |---|---|
 | Copyright infringement from a mis-licensed source | Allowlist + machine gate + four-eyes review + evidence snapshots. |
 | A source changes its license after we used content | License snapshot at acquisition time. |
-| Inaccurate or non-B2 German content | Verifier sign-off (the pedagogical review half of backlog #4, still open). |
+| Inaccurate or non-B2 German content | Each item carries a `reference` (Wiktionary / DWDS / Tatoeba) it was verified against, plus verifier sign-off (the pedagogical review half of backlog #4, still open). |
+| Unverifiable AI-drafted content slips through | `reference` required for `authored`/`adapted` items; linter flags any without one; rewrite or discard the tail. |
 | Share-alike obligation triggered unintentionally | `origin` field policy; prefer OWNED/CC0/CC-BY for adapted content. |
 | Provenance drift (content without a register row) | Linter gate requiring a row per content id. |
 | PII / bias in content | Content is curated and reviewed, not scraped at scale; documented in review. |
@@ -202,8 +250,10 @@ not force a rebuild.
 allowlist defined; the certification research added to the backlog.
 
 **Phase 1 (cheap, mostly mechanical, recommended next):** create the provenance register; back-fill
-it for existing content (the bulk is `OWNED` in-house); extend the linter to require an allowlisted
-license per content id (the machine gate).
+it for existing content by attaching a verifying `reference` to each item (word vs Wiktionary / DWDS,
+example sentence vs Tatoeba), tagging true `origin`, and rewriting or discarding the unverifiable
+tail; extend the linter to require both an allowlisted `license` **and** a `reference`-or-`source`
+per content id (the machine gate).
 
 **Phase 2:** formalise the four-eyes workflow; build the source register + evidence-snapshot habit;
 ship the auto-generated "Sources & Licenses" page.
@@ -234,5 +284,10 @@ SOC 2 today would be premature for a pre-revenue product and a poor use of money
 
 ## Change log
 
+- **v0.2 (2026-06-15):** founder set the content strategy to **traceability over ownership**. Dropped
+  the "written in-house, so we own it" framing; added the facts-vs-creative-text distinction, the
+  approved open-source table (Tatoeba CC-BY, Wiktionary / DWDS as references), a required `reference`
+  field on the register, and the AI-drafting policy (verify-and-cite, or discard). Existing content is
+  re-verified and provenance-tagged, not rebuilt from scratch.
 - **v0.1 (2026-06-14):** initial roadmap drafted. Pending validation from the certification
   deep-research pass (backlog #19).
