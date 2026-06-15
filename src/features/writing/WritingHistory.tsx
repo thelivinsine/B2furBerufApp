@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2, ChevronDown, Lightbulb } from "lucide-react";
+import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2, ChevronDown, Lightbulb, Sparkles } from "lucide-react";
 import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
@@ -176,6 +176,10 @@ function HistoryEntry({
               )}
             </div>
             <p className="text-sm leading-relaxed text-foreground/90">{entry.insight}</p>
+            <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Sparkles className="h-3 w-3 shrink-0" />
+              KI-generierte Rückmeldung
+            </p>
           </div>
 
           {/* Disclosure for the original task + the learner's own text */}
