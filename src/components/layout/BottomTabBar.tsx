@@ -83,15 +83,15 @@ function IcoAnalytics({ active }: { active: boolean }) {
 function IcoMore({ active }: { active: boolean }) {
   return (
     <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <circle cx="5.5"  cy="5.5"  r="1.9" fill="#5b5be6" opacity=".9"  />
-      <circle cx="10"   cy="5.5"  r="1.9" fill="#5b5be6" opacity=".7"  />
-      <circle cx="14.5" cy="5.5"  r="1.9" fill="#5b5be6" opacity=".5"  />
-      <circle cx="5.5"  cy="10"   r="1.9" fill="#5b5be6" opacity=".7"  />
-      <circle cx="10"   cy="10"   r="1.9" fill="#5b5be6" opacity=".5"  />
-      <circle cx="14.5" cy="10"   r="1.9" fill="#5b5be6" opacity=".35" />
-      <circle cx="5.5"  cy="14.5" r="1.9" fill="#5b5be6" opacity=".45" />
-      <circle cx="10"   cy="14.5" r="1.9" fill="#5b5be6" opacity=".3"  />
-      <circle cx="14.5" cy="14.5" r="1.9" fill="#5b5be6" opacity=".2"  />
+      <circle cx="5"    cy="5"    r="2.4" fill="#5b5be6" opacity=".9"  />
+      <circle cx="10"   cy="5"    r="2.4" fill="#5b5be6" opacity=".7"  />
+      <circle cx="15"   cy="5"    r="2.4" fill="#5b5be6" opacity=".5"  />
+      <circle cx="5"    cy="10"   r="2.4" fill="#5b5be6" opacity=".7"  />
+      <circle cx="10"   cy="10"   r="2.4" fill="#5b5be6" opacity=".5"  />
+      <circle cx="15"   cy="10"   r="2.4" fill="#5b5be6" opacity=".35" />
+      <circle cx="5"    cy="15"   r="2.4" fill="#5b5be6" opacity=".45" />
+      <circle cx="10"   cy="15"   r="2.4" fill="#5b5be6" opacity=".3"  />
+      <circle cx="15"   cy="15"   r="2.4" fill="#5b5be6" opacity=".2"  />
     </svg>
   );
 }
@@ -136,7 +136,7 @@ export function BottomTabBar({ onMore }: Props) {
 
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-30 flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
+      className="fixed bottom-0 inset-x-0 z-[60] flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
       // iOS Safari drops the compositing layer of a position:fixed element that
       // uses backdrop-filter when a sibling has a 3D transform (the flashcard's
       // perspective/preserve-3d), making this bar flicker or vanish on scroll.
