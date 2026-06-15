@@ -6,6 +6,9 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 const MORE_COLOR = "#5b5be6";
 const MORE_BG    = "rgba(91,91,230,.08)";
 
+// Icon glyph size. Bumped ~20% (was 24) for clearer, more legible icons.
+const IZ = 29;
+
 // ── Context strip metadata for any path ───────────────────────
 function getContextMeta(pathname: string, pinnedTabs: string[]) {
   // Exact match among pinned tabs first
@@ -24,7 +27,7 @@ function getContextMeta(pathname: string, pinnedTabs: string[]) {
 
 function IcoDashboard({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
+    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
       <rect x="2"  y="2"  width="7" height="7" rx="1.5" fill="#5b5be6" />
       <rect x="11" y="2"  width="7" height="7" rx="1.5" fill="#5b5be6" opacity=".72" />
       <rect x="2"  y="11" width="7" height="7" rx="1.5" fill="#5b5be6" opacity=".72" />
@@ -35,7 +38,7 @@ function IcoDashboard({ active }: { active: boolean }) {
 
 function IcoBook({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
+    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
       {/* Pages expanded to fill the viewBox — from y≈2.5 to y≈17.5, x=2→18 */}
       <path d="M10 2.5C7.5 1.5 4.5 1.5 2 2.5V17.5c2.5-1 5.5-1 8 0V2.5Z"
         fill="#5b5be6" />
@@ -56,7 +59,7 @@ function IcoBook({ active }: { active: boolean }) {
 
 function IcoQuiz({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
+    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
       {/* r=9 fills the viewBox like the dashboard squares do */}
       <circle cx="10" cy="10" r="9" fill="#f59e0b" />
       <polyline
@@ -69,7 +72,7 @@ function IcoQuiz({ active }: { active: boolean }) {
 
 function IcoAnalytics({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
+    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
       <rect x="2.5"  y="12"  width="3.5" height="6"    rx="1.2" fill="#10b7cf" />
       <rect x="8.25" y="7.5" width="3.5" height="10.5" rx="1.2" fill="#10b7cf" opacity=".8" />
       <rect x="14"   y="3"   width="3.5" height="15"   rx="1.2" fill="#10b7cf" opacity=".55" />
@@ -79,7 +82,7 @@ function IcoAnalytics({ active }: { active: boolean }) {
 
 function IcoMore({ active }: { active: boolean }) {
   return (
-    <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
+    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
       <circle cx="5.5"  cy="5.5"  r="1.9" fill="#5b5be6" opacity=".9"  />
       <circle cx="10"   cy="5.5"  r="1.9" fill="#5b5be6" opacity=".7"  />
       <circle cx="14.5" cy="5.5"  r="1.9" fill="#5b5be6" opacity=".5"  />
@@ -108,8 +111,8 @@ function TabIcon({ path, active, color }: { path: string; active: boolean; color
   const Icon = item.icon;
   return (
     <Icon
-      className="h-6 w-6 transition-opacity"
-      style={{ color, opacity: active ? 1 : 0.38 }}
+      className="transition-opacity"
+      style={{ color, opacity: active ? 1 : 0.38, width: IZ, height: IZ }}
     />
   );
 }
@@ -142,13 +145,17 @@ export function BottomTabBar({ onMore }: Props) {
       style={{ transform: "translateZ(0)", willChange: "transform" }}
     >
 
-      {/* ── Context strip ── */}
+      {/* ── Context strip (name bar) ── */}
       <div
-        className="flex items-center px-4 py-1"
+        className="flex items-center gap-2 px-4 py-[7px]"
         style={{ background: ctx.bg, borderBottom: "1px solid rgba(0,0,0,.05)" }}
       >
         <span
-          className="text-[11px] font-extrabold tracking-wide leading-none"
+          className="h-1.5 w-1.5 shrink-0 rounded-full"
+          style={{ background: ctx.color }}
+        />
+        <span
+          className="text-[13px] font-semibold leading-snug tracking-[0.01em]"
           style={{ color: ctx.color }}
         >
           {ctx.label}
@@ -156,7 +163,7 @@ export function BottomTabBar({ onMore }: Props) {
       </div>
 
       {/* ── Icon rail — no text labels ── */}
-      <div className="flex h-[52px] items-stretch">
+      <div className="flex h-[62px] items-stretch">
 
         {tabs.map(({ to, end, label, color, bg }) => (
           <NavLink
@@ -176,8 +183,8 @@ export function BottomTabBar({ onMore }: Props) {
                 <TabIcon path={to} active={isActive} color={color} />
                 {isActive && (
                   <span
-                    className="absolute bottom-[7px] left-1/2 -translate-x-1/2 w-5 rounded-full"
-                    style={{ height: 2.5, background: color }}
+                    className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
+                    style={{ height: 3, background: color }}
                   />
                 )}
               </div>
@@ -198,8 +205,8 @@ export function BottomTabBar({ onMore }: Props) {
             <IcoMore active={moreActive} />
             {moreActive && (
               <span
-                className="absolute bottom-[7px] left-1/2 -translate-x-1/2 w-5 rounded-full"
-                style={{ height: 2.5, background: MORE_COLOR }}
+                className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
+                style={{ height: 3, background: MORE_COLOR }}
               />
             )}
           </div>
