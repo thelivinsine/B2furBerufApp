@@ -46,14 +46,27 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article (nouns), plural (countable nouns), pronunciation hint, two example sentences, and related terms. Currently **490 words** (~49 per theme; verified by `pnpm lint:content`). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build` + `pnpm lint:content`.
 - **Collocations** (`src/data/collocations.ts`): currently **120 Nomen-Verb pairs** (12 per theme). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`, `example {de, en}`. Keep ids unique (`c_` prefix + snake_case).
 - **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.
-- **Content linter (`pnpm lint:content`, gate added 2026-06-14):** `scripts/lint-content.mjs`
-  loads every `src/data/*` bank through Vite's `ssrLoadModule` (no extra dependency) and checks for
-  duplicate ids, broken dialogue branches (bad `next` targets, orphan/dead-end nodes, `start`
-  integrity), missing/empty required fields, dangling cross-references (`themeId`, `scenarioId`,
-  Redemittel/grammar/weakness categories), and em dashes in copy. It runs in CI on every PR and on
-  pushes to `main` (`.github/workflows/validate.yml`), failing the build on any error. **Run it after
-  any content edit**, not just `pnpm build` (TypeScript does not catch duplicate ids, which silently
-  drop React-keyed cards). Plural is intentionally NOT required on nouns (uncountable/plural-only).
+- **Content linter (`pnpm lint:content`, gate added 2026-06-14, provenance checks added 2026-06-15):**
+  `scripts/lint-content.mjs` loads every `src/data/*` bank through Vite's `ssrLoadModule` (no extra
+  dependency) and checks for duplicate ids, broken dialogue branches (bad `next` targets, orphan/
+  dead-end nodes, `start` integrity), missing/empty required fields, dangling cross-references
+  (`themeId`, `scenarioId`, Redemittel/grammar/weakness categories), em dashes in copy, and
+  **provenance register integrity** (every content_id must have a register row; every row's license must
+  be on the commercial-safe allowlist; authored/adapted items without a `reference` URL generate a
+  warning). It runs in CI on every PR and on pushes to `main` (`.github/workflows/validate.yml`),
+  failing the build on any error. **Run it after any content edit**, not just `pnpm build`
+  (TypeScript does not catch duplicate ids, which silently drop React-keyed cards). Plural is
+  intentionally NOT required on nouns (uncountable/plural-only).
+- **Provenance register (`src/data/provenance.ts`, added 2026-06-15):** one `ProvenanceEntry` row per
+  content_id, tracking `origin` (authored/sourced/adapted), `reference` (Wiktionary/DWDS/Tatoeba URL),
+  `license` (SPDX from the allowlist), `review_status` (draft/verified), and who added/verified it.
+  All 769 existing items have stub rows (`review_status: "draft"`). The back-fill queue (items with empty
+  `reference`) shows as linter warnings. **When adding new content:** add a corresponding row in
+  `provenance.ts` at the same time — the linter errors if a content_id has no row. Use
+  `pnpm generate:provenance` only to bootstrap a fresh register (it overwrites); add new rows manually
+  for incremental additions. The `ProvenanceEntry` type lives in `src/types/index.ts`. See
+  `docs/DATA_GOVERNANCE.md` for the full policy (traceability over ownership; Wiktionary/DWDS for word
+  facts; Tatoeba CC-BY for example sentences).
 
 ## UI conventions — modal / popup overlays (locked 2026-06-07)
 The founder reviewed the sign-in dialog's backdrop and **locked this as the standard look for
