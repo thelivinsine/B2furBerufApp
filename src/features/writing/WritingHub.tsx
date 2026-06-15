@@ -157,6 +157,11 @@ export function WritingHub() {
   const prompt = writingPrompts[theme][length];
   const [min, max] = lengthMeta[length].range;
   const enough = words >= Math.floor(min * 0.6);
+  // Minimum words before an evaluation is allowed. Below this the button is
+  // locked on purpose; the hint below the editor tells the learner why.
+  const minWords = 5;
+  const remaining = Math.max(0, minWords - words);
+  const tooShort = words < minWords;
 
   const reset = () => setParams({});
   const startOver = () => {
@@ -260,7 +265,11 @@ export function WritingHub() {
                   Neu schreiben
                 </Button>
               )}
-              <Button onClick={handleEvaluate} disabled={submitting || words < 5} variant="gradient">
+              <Button
+                onClick={handleEvaluate}
+                disabled={submitting || tooShort}
+                variant="gradient"
+              >
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" /> Wird geprüft …
@@ -273,6 +282,12 @@ export function WritingHub() {
               </Button>
             </div>
           </div>
+          {tooShort && (
+            <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
+              <PenLine className="h-3.5 w-3.5 shrink-0" />
+              Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
+            </p>
+          )}
         </CardContent>
       </Card>
 
