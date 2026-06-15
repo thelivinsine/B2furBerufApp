@@ -156,6 +156,7 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
   }
 
   function startLongPress() {
+    if (editMode) return; // already editing; let drags/taps through
     longPressRef.current = setTimeout(() => {
       try { navigator.vibrate(40); } catch { /* not available */ }
       onLongPress();
@@ -216,12 +217,16 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
               );
             })()}
 
-            {/* Moveable pinned tabs — drag to reorder, X to send to sheet */}
+            {/* Moveable pinned tabs — drag to reorder, X to send to sheet.
+                flexGrow matches the icon count so each icon keeps the same
+                width as Home/Mehr (which are flex-1). Without this the group
+                would be a single flex-1 slot and the icons would bunch up. */}
             <Reorder.Group
               axis="x"
               values={moveablePaths}
               onReorder={handleReorder}
-              className="flex flex-1"
+              className="flex"
+              style={{ flexGrow: moveablePaths.length, flexShrink: 1, flexBasis: 0 }}
               as="div"
             >
               {moveablePaths.map((path, idx) => {
@@ -244,11 +249,17 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
                       <TabIcon path={path} active={false} color={color} />
                       {localOrder.length > 2 && (
                         <button
-                          onPointerDown={e => { e.stopPropagation(); removeFromBar(path); }}
-                          className="absolute -top-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-red-500 shadow-md"
+                          type="button"
+                          // stop the drag gesture from claiming this press, then
+                          // remove on the click so framer-motion's pointer session
+                          // doesn't swallow the state change.
+                          onPointerDownCapture={e => e.stopPropagation()}
+                          onPointerDown={e => e.stopPropagation()}
+                          onClick={e => { e.stopPropagation(); removeFromBar(path); }}
+                          className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 shadow-md active:scale-90"
                           aria-label={`${label} entfernen`}
                         >
-                          <X className="h-2.5 w-2.5 text-white" strokeWidth={3.5} />
+                          <X className="h-3 w-3 text-white" strokeWidth={3} />
                         </button>
                       )}
                     </motion.div>

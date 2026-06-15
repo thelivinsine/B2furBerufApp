@@ -1,7 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { NavLink } from "react-router-dom";
-import { Reorder, motion, AnimatePresence } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Check, Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
@@ -78,32 +78,22 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
           <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-border" />
 
           {editMode ? (
-            /* ── Edit mode: all icons jiggle with X badge; tap to add to bar ── */
-            <Reorder.Group
-              axis="y"
-              values={nonPinnedItems.map(i => i.to)}
-              onReorder={() => {/* order within sheet has no persistent meaning */}}
-              className="grid grid-cols-3 gap-x-3 gap-y-5"
-              as="div"
-            >
+            /* ── Edit mode: icons jiggle; tap one to add it to the bar ── */
+            <div className="grid grid-cols-3 gap-x-3 gap-y-5">
               {nonPinnedItems.map(({ to, label, icon: Icon, color, bg }, idx) => {
                 const added = justAdded.has(to);
                 return (
-                  <Reorder.Item
-                    key={to}
-                    value={to}
-                    as="div"
-                    className="flex flex-col items-center gap-2"
-                    style={{ touchAction: "none" }}
-                  >
+                  <div key={to} className="flex flex-col items-center gap-2">
                     <motion.button
-                      className="relative flex h-16 w-full items-center justify-center rounded-2xl outline-none"
+                      type="button"
+                      disabled={atMax}
+                      className="relative flex h-16 w-full items-center justify-center rounded-2xl outline-none disabled:cursor-not-allowed"
                       style={{ background: bg }}
                       animate={{ rotate: [-1.5, 1.5, -1.5] }}
                       transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.07, ease: "easeInOut" }}
-                      onPointerDown={e => { e.stopPropagation(); if (!atMax && !added) addToBar(to); }}
+                      onClick={() => { if (!atMax && !added) addToBar(to); }}
                     >
-                      <Icon style={{ width: 28, height: 28, color, opacity: added ? 0 : (atMax ? 0.35 : 0.8) }} />
+                      <Icon style={{ width: 28, height: 28, color, opacity: added ? 0 : (atMax ? 0.35 : 0.85) }} />
 
                       {/* Added confirmation flash */}
                       <AnimatePresence>
@@ -121,21 +111,23 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
                         )}
                       </AnimatePresence>
 
-                      {/* Red X badge — visual consistency with bar icons in edit mode */}
-                      <span
-                        className="absolute -top-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-red-500 shadow-md"
-                        aria-hidden="true"
-                      >
-                        <X className="h-2.5 w-2.5 text-white" strokeWidth={3.5} />
-                      </span>
+                      {/* Green + badge — tap to add to the bar */}
+                      {!atMax && !added && (
+                        <span
+                          className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 shadow-md"
+                          aria-hidden="true"
+                        >
+                          <Plus className="h-3 w-3 text-white" strokeWidth={3} />
+                        </span>
+                      )}
                     </motion.button>
                     <span className="text-center text-[11px] font-medium leading-tight text-foreground/70">
                       {label}
                     </span>
-                  </Reorder.Item>
+                  </div>
                 );
               })}
-            </Reorder.Group>
+            </div>
           ) : (
             /* ── Normal mode: clean icon grid, tap to navigate ── */
             <nav className="grid grid-cols-3 gap-x-3 gap-y-5">
