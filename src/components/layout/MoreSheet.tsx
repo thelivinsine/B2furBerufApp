@@ -1,8 +1,8 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { NavLink } from "react-router-dom";
 import { Reorder, motion, AnimatePresence } from "framer-motion";
-import { Check } from "lucide-react";
-import { useState } from "react";
+import { Check, X } from "lucide-react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -10,185 +10,182 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  editMode: boolean;
+  onLongPress: () => void;
 }
 
-export function MoreSheet({ open, onOpenChange }: Props) {
+export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) {
   const pinnedRaw     = useSettingsStore(s => s.pinnedTabs);
   const setPinnedTabs = useSettingsStore(s => s.setPinnedTabs);
   const pinnedTabs    = pinnedRaw && pinnedRaw.length > 0 ? pinnedRaw : DEFAULT_PINNED_TABS;
 
-  // Tracks paths whose "added" confirmation badge is still visible.
   const [justAdded, setJustAdded] = useState<Set<string>>(new Set());
+  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const nonPinnedItems = navItems.filter(i => !pinnedTabs.includes(i.to));
   const atMax          = pinnedTabs.length >= 4;
 
-  function addTab(path: string) {
+  function addToBar(path: string) {
     if (atMax) return;
     const next = navItems.map(i => i.to).filter(p => [...pinnedTabs, path].includes(p));
     setPinnedTabs(next);
-    // Flash the "added" checkmark for 800ms, then fade it out.
     setJustAdded(prev => new Set([...prev, path]));
     setTimeout(() => {
       setJustAdded(prev => { const s = new Set(prev); s.delete(path); return s; });
     }, 800);
   }
 
+  function startLongPress() {
+    if (editMode) return;
+    longPressRef.current = setTimeout(() => {
+      try { navigator.vibrate(40); } catch { /* not available */ }
+      onLongPress();
+    }, 600);
+  }
+  function cancelLongPress() {
+    if (longPressRef.current) {
+      clearTimeout(longPressRef.current);
+      longPressRef.current = null;
+    }
+  }
+
   return (
     <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
       <DialogPrimitive.Portal>
-        {/* Overlay stops just above the bottom tab bar so the bar stays visible. */}
+        {/* Overlay stops just above the tab bar so the bar stays visible. */}
         <DialogPrimitive.Overlay
           className="fixed inset-x-0 top-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-fade-in lg:hidden"
           style={{ bottom: "calc(6rem + env(safe-area-inset-bottom))" }}
         />
         <DialogPrimitive.Content
           aria-describedby={undefined}
+          // no-callout: cascades to all <a> children to suppress iOS link popup.
           className={cn(
+            "no-callout",
             "fixed inset-x-0 bottom-0 z-50 max-h-[75dvh] overflow-y-auto",
             "rounded-t-2xl border-t border-x-0 border-b-0 border-border bg-surface px-5 pt-3",
-            // Clear the full bar height (name strip ~30px + icon rail 62px + safe area).
             "pb-[calc(5.75rem+env(safe-area-inset-bottom))]",
             "data-[state=open]:animate-slide-up lg:hidden",
           )}
+          onContextMenu={e => e.preventDefault()}
+          onTouchStart={startLongPress}
+          onTouchMove={cancelLongPress}
+          onTouchEnd={cancelLongPress}
         >
           <DialogPrimitive.Title className="sr-only">Mehr Bereiche</DialogPrimitive.Title>
 
           {/* Grab handle */}
           <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-border" />
 
-          {/* ── Section 1: Deine Leiste — draggable to reorder ── */}
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-            Deine Leiste
-          </p>
-          <Reorder.Group
-            axis="x"
-            values={pinnedTabs}
-            onReorder={setPinnedTabs}
-            className="mb-6 flex gap-2"
-            as="div"
-          >
-            {pinnedTabs.map(path => {
-              const item = navItems.find(i => i.to === path);
-              if (!item) return null;
-              const { label, icon: Icon, color, bg } = item;
-              return (
-                <Reorder.Item
-                  key={path}
-                  value={path}
-                  as="div"
-                  className="flex flex-1 flex-col items-center gap-1.5"
-                  style={{ touchAction: "none" }}
-                >
-                  <motion.div
-                    className="flex h-14 w-full cursor-grab items-center justify-center rounded-2xl active:cursor-grabbing"
-                    style={{ background: bg }}
-                    whileDrag={{ scale: 1.08, boxShadow: "0 8px 20px rgba(0,0,0,.18)" }}
-                  >
-                    <Icon style={{ width: 26, height: 26, color }} />
-                  </motion.div>
-                  <span className="text-center text-[10px] font-medium leading-tight text-foreground/70">
-                    {label}
-                  </span>
-                </Reorder.Item>
-              );
-            })}
-          </Reorder.Group>
-
-          {/* ── Section 2: Weitere Bereiche — tap to add ── */}
-          <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
-            Weitere Bereiche
-          </p>
-
-          {nonPinnedItems.length === 0 ? (
-            <p className="py-4 text-center text-sm text-muted-foreground">
-              Alle Bereiche sind bereits in der Leiste.
-            </p>
-          ) : (
-            <nav className="grid grid-cols-3 gap-x-3 gap-y-5">
-              {nonPinnedItems.map(({ to, label, icon: Icon, color, bg }) => {
+          {editMode ? (
+            /* ── Edit mode: all icons jiggle with X badge; tap to add to bar ── */
+            <Reorder.Group
+              axis="y"
+              values={nonPinnedItems.map(i => i.to)}
+              onReorder={() => {/* order within sheet has no persistent meaning */}}
+              className="grid grid-cols-3 gap-x-3 gap-y-5"
+              as="div"
+            >
+              {nonPinnedItems.map(({ to, label, icon: Icon, color, bg }, idx) => {
                 const added = justAdded.has(to);
                 return (
-                  <NavLink
+                  <Reorder.Item
                     key={to}
-                    to={to}
-                    onClick={e => {
-                      if (!atMax) {
-                        // Add to the bar instead of navigating when there is room.
-                        e.preventDefault();
-                        addTab(to);
-                      } else {
-                        // At max — navigate normally and close the sheet.
-                        onOpenChange(false);
-                      }
-                    }}
-                    className={cn(
-                      "flex flex-col items-center gap-2 rounded-2xl outline-none",
-                      "focus-visible:ring-2 focus-visible:ring-primary",
-                      atMax && !added && "opacity-50",
-                    )}
+                    value={to}
+                    as="div"
+                    className="flex flex-col items-center gap-2"
+                    style={{ touchAction: "none" }}
                   >
-                    {({ isActive }) => (
-                      <>
-                        <div
-                          className="relative flex h-16 w-full items-center justify-center rounded-2xl transition-all duration-150"
-                          style={{ background: isActive ? bg : "rgba(0,0,0,.04)" }}
-                        >
-                          <Icon
-                            style={{
-                              width: 28,
-                              height: 28,
-                              color,
-                              opacity: added ? 0 : (isActive ? 1 : 0.65),
-                              transition: "opacity 0.15s",
-                            }}
-                          />
+                    <motion.button
+                      className="relative flex h-16 w-full items-center justify-center rounded-2xl outline-none"
+                      style={{ background: bg }}
+                      animate={{ rotate: [-1.5, 1.5, -1.5] }}
+                      transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.07, ease: "easeInOut" }}
+                      onPointerDown={e => { e.stopPropagation(); if (!atMax && !added) addToBar(to); }}
+                    >
+                      <Icon style={{ width: 28, height: 28, color, opacity: added ? 0 : (atMax ? 0.35 : 0.8) }} />
 
-                          {/* Added checkmark flash */}
-                          <AnimatePresence>
-                            {added && (
-                              <motion.div
-                                key="check"
-                                className="absolute inset-0 flex items-center justify-center rounded-2xl"
-                                style={{ background: bg }}
-                                initial={{ scale: 0.6, opacity: 0 }}
-                                animate={{ scale: 1, opacity: 1 }}
-                                exit={{ scale: 1.1, opacity: 0 }}
-                                transition={{ duration: 0.2 }}
-                              >
-                                <Check
-                                  className="font-bold"
-                                  style={{ width: 28, height: 28, color, strokeWidth: 3 }}
-                                />
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                      {/* Added confirmation flash */}
+                      <AnimatePresence>
+                        {added && (
+                          <motion.div
+                            className="absolute inset-0 flex items-center justify-center rounded-2xl"
+                            style={{ background: bg }}
+                            initial={{ scale: 0.6, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 1.1, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <Check style={{ width: 28, height: 28, color, strokeWidth: 3 }} />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
 
-                          {/* + badge — shown when there's room and item is not active */}
-                          {!atMax && !added && (
-                            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 text-[11px] font-bold text-white shadow">
-                              +
-                            </span>
-                          )}
-                        </div>
-
-                        <span
-                          className="text-center text-[11px] font-medium leading-tight"
-                          style={{ color: isActive ? color : undefined }}
-                        >
-                          {label}
-                        </span>
-                      </>
-                    )}
-                  </NavLink>
+                      {/* Red X badge — visual consistency with bar icons in edit mode */}
+                      <span
+                        className="absolute -top-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-red-500 shadow-md"
+                        aria-hidden="true"
+                      >
+                        <X className="h-2.5 w-2.5 text-white" strokeWidth={3.5} />
+                      </span>
+                    </motion.button>
+                    <span className="text-center text-[11px] font-medium leading-tight text-foreground/70">
+                      {label}
+                    </span>
+                  </Reorder.Item>
                 );
               })}
+            </Reorder.Group>
+          ) : (
+            /* ── Normal mode: clean icon grid, tap to navigate ── */
+            <nav className="grid grid-cols-3 gap-x-3 gap-y-5">
+              {nonPinnedItems.map(({ to, label, icon: Icon, color, bg }) => (
+                <NavLink
+                  key={to}
+                  to={to}
+                  onClick={() => onOpenChange(false)}
+                  onContextMenu={e => e.preventDefault()}
+                  className="flex flex-col items-center gap-2 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                >
+                  {({ isActive }) => (
+                    <>
+                      <div
+                        className="flex h-16 w-full items-center justify-center rounded-2xl transition-all duration-150"
+                        style={
+                          isActive
+                            ? { background: bg, outline: `2px solid ${color}` }
+                            : { background: "rgba(0,0,0,.04)" }
+                        }
+                      >
+                        <Icon style={{ width: 28, height: 28, color, opacity: isActive ? 1 : 0.65 }} />
+                      </div>
+                      <span
+                        className="text-center text-[11px] font-medium leading-tight"
+                        style={{ color: isActive ? color : undefined }}
+                      >
+                        {label}
+                      </span>
+                    </>
+                  )}
+                </NavLink>
+              ))}
+
+              {nonPinnedItems.length === 0 && (
+                <p className="col-span-3 py-6 text-center text-sm text-muted-foreground">
+                  Alle Bereiche sind in der Leiste.
+                </p>
+              )}
             </nav>
           )}
 
-          {atMax && nonPinnedItems.length > 0 && (
+          {editMode && atMax && nonPinnedItems.length > 0 && (
             <p className="mt-4 text-center text-[12px] text-muted-foreground">
-              Leiste voll (max. 4). Erst ein Icon entfernen, um ein neues hinzuzufügen.
+              Leiste voll (max. 4). Erst ein Icon entfernen.
+            </p>
+          )}
+          {editMode && !atMax && nonPinnedItems.length > 0 && (
+            <p className="mt-4 text-center text-[12px] text-muted-foreground">
+              Icon antippen, um es zur Leiste hinzuzufügen.
             </p>
           )}
         </DialogPrimitive.Content>

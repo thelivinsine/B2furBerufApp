@@ -1,8 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Reorder, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { Plus, X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
 import type { NavItem } from "./nav-items";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -10,7 +9,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 const MORE_COLOR = "#5b5be6";
 const MORE_BG    = "rgba(91,91,230,.08)";
 
-// Icon glyph size (~20% larger than the original for readability).
+// Icon glyph size (~20% larger than the original for Duolingo-style readability).
 const IZ = 29;
 
 // ── Context strip metadata for any path ───────────────────────
@@ -112,16 +111,18 @@ function TabIcon({ path, active, color }: { path: string; active: boolean; color
 // ── Component ──────────────────────────────────────────────────
 interface Props {
   onMore: () => void;
+  onLongPress: () => void;
+  editMode: boolean;
 }
 
-export function BottomTabBar({ onMore }: Props) {
+export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
   const location      = useLocation();
   const pathname      = location.pathname;
   const pinnedRaw     = useSettingsStore(s => s.pinnedTabs);
   const setPinnedTabs = useSettingsStore(s => s.setPinnedTabs);
   const pinnedTabs    = pinnedRaw && pinnedRaw.length > 0 ? pinnedRaw : DEFAULT_PINNED_TABS;
 
-  const [editMode,   setEditMode]   = useState(false);
+  // Local drag-order mirrors the store; stays in sync when not in the middle of a drag.
   const [localOrder, setLocalOrder] = useState<string[]>(pinnedTabs);
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -137,20 +138,17 @@ export function BottomTabBar({ onMore }: Props) {
     .map(path => navItems.find(i => i.to === path))
     .filter((i): i is NavItem => i != null);
 
-  function enterEditMode() {
-    setLocalOrder([...pinnedTabs]);
-    setEditMode(true);
-    try { navigator.vibrate(40); } catch { /* not available */ }
+  // Moveable bar tabs = all pinned tabs except "/" (home, fixed first position).
+  const moveablePaths = displayOrder.filter(p => p !== "/");
+
+  function handleReorder(newMoveable: string[]) {
+    const next = ["/", ...newMoveable];
+    setLocalOrder(next);
+    setPinnedTabs(next);
   }
 
-  function exitEditMode() { setEditMode(false); }
-
-  function handleReorder(newOrder: string[]) {
-    setLocalOrder(newOrder);
-    setPinnedTabs(newOrder);
-  }
-
-  function removeTab(path: string) {
+  function removeFromBar(path: string) {
+    // Min 2 total (home always counts, so at least 1 other must remain).
     if (localOrder.length <= 2) return;
     const next = localOrder.filter(t => t !== path);
     setLocalOrder(next);
@@ -158,8 +156,10 @@ export function BottomTabBar({ onMore }: Props) {
   }
 
   function startLongPress() {
-    if (editMode) return;
-    longPressRef.current = setTimeout(enterEditMode, 600);
+    longPressRef.current = setTimeout(() => {
+      try { navigator.vibrate(40); } catch { /* not available */ }
+      onLongPress();
+    }, 600);
   }
   function cancelLongPress() {
     if (longPressRef.current) {
@@ -168,57 +168,31 @@ export function BottomTabBar({ onMore }: Props) {
     }
   }
 
-  // Shared handler to block the native browser link context menu that iOS
-  // shows on long-press of <a> elements, which competes with our edit mode.
-  function blockContextMenu(e: React.MouseEvent | React.TouchEvent) {
-    e.preventDefault();
-  }
-
   return (
     <nav
-      className="fixed bottom-0 inset-x-0 z-[60] flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
-      onContextMenu={blockContextMenu}
-      // iOS Safari compositing-layer fix for flashcard siblings using preserve-3d.
-      // -webkit-touch-callout:none suppresses the native link long-press popup.
-      style={{
-        transform: "translateZ(0)",
-        willChange: "transform",
-        WebkitTouchCallout: "none" as React.CSSProperties["WebkitTouchCallout"],
-        userSelect: "none",
-      }}
+      // no-callout: defined in index.css; cascades to all <a> children via *
+      // to suppress the iOS Safari link-preview popup on long-press.
+      className="no-callout fixed bottom-0 inset-x-0 z-[60] flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
+      onContextMenu={e => e.preventDefault()}
+      style={{ transform: "translateZ(0)", willChange: "transform" }}
     >
 
-      {/* ── Context / edit-mode strip ── */}
-      {editMode ? (
-        <div
-          className="flex items-center justify-between px-4 py-[7px]"
-          style={{ background: MORE_BG, borderBottom: "1px solid rgba(0,0,0,.05)" }}
+      {/* ── Context strip ── */}
+      <div
+        className="flex items-center gap-2 px-4 py-[7px]"
+        style={{ background: editMode ? MORE_BG : ctx.bg, borderBottom: "1px solid rgba(0,0,0,.05)" }}
+      >
+        <span
+          className="h-1.5 w-1.5 shrink-0 rounded-full"
+          style={{ background: editMode ? MORE_COLOR : ctx.color }}
+        />
+        <span
+          className="text-[13px] font-semibold leading-snug tracking-[0.01em]"
+          style={{ color: editMode ? MORE_COLOR : ctx.color }}
         >
-          <span className="text-[13px] font-semibold leading-snug" style={{ color: MORE_COLOR }}>
-            Leiste anpassen
-          </span>
-          <button
-            onClick={exitEditMode}
-            className="text-[13px] font-bold leading-snug"
-            style={{ color: MORE_COLOR }}
-          >
-            Fertig
-          </button>
-        </div>
-      ) : (
-        <div
-          className="flex items-center gap-2 px-4 py-[7px]"
-          style={{ background: ctx.bg, borderBottom: "1px solid rgba(0,0,0,.05)" }}
-        >
-          <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: ctx.color }} />
-          <span
-            className="text-[13px] font-semibold leading-snug tracking-[0.01em]"
-            style={{ color: ctx.color }}
-          >
-            {ctx.label}
-          </span>
-        </div>
-      )}
+          {editMode ? "Leiste anpassen" : ctx.label}
+        </span>
+      </div>
 
       {/* ── Icon rail ── */}
       <div
@@ -229,16 +203,28 @@ export function BottomTabBar({ onMore }: Props) {
       >
 
         {editMode ? (
-          /* ── Edit mode: drag-to-reorder + remove badges ── */
           <>
+            {/* Home — always fixed first, no badge */}
+            {(() => {
+              const home = navItems.find(i => i.to === "/")!;
+              return (
+                <div key="/" className="flex flex-1 p-1">
+                  <div className="flex flex-1 items-center justify-center rounded-xl">
+                    <TabIcon path="/" active={false} color={home.color} />
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Moveable pinned tabs — drag to reorder, X to send to sheet */}
             <Reorder.Group
               axis="x"
-              values={localOrder}
+              values={moveablePaths}
               onReorder={handleReorder}
               className="flex flex-1"
               as="div"
             >
-              {localOrder.map((path, idx) => {
+              {moveablePaths.map((path, idx) => {
                 const item = navItems.find(i => i.to === path);
                 if (!item) return null;
                 const { label, color } = item;
@@ -258,7 +244,7 @@ export function BottomTabBar({ onMore }: Props) {
                       <TabIcon path={path} active={false} color={color} />
                       {localOrder.length > 2 && (
                         <button
-                          onPointerDown={e => { e.stopPropagation(); removeTab(path); }}
+                          onPointerDown={e => { e.stopPropagation(); removeFromBar(path); }}
                           className="absolute -top-0.5 -right-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-red-500 shadow-md"
                           aria-label={`${label} entfernen`}
                         >
@@ -271,26 +257,15 @@ export function BottomTabBar({ onMore }: Props) {
               })}
             </Reorder.Group>
 
-            {localOrder.length < 4 && (
-              <button
-                onClick={onMore}
-                aria-label="Tab hinzufügen"
-                className="flex flex-1 p-1"
-              >
-                <div className={cn(
-                  "flex flex-1 items-center justify-center rounded-xl",
-                  "border-2 border-dashed border-muted-foreground/30",
-                )}>
-                  <Plus
-                    className="text-muted-foreground/50"
-                    style={{ width: Math.round(IZ * 0.72), height: Math.round(IZ * 0.72) }}
-                  />
-                </div>
-              </button>
-            )}
+            {/* Mehr — fixed last, no badge, opens the sheet to add more icons */}
+            <button onClick={onMore} aria-label="Mehr" className="flex flex-1 p-1">
+              <div className="flex flex-1 items-center justify-center rounded-xl">
+                <IcoMore active={false} />
+              </div>
+            </button>
           </>
         ) : (
-          /* ── Normal mode: tappable NavLinks ── */
+          /* ── Normal mode ── */
           <>
             {displayTabs.map(({ to, end, label, color, bg }) => (
               <NavLink
@@ -299,7 +274,7 @@ export function BottomTabBar({ onMore }: Props) {
                 end={end}
                 aria-label={label}
                 className="flex flex-1 p-1"
-                onContextMenu={blockContextMenu}
+                onContextMenu={e => e.preventDefault()}
               >
                 {({ isActive }) => (
                   <div
@@ -318,11 +293,7 @@ export function BottomTabBar({ onMore }: Props) {
               </NavLink>
             ))}
 
-            <button
-              onClick={onMore}
-              aria-label="Mehr"
-              className="flex flex-1 p-1"
-            >
+            <button onClick={onMore} aria-label="Mehr" className="flex flex-1 p-1">
               <div
                 className="relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150"
                 style={moreActive ? { background: MORE_BG } : {}}

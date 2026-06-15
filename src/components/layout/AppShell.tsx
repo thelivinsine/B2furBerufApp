@@ -19,6 +19,12 @@ import { cn } from "@/lib/utils";
 
 export function AppShell() {
   const [moreOpen, setMoreOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+
+  function enterEditMode() {
+    setEditMode(true);
+    setMoreOpen(true);
+  }
   const location = useLocation();
   const navigate = useNavigate();
   const authStatus = useAuthStore((s) => s.status);
@@ -68,8 +74,20 @@ export function AppShell() {
       </aside>
 
       {/* Mobile bottom tab bar + "Mehr" sheet */}
-      <BottomTabBar onMore={() => setMoreOpen(true)} />
-      <MoreSheet open={moreOpen} onOpenChange={setMoreOpen} />
+      <BottomTabBar
+        onMore={() => setMoreOpen(true)}
+        onLongPress={enterEditMode}
+        editMode={editMode}
+      />
+      <MoreSheet
+        open={moreOpen}
+        editMode={editMode}
+        onLongPress={enterEditMode}
+        onOpenChange={open => {
+          setMoreOpen(open);
+          if (!open) setEditMode(false); // auto-save: edit mode ends when sheet closes
+        }}
+      />
 
       <div className="lg:pl-64">
         {/* Top bar */}
