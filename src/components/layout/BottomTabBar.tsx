@@ -37,16 +37,18 @@ function IcoDashboard({ active }: { active: boolean }) {
 function IcoBook({ active }: { active: boolean }) {
   return (
     <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M10 4C8 3.2 5.5 3.2 3.5 4V16c2-.8 4.5-.8 6.5 0V4Z"
+      {/* Pages expanded to fill the viewBox — from y≈2.5 to y≈17.5, x=2→18 */}
+      <path d="M10 2.5C7.5 1.5 4.5 1.5 2 2.5V17.5c2.5-1 5.5-1 8 0V2.5Z"
         fill={active ? "#5b5be6" : "#c2c4d6"} />
-      <path d="M10 4c2-.8 4.5-.8 6.5 0V16c-2-.8-4.5-.8-6.5 0V4Z"
+      <path d="M10 2.5c2.5-1 5.5-1 8 0V17.5c-2.5-1-5.5-1-8 0V2.5Z"
         fill={active ? "#10b7cf" : "#c2c4d6"} opacity={active ? 1 : .7} />
       {active && (
         <>
-          <line x1="5"    y1="7.5" x2="8.5" y2="7.5" stroke="white" strokeWidth=".9" strokeLinecap="round" opacity={.7} />
-          <line x1="5"    y1="10"  x2="8.5" y2="10"  stroke="white" strokeWidth=".9" strokeLinecap="round" opacity={.5} />
-          <line x1="11.5" y1="7.5" x2="15"  y2="7.5" stroke="white" strokeWidth=".9" strokeLinecap="round" opacity={.5} />
-          <line x1="11.5" y1="10"  x2="15"  y2="10"  stroke="white" strokeWidth=".9" strokeLinecap="round" opacity={.35} />
+          <line x1="4.5"  y1="7"   x2="8.5"  y2="7"   stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.7} />
+          <line x1="4.5"  y1="10"  x2="8.5"  y2="10"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
+          <line x1="4.5"  y1="13"  x2="8.5"  y2="13"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.35} />
+          <line x1="11.5" y1="7"   x2="15.5" y2="7"   stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
+          <line x1="11.5" y1="10"  x2="15.5" y2="10"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.35} />
         </>
       )}
     </svg>
@@ -56,10 +58,11 @@ function IcoBook({ active }: { active: boolean }) {
 function IcoQuiz({ active }: { active: boolean }) {
   return (
     <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <circle cx="10" cy="10" r="8" fill={active ? "#f59e0b" : "#c2c4d6"} />
+      {/* r=9 fills the viewBox like the dashboard squares do */}
+      <circle cx="10" cy="10" r="9" fill={active ? "#f59e0b" : "#c2c4d6"} />
       <polyline
-        points="6.5,10 9,12.5 13.5,7.5"
-        stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" fill="none"
+        points="6,10.5 8.5,13 14,7"
+        stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" fill="none"
       />
     </svg>
   );
