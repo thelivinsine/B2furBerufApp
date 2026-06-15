@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-14 (session 22). Branch: `claude/vibrant-meitner-mfl9xk`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-15 (session 23). Branch: `claude/app-refresh-text-flash-r6k69u`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -261,6 +261,28 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `--warning` / `--accent` tokens (auto light/dark). Buttons now form a difficulty ramp:
   Nochmal=red → Schwer=amber → Gut=teal → Einfach=green. (QuickRevision's 2-button red/green scale
   was already fine.)
+
+### Session 23 (2026-06-15) — Boot-splash flash fix + logo-redo backlog SHIPPED ✅
+Branch `claude/app-refresh-text-flash-r6k69u`. Squash-merged to `main` (PRs #150–#151).
+
+**Problem:** on every refresh the static `#root` fallback in `index.html` (the full plain-language
+description, added in s22/PR #143 so Google's no-JS OAuth crawler can read the app's purpose) flashed
+on screen before React mounted. It read like a glitch because it was a wall of marketing copy, not a
+loading screen.
+
+**Fix (CSP-safe, no inline JS):**
+- First attempt (PR #150) added an inline `<script>` to set a `.js` class and hide the text via CSS.
+  **It silently failed** because the page CSP is `script-src 'self'` with no `'unsafe-inline'` and no
+  nonce/hash, so the inline script was blocked and the class never applied. Lesson for future work:
+  **`index.html` cannot run inline scripts**; only external `/self` scripts (like `spa-redirect.js`)
+  or `<style>`/`<noscript>` overlays (style-src allows `'unsafe-inline'`).
+- Correct fix (PR #151): default the boot fallback to a minimal **branded splash** (`#boot-splash`:
+  logo + tagline + spinner) for everyone, and use a `<noscript><style>` override to reveal the full
+  description (`#boot-seo`) only when scripting is disabled. JS browsers now see an intentional-looking
+  loading splash; no-JS crawlers / Google's OAuth reviewer still get the full description in the raw
+  HTML. The spinner has a `prefers-reduced-motion` fallback. **Founder-verified: the flash is gone.**
+
+**Also:** added **backlog #20** — redo the Genauly logo (founder noticed it looks too close to Canva).
 
 ### Session 22 cont. (2026-06-14) — Data governance roadmap drafted 📋
 Founder brainstormed making content ingestion **audit-ready** for eventual certification (TÜV
@@ -1014,6 +1036,20 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     Article 10 data-governance obligations that follow; and any edtech-specific schemes worth
     pursuing. Output feeds a v0.2 of `DATA_GOVERNANCE.md`. Recommended model: **Fable** (or the
     deep-research harness). This is research only, no code.
+20. **Redo the logo — too close to Canva (added 2026-06-15):** the founder noticed the current
+    Genauly mark (rounded gradient square with a white "G") looks very close to the Canva logo and
+    wants it redesigned into something distinctive. Scope when picked up:
+    - Design a new brand mark that is clearly differentiated from Canva (and other rounded-gradient-
+      square app icons). Keep it legible at favicon size and recognisable on a home screen.
+    - Once approved, regenerate **every** asset that currently uses the mark, matching the existing
+      treatment rules in `CLAUDE.md` → "Brand logo": the canonical in-app file
+      `public/genauly-default-logo-transparent-corners.png` (rounded transparent corners, used in all
+      in-app spots), the favicons (`favicon-32.png`/`favicon-16.png`, rounded transparent corners),
+      and the **full-bleed opaque** OS icons (`apple-touch-icon.png`, `pwa-192x192.png`,
+      `pwa-512x512.png`, `pwa-maskable-512x512.png`). Also refresh the full-bleed square variant used
+      for Google's OAuth consent crop (not in the repo).
+    - Recommended model: **Fable** for the design direction, then **Sonnet** for the mechanical
+      asset regeneration + wiring.
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
