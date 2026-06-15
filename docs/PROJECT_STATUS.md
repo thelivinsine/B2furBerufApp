@@ -284,6 +284,29 @@ loading screen.
 
 **Also:** added **backlog #20** — redo the Genauly logo (founder noticed it looks too close to Canva).
 
+### Session 23 cont. (2026-06-15) — Data governance v0.2/v0.3 + certification research SHIPPED ✅
+Branch `claude/vibrant-meitner-mfl9xk`. Docs only, squash-merged to `main` (PR #153 for v0.2; the
+v0.3 + research bundle in a follow-up PR).
+
+**1. Content strategy decision (v0.2): traceability over ownership.** Founder rejected leaning on "we
+wrote it in-house, so we own it." New policy: every item traces to an authoritative reference or a
+commercial-safe source. Much of today's library is AI-assisted drafting (legally safe, since AI text
+has no rights holder, but a weak provenance answer), so AI drafting is now a *first step only* that
+must be verified-and-cited or rewritten/discarded. Added the facts-vs-creative-text distinction (words/
+genders/plurals are facts, not copyrightable: verify vs Wiktionary/DWDS rather than copying a protected
+list), an approved open-source table (**Tatoeba CC-BY** for sentences), and a required `reference` field
+on the register. Founder chose **re-verify + backfill existing content**, not a hard rebuild.
+
+**2. Certification deep-research (#19) DONE → `docs/CERTIFICATION_RESEARCH.md` + governance v0.3.** Ran
+the deep-research harness (5 cited passes). Conclusions: we are **most likely NOT high-risk** under the
+EU AI Act (profiling + institutional-gating are the two flip risks); **Article 50 transparency** (tell
+users they're interacting with AI / mark AI output) is a real obligation by **2 Aug 2026** → new
+backlog **#21**; when certifying, sequence **ISO 27001 then ISO 42001** via TÜV NORD/SÜD (~$15K to
+$60K/standard); SOC 2 is US-centric, defer. Still needs a lawyer's sign-off on the risk class (#15).
+
+**Also:** documented that **Fable is temporarily unavailable** (US government restriction); use **Opus**
+for Fable-recommended tasks until it returns (note in the Model-guidance section).
+
 ### Session 22 cont. (2026-06-14) — Data governance roadmap drafted 📋
 Founder brainstormed making content ingestion **audit-ready** for eventual certification (TÜV
 Rheinland / EY-style) and guaranteeing all content is under commercial-safe Creative Commons
@@ -1042,15 +1065,16 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       already signals they evolve. Keep the internal "needs lawyer review" caveat in this backlog,
       not user-facing. **Founder confirmed 2026-06-08: no banner.** (Revisit only the
       language-precedence line + Impressum during the lawyer pass.)
-19. **Certification landscape deep-research (added 2026-06-14):** run a thorough, cited research pass
-    to validate the assumptions in `docs/DATA_GOVERNANCE.md`. Questions to answer with real sources:
-    ISO/IEC 42001 vs SOC 2 vs ISAE 3000 vs ISO/IEC 27001 for an EU edtech AI product (what each
-    actually certifies, which fits us); realistic cost and timeline for each, and which body (TÜV
-    Rheinland / SÜD / NORD, EY, others); Genauly's **EU AI Act risk classification** (is AI writing/
-    pronunciation feedback "high-risk" under Annex III education, or limited-risk?) and the concrete
-    Article 10 data-governance obligations that follow; and any edtech-specific schemes worth
-    pursuing. Output feeds a v0.2 of `DATA_GOVERNANCE.md`. Recommended model: **Fable** (or the
-    deep-research harness). This is research only, no code.
+19. **Certification landscape deep-research — DONE (2026-06-15).** Completed via the deep-research
+    harness (5 parallel cited passes). Output: **`docs/CERTIFICATION_RESEARCH.md`** (full findings +
+    sources), with conclusions folded into `DATA_GOVERNANCE.md` v0.3. Headlines: we are **most likely
+    NOT high-risk** under the EU AI Act (Annex III(3) is institution-tied; formative feedback + the Art.
+    6(3) carve-out likely keep us out), with **profiling** and **institutional gating** as the two flip
+    risks; **Article 50 transparency** (tell users they're interacting with AI / mark AI output) is a
+    real obligation by **2 Aug 2026**; when we certify, sequence **ISO 27001 then ISO 42001** via TÜV
+    NORD/SÜD (~$15K to $60K per standard); SOC 2 is US-centric, defer. Cheap trust signals exist (MISSION
+    KI, Art. 95 code, Comenius EduMedia, Fraunhofer KI-Prüfkatalog). **Still needs a lawyer's sign-off**
+    on the risk class (ties into #15). Spawned a new action #21 (ship Art. 50 transparency).
 20. **Redo the logo — too close to Canva (added 2026-06-15):** the founder noticed the current
     Genauly mark (rounded gradient square with a white "G") looks very close to the Canva logo and
     wants it redesigned into something distinctive. Scope when picked up:
@@ -1065,8 +1089,21 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       for Google's OAuth consent crop (not in the repo).
     - Recommended model: **Fable** for the design direction, then **Sonnet** for the mechanical
       asset regeneration + wiring.
+21. **EU AI Act Article 50 transparency (added 2026-06-15, from the #19 research):** before **2 Aug
+    2026**, add a clear disclosure wherever the app gives AI feedback that the feedback is AI-generated
+    and that the user is interacting with an AI. Small UI/copy change (likely a one-line note on the
+    Schreibtraining/feedback surfaces + a line in the privacy policy). Also write the documented
+    **Article 6(3) risk assessment** (are we high-risk? answer the profiling question) so it exists on
+    file. Detail and sources in `docs/CERTIFICATION_RESEARCH.md`. Confirm scope with the lawyer (#15).
+    Recommended model: **Sonnet** (mechanical), legal nuance to **Opus**.
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
+
+> **Fable temporarily unavailable (2026-06-15):** Fable is restricted by the US government and cannot
+> be selected right now. **Until it returns, use Opus for any task that recommends Fable** (design,
+> strategy, legal nuance, research-heavy planning). The "Recommended model: Fable" notes throughout
+> this doc stand as the long-term preference; read them as "Opus for now" while the restriction holds.
+> Revert to Fable once it is available again.
 
 We now have **Fable 5** as the frontier model alongside the Claude 4.X family. Claude Code does
 **not** auto-pick a model per task: whatever you set in `/model` runs the whole session, and the
