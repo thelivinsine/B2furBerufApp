@@ -1,28 +1,27 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { navItems, PRIMARY_TAB_PATHS } from "./nav-items";
+import { navItems } from "./nav-items";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
-// ── Per-tab metadata (color + tinted bg) ──────────────────────
 const MORE_COLOR = "#5b5be6";
 const MORE_BG    = "rgba(91,91,230,.08)";
 
-const TAB_DEFS = [
-  { to: "/",           end: true,  label: "Dashboard",   color: "#5b5be6", bg: "rgba(91,91,230,.08)"  },
-  { to: "/vocabulary", end: false, label: "Wortschatz",  color: "#5b5be6", bg: "rgba(91,91,230,.08)"  },
-  { to: "/quiz",       end: false, label: "Quiz",        color: "#f59e0b", bg: "rgba(245,158,11,.08)" },
-  { to: "/analytics",  end: false, label: "Fortschritt", color: "#10b7cf", bg: "rgba(16,183,207,.08)" },
-] as const;
-
-type TabPath = (typeof TAB_DEFS)[number]["to"];
-const PATH_META = Object.fromEntries(TAB_DEFS.map(t => [t.to, t])) as Record<TabPath, typeof TAB_DEFS[number]>;
-
-function getContextMeta(pathname: string) {
-  if (pathname in PATH_META) return PATH_META[pathname as TabPath];
-  const match = navItems.find(i => i.to !== "/" && pathname.startsWith(i.to));
-  return { label: match?.label ?? "Mehr", color: MORE_COLOR, bg: MORE_BG };
+// ── Context strip metadata for any path ───────────────────────
+function getContextMeta(pathname: string, pinnedTabs: string[]) {
+  // Exact match among pinned tabs first
+  const exact = navItems.find(i => i.to === pathname);
+  if (exact) return { label: exact.label, color: exact.color, bg: exact.bg };
+  // Prefix match for nested routes
+  const prefix = navItems.find(i => i.to !== "/" && pathname.startsWith(i.to));
+  if (prefix) return { label: prefix.label, color: prefix.color, bg: prefix.bg };
+  // "Mehr" fallback when on a secondary page opened from the drawer
+  const mehr = navItems.find(i => pinnedTabs.includes(i.to) === false && pathname.startsWith(i.to));
+  return { label: mehr?.label ?? "Mehr", color: MORE_COLOR, bg: MORE_BG };
 }
 
-// ── Custom SVG icons — 24 px, ~15% larger than the old h-5 w-5 ─
+// ── Custom SVG icons for the 4 original primary tabs ──────────
+// (24px canvas, ~20% larger than the old h-5 w-5 for Duolingo-style readability)
+
 function IcoDashboard({ active }: { active: boolean }) {
   const c = active ? "#5b5be6" : "#c2c4d6";
   return (
@@ -38,18 +37,10 @@ function IcoDashboard({ active }: { active: boolean }) {
 function IcoBook({ active }: { active: boolean }) {
   return (
     <svg width="24" height="24" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      {/* Left page — indigo when active */}
-      <path
-        d="M10 4C8 3.2 5.5 3.2 3.5 4V16c2-.8 4.5-.8 6.5 0V4Z"
-        fill={active ? "#5b5be6" : "#c2c4d6"}
-      />
-      {/* Right page — cyan when active */}
-      <path
-        d="M10 4c2-.8 4.5-.8 6.5 0V16c-2-.8-4.5-.8-6.5 0V4Z"
-        fill={active ? "#10b7cf" : "#c2c4d6"}
-        opacity={active ? 1 : .7}
-      />
-      {/* Page lines — only visible when active */}
+      <path d="M10 4C8 3.2 5.5 3.2 3.5 4V16c2-.8 4.5-.8 6.5 0V4Z"
+        fill={active ? "#5b5be6" : "#c2c4d6"} />
+      <path d="M10 4c2-.8 4.5-.8 6.5 0V16c-2-.8-4.5-.8-6.5 0V4Z"
+        fill={active ? "#10b7cf" : "#c2c4d6"} opacity={active ? 1 : .7} />
       {active && (
         <>
           <line x1="5"    y1="7.5" x2="8.5" y2="7.5" stroke="white" strokeWidth=".9" strokeLinecap="round" opacity={.7} />
@@ -102,12 +93,26 @@ function IcoMore({ active }: { active: boolean }) {
   );
 }
 
-const TAB_ICONS: Record<TabPath, (active: boolean) => React.ReactNode> = {
+// Tabs with a hand-crafted SVG icon — others fall back to the lucide icon.
+const CUSTOM_ICON: Record<string, (active: boolean) => React.ReactNode> = {
   "/":           a => <IcoDashboard active={a} />,
   "/vocabulary": a => <IcoBook      active={a} />,
   "/quiz":       a => <IcoQuiz      active={a} />,
   "/analytics":  a => <IcoAnalytics active={a} />,
 };
+
+function TabIcon({ path, active, color }: { path: string; active: boolean; color: string }) {
+  if (path in CUSTOM_ICON) return <>{CUSTOM_ICON[path](active)}</>;
+  const item = navItems.find(i => i.to === path);
+  if (!item) return null;
+  const Icon = item.icon;
+  return (
+    <Icon
+      className="h-6 w-6 transition-colors"
+      style={{ color: active ? color : "#c2c4d6" }}
+    />
+  );
+}
 
 // ── Component ──────────────────────────────────────────────────
 interface Props {
@@ -115,10 +120,14 @@ interface Props {
 }
 
 export function BottomTabBar({ onMore }: Props) {
-  const location  = useLocation();
-  const pathname  = location.pathname;
-  const moreActive = !PRIMARY_TAB_PATHS.includes(pathname);
-  const ctx = getContextMeta(pathname);
+  const location    = useLocation();
+  const pathname    = location.pathname;
+  const pinnedTabs  = useSettingsStore(s => s.pinnedTabs);
+  const moreActive  = !pinnedTabs.includes(pathname);
+  const ctx         = getContextMeta(pathname, pinnedTabs);
+
+  // Resolve the pinned tabs in navItems order, with their metadata
+  const tabs = navItems.filter(i => pinnedTabs.includes(i.to));
 
   return (
     <nav className="fixed bottom-0 inset-x-0 z-30 flex flex-col border-t border-border bg-surface/80 backdrop-blur-xl pb-safe lg:hidden">
@@ -126,10 +135,7 @@ export function BottomTabBar({ onMore }: Props) {
       {/* ── Context strip ── */}
       <div
         className="flex items-center px-4 py-1"
-        style={{
-          background: ctx.bg,
-          borderBottom: "1px solid rgba(0,0,0,.05)",
-        }}
+        style={{ background: ctx.bg, borderBottom: "1px solid rgba(0,0,0,.05)" }}
       >
         <span
           className="text-[11px] font-extrabold tracking-wide leading-none"
@@ -142,7 +148,7 @@ export function BottomTabBar({ onMore }: Props) {
       {/* ── Icon rail — no text labels ── */}
       <div className="flex h-[52px] items-stretch">
 
-        {TAB_DEFS.map(({ to, end, label, color, bg }) => (
+        {tabs.map(({ to, end, label, color, bg }) => (
           <NavLink
             key={to}
             to={to}
@@ -157,7 +163,7 @@ export function BottomTabBar({ onMore }: Props) {
                 )}
                 style={isActive ? { background: bg } : {}}
               >
-                {TAB_ICONS[to](isActive)}
+                <TabIcon path={to} active={isActive} color={color} />
                 {isActive && (
                   <span
                     className="absolute bottom-[7px] left-1/2 -translate-x-1/2 w-5 rounded-full"
@@ -169,16 +175,14 @@ export function BottomTabBar({ onMore }: Props) {
           </NavLink>
         ))}
 
-        {/* Mehr */}
+        {/* Mehr — always shown as the last item */}
         <button
           onClick={onMore}
           aria-label="Mehr"
           className="flex flex-1 p-1"
         >
           <div
-            className={cn(
-              "relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150",
-            )}
+            className="relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150"
             style={moreActive ? { background: MORE_BG } : {}}
           >
             <IcoMore active={moreActive} />

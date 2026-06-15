@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { DEFAULT_PINNED_TABS } from "@/components/layout/nav-items";
 
 export type ThemeMode = "light" | "dark" | "system";
 export type CefrLevel = "A2" | "B1" | "B2" | "C1";
@@ -24,9 +25,13 @@ interface SettingsState {
   recognitionEnabled: boolean;
   reducedMotion: boolean;
 
+  /** Ordered list of nav paths pinned to the bottom tab bar (max 4). */
+  pinnedTabs: string[];
+
   setSettings: (patch: Partial<SettingsState>) => void;
   completeOnboarding: (patch: Partial<SettingsState>) => void;
   resetSettings: () => void;
+  setPinnedTabs: (tabs: string[]) => void;
 }
 
 const defaults = {
@@ -44,6 +49,7 @@ const defaults = {
   voiceURI: null,
   recognitionEnabled: false,
   reducedMotion: false,
+  pinnedTabs: DEFAULT_PINNED_TABS,
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -53,6 +59,7 @@ export const useSettingsStore = create<SettingsState>()(
       setSettings: (patch) => set(patch),
       completeOnboarding: (patch) => set({ ...patch, onboarded: true }),
       resetSettings: () => set({ ...defaults }),
+      setPinnedTabs: (tabs) => set({ pinnedTabs: tabs }),
     }),
     { name: "b2beruf.settings.v1" },
   ),
