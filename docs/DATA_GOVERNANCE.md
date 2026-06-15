@@ -1,9 +1,10 @@
 # Data Governance & Content Provenance
 
-_Status: **v0.2 draft (2026-06-15)**. This roadmap is intentionally provisional. The specific
-certification claims (which standard, which body, cost, timeline, and our EU AI Act risk class) are
-estimates and MUST be validated by the certification deep-research pass (backlog #19) before we act
-on them or quote them externally. Update this doc once that research lands._
+_Status: **v0.3 draft (2026-06-15)**. The certification deep-research pass (backlog #19) is now done:
+see **`docs/CERTIFICATION_RESEARCH.md`** for the cited findings. This doc's assumptions held; the
+refinements from the research are folded in below and flagged "(research-validated 2026-06-15)". The
+research is desk research, not legal advice: the EU AI Act risk classification still needs a lawyer's
+sign-off (backlog #15) before we rely on it externally._
 
 _v0.2 change (founder decision, 2026-06-15): the content strategy is **traceability over ownership**.
 We do not lean on a blanket "we wrote it in-house, so we own it." Every item must trace to an
@@ -50,6 +51,14 @@ and all of them certify our **process and management system**, not the data itse
 
 The practical takeaway: **the certificate is downstream.** What we build now is the *system*. The
 external examination of that system is a later, paid step.
+
+**Research-validated (2026-06-15):** ISO is a *certificate* from an accredited body; SOC 2 / ISAE 3000
+is an auditor's *report* (EY and the Big Four do this side, not ISO). **SOC 2 is US-centric; European
+buyers ask for ISO 27001.** ISO 42001 is the AI-specific standard and builds on top of ISO 27001. So
+when we do certify, the sequence is **ISO 27001 first, then ISO 42001 on top** (reuses the same
+management system), with **TÜV NORD / TÜV SÜD** as the likely body (both are live on ISO 42001; TÜV NORD
+is among the first accredited). SOC 2 only if we later chase US enterprise. Budget roughly **$15K to
+$60K per standard** and several months each. Full detail and sources in `CERTIFICATION_RESEARCH.md`.
 
 ## Scope
 
@@ -237,12 +246,27 @@ procedures to write (short, practical SOPs, drafted in a later phase):
 | SOPs + risk register | Core management system | Risk management (Art. 9) | Control environment |
 | Internal audit cadence | Performance evaluation | Post-market monitoring | Monitoring |
 
-**EU AI Act risk class (to confirm in deep research).** Genauly is currently a learning aid that
-gives AI feedback on writing and pronunciation. It does not, today, make admissions decisions or
-formally grade outcomes that determine access to education. That likely places it below the
-"high-risk" education category in Annex III, but the line is genuinely uncertain. We will **design to
-the stricter (high-risk) data-governance standard regardless**, so a later classification change does
-not force a rebuild.
+**EU AI Act risk class (research-validated 2026-06-15, lawyer sign-off still pending).** Genauly gives
+AI feedback on writing and pronunciation. It does not make admissions decisions or assign formal grades
+that gate access to education. The research concludes we are **most likely NOT high-risk**: Annex III(3)
+is tied to educational *institutions* and consequential outcomes, formative practice feedback is
+plausibly outside it, and the **Article 6(3) carve-out** (narrow/preparatory task, no material influence
+on decisions) likely applies. **Two things would flip us to high-risk, and are the live uncertainties:**
+1. **Profiling.** A system that profiles natural persons is *always* high-risk. Tracking a learner's
+   traits/progress to adapt content could count as profiling. Assess this before relying on the carve-out.
+2. **Institutional deployment / gating.** If the app is used inside a course/institution or its scores
+   gate progression or certification, it slides toward Annex III(3)(b).
+
+If we claim the carve-out, the Act (Art. 6(4)) requires a **documented risk assessment on file before
+going to market**. We still **design to the stricter (high-risk) data-governance standard regardless**,
+so a later reclassification does not force a rebuild. See `CERTIFICATION_RESEARCH.md` for sources.
+
+**Near-term legal action: Article 50 transparency (effective 2 Aug 2026).** Regardless of risk class,
+if AI interacts directly with users we must tell them they are interacting with an AI, and generative
+AI output should be marked as AI-generated. This is a concrete obligation that plausibly binds us and is
+a small UI/copy change. **Tracked as an action below and in `CERTIFICATION_RESEARCH.md`.** (A pending
+"Digital Omnibus" proposal may defer the *high-risk* dates to Dec 2027, but it is not yet law, and it
+does not obviously move the Art. 50 date.)
 
 ## Phased roadmap
 
@@ -262,9 +286,20 @@ ship the auto-generated "Sources & Licenses" page.
 items per quarter, re-verify license + accuracy, retain evidence).
 
 **Phase 4 (only when revenue or a concrete customer / investor demand justifies it):** engage an
-external body for an ISO 42001 readiness assessment or a SOC 2 / ISAE 3000 engagement, and pursue the
-certificate. This is the expensive step (an estimate, to be confirmed: several months and tens of
-thousands of euros). Do not start it speculatively.
+external body. **Sequence (research-validated): ISO 27001 first** (what EU buyers ask for), then
+**ISO 42001** on top (AI-specific, reuses the 27001 system); **TÜV NORD / TÜV SÜD** are the likely
+bodies. SOC 2 / ISAE 3000 (via a CPA firm such as A-LIGN, Schellman, or a Big Four) only for US
+enterprise. Budget roughly **$15K to $60K per standard** and several months each. Do not start it
+speculatively.
+
+**Near-term legal actions (not certification, but cheap and arguably required):**
+- **Ship Article 50 transparency** before 2 Aug 2026: a clear "this feedback is AI-generated / you are
+  interacting with an AI" disclosure wherever the app gives AI feedback.
+- **Write a documented Article 6(3) risk assessment** answering the profiling question (see EU AI Act
+  section). Needed on file if we claim we are not high-risk.
+- Consider cheap trust signals: the German **MISSION KI** low-risk-AI standard (built for SMEs), an
+  **Art. 95 voluntary code of conduct** posture, the **Comenius EduMedia** edtech seal, and the free
+  **Fraunhofer KI-Prüfkatalog** as an internal checklist. Detail in `CERTIFICATION_RESEARCH.md`.
 
 ## CTO recommendation
 
@@ -284,6 +319,12 @@ SOC 2 today would be premature for a pre-revenue product and a poor use of money
 
 ## Change log
 
+- **v0.3 (2026-06-15):** certification deep-research pass (backlog #19) completed and folded in; see
+  `CERTIFICATION_RESEARCH.md`. Key refinements: we are most likely **not high-risk** under the EU AI Act
+  (with profiling + institutional-gating as the two flip risks); **Article 50 transparency** (by 2 Aug
+  2026) is a concrete near-term action; certification sequence is **ISO 27001 then ISO 42001** via TÜV
+  NORD/SÜD; cost estimates (~$15K to $60K/standard) and the "defer paid cert" call confirmed. Added cheap
+  trust-signal options (MISSION KI, Art. 95 code, Comenius, Fraunhofer KI-Prüfkatalog).
 - **v0.2 (2026-06-15):** founder set the content strategy to **traceability over ownership**. Dropped
   the "written in-house, so we own it" framing; added the facts-vs-creative-text distinction, the
   approved open-source table (Tatoeba CC-BY, Wiktionary / DWDS as references), a required `reference`
