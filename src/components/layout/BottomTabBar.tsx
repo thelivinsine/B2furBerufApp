@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { navItems } from "./nav-items";
+import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
 const MORE_COLOR = "#5b5be6";
@@ -125,7 +125,9 @@ interface Props {
 export function BottomTabBar({ onMore }: Props) {
   const location    = useLocation();
   const pathname    = location.pathname;
-  const pinnedTabs  = useSettingsStore(s => s.pinnedTabs);
+  // Guard against an older persisted settings object that predates pinnedTabs.
+  const pinnedRaw   = useSettingsStore(s => s.pinnedTabs);
+  const pinnedTabs  = pinnedRaw && pinnedRaw.length > 0 ? pinnedRaw : DEFAULT_PINNED_TABS;
   const moreActive  = !pinnedTabs.includes(pathname);
   const ctx         = getContextMeta(pathname, pinnedTabs);
 
@@ -133,7 +135,15 @@ export function BottomTabBar({ onMore }: Props) {
   const tabs = navItems.filter(i => pinnedTabs.includes(i.to));
 
   return (
-    <nav className="fixed bottom-0 inset-x-0 z-30 flex flex-col border-t border-border bg-surface/80 backdrop-blur-xl pb-safe lg:hidden">
+    <nav
+      className="fixed bottom-0 inset-x-0 z-30 flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
+      // iOS Safari drops the compositing layer of a position:fixed element that
+      // uses backdrop-filter when a sibling has a 3D transform (the flashcard's
+      // perspective/preserve-3d), making this bar flicker or vanish on scroll.
+      // Pinning it to its own GPU layer keeps it painted and stable. The high
+      // bg opacity is a fallback so the bar is solid even if the blur drops.
+      style={{ transform: "translateZ(0)", willChange: "transform" }}
+    >
 
       {/* ── Context strip ── */}
       <div
