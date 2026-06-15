@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock, History } from "lucide-react";
@@ -53,11 +53,8 @@ export function WritingHub() {
   const status = useAuthStore((s) => s.status);
   const isSignedIn = status === "signedIn";
   const [authOpen, setAuthOpen] = useState(false);
-  const restoredRef = useRef(false);
-  const resumedRef = useRef(false);
 
-  // Submit the current draft for AI evaluation. Defined before the early return
-  // below so the resume effect can call it (rules of hooks).
+  // Submit the current draft for AI evaluation.
   const submit = async () => {
     if (!theme) return;
     setSubmitting(true);
@@ -67,31 +64,18 @@ export function WritingHub() {
     setSubmitting(false);
   };
 
-  // Restore an in-progress draft (e.g. after returning from sign-in) so the
-  // learner's text is exactly where they left it. Runs once per mount and only
-  // for the matching theme; never clobbers text the user is already editing.
+  // After sign-in, restore the in-progress draft so the learner's text is
+  // exactly where they left it, then drop the draft. We deliberately do NOT
+  // auto-evaluate: the learner presses Auswerten again themselves, so they get
+  // a second chance to review or edit before spending an evaluation.
   useEffect(() => {
-    if (restoredRef.current || !theme) return;
+    if (!theme || !isSignedIn) return;
     const draft = loadWritingDraft();
-    if (draft && draft.theme === theme) {
-      restoredRef.current = true;
-      setLength(draft.length);
-      setText((prev) => (prev ? prev : draft.text));
-    }
-  }, [theme]);
-
-  // After the learner signs in, automatically resume the evaluation they were
-  // blocked on at the login wall, once, if there is enough text.
-  useEffect(() => {
-    if (resumedRef.current || !isSignedIn || !theme) return;
-    const draft = loadWritingDraft();
-    if (!draft || !draft.resume || draft.theme !== theme || words < 5) return;
-    resumedRef.current = true;
+    if (!draft || draft.theme !== theme) return;
+    setLength(draft.length);
+    setText((prev) => (prev ? prev : draft.text));
     clearWritingDraft();
-    void submit();
-    // submit closes over the just-restored text; deps kept minimal on purpose.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSignedIn, theme, words]);
+  }, [theme, isSignedIn]);
 
   // Theme picker / history toggle
   if (!theme) {
