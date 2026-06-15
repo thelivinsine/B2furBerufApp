@@ -111,10 +111,13 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
             <motion.div
               animate={{ rotateY: flipped ? 180 : 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="relative h-64 sm:h-72 w-full [transform-style:preserve-3d]"
+              // Grid-stack both faces in one cell so the card grows to fit the
+              // taller (back) side instead of clipping long content. min-h keeps
+              // a card-like minimum when content is short.
+              className="grid min-h-[16rem] w-full sm:min-h-[18rem] [transform-style:preserve-3d]"
             >
               {/* Front */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-surface p-8 shadow-soft [backface-visibility:hidden]">
+              <div className="relative [grid-area:1/1] flex flex-col items-center justify-center gap-4 rounded-2xl border border-border bg-surface p-8 shadow-soft [backface-visibility:hidden]">
                 <Badge variant={m === "mastered" ? "success" : m === "new" ? "muted" : "default"}>
                   {m === "new" ? "neu" : m === "learning" ? "lernen" : m === "review" ? "wiederholen" : "gemeistert"}
                 </Badge>
@@ -129,7 +132,7 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
                 <p className="absolute bottom-4 text-xs text-muted-foreground">Tippen zum Umdrehen</p>
               </div>
               {/* Back */}
-              <div className="absolute inset-0 flex flex-col justify-center gap-3 rounded-2xl border border-primary/30 bg-surface p-7 shadow-glow [backface-visibility:hidden] [transform:rotateY(180deg)]">
+              <div className="[grid-area:1/1] flex flex-col justify-center gap-3 rounded-2xl border border-primary/30 bg-surface p-7 shadow-glow [backface-visibility:hidden] [transform:rotateY(180deg)]">
                 <p className="text-xl font-semibold">{card.en}</p>
                 <p className="text-xs text-muted-foreground">{card.context}</p>
                 <div className="space-y-2 border-t border-border pt-3">
