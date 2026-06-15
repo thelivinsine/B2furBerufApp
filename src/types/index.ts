@@ -316,3 +316,56 @@ export interface SrsCard {
 }
 
 export type Grade = 0 | 3 | 4 | 5;
+
+/* ---------------- Data governance — provenance register ---------------- */
+
+export type ProvenanceContentType =
+  | "vocabulary"
+  | "collocation"
+  | "grammar_topic"
+  | "grammar_drill"
+  | "dialogue"
+  | "exam_set"
+  | "redemittel"
+  | "writing_prompt";
+
+export type ProvenanceOrigin = "sourced" | "adapted" | "authored";
+
+export type ProvenanceLicense =
+  | "OWNED"
+  | "CC0-1.0"
+  | "CC-BY-4.0"
+  | "CC-BY-3.0"
+  | "CC-BY-2.0"
+  | "CC-BY-2.0-FR"
+  | "CC-BY-SA-4.0"
+  | "Public-Domain";
+
+export type ProvenanceReviewStatus = "draft" | "verified" | "published" | "retired";
+
+export interface ProvenanceEntry {
+  content_id: string;
+  content_type: ProvenanceContentType;
+  /** Human-readable headword or summary for reviewers. */
+  label: string;
+  origin: ProvenanceOrigin;
+  /** External source name, e.g. "Tatoeba". Blank for authored. */
+  source_name?: string;
+  /** Direct link to the source item. */
+  source_url?: string;
+  /**
+   * Authoritative reference the item was verified against (Wiktionary / DWDS /
+   * Tatoeba URL). Required for authored and adapted items. Empty string means
+   * back-fill is pending — the linter warns on empty for authored/adapted items.
+   */
+  reference: string;
+  license: ProvenanceLicense;
+  license_url?: string;
+  attribution_required: boolean;
+  attribution_text?: string;
+  added_by: string;
+  verified_by?: string;
+  verified_date?: string;
+  review_status: ProvenanceReviewStatus;
+  notes?: string;
+}

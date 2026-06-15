@@ -18,6 +18,12 @@ import { createServer } from "vite";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
+/* ---- provenance: allowed license identifiers (must match ProvenanceLicense) ---- */
+const LICENSE_ALLOWLIST = new Set([
+  "OWNED", "CC0-1.0", "CC-BY-4.0", "CC-BY-3.0", "CC-BY-2.0", "CC-BY-2.0-FR",
+  "CC-BY-SA-4.0", "Public-Domain",
+]);
+
 /* ---- valid value sets (mirror of src/types/index.ts string unions) ---- */
 const THEME_IDS = [
   "meetings", "scheduling", "logistics", "customer", "conflict",
@@ -292,6 +298,37 @@ function lintWritingPrompts(writingPrompts) {
     if (!writingPrompts[id]) error(ds, id, "no writing prompt for theme");
 }
 
+function lintProvenance(provenance, allContentIds) {
+  const ds = "provenance";
+
+  // Build a map for duplicate detection.
+  const seen = new Map();
+  for (const [i, entry] of provenance.entries()) {
+    const id = entry?.content_id;
+    if (!isStr(id)) { error(ds, `[${i}]`, "content_id missing"); continue; }
+    if (seen.has(id)) error(ds, id, `duplicate provenance row (also at index ${seen.get(id)})`);
+    else seen.set(id, i);
+
+    // License must be on the commercial-safe allowlist.
+    if (!LICENSE_ALLOWLIST.has(entry.license))
+      error(ds, id, `license "${entry.license}" is not on the allowlist (forbidden or unknown)`);
+
+    // Every authored/adapted item should have a non-empty reference — the
+    // traceability requirement. Warn (not error) because back-fill is ongoing.
+    if ((entry.origin === "authored" || entry.origin === "adapted") && !isStr(entry.reference))
+      warn(ds, id, `${entry.origin} item has no reference — back-fill with Wiktionary/DWDS/Tatoeba URL`);
+
+    // Dangling row: register row points to a content_id that doesn't exist.
+    if (!allContentIds.has(id))
+      error(ds, id, "provenance row for unknown content_id (content deleted or id changed?)");
+  }
+
+  // Missing row: content_id exists in the data banks but has no register row.
+  for (const id of allContentIds) {
+    if (!seen.has(id)) error(ds, id, "no provenance row — add a row to src/data/provenance.ts");
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* run                                                                 */
 /* ------------------------------------------------------------------ */
@@ -312,7 +349,7 @@ async function main() {
   let data;
   try {
     const load = (p) => server.ssrLoadModule(p);
-    const [vocab, colloc, gram, dia, exams, rede, themes, areas, writing] = await Promise.all([
+    const [vocab, colloc, gram, dia, exams, rede, themes, areas, writing, prov] = await Promise.all([
       load("/src/data/vocabulary.ts"),
       load("/src/data/collocations.ts"),
       load("/src/data/grammar.ts"),
@@ -322,6 +359,7 @@ async function main() {
       load("/src/data/themes.ts"),
       load("/src/data/practiceAreas.ts"),
       load("/src/data/writingPrompts.ts"),
+      load("/src/data/provenance.ts"),
     ]);
     data = {
       vocabulary: vocab.vocabulary,
@@ -333,6 +371,7 @@ async function main() {
       themes: themes.themes,
       practiceAreas: areas.practiceAreas,
       writingPrompts: writing.writingPrompts,
+      provenance: prov.provenance,
     };
   } finally {
     await server.close();
@@ -348,8 +387,26 @@ async function main() {
   lintPracticeAreas(data.practiceAreas);
   lintWritingPrompts(data.writingPrompts);
 
-  // Em-dash sweep across every user-facing string in every bank.
-  for (const [name, items] of Object.entries(data)) scanEmDash(items, name, name);
+  // Build the full set of trackable content ids from all banks, then check
+  // that the provenance register has exactly one row per id.
+  const allContentIds = new Set([
+    ...data.vocabulary.map((v) => v.id),
+    ...data.collocations.map((c) => c.id),
+    ...data.grammar.map((t) => t.id),
+    ...data.grammar.flatMap((t) => t.drills?.map((d) => d.id) ?? []),
+    ...data.scenarios.map((s) => s.id),
+    ...data.examSets.map((e) => e.id),
+    ...data.redemittel.map((r) => r.id),
+    // Writing prompts are keyed by themeId, not individual ids.
+    ...THEME_IDS.filter((id) => data.writingPrompts[id]).map((id) => `wp_${id}`),
+  ]);
+  lintProvenance(data.provenance, allContentIds);
+
+  // Em-dash sweep across every user-facing string in every bank
+  // (skip the provenance register — notes are internal, not user-facing copy).
+  const userFacingData = { ...data };
+  delete userFacingData.provenance;
+  for (const [name, items] of Object.entries(userFacingData)) scanEmDash(items, name, name);
 
   /* ---- report ---- */
   const counts = {
@@ -362,6 +419,8 @@ async function main() {
     examSets: data.examSets.length,
     redemittel: data.redemittel.length,
     practiceAreas: data.practiceAreas.length,
+    "provenance rows": data.provenance.length,
+    "provenance verified": data.provenance.filter((e) => e.review_status === "verified").length,
   };
   console.log("Content lint — checked:");
   for (const [k, v] of Object.entries(counts)) console.log(`  ${String(v).padStart(4)} ${k}`);
