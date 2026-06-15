@@ -49,13 +49,18 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
     }
   }
 
+  // modal={false} is essential: a modal Radix dialog sets pointer-events:none
+  // on everything outside the sheet, which makes the bottom tab bar inert so its
+  // drag-to-reorder and X buttons stop responding while the sheet is open.
   return (
-    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange}>
+    <DialogPrimitive.Root open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogPrimitive.Portal>
-        {/* Overlay stops just above the tab bar so the bar stays visible. */}
+        {/* Overlay stops just above the tab bar so the bar stays visible and
+            interactive. Tapping the dimmed area closes the sheet (saves). */}
         <DialogPrimitive.Overlay
-          className="fixed inset-x-0 top-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-fade-in lg:hidden"
+          className="pointer-events-auto fixed inset-x-0 top-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-fade-in lg:hidden"
           style={{ bottom: "calc(6rem + env(safe-area-inset-bottom))" }}
+          onPointerDown={() => onOpenChange(false)}
         />
         <DialogPrimitive.Content
           aria-describedby={undefined}
@@ -71,6 +76,13 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
           onTouchStart={startLongPress}
           onTouchMove={cancelLongPress}
           onTouchEnd={cancelLongPress}
+          // With modal={false} Radix still fires interact-outside; keep the sheet
+          // open when the user is operating the tab bar (drag/X), close otherwise.
+          onInteractOutside={e => {
+            const target = e.target as HTMLElement | null;
+            if (target?.closest("#bottom-tab-bar")) e.preventDefault();
+          }}
+          onOpenAutoFocus={e => e.preventDefault()}
         >
           <DialogPrimitive.Title className="sr-only">Mehr Bereiche</DialogPrimitive.Title>
 

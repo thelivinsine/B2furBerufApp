@@ -171,6 +171,7 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
 
   return (
     <nav
+      id="bottom-tab-bar"
       // no-callout: defined in index.css; cascades to all <a> children via *
       // to suppress the iOS Safari link-preview popup on long-press.
       className="no-callout fixed bottom-0 inset-x-0 z-[60] flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
