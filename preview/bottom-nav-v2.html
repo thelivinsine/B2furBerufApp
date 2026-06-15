@@ -1,0 +1,859 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Genauly · Bottom Nav v2 — 6 New Concepts</title>
+<style>
+  :root {
+    --primary: #5b5be6;
+    --accent: #10b7cf;
+    --surface: #f7f8fc;
+    --bg: #e9eaf0;
+    --text: #1a1b2e;
+    --muted: #8b8fa8;
+    --border: rgba(0,0,0,.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    font-family: -apple-system, 'Inter', system-ui, Segoe UI, Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    color: var(--text);
+  }
+
+  /* Layout */
+  .page { max-width: 1080px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { text-align: center; margin-bottom: 32px; }
+  header h1 { font-size: 22px; font-weight: 700; margin: 0 0 6px; color: var(--text); }
+  header p  { font-size: 14px; color: var(--muted); margin: 0; line-height: 1.6; max-width: 580px; margin: 0 auto; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 28px;
+  }
+
+  /* Card */
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.09);
+    overflow: hidden;
+  }
+  .card-label {
+    padding: 14px 18px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-label .letter {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    border-radius: 6px;
+    padding: 2px 7px;
+    margin-right: 7px;
+    vertical-align: middle;
+  }
+  .card-label .name { font-size: 13px; font-weight: 700; color: var(--text); vertical-align: middle; }
+  .card-label .desc { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+  /* Phone frame */
+  .phone-wrap {
+    padding: 16px;
+    background: #f4f5f9;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    min-height: 260px;
+  }
+  .phone {
+    width: 220px;
+    background: #fff;
+    border-radius: 28px;
+    border: 2px solid #d0d3e0;
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    overflow: hidden;
+    position: relative;
+  }
+  /* Notch */
+  .phone::before {
+    content: '';
+    display: block;
+    width: 60px; height: 6px;
+    background: #d0d3e0;
+    border-radius: 3px;
+    margin: 8px auto 0;
+  }
+  .phone-content {
+    padding: 10px 0 0;
+    min-height: 130px;
+    background: #f7f8fc;
+    position: relative;
+  }
+  .phone-body-text {
+    padding: 0 12px;
+    font-size: 9px;
+    color: #b0b3c4;
+    line-height: 1.5;
+  }
+  .phone-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    padding: 0 12px;
+    margin-bottom: 4px;
+  }
+  /* Subtle content lines */
+  .line {
+    height: 7px;
+    border-radius: 4px;
+    background: #e4e5ef;
+    margin: 5px 12px;
+  }
+  .line.short { width: 55%; }
+  .line.med { width: 75%; }
+
+  /* ─────────────── CONCEPT A: iOS 26 Liquid Glass ─────────────── */
+  .nav-a {
+    margin: 0 10px 14px;
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.85);
+    border-radius: 22px;
+    box-shadow:
+      0 8px 32px rgba(91,91,230,.14),
+      0 2px 8px rgba(0,0,0,.06),
+      inset 0 1px 0 rgba(255,255,255,.9);
+    padding: 6px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+  .nav-a .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    padding: 4px 2px;
+    border-radius: 16px;
+    cursor: pointer;
+  }
+  .nav-a .tab.active {
+    background: linear-gradient(135deg, rgba(91,91,230,.15), rgba(16,183,207,.1));
+  }
+  .nav-a .tab .icon { font-size: 16px; line-height: 1; }
+  .nav-a .tab .lbl { font-size: 7.5px; font-weight: 600; color: #8b8fa8; }
+  .nav-a .tab.active .lbl { color: var(--primary); }
+  .nav-a .tab.active .icon { filter: drop-shadow(0 0 3px rgba(91,91,230,.5)); }
+  /* Glass shimmer overlay */
+  .nav-a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,.2) 0%, rgba(255,255,255,0) 60%);
+    pointer-events: none;
+    border-radius: inherit;
+  }
+
+  /* ─────────────── CONCEPT B: Gamified Streak Bar ─────────────── */
+  .nav-b-wrap {
+    background: #fff;
+    border-top: 1.5px solid #edeef6;
+    padding-bottom: 6px;
+  }
+  .streak-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 12px 3px;
+    font-size: 8px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: linear-gradient(135deg, #ff7a1a, #ffb347);
+    border-radius: 10px;
+    padding: 2px 7px 2px 4px;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+  }
+  .xp-badge {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 10px;
+    padding: 2px 7px 2px 5px;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+  }
+  .nav-b {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    padding: 2px 4px 2px;
+  }
+  .nav-b .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    flex: 1;
+    padding: 3px 2px;
+    border-radius: 12px;
+    position: relative;
+  }
+  .nav-b .tab.active {
+    background: linear-gradient(180deg, rgba(91,91,230,.1), rgba(91,91,230,.04));
+  }
+  .nav-b .tab .icon { font-size: 16px; line-height: 1; }
+  .nav-b .tab .lbl { font-size: 7px; font-weight: 600; color: #8b8fa8; }
+  .nav-b .tab.active .lbl { color: var(--primary); font-weight: 700; }
+  .nav-b .tab.active .icon { transform: scale(1.15); display: inline-block; }
+  .nav-b .dot-new {
+    position: absolute;
+    top: 1px; right: 14px;
+    width: 5px; height: 5px;
+    background: #ff4757;
+    border-radius: 50%;
+    border: 1px solid #fff;
+  }
+
+  /* ─────────────── CONCEPT C: Neon Dark Command Bar ─────────────── */
+  .phone.dark { background: #12121e; border-color: #2a2a3e; }
+  .phone.dark .phone-content { background: #12121e; }
+  .phone.dark .phone-title { color: #e8e9f5; }
+  .phone.dark .line { background: #1e1e32; }
+  .phone.dark::before { background: #2a2a3e; }
+  .nav-c {
+    background: #0d0d1a;
+    border-top: 1px solid #1e1e35;
+    padding: 8px 6px 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .nav-c .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    padding: 4px 2px;
+    border-radius: 12px;
+  }
+  .nav-c .tab .icon { font-size: 16px; line-height: 1; filter: brightness(0.5); }
+  .nav-c .tab .lbl { font-size: 7px; font-weight: 600; color: #444466; }
+  .nav-c .tab.active .icon {
+    filter: none drop-shadow(0 0 6px rgba(91,91,230,.9));
+    text-shadow: 0 0 8px rgba(91,91,230,0.9);
+  }
+  .nav-c .tab.active .lbl {
+    color: transparent;
+    background: linear-gradient(135deg, #8484f0, var(--accent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-weight: 700;
+  }
+  .nav-c .tab.active {
+    position: relative;
+  }
+  .nav-c .tab.active::before {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px; height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 1px;
+    box-shadow: 0 0 6px var(--primary);
+  }
+
+  /* ─────────────── CONCEPT D: Floating Action Dock ─────────────── */
+  .nav-d-wrap {
+    position: relative;
+    padding: 0 0 14px;
+    background: #f7f8fc;
+  }
+  .nav-d {
+    margin: 0 12px;
+    background: #1a1a2e;
+    border-radius: 24px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    box-shadow:
+      0 8px 28px rgba(91,91,230,.28),
+      0 3px 10px rgba(0,0,0,.25);
+    position: relative;
+    overflow: hidden;
+  }
+  /* ambient glow inside */
+  .nav-d::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 120%, rgba(91,91,230,.3) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .nav-d .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    padding: 3px 0;
+    z-index: 1;
+    position: relative;
+  }
+  .nav-d .tab .icon { font-size: 16px; line-height: 1; filter: brightness(0.45) saturate(0); }
+  .nav-d .tab .lbl { font-size: 7px; color: #444466; font-weight: 600; }
+  .nav-d .tab.active .icon { filter: none; }
+  .nav-d .tab.active .lbl { color: #a0a0f8; font-weight: 700; }
+  /* Active pill glow */
+  .nav-d .tab.active::before {
+    content: '';
+    position: absolute;
+    inset: -4px -6px;
+    background: rgba(91,91,230,.18);
+    border-radius: 14px;
+    z-index: -1;
+  }
+  /* Center action button */
+  .nav-d .fab-center {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+    box-shadow: 0 0 14px rgba(91,91,230,.6);
+    z-index: 1;
+  }
+
+  /* ─────────────── CONCEPT E: Progress Ring Nav ─────────────── */
+  .nav-e {
+    background: #fff;
+    border-top: 1.5px solid #edeef6;
+    padding: 6px 4px 10px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .nav-e .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    padding: 2px;
+  }
+  .ring-wrap {
+    position: relative;
+    width: 32px; height: 32px;
+  }
+  .ring-wrap svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  .ring-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .nav-e .tab .lbl { font-size: 7px; font-weight: 600; color: #8b8fa8; }
+  .nav-e .tab.active .lbl { color: var(--primary); font-weight: 700; }
+
+  /* ─────────────── CONCEPT F: Context Strip + Icon Rail ─────────────── */
+  .nav-f {
+    background: #fff;
+    border-top: 1.5px solid #edeef6;
+  }
+  .ctx-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 14px 3px;
+    background: linear-gradient(90deg, rgba(91,91,230,.07) 0%, rgba(16,183,207,.05) 100%);
+    border-bottom: 1px solid rgba(91,91,230,.1);
+  }
+  .ctx-section {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .ctx-dot {
+    width: 6px; height: 6px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .ctx-name {
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: .02em;
+  }
+  .ctx-tag {
+    font-size: 7.5px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #fff;
+    border-radius: 6px;
+    padding: 1px 5px;
+    font-weight: 700;
+  }
+  .nav-f-tabs {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5px 4px 8px;
+  }
+  .nav-f-tabs .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex: 1;
+    padding: 3px 2px;
+    border-radius: 10px;
+  }
+  .nav-f-tabs .tab .icon { font-size: 15px; line-height: 1; color: #a0a3b8; }
+  .nav-f-tabs .tab .lbl { font-size: 7px; font-weight: 600; color: #a0a3b8; }
+  .nav-f-tabs .tab.active {
+    background: rgba(91,91,230,.08);
+  }
+  .nav-f-tabs .tab.active .icon { color: var(--primary); }
+  .nav-f-tabs .tab.active .lbl { color: var(--primary); font-weight: 700; }
+
+
+  /* Tip section */
+  .tips {
+    margin-top: 32px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+    padding: 18px 20px;
+  }
+  .tips h2 { font-size: 14px; font-weight: 700; margin: 0 0 12px; }
+  .tips table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .tips td, .tips th { padding: 7px 10px; text-align: left; border-bottom: 1px solid #eee; }
+  .tips th { font-weight: 700; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  .tips td:first-child { font-weight: 700; white-space: nowrap; }
+  .badge-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 20px;
+    padding: 2px 8px;
+    background: #eef0ff;
+    color: var(--primary);
+  }
+  .badge-dark { background: #1a1a2e; color: #a0a0f8; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Bottom Nav — 6 New Concepts</h1>
+    <p>Active tab shown as "Wortschatz". Brand colors: indigo <b>#5b5be6</b> + cyan <b>#10b7cf</b>.<br>Reply with the letter(s) you like and I'll build it into the app.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- ══════════════ A: iOS 26 Liquid Glass ══════════════ -->
+    <div class="card">
+      <div class="card-label">
+        <span class="letter">A</span>
+        <span class="name">iOS 26 Liquid Glass</span>
+        <div class="desc">Floating frosted-glass pill. Inspired by Apple's 2025 WWDC redesign — the hottest new trend. Shrinks when scrolling content, expands back on scroll-up.</div>
+      </div>
+      <div class="phone-wrap" style="background:linear-gradient(160deg,#e8e9ff 0%,#d8f4f9 100%); align-items:flex-end; padding-bottom:0;">
+        <div class="phone" style="background:linear-gradient(160deg,#eef0ff,#d8f4f9); border-color:#cdd0e8;">
+          <div class="phone-content" style="background:transparent; padding-bottom:0;">
+            <div class="phone-title">Wortschatz</div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+            <div class="line med"></div>
+            <div class="line" style="width:40%"></div>
+            <div style="height:8px"></div>
+            <!-- Glass nav floats OVER the content -->
+            <div style="padding:0 0 14px; position:relative;">
+              <div class="nav-a" style="position:relative;">
+                <div class="tab">
+                  <div class="icon">🏠</div>
+                  <div class="lbl">Start</div>
+                </div>
+                <div class="tab active">
+                  <div class="icon">📖</div>
+                  <div class="lbl">Wortschatz</div>
+                </div>
+                <div class="tab">
+                  <div class="icon">❓</div>
+                  <div class="lbl">Quiz</div>
+                </div>
+                <div class="tab">
+                  <div class="icon">📊</div>
+                  <div class="lbl">Fortschritt</div>
+                </div>
+                <div class="tab">
+                  <div class="icon">⋯</div>
+                  <div class="lbl">Mehr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ B: Gamified Streak Bar ══════════════ -->
+    <div class="card">
+      <div class="card-label">
+        <span class="letter">B</span>
+        <span class="name">Gamified Streak Bar</span>
+        <div class="desc">Duolingo-inspired. A mini-strip above the tabs shows your streak and XP — always visible. Red dot for new content. Active tab bounces slightly.</div>
+      </div>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-content" style="padding-bottom:0;">
+            <div class="phone-title">Wortschatz</div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+            <div class="line med"></div>
+            <div class="line" style="width:40%"></div>
+            <div style="height:6px"></div>
+          </div>
+          <div class="nav-b-wrap">
+            <div class="streak-row">
+              <div class="streak-badge">🔥 <span>14 Tage</span></div>
+              <span style="font-size:8px;color:#c0c3d4;">Tagessträhne</span>
+              <div class="xp-badge">⚡ <span>280 XP</span></div>
+            </div>
+            <div class="nav-b">
+              <div class="tab">
+                <div class="icon">🏠</div>
+                <div class="lbl">Start</div>
+              </div>
+              <div class="tab active">
+                <div class="icon">📖</div>
+                <div class="lbl">Wortschatz</div>
+              </div>
+              <div class="tab" style="position:relative;">
+                <div class="dot-new"></div>
+                <div class="icon">❓</div>
+                <div class="lbl">Quiz</div>
+              </div>
+              <div class="tab">
+                <div class="icon">📊</div>
+                <div class="lbl">Fortschritt</div>
+              </div>
+              <div class="tab">
+                <div class="icon">⋯</div>
+                <div class="lbl">Mehr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ C: Neon Dark Command Bar ══════════════ -->
+    <div class="card">
+      <div class="card-label">
+        <span class="letter">C</span>
+        <span class="name">Neon Dark Command Bar</span>
+        <div class="desc">Premium dark aesthetic (Linear, Vercel, Raycast). Active tab glows in brand indigo with a neon underline. Works especially well in the app's dark mode.</div>
+      </div>
+      <div class="phone-wrap" style="background:#0d0d1a;">
+        <div class="phone dark">
+          <div class="phone-content" style="padding-bottom:0;">
+            <div class="phone-title">Wortschatz</div>
+            <div class="line"></div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+            <div class="line med"></div>
+            <div style="height:6px"></div>
+          </div>
+          <div class="nav-c">
+            <div class="tab">
+              <div class="icon">🏠</div>
+              <div class="lbl">Start</div>
+            </div>
+            <div class="tab active">
+              <div class="icon">📖</div>
+              <div class="lbl">Wortschatz</div>
+            </div>
+            <div class="tab">
+              <div class="icon">❓</div>
+              <div class="lbl">Quiz</div>
+            </div>
+            <div class="tab">
+              <div class="icon">📊</div>
+              <div class="lbl">Fortschritt</div>
+            </div>
+            <div class="tab">
+              <div class="icon">⋯</div>
+              <div class="lbl">Mehr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ D: Floating Dark Dock ══════════════ -->
+    <div class="card">
+      <div class="card-label">
+        <span class="letter">D</span>
+        <span class="name">Floating Action Dock</span>
+        <div class="desc">Dark floating pill with an ambient purple glow from below — inspired by macOS Dock + TikTok's center button. The center FAB launches the current lesson instantly.</div>
+      </div>
+      <div class="phone-wrap" style="background:#f4f5f9; padding-bottom:0; align-items:flex-end;">
+        <div class="phone">
+          <div class="phone-content" style="padding-bottom:0;">
+            <div class="phone-title">Wortschatz</div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+            <div class="line med"></div>
+            <div class="line" style="width:35%"></div>
+            <div style="height:6px"></div>
+          </div>
+          <div class="nav-d-wrap" style="background:#f7f8fc; padding-bottom:14px;">
+            <div class="nav-d">
+              <div class="tab">
+                <div class="icon">🏠</div>
+                <div class="lbl" style="color:#444466">Start</div>
+              </div>
+              <div class="tab active">
+                <div class="icon">📖</div>
+                <div class="lbl">Wortschatz</div>
+              </div>
+              <div class="fab-center">⚡</div>
+              <div class="tab">
+                <div class="icon">❓</div>
+                <div class="lbl" style="color:#444466">Quiz</div>
+              </div>
+              <div class="tab">
+                <div class="icon">⋯</div>
+                <div class="lbl" style="color:#444466">Mehr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ E: Progress Ring Nav ══════════════ -->
+    <div class="card">
+      <div class="card-label">
+        <span class="letter">E</span>
+        <span class="name">Progress Ring Nav</span>
+        <div class="desc">Unique to learning apps. Each tab icon sits inside a thin circular ring showing your completion progress for that section. Mastery visible at a glance.</div>
+      </div>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-content" style="padding-bottom:0;">
+            <div class="phone-title">Wortschatz</div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+            <div class="line med"></div>
+            <div class="line" style="width:40%"></div>
+            <div style="height:6px"></div>
+          </div>
+          <div class="nav-e">
+            <!-- Tab 1: 40% done, inactive -->
+            <div class="tab">
+              <div class="ring-wrap">
+                <svg viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="13" stroke="#e8e9f5" stroke-width="2.5"/>
+                  <circle cx="16" cy="16" r="13" stroke="#c8cae0" stroke-width="2.5"
+                    stroke-dasharray="81.68" stroke-dashoffset="49"
+                    stroke-linecap="round" transform="rotate(-90 16 16)"/>
+                </svg>
+                <div class="ring-icon">🏠</div>
+              </div>
+              <div class="lbl">Start</div>
+            </div>
+            <!-- Tab 2: 72% done, active -->
+            <div class="tab active">
+              <div class="ring-wrap">
+                <svg viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="13" stroke="#e8e9f5" stroke-width="2.5"/>
+                  <circle cx="16" cy="16" r="13" stroke="url(#rg1)" stroke-width="2.5"
+                    stroke-dasharray="81.68" stroke-dashoffset="22.9"
+                    stroke-linecap="round" transform="rotate(-90 16 16)"/>
+                  <defs>
+                    <linearGradient id="rg1" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0" stop-color="#5b5be6"/>
+                      <stop offset="1" stop-color="#10b7cf"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                <div class="ring-icon" style="color:var(--primary)">📖</div>
+              </div>
+              <div class="lbl">Wortschatz</div>
+            </div>
+            <!-- Tab 3: 55% done, inactive -->
+            <div class="tab">
+              <div class="ring-wrap">
+                <svg viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="13" stroke="#e8e9f5" stroke-width="2.5"/>
+                  <circle cx="16" cy="16" r="13" stroke="#c8cae0" stroke-width="2.5"
+                    stroke-dasharray="81.68" stroke-dashoffset="36.75"
+                    stroke-linecap="round" transform="rotate(-90 16 16)"/>
+                </svg>
+                <div class="ring-icon">❓</div>
+              </div>
+              <div class="lbl">Quiz</div>
+            </div>
+            <!-- Tab 4: 20% done, inactive -->
+            <div class="tab">
+              <div class="ring-wrap">
+                <svg viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="13" stroke="#e8e9f5" stroke-width="2.5"/>
+                  <circle cx="16" cy="16" r="13" stroke="#c8cae0" stroke-width="2.5"
+                    stroke-dasharray="81.68" stroke-dashoffset="65.3"
+                    stroke-linecap="round" transform="rotate(-90 16 16)"/>
+                </svg>
+                <div class="ring-icon">📊</div>
+              </div>
+              <div class="lbl">Fortschritt</div>
+            </div>
+            <!-- Tab 5: no ring -->
+            <div class="tab">
+              <div class="ring-wrap">
+                <svg viewBox="0 0 32 32" fill="none">
+                  <circle cx="16" cy="16" r="13" stroke="#e8e9f5" stroke-width="2"/>
+                </svg>
+                <div class="ring-icon">⋯</div>
+              </div>
+              <div class="lbl">Mehr</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════ F: Context Strip + Icon Rail ══════════════ -->
+    <div class="card">
+      <div class="card-label">
+        <span class="letter">F</span>
+        <span class="name">Context Strip + Icon Rail</span>
+        <div class="desc">Two-zone nav. A slim tinted strip above shows the current section name and a dynamic badge (e.g. "72% gelernt"). Below is a clean icon rail. Rich info, minimal height.</div>
+      </div>
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-content" style="padding-bottom:0;">
+            <div class="phone-title">Wortschatz</div>
+            <div class="line med"></div>
+            <div class="line short"></div>
+            <div class="line med"></div>
+            <div class="line" style="width:40%"></div>
+            <div style="height:6px"></div>
+          </div>
+          <div class="nav-f">
+            <div class="ctx-strip">
+              <div class="ctx-section">
+                <div class="ctx-dot"></div>
+                <div class="ctx-name">Wortschatz</div>
+              </div>
+              <div class="ctx-tag">72% gelernt</div>
+            </div>
+            <div class="nav-f-tabs">
+              <div class="tab">
+                <div class="icon">🏠</div>
+                <div class="lbl">Start</div>
+              </div>
+              <div class="tab active">
+                <div class="icon" style="color:var(--primary)">📖</div>
+                <div class="lbl">Wortschatz</div>
+              </div>
+              <div class="tab">
+                <div class="icon">❓</div>
+                <div class="lbl">Quiz</div>
+              </div>
+              <div class="tab">
+                <div class="icon">📊</div>
+                <div class="lbl">Fortschritt</div>
+              </div>
+              <div class="tab">
+                <div class="icon">⋯</div>
+                <div class="lbl">Mehr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+  <!-- Comparison table -->
+  <div class="tips">
+    <h2>Quick comparison</h2>
+    <table>
+      <tr>
+        <th>Concept</th>
+        <th>Mood</th>
+        <th>Inspired by</th>
+        <th>Best for</th>
+      </tr>
+      <tr>
+        <td><span class="badge-pill">A · Glass</span></td>
+        <td>Premium / airy</td>
+        <td>iOS 26 (WWDC 2025)</td>
+        <td>Light mode, modern feel</td>
+      </tr>
+      <tr>
+        <td><span class="badge-pill">B · Streak</span></td>
+        <td>Motivating / playful</td>
+        <td>Duolingo</td>
+        <td>Habit-building, daily use</td>
+      </tr>
+      <tr>
+        <td><span class="badge-pill badge-dark">C · Neon</span></td>
+        <td>Focused / sleek</td>
+        <td>Linear, Raycast, Vercel</td>
+        <td>Dark mode, power users</td>
+      </tr>
+      <tr>
+        <td><span class="badge-pill badge-dark">D · Dock</span></td>
+        <td>Bold / dynamic</td>
+        <td>macOS Dock + TikTok</td>
+        <td>Quick launch center action</td>
+      </tr>
+      <tr>
+        <td><span class="badge-pill">E · Rings</span></td>
+        <td>Unique / motivating</td>
+        <td>Apple Watch Activity</td>
+        <td>Learning apps only — shows mastery</td>
+      </tr>
+      <tr>
+        <td><span class="badge-pill">F · Context</span></td>
+        <td>Informative / clean</td>
+        <td>GitHub mobile, Notion</td>
+        <td>Users who want context at a glance</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>
