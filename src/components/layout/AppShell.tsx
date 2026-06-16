@@ -78,6 +78,7 @@ export function AppShell() {
         onMore={() => setMoreOpen(true)}
         onLongPress={enterEditMode}
         editMode={editMode}
+        moreOpen={moreOpen}
       />
       <MoreSheet
         open={moreOpen}

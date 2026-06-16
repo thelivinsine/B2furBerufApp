@@ -68,18 +68,22 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
   `docs/DATA_GOVERNANCE.md` for the full policy (traceability over ownership; Wiktionary/DWDS for word
   facts; Tatoeba CC-BY for example sentences).
 
-## Mobile bottom tab bar (locked 2026-06-16)
+## Mobile bottom tab bar (locked 2026-06-16; context strip removed s26)
 
 The founder iterated extensively on the mobile nav bar through sessions 15 and 24. The design
 below is locked. **Do not change structure, edit-mode behavior, or icon rules without an explicit
 founder request.**
 
 ### Layout
-- Fixed bottom bar with two zones: a **context strip** (label row above icons) and an
-  **icon rail** (62px tall). The context strip shows the active section's name **plus a short
-  subtitle** (`desc` per `NavItem` in `nav-items.ts`) for context, so it is two lines tall. The
-  More sheet's overlay bottom + bottom padding are sized to clear this taller bar; keep them in
-  sync if the strip height changes.
+- Fixed bottom bar with a single **icon rail** (62px tall). The old **context strip** (the label
+  row above the icons that showed the section name + subtitle) was **removed in s26**: each section
+  already renders its own title at the top of the page, so it was redundant. The `desc` field on
+  `NavItem` stays for reuse (landing/marketing copy) but is no longer shown in the bar. The More
+  sheet's overlay `bottom` (`3.875rem`), its bottom padding (`5.75rem`), and the `.pb-nav` utility
+  are all sized for the shorter single-rail bar; keep them in sync if the rail height changes.
+- **Mehr selection (s26):** the Mehr tab shows its selected state (indigo pill + underline) while
+  the More sheet is open, and the pinned tabs drop their highlight so the selection clearly sits on
+  Mehr. `BottomTabBar` takes a `moreOpen` prop from `AppShell` for this.
 - **5 slots total:** Home (fixed, always slot 1) + up to 3 moveable icons + Mehr (fixed, always
   last). This gives max 4 content icons + Mehr.
 - Minimum 2 icons in the bar (Home + at least one other); the X button hides when at the minimum.
@@ -102,16 +106,26 @@ founder request.**
 - Triggered by **long-pressing anywhere** on the tab bar OR anywhere on the More sheet (600ms, with
   haptic vibrate). Both surfaces open edit mode simultaneously.
 - In edit mode: icons **jiggle** (framer-motion `rotate: [-1.5, 1.5, -1.5]`, infinite) and show a
-  red X badge. Dragging icons left/right reorders them in the bar. Tapping X removes an icon.
+  badge (red X in the bar, green + in the sheet). Dragging icons left/right reorders them in the bar.
+  Tapping X removes a bar icon.
+- **Both the bar AND the More sheet are reorderable (s26).** Bar icons reorder via framer
+  `Reorder.Group` (horizontal). Sheet icons reorder via a **custom 2D grid drag-sort** in
+  `MoreSheet.tsx`: each tile is a `motion.div` with `layout` + `drag`; `reorderDuringDrag` finds the
+  tile the pointer is over (by `getBoundingClientRect`) and splices the dragged path into that slot,
+  and `layout` animates the rest. The sheet order persists in `useSettingsStore.moreOrder` (a full
+  ordering of every route path; empty = `nav-items` order). `setMoreOrder` keeps pinned routes in
+  their slots and only rearranges the non-pinned ones.
+- **Add/remove movement animation (s26):** bar and sheet items use `layout` + `AnimatePresence`
+  (spring) so adding/removing an icon smoothly slides the others into their new positions instead of
+  snapping.
 - **No "Fertig" / "Done" button.** Edit mode ends automatically when the user taps anywhere outside
   the sheet (auto-save). The sheet also has a grab handle; tapping the dimmed overlay above closes it.
 - Home and Mehr are **fixed** and not draggable or removeable.
 
 ### Adding icons to the bar
-Two gestures, both work while the More sheet is open in edit mode:
-1. **Tap the green + badge** on a sheet icon.
-2. **Drag the icon downward ~72px** — it snaps back and the icon appears in the bar.
-Both show a green checkmark flash on the icon as confirmation.
+While the More sheet is open in edit mode, **tap the green + badge** on a sheet icon to add it to the
+bar. (The earlier "drag the icon downward ~72px to add" gesture was removed in s26 because free
+drag now reorders the sheet grid; the + badge is the single, unambiguous add affordance.)
 
 ### iOS-specific fixes (do not revert)
 - **No native link popup on long-press:** `.no-callout` CSS class (in `src/index.css`) with
@@ -126,6 +140,9 @@ Both show a green checkmark flash on the icon as confirmation.
 
 ### Store architecture
 - Pinned tabs stored in `useSettingsStore` as `pinnedTabs: string[]` (array of route paths).
+- More-sheet order stored in `useSettingsStore` as `moreOrder: string[]` (full ordering of every
+  route path; empty array = fall back to `nav-items` order). Rides into `profiles.settings` jsonb
+  via cloudSync like the other settings.
 - `DEFAULT_PINNED_TABS = ["/", "/vocabulary", "/quiz", "/analytics"]` in `nav-items.ts`.
 - `BottomTabBar` reads the store **directly** (no local buffer state). Any external write
   (e.g. MoreSheet adding a tab) is reflected immediately. Never add a `localOrder` cache or

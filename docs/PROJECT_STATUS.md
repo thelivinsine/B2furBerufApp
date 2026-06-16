@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-16 (session 25). Branch: `claude/icon-color-consistency-05e2i0`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-16 (session 26). Branch: `claude/context-bar-menu-animations-g9gfd3`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -263,6 +263,27 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   a centred 16-unit target with a per-mark weight (so heavy filled shapes don't read larger). Tune
   sizes via that map. CLAUDE.md "Icon color rule" updated to match the new all-custom-SVG setup.
 - `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green. Shipped via PRs #178–#182.
+
+### Session 26 (2026-06-16) — Bottom-bar context strip removed + More-sheet reorder & animations
+- **Context strip removed:** the label/subtitle row above the bottom-bar icons was redundant (every
+  section already shows its own title at the top of the page), so the bar is now a single 62px icon
+  rail. The More sheet overlay `bottom` (→ `3.875rem`), its bottom padding (→ `5.75rem`), and the
+  `.pb-nav` utility were all resized for the shorter bar. `NavItem.desc` is kept for reuse but no
+  longer rendered in the bar. `getContextMeta` deleted from `BottomTabBar.tsx`.
+- **Mehr selection fixed:** the Mehr tab now shows its selected pill + underline while the More sheet
+  is open, and the pinned tabs drop their highlight so the selection clearly sits on Mehr.
+  `AppShell` passes a new `moreOpen` prop into `BottomTabBar`.
+- **Reorder inside the More sheet (new):** the sheet's edit-mode grid is now drag-sortable via a
+  custom 2D grid sort in `MoreSheet.tsx` (`reorderDuringDrag` finds the tile under the pointer and
+  splices the dragged path into its slot; `layout` animates the rest). Order persists in a new
+  `useSettingsStore.moreOrder: string[]` (full route ordering; empty = `nav-items` order), kept in
+  sync so pinned routes hold their slots.
+- **Add/remove movement animation (new):** bar and sheet icons use framer `layout` +
+  `AnimatePresence` (spring) so adding/removing an icon slides the rest into place instead of
+  snapping.
+- **Gesture change:** the old "drag a sheet icon down ~72px to add it to the bar" gesture was
+  removed (free drag now reorders the grid); the green **+ badge** is the single add affordance.
+- `pnpm build` + `pnpm lint:content` green. Branch `claude/context-bar-menu-animations-g9gfd3`.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
 - **Sign-up honesty fix (PR #19, merged):** sign-up no longer falsely reports success when email

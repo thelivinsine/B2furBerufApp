@@ -1,10 +1,11 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { NavLink } from "react-router-dom";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import { Check, Plus } from "lucide-react";
-import { useRef, useState } from "react";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
+import { Plus } from "lucide-react";
+import { useMemo, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
+import type { NavItem } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
@@ -15,106 +16,150 @@ interface Props {
   onLongPress: () => void;
 }
 
-// Drag-to-add threshold in pixels downward
-const DRAG_ADD_THRESHOLD = 72;
+/** Build a full ordering of every route, honouring the saved custom order and
+ *  appending any routes the saved order doesn't know about yet. */
+function fullOrder(saved: string[]): string[] {
+  const all = navItems.map(i => i.to);
+  if (saved.length === 0) return all;
+  const seen = new Set(saved);
+  return [...saved.filter(p => all.includes(p)), ...all.filter(p => !seen.has(p))];
+}
 
-function DraggableSheetIcon({
-  to, label, color, bg, idx, atMax, justAdded, onAdd,
+function EditGridIcon({
+  item, atMax, dragId, onReorder, onAdd, onDragStart, onDragEnd, registerRef,
 }: {
-  to: string; label: string;
-  color: string; bg: string; idx: number; atMax: boolean;
-  justAdded: Set<string>; onAdd: (path: string) => void;
+  item: NavItem;
+  atMax: boolean;
+  dragId: string | null;
+  onReorder: (path: string, info: PanInfo) => void;
+  onAdd: (path: string) => void;
+  onDragStart: (path: string) => void;
+  onDragEnd: () => void;
+  registerRef: (path: string, el: HTMLDivElement | null) => void;
 }) {
-  const added = justAdded.has(to);
-  const dragY  = useMotionValue(0);
-  // When dragged past threshold, icon scales up and turns green slightly
-  const scale = useTransform(dragY, [0, DRAG_ADD_THRESHOLD], [1, 1.18]);
-  const iconOpacity = useTransform(dragY, [0, DRAG_ADD_THRESHOLD * 0.5, DRAG_ADD_THRESHOLD], [added ? 0 : (atMax ? 0.35 : 0.85), added ? 0 : (atMax ? 0.35 : 0.85), 0]);
+  const { to, label, color, bg } = item;
+  const isDragging = dragId === to;
 
   return (
-    <div className="flex flex-col items-center gap-2">
-      {/* Drag wrapper — drags the whole tile downward; separate from jiggle */}
+    <motion.div
+      layout
+      ref={el => registerRef(to, el)}
+      initial={{ scale: 0.6, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      exit={{ scale: 0.6, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 500, damping: 38 }}
+      style={{ zIndex: isDragging ? 50 : 1, position: "relative" }}
+      className="flex flex-col items-center gap-2"
+    >
+      {/* Drag wrapper handles reordering; the inner element does the jiggle so
+          the continuous rotate doesn't fight the drag transform. */}
       <motion.div
-        drag={!atMax && !added ? "y" : false}
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={{ top: 0, bottom: 0.55 }}
+        drag
+        dragSnapToOrigin
+        dragElastic={0.18}
         dragMomentum={false}
-        style={{ y: dragY, touchAction: "none" }}
-        onDragEnd={(_, info) => {
-          if (info.offset.y > DRAG_ADD_THRESHOLD && !atMax && !added) {
-            onAdd(to);
-          }
-          dragY.set(0);
-        }}
+        whileDrag={{ scale: 1.12 }}
+        onDragStart={() => onDragStart(to)}
+        onDrag={(_, info) => onReorder(to, info)}
+        onDragEnd={onDragEnd}
+        style={{ touchAction: "none" }}
         className="relative w-full"
       >
-        {/* Jiggle + scale wrapper */}
-        <motion.button
-          type="button"
-          disabled={atMax}
-          className="relative flex h-16 w-full items-center justify-center rounded-2xl outline-none disabled:cursor-not-allowed"
-          style={{ background: bg, scale }}
-          animate={{ rotate: [-1.5, 1.5, -1.5] }}
-          transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.07, ease: "easeInOut" }}
-          onClick={() => { if (!atMax && !added) onAdd(to); }}
+        <motion.div
+          className="relative flex h-16 w-full items-center justify-center rounded-2xl"
+          style={{ background: bg }}
+          animate={isDragging ? { rotate: 0 } : { rotate: [-1.5, 1.5, -1.5] }}
+          transition={isDragging ? { duration: 0.15 } : { repeat: Infinity, duration: 0.5, ease: "easeInOut" }}
         >
-          <motion.div style={{ opacity: iconOpacity }}>
-            <RouteIcon path={to} size={28} />
-          </motion.div>
+          <RouteIcon path={to} size={28} active />
 
-          {/* Added confirmation flash */}
-          <AnimatePresence>
-            {added && (
-              <motion.div
-                className="absolute inset-0 flex items-center justify-center rounded-2xl"
-                style={{ background: bg }}
-                initial={{ scale: 0.6, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 1.1, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Check style={{ width: 28, height: 28, color, strokeWidth: 3 }} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Green + badge */}
-          {!atMax && !added && (
-            <span
-              className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-500 shadow-md"
-              aria-hidden="true"
+          {/* Green + badge — tap to add this section to the bar */}
+          {!atMax && (
+            <button
+              type="button"
+              onPointerDownCapture={e => e.stopPropagation()}
+              onPointerDown={e => e.stopPropagation()}
+              onClick={e => { e.stopPropagation(); onAdd(to); }}
+              className="absolute -top-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 shadow-md active:scale-90"
+              aria-label={`${label} zur Leiste hinzufügen`}
             >
-              <Plus className="h-3 w-3 text-white" strokeWidth={3} />
-            </span>
+              <Plus className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+            </button>
           )}
-        </motion.button>
+        </motion.div>
       </motion.div>
-      <span className="text-center text-[11px] font-medium leading-tight text-foreground/70">
+      <span className="text-center text-[11px] font-medium leading-tight" style={{ color }}>
         {label}
       </span>
-    </div>
+    </motion.div>
   );
 }
 
 export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) {
   const pinnedRaw     = useSettingsStore(s => s.pinnedTabs);
   const setPinnedTabs = useSettingsStore(s => s.setPinnedTabs);
+  const moreOrderRaw  = useSettingsStore(s => s.moreOrder);
+  const setMoreOrder  = useSettingsStore(s => s.setMoreOrder);
   const pinnedTabs    = pinnedRaw && pinnedRaw.length > 0 ? pinnedRaw : DEFAULT_PINNED_TABS;
 
-  const [justAdded, setJustAdded] = useState<Set<string>>(new Set());
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const itemEls      = useRef<Map<string, HTMLDivElement>>(new Map());
+  // Drives the lift/zIndex of the tile currently being dragged. Only changes on
+  // drag start/end, so it doesn't re-render on every pointer move.
+  const [dragId, setDragId] = useState<string | null>(null);
 
-  const nonPinnedItems = navItems.filter(i => !pinnedTabs.includes(i.to));
-  const atMax          = pinnedTabs.length >= 4;
+  // Non-pinned routes, ordered by the saved custom order.
+  const order = useMemo(() => fullOrder(moreOrderRaw), [moreOrderRaw]);
+  const nonPinnedItems = useMemo(() => {
+    return order
+      .filter(p => !pinnedTabs.includes(p))
+      .map(p => navItems.find(i => i.to === p))
+      .filter((i): i is NavItem => i != null);
+  }, [order, pinnedTabs]);
+
+  const atMax = pinnedTabs.length >= 4;
 
   function addToBar(path: string) {
     if (atMax) return;
     const next = navItems.map(i => i.to).filter(p => [...pinnedTabs, path].includes(p));
     setPinnedTabs(next);
-    setJustAdded(prev => new Set([...prev, path]));
-    setTimeout(() => {
-      setJustAdded(prev => { const s = new Set(prev); s.delete(path); return s; });
-    }, 800);
+  }
+
+  function registerRef(path: string, el: HTMLDivElement | null) {
+    if (el) itemEls.current.set(path, el);
+    else itemEls.current.delete(path);
+  }
+
+  // Live reorder: while a tile is dragged, find the tile whose centre is closest
+  // to the pointer and slot the dragged tile into that position.
+  function reorderDuringDrag(path: string, info: PanInfo) {
+    const current = nonPinnedItems.map(i => i.to);
+    const from = current.indexOf(path);
+    if (from === -1) return;
+
+    // Reorder only when the pointer sits over another tile (not just nearest),
+    // which keeps the shuffle stable and jitter-free in the gaps between tiles.
+    let closest = from;
+    current.forEach((p, i) => {
+      if (p === path) return; // the dragged tile follows the pointer — skip it
+      const el = itemEls.current.get(p);
+      if (!el) return;
+      const r = el.getBoundingClientRect();
+      const inside =
+        info.point.x >= r.left && info.point.x <= r.right &&
+        info.point.y >= r.top  && info.point.y <= r.bottom;
+      if (inside) closest = i;
+    });
+
+    if (closest !== from) {
+      const next = [...current];
+      next.splice(from, 1);
+      next.splice(closest, 0, path);
+      // Persist the new order across ALL routes, keeping pinned routes in place.
+      let k = 0;
+      const merged = order.map(p => (pinnedTabs.includes(p) ? p : next[k++]));
+      setMoreOrder(merged);
+    }
   }
 
   function startLongPress() {
@@ -141,22 +186,22 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
             interactive. Tapping the dimmed area closes the sheet (saves). */}
         <DialogPrimitive.Overlay
           className="pointer-events-auto fixed inset-x-0 top-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-fade-in lg:hidden"
-          style={{ bottom: "calc(6.75rem + env(safe-area-inset-bottom))" }}
+          style={{ bottom: "calc(3.875rem + env(safe-area-inset-bottom))" }}
           onPointerDown={() => onOpenChange(false)}
         />
         <DialogPrimitive.Content
           aria-describedby={undefined}
           // no-callout: cascades to all <a> children to suppress iOS link popup.
           // In edit mode, overflow-visible lets dragged icons render outside the sheet
-          // boundary (needed for the drag-down-to-add gesture).
+          // boundary while being reordered.
           className={cn(
             "no-callout",
             "fixed inset-x-0 bottom-0 z-50 max-h-[75dvh]",
             editMode ? "overflow-visible" : "overflow-y-auto",
             "rounded-t-2xl border-t border-x-0 border-b-0 border-border bg-surface px-5 pt-3",
-            // Clear the bottom tab bar (~5.75rem tall) with extra breathing room so the
-            // last row's labels never sit under the bar's context strip.
-            "pb-[calc(7.75rem+env(safe-area-inset-bottom))]",
+            // Clear the bottom tab bar (~62px tall) with extra breathing room so the
+            // last row's labels never sit under the bar.
+            "pb-[calc(5.75rem+env(safe-area-inset-bottom))]",
             "data-[state=open]:animate-slide-up lg:hidden",
           )}
           onContextMenu={e => e.preventDefault()}
@@ -177,22 +222,24 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
           <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-border" />
 
           {editMode ? (
-            /* ── Edit mode: icons jiggle; tap or drag down to add to bar ── */
-            <div className="grid grid-cols-3 gap-x-3 gap-y-5">
-              {nonPinnedItems.map(({ to, label, color, bg }, idx) => (
-                <DraggableSheetIcon
-                  key={to}
-                  to={to}
-                  label={label}
-                  color={color}
-                  bg={bg}
-                  idx={idx}
-                  atMax={atMax}
-                  justAdded={justAdded}
-                  onAdd={addToBar}
-                />
-              ))}
-            </div>
+            /* ── Edit mode: icons jiggle; drag to reorder, tap + to add to bar ── */
+            <motion.div layout className="grid grid-cols-3 gap-x-3 gap-y-5">
+              <AnimatePresence initial={false}>
+                {nonPinnedItems.map(item => (
+                  <EditGridIcon
+                    key={item.to}
+                    item={item}
+                    atMax={atMax}
+                    dragId={dragId}
+                    onReorder={reorderDuringDrag}
+                    onAdd={addToBar}
+                    onDragStart={setDragId}
+                    onDragEnd={() => setDragId(null)}
+                    registerRef={registerRef}
+                  />
+                ))}
+              </AnimatePresence>
+            </motion.div>
           ) : (
             /* ── Normal mode: clean icon grid, tap to navigate ── */
             <nav className="grid grid-cols-3 gap-x-3 gap-y-5">
@@ -242,7 +289,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
           )}
           {editMode && !atMax && nonPinnedItems.length > 0 && (
             <p className="mt-4 text-center text-[12px] text-muted-foreground">
-              Antippen oder nach unten ziehen, um zur Leiste hinzuzufügen.
+              Ziehen zum Sortieren. Auf das Plus tippen, um zur Leiste hinzuzufügen.
             </p>
           )}
         </DialogPrimitive.Content>
