@@ -112,6 +112,38 @@ const RENDERERS: Record<string, Render> = {
   ),
 };
 
+// ── Optical size normalisation ───────────────────────────────────────────
+// Each mark is drawn freehand on the 20×20 grid, so its actual inked area
+// differs (a filled disc spans ~17px, a speech bubble ~13px). Left as-is they
+// look like different sizes. We scale every mark so its bounding box fits a
+// common target, centred in the grid, with a per-mark weight so visually heavy
+// shapes (filled discs) don't read larger than airy ones.
+const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
+
+// [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
+const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
+  "/":             { box: [1.5, 2.2, 17, 15.6],     weight: 0.98 },
+  "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.0 },
+  "/redemittel":   { box: [3, 2.5, 14, 13],         weight: 1.0 },
+  "/grammar":      { box: [4.5, 2.5, 11, 14.7],     weight: 1.0 },
+  "/collocations": { box: [2.05, 4.45, 15.9, 11.1], weight: 1.0 },
+  "/quiz":         { box: [1.4, 1.4, 17.2, 17.2],   weight: 0.9 },
+  "/writing":      { box: [3.5, 2.9, 13.6, 12.9],   weight: 1.04 },
+  "/simulation":   { box: [4.2, 1.6, 11.6, 16.2],   weight: 1.0 },
+  "/exam":         { box: [1.8, 2.8, 16.4, 11.9],   weight: 1.0 },
+  "/revision":     { box: [4.8, 2, 10.4, 16],       weight: 1.0 },
+  "/analytics":    { box: [2.5, 3, 15, 14.5],       weight: 1.0 },
+  "/settings":     { box: [2.31, 2.31, 15.38, 15.38], weight: 0.97 },
+};
+
+function normTransform(box: [number, number, number, number], weight: number): string {
+  const [x, y, w, h] = box;
+  const s = (TARGET * weight) / Math.max(w, h);
+  const cx = x + w / 2;
+  const cy = y + h / 2;
+  return `translate(10 10) scale(${s.toFixed(4)}) translate(${(-cx).toFixed(4)} ${(-cy).toFixed(4)})`;
+}
+
 export function RouteIcon({
   path,
   size = 24,
@@ -132,6 +164,8 @@ export function RouteIcon({
     return <Icon style={{ color, opacity: active ? 1 : 0.38, width: size, height: size }} />;
   }
 
+  const norm = NORM[path];
+
   return (
     <svg
       width={size}
@@ -142,7 +176,7 @@ export function RouteIcon({
       className="transition-opacity"
       style={{ opacity: active ? 1 : 0.38 }}
     >
-      {render(color)}
+      {norm ? <g transform={normTransform(norm.box, norm.weight)}>{render(color)}</g> : render(color)}
     </svg>
   );
 }
@@ -162,10 +196,12 @@ export function MoreIcon({ active = true, size = 24 }: { active?: boolean; size?
       className="transition-opacity"
       style={{ opacity: active ? 1 : 0.38 }}
     >
-      <rect x="2"  y="2"  width="7" height="7" rx="1.6" fill={BRAND} />
-      <rect x="11" y="2"  width="7" height="7" rx="1.6" fill={BRAND} opacity=".72" />
-      <rect x="2"  y="11" width="7" height="7" rx="1.6" fill={BRAND} opacity=".72" />
-      <rect x="11" y="11" width="7" height="7" rx="1.6" fill={BRAND} opacity=".45" />
+      <g transform={normTransform([2, 2, 16, 16], 0.95)}>
+        <rect x="2"  y="2"  width="7" height="7" rx="1.6" fill={BRAND} />
+        <rect x="11" y="2"  width="7" height="7" rx="1.6" fill={BRAND} opacity=".72" />
+        <rect x="2"  y="11" width="7" height="7" rx="1.6" fill={BRAND} opacity=".72" />
+        <rect x="11" y="11" width="7" height="7" rx="1.6" fill={BRAND} opacity=".45" />
+      </g>
     </svg>
   );
 }
