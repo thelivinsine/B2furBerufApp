@@ -71,7 +71,7 @@ function EditGridIcon({
           animate={isDragging ? { rotate: 0 } : { rotate: [-1.5, 1.5, -1.5] }}
           transition={isDragging ? { duration: 0.15 } : { repeat: Infinity, duration: 0.5, ease: "easeInOut" }}
         >
-          <RouteIcon path={to} size={28} active />
+          <RouteIcon path={to} size={32} active />
 
           {/* Green + badge — tap to add this section to the bar */}
           {!atMax && (
@@ -186,7 +186,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
             interactive. Tapping the dimmed area closes the sheet (saves). */}
         <DialogPrimitive.Overlay
           className="pointer-events-auto fixed inset-x-0 top-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-fade-in lg:hidden"
-          style={{ bottom: "calc(3.875rem + env(safe-area-inset-bottom))" }}
+          style={{ bottom: "calc(4.375rem + env(safe-area-inset-bottom))" }}
           onPointerDown={() => onOpenChange(false)}
         />
         <DialogPrimitive.Content
@@ -199,9 +199,9 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
             "fixed inset-x-0 bottom-0 z-50 max-h-[75dvh]",
             editMode ? "overflow-visible" : "overflow-y-auto",
             "rounded-t-2xl border-t border-x-0 border-b-0 border-border bg-surface px-5 pt-3",
-            // Clear the bottom tab bar (~62px tall) with extra breathing room so the
+            // Clear the bottom tab bar (~70px tall) with extra breathing room so the
             // last row's labels never sit under the bar.
-            "pb-[calc(5.75rem+env(safe-area-inset-bottom))]",
+            "pb-[calc(6.25rem+env(safe-area-inset-bottom))]",
             "data-[state=open]:animate-slide-up lg:hidden",
           )}
           onContextMenu={e => e.preventDefault()}
@@ -261,7 +261,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
                             : { background: "rgba(0,0,0,.04)" }
                         }
                       >
-                        <RouteIcon path={to} size={28} active />
+                        <RouteIcon path={to} size={32} active />
                       </div>
                       <span
                         className="text-center text-[11px] font-medium leading-tight"

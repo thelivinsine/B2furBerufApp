@@ -9,7 +9,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 
 const MORE_COLOR = "#5b5be6";
 const MORE_BG    = "rgba(91,91,230,.08)";
-const IZ = 29; // icon size
+const IZ = 32; // icon size
 
 // Every surface (bottom bar, More sheet, sidebar) draws the SAME custom branded
 // SVG for a given route — defined once in route-icons.tsx — so an icon is
@@ -83,7 +83,7 @@ export function BottomTabBar({ onMore, onLongPress, editMode, moreOpen }: Props)
       {/* Icon rail. The old context strip was removed: every section already
           shows its own title at the top of the page, so it was redundant. */}
       <div
-        className="flex h-[62px] items-stretch"
+        className="flex h-[70px] items-stretch"
         onTouchStart={startLongPress}
         onTouchMove={cancelLongPress}
         onTouchEnd={cancelLongPress}

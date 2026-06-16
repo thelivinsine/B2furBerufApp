@@ -283,6 +283,11 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   snapping.
 - **Gesture change:** the old "drag a sheet icon down ~72px to add it to the bar" gesture was
   removed (free drag now reorders the grid); the green **+ badge** is the single add affordance.
+- **Follow-up fixes (same session):** (1) the More sheet stayed open when tapping a bar tab (e.g.
+  Home) because the bar sits below the sheet overlay (`modal={false}`); `AppShell` now closes the
+  sheet + exits edit mode on any `location.pathname` change. (2) Bar rail height 62px → 70px and
+  icons 29px → 32px (matched to the More sheet, also bumped 28px → 32px); overlay `bottom`, sheet
+  padding, and `.pb-nav` re-tuned for the taller bar.
 - `pnpm build` + `pnpm lint:content` green. Branch `claude/context-bar-menu-animations-g9gfd3`.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)

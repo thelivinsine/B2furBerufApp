@@ -27,6 +27,13 @@ export function AppShell() {
   }
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Navigating to any route (e.g. tapping Home or another tab in the bar while
+  // the sheet is open) closes the More sheet and exits edit mode.
+  useEffect(() => {
+    setMoreOpen(false);
+    setEditMode(false);
+  }, [location.pathname]);
   const authStatus = useAuthStore((s) => s.status);
   const xp = useProgressStore((s) => s.xp);
   const streak = useProgressStore((s) => s.streak);
