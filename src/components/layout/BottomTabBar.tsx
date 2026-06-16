@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { X } from "lucide-react";
 import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
 import type { NavItem } from "./nav-items";
+import { RouteIcon, MoreIcon } from "./route-icons";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
 const MORE_COLOR = "#5b5be6";
@@ -19,77 +20,16 @@ function getContextMeta(pathname: string, pinnedTabs: string[]) {
   return { label: mehr?.label ?? "Mehr", color: MORE_COLOR, bg: MORE_BG };
 }
 
-function IcoDashboard({ active }: { active: boolean }) {
-  return (
-    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <rect x="2"  y="2"  width="7" height="7" rx="1.5" fill="#5b5be6" />
-      <rect x="11" y="2"  width="7" height="7" rx="1.5" fill="#5b5be6" opacity=".72" />
-      <rect x="2"  y="11" width="7" height="7" rx="1.5" fill="#5b5be6" opacity=".72" />
-      <rect x="11" y="11" width="7" height="7" rx="1.5" fill="#5b5be6" opacity=".45" />
-    </svg>
-  );
+// Every surface (bottom bar, More sheet, sidebar) draws the SAME custom branded
+// SVG for a given route — defined once in route-icons.tsx — so an icon is
+// recognisable everywhere. The mark carries the route's accent colour itself;
+// `active` only toggles the opacity.
+function TabIcon({ path, active }: { path: string; active: boolean }) {
+  return <RouteIcon path={path} size={IZ} active={active} />;
 }
-function IcoBook({ active }: { active: boolean }) {
-  return (
-    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <path d="M10 2.5C7.5 1.5 4.5 1.5 2 2.5V17.5c2.5-1 5.5-1 8 0V2.5Z" fill="#2563eb" />
-      <path d="M10 2.5c2.5-1 5.5-1 8 0V17.5c-2.5-1-5.5-1-8 0V2.5Z" fill="#60a5fa" />
-      {active && (<>
-        <line x1="4.5" y1="7"  x2="8.5"  y2="7"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.7} />
-        <line x1="4.5" y1="10" x2="8.5"  y2="10" stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
-        <line x1="4.5" y1="13" x2="8.5"  y2="13" stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.35} />
-        <line x1="11.5" y1="7" x2="15.5" y2="7"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
-        <line x1="11.5" y1="10" x2="15.5" y2="10" stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.35} />
-      </>)}
-    </svg>
-  );
-}
-function IcoQuiz({ active }: { active: boolean }) {
-  return (
-    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <circle cx="10" cy="10" r="9" fill="#f97316" />
-      <polyline points="6,10.5 8.5,13 14,7" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-    </svg>
-  );
-}
-function IcoAnalytics({ active }: { active: boolean }) {
-  return (
-    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <rect x="2.5"  y="12"  width="3.5" height="6"    rx="1.2" fill="#0ea5e9" />
-      <rect x="8.25" y="7.5" width="3.5" height="10.5" rx="1.2" fill="#0ea5e9" opacity=".8" />
-      <rect x="14"   y="3"   width="3.5" height="15"   rx="1.2" fill="#0ea5e9" opacity=".55" />
-    </svg>
-  );
-}
+
 function IcoMore({ active }: { active: boolean }) {
-  return (
-    <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <circle cx="5"  cy="5"  r="2.4" fill="#5b5be6" opacity=".9"  />
-      <circle cx="10" cy="5"  r="2.4" fill="#5b5be6" opacity=".7"  />
-      <circle cx="15" cy="5"  r="2.4" fill="#5b5be6" opacity=".5"  />
-      <circle cx="5"  cy="10" r="2.4" fill="#5b5be6" opacity=".7"  />
-      <circle cx="10" cy="10" r="2.4" fill="#5b5be6" opacity=".5"  />
-      <circle cx="15" cy="10" r="2.4" fill="#5b5be6" opacity=".35" />
-      <circle cx="5"  cy="15" r="2.4" fill="#5b5be6" opacity=".45" />
-      <circle cx="10" cy="15" r="2.4" fill="#5b5be6" opacity=".3"  />
-      <circle cx="15" cy="15" r="2.4" fill="#5b5be6" opacity=".2"  />
-    </svg>
-  );
-}
-
-const CUSTOM_ICON: Record<string, (active: boolean) => React.ReactNode> = {
-  "/":           a => <IcoDashboard active={a} />,
-  "/vocabulary": a => <IcoBook      active={a} />,
-  "/quiz":       a => <IcoQuiz      active={a} />,
-  "/analytics":  a => <IcoAnalytics active={a} />,
-};
-
-function TabIcon({ path, active, color }: { path: string; active: boolean; color: string }) {
-  if (path in CUSTOM_ICON) return <>{CUSTOM_ICON[path](active)}</>;
-  const item = navItems.find(i => i.to === path);
-  if (!item) return null;
-  const Icon = item.icon;
-  return <Icon className="transition-opacity" style={{ color, opacity: active ? 1 : 0.38, width: IZ, height: IZ }} />;
+  return <MoreIcon active={active} size={IZ} />;
 }
 
 interface Props {
@@ -166,16 +106,11 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
         {editMode ? (
           <>
             {/* Home — always fixed, no badge */}
-            {(() => {
-              const home = navItems.find(i => i.to === "/")!;
-              return (
-                <div className="flex flex-1 p-1">
-                  <div className="flex flex-1 items-center justify-center rounded-xl">
-                    <TabIcon path="/" active={false} color={home.color} />
-                  </div>
-                </div>
-              );
-            })()}
+            <div className="flex flex-1 p-1">
+              <div className="flex flex-1 items-center justify-center rounded-xl">
+                <TabIcon path="/" active={false} />
+              </div>
+            </div>
 
             {/* Reorderable pinned tabs.
                 flexGrow = icon count keeps each slot the same width as Home/Mehr. */}
@@ -190,7 +125,7 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
               {moveablePaths.map((path, idx) => {
                 const item = navItems.find(i => i.to === path);
                 if (!item) return null;
-                const { label, color } = item;
+                const { label } = item;
                 return (
                   <Reorder.Item
                     key={path}
@@ -204,7 +139,7 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
                       animate={{ rotate: [-1.5, 1.5, -1.5] }}
                       transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.08, ease: "easeInOut" }}
                     >
-                      <TabIcon path={path} active={false} color={color} />
+                      <TabIcon path={path} active={false} />
                       {pinnedTabs.length > 2 && (
                         <button
                           type="button"
@@ -244,7 +179,7 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
                     className="relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150"
                     style={isActive ? { background: bg } : {}}
                   >
-                    <TabIcon path={to} active={isActive} color={color} />
+                    <TabIcon path={to} active={isActive} />
                     {isActive && (
                       <span className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
                         style={{ height: 3, background: color }} />
