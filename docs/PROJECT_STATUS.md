@@ -295,6 +295,16 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   scale pop was also shifting icons on long-press. Positions now stay put and the jiggle starts
   immediately. (3) The Mehr tab now toggles: tapping it while the sheet is open closes it (and exits
   edit mode) via `toggleMore` in `AppShell`.
+- **Follow-up fixes round 3 (same session):** (1) scaled the whole mobile bottom nav down ~10% after
+  it felt too big: rail 70px → **63px**, icons 32px → **29px** in both the bar and the More sheet,
+  with overlay `bottom`, sheet padding, and `.pb-nav` re-tuned to match (PR #191). (2) Fixed an
+  intermittent "design glitch" where the whole mobile view got stuck **scrolled sideways** (header
+  logo gone, "Vokabeltrainer" clipped to "kabeltrainer", card text cut off on the left). The guard
+  against horizontal scroll only lived on `<body>`, but the real scroll container is `<html>`, and
+  Radix portals (Select/Dialog) mount at the end of `<body>` and can momentarily push the document
+  sideways before Floating UI positions them, which iOS leaves stuck. Added `overflow-x: clip` +
+  `overscroll-behavior-x: none` to `html` in `src/index.css` (`clip`, not `hidden`, so no scroll
+  container is created and the sticky header is untouched) (PR #192).
 - `pnpm build` + `pnpm lint:content` green. Branch `claude/context-bar-menu-animations-g9gfd3`.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
@@ -1225,12 +1235,14 @@ source of truth.
 
 **Most recent work (sessions 23–26):** data-governance v0.2/v0.3 + boot-splash fix (s23), unique
 per-route icon colours + all-custom branded SVG marks (s25), and the **mobile nav overhaul (s26)**:
-removed the bottom-bar context strip, taller 70px rail with 32px icons (matched in the More sheet),
+removed the bottom-bar context strip, a 63px rail with 29px icons (matched in the More sheet),
 Mehr tab shows selected state + toggles the sheet closed, the sheet closes on navigation, the More
 sheet is now drag-reorderable (persisted in `useSettingsStore.moreOrder`), and add/remove use
 `layout` + `AnimatePresence` movement animations (opacity-only enter/exit so the jiggle never
-freezes). See the Session 26 log above for details and the CLAUDE.md "Mobile bottom tab bar" section
-for the locked behavior.
+freezes). A late fix also stopped an intermittent horizontal-shift glitch by clipping `overflow-x`
+on `<html>` (not just `<body>`) so a briefly-mispositioned Radix portal can't leave the page stuck
+scrolled sideways. See the Session 26 log above for details and the CLAUDE.md "Mobile bottom tab
+bar" section for the locked behavior.
 
 **Earlier handoff (sessions 9–22, 2026-06-04 → 06-14):**
 
