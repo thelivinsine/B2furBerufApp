@@ -25,6 +25,14 @@ export function AppShell() {
     setEditMode(true);
     setMoreOpen(true);
   }
+  // Tapping the Mehr tab toggles the sheet: open it, or close it (and exit edit
+  // mode) if it is already open.
+  function toggleMore() {
+    setMoreOpen(prev => {
+      if (prev) setEditMode(false);
+      return !prev;
+    });
+  }
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -82,7 +90,7 @@ export function AppShell() {
 
       {/* Mobile bottom tab bar + "Mehr" sheet */}
       <BottomTabBar
-        onMore={() => setMoreOpen(true)}
+        onMore={toggleMore}
         onLongPress={enterEditMode}
         editMode={editMode}
         moreOpen={moreOpen}

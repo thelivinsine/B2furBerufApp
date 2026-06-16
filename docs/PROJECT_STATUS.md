@@ -288,6 +288,13 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   sheet + exits edit mode on any `location.pathname` change. (2) Bar rail height 62px → 70px and
   icons 29px → 32px (matched to the More sheet, also bumped 28px → 32px); overlay `bottom`, sheet
   padding, and `.pb-nav` re-tuned for the taller bar.
+- **Follow-up fixes round 2 (same session):** (1) removed the edit-mode "Ziehen zum Sortieren …"
+  instruction sentence. (2) Enter/exit on bar + sheet edit tiles is now opacity-only (no `scale`):
+  animating a transform on a `layout`/Reorder element fought framer's projection and was freezing
+  the jiggle until the next re-render (the "icons only jiggle after an add/remove" bug), and the
+  scale pop was also shifting icons on long-press. Positions now stay put and the jiggle starts
+  immediately. (3) The Mehr tab now toggles: tapping it while the sheet is open closes it (and exits
+  edit mode) via `toggleMore` in `AppShell`.
 - `pnpm build` + `pnpm lint:content` green. Branch `claude/context-bar-menu-animations-g9gfd3`.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
