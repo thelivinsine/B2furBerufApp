@@ -164,9 +164,9 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
   .pb-nav {
-    /* Bottom bar = 62px icon rail + safe area (the old name strip was removed).
+    /* Bottom bar = 70px icon rail + safe area (the old name strip was removed).
        Keep a comfortable gap so content never sits under the bar. */
-    padding-bottom: calc(3.875rem + env(safe-area-inset-bottom) + 1.5rem);
+    padding-bottom: calc(4.375rem + env(safe-area-inset-bottom) + 1.5rem);
   }
   /* Suppresses the iOS Safari link-preview popup that appears on long-press
      of <a> elements. Applied to the nav bar and More sheet containers.
