@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-15 (session 23). Branch: `claude/app-refresh-text-flash-r6k69u`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-16 (session 24). Branch: `claude/vibrant-meitner-mfl9xk`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -1274,6 +1274,30 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
 - Redemittel: **72** entries
 
 **Dev branch:** `claude/vibrant-meitner-mfl9xk` — realign to `origin/main` after each squash-merge.
+
+### Session 24 (2026-06-16) — Mobile nav bar: sync fix, drag-reorder, drag-to-add (PR #175) ✅
+
+Three persistent bugs in the bottom tab bar / More sheet were fixed together:
+
+**1. Sync bug (icons added from sheet didn't appear in bar):** `BottomTabBar` had a `localOrder`
+buffer state with a `useEffect` that only synced from the zustand store when `!editMode`. So
+`setPinnedTabs` calls from `MoreSheet` were silently ignored while the sheet was open. Fixed by
+removing `localOrder` entirely; the bar now reads `pinnedTabs` from the store directly as the
+single source of truth.
+
+**2. Drag-to-reorder in bar:** `Reorder.Group` now writes back to the store on every reorder event.
+`flexGrow=moveablePaths.length` keeps all icon slots the same width regardless of count. Red X
+buttons use `onPointerDownCapture` + `onPointerDown` stopPropagation so framer-motion's drag
+gesture doesn't swallow the tap before `onClick` fires.
+
+**3. Drag-to-add from More sheet:** Sheet icons in edit mode are wrapped in a `motion.div` with
+`drag="y"` and `dragElastic={{ top: 0, bottom: 0.55 }}`. Dragging an icon downward 72px triggers
+`addToBar()` and snaps back. The sheet Content switches from `overflow-y-auto` to `overflow-visible`
+in edit mode so the dragged icon can render outside the panel boundary during the gesture. The
+jiggle animation (`rotate`) lives on the inner `motion.button` so it doesn't conflict with the
+outer drag transform. Icon scale grows to 1.18× as the drag nears the threshold for visual feedback.
+
+All changes shipped as PR #175, squash-merged to `main`.
 
 **Next (priority order):**
 1. **Cloudflare Pages migration (decided s22, deferred until OAuth clears):** after Google confirms
