@@ -203,3 +203,22 @@ backfilled from the same session's transcript so the trail is complete.)
   "continue" prompts that just asked me to finish merging the in-flight PR #190, which I did.)
 - **Artifacts:** `BottomTabBar.tsx`, `MoreSheet.tsx`, `index.css`, `CLAUDE.md`,
   `docs/SESSION_PROMPT_LOG.md`. Shipped via PR #191.
+
+## Entry 11 — 2026-06-16 20:38 UTC
+- **Branch:** `claude/context-bar-menu-animations-g9gfd3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** two screenshots of the Vokabeltrainer (Kollokationen tab). One shows the whole
+  view shifted left and clipped (header logo gone, "Vokabeltrainer" rendered as "kabeltrainer",
+  "WORTSCHATZ" as "ETSCHATZ", card text cut off on the left); the other shows the same screen
+  rendering correctly.
+- **Prompt (verbatim):**
+  > there are sometimes design glitches like the ones attached. can you check for them and fix?
+- **Response summary:** Diagnosed the intermittent glitch as a root-level horizontal-scroll offset:
+  the whole document (header included) gets stuck scrolled sideways. The existing guard only clipped
+  horizontal overflow on `body`, but the real scroll container is `<html>`, and Radix portals
+  (Select/Dialog dropdowns) mount at the end of `<body>` and can momentarily push the page sideways
+  before Floating UI positions them, which iOS leaves stuck. Added `overflow-x: clip` +
+  `overscroll-behavior-x: none` to `html` in `src/index.css` (using `clip`, not `hidden`, so no
+  scroll container is created and the sticky header is unaffected). `pnpm build` green.
+- **Artifacts:** `src/index.css`, `docs/SESSION_PROMPT_LOG.md`. Shipped via PR (merge SHA in git
+  history).
