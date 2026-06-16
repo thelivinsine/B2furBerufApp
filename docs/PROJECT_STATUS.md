@@ -237,15 +237,20 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
     already required explicit action — so the whole app is now consistent.
   - `npm run build` passes. Deploy pending founder squash-merge of PR #14.
 
-### Session 25 (2026-06-16) — Unique per-section icon colours
-- Each navigation route now owns ONE unique accent colour (no more duplicates: Wortschatz, Quiz,
-  Prüfungsmodus, Schnellwiederholung, Fortschritt, Einstellungen all had shared hues before).
-  Defined once in `src/components/layout/nav-items.ts` (`color` + matching `bg`).
-- The same colour follows each icon everywhere it renders: bottom tab bar (incl. the custom hero
-  SVGs for Vocabulary/Quiz/Analytics, updated to match), the More sheet, and the desktop
-  `Sidebar` (icons are now tinted with their route colour, dimmed when inactive).
+### Session 25 (2026-06-16) — Unique per-section icon colours + custom branded icons everywhere
+- **Unique colour per route:** each navigation route now owns ONE unique accent colour (no more
+  duplicates: Wortschatz, Quiz, Prüfungsmodus, Schnellwiederholung, Fortschritt, Einstellungen all
+  had shared hues before). Defined once in `src/components/layout/nav-items.ts` (`color` + `bg`).
+- **One icon per route, used everywhere (new):** custom branded SVG marks now live in
+  `src/components/layout/route-icons.tsx` (`RouteIcon` + `MoreIcon`) — one hand-drawn mark per
+  route on a 20×20 grid, in the route's accent colour with lighter layers from its own opacity.
+  This single registry is the source for the bottom tab bar, the More sheet, AND the desktop
+  `Sidebar`, so a section shows the same icon AND colour on every surface. Replaced the old setup
+  where the bottom bar had custom SVGs for only 4 "hero" routes while everything else used lucide.
 - Dashboard + the "Mehr" menu keep the brand indigo `#5b5be6` as the app/chrome anchor.
-- `pnpm build` + `pnpm lint:content` green.
+- `nav-items.ts` still carries a lucide `icon` per route; `RouteIcon` falls back to it for any
+  route without a custom mark. Reference sheet: `preview/route-icons-preview.svg`.
+- `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
 - **Sign-up honesty fix (PR #19, merged):** sign-up no longer falsely reports success when email

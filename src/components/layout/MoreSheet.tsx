@@ -5,6 +5,7 @@ import { Check, Plus } from "lucide-react";
 import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
+import { RouteIcon } from "./route-icons";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
 interface Props {
@@ -18,9 +19,9 @@ interface Props {
 const DRAG_ADD_THRESHOLD = 72;
 
 function DraggableSheetIcon({
-  to, label, icon: Icon, color, bg, idx, atMax, justAdded, onAdd,
+  to, label, color, bg, idx, atMax, justAdded, onAdd,
 }: {
-  to: string; label: string; icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+  to: string; label: string;
   color: string; bg: string; idx: number; atMax: boolean;
   justAdded: Set<string>; onAdd: (path: string) => void;
 }) {
@@ -58,7 +59,7 @@ function DraggableSheetIcon({
           onClick={() => { if (!atMax && !added) onAdd(to); }}
         >
           <motion.div style={{ opacity: iconOpacity }}>
-            <Icon style={{ width: 28, height: 28, color }} />
+            <RouteIcon path={to} size={28} />
           </motion.div>
 
           {/* Added confirmation flash */}
@@ -176,12 +177,11 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
           {editMode ? (
             /* ── Edit mode: icons jiggle; tap or drag down to add to bar ── */
             <div className="grid grid-cols-3 gap-x-3 gap-y-5">
-              {nonPinnedItems.map(({ to, label, icon: Icon, color, bg }, idx) => (
+              {nonPinnedItems.map(({ to, label, color, bg }, idx) => (
                 <DraggableSheetIcon
                   key={to}
                   to={to}
                   label={label}
-                  icon={Icon as React.ComponentType<React.SVGProps<SVGSVGElement>>}
                   color={color}
                   bg={bg}
                   idx={idx}
@@ -194,7 +194,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
           ) : (
             /* ── Normal mode: clean icon grid, tap to navigate ── */
             <nav className="grid grid-cols-3 gap-x-3 gap-y-5">
-              {nonPinnedItems.map(({ to, label, icon: Icon, color, bg }) => (
+              {nonPinnedItems.map(({ to, label, color, bg }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -212,7 +212,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
                             : { background: "rgba(0,0,0,.04)" }
                         }
                       >
-                        <Icon style={{ width: 28, height: 28, color, opacity: isActive ? 1 : 0.65 }} />
+                        <RouteIcon path={to} size={28} active />
                       </div>
                       <span
                         className="text-center text-[11px] font-medium leading-tight"

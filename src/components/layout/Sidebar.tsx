@@ -1,6 +1,7 @@
 import { NavLink, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { navItems } from "./nav-items";
+import { RouteIcon } from "./route-icons";
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
@@ -19,7 +20,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
 
       <nav className="flex flex-col gap-0.5">
-        {navItems.map(({ to, label, icon: Icon, end, color }) => (
+        {navItems.map(({ to, label, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -36,9 +37,9 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           >
             {({ isActive }) => (
               <>
-                {/* Each route keeps its unique accent colour here too, matching
-                    the bottom tab bar and More sheet. Dimmed when inactive. */}
-                <Icon className="h-[18px] w-[18px] transition-opacity" style={{ color, opacity: isActive ? 1 : 0.55 }} />
+                {/* Same custom branded mark as the bottom tab bar and More sheet.
+                    Dimmed when inactive. */}
+                <RouteIcon path={to} size={18} active={isActive} />
                 {label}
               </>
             )}
