@@ -75,17 +75,28 @@ below is locked. **Do not change structure, edit-mode behavior, or icon rules wi
 founder request.**
 
 ### Layout
-- Fixed bottom bar with two zones: a **context strip** (thin label row above icons) and an
-  **icon rail** (62px tall).
+- Fixed bottom bar with two zones: a **context strip** (label row above icons) and an
+  **icon rail** (62px tall). The context strip shows the active section's name **plus a short
+  subtitle** (`desc` per `NavItem` in `nav-items.ts`) for context, so it is two lines tall. The
+  More sheet's overlay bottom + bottom padding are sized to clear this taller bar; keep them in
+  sync if the strip height changes.
 - **5 slots total:** Home (fixed, always slot 1) + up to 3 moveable icons + Mehr (fixed, always
   last). This gives max 4 content icons + Mehr.
 - Minimum 2 icons in the bar (Home + at least one other); the X button hides when at the minimum.
 - Icons not pinned to the bar live in the **More sheet** (grid of 3 columns with names below each icon).
 
-### Icon color rule
+### Icon color rule (updated 2026-06-16, s25)
 - Icons are **always colored** (never grey/monochrome). Inactive = 38% opacity. Active = 100%.
-- The four "hero" icons (Dashboard, Vocabulary, Quiz, Analytics) use custom SVG with the brand
-  palette; all other routes use their lucide icon at the same opacity rule.
+- **Every route has ONE custom branded SVG mark and ONE unique accent colour**, both defined once
+  in `src/components/layout/route-icons.tsx` (`RouteIcon`) + `nav-items.ts` (`color`/`bg`). The
+  same mark and colour render on every surface: bottom tab bar, More sheet, and desktop `Sidebar`.
+  (This replaced the old split where only four "hero" routes had custom SVGs and the rest used
+  lucide.) `nav-items.ts` still carries a lucide `icon` per route purely as a `RouteIcon` fallback.
+- Marks are normalised to a common **optical size** (`NORM` map + `normTransform` in
+  `route-icons.tsx`): each mark's bounding box is scaled to a centred 16-unit target with a
+  per-mark weight, so a filled disc doesn't read larger than an airy glyph. Re-tune via that map.
+- Dashboard = a house glyph; the **Mehr** menu = the 2×2 grid (the apps/more glyph), `MoreIcon`.
+  Both keep the brand indigo `#5b5be6`. Reference sheet: `preview/route-icons-preview.svg`.
 
 ### Edit mode (iOS home-screen style)
 - Triggered by **long-pressing anywhere** on the tab bar OR anywhere on the More sheet (600ms, with
