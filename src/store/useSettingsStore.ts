@@ -27,11 +27,14 @@ interface SettingsState {
 
   /** Ordered list of nav paths pinned to the bottom tab bar (max 4). */
   pinnedTabs: string[];
+  /** Custom order of the routes shown in the "Mehr" sheet. Empty = navItems order. */
+  moreOrder: string[];
 
   setSettings: (patch: Partial<SettingsState>) => void;
   completeOnboarding: (patch: Partial<SettingsState>) => void;
   resetSettings: () => void;
   setPinnedTabs: (tabs: string[]) => void;
+  setMoreOrder: (order: string[]) => void;
 }
 
 const defaults = {
@@ -50,6 +53,7 @@ const defaults = {
   recognitionEnabled: false,
   reducedMotion: false,
   pinnedTabs: DEFAULT_PINNED_TABS,
+  moreOrder: [] as string[],
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -60,6 +64,7 @@ export const useSettingsStore = create<SettingsState>()(
       completeOnboarding: (patch) => set({ ...patch, onboarded: true }),
       resetSettings: () => set({ ...defaults }),
       setPinnedTabs: (tabs) => set({ pinnedTabs: tabs }),
+      setMoreOrder: (order) => set({ moreOrder: order }),
     }),
     { name: "b2beruf.settings.v1" },
   ),

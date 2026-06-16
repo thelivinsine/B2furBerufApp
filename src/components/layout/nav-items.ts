@@ -21,9 +21,9 @@ export interface NavItem {
   end?: boolean;
   /** Accent colour used in the bottom tab bar when this tab is active. */
   color: string;
-  /** Tinted background for the active pill and context strip. */
+  /** Tinted background for the active pill / icon backdrop. */
   bg: string;
-  /** Short subtitle shown in the bottom-bar context strip for extra context. */
+  /** Short subtitle (used on the landing/marketing surfaces and kept for reuse). */
   desc: string;
 }
 
