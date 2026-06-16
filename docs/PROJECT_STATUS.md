@@ -1254,6 +1254,9 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
 - Mobile redesign = **Layer 2 ✅ · Layer 3 ✅ — DONE**.
 - Keep `src/components/ui/card.tsx` **untouched**.
 - Pre-React crash painter is a **permanent** safety net (do not remove).
+- **Mobile bottom tab bar design (locked 2026-06-16, PRs #76–#175):** iOS home-screen style
+  edit mode, always-colored icons (38% inactive / 100% active), no Fertig button, auto-save on
+  outside tap, Home + Mehr fixed. Full spec in `CLAUDE.md` → "Mobile bottom tab bar".
 - **Modal/popup overlay design (locked 2026-06-07, PR #108):** brand-tinted radial spotlight
   via `bg-dialog-overlay` + `shadow-elevated-soft` (no flat black, no backdrop-blur) — the
   standard for ALL popups/dialogs/sheets going forward. Already wired into the shared
@@ -1275,29 +1278,79 @@ squash-merge — see CLAUDE.md). The branch name is reassigned per session; `mai
 
 **Dev branch:** `claude/vibrant-meitner-mfl9xk` — realign to `origin/main` after each squash-merge.
 
-### Session 24 (2026-06-16) — Mobile nav bar: sync fix, drag-reorder, drag-to-add (PR #175) ✅
+### Session 24 (2026-06-16) — Mobile nav bar complete redesign + bug fixes (PRs #175–#176) ✅
 
-Three persistent bugs in the bottom tab bar / More sheet were fixed together:
+This session completed a multi-iteration redesign of the mobile bottom tab bar and More sheet
+that the founder drove across sessions 23–24. All changes are live on `main`.
 
-**1. Sync bug (icons added from sheet didn't appear in bar):** `BottomTabBar` had a `localOrder`
-buffer state with a `useEffect` that only synced from the zustand store when `!editMode`. So
-`setPinnedTabs` calls from `MoreSheet` were silently ignored while the sheet was open. Fixed by
-removing `localOrder` entirely; the bar now reads `pinnedTabs` from the store directly as the
-single source of truth.
+**Feature set delivered (full list):**
 
-**2. Drag-to-reorder in bar:** `Reorder.Group` now writes back to the store on every reorder event.
-`flexGrow=moveablePaths.length` keeps all icon slots the same width regardless of count. Red X
-buttons use `onPointerDownCapture` + `onPointerDown` stopPropagation so framer-motion's drag
-gesture doesn't swallow the tap before `onClick` fires.
+- **Always-colored icons:** icons show their accent color at all times. Inactive = 38% opacity,
+  active = 100%. Never grey/monochrome. The four hero icons (Dashboard, Vocabulary, Quiz,
+  Analytics) use custom SVGs with the brand palette; all other routes use their lucide icon at
+  the same opacity rule.
 
-**3. Drag-to-add from More sheet:** Sheet icons in edit mode are wrapped in a `motion.div` with
-`drag="y"` and `dragElastic={{ top: 0, bottom: 0.55 }}`. Dragging an icon downward 72px triggers
-`addToBar()` and snaps back. The sheet Content switches from `overflow-y-auto` to `overflow-visible`
-in edit mode so the dragged icon can render outside the panel boundary during the gesture. The
-jiggle animation (`rotate`) lives on the inner `motion.button` so it doesn't conflict with the
-outer drag transform. Icon scale grows to 1.18× as the drag nears the threshold for visual feedback.
+- **Larger, intentional nav bar:** icons 20% bigger (29px), taller context strip with a colored
+  dot + semibold label, 62px icon rail. Spacing is even and deliberately sized.
 
-All changes shipped as PR #175, squash-merged to `main`.
+- **More sheet grid:** additional routes shown in a 3-column icon grid with names below each tile,
+  matching the visual language of the bar. No section headers.
+
+- **iOS home-screen edit mode:**
+  - Long-press anywhere on the bar OR the More sheet (600ms + haptic vibrate) opens edit mode.
+  - Icons jiggle (framer-motion infinite rotate animation) and show a red X badge.
+  - Drag icons left/right in the bar to reorder.
+  - Tap X to remove an icon (hidden when at minimum 2 icons in bar).
+  - No "Fertig" button. Tapping outside auto-saves and exits edit mode.
+  - Home and Mehr are fixed; everything else is moveable between bar and sheet.
+
+- **Adding icons to the bar (two gestures):**
+  - Tap the green + badge on a sheet icon.
+  - Drag the sheet icon downward ~72px (it scales to 1.18× near the threshold as visual feedback,
+    then snaps back and the icon appears in the bar).
+  - Both show a green checkmark flash as confirmation.
+
+- **Max/min constraints:** max 4 icons + Mehr in bar; min 2 icons (X button hidden at minimum).
+
+- **iOS context menu suppressed:** long-pressing `<a>` tags on iOS shows a "Copy link / Share"
+  native popup. Fixed with `.no-callout` CSS class (in `index.css`) applying
+  `-webkit-touch-callout: none !important` to the container AND its `*` children. Inline style
+  does NOT cascade to NavLink's rendered `<a>` tags; only the CSS class selector does.
+
+- **Bar stays interactive while sheet is open:** `modal={false}` on `DialogPrimitive.Root` in
+  `MoreSheet.tsx`. Radix Dialog's default modal mode sets `pointer-events: none` on everything
+  outside the sheet, which made the bar inert. `modal={false}` with a custom
+  `onInteractOutside` guard (allows clicks on `#bottom-tab-bar`) is the correct fix.
+
+- **GPU compositing fix for iOS Safari:** `transform: translateZ(0)` + `willChange: transform`
+  on the `<nav>` element prevents iOS Safari from collapsing the bar under a `backdrop-filter`
+  sibling.
+
+**Bugs fixed in final PR #175:**
+
+1. **Sync bug (icons added from sheet didn't appear in bar):** `BottomTabBar` had a `localOrder`
+   buffer state with a `useEffect` that only synced from the store when `!editMode`, silently
+   ignoring `setPinnedTabs` calls while the sheet was open. Fixed by removing `localOrder`
+   entirely; the bar reads `pinnedTabs` from the zustand store directly — store is the single
+   source of truth.
+
+2. **Drag-to-reorder in bar not working:** `Reorder.Group` now writes every reorder back to the
+   store. `flexGrow: moveablePaths.length` keeps all icon slots the same width regardless of count
+   (previously `flex-1` caused all moveable icons to bunch into one slot).
+
+3. **X button not firing:** action was in `onPointerDown` which framer-motion's drag consumed
+   first. Fixed: action in `onClick`, guarded by `onPointerDownCapture` + `onPointerDown`
+   stopPropagation so the drag gesture never sees the pointer.
+
+**Founder preferences captured:**
+- Edit mode must feel exactly like iOS/Android home screen app rearrangement.
+- No extra buttons/chrome in edit mode; gestures drive everything.
+- Icon colors must always be visible (never greyed out).
+- More sheet is purely a navigation/edit surface — no section labels, no hierarchy.
+- Feedback (checkmark flash, scale animation) is essential so the user knows their tap/drag worked.
+- No native browser popup interrupting long-press on mobile links.
+
+All changes shipped as PR #175 + docs PR #176, both squash-merged to `main`.
 
 **Next (priority order):**
 1. **Cloudflare Pages migration (decided s22, deferred until OAuth clears):** after Google confirms

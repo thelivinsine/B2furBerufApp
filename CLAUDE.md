@@ -68,6 +68,62 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
   `docs/DATA_GOVERNANCE.md` for the full policy (traceability over ownership; Wiktionary/DWDS for word
   facts; Tatoeba CC-BY for example sentences).
 
+## Mobile bottom tab bar (locked 2026-06-16)
+
+The founder iterated extensively on the mobile nav bar through sessions 15 and 24. The design
+below is locked. **Do not change structure, edit-mode behavior, or icon rules without an explicit
+founder request.**
+
+### Layout
+- Fixed bottom bar with two zones: a **context strip** (thin label row above icons) and an
+  **icon rail** (62px tall).
+- **5 slots total:** Home (fixed, always slot 1) + up to 3 moveable icons + Mehr (fixed, always
+  last). This gives max 4 content icons + Mehr.
+- Minimum 2 icons in the bar (Home + at least one other); the X button hides when at the minimum.
+- Icons not pinned to the bar live in the **More sheet** (grid of 3 columns with names below each icon).
+
+### Icon color rule
+- Icons are **always colored** (never grey/monochrome). Inactive = 38% opacity. Active = 100%.
+- The four "hero" icons (Dashboard, Vocabulary, Quiz, Analytics) use custom SVG with the brand
+  palette; all other routes use their lucide icon at the same opacity rule.
+
+### Edit mode (iOS home-screen style)
+- Triggered by **long-pressing anywhere** on the tab bar OR anywhere on the More sheet (600ms, with
+  haptic vibrate). Both surfaces open edit mode simultaneously.
+- In edit mode: icons **jiggle** (framer-motion `rotate: [-1.5, 1.5, -1.5]`, infinite) and show a
+  red X badge. Dragging icons left/right reorders them in the bar. Tapping X removes an icon.
+- **No "Fertig" / "Done" button.** Edit mode ends automatically when the user taps anywhere outside
+  the sheet (auto-save). The sheet also has a grab handle; tapping the dimmed overlay above closes it.
+- Home and Mehr are **fixed** and not draggable or removeable.
+
+### Adding icons to the bar
+Two gestures, both work while the More sheet is open in edit mode:
+1. **Tap the green + badge** on a sheet icon.
+2. **Drag the icon downward ~72px** — it snaps back and the icon appears in the bar.
+Both show a green checkmark flash on the icon as confirmation.
+
+### iOS-specific fixes (do not revert)
+- **No native link popup on long-press:** `.no-callout` CSS class (in `src/index.css`) with
+  `-webkit-touch-callout: none !important` applied to the container AND its `*` children. Inline
+  style does NOT cascade to NavLink's `<a>` tags — only the CSS class selector does.
+- **`modal={false}`** on `DialogPrimitive.Root` in `MoreSheet.tsx`: Radix Dialog defaults to modal,
+  which sets `pointer-events: none` on all elements outside the sheet. This makes the tab bar inert
+  while the sheet is open. `modal={false}` prevents this.
+- **`transform: translateZ(0)` + `willChange: transform`** on the `<nav>` in `BottomTabBar.tsx`:
+  forces a GPU compositing layer, preventing iOS Safari from collapsing the bar under a
+  `backdrop-filter` sibling and making it invisible.
+
+### Store architecture
+- Pinned tabs stored in `useSettingsStore` as `pinnedTabs: string[]` (array of route paths).
+- `DEFAULT_PINNED_TABS = ["/", "/vocabulary", "/quiz", "/analytics"]` in `nav-items.ts`.
+- `BottomTabBar` reads the store **directly** (no local buffer state). Any external write
+  (e.g. MoreSheet adding a tab) is reflected immediately. Never add a `localOrder` cache or
+  `useEffect` sync layer — that was the root cause of the "icon added but didn't appear" bug.
+- `Reorder.Group` uses `flexGrow: moveablePaths.length` so all icon slots stay the same width
+  when the icon count changes in edit mode.
+- X-button `onClick` is guarded with `onPointerDownCapture` + `onPointerDown` stopPropagation so
+  framer-motion's drag gesture doesn't consume the pointer before the click fires.
+
 ## UI conventions — modal / popup overlays (locked 2026-06-07)
 The founder reviewed the sign-in dialog's backdrop and **locked this as the standard look for
 all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` or heavy
@@ -135,21 +191,22 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
-- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/genauly-blank-page-9biDi`).
+- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/vibrant-meitner-mfl9xk`).
 - The remote sandbox cannot reach the live `*.github.io` site — verifying the deploy (Actions tab green + live site) is left to the user.
 
 ## Workflow notes
-- Development branch for this work: **`claude/genauly-blank-page-9biDi`** (the active automation branch since session 9; `claude/loving-cray-lMLj3` was used through session 8 and is now stale). The branch name may be reassigned per session — **`main` is always the source of truth**; whatever branch a session is assigned, ship to production by opening a PR into `main` and merging (squash) — the merge triggers `pages.yml`.
+- Development branch for this work: **`claude/vibrant-meitner-mfl9xk`** (active as of session 24).
+  The branch name is reassigned per session — **`main` is always the source of truth**; whatever
+  branch a session is assigned, ship to production by opening a PR into `main` and merging (squash).
 - **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `pnpm build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.
 - **Documentation (REQUIRED after every significant task or series of tasks):** after shipping a feature, a content expansion, or a batch of UX fixes, update `docs/PROJECT_STATUS.md` — the session log, content counts, and "Resume here" section. Commit and push the doc update on the dev branch, then merge it to `main` like any other change. This keeps the status doc accurate for future sessions.
 
 ### Post-deploy GitHub housekeeping (REQUIRED after every squash-merge)
 Squash-merging rewrites history: `main` gets one new commit while the long-lived dev branch still holds the original unsquashed commits, so they diverge and the **next** PR conflicts (this bit us on PR #23). Run this realignment **every time** right after a merge:
 1. `git fetch origin main`
-2. `git checkout claude/genauly-blank-page-9biDi`
-3. `git reset --hard origin/main` — make the dev branch identical to production.
-4. `git push --force-with-lease origin claude/genauly-blank-page-9biDi` — `--force-with-lease` (never plain `--force`); safe because this is the sole dedicated automation branch with no other contributors. (Substitute the session's actual assigned branch if different.)
-5. Confirm `git status` shows the branch level with `origin/main` and the working tree clean.
+2. `git reset --hard origin/main` — make the dev branch identical to production.
+3. `git push --force-with-lease origin <current-branch>` — `--force-with-lease` (never plain `--force`); safe because this is the sole dedicated automation branch with no other contributors.
+4. Confirm `git status` shows the branch level with `origin/main` and the working tree clean.
 
 Also: don't pre-write the next PR's `_Last updated`/log entry against a stale branch — realign first, then make new edits. The founder still verifies the live result; the sandbox can't reach the `*.github.io` site or the Actions tab.
 
