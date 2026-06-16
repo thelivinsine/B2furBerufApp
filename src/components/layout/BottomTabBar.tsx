@@ -32,8 +32,8 @@ function IcoDashboard({ active }: { active: boolean }) {
 function IcoBook({ active }: { active: boolean }) {
   return (
     <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <path d="M10 2.5C7.5 1.5 4.5 1.5 2 2.5V17.5c2.5-1 5.5-1 8 0V2.5Z" fill="#5b5be6" />
-      <path d="M10 2.5c2.5-1 5.5-1 8 0V17.5c-2.5-1-5.5-1-8 0V2.5Z" fill="#10b7cf" />
+      <path d="M10 2.5C7.5 1.5 4.5 1.5 2 2.5V17.5c2.5-1 5.5-1 8 0V2.5Z" fill="#2563eb" />
+      <path d="M10 2.5c2.5-1 5.5-1 8 0V17.5c-2.5-1-5.5-1-8 0V2.5Z" fill="#60a5fa" />
       {active && (<>
         <line x1="4.5" y1="7"  x2="8.5"  y2="7"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.7} />
         <line x1="4.5" y1="10" x2="8.5"  y2="10" stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
@@ -47,7 +47,7 @@ function IcoBook({ active }: { active: boolean }) {
 function IcoQuiz({ active }: { active: boolean }) {
   return (
     <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <circle cx="10" cy="10" r="9" fill="#f59e0b" />
+      <circle cx="10" cy="10" r="9" fill="#f97316" />
       <polyline points="6,10.5 8.5,13 14,7" stroke="white" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </svg>
   );
@@ -55,9 +55,9 @@ function IcoQuiz({ active }: { active: boolean }) {
 function IcoAnalytics({ active }: { active: boolean }) {
   return (
     <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
-      <rect x="2.5"  y="12"  width="3.5" height="6"    rx="1.2" fill="#10b7cf" />
-      <rect x="8.25" y="7.5" width="3.5" height="10.5" rx="1.2" fill="#10b7cf" opacity=".8" />
-      <rect x="14"   y="3"   width="3.5" height="15"   rx="1.2" fill="#10b7cf" opacity=".55" />
+      <rect x="2.5"  y="12"  width="3.5" height="6"    rx="1.2" fill="#0ea5e9" />
+      <rect x="8.25" y="7.5" width="3.5" height="10.5" rx="1.2" fill="#0ea5e9" opacity=".8" />
+      <rect x="14"   y="3"   width="3.5" height="15"   rx="1.2" fill="#0ea5e9" opacity=".55" />
     </svg>
   );
 }

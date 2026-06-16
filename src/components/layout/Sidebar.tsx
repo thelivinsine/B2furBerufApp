@@ -19,7 +19,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       </Link>
 
       <nav className="flex flex-col gap-0.5">
-        {navItems.map(({ to, label, icon: Icon, end }) => (
+        {navItems.map(({ to, label, icon: Icon, end, color }) => (
           <NavLink
             key={to}
             to={to}
@@ -34,8 +34,14 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               )
             }
           >
-            <Icon className="h-[18px] w-[18px]" />
-            {label}
+            {({ isActive }) => (
+              <>
+                {/* Each route keeps its unique accent colour here too, matching
+                    the bottom tab bar and More sheet. Dimmed when inactive. */}
+                <Icon className="h-[18px] w-[18px] transition-opacity" style={{ color, opacity: isActive ? 1 : 0.55 }} />
+                {label}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
