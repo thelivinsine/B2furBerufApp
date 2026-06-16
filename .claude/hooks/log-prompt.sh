@@ -18,6 +18,12 @@ branch="$(git -C "$root" rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown
 
 input="$(cat)"
 
+# Skip non-text submissions (tool results and question answers fire this event
+# with an empty prompt) so the trail only records real founder messages.
+if [ -z "$(printf '%s' "$input" | jq -r '.prompt // ""' 2>/dev/null)" ]; then
+  exit 0
+fi
+
 printf '%s' "$input" \
   | jq -c --arg ts "$ts" --arg branch "$branch" \
       '{ts: $ts, branch: $branch, session_id: (.session_id // null), cwd: (.cwd // null), prompt: (.prompt // "")}' \
