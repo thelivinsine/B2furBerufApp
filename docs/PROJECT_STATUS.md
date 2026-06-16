@@ -237,6 +237,16 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
     already required explicit action — so the whole app is now consistent.
   - `npm run build` passes. Deploy pending founder squash-merge of PR #14.
 
+### Session 25 (2026-06-16) — Unique per-section icon colours
+- Each navigation route now owns ONE unique accent colour (no more duplicates: Wortschatz, Quiz,
+  Prüfungsmodus, Schnellwiederholung, Fortschritt, Einstellungen all had shared hues before).
+  Defined once in `src/components/layout/nav-items.ts` (`color` + matching `bg`).
+- The same colour follows each icon everywhere it renders: bottom tab bar (incl. the custom hero
+  SVGs for Vocabulary/Quiz/Analytics, updated to match), the More sheet, and the desktop
+  `Sidebar` (icons are now tinted with their route colour, dimmed when inactive).
+- Dashboard + the "Mehr" menu keep the brand indigo `#5b5be6` as the app/chrome anchor.
+- `pnpm build` + `pnpm lint:content` green.
+
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
 - **Sign-up honesty fix (PR #19, merged):** sign-up no longer falsely reports success when email
   confirmation is pending. Paired with the founder disabling **"Confirm email"** in Supabase, so
