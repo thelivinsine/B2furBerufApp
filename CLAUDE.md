@@ -106,9 +106,9 @@ founder request.**
 ### Edit mode (iOS home-screen style)
 - Triggered by **long-pressing anywhere** on the tab bar OR anywhere on the More sheet (600ms, with
   haptic vibrate). Both surfaces open edit mode simultaneously.
-- In edit mode: icons **jiggle** (framer-motion `rotate: [-1.5, 1.5, -1.5]`, infinite) and show a
-  badge (red X in the bar, green + in the sheet). Dragging icons left/right reorders them in the bar.
-  Tapping X removes a bar icon.
+- In edit mode: icons **jiggle** (framer-motion `rotate` keyframes, infinite) and show a badge (red
+  X in the bar, green + in the sheet). Dragging icons left/right reorders them in the bar. Tapping X
+  removes a bar icon. There is **no instruction sentence** in the sheet (removed s26).
 - **Both the bar AND the More sheet are reorderable (s26).** Bar icons reorder via framer
   `Reorder.Group` (horizontal). Sheet icons reorder via a **custom 2D grid drag-sort** in
   `MoreSheet.tsx`: each tile is a `motion.div` with `layout` + `drag`; `reorderDuringDrag` finds the
@@ -116,12 +116,23 @@ founder request.**
   and `layout` animates the rest. The sheet order persists in `useSettingsStore.moreOrder` (a full
   ordering of every route path; empty = `nav-items` order). `setMoreOrder` keeps pinned routes in
   their slots and only rearranges the non-pinned ones.
-- **Add/remove movement animation (s26):** bar and sheet items use `layout` + `AnimatePresence`
-  (spring) so adding/removing an icon smoothly slides the others into their new positions instead of
-  snapping.
+- **Add/remove movement animation (s26):** bar and sheet items use `layout` + `AnimatePresence` so
+  adding/removing an icon slides the others into their new positions instead of snapping.
+- **Enter/exit is opacity-only, never `scale` (s26, locked):** animating a transform (scale) on a
+  `layout`/`Reorder` element fights framer-motion's layout projection. That froze the infinite
+  jiggle until the next re-render (icons only jiggled after an add/remove) and shifted icon
+  positions on long-press. Keep tile enter/exit on `opacity` so positions stay put and the jiggle
+  starts immediately. Do not reintroduce a scale pop on these elements.
 - **No "Fertig" / "Done" button.** Edit mode ends automatically when the user taps anywhere outside
   the sheet (auto-save). The sheet also has a grab handle; tapping the dimmed overlay above closes it.
 - Home and Mehr are **fixed** and not draggable or removeable.
+
+### Opening / closing the More sheet (s26)
+- The **Mehr** tab toggles the sheet: tapping it opens the sheet, or closes it (and exits edit mode)
+  if already open. `AppShell.toggleMore` drives this; `BottomTabBar` gets `onMore={toggleMore}`.
+- **Navigating to any route closes the sheet.** Because the bar sits below the sheet overlay
+  (`modal={false}`), tapping a bar tab (e.g. Home) navigates without Radix closing the sheet, so
+  `AppShell` closes `moreOpen` + `editMode` on every `location.pathname` change.
 
 ### Adding icons to the bar
 While the More sheet is open in edit mode, **tap the green + badge** on a sheet icon to add it to the

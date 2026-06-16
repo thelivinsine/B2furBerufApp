@@ -1218,9 +1218,21 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 
 ## Resume here (next session)
 
-**Handoff after sessions 9–22 (2026-06-04 → 06-14).** Everything noted ✅ is merged to `main`.
-Active automation branch: `claude/vibrant-meitner-mfl9xk` (realign to `origin/main` after each
-squash-merge — see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
+**Handoff after session 26 (2026-06-16).** Everything noted ✅ is merged to `main`.
+Active automation branch: `claude/context-bar-menu-animations-g9gfd3` (realign to `origin/main`
+after each squash-merge — see CLAUDE.md). The branch name is reassigned per session; `main` is the
+source of truth.
+
+**Most recent work (sessions 23–26):** data-governance v0.2/v0.3 + boot-splash fix (s23), unique
+per-route icon colours + all-custom branded SVG marks (s25), and the **mobile nav overhaul (s26)**:
+removed the bottom-bar context strip, taller 70px rail with 32px icons (matched in the More sheet),
+Mehr tab shows selected state + toggles the sheet closed, the sheet closes on navigation, the More
+sheet is now drag-reorderable (persisted in `useSettingsStore.moreOrder`), and add/remove use
+`layout` + `AnimatePresence` movement animations (opacity-only enter/exit so the jiggle never
+freezes). See the Session 26 log above for details and the CLAUDE.md "Mobile bottom tab bar" section
+for the locked behavior.
+
+**Earlier handoff (sessions 9–22, 2026-06-04 → 06-14):**
 
 **Shipped & live (all on `main`):**
 - **Blank-page bug FIXED (s9):** circular ESM chunk → pre-React TDZ crash + permanent crash painter.
