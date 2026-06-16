@@ -67,6 +67,16 @@
   html {
     -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
+    /* The real scroll container is <html>, not <body>. Clip horizontal overflow
+       here too so nothing can leave the document scrolled sideways. Without this,
+       a briefly-mispositioned portal (a Radix Select / Dialog renders at the end
+       of <body> before it is placed) or any stray-wide descendant could push the
+       page over, and iOS would leave it stuck there: the whole view shifted left
+       and clipped (logo gone, "Vokabeltrainer" became "kabeltrainer"). `clip` (not
+       `hidden`) creates no scroll container, so the sticky header is untouched.
+       `overscroll-behavior-x` also kills sideways rubber-banding on iOS. */
+    overflow-x: clip;
+    overscroll-behavior-x: none;
   }
 
   body {
