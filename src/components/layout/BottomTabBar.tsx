@@ -13,11 +13,11 @@ const IZ = 29; // icon size
 
 function getContextMeta(pathname: string, pinnedTabs: string[]) {
   const exact = navItems.find(i => i.to === pathname);
-  if (exact) return { label: exact.label, color: exact.color, bg: exact.bg };
+  if (exact) return { label: exact.label, desc: exact.desc, color: exact.color, bg: exact.bg };
   const prefix = navItems.find(i => i.to !== "/" && pathname.startsWith(i.to));
-  if (prefix) return { label: prefix.label, color: prefix.color, bg: prefix.bg };
+  if (prefix) return { label: prefix.label, desc: prefix.desc, color: prefix.color, bg: prefix.bg };
   const mehr = navItems.find(i => !pinnedTabs.includes(i.to) && pathname.startsWith(i.to));
-  return { label: mehr?.label ?? "Mehr", color: MORE_COLOR, bg: MORE_BG };
+  return { label: mehr?.label ?? "Mehr", desc: mehr?.desc ?? "Weitere Bereiche", color: MORE_COLOR, bg: MORE_BG };
 }
 
 // Every surface (bottom bar, More sheet, sidebar) draws the SAME custom branded
@@ -85,15 +85,20 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
       onContextMenu={e => e.preventDefault()}
       style={{ transform: "translateZ(0)", willChange: "transform" }}
     >
-      {/* Context strip */}
+      {/* Context strip — section name plus a short subtitle for extra context */}
       <div
-        className="flex items-center gap-2 px-4 py-[7px]"
+        className="flex items-center gap-2 px-4 py-[6px]"
         style={{ background: editMode ? MORE_BG : ctx.bg, borderBottom: "1px solid rgba(0,0,0,.05)" }}
       >
         <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: editMode ? MORE_COLOR : ctx.color }} />
-        <span className="text-[13px] font-semibold leading-snug tracking-[0.01em]" style={{ color: editMode ? MORE_COLOR : ctx.color }}>
-          {editMode ? "Leiste anpassen" : ctx.label}
-        </span>
+        <div className="flex min-w-0 flex-col leading-tight">
+          <span className="truncate text-[13px] font-semibold leading-tight tracking-[0.01em]" style={{ color: editMode ? MORE_COLOR : ctx.color }}>
+            {editMode ? "Leiste anpassen" : ctx.label}
+          </span>
+          <span className="truncate text-[11px] font-medium leading-tight text-foreground/55">
+            {editMode ? "Icons ziehen oder entfernen" : ctx.desc}
+          </span>
+        </div>
       </div>
 
       {/* Icon rail */}

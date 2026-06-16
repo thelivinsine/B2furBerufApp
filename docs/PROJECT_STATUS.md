@@ -250,6 +250,11 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
 - Dashboard + the "Mehr" menu keep the brand indigo `#5b5be6` as the app/chrome anchor.
 - `nav-items.ts` still carries a lucide `icon` per route; `RouteIcon` falls back to it for any
   route without a custom mark. Reference sheet: `preview/route-icons-preview.svg`.
+- **Home/Mehr icon swap + richer context strip:** Home is now a house glyph (was the 2×2 grid),
+  and the "Mehr" menu took over the 2×2 grid (the classic apps/more glyph). The bottom-bar context
+  strip now shows the section name PLUS a short German subtitle (`desc` per `NavItem`) for context
+  instead of just the name. The strip is one line taller, so the More sheet overlay/padding were
+  nudged to keep clearance.
 - `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)

@@ -141,7 +141,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
             interactive. Tapping the dimmed area closes the sheet (saves). */}
         <DialogPrimitive.Overlay
           className="pointer-events-auto fixed inset-x-0 top-0 z-40 bg-black/40 backdrop-blur-sm data-[state=open]:animate-fade-in lg:hidden"
-          style={{ bottom: "calc(6rem + env(safe-area-inset-bottom))" }}
+          style={{ bottom: "calc(6.75rem + env(safe-area-inset-bottom))" }}
           onPointerDown={() => onOpenChange(false)}
         />
         <DialogPrimitive.Content

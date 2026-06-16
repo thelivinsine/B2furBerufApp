@@ -16,13 +16,11 @@ const BRAND = "#5b5be6";
 type Render = (c: string) => React.ReactNode;
 
 const RENDERERS: Record<string, Render> = {
-  // Dashboard — 2×2 grid of tiles
+  // Dashboard / Home — a house (roof + body with a doorway cutout)
   "/": c => (
     <>
-      <rect x="2"  y="2"  width="7" height="7" rx="1.6" fill={c} />
-      <rect x="11" y="2"  width="7" height="7" rx="1.6" fill={c} opacity=".72" />
-      <rect x="2"  y="11" width="7" height="7" rx="1.6" fill={c} opacity=".72" />
-      <rect x="11" y="11" width="7" height="7" rx="1.6" fill={c} opacity=".45" />
+      <path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill={c} />
+      <path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill={c} opacity=".82" />
     </>
   ),
   // Wortschatz — open book
@@ -150,12 +148,10 @@ export function RouteIcon({
 }
 
 // The "Mehr" overflow button is not a route, so it gets its own branded mark:
-// a 3×3 dot cluster in the brand indigo.
+// a 2×2 tile grid (the classic "more / apps" glyph) in the brand indigo.
 export const MORE_BRAND = BRAND;
 
 export function MoreIcon({ active = true, size = 24 }: { active?: boolean; size?: number }) {
-  const rows = [0, 1, 2];
-  const cols = [0, 1, 2];
   return (
     <svg
       width={size}
@@ -166,18 +162,10 @@ export function MoreIcon({ active = true, size = 24 }: { active?: boolean; size?
       className="transition-opacity"
       style={{ opacity: active ? 1 : 0.38 }}
     >
-      {rows.map(r =>
-        cols.map(col => (
-          <circle
-            key={`${r}-${col}`}
-            cx={5 + col * 5}
-            cy={5 + r * 5}
-            r={2.4}
-            fill={BRAND}
-            opacity={0.9 - (r * 3 + col) * 0.075}
-          />
-        )),
-      )}
+      <rect x="2"  y="2"  width="7" height="7" rx="1.6" fill={BRAND} />
+      <rect x="11" y="2"  width="7" height="7" rx="1.6" fill={BRAND} opacity=".72" />
+      <rect x="2"  y="11" width="7" height="7" rx="1.6" fill={BRAND} opacity=".72" />
+      <rect x="11" y="11" width="7" height="7" rx="1.6" fill={BRAND} opacity=".45" />
     </svg>
   );
 }
