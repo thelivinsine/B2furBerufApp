@@ -240,6 +240,7 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   branch a session is assigned, ship to production by opening a PR into `main` and merging (squash).
 - **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `pnpm build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.
 - **Documentation (REQUIRED after every significant task or series of tasks):** after shipping a feature, a content expansion, or a batch of UX fixes, update `docs/PROJECT_STATUS.md` — the session log, content counts, and "Resume here" section. Commit and push the doc update on the dev branch, then merge it to `main` like any other change. This keeps the status doc accurate for future sessions.
+- **Prompt & session log (REQUIRED for every founder prompt, added 2026-06-16):** append one entry per founder prompt to `docs/SESSION_PROMPT_LOG.md` (append-only, newest at the bottom) capturing the verbatim prompt, timestamp, branch, any attachments, a response summary, and the artifacts (files · commit SHAs · PR #s). This is the **authorship paper trail** for a possible copyright filing. Keep the detail there, not in this file. Do NOT paste secrets, and do NOT write the assistant's internal model identifier into the log (it is a committed artifact). Git history + merged PRs remain the primary record; the log is the human-readable supplement. See the file header for the full policy and entry template.
 
 ### Post-deploy GitHub housekeeping (REQUIRED after every squash-merge)
 Squash-merging rewrites history: `main` gets one new commit while the long-lived dev branch still holds the original unsquashed commits, so they diverge and the **next** PR conflicts (this bit us on PR #23). Run this realignment **every time** right after a merge:
@@ -256,4 +257,7 @@ Also: don't pre-write the next PR's `_Last updated`/log entry against a stale br
 - **`docs/EXPANSION_PLAN.md`** — approved phased plan (Phase 1: grammar/collocations/leveled
   quizzes, client-side; Phase 2: Supabase auth + cloud sync + AI writing coach). Next work = Phase 1.
 - **`docs/IMPLEMENTATION_PLAN.md`** — original from-scratch build plan (historical reference).
+- **`docs/SESSION_PROMPT_LOG.md`** — append-only paper trail of every founder prompt + response
+  (authorship record for a possible copyright filing). Append an entry for each prompt; see the
+  "Prompt & session log" rule under "Workflow notes".
 - Founder is **non-technical**; act as a decisive CTO who minimizes their ops burden and caps costs.
