@@ -23,6 +23,14 @@ authored commits) and the **merged pull requests**.
   `docs/PROJECT_STATUS.md` keeps the higher-level session narrative. Keep those lean; put the
   blow-by-blow here.
 
+### Automated raw capture
+A `UserPromptSubmit` hook (`.claude/hooks/log-prompt.sh`, wired in `.claude/settings.json`) appends
+one JSON line per prompt to **`docs/prompt-log-raw.jsonl`** — `{ts, branch, session_id, cwd,
+prompt}` — independent of this curated file. That JSONL is the tamper-evident machine record (every
+prompt verbatim, even ones not yet written up here); this Markdown file is the human-readable
+narrative with response summaries and artifacts. Because `.claude/` is created mid-session, the hook
+begins firing from the **next** session.
+
 ### Entry template
 ```
 ## Entry N — <YYYY-MM-DD HH:MM UTC>
@@ -147,3 +155,20 @@ backfilled from the same session's transcript so the trail is complete.)
   rule to CLAUDE.md's Workflow notes that points here. Suggested an optional `UserPromptSubmit` hook
   for tamper-resistant raw-prompt capture and noted that git history + PRs remain the primary record.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (new), `CLAUDE.md`. Shipped via PR #188.
+
+## Entry 8 — 2026-06-16 14:20 UTC
+- **Branch:** `claude/context-bar-menu-animations-g9gfd3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > yes, wire up the hook, and yes, I want to keep the prompt log and claude.md too in a private
+  > place if possible
+- **Response summary:** Added the `UserPromptSubmit` hook: `.claude/hooks/log-prompt.sh` (appends a
+  raw JSON line per prompt to `docs/prompt-log-raw.jsonl`, writes only to that file, never blocks)
+  and `.claude/settings.json` wiring it for all sessions; pipe-tested it. Documented the raw capture
+  in this file's header. For "private place": confirmed the repo is currently public and free GitHub
+  Pages requires a public repo, so making the source private has a hosting tradeoff; asked the
+  founder to choose between making the repo private (Cloudflare Pages migration, or GitHub Pro), or
+  moving only the logs to a separate private repo.
+- **Artifacts:** `.claude/settings.json` (new), `.claude/hooks/log-prompt.sh` (new),
+  `docs/SESSION_PROMPT_LOG.md`, `CLAUDE.md`. Privacy approach pending founder decision.
