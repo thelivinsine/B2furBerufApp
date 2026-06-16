@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-16 (session 24). Branch: `claude/vibrant-meitner-mfl9xk`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-16 (session 25). Branch: `claude/icon-color-consistency-05e2i0`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -255,7 +255,14 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   strip now shows the section name PLUS a short German subtitle (`desc` per `NavItem`) for context
   instead of just the name. The strip is one line taller, so the More sheet overlay/padding were
   nudged to keep clearance.
-- `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green.
+- **More sheet overlap fix:** the sheet's bottom padding equalled the bar height, so the last icon
+  row's labels overlapped the bar's context strip. Bumped padding so the grid lifts clear.
+- **Uniform icon optical size:** each mark was drawn freehand on the 20×20 grid with a different
+  inked area (filled Quiz disc ~17px vs speech bubble ~13px), so they looked like different sizes.
+  Added a `NORM` map + `normTransform` in `route-icons.tsx` that scales each mark's bounding box to
+  a centred 16-unit target with a per-mark weight (so heavy filled shapes don't read larger). Tune
+  sizes via that map. CLAUDE.md "Icon color rule" updated to match the new all-custom-SVG setup.
+- `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green. Shipped via PRs #178–#182.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
 - **Sign-up honesty fix (PR #19, merged):** sign-up no longer falsely reports success when email
