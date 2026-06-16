@@ -26,9 +26,10 @@ function fullOrder(saved: string[]): string[] {
 }
 
 function EditGridIcon({
-  item, atMax, dragId, onReorder, onAdd, onDragStart, onDragEnd, registerRef,
+  item, idx, atMax, dragId, onReorder, onAdd, onDragStart, onDragEnd, registerRef,
 }: {
   item: NavItem;
+  idx: number;
   atMax: boolean;
   dragId: string | null;
   onReorder: (path: string, info: PanInfo) => void;
@@ -41,13 +42,16 @@ function EditGridIcon({
   const isDragging = dragId === to;
 
   return (
+    // `layout` drives the sibling-slide on add/remove. Enter/exit is opacity-only
+    // (no scale): animating a transform on a layout element fights framer's
+    // projection and was freezing the jiggle until the next re-render.
     <motion.div
       layout
       ref={el => registerRef(to, el)}
-      initial={{ scale: 0.6, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      exit={{ scale: 0.6, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 500, damping: 38 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
       style={{ zIndex: isDragging ? 50 : 1, position: "relative" }}
       className="flex flex-col items-center gap-2"
     >
@@ -68,8 +72,10 @@ function EditGridIcon({
         <motion.div
           className="relative flex h-16 w-full items-center justify-center rounded-2xl"
           style={{ background: bg }}
-          animate={isDragging ? { rotate: 0 } : { rotate: [-1.5, 1.5, -1.5] }}
-          transition={isDragging ? { duration: 0.15 } : { repeat: Infinity, duration: 0.5, ease: "easeInOut" }}
+          animate={isDragging ? { rotate: 0 } : { rotate: [-2.5, 2.5, -2.5] }}
+          transition={isDragging
+            ? { duration: 0.15 }
+            : { repeat: Infinity, duration: 0.45, ease: "easeInOut", delay: idx * 0.05 }}
         >
           <RouteIcon path={to} size={32} active />
 
@@ -223,12 +229,13 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
 
           {editMode ? (
             /* ── Edit mode: icons jiggle; drag to reorder, tap + to add to bar ── */
-            <motion.div layout className="grid grid-cols-3 gap-x-3 gap-y-5">
+            <div className="grid grid-cols-3 gap-x-3 gap-y-5">
               <AnimatePresence initial={false}>
-                {nonPinnedItems.map(item => (
+                {nonPinnedItems.map((item, idx) => (
                   <EditGridIcon
                     key={item.to}
                     item={item}
+                    idx={idx}
                     atMax={atMax}
                     dragId={dragId}
                     onReorder={reorderDuringDrag}
@@ -239,7 +246,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
                   />
                 ))}
               </AnimatePresence>
-            </motion.div>
+            </div>
           ) : (
             /* ── Normal mode: clean icon grid, tap to navigate ── */
             <nav className="grid grid-cols-3 gap-x-3 gap-y-5">
@@ -285,11 +292,6 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
           {editMode && atMax && nonPinnedItems.length > 0 && (
             <p className="mt-4 text-center text-[12px] text-muted-foreground">
               Leiste voll (max. 4). Erst ein Icon entfernen.
-            </p>
-          )}
-          {editMode && !atMax && nonPinnedItems.length > 0 && (
-            <p className="mt-4 text-center text-[12px] text-muted-foreground">
-              Ziehen zum Sortieren. Auf das Plus tippen, um zur Leiste hinzuzufügen.
             </p>
           )}
         </DialogPrimitive.Content>

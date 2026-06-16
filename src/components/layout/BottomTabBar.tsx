@@ -117,10 +117,10 @@ export function BottomTabBar({ onMore, onLongPress, editMode, moreOpen }: Props)
                       key={path}
                       value={path}
                       as="div"
-                      initial={{ scale: 0.4, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.4, opacity: 0 }}
-                      transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.18 }}
                       className="flex flex-1 p-1"
                       style={{ touchAction: "none" }}
                     >
