@@ -154,7 +154,9 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
             "fixed inset-x-0 bottom-0 z-50 max-h-[75dvh]",
             editMode ? "overflow-visible" : "overflow-y-auto",
             "rounded-t-2xl border-t border-x-0 border-b-0 border-border bg-surface px-5 pt-3",
-            "pb-[calc(5.75rem+env(safe-area-inset-bottom))]",
+            // Clear the bottom tab bar (~5.75rem tall) with extra breathing room so the
+            // last row's labels never sit under the bar's context strip.
+            "pb-[calc(7.75rem+env(safe-area-inset-bottom))]",
             "data-[state=open]:animate-slide-up lg:hidden",
           )}
           onContextMenu={e => e.preventDefault()}
