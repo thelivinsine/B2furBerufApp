@@ -35,6 +35,7 @@ export async function buildExport(): Promise<Record<string, unknown>> {
         supabase
           .from("writing_evaluations")
           .select("*")
+          .eq("user_id", user.id)
           .order("created_at", { ascending: false }),
       ]);
       cloud = {

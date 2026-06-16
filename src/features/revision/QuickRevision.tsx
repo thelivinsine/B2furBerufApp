@@ -118,7 +118,19 @@ export function QuickRevision() {
           <Progress value={(index / total) * 100} />
         </div>
 
-        <div className="[perspective:1200px]" onClick={() => setFlipped((f) => !f)}>
+        <div
+          className="[perspective:1200px]"
+          role="button"
+          tabIndex={0}
+          aria-label="Karte umdrehen"
+          onClick={() => setFlipped((f) => !f)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setFlipped((f) => !f);
+            }
+          }}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={card.id}

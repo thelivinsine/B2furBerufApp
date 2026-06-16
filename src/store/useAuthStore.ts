@@ -7,6 +7,11 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 
 type AuthStatus = "loading" | "anonymous" | "signedIn" | "signedOut";
 
+/** Turnstile is active only when a site key is configured (matches the auth UI).
+ *  When active, guest sign-in must carry a captcha token so the AI budget can't
+ *  be drained by automated anonymous sign-ups. Dormant in dev/CI (no key). */
+export const TURNSTILE_ENABLED = !!import.meta.env.VITE_TURNSTILE_SITE_KEY;
+
 interface AuthState {
   session: Session | null;
   user: User | null;
@@ -83,6 +88,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   signInAsGuest: async (captchaToken) => {
+    if (TURNSTILE_ENABLED && !captchaToken) {
+      set({ error: "Bitte bestätige zuerst die Sicherheitsprüfung." });
+      return;
+    }
     set({ busy: true, error: null });
     const { error } = await supabase.auth.signInAnonymously(
       captchaToken ? { options: { captchaToken } } : undefined,

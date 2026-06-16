@@ -14,7 +14,7 @@ export function review(card: SrsCard, grade: Grade, on: Date = new Date()): SrsC
   let { ease, interval, reps } = card;
 
   if (grade < 3) {
-    // Lapse — reset reps, short relearning step.
+    // Lapse: reset reps, short relearning step.
     reps = 0;
     interval = 1;
   } else {
@@ -22,11 +22,12 @@ export function review(card: SrsCard, grade: Grade, on: Date = new Date()): SrsC
     if (reps === 1) interval = 1;
     else if (reps === 2) interval = 4;
     else interval = Math.round(interval * ease);
-
-    // Adjust ease factor per SM-2.
-    ease = ease + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
-    ease = Math.max(1.3, ease);
   }
+
+  // Adjust ease factor per SM-2. This applies on every review, including a
+  // lapse, so a repeatedly failed card loses ease and resurfaces sooner.
+  ease = ease + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02));
+  ease = Math.max(1.3, ease);
 
   const next = new Date(on);
   next.setDate(next.getDate() + interval);
