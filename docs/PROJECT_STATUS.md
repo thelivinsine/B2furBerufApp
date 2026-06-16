@@ -1432,6 +1432,11 @@ All changes shipped as PR #175 + docs PR #176, both squash-merged to `main`.
    - Move `genauly.de` DNS from Namecheap to Cloudflare nameservers.
    - Verify Google OAuth redirect URI still works post-DNS change.
    - Update `pages.yml` or remove it if GitHub Pages deploy is retired.
+   - **Privacy bonus (decided s26):** making the repo private here is also how the founder wants the
+     prompt/session logs (`docs/SESSION_PROMPT_LOG.md` + `docs/prompt-log-raw.jsonl`) and `CLAUDE.md`
+     made private. The founder chose this over a separate private repo for the logs, so until this
+     migration lands the repo (and new log entries) stay public. Switch the repo to **private** as
+     part of this migration.
 2. **GDPR follow-ups (from s20 pass):** fill the **Impressum** name/address (then re-enable the page
    per `CLAUDE.md`/`PHASE2_SETUP.md`) and the **data-location region** placeholder in the privacy
    policy; optionally enable the **pg_cron auto-retention** for writing text (SQL in `PHASE2_SETUP.md`).

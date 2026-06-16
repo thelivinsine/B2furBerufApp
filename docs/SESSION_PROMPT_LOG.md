@@ -172,3 +172,20 @@ backfilled from the same session's transcript so the trail is complete.)
   moving only the logs to a separate private repo.
 - **Artifacts:** `.claude/settings.json` (new), `.claude/hooks/log-prompt.sh` (new),
   `docs/SESSION_PROMPT_LOG.md`, `CLAUDE.md`. Privacy approach pending founder decision.
+
+## Entry 9 — 2026-06-16 14:36 UTC
+- **Branch:** `claude/context-bar-menu-animations-g9gfd3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > anyway there is a backlog item to migrate the whole repo to cloudflare, is additional private
+  > repo to store the log files necessary?
+- **Response summary:** Confirmed a separate private repo is NOT needed. The founder picked "private
+  repo + Cloudflare (free)", which matches the already-planned Cloudflare Pages migration (backlog,
+  see PROJECT_STATUS "Resume here" item 1, decided s22): that migration takes the whole repo private,
+  carrying CLAUDE.md + both logs with it. Cross-referenced this on the backlog item and noted the
+  repo (and new log entries) stay public until the migration lands. Also refined the hook to skip
+  empty/non-text submissions (tool results, question answers) so the trail only records real
+  messages, and committed the first real raw-capture line.
+- **Artifacts:** `.claude/hooks/log-prompt.sh`, `docs/prompt-log-raw.jsonl` (first commit),
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Shipped via PR #190.
