@@ -75,12 +75,12 @@ below is locked. **Do not change structure, edit-mode behavior, or icon rules wi
 founder request.**
 
 ### Layout
-- Fixed bottom bar with a single **icon rail** (70px tall; icons render at 32px, matching the More
+- Fixed bottom bar with a single **icon rail** (63px tall; icons render at 29px, matching the More
   sheet). The old **context strip** (the label row above the icons that showed the section name +
   subtitle) was **removed in s26**: each section already renders its own title at the top of the
   page, so it was redundant. The `desc` field on `NavItem` stays for reuse (landing/marketing copy)
-  but is no longer shown in the bar. The More sheet's overlay `bottom` (`4.375rem`), its bottom
-  padding (`6.25rem`), and the `.pb-nav` utility are all sized for the single-rail bar; keep them in
+  but is no longer shown in the bar. The More sheet's overlay `bottom` (`3.9375rem`), its bottom
+  padding (`5.75rem`), and the `.pb-nav` utility are all sized for the single-rail bar; keep them in
   sync if the rail height changes.
 - **Mehr selection (s26):** the Mehr tab shows its selected state (indigo pill + underline) while
   the More sheet is open, and the pinned tabs drop their highlight so the selection clearly sits on

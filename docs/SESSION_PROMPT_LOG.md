@@ -189,3 +189,17 @@ backfilled from the same session's transcript so the trail is complete.)
   messages, and committed the first real raw-capture line.
 - **Artifacts:** `.claude/hooks/log-prompt.sh`, `docs/prompt-log-raw.jsonl` (first commit),
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Shipped via PR #190.
+
+## Entry 10 — 2026-06-16 17:21 UTC
+- **Branch:** `claude/context-bar-menu-animations-g9gfd3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the icons and the navigation bar seem a bit too big now. can you decrease the size by 10% roughly?
+- **Response summary:** Scaled the mobile bottom nav down ~10%: rail height 70px → 63px and icons
+  29px in both the bar and the More sheet (down from 32px). Re-tuned the dependent clearances (More
+  sheet overlay `bottom` 4.375rem → 3.9375rem, sheet padding 6.25rem → 5.75rem, `.pb-nav`
+  4.375rem → 3.9375rem) and updated the CLAUDE.md measurements. `pnpm build` green. (Preceded by two
+  "continue" prompts that just asked me to finish merging the in-flight PR #190, which I did.)
+- **Artifacts:** `BottomTabBar.tsx`, `MoreSheet.tsx`, `index.css`, `CLAUDE.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Shipped via PR #191.
