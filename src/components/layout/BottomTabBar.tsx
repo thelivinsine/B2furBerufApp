@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Reorder, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { X } from "lucide-react";
 import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
 import type { NavItem } from "./nav-items";
@@ -8,11 +8,8 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 
 const MORE_COLOR = "#5b5be6";
 const MORE_BG    = "rgba(91,91,230,.08)";
+const IZ = 29; // icon size
 
-// Icon glyph size (~20% larger than the original for Duolingo-style readability).
-const IZ = 29;
-
-// ── Context strip metadata for any path ───────────────────────
 function getContextMeta(pathname: string, pinnedTabs: string[]) {
   const exact = navItems.find(i => i.to === pathname);
   if (exact) return { label: exact.label, color: exact.color, bg: exact.bg };
@@ -21,8 +18,6 @@ function getContextMeta(pathname: string, pinnedTabs: string[]) {
   const mehr = navItems.find(i => !pinnedTabs.includes(i.to) && pathname.startsWith(i.to));
   return { label: mehr?.label ?? "Mehr", color: MORE_COLOR, bg: MORE_BG };
 }
-
-// ── Custom SVG icons ───────────────────────────────────────────
 
 function IcoDashboard({ active }: { active: boolean }) {
   return (
@@ -34,25 +29,21 @@ function IcoDashboard({ active }: { active: boolean }) {
     </svg>
   );
 }
-
 function IcoBook({ active }: { active: boolean }) {
   return (
     <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
       <path d="M10 2.5C7.5 1.5 4.5 1.5 2 2.5V17.5c2.5-1 5.5-1 8 0V2.5Z" fill="#5b5be6" />
       <path d="M10 2.5c2.5-1 5.5-1 8 0V17.5c-2.5-1-5.5-1-8 0V2.5Z" fill="#10b7cf" />
-      {active && (
-        <>
-          <line x1="4.5"  y1="7"   x2="8.5"  y2="7"   stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.7} />
-          <line x1="4.5"  y1="10"  x2="8.5"  y2="10"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
-          <line x1="4.5"  y1="13"  x2="8.5"  y2="13"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.35} />
-          <line x1="11.5" y1="7"   x2="15.5" y2="7"   stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
-          <line x1="11.5" y1="10"  x2="15.5" y2="10"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.35} />
-        </>
-      )}
+      {active && (<>
+        <line x1="4.5" y1="7"  x2="8.5"  y2="7"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.7} />
+        <line x1="4.5" y1="10" x2="8.5"  y2="10" stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
+        <line x1="4.5" y1="13" x2="8.5"  y2="13" stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.35} />
+        <line x1="11.5" y1="7" x2="15.5" y2="7"  stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.5} />
+        <line x1="11.5" y1="10" x2="15.5" y2="10" stroke="white" strokeWidth="1" strokeLinecap="round" opacity={.35} />
+      </>)}
     </svg>
   );
 }
-
 function IcoQuiz({ active }: { active: boolean }) {
   return (
     <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
@@ -61,7 +52,6 @@ function IcoQuiz({ active }: { active: boolean }) {
     </svg>
   );
 }
-
 function IcoAnalytics({ active }: { active: boolean }) {
   return (
     <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
@@ -71,7 +61,6 @@ function IcoAnalytics({ active }: { active: boolean }) {
     </svg>
   );
 }
-
 function IcoMore({ active }: { active: boolean }) {
   return (
     <svg width={IZ} height={IZ} viewBox="0 0 20 20" fill="none" aria-hidden="true" opacity={active ? 1 : 0.38}>
@@ -100,15 +89,9 @@ function TabIcon({ path, active, color }: { path: string; active: boolean; color
   const item = navItems.find(i => i.to === path);
   if (!item) return null;
   const Icon = item.icon;
-  return (
-    <Icon
-      className="transition-opacity"
-      style={{ color, opacity: active ? 1 : 0.38, width: IZ, height: IZ }}
-    />
-  );
+  return <Icon className="transition-opacity" style={{ color, opacity: active ? 1 : 0.38, width: IZ, height: IZ }} />;
 }
 
-// ── Component ──────────────────────────────────────────────────
 interface Props {
   onMore: () => void;
   onLongPress: () => void;
@@ -120,97 +103,73 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
   const pathname      = location.pathname;
   const pinnedRaw     = useSettingsStore(s => s.pinnedTabs);
   const setPinnedTabs = useSettingsStore(s => s.setPinnedTabs);
+  // Read store directly — no localOrder buffer. This ensures any external
+  // change (e.g. MoreSheet adding a tab) is reflected here immediately.
   const pinnedTabs    = pinnedRaw && pinnedRaw.length > 0 ? pinnedRaw : DEFAULT_PINNED_TABS;
 
-  // Local drag-order mirrors the store; stays in sync when not in the middle of a drag.
-  const [localOrder, setLocalOrder] = useState<string[]>(pinnedTabs);
-  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    if (!editMode) setLocalOrder(pinnedTabs);
-  }, [pinnedTabs, editMode]);
+  const longPressRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const moreActive  = !pinnedTabs.includes(pathname);
   const ctx         = getContextMeta(pathname, pinnedTabs);
-
-  const displayOrder = editMode ? localOrder : pinnedTabs;
-  const displayTabs  = displayOrder
+  const displayTabs = pinnedTabs
     .map(path => navItems.find(i => i.to === path))
     .filter((i): i is NavItem => i != null);
 
-  // Moveable bar tabs = all pinned tabs except "/" (home, fixed first position).
-  const moveablePaths = displayOrder.filter(p => p !== "/");
+  // "/" (Home) is always fixed first — only the others are reorderable.
+  const moveablePaths = pinnedTabs.filter(p => p !== "/");
 
   function handleReorder(newMoveable: string[]) {
-    const next = ["/", ...newMoveable];
-    setLocalOrder(next);
-    setPinnedTabs(next);
+    setPinnedTabs(["/", ...newMoveable]);
   }
 
   function removeFromBar(path: string) {
-    // Min 2 total (home always counts, so at least 1 other must remain).
-    if (localOrder.length <= 2) return;
-    const next = localOrder.filter(t => t !== path);
-    setLocalOrder(next);
-    setPinnedTabs(next);
+    if (pinnedTabs.length <= 2) return; // keep at least home + 1 other
+    setPinnedTabs(pinnedTabs.filter(t => t !== path));
   }
 
   function startLongPress() {
-    if (editMode) return; // already editing; let drags/taps through
+    if (editMode) return;
     longPressRef.current = setTimeout(() => {
       try { navigator.vibrate(40); } catch { /* not available */ }
       onLongPress();
     }, 600);
   }
   function cancelLongPress() {
-    if (longPressRef.current) {
-      clearTimeout(longPressRef.current);
-      longPressRef.current = null;
-    }
+    if (longPressRef.current) { clearTimeout(longPressRef.current); longPressRef.current = null; }
   }
 
   return (
     <nav
       id="bottom-tab-bar"
-      // no-callout: defined in index.css; cascades to all <a> children via *
-      // to suppress the iOS Safari link-preview popup on long-press.
       className="no-callout fixed bottom-0 inset-x-0 z-[60] flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
       onContextMenu={e => e.preventDefault()}
       style={{ transform: "translateZ(0)", willChange: "transform" }}
     >
-
-      {/* ── Context strip ── */}
+      {/* Context strip */}
       <div
         className="flex items-center gap-2 px-4 py-[7px]"
         style={{ background: editMode ? MORE_BG : ctx.bg, borderBottom: "1px solid rgba(0,0,0,.05)" }}
       >
-        <span
-          className="h-1.5 w-1.5 shrink-0 rounded-full"
-          style={{ background: editMode ? MORE_COLOR : ctx.color }}
-        />
-        <span
-          className="text-[13px] font-semibold leading-snug tracking-[0.01em]"
-          style={{ color: editMode ? MORE_COLOR : ctx.color }}
-        >
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: editMode ? MORE_COLOR : ctx.color }} />
+        <span className="text-[13px] font-semibold leading-snug tracking-[0.01em]" style={{ color: editMode ? MORE_COLOR : ctx.color }}>
           {editMode ? "Leiste anpassen" : ctx.label}
         </span>
       </div>
 
-      {/* ── Icon rail ── */}
+      {/* Icon rail */}
       <div
         className="flex h-[62px] items-stretch"
         onTouchStart={startLongPress}
         onTouchMove={cancelLongPress}
         onTouchEnd={cancelLongPress}
       >
-
         {editMode ? (
           <>
-            {/* Home — always fixed first, no badge */}
+            {/* Home — always fixed, no badge */}
             {(() => {
               const home = navItems.find(i => i.to === "/")!;
               return (
-                <div key="/" className="flex flex-1 p-1">
+                <div className="flex flex-1 p-1">
                   <div className="flex flex-1 items-center justify-center rounded-xl">
                     <TabIcon path="/" active={false} color={home.color} />
                   </div>
@@ -218,17 +177,15 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
               );
             })()}
 
-            {/* Moveable pinned tabs — drag to reorder, X to send to sheet.
-                flexGrow matches the icon count so each icon keeps the same
-                width as Home/Mehr (which are flex-1). Without this the group
-                would be a single flex-1 slot and the icons would bunch up. */}
+            {/* Reorderable pinned tabs.
+                flexGrow = icon count keeps each slot the same width as Home/Mehr. */}
             <Reorder.Group
               axis="x"
               values={moveablePaths}
               onReorder={handleReorder}
+              as="div"
               className="flex"
               style={{ flexGrow: moveablePaths.length, flexShrink: 1, flexBasis: 0 }}
-              as="div"
             >
               {moveablePaths.map((path, idx) => {
                 const item = navItems.find(i => i.to === path);
@@ -248,12 +205,9 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
                       transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.08, ease: "easeInOut" }}
                     >
                       <TabIcon path={path} active={false} color={color} />
-                      {localOrder.length > 2 && (
+                      {pinnedTabs.length > 2 && (
                         <button
                           type="button"
-                          // stop the drag gesture from claiming this press, then
-                          // remove on the click so framer-motion's pointer session
-                          // doesn't swallow the state change.
                           onPointerDownCapture={e => e.stopPropagation()}
                           onPointerDown={e => e.stopPropagation()}
                           onClick={e => { e.stopPropagation(); removeFromBar(path); }}
@@ -269,7 +223,7 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
               })}
             </Reorder.Group>
 
-            {/* Mehr — fixed last, no badge, opens the sheet to add more icons */}
+            {/* Mehr — fixed last, opens sheet to add icons */}
             <button onClick={onMore} aria-label="Mehr" className="flex flex-1 p-1">
               <div className="flex flex-1 items-center justify-center rounded-xl">
                 <IcoMore active={false} />
@@ -277,14 +231,11 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
             </button>
           </>
         ) : (
-          /* ── Normal mode ── */
+          /* Normal mode */
           <>
             {displayTabs.map(({ to, end, label, color, bg }) => (
               <NavLink
-                key={to}
-                to={to}
-                end={end}
-                aria-label={label}
+                key={to} to={to} end={end} aria-label={label}
                 className="flex flex-1 p-1"
                 onContextMenu={e => e.preventDefault()}
               >
@@ -295,16 +246,13 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
                   >
                     <TabIcon path={to} active={isActive} color={color} />
                     {isActive && (
-                      <span
-                        className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
-                        style={{ height: 3, background: color }}
-                      />
+                      <span className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
+                        style={{ height: 3, background: color }} />
                     )}
                   </div>
                 )}
               </NavLink>
             ))}
-
             <button onClick={onMore} aria-label="Mehr" className="flex flex-1 p-1">
               <div
                 className="relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150"
@@ -312,16 +260,13 @@ export function BottomTabBar({ onMore, onLongPress, editMode }: Props) {
               >
                 <IcoMore active={moreActive} />
                 {moreActive && (
-                  <span
-                    className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
-                    style={{ height: 3, background: MORE_COLOR }}
-                  />
+                  <span className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
+                    style={{ height: 3, background: MORE_COLOR }} />
                 )}
               </div>
             </button>
           </>
         )}
-
       </div>
     </nav>
   );
