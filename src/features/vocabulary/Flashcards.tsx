@@ -74,7 +74,9 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
 
   const grade = (g: Grade) => {
     reviewVocab(card.id, g);
-    addXp(g >= 5 ? XP.flashcardEasy : XP.flashcard);
+    // A lapse ("Again", grade < 3) earns no XP: failing a card shouldn't grant
+    // more than getting it "Easy". Successful recalls reward effort (Good > Easy).
+    addXp(g < 3 ? 0 : g >= 5 ? XP.flashcardEasy : XP.flashcard);
     const nextReviewed = reviewed + 1;
     setReviewed(nextReviewed);
     if (index + 1 >= queue.length) {

@@ -1,5 +1,5 @@
 import { supabase } from "@/lib/supabase";
-import { useAuthStore } from "@/store/useAuthStore";
+import { TURNSTILE_ENABLED, useAuthStore } from "@/store/useAuthStore";
 import type { ThemeId, WeaknessCategory } from "@/types";
 
 export interface WritingHistoryEntry {
@@ -81,6 +81,15 @@ export async function evaluateWriting(input: {
 }): Promise<WritingEvalResult> {
   const auth = useAuthStore.getState();
   if (auth.status === "signedOut" || !auth.session) {
+    // When Turnstile is active, guest sign-in needs a captcha token we can't
+    // obtain silently here. Send the learner through the captcha-gated auth UI
+    // instead of failing the anonymous sign-in opaquely.
+    if (TURNSTILE_ENABLED) {
+      return {
+        ok: false,
+        message: "Bitte melde dich an, um die Schreibbewertung zu nutzen.",
+      };
+    }
     await auth.signInAsGuest();
   }
 

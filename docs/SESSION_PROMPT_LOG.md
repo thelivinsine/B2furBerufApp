@@ -222,3 +222,32 @@ backfilled from the same session's transcript so the trail is complete.)
   scroll container is created and the sticky header is unaffected). `pnpm build` green.
 - **Artifacts:** `src/index.css`, `docs/SESSION_PROMPT_LOG.md`. Shipped via PR (merge SHA in git
   history).
+
+## Entry 12 — 2026-06-16 22:47 UTC
+- **Branch:** `claude/app-audit-testing-bqrdkj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > I want you to do a thorough audit of all the functionalities, front end and back end checks to
+  > find out any inconsistencies. errorrs, glitches that are in the app. perform all necessary test
+  > cases and apply the fixes.
+- **Response summary:** Ran a full audit (build, typecheck, content lint, plus a deep read of the
+  engine, stores, components, data banks, and Supabase layer). Headline: the app is healthy, no hard
+  errors, lint/build/typecheck all green. Applied the genuine fixes the audit surfaced: (1) added the
+  missing `.eq("user_id")` filter to the data-export `writing_evaluations` query for consistency with
+  its siblings; (2) added `Access-Control-Max-Age` to both Edge Function CORS responses; (3) gave the
+  exam free-text input an `aria-label`; (4) made the QuickRevision flip card keyboard-accessible
+  (`role`/`tabIndex`/Enter+Space); (5) stopped flashcard XP from rewarding a failed "Again" with the
+  full review XP; (6) corrected the SRS scheduler to lower the ease factor on a lapse (true SM-2);
+  (8) gated guest sign-in behind a captcha token when Turnstile is configured, and routed the writing
+  flow through the captcha-gated auth UI instead of a silent guest creation in that case. Dropped the
+  planned "scoring 70% baseline" change after verifying `examSets.ts` has zero quality-scored options:
+  the 70% is the intended exam participation credit, not a fabricated score, and real dialogues always
+  carry quality options so the default is never hit for them. Documented several agent findings as
+  verified non-issues (MoreSheet padding is intentional, flashcard Easy/Good ordering is correct).
+  `pnpm build`, `pnpm typecheck`, and `pnpm lint:content` all green.
+- **Artifacts:** `src/lib/dataExport.ts`, `supabase/functions/evaluate-writing/index.ts`,
+  `supabase/functions/delete-account/index.ts`, `src/features/exam/ExamRunner.tsx`,
+  `src/features/revision/QuickRevision.tsx`, `src/features/vocabulary/Flashcards.tsx`,
+  `src/engine/srs.ts`, `src/store/useAuthStore.ts`, `src/lib/writing.ts`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Shipped via PR (merge SHA in git history).

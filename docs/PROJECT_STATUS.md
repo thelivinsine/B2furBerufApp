@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-16 (session 26). Branch: `claude/context-bar-menu-animations-g9gfd3`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-16 (session 27). Branch: `claude/app-audit-testing-bqrdkj`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -306,6 +306,35 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   `overscroll-behavior-x: none` to `html` in `src/index.css` (`clip`, not `hidden`, so no scroll
   container is created and the sticky header is untouched) (PR #192).
 - `pnpm build` + `pnpm lint:content` green. Branch `claude/context-bar-menu-animations-g9gfd3`.
+
+### Session 27 (2026-06-16) — Full app audit + targeted fixes
+- **Audit headline: the app is healthy.** `pnpm build`, `pnpm typecheck`, and `pnpm lint:content`
+  all pass with zero errors (only the known ~159 provenance back-fill warnings). No crashes, broken
+  routes, duplicate IDs, broken dialogue branches, missing content, or em dashes in user copy.
+  Content counts all match (490 vocab, 120 collocations, 10 grammar topics/47 drills, 769 provenance
+  rows); consent version matches the legal `LAST_UPDATED` date.
+- **Fixes applied:**
+  - `dataExport.ts`: added the missing `.eq("user_id", user.id)` to the `writing_evaluations` query
+    so it matches its sibling queries (RLS already enforced it; this is consistency + defense-in-depth).
+  - Both Edge Functions (`evaluate-writing`, `delete-account`): added `Access-Control-Max-Age: 86400`
+    so browsers cache the CORS preflight (fewer OPTIONS round-trips).
+  - `ExamRunner.tsx`: gave the free-text answer input an `aria-label`.
+  - `QuickRevision.tsx`: made the flip card keyboard-accessible (`role="button"`, `tabIndex`, Enter/Space).
+  - `Flashcards.tsx`: a lapsed card ("Again", grade < 3) no longer earns the full review XP (it earned
+    more than an "Easy" recall before). Successful recalls still reward effort (Good 6 > Easy 4).
+  - `srs.ts`: the SM-2 ease factor now decreases on a lapse (it was only updated on success), so a
+    repeatedly failed card loses ease and resurfaces sooner.
+  - Guest sign-in is now gated behind a captcha token **when Turnstile is configured**
+    (`VITE_TURNSTILE_SITE_KEY`): `useAuthStore.signInAsGuest` refuses without a token, and the writing
+    flow (`writing.ts`) routes signed-out users through the captcha-gated auth UI instead of a silent
+    guest creation. Dormant (no behavior change) until a site key is set, then closes the
+    anonymous-signup AI-budget abuse vector.
+- **Verified non-issues (not changed):** the MoreSheet `5.75rem` padding is intentional; the
+  flashcard Easy(4) < Good(6) ordering is correct (effort-based). Dropped a planned "scoring 70%
+  baseline" change after confirming `examSets.ts` has zero quality-scored options: that 70% is the
+  intended exam participation credit, and real dialogues always carry quality options, so the default
+  is never hit for them. Changing it would have wrongly dropped every exam score by ~28 points.
+- `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green. Branch `claude/app-audit-testing-bqrdkj`.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
 - **Sign-up honesty fix (PR #19, merged):** sign-up no longer falsely reports success when email
