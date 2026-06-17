@@ -147,10 +147,12 @@ function normTransform(box: [number, number, number, number], weight: number): s
 export function RouteIcon({
   path,
   size = 24,
-  active = true,
 }: {
   path: string;
   size?: number;
+  // Accepted for call-site compatibility but no longer dims the icon: every
+  // icon renders at full opacity. The active tab is marked by its background
+  // pill + underline (bar), highlight (More sheet) or row styling (sidebar).
   active?: boolean;
 }) {
   const item = navItems.find(i => i.to === path);
@@ -161,7 +163,7 @@ export function RouteIcon({
     // Safety net: any route without a custom mark falls back to its lucide icon.
     const Icon = item?.icon;
     if (!Icon) return null;
-    return <Icon style={{ color, opacity: active ? 1 : 0.38, width: size, height: size }} />;
+    return <Icon style={{ color, width: size, height: size }} />;
   }
 
   const norm = NORM[path];
@@ -173,8 +175,6 @@ export function RouteIcon({
       viewBox="0 0 20 20"
       fill="none"
       aria-hidden="true"
-      className="transition-opacity"
-      style={{ opacity: active ? 1 : 0.38 }}
     >
       {norm ? <g transform={normTransform(norm.box, norm.weight)}>{render(color)}</g> : render(color)}
     </svg>
@@ -185,7 +185,7 @@ export function RouteIcon({
 // a 2×2 tile grid (the classic "more / apps" glyph) in the brand indigo.
 export const MORE_BRAND = BRAND;
 
-export function MoreIcon({ active = true, size = 24 }: { active?: boolean; size?: number }) {
+export function MoreIcon({ size = 24 }: { active?: boolean; size?: number }) {
   return (
     <svg
       width={size}
@@ -193,8 +193,6 @@ export function MoreIcon({ active = true, size = 24 }: { active?: boolean; size?
       viewBox="0 0 20 20"
       fill="none"
       aria-hidden="true"
-      className="transition-opacity"
-      style={{ opacity: active ? 1 : 0.38 }}
     >
       <g transform={normTransform([2, 2, 16, 16], 0.95)}>
         <rect x="2"  y="2"  width="7" height="7" rx="1.6" fill={BRAND} />
