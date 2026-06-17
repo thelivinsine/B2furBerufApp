@@ -101,6 +101,9 @@ founder request.**
   same mark and colour render on every surface: bottom tab bar, More sheet, and desktop `Sidebar`.
   (This replaced the old split where only four "hero" routes had custom SVGs and the rest used
   lucide.) `nav-items.ts` still carries a lucide `icon` per route purely as a `RouteIcon` fallback.
+  **Exception (s27):** the Wortschatz book is intentionally **two-tone** (indigo `#5b5be6` spine +
+  cyan `#10b7cf` right page), matching the F2 "Per-section Color" preview, so it ignores its route
+  accent. Every other mark still uses a single accent with opacity layers.
 - Marks are normalised to a common **optical size** (`NORM` map + `normTransform` in
   `route-icons.tsx`): each mark's bounding box is scaled to a centred 16-unit target with a
   per-mark weight, so a filled disc doesn't read larger than an airy glyph. Re-tune via that map.
