@@ -320,4 +320,27 @@ backfilled from the same session's transcript so the trail is complete.)
   grid icon 0.95 → 1.0. Padding and the selection cloud/pill were untouched. `pnpm build` +
   `pnpm typecheck` green.
 - **Artifacts:** `src/components/layout/route-icons.tsx`, `docs/SESSION_PROMPT_LOG.md`. Shipped via
-  PR (merge SHA in git history).
+  PR #198 (merge `fb8cd01`).
+
+## Entries 17–19 — 2026-06-17 ~06:50–06:56 UTC (icon color thread)
+- **Branch:** `claude/app-audit-testing-bqrdkj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** entry 19 included a screenshot of the F2 "Per-section Color" preview (two-tone
+  indigo+cyan Wortschatz book).
+- **Prompts (verbatim):**
+  > the color of the vocab training icon isn't the same the one you showed in the preview f2, why is
+  > that?
+  > can you provide me the link to the preview html again?
+  > the icon here has two shades of blue isn't it? the current icon in the app is clearly different.
+  > why do you say it's not? I want the icon to be how it's in preview
+- **Response summary:** First I compared against the wrong reference sheet (`route-icons-preview.svg`,
+  single-hue book) and incorrectly said the colors matched. Provided raw.githack links to the
+  `preview/*.html` mockups (they are not on the live site since `preview/` isn't part of the Vite
+  build). The founder's screenshot then made it clear: the F2 "Per-section Color" book is **two-tone
+  indigo + cyan**, whereas the app book was a single `#2563eb` at two opacities. Corrected it by
+  converting the `/vocabulary` mark in `route-icons.tsx` to the two-tone book (indigo `#5b5be6` left
+  page + cyan `#10b7cf` right page, white lines on both pages), reusing the existing book geometry so
+  the optical sizing stays correct. Documented the two-tone exception in CLAUDE.md's icon rule.
+  `pnpm build` + `pnpm typecheck` green.
+- **Artifacts:** `src/components/layout/route-icons.tsx`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
+  Shipped via PR (merge SHA in git history).

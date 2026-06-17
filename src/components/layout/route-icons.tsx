@@ -23,14 +23,18 @@ const RENDERERS: Record<string, Render> = {
       <path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill={c} opacity=".82" />
     </>
   ),
-  // Wortschatz — open book
-  "/vocabulary": c => (
+  // Wortschatz — two-tone open book (indigo spine + cyan right page), matching
+  // the F2 "Per-section Color" preview. This is the one icon that intentionally
+  // uses two distinct hues rather than opacity layers of a single accent, so it
+  // ignores the route accent `c`.
+  "/vocabulary": () => (
     <>
-      <path d="M10 3.4C7.7 2.4 4.8 2.4 2.4 3.4V16.6c2.4-1 5.3-1 7.6 0V3.4Z" fill={c} />
-      <path d="M10 3.4c2.3-1 5.2-1 7.6 0V16.6c-2.4-1-5.3-1-7.6 0V3.4Z" fill={c} opacity=".5" />
-      <line x1="4.4" y1="7"  x2="8.2"  y2="7"  stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".75" />
-      <line x1="4.4" y1="9.6" x2="8.2" y2="9.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".55" />
-      <line x1="4.4" y1="12.2" x2="7" y2="12.2" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".4" />
+      <path d="M10 3.4C7.7 2.4 4.8 2.4 2.4 3.4V16.6c2.4-1 5.3-1 7.6 0V3.4Z" fill="#5b5be6" />
+      <path d="M10 3.4c2.3-1 5.2-1 7.6 0V16.6c-2.4-1-5.3-1-7.6 0V3.4Z" fill="#10b7cf" />
+      <line x1="4.4"  y1="7"   x2="8.2"  y2="7"   stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".7" />
+      <line x1="4.4"  y1="9.6" x2="8.2"  y2="9.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".5" />
+      <line x1="11.8" y1="7"   x2="15.6" y2="7"   stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".5" />
+      <line x1="11.8" y1="9.6" x2="15.6" y2="9.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".35" />
     </>
   ),
   // Redemittel — speech bubble with reply dots
