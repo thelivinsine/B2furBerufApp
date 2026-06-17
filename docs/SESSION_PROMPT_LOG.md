@@ -343,4 +343,23 @@ backfilled from the same session's transcript so the trail is complete.)
   the optical sizing stays correct. Documented the two-tone exception in CLAUDE.md's icon rule.
   `pnpm build` + `pnpm typecheck` green.
 - **Artifacts:** `src/components/layout/route-icons.tsx`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
-  Shipped via PR (merge SHA in git history).
+  Shipped via PR #199 (merge `6e7610e`).
+
+## Entry 20 — 2026-06-17 07:00 UTC
+- **Branch:** `claude/app-audit-testing-bqrdkj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim):**
+  > in addition also see if there's a chance to make other icons two tone similar to the book icon
+  > with one of the shades looking like a neon color
+  > increase the size of the home icon by 5% as it's still looking a bit smaller.
+- **Response summary:** (1) Bumped the home icon optical weight 1.02 → 1.07 (+5%) in the `NORM` map.
+  (2) For the two-tone + neon idea across all icons (a subjective visual overhaul, and some marks like
+  the gear/bolt don't split naturally), built a proposal preview sheet
+  (`preview/route-icons-two-tone-neon.svg`) rather than overhauling the live icons blind: each mark
+  keeps its section colour as the base and gains a brighter neon second tone (e.g. home indigo + neon
+  cyan body, collocations amber + neon-yellow second ring, analytics neon-cyan bar gradient). Sent it
+  to the founder for direction before applying to the app. `pnpm build` + `pnpm typecheck` green.
+- **Artifacts:** `src/components/layout/route-icons.tsx` (home size),
+  `preview/route-icons-two-tone-neon.svg` (new), `docs/SESSION_PROMPT_LOG.md`. Shipped via PR
+  (merge SHA in git history).
