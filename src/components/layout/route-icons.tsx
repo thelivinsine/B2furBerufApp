@@ -122,18 +122,18 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 
 // [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
-  "/":             { box: [1.5, 2.2, 17, 15.6],     weight: 0.98 },
-  "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.0 },
-  "/redemittel":   { box: [3, 2.5, 14, 13],         weight: 1.0 },
-  "/grammar":      { box: [4.5, 2.5, 11, 14.7],     weight: 1.0 },
-  "/collocations": { box: [2.05, 4.45, 15.9, 11.1], weight: 1.0 },
-  "/quiz":         { box: [1.4, 1.4, 17.2, 17.2],   weight: 0.9 },
+  "/":             { box: [1.5, 2.2, 17, 15.6],     weight: 1.02 },
+  "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },
+  "/redemittel":   { box: [3, 2.5, 14, 13],         weight: 1.05 },
+  "/grammar":      { box: [4.5, 2.5, 11, 14.7],     weight: 1.08 },
+  "/collocations": { box: [2.05, 4.45, 15.9, 11.1], weight: 1.05 },
+  "/quiz":         { box: [1.4, 1.4, 17.2, 17.2],   weight: 0.92 },
   "/writing":      { box: [3.5, 2.9, 13.6, 12.9],   weight: 1.04 },
-  "/simulation":   { box: [4.2, 1.6, 11.6, 16.2],   weight: 1.0 },
-  "/exam":         { box: [1.8, 2.8, 16.4, 11.9],   weight: 1.0 },
+  "/simulation":   { box: [4.2, 1.6, 11.6, 16.2],   weight: 1.05 },
+  "/exam":         { box: [1.8, 2.8, 16.4, 11.9],   weight: 1.08 },
   "/revision":     { box: [4.8, 2, 10.4, 16],       weight: 1.0 },
-  "/analytics":    { box: [2.5, 3, 15, 14.5],       weight: 1.0 },
-  "/settings":     { box: [2.31, 2.31, 15.38, 15.38], weight: 0.97 },
+  "/analytics":    { box: [2.5, 3, 15, 14.5],       weight: 1.08 },
+  "/settings":     { box: [2.31, 2.31, 15.38, 15.38], weight: 1.01 },
 };
 
 function normTransform(box: [number, number, number, number], weight: number): string {
@@ -194,7 +194,7 @@ export function MoreIcon({ size = 24 }: { active?: boolean; size?: number }) {
       fill="none"
       aria-hidden="true"
     >
-      <g transform={normTransform([2, 2, 16, 16], 0.95)}>
+      <g transform={normTransform([2, 2, 16, 16], 1.0)}>
         <rect x="2"  y="2"  width="7" height="7" rx="1.6" fill={BRAND} />
         <rect x="11" y="2"  width="7" height="7" rx="1.6" fill={BRAND} opacity=".72" />
         <rect x="2"  y="11" width="7" height="7" rx="1.6" fill={BRAND} opacity=".72" />
