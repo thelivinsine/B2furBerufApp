@@ -288,12 +288,6 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
               )}
             </nav>
           )}
-
-          {editMode && atMax && nonPinnedItems.length > 0 && (
-            <p className="mt-4 text-center text-[12px] text-muted-foreground">
-              Leiste voll (max. 4). Erst ein Icon entfernen.
-            </p>
-          )}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
