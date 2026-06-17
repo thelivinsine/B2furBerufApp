@@ -30,15 +30,16 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
               cn(
                 "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-primary/20 font-semibold text-foreground"
+                  ? "bg-gradient-to-r from-muted to-border font-semibold text-foreground"
                   : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
               )
             }
           >
             {({ isActive }) => (
               <>
-                {/* Same custom branded mark as the bottom tab bar and More sheet.
-                    Dimmed when inactive. */}
+                {/* Same custom branded mark as the bottom tab bar and More sheet
+                    (full opacity everywhere; the active row is marked by its grey
+                    gradient + bold text). */}
                 <RouteIcon path={to} size={18} active={isActive} />
                 {label}
               </>

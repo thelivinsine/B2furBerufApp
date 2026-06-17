@@ -336,6 +336,29 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
   is never hit for them. Changing it would have wrongly dropped every exam score by ~28 points.
 - `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green. Branch `claude/app-audit-testing-bqrdkj`.
 
+### Session 27 cont. — Navigation icon polish (SHIPPED)
+A run of founder-driven nav-icon refinements, all in `route-icons.tsx` / `nav-items.ts` plus the
+three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
+- **Audit fixes** also included an a11y pass and the SRS/XP/captcha/CORS fixes above (PR #194).
+- **Removed the "Leiste voll" helper line** from the More sheet edit mode (PR #195).
+- **More sheet closes on re-tapping the active tab:** it only closed via the `location.pathname`
+  effect, but re-tapping the active tab doesn't change the route. Added `onNavigate`/`closeMore` so
+  any bar tap closes the sheet (PR #196).
+- **Full opacity everywhere:** removed the 38% inactive dimming so icons no longer read as blurred;
+  active is shown by the backdrop/underline, not opacity (PR #197).
+- **Optical-size re-tune (~5%):** bumped most `NORM` weights to reduce empty space, boosted the small
+  marks (grammar/exam/analytics), kept large ones restrained, left the pencil unchanged; later bumped
+  the home icon another +5% (PRs #198, #200).
+- **Two-tone book → two-tone + neon for all icons:** the Wortschatz book first became two-tone indigo
+  `#5b5be6` + cyan `#10b7cf` to match the F2 "Per-section Color" preview (PR #199). The founder then
+  approved extending the two-tone treatment to **every** icon, each with a brighter **neon** second
+  tone (proposal sheet `preview/route-icons-two-tone-neon.svg`).
+- **Grey-gradient icon boxes:** the rounded pill/tile behind icons now uses a neutral grey gradient
+  (`from-muted to-border`) instead of the section colour at low opacity, across the bar, Mehr pill,
+  More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
+  for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
+- `pnpm build` + `pnpm typecheck` green throughout.
+
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
 - **Sign-up honesty fix (PR #19, merged):** sign-up no longer falsely reports success when email
   confirmation is pending. Paired with the founder disabling **"Confirm email"** in Supabase, so

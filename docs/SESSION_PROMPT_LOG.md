@@ -361,5 +361,28 @@ backfilled from the same session's transcript so the trail is complete.)
   cyan body, collocations amber + neon-yellow second ring, analytics neon-cyan bar gradient). Sent it
   to the founder for direction before applying to the app. `pnpm build` + `pnpm typecheck` green.
 - **Artifacts:** `src/components/layout/route-icons.tsx` (home size),
-  `preview/route-icons-two-tone-neon.svg` (new), `docs/SESSION_PROMPT_LOG.md`. Shipped via PR
-  (merge SHA in git history).
+  `preview/route-icons-two-tone-neon.svg` (new), `docs/SESSION_PROMPT_LOG.md`. Shipped via PR #200
+  (merge `7a70709`).
+
+## Entry 21 — 2026-06-17 07:29 UTC
+- **Branch:** `claude/app-audit-testing-bqrdkj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > looks good. for the padding/rounded boxes around the icons, use only grey color with gradients
+  > and not the same colored faded boxes for the icons. knce done, update the documentation
+- **Response summary:** The founder approved the two-tone + neon icon proposal, so (1) applied the
+  two-tone + neon treatment to every icon renderer in `route-icons.tsx` (base = section accent, plus
+  a hard-coded neon second tone: home neon-cyan body, redemittel neon-magenta dots, grammar neon-lime
+  half, kollokationen neon-yellow ring, quiz neon-yellow check, writing neon-pink tip, simulation
+  neon-teal stand, exam neon-pink base, revision neon-yellow lower bolt, analytics neon-cyan bars,
+  settings neon-blue gear centre). (2) Changed every icon backdrop box from the section colour at low
+  opacity to a neutral **grey gradient** (`bg-gradient-to-b from-muted to-border`, dark-mode aware):
+  the bar's active pill + Mehr pill (`BottomTabBar`), the edit + normal More-sheet tiles
+  (`MoreSheet`), and the sidebar active row (`Sidebar`, was `bg-primary/20`). The `nav-items.ts` `bg`
+  tint field is now unused for backdrops. (3) Updated docs: CLAUDE.md "Icon color rule" (two-tone+neon
+  + grey-box design), PROJECT_STATUS.md (Session 27 cont.), and this log. `pnpm build` +
+  `pnpm typecheck` green.
+- **Artifacts:** `src/components/layout/route-icons.tsx`, `src/components/layout/BottomTabBar.tsx`,
+  `src/components/layout/MoreSheet.tsx`, `src/components/layout/Sidebar.tsx`, `CLAUDE.md`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Shipped via PR (merge SHA in git history).

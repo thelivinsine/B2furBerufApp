@@ -93,17 +93,27 @@ founder request.**
 ### Icon color rule (updated 2026-06-17, s27)
 - Icons are **always colored** (never grey/monochrome) and now render at **full opacity everywhere**
   (founder request s27: the old 38% inactive dimming read as blurred). The active tab is marked by
-  its background pill + underline (bar), highlight (More sheet), or row styling (sidebar), not by
-  opacity. `RouteIcon`/`MoreIcon` still accept an `active` prop for call-site compatibility but it no
-  longer changes opacity. Do not reintroduce inactive dimming.
-- **Every route has ONE custom branded SVG mark and ONE unique accent colour**, both defined once
-  in `src/components/layout/route-icons.tsx` (`RouteIcon`) + `nav-items.ts` (`color`/`bg`). The
-  same mark and colour render on every surface: bottom tab bar, More sheet, and desktop `Sidebar`.
+  its grey-gradient backdrop + underline (bar), highlight (More sheet), or row styling (sidebar), not
+  by opacity. `RouteIcon`/`MoreIcon` still accept an `active` prop for call-site compatibility but it
+  no longer changes opacity. Do not reintroduce inactive dimming.
+- **Two-tone + neon marks (s27):** every route's mark is **two-tone**, its section base colour plus a
+  brighter **neon** second tone (e.g. home indigo + neon-cyan body, Wortschatz indigo `#5b5be6` +
+  cyan `#10b7cf`, Kollokationen amber + neon-yellow ring, Fortschritt sky → neon-cyan bars,
+  Einstellungen slate gear + neon-blue centre). The base layer reads from the route accent (`c` in
+  `route-icons.tsx`); the neon second tone is hard-coded per mark in the renderer. The proposal/
+  reference sheet is `preview/route-icons-two-tone-neon.svg`. Do not flatten these back to a single
+  accent with opacity layers.
+- **Box backdrops are grey, not section-tinted (s27):** the rounded pill/tile behind an icon uses a
+  neutral **grey gradient** (`bg-gradient-to-b from-muted to-border`, adapts to dark mode), NOT the
+  section colour at low opacity. This applies to the bar's active pill, the Mehr pill, every More-
+  sheet tile (edit + normal), and the sidebar's active row. The old per-section `bg` tint field in
+  `nav-items.ts` is no longer used for backdrops (kept in the data for possible reuse). Do not
+  reintroduce colour-tinted icon boxes.
+- **Every route has ONE custom branded SVG mark and ONE unique accent base colour**, both defined
+  once in `src/components/layout/route-icons.tsx` (`RouteIcon`) + `nav-items.ts` (`color`). The same
+  mark and colours render on every surface: bottom tab bar, More sheet, and desktop `Sidebar`.
   (This replaced the old split where only four "hero" routes had custom SVGs and the rest used
   lucide.) `nav-items.ts` still carries a lucide `icon` per route purely as a `RouteIcon` fallback.
-  **Exception (s27):** the Wortschatz book is intentionally **two-tone** (indigo `#5b5be6` spine +
-  cyan `#10b7cf` right page), matching the F2 "Per-section Color" preview, so it ignores its route
-  accent. Every other mark still uses a single accent with opacity layers.
 - Marks are normalised to a common **optical size** (`NORM` map + `normTransform` in
   `route-icons.tsx`): each mark's bounding box is scaled to a centred 16-unit target with a
   per-mark weight, so a filled disc doesn't read larger than an airy glyph. Re-tune via that map.

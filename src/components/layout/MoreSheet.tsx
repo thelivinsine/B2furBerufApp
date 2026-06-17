@@ -38,7 +38,7 @@ function EditGridIcon({
   onDragEnd: () => void;
   registerRef: (path: string, el: HTMLDivElement | null) => void;
 }) {
-  const { to, label, color, bg } = item;
+  const { to, label, color } = item;
   const isDragging = dragId === to;
 
   return (
@@ -70,8 +70,7 @@ function EditGridIcon({
         className="relative w-full"
       >
         <motion.div
-          className="relative flex h-16 w-full items-center justify-center rounded-2xl"
-          style={{ background: bg }}
+          className="relative flex h-16 w-full items-center justify-center rounded-2xl bg-gradient-to-b from-muted to-border"
           animate={isDragging ? { rotate: 0 } : { rotate: [-2.5, 2.5, -2.5] }}
           transition={isDragging
             ? { duration: 0.15 }
@@ -250,7 +249,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
           ) : (
             /* ── Normal mode: clean icon grid, tap to navigate ── */
             <nav className="grid grid-cols-3 gap-x-3 gap-y-5">
-              {nonPinnedItems.map(({ to, label, color, bg }) => (
+              {nonPinnedItems.map(({ to, label, color }) => (
                 <NavLink
                   key={to}
                   to={to}
@@ -261,12 +260,12 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
                   {({ isActive }) => (
                     <>
                       <div
-                        className="flex h-16 w-full items-center justify-center rounded-2xl transition-all duration-150"
-                        style={
+                        className={cn(
+                          "flex h-16 w-full items-center justify-center rounded-2xl bg-gradient-to-b transition-all duration-150",
                           isActive
-                            ? { background: bg, outline: `2px solid ${color}` }
-                            : { background: "rgba(0,0,0,.04)" }
-                        }
+                            ? "from-muted to-border ring-2 ring-muted-foreground/25"
+                            : "from-muted/60 to-border/50",
+                        )}
                       >
                         <RouteIcon path={to} size={29} active />
                       </div>

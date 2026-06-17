@@ -16,11 +16,11 @@ const BRAND = "#5b5be6";
 type Render = (c: string) => React.ReactNode;
 
 const RENDERERS: Record<string, Render> = {
-  // Dashboard / Home — a house (roof + body with a doorway cutout)
+  // Dashboard / Home — a house (indigo roof + neon-cyan body)
   "/": c => (
     <>
       <path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill={c} />
-      <path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill={c} opacity=".82" />
+      <path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill="#22d3ee" />
     </>
   ),
   // Wortschatz — two-tone open book (indigo spine + cyan right page), matching
@@ -37,82 +37,87 @@ const RENDERERS: Record<string, Render> = {
       <line x1="11.8" y1="9.6" x2="15.6" y2="9.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".35" />
     </>
   ),
-  // Redemittel — speech bubble with reply dots
+  // Redemittel — speech bubble with neon-magenta reply dots
   "/redemittel": c => (
     <>
       <path d="M3 5a2.5 2.5 0 0 1 2.5-2.5h9A2.5 2.5 0 0 1 17 5v5a2.5 2.5 0 0 1-2.5 2.5H8l-3.4 3V12.5A2.5 2.5 0 0 1 3 10V5Z" fill={c} />
-      <circle cx="6.8" cy="7.5" r="1.05" fill="#fff" opacity=".9" />
-      <circle cx="10"  cy="7.5" r="1.05" fill="#fff" opacity=".7" />
-      <circle cx="13.2" cy="7.5" r="1.05" fill="#fff" opacity=".5" />
+      <circle cx="6.8" cy="7.5" r="1.15" fill="#e879f9" />
+      <circle cx="10"  cy="7.5" r="1.15" fill="#e879f9" />
+      <circle cx="13.2" cy="7.5" r="1.15" fill="#e879f9" />
     </>
   ),
-  // Grammatik — bookmark with text lines
+  // Grammatik — bookmark split into emerald + neon-lime halves
   "/grammar": c => (
     <>
       <path d="M5.5 2.5h9a1 1 0 0 1 1 1V17.2l-5.5-3.1L4.5 17.2V3.5a1 1 0 0 1 1-1Z" fill={c} />
-      <line x1="7.4" y1="6.2" x2="12.6" y2="6.2" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" opacity=".8" />
-      <line x1="7.4" y1="8.8" x2="11"   y2="8.8" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" opacity=".55" />
+      <path d="M10 2.5h4.5a1 1 0 0 1 1 1V17.2L10 14.1V2.5Z" fill="#a3e635" />
     </>
   ),
-  // Kollokationen — two interlocking rings (combine)
+  // Kollokationen — two interlocking rings (amber + neon-yellow)
   "/collocations": c => (
     <>
       <circle cx="7.6"  cy="10" r="4.4" stroke={c} strokeWidth="2.3" fill="none" />
-      <circle cx="12.4" cy="10" r="4.4" stroke={c} strokeWidth="2.3" fill="none" opacity=".55" />
+      <circle cx="12.4" cy="10" r="4.4" stroke="#fde047" strokeWidth="2.3" fill="none" />
     </>
   ),
-  // Quiz — disc with check
+  // Quiz — disc with neon-yellow check
   "/quiz": c => (
     <>
       <circle cx="10" cy="10" r="8.6" fill={c} />
-      <polyline points="6,10.5 8.7,13 14,7" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      <polyline points="6,10.5 8.7,13 14,7" stroke="#fde047" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </>
   ),
-  // Schreibtraining — pencil
+  // Schreibtraining — pencil (red body + neon-pink tip)
   "/writing": c => (
     <>
       <path d="M14.7 2.9a1.7 1.7 0 0 1 2.4 2.4L7.5 14.9l-3.4.9.9-3.4 9.7-9.5Z" fill={c} />
-      <line x1="13.2" y1="4.4" x2="15.6" y2="6.8" stroke="#fff" strokeWidth="1.1" strokeLinecap="round" opacity=".65" />
+      <path d="M4.1 15.8l.9-3.4 2.5 2.5-3.4.9Z" fill="#fb7185" />
     </>
   ),
-  // Sprechsimulation — microphone
+  // Sprechsimulation — microphone (cyan capsule + neon-teal stand)
   "/simulation": c => (
     <>
       <rect x="7.5" y="2.4" width="5" height="9.2" rx="2.5" fill={c} />
-      <path d="M5 9.4a5 5 0 0 0 10 0" stroke={c} strokeWidth="1.6" strokeLinecap="round" fill="none" opacity=".6" />
-      <line x1="10" y1="14.4" x2="10" y2="17" stroke={c} strokeWidth="1.6" strokeLinecap="round" opacity=".6" />
-      <line x1="7.2" y1="17" x2="12.8" y2="17" stroke={c} strokeWidth="1.6" strokeLinecap="round" opacity=".6" />
+      <path d="M5 9.4a5 5 0 0 0 10 0" stroke="#5eead4" strokeWidth="1.6" strokeLinecap="round" fill="none" />
+      <line x1="10" y1="14.4" x2="10" y2="17" stroke="#5eead4" strokeWidth="1.6" strokeLinecap="round" />
+      <line x1="7.2" y1="17" x2="12.8" y2="17" stroke="#5eead4" strokeWidth="1.6" strokeLinecap="round" />
     </>
   ),
-  // Prüfungsmodus — graduation cap
+  // Prüfungsmodus — graduation cap (fuchsia top + neon-pink base)
   "/exam": c => (
     <>
       <path d="M10 2.8 1.8 6.4 10 10l8.2-3.6L10 2.8Z" fill={c} />
-      <path d="M4.8 8.6v3.4c0 1.5 2.4 2.7 5.2 2.7s5.2-1.2 5.2-2.7V8.6L10 10.9 4.8 8.6Z" fill={c} opacity=".55" />
+      <path d="M4.8 8.6v3.4c0 1.5 2.4 2.7 5.2 2.7s5.2-1.2 5.2-2.7V8.6L10 10.9 4.8 8.6Z" fill="#f0abfc" />
       <line x1="17.4" y1="6.6" x2="17.4" y2="11.2" stroke={c} strokeWidth="1.2" strokeLinecap="round" />
     </>
   ),
-  // Schnellwiederholung — lightning bolt
+  // Schnellwiederholung — lightning bolt (amber-yellow top, neon-yellow lower)
   "/revision": c => (
-    <polygon points="12,2 4.8,11 9.2,11 8,18 15.2,8.6 10.8,8.6" fill={c} />
+    <>
+      <polygon points="12,2 4.8,11 9.2,11 8,18 15.2,8.6 10.8,8.6" fill={c} />
+      <polygon points="9.2,11 8,18 15.2,8.6 10.8,8.6" fill="#fde047" />
+    </>
   ),
-  // Fortschritt — bar chart
+  // Fortschritt — bar chart (sky base rising into neon cyan)
   "/analytics": c => (
     <>
       <rect x="2.5"  y="11"  width="3.5" height="6.5"  rx="1.2" fill={c} />
-      <rect x="8.25" y="7"   width="3.5" height="10.5" rx="1.2" fill={c} opacity=".78" />
-      <rect x="14"   y="3"   width="3.5" height="14.5" rx="1.2" fill={c} opacity=".52" />
+      <rect x="8.25" y="7"   width="3.5" height="10.5" rx="1.2" fill="#22d3ee" />
+      <rect x="14"   y="3"   width="3.5" height="14.5" rx="1.2" fill="#67e8f9" />
     </>
   ),
-  // Einstellungen — gear
+  // Einstellungen — gear (slate ring + neon-blue centre)
   "/settings": c => (
-    <g transform="translate(10 10) scale(0.83) translate(-12 -12)">
-      <path
-        fill={c}
-        fillRule="evenodd"
-        d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"
-      />
-    </g>
+    <>
+      <g transform="translate(10 10) scale(0.83) translate(-12 -12)">
+        <path
+          fill={c}
+          fillRule="evenodd"
+          d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"
+        />
+      </g>
+      <circle cx="10" cy="10" r="2.6" fill="#38bdf8" />
+    </>
   ),
 };
 
