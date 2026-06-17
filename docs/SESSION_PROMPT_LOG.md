@@ -386,3 +386,30 @@ backfilled from the same session's transcript so the trail is complete.)
 - **Artifacts:** `src/components/layout/route-icons.tsx`, `src/components/layout/BottomTabBar.tsx`,
   `src/components/layout/MoreSheet.tsx`, `src/components/layout/Sidebar.tsx`, `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Shipped via PR (merge SHA in git history).
+
+## Entries 22–24 — 2026-06-17 (selection cloud thread)
+- **Branch:** `claude/cloud-icon-bottom-bar-epi0dt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim):**
+  > the cloud surrounding the icon is too big. also the gradient of the cloud could be improved. can
+  > you provide some mockups for the bottom bar and more menu as a html and provide the preview link
+  > as done in previous sessions?
+  > compact squircle looks good but the same compact squircle should be also applied for menu icons.
+  > but I want you to generate some previews for the cloud's gradients as the current grey gradient
+  > looks outward protruded. i want to see if there's a better design
+  > select flat and even style. for the menu icons the cloud should only appear when selected.
+- **Response summary:** The "cloud" is the grey gradient backdrop behind the active icon (and behind
+  every More-sheet tile), which filled the whole tab slot. (1) Built `preview/nav-cloud-refined.html`
+  (raw.githack link) showing the current full-slot pill vs two tighter options; founder picked the
+  **compact squircle**. (2) Built `preview/nav-cloud-gradients.html` with six gradient studies of the
+  squircle (convex/current, flat&even, inset, top-lit halo, hairline ring, cool diagonal); founder
+  picked **G1 flat & even**. (3) Implemented: bar active pill + Mehr pill are now a compact `h-11 w-11
+  rounded-2xl` squircle hugging the icon with the flat `from-muted to-border` gradient (no raised-dome
+  shadow); the underline moved to `bottom-[6px]`. More sheet tiles are compact `h-12 w-12` squircles,
+  and the cloud now appears **only behind the selected section** in browse mode (unselected = bare
+  icon); edit mode keeps the squircle on all tiles as the draggable-tile affordance. Updated CLAUDE.md
+  (s28 squircle + selected-only rules). `pnpm build` + `pnpm lint:content` green.
+- **Artifacts:** `preview/nav-cloud-refined.html`, `preview/nav-cloud-gradients.html`,
+  `src/components/layout/BottomTabBar.tsx`, `src/components/layout/MoreSheet.tsx`, `CLAUDE.md`,
+  `docs/SESSION_PROMPT_LOG.md`.

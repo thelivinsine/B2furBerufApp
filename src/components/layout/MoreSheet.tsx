@@ -67,10 +67,10 @@ function EditGridIcon({
         onDrag={(_, info) => onReorder(to, info)}
         onDragEnd={onDragEnd}
         style={{ touchAction: "none" }}
-        className="relative w-full"
+        className="relative flex w-full justify-center"
       >
         <motion.div
-          className="relative flex h-16 w-full items-center justify-center rounded-2xl bg-gradient-to-b from-muted to-border"
+          className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-b from-muted to-border"
           animate={isDragging ? { rotate: 0 } : { rotate: [-2.5, 2.5, -2.5] }}
           transition={isDragging
             ? { duration: 0.15 }
@@ -259,12 +259,12 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
                 >
                   {({ isActive }) => (
                     <>
+                      {/* Compact squircle "cloud" only appears on the selected
+                          section; the rest show a bare icon. Flat, even grey. */}
                       <div
                         className={cn(
-                          "flex h-16 w-full items-center justify-center rounded-2xl bg-gradient-to-b transition-all duration-150",
-                          isActive
-                            ? "from-muted to-border ring-2 ring-muted-foreground/25"
-                            : "from-muted/60 to-border/50",
+                          "flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-150",
+                          isActive && "bg-gradient-to-b from-muted to-border",
                         )}
                       >
                         <RouteIcon path={to} size={29} active />
