@@ -6,9 +6,11 @@ import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
 import type { NavItem } from "./nav-items";
 import { RouteIcon, MoreIcon } from "./route-icons";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { cn } from "@/lib/utils";
 
 const MORE_COLOR = "#5b5be6";
-const MORE_BG    = "rgba(91,91,230,.08)";
+// Grey gradient backdrop for the active pill (no section-colour tint).
+const ACTIVE_BOX = "bg-gradient-to-b from-muted to-border";
 const IZ = 29; // icon size
 
 // Every surface (bottom bar, More sheet, sidebar) draws the SAME custom branded
@@ -163,7 +165,7 @@ export function BottomTabBar({ onMore, onNavigate, onLongPress, editMode, moreOp
         ) : (
           /* Normal mode */
           <>
-            {displayTabs.map(({ to, end, label, color, bg }) => (
+            {displayTabs.map(({ to, end, label, color }) => (
               <NavLink
                 key={to} to={to} end={end} aria-label={label}
                 className="flex flex-1 p-1"
@@ -176,8 +178,10 @@ export function BottomTabBar({ onMore, onNavigate, onLongPress, editMode, moreOp
                   const showActive = isActive && !moreOpen;
                   return (
                     <div
-                      className="relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150"
-                      style={showActive ? { background: bg } : {}}
+                      className={cn(
+                        "relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150",
+                        showActive && ACTIVE_BOX,
+                      )}
                     >
                       <TabIcon path={to} active={showActive} />
                       {showActive && (
@@ -191,8 +195,10 @@ export function BottomTabBar({ onMore, onNavigate, onLongPress, editMode, moreOp
             ))}
             <button onClick={onMore} aria-label="Mehr" className="flex flex-1 p-1">
               <div
-                className="relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150"
-                style={moreActive ? { background: MORE_BG } : {}}
+                className={cn(
+                  "relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150",
+                  moreActive && ACTIVE_BOX,
+                )}
               >
                 <IcoMore active={moreActive} />
                 {moreActive && (
