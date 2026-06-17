@@ -177,15 +177,19 @@ export function BottomTabBar({ onMore, onNavigate, onLongPress, editMode, moreOp
                   // so pinned tabs drop their active highlight.
                   const showActive = isActive && !moreOpen;
                   return (
-                    <div
-                      className={cn(
-                        "relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150",
-                        showActive && ACTIVE_BOX,
-                      )}
-                    >
-                      <TabIcon path={to} active={showActive} />
+                    <div className="relative flex flex-1 items-center justify-center">
+                      {/* Compact squircle "cloud" hugs the icon instead of filling
+                          the whole slot. Flat, even grey gradient (no raised dome). */}
+                      <div
+                        className={cn(
+                          "flex h-11 w-11 items-center justify-center rounded-2xl transition-colors duration-150",
+                          showActive && ACTIVE_BOX,
+                        )}
+                      >
+                        <TabIcon path={to} active={showActive} />
+                      </div>
                       {showActive && (
-                        <span className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
+                        <span className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-6 rounded-full"
                           style={{ height: 3, background: color }} />
                       )}
                     </div>
@@ -194,15 +198,17 @@ export function BottomTabBar({ onMore, onNavigate, onLongPress, editMode, moreOp
               </NavLink>
             ))}
             <button onClick={onMore} aria-label="Mehr" className="flex flex-1 p-1">
-              <div
-                className={cn(
-                  "relative flex flex-1 items-center justify-center rounded-xl transition-colors duration-150",
-                  moreActive && ACTIVE_BOX,
-                )}
-              >
-                <IcoMore active={moreActive} />
+              <div className="relative flex flex-1 items-center justify-center">
+                <div
+                  className={cn(
+                    "flex h-11 w-11 items-center justify-center rounded-2xl transition-colors duration-150",
+                    moreActive && ACTIVE_BOX,
+                  )}
+                >
+                  <IcoMore active={moreActive} />
+                </div>
                 {moreActive && (
-                  <span className="absolute bottom-[8px] left-1/2 -translate-x-1/2 w-6 rounded-full"
+                  <span className="absolute bottom-[6px] left-1/2 -translate-x-1/2 w-6 rounded-full"
                     style={{ height: 3, background: MORE_COLOR }} />
                 )}
               </div>

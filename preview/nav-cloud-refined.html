@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Genauly · Selection cloud — refined size + gradient</title>
+<style>
+  :root {
+    /* tokens lifted from src/index.css (light mode) */
+    --background: hsl(240 20% 99%);
+    --surface:    hsl(0 0% 100%);
+    --muted:      hsl(240 16% 95%);
+    --border:     hsl(240 14% 90%);
+    --muted-fg:   hsl(240 6% 44%);
+    --primary:    hsl(245 70% 60%);
+    --text:       #1a1b2e;
+    --page-bg:    #e9eaf0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--page-bg);
+    font-family: -apple-system, 'Inter', system-ui, Segoe UI, Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    color: var(--text);
+    padding-bottom: 60px;
+  }
+  .page { max-width: 940px; margin: 0 auto; padding: 30px 16px 0; }
+
+  header { text-align: center; margin-bottom: 30px; }
+  header h1 { font-size: 21px; font-weight: 800; margin-bottom: 8px; }
+  header p  { font-size: 13.5px; color: var(--muted-fg); line-height: 1.65; max-width: 600px; margin: 0 auto; }
+
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 780px) { .row { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; } }
+
+  .card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 4px 28px rgba(0,0,0,.1);
+    overflow: hidden;
+  }
+  .card-label { padding: 14px 18px 12px; border-bottom: 1px solid #f0f1f7; }
+  .badge {
+    display: inline-block;
+    font-size: 10px; font-weight: 800; letter-spacing: .05em;
+    background: var(--primary); color: #fff;
+    border-radius: 7px; padding: 2px 8px; margin-right: 6px; vertical-align: middle;
+  }
+  .badge.cur { background: #9aa0b8; }
+  .card-name { font-size: 13px; font-weight: 700; vertical-align: middle; }
+  .card-desc { font-size: 11.5px; color: var(--muted-fg); margin-top: 5px; line-height: 1.5; }
+
+  /* phone shell */
+  .phone-wrap {
+    background: linear-gradient(150deg, #eef0ff 0%, #dff5fa 100%);
+    padding: 22px 16px 0;
+    display: flex; justify-content: center; align-items: flex-end;
+  }
+  .phone {
+    width: 218px;
+    background: #fff;
+    border-radius: 28px 28px 0 0;
+    border: 2px solid #cdd0e5; border-bottom: none;
+    box-shadow: 0 -4px 24px rgba(91,91,230,.12), 0 -2px 8px rgba(0,0,0,.06);
+    overflow: hidden;
+  }
+  .notch { width: 54px; height: 8px; background: #1a1b2e; border-radius: 4px; margin: 8px auto 0; }
+  .phone-body { padding: 12px 0 2px; background: #f7f8fc; }
+  .screen-title { font-size: 12px; font-weight: 800; padding: 0 14px 8px; color: var(--text); }
+  .line { height: 7px; border-radius: 4px; background: #e4e5ef; margin: 6px 14px; }
+
+  /* ── nav bar ── */
+  .nav-base { background: var(--surface); border-top: 1.5px solid #edeef6; }
+  .rail { display: flex; align-items: stretch; height: 63px; padding: 4px; }
+  .tab {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .tab .cloud {
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .tab svg { display: block; position: relative; z-index: 1; }
+  .underline {
+    position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%);
+    width: 22px; height: 3px; border-radius: 3px; z-index: 2;
+  }
+
+  /* ===== CURRENT (reference) — fills the whole slot ===== */
+  .cur-bar .tab.active .cloud {
+    width: 100%; min-height: 55px;
+    border-radius: 12px;
+    background: linear-gradient(to bottom, var(--muted), var(--border));
+  }
+
+  /* ===== A · Compact squircle ===== */
+  .A-bar .tab.active .cloud {
+    width: 46px; height: 46px;
+    border-radius: 15px;
+    background:
+      linear-gradient(155deg, #fbfbfe 0%, #eef0f6 48%, #e3e5ef 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.9),
+      inset 0 -1px 2px rgba(120,124,150,.10),
+      0 1px 2px rgba(40,44,80,.07);
+  }
+
+  /* ===== B · Soft disc ===== */
+  .B-bar .tab.active .cloud {
+    width: 44px; height: 44px;
+    border-radius: 999px;
+    background:
+      radial-gradient(120% 120% at 50% 18%, #ffffff 0%, #eef0f6 55%, #e1e3ee 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.95),
+      0 1px 3px rgba(40,44,80,.08);
+  }
+
+  /* default (non-active) cloud is just centring */
+  .tab:not(.active) .cloud { min-height: 46px; }
+
+  /* ── more-menu grid ── */
+  .sheet { background: var(--surface); padding: 4px 14px 16px; }
+  .handle { width: 40px; height: 4px; border-radius: 999px; background: var(--border); margin: 10px auto 16px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 12px; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .cell .tile { display: flex; align-items: center; justify-content: center; }
+  .cell .lbl { font-size: 11px; font-weight: 600; line-height: 1.1; }
+
+  /* current sheet tile = big h-16 full-width gradient */
+  .cur-sheet .tile {
+    width: 100%; height: 64px; border-radius: 16px;
+    background: linear-gradient(to bottom, var(--muted), var(--border));
+  }
+  /* A sheet tile = smaller squircle, refined gradient */
+  .A-sheet .tile {
+    width: 100%; height: 56px; border-radius: 16px;
+    background: linear-gradient(155deg, #fbfbfe 0%, #eef0f6 50%, #e3e5ef 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 2px rgba(120,124,150,.08);
+  }
+  /* B sheet tile = disc badge centred, smaller footprint */
+  .B-sheet .tile {
+    width: 56px; height: 56px; border-radius: 999px;
+    background: radial-gradient(120% 120% at 50% 18%, #ffffff 0%, #eef0f6 55%, #e1e3ee 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.95), 0 1px 3px rgba(40,44,80,.07);
+  }
+
+  .section-title { font-size: 14px; font-weight: 800; text-align:center; margin: 40px 0 18px; color: var(--text); }
+  .notes {
+    margin-top: 34px; background:#fff; border-radius:16px; padding:18px 22px;
+    box-shadow:0 2px 12px rgba(0,0,0,.06);
+    font-size:12.5px; color:var(--muted-fg); line-height:1.75; max-width: 760px; margin-left:auto; margin-right:auto;
+  }
+  .notes b { color: var(--text); }
+  .swatch { display:inline-block; width:11px; height:11px; border-radius:3px; vertical-align:middle; margin:0 3px; border:1px solid rgba(0,0,0,.08); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Selection “cloud” — smaller + better gradient</h1>
+    <p>The grey pill behind the active icon (and behind every More-sheet tile) currently fills the
+       whole slot, so it reads as a big box. Below: the <b>current</b> look next to two tighter
+       options with a richer gradient. Reply <b>A</b>, <b>B</b>, or mix (e.g. “A in the bar, B in the sheet”).</p>
+  </header>
+
+  <!-- ════════════════ BOTTOM BAR ROW ════════════════ -->
+  <div class="row">
+
+    <!-- CURRENT -->
+    <div class="card">
+      <div class="card-label">
+        <span class="badge cur">NOW</span>
+        <span class="card-name">Current</span>
+        <div class="card-desc">Pill fills the slot (rounded-xl, ~55px tall, full width). Flat 2-stop grey, top lighter. This is the “too big” box.</div>
+      </div>
+      <div class="phone-wrap"><div class="phone">
+        <div class="notch"></div>
+        <div class="phone-body">
+          <div class="screen-title">Wortschatz</div>
+          <div class="line" style="width:calc(100% - 28px)"></div>
+          <div class="line" style="width:68%"></div>
+          <div class="line" style="width:calc(100% - 28px)"></div>
+          <div class="line" style="width:52%"></div>
+          <div class="line" style="width:78%"></div>
+        </div>
+        <div class="nav-base"><div class="rail cur-bar" id="bar-cur"></div></div>
+      </div></div>
+    </div>
+
+    <!-- A -->
+    <div class="card">
+      <div class="card-label">
+        <span class="badge">A</span>
+        <span class="card-name">Compact squircle</span>
+        <div class="card-desc">46×46 rounded square that hugs the icon. Diagonal 3-stop gradient with a top highlight + soft inner depth, so it looks like a raised key, not a flat box.</div>
+      </div>
+      <div class="phone-wrap"><div class="phone">
+        <div class="notch"></div>
+        <div class="phone-body">
+          <div class="screen-title">Wortschatz</div>
+          <div class="line" style="width:calc(100% - 28px)"></div>
+          <div class="line" style="width:68%"></div>
+          <div class="line" style="width:calc(100% - 28px)"></div>
+          <div class="line" style="width:52%"></div>
+          <div class="line" style="width:78%"></div>
+        </div>
+        <div class="nav-base"><div class="rail A-bar" id="bar-A"></div></div>
+      </div></div>
+    </div>
+
+    <!-- B -->
+    <div class="card">
+      <div class="card-label">
+        <span class="badge">B</span>
+        <span class="card-name">Soft disc</span>
+        <div class="card-desc">44px circle. Radial gradient lit from the top, like a soft spotlight under the icon. The roundest, lightest-footprint option.</div>
+      </div>
+      <div class="phone-wrap"><div class="phone">
+        <div class="notch"></div>
+        <div class="phone-body">
+          <div class="screen-title">Wortschatz</div>
+          <div class="line" style="width:calc(100% - 28px)"></div>
+          <div class="line" style="width:68%"></div>
+          <div class="line" style="width:calc(100% - 28px)"></div>
+          <div class="line" style="width:52%"></div>
+          <div class="line" style="width:78%"></div>
+        </div>
+        <div class="nav-base"><div class="rail B-bar" id="bar-B"></div></div>
+      </div></div>
+    </div>
+
+  </div><!-- /row bar -->
+
+  <!-- ════════════════ MORE MENU ROW ════════════════ -->
+  <div class="section-title">More menu — same treatment on the tiles</div>
+  <div class="row">
+
+    <div class="card">
+      <div class="card-label">
+        <span class="badge cur">NOW</span>
+        <span class="card-name">Current tiles</span>
+        <div class="card-desc">Each tile is a tall full-width grey box (h-16, flat gradient).</div>
+      </div>
+      <div class="sheet cur-sheet"><div class="handle"></div><div class="grid" id="sheet-cur"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">
+        <span class="badge">A</span>
+        <span class="card-name">Shorter tiles</span>
+        <div class="card-desc">Same full-width tile, trimmed height + the refined diagonal gradient with a highlight.</div>
+      </div>
+      <div class="sheet A-sheet"><div class="handle"></div><div class="grid" id="sheet-A"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">
+        <span class="badge">B</span>
+        <span class="card-name">Disc badges</span>
+        <div class="card-desc">Each icon sits on a round badge with the soft top-lit radial. Airy and playful.</div>
+      </div>
+      <div class="sheet B-sheet"><div class="handle"></div><div class="grid" id="sheet-B"></div></div>
+    </div>
+
+  </div><!-- /row sheet -->
+
+  <div class="notes">
+    <b>Why it looks lighter:</b> the gradient goes from a 3-stop diagonal (highlight
+    <span class="swatch" style="background:#fbfbfe"></span> → mid
+    <span class="swatch" style="background:#eef0f6"></span> → base
+    <span class="swatch" style="background:#e3e5ef"></span>) plus a 1px inner top highlight and a
+    faint bottom shadow, instead of the current flat 2-stop
+    <span class="swatch" style="background:hsl(240 16% 95%)"></span> →
+    <span class="swatch" style="background:hsl(240 14% 90%)"></span>. It keeps the grey, neutral look
+    (per the s27 rule) but gains a little depth so it reads as a soft key rather than a slab.<br><br>
+    All values adapt to dark mode the same way (token-based). Once you pick, I’ll wire it into
+    <b>BottomTabBar</b> (the active pill) and <b>MoreSheet</b> (the tiles), keeping the underline and
+    Mehr-selection behaviour. Reply <b>A</b>, <b>B</b>, or a mix.
+  </div>
+
+</div>
+
+<script>
+/* ── two-tone + neon route marks, mirrored from src/components/layout/route-icons.tsx ── */
+const MARKS = {
+  "/": `<path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill="#5b5be6"/><path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill="#22d3ee"/>`,
+  "/vocabulary": `<path d="M10 3.4C7.7 2.4 4.8 2.4 2.4 3.4V16.6c2.4-1 5.3-1 7.6 0V3.4Z" fill="#5b5be6"/><path d="M10 3.4c2.3-1 5.2-1 7.6 0V16.6c-2.4-1-5.3-1-7.6 0V3.4Z" fill="#10b7cf"/><line x1="4.4" y1="7" x2="8.2" y2="7" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/><line x1="4.4" y1="9.6" x2="8.2" y2="9.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".5"/><line x1="11.8" y1="7" x2="15.6" y2="7" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".5"/><line x1="11.8" y1="9.6" x2="15.6" y2="9.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".35"/>`,
+  "/redemittel": `<path d="M3 5a2.5 2.5 0 0 1 2.5-2.5h9A2.5 2.5 0 0 1 17 5v5a2.5 2.5 0 0 1-2.5 2.5H8l-3.4 3V12.5A2.5 2.5 0 0 1 3 10V5Z" fill="#0ea5e9"/><circle cx="6.8" cy="7.5" r="1.15" fill="#e879f9"/><circle cx="10" cy="7.5" r="1.15" fill="#e879f9"/><circle cx="13.2" cy="7.5" r="1.15" fill="#e879f9"/>`,
+  "/grammar": `<path d="M5.5 2.5h9a1 1 0 0 1 1 1V17.2l-5.5-3.1L4.5 17.2V3.5a1 1 0 0 1 1-1Z" fill="#10b981"/><path d="M10 2.5h4.5a1 1 0 0 1 1 1V17.2L10 14.1V2.5Z" fill="#a3e635"/>`,
+  "/collocations": `<circle cx="7.6" cy="10" r="4.4" stroke="#f59e0b" stroke-width="2.3" fill="none"/><circle cx="12.4" cy="10" r="4.4" stroke="#fde047" stroke-width="2.3" fill="none"/>`,
+  "/quiz": `<circle cx="10" cy="10" r="8.6" fill="#6366f1"/><polyline points="6,10.5 8.7,13 14,7" stroke="#fde047" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
+  "/writing": `<path d="M14.7 2.9a1.7 1.7 0 0 1 2.4 2.4L7.5 14.9l-3.4.9.9-3.4 9.7-9.5Z" fill="#ef4444"/><path d="M4.1 15.8l.9-3.4 2.5 2.5-3.4.9Z" fill="#fb7185"/>`,
+  "/simulation": `<rect x="7.5" y="2.4" width="5" height="9.2" rx="2.5" fill="#06b6d4"/><path d="M5 9.4a5 5 0 0 0 10 0" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round" fill="none"/><line x1="10" y1="14.4" x2="10" y2="17" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"/><line x1="7.2" y1="17" x2="12.8" y2="17" stroke="#5eead4" stroke-width="1.6" stroke-linecap="round"/>`,
+  "/exam": `<path d="M10 2.8 1.8 6.4 10 10l8.2-3.6L10 2.8Z" fill="#d946ef"/><path d="M4.8 8.6v3.4c0 1.5 2.4 2.7 5.2 2.7s5.2-1.2 5.2-2.7V8.6L10 10.9 4.8 8.6Z" fill="#f0abfc"/><line x1="17.4" y1="6.6" x2="17.4" y2="11.2" stroke="#d946ef" stroke-width="1.2" stroke-linecap="round"/>`,
+  "/revision": `<polygon points="12,2 4.8,11 9.2,11 8,18 15.2,8.6 10.8,8.6" fill="#f59e0b"/><polygon points="9.2,11 8,18 15.2,8.6 10.8,8.6" fill="#fde047"/>`,
+  "/analytics": `<rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="#0ea5e9"/><rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/><rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/>`,
+  "/settings": `<g transform="translate(10 10) scale(0.83) translate(-12 -12)"><path fill="#64748b" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58Z"/></g><circle cx="10" cy="10" r="2.6" fill="#38bdf8"/>`,
+  "/more": `<rect x="2" y="2" width="7" height="7" rx="1.6" fill="#5b5be6"/><rect x="11" y="2" width="7" height="7" rx="1.6" fill="#5b5be6" opacity=".72"/><rect x="2" y="11" width="7" height="7" rx="1.6" fill="#5b5be6" opacity=".72"/><rect x="11" y="11" width="7" height="7" rx="1.6" fill="#5b5be6" opacity=".45"/>`,
+};
+const LABELS = {
+  "/redemittel":"Redemittel","/grammar":"Grammatik","/collocations":"Kollokationen",
+  "/writing":"Schreiben","/simulation":"Sprechen","/exam":"Prüfung",
+  "/revision":"Wiederholung","/settings":"Einstellungen",
+};
+const ACCENT = {
+  "/redemittel":"#0ea5e9","/grammar":"#10b981","/collocations":"#f59e0b",
+  "/writing":"#ef4444","/simulation":"#06b6d4","/exam":"#d946ef",
+  "/revision":"#f59e0b","/settings":"#64748b",
+};
+function svg(path, size){ return `<svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="none">${MARKS[path]}</svg>`; }
+
+/* bar order: home, vocab (active), quiz, analytics, more */
+const BAR = ["/", "/vocabulary", "/quiz", "/analytics", "/more"];
+function buildBar(id){
+  const el = document.getElementById(id);
+  el.innerHTML = BAR.map(p => {
+    const active = p === "/vocabulary";
+    const ul = active ? `<span class="underline" style="background:#5b5be6"></span>` : "";
+    return `<div class="tab ${active?'active':''}"><div class="cloud">${svg(p,29)}</div>${ul}</div>`;
+  }).join("");
+}
+["bar-cur","bar-A","bar-B"].forEach(buildBar);
+
+/* sheet order: the routes not pinned to the bar */
+const SHEET = ["/redemittel","/grammar","/collocations","/writing","/simulation","/exam","/revision","/settings"];
+function buildSheet(id){
+  const el = document.getElementById(id);
+  el.innerHTML = SHEET.map(p =>
+    `<div class="cell"><div class="tile">${svg(p,29)}</div><div class="lbl" style="color:${ACCENT[p]}">${LABELS[p]}</div></div>`
+  ).join("");
+}
+["sheet-cur","sheet-A","sheet-B"].forEach(buildSheet);
+</script>
+</body>
+</html>

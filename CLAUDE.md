@@ -105,10 +105,21 @@ founder request.**
   accent with opacity layers.
 - **Box backdrops are grey, not section-tinted (s27):** the rounded pill/tile behind an icon uses a
   neutral **grey gradient** (`bg-gradient-to-b from-muted to-border`, adapts to dark mode), NOT the
-  section colour at low opacity. This applies to the bar's active pill, the Mehr pill, every More-
-  sheet tile (edit + normal), and the sidebar's active row. The old per-section `bg` tint field in
+  section colour at low opacity. This applies to the bar's active pill, the Mehr pill, the selected
+  More-sheet tile, and the sidebar's active row. The old per-section `bg` tint field in
   `nav-items.ts` is no longer used for backdrops (kept in the data for possible reuse). Do not
   reintroduce colour-tinted icon boxes.
+- **Compact-squircle backdrop, flat & even gradient (updated 2026-06-17, s28):** the backdrop is a
+  **compact rounded squircle that hugs the icon** (`h-11 w-11 rounded-2xl` in the bar, `h-12 w-12
+  rounded-2xl` in the More sheet), NOT a pill that fills the whole tab slot or a full-width `h-16`
+  tile. The gradient is the plain flat `from-muted to-border` (the "flat & even" option): no inner
+  highlight + drop-shadow recipe, which made the box read as a raised/protruding dome. Keep it flush.
+- **More-sheet cloud only on the selected tile (s28):** in the normal (browse) sheet the grey
+  squircle cloud appears **only behind the currently-selected section**; every other tile shows a
+  bare icon (no backdrop, no ring). In **edit mode** all tiles keep the squircle cloud as the
+  draggable-tile affordance (they jiggle and host the green + badge). Reference mockups:
+  `preview/nav-cloud-refined.html` (size) and `preview/nav-cloud-gradients.html` (gradient studies,
+  founder chose "G1 flat & even"). Do not put a cloud behind unselected browse tiles again.
 - **Every route has ONE custom branded SVG mark and ONE unique accent base colour**, both defined
   once in `src/components/layout/route-icons.tsx` (`RouteIcon`) + `nav-items.ts` (`color`). The same
   mark and colours render on every surface: bottom tab bar, More sheet, and desktop `Sidebar`.

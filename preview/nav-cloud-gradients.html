@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Genauly · Selection cloud — gradient studies</title>
+<style>
+  :root {
+    --surface: #ffffff;
+    --muted-fg: hsl(240 6% 44%);
+    --primary: hsl(245 70% 60%);
+    --text: #1a1b2e;
+    --page-bg: #e9eaf0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--page-bg);
+    font-family: -apple-system, 'Inter', system-ui, Segoe UI, Roboto, sans-serif;
+    -webkit-text-size-adjust: 100%;
+    color: var(--text);
+    padding-bottom: 60px;
+  }
+  .page { max-width: 1000px; margin: 0 auto; padding: 30px 16px 0; }
+  header { text-align: center; margin-bottom: 30px; }
+  header h1 { font-size: 21px; font-weight: 800; margin-bottom: 8px; }
+  header p  { font-size: 13.5px; color: var(--muted-fg); line-height: 1.65; max-width: 640px; margin: 0 auto; }
+
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  @media (max-width: 820px) { .row { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; } }
+
+  .card { background: #fff; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,.1); overflow: hidden; }
+  .card-label { padding: 13px 16px 11px; border-bottom: 1px solid #f0f1f7; }
+  .badge {
+    display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .05em;
+    background: var(--primary); color: #fff; border-radius: 7px; padding: 2px 8px; margin-right: 6px; vertical-align: middle;
+  }
+  .badge.cur { background: #9aa0b8; }
+  .card-name { font-size: 12.5px; font-weight: 700; vertical-align: middle; }
+  .card-desc { font-size: 11px; color: var(--muted-fg); margin-top: 5px; line-height: 1.5; }
+
+  /* mini bar */
+  .barwrap { background: linear-gradient(150deg, #eef0ff 0%, #dff5fa 100%); padding: 16px 12px 0; }
+  .bar { background: var(--surface); border: 1.5px solid #edeef6; border-bottom: none; border-radius: 14px 14px 0 0; }
+  .rail { display: flex; align-items: stretch; height: 60px; padding: 4px; }
+  .tab { flex: 1; display: flex; align-items: center; justify-content: center; position: relative; }
+  .tab svg { display: block; position: relative; z-index: 1; }
+  .cloud { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 15px; }
+  .underline { position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 20px; height: 3px; border-radius: 3px; background: #5b5be6; }
+
+  /* menu strip — compact squircles */
+  .menu { background: var(--surface); padding: 13px 14px 15px; }
+  .menu-title { font-size: 10px; font-weight: 800; letter-spacing: .04em; color: var(--muted-fg); text-transform: uppercase; margin-bottom: 11px; }
+  .mgrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 13px 6px; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .tile { display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 16px; }
+  .cell .lbl { font-size: 10px; font-weight: 600; line-height: 1.1; }
+
+  /* ════════ GRADIENT VARIANTS — applied to .cloud + .tile ════════ */
+
+  /* G0 · current (protruded / convex) */
+  .g0 {
+    background: linear-gradient(155deg, #fbfbfe 0%, #eef0f6 48%, #e3e5ef 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 2px rgba(120,124,150,.10), 0 1px 2px rgba(40,44,80,.07);
+  }
+  /* G1 · flat & even — subtle vertical, no raised highlight */
+  .g1 {
+    background: linear-gradient(180deg, #f4f5f9 0%, #eceef4 100%);
+    box-shadow: inset 0 0 0 1px rgba(120,124,150,.06);
+  }
+  /* G2 · inset / recessed — looks pressed into the bar */
+  .g2 {
+    background: linear-gradient(180deg, #e7e9f1 0%, #f3f4f9 100%);
+    box-shadow: inset 0 1.5px 2.5px rgba(120,124,150,.22), inset 0 -1px 0 rgba(255,255,255,.85);
+  }
+  /* G3 · top-lit halo — radial, soft, no hard edge line */
+  .g3 {
+    background: radial-gradient(125% 115% at 50% 0%, #fcfcff 0%, #edeef4 58%, #e5e6ef 100%);
+    box-shadow: inset 0 0 0 1px rgba(120,124,150,.05);
+  }
+  /* G4 · hairline ring — flat fill, defined only by a crisp inner border */
+  .g4 {
+    background: #f1f2f7;
+    box-shadow: inset 0 0 0 1px rgba(120,124,150,.16);
+  }
+  /* G5 · cool diagonal — soft 3-stop, faintly cool, no drop shadow so it sits flush */
+  .g5 {
+    background: linear-gradient(145deg, #f3f5fc 0%, #e8eaf3 55%, #dfe2ee 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.65);
+  }
+
+  .notes {
+    margin-top: 30px; background:#fff; border-radius:16px; padding:18px 22px;
+    box-shadow:0 2px 12px rgba(0,0,0,.06);
+    font-size:12.5px; color:var(--muted-fg); line-height:1.75; max-width: 780px; margin: 30px auto 0;
+  }
+  .notes b { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Selection cloud — gradient studies</h1>
+    <p>Compact squircle locked for both the bar and the menu tiles. The current grey fill looks
+       <b>convex / protruding outward</b>. Below, the same squircle with six gradient treatments,
+       shown in the bar (active = Wortschatz) and on three menu tiles. Reply with a code (G1–G5) or mix.</p>
+  </header>
+
+  <div class="row" id="grid"></div>
+
+  <div class="notes">
+    <b>The “protruding” effect</b> comes from the current recipe: a top white highlight + a bottom
+    drop shadow, which together fake a raised dome. The alternatives drop or invert that:<br>
+    <b>G1 Flat &amp; even</b> – gentle top-to-bottom grey, no highlight. Calm and modern.<br>
+    <b>G2 Inset</b> – inner top shadow makes the icon sit in a pressed well (iOS keycap feel).<br>
+    <b>G3 Top-lit halo</b> – soft radial glow from the top, no hard edge. Premium, diffuse.<br>
+    <b>G4 Hairline ring</b> – flat fill, shape read only from a crisp 1px inner border. Cleanest.<br>
+    <b>G5 Cool diagonal</b> – soft diagonal with a faint cool tint, sits flush (no drop shadow).<br><br>
+    All stay neutral grey (s27 rule) and adapt to dark mode via tokens. Pick one and I’ll apply it to
+    the active pill in <b>BottomTabBar</b> and the compact-squircle tiles in <b>MoreSheet</b>.
+  </div>
+</div>
+
+<script>
+const MARKS = {
+  "/": `<path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill="#5b5be6"/><path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill="#22d3ee"/>`,
+  "/vocabulary": `<path d="M10 3.4C7.7 2.4 4.8 2.4 2.4 3.4V16.6c2.4-1 5.3-1 7.6 0V3.4Z" fill="#5b5be6"/><path d="M10 3.4c2.3-1 5.2-1 7.6 0V16.6c-2.4-1-5.3-1-7.6 0V3.4Z" fill="#10b7cf"/><line x1="4.4" y1="7" x2="8.2" y2="7" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/><line x1="4.4" y1="9.6" x2="8.2" y2="9.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".5"/><line x1="11.8" y1="7" x2="15.6" y2="7" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".5"/><line x1="11.8" y1="9.6" x2="15.6" y2="9.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".35"/>`,
+  "/quiz": `<circle cx="10" cy="10" r="8.6" fill="#6366f1"/><polyline points="6,10.5 8.7,13 14,7" stroke="#fde047" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
+  "/analytics": `<rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="#0ea5e9"/><rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/><rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/>`,
+  "/more": `<rect x="2" y="2" width="7" height="7" rx="1.6" fill="#5b5be6"/><rect x="11" y="2" width="7" height="7" rx="1.6" fill="#5b5be6" opacity=".72"/><rect x="2" y="11" width="7" height="7" rx="1.6" fill="#5b5be6" opacity=".72"/><rect x="11" y="11" width="7" height="7" rx="1.6" fill="#5b5be6" opacity=".45"/>`,
+  "/redemittel": `<path d="M3 5a2.5 2.5 0 0 1 2.5-2.5h9A2.5 2.5 0 0 1 17 5v5a2.5 2.5 0 0 1-2.5 2.5H8l-3.4 3V12.5A2.5 2.5 0 0 1 3 10V5Z" fill="#0ea5e9"/><circle cx="6.8" cy="7.5" r="1.15" fill="#e879f9"/><circle cx="10" cy="7.5" r="1.15" fill="#e879f9"/><circle cx="13.2" cy="7.5" r="1.15" fill="#e879f9"/>`,
+  "/grammar": `<path d="M5.5 2.5h9a1 1 0 0 1 1 1V17.2l-5.5-3.1L4.5 17.2V3.5a1 1 0 0 1 1-1Z" fill="#10b981"/><path d="M10 2.5h4.5a1 1 0 0 1 1 1V17.2L10 14.1V2.5Z" fill="#a3e635"/>`,
+  "/writing": `<path d="M14.7 2.9a1.7 1.7 0 0 1 2.4 2.4L7.5 14.9l-3.4.9.9-3.4 9.7-9.5Z" fill="#ef4444"/><path d="M4.1 15.8l.9-3.4 2.5 2.5-3.4.9Z" fill="#fb7185"/>`,
+};
+const LABELS = { "/redemittel":"Redemittel","/grammar":"Grammatik","/writing":"Schreiben" };
+const ACCENT = { "/redemittel":"#0ea5e9","/grammar":"#10b981","/writing":"#ef4444" };
+function svg(path, size){ return `<svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="none">${MARKS[path]}</svg>`; }
+
+const BAR = ["/", "/vocabulary", "/quiz", "/analytics", "/more"];
+const MENU = ["/redemittel", "/grammar", "/writing"];
+
+const VARIANTS = [
+  { code:"NOW", cls:"g0", cur:true,  name:"Current — convex",  desc:"Top highlight + bottom shadow fake a raised dome. This is the protruding look." },
+  { code:"G1",  cls:"g1", name:"Flat & even",   desc:"Gentle vertical grey, no highlight. Calm, modern, sits flush." },
+  { code:"G2",  cls:"g2", name:"Inset / pressed", desc:"Inner top shadow — the icon sits in a recessed well." },
+  { code:"G3",  cls:"g3", name:"Top-lit halo",  desc:"Soft radial glow from the top, no hard edge. Diffuse and premium." },
+  { code:"G4",  cls:"g4", name:"Hairline ring", desc:"Flat fill, shape read from a crisp 1px inner border. Cleanest." },
+  { code:"G5",  cls:"g5", name:"Cool diagonal", desc:"Soft cool-tinted diagonal, no drop shadow." },
+];
+
+document.getElementById("grid").innerHTML = VARIANTS.map(v => {
+  const bar = BAR.map(p => {
+    const active = p === "/vocabulary";
+    return `<div class="tab">${active ? `<div class="cloud ${v.cls}">${svg(p,29)}</div><span class="underline"></span>` : svg(p,29)}</div>`;
+  }).join("");
+  const menu = MENU.map(p =>
+    `<div class="cell"><div class="tile ${v.cls}">${svg(p,29)}</div><div class="lbl" style="color:${ACCENT[p]}">${LABELS[p]}</div></div>`
+  ).join("");
+  return `
+    <div class="card">
+      <div class="card-label">
+        <span class="badge ${v.cur?'cur':''}">${v.code}</span>
+        <span class="card-name">${v.name}</span>
+        <div class="card-desc">${v.desc}</div>
+      </div>
+      <div class="barwrap"><div class="bar"><div class="rail">${bar}</div></div></div>
+      <div class="menu"><div class="menu-title">More menu</div><div class="mgrid">${menu}</div></div>
+    </div>`;
+}).join("");
+</script>
+</body>
+</html>
