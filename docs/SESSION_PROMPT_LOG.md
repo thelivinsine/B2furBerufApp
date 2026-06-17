@@ -250,4 +250,17 @@ backfilled from the same session's transcript so the trail is complete.)
   `supabase/functions/delete-account/index.ts`, `src/features/exam/ExamRunner.tsx`,
   `src/features/revision/QuickRevision.tsx`, `src/features/vocabulary/Flashcards.tsx`,
   `src/engine/srs.ts`, `src/store/useAuthStore.ts`, `src/lib/writing.ts`, `docs/PROJECT_STATUS.md`,
-  `docs/SESSION_PROMPT_LOG.md`. Shipped via PR (merge SHA in git history).
+  `docs/SESSION_PROMPT_LOG.md`. Shipped via PR #194 (merge `8acbe73`).
+
+## Entry 13 — 2026-06-17 06:22 UTC
+- **Branch:** `claude/app-audit-testing-bqrdkj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > get rid of the line "leiste voll..." when editing the more menu
+- **Response summary:** Removed the "Leiste voll (max. 4). Erst ein Icon entfernen." helper line that
+  appeared at the bottom of the More sheet in edit mode when the bar already held its max icons
+  (`MoreSheet.tsx`). The `atMax` flag is still used elsewhere (the + badge already hides when the bar
+  is full), so the affordance still communicates the limit without the sentence. `pnpm build` green.
+- **Artifacts:** `src/components/layout/MoreSheet.tsx`, `docs/SESSION_PROMPT_LOG.md`. Shipped via PR
+  (merge SHA in git history).
