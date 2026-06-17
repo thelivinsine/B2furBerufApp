@@ -126,7 +126,7 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 
 // [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
-  "/":             { box: [1.5, 2.2, 17, 15.6],     weight: 1.02 },
+  "/":             { box: [1.5, 2.2, 17, 15.6],     weight: 1.07 },
   "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },
   "/redemittel":   { box: [3, 2.5, 14, 13],         weight: 1.05 },
   "/grammar":      { box: [4.5, 2.5, 11, 14.7],     weight: 1.08 },
