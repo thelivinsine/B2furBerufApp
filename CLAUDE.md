@@ -90,8 +90,12 @@ founder request.**
 - Minimum 2 icons in the bar (Home + at least one other); the X button hides when at the minimum.
 - Icons not pinned to the bar live in the **More sheet** (grid of 3 columns with names below each icon).
 
-### Icon color rule (updated 2026-06-16, s25)
-- Icons are **always colored** (never grey/monochrome). Inactive = 38% opacity. Active = 100%.
+### Icon color rule (updated 2026-06-17, s27)
+- Icons are **always colored** (never grey/monochrome) and now render at **full opacity everywhere**
+  (founder request s27: the old 38% inactive dimming read as blurred). The active tab is marked by
+  its background pill + underline (bar), highlight (More sheet), or row styling (sidebar), not by
+  opacity. `RouteIcon`/`MoreIcon` still accept an `active` prop for call-site compatibility but it no
+  longer changes opacity. Do not reintroduce inactive dimming.
 - **Every route has ONE custom branded SVG mark and ONE unique accent colour**, both defined once
   in `src/components/layout/route-icons.tsx` (`RouteIcon`) + `nav-items.ts` (`color`/`bg`). The
   same mark and colour render on every surface: bottom tab bar, More sheet, and desktop `Sidebar`.

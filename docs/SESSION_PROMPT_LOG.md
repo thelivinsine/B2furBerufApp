@@ -281,4 +281,21 @@ backfilled from the same session's transcript so the trail is complete.)
   `onClick`, so any bar-tap closes the sheet (and exits edit mode) regardless of whether the route
   changes. The pathname effect stays as a backstop for programmatic navigation. `pnpm build` green.
 - **Artifacts:** `src/components/layout/AppShell.tsx`, `src/components/layout/BottomTabBar.tsx`,
-  `docs/SESSION_PROMPT_LOG.md`. Shipped via PR (merge SHA in git history).
+  `docs/SESSION_PROMPT_LOG.md`. Shipped via PR #196 (merge `e75236b`).
+
+## Entry 15 — 2026-06-17 06:36 UTC
+- **Branch:** `claude/app-audit-testing-bqrdkj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > fix the opacity of the icons. they look blurred because of the reduced opacity. I want all icons
+  > to have same opacity as the selected icon.
+- **Response summary:** Removed the 38% inactive-icon dimming so every nav icon renders at full
+  opacity, matching the selected icon. The dimming all flowed through `RouteIcon`/`MoreIcon` in
+  `route-icons.tsx` (the More sheet already used full opacity); dropped the opacity style from both.
+  Kept the `active` prop in the type for call-site compatibility (BottomTabBar/Sidebar still pass it)
+  but it no longer affects opacity. The active tab is still marked by its background pill + underline
+  (bar), highlight (More sheet), and row styling (sidebar). Updated the CLAUDE.md "Icon color rule"
+  (a locked rule) per this founder request. `pnpm build` + `pnpm typecheck` green.
+- **Artifacts:** `src/components/layout/route-icons.tsx`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
+  Shipped via PR (merge SHA in git history).
