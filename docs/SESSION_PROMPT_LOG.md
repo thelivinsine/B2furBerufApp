@@ -298,4 +298,26 @@ backfilled from the same session's transcript so the trail is complete.)
   (bar), highlight (More sheet), and row styling (sidebar). Updated the CLAUDE.md "Icon color rule"
   (a locked rule) per this founder request. `pnpm build` + `pnpm typecheck` green.
 - **Artifacts:** `src/components/layout/route-icons.tsx`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
-  Shipped via PR (merge SHA in git history).
+  Shipped via PR #197 (merge `f6bf010`).
+
+## Entry 16 — 2026-06-17 06:45 UTC
+- **Branch:** `claude/app-audit-testing-bqrdkj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** one screenshot (mobile dashboard with the More sheet open, showing the 3-column
+  icon grid: Redemittel, Grammatik, Kollokationen, Quiz, Sprechsimulation, Prüfungsmodus,
+  Fortschritt, Schnellwiederholung, Einstellungen, plus the bottom bar).
+- **Prompt (verbatim):**
+  > i want you to adjust the sizes of the icons because some of them look a bit too big and some of
+  > them a bit too small. keep all other things constant like padding and selection cloud around the
+  > icon. In general it looks like there's a bit too much empty space. try to increase the size by 5%
+  > something to keep it compact. but note that not all icons need to be increased in size e.g. the
+  > pencil icon. check the screenshot and adjust the sizes
+- **Response summary:** Re-tuned the per-mark optical `weight` values in the `NORM` map in
+  `route-icons.tsx` (final size ∝ weight) for a ~5% general increase to reduce empty space, with
+  per-icon nudges: the visibly small marks got more (grammar bookmark, exam cap, analytics bars all
+  1.0 → 1.08), the already-large marks stayed restrained (quiz disc 0.9 → 0.92, revision bolt kept at
+  1.0), and the pencil (`/writing`) was left unchanged at 1.04 per the request. Also bumped the Mehr
+  grid icon 0.95 → 1.0. Padding and the selection cloud/pill were untouched. `pnpm build` +
+  `pnpm typecheck` green.
+- **Artifacts:** `src/components/layout/route-icons.tsx`, `docs/SESSION_PROMPT_LOG.md`. Shipped via
+  PR (merge SHA in git history).
