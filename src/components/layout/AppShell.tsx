@@ -37,11 +37,17 @@ export function AppShell() {
   const navigate = useNavigate();
 
   // Navigating to any route (e.g. tapping Home or another tab in the bar while
-  // the sheet is open) closes the More sheet and exits edit mode.
+  // the sheet is open) closes the More sheet and exits edit mode. This handles
+  // cross-route navigation; tapping the tab that is already active doesn't
+  // change the pathname, so the bar also calls closeMore() directly on tap.
   useEffect(() => {
     setMoreOpen(false);
     setEditMode(false);
   }, [location.pathname]);
+  function closeMore() {
+    setMoreOpen(false);
+    setEditMode(false);
+  }
   const authStatus = useAuthStore((s) => s.status);
   const xp = useProgressStore((s) => s.xp);
   const streak = useProgressStore((s) => s.streak);
@@ -91,6 +97,7 @@ export function AppShell() {
       {/* Mobile bottom tab bar + "Mehr" sheet */}
       <BottomTabBar
         onMore={toggleMore}
+        onNavigate={closeMore}
         onLongPress={enterEditMode}
         editMode={editMode}
         moreOpen={moreOpen}
