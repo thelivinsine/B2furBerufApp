@@ -263,4 +263,22 @@ backfilled from the same session's transcript so the trail is complete.)
   (`MoreSheet.tsx`). The `atMax` flag is still used elsewhere (the + badge already hides when the bar
   is full), so the affordance still communicates the limit without the sentence. `pnpm build` green.
 - **Artifacts:** `src/components/layout/MoreSheet.tsx`, `docs/SESSION_PROMPT_LOG.md`. Shipped via PR
-  (merge SHA in git history).
+  #195 (merge `95763bc`).
+
+## Entry 14 — 2026-06-17 06:32 UTC
+- **Branch:** `claude/app-audit-testing-bqrdkj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** one screenshot (mobile Schreibtraining with the More sheet stuck open over it).
+- **Prompt (verbatim):**
+  > there's a bug or something where when schreibtraining is open and then more icon is pressed, and
+  > again schreibtraining is pressed, the more menu doesn't close. it happens when a bottom bar item
+  > is open, more icon is pressed, and then again the particular bottom bar item which is open in the
+  > background is pressed again, the more menu doesn't close. I want it to close even then. fix it
+- **Response summary:** Root-caused it: the More sheet only closed via the `location.pathname`
+  `useEffect` in `AppShell`, but tapping the tab that is already active navigates to the same route,
+  so the pathname never changes and the effect never fires. Added a `closeMore()` handler in
+  `AppShell`, passed it to `BottomTabBar` as `onNavigate`, and wired it to each normal-mode tab's
+  `onClick`, so any bar-tap closes the sheet (and exits edit mode) regardless of whether the route
+  changes. The pathname effect stays as a backstop for programmatic navigation. `pnpm build` green.
+- **Artifacts:** `src/components/layout/AppShell.tsx`, `src/components/layout/BottomTabBar.tsx`,
+  `docs/SESSION_PROMPT_LOG.md`. Shipped via PR (merge SHA in git history).

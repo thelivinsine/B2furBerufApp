@@ -25,13 +25,17 @@ function IcoMore({ active }: { active: boolean }) {
 
 interface Props {
   onMore: () => void;
+  /** Close the "Mehr" sheet when a bar tab is tapped, even the already-active one
+   *  (tapping the active tab doesn't change the route, so the pathname effect
+   *  wouldn't fire). */
+  onNavigate: () => void;
   onLongPress: () => void;
   editMode: boolean;
   /** Whether the "Mehr" sheet is open — keeps the More icon selected while browsing it. */
   moreOpen: boolean;
 }
 
-export function BottomTabBar({ onMore, onLongPress, editMode, moreOpen }: Props) {
+export function BottomTabBar({ onMore, onNavigate, onLongPress, editMode, moreOpen }: Props) {
   const location      = useLocation();
   const pathname      = location.pathname;
   const pinnedRaw     = useSettingsStore(s => s.pinnedTabs);
@@ -163,6 +167,7 @@ export function BottomTabBar({ onMore, onLongPress, editMode, moreOpen }: Props)
               <NavLink
                 key={to} to={to} end={end} aria-label={label}
                 className="flex flex-1 p-1"
+                onClick={onNavigate}
                 onContextMenu={e => e.preventDefault()}
               >
                 {({ isActive }) => {
