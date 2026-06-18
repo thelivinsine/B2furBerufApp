@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-16 (session 27). Branch: `claude/app-audit-testing-bqrdkj`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-17 (session 28). Branch: `claude/cloud-icon-bottom-bar-epi0dt`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,25 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 28 (2026-06-17) — Selection "cloud" refinement: compact squircle + selected-only menu (SHIPPED ✅)
+Founder feedback: the grey backdrop behind the active icon (the "cloud") was too big and the gradient
+looked convex/protruding. Iterated via HTML mockups (raw.githack preview links, the same flow as the
+icon previews) before touching live code:
+- **Mockup 1 (`preview/nav-cloud-refined.html`):** current full-slot pill vs tighter options. Founder
+  picked the **compact squircle**.
+- **Mockup 2 (`preview/nav-cloud-gradients.html`):** six gradient studies of the squircle. Founder
+  picked **G1 "flat & even"** (plain `from-muted to-border`, no highlight/shadow dome).
+- **Implemented (PR #202, merge `69eee0c`):**
+  - Bar active pill + Mehr pill → compact `h-11 w-11 rounded-2xl` squircle hugging the icon (was a
+    slot-filling `rounded-xl` pill); underline moved to `bottom-[6px]` (`BottomTabBar`).
+  - More sheet → compact `h-12 w-12` squircle tiles; the grey cloud now appears **only behind the
+    selected section** in browse mode (every other tile is a bare icon on white). Edit mode keeps the
+    squircle on all tiles as the draggable-tile affordance (`MoreSheet`).
+  - Note: founder initially saw clouds on every browse tile after the deploy — that was the PWA
+    service-worker serving the cached pre-#202 build; a full app close/reopen picked up the fix.
+- Docs: CLAUDE.md gained the s28 rules (compact-squircle backdrop, flat & even gradient, More-sheet
+  cloud only on the selected tile). `pnpm build` + `pnpm lint:content` green.
 
 ### Session 3 (2026-06-01) — auth polish + dark-mode readability (SHIPPED & LIVE)
 - **Sign-up honesty fix (PR #19, merged):** sign-up no longer falsely reports success when email
@@ -1285,7 +1304,15 @@ Active automation branch: `claude/context-bar-menu-animations-g9gfd3` (realign t
 after each squash-merge — see CLAUDE.md). The branch name is reassigned per session; `main` is the
 source of truth.
 
-**Most recent work (sessions 23–26):** data-governance v0.2/v0.3 + boot-splash fix (s23), unique
+**Most recent work (sessions 27–28):** nav-icon polish — full-opacity icons, optical-size re-tune,
+two-tone + neon marks for every route, and **grey-gradient icon backdrops** (s27); then the
+**selection-cloud refinement (s28)**: the active backdrop is now a **compact rounded squircle** that
+hugs the icon (flat "G1" `from-muted to-border` gradient, no protruding dome), and in the More sheet
+the cloud appears **only behind the selected section** (others are bare icons on white), while edit
+mode keeps the squircle as the draggable-tile handle. See the Session 27/28 logs above and the
+CLAUDE.md "Mobile bottom tab bar" section (s27/s28 rules) for the locked behavior.
+
+**Earlier nav work (sessions 23–26):** data-governance v0.2/v0.3 + boot-splash fix (s23), unique
 per-route icon colours + all-custom branded SVG marks (s25), and the **mobile nav overhaul (s26)**:
 removed the bottom-bar context strip, a 63px rail with 29px icons (matched in the More sheet),
 Mehr tab shows selected state + toggles the sheet closed, the sheet closes on navigation, the More
