@@ -70,7 +70,7 @@ function EditGridIcon({
         className="relative flex w-full justify-center"
       >
         <motion.div
-          className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-b from-muted to-border"
+          className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-border"
           animate={isDragging ? { rotate: 0 } : { rotate: [-2.5, 2.5, -2.5] }}
           transition={isDragging
             ? { duration: 0.15 }
@@ -264,7 +264,7 @@ export function MoreSheet({ open, onOpenChange, editMode, onLongPress }: Props) 
                       <div
                         className={cn(
                           "flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-150",
-                          isActive && "bg-gradient-to-b from-muted to-border",
+                          isActive && "bg-border",
                         )}
                       >
                         <RouteIcon path={to} size={29} active />

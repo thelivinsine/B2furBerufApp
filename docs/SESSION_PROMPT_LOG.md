@@ -413,3 +413,20 @@ backfilled from the same session's transcript so the trail is complete.)
 - **Artifacts:** `preview/nav-cloud-refined.html`, `preview/nav-cloud-gradients.html`,
   `src/components/layout/BottomTabBar.tsx`, `src/components/layout/MoreSheet.tsx`, `CLAUDE.md`,
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 25 — 2026-06-18 (selection backdrop: drop the gradient)
+- **Branch:** `claude/bottom-nav-selection-style-nfo0dy`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > i like the selection, grey circle, for the bottom navigation bar and the icons in more menu. but
+  > I don't like the gradient. can you just get rid of the gradient and just keep a suitable light
+  > grey shade
+- **Response summary:** Replaced the grey gradient backdrop (`bg-gradient-to-b from-muted to-border`)
+  with a single flat light-grey shade (`bg-border`) on all four selection backdrops: the bottom
+  bar's active pill + Mehr pill (`BottomTabBar` `ACTIVE_BOX`), the More-sheet edit-mode tile and the
+  selected browse tile (`MoreSheet`), and the desktop sidebar's active row (kept consistent).
+  `bg-border` reads as a clear, even light grey in both light and dark mode (no protruding dome).
+  Updated CLAUDE.md (s29 flat-fill rule). `pnpm build` green.
+- **Artifacts:** `src/components/layout/BottomTabBar.tsx`, `src/components/layout/MoreSheet.tsx`,
+  `src/components/layout/Sidebar.tsx`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.

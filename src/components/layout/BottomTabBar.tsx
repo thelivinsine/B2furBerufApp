@@ -9,8 +9,8 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { cn } from "@/lib/utils";
 
 const MORE_COLOR = "#5b5be6";
-// Grey gradient backdrop for the active pill (no section-colour tint).
-const ACTIVE_BOX = "bg-gradient-to-b from-muted to-border";
+// Flat light-grey backdrop for the active pill (no gradient, no section-colour tint).
+const ACTIVE_BOX = "bg-border";
 const IZ = 29; // icon size
 
 // Every surface (bottom bar, More sheet, sidebar) draws the SAME custom branded
