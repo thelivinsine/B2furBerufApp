@@ -1,7 +1,15 @@
-# Genauly — B2 Beruf Speaking Prep
+# Genauly — German for the intermediate (B1–B2) plateau
 
-Interactive prep platform for the **Goethe / telc Deutsch B2 Beruf** speaking exam.
+Genauly helps adult learners break through the intermediate German plateau (B1–B2) and build
+practical fluency for the situations that actually matter in real life: the **workplace**, plus
+**everyday tasks** like bureaucracy (Behörde), banking, healthcare (Arzt), and housing. It also
+supports direct preparation for the **telc Deutsch B2 Beruf** and **Goethe-Zertifikat B2** exams.
 React + TypeScript + Vite SPA, deployed to GitHub Pages.
+
+**Scope note (do not narrow this again):** the product was repositioned in session 21 (2026-06-12)
+from "B2 Beruf speaking-exam prep" to the broader B1–B2 plateau framing above. The live landing page,
+`/about`, the PWA manifest, and `docs/BUSINESS_PLAN.md` already reflect it. Exam prep is **one
+pillar**, not the whole product; daily-life domains beyond the workplace are core, not optional.
 
 ## Stack
 - **Vite 6** + **React 18** + **TypeScript 5.7** (strict, project references via `tsc -b`)
@@ -42,7 +50,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - This rule is for all AI tools building this app. Prefer plain, natural punctuation over dashes.
 
 ## Content conventions
-- **Themes**: ten workplace topics: meetings, scheduling, logistics, customer, conflict, project, technology, sustainability, safety, travel.
+- **Themes**: currently ten **workplace** topics (meetings, scheduling, logistics, customer, conflict, project, technology, sustainability, safety, travel). These were built first, but the product scope is broader than the workplace (see the scope note at the top): the roadmap adds **daily-life domains** like bureaucracy/Behörde, banking, healthcare/Arzt, and housing, so content there is not yet built. When adding a life-domain theme, match the `ExamTheme` schema in `src/data/themes.ts`, keep ids unique, and add matching vocab/collocations/dialogues + provenance rows.
 - **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article (nouns), plural (countable nouns), pronunciation hint, two example sentences, and related terms. Currently **490 words** (~49 per theme; verified by `pnpm lint:content`). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build` + `pnpm lint:content`.
 - **Collocations** (`src/data/collocations.ts`): currently **120 Nomen-Verb pairs** (12 per theme). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`), `themeId`, `example {de, en}`. Keep ids unique (`c_` prefix + snake_case).
 - **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.

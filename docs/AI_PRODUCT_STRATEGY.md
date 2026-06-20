@@ -1,10 +1,21 @@
 # Genauly — AI Product Innovation Strategy
 
 _Research-backed playbook for using modern AI to generate, validate, prioritise, and ship
-high-value features for the B2 Beruf speaking-prep app._
+high-value features for Genauly: helping B1–B2 learners break through the intermediate German
+plateau and reach usable fluency for real-life situations (workplace **plus** bureaucracy, banking,
+healthcare, and housing), with certification exam prep as one pillar._
 
-_Prepared: 2026-06-20 · Branch `claude/genauly-ai-strategy-8wrlcz` · Audience: non-technical founder + small build team (currently the founder + Claude Code as CTO)._
+_Prepared: 2026-06-20 (rev. 2 same day) · Branch `claude/genauly-ai-strategy-8wrlcz` · Audience: non-technical founder + small build team (currently the founder + Claude Code as CTO)._
 
+> **Scope (corrected 2026-06-20).** Genauly's mission is to help adult learners break through the
+> **intermediate German plateau (B1–B2)** and reach usable fluency for the situations that matter:
+> the workplace *and* everyday life (bureaucracy/Behörde, banking, healthcare/Arzt, housing). Direct
+> **exam prep (telc Deutsch B2 Beruf, Goethe-Zertifikat B2) is one pillar, not the whole product.**
+> Revision 1 of this doc over-indexed on the speaking exam because the developer-facing `CLAUDE.md`
+> header still described the app as "B2 Beruf Speaking Prep"; that header (and the `EXPANSION_PLAN`
+> title) were stale and have been corrected alongside this revision. The repositioning itself shipped
+> in session 21 (live landing page, `/about`, PWA manifest, `docs/BUSINESS_PLAN.md`).
+>
 > **Scope note.** This is a strategy/advisory document, not product copy. It still follows the
 > house no-em-dash rule. Where it cites evidence, links are inline and collected under "Sources".
 > Nothing here changes app behaviour; it is a decision aid you can act on incrementally.
@@ -13,6 +24,15 @@ _Prepared: 2026-06-20 · Branch `claude/genauly-ai-strategy-8wrlcz` · Audience:
 
 ## 1. Executive summary
 
+Genauly's mission is to get learners *off the intermediate plateau*. The B1–B2 stall is the single
+most documented dropout point in language learning: generic high-frequency vocabulary runs out, and
+the next level demands spontaneous, flexible production across many real-world topics rather than
+rehearsed phrases. Most learners never escape it. That is the problem Genauly exists to solve, in two
+domains that mainstream apps ignore: the **workplace** *and* the **everyday-life situations** that
+matter most to adult immigrants and residents (a Behörde appointment, a bank call, a doctor visit, a
+rental viewing). Exam prep (telc B2 Beruf, Goethe B2) is one important pillar, because B2 gates visas
+and professional licensing, but it is not the whole product.
+
 Genauly already does the hard, unglamorous part right: it is built on the two learning mechanisms
 with the strongest empirical support in all of cognitive psychology, **retrieval practice (active
 recall)** and **spaced repetition** (your SM-2 SRS engine). The 2013 Dunlosky review and the
@@ -20,30 +40,33 @@ Roediger & Karpicke "testing effect" work put these at the top of the evidence p
 re-reading, highlighting, and most "edtech" gimmicks. That is a real moat: most competitors bolt AI
 onto a weak pedagogical core. You should bolt AI onto a strong one.
 
-The single biggest product gap for a **speaking** exam is **productive output practice**. The
-research splits into Krashen's "comprehensible input" (you learn by understanding language slightly
-above your level) and Swain's "comprehensible output" (you learn by producing language, noticing the
-gap, and self-correcting). A speaking exam lives almost entirely in Swain's territory, and output
-practice is exactly what is hardest to deliver cheaply at scale without AI. This is where modern
-LLMs plus speech models change the unit economics: a believable B2-Beruf roleplay partner, instant
-diagnostic feedback on a spoken answer, and pronunciation scoring used to be impossible for a
-two-person team. They are now a weekend prototype.
+What breaks a plateau is **contextual practice in real situations**, combining rich comprehensible
+*input* slightly above the learner's level (Krashen) with structured *output* where they produce
+language, notice the gap, and self-correct (Swain). The biggest product gap mainstream apps leave is
+exactly this: believable, feedback-rich practice in the specific situations a learner will actually
+face, across both work and daily life. That used to be impossible to deliver cheaply at scale.
+Modern LLMs plus speech models change the unit economics: a Behörde-counter roleplay, a "explain
+this Bescheid in plain German" helper, a mock job interview, or instant diagnostic feedback on a
+spoken answer used to be impossible for a two-person team. They are now a weekend prototype.
 
 Three strategic bets, in order:
 
-1. **Quick wins (now → 4 weeks):** Use AI as a *build-time and back-office* tool first (content
-   generation with provenance, exam-rubric feedback on the writing coach you already planned,
-   internal idea/validation workflows). Low risk, no new runtime data processing, no GDPR surface.
-2. **Medium term (1–3 months):** Ship an **AI speaking partner** and **AI exam examiner** as the
-   flagship runtime features, gated behind auth (your Phase 2 Supabase work), with audio processed
-   transiently and never stored by default.
+1. **Quick wins (now → 4 weeks):** Use AI as a *build-time and back-office* tool first (generate
+   situation scenarios and content for new life-domains *with provenance*, rubric feedback on the
+   writing coach you already planned, internal idea/validation workflows). Low risk, no new runtime
+   data processing, no GDPR surface. This is also how you cheaply expand content beyond the workplace.
+2. **Medium term (1–3 months):** Ship an **AI situation partner** (workplace *and* daily-life
+   scenarios) and an **AI feedback/examiner** as the flagship runtime features, gated behind auth
+   (your Phase 2 Supabase work), with audio processed transiently and never stored by default.
 3. **Long term (3–9 months):** Personalised, adaptive study plans driven by your existing analytics,
-   plus a thin "ask-anything" tutor. These need the most care on cost, latency, and GDPR/EU AI Act,
-   so they come last.
+   a real-life "scenario library" spanning bureaucracy/banking/healthcare/housing, plus a thin
+   "ask-anything" tutor. These need the most care on cost, latency, and GDPR/EU AI Act, so they come last.
 
 The thread through all of it: **AI is leverage on a pedagogically sound product, not the product.**
-Measure every AI feature against learning outcomes (mock-exam score deltas, retention of reviewed
-items) and retention (D7/D30, streak survival), not "engagement with the AI" for its own sake.
+Measure every AI feature against learning outcomes (plateau progress: can the learner now handle the
+situation? plus retention of reviewed items) and retention (D7/D30, streak survival), not
+"engagement with the AI" for its own sake. Exam-score deltas are one outcome among several, not the
+only one.
 
 ---
 
@@ -59,14 +82,20 @@ spacing can roughly double the efficiency of massed study at equal total time. T
 [Spacing-effect evidence (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC8759977/) ·
 [Active recall vs spaced repetition, evidence compared](https://recallify.ai/evidence-for-active-recall-and-spaced-repetition/)
 
-**Finding 2 — A speaking exam is an "output" problem, and output practice is the scarce, defensible thing.**
-Swain's comprehensible-output hypothesis argues learners advance when they *produce* language, notice
-where they cannot express meaning, and revise. Krashen counters that input dominates. For a B2 Beruf
-*Sprechen* exam (presenting, negotiating, reacting), the test literally scores output, so the
-practical answer is: you need both, but the product gap competitors under-serve is *structured,
-feedback-rich speaking output*. **Implication:** AI roleplay + diagnostic feedback is the highest-
-leverage feature, not more flashcards.
-[Krashen vs Swain overview (Leonardo English)](https://www.leonardoenglish.com/blog/comprehensible-input) ·
+**Finding 2 — The B1–B2 plateau is the core problem, and it is broken by contextual input + output across real situations (not just exam drills).**
+The intermediate plateau is a well-documented SLA phenomenon: high-frequency vocabulary runs out, and
+the B1→B2 jump demands a qualitative shift from rehearsed responses to *spontaneous, flexible
+production* on a wide range of topics, professional *and* everyday. Most learners stall here and many
+give up. The mechanism for breaking through combines Krashen's *comprehensible input* (understanding
+language a step above your level) with Swain's *comprehensible output* (producing language, noticing
+the gap, revising). The practical answer: learners need rich, situation-specific practice, input and
+output, across the exact contexts they will face, at work *and* in daily life (Behörde, bank, doctor,
+landlord). That is the gap mainstream apps under-serve. **Implication:** AI roleplay + diagnostic
+feedback, spanning workplace *and* daily-life scenarios, is the highest-leverage feature, not more
+generic flashcards. A speaking exam is one high-stakes instance of this output problem, not the
+boundary of it.
+[Intermediate plateau, why B1–B2 learners stall (Glossika)](https://ai.glossika.com/blog/overcoming-intermediate-plateau) ·
+[Krashen input vs Swain output overview (Leonardo English)](https://www.leonardoenglish.com/blog/comprehensible-input) ·
 [Swain, Comprehensible Output (Krashen's reply, PDF)](https://www.sdkrashen.com/content/articles/comprehensible_output.pdf)
 
 **Finding 3 — The category leader has already validated AI roleplay + "explain my answer", and monetised it.**
@@ -74,8 +103,9 @@ Duolingo Max (GPT-4) ships exactly two features: **Roleplay** (scenario conversa
 feedback) and **Explain My Answer** (rule breakdown on mistakes), later **Video Call** with a
 character. They put these behind the top subscription tier. This is strong market validation that
 (a) learners value AI conversation + explanation, and (b) it supports premium pricing. **Implication:**
-you can fast-follow with a *B2-Beruf-specialised* version, which is a sharper wedge than Duolingo's
-generalist breadth.
+you can fast-follow with a version *specialised for the German B1–B2 plateau and the real-life
+situations learners actually face* (work, Behörde, banking, healthcare, housing), a far sharper wedge
+than Duolingo's generalist breadth.
 [OpenAI × Duolingo case](https://openai.com/index/duolingo/) ·
 [Duolingo Max announcement (investor)](https://investors.duolingo.com/news-releases/news-release-details/duolingo-max-shows-future-ai-education)
 
@@ -91,7 +121,7 @@ do not over-promise native-like intonation scoring you cannot reliably deliver.
 **Finding 5 — Running AI on user speech/text in the EU is a GDPR *and* EU AI Act question, and DPIAs are becoming the default gate.**
 The EU AI Act layers on top of GDPR; it does not replace it. For conversational AI touching personal
 data at scale, a **DPIA** is increasingly the standard gating step, and the EDPB's Opinion 28/2024
-is the reference for how GDPR applies to AI models. Most B2-Beruf practice content is not "special
+is the reference for how GDPR applies to AI models. Most Genauly practice content is not "special
 category" data, which keeps you out of the worst tier, but a learner's voice and free-text answers
 are still personal data. **Implication:** design for *transient processing, no audio retention by
 default, EU-region inference where possible, and a short DPIA* before the speaking features go live.
@@ -110,19 +140,21 @@ with ICE-style estimates, switch the Reach term to real analytics once Phase 2 t
 
 ## 3. The AI opportunity landscape for Genauly
 
-Eight categories, with where Genauly specifically wins. "B2 Beruf" focus is your differentiator
-against generalist apps, so every row is framed for the *workplace German exam*, not generic English.
+Eight categories, with where Genauly specifically wins. Your differentiator against generalist apps
+is **plateau-breaking, situation-based German for real life**, work *and* daily-life domains
+(bureaucracy/Behörde, banking, healthcare, housing), with exam prep as one high-value pillar. Every
+row is framed for that, not for generic English and not for the workplace exam alone.
 
 | Category | Highest-leverage AI move for Genauly | Why it matters here |
 |---|---|---|
-| **Learning effectiveness** | AI feeds missed words/structures from conversations back into the SRS queue; "explain my mistake" in German + English | Closes the loop between output practice and retrieval practice (Findings 1–2) |
-| **User engagement** | Scenario roleplay with your 10 workplace themes (meeting, conflict, logistics…) | Output practice is intrinsically more engaging than flashcards, and it is exam-shaped |
-| **Personalisation** | Adaptive daily plan from analytics: target weak themes/grammar groups | You already track weakness categories; AI turns them into a sequenced plan |
-| **Retention** | AI "exam-day countdown" coach + smart streak recovery | Speaking confidence is the emotional hook; tie streaks to mock-exam readiness |
-| **Content creation** | Build-time generation of vocab examples, collocations, distractors, with provenance rows | Scales your 490-word/120-collocation banks safely under your governance policy |
-| **Assessment & feedback** | AI examiner that scores a spoken/written answer against the real Goethe/telc rubric | This is the feature learners will pay for; it is your writing-coach plan extended to speaking |
-| **Community & social** | AI-moderated peer practice matching + shared scenario library | Lightweight social without building a full community product |
-| **Business growth** | AI-personalised landing pages per acquisition channel; in-app upsell at the "you're exam-ready" moment | Convert the confidence payoff into subscription intent |
+| **Learning effectiveness** | AI feeds missed words/structures from conversations back into the SRS queue; "explain my mistake" in German + English | Closes the loop between situation output practice and retrieval practice (Findings 1–2) |
+| **User engagement** | Scenario roleplay across both pillars: the 10 workplace themes *and* daily-life situations (Behörde counter, bank call, doctor visit, flat viewing) | Situated output practice in the user's real life is intrinsically more engaging than flashcards |
+| **Personalisation** | Adaptive plan from analytics: target weak themes/grammar groups *and* the life-domains the learner flags as their goal (job vs visa vs settling in) | You already track weakness categories; AI sequences them to the learner's real-life goal |
+| **Retention** | AI goal coach (exam-day countdown *or* "ready for your Behörde appointment") + smart streak recovery | The emotional hook is confidence in a real upcoming situation, not only an exam |
+| **Content creation** | Build-time generation of vocab/collocations/scenarios *for new life-domains*, with provenance rows | The cheapest way to expand beyond the 10 workplace themes into bureaucracy/banking/healthcare/housing |
+| **Assessment & feedback** | AI feedback that scores a spoken/written answer against the real Goethe/telc rubric *and* against "did you accomplish the real-world task?" | Exam learners pay for rubric scoring; daily-life learners want "would this have worked at the counter?" |
+| **Community & social** | AI-moderated peer practice matching + shared real-life scenario library | Lightweight social; user-contributed situations grow the scenario library |
+| **Business growth** | AI-personalised onboarding by goal (exam / visa / job / settling in); upsell at the "you're ready for X" moment | Convert the confidence payoff into subscription intent across every goal, not just exam day |
 
 ---
 
@@ -177,17 +209,20 @@ A loop a two-person team can actually run. Each stage has a copy-paste prompt sc
 **Stage 1 — Discover (pain points & Jobs-to-be-Done).** Feed real inputs (interview notes, app-store
 reviews of competitors, support messages, your analytics on where users drop) into Claude/NotebookLM.
 
-> Prompt: *"You are a JTBD researcher. Here are [N] notes from B2-Beruf exam candidates: [paste].
-> Extract the top jobs in the format 'When I ___, I want to ___, so I can ___.' For each, rate
-> frequency and intensity 1–5, and quote the evidence. Flag jobs unique to a **workplace** exam
-> (vs general German) and jobs nobody is serving well."*
+> Prompt: *"You are a JTBD researcher. Here are [N] notes from B1–B2 German learners (mix of exam,
+> work, and daily-life goals): [paste]. Extract the top jobs in the format 'When I ___, I want to
+> ___, so I can ___.' For each, rate frequency and intensity 1–5, and quote the evidence. Flag jobs
+> unique to **real-life German in Germany** (work, Behörde, banking, healthcare, housing) vs general
+> German, and jobs nobody is serving well."*
 
 **Stage 2 — Generate (feature ideation against a job).** One job at a time, not "give me 50 ideas".
 
-> Prompt: *"For this job: [paste one JTBD]. Generate 8 feature concepts for a B2-Beruf speaking-prep
-> app. For each: the concept in one line, the learning-science rationale (retrieval/spacing/output),
-> the smallest version that delivers value, and the riskiest assumption. Bias toward ideas that
-> reuse an existing SRS/analytics/dialogue engine. No generic gamification."*
+> Prompt: *"For this job: [paste one JTBD]. Generate 8 feature concepts for Genauly, an app that helps
+> B1–B2 learners break through the German plateau for real-life situations (work *and* daily life:
+> Behörde, banking, healthcare, housing), with exam prep as one pillar. For each: the concept in one
+> line, the learning-science rationale (retrieval/spacing/input/output), the smallest version that
+> delivers value, and the riskiest assumption. Bias toward ideas that reuse an existing
+> SRS/analytics/dialogue engine. No generic gamification."*
 
 **Stage 3 — Validate (cheapest test first).** See §6. Generate the artefacts with AI, run the test
 with humans.
@@ -220,7 +255,7 @@ Validate before you build. Order tests cheapest-to-most-expensive; stop as soon 
 - **Activation:** % of new users who complete one speaking session in week 1.
 - **Engagement:** speaking sessions/week per active user (quality over raw screen time).
 - **Retention:** D7/D30 retention; streak survival; exam-date cohort retention.
-- **Business:** free→paid conversion at the "exam-ready" moment; gross margin per AI session (watch token cost).
+- **Business:** free→paid conversion at the "you're ready for X" moment (exam, appointment, interview); gross margin per AI session (watch token cost).
 
 **Fake-door is your best friend.** Because the live site is static GitHub Pages and feature-branch
 pushes do not deploy, the cleanest pre-build test is a single landing/`/preview` page on `main` with
@@ -230,9 +265,9 @@ a waitlist button wired to a Supabase table. Cost: near zero. Signal: high.
 
 ## 7. Prioritisation system (scoring model + worked examples)
 
-Adapted RICE, tuned for a pre-revenue B2-Beruf team. Two extra factors matter for you that vanilla
-RICE omits: **Strategic differentiation** (does it deepen the B2-Beruf wedge vs generalist apps?)
-and **Risk** (GDPR/cost/latency). Score each 1–5 except Reach and Effort.
+Adapted RICE, tuned for a pre-revenue plateau-focused team. Two extra factors matter for you that
+vanilla RICE omits: **Strategic differentiation** (does it deepen the "plateau-breaking, real-life
+German" wedge vs generalist apps?) and **Risk** (GDPR/cost/latency). Score each 1–5 except Reach and Effort.
 
 ```
 Score = (Reach × Impact × Confidence × Differentiation) / (Effort × Risk)
@@ -240,7 +275,7 @@ Score = (Reach × Impact × Confidence × Differentiation) / (Effort × Risk)
   Reach          1–5   how many active users touch it (use real analytics once you have them)
   Impact         1–5   per-user value: learning outcome + engagement
   Confidence     1–5   evidence it will work (research + validation done)
-  Differentiation 1–5  how much it sharpens the B2-Beruf moat
+  Differentiation 1–5  how much it sharpens the plateau / real-life-German moat
   Effort         1–5   build + maintenance cost (5 = very large)
   Risk           1–5   GDPR/cost/latency/accuracy exposure (5 = scary)
 ```
@@ -249,18 +284,20 @@ Worked examples (illustrative pre-validation estimates; re-score after validatio
 
 | Idea | R | I | C | Diff | Eff | Risk | Score | Read |
 |---|---|---|---|---|---|---|---|---|
-| AI speaking roleplay (themes) | 5 | 5 | 4 | 5 | 3 | 3 | **55.6** | Flagship, do first |
-| AI exam examiner (rubric scoring) | 4 | 5 | 4 | 5 | 3 | 3 | **44.4** | Pair with roleplay |
+| AI situation partner (work + daily life) | 5 | 5 | 4 | 5 | 3 | 3 | **55.6** | Flagship, do first |
+| AI examiner & task-feedback | 4 | 5 | 4 | 5 | 3 | 3 | **44.4** | Pair with the partner |
+| Behörde & document decoder | 4 | 5 | 4 | 5 | 3 | 3 | **44.4** | Sharp daily-life wedge |
+| Daily-life scenario packs (Behörde first) | 4 | 4 | 4 | 5 | 3 | 1 | **106.7** | Cheap content expansion, do early |
 | Explain-my-mistake (DE+EN) | 5 | 4 | 5 | 3 | 2 | 2 | **75.0** | Cheap, high-value quick win |
 | AI-generated content + provenance | 3 | 3 | 5 | 2 | 2 | 1 | **45.0** | Back-office quick win |
-| Adaptive daily study plan | 4 | 4 | 3 | 4 | 4 | 2 | **24.0** | Medium term |
+| Adaptive plan (goal-aware) | 4 | 4 | 3 | 4 | 4 | 2 | **24.0** | Medium term |
 | Live low-latency voice call | 3 | 4 | 3 | 4 | 5 | 4 | **7.2** | Long term (cost/latency) |
 | Pronunciation phoneme scoring | 3 | 4 | 3 | 4 | 4 | 4 | **9.0** | Long term (prosody gap, cost) |
 
-The pattern is deliberate: the **highest scores are the cheap, high-confidence wins**
-("explain my mistake", content generation), which you ship first to build momentum, while the
-glamorous voice features score lower until cost/latency/GDPR confidence improves. Re-score with real
-Reach numbers once Phase 2 analytics land.
+The pattern is deliberate: the **highest scores are the cheap, high-differentiation wins** (daily-life
+scenario packs, "explain my mistake", content generation), which you ship first to build momentum and
+to widen the product beyond the workplace, while the glamorous voice features score lower until
+cost/latency/GDPR confidence improves. Re-score with real Reach numbers once Phase 2 analytics land.
 
 ---
 
@@ -269,15 +306,19 @@ Reach numbers once Phase 2 analytics land.
 Numbered, mapped to a category, with the smallest viable version and the cheapest validation. IDs are
 for your backlog.
 
-1. **AI Speaking Partner ("Sprechpartner")** — *Engagement / Output.* Text-or-voice roleplay across
-   your 10 workplace themes (lead a meeting, de-escalate a conflict, brief a colleague). Ends by
-   pushing missed words into SRS. **MVP:** text-only, 3 scenarios, Web Speech for voice-out.
-   **Validate:** fake-door waitlist + Wizard-of-Oz (you play the partner for 10 testers via chat).
+1. **AI Situation Partner ("Gesprächspartner")** — *Engagement / Output.* Text-or-voice roleplay
+   across **both pillars**: workplace scenarios (lead a meeting, de-escalate a conflict, brief a
+   colleague) *and* daily-life scenarios (register at the Bürgeramt, dispute a bank charge, describe
+   symptoms to a doctor, ask a landlord about the Nebenkostenabrechnung). Ends by pushing missed words
+   into SRS. **MVP:** text-only, 3 scenarios spanning one work + two life domains, Web Speech for
+   voice-out. **Validate:** fake-door waitlist + Wizard-of-Oz (you play the partner for 10 testers via chat).
 
-2. **AI Exam Examiner ("Prüfer-Modus")** — *Assessment.* Submit a spoken or written answer to a
-   Teil-1/2/3 task; get a score against the real Goethe/telc rubric (Aufgabenbewältigung, Kohärenz,
-   Wortschatz, Korrektheit, Aussprache) plus 2 concrete fixes. **MVP:** written first, reuse your
-   planned writing coach. **Validate:** hand-grade 20 answers, ask testers if scores feel fair.
+2. **AI Examiner & Task-Feedback ("Prüfer-Modus")** — *Assessment.* Submit a spoken or written
+   answer; get scored feedback plus 2 concrete fixes. Two modes share one engine: **exam mode** scores
+   against the real Goethe/telc rubric (Aufgabenbewältigung, Kohärenz, Wortschatz, Korrektheit,
+   Aussprache); **real-life mode** scores "did you accomplish the task, and was the register right for
+   a counter/bank/doctor?". **MVP:** written exam mode first, reuse your planned writing coach.
+   **Validate:** hand-grade 20 answers, ask testers if scores feel fair.
 
 3. **Explain-My-Mistake (DE + EN)** — *Feedback.* On any wrong quiz/drill answer, a one-tap "warum?"
    gives a short rule explanation in German with an English gloss. **MVP:** cache explanations per
@@ -307,17 +348,19 @@ for your backlog.
    real speaking exam with an AI examiner and a final report. The emotional payoff that drives
    conversion. **MVP:** stitch ideas 1+2. **Validate:** does a completed mock predict subscription?
 
-10. **Exam-Readiness Score** — *Retention / Growth.* A single 0–100 confidence number from analytics
-    + mock results, with "what to do to raise it". **MVP:** weighted formula, AI writes the advice.
-    **Validate:** correlate the score with real reported exam pass/fail.
+10. **Goal-Readiness Score** — *Retention / Growth.* A single 0–100 confidence number **per goal**
+    (pass the exam, handle a Behörde appointment, get through a job interview, settle into daily life)
+    from analytics + mock/scenario results, with "what to do to raise it". **MVP:** weighted formula,
+    AI writes the advice. **Validate:** correlate with real reported outcomes (exam pass, "the
+    appointment went fine").
 
-11. **AI Vocabulary Sentence Mining** — *Personalisation.* Personalised example sentences for a target
-    word using the learner's own job context ("ich arbeite in der Logistik"). **Validate:** do
-    personalised examples beat generic on recall?
+11. **AI Sentence Mining (life context)** — *Personalisation.* Personalised example sentences for a
+    target word using the learner's own context, work *or* daily life ("ich arbeite in der Logistik",
+    "ich habe einen Termin beim Ausländeramt"). **Validate:** do personalised examples beat generic on recall?
 
 12. **Register Switcher** — *Learning effectiveness.* Take a learner's casual sentence and show the
-    formal/workplace ("Sie"-form, professional) version, a core B2-Beruf skill. **MVP:** build-time
-    pairs first. **Validate:** survey demand among testers.
+    formal ("Sie"-form, professional/official) version, a core plateau skill needed at work *and* with
+    officials and banks. **MVP:** build-time pairs first. **Validate:** survey demand among testers.
 
 13. **AI-Moderated Peer Practice Matching** — *Community.* Match two learners at similar levels for a
     scripted roleplay; AI provides the scenario and post-session feedback to both. **MVP:** async
@@ -330,20 +373,34 @@ for your backlog.
 15. **Spaced Roleplay Reminders** — *Retention.* AI schedules the *next* best roleplay based on SRS
     timing and weak themes, delivered as a push/email nudge. **Validate:** nudge → session conversion.
 
-16. **AI-Personalised Landing & Onboarding** — *Business growth.* Tailor the first-run flow and
-    marketing headline to the user's stated exam (Goethe vs telc) and job field. **MVP:** 2–3 variants,
-    not full generation. **Validate:** A/B activation rate.
+16. **AI-Personalised Onboarding by Goal** — *Business growth.* Tailor the first-run flow and headline
+    to the user's stated goal (pass an exam / get a visa / handle a job / settle into daily life) and
+    domain. **MVP:** 2–3 variants, not full generation. **Validate:** A/B activation rate.
 
 17. **Confidence Journal with AI Reflection** — *Retention.* Short weekly "how do you feel about
-    speaking?" check-in; AI reflects patterns and celebrates progress. **Validate:** retention lift in
-    the cohort that journals.
+    speaking German in real situations?" check-in; AI reflects patterns and celebrates progress.
+    **Validate:** retention lift in the cohort that journals.
 
 18. **Build-time Content QA Agent** — *Content creation / quality.* An agent that pre-checks new
     content for em-dashes, register, factual German, and missing provenance *before* `pnpm lint:content`.
     **Validate:** fewer linter failures + reviewer time saved.
 
-Ideas 3, 7, 8, 18 are **build-time / low-GDPR quick wins**. Ideas 1, 2, 6, 9 are the **flagship
-runtime cluster**. Ideas 11–17 are medium-term once the flagship is live.
+19. **Behörde & Document Decoder** — *Daily-life / Learning effectiveness.* Paste or describe a German
+    official letter (Bescheid, Mahnung, Nebenkostenabrechnung, a bank or insurance notice); get a
+    plain-German + English explanation, the action required, and the 5 key terms pushed to SRS. A
+    genuine "I needed this today" hook for immigrants, and a sharp daily-life differentiator. **MVP:**
+    text paste only (no OCR yet), strictly explanation (not legal advice; show a disclaimer).
+    **Validate:** fake-door + Wizard-of-Oz on 10 real documents from testers.
+
+20. **Daily-Life Scenario Packs** — *Content creation / Engagement.* Themed scenario sets for the new
+    life-domains (Bürgeramt/Ausländerbehörde, banking, doctor/Apotheke, housing/Wohnungssuche), built
+    with the AI Scenario Generator (idea 7) under your provenance policy. This is how the product
+    physically grows beyond the 10 workplace themes. **MVP:** one pack (Behörde) end-to-end.
+    **Validate:** demand survey + completion/retention of the new pack vs the workplace themes.
+
+Ideas 3, 7, 8, 18, 20 are **build-time / low-GDPR quick wins** (and the path into new life-domains).
+Ideas 1, 2, 6, 9, 19 are the **flagship runtime cluster**, spanning work *and* daily life. Ideas
+10–17 are medium-term once the flagship is live.
 
 ---
 
@@ -359,21 +416,27 @@ runtime cluster**. Ideas 11–17 are medium-term once the flagship is live.
   calls through **Supabase Edge Functions**, never the browser.
 - Add an AI-specific consent line and bump `CONSENT_VERSION` in lockstep with the legal pages.
 
-### Quick wins (weeks 1–4) — build-time AI + cheapest runtime feature
+### Quick wins (weeks 1–4) — build-time AI + cheapest runtime feature + widen scope
 - **Explain-My-Mistake (idea 3)** with cached explanations: near-zero runtime cost, high value.
-- **Build-time content generation** (ideas 7, 8, 18) under your provenance/governance policy.
-- **Fake-door landing test** for the AI Speaking Partner to size demand before building it.
+- **First daily-life scenario pack (ideas 20 + 7)** built with build-time AI under provenance/governance
+  policy. Start with **Behörde**: it widens the product beyond the workplace at near-zero runtime cost.
+- **Build-time content generation** (ideas 7, 8, 18) for the new life-domains.
+- **Fake-door landing test** for the AI Situation Partner *and* the Behörde Document Decoder (idea 19)
+  to size demand across both pillars before building them.
 - Internalise the §5 workflow: run one Discover→Generate→Validate loop end-to-end.
 
-### Medium term (months 1–3) — the flagship cluster
-- **AI Speaking Partner (idea 1)**, text-first then Web-Speech voice, behind auth, EU edge function.
-- **AI Exam Examiner (idea 2)** reusing the writing-coach plumbing; start written, add spoken.
+### Medium term (months 1–3) — the flagship cluster (work + daily life)
+- **AI Situation Partner (idea 1)**, text-first then Web-Speech voice, covering workplace *and* the
+  first daily-life packs, behind auth, EU edge function.
+- **AI Examiner & Task-Feedback (idea 2)** reusing the writing-coach plumbing; start written, add spoken.
+- **Behörde & Document Decoder (idea 19)** as the standout daily-life feature.
 - **Conversation-to-SRS loop (idea 6)** to tie it back to your retrieval-practice core.
-- **Mock Oral Exam (idea 9)** + **Exam-Readiness Score (idea 10)** as the conversion moment.
+- **Mock Oral Exam (idea 9)** + **Goal-Readiness Score (idea 10)** as the conversion moment.
 - Instrument everything in PostHog/Supabase; re-score the backlog with real Reach.
 
-### Long term (months 3–9) — adaptive + voice + monetisation
-- **Adaptive daily plan (idea 4)** and **personalised sentences (idea 11)** once telemetry is rich.
+### Long term (months 3–9) — adaptive + full scenario library + voice + monetisation
+- **Goal-aware adaptive plan (idea 4)** and **life-context sentences (idea 11)** once telemetry is rich.
+- **Full daily-life scenario library** (banking, healthcare, housing) beyond the first Behörde pack.
 - **Low-latency live voice** and **phoneme pronunciation scoring** once cost/latency/accuracy and the
   EU AI Act high-risk timeline (obligations land Aug 2026) are comfortable.
 - **AI-personalised growth (ideas 15–17)** to lift retention and conversion.
@@ -389,22 +452,25 @@ runtime cluster**. Ideas 11–17 are medium-term once the flagship is live.
 
 ## 10. Prioritised action plan — next steps
 
-1. **This week:** Run one full §5 loop on the single job "I need to feel ready to *speak* on exam
-   day." Output: a scored backlog (use §7), confirming the flagship cluster.
+1. **This week:** Run two full §5 loops, one per pillar: "I need to feel ready to *speak* on exam day"
+   *and* "I need to handle my Behörde appointment in German." Output: a scored backlog (use §7),
+   confirming the flagship cluster across work *and* daily life.
 2. **This week:** Ship **Explain-My-Mistake** with cached explanations (quick win, idea 3) and put a
-   **fake-door waitlist** for the AI Speaking Partner on a `/preview` page on `main`.
+   **fake-door waitlist** for the AI Situation Partner *and* the Behörde Document Decoder on a
+   `/preview` page on `main`, so you size demand for both pillars at once.
 3. **Week 0 of any runtime AI:** Write the light **DPIA**, set the **no-store audio** rule, wire the
    **Supabase Edge Function proxy** with EU region + no-training provider terms, bump consent version.
-4. **Weeks 2–4:** Use build-time AI to expand content under your provenance policy; measure reviewer
-   time saved and waitlist signups.
-5. **Month 1–3:** Build the flagship cluster (ideas 1, 2, 6, 9, 10) behind auth; instrument metrics;
+4. **Weeks 2–4:** Use build-time AI to ship the **first daily-life scenario pack (Behörde)** and expand
+   content under your provenance policy; measure reviewer time saved and waitlist signups.
+5. **Month 1–3:** Build the flagship cluster (ideas 1, 2, 6, 9, 10, 19) behind auth; instrument metrics;
    hand-grade before automating (Wizard-of-Oz) so feedback quality is proven before scale.
 6. **Ongoing:** Monthly innovation loop; keep this doc's scoring backlog live; re-score with real
    analytics; track gross margin per AI session every week.
 
 **The one-sentence strategy:** Genauly's edge is a pedagogically sound retrieval-and-spacing core; use
-AI to add the one thing that core cannot cheaply provide on its own, *feedback-rich speaking output
-practice for the workplace exam*, and ship it safely, cheaply, and measurably.
+AI to add the one thing that core cannot cheaply provide on its own, *feedback-rich, situation-based
+practice that breaks the B1–B2 plateau across work and daily life*, and ship it safely, cheaply, and
+measurably.
 
 ---
 
@@ -412,6 +478,7 @@ practice for the workplace exam*, and ship it safely, cheaply, and measurably.
 
 - Dunlosky-style spacing/testing evidence — [PMC: spacing effect](https://pmc.ncbi.nlm.nih.gov/articles/PMC8759977/)
 - Active recall vs spaced repetition, compared — [recallify.ai](https://recallify.ai/evidence-for-active-recall-and-spaced-repetition/)
+- Intermediate plateau (why B1–B2 learners stall) — [Glossika](https://ai.glossika.com/blog/overcoming-intermediate-plateau)
 - Krashen comprehensible input vs Swain output — [Leonardo English](https://www.leonardoenglish.com/blog/comprehensible-input)
 - Swain comprehensible output (with Krashen reply, PDF) — [sdkrashen.com](https://www.sdkrashen.com/content/articles/comprehensible_output.pdf)
 - Duolingo × OpenAI case — [openai.com/index/duolingo](https://openai.com/index/duolingo/)

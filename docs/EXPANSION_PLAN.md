@@ -1,7 +1,13 @@
-# B2 Beruf App — Feature Expansion Plan (Grammar, Quizzes, Auth + AI Writing)
+# Genauly — Feature Expansion Plan (Grammar, Quizzes, Auth + AI Writing)
 
 > Status: **APPROVED, not yet implemented.** Phase 1 is the next work to start.
 > Working branch: `claude/determined-euler-xUDrh`. See `docs/PROJECT_STATUS.md` for live status.
+>
+> **Scope note (added 2026-06-20):** this plan predates the session-21 repositioning. The product is
+> no longer "B2 Beruf exam prep" only; it targets the broader **B1–B2 intermediate plateau** across
+> the workplace *and* daily-life domains (bureaucracy/Behörde, banking, healthcare, housing). The
+> Phase 1/2 mechanics below still apply; read every "B2 Beruf" reference as the broader plateau scope.
+> The current AI direction lives in `docs/AI_PRODUCT_STRATEGY.md`.
 
 ## Context
 The original app shipped and is live: a polished client-side SPA (onboarding, dashboard,

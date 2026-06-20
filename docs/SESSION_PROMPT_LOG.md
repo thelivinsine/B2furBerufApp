@@ -454,3 +454,34 @@ backfilled from the same session's transcript so the trail is complete.)
   Advisory doc only; no app behaviour changed; no build needed (no code). Pushed to the dev branch; no
   PR opened (strategy doc, founder can request merge).
 - **Artifacts:** `docs/AI_PRODUCT_STRATEGY.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 27 — 2026-06-20 (broaden AI strategy to the full B1-B2 plateau scope)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > afrer skimming through the strategy document it's clear to me that your understanding of the app
+  > is based on the earlier scope. You need to take into consideration the broadened scope of the app
+  > which is to support learners who are stuck in rhe intermediate plateau b1-b2 and help them grow
+  > their german in workplace and other important day-to-day tasks like bureaucracy or banking. first
+  > identify areas in the code base which led you to fall back on the earlier scope and update those
+  > parts of the documentation. Then, update the strategy document considering this broder scope
+  > within the current pr.
+- **Response summary:** Traced the narrow-scope framing to stale developer-facing docs: `CLAUDE.md`
+  header still read "B2 Beruf Speaking Prep / prep platform for the Goethe / telc Deutsch B2 Beruf
+  speaking exam" and its themes line said "ten workplace topics", and `EXPANSION_PLAN.md` was titled
+  "B2 Beruf App". The broadened B1-B2 plateau positioning had already shipped in session 21 (live
+  landing page, `/about`, PWA manifest, `BUSINESS_PLAN.md`) but never propagated to CLAUDE.md, which
+  is read first and overrides. **Doc fixes:** rewrote the CLAUDE.md header to the B1-B2 plateau framing
+  (workplace + daily-life domains: bureaucracy/Behörde, banking, healthcare, housing) with a "do not
+  narrow this again" scope note; broadened the themes line to mark the ten workplace themes as the
+  current set with life-domains on the roadmap; added a scope-correction banner to EXPANSION_PLAN.md.
+  **Strategy doc reframe (`docs/AI_PRODUCT_STRATEGY.md`):** retitled/scope-noted; rewrote the executive
+  summary around breaking the plateau across two pillars; reframed Finding 2 to the intermediate
+  plateau (added a plateau research source) with input+output across real situations; broadened the
+  opportunity map, the RICE wording + worked-example table (added Behörde decoder and daily-life
+  scenario packs), and the roadmap + action plan to cover both pillars; broadened feature ideas and
+  added two daily-life ideas (#19 Behörde & Document Decoder, #20 Daily-Life Scenario Packs).
+  Advisory doc only; no app behaviour changed; updated within the current PR #205.
+- **Artifacts:** `CLAUDE.md`, `docs/EXPANSION_PLAN.md`, `docs/AI_PRODUCT_STRATEGY.md`,
+  `docs/SESSION_PROMPT_LOG.md`.
