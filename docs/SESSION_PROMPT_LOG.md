@@ -485,3 +485,29 @@ backfilled from the same session's transcript so the trail is complete.)
   Advisory doc only; no app behaviour changed; updated within the current PR #205.
 - **Artifacts:** `CLAUDE.md`, `docs/EXPANSION_PLAN.md`, `docs/AI_PRODUCT_STRATEGY.md`,
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 28 — 2026-06-20 (deep-research refresh of the AI strategy doc)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > is the strategy document grounded with deep research as the intial prompt asked in the session? if
+  > not you need to conduct deep research referring to actual reliable latest sources online. I ask
+  > this because your recommendations seem outdated e.g. chtgpt 4 when we already have 5.5 as the
+  > latest. [follow-up:] not just the tool recos section, I need you to do a critical review of the
+  > entire document, do a thorough research where necessary and update it.
+- **Response summary:** Ran ~10 web searches for the June 2026 landscape and did a full critical
+  review of `docs/AI_PRODUCT_STRATEGY.md` (now rev. 3). Corrected dated/incorrect claims: all model
+  names + prices refreshed (Claude Opus 4.8 $5/$25, Sonnet 4.6 $3/$15, Haiku 4.5 $1/$5; OpenAI GPT-5.5
+  $5/$30; Gemini 3.1 Pro $2/$12, 3.5 Flash $1.50/$9; `gpt-realtime` / Gemini Live for voice; Lovable/
+  v0/Bolt/Figma Make for prototyping; Azure/SpeechAce/ELSA for pronunciation). Fixed a factual error:
+  the EU AI Act high-risk deadline was deferred to **2 Dec 2027** (Digital Omnibus, May 2026), not Aug
+  2026, and added the nuance that AI scoring exams/determining education access can be Annex III
+  high-risk (so frame the examiner as practice feedback). Added three evidence-led findings: (F3) the
+  2025 Harvard AI-tutoring RCT (effect 0.7–1.3 SD) plus Nigeria World Bank RCT and LearnLM trials;
+  (F4) 2026 market data (~$24B → ~$51B by 2031, Duolingo premium-speaking willingness-to-pay, Speak
+  ~$1B); (F6) the capability-up/cost-down picture; and a critical counterweight (F8) on
+  "metacognitive laziness" → design for productive struggle. Reworked the executive summary, tools
+  tables, roadmap, cross-references (§6→§7 fix, finding-number renumber), and a categorised Sources
+  list with honest caveats. Direction unchanged; grounding much stronger. Updated within PR #205.
+- **Artifacts:** `docs/AI_PRODUCT_STRATEGY.md`, `docs/SESSION_PROMPT_LOG.md`.

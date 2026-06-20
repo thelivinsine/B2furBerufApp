@@ -5,7 +5,14 @@ high-value features for Genauly: helping B1–B2 learners break through the inte
 plateau and reach usable fluency for real-life situations (workplace **plus** bureaucracy, banking,
 healthcare, and housing), with certification exam prep as one pillar._
 
-_Prepared: 2026-06-20 (rev. 2 same day) · Branch `claude/genauly-ai-strategy-8wrlcz` · Audience: non-technical founder + small build team (currently the founder + Claude Code as CTO)._
+_Prepared: 2026-06-20 (rev. 3) · Branch `claude/genauly-ai-strategy-8wrlcz` · Audience: non-technical founder + small build team (currently the founder + Claude Code as CTO)._
+
+> **Revision 3 (2026-06-20).** Refreshed all research to the June 2026 landscape and corrected dated
+> claims: model/tool names and prices are now current (Claude Opus 4.8 / Sonnet 4.6 / Haiku 4.5,
+> GPT-5.5, Gemini 3.1 Pro / 3.5 Flash, `gpt-realtime`, Gemini Live); added the 2025 Harvard
+> AI-tutoring RCT and 2026 market data; corrected the EU AI Act timeline (high-risk deadline deferred
+> to Dec 2027, not Aug 2026); and added a "productive struggle" guardrail finding. Net: the strategy
+> is unchanged in direction but better grounded and now evidence-led rather than assertion-led.
 
 > **Scope (corrected 2026-06-20).** Genauly's mission is to help adult learners break through the
 > **intermediate German plateau (B1–B2)** and reach usable fluency for the situations that matter:
@@ -49,6 +56,17 @@ Modern LLMs plus speech models change the unit economics: a Behörde-counter rol
 this Bescheid in plain German" helper, a mock job interview, or instant diagnostic feedback on a
 spoken answer used to be impossible for a two-person team. They are now a weekend prototype.
 
+Three 2025–2026 developments make this the right moment, and they are why this revision is more
+confident than a generic "add AI" pitch. **First, the evidence turned:** a 2025 Harvard randomized
+controlled trial found a well-designed AI tutor beat an active-learning class by roughly 0.7–1.3
+standard deviations, in less time (Finding 3). AI conversation is now a measured learning
+intervention, not just engagement bait. **Second, the market validated it:** online language learning
+is ~$24B and growing ~16%/year, Duolingo reports users will pay more for premium AI speaking, and the
+AI-conversation app Speak reportedly hit a ~$1B valuation (Finding 4). **Third, cost collapsed:** a
+capable chat-turn model now costs cents per active user per month (Finding 6). The one essential
+caveat (Finding 8): badly designed AI tutors create dependence, not skill, so every feature here is
+built around *productive struggle*, the learner produces first, then gets feedback, then retrieves.
+
 Three strategic bets, in order:
 
 1. **Quick wins (now → 4 weeks):** Use AI as a *build-time and back-office* tool first (generate
@@ -73,7 +91,7 @@ only one.
 ## 2. Key research findings (with sources)
 
 **Finding 1 — Your core is the highest-evidence learning science there is. Lean into it in copy and product.**
-A large interdisciplinary review (Dunlosky et al.) rated *practice testing* and *distributed
+A large interdisciplinary review (Dunlosky et al., 2013) rated *practice testing* and *distributed
 practice* as the only two techniques with "high utility" across ages, materials, and subjects;
 spacing can roughly double the efficiency of massed study at equal total time. The "testing effect"
 (Roediger & Karpicke, 2006) shows retrieval beats re-study, with the gap widening at one-week delay.
@@ -98,40 +116,85 @@ boundary of it.
 [Krashen input vs Swain output overview (Leonardo English)](https://www.leonardoenglish.com/blog/comprehensible-input) ·
 [Swain, Comprehensible Output (Krashen's reply, PDF)](https://www.sdkrashen.com/content/articles/comprehensible_output.pdf)
 
-**Finding 3 — The category leader has already validated AI roleplay + "explain my answer", and monetised it.**
-Duolingo Max (GPT-4) ships exactly two features: **Roleplay** (scenario conversation partner with
-feedback) and **Explain My Answer** (rule breakdown on mistakes), later **Video Call** with a
-character. They put these behind the top subscription tier. This is strong market validation that
-(a) learners value AI conversation + explanation, and (b) it supports premium pricing. **Implication:**
-you can fast-follow with a version *specialised for the German B1–B2 plateau and the real-life
-situations learners actually face* (work, Behörde, banking, healthcare, housing), a far sharper wedge
-than Duolingo's generalist breadth.
-[OpenAI × Duolingo case](https://openai.com/index/duolingo/) ·
-[Duolingo Max announcement (investor)](https://investors.duolingo.com/news-releases/news-release-details/duolingo-max-shows-future-ai-education)
+**Finding 3 — AI conversation and tutoring now produce real, measured learning gains, not just engagement (2025–2026 RCTs).**
+This is the most important update since revision 1. A 2025 Harvard randomized controlled trial
+(Kestin et al., *Scientific Reports*) found students learning through a well-designed AI tutor learned
+*more in less time* than in an active-learning class, an effect size of roughly **0.7–1.3 standard
+deviations**, while reporting higher engagement and motivation. A World Bank RCT in Nigeria (a
+six-week after-school programme using a GPT-class model) found gains of ~0.3 SD overall and ~0.23 SD
+in English. Google DeepMind's LearnLM trials had supervising human tutors approve ~76% of the model's
+drafted Socratic messages with zero or minimal edits. **Implication:** a feedback-rich AI tutor/partner
+is now an evidence-backed intervention, not a gimmick, *provided it is built around productive
+struggle* (see Finding 8). This is the research backbone of the whole strategy.
+[Harvard AI-tutoring RCT (Nature, Scientific Reports 2025)](https://www.nature.com/articles/s41598-025-97652-6) ·
+[LearnLM pedagogy trials (Google DeepMind, Nov 2025, PDF)](https://storage.googleapis.com/deepmind-media/LearnLM/learnLM_nov25.pdf)
 
-**Finding 4 — Automatic pronunciation assessment is now good enough to be useful, with known limits.**
+**Finding 4 — The market is large and growing, and the category leader has monetised AI speaking, validating the wedge.**
+Online language learning is ~$24B in 2026, forecast to ~$51B by 2031 (~16% CAGR). Duolingo, the
+leader, has made 2026 an explicit AI "investment year": its GPT-powered **Roleplay**, **Explain My
+Answer**, and **Video Call** (real-time conversation with a character) sit in its top subscription
+tiers, and management reports customers are *willing to pay more for premium speaking experiences*.
+Speak, an AI-conversation-first app, reportedly raised ~$78M at a ~$1B valuation in 2026 on exactly
+this thesis. **Implication:** AI conversation + explanation demonstrably attracts users and supports
+premium pricing. Your edge is not breadth (Duolingo wins there) but a sharp, specialised wedge: the
+German B1–B2 plateau across the real-life situations (work, Behörde, banking, healthcare, housing)
+that generalists ignore. Fast-follow the proven features; differentiate on specificity.
+[Online language-learning market size (Mordor)](https://www.mordorintelligence.com/industry-reports/online-language-learning-market) ·
+[Duolingo 2026 AI "investment year" + premium speaking (PYMNTS)](https://www.pymnts.com/earnings/2026/duolingo-bets-on-user-growth-to-outpace-ai-disruption/) ·
+[OpenAI × Duolingo case](https://openai.com/index/duolingo/)
+
+**Finding 5 — Automatic pronunciation assessment is now good enough to be useful, with known limits.**
 CALL research shows ASR-based mispronunciation detection and automatic pronunciation assessment work
 well on *segmental* features (individual sounds), and LLM/multimodal models have pushed accuracy
-further, but there is a persistent gap on *prosody* (rhythm, intonation, stress). **Implication:**
-ship pronunciation feedback, but scope claims to word/sound-level accuracy and "intelligibility";
-do not over-promise native-like intonation scoring you cannot reliably deliver.
+further, but there is a persistent gap on *prosody* (rhythm, intonation, stress). Production APIs
+(Azure Speech assesses ~33 locales for accuracy/fluency/miscue; SpeechAce scores at syllable/phoneme
+level; ELSA covers sounds plus sentence-level intonation) exist and support German, but Microsoft's
+own docs flag accuracy limits. **Implication:** ship pronunciation feedback, but scope claims to
+word/sound-level accuracy and "intelligibility"; do not over-promise native-like intonation scoring
+you cannot reliably deliver.
 [Systematic review of ASR in EFL pronunciation (T&F)](https://www.tandfonline.com/doi/full/10.1080/2331186X.2025.2466288) ·
-[AI in CALL overview (arXiv)](https://arxiv.org/pdf/2505.02032)
+[Azure pronunciation assessment limits (Microsoft)](https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/speech-service/pronunciation-assessment/characteristics-and-limitations-pronunciation-assessment)
 
-**Finding 5 — Running AI on user speech/text in the EU is a GDPR *and* EU AI Act question, and DPIAs are becoming the default gate.**
-The EU AI Act layers on top of GDPR; it does not replace it. For conversational AI touching personal
-data at scale, a **DPIA** is increasingly the standard gating step, and the EDPB's Opinion 28/2024
-is the reference for how GDPR applies to AI models. Most Genauly practice content is not "special
-category" data, which keeps you out of the worst tier, but a learner's voice and free-text answers
-are still personal data. **Implication:** design for *transient processing, no audio retention by
-default, EU-region inference where possible, and a short DPIA* before the speaking features go live.
-[EDPB Opinion 28/2024 explainer](https://measuredcollective.com/edpb-ai-models-personal-data-gdpr-guidance/) ·
-[EU AI Act × GDPR (Taylor Wessing)](https://www.taylorwessing.com/en/global-data-hub/2025/eu-digital-laws-and-gdpr/gdh---the-eu-ai-act-and-the-gdpr)
+**Finding 6 — Capability is up and cost has fallen sharply (June 2026), so "build it now" is cheaper than even a year ago.**
+The current frontier (June 2026): Anthropic **Claude Opus 4.8 / Sonnet 4.6 / Haiku 4.5**, OpenAI
+**GPT-5.5**, Google **Gemini 3.1 Pro / 3.5 Flash**, all with ~1M-token context and aggressive cost
+levers (batch processing ~50% off, prompt caching up to ~90% off). A capable chat-turn model (Haiku
+4.5 at ~$1/$5 per million in/out tokens, Gemini 3 Flash at ~$0.50/$3) now costs cents per active user
+per month, and cached/repeated content is near-free. Real-time speech-to-speech (OpenAI
+`gpt-realtime`, Gemini Live) is production-ready but remains the priciest path. **Implication:** the
+cheap text features in this doc are affordable today; reserve the expensive live-voice path for a paid
+tier and meter it. Prices move fast, re-check before committing.
+[Anthropic API pricing 2026](https://www.cloudzero.com/blog/claude-api-pricing/) ·
+[OpenAI GPT-5.5 pricing 2026](https://devtk.ai/en/blog/openai-api-pricing-guide-2026/) ·
+[Gemini 3 pricing 2026](https://www.eesel.ai/blog/google-gemini-3-pricing)
 
-**Finding 6 — Prioritisation should use a lightweight, reach-aware scoring model.**
+**Finding 7 — GDPR plus the EU AI Act, with a key 2026 update: high-risk deadlines slipped, but DPIAs still gate you.**
+The EU AI Act layers on top of GDPR; it does not replace it. Under the **"Digital Omnibus" provisional
+agreement (May 2026)**, the high-risk (Annex III) compliance deadline was **deferred from 2 Aug 2026
+to 2 Dec 2027** (revision 1 of this doc wrongly said obligations land Aug 2026). General-purpose-AI
+obligations have applied since Aug 2025. A language-learning *practice* tutor is generally **not**
+high-risk, but note the nuance: AI used to *score exams or determine access to education* can fall
+under Annex III, so frame your AI examiner as **practice feedback, not official certification**.
+Regardless of tier, a **DPIA** is the practical gate for processing voice/free-text, and the EDPB's
+Opinion 28/2024 is the GDPR-for-AI reference. **Implication:** transient processing, no audio
+retention by default, EU-region inference where possible, and a short DPIA before speaking features
+go live.
+[EU AI Act Digital Omnibus, deferred high-risk dates (Gibson Dunn)](https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/) ·
+[EDPB Opinion 28/2024 explainer](https://measuredcollective.com/edpb-ai-models-personal-data-gdpr-guidance/)
+
+**Finding 8 — Designed badly, AI tutors create dependence, not skill. Build for productive struggle.**
+The necessary counterweight to Finding 3: recent studies warn of *"metacognitive laziness"*, where
+learners who lean on generative AI for answers disengage their own effort and retain less. **Implication:**
+every AI feature must push the learner to *produce and retrieve* (Swain output, then SRS), not just
+receive answers. Concretely, the AI partner makes the user speak first; "explain my mistake" appears
+*after* an attempt, never instead of it; and conversation gaps flow back into retrieval practice. This
+discipline is also what differentiates Genauly from answer-dispensing chatbots.
+[Generative AI and metacognitive laziness in education (arXiv 2025)](https://arxiv.org/pdf/2512.12306)
+
+**Finding 9 — Prioritisation should use a lightweight, reach-aware scoring model.**
 RICE (Reach × Impact × Confidence ÷ Effort, from Intercom) and its simpler cousin ICE (Sean Ellis)
 are the pragmatic standard for a small team. RICE is better once you have usage data to estimate
-Reach; ICE is fine before that. **Implication:** use the adapted scoring model in §6 below; start
+Reach; ICE is fine before that. **Implication:** use the adapted scoring model in §7 below; start
 with ICE-style estimates, switch the Reach term to real analytics once Phase 2 telemetry exists.
 [RICE vs ICE (Railsware)](https://railsware.com/blog/rice-framework/) ·
 [ICE origin, Sean Ellis (ProductLift)](https://www.productlift.dev/blog/prioritizing-with-ice-model/)
@@ -163,33 +226,42 @@ row is framed for that, not for generic English and not for the workplace exam a
 Split into **build-time / back-office** tools (you the team use them; no user-data or GDPR surface)
 and **runtime** tools (called from the app on user input; cost, latency, and GDPR matter).
 
+_Model names and prices below are the **June 2026** landscape and move fast; treat costs as
+order-of-magnitude and re-check before committing. Per-million-token (input/output) rates are listed
+where useful._
+
 ### 4a. Build-time & team tools
 
 | Tool | Best for | Strengths | Weaknesses | Rough cost | Ideal Genauly use |
 |---|---|---|---|---|---|
-| **Claude (Opus/Sonnet) + Claude Code** | Ideation, content drafting, coding, this kind of analysis | Strong reasoning, long context, already your dev harness | Needs review for German-fact accuracy | API usage-based; Code in your plan | Generate vocab examples/distractors, draft feature specs, write the validation artefacts |
-| **ChatGPT / GPT-4-class** | Brainstorming, competitor synthesis, German copy variants | Fast, broad, good German | Hallucinates citations; verify | ~$20/mo Plus or API | Second opinion on ideas; A/B copy generation |
+| **Claude Opus 4.8 / Sonnet 4.6 + Claude Code** | Ideation, content drafting, coding, this analysis | Strong reasoning, ~1M context, already your dev harness | Review for German-fact accuracy | Opus $5/$25, Sonnet $3/$15 per 1M; Code in your plan | Generate vocab examples/distractors, draft feature specs, write validation artefacts |
+| **ChatGPT (GPT-5.5)** | Brainstorming, competitor synthesis, German copy variants | Fast, broad, strong German, 1M context | Hallucinates citations; verify | ~$20/mo Plus, or API $5/$30 per 1M | Second opinion on ideas; A/B copy generation |
+| **Google Gemini 3.1 Pro / 3.5 Flash** | Long-context synthesis, cheap bulk drafting | 2M context (Pro), very cheap Flash tier | Data-residency review for EU | Flash $1.50/$9, Pro $2/$12 per 1M | Bulk-draft scenario/vocab candidates for review |
 | **Perplexity** | Competitor & market research with sources | Returns citations you can check | Shallow on niche edtech | ~$20/mo | Map competitor feature sets, exam-format changes |
 | **NotebookLM** | Synthesising your own docs/research | Grounded in *your* uploads, low hallucination | Google account/data residency review | Free tier | Synthesise user interviews + your docs into themes |
-| **Figma + First Draft / AI plugins** | UX/UI ideation, mockups | Fast layout exploration | Generic output, needs taste | Figma free/paid | Prototype the speaking-session screen before building |
-| **v0 / Bolt / Lovable** | Rapid throwaway prototypes | Working React fast | Not your stack conventions; throwaway only | Free–$20/mo | Validate a flow in a clickable prototype, then rebuild properly in your repo |
+| **Lovable / v0 (Vercel) / Bolt / Figma Make** | Rapid throwaway prototypes | Working React fast; Bolt strong full-stack, v0 polished front-end, Figma Make adds interaction to designs | Not your stack conventions; throwaway only | Free–~$20–30/mo | Validate a flow as a clickable prototype, then rebuild properly in your repo |
 | **Dovetail / Marvin (or NotebookLM)** | User-research synthesis | Tags + themes from transcripts | Paid tiers add up | Free–$$ | Cluster interview pain points into JTBD |
-| **Maze / PostHog** | Experiment design + behavioural analytics | A/B tests, funnels, session insight; PostHog is EU-hostable | Setup effort | Free tiers exist | Run validation tests; measure activation/retention |
+| **PostHog / Maze** | Experiment design + behavioural analytics | A/B tests, funnels, session insight; PostHog is EU-hostable | Setup effort | Generous free tiers | Run validation tests; measure activation/retention |
 
 ### 4b. Runtime AI (called on user input)
 
 | Tool | Best for | Strengths | Weaknesses | Rough cost | Ideal Genauly use |
 |---|---|---|---|---|---|
-| **Anthropic Claude API (Haiku/Sonnet)** | Roleplay turns, feedback, "explain my answer" | Strong German, good instruction-following, **EU inference options + no-training commitments on API** | Per-token cost at scale | Haiku is cheapest; Sonnet for graded feedback | Conversation engine + rubric-based scoring |
-| **OpenAI Realtime / GPT-4o** | Low-latency *spoken* conversation | Best-in-class voice latency | Cost, data-residency review needed | Usage-based, voice is pricier | Live spoken roleplay (premium tier) |
-| **Web Speech API (already in your stack)** | TTS prompts + STT capture | Free, on-device, no data leaves browser | Browser-dependent quality, weak STT for accented German | Free | Keep as the zero-cost default tier |
-| **Azure Speech / SpeechAce / ELSA-style APIs** | Pronunciation scoring | Phoneme-level assessment, German support | Cost; prosody still weak (Finding 4) | Per-minute | Premium pronunciation feedback |
+| **Claude Haiku 4.5** | High-volume roleplay turns, "explain my answer" | Cheap, fast, strong German; batch + prompt caching cut cost ~50–90% | Less depth than Opus/Sonnet | ~$1/$5 per 1M | Default conversation engine + cached explanations |
+| **Claude Sonnet 4.6 (or Opus 4.8)** | Graded feedback / rubric scoring | Best instruction-following for nuanced scoring; **API no-training commitments** | Pricier than Haiku | $3/$15 (Sonnet), $5/$25 (Opus) | The AI examiner / task-feedback grader |
+| **Gemini 3 Flash / 3.5 Flash** | Cheapest acceptable chat turns | Very low cost, 1M context | EU data-residency review | $0.50/$3 – $1.50/$9 | Cost-optimised alternative for chat-turn volume |
+| **OpenAI `gpt-realtime` / Gemini Live** | Low-latency *spoken* conversation | Production speech-to-speech (WebRTC/WebSocket); Gemini Live does 70+ languages | Priciest path; data-residency review; latency not always published | Usage-based, voice premium | Live spoken roleplay (paid tier only) |
+| **Web Speech API (already in your stack)** | TTS prompts + STT capture | Free, on-device, no data leaves browser | Browser-dependent; weak STT for accented German | Free | Keep as the zero-cost default tier |
+| **Azure Speech / SpeechAce / ELSA** | Pronunciation scoring | Phoneme/syllable-level, German support (Azure ~33 locales) | Cost; prosody still weak (Finding 5) | Per-minute | Premium pronunciation feedback |
 | **Whisper (self-host or API)** | Transcribing user speech for grading | Robust multilingual ASR | Self-host = infra; API = data leaves | API usage / GPU cost | Transcribe spoken answers before LLM grading |
 | **Supabase Edge Functions (your Phase 2)** | Server-side AI proxy | Keeps API keys off client, EU region, RLS | You maintain it | Included in Supabase | The *only* correct place to call paid AI APIs from |
 
 **Hard rule:** never call a paid AI API directly from the browser SPA. Route every runtime AI call
 through a **Supabase Edge Function** so keys stay server-side, region is EU, rate limits are
 enforced, and you have one place to log/consent/redact. This matches your existing Phase 2 plan.
+**Model choice rule:** default to the cheapest model that passes your quality bar (Haiku 4.5 / Gemini
+Flash for chat turns), and reserve Sonnet/Opus for graded feedback where nuance pays. Re-evaluate
+quarterly; this tier list will shift.
 
 ---
 
@@ -329,7 +401,7 @@ for your backlog.
    **MVP:** rules first, AI only for the rationale text. **Validate:** does plan-completion predict D30?
 
 5. **Pronunciation Coach (segmental)** — *Feedback.* Record a sentence, get word/sound-level feedback
-   and a model re-read. Scope to sounds/intelligibility, not intonation (Finding 4). **MVP:** Web
+   and a model re-read. Scope to sounds/intelligibility, not intonation (Finding 5). **MVP:** Web
    Speech STT + simple diff before paying for SpeechAce/Azure. **Validate:** do users re-record?
 
 6. **Conversation-to-SRS loop** — *Learning effectiveness.* Any word/structure a user fumbled in a
@@ -407,8 +479,9 @@ Ideas 1, 2, 6, 9, 19 are the **flagship runtime cluster**, spanning work *and* d
 ## 9. Practical roadmap (with GDPR/security baked in)
 
 ### Phase 0 — Guardrails first (week 0, before any runtime AI)
-- Write a **short DPIA** for AI features touching voice/free-text (Finding 5). Most content is not
-  special-category data, so this is light, but do it.
+- Write a **short DPIA** for AI features touching voice/free-text (Finding 7). Most content is not
+  special-category data, so this is light, but do it. Frame the AI examiner as *practice feedback*,
+  not official certification, to stay clear of the EU AI Act's high-risk education tier.
 - Decide the data rule and put it in your privacy page: **audio is processed transiently and not
   stored by default; transcripts/feedback are stored only with consent and are user-deletable**
   (you already have per-submission delete + export from Phase 2 GDPR work, reuse it).
@@ -437,8 +510,9 @@ Ideas 1, 2, 6, 9, 19 are the **flagship runtime cluster**, spanning work *and* d
 ### Long term (months 3–9) — adaptive + full scenario library + voice + monetisation
 - **Goal-aware adaptive plan (idea 4)** and **life-context sentences (idea 11)** once telemetry is rich.
 - **Full daily-life scenario library** (banking, healthcare, housing) beyond the first Behörde pack.
-- **Low-latency live voice** and **phoneme pronunciation scoring** once cost/latency/accuracy and the
-  EU AI Act high-risk timeline (obligations land Aug 2026) are comfortable.
+- **Low-latency live voice** (`gpt-realtime` / Gemini Live) and **phoneme pronunciation scoring** once
+  cost/latency/accuracy are comfortable. (The EU AI Act high-risk deadline was deferred to Dec 2027,
+  so timeline pressure there has eased, but keep the practice-feedback framing from Finding 7.)
 - **AI-personalised growth (ideas 15–17)** to lift retention and conversion.
 - Revisit the DPIA and AI Act posture as features deepen.
 
@@ -476,20 +550,40 @@ measurably.
 
 ## Sources
 
+_Learning science_
 - Dunlosky-style spacing/testing evidence — [PMC: spacing effect](https://pmc.ncbi.nlm.nih.gov/articles/PMC8759977/)
 - Active recall vs spaced repetition, compared — [recallify.ai](https://recallify.ai/evidence-for-active-recall-and-spaced-repetition/)
 - Intermediate plateau (why B1–B2 learners stall) — [Glossika](https://ai.glossika.com/blog/overcoming-intermediate-plateau)
 - Krashen comprehensible input vs Swain output — [Leonardo English](https://www.leonardoenglish.com/blog/comprehensible-input)
 - Swain comprehensible output (with Krashen reply, PDF) — [sdkrashen.com](https://www.sdkrashen.com/content/articles/comprehensible_output.pdf)
-- Duolingo × OpenAI case — [openai.com/index/duolingo](https://openai.com/index/duolingo/)
-- Duolingo Max announcement — [investors.duolingo.com](https://investors.duolingo.com/news-releases/news-release-details/duolingo-max-shows-future-ai-education)
+
+_AI in education (evidence + cautions)_
+- Harvard AI-tutoring RCT, effect size 0.7–1.3 SD — [Nature, Scientific Reports 2025](https://www.nature.com/articles/s41598-025-97652-6)
+- LearnLM pedagogy trials — [Google DeepMind, Nov 2025 (PDF)](https://storage.googleapis.com/deepmind-media/LearnLM/learnLM_nov25.pdf)
+- "Metacognitive laziness" / over-reliance caution — [arXiv 2025](https://arxiv.org/pdf/2512.12306)
 - ASR in EFL pronunciation, systematic review — [Taylor & Francis](https://www.tandfonline.com/doi/full/10.1080/2331186X.2025.2466288)
-- AI in CALL, overview — [arXiv 2505.02032](https://arxiv.org/pdf/2505.02032)
+- Azure pronunciation assessment limits — [Microsoft Learn](https://learn.microsoft.com/en-us/azure/foundry/responsible-ai/speech-service/pronunciation-assessment/characteristics-and-limitations-pronunciation-assessment)
+
+_Market & competitors_
+- Online language-learning market size/forecast — [Mordor Intelligence](https://www.mordorintelligence.com/industry-reports/online-language-learning-market)
+- Duolingo 2026 AI "investment year" + premium speaking — [PYMNTS](https://www.pymnts.com/earnings/2026/duolingo-bets-on-user-growth-to-outpace-ai-disruption/)
+- Duolingo × OpenAI case — [openai.com/index/duolingo](https://openai.com/index/duolingo/)
+
+_Models & pricing (June 2026, volatile)_
+- Anthropic Claude API pricing 2026 — [CloudZero](https://www.cloudzero.com/blog/claude-api-pricing/)
+- OpenAI GPT-5.5 pricing 2026 — [DevTk.AI](https://devtk.ai/en/blog/openai-api-pricing-guide-2026/)
+- Google Gemini 3 pricing 2026 — [eesel AI](https://www.eesel.ai/blog/google-gemini-3-pricing)
+- OpenAI realtime voice (`gpt-realtime`) — [OpenAI](https://openai.com/index/introducing-gpt-realtime/)
+- AI prototyping tools compared (Lovable/v0/Bolt/Figma Make) — [EPAM](https://www.epam.com/insights/ai/blogs/best-vibe-coding-tools-v0-lovable-bolt-replit-and-figma-make)
+
+_Compliance & process_
+- EU AI Act Digital Omnibus, deferred high-risk dates — [Gibson Dunn](https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/)
 - EDPB Opinion 28/2024 on AI & personal data — [explainer](https://measuredcollective.com/edpb-ai-models-personal-data-gdpr-guidance/)
-- EU AI Act × GDPR — [Taylor Wessing](https://www.taylorwessing.com/en/global-data-hub/2025/eu-digital-laws-and-gdpr/gdh---the-eu-ai-act-and-the-gdpr)
 - RICE framework — [Railsware](https://railsware.com/blog/rice-framework/)
 - ICE framework / Sean Ellis — [ProductLift](https://www.productlift.dev/blog/prioritizing-with-ice-model/)
 
-_Caveat: web-sourced claims above were drawn from reputable secondary summaries; for a formal
-filing or legal sign-off, confirm the primary papers (Dunlosky et al. 2013; Roediger & Karpicke 2006;
-Swain 1985) and have a DPO review the DPIA._
+_Caveats: (1) Several citations are reputable secondary summaries; for a formal filing or legal
+sign-off, confirm the primary papers (Dunlosky et al. 2013; Roediger & Karpicke 2006; Swain 1985;
+Kestin et al. 2025) and have a DPO review the DPIA. (2) Model names and prices reflect the June 2026
+landscape and change frequently, re-check provider pricing pages before committing. (3) The Speak
+~$1B valuation and exact model prices are as reported by industry sources, not company filings._
