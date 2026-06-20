@@ -430,3 +430,84 @@ backfilled from the same session's transcript so the trail is complete.)
   Updated CLAUDE.md (s29 flat-fill rule). `pnpm build` green.
 - **Artifacts:** `src/components/layout/BottomTabBar.tsx`, `src/components/layout/MoreSheet.tsx`,
   `src/components/layout/Sidebar.tsx`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 26 — 2026-06-20 (AI product strategy research)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > Role: You are a senior AI product strategist, edtech consultant, and innovation researcher with
+  > expertise in language learning products. Task: I am building a language learning app Genauly and
+  > want to leverage modern AI tools effectively to generate, validate, prioritize, and implement new
+  > product ideas that create measurable user value. [Full request: research-backed analysis covering
+  > the AI opportunity landscape, AI tools/workflows, an idea-generation framework, a validation
+  > framework, a prioritization system, and a practical roadmap; deliverables = executive summary,
+  > cited findings, tools table, repeatable workflow, 10-20 feature ideas with validation methods, and
+  > a prioritized action plan.]
+- **Response summary:** Conducted web research across six evidence areas (retrieval practice/spaced
+  repetition, Krashen input vs Swain output, Duolingo Max GPT-4 features, AI pronunciation/CALL
+  assessment, GDPR + EU AI Act/DPIA, RICE/ICE prioritization) and wrote `docs/AI_PRODUCT_STRATEGY.md`:
+  an executive summary, six cited findings, an 8-category opportunity map, build-time vs runtime AI
+  tool tables, a 5-stage innovation workflow with prompt scaffolds, a validation framework, an adapted
+  RICE scoring model with worked examples, 18 Genauly-specific feature ideas each with a validation
+  method, a GDPR-safe phased roadmap (quick wins / medium / long term), and a next-steps action plan.
+  Advisory doc only; no app behaviour changed; no build needed (no code). Pushed to the dev branch; no
+  PR opened (strategy doc, founder can request merge).
+- **Artifacts:** `docs/AI_PRODUCT_STRATEGY.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 27 — 2026-06-20 (broaden AI strategy to the full B1-B2 plateau scope)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > afrer skimming through the strategy document it's clear to me that your understanding of the app
+  > is based on the earlier scope. You need to take into consideration the broadened scope of the app
+  > which is to support learners who are stuck in rhe intermediate plateau b1-b2 and help them grow
+  > their german in workplace and other important day-to-day tasks like bureaucracy or banking. first
+  > identify areas in the code base which led you to fall back on the earlier scope and update those
+  > parts of the documentation. Then, update the strategy document considering this broder scope
+  > within the current pr.
+- **Response summary:** Traced the narrow-scope framing to stale developer-facing docs: `CLAUDE.md`
+  header still read "B2 Beruf Speaking Prep / prep platform for the Goethe / telc Deutsch B2 Beruf
+  speaking exam" and its themes line said "ten workplace topics", and `EXPANSION_PLAN.md` was titled
+  "B2 Beruf App". The broadened B1-B2 plateau positioning had already shipped in session 21 (live
+  landing page, `/about`, PWA manifest, `BUSINESS_PLAN.md`) but never propagated to CLAUDE.md, which
+  is read first and overrides. **Doc fixes:** rewrote the CLAUDE.md header to the B1-B2 plateau framing
+  (workplace + daily-life domains: bureaucracy/Behörde, banking, healthcare, housing) with a "do not
+  narrow this again" scope note; broadened the themes line to mark the ten workplace themes as the
+  current set with life-domains on the roadmap; added a scope-correction banner to EXPANSION_PLAN.md.
+  **Strategy doc reframe (`docs/AI_PRODUCT_STRATEGY.md`):** retitled/scope-noted; rewrote the executive
+  summary around breaking the plateau across two pillars; reframed Finding 2 to the intermediate
+  plateau (added a plateau research source) with input+output across real situations; broadened the
+  opportunity map, the RICE wording + worked-example table (added Behörde decoder and daily-life
+  scenario packs), and the roadmap + action plan to cover both pillars; broadened feature ideas and
+  added two daily-life ideas (#19 Behörde & Document Decoder, #20 Daily-Life Scenario Packs).
+  Advisory doc only; no app behaviour changed; updated within the current PR #205.
+- **Artifacts:** `CLAUDE.md`, `docs/EXPANSION_PLAN.md`, `docs/AI_PRODUCT_STRATEGY.md`,
+  `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 28 — 2026-06-20 (deep-research refresh of the AI strategy doc)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > is the strategy document grounded with deep research as the intial prompt asked in the session? if
+  > not you need to conduct deep research referring to actual reliable latest sources online. I ask
+  > this because your recommendations seem outdated e.g. chtgpt 4 when we already have 5.5 as the
+  > latest. [follow-up:] not just the tool recos section, I need you to do a critical review of the
+  > entire document, do a thorough research where necessary and update it.
+- **Response summary:** Ran ~10 web searches for the June 2026 landscape and did a full critical
+  review of `docs/AI_PRODUCT_STRATEGY.md` (now rev. 3). Corrected dated/incorrect claims: all model
+  names + prices refreshed (Claude Opus 4.8 $5/$25, Sonnet 4.6 $3/$15, Haiku 4.5 $1/$5; OpenAI GPT-5.5
+  $5/$30; Gemini 3.1 Pro $2/$12, 3.5 Flash $1.50/$9; `gpt-realtime` / Gemini Live for voice; Lovable/
+  v0/Bolt/Figma Make for prototyping; Azure/SpeechAce/ELSA for pronunciation). Fixed a factual error:
+  the EU AI Act high-risk deadline was deferred to **2 Dec 2027** (Digital Omnibus, May 2026), not Aug
+  2026, and added the nuance that AI scoring exams/determining education access can be Annex III
+  high-risk (so frame the examiner as practice feedback). Added three evidence-led findings: (F3) the
+  2025 Harvard AI-tutoring RCT (effect 0.7–1.3 SD) plus Nigeria World Bank RCT and LearnLM trials;
+  (F4) 2026 market data (~$24B → ~$51B by 2031, Duolingo premium-speaking willingness-to-pay, Speak
+  ~$1B); (F6) the capability-up/cost-down picture; and a critical counterweight (F8) on
+  "metacognitive laziness" → design for productive struggle. Reworked the executive summary, tools
+  tables, roadmap, cross-references (§6→§7 fix, finding-number renumber), and a categorised Sources
+  list with honest caveats. Direction unchanged; grounding much stronger. Updated within PR #205.
+- **Artifacts:** `docs/AI_PRODUCT_STRATEGY.md`, `docs/SESSION_PROMPT_LOG.md`.
