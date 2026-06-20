@@ -1272,6 +1272,20 @@ export const collocations: Collocation[] = [
     themeId: "safety",
     example: { de: "Jede Abteilung erstellt einen eigenen Notfallplan.", en: "Each department draws up its own emergency plan." },
   },
+
+  /* ----------------------- Behörden & Ämter ----------------------- */
+  { id: "c_antrag_stellen", noun: "einen Antrag", verb: "stellen", full: "einen Antrag stellen", en: "to submit an application", register: "neutral", themeId: "behoerde", example: { de: "Sie können den Antrag online stellen.", en: "You can submit the application online." } },
+  { id: "c_behoerdentermin_vereinbaren", noun: "einen Termin", verb: "vereinbaren", full: "einen Termin vereinbaren", en: "to arrange an appointment", register: "neutral", themeId: "behoerde", example: { de: "Bitte vereinbaren Sie vorab einen Termin.", en: "Please arrange an appointment in advance." } },
+  { id: "c_formular_ausfuellen", noun: "ein Formular", verb: "ausfüllen", full: "ein Formular ausfüllen", en: "to fill in a form", register: "neutral", themeId: "behoerde", example: { de: "Füllen Sie das Formular bitte leserlich aus.", en: "Please fill in the form legibly." } },
+  { id: "c_unterlagen_einreichen", noun: "die Unterlagen", verb: "einreichen", full: "die Unterlagen einreichen", en: "to submit the documents", register: "neutral", themeId: "behoerde", example: { de: "Reichen Sie die Unterlagen vollständig ein.", en: "Submit the documents in full." } },
+  { id: "c_behoerde_frist_einhalten", noun: "die Frist", verb: "einhalten", full: "die Frist einhalten", en: "to meet the deadline", register: "neutral", themeId: "behoerde", example: { de: "Achten Sie darauf, die Frist einzuhalten.", en: "Make sure to meet the deadline." } },
+  { id: "c_gebuehr_zahlen", noun: "eine Gebühr", verb: "zahlen", full: "eine Gebühr zahlen", en: "to pay a fee", register: "neutral", themeId: "behoerde", example: { de: "Für die Bearbeitung müssen Sie eine Gebühr zahlen.", en: "You have to pay a fee for the processing." } },
+  { id: "c_aufenthaltstitel_verlaengern", noun: "den Aufenthaltstitel", verb: "verlängern", full: "den Aufenthaltstitel verlängern", en: "to extend the residence permit", register: "neutral", themeId: "behoerde", example: { de: "Ich möchte meinen Aufenthaltstitel verlängern.", en: "I would like to extend my residence permit." } },
+  { id: "c_nachweis_erbringen", noun: "einen Nachweis", verb: "erbringen", full: "einen Nachweis erbringen", en: "to provide proof", register: "formal", themeId: "behoerde", example: { de: "Sie müssen einen Nachweis über Ihr Einkommen erbringen.", en: "You have to provide proof of your income." } },
+  { id: "c_behoerdentermin_absagen", noun: "einen Termin", verb: "absagen", full: "einen Termin absagen", en: "to cancel an appointment", register: "neutral", themeId: "behoerde", example: { de: "Falls Sie verhindert sind, sagen Sie den Termin bitte ab.", en: "If you are unable to attend, please cancel the appointment." } },
+  { id: "c_bescheid_erhalten", noun: "einen Bescheid", verb: "erhalten", full: "einen Bescheid erhalten", en: "to receive an official decision", register: "neutral", themeId: "behoerde", example: { de: "Sie erhalten den Bescheid schriftlich per Post.", en: "You will receive the decision in writing by post." } },
+  { id: "c_anmeldung_vornehmen", noun: "die Anmeldung", verb: "vornehmen", full: "die Anmeldung vornehmen", en: "to carry out the registration", register: "formal", themeId: "behoerde", example: { de: "Die Anmeldung können Sie direkt im Bürgeramt vornehmen.", en: "You can carry out the registration directly at the citizens' office." } },
+  { id: "c_widerspruch_einlegen", noun: "Widerspruch", verb: "einlegen", full: "Widerspruch einlegen", en: "to file an objection / appeal", register: "formal", themeId: "behoerde", example: { de: "Gegen den Bescheid können Sie innerhalb eines Monats Widerspruch einlegen.", en: "You can file an objection against the decision within one month." } },
 ];
 
 export const collocationsByTheme = (themeId: string) =>

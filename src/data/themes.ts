@@ -141,6 +141,20 @@ export const themes: ExamTheme[] = [
       "Spesen abrechnen",
     ],
   },
+  {
+    id: "behoerde",
+    title: "Authorities & Bureaucracy",
+    titleDe: "Behörden & Ämter",
+    blurb: "Handle real-life German bureaucracy: register an address, apply at the Bürgeramt and deal with official letters.",
+    icon: "Landmark",
+    accent: "from-amber-500 to-yellow-500",
+    situations: [
+      "Sich beim Bürgeramt anmelden",
+      "Einen Termin bei der Ausländerbehörde wahrnehmen",
+      "Einen Antrag stellen und Unterlagen einreichen",
+      "Auf einen Bescheid reagieren",
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);

@@ -12,7 +12,8 @@ export type ThemeId =
   | "technology"
   | "sustainability"
   | "safety"
-  | "travel";
+  | "travel"
+  | "behoerde";
 
 export interface ExamTheme {
   id: ThemeId;

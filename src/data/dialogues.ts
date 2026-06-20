@@ -1465,7 +1465,145 @@ const dienstreise: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise];
+const anmeldung: Scenario = {
+  id: "sc_anmeldung",
+  themeId: "behoerde",
+  title: "Anmeldung beim Bürgeramt",
+  task: "Melden Sie Ihren neuen Wohnsitz beim Bürgeramt an und klären Sie offene Fragen mit der Sachbearbeiterin.",
+  context:
+    "Sie sind gerade nach Berlin gezogen und müssen sich innerhalb von zwei Wochen anmelden. Am Schalter im Bürgeramt erklärt Ihnen die Sachbearbeiterin die nötigen Schritte.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "a1",
+  nodes: {
+    a1: {
+      id: "a1",
+      speaker: "partner",
+      line: "Guten Tag, womit kann ich Ihnen helfen?",
+      gloss: "Hello, how can I help you?",
+      hints: ["Begrüße höflich.", "Sage klar, was du möchtest (dich anmelden)."],
+      options: [
+        { id: "a1a", text: "Guten Tag, ich möchte mich anmelden. Ich bin gerade nach Berlin gezogen.", uses: "clarification", quality: 1, feedback: "Sehr gut: höfliche Begrüßung und ein klares Anliegen.", next: "a2" },
+        { id: "a1b", text: "Guten Tag, ich brauche eine Meldebescheinigung für meinen neuen Wohnsitz.", uses: "clarification", quality: 0.8, feedback: "Gut, aber nenne zuerst, dass du dich anmelden möchtest.", next: "a2" },
+        { id: "a1c", text: "Anmeldung.", uses: "reactions", quality: 0.4, feedback: "Zu knapp. Im Amt solltest du in ganzen, höflichen Sätzen sprechen.", next: "a2" },
+      ],
+    },
+    a2: {
+      id: "a2",
+      speaker: "partner",
+      line: "Gerne. Haben Sie die nötigen Unterlagen dabei? Ich brauche Ihren Personalausweis und die Wohnungsgeberbestätigung.",
+      gloss: "Gladly. Do you have the necessary documents with you? I need your ID card and the landlord confirmation.",
+      hints: ["Bestätige, was du dabei hast.", "Frag nach, wenn du einen Begriff nicht kennst."],
+      options: [
+        { id: "a2a", text: "Ja, ich habe meinen Personalausweis und die Wohnungsgeberbestätigung dabei.", uses: "agree", quality: 1, feedback: "Perfekt: klar und vorbereitet.", next: "a3" },
+        { id: "a2b", text: "Die Wohnungsgeberbestätigung? Könnten Sie mir kurz erklären, was das ist?", uses: "clarification", quality: 0.9, feedback: "Stark: höflich nachfragen ist im Amt genau richtig.", next: "a3" },
+        { id: "a2c", text: "Nein, ich habe nichts dabei.", uses: "reactions", quality: 0.3, feedback: "Ohne Unterlagen geht es nicht. Frag, was du nachreichen kannst.", next: "a3" },
+      ],
+    },
+    a3: {
+      id: "a3",
+      speaker: "partner",
+      line: "Alles klar. Dann müssen Sie nur noch das Anmeldeformular ausfüllen. Möchten Sie es selbst ausfüllen oder brauchen Sie Hilfe?",
+      gloss: "All right. Then you just need to fill in the registration form. Would you like to fill it in yourself or do you need help?",
+      hints: ["Mach einen konkreten Vorschlag.", "Du kannst um Hilfe bei einzelnen Begriffen bitten."],
+      options: [
+        { id: "a3a", text: "Ich fülle es gern selbst aus. Könnten Sie mir bei einer Frage helfen, falls nötig?", uses: "suggestions", quality: 1, feedback: "Sehr gut: selbstständig und trotzdem höflich um Hilfe gebeten.", next: "a4" },
+        { id: "a3b", text: "Könnten Sie mir bitte helfen? Einige Begriffe verstehe ich noch nicht.", uses: "clarification", quality: 0.9, feedback: "Gut: ehrlich und höflich um Unterstützung gebeten.", next: "a4" },
+        { id: "a3c", text: "Das ist mir egal.", uses: "reactions", quality: 0.3, feedback: "Zeig etwas mehr Initiative, das wirkt kooperativer.", next: "a4" },
+      ],
+    },
+    a4: {
+      id: "a4",
+      speaker: "partner",
+      line: "Wunderbar, das Formular ist vollständig. Die Anmeldung ist kostenlos und Sie bekommen die Meldebescheinigung sofort. Haben Sie noch Fragen?",
+      gloss: "Wonderful, the form is complete. The registration is free and you receive the registration certificate immediately. Do you have any questions?",
+      hints: ["Bedanke dich.", "Du kannst eine sinnvolle Nachfrage stellen (z. B. zur Steuer-ID)."],
+      options: [
+        { id: "a4a", text: "Vielen Dank. Brauche ich die Meldebescheinigung auch für die Steuer-ID?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende, relevante Nachfrage.", next: "a_end" },
+        { id: "a4b", text: "Nein, danke. Das war sehr hilfreich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "a_end" },
+        { id: "a4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "a_end" },
+      ],
+    },
+    a_end: {
+      id: "a_end",
+      speaker: "narrator",
+      line: "Sie haben sich erfolgreich angemeldet und Ihre Meldebescheinigung erhalten. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+const auslaenderbehoerde: Scenario = {
+  id: "sc_auslaenderbehoerde",
+  themeId: "behoerde",
+  title: "Termin bei der Ausländerbehörde",
+  task: "Verlängern Sie Ihren Aufenthaltstitel und finden Sie eine Lösung, obwohl ein Nachweis fehlt.",
+  context:
+    "Ihr Aufenthaltstitel läuft bald ab. Bei der Ausländerbehörde stellt sich heraus, dass eine Unterlage fehlt. Bleiben Sie höflich und lösungsorientiert.",
+  level: 2,
+  minutes: 6,
+  targetRedemittel: ["clarification", "compromise", "suggestions", "agree"],
+  start: "m1",
+  nodes: {
+    m1: {
+      id: "m1",
+      speaker: "partner",
+      line: "Guten Tag. Sie möchten Ihren Aufenthaltstitel verlängern, richtig? Bitte legen Sie Ihre Unterlagen vor.",
+      gloss: "Hello. You would like to extend your residence permit, correct? Please present your documents.",
+      hints: ["Bestätige dein Anliegen klar.", "Du kannst nachfragen, welche Unterlagen genau nötig sind."],
+      options: [
+        { id: "m1a", text: "Guten Tag, ja genau. Hier sind mein Pass, der Antrag und mein Arbeitsvertrag.", uses: "clarification", quality: 1, feedback: "Sehr gut: klar, vorbereitet und vollständig.", next: "m2" },
+        { id: "m1b", text: "Guten Tag. Ja, ich möchte verlängern. Welche Unterlagen brauchen Sie genau?", uses: "clarification", quality: 0.9, feedback: "Gut: eine sinnvolle Rückfrage zu Beginn.", next: "m2" },
+        { id: "m1c", text: "Ja.", uses: "reactions", quality: 0.3, feedback: "Zu knapp. Antworte in ganzen Sätzen und sei aktiv.", next: "m2" },
+      ],
+    },
+    m2: {
+      id: "m2",
+      speaker: "partner",
+      line: "Mir fehlt noch der Nachweis Ihrer Krankenversicherung. Ohne diesen kann ich den Antrag leider nicht bearbeiten.",
+      gloss: "I am still missing proof of your health insurance. Without it I unfortunately cannot process the application.",
+      hints: ["Reagiere ruhig und höflich.", "Schlage eine Lösung vor (z. B. nachreichen)."],
+      options: [
+        { id: "m2a", text: "Das tut mir leid. Könnte ich den Nachweis bis morgen nachreichen?", uses: "compromise", quality: 1, feedback: "Stark: ruhig geblieben und gleich eine Lösung angeboten.", next: "m3" },
+        { id: "m2b", text: "Den habe ich leider vergessen. Was kann ich jetzt am besten tun?", uses: "clarification", quality: 0.8, feedback: "Gut: ehrlich und nach dem nächsten Schritt gefragt.", next: "m3" },
+        { id: "m2c", text: "Das ist doch nicht mein Problem.", uses: "disagree", quality: 0.2, feedback: "Zu unhöflich. Im Amt kommst du mit Kooperation viel weiter.", next: "m3" },
+      ],
+    },
+    m3: {
+      id: "m3",
+      speaker: "partner",
+      line: "Sie können den Nachweis per E-Mail nachreichen. Allerdings läuft Ihr aktueller Titel in zwei Wochen ab.",
+      gloss: "You can submit the proof by email. However, your current permit expires in two weeks.",
+      hints: ["Frag nach einer Übergangslösung.", "Schlage einen konkreten Zeitplan vor."],
+      options: [
+        { id: "m3a", text: "Verstehe. Könnten Sie mir eine Fiktionsbescheinigung ausstellen, damit ich legal bleibe?", uses: "clarification", quality: 1, feedback: "Ausgezeichnet: nach der passenden Übergangslösung gefragt.", next: "m4" },
+        { id: "m3b", text: "Dann reiche ich den Nachweis bis übermorgen per E-Mail nach. Geht das so?", uses: "suggestions", quality: 0.9, feedback: "Gut: konkreter Vorschlag mit klarem Zeitrahmen.", next: "m4" },
+        { id: "m3c", text: "Zwei Wochen? Das ist viel zu kurz.", uses: "reactions", quality: 0.4, feedback: "Verständlich, aber bleib lösungsorientiert statt nur zu klagen.", next: "m4" },
+      ],
+    },
+    m4: {
+      id: "m4",
+      speaker: "partner",
+      line: "Gut. Ich stelle Ihnen eine Fiktionsbescheinigung aus. Sobald der Nachweis da ist, bearbeite ich die Verlängerung. Die Gebühr beträgt 100 Euro.",
+      gloss: "Good. I will issue you a temporary certificate. As soon as the proof arrives, I will process the extension. The fee is 100 euros.",
+      hints: ["Bedanke dich und bestätige.", "Du kannst nach der Zahlungsart fragen."],
+      options: [
+        { id: "m4a", text: "Vielen Dank für Ihre Hilfe. Wie kann ich die Gebühr bezahlen?", uses: "clarification", quality: 1, feedback: "Top: höflich bedankt und den nächsten Schritt geklärt.", next: "m_end" },
+        { id: "m4b", text: "In Ordnung, einverstanden. Ich überweise die Gebühr noch heute.", uses: "agree", quality: 1, feedback: "Sehr gut: klar zugestimmt und proaktiv.", next: "m_end" },
+        { id: "m4c", text: "Okay, gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank würde den Abschluss runden.", next: "m_end" },
+      ],
+    },
+    m_end: {
+      id: "m_end",
+      speaker: "narrator",
+      line: "Sie haben die Verlängerung professionell geklärt und einen Lösungsweg vereinbart. Sehr gut!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>
