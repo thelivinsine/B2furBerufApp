@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock, History } from "lucide-react";
+import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock, History, Info } from "lucide-react";
 import type { ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { writingPrompts } from "@/data/writingPrompts";
@@ -288,6 +288,19 @@ export function WritingHub() {
               Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
             </p>
           )}
+          {/* EU AI Act Art. 50 transparency: tell the user, at the point of use, that they
+              are interacting with an AI and that the output is AI-generated. */}
+          <p className="flex items-start gap-1.5 border-t border-border pt-3 text-xs text-muted-foreground">
+            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+            <span>
+              Dein Text wird zur Auswertung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung
+              ist KI-generiert und kann Fehler enthalten.{" "}
+              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+                Mehr im Datenschutz
+              </Link>
+              .
+            </span>
+          </p>
         </CardContent>
       </Card>
 

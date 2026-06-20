@@ -537,3 +537,26 @@ backfilled from the same session's transcript so the trail is complete.)
   `src/data/themes.ts`, `src/data/vocabulary.ts`, `src/data/collocations.ts`, `src/data/dialogues.ts`,
   `src/data/writingPrompts.ts`, `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 30 — 2026-06-20 (data audit-ready: reference back-fill + EU AI Act Art. 50)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > okay, meanwhile can you pull up latest info about making the app's data audit ready. What's the status and what's next in this stream?
+  > [then:] go ahead with both of them
+- **Response summary:** Reported the status of the data-governance / audit-ready stream (backlog #7),
+  then shipped the two cheapest next steps the founder approved together. (1) **Provenance reference
+  back-fill:** added `scripts/backfill-provenance-refs.mjs`, which fills only the ~162 empty-reference
+  authored rows (grammar → German Wikipedia, redemittel → DWDS corpus search, dialogues/exam
+  sets/writing prompts → CEFR B2 descriptors), leaving the already-referenced vocab/collocation rows
+  untouched. All 809 rows now carry a reference; the linter's back-fill warning queue is empty. Rows
+  stay `review_status: "draft"` (machine-assigned references, human verification still pending).
+  (2) **EU AI Act Article 50 transparency:** confirmed the writing coach is the only generative-AI
+  surface (speech = Web Speech API, simulations = scripted), which already marked output as
+  "KI-generierte Rückmeldung"; added an explicit point-of-use AI disclosure on the writing editor
+  linking to the privacy page. Verified: `pnpm lint:content` zero warnings (was ~162), `pnpm build`
+  + typecheck green.
+- **Artifacts:** `src/features/writing/WritingHub.tsx`, `src/data/provenance.ts`,
+  `scripts/backfill-provenance-refs.mjs`, `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR # appended on push/merge.

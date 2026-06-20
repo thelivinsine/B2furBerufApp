@@ -208,10 +208,20 @@ being a formality. The mechanism must exist before we ingest any externally lice
 - **Already live (2026-06-14):** `pnpm lint:content` + the `validate.yml` CI gate validate structural
   integrity (duplicate ids, broken dialogue branches, missing fields, cross-references, em dashes).
   See `CLAUDE.md`.
-- **Planned (Phase 1):** extend the same linter so every `content_id` in the data files **must** have
-  a provenance row whose `license` is on the allowlist, or the build fails. This turns "we only use
-  commercial-safe licenses" from a promise into a machine-enforced, auditor-verifiable fact. It also
-  flags any content id with no register row, and any register row for a non-existent id.
+- **Live (Phase 1, 2026-06-15):** the linter now also enforces provenance integrity: every
+  `content_id` **must** have exactly one register row whose `license` is on the allowlist, or the
+  build fails; it errors on a row for a non-existent id and warns on an authored/adapted row with no
+  reference. This turns "we only use commercial-safe licenses" from a promise into a machine-enforced,
+  auditor-verifiable fact.
+- **Reference back-fill complete (2026-06-20):** every one of the 809 rows now carries a non-empty
+  `reference`, so the back-fill warning queue is empty. Coverage by type: vocabulary → Wiktionary
+  headword; collocations → DWDS noun entry; grammar topics/drills → the German Wikipedia article for
+  the topic (grammar rules are facts, cited not copied); redemittel → DWDS corpus search for the
+  phrase; dialogues / exam sets / writing prompts → the Council of Europe CEFR B2 descriptors they
+  are designed against. The bootstrap/back-fill scripts (`scripts/generate-provenance-stubs.mjs`,
+  `scripts/backfill-provenance-refs.mjs`) document exactly how each reference was derived. **These
+  references are machine-assigned starting points, not human-verified:** all 809 rows stay
+  `review_status: "draft"`. Flipping draft → verified is the still-open four-eyes step (Phase 2).
 
 ## Documented procedures (the "management system")
 
@@ -293,8 +303,12 @@ enterprise. Budget roughly **$15K to $60K per standard** and several months each
 speculatively.
 
 **Near-term legal actions (not certification, but cheap and arguably required):**
-- **Ship Article 50 transparency** before 2 Aug 2026: a clear "this feedback is AI-generated / you are
-  interacting with an AI" disclosure wherever the app gives AI feedback.
+- **Article 50 transparency — SHIPPED (2026-06-20), ahead of the 2 Aug 2026 date.** The only
+  generative-AI surface is the writing coach (speech is the Web Speech API, simulations are scripted
+  dialogue trees). It already marked its output as "KI-generierte Rückmeldung" in both the live result
+  and the history. We added an explicit point-of-use disclosure on the writing editor: "Dein Text wird
+  zur Auswertung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung ist KI-generiert und kann
+  Fehler enthalten," linking to the privacy page. Revisit if any new AI-interactive surface is added.
 - **Write a documented Article 6(3) risk assessment** answering the profiling question (see EU AI Act
   section). Needed on file if we claim we are not high-risk.
 - Consider cheap trust signals: the German **MISSION KI** low-risk-AI standard (built for SMEs), an
@@ -319,6 +333,13 @@ SOC 2 today would be premature for a pre-revenue product and a poor use of money
 
 ## Change log
 
+- **v0.4 (2026-06-20):** two stream items shipped. (1) **Reference back-fill complete** — all 809
+  register rows now carry a non-empty `reference` (grammar → German Wikipedia, redemittel → DWDS
+  corpus search, dialogues/exam sets/writing prompts → CEFR B2 descriptors), so the linter's
+  back-fill warning queue is empty. Added `scripts/backfill-provenance-refs.mjs` to document the
+  derivation. Rows stay `draft`; human verification (four-eyes) is the next open step. (2) **EU AI Act
+  Article 50 transparency shipped** on the writing coach (explicit point-of-use AI disclosure plus the
+  existing AI-generated output marking), ahead of the 2 Aug 2026 date.
 - **v0.3 (2026-06-15):** certification deep-research pass (backlog #19) completed and folded in; see
   `CERTIFICATION_RESEARCH.md`. Key refinements: we are most likely **not high-risk** under the EU AI Act
   (with profiling + institutional-gating as the two flip risks); **Article 50 transparency** (by 2 Aug
