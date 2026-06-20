@@ -430,3 +430,27 @@ backfilled from the same session's transcript so the trail is complete.)
   Updated CLAUDE.md (s29 flat-fill rule). `pnpm build` green.
 - **Artifacts:** `src/components/layout/BottomTabBar.tsx`, `src/components/layout/MoreSheet.tsx`,
   `src/components/layout/Sidebar.tsx`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 26 — 2026-06-20 (AI product strategy research)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > Role: You are a senior AI product strategist, edtech consultant, and innovation researcher with
+  > expertise in language learning products. Task: I am building a language learning app Genauly and
+  > want to leverage modern AI tools effectively to generate, validate, prioritize, and implement new
+  > product ideas that create measurable user value. [Full request: research-backed analysis covering
+  > the AI opportunity landscape, AI tools/workflows, an idea-generation framework, a validation
+  > framework, a prioritization system, and a practical roadmap; deliverables = executive summary,
+  > cited findings, tools table, repeatable workflow, 10-20 feature ideas with validation methods, and
+  > a prioritized action plan.]
+- **Response summary:** Conducted web research across six evidence areas (retrieval practice/spaced
+  repetition, Krashen input vs Swain output, Duolingo Max GPT-4 features, AI pronunciation/CALL
+  assessment, GDPR + EU AI Act/DPIA, RICE/ICE prioritization) and wrote `docs/AI_PRODUCT_STRATEGY.md`:
+  an executive summary, six cited findings, an 8-category opportunity map, build-time vs runtime AI
+  tool tables, a 5-stage innovation workflow with prompt scaffolds, a validation framework, an adapted
+  RICE scoring model with worked examples, 18 Genauly-specific feature ideas each with a validation
+  method, a GDPR-safe phased roadmap (quick wins / medium / long term), and a next-steps action plan.
+  Advisory doc only; no app behaviour changed; no build needed (no code). Pushed to the dev branch; no
+  PR opened (strategy doc, founder can request merge).
+- **Artifacts:** `docs/AI_PRODUCT_STRATEGY.md`, `docs/SESSION_PROMPT_LOG.md`.
