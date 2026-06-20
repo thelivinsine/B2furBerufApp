@@ -26,6 +26,7 @@ import {
   KeyRound,
   ArrowRightLeft,
   Boxes,
+  Landmark,
   type LucideIcon,
 } from "lucide-react";
 
@@ -57,6 +58,7 @@ const map: Record<string, LucideIcon> = {
   KeyRound,
   ArrowRightLeft,
   Boxes,
+  Landmark,
 };
 
 export function iconByName(name: string): LucideIcon {

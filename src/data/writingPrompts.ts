@@ -72,4 +72,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       "Schreibe eine kurze E-Mail, um eine Dienstreise zu organisieren (Termin, Ziel, Zweck).",
     long: "Schreibe einen Bericht über eine Dienstreise. Fasse die wichtigsten Ergebnisse zusammen, bewerte den Nutzen der Reise und gib eine Empfehlung für künftige Reisen.",
   },
+  behoerde: {
+    themeId: "behoerde",
+    short:
+      "Schreibe eine kurze E-Mail an das Bürgeramt: Bitte um einen Termin zur Anmeldung deines neuen Wohnsitzes und nenne deine Verfügbarkeit.",
+    long: "Verfasse eine formelle E-Mail an die Ausländerbehörde. Erkläre, dass du deinen Aufenthaltstitel verlängern möchtest, frage nach den nötigen Unterlagen und bitte höflich um einen Termin.",
+  },
 };

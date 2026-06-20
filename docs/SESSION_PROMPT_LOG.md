@@ -511,3 +511,29 @@ backfilled from the same session's transcript so the trail is complete.)
   tables, roadmap, cross-references (§6→§7 fix, finding-number renumber), and a categorised Sources
   list with honest caveats. Direction unchanged; grounding much stronger. Updated within PR #205.
 - **Artifacts:** `docs/AI_PRODUCT_STRATEGY.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 29 — 2026-06-20 (ship first daily-life content pack: Behörde)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > go ahead and scope the scenario pack module. include a non tech summary in the plan
+  > [then, after plan approval:] continue where you left off
+- **Response summary:** Scoped (plan-mode) then implemented the first daily-life content pack,
+  the new `behoerde` theme (Behörden & Ämter), per the AI strategy doc's top-scored move and
+  founder backlog #18. Shipped a **lean starter** as a **flat 11th theme** (both confirmed via
+  AskUserQuestion): ~25 vocabulary items, 12 collocations, 2 branching scenarios (`sc_anmeldung`
+  level 1, `sc_auslaenderbehoerde` level 2), 1 writing prompt, and provenance rows for all 40 new
+  ids. Wiring: extended the `ThemeId` union (`src/types/index.ts`) and the synced `THEME_IDS` array
+  (`scripts/lint-content.mjs`), registered the `Landmark` lucide icon (`src/lib/icons.ts`), and added
+  the theme to `src/data/themes.ts`. The pack auto-surfaces in Quiz/Vocabulary/Collocations (they map
+  over `themes`) and the SimulationHub (groups scenarios by level), so no UI redesign was needed.
+  Fixed three colliding collocation ids (renamed to `c_behoerde*`). Verified: `pnpm lint:content`
+  passes (11 themes, 515 vocab, 132 collocations, 12 dialogues, 809 provenance rows; only pre-existing
+  advisory reference warnings), `pnpm typecheck` exit 0, `pnpm build` exit 0. Updated CLAUDE.md counts
+  + the new-theme checklist, and PROJECT_STATUS #18 progress note. Out of scope (noted): domain-grouping
+  UI (#5), nav/Dashboard redesign, exam set, runtime AI / Article 50.
+- **Artifacts:** `src/types/index.ts`, `scripts/lint-content.mjs`, `src/lib/icons.ts`,
+  `src/data/themes.ts`, `src/data/vocabulary.ts`, `src/data/collocations.ts`, `src/data/dialogues.ts`,
+  `src/data/writingPrompts.ts`, `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`.

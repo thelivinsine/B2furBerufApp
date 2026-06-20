@@ -1193,6 +1193,14 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       marketing; the library is growing and numbers will be outdated quickly.
     - Recommended model for the design/planning phase: **Fable** (creative + strategic).
       Implementation: **Opus** for cross-section rework, **Sonnet** for mechanical content work.
+    - **PROGRESS (2026-06-20):** the **first daily-life content pack shipped**, theme `behoerde`
+      (Behörden & Ämter): ~25 vocab, 12 collocations, 2 branching scenarios (levels 1–2), 1 writing
+      prompt, provenance rows. It auto-surfaces in Quiz/Vocabulary/Collocations/Simulation (those
+      map over `themes` / group scenarios by level), so no UI redesign was needed. Counts now: 515
+      vocab, 132 collocations, 12 dialogues, 11 themes. This is the reference template for the
+      remaining packs (banking, healthcare, housing). Still open under #18: the nav/Dashboard
+      "situation-based" redesign and the Bürokratie-vs-Office domain grouping (backlog #5).
+      Scoping doc: `docs/AI_PRODUCT_STRATEGY.md`.
 15. **Legal review with a lawyer (founder, 2026-06-08):** the live `/privacy` and `/terms` (AGB)
     pages were written in plain language by the team, not a lawyer. Before any paid plans (#8/#9)
     or a marketing campaign (#13) launch, have a qualified lawyer review both for German/EU
