@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-17 (session 28). Branch: `claude/cloud-icon-bottom-bar-epi0dt`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-20 (session 30). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,29 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 30 (2026-06-20) — Data audit-ready stream: reference back-fill + EU AI Act Art. 50 (SHIPPED ✅)
+Advanced the data-governance / audit-ready stream (backlog #7) on two fronts the founder approved together:
+- **Provenance reference back-fill complete.** The bootstrap generator had only auto-filled references
+  for vocabulary (Wiktionary) and collocations (DWDS), leaving ~162 authored rows (grammar, redemittel,
+  dialogues, exam sets, writing prompts) with an empty `reference` (the linter back-fill queue). Added
+  `scripts/backfill-provenance-refs.mjs`, which fills **only** empty references with a genuine,
+  type-appropriate source: grammar topics/drills → the German Wikipedia article for the topic
+  (grammar = facts), redemittel → DWDS corpus search for the phrase, dialogues/exam sets/writing
+  prompts → the Council of Europe CEFR B2 descriptors. All **809 rows now carry a reference; the linter
+  warning queue is empty.** References are machine-assigned starting points, not verified: every row
+  stays `review_status: "draft"`. The four-eyes verification pass (draft → verified) is the next open
+  governance step.
+- **EU AI Act Article 50 transparency shipped** (ahead of the 2 Aug 2026 date). Confirmed the writing
+  coach is the only generative-AI surface (speech = Web Speech API; simulations = scripted dialogue
+  trees). It already marked output as "KI-generierte Rückmeldung" in the live result and history; added
+  an explicit point-of-use disclosure on the writing editor ("Dein Text wird zur Auswertung an eine KI
+  (Anthropic Claude) gesendet. Die Rückmeldung ist KI-generiert und kann Fehler enthalten.") linking to
+  the privacy page.
+- Verified: `pnpm lint:content` passes with **zero warnings** (was ~162), `pnpm build` + typecheck
+  green. Docs updated (`DATA_GOVERNANCE.md` v0.4). **Still open in this stream:** human verification
+  of the references, the Tatoeba example-sentence sourcing for vocab sentences, and the Article 6(3)
+  profiling risk assessment.
 
 ### Session 28 (2026-06-17) — Selection "cloud" refinement: compact squircle + selected-only menu (SHIPPED ✅)
 Founder feedback: the grey backdrop behind the active icon (the "cloud") was too big and the gradient
