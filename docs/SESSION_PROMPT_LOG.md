@@ -602,3 +602,23 @@ backfilled from the same session's transcript so the trail is complete.)
 - **Artifacts:** `src/features/legal/Sources.tsx`, `src/router.tsx`, `src/features/settings/Settings.tsx`,
   `src/features/landing/LandingPage.tsx`, `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR # appended on push/merge.
+
+## Entry 33 — 2026-06-23 (first check:refs run + reference corrections)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the failed "Check provenance references" workflow run
+- **Prompt (verbatim):**
+  > this is what I get when I run the workflow [screenshot: step "Check provenance reference URLs" failed]
+- **Response summary:** Pulled the Actions log via the GitHub MCP tools and triaged the 183 reported
+  failures: the checker was too harsh, not 183 dead links. ~70 were HTTP 429 (Wikimedia rate-limiting
+  at concurrency 5, valid pages), 33 were HTTP 403 (Council of Europe blocks bots), and 117 were
+  genuine 404s (B2-Beruf compound nouns absent from Wiktionary, reflexive/particle verbs, headword bugs
+  like gender pairs and "(Pl.)"/"(PSA)", 2 bad collocation DWDS lemmas, 1 wrong Wikipedia title). Fixed
+  both: hardened the checker (concurrency 2, Retry-After, CEFR not-status-checkable, 429/403 → "could
+  not verify" instead of failure) and re-pointed the 117 dead references via
+  `scripts/fix-provenance-refs.mjs` (vocab/collocations → DWDS corpus search; Konnektoren grammar →
+  de.wikipedia "Konjunktion (Wortart)"). Status-checkable set 629 → 517. `pnpm build` +
+  `pnpm lint:content` green. Asked founder to re-run the workflow to confirm.
+- **Artifacts:** `scripts/check-provenance-refs.mjs`, `scripts/fix-provenance-refs.mjs`,
+  `src/data/provenance.ts`, `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR # appended on push/merge.
