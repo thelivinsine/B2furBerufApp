@@ -374,8 +374,13 @@ prepositional-phrase lemmas, 1 wrong Wikipedia title). Two fixes:
   evidence); the Konnektoren grammar topic+drills → de.wikipedia "Konjunktion (Wortart)". Touches only
   the listed ids; review_status stays "draft".
 Status-checkable set now 517 (was 629); 184 not-status-checkable (DWDS corpus + CEFR). `pnpm build` +
-`pnpm lint:content` green. **Next:** founder re-runs the workflow to confirm green; a handful of
-stragglers (404s previously masked by 429) may remain for a quick second pass.
+`pnpm lint:content` green.
+
+**Second pass (same day):** run #2 came back with 26 genuine 404s (the stragglers that were masked as
+429 in run #1, now caught because the gentler checker reported zero rate-limits). All vocab compounds/
+verbs; re-pointed to DWDS corpus search via the same fix script. Total dead refs corrected across the
+two passes: **143**. Status-checkable set now 491; 210 not-status-checkable. Next run is expected green
+(the remaining 491 all resolved cleanly in run #2).
 
 ### Session 32 (2026-06-23) — In-app "Sources & Licenses" page (audit-ready stream cont.) (SHIPPED ✅)
 Founder asked where they (and the public) can see the data and its source links. Built the

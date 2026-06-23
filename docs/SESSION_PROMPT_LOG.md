@@ -622,3 +622,19 @@ backfilled from the same session's transcript so the trail is complete.)
 - **Artifacts:** `scripts/check-provenance-refs.mjs`, `scripts/fix-provenance-refs.mjs`,
   `src/data/provenance.ts`, `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR # appended on push/merge.
+
+## Entry 34 — 2026-06-23 (check:refs second pass — clear the 26 stragglers)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > I ran it again and still got an error
+- **Response summary:** Pulled run #2's log: down to 26 failures (from 183), all genuine Wiktionary
+  404s, the stragglers that were masked as HTTP 429 in run #1 and surfaced once the gentler checker
+  stopped hitting rate limits (it reported zero 429s this time). Added the 26 vocab ids to the
+  `fix-provenance-refs.mjs` DEAD_404 set and re-pointed them to DWDS corpus search. Total dead refs
+  corrected across both passes: 143. Status-checkable set 517 → 491 (the remaining 491 all resolved
+  cleanly in run #2, so the next run is expected green). `pnpm lint:content` + `pnpm build` green.
+- **Artifacts:** `scripts/fix-provenance-refs.mjs`, `src/data/provenance.ts`,
+  `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR #
+  appended on push/merge.

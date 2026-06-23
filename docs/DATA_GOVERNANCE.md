@@ -225,11 +225,11 @@ any externally licensed content, as required.
   transient rate-limits do not cry wolf. The DWDS corpus-search and CEFR links are treated as
   not-status-checkable. It is **not a PR gate** (external checks are flaky/slow); it runs from the
   script or the manual `check-refs.yml` GitHub Action (Actions tab → "Check provenance references" →
-  Run). The **first live run (2026-06-23) found 117 dead Wiktionary references** (B2-Beruf compound
-  nouns with no Wiktionary entry, reflexive/particle verbs, a few headword bugs); these were re-pointed
-  to DWDS corpus search via `scripts/fix-provenance-refs.mjs`. A live link confirms the page exists,
-  **not** that it is the correct sense, so this attests to one machine-checkable half of verification;
-  content accuracy still needs human sign-off.
+  Run). The **first two live runs (2026-06-23) found 143 dead Wiktionary references** (B2-Beruf
+  compound nouns with no Wiktionary entry, reflexive/particle verbs, a few headword bugs); these were
+  re-pointed to DWDS corpus search via `scripts/fix-provenance-refs.mjs`. A live link confirms the page
+  exists, **not** that it is the correct sense, so this attests to one machine-checkable half of
+  verification; content accuracy still needs human sign-off.
 - **Reference back-fill complete (2026-06-20):** every one of the 809 rows now carries a non-empty
   `reference`, so the back-fill warning queue is empty. Coverage by type: vocabulary → Wiktionary
   headword; collocations → DWDS noun entry; grammar topics/drills → the German Wikipedia article for
