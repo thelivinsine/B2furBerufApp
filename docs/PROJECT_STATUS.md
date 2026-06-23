@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-23 (session 31). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-23 (session 32). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,21 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 32 (2026-06-23) — In-app "Sources & Licenses" page (audit-ready stream cont.) (SHIPPED ✅)
+Founder asked where they (and the public) can see the data and its source links. Built the
+auto-generated **"Sources & Licenses" page at `/sources`** (`src/features/legal/Sources.tsx`), the
+Phase 2 attribution-surfacing item from `DATA_GOVERNANCE.md`. It renders entirely from the provenance
+register (so it never drifts from the content): an "our approach" intro, the upstream references we
+rely on (Wiktionary, DWDS, Wikipedia, CEFR) with licences + per-source counts, the licence breakdown of
+our own content, and the **full itemised list of all 809 items with a link to each source**, grouped by
+content type in collapsible sections (children render only when expanded, to stay light). Bilingual
+DE/EN via the shared `LegalChrome`; linked from Settings and the landing footer. Already surfaces any
+`attribution_required`/`attribution_text` rows, so Tatoeba CC-BY credit will appear automatically once
+ingested. **Lazy-loaded** so the ~800-row register stays out of the main bundle (main chunk unchanged at
+124 KB gzip; the register is a separate 24 KB-gzip chunk loaded only on `/sources`). `pnpm build` +
+typecheck green. This is the human-readable answer to "where can I see the data and sources" the founder
+wanted (the raw register also lives in `src/data/provenance.ts`).
 
 ### Session 31 (2026-06-23) — Reference URL checker (audit-ready stream cont.) (SHIPPED ✅)
 Built the automated reference-URL validator the founder asked for, the highest-leverage first step of

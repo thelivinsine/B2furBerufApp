@@ -581,3 +581,24 @@ backfilled from the same session's transcript so the trail is complete.)
 - **Artifacts:** `scripts/check-provenance-refs.mjs`, `.github/workflows/check-refs.yml`,
   `package.json` (check:refs alias), `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR # appended on push/merge.
+
+## Entry 32 — 2026-06-23 (in-app Sources & Licenses page)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > can you explain me what the current setup is when it comes to data checks and audit readiness? where can I see the data and the corresponding links for sources?
+- **Response summary:** Explained the two checks (the `lint:content` gate run automatically on every
+  PR/push, and the on-demand `check:refs` link checker) and the four audit-readiness pillars, then
+  pointed at where the data lives (`src/data/*.ts`, register in `src/data/provenance.ts`). Since those
+  are code files, offered a readable view; founder chose the in-app page (via AskUserQuestion). Built
+  the auto-generated **"Sources & Licenses" page at `/sources`** (`src/features/legal/Sources.tsx`),
+  generated entirely from the provenance register: traceability intro, upstream references (Wiktionary,
+  DWDS, Wikipedia, CEFR) with licences + counts, our content's licence breakdown, and the full
+  itemised list of all 809 items with a source link each, grouped by type in collapsible sections.
+  Bilingual DE/EN (shared `LegalChrome`); linked from Settings + landing footer; surfaces any required
+  attribution automatically. Lazy-loaded so the register stays out of the main bundle (main chunk
+  unchanged at 124 KB gzip; register is a separate 24 KB-gzip chunk). `pnpm build` + typecheck green.
+- **Artifacts:** `src/features/legal/Sources.tsx`, `src/router.tsx`, `src/features/settings/Settings.tsx`,
+  `src/features/landing/LandingPage.tsx`, `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR # appended on push/merge.

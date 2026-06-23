@@ -197,11 +197,15 @@ register. Snapshots protect us if a source later changes its terms.
 
 ## Attribution surfacing
 
-CC-BY and CC-BY-SA require visible credit. The plan is an **auto-generated "Sources & Licenses"
-page** in the app, built from the `attribution_required` / `attribution_text` fields in the register,
-so compliance is both real and demonstrable. Because the plan leans on **Tatoeba (CC-BY)** for example
-sentences and cites Wiktionary / DWDS as references, this page carries real attribution rather than
-being a formality. The mechanism must exist before we ingest any externally licensed content.
+CC-BY and CC-BY-SA require visible credit. The **auto-generated "Sources & Licenses" page** lives at
+**`/sources`** (`src/features/legal/Sources.tsx`, shipped 2026-06-23), built directly from the
+provenance register so it stays in sync automatically. It shows the traceability approach, the upstream
+references we rely on (Wiktionary, DWDS, Wikipedia, CEFR) with their licences, the licence breakdown of
+our own content, and the full itemised list of every content id with a link to its source (grouped by
+type, collapsible). It already renders any `attribution_required` / `attribution_text` rows, so the
+moment we ingest CC-BY content (e.g. **Tatoeba** example sentences) the credit surfaces automatically.
+The page is linked from Settings and the landing footer. The mechanism now exists ahead of ingesting
+any externally licensed content, as required.
 
 ## Automated controls
 
