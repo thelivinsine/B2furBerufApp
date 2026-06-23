@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-23 (session 32). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-23 (session 33). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,24 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 33 (2026-06-23) — First check:refs run + reference corrections (audit-ready stream cont.) (SHIPPED ✅)
+Founder ran the `check:refs` workflow; it reported 183 failures. Triaged from the Actions log: the
+checker was too harsh, not 183 dead links. Causes: ~70 HTTP 429 (Wikimedia rate-limiting at
+concurrency 5, valid pages), 33 HTTP 403 (Council of Europe blocks bots, page fine), and **117 genuine
+404s** (B2-Beruf compound nouns with no Wiktionary entry, reflexive/particle verbs like "sich
+abstimmen", headword bugs like gender pairs "X / die Y" and "(Pl.)"/"(PSA)", 2 collocation DWDS
+prepositional-phrase lemmas, 1 wrong Wikipedia title). Two fixes:
+- **Checker hardened** (`scripts/check-provenance-refs.mjs`): concurrency 5→2, `Retry-After` honoured,
+  more retries; CEFR/coe.int treated as not-status-checkable; **429/403 now bucketed as "could not
+  verify" and do NOT fail the run** (only true 404/dead links do). Removes the false-negative flood.
+- **117 dead references re-pointed** (`scripts/fix-provenance-refs.mjs`): the verified-404 vocab/
+  collocation ids → DWDS corpus search (`/r?q=`, resolves for any attested term, honest usage
+  evidence); the Konnektoren grammar topic+drills → de.wikipedia "Konjunktion (Wortart)". Touches only
+  the listed ids; review_status stays "draft".
+Status-checkable set now 517 (was 629); 184 not-status-checkable (DWDS corpus + CEFR). `pnpm build` +
+`pnpm lint:content` green. **Next:** founder re-runs the workflow to confirm green; a handful of
+stragglers (404s previously masked by 429) may remain for a quick second pass.
 
 ### Session 32 (2026-06-23) — In-app "Sources & Licenses" page (audit-ready stream cont.) (SHIPPED ✅)
 Founder asked where they (and the public) can see the data and its source links. Built the

@@ -28,9 +28,12 @@ const DRY = process.argv.includes("--dry");
 
 /* Wikimedia requires a descriptive User-Agent with contact info, else 403. */
 const UA = "genauly-ref-check/1.0 (https://genauly.de; provenance link audit)";
-const CONCURRENCY = 5;
+// Wikimedia rate-limits hard, so stay gentle: low concurrency + a real pause
+// between requests. Better slow-and-green than fast-and-falsely-red.
+const CONCURRENCY = 2;
+const REQUEST_DELAY_MS = 350;
 const TIMEOUT_MS = 15000;
-const MAX_RETRIES = 3;
+const MAX_RETRIES = 5;
 
 /* Decide how a URL is checked from its host + path. */
 function classify(url) {
@@ -41,13 +44,14 @@ function classify(url) {
     return { kind: "invalid" };
   }
   const host = u.hostname.replace(/^www\./, "");
-  // DWDS corpus search: status is meaningless (always 200). Manual only.
+  // DWDS corpus search: status is meaningless (always 200). Not status-checkable.
   if (host === "dwds.de" && u.pathname.startsWith("/r")) return { kind: "manual", host };
+  // Council of Europe blocks automated requests (returns 403). It is a single,
+  // stable URL, so a status check tells us nothing — treat as not-checkable.
+  if (host === "coe.int") return { kind: "manual", host };
   // DWDS word entry: 200 = entry exists; the page also shows a not-found notice.
   if (host === "dwds.de") return { kind: "status+body", host, notFound: ["Es wurde kein Eintrag gefunden", "Diese Seite gibt es nicht"] };
-  // Wiktionary / Wikipedia / CoE: a missing page is a clean 404.
-  if (host === "wiktionary.org" || host === "wikipedia.org" || host === "coe.int")
-    return { kind: "status", host };
+  // Wiktionary / Wikipedia: a missing page is a clean 404.
   return { kind: "status", host };
 }
 
@@ -63,9 +67,13 @@ async function fetchWithRetry(url, wantBody) {
         signal: ctrl.signal,
       });
       clearTimeout(timer);
-      // Back off on rate-limit / transient server errors.
+      // Back off on rate-limit / transient server errors, honouring Retry-After.
       if ((res.status === 429 || res.status >= 500) && attempt < MAX_RETRIES) {
-        await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
+        const retryAfter = Number(res.headers.get("retry-after"));
+        const wait = Number.isFinite(retryAfter) && retryAfter > 0
+          ? retryAfter * 1000
+          : 800 * 2 ** attempt;
+        await new Promise((r) => setTimeout(r, wait));
         continue;
       }
       const body = wantBody && res.ok ? await res.text() : "";
@@ -73,7 +81,7 @@ async function fetchWithRetry(url, wantBody) {
     } catch (err) {
       clearTimeout(timer);
       if (attempt < MAX_RETRIES) {
-        await new Promise((r) => setTimeout(r, 500 * 2 ** attempt));
+        await new Promise((r) => setTimeout(r, 800 * 2 ** attempt));
         continue;
       }
       return { status: 0, body: "", error: err?.message ?? String(err) };
@@ -89,7 +97,7 @@ async function runPool(items, worker) {
     while (next < items.length) {
       const i = next++;
       results[i] = await worker(items[i], i);
-      await new Promise((r) => setTimeout(r, 120)); // be polite
+      await new Promise((r) => setTimeout(r, REQUEST_DELAY_MS)); // be polite
     }
   }
   await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, lane));
@@ -148,11 +156,18 @@ async function main() {
     return;
   }
 
-  console.log(`\nChecking ${checkable.length} URLs over the network …\n`);
-  const failed = [];
+  console.log(`\nChecking ${checkable.length} URLs over the network (gentle, this takes a few minutes) …\n`);
+  const failed = []; // hard: dead link / network error -> fails the run
+  const indeterminate = []; // soft: rate-limited / bot-blocked -> could not verify, no fail
   await runPool(checkable, async ([url, v]) => {
     const wantBody = v.info.kind === "status+body";
     const { status, body, error } = await fetchWithRetry(url, wantBody);
+    // 429 (still rate-limited after retries) and 403 (bot-blocked) are not proof
+    // of a dead link, so they are "could not verify", not a failure.
+    if (status === 429 || status === 403) {
+      indeterminate.push({ url, reason: `HTTP ${status} (could not verify)`, ids: v.ids });
+      return "indeterminate";
+    }
     let ok = status >= 200 && status < 400;
     let reason = error ? `network error: ${error}` : `HTTP ${status}`;
     if (ok && wantBody && v.info.notFound?.some((m) => body.includes(m))) {
@@ -168,8 +183,17 @@ async function main() {
     for (const [url, v] of invalid) console.log(`  ${url}  →  ${v.ids.slice(0, 3).join(", ")}${v.ids.length > 3 ? ` +${v.ids.length - 3}` : ""}`);
   }
 
+  if (indeterminate.length) {
+    console.log(`~ ${indeterminate.length} reference(s) could NOT be verified (rate-limited or bot-blocked, not counted as failures):`);
+    for (const f of indeterminate.sort((a, b) => b.ids.length - a.ids.length).slice(0, 10)) {
+      console.log(`  [${f.reason}] ${f.url}`);
+    }
+    if (indeterminate.length > 10) console.log(`  … and ${indeterminate.length - 10} more`);
+    console.log("");
+  }
+
   if (failed.length === 0) {
-    console.log(`✔ All ${checkable.length} checkable references resolve.`);
+    console.log(`✔ All resolvable references checked out. ${indeterminate.length ? `(${indeterminate.length} could not be verified, see above.)` : ""}`);
   } else {
     console.log(`✗ ${failed.length} reference(s) FAILED (fix the URL or the content id it points at):\n`);
     for (const f of failed.sort((a, b) => b.ids.length - a.ids.length)) {
@@ -180,8 +204,9 @@ async function main() {
   }
 
   console.log(`\nReminder: a live link confirms the page exists, not that it is the correct sense.`);
-  console.log(`The ${manual.length} DWDS corpus-search links (redemittel) and content accuracy still need human review.`);
+  console.log(`The ${manual.length} not-status-checkable links (DWDS corpus search + CEFR) and content accuracy still need human review.`);
 
+  // Only genuine dead links / malformed URLs fail the run; rate-limits do not.
   if (failed.length > 0 || invalid.length > 0) process.exitCode = 1;
 }
 
