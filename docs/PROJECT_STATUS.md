@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-20 (session 30). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-23 (session 31). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,19 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 31 (2026-06-23) — Reference URL checker (audit-ready stream cont.) (SHIPPED ✅)
+Built the automated reference-URL validator the founder asked for, the highest-leverage first step of
+the still-open verification work. `scripts/check-provenance-refs.mjs` (`pnpm check:refs`) fetches every
+provenance `reference` and reports dead links, wrong Wiktionary headwords (404), missing Wikipedia
+articles, and unknown DWDS entries. It dedups 809 rows → **701 unique URLs** (629 status-checkable;
+72 DWDS corpus-search links flagged "not auto-checkable" rather than faked; 0 malformed) and exits
+non-zero on any failure. Because this sandbox blocks outbound HTTPS (`host_not_allowed`), it ships with
+a manual `workflow_dispatch` GitHub Action (`.github/workflows/check-refs.yml`) so the non-technical
+founder can run it from the Actions tab where egress is open; also runnable locally via `pnpm check:refs`
+(`--dry` parses without network). Verified the parse/dedup path here with `--dry`. **This attests to the
+"link is live" half of verification only; content accuracy (correct sense, B2 quality) still needs human
+sign-off.** Docs updated (DATA_GOVERNANCE.md automated-controls list).
 
 ### Session 30 (2026-06-20) — Data audit-ready stream: reference back-fill + EU AI Act Art. 50 (SHIPPED ✅)
 Advanced the data-governance / audit-ready stream (backlog #7) on two fronts the founder approved together:

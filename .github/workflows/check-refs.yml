@@ -1,0 +1,35 @@
+name: Check provenance references
+
+# On-demand audit that verifies every provenance `reference` URL actually
+# resolves (catches dead links, wrong Wiktionary headwords, missing Wikipedia
+# articles, unknown DWDS entries). It is NOT a PR gate: external link checks are
+# flaky and slow, so this runs only when triggered by hand from the Actions tab.
+# A red run means one or more references need fixing; the log lists which.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-refs:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions pinned to commit SHAs (not floating tags), matching validate.yml.
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check provenance reference URLs
+        run: pnpm check:refs
