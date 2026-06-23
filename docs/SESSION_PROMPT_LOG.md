@@ -638,3 +638,21 @@ backfilled from the same session's transcript so the trail is complete.)
 - **Artifacts:** `scripts/fix-provenance-refs.mjs`, `src/data/provenance.ts`,
   `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR #
   appended on push/merge.
+
+## Entry 35 — 2026-06-23 (docs update + two strategy backlog items)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > now it's successful. Can you summarise what happened?
+  > [then:] can you update documentation from this session and also add it to the tondo list the following items:
+  > - a comprehensive end to end data strategy for the app
+  > - a thorough and detailed visualization plan for all the learning components of the app
+- **Response summary:** Confirmed `check:refs` run #3 is green (all 491 status-checkable references
+  resolve; 143 dead refs corrected across runs #1–#2). Updated `docs/PROJECT_STATUS.md`: recorded the
+  run #3 green result in the session 33 entry, added a session 34 entry, bumped the header to session
+  34, and added two backlog items — **#22 comprehensive end-to-end data strategy** (`DATA_STRATEGY.md`
+  umbrella over all data classes) and **#23 detailed visualization plan for all learning components**
+  (`VISUALIZATION_PLAN.md`, per-component visual + data-viz specs) — plus mapped both in the
+  model-guidance table. Docs-only change; no code.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.

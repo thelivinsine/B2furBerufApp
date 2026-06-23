@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-23 (session 33). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-23 (session 34). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -359,6 +359,21 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
 
+### Session 34 (2026-06-23) — check:refs green confirmed + two strategy backlog items added
+- **check:refs run #3 is GREEN.** After the two correction passes (143 dead refs re-pointed), all 491
+  status-checkable references resolve. The "links are live and traceable" half of provenance
+  verification is machine-confirmed. (Run history: #1 183 flagged → mostly false alarms + 117 real;
+  #2 26 stragglers; #3 clean.)
+- **Two new backlog items added** at the founder's request: **#22 comprehensive end-to-end data
+  strategy** (a single `DATA_STRATEGY.md` umbrella over content + user + AI + analytics data,
+  unifying `DATA_GOVERNANCE.md`/`EXPANSION_PLAN.md`/`PHASE2_SETUP.md`) and **#23 detailed
+  visualization plan for all learning components** (`VISUALIZATION_PLAN.md`: per-component visual
+  specs + progress/data-viz with `recharts`, consistent with the locked design system; ties into the
+  Dashboard #1, mnemonics #4, simulations #3, Schreibtraining #6 backlog items). Both mapped in the
+  model-guidance table. Neither scoped/started yet.
+- Docs only this session (no code). `DATA_GOVERNANCE.md` already reflected the checker; PROJECT_STATUS
+  session 33 updated with the run #3 green result.
+
 ### Session 33 (2026-06-23) — First check:refs run + reference corrections (audit-ready stream cont.) (SHIPPED ✅)
 Founder ran the `check:refs` workflow; it reported 183 failures. Triaged from the Actions log: the
 checker was too harsh, not 183 dead links. Causes: ~70 HTTP 429 (Wikimedia rate-limiting at
@@ -379,8 +394,12 @@ Status-checkable set now 517 (was 629); 184 not-status-checkable (DWDS corpus + 
 **Second pass (same day):** run #2 came back with 26 genuine 404s (the stragglers that were masked as
 429 in run #1, now caught because the gentler checker reported zero rate-limits). All vocab compounds/
 verbs; re-pointed to DWDS corpus search via the same fix script. Total dead refs corrected across the
-two passes: **143**. Status-checkable set now 491; 210 not-status-checkable. Next run is expected green
-(the remaining 491 all resolved cleanly in run #2).
+two passes: **143**. Status-checkable set now 491; 210 not-status-checkable.
+
+**Run #3 (2026-06-23): GREEN ✅.** All 491 status-checkable references resolve; the "links are live and
+traceable" half of verification is now machine-confirmed. The remaining open work in the audit-ready
+stream is the human accuracy sign-off (draft → verified), Tatoeba example-sentence sourcing, and the
+Article 6(3) profiling risk assessment.
 
 ### Session 32 (2026-06-23) — In-app "Sources & Licenses" page (audit-ready stream cont.) (SHIPPED ✅)
 Founder asked where they (and the public) can see the data and its source links. Built the
@@ -1319,6 +1338,37 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     **Article 6(3) risk assessment** (are we high-risk? answer the profiling question) so it exists on
     file. Detail and sources in `docs/CERTIFICATION_RESEARCH.md`. Confirm scope with the lawyer (#15).
     Recommended model: **Sonnet** (mechanical), legal nuance to **Opus**.
+22. **Comprehensive end-to-end data strategy (added 2026-06-23):** produce a single coherent strategy
+    document (e.g. `docs/DATA_STRATEGY.md`) covering the **full lifecycle of every kind of data in the
+    app**, unifying threads currently spread across `DATA_GOVERNANCE.md`, `EXPANSION_PLAN.md`, and
+    `PHASE2_SETUP.md`. Scope when picked up:
+    - **Inventory by data class:** learning content (`src/data/*`), the provenance register, user
+      progress + SRS state, writing submissions + AI feedback, settings + consent, and any analytics.
+    - **Where each lives and how it flows:** localStorage (`b2beruf.*`), Supabase `profiles.settings`
+      jsonb via `cloudSync`, the writing/delete-account Edge Functions, and AI-provider round-trips.
+    - **Lifecycle:** acquisition/sourcing, validation (`lint:content`, `check:refs`), the four-eyes
+      verification roadmap (draft → verified), Tatoeba example-sentence sourcing, retention/deletion
+      (GDPR export + delete), and backup/migration.
+    - **Governance & compliance:** how it satisfies EU AI Act Art. 10 / ISO 42001, the licence
+      allowlist, and the audit-ready posture already built.
+    - **A data model / ERD** and a roadmap of the gaps. This is the strategic umbrella over the
+      audit-ready stream (#7). Recommended model: **Fable** (strategy; **Opus** while Fable is
+      restricted).
+23. **Detailed visualization plan for all learning components (added 2026-06-23):** produce a thorough
+    design + data-viz plan (e.g. `docs/VISUALIZATION_PLAN.md`) for how **every learning component is
+    visually presented** and how progress/data is visualized, consistent with the locked design system
+    (bottom nav, dialog overlays, brand, two-tone icons). Scope when picked up:
+    - **Component by component:** Vocabulary (flashcards, der/die/das gender colour-coding, visual
+      mnemonics — ties #4), Collocations, Grammar drills, Redemittel, Dialogues/Simulations (ties #3),
+      Exam mode, Quiz, and the Writing coach.
+    - **Progress & data visualization:** the Dashboard (ties #1) and Analytics — SRS due/mastery
+      views, XP/levels/streaks, per-theme and per-weakness breakdowns, using the existing `recharts`
+      dependency. Define a consistent chart language.
+    - **Cross-cutting:** a shared visual vocabulary, empty/loading/error states, motion
+      (`framer-motion`) guidelines, dark-mode, and accessibility (contrast, reduced-motion).
+    - Deliver mockups/specs per component and a build order. Ties into #1 (Dashboard redesign) and #6
+      (Schreibtraining redesign). Recommended model: **Fable** (design direction; **Opus** for now),
+      **Sonnet/Opus** for the build.
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
@@ -1369,6 +1419,8 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 | Google sign-in branding completion | **Sonnet** | Mostly console steps + guidance, little code |
 | Gate Schreibtraining behind sign-in | **Sonnet** | Reuse existing `AuthDialog` |
 | Pricing page + plan/tier design | **Fable → Sonnet** | Strategy with Fable, build page with Sonnet |
+| End-to-end data strategy (#22) | **Fable** (Opus for now) | Cross-cutting strategy + data modelling, not code |
+| Visualization plan for learning components (#23) | **Fable → Opus/Sonnet** | Design direction with Fable, build the views with Opus/Sonnet |
 | Monetization tier + paywall feature flags | **Opus** | Backend + UI + careful gating logic |
 | Payment gateway integration | **Opus** | Money-handling; Fable for architecture/security design |
 | Domain-based content filtering (by sector) | **Fable → Opus** | Data-model design with Fable, implement with Opus |
