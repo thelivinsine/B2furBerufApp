@@ -71,6 +71,11 @@ const CollocationsBrowser = lazyWithReload(() =>
     default: m.CollocationsBrowser,
   })),
 );
+// Lazy: the Sources page pulls in the full provenance register (~800 rows), so
+// keep it out of the main bundle and load it only when /sources is visited.
+const Sources = lazyWithReload(() =>
+  import("@/features/legal/Sources").then((m) => ({ default: m.Sources })),
+);
 
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
@@ -101,6 +106,14 @@ export const router = createBrowserRouter([
   {
     path: "/terms",
     element: <TermsOfService />,
+  },
+  {
+    path: "/sources",
+    element: (
+      <Suspense fallback={null}>
+        <Sources />
+      </Suspense>
+    ),
   },
   // Impressum route temporarily disabled (see import note above). /impressum
   // falls through to the catch-all redirect until re-enabled.
