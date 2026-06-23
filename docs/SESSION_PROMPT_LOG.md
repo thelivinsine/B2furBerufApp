@@ -560,3 +560,24 @@ backfilled from the same session's transcript so the trail is complete.)
 - **Artifacts:** `src/features/writing/WritingHub.tsx`, `src/data/provenance.ts`,
   `scripts/backfill-provenance-refs.mjs`, `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR # appended on push/merge.
+
+## Entry 31 — 2026-06-23 (automated provenance reference-URL checker)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > what needs human verification?
+  > [then:] yes
+- **Response summary:** Explained the four-eyes verification gap (all 809 provenance rows are
+  `review_status: "draft"`; the machine-assigned references are unchecked), then built the validator
+  the founder approved. `scripts/check-provenance-refs.mjs` (`pnpm check:refs`) fetches every
+  reference URL and flags dead links / wrong Wiktionary headwords (404) / missing Wikipedia articles /
+  unknown DWDS entries; it dedups 809 rows → 701 unique URLs (629 status-checkable, 72 DWDS
+  corpus-search flagged "not auto-checkable", 0 malformed) and exits non-zero on failure. This sandbox
+  blocks outbound HTTPS (`x-deny-reason: host_not_allowed`), so it also ships a manual
+  `workflow_dispatch` GitHub Action (`.github/workflows/check-refs.yml`) the founder can run from the
+  Actions tab where egress is open. Verified the parse/dedup path locally with `--dry`. Honest scope:
+  attests to "link is live", not "correct sense"; content accuracy still needs human review.
+- **Artifacts:** `scripts/check-provenance-refs.mjs`, `.github/workflows/check-refs.yml`,
+  `package.json` (check:refs alias), `docs/DATA_GOVERNANCE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Commit SHAs + PR # appended on push/merge.

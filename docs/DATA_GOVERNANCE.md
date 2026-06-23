@@ -213,6 +213,14 @@ being a formality. The mechanism must exist before we ingest any externally lice
   build fails; it errors on a row for a non-existent id and warns on an authored/adapted row with no
   reference. This turns "we only use commercial-safe licenses" from a promise into a machine-enforced,
   auditor-verifiable fact.
+- **Reference URL checker (`pnpm check:refs`, added 2026-06-23):** an on-demand audit that fetches
+  every `reference` URL and reports dead links, wrong Wiktionary headwords (404), missing Wikipedia
+  articles, and unknown DWDS entries. It checks the 629 status-verifiable links and honestly flags the
+  72 DWDS corpus-search links (redemittel) as "not auto-checkable" rather than pretending to validate
+  them. It is **not a PR gate** (external checks are flaky/slow); it runs from the script or the manual
+  `check-refs.yml` GitHub Action (the Actions tab → "Check provenance references" → Run). A live link
+  confirms the page exists, **not** that it is the correct sense, so this attests to one machine-checkable
+  half of verification; content accuracy still needs human sign-off.
 - **Reference back-fill complete (2026-06-20):** every one of the 809 rows now carries a non-empty
   `reference`, so the back-fill warning queue is empty. Coverage by type: vocabulary → Wiktionary
   headword; collocations → DWDS noun entry; grammar topics/drills → the German Wikipedia article for
