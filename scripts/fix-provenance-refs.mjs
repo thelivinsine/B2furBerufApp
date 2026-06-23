@@ -75,6 +75,13 @@ const DEAD_404 = new Set([
   "v_buergeramt", "v_ummeldung", "v_meldebescheinigung", "v_wartenummer",
   // collocations whose DWDS noun lemma was a prepositional phrase
   "c_zur_sprache_bringen", "c_gefahr_hinweisen",
+  // second pass: stragglers that were masked as HTTP 429 in the first run
+  "v_zwischenschritt", "v_projektstand", "v_verletzen", "v_einerseits", "v_redezeit",
+  "v_nachbereitung", "v_wortergreifen", "v_umlaufverfahren", "v_nachbetreuung", "v_maengelruege",
+  "v_lieferbedingungen", "v_stammdaten", "v_garantieanspruch", "v_vermittler", "v_sachebene",
+  "v_vorwuerfe_zurueckweisen", "v_ich_botschaft", "v_deeskalationsstrategie", "v_lieferantenbewertung",
+  "v_green_procurement", "v_treibhausgasemissionen", "v_ressourcenschonung", "v_gefaehrdungsbeurteilung",
+  "v_sicherheitsbeauftragter", "v_arbeitsschutzgesetz", "v_sicherheitseinweisung",
 ]);
 
 /* Clean a label into a DWDS corpus-search query: drop a leading article, the
