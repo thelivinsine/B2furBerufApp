@@ -670,3 +670,23 @@ backfilled from the same session's transcript so the trail is complete.)
   primitive untouched. `pnpm build` green.
 - **Artifacts:** `src/features/vocabulary/VocabularyTrainer.tsx`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.
+
+## Entry 37 — 2026-06-24 (fix collocation tiles overflowing right in Wortschatz)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the Wortschatz → Kollokationen tiles with the teal "formell" badge clipped at the right edge
+- **Prompt (verbatim):**
+  > I didn't ask about the tabs swtiches. I was talking about the tiles down below. see attached picture. fix it
+- **Response summary:** Correct target this time: the collocation **tiles** (`CollocationsList`), not the
+  tab row. Root cause: the tile grid was `grid gap-3 sm:grid-cols-2` — on mobile there is no explicit
+  column count, so the grid used an implicit `auto` column sized by its widest content. The tile titles
+  use `truncate` (`white-space: nowrap`) with no `min-w-0`, so the longest collocation phrase in the
+  list forced the column wider than the viewport; every tile overflowed right and the rightmost element
+  (the `formell` badge) was clipped at the screen edge. Fixed by (1) adding `grid-cols-1` so the mobile
+  column uses `minmax(0,1fr)` and is capped to the container, and (2) adding `min-w-0`/`flex-1` down the
+  tile's flex chain (grid item, text column, title row, title `<p>`) + `shrink-0` on the SpeakButton, so
+  long titles truncate within the card instead of forcing width. The standalone `/collocations`
+  (`CollocationsBrowser`) wraps its titles (no truncate) so it does not have this bug; left untouched.
+  `pnpm build` green.
+- **Artifacts:** `src/features/vocabulary/CollocationsList.tsx`, `docs/SESSION_PROMPT_LOG.md`. Commit
+  SHA appended on push.
