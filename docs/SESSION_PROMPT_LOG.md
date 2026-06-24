@@ -656,3 +656,17 @@ backfilled from the same session's transcript so the trail is complete.)
   (`VISUALIZATION_PLAN.md`, per-component visual + data-viz specs) — plus mapped both in the
   model-guidance table. Docs-only change; no code.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.
+
+## Entry 36 — 2026-06-23 (fix Wortschatz Kollokationen tab cut off on the right)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the collocations section within wortschatz is cut off to the right fix it
+- **Response summary:** Diagnosed the Wortschatz tab row (`VocabularyTrainer`, 4 tabs) overflowing on
+  narrow screens — the shared `TabsList` uses `overflow-x-auto` + `no-scrollbar`, clipping the
+  rightmost "Kollokationen" tab with no visible scrollbar. Fixed by adding `flex-wrap` to that
+  `TabsList` instance so the tabs wrap to a second row and all four stay visible. Local override; shared
+  primitive untouched. `pnpm build` green.
+- **Artifacts:** `src/features/vocabulary/VocabularyTrainer.tsx`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.

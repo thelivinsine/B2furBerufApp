@@ -53,7 +53,7 @@ export function VocabularyTrainer() {
       />
 
       <Tabs value={mode} onValueChange={setMode}>
-        <TabsList>
+        <TabsList className="flex-wrap">
           <TabsTrigger value="flashcards">
             <Layers className="h-4 w-4" /> Karteikarten
           </TabsTrigger>
