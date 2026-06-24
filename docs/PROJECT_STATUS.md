@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-23 (session 34). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-23 (session 35). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,13 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 35 (2026-06-23) — Wortschatz tab overflow fix (SHIPPED ✅)
+The Wortschatz (`VocabularyTrainer`) tab row has 4 tabs (Karteikarten, Quiz, Übersicht, Kollokationen);
+the shared `TabsList` uses `overflow-x-auto` + `no-scrollbar`, so on narrow screens the rightmost tab
+(**Kollokationen**) was clipped off the right edge with no visible scroll affordance. Fixed by adding
+`flex-wrap` to that `TabsList` instance so the tabs wrap to a second row instead of clipping (all four
+always visible). Local override only; the shared Tabs primitive is unchanged. `pnpm build` green.
 
 ### Session 34 (2026-06-23) — check:refs green confirmed + two strategy backlog items added
 - **check:refs run #3 is GREEN.** After the two correction passes (143 dead refs re-pointed), all 491
