@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, ChevronDown, Combine, ListChecks, Search, X 
 import { collocations } from "@/data/collocations";
 import { themes, themeById } from "@/data/themes";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
@@ -30,52 +31,34 @@ const pillActive = "bg-primary text-primary-foreground border-primary";
 type Collocation = (typeof collocations)[number];
 
 function CollocationCard({ c }: { c: Collocation }) {
-  const [hoverHalf, setHoverHalf] = useState<"top" | "bottom" | null>(null);
-  const isFormal = c.register === "formal";
-
   return (
-    <Card
-      className={cn(
-        "h-full",
-        isFormal
-          ? "bg-indigo-50 dark:bg-indigo-950/25 border-indigo-200/60 dark:border-indigo-800/40"
-          : "",
-      )}
-      onMouseMove={(e) => {
-        const rect = e.currentTarget.getBoundingClientRect();
-        setHoverHalf(e.clientY < rect.top + rect.height / 2 ? "top" : "bottom");
-      }}
-      onMouseLeave={() => setHoverHalf(null)}
-    >
+    <Card className="card-hover h-full">
       <CardContent className="p-4">
-        {/* Line 1 + 2: phrase and translation — tight gap */}
+        {/* Phrase + translation, with the formell badge top-right (matches the
+            Wortschatz Kollokationen tiles). */}
         <div className="flex items-start justify-between gap-2">
-          <p className="text-base font-bold leading-snug">{c.full}</p>
-          <SpeakButton
-            text={c.full}
-            className={cn(
-              "mt-0.5 shrink-0 transition-opacity duration-150",
-              "[@media(hover:hover)]:opacity-0",
-              hoverHalf === "top" ? "[@media(hover:hover)]:opacity-100" : "",
-            )}
-          />
-        </div>
-        <p className="text-sm italic text-muted-foreground">{c.en}</p>
-
-        {/* Line 3 + 4: example — larger gap from line 2, same tight gap within */}
-        <div className="mt-5 space-y-1.5">
-          <div className="flex items-start gap-1.5">
-            <p className="flex-1 text-sm font-semibold leading-relaxed">{c.example.de}</p>
-            <SpeakButton
-              text={c.example.de}
-              className={cn(
-                "mt-0.5 shrink-0 transition-opacity duration-150",
-                "[@media(hover:hover)]:opacity-0",
-                hoverHalf === "bottom" ? "[@media(hover:hover)]:opacity-100" : "",
-              )}
-            />
+          <div className="min-w-0 flex-1">
+            <div className="flex min-w-0 items-center gap-1.5">
+              <p className="min-w-0 truncate font-semibold">{c.full}</p>
+              <SpeakButton text={c.full} className="shrink-0" />
+            </div>
+            <p className="text-sm text-muted-foreground">{c.en}</p>
           </div>
-          <p className="text-xs text-muted-foreground">{c.example.en}</p>
+          {c.register === "formal" && (
+            <Badge variant="accent" className="shrink-0">
+              formell
+            </Badge>
+          )}
+        </div>
+
+        {/* Example: divider + italic German, with its English translation and
+            its own audio kept (the extra content this view carries). */}
+        <div className="mt-2 border-t border-border pt-2">
+          <div className="flex items-start gap-1.5">
+            <p className="min-w-0 flex-1 text-sm italic text-muted-foreground">„{c.example.de}"</p>
+            <SpeakButton text={c.example.de} className="shrink-0" />
+          </div>
+          <p className="mt-0.5 text-xs text-muted-foreground">{c.example.en}</p>
         </div>
       </CardContent>
     </Card>
