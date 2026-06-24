@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-24 (session 36). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-24 (session 37). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,24 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 37 (2026-06-24) — Founder-only source-verification overlay on /sources (SHIPPED ✅)
+Founder asked for a way to mark data sources as verified and add comments, restricted to one user.
+Confirmed via AskUserQuestion: **Supabase persistence** (cross-device) and **everything private**
+(admin-only, comments never public). Built:
+- **Migration `0004_provenance_reviews.sql`** — new `provenance_reviews` table (`content_id` PK,
+  `verified`, `comment`, `reviewed_by`, `updated_at`) with an RLS policy `provenance_reviews_founder_all`
+  that only allows a session whose JWT email is the founder's to read/write. Server-side lock.
+- **`src/lib/admin.ts`** — `FOUNDER_EMAIL` + `isFounder(user)` client gate (mirrors the RLS email).
+- **`src/lib/provenanceReviews.ts`** — best-effort `fetchProvenanceReviews()` + `saveProvenanceReview()`.
+- **`Sources.tsx`** — when the founder is signed in, a "Quellenprüfung" banner (live verified count +
+  save status) renders at the top, and every item row in "Alle Inhalte und ihre Quellen" gets a
+  "geprüft" checkbox + a "Notiz" field, saving automatically (optimistic, debounced via onBlur for
+  notes). Group summaries show `verified/total ✓` in admin mode. Public page is unchanged for everyone
+  else. Bilingual DE/EN.
+- **Founder one-time step:** run migration 0004 in the Supabase SQL editor (documented in
+  `docs/PHASE2_SETUP.md` → "Admin source review"). Until then saves silently no-op (offline-first).
+`pnpm build` + `pnpm lint:content` green.
 
 ### Session 36 (2026-06-24) — Align dedicated Kollokationen cards to the Wortschatz tile design (SHIPPED ✅)
 Founder asked to apply the Wortschatz → Kollokationen tile design to the standalone `/collocations`

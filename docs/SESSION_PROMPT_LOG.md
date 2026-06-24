@@ -706,3 +706,21 @@ backfilled from the same session's transcript so the trail is complete.)
   speaker state machinery. `pnpm build` green.
 - **Artifacts:** `src/features/collocations/CollocationsBrowser.tsx`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.
+
+## Entry 39 — 2026-06-24 (founder-only "verify + comment" overlay for the data-sources page)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > I want you to build an option to mark the data sources as verified and add any comments if necessary for the data sources pages - only to one user. is that possible?
+- **Response summary:** Confirmed feasible. Asked (AskUserQuestion) about persistence + visibility;
+  founder chose **Supabase** storage and **everything private** (admin-only). Built a founder-only
+  review overlay on `/sources`: a new `provenance_reviews` table (migration 0004) locked by RLS to the
+  founder's JWT email, a client gate (`src/lib/admin.ts` `isFounder`), a best-effort data layer
+  (`src/lib/provenanceReviews.ts`), and admin UI in `Sources.tsx` (per-item "geprüft" checkbox + "Notiz"
+  field, live verified count, save status, `verified/total ✓` group summaries). Public page unchanged.
+  Documented the one-time migration step in `docs/PHASE2_SETUP.md`. `pnpm build` + `pnpm lint:content`
+  green. **Requires founder to run migration 0004 in Supabase for saves to persist.**
+- **Artifacts:** `supabase/migrations/0004_provenance_reviews.sql`, `src/lib/admin.ts`,
+  `src/lib/provenanceReviews.ts`, `src/features/legal/Sources.tsx`, `docs/PHASE2_SETUP.md`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.
