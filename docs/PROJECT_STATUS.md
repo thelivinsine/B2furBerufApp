@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-23 (session 35). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-24 (session 36). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,17 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 36 (2026-06-24) — Align dedicated Kollokationen cards to the Wortschatz tile design (SHIPPED ✅)
+Founder asked to apply the Wortschatz → Kollokationen tile design to the standalone `/collocations`
+(`CollocationsBrowser`) cards too. Confirmed via AskUserQuestion to **keep the extra content** the
+browser carries (the example's English translation + its own audio button). Restyled `CollocationCard`
+to match `CollocationsList`: truncating `font-semibold` phrase, muted (non-italic) English meaning, a
+**`formell` badge** top-right (replacing the old indigo formal-card background tint), and a top-border
+divider with the italic German example in „…" quotes. Kept the example EN line and the example audio
+button (now always visible). Removed the hover-reveal speaker machinery (`hoverHalf` state +
+`onMouseMove/onMouseLeave`) so the speakers are always visible like the Wortschatz tiles. `pnpm build`
+green.
 
 ### Session 35 (2026-06-23) — Wortschatz tab overflow fix (SHIPPED ✅)
 The Wortschatz (`VocabularyTrainer`) tab row has 4 tabs (Karteikarten, Quiz, Übersicht, Kollokationen);

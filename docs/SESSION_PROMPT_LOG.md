@@ -690,3 +690,19 @@ backfilled from the same session's transcript so the trail is complete.)
   `pnpm build` green.
 - **Artifacts:** `src/features/vocabulary/CollocationsList.tsx`, `docs/SESSION_PROMPT_LOG.md`. Commit
   SHA appended on push.
+
+## Entry 38 — 2026-06-24 (match dedicated Kollokationen cards to the Wortschatz tile design)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > can you apply the same design as the tiles under the collocations within wortschatz menu to the collocations menu items as well?
+- **Response summary:** Asked (AskUserQuestion) whether to match exactly or keep the browser's extra
+  content; founder chose **keep extra content**. Restyled `CollocationsBrowser`'s `CollocationCard` to
+  match `CollocationsList` (Wortschatz tab): truncating `font-semibold` phrase + always-visible
+  speaker, muted non-italic English meaning, a `formell` badge top-right (replacing the indigo
+  formal-card background), and a top-border divider with the italic German example in „…" quotes. Kept
+  the example's English translation and its audio button (always visible). Removed the hover-reveal
+  speaker state machinery. `pnpm build` green.
+- **Artifacts:** `src/features/collocations/CollocationsBrowser.tsx`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.
