@@ -1,7 +1,14 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { provenance } from "@/data/provenance";
 import type { ProvenanceContentType, ProvenanceEntry } from "@/types";
+import { useAuthStore } from "@/store/useAuthStore";
+import { isFounder } from "@/lib/admin";
+import {
+  fetchProvenanceReviews,
+  saveProvenanceReview,
+  type ProvenanceReview,
+} from "@/lib/provenanceReviews";
 import { LegalChrome, Section, type Lang } from "./LegalChrome";
 
 /**
@@ -88,19 +95,96 @@ function hostOf(url: string): string {
   }
 }
 
+/** Founder-only review controls threaded down to each item row. Undefined for
+ *  everyone else, so the public page renders exactly as before. */
+interface AdminApi {
+  reviews: Map<string, ProvenanceReview>;
+  onChange: (
+    contentId: string,
+    patch: Partial<Pick<ProvenanceReview, "verified" | "comment">>,
+  ) => void;
+}
+
+/* One item row: label + source link for everyone; plus a "verified" toggle and
+   an internal QC note when the founder is signed in (admin). */
+function ItemRow({ r, lang, admin }: { r: ProvenanceEntry; lang: Lang; admin?: AdminApi }) {
+  const review = admin?.reviews.get(r.content_id);
+  const verified = review?.verified ?? r.review_status === "verified";
+  const [comment, setComment] = useState(review?.comment ?? "");
+
+  // Adopt the saved note once the reviews load (or change) after first render.
+  useEffect(() => {
+    setComment(review?.comment ?? "");
+  }, [review?.comment]);
+
+  return (
+    <li className="px-4 py-2 text-sm">
+      <div className="flex items-center justify-between gap-3">
+        <span className="min-w-0 truncate text-foreground/90">{r.label}</span>
+        {r.reference ? (
+          <a
+            href={r.reference}
+            target="_blank"
+            rel="noreferrer"
+            className="flex shrink-0 items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline"
+          >
+            {hostOf(r.reference) || (lang === "de" ? "Quelle" : "source")}
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        ) : (
+          <span className="shrink-0 text-xs text-muted-foreground">
+            {lang === "de" ? "keine Quelle" : "no source"}
+          </span>
+        )}
+      </div>
+
+      {admin && (
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-foreground">
+            <input
+              type="checkbox"
+              checked={verified}
+              onChange={(e) => admin.onChange(r.content_id, { verified: e.target.checked })}
+              className="h-3.5 w-3.5 accent-primary"
+            />
+            {lang === "de" ? "geprüft" : "verified"}
+          </label>
+          <input
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onBlur={() => {
+              if ((review?.comment ?? "") !== comment) {
+                admin.onChange(r.content_id, { comment });
+              }
+            }}
+            placeholder={lang === "de" ? "Notiz…" : "Note…"}
+            className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+          />
+        </div>
+      )}
+    </li>
+  );
+}
+
 /* One collapsible group of items for a single content type. Children render only
    when the group is opened, so the full register stays light until expanded. */
 function TypeGroup({
   type,
   rows,
   lang,
+  admin,
 }: {
   type: ProvenanceContentType;
   rows: ProvenanceEntry[];
   lang: Lang;
+  admin?: AdminApi;
 }) {
   const [open, setOpen] = useState(false);
   const name = TYPE_LABEL[type][lang];
+  const verifiedCount = admin
+    ? rows.filter((r) => admin.reviews.get(r.content_id)?.verified).length
+    : 0;
   return (
     <details
       className="rounded-lg border border-border bg-surface/50"
@@ -108,29 +192,14 @@ function TypeGroup({
     >
       <summary className="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-foreground">
         <span>{name}</span>
-        <span className="text-xs text-muted-foreground">{rows.length}</span>
+        <span className="text-xs text-muted-foreground">
+          {admin ? `${verifiedCount}/${rows.length} ✓` : rows.length}
+        </span>
       </summary>
       {open && (
         <ul className="divide-y divide-border border-t border-border">
           {rows.map((r) => (
-            <li key={r.content_id} className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
-              <span className="min-w-0 truncate text-foreground/90">{r.label}</span>
-              {r.reference ? (
-                <a
-                  href={r.reference}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex shrink-0 items-center gap-1 text-xs font-medium text-primary underline-offset-2 hover:underline"
-                >
-                  {hostOf(r.reference) || (lang === "de" ? "Quelle" : "source")}
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              ) : (
-                <span className="shrink-0 text-xs text-muted-foreground">
-                  {lang === "de" ? "keine Quelle" : "no source"}
-                </span>
-              )}
-            </li>
+            <ItemRow key={r.content_id} r={r} lang={lang} admin={admin} />
           ))}
         </ul>
       )}
@@ -140,6 +209,59 @@ function TypeGroup({
 
 export function Sources() {
   const [lang, setLang] = useState<Lang>("de");
+  const user = useAuthStore((s) => s.user);
+  const admin = isFounder(user);
+
+  const [reviews, setReviews] = useState<Map<string, ProvenanceReview>>(new Map());
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
+  // Load the founder's saved review marks once, when signed in as admin.
+  useEffect(() => {
+    if (!admin) {
+      setReviews(new Map());
+      return;
+    }
+    let cancelled = false;
+    fetchProvenanceReviews().then((m) => {
+      if (!cancelled) setReviews(m);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [admin]);
+
+  const adminApi: AdminApi | undefined = useMemo(() => {
+    if (!admin) return undefined;
+    return {
+      reviews,
+      onChange: (contentId, patch) => {
+        const uid = user?.id;
+        if (!uid) return;
+        const cur = reviews.get(contentId) ?? {
+          content_id: contentId,
+          verified: false,
+          comment: null,
+        };
+        const merged: ProvenanceReview = {
+          content_id: contentId,
+          verified: patch.verified ?? cur.verified,
+          // normalise an empty note to null so the column stays clean
+          comment:
+            patch.comment !== undefined ? (patch.comment ?? "").trim() || null : cur.comment,
+        };
+        setReviews((prev) => new Map(prev).set(contentId, merged));
+        setSaveState("saving");
+        saveProvenanceReview(merged, uid).then((ok) =>
+          setSaveState(ok ? "saved" : "error"),
+        );
+      },
+    };
+  }, [admin, reviews, user?.id]);
+
+  const liveVerified = useMemo(
+    () => [...reviews.values()].filter((r) => r.verified).length,
+    [reviews],
+  );
 
   const stats = useMemo(() => {
     const byType = new Map<ProvenanceContentType, ProvenanceEntry[]>();
@@ -168,6 +290,31 @@ export function Sources() {
       title={t("Quellen & Lizenzen", "Sources & Licenses")}
       lastUpdated="2026-06-23"
     >
+      {admin && (
+        <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="font-semibold text-foreground">
+              {t("Quellenprüfung (nur für dich)", "Source review (you only)")}
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {saveState === "saving"
+                ? t("Speichern…", "Saving…")
+                : saveState === "saved"
+                  ? t("Gespeichert", "Saved")
+                  : saveState === "error"
+                    ? t("Fehler beim Speichern", "Save failed")
+                    : ""}
+            </span>
+          </div>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t(
+              `Du bist als Admin angemeldet. Hake unten Einträge als „geprüft“ ab und füge bei Bedarf eine Notiz hinzu. Nur du siehst diese Markierungen. Bisher geprüft: ${liveVerified} von ${stats.total}.`,
+              `You are signed in as admin. Tick items below as “verified” and add a note if needed. Only you can see these marks. Verified so far: ${liveVerified} of ${stats.total}.`,
+            )}
+          </p>
+        </div>
+      )}
+
       <Section title={t("Unser Ansatz", "Our approach")}>
         <p>
           {t(
@@ -250,7 +397,13 @@ export function Sources() {
         </p>
         <div className="space-y-2">
           {TYPE_ORDER.filter((type) => stats.byType.has(type)).map((type) => (
-            <TypeGroup key={type} type={type} rows={stats.byType.get(type)!} lang={lang} />
+            <TypeGroup
+              key={type}
+              type={type}
+              rows={stats.byType.get(type)!}
+              lang={lang}
+              admin={adminApi}
+            />
           ))}
         </div>
       </Section>

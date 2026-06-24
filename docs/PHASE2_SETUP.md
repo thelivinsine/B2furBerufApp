@@ -227,3 +227,23 @@ the Supabase dashboard. Do these once after the GDPR PR is live:
      "ladungsfähige Anschrift", not a P.O. box) rather than a home address. To
      re-enable: fill the placeholders, then uncomment the import + `/impressum`
      route in `router.tsx` and restore the footer/Settings/privacy/terms links.
+
+## Admin source review (provenance QC): founder setup step
+
+The `/sources` page has a founder-only overlay for marking each content item as
+human-verified and attaching an internal note. It is gated to your account both
+in the UI and server-side. To turn it on, run the migration once:
+
+1. **Create the review table.** Run `supabase/migrations/0004_provenance_reviews.sql`
+   in the Supabase SQL editor. It creates `public.provenance_reviews` with an RLS
+   policy that only allows a session whose login email is `thelivinsine@gmail.com`
+   to read or write. No other user (and no anonymous visitor) can see the marks or
+   notes. Verify: the policy `provenance_reviews_founder_all` appears under
+   Authentication → Policies for `provenance_reviews`.
+2. **Use it.** Sign in with that account, open `/sources`, and a "Quellenprüfung"
+   box appears at the top. Each item in "Alle Inhalte und ihre Quellen" gets a
+   "geprüft" checkbox and a "Notiz" field; changes save automatically. If you skip
+   the migration the page still works for everyone, the saves just silently no-op
+   for you (best-effort, offline-first).
+   - If the gating email ever changes, update it in BOTH the migration's policy and
+     `FOUNDER_EMAIL` in `src/lib/admin.ts`.
