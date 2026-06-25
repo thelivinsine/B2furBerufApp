@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-25 (session 38). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-25 (session 39). Branch: `claude/bug-attached-picture-fxgv5j`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,24 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 39 (2026-06-25) — Mobile card grids overflowing off the right edge (SHIPPED ✅)
+Founder reported (mobile screenshots) that the Kollokationen tiles were cut off on the **right**, with
+the `formell` badge clipped to "for". This is a different bug from the s38 "cut off by the bottom bar"
+check (that one was vertical and was a non-bug); this is real **horizontal overflow**.
+- **Root cause:** the card grids declared responsive `sm:`/`md:`/`lg:grid-cols-N` but **no base
+  `grid-cols-1`**. Below the smallest breakpoint, CSS grid falls back to an implicit `auto`
+  (max-content) single column, which stretches to the widest card's longest unwrapped line and pushes
+  the cards past the right edge of the viewport. The Kollokationen example sentence (italic German in a
+  flex row) made the max-content wide enough to trigger it first.
+- **Fix:** added an explicit `grid-cols-1` base to every affected grid so the mobile column is
+  constrained to `1fr` (container width) and content wraps. Swept the whole app:
+  `CollocationsBrowser`, `ExamHub` (×2), `VocabList`, `GrammarDrillCard`, `GrammarHub` (×2),
+  `LandingPage`, `QuizHub` (×2), `RedemittelTrainer`, `Settings`, `Dashboard` (hero + cards),
+  `SimulationHub`, `WritingHub`, `Analytics`. Grids that already had a base count (`CollocationsList`,
+  `Flashcards`) were left as-is.
+- `pnpm build` green. Shipped via **PR #219** (squash-merged to `main`). Branch:
+  `claude/bug-attached-picture-fxgv5j`.
 
 ### Session 38 (2026-06-25) — Sign-up button stuck disabled on autofill + collocations tile-cutoff check (SHIPPED ✅)
 Founder reported two things from mobile screenshots:
@@ -1486,11 +1504,14 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 
 ## Resume here (next session)
 
-**Handoff after session 38 (2026-06-25).** Everything noted ✅ is merged to `main`.
-Active automation branch: `claude/genauly-ai-strategy-8wrlcz` (realign to `origin/main` after each
+**Handoff after session 39 (2026-06-25).** Everything noted ✅ is merged to `main`.
+Active automation branch: `claude/bug-attached-picture-fxgv5j` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Most recent work (sessions 35–38):**
+**Most recent work (sessions 35–39):**
+- **s39** — fixed mobile **card grids overflowing off the right edge** (Kollokationen `formell` badge
+  clipped). Root cause: responsive `grid-cols-N` with no base `grid-cols-1` falls back to an implicit
+  max-content column on mobile. Added `grid-cols-1` across every affected grid (PR #219).
 - **s35** — Wortschatz tab overflow fix.
 - **s36** — aligned the dedicated `/collocations` (Kollokationen menu) cards to the Wortschatz
   Kollokationen tile design (truncating semibold phrase, muted meaning, `formell` badge instead of an
