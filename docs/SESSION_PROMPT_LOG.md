@@ -850,3 +850,78 @@ Branch: `claude/bug-attached-picture-fxgv5j`.
 - **Response summary:** Extended the Session 39 entry in `docs/PROJECT_STATUS.md` (grid fix + hook
   removal + recorded preferences) and backfilled Entries 41–47 in this prompt log.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 48 — 2026-06-25 (no save option on the source-review overlay)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > reg. the sources and the option to add notes and mark as verified, when I mark it verified and write something for a particular word, I have no option to save. Can you add the necessary features?
+- **Response summary:** The s37 admin overlay auto-saved silently (verified on toggle, note on blur)
+  with only a small global indicator, so it felt like there was no way to save. Added a per-row **Save**
+  button (`src/features/legal/Sources.tsx`) that commits the `verified` flag + note together, disabled
+  until dirty, showing `Speichern`/`Speichern…`/`Gespeichert ✓` and red `Nicht gespeichert` on failure;
+  Enter in the note saves too. Made `AdminApi.onChange` return `Promise<boolean>` and only update the
+  local cache on a successful write, so a failed save no longer looks saved. Bilingual DE/EN.
+  `pnpm build` green.
+- **Artifacts:** `src/features/legal/Sources.tsx`; PR #223 (merge SHA 014d44f).
+
+## Entry 49 — 2026-06-25 (what is my action point?)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > explain me clearly what is the action point from my side
+- **Response summary:** Explained the single action point: run the one-time Supabase migration
+  `supabase/migrations/0004_provenance_reviews.sql` in the SQL editor (steps from
+  `docs/PHASE2_SETUP.md` → "Admin source review"), because the saves write to the `provenance_reviews`
+  table which must exist first. Gave step-by-step instructions and how to confirm it worked.
+- **Artifacts:** none (explanation only).
+
+## Entry 50 — 2026-06-25 ("Nicht gespeichert" — is it normal?)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of /sources admin rows showing red "Nicht gespeichert" next to Save, with
+  a test note "it's asking me to login, should find a better source url" on a dwds.de item.
+- **Prompt (verbatim):**
+  > I'm getting something like "nicht gespeichert" Is it normal?
+- **Response summary:** Clarified it is **not** OK: "Nicht gespeichert" means the save did not persist,
+  the expected symptom when migration 0004 has not been run (the `provenance_reviews` table is missing).
+  Asked whether the migration had been run and offered to paste the full SQL. Also noted the dwds.de
+  login observation is a separate source-quality issue.
+- **Artifacts:** none.
+
+## Entry 51 — 2026-06-25 (Supabase task done, saving works)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > I did the supabase task and it's working well for me now
+- **Response summary:** Confirmed the source-review feature is fully working now that migration 0004 is
+  applied (marks persist to the founder's account, private, cross-device). Offered to log the session
+  and to look into the flagged dwds.de source.
+- **Artifacts:** none.
+
+## Entry 52 — 2026-06-25 (add a task for source review + strategy)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > before doing the second item, can you add a task to deep-dive and properly review each of the sources used, their licenses and prepare a good source strategy as part of the data strategy?
+- **Response summary:** Added **backlog #24** to `docs/PROJECT_STATUS.md`: deep-dive review of every
+  external source, confirm licences/commercial-use terms, fix problem sources (incl. the dwds.de
+  login item), reconcile against the SPDX allowlist, and define a ranked source strategy per content
+  type. Cross-linked to #7 (audit infra) and #22 (data strategy). Deferred the actual dwds.de source
+  swap under this item at the founder's request.
+- **Artifacts:** `docs/PROJECT_STATUS.md`; PR #224 (merge SHA 04e9217).
+
+## Entry 53 — 2026-06-25 (document this session before moving on)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > update necessary developments and prompts from this session in the relevant documentation files. I'll move on with a new session later.
+- **Response summary:** Extended the Session 39 entry in `docs/PROJECT_STATUS.md` (Sources Save button +
+  migration-0004 confirmation + backlog #24) and the "Resume here" pointer, and appended Entries 48–53
+  to this prompt log.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.

@@ -386,6 +386,21 @@ check (that one was vertical and was a non-bug); this is real **horizontal overf
     `.claude/settings.json` to `{}`, and updated the stale references in `CLAUDE.md` and
     `docs/SESSION_PROMPT_LOG.md`. The existing `docs/prompt-log-raw.jsonl` is **kept** as a historical
     record (no longer appended to); the founder confirmed there's no reason to delete it.
+  - **Explicit Save button on the `/sources` admin overlay (PR #223):** the founder-only source-review
+    controls (s37) auto-saved silently (verified on toggle, note on blur) with only a small global
+    indicator, so it felt like there was "no option to save". Added a per-row **Save** button that
+    commits the `verified` flag and the note **together**, disabled until there are unsaved changes,
+    showing `Speichern` → `Speichern…` → `Gespeichert ✓` and a red `Nicht gespeichert` on failure
+    (Enter in the note also saves). The local cache now updates **only on a successful write**, so a
+    failed save no longer looks saved. Bilingual DE/EN. `src/features/legal/Sources.tsx` +
+    `src/lib/provenanceReviews.ts` flow (the parent `onChange` now returns `Promise<boolean>`).
+    **Founder then ran Supabase migration 0004 and confirmed saving works** (it had shown "Nicht
+    gespeichert" beforehand precisely because the `provenance_reviews` table did not exist yet).
+  - **Added backlog #24 (PR #224):** "Deep-dive source review + source strategy" — review every external
+    source, confirm licences/commercial-use terms, fix problem sources (the founder flagged a **dwds.de**
+    item that requires login), reconcile claims against the SPDX allowlist, and define a ranked source
+    strategy per content type. Cross-linked to #7 (audit infra) and #22 (data strategy). The actual
+    dwds.de source swap was intentionally **deferred** under this item at the founder's request.
 - **Preferences recorded this session:**
   - The prompt log (`docs/SESSION_PROMPT_LOG.md`) is now updated **manually, only when the founder
     asks** — never automatically. The `UserPromptSubmit` auto-logging hook was removed accordingly.
@@ -1551,7 +1566,10 @@ squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` 
   **removed the `UserPromptSubmit` prompt-logging hook** (PR #221) at the founder's request; the prompt
   log is now **manual-only** (founder will ask when to log). `docs/prompt-log-raw.jsonl` kept as
   history, no longer written to. Noted but did not fix a **mismatched German quote** (`„…"` vs `„…"`)
-  in the collocation example sentences.
+  in the collocation example sentences. Added an **explicit Save button to the `/sources` admin
+  overlay** (PR #223); founder ran **Supabase migration 0004** and confirmed source-review saving now
+  works. Added **backlog #24** (deep-dive source review + source strategy, PR #224); the **dwds.de
+  source swap is deferred** under that item.
 - **s35** — Wortschatz tab overflow fix.
 - **s36** — aligned the dedicated `/collocations` (Kollokationen menu) cards to the Wortschatz
   Kollokationen tile design (truncating semibold phrase, muted meaning, `formell` badge instead of an
