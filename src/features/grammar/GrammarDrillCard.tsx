@@ -52,7 +52,7 @@ export function GrammarDrillCard({ drill }: { drill: GrammarDrill }) {
       {drill.gloss && <p className="mt-1 text-xs text-muted-foreground">{drill.gloss}</p>}
 
       {options ? (
-        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
           {options.map((opt) => {
             const correct = opt === drill.answer;
             const isPicked = picked === opt;

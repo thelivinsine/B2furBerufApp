@@ -80,7 +80,7 @@ export function GrammarHub() {
         <span className="text-xs text-muted-foreground">Kollokationen →</span>
       </Link>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {grouped
           .flatMap(({ group, topics }) => topics.map((topic) => ({ topic, group })))
           .map(({ topic, group }, i) => {
@@ -152,7 +152,7 @@ function GrammarTopicView({ topic, onBack }: { topic: GrammarTopic; onBack: () =
       {/* Examples */}
       <section className="space-y-3">
         <h2 className="flex items-center gap-2 font-semibold"><BookMarked className="h-4 w-4 text-primary" /> Beispiele</h2>
-        <div className="grid gap-2.5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           {topic.examples.map((ex, i) => (
             <Card key={i}>
               <CardContent className="flex items-start justify-between gap-2 p-4">
