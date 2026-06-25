@@ -23,13 +23,13 @@ authored commits) and the **merged pull requests**.
   `docs/PROJECT_STATUS.md` keeps the higher-level session narrative. Keep those lean; put the
   blow-by-blow here.
 
-### Automated raw capture
-A `UserPromptSubmit` hook (`.claude/hooks/log-prompt.sh`, wired in `.claude/settings.json`) appends
-one JSON line per prompt to **`docs/prompt-log-raw.jsonl`** — `{ts, branch, session_id, cwd,
-prompt}` — independent of this curated file. That JSONL is the tamper-evident machine record (every
-prompt verbatim, even ones not yet written up here); this Markdown file is the human-readable
-narrative with response summaries and artifacts. Because `.claude/` is created mid-session, the hook
-begins firing from the **next** session.
+### Automated raw capture (removed 2026-06-25)
+There used to be a `UserPromptSubmit` hook (`.claude/hooks/log-prompt.sh`) that appended one JSON
+line per prompt to **`docs/prompt-log-raw.jsonl`**. The founder asked for it to be removed on
+2026-06-25, so the hook and its script are gone and `.claude/settings.json` no longer wires it. The
+existing `docs/prompt-log-raw.jsonl` is kept as a historical record but is no longer appended to.
+This curated Markdown file remains the prompt log, and entries are now added **manually only when the
+founder asks**.
 
 ### Entry template
 ```
