@@ -1486,18 +1486,31 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 
 ## Resume here (next session)
 
-**Handoff after session 26 (2026-06-16).** Everything noted ✅ is merged to `main`.
-Active automation branch: `claude/context-bar-menu-animations-g9gfd3` (realign to `origin/main`
-after each squash-merge — see CLAUDE.md). The branch name is reassigned per session; `main` is the
-source of truth.
+**Handoff after session 38 (2026-06-25).** Everything noted ✅ is merged to `main`.
+Active automation branch: `claude/genauly-ai-strategy-8wrlcz` (realign to `origin/main` after each
+squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Most recent work (sessions 27–28):** nav-icon polish — full-opacity icons, optical-size re-tune,
-two-tone + neon marks for every route, and **grey-gradient icon backdrops** (s27); then the
-**selection-cloud refinement (s28)**: the active backdrop is now a **compact rounded squircle** that
-hugs the icon (flat "G1" `from-muted to-border` gradient, no protruding dome), and in the More sheet
-the cloud appears **only behind the selected section** (others are bare icons on white), while edit
-mode keeps the squircle as the draggable-tile handle. See the Session 27/28 logs above and the
-CLAUDE.md "Mobile bottom tab bar" section (s27/s28 rules) for the locked behavior.
+**Most recent work (sessions 35–38):**
+- **s35** — Wortschatz tab overflow fix.
+- **s36** — aligned the dedicated `/collocations` (Kollokationen menu) cards to the Wortschatz
+  Kollokationen tile design (truncating semibold phrase, muted meaning, `formell` badge instead of an
+  indigo background, divider + italic German example), keeping the browser's extra content (example
+  English line + its audio button).
+- **s37** — founder-only **source-verification overlay** on `/sources`: a Supabase-backed,
+  admin-only (gated to `thelivinsine@gmail.com`) layer to mark provenance entries verified and add
+  private comments. **Action still pending on the founder:** run `supabase/migrations/0004_provenance_reviews.sql`
+  in the Supabase SQL Editor so the saves persist (see `docs/PHASE2_SETUP.md` → "Admin source review").
+- **s38** — fixed the **sign-up button staying disabled when email/password are autofilled** (iOS
+  Safari / password managers don't fire React's `onChange`; added a `:-webkit-autofill` animation hook
+  in `index.css` that `AuthDialog` reads into state). Also investigated a "collocations tiles cut off"
+  report and found **no bug** (the shared `.pb-nav` already clears the bottom bar by 24px; the
+  screenshot was the top of the list mid-scroll). Awaiting founder confirmation at the true bottom of
+  the list before any further change.
+
+**Older nav handoff (sessions 26–28):** the bottom tab bar + More sheet are locked, see the
+CLAUDE.md "Mobile bottom tab bar" section for the full rules. Highlights: removed context strip, 63px
+rail, drag-reorderable bar + sheet, two-tone neon route marks, compact-squircle grey selection
+backdrops, opacity-only enter/exit.
 
 **Earlier nav work (sessions 23–26):** data-governance v0.2/v0.3 + boot-splash fix (s23), unique
 per-route icon colours + all-custom branded SVG marks (s25), and the **mobile nav overhaul (s26)**:
