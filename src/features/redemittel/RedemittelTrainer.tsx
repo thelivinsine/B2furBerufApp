@@ -49,7 +49,7 @@ export function RedemittelTrainer() {
                   </div>
                   <Badge variant="muted" className="ml-auto">{phrases.length}</Badge>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {phrases.map((p, i) => {
                     const reg = registerLabel[p.register];
                     return (

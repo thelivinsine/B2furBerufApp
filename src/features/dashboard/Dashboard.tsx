@@ -112,7 +112,7 @@ export function Dashboard() {
         className="relative overflow-hidden rounded-2xl border border-primary/15 bg-surface shadow-glow"
       >
         <div className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="relative grid items-center gap-6 p-6 sm:p-8 md:grid-cols-[1.5fr_1fr] md:gap-8">
+        <div className="relative grid grid-cols-1 items-center gap-6 p-6 sm:p-8 md:grid-cols-[1.5fr_1fr] md:gap-8">
           {/* Content */}
           <div>
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
@@ -188,7 +188,7 @@ export function Dashboard() {
             </Button>
           }
         />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {ordered.map(({ theme, words, sims, mastered }, i) => {
             const Icon = iconByName(theme.icon);
             const masteredPct = pct(mastered, words.length);

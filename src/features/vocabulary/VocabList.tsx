@@ -17,7 +17,7 @@ export function VocabList({ items }: { items: VocabItem[] }) {
   const srs = useProgressStore((s) => s.srs);
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {items.map((v, i) => {
         const label = labelMap[masteryLabel(mastery(srs[v.id]))];
         return (

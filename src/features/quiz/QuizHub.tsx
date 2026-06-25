@@ -97,7 +97,7 @@ export function QuizHub() {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {levels.map((l, i) => (
             <motion.button
               key={l.value}
@@ -130,7 +130,7 @@ export function QuizHub() {
         title="Themen-Quiz"
         description="Teste dein Wissen pro Thema in drei Stufen – Vokabeln, Nomen-Verb-Verbindungen und Grammatik gemischt, mit XP und Wiederholung (SRS)."
       />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {themeCards.map((t, i) => {
           const Icon = iconByName(t.icon);
           return (

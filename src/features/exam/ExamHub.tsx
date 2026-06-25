@@ -31,7 +31,7 @@ export function ExamHub() {
         description="Vollständige Simulation des B2-Beruf-Prüfungsmoduls unter realistischen Bedingungen – mit Aufgabenblatt, Zeitlimit und Bewertungsraster."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {examSets.map((ex, i) => {
           const lastAttempt = [...examsDone].reverse().find((e) => e.id === ex.id);
           return (
@@ -82,7 +82,7 @@ export function ExamHub() {
       <Card className="bg-mesh">
         <CardContent className="p-5">
           <p className="text-sm font-semibold">Bewertungskriterien</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {examSets[0].rubric.map((r) => (
               <div key={r.id} className="text-sm">
                 <span className="font-medium">{r.label}: </span>

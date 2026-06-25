@@ -173,7 +173,7 @@ export function LandingPage() {
 
       {/* Feature grid */}
       <section className="relative z-10 mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f, i) => (
             <motion.div
               key={f.title}

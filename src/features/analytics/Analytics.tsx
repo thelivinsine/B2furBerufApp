@@ -180,7 +180,7 @@ export function Analytics() {
       />
 
       {/* Top stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard icon={Zap} label="Gesamt-XP" value={xp.toLocaleString()} hint={`Level ${info.level} · ${tier.name}`} />
         <StatCard icon={Flame} label="Aktuelle Serie" value={`${streak} Tage`} hint={`Rekord: ${longestStreak} Tage`} accent="warning" />
         <StatCard icon={BookOpen} label="Vokabeln gemeistert" value={`${masteryGroups.mastered}/${vocabulary.length}`} hint={`${pct(masteryGroups.mastered, vocabulary.length)}%`} accent="success" />
