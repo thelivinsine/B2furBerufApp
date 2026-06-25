@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Lock, Mail, Cloud } from "lucide-react";
 import {
   Dialog,
@@ -49,6 +49,17 @@ export function AuthDialog({
   const [password, setPassword] = useState("");
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [consent, setConsent] = useState(false);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  // iOS Safari / password managers autofill the email + password without firing
+  // a change event, so the controlled state stays empty and the submit button
+  // never enables. The `:-webkit-autofill` CSS animation (see index.css) fires
+  // an animationstart we hook here to copy the filled values into state.
+  const syncAutofilled = () => {
+    if (emailRef.current) setEmail(emailRef.current.value);
+    if (passwordRef.current) setPassword(passwordRef.current.value);
+  };
 
   // Sync to the requested intent each time the dialog is opened.
   useEffect(() => {
@@ -219,10 +230,12 @@ export function AuthDialog({
             <div className="flex items-center gap-2 rounded-lg border border-input bg-surface px-3 focus-within:ring-2 focus-within:ring-ring">
               <Mail className="h-4 w-4 text-muted-foreground" />
               <input
+                ref={emailRef}
                 type="email"
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onAnimationStart={syncAutofilled}
                 placeholder="du@beispiel.de"
                 className="h-11 flex-1 bg-transparent text-sm outline-none"
               />
@@ -234,10 +247,12 @@ export function AuthDialog({
             <div className="flex items-center gap-2 rounded-lg border border-input bg-surface px-3 focus-within:ring-2 focus-within:ring-ring">
               <Lock className="h-4 w-4 text-muted-foreground" />
               <input
+                ref={passwordRef}
                 type="password"
                 autoComplete={isSignup ? "new-password" : "current-password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onAnimationStart={syncAutofilled}
                 onKeyDown={(e) => e.key === "Enter" && submit()}
                 placeholder={isSignup ? "Mindestens 6 Zeichen" : "Dein Passwort"}
                 className="h-11 flex-1 bg-transparent text-sm outline-none"
