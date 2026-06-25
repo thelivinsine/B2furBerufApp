@@ -724,3 +724,36 @@ backfilled from the same session's transcript so the trail is complete.)
 - **Artifacts:** `supabase/migrations/0004_provenance_reviews.sql`, `src/lib/admin.ts`,
   `src/lib/provenanceReviews.ts`, `src/features/legal/Sources.tsx`, `docs/PHASE2_SETUP.md`,
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.
+
+## Entry 39 — 2026-06-25 (collocations tiles appear cut off)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** mobile screenshot of /collocations (Kollokationen) with a tile meeting the bottom tab bar.
+- **Prompt (verbatim):**
+  > the tiles are being cut off. fix it
+- **Response summary:** Investigated the bottom clearance. The shared AppShell `<main>` already
+  applies `.pb-nav` (`calc(3.9375rem + env(safe-area-inset-bottom) + 1.5rem)` = 63px bar + safe-area +
+  24px), so the last tile clears the fixed bar by 24px. The screenshot shows the first two
+  collocations with no filter (132 results), i.e. the top of the list mid-scroll, where the
+  translucent fixed bar overlaps a passing tile (normal, universal behaviour). No clipping bug found;
+  no code change. Asked the founder to confirm at the true bottom of the list, and offered to widen
+  the comfort gap if the last tile still reads as cut.
+- **Artifacts:** none (investigation only).
+
+## Entry 40 — 2026-06-25 (account-creation button stays disabled)
+- **Branch:** `claude/genauly-ai-strategy-8wrlcz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** mobile screenshot of the "Konto erstellen" dialog: email + password filled,
+  Turnstile "Success!", consent checked, but the submit button greyed out.
+- **Prompt (verbatim):**
+  > there seems to be a bug with account creation window. even after entering email and password the button below doesn't activate
+  > check why is it and fix it.
+- **Response summary:** Root cause was iOS Safari / password-manager **autofill not firing React's
+  `onChange`**, leaving the controlled `email`/`password` state empty so `canSubmit` never became
+  true. (The rendered Turnstile widget proved the captcha key is set and was solved; consent was
+  visibly checked, so the credentials state was the only remaining gate.) Fix: a WebKit autofill hook
+  via a no-op `@keyframes onAutoFillStart` on `input:-webkit-autofill` in `index.css`, with
+  `AuthDialog` listening on `onAnimationStart` to copy the autofilled `ref.value` into state. Typing
+  is unaffected. `pnpm build` green.
+- **Artifacts:** `src/features/auth/AuthDialog.tsx`, `src/index.css`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.

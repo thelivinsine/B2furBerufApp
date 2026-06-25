@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-24 (session 37). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-25 (session 38). Branch: `claude/genauly-ai-strategy-8wrlcz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,23 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 38 (2026-06-25) — Sign-up button stuck disabled on autofill + collocations tile-cutoff check (SHIPPED ✅)
+Founder reported two things from mobile screenshots:
+1. **Account-creation button never activated** even with email + password filled, captcha solved
+   ("Success!"), and the consent box checked. Root cause: **iOS Safari / password-manager autofill
+   does not fire React's `onChange`**, so the controlled `email`/`password` state stayed empty and
+   `canSubmit` never became true (the rendered Turnstile widget proved the captcha was already
+   solved, and consent was visibly checked, so the email/password state was the only remaining gate).
+   Fix: a WebKit autofill hook. A no-op `@keyframes onAutoFillStart` is attached to
+   `input:-webkit-autofill` in `index.css`; `AuthDialog` listens via `onAnimationStart` on the email
+   and password inputs and copies the autofilled `ref.value` into state, so the button enables. Plain
+   typing is unaffected. `pnpm build` green.
+2. **Collocations tiles "cut off"** by the bottom tab bar. Investigated: no clipping bug. The shared
+   `<main>` already carries `.pb-nav` (`63px bar + safe-area + 24px`), so the last row clears the bar
+   by 24px. The screenshot showed the first two collocations with no filter (132 results), i.e. the
+   top of the list mid-scroll, where the translucent fixed bar naturally overlaps a passing tile. No
+   code change; flagged for founder confirmation at the true bottom of the list.
 
 ### Session 37 (2026-06-24) — Founder-only source-verification overlay on /sources (SHIPPED ✅)
 Founder asked for a way to mark data sources as verified and add comments, restricted to one user.

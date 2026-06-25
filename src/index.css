@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Autofill detection hook. WebKit (iOS Safari) and Chrome do NOT fire an
+   input/change event when the browser or a password manager autofills a field,
+   so React's controlled state stays empty and submit buttons never enable.
+   We attach this no-op animation to autofilled inputs; components listen for it
+   via `onAnimationStart` and read the filled value into state. See AuthDialog. */
+@keyframes onAutoFillStart {
+  from {
+    /* no-op */
+  }
+  to {
+    /* no-op */
+  }
+}
+input:-webkit-autofill {
+  animation-name: onAutoFillStart;
+  animation-duration: 0.01s;
+}
+
 @layer base {
   :root {
     --background: 240 20% 99%;
