@@ -757,3 +757,96 @@ backfilled from the same session's transcript so the trail is complete.)
   is unaffected. `pnpm build` green.
 - **Artifacts:** `src/features/auth/AuthDialog.tsx`, `src/index.css`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md`. Commit SHA appended on push.
+
+## Session 39 — 2026-06-25 — Mobile card-grid overflow + remove prompt-logging hook
+Branch: `claude/bug-attached-picture-fxgv5j`.
+
+## Entry 41 — 2026-06-25 (mismatched quotation marks on collocation cards)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** mobile screenshot of /collocations (Kollokationen) example sentences.
+- **Prompt (verbatim):**
+  > there's a bug in the attached picture. check and tell me what it is
+- **Response summary:** Diagnosed (no fix requested) the example sentences using **mismatched German
+  quotes**: opening with `„` (U+201E) but closing with a straight ASCII `"` instead of the German
+  closing `"` (U+201C), at `CollocationsBrowser.tsx:58` (`„{c.example.de}"`). Also confirmed the en
+  dash `–` in the page subtitle is **not** a bug (the style guide bans only em dashes). Noted the same
+  `„…"` pattern likely recurs in other card components and offered to sweep.
+- **Artifacts:** none (diagnosis only).
+
+## Entry 42 — 2026-06-25 (collocations tiles cut off on the right)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** mobile screenshot of /collocations with cards bleeding off the right edge; the
+  `formell` badge on "Protokoll führen" clipped to "for".
+- **Prompt (verbatim):**
+  > the collocations tiles are all being cut off to the right, do you see it?
+- **Response summary:** Root cause: the card grid at `CollocationsBrowser.tsx:270` declared
+  `sm:`/`lg:grid-cols-N` but **no base `grid-cols-1`**, so below the `sm` breakpoint CSS grid falls
+  back to an implicit `auto` (max-content) single column that stretches to the widest card's longest
+  unwrapped line and overflows the viewport. Added `grid-cols-1`. `pnpm build` green; committed to the
+  branch.
+- **Artifacts:** `src/features/collocations/CollocationsBrowser.tsx` (commit 41885c4).
+
+## Entry 43 — 2026-06-25 (still happening → sweep the whole app)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** mobile screenshot still showing the right-edge cutoff.
+- **Prompt (verbatim):**
+  > it's still happening
+  >
+  > (then, via AskUserQuestion → "Also sweep other pages", plus:)
+  > check through the app and apply the fixes everywhere where this is the case
+- **Response summary:** Explained the earlier fix was on the feature branch, not on `main`, so the
+  live site (which serves `main`) was unchanged. Then swept every responsive card grid missing a base
+  column and added `grid-cols-1`: `ExamHub` (×2), `VocabList`, `GrammarDrillCard`, `GrammarHub` (×2),
+  `LandingPage`, `QuizHub` (×2), `RedemittelTrainer`, `Settings`, `Dashboard` (hero + cards),
+  `SimulationHub`, `WritingHub`, `Analytics` (`CollocationsList` and `Flashcards` already had a base
+  count). `pnpm build` green. Shipped via PR #219 (squash-merged to `main`).
+- **Artifacts:** 12 feature files; PR #219 (merge SHA ce0c6e2); session log PR #220 (merge SHA b69b011).
+
+## Entry 44 — 2026-06-25 (log it; manual prompt-logging from now on)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > yes log it. but don't automatically log the prompt log. I'll prompt you from now on when to log it.
+- **Response summary:** Logged Session 39 (the grid fix) in `docs/PROJECT_STATUS.md` only (new session
+  entry, header date/branch, "Resume here" pointer) and shipped it via PR #220. **Preference recorded:**
+  the prompt log (`SESSION_PROMPT_LOG.md`) is now updated **manually only when the founder asks**, never
+  automatically.
+- **Artifacts:** `docs/PROJECT_STATUS.md`; PR #220 (merge SHA b69b011).
+
+## Entry 45 — 2026-06-25 (remove the prompt-logging hook)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > get rid of the hook - that's what I'm talking about
+- **Response summary:** Removed the `UserPromptSubmit` auto-logging hook: deleted
+  `.claude/hooks/log-prompt.sh`, set `.claude/settings.json` to `{}`, and updated the now-stale
+  references in `CLAUDE.md` and this file's header. Kept `docs/prompt-log-raw.jsonl` as a historical
+  record (no longer appended to). Shipped via PR #221.
+- **Artifacts:** `.claude/hooks/log-prompt.sh` (deleted), `.claude/settings.json`, `CLAUDE.md`,
+  `docs/SESSION_PROMPT_LOG.md`; PR #221 (merge SHA 5ea364d).
+
+## Entry 46 — 2026-06-25 (why delete the raw log?)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > why to delete it?
+- **Response summary:** Clarified there is no good reason to delete `docs/prompt-log-raw.jsonl`; it is
+  a harmless static file now that the hook is gone and it is the authorship paper trail. Recommended
+  keeping it. No change made.
+- **Artifacts:** none.
+
+## Entry 47 — 2026-06-25 (document this session)
+- **Branch:** `claude/bug-attached-picture-fxgv5j`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > document the developments, preferences, and important prompts in this session
+- **Response summary:** Extended the Session 39 entry in `docs/PROJECT_STATUS.md` (grid fix + hook
+  removal + recorded preferences) and backfilled Entries 41–47 in this prompt log.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.

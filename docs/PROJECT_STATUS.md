@@ -376,6 +376,19 @@ check (that one was vertical and was a non-bug); this is real **horizontal overf
   `Flashcards`) were left as-is.
 - `pnpm build` green. Shipped via **PR #219** (squash-merged to `main`). Branch:
   `claude/bug-attached-picture-fxgv5j`.
+- **Also this session:**
+  - **Quote-mark finding (no fix requested):** the founder first asked what the bug in a screenshot
+    was. Diagnosed the collocation example sentences using **mismatched German quotes**, opening with
+    `„` (U+201E) but closing with a straight ASCII `"` instead of `"` (U+201C), at
+    `CollocationsBrowser.tsx:58`. Left as-is (founder only asked to identify it); the same `„…"`
+    pattern likely recurs in other card components if a future sweep is wanted.
+  - **Removed the prompt-logging hook (PR #221):** deleted `.claude/hooks/log-prompt.sh`, set
+    `.claude/settings.json` to `{}`, and updated the stale references in `CLAUDE.md` and
+    `docs/SESSION_PROMPT_LOG.md`. The existing `docs/prompt-log-raw.jsonl` is **kept** as a historical
+    record (no longer appended to); the founder confirmed there's no reason to delete it.
+- **Preferences recorded this session:**
+  - The prompt log (`docs/SESSION_PROMPT_LOG.md`) is now updated **manually, only when the founder
+    asks** — never automatically. The `UserPromptSubmit` auto-logging hook was removed accordingly.
 
 ### Session 38 (2026-06-25) — Sign-up button stuck disabled on autofill + collocations tile-cutoff check (SHIPPED ✅)
 Founder reported two things from mobile screenshots:
@@ -1511,7 +1524,11 @@ squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` 
 **Most recent work (sessions 35–39):**
 - **s39** — fixed mobile **card grids overflowing off the right edge** (Kollokationen `formell` badge
   clipped). Root cause: responsive `grid-cols-N` with no base `grid-cols-1` falls back to an implicit
-  max-content column on mobile. Added `grid-cols-1` across every affected grid (PR #219).
+  max-content column on mobile. Added `grid-cols-1` across every affected grid (PR #219). Also
+  **removed the `UserPromptSubmit` prompt-logging hook** (PR #221) at the founder's request; the prompt
+  log is now **manual-only** (founder will ask when to log). `docs/prompt-log-raw.jsonl` kept as
+  history, no longer written to. Noted but did not fix a **mismatched German quote** (`„…"` vs `„…"`)
+  in the collocation example sentences.
 - **s35** — Wortschatz tab overflow fix.
 - **s36** — aligned the dedicated `/collocations` (Kollokationen menu) cards to the Wortschatz
   Kollokationen tile design (truncating semibold phrase, muted meaning, `formell` badge instead of an
