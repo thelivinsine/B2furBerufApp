@@ -1453,6 +1453,29 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     - Deliver mockups/specs per component and a build order. Ties into #1 (Dashboard redesign) and #6
       (Schreibtraining redesign). Recommended model: **Fable** (design direction; **Opus** for now),
       **Sonnet/Opus** for the build.
+24. **Deep-dive source review + source strategy (added 2026-06-25):** properly review **every external
+    source the content relies on**, confirm each one's **licence and commercial-use terms**, and write a
+    coherent **source strategy** as a strand of the data strategy (#22). This is the qualitative "are
+    these the right sources, and are we allowed to use them?" pass that complements the mechanical
+    `check:refs` link-liveness gate. Scope when picked up:
+    - **Audit the sources actually in use:** start from `SOURCE_META` in `src/features/legal/Sources.tsx`
+      and the host breakdown the `/sources` page computes from `src/data/provenance.ts` (currently
+      Wiktionary, DWDS, Wikipedia, Europarat/CEFR). For each: confirm the real licence + version, whether
+      commercial use and our specific use (citing word facts vs. copying lists/sentences) is permitted,
+      what attribution it requires, and stability/accessibility of the URL.
+    - **Fix problem sources:** e.g. the founder flagged a **dwds.de** item whose reference "asks me to
+      login" — find a freely-viewable, citable alternative (or a stable deep link). Generally prefer
+      sources that are open without login and unambiguously commercial-safe.
+    - **License hygiene:** reconcile what `SOURCE_META` claims against the commercial-safe SPDX allowlist
+      the linter enforces and the `provenance.ts` `license` field; flag any mismatch (e.g. CC BY-SA
+      share-alike implications for any adapted text, DWDS "reference" status).
+    - **Define the strategy:** a ranked list of approved sources per content type (word facts, example
+      sentences, grammar, level descriptors), the rule for when each may be used, the attribution
+      pattern, and a fallback order. Capture it in `docs/DATA_GOVERNANCE.md` (or the planned
+      `docs/DATA_STRATEGY.md` from #22) so future content authoring follows it.
+    - Ties into **#7** (audit infrastructure) and **#22** (end-to-end data strategy); this is the
+      "sources" chapter of that umbrella. Recommended model: **Fable** (research/strategy; **Opus** for
+      now while Fable is restricted).
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
