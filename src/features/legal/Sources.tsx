@@ -9,6 +9,7 @@ import {
   saveProvenanceReview,
   type ProvenanceReview,
 } from "@/lib/provenanceReviews";
+import { cn } from "@/lib/utils";
 import { LegalChrome, Section, type Lang } from "./LegalChrome";
 
 /**
@@ -99,23 +100,44 @@ function hostOf(url: string): string {
  *  everyone else, so the public page renders exactly as before. */
 interface AdminApi {
   reviews: Map<string, ProvenanceReview>;
+  /** Persist a row's flag + note. Resolves to whether the write landed, so the
+   *  row can show a truthful saved/failed state. */
   onChange: (
     contentId: string,
     patch: Partial<Pick<ProvenanceReview, "verified" | "comment">>,
-  ) => void;
+  ) => Promise<boolean>;
 }
 
-/* One item row: label + source link for everyone; plus a "verified" toggle and
-   an internal QC note when the founder is signed in (admin). */
+/* One item row: label + source link for everyone; plus a "verified" toggle, an
+   internal QC note, and an explicit Save button when the founder is signed in
+   (admin). The flag and the note are edited locally and committed together by
+   the Save button, which is disabled until there are unsaved changes. */
 function ItemRow({ r, lang, admin }: { r: ProvenanceEntry; lang: Lang; admin?: AdminApi }) {
   const review = admin?.reviews.get(r.content_id);
-  const verified = review?.verified ?? r.review_status === "verified";
-  const [comment, setComment] = useState(review?.comment ?? "");
+  const savedVerified = review?.verified ?? r.review_status === "verified";
+  const savedComment = review?.comment ?? "";
 
-  // Adopt the saved note once the reviews load (or change) after first render.
+  const [verified, setVerified] = useState(savedVerified);
+  const [comment, setComment] = useState(savedComment);
+
+  // Re-sync the editable fields once the saved review loads (or changes) after
+  // first render, e.g. when the founder's marks finish fetching.
   useEffect(() => {
-    setComment(review?.comment ?? "");
-  }, [review?.comment]);
+    setVerified(savedVerified);
+    setComment(savedComment);
+  }, [savedVerified, savedComment]);
+
+  const [status, setStatus] = useState<"idle" | "saving" | "error">("idle");
+
+  const dirty = verified !== savedVerified || comment.trim() !== savedComment.trim();
+  const hasSaved = review !== undefined || savedVerified || savedComment.length > 0;
+
+  const save = async () => {
+    if (!admin || !dirty || status === "saving") return;
+    setStatus("saving");
+    const ok = await admin.onChange(r.content_id, { verified, comment });
+    setStatus(ok ? "idle" : "error");
+  };
 
   return (
     <li className="px-4 py-2 text-sm">
@@ -144,7 +166,7 @@ function ItemRow({ r, lang, admin }: { r: ProvenanceEntry; lang: Lang; admin?: A
             <input
               type="checkbox"
               checked={verified}
-              onChange={(e) => admin.onChange(r.content_id, { verified: e.target.checked })}
+              onChange={(e) => setVerified(e.target.checked)}
               className="h-3.5 w-3.5 accent-primary"
             />
             {lang === "de" ? "geprüft" : "verified"}
@@ -153,14 +175,47 @@ function ItemRow({ r, lang, admin }: { r: ProvenanceEntry; lang: Lang; admin?: A
             type="text"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
-            onBlur={() => {
-              if ((review?.comment ?? "") !== comment) {
-                admin.onChange(r.content_id, { comment });
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                save();
               }
             }}
             placeholder={lang === "de" ? "Notiz…" : "Note…"}
             className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
           />
+          <button
+            type="button"
+            disabled={!dirty || status === "saving"}
+            onClick={save}
+            className={cn(
+              "shrink-0 rounded-md px-3 py-1 text-xs font-medium transition-colors",
+              dirty && status !== "saving"
+                ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                : "cursor-default bg-muted text-muted-foreground",
+            )}
+          >
+            {status === "saving"
+              ? lang === "de"
+                ? "Speichern…"
+                : "Saving…"
+              : dirty
+                ? lang === "de"
+                  ? "Speichern"
+                  : "Save"
+                : hasSaved
+                  ? lang === "de"
+                    ? "Gespeichert ✓"
+                    : "Saved ✓"
+                  : lang === "de"
+                    ? "Speichern"
+                    : "Save"}
+          </button>
+          {status === "error" && (
+            <span className="shrink-0 text-xs text-destructive">
+              {lang === "de" ? "Nicht gespeichert" : "Not saved"}
+            </span>
+          )}
         </div>
       )}
     </li>
@@ -234,9 +289,9 @@ export function Sources() {
     if (!admin) return undefined;
     return {
       reviews,
-      onChange: (contentId, patch) => {
+      onChange: async (contentId, patch) => {
         const uid = user?.id;
-        if (!uid) return;
+        if (!uid) return false;
         const cur = reviews.get(contentId) ?? {
           content_id: contentId,
           verified: false,
@@ -249,11 +304,13 @@ export function Sources() {
           comment:
             patch.comment !== undefined ? (patch.comment ?? "").trim() || null : cur.comment,
         };
-        setReviews((prev) => new Map(prev).set(contentId, merged));
         setSaveState("saving");
-        saveProvenanceReview(merged, uid).then((ok) =>
-          setSaveState(ok ? "saved" : "error"),
-        );
+        const ok = await saveProvenanceReview(merged, uid);
+        // Only commit to the local cache once the write actually lands, so a
+        // failed save (e.g. table not provisioned) does not look saved.
+        if (ok) setReviews((prev) => new Map(prev).set(contentId, merged));
+        setSaveState(ok ? "saved" : "error");
+        return ok;
       },
     };
   }, [admin, reviews, user?.id]);
