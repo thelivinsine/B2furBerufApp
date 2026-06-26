@@ -695,8 +695,26 @@ relevance facet (`context: "work" | "personal" | "both"` on each theme/item).
 - **Babbel / Duolingo** ask the learner's goal at onboarding (career / travel / personal),
   and Babbel runs a corporate "work German" arm. → validates **asking Mode upfront**.
 
-Sources: telc Deutsch B2 Beruf / *Deutsch-Test für den Beruf* framework and handbooks
-(telc.net, bamf.de); DeuFöV / Berufssprachkurse (bamf.de); Babbel onboarding/goal segmentation.
+### Sources (full list, also on the deck's References slides)
+
+*Primary — German professional-language framework & exams:*
+1. telc Deutsch B1·B2 Beruf — exam overview: <https://www.telc.net/en/language-examinations/certificate-exams/german/telc-german-b1b2-business/>
+2. telc Deutsch-Test für den Beruf B2: <https://www.telc.net/en/language-examinations/certificate-exams/german/german-for-business/german-for-business-b2/>
+3. telc Rahmencurriculum & Handbuch Deutsch Pflege B1·B2 (PDF): <https://shop.telc.net/media/catalog/product/file/5036B01010201bib.pdf>
+4. BAMF — Berufssprachkurse / DeuFöV (overview): <https://www.bamf.de/DE/Themen/Integration/ZugewanderteTeilnehmende/DeutschBeruf/deutsch-beruf.html>
+5. BAMF — Berufssprachkurse Anerkennung Gesundheitswesen (Pflege): <https://www.bamf.de/DE/Themen/Integration/ZugewanderteTeilnehmende/AnerkennungsBSK/anerkennungsbsk-node.html>
+6. BAMF — Konzept „Gesundheitsfachberufe" (PDF): <https://www.bamf.de/SharedDocs/Anlagen/DE/Integration/Berufsbezsprachf-ESF-BAMF/BSK-Konzepte/konzept-nichtakademische-gesundheitsberufe.pdf>
+7. BAMF — Lernzielkatalog Spezial-/Basisberufssprachkurse (PDF): <https://www.bamf.de/SharedDocs/Anlagen/DE/Integration/Berufsbezsprachf-ESF-BAMF/BSK-Konzepte/lernzielkatalog-spezial-und-basisberufssprachkurse.pdf>
+8. Council of Europe — CEFR (official framework): <https://www.coe.int/en/web/common-european-framework-reference-languages>
+
+*Secondary — language-app benchmarks (goal/use-case segmentation):*
+9. Babbel — comparison of best language-learning apps: <https://www.babbel.com/compare-best-language-learning-apps>
+10. Babbel — apps for travelers / digital nomads: <https://www.babbel.com/best-language-learning-apps-for-digital-nomads>
+
+*Sourcing note:* claims 1–8 ground the load-bearing research (Mode, sector, situation,
+counterpart). The structural descriptions of Duolingo / Busuu / Lingoda / Anki are from
+general product familiarity, not citation-grade. All Genauly current-state facts are
+verified against the codebase, not the web.
 
 ## A4 — What Work mode unlocks (the mode-specific facets)
 
