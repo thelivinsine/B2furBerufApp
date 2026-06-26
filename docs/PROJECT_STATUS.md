@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-26 (session 40). Branch: `claude/todo-priorities-0f8hlr`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-26 (session 41). Branch: `claude/theme-taxonomy-filtering-redesign-7q0gco`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,38 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
+A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes
+backlog **#5** (domain/sector-based filtering) plus the founder's new Work/Personal/Both idea.
+- **Strategy deck authored** in two forms: `docs/TAXONOMY_REDESIGN.md` (detailed technical version) and
+  `docs/TAXONOMY_REDESIGN.pptx` (**37-slide** plain-language deck for the non-technical founder, built
+  programmatically with python-pptx). Recommends a **faceted model** (mix-and-match labels) over the
+  current flat single-axis list, with a shallow **Domain → Theme → Sub-theme** hierarchy and orthogonal
+  facets (cefr, register, pos, frequency, exam tag).
+- **Diagnosis grounded in the codebase:** the app today runs three incompatible taxonomies (themes for
+  vocab/collocations, communicative function for Redemittel, grammar groups for grammar), has **no
+  CEFR/level field on any content** (only quiz `difficulty: 1|2|3`, unsurfaced), and filters via a
+  single theme `Select` in `VocabularyTrainer.tsx`.
+- **Work/Personal/Both "Mode" layer added** (founder's idea, session iteration): a top-level lens set at
+  onboarding that scopes the tree and unlocks work-only facets (**sector, workplace situation,
+  counterpart, task type**). Designed as a **lens, not a wall** (never hides content). Grounded in real
+  web research: telc/BAMF *Rahmencurriculum für den Beruf* (fields of action + counterpart), **DeuFöV**
+  state courses splitting job German by sector (care/technical/commercial), telc *Deutsch Pflege* exam,
+  and Babbel/Duolingo goal-based onboarding. Sources listed on the deck's References slides.
+- **8 UI mockups** built in `preview/taxonomy/` (HTML matching the app's brand tokens, screenshotted with
+  the bundled Chromium): before/after vocab browser, sub-topic drill-down, goal-first home,
+  connected-word detail, advanced filter sheet, **Mode picker**, **Work-mode browser**.
+- **Approved implementation plan** written to `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`: Phases 0–4
+  (0 = types + store `mode` + linter foundations, invisible; 1 = CEFR levels + onboarding Mode picker +
+  header switch + Level filter = first shippable milestone; 2 = sub-themes; 3 = faceted browser +
+  work-mode facets + goal cards; 4 = cross-module links + adaptive review). Reuses the existing settings
+  store (`goal`/`level` already there, cloudSync auto-syncs new keys), the linter's mirror-array pattern,
+  the onboarding `SelectRow`, and the provenance draft→verify workflow. **Decisions locked:** full
+  5-phase plan; `mode` is a NEW axis separate from the existing `goal` (exam/work/fluency).
+- **Shipped via PR #231** (squash-merged to `main`, merge SHA `6fe25c7`): all of the above docs +
+  mockups. Post-merge realignment done (branch reset to `origin/main`, force-with-lease). **Nothing is
+  implemented yet** — Phase 0–1 is the recommended next build step.
 
 ### Session 40 (2026-06-26) — Triple collocations bank + hide example translations + Select dropdown overlay
 - **Collocations bank tripled** from 132 to **396** Nomen-Verb pairs (264 new entries, +24 per theme
@@ -1317,6 +1349,10 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 5. **Domain-based filtering for Vocabulary, Collocations, and scenario-based learning:**
    split content into "Bürokratie / bureaucratic work" vs. "office work," and within office
    work, further filter by industry/sector.
+   - **SCOPED 2026-06-26 (session 41).** This is now designed in `docs/TAXONOMY_REDESIGN.md`
+     (+ `.pptx`) and planned in `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`: a faceted Domain → Theme →
+     Sub-theme model with a Work/Personal/Both **Mode** lens and work-only **sector** facet (the
+     industry/sector split the founder asked for). Not built yet; Phase 0–1 is the next build step.
 6. **Redesign the Schreibtraining section.**
 7. **Sourcing/audit infrastructure for content data:** build a data structure + pipeline to
    scrape from reliable open-licensed sources (see "Approved open-licensed sources" above), with
