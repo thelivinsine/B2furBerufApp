@@ -359,10 +359,10 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
 
-### Session 40 (2026-06-26) — Triple the collocations bank + hide example translations + hide Wortschatz tab
+### Session 40 (2026-06-26) — Triple collocations bank + hide example translations + Select dropdown overlay
 - **Collocations bank tripled** from 132 to **396** Nomen-Verb pairs (264 new entries, +24 per theme
   across all 11 themes). High-frequency, exam-relevant B1-B2 pairs sourced from standard telc/Goethe
-  word fields. `behoerde` theme leans on formal Amt/Antrag/Behörde register.
+  word fields. `behoerde` theme leans on formal Amt/Antrag/Behörde register. PR #226.
 - **English example translations hidden** on the dedicated `/collocations` cards. The phrase-level
   English gloss (`c.en`) remains visible; only the example sentence English (`c.example.en`) is hidden
   in the UI. Data and linter unchanged (field still required and populated).
@@ -370,6 +370,12 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   via the dedicated `/collocations` menu item. Implemented as commented-out code (reversible).
 - **264 provenance rows** added to `src/data/provenance.ts` (total: 1073). Each new collocation has a
   matching DWDS-referenced provenance entry.
+- **Select dropdown scrim overlay** (PRs #227–#229): founder reported poor contrast between the
+  dropdown menu and the page content behind it. Added a `bg-dialog-overlay` scrim (the same
+  brand-tinted radial spotlight used by the login dialog, per the locked overlay convention) behind
+  the Select dropdown via `createPortal`. The dropdown card uses `shadow-elevated-soft` + `rounded-xl`
+  matching the dialog card styling. Open state is tracked via React context (`SelectOpenCtx`) so the
+  scrim only renders while the dropdown is actually open and is removed when it closes.
 - `pnpm lint:content` and `pnpm build` both pass clean.
 
 ### Session 39 (2026-06-25) — Mobile card grids overflowing off the right edge (SHIPPED ✅)
@@ -1576,7 +1582,9 @@ squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` 
 - **s40** — **tripled the collocations bank** from 132 to 396 entries (+24/theme across all 11 themes).
   **Hid the English example translation** on `/collocations` cards (phrase gloss stays). **Hid the
   Kollokationen tab** inside Wortschatz (reversible, commented out). 264 provenance rows added (total
-  1073). `pnpm lint:content` and `pnpm build` green.
+  1073). Added **Select dropdown scrim overlay** using the locked `bg-dialog-overlay` convention
+  (PRs #227–#229); tracks open state via context so the scrim only shows while the dropdown is open.
+  `pnpm lint:content` and `pnpm build` green.
 - **s39** — fixed mobile **card grids overflowing off the right edge** (Kollokationen `formell` badge
   clipped). Root cause: responsive `grid-cols-N` with no base `grid-cols-1` falls back to an implicit
   max-content column on mobile. Added `grid-cols-1` across every affected grid (PR #219). Also
