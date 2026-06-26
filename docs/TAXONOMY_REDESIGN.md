@@ -10,12 +10,17 @@ Each `## Slide N` block is one slide. Read top to bottom.
 > (slides 23–25) is the part to act on; slides 1–22 are the reasoning.
 >
 > **Companion artifacts:**
-> - **`docs/TAXONOMY_REDESIGN.pptx`** — a plain-language slide deck (29 slides) of this
+> - **`docs/TAXONOMY_REDESIGN.pptx`** — a plain-language slide deck (35 slides) of this
 >   same plan, written for a non-technical reader, with **app mockups** of every idea.
 >   This markdown is the detailed technical version; the `.pptx` is the friendlier one.
 > - **`preview/taxonomy/`** — the UI mockups (HTML + screenshots) embedded in the deck:
 >   the before/after vocabulary screen, sub-topic drill-down, goal-first home, the
->   connected-word detail, and the advanced filter sheet.
+>   connected-word detail, the advanced filter sheet, plus the **Mode picker** and
+>   **Work-mode browser** added in the addendum below.
+>
+> **Addendum (added later):** the **"Mode" layer (Work / Personal / Both)** is specified
+> at the end of this document, after Slide 25. It sits *above* the theme hierarchy and is
+> the most significant change since the first draft. Read it together with Slides 8–12.
 
 ---
 
@@ -635,3 +640,127 @@ while it is cheap; back-fill the facets as the library grows.
 - *Quizzes:* the only place a level-like field exists (`difficulty: 1|2|3`), not surfaced as a filter.
 - *Filtering UI:* a single theme `Select` in `VocabularyTrainer.tsx`; theme state in the URL via
   `useSearchParams`. No other facet is filterable anywhere.
+
+---
+
+# Addendum — The "Mode" layer (Work / Personal / Both)
+
+*Added after the first draft, at the founder's request. This is the most significant
+change to the framework. It sits **above** the Domain → Theme → Sub-theme hierarchy and
+reshapes the whole experience around the learner's reason for being here. Read alongside
+Slides 8–12 of the `.pptx`, which present this in plain language with mockups.*
+
+## A1 — What Mode is
+
+A single top-level lens the learner picks once (at onboarding) and can switch anytime:
+
+- **`beruf`** (Work) · **`privat`** (Personal life) · **`beides`** (Both)
+
+Mode is **not** a fourth hierarchy level. It is a **lens**: a persisted setting plus a
+relevance tag on content. It (a) scopes/emphasizes which Fields, themes and goal-cards
+surface, and (b) toggles a set of **mode-specific facets** on or off.
+
+## A2 — Why a lens, not a hard top folder (the central decision)
+
+Two models were considered:
+
+| Model | Mode → Field → Theme → Sub-theme (hard, 4 tiers) | Mode as a lens (recommended) |
+|---|---|---|
+| Each item's home | exactly one mode | belongs to work / personal / **both** |
+| Dual-use content (doctor visit, workplace health, "I see it differently…") | must be **duplicated** | tagged `both`, stored once |
+| Browse depth | 4 visible levels (breaks the 3-level rule) | 3 visible levels; Mode is a switch, not a level |
+| Switching modes | re-navigation | one tap; content re-weights, nothing moves |
+
+**Recommendation: lens.** Real life overlaps, and the official frameworks (below) blend
+work and daily life in the same "Handlungsfelder," so a hard partition would force
+duplication. Present it as a clean mode switch (feels top-level) but implement it as a
+relevance facet (`context: "work" | "personal" | "both"` on each theme/item).
+
+**Hard rule — a lens guides, it never gatekeeps:**
+- Mode sets defaults and emphasis only; it must never lock content away. In Work mode a
+  learner can still reach a doctor's-visit phrase.
+- **Search ignores Mode** by default, so nothing is ever truly hidden.
+- **`beides`** shows the union; no content is mode-exclusive.
+
+## A3 — Research grounding (this mirrors how German is actually taught)
+
+- **telc / BAMF *Rahmencurriculum für den Beruf*** organizes work German into ~12
+  *Handlungsfelder* (fields of action) **plus** separate *übergreifende Kommunikationsbereiche*
+  for **who you talk to** (Vorgesetzte / Kollegen / Kunden / Personalabteilung). → validates
+  two distinct Work facets: **Situation** and **Counterpart**.
+- **DeuFöV (German state-funded Berufssprachkurse)** split professional German by **sector**:
+  Gesundheit/Pflege, gewerblich-technisch, kaufmännisch. → validates the **Sector** facet.
+- **telc has a dedicated *Deutsch Pflege* B1·B2 exam.** → sector matters enough to certify
+  per-sector; care work is the largest professional-German market.
+- **Babbel / Duolingo** ask the learner's goal at onboarding (career / travel / personal),
+  and Babbel runs a corporate "work German" arm. → validates **asking Mode upfront**.
+
+Sources: telc Deutsch B2 Beruf / *Deutsch-Test für den Beruf* framework and handbooks
+(telc.net, bamf.de); DeuFöV / Berufssprachkurse (bamf.de); Babbel onboarding/goal segmentation.
+
+## A4 — What Work mode unlocks (the mode-specific facets)
+
+All optional, all conditional (they appear only in Work mode, the way an e-commerce site
+shows "screen size" only under Electronics). Tier them:
+
+| Facet | Values (starter set) | Tier | Notes |
+|---|---|---|---|
+| **`sector`** (Branche) | care, trades/Handwerk, office/Büro, IT, retail, hospitality, logistics, production | **primary** | Mirrors DeuFöV. **Start with 2–3 we'll actually build** (care + office), not 8 empty ones. |
+| **`workSituation`** | meeting, shift-handover, customer call, instructions, onboarding, sick-leave call, review | primary | Largely = our existing 10 workplace **themes**; little new structure needed. |
+| **`counterpart`** (Gegenüber) | manager, colleague, customer, team/report | primary | Drives **register** (Sie/du, formality). Very German-specific. |
+| **`taskType`** | e-mail, phone call, report, instruction, presentation | secondary | The telc exam-action axis; ties to Schreibtraining and exam tags. |
+| **`department`** | HR, sales, production, service, accounting | advanced | Optional; only for dense sectors. |
+
+**Personal mode** gets a lighter symmetric set: `lifeArea` (Behörde, banking, housing,
+health, family, shopping) and `lifeSituation` (appointment, complaint, application, small
+talk, emergency). Register still applies (formal at the Amt, informal with friends).
+
+## A5 — How Mode reframes the existing design
+
+- **Hierarchy:** unchanged in depth. `MODE (lens) ▸ Field → Theme → Sub-theme`. Each Field
+  carries a `context` tag; "Health & social" is `both` and surfaces in either mode.
+- **Onboarding:** one friendly question ("Wofür lernst du Deutsch? Beruf / Alltag / Beides")
+  sets the default Mode. One question, not a quiz; refine over time.
+- **Header:** a small mode pill (e.g. "💼 Beruf ▾") is the always-present switch.
+- **Store:** add `mode: "beruf" | "privat" | "beides"` (+ remembered sub-selections like
+  last `sector`) to `useSettingsStore`, riding `profiles.settings` jsonb via cloudSync,
+  exactly like `pinnedTabs` / `moreOrder`. No new infra.
+- **Goal cards / intent navigation:** the dashboard's starting points are filtered by Mode
+  (work goals in Work mode, life goals in Personal). This is also where Mode answers the
+  "learner motivation" parameter flagged as missing in the original deck.
+- **Module impact:** strongest on **Vocabulary** (sector-specific words) and **Redemittel**
+  (counterpart-specific register); lightest on **Grammar** (mostly `both`). Consistent with
+  the module-specific analysis (Slides 17–19 of the main doc).
+
+## A6 — Types & linter (closed axes, same pattern as `THEME_IDS`)
+
+```ts
+export type LearningMode = "beruf" | "privat" | "beides";
+export type ContextTag   = "work" | "personal" | "both";   // on themes/items
+export type WorkSector   = "care" | "office" | "trades" | "it" | "retail" | "hospitality" /* … */;
+export type Counterpart  = "manager" | "colleague" | "customer" | "team";
+```
+
+Add each as a union in `src/types/index.ts` **and** a mirrored array in
+`scripts/lint-content.mjs` (the established sync pattern), so the content linter validates
+them like theme ids. All new facets optional → existing content stays valid (rolls up).
+
+## A7 — Risks specific to Mode
+
+| Risk | Severity | Mitigation |
+|---|---|---|
+| Walling content off / annoying "Both" users | **High** | Lens-not-wall (A2); search ignores Mode; one-tap switch; `beides` = union |
+| `sector` filters are empty (almost no sector-tagged content yet) | **High** | Ship only sectors we'll author (care, office); reveal more as density grows; never show a 0-count sector |
+| Onboarding friction (too many questions) | Medium | One question; defaults to `beides`; refine later |
+| Mode × theme double-tagging burden | Medium | `context` defaults to `both`; only specialize where it matters |
+
+## A8 — Where it lands in the roadmap
+
+- **Phase 0:** add the `mode`/`context` tags + `LearningMode` to the store and types
+  (invisible; everything defaults to `beides`/`both`).
+- **Phase 1:** the onboarding **Mode picker** + header switch ship alongside the Level filter.
+- **Phase 3:** the **Work-mode facets** (sector / situation / counterpart) ship with the full
+  filter bar and goal cards, once there is sector-tagged content to filter.
+
+Mockups: `preview/taxonomy/07-mode-onboarding.html` (the picker) and `08-work-mode.html`
+(the Work-mode browser with sector/situation/counterpart facets), screenshotted into the deck.
