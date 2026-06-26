@@ -1,4 +1,5 @@
 import * as React from "react";
+import { createPortal } from "react-dom";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,11 +27,20 @@ const SelectTrigger = React.forwardRef<
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
+function SelectScrim() {
+  return createPortal(
+    <div className="pointer-events-none fixed inset-0 z-40 bg-black/20" aria-hidden />,
+    document.body,
+  );
+}
+
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
 >(({ className, children, position = "popper", ...props }, ref) => (
-  <SelectPrimitive.Portal>
+  <>
+    <SelectScrim />
+    <SelectPrimitive.Portal>
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
@@ -47,7 +57,8 @@ const SelectContent = React.forwardRef<
         {children}
       </SelectPrimitive.Viewport>
     </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
+    </SelectPrimitive.Portal>
+  </>
 ));
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
