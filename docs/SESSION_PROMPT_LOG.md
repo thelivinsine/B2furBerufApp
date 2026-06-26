@@ -925,3 +925,167 @@ Branch: `claude/bug-attached-picture-fxgv5j`.
   migration-0004 confirmation + backlog #24) and the "Resume here" pointer, and appended Entries 48–53
   to this prompt log.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Session 41 — 2026-06-26 — Taxonomy & filtering redesign (research, deck, Mode layer, implementation plan)
+Branch: `claude/theme-taxonomy-filtering-redesign-7q0gco`. Docs-only session; shipped via PR #231
+(squash-merged to `main`, merge SHA `6fe25c7`).
+
+## Entry 54 — 2026-06-26 (taxonomy research brief)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim — long structured brief, reproduced in a fenced block for fidelity):**
+~~~~
+# Prompt: Research & Redesign Theme Categorization and Filtering System for Language Learning App
+
+You are a senior product strategist, learning experience designer, and taxonomy architect specializing in language-learning platforms.
+
+## Context
+We are building a highly ambitious language-learning app with broad scope and deep coverage across multiple learning modules, including: Vocabulary (Wortschatz), Collocations, Redemittel (functional phrases / expressions), Schreibtraining (writing practice).
+
+The current categorization system in the app is limited and may not adequately support long-term scalability, discoverability, personalization, and advanced learning pathways. We want to redesign the entire taxonomy and filtering framework for these modules from first principles.
+
+## Objective
+Conduct deep research and provide a comprehensive recommendation for redesigning how themes/topics should be categorized and filtered across the modules listed above. [Goal: intuitive, pedagogically sound, scalable, flexible across modules, suitable for adaptive learning/personalization, easy layered filtering.]
+
+## Research Scope
+1. Benchmark Research (Duolingo, Babbel, Busuu, Lingoda, Goethe, TELC, CEFR, publishers, LMS/EdTech).
+2. Theme Categorization Framework (theme/topic, difficulty A1–C2, CEFR, use case, domain/industry, skill type, formality, communication purpose, frequency/usefulness, grammar dependency, linguistic complexity).
+3. Multi-Layer Filtering System (Core / Contextual / Linguistic / Learning filters; essential vs optional vs advanced).
+4. Theme Hierarchy Design (number of broad themes, sub-themes, deeper categories; ideal depth; Broad → Sub → Micro example).
+5. Module-Specific Considerations (should all modules share one taxonomy? module-specific layers? standardization vs customization?).
+6. Important Parameters We May Be Missing (learner motivation, intent-based navigation, progression pathways, search behavior, content tagging strategy, AI personalization, content expansion readiness, cross-module linking).
+
+## Deliverables
+Provide a detailed report in the format of a professional slide deck. [Slide 1 Executive Summary; 2–4 Benchmark Analysis; 5–7 Core Taxonomy Principles; 8–12 Proposed Theme Architecture; 13–16 Proposed Filtering System; 17–19 Module-Specific Recommendations; 20–22 Risks & Tradeoffs; 23–25 Final Recommendation.]
+
+## Output Requirements
+- Be extremely detailed and analytical; structured frameworks and tables; visual hierarchy examples; explain tradeoffs; recommendations backed by research; both learner UX and backend content architecture perspectives; prioritize long-term scalability and excellence. Challenge assumptions and propose better approaches where necessary.
+~~~~
+- **Response summary:** Audited the live taxonomy in code (11 flat themes on one shared `ThemeId`, three
+  incompatible per-module taxonomies, no CEFR field, single-dropdown filter) and wrote a 25-slide
+  research/strategy deck recommending a faceted model + shallow Domain→Theme→Sub-theme hierarchy +
+  progressive faceted filtering, grounded in the current code.
+- **Artifacts:** `docs/TAXONOMY_REDESIGN.md`; first commit on the branch.
+
+## Entry 55 — 2026-06-26 (where to access the deck)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > are you done with all the tasks from the above promp? where can i access the slide deck?
+- **Response summary:** Confirmed the research deliverable was complete; pointed to
+  `docs/TAXONOMY_REDESIGN.md` on the branch (GitHub-rendered) and offered other formats. Was honest that
+  it was delivered as a markdown "slide deck", not a real presentation file.
+- **Artifacts:** none (existing `docs/TAXONOMY_REDESIGN.md`).
+
+## Entry 56 — 2026-06-26 (too technical; review robustness; plain language; mockups)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > the content of the ppt is too technical and dry. First, review your work if the analysis is robust. And then, explain the slides better for a non-tech person? Also, generate previews and inlcude screenshots with several examples of how the app looks when implemented the ideas from the ppt.
+- **Response summary:** (1) Stress-tested the analysis (re-verified core claims against the code; flagged
+  the soft spots: benchmarks not freshly web-sourced, the "15,000 slices" combinatorics oversells given
+  sparsity). (2) Rewrote the deck in plain language with a supermarket analogy. (3) Built 6 app mockups
+  in `preview/taxonomy/` (HTML in the app's brand tokens, screenshotted with the bundled Chromium) and
+  generated a real **.pptx** (python-pptx) embedding them. Fixed a real bug where multi-line callouts
+  stored literal newlines that PowerPoint would collapse.
+- **Artifacts:** `docs/TAXONOMY_REDESIGN.pptx`, `preview/taxonomy/*` (01–06 + app.css), updated
+  `docs/TAXONOMY_REDESIGN.md`.
+
+## Entry 57 — 2026-06-26 (link to ppt)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > give me the link to ppt
+- **Response summary:** Gave the GitHub blob + raw download links for `docs/TAXONOMY_REDESIGN.pptx` on the
+  branch (noting GitHub can't preview .pptx and the repo is private), and re-sent the file directly.
+- **Artifacts:** none.
+
+## Entry 58 — 2026-06-26 (add Work/Personal/Both Mode; deep research)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > I really like the analysis and suggestions. I want to add a further broader category/mode - Personal life vs Work vs Both. Once the user selects one of the modes, then all the category/filters with the recommended tree system and build the backbone. When work mode is chosen, the user should be able to select a wide range of categories like work sector, kind of tasks, typical work place situations, department specific, etc. I'm just blurting out my ideas. Can you do a deep research on how to integrate this idea into your analysis and update the ppt?
+- **Response summary:** Ran real web research (telc/BAMF *Rahmencurriculum für den Beruf*, DeuFöV sector
+  modules, telc *Deutsch Pflege*, Babbel/Duolingo onboarding) that validated the idea. Integrated a
+  top-level **Work/Personal/Both Mode** lens (lens-not-wall) with work-only facets (sector, situation,
+  counterpart, task type). Added a new Mode section to the deck (now 35 slides), two new mockups
+  (onboarding Mode picker + Work-mode browser), and a full technical addendum to the markdown.
+- **Artifacts:** updated `docs/TAXONOMY_REDESIGN.pptx` + `.md`, `preview/taxonomy/07-mode-onboarding.html`,
+  `08-work-mode.html` + screenshots.
+
+## Entry 59 — 2026-06-26 (add all research sources to the ppt)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > can you make sure to add all the sources from your research in the ppt?
+- **Response summary:** Added two **References** slides (deck now 37 slides) listing the 10 research
+  sources as clickable hyperlinks (primary telc/BAMF/DeuFöV + CEFR; secondary Babbel), with an honesty
+  note distinguishing cited claims from general product knowledge. Mirrored the source list into the
+  markdown addendum.
+- **Artifacts:** updated `docs/TAXONOMY_REDESIGN.pptx` + `.md`.
+
+## Entry 60 — 2026-06-26 (make an implementation plan)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > Make an implementation plan for the taxonomy redesign of genauly. Provide the plan with detailed instructions and an executive summary of each section of the plan.
+- **Response summary:** Entered plan mode; read the settings store, content linter, onboarding flow and
+  cloudSync to ground the plan in real integration points (found `goal`/`level` already in the store,
+  cloudSync auto-syncs new keys, the linter's mirror-array pattern, the reusable onboarding `SelectRow`).
+  Drafted a staged 5-phase implementation plan with an executive summary per phase.
+- **Artifacts:** plan file (later written to `docs/TAXONOMY_IMPLEMENTATION_PLAN.md` in Entry 63).
+
+## Entry 61 — 2026-06-26 (decisions 1A/2A + install plugins request)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > 1A, 2A. Before you provide with the plan, can you install fallow and ponytail agents/plugins and then provide the updated plan?
+- **Response summary:** Recorded the decisions (full 5-phase plan; `mode` as a separate axis from
+  `goal`). Was honest that I **cannot** install "fallow"/"ponytail": no install tool is available, they
+  are not in the session's agent list, and I could not verify they exist; explained plugin install is
+  founder-driven via the client's `/plugin` flow. Noted the plan already reflected 1A/2A.
+- **Artifacts:** none.
+
+## Entry 62 — 2026-06-26 (give me the questions)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > give me the questions
+- **Response summary:** Re-presented the two clarifying questions in text (plan depth: full 5-phase vs
+  first-milestone-only; and how `mode` relates to the existing `goal` field) after the interactive
+  question tool had errored. Founder had already answered 1A/2A.
+- **Artifacts:** none.
+
+## Entry 63 — 2026-06-26 (write the plan to docs + merge to main)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > can you write the plan in the docs folder and merge to main along with the analysis ppt?
+- **Response summary:** Wrote the approved plan to `docs/TAXONOMY_IMPLEMENTATION_PLAN.md` (with a doc
+  header + cross-link from the redesign deck), committed it, opened **PR #231** and squash-merged the
+  whole taxonomy effort (deck `.md` + `.pptx`, plan, `preview/taxonomy/` mockups) into `main`. Ran the
+  post-merge realignment (reset branch to `origin/main`, force-with-lease). Docs-only; nothing built.
+- **Artifacts:** `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/TAXONOMY_REDESIGN.md`; PR #231 (merge SHA
+  `6fe25c7`).
+
+## Entry 64 — 2026-06-26 (document this session)
+- **Branch:** `claude/theme-taxonomy-filtering-redesign-7q0gco`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > update the documentation for this session
+- **Response summary:** Added the **Session 41** entry to `docs/PROJECT_STATUS.md` (research deck + Mode
+  layer + implementation plan, all merged via PR #231), updated the `_Last updated_` header and tied the
+  work into backlog #5 (domain/sector filtering, now scoped), and appended Entries 54–64 to this prompt
+  log.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
