@@ -58,7 +58,7 @@ function CollocationCard({ c }: { c: Collocation }) {
             <p className="min-w-0 flex-1 text-sm italic text-muted-foreground">„{c.example.de}"</p>
             <SpeakButton text={c.example.de} className="shrink-0" />
           </div>
-          <p className="mt-0.5 text-xs text-muted-foreground">{c.example.en}</p>
+          {/* English example translation hidden for now */}
         </div>
       </CardContent>
     </Card>

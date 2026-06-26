@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-25 (session 39). Branch: `claude/bug-attached-picture-fxgv5j`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-26 (session 40). Branch: `claude/todo-priorities-0f8hlr`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -26,7 +26,7 @@ This file is the single place to re-orient when resuming work. For the full desi
 - **Engine (1B):** `src/engine/quiz.ts` `buildThemeQuiz(themeId, difficulty, count)` generates
   mixed sets from vocab/collocations/grammar banks; reuses SRS (`reviewVocab`) + scoring.
   Added `XP.quizEasy/quizMedium/quizHard/grammarDrill`.
-- **Content (1C):** `src/data/collocations.ts` (**68** Nomen-Verb pairs, ~6–8/theme);
+- **Content (1C):** `src/data/collocations.ts` (**396** Nomen-Verb pairs, ~36/theme);
   `src/data/grammar.ts` rewritten to **11 `GrammarTopic`s** w/ drills (Konnektoren, Relativsätze,
   da-/wo-Wörter, Verbstellung/TeKaMoLo, Nebensätze, Kasus, Nomen-Verb, K-II, Modal, Passiv);
   `redemittel.ts` grown to **72**; **10 connectors** added to vocab (**304** words);
@@ -311,7 +311,7 @@ OFF** to be instant, and the Google button needs the **Google provider** configu
 - **Audit headline: the app is healthy.** `pnpm build`, `pnpm typecheck`, and `pnpm lint:content`
   all pass with zero errors (only the known ~159 provenance back-fill warnings). No crashes, broken
   routes, duplicate IDs, broken dialogue branches, missing content, or em dashes in user copy.
-  Content counts all match (490 vocab, 120 collocations, 10 grammar topics/47 drills, 769 provenance
+  Content counts all match (490 vocab, 396 collocations, 10 grammar topics/47 drills, 1073 provenance
   rows); consent version matches the legal `LAST_UPDATED` date.
 - **Fixes applied:**
   - `dataExport.ts`: added the missing `.eq("user_id", user.id)` to the `writing_evaluations` query
@@ -358,6 +358,19 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 40 (2026-06-26) — Triple the collocations bank + hide example translations + hide Wortschatz tab
+- **Collocations bank tripled** from 132 to **396** Nomen-Verb pairs (264 new entries, +24 per theme
+  across all 11 themes). High-frequency, exam-relevant B1-B2 pairs sourced from standard telc/Goethe
+  word fields. `behoerde` theme leans on formal Amt/Antrag/Behörde register.
+- **English example translations hidden** on the dedicated `/collocations` cards. The phrase-level
+  English gloss (`c.en`) remains visible; only the example sentence English (`c.example.en`) is hidden
+  in the UI. Data and linter unchanged (field still required and populated).
+- **Kollokationen tab hidden** inside Wortschatz (`/vocabulary`). Collocations are now only reachable
+  via the dedicated `/collocations` menu item. Implemented as commented-out code (reversible).
+- **264 provenance rows** added to `src/data/provenance.ts` (total: 1073). Each new collocation has a
+  matching DWDS-referenced provenance entry.
+- `pnpm lint:content` and `pnpm build` both pass clean.
 
 ### Session 39 (2026-06-25) — Mobile card grids overflowing off the right edge (SHIPPED ✅)
 Founder reported (mobile screenshots) that the Kollokationen tiles were cut off on the **right**, with
@@ -1389,7 +1402,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       (Behörden & Ämter): ~25 vocab, 12 collocations, 2 branching scenarios (levels 1–2), 1 writing
       prompt, provenance rows. It auto-surfaces in Quiz/Vocabulary/Collocations/Simulation (those
       map over `themes` / group scenarios by level), so no UI redesign was needed. Counts now: 515
-      vocab, 132 collocations, 12 dialogues, 11 themes. This is the reference template for the
+      vocab, 396 collocations, 12 dialogues, 11 themes. This is the reference template for the
       remaining packs (banking, healthcare, housing). Still open under #18: the nav/Dashboard
       "situation-based" redesign and the Bürokratie-vs-Office domain grouping (backlog #5).
       Scoping doc: `docs/AI_PRODUCT_STRATEGY.md`.
@@ -1555,11 +1568,15 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 
 ## Resume here (next session)
 
-**Handoff after session 39 (2026-06-25).** Everything noted ✅ is merged to `main`.
-Active automation branch: `claude/bug-attached-picture-fxgv5j` (realign to `origin/main` after each
+**Handoff after session 40 (2026-06-26).** Everything noted ✅ is merged to `main`.
+Active automation branch: `claude/todo-priorities-0f8hlr` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Most recent work (sessions 35–39):**
+**Most recent work (sessions 35–40):**
+- **s40** — **tripled the collocations bank** from 132 to 396 entries (+24/theme across all 11 themes).
+  **Hid the English example translation** on `/collocations` cards (phrase gloss stays). **Hid the
+  Kollokationen tab** inside Wortschatz (reversible, commented out). 264 provenance rows added (total
+  1073). `pnpm lint:content` and `pnpm build` green.
 - **s39** — fixed mobile **card grids overflowing off the right edge** (Kollokationen `formell` badge
   clipped). Root cause: responsive `grid-cols-N` with no base `grid-cols-1` falls back to an implicit
   max-content column on mobile. Added `grid-cols-1` across every affected grid (PR #219). Also
@@ -1710,13 +1727,14 @@ bar" section for the locked behavior.
   banner** (functional-only storage is consent-exempt); GDPR rights are in-app self-service. Keep
   `CONSENT_VERSION` (`src/lib/consent.ts`) in lockstep with the legal `LAST_UPDATED`. `CLAUDE.md` → "Legal pages & consent".
 
-**Content counts (live, verified by `pnpm lint:content` 2026-06-14):**
-- Vocabulary: **490 words** (was 498; 8 duplicate ids removed s22)
-- Collocations: **120 Nomen-Verb pairs** (12/theme)
+**Content counts (live, verified by `pnpm lint:content` 2026-06-26):**
+- Vocabulary: **515 words**
+- Collocations: **396 Nomen-Verb pairs** (~36/theme; tripled from 132 in s40)
 - Grammar: **47 drills** · **10 topics**
-- Dialogues (branching scenarios): **10** (1 per theme)
+- Dialogues (branching scenarios): **12** (incl. behoerde)
 - Exam sets: **10** (1 per theme · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
+- Provenance rows: **1073**
 
 **Dev branch:** `claude/vibrant-meitner-mfl9xk` — realign to `origin/main` after each squash-merge.
 
