@@ -4,7 +4,27 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const Select = SelectPrimitive.Root;
+const SelectOpenCtx = React.createContext(false);
+
+function Select({
+  onOpenChange,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof SelectPrimitive.Root>) {
+  const [open, setOpen] = React.useState(false);
+  return (
+    <SelectOpenCtx.Provider value={open}>
+      <SelectPrimitive.Root
+        {...props}
+        open={open}
+        onOpenChange={(o) => {
+          setOpen(o);
+          onOpenChange?.(o);
+        }}
+      />
+    </SelectOpenCtx.Provider>
+  );
+}
+
 const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
@@ -27,39 +47,44 @@ const SelectTrigger = React.forwardRef<
 ));
 SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
-function SelectScrim() {
-  return createPortal(
-    <div className="pointer-events-none fixed inset-0 z-40 bg-dialog-overlay" aria-hidden />,
-    document.body,
-  );
-}
-
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = "popper", ...props }, ref) => (
-  <>
-    <SelectScrim />
+>(({ className, children, position = "popper", ...props }, ref) => {
+  const open = React.useContext(SelectOpenCtx);
+  return (
     <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      className={cn(
-        "relative z-50 max-h-80 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-surface text-foreground shadow-elevated-soft data-[state=open]:animate-fade-in",
-        position === "popper" && "translate-y-1",
-        className,
-      )}
-      position={position}
-      {...props}
-    >
-      <SelectPrimitive.Viewport
-        className={cn("p-1", position === "popper" && "w-full min-w-[var(--radix-select-trigger-width)]")}
+      <SelectPrimitive.Content
+        ref={ref}
+        className={cn(
+          "relative z-50 max-h-80 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-surface text-foreground shadow-elevated-soft data-[state=open]:animate-fade-in",
+          position === "popper" && "translate-y-1",
+          className,
+        )}
+        position={position}
+        {...props}
       >
-        {children}
-      </SelectPrimitive.Viewport>
-    </SelectPrimitive.Content>
+        {open &&
+          createPortal(
+            <div
+              className="pointer-events-none fixed inset-0 z-40 bg-dialog-overlay"
+              aria-hidden
+            />,
+            document.body,
+          )}
+        <SelectPrimitive.Viewport
+          className={cn(
+            "p-1",
+            position === "popper" &&
+              "w-full min-w-[var(--radix-select-trigger-width)]",
+          )}
+        >
+          {children}
+        </SelectPrimitive.Viewport>
+      </SelectPrimitive.Content>
     </SelectPrimitive.Portal>
-  </>
-));
+  );
+});
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 
 const SelectItem = React.forwardRef<
