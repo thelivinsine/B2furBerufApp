@@ -8,6 +8,14 @@ Each `## Slide N` block is one slide. Read top to bottom.
 
 > Status: proposal / research. Nothing here is shipped. The "Final Recommendation"
 > (slides 23–25) is the part to act on; slides 1–22 are the reasoning.
+>
+> **Companion artifacts:**
+> - **`docs/TAXONOMY_REDESIGN.pptx`** — a plain-language slide deck (29 slides) of this
+>   same plan, written for a non-technical reader, with **app mockups** of every idea.
+>   This markdown is the detailed technical version; the `.pptx` is the friendlier one.
+> - **`preview/taxonomy/`** — the UI mockups (HTML + screenshots) embedded in the deck:
+>   the before/after vocabulary screen, sub-topic drill-down, goal-first home, the
+>   connected-word detail, and the advanced filter sheet.
 
 ---
 
