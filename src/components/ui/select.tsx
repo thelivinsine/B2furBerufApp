@@ -29,7 +29,7 @@ SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 
 function SelectScrim() {
   return createPortal(
-    <div className="pointer-events-none fixed inset-0 z-40 bg-black/20" aria-hidden />,
+    <div className="pointer-events-none fixed inset-0 z-40 bg-dialog-overlay" aria-hidden />,
     document.body,
   );
 }
@@ -44,7 +44,7 @@ const SelectContent = React.forwardRef<
     <SelectPrimitive.Content
       ref={ref}
       className={cn(
-        "relative z-50 max-h-80 min-w-[8rem] overflow-hidden rounded-lg border border-border bg-surface text-foreground shadow-elevated data-[state=open]:animate-fade-in",
+        "relative z-50 max-h-80 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-surface text-foreground shadow-elevated-soft data-[state=open]:animate-fade-in",
         position === "popper" && "translate-y-1",
         className,
       )}
