@@ -138,7 +138,7 @@ export function FacetSheet<T>({
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="bottom-0 left-0 right-0 top-auto max-h-[85dvh] w-full max-w-none translate-x-0 translate-y-0 gap-0 rounded-b-none rounded-t-2xl border-x-0 border-b-0 p-0 sm:left-1/2 sm:right-auto sm:w-[calc(100%-2rem)] sm:max-w-lg sm:-translate-x-1/2"
+          className="bottom-0 left-0 right-0 top-auto grid-rows-[auto_auto_minmax(0,1fr)_auto] max-h-[85dvh] w-full max-w-none translate-x-0 translate-y-0 gap-0 overflow-y-hidden rounded-b-none rounded-t-2xl border-x-0 border-b-0 p-0 sm:left-1/2 sm:right-auto sm:w-[calc(100%-2rem)] sm:max-w-lg sm:-translate-x-1/2"
         >
           {/* Grab handle */}
           <div className="mx-auto mt-2.5 h-1 w-9 shrink-0 rounded-full bg-border" />
@@ -155,7 +155,7 @@ export function FacetSheet<T>({
             )}
           </div>
 
-          <div className="space-y-5 overflow-y-auto px-5 pb-4">
+          <div className="min-h-0 space-y-5 overflow-y-auto px-5 pb-4">
             {facets.map((facet) => (
               <div key={facet.id}>
                 <div className="mb-2 flex items-baseline justify-between">
