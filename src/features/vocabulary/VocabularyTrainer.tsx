@@ -65,7 +65,25 @@ const POS_FACET: FacetDef<VocabItem> = {
   })),
   get: (v) => v.pos,
 };
-// Work-mode facet: only exposed when the Mode lens is "work" (Taxonomy Phase 3).
+const SITUATION_ORDER = [
+  "meeting",
+  "shift-handover",
+  "customer-call",
+  "instructions",
+  "onboarding",
+  "sick-leave",
+  "review",
+];
+const SITUATION_LABEL: Record<string, string> = {
+  meeting: "Besprechung",
+  "shift-handover": "Übergabe",
+  "customer-call": "Kundengespräch",
+  instructions: "Unterweisung",
+  onboarding: "Einarbeitung",
+  "sick-leave": "Krankmeldung",
+  review: "Feedback",
+};
+// Work-mode facets: only exposed when the Mode lens is "work" (Taxonomy Phase 3).
 const SECTOR_FACET: FacetDef<VocabItem> = {
   id: "sector",
   label: "Branche",
@@ -75,6 +93,17 @@ const SECTOR_FACET: FacetDef<VocabItem> = {
   })),
   get: (v) => v.sector,
 };
+const SITUATION_FACET: FacetDef<VocabItem> = {
+  id: "workSituation",
+  label: "Situation",
+  options: present(SITUATION_ORDER, (s) => vocabulary.some((v) => v.workSituation === s)).map((s) => ({
+    value: s,
+    label: SITUATION_LABEL[s],
+  })),
+  get: (v) => v.workSituation,
+};
+const WORK_FACETS = [SECTOR_FACET, SITUATION_FACET];
+const ALL_FACETS = [CEFR_FACET, POS_FACET, SECTOR_FACET, SITUATION_FACET];
 
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
@@ -83,9 +112,9 @@ export function VocabularyTrainer() {
   const sub = params.get("sub") ?? ""; // "" = none, "all" = whole theme, else a subThemeId
   const [mode, setMode] = useState("flashcards");
 
-  // Sector is a Work-mode facet: only surface it when the lens is "work".
+  // Sector + Situation are Work-mode facets: only surface them when lens === "work".
   const facets = useMemo(
-    () => (learningMode === "work" ? [CEFR_FACET, POS_FACET, SECTOR_FACET] : [CEFR_FACET, POS_FACET]),
+    () => (learningMode === "work" ? [CEFR_FACET, POS_FACET, ...WORK_FACETS] : [CEFR_FACET, POS_FACET]),
     [learningMode],
   );
 
@@ -98,10 +127,10 @@ export function VocabularyTrainer() {
   const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
   const activeSub = subThemes.find((s) => s.id === sub);
 
-  // Selection (CEFR / Wortart / Branche) lives in the URL alongside ?theme=/?sub=.
+  // Selection (CEFR / Wortart / Branche / Situation) lives in the URL alongside ?theme=/?sub=.
   const selection: FacetSelection = useMemo(() => {
     const s: FacetSelection = {};
-    for (const f of [CEFR_FACET, POS_FACET, SECTOR_FACET]) {
+    for (const f of ALL_FACETS) {
       const raw = params.get(f.id);
       if (raw) s[f.id] = raw.split(",");
     }
@@ -115,7 +144,7 @@ export function VocabularyTrainer() {
   );
   const items = useMemo(() => applyFacets(scoped, facets, selection), [scoped, facets, selection]);
   // Remount key so the flashcard/quiz decks reshuffle when the facets change.
-  const facetKey = ["cefr", "pos", "sector"].map((id) => params.get(id) ?? "").join("|");
+  const facetKey = ALL_FACETS.map((f) => params.get(f.id) ?? "").join("|");
 
   const activeChips = facets.flatMap((f) =>
     (selection[f.id] ?? []).map((v) => ({
@@ -135,7 +164,7 @@ export function VocabularyTrainer() {
 
   const setSelection = (next: FacetSelection) => {
     const p = new URLSearchParams(params);
-    for (const f of [CEFR_FACET, POS_FACET, SECTOR_FACET]) {
+    for (const f of ALL_FACETS) {
       const v = next[f.id];
       if (v && v.length) p.set(f.id, v.join(","));
       else p.delete(f.id);

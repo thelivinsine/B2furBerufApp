@@ -1311,3 +1311,19 @@ backfilled from the session summary so the trail is complete.)
   Register filter into the Redemittel browse view (**PR #245**).
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx` (PR #244); `src/features/redemittel/RedemittelTrainer.tsx`
   (PR #245); `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 80 — 2026-06-27 (continue: workSituation facet)
+- **Branch:** `claude/taxonomy-review-next-phase-ynw1lt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > continue with the plan now
+- **Response summary:** Tagged **`workSituation`** on a cross-cutting set of vocab (`shift-handover` for
+  the care shift words, `instructions` for safety/hygiene, `meeting`, `customer-call`) and exposed it as a
+  **second Work-mode facet "Situation"** in the Vokabeltrainer next to "Branche" (both appear only when
+  `mode==="work"`; state in `?workSituation=`). Made the honest call to **leave `counterpart` 0-tagged**
+  (redemittel are general-purpose, so counterpart tags would be low-signal guesswork; documented to author
+  counterpart-specific variants later if wanted). Refreshed the stale CLAUDE.md taxonomy + Vokabeltrainer
+  UI notes. `pnpm lint:content` + `pnpm build` green. Phase 3 is effectively complete; **Phase 4** is next.
+- **Artifacts:** `src/data/vocabulary.ts`, `src/features/vocabulary/VocabularyTrainer.tsx`, `CLAUDE.md`,
+  `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.

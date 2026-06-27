@@ -425,10 +425,15 @@ regressed.
   üben?" intent tiles**. Removed the big focal hero + four-stat status strip + level bar (all already on
   the Fortschritt page) and replaced them with **one compact summary strip** below the tiles (streak ·
   today XP/goal · days-to-exam · recommended action · "Fortschritt" link). Mode pill untouched.
-- **Resume here →** remaining Phase 3 polish: tag **`workSituation` + `counterpart`** (still 0-tagged) and
-  expose them as further Work facets; broaden `sector` tagging beyond the curated starter set. Then
-  **Phase 4** (cross-module "Related" panel + mode/level-aware SRS review). Carry-over: `cefr` tags are
-  AI-drafted and still need human verification against Goethe/telc/DeuFöV lists.
+- **workSituation facet (session 43):** tagged a cross-cutting set of vocab (`shift-handover` for the
+  care shift words, `instructions` for safety/hygiene, `meeting`, `customer-call`) and exposed it as a
+  **2nd Work-mode facet "Situation"** in the Vokabeltrainer (next to "Branche"); both appear only in Work
+  mode. `counterpart` left 0-tagged on purpose (redemittel are general-purpose → low-signal).
+- **Resume here →** **Phase 4** is the next milestone: a cross-module **"Related" panel** (query shared
+  `subThemeId`+`cefr` to pull a matching collocation / Redemittel / writing prompt / dialogue) and
+  **mode/level-aware SRS review** (weight the daily queue by `mode`/`sector`/weak `cefr` band). Optional
+  Phase 3 polish: broaden `sector`/`workSituation` tagging, extend sub-themes past 3 of 11. Carry-over:
+  `cefr` tags are AI-drafted and still need human verification against Goethe/telc/DeuFöV lists.
 
 ### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
 A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes
