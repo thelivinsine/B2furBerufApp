@@ -73,3 +73,29 @@ export const practiceAreas: PracticeArea[] = [
 
 export const practiceAreaById = (id: WeaknessCategory) =>
   practiceAreas.find((p) => p.id === id);
+
+/** Destinations whose browser understands a `?theme=` filter. */
+const THEME_AWARE = ["/vocabulary", "/collocations", "/quiz"];
+
+/**
+ * Resolve a practice deep-link with the writing context folded in (Taxonomy
+ * Phase 4 step 3). When the coach knows which theme the text was about, the
+ * "Üben" button lands on a *filtered* drill set instead of the whole bank:
+ * theme-aware destinations get `?theme=`, and the register weakness opens the
+ * formal Redemittel directly. Falls back to the static route when no context.
+ */
+export function practiceRoute(
+  area: PracticeArea,
+  ctx: { theme?: string } = {},
+): string {
+  const [path, query] = area.route.split("?");
+  const params = new URLSearchParams(query);
+  if (ctx.theme && THEME_AWARE.includes(path) && !params.has("theme")) {
+    params.set("theme", ctx.theme);
+  }
+  if (area.id === "register" && path === "/redemittel" && !params.has("register")) {
+    params.set("register", "formal");
+  }
+  const qs = params.toString();
+  return qs ? `${path}?${qs}` : path;
+}

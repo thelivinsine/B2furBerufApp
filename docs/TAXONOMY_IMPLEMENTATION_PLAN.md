@@ -244,15 +244,22 @@ build green.
 
 ---
 
-## Phase 4 — Cross-module linking + adaptive review ⏳ IN PROGRESS
+## Phase 4 — Cross-module linking + adaptive review ✅ SHIPPED (session 43)
 
-> **Step 1 SHIPPED (session 43):** the cross-module **"Verbunden" panel**
-> (`src/features/vocabulary/RelatedPanel.tsx`). In the Vokabeltrainer **Übersicht** list, each word
-> expands to show matching content from the other banks via the shared `themeId`/`subThemeId` join key:
-> a **Kollokation** (same sub-theme if available, else theme → `/collocations?theme=`), the theme's
-> **Schreibtraining** prompt (→ `/writing?theme=`), and a **Dialog** (→ `/simulation`). No hand-kept id
-> lists. Redemittel are not linked (they carry no `themeId`). **Remaining:** mode/level-aware SRS review
-> (step 2) and writing-coach deep-links (step 3).
+> **All three steps shipped in session 43.**
+> - **Step 1 — cross-module "Verbunden" panel** (`src/features/vocabulary/RelatedPanel.tsx`): in the
+>   Vokabeltrainer **Übersicht** list, each word expands to matching content from the other banks via the
+>   shared `themeId`/`subThemeId` join: a **Kollokation** (same sub-theme if available → `/collocations?theme=`),
+>   the theme's **Schreibtraining** prompt (→ `/writing?theme=`), and a **Dialog** (→ `/simulation`). No
+>   hand-kept id lists. Redemittel aren't linked (no `themeId`).
+> - **Step 2 — mode/level-aware review** (`src/engine/srs.ts` `reviewWeight()` + `QuickRevision`): the
+>   Schnellwiederholung deck is now **weighted** by the Mode lens (work/personal theme `context`), card
+>   weakness (low mastery), and the learner's **weakest CEFR band**. Weighted, not walled: every due card
+>   can still appear, but relevant + weaker cards are far likelier. `reviewWeight` is pure/data-agnostic.
+> - **Step 3 — writing-coach deep-links** (`practiceRoute()` in `practiceAreas.ts`): the writing coach's
+>   "Üben" button now lands on a **filtered** drill set, folding the prompt's `theme` into theme-aware
+>   destinations (`/vocabulary`/`/collocations`/`/quiz`) and opening formal Redemittel for the register
+>   weakness.
 
 **Executive summary:** Turn four parallel banks into one connected graph and let the
 SRS/writing-coach compose sessions as facet queries. This is the AI/personalization payoff;

@@ -56,6 +56,24 @@ export function masteryLabel(score: number): "new" | "learning" | "review" | "ma
 }
 
 /**
+ * Priority weight for the adaptive review queue (Taxonomy Phase 4): higher =
+ * surface sooner. Weaker cards rank above stronger ones, and cards relevant to
+ * the active Mode lens (or a weak CEFR band) get a boost. Kept pure and
+ * data-agnostic (no content imports) so the engine stays decoupled — callers
+ * pass the already-computed flags.
+ */
+export function reviewWeight(
+  card: SrsCard | undefined,
+  opts: { modeMatch?: boolean; levelMatch?: boolean; jitter?: number } = {},
+): number {
+  let w = 1 - mastery(card); // 0 (mastered) → 1 (never studied)
+  if (opts.modeMatch) w += 1; // relevant to the chosen work/personal lens
+  if (opts.levelMatch) w += 0.5; // sits in a CEFR band the learner is weak at
+  w += opts.jitter ?? 0; // tie-break + session-to-session variety
+  return w;
+}
+
+/**
  * Review backlog: how many *started* cards in the SRS store are due today.
  * Never-studied words aren't in the store, so they're intentionally excluded
  * here — this is the "to review" count, not the "new to learn" queue (which is
