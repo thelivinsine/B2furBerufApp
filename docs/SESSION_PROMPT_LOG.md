@@ -1089,3 +1089,137 @@ Provide a detailed report in the format of a professional slide deck. [Slide 1 E
   work into backlog #5 (domain/sector filtering, now scoped), and appended Entries 54–64 to this prompt
   log.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+---
+
+## Session 42 — 2026-06-27 — Taxonomy redesign Phases 0–2 implemented & shipped
+Branch: `claude/taxonomy-redesign-qp2euj`. First build session on the approved
+`docs/TAXONOMY_IMPLEMENTATION_PLAN.md`. (Entries 65–66 were given before a context compaction and are
+backfilled from the session summary so the trail is complete.)
+
+## Entry 65 — 2026-06-27 (start implementing the taxonomy plan)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > can you start implementing the taxonomy redesign plan by referring relevant documentation?
+- **Response summary:** Began Phase 0 + Phase 1 (the plan's recommended first milestone). Phase 0: added
+  the faceted types (`DomainId`, `LearningMode`, `ContextTag`, `ContentCefr`, `Frequency`, `WorkSector`,
+  `Counterpart`, `WorkSituation`, `TaskType`) and optional facet fields to `src/types/index.ts`, the
+  `src/data/domains.ts` registry (6 domains), `domain`/`context` on all 11 themes, `mode` in
+  `useSettingsStore`, and matching linter mirror-arrays/validations. Phase 1: tagged all 515 vocab + 396
+  collocations with `cefr`, added the onboarding Mode step, the header `ModeSwitcher`, the CEFR Level
+  filter in `VocabularyTrainer` (`filterVocab`), and the quiz CEFR relabel. Committed on the branch.
+- **Artifacts:** `src/types/index.ts`, `src/data/domains.ts`, `src/data/themes.ts`,
+  `src/store/useSettingsStore.ts`, `scripts/lint-content.mjs`, `src/data/vocabulary.ts`,
+  `src/data/collocations.ts`, `src/features/onboarding/Onboarding.tsx`,
+  `src/components/layout/ModeSwitcher.tsx` (new), `src/components/layout/AppShell.tsx`,
+  `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/quiz/*`, `src/engine/quiz.ts`; later
+  shipped via PR #233.
+
+## Entry 66 — 2026-06-27 (also read CLAUDE.md for context)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > read relevant sections of claude.md as well for context
+- **Response summary:** Read the content-conventions, writing-style (no em dashes) and workflow sections
+  of `CLAUDE.md` and applied them to the Phase 0/1 work (linter mirror-array pattern, em-dash-free copy,
+  auto-ship workflow). No separate artifact; informed Entry 65's implementation.
+- **Artifacts:** none (context only).
+
+## Entry 67 — 2026-06-27 (is it live?)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > is it live?
+- **Response summary:** Explained that feature-branch work does not deploy until merged to `main`, then
+  opened **PR #233** (Phase 0+1) and squash-merged it so the Pages deploy runs. Ran the post-merge
+  realignment (reset branch to `origin/main`, force-with-lease).
+- **Artifacts:** PR #233 (merge SHA `ebacbbd`).
+
+## Entry 68 — 2026-06-27 (what changes should I see?)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > what changes am I supposed to see in the app
+- **Response summary:** Listed the visible changes: the onboarding Mode step, the header Mode pill, the
+  CEFR Level dropdown in the Vokabeltrainer, and the CEFR labels on the quiz level cards. Noted the
+  taxonomy foundations are under the hood.
+- **Artifacts:** none (answer only).
+
+## Entry 69 — 2026-06-27 (I don't see the changes)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > I don't see any of these changes
+- **Response summary:** Checked the GitHub Actions runs for `main` and confirmed the deploy for merge
+  commit `ebacbbde` completed successfully, so the changes are live. Advised a hard refresh (PWA service
+  worker cache) and noted onboarding only shows for new users.
+- **Artifacts:** none (diagnosis only).
+
+## Entry 70 — 2026-06-27 (gap analysis of Phase 0 & 1)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > can you do a gap analysis of what's in the plan vs what's implemented for phase 0 & 1?
+- **Response summary:** Verified each plan item against the code and reported: Phase 0/1 functionally
+  complete; three minor Phase-0 misses (`ExamTheme.subThemes?` field, `SubThemeId` alias, unvalidated
+  `WorkSituation`/`TaskType`); two substantive carry-overs (CEFR tags AI-drafted not human-verified;
+  `mode` persisted but no content effect yet).
+- **Artifacts:** none (analysis only).
+
+## Entry 71 — 2026-06-27 (close the Phase-0 misses)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > yes, go ahead and give your best
+- **Response summary:** Closed the Phase-0 checklist tail: added the `SubThemeId` alias + `SubTheme`
+  interface + `ExamTheme.subThemes?`, and wired `workSituation?`/`taskType?` as real validate-when-present
+  facets (peers of `sector`/`counterpart`) with `WORK_SITUATIONS`/`TASK_TYPES` linter arrays + theme
+  `subThemes` structural checks. Typecheck/lint/build green; shipped via **PR #234**.
+- **Artifacts:** `src/types/index.ts`, `scripts/lint-content.mjs`; PR #234 (merge SHA `3c21360`).
+
+## Entry 72 — 2026-06-27 (start Phase 2)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > yes, go ahead and do your best
+- **Response summary:** Implemented Phase 2 (sub-themes). Added `subThemes` to `behoerde` (4),
+  `customer` (3) and `meetings` (3); tagged 122 vocab + 105 collocations with `subThemeId` (cross-cutting
+  items left to roll up); built the `SubThemePicker` drill-down with `?sub=` + breadcrumb in
+  `VocabularyTrainer`; added `vocabBySubTheme`/`collocationsBySubTheme` + a `sub` option on `filterVocab`;
+  and made the linter cross-validate every `subThemeId` against its theme. Shipped via **PR #235**, then
+  logged **Session 42** in `docs/PROJECT_STATUS.md` (**PR #236**). Counts reconcile to each theme total.
+- **Artifacts:** `src/data/themes.ts`, `src/data/vocabulary.ts`, `src/data/collocations.ts`,
+  `src/features/vocabulary/SubThemePicker.tsx` (new), `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `scripts/lint-content.mjs`, `docs/PROJECT_STATUS.md`; PR #235 (merge SHA `59b9e62`), PR #236
+  (merge SHA `1355ea0`).
+
+## Entry 73 — 2026-06-27 (update the documentation so far)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > update the documentation so far
+- **Response summary:** Brought the long-lived docs in line with Phases 0–2. Added a "Taxonomy layer"
+  bullet to `CLAUDE.md` (domains, sub-themes, facets, `mode`, linter validations, filter helpers), fixed
+  the stale collocations count (132 → 396) and added the facet fields to the schema notes; marked Phases
+  0/1/2 SHIPPED and Phase 3 NEXT in `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`. Shipped via **PR #237**.
+- **Artifacts:** `CLAUDE.md`, `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`; PR #237 (merge SHA `590794c`).
+
+## Entry 74 — 2026-06-27 (is the prompt log updated?)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > is prompt log also updated?
+- **Response summary:** It was not, so appended the **Session 42** block (Entries 65–74) to this log,
+  covering every founder prompt of the session with its artifacts and merge SHAs, and shipped it.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`; PR #238.
