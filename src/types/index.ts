@@ -35,6 +35,9 @@ export interface Domain {
 export type LearningMode = "work" | "personal" | "both";
 export type ContextTag = "work" | "personal" | "both";
 
+/** Stable slug identifying a sub-theme within a theme (e.g. "behoerde.antrag"). */
+export type SubThemeId = string;
+
 export type ContentCefr =
   | "A2"
   | "B1.1"
@@ -75,6 +78,15 @@ export type TaskType =
   | "instruction"
   | "presentation";
 
+/** A sub-topic within a theme. Phase 2 promotes `situations[]` into these. */
+export interface SubTheme {
+  id: SubThemeId;
+  title: string;
+  titleDe: string;
+  /** Index into the parent theme's `situations[]` this sub-theme derives from. */
+  situationsIndex?: number;
+}
+
 export interface ExamTheme {
   id: ThemeId;
   title: string;
@@ -86,6 +98,7 @@ export interface ExamTheme {
   situations: string[];
   domain?: DomainId;
   context?: ContextTag;
+  subThemes?: SubTheme[];
 }
 
 export type PartOfSpeech =
@@ -112,9 +125,10 @@ export interface VocabItem {
   related: string[];
   themeId: ThemeId;
   cefr?: ContentCefr;
-  subThemeId?: string;
+  subThemeId?: SubThemeId;
   frequency?: Frequency;
   sector?: WorkSector;
+  workSituation?: WorkSituation;
 }
 
 export type RedemittelCategory =
@@ -139,6 +153,7 @@ export interface RedemittelPhrase {
   cefr?: ContentCefr;
   themeId?: ThemeId;
   counterpart?: Counterpart;
+  taskType?: TaskType;
 }
 
 /* ---------------- Dialogue / simulation engine ---------------- */
@@ -283,9 +298,10 @@ export interface Collocation {
   themeId?: ThemeId;
   example: { de: string; en: string };
   cefr?: ContentCefr;
-  subThemeId?: string;
+  subThemeId?: SubThemeId;
   frequency?: Frequency;
   sector?: WorkSector;
+  workSituation?: WorkSituation;
 }
 
 /* ---------------- Leveled quizzes ---------------- */
