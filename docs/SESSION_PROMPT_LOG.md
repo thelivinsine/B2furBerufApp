@@ -1359,4 +1359,16 @@ backfilled from the session summary so the trail is complete.)
   for the register weakness). `pnpm build` green. **The taxonomy redesign (Phases 0–4) is now fully shipped.**
 - **Artifacts:** `src/engine/srs.ts`, `src/features/revision/QuickRevision.tsx`, `src/data/practiceAreas.ts`,
   `src/features/writing/WritingHub.tsx`, `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
-  `docs/SESSION_PROMPT_LOG.md`; PR #TBD.
+  `docs/SESSION_PROMPT_LOG.md`; PR #248.
+
+## Entry 83 — 2026-06-27 (pause + update documentation)
+- **Branch:** `claude/taxonomy-review-next-phase-ynw1lt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > pause here. update documentation
+- **Response summary:** Closing-pass on the docs for session 43. Fixed the leftover `PR #TBD` placeholders
+  (Entries 79/81/82 → PRs #244/#247/#248), added a **Session 43** summary block to `docs/PROJECT_STATUS.md`
+  (taxonomy Phases 3–4 + dashboard restructure, PRs #240–#248), and confirmed `CLAUDE.md`
+  (counts/facets/UI) and `docs/TAXONOMY_IMPLEMENTATION_PLAN.md` are current. No app code changed.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.

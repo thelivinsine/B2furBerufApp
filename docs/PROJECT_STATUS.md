@@ -359,6 +359,26 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
 
+### Session 43 (2026-06-27) — Taxonomy redesign Phases 3–4 SHIPPED + dashboard restructure ✅
+Completed the taxonomy redesign. All of Phase 3 and Phase 4 are live on `main` across nine squash-merged
+PRs (#240–#248). The untagged-rolls-up invariant held throughout. Highlights (full detail in the taxonomy
+section above):
+- **Phase 3 — faceted browser, Work-mode facets, intent cards.** Mode-aware **intent cards** on the
+  dashboard (#240); **register unification** + reusable **`FacetSheet`** (live counts, greyed dead-ends)
+  wired into Kollokationen (#241); **care/Pflege sector back-fill** + first `office` tags, vocab 515→528
+  (#242); FacetSheet in the Vokabeltrainer with CEFR + Wortart + Work-only **Branche** facet (#243);
+  Redemittel **Register filter** (#245); **workSituation** tags + Work-only **Situation** facet (#246).
+  `mode` now has a real content effect (filters intent cards, gates the Work facets).
+- **Dashboard restructure (#244):** leads with the "Was möchtest du üben?" tiles; the big progress block
+  collapsed to a compact strip (full stats already live on Fortschritt).
+- **Phase 4 — cross-module linking + adaptive review.** Cross-module **"Verbunden" panel** on vocab words
+  (#247); **mode/level-aware** Schnellwiederholung deck via pure `reviewWeight()` + weakest-CEFR-band
+  detection, plus **filtered writing-coach deep-links** via `practiceRoute()` (#248).
+- **Deliberate non-actions (documented):** `counterpart` left 0-tagged and Redemittel left without a
+  `themeId` (both are general-purpose, so tags would be low-signal). `cefr` tags remain AI-draft pending
+  human verification.
+- `pnpm lint:content` + `pnpm build` green on every PR; branch realigned to `main` after each squash-merge.
+
 ### Session 42 (2026-06-27) — Taxonomy redesign Phases 0–2 IMPLEMENTED & SHIPPED ✅
 First build session on the approved `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`. Phases 0, 1 and 2 are now
 live on `main` across three squash-merged PRs. Untagged-rolls-up invariant held throughout, so nothing
