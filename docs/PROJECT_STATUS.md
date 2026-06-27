@@ -418,11 +418,17 @@ regressed.
   Work-mode facets are functional end to end.
 - **Verification each phase:** `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green. Sandbox
   can't reach the live `*.github.io` site; founder confirms the deployed result.
-- **Resume here →** remaining Phase 3 polish: wire `FacetSheet` into **RedemittelPractice** (register +
-  category); tag **`workSituation` + `counterpart`** (still 0-tagged) and expose them as further Work
-  facets; broaden `sector` tagging beyond the curated starter set. Then **Phase 4** (cross-module
-  "Related" panel + mode/level-aware SRS review). Carry-over: `cefr` tags are AI-drafted and still need
-  human verification against Goethe/telc/DeuFöV lists.
+- **Redemittel Register filter (session 43):** the Redemittel browse view gained a `FacetSheet` **Register
+  filter** (neutral/formell/diplomatisch, present 38/29/5); categories with no matches are hidden. State
+  in `?register=`.
+- **Dashboard restructure (session 43, PR #244):** the dashboard now **leads with the "Was möchtest du
+  üben?" intent tiles**. Removed the big focal hero + four-stat status strip + level bar (all already on
+  the Fortschritt page) and replaced them with **one compact summary strip** below the tiles (streak ·
+  today XP/goal · days-to-exam · recommended action · "Fortschritt" link). Mode pill untouched.
+- **Resume here →** remaining Phase 3 polish: tag **`workSituation` + `counterpart`** (still 0-tagged) and
+  expose them as further Work facets; broaden `sector` tagging beyond the curated starter set. Then
+  **Phase 4** (cross-module "Related" panel + mode/level-aware SRS review). Carry-over: `cefr` tags are
+  AI-drafted and still need human verification against Goethe/telc/DeuFöV lists.
 
 ### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
 A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes

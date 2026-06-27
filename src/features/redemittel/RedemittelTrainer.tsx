@@ -1,11 +1,20 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Dumbbell, Library } from "lucide-react";
+import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
 import { iconByName } from "@/lib/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  FacetSheet,
+  ActiveFilterChip,
+  applyFacets,
+  type FacetDef,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { SectionHeading } from "@/components/shared/misc";
 import { RedemittelPractice } from "./RedemittelPractice";
@@ -16,8 +25,42 @@ const registerLabel: Record<string, { text: string; variant: "muted" | "default"
   diplomatic: { text: "diplomatisch", variant: "accent" },
 };
 
+const registerPresent = ["neutral", "formal", "diplomatic"].filter((r) =>
+  redemittel.some((p) => p.register === r),
+);
+const REDEMITTEL_FACETS: FacetDef<RedemittelPhrase>[] = [
+  {
+    id: "register",
+    label: "Register",
+    options: registerPresent.map((r) => ({ value: r, label: registerLabel[r].text })),
+    get: (p) => p.register,
+  },
+];
+
 export function RedemittelTrainer() {
   const [tab, setTab] = useState("browse");
+  const [params, setParams] = useSearchParams();
+
+  // Register filter for the browse view (state in ?register=).
+  const selection: FacetSelection = useMemo(() => {
+    const s: FacetSelection = {};
+    const raw = params.get("register");
+    if (raw) s.register = raw.split(",");
+    return s;
+  }, [params]);
+
+  const setSelection = (next: FacetSelection) => {
+    const p = new URLSearchParams(params);
+    const v = next.register;
+    if (v && v.length) p.set("register", v.join(","));
+    else p.delete("register");
+    setParams(p, { replace: true });
+  };
+
+  const activeChips = (selection.register ?? []).map((v) => ({
+    value: v,
+    label: registerLabel[v].text,
+  }));
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -33,10 +76,32 @@ export function RedemittelTrainer() {
           <TabsTrigger value="practice"><Dumbbell className="h-4 w-4" /> Üben</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="browse" className="space-y-8">
+        <TabsContent value="browse" className="space-y-6">
+          <div className="flex flex-wrap items-center gap-2">
+            <FacetSheet
+              items={redemittel}
+              facets={REDEMITTEL_FACETS}
+              selection={selection}
+              onChange={setSelection}
+              resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
+            />
+            {activeChips.map((chip) => (
+              <ActiveFilterChip
+                key={chip.value}
+                label={chip.label}
+                onRemove={() =>
+                  setSelection({
+                    register: (selection.register ?? []).filter((v) => v !== chip.value),
+                  })
+                }
+              />
+            ))}
+          </div>
+
           {redemittelCategories.map((cat) => {
             const Icon = iconByName(cat.icon);
-            const phrases = redemittelByCategory(cat.id);
+            const phrases = applyFacets(redemittelByCategory(cat.id), REDEMITTEL_FACETS, selection);
+            if (phrases.length === 0) return null;
             return (
               <section key={cat.id} className="space-y-3">
                 <div className="flex items-center gap-2.5">
