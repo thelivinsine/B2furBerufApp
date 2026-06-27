@@ -16,10 +16,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  FacetSheet,
+  ActiveFilterChip,
+  applyFacets,
+  type FacetDef,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
 import { cn } from "@/lib/utils";
 
 function normalise(s: string) {
   return s.toLowerCase().replace(/[äöü]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue" }[c] ?? c));
+}
+
+type CollocationItem = (typeof collocations)[number];
+
+// Facet definitions for the slide-up filter sheet. Options are derived from the
+// values actually present in the bank, so an always-empty level never appears.
+const CEFR_ORDER = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];
+const REGISTER_LABEL: Record<string, string> = {
+  neutral: "neutral",
+  formal: "formell",
+  diplomatic: "diplomatisch",
+};
+const cefrPresent = CEFR_ORDER.filter((c) => collocations.some((x) => x.cefr === c));
+const registerPresent = ["neutral", "formal", "diplomatic"].filter((r) =>
+  collocations.some((x) => x.register === r),
+);
+const COLLOCATION_FACETS: FacetDef<CollocationItem>[] = [
+  {
+    id: "cefr",
+    label: "Stufe (CEFR)",
+    hint: "Mehrfachauswahl",
+    options: cefrPresent.map((c) => ({ value: c, label: c })),
+    get: (c) => c.cefr,
+  },
+  {
+    id: "register",
+    label: "Register",
+    options: registerPresent.map((r) => ({ value: r, label: REGISTER_LABEL[r] })),
+    get: (c) => c.register,
+  },
+];
+
+/** Display label for one active facet value (used by the removable bar chips). */
+function facetValueLabel(facetId: string, value: string): string {
+  const facet = COLLOCATION_FACETS.find((f) => f.id === facetId);
+  return facet?.options.find((o) => o.value === value)?.label ?? value;
 }
 
 const pillBase =
@@ -44,9 +87,9 @@ function CollocationCard({ c }: { c: Collocation }) {
             </div>
             <p className="text-sm text-muted-foreground">{c.en}</p>
           </div>
-          {c.register === "formal" && (
+          {(c.register === "formal" || c.register === "diplomatic") && (
             <Badge variant="accent" className="shrink-0">
-              formell
+              {c.register === "diplomatic" ? "diplomatisch" : "formell"}
             </Badge>
           )}
         </div>
@@ -81,7 +124,32 @@ export function CollocationsBrowser() {
     return [...new Set(base.map((c) => c.verb))].sort();
   }, [themeParam]);
 
-  const filtered = useMemo(() => {
+  // Facet selection (CEFR / register) lives in the URL alongside ?theme=.
+  const selection: FacetSelection = useMemo(() => {
+    const s: FacetSelection = {};
+    for (const f of COLLOCATION_FACETS) {
+      const raw = params.get(f.id);
+      if (raw) s[f.id] = raw.split(",");
+    }
+    return s;
+  }, [params]);
+
+  const setSelection = (next: FacetSelection) => {
+    const p = new URLSearchParams(params);
+    for (const f of COLLOCATION_FACETS) {
+      const v = next[f.id];
+      if (v && v.length) p.set(f.id, v.join(","));
+      else p.delete(f.id);
+    }
+    setParams(p, { replace: true });
+  };
+
+  const removeFacetValue = (facetId: string, value: string) =>
+    setSelection({ ...selection, [facetId]: (selection[facetId] ?? []).filter((v) => v !== value) });
+
+  // Theme + verb + search scope; the facet sheet counts and the final list both
+  // build on this so the live counts reflect the current context.
+  const scoped = useMemo(() => {
     let list =
       themeParam === "all" ? collocations : collocations.filter((c) => c.themeId === themeParam);
     if (verbFilter !== "all") list = list.filter((c) => c.verb === verbFilter);
@@ -97,6 +165,15 @@ export function CollocationsBrowser() {
     }
     return list;
   }, [themeParam, verbFilter, search]);
+
+  const filtered = useMemo(
+    () => applyFacets(scoped, COLLOCATION_FACETS, selection),
+    [scoped, selection],
+  );
+
+  const activeChips = COLLOCATION_FACETS.flatMap((f) =>
+    (selection[f.id] ?? []).map((v) => ({ facetId: f.id, value: v })),
+  );
 
   const activeTheme = themeParam !== "all" ? themeById(themeParam) : null;
 
@@ -158,7 +235,27 @@ export function CollocationsBrowser() {
             </button>
           )}
         </div>
+
+        <FacetSheet
+          items={scoped}
+          facets={COLLOCATION_FACETS}
+          selection={selection}
+          onChange={setSelection}
+          resultLabel={(n) => `${n} Kollokation${n !== 1 ? "en" : ""} anzeigen`}
+        />
       </div>
+
+      {activeChips.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {activeChips.map(({ facetId, value }) => (
+            <ActiveFilterChip
+              key={`${facetId}:${value}`}
+              label={facetValueLabel(facetId, value)}
+              onRemove={() => removeFacetValue(facetId, value)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Verb chips */}
       <div className="flex items-center gap-1">
@@ -263,7 +360,7 @@ export function CollocationsBrowser() {
         // key forces a full remount + fade whenever the filter set changes,
         // eliminating stuck-card states from index-based animation delays.
         <motion.div
-          key={`${themeParam}__${verbFilter}`}
+          key={`${themeParam}__${verbFilter}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.15 }}

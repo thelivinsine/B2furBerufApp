@@ -1256,4 +1256,23 @@ backfilled from the session summary so the trail is complete.)
   lint:content` + `pnpm build` green. Documented the remaining Phase 3b work (shared faceted filter,
   register unification, and the Work-facet content back-fill) in the plan + status doc.
 - **Artifacts:** `src/features/dashboard/intentCards.ts` (new), `src/features/dashboard/Dashboard.tsx`,
-  `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.
+  `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #240.
+
+## Entry 77 — 2026-06-27 (continue: Phase 3b)
+- **Branch:** `claude/taxonomy-review-next-phase-ynw1lt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > yes, continue
+- **Response summary:** Shipped **Phase 3b**: register unification + the reusable faceted filter, first
+  integration. Widened `Collocation.register` to `neutral|formal|diplomatic` (linter + card badge).
+  Built **`src/features/shared/FacetSheet.tsx`**, a generic slide-up filter sheet (on `dialog.tsx`,
+  overridden to a bottom sheet) with multi-select pills showing live counts and greyed zero-yield
+  options (AND-across / OR-within; exports `matchesFacets`/`applyFacets`/`activeFacetCount`). Wired it
+  into the **CollocationsBrowser** with CEFR + Register facets (`?cefr=`/`?register=`) and removable
+  active-filter chips. Collocations had no level/register filtering before. `pnpm lint:content` +
+  `pnpm build` green. Documented remaining 3c (vocab + redemittel integration, then the Work-facet
+  back-fill).
+- **Artifacts:** `src/features/shared/FacetSheet.tsx` (new), `src/features/collocations/CollocationsBrowser.tsx`,
+  `src/types/index.ts`, `scripts/lint-content.mjs`, `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.

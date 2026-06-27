@@ -36,7 +36,7 @@ const REDEMITTEL_CATEGORIES = [
   "clarification", "opinion", "prosCons", "reactions",
 ];
 const REDEMITTEL_REGISTERS = ["neutral", "formal", "diplomatic"];
-const COLLOCATION_REGISTERS = ["neutral", "formal"];
+const COLLOCATION_REGISTERS = ["neutral", "formal", "diplomatic"];
 const GRAMMAR_GROUPS = [
   "connectors", "relativeClauses", "prepositionalPronouns", "collocations",
   "verbPosition", "konjunktiv2", "modals", "passive", "subordinate", "cases",
