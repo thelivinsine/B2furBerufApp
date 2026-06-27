@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-26 (session 41). Branch: `claude/theme-taxonomy-filtering-redesign-7q0gco`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-27 (session 42). Branch: `claude/taxonomy-redesign-qp2euj`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,41 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 42 (2026-06-27) — Taxonomy redesign Phases 0–2 IMPLEMENTED & SHIPPED ✅
+First build session on the approved `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`. Phases 0, 1 and 2 are now
+live on `main` across three squash-merged PRs. Untagged-rolls-up invariant held throughout, so nothing
+regressed.
+- **Phase 0 — foundations (PR #233, then completed in #234):** new faceted types in
+  `src/types/index.ts` (`DomainId`, `LearningMode`, `ContextTag`, `ContentCefr`, `Frequency`,
+  `WorkSector`, `Counterpart`, `WorkSituation`, `TaskType`, `SubThemeId`, `SubTheme`); `domains.ts`
+  registry (6 domains) + `domainById`; all 11 themes given `domain` + `context`; `mode: LearningMode`
+  (default `"both"`) added to `useSettingsStore` (rides cloudSync automatically). Optional facet fields
+  added to `ExamTheme`/`VocabItem`/`Collocation`/`RedemittelPhrase` (all optional → existing content
+  stays valid). Linter got mirror arrays + validate-when-present checks for every new enum. #234 closed
+  the Phase-0 checklist tail: `ExamTheme.subThemes?`, `SubThemeId` alias, and wired
+  `workSituation?`/`taskType?` as real validated facets (peers of `sector`/`counterpart`).
+- **Phase 1 — levels + Mode picker (PR #233):** all **515 vocab + 396 collocations tagged with `cefr`**
+  (AI-drafted; **human-verify still pending** via provenance `draft→verified`). Onboarding gained a
+  **Mode step** (Beruf/Alltag/Beides, 4→5 steps). New **`ModeSwitcher`** pill in the app header
+  (persists `mode`; currently a saved setting with no content effect yet — re-weighting is Phase 3).
+  **CEFR Level filter** added to `VocabularyTrainer` (`?cefr=`, shareable). Quiz `Difficulty 1|2|3`
+  relabelled to CEFR bands (B1 / B2.1 / B2.2·C1) in `QuizHub`/`QuizRunner` (numeric kept internally for
+  question-type selection).
+- **Phase 2 — sub-themes (PR #235, SHA `59b9e62`):** `behoerde` (4), `customer` (3) and `meetings` (3)
+  split into sub-topics derived from their `situations[]`. **122 vocab + 105 collocations tagged with
+  `subThemeId`**; cross-cutting items (soft-skill adjectives, connectors, generic "Behörde") left
+  untagged on purpose. New **`SubThemePicker`** drill-down (per-sub count + CEFR span, plus a dashed
+  "Gesamtes Thema" escape hatch that includes untagged items). `VocabularyTrainer` gained `?sub=` +
+  breadcrumb + sub-aware filtering/counts; helpers `vocabBySubTheme`/`collocationsBySubTheme` and a `sub`
+  option on `filterVocab`. Linter now cross-validates every `subThemeId` is declared on its theme. Counts
+  reconcile: behoerde 24+1, customer 45+5, meetings 53+1.
+- **Verification each phase:** `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green. Sandbox
+  can't reach the live `*.github.io` site; founder confirms the deployed result.
+- **Resume here →** Phase 3 (faceted filter sheet + Work-mode facets exposed only in Work mode + goal
+  cards) is the next build step. Two known carry-overs: (1) the `cefr` tags are AI-drafted and need human
+  verification against Goethe/telc/DeuFöV lists; (2) `mode` is persisted but has **no content effect**
+  until Phase 3 wires re-weighting. Optionally extend sub-themes to more themes (only 3 of 11 done).
 
 ### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
 A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes
