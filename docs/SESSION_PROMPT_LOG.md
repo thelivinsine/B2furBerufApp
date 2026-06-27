@@ -28,8 +28,10 @@ There used to be a `UserPromptSubmit` hook (`.claude/hooks/log-prompt.sh`) that 
 line per prompt to **`docs/prompt-log-raw.jsonl`**. The founder asked for it to be removed on
 2026-06-25, so the hook and its script are gone and `.claude/settings.json` no longer wires it. The
 existing `docs/prompt-log-raw.jsonl` is kept as a historical record but is no longer appended to.
-This curated Markdown file remains the prompt log, and entries are now added **manually only when the
-founder asks**.
+This curated Markdown file remains the prompt log, and entries are now added **manually**. The founder
+directed (s42) that **any "update the documentation"-type request implies updating this log too**, even
+when the prompt log is not named explicitly. So whenever you update `docs/PROJECT_STATUS.md` for a
+session, append that session's prompts here as well and ship them together.
 
 ### Entry template
 ```
@@ -1223,3 +1225,15 @@ backfilled from the session summary so the trail is complete.)
 - **Response summary:** It was not, so appended the **Session 42** block (Entries 65–74) to this log,
   covering every founder prompt of the session with its artifacts and merge SHAs, and shipped it.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`; PR #238.
+
+## Entry 75 — 2026-06-27 (standing rule: docs updates include the prompt log)
+- **Branch:** `claude/taxonomy-redesign-qp2euj`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > you should update prompt log as well when I say update documentation along with others. I may not be too explicit about it.
+- **Response summary:** Encoded the standing preference so future sessions honour it without being told
+  explicitly: amended the **Documentation** and **Prompt & session log** rules in `CLAUDE.md` to state
+  that any "update the documentation"-type request implies updating `docs/SESSION_PROMPT_LOG.md` too (plus
+  any stale plan/CLAUDE.md docs), and mirrored the rule in this log's "How this log is maintained" header.
+- **Artifacts:** `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`; PR #239.
