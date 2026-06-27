@@ -6,14 +6,15 @@
 > live in `preview/taxonomy/`.
 >
 > **Status (updated 2026-06-27, session 43):** Phases **0, 1 and 2 are SHIPPED** to `main`
-> (PRs #233, #234, #235). **Phase 3 is in progress, split into sub-milestones.** Step 4
-> (mode-aware intent/goal cards) shipped in session 43: the dashboard now opens with a row of
-> "start from a real situation" cards filtered by the learner's Mode, so **`mode` finally has a
-> visible content effect**. Still open in Phase 3: the shared faceted filter (step 1), the
+> (PRs #233, #234, #235). **Phase 3 is in progress, split into sub-milestones 3a/3b/3c.**
+> **3a** (mode-aware intent/goal cards) and **3b** (register unification + the reusable faceted
+> filter, wired into the CollocationsBrowser) both shipped in session 43, so **`mode` now has a
+> visible content effect** and the first surface has a live-count/greyed-dead-end filter sheet.
+> Still open (**3c**): wire the faceted filter into the vocab + redemittel browsers, then the
 > Work-mode facets (step 2, blocked on a `sector`/`workSituation`/`counterpart` content back-fill,
-> all currently 0-tagged), and register unification (step 3). Carry-over: the `cefr` tags are
-> AI-drafted and still need human verification (provenance `draft→verified`). Sub-themes (Phase 2)
-> currently cover 3 of 11 themes (`behoerde`, `customer`, `meetings`).
+> all currently 0-tagged). Carry-over: the `cefr` tags are AI-drafted and still need human
+> verification (provenance `draft→verified`). Sub-themes (Phase 2) currently cover 3 of 11 themes
+> (`behoerde`, `customer`, `meetings`).
 
 ## Context
 
@@ -185,8 +186,22 @@ as before; counts add up to the theme total; lint + build green.
 > dashboard (`src/features/dashboard/intentCards.ts` + `Dashboard.tsx`). Cards carry a pre-built
 > filter bundle and deep-link into the matching browser view; `intentCardsForMode(mode)` filters
 > them by the active lens (a `both` card or `both` mode always shows, so the screen never empties).
-> Live word counts + CEFR ranges are computed from `filterVocab`. **Remaining (3b):** steps 1–3
-> below. Step 2 is gated on a content back-fill (sector/situation/counterpart are 0-tagged today).
+> Live word counts + CEFR ranges are computed from `filterVocab`.
+>
+> **Sub-milestone 3b SHIPPED (session 43):** step 3 (register unification) + the reusable faceted
+> filter (step 1), first integration. `Collocation.register` widened to `neutral|formal|diplomatic`
+> (linter `COLLOCATION_REGISTERS` updated, card badge handles `diplomatisch`). New shared
+> **`src/features/shared/FacetSheet.tsx`**: a "Filter" chip opens a slide-up sheet (reusing
+> `dialog.tsx`, overridden to a bottom sheet) with multi-select option pills that show **live counts**
+> and **grey out zero-yield values** (AND-across / OR-within; `matchesFacets`/`applyFacets` exported).
+> Wired into the **CollocationsBrowser** (CEFR + Register facets, state in `?cefr=`/`?register=`, with
+> removable active-filter chips in the bar). The component is generic over the item type, so the vocab
+> and redemittel browsers can adopt it next.
+>
+> **Remaining (3c):** wire `FacetSheet` into `VocabularyTrainer` (CEFR + part-of-speech, alongside the
+> existing theme/sub drill-down) and `RedemittelPractice` (register + category); then step 2, the
+> **Work-mode facets** (sector/situation/counterpart), which is gated on a content back-fill (those
+> facets are 0-tagged today, so a sector pass for `care`/`office` must land first).
 
 **Executive summary:** Ship the real multi-facet experience: a filter bar with a **slide-up
 filter sheet** (live counts, greyed dead-ends, never an empty screen), the **Work-mode

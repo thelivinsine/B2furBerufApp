@@ -394,11 +394,19 @@ regressed.
   `intentCardsForMode(mode)` filters by the active lens (a `both` card or `both` mode always shows, so
   the screen never empties); word counts + CEFR ranges are computed live from `filterVocab`. **This is
   the first place `mode` actually changes what the learner sees.**
+- **Phase 3b — register unification + faceted filter (session 43):** `Collocation.register` widened to
+  `neutral|formal|diplomatic` (linter `COLLOCATION_REGISTERS` + card badge updated). New reusable
+  **`src/features/shared/FacetSheet.tsx`**: a "Filter" chip opens a slide-up sheet (reusing `dialog.tsx`,
+  overridden to a bottom sheet) whose multi-select option pills show **live counts** and **grey out
+  zero-yield values**, so you can't tap into an empty screen (AND-across-facets / OR-within-facet;
+  `matchesFacets`/`applyFacets`/`activeFacetCount` exported). Generic over item type. **Wired into the
+  CollocationsBrowser first** (CEFR + Register facets, state in `?cefr=`/`?register=`, removable
+  active-filter chips in the bar). Collocations had no level/register filtering before, so this is pure
+  new capability and the lowest-risk proving ground.
 - **Verification each phase:** `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green. Sandbox
   can't reach the live `*.github.io` site; founder confirms the deployed result.
-- **Resume here →** Phase 3b: the **shared faceted filter** (chip bar + slide-up sheet reusing
-  `dialog.tsx`, live counts, greyed dead-ends) across the vocab/collocations browsers (step 1),
-  **register unification** (widen `Collocation.register` to add `diplomatic` + linter, step 3), and the
+- **Resume here →** Phase 3c: adopt `FacetSheet` in the **VocabularyTrainer** (CEFR + part-of-speech,
+  alongside the existing theme/sub drill-down) and **RedemittelPractice** (register + category); then the
   **Work-mode facets** (sector/workSituation/counterpart, step 2). Step 2 is **blocked on a content
   back-fill**: those facets are 0-tagged today, so a sector/situation pass (start with `care`/`office`)
   must land first or the facets would render empty. Carry-over: `cefr` tags are AI-drafted and still need
