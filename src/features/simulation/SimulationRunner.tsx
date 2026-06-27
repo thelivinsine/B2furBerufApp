@@ -134,7 +134,7 @@ export function SimulationRunner({
         <Card className="border-primary/30 shadow-glow">
           <CardContent className="space-y-4 p-6">
             <div className="flex items-center gap-2">
-              <div className="rounded-lg bg-primary/12 p-2 text-primary"><Info className="h-5 w-5" /></div>
+              <div className="rounded-lg bg-primary/10 p-2 text-primary"><Info className="h-5 w-5" /></div>
               <p className="font-semibold">{scenario.title}</p>
             </div>
             <div className="space-y-1">
@@ -219,14 +219,14 @@ export function SimulationRunner({
             {state.transcript.map((t, i) => (
               <div key={i} className={cn("flex gap-2 text-sm", t.speaker === "candidate" ? "justify-end" : "justify-start")}>
                 {t.speaker !== "candidate" && (
-                  <div className="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-primary/12 flex items-center justify-center">
+                  <div className="mt-0.5 h-5 w-5 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
                     {t.speaker === "examiner" ? <Users className="h-3 w-3 text-primary" /> : <User className="h-3 w-3 text-primary" />}
                   </div>
                 )}
                 <p className={cn(
                   "max-w-xs rounded-xl px-3 py-2 text-sm leading-snug",
                   t.speaker === "candidate"
-                    ? "bg-primary/12 text-primary"
+                    ? "bg-primary/10 text-primary"
                     : t.speaker === "narrator"
                     ? "italic text-muted-foreground"
                     : "bg-muted/60"
@@ -280,7 +280,7 @@ export function SimulationRunner({
                 <div className="flex items-start gap-2.5">
                   <div className={cn(
                     "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                    node.speaker === "examiner" ? "bg-accent/12 text-accent" : "bg-primary/12 text-primary"
+                    node.speaker === "examiner" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary"
                   )}>
                     {node.speaker === "examiner" ? <Users className="h-4 w-4" /> : <User className="h-4 w-4" />}
                   </div>
@@ -303,7 +303,7 @@ export function SimulationRunner({
             <Card className="border-accent/40 bg-accent/5">
               <CardContent className="space-y-3 p-5">
                 <div className="flex items-start gap-2.5">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/12 text-accent">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
                     <Users className="h-4 w-4" />
                   </div>
                   <div>
@@ -367,7 +367,7 @@ export function SimulationRunner({
           {visibleHints.length > 0 && (
             <div className="space-y-1.5">
               {visibleHints.map((h, i) => (
-                <div key={i} className="flex items-start gap-2 rounded-lg bg-warning/8 px-3 py-2 text-sm text-warning">
+                <div key={i} className="flex items-start gap-2 rounded-lg bg-warning/10 px-3 py-2 text-sm text-warning">
                   <Lightbulb className="mt-0.5 h-4 w-4 shrink-0" />
                   {h}
                 </div>

@@ -228,7 +228,7 @@ function ConstructTask({ task, onResult }: { task: Task; onResult: (correct: boo
               setBuilt((b) => b.filter((_, idx) => idx !== i));
               setPool((p) => [...p, w]);
             }}
-            className="rounded-lg bg-primary/12 px-3 py-1.5 text-sm font-medium text-primary"
+            className="rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary"
           >
             {w}
           </button>

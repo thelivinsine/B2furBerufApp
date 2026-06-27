@@ -71,7 +71,7 @@ export function SimulationHub() {
                   >
                     <CardContent className="flex h-full flex-col gap-3 p-5">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/12 text-primary">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                           <Mic className="h-5 w-5" />
                         </div>
                         <div className="flex gap-1.5">

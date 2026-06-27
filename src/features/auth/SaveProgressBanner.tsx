@@ -26,7 +26,7 @@ export function SaveProgressBanner() {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-            className="mb-5 flex items-center gap-3 rounded-xl border border-primary/25 bg-primary/8 p-3.5 sm:p-4"
+            className="mb-5 flex items-center gap-3 rounded-xl border border-primary/25 bg-primary/10 p-3.5 sm:p-4"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
               <CloudUpload className="h-5 w-5" />

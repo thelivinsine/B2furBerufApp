@@ -68,7 +68,7 @@ function facetValueLabel(facetId: string, value: string): string {
 const pillBase =
   "shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors border";
 const pillIdle =
-  "bg-white text-foreground border-border/60 hover:border-primary/40 hover:text-primary dark:bg-white/8 dark:border-white/15 dark:hover:border-primary/50";
+  "bg-white text-foreground border-border/60 hover:border-primary/40 hover:text-primary dark:bg-white/10 dark:border-white/15 dark:hover:border-primary/50";
 const pillActive = "bg-primary text-primary-foreground border-primary";
 
 type Collocation = (typeof collocations)[number];
@@ -271,7 +271,7 @@ export function CollocationsBrowser() {
         {!expanded && (
           <button
             onClick={() => scrollBy("left")}
-            className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/8 dark:border-white/15"
+            className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/10 dark:border-white/15"
             aria-label="Nach links scrollen"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
@@ -308,7 +308,7 @@ export function CollocationsBrowser() {
           {!expanded && (
             <button
               onClick={() => scrollBy("right")}
-              className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/8 dark:border-white/15"
+              className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/10 dark:border-white/15"
               aria-label="Nach rechts scrollen"
             >
               <ChevronRight className="h-3.5 w-3.5" />
@@ -316,7 +316,7 @@ export function CollocationsBrowser() {
           )}
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/8 dark:border-white/15"
+            className="shrink-0 rounded-full border border-border/60 bg-white p-1 text-muted-foreground shadow-sm hover:text-foreground dark:bg-white/10 dark:border-white/15"
             aria-label={expanded ? "Weniger anzeigen" : "Alle anzeigen"}
           >
             <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />

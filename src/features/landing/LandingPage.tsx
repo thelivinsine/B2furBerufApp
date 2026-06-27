@@ -182,7 +182,7 @@ export function LandingPage() {
               transition={{ duration: 0.4, delay: 0.05 * i }}
               className="rounded-2xl border border-border bg-surface/70 p-5 shadow-soft backdrop-blur"
             >
-              <div className="inline-flex rounded-xl bg-primary/12 p-2.5 text-primary">
+              <div className="inline-flex rounded-xl bg-primary/10 p-2.5 text-primary">
                 <f.icon className="h-5 w-5" />
               </div>
               <h3 className="mt-3 font-semibold">{f.title}</h3>

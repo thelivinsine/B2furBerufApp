@@ -133,11 +133,11 @@ export function AppShell() {
 
             <div className="flex items-center gap-1.5 sm:gap-2">
               <ModeSwitcher />
-              <div className="flex h-9 items-center gap-1.5 rounded-full bg-warning/12 px-3 text-sm font-semibold text-warning">
+              <div className="flex h-9 items-center gap-1.5 rounded-full bg-warning/10 px-3 text-sm font-semibold text-warning">
                 <Flame className={cn("h-4 w-4", streak > 0 && "fill-warning/30")} />
                 {streak}
               </div>
-              <div className="hidden h-9 items-center gap-1.5 rounded-full bg-primary/12 px-3 text-sm font-semibold text-primary sm:flex">
+              <div className="hidden h-9 items-center gap-1.5 rounded-full bg-primary/10 px-3 text-sm font-semibold text-primary sm:flex">
                 <Zap className="h-4 w-4" />
                 Lvl {level}
               </div>

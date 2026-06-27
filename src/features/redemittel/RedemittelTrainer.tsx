@@ -105,7 +105,7 @@ export function RedemittelTrainer() {
             return (
               <section key={cat.id} className="space-y-3">
                 <div className="flex items-center gap-2.5">
-                  <div className="rounded-lg bg-primary/12 p-2 text-primary">
+                  <div className="rounded-lg bg-primary/10 p-2 text-primary">
                     <Icon className="h-4 w-4" />
                   </div>
                   <div>
