@@ -429,11 +429,16 @@ regressed.
   care shift words, `instructions` for safety/hygiene, `meeting`, `customer-call`) and exposed it as a
   **2nd Work-mode facet "Situation"** in the Vokabeltrainer (next to "Branche"); both appear only in Work
   mode. `counterpart` left 0-tagged on purpose (redemittel are general-purpose → low-signal).
-- **Resume here →** **Phase 4** is the next milestone: a cross-module **"Related" panel** (query shared
-  `subThemeId`+`cefr` to pull a matching collocation / Redemittel / writing prompt / dialogue) and
-  **mode/level-aware SRS review** (weight the daily queue by `mode`/`sector`/weak `cefr` band). Optional
-  Phase 3 polish: broaden `sector`/`workSituation` tagging, extend sub-themes past 3 of 11. Carry-over:
-  `cefr` tags are AI-drafted and still need human verification against Goethe/telc/DeuFöV lists.
+- **Phase 4 step 1 — cross-module "Verbunden" panel (session 43):** `src/features/vocabulary/RelatedPanel.tsx`.
+  In the Vokabeltrainer **Übersicht** list, each word now expands ("Verbunden") to show matching content
+  from the other banks via the shared `themeId`/`subThemeId` join key: a **Kollokation** (same sub-theme
+  if available → `/collocations?theme=`), the theme's **Schreibtraining** prompt (→ `/writing?theme=`),
+  and a **Dialog** (→ `/simulation`). No hand-kept id lists. Redemittel aren't linked (no `themeId`).
+- **Resume here →** **Phase 4 step 2 — mode/level-aware SRS review** (`src/engine/srs.ts`): weight the
+  daily review queue by `mode`/`sector`/weak `cefr` band + `WeaknessCategory`. Then step 3 (writing-coach
+  deep-links to filtered drill sets). Optional Phase 3 polish: broaden `sector`/`workSituation` tagging,
+  extend sub-themes past 3 of 11. Carry-over: `cefr` tags are AI-drafted and still need human
+  verification against Goethe/telc/DeuFöV lists.
 
 ### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
 A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes

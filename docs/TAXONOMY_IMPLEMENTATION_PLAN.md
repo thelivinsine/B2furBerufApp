@@ -244,7 +244,15 @@ build green.
 
 ---
 
-## Phase 4 — Cross-module linking + adaptive review ⏳ PLANNED
+## Phase 4 — Cross-module linking + adaptive review ⏳ IN PROGRESS
+
+> **Step 1 SHIPPED (session 43):** the cross-module **"Verbunden" panel**
+> (`src/features/vocabulary/RelatedPanel.tsx`). In the Vokabeltrainer **Übersicht** list, each word
+> expands to show matching content from the other banks via the shared `themeId`/`subThemeId` join key:
+> a **Kollokation** (same sub-theme if available, else theme → `/collocations?theme=`), the theme's
+> **Schreibtraining** prompt (→ `/writing?theme=`), and a **Dialog** (→ `/simulation`). No hand-kept id
+> lists. Redemittel are not linked (they carry no `themeId`). **Remaining:** mode/level-aware SRS review
+> (step 2) and writing-coach deep-links (step 3).
 
 **Executive summary:** Turn four parallel banks into one connected graph and let the
 SRS/writing-coach compose sessions as facet queries. This is the AI/personalization payoff;
