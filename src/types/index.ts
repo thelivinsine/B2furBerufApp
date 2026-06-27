@@ -15,6 +15,66 @@ export type ThemeId =
   | "travel"
   | "behoerde";
 
+/* ---------------- Taxonomy: domains, modes, facets ---------------- */
+
+export type DomainId =
+  | "beruf"
+  | "arbeitswelt"
+  | "alltag"
+  | "gesundheit"
+  | "bildung"
+  | "pruefung";
+
+export interface Domain {
+  id: DomainId;
+  title: string;
+  titleDe: string;
+  context: ContextTag;
+}
+
+export type LearningMode = "work" | "personal" | "both";
+export type ContextTag = "work" | "personal" | "both";
+
+export type ContentCefr =
+  | "A2"
+  | "B1.1"
+  | "B1.2"
+  | "B2.1"
+  | "B2.2"
+  | "C1";
+
+export type Frequency = "core" | "common" | "specialized";
+
+export type WorkSector =
+  | "care"
+  | "office"
+  | "trades"
+  | "it"
+  | "retail"
+  | "hospitality";
+
+export type Counterpart =
+  | "manager"
+  | "colleague"
+  | "customer"
+  | "team";
+
+export type WorkSituation =
+  | "meeting"
+  | "shift-handover"
+  | "customer-call"
+  | "instructions"
+  | "onboarding"
+  | "sick-leave"
+  | "review";
+
+export type TaskType =
+  | "email"
+  | "phone-call"
+  | "report"
+  | "instruction"
+  | "presentation";
+
 export interface ExamTheme {
   id: ThemeId;
   title: string;
@@ -24,6 +84,8 @@ export interface ExamTheme {
   accent: string; // tailwind gradient classes
   /** Representative real-world situations a candidate might face. */
   situations: string[];
+  domain?: DomainId;
+  context?: ContextTag;
 }
 
 export type PartOfSpeech =
@@ -49,6 +111,10 @@ export interface VocabItem {
   context: string;
   related: string[];
   themeId: ThemeId;
+  cefr?: ContentCefr;
+  subThemeId?: string;
+  frequency?: Frequency;
+  sector?: WorkSector;
 }
 
 export type RedemittelCategory =
@@ -70,6 +136,9 @@ export interface RedemittelPhrase {
   register: "neutral" | "formal" | "diplomatic";
   note?: string;
   example: { de: string; en: string };
+  cefr?: ContentCefr;
+  themeId?: ThemeId;
+  counterpart?: Counterpart;
 }
 
 /* ---------------- Dialogue / simulation engine ---------------- */
@@ -213,6 +282,10 @@ export interface Collocation {
   register?: "neutral" | "formal";
   themeId?: ThemeId;
   example: { de: string; en: string };
+  cefr?: ContentCefr;
+  subThemeId?: string;
+  frequency?: Frequency;
+  sector?: WorkSector;
 }
 
 /* ---------------- Leveled quizzes ---------------- */
