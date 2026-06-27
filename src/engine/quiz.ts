@@ -1,4 +1,5 @@
 import type {
+  ContentCefr,
   Difficulty,
   QuizQuestion,
   MCQQuestion,
@@ -28,6 +29,12 @@ import { XP } from "@/engine/scoring";
 export function quizXp(difficulty: Difficulty): number {
   return difficulty === 1 ? XP.quizEasy : difficulty === 2 ? XP.quizMedium : XP.quizHard;
 }
+
+const DIFFICULTY_CEFR: Record<Difficulty, ContentCefr> = { 1: "B1.2", 2: "B2.1", 3: "B2.2" };
+const DIFFICULTY_LABEL: Record<Difficulty, string> = { 1: "B1", 2: "B2.1", 3: "B2.2 / C1" };
+
+export function difficultyCefr(d: Difficulty): ContentCefr { return DIFFICULTY_CEFR[d]; }
+export function difficultyLabel(d: Difficulty): string { return DIFFICULTY_LABEL[d]; }
 
 let seq = 0;
 const qid = (kind: string) => `q_${kind}_${Date.now().toString(36)}_${seq++}`;

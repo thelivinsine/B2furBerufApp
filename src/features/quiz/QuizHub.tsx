@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { QuizRunner } from "./QuizRunner";
 
-const levels: { value: Difficulty; labelDe: string; desc: string; accent: string }[] = [
-  { value: 1, labelDe: "Leicht", desc: "Erkennen: Übersetzung, Artikel, Zuordnung", accent: "bg-success/15 text-success" },
-  { value: 2, labelDe: "Mittel", desc: "Anwenden: Plural, Lücken, Nomen-Verb, Konnektoren", accent: "bg-warning/15 text-warning" },
-  { value: 3, labelDe: "Schwer", desc: "Können: Satzbau, Relativpronomen, da-/wo-Wörter", accent: "bg-danger/15 text-danger" },
+const levels: { value: Difficulty; labelDe: string; cefr: string; desc: string; accent: string }[] = [
+  { value: 1, labelDe: "Erkennen", cefr: "B1", desc: "Übersetzung, Artikel, Zuordnung", accent: "bg-success/15 text-success" },
+  { value: 2, labelDe: "Anwenden", cefr: "B2.1", desc: "Plural, Lücken, Nomen-Verb, Konnektoren", accent: "bg-warning/15 text-warning" },
+  { value: 3, labelDe: "Können", cefr: "B2.2 / C1", desc: "Satzbau, Relativpronomen, da-/wo-Wörter", accent: "bg-danger/15 text-danger" },
 ];
 
 function isThemeId(v: string | null): v is ThemeId {
@@ -109,7 +109,10 @@ export function QuizHub() {
             >
               <Card className="card-hover h-full">
                 <CardContent className="space-y-2 p-5">
-                  <Badge className={l.accent}>{l.labelDe}</Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge className={l.accent}>{l.cefr}</Badge>
+                    <span className="text-sm font-medium">{l.labelDe}</span>
+                  </div>
                   <p className="text-sm text-muted-foreground">{l.desc}</p>
                 </CardContent>
               </Card>
