@@ -403,13 +403,25 @@ regressed.
   CollocationsBrowser first** (CEFR + Register facets, state in `?cefr=`/`?register=`, removable
   active-filter chips in the bar). Collocations had no level/register filtering before, so this is pure
   new capability and the lowest-risk proving ground.
+- **Sector back-fill (session 43, PR #242):** authored a **13-word care/Pflege pack** (`die Schicht`,
+  `die Übergabe`, `die Hygiene`, `der Angehörige`, `die Fallbesprechung`, `die Pflegedokumentation`, …)
+  spread across existing themes (scheduling/safety/customer/conflict/meetings/technology) so the
+  orthogonal `sector` facet genuinely cuts across topics, plus a curated set of `office` tags
+  (Besprechung/Protokoll/Sitzung/Beschluss/Frist/Deadline/…). Vocab 515→528; matching provenance rows.
+  This unblocked the Work-mode facets. Honest first pass, not exhaustive (sector rolls up).
+- **Phase 3c — vocab faceted filter + Work-mode sector facet (session 43):** `FacetSheet` wired into the
+  **VocabularyTrainer**, replacing the old standalone CEFR `Select`. Facets: **CEFR + Wortart** always,
+  plus the **`sector` ("Branche") facet shown only when the Mode lens is `work`** (`facets` is derived
+  from `learningMode`). State in `?cefr=`/`?pos=`/`?sector=` (multi-select), removable active-filter
+  chips in the bar. The theme `Select` + sub-theme drill-down are untouched; facets apply on top of the
+  theme/sub scope. So **switching to Work mode now reveals the Pflege/Büro sector filter** — the
+  Work-mode facets are functional end to end.
 - **Verification each phase:** `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green. Sandbox
   can't reach the live `*.github.io` site; founder confirms the deployed result.
-- **Resume here →** Phase 3c: adopt `FacetSheet` in the **VocabularyTrainer** (CEFR + part-of-speech,
-  alongside the existing theme/sub drill-down) and **RedemittelPractice** (register + category); then the
-  **Work-mode facets** (sector/workSituation/counterpart, step 2). Step 2 is **blocked on a content
-  back-fill**: those facets are 0-tagged today, so a sector/situation pass (start with `care`/`office`)
-  must land first or the facets would render empty. Carry-over: `cefr` tags are AI-drafted and still need
+- **Resume here →** remaining Phase 3 polish: wire `FacetSheet` into **RedemittelPractice** (register +
+  category); tag **`workSituation` + `counterpart`** (still 0-tagged) and expose them as further Work
+  facets; broaden `sector` tagging beyond the curated starter set. Then **Phase 4** (cross-module
+  "Related" panel + mode/level-aware SRS review). Carry-over: `cefr` tags are AI-drafted and still need
   human verification against Goethe/telc/DeuFöV lists.
 
 ### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)

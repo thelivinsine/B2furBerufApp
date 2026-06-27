@@ -1275,4 +1275,23 @@ backfilled from the session summary so the trail is complete.)
   back-fill).
 - **Artifacts:** `src/features/shared/FacetSheet.tsx` (new), `src/features/collocations/CollocationsBrowser.tsx`,
   `src/types/index.ts`, `scripts/lint-content.mjs`, `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`,
-  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #241.
+
+## Entry 78 — 2026-06-27 (sector back-fill, then continue)
+- **Branch:** `claude/taxonomy-review-next-phase-ynw1lt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > start with sector back-fill and then continue with the plan
+- **Response summary:** Flagged that the `sector` facet had no taggable content (existing vocab is
+  generic office German) and asked how to populate it; founder chose **author a real Pflege pack**. Then
+  (1) **sector back-fill (PR #242):** authored a 13-word care/Pflege vocab pack spread across existing
+  themes so `sector` cuts across topics, tagged a curated set of `office` words, added 13 provenance
+  rows (vocab 515→528); (2) **Phase 3c:** wired the `FacetSheet` into the VocabularyTrainer with CEFR +
+  Wortart facets and the Work-mode **`sector` ("Branche") facet shown only when `mode === "work"`** (state
+  in `?cefr=`/`?pos=`/`?sector=`, removable chips). So the Work-mode facets are now functional end to end.
+  `pnpm lint:content` + `pnpm build` green throughout. Updated CLAUDE.md content counts + the plan/status
+  docs; documented the remaining polish (redemittel faceting, workSituation/counterpart tagging).
+- **Artifacts:** `src/data/vocabulary.ts`, `src/data/provenance.ts`, `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `CLAUDE.md`, `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`;
+  PRs #242 (back-fill) + #TBD (3c).
