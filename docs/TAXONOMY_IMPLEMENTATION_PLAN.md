@@ -14,10 +14,14 @@
 > facets are now functional end to end. The **redemittel** browse view also gained a **Register filter**
 > (FacetSheet: neutral/formell/diplomatisch; empty categories hidden). The **dashboard** was reworked to
 > lead with the intent tiles and slim the progress block down to a compact strip (detail lives on
-> Fortschritt). **Still open:** tag `workSituation`/`counterpart` (still 0-tagged) and expose them as
-> further Work facets, and broaden the `sector` tagging beyond the curated starter set.
+> Fortschritt). **`workSituation`** is now tagged on a cross-cutting set (shift-handover / instructions /
+> meeting / customer-call) and exposed as a 2nd Work-mode facet ("Situation") in the Vokabeltrainer next
+> to "Branche". **Still open:** `counterpart` is intentionally left 0-tagged (redemittel are
+> general-purpose, so counterpart tags would be low-signal; author counterpart-specific phrase variants
+> if wanted), and `sector`/`workSituation` tagging can be broadened beyond the starter set.
 > Carry-over: the `cefr` tags are AI-drafted and still need human verification (provenance
 > `draft→verified`). Sub-themes (Phase 2) cover 3 of 11 themes (`behoerde`, `customer`, `meetings`).
+> **Next milestone: Phase 4** (cross-module "Related" panel + mode/level-aware SRS review).
 
 ## Context
 
