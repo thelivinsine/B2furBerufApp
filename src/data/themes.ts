@@ -16,6 +16,11 @@ export const themes: ExamTheme[] = [
       "Einen Vorschlag im Meeting einbringen",
       "Protokollpunkte abstimmen",
     ],
+    subThemes: [
+      { id: "meetings.ablauf", title: "Running & moderating", titleDe: "Ablauf & Moderation", situationsIndex: 0 },
+      { id: "meetings.beitrag", title: "Contributions & speaking", titleDe: "Beiträge & Wortmeldungen", situationsIndex: 2 },
+      { id: "meetings.entscheidung", title: "Voting & decisions", titleDe: "Abstimmung & Beschlüsse", situationsIndex: 3 },
+    ],
   },
   {
     id: "scheduling",
@@ -63,6 +68,11 @@ export const themes: ExamTheme[] = [
       "Einen Kunden beraten",
       "Eine Beschwerde entgegennehmen",
       "Eine Lösung für den Kunden finden",
+    ],
+    subThemes: [
+      { id: "customer.beratung", title: "Advice & enquiries", titleDe: "Beratung & Anfragen", situationsIndex: 1 },
+      { id: "customer.reklamation", title: "Complaints & claims", titleDe: "Reklamation & Beschwerden", situationsIndex: 0 },
+      { id: "customer.service", title: "Service & solutions", titleDe: "Service & Lösungen", situationsIndex: 3 },
     ],
   },
   {
@@ -175,6 +185,12 @@ export const themes: ExamTheme[] = [
       "Einen Termin bei der Ausländerbehörde wahrnehmen",
       "Einen Antrag stellen und Unterlagen einreichen",
       "Auf einen Bescheid reagieren",
+    ],
+    subThemes: [
+      { id: "behoerde.meldewesen", title: "Registration & residence", titleDe: "Anmeldung & Meldewesen", situationsIndex: 0 },
+      { id: "behoerde.aufenthalt", title: "Immigration & residence", titleDe: "Ausländerbehörde & Aufenthalt", situationsIndex: 1 },
+      { id: "behoerde.antrag", title: "Applications & documents", titleDe: "Anträge & Unterlagen", situationsIndex: 2 },
+      { id: "behoerde.bescheid", title: "Decisions & processing", titleDe: "Bescheide & Bearbeitung", situationsIndex: 3 },
     ],
   },
 ];

@@ -158,7 +158,22 @@ function lintDomains(domains) {
   for (const id of DOMAIN_IDS) if (!present.has(id)) error(ds, id, "domain missing from registry");
 }
 
-function lintVocabulary(vocab) {
+/** Build themeId -> Set(subThemeId) from the theme registry. */
+function buildSubThemeIndex(themes) {
+  const idx = new Map();
+  for (const t of themes) idx.set(t.id, new Set((t.subThemes ?? []).map((s) => s.id)));
+  return idx;
+}
+
+/** Validate an item's optional subThemeId against its theme's declared sub-themes. */
+function checkSubTheme(item, themeId, subThemeIndex, ds, w) {
+  if (item.subThemeId === undefined) return;
+  const declared = subThemeIndex.get(themeId);
+  if (!declared || !declared.has(item.subThemeId))
+    error(ds, w, `subThemeId "${item.subThemeId}" not declared on theme "${themeId}"`);
+}
+
+function lintVocabulary(vocab, subThemeIndex) {
   const ds = "vocabulary";
   checkDuplicateIds(vocab, ds);
   for (const v of vocab) {
@@ -182,10 +197,11 @@ function lintVocabulary(vocab) {
       error(ds, w, `invalid sector "${v.sector}"`);
     if (v.workSituation !== undefined && !WORK_SITUATIONS.includes(v.workSituation))
       error(ds, w, `invalid workSituation "${v.workSituation}"`);
+    checkSubTheme(v, v.themeId, subThemeIndex, ds, w);
   }
 }
 
-function lintCollocations(collocations) {
+function lintCollocations(collocations, subThemeIndex) {
   const ds = "collocations";
   checkDuplicateIds(collocations, ds);
   for (const c of collocations) {
@@ -205,6 +221,7 @@ function lintCollocations(collocations) {
       error(ds, w, `invalid sector "${c.sector}"`);
     if (c.workSituation !== undefined && !WORK_SITUATIONS.includes(c.workSituation))
       error(ds, w, `invalid workSituation "${c.workSituation}"`);
+    if (c.themeId !== undefined) checkSubTheme(c, c.themeId, subThemeIndex, ds, w);
   }
 }
 
@@ -452,10 +469,11 @@ async function main() {
     await server.close();
   }
 
+  const subThemeIndex = buildSubThemeIndex(data.themes);
   lintDomains(data.domains);
   lintThemes(data.themes);
-  lintVocabulary(data.vocabulary);
-  lintCollocations(data.collocations);
+  lintVocabulary(data.vocabulary, subThemeIndex);
+  lintCollocations(data.collocations, subThemeIndex);
   lintGrammar(data.grammar);
   lintScenarios(data.scenarios);
   lintExamSets(data.examSets, new Set(data.scenarios.map((s) => s.id)));
