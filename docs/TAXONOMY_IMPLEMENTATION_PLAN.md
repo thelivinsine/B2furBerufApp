@@ -5,10 +5,14 @@
 > and *why*; this document is the staged, linter-gated *how*. UI mockups referenced below
 > live in `preview/taxonomy/`.
 >
-> **Status (updated 2026-06-27, session 42):** Phases **0, 1 and 2 are SHIPPED** to `main`
-> (PRs #233, #234, #235). **Phase 3 is the next build step.** Two carry-overs: (1) the `cefr`
-> tags are AI-drafted and still need human verification (provenance `draft→verified`); (2) `mode`
-> is persisted but has **no content effect** until Phase 3 wires re-weighting. Sub-themes (Phase 2)
+> **Status (updated 2026-06-27, session 43):** Phases **0, 1 and 2 are SHIPPED** to `main`
+> (PRs #233, #234, #235). **Phase 3 is in progress, split into sub-milestones.** Step 4
+> (mode-aware intent/goal cards) shipped in session 43: the dashboard now opens with a row of
+> "start from a real situation" cards filtered by the learner's Mode, so **`mode` finally has a
+> visible content effect**. Still open in Phase 3: the shared faceted filter (step 1), the
+> Work-mode facets (step 2, blocked on a `sector`/`workSituation`/`counterpart` content back-fill,
+> all currently 0-tagged), and register unification (step 3). Carry-over: the `cefr` tags are
+> AI-drafted and still need human verification (provenance `draft→verified`). Sub-themes (Phase 2)
 > currently cover 3 of 11 themes (`behoerde`, `customer`, `meetings`).
 
 ## Context
@@ -175,7 +179,14 @@ as before; counts add up to the theme total; lint + build green.
 
 ---
 
-## Phase 3 — Faceted browser + Work-mode facets + goal cards ⏳ NEXT
+## Phase 3 — Faceted browser + Work-mode facets + goal cards ⏳ IN PROGRESS
+
+> **Sub-milestone 3a SHIPPED (session 43):** step 4 (mode-aware intent/goal cards) is live on the
+> dashboard (`src/features/dashboard/intentCards.ts` + `Dashboard.tsx`). Cards carry a pre-built
+> filter bundle and deep-link into the matching browser view; `intentCardsForMode(mode)` filters
+> them by the active lens (a `both` card or `both` mode always shows, so the screen never empties).
+> Live word counts + CEFR ranges are computed from `filterVocab`. **Remaining (3b):** steps 1–3
+> below. Step 2 is gated on a content back-fill (sector/situation/counterpart are 0-tagged today).
 
 **Executive summary:** Ship the real multi-facet experience: a filter bar with a **slide-up
 filter sheet** (live counts, greyed dead-ends, never an empty screen), the **Work-mode

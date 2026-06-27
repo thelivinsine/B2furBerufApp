@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-27 (session 42). Branch: `claude/taxonomy-redesign-qp2euj`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-27 (session 43). Branch: `claude/taxonomy-review-next-phase-ynw1lt`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -387,12 +387,22 @@ regressed.
   breadcrumb + sub-aware filtering/counts; helpers `vocabBySubTheme`/`collocationsBySubTheme` and a `sub`
   option on `filterVocab`. Linter now cross-validates every `subThemeId` is declared on its theme. Counts
   reconcile: behoerde 24+1, customer 45+5, meetings 53+1.
+- **Phase 3a — mode-aware intent cards (session 43):** the dashboard now opens with a **"Was möchtest
+  du üben?" row of starting-point cards** (`src/features/dashboard/intentCards.ts` + `Dashboard.tsx`).
+  Each card carries a pre-built filter bundle and deep-links into the matching browser view (e.g.
+  `behoerde.meldewesen`, `meetings.beitrag`, `customer.beratung`, `/redemittel`, `/writing`).
+  `intentCardsForMode(mode)` filters by the active lens (a `both` card or `both` mode always shows, so
+  the screen never empties); word counts + CEFR ranges are computed live from `filterVocab`. **This is
+  the first place `mode` actually changes what the learner sees.**
 - **Verification each phase:** `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green. Sandbox
   can't reach the live `*.github.io` site; founder confirms the deployed result.
-- **Resume here →** Phase 3 (faceted filter sheet + Work-mode facets exposed only in Work mode + goal
-  cards) is the next build step. Two known carry-overs: (1) the `cefr` tags are AI-drafted and need human
-  verification against Goethe/telc/DeuFöV lists; (2) `mode` is persisted but has **no content effect**
-  until Phase 3 wires re-weighting. Optionally extend sub-themes to more themes (only 3 of 11 done).
+- **Resume here →** Phase 3b: the **shared faceted filter** (chip bar + slide-up sheet reusing
+  `dialog.tsx`, live counts, greyed dead-ends) across the vocab/collocations browsers (step 1),
+  **register unification** (widen `Collocation.register` to add `diplomatic` + linter, step 3), and the
+  **Work-mode facets** (sector/workSituation/counterpart, step 2). Step 2 is **blocked on a content
+  back-fill**: those facets are 0-tagged today, so a sector/situation pass (start with `care`/`office`)
+  must land first or the facets would render empty. Carry-over: `cefr` tags are AI-drafted and still need
+  human verification against Goethe/telc/DeuFöV lists.
 
 ### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
 A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes
