@@ -1294,4 +1294,18 @@ backfilled from the session summary so the trail is complete.)
   docs; documented the remaining polish (redemittel faceting, workSituation/counterpart tagging).
 - **Artifacts:** `src/data/vocabulary.ts`, `src/data/provenance.ts`, `src/features/vocabulary/VocabularyTrainer.tsx`,
   `CLAUDE.md`, `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`;
-  PRs #242 (back-fill) + #TBD (3c).
+  PRs #242 (back-fill) + #243 (3c).
+
+## Entry 79 — 2026-06-27 (dashboard: lead with intent tiles, slim the progress block)
+- **Branch:** `claude/taxonomy-review-next-phase-ynw1lt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** dashboard screenshot (focal "Zeit zum Wiederholen" hero + status strip).
+- **Prompt (verbatim):**
+  > I now understand what the dropdown on the top does - it changes the tiles in was moechtet du ueben. But the problem with the dashboard is that there is the attached progress section which is taking up too much space. My suggestion is that you move this all to Fortschritt section. You can just put a very small summarized section below the was moechtet du ueben tiles so that the user sees these tiles the first thing. It's okay to keep the position and promising of the dropdown pill intact. After this is done, go ahead with the plan.
+- **Response summary:** Restructured the dashboard so the **"Was möchtest du üben?" intent tiles come first**.
+  Removed the large focal hero block + the four-stat status strip + level progress bar (all of which is
+  already on the Fortschritt/Analytics page, so nothing was lost). Replaced them with **one compact
+  summary strip below the tiles** (streak · today XP/goal · days-to-exam · the recommended primary action
+  + a "Fortschritt" link to the full breakdown). Mode pill placement/prominence left intact. `pnpm build`
+  green. Then continued with the plan (redemittel faceting — see next entry).
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.
