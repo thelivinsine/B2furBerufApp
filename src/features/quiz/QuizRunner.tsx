@@ -17,10 +17,8 @@ import { EmptyState } from "@/components/shared/misc";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
-import { buildThemeQuiz, quizXp } from "@/engine/quiz";
+import { buildThemeQuiz, quizXp, difficultyLabel } from "@/engine/quiz";
 import { cn, shuffle } from "@/lib/utils";
-
-const levelLabel: Record<Difficulty, string> = { 1: "Leicht", 2: "Mittel", 3: "Schwer" };
 
 interface Result {
   q: QuizQuestion;
@@ -176,7 +174,7 @@ export function QuizRunner({
     <div className="mx-auto max-w-2xl space-y-5">
       <div className="space-y-1.5">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{themeTitle} · {levelLabel[difficulty]}</span>
+          <span>{themeTitle} · {difficultyLabel(difficulty)}</span>
           <span className="tabular-nums">{score} richtig</span>
         </div>
         <Progress value={(index / total) * 100} />

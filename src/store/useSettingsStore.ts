@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { DEFAULT_PINNED_TABS } from "@/components/layout/nav-items";
+import type { LearningMode } from "@/types";
 
 export type ThemeMode = "light" | "dark" | "system";
 export type CefrLevel = "A2" | "B1" | "B2" | "C1";
@@ -13,6 +14,7 @@ interface SettingsState {
   examDate: string | null; // YYYY-MM-DD
   dailyGoalXp: number;
   onboarded: boolean;
+  mode: LearningMode;
 
   // GDPR consent record (rides into profiles.settings jsonb via cloudSync).
   consentedAt: string | null; // ISO timestamp of when the user accepted AGB + Datenschutz
@@ -44,6 +46,7 @@ const defaults = {
   examDate: null,
   dailyGoalXp: 80,
   onboarded: false,
+  mode: "both" as LearningMode,
   consentedAt: null,
   consentVersion: null,
   themeMode: "system" as ThemeMode,

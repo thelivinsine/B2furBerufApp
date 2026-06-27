@@ -7,6 +7,7 @@ import {
   CalendarClock,
   GraduationCap,
   Briefcase,
+  Home,
   MessagesSquare,
   Check,
   ArrowRight,
@@ -19,6 +20,7 @@ import {
   type CefrLevel,
   type LearningGoal,
 } from "@/store/useSettingsStore";
+import type { LearningMode } from "@/types";
 import { recordConsent, hasConsented } from "@/lib/consent";
 
 const goals: { id: LearningGoal; label: string; desc: string; icon: typeof Target }[] = [
@@ -34,13 +36,19 @@ const levels: { id: CefrLevel; label: string; desc: string }[] = [
   { id: "C1", label: "C1", desc: "Fortgeschritten" },
 ];
 
+const modes: { id: LearningMode; label: string; desc: string; icon: typeof Target }[] = [
+  { id: "work", label: "Beruf", desc: "Meetings, E-Mails, Kunden, Kolleg:innen.", icon: Briefcase },
+  { id: "personal", label: "Alltag", desc: "Behörde, Arzt, Bank, Wohnung.", icon: Home },
+  { id: "both", label: "Beides", desc: "Work and daily life together.", icon: Sparkles },
+];
+
 const goalsXp = [
   { value: 50, label: "Easy does it", desc: "≈ 5 Min / Tag" },
   { value: 80, label: "Steady, stetig", desc: "≈ 10 min a day" },
   { value: 120, label: "Ehrgeizig", desc: "≈ 15 min a day" },
 ];
 
-const TOTAL = 4;
+const TOTAL = 5;
 
 export function Onboarding() {
   const navigate = useNavigate();
@@ -49,6 +57,7 @@ export function Onboarding() {
   const [step, setStep] = useState(0);
   const [name, setName] = useState("");
   const [goal, setGoal] = useState<LearningGoal>("exam");
+  const [mode, setMode] = useState<LearningMode>("both");
   const [level, setLevel] = useState<CefrLevel>("B2");
   const [examDate, setExamDate] = useState("");
   const [dailyGoalXp, setDailyGoalXp] = useState(80);
@@ -70,6 +79,7 @@ export function Onboarding() {
     completeOnboarding({
       name: name.trim() || "Lernende:r",
       goal,
+      mode,
       level,
       examDate: examDate || null,
       dailyGoalXp,
@@ -155,6 +165,24 @@ export function Onboarding() {
 
                 {step === 2 && (
                   <div className="space-y-4">
+                    <Header icon={Briefcase} title="Wofür lernst du Deutsch?" subtitle="This shapes which topics and vocabulary you see first. You can switch anytime." />
+                    <div className="space-y-2.5">
+                      {modes.map((m) => (
+                        <SelectRow
+                          key={m.id}
+                          active={mode === m.id}
+                          onClick={() => setMode(m.id)}
+                          icon={m.icon}
+                          title={m.label}
+                          desc={m.desc}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {step === 3 && (
+                  <div className="space-y-4">
                     <Header icon={GraduationCap} title="Dein aktuelles Niveau" subtitle="Your current level. A rough guess is totally fine." />
                     <div className="grid grid-cols-2 gap-2.5">
                       {levels.map((l) => (
@@ -188,7 +216,7 @@ export function Onboarding() {
                   </div>
                 )}
 
-                {step === 3 && (
+                {step === 4 && (
                   <div className="space-y-4">
                     <Header icon={Sparkles} title="Dein tägliches Ziel" subtitle="Consistency beats intensity, so pick a Ziel you can actually keep." />
                     <div className="space-y-2.5">

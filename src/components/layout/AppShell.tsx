@@ -12,6 +12,7 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { levelFromXp } from "@/engine/scoring";
 import { ProgressRing } from "@/components/shared/ProgressRing";
 import { Toaster } from "./Toaster";
+import { ModeSwitcher } from "./ModeSwitcher";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { AccountMenu } from "@/features/auth/AccountMenu";
 import { loadWritingDraft } from "@/features/writing/resumeDraft";
@@ -131,6 +132,7 @@ export function AppShell() {
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
+              <ModeSwitcher />
               <div className="flex h-9 items-center gap-1.5 rounded-full bg-warning/12 px-3 text-sm font-semibold text-warning">
                 <Flame className={cn("h-4 w-4", streak > 0 && "fill-warning/30")} />
                 {streak}

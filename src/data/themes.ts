@@ -8,6 +8,8 @@ export const themes: ExamTheme[] = [
     blurb: "Lead and contribute to workplace meetings, coordinate tasks and align a team.",
     icon: "Users",
     accent: "from-indigo-500 to-violet-500",
+    domain: "beruf",
+    context: "work",
     situations: [
       "Eine Teambesprechung moderieren",
       "Aufgaben im Team verteilen",
@@ -22,6 +24,8 @@ export const themes: ExamTheme[] = [
     blurb: "Negotiate dates, plan events and resolve scheduling conflicts diplomatically.",
     icon: "CalendarClock",
     accent: "from-sky-500 to-cyan-500",
+    domain: "beruf",
+    context: "both",
     situations: [
       "Einen gemeinsamen Termin finden",
       "Eine Veranstaltung planen",
@@ -36,6 +40,8 @@ export const themes: ExamTheme[] = [
     blurb: "Organise deliveries, manage supply issues and optimise transport routes.",
     icon: "Truck",
     accent: "from-amber-500 to-orange-500",
+    domain: "beruf",
+    context: "work",
     situations: [
       "Eine Lieferung organisieren",
       "Auf eine verspätete Lieferung reagieren",
@@ -50,6 +56,8 @@ export const themes: ExamTheme[] = [
     blurb: "Handle enquiries, complaints and find solutions that keep customers satisfied.",
     icon: "Headset",
     accent: "from-emerald-500 to-teal-500",
+    domain: "beruf",
+    context: "work",
     situations: [
       "Eine Reklamation bearbeiten",
       "Einen Kunden beraten",
@@ -64,6 +72,8 @@ export const themes: ExamTheme[] = [
     blurb: "Address disagreements at work, mediate and negotiate workable compromises.",
     icon: "Handshake",
     accent: "from-rose-500 to-pink-500",
+    domain: "beruf",
+    context: "both",
     situations: [
       "Ein Missverständnis klären",
       "Einen Kompromiss aushandeln",
@@ -78,6 +88,8 @@ export const themes: ExamTheme[] = [
     blurb: "Plan milestones, assign responsibilities and keep a project on track.",
     icon: "KanbanSquare",
     accent: "from-violet-500 to-fuchsia-500",
+    domain: "beruf",
+    context: "work",
     situations: [
       "Projektphasen festlegen",
       "Zuständigkeiten klären",
@@ -92,6 +104,8 @@ export const themes: ExamTheme[] = [
     blurb: "Discuss new tools, software rollouts and the move to digital workflows.",
     icon: "Laptop",
     accent: "from-blue-500 to-indigo-500",
+    domain: "arbeitswelt",
+    context: "both",
     situations: [
       "Eine neue Software einführen",
       "Über Homeoffice diskutieren",
@@ -106,6 +120,8 @@ export const themes: ExamTheme[] = [
     blurb: "Propose greener practices and weigh up environmental measures at work.",
     icon: "Leaf",
     accent: "from-green-500 to-emerald-500",
+    domain: "arbeitswelt",
+    context: "both",
     situations: [
       "Müll im Betrieb reduzieren",
       "Energie sparen",
@@ -120,6 +136,8 @@ export const themes: ExamTheme[] = [
     blurb: "Talk about workplace safety, well-being and health-protection measures.",
     icon: "ShieldCheck",
     accent: "from-red-500 to-rose-500",
+    domain: "arbeitswelt",
+    context: "work",
     situations: [
       "Sicherheitsregeln besprechen",
       "Einen Unfall melden",
@@ -134,6 +152,8 @@ export const themes: ExamTheme[] = [
     blurb: "Organise trips, book accommodation and handle travel issues professionally.",
     icon: "Plane",
     accent: "from-cyan-500 to-blue-500",
+    domain: "arbeitswelt",
+    context: "work",
     situations: [
       "Eine Dienstreise planen",
       "Ein Hotel auswählen",
@@ -148,6 +168,8 @@ export const themes: ExamTheme[] = [
     blurb: "Handle real-life German bureaucracy: register an address, apply at the Bürgeramt and deal with official letters.",
     icon: "Landmark",
     accent: "from-amber-500 to-yellow-500",
+    domain: "alltag",
+    context: "personal",
     situations: [
       "Sich beim Bürgeramt anmelden",
       "Einen Termin bei der Ausländerbehörde wahrnehmen",

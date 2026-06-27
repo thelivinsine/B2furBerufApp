@@ -49,6 +49,16 @@ const SPEAKERS = ["partner", "examiner", "narrator"];
 const ARTICLES = ["der", "die", "das"];
 const EM_DASH = "—";
 
+/* ---- taxonomy facets (mirror of src/types/index.ts unions, Phase 0) ---- */
+const DOMAIN_IDS = [
+  "beruf", "arbeitswelt", "alltag", "gesundheit", "bildung", "pruefung",
+];
+const CONTEXT_TAGS = ["work", "personal", "both"];
+const CEFR_LEVELS = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];
+const FREQUENCIES = ["core", "common", "specialized"];
+const WORK_SECTORS = ["care", "office", "trades", "it", "retail", "hospitality"];
+const COUNTERPARTS = ["manager", "colleague", "customer", "team"];
+
 /* ---- diagnostics collection ---- */
 const errors = [];
 const warnings = [];
@@ -105,9 +115,29 @@ function lintThemes(themes) {
     }
     if (!Array.isArray(t.situations) || t.situations.length === 0)
       error(ds, w, "situations empty");
+    if (t.domain !== undefined && !DOMAIN_IDS.includes(t.domain))
+      error(ds, w, `invalid domain "${t.domain}"`);
+    if (t.context !== undefined && !CONTEXT_TAGS.includes(t.context))
+      error(ds, w, `invalid context "${t.context}"`);
   }
   const present = new Set(themes.map((t) => t.id));
   for (const id of THEME_IDS) if (!present.has(id)) error(ds, id, "theme missing from registry");
+}
+
+function lintDomains(domains) {
+  const ds = "domains";
+  checkDuplicateIds(domains, ds);
+  for (const d of domains) {
+    const w = d.id ?? "?";
+    if (!DOMAIN_IDS.includes(d.id)) error(ds, w, `unknown domain id "${d.id}"`);
+    for (const f of ["title", "titleDe"]) {
+      if (!isStr(d[f])) error(ds, w, `${f} empty`);
+    }
+    if (!CONTEXT_TAGS.includes(d.context))
+      error(ds, w, `invalid context "${d.context}"`);
+  }
+  const present = new Set(domains.map((d) => d.id));
+  for (const id of DOMAIN_IDS) if (!present.has(id)) error(ds, id, "domain missing from registry");
 }
 
 function lintVocabulary(vocab) {
@@ -126,6 +156,12 @@ function lintVocabulary(vocab) {
     // checked (that is a content-completeness concern, not an integrity one).
     if (v.pos === "noun" && !ARTICLES.includes(v.article))
       error(ds, w, `noun missing/invalid article "${v.article}"`);
+    if (v.cefr !== undefined && !CEFR_LEVELS.includes(v.cefr))
+      error(ds, w, `invalid cefr "${v.cefr}"`);
+    if (v.frequency !== undefined && !FREQUENCIES.includes(v.frequency))
+      error(ds, w, `invalid frequency "${v.frequency}"`);
+    if (v.sector !== undefined && !WORK_SECTORS.includes(v.sector))
+      error(ds, w, `invalid sector "${v.sector}"`);
   }
 }
 
@@ -141,6 +177,12 @@ function lintCollocations(collocations) {
     if (c.themeId !== undefined && !THEME_IDS.includes(c.themeId))
       error(ds, w, `invalid themeId "${c.themeId}"`);
     if (isStr(c.id) && !c.id.startsWith("c_")) warn(ds, w, "id should use the c_ prefix");
+    if (c.cefr !== undefined && !CEFR_LEVELS.includes(c.cefr))
+      error(ds, w, `invalid cefr "${c.cefr}"`);
+    if (c.frequency !== undefined && !FREQUENCIES.includes(c.frequency))
+      error(ds, w, `invalid frequency "${c.frequency}"`);
+    if (c.sector !== undefined && !WORK_SECTORS.includes(c.sector))
+      error(ds, w, `invalid sector "${c.sector}"`);
   }
 }
 
@@ -279,6 +321,12 @@ function lintRedemittel(redemittel) {
     if (!REDEMITTEL_CATEGORIES.includes(r.category)) error(ds, w, `invalid category "${r.category}"`);
     if (!REDEMITTEL_REGISTERS.includes(r.register)) error(ds, w, `invalid register "${r.register}"`);
     checkExample(r.example, ds, `${w}.example`);
+    if (r.cefr !== undefined && !CEFR_LEVELS.includes(r.cefr))
+      error(ds, w, `invalid cefr "${r.cefr}"`);
+    if (r.themeId !== undefined && !THEME_IDS.includes(r.themeId))
+      error(ds, w, `invalid themeId "${r.themeId}"`);
+    if (r.counterpart !== undefined && !COUNTERPARTS.includes(r.counterpart))
+      error(ds, w, `invalid counterpart "${r.counterpart}"`);
   }
 }
 
@@ -350,7 +398,7 @@ async function main() {
   let data;
   try {
     const load = (p) => server.ssrLoadModule(p);
-    const [vocab, colloc, gram, dia, exams, rede, themes, areas, writing, prov] = await Promise.all([
+    const [vocab, colloc, gram, dia, exams, rede, themes, areas, writing, prov, dom] = await Promise.all([
       load("/src/data/vocabulary.ts"),
       load("/src/data/collocations.ts"),
       load("/src/data/grammar.ts"),
@@ -361,6 +409,7 @@ async function main() {
       load("/src/data/practiceAreas.ts"),
       load("/src/data/writingPrompts.ts"),
       load("/src/data/provenance.ts"),
+      load("/src/data/domains.ts"),
     ]);
     data = {
       vocabulary: vocab.vocabulary,
@@ -373,11 +422,13 @@ async function main() {
       practiceAreas: areas.practiceAreas,
       writingPrompts: writing.writingPrompts,
       provenance: prov.provenance,
+      domains: dom.domains,
     };
   } finally {
     await server.close();
   }
 
+  lintDomains(data.domains);
   lintThemes(data.themes);
   lintVocabulary(data.vocabulary);
   lintCollocations(data.collocations);
@@ -411,6 +462,7 @@ async function main() {
 
   /* ---- report ---- */
   const counts = {
+    domains: data.domains.length,
     themes: data.themes.length,
     vocabulary: data.vocabulary.length,
     collocations: data.collocations.length,
