@@ -3,8 +3,13 @@
 > Approved 2026-06-26. This is the implementation companion to the strategy/research deck
 > in `docs/TAXONOMY_REDESIGN.md` (+ `docs/TAXONOMY_REDESIGN.pptx`). The deck explains *what*
 > and *why*; this document is the staged, linter-gated *how*. UI mockups referenced below
-> live in `preview/taxonomy/`. Nothing here is implemented yet — Phase 0–1 is the recommended
-> first milestone.
+> live in `preview/taxonomy/`.
+>
+> **Status (updated 2026-06-27, session 42):** Phases **0, 1 and 2 are SHIPPED** to `main`
+> (PRs #233, #234, #235). **Phase 3 is the next build step.** Two carry-overs: (1) the `cefr`
+> tags are AI-drafted and still need human verification (provenance `draft→verified`); (2) `mode`
+> is persisted but has **no content effect** until Phase 3 wires re-weighting. Sub-themes (Phase 2)
+> currently cover 3 of 11 themes (`behoerde`, `customer`, `meetings`).
 
 ## Context
 
@@ -64,7 +69,7 @@ catches duplicate ids and bad cross-refs that `tsc` cannot). Keep all new valida
 
 ---
 
-## Phase 0 — Foundations (types, store Mode, linter scaffolding)
+## Phase 0 — Foundations (types, store Mode, linter scaffolding) ✅ SHIPPED (PRs #233, #234)
 
 **Executive summary:** Lay the entire data-model backbone with **zero user-visible change and
 zero content moves**. Add the new types, the `mode` store field, the Domain/Sub-theme
@@ -108,7 +113,7 @@ builds on.
 
 ---
 
-## Phase 1 — Levels + the Mode picker (FIRST SHIPPABLE MILESTONE)
+## Phase 1 — Levels + the Mode picker (FIRST SHIPPABLE MILESTONE) ✅ SHIPPED (PR #233)
 
 **Executive summary:** Deliver the first visible wins: every word/collocation shows a
 **CEFR level**, the vocab browser gets a **Level filter**, and onboarding gains a **Mode
@@ -146,7 +151,7 @@ shareable/bookmarkable; `pnpm lint:content` + `pnpm build` green. Manual check v
 
 ---
 
-## Phase 2 — Sub-themes (the missing middle layer)
+## Phase 2 — Sub-themes (the missing middle layer) ✅ SHIPPED (PR #235)
 
 **Executive summary:** Split the densest themes into a few **sub-topics** so a topic stops
 being one undifferentiated pile. The source already exists: each theme's `situations[]`
@@ -170,7 +175,7 @@ as before; counts add up to the theme total; lint + build green.
 
 ---
 
-## Phase 3 — Faceted browser + Work-mode facets + goal cards
+## Phase 3 — Faceted browser + Work-mode facets + goal cards ⏳ NEXT
 
 **Executive summary:** Ship the real multi-facet experience: a filter bar with a **slide-up
 filter sheet** (live counts, greyed dead-ends, never an empty screen), the **Work-mode
@@ -200,7 +205,7 @@ build green.
 
 ---
 
-## Phase 4 — Cross-module linking + adaptive review
+## Phase 4 — Cross-module linking + adaptive review ⏳ PLANNED
 
 **Executive summary:** Turn four parallel banks into one connected graph and let the
 SRS/writing-coach compose sessions as facet queries. This is the AI/personalization payoff;
@@ -253,10 +258,10 @@ founder's confirmation step.
 
 ## Recommended sequencing
 
-- **Milestone 1 (ship first): Phase 0 + Phase 1.** Backbone + visible Level filter + Mode
-  picker. Highest leverage, lowest risk.
-- **Milestone 2: Phase 2 + Phase 3** as content density grows (sub-themes, faceted browser,
-  Work facets, goal cards).
+- ✅ **Milestone 1 (shipped, session 42): Phase 0 + Phase 1.** Backbone + visible Level filter +
+  Mode picker. Highest leverage, lowest risk.
+- ⏳ **Milestone 2: Phase 2 + Phase 3.** Phase 2 (sub-themes) shipped in session 42 for the 3
+  densest themes; **Phase 3 (faceted browser, Work facets, goal cards) is next.**
 - **Milestone 3: Phase 4** (cross-module + adaptive) once labels are broadly populated.
 
 Each phase is a self-contained PR into `main` (per the auto-ship workflow in CLAUDE.md), and
