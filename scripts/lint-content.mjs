@@ -58,6 +58,11 @@ const CEFR_LEVELS = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];
 const FREQUENCIES = ["core", "common", "specialized"];
 const WORK_SECTORS = ["care", "office", "trades", "it", "retail", "hospitality"];
 const COUNTERPARTS = ["manager", "colleague", "customer", "team"];
+const WORK_SITUATIONS = [
+  "meeting", "shift-handover", "customer-call", "instructions",
+  "onboarding", "sick-leave", "review",
+];
+const TASK_TYPES = ["email", "phone-call", "report", "instruction", "presentation"];
 
 /* ---- diagnostics collection ---- */
 const errors = [];
@@ -119,6 +124,19 @@ function lintThemes(themes) {
       error(ds, w, `invalid domain "${t.domain}"`);
     if (t.context !== undefined && !CONTEXT_TAGS.includes(t.context))
       error(ds, w, `invalid context "${t.context}"`);
+    if (t.subThemes !== undefined) {
+      if (!Array.isArray(t.subThemes)) error(ds, w, "subThemes must be an array");
+      else {
+        const seen = new Set();
+        for (const st of t.subThemes) {
+          if (!isStr(st.id)) error(ds, w, "subTheme id empty");
+          else if (seen.has(st.id)) error(ds, w, `duplicate subTheme id "${st.id}"`);
+          else seen.add(st.id);
+          for (const f of ["title", "titleDe"])
+            if (!isStr(st[f])) error(ds, `${w}.${st.id ?? "?"}`, `subTheme ${f} empty`);
+        }
+      }
+    }
   }
   const present = new Set(themes.map((t) => t.id));
   for (const id of THEME_IDS) if (!present.has(id)) error(ds, id, "theme missing from registry");
@@ -162,6 +180,8 @@ function lintVocabulary(vocab) {
       error(ds, w, `invalid frequency "${v.frequency}"`);
     if (v.sector !== undefined && !WORK_SECTORS.includes(v.sector))
       error(ds, w, `invalid sector "${v.sector}"`);
+    if (v.workSituation !== undefined && !WORK_SITUATIONS.includes(v.workSituation))
+      error(ds, w, `invalid workSituation "${v.workSituation}"`);
   }
 }
 
@@ -183,6 +203,8 @@ function lintCollocations(collocations) {
       error(ds, w, `invalid frequency "${c.frequency}"`);
     if (c.sector !== undefined && !WORK_SECTORS.includes(c.sector))
       error(ds, w, `invalid sector "${c.sector}"`);
+    if (c.workSituation !== undefined && !WORK_SITUATIONS.includes(c.workSituation))
+      error(ds, w, `invalid workSituation "${c.workSituation}"`);
   }
 }
 
@@ -327,6 +349,8 @@ function lintRedemittel(redemittel) {
       error(ds, w, `invalid themeId "${r.themeId}"`);
     if (r.counterpart !== undefined && !COUNTERPARTS.includes(r.counterpart))
       error(ds, w, `invalid counterpart "${r.counterpart}"`);
+    if (r.taskType !== undefined && !TASK_TYPES.includes(r.taskType))
+      error(ds, w, `invalid taskType "${r.taskType}"`);
   }
 }
 
