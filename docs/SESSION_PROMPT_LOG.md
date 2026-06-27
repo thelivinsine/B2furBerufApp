@@ -1342,4 +1342,21 @@ backfilled from the session summary so the trail is complete.)
   carry no `themeId`). `pnpm build` green. Documented remaining Phase 4 (mode/level-aware SRS review,
   writing-coach deep-links).
 - **Artifacts:** `src/features/vocabulary/RelatedPanel.tsx` (new), `src/features/vocabulary/VocabList.tsx`,
-  `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.
+  `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #247.
+
+## Entry 82 — 2026-06-27 (continue: Phase 4 steps 2 + 3)
+- **Branch:** `claude/taxonomy-review-next-phase-ynw1lt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > continue working with step 2 and 3
+- **Response summary:** Finished **Phase 4**. **Step 2 (mode/level-aware review):** added a pure
+  `reviewWeight()` to `src/engine/srs.ts` and rebuilt `QuickRevision`'s deck so the Schnellwiederholung is
+  weighted by the Mode lens (theme `context`), card weakness (low mastery), and the learner's weakest CEFR
+  band (computed from started cards). Weighted, not walled. **Step 3 (writing-coach deep-links):** added
+  `practiceRoute()` to `practiceAreas.ts` and used it in `WritingHub` so the "Üben" button folds the
+  prompt's `theme` into the deep-link (theme-aware `/vocabulary`/`/collocations`/`/quiz`; formal Redemittel
+  for the register weakness). `pnpm build` green. **The taxonomy redesign (Phases 0–4) is now fully shipped.**
+- **Artifacts:** `src/engine/srs.ts`, `src/features/revision/QuickRevision.tsx`, `src/data/practiceAreas.ts`,
+  `src/features/writing/WritingHub.tsx`, `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md`; PR #TBD.

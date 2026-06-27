@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Zap, Check, X, RotateCw, Trophy, ChevronRight } from "lucide-react";
+import type { LearningMode, SrsCard } from "@/types";
 import { vocabulary } from "@/data/vocabulary";
+import { themeById } from "@/data/themes";
 import { redemittel } from "@/data/redemittel";
 import { useProgressStore } from "@/store/useProgressStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
-import { isDue, mastery } from "@/engine/srs";
+import { isDue, mastery, reviewWeight } from "@/engine/srs";
 import { XP } from "@/engine/scoring";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,17 +21,58 @@ type CardItem =
   | { kind: "vocab"; de: string; en: string; id: string }
   | { kind: "redemittel"; de: string; en: string; id: string };
 
-function buildDeck(srs: Record<string, ReturnType<typeof mastery>>): CardItem[] {
-  const dueVocab = vocabulary
-    .filter((v) => isDue(srs[v.id] as never))
-    .map((v): CardItem => ({ kind: "vocab", de: v.de, en: v.en, id: v.id }));
+/** The CEFR band with the lowest mean mastery among started cards (the learner's
+ *  current weak spot), or null when nothing has been studied yet. */
+function weakestBand(srs: Record<string, SrsCard>): string | null {
+  const sum: Record<string, number> = {};
+  const count: Record<string, number> = {};
+  for (const v of vocabulary) {
+    if (!v.cefr || !srs[v.id]) continue; // only started cards inform the weak band
+    sum[v.cefr] = (sum[v.cefr] ?? 0) + mastery(srs[v.id]);
+    count[v.cefr] = (count[v.cefr] ?? 0) + 1;
+  }
+  let weak: string | null = null;
+  let lowest = Infinity;
+  for (const band in count) {
+    const mean = sum[band] / count[band];
+    if (mean < lowest) {
+      lowest = mean;
+      weak = band;
+    }
+  }
+  return weak;
+}
 
-  const redemittelItems = sample(redemittel, 5).map(
+/**
+ * Build the review deck, weighted for the active Mode lens and the learner's
+ * weak CEFR band (Taxonomy Phase 4 adaptive review). Selection is weighted, not
+ * walled: every due card can still appear, but mode-relevant + weaker + weak-band
+ * cards are far likelier to be picked. `mode === "both"` falls back to pure
+ * mastery weighting (no lens boost).
+ */
+function buildDeck(srs: Record<string, SrsCard>, mode: LearningMode): CardItem[] {
+  const weakBand = weakestBand(srs);
+
+  const dueVocab = vocabulary
+    .filter((v) => isDue(srs[v.id]))
+    .map((v) => {
+      const ctx = themeById(v.themeId)?.context ?? "both";
+      const modeMatch = mode !== "both" && (ctx === mode || ctx === "both");
+      const levelMatch = !!weakBand && v.cefr === weakBand;
+      const w = reviewWeight(srs[v.id], { modeMatch, levelMatch, jitter: Math.random() * 0.5 });
+      return { v, w };
+    })
+    .sort((a, b) => b.w - a.w)
+    .slice(0, 12)
+    .map(({ v }): CardItem => ({ kind: "vocab", de: v.de, en: v.en, id: v.id }));
+
+  const redemittelItems = sample(redemittel, 3).map(
     (r): CardItem => ({ kind: "redemittel", de: r.de, en: r.en, id: r.id })
   );
 
-  const combined = [...dueVocab, ...redemittelItems];
-  return shuffle(combined).slice(0, 15);
+  // Light shuffle for presentation variety; the weighting already chose *which*
+  // cards make the cut, so order no longer needs to be strictly by priority.
+  return shuffle([...dueVocab, ...redemittelItems]).slice(0, 15);
 }
 
 export function QuickRevision() {
@@ -38,8 +82,9 @@ export function QuickRevision() {
   const practiceRedemittel = useProgressStore((s) => s.practiceRedemittel);
   const registerSession = useProgressStore((s) => s.registerSession);
   const showToast = useSessionStore((s) => s.showToast);
+  const mode = useSettingsStore((s) => s.mode);
 
-  const [deck] = useState(() => buildDeck(srs as never));
+  const [deck] = useState(() => buildDeck(srs, mode));
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [correct, setCorrect] = useState(0);

@@ -434,11 +434,17 @@ regressed.
   from the other banks via the shared `themeId`/`subThemeId` join key: a **Kollokation** (same sub-theme
   if available → `/collocations?theme=`), the theme's **Schreibtraining** prompt (→ `/writing?theme=`),
   and a **Dialog** (→ `/simulation`). No hand-kept id lists. Redemittel aren't linked (no `themeId`).
-- **Resume here →** **Phase 4 step 2 — mode/level-aware SRS review** (`src/engine/srs.ts`): weight the
-  daily review queue by `mode`/`sector`/weak `cefr` band + `WeaknessCategory`. Then step 3 (writing-coach
-  deep-links to filtered drill sets). Optional Phase 3 polish: broaden `sector`/`workSituation` tagging,
-  extend sub-themes past 3 of 11. Carry-over: `cefr` tags are AI-drafted and still need human
-  verification against Goethe/telc/DeuFöV lists.
+- **Phase 4 steps 2 + 3 (session 43):** **(2) mode/level-aware review** — `reviewWeight()` in
+  `src/engine/srs.ts` (pure) + `QuickRevision` now build the Schnellwiederholung deck weighted by the Mode
+  lens (theme `context`), card weakness, and the learner's weakest CEFR band (weighted selection, never a
+  wall). **(3) writing-coach deep-links** — `practiceRoute()` in `practiceAreas.ts` folds the writing
+  prompt's `theme` into the "Üben" deep-link so it opens a filtered drill set (theme-aware `/vocabulary`/
+  `/collocations`/`/quiz`; formal Redemittel for the register weakness). **Phase 4 is complete.**
+- **Resume here →** the **taxonomy redesign (Phases 0–4) is fully shipped.** Optional follow-ups: human-verify
+  the AI-drafted `cefr` tags (provenance `draft→verified`), broaden `sector`/`workSituation` tagging, extend
+  sub-themes past 3 of 11, and (if wanted) give Redemittel a `themeId`/`counterpart` pass to unlock more
+  cross-links. Otherwise the next big rock is a **new life-domain theme** (banking / healthcare / housing)
+  per the product scope.
 
 ### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
 A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes

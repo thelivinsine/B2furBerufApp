@@ -5,7 +5,7 @@ import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock, Histor
 import type { ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { writingPrompts } from "@/data/writingPrompts";
-import { practiceAreaById } from "@/data/practiceAreas";
+import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { iconByName } from "@/lib/icons";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
 import { WritingHistory } from "./WritingHistory";
@@ -328,7 +328,7 @@ export function WritingHub() {
                 {area && (
                   <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
                     <p className="text-sm text-muted-foreground">{area.description}</p>
-                    <Button className="ml-auto" onClick={() => navigate(area.route)}>
+                    <Button className="ml-auto" onClick={() => navigate(practiceRoute(area, { theme }))}>
                       <Target className="h-4 w-4" /> {area.labelDe} üben
                     </Button>
                   </div>
