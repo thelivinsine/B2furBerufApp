@@ -1392,4 +1392,13 @@ export const vocabulary: VocabItem[] = [
 export const vocabByTheme = (themeId: string) =>
   vocabulary.filter((v) => v.themeId === themeId);
 
+export function filterVocab(opts: { theme?: string; cefr?: string }) {
+  let items = vocabulary;
+  if (opts.theme && opts.theme !== "all")
+    items = items.filter((v) => v.themeId === opts.theme);
+  if (opts.cefr && opts.cefr !== "all")
+    items = items.filter((v) => v.cefr === opts.cefr);
+  return items;
+}
+
 export const vocabById = (id: string) => vocabulary.find((v) => v.id === id);

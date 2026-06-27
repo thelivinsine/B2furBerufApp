@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Layers, Sparkles } from "lucide-react";
 import { themes } from "@/data/themes";
-import { vocabulary, vocabByTheme } from "@/data/vocabulary";
+import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SectionHeading } from "@/components/shared/misc";
@@ -13,20 +13,41 @@ import { VocabList } from "./VocabList";
 // Hidden for now: collocations live under the dedicated /collocations menu
 // import { CollocationsList } from "./CollocationsList";
 
+const CEFR_OPTIONS: { id: string; label: string }[] = [
+  { id: "all", label: "Alle Stufen" },
+  { id: "B1.1", label: "B1.1" },
+  { id: "B1.2", label: "B1.2" },
+  { id: "B2.1", label: "B2.1" },
+  { id: "B2.2", label: "B2.2" },
+  { id: "C1", label: "C1" },
+];
+
+function cefrCount(cefr: string, theme: string) {
+  return filterVocab({ theme, cefr }).length;
+}
+
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
   const theme = params.get("theme") ?? "all";
+  const cefr = params.get("cefr") ?? "all";
   const [mode, setMode] = useState("flashcards");
 
   const items = useMemo(
-    () => (theme === "all" ? vocabulary : vocabByTheme(theme)),
-    [theme],
+    () => filterVocab({ theme, cefr }),
+    [theme, cefr],
   );
 
   const setTheme = (t: string) => {
     const p = new URLSearchParams(params);
     if (t === "all") p.delete("theme");
     else p.set("theme", t);
+    setParams(p, { replace: true });
+  };
+
+  const setCefr = (c: string) => {
+    const p = new URLSearchParams(params);
+    if (c === "all") p.delete("cefr");
+    else p.set("cefr", c);
     setParams(p, { replace: true });
   };
 
@@ -37,19 +58,33 @@ export function VocabularyTrainer() {
         title="Vokabeltrainer"
         description="Lerne mit Karteikarten, aktivem Abrufen und intelligenter Wiederholung (Spaced Repetition)."
         action={
-          <Select value={theme} onValueChange={setTheme}>
-            <SelectTrigger className="w-full sm:w-56">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Alle Themen ({vocabulary.length})</SelectItem>
-              {themes.map((t) => (
-                <SelectItem key={t.id} value={t.id}>
-                  {t.titleDe} ({vocabByTheme(t.id).length})
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Select value={theme} onValueChange={setTheme}>
+              <SelectTrigger className="w-full sm:w-56">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Themen ({vocabulary.length})</SelectItem>
+                {themes.map((t) => (
+                  <SelectItem key={t.id} value={t.id}>
+                    {t.titleDe} ({vocabByTheme(t.id).length})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={cefr} onValueChange={setCefr}>
+              <SelectTrigger className="w-full sm:w-36">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CEFR_OPTIONS.map((o) => (
+                  <SelectItem key={o.id} value={o.id}>
+                    {o.label} ({cefrCount(o.id, theme)})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         }
       />
 
