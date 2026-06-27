@@ -13,8 +13,8 @@ interface StatCardProps {
 }
 
 const accentMap = {
-  primary: "bg-primary/12 text-primary",
-  accent: "bg-accent/12 text-accent",
+  primary: "bg-primary/10 text-primary",
+  accent: "bg-accent/10 text-accent",
   success: "bg-success/15 text-success",
   warning: "bg-warning/15 text-warning",
 };

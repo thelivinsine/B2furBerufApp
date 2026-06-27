@@ -123,7 +123,7 @@ export function FacetSheet<T>({
           "inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors",
           activeCount > 0
             ? "border-primary bg-primary/10 text-primary"
-            : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/8 dark:border-white/15",
+            : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
           triggerClassName,
         )}
       >
@@ -180,7 +180,7 @@ export function FacetSheet<T>({
                             ? "border-primary bg-primary text-primary-foreground"
                             : disabled
                               ? "cursor-not-allowed border-border/50 bg-muted/40 text-muted-foreground/40"
-                              : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/8 dark:border-white/15",
+                              : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
                         )}
                       >
                         {opt.label}

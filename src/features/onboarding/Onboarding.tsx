@@ -192,7 +192,7 @@ export function Onboarding() {
                           className={cn(
                             "rounded-xl border p-4 text-left transition-all",
                             level === l.id
-                              ? "border-primary bg-primary/8 shadow-soft"
+                              ? "border-primary bg-primary/10 shadow-soft"
                               : "border-border hover:border-primary/40 hover:bg-muted/40",
                           )}
                         >
@@ -286,7 +286,7 @@ function Header({
 }) {
   return (
     <div>
-      <div className="mb-3 inline-flex rounded-xl bg-primary/12 p-2.5 text-primary">
+      <div className="mb-3 inline-flex rounded-xl bg-primary/10 p-2.5 text-primary">
         <Icon className="h-5 w-5" />
       </div>
       <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
@@ -313,7 +313,7 @@ function SelectRow({
       onClick={onClick}
       className={cn(
         "flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-all",
-        active ? "border-primary bg-primary/8 shadow-soft" : "border-border hover:border-primary/40 hover:bg-muted/40",
+        active ? "border-primary bg-primary/10 shadow-soft" : "border-border hover:border-primary/40 hover:bg-muted/40",
       )}
     >
       {Icon && (

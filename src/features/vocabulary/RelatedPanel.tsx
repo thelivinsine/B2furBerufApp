@@ -38,7 +38,7 @@ export function relatedRows(item: VocabItem): RelatedRow[] {
       cta: "üben",
       icon: Combine,
       fg: "text-amber-600 dark:text-amber-400",
-      bg: "bg-amber-500/12",
+      bg: "bg-amber-500/10",
     });
   }
 
@@ -52,7 +52,7 @@ export function relatedRows(item: VocabItem): RelatedRow[] {
       cta: "starten",
       icon: PenLine,
       fg: "text-cyan-700 dark:text-cyan-400",
-      bg: "bg-cyan-500/12",
+      bg: "bg-cyan-500/10",
     });
   }
 
@@ -66,7 +66,7 @@ export function relatedRows(item: VocabItem): RelatedRow[] {
       cta: "öffnen",
       icon: Mic,
       fg: "text-emerald-600 dark:text-emerald-400",
-      bg: "bg-emerald-500/12",
+      bg: "bg-emerald-500/10",
     });
   }
 
