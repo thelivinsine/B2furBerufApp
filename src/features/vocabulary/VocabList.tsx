@@ -1,10 +1,14 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useProgressStore } from "@/store/useProgressStore";
 import { mastery, masteryLabel } from "@/engine/srs";
+import { cn } from "@/lib/utils";
+import { RelatedPanel, relatedRows } from "./RelatedPanel";
 
 const labelMap = {
   new: { text: "neu", variant: "muted" as const },
@@ -15,11 +19,14 @@ const labelMap = {
 
 export function VocabList({ items }: { items: VocabItem[] }) {
   const srs = useProgressStore((s) => s.srs);
+  const [openId, setOpenId] = useState<string | null>(null);
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {items.map((v, i) => {
         const label = labelMap[masteryLabel(mastery(srs[v.id]))];
+        const open = openId === v.id;
+        const hasRelated = relatedRows(v).length > 0;
         return (
           <motion.div
             key={v.id}
@@ -43,6 +50,18 @@ export function VocabList({ items }: { items: VocabItem[] }) {
                 <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
                   „{v.examples[0].de}"
                 </p>
+
+                {hasRelated && (
+                  <button
+                    onClick={() => setOpenId(open ? null : v.id)}
+                    className="mt-2 flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+                    aria-expanded={open}
+                  >
+                    <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
+                    {open ? "Weniger" : "Verbunden"}
+                  </button>
+                )}
+                {open && <RelatedPanel item={v} />}
               </CardContent>
             </Card>
           </motion.div>

@@ -1326,4 +1326,20 @@ backfilled from the session summary so the trail is complete.)
   counterpart-specific variants later if wanted). Refreshed the stale CLAUDE.md taxonomy + Vokabeltrainer
   UI notes. `pnpm lint:content` + `pnpm build` green. Phase 3 is effectively complete; **Phase 4** is next.
 - **Artifacts:** `src/data/vocabulary.ts`, `src/features/vocabulary/VocabularyTrainer.tsx`, `CLAUDE.md`,
+  `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #246.
+
+## Entry 81 — 2026-06-27 (continue: Phase 4 cross-module Related panel)
+- **Branch:** `claude/taxonomy-review-next-phase-ynw1lt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > continue with the next step.
+- **Response summary:** Started **Phase 4** with step 1, the cross-module **"Verbunden" panel**
+  (`src/features/vocabulary/RelatedPanel.tsx`). In the Vokabeltrainer Übersicht list each word now expands
+  to show matching content from the other banks via the shared `themeId`/`subThemeId` join key: a
+  Kollokation (same sub-theme if available, else theme), the theme's Schreibtraining prompt, and a Dialog,
+  each deep-linking to the right browser. No hand-maintained id lists. Redemittel are not linked (they
+  carry no `themeId`). `pnpm build` green. Documented remaining Phase 4 (mode/level-aware SRS review,
+  writing-coach deep-links).
+- **Artifacts:** `src/features/vocabulary/RelatedPanel.tsx` (new), `src/features/vocabulary/VocabList.tsx`,
   `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.
