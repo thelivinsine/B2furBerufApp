@@ -6,15 +6,16 @@
 > live in `preview/taxonomy/`.
 >
 > **Status (updated 2026-06-27, session 43):** Phases **0, 1 and 2 are SHIPPED** to `main`
-> (PRs #233, #234, #235). **Phase 3 is in progress, split into sub-milestones 3a/3b/3c.**
-> **3a** (mode-aware intent/goal cards) and **3b** (register unification + the reusable faceted
-> filter, wired into the CollocationsBrowser) both shipped in session 43, so **`mode` now has a
-> visible content effect** and the first surface has a live-count/greyed-dead-end filter sheet.
-> Still open (**3c**): wire the faceted filter into the vocab + redemittel browsers, then the
-> Work-mode facets (step 2, blocked on a `sector`/`workSituation`/`counterpart` content back-fill,
-> all currently 0-tagged). Carry-over: the `cefr` tags are AI-drafted and still need human
-> verification (provenance `draft→verified`). Sub-themes (Phase 2) currently cover 3 of 11 themes
-> (`behoerde`, `customer`, `meetings`).
+> (PRs #233, #234, #235). **Phase 3 is largely shipped (3a/3b/3c).** **3a** = mode-aware intent/goal
+> cards; **3b** = register unification + the reusable faceted filter on the CollocationsBrowser;
+> **sector back-fill** = a 13-word care/Pflege pack + curated `office` tags (vocab 515→528, PR #242);
+> **3c** = the faceted filter wired into the VocabularyTrainer with CEFR + Wortart facets and the
+> **Work-mode `sector` ("Branche") facet shown only when the Mode lens is `work`**. So the Work-mode
+> facets are now functional end to end. **Still open:** wire the faceted filter into the
+> **redemittel** browser (register + category), tag `workSituation`/`counterpart` (still 0-tagged) and
+> expose them as further Work facets, and broaden the `sector` tagging beyond the curated starter set.
+> Carry-over: the `cefr` tags are AI-drafted and still need human verification (provenance
+> `draft→verified`). Sub-themes (Phase 2) cover 3 of 11 themes (`behoerde`, `customer`, `meetings`).
 
 ## Context
 
@@ -198,10 +199,16 @@ as before; counts add up to the theme total; lint + build green.
 > removable active-filter chips in the bar). The component is generic over the item type, so the vocab
 > and redemittel browsers can adopt it next.
 >
-> **Remaining (3c):** wire `FacetSheet` into `VocabularyTrainer` (CEFR + part-of-speech, alongside the
-> existing theme/sub drill-down) and `RedemittelPractice` (register + category); then step 2, the
-> **Work-mode facets** (sector/situation/counterpart), which is gated on a content back-fill (those
-> facets are 0-tagged today, so a sector pass for `care`/`office` must land first).
+> **Sub-milestone 3c SHIPPED (session 43):** `FacetSheet` wired into `VocabularyTrainer` (replaces the
+> old CEFR `Select`) with **CEFR + Wortart** facets, plus the **Work-mode `sector` ("Branche") facet
+> exposed only when `mode === "work"`** (`facets` is mode-derived). State in `?cefr=`/`?pos=`/`?sector=`,
+> removable active-filter chips in the bar. Unblocked by the sector back-fill (13-word care/Pflege pack
+> + curated `office` tags, PR #242), so the sector facet shows two real values (Pflege/Büro) in Work
+> mode. Step 2 (Work-mode facets) is therefore functional.
+>
+> **Remaining:** wire `FacetSheet` into `RedemittelPractice` (register + category); tag
+> `workSituation`/`counterpart` (still 0-tagged) and expose them as further Work facets; broaden the
+> `sector` tagging beyond the starter set.
 
 **Executive summary:** Ship the real multi-facet experience: a filter bar with a **slide-up
 filter sheet** (live counts, greyed dead-ends, never an empty screen), the **Work-mode

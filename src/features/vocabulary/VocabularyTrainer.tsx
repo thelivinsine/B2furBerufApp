@@ -2,10 +2,19 @@ import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Layers, Sparkles, ChevronLeft } from "lucide-react";
+import type { VocabItem } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  FacetSheet,
+  ActiveFilterChip,
+  applyFacets,
+  type FacetDef,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
 import { SectionHeading } from "@/components/shared/misc";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
@@ -14,21 +23,71 @@ import { SubThemePicker } from "./SubThemePicker";
 // Hidden for now: collocations live under the dedicated /collocations menu
 // import { CollocationsList } from "./CollocationsList";
 
-const CEFR_OPTIONS: { id: string; label: string }[] = [
-  { id: "all", label: "Alle Stufen" },
-  { id: "B1.1", label: "B1.1" },
-  { id: "B1.2", label: "B1.2" },
-  { id: "B2.1", label: "B2.1" },
-  { id: "B2.2", label: "B2.2" },
-  { id: "C1", label: "C1" },
-];
+// Facet options derive from the values actually present in the bank, so an
+// always-empty level/part-of-speech/sector never appears.
+const CEFR_ORDER = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];
+const POS_ORDER = ["noun", "verb", "adjective", "adverb", "phrase", "connector"];
+const POS_LABEL: Record<string, string> = {
+  noun: "Nomen",
+  verb: "Verb",
+  adjective: "Adjektiv",
+  adverb: "Adverb",
+  phrase: "Phrase",
+  connector: "Konnektor",
+};
+const SECTOR_ORDER = ["care", "office", "trades", "it", "retail", "hospitality"];
+const SECTOR_LABEL: Record<string, string> = {
+  care: "Pflege",
+  office: "Büro",
+  trades: "Handwerk",
+  it: "IT",
+  retail: "Handel",
+  hospitality: "Gastgewerbe",
+};
+const present = <T,>(order: T[], has: (v: T) => boolean) => order.filter(has);
+
+const CEFR_FACET: FacetDef<VocabItem> = {
+  id: "cefr",
+  label: "Stufe (CEFR)",
+  hint: "Mehrfachauswahl",
+  options: present(CEFR_ORDER, (c) => vocabulary.some((v) => v.cefr === c)).map((c) => ({
+    value: c,
+    label: c,
+  })),
+  get: (v) => v.cefr,
+};
+const POS_FACET: FacetDef<VocabItem> = {
+  id: "pos",
+  label: "Wortart",
+  options: present(POS_ORDER, (p) => vocabulary.some((v) => v.pos === p)).map((p) => ({
+    value: p,
+    label: POS_LABEL[p],
+  })),
+  get: (v) => v.pos,
+};
+// Work-mode facet: only exposed when the Mode lens is "work" (Taxonomy Phase 3).
+const SECTOR_FACET: FacetDef<VocabItem> = {
+  id: "sector",
+  label: "Branche",
+  options: present(SECTOR_ORDER, (s) => vocabulary.some((v) => v.sector === s)).map((s) => ({
+    value: s,
+    label: SECTOR_LABEL[s],
+  })),
+  get: (v) => v.sector,
+};
 
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
+  const learningMode = useSettingsStore((s) => s.mode);
   const theme = params.get("theme") ?? "all";
   const sub = params.get("sub") ?? ""; // "" = none, "all" = whole theme, else a subThemeId
-  const cefr = params.get("cefr") ?? "all";
   const [mode, setMode] = useState("flashcards");
+
+  // Sector is a Work-mode facet: only surface it when the lens is "work".
+  const facets = useMemo(
+    () => (learningMode === "work" ? [CEFR_FACET, POS_FACET, SECTOR_FACET] : [CEFR_FACET, POS_FACET]),
+    [learningMode],
+  );
 
   const activeTheme = theme !== "all" ? themeById(theme) : undefined;
   const subThemes = activeTheme?.subThemes ?? [];
@@ -39,12 +98,32 @@ export function VocabularyTrainer() {
   const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
   const activeSub = subThemes.find((s) => s.id === sub);
 
-  const items = useMemo(
-    () => filterVocab({ theme, sub: subFilter, cefr }),
-    [theme, subFilter, cefr],
-  );
+  // Selection (CEFR / Wortart / Branche) lives in the URL alongside ?theme=/?sub=.
+  const selection: FacetSelection = useMemo(() => {
+    const s: FacetSelection = {};
+    for (const f of [CEFR_FACET, POS_FACET, SECTOR_FACET]) {
+      const raw = params.get(f.id);
+      if (raw) s[f.id] = raw.split(",");
+    }
+    return s;
+  }, [params]);
 
-  const cefrCount = (c: string) => filterVocab({ theme, sub: subFilter, cefr: c }).length;
+  // Theme + sub scope; the facet sheet counts and the final list build on it.
+  const scoped = useMemo(
+    () => filterVocab({ theme, sub: subFilter }),
+    [theme, subFilter],
+  );
+  const items = useMemo(() => applyFacets(scoped, facets, selection), [scoped, facets, selection]);
+  // Remount key so the flashcard/quiz decks reshuffle when the facets change.
+  const facetKey = ["cefr", "pos", "sector"].map((id) => params.get(id) ?? "").join("|");
+
+  const activeChips = facets.flatMap((f) =>
+    (selection[f.id] ?? []).map((v) => ({
+      facetId: f.id,
+      value: v,
+      label: f.options.find((o) => o.value === v)?.label ?? v,
+    })),
+  );
 
   const setTheme = (t: string) => {
     const p = new URLSearchParams(params);
@@ -54,12 +133,18 @@ export function VocabularyTrainer() {
     setParams(p, { replace: true });
   };
 
-  const setCefr = (c: string) => {
+  const setSelection = (next: FacetSelection) => {
     const p = new URLSearchParams(params);
-    if (c === "all") p.delete("cefr");
-    else p.set("cefr", c);
+    for (const f of [CEFR_FACET, POS_FACET, SECTOR_FACET]) {
+      const v = next[f.id];
+      if (v && v.length) p.set(f.id, v.join(","));
+      else p.delete(f.id);
+    }
     setParams(p, { replace: true });
   };
+
+  const removeFacetValue = (facetId: string, value: string) =>
+    setSelection({ ...selection, [facetId]: (selection[facetId] ?? []).filter((v) => v !== value) });
 
   const setSub = (s: string) => {
     const p = new URLSearchParams(params);
@@ -89,21 +174,29 @@ export function VocabularyTrainer() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={cefr} onValueChange={setCefr}>
-              <SelectTrigger className="w-full sm:w-36">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {CEFR_OPTIONS.map((o) => (
-                  <SelectItem key={o.id} value={o.id}>
-                    {o.label} ({cefrCount(o.id)})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <FacetSheet
+              items={scoped}
+              facets={facets}
+              selection={selection}
+              onChange={setSelection}
+              resultLabel={(n) => `${n} Wort${n !== 1 ? "e" : ""} anzeigen`}
+              triggerClassName="h-10 sm:w-auto"
+            />
           </div>
         }
       />
+
+      {activeChips.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          {activeChips.map(({ facetId, value, label }) => (
+            <ActiveFilterChip
+              key={`${facetId}:${value}`}
+              label={label}
+              onRemove={() => removeFacetValue(facetId, value)}
+            />
+          ))}
+        </div>
+      )}
 
       {showPicker && activeTheme ? (
         <SubThemePicker
@@ -142,11 +235,11 @@ export function VocabularyTrainer() {
 
             <TabsContent value="flashcards">
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <Flashcards items={items} key={`fc-${theme}-${sub}`} />
+                <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}`} />
               </motion.div>
             </TabsContent>
             <TabsContent value="quiz">
-              <VocabQuiz items={items} key={`q-${theme}-${sub}`} />
+              <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}`} />
             </TabsContent>
             <TabsContent value="list">
               <VocabList items={items} />
