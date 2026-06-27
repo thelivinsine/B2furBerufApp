@@ -1237,3 +1237,23 @@ backfilled from the session summary so the trail is complete.)
   that any "update the documentation"-type request implies updating `docs/SESSION_PROMPT_LOG.md` too (plus
   any stale plan/CLAUDE.md docs), and mirrored the rule in this log's "How this log is maintained" header.
 - **Artifacts:** `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`; PR #239.
+
+## Session 43 — 2026-06-27 (Taxonomy Phase 3a: mode-aware intent cards)
+
+## Entry 76 — 2026-06-27 (continue with the taxonomy plan, next phase)
+- **Branch:** `claude/taxonomy-review-next-phase-ynw1lt`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > continue with the taxxonomy review plan next phase
+- **Response summary:** Started **Phase 3** of the taxonomy plan. Phase 3 is large and its Work-mode
+  facets (sector/workSituation/counterpart) have **zero tagged content**, so I shipped the cleanest,
+  highest-value slice first: **step 4, the mode-aware intent/goal cards**. Added
+  `src/features/dashboard/intentCards.ts` (7 starting-point cards, each with a pre-built filter bundle +
+  deep-link, `intentCardsForMode()` lens filter, and live `filterVocab`-based word-count/CEFR-range meta)
+  and rendered them as a new "Was möchtest du üben?" section atop the dashboard. This gives `mode` its
+  **first real content effect** (switching the header Mode pill now changes which cards show). `pnpm
+  lint:content` + `pnpm build` green. Documented the remaining Phase 3b work (shared faceted filter,
+  register unification, and the Work-facet content back-fill) in the plan + status doc.
+- **Artifacts:** `src/features/dashboard/intentCards.ts` (new), `src/features/dashboard/Dashboard.tsx`,
+  `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.

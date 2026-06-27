@@ -27,6 +27,7 @@ import { ProgressRing } from "@/components/shared/ProgressRing";
 import { SectionHeading } from "@/components/shared/misc";
 import { useMediaQuery } from "@/lib/hooks";
 import { recommendedNext } from "./recommend";
+import { cardMeta, intentCardsForMode } from "./intentCards";
 
 type Accent = "primary" | "accent" | "success" | "warning";
 const accentText: Record<Accent, string> = {
@@ -62,6 +63,7 @@ function StatItem({
 
 export function Dashboard() {
   const name = useSettingsStore((s) => s.name);
+  const learningMode = useSettingsStore((s) => s.mode);
   const examDate = useSettingsStore((s) => s.examDate);
   const goal = useSettingsStore((s) => s.dailyGoalXp);
   const xp = useProgressStore((s) => s.xp);
@@ -102,6 +104,10 @@ export function Dashboard() {
     b.ratio < a.ratio || (b.ratio === a.ratio && b.words.length > a.words.length) ? b : a,
   );
   const ordered = [featured, ...themeStats.filter((s) => s.theme.id !== featured.theme.id)];
+
+  // Mode-aware starting points (Taxonomy Phase 3). The lens narrows which cards
+  // show but never empties the page; the Themen grid below always stays.
+  const intents = intentCardsForMode(learningMode);
 
   return (
     <div className="space-y-5 sm:space-y-8">
@@ -173,6 +179,44 @@ export function Dashboard() {
           <Progress value={info.progress * 100} className="h-1.5" />
         </div>
       </Card>
+
+      {/* Intent / goal cards — start from a real situation. Filtered by the
+          active Mode lens (Taxonomy Phase 3). */}
+      <section>
+        <SectionHeading
+          eyebrow="Schnellstart"
+          title="Was möchtest du üben?"
+          description="Starte mit einer echten Situation. Wir stellen die passenden Wörter und Übungen zusammen."
+        />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {intents.map((card, i) => (
+            <motion.div
+              key={card.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.04 }}
+            >
+              <Link to={card.to}>
+                <div
+                  className={cn(
+                    "card-hover relative h-full overflow-hidden rounded-2xl bg-gradient-to-br p-4 text-white shadow-soft",
+                    card.accent,
+                  )}
+                >
+                  <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/15 blur-2xl" />
+                  <div className="relative flex h-full flex-col">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-white/80">
+                      {card.eyebrowDe}
+                    </p>
+                    <p className="mt-1 text-base font-semibold leading-snug">{card.titleDe}</p>
+                    <p className="mt-auto pt-3 text-xs text-white/85">{cardMeta(card)}</p>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
       {/* Themes — the main browse surface, with one featured (larger) card. */}
       <section>
