@@ -1307,5 +1307,7 @@ backfilled from the session summary so the trail is complete.)
   already on the Fortschritt/Analytics page, so nothing was lost). Replaced them with **one compact
   summary strip below the tiles** (streak · today XP/goal · days-to-exam · the recommended primary action
   + a "Fortschritt" link to the full breakdown). Mode pill placement/prominence left intact. `pnpm build`
-  green. Then continued with the plan (redemittel faceting — see next entry).
-- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR #TBD.
+  green. Then continued with the plan: shipped the dashboard restructure as **PR #244**, then wired a
+  Register filter into the Redemittel browse view (**PR #245**).
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx` (PR #244); `src/features/redemittel/RedemittelTrainer.tsx`
+  (PR #245); `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.

@@ -11,9 +11,11 @@
 > **sector back-fill** = a 13-word care/Pflege pack + curated `office` tags (vocab 515→528, PR #242);
 > **3c** = the faceted filter wired into the VocabularyTrainer with CEFR + Wortart facets and the
 > **Work-mode `sector` ("Branche") facet shown only when the Mode lens is `work`**. So the Work-mode
-> facets are now functional end to end. **Still open:** wire the faceted filter into the
-> **redemittel** browser (register + category), tag `workSituation`/`counterpart` (still 0-tagged) and
-> expose them as further Work facets, and broaden the `sector` tagging beyond the curated starter set.
+> facets are now functional end to end. The **redemittel** browse view also gained a **Register filter**
+> (FacetSheet: neutral/formell/diplomatisch; empty categories hidden). The **dashboard** was reworked to
+> lead with the intent tiles and slim the progress block down to a compact strip (detail lives on
+> Fortschritt). **Still open:** tag `workSituation`/`counterpart` (still 0-tagged) and expose them as
+> further Work facets, and broaden the `sector` tagging beyond the curated starter set.
 > Carry-over: the `cefr` tags are AI-drafted and still need human verification (provenance
 > `draft→verified`). Sub-themes (Phase 2) cover 3 of 11 themes (`behoerde`, `customer`, `meetings`).
 
