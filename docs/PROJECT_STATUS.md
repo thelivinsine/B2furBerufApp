@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-27 (session 43). Branch: `claude/taxonomy-review-next-phase-ynw1lt`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-28 (session 44). Branch: `claude/review-previous-session-69pxat`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -358,6 +358,38 @@ three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
   More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
   for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
 - `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 44 (2026-06-28) — Session-43 review, app-wide dark-mode fix, filter-harmonization plan ✅
+A review + bugfix + planning session on branch `claude/review-previous-session-69pxat`. Three PRs
+squash-merged to `main` (#250–#252).
+- **Reviewed session 43** end to end (taxonomy Phases 3–4): build/typecheck/`lint:content` green,
+  every new view implemented as documented and responsive. Fixed one latent mobile bug, the
+  `FacetSheet` bottom sheet inherited `overflow-y-auto` on the whole container, so on a short viewport
+  the "Apply" button could scroll away. Constrained the grid (`grid-rows-[auto_auto_minmax(0,1fr)_auto]`)
+  so only the facet list scrolls and the footer stays pinned (**PR #250**).
+- **App-wide dark-mode fix (#251).** Founder reported the Kollokationen filter pills rendering bright
+  white in dark mode. Root cause: **Tailwind's opacity scale only contains multiples of 5, so any
+  color utility using `/8` or `/12` silently failed to compile** (verified in the production CSS, zero
+  rules emitted). Effects: `bg-white dark:bg-white/8` pills lost their dark override and fell back to
+  white; every `/12` tint (badges, stat cards, header streak/level pills, exam/simulation/onboarding
+  icon boxes, RelatedPanel chips) rendered with no background at all. Bumped all `/8` and `/12`
+  color-opacity utilities to `/10` (34 utilities across 16 files); audited the whole `src` tree, those
+  were the only non-multiple-of-5 steps in use, and no hardcoded light-only colors lack a dark variant.
+  **Lesson for future work: only use opacity steps that are multiples of 5** (e.g. `/10`, `/15`), the
+  build does not warn on invalid ones.
+- **Filter-harmonization plan (#252, docs-only).** Founder flagged the search bar / filter button /
+  filter options / theme + branche controls as chaotic and inconsistent across Wortschatz,
+  Kollokationen, Redemittel, etc. Researched the codebase + `docs/TAXONOMY_REDESIGN.md` + the uploaded
+  learning-app playbook (`docs/Language Learning App Success Factors.docx`) and wrote
+  **`docs/FILTER_HARMONIZATION_PLAN.md`**: one shared `Search + Theme + Filter` toolbar
+  (`BrowseToolbar`) + the existing `FacetSheet` on every page, a single responsive panel for
+  mobile+desktop, branded `HubHero` header everywhere, a shared `src/lib/cefr.ts` for consistent CEFR
+  labels, and the verb-rail/legend decluttered into the sheet. Phased: Phase 1 = the 3 filtering pages,
+  Phase 2 = the simpler hubs. **Approved but not yet implemented**, the founder will build it later.
+- **Resume here →** implement `docs/FILTER_HARMONIZATION_PLAN.md` Phase 1 (Wortschatz, Kollokationen,
+  Redemittel) when ready. Other optional follow-ups from session 43 still stand (human-verify `cefr`
+  tags, broaden `sector`/`workSituation`, extend sub-themes past 3 of 11). Next big rock remains a new
+  life-domain theme (banking / healthcare / housing).
 
 ### Session 43 (2026-06-27) — Taxonomy redesign Phases 3–4 SHIPPED + dashboard restructure ✅
 Completed the taxonomy redesign. All of Phase 3 and Phase 4 are live on `main` across nine squash-merged
