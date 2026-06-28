@@ -1372,3 +1372,82 @@ backfilled from the session summary so the trail is complete.)
   (taxonomy Phases 3–4 + dashboard restructure, PRs #240–#248), and confirmed `CLAUDE.md`
   (counts/facets/UI) and `docs/TAXONOMY_IMPLEMENTATION_PLAN.md` are current. No app code changed.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Session 44 — 2026-06-28 — Session-43 review, dark-mode fix, filter-harmonization plan
+Branch: `claude/review-previous-session-69pxat`.
+
+## Entry 84 — 2026-06-28 16:57 UTC
+- **Branch:** `claude/review-previous-session-69pxat`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > can you make sure all the changes in the previous session are all well done as per the plan? fix any bugs you may find and make sure all the updates are both computer and mobile friendly.
+- **Response summary:** Reviewed all of session 43 (taxonomy Phases 3–4, PRs #240–248) against the
+  documented plan. Installed deps and confirmed `pnpm typecheck` + `pnpm build` + `pnpm lint:content`
+  all green. Read every new/changed file (FacetSheet, intent cards, Dashboard, Work-mode facets,
+  RelatedPanel, adaptive QuickRevision, `practiceRoute`, SubThemePicker) and verified each matches the
+  plan and is responsive on mobile + desktop. Found and fixed one latent mobile bug: the `FacetSheet`
+  bottom sheet inherited `overflow-y-auto` on the whole container, so on a short viewport the "Apply"
+  button scrolled away. Constrained the grid to `[auto auto minmax(0,1fr) auto]` so only the facet list
+  scrolls and the footer stays pinned.
+- **Artifacts:** `src/features/shared/FacetSheet.tsx`; commit `0c3bd71` (pre-fix), PR #250; merge `0ed2190`.
+
+## Entry 85 — 2026-06-28 17:25 UTC
+- **Branch:** `claude/review-previous-session-69pxat`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** 1 screenshot (Kollokationen page in dark mode showing bright-white filter pills, verb chips and scroll arrows).
+- **Prompt (verbatim):**
+  > there's a problem with dark mode here. look for such bugs all across the app and fix and auto deploy
+- **Response summary:** Diagnosed the root cause beyond the reported pills: **Tailwind's opacity scale
+  only contains multiples of 5, so any color utility using `/8` or `/12` silently failed to compile**
+  (confirmed via an isolated Tailwind run and by grepping the production CSS, zero rules emitted). Two
+  effects in dark mode: `bg-white dark:bg-white/8` elements lost their dark override and fell back to
+  bright white; every `/12` tint (badges, stat cards, header streak/level pills, exam/simulation/
+  onboarding icon boxes, RelatedPanel chips) rendered with no background. Bumped all `/8` and `/12`
+  color-opacity utilities to `/10` (34 utilities, 16 files). Audited the whole `src` tree: those were
+  the only non-multiple-of-5 steps in use and no hardcoded light-only colors lack a dark variant.
+  Verified the tints now appear in the emitted CSS; typecheck/build/lint green. Shipped and auto-merged.
+- **Artifacts:** 16 files incl. `components/ui/badge.tsx`, `components/shared/StatCard.tsx`,
+  `components/layout/AppShell.tsx`, `features/shared/FacetSheet.tsx`,
+  `features/collocations/CollocationsBrowser.tsx`, `features/vocabulary/RelatedPanel.tsx`, exam/
+  simulation/onboarding/redemittel/quiz files; commit `0c3bd71`, PR #251; merge `f6effee`.
+
+## Entry 86 — 2026-06-28 17:45 UTC
+- **Branch:** `claude/review-previous-session-69pxat`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** 4 screenshots (Vokabeltrainer + Redemittel + Kollokationen filter sheets and the Quiz level picker, showing the inconsistent header/search/filter controls).
+- **Prompt (verbatim):**
+  > the search bar, filter button, filter options, themes and branches available are all super chaotic and inconsistent across the menu items like wortschatz, collocations and other relevant items where these filters are applicable. check the taxonomy plan, and recently uploaded playbook for learning apps and prepare a plan for harmonizing these features, redesign the app to have smoothest UX/UI with least confusion and straightforward usage with highest value.
+- **Response summary:** Entered plan mode. Read the uploaded playbook
+  (`docs/Language Learning App Success Factors.docx`, extracted via python) and the taxonomy spec
+  (`docs/TAXONOMY_REDESIGN.md`), and ran two Explore agents to map every browse page's
+  header/search/filter structure and the intended faceted-filter UX. Confirmed the divergences
+  (two header styles, search only on Kollokationen, Filter button placed differently per page, bespoke
+  verb-rail + legend, inconsistent CEFR labels). Asked the founder four scoping questions; answers:
+  phased rollout, one responsive panel, branded HubHero everywhere, inline `Search + Theme + Filter`.
+  Wrote the plan (a shared `BrowseToolbar` + the existing `FacetSheet` on every page, a shared
+  `src/lib/cefr.ts`, declutter the verb-rail/legend into the sheet). Plan approved.
+- **Artifacts:** plan file `the-search-bar-filter-enumerated-stream.md` (later saved into the repo, see Entry 87). No app code changed.
+
+## Entry 87 — 2026-06-28 17:55 UTC
+- **Branch:** `claude/review-previous-session-69pxat`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > save the plan in the main branch. I'll implement it later
+- **Response summary:** Saved the approved plan into the repo as
+  **`docs/FILTER_HARMONIZATION_PLAN.md`** (marked "PLANNED, not yet implemented"). Docs-only, no code.
+  Shipped to `main` via PR and realigned the dev branch.
+- **Artifacts:** `docs/FILTER_HARMONIZATION_PLAN.md` (new); commit `9f567f6`, PR #252; merge `619f812`.
+
+## Entry 88 — 2026-06-28 18:02 UTC
+- **Branch:** `claude/review-previous-session-69pxat`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Added a **Session 44** block to `docs/PROJECT_STATUS.md` (review + dark-mode
+  fix + filter-harmonization plan, PRs #250–#252, with the "only use opacity steps that are multiples
+  of 5" lesson and the "resume here" pointer to the harmonization plan) and bumped its "Last updated"
+  line. Appended Entries 84–88 here.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
