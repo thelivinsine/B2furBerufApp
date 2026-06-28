@@ -1,31 +1,25 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Layers, Sparkles, ChevronLeft } from "lucide-react";
+import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { HubHero } from "@/components/shared/HubHero";
+import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import {
-  FacetSheet,
-  ActiveFilterChip,
   applyFacets,
   type FacetDef,
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
-import { SectionHeading } from "@/components/shared/misc";
+import { CEFR_ORDER } from "@/lib/cefr";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
 import { VocabList } from "./VocabList";
 import { SubThemePicker } from "./SubThemePicker";
-// Hidden for now: collocations live under the dedicated /collocations menu
-// import { CollocationsList } from "./CollocationsList";
 
-// Facet options derive from the values actually present in the bank, so an
-// always-empty level/part-of-speech/sector never appears.
-const CEFR_ORDER = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];
 const POS_ORDER = ["noun", "verb", "adjective", "adverb", "phrase", "connector"];
 const POS_LABEL: Record<string, string> = {
   noun: "Nomen",
@@ -44,7 +38,29 @@ const SECTOR_LABEL: Record<string, string> = {
   retail: "Handel",
   hospitality: "Gastgewerbe",
 };
+const SITUATION_ORDER = [
+  "meeting",
+  "shift-handover",
+  "customer-call",
+  "instructions",
+  "onboarding",
+  "sick-leave",
+  "review",
+];
+const SITUATION_LABEL: Record<string, string> = {
+  meeting: "Besprechung",
+  "shift-handover": "Übergabe",
+  "customer-call": "Kundengespräch",
+  instructions: "Unterweisung",
+  onboarding: "Einarbeitung",
+  "sick-leave": "Krankmeldung",
+  review: "Feedback",
+};
 const present = <T,>(order: T[], has: (v: T) => boolean) => order.filter(has);
+
+function normalise(s: string) {
+  return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
+}
 
 const CEFR_FACET: FacetDef<VocabItem> = {
   id: "cefr",
@@ -65,25 +81,6 @@ const POS_FACET: FacetDef<VocabItem> = {
   })),
   get: (v) => v.pos,
 };
-const SITUATION_ORDER = [
-  "meeting",
-  "shift-handover",
-  "customer-call",
-  "instructions",
-  "onboarding",
-  "sick-leave",
-  "review",
-];
-const SITUATION_LABEL: Record<string, string> = {
-  meeting: "Besprechung",
-  "shift-handover": "Übergabe",
-  "customer-call": "Kundengespräch",
-  instructions: "Unterweisung",
-  onboarding: "Einarbeitung",
-  "sick-leave": "Krankmeldung",
-  review: "Feedback",
-};
-// Work-mode facets: only exposed when the Mode lens is "work" (Taxonomy Phase 3).
 const SECTOR_FACET: FacetDef<VocabItem> = {
   id: "sector",
   label: "Branche",
@@ -109,10 +106,10 @@ export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
   const learningMode = useSettingsStore((s) => s.mode);
   const theme = params.get("theme") ?? "all";
-  const sub = params.get("sub") ?? ""; // "" = none, "all" = whole theme, else a subThemeId
+  const sub = params.get("sub") ?? "";
   const [mode, setMode] = useState("flashcards");
+  const [search, setSearch] = useState("");
 
-  // Sector + Situation are Work-mode facets: only surface them when lens === "work".
   const facets = useMemo(
     () => (learningMode === "work" ? [CEFR_FACET, POS_FACET, ...WORK_FACETS] : [CEFR_FACET, POS_FACET]),
     [learningMode],
@@ -121,13 +118,10 @@ export function VocabularyTrainer() {
   const activeTheme = theme !== "all" ? themeById(theme) : undefined;
   const subThemes = activeTheme?.subThemes ?? [];
   const hasSubThemes = subThemes.length > 0;
-  // Show the drill-down picker when a sub-themed topic is chosen but no
-  // sub-theme is selected yet. "Gesamtes Thema" sets sub=all to skip it.
   const showPicker = hasSubThemes && !sub;
   const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
   const activeSub = subThemes.find((s) => s.id === sub);
 
-  // Selection (CEFR / Wortart / Branche / Situation) lives in the URL alongside ?theme=/?sub=.
   const selection: FacetSelection = useMemo(() => {
     const s: FacetSelection = {};
     for (const f of ALL_FACETS) {
@@ -137,13 +131,23 @@ export function VocabularyTrainer() {
     return s;
   }, [params]);
 
-  // Theme + sub scope; the facet sheet counts and the final list build on it.
   const scoped = useMemo(
     () => filterVocab({ theme, sub: subFilter }),
     [theme, subFilter],
   );
-  const items = useMemo(() => applyFacets(scoped, facets, selection), [scoped, facets, selection]);
-  // Remount key so the flashcard/quiz decks reshuffle when the facets change.
+
+  const searched = useMemo(() => {
+    if (!search.trim()) return scoped;
+    const q = normalise(search.trim());
+    return scoped.filter(
+      (v) =>
+        normalise(v.de).includes(q) ||
+        normalise(v.en).includes(q) ||
+        v.related.some((r) => normalise(r).includes(q)),
+    );
+  }, [scoped, search]);
+
+  const items = useMemo(() => applyFacets(searched, facets, selection), [searched, facets, selection]);
   const facetKey = ALL_FACETS.map((f) => params.get(f.id) ?? "").join("|");
 
   const activeChips = facets.flatMap((f) =>
@@ -158,7 +162,7 @@ export function VocabularyTrainer() {
     const p = new URLSearchParams(params);
     if (t === "all") p.delete("theme");
     else p.set("theme", t);
-    p.delete("sub"); // reset the drill-down whenever the theme changes
+    p.delete("sub");
     setParams(p, { replace: true });
   };
 
@@ -182,50 +186,38 @@ export function VocabularyTrainer() {
     setParams(p, { replace: true });
   };
 
+  const primaryOptions = [
+    { value: "all", label: "Alle Themen", count: vocabulary.length },
+    ...themes.map((t) => ({
+      value: t.id,
+      label: t.titleDe,
+      count: vocabByTheme(t.id).length,
+    })),
+  ];
+
   return (
     <div className="space-y-4 sm:space-y-6">
-      <SectionHeading
+      <HubHero
+        icon={BookOpenText}
+        gradient="from-indigo-500 to-violet-500"
         eyebrow="Wortschatz"
         title="Vokabeltrainer"
         description="Lerne mit Karteikarten, aktivem Abrufen und intelligenter Wiederholung (Spaced Repetition)."
-        action={
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <Select value={theme} onValueChange={setTheme}>
-              <SelectTrigger className="w-full sm:w-56">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Alle Themen ({vocabulary.length})</SelectItem>
-                {themes.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>
-                    {t.titleDe} ({vocabByTheme(t.id).length})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FacetSheet
-              items={scoped}
-              facets={facets}
-              selection={selection}
-              onChange={setSelection}
-              resultLabel={(n) => `${n} Wort${n !== 1 ? "e" : ""} anzeigen`}
-              triggerClassName="h-10 sm:w-auto"
-            />
-          </div>
-        }
       />
 
-      {activeChips.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          {activeChips.map(({ facetId, value, label }) => (
-            <ActiveFilterChip
-              key={`${facetId}:${value}`}
-              label={label}
-              onRemove={() => removeFacetValue(facetId, value)}
-            />
-          ))}
-        </div>
-      )}
+      <BrowseToolbar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Suche nach Wort, Übersetzung …"
+        primary={{ value: theme, onChange: setTheme, options: primaryOptions }}
+        facetItems={searched}
+        facets={facets}
+        facetSelection={selection}
+        onFacetChange={setSelection}
+        resultLabel={(n) => `${n} Wort${n !== 1 ? "e" : ""} anzeigen`}
+        activeChips={activeChips}
+        onRemoveChip={removeFacetValue}
+      />
 
       {showPicker && activeTheme ? (
         <SubThemePicker
@@ -264,11 +256,11 @@ export function VocabularyTrainer() {
 
             <TabsContent value="flashcards">
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}`} />
+                <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}-${search}`} />
               </motion.div>
             </TabsContent>
             <TabsContent value="quiz">
-              <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}`} />
+              <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}-${search}`} />
             </TabsContent>
             <TabsContent value="list">
               <VocabList items={items} />
