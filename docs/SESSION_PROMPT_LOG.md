@@ -1451,3 +1451,29 @@ Branch: `claude/review-previous-session-69pxat`.
   of 5" lesson and the "resume here" pointer to the harmonization plan) and bumped its "Last updated"
   line. Appended Entries 84–88 here.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 89 — 2026-06-29 ~00:00 UTC
+- **Branch:** `claude/filter-harmonization-plan-0vzdgz`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none.
+- **Prompt (verbatim):**
+  > start implementing the filter harmonization plan
+- **Response summary:** Implemented the full `docs/FILTER_HARMONIZATION_PLAN.md` across both phases.
+  **Phase 1:** created `src/lib/cefr.ts` (shared CEFR scale, replacing 4 duplicated arrays) and
+  `src/features/shared/BrowseToolbar.tsx` (unified toolbar layout). Updated three pages:
+  VocabularyTrainer (SectionHeading to HubHero, added search, BrowseToolbar), CollocationsBrowser
+  (removed verb-chip rail + legend, verb moved into FacetSheet, BrowseToolbar), RedemittelTrainer
+  (SectionHeading to HubHero, added search + Kategorie dropdown, BrowseToolbar). Also updated
+  SubThemePicker and intentCards to use the shared CEFR_ORDER import.
+  **Phase 2:** QuizHub level labels now use `difficultyToBand()` from `src/lib/cefr.ts`.
+  GrammarHub/ExamHub/SimulationHub needed no changes. Verified on mobile + desktop via Playwright
+  screenshots. `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green.
+  Updated docs: PROJECT_STATUS.md (session 45 entry + resume pointer), FILTER_HARMONIZATION_PLAN.md
+  (status to IMPLEMENTED), CLAUDE.md (added cefr.ts to layout, updated taxonomy paragraph with
+  harmonized toolbar info), SESSION_PROMPT_LOG.md (this entry).
+- **Artifacts:** `src/lib/cefr.ts` (new), `src/features/shared/BrowseToolbar.tsx` (new),
+  `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/collocations/CollocationsBrowser.tsx`,
+  `src/features/redemittel/RedemittelTrainer.tsx`, `src/features/vocabulary/SubThemePicker.tsx`,
+  `src/features/dashboard/intentCards.ts`, `src/features/quiz/QuizHub.tsx`,
+  `docs/PROJECT_STATUS.md`, `docs/FILTER_HARMONIZATION_PLAN.md`, `CLAUDE.md`,
+  `docs/SESSION_PROMPT_LOG.md`.

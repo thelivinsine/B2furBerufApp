@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-28 (session 44). Branch: `claude/review-previous-session-69pxat`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-06-29 (session 45). Branch: `claude/filter-harmonization-plan-0vzdgz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -385,11 +385,36 @@ squash-merged to `main` (#250–#252).
   (`BrowseToolbar`) + the existing `FacetSheet` on every page, a single responsive panel for
   mobile+desktop, branded `HubHero` header everywhere, a shared `src/lib/cefr.ts` for consistent CEFR
   labels, and the verb-rail/legend decluttered into the sheet. Phased: Phase 1 = the 3 filtering pages,
-  Phase 2 = the simpler hubs. **Approved but not yet implemented**, the founder will build it later.
-- **Resume here →** implement `docs/FILTER_HARMONIZATION_PLAN.md` Phase 1 (Wortschatz, Kollokationen,
-  Redemittel) when ready. Other optional follow-ups from session 43 still stand (human-verify `cefr`
-  tags, broaden `sector`/`workSituation`, extend sub-themes past 3 of 11). Next big rock remains a new
-  life-domain theme (banking / healthcare / housing).
+  Phase 2 = the simpler hubs. **Implemented in session 45 (below).**
+- **Resume here →** filter harmonization is complete (session 45). Optional follow-ups from session 43
+  still stand (human-verify `cefr` tags, broaden `sector`/`workSituation`, extend sub-themes past 3 of
+  11). Next big rock remains a new life-domain theme (banking / healthcare / housing).
+
+### Session 45 (2026-06-29) — Filter harmonization IMPLEMENTED (Phase 1 + Phase 2) ✅
+Implemented the full `docs/FILTER_HARMONIZATION_PLAN.md` across both phases.
+- **New shared pieces:**
+  - **`src/lib/cefr.ts`** — single source of truth for the CEFR scale (`CEFR_ORDER`, `cefrLabel`,
+    `difficultyToBand`). Replaced 4 duplicated `CEFR_ORDER` arrays (VocabularyTrainer,
+    CollocationsBrowser, SubThemePicker, intentCards).
+  - **`src/features/shared/BrowseToolbar.tsx`** — thin layout wrapper that fixes the position and
+    styling of `[Search] [Primary Select] [FacetSheet trigger]` + active-chips row. Reuses the
+    existing `FacetSheet` and `ActiveFilterChip`.
+- **Phase 1 — three filtering pages:**
+  - **VocabularyTrainer:** `SectionHeading` → `HubHero`, added free-text search (over de/en/related),
+    theme dropdown + filter sheet via `BrowseToolbar`. SubThemePicker + tabs preserved below.
+  - **CollocationsBrowser:** removed the verb-chip scroll/expand rail + the Neutral/Formal colour
+    legend. **Verb filter moved into the FacetSheet** as a third facet (CEFR + Register + Verb), so it
+    gains live counts, greyed dead-ends, and removable chips. Search persisted to URL (`?q=`). Quiz CTA
+    moved to `BrowseToolbar` trailing slot.
+  - **RedemittelTrainer:** `SectionHeading` → `HubHero`, added free-text search (over de/en), added
+    **Kategorie primary dropdown** (`?cat=`) as the primary axis. Filter sheet kept (Register facet).
+    Wendungen/Üben tabs preserved.
+- **Phase 2 — non-filtering hubs:** QuizHub level labels now use `difficultyToBand()` from the shared
+  module, producing consistent `B1 / B2.1 / B2.2·C1` labels. GrammarHub, ExamHub, SimulationHub already
+  used `HubHero` and needed no changes.
+- **Verification:** all three pages tested on mobile (390px) and desktop (1280px). Search narrows
+  results and composes with facets. Filter sheets open with live counts. URL params round-trip. Dark mode
+  correct (no new `bg-white` pills). `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green.
 
 ### Session 43 (2026-06-27) — Taxonomy redesign Phases 3–4 SHIPPED + dashboard restructure ✅
 Completed the taxonomy redesign. All of Phase 3 and Phase 4 are live on `main` across nine squash-merged
@@ -1749,9 +1774,15 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 
 ## Resume here (next session)
 
-**Handoff after session 40 (2026-06-26).** Everything noted ✅ is merged to `main`.
-Active automation branch: `claude/todo-priorities-0f8hlr` (realign to `origin/main` after each
+**Handoff after session 45 (2026-06-29).** Everything noted ✅ is merged to `main`.
+Active automation branch: `claude/filter-harmonization-plan-0vzdgz` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
+
+**Most recent work (session 45):**
+- **Filter harmonization (Phase 1 + 2):** implemented `docs/FILTER_HARMONIZATION_PLAN.md`. Created shared
+  `BrowseToolbar` + `src/lib/cefr.ts`. All three browse pages (Vocabulary, Collocations, Redemittel) now
+  share an identical `[Search] [Theme/Kategorie ▾] [Filter]` toolbar. Verb filter moved into the FacetSheet.
+  QuizHub CEFR labels use the shared `difficultyToBand`. See session 45 entry above for full details.
 
 **Most recent work (sessions 35–40):**
 - **s40** — **tripled the collocations bank** from 132 to 396 entries (+24/theme across all 11 themes).
