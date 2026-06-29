@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Sparkles, ListChecks } from "lucide-react";
 import type { Difficulty, ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
+import { difficultyToBand } from "@/lib/cefr";
 import { vocabByTheme } from "@/data/vocabulary";
 import { collocationsByTheme } from "@/data/collocations";
 import { iconByName } from "@/lib/icons";
@@ -14,9 +15,9 @@ import { HubHero } from "@/components/shared/HubHero";
 import { QuizRunner } from "./QuizRunner";
 
 const levels: { value: Difficulty; labelDe: string; cefr: string; desc: string; accent: string }[] = [
-  { value: 1, labelDe: "Erkennen", cefr: "B1", desc: "Übersetzung, Artikel, Zuordnung", accent: "bg-success/15 text-success" },
-  { value: 2, labelDe: "Anwenden", cefr: "B2.1", desc: "Plural, Lücken, Nomen-Verb, Konnektoren", accent: "bg-warning/15 text-warning" },
-  { value: 3, labelDe: "Können", cefr: "B2.2 / C1", desc: "Satzbau, Relativpronomen, da-/wo-Wörter", accent: "bg-danger/15 text-danger" },
+  { value: 1, labelDe: "Erkennen", cefr: difficultyToBand(1), desc: "Übersetzung, Artikel, Zuordnung", accent: "bg-success/15 text-success" },
+  { value: 2, labelDe: "Anwenden", cefr: difficultyToBand(2), desc: "Plural, Lücken, Nomen-Verb, Konnektoren", accent: "bg-warning/15 text-warning" },
+  { value: 3, labelDe: "Können", cefr: difficultyToBand(3), desc: "Satzbau, Relativpronomen, da-/wo-Wörter", accent: "bg-danger/15 text-danger" },
 ];
 
 function isThemeId(v: string | null): v is ThemeId {
