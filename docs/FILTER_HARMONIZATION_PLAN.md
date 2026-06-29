@@ -1,9 +1,9 @@
 # Harmonize the filter / search / header controls across browse pages
 
-> Status: **PLANNED, not yet implemented** (drafted session 44, 2026-06-28). Approach approved by the
-> founder. Implement Phase 1 first, ship, verify, then Phase 2. See `docs/TAXONOMY_REDESIGN.md` for
-> the underlying faceted-model spec and `docs/Language Learning App Success Factors.docx` for the
-> learning-app playbook this aligns with.
+> Status: **IMPLEMENTED** (session 45, 2026-06-29). Phase 1 (Wortschatz, Kollokationen, Redemittel) and
+> Phase 2 (QuizHub CEFR labels) both shipped. See `docs/TAXONOMY_REDESIGN.md` for the underlying
+> faceted-model spec and `docs/Language Learning App Success Factors.docx` for the learning-app playbook
+> this aligns with.
 
 ## Context
 

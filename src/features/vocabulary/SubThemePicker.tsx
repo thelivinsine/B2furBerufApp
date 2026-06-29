@@ -4,8 +4,7 @@ import type { ExamTheme } from "@/types";
 import { Card } from "@/components/ui/card";
 import { vocabByTheme, vocabBySubTheme } from "@/data/vocabulary";
 import { collocationsBySubTheme } from "@/data/collocations";
-
-const CEFR_ORDER = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];
+import { CEFR_ORDER } from "@/lib/cefr";
 
 /** Compact CEFR span for a sub-theme, e.g. "B1–B2" or "B2". */
 function cefrRange(subId: string): string | null {

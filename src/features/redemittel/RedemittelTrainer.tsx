@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Dumbbell, Library } from "lucide-react";
+import { Dumbbell, Library, MessageSquareText } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
 import { iconByName } from "@/lib/icons";
@@ -9,15 +9,18 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  FacetSheet,
-  ActiveFilterChip,
   applyFacets,
   type FacetDef,
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
+import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { SpeakButton } from "@/components/shared/SpeakButton";
-import { SectionHeading } from "@/components/shared/misc";
+import { HubHero } from "@/components/shared/HubHero";
 import { RedemittelPractice } from "./RedemittelPractice";
+
+function normalise(s: string) {
+  return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
+}
 
 const registerLabel: Record<string, { text: string; variant: "muted" | "default" | "accent" }> = {
   neutral: { text: "neutral", variant: "muted" },
@@ -40,8 +43,10 @@ const REDEMITTEL_FACETS: FacetDef<RedemittelPhrase>[] = [
 export function RedemittelTrainer() {
   const [tab, setTab] = useState("browse");
   const [params, setParams] = useSearchParams();
+  const [search, setSearch] = useState("");
 
-  // Register filter for the browse view (state in ?register=).
+  const category = params.get("cat") ?? "all";
+
   const selection: FacetSelection = useMemo(() => {
     const s: FacetSelection = {};
     const raw = params.get("register");
@@ -57,17 +62,67 @@ export function RedemittelTrainer() {
     setParams(p, { replace: true });
   };
 
-  const activeChips = (selection.register ?? []).map((v) => ({
-    value: v,
-    label: registerLabel[v].text,
-  }));
+  const setCategory = (cat: string) => {
+    const p = new URLSearchParams(params);
+    if (cat === "all") p.delete("cat");
+    else p.set("cat", cat);
+    setParams(p, { replace: true });
+  };
+
+  const removeFacetValue = (facetId: string, value: string) =>
+    setSelection({
+      ...selection,
+      [facetId]: (selection[facetId] ?? []).filter((v) => v !== value),
+    });
+
+  const activeChips = REDEMITTEL_FACETS.flatMap((f) =>
+    (selection[f.id] ?? []).map((v) => ({
+      facetId: f.id,
+      value: v,
+      label: f.options.find((o) => o.value === v)?.label ?? v,
+    })),
+  );
+
+  const categoryScoped = useMemo(() => {
+    if (category === "all") return redemittel;
+    return redemittelByCategory(category as RedemittelPhrase["category"]);
+  }, [category]);
+
+  const searched = useMemo(() => {
+    if (!search.trim()) return categoryScoped;
+    const q = normalise(search.trim());
+    return categoryScoped.filter(
+      (p) => normalise(p.de).includes(q) || normalise(p.en).includes(q),
+    );
+  }, [categoryScoped, search]);
+
+  const filtered = useMemo(
+    () => applyFacets(searched, REDEMITTEL_FACETS, selection),
+    [searched, selection],
+  );
+
+  const primaryOptions = [
+    { value: "all", label: "Alle Kategorien", count: redemittel.length },
+    ...redemittelCategories.map((cat) => ({
+      value: cat.id,
+      label: cat.labelDe,
+      count: redemittelByCategory(cat.id).length,
+    })),
+  ];
+
+  const categoriesToRender =
+    category === "all"
+      ? redemittelCategories
+      : redemittelCategories.filter((c) => c.id === category);
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <SectionHeading
+      <HubHero
+        icon={MessageSquareText}
+        gradient="from-emerald-500 to-teal-500"
         eyebrow="Redemittel"
         title="Redemittel-Training"
-        description="Die wichtigsten Wendungen für Vorschläge, Zustimmung, Verhandlung und Kompromiss – verstehen und aktiv anwenden."
+        description="Die wichtigsten Wendungen für Vorschläge, Zustimmung, Verhandlung und Kompromiss. Verstehen und aktiv anwenden."
       />
 
       <Tabs value={tab} onValueChange={setTab}>
@@ -77,30 +132,37 @@ export function RedemittelTrainer() {
         </TabsList>
 
         <TabsContent value="browse" className="space-y-6">
-          <div className="flex flex-wrap items-center gap-2">
-            <FacetSheet
-              items={redemittel}
-              facets={REDEMITTEL_FACETS}
-              selection={selection}
-              onChange={setSelection}
-              resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
-            />
-            {activeChips.map((chip) => (
-              <ActiveFilterChip
-                key={chip.value}
-                label={chip.label}
-                onRemove={() =>
-                  setSelection({
-                    register: (selection.register ?? []).filter((v) => v !== chip.value),
-                  })
-                }
-              />
-            ))}
-          </div>
+          <BrowseToolbar
+            search={search}
+            onSearch={setSearch}
+            searchPlaceholder="Suche nach Wendung, Übersetzung …"
+            primary={{ value: category, onChange: setCategory, options: primaryOptions }}
+            facetItems={searched}
+            facets={REDEMITTEL_FACETS}
+            facetSelection={selection}
+            onFacetChange={setSelection}
+            resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
+            activeChips={activeChips}
+            onRemoveChip={removeFacetValue}
+          />
 
-          {redemittelCategories.map((cat) => {
+          {categoriesToRender.map((cat) => {
             const Icon = iconByName(cat.icon);
-            const phrases = applyFacets(redemittelByCategory(cat.id), REDEMITTEL_FACETS, selection);
+            const catPhrases = category === "all"
+              ? redemittelByCategory(cat.id)
+              : searched;
+            const phrases = category === "all"
+              ? applyFacets(
+                  search.trim()
+                    ? catPhrases.filter((p) => {
+                        const q = normalise(search.trim());
+                        return normalise(p.de).includes(q) || normalise(p.en).includes(q);
+                      })
+                    : catPhrases,
+                  REDEMITTEL_FACETS,
+                  selection,
+                )
+              : filtered;
             if (phrases.length === 0) return null;
             return (
               <section key={cat.id} className="space-y-3">
@@ -145,6 +207,12 @@ export function RedemittelTrainer() {
               </section>
             );
           })}
+
+          {filtered.length === 0 && (
+            <div className="py-16 text-center text-muted-foreground">
+              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="practice">

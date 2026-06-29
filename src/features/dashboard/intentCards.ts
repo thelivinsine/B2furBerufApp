@@ -108,7 +108,7 @@ export const intentCards: IntentCard[] = [
   },
 ];
 
-const CEFR_ORDER = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];
+import { CEFR_ORDER } from "@/lib/cefr";
 
 /** Compact CEFR span over a vocab bundle, e.g. "B1–B2" or "B2". */
 function cefrRange(vocab: { theme?: string; sub?: string }): string | null {
