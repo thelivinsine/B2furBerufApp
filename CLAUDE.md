@@ -55,11 +55,12 @@ Heute · Bibliothek · Anwenden · Fortschritt). Founder-approved plan, executed
   `ScopeChip` + "Üben" scoped-session buttons. **Founder chose the soft merge:** the single `/library`
   URL, old-route redirects, Quiz retirement, and removing the Vokabeltrainer in-page tabs are DEFERRED to
   **Phase 5** (with the nav re-map). Do not do them earlier.
-- **Phase 4 (Fortschritt + Can-Do) — content half ✅ committed (not merged), UI half PENDING.** The
-  `canDo.ts` bank (25 milestones, AI-drafted then **founder-reviewed and approved 2026-07-02**, provenance
-  `review_status: "verified"`) + linter rules landed. Still to build: the Fortschritt UI (milestone
-  display checked off via each statement's `threshold` vs theme mastery, diagnose card, theme-grid
-  relocation from Heute).
+- **Phase 4 (Fortschritt + Can-Do) — SHIPPED ✅ (session 48).** The `canDo.ts` bank (25 milestones,
+  AI-drafted then **founder-reviewed and approved 2026-07-02**, provenance `review_status: "verified"`)
+  + linter rules, plus the Fortschritt UI: a Can-Do milestone section (the page's new lead, checked off
+  per theme via each statement's `threshold` vs theme mastery), a diagnose card (weakest CEFR band/theme
+  with a one-tap "Session dazu starten"), and the theme mastery grid relocated off Heute (which now ends
+  with a quiet "Alle Themen" link to `/vocabulary`).
 - **Phase 5 (Anwenden hub + nav re-map + facet registry) — NOT STARTED.** Founder-unlocked
   `DEFAULT_PINNED_TABS` change (Heute · Bibliothek · Anwenden · Fortschritt) + the deferred Phase-3 hard
   merge + drop the Verb facet. The s26–28 bottom-bar **mechanics** stay locked; only the registry changes.
@@ -300,11 +301,11 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
-- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/ux-overhaul-step-0-7mtsff`).
+- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/ux-overhaul-phase-4-ui-qh8si7`).
 - The remote sandbox cannot reach the live `*.github.io` site — verifying the deploy (Actions tab green + live site) is left to the user.
 
 ## Workflow notes
-- Development branch for this work: **`claude/ux-overhaul-step-0-7mtsff`** (active as of session 47).
+- Development branch for this work: **`claude/ux-overhaul-phase-4-ui-qh8si7`** (active as of session 48).
   The branch name is reassigned per session — **`main` is always the source of truth**; whatever
   branch a session is assigned, ship to production by opening a PR into `main` and merging (squash).
 - **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `pnpm build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.

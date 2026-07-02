@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-02 (session 47). Branch: `claude/ux-overhaul-step-0-7mtsff`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-02 (session 48). Branch: `claude/ux-overhaul-phase-4-ui-qh8si7`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -1829,27 +1829,13 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 47 (2026-07-02).** Phases 0–3 are merged to `main`. **Phase 4 is HALF done:
-the content half (Can-Do bank + linter) is committed on the branch but NOT yet merged (no PR); the UI
-half is not started.**
-Active automation branch: `claude/ux-overhaul-step-0-7mtsff` (realign to `origin/main` after each
+**Handoff after session 48 (2026-07-02).** Phases 0–3 are merged to `main`. **Phase 4 is DONE**: both
+the content half (Can-Do bank + linter, session 47) and the UI half (Fortschritt redesign, session 48)
+are built, verified, and ready to ship in one PR.
+Active automation branch: `claude/ux-overhaul-phase-4-ui-qh8si7` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
-⚠️ **The branch is currently AHEAD of `main`** by the Phase-4 content commit (`93eb4b7`) + this doc
-commit. Do NOT `git reset --hard origin/main` at the start of the next session or you will drop the
-Phase-4 content work. Build on top of the branch, finish Phase 4, then PR the whole thing.
 
-**Next work = finish `docs/UX_OVERHAUL_PLAN.md` Phase 4 UI half (Fortschritt redesign), on Sonnet 5.**
-The Can-Do data + linter already landed (see the session-47 Phase-4 entry below). Still to build (plan
-E5): the Fortschritt **Can-Do milestone section as the headline** (each `canDoStatements` entry checked
-off when the learner's theme mastery ratio crosses its `threshold`; helper `canDoByTheme` exists), a
-**Diagnose card** (current weakest band/group with a one-tap "Session dazu starten" → `/session`), and
-**relocating the theme mastery grid** from Heute (`Dashboard.tsx`) to Fortschritt (`Analytics.tsx`),
-leaving Heute as hero + Situationen + status strip with a quiet "Alle Themen" link. Then verify + PR +
-merge + docs. **Founder review DONE (2026-07-02):** the founder reviewed the 25 Can-Do statements via
-the GitHub link and approved them; all 25 `can_do` provenance rows are now `review_status: "verified"`
-(`verified_by: "founder"`). The content is settled; the UI half can build on it directly.
-
-After Phase 4: **Phase 5 (Anwenden hub + nav re-map + facet registry), on Opus 4.8.** The tab-bar
+**Next work = Phase 5 (Anwenden hub + nav re-map + facet registry), on Opus 4.8.** The tab-bar
 default-pin change is founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry;
 the s26–28 bar mechanics stay locked. Phase 5 also absorbs the **deferred Phase-3 hard merge** (see the
 Phase 3 scope decision below).
@@ -1861,6 +1847,24 @@ removed and the locked bottom bar was untouched. The **hard merge** deferred to 
 re-map phase): the single `/library` URL + old-route redirects + retiring the standalone Quiz
 section + removing the Vokabeltrainer's in-page Karteikarten/Quiz tabs (superseded by Üben →
 session). Fold these into the Phase 5 work.
+
+**Most recent work (session 48):**
+- **s48 — UX overhaul Phase 4 UI half (Fortschritt redesign) SHIPPED ✅:** built the three pieces
+  from plan E5 on top of the session-47 Can-Do content. **Can-Do milestone section** in
+  `Analytics.tsx`, now the page's lead: for each theme (sorted least-mastered-first, same order as
+  the mastery grid) lists its `canDoByTheme(themeId)` statements, checked off when the theme's
+  mastery ratio (already computed as `themeStats`) crosses the statement's `threshold`; a header
+  badge shows the overall `achieved/total` count. **Diagnose card**: shows the current weakest CEFR
+  band (`weakestBand`) or, for a fresh learner with no started cards, the weakest theme
+  (`weakestTheme`, mode-aware, both pure exports of `engine/session.ts`), with a one-tap "Session
+  dazu starten" button that navigates to `/session?theme=<weakTheme>`. **Relocated the theme mastery
+  grid**: removed the "Deine Themen" browse grid from `Dashboard.tsx` (Heute) — it already lived on
+  Fortschritt as "Beherrschung nach Thema" — and replaced it with a quiet "Alle Themen" card linking
+  to `/vocabulary`; Heute is now hero + Situationen + status strip + that link. No new engine or data,
+  UI assembly only. `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green; headless-Chromium
+  mobile smoke pass confirmed the Can-Do section renders checked/unchecked milestones correctly against
+  seeded `srs` progress, the diagnose button navigates to `/session?theme=...`, and the Heute theme grid
+  is gone with "Alle Themen" in its place. Shipped in one PR bundling the session-47 content commits.
 
 **Most recent work (session 47):**
 - **s47 — UX overhaul Phase 4 CONTENT half (Can-Do bank + linter) committed (not merged):** new

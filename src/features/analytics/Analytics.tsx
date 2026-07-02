@@ -11,16 +11,18 @@ import {
   Bar,
   Cell,
 } from "recharts";
-import { Flame, Zap, Trophy, BookOpen, TrendingUp, Target } from "lucide-react";
+import { Flame, Zap, Trophy, BookOpen, TrendingUp, Target, CheckCircle2, Circle, Compass } from "lucide-react";
 import { vocabulary } from "@/data/vocabulary";
-import { themes } from "@/data/themes";
+import { themes, themeById } from "@/data/themes";
 import { vocabByTheme } from "@/data/vocabulary";
 import { scenarios } from "@/data/dialogues";
 import { redemittel } from "@/data/redemittel";
 import { practiceAreaById } from "@/data/practiceAreas";
+import { canDoByTheme } from "@/data/canDo";
 import { useProgressStore, useEffectiveStreak, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore, type LearningGoal } from "@/store/useSettingsStore";
 import { mastery, masteryLabel, dueCount } from "@/engine/srs";
+import { weakestBand, weakestTheme } from "@/engine/session";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
 import { pct, cn, daysBetween, todayKey } from "@/lib/utils";
 import { getWritingHistory, type WritingHistoryEntry } from "@/lib/writing";
@@ -188,6 +190,26 @@ export function Analytics() {
       .sort((a, b) => a.ratio - b.ratio);
   }, [srs]);
 
+  // Can-Do milestones per theme, in the same least-mastered-first order as the
+  // mastery grid so the diagnose signal and the checklist line up.
+  const canDoGroups = useMemo(() => {
+    return themeStats
+      .map(({ theme, ratio }) => ({ theme, ratio, items: canDoByTheme(theme.id) }))
+      .filter((g) => g.items.length > 0);
+  }, [themeStats]);
+  const canDoTotal = canDoGroups.reduce((acc, g) => acc + g.items.length, 0);
+  const canDoAchieved = canDoGroups.reduce(
+    (acc, g) => acc + g.items.filter((c) => g.ratio >= c.threshold).length,
+    0,
+  );
+
+  // Diagnose: current weakest CEFR band (or theme, as a fallback for a fresh
+  // learner with no started cards yet) plus a one-tap session into it.
+  const learningMode = useSettingsStore((s) => s.mode);
+  const weakBand = weakestBand(srs);
+  const weakTheme = weakestTheme(srs, learningMode);
+  const weakThemeTitle = themeById(weakTheme)?.titleDe ?? weakTheme;
+
   const redemittelPractised = Object.keys(redemittelSeen).length;
 
   return (
@@ -197,6 +219,77 @@ export function Analytics() {
         title="Deine Statistiken"
         description="Überblick über XP, Serien, Wortschatz-Beherrschung und abgeschlossene Aktivitäten."
       />
+
+      {/* Can-Do milestones — the headline: competence, not counters. */}
+      {canDoGroups.length > 0 && (
+        <Card className="border-primary/20">
+          <CardContent className="p-5">
+            <div className="mb-1 flex items-center justify-between">
+              <p className="font-semibold">Was du schon kannst</p>
+              <Badge variant="muted">{canDoAchieved}/{canDoTotal}</Badge>
+            </div>
+            <p className="mb-4 text-xs text-muted-foreground">
+              Kompetenzen nach Thema, sortiert nach Lernbedarf.
+            </p>
+            <div className="space-y-4">
+              {canDoGroups.map(({ theme, ratio, items }) => (
+                <div key={theme.id}>
+                  <p className="mb-1.5 text-sm font-medium text-muted-foreground">{theme.titleDe}</p>
+                  <div className="space-y-1.5">
+                    {items.map((c) => {
+                      const achieved = ratio >= c.threshold;
+                      return (
+                        <div
+                          key={c.id}
+                          className={cn(
+                            "flex items-start gap-2 text-sm",
+                            !achieved && "text-muted-foreground",
+                          )}
+                        >
+                          {achieved ? (
+                            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />
+                          ) : (
+                            <Circle className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/40" />
+                          )}
+                          <span className="flex-1">{c.statement}</span>
+                          {!achieved && (
+                            <span className="shrink-0 text-xs tabular-nums text-muted-foreground/70">
+                              Ziel {Math.round(c.threshold * 100)}%
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Diagnose — the weakest spot right now, one tap into a scoped session. */}
+      <Card className="border-warning/20 bg-warning/5">
+        <CardContent className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <Compass className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
+            <div>
+              <p className="text-sm font-medium text-warning">Deine Schwachstelle</p>
+              <p className="mt-1 text-base font-semibold">
+                {weakBand ? `Niveau ${weakBand}` : weakThemeTitle}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {weakBand
+                  ? `Am wenigsten gefestigt: dein Wortschatz auf Niveau ${weakBand}.`
+                  : `Am wenigsten gefestigt: ${weakThemeTitle}.`}
+              </p>
+            </div>
+          </div>
+          <Button onClick={() => navigate(`/session?theme=${weakTheme}`)}>
+            <Zap className="h-4 w-4" /> Session dazu starten
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Top stats */}
       {coldStart ? (
