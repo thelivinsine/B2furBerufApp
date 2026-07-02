@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-06-29 (session 45). Branch: `claude/filter-harmonization-plan-0vzdgz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-02 (session 46). Branch: `claude/filter-harmonization-plan-0vzdgz`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -386,9 +386,38 @@ squash-merged to `main` (#250–#252).
   mobile+desktop, branded `HubHero` header everywhere, a shared `src/lib/cefr.ts` for consistent CEFR
   labels, and the verb-rail/legend decluttered into the sheet. Phased: Phase 1 = the 3 filtering pages,
   Phase 2 = the simpler hubs. **Implemented in session 45 (below).**
-- **Resume here →** filter harmonization is complete (session 45). Optional follow-ups from session 43
-  still stand (human-verify `cefr` tags, broaden `sector`/`workSituation`, extend sub-themes past 3 of
-  11). Next big rock remains a new life-domain theme (banking / healthcare / housing).
+- **Resume here →** the **UX overhaul plan (session 46, below) is fully approved and is now the
+  roadmap.** Start with Phase 0 (quick wins, Sonnet 5), then Phase 1 (session engine, Opus 4.8); see
+  the phase/model table under "Model guidance". The older follow-ups (human-verify `cefr` tags, new
+  life-domain themes) slot in after or alongside; new themes land best after Phase 3 (Bibliothek).
+
+### Session 46 (2026-07-02) — Full app review + UX overhaul plan, APPROVED ✅ (docs-only)
+Fable session. The founder asked for a critical review of the app and of the s44/s45 filter
+harmonization, then a substantially better plan. **No app code changed; strategy + docs only.**
+- **Full-app review:** all 13 routes screenshotted (mobile 390px + desktop 1280px) and read. Five
+  headline problems: no composed session loop (the pieces exist but the learner must sequence them);
+  home leads with a wall of choices instead of "continue"; redundant practice surfaces (3 flashcard/
+  quiz experiences, 4 library nav slots); German UI carrying English content in load-bearing spots
+  (all 11 theme blurbs, grammar purposes, "Quick Review"); progress reads as bookkeeping (four zero
+  tiles on a new account, no Can-Do milestones). Sign-in banner sits on every screen.
+- **Filter-plan critique (self-critical):** s45 harmonized the *reference* layer but polished the
+  wrong layer; search stayed siloed per bank; scope (theme) resets per page; the relocated Verb facet
+  became a 100+ pill soup; per-page facet wiring does not scale to the coming content packs.
+- **`docs/UX_OVERHAUL_PLAN.md` (new, the roadmap):** session-first redesign. Four-tier filter
+  architecture (Tier 0 personalized defaults / Tier 1 global search across all banks / Tier 2
+  travelling Scope (Domain → Theme → Sub-theme) as app state / Tier 3 refinement facets from a
+  central registry, ≤12-option rule, Verb facet dropped). Four-zone IA: Heute (session hero) ·
+  Bibliothek (4 libraries merged, s45 toolbars reused) · Anwenden (Simulation/Schreiben/Prüfung) ·
+  Fortschritt (Can-Do milestones + diagnosis). New `engine/session.ts` composer + SessionPlayer
+  reusing the existing SRS/quiz/drill machinery. Six phases with a prioritization framework.
+- **All four Part-H decisions recorded (founder):** (1) IA direction approved; (2) tab-bar default
+  pins approved after a plain-language walkthrough, mechanics stay locked; (3) German-first copy
+  confirmed, the founder's "EN peek button" idea parked as **backlog #25** (needs brainstorming;
+  Phase 0 keeps EN as data, so it stays possible); (4) Can-Do statements AI-drafted + founder-
+  reviewed, provenance recipe checked against `DATA_GOVERNANCE.md` (origin `authored`, license
+  `OWNED`, `draft` → `verified`, reference = CoE CEFR descriptors, same as writing prompts).
+- **Model guidance refreshed:** Fable available again (restriction lifted), Sonnet bumped to 5, and
+  a per-phase model table added for the overhaul plan (Phase 0 Sonnet → Phase 1 Opus → …).
 
 ### Session 45 (2026-06-29) — Filter harmonization IMPLEMENTED (Phase 1 + Phase 2) ✅
 Implemented the full `docs/FILTER_HARMONIZATION_PLAN.md` across both phases.
@@ -1800,15 +1829,23 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 45 (2026-06-29).** Everything noted ✅ is merged to `main`.
+**Handoff after session 46 (2026-07-02).** Everything noted ✅ is merged to `main`.
 Active automation branch: `claude/filter-harmonization-plan-0vzdgz` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Most recent work (session 45):**
-- **Filter harmonization (Phase 1 + 2):** implemented `docs/FILTER_HARMONIZATION_PLAN.md`. Created shared
-  `BrowseToolbar` + `src/lib/cefr.ts`. All three browse pages (Vocabulary, Collocations, Redemittel) now
-  share an identical `[Search] [Theme/Kategorie ▾] [Filter]` toolbar. Verb filter moved into the FacetSheet.
-  QuizHub CEFR labels use the shared `difficultyToBand`. See session 45 entry above for full details.
+**Next work = `docs/UX_OVERHAUL_PLAN.md`, fully approved by the founder.** The founder will run the
+phases in separate sessions using the per-phase model table under "Model guidance": **Phase 0 (quick
+wins) on Sonnet 5 first**, then Phase 1 (session engine + Heute) on Opus 4.8. Do not skip the phase
+order 1 → 2 → 3; phases 4 and 5 can swap. The tab-bar default-pin change (Phase 5) is founder-approved
+but strictly limited to `DEFAULT_PINNED_TABS` + route registry; the s26–28 bar mechanics stay locked.
+
+**Most recent work (sessions 45–46):**
+- **s46 — UX overhaul plan (docs-only, approved):** full app review, filter-plan critique, four-tier
+  filter architecture + four-zone IA + session engine design, all Part-H decisions recorded, backlog
+  #25 added (EN peek button, needs brainstorming). See the session 46 entry above.
+- **s45 — Filter harmonization (Phase 1 + 2) implemented:** shared `BrowseToolbar` + `src/lib/cefr.ts`;
+  identical `[Search] [Theme/Kategorie ▾] [Filter]` toolbar on the three browse pages; verb filter moved
+  into the FacetSheet; QuizHub CEFR labels via `difficultyToBand`. See the session 45 entry above.
 
 **Most recent work (sessions 35–40):**
 - **s40** — **tripled the collocations bank** from 132 to 396 entries (+24/theme across all 11 themes).

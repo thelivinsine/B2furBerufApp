@@ -1,8 +1,8 @@
 # UX Overhaul Plan: from tool drawer to learning loop
 
-> Status: **DIRECTION APPROVED** (founder, 2026-07-02): decisions 1, 3, 4 recorded in Part H;
-> decision 2 (tab-bar default pins) still pending founder info/approval, so Phase 5 ships without the
-> pin change until then. Drafted session 46 on founder request. Supersedes the ambition level of
+> Status: **FULLY APPROVED** (founder, 2026-07-02): all four Part-H decisions recorded, including
+> the tab-bar default-pin change (approved after a plain-language walkthrough; the s26–28 bar
+> mechanics stay locked and untouched). Drafted session 46 on founder request. Supersedes the ambition level of
 > `docs/FILTER_HARMONIZATION_PLAN.md` (implemented s45; its primitives are kept and reused, see
 > Part B). Grounded in a full-app screen review (all 13 routes, mobile + desktop) and the uploaded
 > playbook `docs/Language Learning App Success Factors.docx`. Companion specs:
@@ -295,13 +295,13 @@ PR to `main`, founder verifies live. Phase 0 can ship today; 1 → 2 → 3 in or
 ## Part H: founder decisions (recorded 2026-07-02)
 
 1. **IA direction (session-first, 4 zones): APPROVED.** Phases 0–5 may proceed in order.
-2. **Tab-bar default pins: PENDING, founder asked for more info.** Plain-language version of what
-   is being asked: the mobile bottom bar currently shows Home · Wortschatz · Quiz · Fortschritt
-   (+ Mehr) for new users. The proposal changes **only that default set** to Heute · Bibliothek ·
-   Anwenden · Fortschritt (+ Mehr). Everything locked in s26–28 stays exactly as is: long-press
-   edit mode, jiggle, drag-reorder, the More sheet, icon design rules, sizes. Users who already
-   customised their bar keep their custom set; removed routes are remapped to their successors
-   (a pinned Wortschatz becomes Bibliothek). Until approved, Phase 5 ships without this change.
+2. **Tab-bar default pins: APPROVED** (founder, 2026-07-02, after a plain-language walkthrough).
+   The default set for new users changes from Home · Wortschatz · Quiz · Fortschritt (+ Mehr) to
+   Heute · Bibliothek · Anwenden · Fortschritt (+ Mehr). **Scope of the unlock is exactly this and
+   nothing more:** the s26–28 bar mechanics (long-press edit mode, jiggle, drag-reorder, More
+   sheet, icon design rules, sizes) remain locked and untouched. Users who already customised
+   their bar keep their custom set; removed routes are remapped to their successors (a pinned
+   Wortschatz becomes Bibliothek). Ships in Phase 5.
 3. **Copy: German-first CONFIRMED; "EN peek" button parked for brainstorming.** The Phase-0 copy
    pass proceeds (English blurbs/purposes translated to German, EN retained as data). The founder's
    new idea, an EN button at the top of the app that translates the whole screen briefly, is
