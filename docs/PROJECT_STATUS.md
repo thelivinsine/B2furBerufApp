@@ -1834,14 +1834,36 @@ Phase 0 PR merge; see below).
 Active automation branch: `claude/ux-overhaul-step-0-7mtsff` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Next work = `docs/UX_OVERHAUL_PLAN.md` Phase 2 (global search + Tier-0 defaults), on Sonnet 5.**
-Phase 0 (quick wins) and Phase 1 (session engine + Heute) shipped in session 47. Do not skip the
-phase order 2 → 3; phases 4 and 5 can swap. The tab-bar default-pin change (Phase 5) is
-founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry; the s26–28 bar
-mechanics stay locked.
+**Next work = `docs/UX_OVERHAUL_PLAN.md` Phase 3 (Bibliothek + travelling scope), on Opus 4.8.**
+Phases 0–2 shipped in session 47. Do not skip the phase order 3; phases 4 and 5 can swap. The
+tab-bar default-pin change (Phase 5) is founder-approved but strictly limited to
+`DEFAULT_PINNED_TABS` + route registry; the s26–28 bar mechanics stay locked.
 
 **Most recent work (session 47):**
-- **s47 — UX overhaul Phase 1 (session engine + Heute) shipped:** the core "one tap, one composed
+- **s47 — UX overhaul Phase 2 (global search + Tier-0 defaults) shipped:** new `src/lib/search.ts`
+  `searchAll(query)` — one query over vocabulary, collocations, Redemittel, grammar topics and
+  dialogue scenarios together (linear scan, no index needed at ~1,000 items), returning grouped
+  results that deep-link into each bank's home surface (`/vocabulary?theme=&sub=`,
+  `/collocations?theme=&q=`, `/redemittel?cat=`, `/grammar?topic=`, `/simulation`). New
+  `GlobalSearch.tsx` dialog (reuses the locked `Dialog`/`bg-dialog-overlay` primitive): a header
+  icon on mobile, a Sidebar entry + ⌘K/Ctrl+K global shortcut on desktop, both wired through one
+  controlled `open` state in `AppShell.tsx`. This replaces the three siloed per-page search boxes
+  as the *primary* discovery path; the per-page boxes remain as scoped refiners (unchanged). New
+  Tier-0 personalized defaults in `src/lib/cefr.ts` (`defaultVisibleBands`/`hiddenBandsLabel`,
+  mapping the learner's stored coarse `CefrLevel` to the fine-grained `ContentCefr` band + one step
+  up): Vokabeltrainer, Kollokationen and Redemittel now default their list to that band instead of
+  an unfiltered pile, with a quiet "Auch B2.2 · C1 zeigen (n)" escape link (not a facet chip).
+  **Found and fixed during verification:** the vocabulary bank is tagged only B1.2/B2.1/B2.2 (no
+  A2/B1.1/C1 items exist), so the naive "level + 1 band" default rendered a **fully empty list** for
+  an A2-level learner. Fixed with a non-empty guard (`bandNonEmpty` check) on all three pages: the
+  default only activates when it would leave at least one result for the current scope, otherwise
+  it's skipped entirely (no filtering, no escape pill) — the same "never let the learner tap into an
+  empty screen" invariant the s45 FacetSheet already guarantees. `pnpm typecheck` + `pnpm
+  lint:content` + `pnpm build` green; verified in headless mobile + desktop smoke passes (global
+  search open via icon tap, text query, result click-through; ⌘K open on desktop; CEFR band default
+  at B1 showing 477/528 with the escape pill, at A2 correctly falling back to the full list, at B2
+  showing everything unfiltered since B2 is the app's target level).
+- **s47 — UX overhaul Phase 1 (session engine + Heute) shipped (earlier in the session):** the core "one tap, one composed
   session" loop. New pure composer `src/engine/session.ts` (`buildSession` + deterministic
   `sessionPreview` + `weakestBand`/`weakestTheme`/`difficultyForLevel`) turns SRS state + Mode lens +
   a target length into an ordered, **interleaved** `SessionPlan` (new `SessionBlock`/`SessionPlan`
