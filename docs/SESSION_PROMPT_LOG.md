@@ -1477,3 +1477,70 @@ Branch: `claude/review-previous-session-69pxat`.
   `src/features/dashboard/intentCards.ts`, `src/features/quiz/QuizHub.tsx`,
   `docs/PROJECT_STATUS.md`, `docs/FILTER_HARMONIZATION_PLAN.md`, `CLAUDE.md`,
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 90 — 2026-06-29 (session 45, ship + housekeeping prompts)
+- **Branch:** `claude/filter-harmonization-plan-0vzdgz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompts (verbatim, batched housekeeping):** "continue where you left off" (×2), "is everything in main?", "continue"
+- **Response summary:** Completed the s45 filter-harmonization implementation (Entry 89), opened
+  **PR #254** and squash-merged it to `main` (merge `303414a`), realigned the dev branch, verified all
+  three browse pages plus filter sheets and quiz labels via Playwright screenshots on mobile + desktop.
+- **Artifacts:** PR #254; commits `c402b8e`…`9d0ffd1`; merge `303414a`.
+
+## Entry 91 — 2026-07-02 (session 46)
+- **Branch:** `claude/filter-harmonization-plan-0vzdgz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > i recently made a filter harmonization plan but it's not very good. can review the app first and then the filter harmonization plan and suggest a new plan that massively improve the ui/ux of the app and make it exceptionally useful?
+- **Response summary:** Reviewed every route (13 screens, mobile + desktop screenshots), read the key
+  feature components, extracted the learning-app playbook docx, and drafted `docs/UX_OVERHAUL_PLAN.md`:
+  session-first redesign with a four-tier filter architecture and four-zone IA. Follow-up prompt
+  mid-review: "make sure your plan accomodates for all screens" → plan includes a per-screen findings
+  table covering every route plus header, banner, tab bar, onboarding.
+- **Artifacts:** `docs/UX_OVERHAUL_PLAN.md` (new); commit `ce2e925`.
+
+## Entry 92 — 2026-07-02 (session 46)
+- **Branch:** `claude/filter-harmonization-plan-0vzdgz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (summary; long "senior product strategist" brief):** re-issued the review request with a
+  sharper rubric: be highly critical, challenge assumptions, deliver key findings / major UX problems /
+  recommended filter architecture / prioritization framework / implementation roadmap.
+- **Response summary:** Rewrote the plan doc around that rubric, including a self-critical review of
+  the s45 work (siloed search, non-travelling scope, 100+ pill Verb facet, per-page facet wiring that
+  does not scale) and the four-tier filter architecture (defaults → global search → travelling scope →
+  registry-driven facets with a ≤12-option rule).
+- **Artifacts:** `docs/UX_OVERHAUL_PLAN.md` (rewritten in place, same commit line).
+
+## Entry 93 — 2026-07-02 (session 46)
+- **Branch:** `claude/filter-harmonization-plan-0vzdgz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > which claude model should I use for the above plan? there is a table in the to-do's with model suggestions. update it as well
+- **Response summary:** Answered per phase (Phase 0 Sonnet 5 → Phase 1 Opus 4.8 → …; Fable only for
+  Can-Do content authoring). Updated the "Model guidance" section: Fable-available-again note, Sonnet
+  bumped to 5, new per-phase table for the overhaul plan, Dashboard-redesign row superseded.
+- **Artifacts:** `docs/PROJECT_STATUS.md`; commit `8f06916`.
+
+## Entry 94 — 2026-07-02 (session 46)
+- **Branch:** `claude/filter-harmonization-plan-0vzdgz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > for the four decisions from me, 1. approve, 2. I need more info on what this is, 3. add en button on the top of the app just in case the user wants to translate the whole screen at once for a few seconds and then the en gets locked - I need to brainstorm this idea - keep it as a to-do item that needs more thinking. 4. ai-drafted with review - check the data strategy so far for this
+- **Response summary:** Recorded decisions 1/3/4 in Part H; added **backlog #25** (EN peek button,
+  needs brainstorming); checked decision 4 against `DATA_GOVERNANCE.md` and wrote the provenance
+  recipe for `canDo.ts` (origin authored, license OWNED, draft → verified, CoE CEFR descriptor
+  references). Follow-up prompts: "you still did not explain me what is the point 2 of the decisions -
+  explain it to me first" → plain-language explanation of the tab-bar default-pin change; then
+  "okay, continue with this suggestion. I approve" → decision 2 recorded as approved, plan status
+  set to FULLY APPROVED.
+- **Artifacts:** `docs/UX_OVERHAUL_PLAN.md`, `docs/PROJECT_STATUS.md`; commits `25c8acc` +.
+
+## Entry 95 — 2026-07-02 (session 46)
+- **Branch:** `claude/filter-harmonization-plan-0vzdgz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > do the necessary housekeeping and merge the plan to main. Do not implement the plan yet. I'll do it with other models as suggested in the table.
+- **Response summary:** Session 46 documentation completed (status entry, resume pointer, this log),
+  all docs squash-merged to `main`, branch realigned. **No implementation**, per instruction; the
+  founder runs the phases in later sessions with the models from the phase table.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR + merge SHA recorded in git history.
