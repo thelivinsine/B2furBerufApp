@@ -1,14 +1,7 @@
 import {
   LayoutDashboard,
-  BookOpen,
-  MessagesSquare,
-  BookMarked,
-  Combine,
-  ListChecks,
-  PenLine,
-  Mic,
-  GraduationCap,
-  Zap,
+  Library,
+  Target,
   LineChart,
   Settings,
 } from "lucide-react";
@@ -30,22 +23,39 @@ export interface NavItem {
 // Each route owns ONE unique accent colour. The same colour is reused
 // everywhere its icon appears (bottom tab bar, More sheet, desktop sidebar)
 // so a section is recognisable by its colour across the whole app.
+//
+// UX overhaul Phase 5 (session 49): the nav collapsed from a "drawer of 11
+// tools" to the four-zone model (Heute · Bibliothek · Anwenden · Fortschritt,
+// + Einstellungen). The individual library tools (Wortschatz/Kollokationen/
+// Redemittel/Grammatik) now live inside the Bibliothek hub, and the transfer
+// tools (Sprechen/Schreiben/Prüfung) inside Anwenden, so they are no longer
+// top-level nav destinations. Their routes still resolve (redirected into the
+// hub or reachable via deep links); they are just off the nav rail.
 export const navItems: NavItem[] = [
-  { to: "/",             label: "Dashboard",          icon: LayoutDashboard, end: true, color: "#5b5be6", bg: "rgba(91,91,230,.08)",  desc: "Dein Überblick und Tagesziel" },
-  { to: "/vocabulary",   label: "Wortschatz",         icon: BookOpen,                   color: "#2563eb", bg: "rgba(37,99,235,.08)",  desc: "490 Wörter aus 10 Berufsfeldern" },
-  { to: "/redemittel",   label: "Redemittel",         icon: MessagesSquare,             color: "#8b5cf6", bg: "rgba(139,92,246,.08)", desc: "Bausteine für flüssiges Sprechen" },
-  { to: "/grammar",      label: "Grammatik",          icon: BookMarked,                 color: "#10b981", bg: "rgba(16,185,129,.08)", desc: "Regeln und Übungen für B2" },
-  { to: "/collocations", label: "Kollokationen",      icon: Combine,                    color: "#f59e0b", bg: "rgba(245,158,11,.08)", desc: "Nomen-Verb-Verbindungen üben" },
-  { to: "/quiz",         label: "Quiz",               icon: ListChecks,                 color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Teste dein Wissen" },
-  { to: "/writing",      label: "Schreibtraining",    icon: PenLine,                    color: "#ef4444", bg: "rgba(239,68,68,.08)",  desc: "Schreibe und erhalte Feedback" },
-  { to: "/simulation",   label: "Sprechsimulation",   icon: Mic,                        color: "#06b6d4", bg: "rgba(6,182,212,.08)",  desc: "Dialoge wie in der Prüfung" },
-  { to: "/exam",         label: "Prüfungsmodus",      icon: GraduationCap,              color: "#c026d3", bg: "rgba(192,38,211,.08)", desc: "Kompletter Prüfungsdurchlauf" },
-  { to: "/revision",     label: "Schnellwiederholung",icon: Zap,                        color: "#eab308", bg: "rgba(234,179,8,.08)",  desc: "Wiederhole fällige Karten" },
-  { to: "/analytics",    label: "Fortschritt",        icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Deine Statistiken im Blick" },
-  { to: "/settings",     label: "Einstellungen",      icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },
+  { to: "/",          label: "Heute",        icon: LayoutDashboard, end: true, color: "#5b5be6", bg: "rgba(91,91,230,.08)",  desc: "Deine Session und dein Tag" },
+  { to: "/library",   label: "Bibliothek",   icon: Library,                    color: "#2563eb", bg: "rgba(37,99,235,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
+  { to: "/anwenden",  label: "Anwenden",     icon: Target,                     color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Sprechen, Schreiben, Prüfung" },
+  { to: "/analytics", label: "Fortschritt",  icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Meilensteine und Statistiken" },
+  { to: "/settings",  label: "Einstellungen",icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },
 ];
 
-export const DEFAULT_PINNED_TABS = ["/", "/vocabulary", "/quiz", "/analytics"];
+export const DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"];
+
+// Removed top-level routes → their successor zone. Used by the settings-store
+// migration so an existing learner's custom pins / More-sheet order remap onto
+// the new four-zone nav instead of silently disappearing (founder decision
+// 2026-07-02: "a pinned Wortschatz becomes Bibliothek").
+export const ROUTE_SUCCESSOR: Record<string, string> = {
+  "/vocabulary": "/library",
+  "/collocations": "/library",
+  "/redemittel": "/library",
+  "/grammar": "/library",
+  "/quiz": "/library",
+  "/writing": "/anwenden",
+  "/simulation": "/anwenden",
+  "/exam": "/anwenden",
+  "/revision": "/",
+};
 
 /** @deprecated use pinnedTabs from useSettingsStore instead */
 export const PRIMARY_TAB_PATHS = DEFAULT_PINNED_TABS;

@@ -1719,3 +1719,31 @@ Branch: `claude/review-previous-session-69pxat`.
 - **Artifacts:** modified `src/features/analytics/Analytics.tsx`, `src/features/dashboard/Dashboard.tsx`,
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/UX_OVERHAUL_PLAN.md`, `docs/SESSION_PROMPT_LOG.md`;
   PR #260, squash-merged as `74ccd7c`.
+
+## Entry 104 — 2026-07-02 (session 49)
+- **Branch:** `claude/next-step-kve6wf`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > go ahead with next step
+- **Response summary:** Read `docs/PROJECT_STATUS.md` "Resume here", `CLAUDE.md`, and
+  `docs/UX_OVERHAUL_PLAN.md` (Part E4/E6, Part G/H) to confirm the next step = **UX overhaul Phase 5**
+  (Anwenden hub + nav re-map + facet registry, founder-approved). Scoped it to ship the high-value,
+  founder-approved **IA restructure** as one mostly-additive PR, and deliberately deferred the low-value
+  Tier-3 facet-registry/Verb-drop tail and the plan's in-page feature removals (quiz retirement + vocab
+  tab removal) to a follow-up to avoid surprising removals in the nav PR. Built: **AnwendenHub**
+  (`/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung) + renamed the SimulationHub title to
+  "Sprechsimulation"; **LibraryHub** (`/library?tab=…`) folding the four library surfaces into one URL
+  with the old routes redirecting in (params preserved) via `LibraryRedirect`, and made `LibrarySwitcher`
+  tab-based; **four-zone nav** in `nav-items.ts` (`DEFAULT_PINNED_TABS = ["/","/library","/anwenden",
+  "/analytics"]`, navItems collapsed to the 5 zones, `ROUTE_SUCCESSOR` map) with custom `/library` +
+  `/anwenden` marks in `route-icons.tsx`; and a **`useSettingsStore` persist migration** (`version: 1`)
+  remapping existing users' pins/More-order onto the new zones. Verified `pnpm typecheck` +
+  `pnpm lint:content` + `pnpm build` (all green) and a headless-Chromium mobile smoke pass (routing,
+  redirects with preserved params, the four-zone bar, and the `version:0→1` pins migration, zero console
+  errors). Updated `CLAUDE.md` (Phase 5 status + `DEFAULT_PINNED_TABS`/migration facts),
+  `docs/PROJECT_STATUS.md` (session-49 log + "Resume here"), and this log.
+- **Artifacts:** new `src/features/anwenden/AnwendenHub.tsx`, `src/features/library/LibraryHub.tsx`;
+  modified `src/components/layout/nav-items.ts`, `src/components/layout/route-icons.tsx`,
+  `src/store/useSettingsStore.ts`, `src/features/library/LibrarySwitcher.tsx`,
+  `src/features/simulation/SimulationHub.tsx`, `src/features/dashboard/Dashboard.tsx`, `src/router.tsx`,
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; commit + PR # to be filled on push.

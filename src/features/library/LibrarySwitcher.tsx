@@ -1,42 +1,47 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { X } from "lucide-react";
 import { useLibraryScope } from "@/store/useLibraryScope";
 import { cn } from "@/lib/utils";
 
 /**
- * Segmented switcher across the four library surfaces (UX overhaul Phase 3,
- * soft merge). It gives the separate Wörter / Kollokationen / Redemittel /
- * Grammatik pages a single-hub feel without a route merge (that lands in
- * Phase 5 with the nav re-map). Each segment link carries the shared scope
- * (`useLibraryScope`) so the active theme travels when you hop between the two
- * theme-scoped segments.
+ * Segmented switcher across the four library surfaces. Since UX overhaul
+ * Phase 5 (session 49) all four live under the single `/library` hub, selected
+ * by a `?tab=` param (the hard merge that Phase 3 deferred). Each segment link
+ * carries the shared scope (`useLibraryScope`) so the active theme travels when
+ * you hop between the two theme-scoped segments.
  */
-const SEGMENTS: { to: string; label: string; scoped: boolean }[] = [
-  { to: "/vocabulary", label: "Wörter", scoped: true },
-  { to: "/collocations", label: "Kollokationen", scoped: true },
-  { to: "/redemittel", label: "Redemittel", scoped: false },
-  { to: "/grammar", label: "Grammatik", scoped: false },
+const SEGMENTS: { tab: string; label: string; scoped: boolean }[] = [
+  { tab: "woerter", label: "Wörter", scoped: true },
+  { tab: "kollokationen", label: "Kollokationen", scoped: true },
+  { tab: "redemittel", label: "Redemittel", scoped: false },
+  { tab: "grammatik", label: "Grammatik", scoped: false },
 ];
 
+export const LIBRARY_TABS = SEGMENTS.map((s) => s.tab);
+export const DEFAULT_LIBRARY_TAB = "woerter";
+
 export function LibrarySwitcher() {
-  const location = useLocation();
+  const [params] = useSearchParams();
+  const current = params.get("tab") ?? DEFAULT_LIBRARY_TAB;
   const { theme, sub } = useLibraryScope();
 
   const linkFor = (seg: (typeof SEGMENTS)[number]) => {
-    if (!seg.scoped || theme === "all") return seg.to;
     const p = new URLSearchParams();
-    p.set("theme", theme);
-    if (seg.to === "/vocabulary" && sub) p.set("sub", sub);
-    return `${seg.to}?${p.toString()}`;
+    p.set("tab", seg.tab);
+    if (seg.scoped && theme !== "all") {
+      p.set("theme", theme);
+      if (seg.tab === "woerter" && sub) p.set("sub", sub);
+    }
+    return `/library?${p.toString()}`;
   };
 
   return (
     <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-surface p-1">
       {SEGMENTS.map((seg) => {
-        const active = location.pathname === seg.to;
+        const active = current === seg.tab;
         return (
           <Link
-            key={seg.to}
+            key={seg.tab}
             to={linkFor(seg)}
             className={cn(
               "flex-1 whitespace-nowrap rounded-lg px-3 py-1.5 text-center text-sm font-medium transition-colors",

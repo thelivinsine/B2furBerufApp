@@ -61,9 +61,21 @@ Heute · Bibliothek · Anwenden · Fortschritt). Founder-approved plan, executed
   per theme via each statement's `threshold` vs theme mastery), a diagnose card (weakest CEFR band/theme
   with a one-tap "Session dazu starten"), and the theme mastery grid relocated off Heute (which now ends
   with a quiet "Alle Themen" link to `/vocabulary`).
-- **Phase 5 (Anwenden hub + nav re-map + facet registry) — NOT STARTED.** Founder-unlocked
-  `DEFAULT_PINNED_TABS` change (Heute · Bibliothek · Anwenden · Fortschritt) + the deferred Phase-3 hard
-  merge + drop the Verb facet. The s26–28 bottom-bar **mechanics** stay locked; only the registry changes.
+- **Phase 5 (Anwenden hub + nav re-map + facet registry) — IA RESTRUCTURE SHIPPED ✅ (session 49);
+  facet-registry tail deferred.** Done: new **Anwenden hub** (`/anwenden`, 3 cards → Sprechen/Schreiben/
+  Prüfung); **Bibliothek hub** (`/library?tab=woerter|kollokationen|redemittel|grammatik`) folding the
+  four library surfaces into one URL, with the old routes (`/vocabulary`, `/collocations`, `/redemittel`,
+  `/grammar`) redirecting in (query params preserved) and `LibrarySwitcher` now tab-based; the
+  founder-unlocked `DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"]` four-zone nav
+  (nav-items collapsed to Heute · Bibliothek · Anwenden · Fortschritt · Einstellungen, with custom
+  `/library` + `/anwenden` route marks in `route-icons.tsx`); and a **settings-store persist migration**
+  (`version: 1` + `ROUTE_SUCCESSOR`) that remaps existing users' pins/More-order onto the new zones (a
+  pinned Wortschatz→Bibliothek, Simulation→Anwenden). The s26–28 bottom-bar **mechanics** stay locked and
+  untouched (only nav-items + `DEFAULT_PINNED_TABS` changed). **Still deferred (the low-value Tier-3 tail,
+  ships next):** the central facet registry (`src/lib/facets.ts`) + dropping the 100-option Verb facet +
+  the ≤12-option rule; and the plan's in-page removals (retiring the standalone `/quiz` hub, kept
+  reachable via deep links for now, and removing the Vokabeltrainer's Karteikarten/Quiz tabs), held back
+  to minimise removal surprise in the nav PR.
 
 ## Writing style (applies to ALL user-facing copy)
 - **Avoid em dashes (`—`).** The founder dislikes them; they are an overused "AI" tell. Use them
@@ -225,7 +237,10 @@ drag now reorders the sheet grid; the + badge is the single, unambiguous add aff
 - More-sheet order stored in `useSettingsStore` as `moreOrder: string[]` (full ordering of every
   route path; empty array = fall back to `nav-items` order). Rides into `profiles.settings` jsonb
   via cloudSync like the other settings.
-- `DEFAULT_PINNED_TABS = ["/", "/vocabulary", "/quiz", "/analytics"]` in `nav-items.ts`.
+- `DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"]` in `nav-items.ts` (the four-zone
+  nav; changed from `["/", "/vocabulary", "/quiz", "/analytics"]` in Phase 5, session 49). The store is
+  persisted at `version: 1`; its `migrate` remaps any pre-Phase-5 pins/More-order via `ROUTE_SUCCESSOR`
+  (also in `nav-items.ts`) so removed routes forward to their successor zone instead of vanishing.
 - `BottomTabBar` reads the store **directly** (no local buffer state). Any external write
   (e.g. MoreSheet adding a tab) is reflected immediately. Never add a `localOrder` cache or
   `useEffect` sync layer — that was the root cause of the "icon added but didn't appear" bug.

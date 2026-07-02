@@ -37,6 +37,21 @@ const RENDERERS: Record<string, Render> = {
       <line x1="11.8" y1="9.6" x2="15.6" y2="9.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".35" />
     </>
   ),
+  // Bibliothek — a stack of three books (blue spine + neon-cyan middle)
+  "/library": c => (
+    <>
+      <rect x="2.8" y="4"    width="14.4" height="3.4" rx="1.1" fill={c} />
+      <rect x="3.6" y="8.3"  width="14.4" height="3.4" rx="1.1" fill="#22d3ee" />
+      <rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill={c} opacity=".82" />
+    </>
+  ),
+  // Anwenden — a target / bullseye (aim, then apply) in orange + neon-amber
+  "/anwenden": c => (
+    <>
+      <circle cx="10" cy="10" r="7.6" stroke={c} strokeWidth="2.2" fill="none" />
+      <circle cx="10" cy="10" r="3.4" fill="#fbbf24" />
+    </>
+  ),
   // Redemittel — speech bubble with neon-magenta reply dots
   "/redemittel": c => (
     <>
@@ -132,6 +147,8 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 // [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
   "/":             { box: [1.5, 2.2, 17, 15.6],     weight: 1.07 },
+  "/library":      { box: [2.8, 4, 15.2, 12],       weight: 1.05 },
+  "/anwenden":     { box: [1.3, 1.3, 17.4, 17.4],   weight: 0.94 },
   "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },
   "/redemittel":   { box: [3, 2.5, 14, 13],         weight: 1.05 },
   "/grammar":      { box: [4.5, 2.5, 11, 14.7],     weight: 1.08 },
