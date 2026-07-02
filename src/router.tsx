@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
@@ -32,18 +32,11 @@ function lazyWithReload<T extends React.ComponentType<unknown>>(
 const Onboarding = lazyWithReload(() =>
   import("@/features/onboarding/Onboarding").then((m) => ({ default: m.Onboarding })),
 );
-const VocabularyTrainer = lazyWithReload(() =>
-  import("@/features/vocabulary/VocabularyTrainer").then((m) => ({
-    default: m.VocabularyTrainer,
-  })),
+const LibraryHub = lazyWithReload(() =>
+  import("@/features/library/LibraryHub").then((m) => ({ default: m.LibraryHub })),
 );
-const RedemittelTrainer = lazyWithReload(() =>
-  import("@/features/redemittel/RedemittelTrainer").then((m) => ({
-    default: m.RedemittelTrainer,
-  })),
-);
-const GrammarHub = lazyWithReload(() =>
-  import("@/features/grammar/GrammarHub").then((m) => ({ default: m.GrammarHub })),
+const AnwendenHub = lazyWithReload(() =>
+  import("@/features/anwenden/AnwendenHub").then((m) => ({ default: m.AnwendenHub })),
 );
 const QuizHub = lazyWithReload(() =>
   import("@/features/quiz/QuizHub").then((m) => ({ default: m.QuizHub })),
@@ -69,11 +62,6 @@ const Analytics = lazyWithReload(() =>
 const Settings = lazyWithReload(() =>
   import("@/features/settings/Settings").then((m) => ({ default: m.Settings })),
 );
-const CollocationsBrowser = lazyWithReload(() =>
-  import("@/features/collocations/CollocationsBrowser").then((m) => ({
-    default: m.CollocationsBrowser,
-  })),
-);
 // Lazy: the Sources page pulls in the full provenance register (~800 rows), so
 // keep it out of the main bundle and load it only when /sources is visited.
 const Sources = lazyWithReload(() =>
@@ -84,6 +72,17 @@ function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
   if (!onboarded) return <Navigate to="/welcome" replace />;
   return <>{children}</>;
+}
+
+// Phase 5 hard merge: the standalone library routes now redirect into the
+// unified /library hub, forwarding to the matching segment tab and preserving
+// every existing query param (theme, sub, cefr, q, cat, …) so deep links and
+// cross-module "Verbunden" jumps keep working.
+function LibraryRedirect({ tab }: { tab: string }) {
+  const { search } = useLocation();
+  const p = new URLSearchParams(search);
+  p.set("tab", tab);
+  return <Navigate to={`/library?${p.toString()}`} replace />;
 }
 
 // Onboarding has its own Suspense boundary since it renders outside AppShell.
@@ -136,37 +135,26 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/vocabulary",
+        path: "/library",
         element: (
           <RequireOnboarding>
-            <VocabularyTrainer />
+            <LibraryHub />
           </RequireOnboarding>
         ),
       },
       {
-        path: "/redemittel",
+        path: "/anwenden",
         element: (
           <RequireOnboarding>
-            <RedemittelTrainer />
+            <AnwendenHub />
           </RequireOnboarding>
         ),
       },
-      {
-        path: "/grammar",
-        element: (
-          <RequireOnboarding>
-            <GrammarHub />
-          </RequireOnboarding>
-        ),
-      },
-      {
-        path: "/collocations",
-        element: (
-          <RequireOnboarding>
-            <CollocationsBrowser />
-          </RequireOnboarding>
-        ),
-      },
+      // Old library routes → unified /library hub (params preserved).
+      { path: "/vocabulary", element: <LibraryRedirect tab="woerter" /> },
+      { path: "/collocations", element: <LibraryRedirect tab="kollokationen" /> },
+      { path: "/redemittel", element: <LibraryRedirect tab="redemittel" /> },
+      { path: "/grammar", element: <LibraryRedirect tab="grammatik" /> },
       {
         path: "/quiz",
         element: (

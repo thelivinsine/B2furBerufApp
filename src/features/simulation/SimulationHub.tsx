@@ -37,9 +37,9 @@ export function SimulationHub() {
       <HubHero
         icon={Mic}
         gradient="from-cyan-500 to-sky-500"
-        eyebrow="Sprechsimulation"
-        title="Lösung finden"
-        description={'Simuliere das Prüfungsmodul „Lösung finden mit einer/einem Partner:in“ – mit branching Dialogen, Hinweisen und Coaching-Feedback.'}
+        eyebrow="Anwenden"
+        title="Sprechsimulation"
+        description={'Simuliere ein Gespräch mit verzweigten Dialogen, Hinweisen und Coaching-Feedback. In der Prüfung heißt dieses Modul „Lösung finden mit einer/einem Partner:in“.'}
       />
 
       {byLevel.map(({ level, items }) => (

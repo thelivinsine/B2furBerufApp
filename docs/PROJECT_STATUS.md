@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-02 (session 48). Branch: `claude/ux-overhaul-phase-4-ui-qh8si7`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-02 (session 49). Branch: `claude/next-step-kve6wf`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -1829,16 +1829,29 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 48 (2026-07-02).** Phases 0–4 are all merged to `main`. **Phase 4 shipped
-✅**: both the content half (Can-Do bank + linter, session 47) and the UI half (Fortschritt redesign,
-session 48) went out together in PR #260 (squash-merged as `74ccd7c`), `lint-content` CI green.
-Active automation branch: `claude/ux-overhaul-phase-4-ui-qh8si7`, realigned to `origin/main` after the
-merge (see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
+**Handoff after session 49 (2026-07-02).** Phases 0–4 merged to `main`; **Phase 5's IA restructure
+shipped ✅** (session 49, see the session-49 log below). The four-zone nav is live: new **Anwenden hub**
+(`/anwenden`), new **Bibliothek hub** (`/library?tab=…`) with the four old library routes redirecting in,
+the founder-unlocked `DEFAULT_PINNED_TABS` four-zone default, and a settings-store persist migration
+(`version: 1`) remapping existing users' pins/More-order. The s26–28 bottom-bar mechanics stayed locked.
+Branch `claude/next-step-kve6wf` (reassigned per session; `main` is the source of truth).
 
-**Next work = Phase 5 (Anwenden hub + nav re-map + facet registry), on Opus 4.8.** The tab-bar
-default-pin change is founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry;
-the s26–28 bar mechanics stay locked. Phase 5 also absorbs the **deferred Phase-3 hard merge** (see the
-Phase 3 scope decision below).
+**Next work = the Phase-5 facet-registry tail (Opus 4.8), the only remaining Phase-5 items:**
+1. Central **facet registry** `src/lib/facets.ts` (facet defs declared once per content type, derived
+   from the taxonomy enums; pages call `facetsFor("vocab", mode)` instead of hand-wiring), + **drop the
+   100-option Verb facet** from the Kollokationen sheet (global/scoped search covers verb lookup) + the
+   **≤12-option facet-hygiene rule**. This is the lowest-value/lowest-frequency layer (Tier 3), which is
+   why it was split out of the nav PR.
+2. The plan's in-page removals, **held back in session 49 to avoid a surprising feature-removal in the
+   nav PR** (do only after a quick founder heads-up, since they remove visible surfaces): retire the
+   standalone `/quiz` hub (currently kept as a working route, off the nav, reachable via deep links +
+   the Vokabeltrainer Quiz tab), and remove the Vokabeltrainer's Karteikarten/Quiz **in-page tabs**
+   (superseded by the toolbar's "Üben" → composed session). The `Flashcards`/`VocabQuiz` components can
+   stay in the repo (their mechanics live on in the session engine).
+
+After that, Phase 5 (and the whole UX overhaul roadmap) is complete; the next big rocks are the
+optional taxonomy follow-ups (human-verify AI `cefr` tags; broaden `sector`/`workSituation`) and a new
+**life-domain theme** (banking / healthcare / housing) per the product scope.
 
 **Phase 3 scope decision (founder, 2026-07-02):** Phase 3 shipped as a **soft merge** (founder chose
 this over full consolidation). The four library pages got the single-hub feel (segmented switcher +
@@ -1847,6 +1860,44 @@ removed and the locked bottom bar was untouched. The **hard merge** deferred to 
 re-map phase): the single `/library` URL + old-route redirects + retiring the standalone Quiz
 section + removing the Vokabeltrainer's in-page Karteikarten/Quiz tabs (superseded by Üben →
 session). Fold these into the Phase 5 work.
+
+**Most recent work (session 49):**
+- **s49 — UX overhaul Phase 5 IA restructure SHIPPED ✅ (Anwenden hub + Bibliothek hub + four-zone
+  nav re-map):** the visible heart of Phase 5, delivered as a mostly-additive PR so no deep link or
+  founder-used surface broke.
+  - **Anwenden hub** (`src/features/anwenden/AnwendenHub.tsx`, route `/anwenden`): one hub with three
+    big cards (Sprechen → `/simulation`, Schreiben → `/writing`, Prüfung → `/exam`), giving the transfer
+    layer equal visual rank. `SimulationHub`'s title renamed **"Lösung finden" → "Sprechsimulation"**
+    (the telc module name kept only in the description).
+  - **Bibliothek hub** (`src/features/library/LibraryHub.tsx`, route `/library`): the deferred Phase-3
+    **hard merge**. `/library?tab=woerter|kollokationen|redemittel|grammatik` lazy-mounts the existing
+    Vokabeltrainer / Kollokationen / Redemittel / Grammatik surfaces (each still renders its own HubHero
+    + `LibrarySwitcher`). `LibrarySwitcher` is now **tab-based** (switches `?tab=` under `/library`,
+    carrying the travelling scope). The four old routes redirect in via a `LibraryRedirect` component
+    that **preserves every query param** (theme/sub/cefr/q/cat…), so cross-module "Verbunden" jumps,
+    `searchAll` deep links, intent cards and `practiceAreas` routes keep working untouched.
+  - **Four-zone nav re-map** (`nav-items.ts`): navItems collapsed from 12 to **Heute · Bibliothek ·
+    Anwenden · Fortschritt · Einstellungen**; `DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden",
+    "/analytics"]` (founder-unlocked, Part-H decision 2). Custom two-tone route marks added for
+    `/library` (stacked books, blue + neon-cyan) and `/anwenden` (target, orange + neon-amber) in
+    `route-icons.tsx` + `NORM`. **The s26–28 bar mechanics (edit mode, jiggle, drag-reorder, More sheet,
+    icon rules/sizes) were NOT touched** — only the item list + default pins, exactly the approved scope.
+  - **Settings-store migration** (`useSettingsStore`, now `persist` `version: 1`): a `migrate` +
+    `ROUTE_SUCCESSOR` map remaps a pre-Phase-5 learner's saved `pinnedTabs`/`moreOrder` onto the new
+    zones (`/vocabulary`,`/collocations`,`/redemittel`,`/grammar`,`/quiz` → `/library`;
+    `/writing`,`/simulation`,`/exam` → `/anwenden`; `/revision` → `/`), de-duping and keeping Home first,
+    so nobody's custom bar silently loses icons.
+  - **Deliberately deferred** (documented in "Resume here"): the facet registry / Verb-facet drop and the
+    plan's in-page removals (quiz retirement + Vokabeltrainer tab removal). Kept `/quiz` a working route
+    (off the nav) and left the vocab Karteikarten/Quiz tabs in place to avoid a surprising feature
+    removal inside the nav PR.
+  - **Verified:** `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green. Headless-Chromium
+    mobile smoke (390px) confirmed: the four-zone bottom bar renders (Heute · Bibliothek · Anwenden ·
+    Fortschritt · Mehr); `/library` + all four `?tab=` segments render; `/anwenden` shows the three
+    cards; `/vocabulary?theme=behoerde` redirects to `/library?theme=behoerde&tab=woerter`; the
+    Simulation title reads "Sprechsimulation"; **and** a seeded pre-Phase-5 profile (`version: 0`, old
+    pins `["/","/vocabulary","/quiz","/analytics"]`) migrates to `["/","/library","/analytics"]` with
+    zero console errors.
 
 **Most recent work (session 48):**
 - **s48 — UX overhaul Phase 4 UI half (Fortschritt redesign) SHIPPED ✅:** built the three pieces

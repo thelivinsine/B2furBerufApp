@@ -154,12 +154,12 @@ export function Dashboard() {
 
       {/* Quiet link to the full theme library; the mastery breakdown itself
           now lives on Fortschritt (UX overhaul Phase 4). */}
-      <Link to="/vocabulary">
+      <Link to="/library">
         <Card className="card-hover">
           <div className="flex items-center gap-3 px-4 py-3.5 sm:px-5">
             <Library className="h-5 w-5 shrink-0 text-muted-foreground" />
-            <span className="text-sm font-medium">Alle Themen</span>
-            <span className="text-sm text-muted-foreground">Wortschatz, Redemittel und Simulationen durchsuchen</span>
+            <span className="text-sm font-medium">Zur Bibliothek</span>
+            <span className="text-sm text-muted-foreground">Wörter, Kollokationen, Redemittel und Grammatik durchsuchen</span>
             <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
           </div>
         </Card>

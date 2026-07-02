@@ -1,7 +1,26 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { DEFAULT_PINNED_TABS } from "@/components/layout/nav-items";
+import { DEFAULT_PINNED_TABS, ROUTE_SUCCESSOR, navItems } from "@/components/layout/nav-items";
 import type { LearningMode } from "@/types";
+
+// Known nav destinations after the Phase-5 four-zone re-map.
+const KNOWN_TABS = new Set(navItems.map((i) => i.to));
+
+// Remap a saved list of nav paths onto the new four-zone nav: forward removed
+// routes to their successor zone, drop anything unknown, and de-duplicate while
+// preserving order.
+function remapTabs(saved: string[] | undefined): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const path of saved ?? []) {
+    const mapped = ROUTE_SUCCESSOR[path] ?? path;
+    if (KNOWN_TABS.has(mapped) && !seen.has(mapped)) {
+      seen.add(mapped);
+      out.push(mapped);
+    }
+  }
+  return out;
+}
 
 export type ThemeMode = "light" | "dark" | "system";
 export type CefrLevel = "A2" | "B1" | "B2" | "C1";
@@ -73,6 +92,23 @@ export const useSettingsStore = create<SettingsState>()(
       setPinnedTabs: (tabs) => set({ pinnedTabs: tabs }),
       setMoreOrder: (order) => set({ moreOrder: order }),
     }),
-    { name: "b2beruf.settings.v1" },
+    {
+      name: "b2beruf.settings.v1",
+      // v1 (Phase 5, session 49): the bottom-bar nav collapsed to the four-zone
+      // model, so an existing learner's pinned tabs and More-sheet order can
+      // reference routes that are no longer nav destinations. Remap them onto
+      // their successor zones instead of letting them silently vanish.
+      version: 1,
+      migrate: (persisted, version) => {
+        const s = persisted as SettingsState;
+        if (s && version < 1) {
+          let pins = remapTabs(s.pinnedTabs);
+          pins = ["/", ...pins.filter((p) => p !== "/")].slice(0, 4);
+          s.pinnedTabs = pins.length >= 2 ? pins : DEFAULT_PINNED_TABS;
+          s.moreOrder = remapTabs(s.moreOrder);
+        }
+        return s;
+      },
+    },
   ),
 );
