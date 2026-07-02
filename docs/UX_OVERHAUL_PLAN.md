@@ -1,5 +1,11 @@
 # UX Overhaul Plan: from tool drawer to learning loop
 
+> **Execution status (session 47, 2026-07-02):** Phase 0 ✅ merged · Phase 1 ✅ merged · Phase 2 ✅
+> merged · Phase 3 ✅ merged (as a **soft merge** per founder choice; the hard `/library` URL merge +
+> Quiz retirement + Vokabeltrainer-tab removal are deferred into Phase 5) · Phase 4 🟡 content half
+> committed (Can-Do bank + linter, unmerged), **UI half pending** on Sonnet 5 · Phase 5 ⬜ not started
+> (Opus 4.8). See `docs/PROJECT_STATUS.md` "Resume here" for the exact handoff.
+>
 > Status: **FULLY APPROVED** (founder, 2026-07-02): all four Part-H decisions recorded, including
 > the tab-bar default-pin change (approved after a plain-language walkthrough; the s26–28 bar
 > mechanics stay locked and untouched). Drafted session 46 on founder request. Supersedes the ambition level of

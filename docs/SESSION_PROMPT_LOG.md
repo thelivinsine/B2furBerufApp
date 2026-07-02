@@ -1630,3 +1630,42 @@ Branch: `claude/review-previous-session-69pxat`.
   modified `src/features/vocabulary/VocabularyTrainer.tsx`,
   `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`,
   `src/features/grammar/GrammarHub.tsx`, `docs/PROJECT_STATUS.md`; commit `432fde2`.
+
+## Entry 100 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompts (verbatim, in order):**
+  > continue phase 4 now [after switching the session model to Fable 5]
+
+  > stop for phase 4 ui part as I need to change the model to sonet
+
+  > continue the fable task of phase 4
+- **Response summary:** Authored the **content half** of `docs/UX_OVERHAUL_PLAN.md` Phase 4 (the
+  Fable-appropriate pedagogical-German step). Created `src/data/canDo.ts` — 25 CEFR-aligned "Ich kann …"
+  Can-Do milestones (2–3 per theme, all 11 themes, ascending bands + mastery thresholds), written in our
+  own German aligned to the Council of Europe CEFR self-assessment descriptors (cited, not reproduced),
+  per Part-H decision 4. Added the `CanDoStatement` type, the `can_do` provenance content type (+ the
+  `/sources` page label), 25 provenance rows (`origin: authored`, `license: OWNED`, `review_status:
+  "draft"` awaiting founder review), and `lint:content` validation (`lintCanDo`: unique ids, theme/cefr
+  enums, "Ich kann" prefix, threshold range, full theme coverage). Per the founder's mid-task interrupt,
+  **stopped before the Fortschritt UI half** (to be built on Sonnet 5). Verified with typecheck,
+  lint:content, build (all green).
+- **Artifacts:** new `src/data/canDo.ts`; modified `src/types/index.ts`, `src/data/provenance.ts`,
+  `scripts/lint-content.mjs`, `src/features/legal/Sources.tsx`; commit `93eb4b7` (NOT merged — Phase 4 is
+  incomplete, PR opens once the UI half lands).
+
+## Entry 101 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > update all the relevant documentation so far. I'll continue this in another session [after
+  > switching the session model to Opus 4.8]
+- **Response summary:** Brought the documentation in sync with the whole session (Phases 0–3 merged,
+  Phase 4 content-half committed but unmerged). Updated `CLAUDE.md` (Layout section for the new
+  session/library/search files + `canDo.ts`; a new "UX overhaul" status block listing the phase
+  progress; the Can-Do content-bank + linter conventions; refreshed the stale active-branch references
+  from `claude/vibrant-meitner-mfl9xk` to `claude/ux-overhaul-step-0-7mtsff`) and `docs/PROJECT_STATUS.md`
+  (Resume-here rewritten for the Phase-4 UI-half handoff, with a ⚠️ note that the branch is AHEAD of
+  `main` so the next session must NOT reset --hard; new session-47 Phase-4-content log entry). No code
+  changes.
+- **Artifacts:** `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; doc-only commit.

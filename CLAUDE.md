@@ -32,12 +32,36 @@ Notes: `.npmrc` sets `minimum-release-age` (24h supply-chain cooldown) and
 protection); the build does NOT need any allowlisted scripts — keep it that way.
 
 ## Layout (`src/`)
-- `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`
-- `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (spaced repetition)
-- `store/` — zustand stores: `useProgressStore`, `useSessionStore`, `useSettingsStore`
-- `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale)
+- `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`, `domains.ts`, `collocations.ts`, `provenance.ts`, `canDo.ts` (Can-Do milestones, s47)
+- `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (spaced repetition), `quiz.ts`, `session.ts` (composed-session composer, s47)
+- `store/` — zustand stores: `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`, `useLibraryScope` (travelling library scope, s47)
+- `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47)
+- `features/session/` — `SessionPlayer` + `Session` route wrapper (the composed learning loop, s47)
+- `features/library/` — `LibrarySwitcher` + `ScopeChip` (unified Bibliothek chrome, s47)
 - `types/index.ts` — shared types
 - `router.tsx`, `App.tsx`, `main.tsx`
+
+## UX overhaul (session 47, in progress) — read `docs/UX_OVERHAUL_PLAN.md`
+The app is mid-migration from a "drawer of 11 tools" to a **session-first learning loop** (four zones:
+Heute · Bibliothek · Anwenden · Fortschritt). Founder-approved plan, executed phase by phase:
+- **Phase 0 (quick wins) ✅ merged** — banner demoted to Heute-only + persisted dismissal; header slimmed
+  to 4 mobile widgets; theme `blurbDe` + grammar `purposeDe` German copy (EN kept as data); "Deine Themen"
+  + "Schnelle Runde" renames; Fortschritt cold-start goal card.
+- **Phase 1 (session engine + Heute) ✅ merged** — `engine/session.ts` composer + `SessionPlayer` +
+  `/session` route + Heute hero/Situationen; Schnellwiederholung is now the ~5-min preset.
+- **Phase 2 (global search + Tier-0 defaults) ✅ merged** — `lib/search.ts` `searchAll` + `GlobalSearch`
+  (header icon / Sidebar / ⌘K); Bibliothek lists default to the learner's CEFR band + 1 (`defaultVisibleBands`).
+- **Phase 3 (library soft-merge + travelling scope) ✅ merged** — `useLibraryScope` + `LibrarySwitcher` +
+  `ScopeChip` + "Üben" scoped-session buttons. **Founder chose the soft merge:** the single `/library`
+  URL, old-route redirects, Quiz retirement, and removing the Vokabeltrainer in-page tabs are DEFERRED to
+  **Phase 5** (with the nav re-map). Do not do them earlier.
+- **Phase 4 (Fortschritt + Can-Do) — content half ✅ committed (not merged), UI half PENDING.** The
+  `canDo.ts` bank (25 milestones, AI-drafted, provenance `review_status: "draft"` awaiting founder review)
+  + linter rules landed. Still to build: the Fortschritt UI (milestone display checked off via each
+  statement's `threshold` vs theme mastery, diagnose card, theme-grid relocation from Heute).
+- **Phase 5 (Anwenden hub + nav re-map + facet registry) — NOT STARTED.** Founder-unlocked
+  `DEFAULT_PINNED_TABS` change (Heute · Bibliothek · Anwenden · Fortschritt) + the deferred Phase-3 hard
+  merge + drop the Verb facet. The s26–28 bottom-bar **mechanics** stay locked; only the registry changes.
 
 ## Writing style (applies to ALL user-facing copy)
 - **Avoid em dashes (`—`).** The founder dislikes them; they are an overused "AI" tell. Use them
@@ -54,14 +78,17 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - **Taxonomy layer (faceted model, added s42; see `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`).** Above the 11 flat themes sits a shallow Domain → Theme → Sub-theme hierarchy plus orthogonal facets. **Domains** (`src/data/domains.ts`; 6: `beruf`, `arbeitswelt`, `alltag`, `gesundheit`, `bildung`, `pruefung`) group the themes, and each theme carries `domain` + `context` (`work`|`personal`|`both`). **Sub-themes** live on `ExamTheme.subThemes` (slug id like `behoerde.antrag`, bilingual title, optional `situationsIndex`); only `behoerde`, `customer` and `meetings` are split so far (3 of 11). **Facets** are optional content fields: `cefr` (`ContentCefr`: A2/B1.1/B1.2/B2.1/B2.2/C1) and `subThemeId` on vocab + collocations, plus `sector` (`care`/`office`) + `workSituation` (real tags as of s43: care/Pflege + office vocab) and forward-declared `frequency` (vocab + collocations) and `counterpart`/`taskType` (redemittel; `counterpart` still 0-tagged on purpose, redemittel are general-purpose). Every facet is **optional and rolls up**: untagged items still appear under the parent theme, so partial tagging never breaks the app. **`mode`** (`LearningMode` in `useSettingsStore`, default `both`) is a top-level lens chosen at onboarding and switchable via the header `ModeSwitcher`. It is persisted (rides cloudSync) and now has a **real content effect** (Phase 3, s43): it filters the dashboard intent cards and gates the Work-mode facets (`sector` "Branche" + `workSituation` "Situation") in the Vokabeltrainer. Broader mode/level re-weighting of the review queue is Phase 4. **Closed-enum rule:** when you add a union to `src/types/index.ts`, mirror it with a JS array + a validate-when-present check in `scripts/lint-content.mjs`. The linter already validates `DOMAIN_IDS`, `CONTEXT_TAGS`, `CEFR_LEVELS`, `FREQUENCIES`, `WORK_SECTORS`, `COUNTERPARTS`, `WORK_SITUATIONS`, `TASK_TYPES`, and cross-checks that every `subThemeId` is declared on its theme. Helpers: `filterVocab({theme, sub, cefr})`, `vocabBySubTheme`, `collocationsBySubTheme`. UI: a **shared faceted filter** (`src/features/shared/FacetSheet.tsx`, s43): a "Filter" chip opens a slide-up sheet (built on `dialog.tsx`, overridden to a bottom sheet) with multi-select option pills showing live counts and greyed zero-yield values (AND-across / OR-within; exports `matchesFacets`/`applyFacets`/`activeFacetCount`/`ActiveFilterChip`). Wired into the **Vokabeltrainer** (CEFR + Wortart, plus the Work-only `sector`/`workSituation` facets when `mode==="work"`; `?cefr=`/`?pos=`/`?sector=`/`?workSituation=`), the **Kollokationen** browser (CEFR + Register + Verb) and the **Redemittel** browse view (Register). The Vokabeltrainer also keeps the theme `Select` + `SubThemePicker` drill-down (`?sub=`); the quiz shows CEFR labels (B1 / B2.1 / B2.2·C1) derived from its internal `Difficulty 1|2|3` via `difficultyToBand` in `src/lib/cefr.ts`. **Harmonized browse toolbar (s45, `docs/FILTER_HARMONIZATION_PLAN.md`):** all three filtering pages (Vokabeltrainer, Kollokationen, Redemittel) share an identical `[Search] [Primary ▾] [Filter]` toolbar via `src/features/shared/BrowseToolbar.tsx`. All use `HubHero` headers. Kollokationen's verb-chip scroll rail was removed (verb is now a facet inside the sheet). Redemittel gained a Kategorie primary dropdown (`?cat=`). Free-text search added to Vokabeltrainer and Redemittel. `src/lib/cefr.ts` is the single source of truth for the CEFR scale (`CEFR_ORDER`, `cefrLabel`, `difficultyToBand`), replacing previously duplicated arrays.
 - **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article (nouns), plural (countable nouns), pronunciation hint, two example sentences, and related terms. Currently **528 words** (~49 per workplace theme, a ~25-word `behoerde` starter pack, plus a **13-word care/Pflege pack** added s43 and spread across existing themes so the `sector` facet cuts across topics; verified by `pnpm lint:content`), all tagged with a `cefr` facet (AI-drafted, human-verify pending), for the three split themes a `subThemeId`, and for the Pflege pack + a curated set of office words a `sector` (`care`/`office`, the first real `sector` tags). When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build` + `pnpm lint:content`.
 - **Collocations** (`src/data/collocations.ts`): currently **396 Nomen-Verb pairs** (~36 per theme; tripled in s40). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`|`diplomatic`, unified with Redemittel in s43), `themeId`, `example {de, en}`, plus the optional facets `cefr` (all tagged) and `subThemeId` (the three split themes). Keep ids unique (`c_` prefix + snake_case).
-- **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.
+- **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `purposeDe` (German added s47), `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.
+- **Can-Do milestones** (`src/data/canDo.ts`, added s47 for UX overhaul Phase 4): currently **25 `CanDoStatement`s** (2–3 per theme, all 11 covered). Schema: `id` (`cd_` prefix), `themeId`, `cefr` (`ContentCefr`), `statement` (German, must start with "Ich kann"), `en` gloss, `threshold` (0..1 theme-mastery ratio at which the milestone is achieved). **Provenance:** AI-drafted, aligned to the CoE CEFR self-assessment descriptors (cited in `provenance.ts`, never reproduced); all rows `review_status: "draft"` **pending founder review** (flip draft→verified after reading the German). When adding: keep ids unique, ascending `cefr`/`threshold` within a theme, add a matching `can_do` provenance row, run `pnpm lint:content`.
 - **Content linter (`pnpm lint:content`, gate added 2026-06-14, provenance checks added 2026-06-15):**
   `scripts/lint-content.mjs` loads every `src/data/*` bank through Vite's `ssrLoadModule` (no extra
   dependency) and checks for duplicate ids, broken dialogue branches (bad `next` targets, orphan/
   dead-end nodes, `start` integrity), missing/empty required fields, dangling cross-references
   (`themeId`, `scenarioId`, Redemittel/grammar/weakness categories), **taxonomy integrity** (domain
   registry completeness, theme `domain`/`context`, every closed-enum facet validated when present, and
-  every `subThemeId` declared on its parent theme), em dashes in copy, and
+  every `subThemeId` declared on its parent theme), **Can-Do integrity** (unique ids, valid `themeId`/
+  `cefr`, the "Ich kann" statement prefix, `threshold` in `(0,1]`, and every theme covered by at least
+  one milestone), em dashes in copy, and
   **provenance register integrity** (every content_id must have a register row; every row's license must
   be on the commercial-safe allowlist; authored/adapted items without a `reference` URL generate a
   warning). It runs in CI on every PR and on pushes to `main` (`.github/workflows/validate.yml`),
@@ -272,11 +299,11 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
-- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/vibrant-meitner-mfl9xk`).
+- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/ux-overhaul-step-0-7mtsff`).
 - The remote sandbox cannot reach the live `*.github.io` site — verifying the deploy (Actions tab green + live site) is left to the user.
 
 ## Workflow notes
-- Development branch for this work: **`claude/vibrant-meitner-mfl9xk`** (active as of session 24).
+- Development branch for this work: **`claude/ux-overhaul-step-0-7mtsff`** (active as of session 47).
   The branch name is reassigned per session — **`main` is always the source of truth**; whatever
   branch a session is assigned, ship to production by opening a PR into `main` and merging (squash).
 - **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `pnpm build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.
