@@ -1,9 +1,11 @@
 # UX Overhaul Plan: from tool drawer to learning loop
 
-> Status: **PROPOSED** (drafted session 46, 2026-07-02, on founder request). Supersedes the ambition
-> level of `docs/FILTER_HARMONIZATION_PLAN.md` (implemented s45; its primitives are kept and reused,
-> see Part B). Grounded in a full-app screen review (all 13 routes, mobile + desktop) and the
-> uploaded playbook `docs/Language Learning App Success Factors.docx`. Companion specs:
+> Status: **DIRECTION APPROVED** (founder, 2026-07-02): decisions 1, 3, 4 recorded in Part H;
+> decision 2 (tab-bar default pins) still pending founder info/approval, so Phase 5 ships without the
+> pin change until then. Drafted session 46 on founder request. Supersedes the ambition level of
+> `docs/FILTER_HARMONIZATION_PLAN.md` (implemented s45; its primitives are kept and reused, see
+> Part B). Grounded in a full-app screen review (all 13 routes, mobile + desktop) and the uploaded
+> playbook `docs/Language Learning App Success Factors.docx`. Companion specs:
 > `docs/TAXONOMY_REDESIGN.md`, `docs/AI_PRODUCT_STRATEGY.md`.
 
 ## Part A: key findings from the app review
@@ -290,13 +292,32 @@ used layer; that is why it ships last despite being the nominal subject of this 
 Each phase: `pnpm typecheck` + `pnpm lint:content` + `pnpm build` + mobile/desktop screenshot pass,
 PR to `main`, founder verifies live. Phase 0 can ship today; 1 → 2 → 3 in order; 4 and 5 can swap.
 
-## Part H: decisions needed from the founder
+## Part H: founder decisions (recorded 2026-07-02)
 
-1. **Approve the IA direction** (session-first, 4 zones). Everything else follows from this.
-2. **Unlock the tab-bar default pin change** (mechanics stay locked; only the default four routes
-   and their order change).
-3. **German-first copy policy** confirmed? (Blurbs/purposes translated, EN retained as data.)
-4. Can-Do statements: AI-drafted + founder-reviewed (like the CEFR tags), or founder-authored?
+1. **IA direction (session-first, 4 zones): APPROVED.** Phases 0–5 may proceed in order.
+2. **Tab-bar default pins: PENDING, founder asked for more info.** Plain-language version of what
+   is being asked: the mobile bottom bar currently shows Home · Wortschatz · Quiz · Fortschritt
+   (+ Mehr) for new users. The proposal changes **only that default set** to Heute · Bibliothek ·
+   Anwenden · Fortschritt (+ Mehr). Everything locked in s26–28 stays exactly as is: long-press
+   edit mode, jiggle, drag-reorder, the More sheet, icon design rules, sizes. Users who already
+   customised their bar keep their custom set; removed routes are remapped to their successors
+   (a pinned Wortschatz becomes Bibliothek). Until approved, Phase 5 ships without this change.
+3. **Copy: German-first CONFIRMED; "EN peek" button parked for brainstorming.** The Phase-0 copy
+   pass proceeds (English blurbs/purposes translated to German, EN retained as data). The founder's
+   new idea, an EN button at the top of the app that translates the whole screen briefly, is
+   deliberately parked as **backlog #25** in `PROJECT_STATUS.md` pending a brainstorm. The copy
+   pass is its prerequisite (a whole-screen EN layer needs the EN strings kept as data), so Phase 0
+   enables rather than blocks it.
+4. **Can-Do statements: AI-DRAFTED + FOUNDER REVIEW, checked against the data strategy.** This is
+   the exact pattern `docs/DATA_GOVERNANCE.md` already documents: AI drafting is a permitted first
+   step; the founder is the verifier of record (four-eyes preserved: assistant authors, founder
+   approves); nothing ships as trusted until reviewed. Recipe for `src/data/canDo.ts`: one
+   provenance row per statement with `origin: "authored"`, `license: "OWNED"`,
+   `review_status: "draft"`, and a `reference` to the Council of Europe CEFR B2 descriptors, the
+   same precedent already used for dialogues, exam sets, and writing prompts. Statements are
+   written in our own German **aligned to** CEFR descriptors, never copied from them (CoE text is
+   cited, not reproduced; Goethe "Kann-Beschreibungen" remain on the avoid list). The founder flips
+   draft → verified during review, mirroring the pending CEFR-tag verification queue.
 
 ## Appendix: later bets (out of scope now, noted from the playbook)
 

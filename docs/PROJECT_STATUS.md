@@ -1710,6 +1710,20 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     - Ties into **#7** (audit infrastructure) and **#22** (end-to-end data strategy); this is the
       "sources" chapter of that umbrella. Recommended model: **Fable** (research/strategy; **Opus** for
       now while Fable is restricted).
+25. **"EN" peek/translate button (added 2026-07-02, founder idea, NEEDS BRAINSTORMING):** a button at
+    the top of the app that translates the whole current screen to English at once, temporarily; the
+    founder's sketch is "show EN for a few seconds, then it locks/reverts" so a learner gets a quick
+    comprehension check without abandoning German immersion. **Deliberately parked**: the founder wants
+    to brainstorm the interaction before anything is built. Notes for when picked up:
+    - Pedagogically a "comprehension safety net" on top of the German-first copy policy (see
+      `docs/UX_OVERHAUL_PLAN.md` Part H, decision 3). The playbook favours desirable difficulty, so a
+      deliberate-friction reveal (e.g. press-and-hold to peek) may beat a free toggle.
+    - **Prerequisite already planned:** the UX-overhaul Phase-0 German copy pass keeps every EN string
+      as data (blurbs, purposes, etc.), which is exactly what a whole-screen EN layer needs. No conflict.
+    - Open questions to brainstorm: what does "the whole screen" cover (UI chrome, learning content, or
+      both)? Reveal per screen or per element? What does "locked" mean afterwards (cooldown, daily peek
+      budget, nothing)? Accessibility (reduced motion, screen readers).
+    - Recommended model: **Fable** for the interaction-design brainstorm, **Sonnet** for the build.
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
