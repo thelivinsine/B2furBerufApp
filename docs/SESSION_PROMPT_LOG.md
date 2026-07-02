@@ -1608,4 +1608,25 @@ Branch: `claude/review-previous-session-69pxat`.
 - **Artifacts:** new `src/lib/search.ts`, `src/components/layout/GlobalSearch.tsx`; modified
   `src/lib/cefr.ts`, `src/components/layout/AppShell.tsx`, `src/components/layout/Sidebar.tsx`,
   `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/collocations/CollocationsBrowser.tsx`,
-  `src/features/redemittel/RedemittelTrainer.tsx`, `docs/PROJECT_STATUS.md`; commit `b99a5db`.
+  `src/features/redemittel/RedemittelTrainer.tsx`, `docs/PROJECT_STATUS.md`; commit `b99a5db`, PR #258
+  (squash-merged).
+
+## Entry 99 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > continue [after switching the session model to Opus 4.8]
+- **Response summary:** Implemented `docs/UX_OVERHAUL_PLAN.md` Phase 3 (Bibliothek + travelling
+  scope). Before building, used `AskUserQuestion` to resolve how aggressively to consolidate given the
+  founder-locked bottom bar (nav re-map is reserved for Phase 5); founder chose the **soft merge**.
+  Built `useLibraryScope` (in-memory travelling theme scope), a `LibrarySwitcher` segmented control +
+  dismissible `ScopeChip` rendered on all four library pages, wired scope hydration + write-through
+  into Vokabeltrainer and Kollokationen (theme travels both ways, URL still overrides), and added an
+  "Üben" button on both toolbars launching a scoped `/session?theme=`. Nothing removed; the locked bar
+  + nav registry untouched (hard merge deferred to Phase 5). Fixed a mid-build bug where deep-link
+  `?theme=` didn't populate the scope store. Verified with typecheck, lint:content, build, and mobile
+  + desktop smoke passes.
+- **Artifacts:** new `src/store/useLibraryScope.ts`, `src/features/library/LibrarySwitcher.tsx`;
+  modified `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`,
+  `src/features/grammar/GrammarHub.tsx`, `docs/PROJECT_STATUS.md`; commit `432fde2`.

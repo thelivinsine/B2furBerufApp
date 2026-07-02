@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, BookMarked, Lightbulb, Volume2, GraduationCap, Combine } from "lucide-react";
+import { ArrowLeft, BookMarked, Lightbulb, Volume2, GraduationCap } from "lucide-react";
+import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import type { GrammarGroup, GrammarTopic } from "@/types";
 import { grammar, grammarById } from "@/data/grammar";
 import { iconByName } from "@/lib/icons";
@@ -68,17 +69,7 @@ export function GrammarHub() {
         description="Die wichtigsten B2-Strukturen verständlich erklärt – mit Mustern, Beispielen, typischen Fehlern und Mini-Übungen mit sofortigem Feedback."
       />
 
-      {/* Shortcut to the standalone collocations browser */}
-      <Link
-        to="/collocations"
-        className="flex items-center justify-between rounded-xl border border-violet-500/30 bg-violet-500/5 px-4 py-3 transition-colors hover:bg-violet-500/10"
-      >
-        <span className="flex items-center gap-2.5 text-sm font-medium">
-          <Combine className="h-4 w-4 text-violet-500" />
-          Alle Nomen-Verb-Verbindungen durchsuchen
-        </span>
-        <span className="text-xs text-muted-foreground">Kollokationen →</span>
-      </Link>
+      <LibrarySwitcher />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {grouped

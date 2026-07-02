@@ -1834,12 +1834,41 @@ Phase 0 PR merge; see below).
 Active automation branch: `claude/ux-overhaul-step-0-7mtsff` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Next work = `docs/UX_OVERHAUL_PLAN.md` Phase 3 (Bibliothek + travelling scope), on Opus 4.8.**
-Phases 0–2 shipped in session 47. Do not skip the phase order 3; phases 4 and 5 can swap. The
-tab-bar default-pin change (Phase 5) is founder-approved but strictly limited to
-`DEFAULT_PINNED_TABS` + route registry; the s26–28 bar mechanics stay locked.
+**Next work = `docs/UX_OVERHAUL_PLAN.md` Phase 4 (Fortschritt + Can-Do), on Fable → Sonnet 5;
+phases 4 and 5 can swap.** Phases 0–3 shipped in session 47. The tab-bar default-pin change (Phase
+5) is founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry; the s26–28 bar
+mechanics stay locked.
+
+**Phase 3 scope decision (founder, 2026-07-02):** Phase 3 shipped as a **soft merge** (founder chose
+this over full consolidation). The four library pages got the single-hub feel (segmented switcher +
+travelling scope + Üben) *without* a route merge or nav change, so nothing the founder uses was
+removed and the locked bottom bar was untouched. The **hard merge** deferred to **Phase 5** (the nav
+re-map phase): the single `/library` URL + old-route redirects + retiring the standalone Quiz
+section + removing the Vokabeltrainer's in-page Karteikarten/Quiz tabs (superseded by Üben →
+session). Fold these into the Phase 5 work.
 
 **Most recent work (session 47):**
+- **s47 — UX overhaul Phase 3 (library soft-merge + travelling scope) shipped:** new
+  `src/store/useLibraryScope.ts` (in-memory zustand) holds the **Tier-2 travelling scope** — the
+  active library `{theme, sub}` as app state, so picking a theme once follows the learner across the
+  theme-scoped segments until changed. New `src/features/library/LibrarySwitcher.tsx` renders a
+  segmented control (Wörter | Kollokationen | Redemittel | Grammatik) on all four library pages, each
+  link carrying the shared scope, plus a dismissible `ScopeChip` on the theme-scoped surfaces.
+  Vokabeltrainer + Kollokationen **hydrate** their theme from the shared scope when arriving without
+  an explicit `?theme=` (e.g. via the bottom bar) and **sync** their effective theme back into it
+  (dropdown or deep link) via a `useEffect` on the effective theme — so scope travels both directions
+  while URL params still override for shareable deep links. An **"Üben"** button on the Vokabeltrainer
+  and Kollokationen toolbars launches a scoped composed session (`/session?theme=`), folding the
+  quiz-launch entry point into the Phase 1 engine (Kollokationen's old "Quiz: theme" button was
+  repointed). The redundant "durchsuchen" collocations shortcut on the Grammar hub was removed (the
+  switcher supersedes it). **Nothing else was removed; the locked bottom bar + nav registry +
+  `DEFAULT_PINNED_TABS` are untouched** (that consolidation is Phase 5). `pnpm typecheck` + `pnpm
+  lint:content` + `pnpm build` green; verified in headless mobile + desktop smoke passes (scope
+  travels Wörter→Kollokationen carrying `?theme=behoerde`; Üben → `/session?theme=behoerde` whose
+  first card was a Behörde word; the switcher renders on all four pages; the chip dismiss returns to
+  the unscoped list). **Bug caught + fixed mid-build:** a deep-link `?theme=` didn't populate the
+  scope store (only the dropdown did), so scope didn't travel; fixed by syncing the effective theme
+  into the store via effect rather than only on the dropdown handler.
 - **s47 — UX overhaul Phase 2 (global search + Tier-0 defaults) shipped:** new `src/lib/search.ts`
   `searchAll(query)` — one query over vocabulary, collocations, Redemittel, grammar topics and
   dialogue scenarios together (linear scan, no index needed at ~1,000 items), returning grouped
