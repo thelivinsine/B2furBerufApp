@@ -388,6 +388,27 @@ function lintWritingPrompts(writingPrompts) {
     if (!writingPrompts[id]) error(ds, id, "no writing prompt for theme");
 }
 
+function lintCanDo(canDoStatements) {
+  const ds = "canDo";
+  checkDuplicateIds(canDoStatements, ds);
+  for (const c of canDoStatements) {
+    const w = c.id ?? "?";
+    if (!THEME_IDS.includes(c.themeId)) error(ds, w, `unknown themeId "${c.themeId}"`);
+    if (!CEFR_LEVELS.includes(c.cefr)) error(ds, w, `invalid cefr "${c.cefr}"`);
+    for (const f of ["statement", "en"])
+      if (!isStr(c[f])) error(ds, w, `${f} empty`);
+    if (isStr(c.statement) && !c.statement.startsWith("Ich kann"))
+      error(ds, w, `statement must start with "Ich kann" (got "${truncate(c.statement)}")`);
+    if (!isNum(c.threshold) || c.threshold <= 0 || c.threshold > 1)
+      error(ds, w, `threshold must be a number in (0, 1], got ${c.threshold}`);
+  }
+  // Every theme should carry at least one milestone so Fortschritt never shows
+  // an empty Can-Do section for a theme the learner is working on.
+  const themesCovered = new Set(canDoStatements.map((c) => c.themeId));
+  for (const id of THEME_IDS)
+    if (!themesCovered.has(id)) error(ds, id, "theme has no Can-Do statement");
+}
+
 function lintProvenance(provenance, allContentIds) {
   const ds = "provenance";
 
@@ -439,7 +460,7 @@ async function main() {
   let data;
   try {
     const load = (p) => server.ssrLoadModule(p);
-    const [vocab, colloc, gram, dia, exams, rede, themes, areas, writing, prov, dom] = await Promise.all([
+    const [vocab, colloc, gram, dia, exams, rede, themes, areas, writing, prov, dom, canDo] = await Promise.all([
       load("/src/data/vocabulary.ts"),
       load("/src/data/collocations.ts"),
       load("/src/data/grammar.ts"),
@@ -451,6 +472,7 @@ async function main() {
       load("/src/data/writingPrompts.ts"),
       load("/src/data/provenance.ts"),
       load("/src/data/domains.ts"),
+      load("/src/data/canDo.ts"),
     ]);
     data = {
       vocabulary: vocab.vocabulary,
@@ -464,6 +486,7 @@ async function main() {
       writingPrompts: writing.writingPrompts,
       provenance: prov.provenance,
       domains: dom.domains,
+      canDoStatements: canDo.canDoStatements,
     };
   } finally {
     await server.close();
@@ -480,6 +503,7 @@ async function main() {
   lintRedemittel(data.redemittel);
   lintPracticeAreas(data.practiceAreas);
   lintWritingPrompts(data.writingPrompts);
+  lintCanDo(data.canDoStatements);
 
   // Build the full set of trackable content ids from all banks, then check
   // that the provenance register has exactly one row per id.
@@ -491,6 +515,7 @@ async function main() {
     ...data.scenarios.map((s) => s.id),
     ...data.examSets.map((e) => e.id),
     ...data.redemittel.map((r) => r.id),
+    ...data.canDoStatements.map((c) => c.id),
     // Writing prompts are keyed by themeId, not individual ids.
     ...THEME_IDS.filter((id) => data.writingPrompts[id]).map((id) => `wp_${id}`),
   ]);
@@ -514,6 +539,7 @@ async function main() {
     examSets: data.examSets.length,
     redemittel: data.redemittel.length,
     practiceAreas: data.practiceAreas.length,
+    "can-do milestones": data.canDoStatements.length,
     "provenance rows": data.provenance.length,
     "provenance verified": data.provenance.filter((e) => e.review_status === "verified").length,
   };

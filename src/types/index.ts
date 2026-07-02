@@ -451,6 +451,29 @@ export interface SrsCard {
 
 export type Grade = 0 | 3 | 4 | 5;
 
+/* ---------------- Can-Do milestones (UX overhaul Phase 4) ---------------- */
+
+/**
+ * A CEFR-aligned competence milestone ("Ich kann …") attached to a theme.
+ * Statements are written in our own German, aligned to (never copied from)
+ * the Council of Europe CEFR descriptors; each has a provenance row. A
+ * milestone counts as achieved when the learner's mastery ratio in its theme
+ * (share of theme vocab at mastery >= 0.8) crosses `threshold`, so progress
+ * reads as competence instead of a counter.
+ */
+export interface CanDoStatement {
+  id: string;
+  themeId: ThemeId;
+  /** CEFR band the statement is pitched at. */
+  cefr: ContentCefr;
+  /** The German "Ich kann …" statement (user-facing). */
+  statement: string;
+  /** English gloss, kept as data for a future EN-UI mode. */
+  en: string;
+  /** Theme mastery ratio (0..1) at which this milestone is achieved. */
+  threshold: number;
+}
+
 /* ---------------- Data governance — provenance register ---------------- */
 
 export type ProvenanceContentType =
@@ -461,7 +484,8 @@ export type ProvenanceContentType =
   | "dialogue"
   | "exam_set"
   | "redemittel"
-  | "writing_prompt";
+  | "writing_prompt"
+  | "can_do";
 
 export type ProvenanceOrigin = "sourced" | "adapted" | "authored";
 
