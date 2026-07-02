@@ -1,19 +1,13 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Flame, BookOpen, ArrowRight, CalendarDays, Sparkles, Zap } from "lucide-react";
-import { themes } from "@/data/themes";
-import { vocabByTheme } from "@/data/vocabulary";
-import { scenariosByTheme } from "@/data/dialogues";
-import { iconByName } from "@/lib/icons";
+import { Flame, BookOpen, ArrowRight, CalendarDays, Sparkles, Zap, Library } from "lucide-react";
 import { useProgressStore, useTodayXp, useEffectiveStreak } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { mastery, dueCount } from "@/engine/srs";
+import { dueCount } from "@/engine/srs";
 import { sessionPreview } from "@/engine/session";
-import { daysBetween, pct, todayKey, cn } from "@/lib/utils";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { daysBetween, todayKey, cn } from "@/lib/utils";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { SectionHeading } from "@/components/shared/misc";
 import { intentCardsForMode, type IntentCard } from "./intentCards";
 
@@ -47,20 +41,6 @@ export function Dashboard() {
 
   // Mode-aware situation shortcuts: 3 compact chips launching scoped sessions.
   const situations = intentCardsForMode(learningMode).slice(0, 3);
-
-  // Theme stats; feature the least-mastered theme (most room to grow) to give
-  // the browse grid a clear focal point and some size variety.
-  const themeStats = themes.map((t) => {
-    const words = vocabByTheme(t.id);
-    const sims = scenariosByTheme(t.id);
-    const mastered = words.filter((w) => mastery(srs[w.id]) >= 0.8).length;
-    const ratio = words.length ? mastered / words.length : 1;
-    return { theme: t, words, sims, mastered, ratio };
-  });
-  const featured = themeStats.reduce((a, b) =>
-    b.ratio < a.ratio || (b.ratio === a.ratio && b.words.length > a.words.length) ? b : a,
-  );
-  const ordered = [featured, ...themeStats.filter((s) => s.theme.id !== featured.theme.id)];
 
   return (
     <div className="space-y-5 sm:space-y-8">
@@ -172,87 +152,18 @@ export function Dashboard() {
         </div>
       </Card>
 
-      {/* Themes — the main browse surface, with one featured (larger) card. */}
-      <section>
-        <SectionHeading
-          eyebrow="Themen"
-          title="Deine Themen"
-          description="Realistische Situationen aus Beruf und Alltag mit Wortschatz, Redemitteln und Simulationen."
-          action={
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/vocabulary">
-                Wortschatz ansehen <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          }
-        />
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {ordered.map(({ theme, words, sims, mastered }, i) => {
-            const Icon = iconByName(theme.icon);
-            const masteredPct = pct(mastered, words.length);
-            const isFeatured = theme.id === featured.theme.id;
-            return (
-              <motion.div
-                key={theme.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-                className={cn(isFeatured && "sm:col-span-2")}
-              >
-                <Link to={`/vocabulary?theme=${theme.id}`}>
-                  <Card className="card-hover group h-full overflow-hidden">
-                    {isFeatured ? (
-                      <CardContent className="p-5 sm:p-6">
-                        <div className="flex items-start justify-between">
-                          <div className={`rounded-xl bg-gradient-to-br ${theme.accent} p-3 text-white shadow-soft`}>
-                            <Icon className="h-6 w-6" />
-                          </div>
-                          <Badge variant="accent">Empfohlen</Badge>
-                        </div>
-                        <p className="mt-3 text-lg font-semibold">{theme.titleDe}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">{theme.blurbDe}</p>
-                        <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                          <span className="rounded-full bg-muted px-2.5 py-1">{words.length} Wörter</span>
-                          {sims.length > 0 && (
-                            <span className="rounded-full bg-muted px-2.5 py-1">{sims.length} Simulationen</span>
-                          )}
-                        </div>
-                        <div className="mt-3 space-y-1.5">
-                          <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>{mastered} / {words.length} gemeistert</span>
-                            <span>{masteredPct}%</span>
-                          </div>
-                          <Progress value={masteredPct} className="h-1.5" />
-                        </div>
-                      </CardContent>
-                    ) : (
-                      <CardContent className="space-y-3 p-5">
-                        <div className="flex items-start justify-between">
-                          <div className={`rounded-xl bg-gradient-to-br ${theme.accent} p-2.5 text-white shadow-soft`}>
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          {sims.length > 0 && <Badge variant="muted">{sims.length} Sim.</Badge>}
-                        </div>
-                        <div>
-                          <p className="font-semibold">{theme.titleDe}</p>
-                          <p className="line-clamp-2 text-sm text-muted-foreground">{theme.blurbDe}</p>
-                        </div>
-                        <div className="space-y-1.5">
-                          <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>{mastered} / {words.length} Wörter</span>
-                            <span>{masteredPct}%</span>
-                          </div>
-                          <Progress value={masteredPct} className="h-1.5" />
-                        </div>
-                      </CardContent>
-                    )}
-                  </Card>
-                </Link>
-              </motion.div>
-            );
-          })}
-        </div>
-      </section>
+      {/* Quiet link to the full theme library; the mastery breakdown itself
+          now lives on Fortschritt (UX overhaul Phase 4). */}
+      <Link to="/vocabulary">
+        <Card className="card-hover">
+          <div className="flex items-center gap-3 px-4 py-3.5 sm:px-5">
+            <Library className="h-5 w-5 shrink-0 text-muted-foreground" />
+            <span className="text-sm font-medium">Alle Themen</span>
+            <span className="text-sm text-muted-foreground">Wortschatz, Redemittel und Simulationen durchsuchen</span>
+            <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
+          </div>
+        </Card>
+      </Link>
     </div>
   );
 }

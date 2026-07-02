@@ -1630,3 +1630,88 @@ Branch: `claude/review-previous-session-69pxat`.
   modified `src/features/vocabulary/VocabularyTrainer.tsx`,
   `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`,
   `src/features/grammar/GrammarHub.tsx`, `docs/PROJECT_STATUS.md`; commit `432fde2`.
+
+## Entry 100 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompts (verbatim, in order):**
+  > continue phase 4 now [after switching the session model to Fable 5]
+
+  > stop for phase 4 ui part as I need to change the model to sonet
+
+  > continue the fable task of phase 4
+- **Response summary:** Authored the **content half** of `docs/UX_OVERHAUL_PLAN.md` Phase 4 (the
+  Fable-appropriate pedagogical-German step). Created `src/data/canDo.ts` — 25 CEFR-aligned "Ich kann …"
+  Can-Do milestones (2–3 per theme, all 11 themes, ascending bands + mastery thresholds), written in our
+  own German aligned to the Council of Europe CEFR self-assessment descriptors (cited, not reproduced),
+  per Part-H decision 4. Added the `CanDoStatement` type, the `can_do` provenance content type (+ the
+  `/sources` page label), 25 provenance rows (`origin: authored`, `license: OWNED`, `review_status:
+  "draft"` awaiting founder review), and `lint:content` validation (`lintCanDo`: unique ids, theme/cefr
+  enums, "Ich kann" prefix, threshold range, full theme coverage). Per the founder's mid-task interrupt,
+  **stopped before the Fortschritt UI half** (to be built on Sonnet 5). Verified with typecheck,
+  lint:content, build (all green).
+- **Artifacts:** new `src/data/canDo.ts`; modified `src/types/index.ts`, `src/data/provenance.ts`,
+  `scripts/lint-content.mjs`, `src/features/legal/Sources.tsx`; commit `93eb4b7` (NOT merged — Phase 4 is
+  incomplete, PR opens once the UI half lands).
+
+## Entry 101 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > update all the relevant documentation so far. I'll continue this in another session [after
+  > switching the session model to Opus 4.8]
+- **Response summary:** Brought the documentation in sync with the whole session (Phases 0–3 merged,
+  Phase 4 content-half committed but unmerged). Updated `CLAUDE.md` (Layout section for the new
+  session/library/search files + `canDo.ts`; a new "UX overhaul" status block listing the phase
+  progress; the Can-Do content-bank + linter conventions; refreshed the stale active-branch references
+  from `claude/vibrant-meitner-mfl9xk` to `claude/ux-overhaul-step-0-7mtsff`) and `docs/PROJECT_STATUS.md`
+  (Resume-here rewritten for the Phase-4 UI-half handoff, with a ⚠️ note that the branch is AHEAD of
+  `main` so the next session must NOT reset --hard; new session-47 Phase-4-content log entry). No code
+  changes.
+- **Artifacts:** `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; doc-only commit.
+
+## Entry 102 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt summary (not captured verbatim at the time; reconstructed from the commit record):** the
+  founder reviewed the 25 Can-Do statements in `src/data/canDo.ts` (via the GitHub link) and approved
+  them, completing the four-eyes review from Part-H decision 4.
+- **Response summary:** Flipped all 25 `can_do` provenance rows in `src/data/provenance.ts` from
+  `review_status: "draft"` to `"verified"` (`verified_by: "founder"`, `verified_date: "2026-07-02"`).
+  Refreshed the `canDo.ts` file header and the `CLAUDE.md`/`PROJECT_STATUS.md` notes that previously
+  said "review pending" to reflect the approval. `pnpm lint:content` now reports 25 provenance rows
+  verified.
+- **Artifacts:** `src/data/canDo.ts`, `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`;
+  commit `72a67cf`.
+
+## Entry 103 — 2026-07-02 (session 48)
+- **Branch:** `claude/ux-overhaul-phase-4-ui-qh8si7`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim, task-runner instruction):**
+  > Continue the UX overhaul, Phase 4 UI half, on branch `claude/ux-overhaul-step-0-7mtsff`. Read
+  > `docs/UX_OVERHAUL_PLAN.md` (Part E5) and `docs/PROJECT_STATUS.md` "Resume here" first. Build three
+  > things (mostly UI assembly over data/math that already exist): (1) a Can-Do milestone section in
+  > `Analytics.tsx` as the Fortschritt headline, checked off via `canDoByTheme` + theme mastery ratio;
+  > (2) a diagnose card reusing `weakestBand`/`weakestTheme` from `engine/session.ts` with a one-tap
+  > "Session dazu starten"; (3) relocate the theme mastery grid from Heute to Fortschritt (already lives
+  > there), replacing the Dashboard grid with a quiet "Alle Themen" link. Verify with typecheck +
+  > lint:content + build + a headless-Chromium mobile smoke pass, then ship: commit, push, open one PR
+  > into `main` bundling the already-committed Phase-4 content half, wait for CI, squash-merge, and do
+  > the post-merge branch realignment. Update the documentation.
+- **Response summary:** Discovered the session's designated branch (`claude/ux-overhaul-phase-4-ui-qh8si7`)
+  had been created from `main` and did not carry the session-47 Phase-4 content commits, while the branch
+  named in the task text (`claude/ux-overhaul-step-0-7mtsff`) did; reset the designated branch onto that
+  content branch (no local work was lost — the designated branch was clean and identical to `main`) so
+  both halves of Phase 4 could ship together. Built the **Can-Do milestone section** in `Analytics.tsx`
+  (grouped by theme, least-mastered-first, checked off per statement `threshold` vs `themeStats.ratio`,
+  with an overall achieved/total badge), the **diagnose card** (weakest CEFR band via `weakestBand`, or
+  weakest theme via `weakestTheme` as a fresh-learner fallback, with a "Session dazu starten" button
+  navigating to `/session?theme=`), and **removed the "Deine Themen" browse grid from `Dashboard.tsx`**
+  (with its now-unused `iconByName`/`Progress`/`Badge`/`scenariosByTheme`/`vocabByTheme`/`mastery`/`pct`
+  imports), replacing it with a quiet "Alle Themen" card linking to `/vocabulary`. Verified with
+  `pnpm typecheck`, `pnpm lint:content`, `pnpm build` (all green), and a headless-Chromium mobile smoke
+  pass seeding `srs`/settings into `localStorage`: confirmed the Can-Do section renders checked/unchecked
+  milestones correctly, the diagnose button navigates to `/session?theme=...`, and Heute now ends in the
+  hero + Situationen + status strip + "Alle Themen" link with no theme grid.
+- **Artifacts:** modified `src/features/analytics/Analytics.tsx`, `src/features/dashboard/Dashboard.tsx`,
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/UX_OVERHAUL_PLAN.md`, `docs/SESSION_PROMPT_LOG.md`.

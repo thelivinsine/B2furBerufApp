@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-02 (session 47). Branch: `claude/ux-overhaul-step-0-7mtsff`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-02 (session 48). Branch: `claude/ux-overhaul-phase-4-ui-qh8si7`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -1829,15 +1829,16 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 47 (2026-07-02).** Everything noted ✅ is merged to `main` (pending the
-Phase 0 PR merge; see below).
-Active automation branch: `claude/ux-overhaul-step-0-7mtsff` (realign to `origin/main` after each
+**Handoff after session 48 (2026-07-02).** Phases 0–3 are merged to `main`. **Phase 4 is DONE**: both
+the content half (Can-Do bank + linter, session 47) and the UI half (Fortschritt redesign, session 48)
+are built, verified, and ready to ship in one PR.
+Active automation branch: `claude/ux-overhaul-phase-4-ui-qh8si7` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Next work = `docs/UX_OVERHAUL_PLAN.md` Phase 4 (Fortschritt + Can-Do), on Fable → Sonnet 5;
-phases 4 and 5 can swap.** Phases 0–3 shipped in session 47. The tab-bar default-pin change (Phase
-5) is founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry; the s26–28 bar
-mechanics stay locked.
+**Next work = Phase 5 (Anwenden hub + nav re-map + facet registry), on Opus 4.8.** The tab-bar
+default-pin change is founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry;
+the s26–28 bar mechanics stay locked. Phase 5 also absorbs the **deferred Phase-3 hard merge** (see the
+Phase 3 scope decision below).
 
 **Phase 3 scope decision (founder, 2026-07-02):** Phase 3 shipped as a **soft merge** (founder chose
 this over full consolidation). The four library pages got the single-hub feel (segmented switcher +
@@ -1847,7 +1848,38 @@ re-map phase): the single `/library` URL + old-route redirects + retiring the st
 section + removing the Vokabeltrainer's in-page Karteikarten/Quiz tabs (superseded by Üben →
 session). Fold these into the Phase 5 work.
 
+**Most recent work (session 48):**
+- **s48 — UX overhaul Phase 4 UI half (Fortschritt redesign) SHIPPED ✅:** built the three pieces
+  from plan E5 on top of the session-47 Can-Do content. **Can-Do milestone section** in
+  `Analytics.tsx`, now the page's lead: for each theme (sorted least-mastered-first, same order as
+  the mastery grid) lists its `canDoByTheme(themeId)` statements, checked off when the theme's
+  mastery ratio (already computed as `themeStats`) crosses the statement's `threshold`; a header
+  badge shows the overall `achieved/total` count. **Diagnose card**: shows the current weakest CEFR
+  band (`weakestBand`) or, for a fresh learner with no started cards, the weakest theme
+  (`weakestTheme`, mode-aware, both pure exports of `engine/session.ts`), with a one-tap "Session
+  dazu starten" button that navigates to `/session?theme=<weakTheme>`. **Relocated the theme mastery
+  grid**: removed the "Deine Themen" browse grid from `Dashboard.tsx` (Heute) — it already lived on
+  Fortschritt as "Beherrschung nach Thema" — and replaced it with a quiet "Alle Themen" card linking
+  to `/vocabulary`; Heute is now hero + Situationen + status strip + that link. No new engine or data,
+  UI assembly only. `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green; headless-Chromium
+  mobile smoke pass confirmed the Can-Do section renders checked/unchecked milestones correctly against
+  seeded `srs` progress, the diagnose button navigates to `/session?theme=...`, and the Heute theme grid
+  is gone with "Alle Themen" in its place. Shipped in one PR bundling the session-47 content commits.
+
 **Most recent work (session 47):**
+- **s47 — UX overhaul Phase 4 CONTENT half (Can-Do bank + linter) committed (not merged):** new
+  `src/data/canDo.ts` — **25 `CanDoStatement` Can-Do milestones**, 2–3 per theme across all 11 themes,
+  pitched at ascending CEFR bands (B1.2 → B2.1 → B2.2) with ascending mastery `threshold`s. Each is a
+  German "Ich kann …" statement written in our own words, **aligned to the Council of Europe CEFR
+  self-assessment descriptors** (cited in provenance, never reproduced; Goethe "Kann-Beschreibungen"
+  stay on the avoid list) — the exact Part-H-decision-4 recipe. New `CanDoStatement` type + `can_do`
+  provenance content type (with the `/sources` page label + `TYPE_ORDER` entry); **25 provenance rows**
+  (`origin: authored`, `license: OWNED`, reference = CoE self-assessment grid; **founder-reviewed and
+  approved 2026-07-02 → all now `review_status: "verified"`**). New `lint:content` rules (`lintCanDo`): unique ids, valid
+  `themeId`/`cefr`, "Ich kann" prefix, `threshold` in `(0,1]`, and every theme covered; the bank is
+  loaded + counted (25 milestones · 1111 provenance rows). Helper `canDoByTheme`. `pnpm typecheck` +
+  `pnpm lint:content` + `pnpm build` green. Committed as `93eb4b7`; the **UI half is not started** (see
+  "Resume here"). This is the Fable-authored content step; the founder verifies the German.
 - **s47 — UX overhaul Phase 3 (library soft-merge + travelling scope) shipped:** new
   `src/store/useLibraryScope.ts` (in-memory zustand) holds the **Tier-2 travelling scope** — the
   active library `{theme, sub}` as app state, so picking a theme once follows the learner across the
