@@ -1,11 +1,12 @@
 import { Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Loader2 } from "lucide-react";
+import { Flame, Loader2, Search } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { BottomTabBar } from "./BottomTabBar";
 import { MoreSheet } from "./MoreSheet";
+import { GlobalSearch } from "./GlobalSearch";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Toaster } from "./Toaster";
@@ -18,6 +19,20 @@ import { cn } from "@/lib/utils";
 export function AppShell() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Universal shortcut (UX overhaul Phase 2, Tier 1): ⌘K / Ctrl+K opens global
+  // search from anywhere, alongside the header icon and the Sidebar entry.
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   function enterEditMode() {
     setEditMode(true);
@@ -84,8 +99,10 @@ export function AppShell() {
 
       {/* Desktop sidebar */}
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border bg-surface/60 backdrop-blur-xl lg:block">
-        <Sidebar />
+        <Sidebar onSearch={() => setSearchOpen(true)} />
       </aside>
+
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
       {/* Mobile bottom tab bar + "Mehr" sheet */}
       <BottomTabBar
@@ -132,6 +149,13 @@ export function AppShell() {
                 <Flame className={cn("h-4 w-4", streak > 0 && "fill-warning/30")} />
                 {streak}
               </div>
+              <button
+                onClick={() => setSearchOpen(true)}
+                aria-label="Suche öffnen"
+                className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <Search className="h-4 w-4" />
+              </button>
               <ThemeToggle />
               <AccountMenu />
             </div>

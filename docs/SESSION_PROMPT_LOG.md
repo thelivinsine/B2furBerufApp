@@ -1587,4 +1587,25 @@ Branch: `claude/review-previous-session-69pxat`.
   `src/features/session/Session.tsx`, `src/features/quiz/QuestionViews.tsx`; modified
   `src/features/dashboard/Dashboard.tsx`, `src/features/quiz/QuizRunner.tsx`,
   `src/features/revision/QuickRevision.tsx`, `src/features/grammar/GrammarDrillCard.tsx`,
-  `src/router.tsx`, `src/types/index.ts`, `docs/PROJECT_STATUS.md`; commit `fecc9d6`.
+  `src/router.tsx`, `src/types/index.ts`, `docs/PROJECT_STATUS.md`; commit `fecc9d6`, PR #257
+  (squash-merged).
+
+## Entry 98 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > continue [after switching the session model to Sonnet 5]
+- **Response summary:** Implemented `docs/UX_OVERHAUL_PLAN.md` Phase 2 (global search + Tier-0
+  defaults). Built `src/lib/search.ts` `searchAll(query)` — one query over vocabulary, collocations,
+  Redemittel, grammar topics and dialogue scenarios, returning grouped deep-linking results — and a
+  `GlobalSearch` dialog wired into the mobile header icon, a new Sidebar entry, and a ⌘K/Ctrl+K
+  shortcut. Added Tier-0 personalized CEFR-band defaults (`defaultVisibleBands`/`hiddenBandsLabel`
+  in `src/lib/cefr.ts`) to Vokabeltrainer, Kollokationen and Redemittel, with a quiet "auch X zeigen"
+  escape. During verification found that the vocabulary bank has no A2/B1.1/C1-tagged items, so the
+  naive band default rendered an empty list for A2 learners; fixed with a non-empty guard so the
+  default never activates unless it leaves at least one result. Verified with typecheck,
+  lint:content, build, and headless mobile + desktop smoke passes.
+- **Artifacts:** new `src/lib/search.ts`, `src/components/layout/GlobalSearch.tsx`; modified
+  `src/lib/cefr.ts`, `src/components/layout/AppShell.tsx`, `src/components/layout/Sidebar.tsx`,
+  `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/collocations/CollocationsBrowser.tsx`,
+  `src/features/redemittel/RedemittelTrainer.tsx`, `docs/PROJECT_STATUS.md`; commit `b99a5db`.
