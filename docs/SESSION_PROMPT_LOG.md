@@ -1564,4 +1564,27 @@ Branch: `claude/review-previous-session-69pxat`.
   `src/data/grammar.ts`, `src/data/themes.ts`, `src/features/analytics/Analytics.tsx`,
   `src/features/auth/SaveProgressBanner.tsx`, `src/features/dashboard/Dashboard.tsx`,
   `src/features/grammar/GrammarHub.tsx`, `src/features/revision/QuickRevision.tsx`,
-  `src/store/useSettingsStore.ts`, `src/types/index.ts`, `docs/PROJECT_STATUS.md`; commit `b48abd7`.
+  `src/store/useSettingsStore.ts`, `src/types/index.ts`, `docs/PROJECT_STATUS.md`; commit `b48abd7`,
+  PR #256 (squash-merged).
+
+## Entry 97 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > continue [after switching the session model to Opus 4.8]
+- **Response summary:** Implemented `docs/UX_OVERHAUL_PLAN.md` Phase 1 (session engine + Heute), the
+  core "one tap, one composed session" transformation. Built a pure composer `engine/session.ts`
+  (`buildSession` interleaving due vocab + quiz + grammar + Redemittel; deterministic
+  `sessionPreview`; `weakestBand`/`weakestTheme`/`difficultyForLevel`), a `SessionPlayer` that renders
+  every block kind behind one progress bar + XP tally with an end screen (XP, "Stärker geworden"
+  list, forward hook), and new `SessionBlock`/`SessionPlan` types. Reworked Heute to lead with a
+  primary session CTA hero + Situationen chips launching scoped sessions; folded Schnellwiederholung
+  into the short preset of the same engine. Reused existing renderers by extracting shared
+  `QuestionViews.tsx` (QuizRunner + SessionPlayer) and adding backwards-compatible
+  `onResult`/`suppressXp` props to `GrammarDrillCard`. New `/session` route. Verified with typecheck,
+  lint:content, build, and a headless mobile smoke pass driving a full session to the end screen.
+- **Artifacts:** new `src/engine/session.ts`, `src/features/session/SessionPlayer.tsx`,
+  `src/features/session/Session.tsx`, `src/features/quiz/QuestionViews.tsx`; modified
+  `src/features/dashboard/Dashboard.tsx`, `src/features/quiz/QuizRunner.tsx`,
+  `src/features/revision/QuickRevision.tsx`, `src/features/grammar/GrammarDrillCard.tsx`,
+  `src/router.tsx`, `src/types/index.ts`, `docs/PROJECT_STATUS.md`; commit `fecc9d6`.
