@@ -1829,11 +1829,11 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 48 (2026-07-02).** Phases 0–3 are merged to `main`. **Phase 4 is DONE**: both
-the content half (Can-Do bank + linter, session 47) and the UI half (Fortschritt redesign, session 48)
-are built, verified, and ready to ship in one PR.
-Active automation branch: `claude/ux-overhaul-phase-4-ui-qh8si7` (realign to `origin/main` after each
-squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
+**Handoff after session 48 (2026-07-02).** Phases 0–4 are all merged to `main`. **Phase 4 shipped
+✅**: both the content half (Can-Do bank + linter, session 47) and the UI half (Fortschritt redesign,
+session 48) went out together in PR #260 (squash-merged as `74ccd7c`), `lint-content` CI green.
+Active automation branch: `claude/ux-overhaul-phase-4-ui-qh8si7`, realigned to `origin/main` after the
+merge (see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
 **Next work = Phase 5 (Anwenden hub + nav re-map + facet registry), on Opus 4.8.** The tab-bar
 default-pin change is founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry;
@@ -1864,10 +1864,12 @@ session). Fold these into the Phase 5 work.
   UI assembly only. `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green; headless-Chromium
   mobile smoke pass confirmed the Can-Do section renders checked/unchecked milestones correctly against
   seeded `srs` progress, the diagnose button navigates to `/session?theme=...`, and the Heute theme grid
-  is gone with "Alle Themen" in its place. Shipped in one PR bundling the session-47 content commits.
+  is gone with "Alle Themen" in its place. Shipped in PR #260 (bundling the session-47 content
+  commits), squash-merged to `main` as `74ccd7c` after `lint-content` CI passed.
 
 **Most recent work (session 47):**
-- **s47 — UX overhaul Phase 4 CONTENT half (Can-Do bank + linter) committed (not merged):** new
+- **s47 — UX overhaul Phase 4 CONTENT half (Can-Do bank + linter) committed (merged in session 48
+  via PR #260, together with the UI half):** new
   `src/data/canDo.ts` — **25 `CanDoStatement` Can-Do milestones**, 2–3 per theme across all 11 themes,
   pitched at ascending CEFR bands (B1.2 → B2.1 → B2.2) with ascending mastery `threshold`s. Each is a
   German "Ich kann …" statement written in our own words, **aligned to the Council of Europe CEFR
@@ -1878,8 +1880,8 @@ session). Fold these into the Phase 5 work.
   approved 2026-07-02 → all now `review_status: "verified"`**). New `lint:content` rules (`lintCanDo`): unique ids, valid
   `themeId`/`cefr`, "Ich kann" prefix, `threshold` in `(0,1]`, and every theme covered; the bank is
   loaded + counted (25 milestones · 1111 provenance rows). Helper `canDoByTheme`. `pnpm typecheck` +
-  `pnpm lint:content` + `pnpm build` green. Committed as `93eb4b7`; the **UI half is not started** (see
-  "Resume here"). This is the Fable-authored content step; the founder verifies the German.
+  `pnpm lint:content` + `pnpm build` green. Committed as `93eb4b7`. This is the Fable-authored content
+  step; the founder verifies the German. (The UI half followed in session 48, see above.)
 - **s47 — UX overhaul Phase 3 (library soft-merge + travelling scope) shipped:** new
   `src/store/useLibraryScope.ts` (in-memory zustand) holds the **Tier-2 travelling scope** — the
   active library `{theme, sub}` as app state, so picking a theme once follows the learner across the
