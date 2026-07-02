@@ -9,8 +9,8 @@ import type { CanDoStatement } from "@/types";
  * Authorship note (data governance): all statements are written in our own
  * German, aligned to the Council of Europe CEFR self-assessment descriptors
  * (cited in provenance, never reproduced). Goethe "Kann-Beschreibungen" remain
- * on the avoid list. AI-drafted, founder review pending: every provenance row
- * starts as review_status "draft".
+ * on the avoid list. AI-drafted then **founder-reviewed and approved
+ * (2026-07-02)**: every provenance row is review_status "verified".
  */
 export const canDoStatements: CanDoStatement[] = [
   /* ---------------- Besprechungen & Teamarbeit ---------------- */

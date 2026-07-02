@@ -1845,9 +1845,9 @@ off when the learner's theme mastery ratio crosses its `threshold`; helper `canD
 **Diagnose card** (current weakest band/group with a one-tap "Session dazu starten" → `/session`), and
 **relocating the theme mastery grid** from Heute (`Dashboard.tsx`) to Fortschritt (`Analytics.tsx`),
 leaving Heute as hero + Situationen + status strip with a quiet "Alle Themen" link. Then verify + PR +
-merge + docs. **Founder review pending:** the 25 Can-Do statements are `review_status: "draft"` in
-`provenance.ts`; the founder flips draft→verified after reading the German (four-eyes, per Part-H
-decision 4).
+merge + docs. **Founder review DONE (2026-07-02):** the founder reviewed the 25 Can-Do statements via
+the GitHub link and approved them; all 25 `can_do` provenance rows are now `review_status: "verified"`
+(`verified_by: "founder"`). The content is settled; the UI half can build on it directly.
 
 After Phase 4: **Phase 5 (Anwenden hub + nav re-map + facet registry), on Opus 4.8.** The tab-bar
 default-pin change is founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry;
@@ -1870,8 +1870,8 @@ session). Fold these into the Phase 5 work.
   self-assessment descriptors** (cited in provenance, never reproduced; Goethe "Kann-Beschreibungen"
   stay on the avoid list) — the exact Part-H-decision-4 recipe. New `CanDoStatement` type + `can_do`
   provenance content type (with the `/sources` page label + `TYPE_ORDER` entry); **25 provenance rows**
-  (`origin: authored`, `license: OWNED`, `review_status: "draft"` — **awaiting founder review**,
-  reference = CoE self-assessment grid). New `lint:content` rules (`lintCanDo`): unique ids, valid
+  (`origin: authored`, `license: OWNED`, reference = CoE self-assessment grid; **founder-reviewed and
+  approved 2026-07-02 → all now `review_status: "verified"`**). New `lint:content` rules (`lintCanDo`): unique ids, valid
   `themeId`/`cefr`, "Ich kann" prefix, `threshold` in `(0,1]`, and every theme covered; the bank is
   loaded + counted (25 milestones · 1111 provenance rows). Helper `canDoByTheme`. `pnpm typecheck` +
   `pnpm lint:content` + `pnpm build` green. Committed as `93eb4b7`; the **UI half is not started** (see
