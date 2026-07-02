@@ -1713,13 +1713,11 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
-> **Fable temporarily unavailable (2026-06-15):** Fable is restricted by the US government and cannot
-> be selected right now. **Until it returns, use Opus for any task that recommends Fable** (design,
-> strategy, legal nuance, research-heavy planning). The "Recommended model: Fable" notes throughout
-> this doc stand as the long-term preference; read them as "Opus for now" while the restriction holds.
-> Revert to Fable once it is available again.
+> **Fable available again (2026-07-02):** the earlier restriction (noted 2026-06-15) is lifted; Fable
+> is selectable and session 46's app review + UX overhaul plan ran on it. The "Opus for now"
+> workaround no longer applies; "Recommended: Fable" rows mean Fable again.
 
-We now have **Fable 5** as the frontier model alongside the Claude 4.X family. Claude Code does
+We now have **Fable 5** as the frontier model alongside the Claude 4/5 families. Claude Code does
 **not** auto-pick a model per task: whatever you set in `/model` runs the whole session, and the
 assistant can't reassign itself mid-task. So set the model at the **start of each session** based
 on the dominant work. (Subagents the assistant spawns can run on a cheaper model on their own, but
@@ -1733,7 +1731,7 @@ planning, then auto-switches to Sonnet for execution.
 | --- | --- | --- |
 | **Fable 5** (frontier) | Architecture/system design, legal nuance, pricing/monetization strategy, persuasive marketing copy, research-heavy planning | Highest |
 | **Opus 4.8** | Heavy cross-cutting implementation: multi-file features, careful refactors, security-sensitive integrations | High |
-| **Sonnet 4.6** | Standard build work: well-specified features, UI from an approved plan, structured content authoring, doc-following integrations | Medium |
+| **Sonnet 5** | Standard build work: well-specified features, UI from an approved plan, structured content authoring, doc-following integrations | Medium |
 | **Haiku 4.5** | Mechanical, well-bounded edits: placeholder fills, config flips, single-file copy tweaks | Low |
 
 Backlog items mapped to a recommended model (see "Backlog — founder ideas" and "Resume here"):
@@ -1751,7 +1749,7 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 | FAQ section (landing) | **Sonnet** | Straightforward copy + UI |
 | Expand landing copy | **Fable** | Persuasive, on-voice copy; Sonnet if budget-conscious |
 | Visual mnemonics for vocab (der/die/das) | **Sonnet** | Asset wiring against existing schema |
-| Dashboard redesign | **Opus** | Many components; Fable for design direction first |
+| Dashboard redesign | **Opus** | Superseded by UX overhaul Phase 1 (see the phase table below) |
 | Schreibtraining redesign | **Opus** | Cross-section rework |
 | Animated-character scenarios | **Fable → Opus** | Design with Fable, implement with Opus |
 | Legal review with a lawyer (#15) | **Fable** | Engage/brief a lawyer; German/EU legal judgment, not code |
@@ -1771,6 +1769,20 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 | Business plan + case study (#16) | **Fable** | Market sizing, competitive research, unit economics, traction narrative |
 | Pre-seed fundraising (#17) | **Fable** | Investor targeting, pitch deck, data room, instrument strategy |
 | Routine bugfixes (e.g. UI tweaks) | **Sonnet** | Step up to Opus only when a fix turns gnarly or spans many files |
+
+### UX overhaul plan phases mapped to models (added s46; see `docs/UX_OVERHAUL_PLAN.md`)
+
+The design/strategy work is already done (Fable, s46), so the phases below are **implementation**:
+do not burn Fable on them. Fable reappears only where new pedagogical content gets authored.
+
+| Phase | Scope | Recommended | Why |
+| --- | --- | --- | --- |
+| 0. Quick wins | Banner demotion, header slimming, German copy pass, cold-start state | **Sonnet 5** | Well-specified multi-file edits; founder reviews the German copy on the live site |
+| 1. Session engine + Heute | `engine/session.ts`, SessionPlayer, end screen, Heute redesign | **Opus 4.8** | The big cross-cutting build: new engine + player + dashboard rework, regression-sensitive |
+| 2. Global search + Tier-0 defaults | `searchAll()`, result sheet, band-default lists | **Sonnet 5** | Bounded: one pure function + one UI surface + list defaults |
+| 3. Bibliothek + travelling scope | `/library` hub, segments, redirects, scope as app state | **Opus 4.8** | Routing/redirect/app-state work across four pages; easy to regress deep links |
+| 4. Fortschritt + Can-Do | `canDo.ts` data + linter, milestone UI, diagnose card | **Fable → Sonnet 5** | Can-Do statements are pedagogical German content (Fable authors/reviews); UI build is standard |
+| 5. Anwenden + nav re-map + facet registry | Anwenden hub, `DEFAULT_PINNED_TABS`, `lib/facets.ts` | **Opus 4.8** | Touches the locked nav store + pinned-tab migration; careful, not big |
 
 ## Resume here (next session)
 
