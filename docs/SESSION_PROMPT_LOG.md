@@ -1544,3 +1544,24 @@ Branch: `claude/review-previous-session-69pxat`.
   all docs squash-merged to `main`, branch realigned. **No implementation**, per instruction; the
   founder runs the phases in later sessions with the models from the phase table.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; PR + merge SHA recorded in git history.
+
+## Entry 96 — 2026-07-02 (session 47)
+- **Branch:** `claude/ux-overhaul-step-0-7mtsff`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > can you start working on the step 0 of ux overhaul plan?
+- **Response summary:** Implemented `docs/UX_OVERHAUL_PLAN.md` Phase 0 (quick wins): gated the
+  sign-in banner to the Heute/dashboard route with a persisted `signInBannerDismissed` setting;
+  removed the redundant Level pill + XP ring from the mobile header (down to 4 widgets, both
+  values still shown on Fortschritt) and labelled the streak pill; added `blurbDe`/`purposeDe`
+  German fields to all 11 theme cards and 10 grammar topics (English kept as a secondary field);
+  renamed "Prüfungsthemen" → "Deine Themen" and "Quick Review" → "Schnelle Runde"; replaced the
+  four zero-value Fortschritt stat tiles with a goal card (sourced from existing onboarding
+  settings) for learners with no XP/sessions yet. Verified with `pnpm typecheck`, `pnpm
+  lint:content`, `pnpm build`, and a headless-Chromium mobile-viewport smoke pass (dashboard,
+  grammar, revision, analytics).
+- **Artifacts:** `scripts/lint-content.mjs`, `src/components/layout/AppShell.tsx`,
+  `src/data/grammar.ts`, `src/data/themes.ts`, `src/features/analytics/Analytics.tsx`,
+  `src/features/auth/SaveProgressBanner.tsx`, `src/features/dashboard/Dashboard.tsx`,
+  `src/features/grammar/GrammarHub.tsx`, `src/features/revision/QuickRevision.tsx`,
+  `src/store/useSettingsStore.ts`, `src/types/index.ts`, `docs/PROJECT_STATUS.md`; commit `b48abd7`.
