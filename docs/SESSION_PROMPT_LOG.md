@@ -1712,6 +1712,10 @@ Branch: `claude/review-previous-session-69pxat`.
   `pnpm typecheck`, `pnpm lint:content`, `pnpm build` (all green), and a headless-Chromium mobile smoke
   pass seeding `srs`/settings into `localStorage`: confirmed the Can-Do section renders checked/unchecked
   milestones correctly, the diagnose button navigates to `/session?theme=...`, and Heute now ends in the
-  hero + Situationen + status strip + "Alle Themen" link with no theme grid.
+  hero + Situationen + status strip + "Alle Themen" link with no theme grid. Opened PR #260 into
+  `main` bundling the session-47 content commits with this session's UI commit; waited for the
+  `lint-content` CI check to pass, then squash-merged (`74ccd7c`) and realigned the dev branch to
+  `origin/main` per the post-deploy housekeeping rule.
 - **Artifacts:** modified `src/features/analytics/Analytics.tsx`, `src/features/dashboard/Dashboard.tsx`,
-  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/UX_OVERHAUL_PLAN.md`, `docs/SESSION_PROMPT_LOG.md`.
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/UX_OVERHAUL_PLAN.md`, `docs/SESSION_PROMPT_LOG.md`;
+  PR #260, squash-merged as `74ccd7c`.
