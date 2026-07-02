@@ -369,6 +369,48 @@ export interface MatchingQuestion extends QuizQuestionBase {
 
 export type QuizQuestion = MCQQuestion | WordOrderQuestion | MatchingQuestion;
 
+/* ---------------- Composed session (UX overhaul Phase 1) ---------------- */
+
+/**
+ * One step in a composed learning session. Each block reuses an existing
+ * content type and its renderer: a flashcard (vocab retrieval or a Redemittel
+ * recall), a leveled quiz question, or a grammar micro-drill. The composer
+ * (`engine/session.ts`) interleaves the kinds so retrieval practice is mixed,
+ * not blocked. `key` is unique within a plan (React key + de-dup).
+ */
+export type SessionBlock =
+  | {
+      kind: "flashcard";
+      key: string;
+      /** Which bank the card came from (drives how the result is recorded). */
+      source: "vocab" | "redemittel";
+      /** SRS / practice id used to record the result. */
+      sourceId: string;
+      de: string;
+      en: string;
+      /** Optional example sentence shown on the reveal side. */
+      example?: string;
+    }
+  | { kind: "quiz"; key: string; question: QuizQuestion }
+  | {
+      kind: "grammar";
+      key: string;
+      drill: GrammarDrill;
+      /** Human-readable group label for the end-screen forward hook. */
+      groupLabel: string;
+    };
+
+/** An ordered, composed session plus a preview line for the Heute hero. */
+export interface SessionPlan {
+  blocks: SessionBlock[];
+  /** Approximate length in minutes the plan was sized for. */
+  minutes: number;
+  /** One-line composition preview, e.g. "12 fällige Wörter · Schwachstelle: B2.1". */
+  preview: string;
+  /** Forward-hook seed shown on the end screen ("Morgen: … festigen"). */
+  focus: string;
+}
+
 /* ---------------- Practice-area registry (weakness → deep-link) ---------------- */
 
 /** Weakness buckets the writing coach (Phase 2) maps onto practice deep-links. */

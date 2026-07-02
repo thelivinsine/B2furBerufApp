@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Flame, BookOpen, ArrowRight, CalendarDays } from "lucide-react";
+import { Flame, BookOpen, ArrowRight, CalendarDays, Sparkles, Zap } from "lucide-react";
 import { themes } from "@/data/themes";
 import { vocabByTheme } from "@/data/vocabulary";
 import { scenariosByTheme } from "@/data/dialogues";
@@ -8,14 +8,21 @@ import { iconByName } from "@/lib/icons";
 import { useProgressStore, useTodayXp, useEffectiveStreak } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { mastery, dueCount } from "@/engine/srs";
+import { sessionPreview } from "@/engine/session";
 import { daysBetween, pct, todayKey, cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { SectionHeading } from "@/components/shared/misc";
-import { recommendedNext } from "./recommend";
-import { cardMeta, intentCardsForMode } from "./intentCards";
+import { intentCardsForMode, type IntentCard } from "./intentCards";
+
+/** Where a Situationen chip launches: a scoped session for theme cards, else
+ *  the card's own target (writing / redemittel). */
+function chipTarget(card: IntentCard): string {
+  if (card.vocab?.theme) return `/session?theme=${card.vocab.theme}`;
+  return card.to;
+}
 
 export function Dashboard() {
   const name = useSettingsStore((s) => s.name);
@@ -33,11 +40,13 @@ export function Dashboard() {
   const hour = new Date().getHours();
   const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
 
-  const rec = recommendedNext({ due, todayXp, goal, daysToExam });
+  // Composed-session preview for the primary CTA hero (deterministic, so the
+  // line is stable across renders and matches what /session builds).
+  const sessionMinutes = Math.max(5, Math.round(goal / 8));
+  const preview = sessionPreview({ srs, minutes: sessionMinutes });
 
-  // Mode-aware starting points (Taxonomy Phase 3) — the primary surface, shown
-  // first so the learner lands on "what to practise", not on their stats.
-  const intents = intentCardsForMode(learningMode);
+  // Mode-aware situation shortcuts: 3 compact chips launching scoped sessions.
+  const situations = intentCardsForMode(learningMode).slice(0, 3);
 
   // Theme stats; feature the least-mastered theme (most room to grow) to give
   // the browse grid a clear focal point and some size variety.
@@ -55,37 +64,63 @@ export function Dashboard() {
 
   return (
     <div className="space-y-5 sm:space-y-8">
-      {/* Intent / goal cards — the first thing the learner sees. Filtered by the
-          active Mode lens (Taxonomy Phase 3). */}
+      {/* Primary CTA — the one composed session for today (UX overhaul Phase 1).
+          One tap into an interleaved run; browsing stays below. */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {greeting}, {name || "Lernende:r"} 👋
+        </p>
+        <Link to="/session" className="mt-2 block">
+          <div className="card-hover relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 p-5 text-white shadow-soft sm:p-6">
+            <div className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
+            <div className="relative">
+              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/80">
+                <Sparkles className="h-3.5 w-3.5" /> Deine Session · ~{sessionMinutes} Min
+              </div>
+              <p className="mt-1.5 text-xl font-semibold leading-snug">
+                {preview.hasHistory ? "Weiter, wo du warst" : "Leg direkt los"}
+              </p>
+              <p className="mt-1 text-sm text-white/85">{preview.preview}</p>
+              <div className="mt-4 flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-indigo-600 shadow-soft">
+                  <Zap className="h-4 w-4" /> Session starten
+                </span>
+                {due > 0 && (
+                  <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium">
+                    {due} fällig
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </Link>
+      </motion.div>
+
+      {/* Situationen — compact shortcuts that launch a scoped session. */}
       <section>
         <SectionHeading
-          eyebrow={`${greeting}, ${name || "Lernende:r"} 👋`}
-          title="Was möchtest du üben?"
-          description="Starte mit einer echten Situation. Wir stellen die passenden Wörter und Übungen zusammen."
+          eyebrow="Situationen"
+          title="Aus einer echten Situation üben"
+          description="Wähle einen Kontext. Wir stellen dir dazu eine kurze, gemischte Runde zusammen."
         />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {intents.map((card, i) => (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {situations.map((card, i) => (
             <motion.div
               key={card.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 }}
             >
-              <Link to={card.to}>
-                <div
-                  className={cn(
-                    "card-hover relative h-full overflow-hidden rounded-2xl bg-gradient-to-br p-4 text-white shadow-soft",
-                    card.accent,
-                  )}
-                >
-                  <div className="pointer-events-none absolute -right-8 -top-10 h-28 w-28 rounded-full bg-white/15 blur-2xl" />
-                  <div className="relative flex h-full flex-col">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-white/80">
+              <Link to={chipTarget(card)}>
+                <div className="card-hover flex h-full items-center gap-3 rounded-xl border border-border bg-surface p-3.5">
+                  <div className={cn("h-9 w-1.5 shrink-0 rounded-full bg-gradient-to-b", card.accent)} />
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
                       {card.eyebrowDe}
                     </p>
-                    <p className="mt-1 text-base font-semibold leading-snug">{card.titleDe}</p>
-                    <p className="mt-auto pt-3 text-xs text-white/85">{cardMeta(card)}</p>
+                    <p className="truncate text-sm font-semibold">{card.titleDe}</p>
                   </div>
+                  <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
                 </div>
               </Link>
             </motion.div>
@@ -123,10 +158,9 @@ export function Dashboard() {
           )}
 
           <div className="ml-auto flex items-center gap-2">
-            {rec.badge && <Badge variant="warning">{rec.badge}</Badge>}
-            <Button asChild size="sm" variant="gradient">
-              <Link to={rec.to}>
-                <rec.icon className="h-4 w-4" /> {rec.label}
+            <Button asChild size="sm" variant="outline">
+              <Link to="/revision">
+                <Zap className="h-4 w-4" /> Schnelle Runde
               </Link>
             </Button>
             <Button asChild size="sm" variant="ghost">

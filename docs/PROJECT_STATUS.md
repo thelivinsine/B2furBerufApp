@@ -1834,13 +1834,33 @@ Phase 0 PR merge; see below).
 Active automation branch: `claude/ux-overhaul-step-0-7mtsff` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Next work = `docs/UX_OVERHAUL_PLAN.md` Phase 1 (session engine + Heute), on Opus 4.8.** Phase 0
-(quick wins) shipped in session 47. Do not skip the phase order 1 → 2 → 3; phases 4 and 5 can swap.
-The tab-bar default-pin change (Phase 5) is founder-approved but strictly limited to
-`DEFAULT_PINNED_TABS` + route registry; the s26–28 bar mechanics stay locked.
+**Next work = `docs/UX_OVERHAUL_PLAN.md` Phase 2 (global search + Tier-0 defaults), on Sonnet 5.**
+Phase 0 (quick wins) and Phase 1 (session engine + Heute) shipped in session 47. Do not skip the
+phase order 2 → 3; phases 4 and 5 can swap. The tab-bar default-pin change (Phase 5) is
+founder-approved but strictly limited to `DEFAULT_PINNED_TABS` + route registry; the s26–28 bar
+mechanics stay locked.
 
 **Most recent work (session 47):**
-- **s47 — UX overhaul Phase 0 (quick wins) shipped:** sign-in banner now shows only on Heute
+- **s47 — UX overhaul Phase 1 (session engine + Heute) shipped:** the core "one tap, one composed
+  session" loop. New pure composer `src/engine/session.ts` (`buildSession` + deterministic
+  `sessionPreview` + `weakestBand`/`weakestTheme`/`difficultyForLevel`) turns SRS state + Mode lens +
+  a target length into an ordered, **interleaved** `SessionPlan` (new `SessionBlock`/`SessionPlan`
+  types): due vocab flashcards (weighted via `reviewWeight`/`isDue`), leveled quiz questions from the
+  weakest or scoped theme (via `buildThemeQuiz`), a grammar micro-drill, and a Redemittel recall,
+  mixed not blocked. New `src/features/session/SessionPlayer.tsx` renders every block kind behind one
+  progress bar + XP tally and an **end screen** (XP earned, "Stärker geworden" list, "Morgen: …
+  festigen" forward hook); `Session.tsx` route wrapper reads `?theme=`/`?min=`. New `/session` route.
+  **Heute** (`Dashboard.tsx`) now leads with a primary session CTA hero (composition preview from
+  `sessionPreview`) + compact Situationen chips that launch scoped sessions (`/session?theme=`),
+  replacing the browse-card wall; status strip keeps a "Schnelle Runde" secondary + Fortschritt link.
+  **Schnellwiederholung** (`/revision`) is now the short (~5 min) preset of the same engine
+  (`QuickRevision.tsx` is a thin wrapper). Reuse, not rewrite: the three quiz-question views were
+  extracted to shared `src/features/quiz/QuestionViews.tsx` (used by both `QuizRunner` and
+  `SessionPlayer`), and `GrammarDrillCard` gained optional `onResult`/`suppressXp` props (backwards
+  compatible). `pnpm typecheck` + `pnpm lint:content` + `pnpm build` green; verified in a headless
+  mobile smoke pass (Heute hero, a full 16-step session driven to the XP/stärker end screen, and the
+  8-step `/revision` preset), no console errors.
+- **s47 — UX overhaul Phase 0 (quick wins) shipped (earlier in the session):** sign-in banner now shows only on Heute
   (dashboard) and its dismissal persists (`signInBannerDismissed` in `useSettingsStore`, was
   session-only local state before); header slimmed from 5 to 4 mobile widgets (removed the
   redundant Level pill + XP ring, both already visible on Fortschritt; added an `aria-label` to
