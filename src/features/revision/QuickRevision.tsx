@@ -150,7 +150,7 @@ export function QuickRevision() {
     <div className="space-y-4 sm:space-y-6">
       <SectionHeading
         eyebrow="Schnellwiederholung"
-        title="Quick Review"
+        title="Schnelle Runde"
         description="Fällige Vokabeln und Redemittel in einer kompakten Sitzung – ideal für 5-Minuten-Pausen."
       />
 

@@ -115,7 +115,7 @@ function lintThemes(themes) {
   for (const t of themes) {
     const w = t.id ?? "?";
     if (!THEME_IDS.includes(t.id)) error(ds, w, `unknown theme id "${t.id}"`);
-    for (const f of ["title", "titleDe", "blurb", "icon", "accent"]) {
+    for (const f of ["title", "titleDe", "blurb", "blurbDe", "icon", "accent"]) {
       if (!isStr(t[f])) error(ds, w, `${f} empty`);
     }
     if (!Array.isArray(t.situations) || t.situations.length === 0)
@@ -231,7 +231,7 @@ function lintGrammar(grammar) {
   const allDrills = [];
   for (const t of grammar) {
     const w = t.id ?? "?";
-    for (const f of ["title", "titleDe", "purpose", "explanation", "pattern"])
+    for (const f of ["title", "titleDe", "purpose", "purposeDe", "explanation", "pattern"])
       if (!isStr(t[f])) error(ds, w, `${f} empty`);
     if (!GRAMMAR_GROUPS.includes(t.group)) error(ds, w, `invalid group "${t.group}"`);
     if (!Array.isArray(t.examples) || t.examples.length === 0) error(ds, w, "no examples");

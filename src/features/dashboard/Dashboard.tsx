@@ -142,8 +142,8 @@ export function Dashboard() {
       <section>
         <SectionHeading
           eyebrow="Themen"
-          title="Prüfungsthemen"
-          description="Realistische Situationen aus dem Berufsalltag mit Wortschatz, Redemitteln und Simulationen."
+          title="Deine Themen"
+          description="Realistische Situationen aus Beruf und Alltag mit Wortschatz, Redemitteln und Simulationen."
           action={
             <Button asChild variant="ghost" size="sm">
               <Link to="/vocabulary">
@@ -176,7 +176,7 @@ export function Dashboard() {
                           <Badge variant="accent">Empfohlen</Badge>
                         </div>
                         <p className="mt-3 text-lg font-semibold">{theme.titleDe}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">{theme.blurb}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{theme.blurbDe}</p>
                         <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
                           <span className="rounded-full bg-muted px-2.5 py-1">{words.length} Wörter</span>
                           {sims.length > 0 && (
@@ -201,7 +201,7 @@ export function Dashboard() {
                         </div>
                         <div>
                           <p className="font-semibold">{theme.titleDe}</p>
-                          <p className="line-clamp-2 text-sm text-muted-foreground">{theme.blurb}</p>
+                          <p className="line-clamp-2 text-sm text-muted-foreground">{theme.blurbDe}</p>
                         </div>
                         <div className="space-y-1.5">
                           <div className="flex justify-between text-xs text-muted-foreground">

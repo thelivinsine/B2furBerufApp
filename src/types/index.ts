@@ -92,6 +92,7 @@ export interface ExamTheme {
   title: string;
   titleDe: string;
   blurb: string;
+  blurbDe: string;
   icon: string; // lucide icon name
   accent: string; // tailwind gradient classes
   /** Representative real-world situations a candidate might face. */
@@ -276,6 +277,7 @@ export interface GrammarTopic {
   title: string;
   titleDe: string;
   purpose: string;
+  purposeDe: string;
   explanation: string;
   pattern: string;
   examples: GrammarExample[];

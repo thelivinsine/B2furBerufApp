@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-02 (session 46). Branch: `claude/filter-harmonization-plan-0vzdgz`. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-02 (session 47). Branch: `claude/ux-overhaul-step-0-7mtsff`. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. For the full design, see
 `docs/EXPANSION_PLAN.md`. For the original build plan, see `docs/IMPLEMENTATION_PLAN.md`.
@@ -1829,15 +1829,32 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 46 (2026-07-02).** Everything noted ✅ is merged to `main`.
-Active automation branch: `claude/filter-harmonization-plan-0vzdgz` (realign to `origin/main` after each
+**Handoff after session 47 (2026-07-02).** Everything noted ✅ is merged to `main` (pending the
+Phase 0 PR merge; see below).
+Active automation branch: `claude/ux-overhaul-step-0-7mtsff` (realign to `origin/main` after each
 squash-merge, see CLAUDE.md). The branch name is reassigned per session; `main` is the source of truth.
 
-**Next work = `docs/UX_OVERHAUL_PLAN.md`, fully approved by the founder.** The founder will run the
-phases in separate sessions using the per-phase model table under "Model guidance": **Phase 0 (quick
-wins) on Sonnet 5 first**, then Phase 1 (session engine + Heute) on Opus 4.8. Do not skip the phase
-order 1 → 2 → 3; phases 4 and 5 can swap. The tab-bar default-pin change (Phase 5) is founder-approved
-but strictly limited to `DEFAULT_PINNED_TABS` + route registry; the s26–28 bar mechanics stay locked.
+**Next work = `docs/UX_OVERHAUL_PLAN.md` Phase 1 (session engine + Heute), on Opus 4.8.** Phase 0
+(quick wins) shipped in session 47. Do not skip the phase order 1 → 2 → 3; phases 4 and 5 can swap.
+The tab-bar default-pin change (Phase 5) is founder-approved but strictly limited to
+`DEFAULT_PINNED_TABS` + route registry; the s26–28 bar mechanics stay locked.
+
+**Most recent work (session 47):**
+- **s47 — UX overhaul Phase 0 (quick wins) shipped:** sign-in banner now shows only on Heute
+  (dashboard) and its dismissal persists (`signInBannerDismissed` in `useSettingsStore`, was
+  session-only local state before); header slimmed from 5 to 4 mobile widgets (removed the
+  redundant Level pill + XP ring, both already visible on Fortschritt; added an `aria-label` to
+  the streak pill); added German `blurbDe` to all 11 theme cards and `purposeDe` to all 10 grammar
+  topics (English `blurb`/`purpose` kept as a secondary field per the plan, for a future EN-UI
+  mode), wired into `Dashboard.tsx`/`GrammarHub.tsx`; renamed the dashboard heading
+  "Prüfungsthemen" → "Deine Themen" (matches the broader post-s21 scope, not exam-only) and
+  "Quick Review" → "Schnelle Runde" in `QuickRevision.tsx`; Fortschritt (`Analytics.tsx`) now shows
+  a "Dein Ziel" goal card (level + goal + minutes/day, sourced from existing onboarding settings,
+  reusing `recommendedNext()` for the CTA) instead of four zero-value stat tiles when the learner
+  has no XP/sessions yet. `types/index.ts` + `scripts/lint-content.mjs` updated for the two new
+  required content fields (`blurbDe`, `purposeDe`). `pnpm typecheck` + `pnpm lint:content` +
+  `pnpm build` green; verified live in a headless-Chromium mobile-viewport smoke pass (dashboard,
+  grammar, revision, analytics screens).
 
 **Most recent work (sessions 45–46):**
 - **s46 — UX overhaul plan (docs-only, approved):** full app review, filter-plan critique, four-tier

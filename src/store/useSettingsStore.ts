@@ -32,6 +32,9 @@ interface SettingsState {
   /** Custom order of the routes shown in the "Mehr" sheet. Empty = navItems order. */
   moreOrder: string[];
 
+  /** Whether the learner dismissed the "save your progress" sign-in nudge. Persists across sessions. */
+  signInBannerDismissed: boolean;
+
   setSettings: (patch: Partial<SettingsState>) => void;
   completeOnboarding: (patch: Partial<SettingsState>) => void;
   resetSettings: () => void;
@@ -57,6 +60,7 @@ const defaults = {
   reducedMotion: false,
   pinnedTabs: DEFAULT_PINNED_TABS,
   moreOrder: [] as string[],
+  signInBannerDismissed: false,
 };
 
 export const useSettingsStore = create<SettingsState>()(

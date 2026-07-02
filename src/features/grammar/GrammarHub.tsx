@@ -109,7 +109,7 @@ export function GrammarHub() {
                       <Badge variant="muted">{topic.drills.length} Übg.</Badge>
                     </div>
                     <p className="font-semibold leading-snug">{topic.titleDe}</p>
-                    <p className="text-sm text-muted-foreground">{topic.purpose}</p>
+                    <p className="text-sm text-muted-foreground">{topic.purposeDe}</p>
                     <p className="mt-auto line-clamp-2 rounded-md bg-muted/50 px-2 py-1 font-mono text-xs text-muted-foreground">
                       {topic.pattern}
                     </p>
@@ -136,7 +136,7 @@ function GrammarTopicView({ topic, onBack }: { topic: GrammarTopic; onBack: () =
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider text-primary">{topic.title}</p>
         <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{topic.titleDe}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{topic.purpose}</p>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{topic.purposeDe}</p>
       </div>
 
       <Card>
