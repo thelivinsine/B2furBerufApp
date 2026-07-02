@@ -1,9 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Combine, ListChecks } from "lucide-react";
 import { collocations } from "@/data/collocations";
 import { themes, themeById } from "@/data/themes";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ import {
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
-import { CEFR_ORDER } from "@/lib/cefr";
+import { CEFR_ORDER, defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 
 function normalise(s: string) {
   return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
@@ -93,6 +94,8 @@ function CollocationCard({ c }: { c: Collocation }) {
 export function CollocationsBrowser() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
+  const level = useSettingsStore((s) => s.level);
+  const [showAllLevels, setShowAllLevels] = useState(false);
 
   const themeParam = params.get("theme") ?? "all";
   const search = params.get("q") ?? "";
@@ -151,9 +154,25 @@ export function CollocationsBrowser() {
     return list;
   }, [themeParam, search]);
 
+  // Tier-0 personalized default (UX overhaul Phase 2): default to the
+  // learner's CEFR band + one step up, with a quiet escape. Never activates
+  // if it would leave nothing to show (thin coverage at some levels/scopes).
+  const cefrActive = (selection.cefr?.length ?? 0) > 0;
+  const visibleBands = useMemo(() => defaultVisibleBands(level), [level]);
+  const bandNonEmpty = useMemo(
+    () => scoped.some((c) => !c.cefr || visibleBands.includes(c.cefr)),
+    [scoped, visibleBands],
+  );
+  const bandActive = !showAllLevels && !cefrActive && !search.trim() && bandNonEmpty;
+  const bandLimited = useMemo(
+    () => (bandActive ? scoped.filter((c) => !c.cefr || visibleBands.includes(c.cefr)) : scoped),
+    [scoped, bandActive, visibleBands],
+  );
+  const hiddenLabel = bandActive && bandLimited.length < scoped.length ? hiddenBandsLabel(level) : null;
+
   const filtered = useMemo(
-    () => applyFacets(scoped, COLLOCATION_FACETS, selection),
-    [scoped, selection],
+    () => applyFacets(bandLimited, COLLOCATION_FACETS, selection),
+    [bandLimited, selection],
   );
 
   const activeChips = COLLOCATION_FACETS.flatMap((f) =>
@@ -207,9 +226,19 @@ export function CollocationsBrowser() {
         }
       />
 
-      <p className="text-sm text-muted-foreground">
-        {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
-      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <p className="text-sm text-muted-foreground">
+          {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
+        </p>
+        {hiddenLabel && (
+          <button
+            onClick={() => setShowAllLevels(true)}
+            className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground hover:underline"
+          >
+            Auch {hiddenLabel} zeigen ({scoped.length - bandLimited.length})
+          </button>
+        )}
+      </div>
 
       {filtered.length === 0 ? (
         <div className="py-16 text-center text-muted-foreground">
@@ -217,7 +246,7 @@ export function CollocationsBrowser() {
         </div>
       ) : (
         <motion.div
-          key={`${themeParam}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${params.get("verb") ?? ""}__${search}`}
+          key={`${themeParam}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${params.get("verb") ?? ""}__${search}__${showAllLevels}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.15 }}

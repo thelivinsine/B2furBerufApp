@@ -1,9 +1,17 @@
 import { NavLink, Link } from "react-router-dom";
+import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navItems } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 
-export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
+export function Sidebar({
+  onNavigate,
+  onSearch,
+}: {
+  onNavigate?: () => void;
+  /** Opens the global search dialog (UX overhaul Phase 2, Tier 1). */
+  onSearch?: () => void;
+}) {
   return (
     <div className="flex h-full flex-col gap-1 p-4">
       <Link
@@ -18,6 +26,19 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
           <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
         </div>
       </Link>
+
+      {onSearch && (
+        <button
+          onClick={onSearch}
+          className="mb-2 flex items-center gap-2.5 rounded-lg border border-border bg-surface px-3 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+        >
+          <Search className="h-4 w-4" />
+          Suche
+          <span className="ml-auto rounded border border-border px-1.5 py-0.5 text-[10px] font-medium">
+            ⌘K
+          </span>
+        </button>
+      )}
 
       <nav className="flex flex-col gap-0.5">
         {navItems.map(({ to, label, end }) => (

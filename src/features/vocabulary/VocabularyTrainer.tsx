@@ -14,7 +14,7 @@ import {
   type FacetDef,
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
-import { CEFR_ORDER } from "@/lib/cefr";
+import { CEFR_ORDER, defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
 import { VocabList } from "./VocabList";
@@ -105,10 +105,12 @@ const ALL_FACETS = [CEFR_FACET, POS_FACET, SECTOR_FACET, SITUATION_FACET];
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
   const learningMode = useSettingsStore((s) => s.mode);
+  const level = useSettingsStore((s) => s.level);
   const theme = params.get("theme") ?? "all";
   const sub = params.get("sub") ?? "";
   const [mode, setMode] = useState("flashcards");
   const [search, setSearch] = useState("");
+  const [showAllLevels, setShowAllLevels] = useState(false);
 
   const facets = useMemo(
     () => (learningMode === "work" ? [CEFR_FACET, POS_FACET, ...WORK_FACETS] : [CEFR_FACET, POS_FACET]),
@@ -147,7 +149,26 @@ export function VocabularyTrainer() {
     );
   }, [scoped, search]);
 
-  const items = useMemo(() => applyFacets(searched, facets, selection), [searched, facets, selection]);
+  // Tier-0 personalized default (UX overhaul Phase 2): default to the
+  // learner's CEFR band + one step up, with a quiet escape, instead of an
+  // unfiltered 528-item pile. Skipped once the learner searches, picks an
+  // explicit CEFR facet themselves, or the band would leave nothing to show
+  // (some levels have thin coverage in a given scope) — the default may
+  // never produce an empty list.
+  const cefrActive = (selection.cefr?.length ?? 0) > 0;
+  const visibleBands = useMemo(() => defaultVisibleBands(level), [level]);
+  const bandNonEmpty = useMemo(
+    () => searched.some((v) => !v.cefr || visibleBands.includes(v.cefr)),
+    [searched, visibleBands],
+  );
+  const bandActive = !showAllLevels && !cefrActive && !search.trim() && bandNonEmpty;
+  const bandLimited = useMemo(
+    () => (bandActive ? searched.filter((v) => !v.cefr || visibleBands.includes(v.cefr)) : searched),
+    [searched, bandActive, visibleBands],
+  );
+  const hiddenLabel = bandActive && bandLimited.length < searched.length ? hiddenBandsLabel(level) : null;
+
+  const items = useMemo(() => applyFacets(bandLimited, facets, selection), [bandLimited, facets, selection]);
   const facetKey = ALL_FACETS.map((f) => params.get(f.id) ?? "").join("|");
 
   const activeChips = facets.flatMap((f) =>
@@ -219,6 +240,15 @@ export function VocabularyTrainer() {
         onRemoveChip={removeFacetValue}
       />
 
+      {hiddenLabel && (
+        <button
+          onClick={() => setShowAllLevels(true)}
+          className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground hover:underline"
+        >
+          Auch {hiddenLabel} zeigen ({searched.length - bandLimited.length})
+        </button>
+      )}
+
       {showPicker && activeTheme ? (
         <SubThemePicker
           theme={activeTheme}
@@ -256,11 +286,11 @@ export function VocabularyTrainer() {
 
             <TabsContent value="flashcards">
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}-${search}`} />
+                <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
               </motion.div>
             </TabsContent>
             <TabsContent value="quiz">
-              <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}-${search}`} />
+              <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
             </TabsContent>
             <TabsContent value="list">
               <VocabList items={items} />

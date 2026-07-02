@@ -5,6 +5,7 @@ import { Dumbbell, Library, MessageSquareText } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
 import { iconByName } from "@/lib/icons";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -16,6 +17,7 @@ import {
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
+import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { RedemittelPractice } from "./RedemittelPractice";
 
 function normalise(s: string) {
@@ -44,6 +46,8 @@ export function RedemittelTrainer() {
   const [tab, setTab] = useState("browse");
   const [params, setParams] = useSearchParams();
   const [search, setSearch] = useState("");
+  const level = useSettingsStore((s) => s.level);
+  const [showAllLevels, setShowAllLevels] = useState(false);
 
   const category = params.get("cat") ?? "all";
 
@@ -88,13 +92,30 @@ export function RedemittelTrainer() {
     return redemittelByCategory(category as RedemittelPhrase["category"]);
   }, [category]);
 
+  // Tier-0 personalized default (UX overhaul Phase 2): default to the
+  // learner's CEFR band + one step up, with a quiet escape. No CEFR facet
+  // exists here (Register is the only one), so the escape link is the only
+  // override. Never activates if it would leave nothing to show.
+  const visibleBands = useMemo(() => defaultVisibleBands(level), [level]);
+  const bandNonEmpty = useMemo(
+    () => categoryScoped.some((p) => !p.cefr || visibleBands.includes(p.cefr)),
+    [categoryScoped, visibleBands],
+  );
+  const bandActive = !showAllLevels && !search.trim() && bandNonEmpty;
+  const inBand = (p: RedemittelPhrase) => !bandActive || !p.cefr || visibleBands.includes(p.cefr);
+  const bandLimited = useMemo(
+    () => (bandActive ? categoryScoped.filter(inBand) : categoryScoped),
+    [categoryScoped, bandActive, visibleBands],
+  );
+  const hiddenLabel = bandActive && bandLimited.length < categoryScoped.length ? hiddenBandsLabel(level) : null;
+
   const searched = useMemo(() => {
-    if (!search.trim()) return categoryScoped;
+    if (!search.trim()) return bandLimited;
     const q = normalise(search.trim());
-    return categoryScoped.filter(
+    return bandLimited.filter(
       (p) => normalise(p.de).includes(q) || normalise(p.en).includes(q),
     );
-  }, [categoryScoped, search]);
+  }, [bandLimited, search]);
 
   const filtered = useMemo(
     () => applyFacets(searched, REDEMITTEL_FACETS, selection),
@@ -146,10 +167,19 @@ export function RedemittelTrainer() {
             onRemoveChip={removeFacetValue}
           />
 
+          {hiddenLabel && (
+            <button
+              onClick={() => setShowAllLevels(true)}
+              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground hover:underline"
+            >
+              Auch {hiddenLabel} zeigen ({categoryScoped.length - bandLimited.length})
+            </button>
+          )}
+
           {categoriesToRender.map((cat) => {
             const Icon = iconByName(cat.icon);
             const catPhrases = category === "all"
-              ? redemittelByCategory(cat.id)
+              ? redemittelByCategory(cat.id).filter(inBand)
               : searched;
             const phrases = category === "all"
               ? applyFacets(
