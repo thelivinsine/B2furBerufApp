@@ -12,21 +12,41 @@ import { cn, normalize, shuffle } from "@/lib/utils";
  * A single inline grammar drill: multiple-choice when `options` exist,
  * otherwise a free-text input checked with forgiving normalization.
  * Awards XP once on the first correct answer.
+ *
+ * When reused inside the composed SessionPlayer (UX overhaul Phase 1), the
+ * parent passes `suppressXp` (so XP is tallied centrally, not double-counted)
+ * and `onResult` (fired once when the drill is first answered) to drive the
+ * session's progress + end-screen. Both are optional; the standalone Grammar
+ * hub keeps its original self-scoring behaviour.
  */
-export function GrammarDrillCard({ drill }: { drill: GrammarDrill }) {
+export function GrammarDrillCard({
+  drill,
+  onResult,
+  suppressXp = false,
+}: {
+  drill: GrammarDrill;
+  onResult?: (correct: boolean) => void;
+  suppressXp?: boolean;
+}) {
   const addXp = useProgressStore((s) => s.addXp);
   const [picked, setPicked] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [checked, setChecked] = useState(false);
   const [awarded, setAwarded] = useState(false);
+  const [reported, setReported] = useState(false);
 
   const options = useMemo(() => (drill.options ? shuffle(drill.options) : null), [drill.options]);
   const solved = drill.prompt.replace("___", drill.answer);
 
   const award = (correct: boolean) => {
-    if (correct && !awarded) {
+    if (correct && !awarded && !suppressXp) {
       addXp(XP.grammarDrill);
       setAwarded(true);
+    }
+    // Report the first-answer result exactly once (session player advances on it).
+    if (!reported) {
+      setReported(true);
+      onResult?.(correct);
     }
   };
 

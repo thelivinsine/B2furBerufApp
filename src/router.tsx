@@ -60,6 +60,9 @@ const ExamHub = lazyWithReload(() =>
 const QuickRevision = lazyWithReload(() =>
   import("@/features/revision/QuickRevision").then((m) => ({ default: m.QuickRevision })),
 );
+const Session = lazyWithReload(() =>
+  import("@/features/session/Session").then((m) => ({ default: m.Session })),
+);
 const Analytics = lazyWithReload(() =>
   import("@/features/analytics/Analytics").then((m) => ({ default: m.Analytics })),
 );
@@ -193,6 +196,14 @@ export const router = createBrowserRouter([
         element: (
           <RequireOnboarding>
             <ExamHub />
+          </RequireOnboarding>
+        ),
+      },
+      {
+        path: "/session",
+        element: (
+          <RequireOnboarding>
+            <Session />
           </RequireOnboarding>
         ),
       },
