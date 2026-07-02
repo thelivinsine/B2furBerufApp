@@ -1,14 +1,17 @@
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText } from "lucide-react";
+import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText, Zap } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useLibraryScope } from "@/store/useLibraryScope";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
+import { LibrarySwitcher, ScopeChip } from "@/features/library/LibrarySwitcher";
 import {
   applyFacets,
   type FacetDef,
@@ -104,13 +107,36 @@ const ALL_FACETS = [CEFR_FACET, POS_FACET, SECTOR_FACET, SITUATION_FACET];
 
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const learningMode = useSettingsStore((s) => s.mode);
   const level = useSettingsStore((s) => s.level);
+  const scope = useLibraryScope();
   const theme = params.get("theme") ?? "all";
   const sub = params.get("sub") ?? "";
   const [mode, setMode] = useState("flashcards");
   const [search, setSearch] = useState("");
   const [showAllLevels, setShowAllLevels] = useState(false);
+
+  // Tier-2 travelling scope: when arriving without an explicit theme (e.g. via
+  // the bottom bar), inherit the shared library scope so the learner's context
+  // follows them. URL params always win, so shareable deep links are unaffected.
+  useEffect(() => {
+    if (!params.get("theme") && scope.theme !== "all") {
+      const p = new URLSearchParams(params);
+      p.set("theme", scope.theme);
+      if (scope.sub) p.set("sub", scope.sub);
+      setParams(p, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the shared scope in sync with the page's effective theme (whether set
+  // via the dropdown or arrived at through a deep link) so it travels to the
+  // other segments.
+  useEffect(() => {
+    scope.setScope(theme, sub);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theme, sub]);
 
   const facets = useMemo(
     () => (learningMode === "work" ? [CEFR_FACET, POS_FACET, ...WORK_FACETS] : [CEFR_FACET, POS_FACET]),
@@ -185,6 +211,7 @@ export function VocabularyTrainer() {
     else p.set("theme", t);
     p.delete("sub");
     setParams(p, { replace: true });
+    // scope stays in sync via the effect above (covers both dropdown + deep links)
   };
 
   const setSelection = (next: FacetSelection) => {
@@ -226,6 +253,8 @@ export function VocabularyTrainer() {
         description="Lerne mit Karteikarten, aktivem Abrufen und intelligenter Wiederholung (Spaced Repetition)."
       />
 
+      <LibrarySwitcher />
+
       <BrowseToolbar
         search={search}
         onSearch={setSearch}
@@ -238,7 +267,21 @@ export function VocabularyTrainer() {
         resultLabel={(n) => `${n} Wort${n !== 1 ? "e" : ""} anzeigen`}
         activeChips={activeChips}
         onRemoveChip={removeFacetValue}
+        trailing={
+          <Button
+            size="sm"
+            variant="gradient"
+            className="h-10 shrink-0"
+            onClick={() => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`)}
+          >
+            <Zap className="h-3.5 w-3.5" /> Üben
+          </Button>
+        }
       />
+
+      {theme !== "all" && (
+        <ScopeChip label={activeTheme?.titleDe ?? theme} onClear={() => setTheme("all")} />
+      )}
 
       {hiddenLabel && (
         <button

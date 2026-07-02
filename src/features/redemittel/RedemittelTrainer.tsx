@@ -15,6 +15,7 @@ import {
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
+import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
@@ -145,6 +146,8 @@ export function RedemittelTrainer() {
         title="Redemittel-Training"
         description="Die wichtigsten Wendungen für Vorschläge, Zustimmung, Verhandlung und Kompromiss. Verstehen und aktiv anwenden."
       />
+
+      <LibrarySwitcher />
 
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>

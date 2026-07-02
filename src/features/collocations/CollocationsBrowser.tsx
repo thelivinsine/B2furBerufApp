@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Combine, ListChecks } from "lucide-react";
+import { Combine, Zap } from "lucide-react";
 import { collocations } from "@/data/collocations";
 import { themes, themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useLibraryScope } from "@/store/useLibraryScope";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import {
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
+import { LibrarySwitcher, ScopeChip } from "@/features/library/LibrarySwitcher";
 import { CEFR_ORDER, defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 
 function normalise(s: string) {
@@ -95,10 +97,28 @@ export function CollocationsBrowser() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const level = useSettingsStore((s) => s.level);
+  const scope = useLibraryScope();
   const [showAllLevels, setShowAllLevels] = useState(false);
 
   const themeParam = params.get("theme") ?? "all";
   const search = params.get("q") ?? "";
+
+  // Tier-2 travelling scope: inherit the shared library scope when arriving
+  // without an explicit theme; URL params still override for deep links.
+  useEffect(() => {
+    if (!params.get("theme") && scope.theme !== "all") {
+      const p = new URLSearchParams(params);
+      p.set("theme", scope.theme);
+      setParams(p, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Keep the shared scope in sync with the effective theme so it travels.
+  useEffect(() => {
+    scope.setScope(themeParam, "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeParam]);
 
   const selection: FacetSelection = useMemo(() => {
     const s: FacetSelection = {};
@@ -134,6 +154,7 @@ export function CollocationsBrowser() {
     if (val === "all") p.delete("theme");
     else p.set("theme", val);
     setParams(p, { replace: true });
+    scope.setScope(val, ""); // travelling scope: carry to the other segments
   };
 
   const setSearch = (q: string) => setParam("q", q || null);
@@ -200,6 +221,8 @@ export function CollocationsBrowser() {
         description="Feste Verbindungen aus Nomen und Verb. Lerne sie als Einheit und klinge natürlich und präzise im B2-Beruf-Gespräch."
       />
 
+      <LibrarySwitcher />
+
       <BrowseToolbar
         search={search}
         onSearch={setSearch}
@@ -213,18 +236,20 @@ export function CollocationsBrowser() {
         activeChips={activeChips}
         onRemoveChip={removeFacetValue}
         trailing={
-          activeTheme ? (
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-10 shrink-0"
-              onClick={() => navigate(`/quiz?theme=${activeTheme.id}&level=2`)}
-            >
-              <ListChecks className="h-3.5 w-3.5" /> Quiz: {activeTheme.titleDe}
-            </Button>
-          ) : undefined
+          <Button
+            size="sm"
+            variant="gradient"
+            className="h-10 shrink-0"
+            onClick={() => navigate(`/session${activeTheme ? `?theme=${activeTheme.id}` : ""}`)}
+          >
+            <Zap className="h-3.5 w-3.5" /> Üben
+          </Button>
         }
       />
+
+      {activeTheme && (
+        <ScopeChip label={activeTheme.titleDe} onClear={() => setTheme("all")} />
+      )}
 
       <div className="flex flex-wrap items-center gap-3">
         <p className="text-sm text-muted-foreground">
