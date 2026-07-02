@@ -16,6 +16,7 @@ export const grammar: GrammarTopic[] = [
     title: "Connectors for structured arguments",
     titleDe: "Konnektoren",
     purpose: "Link ideas so you sound coherent when weighing options.",
+    purposeDe: "Ideen verknüpfen, damit du beim Abwägen von Optionen zusammenhängend klingst.",
     explanation:
       "Connectors signal how two ideas relate: cause (deshalb, deswegen), concession (trotzdem, dennoch), addition (außerdem, zudem) and contrast (jedoch, allerdings). Most of these are adverbial connectors that occupy position 1, so the conjugated verb stays in position 2.",
     pattern: "…, deshalb + Verb + … · zwar … aber … · einerseits … andererseits …",
@@ -79,6 +80,7 @@ export const grammar: GrammarTopic[] = [
     title: "Relative clauses",
     titleDe: "Relativsätze",
     purpose: "Add precise detail about a person or thing in one smooth sentence.",
+    purposeDe: "Präzise Details zu einer Person oder Sache in einem einzigen flüssigen Satz ergänzen.",
     explanation:
       "A relative clause describes a noun. The relative pronoun (der/die/das …) matches the noun in gender and number, but its CASE comes from its role inside the relative clause. The verb goes to the end of the relative clause.",
     pattern: "Nom: der/die/das · Akk: den/die/das · Dat: dem/der/dem/denen · Gen: dessen/deren",
@@ -143,6 +145,7 @@ export const grammar: GrammarTopic[] = [
     title: "Prepositional pronouns (da-/wo-words)",
     titleDe: "Präpositionalpronomen (da-/wo-Wörter)",
     purpose: "Refer back to whole ideas and ask about prepositional objects naturally.",
+    purposeDe: "Auf ganze Sachverhalte zurückverweisen und natürlich nach Präpositionalobjekten fragen.",
     explanation:
       "When a preposition refers to a thing or idea (not a person), German fuses it: da + preposition (darüber, damit, dafür) for statements, wo + preposition (worüber, womit, wofür) for questions. An -r- is inserted before a vowel: da+auf → darauf, wo+an → woran.",
     pattern: "da(r) + Präposition → darauf, damit, dafür · wo(r) + Präposition → worauf, womit, wofür",
@@ -206,6 +209,7 @@ export const grammar: GrammarTopic[] = [
     title: "Verb position & sentence bracket",
     titleDe: "Verbstellung & Verbklammer (TeKaMoLo)",
     purpose: "Build correct, natural word order, a top marker of B2 accuracy.",
+    purposeDe: "Korrekte, natürliche Wortstellung bilden, ein wichtiges Merkmal für B2-Genauigkeit.",
     explanation:
       "In a main clause the conjugated verb is always second; any second verb part (Infinitiv/Partizip) goes to the very end, forming the 'Verbklammer' (sentence bracket). Mid-field adverbials follow TeKaMoLo order: Temporal – Kausal – Modal – Lokal (when – why – how – where).",
     pattern: "Pos.1 + Verb(2) + … Te-Ka-Mo-Lo … + Verbteil(Ende)",
@@ -269,6 +273,7 @@ export const grammar: GrammarTopic[] = [
     title: "Subordinate clauses: dass / weil / damit",
     titleDe: "Nebensätze: dass / weil / damit",
     purpose: "Justify opinions and explain reasons. The verb goes to the end.",
+    purposeDe: "Meinungen begründen und Gründe erklären. Das Verb steht am Ende.",
     explanation:
       "Subordinating conjunctions (dass, weil, damit, obwohl, wenn, dass) push the conjugated verb to the end of their clause. If the subordinate clause comes first, the main clause starts with its verb (because position 1 is filled by the whole clause).",
     pattern: "Ich denke, dass … (Verb am Ende) · …, weil … · …, damit …",
@@ -332,6 +337,7 @@ export const grammar: GrammarTopic[] = [
     title: "Cases & two-way prepositions",
     titleDe: "Kasus & Wechselpräpositionen",
     purpose: "Pick the right article ending, the backbone of accurate German.",
+    purposeDe: "Die richtige Artikelendung wählen, das Rückgrat von korrektem Deutsch.",
     explanation:
       "Cases mark a noun's role: Nominativ (subject), Akkusativ (direct object), Dativ (indirect object), Genitiv (possession). Two-way prepositions (in, an, auf, über, unter, vor, hinter, neben, zwischen) take the accusative for movement/direction (wohin?) and the dative for location (wo?).",
     pattern: "wohin? → Akkusativ (in den Raum) · wo? → Dativ (in dem Raum)",
@@ -395,6 +401,7 @@ export const grammar: GrammarTopic[] = [
     title: "Noun-verb combinations",
     titleDe: "Nomen-Verb-Verbindungen (Funktionsverbgefüge)",
     purpose: "Sound natural and precise by learning verbs and nouns as fixed chunks.",
+    purposeDe: "Natürlich und präzise klingen, indem du Verben und Nomen als feste Wendungen lernst.",
     explanation:
       "Many ideas are expressed by a fixed noun + verb pair where the verb carries little meaning on its own: eine Entscheidung treffen, Maßnahmen ergreifen, Rücksicht nehmen. Learn them as units; the wrong verb sounds foreign even if each word is correct.",
     pattern: "Nomen + festes Verb → eine Entscheidung treffen · in Frage stellen · zur Verfügung stehen",
@@ -458,6 +465,7 @@ export const grammar: GrammarTopic[] = [
     title: "Konjunktiv II for polite suggestions",
     titleDe: "Konjunktiv II",
     purpose: "Soften proposals and requests so they sound diplomatic.",
+    purposeDe: "Vorschläge und Bitten abschwächen, damit sie diplomatisch klingen.",
     explanation:
       "Konjunktiv II expresses politeness and hypotheticals. The everyday form is 'würde + Infinitiv'; common modals have their own forms: könnte, sollte, müsste, dürfte. Use it to make suggestions and requests less direct.",
     pattern: "würde + Infinitiv · könnte / sollte / müsste / dürfte",
@@ -513,6 +521,7 @@ export const grammar: GrammarTopic[] = [
     title: "Modal verbs for negotiation",
     titleDe: "Modalverben",
     purpose: "Express possibility, necessity and permission precisely.",
+    purposeDe: "Möglichkeit, Notwendigkeit und Erlaubnis präzise ausdrücken.",
     explanation:
       "Modal verbs (können, müssen, sollen, dürfen, wollen, mögen) are conjugated in position 2; the main verb stays as an infinitive at the end. They shade meaning: müssen (necessity), dürfen (permission), sollen (recommendation/others' wish).",
     pattern: "Subjekt + Modalverb(2) + … + Infinitiv (Ende)",
@@ -567,6 +576,7 @@ export const grammar: GrammarTopic[] = [
     title: "Passive for processes",
     titleDe: "Passiv",
     purpose: "Describe workplace procedures neutrally, without naming an actor.",
+    purposeDe: "Arbeitsabläufe neutral beschreiben, ohne eine handelnde Person zu nennen.",
     explanation:
       "The passive (werden + Partizip II) focuses on the action or process rather than who does it, which is ideal for describing procedures. The agent is often omitted or added with 'von'. With modals: modal + Partizip II + werden.",
     pattern: "werden + Partizip II · (Modal) … + Partizip II + werden",

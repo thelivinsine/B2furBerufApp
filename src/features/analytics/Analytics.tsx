@@ -18,10 +18,11 @@ import { vocabByTheme } from "@/data/vocabulary";
 import { scenarios } from "@/data/dialogues";
 import { redemittel } from "@/data/redemittel";
 import { practiceAreaById } from "@/data/practiceAreas";
-import { useProgressStore, useEffectiveStreak } from "@/store/useProgressStore";
-import { mastery, masteryLabel } from "@/engine/srs";
+import { useProgressStore, useEffectiveStreak, useTodayXp } from "@/store/useProgressStore";
+import { useSettingsStore, type LearningGoal } from "@/store/useSettingsStore";
+import { mastery, masteryLabel, dueCount } from "@/engine/srs";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
-import { pct, cn } from "@/lib/utils";
+import { pct, cn, daysBetween, todayKey } from "@/lib/utils";
 import { getWritingHistory, type WritingHistoryEntry } from "@/lib/writing";
 import type { WeaknessCategory } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -30,6 +31,13 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { SectionHeading, StreakBadge, XPBar } from "@/components/shared/misc";
 import { StatCard } from "@/components/shared/StatCard";
+import { recommendedNext } from "@/features/dashboard/recommend";
+
+const goalLabelDe: Record<LearningGoal, string> = {
+  exam: "Fokus auf die B2-Prüfung",
+  work: "Sicherer im Berufsalltag",
+  fluency: "Flüssiger und spontaner sprechen",
+};
 
 function lastNDays(n: number): string[] {
   const days: string[] = [];
@@ -121,6 +129,17 @@ export function Analytics() {
   const scenariosDone = useProgressStore((s) => s.scenariosDone);
   const examsDone = useProgressStore((s) => s.examsDone);
   const totalSessions = useProgressStore((s) => s.totalSessions);
+  const todayXp = useTodayXp();
+  const navigate = useNavigate();
+  const level = useSettingsStore((s) => s.level);
+  const learningGoal = useSettingsStore((s) => s.goal);
+  const examDate = useSettingsStore((s) => s.examDate);
+  const dailyGoalXp = useSettingsStore((s) => s.dailyGoalXp);
+
+  const coldStart = xp === 0 && totalSessions === 0;
+  const daysToExam = examDate ? Math.max(0, daysBetween(todayKey(), examDate)) : null;
+  const rec = recommendedNext({ due: dueCount(srs), todayXp, goal: dailyGoalXp, daysToExam });
+  const minutesGoal = Math.max(5, Math.round(dailyGoalXp / 8));
 
   const [writingEntries, setWritingEntries] = useState<WritingHistoryEntry[]>([]);
   const [writingLoaded, setWritingLoaded] = useState(false);
@@ -180,12 +199,33 @@ export function Analytics() {
       />
 
       {/* Top stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={Zap} label="Gesamt-XP" value={xp.toLocaleString()} hint={`Level ${info.level} · ${tier.name}`} />
-        <StatCard icon={Flame} label="Aktuelle Serie" value={`${streak} Tage`} hint={`Rekord: ${longestStreak} Tage`} accent="warning" />
-        <StatCard icon={BookOpen} label="Vokabeln gemeistert" value={`${masteryGroups.mastered}/${vocabulary.length}`} hint={`${pct(masteryGroups.mastered, vocabulary.length)}%`} accent="success" />
-        <StatCard icon={Trophy} label="Szenarien abgeschlossen" value={`${scenariosDone.length}/${scenarios.length}`} hint={`${examsDone.length} Prüfungen`} accent="accent" />
-      </div>
+      {coldStart ? (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div>
+              <p className="text-sm font-medium text-primary">Dein Ziel</p>
+              <p className="mt-1 text-xl font-semibold">
+                {level} · {goalLabelDe[learningGoal]}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {minutesGoal} Min/Tag
+                {daysToExam !== null && ` · noch ${daysToExam} ${daysToExam === 1 ? "Tag" : "Tage"} bis zur Prüfung`}.
+                Starte deine erste Runde, dann siehst du hier deinen Fortschritt.
+              </p>
+            </div>
+            <Button onClick={() => navigate(rec.to)}>
+              <rec.icon className="h-4 w-4" /> {rec.label}
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard icon={Zap} label="Gesamt-XP" value={xp.toLocaleString()} hint={`Level ${info.level} · ${tier.name}`} />
+          <StatCard icon={Flame} label="Aktuelle Serie" value={`${streak} Tage`} hint={`Rekord: ${longestStreak} Tage`} accent="warning" />
+          <StatCard icon={BookOpen} label="Vokabeln gemeistert" value={`${masteryGroups.mastered}/${vocabulary.length}`} hint={`${pct(masteryGroups.mastered, vocabulary.length)}%`} accent="success" />
+          <StatCard icon={Trophy} label="Szenarien abgeschlossen" value={`${scenariosDone.length}/${scenarios.length}`} hint={`${examsDone.length} Prüfungen`} accent="accent" />
+        </div>
+      )}
 
       {/* XP progress */}
       <Card>

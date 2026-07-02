@@ -3,16 +3,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CloudUpload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { AuthDialog } from "@/features/auth/AuthDialog";
 
 /**
  * Gentle nudge shown to learners who aren't signed in with an email yet
- * (guests / local-only), inviting them to save their progress. Dismissible
- * for the current session; reappears on the next load until they sign in.
+ * (guests / local-only), inviting them to save their progress. Shown once
+ * per device on Heute only; dismissal persists (the "Nur lokal" pill in
+ * Settings remains the durable reminder afterwards).
  */
 export function SaveProgressBanner() {
   const status = useAuthStore((s) => s.status);
-  const [dismissed, setDismissed] = useState(false);
+  const dismissed = useSettingsStore((s) => s.signInBannerDismissed);
+  const setSettings = useSettingsStore((s) => s.setSettings);
   const [authOpen, setAuthOpen] = useState(false);
 
   // Only nudge guests / signed-out learners — never someone already signed in.
@@ -41,7 +44,7 @@ export function SaveProgressBanner() {
               Anmelden
             </Button>
             <button
-              onClick={() => setDismissed(true)}
+              onClick={() => setSettings({ signInBannerDismissed: true })}
               aria-label="Hinweis schließen"
               className="rounded-md p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >

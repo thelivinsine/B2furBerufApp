@@ -1,16 +1,13 @@
 import { Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Zap, Loader2 } from "lucide-react";
+import { Flame, Loader2 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { BottomTabBar } from "./BottomTabBar";
 import { MoreSheet } from "./MoreSheet";
-import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
-import { useSettingsStore } from "@/store/useSettingsStore";
+import { useProgressStore } from "@/store/useProgressStore";
 import { useAuthStore } from "@/store/useAuthStore";
-import { levelFromXp } from "@/engine/scoring";
-import { ProgressRing } from "@/components/shared/ProgressRing";
 import { Toaster } from "./Toaster";
 import { ModeSwitcher } from "./ModeSwitcher";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
@@ -50,12 +47,7 @@ export function AppShell() {
     setEditMode(false);
   }
   const authStatus = useAuthStore((s) => s.status);
-  const xp = useProgressStore((s) => s.xp);
   const streak = useProgressStore((s) => s.streak);
-  const todayXp = useTodayXp();
-  const goal = useSettingsStore((s) => s.dailyGoalXp);
-  const level = levelFromXp(xp).level;
-  const goalProgress = Math.min(todayXp / goal, 1);
 
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we
@@ -133,17 +125,13 @@ export function AppShell() {
 
             <div className="flex items-center gap-1.5 sm:gap-2">
               <ModeSwitcher />
-              <div className="flex h-9 items-center gap-1.5 rounded-full bg-warning/10 px-3 text-sm font-semibold text-warning">
+              <div
+                className="flex h-9 items-center gap-1.5 rounded-full bg-warning/10 px-3 text-sm font-semibold text-warning"
+                aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
+              >
                 <Flame className={cn("h-4 w-4", streak > 0 && "fill-warning/30")} />
                 {streak}
               </div>
-              <div className="hidden h-9 items-center gap-1.5 rounded-full bg-primary/10 px-3 text-sm font-semibold text-primary sm:flex">
-                <Zap className="h-4 w-4" />
-                Lvl {level}
-              </div>
-              <ProgressRing value={goalProgress} size={36} stroke={4}>
-                <span className="text-[9px] font-bold tabular-nums">{todayXp}</span>
-              </ProgressRing>
               <ThemeToggle />
               <AccountMenu />
             </div>
@@ -151,7 +139,7 @@ export function AppShell() {
         </header>
 
         <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8">
-          <SaveProgressBanner />
+          {location.pathname === "/" && <SaveProgressBanner />}
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}>
               <Suspense
