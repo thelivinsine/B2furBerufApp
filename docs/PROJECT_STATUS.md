@@ -1000,7 +1000,7 @@ re-map phase): the single `/library` URL + old-route redirects + retiring the st
 section + removing the Vokabeltrainer's in-page Karteikarten/Quiz tabs (superseded by Üben →
 session). Fold these into the Phase 5 work.
 
-**Most recent work (session 50, 2026-07-03, docs-only, PR #267 merged `532a1b5`):** full docs audit
+**Most recent work (session 50, 2026-07-03, docs-focused, shipped across PRs #267–#269):** full docs audit
 (stale counts reconciled to 1,111 provenance rows; five shipped-plan headers flipped; PROJECT_STATUS
 slimmed with sessions 4–40 + 24 archived to `docs/archive/PROJECT_STATUS_ARCHIVE.md`; new
 `docs/README.md` index + best-practices section); readable transcription of the learning-app playbook
@@ -1008,8 +1008,9 @@ slimmed with sessions 4–40 + 24 archived to `docs/archive/PROJECT_STATUS_ARCHI
 (`docs/strategy/PRODUCT_EVALUATION.md`, seven dimensions); the five recommendations scoped as backlog
 **#26–#30**; and the founder-approved **`docs/plans/LEARNING_ENGINE_PLAN.md`** (Phase 0 quick wins =
 next build; then FSRS, speaking block, custom deck). Then the docs folder was reorganized into
-`strategy/`, `plans/`, `archive/`, and `reference/` subfolders (see `docs/README.md`). Prompt log
-entries 110–117.
+`strategy/`, `plans/`, `archive/`, and `reference/` subfolders (see `docs/README.md`), the only change
+touching `src/` (three code comments repointed at moved docs; CI `lint-content` green). All merged to
+`main` (PRs #267, #268, #269). Prompt log entries 110–118. **Session fully documented.**
 
 **Earlier work (session 49):**
 - **s49 — UX overhaul Phase 5 IA restructure SHIPPED ✅ (Anwenden hub + Bibliothek hub + four-zone
