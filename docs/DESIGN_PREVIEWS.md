@@ -1,5 +1,12 @@
 # Design Previews
 
+> **Status (2026-07-03): the bottom-nav exploration below is RESOLVED and historical.** It captures the
+> session-24 mockup rounds. The founder ultimately selected the **Context Strip + Icon Rail (Concept F)**
+> direction, which was then refined and **locked across sessions 26–28** (the context strip was later
+> removed in s26; two-tone neon marks + compact-squircle backdrops landed in s27–28). The authoritative,
+> current spec for the shipped bar is the **"Mobile bottom tab bar (locked)"** section of `CLAUDE.md`, not
+> this file. This doc is kept as the design paper trail and as the how-to for adding future previews.
+
 All HTML mockups live in the **`preview/`** folder at the repo root. Open any link below in a browser to see the rendered preview (the htmlpreview.github.io service renders the raw GitHub HTML).
 
 ## Bottom Navigation Bar
@@ -77,7 +84,9 @@ All variants include: context strip (no dot), icon-only rail (no labels), custom
 | F4 | Gradient icon + thin underline only; no pill | Plain white, minimal | Ultra minimal, Spotify-like |
 | F5 | Soft pill + underline | Full gradient floating pill | Context-first, very distinctive |
 
-Status: **awaiting founder decision** (session 24).
+Status: **RESOLVED.** The founder chose the Concept F direction; it was refined and locked in sessions
+26–28 (see the banner at the top of this file and the "Mobile bottom tab bar (locked)" section of
+`CLAUDE.md` for the shipped design).
 
 ---
 

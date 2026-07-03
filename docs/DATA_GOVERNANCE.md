@@ -1,6 +1,6 @@
 # Data Governance & Content Provenance
 
-_Status: **v0.3 draft (2026-06-15)**. The certification deep-research pass (backlog #19) is now done:
+_Status: **v0.5 (2026-07-03)**. The certification deep-research pass (backlog #19) is now done:
 see **`docs/CERTIFICATION_RESEARCH.md`** for the cited findings. This doc's assumptions held; the
 refinements from the research are folded in below and flagged "(research-validated 2026-06-15)". The
 research is desk research, not legal advice: the EU AI Act risk classification still needs a lawyer's
@@ -230,15 +230,19 @@ any externally licensed content, as required.
   re-pointed to DWDS corpus search via `scripts/fix-provenance-refs.mjs`. A live link confirms the page
   exists, **not** that it is the correct sense, so this attests to one machine-checkable half of
   verification; content accuracy still needs human sign-off.
-- **Reference back-fill complete (2026-06-20):** every one of the 809 rows now carries a non-empty
-  `reference`, so the back-fill warning queue is empty. Coverage by type: vocabulary → Wiktionary
+- **Reference back-fill (maintained; register now 1,111 rows, last reconciled 2026-07-03):** every one
+  of the **1,111** rows carries a non-empty
+  `reference`, so the back-fill warning queue is empty. (The register was 809 rows at the 2026-06-20
+  back-fill; it has since grown with the s43+ content and the s47 Can-Do bank, each new item added with
+  its reference at authoring time.) Coverage by type: vocabulary → Wiktionary
   headword; collocations → DWDS noun entry; grammar topics/drills → the German Wikipedia article for
   the topic (grammar rules are facts, cited not copied); redemittel → DWDS corpus search for the
   phrase; dialogues / exam sets / writing prompts → the Council of Europe CEFR B2 descriptors they
   are designed against. The bootstrap/back-fill scripts (`scripts/generate-provenance-stubs.mjs`,
   `scripts/backfill-provenance-refs.mjs`) document exactly how each reference was derived. **These
-  references are machine-assigned starting points, not human-verified:** all 809 rows stay
-  `review_status: "draft"`. Flipping draft → verified is the still-open four-eyes step (Phase 2).
+  references are machine-assigned starting points, not human-verified:** 1,086 rows stay
+  `review_status: "draft"`; only the 25 Can-Do statements are `"verified"` (founder-reviewed 2026-07-02).
+  Flipping the remaining draft rows → verified is the still-open four-eyes step (Phase 2).
 
 ## Documented procedures (the "management system")
 
@@ -350,6 +354,11 @@ SOC 2 today would be premature for a pre-revenue product and a poor use of money
 
 ## Change log
 
+- **v0.5 (2026-07-03):** docs-audit reconciliation. The provenance register has grown from 809 rows
+  (the 2026-06-20 back-fill snapshot) to **1,111 rows** as content expanded (s43 Pflege/office packs,
+  the s47 Can-Do bank, and other additions). Updated the current-state counts throughout: 1,111 rows,
+  all still carrying a non-empty `reference` (back-fill queue empty), split 1,086 `draft` / 25
+  `verified` (the founder-approved Can-Do statements). No policy change; numbers only.
 - **v0.4 (2026-06-20):** two stream items shipped. (1) **Reference back-fill complete** — all 809
   register rows now carry a non-empty `reference` (grammar → German Wikipedia, redemittel → DWDS
   corpus search, dialogues/exam sets/writing prompts → CEFR B2 descriptors), so the linter's

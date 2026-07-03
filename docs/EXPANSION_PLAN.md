@@ -1,7 +1,9 @@
 # Genauly — Feature Expansion Plan (Grammar, Quizzes, Auth + AI Writing)
 
-> Status: **APPROVED, not yet implemented.** Phase 1 is the next work to start.
-> Working branch: `claude/determined-euler-xUDrh`. See `docs/PROJECT_STATUS.md` for live status.
+> Status: **BOTH PHASES SHIPPED & LIVE ✅** (Phase 1 content/grammar/quizzes and Phase 2 Supabase auth +
+> cloud sync + AI writing coach are both merged to `main` and founder-verified). This doc is now a
+> historical record of the original expansion plan; current status lives in `docs/PROJECT_STATUS.md`,
+> and the product has since moved on to the taxonomy redesign and the session-first UX overhaul.
 >
 > **Scope note (added 2026-06-20):** this plan predates the session-21 repositioning. The product is
 > no longer "B2 Beruf exam prep" only; it targets the broader **B1–B2 intermediate plateau** across

@@ -1,8 +1,10 @@
 # Mobile-App Redesign Plan
 
-_Status: **Layer 1 (iOS standalone meta tags) SHIPPED 2026-06-04** (session 13). **Layer 2 (bottom
-tab bar) + Layer 3 (mobile density & fit) are PLANNED & APPROVED, not yet implemented** (approved
-2026-06-05). Branch when resuming: `claude/genauly-blank-page-9biDi`._
+_Status: **ALL THREE LAYERS SHIPPED ✅.** Layer 1 (iOS standalone meta tags) shipped 2026-06-04
+(session 13); Layer 2 (bottom tab bar + "Mehr" sheet) and Layer 3 (mobile density) shipped across
+sessions 24–28. The bottom tab bar is now **founder-locked** (see the "Mobile bottom tab bar" section
+in `CLAUDE.md`, which is the authoritative spec). This doc is retained as the historical implementation
+plan; do not change nav structure/mechanics from it without an explicit founder request._
 
 ## Why
 

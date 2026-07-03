@@ -1828,3 +1828,103 @@ Branch: `claude/review-previous-session-69pxat`.
   and added this log entry. With this, session 49 is fully documented and the whole UX overhaul roadmap
   (Phases 0–5) is complete and deployed.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 110 — 2026-07-03 (session 50)
+- **Branch:** `claude/docs-audit-report-0xydsz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > do a thorough audit of all the docs in the docs folder and give me a report
+- **Response summary:** Read all 14 Markdown docs in `docs/` and cross-checked their load-bearing
+  claims against the codebase. Verdict: B (good but drifting). Findings: provenance counts stale in
+  three places (769/809/1073 vs the real 1,111 rows), five plan docs with "not yet implemented"
+  headers for shipped work (EXPANSION_PLAN, MOBILE_APP_PLAN, TAXONOMY_IMPLEMENTATION_PLAN,
+  DESIGN_PREVIEWS, DATA_GOVERNANCE v0.3-vs-v0.4), PROJECT_STATUS at 2,317 lines with three competing
+  "Resume here" pointers and stale branch names, BUSINESS_PLAN stats stale (350 words/120
+  collocations vs 528/396), no docs index, and `prompt-log-raw.jsonl` unexplained. Delivered a
+  prioritized fix list.
+- **Artifacts:** report in chat (fixes applied in the next entry).
+
+## Entry 111 — 2026-07-03 (session 50)
+- **Branch:** `claude/docs-audit-report-0xydsz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > apply all the recommended fixes and suggest me best practices moving forward based on the project's documentation so far
+- **Response summary:** Applied every audit fix: reconciled provenance counts to 1,111 (1,086 draft /
+  25 verified) in `CLAUDE.md` + `DATA_GOVERNANCE.md` (bumped to v0.5 with changelog) +
+  `PROJECT_STATUS.md`; flipped the five stale status headers to shipped; refreshed BUSINESS_PLAN §5
+  stats; collapsed PROJECT_STATUS to one authoritative "Resume here" and generalized stale branch
+  names; split sessions 4–40 + 24 into a new `PROJECT_STATUS_ARCHIVE.md` (2,317 → ~1,279 lines, all
+  47 session logs preserved); added a `docs/README.md` index marking `prompt-log-raw.jsonl` frozen.
+  Suggested seven forward practices (generate counts from the linter, flip headers on ship, size
+  budget + archive cadence for the status doc, de-duplicate the two logs, no branch names in prose,
+  prioritize the draft→verified provenance pass, keep the working disciplines).
+- **Artifacts:** commit `17c18f6` (docs audit) on the session branch; new
+  `docs/PROJECT_STATUS_ARCHIVE.md`, `docs/README.md`.
+
+## Entry 112 — 2026-07-03 (session 50)
+- **Branch:** `claude/docs-audit-report-0xydsz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > can you read the language learning success factors doc?
+- **Response summary:** Extracted the full text of the binary
+  `Language Learning App Success Factors.docx` (~5,200 words, 11 sections + an evaluation
+  meta-prompt) via stdlib XML parsing and summarized it: retrieval practice, FSRS over SM-2,
+  interleaving (~43% better retention), Swain output, Fogg/Hook behavioral design, Mayer CTML, the
+  gamification dilemma, B1–B2 plateau failure modes, competitor benchmarks. Mapped it to Genauly:
+  already-shipped strengths (session loop, Can-Do, global search) and the open gaps (FSRS + latency,
+  speech-first drills, talker variability, the Section-11 evaluation framework).
+- **Artifacts:** scratchpad extraction (committed as a readable doc in the next entry).
+
+## Entry 113 — 2026-07-03 (session 50)
+- **Branch:** `claude/docs-audit-report-0xydsz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > First let me know what tools does the doc suggest for brainstorming? Then, save a readable format in the docs folder and then run the evaluation
+- **Response summary:** Clarified that the playbook has no tooling section; the brainstorming-tool
+  guidance lives in `AI_PRODUCT_STRATEGY.md` §4a/§5 (ChatGPT + Claude for generation,
+  Perplexity/NotebookLM for grounded research, Gemini Flash for bulk drafts, Lovable/v0/Bolt for
+  validation prototypes; one JTBD at a time). Saved a faithful Markdown transcription of the .docx
+  (8 tables reconstructed, citation noise stripped) as `docs/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
+  Ran the playbook's Section-11 evaluation framework against Genauly, grounded in code checks (SM-2
+  confirmed, zero latency tracking, STT built but unused, no custom decks): 7-dimension scorecard
+  (curriculum 4.5 · SLA 4 · CTML 4 · cognitive 3.5 · behavioral 3.5 · gamification 3.5 · exercises
+  3), five failure modes, five recommendations. Saved as `docs/PRODUCT_EVALUATION.md`.
+- **Artifacts:** commit `833eaff`; new `docs/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`,
+  `docs/PRODUCT_EVALUATION.md`; `docs/README.md` index updated.
+
+## Entry 114 — 2026-07-03 (session 50)
+- **Branch:** `claude/docs-audit-report-0xydsz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > scope all 5 recos into backolog items with priority rating
+- **Response summary:** Added backlog items **#26–#30** to `docs/PROJECT_STATUS.md` under a new
+  "Product-evaluation findings" subsection: #26 FSRS + latency capture (P1, split 26a/26b), #27
+  speech-first drill block (P1), #28 guess-before-reveal (P2 quick win), #29 custom decks / word
+  capture (P2), #30 talker variability (P3 quick win). Each names the eval dimension/failure mode it
+  closes, an MVP, effort, and recommended model; suggested build sequence recorded; cross-linked
+  from `PRODUCT_EVALUATION.md`.
+- **Artifacts:** commit `fe359b6`; `docs/PROJECT_STATUS.md`, `docs/PRODUCT_EVALUATION.md`.
+
+## Entry 115 — 2026-07-03 (session 50)
+- **Branch:** `claude/docs-audit-report-0xydsz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > use your fable skill and prepare a thorough and robust plan for the above recos.
+- **Follow-ups (same task):** referred to the published Claude Fable 5 prompting guidelines
+  "wherever relevant"; narrowed scope to "just work on the plan for now. I'll implement the quick
+  wins later."; asked for "a model suggestion for each item in the plan".
+- **Response summary:** Ran a plan-mode design pass: three parallel codebase explorations (SRS
+  engine + review call sites; session engine + speech; stores + cloudSync + Supabase schema) plus a
+  dedicated design agent, then wrote **`docs/LEARNING_ENGINE_PLAN.md`** (approved by the founder):
+  Phase 0 = quick wins (26a latency capture, #28 guess-first gate, #30 voice rotation) with exact
+  files/signatures/copy/verification, Phase 1 = hand-rolled FSRS behind the unchanged `srs.ts`
+  surface with a `scripts/test-srs.mjs` reference-vector gate, Phase 2 = the speech-first
+  SessionPlayer block (first consumer of the dormant STT), Phase 3 = custom deck with the
+  `saved_words` column migration; plus a persistence/sync policy table, risk register, per-item
+  model recommendations (26a Opus · #28 Sonnet · #30 Sonnet · 26b Fable-high · #27 Fable-high ·
+  #29 Opus), and Fable-5-guidelines execution notes. Key discoveries recorded: `review()` has one
+  call site; STT is fully built with zero consumers; a speech-rate slider already exists; the
+  progress table has no catch-all jsonb. Cross-updated PROJECT_STATUS (#26–#30 scoped pointer +
+  Resume-here), README index, PRODUCT_EVALUATION pointer, and this log.
+- **Artifacts:** new `docs/LEARNING_ENGINE_PLAN.md`; modified `docs/PROJECT_STATUS.md`,
+  `docs/README.md`, `docs/PRODUCT_EVALUATION.md`, `docs/SESSION_PROMPT_LOG.md` (this entry).
