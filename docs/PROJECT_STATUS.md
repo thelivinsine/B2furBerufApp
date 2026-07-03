@@ -1000,7 +1000,16 @@ re-map phase): the single `/library` URL + old-route redirects + retiring the st
 section + removing the Vokabeltrainer's in-page Karteikarten/Quiz tabs (superseded by Üben →
 session). Fold these into the Phase 5 work.
 
-**Most recent work (session 49):**
+**Most recent work (session 50, 2026-07-03, docs-only, PR #267 merged `532a1b5`):** full docs audit
+(stale counts reconciled to 1,111 provenance rows; five shipped-plan headers flipped; PROJECT_STATUS
+slimmed with sessions 4–40 + 24 archived to `PROJECT_STATUS_ARCHIVE.md`; new `docs/README.md` index +
+best-practices section); readable transcription of the learning-app playbook
+(`LANGUAGE_LEARNING_SUCCESS_FACTORS.md`); Genauly scored against it (`PRODUCT_EVALUATION.md`, seven
+dimensions); the five recommendations scoped as backlog **#26–#30**; and the founder-approved
+**`docs/LEARNING_ENGINE_PLAN.md`** (Phase 0 quick wins = next build; then FSRS, speaking block,
+custom deck). No `src/` changes. Prompt log entries 110–116.
+
+**Earlier work (session 49):**
 - **s49 — UX overhaul Phase 5 IA restructure SHIPPED ✅ (Anwenden hub + Bibliothek hub + four-zone
   nav re-map):** the visible heart of Phase 5, delivered as a mostly-additive PR so no deep link or
   founder-used surface broke.
