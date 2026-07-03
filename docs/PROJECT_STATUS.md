@@ -6,8 +6,8 @@ Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
 pointer is the `## Resume here (next session)` section near the end of this file** — start there. Older
-detailed session logs (sessions 4–40 + 24) are archived in `docs/PROJECT_STATUS_ARCHIVE.md`. For the full
-design, see `docs/EXPANSION_PLAN.md`; for the original build plan, `docs/IMPLEMENTATION_PLAN.md`.
+detailed session logs (sessions 4–40 + 24) are archived in `docs/archive/PROJECT_STATUS_ARCHIVE.md`. For the full
+design, see `docs/archive/EXPANSION_PLAN.md`; for the original build plan, `docs/archive/IMPLEMENTATION_PLAN.md`.
 
 ## Who I'm working with
 - **Founder is non-technical.** Operate as a seasoned CTO: be decisive and opinionated, minimize
@@ -383,9 +383,9 @@ squash-merged to `main` (#250–#252).
   build does not warn on invalid ones.
 - **Filter-harmonization plan (#252, docs-only).** Founder flagged the search bar / filter button /
   filter options / theme + branche controls as chaotic and inconsistent across Wortschatz,
-  Kollokationen, Redemittel, etc. Researched the codebase + `docs/TAXONOMY_REDESIGN.md` + the uploaded
-  learning-app playbook (`docs/Language Learning App Success Factors.docx`) and wrote
-  **`docs/FILTER_HARMONIZATION_PLAN.md`**: one shared `Search + Theme + Filter` toolbar
+  Kollokationen, Redemittel, etc. Researched the codebase + `docs/plans/TAXONOMY_REDESIGN.md` + the uploaded
+  learning-app playbook (`docs/reference/Language Learning App Success Factors.docx`) and wrote
+  **`docs/plans/FILTER_HARMONIZATION_PLAN.md`**: one shared `Search + Theme + Filter` toolbar
   (`BrowseToolbar`) + the existing `FacetSheet` on every page, a single responsive panel for
   mobile+desktop, branded `HubHero` header everywhere, a shared `src/lib/cefr.ts` for consistent CEFR
   labels, and the verb-rail/legend decluttered into the sheet. Phased: Phase 1 = the 3 filtering pages,
@@ -407,7 +407,7 @@ harmonization, then a substantially better plan. **No app code changed; strategy
 - **Filter-plan critique (self-critical):** s45 harmonized the *reference* layer but polished the
   wrong layer; search stayed siloed per bank; scope (theme) resets per page; the relocated Verb facet
   became a 100+ pill soup; per-page facet wiring does not scale to the coming content packs.
-- **`docs/UX_OVERHAUL_PLAN.md` (new, the roadmap):** session-first redesign. Four-tier filter
+- **`docs/plans/UX_OVERHAUL_PLAN.md` (new, the roadmap):** session-first redesign. Four-tier filter
   architecture (Tier 0 personalized defaults / Tier 1 global search across all banks / Tier 2
   travelling Scope (Domain → Theme → Sub-theme) as app state / Tier 3 refinement facets from a
   central registry, ≤12-option rule, Verb facet dropped). Four-zone IA: Heute (session hero) ·
@@ -424,7 +424,7 @@ harmonization, then a substantially better plan. **No app code changed; strategy
   a per-phase model table added for the overhaul plan (Phase 0 Sonnet → Phase 1 Opus → …).
 
 ### Session 45 (2026-06-29) — Filter harmonization IMPLEMENTED (Phase 1 + Phase 2) ✅
-Implemented the full `docs/FILTER_HARMONIZATION_PLAN.md` across both phases.
+Implemented the full `docs/plans/FILTER_HARMONIZATION_PLAN.md` across both phases.
 - **New shared pieces:**
   - **`src/lib/cefr.ts`** — single source of truth for the CEFR scale (`CEFR_ORDER`, `cefrLabel`,
     `difficultyToBand`). Replaced 4 duplicated `CEFR_ORDER` arrays (VocabularyTrainer,
@@ -470,7 +470,7 @@ section above):
 - `pnpm lint:content` + `pnpm build` green on every PR; branch realigned to `main` after each squash-merge.
 
 ### Session 42 (2026-06-27) — Taxonomy redesign Phases 0–2 IMPLEMENTED & SHIPPED ✅
-First build session on the approved `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`. Phases 0, 1 and 2 are now
+First build session on the approved `docs/plans/TAXONOMY_IMPLEMENTATION_PLAN.md`. Phases 0, 1 and 2 are now
 live on `main` across three squash-merged PRs. Untagged-rolls-up invariant held throughout, so nothing
 regressed.
 - **Phase 0 — foundations (PR #233, then completed in #234):** new faceted types in
@@ -560,8 +560,8 @@ regressed.
 ### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
 A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes
 backlog **#5** (domain/sector-based filtering) plus the founder's new Work/Personal/Both idea.
-- **Strategy deck authored** in two forms: `docs/TAXONOMY_REDESIGN.md` (detailed technical version) and
-  `docs/TAXONOMY_REDESIGN.pptx` (**37-slide** plain-language deck for the non-technical founder, built
+- **Strategy deck authored** in two forms: `docs/plans/TAXONOMY_REDESIGN.md` (detailed technical version) and
+  `docs/reference/TAXONOMY_REDESIGN.pptx` (**37-slide** plain-language deck for the non-technical founder, built
   programmatically with python-pptx). Recommends a **faceted model** (mix-and-match labels) over the
   current flat single-axis list, with a shallow **Domain → Theme → Sub-theme** hierarchy and orthogonal
   facets (cefr, register, pos, frequency, exam tag).
@@ -578,7 +578,7 @@ backlog **#5** (domain/sector-based filtering) plus the founder's new Work/Perso
 - **8 UI mockups** built in `preview/taxonomy/` (HTML matching the app's brand tokens, screenshotted with
   the bundled Chromium): before/after vocab browser, sub-topic drill-down, goal-first home,
   connected-word detail, advanced filter sheet, **Mode picker**, **Work-mode browser**.
-- **Approved implementation plan** written to `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`: Phases 0–4
+- **Approved implementation plan** written to `docs/plans/TAXONOMY_IMPLEMENTATION_PLAN.md`: Phases 0–4
   (0 = types + store `mode` + linter foundations, invisible; 1 = CEFR levels + onboarding Mode picker +
   header switch + Level filter = first shippable milestone; 2 = sub-themes; 3 = faceted browser +
   work-mode facets + goal cards; 4 = cross-module links + adaptive review). Reuses the existing settings
@@ -593,7 +593,7 @@ backlog **#5** (domain/sector-based filtering) plus the founder's new Work/Perso
 ### Older session logs (archived)
 
 Detailed session-by-session logs for **sessions 4–40** and **session 24** now live in
-`docs/PROJECT_STATUS_ARCHIVE.md`, to keep this file navigable. The condensed handoff history is
+`docs/archive/PROJECT_STATUS_ARCHIVE.md`, to keep this file navigable. The condensed handoff history is
 still in the “Resume here” section below; git history and `docs/SESSION_PROMPT_LOG.md` remain the
 authoritative full record.
 
@@ -611,8 +611,8 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 5. **Domain-based filtering for Vocabulary, Collocations, and scenario-based learning:**
    split content into "Bürokratie / bureaucratic work" vs. "office work," and within office
    work, further filter by industry/sector.
-   - **SCOPED 2026-06-26 (session 41).** This is now designed in `docs/TAXONOMY_REDESIGN.md`
-     (+ `.pptx`) and planned in `docs/TAXONOMY_IMPLEMENTATION_PLAN.md`: a faceted Domain → Theme →
+   - **SCOPED 2026-06-26 (session 41).** This is now designed in `docs/plans/TAXONOMY_REDESIGN.md`
+     (+ `.pptx`) and planned in `docs/plans/TAXONOMY_IMPLEMENTATION_PLAN.md`: a faceted Domain → Theme →
      Sub-theme model with a Work/Personal/Both **Mode** lens and work-only **sector** facet (the
      industry/sector split the founder asked for). Not built yet; Phase 0–1 is the next build step.
 6. **Redesign the Schreibtraining section.**
@@ -621,7 +621,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
    a clear, audit-ready human-verification workflow. Every data point in the app should carry
    a clear source, verified status, and other metadata, tracked in an Excel/CSV in the project
    folder (not just inline in the TS files) so it's reviewable independent of the code.
-   - **Now elaborated in `docs/DATA_GOVERNANCE.md` (v0.2, added 2026-06-14, revised 2026-06-15):** the
+   - **Now elaborated in `docs/strategy/DATA_GOVERNANCE.md` (v0.2, added 2026-06-14, revised 2026-06-15):** the
      full governance roadmap, provenance-register schema, commercial-safe license allowlist (SPDX) +
      planned machine gate, four-eyes workflow, and a phased path mapping to ISO/IEC 42001 + EU AI Act
      Article 10. **Founder policy (v0.2): traceability over ownership** — every item traces to an
@@ -645,7 +645,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     writing delete (+ `writing_delete_own` RLS policy), honest reset that also clears cloud, a
     bilingual `/impressum` page, and privacy/terms copy updates (email usage, language-precedence,
     data-location, self-service rights). Decision: **no cookie banner** (functional-only storage is
-    consent-exempt). Founder one-time steps in `docs/PHASE2_SETUP.md` (deploy function, run
+    consent-exempt). Founder one-time steps in `docs/plans/PHASE2_SETUP.md` (deploy function, run
     migration 0003, optionally enable pg_cron retention, fill Impressum + region placeholders).
     Still open: lawyer review (#15), real Impressum details, optional auto-retention, marketing
     opt-in UI once a campaign (#13) is built.
@@ -666,7 +666,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 16. **Business plan + case study (added 2026-06-11, v1.1 shipped 2026-06-12):** produce a
     well-researched business plan and case study for Genauly — covering market sizing, competitive
     landscape, product-led growth model, unit economics, and traction narrative. Delivered in
-    `docs/BUSINESS_PLAN.md`. Updated in v1.1 to reflect the broader positioning (see #18).
+    `docs/strategy/BUSINESS_PLAN.md`. Updated in v1.1 to reflect the broader positioning (see #18).
     Intended as a foundation for investor conversations and pre-seed fundraising (#17). Recommended
     model: **Fable** (research-heavy strategy work).
 17. **Pre-seed funding (added 2026-06-11):** plan and execute a pre-seed fundraising round.
@@ -709,7 +709,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       vocab, 396 collocations, 12 dialogues, 11 themes. This is the reference template for the
       remaining packs (banking, healthcare, housing). Still open under #18: the nav/Dashboard
       "situation-based" redesign and the Bürokratie-vs-Office domain grouping (backlog #5).
-      Scoping doc: `docs/AI_PRODUCT_STRATEGY.md`.
+      Scoping doc: `docs/strategy/AI_PRODUCT_STRATEGY.md`.
 15. **Legal review with a lawyer (founder, 2026-06-08):** the live `/privacy` and `/terms` (AGB)
     pages were written in plain language by the team, not a lawyer. Before any paid plans (#8/#9)
     or a marketing campaign (#13) launch, have a qualified lawyer review both for German/EU
@@ -724,7 +724,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       not user-facing. **Founder confirmed 2026-06-08: no banner.** (Revisit only the
       language-precedence line + Impressum during the lawyer pass.)
 19. **Certification landscape deep-research — DONE (2026-06-15).** Completed via the deep-research
-    harness (5 parallel cited passes). Output: **`docs/CERTIFICATION_RESEARCH.md`** (full findings +
+    harness (5 parallel cited passes). Output: **`docs/strategy/CERTIFICATION_RESEARCH.md`** (full findings +
     sources), with conclusions folded into `DATA_GOVERNANCE.md` v0.3. Headlines: we are **most likely
     NOT high-risk** under the EU AI Act (Annex III(3) is institution-tied; formative feedback + the Art.
     6(3) carve-out likely keep us out), with **profiling** and **institutional gating** as the two flip
@@ -752,7 +752,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     and that the user is interacting with an AI. Small UI/copy change (likely a one-line note on the
     Schreibtraining/feedback surfaces + a line in the privacy policy). Also write the documented
     **Article 6(3) risk assessment** (are we high-risk? answer the profiling question) so it exists on
-    file. Detail and sources in `docs/CERTIFICATION_RESEARCH.md`. Confirm scope with the lawyer (#15).
+    file. Detail and sources in `docs/strategy/CERTIFICATION_RESEARCH.md`. Confirm scope with the lawyer (#15).
     Recommended model: **Sonnet** (mechanical), legal nuance to **Opus**.
 22. **Comprehensive end-to-end data strategy (added 2026-06-23):** produce a single coherent strategy
     document (e.g. `docs/DATA_STRATEGY.md`) covering the **full lifecycle of every kind of data in the
@@ -803,7 +803,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       share-alike implications for any adapted text, DWDS "reference" status).
     - **Define the strategy:** a ranked list of approved sources per content type (word facts, example
       sentences, grammar, level descriptors), the rule for when each may be used, the attribution
-      pattern, and a fallback order. Capture it in `docs/DATA_GOVERNANCE.md` (or the planned
+      pattern, and a fallback order. Capture it in `docs/strategy/DATA_GOVERNANCE.md` (or the planned
       `docs/DATA_STRATEGY.md` from #22) so future content authoring follows it.
     - Ties into **#7** (audit infrastructure) and **#22** (end-to-end data strategy); this is the
       "sources" chapter of that umbrella. Recommended model: **Fable** (research/strategy; **Opus** for
@@ -814,7 +814,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     comprehension check without abandoning German immersion. **Deliberately parked**: the founder wants
     to brainstorm the interaction before anything is built. Notes for when picked up:
     - Pedagogically a "comprehension safety net" on top of the German-first copy policy (see
-      `docs/UX_OVERHAUL_PLAN.md` Part H, decision 3). The playbook favours desirable difficulty, so a
+      `docs/plans/UX_OVERHAUL_PLAN.md` Part H, decision 3). The playbook favours desirable difficulty, so a
       deliberate-friction reveal (e.g. press-and-hold to peek) may beat a free toggle.
     - **Prerequisite already planned:** the UX-overhaul Phase-0 German copy pass keeps every EN string
       as data (blurbs, purposes, etc.), which is exactly what a whole-screen EN layer needs. No conflict.
@@ -823,15 +823,15 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       budget, nothing)? Accessibility (reduced motion, screen readers).
     - Recommended model: **Fable** for the interaction-design brainstorm, **Sonnet** for the build.
 
-### Product-evaluation findings (added 2026-07-03, from `docs/PRODUCT_EVALUATION.md`)
+### Product-evaluation findings (added 2026-07-03, from `docs/strategy/PRODUCT_EVALUATION.md`)
 
 The five items below (#26–#30) are the recommendations from scoring Genauly against the learning-science
-playbook (`docs/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`, Section 11). Each carries a **priority** on a
+playbook (`docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`, Section 11). Each carries a **priority** on a
 value·evidence ÷ effort basis (P1 = do first, P3 = nice-to-have) and names the evaluation dimension /
 failure mode it closes. Suggested sequence: land the cheap wins that ride alongside other work (#26a
 latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 paired to the AI roadmap.
 
-> **SCOPED 2026-07-03 → `docs/LEARNING_ENGINE_PLAN.md` (approved, not yet implemented).** All five
+> **SCOPED 2026-07-03 → `docs/plans/LEARNING_ENGINE_PLAN.md` (approved, not yet implemented).** All five
 > items now have a full file-level engineering plan there: Phase 0 = the quick wins (26a + #28 + #30,
 > one PR, next build), Phase 1 = FSRS (26b), Phase 2 = the speaking block (#27), Phase 3 = the custom
 > deck (#29), with per-item model recommendations, persistence/sync policy, verification recipes, and
@@ -864,7 +864,7 @@ latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 pai
     failure mode #4._ Today users build little "stored value", so switching cost stays low. **MVP:** a
     "Zu meiner Liste" / save-word action and a personal list that feeds the SRS with the learner's own
     context; later, import a word/sentence from anywhere. Pairs naturally with the AI sentence-mining idea
-    in `docs/AI_PRODUCT_STRATEGY.md` (idea 11). Effort: **M** (touches store + cloudSync + a new surface).
+    in `docs/strategy/AI_PRODUCT_STRATEGY.md` (idea 11). Effort: **M** (touches store + cloudSync + a new surface).
     Recommended model: **Opus** (store/sync wiring), **Sonnet** for the UI.
 30. **Talker variability: multi-voice TTS + speed toggle — Priority P3 (Low, quick win).** _Fixes eval
     dim 1/2 (phonological transfer); failure mode #5._ A single TTS voice ties schemas to one sanitized
@@ -931,7 +931,7 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 | Pre-seed fundraising (#17) | **Fable** | Investor targeting, pitch deck, data room, instrument strategy |
 | Routine bugfixes (e.g. UI tweaks) | **Sonnet** | Step up to Opus only when a fix turns gnarly or spans many files |
 
-### UX overhaul plan phases mapped to models (added s46; see `docs/UX_OVERHAUL_PLAN.md`)
+### UX overhaul plan phases mapped to models (added s46; see `docs/plans/UX_OVERHAUL_PLAN.md`)
 
 The design/strategy work is already done (Fable, s46), so the phases below are **implementation**:
 do not burn Fable on them. Fable reappears only where new pedagogical content gets authored.
@@ -984,7 +984,7 @@ happening.
      `SHOW_PRACTICE_TABS` back to `true` to restore the vocab tabs if the founder prefers them.
 
 **Next big rocks (UX overhaul is fully complete):** the **learning-engine roadmap in
-`docs/LEARNING_ENGINE_PLAN.md`** (approved 2026-07-03, backlog #26–#30; **Phase 0 quick wins = 26a
+`docs/plans/LEARNING_ENGINE_PLAN.md`** (approved 2026-07-03, backlog #26–#30; **Phase 0 quick wins = 26a
 latency capture + #28 guess-first + #30 voice variety is the designated next build**, then FSRS /
 speaking block / custom deck), the optional taxonomy follow-ups (human-verify the
 AI-drafted `cefr` tags via provenance `draft→verified`; broaden `sector`/`workSituation` tagging; extend
@@ -1002,12 +1002,14 @@ session). Fold these into the Phase 5 work.
 
 **Most recent work (session 50, 2026-07-03, docs-only, PR #267 merged `532a1b5`):** full docs audit
 (stale counts reconciled to 1,111 provenance rows; five shipped-plan headers flipped; PROJECT_STATUS
-slimmed with sessions 4–40 + 24 archived to `PROJECT_STATUS_ARCHIVE.md`; new `docs/README.md` index +
-best-practices section); readable transcription of the learning-app playbook
-(`LANGUAGE_LEARNING_SUCCESS_FACTORS.md`); Genauly scored against it (`PRODUCT_EVALUATION.md`, seven
-dimensions); the five recommendations scoped as backlog **#26–#30**; and the founder-approved
-**`docs/LEARNING_ENGINE_PLAN.md`** (Phase 0 quick wins = next build; then FSRS, speaking block,
-custom deck). No `src/` changes. Prompt log entries 110–116.
+slimmed with sessions 4–40 + 24 archived to `docs/archive/PROJECT_STATUS_ARCHIVE.md`; new
+`docs/README.md` index + best-practices section); readable transcription of the learning-app playbook
+(`docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`); Genauly scored against it
+(`docs/strategy/PRODUCT_EVALUATION.md`, seven dimensions); the five recommendations scoped as backlog
+**#26–#30**; and the founder-approved **`docs/plans/LEARNING_ENGINE_PLAN.md`** (Phase 0 quick wins =
+next build; then FSRS, speaking block, custom deck). Then the docs folder was reorganized into
+`strategy/`, `plans/`, `archive/`, and `reference/` subfolders (see `docs/README.md`). Prompt log
+entries 110–117.
 
 **Earlier work (session 49):**
 - **s49 — UX overhaul Phase 5 IA restructure SHIPPED ✅ (Anwenden hub + Bibliothek hub + four-zone
@@ -1179,7 +1181,7 @@ custom deck). No `src/` changes. Prompt log entries 110–116.
   clipped). Root cause: responsive `grid-cols-N` with no base `grid-cols-1` falls back to an implicit
   max-content column on mobile. Added `grid-cols-1` across every affected grid (PR #219). Also
   **removed the `UserPromptSubmit` prompt-logging hook** (PR #221) at the founder's request; the prompt
-  log is now **manual-only** (founder will ask when to log). `docs/prompt-log-raw.jsonl` kept as
+  log is now **manual-only** (founder will ask when to log). `docs/reference/prompt-log-raw.jsonl` kept as
   history, no longer written to. Noted but did not fix a **mismatched German quote** (`„…"` vs `„…"`)
   in the collocation example sentences. Added an **explicit Save button to the `/sources` admin
   overlay** (PR #223); founder ran **Supabase migration 0004** and confirmed source-review saving now
@@ -1193,7 +1195,7 @@ custom deck). No `src/` changes. Prompt log entries 110–116.
 - **s37** — founder-only **source-verification overlay** on `/sources`: a Supabase-backed,
   admin-only (gated to `thelivinsine@gmail.com`) layer to mark provenance entries verified and add
   private comments. **Action still pending on the founder:** run `supabase/migrations/0004_provenance_reviews.sql`
-  in the Supabase SQL Editor so the saves persist (see `docs/PHASE2_SETUP.md` → "Admin source review").
+  in the Supabase SQL Editor so the saves persist (see `docs/plans/PHASE2_SETUP.md` → "Admin source review").
 - **s38** — fixed the **sign-up button staying disabled when email/password are autofilled** (iOS
   Safari / password managers don't fire React's `onChange`; added a `:-webkit-autofill` animation hook
   in `index.css` that `AuthDialog` reads into state). Also investigated a "collocations tiles cut off"
@@ -1230,7 +1232,7 @@ bar" section for the locked behavior.
 - **Security hardening — ALL COMPLETE ✅ (s17–18, PRs #85–#93):**
   - pnpm migration + react-router vuln fix · Edge Function CORS/caps · self-hosted fonts ·
     CI SHA-pinning · Turnstile CAPTCHA (frontend + Cloudflare + Supabase) · CSP enforcing.
-  - See `docs/SECURITY.md` for full details. No open security items remain.
+  - See `docs/strategy/SECURITY.md` for full details. No open security items remain.
 - **Streak display bug fixed (s18, PR #90):** `useEffectiveStreak()` — no more stale values
   after missed days.
 - **Stale SW chunk crash fixed for real (s18, PRs #95, #97):** `recoverFromStaleAssets()` in
@@ -1273,7 +1275,7 @@ bar" section for the locked behavior.
   Founder ran the migration + deployed the function live, so all are active. No cookie banner needed.
 - **Impressum built but HIDDEN (s20, PR #127):** `/impressum` exists but is unrouted with all links
   removed until the founder provides a business/service address (it is public by law). Re-enable steps
-  in `CLAUDE.md`, `docs/PHASE2_SETUP.md`.
+  in `CLAUDE.md`, `docs/plans/PHASE2_SETUP.md`.
 - **Writing history records task + text (s20, PRs #128–#129):** the Verlauf now shows the Aufgabe and
   the learner's own submitted text in an expandable, well-structured entry (tip box + labeled sections).
 - **Google OAuth consent branding DONE (s20):** founder completed the Google Cloud Console steps
@@ -1281,7 +1283,7 @@ bar" section for the locked behavior.
 
 - **Broader B1-B2 positioning (s21, PR #140):** landing page re-copied for "German for real life,
   B1-B2 plateau" framing (exam prep repositioned as secondary); new `/about` page with plain-language
-  purpose + Google sign-in data explanation; business plan `docs/BUSINESS_PLAN.md` v1.1; backlog
+  purpose + Google sign-in data explanation; business plan `docs/strategy/BUSINESS_PLAN.md` v1.1; backlog
   #18 documented. Exam naming corrected throughout public copy.
 - **Consent gating fix (s21, PR #141):** sign-up always starts with consent unchecked (previous
   `hasConsented()` pre-check removed); checkbox moved above the Google button so the dependency

@@ -1,7 +1,7 @@
 # Implementation Plan — Genauly Taxonomy & Filtering Redesign
 
 > Approved 2026-06-26. This is the implementation companion to the strategy/research deck
-> in `docs/TAXONOMY_REDESIGN.md` (+ `docs/TAXONOMY_REDESIGN.pptx`). The deck explains *what*
+> in `docs/plans/TAXONOMY_REDESIGN.md` (+ `docs/reference/TAXONOMY_REDESIGN.pptx`). The deck explains *what*
 > and *why*; this document is the staged, linter-gated *how*. UI mockups referenced below
 > live in `preview/taxonomy/`.
 >
@@ -37,7 +37,7 @@ in `VocabularyTrainer.tsx`. There is **no language-level field on any content**,
 sub-topics, no "what's left to practise", and no sense of whether a learner is here for
 **work or daily life**. This works at 11 themes and breaks well before 100.
 
-The approved redesign (see `docs/TAXONOMY_REDESIGN.md` + `docs/TAXONOMY_REDESIGN.pptx`)
+The approved redesign (see `docs/plans/TAXONOMY_REDESIGN.md` + `docs/reference/TAXONOMY_REDESIGN.pptx`)
 moves to a **faceted model with a shallow hierarchy and a top-level Mode lens**:
 
 ```

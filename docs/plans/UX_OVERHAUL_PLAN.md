@@ -13,10 +13,10 @@
 > Status: **FULLY APPROVED** (founder, 2026-07-02): all four Part-H decisions recorded, including
 > the tab-bar default-pin change (approved after a plain-language walkthrough; the s26–28 bar
 > mechanics stay locked and untouched). Drafted session 46 on founder request. Supersedes the ambition level of
-> `docs/FILTER_HARMONIZATION_PLAN.md` (implemented s45; its primitives are kept and reused, see
+> `docs/plans/FILTER_HARMONIZATION_PLAN.md` (implemented s45; its primitives are kept and reused, see
 > Part B). Grounded in a full-app screen review (all 13 routes, mobile + desktop) and the uploaded
-> playbook `docs/Language Learning App Success Factors.docx`. Companion specs:
-> `docs/TAXONOMY_REDESIGN.md`, `docs/AI_PRODUCT_STRATEGY.md`.
+> playbook `docs/reference/Language Learning App Success Factors.docx`. Companion specs:
+> `docs/plans/TAXONOMY_REDESIGN.md`, `docs/strategy/AI_PRODUCT_STRATEGY.md`.
 
 ## Part A: key findings from the app review
 
@@ -319,7 +319,7 @@ PR to `main`, founder verifies live. Phase 0 can ship today; 1 → 2 → 3 in or
    pass is its prerequisite (a whole-screen EN layer needs the EN strings kept as data), so Phase 0
    enables rather than blocks it.
 4. **Can-Do statements: AI-DRAFTED + FOUNDER REVIEW, checked against the data strategy.** This is
-   the exact pattern `docs/DATA_GOVERNANCE.md` already documents: AI drafting is a permitted first
+   the exact pattern `docs/strategy/DATA_GOVERNANCE.md` already documents: AI drafting is a permitted first
    step; the founder is the verifier of record (four-eyes preserved: assistant authors, founder
    approves); nothing ships as trusted until reviewed. Recipe for `src/data/canDo.ts`: one
    provenance row per statement with `origin: "authored"`, `license: "OWNED"`,

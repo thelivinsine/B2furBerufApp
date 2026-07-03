@@ -21,7 +21,7 @@ _Prepared: 2026-06-20 (rev. 3) · Branch `claude/genauly-ai-strategy-8wrlcz` · 
 > Revision 1 of this doc over-indexed on the speaking exam because the developer-facing `CLAUDE.md`
 > header still described the app as "B2 Beruf Speaking Prep"; that header (and the `EXPANSION_PLAN`
 > title) were stale and have been corrected alongside this revision. The repositioning itself shipped
-> in session 21 (live landing page, `/about`, PWA manifest, `docs/BUSINESS_PLAN.md`).
+> in session 21 (live landing page, `/about`, PWA manifest, `docs/strategy/BUSINESS_PLAN.md`).
 >
 > **Scope note.** This is a strategy/advisory document, not product copy. It still follows the
 > house no-em-dash rule. Where it cites evidence, links are inline and collected under "Sources".

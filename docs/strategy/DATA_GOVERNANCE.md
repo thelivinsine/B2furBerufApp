@@ -1,7 +1,7 @@
 # Data Governance & Content Provenance
 
 _Status: **v0.5 (2026-07-03)**. The certification deep-research pass (backlog #19) is now done:
-see **`docs/CERTIFICATION_RESEARCH.md`** for the cited findings. This doc's assumptions held; the
+see **`docs/strategy/CERTIFICATION_RESEARCH.md`** for the cited findings. This doc's assumptions held; the
 refinements from the research are folded in below and flagged "(research-validated 2026-06-15)". The
 research is desk research, not legal advice: the EU AI Act risk classification still needs a lawyer's
 sign-off (backlog #15) before we rely on it externally._

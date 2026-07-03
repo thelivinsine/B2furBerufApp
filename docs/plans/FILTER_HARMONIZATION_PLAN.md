@@ -1,8 +1,8 @@
 # Harmonize the filter / search / header controls across browse pages
 
 > Status: **IMPLEMENTED** (session 45, 2026-06-29). Phase 1 (Wortschatz, Kollokationen, Redemittel) and
-> Phase 2 (QuizHub CEFR labels) both shipped. See `docs/TAXONOMY_REDESIGN.md` for the underlying
-> faceted-model spec and `docs/Language Learning App Success Factors.docx` for the learning-app playbook
+> Phase 2 (QuizHub CEFR labels) both shipped. See `docs/plans/TAXONOMY_REDESIGN.md` for the underlying
+> faceted-model spec and `docs/reference/Language Learning App Success Factors.docx` for the learning-app playbook
 > this aligns with.
 
 ## Context
@@ -18,11 +18,11 @@ behaves differently. From the founder's screenshots and the code audit:
 
 This violates both the project's own taxonomy spec and the uploaded learning-app playbook:
 
-- `docs/TAXONOMY_REDESIGN.md` already prescribes the intended model (Slide 13–15): **Tier-1 core
+- `docs/plans/TAXONOMY_REDESIGN.md` already prescribes the intended model (Slide 13–15): **Tier-1 core
   controls always visible, Tier-2/3 facets behind one "Filter" sheet, live counts, greyed
   zero-yield options, URL-encoded state, search scoped by the active facets, Mode as a lens that
   never gatekeeps**. It was simply never applied uniformly.
-- `docs/Language Learning App Success Factors.docx`: the **Coherence Principle** ("exclude all
+- `docs/reference/Language Learning App Success Factors.docx`: the **Coherence Principle** ("exclude all
   non-essential graphics... screen clutter competes for limited working memory"), **Friction
   Reduction** ("simplify the UI to direct immediate focus to the primary learning activity"), and
   **Discoverability / Intelligent Search** ("maintain an open, searchable content hub").

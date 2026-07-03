@@ -3,7 +3,7 @@
 This document summarises Genauly's security posture, the hardening work done, and the
 **founder action items** that can only be completed in the Supabase dashboard.
 
-The full audit and remediation plan is in `docs/SECURITY_AUDIT_PLAN.pdf`.
+The full audit and remediation plan is in `docs/reference/SECURITY_AUDIT_PLAN.pdf`.
 
 ## Posture (what's already right)
 

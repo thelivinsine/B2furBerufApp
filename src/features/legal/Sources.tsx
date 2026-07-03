@@ -14,7 +14,7 @@ import { LegalChrome, Section, type Lang } from "./LegalChrome";
 
 /**
  * /sources — the auto-generated "Sources & Licenses" page (Phase 2 of the data
- * governance roadmap, see docs/DATA_GOVERNANCE.md). It is built entirely from
+ * governance roadmap, see docs/strategy/DATA_GOVERNANCE.md). It is built entirely from
  * the provenance register (src/data/provenance.ts), so it stays in sync with the
  * content automatically: every learning item, the public reference it traces to,
  * and its licence. This is the human-readable, public-facing view of the

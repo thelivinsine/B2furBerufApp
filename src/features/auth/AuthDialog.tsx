@@ -21,7 +21,7 @@ export type AuthIntent = "signup" | "login";
 /**
  * Toggle for the "Weiter mit Google" button. Turned on once the Google OAuth
  * provider is configured in Supabase + Google Cloud (Client ID / Secret saved
- * in the Supabase Google provider settings). See docs/PHASE2_SETUP.md §8 for
+ * in the Supabase Google provider settings). See docs/plans/PHASE2_SETUP.md §8 for
  * the exact setup steps and redirect URLs.
  */
 const GOOGLE_ENABLED = true;
