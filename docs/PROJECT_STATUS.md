@@ -1830,11 +1830,21 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 ## Resume here (next session)
 
 **Handoff after session 49 (2026-07-02).** Phases 0–4 merged to `main`; **Phase 5's IA restructure
-shipped ✅** (session 49, see the session-49 log below). The four-zone nav is live: new **Anwenden hub**
-(`/anwenden`), new **Bibliothek hub** (`/library?tab=…`) with the four old library routes redirecting in,
-the founder-unlocked `DEFAULT_PINNED_TABS` four-zone default, and a settings-store persist migration
-(`version: 1`) remapping existing users' pins/More-order. The s26–28 bottom-bar mechanics stayed locked.
-Branch `claude/next-step-kve6wf` (reassigned per session; `main` is the source of truth).
+shipped ✅ and founder-verified live** (session 49, see the session-49 log below). The four-zone nav is
+live: new **Anwenden hub** (`/anwenden`), new **Bibliothek hub** (`/library?tab=…`) with the four old
+library routes redirecting in, the founder-unlocked `DEFAULT_PINNED_TABS` four-zone default, and a
+settings-store persist migration (`version: 1`) remapping existing users' pins/More-order. The s26–28
+bottom-bar mechanics stayed locked. Shipped in **PR #262**, squash-merged as **`c317047`**; the founder
+confirmed the new bottom nav on the deployed site. Branch `claude/next-step-kve6wf` (reassigned per
+session; `main` is the source of truth).
+
+**⚠️ Deploy note (recurring):** the `pages.yml` **deploy** job failed on the `c317047` merge with GitHub's
+transient `##[error]Deployment failed, try again later` on the `actions/deploy-pages` step (the build +
+artifact upload succeeded; it is a Pages-platform flake, not a code issue). The **same flake also hit the
+Phase-4 merge `74ccd7c`.** Remedy: re-run the failed deploy job (GitHub Actions → the failed
+"Deploy site to GitHub Pages" run → "Re-run failed jobs"); attempt 2 went green both times. It has now
+recurred twice, so consider hardening `pages.yml` with an automatic retry on the deploy step if it keeps
+happening.
 
 **Next work = the Phase-5 facet-registry tail (Opus 4.8), the only remaining Phase-5 items:**
 1. Central **facet registry** `src/lib/facets.ts` (facet defs declared once per content type, derived
