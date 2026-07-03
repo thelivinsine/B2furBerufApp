@@ -823,6 +823,49 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       budget, nothing)? Accessibility (reduced motion, screen readers).
     - Recommended model: **Fable** for the interaction-design brainstorm, **Sonnet** for the build.
 
+### Product-evaluation findings (added 2026-07-03, from `docs/PRODUCT_EVALUATION.md`)
+
+The five items below (#26–#30) are the recommendations from scoring Genauly against the learning-science
+playbook (`docs/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`, Section 11). Each carries a **priority** on a
+value·evidence ÷ effort basis (P1 = do first, P3 = nice-to-have) and names the evaluation dimension /
+failure mode it closes. Suggested sequence: land the cheap wins that ride alongside other work (#26a
+latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 paired to the AI roadmap.
+
+26. **FSRS scheduler + response-latency capture — Priority P1 (High).** _Fixes eval dim 1; failure mode
+    #1._ The playbook's single most-cited upgrade: replace the SM-2 scheduler (`src/engine/srs.ts`) with
+    **FSRS** (stability / difficulty / retrievability), which the source reports cuts review volume ~23%
+    at equal retention, and score reviews on **latency, not just correctness**. Split into two sub-steps:
+    - **26a (quick win, do now):** start *recording* per-review response latency in the review flow and
+      SRS card state, even before changing the algorithm, so the training data exists when FSRS lands.
+      Small, low-risk, unblocks 26b. Effort: **S**.
+    - **26b:** swap SM-2 → FSRS behind the existing `engine/srs.ts` interface (a drop-in the UX plan
+      appendix already anticipates), keeping "mastered" cards in long-term rotation. Effort: **M–L**.
+    - Recommended model: **Opus** (algorithm + engine correctness).
+27. **Speech-first, latency-tracked production drill — Priority P1 (High).** _Fixes eval dim 5 (the
+    lowest score, 3/5); failure mode #2._ The blueprint's top exercise recommendation: hands-free,
+    time-pressured speech-recognition drills that build spoken fluency, which today's scripted
+    option-selection speaking does not. **MVP:** a new `SessionPlayer` block that prompts the learner to
+    *say* the target under a soft timer, captures it via the existing Web Speech STT (`src/engine/
+    speech.ts`, already feature-detected), and scores accuracy + latency; graceful text fallback when STT
+    is unavailable. Upgrade path to Azure/SpeechAce phoneme scoring behind a paid tier later. Effort:
+    **M–L.** Recommended model: **Opus** (new session block + speech integration).
+28. **Guess-before-reveal (errorful learning) — Priority P2 (Medium, quick win).** _Fixes eval dim 1;
+    failure mode #3._ Prompt a quick guess before showing a translation/answer (anticipatory prediction
+    error), a cheap, high-evidence technique the playbook calls out. **MVP:** an optional "guess first"
+    step in the existing flashcard/quiz components; measure repeat-error rate. Effort: **S.** Recommended
+    model: **Sonnet**.
+29. **Hook "investment" surface: custom decks / word capture — Priority P2 (Medium).** _Fixes eval dim 3;
+    failure mode #4._ Today users build little "stored value", so switching cost stays low. **MVP:** a
+    "Zu meiner Liste" / save-word action and a personal list that feeds the SRS with the learner's own
+    context; later, import a word/sentence from anywhere. Pairs naturally with the AI sentence-mining idea
+    in `docs/AI_PRODUCT_STRATEGY.md` (idea 11). Effort: **M** (touches store + cloudSync + a new surface).
+    Recommended model: **Opus** (store/sync wiring), **Sonnet** for the UI.
+30. **Talker variability: multi-voice TTS + speed toggle — Priority P3 (Low, quick win).** _Fixes eval
+    dim 1/2 (phonological transfer); failure mode #5._ A single TTS voice ties schemas to one sanitized
+    speaker; the playbook flags multi-voice/speed exposure as a productive desirable difficulty. **MVP:**
+    let `engine/speech.ts` rotate among available `speechSynthesis` voices per session block, plus a
+    speed toggle in settings. Effort: **S.** Recommended model: **Sonnet**.
+
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
 > **Fable available again (2026-07-02):** the earlier restriction (noted 2026-06-15) is lifted; Fable

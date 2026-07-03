@@ -139,3 +139,8 @@ Two refinements the framework points to are open: rewards do not yet explicitly 
 + CEFR Can-Do + decluttered UI). The gains left on the table are concentrated in **production mechanics**
 (speech-first) and **scheduler intelligence** (FSRS + latency), which are also the two upgrades the
 source document argues have the largest effect on durable, transferable fluency.
+
+> **Scoped into the backlog (2026-07-03):** these five recommendations are now backlog items
+> **#26–#30** in `docs/PROJECT_STATUS.md`, each with a priority rating (P1: FSRS+latency #26,
+> speech-first #27; P2: guess-first #28, custom decks #29; P3: talker variability #30) and a suggested
+> build sequence.
