@@ -21,6 +21,7 @@ _Last reviewed: 2026-07-03 (docs audit)._
 | `AI_PRODUCT_STRATEGY.md` | Research-backed AI feature playbook (rev 3, June 2026). Dated, cited, confidence-flagged. | 🟢 Current |
 | `BUSINESS_PLAN.md` | Business case, market sizing, competitive landscape, unit economics. | 🟢 Current (v1.1) |
 | `CERTIFICATION_RESEARCH.md` | EU AI Act risk-class + ISO/SOC-2 certification research (backlog #19). | 🟢 Current |
+| `PRODUCT_EVALUATION.md` | Self-assessment of Genauly against the learning-science playbook (7-dimension scorecard + recommendations). | 🟢 Current (2026-07-03) |
 | `DATA_GOVERNANCE.md` | Content provenance & licensing policy (traceability-over-ownership, license allowlist, four-eyes). | 🟢 Current (v0.5) |
 | `SECURITY.md` | Security posture summary + founder action items. Full audit in `SECURITY_AUDIT_PLAN.pdf`. | 🟢 Current |
 
@@ -42,7 +43,8 @@ _Last reviewed: 2026-07-03 (docs audit)._
 
 | File | What it is | Status |
 |---|---|---|
-| `Language Learning App Success Factors.docx` | Uploaded learning-app playbook; cited by the UX/AI/filter docs. | 📎 Reference (binary) |
+| `Language Learning App Success Factors.docx` | Uploaded learning-app playbook (the authoritative original); cited by the UX/AI/filter docs. A readable Markdown transcription is in `LANGUAGE_LEARNING_SUCCESS_FACTORS.md`. | 📎 Reference (binary) |
+| `LANGUAGE_LEARNING_SUCCESS_FACTORS.md` | Readable text+table transcription of the `.docx` playbook (auto-extracted 2026-07-03). | 🟢 Reference |
 | `SECURITY_AUDIT_PLAN.pdf` | Full security audit + remediation plan behind `SECURITY.md`. | 📎 Reference (binary) |
 | `TAXONOMY_REDESIGN.pptx` | Slide version of the taxonomy deck. | 📎 Reference (binary) |
 | `prompt-log-raw.jsonl` | Raw prompt capture from the old `UserPromptSubmit` auto-logging hook (removed 2026-06-25). **Frozen/superseded** by the curated `SESSION_PROMPT_LOG.md`; retained only as a historical raw artifact; do not treat as maintained. | 🧊 Frozen |
