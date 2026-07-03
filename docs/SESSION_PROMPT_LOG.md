@@ -1746,4 +1746,43 @@ Branch: `claude/review-previous-session-69pxat`.
   modified `src/components/layout/nav-items.ts`, `src/components/layout/route-icons.tsx`,
   `src/store/useSettingsStore.ts`, `src/features/library/LibrarySwitcher.tsx`,
   `src/features/simulation/SimulationHub.tsx`, `src/features/dashboard/Dashboard.tsx`, `src/router.tsx`,
-  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; commit + PR # to be filled on push.
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`; commit `6f373ee`, PR #262,
+  squash-merged to `main` as `c317047`.
+
+## Entry 105 — 2026-07-02 (session 49)
+- **Branch:** `claude/next-step-kve6wf`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > What's left in the ux overhaul plan? is everything complete?
+- **Response summary:** Reported that Phases 0–4 are merged and Phase 5's IA restructure just shipped, so
+  the only remaining work is the **Phase-5 tail**: (1) the central facet registry (`src/lib/facets.ts`)
+  + dropping the 100-option Verb facet + the ≤12-option rule, and (2) the plan's in-page removals
+  (retire the standalone `/quiz` hub, remove the Vokabeltrainer Karteikarten/Quiz tabs). Noted the parked
+  items (EN-peek backlog #25, the Appendix "later bets") are explicitly out of scope.
+- **Artifacts:** none (informational).
+
+## Entry 106 — 2026-07-02 (session 49)
+- **Branch:** `claude/next-step-kve6wf`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > are the changes live?
+- **Response summary:** Checked the `pages.yml` deploy run for the merge commit `c317047` via the GitHub
+  Actions API. The **build job succeeded** (artifact uploaded) but the **deploy job failed** on GitHub's
+  `actions/deploy-pages` step with `Deployment failed, try again later` — a transient GitHub Pages
+  platform flake, not a code issue (the same failure had also hit the Phase-4 merge `74ccd7c`).
+  Re-ran the failed deploy job; attempt 2 of the deploy went green (environment `https://genauly.de/`),
+  so the changes went live. Flagged that this Pages flake has now recurred twice and offered to add an
+  automatic retry to `pages.yml`.
+- **Artifacts:** re-ran workflow run `28622060959` (deploy attempt 2, success). No code changes.
+
+## Entry 107 — 2026-07-02 (session 49)
+- **Branch:** `claude/next-step-kve6wf`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > yes, I see the changes. document the session
+- **Response summary:** Founder confirmed the four-zone nav is live on the deployed site. Finalised the
+  session documentation: filled the PR/merge references into the session-49 entries here, added entries
+  105–107 for the follow-up prompts, and updated `docs/PROJECT_STATUS.md` ("Resume here" marked
+  founder-verified live + PR #262/`c317047`, plus a new ops note recording the recurring `pages.yml`
+  "Deployment failed, try again later" flake and the re-run remedy).
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`, `docs/PROJECT_STATUS.md`.
