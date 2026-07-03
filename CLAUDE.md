@@ -116,7 +116,9 @@ Heute · Bibliothek · Anwenden · Fortschritt). Founder-approved plan, executed
 - **Provenance register (`src/data/provenance.ts`, added 2026-06-15):** one `ProvenanceEntry` row per
   content_id, tracking `origin` (authored/sourced/adapted), `reference` (Wiktionary/DWDS/Tatoeba URL),
   `license` (SPDX from the allowlist), `review_status` (draft/verified), and who added/verified it.
-  All 769 existing items have stub rows (`review_status: "draft"`). The back-fill queue (items with empty
+  All 1,111 content items have provenance rows, every one carrying a non-empty `reference` (so the
+  back-fill queue is empty); 1,086 are `review_status: "draft"` and 25 are `"verified"` (the founder-
+  approved Can-Do bank). The back-fill queue (items with empty
   `reference`) shows as linter warnings. **When adding new content:** add a corresponding row in
   `provenance.ts` at the same time — the linter errors if a content_id has no row. Use
   `pnpm generate:provenance` only to bootstrap a fresh register (it overwrites); add new rows manually

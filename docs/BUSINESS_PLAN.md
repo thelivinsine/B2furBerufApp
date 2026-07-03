@@ -90,7 +90,7 @@ Genauly is built around the three things exam-prep learners need most and curren
 
 1. **Exam-format speaking practice.** The telc Deutsch-Test für den Beruf B2 oral exam Teil 3 is an explicitly cooperative workplace planning dialogue ("Gemeinsam eine Aufgabe lösen"). Genauly's branching dialogues replicate that format with lifelike workplace scenarios, not generic conversation. ([telc DTB B2 exam guide](https://www.fragamalia.de/post/deutsch-test-f%C3%BCr-den-beruf-b2))
 
-2. **Workplace vocabulary with retention.** 350+ words and 120 collocations (Nomen-Verb pairs) sourced from telc B2 Beruf word fields, with spaced repetition so learners remember them under exam pressure.
+2. **Workplace vocabulary with retention.** 500+ words and ~400 collocations (Nomen-Verb pairs) sourced from telc B2 Beruf word fields (528 words and 396 collocations as of 2026-07, and growing), with spaced repetition so learners remember them under exam pressure.
 
 3. **AI feedback on writing and pronunciation.** One prioritized tip per submission, powered by Claude Haiku with aggressive input caching, keeps cost marginal while giving learners the kind of targeted feedback that previously required a human tutor.
 

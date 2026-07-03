@@ -21,7 +21,13 @@
 > if wanted), and `sector`/`workSituation` tagging can be broadened beyond the starter set.
 > Carry-over: the `cefr` tags are AI-drafted and still need human verification (provenance
 > `draft→verified`). Sub-themes (Phase 2) cover 3 of 11 themes (`behoerde`, `customer`, `meetings`).
-> **Next milestone: Phase 4** (cross-module "Related" panel + mode/level-aware SRS review).
+>
+> **Update (2026-07-03): ALL PHASES 0–4 ARE SHIPPED ✅.** Phase 4 (cross-module "Related" panel +
+> mode/level-aware SRS review) shipped in session 43, and Phase 3's remaining items (redemittel Register
+> filter) landed in the s45 filter harmonization. The whole taxonomy redesign is live. Remaining are
+> **optional follow-ups, not a next phase:** human-verify the AI-drafted `cefr` tags (provenance
+> `draft→verified`), broaden `sector`/`workSituation` tagging beyond the starter set, and extend
+> sub-themes past 3 of 11. See `docs/PROJECT_STATUS.md` for current status.
 
 ## Context
 
@@ -187,7 +193,7 @@ as before; counts add up to the theme total; lint + build green.
 
 ---
 
-## Phase 3 — Faceted browser + Work-mode facets + goal cards ⏳ IN PROGRESS
+## Phase 3 — Faceted browser + Work-mode facets + goal cards ✅ SHIPPED (3a/3b/3c s43; redemittel Register filter s45)
 
 > **Sub-milestone 3a SHIPPED (session 43):** step 4 (mode-aware intent/goal cards) is live on the
 > dashboard (`src/features/dashboard/intentCards.ts` + `Dashboard.tsx`). Cards carry a pre-built
