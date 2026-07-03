@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText, Zap } from "lucide-react";
-import type { VocabItem } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -12,98 +11,17 @@ import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { LibrarySwitcher, ScopeChip } from "@/features/library/LibrarySwitcher";
-import {
-  applyFacets,
-  type FacetDef,
-  type FacetSelection,
-} from "@/features/shared/FacetSheet";
-import { CEFR_ORDER, defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
+import { applyFacets, type FacetSelection } from "@/features/shared/FacetSheet";
+import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
+import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
 import { VocabList } from "./VocabList";
 import { SubThemePicker } from "./SubThemePicker";
 
-const POS_ORDER = ["noun", "verb", "adjective", "adverb", "phrase", "connector"];
-const POS_LABEL: Record<string, string> = {
-  noun: "Nomen",
-  verb: "Verb",
-  adjective: "Adjektiv",
-  adverb: "Adverb",
-  phrase: "Phrase",
-  connector: "Konnektor",
-};
-const SECTOR_ORDER = ["care", "office", "trades", "it", "retail", "hospitality"];
-const SECTOR_LABEL: Record<string, string> = {
-  care: "Pflege",
-  office: "Büro",
-  trades: "Handwerk",
-  it: "IT",
-  retail: "Handel",
-  hospitality: "Gastgewerbe",
-};
-const SITUATION_ORDER = [
-  "meeting",
-  "shift-handover",
-  "customer-call",
-  "instructions",
-  "onboarding",
-  "sick-leave",
-  "review",
-];
-const SITUATION_LABEL: Record<string, string> = {
-  meeting: "Besprechung",
-  "shift-handover": "Übergabe",
-  "customer-call": "Kundengespräch",
-  instructions: "Unterweisung",
-  onboarding: "Einarbeitung",
-  "sick-leave": "Krankmeldung",
-  review: "Feedback",
-};
-const present = <T,>(order: T[], has: (v: T) => boolean) => order.filter(has);
-
 function normalise(s: string) {
   return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
 }
-
-const CEFR_FACET: FacetDef<VocabItem> = {
-  id: "cefr",
-  label: "Stufe (CEFR)",
-  hint: "Mehrfachauswahl",
-  options: present(CEFR_ORDER, (c) => vocabulary.some((v) => v.cefr === c)).map((c) => ({
-    value: c,
-    label: c,
-  })),
-  get: (v) => v.cefr,
-};
-const POS_FACET: FacetDef<VocabItem> = {
-  id: "pos",
-  label: "Wortart",
-  options: present(POS_ORDER, (p) => vocabulary.some((v) => v.pos === p)).map((p) => ({
-    value: p,
-    label: POS_LABEL[p],
-  })),
-  get: (v) => v.pos,
-};
-const SECTOR_FACET: FacetDef<VocabItem> = {
-  id: "sector",
-  label: "Branche",
-  options: present(SECTOR_ORDER, (s) => vocabulary.some((v) => v.sector === s)).map((s) => ({
-    value: s,
-    label: SECTOR_LABEL[s],
-  })),
-  get: (v) => v.sector,
-};
-const SITUATION_FACET: FacetDef<VocabItem> = {
-  id: "workSituation",
-  label: "Situation",
-  options: present(SITUATION_ORDER, (s) => vocabulary.some((v) => v.workSituation === s)).map((s) => ({
-    value: s,
-    label: SITUATION_LABEL[s],
-  })),
-  get: (v) => v.workSituation,
-};
-const WORK_FACETS = [SECTOR_FACET, SITUATION_FACET];
-const ALL_FACETS = [CEFR_FACET, POS_FACET, SECTOR_FACET, SITUATION_FACET];
 
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
@@ -138,10 +56,7 @@ export function VocabularyTrainer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, sub]);
 
-  const facets = useMemo(
-    () => (learningMode === "work" ? [CEFR_FACET, POS_FACET, ...WORK_FACETS] : [CEFR_FACET, POS_FACET]),
-    [learningMode],
-  );
+  const facets = useMemo(() => vocabFacets(learningMode), [learningMode]);
 
   const activeTheme = theme !== "all" ? themeById(theme) : undefined;
   const subThemes = activeTheme?.subThemes ?? [];
@@ -152,9 +67,9 @@ export function VocabularyTrainer() {
 
   const selection: FacetSelection = useMemo(() => {
     const s: FacetSelection = {};
-    for (const f of ALL_FACETS) {
-      const raw = params.get(f.id);
-      if (raw) s[f.id] = raw.split(",");
+    for (const id of VOCAB_FACET_IDS) {
+      const raw = params.get(id);
+      if (raw) s[id] = raw.split(",");
     }
     return s;
   }, [params]);
@@ -195,7 +110,7 @@ export function VocabularyTrainer() {
   const hiddenLabel = bandActive && bandLimited.length < searched.length ? hiddenBandsLabel(level) : null;
 
   const items = useMemo(() => applyFacets(bandLimited, facets, selection), [bandLimited, facets, selection]);
-  const facetKey = ALL_FACETS.map((f) => params.get(f.id) ?? "").join("|");
+  const facetKey = VOCAB_FACET_IDS.map((id) => params.get(id) ?? "").join("|");
 
   const activeChips = facets.flatMap((f) =>
     (selection[f.id] ?? []).map((v) => ({
@@ -216,10 +131,10 @@ export function VocabularyTrainer() {
 
   const setSelection = (next: FacetSelection) => {
     const p = new URLSearchParams(params);
-    for (const f of ALL_FACETS) {
-      const v = next[f.id];
-      if (v && v.length) p.set(f.id, v.join(","));
-      else p.delete(f.id);
+    for (const id of VOCAB_FACET_IDS) {
+      const v = next[id];
+      if (v && v.length) p.set(id, v.join(","));
+      else p.delete(id);
     }
     setParams(p, { replace: true });
   };
