@@ -1814,3 +1814,17 @@ Branch: `claude/review-previous-session-69pxat`.
   `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`,
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/UX_OVERHAUL_PLAN.md`, `docs/SESSION_PROMPT_LOG.md`;
   PR #264 (`1141cde`) + the final tab-removal PR.
+
+## Entry 109 — 2026-07-03 (session 49 cont.)
+- **Branch:** `claude/next-step-kve6wf`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Final documentation pass after the Phase-5 tail shipped. Confirmed the tail is
+  deployed live: the facet-registry deploy (`1141cde`) and the Vokabeltrainer-tab-removal deploy
+  (`ae67862`, PR #265) both went green, with `ae67862` succeeding on the **first** Pages attempt (no
+  recurrence of the "Deployment failed, try again later" flake this time). Updated
+  `docs/PROJECT_STATUS.md` "Resume here" to record that all three Phase-5 PRs (#262/#264/#265) are live,
+  and added this log entry. With this, session 49 is fully documented and the whole UX overhaul roadmap
+  (Phases 0–5) is complete and deployed.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.

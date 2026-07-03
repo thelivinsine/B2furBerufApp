@@ -1832,7 +1832,8 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 **Handoff after session 49 (2026-07-02). Phase 5 is COMPLETE ✅ — the whole UX overhaul roadmap
 (Phases 0–5) is now shipped.** The IA restructure (PR #262, `c317047`) is founder-verified live; the
 Tier-3 tail then shipped in two more PRs: the **facet registry + Verb-facet drop** (PR #264, `1141cde`)
-and the **Vokabeltrainer tab removal** (this session's final PR). Recap of the four-zone nav: new
+and the **Vokabeltrainer tab removal** (PR #265, `ae67862`). **All three PRs are deployed live** (the
+`ae67862` Pages deploy went green on the first attempt, no flake this time). Recap of the four-zone nav: new
 **Anwenden hub** (`/anwenden`), new **Bibliothek hub** (`/library?tab=…`) with the four old library
 routes redirecting in, the founder-unlocked `DEFAULT_PINNED_TABS` four-zone default, and a settings-store
 persist migration (`version: 1`) remapping existing users' pins/More-order. The s26–28 bottom-bar
