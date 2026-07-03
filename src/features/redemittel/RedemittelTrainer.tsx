@@ -9,11 +9,8 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  applyFacets,
-  type FacetDef,
-  type FacetSelection,
-} from "@/features/shared/FacetSheet";
+import { applyFacets, type FacetSelection } from "@/features/shared/FacetSheet";
+import { redemittelFacets } from "@/lib/facets";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
@@ -31,17 +28,8 @@ const registerLabel: Record<string, { text: string; variant: "muted" | "default"
   diplomatic: { text: "diplomatisch", variant: "accent" },
 };
 
-const registerPresent = ["neutral", "formal", "diplomatic"].filter((r) =>
-  redemittel.some((p) => p.register === r),
-);
-const REDEMITTEL_FACETS: FacetDef<RedemittelPhrase>[] = [
-  {
-    id: "register",
-    label: "Register",
-    options: registerPresent.map((r) => ({ value: r, label: registerLabel[r].text })),
-    get: (p) => p.register,
-  },
-];
+// Facets come from the central registry (Phase 5): Register only.
+const REDEMITTEL_FACETS = redemittelFacets();
 
 export function RedemittelTrainer() {
   const [tab, setTab] = useState("browse");

@@ -11,55 +11,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
-import {
-  applyFacets,
-  type FacetDef,
-  type FacetSelection,
-} from "@/features/shared/FacetSheet";
+import { applyFacets, type FacetSelection } from "@/features/shared/FacetSheet";
+import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { LibrarySwitcher, ScopeChip } from "@/features/library/LibrarySwitcher";
-import { CEFR_ORDER, defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
+import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 
 function normalise(s: string) {
   return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
 }
 
-type CollocationItem = (typeof collocations)[number];
-
-const REGISTER_LABEL: Record<string, string> = {
-  neutral: "neutral",
-  formal: "formell",
-  diplomatic: "diplomatisch",
-};
-const cefrPresent = CEFR_ORDER.filter((c) => collocations.some((x) => x.cefr === c));
-const registerPresent = ["neutral", "formal", "diplomatic"].filter((r) =>
-  collocations.some((x) => x.register === r),
-);
-const allVerbs = [...new Set(collocations.map((c) => c.verb))].sort();
-
-const COLLOCATION_FACETS: FacetDef<CollocationItem>[] = [
-  {
-    id: "cefr",
-    label: "Stufe (CEFR)",
-    hint: "Mehrfachauswahl",
-    options: cefrPresent.map((c) => ({ value: c, label: c })),
-    get: (c) => c.cefr,
-  },
-  {
-    id: "register",
-    label: "Register",
-    options: registerPresent.map((r) => ({ value: r, label: REGISTER_LABEL[r] })),
-    get: (c) => c.register,
-  },
-  {
-    id: "verb",
-    label: "Verb",
-    options: allVerbs.map((v) => ({ value: v, label: v })),
-    get: (c) => c.verb,
-  },
-];
-
-const ALL_FACET_IDS = COLLOCATION_FACETS.map((f) => f.id);
+// Facets come from the central registry (Phase 5): CEFR + Register. The old Verb
+// facet (100+ options) was dropped there; typing a verb into the search box
+// finds every collocation that uses it.
+const COLLOCATION_FACETS = collocationFacets();
+const ALL_FACET_IDS = COLLOCATION_FACET_IDS;
 
 type Collocation = (typeof collocations)[number];
 
@@ -271,7 +237,7 @@ export function CollocationsBrowser() {
         </div>
       ) : (
         <motion.div
-          key={`${themeParam}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${params.get("verb") ?? ""}__${search}__${showAllLevels}`}
+          key={`${themeParam}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${search}__${showAllLevels}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.15 }}
