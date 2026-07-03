@@ -1786,3 +1786,31 @@ Branch: `claude/review-previous-session-69pxat`.
   founder-verified live + PR #262/`c317047`, plus a new ops note recording the recurring `pages.yml`
   "Deployment failed, try again later" flake and the re-run remedy).
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`, `docs/PROJECT_STATUS.md`.
+
+## Entry 108 — 2026-07-03 (session 49 cont.)
+- **Branch:** `claude/next-step-kve6wf`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > continue with it
+- **Prompt (verbatim, follow-up after a dropped AskUserQuestion):**
+  > Continue from where you left off.
+- **Response summary:** Completed the Phase-5 tail in two PRs. **PR #264 (`1141cde`) — facet registry:**
+  new `src/lib/facets.ts` declaring each content type's facets once (`vocabFacets`/`collocationFacets`/
+  `redemittelFacets` + `*_FACET_IDS`, derived from the taxonomy enums), consumed by VocabularyTrainer /
+  CollocationsBrowser / RedemittelTrainer; **dropped the 100-option Verb facet** and codified the
+  **≤12-option rule** (`MAX_FACET_OPTIONS` + a dev-time warning). No UI change. **Final PR — Vokabeltrainer
+  tab removal:** retired the in-page Karteikarten + Quiz tabs behind a reversible `SHOW_PRACTICE_TABS =
+  false` flag; the page is now the browse/inspect surface and practice flows through the toolbar's
+  "Üben → composed session"; hero copy updated. Left the standalone `/quiz` hub as a live off-nav route
+  reachable via deep links (no hard redirect, to preserve the GrammarHub/`practiceAreas` deep-link
+  intents). Tried to confirm the visible removals via `AskUserQuestion` first, but the tool call failed
+  (permission stream closed); given the two "continue" instructions I proceeded, doing the removal
+  reversibly so the founder can veto it live. Verified each step with `pnpm typecheck` + `pnpm
+  lint:content` + `pnpm build` (all green) and headless-Chromium mobile smokes (the three filter sheets
+  render with no Verb facet; the vocab page shows the word list with no Karteikarten/Quiz tabs and
+  "Üben" → `/session`, zero console errors). With this, **the whole UX overhaul roadmap (Phases 0–5) is
+  complete.** Updated `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/UX_OVERHAUL_PLAN.md`, and this log.
+- **Artifacts:** new `src/lib/facets.ts`; modified `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`,
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/UX_OVERHAUL_PLAN.md`, `docs/SESSION_PROMPT_LOG.md`;
+  PR #264 (`1141cde`) + the final tab-removal PR.

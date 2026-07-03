@@ -1,13 +1,14 @@
 # UX Overhaul Plan: from tool drawer to learning loop
 
-> **Execution status (session 49, 2026-07-02):** Phase 0 ✅ merged · Phase 1 ✅ merged · Phase 2 ✅
-> merged · Phase 3 ✅ merged (as a **soft merge** per founder choice) · Phase 4 ✅ merged
-> (Can-Do bank + linter + Fortschritt milestone/diagnose UI + Heute theme-grid relocation) · Phase 5
-> 🟨 **IA restructure shipped** (session 49: Anwenden hub + Bibliothek `/library?tab=` hard merge with
-> old-route redirects + four-zone `DEFAULT_PINNED_TABS` re-map + settings-store migration). **Remaining
-> Phase-5 tail:** the facet registry (`lib/facets.ts`) + Verb-facet drop + ≤12-option rule, and the
-> in-page removals (retire the standalone Quiz hub, remove the Vokabeltrainer Karteikarten/Quiz tabs),
-> both deliberately deferred. See `docs/PROJECT_STATUS.md` "Resume here" for the exact handoff.
+> **Execution status (session 49, 2026-07-02): ALL PHASES COMPLETE ✅.** Phase 0 ✅ · Phase 1 ✅ ·
+> Phase 2 ✅ · Phase 3 ✅ (soft merge per founder choice; the hard `/library` merge landed in Phase 5) ·
+> Phase 4 ✅ (Can-Do bank + linter + Fortschritt milestone/diagnose UI + Heute theme-grid relocation) ·
+> **Phase 5 ✅** (session 49, three PRs: **#262** Anwenden hub + Bibliothek `/library?tab=` hard merge +
+> old-route redirects + four-zone `DEFAULT_PINNED_TABS` re-map + settings-store migration, founder-verified
+> live; **#264** central facet registry `lib/facets.ts` + Verb-facet drop + ≤12-option rule; and the
+> Vokabeltrainer Karteikarten/Quiz **tab removal** behind a reversible `SHOW_PRACTICE_TABS` flag). The
+> standalone `/quiz` hub is off the nav but kept reachable via deep links (no hard redirect, on purpose).
+> See `docs/PROJECT_STATUS.md` "Resume here" for the post-roadmap next steps.
 >
 > Status: **FULLY APPROVED** (founder, 2026-07-02): all four Part-H decisions recorded, including
 > the tab-bar default-pin change (approved after a plain-language walkthrough; the s26–28 bar

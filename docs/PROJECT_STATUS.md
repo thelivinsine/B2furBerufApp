@@ -1829,14 +1829,15 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 49 (2026-07-02).** Phases 0–4 merged to `main`; **Phase 5's IA restructure
-shipped ✅ and founder-verified live** (session 49, see the session-49 log below). The four-zone nav is
-live: new **Anwenden hub** (`/anwenden`), new **Bibliothek hub** (`/library?tab=…`) with the four old
-library routes redirecting in, the founder-unlocked `DEFAULT_PINNED_TABS` four-zone default, and a
-settings-store persist migration (`version: 1`) remapping existing users' pins/More-order. The s26–28
-bottom-bar mechanics stayed locked. Shipped in **PR #262**, squash-merged as **`c317047`**; the founder
-confirmed the new bottom nav on the deployed site. Branch `claude/next-step-kve6wf` (reassigned per
-session; `main` is the source of truth).
+**Handoff after session 49 (2026-07-02). Phase 5 is COMPLETE ✅ — the whole UX overhaul roadmap
+(Phases 0–5) is now shipped.** The IA restructure (PR #262, `c317047`) is founder-verified live; the
+Tier-3 tail then shipped in two more PRs: the **facet registry + Verb-facet drop** (PR #264, `1141cde`)
+and the **Vokabeltrainer tab removal** (this session's final PR). Recap of the four-zone nav: new
+**Anwenden hub** (`/anwenden`), new **Bibliothek hub** (`/library?tab=…`) with the four old library
+routes redirecting in, the founder-unlocked `DEFAULT_PINNED_TABS` four-zone default, and a settings-store
+persist migration (`version: 1`) remapping existing users' pins/More-order. The s26–28 bottom-bar
+mechanics stayed locked throughout. Branch `claude/next-step-kve6wf` (reassigned per session; `main` is
+the source of truth).
 
 **⚠️ Deploy note (recurring):** the `pages.yml` **deploy** job failed on the `c317047` merge with GitHub's
 transient `##[error]Deployment failed, try again later` on the `actions/deploy-pages` step (the build +
@@ -1846,22 +1847,28 @@ Phase-4 merge `74ccd7c`.** Remedy: re-run the failed deploy job (GitHub Actions 
 recurred twice, so consider hardening `pages.yml` with an automatic retry on the deploy step if it keeps
 happening.
 
-**Next work = the Phase-5 facet-registry tail (Opus 4.8), the only remaining Phase-5 items:**
-1. Central **facet registry** `src/lib/facets.ts` (facet defs declared once per content type, derived
-   from the taxonomy enums; pages call `facetsFor("vocab", mode)` instead of hand-wiring), + **drop the
-   100-option Verb facet** from the Kollokationen sheet (global/scoped search covers verb lookup) + the
-   **≤12-option facet-hygiene rule**. This is the lowest-value/lowest-frequency layer (Tier 3), which is
-   why it was split out of the nav PR.
-2. The plan's in-page removals, **held back in session 49 to avoid a surprising feature-removal in the
-   nav PR** (do only after a quick founder heads-up, since they remove visible surfaces): retire the
-   standalone `/quiz` hub (currently kept as a working route, off the nav, reachable via deep links +
-   the Vokabeltrainer Quiz tab), and remove the Vokabeltrainer's Karteikarten/Quiz **in-page tabs**
-   (superseded by the toolbar's "Üben" → composed session). The `Flashcards`/`VocabQuiz` components can
-   stay in the repo (their mechanics live on in the session engine).
+**Phase-5 tail — DONE this session (session 49 cont.):**
+1. **Facet registry** `src/lib/facets.ts` (PR #264, `1141cde`): facet defs declared once per content type
+   (`vocabFacets`/`collocationFacets`/`redemittelFacets` + `*_FACET_IDS`), derived from the taxonomy
+   enums; the three browse pages now consume it instead of hand-wiring. **Dropped the 100-option Verb
+   facet** from Kollokationen (search covers verb lookup) and codified the **≤12-option rule**
+   (`MAX_FACET_OPTIONS` + a dev-time warning in the `facet()` builder). No UI change (same `FacetDef` →
+   same `FacetSheet`).
+2. **Vokabeltrainer tab removal** (this session's final PR): the in-page Karteikarten + Quiz tabs are
+   retired behind a reversible `SHOW_PRACTICE_TABS = false` flag in `VocabularyTrainer.tsx`, so the
+   Vokabeltrainer is now the browse/inspect surface (word list) and focused practice flows through the
+   toolbar's **Üben → composed session**. Hero copy updated to match. `Flashcards`/`VocabQuiz` stay in the
+   repo (used by the session engine).
+   - **`/quiz` decision:** the standalone hub is off the nav (its "retired" state) but kept as a live
+     route, reachable via deep links (GrammarHub "Wissen im Quiz testen" + `practiceAreas`). A hard
+     redirect was deliberately NOT added, so those deep-link intents keep working. Flip
+     `SHOW_PRACTICE_TABS` back to `true` to restore the vocab tabs if the founder prefers them.
 
-After that, Phase 5 (and the whole UX overhaul roadmap) is complete; the next big rocks are the
-optional taxonomy follow-ups (human-verify AI `cefr` tags; broaden `sector`/`workSituation`) and a new
-**life-domain theme** (banking / healthcare / housing) per the product scope.
+**Next big rocks (UX overhaul is fully complete):** the optional taxonomy follow-ups (human-verify the
+AI-drafted `cefr` tags via provenance `draft→verified`; broaden `sector`/`workSituation` tagging; extend
+sub-themes past 3 of 11), a new **life-domain theme** (banking / healthcare / housing) per the product
+scope, and the recurring `pages.yml` deploy-flake hardening (see the deploy note above). Backlog #25 (the
+"EN peek" whole-screen translate button) is still parked pending a brainstorm.
 
 **Phase 3 scope decision (founder, 2026-07-02):** Phase 3 shipped as a **soft merge** (founder chose
 this over full consolidation). The four library pages got the single-hub feel (segmented switcher +

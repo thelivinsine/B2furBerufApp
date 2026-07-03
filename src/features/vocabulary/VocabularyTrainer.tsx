@@ -23,6 +23,14 @@ function normalise(s: string) {
   return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
 }
 
+// UX overhaul Phase 5: the in-page Karteikarten + Quiz tabs are retired here.
+// Focused practice now flows through the toolbar's "Üben" button, which launches
+// a composed session (SRS flashcards + quiz + drills) via the session engine, so
+// the Vokabeltrainer is purely the browse/inspect surface (the word list).
+// Flip this back to `true` to restore the old three-tab layout (the Flashcards /
+// VocabQuiz components are unchanged and still live in the repo).
+const SHOW_PRACTICE_TABS = false;
+
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
@@ -165,7 +173,7 @@ export function VocabularyTrainer() {
         gradient="from-indigo-500 to-violet-500"
         eyebrow="Wortschatz"
         title="Vokabeltrainer"
-        description="Lerne mit Karteikarten, aktivem Abrufen und intelligenter Wiederholung (Spaced Repetition)."
+        description="Durchsuche und filtere deinen Wortschatz. Für eine Übung starte mit „Üben“ eine gemischte Runde mit intelligenter Wiederholung (Spaced Repetition)."
       />
 
       <LibrarySwitcher />
@@ -229,31 +237,35 @@ export function VocabularyTrainer() {
             </button>
           )}
 
-          <Tabs value={mode} onValueChange={setMode}>
-            <TabsList className="flex-wrap">
-              <TabsTrigger value="flashcards">
-                <Layers className="h-4 w-4" /> Karteikarten
-              </TabsTrigger>
-              <TabsTrigger value="quiz">
-                <Sparkles className="h-4 w-4" /> Quiz
-              </TabsTrigger>
-              <TabsTrigger value="list">
-                <BookOpen className="h-4 w-4" /> Übersicht
-              </TabsTrigger>
-            </TabsList>
+          {SHOW_PRACTICE_TABS ? (
+            <Tabs value={mode} onValueChange={setMode}>
+              <TabsList className="flex-wrap">
+                <TabsTrigger value="flashcards">
+                  <Layers className="h-4 w-4" /> Karteikarten
+                </TabsTrigger>
+                <TabsTrigger value="quiz">
+                  <Sparkles className="h-4 w-4" /> Quiz
+                </TabsTrigger>
+                <TabsTrigger value="list">
+                  <BookOpen className="h-4 w-4" /> Übersicht
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="flashcards">
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
-              </motion.div>
-            </TabsContent>
-            <TabsContent value="quiz">
-              <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
-            </TabsContent>
-            <TabsContent value="list">
-              <VocabList items={items} />
-            </TabsContent>
-          </Tabs>
+              <TabsContent value="flashcards">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
+                </motion.div>
+              </TabsContent>
+              <TabsContent value="quiz">
+                <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
+              </TabsContent>
+              <TabsContent value="list">
+                <VocabList items={items} />
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <VocabList items={items} />
+          )}
         </>
       )}
     </div>
