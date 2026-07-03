@@ -1928,3 +1928,21 @@ Branch: `claude/review-previous-session-69pxat`.
   Resume-here), README index, PRODUCT_EVALUATION pointer, and this log.
 - **Artifacts:** new `docs/LEARNING_ENGINE_PLAN.md`; modified `docs/PROJECT_STATUS.md`,
   `docs/README.md`, `docs/PRODUCT_EVALUATION.md`, `docs/SESSION_PROMPT_LOG.md` (this entry).
+
+## Entry 116 — 2026-07-03 (session 50)
+- **Branch:** `claude/docs-audit-report-0xydsz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > yes open a pr and merge. also document the best practices
+- **Response summary:** Documented the audit's seven best practices as a durable "Documentation best
+  practices" section in `docs/README.md` (single-source dated counts, flip plan headers on ship,
+  PROJECT_STATUS size budget + single Resume-here, distinct jobs for the two logs, no session-branch
+  names in durable prose, the standing draft→verified provenance debt, keep the working
+  disciplines), commit `cc70b07`. Then opened **PR #267** bundling the whole session's five docs
+  commits and squash-merged it to `main` as `532a1b5`; ran the required post-merge housekeeping
+  (fetch, reset --hard to origin/main, force-with-lease push; branch level and clean). Docs-only, so
+  the triggered Pages deploy changes nothing visible. A closing wrap-up prompt ("is there any action
+  point left in this session?") was answered with this final log entry and a session-50 status note,
+  shipped as a small follow-up docs PR per the established convention.
+- **Artifacts:** `docs/README.md`, PR #267 (squash `532a1b5`), this entry + the session-50 note in
+  `docs/PROJECT_STATUS.md` (follow-up PR).
