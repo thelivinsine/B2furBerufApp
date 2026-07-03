@@ -831,6 +831,12 @@ value·evidence ÷ effort basis (P1 = do first, P3 = nice-to-have) and names the
 failure mode it closes. Suggested sequence: land the cheap wins that ride alongside other work (#26a
 latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 paired to the AI roadmap.
 
+> **SCOPED 2026-07-03 → `docs/LEARNING_ENGINE_PLAN.md` (approved, not yet implemented).** All five
+> items now have a full file-level engineering plan there: Phase 0 = the quick wins (26a + #28 + #30,
+> one PR, next build), Phase 1 = FSRS (26b), Phase 2 = the speaking block (#27), Phase 3 = the custom
+> deck (#29), with per-item model recommendations, persistence/sync policy, verification recipes, and
+> a risk register. Start any of these items from that doc, not from the summaries below.
+
 26. **FSRS scheduler + response-latency capture — Priority P1 (High).** _Fixes eval dim 1; failure mode
     #1._ The playbook's single most-cited upgrade: replace the SM-2 scheduler (`src/engine/srs.ts`) with
     **FSRS** (stability / difficulty / retrievability), which the source reports cuts review volume ~23%
@@ -977,7 +983,10 @@ happening.
      redirect was deliberately NOT added, so those deep-link intents keep working. Flip
      `SHOW_PRACTICE_TABS` back to `true` to restore the vocab tabs if the founder prefers them.
 
-**Next big rocks (UX overhaul is fully complete):** the optional taxonomy follow-ups (human-verify the
+**Next big rocks (UX overhaul is fully complete):** the **learning-engine roadmap in
+`docs/LEARNING_ENGINE_PLAN.md`** (approved 2026-07-03, backlog #26–#30; **Phase 0 quick wins = 26a
+latency capture + #28 guess-first + #30 voice variety is the designated next build**, then FSRS /
+speaking block / custom deck), the optional taxonomy follow-ups (human-verify the
 AI-drafted `cefr` tags via provenance `draft→verified`; broaden `sector`/`workSituation` tagging; extend
 sub-themes past 3 of 11), a new **life-domain theme** (banking / healthcare / housing) per the product
 scope, and the recurring `pages.yml` deploy-flake hardening (see the deploy note above). Backlog #25 (the

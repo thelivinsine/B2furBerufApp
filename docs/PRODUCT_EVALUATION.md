@@ -144,3 +144,6 @@ source document argues have the largest effect on durable, transferable fluency.
 > **#26–#30** in `docs/PROJECT_STATUS.md`, each with a priority rating (P1: FSRS+latency #26,
 > speech-first #27; P2: guess-first #28, custom decks #29; P3: talker variability #30) and a suggested
 > build sequence.
+>
+> **Planned (2026-07-03):** the full file-level engineering plan for all five is
+> `docs/LEARNING_ENGINE_PLAN.md` (approved; Phase 0 quick wins are the next build).

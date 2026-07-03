@@ -3,7 +3,7 @@
 A map of everything in `docs/`, so a new session (or a new person) knows where to start and which
 documents are live vs. historical. **Start with `PROJECT_STATUS.md` → its `## Resume here` section.**
 
-_Last reviewed: 2026-07-03 (docs audit)._
+_Last reviewed: 2026-07-03 (docs audit + learning-engine plan)._
 
 ## Start here (live status & policy)
 
@@ -29,6 +29,7 @@ _Last reviewed: 2026-07-03 (docs audit)._
 
 | Doc | What it is | Status |
 |---|---|---|
+| `LEARNING_ENGINE_PLAN.md` | Phased engineering plan for backlog #26–#30 (latency capture, guess-first, voice variety, FSRS, speaking block, custom decks). | 🟡 Approved, not yet implemented |
 | `UX_OVERHAUL_PLAN.md` | Session-first redesign (s46). All phases 0–5 shipped. | ✅ Complete |
 | `TAXONOMY_REDESIGN.md` (+ `.pptx`) | Faceted taxonomy strategy deck (the "what/why"). | ✅ Implemented |
 | `TAXONOMY_IMPLEMENTATION_PLAN.md` | The staged "how" for the taxonomy. Phases 0–4 shipped. | ✅ Complete |
