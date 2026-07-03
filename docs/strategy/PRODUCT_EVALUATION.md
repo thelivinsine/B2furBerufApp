@@ -1,7 +1,7 @@
 # Genauly — Product Evaluation against the Learning-Science Playbook
 
 > _Run 2026-07-03. Applies the Section 11 "Reusable Educational Product Evaluation Framework" from
-> `docs/LANGUAGE_LEARNING_SUCCESS_FACTORS.md` to Genauly. Grounded in the codebase (`src/engine/*`,
+> `docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md` to Genauly. Grounded in the codebase (`src/engine/*`,
 > `src/data/*`, the session engine, the Can-Do bank) and the shipped UX overhaul, not a generic rubric.
 > Scores are 1 (Poor) to 5 (World-Class). This is an internal self-assessment, not an external audit._
 
@@ -146,4 +146,4 @@ source document argues have the largest effect on durable, transferable fluency.
 > build sequence.
 >
 > **Planned (2026-07-03):** the full file-level engineering plan for all five is
-> `docs/LEARNING_ENGINE_PLAN.md` (approved; Phase 0 quick wins are the next build).
+> `docs/plans/LEARNING_ENGINE_PLAN.md` (approved; Phase 0 quick wins are the next build).

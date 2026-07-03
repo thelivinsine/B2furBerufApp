@@ -1946,3 +1946,29 @@ Branch: `claude/review-previous-session-69pxat`.
   shipped as a small follow-up docs PR per the established convention.
 - **Artifacts:** `docs/README.md`, PR #267 (squash `532a1b5`), this entry + the session-50 note in
   `docs/PROJECT_STATUS.md` (follow-up PR).
+
+## Entry 117 — 2026-07-03 (session 50)
+- **Branch:** `claude/docs-audit-report-0xydsz`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > one last thing - can you also organise the documents in the docs folder following the best practices as it's currently chaotic ?
+- **Response summary:** Reorganized the flat `docs/` folder (21+ mixed files) into four purpose
+  subfolders, keeping only the three start-here files at root (`README.md`, `PROJECT_STATUS.md`,
+  `SESSION_PROMPT_LOG.md`). `strategy/` = AI_PRODUCT_STRATEGY, BUSINESS_PLAN, CERTIFICATION_RESEARCH,
+  DATA_GOVERNANCE, PRODUCT_EVALUATION, SECURITY; `plans/` = LEARNING_ENGINE_PLAN, PHASE2_SETUP,
+  UX_OVERHAUL_PLAN, TAXONOMY_REDESIGN, TAXONOMY_IMPLEMENTATION_PLAN, FILTER_HARMONIZATION_PLAN;
+  `archive/` = PROJECT_STATUS_ARCHIVE, EXPANSION_PLAN, IMPLEMENTATION_PLAN, MOBILE_APP_PLAN,
+  DESIGN_PREVIEWS; `reference/` = the playbook .docx + its .md transcription, the taxonomy .pptx, the
+  security .pdf, and the frozen prompt-log-raw.jsonl. Surveyed all cross-references first (PROJECT_STATUS
+  cited in 14 files, etc.), used `git mv` (history preserved), then scripted the path updates across
+  every LIVE reference (CLAUDE.md, PROJECT_STATUS, the moved strategy/plans docs) plus three `src/`
+  code COMMENTS that point at moved docs (AuthDialog, supabaseConfig, Sources; comment-only, cannot
+  affect the build). Left append-only history (SESSION_PROMPT_LOG, archive/) naming the old flat paths
+  as written, and noted that in the rewritten README. Rewrote `docs/README.md` as the authoritative
+  index with a folder-structure map, per-folder tables using the new paths, and best-practice #8
+  ("put new docs in the right folder, update the index"). Verified every live `docs/...` reference
+  resolves to an existing file (the only unresolved ones are pre-existing illustrative "e.g."
+  placeholders for docs that never existed).
+- **Artifacts:** `docs/` reorganized into `strategy/`/`plans/`/`archive/`/`reference/`; modified
+  `CLAUDE.md`, `docs/README.md`, `docs/PROJECT_STATUS.md`, and comment lines in
+  `src/features/auth/AuthDialog.tsx`, `src/lib/supabaseConfig.ts`, `src/features/legal/Sources.tsx`.

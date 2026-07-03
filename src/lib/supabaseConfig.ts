@@ -5,7 +5,7 @@
  * browser — they are safe to commit because every table is protected by
  * Row-Level Security (owner-only policies). NEVER put service-role keys,
  * the Anthropic key, or any other secret here; those live only in Supabase
- * Edge Function secrets (see docs/PHASE2_SETUP.md).
+ * Edge Function secrets (see docs/plans/PHASE2_SETUP.md).
  *
  * Values can be overridden at build time via Vite env vars
  * (VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY) for local dev or staging.

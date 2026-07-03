@@ -1,9 +1,9 @@
 # Learning Engine Plan: latency, FSRS, speaking drills, guess-first, custom decks
 
 > Status: **APPROVED 2026-07-03, not yet implemented. Phase 0 (quick wins) is the next build.**
-> Source: the five recommendations of `docs/PRODUCT_EVALUATION.md` (the playbook self-assessment),
+> Source: the five recommendations of `docs/strategy/PRODUCT_EVALUATION.md` (the playbook self-assessment),
 > scoped as backlog items **#26 to #30** in `docs/PROJECT_STATUS.md`. Evidence base:
-> `docs/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
+> `docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
 >
 > Design provenance: grounded in a code exploration pass of `engine/srs.ts`, `engine/session.ts`,
 > `engine/speech.ts`, the review call sites, both zustand stores, and `lib/cloudSync.ts` on
@@ -36,7 +36,7 @@ correctness-only). The five fixes, and the reason for this sequence:
   today; this phase is its first.
 - **#29 custom deck (Phase 3):** the Hook-model "investment" surface (stored value, switching
   cost). Last because it spans store, cloud schema, and UI, and pairs naturally with the
-  sentence-mining idea in `docs/AI_PRODUCT_STRATEGY.md` (idea 11).
+  sentence-mining idea in `docs/strategy/AI_PRODUCT_STRATEGY.md` (idea 11).
 
 Load-bearing facts the whole plan leans on:
 
@@ -281,7 +281,7 @@ is Sonnet-grade, so a single Opus session covers both cleanly.
   `supabase/migrations/0005_saved_words.sql`:
   `alter table public.progress add column if not exists saved_words jsonb not null default '[]'::jsonb;`
   The founder runs it once in the dashboard SQL editor (same runbook pattern as
-  `docs/PHASE2_SETUP.md`); the column default covers all existing rows, no backfill needed.
+  `docs/plans/PHASE2_SETUP.md`); the column default covers all existing rows, no backfill needed.
 - **UI:** a bookmark icon-button in the `src/features/vocabulary/VocabList.tsx` header row (next to
   the SpeakButton, lines 42-44; remember `stopPropagation` like SpeakButton). A "Gespeichert"
   filter on the Bibliothek Wörter tab via the central facet registry (`src/lib/facets.ts`), or a
@@ -290,7 +290,7 @@ is Sonnet-grade, so a single Opus session covers both cleanly.
 - **Engine:** `reviewWeight(card, opts)` (`src/engine/srs.ts:65-74`) gains an optional
   `saved?: boolean` boost (suggest +1, same magnitude as `modeMatch`), threaded from session
   Pool 1 (`session.ts:135-160`) by checking membership in `savedWords`.
-- **Upgrade path:** pairs with `docs/AI_PRODUCT_STRATEGY.md` idea 11 (AI sentence mining):
+- **Upgrade path:** pairs with `docs/strategy/AI_PRODUCT_STRATEGY.md` idea 11 (AI sentence mining):
   saved words are the natural seed list for personalized example sentences.
 - **Copy sketch:** icon aria-label "Wort speichern" / "Gespeichert", filter chip "Gespeichert",
   empty state "Noch keine gespeicherten Wörter. Tippe das Lesezeichen an einem Wort."
