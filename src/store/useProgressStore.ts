@@ -19,9 +19,12 @@ interface ProgressState {
   scenariosDone: string[];
   examsDone: { id: string; score: number; date: string }[];
   totalSessions: number;
+  /** Vocab ids the learner bookmarked for their custom deck (#29). */
+  savedWords: string[];
 
   addXp: (amount: number) => void;
   reviewVocab: (vocabId: string, grade: Grade, latencyMs?: number) => void;
+  toggleSavedWord: (vocabId: string) => void;
   practiceRedemittel: (phraseId: string) => void;
   completeScenario: (scenarioId: string) => void;
   completeExam: (examId: string, score: number) => void;
@@ -41,6 +44,7 @@ const defaults = {
   scenariosDone: [] as string[],
   examsDone: [] as { id: string; score: number; date: string }[],
   totalSessions: 0,
+  savedWords: [] as string[],
 };
 
 /** Updates the streak bookkeeping for "today". */
@@ -80,6 +84,13 @@ export const useProgressStore = create<ProgressState>()(
           const card = s.srs[vocabId] ?? freshCard();
           return { srs: { ...s.srs, [vocabId]: review(card, grade, new Date(), latencyMs) } };
         }),
+
+      toggleSavedWord: (vocabId) =>
+        set((s) => ({
+          savedWords: s.savedWords.includes(vocabId)
+            ? s.savedWords.filter((id) => id !== vocabId)
+            : [...s.savedWords, vocabId],
+        })),
 
       practiceRedemittel: (phraseId) =>
         set((s) => ({

@@ -53,6 +53,7 @@ export function SessionPlayer({
 }) {
   const navigate = useNavigate();
   const srs = useProgressStore((s) => s.srs);
+  const savedWords = useProgressStore((s) => s.savedWords);
   const mode = useSettingsStore((s) => s.mode);
   const level = useSettingsStore((s) => s.level);
   const addXp = useProgressStore((s) => s.addXp);
@@ -64,7 +65,7 @@ export function SessionPlayer({
   // Build once on mount: the composer samples, so re-building each render would
   // reshuffle the deck under the learner.
   const [plan] = useState(() =>
-    buildSession({ srs, mode, minutes, difficulty: difficultyForLevel(level), scope }),
+    buildSession({ srs, savedWords, mode, minutes, difficulty: difficultyForLevel(level), scope }),
   );
 
   const [index, setIndex] = useState(0);

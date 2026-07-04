@@ -79,10 +79,11 @@ export function masteryLabel(score: number): "new" | "learning" | "review" | "ma
  */
 export function reviewWeight(
   card: SrsCard | undefined,
-  opts: { modeMatch?: boolean; levelMatch?: boolean; jitter?: number } = {},
+  opts: { modeMatch?: boolean; levelMatch?: boolean; saved?: boolean; jitter?: number } = {},
 ): number {
   let w = 1 - mastery(card); // 0 (mastered) → 1 (never studied)
   if (opts.modeMatch) w += 1; // relevant to the chosen work/personal lens
+  if (opts.saved) w += 1; // the learner bookmarked it into their custom deck (#29)
   if (opts.levelMatch) w += 0.5; // sits in a CEFR band the learner is weak at
   w += opts.jitter ?? 0; // tie-break + session-to-session variety
   return w;

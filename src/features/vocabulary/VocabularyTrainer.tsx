@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText, Zap } from "lucide-react";
+import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText, Zap, Bookmark } from "lucide-react";
 import { themes, themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useProgressStore } from "@/store/useProgressStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { LibrarySwitcher, ScopeChip } from "@/features/library/LibrarySwitcher";
 import { applyFacets, type FacetSelection } from "@/features/shared/FacetSheet";
 import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
+import { cn } from "@/lib/utils";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
 import { VocabList } from "./VocabList";
@@ -36,9 +38,11 @@ export function VocabularyTrainer() {
   const navigate = useNavigate();
   const learningMode = useSettingsStore((s) => s.mode);
   const level = useSettingsStore((s) => s.level);
+  const savedWords = useProgressStore((s) => s.savedWords);
   const scope = useLibraryScope();
   const theme = params.get("theme") ?? "all";
   const sub = params.get("sub") ?? "";
+  const savedActive = params.get("saved") === "1";
   const [mode, setMode] = useState("flashcards");
   const [search, setSearch] = useState("");
   const [showAllLevels, setShowAllLevels] = useState(false);
@@ -87,7 +91,7 @@ export function VocabularyTrainer() {
     [theme, subFilter],
   );
 
-  const searched = useMemo(() => {
+  const searchedRaw = useMemo(() => {
     if (!search.trim()) return scoped;
     const q = normalise(search.trim());
     return scoped.filter(
@@ -97,6 +101,13 @@ export function VocabularyTrainer() {
         v.related.some((r) => normalise(r).includes(q)),
     );
   }, [scoped, search]);
+
+  // "Gespeichert" filter (#29): a per-learner boolean, so it lives as a toolbar
+  // toggle (`?saved=1`) rather than a content facet in the registry.
+  const searched = useMemo(
+    () => (savedActive ? searchedRaw.filter((v) => savedWords.includes(v.id)) : searchedRaw),
+    [searchedRaw, savedActive, savedWords],
+  );
 
   // Tier-0 personalized default (UX overhaul Phase 2): default to the
   // learner's CEFR band + one step up, with a quiet escape, instead of an
@@ -110,7 +121,7 @@ export function VocabularyTrainer() {
     () => searched.some((v) => !v.cefr || visibleBands.includes(v.cefr)),
     [searched, visibleBands],
   );
-  const bandActive = !showAllLevels && !cefrActive && !search.trim() && bandNonEmpty;
+  const bandActive = !showAllLevels && !cefrActive && !search.trim() && !savedActive && bandNonEmpty;
   const bandLimited = useMemo(
     () => (bandActive ? searched.filter((v) => !v.cefr || visibleBands.includes(v.cefr)) : searched),
     [searched, bandActive, visibleBands],
@@ -157,6 +168,13 @@ export function VocabularyTrainer() {
     setParams(p, { replace: true });
   };
 
+  const toggleSaved = () => {
+    const p = new URLSearchParams(params);
+    if (savedActive) p.delete("saved");
+    else p.set("saved", "1");
+    setParams(p, { replace: true });
+  };
+
   const primaryOptions = [
     { value: "all", label: "Alle Themen", count: vocabulary.length },
     ...themes.map((t) => ({
@@ -191,14 +209,29 @@ export function VocabularyTrainer() {
         activeChips={activeChips}
         onRemoveChip={removeFacetValue}
         trailing={
-          <Button
-            size="sm"
-            variant="gradient"
-            className="h-10 shrink-0"
-            onClick={() => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`)}
-          >
-            <Zap className="h-3.5 w-3.5" /> Üben
-          </Button>
+          <>
+            <Button
+              size="sm"
+              variant={savedActive ? "default" : "outline"}
+              aria-pressed={savedActive}
+              className="h-10 shrink-0"
+              onClick={toggleSaved}
+            >
+              <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
+              Gespeichert
+              {savedWords.length > 0 && (
+                <span className="text-xs opacity-70">({savedWords.length})</span>
+              )}
+            </Button>
+            <Button
+              size="sm"
+              variant="gradient"
+              className="h-10 shrink-0"
+              onClick={() => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`)}
+            >
+              <Zap className="h-3.5 w-3.5" /> Üben
+            </Button>
+          </>
         }
       />
 
@@ -263,6 +296,10 @@ export function VocabularyTrainer() {
                 <VocabList items={items} />
               </TabsContent>
             </Tabs>
+          ) : savedActive && items.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-muted-foreground">
+              Noch keine gespeicherten Wörter. Tippe das Lesezeichen an einem Wort.
+            </p>
           ) : (
             <VocabList items={items} />
           )}

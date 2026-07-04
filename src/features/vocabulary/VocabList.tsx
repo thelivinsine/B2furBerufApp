@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Bookmark } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useProgressStore } from "@/store/useProgressStore";
 import { mastery, masteryLabel } from "@/engine/srs";
@@ -19,6 +20,8 @@ const labelMap = {
 
 export function VocabList({ items }: { items: VocabItem[] }) {
   const srs = useProgressStore((s) => s.srs);
+  const savedWords = useProgressStore((s) => s.savedWords);
+  const toggleSavedWord = useProgressStore((s) => s.toggleSavedWord);
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
@@ -27,6 +30,7 @@ export function VocabList({ items }: { items: VocabItem[] }) {
         const label = labelMap[masteryLabel(mastery(srs[v.id]))];
         const open = openId === v.id;
         const hasRelated = relatedRows(v).length > 0;
+        const saved = savedWords.includes(v.id);
         return (
           <motion.div
             key={v.id}
@@ -45,7 +49,24 @@ export function VocabList({ items }: { items: VocabItem[] }) {
                     <p className="text-sm text-muted-foreground">{v.en}</p>
                     {v.plural && <p className="text-xs text-muted-foreground">Pl.: {v.plural}</p>}
                   </div>
-                  <Badge variant={label.variant}>{label.text}</Badge>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <Badge variant={label.variant}>{label.text}</Badge>
+                    <Button
+                      type="button"
+                      size="icon-sm"
+                      variant="ghost"
+                      aria-label={saved ? "Gespeichert" : "Wort speichern"}
+                      aria-pressed={saved}
+                      title={saved ? "Gespeichert" : "Wort speichern"}
+                      className={cn(saved && "text-primary")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleSavedWord(v.id);
+                      }}
+                    >
+                      <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
+                    </Button>
+                  </div>
                 </div>
                 <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
                   „{v.examples[0].de}"

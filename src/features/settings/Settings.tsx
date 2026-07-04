@@ -31,6 +31,7 @@ export function Settings() {
   const navigate = useNavigate();
   const settings = useSettingsStore();
   const resetProgress = useProgressStore((s) => s.resetProgress);
+  const savedCount = useProgressStore((s) => s.savedWords.length);
   const showToast = useSessionStore((s) => s.showToast);
   const status = useAuthStore((s) => s.status);
   const deleteAccount = useAuthStore((s) => s.deleteAccount);
@@ -189,6 +190,26 @@ export function Settings() {
                 checked={settings.guessFirst}
                 onCheckedChange={(v) => settings.setSettings({ guessFirst: v })}
               />
+            </div>
+            <div className="flex items-center justify-between border-t border-border pt-4">
+              <div>
+                <p className="text-sm font-medium">Gespeicherte Wörter</p>
+                <p className="text-xs text-muted-foreground">
+                  {savedCount > 0
+                    ? `${savedCount} Wort${savedCount !== 1 ? "e" : ""} in deinem Merkzettel. Sie kommen in Übungen häufiger dran.`
+                    : "Tippe das Lesezeichen an einem Wort, um es öfter zu üben."}
+                </p>
+              </div>
+              {savedCount > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="shrink-0"
+                  onClick={() => navigate("/library?tab=woerter&saved=1")}
+                >
+                  Ansehen
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
