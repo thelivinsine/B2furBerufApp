@@ -74,6 +74,7 @@ export function ExamRunner({
   const showToast = useSessionStore((s) => s.showToast);
   const speechEnabled = useSettingsStore((s) => s.speechEnabled);
   const voiceURI = useSettingsStore((s) => s.voiceURI);
+  const voiceVariety = useSettingsStore((s) => s.voiceVariety);
   const speechRate = useSettingsStore((s) => s.speechRate);
 
   const totalSecs = examSet.totalMinutes * 60;
@@ -101,7 +102,7 @@ export function ExamRunner({
       if (!alreadyLogged) {
         dispatch({ type: "record_partner" });
         if (speechEnabled && node.line) {
-          speak(node.line, { voiceURI: voiceURI ?? undefined, rate: speechRate });
+          speak(node.line, { voiceURI: voiceURI ?? undefined, variety: voiceVariety, rate: speechRate });
         }
       }
     }

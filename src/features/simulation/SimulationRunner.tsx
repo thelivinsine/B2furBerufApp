@@ -83,6 +83,7 @@ export function SimulationRunner({
   const showToast = useSessionStore((s) => s.showToast);
   const speechEnabled = useSettingsStore((s) => s.speechEnabled);
   const voiceURI = useSettingsStore((s) => s.voiceURI);
+  const voiceVariety = useSettingsStore((s) => s.voiceVariety);
   const speechRate = useSettingsStore((s) => s.speechRate);
 
   const node = currentNode(state);
@@ -95,7 +96,7 @@ export function SimulationRunner({
       if (!alreadyLogged) {
         dispatch({ type: "record_partner" });
         if (speechEnabled && node.line) {
-          speak(node.line, { voiceURI: voiceURI ?? undefined, rate: speechRate });
+          speak(node.line, { voiceURI: voiceURI ?? undefined, variety: voiceVariety, rate: speechRate });
         }
       }
     }

@@ -349,7 +349,7 @@ export function Settings() {
                     <label className="text-sm font-medium">Stimme (Deutsch)</label>
                     <Select
                       value={settings.voiceURI ?? voices[0]?.voiceURI ?? ""}
-                      onValueChange={(v) => settings.setSettings({ voiceURI: v })}
+                      onValueChange={(v) => settings.setSettings({ voiceURI: v, voiceVariety: false })}
                     >
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -358,6 +358,20 @@ export function Settings() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+                {voices.length > 1 && (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Stimmen abwechseln</p>
+                      <p className="text-xs text-muted-foreground">
+                        Wechselt bei jeder Wiedergabe zwischen den verfügbaren deutschen Stimmen.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.voiceVariety}
+                      onCheckedChange={(v) => settings.setSettings({ voiceVariety: v, voiceURI: v ? null : settings.voiceURI })}
+                    />
                   </div>
                 )}
               </motion.div>

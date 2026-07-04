@@ -23,6 +23,7 @@ export function SpeakButton({
   const [speaking, setSpeaking] = useState(false);
   const rate = useSettingsStore((s) => s.speechRate);
   const voiceURI = useSettingsStore((s) => s.voiceURI);
+  const variety = useSettingsStore((s) => s.voiceVariety);
   const enabled = useSettingsStore((s) => s.speechEnabled);
 
   if (!ttsSupported() || !enabled) return null;
@@ -40,7 +41,7 @@ export function SpeakButton({
         // flip handler), so tapping the speaker only plays audio.
         e.stopPropagation();
         setSpeaking(true);
-        speak(text, { rate, voiceURI: voiceURI ?? undefined, onEnd: () => setSpeaking(false) });
+        speak(text, { rate, voiceURI: voiceURI ?? undefined, variety, onEnd: () => setSpeaking(false) });
       }}
     >
       <Volume2 className={cn("h-4 w-4", speaking && "animate-pulse")} />

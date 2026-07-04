@@ -21,10 +21,29 @@ if (ttsSupported()) {
   };
 }
 
+let voiceRotationCursor = 0;
+
+/**
+ * Talker variability (#30): round-robins through the available German voices
+ * so consecutive utterances differ (round-robin, not random, guarantees that).
+ * Returns undefined under 2 voices, degrading to the default `voices[0]`.
+ * Note: the cursor also advances for utterances cancelled by `synth.cancel()`
+ * on rapid taps; cosmetic, no fix needed.
+ */
+export function nextGermanVoiceURI(): string | undefined {
+  const voices = getGermanVoices();
+  if (voices.length < 2) return undefined;
+  const voice = voices[voiceRotationCursor % voices.length];
+  voiceRotationCursor += 1;
+  return voice.voiceURI;
+}
+
 export interface SpeakOptions {
   rate?: number;
   pitch?: number;
   voiceURI?: string;
+  /** Rotate through the available German voices instead of the default. Ignored when `voiceURI` is set. */
+  variety?: boolean;
   onEnd?: () => void;
 }
 
@@ -40,8 +59,9 @@ export function speak(text: string, opts: SpeakOptions = {}): void {
   u.rate = opts.rate ?? 0.95;
   u.pitch = opts.pitch ?? 1;
   const voices = getGermanVoices();
-  const chosen =
-    (opts.voiceURI && voices.find((v) => v.voiceURI === opts.voiceURI)) || voices[0];
+  // Precedence: a pinned voiceURI wins, else variety rotation, else voices[0].
+  const resolvedURI = opts.voiceURI ?? (opts.variety ? nextGermanVoiceURI() : undefined);
+  const chosen = (resolvedURI && voices.find((v) => v.voiceURI === resolvedURI)) || voices[0];
   if (chosen) u.voice = chosen;
   if (opts.onEnd) u.onend = opts.onEnd;
   synth.speak(u);

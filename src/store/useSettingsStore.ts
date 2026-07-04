@@ -43,6 +43,8 @@ interface SettingsState {
   speechEnabled: boolean;
   speechRate: number;
   voiceURI: string | null;
+  /** Rotate through the available German voices instead of a pinned one (talker variability). */
+  voiceVariety: boolean;
   recognitionEnabled: boolean;
   reducedMotion: boolean;
   /** MCQ questions hide options behind a "think first" gate (anticipatory retrieval). */
@@ -77,6 +79,7 @@ const defaults = {
   speechEnabled: true,
   speechRate: 0.95,
   voiceURI: null,
+  voiceVariety: false,
   recognitionEnabled: false,
   reducedMotion: false,
   guessFirst: true,
