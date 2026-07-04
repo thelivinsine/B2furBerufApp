@@ -58,8 +58,36 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment_retry.outputs.page_url || steps.deployment_final.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      # The actions/deploy-pages step intermittently fails with GitHub's
+      # transient "Deployment failed, try again later" platform error (not a
+      # code issue; the build + artifact upload already succeeded in the build
+      # job). It has recurred on several merges (twice on 2026-07-04, where the
+      # Pages service was briefly degraded and even a manual re-run failed
+      # before recovering). Retry automatically instead: attempts 1 and 2 fail
+      # soft with growing pauses; attempt 3 fails hard so a genuine outage
+      # still surfaces instead of silently shipping nothing.
+      - name: Deploy to GitHub Pages (attempt 1)
         id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+
+      - name: Pause before retry
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 15
+
+      - name: Deploy to GitHub Pages (attempt 2)
+        id: deployment_retry
+        if: steps.deployment.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+
+      - name: Pause before final retry
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
+        run: sleep 60
+
+      - name: Deploy to GitHub Pages (attempt 3)
+        id: deployment_final
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry.outcome == 'failure'
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
