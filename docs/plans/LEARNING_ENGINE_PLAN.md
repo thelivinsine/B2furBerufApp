@@ -1,6 +1,8 @@
 # Learning Engine Plan: latency, FSRS, speaking drills, guess-first, custom decks
 
-> Status: **APPROVED 2026-07-03, not yet implemented. Phase 0 (quick wins) is the next build.**
+> Status: **Phase 0 (quick wins) SHIPPED ✅ 2026-07-04** (PR #271, squash SHA `92ab08b`; see
+> `docs/PROJECT_STATUS.md` → "Resume here" for the shipped-scope recap). **Phase 1 (FSRS, 26b) is the
+> next build.**
 > Source: the five recommendations of `docs/strategy/PRODUCT_EVALUATION.md` (the playbook self-assessment),
 > scoped as backlog items **#26 to #30** in `docs/PROJECT_STATUS.md`. Evidence base:
 > `docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
@@ -59,7 +61,7 @@ Load-bearing facts the whole plan leans on:
 - No test framework exists. Verification follows the `scripts/*.mjs` + package script + CI gate
   pattern established by `lint-content`.
 
-## 2. Phase 0: quick wins (26a + #28 + #30)
+## 2. Phase 0: quick wins (26a + #28 + #30) — SHIPPED ✅ 2026-07-04 (PR #271, `92ab08b`)
 
 One PR, one commit per item so each is independently revertable. Ship the code on a fresh branch
 (not stacked on unmerged docs work; if it must stack, rebase onto `main` after the docs PR

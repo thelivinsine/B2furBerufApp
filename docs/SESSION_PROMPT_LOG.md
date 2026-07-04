@@ -1986,3 +1986,88 @@ Branch: `claude/review-previous-session-69pxat`.
   the one `src/` comment-only touch, marked the session fully documented, and added this closing entry.
   Working tree clean and level with `origin/main`.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (this entry).
+
+## Session 51 — 2026-07-04 — Learning Engine Phase 0 shipped (latency capture, guess-first, voice variety)
+Branch: `claude/whats-next-esga9u`.
+
+## Entry 119 — 2026-07-04 (session 51)
+- **Branch:** `claude/whats-next-esga9u`
+- **Assistant:** Claude Code (Anthropic)
+- **Prompt (verbatim):**
+  > What's next?
+- **Response summary:** Oriented on `docs/PROJECT_STATUS.md`. Confirmed the UX overhaul (Phases 0–5)
+  shipped fully as of session 49, and session 50 was a docs-only reorg. Per the "Resume here" section,
+  the designated next build is Phase 0 (quick wins) of `docs/plans/LEARNING_ENGINE_PLAN.md`: 26a
+  response-latency capture, #28 guess-before-reveal, #30 voice variety. Summarized the three items and
+  asked whether to start implementing.
+- **Artifacts:** none (research/orientation only).
+
+## Entry 120 — 2026-07-04 (session 51)
+- **Prompt (verbatim):**
+  > what is the model reco?
+- **Response summary:** Read off the per-item model table from `LEARNING_ENGINE_PLAN.md` §7: 26a →
+  Opus 4.8 (default effort), #28 → Sonnet 5 (medium), #30 → Sonnet 5 (medium); noted the later phases'
+  recommendations (FSRS and the speech-first block → Fable 5 high effort; custom deck → Opus 4.8) for
+  context.
+- **Artifacts:** none.
+
+## Entry 121 — 2026-07-04 (session 51)
+- **Branch:** `claude/whats-next-esga9u`
+- **Prompt (verbatim):**
+  > start with 26a
+- **Response summary:** Implemented 26a (response-latency capture) on Opus 4.8 per the plan's model
+  recommendation. `SrsCard` gained optional `lastMs`/`emaMs` (60s clamp, EMA α=0.3); `review()`/
+  `reviewVocab()` took an optional `latencyMs` that carries prior samples forward unchanged when absent.
+  New `useAnswerTimer(key)` hook in `lib/hooks.ts`. Wired into 4 capture sites: Flashcards, VocabQuiz,
+  MCQView (shared by QuizRunner + SessionPlayer), and SessionPlayer's flashcard block; documented the
+  per-question remount keys as load-bearing. Caught and fixed a Rules-of-Hooks ordering bug in
+  Flashcards during implementation (timer hook was below an early return). Verified with `pnpm
+  typecheck`/`lint:content`/`build` plus 14 hand-written assertions on the latency math (EMA, clamping,
+  carry-forward, invalid-input rejection, old-format tolerance, rounding) run against the real
+  `engine/srs.ts` via `vite.ssrLoadModule`.
+- **Artifacts:** commit `c087c10`/`e4e6e61` (re-signed) "26a: capture per-card response latency".
+
+## Entry 122 — 2026-07-04 (session 51)
+- **Branch:** `claude/whats-next-esga9u`
+- **Prompt (verbatim):**
+  > continue with 28 and 30
+- **Response summary:** Switched to Sonnet 5 (per the plan's recommendation) and implemented both
+  remaining Phase 0 items. **#28 guess-before-reveal:** new `guessFirst` setting (default on); MCQView
+  and VocabQuiz hide the options grid behind a "think first" gate ("Überlege zuerst…" → "Optionen
+  zeigen") with explicit reset points in VocabQuiz (`next()`/`restart()`) since it isn't remount-keyed;
+  latency spans the think stage on purpose (not reset on reveal); new "Lernen" settings card. **#30
+  voice variety:** new `voiceVariety` setting (default off); `nextGermanVoiceURI()` round-robins the
+  German voice list in `engine/speech.ts`, wired into `SpeakButton`, `SimulationRunner`, `ExamRunner`;
+  Settings UI enforces mutual exclusion with a pinned voice (enabling variety unpins; picking a voice
+  turns variety off). Verified with `pnpm typecheck`/`lint:content`/`build`, isolated round-robin unit
+  tests, and Playwright smoke tests against a live dev server (MCQ gate reveal flow, guessFirst=false
+  bypass, voice-variety mutual exclusion in both directions). Split the two commits cleanly by
+  temporarily stripping/restoring the #30 additions from the two files shared with #28
+  (`useSettingsStore.ts`, `Settings.tsx`) so each commit stays independently revertable and buildable in
+  isolation. A stop-hook flagged all three commits as unverified (wrong committer identity); fixed via
+  `git config` + `git rebase --exec "git commit --amend --no-edit --reset-author"`, confirmed the SSH
+  signatures were actually present in the raw commit objects despite `git log`'s local `%G?` showing `N`
+  (missing `gpg.ssh.allowedSignersFile` for local verification, not a signing gap).
+- **Artifacts:** commits `bc54780`/`7550ac3` (re-signed) "#28: guess-before-reveal", `f959923`/`7dd2317`
+  (re-signed) "#30: talker variability".
+
+## Entry 123 — 2026-07-04 (session 51)
+- **Branch:** `claude/whats-next-esga9u`
+- **Prompt (verbatim):**
+  > go ahead with pr and merge
+- **Response summary:** Pushed the branch, opened PR #271 ("Learning Engine Phase 0: latency capture,
+  guess-first, voice variety") with a summary + test plan of all three items, and subscribed to PR
+  activity. Waited for the `lint-content` CI check (scheduled a short check-in rather than polling);
+  once green with no review comments, squash-merged as `92ab08b` and completed the required post-deploy
+  housekeeping (`git fetch origin main && git reset --hard origin/main && git push --force-with-lease`),
+  leaving the dev branch level with `main` and the working tree clean.
+- **Artifacts:** PR #271, squash-merge SHA `92ab08b` on `main`.
+
+## Entry 124 — 2026-07-04 (session 51)
+- **Branch:** `claude/whats-next-esga9u`
+- **Prompt (verbatim):**
+  > update documentation
+- **Response summary:** Updated `docs/PROJECT_STATUS.md` ("Resume here" section, Phase 0 marked
+  shipped, next steps pointed at Phase 1 FSRS) and appended this session's prompts (entries 119–124) to
+  this log.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (this entry).
