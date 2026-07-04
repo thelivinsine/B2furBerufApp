@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { RotateCw, Check, Sparkles, ChevronRight } from "lucide-react";
 import type { Grade, VocabItem } from "@/types";
@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
+import { useAnswerTimer } from "@/lib/hooks";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { isDue, masteryLabel, mastery } from "@/engine/srs";
@@ -39,6 +40,24 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
   const [flipped, setFlipped] = useState(false);
   const [reviewed, setReviewed] = useState(0);
   const [done, setDone] = useState(false);
+
+  // Latency = front render to first flip (reveal). Capture once per card and
+  // don't overwrite on flip-back. Keyed on the current card id (via `queue`,
+  // which is stable across renders). Kept above the early returns to satisfy
+  // the Rules of Hooks. Note: after "Neue Runde" the queue is stable, so round
+  // 2's first card keeps round 1's genuine first-flip latency; that is a real
+  // measurement, so we accept it rather than reset to a clamped 60s.
+  const currentCardId = queue[index]?.id;
+  const elapsed = useAnswerTimer(currentCardId);
+  const latencyRef = useRef<number | null>(null);
+  const timedCardId = useRef(currentCardId);
+  if (timedCardId.current !== currentCardId) {
+    timedCardId.current = currentCardId;
+    latencyRef.current = null;
+  }
+  const captureFlipLatency = () => {
+    if (latencyRef.current == null) latencyRef.current = elapsed();
+  };
 
   if (items.length === 0) {
     return <EmptyState icon={Sparkles} title="Keine Vokabeln" description="Für dieses Thema gibt es noch keine Einträge." />;
@@ -73,7 +92,7 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
   const m = masteryLabel(mastery(srs[card.id]));
 
   const grade = (g: Grade) => {
-    reviewVocab(card.id, g);
+    reviewVocab(card.id, g, latencyRef.current ?? undefined);
     // A lapse ("Again", grade < 3) earns no XP: failing a card shouldn't grant
     // more than getting it "Easy". Successful recalls reward effort (Good > Easy).
     addXp(g < 3 ? 0 : g >= 5 ? XP.flashcardEasy : XP.flashcard);
@@ -103,7 +122,10 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
         <AnimatePresence mode="wait">
           <motion.button
             key={card.id}
-            onClick={() => setFlipped((f) => !f)}
+            onClick={() => {
+              captureFlipLatency();
+              setFlipped((f) => !f);
+            }}
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
@@ -155,7 +177,14 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
       </div>
 
       {!flipped ? (
-        <Button variant="outline" className="w-full" onClick={() => setFlipped(true)}>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            captureFlipLatency();
+            setFlipped(true);
+          }}
+        >
           Antwort zeigen <ChevronRight className="h-4 w-4" />
         </Button>
       ) : (

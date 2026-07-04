@@ -447,6 +447,19 @@ export interface SrsCard {
   due: string;
   /** Last grade 0–5. */
   lastGrade?: number;
+  /**
+   * Response latency of the most recent review, in ms. Measured from prompt
+   * render to the first committing tap and clamped to a 60s ceiling (clamped,
+   * not discarded, so an idle tab reads "slow" rather than "14 minutes").
+   * Write-only training data for the FSRS upgrade; no scheduling effect yet.
+   */
+  lastMs?: number;
+  /**
+   * Exponential moving average of response latency (alpha 0.3), in ms. Smooths
+   * the per-review `lastMs` into a stable "how fast does this learner recall
+   * this card" signal. Companion to `lastMs`, same clamping.
+   */
+  emaMs?: number;
 }
 
 export type Grade = 0 | 3 | 4 | 5;

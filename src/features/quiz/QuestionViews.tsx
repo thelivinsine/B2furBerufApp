@@ -10,6 +10,8 @@ import type {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SpeakButton } from "@/components/shared/SpeakButton";
+import { useAnswerTimer } from "@/lib/hooks";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { cn, shuffle } from "@/lib/utils";
 
 /**
@@ -28,14 +30,22 @@ export function MCQView({
 }: {
   q: MCQQuestion;
   answered: boolean;
-  onResult: (correct: boolean) => void;
+  onResult: (correct: boolean, latencyMs?: number) => void;
 }) {
+  const guessFirst = useSettingsStore((s) => s.guessFirst);
   const [picked, setPicked] = useState<string | null>(null);
+  // Correct-by-mount thanks to the per-question remount key (q.id) the parent
+  // uses, so a new question always starts un-revealed when the setting is on.
+  const [revealed, setRevealed] = useState(!guessFirst);
+  // Latency = prompt render to option tap. This is a retrieval-latency signal,
+  // so it spans the guess-first "think" stage (it is NOT reset on reveal).
+  const elapsed = useAnswerTimer(q.id);
 
   const choose = (opt: string) => {
     if (picked) return;
+    const latencyMs = elapsed();
     setPicked(opt);
-    onResult(opt === q.answer);
+    onResult(opt === q.answer, latencyMs);
   };
 
   return (
@@ -52,32 +62,43 @@ export function MCQView({
         </CardContent>
       </Card>
 
-      <div className="grid gap-2.5">
-        {q.options.map((opt) => {
-          const correct = opt === q.answer;
-          const isPicked = picked === opt;
-          const state = !picked ? "idle" : correct ? "correct" : isPicked ? "wrong" : "dim";
-          return (
-            <motion.button
-              key={opt}
-              whileTap={{ scale: 0.99 }}
-              disabled={!!picked}
-              onClick={() => choose(opt)}
-              className={cn(
-                "flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors",
-                state === "idle" && "border-border bg-surface hover:border-primary/40 hover:bg-muted/40",
-                state === "correct" && "border-success bg-success/10 text-success",
-                state === "wrong" && "border-danger bg-danger/10 text-danger",
-                state === "dim" && "border-border opacity-50",
-              )}
-            >
-              {opt}
-              {state === "correct" && <Check className="h-4 w-4" />}
-              {state === "wrong" && <X className="h-4 w-4" />}
-            </motion.button>
-          );
-        })}
-      </div>
+      {!revealed ? (
+        <div className="space-y-3">
+          <p className="text-center text-sm text-muted-foreground">
+            Überlege zuerst: Wie heißt die Antwort? Dann vergleiche.
+          </p>
+          <Button variant="outline" className="w-full" onClick={() => setRevealed(true)}>
+            Optionen zeigen
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-2.5">
+          {q.options.map((opt) => {
+            const correct = opt === q.answer;
+            const isPicked = picked === opt;
+            const state = !picked ? "idle" : correct ? "correct" : isPicked ? "wrong" : "dim";
+            return (
+              <motion.button
+                key={opt}
+                whileTap={{ scale: 0.99 }}
+                disabled={!!picked}
+                onClick={() => choose(opt)}
+                className={cn(
+                  "flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors",
+                  state === "idle" && "border-border bg-surface hover:border-primary/40 hover:bg-muted/40",
+                  state === "correct" && "border-success bg-success/10 text-success",
+                  state === "wrong" && "border-danger bg-danger/10 text-danger",
+                  state === "dim" && "border-border opacity-50",
+                )}
+              >
+                {opt}
+                {state === "correct" && <Check className="h-4 w-4" />}
+                {state === "wrong" && <X className="h-4 w-4" />}
+              </motion.button>
+            );
+          })}
+        </div>
+      )}
 
       {answered && q.explain && (
         <p className="rounded-lg bg-muted/50 px-3 py-2 text-sm text-muted-foreground">{q.explain}</p>
@@ -282,7 +303,7 @@ export function QuestionView({
 }: {
   q: QuizQuestion;
   answered: boolean;
-  onResult: (correct: boolean) => void;
+  onResult: (correct: boolean, latencyMs?: number) => void;
 }) {
   if (q.kind === "matching") return <MatchingView q={q} answered={answered} onResult={onResult} />;
   if (q.kind === "wordOrder") return <WordOrderView q={q} answered={answered} onResult={onResult} />;

@@ -173,6 +173,26 @@ export function Settings() {
           </CardContent>
         </Card>
 
+        {/* Learning */}
+        <Card>
+          <CardContent className="space-y-4 p-5">
+            <p className="font-semibold">Lernen</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Erst überlegen, dann Optionen</p>
+                <p className="text-xs text-muted-foreground">
+                  Bei Auswahlfragen kurz selbst antworten, bevor die Optionen erscheinen. Das
+                  stärkt den Abruf.
+                </p>
+              </div>
+              <Switch
+                checked={settings.guessFirst}
+                onCheckedChange={(v) => settings.setSettings({ guessFirst: v })}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Appearance */}
         <Card>
           <CardContent className="space-y-4 p-5">
@@ -329,7 +349,7 @@ export function Settings() {
                     <label className="text-sm font-medium">Stimme (Deutsch)</label>
                     <Select
                       value={settings.voiceURI ?? voices[0]?.voiceURI ?? ""}
-                      onValueChange={(v) => settings.setSettings({ voiceURI: v })}
+                      onValueChange={(v) => settings.setSettings({ voiceURI: v, voiceVariety: false })}
                     >
                       <SelectTrigger><SelectValue /></SelectTrigger>
                       <SelectContent>
@@ -338,6 +358,20 @@ export function Settings() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+                )}
+                {voices.length > 1 && (
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Stimmen abwechseln</p>
+                      <p className="text-xs text-muted-foreground">
+                        Wechselt bei jeder Wiedergabe zwischen den verfügbaren deutschen Stimmen.
+                      </p>
+                    </div>
+                    <Switch
+                      checked={settings.voiceVariety}
+                      onCheckedChange={(v) => settings.setSettings({ voiceVariety: v, voiceURI: v ? null : settings.voiceURI })}
+                    />
                   </div>
                 )}
               </motion.div>

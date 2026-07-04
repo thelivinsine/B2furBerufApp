@@ -7,8 +7,10 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/misc";
 import { SpeakButton } from "@/components/shared/SpeakButton";
+import { useAnswerTimer } from "@/lib/hooks";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { XP } from "@/engine/scoring";
 import { cn, sample, shuffle } from "@/lib/utils";
 
@@ -33,12 +35,18 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
   const registerSession = useProgressStore((s) => s.registerSession);
   const showToast = useSessionStore((s) => s.showToast);
+  const guessFirst = useSettingsStore((s) => s.guessFirst);
 
   const [questions, setQuestions] = useState<Question[]>(() => buildQuiz(items, 10));
   const [index, setIndex] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
+  const [revealed, setRevealed] = useState(!guessFirst);
+
+  // Latency = prompt render to option tap. Keyed on the question index (remounts
+  // the timer per question); kept above the early returns for the Rules of Hooks.
+  const elapsed = useAnswerTimer(index);
 
   const total = questions.length;
   const q = questions[index];
@@ -49,6 +57,7 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
     setPicked(null);
     setScore(0);
     setDone(false);
+    setRevealed(!guessFirst);
   };
 
   const summary = useMemo(() => Math.round((score / Math.max(total, 1)) * 100), [score, total]);
@@ -72,9 +81,10 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
 
   const choose = (choice: string) => {
     if (picked) return;
+    const latencyMs = elapsed();
     setPicked(choice);
     const correct = choice === q.item.en;
-    reviewVocab(q.item.id, correct ? 4 : 0);
+    reviewVocab(q.item.id, correct ? 4 : 0, latencyMs);
     if (correct) {
       setScore((s) => s + 1);
       addXp(XP.quizCorrect);
@@ -90,6 +100,9 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
     } else {
       setIndex((i) => i + 1);
       setPicked(null);
+      // Re-read the live flag so a mid-quiz settings change applies from the
+      // next question.
+      setRevealed(!guessFirst);
     }
   };
 
@@ -125,32 +138,43 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
         </CardContent>
       </Card>
 
-      <div className="grid gap-2.5">
-        {q.choices.map((choice) => {
-          const isCorrect = choice === q.item.en;
-          const isPicked = picked === choice;
-          const state = !picked ? "idle" : isCorrect ? "correct" : isPicked ? "wrong" : "dim";
-          return (
-            <motion.button
-              key={choice}
-              whileTap={{ scale: 0.99 }}
-              disabled={!!picked}
-              onClick={() => choose(choice)}
-              className={cn(
-                "flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors",
-                state === "idle" && "border-border bg-surface hover:border-primary/40 hover:bg-muted/40",
-                state === "correct" && "border-success bg-success/10 text-success",
-                state === "wrong" && "border-danger bg-danger/10 text-danger",
-                state === "dim" && "border-border opacity-50",
-              )}
-            >
-              {choice}
-              {state === "correct" && <Check className="h-4 w-4" />}
-              {state === "wrong" && <X className="h-4 w-4" />}
-            </motion.button>
-          );
-        })}
-      </div>
+      {!revealed ? (
+        <div className="space-y-3">
+          <p className="text-center text-sm text-muted-foreground">
+            Überlege zuerst: Wie heißt die Antwort? Dann vergleiche.
+          </p>
+          <Button variant="outline" className="w-full" onClick={() => setRevealed(true)}>
+            Optionen zeigen
+          </Button>
+        </div>
+      ) : (
+        <div className="grid gap-2.5">
+          {q.choices.map((choice) => {
+            const isCorrect = choice === q.item.en;
+            const isPicked = picked === choice;
+            const state = !picked ? "idle" : isCorrect ? "correct" : isPicked ? "wrong" : "dim";
+            return (
+              <motion.button
+                key={choice}
+                whileTap={{ scale: 0.99 }}
+                disabled={!!picked}
+                onClick={() => choose(choice)}
+                className={cn(
+                  "flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition-colors",
+                  state === "idle" && "border-border bg-surface hover:border-primary/40 hover:bg-muted/40",
+                  state === "correct" && "border-success bg-success/10 text-success",
+                  state === "wrong" && "border-danger bg-danger/10 text-danger",
+                  state === "dim" && "border-border opacity-50",
+                )}
+              >
+                {choice}
+                {state === "correct" && <Check className="h-4 w-4" />}
+                {state === "wrong" && <X className="h-4 w-4" />}
+              </motion.button>
+            );
+          })}
+        </div>
+      )}
 
       {picked && (
         <motion.div

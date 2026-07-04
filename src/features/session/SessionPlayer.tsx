@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Zap,
@@ -101,11 +101,11 @@ export function SessionPlayer({
 
   /* ---- Result handlers per block kind ---- */
 
-  const onQuizResult = (correct: boolean) => {
+  const onQuizResult = (correct: boolean, latencyMs?: number) => {
     if (answered) return;
     setAnswered(true);
     const q = (block as Extract<SessionBlock, { kind: "quiz" }>).question;
-    if (q.sourceId && q.kind !== "matching") reviewVocab(q.sourceId, correct ? 4 : 0);
+    if (q.sourceId && q.kind !== "matching") reviewVocab(q.sourceId, correct ? 4 : 0, latencyMs);
     if (correct) {
       award(quizXp(q.difficulty));
       setCorrectCount((c) => c + 1);
@@ -124,9 +124,11 @@ export function SessionPlayer({
     }
   };
 
-  const onFlashcardGrade = (correct: boolean) => {
+  const onFlashcardGrade = (correct: boolean, latencyMs?: number) => {
     const b = block as Extract<SessionBlock, { kind: "flashcard" }>;
-    if (b.source === "vocab") reviewVocab(b.sourceId, correct ? 4 : 0);
+    // Latency only attributes to a real SRS card (the vocab branch); the
+    // Redemittel branch has no card, so the sample is dropped.
+    if (b.source === "vocab") reviewVocab(b.sourceId, correct ? 4 : 0, latencyMs);
     else practiceRedemittel(b.sourceId);
     if (correct) {
       award(XP.flashcard);
@@ -221,6 +223,9 @@ export function SessionPlayer({
         </div>
 
         <AnimatePresence mode="wait">
+          {/* key={block.key} is load-bearing: it remounts the block per step, which
+              resets FlashcardBlock's mount-time timer and MCQView's per-prompt timer
+              (26a latency capture). */}
           <motion.div
             key={block.key}
             initial={{ opacity: 0, y: 12 }}
@@ -267,9 +272,19 @@ function FlashcardBlock({
   onGrade,
 }: {
   block: Extract<SessionBlock, { kind: "flashcard" }>;
-  onGrade: (correct: boolean) => void;
+  onGrade: (correct: boolean, latencyMs?: number) => void;
 }) {
   const [flipped, setFlipped] = useState(false);
+  // Latency = mount (front render) to first flip (reveal). The block remounts
+  // per block.key, so a mount-time ref is the render start; capture once and
+  // don't overwrite on flip-back.
+  const startRef = useRef(performance.now());
+  const latencyRef = useRef<number | null>(null);
+  const captureFlipLatency = () => {
+    if (latencyRef.current == null) {
+      latencyRef.current = Math.round(performance.now() - startRef.current);
+    }
+  };
 
   return (
     <div className="space-y-5">
@@ -282,10 +297,14 @@ function FlashcardBlock({
         role="button"
         tabIndex={0}
         aria-label="Karte umdrehen"
-        onClick={() => setFlipped((f) => !f)}
+        onClick={() => {
+          captureFlipLatency();
+          setFlipped((f) => !f);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
+            captureFlipLatency();
             setFlipped((f) => !f);
           }
         }}
@@ -312,7 +331,14 @@ function FlashcardBlock({
       </div>
 
       {!flipped ? (
-        <Button variant="outline" className="w-full" onClick={() => setFlipped(true)}>
+        <Button
+          variant="outline"
+          className="w-full"
+          onClick={() => {
+            captureFlipLatency();
+            setFlipped(true);
+          }}
+        >
           Antwort zeigen <ChevronRight className="h-4 w-4" />
         </Button>
       ) : (
@@ -321,10 +347,18 @@ function FlashcardBlock({
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 gap-3"
         >
-          <Button variant="danger" className="h-12 gap-2" onClick={() => onGrade(false)}>
+          <Button
+            variant="danger"
+            className="h-12 gap-2"
+            onClick={() => onGrade(false, latencyRef.current ?? undefined)}
+          >
             <X className="h-4 w-4" /> Nochmal
           </Button>
-          <Button variant="success" className="h-12 gap-2" onClick={() => onGrade(true)}>
+          <Button
+            variant="success"
+            className="h-12 gap-2"
+            onClick={() => onGrade(true, latencyRef.current ?? undefined)}
+          >
             <Check className="h-4 w-4" /> Gewusst
           </Button>
         </motion.div>

@@ -21,7 +21,7 @@ interface ProgressState {
   totalSessions: number;
 
   addXp: (amount: number) => void;
-  reviewVocab: (vocabId: string, grade: Grade) => void;
+  reviewVocab: (vocabId: string, grade: Grade, latencyMs?: number) => void;
   practiceRedemittel: (phraseId: string) => void;
   completeScenario: (scenarioId: string) => void;
   completeExam: (examId: string, score: number) => void;
@@ -75,10 +75,10 @@ export const useProgressStore = create<ProgressState>()(
           };
         }),
 
-      reviewVocab: (vocabId, grade) =>
+      reviewVocab: (vocabId, grade, latencyMs) =>
         set((s) => {
           const card = s.srs[vocabId] ?? freshCard();
-          return { srs: { ...s.srs, [vocabId]: review(card, grade) } };
+          return { srs: { ...s.srs, [vocabId]: review(card, grade, new Date(), latencyMs) } };
         }),
 
       practiceRedemittel: (phraseId) =>
