@@ -1,7 +1,7 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-03 (docs audit; latest work is session 49). The working branch is reassigned every
-session, so **`main` is always the source of truth** (this session: `claude/docs-audit-report-0xydsz`).
+_Last updated: 2026-07-04 (Learning Engine Phase 0 shipped, session 51). The working branch is reassigned
+every session, so **`main` is always the source of truth** (this session: `claude/whats-next-esga9u`).
 Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
@@ -947,16 +947,73 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 49 (2026-07-02). Phase 5 is COMPLETE ✅ — the whole UX overhaul roadmap
-(Phases 0–5) is now shipped.** The IA restructure (PR #262, `c317047`) is founder-verified live; the
-Tier-3 tail then shipped in two more PRs: the **facet registry + Verb-facet drop** (PR #264, `1141cde`)
-and the **Vokabeltrainer tab removal** (PR #265, `ae67862`). **All three PRs are deployed live** (the
-`ae67862` Pages deploy went green on the first attempt, no flake this time). Recap of the four-zone nav: new
+**Handoff after session 51 (2026-07-04). Learning Engine Phase 0 (quick wins) is COMPLETE ✅ and
+merged to `main`** as PR #271 (squash SHA `92ab08b`): **26a response-latency capture** (`SrsCard`
+gained optional `lastMs`/`emaMs`, write-only training data for the coming FSRS scheduler, no scheduling
+behavior change), **#28 guess-before-reveal** (`guessFirst` setting, default on; MCQ questions hide
+their options behind a "think first" gate in both `MCQView` and `VocabQuiz`), and **#30 voice variety**
+(`voiceVariety` setting, default off; `nextGermanVoiceURI()` round-robins the German voice list, wired
+into `SpeakButton`/`SimulationRunner`/`ExamRunner` with mutual exclusion against a pinned voice). Shipped
+as three independently-revertable commits, each verified in isolation (`pnpm typecheck`/`lint:content`/
+`build` plus targeted unit tests and Playwright smoke against a live dev server). No persist/Supabase
+migrations needed, all new fields are optional and ride inside existing jsonb blobs. Branch
+`claude/whats-next-esga9u` (reassigned per session; `main` is the source of truth), realigned to `main`
+post-merge per the standard housekeeping.
+
+**Next up: Phase 1 of `docs/plans/LEARNING_ENGINE_PLAN.md` — the FSRS scheduler (26b).** Recommended
+model **Fable 5, high effort** (subtle scheduler math, silent-failure risk if wrong); run a
+fresh-context verification subagent against the FSRS reference vectors before merging (plan §7). After
+that: **#27 speech-first production block** (Fable 5, high effort; first consumer of the already-built
+`listen()` STT wrapper), then **#29 custom deck / "save word"** (Opus 4.8; store/cloud/DB-migration
+wiring is the risk center). Also still open: the optional taxonomy follow-ups (human-verify the
+AI-drafted `cefr` tags via provenance `draft→verified`; broaden `sector`/`workSituation` tagging; extend
+sub-themes past 3 of 11), a new **life-domain theme** (banking / healthcare / housing) per the product
+scope, and the recurring `pages.yml` deploy-flake hardening (see the deploy note lower down). Backlog #25
+(the "EN peek" whole-screen translate button) is still parked pending a brainstorm.
+
+**Most recent work (session 51, 2026-07-04, shipped as PR #271):**
+- **26a response-latency capture:** `SrsCard` gained optional `lastMs` (clamped to 60s) and `emaMs`
+  (EMA, α=0.3); `review()`/`reviewVocab()` take an optional `latencyMs`, carrying prior samples forward
+  unchanged when it's absent so nothing wipes history. New `useAnswerTimer(key)` hook (`lib/hooks.ts`):
+  a sub-second `performance.now()` timer that resets in the render phase when the per-prompt key
+  changes. Captured at 4 sites: `Flashcards` + `SessionPlayer`'s flashcard block (front render to first
+  flip), `VocabQuiz` + `MCQView` (prompt render to option tap, shared by `QuizRunner` + `SessionPlayer`).
+  Word-order/matching stay unmeasured (not retrieval-latency signals); the Redemittel recall branch has
+  no SRS card so its sample is dropped. Write-only: no scheduling behavior changed. Verified with 14
+  hand-written assertions against the real `engine/srs.ts` (EMA math, clamping, carry-forward,
+  invalid-input rejection, old-format tolerance, rounding).
+- **#28 guess-before-reveal:** new `guessFirst` setting (default **true**). `MCQView` and `VocabQuiz`
+  hide the options grid behind a "think first" gate ("Überlege zuerst: Wie heißt die Antwort? Dann
+  vergleiche." → "Optionen zeigen") until tapped. `MCQView` resets for free via its existing per-question
+  remount key; `VocabQuiz` isn't remount-keyed, so it gets explicit reset points in `next()`/`restart()`
+  (re-reading the live flag, so a mid-quiz settings change applies from the next question). Latency
+  (26a) is deliberately NOT reset on reveal, so it spans the think stage, the retrieval-latency signal
+  wanted. New "Lernen" settings card (between Profil and Darstellung). WordOrder/Matching untouched
+  (already constructive).
+- **#30 voice variety:** new `voiceVariety` setting (default **false**, opt-in). `nextGermanVoiceURI()`
+  in `engine/speech.ts` round-robins the German voice list (not random, so consecutive utterances always
+  differ), degrading to `undefined` under 2 voices; precedence resolved inside `speak()` (pinned
+  `voiceURI` wins, else variety rotation, else `voices[0]`). Wired into `SpeakButton` (~11 surfaces),
+  `SimulationRunner`, `ExamRunner`. Settings UI: a "Stimmen abwechseln" switch under the voice picker,
+  shown only with 2+ German voices, with **mutual exclusion** (enabling variety unpins the voice; picking
+  a voice in the Select turns variety back off).
+- **Process:** the three items shipped as three independently-revertable commits (split cleanly even
+  though `useSettingsStore.ts` and `Settings.tsx` are shared between #28 and #30, by temporarily
+  stripping/restoring the #30 additions before each commit). `pnpm typecheck`/`lint:content`/`build`
+  green on every commit in isolation and on the final tree; Playwright smoke tests against a live dev
+  server covered the MCQ gate reveal flow, `guessFirst=false` bypass, and the voice-variety mutual
+  exclusion in both directions. Shipped via PR #271, squash-merged as `92ab08b`; no persist/Supabase
+  migrations needed (all new fields optional, ride inside existing jsonb blobs). Prompt log entries
+  119–124. **Session fully documented.**
+
+**Earlier handoff (session 49, 2026-07-02): Phase 5 of the UX overhaul is COMPLETE ✅** — the whole
+UX overhaul roadmap (Phases 0–5) shipped. The IA restructure (PR #262, `c317047`) is founder-verified
+live; the Tier-3 tail then shipped in two more PRs: the **facet registry + Verb-facet drop** (PR #264,
+`1141cde`) and the **Vokabeltrainer tab removal** (PR #265, `ae67862`). Recap of the four-zone nav: new
 **Anwenden hub** (`/anwenden`), new **Bibliothek hub** (`/library?tab=…`) with the four old library
 routes redirecting in, the founder-unlocked `DEFAULT_PINNED_TABS` four-zone default, and a settings-store
 persist migration (`version: 1`) remapping existing users' pins/More-order. The s26–28 bottom-bar
-mechanics stayed locked throughout. Branch `claude/next-step-kve6wf` (reassigned per session; `main` is
-the source of truth).
+mechanics stayed locked throughout.
 
 **⚠️ Deploy note (recurring):** the `pages.yml` **deploy** job failed on the `c317047` merge with GitHub's
 transient `##[error]Deployment failed, try again later` on the `actions/deploy-pages` step (the build +
@@ -966,14 +1023,14 @@ Phase-4 merge `74ccd7c`.** Remedy: re-run the failed deploy job (GitHub Actions 
 recurred twice, so consider hardening `pages.yml` with an automatic retry on the deploy step if it keeps
 happening.
 
-**Phase-5 tail — DONE this session (session 49 cont.):**
+**Phase-5 tail (session 49 cont.):**
 1. **Facet registry** `src/lib/facets.ts` (PR #264, `1141cde`): facet defs declared once per content type
    (`vocabFacets`/`collocationFacets`/`redemittelFacets` + `*_FACET_IDS`), derived from the taxonomy
    enums; the three browse pages now consume it instead of hand-wiring. **Dropped the 100-option Verb
    facet** from Kollokationen (search covers verb lookup) and codified the **≤12-option rule**
    (`MAX_FACET_OPTIONS` + a dev-time warning in the `facet()` builder). No UI change (same `FacetDef` →
    same `FacetSheet`).
-2. **Vokabeltrainer tab removal** (this session's final PR): the in-page Karteikarten + Quiz tabs are
+2. **Vokabeltrainer tab removal** (session 49's final PR): the in-page Karteikarten + Quiz tabs are
    retired behind a reversible `SHOW_PRACTICE_TABS = false` flag in `VocabularyTrainer.tsx`, so the
    Vokabeltrainer is now the browse/inspect surface (word list) and focused practice flows through the
    toolbar's **Üben → composed session**. Hero copy updated to match. `Flashcards`/`VocabQuiz` stay in the
@@ -983,15 +1040,6 @@ happening.
      redirect was deliberately NOT added, so those deep-link intents keep working. Flip
      `SHOW_PRACTICE_TABS` back to `true` to restore the vocab tabs if the founder prefers them.
 
-**Next big rocks (UX overhaul is fully complete):** the **learning-engine roadmap in
-`docs/plans/LEARNING_ENGINE_PLAN.md`** (approved 2026-07-03, backlog #26–#30; **Phase 0 quick wins = 26a
-latency capture + #28 guess-first + #30 voice variety is the designated next build**, then FSRS /
-speaking block / custom deck), the optional taxonomy follow-ups (human-verify the
-AI-drafted `cefr` tags via provenance `draft→verified`; broaden `sector`/`workSituation` tagging; extend
-sub-themes past 3 of 11), a new **life-domain theme** (banking / healthcare / housing) per the product
-scope, and the recurring `pages.yml` deploy-flake hardening (see the deploy note above). Backlog #25 (the
-"EN peek" whole-screen translate button) is still parked pending a brainstorm.
-
 **Phase 3 scope decision (founder, 2026-07-02):** Phase 3 shipped as a **soft merge** (founder chose
 this over full consolidation). The four library pages got the single-hub feel (segmented switcher +
 travelling scope + Üben) *without* a route merge or nav change, so nothing the founder uses was
@@ -1000,7 +1048,7 @@ re-map phase): the single `/library` URL + old-route redirects + retiring the st
 section + removing the Vokabeltrainer's in-page Karteikarten/Quiz tabs (superseded by Üben →
 session). Fold these into the Phase 5 work.
 
-**Most recent work (session 50, 2026-07-03, docs-focused, shipped across PRs #267–#269):** full docs audit
+**Earlier work (session 50, 2026-07-03, docs-focused, shipped across PRs #267–#269):** full docs audit
 (stale counts reconciled to 1,111 provenance rows; five shipped-plan headers flipped; PROJECT_STATUS
 slimmed with sessions 4–40 + 24 archived to `docs/archive/PROJECT_STATUS_ARCHIVE.md`; new
 `docs/README.md` index + best-practices section); readable transcription of the learning-app playbook
