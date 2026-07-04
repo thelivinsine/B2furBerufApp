@@ -2109,3 +2109,39 @@ Branch: `claude/whats-next-esga9u`.
   `supabase/migrations/0005_saved_words.sql`, `src/engine/srs.ts`, `src/engine/session.ts`,
   `src/features/session/SessionPlayer.tsx`, `src/features/vocabulary/VocabList.tsx`,
   `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/settings/Settings.tsx`.
+
+## Entry 128 — 2026-07-04 (session 52)
+- **Branch:** `claude/whats-next-q1iln6`
+- **Prompts (verbatim):**
+  > you need to explain point 1 clearly so that I can implement it
+
+  > what should be the name of this sql query?
+
+  > it's done
+- **Response summary:** Gave the founder (non-technical) a step-by-step Supabase dashboard click-path
+  for running migration `0005_saved_words.sql` (SQL Editor → New query → paste the `alter table … add
+  column if not exists saved_words …` statement → Run), with reassurance that it is additive,
+  idempotent, and safe. Suggested naming the saved query `0005_saved_words` to mirror the repo file.
+  Founder ran it successfully. Then, on approval (AskUserQuestion → "Yes, PR + merge"), opened **PR
+  #273**, subscribed to PR activity, confirmed the `lint-content` check passed and the PR was
+  `mergeable_state: clean`, and **squash-merged as `c730e76`**. Completed post-merge housekeeping
+  (`git fetch origin main && git reset --hard origin/main && git push --force-with-lease`); auto-
+  unsubscribed on merge.
+- **Artifacts:** PR #273, squash-merge SHA `c730e76` on `main`; migration `0005_saved_words.sql` applied
+  in Supabase.
+
+## Entry 129 — 2026-07-04 (session 52)
+- **Branch:** `claude/whats-next-q1iln6`
+- **Prompts (verbatim):**
+  > should I start the next tasks in a new session?
+
+  > okay, make sure the documentation is uptodate. I'll continue in a new session
+- **Response summary:** Advised starting each remaining Learning Engine phase (26b FSRS, then #27
+  speech-first block) in a fresh session: both want Fable 5 / high effort (this session ran Opus 4.8),
+  a cold start keeps context lean, and 26b's plan calls for a fresh-context verification subagent.
+  Then updated the docs to reflect the merged state: `docs/PROJECT_STATUS.md` (header + "Resume here"
+  #29 flipped from "implemented on branch" to "shipped, PR #273 / `c730e76`", migration-run noted),
+  `docs/plans/LEARNING_ENGINE_PLAN.md` (status header + Phase 3 section marked SHIPPED, noting the
+  toolbar-toggle deviation), and this log.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/plans/LEARNING_ENGINE_PLAN.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entries 128–129).

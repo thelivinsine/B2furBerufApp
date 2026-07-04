@@ -1,8 +1,11 @@
 # Learning Engine Plan: latency, FSRS, speaking drills, guess-first, custom decks
 
-> Status: **Phase 0 (quick wins) SHIPPED ✅ 2026-07-04** (PR #271, squash SHA `92ab08b`; see
-> `docs/PROJECT_STATUS.md` → "Resume here" for the shipped-scope recap). **Phase 1 (FSRS, 26b) is the
-> next build.**
+> Status: **Phase 0 (quick wins) SHIPPED ✅ 2026-07-04** (PR #271, squash SHA `92ab08b`) and
+> **Phase 3 (custom deck / "save word", #29) SHIPPED ✅ 2026-07-04** (PR #273, squash SHA `c730e76`;
+> migration 0005 run by the founder). Phase 3 was pulled forward out of order (it is self-contained and
+> was a good Opus 4.8 fit); see `docs/PROJECT_STATUS.md` → "Resume here" for the shipped-scope recap.
+> **Remaining: Phase 1 (FSRS, 26b) is the next build, then Phase 2 (#27 speech-first block).** Both
+> recommend Fable 5, high effort.
 > Source: the five recommendations of `docs/strategy/PRODUCT_EVALUATION.md` (the playbook self-assessment),
 > scoped as backlog items **#26 to #30** in `docs/PROJECT_STATUS.md`. Evidence base:
 > `docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
@@ -268,7 +271,12 @@ fuzzy matching, and flaky browser speech APIs; verify in a real browser, not jus
   listening state "Ich höre zu …"; success "Gut gesagt!"; fallback prompt "Mikrofon nicht
   verfügbar. Tippe deine Antwort."
 
-## 5. Phase 3: custom deck / "save word" (#29)
+## 5. Phase 3: custom deck / "save word" (#29) — SHIPPED ✅ (session 52, PR #273, `c730e76`)
+
+Shipped as described below, with one deliberate deviation: the "Gespeichert" filter was implemented as
+a per-learner **toolbar toggle** (`?saved=1` in `VocabularyTrainer`) rather than a facet in the central
+registry, because "saved" is learner state, not a static content field, so it fought the facet option
+model exactly as the fallback in this section anticipated. Migration 0005 was run by the founder.
 
 **Empfohlenes Modell: Opus 4.8.** The risk sits in store/cloudSync/DB-migration wiring; the UI half
 is Sonnet-grade, so a single Opus session covers both cleanly.
