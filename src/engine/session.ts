@@ -102,6 +102,8 @@ export interface BuildSessionOpts {
   difficulty?: Difficulty;
   /** Optional situation scope (a Situationen chip) that biases theme selection. */
   scope?: ThemeId;
+  /** Vocab ids in the learner's custom deck (#29); each gets a review boost. */
+  savedWords?: string[];
 }
 
 /** Interleave several ordered pools round-robin so kinds alternate, not block. */
@@ -128,6 +130,7 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
   const { srs, mode, minutes, scope } = opts;
   const difficulty = opts.difficulty ?? 2;
   const limit = targetBlocks(minutes);
+  const saved = new Set(opts.savedWords ?? []);
 
   const scopeTheme = scope ?? weakestTheme(srs, mode);
   const band = weakestBand(srs);
@@ -141,8 +144,12 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
       const levelMatch = !!band && v.cefr === band;
       const scopeBoost = v.themeId === scopeTheme ? 1 : 0;
       const w =
-        reviewWeight(srs[v.id], { modeMatch, levelMatch, jitter: Math.random() * 0.5 }) +
-        scopeBoost;
+        reviewWeight(srs[v.id], {
+          modeMatch,
+          levelMatch,
+          saved: saved.has(v.id),
+          jitter: Math.random() * 0.5,
+        }) + scopeBoost;
       return { v, w };
     })
     .sort((a, b) => b.w - a.w)

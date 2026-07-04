@@ -947,7 +947,24 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 51 (2026-07-04). Learning Engine Phase 0 (quick wins) is COMPLETE ✅ and
+**Handoff after session 52 (2026-07-04). Learning Engine #29 (custom deck / "save word") is
+IMPLEMENTED ✅ on branch `claude/whats-next-q1iln6`, not yet merged** (commit `3a529cf`; ready to
+ship pending a PR + squash-merge). What shipped: a per-learner **saved-words deck** on the progress
+store (`savedWords: string[]` + `toggleSavedWord(id)`, cleared by `resetProgress`), wired into
+cloudSync (`progressRow` writes `saved_words`, `mergeRemoteProgress` unions across devices) with a new
+**`supabase/migrations/0005_saved_words.sql`** that the founder must run once in the SQL editor (adds
+the `progress.saved_words` jsonb column, default `'[]'`, no backfill). UI: a **bookmark toggle on each
+Vokabeltrainer word card** (`VocabList.tsx`, stopPropagation like SpeakButton) and a **"Gespeichert"
+toolbar filter** (`?saved=1`; kept a per-learner toggle rather than a content facet, since "saved"
+isn't a static content field) with an empty state, plus a saved-count row in the Settings "Lernen"
+card. Engine: `reviewWeight` gained a **`saved` boost (+1)** threaded through session Pool 1
+(`buildSession` takes `savedWords`), so bookmarked words surface sooner in composed sessions. Verified:
+`pnpm typecheck`/`lint:content`/`build` green + a Playwright smoke test (toggle, persistence, filter
+narrowing, empty state) with zero console errors. **Founder action item:** run migration 0005 in the
+Supabase dashboard SQL editor (same runbook as `docs/plans/PHASE2_SETUP.md`) so saved words sync;
+until then the deck still works locally and rides localStorage.
+
+**Earlier handoff (session 51, 2026-07-04). Learning Engine Phase 0 (quick wins) is COMPLETE ✅ and
 merged to `main`** as PR #271 (squash SHA `92ab08b`): **26a response-latency capture** (`SrsCard`
 gained optional `lastMs`/`emaMs`, write-only training data for the coming FSRS scheduler, no scheduling
 behavior change), **#28 guess-before-reveal** (`guessFirst` setting, default on; MCQ questions hide
@@ -964,8 +981,8 @@ post-merge per the standard housekeeping.
 model **Fable 5, high effort** (subtle scheduler math, silent-failure risk if wrong); run a
 fresh-context verification subagent against the FSRS reference vectors before merging (plan §7). After
 that: **#27 speech-first production block** (Fable 5, high effort; first consumer of the already-built
-`listen()` STT wrapper), then **#29 custom deck / "save word"** (Opus 4.8; store/cloud/DB-migration
-wiring is the risk center). Also still open: the optional taxonomy follow-ups (human-verify the
+`listen()` STT wrapper). **#29 custom deck / "save word" is now done** (session 52, above), leaving 26b
+and #27 as the remaining Learning Engine phases. Also still open: the optional taxonomy follow-ups (human-verify the
 AI-drafted `cefr` tags via provenance `draft→verified`; broaden `sector`/`workSituation` tagging; extend
 sub-themes past 3 of 11), a new **life-domain theme** (banking / healthcare / housing) per the product
 scope, and the recurring `pages.yml` deploy-flake hardening (see the deploy note lower down). Backlog #25

@@ -82,6 +82,7 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
     scenariosDone: unionStrings(s.scenariosDone, (remote.scenarios_done as string[]) ?? []),
     examsDone: Array.from(examsMap.values()),
     totalSessions: Math.max(s.totalSessions, (remote.total_sessions as number) ?? 0),
+    savedWords: unionStrings(s.savedWords, (remote.saved_words as string[]) ?? []),
   });
   applyingRemote = false;
 }
@@ -125,6 +126,7 @@ function progressRow(s: ProgressSnapshot) {
     scenarios_done: s.scenariosDone,
     exams_done: s.examsDone,
     total_sessions: s.totalSessions,
+    saved_words: s.savedWords,
     updated_at: new Date().toISOString(),
   };
 }
