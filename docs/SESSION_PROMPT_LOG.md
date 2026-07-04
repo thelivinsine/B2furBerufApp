@@ -2190,17 +2190,22 @@ Branch: `claude/whats-next-esga9u`.
   > go ahead and merge it
 
   > document the session
+
+  > [screenshot of the Actions "Deploy site to GitHub Pages" history showing #282–#284 failed, #285 green]
 - **Response summary:** After the 26b FSRS work merged (entry 130), diagnosed the "error" the founder
   saw: the `Deploy site to GitHub Pages` job failing on both session-53 merges (`c1dada8`, `9ba8be4`)
   with GitHub's transient `Deployment failed, try again later` at the `actions/deploy-pages` step. Ruled
   out a code cause (the `validate` gate passed and a local `pnpm build` was green; the failure is at the
   Pages publish step, not the build). It was a genuine short GitHub Pages incident: deploys succeeded
-  ~30 min earlier, and even the founder's manual re-run failed before recovering. Once the service
-  recovered, deploy runs #282/#283 went green, so the FSRS change is live. Then, on the founder's go,
-  **hardened `pages.yml`**: the deploy job now runs up to 3 in-job attempts of the pinned
+  ~30 min earlier, and even the founder's manual re-run failed before recovering. Then, on the founder's
+  go, **hardened `pages.yml`**: the deploy job now runs up to 3 in-job attempts of the pinned
   `actions/deploy-pages` (fail-soft 1–2 with 15s/60s pauses, hard 3), with the `environment.url` falling
   back across attempts. Shipped as **PR #277**, `validate` gate green, **squash-merged as `c00341a`**,
-  post-merge realignment done; the merge's own deploy run #284 exercised the new retry and went green.
+  post-merge realignment done. (Correction: an interim status claim that deploy runs #282/#283/#284 went
+  green was wrong, from an unreliable WebFetch read of the Actions page. A founder screenshot showed the
+  incident ran long enough that #282/#283/#284 all failed, #284 exhausting all 3 retry attempts; the
+  next merge's run **#285 (`ab6278e`) went green** in 2m 20s, the retry visibly rescuing a later attempt.
+  Since each Pages deploy publishes the whole site, #285's success put the FSRS change live.)
   Finally updated the docs (this session close-out): `docs/PROJECT_STATUS.md` (deploy note rewritten to
   "auto-retried", PR #277 added to the session-53 handoff), `CLAUDE.md` (deploy-retry note), and this
   log.

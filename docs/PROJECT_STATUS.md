@@ -971,9 +971,13 @@ housekeeping done (branch `claude/26b-task-n3tl75` reset to `origin/main`, force
 **Also shipped this session (PR #277, squash SHA `c00341a`):** the long-standing `pages.yml` deploy
 flake is now **auto-retried** (up to 3 in-job attempts of `actions/deploy-pages`; see the "Deploy note"
 lower down). This came up because the flake hit both session-53 merges and a manual re-run failed until
-the Pages service recovered (a genuine short GitHub Pages incident, not the code); the FSRS change is
-live on `main` (deploy runs #282/#283 went green once the incident passed, and PR #277's own merge
-deploy #284 exercised the new retry green). Prompt-log entries 130–131.
+the Pages service recovered (a genuine short GitHub Pages incident, not the code). The incident ran long
+enough that deploy runs #282/#283/#284 all failed (#284 exhausted all 3 retry attempts while Pages was
+still degraded); the next merge's deploy, **run #285 (`ab6278e`, tip of `main`), went green after the
+retry rescued a later attempt** (2m 20s vs a clean ~22s, so the retry visibly engaged). Because each
+Pages deploy publishes the whole site from the current commit, #285's success means the FSRS change and
+all prior work are live. Takeaway confirmed: the retry self-heals a single-blip flake but cannot beat a
+multi-minute outage. Prompt-log entries 130–131.
 
 **Earlier handoff (session 52, 2026-07-04). Learning Engine #29 (custom deck / "save word") is
 COMPLETE ✅ and merged to `main`** as PR #273 (squash SHA `c730e76`). What shipped: a per-learner **saved-words deck** on the progress
@@ -1068,8 +1072,11 @@ Pages service was briefly degraded and even a **manual re-run failed** until it 
 session 53 (PR #277, squash SHA `c00341a`):** the deploy job now runs up to **three attempts** of the
 same pinned `actions/deploy-pages` action in-job (attempts 1–2 fail soft with 15s/60s pauses; attempt 3
 fails hard so a genuine outage still surfaces), with the `environment.url` falling back across the
-attempts. Proven on its own merge (run #284 green). So a single-blip flake now self-heals; only a
-multi-minute GitHub Pages outage would still need a manual re-run once the service recovers. **Old
+attempts. First real-world test was rough but instructive: run #284 (PR #277's own merge) exhausted all
+3 attempts because the Pages incident was still active, then the next merge's run **#285 went green in
+2m 20s** (vs a clean ~22s), showing the retry engaged and rescued a later attempt once the service
+recovered. So a single-blip flake now self-heals; only a multi-minute GitHub Pages outage (like the one
+on 2026-07-04) would still fail all attempts and need re-running after the service recovers. **Old
 manual remedy (if all three attempts ever fail):** GitHub Actions → the failed "Deploy site to GitHub
 Pages" run → "Re-run failed jobs".
 
