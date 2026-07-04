@@ -2171,3 +2171,38 @@ Branch: `claude/whats-next-esga9u`.
   `src/types/index.ts`, `scripts/test-srs.mjs`, `package.json`, `.github/workflows/validate.yml`;
   docs follow-up PR (`docs/PROJECT_STATUS.md`, `docs/plans/LEARNING_ENGINE_PLAN.md`,
   `docs/SESSION_PROMPT_LOG.md`, `CLAUDE.md`).
+
+## Entry 131 — 2026-07-04 (session 53)
+- **Branch:** `claude/26b-task-n3tl75`
+- **Prompts (verbatim):**
+  > is everything done? there seems to be an error
+
+  > are you done?
+
+  > can you do that?
+
+  > i reran the session 53 close out
+
+  > it failed again. check why it's happening
+
+  > can you check what's the error with deployement?
+
+  > go ahead and merge it
+
+  > document the session
+- **Response summary:** After the 26b FSRS work merged (entry 130), diagnosed the "error" the founder
+  saw: the `Deploy site to GitHub Pages` job failing on both session-53 merges (`c1dada8`, `9ba8be4`)
+  with GitHub's transient `Deployment failed, try again later` at the `actions/deploy-pages` step. Ruled
+  out a code cause (the `validate` gate passed and a local `pnpm build` was green; the failure is at the
+  Pages publish step, not the build). It was a genuine short GitHub Pages incident: deploys succeeded
+  ~30 min earlier, and even the founder's manual re-run failed before recovering. Once the service
+  recovered, deploy runs #282/#283 went green, so the FSRS change is live. Then, on the founder's go,
+  **hardened `pages.yml`**: the deploy job now runs up to 3 in-job attempts of the pinned
+  `actions/deploy-pages` (fail-soft 1–2 with 15s/60s pauses, hard 3), with the `environment.url` falling
+  back across attempts. Shipped as **PR #277**, `validate` gate green, **squash-merged as `c00341a`**,
+  post-merge realignment done; the merge's own deploy run #284 exercised the new retry and went green.
+  Finally updated the docs (this session close-out): `docs/PROJECT_STATUS.md` (deploy note rewritten to
+  "auto-retried", PR #277 added to the session-53 handoff), `CLAUDE.md` (deploy-retry note), and this
+  log.
+- **Artifacts:** PR #277, squash-merge SHA `c00341a` on `main`; files `.github/workflows/pages.yml`,
+  `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md` (this entry).
