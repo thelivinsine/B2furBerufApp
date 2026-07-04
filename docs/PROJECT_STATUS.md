@@ -968,7 +968,12 @@ a composed-session flashcard review persisting exactly the FSRS first-rating ref
 (`stability 2.3065, difficulty 2.1181, interval 2`) with zero console errors. The "correct but
 slow" latency grading stays deferred (plan Phase 1.5; needs 3+ samples per card). Post-merge
 housekeeping done (branch `claude/26b-task-n3tl75` reset to `origin/main`, force-with-lease).
-Prompt-log entry 130.
+**Also shipped this session (PR #277, squash SHA `c00341a`):** the long-standing `pages.yml` deploy
+flake is now **auto-retried** (up to 3 in-job attempts of `actions/deploy-pages`; see the "Deploy note"
+lower down). This came up because the flake hit both session-53 merges and a manual re-run failed until
+the Pages service recovered (a genuine short GitHub Pages incident, not the code); the FSRS change is
+live on `main` (deploy runs #282/#283 went green once the incident passed, and PR #277's own merge
+deploy #284 exercised the new retry green). Prompt-log entries 130–131.
 
 **Earlier handoff (session 52, 2026-07-04). Learning Engine #29 (custom deck / "save word") is
 COMPLETE ✅ and merged to `main`** as PR #273 (squash SHA `c730e76`). What shipped: a per-learner **saved-words deck** on the progress
@@ -1055,13 +1060,18 @@ routes redirecting in, the founder-unlocked `DEFAULT_PINNED_TABS` four-zone defa
 persist migration (`version: 1`) remapping existing users' pins/More-order. The s26–28 bottom-bar
 mechanics stayed locked throughout.
 
-**⚠️ Deploy note (recurring):** the `pages.yml` **deploy** job failed on the `c317047` merge with GitHub's
-transient `##[error]Deployment failed, try again later` on the `actions/deploy-pages` step (the build +
-artifact upload succeeded; it is a Pages-platform flake, not a code issue). The **same flake also hit the
-Phase-4 merge `74ccd7c`.** Remedy: re-run the failed deploy job (GitHub Actions → the failed
-"Deploy site to GitHub Pages" run → "Re-run failed jobs"); attempt 2 went green both times. It has now
-recurred twice, so consider hardening `pages.yml` with an automatic retry on the deploy step if it keeps
-happening.
+**✅ Deploy note (recurring flake, now auto-retried since s53):** the `pages.yml` **deploy** job
+intermittently failed with GitHub's transient `##[error]Deployment failed, try again later` on the
+`actions/deploy-pages` step (the build + artifact upload succeed; it is a Pages-platform flake, not a
+code issue). It hit `c317047`, `74ccd7c`, and both session-53 merges (`c1dada8`/`9ba8be4`), where the
+Pages service was briefly degraded and even a **manual re-run failed** until it recovered. **Fixed in
+session 53 (PR #277, squash SHA `c00341a`):** the deploy job now runs up to **three attempts** of the
+same pinned `actions/deploy-pages` action in-job (attempts 1–2 fail soft with 15s/60s pauses; attempt 3
+fails hard so a genuine outage still surfaces), with the `environment.url` falling back across the
+attempts. Proven on its own merge (run #284 green). So a single-blip flake now self-heals; only a
+multi-minute GitHub Pages outage would still need a manual re-run once the service recovers. **Old
+manual remedy (if all three attempts ever fail):** GitHub Actions → the failed "Deploy site to GitHub
+Pages" run → "Re-run failed jobs".
 
 **Phase-5 tail (session 49 cont.):**
 1. **Facet registry** `src/lib/facets.ts` (PR #264, `1141cde`): facet defs declared once per content type

@@ -326,6 +326,7 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — the only other workflow in `.github/workflows/` is `validate.yml` (the content-lint + SRS test gate), which never deploys. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
 - **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (reassigned per session; `claude/26b-task-n3tl75` as of session 53).
 - The remote sandbox cannot reach the live `*.github.io` site — verifying the deploy (Actions tab green + live site) is left to the user.
+- **Deploy retry (s53):** `pages.yml`'s deploy job retries `actions/deploy-pages` up to 3 times in-job (fail-soft attempts 1–2 with 15s/60s pauses, hard attempt 3) to absorb GitHub's transient `Deployment failed, try again later` Pages flake. A green run may therefore show a red attempt 1; that is expected, not a regression. Only a sustained GitHub Pages outage now needs a manual "Re-run failed jobs".
 
 ## Workflow notes
 - Development branch for this work: **`claude/26b-task-n3tl75`** (active as of session 53).
