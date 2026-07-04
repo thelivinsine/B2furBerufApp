@@ -19,8 +19,9 @@ design, see `docs/archive/EXPANSION_PLAN.md`; for the original build plan, `docs
 ### Original SPA — live (on `main`)
 - Full client-side SPA: onboarding, dashboard, vocabulary (flashcards/quiz/list), redemittel
   (browse + practice), branching simulations, timed exam mode, analytics, settings.
-- Engines: SM-2 SRS (`engine/srs.ts`), XP/levels/tiers (`engine/scoring.ts`), Web Speech TTS/STT
-  (`engine/speech.ts`), branching dialogue runner (`engine/dialogue.ts`).
+- Engines: SRS (`engine/srs.ts`; SM-2 originally, swapped to FSRS-6 in s53 / PR #275), XP/levels/tiers
+  (`engine/scoring.ts`), Web Speech TTS/STT (`engine/speech.ts`), branching dialogue runner
+  (`engine/dialogue.ts`).
 - State: zustand stores persisted to localStorage (`b2beruf.progress.v1`, `b2beruf.settings.v1`).
 
 ### Phase 1 — SHIPPED & LIVE ✅ (on `main` via `pages.yml`, founder-verified 2026-05-30)
@@ -947,7 +948,29 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 52 (2026-07-04). Learning Engine #29 (custom deck / "save word") is
+**Handoff after session 53 (2026-07-04). Learning Engine Phase 1, the FSRS scheduler (26b), is
+COMPLETE ✅ and merged to `main`** as PR #275 (squash SHA `c1dada8`). `src/engine/srs.ts` now runs a
+compact hand-rolled **FSRS-6** scheduler (21 default weights, desired retention 0.9, no fuzzing,
+day-granular with no sub-day learning steps) behind the **unchanged** export surface, so no call
+sites changed. `SrsCard` gained optional `stability`/`difficulty` (they ride inside the `srs` jsonb
+blob; no persist or Supabase migration). Legacy SM-2 cards seed lazily on their next review
+(stability from `interval`, difficulty inversely from `ease`); untouched cards keep identical
+`mastery()` scores, so the theme grid and Can-Do milestones don't shift. `reps` is now a
+total-review counter that never resets (keeps cloudSync's higher-reps-wins merge valid), and `ease`
+keeps updating by the SM-2 rule, so reverting the one engine file would restore the old scheduling
+with no data repair. **New CI gate: `pnpm test:srs`** (`scripts/test-srs.mjs`, added to
+`validate.yml` next to `lint:content`): 310 assertions against golden vectors generated from
+**py-fsrs 6.3.1**, the open-spaced-repetition FSRS-6 reference (grade sequences, same-day/late/
+early reviews, legacy seeding, the 26a latency regression, contract invariants). Verified per plan
+§7: all four gates green, a fresh-context verification subagent independently re-derived the
+formulas and golden vectors (verdict PASS), and a Playwright smoke against a live dev server showed
+a composed-session flashcard review persisting exactly the FSRS first-rating reference values
+(`stability 2.3065, difficulty 2.1181, interval 2`) with zero console errors. The "correct but
+slow" latency grading stays deferred (plan Phase 1.5; needs 3+ samples per card). Post-merge
+housekeeping done (branch `claude/26b-task-n3tl75` reset to `origin/main`, force-with-lease).
+Prompt-log entry 130.
+
+**Earlier handoff (session 52, 2026-07-04). Learning Engine #29 (custom deck / "save word") is
 COMPLETE ✅ and merged to `main`** as PR #273 (squash SHA `c730e76`). What shipped: a per-learner **saved-words deck** on the progress
 store (`savedWords: string[]` + `toggleSavedWord(id)`, cleared by `resetProgress`), wired into
 cloudSync (`progressRow` writes `saved_words`, `mergeRemoteProgress` unions across devices) with a new
@@ -977,12 +1000,12 @@ migrations needed, all new fields are optional and ride inside existing jsonb bl
 `claude/whats-next-esga9u` (reassigned per session; `main` is the source of truth), realigned to `main`
 post-merge per the standard housekeeping.
 
-**Next up: Phase 1 of `docs/plans/LEARNING_ENGINE_PLAN.md` — the FSRS scheduler (26b).** Recommended
-model **Fable 5, high effort** (subtle scheduler math, silent-failure risk if wrong); run a
-fresh-context verification subagent against the FSRS reference vectors before merging (plan §7). After
-that: **#27 speech-first production block** (Fable 5, high effort; first consumer of the already-built
-`listen()` STT wrapper). **#29 custom deck / "save word" is now done** (session 52, above), leaving 26b
-and #27 as the remaining Learning Engine phases. Also still open: the optional taxonomy follow-ups (human-verify the
+**Next up: Phase 2 of `docs/plans/LEARNING_ENGINE_PLAN.md` — the #27 speech-first production block.**
+Recommended model **Fable 5, high effort** (new session block kind, first consumer of the already-built
+`listen()` STT wrapper in `engine/speech.ts`, fuzzy answer matching, flaky browser speech APIs; verify
+in a real browser). That is the LAST remaining Learning Engine phase (26a/#28/#30 shipped s51, #29
+shipped s52, 26b FSRS shipped s53, above); the optional Phase 1.5 latency plug-in ("correct but slow"
+demotes Good→Hard, needs 3+ samples per card) can ride along or follow. Also still open: the optional taxonomy follow-ups (human-verify the
 AI-drafted `cefr` tags via provenance `draft→verified`; broaden `sector`/`workSituation` tagging; extend
 sub-themes past 3 of 11), a new **life-domain theme** (banking / healthcare / housing) per the product
 scope, and the recurring `pages.yml` deploy-flake hardening (see the deploy note lower down). Backlog #25

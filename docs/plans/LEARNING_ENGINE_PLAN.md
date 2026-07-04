@@ -1,11 +1,13 @@
 # Learning Engine Plan: latency, FSRS, speaking drills, guess-first, custom decks
 
-> Status: **Phase 0 (quick wins) SHIPPED ✅ 2026-07-04** (PR #271, squash SHA `92ab08b`) and
+> Status: **Phase 0 (quick wins) SHIPPED ✅ 2026-07-04** (PR #271, squash SHA `92ab08b`),
 > **Phase 3 (custom deck / "save word", #29) SHIPPED ✅ 2026-07-04** (PR #273, squash SHA `c730e76`;
-> migration 0005 run by the founder). Phase 3 was pulled forward out of order (it is self-contained and
-> was a good Opus 4.8 fit); see `docs/PROJECT_STATUS.md` → "Resume here" for the shipped-scope recap.
-> **Remaining: Phase 1 (FSRS, 26b) is the next build, then Phase 2 (#27 speech-first block).** Both
-> recommend Fable 5, high effort.
+> migration 0005 run by the founder; pulled forward out of order as a self-contained Opus 4.8 fit),
+> and **Phase 1 (FSRS scheduler, 26b) SHIPPED ✅ 2026-07-04** (PR #275, squash SHA `c1dada8`; Fable 5
+> high effort per §7, verified by a fresh-context subagent against py-fsrs reference vectors plus the
+> new `pnpm test:srs` CI gate). See `docs/PROJECT_STATUS.md` → "Resume here" for the shipped-scope
+> recaps. **Remaining: Phase 2 (#27 speech-first block), Fable 5 high effort, then the optional
+> Phase 1.5 latency plug-in.**
 > Source: the five recommendations of `docs/strategy/PRODUCT_EVALUATION.md` (the playbook self-assessment),
 > scoped as backlog items **#26 to #30** in `docs/PROJECT_STATUS.md`. Evidence base:
 > `docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
@@ -192,11 +194,27 @@ and mutual exclusion) is already decided here.
    repeated SpeakButton taps rotate audibly; pinning a voice in the Select flips the switch off;
    the switch hides with 0 or 1 German voices. Simulation and Exam audio still play.
 
-## 3. Phase 1: FSRS scheduler (26b)
+## 3. Phase 1: FSRS scheduler (26b) — SHIPPED ✅ 2026-07-04 (PR #275, `c1dada8`)
 
 **Empfohlenes Modell: Fable 5, high effort.** Subtle scheduler math that silently degrades learning
 if wrong. Run a fresh-context verification subagent against the FSRS reference vectors before
 merging (see §7). Opus 4.8 is the fallback model.
+
+> **As shipped (session 53):** implemented as specified below, hand-rolled (the `ts-fsrs` fallback
+> dependency was not needed). Chosen algorithm revision: **FSRS-6** (21 default weights,
+> trainable-decay retrievability), matched against **py-fsrs 6.3.1** configured for this app's
+> semantics (no sub-day learning/relearning steps, no fuzzing, desired retention 0.9, max interval
+> 36500 days). Elapsed time since the last review is reconstructed as `due - interval` (both
+> day-granular), and same-day repeats take FSRS's short-term stability path. One deliberate reading
+> of the seed spec was verified in-session: the ease→difficulty map is linear through ease 2.5 → D 3
+> and keeps falling toward the clamp at 1 for higher ease, so an often-rated-Easy card seeds easy
+> (consistent with FSRS's own difficulty floor). The verification recipe became `scripts/test-srs.mjs`
+> + `pnpm test:srs` + a validate.yml step: 310 assertions against golden vectors generated from
+> py-fsrs (grade sequences including the library's published happy path, same-day/late/early reviews,
+> legacy seeding, the 26a latency regression, contract invariants), all passing at 1e-9 tolerance.
+> A fresh-context verification subagent independently re-derived the formulas and vectors (verdict
+> PASS), and a Playwright smoke confirmed a live composed-session review persists the exact FSRS
+> first-rating reference values. The latency plug-in below stays Phase 1.5 (not shipped).
 
 Replace SM-2 inside `review()` with a hand-rolled compact FSRS, behind the **unchanged** export
 surface of `src/engine/srs.ts` (`review`, `freshCard`, `isDue`, `mastery`, `masteryLabel`,

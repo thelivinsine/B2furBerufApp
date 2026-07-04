@@ -15,7 +15,7 @@ pillar**, not the whole product; daily-life domains beyond the workplace are cor
 - **Vite 6** + **React 18** + **TypeScript 5.7** (strict, project references via `tsc -b`)
 - **Tailwind 3** (config in `tailwind.config.ts`), **Radix UI** primitives, **framer-motion**, **lucide-react**, **recharts**
 - **zustand** for state, **react-router-dom 6** for routing
-- No test framework configured yet.
+- No test framework configured; targeted gates live as `scripts/*.mjs` (see `pnpm test:srs` below).
 
 ## Commands
 **Package manager is `pnpm`** (pinned via the `packageManager` field; lockfile is `pnpm-lock.yaml`).
@@ -26,6 +26,8 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
 - `pnpm preview` — preview the production build
 - `pnpm audit` — check for dependency vulnerabilities (CI/security gate)
 - `pnpm lint:content` — validate the `src/data/*` content banks (CI gate, see below)
+- `pnpm test:srs` — assert `engine/srs.ts` against FSRS golden vectors from py-fsrs (CI gate, s53).
+  **Run it after any `engine/srs.ts` edit.** Vector provenance is in the `scripts/test-srs.mjs` header.
 
 Notes: `.npmrc` sets `minimum-release-age` (24h supply-chain cooldown) and
 `package-manager-strict`. pnpm blocks dependency build scripts by default (a supply-chain
@@ -33,7 +35,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 
 ## Layout (`src/`)
 - `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`, `domains.ts`, `collocations.ts`, `provenance.ts`, `canDo.ts` (Can-Do milestones, s47)
-- `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (spaced repetition), `quiz.ts`, `session.ts` (composed-session composer, s47)
+- `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (FSRS-6 spaced repetition since s53; legacy SM-2 fields kept warm for rollback), `quiz.ts`, `session.ts` (composed-session composer, s47)
 - `store/` — zustand stores: `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`, `useLibraryScope` (travelling library scope, s47)
 - `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47)
 - `features/session/` — `SessionPlayer` + `Session` route wrapper (the composed learning loop, s47)
@@ -321,12 +323,12 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   analytics/marketing storage is ever added.
 
 ## Deployment (GitHub Pages)
-- **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — `pages.yml` is the sole workflow in `.github/workflows/`. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
-- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (currently `claude/ux-overhaul-phase-4-ui-qh8si7`).
+- **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — the only other workflow in `.github/workflows/` is `validate.yml` (the content-lint + SRS test gate), which never deploys. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
+- **Feature-branch pushes do NOT update the live site.** Work only goes live once merged to `main`. If the founder says "I don't see the change," the most likely cause is unmerged work on the active automation branch (reassigned per session; `claude/26b-task-n3tl75` as of session 53).
 - The remote sandbox cannot reach the live `*.github.io` site — verifying the deploy (Actions tab green + live site) is left to the user.
 
 ## Workflow notes
-- Development branch for this work: **`claude/ux-overhaul-phase-4-ui-qh8si7`** (active as of session 48).
+- Development branch for this work: **`claude/26b-task-n3tl75`** (active as of session 53).
   The branch name is reassigned per session — **`main` is always the source of truth**; whatever
   branch a session is assigned, ship to production by opening a PR into `main` and merging (squash).
 - **Auto-ship preference (founder approved 2026-06-01):** the founder wants changes live, not parked on the branch. When a change is complete and `pnpm build` is green, **open a PR into `main` and squash-merge it yourself** (no need to ask each time) so it deploys. Use the GitHub MCP tools. The founder remains the one who confirms the live result.

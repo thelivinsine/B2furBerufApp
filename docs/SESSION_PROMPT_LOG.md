@@ -2145,3 +2145,29 @@ Branch: `claude/whats-next-esga9u`.
   toolbar-toggle deviation), and this log.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/plans/LEARNING_ENGINE_PLAN.md`,
   `docs/SESSION_PROMPT_LOG.md` (entries 128–129).
+
+## Entry 130 — 2026-07-04 (session 53)
+- **Branch:** `claude/26b-task-n3tl75`
+- **Prompt (verbatim):**
+  > start with 26b task
+- **Response summary:** Implemented Learning Engine Phase 1 (26b): replaced the SM-2 scheduler in
+  `src/engine/srs.ts` with a compact hand-rolled **FSRS-6** scheduler behind the unchanged export
+  surface (no call sites changed). `SrsCard` gained optional `stability`/`difficulty`; legacy SM-2
+  cards seed lazily on their next review (stability from `interval`, difficulty inversely from
+  `ease`), untouched cards keep identical `mastery()` scores; `reps` became a never-resetting
+  total-review counter (cloudSync merge safety) and `ease` stays warm under the SM-2 rule (one-file
+  rollback). Built the new CI gate `scripts/test-srs.mjs` (`pnpm test:srs`, wired into
+  `validate.yml`): 310 assertions against golden vectors generated from py-fsrs 6.3.1 (the
+  open-spaced-repetition FSRS-6 reference) run with the app's semantics (no sub-day steps, no
+  fuzzing, retention 0.9), covering grade sequences, same-day/late/early reviews, legacy seeding,
+  the 26a latency regression, and contract invariants. Verified per plan §7: `pnpm typecheck`/
+  `lint:content`/`build`/`test:srs` all green; a fresh-context verification subagent independently
+  re-derived the formulas and golden vectors from the py-fsrs source (verdict PASS, one comment nit
+  fixed); Playwright smoke against a live dev server persisted the exact FSRS first-rating values
+  from a composed-session flashcard review with zero console errors. Opened PR #275, waited for CI,
+  squash-merged as `c1dada8`, completed post-merge realignment, then shipped these doc updates
+  (status doc, this log, plan status, CLAUDE.md) as a follow-up docs PR.
+- **Artifacts:** PR #275, squash-merge SHA `c1dada8` on `main`; files `src/engine/srs.ts`,
+  `src/types/index.ts`, `scripts/test-srs.mjs`, `package.json`, `.github/workflows/validate.yml`;
+  docs follow-up PR (`docs/PROJECT_STATUS.md`, `docs/plans/LEARNING_ENGINE_PLAN.md`,
+  `docs/SESSION_PROMPT_LOG.md`, `CLAUDE.md`).
