@@ -1,8 +1,8 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-04 (Learning Engine Phase 0 shipped, session 51). The working branch is reassigned
-every session, so **`main` is always the source of truth** (this session: `claude/whats-next-esga9u`).
-Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-04 (Learning Engine #29 custom deck shipped, session 52). The working branch is
+reassigned every session, so **`main` is always the source of truth** (this session:
+`claude/whats-next-q1iln6`). Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
 pointer is the `## Resume here (next session)` section near the end of this file** — start there. Older
@@ -948,8 +948,7 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 ## Resume here (next session)
 
 **Handoff after session 52 (2026-07-04). Learning Engine #29 (custom deck / "save word") is
-IMPLEMENTED ✅ on branch `claude/whats-next-q1iln6`, not yet merged** (commit `3a529cf`; ready to
-ship pending a PR + squash-merge). What shipped: a per-learner **saved-words deck** on the progress
+COMPLETE ✅ and merged to `main`** as PR #273 (squash SHA `c730e76`). What shipped: a per-learner **saved-words deck** on the progress
 store (`savedWords: string[]` + `toggleSavedWord(id)`, cleared by `resetProgress`), wired into
 cloudSync (`progressRow` writes `saved_words`, `mergeRemoteProgress` unions across devices) with a new
 **`supabase/migrations/0005_saved_words.sql`** that the founder must run once in the SQL editor (adds
@@ -960,9 +959,10 @@ isn't a static content field) with an empty state, plus a saved-count row in the
 card. Engine: `reviewWeight` gained a **`saved` boost (+1)** threaded through session Pool 1
 (`buildSession` takes `savedWords`), so bookmarked words surface sooner in composed sessions. Verified:
 `pnpm typecheck`/`lint:content`/`build` green + a Playwright smoke test (toggle, persistence, filter
-narrowing, empty state) with zero console errors. **Founder action item:** run migration 0005 in the
-Supabase dashboard SQL editor (same runbook as `docs/plans/PHASE2_SETUP.md`) so saved words sync;
-until then the deck still works locally and rides localStorage.
+narrowing, empty state) with zero console errors. **Migration 0005 was run by the founder in the
+Supabase SQL editor 2026-07-04**, so `progress.saved_words` exists and saved words sync across devices.
+Post-merge housekeeping done (branch reset to `origin/main`, force-with-lease). Prompt-log entries
+127–129.
 
 **Earlier handoff (session 51, 2026-07-04). Learning Engine Phase 0 (quick wins) is COMPLETE ✅ and
 merged to `main`** as PR #271 (squash SHA `92ab08b`): **26a response-latency capture** (`SrsCard`
