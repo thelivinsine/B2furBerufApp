@@ -11,6 +11,7 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "lint:content": "node scripts/lint-content.mjs",
+    "test:srs": "node scripts/test-srs.mjs",
     "generate:provenance": "node scripts/generate-provenance-stubs.mjs",
     "check:refs": "node scripts/check-provenance-refs.mjs"
   },

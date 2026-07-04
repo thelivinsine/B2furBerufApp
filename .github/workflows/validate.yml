@@ -36,3 +36,8 @@ jobs:
 
       - name: Lint content
         run: pnpm lint:content
+
+      # FSRS scheduler gate (Learning Engine 26b): asserts src/engine/srs.ts
+      # against golden vectors from the py-fsrs reference implementation.
+      - name: Test SRS engine
+        run: pnpm test:srs

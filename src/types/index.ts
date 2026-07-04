@@ -437,14 +437,32 @@ export interface PracticeArea {
 /* ---------------- Spaced repetition ---------------- */
 
 export interface SrsCard {
-  /** Ease factor (SM-2). */
+  /**
+   * Ease factor (SM-2 legacy). The FSRS scheduler (26b) no longer reads it,
+   * but keeps updating it with the SM-2 rule so reverting the engine to SM-2
+   * needs no data repair.
+   */
   ease: number;
-  /** Interval in days. */
+  /** Interval in days (still the source of the day-granular `due`). */
   interval: number;
-  /** Consecutive correct reviews. */
+  /**
+   * Total reviews. Under FSRS (26b) this no longer resets on a lapse: it must
+   * only grow, because cloudSync's mergeSrs picks the higher-reps card.
+   */
   reps: number;
   /** Due date as YYYY-MM-DD. */
   due: string;
+  /**
+   * FSRS memory stability: days until recall probability decays to 90%.
+   * Absent on cards last written by the SM-2 era; seeded lazily from
+   * `interval` on the next review (see engine/srs.ts).
+   */
+  stability?: number;
+  /**
+   * FSRS difficulty, clamped to 1..10 (higher = harder). Absent on legacy
+   * cards; seeded lazily from `ease` on the next review.
+   */
+  difficulty?: number;
   /** Last grade 0–5. */
   lastGrade?: number;
   /**
