@@ -2071,3 +2071,41 @@ Branch: `claude/whats-next-esga9u`.
   shipped, next steps pointed at Phase 1 FSRS) and appended this session's prompts (entries 119–124) to
   this log.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (this entry).
+
+## Entry 125 — 2026-07-04 (session 52)
+- **Branch:** `claude/whats-next-q1iln6`
+- **Prompt (verbatim):**
+  > What's next?
+- **Response summary:** Read `docs/PROJECT_STATUS.md` "Resume here". Reported the next build step as
+  Phase 1 of the Learning Engine plan (the FSRS scheduler, #26b), followed by #27 speech-first block and
+  #29 custom deck, plus the standing lower-priority items (cefr human-verify, sector/situation tagging,
+  a new life-domain theme, the `pages.yml` deploy-flake hardening, backlog #25). No code changed.
+- **Artifacts:** none (informational).
+
+## Entry 126 — 2026-07-04 (session 52)
+- **Branch:** `claude/whats-next-q1iln6`
+- **Prompt (verbatim):**
+  > What's the model reco for the above items?
+- **Response summary:** Relayed the per-item model/effort table from `docs/plans/LEARNING_ENGINE_PLAN.md`
+  §7: 26b FSRS → Fable 5 (high), #27 speaking block → Fable 5 (high), #29 custom deck → Opus 4.8
+  (default), noting the shipped Phase 0 items for completeness. No code changed.
+- **Artifacts:** none (informational).
+
+## Entry 127 — 2026-07-04 (session 52)
+- **Branch:** `claude/whats-next-q1iln6`
+- **Prompt (verbatim):**
+  > do the item 29 now
+- **Response summary:** Implemented Learning Engine #29 (custom deck / "save word") end to end.
+  Progress store gained `savedWords: string[]` + `toggleSavedWord(id)` (cleared by resetProgress via the
+  defaults spread); cloudSync writes/merges `saved_words` and migration `0005_saved_words.sql` adds the
+  jsonb column. UI: a bookmark toggle on each Vokabeltrainer word card (stopPropagation like SpeakButton)
+  plus a "Gespeichert" toolbar filter (`?saved=1`, kept a per-learner toggle rather than a content facet)
+  with an empty state and a Settings "Lernen" saved-count row. Engine: `reviewWeight` gained a `saved`
+  boost (+1) threaded through session Pool 1 so bookmarked words surface sooner. Verified with
+  `pnpm typecheck`/`lint:content`/`build` (all green) and a Playwright smoke test against a live dev
+  server (bookmark toggle, persistence to the progress store, filter narrowing to the saved word, and
+  the empty state), zero console errors.
+- **Artifacts:** commit `3a529cf`; files `src/store/useProgressStore.ts`, `src/lib/cloudSync.ts`,
+  `supabase/migrations/0005_saved_words.sql`, `src/engine/srs.ts`, `src/engine/session.ts`,
+  `src/features/session/SessionPlayer.tsx`, `src/features/vocabulary/VocabList.tsx`,
+  `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/settings/Settings.tsx`.
