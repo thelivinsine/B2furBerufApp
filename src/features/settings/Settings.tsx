@@ -173,6 +173,26 @@ export function Settings() {
           </CardContent>
         </Card>
 
+        {/* Learning */}
+        <Card>
+          <CardContent className="space-y-4 p-5">
+            <p className="font-semibold">Lernen</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Erst überlegen, dann Optionen</p>
+                <p className="text-xs text-muted-foreground">
+                  Bei Auswahlfragen kurz selbst antworten, bevor die Optionen erscheinen. Das
+                  stärkt den Abruf.
+                </p>
+              </div>
+              <Switch
+                checked={settings.guessFirst}
+                onCheckedChange={(v) => settings.setSettings({ guessFirst: v })}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Appearance */}
         <Card>
           <CardContent className="space-y-4 p-5">

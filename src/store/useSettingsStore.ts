@@ -45,6 +45,8 @@ interface SettingsState {
   voiceURI: string | null;
   recognitionEnabled: boolean;
   reducedMotion: boolean;
+  /** MCQ questions hide options behind a "think first" gate (anticipatory retrieval). */
+  guessFirst: boolean;
 
   /** Ordered list of nav paths pinned to the bottom tab bar (max 4). */
   pinnedTabs: string[];
@@ -77,6 +79,7 @@ const defaults = {
   voiceURI: null,
   recognitionEnabled: false,
   reducedMotion: false,
+  guessFirst: true,
   pinnedTabs: DEFAULT_PINNED_TABS,
   moreOrder: [] as string[],
   signInBannerDismissed: false,
