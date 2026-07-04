@@ -61,11 +61,11 @@ export function QuizRunner({
     [score, total],
   );
 
-  const recordAndNext = (correct: boolean) => {
+  const recordAndNext = (correct: boolean, latencyMs?: number) => {
     if (answered) return;
     setAnswered(true);
     if (q.sourceId && q.kind !== "matching") {
-      reviewVocab(q.sourceId, correct ? 4 : 0);
+      reviewVocab(q.sourceId, correct ? 4 : 0, latencyMs);
     }
     if (correct) addXp(quizXp(difficulty));
     setResults((r) => [...r, { q, correct }]);
@@ -177,6 +177,8 @@ export function QuizRunner({
         </div>
       </div>
 
+      {/* key={q.id} is load-bearing: it remounts QuestionView per question, which
+          resets MCQView's per-prompt answer timer (26a latency capture). */}
       <motion.div key={q.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <QuestionView q={q} answered={answered} onResult={recordAndNext} />
       </motion.div>

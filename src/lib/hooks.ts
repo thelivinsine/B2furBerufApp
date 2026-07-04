@@ -52,6 +52,25 @@ export function useStopwatch(auto = false) {
   };
 }
 
+/**
+ * Millisecond answer timer for response-latency capture. Returns a stable getter
+ * for the elapsed time (ms) since the current prompt first rendered. Pass a
+ * `key` that changes per prompt (question id, card id, block key); the start
+ * time resets in the render phase when `key` changes, so it captures "first
+ * render of the new prompt" before paint. Ref writes are idempotent under
+ * StrictMode. Unlike `useStopwatch`/`useCountdown` (second-granular) this reads
+ * `performance.now()` directly for sub-second precision.
+ */
+export function useAnswerTimer(key: unknown): () => number {
+  const startRef = useRef(performance.now());
+  const keyRef = useRef(key);
+  if (keyRef.current !== key) {
+    keyRef.current = key;
+    startRef.current = performance.now();
+  }
+  return useCallback(() => Math.round(performance.now() - startRef.current), []);
+}
+
 export function useMediaQuery(query: string): boolean {
   const [matches, setMatches] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia(query).matches : false,

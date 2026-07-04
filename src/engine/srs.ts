@@ -10,7 +10,12 @@ export function freshCard(due: string = todayKey()): SrsCard {
   return { ease: 2.5, interval: 0, reps: 0, due };
 }
 
-export function review(card: SrsCard, grade: Grade, on: Date = new Date()): SrsCard {
+export function review(
+  card: SrsCard,
+  grade: Grade,
+  on: Date = new Date(),
+  latencyMs?: number,
+): SrsCard {
   let { ease, interval, reps } = card;
 
   if (grade < 3) {
@@ -32,7 +37,17 @@ export function review(card: SrsCard, grade: Grade, on: Date = new Date()): SrsC
   const next = new Date(on);
   next.setDate(next.getDate() + interval);
 
-  return { ease, interval, reps, due: todayKey(next), lastGrade: grade };
+  // Response-latency capture (write-only training data for the FSRS upgrade; no
+  // scheduling effect yet). A latency-less call carries the previous samples
+  // forward unchanged, so it never wipes history.
+  let { lastMs, emaMs } = card;
+  if (typeof latencyMs === "number" && Number.isFinite(latencyMs) && latencyMs > 0) {
+    const ms = Math.min(Math.round(latencyMs), 60000);
+    lastMs = ms;
+    emaMs = card.emaMs == null ? ms : Math.round(0.3 * ms + 0.7 * card.emaMs);
+  }
+
+  return { ease, interval, reps, due: todayKey(next), lastGrade: grade, lastMs, emaMs };
 }
 
 export function isDue(card: SrsCard | undefined, today: string = todayKey()): boolean {

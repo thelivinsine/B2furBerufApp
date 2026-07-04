@@ -10,6 +10,7 @@ import type {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SpeakButton } from "@/components/shared/SpeakButton";
+import { useAnswerTimer } from "@/lib/hooks";
 import { cn, shuffle } from "@/lib/utils";
 
 /**
@@ -28,14 +29,18 @@ export function MCQView({
 }: {
   q: MCQQuestion;
   answered: boolean;
-  onResult: (correct: boolean) => void;
+  onResult: (correct: boolean, latencyMs?: number) => void;
 }) {
   const [picked, setPicked] = useState<string | null>(null);
+  // Latency = prompt render to option tap. This is a retrieval-latency signal,
+  // so it spans any guess-first "think" stage (it is not reset on reveal).
+  const elapsed = useAnswerTimer(q.id);
 
   const choose = (opt: string) => {
     if (picked) return;
+    const latencyMs = elapsed();
     setPicked(opt);
-    onResult(opt === q.answer);
+    onResult(opt === q.answer, latencyMs);
   };
 
   return (
@@ -282,7 +287,7 @@ export function QuestionView({
 }: {
   q: QuizQuestion;
   answered: boolean;
-  onResult: (correct: boolean) => void;
+  onResult: (correct: boolean, latencyMs?: number) => void;
 }) {
   if (q.kind === "matching") return <MatchingView q={q} answered={answered} onResult={onResult} />;
   if (q.kind === "wordOrder") return <WordOrderView q={q} answered={answered} onResult={onResult} />;

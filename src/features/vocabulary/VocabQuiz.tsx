@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { EmptyState } from "@/components/shared/misc";
 import { SpeakButton } from "@/components/shared/SpeakButton";
+import { useAnswerTimer } from "@/lib/hooks";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { XP } from "@/engine/scoring";
@@ -40,6 +41,10 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
 
+  // Latency = prompt render to option tap. Keyed on the question index (remounts
+  // the timer per question); kept above the early returns for the Rules of Hooks.
+  const elapsed = useAnswerTimer(index);
+
   const total = questions.length;
   const q = questions[index];
 
@@ -72,9 +77,10 @@ export function VocabQuiz({ items }: { items: VocabItem[] }) {
 
   const choose = (choice: string) => {
     if (picked) return;
+    const latencyMs = elapsed();
     setPicked(choice);
     const correct = choice === q.item.en;
-    reviewVocab(q.item.id, correct ? 4 : 0);
+    reviewVocab(q.item.id, correct ? 4 : 0, latencyMs);
     if (correct) {
       setScore((s) => s + 1);
       addXp(XP.quizCorrect);
