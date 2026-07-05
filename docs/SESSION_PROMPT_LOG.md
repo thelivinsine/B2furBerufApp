@@ -576,3 +576,16 @@ Branch: `claude/whats-next-esga9u`.
   > what's next?
 - **Response summary:** Picked up the "Resume here" pointer and shipped **Learning Engine Phase 2, the #27 speech-first production block** (the last remaining phase), per `docs/plans/LEARNING_ENGINE_PLAN.md` §4. New `"speaking"` session block (first consumer of the `listen()` STT wrapper): behind the `recognitionEnabled` opt-in + browser support, the composer adds up to 2 production blocks from the top-weighted due vocab; the learner sees the EN meaning + EN example, taps the mic, says the German target, and the transcript is matched by the new pure `src/engine/pronounce.ts` (article/`sich` stripping, ß→ss, exact / word-boundary containment / length-scaled Levenshtein). Grades 4/0 into FSRS with 26a latency spanning the think stage; +12 XP. Fallback ladder: hard STT error → typed input graded by the same matcher (2 errors → remaining speaking blocks start typed); `no-speech` → retry; voluntary "Lieber tippen" always available. New CI gate `pnpm test:pronounce` (26 checks) in `validate.yml`. Verified with all five gates green plus a 21-check Playwright smoke (mocked SpeechRecognition; STT happy path with exactly +12 XP and persisted latency, typed paths, error fallback, recognition-off session shows no speaking block; zero console errors). Squash-merged and realigned; docs updated (plan status, PROJECT_STATUS handoff + next-up list, CLAUDE.md commands/engine lines, this entry).
 - **Artifacts:** `src/engine/pronounce.ts`, `scripts/test-pronounce.mjs` (new); `src/types/index.ts`, `src/engine/session.ts`, `src/engine/scoring.ts`, `src/features/session/SessionPlayer.tsx`, `src/features/settings/Settings.tsx`, `package.json`, `.github/workflows/validate.yml` (modified). PR #284, squash SHA `6d1d8b4`. Docs commit follows on the same branch.
+
+## Entry 137 — 2026-07-05 (session 56)
+- **Branch:** `claude/whats-next-yqdvc9`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim):**
+  > continue where you left off
+  >
+  > are you done?
+  >
+  > it works
+- **Response summary:** Session-56 wrap-up. "Continue" resumed mid-verification (the Playwright smoke was written but not yet run); the smoke surfaced and fixed two real bugs (StrictMode double-mount latched the unmount guard; STT `onend` after `onerror` dragged the UI back from the typed fallback) before the ship. Confirmed completion status, and the founder then **verified the #27 speaking block working on the live site** (PR #284 deploy green). Learning Engine plan fully shipped and live-verified.
+- **Artifacts:** this entry only.
