@@ -196,13 +196,45 @@ export async function pushProgressNow(): Promise<boolean> {
 function scheduleProgressPush() {
   if (applyingRemote || !userId) return;
   if (progressTimer) clearTimeout(progressTimer);
-  progressTimer = setTimeout(pushProgress, DEBOUNCE_MS);
+  progressTimer = setTimeout(() => {
+    progressTimer = null;
+    void pushProgress();
+  }, DEBOUNCE_MS);
 }
 
 function scheduleSettingsPush() {
   if (applyingRemote || !userId) return;
   if (settingsTimer) clearTimeout(settingsTimer);
-  settingsTimer = setTimeout(pushSettings, DEBOUNCE_MS);
+  settingsTimer = setTimeout(() => {
+    settingsTimer = null;
+    void pushSettings();
+  }, DEBOUNCE_MS);
+}
+
+/**
+ * Fire any debounce-pending pushes immediately. Called when the app is
+ * backgrounded (the mobile pattern "finish the session, close the PWA"
+ * previously lost whatever was inside the 1.5 s debounce window) and before
+ * sign-out tears the session down (stopCloudSync used to silently discard a
+ * pending push).
+ */
+export async function flushCloudSync(): Promise<void> {
+  const tasks: Promise<unknown>[] = [];
+  if (progressTimer) {
+    clearTimeout(progressTimer);
+    progressTimer = null;
+    tasks.push(pushProgress());
+  }
+  if (settingsTimer) {
+    clearTimeout(settingsTimer);
+    settingsTimer = null;
+    tasks.push(pushSettings());
+  }
+  await Promise.all(tasks);
+}
+
+function onVisibilityHidden() {
+  if (document.visibilityState === "hidden") void flushCloudSync();
 }
 
 /* ------------------------------- lifecycle -------------------------------- */
@@ -227,9 +259,12 @@ export async function startCloudSync(uid: string) {
   // 2) Push the merged local state up so both sides converge immediately.
   await Promise.all([pushProgress(), pushSettings()]);
 
-  // 3) Write-through subsequent local changes (debounced).
+  // 3) Write-through subsequent local changes (debounced), with a flush when
+  // the app is backgrounded so closing the PWA right after a session never
+  // strands the last reviews inside the debounce window.
   unsubProgress = useProgressStore.subscribe(scheduleProgressPush);
   unsubSettings = useSettingsStore.subscribe(scheduleSettingsPush);
+  document.addEventListener("visibilitychange", onVisibilityHidden);
 }
 
 export function stopCloudSync() {
@@ -237,6 +272,7 @@ export function stopCloudSync() {
   unsubSettings?.();
   unsubProgress = null;
   unsubSettings = null;
+  document.removeEventListener("visibilitychange", onVisibilityHidden);
   if (progressTimer) clearTimeout(progressTimer);
   if (settingsTimer) clearTimeout(settingsTimer);
   progressTimer = null;
