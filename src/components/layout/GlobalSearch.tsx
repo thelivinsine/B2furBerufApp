@@ -1,8 +1,22 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { searchAll } from "@/lib/search";
+import type { SearchGroup } from "@/lib/search";
+
+/**
+ * `lib/search` statically imports EVERY content bank (vocabulary,
+ * collocations, dialogues, redemittel, grammar), and this component is mounted
+ * eagerly by AppShell on every page. Importing it lazily keeps the banks that
+ * only search needs (dialogues, collocations) out of the main bundle; the
+ * module is fetched once when the dialog first opens and cached by the module
+ * system afterwards.
+ */
+type SearchFn = (query: string) => SearchGroup[];
+let searchFn: SearchFn | null = null;
+function loadSearch(): Promise<SearchFn> {
+  return import("@/lib/search").then((m) => (searchFn = m.searchAll));
+}
 
 /**
  * The universal search surface (UX overhaul Phase 2, Tier 1): one query box
@@ -25,6 +39,8 @@ export function GlobalSearch({
   useEffect(() => {
     if (!open) return;
     setQuery("");
+    // Warm the search module while the user reaches for the keyboard.
+    if (!searchFn) void loadSearch();
     const id = requestAnimationFrame(() => inputRef.current?.focus());
     return () => cancelAnimationFrame(id);
   }, [open]);
@@ -32,7 +48,24 @@ export function GlobalSearch({
   // Defer the corpus scan + result-list render behind keystrokes so typing
   // stays responsive on slow devices; the input itself uses the live value.
   const deferredQuery = useDeferredValue(query);
-  const groups = useMemo(() => searchAll(deferredQuery), [deferredQuery]);
+  const [groups, setGroups] = useState<SearchGroup[]>([]);
+  useEffect(() => {
+    if (deferredQuery.trim().length < 2) {
+      setGroups([]);
+      return;
+    }
+    if (searchFn) {
+      setGroups(searchFn(deferredQuery));
+      return;
+    }
+    let cancelled = false;
+    void loadSearch().then((fn) => {
+      if (!cancelled) setGroups(fn(deferredQuery));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [deferredQuery]);
   const totalResults = groups.reduce((n, g) => n + g.count, 0);
   // The empty/hint states read the deferred query too, so "Keine Ergebnisse"
   // never flashes while results for fresh keystrokes are still being computed.

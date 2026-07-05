@@ -4,7 +4,10 @@ import { Flame, BookOpen, ArrowRight, CalendarDays, Sparkles, Zap, Library } fro
 import { useProgressStore, useTodayXp, useEffectiveStreak } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { dueCount } from "@/engine/srs";
-import { sessionPreview } from "@/engine/session";
+// Import the light preview module directly (NOT engine/session): the Dashboard
+// is eager, and going through engine/session would pull the quiz builder and
+// the collocations bank into the main bundle.
+import { sessionPreview } from "@/engine/sessionPreview";
 import { daysBetween, todayKey, cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

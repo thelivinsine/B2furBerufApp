@@ -3,9 +3,6 @@ import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
-import { PrivacyPolicy } from "@/features/legal/PrivacyPolicy";
-import { TermsOfService } from "@/features/legal/TermsOfService";
-import { About } from "@/features/about/About";
 // Impressum is built but TEMPORARILY HIDDEN until the founder fills the real
 // name/address placeholders (deferred to the lawyer/launch pass). To re-enable:
 // restore this import, the /impressum route below, and the footer/Settings +
@@ -67,6 +64,17 @@ const Settings = lazyWithReload(() =>
 const Sources = lazyWithReload(() =>
   import("@/features/legal/Sources").then((m) => ({ default: m.Sources })),
 );
+// Lazy: the bilingual legal bodies + About are long text components that are
+// rarely visited from inside the app; no reason to ship them eagerly.
+const PrivacyPolicy = lazyWithReload(() =>
+  import("@/features/legal/PrivacyPolicy").then((m) => ({ default: m.PrivacyPolicy })),
+);
+const TermsOfService = lazyWithReload(() =>
+  import("@/features/legal/TermsOfService").then((m) => ({ default: m.TermsOfService })),
+);
+const About = lazyWithReload(() =>
+  import("@/features/about/About").then((m) => ({ default: m.About })),
+);
 
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
@@ -99,15 +107,27 @@ export const router = createBrowserRouter([
   },
   {
     path: "/about",
-    element: <About />,
+    element: (
+      <Suspense fallback={null}>
+        <About />
+      </Suspense>
+    ),
   },
   {
     path: "/privacy",
-    element: <PrivacyPolicy />,
+    element: (
+      <Suspense fallback={null}>
+        <PrivacyPolicy />
+      </Suspense>
+    ),
   },
   {
     path: "/terms",
-    element: <TermsOfService />,
+    element: (
+      <Suspense fallback={null}>
+        <TermsOfService />
+      </Suspense>
+    ),
   },
   {
     path: "/sources",
