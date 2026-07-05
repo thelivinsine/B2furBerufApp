@@ -21,5 +21,16 @@ export function Session() {
   const themeParam = params.get("theme");
   const scope = themeParam && themeById(themeParam) ? (themeParam as ThemeId) : undefined;
 
-  return <SessionPlayer minutes={minutes} scope={scope} eyebrow="Heute" title="Deine Session" />;
+  // Key by scope + length: the player builds its plan once on mount, so an
+  // in-app navigation to a different ?theme= or ?min= must remount it or the
+  // learner keeps the old deck under the new URL.
+  return (
+    <SessionPlayer
+      key={`${scope ?? "all"}-${minutes}`}
+      minutes={minutes}
+      scope={scope}
+      eyebrow="Heute"
+      title="Deine Session"
+    />
+  );
 }

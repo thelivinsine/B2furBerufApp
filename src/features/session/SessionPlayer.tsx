@@ -38,24 +38,36 @@ interface Reinforced {
   en: string;
 }
 
+interface SessionPlayerProps {
+  minutes: number;
+  eyebrow?: string;
+  title?: string;
+  scope?: ThemeId;
+}
+
 /**
  * The one player for a composed session (UX overhaul Phase 1). It renders any
  * block kind the composer produced (vocab/Redemittel flashcard, leveled quiz
  * question, grammar micro-drill) behind a single progress bar + XP tally, then
  * shows an end screen: XP earned, what got stronger, and one forward hook.
  * Schnellwiederholung is just this player with a short `minutes` preset.
+ *
+ * The wrapper only holds a run counter: "Neue Runde" bumps it, remounting the
+ * run below with a fresh plan (previously a full window.location.reload(),
+ * which re-booted the whole app just to reshuffle).
  */
-export function SessionPlayer({
+export function SessionPlayer(props: SessionPlayerProps) {
+  const [runId, setRunId] = useState(0);
+  return <SessionRun key={runId} {...props} onRestart={() => setRunId((i) => i + 1)} />;
+}
+
+function SessionRun({
   minutes,
   eyebrow = "Session",
   title = "Deine Session",
   scope,
-}: {
-  minutes: number;
-  eyebrow?: string;
-  title?: string;
-  scope?: ThemeId;
-}) {
+  onRestart,
+}: SessionPlayerProps & { onRestart: () => void }) {
   const navigate = useNavigate();
   const srs = useProgressStore((s) => s.srs);
   const savedWords = useProgressStore((s) => s.savedWords);
@@ -228,7 +240,7 @@ export function SessionPlayer({
         </div>
 
         <div className="flex flex-wrap justify-center gap-2">
-          <Button variant="gradient" onClick={() => window.location.reload()}>
+          <Button variant="gradient" onClick={onRestart}>
             <RotateCw className="h-4 w-4" /> Neue Runde
           </Button>
           <Button variant="outline" onClick={() => navigate("/")}>
