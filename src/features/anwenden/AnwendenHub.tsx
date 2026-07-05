@@ -47,7 +47,6 @@ export function AnwendenHub() {
         gradient="from-orange-500 to-amber-500"
         eyebrow="Anwenden"
         title="Wissen anwenden"
-        description="Bring das Gelernte ins echte Gespräch: sprechen, schreiben und die Prüfung proben."
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

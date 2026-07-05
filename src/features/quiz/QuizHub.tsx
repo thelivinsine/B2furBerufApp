@@ -132,7 +132,6 @@ export function QuizHub() {
         gradient="from-violet-500 to-indigo-500"
         eyebrow="Quiz"
         title="Themen-Quiz"
-        description="Teste dein Wissen pro Thema in drei Stufen – Vokabeln, Nomen-Verb-Verbindungen und Grammatik gemischt, mit XP und Wiederholung (SRS)."
       />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {themeCards.map((t, i) => {

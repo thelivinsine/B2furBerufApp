@@ -86,7 +86,6 @@ export function WritingHub() {
           gradient="from-rose-500 to-pink-500"
           eyebrow="KI-Schreibcoach"
           title="Schreibtraining"
-          description="Schreibe einen kurzen oder langen Text zu einem Berufsthema. Die KI nennt dir deine wichtigste Schwachstelle – und einen Knopf, der dich direkt zur passenden Übung bringt."
         />
 
         {/* Tab switcher */}

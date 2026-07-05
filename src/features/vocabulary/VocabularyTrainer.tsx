@@ -191,7 +191,6 @@ export function VocabularyTrainer() {
         gradient="from-indigo-500 to-violet-500"
         eyebrow="Wortschatz"
         title="Vokabeltrainer"
-        description="Durchsuche und filtere deinen Wortschatz. Für eine Übung starte mit „Üben“ eine gemischte Runde mit intelligenter Wiederholung (Spaced Repetition)."
       />
 
       <LibrarySwitcher />

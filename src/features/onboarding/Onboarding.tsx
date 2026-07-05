@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
-  Sparkles,
-  Target,
-  CalendarClock,
-  GraduationCap,
   Briefcase,
   Home,
-  MessagesSquare,
+  GraduationCap,
+  Sparkles,
   Check,
   ArrowRight,
 } from "lucide-react";
@@ -23,68 +20,48 @@ import {
 import type { LearningMode } from "@/types";
 import { recordConsent, hasConsented } from "@/lib/consent";
 
-const goals: { id: LearningGoal; label: string; desc: string; icon: typeof Target }[] = [
-  { id: "exam", label: "Ace the Prüfung", desc: "Train laser-focused for the B2-Beruf exam.", icon: GraduationCap },
-  { id: "work", label: "Shine im Job", desc: "Handle everyday Kommunikation at work with ease.", icon: Briefcase },
-  { id: "fluency", label: "Speak flüssiger", desc: "React spontan and sound natural.", icon: MessagesSquare },
+/**
+ * One-screen setup (redesign Phase 1.3). A single "Wofür lernst du Deutsch?"
+ * choice sets both the learning goal and the Mode lens, one CEFR chip row sets
+ * the level, and the consent checkbox is recorded BEFORE any learning progress
+ * is stored. Then the learner drops straight into a short composed taster.
+ * Name, exam date and daily rhythm are collected contextually later, so
+ * completeOnboarding leaves them at their store defaults.
+ */
+
+const setups: {
+  id: string;
+  label: string;
+  desc: string;
+  icon: typeof Briefcase;
+  goal: LearningGoal;
+  mode: LearningMode;
+}[] = [
+  { id: "beruf", label: "Beruf", desc: "Job & Büro", icon: Briefcase, goal: "work", mode: "work" },
+  { id: "alltag", label: "Alltag", desc: "Behörde, Arzt, Bank", icon: Home, goal: "fluency", mode: "personal" },
+  { id: "pruefung", label: "Prüfung", desc: "telc / Goethe B2", icon: GraduationCap, goal: "exam", mode: "both" },
+  { id: "beides", label: "Beides", desc: "Beruf & Alltag", icon: Sparkles, goal: "fluency", mode: "both" },
 ];
 
-const levels: { id: CefrLevel; label: string; desc: string }[] = [
-  { id: "A2", label: "A2", desc: "Just starting" },
-  { id: "B1", label: "B1", desc: "Mittelstufe" },
-  { id: "B2", label: "B2", desc: "Getting there" },
-  { id: "C1", label: "C1", desc: "Fortgeschritten" },
-];
-
-const modes: { id: LearningMode; label: string; desc: string; icon: typeof Target }[] = [
-  { id: "work", label: "Beruf", desc: "Meetings, E-Mails, Kunden, Kolleg:innen.", icon: Briefcase },
-  { id: "personal", label: "Alltag", desc: "Behörde, Arzt, Bank, Wohnung.", icon: Home },
-  { id: "both", label: "Beides", desc: "Work and daily life together.", icon: Sparkles },
-];
-
-const goalsXp = [
-  { value: 50, label: "Easy does it", desc: "≈ 5 Min / Tag" },
-  { value: 80, label: "Steady, stetig", desc: "≈ 10 min a day" },
-  { value: 120, label: "Ehrgeizig", desc: "≈ 15 min a day" },
-];
-
-const TOTAL = 5;
+const levels: CefrLevel[] = ["A2", "B1", "B2", "C1"];
 
 export function Onboarding() {
   const navigate = useNavigate();
   const completeOnboarding = useSettingsStore((s) => s.completeOnboarding);
 
-  const [step, setStep] = useState(0);
-  const [name, setName] = useState("");
-  const [goal, setGoal] = useState<LearningGoal>("exam");
-  const [mode, setMode] = useState<LearningMode>("both");
+  const [setupId, setSetupId] = useState("pruefung");
   const [level, setLevel] = useState<CefrLevel>("B2");
-  const [examDate, setExamDate] = useState("");
-  const [dailyGoalXp, setDailyGoalXp] = useState(80);
-  // Guests never open AuthDialog, so the final step gates on accepting the
-  // terms here. Pre-check if already accepted (e.g. returning to onboarding).
+  // Guests never open AuthDialog, so setup gates on accepting the terms here.
   const [consent, setConsent] = useState(hasConsented());
 
-  const next = () => setStep((s) => Math.min(s + 1, TOTAL - 1));
-  // On the first step there's no previous step — go back to the landing page
-  // instead of leaving a dead, disabled button.
-  const back = () => {
-    if (step === 0) navigate("/welcome");
-    else setStep((s) => Math.max(s - 1, 0));
-  };
-
-  const finish = () => {
+  const start = () => {
     if (!consent) return;
+    const setup = setups.find((s) => s.id === setupId) ?? setups[2];
+    // Consent is recorded before completeOnboarding writes any profile state.
     recordConsent();
-    completeOnboarding({
-      name: name.trim() || "Lernende:r",
-      goal,
-      mode,
-      level,
-      examDate: examDate || null,
-      dailyGoalXp,
-    });
-    navigate("/", { replace: true });
+    completeOnboarding({ goal: setup.goal, mode: setup.mode, level });
+    // Straight into a short composed taster (existing composer, ~90s).
+    navigate("/session?min=1", { replace: true });
   };
 
   return (
@@ -98,241 +75,92 @@ export function Onboarding() {
       >
         <div className="mb-6 flex items-center justify-center gap-2.5">
           <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-10 w-10 rounded-xl shadow-glow" />
-          <span className="text-lg font-semibold tracking-tight">Genauly: German for real life</span>
+          <span className="text-lg font-semibold tracking-tight">Genauly</span>
         </div>
 
-        <Card className="overflow-hidden p-0 shadow-elevated">
-          {/* Progress */}
-          <div className="flex gap-1.5 p-4">
-            {Array.from({ length: TOTAL }).map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "h-1.5 flex-1 rounded-full transition-colors",
-                  i <= step ? "bg-accent-gradient" : "bg-muted",
-                )}
-              />
-            ))}
-          </div>
-
-          <div className="px-6 pb-6 pt-2">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={step}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.25 }}
-              >
-                {step === 0 && (
-                  <div className="space-y-5">
-                    <Header
-                      icon={Sparkles}
-                      title="Willkommen!"
-                      subtitle="Your personal coach for Deutsch im Beruf, from Wortschatz and Grammatik to writing and speaking. Let's get you set up."
-                    />
-                    <div>
-                      <label className="mb-1.5 block text-sm font-medium">Wie heißt du? What should we call you?</label>
-                      <input
-                        autoFocus
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && next()}
-                        placeholder="Your name / dein Name"
-                        className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring"
-                      />
+        <Card className="space-y-6 p-6 shadow-elevated">
+          <div>
+            <h2 className="text-xl font-semibold tracking-tight">Wofür lernst du Deutsch?</h2>
+            <div className="mt-4 grid grid-cols-2 gap-2.5">
+              {setups.map((s) => {
+                const Icon = s.icon;
+                const active = setupId === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setSetupId(s.id)}
+                    className={cn(
+                      "rounded-xl border p-4 text-left transition-all",
+                      active
+                        ? "border-primary bg-primary/10 shadow-soft"
+                        : "border-border hover:border-primary/40 hover:bg-muted/40",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "mb-2 inline-flex rounded-lg p-2",
+                        active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
+                      )}
+                    >
+                      <Icon className="h-5 w-5" />
                     </div>
-                  </div>
-                )}
-
-                {step === 1 && (
-                  <div className="space-y-4">
-                    <Header icon={Target} title="Was ist dein Ziel?" subtitle="Tell us your goal, so we can tailor everything to you." />
-                    <div className="space-y-2.5">
-                      {goals.map((g) => (
-                        <SelectRow
-                          key={g.id}
-                          active={goal === g.id}
-                          onClick={() => setGoal(g.id)}
-                          icon={g.icon}
-                          title={g.label}
-                          desc={g.desc}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {step === 2 && (
-                  <div className="space-y-4">
-                    <Header icon={Briefcase} title="Wofür lernst du Deutsch?" subtitle="This shapes which topics and vocabulary you see first. You can switch anytime." />
-                    <div className="space-y-2.5">
-                      {modes.map((m) => (
-                        <SelectRow
-                          key={m.id}
-                          active={mode === m.id}
-                          onClick={() => setMode(m.id)}
-                          icon={m.icon}
-                          title={m.label}
-                          desc={m.desc}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {step === 3 && (
-                  <div className="space-y-4">
-                    <Header icon={GraduationCap} title="Dein aktuelles Niveau" subtitle="Your current level. A rough guess is totally fine." />
-                    <div className="grid grid-cols-2 gap-2.5">
-                      {levels.map((l) => (
-                        <button
-                          key={l.id}
-                          onClick={() => setLevel(l.id)}
-                          className={cn(
-                            "rounded-xl border p-4 text-left transition-all",
-                            level === l.id
-                              ? "border-primary bg-primary/10 shadow-soft"
-                              : "border-border hover:border-primary/40 hover:bg-muted/40",
-                          )}
-                        >
-                          <p className="text-lg font-semibold">{l.label}</p>
-                          <p className="text-xs text-muted-foreground">{l.desc}</p>
-                        </button>
-                      ))}
-                    </div>
-                    <div>
-                      <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
-                        <CalendarClock className="h-4 w-4 text-muted-foreground" />
-                        Prüfungstermin / exam date (optional)
-                      </label>
-                      <input
-                        type="date"
-                        value={examDate}
-                        onChange={(e) => setExamDate(e.target.value)}
-                        className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring"
-                      />
-                    </div>
-                  </div>
-                )}
-
-                {step === 4 && (
-                  <div className="space-y-4">
-                    <Header icon={Sparkles} title="Dein tägliches Ziel" subtitle="Consistency beats intensity, so pick a Ziel you can actually keep." />
-                    <div className="space-y-2.5">
-                      {goalsXp.map((g) => (
-                        <SelectRow
-                          key={g.value}
-                          active={dailyGoalXp === g.value}
-                          onClick={() => setDailyGoalXp(g.value)}
-                          title={`${g.label} · ${g.value} XP`}
-                          desc={g.desc}
-                        />
-                      ))}
-                    </div>
-                    <label className="flex items-start gap-2.5 pt-1 text-sm text-muted-foreground">
-                      <input
-                        type="checkbox"
-                        checked={consent}
-                        onChange={(e) => setConsent(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
-                      />
-                      <span>
-                        Ich stimme den{" "}
-                        <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-                          AGB
-                        </a>{" "}
-                        und der{" "}
-                        <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-                          Datenschutzerklärung
-                        </a>{" "}
-                        zu.
-                      </span>
-                    </label>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-
-            <div className="mt-6 flex items-center justify-between">
-              <Button variant="ghost" onClick={back}>
-                Zurück
-              </Button>
-              {step < TOTAL - 1 ? (
-                <Button variant="gradient" onClick={next} className="gap-1.5">
-                  Weiter <ArrowRight className="h-4 w-4" />
-                </Button>
-              ) : (
-                <Button variant="gradient" onClick={finish} disabled={!consent} className="gap-1.5">
-                  Los geht's <Check className="h-4 w-4" />
-                </Button>
-              )}
+                    <p className="text-sm font-semibold">{s.label}</p>
+                    <p className="text-xs text-muted-foreground">{s.desc}</p>
+                  </button>
+                );
+              })}
             </div>
           </div>
+
+          <div>
+            <p className="mb-2 text-sm font-medium">Dein Niveau</p>
+            <div className="grid grid-cols-4 gap-2">
+              {levels.map((l) => (
+                <button
+                  key={l}
+                  onClick={() => setLevel(l)}
+                  className={cn(
+                    "rounded-lg border py-2.5 text-sm font-semibold transition-all",
+                    level === l
+                      ? "border-primary bg-primary/10 text-primary shadow-soft"
+                      : "border-border text-muted-foreground hover:border-primary/40 hover:bg-muted/40",
+                  )}
+                >
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <label className="flex items-start gap-2.5 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-input accent-primary"
+            />
+            <span>
+              Ich stimme den{" "}
+              <a href="/terms" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                AGB
+              </a>{" "}
+              und der{" "}
+              <a href="/privacy" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
+                Datenschutzerklärung
+              </a>{" "}
+              zu.
+            </span>
+          </label>
+
+          <Button variant="gradient" onClick={start} disabled={!consent} className="w-full gap-1.5">
+            Los geht's <ArrowRight className="h-4 w-4" />
+          </Button>
         </Card>
+
+        <p className="mt-4 flex items-center justify-center gap-1.5 text-center text-xs text-muted-foreground">
+          <Check className="h-3.5 w-3.5" /> In unter einer Minute in deiner ersten Übung
+        </p>
       </motion.div>
     </div>
-  );
-}
-
-function Header({
-  icon: Icon,
-  title,
-  subtitle,
-}: {
-  icon: typeof Target;
-  title: string;
-  subtitle: string;
-}) {
-  return (
-    <div>
-      <div className="mb-3 inline-flex rounded-xl bg-primary/10 p-2.5 text-primary">
-        <Icon className="h-5 w-5" />
-      </div>
-      <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
-      <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
-    </div>
-  );
-}
-
-function SelectRow({
-  active,
-  onClick,
-  icon: Icon,
-  title,
-  desc,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon?: typeof Target;
-  title: string;
-  desc: string;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-all",
-        active ? "border-primary bg-primary/10 shadow-soft" : "border-border hover:border-primary/40 hover:bg-muted/40",
-      )}
-    >
-      {Icon && (
-        <div className={cn("rounded-lg p-2", active ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground")}>
-          <Icon className="h-4 w-4" />
-        </div>
-      )}
-      <div className="flex-1">
-        <p className="text-sm font-semibold">{title}</p>
-        <p className="text-xs text-muted-foreground">{desc}</p>
-      </div>
-      <div
-        className={cn(
-          "flex h-5 w-5 items-center justify-center rounded-full border transition-colors",
-          active ? "border-primary bg-primary text-primary-foreground" : "border-border",
-        )}
-      >
-        {active && <Check className="h-3 w-3" />}
-      </div>
-    </button>
   );
 }

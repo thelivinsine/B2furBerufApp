@@ -85,8 +85,12 @@ const defaults = {
   speechEnabled: true,
   speechRate: 0.95,
   voiceURI: null,
-  voiceVariety: false,
-  recognitionEnabled: false,
+  // Redesign Phase 1.1: two research-backed pedagogy features ship ON by default
+  // (talker variability + speech-first production). STT support is still enforced
+  // downstream by recognitionSupported() with a typed fallback, so an unsupported
+  // browser sees no ill effect from recognitionEnabled being true.
+  voiceVariety: true,
+  recognitionEnabled: true,
   reducedMotion: false,
   guessFirst: true,
   latencyGrading: true,
@@ -111,7 +115,13 @@ export const useSettingsStore = create<SettingsState>()(
       // model, so an existing learner's pinned tabs and More-sheet order can
       // reference routes that are no longer nav destinations. Remap them onto
       // their successor zones instead of letting them silently vanish.
-      version: 1,
+      // v2 (redesign Phase 1.1): adopt the new pedagogy defaults for existing
+      // users. Both switches were default-off and effectively inert (voiceVariety
+      // unused; recognitionEnabled gated a session block that only shipped in s56),
+      // so a persisted `false` reflects the old default, not a deliberate opt-out.
+      // We flip false → true and never touch a value already `true` (a real
+      // opt-in) or any other setting.
+      version: 2,
       migrate: (persisted, version) => {
         const s = persisted as SettingsState;
         if (s && version < 1) {
@@ -119,6 +129,10 @@ export const useSettingsStore = create<SettingsState>()(
           pins = ["/", ...pins.filter((p) => p !== "/")].slice(0, 4);
           s.pinnedTabs = pins.length >= 2 ? pins : DEFAULT_PINNED_TABS;
           s.moreOrder = remapTabs(s.moreOrder);
+        }
+        if (s && version < 2) {
+          if (s.voiceVariety === false) s.voiceVariety = true;
+          if (s.recognitionEnabled === false) s.recognitionEnabled = true;
         }
         return s;
       },
