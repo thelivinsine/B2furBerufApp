@@ -604,8 +604,8 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 **Handoff after session 55 (2026-07-05, docs only, nothing built).** Token-efficiency housekeeping in
 response to a founder review of a Perplexity "agent tax" analysis. Trimmed the context that loads every
-session: rotated the append-only prompt log (entries 1–109 → `docs/archive/SESSION_PROMPT_LOG_ARCHIVE.md`,
-live file now session 50+), relocated the PROJECT_STATUS session-25–46 detail into
+session: rotated the append-only prompt log (entries 1–109 archived, live file now session 50+),
+relocated the PROJECT_STATUS session-25–46 detail into
 `docs/archive/PROJECT_STATUS_ARCHIVE.md`, and split the "why" behind locked decisions out of `CLAUDE.md`
 into the new **`docs/DECISIONS.md`** (UX-overhaul phase history + mobile-bar mechanism/mockup detail).
 Added a "Working efficiently (token/context discipline)" rule to `CLAUDE.md`. **Every operative
@@ -617,7 +617,11 @@ stale `LEARNING_ENGINE_PLAN` status in the index (Phases 0/1/3 shipped, not "not
 the stale hardcoded session-branch name from `CLAUDE.md` (docs best-practice #5); refreshed `docs/README.md`
 (new `DECISIONS.md` + prompt-log-archive rows). Content counts spot-checked against `src/data` (provenance
 1,111 + Can-Do 25 match, not stale). `plans/` now holds only active work (`LEARNING_ENGINE_PLAN`,
-`PHASE2_SETUP`). No app code touched, no build needed. Prompt-log entries 133–134.
+`PHASE2_SETUP`). No app code touched, no build needed. Finally, **codified a prompt-log rotation policy
+and split the prompt-log archive by ISO week** (founder request): the archived entries now live in
+`docs/archive/prompt-log/SESSION_PROMPT_LOG_YYYY-Www.md` (one file per week + a `README.md` index) so a
+lookup loads only one week; the live log's header now carries the standing rule (append to the tail;
+rotate at ~1,200 lines into the matching week file). Prompt-log entries 133–135.
 
 **Earlier handoff (session 54, 2026-07-05, docs only, nothing built).** The founder brought a rough
 idea for a **story-driven 2D German life RPG** (hero's journey, Pokémon-like; items = language;

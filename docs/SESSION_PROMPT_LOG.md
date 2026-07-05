@@ -22,6 +22,19 @@ authored commits) and the **merged pull requests**.
 - This file is the detailed trail. `CLAUDE.md` only carries the short rule and points here, and
   `docs/PROJECT_STATUS.md` keeps the higher-level session narrative. Keep those lean; put the
   blow-by-blow here.
+- **Append to the tail, don't re-read the whole log.** To add an entry you only need the last entry's
+  number and the template above. Read the final ~30 lines, not the entire file, so logging stays cheap
+  as history grows.
+
+### Rotation policy (keep the live file bounded, added 2026-07-05)
+This live file must not grow without limit. **Budget: keep the current session plus roughly the last 5
+sessions here, and rotate whenever the live file passes ~1,200 lines.** To rotate, move the oldest
+entries out of this file into the **ISO-week** archive under `docs/archive/prompt-log/` (one file per
+week, `SESSION_PROMPT_LOG_YYYY-Www.md`; see that folder's `README.md` index). Append each moved entry to
+the week file matching **its own date** (create the week file if it does not exist yet, with the same
+short header the others use). Keep this header, the rule, and the entry template in the live file. The
+week archives themselves are append-only history: never rewrite entries when moving them, and loading a
+single week stays cheap because each week file is small.
 
 ### Automated raw capture (removed 2026-06-25)
 There used to be a `UserPromptSubmit` hook (`.claude/hooks/log-prompt.sh`) that appended one JSON
@@ -49,8 +62,9 @@ session, append that session's prompts here as well and ship them together.
 
 ## Archived entries
 
-Entries **1–109 (sessions 26–49)** live in **`docs/archive/SESSION_PROMPT_LOG_ARCHIVE.md`** to keep
-this file lean. This file holds **session 50 onward**. Keep appending here, newest at the bottom.
+Entries **1–109 (sessions 26–49)** are archived by ISO week under **`docs/archive/prompt-log/`**
+(`SESSION_PROMPT_LOG_2026-W25/W26/W27.md`; see that folder's `README.md` index). This file holds
+**session 50 onward**. Keep appending here, newest at the bottom, and rotate per the policy above.
 
 ## Entry 110 — 2026-07-03 (session 50)
 - **Branch:** `claude/docs-audit-report-0xydsz`
@@ -538,3 +552,18 @@ Branch: `claude/whats-next-esga9u`.
   > go ahead and merge but also do a thorough audit/review of all the docs and make sure any stale info is archived.
 - **Response summary:** Ran a full docs audit before merging. Archived the four plans whose work is 100% shipped by moving them from `docs/plans/` to `docs/archive/` (`UX_OVERHAUL_PLAN`, `FILTER_HARMONIZATION_PLAN`, `TAXONOMY_IMPLEMENTATION_PLAN`, `TAXONOMY_REDESIGN`); kept `LEARNING_ENGINE_PLAN` (Phase 2 pending) and `PHASE2_SETUP` (live runbook) in `plans/`. Rewired every live cross-reference to the new archive paths (CLAUDE.md, PROJECT_STATUS.md, DECISIONS.md) and fixed the moved files' internal cross-refs; left append-only history (`SESSION_PROMPT_LOG*`, `archive/PROJECT_STATUS_ARCHIVE.md`) as written per the docs rules. Fixed a stale status header in the index (`LEARNING_ENGINE_PLAN` was marked "not yet implemented" over shipped Phases 0/1/3). Removed the stale hardcoded session-branch name (`claude/26b-task-n3tl75`) from `CLAUDE.md` per docs best-practice #5. Refreshed `docs/README.md` (added `DECISIONS.md` + `SESSION_PROMPT_LOG_ARCHIVE.md` rows, moved the four plans to the archive table, bumped "Last reviewed"). Spot-checked content counts against `src/data` (provenance 1,111 and Can-Do 25 match the quoted figures, not stale). Then squash-merged the branch into `main` and ran post-merge realignment.
 - **Artifacts:** `git mv` of 4 plans `docs/plans/*` → `docs/archive/*`; edits to `CLAUDE.md`, `docs/README.md`, `docs/PROJECT_STATUS.md`, `docs/DECISIONS.md`, `docs/SESSION_PROMPT_LOG.md`. Commit + squash-merge SHAs recorded in git history / the merged PR.
+
+## Entry 135 — 2026-07-05 (session 55)
+- **Branch:** reassigned per session; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim):**
+  > how does prompt logging work from now? it may keep getting bigger, right?
+  >
+  > 600 lines doesn't sound like much though, is it?
+  >
+  > and the archive session prompt log should be split by month. Because loading an archived huge session prompt is also token-costly
+  >
+  > scrap that - split it by weeek, not month
+- **Response summary:** Explained the logging mechanism (append-only, manual since the s25 hook removal; live file is a write/tail target, not read every turn) and that only the live file's size costs tokens while the archive is cold storage. Set the live-file budget at ~1,200 lines (~14k tokens, ~10-session cadence) rather than the initially-floated 600. Then, per the founder's decision, **split the prompt-log archive by ISO week**: replaced the single `SESSION_PROMPT_LOG_ARCHIVE.md` (1,789 lines) with `docs/archive/prompt-log/SESSION_PROMPT_LOG_2026-W25/W26/W27.md` + a folder `README.md` index (27/64/21 entries, no loss), so any lookup loads one week. Codified the standing rotation policy in the live log's header (append to the tail; rotate at ~1,200 lines into the week file matching each entry's date) and updated `docs/README.md` + the PROJECT_STATUS session-55 handoff.
+- **Artifacts:** new `docs/archive/prompt-log/` (3 weekly files + `README.md`); removed `docs/archive/SESSION_PROMPT_LOG_ARCHIVE.md`; edits to `docs/SESSION_PROMPT_LOG.md` (rotation policy + tail-append rule + archive pointer), `docs/README.md`, `docs/PROJECT_STATUS.md`. Commit SHA recorded in git history.
