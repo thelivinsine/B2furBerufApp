@@ -486,11 +486,11 @@ value·evidence ÷ effort basis (P1 = do first, P3 = nice-to-have) and names the
 failure mode it closes. Suggested sequence: land the cheap wins that ride alongside other work (#26a
 latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 paired to the AI roadmap.
 
-> **SCOPED 2026-07-03 → `docs/plans/LEARNING_ENGINE_PLAN.md` (approved, not yet implemented).** All five
-> items now have a full file-level engineering plan there: Phase 0 = the quick wins (26a + #28 + #30,
-> one PR, next build), Phase 1 = FSRS (26b), Phase 2 = the speaking block (#27), Phase 3 = the custom
-> deck (#29), with per-item model recommendations, persistence/sync policy, verification recipes, and
-> a risk register. Start any of these items from that doc, not from the summaries below.
+> **SCOPED 2026-07-03 → `docs/plans/LEARNING_ENGINE_PLAN.md`; ALL FIVE ITEMS SHIPPED ✅ (Phase 0 =
+> 26a + #28 + #30 in s51/PR #271, Phase 3 = #29 in s52/PR #273, Phase 1 = 26b FSRS in s53/PR #275,
+> Phase 2 = #27 speaking block in s56/PR #284).** Only the optional Phase 1.5 latency plug-in
+> remains. The summaries below are the original scoping record; the as-shipped notes live in the
+> plan doc and the "Resume here" handoffs.
 
 26. **FSRS scheduler + response-latency capture — Priority P1 (High).** _Fixes eval dim 1; failure mode
     #1._ The playbook's single most-cited upgrade: replace the SM-2 scheduler (`src/engine/srs.ts`) with
@@ -602,7 +602,31 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 55 (2026-07-05, docs only, nothing built).** Token-efficiency housekeeping in
+**Handoff after session 56 (2026-07-05). Learning Engine Phase 2, the #27 speech-first production
+block, is COMPLETE ✅ and merged to `main`** as PR #284 (squash SHA `6d1d8b4`). That was the LAST
+Learning Engine phase: all five items (26a, 26b, #27, #28, #29, #30) are now shipped. What shipped:
+a new **`"speaking"` session block**, the first consumer of the `listen()` STT wrapper in
+`engine/speech.ts`. Behind the `recognitionEnabled` opt-in (now no longer inert; Settings copy
+updated) plus `recognitionSupported()`, the composer (`engine/session.ts`, new `speaking?: boolean`
+on `BuildSessionOpts`, engine stays pure) adds up to 2 production blocks per session from the
+top-weighted due vocab, showing the EN meaning + EN example (the DE sentence would reveal the
+answer). The learner taps the mic (user gesture required by webkit STT), an 8s soft countdown caps
+the window, partials stream, and the final transcript is matched by the new pure
+**`src/engine/pronounce.ts`** (strip punctuation + leading der/die/das/ein/eine/`sich`, ß→ss;
+exact / word-boundary containment / length-scaled Levenshtein). Grades 4/0 → `reviewVocab` with 26a
+latency spanning the think stage; +12 XP (`XP.speakingDrill`). **Fallback ladder:** hard STT error
+or no ctor flips the block to a typed input graded by the same matcher (after 2 hard errors the
+remaining speaking blocks start typed); `no-speech` returns to the prompt; a voluntary "Lieber
+tippen" path always exists. **New CI gate `pnpm test:pronounce`** (26 checks, `validate.yml` next to
+`test:srs`) pins the matcher contract. Verified: all five gates green plus a 21-check Playwright
+smoke against a live dev server with a mocked SpeechRecognition (STT happy path with exactly +12 XP
+and persisted `lastMs`, voluntary typed path, mic-error fallback, recognition-off full session never
+shows the block), zero console errors. Two real-browser guards worth knowing: STT `onerror` is
+always followed by `onend` (the end handler checks the live handle so it can't drag the UI back to
+the prompt), and StrictMode's dev double-invoke re-arms the unmount evaluation guard. Post-merge
+housekeeping done (branch reset to `origin/main`, force-with-lease). Prompt-log entry 136.
+
+**Earlier handoff (session 55, 2026-07-05, docs only, nothing built).** Token-efficiency housekeeping in
 response to a founder review of a Perplexity "agent tax" analysis. Trimmed the context that loads every
 session: rotated the append-only prompt log (entries 1–109 archived, live file now session 50+),
 relocated the PROJECT_STATUS session-25–46 detail into
@@ -698,16 +722,18 @@ migrations needed, all new fields are optional and ride inside existing jsonb bl
 `claude/whats-next-esga9u` (reassigned per session; `main` is the source of truth), realigned to `main`
 post-merge per the standard housekeeping.
 
-**Next up: Phase 2 of `docs/plans/LEARNING_ENGINE_PLAN.md` — the #27 speech-first production block.**
-Recommended model **Fable 5, high effort** (new session block kind, first consumer of the already-built
-`listen()` STT wrapper in `engine/speech.ts`, fuzzy answer matching, flaky browser speech APIs; verify
-in a real browser). That is the LAST remaining Learning Engine phase (26a/#28/#30 shipped s51, #29
-shipped s52, 26b FSRS shipped s53, above); the optional Phase 1.5 latency plug-in ("correct but slow"
-demotes Good→Hard, needs 3+ samples per card) can ride along or follow. Also still open: the optional taxonomy follow-ups (human-verify the
-AI-drafted `cefr` tags via provenance `draft→verified`; broaden `sector`/`workSituation` tagging; extend
-sub-themes past 3 of 11), a new **life-domain theme** (banking / healthcare / housing) per the product
-scope, and the recurring `pages.yml` deploy-flake hardening (see the deploy note lower down). Backlog #25
-(the "EN peek" whole-screen translate button) is still parked pending a brainstorm.
+**Next up: the Learning Engine plan is fully shipped (26a/#28/#30 s51, #29 s52, 26b s53, #27 s56).**
+Open candidates, in rough order of product value:
+- A new **life-domain theme** (banking / healthcare/Arzt / housing) per the product scope; the
+  `behoerde` pack is the reference template. Content-heavy, founder may want to pick the domain.
+- The optional **Phase 1.5 latency plug-in** from `docs/plans/LEARNING_ENGINE_PLAN.md` ("correct but
+  slow" demotes Good→Hard using `emaMs`, only with 3+ samples per card, only against the card's own
+  EMA). Small, self-contained engine change behind the existing `pnpm test:srs` gate.
+- The optional taxonomy follow-ups (human-verify the AI-drafted `cefr` tags via provenance
+  `draft→verified`; broaden `sector`/`workSituation` tagging; extend sub-themes past 3 of 11).
+- The **game concept** (`docs/strategy/GAME_CONCEPT.md`, s54): waiting on founder decisions (brand,
+  pixel-art direction) before any build work is scoped.
+- Backlog #25 (the "EN peek" whole-screen translate button) is still parked pending a brainstorm.
 
 **Most recent work (session 51, 2026-07-04, shipped as PR #271):**
 - **26a response-latency capture:** `SrsCard` gained optional `lastMs` (clamped to 60s) and `emaMs`

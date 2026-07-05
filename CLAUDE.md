@@ -28,6 +28,8 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
 - `pnpm lint:content` — validate the `src/data/*` content banks (CI gate, see below)
 - `pnpm test:srs` — assert `engine/srs.ts` against FSRS golden vectors from py-fsrs (CI gate, s53).
   **Run it after any `engine/srs.ts` edit.** Vector provenance is in the `scripts/test-srs.mjs` header.
+- `pnpm test:pronounce` — assert the `engine/pronounce.ts` spoken/typed answer matcher (CI gate, s56).
+  **Run it after any `engine/pronounce.ts` edit.**
 
 Notes: `.npmrc` sets `minimum-release-age` (24h supply-chain cooldown) and
 `package-manager-strict`. pnpm blocks dependency build scripts by default (a supply-chain
@@ -35,7 +37,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 
 ## Layout (`src/`)
 - `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`, `domains.ts`, `collocations.ts`, `provenance.ts`, `canDo.ts` (Can-Do milestones, s47)
-- `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (FSRS-6 spaced repetition since s53; legacy SM-2 fields kept warm for rollback), `quiz.ts`, `session.ts` (composed-session composer, s47)
+- `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (FSRS-6 spaced repetition since s53; legacy SM-2 fields kept warm for rollback), `pronounce.ts` (tolerant spoken-answer matcher for the speaking block, s56), `quiz.ts`, `session.ts` (composed-session composer, s47; speaking pool added s56 behind the `recognitionEnabled` opt-in)
 - `store/` — zustand stores: `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`, `useLibraryScope` (travelling library scope, s47)
 - `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47)
 - `features/session/` — `SessionPlayer` + `Session` route wrapper (the composed learning loop, s47)

@@ -5,9 +5,11 @@
 > migration 0005 run by the founder; pulled forward out of order as a self-contained Opus 4.8 fit),
 > and **Phase 1 (FSRS scheduler, 26b) SHIPPED ✅ 2026-07-04** (PR #275, squash SHA `c1dada8`; Fable 5
 > high effort per §7, verified by a fresh-context subagent against py-fsrs reference vectors plus the
-> new `pnpm test:srs` CI gate). See `docs/PROJECT_STATUS.md` → "Resume here" for the shipped-scope
-> recaps. **Remaining: Phase 2 (#27 speech-first block), Fable 5 high effort, then the optional
-> Phase 1.5 latency plug-in.**
+> new `pnpm test:srs` CI gate), and **Phase 2 (#27 speech-first block) SHIPPED ✅ 2026-07-05** (PR #284,
+> squash SHA `6d1d8b4`; Fable 5 high effort per §7, verified by the new `pnpm test:pronounce` CI gate
+> plus a Playwright smoke with a mocked SpeechRecognition). See `docs/PROJECT_STATUS.md` → "Resume
+> here" for the shipped-scope recaps. **All five items are shipped. Remaining: only the optional
+> Phase 1.5 latency plug-in ("correct but slow" demotes Good→Hard, needs 3+ samples per card).**
 > Source: the five recommendations of `docs/strategy/PRODUCT_EVALUATION.md` (the playbook self-assessment),
 > scoped as backlog items **#26 to #30** in `docs/PROJECT_STATUS.md`. Evidence base:
 > `docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
@@ -252,10 +254,25 @@ and the hard part (the parameter optimizer) is not needed client-side.
 - **Rollback story:** legacy fields are retained and kept warm, so reverting the engine file
   reverts scheduling behavior with no data repair.
 
-## 4. Phase 2: speech-first production block (#27)
+## 4. Phase 2: speech-first production block (#27) — SHIPPED ✅ 2026-07-05 (PR #284, `6d1d8b4`)
 
 **Empfohlenes Modell: Fable 5, high effort.** A new block kind end to end, the first STT consumer,
 fuzzy matching, and flaky browser speech APIs; verify in a real browser, not just the build.
+
+> **As shipped (session 56):** implemented as specified below, with the matcher in its own pure
+> `src/engine/pronounce.ts` (leading `sich` treated like an article so bare verb forms count;
+> ß→ss). One deliberate reading of the fallback ladder: "repeated STT failure → skip remaining
+> speaking blocks" was implemented as *remaining speaking blocks start directly in the typed
+> fallback* (after 2 hard errors), which preserves the session's block count and keeps the
+> production practice. `no-speech` returns to the prompt for a retry instead of counting as a hard
+> failure. An 8s soft countdown caps the mic window and grades the best partial when no final
+> transcript arrives. Two real-browser findings are guarded in code: `onerror` is always followed
+> by `onend` (the end handler must not drag the UI back after an error routed to typing), and
+> StrictMode's dev double-invoke would latch the unmount guard (the effect body re-arms it). New CI
+> gate `pnpm test:pronounce` (26 checks) pins the matcher contract in `validate.yml`. Verified by a
+> 21-check Playwright smoke with a mocked SpeechRecognition (STT happy path with +12 XP and
+> persisted latency, voluntary typed path, mic-error fallback, recognition-off session shows no
+> speaking block), zero console errors.
 
 - **`src/types/index.ts`:** new `SessionBlock` union member
   `{ kind: "speaking"; key: string; sourceId: string; de: string; en: string; example?: string }`.
