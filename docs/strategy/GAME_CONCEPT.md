@@ -178,8 +178,10 @@ engine, the dialogue runner, the scoring engine, and the CEFR/theme/facet taxono
 questions, not yet decided:
 - Does it ship under the Genauly brand or its own name?
 - Final blessing on the pixel-art direction.
-- Tech approach for the 2D layer (e.g. Phaser or canvas inside the React stack vs. a separate
-  app) is deliberately unexplored until the concept firms up.
+- Tech approach for the 2D layer: explored and PROPOSED in
+  `docs/plans/GAME_IMPLEMENTATION_PLAN.md` (session 62, 2026-07-05): build inside Genauly as a
+  lazy route, React renders all scenes, Phaser only for the later walkable overworld, missions
+  as a lintable data bank over the existing engines. Awaiting founder go-ahead.
 
 ## Research grounding (from the brainstorm)
 
