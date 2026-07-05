@@ -2211,3 +2211,81 @@ Branch: `claude/whats-next-esga9u`.
   log.
 - **Artifacts:** PR #277, squash-merge SHA `c00341a` on `main`; files `.github/workflows/pages.yml`,
   `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md` (this entry).
+
+## Entry 132 — 2026-07-05 (session 54)
+- **Branch:** `claude/german-learning-game-idea-df1675`
+- **Prompts (verbatim):**
+  > i have an idea that's quite rough at the moment and want to brainstorm with you. following is
+  > the idea. brainstorm with me. ask questions when you don't understand something or when needed.
+  > feel free to ground your facts on scientific and official sources. below is the idea:
+  >
+  > Hero's journey similar to Pokémon Nintendo game
+  > Main story line with real life scenarios
+  > 2d game interface
+  > Elixers, potions, wild cards, vouchers, stones, poke balls, etc becomes verbs, nouns,
+  > prepositions, konj. 1&2, passiv, grammar etc.
+  > Various types of missions uses items from player's bag. All items have upgrades as the user
+  > passes levels.
+  >
+  > The powers of the player are mainly characters panel. Potions are beers, and wild cards are
+  > local german friends. Achievements and finds can include stuff like German cars, other German
+  > things. Each exercise or mission earns the player xp points and collects items which determines
+  > life in later stages either difficult or hard.
+  >
+  > Graphics similar to clash of clans or winter lockdown.
+  >
+  > The player as he progresses through the missions have to keep repeating the exercises again and
+  > again similar to real life like doing Anmeldung when moving in Germany or changing addresses.
+  > Doing each of these things should simulate real life websites, scenes, fights with strangers in
+  > supermarkets or Sbahn stations, etc.
+  >
+  > Every line and word in the game should have a D and E button so that the player can see the
+  > English translation or German explanation of the word/sentence.
+  >
+  > Doing the side quests will get the player lot of ammo or loot in their bag. These side quests
+  > are a mix of collecting words from the real world like taking photo or recording a voice note
+  > or message of a newly learnt world in the outside world. This builds on the real life
+  > experience. In addition, there will be all sorts of german language learning games inspired by
+  > various online platforms to help discover new words, grammar, and use cases which will again be
+  > collected in the bag for the missions in the main story line. To help find the right words in
+  > the vast amount of collections, there will be appropriate categorization of the words and
+  > filters.
+  >
+  > Each level has limited number of typing and time in it and the player has to use the ammo from
+  > the bag.
+
+  > 1. broader audience and scope
+  > 2. flexible. I'm open for ideas
+  > 3. open for ideas
+  > 4. let's pick Anmeldung
+
+  > Sounds good. Make a note of this for future reference - The core philosophy (I'm just writing
+  > my thoughts as they come, so it's a bit unpolished) of this game concept in the app is to
+  > involve learner personally into a story and teach them german through cultural insights,
+  > visuals and emotions - each scene and mission builds upon the last one and progresses
+  > incrementally for the learner to keep learning new words and associate them properly with a
+  > personal situation in the game. The ultimate goal of the app is to have a huge storyline with
+  > several hundreds of missions by including 1000's of scenes like above in the game. Most of the
+  > apps these days are dry text based, context-less practice apps. The personal involvement is way
+  > less and visuals are almost zero. This should address that.
+  > [interrupted, then:] For some reason in the text above you say B2 exam is the end game and this
+  > app is for exam learners - that's wrong!!!! The scope of this app has been long ago broadened.
+  > You're getting stale info!
+- **Response summary:** Brainstormed the founder's story-driven 2D German life RPG idea, grounded
+  in research (task-based language teaching, task-based RPG studies, Duolingo hearts/Energy
+  backlash on punitive metering). Key shaped outcomes: items = language and battles = conversations
+  (Redemittel as moves, Konjunktiv II crits); story-justified repetition with FSRS as the "dungeon
+  master" timing recurring missions (re-Anmeldung on moves); failure is content, never lockout
+  (scaffolded retries, missing-item fetch quests, opt-in Prüfungsmodus for time/typing limits);
+  retro pixel art proposed over Clash-of-Clans-grade production; beer-as-potion softened to a
+  Kaffee/Feierabendbier/Döner item lexicon; real-world photo/voice side quests kept on-device for
+  GDPR. Founder decisions: broad audience and scope, flexible on story shape, open on failure
+  design, and the **Anmeldung mission as the first vertical slice** (5 scenes: Termin parody
+  website, document loadout, waiting room, Frau Schmidt dialogue boss, Anmeldeformular cloze,
+  rewarding the Meldebestätigung key item). Founder correction adopted as a hard scope guardrail:
+  broad audience, exam prep only an optional side path, never the spine or default endgame. Wrote
+  everything (founder philosophy verbatim, pillars, chapter skeleton, open questions: naming and
+  pixel-art blessing) into the new **`docs/strategy/GAME_CONCEPT.md`**, plus status-doc handoff.
+  Nothing built; concept only.
+- **Artifacts:** `docs/strategy/GAME_CONCEPT.md` (new), `docs/PROJECT_STATUS.md` (header +
+  session-54 handoff), `docs/SESSION_PROMPT_LOG.md` (this entry); PR into `main` per auto-ship.
