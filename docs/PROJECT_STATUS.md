@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (Learning Engine Phase 1.5 latency plug-in shipped, session 57). The working branch is
+_Last updated: 2026-07-05 (full performance/bug/robustness audit executed, PRs #289–#295, session 58). The working branch is
 reassigned every session, so **`main` is always the source of truth**. Product name: **Genauly**
 (domain `genauly.de`)._
 
