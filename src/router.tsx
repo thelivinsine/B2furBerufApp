@@ -1,6 +1,8 @@
 import React, { Suspense } from "react";
 import { createBrowserRouter, Navigate, useLocation } from "react-router-dom";
+import type { RouteObject } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
+import { RouteError } from "@/components/layout/RouteError";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { LandingPage } from "@/features/landing/LandingPage";
 // Impressum is built but TEMPORARILY HIDDEN until the founder fills the real
@@ -100,13 +102,27 @@ const OnboardingRoute = (
   </Suspense>
 );
 
+// Per-route error boundary (audit D5): attached to every CHILD route inside
+// the AppShell layout, so a page crash renders inside the Outlet and the
+// shell (header, nav) survives. Standalone routes get it directly. Errors
+// bubble to the nearest errorElement, so without the per-child placement one
+// broken page would take down the whole layout.
+const routeError = <RouteError />;
+
+/** Add the shared errorElement to a route unless it defines its own. */
+function withRouteError<T extends { errorElement?: React.ReactNode }>(route: T): T {
+  return { errorElement: routeError, ...route };
+}
+
 export const router = createBrowserRouter([
   {
     path: "/welcome",
     element: <LandingPage />,
+    errorElement: routeError,
   },
   {
     path: "/about",
+    errorElement: routeError,
     element: (
       <Suspense fallback={null}>
         <About />
@@ -115,6 +131,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/privacy",
+    errorElement: routeError,
     element: (
       <Suspense fallback={null}>
         <PrivacyPolicy />
@@ -123,6 +140,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/terms",
+    errorElement: routeError,
     element: (
       <Suspense fallback={null}>
         <TermsOfService />
@@ -131,6 +149,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/sources",
+    errorElement: routeError,
     element: (
       <Suspense fallback={null}>
         <Sources />
@@ -142,10 +161,12 @@ export const router = createBrowserRouter([
   {
     path: "/start",
     element: OnboardingRoute,
+    errorElement: routeError,
   },
   {
     element: <AppShell />,
-    children: [
+    errorElement: routeError,
+    children: ([
       {
         path: "/",
         element: (
@@ -240,6 +261,6 @@ export const router = createBrowserRouter([
         ),
       },
       { path: "*", element: <Navigate to="/" replace /> },
-    ],
+    ] as RouteObject[]).map(withRouteError),
   },
 ]);
