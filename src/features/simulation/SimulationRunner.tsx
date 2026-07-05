@@ -20,7 +20,7 @@ import {
   recordPartnerLine,
   chooseOption,
   advanceFree,
-  useHint,
+  applyHint,
   scoreDialogue,
   type DialogueState,
 } from "@/engine/dialogue";
@@ -56,7 +56,7 @@ function reducer(state: DialogueState, action: Action): DialogueState {
     case "advance_free":
       return advanceFree(state, action.spoken);
     case "hint":
-      return useHint(state);
+      return applyHint(state);
     case "restart":
       return startDialogue(action.scenario);
     default:

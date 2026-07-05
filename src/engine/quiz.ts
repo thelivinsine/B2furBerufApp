@@ -183,7 +183,7 @@ function pluralQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MC
     kind: "plural",
     difficulty,
     themeId: item.themeId,
-    prompt: `Plural von „${item.de}\"?`,
+    prompt: `Plural von „${item.de}"?`,
     answer: item.plural!,
     options: shuffle([item.plural!, ...distractors]),
     sourceId: item.id,
@@ -341,7 +341,9 @@ export function buildThemeQuiz(
         pushUnique(articleQ(sample(nouns, 1)[0], difficulty));
       } else if (vocab.length >= 4) {
         pushUnique(matchingQ(vocab, difficulty, themeId));
-      } else if (vocab.length >= 4) {
+      } else if (vocab.length > 0) {
+        // Fallback for tiny pools (was dead code behind a duplicated >= 4
+        // condition): distractors come from vocabAll, so one word suffices.
         pushUnique(translationQ(sample(vocab, 1)[0], vocabAll, difficulty));
       }
     } else if (difficulty === 2) {

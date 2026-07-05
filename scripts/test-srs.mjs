@@ -131,7 +131,7 @@ function fail(name, msg) {
   console.error(`  ✗ ${name}: ${msg}`);
 }
 
-function ok(name) {
+function ok(_name) {
   checks += 1;
 }
 

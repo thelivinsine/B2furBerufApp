@@ -86,7 +86,7 @@ export function advanceFree(state: DialogueState, spoken?: string): DialogueStat
   };
 }
 
-export function useHint(state: DialogueState): DialogueState {
+export function applyHint(state: DialogueState): DialogueState {
   return { ...state, hintsUsed: state.hintsUsed + 1 };
 }
 

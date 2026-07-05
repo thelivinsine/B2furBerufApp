@@ -108,7 +108,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     let error;
     // Whether the account exists but isn't logged in yet (Supabase "Confirm
     // email" is on → a confirmation link must be clicked first).
-    let needsConfirmation = false;
+    let needsConfirmation: boolean;
     if (current?.is_anonymous) {
       // updateUser upgrades an existing authenticated session — no captchaToken needed.
       const { data, error: e } = await supabase.auth.updateUser({ email, password });
