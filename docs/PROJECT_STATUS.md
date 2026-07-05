@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (full performance/bug/robustness audit executed, PRs #289–#295, session 58). The working branch is
+_Last updated: 2026-07-05 (Bibliothek Grammatik tile bounce-to-Wörter fix, session 59). The working branch is
 reassigned every session, so **`main` is always the source of truth**. Product name: **Genauly**
 (domain `genauly.de`)._
 
@@ -602,7 +602,21 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 58 (2026-07-05). Full performance/bug/robustness audit EXECUTED ✅, six PRs
+**Handoff after session 59 (2026-07-05). Bibliothek Grammatik bug FIXED ✅ and merged to `main`.**
+The founder reported that tapping any Grammatik tile in the Bibliothek (Konnektoren etc.) bounced
+them to the Wörter tab. Root cause: `GrammarHub` opened a topic with `setParams({ topic: id })`,
+which replaces the whole query string and drops `tab=grammatik`; `LibraryHub` then saw no `tab` and
+fell back to `DEFAULT_LIBRARY_TAB` ("woerter"). A Phase-5 regression: harmless when GrammarHub lived
+at standalone `/grammar`, breaking once it became a `?tab=` segment of `/library`. The back button
+(`setParams({})`) had the same flaw. Fix in `src/features/grammar/GrammarHub.tsx`: both `open` and
+the new `close` clone the current params (`new URLSearchParams(params)`) and only set/delete
+`topic`, the same idiom the other three library surfaces already use. Verified with a Playwright
+check against the production preview (tile click keeps `tab=grammatik&topic=...`, topic view
+renders, back returns to the grammar grid) plus `pnpm build`. **Next candidates** carry over from
+session 58: founder live-verification of app feel on a real phone; burn down the ~31 lint warnings;
+`useDeferredValue` on the Vokabeltrainer filter memos if old devices still stutter.
+
+**Earlier handoff after session 58 (2026-07-05). Full performance/bug/robustness audit EXECUTED ✅, six PRs
 merged to `main`** (#289–#294 + the Phase-6 polish PR, see below). The founder reported the app
 "buggy, laggy and unresponsive"; the audit report + fix plan lives in
 **`docs/plans/APP_AUDIT_2026-07-05.md`** (committed with PR #289) and every phase in it is now
