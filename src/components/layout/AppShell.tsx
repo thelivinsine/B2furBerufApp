@@ -7,7 +7,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { BottomTabBar } from "./BottomTabBar";
 import { MoreSheet } from "./MoreSheet";
 import { GlobalSearch } from "./GlobalSearch";
-import { useProgressStore } from "@/store/useProgressStore";
+import { useEffectiveStreak } from "@/store/useProgressStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Toaster } from "./Toaster";
 import { ModeSwitcher } from "./ModeSwitcher";
@@ -62,7 +62,9 @@ export function AppShell() {
     setEditMode(false);
   }
   const authStatus = useAuthStore((s) => s.status);
-  const streak = useProgressStore((s) => s.streak);
+  // Effective streak (0 once broken) so the header never disagrees with the
+  // dashboard after a missed day.
+  const streak = useEffectiveStreak();
 
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we
