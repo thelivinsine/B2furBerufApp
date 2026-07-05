@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { recoverFromStaleAssets, isChunkLoadError } from "./lib/recover";
+import { watchSwUpdates } from "./lib/swUpdate";
 // Self-hosted Inter (variable). Replaces the third-party rsms.me stylesheet —
 // no external font dependency, no IP leak, and a tighter CSP.
 import "@fontsource-variable/inter";
@@ -46,6 +47,8 @@ function paintFatal(label: string, detail: unknown): void {
 // error / unhandled rejection — and react-router shows its own "Unexpected
 // Application Error" before our React boundary can. Catch it here too and
 // self-heal by clearing the SW caches and reloading.
+watchSwUpdates();
+
 window.addEventListener("error", (e) => {
   if (isChunkLoadError(e.error ?? e.message)) {
     void recoverFromStaleAssets();

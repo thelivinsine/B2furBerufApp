@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (Bibliothek Grammatik tile bounce-to-Wörter fix, session 59). The working branch is
+_Last updated: 2026-07-05 (Bibliothek Grammatik fix + PWA auto-update watcher, session 59). The working branch is
 reassigned every session, so **`main` is always the source of truth**. Product name: **Genauly**
 (domain `genauly.de`)._
 
@@ -620,7 +620,24 @@ that is the intended reset), every deep link into library content routes through
 carries the travelling scope). Confirmed at runtime with a 7-check Playwright smoke: saved-toggle /
 search / facet params keep their tab, the switcher carries theme scope, old `/grammar?topic=` deep
 links land on the topic, and browser Back from a topic returns to the grammar grid. No code change
-needed beyond the PR #297 fix. **Next candidates** carry over from
+needed beyond the PR #297 fix.
+
+**Follow-up in the same session: PWA auto-update watcher (`src/lib/swUpdate.ts`).** The founder
+reported the grammar fix "isn't solved yet" after it was already deployed (Pages runs 304–305
+green). Root cause was the update path, not the fix: the service worker (`registerType:
+"autoUpdate"`) serves the OLD precached app on launch and only swaps in a new deploy on the *next*
+relaunch, so an installed home-screen app needs two full relaunches to show any deploy. New
+`watchSwUpdates()` (called from `main.tsx`): reloads once when the new worker takes control within
+30s of load (the update-on-launch case); if a deploy lands mid-session it defers the reload to the
+next app resume so an in-progress exercise is never interrupted; on every resume it also asks the
+browser to re-check `sw.js` (throttled to 1/min) because iOS PWAs are resumed, not relaunched.
+First-install `clientsClaim` is guarded (no spurious reload). Complements the existing reactive
+`lib/recover.ts` (which only heals after a chunk-load crash). Verified with a Playwright
+end-to-end SW test against the production preview: no reload on first install, auto-reload after a
+simulated deploy (bumped `sw.js` revision), grammar tiles still work after the reload; `pnpm
+build`/`lint`/`test:unit`/`check:bundle` green. Note: the founder's device adopts THIS change only
+after one more manual close-and-reopen cycle (the old code without the watcher is what's cached);
+every deploy after that self-adopts. **Next candidates** carry over from
 session 58: founder live-verification of app feel on a real phone; burn down the ~31 lint warnings;
 `useDeferredValue` on the Vokabeltrainer filter memos if old devices still stutter.
 
