@@ -3,7 +3,8 @@
 A map of everything in `docs/`, so a new session (or a new person) knows where to start and which
 documents are live vs. historical. **Start with `PROJECT_STATUS.md` → its `## Resume here` section.**
 
-_Last reviewed: 2026-07-03 (docs audit + learning-engine plan + folder reorg)._
+_Last reviewed: 2026-07-05 (token-efficiency restructure: split `DECISIONS.md` out of `CLAUDE.md`,
+rotated the two big logs into `archive/`, moved four completed plans to `archive/`)._
 
 ## Folder structure
 
@@ -30,7 +31,8 @@ authoritative current location of every file.
 | File | What it is | Status |
 |---|---|---|
 | **`PROJECT_STATUS.md`** | The single re-orientation point: current status, locked decisions, backlog, model guidance, and the authoritative **"Resume here"** handoff. | 🟢 Live, read first |
-| `SESSION_PROMPT_LOG.md` | Append-only paper trail of every founder prompt + response (authorship record for a possible copyright filing). | 🟢 Live; append every session |
+| `SESSION_PROMPT_LOG.md` | Append-only paper trail of every founder prompt + response (authorship record for a possible copyright filing). Live file holds session 50+; older entries in `archive/SESSION_PROMPT_LOG_ARCHIVE.md`. | 🟢 Live; append every session |
+| `DECISIONS.md` | The "why" behind locked decisions (UX-overhaul phase history, mobile-bar mechanism/mockup detail). Split out of `CLAUDE.md` so that file stays lean; read before undoing a "locked" rule. | 🟢 Live |
 | `../CLAUDE.md` (repo root) | Developer/agent operating instructions, conventions, and locked designs. Authoritative for the mobile bottom bar and content conventions. | 🟢 Live |
 
 ## `strategy/` — business, product, governance (advisory, current)
@@ -48,18 +50,19 @@ authoritative current location of every file.
 
 | File | What it is | Status |
 |---|---|---|
-| `plans/LEARNING_ENGINE_PLAN.md` | Phased plan for backlog #26–#30 (latency capture, guess-first, voice variety, FSRS, speaking block, custom decks). | 🟡 Approved, not yet implemented |
+| `plans/LEARNING_ENGINE_PLAN.md` | Phased plan for backlog #26–#30 (latency capture, guess-first, voice variety, FSRS, speaking block, custom decks). Phases 0, 1, 3 shipped; Phase 2 (speaking block) + optional Phase 1.5 pending. | 🟡 Partially shipped (active) |
 | `plans/PHASE2_SETUP.md` | Founder checklist/runbook to switch on the Supabase backend. | 🟢 Live runbook |
-| `plans/UX_OVERHAUL_PLAN.md` | Session-first redesign (s46). All phases 0–5 shipped. | ✅ Complete |
-| `plans/TAXONOMY_REDESIGN.md` | Faceted taxonomy strategy deck, "what/why" (slides in `reference/TAXONOMY_REDESIGN.pptx`). | ✅ Implemented |
-| `plans/TAXONOMY_IMPLEMENTATION_PLAN.md` | The staged "how" for the taxonomy. Phases 0–4 shipped. | ✅ Complete |
-| `plans/FILTER_HARMONIZATION_PLAN.md` | Unified browse toolbar across pages (s45). | ✅ Implemented |
 
 ## `archive/` — historical / superseded
 
 | File | What it is | Status |
 |---|---|---|
-| `archive/PROJECT_STATUS_ARCHIVE.md` | Detailed session-by-session logs for sessions 4–40 + 24, split out of the status file to keep it navigable. | 🗄 Archive |
+| `archive/PROJECT_STATUS_ARCHIVE.md` | Detailed session-by-session logs for sessions 4–46, split out of the status file to keep it navigable. | 🗄 Archive |
+| `archive/SESSION_PROMPT_LOG_ARCHIVE.md` | Prompt-log entries 1–109 (sessions 26–49), split out of the live prompt log. Append-only history; left as written. | 🗄 Archive |
+| `archive/UX_OVERHAUL_PLAN.md` | Session-first redesign (s46). All phases 0–5 shipped. | ✅ Complete (archived s55) |
+| `archive/TAXONOMY_REDESIGN.md` | Faceted taxonomy strategy deck, "what/why" (slides in `reference/TAXONOMY_REDESIGN.pptx`). | ✅ Implemented (archived s55) |
+| `archive/TAXONOMY_IMPLEMENTATION_PLAN.md` | The staged "how" for the taxonomy. Phases 0–4 shipped. | ✅ Complete (archived s55) |
+| `archive/FILTER_HARMONIZATION_PLAN.md` | Unified browse toolbar across pages (s45). | ✅ Implemented (archived s55) |
 | `archive/EXPANSION_PLAN.md` | Original Phase 1 (content/grammar/quizzes) + Phase 2 (Supabase/AI) plan. Both shipped. | ✅ Historical |
 | `archive/IMPLEMENTATION_PLAN.md` | The from-scratch build plan (repo was empty at the time). | ✅ Historical |
 | `archive/MOBILE_APP_PLAN.md` | Mobile redesign (iOS meta tags + bottom bar + density). All 3 layers shipped; bar now locked in `CLAUDE.md`. | ✅ Historical |

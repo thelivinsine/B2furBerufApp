@@ -266,8 +266,8 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 5. **Domain-based filtering for Vocabulary, Collocations, and scenario-based learning:**
    split content into "Bürokratie / bureaucratic work" vs. "office work," and within office
    work, further filter by industry/sector.
-   - **SCOPED 2026-06-26 (session 41).** This is now designed in `docs/plans/TAXONOMY_REDESIGN.md`
-     (+ `.pptx`) and planned in `docs/plans/TAXONOMY_IMPLEMENTATION_PLAN.md`: a faceted Domain → Theme →
+   - **SCOPED 2026-06-26 (session 41).** This is now designed in `docs/archive/TAXONOMY_REDESIGN.md`
+     (+ `.pptx`) and planned in `docs/archive/TAXONOMY_IMPLEMENTATION_PLAN.md`: a faceted Domain → Theme →
      Sub-theme model with a Work/Personal/Both **Mode** lens and work-only **sector** facet (the
      industry/sector split the founder asked for). Not built yet; Phase 0–1 is the next build step.
 6. **Redesign the Schreibtraining section.**
@@ -469,7 +469,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     comprehension check without abandoning German immersion. **Deliberately parked**: the founder wants
     to brainstorm the interaction before anything is built. Notes for when picked up:
     - Pedagogically a "comprehension safety net" on top of the German-first copy policy (see
-      `docs/plans/UX_OVERHAUL_PLAN.md` Part H, decision 3). The playbook favours desirable difficulty, so a
+      `docs/archive/UX_OVERHAUL_PLAN.md` Part H, decision 3). The playbook favours desirable difficulty, so a
       deliberate-friction reveal (e.g. press-and-hold to peek) may beat a free toggle.
     - **Prerequisite already planned:** the UX-overhaul Phase-0 German copy pass keeps every EN string
       as data (blurbs, purposes, etc.), which is exactly what a whole-screen EN layer needs. No conflict.
@@ -586,7 +586,7 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 | Pre-seed fundraising (#17) | **Fable** | Investor targeting, pitch deck, data room, instrument strategy |
 | Routine bugfixes (e.g. UI tweaks) | **Sonnet** | Step up to Opus only when a fix turns gnarly or spans many files |
 
-### UX overhaul plan phases mapped to models (added s46; see `docs/plans/UX_OVERHAUL_PLAN.md`)
+### UX overhaul plan phases mapped to models (added s46; see `docs/archive/UX_OVERHAUL_PLAN.md`)
 
 The design/strategy work is already done (Fable, s46), so the phases below are **implementation**:
 do not burn Fable on them. Fable reappears only where new pedagogical content gets authored.
@@ -610,7 +610,14 @@ live file now session 50+), relocated the PROJECT_STATUS session-25–46 detail 
 into the new **`docs/DECISIONS.md`** (UX-overhaul phase history + mobile-bar mechanism/mockup detail).
 Added a "Working efficiently (token/context discipline)" rule to `CLAUDE.md`. **Every operative
 do/don't rule was preserved; only narrative/rationale moved.** Net effect: the files normally read per
-session dropped ~4110 → ~1973 lines (~52%). No app code touched, no build needed. Prompt-log entry 133.
+session dropped ~4110 → ~1973 lines (~52%). Then a **thorough docs audit** (founder request): moved the
+four fully-completed plans (`UX_OVERHAUL_PLAN`, `FILTER_HARMONIZATION_PLAN`, `TAXONOMY_IMPLEMENTATION_PLAN`,
+`TAXONOMY_REDESIGN`) from `docs/plans/` into `docs/archive/` and rewired every live reference; fixed the
+stale `LEARNING_ENGINE_PLAN` status in the index (Phases 0/1/3 shipped, not "not yet implemented"); removed
+the stale hardcoded session-branch name from `CLAUDE.md` (docs best-practice #5); refreshed `docs/README.md`
+(new `DECISIONS.md` + prompt-log-archive rows). Content counts spot-checked against `src/data` (provenance
+1,111 + Can-Do 25 match, not stale). `plans/` now holds only active work (`LEARNING_ENGINE_PLAN`,
+`PHASE2_SETUP`). No app code touched, no build needed. Prompt-log entries 133–134.
 
 **Earlier handoff (session 54, 2026-07-05, docs only, nothing built).** The founder brought a rough
 idea for a **story-driven 2D German life RPG** (hero's journey, Pokémon-like; items = language;

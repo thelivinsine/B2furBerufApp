@@ -14,7 +14,7 @@ here first. For the day-by-day prompt trail see `docs/SESSION_PROMPT_LOG.md`; fo
 ## UX overhaul (session 47–49) — phase-by-phase record
 
 The app was migrated from a "drawer of 11 tools" to a **session-first learning loop** (four zones:
-Heute · Bibliothek · Anwenden · Fortschritt). Founder-approved plan (`docs/plans/UX_OVERHAUL_PLAN.md`),
+Heute · Bibliothek · Anwenden · Fortschritt). Founder-approved plan (`docs/archive/UX_OVERHAUL_PLAN.md`),
 executed phase by phase. All phases below are **shipped**; `CLAUDE.md` carries only the current state
 plus the two still-live operative notes (standalone `/quiz` status; `SHOW_PRACTICE_TABS` flag).
 
