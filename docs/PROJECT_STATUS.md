@@ -612,7 +612,15 @@ at standalone `/grammar`, breaking once it became a `?tab=` segment of `/library
 the new `close` clone the current params (`new URLSearchParams(params)`) and only set/delete
 `topic`, the same idiom the other three library surfaces already use. Verified with a Playwright
 check against the production preview (tile click keeps `tab=grammatik&topic=...`, topic view
-renders, back returns to the grammar grid) plus `pnpm build`. **Next candidates** carry over from
+renders, back returns to the grammar grid) plus `pnpm build`. A follow-up **app-wide sweep for the
+same bug class found no other instances**: all nine `useSearchParams` writers audited (the other
+three library surfaces clone params; WritingHub/QuizHub replace them on standalone routes where
+that is the intended reset), every deep link into library content routes through `LibraryRedirect`
+(params preserved, correct tab added), and `LibrarySwitcher` rebuilds params deliberately (it
+carries the travelling scope). Confirmed at runtime with a 7-check Playwright smoke: saved-toggle /
+search / facet params keep their tab, the switcher carries theme scope, old `/grammar?topic=` deep
+links land on the topic, and browser Back from a topic returns to the grammar grid. No code change
+needed beyond the PR #297 fix. **Next candidates** carry over from
 session 58: founder live-verification of app feel on a real phone; burn down the ~31 lint warnings;
 `useDeferredValue` on the Vokabeltrainer filter memos if old devices still stutter.
 
