@@ -1,8 +1,8 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-04 (Learning Engine #29 custom deck shipped, session 52). The working branch is
+_Last updated: 2026-07-05 (game-concept brainstorm captured, session 54). The working branch is
 reassigned every session, so **`main` is always the source of truth** (this session:
-`claude/whats-next-q1iln6`). Product name: **Genauly** (domain `genauly.de`)._
+`claude/german-learning-game-idea-df1675`). Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
 pointer is the `## Resume here (next session)` section near the end of this file** — start there. Older
@@ -948,7 +948,21 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 53 (2026-07-04). Learning Engine Phase 1, the FSRS scheduler (26b), is
+**Handoff after session 54 (2026-07-05, docs only, nothing built).** The founder brought a rough
+idea for a **story-driven 2D German life RPG** (hero's journey, Pokémon-like; items = language;
+missions = real-life scenarios like the Anmeldung; battles = conversations; real-world photo/
+voice side quests; D/E translation buttons on every line) and we brainstormed it into a concept.
+The full concept, including the founder's verbatim core philosophy (personal involvement, cultural
+insight + visuals + emotion, incremental scene-on-scene learning, ambition of hundreds of missions
+and thousands of scenes), the failure-is-content design, the chapter skeleton, and the **Anmeldung
+vertical slice** chosen as the first prototype target, is captured in
+**`docs/strategy/GAME_CONCEPT.md`**. **Scope guardrail (founder correction, do not regress):** the
+game targets a BROAD audience; exam prep is at most one optional side path, never the spine or
+default endgame. Open questions for the founder: own brand vs. Genauly name, and final blessing on
+the retro pixel-art direction. No build work is scoped yet; treat the concept doc as the reference
+when the founder wants to take the next step. Prompt-log entry 132.
+
+**Earlier handoff (session 53, 2026-07-04). Learning Engine Phase 1, the FSRS scheduler (26b), is
 COMPLETE ✅ and merged to `main`** as PR #275 (squash SHA `c1dada8`). `src/engine/srs.ts` now runs a
 compact hand-rolled **FSRS-6** scheduler (21 default weights, desired retention 0.9, no fuzzing,
 day-granular with no sub-day learning steps) behind the **unchanged** export surface, so no call
