@@ -104,6 +104,12 @@ export interface BuildSessionOpts {
   scope?: ThemeId;
   /** Vocab ids in the learner's custom deck (#29); each gets a review boost. */
   savedWords?: string[];
+  /**
+   * Include speaking production blocks (#27). The engine stays pure: the
+   * caller computes this as `recognitionEnabled && recognitionSupported()`,
+   * so learners without mic/STT/opt-in never see the block kind.
+   */
+  speaking?: boolean;
 }
 
 /** Interleave several ordered pools round-robin so kinds alternate, not block. */
@@ -136,7 +142,7 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
   const band = weakestBand(srs);
 
   /* --- Pool 1: due vocab retrieval (flashcards), weighted + scope-biased --- */
-  const vocabBlocks: SessionBlock[] = vocabulary
+  const weightedDue = vocabulary
     .filter((v) => isDue(srs[v.id]))
     .map((v) => {
       const ctx = themeById(v.themeId)?.context ?? "both";
@@ -152,19 +158,36 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
         }) + scopeBoost;
       return { v, w };
     })
-    .sort((a, b) => b.w - a.w)
-    .slice(0, Math.ceil(limit * 0.6))
-    .map(
-      ({ v }): SessionBlock => ({
-        kind: "flashcard",
-        key: `fc_${v.id}`,
-        source: "vocab",
-        sourceId: v.id,
-        de: v.de,
-        en: v.en,
-        example: v.examples[0]?.de,
-      }),
-    );
+    .sort((a, b) => b.w - a.w);
+
+  const vocabBlocks: SessionBlock[] = weightedDue.slice(0, Math.ceil(limit * 0.6)).map(
+    ({ v }): SessionBlock => ({
+      kind: "flashcard",
+      key: `fc_${v.id}`,
+      source: "vocab",
+      sourceId: v.id,
+      de: v.de,
+      en: v.en,
+      example: v.examples[0]?.de,
+    }),
+  );
+
+  /* --- Pool 5: speaking production (#27), top due words, mic opt-in only.
+     Reuses Pool 1's weighting; overlap with a flashcard block is fine (and
+     useful: recognition first, production after). --- */
+  const speakingBlocks: SessionBlock[] = opts.speaking
+    ? weightedDue.slice(0, 2).map(
+        ({ v }): SessionBlock => ({
+          kind: "speaking",
+          key: `sp_${v.id}`,
+          sourceId: v.id,
+          de: v.de,
+          en: v.en,
+          // English example only: the German sentence would reveal the answer.
+          example: v.examples[0]?.en,
+        }),
+      )
+    : [];
 
   /* --- Pool 2: leveled quiz questions from the scoped/weak theme --- */
   const quizBlocks: SessionBlock[] = buildThemeQuiz(scopeTheme, difficulty, 5).map(
@@ -202,7 +225,10 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
     }),
   );
 
-  const blocks = interleave([vocabBlocks, quizBlocks, grammarBlocks, redeBlocks], limit);
+  const blocks = interleave(
+    [vocabBlocks, quizBlocks, grammarBlocks, redeBlocks, speakingBlocks],
+    limit,
+  );
 
   const due = dueCount(srs);
   const preview = buildPreview(due, band, redeBlocks.length);

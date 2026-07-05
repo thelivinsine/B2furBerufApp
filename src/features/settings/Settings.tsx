@@ -402,7 +402,7 @@ export function Settings() {
                 {settings.recognitionEnabled ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
                 <div>
                   <p className="text-sm font-medium">Spracherkennung</p>
-                  <p className="text-xs text-muted-foreground">Experimentell – nicht auf allen Geräten verfügbar</p>
+                  <p className="text-xs text-muted-foreground">Schaltet Sprechblöcke in Sessions frei. Experimentell, nicht auf allen Geräten verfügbar</p>
                 </div>
               </div>
               <Switch

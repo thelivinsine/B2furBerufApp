@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Zap,
@@ -10,6 +10,8 @@ import {
   Sparkles,
   RotateCw,
   TrendingUp,
+  Mic,
+  Keyboard,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { SessionBlock } from "@/types";
@@ -19,6 +21,9 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { buildSession, difficultyForLevel } from "@/engine/session";
 import { quizXp } from "@/engine/quiz";
 import { XP } from "@/engine/scoring";
+import { listen, recognitionSupported, type RecognitionHandle } from "@/engine/speech";
+import { matchesSpoken } from "@/engine/pronounce";
+import { useCountdown } from "@/lib/hooks";
 import { QuestionView, kindLabel } from "@/features/quiz/QuestionViews";
 import { GrammarDrillCard } from "@/features/grammar/GrammarDrillCard";
 import { Button } from "@/components/ui/button";
@@ -56,6 +61,7 @@ export function SessionPlayer({
   const savedWords = useProgressStore((s) => s.savedWords);
   const mode = useSettingsStore((s) => s.mode);
   const level = useSettingsStore((s) => s.level);
+  const recognitionEnabled = useSettingsStore((s) => s.recognitionEnabled);
   const addXp = useProgressStore((s) => s.addXp);
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
   const practiceRedemittel = useProgressStore((s) => s.practiceRedemittel);
@@ -65,11 +71,23 @@ export function SessionPlayer({
   // Build once on mount: the composer samples, so re-building each render would
   // reshuffle the deck under the learner.
   const [plan] = useState(() =>
-    buildSession({ srs, savedWords, mode, minutes, difficulty: difficultyForLevel(level), scope }),
+    buildSession({
+      srs,
+      savedWords,
+      mode,
+      minutes,
+      difficulty: difficultyForLevel(level),
+      scope,
+      speaking: recognitionEnabled && recognitionSupported(),
+    }),
   );
 
   const [index, setIndex] = useState(0);
   const [answered, setAnswered] = useState(false);
+  // Fallback ladder (#27): after repeated STT failures the remaining speaking
+  // blocks skip the mic entirely and start in the typed-input fallback.
+  const sttErrorsRef = useRef(0);
+  const [sttDisabled, setSttDisabled] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [stronger, setStronger] = useState<Reinforced[]>([]);
@@ -123,6 +141,23 @@ export function SessionPlayer({
       setCorrectCount((c) => c + 1);
       pushStronger({ de: b.groupLabel, en: b.drill.answer });
     }
+  };
+
+  const onSpeakingResult = (correct: boolean, latencyMs?: number) => {
+    if (answered) return;
+    setAnswered(true);
+    const b = block as Extract<SessionBlock, { kind: "speaking" }>;
+    reviewVocab(b.sourceId, correct ? 4 : 0, latencyMs);
+    if (correct) {
+      award(XP.speakingDrill);
+      setCorrectCount((c) => c + 1);
+      pushStronger({ de: b.de, en: b.en });
+    }
+  };
+
+  const onSttError = () => {
+    sttErrorsRef.current += 1;
+    if (sttErrorsRef.current >= 2) setSttDisabled(true);
   };
 
   const onFlashcardGrade = (correct: boolean, latencyMs?: number) => {
@@ -252,6 +287,14 @@ export function SessionPlayer({
                 <GrammarDrillCard drill={block.drill} onResult={onGrammarResult} suppressXp />
               </>
             )}
+            {block.kind === "speaking" && (
+              <SpeakingBlock
+                block={block}
+                sttDisabled={sttDisabled}
+                onSttError={onSttError}
+                onResult={onSpeakingResult}
+              />
+            )}
           </motion.div>
         </AnimatePresence>
 
@@ -263,6 +306,239 @@ export function SessionPlayer({
           </motion.div>
         )}
       </div>
+    </div>
+  );
+}
+
+/* ---------------- Speaking production block (#27) ---------------- */
+
+/** Max seconds the mic stays open before we grade whatever was heard. */
+const LISTEN_SECONDS = 8;
+
+/**
+ * The first consumer of `listen()` (Web Speech STT). Loop: show the EN meaning,
+ * learner taps the mic (STT needs a user gesture on several browsers), a soft
+ * countdown caps the listening window, partials stream in, the final transcript
+ * is matched tolerantly against the German target, instant feedback, grade.
+ * Fallback ladder: no ctor / permission denied / hard error flips this block to
+ * a typed input; `sttDisabled` (repeated failures) starts there directly.
+ */
+function SpeakingBlock({
+  block,
+  sttDisabled,
+  onSttError,
+  onResult,
+}: {
+  block: Extract<SessionBlock, { kind: "speaking" }>;
+  sttDisabled: boolean;
+  onSttError: () => void;
+  onResult: (correct: boolean, latencyMs?: number) => void;
+}) {
+  const [stage, setStage] = useState<"prompt" | "listening" | "typed">(
+    sttDisabled ? "typed" : "prompt",
+  );
+  const [micFailed, setMicFailed] = useState(sttDisabled);
+  const [noSpeech, setNoSpeech] = useState(false);
+  const [partial, setPartial] = useState("");
+  const [typedAnswer, setTypedAnswer] = useState("");
+  const [outcome, setOutcome] = useState<{ correct: boolean; heard: string } | null>(null);
+
+  // Latency = block mount (prompt render) to the graded answer, spanning the
+  // think stage like the 26a MCQ semantics. The block remounts per block.key.
+  const startRef = useRef(performance.now());
+  const handleRef = useRef<RecognitionHandle | null>(null);
+  const partialRef = useRef("");
+  const evaluatedRef = useRef(false);
+
+  const countdown = useCountdown(LISTEN_SECONDS, {
+    onExpire: () => handleRef.current?.stop(),
+  });
+
+  // Unmount: never let a late recognition event grade a stale block. The
+  // effect body re-arms the flag because StrictMode's dev double-invoke runs
+  // this cleanup once on a component that stays mounted.
+  useEffect(() => {
+    evaluatedRef.current = false;
+    return () => {
+      evaluatedRef.current = true;
+      handleRef.current?.stop();
+    };
+  }, []);
+
+  const evaluate = (transcript: string) => {
+    if (evaluatedRef.current) return;
+    evaluatedRef.current = true;
+    handleRef.current?.stop();
+    handleRef.current = null;
+    countdown.pause();
+    const correct = matchesSpoken(transcript, block.de);
+    setOutcome({ correct, heard: transcript.trim() });
+    onResult(correct, Math.round(performance.now() - startRef.current));
+  };
+
+  const flipToTyped = () => {
+    handleRef.current?.stop();
+    handleRef.current = null;
+    countdown.pause();
+    setStage("typed");
+  };
+
+  const startListening = () => {
+    setNoSpeech(false);
+    setPartial("");
+    partialRef.current = "";
+    const handle = listen({
+      onPartial: (text) => {
+        partialRef.current = text;
+        setPartial(text);
+      },
+      onFinal: (text) => evaluate(text),
+      onError: (err) => {
+        if (evaluatedRef.current) return;
+        handleRef.current = null;
+        countdown.pause();
+        if (err === "aborted") return; // our own stop; onEnd handles the rest
+        if (err === "no-speech") {
+          setStage("prompt");
+          setNoSpeech(true);
+          return;
+        }
+        // Hard failure (not-allowed, network, audio-capture, ...): typed fallback.
+        setMicFailed(true);
+        onSttError();
+        setStage("typed");
+      },
+      onEnd: () => {
+        // A cleared handle means an error handler (or a voluntary flip to
+        // typing) already routed this attempt; onError is always followed by
+        // onEnd, which must not drag the stage back.
+        if (evaluatedRef.current || !handleRef.current) return;
+        // Window closed without a final result: grade the best partial, or
+        // return to the prompt when nothing was heard at all.
+        if (partialRef.current.trim()) evaluate(partialRef.current);
+        else {
+          handleRef.current = null;
+          countdown.pause();
+          setStage("prompt");
+          setNoSpeech(true);
+        }
+      },
+    });
+    if (!handle) {
+      setMicFailed(true);
+      onSttError();
+      setStage("typed");
+      return;
+    }
+    handleRef.current = handle;
+    setStage("listening");
+    countdown.reset(LISTEN_SECONDS);
+    countdown.start();
+  };
+
+  const submitTyped = () => {
+    if (typedAnswer.trim()) evaluate(typedAnswer);
+  };
+
+  return (
+    <div className="space-y-5">
+      <div className="flex justify-end">
+        <Badge variant="muted">Sprechen</Badge>
+      </div>
+
+      <div className="flex min-h-[13rem] flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-surface p-6 shadow-soft">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Sag es auf Deutsch:
+        </p>
+        <p className="text-center text-2xl font-semibold">{block.en}</p>
+        {block.example && (
+          <p className="text-center text-sm italic text-muted-foreground">„{block.example}"</p>
+        )}
+        {stage === "listening" && (
+          <div className="flex flex-col items-center gap-1 pt-1">
+            <p className="flex items-center gap-2 text-sm font-medium text-primary">
+              <Mic className="h-4 w-4 animate-pulse" /> Ich höre zu … ({countdown.remaining}s)
+            </p>
+            {partial && <p className="text-sm text-muted-foreground">„{partial}"</p>}
+          </div>
+        )}
+      </div>
+
+      {outcome ? (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-2xl border p-4 ${
+            outcome.correct ? "border-success/25 bg-success/5" : "border-danger/25 bg-danger/5"
+          }`}
+        >
+          <p
+            className={`flex items-center gap-2 text-sm font-semibold ${
+              outcome.correct ? "text-success" : "text-danger"
+            }`}
+          >
+            {outcome.correct ? (
+              <>
+                <Check className="h-4 w-4" /> Gut gesagt!
+              </>
+            ) : (
+              <>
+                <X className="h-4 w-4" /> Nicht ganz.
+              </>
+            )}
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="text-base font-semibold">{block.de}</span>
+            <SpeakButton text={block.de} />
+          </div>
+          {!outcome.correct && outcome.heard && (
+            <p className="mt-1 text-sm text-muted-foreground">Deine Antwort: „{outcome.heard}"</p>
+          )}
+        </motion.div>
+      ) : stage === "prompt" ? (
+        <div className="space-y-2">
+          {noSpeech && (
+            <p className="text-center text-sm text-muted-foreground">
+              Nichts gehört. Versuch es nochmal oder tippe deine Antwort.
+            </p>
+          )}
+          <Button variant="gradient" className="h-12 w-full gap-2" onClick={startListening}>
+            <Mic className="h-4 w-4" /> Jetzt sprechen
+          </Button>
+          <Button variant="ghost" size="sm" className="w-full gap-2" onClick={flipToTyped}>
+            <Keyboard className="h-4 w-4" /> Lieber tippen
+          </Button>
+        </div>
+      ) : stage === "listening" ? (
+        <Button
+          variant="outline"
+          className="h-12 w-full"
+          onClick={() => handleRef.current?.stop()}
+        >
+          Fertig
+        </Button>
+      ) : (
+        <div className="space-y-2">
+          <p className="text-center text-sm text-muted-foreground">
+            {micFailed
+              ? "Mikrofon nicht verfügbar. Tippe deine Antwort."
+              : "Tippe, was du sagen wolltest."}
+          </p>
+          <div className="flex gap-2">
+            <input
+              autoFocus
+              value={typedAnswer}
+              onChange={(e) => setTypedAnswer(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submitTyped()}
+              placeholder="Deine Antwort auf Deutsch …"
+              className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring"
+            />
+            <Button variant="gradient" className="h-11" onClick={submitTyped}>
+              Prüfen
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
