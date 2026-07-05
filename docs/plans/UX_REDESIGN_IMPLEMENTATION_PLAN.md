@@ -1,7 +1,8 @@
 # UX/UI Redesign — Phase-wise Implementation Plan (with Claude model recommendations)
 
-_Status: **APPROVED PLAN**, session 63 (2026-07-05). Execution has not started; each phase below is
-a future session's work. This doc merges the two redesign reports into one executable plan:_
+_Status: **IN PROGRESS**, session 64 (2026-07-05). **Phase 1 "The Diet" shipped** (PR #305) and
+**Phase 2 "The Stage" shipped** (PR #307). Phases 3–4 remain future sessions' work; **Phase 3 "The
+World Seed" is next**. This doc merges the two redesign reports into one executable plan:_
 
 1. **`docs/reference/GENAULY_UX_UI_ANALYSIS.md`** (PR #300): the 7-dimension UX audit. Headline
    findings: the FSRS engine is world-class but the default experience is recognition-heavy; the
