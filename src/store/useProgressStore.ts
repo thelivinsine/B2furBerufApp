@@ -123,7 +123,14 @@ export const useProgressStore = create<ProgressState>()(
 
       resetProgress: () => set({ ...defaults, srs: {}, dailyXp: {} }),
     }),
-    { name: "b2beruf.progress.v1" },
+    {
+      name: "b2beruf.progress.v1",
+      // Explicit persist version so the NEXT SrsCard/state shape change has a
+      // migration hook ready (audit D6). 0 matches what zustand has been
+      // writing implicitly, so existing learners rehydrate unchanged.
+      version: 0,
+      migrate: (persisted) => persisted as ProgressState,
+    },
   ),
 );
 
