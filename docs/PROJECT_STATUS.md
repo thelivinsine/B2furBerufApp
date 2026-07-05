@@ -1,6 +1,16 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (session 66: UX redesign **Phase 3 "The World Seed" COMPLETE** (tasks
+_Last updated: 2026-07-05 (session 67: UX redesign **Phase 4 "The Depth" scoped + task 4.1 shipped**.
+The Phase 4 sketch was expanded to a Phase-3-granularity task table in
+`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md` (4.1 typed-recall grading engine, 4.2 typing block, 4.3
+Lesen/Hören content bank, 4.4 reading/listening block, 4.5 progression chip, 4.6 gates/ship, with model
+recommendations and a 2–3 session split), and **task 4.1 executed**: new pure `src/engine/typing.ts`
+`gradeTyped(typed, expected)` returning a three-tier verdict (correct/almost/wrong) that maps onto the
+FSRS Grade scale, with alternate umlaut/ß spellings fully correct, articles + reflexive "sich" graded
+separately, tighter-than-spoken typo tolerance, and no containment credit; 18 new Vitest cases in
+`tests/typing.test.ts` (`test:unit` 38 → 56); `levenshtein` exported from `engine/pronounce.ts` for
+reuse. Shipped as **PR #316** (`8bbe1d6`). 4.2–4.6 await the founder's priority call vs the game plan.
+Prior: session 66: UX redesign **Phase 3 "The World Seed" COMPLETE** (tasks
 3.3–3.6), per `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`: **Fortschritt** (`/analytics`) rebuilt as
 a quest board, leading with the `CityStrip`, a "next quest" card driven by the nearest unachieved
 `canDo.ts` milestone, and a "Meine Sammlung" entry card, with the XP chart / vocab-mastery chart /
@@ -613,6 +623,38 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 | 5. Anwenden + nav re-map + facet registry | Anwenden hub, `DEFAULT_PINNED_TABS`, `lib/facets.ts` | **Opus 4.8** | Touches the locked nav store + pinned-tab migration; careful, not big |
 
 ## Resume here (next session)
+
+**Handoff after session 67 (2026-07-05). UX redesign Phase 4 "The Depth" is SCOPED and task 4.1 is
+SHIPPED ✅ (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What happened:
+- **Phase 4 task table drafted** at Phase-3 granularity (6 tasks): 4.1 typed-recall grading engine
+  (Fable), 4.2 typing block wired into the composer + SessionPlayer (Opus), 4.3 Lesen/Hören content
+  bank `src/data/texts.ts` (Fable), 4.4 reading/listening composer block + renderer (Opus), 4.5
+  per-theme progression chip (Sonnet), 4.6 gates/ship (Haiku). Suggested split: **Session A = 4.1+4.2**
+  (ships standalone; the audit's "if only one thing ships" item and reused by game-plan G1), **Session
+  B = 4.3+4.4**, **short Session C = 4.5+4.6**.
+- **Task 4.1 executed and merged (PR #316, `8bbe1d6`).** New pure `src/engine/typing.ts`:
+  `gradeTyped(typed, expected)` → `{ verdict: "correct"|"almost"|"wrong", reason? }`. Design (all in the
+  module header): three tiers map onto the FSRS `Grade` scale for 4.2 (correct→Good, almost→Hard,
+  wrong→Again, so near-misses stop feeding the scheduler false evidence); alternate umlaut/ß spellings
+  fold to digraphs on BOTH sides (fully correct, but Bär/Bar stay distinct); spacing + hyphenation
+  interchangeable; article and reflexive "sich" graded **separately** from the head word (wrong/missing
+  lead with a correct head is "almost", carrying `reason: "article"|"reflexive"`, never a pass or a
+  fail); typo tolerance tighter than the spoken matcher (0 edits ≤3 letters, 1 to 9, 2 from 10) and a
+  within-tolerance slip is "almost" not "correct"; **no containment credit** (unlike `matchesSpoken`).
+  `engine/pronounce.ts` exports `levenshtein` for reuse (behavior unchanged). 18 new cases in
+  `tests/typing.test.ts` including a contrast test vs `matchesSpoken` containment.
+- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors / 31 baseline warnings), `lint:content`,
+  `test:unit` **56**, `test:pronounce` 26, `check:bundle` main chunk **78.9 kB** (`typing.ts` has NO
+  consumer yet, so it is not on any import path; wiring is task 4.2).
+
+**Next step (founder decision pending):** continue **Phase 4 Session A** by executing **task 4.2**
+(new `kind: "typing"` composer block + SessionPlayer renderer, graduation rule so only stable cards get
+typed recall, latency + verdict into `reviewVocab`), OR pivot to **game plan G1** (`GAME_IMPLEMENTATION_PLAN.md`,
+still PROPOSED; its G0 prerequisite — redesign Phases 1–3 — is now fully shipped, and 4.1's tolerant
+grading is exactly what G1's formCloze / dialogue-battle scenes need). The recommendation stands: finish
+4.2 first so typed recall reaches the default loop and de-risks G1.
+
+---
 
 **Handoff after session 66 (2026-07-05). UX redesign Phase 3 "The World Seed" is COMPLETE ✅
 (tasks 3.3–3.6, plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
