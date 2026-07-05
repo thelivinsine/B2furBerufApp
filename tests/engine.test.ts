@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { buildSession } from "@/engine/session";
+import { buildSession, graduatedToTyping } from "@/engine/session";
 import { sessionPreview, targetBlocks, weakestBand } from "@/engine/sessionPreview";
 import { freshCard, review, isDue, mastery } from "@/engine/srs";
 import { searchAll } from "@/lib/search";
 import { daysBetween, shuffle, todayKey } from "@/lib/utils";
 import { vocabulary } from "@/data/vocabulary";
+import type { SrsCard } from "@/types";
 
 describe("session composer", () => {
   it("builds a non-empty, bounded plan for a fresh learner", () => {
@@ -32,6 +33,50 @@ describe("session composer", () => {
     const without = buildSession({ srs: {}, mode: "both", minutes: 15, speaking: false });
     expect(withSpeaking.blocks.some((b) => b.kind === "speaking")).toBe(true);
     expect(without.blocks.some((b) => b.kind === "speaking")).toBe(false);
+  });
+
+  it("keeps new/young cards on recognition flashcards, not typing (4.2)", () => {
+    // A fresh learner: every card is undefined, so nothing has graduated.
+    const plan = buildSession({ srs: {}, mode: "both", minutes: 15 });
+    expect(plan.blocks.some((b) => b.kind === "typing")).toBe(false);
+  });
+
+  it("graduates established cards to typed forward recall (4.2)", () => {
+    // Every vocab card is due, deep, and past the stability floor → all the
+    // vocab-sourced blocks must be typing, none recognition flashcards.
+    const graduated: SrsCard = {
+      ease: 2.5,
+      interval: 20,
+      reps: 4,
+      due: "2000-01-01",
+      stability: 20,
+    };
+    const srs: Record<string, SrsCard> = {};
+    for (const v of vocabulary) srs[v.id] = graduated;
+    const plan = buildSession({ srs, mode: "both", minutes: 15 });
+    expect(plan.blocks.some((b) => b.kind === "typing")).toBe(true);
+    const vocabFlashcards = plan.blocks.filter(
+      (b) => b.kind === "flashcard" && b.source === "vocab",
+    );
+    expect(vocabFlashcards.length).toBe(0);
+  });
+
+  it("graduatedToTyping gates on both reps and the stability floor (4.2)", () => {
+    expect(graduatedToTyping(undefined)).toBe(false);
+    // Deep enough but below the floor.
+    expect(
+      graduatedToTyping({ ease: 2.5, interval: 3, reps: 4, due: "2000-01-01", stability: 3 }),
+    ).toBe(false);
+    // Past the floor but too young (one lucky answer must not jump to typing).
+    expect(
+      graduatedToTyping({ ease: 2.5, interval: 20, reps: 1, due: "2000-01-01", stability: 20 }),
+    ).toBe(false);
+    // Deep and past the floor.
+    expect(
+      graduatedToTyping({ ease: 2.5, interval: 20, reps: 4, due: "2000-01-01", stability: 20 }),
+    ).toBe(true);
+    // Legacy card without stability falls back to interval.
+    expect(graduatedToTyping({ ease: 2.5, interval: 20, reps: 4, due: "2000-01-01" })).toBe(true);
   });
 
   it("sessionPreview is deterministic and reports history", () => {

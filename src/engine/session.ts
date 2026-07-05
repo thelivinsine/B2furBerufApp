@@ -34,6 +34,26 @@ export type { SessionPreview } from "@/engine/sessionPreview";
  * so the Heute hero can show a stable "here's what's in today's session" line.
  */
 
+/**
+ * Stability (FSRS days-to-90%-recall) at/above which a due vocab card
+ * graduates from a recognition flashcard to typed forward recall (task 4.2).
+ * New and young cards stay on recognition, where retrieval difficulty is
+ * lower, and only cards the learner already holds are asked to be produced
+ * from memory. Legacy cards fall back to `interval` (their stability is
+ * seeded lazily on the next review, see engine/srs.ts).
+ */
+export const TYPING_STABILITY_FLOOR = 8;
+
+/**
+ * True when a due card is established enough for typed forward recall: at
+ * least a couple of reviews deep AND past the stability floor, so a single
+ * lucky first answer never jumps a brand-new word straight to typing.
+ */
+export function graduatedToTyping(card: SrsCard | undefined): boolean {
+  if (!card || card.reps < 2) return false;
+  return (card.stability ?? card.interval) >= TYPING_STABILITY_FLOOR;
+}
+
 /** Map the learner's stored CEFR level to a quiz difficulty band. */
 export function difficultyForLevel(level: string | undefined): Difficulty {
   if (level === "A2" || level === "B1") return 1;
@@ -139,16 +159,28 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
     })
     .sort((a, b) => b.w - a.w);
 
+  // Graduated cards (established enough, per graduatedToTyping) become typed
+  // forward-recall blocks; new/young cards stay on recognition flashcards.
   const vocabBlocks: SessionBlock[] = weightedDue.slice(0, Math.ceil(limit * 0.6)).map(
-    ({ v }): SessionBlock => ({
-      kind: "flashcard",
-      key: `fc_${v.id}`,
-      source: "vocab",
-      sourceId: v.id,
-      de: v.de,
-      en: v.en,
-      example: v.examples[0]?.de,
-    }),
+    ({ v }): SessionBlock =>
+      graduatedToTyping(srs[v.id])
+        ? {
+            kind: "typing",
+            key: `ty_${v.id}`,
+            sourceId: v.id,
+            de: v.de,
+            en: v.en,
+            example: v.examples[0]?.de,
+          }
+        : {
+            kind: "flashcard",
+            key: `fc_${v.id}`,
+            source: "vocab",
+            sourceId: v.id,
+            de: v.de,
+            en: v.en,
+            example: v.examples[0]?.de,
+          },
   );
 
   /* --- Pool 5: speaking production (#27), top due words, mic opt-in only.
