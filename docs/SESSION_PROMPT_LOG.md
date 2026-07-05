@@ -833,3 +833,32 @@ Branch: `claude/whats-next-esga9u`.
   > document the session and give me prompt for next session
 - **Response summary:** Documentation wrap-up for session 66 (redesign Phase 3 tasks 3.3–3.6, PR #314). Most of the record was already written inline while shipping (the PROJECT_STATUS header + session-66 "Resume here" handoff, the plan's status line and task table, the CLAUDE.md Layout bullet, prompt-log entry 162). This pass filled in the one gap left as a placeholder: entry 162's Artifacts line now records the real **PR #314** and squash SHA **`e077af3`** instead of "PR # + squash SHA recorded in git history", plus this entry 163. Delivered the founder a ready-to-paste prompt for the next session below (Phase 4 "The Depth" is unscoped; the next session's first job is to turn it into a task table like Phase 3's, using `docs/plans/MINIMAL_UX_REDESIGN_PLAN.md`'s Phase 4 sketch as the source).
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (modified). Doc-only, no PR needed unless the founder wants this pushed as a follow-up commit.
+
+## Entry 164 — 2026-07-05 (session 67)
+- **Branch:** `claude/phase-4-task-breakdown-3vn7b8`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > Read the "Resume here" section of docs/PROJECT_STATUS.md. UX redesign Phase 3 "The World Seed" is complete (tasks 3.1–3.6, all shipped). Phase 4 "The Depth" (typed forward-recall, authentic Lesen/Hören) is not yet scoped into tasks.
+  > First, turn Phase 4 into a task table like Phase 3's: read docs/plans/MINIMAL_UX_REDESIGN_PLAN.md's Phase 4 sketch and docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md's structure, then draft the task breakdown with per-task files and model recommendations (Fable for original assets, Sonnet for wiring, Haiku for mechanical gates), and check in with me before executing — I want to confirm scope and priority against docs/plans/GAME_IMPLEMENTATION_PLAN.md (still PROPOSED) before committing a session to it. Set a timer for yourself for 11:50 pm to continue then because I'm approaching token limit and that's when my next session renews.
+  > (follow-up: I meant 11:50 pm CET)
+- **Response summary:** Read the three plan docs and the PROJECT_STATUS "Resume here" handoff, then expanded the Phase 4 sketch into a Phase-3-granularity task table in `UX_REDESIGN_IMPLEMENTATION_PLAN.md`: 6 tasks (4.1 typed-recall grading engine / Fable, 4.2 typing block / Opus, 4.3 Lesen/Hören content bank / Fable, 4.4 reading-listening composer block / Opus, 4.5 progression chip / Sonnet, 4.6 gates-ship / Haiku), each with files + model rationale, plus a suggested 2–3 session split (A = 4.1+4.2, B = 4.3+4.4, C = 4.5+4.6). Committed as `fa7d023` (branch only, NOT merged) pending founder confirmation; surfaced the two open questions (Phase 4 vs game-plan G1 priority; approve the breakdown/split) and set a `send_later` self-timer for 23:52 CET (11:50 pm + 2 min buffer past window renewal).
+- **Artifacts:** `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md` (modified), commit `fa7d023`. Self-timer trigger `trig_01TRLQYbwG62Vgg8z2bYCpFf`.
+
+## Entry 165 — 2026-07-05 (session 67)
+- **Branch:** `claude/phase-4-task-breakdown-3vn7b8`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > do 4.1 now
+- **Response summary:** Executed Phase 4 task 4.1, the typed-recall grading engine. New pure `src/engine/typing.ts` with `gradeTyped(typed, expected)` returning a three-tier verdict (correct/almost/wrong + optional `reason`) designed to map onto the FSRS Grade scale (Good/Hard/Again). Rules: alternate umlaut/ß spellings fold to digraphs on both sides (fully correct, Bär/Bar kept distinct); spacing + hyphenation interchangeable; article and reflexive "sich" graded separately from the head word (missing/wrong lead with a correct head = "almost", never a fail or a pass); typo tolerance tighter than the spoken matcher (0/1/2 edits by length) grading "almost"; no containment credit. Exported `levenshtein` from `engine/pronounce.ts` for reuse (behavior unchanged, `test:pronounce` 26 green). 18 new Vitest cases in `tests/typing.test.ts` (`test:unit` 38 → 56) including a contrast test vs `matchesSpoken` containment. All gates green (build, typecheck, lint 0 errors, lint:content, check:bundle 78.9 kB unchanged since the engine has no consumer yet). Shipped via **PR #316**, squash-merged to `main` at **`8bbe1d6`**; dev branch realigned (reset --hard origin/main + force-with-lease). Plan doc updated to mark 4.1 executed.
+- **Artifacts:** `src/engine/typing.ts` (new), `tests/typing.test.ts` (new), `src/engine/pronounce.ts`, `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md` (modified). **PR #316**, squash SHA **`8bbe1d6`**.
+
+## Entry 166 — 2026-07-05 (session 67)
+- **Branch:** `claude/phase-4-task-breakdown-3vn7b8`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > (self-timer fired at 23:52 CET) Resume the Phase 4 planning thread: check whether the founder confirmed scope/priority; if confirmed proceed, else re-surface the two open questions and wait.
+- **Response summary:** Timer fired after the thread had already advanced (the founder said "do 4.1 now" and 4.1 shipped as PR #316). Rather than re-ask stale questions, did the deferred documentation pass for session 67: PROJECT_STATUS header + a new session-67 "Resume here" handoff (Phase 4 scoped, 4.1 shipped, 4.2-vs-G1 decision framed), and prompt-log entries 164–166. Re-surfaced the one genuinely open decision (continue with task 4.2 to finish Session A, or pivot to game-plan G1) and waited.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (modified). Doc-only.
