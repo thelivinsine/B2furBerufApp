@@ -1,6 +1,7 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (Bibliothek Grammatik fix + PWA auto-update watcher, session 59). The working branch is
+_Last updated: 2026-07-05 (minimal, game-ready redesign strategy PROPOSED, session 61; plan in
+`docs/plans/MINIMAL_UX_REDESIGN_PLAN.md`, awaiting founder go-ahead). The working branch is
 reassigned every session, so **`main` is always the source of truth**. Product name: **Genauly**
 (domain `genauly.de`)._
 
@@ -602,7 +603,27 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 59 (2026-07-05). Bibliothek Grammatik bug FIXED ✅ and merged to `main`.**
+**Handoff after session 61 (2026-07-05). Minimal, game-ready redesign strategy PROPOSED, not yet
+implemented.** The founder asked how to redesign the front end to be minimal, extremely user
+friendly, intuitive and engaging for two audiences (short-attention busy professionals/students
+AND hardcore exam preppers), with less German interface text, and with exercise progress feeding
+the future game as a unified world. Deliverables: a visual strategy report (Artifact, with
+before/after mockups of Heute, focus-mode session, loot-drop end screen and the city strip) plus
+the engineering plan **`docs/plans/MINIMAL_UX_REDESIGN_PLAN.md`**. Core strategy: "lean surface,
+deep drawer" (skimmer gets a 3-element Heute, 1-screen onboarding + 90-second taster, full-screen
+focus-mode sessions; the diver keeps Bibliothek/Prüfung/Fortschritt depth one tap deeper),
+a microcopy budget (no section-description sentences; German is content, not chrome; D/E gloss
+component shipped early from the game concept), gradients restricted to Start + reward moments,
+one new reward-gold token, and a game-contract layer: FSRS state renders as collection-card
+levels (loot), theme mastery as six SVG domain buildings (the city strip, seed of the RPG world
+map), Can-Do milestones as quest cards. Four phases (1 diet · 2 stage · 3 world seed · 4 depth,
+detail in the plan doc); Phase 1 also flips the two research-backed defaults from
+`docs/reference/GENAULY_UX_UI_ANALYSIS.md` (voiceVariety on, speaking on where supported). Locked
+constraints restated in the plan (bottom bar, overlays, bundle budget, consent flow, no em
+dashes, no new deps, no tracking). **Next step: founder reviews the report; on go-ahead, execute
+Phase 1 on the session branch.**
+
+**Earlier handoff after session 59 (2026-07-05). Bibliothek Grammatik bug FIXED ✅ and merged to `main`.**
 The founder reported that tapping any Grammatik tile in the Bibliothek (Konnektoren etc.) bounced
 them to the Wörter tab. Root cause: `GrammarHub` opened a topic with `setParams({ topic: id })`,
 which replaces the whole query string and drops `tab=grammatik`; `LibraryHub` then saw no `tab` and
