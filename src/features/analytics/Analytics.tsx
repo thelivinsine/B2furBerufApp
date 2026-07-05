@@ -217,7 +217,6 @@ export function Analytics() {
       <SectionHeading
         eyebrow="Fortschritt"
         title="Deine Statistiken"
-        description="Überblick über XP, Serien, Wortschatz-Beherrschung und abgeschlossene Aktivitäten."
       />
 
       {/* Can-Do milestones — the headline: competence, not counters. */}

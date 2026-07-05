@@ -79,7 +79,6 @@ export function GrammarHub() {
         gradient="from-emerald-500 to-teal-500"
         eyebrow="Grammatik"
         title="Grammatik-Werkstatt"
-        description="Die wichtigsten B2-Strukturen verständlich erklärt – mit Mustern, Beispielen, typischen Fehlern und Mini-Übungen mit sofortigem Feedback."
       />
 
       <LibrarySwitcher />

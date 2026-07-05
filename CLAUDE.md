@@ -88,6 +88,14 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   every visible string: UI labels, onboarding/landing copy, content data (`src/data/*`), grammar
   explanations/glosses, toasts, and meta/manifest text. (The en dash `–` and bullet `·` are fine.)
 - This rule is for all AI tools building this app. Prefer plain, natural punctuation over dashes.
+- **Microcopy budget (redesign Phase 1.5, 2026-07-05).** Interface copy is chrome, not content:
+  keep it out of the way. A section/page/hub **eyebrow ≤ 2 words**, a **title ≤ 5 words**, and
+  **no section-description sentence** under a header (the shared `SectionHeading`/`HubHero`
+  `description` prop stays unset on hub/section headers). The German learning content itself is
+  display-size and exempt. Functional strings that guide the user still stand: `EmptyState`
+  descriptions, form helper/error text, and the dynamic session preview line are not "section
+  descriptions" and are kept. When adding a new hub/section header, do not reintroduce a filler
+  subtitle sentence.
 
 ## Content conventions
 - **Themes**: ten **workplace** topics (meetings, scheduling, logistics, customer, conflict, project, technology, sustainability, safety, travel) plus the **first daily-life pack `behoerde`** (Behörden & Ämter, added 2026-06-20). The product scope is broader than the workplace (see the scope note at the top): the roadmap adds more **daily-life domains** like banking, healthcare/Arzt, and housing, not yet built. When adding a life-domain theme, extend the `ThemeId` union in `src/types/index.ts` **and** the `THEME_IDS` array in `scripts/lint-content.mjs` (kept in sync), register the lucide icon in `src/lib/icons.ts`, match the `ExamTheme` schema in `src/data/themes.ts` (including `domain` + `context`, and optionally `subThemes`; see the Taxonomy layer bullet below), add a writing prompt (one per theme is required), keep ids unique, and add matching vocab/collocations/dialogues + provenance rows. The `behoerde` pack is the reference template.

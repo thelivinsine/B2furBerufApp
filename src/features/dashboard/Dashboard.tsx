@@ -1,17 +1,18 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Flame, BookOpen, ArrowRight, CalendarDays, Sparkles, Zap, Library } from "lucide-react";
+import {
+  Flame,
+  ArrowRight,
+  Zap,
+  Home,
+  Briefcase,
+  GraduationCap,
+  Sparkles,
+} from "lucide-react";
 import { useProgressStore, useTodayXp, useEffectiveStreak } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { dueCount } from "@/engine/srs";
-// Import the light preview module directly (NOT engine/session): the Dashboard
-// is eager, and going through engine/session would pull the quiz builder and
-// the collocations bank into the main bundle.
-import { sessionPreview } from "@/engine/sessionPreview";
-import { daysBetween, todayKey, cn } from "@/lib/utils";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { SectionHeading } from "@/components/shared/misc";
+import { daysBetween, todayKey } from "@/lib/utils";
 import { intentCardsForMode, type IntentCard } from "./intentCards";
 
 /** Where a Situationen chip launches: a scoped session for theme cards, else
@@ -19,6 +20,15 @@ import { intentCardsForMode, type IntentCard } from "./intentCards";
 function chipTarget(card: IntentCard): string {
   if (card.vocab?.theme) return `/session?theme=${card.vocab.theme}`;
   return card.to;
+}
+
+/** Icon-first affordance for a Situationen chip, derived from its domain eyebrow
+ *  (rendering only, so intentCards data stays untouched). */
+function chipIcon(card: IntentCard): typeof Home {
+  if (card.eyebrowDe.startsWith("Alltag")) return Home;
+  if (card.eyebrowDe.startsWith("Prüfung")) return GraduationCap;
+  if (card.eyebrowDe.startsWith("Beruf &")) return Sparkles;
+  return Briefcase;
 }
 
 export function Dashboard() {
@@ -37,136 +47,92 @@ export function Dashboard() {
   const hour = new Date().getHours();
   const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
 
-  // Composed-session preview for the primary CTA hero (deterministic, so the
-  // line is stable across renders and matches what /session builds).
+  // Session length target, deterministic so the subtitle stays stable.
   const sessionMinutes = Math.max(5, Math.round(goal / 8));
-  const preview = sessionPreview({ srs, minutes: sessionMinutes });
 
   // Mode-aware situation shortcuts: 3 compact chips launching scoped sessions.
   const situations = intentCardsForMode(learningMode).slice(0, 3);
 
   return (
-    <div className="space-y-5 sm:space-y-8">
-      {/* Primary CTA — the one composed session for today (UX overhaul Phase 1).
-          One tap into an interleaved run; browsing stays below. */}
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          {greeting}, {name || "Lernende:r"} 👋
-        </p>
-        <Link to="/session" className="mt-2 block">
+    <div className="space-y-6 sm:space-y-8">
+      {/* 1 — Orientation: one conic ring fusing greeting, streak and daily goal.
+          Pure CSS gradient, no recharts on the eager path. */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-4"
+      >
+        <div className="relative h-24 w-24 shrink-0" role="img" aria-label={`${goalPercent}% des Tagesziels`}>
+          <div
+            className="h-full w-full rounded-full"
+            style={{
+              background: `conic-gradient(hsl(var(--primary)) ${goalPercent * 3.6}deg, hsl(var(--border)) ${goalPercent * 3.6}deg)`,
+            }}
+          />
+          <div className="absolute inset-[9px] flex flex-col items-center justify-center rounded-full bg-background">
+            <Flame className="h-4 w-4 text-warning" />
+            <span className="text-lg font-bold leading-none tabular-nums">{streak}</span>
+          </div>
+        </div>
+        <div className="min-w-0">
+          <p className="text-lg font-semibold leading-tight">
+            {greeting}
+            {name ? `, ${name}` : ""}
+          </p>
+          <p className="mt-1 text-sm tabular-nums text-muted-foreground">
+            {todayXp} / {goal} XP · {goalPercent}%
+          </p>
+          {daysToExam !== null && (
+            <p className="mt-0.5 text-xs tabular-nums text-muted-foreground">{daysToExam} Tage bis Prüfung</p>
+          )}
+        </div>
+      </motion.div>
+
+      {/* 2 — The one primary action. The only gradient element on the screen. */}
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.04 }}>
+        <Link to="/session" className="block">
           <div className="card-hover relative overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 p-5 text-white shadow-soft sm:p-6">
             <div className="pointer-events-none absolute -right-10 -top-12 h-40 w-40 rounded-full bg-white/15 blur-2xl" />
-            <div className="relative">
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-white/80">
-                <Sparkles className="h-3.5 w-3.5" /> Deine Session · ~{sessionMinutes} Min
+            <div className="relative flex items-center gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/20">
+                <Zap className="h-6 w-6" />
               </div>
-              <p className="mt-1.5 text-xl font-semibold leading-snug">
-                {preview.hasHistory ? "Weiter, wo du warst" : "Leg direkt los"}
-              </p>
-              <p className="mt-1 text-sm text-white/85">{preview.preview}</p>
-              <div className="mt-4 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-sm font-semibold text-indigo-600 shadow-soft">
-                  <Zap className="h-4 w-4" /> Session starten
-                </span>
-                {due > 0 && (
-                  <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium">
-                    {due} fällig
-                  </span>
-                )}
+              <div className="min-w-0">
+                <p className="text-lg font-semibold leading-tight">Session starten</p>
+                <p className="mt-0.5 text-sm tabular-nums text-white/85">
+                  ~{sessionMinutes} Min{due > 0 ? ` · ${due} fällig` : ""}
+                </p>
               </div>
+              <ArrowRight className="ml-auto h-5 w-5 shrink-0" />
             </div>
           </div>
         </Link>
       </motion.div>
 
-      {/* Situationen — compact shortcuts that launch a scoped session. */}
-      <section>
-        <SectionHeading
-          eyebrow="Situationen"
-          title="Aus einer echten Situation üben"
-          description="Wähle einen Kontext. Wir stellen dir dazu eine kurze, gemischte Runde zusammen."
-        />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {situations.map((card, i) => (
+      {/* 3 — Situationen: icon-first shortcuts into a scoped session. No header. */}
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+        {situations.map((card, i) => {
+          const Icon = chipIcon(card);
+          return (
             <motion.div
               key={card.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04 }}
+              transition={{ delay: 0.08 + i * 0.04 }}
             >
               <Link to={chipTarget(card)}>
-                <div className="card-hover flex h-full items-center gap-3 rounded-xl border border-border bg-surface p-3.5">
-                  <div className={cn("h-9 w-1.5 shrink-0 rounded-full bg-gradient-to-b", card.accent)} />
-                  <div className="min-w-0">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      {card.eyebrowDe}
-                    </p>
-                    <p className="truncate text-sm font-semibold">{card.titleDe}</p>
+                <div className="card-hover flex h-full items-center gap-2.5 rounded-xl border border-border bg-surface p-3">
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                    <Icon className="h-4 w-4" />
                   </div>
+                  <p className="truncate text-sm font-medium">{card.titleDe}</p>
                   <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
                 </div>
               </Link>
             </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* Compact progress summary — just enough to orient + a primary action.
-          The full breakdown (XP charts, mastery, streak record) lives on the
-          Fortschritt page, linked here. */}
-      <Card className="overflow-hidden">
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-3 px-4 py-3.5 sm:px-5">
-          <div className="flex items-center gap-2">
-            <Flame className="h-5 w-5 shrink-0 text-warning" />
-            <span className="text-sm">
-              <span className="font-semibold tabular-nums">{streak}</span>{" "}
-              <span className="text-muted-foreground">{streak === 1 ? "Tag Serie" : "Tage Serie"}</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 shrink-0 text-success" />
-            <span className="text-sm">
-              <span className="font-semibold tabular-nums">{todayXp}</span>
-              <span className="text-muted-foreground"> / {goal} XP heute · {goalPercent}%</span>
-            </span>
-          </div>
-          {daysToExam !== null && (
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 shrink-0 text-accent" />
-              <span className="text-sm">
-                <span className="font-semibold tabular-nums">{daysToExam}</span>{" "}
-                <span className="text-muted-foreground">Tage bis Prüfung</span>
-              </span>
-            </div>
-          )}
-
-          <div className="ml-auto flex items-center gap-2">
-            <Button asChild size="sm" variant="outline">
-              <Link to="/revision">
-                <Zap className="h-4 w-4" /> Schnelle Runde
-              </Link>
-            </Button>
-            <Button asChild size="sm" variant="ghost">
-              <Link to="/analytics">
-                Fortschritt <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </Card>
-
-      {/* Quiet link to the full theme library; the mastery breakdown itself
-          now lives on Fortschritt (UX overhaul Phase 4). */}
-      <Link to="/library">
-        <Card className="card-hover">
-          <div className="flex items-center gap-3 px-4 py-3.5 sm:px-5">
-            <Library className="h-5 w-5 shrink-0 text-muted-foreground" />
-            <span className="text-sm font-medium">Zur Bibliothek</span>
-            <span className="text-sm text-muted-foreground">Wörter, Kollokationen, Redemittel und Grammatik durchsuchen</span>
-            <ArrowRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground" />
-          </div>
-        </Card>
-      </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

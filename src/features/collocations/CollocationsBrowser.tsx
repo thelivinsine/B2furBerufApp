@@ -190,7 +190,6 @@ export function CollocationsBrowser() {
         gradient="from-violet-500 to-purple-500"
         eyebrow="Nomen-Verb-Verbindungen"
         title="Kollokationen"
-        description="Feste Verbindungen aus Nomen und Verb. Lerne sie als Einheit und klinge natürlich und präzise im B2-Beruf-Gespräch."
       />
 
       <LibrarySwitcher />

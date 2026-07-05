@@ -1,8 +1,10 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (session 63: phase-wise UX redesign implementation plan APPROVED, in
-`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`, with per-task Claude model recommendations;
-execution starts with redesign Phase 1 next session. Session 62's game implementation strategy,
+_Last updated: 2026-07-05 (session 64: UX redesign **Phase 1 "The Diet" EXECUTED** on the session
+branch, per `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`. All six tasks shipped: pedagogy defaults
+flipped ON with a settings-store v2 persist migration, Heute slimmed to 3 elements, onboarding
+collapsed to one setup screen + composed taster, a new `<Gloss>` tap-translate component, and an
+app-wide microcopy sweep. Next: redesign Phase 2 "The Stage". Session 62's game plan,
 `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and sequences after redesign Phases
 1–3). The working branch is reassigned every session, so **`main` is always the source of
 truth**. Product name: **Genauly** (domain `genauly.de`)._
@@ -605,7 +607,46 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 63 (2026-07-05). Phase-wise implementation plan for the UX redesign
+**Handoff after session 64 (2026-07-05). UX redesign Phase 1 "The Diet" is EXECUTED ✅ on the
+session branch (all six tasks; plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+- **1.1 Pedagogy defaults ON (`src/store/useSettingsStore.ts`).** `voiceVariety` and
+  `recognitionEnabled` now default `true`. Persist config bumped **v1 → v2** with a migrate that flips
+  a persisted `false → true` for existing users (both switches were default-off and effectively inert,
+  so `false` was the old default, not an opt-out; a value already `true` is never touched). STT support
+  stays enforced downstream by `recognitionEnabled && recognitionSupported()` with a typed fallback, so
+  the store default is safe on unsupported browsers.
+- **1.2 Heute slimmed to 3 elements (`src/features/dashboard/Dashboard.tsx`).** A pure CSS conic
+  **goal ring** (streak flame + count in the center, greeting + XP/% beside it), one **gradient Start
+  button** ("~N Min · X fällig", the only gradient on the screen), and an **icon-first Situationen chip
+  row** (no header, no description). The old stats-strip card and Bibliothek link card are gone; the
+  eager path is lighter (dropped the `sessionPreview` import). `/revision` lost its only UI link but
+  stays a live route.
+- **1.3 Onboarding → one screen + taster (`src/features/onboarding/Onboarding.tsx`).** Five steps
+  collapsed to a single setup card: a 2×2 "Wofür lernst du Deutsch?" tile (Beruf/Alltag/Prüfung/Beides,
+  each sets goal **and** mode), a CEFR chip row, the consent checkbox (recorded via `recordConsent()`
+  **before** `completeOnboarding`, `CONSENT_VERSION` untouched), then a straight `navigate("/session?min=1")`
+  into a ~90s composed taster (the composer clamps to a 6-block minimum). Name/exam-date/rhythm are
+  dropped from onboarding and default in the store, to be collected contextually later.
+- **1.4 `<Gloss>` component (`src/features/shared/Gloss.tsx`).** Tap toggles DE↔EN per tap (no
+  persistence), dotted-underline affordance, `stopPropagation` so it works inside the tappable
+  flashcard. Wired into the two SessionPlayer renderers with a real DE/EN pair: the flashcard reveal
+  (`initial="en"`) and the speaking answer. Quiz/grammar prompts are deliberately NOT glossed (that
+  would defeat the exercise).
+- **1.5 Microcopy sweep + CLAUDE.md rule.** Deleted the section-description sentence on 11 hub/page
+  headers (Analytics, Writing, Simulation, Settings, Redemittel, Quiz, Kollokationen, Grammatik,
+  Anwenden, Vokabeltrainer, Prüfung); `EmptyState`/form/session-preview strings kept. Added the
+  **microcopy budget** rule to `CLAUDE.md` (eyebrow ≤ 2 words, title ≤ 5 words, no header subtitle).
+- **1.6 Gates.** All green: `pnpm build`, `typecheck`, `lint:content`, `test:unit` (23), `check:bundle`
+  (main chunk **77.9 kB**, budget 400), `lint` (0 errors, 31 baseline warnings). Self-review found no
+  correctness bugs; no locked files touched (bottom bar, dialog tokens, consent flow all intact).
+
+**Next step: redesign Phase 2 "The Stage"** (focus-mode `/session`, combo counter + reward-gold
+tokens, loot-drop end screen + `engine/collection.ts` Lv mapping with a unit test). Opus-tier for the
+AppShell chrome-hiding (adjacent to the locked bottom bar) and the SessionPlayer refactor.
+
+---
+
+**Earlier handoff after session 63 (2026-07-05). Phase-wise implementation plan for the UX redesign
 WRITTEN and shipped: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`.** The founder asked for a
 robust phase-wise plan built from the two latest redesign reports
 (`docs/reference/GENAULY_UX_UI_ANALYSIS.md`, PR #300, and

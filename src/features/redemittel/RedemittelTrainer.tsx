@@ -131,7 +131,6 @@ export function RedemittelTrainer() {
         gradient="from-emerald-500 to-teal-500"
         eyebrow="Redemittel"
         title="Redemittel-Training"
-        description="Die wichtigsten Wendungen für Vorschläge, Zustimmung, Verhandlung und Kompromiss. Verstehen und aktiv anwenden."
       />
 
       <LibrarySwitcher />

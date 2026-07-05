@@ -114,7 +114,6 @@ export function Settings() {
       <SectionHeading
         eyebrow="Einstellungen"
         title="Einstellungen"
-        description="Passe App-Verhalten, Sprach- und Darstellungsoptionen an."
       />
 
       <div className="mx-auto max-w-2xl space-y-5">

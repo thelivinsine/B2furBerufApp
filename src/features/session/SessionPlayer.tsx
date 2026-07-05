@@ -31,6 +31,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { SectionHeading, EmptyState } from "@/components/shared/misc";
 import { SpeakButton } from "@/components/shared/SpeakButton";
+import { Gloss } from "@/features/shared/Gloss";
 import type { ThemeId } from "@/types";
 
 interface Reinforced {
@@ -500,7 +501,7 @@ function SpeakingBlock({
             )}
           </p>
           <div className="mt-2 flex items-center gap-2">
-            <span className="text-base font-semibold">{block.de}</span>
+            <Gloss de={block.de} en={block.en} className="text-base font-semibold" />
             <SpeakButton text={block.de} />
           </div>
           {!outcome.correct && outcome.heard && (
@@ -611,7 +612,7 @@ function FlashcardBlock({
           </div>
           {/* Back */}
           <div className="[grid-area:1/1] flex flex-col items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-surface p-6 shadow-glow [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <p className="text-center text-xl font-semibold text-primary">{block.en}</p>
+            <Gloss de={block.de} en={block.en} initial="en" className="text-center text-xl font-semibold text-primary" />
             {block.example && (
               <p className="text-center text-sm italic text-muted-foreground">„{block.example}"</p>
             )}

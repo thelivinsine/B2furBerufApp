@@ -28,7 +28,6 @@ export function ExamHub() {
         gradient="from-amber-500 to-orange-500"
         eyebrow="Prüfungsmodus"
         title="Prüfungssimulation"
-        description="Vollständige Simulation des B2-Beruf-Prüfungsmoduls unter realistischen Bedingungen – mit Aufgabenblatt, Zeitlimit und Bewertungsraster."
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
