@@ -54,6 +54,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47)
 - `features/session/` — `SessionPlayer` + `Session` route wrapper (the composed learning loop, s47)
 - `features/library/` — `LibrarySwitcher` + `ScopeChip` (unified Bibliothek chrome, s47)
+- `features/collection/Sammlung.tsx` — "Meine Sammlung" bag view (redesign Phase 3.4): every bookmarked word plus every word with a `cardLevel >= 1` (`engine/collection.ts`) as a browsable, level-filterable card grid. Off the nav, reached only via the "Meine Sammlung" entry card on Fortschritt (`/analytics`) and the `/sammlung` deep link, the same pattern as the retired `/quiz`. Lazy route (walks the vocabulary bank).
 - `components/city/domain-buildings.tsx` — the six flat SVG domain buildings (redesign Phase 3.1): two-tone + neon marks in the `route-icons.tsx` language, soft corners only (rx on every rect, round-join strokes on pointed shapes), ground-aligned optical sizing, plus the `DOMAIN_BUILDINGS` mastery registry that 3.2's city strip consumes. Lit = bright white windows, unlit = dark shaded openings; the founder rejected gold windows, so **no reward-gold in these marks**. Review sheet: `preview/domain-buildings-preview.svg` (the TSX is the geometry source of truth).
 - `types/index.ts` — shared types
 - `router.tsx`, `App.tsx`, `main.tsx`

@@ -45,11 +45,13 @@ const VocabCard = memo(function VocabCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <p className="truncate font-semibold">{v.de}</p>
+              <p className="truncate text-base font-semibold sm:text-lg">{v.de}</p>
               <SpeakButton text={v.de} />
             </div>
-            <p className="text-sm text-muted-foreground">{v.en}</p>
-            {v.plural && <p className="text-xs text-muted-foreground">Pl.: {v.plural}</p>}
+            <p className="text-xs text-muted-foreground">
+              {v.en}
+              {v.plural && ` · Pl.: ${v.plural}`}
+            </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <Badge variant={badge.variant}>{badge.text}</Badge>

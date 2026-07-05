@@ -11,7 +11,20 @@ import {
   Bar,
   Cell,
 } from "recharts";
-import { Flame, Zap, Trophy, BookOpen, TrendingUp, Target, CheckCircle2, Circle, Compass } from "lucide-react";
+import {
+  Flame,
+  Zap,
+  Trophy,
+  BookOpen,
+  TrendingUp,
+  Target,
+  CheckCircle2,
+  Circle,
+  Compass,
+  Sparkles,
+  Boxes,
+  ChevronDown,
+} from "lucide-react";
 import { vocabulary } from "@/data/vocabulary";
 import { themes, themeById } from "@/data/themes";
 import { vocabByTheme } from "@/data/vocabulary";
@@ -34,6 +47,8 @@ import { Progress } from "@/components/ui/progress";
 import { SectionHeading, StreakBadge, XPBar } from "@/components/shared/misc";
 import { StatCard } from "@/components/shared/StatCard";
 import { recommendedNext } from "@/features/dashboard/recommend";
+import CityStrip from "@/components/city/CityStrip";
+import { cardLevel } from "@/engine/collection";
 
 const goalLabelDe: Record<LearningGoal, string> = {
   exam: "Fokus auf die B2-Prüfung",
@@ -131,6 +146,7 @@ export function Analytics() {
   const scenariosDone = useProgressStore((s) => s.scenariosDone);
   const examsDone = useProgressStore((s) => s.examsDone);
   const totalSessions = useProgressStore((s) => s.totalSessions);
+  const savedWords = useProgressStore((s) => s.savedWords);
   const todayXp = useTodayXp();
   const navigate = useNavigate();
   const level = useSettingsStore((s) => s.level);
@@ -212,12 +228,90 @@ export function Analytics() {
 
   const redemittelPractised = Object.keys(redemittelSeen).length;
 
+  // The next claimable Can-Do quest: the not-yet-achieved milestone closest to
+  // its threshold, so the quest card always points at the nearest win.
+  const nextQuest = useMemo(() => {
+    const upcoming = canDoGroups.flatMap(({ theme, ratio, items }) =>
+      items
+        .filter((c) => ratio < c.threshold)
+        .map((item) => ({ theme, ratio, item, gap: item.threshold - ratio })),
+    );
+    upcoming.sort((a, b) => a.gap - b.gap);
+    return upcoming[0] ?? null;
+  }, [canDoGroups]);
+
+  // Meine Sammlung teaser: words the learner has bookmarked or reviewed at
+  // least once (collection level >= 1), the count shown on the entry card.
+  const collectionCount = useMemo(
+    () => vocabulary.filter((v) => cardLevel(srs[v.id]) >= 1 || savedWords.includes(v.id)).length,
+    [srs, savedWords],
+  );
+
+  const detailsExpanded = useSettingsStore((s) => s.progressDetailsExpanded);
+  const setSettings = useSettingsStore((s) => s.setSettings);
+
   return (
     <div className="space-y-5 sm:space-y-8">
       <SectionHeading
         eyebrow="Fortschritt"
         title="Deine Statistiken"
       />
+
+      {/* City view — the quest board's map: mastery lights the skyline. */}
+      <CityStrip />
+
+      {/* Next quest — the single nearest Can-Do milestone, claimable on tap. */}
+      {nextQuest ? (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+              <div>
+                <p className="text-sm font-medium text-primary">Nächste Quest · {nextQuest.theme.titleDe}</p>
+                <p className="mt-1 text-base font-semibold">{nextQuest.item.statement}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <Progress value={(nextQuest.ratio / nextQuest.item.threshold) * 100} className="h-1.5 w-32" />
+                  <span className="text-xs tabular-nums text-muted-foreground">
+                    Ziel {Math.round(nextQuest.item.threshold * 100)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+            <Button onClick={() => navigate(`/session?theme=${nextQuest.theme.id}`)}>
+              <Zap className="h-4 w-4" /> Quest üben
+            </Button>
+          </CardContent>
+        </Card>
+      ) : (
+        canDoGroups.length > 0 && (
+          <Card className="border-success/20 bg-success/5">
+            <CardContent className="flex items-center gap-3 p-5">
+              <Sparkles className="h-5 w-5 shrink-0 text-success" />
+              <p className="text-sm font-medium text-success">
+                Alle Kompetenzen erreicht. Neue Themen schalten neue Quests frei.
+              </p>
+            </CardContent>
+          </Card>
+        )
+      )}
+
+      {/* Meine Sammlung — the bag view entry, Phase 3.4. */}
+      <Card className="card-hover cursor-pointer" onClick={() => navigate("/sammlung")}>
+        <CardContent className="flex items-center justify-between gap-4 p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+              <Boxes className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold">Meine Sammlung</p>
+              <p className="text-sm text-muted-foreground">
+                {collectionCount}/{vocabulary.length} Wörter gesammelt
+              </p>
+            </div>
+          </div>
+          <Button size="sm" variant="outline">Ansehen</Button>
+        </CardContent>
+      </Card>
 
       {/* Can-Do milestones — the headline: competence, not counters. */}
       {canDoGroups.length > 0 && (
@@ -332,81 +426,100 @@ export function Analytics() {
         </CardContent>
       </Card>
 
-      {/* XP last 30 days */}
-      <Card>
-        <CardContent className="p-5">
-          <p className="mb-4 font-semibold">XP – letzte 30 Tage</p>
-          <ResponsiveContainer width="100%" height={160}>
-            <AreaChart data={xpChartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <defs>
-                <linearGradient id="xpGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.25} />
-                  <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis
-                dataKey="label"
-                tick={{ fontSize: 10 }}
-                axisLine={false}
-                tickLine={false}
-                interval={4}
-              />
-              <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip
-                contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
-              />
-              <Area type="monotone" dataKey="xp" stroke="var(--color-primary)" strokeWidth={2} fill="url(#xpGrad)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
+      {/* Details — charts, calendar and the mastery grid, collapsed by default
+          so the quest board leads with competence, not counters (redesign
+          Phase 3.3). Expanded state persists in useSettingsStore. */}
+      <button
+        onClick={() => setSettings({ progressDetailsExpanded: !detailsExpanded })}
+        aria-expanded={detailsExpanded}
+        className="flex w-full items-center gap-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ChevronDown className={cn("h-4 w-4 transition-transform", detailsExpanded && "rotate-180")} />
+        Details
+      </button>
 
-      {/* Per-theme mastery */}
-      <Card>
-        <CardContent className="p-5">
-          <p className="mb-1 font-semibold">Beherrschung nach Thema</p>
-          <p className="mb-4 text-xs text-muted-foreground">Sortiert nach Lernbedarf (oben = meiste Lücken)</p>
-          <div className="space-y-3">
-            {themeStats.map(({ theme, total, mastered, ratio }) => (
-              <div key={theme.id} className="space-y-1">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="font-medium">{theme.titleDe}</span>
-                  <span className="tabular-nums text-muted-foreground">
-                    {mastered}/{total} · {Math.round(ratio * 100)}%
-                  </span>
-                </div>
-                <Progress value={ratio * 100} className="h-1.5" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+      {detailsExpanded && (
+        <div className="space-y-5 sm:space-y-8">
+          {/* XP last 30 days */}
+          <Card>
+            <CardContent className="p-5">
+              <p className="mb-4 font-semibold">XP – letzte 30 Tage</p>
+              <ResponsiveContainer width="100%" height={160}>
+                <AreaChart data={xpChartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                  <defs>
+                    <linearGradient id="xpGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fontSize: 10 }}
+                    axisLine={false}
+                    tickLine={false}
+                    interval={4}
+                  />
+                  <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
+                  />
+                  <Area type="monotone" dataKey="xp" stroke="var(--color-primary)" strokeWidth={2} fill="url(#xpGrad)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
 
-      {/* Vocab mastery distribution */}
-      <Card>
-        <CardContent className="p-5">
-          <p className="mb-4 font-semibold">Wortschatz-Beherrschung</p>
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={masteryData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-              <Tooltip
-                contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
-              />
-              <Bar dataKey="value" radius={[4, 4, 0, 0]}>
-                {masteryData.map((entry, i) => (
-                  <Cell key={i} fill={entry.fill} />
+          {/* Per-theme mastery */}
+          <Card>
+            <CardContent className="p-5">
+              <p className="mb-1 font-semibold">Beherrschung nach Thema</p>
+              <p className="mb-4 text-xs text-muted-foreground">Sortiert nach Lernbedarf (oben = meiste Lücken)</p>
+              <div className="space-y-3">
+                {themeStats.map(({ theme, total, mastered, ratio }) => (
+                  <div key={theme.id} className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">{theme.titleDe}</span>
+                      <span className="tabular-nums text-muted-foreground">
+                        {mastered}/{total} · {Math.round(ratio * 100)}%
+                      </span>
+                    </div>
+                    <Progress value={ratio * 100} className="h-1.5" />
+                  </div>
                 ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {masteryData.map((d) => (
-              <Badge key={d.label} variant="muted">{d.label}: {d.value}</Badge>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Vocab mastery distribution */}
+          <Card>
+            <CardContent className="p-5">
+              <p className="mb-4 font-semibold">Wortschatz-Beherrschung</p>
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={masteryData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
+                  />
+                  <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                    {masteryData.map((entry, i) => (
+                      <Cell key={i} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {masteryData.map((d) => (
+                  <Badge key={d.label} variant="muted">{d.label}: {d.value}</Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Activity calendar */}
+          <ActivityCalendar />
+        </div>
+      )}
 
       {/* Writing weaknesses */}
       <Card>
@@ -445,9 +558,6 @@ export function Analytics() {
           </CardContent>
         </Card>
       )}
-
-      {/* Activity calendar */}
-      <ActivityCalendar />
     </div>
   );
 }

@@ -64,6 +64,9 @@ interface SettingsState {
   /** Whether the learner dismissed the "save your progress" sign-in nudge. Persists across sessions. */
   signInBannerDismissed: boolean;
 
+  /** Fortschritt "Details" section (charts/calendar/mastery grid) expanded state, redesign Phase 3.3. */
+  progressDetailsExpanded: boolean;
+
   setSettings: (patch: Partial<SettingsState>) => void;
   completeOnboarding: (patch: Partial<SettingsState>) => void;
   resetSettings: () => void;
@@ -97,6 +100,7 @@ const defaults = {
   pinnedTabs: DEFAULT_PINNED_TABS,
   moreOrder: [] as string[],
   signInBannerDismissed: false,
+  progressDetailsExpanded: false,
 };
 
 export const useSettingsStore = create<SettingsState>()(

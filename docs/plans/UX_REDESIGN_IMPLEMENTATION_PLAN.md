@@ -1,11 +1,14 @@
 # UX/UI Redesign — Phase-wise Implementation Plan (with Claude model recommendations)
 
-_Status: **IN PROGRESS**, session 65 (2026-07-05). **Phase 1 "The Diet" shipped** (PR #305),
-**Phase 2 "The Stage" shipped** (PR #307), and **Phase 3 tasks 3.1 + 3.2 shipped** (the six
-domain-building SVGs, `src/components/city/domain-buildings.tsx` + review sheet, founder-tuned through
-two feedback rounds: soft corners, lit = white windows / unlit = dark openings, no reward-gold; and the
-lazy city strip on Heute, `CityStrip.tsx` + `mastery.ts`). **Phase 3 tasks 3.3–3.6 are next**; Phase 4
-remains future sessions' work. This doc merges the two redesign reports into one executable plan:_
+_Status: **IN PROGRESS**, session 66 (2026-07-05). **Phase 1 "The Diet" shipped** (PR #305),
+**Phase 2 "The Stage" shipped** (PR #307), and **Phase 3 "The World Seed" shipped in full**
+(tasks 3.1–3.6): the six domain-building SVGs (`src/components/city/domain-buildings.tsx`), the lazy
+city strip on Heute (`CityStrip.tsx` + `mastery.ts`), Fortschritt rebuilt as a quest board (city strip +
+next-Can-Do quest card + "Meine Sammlung" entry, charts/calendar/mastery grid collapsed under a
+persisted "Details" toggle), the „Meine Sammlung" bag view (`features/collection/Sammlung.tsx`,
+`/sammlung`), and a Bibliothek styling pass (German word leads each row, meta demoted to one line).
+**Phase 4 "The Depth" is next** (typed forward-recall, authentic Lesen/Hören); not yet scoped into
+tasks. This doc merges the two redesign reports into one executable plan:_
 
 1. **`docs/reference/GENAULY_UX_UI_ANALYSIS.md`** (PR #300): the 7-dimension UX audit. Headline
    findings: the FSRS engine is world-class but the default experience is recognition-heavy; the
@@ -112,6 +115,7 @@ more yours the longer you use it.
 
 | # | Task | Files | Model | Why this model |
 |---|---|---|---|---|
+| ✅ | *All of 3.1–3.6 shipped session 65–66.* | | | |
 | 3.1 | Six flat SVG **domain buildings** in the established two-tone + neon mark style (`route-icons.tsx` conventions: base tone from accent, hard-coded neon second tone, NORM optical sizing). Lit (reward-gold accents) and unlit states. Deliberately the seed of the game's city map; no pixel art (awaits founder blessing per `GAME_CONCEPT.md`). | new SVG module patterned on `src/components/layout/route-icons.tsx` | **Fable 5** | Original illustration inside a locked visual language is where cheaper models are weakest; these assets are reused everywhere (Heute, Fortschritt, future game), so one Fable session pays for itself. |
 | 3.2 | City strip on Heute: buildings with lit/unlit state from theme/domain mastery (existing `useProgressStore` data). Keep the eager path light; lazy-load if it threatens the budget. | `Dashboard.tsx`, `useProgressStore` selectors | **Sonnet 5** | Presentational wiring over existing data. |
 | 3.3 | Fortschritt led by the city view + the next Can-Do milestone as a **quest card** ("Ich kann …", progress bar, claim moment via `canDo.ts` thresholds); charts/calendar/mastery grid collapse under an expandable "Details" section (expanded flag persisted in `useSettingsStore`). | `src/features/analytics/Analytics.tsx` | **Sonnet 5** | Rearrangement of existing sections; recharts stays lazy. |
