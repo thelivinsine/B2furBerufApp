@@ -603,7 +603,7 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 ## Resume here (next session)
 
 **Handoff after session 57 (2026-07-05). The optional Learning Engine Phase 1.5 latency plug-in is
-COMPLETE ✅ and merged to `main`** (PR + squash SHA recorded in git history). This closes the
+COMPLETE ✅ and merged to `main`** as PR #287 (squash SHA `8835b52`). This closes the
 `docs/plans/LEARNING_ENGINE_PLAN.md` roadmap entirely: nothing in it remains. What shipped: a
 **"correct but slow" demotion** in `src/engine/srs.ts`. When enabled, a Good rating (grade 4) whose
 clamped response latency exceeds **1.5×** the card's own `emaMs` is graded as **Hard** instead, so a
@@ -621,7 +621,7 @@ ride inside the existing `srs` jsonb blob and the settings jsonb sweep). Verifie
 green (**`pnpm test:srs` now 323 checks**, +13 new Phase-1.5 assertions that prove a demoted Good
 equals a real Hard on the same card state, and that fast / flag-off / <3-samples / floor-guarded
 cases all skip the demotion), plus `typecheck` + `lint:content` + `build`. Post-merge housekeeping
-done (branch reset to `origin/main`, force-with-lease). Prompt-log entry 138.
+done (branch reset to `origin/main`, force-with-lease). Prompt-log entries 138–139.
 
 **Earlier handoff after session 56 (2026-07-05). Learning Engine Phase 2, the #27 speech-first production
 block, is COMPLETE ✅ and merged to `main`** as PR #284 (squash SHA `6d1d8b4`). That was the LAST
