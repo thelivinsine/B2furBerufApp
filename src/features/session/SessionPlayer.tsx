@@ -15,7 +15,7 @@ import {
   Keyboard,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import type { SessionBlock } from "@/types";
+import type { Grade, SessionBlock } from "@/types";
 import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
@@ -25,6 +25,7 @@ import { quizXp } from "@/engine/quiz";
 import { XP } from "@/engine/scoring";
 import { listen, recognitionSupported, type RecognitionHandle } from "@/engine/speech";
 import { matchesSpoken } from "@/engine/pronounce";
+import { gradeTyped, type TypedGrade } from "@/engine/typing";
 import { useCountdown } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { QuestionView, kindLabel } from "@/features/quiz/QuestionViews";
@@ -147,11 +148,11 @@ function SessionRun({
     sourceId: string,
     de: string,
     en: string,
-    correct: boolean,
+    grade: Grade,
     latencyMs?: number,
   ) => {
     const before = useProgressStore.getState().srs[sourceId];
-    reviewVocab(sourceId, correct ? 4 : 0, latencyMs);
+    reviewVocab(sourceId, grade, latencyMs);
     const after = useProgressStore.getState().srs[sourceId];
     setLoot((list) =>
       list.some((x) => x.de === de)
@@ -181,7 +182,7 @@ function SessionRun({
     setAnswered(true);
     const q = (block as Extract<SessionBlock, { kind: "quiz" }>).question;
     registerResult(correct);
-    if (q.sourceId && q.kind !== "matching") captureLoot(q.sourceId, q.prompt, q.answer, correct, latencyMs);
+    if (q.sourceId && q.kind !== "matching") captureLoot(q.sourceId, q.prompt, q.answer, correct ? 4 : 0, latencyMs);
     if (correct) award(quizXp(q.difficulty));
   };
 
@@ -197,8 +198,22 @@ function SessionRun({
     setAnswered(true);
     const b = block as Extract<SessionBlock, { kind: "speaking" }>;
     registerResult(correct);
-    captureLoot(b.sourceId, b.de, b.en, correct, latencyMs);
+    captureLoot(b.sourceId, b.de, b.en, correct ? 4 : 0, latencyMs);
     if (correct) award(XP.speakingDrill);
+  };
+
+  // Typed forward recall (4.2): the three-tier verdict maps onto the SRS Grade
+  // scale so near-misses feed FSRS as "Hard" (3), not a clean pass or an Again.
+  // Combo/XP only reward a full "correct"; "almost" still schedules gently.
+  const onTypingResult = (grade: TypedGrade, latencyMs?: number) => {
+    if (answered) return;
+    setAnswered(true);
+    const b = block as Extract<SessionBlock, { kind: "typing" }>;
+    const srsGrade: Grade =
+      grade.verdict === "correct" ? 4 : grade.verdict === "almost" ? 3 : 0;
+    registerResult(grade.verdict === "correct");
+    captureLoot(b.sourceId, b.de, b.en, srsGrade, latencyMs);
+    if (grade.verdict === "correct") award(XP.flashcard);
   };
 
   const onSttError = () => {
@@ -211,7 +226,7 @@ function SessionRun({
     registerResult(correct);
     // Latency + loot only attribute to a real SRS card (the vocab branch); the
     // Redemittel branch has no card, so the sample is dropped and it isn't loot.
-    if (b.source === "vocab") captureLoot(b.sourceId, b.de, b.en, correct, latencyMs);
+    if (b.source === "vocab") captureLoot(b.sourceId, b.de, b.en, correct ? 4 : 0, latencyMs);
     else practiceRedemittel(b.sourceId);
     if (correct) award(XP.flashcard);
     advance();
@@ -354,6 +369,9 @@ function SessionRun({
                 onSttError={onSttError}
                 onResult={onSpeakingResult}
               />
+            )}
+            {block.kind === "typing" && (
+              <TypingBlock block={block} onResult={onTypingResult} />
             )}
           </motion.div>
         </AnimatePresence>
@@ -685,6 +703,130 @@ function SpeakingBlock({
               Prüfen
             </Button>
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- Typed forward recall (4.2) ---------------- */
+
+/** German feedback line for an "almost" verdict, keyed by the miss reason. */
+const TYPED_ALMOST_NOTE: Record<NonNullable<TypedGrade["reason"]>, string> = {
+  article: "Fast. Achte auf den Artikel.",
+  reflexive: "Fast. Das Reflexivpronomen „sich“ fehlt.",
+  spelling: "Fast. Kleiner Tippfehler.",
+};
+
+/**
+ * Typed forward recall: the EN meaning is shown display-size, the learner types
+ * the German from memory, and `gradeTyped` returns a three-tier verdict that the
+ * player maps onto the SRS grade scale. "Anzeigen" reveals the answer and grades
+ * it as a miss (a give-up must not feed the scheduler a pass). Latency spans the
+ * think stage (mount to the graded answer), matching the other block kinds; the
+ * block remounts per block.key so the refs reset each step.
+ */
+function TypingBlock({
+  block,
+  onResult,
+}: {
+  block: Extract<SessionBlock, { kind: "typing" }>;
+  onResult: (grade: TypedGrade, latencyMs?: number) => void;
+}) {
+  const [value, setValue] = useState("");
+  const [outcome, setOutcome] = useState<TypedGrade | null>(null);
+  const startRef = useRef(performance.now());
+  const evaluatedRef = useRef(false);
+
+  const grade = (result: TypedGrade) => {
+    if (evaluatedRef.current) return;
+    evaluatedRef.current = true;
+    setOutcome(result);
+    onResult(result, Math.round(performance.now() - startRef.current));
+  };
+
+  const submit = () => {
+    if (evaluatedRef.current || !value.trim()) return;
+    grade(gradeTyped(value, block.de));
+  };
+
+  const correct = outcome?.verdict === "correct";
+  const almost = outcome?.verdict === "almost";
+  const tone = correct
+    ? "border-success/25 bg-success/5 text-success"
+    : almost
+      ? "border-warning/25 bg-warning/5 text-warning"
+      : "border-danger/25 bg-danger/5 text-danger";
+
+  return (
+    <div className="space-y-5">
+      <div className="flex justify-end">
+        <Badge variant="muted">Tippen</Badge>
+      </div>
+
+      <div className="flex min-h-[13rem] flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-surface p-6 shadow-soft">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Schreib es auf Deutsch:
+        </p>
+        <p className="text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
+      </div>
+
+      {outcome ? (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`rounded-2xl border p-4 ${tone}`}
+        >
+          <p className="flex items-center gap-2 text-sm font-semibold">
+            {correct ? (
+              <>
+                <Check className="h-4 w-4" /> Richtig!
+              </>
+            ) : almost ? (
+              <>
+                <ArrowRight className="h-4 w-4" />{" "}
+                {outcome.reason ? TYPED_ALMOST_NOTE[outcome.reason] : "Fast."}
+              </>
+            ) : (
+              <>
+                <X className="h-4 w-4" /> Nicht ganz.
+              </>
+            )}
+          </p>
+          <div className="mt-2 flex items-center gap-2">
+            <Gloss de={block.de} en={block.en} className="text-base font-semibold text-foreground" />
+            <SpeakButton text={block.de} />
+          </div>
+          {block.example && (
+            <p className="mt-1 text-sm italic text-muted-foreground">„{block.example}"</p>
+          )}
+          {!correct && value.trim() && (
+            <p className="mt-1 text-sm text-muted-foreground">Deine Antwort: „{value.trim()}"</p>
+          )}
+        </motion.div>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              autoFocus
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submit()}
+              placeholder="Deutsches Wort tippen …"
+              className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring"
+            />
+            <Button variant="gradient" className="h-11" onClick={submit}>
+              Prüfen
+            </Button>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full"
+            onClick={() => grade({ verdict: "wrong" })}
+          >
+            Anzeigen
+          </Button>
         </div>
       )}
     </div>

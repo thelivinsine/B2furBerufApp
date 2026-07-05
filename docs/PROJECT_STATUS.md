@@ -1,6 +1,16 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (session 67: UX redesign **Phase 4 "The Depth" scoped + task 4.1 shipped**.
+_Last updated: 2026-07-05 (session 68: UX redesign **Phase 4 task 4.2 shipped** (typed-recall block in
+the loop). New `kind: "typing"` `SessionBlock`; the composer graduates due vocab from recognition
+flashcards to typed forward recall once a card is established (`graduatedToTyping`: reps ≥ 2 AND FSRS
+stability ≥ `TYPING_STABILITY_FLOOR` = 8 days, legacy cards fall back to `interval`), while new/young
+cards stay on flashcards. New `TypingBlock` renderer in `SessionPlayer`: EN prompt display-size, typed
+DE input graded by 4.1's `gradeTyped`, an "Anzeigen" reveal that grades as a miss, latency + verdict
+into `reviewVocab`. The three-tier verdict maps onto the SRS Grade scale (correct → 4, almost → 3/Hard,
+wrong → 0) so near-misses schedule gently instead of feeding false evidence; combo/XP reward only a
+clean "correct". `captureLoot` now takes an explicit `Grade`. 3 new composer Vitest cases (`test:unit`
+56 → 59); all gates green (build, lint 0 errors, `lint:content`, `check:bundle` main chunk 78.9 kB).
+Prior: session 67: UX redesign **Phase 4 "The Depth" scoped + task 4.1 shipped**.
 The Phase 4 sketch was expanded to a Phase-3-granularity task table in
 `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md` (4.1 typed-recall grading engine, 4.2 typing block, 4.3
 Lesen/Hören content bank, 4.4 reading/listening block, 4.5 progression chip, 4.6 gates/ship, with model
@@ -9,7 +19,7 @@ recommendations and a 2–3 session split), and **task 4.1 executed**: new pure 
 FSRS Grade scale, with alternate umlaut/ß spellings fully correct, articles + reflexive "sich" graded
 separately, tighter-than-spoken typo tolerance, and no containment credit; 18 new Vitest cases in
 `tests/typing.test.ts` (`test:unit` 38 → 56); `levenshtein` exported from `engine/pronounce.ts` for
-reuse. Shipped as **PR #316** (`8bbe1d6`). 4.2–4.6 await the founder's priority call vs the game plan.
+reuse. Shipped as **PR #316** (`8bbe1d6`).
 Prior: session 66: UX redesign **Phase 3 "The World Seed" COMPLETE** (tasks
 3.3–3.6), per `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`: **Fortschritt** (`/analytics`) rebuilt as
 a quest board, leading with the `CityStrip`, a "next quest" card driven by the nearest unachieved
@@ -623,6 +633,30 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 | 5. Anwenden + nav re-map + facet registry | Anwenden hub, `DEFAULT_PINNED_TABS`, `lib/facets.ts` | **Opus 4.8** | Touches the locked nav store + pinned-tab migration; careful, not big |
 
 ## Resume here (next session)
+
+**Handoff after session 68 (2026-07-05). UX redesign Phase 4 Session A is COMPLETE ✅: task 4.2
+(typed-recall block in the loop) shipped, so 4.1 + 4.2 together put tolerant typed forward recall into
+the default session and feeding FSRS (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+- **New `kind: "typing"` `SessionBlock`** (`src/types/index.ts`): vocab-only forward recall (EN → typed DE),
+  same shape as `speaking` (sourceId/de/en/example).
+- **Composer graduation rule** (`src/engine/session.ts`): `graduatedToTyping(card)` returns true when a
+  due card is `reps >= 2` AND `(stability ?? interval) >= TYPING_STABILITY_FLOOR` (8 days). Pool 1 maps
+  graduated due cards to `typing` blocks (`ty_` key), new/young cards stay recognition `flashcard`s. A
+  single lucky first answer never jumps a brand-new word to typing.
+- **`TypingBlock` renderer** (`SessionPlayer.tsx`): EN prompt display-size, a typed DE input graded by
+  4.1's `gradeTyped`, an "Anzeigen" give-up that grades as a miss, three-tier feedback (success/warning/
+  danger tones) with the correct answer + `SpeakButton` + example, latency captured mount→answer. The
+  verdict maps onto the SRS `Grade` scale (correct → 4 Good, almost → 3 Hard, wrong → 0 Again); combo/XP
+  reward only a clean "correct". `captureLoot` refactored to take an explicit `Grade` (all callers updated).
+- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **59**
+  (56 → 59: +3 composer cases for the graduation rule), `check:bundle` main chunk **78.9 kB**.
+
+**Next step:** Phase 4 **Session B = 4.3 + 4.4** (Lesen/Hören content bank `src/data/texts.ts` + the
+`reading`/`listening` composer block + renderer), then short Session C = 4.5 (progression chip) + 4.6
+(docs/ship). OR pivot to game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`), whose formCloze / dialogue-battle
+scenes now have both the tolerant grading (4.1) and a typed-input block pattern (4.2) to build on.
+
+---
 
 **Handoff after session 67 (2026-07-05). UX redesign Phase 4 "The Depth" is SCOPED and task 4.1 is
 SHIPPED ✅ (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What happened:

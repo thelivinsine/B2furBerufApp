@@ -409,6 +409,17 @@ export type SessionBlock =
       en: string;
       /** English example for context (the German sentence would reveal the answer). */
       example?: string;
+    }
+  | {
+      kind: "typing";
+      key: string;
+      /** Vocab SRS id used to record the result. */
+      sourceId: string;
+      /** The German target the learner types from memory (bank display form). */
+      de: string;
+      en: string;
+      /** English example for context (the German sentence would reveal the answer). */
+      example?: string;
     };
 
 /** An ordered, composed session plus a preview line for the Heute hero. */
