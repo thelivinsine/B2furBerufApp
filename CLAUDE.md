@@ -52,7 +52,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47)
 - `features/session/` — `SessionPlayer` + `Session` route wrapper (the composed learning loop, s47)
 - `features/library/` — `LibrarySwitcher` + `ScopeChip` (unified Bibliothek chrome, s47)
-- `components/city/domain-buildings.tsx` — the six flat SVG domain buildings (redesign Phase 3.1): two-tone + neon marks in the `route-icons.tsx` language, unlit/lit (reward-gold) states, ground-aligned optical sizing, plus the `DOMAIN_BUILDINGS` mastery registry that 3.2's city strip consumes. Review sheet: `preview/domain-buildings-preview.svg` (the TSX is the geometry source of truth).
+- `components/city/domain-buildings.tsx` — the six flat SVG domain buildings (redesign Phase 3.1): two-tone + neon marks in the `route-icons.tsx` language, soft corners only (rx on every rect, round-join strokes on pointed shapes), ground-aligned optical sizing, plus the `DOMAIN_BUILDINGS` mastery registry that 3.2's city strip consumes. Lit = bright white windows, unlit = dark shaded openings; the founder rejected gold windows, so **no reward-gold in these marks**. Review sheet: `preview/domain-buildings-preview.svg` (the TSX is the geometry source of truth).
 - `types/index.ts` — shared types
 - `router.tsx`, `App.tsx`, `main.tsx`
 
@@ -66,7 +66,8 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   is on screen, and `AppShell` hides all chrome (header, bottom bar, sidebar) on `/session` + `/revision`
   so the session plays as a full-screen stage; chrome returns on the end screen. The locked bottom-bar
   internals are untouched (just not mounted in focus mode). Reward-gold tokens (`--reward`/`--reward-bg`,
-  Tailwind `reward`/`reward-bg`) are reserved for loot / combo / lit buildings only.
+  Tailwind `reward`/`reward-bg`) are reserved for loot / combo moments only (the domain-building marks
+  tried gold windows and the founder rejected them; buildings light up white instead).
 - **Global search:** `lib/search.ts` `searchAll` + `GlobalSearch` (header icon / Sidebar / ⌘K).
 - **Bibliothek hub:** single `/library?tab=woerter|kollokationen|redemittel|grammatik`; old routes
   (`/vocabulary`, `/collocations`, `/redemittel`, `/grammar`) redirect in (query params preserved).

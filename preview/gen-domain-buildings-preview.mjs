@@ -6,15 +6,11 @@
 // which is the source of truth. If you edit a mark there, update the same
 // shapes here and regenerate the sheet.
 
-// Reward-gold tokens resolved to hex for the static preview
-// (in-app the marks use hsl(var(--reward)) so they adapt to dark mode).
-const REWARD_LIGHT = "#db8d06"; // hsl(38 95% 44%)
-const REWARD_DARK = "#e8a33d"; // hsl(36 79% 57%)
-
-// win(o) -> fill attrs for a glow element with unlit opacity o
-const mk = (reward) => ({
-  win: (lit, o) => (lit ? `fill="${reward}"` : `fill="#fff" opacity="${o}"`),
-  reward,
+// Glow elements (windows, doors, emblems): bright white when lit, a dark
+// shade ("lights off") when unlit. No reward-gold in these marks.
+const DARK = "#0c1222";
+const mk = () => ({
+  win: (lit, o) => (lit ? `fill="#fff" opacity="${o}"` : `fill="${DARK}" opacity="0.28"`),
 });
 
 const BUILDINGS = [
@@ -48,7 +44,7 @@ const BUILDINGS = [
         .map(
           (x) => `
       <rect x="${x}" y="8.2" width="1.6" height="7.7" ${
-        lit ? `fill="REWARD"` : `fill="${c}" opacity="0.28"`
+        lit ? `fill="${c}" opacity="0.28"` : `fill="${DARK}" opacity="0.24"`
       } />`
         )
         .join("")}
@@ -72,7 +68,7 @@ const BUILDINGS = [
       <rect x="2.4" y="4.8" width="15.2" height="1.7" rx="0.85" fill="#67e8f9" />
       <rect x="2.6" y="15.7" width="14.8" height="1.5" rx="0.7" fill="${c}" opacity="0.85" />
       <circle cx="10" cy="9.7" r="1.7" fill="none" stroke-width="1.25" ${
-        lit ? `stroke="REWARD"` : `stroke="#fff" opacity="0.85"`
+        lit ? `stroke="#fff" opacity="0.85"` : `stroke="${DARK}" opacity="0.3"`
       } />
       <rect x="8.9" y="13.6" width="2.2" height="2.1" rx="0.5" ${win(lit, 0.5)} />
       <rect x="4.6" y="12.4" width="1.9" height="1.9" rx="0.5" ${win(lit, 0.5)} />
@@ -135,7 +131,7 @@ function transform([x, , w, h], weight) {
 const CELL = 108;
 const MARK = 88;
 
-function panel(bg, fg, reward, title, rows, yOff) {
+function panel(bg, fg, title, rows, yOff) {
   const width = BUILDINGS.length * CELL + 40;
   let out = `<rect x="10" y="${yOff}" width="${width - 20}" height="${rows.length * (CELL + 26) + 46}" rx="14" fill="${bg}" />
   <text x="30" y="${yOff + 30}" font-family="system-ui" font-size="13" font-weight="600" fill="${fg}">${title}</text>`;
@@ -143,11 +139,7 @@ function panel(bg, fg, reward, title, rows, yOff) {
     const y = yOff + 44 + r * (CELL + 26);
     BUILDINGS.forEach((b, i) => {
       const x = 30 + i * CELL;
-      const helpers = mk(reward);
-      const body = b
-        .render(b.color, lit, helpers)
-        .replaceAll('fill="REWARD"', `fill="${reward}"`)
-        .replaceAll('stroke="REWARD"', `stroke="${reward}"`);
+      const body = b.render(b.color, lit, mk());
       out += `
   <svg x="${x}" y="${y}" width="${MARK}" height="${MARK}" viewBox="0 0 20 20" fill="none">
     <g transform="${transform(b.box, b.weight)}">${body}</g>
@@ -159,11 +151,11 @@ function panel(bg, fg, reward, title, rows, yOff) {
 }
 
 const width = BUILDINGS.length * CELL + 60;
-const light = panel("#f8fafc", "#334155", REWARD_LIGHT, "Light · unlit / lit", [
+const light = panel("#f8fafc", "#334155", "Light · unlit / lit", [
   { lit: false },
   { lit: true },
 ], 10);
-const dark = panel("#16161f", "#cbd5e1", REWARD_DARK, "Dark · unlit / lit", [
+const dark = panel("#16161f", "#cbd5e1", "Dark · unlit / lit", [
   { lit: false },
   { lit: true },
 ], 10 + light.height + 14);
