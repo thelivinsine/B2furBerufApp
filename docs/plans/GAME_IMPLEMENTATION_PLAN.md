@@ -92,6 +92,16 @@ the game mutually reinforcing instead of two products fighting for the same minu
 | Overworld engine | Phaser (MIT), lazy chunk | 0 | G3 |
 | Mission content drafting | AI-assisted drafts, founder-verified, provenance rows per `DATA_GOVERNANCE.md` | existing plan | G2+ |
 
+**Cost boundary (founder question, session 62):** the paid rows above (asset packs + Aseprite,
+~30–60 EUR one-time, no recurring costs anywhere in the plan) are the ONLY money in the plan,
+and both are optional. Free path: Pixelorama or LibreSprite replace Aseprite at comparable
+quality for our needs (buy Aseprite only if heavy sprite animation becomes routine), and Kenney
+CC0 pixel tilesets + OpenGameArt replace the paid packs. The trade-off on art is setting and
+consistency, not raw quality: free packs in the modern-everyday-city style the game needs are
+scarce, so mixing artists' styles reads as cheap and the patching time costs more than the
+packs. Decision: mockups for the art blessing are produced with free assets (zero spend); the
+specific packs are bought only after the founder approves the direction.
+
 Asset licenses get tracked like content provenance (a row per pack: source URL, license, what it
 covers). AI image generation may be used to explore concepts, but shipped art comes from
 licensed packs or commissioned/hand-touched work; do not ship raw AI sprites into the app
