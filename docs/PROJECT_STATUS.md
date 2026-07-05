@@ -1,13 +1,14 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (session 64: UX redesign **Phases 1 "The Diet" AND 2 "The Stage" EXECUTED**
-on the session branch, per `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`. Phase 1 (shipped in PR #305):
-pedagogy defaults ON + settings-store v2 migration, 3-element Heute, one-screen onboarding + taster,
-`<Gloss>`, microcopy sweep. Phase 2: full-screen focus-mode `/session`, combo counter + reward-gold
-tokens, loot-drop end screen + `engine/collection.ts` Lv mapping (unit-tested). Next: redesign Phase 3
-"The World Seed". Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and
-sequences after redesign Phases 1–3). The working branch is reassigned every session, so **`main` is
-always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-05 (session 65: UX redesign **Phase 3 task 3.1 EXECUTED**, per
+`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`: the six flat SVG **domain buildings** (Büro, Bürgeramt,
+Bank, Arztpraxis, Wohnhaus, Prüfungshalle) in the two-tone + neon route-mark language with unlit / lit
+(reward-gold) states, as `src/components/city/domain-buildings.tsx` + unit tests + a review sheet in
+`preview/`. Tasks 3.2–3.6 (city strip on Heute, Fortschritt quest cards, „Meine Sammlung", Bibliothek
+presentation pass) are next. Session 64 shipped Phases 1 "The Diet" (PR #305) and 2 "The Stage" (PR #307).
+Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and sequences after
+redesign Phases 1–3). The working branch is reassigned every session, so **`main` is always the source
+of truth**. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
 pointer is the `## Resume here (next session)` section near the end of this file** — start there. Older
@@ -607,7 +608,40 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 64 (2026-07-05, part 2). UX redesign Phase 2 "The Stage" is EXECUTED ✅ on the
+**Handoff after session 65 (2026-07-05). UX redesign Phase 3 task 3.1 is EXECUTED ✅ (plan:
+`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+- **3.1 Domain buildings (`src/components/city/domain-buildings.tsx`, new).** Six flat SVG buildings in
+  the established two-tone + neon mark style (base accent + hard-coded neon second tone, 20×20 grid):
+  Büro (indigo tower, cyan annex), Bürgeramt (slate colonnade, amber pediment), Bank (sky block, cyan
+  cornice, coin-ring emblem), Arztpraxis (rose clinic, glowing cross sign), Wohnhaus (teal house, neon
+  roof), Prüfungshalle (fuchsia dome hall, neon entablature). Each mark has an **unlit** state (quiet
+  white windows/emblems) and a **lit** state where the glow elements switch to `hsl(var(--reward))`,
+  the Phase-2.3 reward-gold token (dark-mode aware; reserved for loot/combo/lit buildings). Marks are
+  normalised like route icons but to a **common ground line** (`groundTransform`), so a city strip gets
+  a shared street level with a varied skyline (deliberate).
+- **Registry for 3.2.** `DOMAIN_BUILDINGS` carries per building: German `label`, base `color`, and the
+  mastery sources that will light it: `domains` (buero → beruf+arbeitswelt, arztpraxis → gesundheit,
+  pruefungshalle → pruefung+bildung) and/or `themeIds` (buergeramt → behoerde, more precise than the
+  whole alltag domain). **bank and wohnhaus are intentionally empty**: they are the future banking and
+  housing packs and stay unlit until that content exists. A unit test pins that no domain or theme
+  lights two buildings.
+- **Tests + review sheet.** `tests/domain-buildings.test.tsx` (registry integrity, 20-unit grid render,
+  reward gold appears only when lit; test:unit now 33). Founder review sheet:
+  `preview/domain-buildings-preview.svg` (light/dark × unlit/lit), regenerate via
+  `node preview/gen-domain-buildings-preview.mjs`; the TSX is the geometry source of truth.
+- **Gates.** All green: `build`, `typecheck`, `lint` (0 errors / 31 baseline warnings), `lint:content`,
+  `test:unit` (33), `check:bundle` (78.2 kB, module not yet on the eager path since nothing imports it
+  until 3.2).
+
+**Next step: redesign Phase 3 tasks 3.2–3.6** (Sonnet/Haiku tier): city strip on Heute from
+`useProgressStore` mastery (3.2, consume `DOMAIN_BUILDINGS` + `DomainBuildingIcon`), Fortschritt led by
+city + Can-Do quest card with charts behind "Details" (3.3), „Meine Sammlung" bag view on
+`engine/collection.ts` (3.4), Bibliothek presentation pass (3.5), gates + ship watching `check:bundle`
+(3.6).
+
+---
+
+**Earlier handoff after session 64 (2026-07-05, part 2). UX redesign Phase 2 "The Stage" is EXECUTED ✅ on the
 session branch (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
 - **2.1 Focus mode (`AppShell.tsx` + `useSessionStore`).** New transient `focusMode` flag: the
   SessionPlayer sets it true while a block is on screen (via `useLayoutEffect`, so no chrome flash) and
