@@ -39,10 +39,10 @@ const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation })
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-1.5">
-              <p className="min-w-0 truncate font-semibold">{c.full}</p>
+              <p className="min-w-0 truncate text-base font-semibold sm:text-lg">{c.full}</p>
               <SpeakButton text={c.full} className="shrink-0" />
             </div>
-            <p className="text-sm text-muted-foreground">{c.en}</p>
+            <p className="text-xs text-muted-foreground">{c.en}</p>
           </div>
           {(c.register === "formal" || c.register === "diplomatic") && (
             <Badge variant="accent" className="shrink-0">

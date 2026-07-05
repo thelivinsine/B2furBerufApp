@@ -1,16 +1,20 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (session 65: UX redesign **Phase 3 tasks 3.1 + 3.2 EXECUTED**, per
-`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`: the six flat SVG **domain buildings** (Büro, Bürgeramt,
-Bank, Arztpraxis, Wohnhaus, Prüfungshalle) in the two-tone + neon route-mark language, founder-tuned to
-soft corners and a white-window lit state (gold windows rejected), as
-`src/components/city/domain-buildings.tsx`; plus the **city strip on Heute** (`CityStrip.tsx`, lazy) lit
-from real theme/domain mastery via `components/city/mastery.ts`. Tasks 3.3–3.6 (Fortschritt quest cards,
-„Meine Sammlung", Bibliothek presentation pass) are next. Session 64 shipped Phases 1 "The Diet" (PR
-#305) and 2 "The Stage" (PR #307).
+_Last updated: 2026-07-05 (session 66: UX redesign **Phase 3 "The World Seed" COMPLETE** (tasks
+3.3–3.6), per `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`: **Fortschritt** (`/analytics`) rebuilt as
+a quest board, leading with the `CityStrip`, a "next quest" card driven by the nearest unachieved
+`canDo.ts` milestone, and a "Meine Sammlung" entry card, with the XP chart / vocab-mastery chart /
+per-theme mastery grid / activity calendar collapsed behind a "Details" toggle persisted in
+`useSettingsStore.progressDetailsExpanded`; the new **„Meine Sammlung" bag view**
+(`src/features/collection/Sammlung.tsx`, `/sammlung`, off-nav deep link like `/quiz`) browses every
+bookmarked or `cardLevel >= 1` word with a level filter; and a **Bibliothek styling pass** across the
+Vokabeltrainer/Kollokationen/Redemittel row cards (German word bumped to `text-base`/`text-lg` semibold,
+English + secondary meta collapsed into one quiet `text-xs` line). Session 65 shipped Phase 3 tasks 3.1
++ 3.2 (domain buildings + city strip); session 64 shipped Phases 1 "The Diet" (PR #305) and 2 "The
+Stage" (PR #307).
 Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and sequences after
-redesign Phases 1–3). The working branch is reassigned every session, so **`main` is always the source
-of truth**. Product name: **Genauly** (domain `genauly.de`)._
+redesign Phases 1–3 (now all shipped). The working branch is reassigned every session, so **`main` is
+always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
 pointer is the `## Resume here (next session)` section near the end of this file** — start there. Older
@@ -610,7 +614,46 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 65 (2026-07-05). UX redesign Phase 3 task 3.1 is EXECUTED ✅ (plan:
+**Handoff after session 66 (2026-07-05). UX redesign Phase 3 "The World Seed" is COMPLETE ✅
+(tasks 3.3–3.6, plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+- **3.3 Fortschritt quest board (`src/features/analytics/Analytics.tsx`).** New headline order:
+  `<CityStrip/>` (reused directly, no re-lazy-loading — Analytics is already a lazy route per the
+  CLAUDE.md exception), a **next-quest card** (the not-yet-achieved `canDo.ts` milestone with the
+  smallest `threshold - ratio` gap, so it always points at the nearest win; a progress bar + "Quest
+  üben" CTA into `/session?theme=<theme>`; an all-done state once every milestone is achieved), and a
+  **"Meine Sammlung" entry card** (collected-word count, navigates to `/sammlung`). The full Can-Do
+  checklist, the weakest-spot diagnose card, top stats, XP/level bar, writing weaknesses and exam
+  history stay visible below. The XP 30-day chart, per-theme mastery grid, vocab-mastery distribution
+  chart and the activity calendar are collapsed into a single "Details" disclosure (plain button +
+  `ChevronDown`, no new dependency) gated on a new **`useSettingsStore.progressDetailsExpanded`**
+  boolean (default `false`, persisted, no version bump needed since it's an additive key).
+- **3.4 „Meine Sammlung" (`src/features/collection/Sammlung.tsx`, new; route `/sammlung`).** The bag
+  view of the stored-value loop: every vocabulary word that is either bookmarked (`savedWords`) or has
+  `cardLevel(srs[id]) >= 1` (`engine/collection.ts`, unchanged) shows as a card with a `Lv n` badge
+  (levels 1–5) and the existing bookmark toggle; a level filter (Alle/Lv5…Lv1) plus `usePagedList`
+  windowing reused from the Vokabeltrainer pattern. Off the nav — reached only via the Fortschritt
+  entry card, the same "deep link only" pattern as the retired `/quiz` — so the locked bottom-bar
+  nav (`nav-items.ts`, pinned tabs, More sheet) was **not touched**. Lazy route (walks the vocabulary
+  bank, matching every other content-bank consumer).
+- **3.5 Bibliothek presentation pass (styling only).** In `VocabList.tsx`, `CollocationsBrowser.tsx`
+  and `RedemittelTrainer.tsx`'s row cards: the lead German word/phrase (`v.de`/`c.full`/`p.de`) bumped
+  from a bare `font-semibold` to `text-base font-semibold sm:text-lg`; the English gloss (plus plural,
+  or plus the Redemittel `note`) demoted from two separate lines to one quiet `text-xs
+  text-muted-foreground` line. Structure, facets, search and the toolbar are byte-for-byte unchanged.
+- **Gates.** All green: `build`, `typecheck`, `lint` (0 errors / 31 baseline warnings, unchanged),
+  `lint:content`, `test:unit` (38, unchanged — no new engine logic to pin), `test:srs` (323),
+  `check:bundle` (main chunk **78.9 kB**; `Sammlung` and `Analytics` both land in their own lazy
+  chunks, ~3.2 kB and ~22 kB respectively).
+
+**Next step: Phase 4 "The Depth"** (typed forward-recall, authentic Lesen/Hören) is not yet scoped
+into tasks — the next planning session should turn `docs/plans/MINIMAL_UX_REDESIGN_PLAN.md`'s Phase 4
+sketch into a task table like Phase 3's, or re-check with the founder on priority against the
+`docs/plans/GAME_IMPLEMENTATION_PLAN.md` (still PROPOSED, sequenced after redesign Phases 1–3, now all
+shipped).
+
+---
+
+**Earlier handoff after session 65 (2026-07-05). UX redesign Phase 3 task 3.1 is EXECUTED ✅ (plan:
 `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
 - **3.1 Domain buildings (`src/components/city/domain-buildings.tsx`, new).** Six flat SVG buildings in
   the established two-tone + neon mark style (base accent + hard-coded neon second tone, 20×20 grid):

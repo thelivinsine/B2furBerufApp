@@ -58,6 +58,11 @@ const Session = lazyWithReload(() =>
 const Analytics = lazyWithReload(() =>
   import("@/features/analytics/Analytics").then((m) => ({ default: m.Analytics })),
 );
+// Lazy: the bag view walks the vocabulary bank for collection levels, so it
+// stays off the eager path like the other content-bank consumers.
+const Sammlung = lazyWithReload(() =>
+  import("@/features/collection/Sammlung").then((m) => ({ default: m.Sammlung })),
+);
 const Settings = lazyWithReload(() =>
   import("@/features/settings/Settings").then((m) => ({ default: m.Settings })),
 );
@@ -249,6 +254,16 @@ export const router = createBrowserRouter([
         element: (
           <RequireOnboarding>
             <Analytics />
+          </RequireOnboarding>
+        ),
+      },
+      {
+        // Off the nav ("deep link only", like /quiz): reached from the
+        // Fortschritt quest board's "Meine Sammlung" entry card.
+        path: "/sammlung",
+        element: (
+          <RequireOnboarding>
+            <Sammlung />
           </RequireOnboarding>
         ),
       },

@@ -203,11 +203,13 @@ export function RedemittelTrainer() {
                         <Card className="card-hover h-full">
                           <CardContent className="space-y-2 p-4">
                             <div className="flex items-start justify-between gap-2">
-                              <p className="font-semibold leading-snug">{p.de}</p>
+                              <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
                               <SpeakButton text={p.de} />
                             </div>
-                            <p className="text-sm text-muted-foreground">{p.en}</p>
-                            {p.note && <p className="text-xs text-primary">💡 {p.note}</p>}
+                            <p className="text-xs text-muted-foreground">
+                              {p.en}
+                              {p.note && ` · 💡 ${p.note}`}
+                            </p>
                             <div className="flex items-center justify-between border-t border-border pt-2">
                               <p className="text-xs italic text-muted-foreground">„{p.example.de}"</p>
                               <Badge variant={reg.variant}>{reg.text}</Badge>
