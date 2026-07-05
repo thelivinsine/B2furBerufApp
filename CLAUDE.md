@@ -43,45 +43,29 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - `types/index.ts` — shared types
 - `router.tsx`, `App.tsx`, `main.tsx`
 
-## UX overhaul (session 47, in progress) — read `docs/plans/UX_OVERHAUL_PLAN.md`
-The app is mid-migration from a "drawer of 11 tools" to a **session-first learning loop** (four zones:
-Heute · Bibliothek · Anwenden · Fortschritt). Founder-approved plan, executed phase by phase:
-- **Phase 0 (quick wins) ✅ merged** — banner demoted to Heute-only + persisted dismissal; header slimmed
-  to 4 mobile widgets; theme `blurbDe` + grammar `purposeDe` German copy (EN kept as data); "Deine Themen"
-  + "Schnelle Runde" renames; Fortschritt cold-start goal card.
-- **Phase 1 (session engine + Heute) ✅ merged** — `engine/session.ts` composer + `SessionPlayer` +
-  `/session` route + Heute hero/Situationen; Schnellwiederholung is now the ~5-min preset.
-- **Phase 2 (global search + Tier-0 defaults) ✅ merged** — `lib/search.ts` `searchAll` + `GlobalSearch`
-  (header icon / Sidebar / ⌘K); Bibliothek lists default to the learner's CEFR band + 1 (`defaultVisibleBands`).
-- **Phase 3 (library soft-merge + travelling scope) ✅ merged** — `useLibraryScope` + `LibrarySwitcher` +
-  `ScopeChip` + "Üben" scoped-session buttons. **Founder chose the soft merge:** the single `/library`
-  URL, old-route redirects, Quiz retirement, and removing the Vokabeltrainer in-page tabs are DEFERRED to
-  **Phase 5** (with the nav re-map). Do not do them earlier.
-- **Phase 4 (Fortschritt + Can-Do) — SHIPPED ✅ (session 48).** The `canDo.ts` bank (25 milestones,
-  AI-drafted then **founder-reviewed and approved 2026-07-02**, provenance `review_status: "verified"`)
-  + linter rules, plus the Fortschritt UI: a Can-Do milestone section (the page's new lead, checked off
-  per theme via each statement's `threshold` vs theme mastery), a diagnose card (weakest CEFR band/theme
-  with a one-tap "Session dazu starten"), and the theme mastery grid relocated off Heute (which now ends
-  with a quiet "Alle Themen" link to `/vocabulary`).
-- **Phase 5 (Anwenden hub + nav re-map + facet registry) — COMPLETE ✅ (session 49).** Done: new
-  **Anwenden hub** (`/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung); **Bibliothek hub**
-  (`/library?tab=woerter|kollokationen|redemittel|grammatik`) folding the four library surfaces into one
-  URL, with the old routes (`/vocabulary`, `/collocations`, `/redemittel`, `/grammar`) redirecting in
-  (query params preserved) and `LibrarySwitcher` now tab-based; the founder-unlocked
-  `DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"]` four-zone nav (nav-items collapsed
-  to Heute · Bibliothek · Anwenden · Fortschritt · Einstellungen, with custom `/library` + `/anwenden`
-  route marks in `route-icons.tsx`); a **settings-store persist migration** (`version: 1` +
-  `ROUTE_SUCCESSOR`) that remaps existing users' pins/More-order onto the new zones (a pinned
-  Wortschatz→Bibliothek, Simulation→Anwenden); the **central facet registry** (`src/lib/facets.ts`,
-  `vocabFacets`/`collocationFacets`/`redemittelFacets` + `*_FACET_IDS`) that replaced the per-page facet
-  defs, **dropped the 100-option Verb facet**, and codified the **≤12-option rule** (`MAX_FACET_OPTIONS`);
-  and the **removal of the Vokabeltrainer's in-page Karteikarten/Quiz tabs** (behind the reversible
-  `SHOW_PRACTICE_TABS = false` flag in `VocabularyTrainer.tsx`) so the Vokabeltrainer is now the
-  browse/inspect surface and focused practice flows through the toolbar's **Üben → composed session**.
-  The s26–28 bottom-bar **mechanics** stay locked and untouched throughout. **Standalone `/quiz` status:**
-  the hub is off the nav (its "retired" state) but still a live route, reachable via deep links (GrammarHub
-  "Wissen im Quiz testen" + `practiceAreas`); a hard redirect was deliberately NOT added so those deep-link
-  intents keep working. `Flashcards`/`VocabQuiz` components stay in the repo (used by the session engine).
+## UX overhaul (sessions 47–49) — COMPLETE ✅ (plan: `docs/plans/UX_OVERHAUL_PLAN.md`)
+The app was migrated from a "drawer of 11 tools" to a **session-first learning loop**, four zones:
+**Heute · Bibliothek · Anwenden · Fortschritt** (+ Einstellungen). All five phases (0–5) shipped; the
+phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you must not regress:
+- **Session engine:** `engine/session.ts` composer + `SessionPlayer` + `/session`; Schnellwiederholung
+  is the ~5-min preset. Focused practice flows through the toolbar's **Üben → composed session**.
+- **Global search:** `lib/search.ts` `searchAll` + `GlobalSearch` (header icon / Sidebar / ⌘K).
+- **Bibliothek hub:** single `/library?tab=woerter|kollokationen|redemittel|grammatik`; old routes
+  (`/vocabulary`, `/collocations`, `/redemittel`, `/grammar`) redirect in (query params preserved).
+  Lists default to the learner's CEFR band + 1 (`defaultVisibleBands`).
+- **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
+- **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
+  lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
+- **Four-zone nav:** `DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"]`; settings-store
+  persist migration (`version: 1` + `ROUTE_SUCCESSOR` in `nav-items.ts`) forwards old pins to their new
+  zone. The s26–28 bottom-bar **mechanics stay locked**.
+- **Facet registry:** `src/lib/facets.ts` (`vocab`/`collocation`/`redemittel` facets + `*_FACET_IDS`) is
+  the single source; the **≤12-option rule** (`MAX_FACET_OPTIONS`) is codified there.
+- **Standalone `/quiz` status:** off the nav ("retired") but still a **live route**, reached via deep
+  links (GrammarHub "Wissen im Quiz testen" + `practiceAreas`). A hard redirect was deliberately NOT
+  added so those intents keep working. The Vokabeltrainer's in-page Karteikarten/Quiz tabs are hidden
+  behind the reversible `SHOW_PRACTICE_TABS = false` flag; `Flashcards`/`VocabQuiz` stay in the repo
+  (used by the session engine).
 
 ## Writing style (applies to ALL user-facing copy)
 - **Avoid em dashes (`—`).** The founder dislikes them; they are an overused "AI" tell. Use them
@@ -130,9 +114,9 @@ Heute · Bibliothek · Anwenden · Fortschritt). Founder-approved plan, executed
 
 ## Mobile bottom tab bar (locked 2026-06-16; context strip removed s26)
 
-The founder iterated extensively on the mobile nav bar through sessions 15 and 24. The design
-below is locked. **Do not change structure, edit-mode behavior, or icon rules without an explicit
-founder request.**
+The founder iterated extensively on the mobile nav bar (sessions 15–29). The rules below are locked:
+**do not change structure, edit-mode behavior, or icon rules without an explicit founder request.**
+Deeper mechanism/mockup references and the s25–29 evolution are in **`docs/DECISIONS.md`**.
 
 ### Layout
 - Fixed bottom bar with a single **icon rail** (63px tall; icons render at 29px, matching the More
@@ -157,12 +141,9 @@ founder request.**
   by opacity. `RouteIcon`/`MoreIcon` still accept an `active` prop for call-site compatibility but it
   no longer changes opacity. Do not reintroduce inactive dimming.
 - **Two-tone + neon marks (s27):** every route's mark is **two-tone**, its section base colour plus a
-  brighter **neon** second tone (e.g. home indigo + neon-cyan body, Wortschatz indigo `#5b5be6` +
-  cyan `#10b7cf`, Kollokationen amber + neon-yellow ring, Fortschritt sky → neon-cyan bars,
-  Einstellungen slate gear + neon-blue centre). The base layer reads from the route accent (`c` in
-  `route-icons.tsx`); the neon second tone is hard-coded per mark in the renderer. The proposal/
-  reference sheet is `preview/route-icons-two-tone-neon.svg`. Do not flatten these back to a single
-  accent with opacity layers.
+  brighter **neon** second tone. The base layer reads from the route accent (`c` in `route-icons.tsx`);
+  the neon tone is hard-coded per mark in the renderer (examples + preview sheet in `DECISIONS.md`).
+  Do not flatten these back to a single accent with opacity layers.
 - **Box backdrops are grey, not section-tinted (s27; flat fill since s29):** the rounded pill/tile
   behind an icon uses a neutral **flat light grey** (`bg-border`, adapts to dark mode), NOT the
   section colour at low opacity. This applies to the bar's active pill, the Mehr pill, the selected
@@ -179,9 +160,8 @@ founder request.**
 - **More-sheet cloud only on the selected tile (s28):** in the normal (browse) sheet the grey
   squircle cloud appears **only behind the currently-selected section**; every other tile shows a
   bare icon (no backdrop, no ring). In **edit mode** all tiles keep the squircle cloud as the
-  draggable-tile affordance (they jiggle and host the green + badge). Reference mockups:
-  `preview/nav-cloud-refined.html` (size) and `preview/nav-cloud-gradients.html` (gradient studies,
-  founder chose "G1 flat & even"). Do not put a cloud behind unselected browse tiles again.
+  draggable-tile affordance (they jiggle and host the green + badge). Do not put a cloud behind
+  unselected browse tiles again. (Reference mockups in `DECISIONS.md`.)
 - **Every route has ONE custom branded SVG mark and ONE unique accent base colour**, both defined
   once in `src/components/layout/route-icons.tsx` (`RouteIcon`) + `nav-items.ts` (`color`). The same
   mark and colours render on every surface: bottom tab bar, More sheet, and desktop `Sidebar`.
@@ -201,18 +181,15 @@ founder request.**
   removes a bar icon. There is **no instruction sentence** in the sheet (removed s26).
 - **Both the bar AND the More sheet are reorderable (s26).** Bar icons reorder via framer
   `Reorder.Group` (horizontal). Sheet icons reorder via a **custom 2D grid drag-sort** in
-  `MoreSheet.tsx`: each tile is a `motion.div` with `layout` + `drag`; `reorderDuringDrag` finds the
-  tile the pointer is over (by `getBoundingClientRect`) and splices the dragged path into that slot,
-  and `layout` animates the rest. The sheet order persists in `useSettingsStore.moreOrder` (a full
-  ordering of every route path; empty = `nav-items` order). `setMoreOrder` keeps pinned routes in
-  their slots and only rearranges the non-pinned ones.
+  `MoreSheet.tsx` (mechanism in `DECISIONS.md`). The sheet order persists in
+  `useSettingsStore.moreOrder` (full ordering of every route path; empty = `nav-items` order);
+  `setMoreOrder` keeps pinned routes in their slots and only rearranges the non-pinned ones.
 - **Add/remove movement animation (s26):** bar and sheet items use `layout` + `AnimatePresence` so
   adding/removing an icon slides the others into their new positions instead of snapping.
 - **Enter/exit is opacity-only, never `scale` (s26, locked):** animating a transform (scale) on a
-  `layout`/`Reorder` element fights framer-motion's layout projection. That froze the infinite
-  jiggle until the next re-render (icons only jiggled after an add/remove) and shifted icon
-  positions on long-press. Keep tile enter/exit on `opacity` so positions stay put and the jiggle
-  starts immediately. Do not reintroduce a scale pop on these elements.
+  `layout`/`Reorder` element fights framer-motion's layout projection (it froze the jiggle and shifted
+  icon positions; full why in `DECISIONS.md`). Keep tile enter/exit on `opacity`. Do not reintroduce
+  a scale pop on these elements.
 - **No "Fertig" / "Done" button.** Edit mode ends automatically when the user taps anywhere outside
   the sheet (auto-save). The sheet also has a grab handle; tapping the dimmed overlay above closes it.
 - Home and Mehr are **fixed** and not draggable or removeable.
@@ -329,6 +306,14 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
 - **Deploy retry (s53):** `pages.yml`'s deploy job retries `actions/deploy-pages` up to 3 times in-job (fail-soft attempts 1–2 with 15s/60s pauses, hard attempt 3) to absorb GitHub's transient `Deployment failed, try again later` Pages flake. A green run may therefore show a red attempt 1; that is expected, not a regression. Only a sustained GitHub Pages outage now needs a manual "Re-run failed jobs".
 
 ## Workflow notes
+- **Working efficiently (token / context discipline, added 2026-07-05).** The founder is on a usage-
+  windowed plan, so wasted context = less real work per window. Keep sessions lean: (1) prefer
+  **targeted `Grep`/`Glob` search over reading whole files**; read only the slice you need. (2) **Batch
+  independent tool calls** in one step. (3) Don't spawn **subagents** for routine work, each cold-starts
+  and re-derives context (the expensive path); handle it inline. (4) Route by job size: small/mechanical
+  asks stay small and scoped; for a big refactor, **plan first, then execute** so you don't re-walk the
+  tree mid-loop. (5) `/compact` when a session gets long. (6) Keep this file and the docs lean, historical
+  "why" belongs in `docs/DECISIONS.md`, the blow-by-blow in `docs/SESSION_PROMPT_LOG.md`, not here.
 - Development branch for this work: **`claude/26b-task-n3tl75`** (active as of session 53).
   The branch name is reassigned per session — **`main` is always the source of truth**; whatever
   branch a session is assigned, ship to production by opening a PR into `main` and merging (squash).
@@ -351,6 +336,8 @@ Also: don't pre-write the next PR's `_Last updated`/log entry against a stale br
 - **`docs/archive/EXPANSION_PLAN.md`** — approved phased plan (Phase 1: grammar/collocations/leveled
   quizzes, client-side; Phase 2: Supabase auth + cloud sync + AI writing coach). Next work = Phase 1.
 - **`docs/archive/IMPLEMENTATION_PLAN.md`** — original from-scratch build plan (historical reference).
+- **`docs/DECISIONS.md`** — the "why" behind locked decisions (UX-overhaul phase history, mobile-bar
+  mechanism/mockup detail). Read before undoing any "locked" rule stated tersely in this file.
 - **`docs/SESSION_PROMPT_LOG.md`** — append-only paper trail of every founder prompt + response
   (authorship record for a possible copyright filing). Append an entry for each prompt; see the
   "Prompt & session log" rule under "Workflow notes".
