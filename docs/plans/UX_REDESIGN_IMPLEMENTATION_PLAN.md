@@ -1,10 +1,11 @@
 # UX/UI Redesign — Phase-wise Implementation Plan (with Claude model recommendations)
 
 _Status: **IN PROGRESS**, session 65 (2026-07-05). **Phase 1 "The Diet" shipped** (PR #305),
-**Phase 2 "The Stage" shipped** (PR #307), and **Phase 3 task 3.1 shipped** (the six domain-building
-SVGs, `src/components/city/domain-buildings.tsx` + `preview/domain-buildings-preview.svg`). **Phase 3
-tasks 3.2–3.6 are next**; Phase 4 remains future sessions' work. This doc merges the two redesign
-reports into one executable plan:_
+**Phase 2 "The Stage" shipped** (PR #307), and **Phase 3 tasks 3.1 + 3.2 shipped** (the six
+domain-building SVGs, `src/components/city/domain-buildings.tsx` + review sheet, founder-tuned through
+two feedback rounds: soft corners, lit = white windows / unlit = dark openings, no reward-gold; and the
+lazy city strip on Heute, `CityStrip.tsx` + `mastery.ts`). **Phase 3 tasks 3.3–3.6 are next**; Phase 4
+remains future sessions' work. This doc merges the two redesign reports into one executable plan:_
 
 1. **`docs/reference/GENAULY_UX_UI_ANALYSIS.md`** (PR #300): the 7-dimension UX audit. Headline
    findings: the FSRS engine is world-class but the default experience is recognition-heavy; the

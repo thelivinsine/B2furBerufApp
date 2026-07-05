@@ -1,11 +1,13 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (session 65: UX redesign **Phase 3 task 3.1 EXECUTED**, per
+_Last updated: 2026-07-05 (session 65: UX redesign **Phase 3 tasks 3.1 + 3.2 EXECUTED**, per
 `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`: the six flat SVG **domain buildings** (Büro, Bürgeramt,
-Bank, Arztpraxis, Wohnhaus, Prüfungshalle) in the two-tone + neon route-mark language with unlit / lit
-(reward-gold) states, as `src/components/city/domain-buildings.tsx` + unit tests + a review sheet in
-`preview/`. Tasks 3.2–3.6 (city strip on Heute, Fortschritt quest cards, „Meine Sammlung", Bibliothek
-presentation pass) are next. Session 64 shipped Phases 1 "The Diet" (PR #305) and 2 "The Stage" (PR #307).
+Bank, Arztpraxis, Wohnhaus, Prüfungshalle) in the two-tone + neon route-mark language, founder-tuned to
+soft corners and a white-window lit state (gold windows rejected), as
+`src/components/city/domain-buildings.tsx`; plus the **city strip on Heute** (`CityStrip.tsx`, lazy) lit
+from real theme/domain mastery via `components/city/mastery.ts`. Tasks 3.3–3.6 (Fortschritt quest cards,
+„Meine Sammlung", Bibliothek presentation pass) are next. Session 64 shipped Phases 1 "The Diet" (PR
+#305) and 2 "The Stage" (PR #307).
 Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and sequences after
 redesign Phases 1–3). The working branch is reassigned every session, so **`main` is always the source
 of truth**. Product name: **Genauly** (domain `genauly.de`)._
@@ -636,9 +638,35 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
   `test:unit` (33), `check:bundle` (78.2 kB, module not yet on the eager path since nothing imports it
   until 3.2).
 
-**Next step: redesign Phase 3 tasks 3.2–3.6** (Sonnet/Haiku tier): city strip on Heute from
-`useProgressStore` mastery (3.2, consume `DOMAIN_BUILDINGS` + `DomainBuildingIcon`), Fortschritt led by
-city + Can-Do quest card with charts behind "Details" (3.3), „Meine Sammlung" bag view on
+**Update (same session, part 2): task 3.2 city strip is EXECUTED ✅ and the 3.1 marks were
+founder-tuned twice.** What changed on top of the part-1 handoff below:
+- **Founder round 1 (soft corners):** every rect in the building marks carries an `rx`; pointed shapes
+  (pediment, roofs, dome base) are rounded via same-color strokes with `strokeLinejoin="round"`;
+  bodies tuck under wider bands so rounded corners leave no seam notches. Rule in the module header:
+  soft corners only, no new sharp shapes.
+- **Founder round 2 (NO gold windows):** the gold-window lit state was REJECTED. Lit = the bright
+  white-window look; unlit = the same openings as dark shades (`#0c1222`, "lights off"). Reward-gold
+  is fully out of the building marks; the token reservation comments in `index.css`,
+  `tailwind.config.ts` and CLAUDE.md now read "loot / combo moments" and note the rejection. The unit
+  test pins: dark openings only when unlit, no reward token in either state.
+- **3.2 City strip on Heute.** New `src/components/city/mastery.ts`: pure `cityProgress(srs)` resolves
+  each building's themes (explicit `themeIds` claim first, then domain rollup, no double counting),
+  counts mastered words (same ≥0.8 bar as Analytics/composer), and lights a building at
+  `LIT_THRESHOLD = 0.4` mastered share. `weakestTheme` per building = its least-mastered theme. New
+  `CityStrip.tsx` renders the six buildings ground-aligned on a street line (border-b) in a `bg-surface`
+  card as Heute element 4 (no header, no copy; aria-labels only); tapping a building with content starts
+  `/session?theme=<weakestTheme>`; the future packs (bank, wohnhaus) stay unlit and inert.
+  **Bundle lesson:** a static import chain Dashboard → mastery → vocabulary ballooned the main chunk
+  78 → 330 kB (Phase 1 had removed vocabulary from the eager path). Fix: `CityStrip` is `React.lazy`
+  behind a fixed-height Suspense fallback; main chunk back to **78.6 kB**, strip in its own ~7 kB chunk.
+  CLAUDE.md's eager-path rule was rewritten to match reality (Dashboard imports NO content bank; new
+  bank-dependent Dashboard elements go in lazy chunks). 5 new Vitest cases in `tests/city-mastery.test.ts`
+  (fresh profile unlit, no double counting, future packs inert, behoerde lights Bürgeramt at threshold
+  without leaking, weakest-theme pick); test:unit **38**. Verified on the dev server (seeded profile,
+  headless Chromium screenshots at mobile width).
+
+**Next step: redesign Phase 3 tasks 3.3–3.6** (Sonnet/Haiku tier): Fortschritt led by the city view +
+Can-Do quest card with charts behind "Details" (3.3), „Meine Sammlung" bag view on
 `engine/collection.ts` (3.4), Bibliothek presentation pass (3.5), gates + ship watching `check:bundle`
 (3.6).
 
