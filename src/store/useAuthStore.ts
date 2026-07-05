@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { startCloudSync, stopCloudSync } from "@/lib/cloudSync";
+import { startCloudSync, stopCloudSync, flushCloudSync } from "@/lib/cloudSync";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
@@ -158,6 +158,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   signOut: async () => {
     set({ busy: true });
+    // Push any debounce-pending progress while the session token is still
+    // valid; stopCloudSync alone would silently drop it.
+    await flushCloudSync();
     stopCloudSync();
     await supabase.auth.signOut();
     set({ busy: false, session: null, user: null, status: "signedOut" });
