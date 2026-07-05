@@ -783,3 +783,30 @@ Branch: `claude/whats-next-esga9u`.
   > go ahead with the next step
 - **Response summary:** Executed UX redesign **Phase 3 task 3.2**, the city strip on Heute. New pure helper `src/components/city/mastery.ts`: `cityProgress(srs)` resolves each domain building's contributing themes (a building's explicit `themeIds` claim first, then domain rollup; a theme never counts twice), computes the mastered-word share per building (same mastery ≥ 0.8 bar as the Analytics theme grid and the session composer), lights a building at `LIT_THRESHOLD = 0.4`, and exposes each building's least-mastered theme as its session target. New `src/components/city/CityStrip.tsx` renders the six buildings ground-aligned on a street line inside a surface card as the fourth Heute element, no header and no visible copy (aria-labels carry the percentages); tapping a building starts `/session?theme=<weakest theme>`; Bank and Wohnhaus (future packs) render unlit and inert. Bundle discipline: the first cut imported the vocabulary bank statically from the Dashboard and blew the main chunk from 78 to 330 kB, so the strip is `React.lazy` behind a fixed-height Suspense fallback; final main chunk 78.6 kB with the strip in its own ~7 kB chunk. CLAUDE.md's eager-path rule was rewritten to the current truth (Dashboard imports no content bank; bank-dependent Heute elements go in lazy chunks). Added `tests/city-mastery.test.ts` (5 cases: fresh profile fully unlit, every word counted at most once, future packs inert, mastering behoerde lights the Bürgeramt at the threshold without leaking into other buildings, weakest-theme selection); test:unit 38. Verified against the running dev server with a seeded profile (onboarded user + 11 mastered behoerde words) via headless-Chromium screenshots at mobile width. Gates green: build, typecheck, lint (0 errors), test:unit, check:bundle (78.6 kB).
 - **Artifacts:** `src/components/city/mastery.ts`, `src/components/city/CityStrip.tsx`, `tests/city-mastery.test.ts` (new); `src/features/dashboard/Dashboard.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`, `docs/SESSION_PROMPT_LOG.md` (modified). PR # + squash SHA recorded in git history.
+
+## Entry 159 — 2026-07-05 (session 65)
+- **Branch:** `claude/ux-redesign-task-3-1-4cgajs`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > What's next now?
+- **Response summary:** Chat-only answer (chronologically this prompt came between entries 157 and 158, before the "go ahead" that executed task 3.2). Laid out the remainder of redesign Phase 3 per the plan: 3.2 city strip on Heute from `useProgressStore` mastery, 3.3 Fortschritt as quest board (city view + claimable Can-Do quest card, charts under an expandable "Details"), 3.4 „Meine Sammlung" bag view on `engine/collection.ts`, 3.5 Bibliothek presentation-only pass, 3.6 gates + ship watching the bundle budget. Noted all are Sonnet-tier wiring (the Fable illustration work is done), roughly one session for 3.2–3.6, and that Phase 4 "The Depth" (typed forward-recall, authentic Lesen/Hören) follows. Offered to proceed.
+- **Artifacts:** none (chat only).
+
+## Entry 160 — 2026-07-05 (session 65)
+- **Branch:** `claude/ux-redesign-task-3-1-4cgajs`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > what model should I use for the next step
+- **Response summary:** Chat-only answer. Per the plan's model table: **Sonnet 5** for tasks 3.3 and 3.4 (presentational wiring over existing data, no locked constraints or engine logic in play; the Fable-tier illustration task is done). Recommended running 3.3–3.6 in one Sonnet 5 session rather than micro-switching to Haiku for the two mechanical closers, and starting that session from the PROJECT_STATUS "Resume here" handoff, which carries the 3.2 lessons (lazy-load anything touching the vocabulary bank; no reward-gold in building marks; Analytics is already a lazy route so it may import the mastery helper directly).
+- **Artifacts:** none (chat only).
+
+## Entry 161 — 2026-07-05 (session 65)
+- **Branch:** `claude/ux-redesign-task-3-1-4cgajs`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document this session and give me a prompt for new session
+- **Response summary:** Documentation wrap-up for session 65 (redesign tasks 3.1 + 3.2 and the two founder design rounds, PRs #309–#312). Most of the record was written inline as each piece shipped: the PROJECT_STATUS header and two-part "Resume here" handoff, prompt-log entries 155–158, the plan status line, and the CLAUDE.md updates (city module layout line, rewritten eager-path bundle rule, narrowed reward-gold reservation). This pass added the missing pieces: a new **DECISIONS.md section** locking the domain-building visual language with its "why" (soft corners only + the stroke-join rounding technique and seam-tucking draw order; lit = white windows / unlit = dark openings with reward-gold rejected for buildings and pinned by unit test; ground-aligned normalisation; the preview-sheet review workflow), plus prompt-log entries 159–161 for the session's chat-only prompts and this one. Also delivered the founder a ready-to-paste prompt for the next session (execute Phase 3 tasks 3.3–3.6 on Sonnet 5, starting from the PROJECT_STATUS handoff).
+- **Artifacts:** `docs/DECISIONS.md`, `docs/SESSION_PROMPT_LOG.md` (modified). Doc-only PR + squash SHA recorded in git history.

@@ -83,3 +83,28 @@ plus the two still-live operative notes (standalone `/quiz` status; `SHOW_PRACTI
   flat grey. s28 made the backdrop a compact squircle that hugs the icon (not a full-slot pill or raised
   dome) and limited the browse-sheet cloud to the selected tile. s29 dropped the backdrop gradient for a
   single flat `bg-border` shade.
+
+## Domain-building marks (session 65) — founder-tuned visual language
+
+The six city buildings (`src/components/city/domain-buildings.tsx`, redesign Phase 3.1/3.2) went
+through two founder-feedback rounds. The resulting rules are locked; the "why":
+
+- **Soft corners only.** The first cut had square body corners and pointed triangle roofs; the founder
+  flagged them as off-language ("the existing icons don't have sharp corners"). Every rect now carries
+  an `rx` (bodies 0.9–1.2, bands 0.6–0.85, windows 0.4–0.6), and pointed shapes (Bürgeramt pediment,
+  Wohnhaus roof, Prüfungshalle dome base) are rounded via a same-color stroke with
+  `strokeLinejoin="round"` on a slightly inset path. Bodies extend up BEHIND their wider
+  cornices/roofbands (draw order matters) so rounded corners leave no white notch at seams. Don't add
+  sharp-cornered shapes to these marks.
+- **No gold windows; lit = white.** The lit state originally rendered windows/emblems in the Phase-2.3
+  reward-gold token. The founder rejected it and chose the white-window look as lit. Lit = bright
+  white openings; unlit = the same openings as dark shades (`#0c1222` at ~0.24–0.3, "lights off").
+  Reward-gold (`--reward`/`--reward-bg`) is therefore reserved for **loot/combo moments only**; the
+  unit test in `tests/domain-buildings.test.tsx` pins that neither building state uses the token. Do
+  not reintroduce gold into the building marks.
+- **Ground-aligned normalisation.** Buildings normalise like route icons (bounding box + weight) but
+  anchor to a common ground line (`groundTransform`) instead of a centred box: a city strip needs one
+  street level with a varied skyline. Skyline height variety is deliberate, not an inconsistency.
+- **Review workflow.** The static sheet `preview/domain-buildings-preview.svg` (generator
+  `preview/gen-domain-buildings-preview.mjs`, light/dark × unlit/lit) is the founder-review artifact;
+  the TSX is the geometry source of truth and the two are kept in sync manually.
