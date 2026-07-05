@@ -1,10 +1,11 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (game implementation strategy PROPOSED, session 62; plan in
-`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, awaiting founder go-ahead, alongside the session-61
-redesign plan `docs/plans/MINIMAL_UX_REDESIGN_PLAN.md`, also awaiting go-ahead). The working
-branch is reassigned every session, so **`main` is always the source of truth**. Product name:
-**Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-05 (session 63: phase-wise UX redesign implementation plan APPROVED, in
+`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`, with per-task Claude model recommendations;
+execution starts with redesign Phase 1 next session. Session 62's game implementation strategy,
+`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and sequences after redesign Phases
+1–3). The working branch is reassigned every session, so **`main` is always the source of
+truth**. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
 pointer is the `## Resume here (next session)` section near the end of this file** — start there. Older
@@ -604,7 +605,27 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 62 (2026-07-05). Game implementation strategy PROPOSED, not yet
+**Handoff after session 63 (2026-07-05). Phase-wise implementation plan for the UX redesign
+WRITTEN and shipped: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`.** The founder asked for a
+robust phase-wise plan built from the two latest redesign reports
+(`docs/reference/GENAULY_UX_UI_ANALYSIS.md`, PR #300, and
+`docs/plans/MINIMAL_UX_REDESIGN_PLAN.md`, PR #301), with a Claude model recommendation for each
+task and a brief non-technical summary per phase. The new doc is the execution layer on top of the
+session-61 design spec: a 5-point design north star, a model legend (Haiku 4.5 for mechanical
+sweeps, Sonnet 5 as the workhorse, Opus 4.8 near locked constraints / persisted-store migrations /
+engine helpers, Fable 5 for illustration and grading-design work), and four phases with per-task
+tables (task, files, model, rationale), acceptance criteria and risks: **Phase 1 diet** (defaults
+flip incl. settings-store persist migration, 3-element Heute, 1-screen onboarding + taster, Gloss
+component, microcopy budget), **Phase 2 stage** (focus-mode `/session`, combo counter +
+reward-gold tokens, loot end screen + `engine/collection.ts` Lv mapping with unit test), **Phase 3
+world seed** (six Fable-designed SVG domain buildings, city strip, quest cards, Meine Sammlung),
+**Phase 4 depth** (typed forward-recall block, authentic Lesen/Hören block, visible progression),
+plus a Phase 5 backlog (grammar Übersicht visuals, variable rewards, rephrase ladder). This dovetails
+with session 62's game plan: its G0 phase IS redesign Phases 1–3. No app code changed. **Next
+step: execute redesign Phase 1 on the session branch, starting with task 1.1 (the
+`useSettingsStore` defaults flip + persist migration, Opus-tier care).**
+
+**Earlier handoff after session 62 (2026-07-05). Game implementation strategy PROPOSED, not yet
 implemented.** The founder asked how to implement the game idea (approach, tools, strategy).
 Deliverable: **`docs/plans/GAME_IMPLEMENTATION_PLAN.md`**, the engineering companion to
 `docs/strategy/GAME_CONCEPT.md`, closing the tech-approach question that the concept doc had

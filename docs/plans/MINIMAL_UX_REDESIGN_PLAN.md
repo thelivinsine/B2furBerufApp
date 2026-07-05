@@ -1,5 +1,10 @@
 # Minimal, game-ready front-end redesign — plan
 
+> **Execution layer:** the task-level implementation plan (with per-task Claude model
+> recommendations, acceptance criteria and phase summaries) lives in
+> `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md` (session 63). Use that doc to run the phases;
+> this doc remains the screen-by-screen design spec.
+
 _Status: **PROPOSED**, awaiting founder go-ahead (session 61, 2026-07-05). Nothing here is
 implemented yet. This is the engineering companion to the visual strategy report delivered to the
 founder in session 61; it builds directly on `docs/reference/GENAULY_UX_UI_ANALYSIS.md` (the 7-dimension
