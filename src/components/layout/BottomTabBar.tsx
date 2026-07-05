@@ -79,10 +79,12 @@ export function BottomTabBar({ onMore, onNavigate, onLongPress, editMode, moreOp
     if (longPressRef.current) { clearTimeout(longPressRef.current); longPressRef.current = null; }
   }
 
+  // blur-md, not xl: at 95% surface opacity the stronger blur is barely
+  // visible but repaints the whole bar region every scroll frame (audit B3).
   return (
     <nav
       id="bottom-tab-bar"
-      className="no-callout fixed bottom-0 inset-x-0 z-[60] flex flex-col border-t border-border bg-surface/95 backdrop-blur-xl pb-safe lg:hidden"
+      className="no-callout fixed bottom-0 inset-x-0 z-[60] flex flex-col border-t border-border bg-surface/95 backdrop-blur-md pb-safe lg:hidden"
       onContextMenu={e => e.preventDefault()}
       style={{ transform: "translateZ(0)", willChange: "transform" }}
     >

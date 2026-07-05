@@ -602,7 +602,44 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 57 (2026-07-05). The optional Learning Engine Phase 1.5 latency plug-in is
+**Handoff after session 58 (2026-07-05). Full performance/bug/robustness audit EXECUTED ✅, six PRs
+merged to `main`** (#289–#294 + the Phase-6 polish PR, see below). The founder reported the app
+"buggy, laggy and unresponsive"; the audit report + fix plan lives in
+**`docs/plans/APP_AUDIT_2026-07-05.md`** (committed with PR #289) and every phase in it is now
+shipped. What changed, by phase: **(1, #289)** header streak uses `useEffectiveStreak` (no more
+stale flame after a missed day); `/session` remounts on `?theme=`/`?min=` change and "Neue Runde"
+rebuilds in place instead of `window.location.reload()`; the Settings "Animationen reduzieren"
+toggle is real now (`MotionConfig` in `App.tsx`, also honours OS `prefers-reduced-motion`);
+`.card-hover` transitions only transform+shadow. **(2, #290)** `BrowseToolbar` debounces search
+(180 ms; also keeps `history.replaceState` off the keystroke path, which Safari rate-limits);
+`VocabList` cards are memoized with per-card store selectors and stream in 60-at-a-time via the new
+**`src/lib/usePagedList.ts`** (IntersectionObserver sentinel + "Mehr anzeigen" fallback);
+Kollokationen got the same treatment (plus: search term removed from the grid remount key);
+Redemittel dropped per-card stagger wrappers; `lib/search.ts` builds a pre-normalised lazy index
+and `GlobalSearch` defers the query. **(3, #291)** main bundle **606 kB → ~322 kB** (174 → 96 kB
+gzip): `GlobalSearch` imports `lib/search` dynamically (dialogues/collocations leave the eager
+path); new **`src/engine/sessionPreview.ts`** carries the light preview half for the eager
+Dashboard (`engine/session.ts` re-exports it; import sessionPreview from the light module in eager
+code, NEVER from engine/session); `/privacy`, `/terms`, `/about` are lazy routes. **(4, #292)**
+new `flushCloudSync()` pushes debounce-pending progress on `visibilitychange=hidden` and is awaited
+in `signOut` (closing the PWA right after a session no longer strands the last reviews). **(5a,
+#293)** per-route `errorElement` (`RouteError`) so a page crash keeps the shell alive; progress
+store persist now has an explicit `version: 0` + migrate hook. **(5b, #294)** CI guardrails in
+`validate.yml`: **`pnpm lint`** (new ESLint flat config; rules-of-hooks etc. block, compiler-era
+react-hooks rules are warnings = visible debt, ~31 currently), **`pnpm test:unit`** (new Vitest
+suite, 23 tests in `tests/`), **`pnpm build`** (PRs previously merged without a build!), and
+**`pnpm check:bundle`** (`scripts/check-bundle-size.mjs`, main-chunk budget 400 kB). The linter
+caught real bugs, fixed in #294: dead else-if in `engine/quiz.ts` (tiny-pool fallback never ran),
+stray `\"` in the plural prompt, `engine/dialogue.ts` `useHint` renamed **`applyHint`**. **(6)**
+mobile-only blur reduction on the sticky header + bottom bar (`backdrop-blur-md`, more opaque
+surface; desktop unchanged) — this is the one **visual** change of the series; founder can veto
+after seeing it live. Verified throughout with an 11-check Playwright smoke against the production
+preview + all seven gates green. **Next candidates:** founder live-verification of feel on a real
+phone; burn down the 31 lint warnings; consider `useDeferredValue` on the Vokabeltrainer filter
+memos if very old devices still stutter; the B3 full option (solid mobile surfaces) if jank
+persists.
+
+**Earlier handoff after session 57 (2026-07-05). The optional Learning Engine Phase 1.5 latency plug-in is
 COMPLETE ✅ and merged to `main`** as PR #287 (squash SHA `8835b52`). This closes the
 `docs/plans/LEARNING_ENGINE_PLAN.md` roadmap entirely: nothing in it remains. What shipped: a
 **"correct but slow" demotion** in `src/engine/srs.ts`. When enabled, a Good rating (grade 4) whose
