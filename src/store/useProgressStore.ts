@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import type { Grade, SrsCard } from "@/types";
 import { freshCard, review } from "@/engine/srs";
 import { daysBetween, todayKey } from "@/lib/utils";
+import { useSettingsStore } from "@/store/useSettingsStore";
 
 interface ProgressState {
   xp: number;
@@ -82,7 +83,13 @@ export const useProgressStore = create<ProgressState>()(
       reviewVocab: (vocabId, grade, latencyMs) =>
         set((s) => {
           const card = s.srs[vocabId] ?? freshCard();
-          return { srs: { ...s.srs, [vocabId]: review(card, grade, new Date(), latencyMs) } };
+          const latencyGrading = useSettingsStore.getState().latencyGrading;
+          return {
+            srs: {
+              ...s.srs,
+              [vocabId]: review(card, grade, new Date(), latencyMs, { latencyGrading }),
+            },
+          };
         }),
 
       toggleSavedWord: (vocabId) =>

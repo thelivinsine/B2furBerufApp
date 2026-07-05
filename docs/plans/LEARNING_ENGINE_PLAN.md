@@ -8,8 +8,9 @@
 > new `pnpm test:srs` CI gate), and **Phase 2 (#27 speech-first block) SHIPPED ✅ 2026-07-05** (PR #284,
 > squash SHA `6d1d8b4`; Fable 5 high effort per §7, verified by the new `pnpm test:pronounce` CI gate
 > plus a Playwright smoke with a mocked SpeechRecognition). See `docs/PROJECT_STATUS.md` → "Resume
-> here" for the shipped-scope recaps. **All five items are shipped. Remaining: only the optional
-> Phase 1.5 latency plug-in ("correct but slow" demotes Good→Hard, needs 3+ samples per card).**
+> here" for the shipped-scope recaps. **All five items are shipped, and the optional Phase 1.5
+> latency plug-in ("correct but slow" demotes Good→Hard) shipped in session 57 (see §3). This plan
+> is fully delivered.**
 > Source: the five recommendations of `docs/strategy/PRODUCT_EVALUATION.md` (the playbook self-assessment),
 > scoped as backlog items **#26 to #30** in `docs/PROJECT_STATUS.md`. Evidence base:
 > `docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
@@ -241,10 +242,16 @@ and the hard part (the parameter optimizer) is not needed client-side.
 - **`mastery()`** reformulated from stability (e.g. saturating `stability / 30`, blended with reps
   as today) keeping the same 0..1 contract so `masteryLabel`, the theme grid, Can-Do thresholds,
   and `reviewWeight` are untouched.
-- **Latency plug-in (Phase 1.5, a separate toggle, not day one):** "correct but slow" demotes
-  Good→Hard using `emaMs`, only when a card has at least 3 latency samples (first-sample EMA is
-  noisy), and only relative to the card's own EMA (flashcard flip latency and MCQ select latency
-  are different quantities; never compare across formats with absolute thresholds).
+- **Latency plug-in (Phase 1.5) — SHIPPED ✅ session 57.** "Correct but slow" demotes Good→Hard
+  when the review's clamped latency exceeds `LATENCY_SLOW_FACTOR` (1.5×) of the card's own `emaMs`,
+  gated on `LATENCY_MIN_SAMPLES` (3) prior samples so the EMA is trustworthy, and purely relative
+  to that per-card EMA (never an absolute cross-format threshold). A `LATENCY_SLOW_FLOOR_MS` (2000)
+  guard only *blocks* demotion of a sub-2s, obviously-confident recall; it never causes one. New
+  `SrsCard.msCount` counts samples; `review()` gained an `opts.latencyGrading` flag (engine default
+  off, so pure/test calls never demote), fed by the new `latencyGrading` setting (default **on**,
+  toggle in the Settings "Lernen" card). The demotion is scheduling-only: `lastGrade` keeps the
+  learner's honest button press and latency is still recorded. 13 new `pnpm test:srs` assertions pin
+  it (demoted Good == a real Hard on the same card state; fast/off/<3-samples/floor all skip).
 - **Verification without a test framework:** new `scripts/test-srs.mjs` + a `test:srs` package
   script + a step in `.github/workflows/validate.yml` (the `lint-content` pattern). Assert the
   scheduler against published FSRS reference vectors (the open-spaced-repetition project publishes

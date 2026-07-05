@@ -49,6 +49,12 @@ interface SettingsState {
   reducedMotion: boolean;
   /** MCQ questions hide options behind a "think first" gate (anticipatory retrieval). */
   guessFirst: boolean;
+  /**
+   * Grade a correct-but-slow recall as Hard rather than Good (Phase 1.5 latency
+   * plug-in), so a laboured answer schedules sooner. Self-relative and inert
+   * until a card has enough latency samples; see engine/srs.ts.
+   */
+  latencyGrading: boolean;
 
   /** Ordered list of nav paths pinned to the bottom tab bar (max 4). */
   pinnedTabs: string[];
@@ -83,6 +89,7 @@ const defaults = {
   recognitionEnabled: false,
   reducedMotion: false,
   guessFirst: true,
+  latencyGrading: true,
   pinnedTabs: DEFAULT_PINNED_TABS,
   moreOrder: [] as string[],
   signInBannerDismissed: false,

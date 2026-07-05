@@ -252,6 +252,57 @@ async function main() {
       assertEqual("latency.clamp.60s", c.lastMs, 60000);
     }
 
+    /* ---- Phase 1.5: "correct but slow" demotes Good -> Hard (self-relative) ---- */
+    {
+      // An established card with 3 latency samples and a ~1000ms EMA.
+      let base = review(freshCard(dateKey(T0)), 4, onDay(0), 1000);
+      base = review(base, 4, onDay(2), 1000);
+      base = review(base, 4, onDay(20), 1000);
+      assertEqual("latencyGrade.buildsMsCount", base.msCount, 3);
+      assertEqual("latencyGrade.buildsEma", base.emaMs, 1000);
+
+      const on = onDay(60);
+      // Slow (5000ms > 1000*1.5 and > 2000 floor) + flag on -> graded as Hard.
+      const demoted = review({ ...base }, 4, on, 5000, { latencyGrading: true });
+      const hardRef = review({ ...base }, 3, on);
+      assertClose("latencyGrade.demoted.stability", demoted.stability, hardRef.stability);
+      assertClose("latencyGrade.demoted.difficulty", demoted.difficulty, hardRef.difficulty);
+      assertEqual("latencyGrade.demoted.interval", demoted.interval, hardRef.interval);
+      // The demotion is scheduling-only: latency is still recorded, msCount
+      // grows, and lastGrade keeps the learner's honest button press (Good).
+      assertEqual("latencyGrade.demoted.msCount", demoted.msCount, 4);
+      assertEqual("latencyGrade.demoted.lastGrade", demoted.lastGrade, 4);
+
+      // Fast (within EMA) -> stays Good.
+      const plainGood = review({ ...base }, 4, on);
+      const fast = review({ ...base }, 4, on, 1000, { latencyGrading: true });
+      assertClose("latencyGrade.fastStaysGood", fast.stability, plainGood.stability);
+
+      // Slow but flag off -> not demoted.
+      const slowNoFlag = review({ ...base }, 4, on, 5000);
+      assertClose("latencyGrade.offNotDemoted", slowNoFlag.stability, plainGood.stability);
+
+      // A latency-less review carries the sample count forward unchanged.
+      const carried = review({ ...base }, 4, on);
+      assertEqual("latencyGrade.msCountCarries", carried.msCount, 3);
+
+      // Fewer than 3 prior samples -> EMA not yet trusted, no demotion.
+      let base2 = review(freshCard(dateKey(T0)), 4, onDay(0), 1000);
+      base2 = review(base2, 4, onDay(2), 1000);
+      assertEqual("latencyGrade.twoSamples", base2.msCount, 2);
+      const slowFew = review({ ...base2 }, 4, on, 5000, { latencyGrading: true });
+      const goodFew = review({ ...base2 }, 4, on);
+      assertClose("latencyGrade.needs3Samples", slowFew.stability, goodFew.stability);
+
+      // Floor guard: ratio-slow but sub-2s in absolute terms -> not demoted.
+      let base3 = review(freshCard(dateKey(T0)), 4, onDay(0), 800);
+      base3 = review(base3, 4, onDay(2), 800);
+      base3 = review(base3, 4, onDay(20), 800);
+      const nearFast = review({ ...base3 }, 4, on, 1300, { latencyGrading: true }); // 1300 > 800*1.5 but < 2000
+      const goodFloor = review({ ...base3 }, 4, on);
+      assertClose("latencyGrade.floorBlocks", nearFast.stability, goodFloor.stability);
+    }
+
     /* ---- contracts: reps monotonicity, warm ease, due, mastery ---- */
     {
       let c = review(freshCard(dateKey(T0)), 4, T0);
