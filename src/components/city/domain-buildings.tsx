@@ -17,6 +17,11 @@ import type { DomainId, ThemeId } from "@/types";
 // an unlit building still looks like a finished mark, just with the lights
 // off. Container styling (halo, chip, label) is the call site's job.
 //
+// Soft corners everywhere (founder feedback, session 66): every rect
+// carries an rx, and pointed shapes (pediment, roofs, dome base) are
+// rounded via a same-color stroke with strokeLinejoin="round". Don't add
+// new sharp-cornered shapes to a mark.
+//
 // Unlike route marks, buildings are normalised to a COMMON GROUND LINE
 // instead of a centred box: a city strip needs a shared baseline with a
 // varied skyline (the tower may be taller than the bank). Skyline variety
@@ -78,66 +83,73 @@ const RENDERERS: Record<DomainBuildingId, Render> = {
   // Büro — indigo office tower with a neon-cyan annex; a window grid glows.
   buero: (c, lit) => (
     <>
-      <rect x="3.4" y="2.6" width="9.2" height="14.6" rx="0.9" fill={c} />
-      <rect x="12.6" y="8.6" width="4.8" height="8.6" rx="0.9" fill="#22d3ee" />
+      <rect x="3.4" y="2.6" width="9.2" height="14.6" rx="1.2" fill={c} />
+      <rect x="12.6" y="8.6" width="4.8" height="8.6" rx="1.2" fill="#22d3ee" />
       {[4.6, 7.5, 10.4, 13.3].map(y => (
         <g key={y}>
-          <rect x="5.2" y={y} width="2.1" height="1.7" rx="0.3" {...glow(lit, 0.5)} />
-          <rect x="8.6" y={y} width="2.1" height="1.7" rx="0.3" {...glow(lit, 0.5)} />
+          <rect x="5.2" y={y} width="2.1" height="1.7" rx="0.5" {...glow(lit, 0.5)} />
+          <rect x="8.6" y={y} width="2.1" height="1.7" rx="0.5" {...glow(lit, 0.5)} />
         </g>
       ))}
-      <rect x="14" y="10.6" width="2.1" height="1.7" rx="0.3" {...glow(lit, 0.8)} />
-      <rect x="14" y="13.5" width="2.1" height="1.7" rx="0.3" {...glow(lit, 0.8)} />
+      <rect x="14" y="10.6" width="2.1" height="1.7" rx="0.5" {...glow(lit, 0.8)} />
+      <rect x="14" y="13.5" width="2.1" height="1.7" rx="0.5" {...glow(lit, 0.8)} />
     </>
   ),
   // Bürgeramt — civic slate colonnade under a neon-amber pediment; light
-  // pours through the colonnade gaps when lit.
+  // pours through the colonnade gaps when lit. Column/gap ends are tucked
+  // under the architrave and plinth so their visible edges stay clean.
   buergeramt: (c, lit) => (
     <>
-      <path d="M10 2 2.4 7.2H17.6L10 2Z" fill="#fbbf24" />
-      <circle cx="10" cy="5.5" r="0.9" fill="#fff" opacity="0.75" />
-      <rect x="3.2" y="7.2" width="13.6" height="1.4" rx="0.3" fill={c} />
       {[5.8, 9.2, 12.6].map(x =>
         lit ? (
-          <rect key={x} x={x} y="8.6" width="1.6" height="6.9" fill={REWARD} />
+          <rect key={x} x={x} y="8.2" width="1.6" height="7.7" fill={REWARD} />
         ) : (
-          <rect key={x} x={x} y="8.6" width="1.6" height="6.9" fill={c} opacity="0.28" />
+          <rect key={x} x={x} y="8.2" width="1.6" height="7.7" fill={c} opacity="0.28" />
         )
       )}
       {[4.0, 7.4, 10.8, 14.2].map(x => (
-        <rect key={x} x={x} y="8.6" width="1.8" height="6.9" fill={c} />
+        <rect key={x} x={x} y="8.2" width="1.8" height="7.7" fill={c} />
       ))}
-      <rect x="2.4" y="15.5" width="15.2" height="1.7" rx="0.4" fill={c} />
+      <rect x="3.2" y="7.2" width="13.6" height="1.4" rx="0.6" fill={c} />
+      <path
+        d="M10 2.65 3.05 7.2h13.9L10 2.65Z"
+        fill="#fbbf24"
+        stroke="#fbbf24"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+      <circle cx="10" cy="5.5" r="0.9" fill="#fff" opacity="0.75" />
+      <rect x="2.4" y="15.5" width="15.2" height="1.7" rx="0.7" fill={c} />
     </>
   ),
   // Bank — sky-blue block with a neon-cyan cornice; the coin-ring emblem
   // turns gold when lit.
   bank: (c, lit) => (
     <>
-      <rect x="2.4" y="4.8" width="15.2" height="1.7" rx="0.5" fill="#67e8f9" />
-      <rect x="3.2" y="6.5" width="13.6" height="9.2" fill={c} />
-      <rect x="2.6" y="15.7" width="14.8" height="1.5" rx="0.4" fill={c} opacity="0.85" />
+      <rect x="3.2" y="6.1" width="13.6" height="10.1" rx="0.9" fill={c} />
+      <rect x="2.4" y="4.8" width="15.2" height="1.7" rx="0.85" fill="#67e8f9" />
+      <rect x="2.6" y="15.7" width="14.8" height="1.5" rx="0.7" fill={c} opacity="0.85" />
       {lit ? (
         <circle cx="10" cy="9.7" r="1.7" fill="none" strokeWidth="1.25" stroke={REWARD} />
       ) : (
         <circle cx="10" cy="9.7" r="1.7" fill="none" strokeWidth="1.25" stroke="#fff" opacity="0.85" />
       )}
-      <rect x="8.9" y="13.6" width="2.2" height="2.1" {...glow(lit, 0.5)} />
-      <rect x="4.6" y="12.4" width="1.9" height="1.9" rx="0.3" {...glow(lit, 0.5)} />
-      <rect x="13.5" y="12.4" width="1.9" height="1.9" rx="0.3" {...glow(lit, 0.5)} />
+      <rect x="8.9" y="13.6" width="2.2" height="2.1" rx="0.5" {...glow(lit, 0.5)} />
+      <rect x="4.6" y="12.4" width="1.9" height="1.9" rx="0.5" {...glow(lit, 0.5)} />
+      <rect x="13.5" y="12.4" width="1.9" height="1.9" rx="0.5" {...glow(lit, 0.5)} />
     </>
   ),
   // Arztpraxis — rose clinic with a neon roofband; the white cross sign
   // glows gold when lit (like a pharmacy sign at night).
   arztpraxis: (c, lit) => (
     <>
-      <rect x="2.6" y="5" width="14.8" height="1.7" rx="0.5" fill="#fb7185" />
-      <rect x="3.4" y="6.7" width="13.2" height="10.5" fill={c} />
-      <rect x="8.8" y="7.7" width="2.4" height="5.8" rx="0.4" {...glow(lit, 0.95)} />
-      <rect x="7.1" y="9.4" width="5.8" height="2.4" rx="0.4" {...glow(lit, 0.95)} />
-      <rect x="9.1" y="14.2" width="1.8" height="3" {...glow(lit, 0.55)} />
-      <rect x="4.8" y="14.2" width="2" height="1.9" rx="0.3" {...glow(lit, 0.5)} />
-      <rect x="13.2" y="14.2" width="2" height="1.9" rx="0.3" {...glow(lit, 0.5)} />
+      <rect x="3.4" y="6.2" width="13.2" height="11" rx="0.9" fill={c} />
+      <rect x="2.6" y="5" width="14.8" height="1.7" rx="0.85" fill="#fb7185" />
+      <rect x="8.8" y="7.7" width="2.4" height="5.8" rx="0.6" {...glow(lit, 0.95)} />
+      <rect x="7.1" y="9.4" width="5.8" height="2.4" rx="0.6" {...glow(lit, 0.95)} />
+      <rect x="9.1" y="14.2" width="1.8" height="3" rx="0.4" {...glow(lit, 0.55)} />
+      <rect x="4.8" y="14.2" width="2" height="1.9" rx="0.5" {...glow(lit, 0.5)} />
+      <rect x="13.2" y="14.2" width="2" height="1.9" rx="0.5" {...glow(lit, 0.5)} />
     </>
   ),
   // Wohnhaus — teal house with a neon roof and chimney; two windows and the
@@ -145,21 +157,33 @@ const RENDERERS: Record<DomainBuildingId, Render> = {
   // house glyphs stay distinct.)
   wohnhaus: (c, lit) => (
     <>
-      <rect x="13.4" y="3.6" width="1.9" height="3.4" fill={c} />
-      <path d="M10 2.2 2.6 8.4H17.4L10 2.2Z" fill="#5eead4" />
-      <rect x="4" y="8.4" width="12" height="8.8" fill={c} />
-      <rect x="5.6" y="10" width="2.3" height="2.3" rx="0.3" {...glow(lit, 0.55)} />
-      <rect x="12.1" y="10" width="2.3" height="2.3" rx="0.3" {...glow(lit, 0.55)} />
-      <rect x="8.8" y="12.9" width="2.4" height="4.3" {...glow(lit, 0.55)} />
+      <rect x="13.4" y="3.4" width="1.9" height="3.6" rx="0.5" fill={c} />
+      <rect x="4" y="7.8" width="12" height="9.4" rx="0.9" fill={c} />
+      <path
+        d="M10 2.85 3.25 8.4h13.5L10 2.85Z"
+        fill="#5eead4"
+        stroke="#5eead4"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+      <rect x="5.6" y="10" width="2.3" height="2.3" rx="0.5" {...glow(lit, 0.55)} />
+      <rect x="12.1" y="10" width="2.3" height="2.3" rx="0.5" {...glow(lit, 0.55)} />
+      <rect x="8.8" y="12.9" width="2.4" height="4.3" rx="0.5" {...glow(lit, 0.55)} />
     </>
   ),
   // Prüfungshalle — fuchsia dome hall with a neon entablature; the clock
   // and the three entrance arches glow.
   pruefungshalle: (c, lit) => (
     <>
-      <path d="M2.8 9.6a7.2 7.2 0 0 1 14.4 0Z" fill={c} />
-      <rect x="2.2" y="9.6" width="15.6" height="1.5" rx="0.4" fill="#f0abfc" />
-      <rect x="3" y="11.1" width="14" height="6.1" fill={c} opacity="0.85" />
+      <rect x="3" y="10.6" width="14" height="6.6" rx="0.9" fill={c} opacity="0.85" />
+      <path
+        d="M3.4 9.6a6.6 6.6 0 0 1 13.2 0Z"
+        fill={c}
+        stroke={c}
+        strokeWidth="1.2"
+        strokeLinejoin="round"
+      />
+      <rect x="2.2" y="9.6" width="15.6" height="1.5" rx="0.75" fill="#f0abfc" />
       <circle cx="10" cy="6.4" r="1.8" {...glow(lit, 0.85)} />
       <path d="M4.9 17.2v-2.2a1.1 1.1 0 0 1 2.2 0v2.2Z" {...glow(lit, 0.5)} />
       <path d="M8.9 17.2v-2.2a1.1 1.1 0 0 1 2.2 0v2.2Z" {...glow(lit, 0.5)} />

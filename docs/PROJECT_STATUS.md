@@ -618,7 +618,9 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
   white windows/emblems) and a **lit** state where the glow elements switch to `hsl(var(--reward))`,
   the Phase-2.3 reward-gold token (dark-mode aware; reserved for loot/combo/lit buildings). Marks are
   normalised like route icons but to a **common ground line** (`groundTransform`), so a city strip gets
-  a shared street level with a varied skyline (deliberate).
+  a shared street level with a varied skyline (deliberate). After founder review, a **soft-corner pass**
+  landed: every rect carries an `rx` and the pointed shapes (pediment, roofs, dome base) are rounded via
+  a same-color stroke with `strokeLinejoin="round"`; don't add sharp-cornered shapes to these marks.
 - **Registry for 3.2.** `DOMAIN_BUILDINGS` carries per building: German `label`, base `color`, and the
   mastery sources that will light it: `domains` (buero → beruf+arbeitswelt, arztpraxis → gesundheit,
   pruefungshalle → pruefung+bildung) and/or `themeIds` (buergeramt → behoerde, more precise than the
