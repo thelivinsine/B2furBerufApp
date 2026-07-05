@@ -1,9 +1,10 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (minimal, game-ready redesign strategy PROPOSED, session 61; plan in
-`docs/plans/MINIMAL_UX_REDESIGN_PLAN.md`, awaiting founder go-ahead). The working branch is
-reassigned every session, so **`main` is always the source of truth**. Product name: **Genauly**
-(domain `genauly.de`)._
+_Last updated: 2026-07-05 (game implementation strategy PROPOSED, session 62; plan in
+`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, awaiting founder go-ahead, alongside the session-61
+redesign plan `docs/plans/MINIMAL_UX_REDESIGN_PLAN.md`, also awaiting go-ahead). The working
+branch is reassigned every session, so **`main` is always the source of truth**. Product name:
+**Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
 pointer is the `## Resume here (next session)` section near the end of this file** — start there. Older
@@ -603,7 +604,29 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 61 (2026-07-05). Minimal, game-ready redesign strategy PROPOSED, not yet
+**Handoff after session 62 (2026-07-05). Game implementation strategy PROPOSED, not yet
+implemented.** The founder asked how to implement the game idea (approach, tools, strategy).
+Deliverable: **`docs/plans/GAME_IMPLEMENTATION_PLAN.md`**, the engineering companion to
+`docs/strategy/GAME_CONCEPT.md`, closing the tech-approach question that the concept doc had
+left open. Four decisions recommended: (1) build inside Genauly as a lazy-loaded `/welt` route,
+not a separate app (one progression state, one deploy, extractable later); (2) React renders
+all mission scenes (battles are conversations, missions are forms/websites, all UI-shaped);
+a game engine (Phaser, MIT, lazy chunk) arrives ONLY for the later walkable pixel city, and
+Godot/Unity are rejected for web-export weight and a foreign codebase; (3) missions are a data
+bank (`data/missions.ts` + `engine/mission.ts` runner, closed scene-type union, lint:content
+graph checks) so hundreds of missions become a content routine, with "mission #2 touches only
+data files" as the pipeline metric; (4) FSRS stays the single memory model and acts as the
+dungeon master for mission recurrence (game grades flow through `reviewVocab`). Tooling/cost
+map: itch.io modern-city pixel packs (~10–40 EUR), Aseprite, kenney.nl CC0 audio, Tiled + Phaser
+free, everything else already in the repo. Phases: G0 = execute the session-61 redesign Phases
+1–3 first (they seed the game world), G1 = mission engine + Anmeldung vertical slice in React,
+G2 = Chapter 1 "Ankommen" + a real-user playtest gate, G3 = Phaser walkable world, G4 = content
+scale. Risks named: engine-first trap, content-scale trap, forked-progress trap, pending
+pixel-art blessing (no asset purchases before mockup approval). **Next step: founder picks the
+order (recommended: redesign Phase 1 next, then G1) and approves producing 2–3 pixel mockup
+scenes for the art blessing.**
+
+**Earlier handoff after session 61 (2026-07-05). Minimal, game-ready redesign strategy PROPOSED, not yet
 implemented.** The founder asked how to redesign the front end to be minimal, extremely user
 friendly, intuitive and engaging for two audiences (short-attention busy professionals/students
 AND hardcore exam preppers), with less German interface text, and with exercise progress feeding
