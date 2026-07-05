@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -29,9 +29,14 @@ export function GlobalSearch({
     return () => cancelAnimationFrame(id);
   }, [open]);
 
-  const groups = useMemo(() => searchAll(query), [query]);
+  // Defer the corpus scan + result-list render behind keystrokes so typing
+  // stays responsive on slow devices; the input itself uses the live value.
+  const deferredQuery = useDeferredValue(query);
+  const groups = useMemo(() => searchAll(deferredQuery), [deferredQuery]);
   const totalResults = groups.reduce((n, g) => n + g.count, 0);
-  const trimmed = query.trim();
+  // The empty/hint states read the deferred query too, so "Keine Ergebnisse"
+  // never flashes while results for fresh keystrokes are still being computed.
+  const trimmed = deferredQuery.trim();
 
   const go = (to: string) => {
     onOpenChange(false);
