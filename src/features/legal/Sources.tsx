@@ -327,7 +327,7 @@ export function Sources() {
     const byHost = new Map<string, number>();
     const byLicense = new Map<string, number>();
     let verified = 0;
-    let attributions: ProvenanceEntry[] = [];
+    const attributions: ProvenanceEntry[] = [];
     for (const r of provenance) {
       if (!byType.has(r.content_type)) byType.set(r.content_type, []);
       byType.get(r.content_type)!.push(r);

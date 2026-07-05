@@ -46,3 +46,23 @@ jobs:
       # spoken/typed answer matching contract of src/engine/pronounce.ts.
       - name: Test pronounce matcher
         run: pnpm test:pronounce
+
+      # Lint gate (audit D2, s58): rules-of-hooks + TS recommended. Errors
+      # block; the compiler-era react-hooks rules are warnings (visible debt).
+      - name: Lint
+        run: pnpm lint
+
+      # Unit/component smoke suite (audit D3, s58): stores, session composer,
+      # search, and the paged-list/debounce behaviors.
+      - name: Unit tests
+        run: pnpm test:unit
+
+      # Build gate (audit D1, s58): before this, a PR with a type error or a
+      # broken import merged green and only failed inside the Pages deploy.
+      - name: Build
+        run: pnpm build
+
+      # Bundle budget (audit D4, s58): fail if the eager main chunk creeps
+      # past its budget again (was 606 kB before the audit; ~330 kB after).
+      - name: Check bundle budget
+        run: pnpm check:bundle
