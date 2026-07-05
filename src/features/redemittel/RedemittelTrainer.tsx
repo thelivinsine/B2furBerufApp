@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
 import { Dumbbell, Library, MessageSquareText } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
@@ -198,15 +197,10 @@ export function RedemittelTrainer() {
                   <Badge variant="muted" className="ml-auto">{phrases.length}</Badge>
                 </div>
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {phrases.map((p, i) => {
+                  {phrases.map((p) => {
                     const reg = registerLabel[p.register];
                     return (
-                      <motion.div
-                        key={p.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: Math.min(i * 0.03, 0.25) }}
-                      >
+                      <div key={p.id}>
                         <Card className="card-hover h-full">
                           <CardContent className="space-y-2 p-4">
                             <div className="flex items-start justify-between gap-2">
@@ -221,7 +215,7 @@ export function RedemittelTrainer() {
                             </div>
                           </CardContent>
                         </Card>
-                      </motion.div>
+                      </div>
                     );
                   })}
                 </div>

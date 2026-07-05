@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Combine, Zap } from "lucide-react";
@@ -16,6 +16,7 @@ import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { LibrarySwitcher, ScopeChip } from "@/features/library/LibrarySwitcher";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
+import { usePagedList } from "@/lib/usePagedList";
 
 function normalise(s: string) {
   return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
@@ -29,7 +30,9 @@ const ALL_FACET_IDS = COLLOCATION_FACET_IDS;
 
 type Collocation = (typeof collocations)[number];
 
-function CollocationCard({ c }: { c: Collocation }) {
+// Memoized: cards come from the static bank, so a filter change re-renders
+// only the cards whose identity actually changed, not all ~400.
+const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation }) {
   return (
     <Card className="card-hover h-full">
       <CardContent className="p-4">
@@ -57,7 +60,7 @@ function CollocationCard({ c }: { c: Collocation }) {
       </CardContent>
     </Card>
   );
-}
+});
 
 export function CollocationsBrowser() {
   const [params, setParams] = useSearchParams();
@@ -172,6 +175,9 @@ export function CollocationsBrowser() {
 
   const activeTheme = themeParam !== "all" ? themeById(themeParam) : null;
 
+  // Incremental rendering: 60 cards now, the rest as you scroll.
+  const { visible, hasMore, remaining, sentinelRef, showMore } = usePagedList(filtered);
+
   const primaryOptions = [
     { value: "all", label: "Alle Themen" },
     ...themes.map((t) => ({ value: t.id, label: t.titleDe })),
@@ -236,17 +242,28 @@ export function CollocationsBrowser() {
           Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
         </div>
       ) : (
-        <motion.div
-          key={`${themeParam}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${search}__${showAllLevels}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.15 }}
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {filtered.map((c) => (
-            <CollocationCard key={c.id} c={c} />
-          ))}
-        </motion.div>
+        <>
+          {/* The remount key deliberately excludes the search term: re-keying
+              per query change remounted the entire grid on every search flush. */}
+          <motion.div
+            key={`${themeParam}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${showAllLevels}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          >
+            {visible.map((c) => (
+              <CollocationCard key={c.id} c={c} />
+            ))}
+          </motion.div>
+          {hasMore && (
+            <div ref={sentinelRef} className="flex justify-center pt-2">
+              <Button variant="outline" size="sm" onClick={showMore}>
+                Mehr anzeigen ({remaining} weitere)
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
