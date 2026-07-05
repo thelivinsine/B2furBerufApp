@@ -193,6 +193,19 @@ export function Settings() {
             </div>
             <div className="flex items-center justify-between border-t border-border pt-4">
               <div>
+                <p className="text-sm font-medium">Langsame Antworten öfter wiederholen</p>
+                <p className="text-xs text-muted-foreground">
+                  Wenn du eine Antwort zwar richtig, aber deutlich langsamer als sonst gibst, wird
+                  sie früher wieder abgefragt.
+                </p>
+              </div>
+              <Switch
+                checked={settings.latencyGrading}
+                onCheckedChange={(v) => settings.setSettings({ latencyGrading: v })}
+              />
+            </div>
+            <div className="flex items-center justify-between border-t border-border pt-4">
+              <div>
                 <p className="text-sm font-medium">Gespeicherte Wörter</p>
                 <p className="text-xs text-muted-foreground">
                   {savedCount > 0

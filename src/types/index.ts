@@ -489,6 +489,13 @@ export interface SrsCard {
    * this card" signal. Companion to `lastMs`, same clamping.
    */
   emaMs?: number;
+  /**
+   * Count of latency samples folded into `emaMs`. Gates the Phase 1.5 latency
+   * plug-in ("correct but slow" demotes Good -> Hard) so it only fires once the
+   * card's own EMA is trustworthy (>= 3 samples). Grows only when a real
+   * latency sample is recorded; a latency-less review carries it forward.
+   */
+  msCount?: number;
 }
 
 export type Grade = 0 | 3 | 4 | 5;

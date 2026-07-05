@@ -38,6 +38,25 @@ const DESIRED_RETENTION = 0.9;
 const STABILITY_MIN = 0.001;
 const MAX_INTERVAL_DAYS = 36500;
 
+/**
+ * Phase 1.5 latency plug-in ("correct but slow"). When enabled, a Good rating
+ * whose response was markedly slower than the card's OWN latency EMA is graded
+ * as Hard instead, so a laboured recall schedules sooner. Deliberately
+ * conservative and self-relative:
+ * - `LATENCY_MIN_SAMPLES` prior samples are required before the EMA is trusted
+ *   (a first-sample EMA is just the sample, which carries no "slower than usual"
+ *   information).
+ * - the trigger is purely the ratio to the card's own EMA, never an absolute
+ *   cross-format threshold (flashcard flip time and MCQ select time are
+ *   different quantities and share one card's EMA).
+ * - `LATENCY_SLOW_FLOOR_MS` only *blocks* demotion of an answer that is fast in
+ *   absolute terms (a low-EMA card whose sample beats the ratio but is still a
+ *   sub-2s, obviously-confident recall); it can never cause a demotion.
+ */
+const LATENCY_MIN_SAMPLES = 3;
+const LATENCY_SLOW_FACTOR = 1.5;
+const LATENCY_SLOW_FLOOR_MS = 2000;
+
 /** FSRS rating scale: 1 = Again, 2 = Hard, 3 = Good, 4 = Easy. */
 type Rating = 1 | 2 | 3 | 4;
 
@@ -158,8 +177,29 @@ export function review(
   grade: Grade,
   on: Date = new Date(),
   latencyMs?: number,
+  opts: { latencyGrading?: boolean } = {},
 ): SrsCard {
-  const rating = toRating(grade);
+  // Clamp this review's latency sample (26a). `undefined` = no sample this call.
+  const sampleMs =
+    typeof latencyMs === "number" && Number.isFinite(latencyMs) && latencyMs > 0
+      ? Math.min(Math.round(latencyMs), 60000)
+      : undefined;
+
+  // Phase 1.5: "correct but slow" demotes Good -> Hard, relative to the card's
+  // own latency EMA and only once that EMA is trustworthy. The decision reads
+  // the PRIOR emaMs/msCount, before this sample is folded in below.
+  const effectiveGrade: Grade =
+    opts.latencyGrading &&
+    grade === 4 &&
+    sampleMs !== undefined &&
+    (card.msCount ?? 0) >= LATENCY_MIN_SAMPLES &&
+    card.emaMs != null &&
+    sampleMs > card.emaMs * LATENCY_SLOW_FACTOR &&
+    sampleMs > LATENCY_SLOW_FLOOR_MS
+      ? 3
+      : grade;
+
+  const rating = toRating(effectiveGrade);
 
   let stability: number;
   let difficulty: number;
@@ -203,20 +243,20 @@ export function review(
 
   // Keep the SM-2 ease factor warm (same update rule as the old scheduler) so
   // reverting this file to SM-2 restores sensible scheduling with no data
-  // repair. FSRS itself never reads it.
+  // repair. FSRS itself never reads it. Uses the effective (possibly demoted)
+  // grade so a reverted SM-2 engine stays consistent with the FSRS scheduling.
   const ease = Math.max(
     1.3,
-    card.ease + (0.1 - (5 - grade) * (0.08 + (5 - grade) * 0.02)),
+    card.ease + (0.1 - (5 - effectiveGrade) * (0.08 + (5 - effectiveGrade) * 0.02)),
   );
 
   // Response-latency capture (26a). A latency-less call carries the previous
-  // samples forward unchanged, so it never wipes history. Scheduling effect
-  // is deferred to the Phase 1.5 latency plug-in (needs >= 3 samples per card).
-  let { lastMs, emaMs } = card;
-  if (typeof latencyMs === "number" && Number.isFinite(latencyMs) && latencyMs > 0) {
-    const ms = Math.min(Math.round(latencyMs), 60000);
-    lastMs = ms;
-    emaMs = card.emaMs == null ? ms : Math.round(0.3 * ms + 0.7 * card.emaMs);
+  // samples (and their count) forward unchanged, so it never wipes history.
+  let { lastMs, emaMs, msCount } = card;
+  if (sampleMs !== undefined) {
+    lastMs = sampleMs;
+    emaMs = card.emaMs == null ? sampleMs : Math.round(0.3 * sampleMs + 0.7 * card.emaMs);
+    msCount = (card.msCount ?? 0) + 1;
   }
 
   return {
@@ -224,9 +264,12 @@ export function review(
     interval,
     reps,
     due: todayKey(next),
+    // The learner's actual button press, not the possibly-demoted scheduling
+    // grade: this is the honest record of what they rated.
     lastGrade: grade,
     lastMs,
     emaMs,
+    msCount,
     stability,
     difficulty,
   };

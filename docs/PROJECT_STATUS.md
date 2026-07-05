@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (docs-lean restructure for token efficiency, session 55). The working branch is
+_Last updated: 2026-07-05 (Learning Engine Phase 1.5 latency plug-in shipped, session 57). The working branch is
 reassigned every session, so **`main` is always the source of truth**. Product name: **Genauly**
 (domain `genauly.de`)._
 
@@ -602,7 +602,28 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 56 (2026-07-05). Learning Engine Phase 2, the #27 speech-first production
+**Handoff after session 57 (2026-07-05). The optional Learning Engine Phase 1.5 latency plug-in is
+COMPLETE ✅ and merged to `main`** (PR + squash SHA recorded in git history). This closes the
+`docs/plans/LEARNING_ENGINE_PLAN.md` roadmap entirely: nothing in it remains. What shipped: a
+**"correct but slow" demotion** in `src/engine/srs.ts`. When enabled, a Good rating (grade 4) whose
+clamped response latency exceeds **1.5×** the card's own `emaMs` is graded as **Hard** instead, so a
+laboured recall schedules sooner. It is deliberately conservative and self-relative: gated on **≥3
+prior latency samples** (new optional `SrsCard.msCount`) so the per-card EMA is trustworthy, keyed
+purely to the card's own EMA (never an absolute cross-format threshold, since flashcard-flip and
+MCQ-select latencies share one card's EMA), and a **2000ms floor** that only *blocks* demotion of a
+sub-2s confident recall (never causes one). The demotion is scheduling-only: `lastGrade` still
+records the learner's honest button press and the latency sample is still captured. Wiring:
+`review()` gained an `opts.latencyGrading` flag (engine default **off**, so `test:srs` golden
+sequences and any other pure caller never demote); `useProgressStore.reviewVocab` reads the new
+`latencyGrading` setting (default **on**, opt-out toggle in the Settings "Lernen" card) via
+`useSettingsStore.getState()` and passes it through. No persist/Supabase migration (both new fields
+ride inside the existing `srs` jsonb blob and the settings jsonb sweep). Verified: all four gates
+green (**`pnpm test:srs` now 323 checks**, +13 new Phase-1.5 assertions that prove a demoted Good
+equals a real Hard on the same card state, and that fast / flag-off / <3-samples / floor-guarded
+cases all skip the demotion), plus `typecheck` + `lint:content` + `build`. Post-merge housekeeping
+done (branch reset to `origin/main`, force-with-lease). Prompt-log entry 138.
+
+**Earlier handoff after session 56 (2026-07-05). Learning Engine Phase 2, the #27 speech-first production
 block, is COMPLETE ✅ and merged to `main`** as PR #284 (squash SHA `6d1d8b4`). That was the LAST
 Learning Engine phase: all five items (26a, 26b, #27, #28, #29, #30) are now shipped. What shipped:
 a new **`"speaking"` session block**, the first consumer of the `listen()` STT wrapper in
@@ -722,13 +743,11 @@ migrations needed, all new fields are optional and ride inside existing jsonb bl
 `claude/whats-next-esga9u` (reassigned per session; `main` is the source of truth), realigned to `main`
 post-merge per the standard housekeeping.
 
-**Next up: the Learning Engine plan is fully shipped (26a/#28/#30 s51, #29 s52, 26b s53, #27 s56).**
-Open candidates, in rough order of product value:
+**Next up: the Learning Engine plan is fully shipped, including the optional Phase 1.5 tail
+(26a/#28/#30 s51, #29 s52, 26b s53, #27 s56, Phase 1.5 latency plug-in s57).** Open candidates, in
+rough order of product value:
 - A new **life-domain theme** (banking / healthcare/Arzt / housing) per the product scope; the
   `behoerde` pack is the reference template. Content-heavy, founder may want to pick the domain.
-- The optional **Phase 1.5 latency plug-in** from `docs/plans/LEARNING_ENGINE_PLAN.md` ("correct but
-  slow" demotes Good→Hard using `emaMs`, only with 3+ samples per card, only against the card's own
-  EMA). Small, self-contained engine change behind the existing `pnpm test:srs` gate.
 - The optional taxonomy follow-ups (human-verify the AI-drafted `cefr` tags via provenance
   `draft→verified`; broaden `sector`/`workSituation` tagging; extend sub-themes past 3 of 11).
 - The **game concept** (`docs/strategy/GAME_CONCEPT.md`, s54): waiting on founder decisions (brand,
