@@ -1067,3 +1067,358 @@ All changes shipped as PR #175 + docs PR #176, both squash-merged to `main`.
    future session should help prioritize and break these into phases.
 
 _(Layer 1 ✅ · Layer 2 ✅ · Layer 3 ✅ · Content: all 10 themes ✅ · Security: 100% complete ✅)_
+
+---
+
+## Detailed session logs 25–46 (relocated 2026-07-05)
+
+_Moved out of `docs/PROJECT_STATUS.md` to keep it lean. Locked design rules from these
+sessions live in `CLAUDE.md` and `docs/DECISIONS.md`; this is the narrative record._
+
+### Session 25 (2026-06-16) — Unique per-section icon colours + custom branded icons everywhere
+- **Unique colour per route:** each navigation route now owns ONE unique accent colour (no more
+  duplicates: Wortschatz, Quiz, Prüfungsmodus, Schnellwiederholung, Fortschritt, Einstellungen all
+  had shared hues before). Defined once in `src/components/layout/nav-items.ts` (`color` + `bg`).
+- **One icon per route, used everywhere (new):** custom branded SVG marks now live in
+  `src/components/layout/route-icons.tsx` (`RouteIcon` + `MoreIcon`) — one hand-drawn mark per
+  route on a 20×20 grid, in the route's accent colour with lighter layers from its own opacity.
+  This single registry is the source for the bottom tab bar, the More sheet, AND the desktop
+  `Sidebar`, so a section shows the same icon AND colour on every surface. Replaced the old setup
+  where the bottom bar had custom SVGs for only 4 "hero" routes while everything else used lucide.
+- Dashboard + the "Mehr" menu keep the brand indigo `#5b5be6` as the app/chrome anchor.
+- `nav-items.ts` still carries a lucide `icon` per route; `RouteIcon` falls back to it for any
+  route without a custom mark. Reference sheet: `preview/route-icons-preview.svg`.
+- **Home/Mehr icon swap + richer context strip:** Home is now a house glyph (was the 2×2 grid),
+  and the "Mehr" menu took over the 2×2 grid (the classic apps/more glyph). The bottom-bar context
+  strip now shows the section name PLUS a short German subtitle (`desc` per `NavItem`) for context
+  instead of just the name. The strip is one line taller, so the More sheet overlay/padding were
+  nudged to keep clearance.
+- **More sheet overlap fix:** the sheet's bottom padding equalled the bar height, so the last icon
+  row's labels overlapped the bar's context strip. Bumped padding so the grid lifts clear.
+- **Uniform icon optical size:** each mark was drawn freehand on the 20×20 grid with a different
+  inked area (filled Quiz disc ~17px vs speech bubble ~13px), so they looked like different sizes.
+  Added a `NORM` map + `normTransform` in `route-icons.tsx` that scales each mark's bounding box to
+  a centred 16-unit target with a per-mark weight (so heavy filled shapes don't read larger). Tune
+  sizes via that map. CLAUDE.md "Icon color rule" updated to match the new all-custom-SVG setup.
+- `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green. Shipped via PRs #178–#182.
+
+### Session 26 (2026-06-16) — Bottom-bar context strip removed + More-sheet reorder & animations
+- **Context strip removed:** the label/subtitle row above the bottom-bar icons was redundant (every
+  section already shows its own title at the top of the page), so the bar is now a single 62px icon
+  rail. The More sheet overlay `bottom` (→ `3.875rem`), its bottom padding (→ `5.75rem`), and the
+  `.pb-nav` utility were all resized for the shorter bar. `NavItem.desc` is kept for reuse but no
+  longer rendered in the bar. `getContextMeta` deleted from `BottomTabBar.tsx`.
+- **Mehr selection fixed:** the Mehr tab now shows its selected pill + underline while the More sheet
+  is open, and the pinned tabs drop their highlight so the selection clearly sits on Mehr.
+  `AppShell` passes a new `moreOpen` prop into `BottomTabBar`.
+- **Reorder inside the More sheet (new):** the sheet's edit-mode grid is now drag-sortable via a
+  custom 2D grid sort in `MoreSheet.tsx` (`reorderDuringDrag` finds the tile under the pointer and
+  splices the dragged path into its slot; `layout` animates the rest). Order persists in a new
+  `useSettingsStore.moreOrder: string[]` (full route ordering; empty = `nav-items` order), kept in
+  sync so pinned routes hold their slots.
+- **Add/remove movement animation (new):** bar and sheet icons use framer `layout` +
+  `AnimatePresence` (spring) so adding/removing an icon slides the rest into place instead of
+  snapping.
+- **Gesture change:** the old "drag a sheet icon down ~72px to add it to the bar" gesture was
+  removed (free drag now reorders the grid); the green **+ badge** is the single add affordance.
+- **Follow-up fixes (same session):** (1) the More sheet stayed open when tapping a bar tab (e.g.
+  Home) because the bar sits below the sheet overlay (`modal={false}`); `AppShell` now closes the
+  sheet + exits edit mode on any `location.pathname` change. (2) Bar rail height 62px → 70px and
+  icons 29px → 32px (matched to the More sheet, also bumped 28px → 32px); overlay `bottom`, sheet
+  padding, and `.pb-nav` re-tuned for the taller bar.
+- **Follow-up fixes round 2 (same session):** (1) removed the edit-mode "Ziehen zum Sortieren …"
+  instruction sentence. (2) Enter/exit on bar + sheet edit tiles is now opacity-only (no `scale`):
+  animating a transform on a `layout`/Reorder element fought framer's projection and was freezing
+  the jiggle until the next re-render (the "icons only jiggle after an add/remove" bug), and the
+  scale pop was also shifting icons on long-press. Positions now stay put and the jiggle starts
+  immediately. (3) The Mehr tab now toggles: tapping it while the sheet is open closes it (and exits
+  edit mode) via `toggleMore` in `AppShell`.
+- **Follow-up fixes round 3 (same session):** (1) scaled the whole mobile bottom nav down ~10% after
+  it felt too big: rail 70px → **63px**, icons 32px → **29px** in both the bar and the More sheet,
+  with overlay `bottom`, sheet padding, and `.pb-nav` re-tuned to match (PR #191). (2) Fixed an
+  intermittent "design glitch" where the whole mobile view got stuck **scrolled sideways** (header
+  logo gone, "Vokabeltrainer" clipped to "kabeltrainer", card text cut off on the left). The guard
+  against horizontal scroll only lived on `<body>`, but the real scroll container is `<html>`, and
+  Radix portals (Select/Dialog) mount at the end of `<body>` and can momentarily push the document
+  sideways before Floating UI positions them, which iOS leaves stuck. Added `overflow-x: clip` +
+  `overscroll-behavior-x: none` to `html` in `src/index.css` (`clip`, not `hidden`, so no scroll
+  container is created and the sticky header is untouched) (PR #192).
+- `pnpm build` + `pnpm lint:content` green. Branch `claude/context-bar-menu-animations-g9gfd3`.
+
+### Session 27 (2026-06-16) — Full app audit + targeted fixes
+- **Audit headline: the app is healthy.** `pnpm build`, `pnpm typecheck`, and `pnpm lint:content`
+  all pass with zero errors (only the known ~159 provenance back-fill warnings). No crashes, broken
+  routes, duplicate IDs, broken dialogue branches, missing content, or em dashes in user copy.
+  Content counts all match (490 vocab, 396 collocations, 10 grammar topics/47 drills, 1073 provenance
+  rows); consent version matches the legal `LAST_UPDATED` date.
+- **Fixes applied:**
+  - `dataExport.ts`: added the missing `.eq("user_id", user.id)` to the `writing_evaluations` query
+    so it matches its sibling queries (RLS already enforced it; this is consistency + defense-in-depth).
+  - Both Edge Functions (`evaluate-writing`, `delete-account`): added `Access-Control-Max-Age: 86400`
+    so browsers cache the CORS preflight (fewer OPTIONS round-trips).
+  - `ExamRunner.tsx`: gave the free-text answer input an `aria-label`.
+  - `QuickRevision.tsx`: made the flip card keyboard-accessible (`role="button"`, `tabIndex`, Enter/Space).
+  - `Flashcards.tsx`: a lapsed card ("Again", grade < 3) no longer earns the full review XP (it earned
+    more than an "Easy" recall before). Successful recalls still reward effort (Good 6 > Easy 4).
+  - `srs.ts`: the SM-2 ease factor now decreases on a lapse (it was only updated on success), so a
+    repeatedly failed card loses ease and resurfaces sooner.
+  - Guest sign-in is now gated behind a captcha token **when Turnstile is configured**
+    (`VITE_TURNSTILE_SITE_KEY`): `useAuthStore.signInAsGuest` refuses without a token, and the writing
+    flow (`writing.ts`) routes signed-out users through the captcha-gated auth UI instead of a silent
+    guest creation. Dormant (no behavior change) until a site key is set, then closes the
+    anonymous-signup AI-budget abuse vector.
+- **Verified non-issues (not changed):** the MoreSheet `5.75rem` padding is intentional; the
+  flashcard Easy(4) < Good(6) ordering is correct (effort-based). Dropped a planned "scoring 70%
+  baseline" change after confirming `examSets.ts` has zero quality-scored options: that 70% is the
+  intended exam participation credit, and real dialogues always carry quality options, so the default
+  is never hit for them. Changing it would have wrongly dropped every exam score by ~28 points.
+- `pnpm build` + `pnpm typecheck` + `pnpm lint:content` green. Branch `claude/app-audit-testing-bqrdkj`.
+
+### Session 27 cont. — Navigation icon polish (SHIPPED)
+A run of founder-driven nav-icon refinements, all in `route-icons.tsx` / `nav-items.ts` plus the
+three icon surfaces (`BottomTabBar`, `MoreSheet`, `Sidebar`):
+- **Audit fixes** also included an a11y pass and the SRS/XP/captcha/CORS fixes above (PR #194).
+- **Removed the "Leiste voll" helper line** from the More sheet edit mode (PR #195).
+- **More sheet closes on re-tapping the active tab:** it only closed via the `location.pathname`
+  effect, but re-tapping the active tab doesn't change the route. Added `onNavigate`/`closeMore` so
+  any bar tap closes the sheet (PR #196).
+- **Full opacity everywhere:** removed the 38% inactive dimming so icons no longer read as blurred;
+  active is shown by the backdrop/underline, not opacity (PR #197).
+- **Optical-size re-tune (~5%):** bumped most `NORM` weights to reduce empty space, boosted the small
+  marks (grammar/exam/analytics), kept large ones restrained, left the pencil unchanged; later bumped
+  the home icon another +5% (PRs #198, #200).
+- **Two-tone book → two-tone + neon for all icons:** the Wortschatz book first became two-tone indigo
+  `#5b5be6` + cyan `#10b7cf` to match the F2 "Per-section Color" preview (PR #199). The founder then
+  approved extending the two-tone treatment to **every** icon, each with a brighter **neon** second
+  tone (proposal sheet `preview/route-icons-two-tone-neon.svg`).
+- **Grey-gradient icon boxes:** the rounded pill/tile behind icons now uses a neutral grey gradient
+  (`from-muted to-border`) instead of the section colour at low opacity, across the bar, Mehr pill,
+  More-sheet tiles, and the sidebar active row. The `nav-items.ts` `bg` tint field is no longer used
+  for backdrops. CLAUDE.md "Icon color rule" updated to capture the two-tone+neon + grey-box design.
+- `pnpm build` + `pnpm typecheck` green throughout.
+
+### Session 44 (2026-06-28) — Session-43 review, app-wide dark-mode fix, filter-harmonization plan ✅
+A review + bugfix + planning session on branch `claude/review-previous-session-69pxat`. Three PRs
+squash-merged to `main` (#250–#252).
+- **Reviewed session 43** end to end (taxonomy Phases 3–4): build/typecheck/`lint:content` green,
+  every new view implemented as documented and responsive. Fixed one latent mobile bug, the
+  `FacetSheet` bottom sheet inherited `overflow-y-auto` on the whole container, so on a short viewport
+  the "Apply" button could scroll away. Constrained the grid (`grid-rows-[auto_auto_minmax(0,1fr)_auto]`)
+  so only the facet list scrolls and the footer stays pinned (**PR #250**).
+- **App-wide dark-mode fix (#251).** Founder reported the Kollokationen filter pills rendering bright
+  white in dark mode. Root cause: **Tailwind's opacity scale only contains multiples of 5, so any
+  color utility using `/8` or `/12` silently failed to compile** (verified in the production CSS, zero
+  rules emitted). Effects: `bg-white dark:bg-white/8` pills lost their dark override and fell back to
+  white; every `/12` tint (badges, stat cards, header streak/level pills, exam/simulation/onboarding
+  icon boxes, RelatedPanel chips) rendered with no background at all. Bumped all `/8` and `/12`
+  color-opacity utilities to `/10` (34 utilities across 16 files); audited the whole `src` tree, those
+  were the only non-multiple-of-5 steps in use, and no hardcoded light-only colors lack a dark variant.
+  **Lesson for future work: only use opacity steps that are multiples of 5** (e.g. `/10`, `/15`), the
+  build does not warn on invalid ones.
+- **Filter-harmonization plan (#252, docs-only).** Founder flagged the search bar / filter button /
+  filter options / theme + branche controls as chaotic and inconsistent across Wortschatz,
+  Kollokationen, Redemittel, etc. Researched the codebase + `docs/plans/TAXONOMY_REDESIGN.md` + the uploaded
+  learning-app playbook (`docs/reference/Language Learning App Success Factors.docx`) and wrote
+  **`docs/plans/FILTER_HARMONIZATION_PLAN.md`**: one shared `Search + Theme + Filter` toolbar
+  (`BrowseToolbar`) + the existing `FacetSheet` on every page, a single responsive panel for
+  mobile+desktop, branded `HubHero` header everywhere, a shared `src/lib/cefr.ts` for consistent CEFR
+  labels, and the verb-rail/legend decluttered into the sheet. Phased: Phase 1 = the 3 filtering pages,
+  Phase 2 = the simpler hubs. **Implemented in session 45 (below).**
+- **Historical pointer (as of session 46; superseded by the `## Resume here` section below) →** the
+  **UX overhaul plan was fully approved and became the roadmap.** Start with Phase 0 (quick wins, Sonnet 5), then Phase 1 (session engine, Opus 4.8); see
+  the phase/model table under "Model guidance". The older follow-ups (human-verify `cefr` tags, new
+  life-domain themes) slot in after or alongside; new themes land best after Phase 3 (Bibliothek).
+
+### Session 46 (2026-07-02) — Full app review + UX overhaul plan, APPROVED ✅ (docs-only)
+Fable session. The founder asked for a critical review of the app and of the s44/s45 filter
+harmonization, then a substantially better plan. **No app code changed; strategy + docs only.**
+- **Full-app review:** all 13 routes screenshotted (mobile 390px + desktop 1280px) and read. Five
+  headline problems: no composed session loop (the pieces exist but the learner must sequence them);
+  home leads with a wall of choices instead of "continue"; redundant practice surfaces (3 flashcard/
+  quiz experiences, 4 library nav slots); German UI carrying English content in load-bearing spots
+  (all 11 theme blurbs, grammar purposes, "Quick Review"); progress reads as bookkeeping (four zero
+  tiles on a new account, no Can-Do milestones). Sign-in banner sits on every screen.
+- **Filter-plan critique (self-critical):** s45 harmonized the *reference* layer but polished the
+  wrong layer; search stayed siloed per bank; scope (theme) resets per page; the relocated Verb facet
+  became a 100+ pill soup; per-page facet wiring does not scale to the coming content packs.
+- **`docs/plans/UX_OVERHAUL_PLAN.md` (new, the roadmap):** session-first redesign. Four-tier filter
+  architecture (Tier 0 personalized defaults / Tier 1 global search across all banks / Tier 2
+  travelling Scope (Domain → Theme → Sub-theme) as app state / Tier 3 refinement facets from a
+  central registry, ≤12-option rule, Verb facet dropped). Four-zone IA: Heute (session hero) ·
+  Bibliothek (4 libraries merged, s45 toolbars reused) · Anwenden (Simulation/Schreiben/Prüfung) ·
+  Fortschritt (Can-Do milestones + diagnosis). New `engine/session.ts` composer + SessionPlayer
+  reusing the existing SRS/quiz/drill machinery. Six phases with a prioritization framework.
+- **All four Part-H decisions recorded (founder):** (1) IA direction approved; (2) tab-bar default
+  pins approved after a plain-language walkthrough, mechanics stay locked; (3) German-first copy
+  confirmed, the founder's "EN peek button" idea parked as **backlog #25** (needs brainstorming;
+  Phase 0 keeps EN as data, so it stays possible); (4) Can-Do statements AI-drafted + founder-
+  reviewed, provenance recipe checked against `DATA_GOVERNANCE.md` (origin `authored`, license
+  `OWNED`, `draft` → `verified`, reference = CoE CEFR descriptors, same as writing prompts).
+- **Model guidance refreshed:** Fable available again (restriction lifted), Sonnet bumped to 5, and
+  a per-phase model table added for the overhaul plan (Phase 0 Sonnet → Phase 1 Opus → …).
+
+### Session 45 (2026-06-29) — Filter harmonization IMPLEMENTED (Phase 1 + Phase 2) ✅
+Implemented the full `docs/plans/FILTER_HARMONIZATION_PLAN.md` across both phases.
+- **New shared pieces:**
+  - **`src/lib/cefr.ts`** — single source of truth for the CEFR scale (`CEFR_ORDER`, `cefrLabel`,
+    `difficultyToBand`). Replaced 4 duplicated `CEFR_ORDER` arrays (VocabularyTrainer,
+    CollocationsBrowser, SubThemePicker, intentCards).
+  - **`src/features/shared/BrowseToolbar.tsx`** — thin layout wrapper that fixes the position and
+    styling of `[Search] [Primary Select] [FacetSheet trigger]` + active-chips row. Reuses the
+    existing `FacetSheet` and `ActiveFilterChip`.
+- **Phase 1 — three filtering pages:**
+  - **VocabularyTrainer:** `SectionHeading` → `HubHero`, added free-text search (over de/en/related),
+    theme dropdown + filter sheet via `BrowseToolbar`. SubThemePicker + tabs preserved below.
+  - **CollocationsBrowser:** removed the verb-chip scroll/expand rail + the Neutral/Formal colour
+    legend. **Verb filter moved into the FacetSheet** as a third facet (CEFR + Register + Verb), so it
+    gains live counts, greyed dead-ends, and removable chips. Search persisted to URL (`?q=`). Quiz CTA
+    moved to `BrowseToolbar` trailing slot.
+  - **RedemittelTrainer:** `SectionHeading` → `HubHero`, added free-text search (over de/en), added
+    **Kategorie primary dropdown** (`?cat=`) as the primary axis. Filter sheet kept (Register facet).
+    Wendungen/Üben tabs preserved.
+- **Phase 2 — non-filtering hubs:** QuizHub level labels now use `difficultyToBand()` from the shared
+  module, producing consistent `B1 / B2.1 / B2.2·C1` labels. GrammarHub, ExamHub, SimulationHub already
+  used `HubHero` and needed no changes.
+- **Verification:** all three pages tested on mobile (390px) and desktop (1280px). Search narrows
+  results and composes with facets. Filter sheets open with live counts. URL params round-trip. Dark mode
+  correct (no new `bg-white` pills). `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green.
+
+### Session 43 (2026-06-27) — Taxonomy redesign Phases 3–4 SHIPPED + dashboard restructure ✅
+Completed the taxonomy redesign. All of Phase 3 and Phase 4 are live on `main` across nine squash-merged
+PRs (#240–#248). The untagged-rolls-up invariant held throughout. Highlights (full detail in the taxonomy
+section above):
+- **Phase 3 — faceted browser, Work-mode facets, intent cards.** Mode-aware **intent cards** on the
+  dashboard (#240); **register unification** + reusable **`FacetSheet`** (live counts, greyed dead-ends)
+  wired into Kollokationen (#241); **care/Pflege sector back-fill** + first `office` tags, vocab 515→528
+  (#242); FacetSheet in the Vokabeltrainer with CEFR + Wortart + Work-only **Branche** facet (#243);
+  Redemittel **Register filter** (#245); **workSituation** tags + Work-only **Situation** facet (#246).
+  `mode` now has a real content effect (filters intent cards, gates the Work facets).
+- **Dashboard restructure (#244):** leads with the "Was möchtest du üben?" tiles; the big progress block
+  collapsed to a compact strip (full stats already live on Fortschritt).
+- **Phase 4 — cross-module linking + adaptive review.** Cross-module **"Verbunden" panel** on vocab words
+  (#247); **mode/level-aware** Schnellwiederholung deck via pure `reviewWeight()` + weakest-CEFR-band
+  detection, plus **filtered writing-coach deep-links** via `practiceRoute()` (#248).
+- **Deliberate non-actions (documented):** `counterpart` left 0-tagged and Redemittel left without a
+  `themeId` (both are general-purpose, so tags would be low-signal). `cefr` tags remain AI-draft pending
+  human verification.
+- `pnpm lint:content` + `pnpm build` green on every PR; branch realigned to `main` after each squash-merge.
+
+### Session 42 (2026-06-27) — Taxonomy redesign Phases 0–2 IMPLEMENTED & SHIPPED ✅
+First build session on the approved `docs/plans/TAXONOMY_IMPLEMENTATION_PLAN.md`. Phases 0, 1 and 2 are now
+live on `main` across three squash-merged PRs. Untagged-rolls-up invariant held throughout, so nothing
+regressed.
+- **Phase 0 — foundations (PR #233, then completed in #234):** new faceted types in
+  `src/types/index.ts` (`DomainId`, `LearningMode`, `ContextTag`, `ContentCefr`, `Frequency`,
+  `WorkSector`, `Counterpart`, `WorkSituation`, `TaskType`, `SubThemeId`, `SubTheme`); `domains.ts`
+  registry (6 domains) + `domainById`; all 11 themes given `domain` + `context`; `mode: LearningMode`
+  (default `"both"`) added to `useSettingsStore` (rides cloudSync automatically). Optional facet fields
+  added to `ExamTheme`/`VocabItem`/`Collocation`/`RedemittelPhrase` (all optional → existing content
+  stays valid). Linter got mirror arrays + validate-when-present checks for every new enum. #234 closed
+  the Phase-0 checklist tail: `ExamTheme.subThemes?`, `SubThemeId` alias, and wired
+  `workSituation?`/`taskType?` as real validated facets (peers of `sector`/`counterpart`).
+- **Phase 1 — levels + Mode picker (PR #233):** all **515 vocab + 396 collocations tagged with `cefr`**
+  (AI-drafted; **human-verify still pending** via provenance `draft→verified`). Onboarding gained a
+  **Mode step** (Beruf/Alltag/Beides, 4→5 steps). New **`ModeSwitcher`** pill in the app header
+  (persists `mode`; currently a saved setting with no content effect yet — re-weighting is Phase 3).
+  **CEFR Level filter** added to `VocabularyTrainer` (`?cefr=`, shareable). Quiz `Difficulty 1|2|3`
+  relabelled to CEFR bands (B1 / B2.1 / B2.2·C1) in `QuizHub`/`QuizRunner` (numeric kept internally for
+  question-type selection).
+- **Phase 2 — sub-themes (PR #235, SHA `59b9e62`):** `behoerde` (4), `customer` (3) and `meetings` (3)
+  split into sub-topics derived from their `situations[]`. **122 vocab + 105 collocations tagged with
+  `subThemeId`**; cross-cutting items (soft-skill adjectives, connectors, generic "Behörde") left
+  untagged on purpose. New **`SubThemePicker`** drill-down (per-sub count + CEFR span, plus a dashed
+  "Gesamtes Thema" escape hatch that includes untagged items). `VocabularyTrainer` gained `?sub=` +
+  breadcrumb + sub-aware filtering/counts; helpers `vocabBySubTheme`/`collocationsBySubTheme` and a `sub`
+  option on `filterVocab`. Linter now cross-validates every `subThemeId` is declared on its theme. Counts
+  reconcile: behoerde 24+1, customer 45+5, meetings 53+1.
+- **Phase 3a — mode-aware intent cards (session 43):** the dashboard now opens with a **"Was möchtest
+  du üben?" row of starting-point cards** (`src/features/dashboard/intentCards.ts` + `Dashboard.tsx`).
+  Each card carries a pre-built filter bundle and deep-links into the matching browser view (e.g.
+  `behoerde.meldewesen`, `meetings.beitrag`, `customer.beratung`, `/redemittel`, `/writing`).
+  `intentCardsForMode(mode)` filters by the active lens (a `both` card or `both` mode always shows, so
+  the screen never empties); word counts + CEFR ranges are computed live from `filterVocab`. **This is
+  the first place `mode` actually changes what the learner sees.**
+- **Phase 3b — register unification + faceted filter (session 43):** `Collocation.register` widened to
+  `neutral|formal|diplomatic` (linter `COLLOCATION_REGISTERS` + card badge updated). New reusable
+  **`src/features/shared/FacetSheet.tsx`**: a "Filter" chip opens a slide-up sheet (reusing `dialog.tsx`,
+  overridden to a bottom sheet) whose multi-select option pills show **live counts** and **grey out
+  zero-yield values**, so you can't tap into an empty screen (AND-across-facets / OR-within-facet;
+  `matchesFacets`/`applyFacets`/`activeFacetCount` exported). Generic over item type. **Wired into the
+  CollocationsBrowser first** (CEFR + Register facets, state in `?cefr=`/`?register=`, removable
+  active-filter chips in the bar). Collocations had no level/register filtering before, so this is pure
+  new capability and the lowest-risk proving ground.
+- **Sector back-fill (session 43, PR #242):** authored a **13-word care/Pflege pack** (`die Schicht`,
+  `die Übergabe`, `die Hygiene`, `der Angehörige`, `die Fallbesprechung`, `die Pflegedokumentation`, …)
+  spread across existing themes (scheduling/safety/customer/conflict/meetings/technology) so the
+  orthogonal `sector` facet genuinely cuts across topics, plus a curated set of `office` tags
+  (Besprechung/Protokoll/Sitzung/Beschluss/Frist/Deadline/…). Vocab 515→528; matching provenance rows.
+  This unblocked the Work-mode facets. Honest first pass, not exhaustive (sector rolls up).
+- **Phase 3c — vocab faceted filter + Work-mode sector facet (session 43):** `FacetSheet` wired into the
+  **VocabularyTrainer**, replacing the old standalone CEFR `Select`. Facets: **CEFR + Wortart** always,
+  plus the **`sector` ("Branche") facet shown only when the Mode lens is `work`** (`facets` is derived
+  from `learningMode`). State in `?cefr=`/`?pos=`/`?sector=` (multi-select), removable active-filter
+  chips in the bar. The theme `Select` + sub-theme drill-down are untouched; facets apply on top of the
+  theme/sub scope. So **switching to Work mode now reveals the Pflege/Büro sector filter** — the
+  Work-mode facets are functional end to end.
+- **Verification each phase:** `pnpm typecheck` + `pnpm lint:content` + `pnpm build` all green. Sandbox
+  can't reach the live `*.github.io` site; founder confirms the deployed result.
+- **Redemittel Register filter (session 43):** the Redemittel browse view gained a `FacetSheet` **Register
+  filter** (neutral/formell/diplomatisch, present 38/29/5); categories with no matches are hidden. State
+  in `?register=`.
+- **Dashboard restructure (session 43, PR #244):** the dashboard now **leads with the "Was möchtest du
+  üben?" intent tiles**. Removed the big focal hero + four-stat status strip + level bar (all already on
+  the Fortschritt page) and replaced them with **one compact summary strip** below the tiles (streak ·
+  today XP/goal · days-to-exam · recommended action · "Fortschritt" link). Mode pill untouched.
+- **workSituation facet (session 43):** tagged a cross-cutting set of vocab (`shift-handover` for the
+  care shift words, `instructions` for safety/hygiene, `meeting`, `customer-call`) and exposed it as a
+  **2nd Work-mode facet "Situation"** in the Vokabeltrainer (next to "Branche"); both appear only in Work
+  mode. `counterpart` left 0-tagged on purpose (redemittel are general-purpose → low-signal).
+- **Phase 4 step 1 — cross-module "Verbunden" panel (session 43):** `src/features/vocabulary/RelatedPanel.tsx`.
+  In the Vokabeltrainer **Übersicht** list, each word now expands ("Verbunden") to show matching content
+  from the other banks via the shared `themeId`/`subThemeId` join key: a **Kollokation** (same sub-theme
+  if available → `/collocations?theme=`), the theme's **Schreibtraining** prompt (→ `/writing?theme=`),
+  and a **Dialog** (→ `/simulation`). No hand-kept id lists. Redemittel aren't linked (no `themeId`).
+- **Phase 4 steps 2 + 3 (session 43):** **(2) mode/level-aware review** — `reviewWeight()` in
+  `src/engine/srs.ts` (pure) + `QuickRevision` now build the Schnellwiederholung deck weighted by the Mode
+  lens (theme `context`), card weakness, and the learner's weakest CEFR band (weighted selection, never a
+  wall). **(3) writing-coach deep-links** — `practiceRoute()` in `practiceAreas.ts` folds the writing
+  prompt's `theme` into the "Üben" deep-link so it opens a filtered drill set (theme-aware `/vocabulary`/
+  `/collocations`/`/quiz`; formal Redemittel for the register weakness). **Phase 4 is complete.**
+- **Historical pointer (as of session 43; see the `## Resume here` section below for current next steps) →**
+  the **taxonomy redesign (Phases 0–4) is fully shipped.** Optional follow-ups: human-verify
+  the AI-drafted `cefr` tags (provenance `draft→verified`), broaden `sector`/`workSituation` tagging, extend
+  sub-themes past 3 of 11, and (if wanted) give Redemittel a `themeId`/`counterpart` pass to unlock more
+  cross-links. Otherwise the next big rock is a **new life-domain theme** (banking / healthcare / housing)
+  per the product scope.
+
+### Session 41 (2026-06-26) — Taxonomy & filtering redesign: research deck + Mode layer + implementation plan (docs-only, MERGED ✅)
+A research + strategy + planning session. **No app code changed; documentation/artifacts only.** Scopes
+backlog **#5** (domain/sector-based filtering) plus the founder's new Work/Personal/Both idea.
+- **Strategy deck authored** in two forms: `docs/plans/TAXONOMY_REDESIGN.md` (detailed technical version) and
+  `docs/reference/TAXONOMY_REDESIGN.pptx` (**37-slide** plain-language deck for the non-technical founder, built
+  programmatically with python-pptx). Recommends a **faceted model** (mix-and-match labels) over the
+  current flat single-axis list, with a shallow **Domain → Theme → Sub-theme** hierarchy and orthogonal
+  facets (cefr, register, pos, frequency, exam tag).
+- **Diagnosis grounded in the codebase:** the app today runs three incompatible taxonomies (themes for
+  vocab/collocations, communicative function for Redemittel, grammar groups for grammar), has **no
+  CEFR/level field on any content** (only quiz `difficulty: 1|2|3`, unsurfaced), and filters via a
+  single theme `Select` in `VocabularyTrainer.tsx`.
+- **Work/Personal/Both "Mode" layer added** (founder's idea, session iteration): a top-level lens set at
+  onboarding that scopes the tree and unlocks work-only facets (**sector, workplace situation,
+  counterpart, task type**). Designed as a **lens, not a wall** (never hides content). Grounded in real
+  web research: telc/BAMF *Rahmencurriculum für den Beruf* (fields of action + counterpart), **DeuFöV**
+  state courses splitting job German by sector (care/technical/commercial), telc *Deutsch Pflege* exam,
+  and Babbel/Duolingo goal-based onboarding. Sources listed on the deck's References slides.
+- **8 UI mockups** built in `preview/taxonomy/` (HTML matching the app's brand tokens, screenshotted with
+  the bundled Chromium): before/after vocab browser, sub-topic drill-down, goal-first home,
+  connected-word detail, advanced filter sheet, **Mode picker**, **Work-mode browser**.
+- **Approved implementation plan** written to `docs/plans/TAXONOMY_IMPLEMENTATION_PLAN.md`: Phases 0–4
+  (0 = types + store `mode` + linter foundations, invisible; 1 = CEFR levels + onboarding Mode picker +
+  header switch + Level filter = first shippable milestone; 2 = sub-themes; 3 = faceted browser +
+  work-mode facets + goal cards; 4 = cross-module links + adaptive review). Reuses the existing settings
+  store (`goal`/`level` already there, cloudSync auto-syncs new keys), the linter's mirror-array pattern,
+  the onboarding `SelectRow`, and the provenance draft→verify workflow. **Decisions locked:** full
+  5-phase plan; `mode` is a NEW axis separate from the existing `goal` (exam/work/fluency).
+- **Shipped via PR #231** (squash-merged to `main`, merge SHA `6fe25c7`): all of the above docs +
+  mockups. Post-merge realignment done (branch reset to `origin/main`, force-with-lease). **Nothing is
+  implemented yet** — Phase 0–1 is the recommended next build step.

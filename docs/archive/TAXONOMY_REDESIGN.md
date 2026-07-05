@@ -10,7 +10,7 @@ Each `## Slide N` block is one slide. Read top to bottom.
 > (slides 23–25) is the part to act on; slides 1–22 are the reasoning.
 >
 > **Companion artifacts:**
-> - **`docs/plans/TAXONOMY_IMPLEMENTATION_PLAN.md`** — the approved, staged implementation plan
+> - **`docs/archive/TAXONOMY_IMPLEMENTATION_PLAN.md`** — the approved, staged implementation plan
 >   (the *how*): Phases 0–4, files to touch, reuse points, and verification gates.
 > - **`docs/reference/TAXONOMY_REDESIGN.pptx`** — a plain-language slide deck (37 slides) of this
 >   same plan, written for a non-technical reader, with **app mockups** of every idea.

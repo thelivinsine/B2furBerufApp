@@ -13,10 +13,10 @@
 > Status: **FULLY APPROVED** (founder, 2026-07-02): all four Part-H decisions recorded, including
 > the tab-bar default-pin change (approved after a plain-language walkthrough; the s26–28 bar
 > mechanics stay locked and untouched). Drafted session 46 on founder request. Supersedes the ambition level of
-> `docs/plans/FILTER_HARMONIZATION_PLAN.md` (implemented s45; its primitives are kept and reused, see
+> `docs/archive/FILTER_HARMONIZATION_PLAN.md` (implemented s45; its primitives are kept and reused, see
 > Part B). Grounded in a full-app screen review (all 13 routes, mobile + desktop) and the uploaded
 > playbook `docs/reference/Language Learning App Success Factors.docx`. Companion specs:
-> `docs/plans/TAXONOMY_REDESIGN.md`, `docs/strategy/AI_PRODUCT_STRATEGY.md`.
+> `docs/archive/TAXONOMY_REDESIGN.md`, `docs/strategy/AI_PRODUCT_STRATEGY.md`.
 
 ## Part A: key findings from the app review
 

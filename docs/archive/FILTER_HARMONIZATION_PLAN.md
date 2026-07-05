@@ -1,7 +1,7 @@
 # Harmonize the filter / search / header controls across browse pages
 
 > Status: **IMPLEMENTED** (session 45, 2026-06-29). Phase 1 (Wortschatz, Kollokationen, Redemittel) and
-> Phase 2 (QuizHub CEFR labels) both shipped. See `docs/plans/TAXONOMY_REDESIGN.md` for the underlying
+> Phase 2 (QuizHub CEFR labels) both shipped. See `docs/archive/TAXONOMY_REDESIGN.md` for the underlying
 > faceted-model spec and `docs/reference/Language Learning App Success Factors.docx` for the learning-app playbook
 > this aligns with.
 
@@ -18,7 +18,7 @@ behaves differently. From the founder's screenshots and the code audit:
 
 This violates both the project's own taxonomy spec and the uploaded learning-app playbook:
 
-- `docs/plans/TAXONOMY_REDESIGN.md` already prescribes the intended model (Slide 13–15): **Tier-1 core
+- `docs/archive/TAXONOMY_REDESIGN.md` already prescribes the intended model (Slide 13–15): **Tier-1 core
   controls always visible, Tier-2/3 facets behind one "Filter" sheet, live counts, greyed
   zero-yield options, URL-encoded state, search scoped by the active facets, Mode as a lens that
   never gatekeeps**. It was simply never applied uniformly.
