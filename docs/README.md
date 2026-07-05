@@ -31,7 +31,7 @@ authoritative current location of every file.
 | File | What it is | Status |
 |---|---|---|
 | **`PROJECT_STATUS.md`** | The single re-orientation point: current status, locked decisions, backlog, model guidance, and the authoritative **"Resume here"** handoff. | 🟢 Live, read first |
-| `SESSION_PROMPT_LOG.md` | Append-only paper trail of every founder prompt + response (authorship record for a possible copyright filing). Live file holds session 50+; older entries in `archive/SESSION_PROMPT_LOG_ARCHIVE.md`. | 🟢 Live; append every session |
+| `SESSION_PROMPT_LOG.md` | Append-only paper trail of every founder prompt + response (authorship record for a possible copyright filing). Live file holds session 50+ and rotates at ~1,200 lines; older entries archived by ISO week in `archive/prompt-log/`. | 🟢 Live; append every session |
 | `DECISIONS.md` | The "why" behind locked decisions (UX-overhaul phase history, mobile-bar mechanism/mockup detail). Split out of `CLAUDE.md` so that file stays lean; read before undoing a "locked" rule. | 🟢 Live |
 | `../CLAUDE.md` (repo root) | Developer/agent operating instructions, conventions, and locked designs. Authoritative for the mobile bottom bar and content conventions. | 🟢 Live |
 
@@ -58,7 +58,7 @@ authoritative current location of every file.
 | File | What it is | Status |
 |---|---|---|
 | `archive/PROJECT_STATUS_ARCHIVE.md` | Detailed session-by-session logs for sessions 4–46, split out of the status file to keep it navigable. | 🗄 Archive |
-| `archive/SESSION_PROMPT_LOG_ARCHIVE.md` | Prompt-log entries 1–109 (sessions 26–49), split out of the live prompt log. Append-only history; left as written. | 🗄 Archive |
+| `archive/prompt-log/` | Prompt-log entries 1–109 (sessions 26–49), split by **ISO week** (`SESSION_PROMPT_LOG_YYYY-Www.md` + a `README.md` index) so a lookup loads only one week. Append-only history; left as written. | 🗄 Archive |
 | `archive/UX_OVERHAUL_PLAN.md` | Session-first redesign (s46). All phases 0–5 shipped. | ✅ Complete (archived s55) |
 | `archive/TAXONOMY_REDESIGN.md` | Faceted taxonomy strategy deck, "what/why" (slides in `reference/TAXONOMY_REDESIGN.pptx`). | ✅ Implemented (archived s55) |
 | `archive/TAXONOMY_IMPLEMENTATION_PLAN.md` | The staged "how" for the taxonomy. Phases 0–4 shipped. | ✅ Complete (archived s55) |
