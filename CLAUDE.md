@@ -36,10 +36,12 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   search, paged-list + debounce contracts. Extend it when touching those areas.
 - `pnpm check:bundle` — main-chunk size budget, 400 kB (CI gate, s58; run after `pnpm build`).
   If a feature legitimately needs more, raise the budget in `scripts/check-bundle-size.mjs` in the
-  same PR and say why. **Keep eager code light:** the Dashboard imports `engine/sessionPreview.ts`
-  (NOT `engine/session.ts`) and `GlobalSearch` imports `lib/search` dynamically; don't re-introduce
-  a static import chain from eager code to the content banks beyond vocabulary
-  (audit: `docs/plans/APP_AUDIT_2026-07-05.md`).
+  same PR and say why. **Keep eager code light:** since the Phase-1 Heute slim-down the Dashboard
+  imports NO content bank at all (not even vocabulary; the main chunk is ~78 kB), its city strip
+  `React.lazy`-loads `components/city/CityStrip.tsx` (whose mastery resolution walks vocabulary +
+  themes), and `GlobalSearch` imports `lib/search` dynamically. Don't re-introduce a static import
+  chain from eager code to any content bank; a new Dashboard element that needs bank data belongs in
+  a lazy chunk like CityStrip (audit: `docs/plans/APP_AUDIT_2026-07-05.md`).
 
 Notes: `.npmrc` sets `minimum-release-age` (24h supply-chain cooldown) and
 `package-manager-strict`. pnpm blocks dependency build scripts by default (a supply-chain

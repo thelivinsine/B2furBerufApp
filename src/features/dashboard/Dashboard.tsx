@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -14,6 +15,10 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { dueCount } from "@/engine/srs";
 import { daysBetween, todayKey } from "@/lib/utils";
 import { intentCardsForMode, type IntentCard } from "./intentCards";
+
+// The city strip resolves mastery over the vocabulary bank, so it loads
+// lazily to keep the bank off the eager path (bundle budget, CLAUDE.md).
+const CityStrip = lazy(() => import("@/components/city/CityStrip"));
 
 /** Where a Situationen chip launches: a scoped session for theme cards, else
  *  the card's own target (writing / redemittel). */
@@ -133,6 +138,20 @@ export function Dashboard() {
           );
         })}
       </div>
+
+      {/* 4 — The city strip: lit = mastered, tap = practice that district.
+          Buildings without content yet stay unlit and inert (future packs). */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.16 }}
+        role="group"
+        aria-label="Deine Stadt"
+      >
+        <Suspense fallback={<div className="h-[72px] rounded-2xl border border-border bg-surface" />}>
+          <CityStrip />
+        </Suspense>
+      </motion.div>
     </div>
   );
 }
