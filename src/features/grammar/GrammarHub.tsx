@@ -53,11 +53,24 @@ export function GrammarHub() {
       .filter((x) => x.topics.length > 0);
   }, []);
 
+  // Keep `tab=grammatik` (and any other params) intact when opening/closing a
+  // topic; replacing the whole param set bounced /library back to the default
+  // Wörter tab.
+  const close = () => {
+    const p = new URLSearchParams(params);
+    p.delete("topic");
+    setParams(p, { replace: true });
+  };
+
   if (topicId && topic) {
-    return <GrammarTopicView topic={topic} onBack={() => setParams({}, { replace: true })} />;
+    return <GrammarTopicView topic={topic} onBack={close} />;
   }
 
-  const open = (id: string) => setParams({ topic: id });
+  const open = (id: string) => {
+    const p = new URLSearchParams(params);
+    p.set("topic", id);
+    setParams(p);
+  };
 
   return (
     <div className="space-y-4 sm:space-y-6">
