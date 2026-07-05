@@ -398,6 +398,17 @@ export type SessionBlock =
       drill: GrammarDrill;
       /** Human-readable group label for the end-screen forward hook. */
       groupLabel: string;
+    }
+  | {
+      kind: "speaking";
+      key: string;
+      /** Vocab SRS id used to record the result. */
+      sourceId: string;
+      /** The German target the learner must produce out loud. */
+      de: string;
+      en: string;
+      /** English example for context (the German sentence would reveal the answer). */
+      example?: string;
     };
 
 /** An ordered, composed session plus a preview line for the Heute hero. */

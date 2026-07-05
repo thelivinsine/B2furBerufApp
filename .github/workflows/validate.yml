@@ -41,3 +41,8 @@ jobs:
       # against golden vectors from the py-fsrs reference implementation.
       - name: Test SRS engine
         run: pnpm test:srs
+
+      # Speaking-block matcher gate (Learning Engine #27): pins the tolerant
+      # spoken/typed answer matching contract of src/engine/pronounce.ts.
+      - name: Test pronounce matcher
+        run: pnpm test:pronounce

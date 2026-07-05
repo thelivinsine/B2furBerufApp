@@ -12,6 +12,7 @@
     "typecheck": "tsc -b --noEmit",
     "lint:content": "node scripts/lint-content.mjs",
     "test:srs": "node scripts/test-srs.mjs",
+    "test:pronounce": "node scripts/test-pronounce.mjs",
     "generate:provenance": "node scripts/generate-provenance-stubs.mjs",
     "check:refs": "node scripts/check-provenance-refs.mjs"
   },
