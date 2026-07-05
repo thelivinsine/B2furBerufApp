@@ -42,6 +42,11 @@ const config: Config = {
           DEFAULT: "hsl(var(--danger))",
           foreground: "hsl(var(--danger-foreground))",
         },
+        // Reward-gold (redesign Phase 2.3): loot / combo / lit buildings only.
+        reward: {
+          DEFAULT: "hsl(var(--reward))",
+          bg: "hsl(var(--reward-bg))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

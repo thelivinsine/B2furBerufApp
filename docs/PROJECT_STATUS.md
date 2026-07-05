@@ -1,13 +1,13 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (session 64: UX redesign **Phase 1 "The Diet" EXECUTED** on the session
-branch, per `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`. All six tasks shipped: pedagogy defaults
-flipped ON with a settings-store v2 persist migration, Heute slimmed to 3 elements, onboarding
-collapsed to one setup screen + composed taster, a new `<Gloss>` tap-translate component, and an
-app-wide microcopy sweep. Next: redesign Phase 2 "The Stage". Session 62's game plan,
-`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and sequences after redesign Phases
-1–3). The working branch is reassigned every session, so **`main` is always the source of
-truth**. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-05 (session 64: UX redesign **Phases 1 "The Diet" AND 2 "The Stage" EXECUTED**
+on the session branch, per `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`. Phase 1 (shipped in PR #305):
+pedagogy defaults ON + settings-store v2 migration, 3-element Heute, one-screen onboarding + taster,
+`<Gloss>`, microcopy sweep. Phase 2: full-screen focus-mode `/session`, combo counter + reward-gold
+tokens, loot-drop end screen + `engine/collection.ts` Lv mapping (unit-tested). Next: redesign Phase 3
+"The World Seed". Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and
+sequences after redesign Phases 1–3). The working branch is reassigned every session, so **`main` is
+always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the single place to re-orient when resuming work. **The one authoritative "what to do next"
 pointer is the `## Resume here (next session)` section near the end of this file** — start there. Older
@@ -607,8 +607,42 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 
 ## Resume here (next session)
 
-**Handoff after session 64 (2026-07-05). UX redesign Phase 1 "The Diet" is EXECUTED ✅ on the
-session branch (all six tasks; plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+**Handoff after session 64 (2026-07-05, part 2). UX redesign Phase 2 "The Stage" is EXECUTED ✅ on the
+session branch (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+- **2.1 Focus mode (`AppShell.tsx` + `useSessionStore`).** New transient `focusMode` flag: the
+  SessionPlayer sets it true while a block is on screen (via `useLayoutEffect`, so no chrome flash) and
+  false on the end/empty screen and on unmount. AppShell hides the header, bottom bar and sidebar when
+  `focusMode && pathname ∈ {/session, /revision}`, so the session plays full-screen. The locked bottom-bar
+  internals (s26-29, iOS `translateZ`/`no-callout` fixes) are untouched, just not mounted in focus mode.
+- **2.2 SessionPlayer focus refactor.** One block per screen on a min-h-screen stage: a top rail (✕ exit
+  with a confirm overlay using the locked `bg-dialog-overlay` token, thin progress bar, combo/XP),
+  centered block with horizontal slide transitions, display-size German (flashcard/speaking bumped to
+  `text-3xl sm:text-4xl`). The 26a latency signal is preserved: `captureLoot` still threads `latencyMs`
+  into `reviewVocab` for flashcard/quiz/speaking.
+- **2.3 Combo counter + reward-gold tokens.** Consecutive-correct `combo` (resets on a miss); a gold pulse
+  pill appears at ≥3 (framer `key={combo}` spring). New `--reward`/`--reward-bg` HSL tokens (index.css,
+  both themes) + Tailwind `reward`/`reward-bg`, reserved for loot / combo / lit buildings.
+- **2.4 `engine/collection.ts` + unit test.** Pure `cardLevel(card)` maps FSRS stability (legacy interval
+  fallback) to Lv 0-5 via fixed day bands [1,7,21,60]; `leveledUp(before, after)` compares. 5 new Vitest
+  cases in `tests/collection.test.ts` pin the boundaries. This is the **stable game contract**; do not drift
+  the bands.
+- **2.5 Loot-drop end screen.** A `RewardRing` (animated gold conic-equivalent SVG ring filling to the daily
+  goal %), reviewed words as `LootCard`s showing `Lv n` and an ↑ on cards that leveled this session
+  (captured via before/after `cardLevel` around each synchronous `reviewVocab`), and the kept "Morgen: X
+  festigen" forward hook. Chrome returns here (focus flag cleared).
+- **Gates.** All green: `build`, `typecheck`, `lint` (0 errors / 31 baseline warnings), `lint:content`,
+  `test:unit` (**28**, +5 collection), `check:bundle` (main chunk **78.2 kB**), `test:srs` (323). Self-review
+  clean; no locked files' internals touched.
+
+**Next step: redesign Phase 3 "The World Seed"** (six Fable-designed SVG domain buildings, city strip on
+Heute, Fortschritt quest cards, „Meine Sammlung" bag view reusing `engine/collection.ts`). Task 3.1 (the SVG
+buildings) is the Fable-tier illustration task; the rest is Sonnet-tier presentational wiring. Watch
+`check:bundle` as SVGs + new views land.
+
+---
+
+**Earlier handoff after session 64 (2026-07-05, part 1). UX redesign Phase 1 "The Diet" is EXECUTED ✅ and
+merged to `main` (PR #305, squash `3a044a5`; plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
 - **1.1 Pedagogy defaults ON (`src/store/useSettingsStore.ts`).** `voiceVariety` and
   `recognitionEnabled` now default `true`. Persist config bumped **v1 → v2** with a migrate that flips
   a persisted `false → true` for existing users (both switches were default-off and effectively inert,

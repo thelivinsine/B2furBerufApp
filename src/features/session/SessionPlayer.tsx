@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Zap,
@@ -6,24 +6,27 @@ import {
   X,
   ChevronRight,
   ArrowRight,
+  ArrowUp,
   Trophy,
   Sparkles,
   RotateCw,
-  TrendingUp,
+  Flame,
   Mic,
   Keyboard,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { SessionBlock } from "@/types";
-import { useProgressStore } from "@/store/useProgressStore";
+import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { buildSession, difficultyForLevel } from "@/engine/session";
+import { cardLevel, leveledUp } from "@/engine/collection";
 import { quizXp } from "@/engine/quiz";
 import { XP } from "@/engine/scoring";
 import { listen, recognitionSupported, type RecognitionHandle } from "@/engine/speech";
 import { matchesSpoken } from "@/engine/pronounce";
 import { useCountdown } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import { QuestionView, kindLabel } from "@/features/quiz/QuestionViews";
 import { GrammarDrillCard } from "@/features/grammar/GrammarDrillCard";
 import { Button } from "@/components/ui/button";
@@ -34,9 +37,13 @@ import { SpeakButton } from "@/components/shared/SpeakButton";
 import { Gloss } from "@/features/shared/Gloss";
 import type { ThemeId } from "@/types";
 
-interface Reinforced {
+/** A word practiced this session, rendered as a collectible card on the end
+ *  screen. `up` marks a collection-level increase (Phase 2.4 game contract). */
+interface LootItem {
   de: string;
   en: string;
+  level: number;
+  up: boolean;
 }
 
 interface SessionPlayerProps {
@@ -49,8 +56,9 @@ interface SessionPlayerProps {
 /**
  * The one player for a composed session (UX overhaul Phase 1). It renders any
  * block kind the composer produced (vocab/Redemittel flashcard, leveled quiz
- * question, grammar micro-drill) behind a single progress bar + XP tally, then
- * shows an end screen: XP earned, what got stronger, and one forward hook.
+ * question, grammar micro-drill) as a full-screen focus stage (Phase 2): one
+ * block per screen, a thin progress bar, a combo counter, then a loot-drop end
+ * screen (ring fill, collected words as leveled cards, one forward hook).
  * Schnellwiederholung is just this player with a short `minutes` preset.
  *
  * The wrapper only holds a run counter: "Neue Runde" bumps it, remounting the
@@ -65,7 +73,6 @@ export function SessionPlayer(props: SessionPlayerProps) {
 function SessionRun({
   minutes,
   eyebrow = "Session",
-  title = "Deine Session",
   scope,
   onRestart,
 }: SessionPlayerProps & { onRestart: () => void }) {
@@ -74,12 +81,15 @@ function SessionRun({
   const savedWords = useProgressStore((s) => s.savedWords);
   const mode = useSettingsStore((s) => s.mode);
   const level = useSettingsStore((s) => s.level);
+  const goal = useSettingsStore((s) => s.dailyGoalXp);
   const recognitionEnabled = useSettingsStore((s) => s.recognitionEnabled);
   const addXp = useProgressStore((s) => s.addXp);
+  const todayXp = useTodayXp();
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
   const practiceRedemittel = useProgressStore((s) => s.practiceRedemittel);
   const registerSession = useProgressStore((s) => s.registerSession);
   const showToast = useSessionStore((s) => s.showToast);
+  const setFocusMode = useSessionStore((s) => s.setFocusMode);
 
   // Build once on mount: the composer samples, so re-building each render would
   // reshuffle the deck under the learner.
@@ -103,18 +113,51 @@ function SessionRun({
   const [sttDisabled, setSttDisabled] = useState(false);
   const [xpEarned, setXpEarned] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
-  const [stronger, setStronger] = useState<Reinforced[]>([]);
+  const [combo, setCombo] = useState(0);
+  const [loot, setLoot] = useState<LootItem[]>([]);
   const [done, setDone] = useState(false);
+  const [exitConfirm, setExitConfirm] = useState(false);
 
   const total = plan.blocks.length;
   const block = plan.blocks[index];
 
-  const pushStronger = (r: Reinforced) =>
-    setStronger((list) => (list.some((x) => x.de === r.de) ? list : [...list, r]));
+  // Focus mode (Phase 2.1): a full-screen stage while a block is on screen; the
+  // chrome returns on the end/empty screen (and when this run unmounts).
+  useLayoutEffect(() => {
+    setFocusMode(!done && total > 0);
+    return () => setFocusMode(false);
+  }, [done, total, setFocusMode]);
 
   const award = (xp: number) => {
     addXp(xp);
     setXpEarned((v) => v + xp);
+  };
+
+  // Combo (Phase 2.3): consecutive-correct counter, resets on a miss. Also owns
+  // the correct tally so every block kind funnels through one place.
+  const registerResult = (correct: boolean) => {
+    if (correct) setCorrectCount((c) => c + 1);
+    setCombo((c) => (correct ? c + 1 : 0));
+  };
+
+  // Collect a practiced word as loot (Phase 2.4/2.5): read the card level before
+  // and after the review so the end screen can mark level-ups. reviewVocab writes
+  // synchronously, so getState() straddles the update.
+  const captureLoot = (
+    sourceId: string,
+    de: string,
+    en: string,
+    correct: boolean,
+    latencyMs?: number,
+  ) => {
+    const before = useProgressStore.getState().srs[sourceId];
+    reviewVocab(sourceId, correct ? 4 : 0, latencyMs);
+    const after = useProgressStore.getState().srs[sourceId];
+    setLoot((list) =>
+      list.some((x) => x.de === de)
+        ? list
+        : [...list, { de, en, level: cardLevel(after), up: leveledUp(before, after) }],
+    );
   };
 
   const finish = () => {
@@ -137,35 +180,25 @@ function SessionRun({
     if (answered) return;
     setAnswered(true);
     const q = (block as Extract<SessionBlock, { kind: "quiz" }>).question;
-    if (q.sourceId && q.kind !== "matching") reviewVocab(q.sourceId, correct ? 4 : 0, latencyMs);
-    if (correct) {
-      award(quizXp(q.difficulty));
-      setCorrectCount((c) => c + 1);
-      if (q.kind !== "matching") pushStronger({ de: q.prompt, en: q.answer });
-    }
+    registerResult(correct);
+    if (q.sourceId && q.kind !== "matching") captureLoot(q.sourceId, q.prompt, q.answer, correct, latencyMs);
+    if (correct) award(quizXp(q.difficulty));
   };
 
   const onGrammarResult = (correct: boolean) => {
     if (answered) return;
     setAnswered(true);
-    const b = block as Extract<SessionBlock, { kind: "grammar" }>;
-    if (correct) {
-      award(XP.grammarDrill);
-      setCorrectCount((c) => c + 1);
-      pushStronger({ de: b.groupLabel, en: b.drill.answer });
-    }
+    registerResult(correct);
+    if (correct) award(XP.grammarDrill);
   };
 
   const onSpeakingResult = (correct: boolean, latencyMs?: number) => {
     if (answered) return;
     setAnswered(true);
     const b = block as Extract<SessionBlock, { kind: "speaking" }>;
-    reviewVocab(b.sourceId, correct ? 4 : 0, latencyMs);
-    if (correct) {
-      award(XP.speakingDrill);
-      setCorrectCount((c) => c + 1);
-      pushStronger({ de: b.de, en: b.en });
-    }
+    registerResult(correct);
+    captureLoot(b.sourceId, b.de, b.en, correct, latencyMs);
+    if (correct) award(XP.speakingDrill);
   };
 
   const onSttError = () => {
@@ -175,15 +208,12 @@ function SessionRun({
 
   const onFlashcardGrade = (correct: boolean, latencyMs?: number) => {
     const b = block as Extract<SessionBlock, { kind: "flashcard" }>;
-    // Latency only attributes to a real SRS card (the vocab branch); the
-    // Redemittel branch has no card, so the sample is dropped.
-    if (b.source === "vocab") reviewVocab(b.sourceId, correct ? 4 : 0, latencyMs);
+    registerResult(correct);
+    // Latency + loot only attribute to a real SRS card (the vocab branch); the
+    // Redemittel branch has no card, so the sample is dropped and it isn't loot.
+    if (b.source === "vocab") captureLoot(b.sourceId, b.de, b.en, correct, latencyMs);
     else practiceRedemittel(b.sourceId);
-    if (correct) {
-      award(XP.flashcard);
-      setCorrectCount((c) => c + 1);
-      pushStronger({ de: b.de, en: b.en });
-    }
+    if (correct) award(XP.flashcard);
     advance();
   };
 
@@ -209,32 +239,34 @@ function SessionRun({
 
   if (done) {
     const pct = Math.round((correctCount / total) * 100);
+    const goalPercent = Math.round(Math.min(todayXp / Math.max(goal, 1), 1) * 100);
     return (
-      <div className="mx-auto max-w-xl space-y-5">
-        <EmptyState
-          icon={Trophy}
-          title={`+${xpEarned} XP · ${correctCount}/${total} richtig`}
-          description={
-            pct >= 70 ? "Starke Runde! Das sitzt immer besser." : "Gut gemacht. Wiederholung festigt es."
-          }
-        />
-
-        {stronger.length > 0 && (
-          <div className="rounded-2xl border border-success/25 bg-success/5 p-4">
-            <p className="flex items-center gap-2 text-sm font-semibold text-success">
-              <TrendingUp className="h-4 w-4" /> Stärker geworden
+      <div className="mx-auto max-w-xl space-y-6 py-4">
+        {/* Loot drop: the daily ring fills, then the XP tally lands. */}
+        <div className="flex flex-col items-center gap-3 text-center">
+          <RewardRing percent={goalPercent} />
+          <div>
+            <p className="text-2xl font-bold tabular-nums">+{xpEarned} XP</p>
+            <p className="text-sm tabular-nums text-muted-foreground">
+              {correctCount}/{total} richtig · {pct >= 70 ? "starke Runde" : "gut gemacht"}
             </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {stronger.slice(0, 6).map((r) => (
-                <Badge key={r.de} variant="success" className="max-w-full truncate">
-                  {r.de}
-                </Badge>
+          </div>
+        </div>
+
+        {loot.length > 0 && (
+          <div>
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-reward">
+              Gesammelt
+            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {loot.map((item, i) => (
+                <LootCard key={item.de} item={item} index={i} />
               ))}
             </div>
           </div>
         )}
 
-        <div className="rounded-2xl border border-border bg-surface p-4">
+        <div className="rounded-2xl border border-border bg-surface p-4 text-center">
           <p className="text-sm text-muted-foreground">
             Morgen: <span className="font-medium text-foreground">{plan.focus}</span> festigen.
           </p>
@@ -252,34 +284,49 @@ function SessionRun({
     );
   }
 
-  /* ---- Active block ---- */
+  /* ---- Active block (full-screen focus stage, Phase 2.2) ---- */
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <SectionHeading eyebrow={eyebrow} title={title} description={plan.preview} />
+    <div className="flex min-h-screen flex-col py-3">
+      {/* Top rail: exit, thin progress, combo / XP. */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={() => setExitConfirm(true)}
+          aria-label="Session verlassen"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        <Progress value={(index / total) * 100} className="flex-1" />
+        {combo >= 3 ? (
+          <motion.span
+            key={combo}
+            initial={{ scale: 0.7 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", stiffness: 500, damping: 18 }}
+            className="flex shrink-0 items-center gap-1 rounded-full bg-reward-bg px-2.5 py-1 text-xs font-bold text-reward"
+          >
+            <Flame className="h-3.5 w-3.5" /> ×{combo}
+          </motion.span>
+        ) : (
+          <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-primary">
+            <Zap className="h-3.5 w-3.5" /> {xpEarned}
+          </span>
+        )}
+      </div>
 
-      <div className="mx-auto max-w-2xl space-y-5">
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between text-xs text-muted-foreground">
-            <span>
-              Schritt {index + 1} von {total}
-            </span>
-            <span className="flex items-center gap-1 font-medium text-primary">
-              <Zap className="h-3.5 w-3.5" /> {xpEarned} XP
-            </span>
-          </div>
-          <Progress value={(index / total) * 100} />
-        </div>
-
+      {/* Center stage: one block per screen, slide transitions. */}
+      <div className="flex flex-1 flex-col justify-center py-4">
         <AnimatePresence mode="wait">
           {/* key={block.key} is load-bearing: it remounts the block per step, which
               resets FlashcardBlock's mount-time timer and MCQView's per-prompt timer
               (26a latency capture). */}
           <motion.div
             key={block.key}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
+            initial={{ opacity: 0, x: 24 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -24 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
           >
             {block.kind === "flashcard" && (
               <FlashcardBlock block={block} onGrade={onFlashcardGrade} />
@@ -310,16 +357,104 @@ function SessionRun({
             )}
           </motion.div>
         </AnimatePresence>
+      </div>
 
+      {/* Bottom action: advance after a non-flashcard answer. */}
+      <div className="min-h-[3.5rem]">
         {block.kind !== "flashcard" && answered && (
           <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <Button variant="gradient" className="w-full" onClick={advance}>
+            <Button variant="gradient" className="h-12 w-full" onClick={advance}>
               {index + 1 >= total ? "Session beenden" : "Weiter"} <ArrowRight className="h-4 w-4" />
             </Button>
           </motion.div>
         )}
       </div>
+
+      {/* Exit confirm overlay (uses the locked dialog-overlay token). */}
+      <AnimatePresence>
+        {exitConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-dialog-overlay p-6"
+            onClick={() => setExitConfirm(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-xs rounded-2xl border border-border bg-surface p-5 text-center shadow-elevated-soft"
+            >
+              <p className="font-semibold">Session beenden?</p>
+              <p className="mt-1 text-sm text-muted-foreground">Dein Fortschritt bleibt gespeichert.</p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                <Button variant="outline" onClick={() => setExitConfirm(false)}>
+                  Weiter üben
+                </Button>
+                <Button variant="gradient" onClick={() => navigate("/")}>
+                  Beenden
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+/* ---------------- End-screen loot (Phase 2.5) ---------------- */
+
+/** The daily-goal ring, animated fill in reward-gold, with a trophy center. */
+function RewardRing({ percent }: { percent: number }) {
+  const r = 42;
+  const circ = 2 * Math.PI * r;
+  return (
+    <div className="relative h-28 w-28">
+      <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+        <circle cx="50" cy="50" r={r} fill="none" stroke="hsl(var(--border))" strokeWidth="8" />
+        <motion.circle
+          cx="50"
+          cy="50"
+          r={r}
+          fill="none"
+          stroke="hsl(var(--reward))"
+          strokeWidth="8"
+          strokeLinecap="round"
+          strokeDasharray={circ}
+          initial={{ strokeDashoffset: circ }}
+          animate={{ strokeDashoffset: circ * (1 - percent / 100) }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Trophy className="h-8 w-8 text-reward" />
+      </div>
+    </div>
+  );
+}
+
+/** A practiced word as a collectible card; leveled-up cards glow reward-gold. */
+function LootCard({ item, index }: { item: LootItem; index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: 0.15 + index * 0.05, type: "spring", stiffness: 400, damping: 22 }}
+      className={cn(
+        "rounded-xl border p-3",
+        item.up ? "border-reward/40 bg-reward-bg" : "border-border bg-surface",
+      )}
+    >
+      <p className="truncate text-sm font-semibold">{item.de}</p>
+      <p className="truncate text-xs text-muted-foreground">{item.en}</p>
+      <div className="mt-1.5 flex items-center gap-1 text-xs font-bold text-reward">
+        Lv {item.level}
+        {item.up && <ArrowUp className="h-3 w-3" />}
+      </div>
+    </motion.div>
   );
 }
 
@@ -463,7 +598,7 @@ function SpeakingBlock({
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Sag es auf Deutsch:
         </p>
-        <p className="text-center text-2xl font-semibold">{block.en}</p>
+        <p className="text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
         {block.example && (
           <p className="text-center text-sm italic text-muted-foreground">„{block.example}"</p>
         )}
@@ -606,7 +741,7 @@ function FlashcardBlock({
         >
           {/* Front */}
           <div className="[grid-area:1/1] flex flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-surface p-6 shadow-soft [backface-visibility:hidden]">
-            <p className="text-center text-2xl font-semibold">{block.de}</p>
+            <p className="text-center text-3xl font-semibold sm:text-4xl">{block.de}</p>
             <SpeakButton text={block.de} />
             <p className="text-xs text-muted-foreground">Tippen zum Umdrehen</p>
           </div>
