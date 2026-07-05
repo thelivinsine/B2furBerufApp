@@ -47,7 +47,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 
 ## Layout (`src/`)
 - `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`, `domains.ts`, `collocations.ts`, `provenance.ts`, `canDo.ts` (Can-Do milestones, s47)
-- `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (FSRS-6 spaced repetition since s53; legacy SM-2 fields kept warm for rollback), `pronounce.ts` (tolerant spoken-answer matcher for the speaking block, s56), `quiz.ts`, `session.ts` (composed-session composer, s47; speaking pool added s56 behind the `recognitionEnabled` opt-in)
+- `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (FSRS-6 spaced repetition since s53; legacy SM-2 fields kept warm for rollback), `pronounce.ts` (tolerant spoken-answer matcher for the speaking block, s56), `quiz.ts`, `session.ts` (composed-session composer, s47; speaking pool added s56 behind the `recognitionEnabled` opt-in), `collection.ts` (redesign Phase 2.4: pure FSRS-stability→Lv 1-5 "collection level" mapping, the stable game contract for loot cards / Sammlung; unit-tested, do not drift the band boundaries)
 - `store/` — zustand stores: `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`, `useLibraryScope` (travelling library scope, s47)
 - `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47)
 - `features/session/` — `SessionPlayer` + `Session` route wrapper (the composed learning loop, s47)
@@ -61,6 +61,11 @@ The app was migrated from a "drawer of 11 tools" to a **session-first learning l
 phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you must not regress:
 - **Session engine:** `engine/session.ts` composer + `SessionPlayer` + `/session`; Schnellwiederholung
   is the ~5-min preset. Focused practice flows through the toolbar's **Üben → composed session**.
+  **Focus mode (redesign Phase 2.1):** `SessionPlayer` sets `useSessionStore.focusMode` while a block
+  is on screen, and `AppShell` hides all chrome (header, bottom bar, sidebar) on `/session` + `/revision`
+  so the session plays as a full-screen stage; chrome returns on the end screen. The locked bottom-bar
+  internals are untouched (just not mounted in focus mode). Reward-gold tokens (`--reward`/`--reward-bg`,
+  Tailwind `reward`/`reward-bg`) are reserved for loot / combo / lit buildings only.
 - **Global search:** `lib/search.ts` `searchAll` + `GlobalSearch` (header icon / Sidebar / ⌘K).
 - **Bibliothek hub:** single `/library?tab=woerter|kollokationen|redemittel|grammatik`; old routes
   (`/vocabulary`, `/collocations`, `/redemittel`, `/grammar`) redirect in (query params preserved).

@@ -46,6 +46,11 @@ input:-webkit-autofill {
     --danger: 0 72% 56%;
     --danger-foreground: 0 0% 100%;
 
+    /* Reward-gold (redesign Phase 2.3): reserved for loot / combo / lit
+       buildings only. `reward` is the gold mark, `reward-bg` its pale tint. */
+    --reward: 38 95% 44%;
+    --reward-bg: 39 88% 94%;
+
     --shadow: 240 30% 30%;
     --radius: 0.875rem;
   }
@@ -74,6 +79,9 @@ input:-webkit-autofill {
     --warning-foreground: 30 40% 10%;
     --danger: 0 72% 62%;
     --danger-foreground: 240 30% 8%;
+
+    --reward: 36 79% 57%;
+    --reward-bg: 38 45% 13%;
 
     --shadow: 240 60% 2%;
   }

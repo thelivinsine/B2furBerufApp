@@ -8,6 +8,7 @@ import { BottomTabBar } from "./BottomTabBar";
 import { MoreSheet } from "./MoreSheet";
 import { GlobalSearch } from "./GlobalSearch";
 import { useEffectiveStreak } from "@/store/useProgressStore";
+import { useSessionStore } from "@/store/useSessionStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Toaster } from "./Toaster";
 import { ModeSwitcher } from "./ModeSwitcher";
@@ -66,6 +67,16 @@ export function AppShell() {
   // dashboard after a missed day.
   const streak = useEffectiveStreak();
 
+  // Focus mode (Phase 2.1): the SessionPlayer flags an active composed session,
+  // and we hide all chrome (header, bottom bar, sidebar) so it plays as a
+  // full-screen stage. Both routes that mount the player (`/session` and the
+  // Schnellwiederholung preset `/revision`) qualify; gating on the route too
+  // means a stale flag can never strand the app chromeless anywhere else.
+  // Chrome returns on the end screen (the player clears the flag) and off-route.
+  const focusMode = useSessionStore((s) => s.focusMode);
+  const focus =
+    focusMode && (location.pathname === "/session" || location.pathname === "/revision");
+
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we
   // send them back to /writing, where WritingHub restores the text and resumes
@@ -100,35 +111,42 @@ export function AppShell() {
       <Toaster />
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border bg-surface/60 backdrop-blur-xl lg:block">
-        <Sidebar onSearch={() => setSearchOpen(true)} />
-      </aside>
+      {!focus && (
+        <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-border bg-surface/60 backdrop-blur-xl lg:block">
+          <Sidebar onSearch={() => setSearchOpen(true)} />
+        </aside>
+      )}
 
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
-      {/* Mobile bottom tab bar + "Mehr" sheet */}
-      <BottomTabBar
-        onMore={toggleMore}
-        onNavigate={closeMore}
-        onLongPress={enterEditMode}
-        editMode={editMode}
-        moreOpen={moreOpen}
-      />
-      <MoreSheet
-        open={moreOpen}
-        editMode={editMode}
-        onLongPress={enterEditMode}
-        onOpenChange={open => {
-          setMoreOpen(open);
-          if (!open) setEditMode(false); // auto-save: edit mode ends when sheet closes
-        }}
-      />
+      {/* Mobile bottom tab bar + "Mehr" sheet (hidden in focus mode) */}
+      {!focus && (
+        <>
+          <BottomTabBar
+            onMore={toggleMore}
+            onNavigate={closeMore}
+            onLongPress={enterEditMode}
+            editMode={editMode}
+            moreOpen={moreOpen}
+          />
+          <MoreSheet
+            open={moreOpen}
+            editMode={editMode}
+            onLongPress={enterEditMode}
+            onOpenChange={open => {
+              setMoreOpen(open);
+              if (!open) setEditMode(false); // auto-save: edit mode ends when sheet closes
+            }}
+          />
+        </>
+      )}
 
-      <div className="lg:pl-64">
+      <div className={cn(!focus && "lg:pl-64")}>
         {/* Top bar */}
         {/* Mobile gets a lighter blur + more opaque surface: backdrop-filter on
             fixed/sticky layers repaints on every scroll frame and was a scroll-
             jank source on phones (audit B3). Desktop keeps the original look. */}
+        {!focus && (
         <header className="sticky top-0 z-20 border-b border-border bg-surface/90 pt-safe backdrop-blur-md lg:bg-surface/70 lg:backdrop-blur-xl">
           <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-2">
@@ -166,8 +184,15 @@ export function AppShell() {
             </div>
           </div>
         </header>
+        )}
 
-        <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8">
+        <main
+          className={cn(
+            focus
+              ? "mx-auto flex min-h-screen w-full max-w-2xl flex-col px-4 pt-safe pb-safe sm:px-6"
+              : "mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8",
+          )}
+        >
           {location.pathname === "/" && <SaveProgressBanner />}
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}>
