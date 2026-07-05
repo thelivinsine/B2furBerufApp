@@ -9,6 +9,7 @@ import {
 afterEach(cleanup);
 
 const REWARD = "hsl(var(--reward))";
+const DARK = "#0c1222";
 
 describe("domain-buildings registry", () => {
   it("has exactly the six city buildings with unique ids and base colors", () => {
@@ -43,14 +44,16 @@ describe("DomainBuildingIcon", () => {
     }
   });
 
-  it("uses reward gold only in the lit state", () => {
+  it("darkens the openings when unlit and never uses reward gold", () => {
     for (const b of DOMAIN_BUILDINGS) {
       const unlit = render(<DomainBuildingIcon id={b.id} />);
+      expect(unlit.container.innerHTML).toContain(DARK);
       expect(unlit.container.innerHTML).not.toContain(REWARD);
       unlit.unmount();
 
       const lit = render(<DomainBuildingIcon id={b.id} lit />);
-      expect(lit.container.innerHTML).toContain(REWARD);
+      expect(lit.container.innerHTML).not.toContain(DARK);
+      expect(lit.container.innerHTML).not.toContain(REWARD);
       lit.unmount();
     }
   });

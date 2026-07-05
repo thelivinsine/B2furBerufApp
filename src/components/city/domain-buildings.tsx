@@ -10,12 +10,13 @@ import type { DomainId, ThemeId } from "@/types";
 // is two-tone, a base accent plus a hard-coded brighter neon second tone,
 // on a 20×20 grid with optical-size normalisation.
 //
-// Each building has an UNLIT and a LIT state. Lit swaps the glow elements
-// (windows, doors, emblems) to the reward-gold token, which is reserved for
-// loot / combo / lit buildings (redesign Phase 2.3) and adapts to dark mode
-// via hsl(var(--reward)). Unlit keeps them as quiet white/tint details, so
-// an unlit building still looks like a finished mark, just with the lights
-// off. Container styling (halo, chip, label) is the call site's job.
+// Each building has an UNLIT and a LIT state (founder-tuned, session 66):
+// LIT renders the glow elements (windows, doors, emblems) as bright white
+// details; UNLIT renders the same elements as dark shaded openings, so the
+// building keeps its color but clearly has the lights off. No reward-gold
+// in these marks (the gold-window variant was tried and rejected; gold
+// stays reserved for loot/combo moments). Container styling (halo, chip,
+// label) is the call site's job.
 //
 // Soft corners everywhere (founder feedback, session 66): every rect
 // carries an rx, and pointed shapes (pediment, roofs, dome base) are
@@ -69,13 +70,13 @@ export const DOMAIN_BUILDINGS: DomainBuilding[] = [
 export const domainBuildingById = (id: DomainBuildingId) =>
   DOMAIN_BUILDINGS.find(b => b.id === id)!;
 
-/** Reward-gold token (Phase 2.3); adapts to dark mode via the CSS var. */
-const REWARD = "hsl(var(--reward))";
+/** Dark shade for unlit openings ("lights off"). */
+const DARK = "#0c1222";
 
-/** Fill props for a glow element (window/door/emblem): quiet white detail
- *  when unlit, full reward-gold when lit. */
-const glow = (lit: boolean, unlitOpacity: number) =>
-  lit ? { fill: REWARD } : { fill: "#fff", opacity: unlitOpacity };
+/** Fill props for a glow element (window/door/emblem): bright white when
+ *  lit, a dark shaded opening when unlit. */
+const glow = (lit: boolean, litOpacity: number) =>
+  lit ? { fill: "#fff", opacity: litOpacity } : { fill: DARK, opacity: 0.28 };
 
 type Render = (c: string, lit: boolean) => ReactNode;
 
@@ -102,9 +103,9 @@ const RENDERERS: Record<DomainBuildingId, Render> = {
     <>
       {[5.8, 9.2, 12.6].map(x =>
         lit ? (
-          <rect key={x} x={x} y="8.2" width="1.6" height="7.7" fill={REWARD} />
-        ) : (
           <rect key={x} x={x} y="8.2" width="1.6" height="7.7" fill={c} opacity="0.28" />
+        ) : (
+          <rect key={x} x={x} y="8.2" width="1.6" height="7.7" fill={DARK} opacity="0.24" />
         )
       )}
       {[4.0, 7.4, 10.8, 14.2].map(x => (
@@ -123,16 +124,16 @@ const RENDERERS: Record<DomainBuildingId, Render> = {
     </>
   ),
   // Bank — sky-blue block with a neon-cyan cornice; the coin-ring emblem
-  // turns gold when lit.
+  // brightens to white when lit.
   bank: (c, lit) => (
     <>
       <rect x="3.2" y="6.1" width="13.6" height="10.1" rx="0.9" fill={c} />
       <rect x="2.4" y="4.8" width="15.2" height="1.7" rx="0.85" fill="#67e8f9" />
       <rect x="2.6" y="15.7" width="14.8" height="1.5" rx="0.7" fill={c} opacity="0.85" />
       {lit ? (
-        <circle cx="10" cy="9.7" r="1.7" fill="none" strokeWidth="1.25" stroke={REWARD} />
-      ) : (
         <circle cx="10" cy="9.7" r="1.7" fill="none" strokeWidth="1.25" stroke="#fff" opacity="0.85" />
+      ) : (
+        <circle cx="10" cy="9.7" r="1.7" fill="none" strokeWidth="1.25" stroke={DARK} opacity="0.3" />
       )}
       <rect x="8.9" y="13.6" width="2.2" height="2.1" rx="0.5" {...glow(lit, 0.5)} />
       <rect x="4.6" y="12.4" width="1.9" height="1.9" rx="0.5" {...glow(lit, 0.5)} />
@@ -140,7 +141,7 @@ const RENDERERS: Record<DomainBuildingId, Render> = {
     </>
   ),
   // Arztpraxis — rose clinic with a neon roofband; the white cross sign
-  // glows gold when lit (like a pharmacy sign at night).
+  // shows as a dark silhouette until lit (like a pharmacy sign at night).
   arztpraxis: (c, lit) => (
     <>
       <rect x="3.4" y="6.2" width="13.2" height="11" rx="0.9" fill={c} />
@@ -223,7 +224,7 @@ export function DomainBuildingIcon({
   size = 56,
 }: {
   id: DomainBuildingId;
-  /** Lit = mastered/earned: glow elements render in reward gold. */
+  /** Lit = mastered/earned: windows and emblems render bright white. */
   lit?: boolean;
   size?: number;
 }) {

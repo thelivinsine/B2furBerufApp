@@ -614,9 +614,10 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
   the established two-tone + neon mark style (base accent + hard-coded neon second tone, 20×20 grid):
   Büro (indigo tower, cyan annex), Bürgeramt (slate colonnade, amber pediment), Bank (sky block, cyan
   cornice, coin-ring emblem), Arztpraxis (rose clinic, glowing cross sign), Wohnhaus (teal house, neon
-  roof), Prüfungshalle (fuchsia dome hall, neon entablature). Each mark has an **unlit** state (quiet
-  white windows/emblems) and a **lit** state where the glow elements switch to `hsl(var(--reward))`,
-  the Phase-2.3 reward-gold token (dark-mode aware; reserved for loot/combo/lit buildings). Marks are
+  roof), Prüfungshalle (fuchsia dome hall, neon entablature). Each mark has a **lit** state (bright
+  white windows/emblems) and an **unlit** state (the same openings as dark shades, "lights off").
+  The founder tried and REJECTED gold windows, so **no reward-gold in these marks**; the reward tokens
+  stay reserved for loot/combo moments. Marks are
   normalised like route icons but to a **common ground line** (`groundTransform`), so a city strip gets
   a shared street level with a varied skyline (deliberate). After founder review, a **soft-corner pass**
   landed: every rect carries an `rx` and the pointed shapes (pediment, roofs, dome base) are rounded via
