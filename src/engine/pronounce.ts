@@ -28,8 +28,9 @@ export function normalizeSpoken(text: string): string {
   return words.join(" ");
 }
 
-/** Classic two-row Levenshtein; inputs are short (a word or phrase). */
-function levenshtein(a: string, b: string): number {
+/** Classic two-row Levenshtein; inputs are short (a word or phrase).
+ * Shared with `engine/typing.ts` (typed forward-recall grading). */
+export function levenshtein(a: string, b: string): number {
   if (a === b) return 0;
   if (!a.length) return b.length;
   if (!b.length) return a.length;
