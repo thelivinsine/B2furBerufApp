@@ -8,8 +8,9 @@ next-Can-Do quest card + "Meine Sammlung" entry, charts/calendar/mastery grid co
 persisted "Details" toggle), the „Meine Sammlung" bag view (`features/collection/Sammlung.tsx`,
 `/sammlung`), and a Bibliothek styling pass (German word leads each row, meta demoted to one line).
 **Phase 4 "The Depth" is underway** (typed forward-recall, authentic Lesen/Hören): the task
-breakdown was drafted in session 67 (see the Phase 4 section) and **Session A (4.1 grading engine +
-4.2 typed-recall block in the loop) is shipped**; 4.3–4.6 await the founder's priority call against the
+breakdown was drafted in session 67 (see the Phase 4 section), **Session A (4.1 grading engine +
+4.2 typed-recall block in the loop) is shipped**, and **4.3 (Lesen/Hören text bank) shipped in
+session 69**; 4.4–4.6 await the founder's priority call against the
 still-PROPOSED `GAME_IMPLEMENTATION_PLAN.md`. This doc merges the two redesign reports into one
 executable plan:_
 
@@ -136,7 +137,9 @@ claims fire at `canDo.ts` thresholds; Sammlung browsable; bundle under budget; g
 
 _Task breakdown drafted session 67 (2026-07-05). **Session A (tasks 4.1 + 4.2) is EXECUTED ✅**: 4.1
 grading engine (s67, `engine/typing.ts`) and 4.2 typed-recall block in the loop (s68, `kind: "typing"`
-composer block + `TypingBlock` renderer + `graduatedToTyping` graduation rule). Tasks 4.3–4.6 remain
+composer block + `TypingBlock` renderer + `graduatedToTyping` graduation rule). **Task 4.3 is EXECUTED ✅**
+(s69, PR #320): the `src/data/texts.ts` Lesen/Hören bank (10 texts / 30 checks) with linter + provenance
+coverage; 4.4 can now consume it. Tasks 4.4–4.6 remain
 pending the founder's priority call against `docs/plans/GAME_IMPLEMENTATION_PLAN.md` (still PROPOSED; its
 G0 prerequisite, redesign Phases 1–3, is now fully shipped, so G1 is also eligible)._
 
@@ -150,7 +153,7 @@ real-world texts are what actually break the intermediate plateau this product e
 |---|---|---|---|---|
 | 4.1 ✅ | **Typed-recall grading engine** (audit rec #1, "if only one thing ships"): pure `gradeTyped(expected, typed)` helper with tolerant matching in the `engine/pronounce.ts` spirit: case/whitespace normalisation, alternate umlaut spellings (ae/oe/ue/ss), article graded separately for nouns (wrong/missing article is a "partial", not a fail), and a small length-scaled edit-distance tolerance for typos. Three-tier verdict (correct / almost / wrong) so near-misses grade as FSRS "Hard", not "Again". **Vitest suite for the grading bands** (new `tests/typing.test.ts`); run `pnpm test:pronounce` if the shared matcher is touched. | new `src/engine/typing.ts` (+ maybe shared normalisation in `engine/pronounce.ts`), `tests/typing.test.ts` | **Fable 5** | Grading-tolerance design directly shapes the data the FSRS scheduler learns from; a too-strict or too-lax matcher silently corrupts scheduling for every user. |
 | 4.2 ✅ | **Typed-recall block in the loop:** new `kind: "typing"` `SessionBlock` in the composer with a graduation rule (cards above a stability floor get typed forward-recall; new/young cards stay on recognition flashcards), renderer in `SessionPlayer` (EN prompt display-size, typed DE input, "Anzeigen" reveal fallback that grades as a miss, latency + verdict feed `reviewVocab`, combo/loot untouched). Extend the session-composer Vitest pins. | `engine/session.ts`, `features/session/SessionPlayer.tsx`, `tests/` | **Opus 4.8** | Integration threads through the composer pools and the FSRS `latencyMs` capture path; a dropped signal here is the Phase 2 risk all over again. |
-| 4.3 | **Lesen/Hören content bank** (audit rec #3): new `src/data/texts.ts` with ~8–12 short authentic-style B1–B2 texts (Behörden letter, workplace email, memo, announcement, voicemail script) each with `themeId`, `cefr`, DE text + EN gloss, and 2–3 comprehension checks. Closed enums mirrored in `scripts/lint-content.mjs`; one provenance row per item (`review_status: "draft"` for the founder pass). | new `src/data/texts.ts`, `src/types/index.ts`, `src/data/provenance.ts`, `scripts/lint-content.mjs` | **Fable 5** | Original German content at a calibrated CEFR band is authored work, and the bank's schema is a new content contract the linter must be able to police. |
+| 4.3 ✅ | **Lesen/Hören content bank** (audit rec #3): new `src/data/texts.ts` with ~8–12 short authentic-style B1–B2 texts (Behörden letter, workplace email, memo, announcement, voicemail script) each with `themeId`, `cefr`, DE text + EN gloss, and 2–3 comprehension checks. Closed enums mirrored in `scripts/lint-content.mjs`; one provenance row per item (`review_status: "draft"` for the founder pass). | new `src/data/texts.ts`, `src/types/index.ts`, `src/data/provenance.ts`, `scripts/lint-content.mjs` | **Fable 5** | Original German content at a calibrated CEFR band is authored work, and the bank's schema is a new content contract the linter must be able to police. |
 | 4.4 | **Lesen/Hören composer block + renderer:** `kind: "reading"` block (plus a listening variant that plays the same text via `engine/speech.ts` TTS when available), full-screen text card with tap-gloss, comprehension MCQ, results feed XP/theme progress (NOT vocab FSRS), weighted ~1 block per composed session. | `engine/session.ts`, `SessionPlayer.tsx` | **Opus 4.8** | A new first-class block kind touches session weighting and the focus-mode stage; content-governance rules apply. |
 | 4.5 | **Visible progression chip** (audit rec #5a): small per-theme phase label (e.g. Aufbau → Festigen → Gemischt) derived from existing FSRS/theme-mastery state, shown on the Fortschritt theme grid and as the subtitle of a city-building tap. | `features/analytics/Analytics.tsx`, `components/city/`, `src/lib/` | **Sonnet 5** | Small derived-state UI once 4.1/4.2 land; no new state. |
 | 4.6 | Gates + ship + docs: all gates including `test:srs`/`test:pronounce`, CLAUDE.md content counts (texts bank), `PROJECT_STATUS.md` + `SESSION_PROMPT_LOG.md`, PR → `main` → squash-merge → branch realign. | — | **Haiku 4.5** | Mechanical. |
