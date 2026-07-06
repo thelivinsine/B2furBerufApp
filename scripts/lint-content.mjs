@@ -591,7 +591,7 @@ function lintMissions(missions, refs) {
         if (s.notice !== undefined) checkBiText(s.notice, ds, sw, "notice");
         hasChoiceExit = checkChoices(s.choices, true);
       } else if (s.kind === "loadout") {
-        checkBiText(s.intro, ds, sw, "intro");
+        if (s.intro !== undefined) checkBiText(s.intro, ds, sw, "intro");
         if (s.cta !== undefined) checkBiText(s.cta, ds, sw, "cta");
         if (!Array.isArray(s.slots) || s.slots.length === 0) error(ds, sw, "loadout has no slots");
         else {

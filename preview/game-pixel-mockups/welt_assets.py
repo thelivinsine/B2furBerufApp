@@ -327,6 +327,71 @@ def backdrop_strasse():
     rect(img, 220, 90, 2, 8, (110, 114, 132))
     return img
 
+# open travel bag, front view, 26x20 (loadout stage centerpiece)
+BAG = [
+    "....kkkkkkkkkkkkkkkkkk....",
+    "...kwwwwwwwwwwwwwwwwwwk...",
+    "..kwkkkkkkkkkkkkkkkkkkwk..",
+    ".kbbkbbbbbbbbbbbbbbbbkbbk.",
+    ".kbbbbbbbbbbbbbbbbbbbbbbk.",
+    ".kbbbbbbbbbbbbbbbbbbbbbbk.",
+    ".kbbjjjjjjjjjjjjjjjjjjbbk.",
+    ".kbbjjjjjjjjjjjjjjjjjjbbk.",
+    ".kbbbbbbbbbbbbbbbbbbbbbbk.",
+    ".kbbbbbbbbbbbbbbbbbbbbbbk.",
+    ".kbbbbbbbbbbbbbbbbbbbbbbk.",
+    ".kbbbbbbbbbbbbbbbbbbbbbbk.",
+    "..kbbbbbbbbbbbbbbbbbbbbk..",
+    "...kkkkkkkkkkkkkkkkkkkk...",
+]
+BAG_CMAP = {'k': OUT, 'b': (168, 84, 64), 'j': (219, 166, 77), 'w': (140, 66, 50)}
+
+# document icons, 12x14: ID card / plain contract / signed confirmation
+DOC_AUSWEIS = [
+    "kkkkkkkkkkkk",
+    "kjjjjjjjjjjk",
+    "kjjjjjjjjjjk",
+    "kwwwwwwwwwwk",
+    "kwsskwwwwwwk",
+    "kwsskwllllwk",
+    "kwsskwwwwwwk",
+    "kwwwwwllllwk",
+    "kwwwwwwwwwwk",
+    "kwllllllwwwk",
+    "kwwwwwwwwwwk",
+    "kkkkkkkkkkkk",
+]
+DOC_VERTRAG = [
+    "kkkkkkkkkk..",
+    "kwwwwwwwwkk.",
+    "kwwwwwwwwwk.",
+    "kwllllllwwk.",
+    "kwwwwwwwwwk.",
+    "kwllllllwwk.",
+    "kwwwwwwwwwk.",
+    "kwllllwwwwk.",
+    "kwwwwwwwwwk.",
+    "kwllllllwwk.",
+    "kwwwwwwwwwk.",
+    "kkkkkkkkkkk.",
+]
+DOC_WGB = [
+    "kkkkkkkkkk..",
+    "kwwwwwwwwkk.",
+    "kwwwwwwwwwk.",
+    "kwllllllwwk.",
+    "kwwwwwwwwwk.",
+    "kwllllwwwwk.",
+    "kwwwwwwwwwk.",
+    "kwwwwwttwwk.",
+    "kwzzzwttwwk.",
+    "kwwwwwwwwwk.",
+    "kwwwwwwwwwk.",
+    "kkkkkkkkkkk.",
+]
+DOC_CMAP = {'k': OUT, 'w': (250, 250, 248), 'l': (196, 200, 210), 'j': INDIGO,
+            's': SKIN, 'z': (90, 96, 140), 't': (100, 144, 98)}
+
 def sprite_png(rows, cmap, name):
     img = Image.new('RGBA', (len(rows[0]), len(rows)), (0, 0, 0, 0))
     for ry, row in enumerate(rows):
@@ -343,4 +408,8 @@ backdrop_wohnung().save(os.path.join(OUT_DIR, "wohnung.png"))
 backdrop_strasse().save(os.path.join(OUT_DIR, "strasse.png"))
 sprite_png(SCHMIDT, SCHMIDT_CMAP, "schmidt.png")
 sprite_png(PLAYER_BACK, PLAYER_CMAP, "player.png")
+sprite_png(BAG, BAG_CMAP, "bag.png")
+sprite_png(DOC_AUSWEIS, DOC_CMAP, "doc-ausweis.png")
+sprite_png(DOC_VERTRAG, DOC_CMAP, "doc-vertrag.png")
+sprite_png(DOC_WGB, DOC_CMAP, "doc-wgb.png")
 print("welt assets written to", os.path.abspath(OUT_DIR))

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, ChevronRight, Globe, SkipForward } from "lucide-react";
+import { ChevronRight, Globe, SkipForward } from "lucide-react";
 import type {
   CutsceneScene,
   FormClozeScene,
@@ -17,7 +17,16 @@ import { npcById } from "@/data/missions";
 import { shuffle, sample, cn } from "@/lib/utils";
 import { Gloss } from "@/features/shared/Gloss";
 import { SpeakButton } from "@/components/shared/SpeakButton";
-import { PixelStage, GameCard, SheetCard, Pill, Chip } from "@/features/welt/stage";
+import {
+  PixelStage,
+  GameCard,
+  SheetCard,
+  Pill,
+  Chip,
+  BAG_SPRITE,
+  DOC_ICONS,
+  DOC_ICON_FALLBACK,
+} from "@/features/welt/stage";
 
 /**
  * Scene renderers for the mission player (game G1), one per scene kind
@@ -246,47 +255,60 @@ export function LoadoutView({
 
   return (
     <div className="space-y-3">
-      <PixelStage setting={scene.setting} />
-      <SheetCard className="space-y-4 p-4">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-sm font-semibold text-slate-700">
-            <Gloss de={scene.intro.de} en={scene.intro.en} />
-          </p>
-          <Chip tone="slate">
-            {packedCount}/{scene.slots.length}
-          </Chip>
+      {/* The stage IS the task: an open bag, one slot per document, filling
+          as the player packs. No text checklist; the picture carries it. */}
+      <PixelStage setting={scene.setting}>
+        <div className="absolute inset-x-0 bottom-3 flex flex-col items-center gap-1.5">
+          <div className="flex items-end gap-2">
+            {scene.slots.map((s) => {
+              const packed = !!run.packed[s.id];
+              const isActive = active?.id === s.id;
+              const icon = (s.grantsItem && DOC_ICONS[s.grantsItem]) || DOC_ICON_FALLBACK;
+              return (
+                <motion.span
+                  key={s.id}
+                  animate={packed ? { scale: [1.4, 1] } : {}}
+                  className={cn(
+                    "flex h-12 w-11 items-center justify-center rounded-xl border-2 bg-white/85",
+                    packed
+                      ? "border-teal-400"
+                      : isActive
+                        ? "border-dashed border-[#5b5be6]"
+                        : "border-dashed border-slate-300",
+                  )}
+                >
+                  <img
+                    src={icon}
+                    alt=""
+                    className={cn("w-7 select-none", !packed && "opacity-25 grayscale")}
+                    style={{ imageRendering: "pixelated" }}
+                    draggable={false}
+                  />
+                </motion.span>
+              );
+            })}
+          </div>
+          <img
+            src={BAG_SPRITE}
+            alt=""
+            className="w-20 select-none"
+            style={{ imageRendering: "pixelated" }}
+            draggable={false}
+          />
         </div>
+      </PixelStage>
 
-        {/* bag checklist */}
-        <ul className="space-y-1.5">
-          {scene.slots.map((s) => {
-            const v = vocabById(s.vocabId);
-            const packed = !!run.packed[s.id];
-            const isActive = active?.id === s.id;
-            return (
-              <li
-                key={s.id}
-                className={cn(
-                  "flex items-center gap-2 rounded-xl border px-3 py-2 text-sm",
-                  packed
-                    ? "border-teal-200 bg-teal-50 text-teal-700"
-                    : isActive
-                      ? "border-[#5b5be6]/40 bg-indigo-50/50 text-slate-700"
-                      : "border-slate-200 text-slate-400",
-                )}
-              >
-                {packed ? <Check className="h-4 w-4 shrink-0" /> : <span className="h-4 w-4 shrink-0 rounded-full border border-current opacity-40" />}
-                {packed && v ? <Gloss de={v.de} en={v.en} /> : v?.en}
-              </li>
-            );
-          })}
-        </ul>
-
+      <SheetCard className="space-y-3 p-4">
         {active && activeVocab ? (
-          <div className="space-y-2">
-            <p className="text-sm text-slate-500">
-              Pack ein: <span className="font-semibold text-slate-700">{activeVocab.en}</span>
-            </p>
+          <>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm text-slate-500">
+                Pack ein: <span className="font-semibold text-slate-700">{activeVocab.en}</span>
+              </p>
+              <Chip tone="slate">
+                {packedCount}/{scene.slots.length}
+              </Chip>
+            </div>
             <div className="grid grid-cols-1 gap-2">
               {options.map((de) => {
                 const wrong = wrongPicks.includes(de);
@@ -311,10 +333,10 @@ export function LoadoutView({
                 }}
                 className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-slate-600"
               >
-                <SkipForward className="h-3.5 w-3.5" /> Ohne dieses Dokument weitergehen
+                <SkipForward className="h-3.5 w-3.5" /> Ohne Dokument weiter
               </button>
             </div>
-          </div>
+          </>
         ) : (
           <div className="flex items-center justify-between gap-2">
             <p className="text-sm text-slate-500">
@@ -412,7 +434,10 @@ export function ListeningView({ scene, act }: SceneViewProps & { scene: Listenin
             </div>
             {chosen !== null && (
               <div className="flex items-center justify-between gap-2">
-                <p className="flex-1 text-xs text-slate-500">{check.explain}</p>
+                {/* explanation only when the answer was wrong (text budget) */}
+                <p className="flex-1 text-xs text-slate-500">
+                  {chosen !== check.answer ? check.explain : ""}
+                </p>
                 <Pill
                   primary
                   onClick={() => {

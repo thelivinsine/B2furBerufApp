@@ -151,7 +151,8 @@ export interface LoadoutSlot {
 
 export interface LoadoutScene extends SceneBase {
   kind: "loadout";
-  intro: BiText;
+  /** Optional flavor line; the bag-and-slots stage visual carries the task. */
+  intro?: BiText;
   slots: LoadoutSlot[];
   /** Extra vocab ids mixed into the retrieval options as distractors. */
   distractorVocabIds?: string[];
