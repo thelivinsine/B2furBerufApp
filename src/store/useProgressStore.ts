@@ -22,6 +22,13 @@ interface ProgressState {
   totalSessions: number;
   /** Vocab ids the learner bookmarked for their custom deck (#29). */
   savedWords: string[];
+  /**
+   * Neuland game state (G1). Local-only for now: cloudSync's progress row has
+   * a fixed column set, so these ride into Supabase only once the G2 schema
+   * migration adds a column (an unknown column would fail the whole upsert).
+   */
+  missionsDone: string[];
+  keyItems: string[];
 
   addXp: (amount: number) => void;
   reviewVocab: (vocabId: string, grade: Grade, latencyMs?: number) => void;
@@ -30,6 +37,8 @@ interface ProgressState {
   completeScenario: (scenarioId: string) => void;
   completeExam: (examId: string, score: number) => void;
   registerSession: () => void;
+  completeMission: (missionId: string) => void;
+  grantKeyItems: (itemIds: string[]) => void;
   resetProgress: () => void;
 }
 
@@ -46,6 +55,8 @@ const defaults = {
   examsDone: [] as { id: string; score: number; date: string }[],
   totalSessions: 0,
   savedWords: [] as string[],
+  missionsDone: [] as string[],
+  keyItems: [] as string[],
 };
 
 /** Updates the streak bookkeeping for "today". */
@@ -120,6 +131,18 @@ export const useProgressStore = create<ProgressState>()(
         })),
 
       registerSession: () => set((s) => ({ totalSessions: s.totalSessions + 1 })),
+
+      completeMission: (missionId) =>
+        set((s) => ({
+          missionsDone: s.missionsDone.includes(missionId)
+            ? s.missionsDone
+            : [...s.missionsDone, missionId],
+        })),
+
+      grantKeyItems: (itemIds) =>
+        set((s) => ({
+          keyItems: Array.from(new Set([...s.keyItems, ...itemIds])),
+        })),
 
       resetProgress: () => set({ ...defaults, srs: {}, dailyXp: {} }),
     }),

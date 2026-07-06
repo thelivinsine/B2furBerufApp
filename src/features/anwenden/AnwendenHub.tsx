@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Target, Mic, PenLine, GraduationCap, ChevronRight, type LucideIcon } from "lucide-react";
+import { Target, Mic, PenLine, GraduationCap, Gamepad2, ChevronRight, type LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { HubHero } from "@/components/shared/HubHero";
 import { cn } from "@/lib/utils";
@@ -15,6 +15,7 @@ const CARDS: {
   gradient: string;
   title: string;
   desc: string;
+  badge?: string;
 }[] = [
   {
     to: "/simulation",
@@ -37,6 +38,14 @@ const CARDS: {
     title: "Prüfung",
     desc: "Ein kompletter Prüfungsdurchlauf unter realistischen Bedingungen und mit Zeitdruck.",
   },
+  {
+    to: "/welt",
+    icon: Gamepad2,
+    gradient: "from-indigo-500 to-violet-500",
+    title: "Neuland",
+    desc: "Das Spiel: Lebe dein erstes Jahr in Deutschland. Kapitel 1 startet im Bürgeramt.",
+    badge: "Beta",
+  },
 ];
 
 export function AnwendenHub() {
@@ -49,7 +58,7 @@ export function AnwendenHub() {
         title="Wissen anwenden"
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {CARDS.map((card, i) => (
           <motion.div
             key={card.to}
@@ -69,7 +78,14 @@ export function AnwendenHub() {
                     <card.icon className="h-6 w-6" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-semibold leading-snug">{card.title}</p>
+                    <p className="text-lg font-semibold leading-snug">
+                      {card.title}
+                      {card.badge && (
+                        <span className="ml-2 inline-block rounded-lg bg-amber-100 px-1.5 py-0.5 align-middle text-xs font-semibold text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
+                          {card.badge}
+                        </span>
+                      )}
+                    </p>
                     <p className="mt-1 text-sm text-muted-foreground">{card.desc}</p>
                   </div>
                   <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">

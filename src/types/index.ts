@@ -604,7 +604,8 @@ export type ProvenanceContentType =
   | "redemittel"
   | "writing_prompt"
   | "can_do"
-  | "text";
+  | "text"
+  | "mission";
 
 export type ProvenanceOrigin = "sourced" | "adapted" | "authored";
 

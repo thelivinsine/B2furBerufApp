@@ -179,6 +179,14 @@ learners even if the game slips, and the game then starts from a world that alre
 Do not start G1 before the redesign's Phase 2 is live.
 
 ### G1: mission engine + the Anmeldung vertical slice (2–4 sessions)
+_Status update 2026-07-06 (session 73): **SHIPPED ✅.** `src/types/game.ts` + `engine/mission.ts`
++ mission graph checks in `lint-content.mjs` + `tests/mission.test.ts`; six scene renderers in
+`src/features/welt/` styled to the blessed scene-7 reference (light-only, code-authored placeholder
+pixel art, `welt_assets.py`); the founder-approved chapter-1 boss mission `m_kap1_anmeldung` live
+behind the lazy `/welt` route (Beta card on Anwenden). Game progression state is local-only until a
+G2 Supabase migration adds columns for `missions_done`/`key_items` (an unknown column would fail
+the whole progress upsert). The exit criterion (founder plays it on their phone; feels like a game,
+not a quiz in a costume) is now in the founder's hands._
 Build `engine/mission.ts`, the `Mission`/`Scene` types, the 5 scene renderers the slice needs,
 and the Anmeldung mission exactly as specced in the concept doc (booking parody → bag loadout →
 waiting room → Frau Schmidt dialogue battle → form cloze → Meldebestätigung key item). Ships

@@ -66,6 +66,11 @@ const Sammlung = lazyWithReload(() =>
 const Settings = lazyWithReload(() =>
   import("@/features/settings/Settings").then((m) => ({ default: m.Settings })),
 );
+// Lazy: the Neuland game world (G1 Beta) walks the mission + vocabulary banks
+// and carries its own pixel assets; strictly off the eager path.
+const Welt = lazyWithReload(() =>
+  import("@/features/welt/Welt").then((m) => ({ default: m.Welt })),
+);
 // Lazy: the Sources page pulls in the full provenance register (~800 rows), so
 // keep it out of the main bundle and load it only when /sources is visited.
 const Sources = lazyWithReload(() =>
@@ -230,6 +235,16 @@ export const router = createBrowserRouter([
         element: (
           <RequireOnboarding>
             <ExamHub />
+          </RequireOnboarding>
+        ),
+      },
+      {
+        // The Neuland game world (G1, Beta): off the nav, reached via the
+        // Anwenden hub card and the /welt deep link (same pattern as /quiz).
+        path: "/welt",
+        element: (
+          <RequireOnboarding>
+            <Welt />
           </RequireOnboarding>
         ),
       },
