@@ -870,4 +870,22 @@ Branch: `claude/whats-next-esga9u`.
 - **Prompt (verbatim):**
   > do task 4.2
 - **Response summary:** Executed Phase 4 task 4.2, the typed-recall block in the loop (finishing Session A). Added a `kind: "typing"` variant to `SessionBlock` (vocab-only forward recall, same shape as `speaking`). In the composer (`engine/session.ts`), added `graduatedToTyping(card)` + `TYPING_STABILITY_FLOOR` (8 days): a due card graduates from a recognition flashcard to typed forward recall once it is `reps >= 2` AND `(stability ?? interval) >= 8`, so new/young cards stay on flashcards. Pool 1 now emits `typing` blocks (`ty_` key) for graduated cards. New `TypingBlock` renderer in `SessionPlayer.tsx`: EN prompt display-size, typed DE input graded by 4.1's `gradeTyped`, an "Anzeigen" reveal that grades as a miss, three-tier feedback (success/warning/danger) with the answer + SpeakButton + example, latency captured mount→answer. Verdict maps onto the SRS `Grade` scale (correct → 4, almost → 3/Hard, wrong → 0) so near-misses schedule gently; combo/XP reward only a clean correct. Refactored `captureLoot` to take an explicit `Grade` (all callers updated). 3 new composer Vitest cases (`test:unit` 56 → 59). All gates green (build, typecheck, lint 0 errors, lint:content, check:bundle main chunk 78.9 kB). Shipped via PR → squash-merge → branch realign.
-- **Artifacts:** `src/types/index.ts`, `src/engine/session.ts`, `src/features/session/SessionPlayer.tsx`, `tests/engine.test.ts`, `docs/PROJECT_STATUS.md`, `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`, `docs/SESSION_PROMPT_LOG.md` (modified). PR # + squash SHA recorded on merge.
+- **Artifacts:** `src/types/index.ts`, `src/engine/session.ts`, `src/features/session/SessionPlayer.tsx`, `tests/engine.test.ts`, `docs/PROJECT_STATUS.md`, `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`, `docs/SESSION_PROMPT_LOG.md` (modified). **PR #318**, squash SHA **`09c3886`**.
+
+## Entry 168 — 2026-07-05 (session 68)
+- **Branch:** `claude/task-4-2-ueh4yw`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > What's model recommendation for the next tasks
+- **Response summary:** Restated the per-task model recommendations already in the Phase 4 table for the remaining tasks: 4.3 Lesen/Hören content bank → **Fable 5** (authored CEFR-calibrated German + new schema contract), 4.4 reading/listening composer block + renderer → **Opus 4.8** (new first-class block kind, weighting + focus-mode, regression-sensitive), 4.5 progression chip → **Sonnet 5** (small derived-state UI), 4.6 gates/ship/docs → **Haiku 4.5** (mechanical). Recommended the split Session B = 4.3 + 4.4 (Fable authors, then Opus builds, as a hand-off not parallel work since 4.4 depends on 4.3's schema), short Session C = 4.5 + 4.6. Flagged the standing alternative of pivoting to game-plan G1 (Opus), while recommending finishing Session B first.
+- **Artifacts:** none (advisory answer, no file changes).
+
+## Entry 169 — 2026-07-05 (session 68)
+- **Branch:** `claude/task-4-2-ueh4yw`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Documentation pass for session 68. The core status docs were already updated when 4.2 shipped (PROJECT_STATUS header + a new session-68 "Resume here" handoff; the Phase 4 plan marking 4.2 ✅ and Session A complete; prompt-log entry 167). This pass filled entry 167's PR/SHA (PR #318, `09c3886`) and appended prompt-log entries 168 (model-recommendation Q&A) and 169 (this documentation request) so every founder prompt of the session is captured. Shipped via PR → squash-merge → branch realign.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (modified). PR # + squash SHA recorded on merge.
