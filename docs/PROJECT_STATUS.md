@@ -6,8 +6,9 @@ always-visible backpack (bag-answered document demands), English as a rationed W
 resource, a full-screen pixel-styled game frame, locked world/battle-composition scale rules,
 and a two-part research report + chapter-1 gameplay deck. **G2 is HALTED on founder order
 ("Wait for my go")**: a small G2 groundwork draft (missions 1.1/1.2 + settings) sits PARKED
-UNMERGED on the session branch. The working branch is reassigned every session, so **`main` is
-always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
+UNMERGED as the session branch tip (commit `wip(G2, PARKED, DO NOT MERGE)`). The working branch
+is reassigned every session, so **`main` is always the source of truth**. Product name:
+**Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
@@ -194,13 +195,16 @@ G2 is HALTED awaiting the founder's explicit go.** What happened:
   **`docs/strategy/MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md`** (founder request).
   **New mission exercises must draft against the research catalog.**
 - **G2 STATUS: HALTED by the founder ("stop before proceeding with g2. Wait for my go").** G2
-  authoring had just begun when the stop arrived; the partial draft is PARKED as a WIP commit on
-  `claude/neuland-g1-g2-feedback-wkf28n` (UNMERGED, not on `main`): three new scene settings
-  (terminal/laden/supermarkt) with generated backdrops, scene `label` override, `doc-pass.png`,
-  four chapter-1 NPCs, three key items (ki_reisepass/ki_fahrschein/ki_sim_vertrag), and draft
-  mission data for 1.1 + 1.2. Still open when resumed: missions 1.3-1.5, provenance rows, boss
-  `requiresMissions` gating + replay-unlock in Welt.tsx (drafted), test updates, all gates, a
-  playthrough. **Do not merge or continue the WIP without the founder's go.**
+  authoring had just begun when the stop arrived; the partial draft is PARKED as the **tip commit
+  of the session branch** `claude/neuland-g1-g2-feedback-wkf28n` (message prefix `wip(G2, PARKED,
+  DO NOT MERGE)`; UNMERGED, deliberately NOT on `main`). To resume after the founder's go:
+  `git checkout claude/neuland-g1-g2-feedback-wkf28n` and continue from that commit (or a fresh
+  branch cherry-picking it). It contains: three new scene settings (terminal/laden/supermarkt)
+  with a backdrop generator, scene `label` override, `doc-pass.png`, four chapter-1 NPCs, three
+  key items (ki_reisepass/ki_fahrschein/ki_sim_vertrag), and draft mission data for 1.1 + 1.2.
+  Still open when resumed: missions 1.3-1.5, provenance rows, boss `requiresMissions` gating +
+  replay-unlock in Welt.tsx (drafted), asset regeneration (`python3 welt_assets.py`), test
+  updates, all gates, a playthrough. **Do not merge or continue the WIP without the founder's go.**
 - **Plan position** (`GAME_IMPLEMENTATION_PLAN.md`): G0 ✅ (s63-66) · G1 ✅ shipped s73 with
   three playtest rounds applied (s73 x2, s74 x1 + hotfixes) · s74 research ✅ (feeds G2) ·
   **G2 ⏸ awaiting founder go** (scope when resumed: missions 1.1-1.5 per the deck scripts,

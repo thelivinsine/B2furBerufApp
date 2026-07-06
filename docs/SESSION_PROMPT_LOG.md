@@ -1269,3 +1269,24 @@ Branch: `claude/whats-next-esga9u`.
   and ranked recommendations). Cross-linked from `MISSION_ACTIVITY_RESEARCH.md` §1.
 - **Artifacts:** `docs/strategy/MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md`,
   `docs/strategy/MISSION_ACTIVITY_RESEARCH.md` (cross-link).
+
+## Entry 203 — 2026-07-06 (session 74, close)
+- **Branch:** `claude/neuland-g1-g2-feedback-wkf28n`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session. i'll continue in another session
+- **Response summary:** Final documentation pass for session 74 (most of the session was already
+  documented in PR #347: prompt-log entries 196-202, the PROJECT_STATUS handoff, DECISIONS.md
+  "Game interaction & pixel-UI rules", GAME_DESIGN.md §4 amendments, CLAUDE.md game-layer
+  refresh, and the verbatim multi-agent transcripts in
+  `docs/strategy/MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md`). This entry adds the closing prompt to
+  the log and sharpens the PROJECT_STATUS "Resume here" pointer to the parked G2 WIP (named by
+  branch + commit-message prefix `wip(G2, PARKED, DO NOT MERGE)` rather than a fragile SHA, with
+  the exact resume command). Session-74 shipping recap: G1 playtest round 3 (#343) + two live
+  hotfixes (#344 battle composition + backpack popup, #345 one human scale), the multi-agent
+  mission-activity research + chapter-1 gameplay deck (#346), and the documentation wrap (#347),
+  all squash-merged to `main` and deploying via Pages. G2 remains HALTED awaiting the founder's
+  explicit go; its partial draft stays parked unmerged on the session branch.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (this entry), `docs/PROJECT_STATUS.md` (Resume-here
+  pointer sharpened).
