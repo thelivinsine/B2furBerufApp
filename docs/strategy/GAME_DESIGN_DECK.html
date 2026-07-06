@@ -1,0 +1,714 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neuland · Game Design Deck</title>
+<style>
+  :root {
+    --night: #14162b;
+    --night-2: #1d2038;
+    --paper: #f1f2f7;
+    --paper-2: #ffffff;
+    --indigo: #5b5be6;
+    --gold: #d98a06;
+    --gold-soft: #f3e3c3;
+    --grass: #4f9e49;
+    --rose: #d95c6e;
+    --ink: #23253c;
+    --ink-soft: #5a5d78;
+    --line: #d9dbe8;
+    --bg: var(--paper);
+    --card: var(--paper-2);
+    --fg: var(--ink);
+    --muted: var(--ink-soft);
+    --bar-track: #dcdeeb;
+    --shadow-hard: #c3c6da;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: var(--night);
+      --card: var(--night-2);
+      --fg: #e9eaf4;
+      --muted: #9a9db8;
+      --line: #32365550;
+      --gold: #e8a33d;
+      --gold-soft: #3a2f17;
+      --grass: #6fbf59;
+      --rose: #e2687a;
+      --bar-track: #23263f;
+      --shadow-hard: #060714;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: var(--night);
+    --card: var(--night-2);
+    --fg: #e9eaf4;
+    --muted: #9a9db8;
+    --line: #32365550;
+    --gold: #e8a33d;
+    --gold-soft: #3a2f17;
+    --grass: #6fbf59;
+    --rose: #e2687a;
+    --bar-track: #23263f;
+    --shadow-hard: #060714;
+  }
+  :root[data-theme="light"] {
+    --bg: var(--paper);
+    --card: var(--paper-2);
+    --fg: var(--ink);
+    --muted: var(--ink-soft);
+    --line: #d9dbe8;
+    --gold: #d98a06;
+    --gold-soft: #f3e3c3;
+    --grass: #4f9e49;
+    --rose: #d95c6e;
+    --bar-track: #dcdeeb;
+    --shadow-hard: #c3c6da;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-snap-type: y proximity; }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55;
+    font-size: 16px;
+  }
+  .mono { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace; }
+
+  /* XP bar (scroll progress) */
+  .xpbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 8px;
+    background: var(--bar-track); z-index: 50;
+  }
+  .xpbar i {
+    display: block; height: 100%; width: 0;
+    background: repeating-linear-gradient(90deg, var(--gold) 0 12px, color-mix(in srgb, var(--gold) 78%, var(--bg)) 12px 16px);
+  }
+  .hud {
+    position: fixed; top: 14px; right: 14px; z-index: 50;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11px; letter-spacing: .08em;
+    color: var(--muted);
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    padding: 4px 8px; border: 1px solid var(--line);
+  }
+
+  .slide {
+    min-height: 100svh;
+    scroll-snap-align: start;
+    display: flex; align-items: center; justify-content: center;
+    padding: 64px 20px;
+    border-bottom: 1px solid var(--line);
+  }
+  .inner { width: 100%; max-width: 760px; }
+
+  .eyebrow {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--gold); margin: 0 0 14px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  h1, h2 {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    text-transform: uppercase; letter-spacing: .02em;
+    line-height: 1.12; text-wrap: balance; margin: 0 0 18px;
+  }
+  h2 { font-size: clamp(24px, 4.6vw, 34px); }
+  p.lead { font-size: clamp(17px, 2.6vw, 20px); max-width: 62ch; }
+  p, li { color: var(--fg); max-width: 68ch; }
+  .dim { color: var(--muted); }
+  strong { font-weight: 650; }
+  em { font-style: italic; }
+
+  /* Title slide */
+  .title-slide { text-align: left; }
+  .title-slide h1 {
+    font-size: clamp(44px, 10vw, 92px);
+    letter-spacing: .04em;
+    color: var(--fg);
+    text-shadow: 4px 4px 0 var(--shadow-hard);
+    margin-bottom: 8px;
+  }
+  .title-sub { font-size: clamp(16px, 2.6vw, 20px); color: var(--muted); margin: 0 0 26px; }
+  .press-start {
+    display: inline-block; margin-top: 30px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--gold);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .press-start { animation: blink 1.6s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: .25; } }
+  }
+  #skyline { width: 100%; height: 110px; display: block; margin: 26px 0 4px; image-rendering: pixelated; }
+
+  /* cards */
+  .cards { display: grid; gap: 10px; margin-top: 20px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    padding: 14px 16px;
+  }
+  .card h3 {
+    margin: 0 0 4px; font-size: 15px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    letter-spacing: .02em;
+  }
+  .card h3 .num { color: var(--gold); margin-right: 8px; }
+  .card p { margin: 0; font-size: 14.5px; color: var(--muted); max-width: none; }
+  .card.boss { border-left: 4px solid var(--gold); }
+  .card.boss h3 .num { color: var(--rose); }
+
+  .tag {
+    display: inline-block; margin-left: 8px; padding: 1px 7px;
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 10px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--gold); border: 1px solid var(--gold);
+    vertical-align: 2px;
+  }
+
+  table { border-collapse: collapse; width: 100%; margin-top: 18px; font-size: 14.5px; }
+  th, td { text-align: left; padding: 9px 12px; border: 1px solid var(--line); vertical-align: top; }
+  th { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  td strong { white-space: nowrap; }
+  .tablewrap { overflow-x: auto; }
+
+  ul.tight { padding-left: 20px; margin: 14px 0 0; display: grid; gap: 8px; }
+
+  /* battle mock */
+  .battle {
+    background: var(--card); border: 1px solid var(--line);
+    padding: 18px; margin-top: 20px;
+    font-size: 14px;
+  }
+  .bar { margin: 6px 0 14px; }
+  .bar .lbl { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; }
+  .bar .track { height: 10px; background: var(--bar-track); margin-top: 4px; }
+  .bar .track i { display: block; height: 100%; }
+  .bar.geduld .track i { width: 34%; background: var(--rose); }
+  .bar.standing .track i { width: 72%; background: var(--grass); }
+  .moves { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 12px; }
+  .move {
+    border: 1px solid var(--line); padding: 8px 10px;
+    font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px;
+  }
+  .move span { display: block; font-family: system-ui, sans-serif; font-size: 13px; margin-top: 3px; color: var(--muted); }
+  .move.crit { border-color: var(--gold); }
+  .move.crit b { color: var(--gold); }
+
+  /* pixel sprites (box-shadow art, 4px pixels) */
+  .sprite { width: 4px; height: 4px; margin: 10px 44px 26px 0; display: inline-block; }
+  .row-sprites { display: flex; align-items: flex-end; flex-wrap: wrap; }
+
+  .footer-note { font-size: 13px; color: var(--muted); margin-top: 26px; }
+  .kbd-hint { position: fixed; bottom: 12px; right: 14px; z-index: 50; font-size: 10px; letter-spacing: .1em; color: var(--muted); font-family: ui-monospace, Menlo, monospace; }
+  @media (max-width: 640px) { .kbd-hint { display: none; } }
+</style>
+
+<div class="xpbar"><i id="xp"></i></div>
+<div class="hud"><span id="hudnum">01</span>/<span id="hudtotal">20</span></div>
+<div class="kbd-hint">↑ ↓ NAVIGATE</div>
+
+<!-- 1 · TITLE -->
+<section class="slide title-slide">
+  <div class="inner">
+    <p class="eyebrow">Genauly · Spielkonzept</p>
+    <h1>Neuland</h1>
+    <p class="title-sub">Ein Leben auf Deutsch. A story RPG where the loot is language.<br>
+    <span class="dim">Working title, city and cast are proposals. Everything here is yours to rename.</span></p>
+    <canvas id="skyline" width="760" height="110" aria-hidden="true"></canvas>
+    <span class="press-start">▶ Press Start · Design deck · 2026-07-06</span>
+  </div>
+</section>
+
+<!-- 2 · THE IDEA -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">01 · Die Idee</p>
+    <h2>Live a life, keep the words</h2>
+    <p class="lead">Most language apps are dry, text-based practice with zero personal involvement. Neuland puts the learner inside a story: you arrive in Germany, and every scene, form, argument and small victory attaches new German to something that happened <em>to you</em>.</p>
+    <ul class="tight">
+      <li><strong>Personal involvement:</strong> words are learned inside situations you lived, not decks.</li>
+      <li><strong>Culture, visuals, emotion:</strong> scenes teach how Germany works (Pfand, Termine, Ruhezeiten) and make you feel it.</li>
+      <li><strong>Incremental scenes:</strong> each mission builds on the last; words return in later scenes so they stick.</li>
+      <li><strong>Built to scale:</strong> an authored spine of ~36 missions, then hundreds of generated variants.</li>
+    </ul>
+    <p class="footer-note">There is no villain. The antagonist is everyday Germany: forms, Termine, unwritten rules. Winning means building a life.</p>
+  </div>
+</section>
+
+<!-- 3 · PLAYER -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">02 · Du bist der Held</p>
+    <h2>The player and the premise</h2>
+    <p class="lead">You play yourself: two suitcases, a reason for coming, and imperfect German.</p>
+    <ul class="tight">
+      <li><strong>Character creation:</strong> your name, where you come from, and why Germany (job, study, love, fresh start). Your reason colors dialogues and dream scenes through the whole story.</li>
+      <li><strong>Your German level</strong> seeds the difficulty (CEFR-banded, from about A2 up). Changeable anytime.</li>
+      <li><strong>The city, „Neustadt":</strong> deliberately every-town Germany. S-Bahn spine, Altbau quarter, a concrete Amt, a Büropark, a Kiez with a Späti. Districts unlock chapter by chapter.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 4 · CAST -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">03 · Die Leute</p>
+    <h2>A small recurring cast</h2>
+    <p>Six characters carry the story across all chapters. Familiar faces are cheap to build and the emotional glue of the game.</p>
+    <div class="tablewrap"><table>
+      <tr><th>Wer</th><th>Rolle</th></tr>
+      <tr><td><strong>Jonas</strong></td><td>Your local German friend and the playable wild card: once per mission he can rescue a conversation, translate Beamtendeutsch or lend a document. Late in the game, you help him.</td></tr>
+      <tr><td><strong>Frau Schmidt</strong></td><td>Bürgeramt boss of chapter 1. Rapid Beamtendeutsch, zero small talk. Recurs at every Amt; by chapter 4 she greets you by name. The running gag and the warmest payoff.</td></tr>
+      <tr><td><strong>Ayşe</strong></td><td>Your WG flatmate. Switches between Hochdeutsch, Kiezdeutsch and Turkish with her mother: your window into how real informal German sounds.</td></tr>
+      <tr><td><strong>Herr Krause</strong></td><td>The Hausmeister. Speaks in complaints. Your diplomacy training dummy; one day he lends you tools, the highest honor he knows.</td></tr>
+      <tr><td><strong>Frau Weber</strong></td><td>Your boss from chapter 4. Fair, busy, loves Konjunktiv II. Carries the whole workplace arc.</td></tr>
+      <tr><td><strong>Herr Nguyen</strong></td><td>Runs the Späti under your flat. Rumors, side quests, collectibles, Pfand jokes.</td></tr>
+    </table></div>
+  </div>
+</section>
+
+<!-- 5 · CORE LOOP -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">04 · So spielt es sich</p>
+    <h2>The core loop</h2>
+    <div class="cards">
+      <div class="card"><h3><span class="num">1</span>City map</h3><p>Pick a story mission, a recurring errand (review in disguise) or a side quest.</p></div>
+      <div class="card"><h3><span class="num">2</span>Pack the bag</h3><p>The mission shows what language it needs. Packing each item is a short retrieval exercise.</p></div>
+      <div class="card"><h3><span class="num">3</span>Play the scenes</h3><p>3 to 6 scenes: dialogues, battles, parody documents and websites, forms, listening moments.</p></div>
+      <div class="card"><h3><span class="num">4</span>Take the loot</h3><p>XP, new word and Redemittel cards, key documents, story progress. Failing spawns a rescue quest, never a lockout.</p></div>
+      <div class="card"><h3><span class="num">5</span>The scheduler strikes back</h3><p>The spaced-repetition engine plays dungeon master: it re-issues mission variants exactly when your words are due for review. "The game made me do the Anmeldung again" and "my Behörde words were due" are the same event.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 · INTERACTION -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">05 · Interaktion</p>
+    <h2>How the player interacts</h2>
+    <ul class="tight">
+      <li><strong>D and E on every line.</strong> Tap D for a simple German explanation, E for English. Tap any word for its card and bag it. Nobody is ever stuck.</li>
+      <li><strong>The input ladder: tap → type → speak.</strong> Every moment can be answered by tapping a choice, typing it, or saying it into the mic (opt-in). Higher rungs earn more XP and loot. The game nudges you one rung up when a word is strong.</li>
+      <li><strong>Choices carry register, not right/wrong.</strong> Saying „du" to Frau Schmidt is not an error popup. She raises an eyebrow and her patience drops. Consequences live in the world.</li>
+      <li><strong>Documents are playable.</strong> Parody Anmeldeformulare, WG ads, ticket machines and booking sites are interactive props. Reading real-life formats IS the gameplay.</li>
+      <li><strong>Listening is diegetic.</strong> Voicemails, platform announcements and phone calls play as audio (existing text-to-speech), with replay and a read-along reveal.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7 · BATTLES -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">06 · Kämpfe sind Gespräche</p>
+    <h2>Battles are conversations</h2>
+    <p>The Pokémon fight, rebuilt for language, without violence. You do not attack anyone; you hold a conversation together.</p>
+    <div class="battle" role="img" aria-label="Mock battle screen: Frau Schmidt with a patience bar, the player with a standing bar, and four selectable conversation moves">
+      <div class="bar geduld"><div class="lbl"><span>Frau Schmidt · Geduld</span><span>34%</span></div><div class="track"><i></i></div></div>
+      <div class="bar standing"><div class="lbl"><span>Du · Standing</span><span>72%</span></div><div class="track"><i></i></div></div>
+      <div class="moves">
+        <div class="move"><b>NACHHAKEN</b><span>„Könnten Sie das bitte wiederholen?"</span></div>
+        <div class="move crit"><b>K-II CRIT</b><span>„Wären Sie so freundlich, mir zu zeigen, wo...?"</span></div>
+        <div class="move"><b>ZUSAMMENFASSEN</b><span>„Also brauche ich nur noch die Bestätigung?"</span></div>
+        <div class="move"><b>WILD CARD: JONAS</b><span>He rephrases it, and shows you how.</span></div>
+      </div>
+    </div>
+    <ul class="tight">
+      <li><strong>Geduld vs Standing:</strong> the opponent's patience against your composure. At zero patience the talk ends („Kommen Sie wieder, wenn Sie alle Unterlagen haben").</li>
+      <li><strong>Moves are cards from your bag</strong>, produced on the input ladder. Konjunktiv II politeness lands critical hits; wrong register misfires.</li>
+      <li><strong>Kind status effects:</strong> „Missverständnis" (a comprehension check), „Beamtendeutsch" (denser text, D button to the rescue), „Small-Talk-Falle" (steer the topic back).</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 8 · BAG -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">07 · Die Tasche</p>
+    <h2>Items are language</h2>
+    <div class="tablewrap"><table>
+      <tr><th>Item class</th><th>What it is</th><th>Examples</th></tr>
+      <tr><td><strong>Wortkarten</strong></td><td>Vocabulary cards, level 1 to 5, driven live by how well you actually know them (already built).</td><td>der Mietvertrag, die Vollmacht</td></tr>
+      <tr><td><strong>Redemittel-Moves</strong></td><td>Conversation moves grouped by function and register.</td><td>„Ich sehe das etwas anders, weil..."</td></tr>
+      <tr><td><strong>Grammatik-Kräfte</strong></td><td>Unlockable powers enabling bigger moves.</td><td>Konjunktiv II, Passiv</td></tr>
+      <tr><td><strong>Schlüssel-Dokumente</strong></td><td>Key items later missions genuinely require, like real German dependency chains.</td><td>Meldebestätigung, Mietvertrag</td></tr>
+      <tr><td><strong>Verbrauchsgüter</strong></td><td>Rare, jokey mid-battle composure restores.</td><td>Kaffee (small heal), Döner (revive), Feierabendbier (rare full restore)</td></tr>
+      <tr><td><strong>Fundstücke</strong></td><td>Cultural collectibles, zero power, pure joy. Displayed on a shelf in your flat.</td><td>Pfandflasche, Wackeldackel</td></tr>
+    </table></div>
+    <p class="footer-note">The bag reuses the app's existing categories (theme, level, word class, register), so loot is findable the moment a mission demands it.</p>
+  </div>
+</section>
+
+<!-- 9 · PROGRESSION -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">08 · Fortschritt</p>
+    <h2>One progress, two views</h2>
+    <p class="lead">The app and the game are two windows onto the same learning state. Nothing forks.</p>
+    <ul class="tight">
+      <li><strong>XP and level:</strong> the same pool the app already tracks.</li>
+      <li><strong>Card levels 1 to 5:</strong> computed from the memory engine's stability (shipped).</li>
+      <li><strong>The city lights up:</strong> the progress page's buildings grow into the game's world map. Mastering a life domain literally turns its lights on.</li>
+      <li><strong>Quests are „Ich kann..." milestones:</strong> the existing Can-Do goals become the quest log. Claiming one is a story beat.</li>
+      <li><strong>Review is disguised as life:</strong> Germany repeats itself (a new form, another Termin). The scheduler exploits that: recurring missions arrive exactly when your words need refreshing.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 10 · FAILURE -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">09 · Scheitern ist Story</p>
+    <h2>Failure is content, never lockout</h2>
+    <ul class="tight">
+      <li><strong>No hearts, no energy meter, no lives.</strong> Both punishing-meter designs on the market visibly failed. You can always play.</li>
+      <li><strong>Losing a battle has story consequences and a scaffolded retry:</strong> Jonas texts a hint, the missing phrase slips into your bag, and re-entry is one tap.</li>
+      <li><strong>A missing document spawns its own mini-mission</strong> that teaches exactly the gap, then sends you back in stronger.</li>
+      <li><strong>A thin bag scrapes through awkwardly</strong> (less XP, funnier scenes); a rich bag wins with flair and bonus loot. Harder later, never stuck later.</li>
+      <li><strong>Prüfungsmodus</strong> <span class="tag">Opt-in</span> replays any mission with typed answers, timers and no D/E, for better loot. Never the default, and it gives every mission replay value.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 11 · STORY OVERVIEW -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">10 · Die Geschichte</p>
+    <h2>Six chapters, ~36 missions</h2>
+    <p>An authored spine everyone shares; procedurally generated variants in between. Chapters are life domains, mapped 1:1 onto the app's existing content taxonomy.</p>
+    <div class="cards">
+      <div class="card"><h3><span class="num">K1</span>Ankommen</h3><p>Airport to Anmeldung. Survive week one.</p></div>
+      <div class="card"><h3><span class="num">K2</span>Wohnen</h3><p>WG hunt, Mietvertrag, Hausmeister, neighbors.</p></div>
+      <div class="card"><h3><span class="num">K3</span>Geld &amp; Papierkram</h3><p>Bank, insurance, Rundfunkbeitrag, the paper dragon.</p></div>
+      <div class="card"><h3><span class="num">K4</span>Arbeit</h3><p>Application to office life. The ten workplace themes.</p></div>
+      <div class="card"><h3><span class="num">K5</span>Gesund &amp; Sozial</h3><p>Arzt, Apotheke, Stammtisch, Verein, your own party.</p></div>
+      <div class="card"><h3><span class="num">K6</span>Mein Ziel</h3><p>You pick the endgame: career, home, citizenship, community, or (optionally) an exam.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 · K1 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">11 · Kapitel 1 · Bahnhofsviertel</p>
+    <h2>Ankommen</h2>
+    <div class="cards">
+      <div class="card"><h3><span class="num">1.1</span>Willkommen in Neuland</h3><p>Passport control small talk, find your train, meet Jonas. Tutorial for D/E, word-bagging and choices. Loot: survival starter pack.</p></div>
+      <div class="card"><h3><span class="num">1.2</span>Der Fahrkarten-Automat</h3><p>Your first battle is against a machine: the parody ticket Automat and its tariff-zone riddles. Machines have infinite patience but eat coins.</p></div>
+      <div class="card"><h3><span class="num">1.3</span>Die SIM-Karte</h3><p>Phone-shop dialogue, prepaid vs Vertrag, resist the upsell. First contract-reading UI. Key item: SIM-Vertrag.</p></div>
+      <div class="card"><h3><span class="num">1.4</span>Der erste Einkauf</h3><p>Find groceries by German labels, learn the Pfand system, survive the legendary checkout speed (a gentle timed mini-game with a kind fail state).</p></div>
+      <div class="card"><h3><span class="num">1.5</span>Ein Dach über dem Kopf</h3><p>Jonas arranges a temporary room; the landlord needs a signed Wohnungsgeberbestätigung. Your first real form, and the setup for the boss.</p></div>
+      <div class="card boss"><h3><span class="num">BOSS</span>Die Anmeldung <span class="tag">Vertical slice</span></h3><p>Book the Termin on a parody website, pack your documents, endure the waiting room, face Frau Schmidt in a dialogue battle, and type the Anmeldeformular finale. Reward: the Meldebestätigung, which chapter 3 will demand.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 · K2 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">12 · Kapitel 2 · Altbauviertel</p>
+    <h2>Wohnen</h2>
+    <div class="cards">
+      <div class="card"><h3><span class="num">2.1</span>Die WG-Suche</h3><p>Decode parody WG ads („2er-WG, NR, WM vorhanden"), spot the scam listing, and type a short application message.</p></div>
+      <div class="card"><h3><span class="num">2.2</span>Die Besichtigung</h3><p>A casting battle: impress Ayşe and the WG over tea. Small talk, hobbies, the du/Sie decision. The fail path is a worse-but-funny sublet with a retry later.</p></div>
+      <div class="card"><h3><span class="num">2.3</span>Der Mietvertrag</h3><p>Contract reading with trap clauses: Kaution, Nebenkosten, Schönheitsreparaturen. Catch the bad clause or feel it later. Key item: Mietvertrag.</p></div>
+      <div class="card"><h3><span class="num">2.4</span>Der Umzug</h3><p>Borrow a Transporter, navigate the Halteverbot, and build flat-pack furniture from German-only instructions. Imperative grammar as gameplay.</p></div>
+      <div class="card"><h3><span class="num">2.5</span>Der Hausmeister</h3><p>The heater is dead. Win over Herr Krause with your first diplomatic-register moves. Reward: warmth, and his grudging-respect meter appears.</p></div>
+      <div class="card boss"><h3><span class="num">BOSS</span>Die Ruhestörung</h3><p>Your housewarming was loud and the neighbor complains formally. Mediation battle: apologize without groveling, propose Ruhezeiten, win the Nachbarschaftsfrieden.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 · K3 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">13 · Kapitel 3 · Innenstadt</p>
+    <h2>Geld &amp; Papierkram</h2>
+    <div class="cards">
+      <div class="card"><h3><span class="num">3.1</span>Das Bankkonto</h3><p>The bank demands your Meldebestätigung: the chapter-1 key item, the dependency chain made visible. Account types, fee tables, TAN comedy.</p></div>
+      <div class="card"><h3><span class="num">3.2</span>Der Versicherungs-Dschungel</h3><p>A street promoter, a friend and a comparison site all disagree. Reading mission: essential (Haftpflicht) vs nonsense. Wrong picks cost in-game money, never progress.</p></div>
+      <div class="card"><h3><span class="num">3.3</span>Der Brief vom Beitragsservice</h3><p>The mysterious Rundfunkbeitrag letter. Official-letter reading, reply by form, and the cultural scene that explains why it exists at all.</p></div>
+      <div class="card"><h3><span class="num">3.4</span>Das Paket vom Zoll</h3><p>A package from home is stuck at customs. A fetch-quest across town with a Zollamt battle; teaches formal phone calls, voicemail included.</p></div>
+      <div class="card boss"><h3><span class="num">BOSS</span>Die Formular-Hydra</h3><p>A multi-form gauntlet: every completed form spawns the next until your typed accuracy cuts off all heads. Recurring review, wearing its boss costume openly.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 · K4 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">14 · Kapitel 4 · Büropark</p>
+    <h2>Arbeit</h2>
+    <div class="cards">
+      <div class="card"><h3><span class="num">4.1</span>Die Bewerbung</h3><p>Decode a job ad, assemble CV and Anschreiben from phrase blocks, submit. Connects to the app's writing coach for free-text ambition.</p></div>
+      <div class="card boss"><h3><span class="num">BOSS</span>Das Vorstellungsgespräch</h3><p>Interview battle with Frau Weber: strengths without bragging, weaknesses without self-destruction, salary in Konjunktiv. Reward: der Arbeitsvertrag, and the Büropark unlocks.</p></div>
+      <div class="card"><h3><span class="num">4.3</span>Der erste Arbeitstag</h3><p>Onboarding maze: IT passwords, Kaffeeküche etiquette, and the du/Sie minefield, mapped colleague by colleague.</p></div>
+      <div class="card"><h3><span class="num">4.4</span>Das Meeting</h3><p>Follow the agenda, interrupt politely, summarize. Introduces the „zusammenfassen" move class.</p></div>
+      <div class="card"><h3><span class="num">4.5</span>Der schwierige Kunde</h3><p>The complaint call: the patience bar in its purest form. De-escalation Redemittel earn their keep.</p></div>
+      <div class="card"><h3><span class="num">4.6</span>Der Streit ums Projekt</h3><p>Defend your plan diplomatically, then absorb a deadline change without losing standing.</p></div>
+      <div class="card"><h3><span class="num">4.7</span>Die Dienstreise</h3><p>Book it, ride it, survive a delayed ICE, present at the client site. Afterwards office life continues as recurring errands over all ten workplace themes.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16 · K5 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">15 · Kapitel 5 · Kiez &amp; Stadtpark</p>
+    <h2>Gesund &amp; Sozial</h2>
+    <div class="cards">
+      <div class="card"><h3><span class="num">5.1</span>Der Arzttermin</h3><p>Call the Praxis, describe symptoms with body vocabulary, navigate the Versichertenkarte ritual with Dr. Sommer.</p></div>
+      <div class="card"><h3><span class="num">5.2</span>In der Apotheke</h3><p>Pharmacy consultation: dosage language, the generics question, rezeptfrei vs rezeptpflichtig.</p></div>
+      <div class="card"><h3><span class="num">5.3</span>Der Stammtisch</h3><p>Herr Nguyen sends you to the Kneipe. A social battle night of small talk, opinions and toasts. The rare Feierabendbier item is discovered here.</p></div>
+      <div class="card"><h3><span class="num">5.4</span>Der Verein</h3><p>Join one: Fußball, Chor or Kleingarten. German club bureaucracy is the comedy; belonging is the reward.</p></div>
+      <div class="card"><h3><span class="num">5.5</span>Das Wochenende</h3><p>An S-Bahn day trip: ticket zones revisited, etiquette micro-scenes, and a Kontrolleur encounter that replays chapter-1 vocabulary.</p></div>
+      <div class="card boss"><h3><span class="num">BOSS</span>Das Einweihungsfest</h3><p>Host your own party. Written invitations, a German recipe, Krause at the door, and a surprise cameo by Frau Schmidt. The whole cast on one stage; your standing bar is renamed Gastgeber-Ehre for the night.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 17 · K6 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">16 · Kapitel 6 · Endgame</p>
+    <h2>Mein Ziel: you choose the ending</h2>
+    <p>After the party, the game asks what a good life here means to you. Each goal is a mission chain that hardens everything: thinner D/E, richer registers, higher input rungs.</p>
+    <div class="cards">
+      <div class="card"><h3><span class="num">A</span>Der unbefristete Vertrag</h3><p>The career path: a negotiation arc with Frau Weber.</p></div>
+      <div class="card"><h3><span class="num">B</span>Die Traumwohnung</h3><p>The full apartment hunt again, solo, at real difficulty.</p></div>
+      <div class="card"><h3><span class="num">C</span>Die Einbürgerung</h3><p>The paperwork summit, with optional Einbürgerungstest content.</p></div>
+      <div class="card"><h3><span class="num">D</span>Das eigene Projekt</h3><p>Found a Verein or Kiez initiative. You become the helper for a newcomer: the role-reversal ending, with Jonas cheering.</p></div>
+      <div class="card"><h3><span class="num">E</span>Die Prüfung</h3><p>Optional: telc B2 or Goethe B2 as ONE selectable goal for players who want it. Never the default, never the spine of the story.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 18 · SIDE QUESTS -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">17 · Nebenquests</p>
+    <h2>Side quests and the real world</h2>
+    <ul class="tight">
+      <li><strong>Wort-Safari:</strong> photograph a sign or record a voice note using a freshly learned word out in the real world. The card gets a personal badge and a memory boost. Photos stay on your device only.</li>
+      <li><strong>Kiez-Aufträge:</strong> Herr Nguyen's rotating mini-games: listening snippets, speed-sorting der/die/das crates, Pfand-return arithmetic.</li>
+      <li><strong>Fundstücke:</strong> cultural collectibles hidden in scenes. A shelf in your flat displays them; your flat slowly becoming „yours" is the ambient progress display.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 19 · TONE & ART -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">18 · Stil &amp; Ton</p>
+    <h2>Warm, funny, on your side</h2>
+    <ul class="tight">
+      <li><strong>Tone:</strong> the game lovingly roasts German bureaucracy, never the learner. Humor is situational, not text-wall jokes.</li>
+      <li><strong>Visuals (proposal, awaiting your blessing):</strong> committed retro 2D pixel art in the spirit of the Game Boy Advance era. Distinctive, affordable, and honest about being a solo-founder production. Next step: 2 or 3 mockup scenes from free assets, zero spend, for you to approve or reject.</li>
+      <li><strong>Language:</strong> scene German is level-banded to the player; interface text stays minimal; D and E sit on every content line. No em dashes anywhere.</li>
+    </ul>
+    <div class="row-sprites" aria-hidden="true">
+      <div class="sprite" id="sp-doc"></div>
+      <div class="sprite" id="sp-key"></div>
+      <div class="sprite" id="sp-coffee"></div>
+      <div class="sprite" id="sp-heart"></div>
+      <div class="sprite" id="sp-bubble"></div>
+    </div>
+    <p class="footer-note dim">Pixel props above are code-drawn placeholders, not the proposed art style.</p>
+  </div>
+</section>
+
+<!-- 20 · REALITY -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">19 · Schon gebaut</p>
+    <h2>Most of this already exists</h2>
+    <div class="tablewrap"><table>
+      <tr><th>Already shipped in Genauly</th><th>New for the game</th></tr>
+      <tr><td>Memory engine + card levels 1 to 5 + the Sammlung bag</td><td>Mission engine and scene player</td></tr>
+      <tr><td>Dialogue runner, scoring, speech, typing and speaking matchers</td><td>Battle presentation (Geduld/Standing bars, move picker)</td></tr>
+      <tr><td>1,121 license-tracked content items with levels and themes</td><td>Mission scripts, cast, key items</td></tr>
+      <tr><td>City buildings, quest cards, focus mode, D/E gloss, reading block</td><td>World map area in the app, loadout screen, parody documents</td></tr>
+    </table></div>
+    <p class="footer-note">Build order, tooling and the cost cap (roughly 30 to 60 EUR one-time, nothing recurring) live in the implementation plan. First playable milestone: the Anmeldung boss mission, end to end.</p>
+  </div>
+</section>
+
+<!-- 21 · DECISIONS -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">20 · Deine Entscheidungen</p>
+    <h2>What needs your yes</h2>
+    <div class="cards">
+      <div class="card"><h3><span class="num">1</span>Art blessing</h3><p>Approve producing 2 or 3 pixel mockup scenes (free assets, zero spend) to lock the look.</p></div>
+      <div class="card"><h3><span class="num">2</span>Names</h3><p>„Neuland" (game), „Neustadt" (city), and the cast are proposals. Rename anything.</p></div>
+      <div class="card"><h3><span class="num">3</span>Chapter 1 sign-off</h3><p>Bless the six Ankommen missions before content writing starts. The Anmeldung slice itself is already specced.</p></div>
+    </div>
+    <p class="press-start">▶ Ready when you are</p>
+  </div>
+</section>
+
+<script>
+  // Scroll progress (XP bar) + slide counter
+  var slides = document.querySelectorAll('.slide');
+  document.getElementById('hudtotal').textContent = String(slides.length).padStart(2, '0');
+  var xp = document.getElementById('xp');
+  var hudnum = document.getElementById('hudnum');
+  function onScroll() {
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - doc.clientHeight;
+    var p = max > 0 ? doc.scrollTop / max : 0;
+    xp.style.width = (p * 100).toFixed(2) + '%';
+    var idx = 0, mid = doc.scrollTop + doc.clientHeight * 0.5;
+    slides.forEach(function (s, i) { if (s.offsetTop <= mid) idx = i; });
+    hudnum.textContent = String(idx + 1).padStart(2, '0');
+  }
+  document.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // Arrow-key slide navigation
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'PageDown' && e.key !== 'PageUp') return;
+    e.preventDefault();
+    var doc = document.documentElement;
+    var mid = doc.scrollTop + 4;
+    var idx = 0;
+    slides.forEach(function (s, i) { if (s.offsetTop <= mid) idx = i; });
+    var next = (e.key === 'ArrowDown' || e.key === 'PageDown') ? Math.min(idx + 1, slides.length - 1) : Math.max(idx - 1, 0);
+    slides[next].scrollIntoView();
+  });
+
+  // Pixel skyline (canvas, deterministic)
+  (function () {
+    var cv = document.getElementById('skyline');
+    if (!cv) return;
+    var ctx = cv.getContext('2d');
+    var css = getComputedStyle(document.documentElement);
+    function draw() {
+      var indigo = css.getPropertyValue('--indigo').trim() || '#5b5be6';
+      var gold = css.getPropertyValue('--gold').trim() || '#e8a33d';
+      var line = css.getPropertyValue('--muted').trim() || '#9a9db8';
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      var px = 6, ground = cv.height - px;
+      // deterministic pseudo-random from a fixed seed
+      var seed = 42;
+      function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+      var x = 0;
+      ctx.globalAlpha = 1;
+      while (x < cv.width) {
+        var w = px * (3 + Math.floor(rnd() * 4));
+        var h = px * (4 + Math.floor(rnd() * 12));
+        var isAmt = rnd() > 0.82;
+        ctx.fillStyle = isAmt ? indigo : line;
+        ctx.globalAlpha = isAmt ? 0.9 : 0.35;
+        ctx.fillRect(x, ground - h, w - px, h);
+        // lit windows
+        ctx.fillStyle = gold; ctx.globalAlpha = 0.95;
+        for (var wy = ground - h + px; wy < ground - px; wy += px * 2) {
+          for (var wx = x + px; wx < x + w - px * 2; wx += px * 2) {
+            if (rnd() > 0.55) ctx.fillRect(wx, wy, px / 2, px / 2 + 1);
+          }
+        }
+        x += w;
+      }
+      // ground line
+      ctx.globalAlpha = 0.6; ctx.fillStyle = line;
+      ctx.fillRect(0, ground, cv.width, 2);
+      ctx.globalAlpha = 1;
+    }
+    draw();
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq && mq.addEventListener) mq.addEventListener('change', draw);
+    new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
+
+  // Box-shadow pixel sprites, 4px grid
+  (function () {
+    var P = 4;
+    function sprite(id, rows, colors) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      var shadows = [];
+      rows.forEach(function (row, y) {
+        row.split('').forEach(function (ch, x) {
+          if (ch === '.') return;
+          var c = colors[ch];
+          if (c) shadows.push((x * P) + 'px ' + (y * P) + 'px 0 0 ' + c);
+        });
+      });
+      el.style.boxShadow = shadows.join(',');
+      el.style.width = P + 'px'; el.style.height = P + 'px';
+    }
+    var css = getComputedStyle(document.documentElement);
+    function v(n, fb) { return css.getPropertyValue(n).trim() || fb; }
+    function drawAll() {
+      var css2 = getComputedStyle(document.documentElement);
+      var G = css2.getPropertyValue('--gold').trim() || '#e8a33d';
+      var I = css2.getPropertyValue('--indigo').trim() || '#5b5be6';
+      var R = css2.getPropertyValue('--rose').trim() || '#e2687a';
+      var F = css2.getPropertyValue('--fg').trim() || '#888';
+      var M = css2.getPropertyValue('--muted').trim() || '#999';
+      sprite('sp-doc', [
+        'FFFFFF..',
+        'F....FF.',
+        'F.....F.',
+        'F.III.F.',
+        'F.....F.',
+        'F.III.F.',
+        'F.....F.',
+        'FFFFFFF.'
+      ], { F: M, I: I });
+      sprite('sp-key', [
+        '.GGG....',
+        'G...G...',
+        'G...G...',
+        '.GGG....',
+        '..G.....',
+        '..G.G...',
+        '..GGG...',
+        '..G.....'
+      ], { G: G });
+      sprite('sp-coffee', [
+        '........',
+        '.F.F....',
+        '..F.F...',
+        'MMMMM...',
+        'M...M.M.',
+        'M...MMM.',
+        'M...M...',
+        '.MMM....'
+      ], { M: M, F: F });
+      sprite('sp-heart', [
+        '.RR.RR..',
+        'RRRRRRR.',
+        'RRRRRRR.',
+        'RRRRRRR.',
+        '.RRRRR..',
+        '..RRR...',
+        '...R....',
+        '........'
+      ], { R: R });
+      sprite('sp-bubble', [
+        'IIIIIII.',
+        'I.....I.',
+        'I.GGG.I.',
+        'I.....I.',
+        'I.GG..I.',
+        'IIIIIII.',
+        '..I.....',
+        '.I......'
+      ], { I: I, G: G });
+    }
+    drawAll();
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mq && mq.addEventListener) mq.addEventListener('change', drawAll);
+    new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  })();
+</script>
