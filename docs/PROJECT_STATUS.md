@@ -165,6 +165,24 @@ under ~250 lines. This split was done in session 70 (the file had grown to 1,624
 
 ## Resume here (next session)
 
+**Handoff after session 72 (2026-07-06). Pre-G1 pixel-art mockups are DONE and awaiting the
+founder's approve/reject on the art direction (no game code, zero spend).** Three mockup scenes of
+the Anmeldung vertical slice in the proposed retro GBA style (240x160 native, 4x nearest-neighbor)
+live in `preview/game-pixel-mockups/`: the parody Termin website, the Bürgeramt waiting room, and
+the Frau Schmidt dialogue battle (GEDULD/MUT bars, Redemittel moves, D/E chips, brand indigo
+dialogue chrome). Constraint note: the sandbox network policy blocks kenney.nl / OpenGameArt /
+itch.io, so instead of downloading free packs the art was **hand-authored in code** (original,
+license-clean; `scenes.py` + the bitmap pixel font `pixfont.py` in the same folder regenerate the
+PNGs). This satisfies the plan's "mockups with free assets, zero spend" rule; real packs are only
+bought after the blessing (G2).
+
+**Next step:** if the founder blesses the direction, start game plan G1
+(`docs/plans/GAME_IMPLEMENTATION_PLAN.md`: Mission/Scene schema + `engine/mission.ts` first). If
+rejected, iterate the mockups (the generator makes restyling cheap) or fall back to the flat-SVG
+direction mentioned in the plan.
+
+---
+
 **Handoff after session 71 (2026-07-06). Frontend design/brand audit is DONE (doc-only, no code
 changed): `docs/plans/DESIGN_AUDIT_2026-07-06.md`.** The founder asked for a thorough audit of the
 frontend design, brand and visual assets with weaknesses + top 5 recommendations. Findings in short:
@@ -185,31 +203,7 @@ still PROPOSED). Phase 4 of the UX redesign is complete (session 70).
 
 ---
 
-**Handoff after session 70 (2026-07-06). UX redesign Phase 4 is COMPLETE ✅: Session C shipped
-tasks 4.5 (visible progression chip, PR TBD) and 4.6 (this gates/docs wrap), closing out Phase 4
-(plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What 4.5 shipped:
-- **`src/lib/phase.ts` (new):** `themePhase(ratio)` maps a theme's existing mastery ratio to a
-  three-step **Aufbau → Festigen → Gemischt** label, reusing the app's two existing mastery bars
-  (`< 0.4` = Aufbau, `< 0.8` = Festigen matching the city `LIT_THRESHOLD`/engine `masteryLabel`
-  bands, `>= 0.8` = Gemischt matching the `mastery() >= 0.8` "mastered" bar). Pure derived function,
-  **no new state**: both call sites already compute the ratio.
-- **Fortschritt theme grid** (`features/analytics/Analytics.tsx`, "Beherrschung nach Thema" card):
-  each theme row now shows a phase `Badge` (muted/accent/success per phase) next to the theme title.
-- **City-building tap** (`components/city/CityStrip.tsx`): the accessible label and hover title on
-  each lit building now include the phase (e.g. "Büro · Festigen"), alongside the existing percentage.
-- **Gates (4.6):** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit`
-  **62** (unchanged, no new test surface for a pure derived-label helper), `test:srs` 323 checks,
-  `test:pronounce` 26 checks, `check:bundle` main chunk **79.0 kB**.
-
-**Next step:** Phase 4 (typed recall + authentic input + progression visibility) is done. The
-founder's standing priority call stands: pivot to the game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`,
-still PROPOSED), whose formCloze / dialogue-battle scenes build on 4.1's tolerant typed grading, 4.2's
-typed-block pattern, and 4.4's authentic-input block pattern; or pick the next item off the founder
-backlog in `docs/PROJECT_REFERENCE.md`.
-
----
-
-_Older handoffs (sessions 2–69) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
+_Older handoffs (sessions 2–70) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
 
 **Content counts (verified from `src/data/*` on 2026-07-03):**
 - Vocabulary: **528 words**
