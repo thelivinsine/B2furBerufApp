@@ -1,16 +1,18 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 69: UX redesign **Phase 4 task 4.3 shipped** (Lesen/Hören text bank,
-PR #320, `f09da8e`). New `src/data/texts.ts`: **10 authored authentic-style B1–B2 texts** across 9 themes
-(2 Behörden letters, 2 workplace emails, 2 memos, 2 announcements, 2 voicemail scripts), each with a
-German title + full text, an English gloss and 2–3 German MCQ comprehension checks (**30 checks** total;
-voicemails double as TTS listening input in 4.4). New types `TextKind`/`TextCheck`/`ReadingText` +
-`"text"` in `ProvenanceContentType`; `lint-content.mjs` gained the `TEXT_KINDS` mirror and a `lintTexts`
-validator (enums, required fields, 2–3-checks contract, answer among options, globally unique check ids,
-`subThemeId` cross-check) and the bank rides the provenance cross-check (one authored/OWNED `draft` row
-per text, CoE level descriptors cited as CEFR calibration). `/sources` page labels the new type. No UI
-yet: nothing eager imports the bank (main chunk 78.9 kB unchanged); the composer block + renderer are
-task 4.4. Provenance register now **1,121 rows**.
+_Last updated: 2026-07-06 (session 69: UX redesign **Phase 4 Session B shipped** (4.3 Lesen/Hören text
+bank + 4.4 reading/listening block), so authentic input is now live in the composed session. **4.4**
+(PR #322, `98c4688`) adds a first-class `kind: "reading"` `SessionBlock`: the composer emits ~1 per
+session (Pool 6, prefers the scoped/weak theme, then the Mode lens, then any), and a voicemail text plays
+as a **listening** variant via `engine/speech.ts` TTS when the caller reports support (pure `listening`
+opt = `ttsSupported()`). New `src/features/session/ReadingBlock.tsx` renderer: a two-stage focus screen,
+read/listen the passage (tap-gloss title, `Übersetzung` toggle, TTS play/replay + `Text anzeigen` reveal
+for the listening variant), then the 2–3 comprehension MCQs one at a time. Results feed **XP**
+(`XP.readingCheck` = 8 per correct check) + the session tally as ONE aggregate (majority-correct) unit,
+and **never touch vocab FSRS**. `test:unit` 59 → 62; main chunk 78.9 kB (bank + renderer ride the lazy
+session chunk). **4.3** (PR #320, `f09da8e`) shipped the bank earlier the same session: **10 authored
+authentic-style B1–B2 texts** / **30 checks**, new `TextKind`/`TextCheck`/`ReadingText` types, `TEXT_KINDS`
+linter mirror + `lintTexts` validator, and one `text` provenance row each (register now **1,121 rows**).
 Prior: session 68: UX redesign **Phase 4 task 4.2 shipped** (typed-recall block in
 the loop). New `kind: "typing"` `SessionBlock`; the composer graduates due vocab from recognition
 flashcards to typed forward recall once a card is established (`graduatedToTyping`: reps ≥ 2 AND FSRS
@@ -644,6 +646,33 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 | 5. Anwenden + nav re-map + facet registry | Anwenden hub, `DEFAULT_PINNED_TABS`, `lib/facets.ts` | **Opus 4.8** | Touches the locked nav store + pinned-tab migration; careful, not big |
 
 ## Resume here (next session)
+
+**Handoff after session 69 (2026-07-06). UX redesign Phase 4 Session B is COMPLETE ✅: tasks 4.3
+(Lesen/Hören text bank, PR #320 `f09da8e`) AND 4.4 (reading/listening composer block + renderer, PR #322
+`98c4688`) shipped, so authentic reading/listening input is now live in the composed session (plan:
+`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What 4.4 shipped:
+- **New `kind: "reading"` `SessionBlock`** (`src/types/index.ts`): `textId` + a `listening` flag.
+- **Composer** (`src/engine/session.ts`): Pool 6 emits **exactly one** reading block per session; prefers a
+  text on the scoped/weak theme, else one in the active Mode lens, else any. A voicemail text plays as a
+  **listening** variant when the caller reports TTS (new pure `listening` opt, player passes
+  `ttsSupported()`); every other genre renders as readable text. `test:unit` gained 3 composer cases.
+- **`ReadingBlock` renderer** (`src/features/session/ReadingBlock.tsx`, new — extracted so `SessionPlayer`
+  stays under the ~1000-line line the plan flagged): a two-stage full-screen focus block. Read/listen stage
+  (genre + CEFR badges, tap-gloss title, `Übersetzung` toggle; listening = TTS play/replay with a
+  `Text anzeigen` reveal fallback), then the 2–3 comprehension MCQs one at a time (reuses the quiz MCQ
+  styling + `explain`). `XP.readingCheck` (8) per correct check; the block registers ONE aggregate tally
+  result (majority-correct) at completion, so it never inflates correct/total, and it **never touches vocab
+  FSRS** (comprehension practice, not a graded SRS card — keeps 4.5's "no new state" invariant intact).
+- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **62**,
+  `check:bundle` main chunk **78.9 kB** (bank + renderer ride the lazy session-route chunk).
+
+**Next step:** short Session C = **4.5** (visible per-theme progression chip on the Fortschritt theme grid
++ city-building tap, derived from existing FSRS/theme-mastery state, **no new state** — Sonnet) + **4.6**
+(gates/docs wrap). OR the standing alternative: pivot to game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`, still
+PROPOSED), whose formCloze / dialogue-battle scenes now have the tolerant typed grading (4.1), the typed
+block pattern (4.2), and the authentic-input block pattern (4.4) to build on.
+
+---
 
 **Handoff after session 69 (2026-07-06). UX redesign Phase 4 task 4.3 is SHIPPED ✅ (PR #320,
 squash SHA `f09da8e`): the Lesen/Hören content bank, the first half of Session B (plan:

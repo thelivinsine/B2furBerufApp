@@ -52,7 +52,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (FSRS-6 spaced repetition since s53; legacy SM-2 fields kept warm for rollback), `pronounce.ts` (tolerant spoken-answer matcher for the speaking block, s56), `quiz.ts`, `session.ts` (composed-session composer, s47; speaking pool added s56 behind the `recognitionEnabled` opt-in), `collection.ts` (redesign Phase 2.4: pure FSRS-stability→Lv 1-5 "collection level" mapping, the stable game contract for loot cards / Sammlung; unit-tested, do not drift the band boundaries)
 - `store/` — zustand stores: `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`, `useLibraryScope` (travelling library scope, s47)
 - `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47)
-- `features/session/` — `SessionPlayer` + `Session` route wrapper (the composed learning loop, s47)
+- `features/session/` — `SessionPlayer` + `Session` route wrapper (the composed learning loop, s47); `ReadingBlock.tsx` (Lesen/Hören authentic-input block renderer, s69/4.4)
 - `features/library/` — `LibrarySwitcher` + `ScopeChip` (unified Bibliothek chrome, s47)
 - `features/collection/Sammlung.tsx` — "Meine Sammlung" bag view (redesign Phase 3.4): every bookmarked word plus every word with a `cardLevel >= 1` (`engine/collection.ts`) as a browsable, level-filterable card grid. Off the nav, reached only via the "Meine Sammlung" entry card on Fortschritt (`/analytics`) and the `/sammlung` deep link, the same pattern as the retired `/quiz`. Lazy route (walks the vocabulary bank).
 - `components/city/domain-buildings.tsx` — the six flat SVG domain buildings (redesign Phase 3.1): two-tone + neon marks in the `route-icons.tsx` language, soft corners only (rx on every rect, round-join strokes on pointed shapes), ground-aligned optical sizing, plus the `DOMAIN_BUILDINGS` mastery registry that 3.2's city strip consumes. Lit = bright white windows, unlit = dark shaded openings; the founder rejected gold windows, so **no reward-gold in these marks**. Review sheet: `preview/domain-buildings-preview.svg` (the TSX is the geometry source of truth).
@@ -64,7 +64,12 @@ The app was migrated from a "drawer of 11 tools" to a **session-first learning l
 **Heute · Bibliothek · Anwenden · Fortschritt** (+ Einstellungen). All five phases (0–5) shipped; the
 phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you must not regress:
 - **Session engine:** `engine/session.ts` composer + `SessionPlayer` + `/session`; Schnellwiederholung
-  is the ~5-min preset. Focused practice flows through the toolbar's **Üben → composed session**.
+  is the ~5-min preset. Focused practice flows through the toolbar's **Üben → composed session**. Block
+  kinds: recognition `flashcard` (vocab/Redemittel), `quiz`, `grammar`, `speaking` (mic opt-in, s56),
+  `typing` (typed forward recall, s68/4.2), and `reading` (Lesen/Hören authentic-input, s69/4.4:
+  `engine/session.ts` Pool 6 emits ~1 per session, `features/session/ReadingBlock.tsx` renders a text +
+  its comprehension MCQs, a voicemail plays via TTS when `ttsSupported()`; feeds XP + the session tally,
+  **never vocab FSRS**).
   **Focus mode (redesign Phase 2.1):** `SessionPlayer` sets `useSessionStore.focusMode` while a block
   is on screen, and `AppShell` hides all chrome (header, bottom bar, sidebar) on `/session` + `/revision`
   so the session plays as a full-screen stage; chrome returns on the end screen. The locked bottom-bar
