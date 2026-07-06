@@ -67,7 +67,17 @@ interface SettingsState {
   /** Fortschritt "Details" section (charts/calendar/mastery grid) expanded state, redesign Phase 3.3. */
   progressDetailsExpanded: boolean;
 
+  /**
+   * Can-Do milestone ids the learner has explicitly claimed on the Fortschritt
+   * quest board (redesign Phase 3.3 "claim moment"). A milestone becomes
+   * claimable once its theme-mastery ratio crosses the threshold; claiming it
+   * acknowledges the win so the reward card advances to the next one. Rides
+   * cloudSync via the settings jsonb blob like the other flags.
+   */
+  claimedMilestones: string[];
+
   setSettings: (patch: Partial<SettingsState>) => void;
+  claimMilestone: (id: string) => void;
   completeOnboarding: (patch: Partial<SettingsState>) => void;
   resetSettings: () => void;
   setPinnedTabs: (tabs: string[]) => void;
@@ -101,6 +111,7 @@ const defaults = {
   moreOrder: [] as string[],
   signInBannerDismissed: false,
   progressDetailsExpanded: false,
+  claimedMilestones: [] as string[],
 };
 
 export const useSettingsStore = create<SettingsState>()(
@@ -108,6 +119,12 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       ...defaults,
       setSettings: (patch) => set(patch),
+      claimMilestone: (id) =>
+        set((s) =>
+          s.claimedMilestones.includes(id)
+            ? {}
+            : { claimedMilestones: [...s.claimedMilestones, id] },
+        ),
       completeOnboarding: (patch) => set({ ...patch, onboarded: true }),
       resetSettings: () => set({ ...defaults }),
       setPinnedTabs: (tabs) => set({ pinnedTabs: tabs }),

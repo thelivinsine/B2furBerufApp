@@ -1,5 +1,4 @@
 import type { ContextTag, LearningMode } from "@/types";
-import { filterVocab } from "@/data/vocabulary";
 
 /**
  * Intent / goal cards (Taxonomy Phase 3, step 4): "start from a real situation"
@@ -107,36 +106,6 @@ export const intentCards: IntentCard[] = [
     minutes: 20,
   },
 ];
-
-import { CEFR_ORDER } from "@/lib/cefr";
-
-/** Compact CEFR span over a vocab bundle, e.g. "B1–B2" or "B2". */
-function cefrRange(vocab: { theme?: string; sub?: string }): string | null {
-  const idxs = filterVocab(vocab)
-    .map((v) => (v.cefr ? CEFR_ORDER.indexOf(v.cefr) : -1))
-    .filter((i) => i >= 0)
-    .sort((a, b) => a - b);
-  if (!idxs.length) return null;
-  const short = (s: string) => s.split(".")[0];
-  const lo = short(CEFR_ORDER[idxs[0]]);
-  const hi = short(CEFR_ORDER[idxs[idxs.length - 1]]);
-  return lo === hi ? lo : `${lo}–${hi}`;
-}
-
-/** The meta line shown at the bottom of a card (live word count where applicable). */
-export function cardMeta(card: IntentCard): string {
-  if (card.vocab) {
-    const count = filterVocab(card.vocab).length;
-    const range = cefrRange(card.vocab);
-    const parts = [`${count} Wörter`];
-    if (range) parts.push(range);
-    if (card.minutes) parts.push(`${card.minutes} Min`);
-    return parts.join(" · ");
-  }
-  const parts = [card.meta ?? ""];
-  if (card.minutes) parts.push(`${card.minutes} Min`);
-  return parts.filter(Boolean).join(" · ");
-}
 
 /** Cards relevant to the active Mode lens (see module doc for the rollup rule). */
 export function intentCardsForMode(mode: LearningMode): IntentCard[] {

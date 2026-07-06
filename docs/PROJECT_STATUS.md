@@ -1,14 +1,15 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 70: UX redesign **Phase 4 is COMPLETE ✅**. Session C shipped the
-last two tasks: **4.5** the Aufbau/Festigen/Gemischt progression chip (`src/lib/phase.ts`, a pure
-derived label on the existing theme-mastery ratio, no new state) on the Fortschritt theme grid and the
-city-building tap label, and **4.6** this gates/docs wrap. Sessions A (4.1–4.2, typed recall) and B
-(4.3–4.4, Lesen/Hören authentic input) shipped in sessions 68–69; full detail for all of Phase 4 is in
-the "Resume here" handoffs below and the archive. Session 62's game plan,
-`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and is now the standing next-step candidate
-now that redesign Phases 1–4 are all shipped. The working branch is reassigned every session, so
-**`main` is always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-06 (session 71: two parallel audits. **(1) UX redesign audit + gap analysis**
+(report: `docs/plans/UX_AUDIT_2026-07-06.md`) confirmed redesign Phases 1–4 are faithfully implemented,
+all gates green; two gaps were found and fixed the same session: a latent eager-bundle landmine (dead
+`cardMeta`/`cefrRange` + `filterVocab` import removed from `intentCards.ts`) and the missing quest
+"claim moment" (new persisted `claimedMilestones` + a reward-gold "Einlösen" card on Fortschritt).
+**(2) Frontend design/brand audit** (`docs/plans/DESIGN_AUDIT_2026-07-06.md`, doc-only) flagged missing
+social-preview meta, five parallel accent systems, a light-mode boot flash, Denglish copy, and contrast
+failures. Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED. The working
+branch is reassigned every session, so **`main` is always the source of truth**. Product name:
+**Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
@@ -185,31 +186,31 @@ still PROPOSED). Phase 4 of the UX redesign is complete (session 70).
 
 ---
 
-**Handoff after session 70 (2026-07-06). UX redesign Phase 4 is COMPLETE ✅: Session C shipped
-tasks 4.5 (visible progression chip, PR TBD) and 4.6 (this gates/docs wrap), closing out Phase 4
-(plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What 4.5 shipped:
-- **`src/lib/phase.ts` (new):** `themePhase(ratio)` maps a theme's existing mastery ratio to a
-  three-step **Aufbau → Festigen → Gemischt** label, reusing the app's two existing mastery bars
-  (`< 0.4` = Aufbau, `< 0.8` = Festigen matching the city `LIT_THRESHOLD`/engine `masteryLabel`
-  bands, `>= 0.8` = Gemischt matching the `mastery() >= 0.8` "mastered" bar). Pure derived function,
-  **no new state**: both call sites already compute the ratio.
-- **Fortschritt theme grid** (`features/analytics/Analytics.tsx`, "Beherrschung nach Thema" card):
-  each theme row now shows a phase `Badge` (muted/accent/success per phase) next to the theme title.
-- **City-building tap** (`components/city/CityStrip.tsx`): the accessible label and hover title on
-  each lit building now include the phase (e.g. "Büro · Festigen"), alongside the existing percentage.
-- **Gates (4.6):** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit`
-  **62** (unchanged, no new test surface for a pure derived-label helper), `test:srs` 323 checks,
-  `test:pronounce` 26 checks, `check:bundle` main chunk **79.0 kB**.
+**Handoff after session 71 (2026-07-06). UX redesign audit + gap analysis, plus two follow-up fixes.**
+A code-level audit of redesign Phases 1–4 (report: `docs/plans/UX_AUDIT_2026-07-06.md`) verified every
+task against the real code (not the docs) and re-ran all gates green. Verdict: faithfully implemented,
+locked invariants intact (persist migration, FSRS latency, mobile bar + iOS fixes, eager-bundle budget,
+no em dashes). Two gaps were found and fixed the same session:
+- **Eager-bundle de-risk:** `src/features/dashboard/intentCards.ts` statically imported `filterVocab`
+  from the 245 kB vocabulary bank, used only by dead `cardMeta`/`cefrRange` helpers (kept out of the
+  main chunk by tree-shaking alone). Removed the dead helpers + imports so Heute's ~78 kB eager-path
+  invariant is now structural, not accidental. Main chunk unchanged (79.1 kB).
+- **Quest claim moment:** the plan promised a Can-Do "claim moment"; achievement was silently passive.
+  Added persisted `claimedMilestones: string[]` + `claimMilestone(id)` to `useSettingsStore` (rides
+  cloudSync via the settings jsonb blob, no version bump). Fortschritt now shows a reward-gold,
+  spring-in "Quest geschafft · <Thema>" card with an "Einlösen" button for any achieved-but-unclaimed
+  milestone, advancing to the next win; reduced-motion honored. New `claimMilestone` idempotency test.
+- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **63**
+  (+1), `check:bundle` main chunk **79.1 kB**. Non-blocking gaps left documented in the audit report
+  (word-order quiz has no FSRS latency sample; `bank`/`wohnhaus` city buildings await content packs;
+  onboarding defers name/exam-date to Settings, which covers them).
 
-**Next step:** Phase 4 (typed recall + authentic input + progression visibility) is done. The
-founder's standing priority call stands: pivot to the game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`,
-still PROPOSED), whose formCloze / dialogue-battle scenes build on 4.1's tolerant typed grading, 4.2's
-typed-block pattern, and 4.4's authentic-input block pattern; or pick the next item off the founder
-backlog in `docs/PROJECT_REFERENCE.md`.
+**Next step:** pivot to game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, still PROPOSED) or pick
+the next founder-backlog item in `docs/PROJECT_REFERENCE.md`.
 
 ---
 
-_Older handoffs (sessions 2–69) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
+_Older handoffs (sessions 2–70) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
 
 **Content counts (verified from `src/data/*` on 2026-07-03):**
 - Vocabulary: **528 words**

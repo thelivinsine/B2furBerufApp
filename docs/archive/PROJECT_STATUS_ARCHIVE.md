@@ -7,6 +7,39 @@ authoritative full authorship record remains git history + `docs/SESSION_PROMPT_
 
 ---
 
+## Session 70 (2026-07-06) — UX redesign Phase 4 Session C (progression chip + wrap)
+
+**Phase 4 COMPLETE: tasks 4.5 (visible progression chip) + 4.6 (gates/docs wrap).** What 4.5 shipped:
+- **`src/lib/phase.ts` (new):** `themePhase(ratio)` maps a theme's existing mastery ratio to a
+  three-step **Aufbau → Festigen → Gemischt** label, reusing the app's two existing mastery bars
+  (`< 0.4` = Aufbau, `< 0.8` = Festigen matching the city `LIT_THRESHOLD`/engine `masteryLabel` bands,
+  `>= 0.8` = Gemischt matching the `mastery() >= 0.8` "mastered" bar). Pure derived function, no new
+  state: both call sites already compute the ratio.
+- **Fortschritt theme grid** (`features/analytics/Analytics.tsx`): each theme row shows a phase `Badge`.
+- **City-building tap** (`components/city/CityStrip.tsx`): the aria-label/title include the phase.
+- **Gates:** all green; `test:unit` 62, `test:srs` 323, `test:pronounce` 26, `check:bundle` 79.0 kB.
+
+---
+
+## Session 69 (2026-07-06) — UX redesign Phase 4 Session B (Lesen/Hören authentic input)
+
+**Phase 4 Session B COMPLETE: tasks 4.3 (Lesen/Hören text bank, PR #320 `f09da8e`) AND 4.4
+(reading/listening composer block + renderer, PR #322 `98c4688`).** What 4.4 shipped:
+- **New `kind: "reading"` `SessionBlock`** (`src/types/index.ts`): `textId` + a `listening` flag.
+- **Composer** (`src/engine/session.ts`): Pool 6 emits **exactly one** reading block per session;
+  prefers a text on the scoped/weak theme, else one in the active Mode lens, else any. A voicemail
+  text plays as a **listening** variant when the caller reports TTS (new pure `listening` opt, player
+  passes `ttsSupported()`); every other genre renders as readable text. `test:unit` gained 3 cases.
+- **`ReadingBlock` renderer** (`src/features/session/ReadingBlock.tsx`, extracted so `SessionPlayer`
+  stays under ~1000 lines): a two-stage full-screen focus block. Read/listen stage (genre + CEFR
+  badges, tap-gloss title, `Übersetzung` toggle; listening = TTS play/replay with a `Text anzeigen`
+  reveal fallback), then the 2–3 comprehension MCQs one at a time. `XP.readingCheck` (8) per correct
+  check; the block registers ONE aggregate tally (majority-correct) at completion, so it never
+  inflates correct/total, and it **never touches vocab FSRS**.
+- **Gates:** all green; `check:bundle` main chunk **78.9 kB** (bank + renderer ride the lazy chunk).
+
+---
+
 ## Sessions 40 → 4 (detailed logs)
 
 ### Session 40 (2026-06-26) — Triple collocations bank + hide example translations + Select dropdown overlay

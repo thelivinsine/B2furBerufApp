@@ -61,4 +61,18 @@ describe("settings store", () => {
     expect(useSettingsStore.getState().pinnedTabs[0]).toBe("/");
     useSettingsStore.getState().resetSettings();
   });
+
+  it("claimMilestone appends unique ids and is idempotent", () => {
+    useSettingsStore.getState().resetSettings();
+    expect(useSettingsStore.getState().claimedMilestones).toEqual([]);
+    useSettingsStore.getState().claimMilestone("cd_meetings_1");
+    useSettingsStore.getState().claimMilestone("cd_customer_1");
+    useSettingsStore.getState().claimMilestone("cd_meetings_1"); // duplicate, ignored
+    expect(useSettingsStore.getState().claimedMilestones).toEqual([
+      "cd_meetings_1",
+      "cd_customer_1",
+    ]);
+    useSettingsStore.getState().resetSettings();
+    expect(useSettingsStore.getState().claimedMilestones).toEqual([]);
+  });
 });
