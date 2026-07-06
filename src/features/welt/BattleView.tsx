@@ -93,9 +93,10 @@ export function BattleView({
             />
           </motion.div>
         )}
-        {/* the player holds the bottom band, foreground scale (opponent top,
-            player bottom: the founder's battle-composition rule, s74) */}
-        <StageSprite src={PLAYER_SPRITE} x={14.5} y={53} w={13} />
+        {/* the player holds the bottom band at the same human scale as the
+            opponent (founder rules s74: opponent top, player bottom; people
+            stay the same size, no foreground zoom) */}
+        <StageSprite src={PLAYER_SPRITE} x={18} y={68} w={7} />
 
         {/* enemy card: HER Geduld delta floats here */}
         <GameCard className="absolute left-3 top-3 w-[54%] max-w-56 space-y-1.5 px-3 py-2.5">
