@@ -171,7 +171,9 @@ under ~250 lines. This split was done in session 70 (the file had grown to 1,624
 **Handoff after session 62 continued (2026-07-06). Detailed game design DRAFTED, awaiting founder
 review: `docs/strategy/GAME_DESIGN.md`.** The founder asked for a detailed gameplan with storyline,
 per-mission descriptions, game elements and player interaction, delivered as a slide deck. The deck
-(21 slides) was delivered as a Claude Artifact; the durable source of truth is the new
+(21 slides) was delivered as a Claude Artifact AND committed as
+**`docs/strategy/GAME_DESIGN_DECK.html`** (self-contained, open in any browser; added after the
+Artifact link failed for the founder); the durable source of truth is the new
 **`docs/strategy/GAME_DESIGN.md`**, the design layer between `GAME_CONCEPT.md` (pillars) and
 `GAME_IMPLEMENTATION_PLAN.md` (build). Contents: premise + character creation (you arrive with two
 suitcases and a reason; no villain, everyday Germany is the antagonist); the city **"Neustadt"** and
