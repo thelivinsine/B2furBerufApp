@@ -1,31 +1,14 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 69: UX redesign **Phase 4 Session B shipped** (4.3 Lesen/Hören text
-bank + 4.4 reading/listening block), so authentic input is now live in the composed session. **4.4**
-(PR #322, `98c4688`) adds a first-class `kind: "reading"` `SessionBlock`: the composer emits ~1 per
-session (Pool 6, prefers the scoped/weak theme, then the Mode lens, then any), and a voicemail text plays
-as a **listening** variant via `engine/speech.ts` TTS when the caller reports support (pure `listening`
-opt = `ttsSupported()`). New `src/features/session/ReadingBlock.tsx` renderer: a two-stage focus screen,
-read/listen the passage (tap-gloss title, `Übersetzung` toggle, TTS play/replay + `Text anzeigen` reveal
-for the listening variant), then the 2–3 comprehension MCQs one at a time. Results feed **XP**
-(`XP.readingCheck` = 8 per correct check) + the session tally as ONE aggregate (majority-correct) unit,
-and **never touch vocab FSRS**. `test:unit` 59 → 62; main chunk 78.9 kB (bank + renderer ride the lazy
-session chunk). **4.3** (PR #320, `f09da8e`) shipped the bank earlier the same session: **10 authored
-authentic-style B1–B2 texts** / **30 checks**, new `TextKind`/`TextCheck`/`ReadingText` types, `TEXT_KINDS`
-linter mirror + `lintTexts` validator, and one `text` provenance row each (register now **1,121 rows**).
-Prior: session 68: UX redesign **Phase 4 task 4.2 shipped** (typed-recall block in
-the loop). New `kind: "typing"` `SessionBlock`; the composer graduates due vocab from recognition
-flashcards to typed forward recall once a card is established (`graduatedToTyping`: reps ≥ 2 AND FSRS
-stability ≥ `TYPING_STABILITY_FLOOR` = 8 days, legacy cards fall back to `interval`), while new/young
-cards stay on flashcards. New `TypingBlock` renderer in `SessionPlayer`: EN prompt display-size, typed
-DE input graded by 4.1's `gradeTyped`, an "Anzeigen" reveal that grades as a miss, latency + verdict
-into `reviewVocab`. The three-tier verdict maps onto the SRS Grade scale (correct → 4, almost → 3/Hard,
-wrong → 0) so near-misses schedule gently instead of feeding false evidence; combo/XP reward only a
-clean "correct". `captureLoot` now takes an explicit `Grade`. 3 new composer Vitest cases (`test:unit`
-56 → 59); all gates green (build, lint 0 errors, `lint:content`, `check:bundle` main chunk 78.9 kB).
-Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and sequences after
-redesign Phases 1–3 (now all shipped). The working branch is reassigned every session, so **`main` is
-always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-06 (session 70: UX redesign **Phase 4 is COMPLETE ✅**. Session C shipped the
+last two tasks: **4.5** the Aufbau/Festigen/Gemischt progression chip (`src/lib/phase.ts`, a pure
+derived label on the existing theme-mastery ratio, no new state) on the Fortschritt theme grid and the
+city-building tap label, and **4.6** this gates/docs wrap. Sessions A (4.1–4.2, typed recall) and B
+(4.3–4.4, Lesen/Hören authentic input) shipped in sessions 68–69; full detail for all of Phase 4 is in
+the "Resume here" handoffs below and the archive. Session 62's game plan,
+`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and is now the standing next-step candidate
+now that redesign Phases 1–4 are all shipped. The working branch is reassigned every session, so
+**`main` is always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
@@ -182,6 +165,30 @@ under ~250 lines. This split was done in session 70 (the file had grown to 1,624
 
 ## Resume here (next session)
 
+**Handoff after session 70 (2026-07-06). UX redesign Phase 4 is COMPLETE ✅: Session C shipped
+tasks 4.5 (visible progression chip, PR TBD) and 4.6 (this gates/docs wrap), closing out Phase 4
+(plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What 4.5 shipped:
+- **`src/lib/phase.ts` (new):** `themePhase(ratio)` maps a theme's existing mastery ratio to a
+  three-step **Aufbau → Festigen → Gemischt** label, reusing the app's two existing mastery bars
+  (`< 0.4` = Aufbau, `< 0.8` = Festigen matching the city `LIT_THRESHOLD`/engine `masteryLabel`
+  bands, `>= 0.8` = Gemischt matching the `mastery() >= 0.8` "mastered" bar). Pure derived function,
+  **no new state**: both call sites already compute the ratio.
+- **Fortschritt theme grid** (`features/analytics/Analytics.tsx`, "Beherrschung nach Thema" card):
+  each theme row now shows a phase `Badge` (muted/accent/success per phase) next to the theme title.
+- **City-building tap** (`components/city/CityStrip.tsx`): the accessible label and hover title on
+  each lit building now include the phase (e.g. "Büro · Festigen"), alongside the existing percentage.
+- **Gates (4.6):** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit`
+  **62** (unchanged, no new test surface for a pure derived-label helper), `test:srs` 323 checks,
+  `test:pronounce` 26 checks, `check:bundle` main chunk **79.0 kB**.
+
+**Next step:** Phase 4 (typed recall + authentic input + progression visibility) is done. The
+founder's standing priority call stands: pivot to the game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`,
+still PROPOSED), whose formCloze / dialogue-battle scenes build on 4.1's tolerant typed grading, 4.2's
+typed-block pattern, and 4.4's authentic-input block pattern; or pick the next item off the founder
+backlog in `docs/PROJECT_REFERENCE.md`.
+
+---
+
 **Handoff after session 69 (2026-07-06). UX redesign Phase 4 Session B is COMPLETE ✅: tasks 4.3
 (Lesen/Hören text bank, PR #320 `f09da8e`) AND 4.4 (reading/listening composer block + renderer, PR #322
 `98c4688`) shipped, so authentic reading/listening input is now live in the composed session (plan:
@@ -209,61 +216,7 @@ block pattern (4.2), and the authentic-input block pattern (4.4) to build on.
 
 ---
 
-**Handoff after session 69 (2026-07-06). UX redesign Phase 4 task 4.3 is SHIPPED ✅ (PR #320,
-squash SHA `f09da8e`): the Lesen/Hören content bank, the first half of Session B (plan:
-`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
-- **`src/data/texts.ts` (new):** 10 authored authentic-style B1–B2 texts across 9 themes, in the five
-  genres the plan names: Behörden letters (`tx_behoerde_anmeldung_brief` B1.2 meldewesen,
-  `tx_behoerde_unterlagen_brief` B2.1 antrag), workplace emails (scheduling B1.2, customer/reklamation
-  B2.1), memos (meetings/entscheidung B2.1, project B2.2), announcements (technology B1.2, safety B2.1),
-  voicemail scripts (travel B1.2, logistics B2.1; these double as TTS listening input in 4.4). Each item:
-  `id`/`kind`/`themeId`/`cefr`/`title`/`titleEn`/`de`/`en` + 2–3 MCQ `checks` (30 total, German
-  questions, `explain` in English). All names/numbers/offices fictitious; no em dashes.
-- **Types (`src/types/index.ts`):** `TextKind` (letter/email/memo/announcement/voicemail), `TextCheck`,
-  `ReadingText`; `"text"` added to `ProvenanceContentType`.
-- **Linter (`scripts/lint-content.mjs`):** `TEXT_KINDS` closed-enum mirror + `lintTexts` (kind/themeId/
-  cefr enums, required fields, **checks length ≥ 2 is an error** (the 4.4 renderer contract), answer
-  among options, globally unique check ids via a `texts/checks` sweep, `subThemeId` declared on the
-  parent theme, `tx_` prefix warning). Bank loaded, counted (`texts`, `text checks`) and included in
-  the provenance cross-check (one row per text; embedded checks ride on the text's row).
-- **Provenance:** 10 authored/OWNED rows, `review_status: "draft"` for the founder pass; register now
-  **1,121 rows** (1,096 draft / 25 verified). `/sources` (`features/legal/Sources.tsx`) got the required
-  label + ordering entry for the new type.
-- **Gates:** all green — `build`, `lint` (0 errors), `lint:content` (0 errors/warnings), `test:unit` 59,
-  `check:bundle` main chunk **78.9 kB** (bank has no eager consumer; 4.4 must keep it in a lazy chunk).
-
-**Next step:** **task 4.4** (Opus per the plan): `kind: "reading"` composer block (+ listening variant
-via `engine/speech.ts` TTS), full-screen text card with tap-gloss + comprehension MCQ in `SessionPlayer`,
-results feeding XP/theme progress (NOT vocab FSRS), ~1 block per composed session. Then short Session C
-= 4.5 (progression chip) + 4.6 (docs/ship). The founder's pending priority call vs game-plan G1 stands.
-
----
-
-**Handoff after session 68 (2026-07-05). UX redesign Phase 4 Session A is COMPLETE ✅: task 4.2
-(typed-recall block in the loop) shipped, so 4.1 + 4.2 together put tolerant typed forward recall into
-the default session and feeding FSRS (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
-- **New `kind: "typing"` `SessionBlock`** (`src/types/index.ts`): vocab-only forward recall (EN → typed DE),
-  same shape as `speaking` (sourceId/de/en/example).
-- **Composer graduation rule** (`src/engine/session.ts`): `graduatedToTyping(card)` returns true when a
-  due card is `reps >= 2` AND `(stability ?? interval) >= TYPING_STABILITY_FLOOR` (8 days). Pool 1 maps
-  graduated due cards to `typing` blocks (`ty_` key), new/young cards stay recognition `flashcard`s. A
-  single lucky first answer never jumps a brand-new word to typing.
-- **`TypingBlock` renderer** (`SessionPlayer.tsx`): EN prompt display-size, a typed DE input graded by
-  4.1's `gradeTyped`, an "Anzeigen" give-up that grades as a miss, three-tier feedback (success/warning/
-  danger tones) with the correct answer + `SpeakButton` + example, latency captured mount→answer. The
-  verdict maps onto the SRS `Grade` scale (correct → 4 Good, almost → 3 Hard, wrong → 0 Again); combo/XP
-  reward only a clean "correct". `captureLoot` refactored to take an explicit `Grade` (all callers updated).
-- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **59**
-  (56 → 59: +3 composer cases for the graduation rule), `check:bundle` main chunk **78.9 kB**.
-
-**Next step:** Phase 4 **Session B = 4.3 + 4.4** (Lesen/Hören content bank `src/data/texts.ts` + the
-`reading`/`listening` composer block + renderer), then short Session C = 4.5 (progression chip) + 4.6
-(docs/ship). OR pivot to game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`), whose formCloze / dialogue-battle
-scenes now have both the tolerant grading (4.1) and a typed-input block pattern (4.2) to build on.
-
----
-
-_Older handoffs (sessions 2–67) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
+_Older handoffs (sessions 2–69) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
 
 **Content counts (verified from `src/data/*` on 2026-07-03):**
 - Vocabulary: **528 words**

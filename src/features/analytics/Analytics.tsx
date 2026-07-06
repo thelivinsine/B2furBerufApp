@@ -38,6 +38,7 @@ import { mastery, masteryLabel, dueCount } from "@/engine/srs";
 import { weakestBand, weakestTheme } from "@/engine/session";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
 import { pct, cn, daysBetween, todayKey } from "@/lib/utils";
+import { themePhaseLabel, THEME_PHASE_BADGE_VARIANT, themePhase } from "@/lib/phase";
 import { getWritingHistory, type WritingHistoryEntry } from "@/lib/writing";
 import type { WeaknessCategory } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -478,7 +479,14 @@ export function Analytics() {
                 {themeStats.map(({ theme, total, mastered, ratio }) => (
                   <div key={theme.id} className="space-y-1">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">{theme.titleDe}</span>
+                      <span className="flex items-center gap-2 font-medium">
+                        {theme.titleDe}
+                        {total > 0 && (
+                          <Badge variant={THEME_PHASE_BADGE_VARIANT[themePhase(ratio)]}>
+                            {themePhaseLabel(ratio)}
+                          </Badge>
+                        )}
+                      </span>
                       <span className="tabular-nums text-muted-foreground">
                         {mastered}/{total} · {Math.round(ratio * 100)}%
                       </span>

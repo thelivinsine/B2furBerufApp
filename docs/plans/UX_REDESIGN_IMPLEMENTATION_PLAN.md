@@ -141,9 +141,11 @@ composer block + `TypingBlock` renderer + `graduatedToTyping` graduation rule). 
 EXECUTED ✅** (s69): 4.3 (PR #320) the `src/data/texts.ts` Lesen/Hören bank (10 texts / 30 checks) with
 linter + provenance coverage, and 4.4 (PR #322) the `kind: "reading"` composer block + `ReadingBlock`
 renderer (read/listen stage with TTS + tap-gloss, then comprehension MCQs; XP + session tally, never vocab
-FSRS). Tasks 4.5–4.6 remain
-pending the founder's priority call against `docs/plans/GAME_IMPLEMENTATION_PLAN.md` (still PROPOSED; its
-G0 prerequisite, redesign Phases 1–3, is now fully shipped, so G1 is also eligible)._
+FSRS). **Session C (4.5 + 4.6) is EXECUTED ✅** (s70): 4.5 the `src/lib/phase.ts` Aufbau/Festigen/Gemischt
+progression chip on the Fortschritt theme grid + city-building tap label (pure derived function, no new
+state), and 4.6 this gates/docs wrap. **Phase 4 is now COMPLETE.** Next up is the founder's priority call
+against `docs/plans/GAME_IMPLEMENTATION_PLAN.md` (still PROPOSED; its G0 prerequisite, redesign Phases
+1–3, is fully shipped, and G1 now also has 4.1/4.2/4.4's typed-grading and block patterns to build on)._
 
 **In plain words:** This phase upgrades what learning science says matters most. First, instead
 of only tapping multiple-choice answers, learners type the German word from memory (with
@@ -157,15 +159,15 @@ real-world texts are what actually break the intermediate plateau this product e
 | 4.2 ✅ | **Typed-recall block in the loop:** new `kind: "typing"` `SessionBlock` in the composer with a graduation rule (cards above a stability floor get typed forward-recall; new/young cards stay on recognition flashcards), renderer in `SessionPlayer` (EN prompt display-size, typed DE input, "Anzeigen" reveal fallback that grades as a miss, latency + verdict feed `reviewVocab`, combo/loot untouched). Extend the session-composer Vitest pins. | `engine/session.ts`, `features/session/SessionPlayer.tsx`, `tests/` | **Opus 4.8** | Integration threads through the composer pools and the FSRS `latencyMs` capture path; a dropped signal here is the Phase 2 risk all over again. |
 | 4.3 ✅ | **Lesen/Hören content bank** (audit rec #3): new `src/data/texts.ts` with ~8–12 short authentic-style B1–B2 texts (Behörden letter, workplace email, memo, announcement, voicemail script) each with `themeId`, `cefr`, DE text + EN gloss, and 2–3 comprehension checks. Closed enums mirrored in `scripts/lint-content.mjs`; one provenance row per item (`review_status: "draft"` for the founder pass). | new `src/data/texts.ts`, `src/types/index.ts`, `src/data/provenance.ts`, `scripts/lint-content.mjs` | **Fable 5** | Original German content at a calibrated CEFR band is authored work, and the bank's schema is a new content contract the linter must be able to police. |
 | 4.4 ✅ | **Lesen/Hören composer block + renderer:** `kind: "reading"` block (plus a listening variant that plays the same text via `engine/speech.ts` TTS when available), full-screen text card with tap-gloss, comprehension MCQ, results feed XP/theme progress (NOT vocab FSRS), weighted ~1 block per composed session. | `engine/session.ts`, `SessionPlayer.tsx` | **Opus 4.8** | A new first-class block kind touches session weighting and the focus-mode stage; content-governance rules apply. |
-| 4.5 | **Visible progression chip** (audit rec #5a): small per-theme phase label (e.g. Aufbau → Festigen → Gemischt) derived from existing FSRS/theme-mastery state, shown on the Fortschritt theme grid and as the subtitle of a city-building tap. | `features/analytics/Analytics.tsx`, `components/city/`, `src/lib/` | **Sonnet 5** | Small derived-state UI once 4.1/4.2 land; no new state. |
-| 4.6 | Gates + ship + docs: all gates including `test:srs`/`test:pronounce`, CLAUDE.md content counts (texts bank), `PROJECT_STATUS.md` + `SESSION_PROMPT_LOG.md`, PR → `main` → squash-merge → branch realign. | — | **Haiku 4.5** | Mechanical. |
+| 4.5 ✅ | **Visible progression chip** (audit rec #5a): small per-theme phase label (e.g. Aufbau → Festigen → Gemischt) derived from existing FSRS/theme-mastery state, shown on the Fortschritt theme grid and as the subtitle of a city-building tap. | `features/analytics/Analytics.tsx`, `components/city/`, `src/lib/` | **Sonnet 5** | Small derived-state UI once 4.1/4.2 land; no new state. |
+| 4.6 ✅ | Gates + ship + docs: all gates including `test:srs`/`test:pronounce`, CLAUDE.md content counts (texts bank), `PROJECT_STATUS.md` + `SESSION_PROMPT_LOG.md`, PR → `main` → squash-merge → branch realign. | — | **Haiku 4.5** | Mechanical. |
 
 **Suggested session split (matches the M–L, 2–3 session estimate):**
 - **Session A — typed recall (4.1 + 4.2 + gates).** Ships standalone; this is the audit's
   "if only one thing ships" item and the half of Phase 4 the game plan also reuses (G1's
   formCloze / dialogue-battle scenes need exactly this tolerant typed grading).
 - **Session B — authentic input (4.3 + 4.4 + gates).** Content authoring + the new block kind.
-- **Session C (short) — 4.5 + 4.6** wrap-up, or fold 4.5 into B if it runs light.
+- **Session C (short) — 4.5 + 4.6 ✅ EXECUTED** (s70) wrap-up.
 
 **Acceptance criteria:** typed recall live in the default loop and feeding FSRS; at least one
 authentic-input block kind in the composer; grading covered by unit tests; gates green.
