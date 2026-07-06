@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
-import type { DialogueBattleScene } from "@/types/game";
+import type { BattleMove, DialogueBattleScene } from "@/types/game";
 import { currentBattleNode, playMove, resolveBattle, type MissionRun } from "@/engine/mission";
+import { gradeTyped } from "@/engine/typing";
 import { npcById, keyItemById } from "@/data/missions";
 import { cn } from "@/lib/utils";
 import { Gloss } from "@/features/shared/Gloss";
@@ -40,23 +41,26 @@ export function BattleView({
   act,
 }: SceneViewProps & { scene: DialogueBattleScene; run: MissionRun }) {
   const [showEn, setShowEn] = useState(false);
+  // Typed challenge in progress (the input ladder's higher rung).
+  const [typingMove, setTypingMove] = useState<BattleMove | null>(null);
+  const [typedInput, setTypedInput] = useState("");
   const battle = run.battle;
   const node = currentBattleNode(run);
   if (!battle || !node) return null;
+
+  const submitTyped = (m: BattleMove) => {
+    if (!typedInput.trim() || !m.cloze) return;
+    const verdict = gradeTyped(typedInput, m.cloze).verdict;
+    setTypingMove(null);
+    setTypedInput("");
+    act((r) => playMove(r, m.id, verdict));
+  };
 
   const npc = npcById.get(scene.npc);
   const sprite = npc?.sprite ? NPC_SPRITES[npc.sprite] : undefined;
   const last = battle.last;
   const missingItem = last?.missingItem ? keyItemById.get(last.missingItem) : undefined;
   const bigHit = (last?.geduld ?? 0) <= -10;
-  // The floating delta chip shows the Geduld delta when there is one, else
-  // the Mut delta; sign/color must come from the SHOWN value.
-  const delta =
-    last && last.geduld !== 0
-      ? { label: "Geduld", value: last.geduld }
-      : last && last.mut !== 0
-        ? { label: "Mut", value: last.mut }
-        : undefined;
 
   return (
     <div className="space-y-3">
@@ -81,35 +85,23 @@ export function BattleView({
         )}
         <StageSprite src={PLAYER_SPRITE} x={15} y={49} w={7} />
 
-        {/* enemy card */}
+        {/* enemy card: HER Geduld delta floats here */}
         <GameCard className="absolute left-3 top-3 w-[54%] max-w-56 space-y-1.5 px-3 py-2.5">
           <div className="flex items-center justify-between gap-2">
             <span className="truncate text-sm font-bold">{npc?.name}</span>
-            <Chip>{scene.npcCefr}</Chip>
+            <span className="flex items-center gap-1.5">
+              <DeltaFloat turns={battle.turns} value={last?.geduld ?? 0} />
+              <Chip>{scene.npcCefr}</Chip>
+            </span>
           </div>
           <Meter label="Geduld" value={battle.geduld} max={battle.geduldMax} color={GAME_AMBER} />
         </GameCard>
 
-        {/* player card */}
+        {/* player card: YOUR Mut delta floats here */}
         <GameCard className="absolute bottom-3 right-3 w-[48%] max-w-52 space-y-1.5 px-3 py-2.5">
           <div className="flex items-center justify-between gap-2">
             <span className="text-sm font-bold">Du</span>
-            <AnimatePresence>
-              {delta && battle.turns > 0 && (
-                <motion.span
-                  key={battle.turns}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className={cn(
-                    "text-xs font-bold",
-                    delta.value < 0 ? "text-rose-500" : "text-teal-600",
-                  )}
-                >
-                  {`${delta.value > 0 ? "+" : ""}${delta.value} ${delta.label}`}
-                </motion.span>
-              )}
-            </AnimatePresence>
+            <DeltaFloat turns={battle.turns} value={last?.mut ?? 0} />
           </div>
           <Meter label="Mut" value={battle.mut} max={battle.mutMax} color={GAME_INDIGO} />
         </GameCard>
@@ -151,6 +143,11 @@ export function BattleView({
             Dir fehlt: {missingItem.de}!
           </p>
         )}
+        {last?.typed === "wrong" && !missingItem && (
+          <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm font-medium text-rose-600">
+            Vertippt! Der Satz verliert seine Wirkung.
+          </p>
+        )}
         {last?.feedback && !missingItem && (
           <p className="text-sm italic text-slate-500">
             <Gloss de={last.feedback.de} en={last.feedback.en} />
@@ -169,25 +166,85 @@ export function BattleView({
               <p className="text-xs font-medium text-slate-400">Wähle deine Antwort</p>
               <TranslateToggle on={showEn} onToggle={() => setShowEn((v) => !v)} />
             </div>
-            {node.moves?.map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                onClick={() => act((r) => playMove(r, m.id))}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left transition-all hover:border-[#5b5be6]/50 active:scale-[0.99]"
-              >
-                {m.tag && (
-                  <span className="flex items-center gap-2">
-                    <Chip tone={m.crit ? "amber" : "indigo"}>{m.tag}</Chip>
+            {node.moves?.map((m) =>
+              typingMove?.id === m.id ? (
+                /* typed challenge: complete the gap to land the move */
+                <form
+                  key={m.id}
+                  className="space-y-2 rounded-xl border-2 border-[#5b5be6]/50 bg-white px-3 py-2.5"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    submitTyped(m);
+                  }}
+                >
+                  <span className="block text-sm leading-snug text-slate-700">
+                    {m.de.replace(m.cloze!, "____")}
                   </span>
-                )}
-                <span className="mt-1 block text-sm leading-snug text-slate-700">{m.de}</span>
-                {showEn && <span className="block text-xs leading-snug text-slate-400">{m.en}</span>}
-              </button>
-            ))}
+                  <div className="flex gap-2">
+                    <input
+                      value={typedInput}
+                      onChange={(e) => setTypedInput(e.target.value)}
+                      autoFocus
+                      autoCapitalize="none"
+                      autoCorrect="off"
+                      spellCheck={false}
+                      placeholder="Fehlendes Wort"
+                      className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-800 outline-none focus:border-[#5b5be6]"
+                    />
+                    <Pill primary disabled={!typedInput.trim()} onClick={() => submitTyped(m)}>
+                      Sagen
+                    </Pill>
+                  </div>
+                </form>
+              ) : (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => {
+                    if (m.cloze) {
+                      setTypingMove(m);
+                      setTypedInput("");
+                    } else {
+                      act((r) => playMove(r, m.id));
+                    }
+                  }}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-left transition-all hover:border-[#5b5be6]/50 active:scale-[0.99]"
+                >
+                  {m.tag && (
+                    <span className="flex items-center gap-2">
+                      <Chip tone={m.crit ? "amber" : "indigo"}>{m.tag}</Chip>
+                      {m.cloze && <Chip tone="teal">Tippen</Chip>}
+                    </span>
+                  )}
+                  <span className="mt-1 block text-sm leading-snug text-slate-700">
+                    {m.cloze ? m.de.replace(m.cloze, "____") : m.de}
+                  </span>
+                  {showEn && <span className="block text-xs leading-snug text-slate-400">{m.en}</span>}
+                </button>
+              ),
+            )}
           </div>
         )}
       </SheetCard>
     </div>
+  );
+}
+
+/** Floating +/- number next to the bar it belongs to. */
+function DeltaFloat({ turns, value }: { turns: number; value: number }) {
+  return (
+    <AnimatePresence>
+      {turns > 0 && value !== 0 && (
+        <motion.span
+          key={turns}
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className={cn("text-xs font-bold", value < 0 ? "text-rose-500" : "text-teal-600")}
+        >
+          {value > 0 ? `+${value}` : value}
+        </motion.span>
+      )}
+    </AnimatePresence>
   );
 }

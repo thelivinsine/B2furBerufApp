@@ -30,6 +30,9 @@ export type MissionEffect =
 
 /* ---------------- state ---------------- */
 
+/** Outcome of a typed (cloze) battle move. */
+export type TypedMoveVerdict = "correct" | "almost" | "wrong";
+
 /** Presentation payload of the most recent battle move. */
 export interface BattleLast {
   moveId: string;
@@ -40,6 +43,8 @@ export interface BattleLast {
   feedback?: BiText;
   /** Set when the move needed a key item the player does not hold. */
   missingItem?: string;
+  /** Set when the move was a typed challenge. */
+  typed?: TypedMoveVerdict;
 }
 
 export interface BattleRuntime {
@@ -102,7 +107,7 @@ function initBattle(scene: DialogueBattleScene): BattleRuntime {
     nodeId: scene.start,
     geduld: scene.geduld,
     geduldMax: scene.geduld,
-    mut: scene.mut,
+    mut: scene.mutStart ?? scene.mut,
     mutMax: scene.mut,
     turns: 0,
   };
@@ -263,8 +268,16 @@ function gradeForQuality(q: number): Grade {
  * node graph, and forces the bust node when a bar empties. Terminal nodes are
  * NOT auto-resolved: the player component shows the closing line, then calls
  * `resolveBattle`.
+ *
+ * Typed (cloze) moves pass the grading verdict: "correct" lands the move at
+ * full strength plus a typing bonus (the ladder rung pays), "almost" lands
+ * it without the crit, "wrong" makes it misfire (weakened deltas).
  */
-export function playMove(run: MissionRun, moveId: string): MissionRun {
+export function playMove(
+  run: MissionRun,
+  moveId: string,
+  typed?: TypedMoveVerdict,
+): MissionRun {
   const scene = currentScene(run);
   const node = currentBattleNode(run);
   if (scene.kind !== "dialogueBattle" || !run.battle || !node?.moves) return { ...run, effects: [] };
@@ -282,20 +295,37 @@ export function playMove(run: MissionRun, moveId: string): MissionRun {
     nextNodeId = move.nextIfMissing ?? move.next;
     last = { moveId, crit: false, geduld: 0, mut: 0, missingItem: move.requiresItem };
   } else {
-    geduld = clamp(geduld + move.geduld, 0, run.battle.geduldMax);
-    mut = clamp(mut + move.mut, 0, run.battle.mutMax);
+    let crit = !!move.crit;
+    let quality = move.quality;
+    let dGeduld = move.geduld;
+    let dMut = move.mut;
+    const verdict = move.cloze ? (typed ?? "wrong") : undefined;
+    if (verdict === "almost") {
+      crit = false;
+      quality = Math.max(quality - 0.2, 0.3);
+    } else if (verdict === "wrong") {
+      // The move misfires: the fumble costs patience and composure.
+      crit = false;
+      quality = Math.min(quality, 0.2);
+      dGeduld = Math.min(dGeduld, 0) - 8;
+      dMut = Math.min(dMut, 0) - 4;
+    }
+    geduld = clamp(geduld + dGeduld, 0, run.battle.geduldMax);
+    mut = clamp(mut + dMut, 0, run.battle.mutMax);
     nextNodeId = move.next;
     last = {
       moveId,
-      crit: !!move.crit,
-      geduld: move.geduld,
-      mut: move.mut,
-      feedback: move.feedback,
+      crit,
+      geduld: dGeduld,
+      mut: dMut,
+      feedback: verdict === "wrong" ? undefined : move.feedback,
+      typed: verdict,
     };
     if (move.redemittelId) effects.push({ type: "redemittelPractice", redemittelId: move.redemittelId });
     if (move.vocabId)
-      effects.push({ type: "vocabGrade", vocabId: move.vocabId, grade: gradeForQuality(move.quality) });
-    if (move.quality >= 0.6) effects.push({ type: "xp", amount: XP.simulationTurn });
+      effects.push({ type: "vocabGrade", vocabId: move.vocabId, grade: gradeForQuality(quality) });
+    if (quality >= 0.6) effects.push({ type: "xp", amount: XP.simulationTurn });
+    if (verdict === "correct") effects.push({ type: "xp", amount: XP.flashcardEasy });
   }
 
   // A drained bar ends the conversation regardless of the graph position.
@@ -322,11 +352,28 @@ export function playMove(run: MissionRun, moveId: string): MissionRun {
  * routing, a loss routes to `onLose` (the scaffolded-retry hook: failure is
  * content, never lockout).
  */
+/** Victory bonus ceiling: a flawless finish (both bars full) earns this. */
+export const BATTLE_FINISH_BONUS = 30;
+
 export function resolveBattle(run: MissionRun): MissionRun {
   const scene = currentScene(run);
   const node = currentBattleNode(run);
   if (scene.kind !== "dialogueBattle" || !node?.outcome) return { ...run, effects: [] };
-  if (node.outcome === "win") return completeScene(run);
+  if (node.outcome === "win") {
+    // Finish quality matters: the higher both bars ended, the bigger the
+    // bonus (keeping Geduld AND Mut high is the whole game of the battle).
+    const b = run.battle;
+    const bonus = b
+      ? Math.round((BATTLE_FINISH_BONUS * (b.geduld + b.mut)) / (b.geduldMax + b.mutMax))
+      : 0;
+    const routed = completeScene(run);
+    if (bonus <= 0) return routed;
+    return {
+      ...routed,
+      xp: routed.xp + bonus,
+      effects: [{ type: "xp", amount: bonus }, ...routed.effects],
+    };
+  }
   return enterScene(run, scene.onLose, []);
 }
 

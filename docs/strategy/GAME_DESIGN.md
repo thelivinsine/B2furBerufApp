@@ -68,6 +68,18 @@ emotional payoff):
   Reading real-life text formats IS the gameplay, not a cutscene.
 - **Voicemails and announcements are listening moments** (existing TTS), with replay and a
   read-along reveal for support.
+- **Wartezeiten sind Gameplay (founder direction 2026-07-06, s73; flesh out in G2).** Whenever
+  the story imposes a wait (the Termin queue, a processing period, a delayed train), a fictional
+  in-game clock runs, not a real-time counter. The player chooses: sit it out (a flavored time
+  skip) or ENGAGE with the world while waiting, e.g. make small talk with a neighbor in the
+  queue, read the notice board, or complete a side quest, and engaging is rewarded (the wait
+  shortens, or it pays XP/loot). No waiting screen may be a dead end; every wait is a playable
+  beat. Details to be specced when G2 builds the chapter-1 missions.
+- **Interaction-first, minimal text (founder direction 2026-07-06, s73).** Missions must play
+  like game missions, not text screens: every scene needs a visual that carries its meaning by
+  itself (the loadout's items lie in the room and are collected by walking to them), on-screen
+  prose stays minimal, and exercises should engage the player through variety (tap AND type AND
+  act in the world), not stacked multiple-choice lists.
 
 ## 5. Battles are conversations
 
@@ -270,6 +282,12 @@ hardens earlier systems (all input rungs, thinner D/E, richer registers):
   listening snippets, speed-sorting der/die/das crates, Pfand-return arithmetic in German).
 - **Fundstücke hunting:** cultural collectibles hidden in scenes; a shelf in your flat
   displays them (the flat slowly becoming "yours" is the ambient progress display).
+- **Print-Prop-Quests (founder direction 2026-07-06, s73; flesh out in G2).** Printed props
+  recur across many scenes: Werbung posters, Anzeigen (classified ads), Flyer/Faltblätter,
+  Aushänge on notice boards. Every one is tappable, and engaging with it opens a mini-exercise
+  over the real text: reading comprehension, a crossword, or a grid/guessing game. Completing
+  them pays powers/points/perks, so the world's paper clutter becomes a recurring, optional
+  learning surface (and a natural filler for the waiting beats above).
 
 ## 11. Tone, style, language
 

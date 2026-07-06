@@ -122,18 +122,47 @@ describe("mission runner: listening", () => {
 });
 
 describe("mission runner: dialogue battle", () => {
-  it("initialises fresh bars on scene entry", () => {
+  it("initialises fresh bars on scene entry (Mut starts below its max)", () => {
     const run = reachBattle();
     expect(currentScene(run).kind).toBe("dialogueBattle");
-    expect(run.battle).toMatchObject({ nodeId: "b1", geduld: 100, mut: 100 });
+    expect(run.battle).toMatchObject({ nodeId: "b1", geduld: 100, mut: 60, mutMax: 100 });
   });
 
-  it("clamps bar gains at the maximum (crit at full Geduld)", () => {
+  it("clamps Geduld gains at the maximum and lands a typed crit", () => {
+    let run = reachBattle();
+    run = playMove(run, "b1_krit", "correct");
+    expect(run.battle!.geduld).toBe(100); // +6 clamped at the max
+    expect(run.battle!.mut).toBe(74); // 60 + 14, visible headroom
+    expect(run.battle!.last).toMatchObject({ crit: true, typed: "correct" });
+  });
+
+  it("misfires a typed move on a wrong answer (weakened, no crit)", () => {
+    let run = reachBattle();
+    run = playMove(run, "b1_krit", "wrong");
+    expect(run.battle!.last).toMatchObject({ crit: false, typed: "wrong" });
+    expect(run.battle!.geduld).toBe(92); // min(+6, 0) - 8
+    expect(run.battle!.mut).toBe(56); // min(+14, 0) - 4
+  });
+
+  it("treats a cloze move without a verdict as wrong (no free crits)", () => {
     let run = reachBattle();
     run = playMove(run, "b1_krit");
-    expect(run.battle!.geduld).toBe(100);
-    expect(run.battle!.mut).toBe(100);
-    expect(run.battle!.last).toMatchObject({ crit: true });
+    expect(run.battle!.last).toMatchObject({ crit: false, typed: "wrong" });
+  });
+
+  it("pays a victory bonus scaled by the remaining bars", () => {
+    let run = reachBattle();
+    run = playMove(run, "b1_ok");
+    run = playMove(run, "b2_doc");
+    run = playMove(run, "b3_doc");
+    run = playMove(run, "b4_ok");
+    const before = run.xp;
+    const b = run.battle!;
+    const expected = Math.round((30 * (b.geduld + b.mut)) / (b.geduldMax + b.mutMax));
+    run = resolveBattle(run);
+    expect(expected).toBeGreaterThan(0);
+    expect(run.effects).toContainEqual({ type: "xp", amount: expected });
+    expect(run.xp).toBe(before + expected);
   });
 
   it("wins through the graph and routes to the form scene", () => {
@@ -177,7 +206,7 @@ describe("mission runner: dialogue battle", () => {
     // Re-entering the battle resets the bars (walk back in stronger).
     run = completeScene(run);
     expect(run.sceneId).toBe("schmidt");
-    expect(run.battle).toMatchObject({ nodeId: "b1", geduld: 100, mut: 100 });
+    expect(run.battle).toMatchObject({ nodeId: "b1", geduld: 100, mut: 60 });
   });
 
   it("forces the bust node when Geduld drains to zero", () => {
