@@ -15,7 +15,7 @@
  * DO NOT regenerate from scratch — it would overwrite back-filled references.
  * Add new rows manually as new content is added.
  *
- * Total rows: 1098
+ * Total rows: 1121
  */
 import type { ProvenanceEntry } from "@/types";
 
@@ -13401,5 +13401,125 @@ export const provenance: ProvenanceEntry[] = [
     verified_by: "founder",
     verified_date: "2026-07-02",
     notes: "themeId=behoerde; cefr=B2.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
+  },
+  {
+    content_id: "tx_behoerde_anmeldung_brief",
+    content_type: "text",
+    label: "Ihr Termin zur Anmeldung im Bürgeramt",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=behoerde; cefr=B1.2; kind=letter. Authored authentic-style Behörden letter (fictitious names/offices); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_behoerde_unterlagen_brief",
+    content_type: "text",
+    label: "Ihr Antrag auf Wohngeld: fehlende Unterlagen",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=behoerde; cefr=B2.1; kind=letter. Authored authentic-style Behörden letter (fictitious names/offices); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_scheduling_email_verschiebung",
+    content_type: "text",
+    label: "Verschiebung unseres Termins am Donnerstag",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=scheduling; cefr=B1.2; kind=email. Authored authentic-style workplace email (fictitious names); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_customer_email_reklamation",
+    content_type: "text",
+    label: "Ihre Reklamation vom 28. Juni, Auftragsnummer 88213",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=customer; cefr=B2.1; kind=email. Authored authentic-style customer-service email (fictitious names/numbers); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_meetings_memo_protokoll",
+    content_type: "text",
+    label: "Kurzprotokoll: Teambesprechung vom 3. Juli",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=meetings; cefr=B2.1; kind=memo. Authored authentic-style meeting minutes memo (fictitious names); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_project_memo_status",
+    content_type: "text",
+    label: "Statusbericht: Projekt Kundenportal, Stand 30. Juni",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=project; cefr=B2.2; kind=memo. Authored authentic-style project status memo (fictitious names/project); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_technology_ankuendigung_wartung",
+    content_type: "text",
+    label: "Wartung der IT-Systeme am Samstag",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=technology; cefr=B1.2; kind=announcement. Authored authentic-style internal IT announcement; CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_safety_aushang_unterweisung",
+    content_type: "text",
+    label: "Jährliche Sicherheitsunterweisung im Lager",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=safety; cefr=B2.1; kind=announcement. Authored authentic-style warehouse safety notice; CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_travel_voicemail_flug",
+    content_type: "text",
+    label: "Voicemail: Umbuchung Ihres Rückflugs aus Wien",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=travel; cefr=B1.2; kind=voicemail. Authored authentic-style voicemail script (fictitious names/numbers), doubles as TTS listening input; CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_logistics_voicemail_lieferung",
+    content_type: "text",
+    label: "Voicemail: Verzögerung Ihrer Lieferung 774512",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=logistics; cefr=B2.1; kind=voicemail. Authored authentic-style voicemail script (fictitious names/numbers), doubles as TTS listening input; CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
   }
 ];
