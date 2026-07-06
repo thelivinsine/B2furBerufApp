@@ -124,11 +124,13 @@ is findable when a mission demands it.
 - **Prüfungsmodus** is a per-mission opt-in replay mode (typed answers, timers, no D/E) with
   better loot. Never the default. This also gives every mission natural replay value.
 
-## 9. The story: six chapters, ~36 authored missions
+## 9. The story: seven chapters, ~40 authored missions
 
 The authored spine below is v1. Within and after it, mission VARIANTS are procedurally composed
 from the content banks (same schema, FSRS-picked language), which is how "several hundred
-missions" scale without hundreds of hand-authored scripts.
+missions" scale without hundreds of hand-authored scripts. **Structural rule (founder,
+2026-07-06): every chapter ends on its boss.** Missions inside a chapter lead up to the boss;
+what happens after a boss belongs to the next chapter.
 
 ### Kapitel 1 · Ankommen (district: Bahnhofsviertel) — 6 missions
 1. **Willkommen in Neuland.** Airport arrival: passport control small talk, find the train.
@@ -181,25 +183,40 @@ missions" scale without hundreds of hand-authored scripts.
    every completed form spawns the next, until the player's typed-cloze accuracy cuts all
    heads. Pure recurring-review content wearing its boss costume openly.
 
-### Kapitel 4 · Arbeit (district: Büropark) — 7 missions (maps onto the ten workplace themes)
-1. **Die Bewerbung.** Decode a job ad, assemble CV + Anschreiben from Redemittel blocks
-   (typed), submit. Ties into the existing Schreibtraining for free-text ambition.
-2. **BOSS: Das Vorstellungsgespräch.** Interview battle with Frau Weber: strengths without
+### Kapitel 4 · Die Jobsuche (Agentur & Zuhause) — 7 missions, boss last
+1. **Die Orientierung.** Coffee with Jonas: what do you actually want here? Decode German job
+   titles and the m/w/d jungle on a parody job portal; build a skills inventory (the first
+   talking-about-yourself Redemittel).
+2. **Die Stellenanzeige.** Reading battle over three job ads: requirements vs nice-to-haves,
+   corporate Denglisch, and one red-flag ad to spot before wasting an application on it.
+3. **Der Lebenslauf.** Build the tabellarischer Lebenslauf: German CV conventions, the photo
+   question, explaining gaps without panic. Typed form finale.
+4. **Das Anschreiben.** The cover letter, assembled from Redemittel blocks then personalized
+   (typed; ties into the existing Schreibtraining). Confident without bragging: the register
+   tightrope.
+5. **Der Anruf.** Call the company: get past the front desk, ask two smart questions about the
+   role, leave a voicemail that gets returned. Listening + speaking under gentle pressure.
+6. **Die Generalprobe.** Mock-interview night in the WG: Ayşe plays the merciless interviewer,
+   Jonas coaches. The Stärken/Schwächen cards are forged here; bag loadout for the boss.
+7. **BOSS: Das Vorstellungsgespräch.** Interview battle with Frau Weber: strengths without
    bragging, weaknesses without self-destruction, salary Konjunktiv. Reward: der
-   Arbeitsvertrag key item and Büropark access.
-3. **Der erste Arbeitstag.** Onboarding maze: IT passwords, Kaffeeküche etiquette, the du/Sie
-   minefield mapped per colleague (a social graph the player fills in).
-4. **Das Meeting.** Meetings theme: agenda-following, interrupting politely, summarizing.
-   Introduces the "zusammenfassen" move class.
-5. **Der schwierige Kunde.** Customer theme: complaint call battle (patience bar in its purest
-   form), de-escalation Redemittel.
-6. **Der Streit ums Projekt.** Conflict + project themes: defend your plan diplomatically in
-   front of the team, then absorb a deadline change without losing standing.
-7. **Die Dienstreise.** Travel theme capstone: book, ride, survive a delayed ICE, present at
-   the client site. Rolls scheduling/logistics/technology themes into recurring office
-   errands afterwards.
+   Arbeitsvertrag key item; the Büropark district unlocks.
 
-### Kapitel 5 · Gesund & Sozial (districts: Kiez & Stadtpark) — 6 missions
+### Kapitel 5 · Im Büro (district: Büropark) — 5 missions (maps onto the ten workplace themes)
+1. **Der erste Arbeitstag.** Onboarding maze: IT passwords, Kaffeeküche etiquette, the du/Sie
+   minefield mapped per colleague (a social graph the player fills in).
+2. **Das Meeting.** Meetings theme: agenda-following, interrupting politely, summarizing.
+   Introduces the "zusammenfassen" move class.
+3. **Der schwierige Kunde.** Customer theme: complaint call battle (patience bar in its purest
+   form), de-escalation Redemittel.
+4. **Der Streit ums Projekt.** Conflict + project themes: defend your plan diplomatically in
+   front of the team, then absorb a deadline change without losing standing.
+5. **BOSS: Die Dienstreise.** Travel theme capstone: book, ride, survive a delayed ICE,
+   present at the client site with everything the chapter taught. Afterwards office life
+   continues as recurring errands over all ten workplace themes
+   (scheduling/logistics/technology weave in here).
+
+### Kapitel 6 · Gesund & Sozial (districts: Kiez & Stadtpark) — 6 missions
 1. **Der Arzttermin.** Call the Praxis (listening + speaking), describe symptoms with body
    vocab, navigate the Versichertenkarte ritual with Dr. Sommer.
 2. **In der Apotheke.** Pharmacy consultation: dosage language, generics question, the
@@ -215,8 +232,8 @@ missions" scale without hundreds of hand-authored scripts.
    Frau Schmidt's surprise cameo. The chapter's whole cast on one stage; standing bar renamed
    "Gastgeber-Ehre" for the night.
 
-### Kapitel 6 · Mein Ziel (endgame, player-chosen) — 4+ mission chains
-At the chapter-5 finale the player picks their life goal; each is an authored chain that
+### Kapitel 7 · Mein Ziel (endgame, player-chosen) — 4+ mission chains
+At the chapter-6 finale the player picks their life goal; each is an authored chain that
 hardens earlier systems (all input rungs, thinner D/E, richer registers):
 - **Der unbefristete Vertrag** (career: negotiation arc with Frau Weber).
 - **Die Traumwohnung** (housing: the full apartment hunt at higher difficulty, solo).
