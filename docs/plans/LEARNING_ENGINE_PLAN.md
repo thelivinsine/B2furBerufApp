@@ -12,7 +12,7 @@
 > latency plug-in ("correct but slow" demotes Good→Hard) shipped in session 57 (see §3). This plan
 > is fully delivered.**
 > Source: the five recommendations of `docs/strategy/PRODUCT_EVALUATION.md` (the playbook self-assessment),
-> scoped as backlog items **#26 to #30** in `docs/PROJECT_STATUS.md`. Evidence base:
+> scoped as backlog items **#26 to #30** in `docs/PROJECT_REFERENCE.md`. Evidence base:
 > `docs/reference/LANGUAGE_LEARNING_SUCCESS_FACTORS.md`.
 >
 > Design provenance: grounded in a code exploration pass of `engine/srs.ts`, `engine/session.ts`,
