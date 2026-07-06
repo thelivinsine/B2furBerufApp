@@ -25,8 +25,10 @@ each blind to the others, all grounded in `GAME_DESIGN.md`, `src/data/missions.t
    Crystallize, Newcomer, Terra Alia, Kagami), what their gameplay actually consists of, what
    reviews praise and pan.
 
-The synthesis below deduplicates the four reports. To rerun this method for a future chapter:
-same four personas, seeded with the chapter's mission list and the current scene-kind union.
+The synthesis below deduplicates the four reports. The COMPLETE verbatim briefs and persona
+reports are preserved in `MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md` (founder request, s74). To
+rerun this method for a future chapter: same four personas, seeded with the chapter's mission
+list and the current scene-kind union.
 
 ## 2. The synthesized activity-type catalog
 

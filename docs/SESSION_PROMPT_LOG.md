@@ -1128,3 +1128,144 @@ Branch: `claude/whats-next-esga9u`.
   > Document this session so far. I'll continue in another session. I have more feedback and tweaks to make
 - **Response summary:** Session-73 documentation wrap. The session shipped game phase G1 end to end plus two same-day founder playtest rounds, across four merged PRs: **#338** (mission engine: `types/game.ts` schema, `engine/mission.ts` runner, linter graph checks, Vitest suite, six scene renderers under `src/features/welt/`, the Anmeldung boss mission, chapter-1 list sign-off, design-v3 alignment to the six-chapter spine), **#339** (playtest round 1: where-am-I stage chips, text diet, bag-slot loadout visual), **#340** (playtest round 2: walk-and-pick loadout room interaction, battle delta-chip bug fix, live Mut bar via `mutStart` + rebalance, typed cloze battle moves, bar-scaled victory bonus; waiting-as-gameplay + Print-Prop-Quests specced into `GAME_DESIGN.md` §4/§10 and backlog #32a/#32b), **#341** (founder model decision: G2 runs on Opus 4.8/Sonnet 5/Haiku, Fable optional for a later content tone pass). All prompts logged as entries 188–194; `PROJECT_STATUS.md` header + handoff refreshed, noting the founder has MORE feedback/tweaks queued as the next session's first order of business, before G2. Gates green throughout (81 unit tests, bundle 79.5 kB main, game in its own lazy chunk); every round verified with a full scripted browser playthrough.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (this entry). Merge SHAs: #338 `70fa084`, #339 `6337dbb`, #340 `54aaef1`, #341 `405e106`.
+
+## Entry 196 — 2026-07-06 (session 74, open)
+- **Branch:** `claude/neuland-g1-g2-feedback-wkf28n`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > Read the "Resume here" handoff in docs/PROJECT_STATUS.md. First apply my feedback below to the Neuland G1 slice, then continue with G2 per the plan. Here's my feedback:
+  > 1. The pokemon style bag is missing. It should be with the player and should be visible in the game at all times and the items within should be useful to the player when completing the missions.
+  > 2. The english translation button should not be available to the player all the time, else it doesn't feel like a game anymore.
+  > 3. I want more variety in the questions type - in the mission with Frau schmidt, if there are multiple options with a much nicer option and another one also a nice option, then it doesn't make much of a difference to the player if they chose either of those. And another question is like can you handover a personalauswies - instead of providing text options below the question, the user should search in the bag to tap on one of the items.
+  > 4. I want you to do write a robust plan on researching, brainstorming and ideating what kind of questions and activities should be part of the missions - just sharing an idea but you could also use different approach if better - may be you could use multiple agents with various personalities like expert german teacher meets expert game developer meets expert in german literature to ideate this. Once this research and brainstorming is completed - in the first part of the report I want the outcome of the research, then in second section I want complete sccript for the gameplay for each of the first chapter in a html based slide deck (similar to the design doc v3) missions leading upto the boss stage including the intorduction of the game to the player, introduction tot he characters, backstory, selection of language level of the player, his friends, what environments the player travels across in each stage, what challenges the player has, the help and options he has like the freinds or bag or EN translation, mission challenges and any other aspects I may have missed.
+  > 5. The dimensions of objects vs player are way too off. Example - the chairs in the waiting room are way too bigger than the player, and the player itself is too small and looks somewhat vertically squished. Such dimensions of the things and relative sizes should be taken care of and well defined.
+  > 6. I expected the game to be in full screen where all the interactions happen inside the game area, and I want the design of questions and other interactive elements to follow the game 2d pixelated art as it currently looks like a patchwork of different arts and not immersive.
+- **Response summary:** Playtest round 3 applied and shipped (PR #343, squash `5aa4080`), then the research
+  commissioned in item 4 executed and shipped (PR #346, squash `7769a6c`). **Code (items 1/2/3/5/6):**
+  (1) persistent HUD bag with item count that pulses on demands; (2) the always-on E toggle removed and
+  replaced by the Wörterbuch bag item (3 charges per mission; one charge reveals English for the current
+  scene only; engine: `MissionRun.dictUses` + `useDictionary`); (3) new battle `ask` nodes: document
+  demands are answered by opening the Tasche and tapping the item (engine `handItem`/`admitMissing`;
+  wrong item costs Geduld + earns a deadpan reaction line; conceding routes into the fetch-quest
+  branch); both Schmidt document demands converted, remaining option lists differentiated (visible
+  costs + reaction feedback on the plain-polite moves, a costly "So tun als ob" bluff path, crits no
+  longer telegraphed); (5) world scale locked in `welt_assets.py` (standing adult 28-32 px, chair
+  ~19 px, seated ~20 px; player sprite redrawn 16x30, chairs shrunk, committed `proportions-check.png`);
+  (6) the mission player became a fixed full-screen game layer and every in-game surface was restyled
+  to the pixel language (outlined panels, hard offset shadows, RPG name plates, chunky bars). Linter
+  gained ask-node graph checks + `dictUses`; runner tests extended to 85; verified with a full scripted
+  phone-viewport browser playthrough (wrong-item beat + dictionary flow included), zero console errors.
+  **Research (item 4, the multi-agent brainstorm):** four independent expert personas ran IN PARALLEL as
+  subagents, each blind to the others, each grounded in `GAME_DESIGN.md` + `src/data/missions.ts` +
+  `src/types/game.ts`: (P1) a veteran DaF-Didaktikerin and telc/Goethe examiner (activity types by
+  competence + SLA principle, meaningful-choice rules, error-handling design), (P2) a veteran 2D-RPG
+  game designer (interaction verbs beyond multiple choice, choice-architecture levers, Pokemon-grade bag
+  design, full-screen scene grammar, chapter pacing), (P3) a German culture and literature expert
+  (authentic text-genre props, per-mission comedy beats, unwritten-rules moments, NPC register voices,
+  text-genre difficulty ladder), and (P4) a market researcher with live web access who surveyed 11
+  shipped language-learning games (Wagotabi, Noun Town, Influent, Shashingo, Lingotopia, Learn Japanese
+  to Survive, Duolingo Stories/Adventures, Crystallize, Newcomer, Terra Alia, Kagami) with sources, and
+  extracted the most-praised patterns, the failure modes, and the gaps nobody owns. Per the founder's
+  budget decision (s73), the personas ran on the cheaper tiers (two on Opus 4.8, two on Sonnet 5); the
+  lead session synthesized the four reports. Deliverables: `docs/strategy/MISSION_ACTIVITY_RESEARCH.md`
+  (method as a rerunnable plan, the merged 20-entry activity catalog with engine-fit + CEFR bands, six
+  meaningful-choice levers, recast-based error handling, market evidence, ranked G2 adoption order,
+  chapter-1 pedagogy map) and `docs/strategy/CHAPTER1_GAMEPLAY_DECK.html` (the founder-facing two-part
+  slide deck in the v3 deck's visual language: Part 1 research outcomes; Part 2 the complete chapter-1
+  gameplay script: opening + character creation incl. language-level selection, cast + backstory, help
+  systems, missions 1.1-1.6 scene by scene with German lines, environments/text-genre ladder, the
+  one-new-mechanic-per-mission ramp), also delivered as a claude.ai Artifact for immediate viewing.
+- **Artifacts:** PR #343 (`5aa4080`): `src/types/game.ts`, `src/engine/mission.ts`, `src/data/missions.ts`,
+  `src/features/welt/*` (stage/MissionPlayer/scenes/BattleView/Welt + assets incl. new `dict.png`),
+  `scripts/lint-content.mjs`, `tests/mission.test.ts`, `src/index.css`,
+  `preview/game-pixel-mockups/welt_assets.py` + `proportions-check.png`. PR #346 (`7769a6c`):
+  `docs/strategy/MISSION_ACTIVITY_RESEARCH.md`, `docs/strategy/CHAPTER1_GAMEPLAY_DECK.html`.
+
+## Entry 197 — 2026-07-06 (session 74, continued)
+- **Branch:** `claude/neuland-g1-g2-feedback-wkf28n`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the player avatar is standing in an empty space in a weird position in the newly generated boss mission scene. The lady and her patience bar is on the top of the screen so the player avatar and the player's bar can be to the bottom so that the user/player has clear idea of the elements on the screen
+- **Response summary:** Battle composition rule applied (PR #344, squash `1aa76dd`): Frau Schmidt and her
+  Geduld bar keep the top band, the player sprite moved to the bottom band standing on a proper ground
+  shadow (regenerated `amt.png`), next to the "Du"/Mut card. Top = opponent, bottom = you.
+- **Artifacts:** `src/features/welt/BattleView.tsx`, `preview/game-pixel-mockups/welt_assets.py`,
+  `src/features/welt/assets/amt.png` (part of PR #344).
+
+## Entry 198 — 2026-07-06 (session 74, continued)
+- **Branch:** `claude/neuland-g1-g2-feedback-wkf28n`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the tasche pop up window looks good but it would be even better if the outline of the pop up window is in the shape of a backpack
+- **Response summary:** The bag popup is now drawn as the backpack itself (same PR #344): carry handle on
+  top, leather dome with rounded shoulders, amber zip band, cream interior holding the item grid.
+- **Artifacts:** `src/features/welt/MissionPlayer.tsx` (part of PR #344).
+
+## Entry 199 — 2026-07-06 (session 74, continued)
+- **Branch:** `claude/neuland-g1-g2-feedback-wkf28n`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > now the player avatar looks way too big. Can you keep the people's sixes more or less the same?
+- **Response summary:** The foreground zoom from the composition fix was reverted (PR #345, squash
+  `9bfa14b`): the player renders at the same human scale as Frau Schmidt (7% stage width, matching the
+  loadout walk sprite) on a proportional shadow, still holding the bottom band. Locked as a rule: people
+  stay at ONE world scale, no foreground zoom (recorded in `DECISIONS.md`).
+- **Artifacts:** `src/features/welt/BattleView.tsx`, `welt_assets.py`, `amt.png` (PR #345).
+
+## Entry 200 — 2026-07-06 (session 74, continued)
+- **Branch:** `claude/neuland-g1-g2-feedback-wkf28n`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session first, espcially the brainstorming with multi agents and the research involved.
+- **Response summary:** This documentation pass: prompt-log entries 196-201, a new `PROJECT_STATUS.md`
+  handoff (older handoff archived to the W28 chunk), the session-74 founder rulings recorded in
+  `docs/DECISIONS.md` ("Game interaction & pixel-UI rules"), `GAME_DESIGN.md` §4 amended (translation as
+  a bag resource supersedes always-on D/E inside missions; bag-answered demands; battle composition),
+  and the CLAUDE.md game-layer section refreshed. The multi-agent research method and outcomes were
+  already durably recorded in `docs/strategy/MISSION_ACTIVITY_RESEARCH.md` (PR #346); entry 196 above
+  carries the full method description for the paper trail.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 196-201),
+  `docs/DECISIONS.md`, `docs/strategy/GAME_DESIGN.md`, `CLAUDE.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.
+
+## Entry 201 — 2026-07-06 (session 74, close)
+- **Branch:** `claude/neuland-g1-g2-feedback-wkf28n`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > where are you now in the game implementation plan? stop before proceeding with g2. Wait for my go
+- **Response summary:** G2 halted per founder instruction. Plan position: G0 complete (s63-66), G1
+  complete and shipped with three founder playtest rounds applied (s73 rounds 1-2, s74 round 3 across
+  PRs #343/#344/#345), the s74 activity research + chapter-1 gameplay deck complete (PR #346). G2 had
+  just been STARTED when the stop arrived: schema groundwork (three new scene settings terminal/laden/
+  supermarkt with generated backdrops, scene `label` override, Reisepass icon, four chapter-1 NPCs,
+  three key items) plus draft mission data for 1.1 "Willkommen in Neuland" and 1.2 "Der
+  Fahrkarten-Automat". That work was PARKED UNMERGED as a clearly-labeled WIP commit on the session
+  branch (missions 1.3-1.5, provenance rows, boss gating, gates and playthrough all still open); main
+  contains no G2 content. Next session resumes from the WIP commit only after the founder's explicit go.
+- **Artifacts:** parked WIP commit on `claude/neuland-g1-g2-feedback-wkf28n` (unmerged; see PROJECT_STATUS
+  "Resume here").
+
+## Entry 202 — 2026-07-06 (session 74, close)
+- **Branch:** `claude/neuland-g1-g2-feedback-wkf28n`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim, two consecutive messages):**
+  > save the multi agent research and ideation as a separate file complementing the other relevant docs
+  > with all the details from the chat in it
+- **Response summary:** Created `docs/strategy/MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md`: the
+  complete, verbatim archive of the multi-agent brainstorm: the founder's commission, the method
+  (four personas in parallel, blind to each other, two on Opus 4.8 + two on Sonnet 5), the exact
+  brief given to each persona, and each persona's full unedited report (DaF-Didaktikerin
+  activity catalog + choice/error design in German, the game designer's 20-verb interaction
+  catalog + six choice levers + bag spec + full-screen scene grammar + chapter pacing, the
+  culture expert's prop catalog + comedy beats + unwritten rules + register voices + genre
+  ladder, and the market researcher's 12-game sweep with sources, praised/panned patterns, gaps
+  and ranked recommendations). Cross-linked from `MISSION_ACTIVITY_RESEARCH.md` §1.
+- **Artifacts:** `docs/strategy/MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md`,
+  `docs/strategy/MISSION_ACTIVITY_RESEARCH.md` (cross-link).

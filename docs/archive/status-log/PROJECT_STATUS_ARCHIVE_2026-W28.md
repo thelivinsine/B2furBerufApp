@@ -184,3 +184,30 @@ chain** in K6 (boss: der unbefristete Vertrag), not a spine chapter, and **Pfand
 Späti consumables; spec in `GAME_DESIGN.md` §6). Structural rule from founder review: **every
 chapter ends on its boss**. Its open decisions were resolved across s72 (art + title) and s73
 (chapter-1 mission list sign-off).
+**Handoff after session 72 (2026-07-06). Pre-G1 art blessing is COMPLETE ✅: the founder BLESSED
+the modern pixel style and the game's art direction is now locked (no game code, zero spend).**
+Eight mockup scenes of the Anmeldung vertical slice live in `preview/game-pixel-mockups/` (all
+hand-authored in code because the sandbox blocks the free asset hosts; original + license-clean,
+generators committed alongside the PNGs). Founder decisions, recorded in full in
+`docs/DECISIONS.md` → "Game art direction (session 72)":
+- **2D pixel form approved**; the GBA-authentic styling of scenes 1–6 **rejected** as dated
+  ("reminds me of the 90's"). Those scenes stay as art-form proof, not style reference.
+- **`scene7-modern-hell.png` is the blessed reference** ("i love this new mock up style!"):
+  muted contemporary palette, modern Bürgeramt set, soft outlines, app-language UI (rounded
+  floating cards, pills, bottom sheet, brand indigo accent), crisp half-size UI pixels over the
+  chunky 240x160 world. G2 pack purchases must select against this reference.
+- **In-game dark mode deferred** (liked, but "a bit of a stretch because of limited budget");
+  tracked as backlog #31 in `docs/PROJECT_REFERENCE.md`. v1 game scenes are light-theme only.
+Doc updates shipped with the blessing: `GAME_CONCEPT.md` Visuals pillar + open questions,
+`GAME_IMPLEMENTATION_PLAN.md` guardrail + founder-decision list, the mockup folder README verdict.
+
+Late-session addition: the founder also approved the game title **"Neuland"** from the
+`GAME_DESIGN.md` proposals ("neuland is good"); city "Neustadt" + NPC cast stay unobjected
+proposals, chapter-1 sign-off still open (recorded in `DECISIONS.md` and `GAME_DESIGN.md` §13).
+
+**Next step:** start game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`: Mission/Scene schema
++ `engine/mission.ts` + lint checks first, then scene renderers and the Anmeldung mission
+content), building game UI surfaces to the scene-7 style. The narrative layer for G1 is the
+drafted `docs/strategy/GAME_DESIGN.md` (see the next handoff below).
+
+---

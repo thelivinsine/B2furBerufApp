@@ -1,21 +1,20 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 73: **game phase G1 SHIPPED + two founder playtest rounds
-applied same-day** (PRs #338/#339/#340/#341). The Neuland mission engine, six scene renderers,
-and the founder-approved chapter-1 Anmeldung boss mission are live behind the lazy `/welt` route
-(Beta card on Anwenden), now with the walk-and-pick loadout, typed battle moves, live dual bars
-and a finish bonus. **The founder has MORE feedback/tweaks queued for the next session** (see
-"Resume here"), which runs on **Opus 4.8/Sonnet, not Fable**. Prior updates same day: session 72
-blessed the modern pixel art direction + the "Neuland" title. The working branch is reassigned
-every session, so **`main` is always the source of truth**. Product name: **Genauly**
-(domain `genauly.de`)._
+_Last updated: 2026-07-06 (session 74: **founder playtest round 3 applied + multi-agent
+mission-activity research shipped** (PRs #343/#344/#345/#346). The Neuland slice now has the
+always-visible backpack (bag-answered document demands), English as a rationed Wörterbuch
+resource, a full-screen pixel-styled game frame, locked world/battle-composition scale rules,
+and a two-part research report + chapter-1 gameplay deck. **G2 is HALTED on founder order
+("Wait for my go")**: a small G2 groundwork draft (missions 1.1/1.2 + settings) sits PARKED
+UNMERGED on the session branch. The working branch is reassigned every session, so **`main` is
+always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
 - **`docs/PROJECT_REFERENCE.md`** — stable reference that rarely changes: the founder backlog,
   the product-evaluation findings, per-session model guidance, and reusable research findings.
 - **`docs/archive/PROJECT_STATUS_ARCHIVE.md`** — index into the append-only history, chunked by ISO week
-  under `docs/archive/status-log/` (sessions 1–71 + an `ops-notes` file).
+  under `docs/archive/status-log/` (sessions 1–72 + an `ops-notes` file).
 - **`docs/DECISIONS.md`** — the "why" behind locked decisions. Full design: `docs/archive/EXPANSION_PLAN.md`.
 
 **Doc-hygiene rule (keep this file lean):** when you append a new handoff to `## Resume here`, move any
@@ -166,6 +165,51 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 74 (2026-07-06). Playtest round 3 + activity research SHIPPED ✅;
+G2 is HALTED awaiting the founder's explicit go.** What happened:
+- **Founder feedback round 3 applied to the G1 slice** (PR #343, plus live hotfixes #344/#345):
+  1. **The bag** is with the player at all times (HUD slot with count, pulses on demands; popup
+     drawn as the backpack: handle, leather dome, zip band). 2. **English is a game resource**:
+  the always-on E toggle is gone; the Wörterbuch bag item has 3 charges/mission, one charge
+  reveals English for the current scene (`dictUses`/`useDictionary`). 3. **Bag-answered
+  demands**: battle `ask` nodes (engine `handItem`/`admitMissing`; wrong item = Geduld cost +
+  deadpan line; conceding = fetch-quest branch); both Schmidt document demands converted, the
+  remaining option lists differentiated (visible costs, reaction lines, a bluff path, no crit
+  telegraphing). 5. **World scale locked** in `welt_assets.py` (adult 28-32 px, chair ~19 px;
+  taller player sprite, `proportions-check.png`). 6. **Full-screen pixel UI**: fixed game layer,
+  edge-to-edge stage, all surfaces pixel-styled (outlined panels, hard shadows, name plates).
+  Battle composition rule (founder, #344/#345): opponent + bar top band, player + Mut bar bottom
+  band, ONE human scale (no foreground zoom). All in `DECISIONS.md` "Game interaction &
+  pixel-UI rules"; linter knows `ask`/`dictUses`; 85 unit tests; playthrough-verified.
+- **Feedback item 4, the multi-agent research, is DONE** (PR #346): four expert personas ran in
+  parallel as subagents (DaF-Didaktikerin/examiner, veteran game designer, German culture
+  expert, market researcher with a live web sweep of 11 shipped language games), two on Opus 4.8
+  and two on Sonnet 5 per the s73 budget decision, synthesized into
+  **`docs/strategy/MISSION_ACTIVITY_RESEARCH.md`** (20-entry activity catalog with engine fit,
+  six meaningful-choice levers, error-handling rules, market evidence, ranked G2 adoption order)
+  and **`docs/strategy/CHAPTER1_GAMEPLAY_DECK.html`** (two-part founder deck: research outcomes
+  + complete chapter-1 scripts: opening, character creation with language-level selection, cast,
+  help systems, missions 1.1-1.6 scene by scene, environments, ramp). Also delivered as an
+  Artifact. The COMPLETE verbatim persona briefs + reports are archived in
+  **`docs/strategy/MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md`** (founder request).
+  **New mission exercises must draft against the research catalog.**
+- **G2 STATUS: HALTED by the founder ("stop before proceeding with g2. Wait for my go").** G2
+  authoring had just begun when the stop arrived; the partial draft is PARKED as a WIP commit on
+  `claude/neuland-g1-g2-feedback-wkf28n` (UNMERGED, not on `main`): three new scene settings
+  (terminal/laden/supermarkt) with generated backdrops, scene `label` override, `doc-pass.png`,
+  four chapter-1 NPCs, three key items (ki_reisepass/ki_fahrschein/ki_sim_vertrag), and draft
+  mission data for 1.1 + 1.2. Still open when resumed: missions 1.3-1.5, provenance rows, boss
+  `requiresMissions` gating + replay-unlock in Welt.tsx (drafted), test updates, all gates, a
+  playthrough. **Do not merge or continue the WIP without the founder's go.**
+- **Plan position** (`GAME_IMPLEMENTATION_PLAN.md`): G0 ✅ (s63-66) · G1 ✅ shipped s73 with
+  three playtest rounds applied (s73 x2, s74 x1 + hotfixes) · s74 research ✅ (feeds G2) ·
+  **G2 ⏸ awaiting founder go** (scope when resumed: missions 1.1-1.5 per the deck scripts,
+  recurring NPCs, licensed pixel packs vs scene 7 + scale table, FSRS-driven recurrence,
+  Supabase migration for game-state sync, then the 5-10-learner playtest gate) · G3/G4 not
+  started. Model guidance for G2 stands: Opus 4.8 / Sonnet 5 / Haiku, not Fable.
+
+---
+
 **Handoff after session 73 (2026-07-06). Game phase G1 SHIPPED ✅: the Neuland mission engine and
 the Anmeldung vertical slice are live behind `/welt` (Beta).** What exists now:
 - **Schema + runner:** `src/types/game.ts` (Mission/Scene closed unions: cutscene, websiteParody,
@@ -222,37 +266,7 @@ FSRS-recurrence engine work, Sonnet 5 drafts missions 1.1-1.5 against the `GAME_
 scene-by-scene specs, Haiku ships. The mission linter + the 81-test runner suite are the safety
 net. Optional Fable spend later: one tone/humor pass over the finished chapter-1 German.
 
----
-
-**Handoff after session 72 (2026-07-06). Pre-G1 art blessing is COMPLETE ✅: the founder BLESSED
-the modern pixel style and the game's art direction is now locked (no game code, zero spend).**
-Eight mockup scenes of the Anmeldung vertical slice live in `preview/game-pixel-mockups/` (all
-hand-authored in code because the sandbox blocks the free asset hosts; original + license-clean,
-generators committed alongside the PNGs). Founder decisions, recorded in full in
-`docs/DECISIONS.md` → "Game art direction (session 72)":
-- **2D pixel form approved**; the GBA-authentic styling of scenes 1–6 **rejected** as dated
-  ("reminds me of the 90's"). Those scenes stay as art-form proof, not style reference.
-- **`scene7-modern-hell.png` is the blessed reference** ("i love this new mock up style!"):
-  muted contemporary palette, modern Bürgeramt set, soft outlines, app-language UI (rounded
-  floating cards, pills, bottom sheet, brand indigo accent), crisp half-size UI pixels over the
-  chunky 240x160 world. G2 pack purchases must select against this reference.
-- **In-game dark mode deferred** (liked, but "a bit of a stretch because of limited budget");
-  tracked as backlog #31 in `docs/PROJECT_REFERENCE.md`. v1 game scenes are light-theme only.
-Doc updates shipped with the blessing: `GAME_CONCEPT.md` Visuals pillar + open questions,
-`GAME_IMPLEMENTATION_PLAN.md` guardrail + founder-decision list, the mockup folder README verdict.
-
-Late-session addition: the founder also approved the game title **"Neuland"** from the
-`GAME_DESIGN.md` proposals ("neuland is good"); city "Neustadt" + NPC cast stay unobjected
-proposals, chapter-1 sign-off still open (recorded in `DECISIONS.md` and `GAME_DESIGN.md` §13).
-
-**Next step:** start game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`: Mission/Scene schema
-+ `engine/mission.ts` + lint checks first, then scene renderers and the Anmeldung mission
-content), building game UI surfaces to the scene-7 style. The narrative layer for G1 is the
-drafted `docs/strategy/GAME_DESIGN.md` (see the next handoff below).
-
----
-
-_Older handoffs (sessions 1–62 continued) are archived by ISO week under `docs/archive/status-log/`
+_Older handoffs (sessions 1–72) are archived by ISO week under `docs/archive/status-log/`
 (index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`)._
 
 **Content counts (verified from `src/data/*` on 2026-07-06):**

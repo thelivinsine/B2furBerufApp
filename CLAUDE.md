@@ -72,18 +72,32 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
   ids exist, required key items are obtainable so a mission can never soft-lock, acyclic mission
   dependencies). `tests/mission.test.ts` pins the runner; extend it when touching
   `engine/mission.ts`.
-- **Art/UI locked to the scene-7 reference** (`docs/DECISIONS.md` "Game art direction"): game
-  scenes are light-theme-only (dark deferred, backlog #31), app-language UI over chunky pixel
-  backdrops, brand indigo the single loud accent, reward-gold only on the victory loot screen.
-  Placeholder art is code-authored (`preview/game-pixel-mockups/welt_assets.py` writes
-  `src/features/welt/assets/`); G2 replaces it with licensed packs selected against scene 7.
-  Renderers live in `src/features/welt/`; `/welt` is in the AppShell focus-mode gate so missions
-  play chrome-free. Failure is content, never lockout: battle losses route through `onLose`
-  scaffolded-retry scenes; no hearts or energy meters, ever. **Interaction-first (founder, s73):**
-  scenes must play like game missions with minimal on-screen text (the loadout is walk-and-pick in
-  the room; battles mix tap and typed cloze moves; both bars must stay high and the finish quality
-  pays a victory bonus). Waiting beats become gameplay and print-prop mini-quests (Werbung/Anzeige/
-  Flyer) are the recurring side-quest pattern; both specced in `GAME_DESIGN.md` §4/§10, built in G2.
+- **Art/UI: scene-7 palette, PIXEL-GAME chrome, full-screen (s72 blessing as amended s74;
+  `docs/DECISIONS.md` "Game art direction" + "Game interaction & pixel-UI rules"):** game scenes
+  are light-theme-only (dark deferred, backlog #31), brand indigo the single loud accent,
+  reward-gold only on the victory loot screen. Since s74 the mission player is a FIXED
+  full-screen layer (dark surround, edge-to-edge stage) and every in-game surface is
+  pixel-styled (2px outlines in `GAME_OUT` #463c44, hard offset shadows, near-square corners,
+  RPG name plates); do not reintroduce app-chrome cards inside missions. **World scale is
+  locked** at the top of `preview/game-pixel-mockups/welt_assets.py` (standing adult 28-32 px on
+  the 240x160 world, chair ~19 px; `proportions-check.png` verifies), and battles stage
+  opponent+bar top / player+Mut-bar bottom at ONE human scale (no foreground zoom). Placeholder
+  art is code-authored (`welt_assets.py` writes `src/features/welt/assets/`); G2 replaces it
+  with licensed packs selected against scene 7 AND the scale table. Renderers live in
+  `src/features/welt/`; `/welt` is in the AppShell focus-mode gate. Failure is content, never
+  lockout: battle losses route through `onLose` scaffolded-retry scenes; no hearts or energy
+  meters, ever. **Interaction-first (founder, s73/s74):** scenes must play like game missions
+  with minimal on-screen text. The **bag is in the HUD at all times** (backpack-shaped popup);
+  document demands are battle `ask` nodes answered by tapping the item in the bag
+  (`handItem`/`admitMissing`), never sentence lists. **English is a rationed resource:** the
+  Wörterbuch bag item (3 charges/mission, `MissionRun.dictUses` + `useDictionary`) reveals
+  English for the current scene only; there is no always-on E toggle in missions. Battles mix
+  tap and typed cloze moves; both bars must stay high and the finish quality pays a victory
+  bonus. Waiting beats become gameplay and print-prop mini-quests (Werbung/Anzeige/Flyer) are
+  the recurring side-quest pattern; both specced in `GAME_DESIGN.md` §4/§10, built in G2.
+  **Activity design source (s74):** new mission exercises draft against
+  `docs/strategy/MISSION_ACTIVITY_RESEARCH.md` (the multi-persona research catalog); the
+  founder-facing chapter-1 scripts are `docs/strategy/CHAPTER1_GAMEPLAY_DECK.html`.
 - **Game progression state** (`missionsDone`, `keyItems` on `useProgressStore`) is **local-only
   for now**: cloudSync's `progress` upsert has a fixed column set and an unknown column fails the
   whole upsert, so syncing game state needs the G2 Supabase migration first.
