@@ -211,6 +211,13 @@ recurring NPCs, licensed pixel packs (select against scene 7), FSRS-driven recur
 playtest gate. Also G2: Supabase migration to sync `missionsDone`/`keyItems`. **Exit criterion
 for G1 stands: the founder plays the slice on their phone and it feels like a game.**
 
+**Model for G2 (founder decision s73, saving Fable budget): run G2 on Opus 4.8 / Sonnet 5,
+NOT Fable.** The Fable-tier work (schema architecture, art direction, chapter-1 narrative specs,
+Anmeldung content) is done and locked; per the plan's model map, Opus 4.8 handles the
+FSRS-recurrence engine work, Sonnet 5 drafts missions 1.1-1.5 against the `GAME_DESIGN.md`
+scene-by-scene specs, Haiku ships. The mission linter + the 81-test runner suite are the safety
+net. Optional Fable spend later: one tone/humor pass over the finished chapter-1 German.
+
 ---
 
 **Handoff after session 72 (2026-07-06). Pre-G1 art blessing is COMPLETE ✅: the founder BLESSED
