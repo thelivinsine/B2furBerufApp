@@ -10,6 +10,7 @@ import { vocabulary, vocabByTheme } from "@/data/vocabulary";
 import { themes, themeById } from "@/data/themes";
 import { redemittel } from "@/data/redemittel";
 import { grammar } from "@/data/grammar";
+import { texts } from "@/data/texts";
 import { isDue, mastery, reviewWeight, dueCount } from "@/engine/srs";
 import { buildThemeQuiz } from "@/engine/quiz";
 import { targetBlocks, weakestBand, buildPreview } from "@/engine/sessionPreview";
@@ -109,6 +110,12 @@ export interface BuildSessionOpts {
    * so learners without mic/STT/opt-in never see the block kind.
    */
   speaking?: boolean;
+  /**
+   * TTS is available (task 4.4). Lets a voicemail Lesen/Hören text play as a
+   * listening variant; the engine stays pure, so the caller passes
+   * `ttsSupported()`. Reading texts render regardless of this flag.
+   */
+  listening?: boolean;
 }
 
 /** Interleave several ordered pools round-robin so kinds alternate, not block. */
@@ -236,8 +243,35 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
     }),
   );
 
+  /* --- Pool 6: one Lesen/Hören comprehension block (task 4.4). Authentic
+     input feeds XP + theme progress, never vocab FSRS, so it stays out of the
+     retrieval pools above. Prefer a text on the scoped/weak theme, else one in
+     the Mode lens, else any. A voicemail plays as listening when TTS exists. --- */
+  const readingLensPool = texts.filter((t) => {
+    if (mode === "both") return true;
+    const ctx = themeById(t.themeId)?.context ?? "both";
+    return ctx === mode || ctx === "both";
+  });
+  const scopedTexts = readingLensPool.filter((t) => t.themeId === scopeTheme);
+  const readingSource = scopedTexts.length
+    ? scopedTexts
+    : readingLensPool.length
+      ? readingLensPool
+      : texts;
+  const readingText = sample(readingSource, 1)[0];
+  const readingBlocks: SessionBlock[] = readingText
+    ? [
+        {
+          kind: "reading",
+          key: `rd_${readingText.id}`,
+          textId: readingText.id,
+          listening: readingText.kind === "voicemail" && !!opts.listening,
+        },
+      ]
+    : [];
+
   const blocks = interleave(
-    [vocabBlocks, quizBlocks, grammarBlocks, redeBlocks, speakingBlocks],
+    [vocabBlocks, quizBlocks, grammarBlocks, redeBlocks, speakingBlocks, readingBlocks],
     limit,
   );
 

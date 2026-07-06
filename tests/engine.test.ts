@@ -79,6 +79,38 @@ describe("session composer", () => {
     expect(graduatedToTyping({ ease: 2.5, interval: 20, reps: 4, due: "2000-01-01" })).toBe(true);
   });
 
+  it("includes exactly one Lesen/Hören reading block (4.4)", () => {
+    const plan = buildSession({ srs: {}, mode: "both", minutes: 15 });
+    const reading = plan.blocks.filter((b) => b.kind === "reading");
+    expect(reading.length).toBe(1);
+  });
+
+  it("plays a voicemail as listening only when the caller reports TTS (4.4)", () => {
+    // Scope to logistics, whose only text is a voicemail, so the reading block
+    // is deterministic. With listening support it plays as audio; without, it
+    // still appears as a readable text block.
+    const withTts = buildSession({
+      srs: {}, mode: "both", minutes: 15, scope: "logistics", listening: true,
+    });
+    const withoutTts = buildSession({
+      srs: {}, mode: "both", minutes: 15, scope: "logistics", listening: false,
+    });
+    const readOf = (p: ReturnType<typeof buildSession>) =>
+      p.blocks.find((b) => b.kind === "reading") as
+        | Extract<(typeof p.blocks)[number], { kind: "reading" }>
+        | undefined;
+    expect(readOf(withTts)?.listening).toBe(true);
+    expect(readOf(withoutTts)?.listening).toBe(false);
+  });
+
+  it("scopes the reading block to the requested theme when a text exists (4.4)", () => {
+    const plan = buildSession({ srs: {}, mode: "both", minutes: 15, scope: "behoerde" });
+    const reading = plan.blocks.find((b) => b.kind === "reading") as
+      | Extract<(typeof plan.blocks)[number], { kind: "reading" }>
+      | undefined;
+    expect(reading?.textId.startsWith("tx_behoerde")).toBe(true);
+  });
+
   it("sessionPreview is deterministic and reports history", () => {
     const a = sessionPreview({ srs: {}, minutes: 10 });
     const b = sessionPreview({ srs: {}, minutes: 10 });
