@@ -151,3 +151,10 @@ rule). **Round 3 (scenes 7–8, founder feedback):** the same battle restyled mo
    v1 ships light-theme-only game scenes; dark mode is parked in the `PROJECT_REFERENCE.md`
    backlog. Do not spend art or engineering budget on game dark mode without a new founder
    go-ahead.
+
+## Game title (session 72, 2026-07-06) — "Neuland" approved
+
+The founder approved the game's title from the `GAME_DESIGN.md` naming proposals: **"Neuland"**
+(verbatim: "neuland is good"). Use it as the game's name in design docs and content. The city
+name "Neustadt" and the NPC cast names remain proposals the founder has not objected to; treat
+them as defaults until renamed, not as locked.
