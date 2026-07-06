@@ -229,10 +229,11 @@ def backdrop_amt():
     window(img)
     shelf(img)
     floor_plant(img)
-    # ground shadows: desk spot, the player's FOREGROUND spot (bottom-left,
-    # battle composition s74: opponent top band, player bottom band), desk base
+    # ground shadows: desk spot, the player's spot (bottom-left band, battle
+    # composition s74: opponent top, player bottom, both at the SAME human
+    # scale, no foreground zoom), desk base
     dim_ellipse(img, 148, 71, 202, 79)
-    dim_ellipse(img, 22, 136, 80, 148)
+    dim_ellipse(img, 38, 134, 66, 142)
     dim_ellipse(img, 118, 76, 164, 83, 0.93)
     # modern service desk with monitor
     rect(img, 118, 62, 46, 18, (240, 238, 233))
