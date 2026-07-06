@@ -2468,3 +2468,30 @@ the default session and feeding FSRS (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATI
 (docs/ship). OR pivot to game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`), whose formCloze / dialogue-battle
 scenes now have both the tolerant grading (4.1) and a typed-input block pattern (4.2) to build on.
 
+
+---
+
+**Handoff after session 69 (2026-07-06). UX redesign Phase 4 Session B is COMPLETE ✅: tasks 4.3
+(Lesen/Hören text bank, PR #320 `f09da8e`) AND 4.4 (reading/listening composer block + renderer, PR #322
+`98c4688`) shipped, so authentic reading/listening input is now live in the composed session (plan:
+`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What 4.4 shipped:
+- **New `kind: "reading"` `SessionBlock`** (`src/types/index.ts`): `textId` + a `listening` flag.
+- **Composer** (`src/engine/session.ts`): Pool 6 emits **exactly one** reading block per session; prefers a
+  text on the scoped/weak theme, else one in the active Mode lens, else any. A voicemail text plays as a
+  **listening** variant when the caller reports TTS (new pure `listening` opt, player passes
+  `ttsSupported()`); every other genre renders as readable text. `test:unit` gained 3 composer cases.
+- **`ReadingBlock` renderer** (`src/features/session/ReadingBlock.tsx`, new — extracted so `SessionPlayer`
+  stays under the ~1000-line line the plan flagged): a two-stage full-screen focus block. Read/listen stage
+  (genre + CEFR badges, tap-gloss title, `Übersetzung` toggle; listening = TTS play/replay with a
+  `Text anzeigen` reveal fallback), then the 2–3 comprehension MCQs one at a time (reuses the quiz MCQ
+  styling + `explain`). `XP.readingCheck` (8) per correct check; the block registers ONE aggregate tally
+  result (majority-correct) at completion, so it never inflates correct/total, and it **never touches vocab
+  FSRS** (comprehension practice, not a graded SRS card — keeps 4.5's "no new state" invariant intact).
+- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **62**,
+  `check:bundle` main chunk **78.9 kB** (bank + renderer ride the lazy session-route chunk).
+
+**Next step:** short Session C = **4.5** (visible per-theme progression chip on the Fortschritt theme grid
++ city-building tap, derived from existing FSRS/theme-mastery state, **no new state** — Sonnet) + **4.6**
+(gates/docs wrap). OR the standing alternative: pivot to game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`, still
+PROPOSED), whose formCloze / dialogue-battle scenes now have the tolerant typed grading (4.1), the typed
+block pattern (4.2), and the authentic-input block pattern (4.4) to build on.
