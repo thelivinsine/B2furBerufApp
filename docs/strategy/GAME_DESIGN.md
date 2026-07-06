@@ -1,4 +1,4 @@
-# Game design: storyline, missions, systems (working title "Neuland")
+# Game design: storyline, missions, systems (title "Neuland", founder-approved)
 
 _Status: **DRAFT for founder review** (session 62 continued, 2026-07-06). This is the detailed
 design layer on top of `docs/strategy/GAME_CONCEPT.md` (pillars, scope guardrail, research) and
@@ -21,8 +21,10 @@ a life: a flat, an income, a doctor you trust, people who know your name.
 - **The city (proposal): Neustadt.** Deliberately every-town Germany: an S-Bahn spine, an
   Altbau quarter, a concrete Amt, a Büropark, a Kiez with a Späti. One walkable map whose
   districts unlock chapter by chapter.
-- **Working title (proposal): "Neuland".** German for uncharted territory, which is exactly
-  what the player is standing in. Founder may rename at any time; nothing depends on it.
+- **Title: "Neuland" — APPROVED by the founder (2026-07-06, session 72: "neuland is good").**
+  German for uncharted territory, which is exactly what the player is standing in. No longer
+  a proposal; use it as the game's name in design and content work. (The city name "Neustadt"
+  stays a proposal the founder has not objected to.)
 
 ## 2. Recurring cast
 
@@ -280,7 +282,12 @@ see `docs/plans/GAME_IMPLEMENTATION_PLAN.md`.
 
 ## 13. Open decisions for the founder
 
-1. **Art blessing:** approve producing 2–3 pixel mockup scenes (free assets).
-2. **Names (proposals):** game title "Neuland", city "Neustadt", the NPC cast. All renameable.
+1. ~~**Art blessing:** approve producing 2–3 pixel mockup scenes (free assets).~~ RESOLVED
+   2026-07-06 (session 72): mockups produced and the **modern pixel style blessed**
+   (`preview/game-pixel-mockups/scene7-modern-hell.png` is the reference; GBA styling
+   rejected; in-game dark mode deferred). Record: `docs/DECISIONS.md` → "Game art direction".
+2. ~~**Names (proposals):** game title "Neuland", city "Neustadt", the NPC cast. All
+   renameable.~~ PARTIALLY RESOLVED 2026-07-06 (session 72): the founder approved the game
+   title **"Neuland"**. City "Neustadt" and the NPC cast remain unobjected proposals.
 3. **Chapter-1 mission list sign-off** before G1 content authoring starts (the vertical slice
-   itself is already specced in the concept doc).
+   itself is already specced in the concept doc). STILL OPEN.

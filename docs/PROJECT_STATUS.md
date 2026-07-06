@@ -1,15 +1,13 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 62 continued: **detailed game design DRAFTED** in
-`docs/strategy/GAME_DESIGN.md` + a founder slide deck, awaiting review; see the top "Resume here"
-handoff. Prior update, session 71: two parallel audits. **(1) UX redesign audit + gap analysis**
-(report: `docs/plans/UX_AUDIT_2026-07-06.md`) confirmed redesign Phases 1–4 are faithfully implemented,
-all gates green; two gaps were found and fixed the same session: a latent eager-bundle landmine (dead
-`cardMeta`/`cefrRange` + `filterVocab` import removed from `intentCards.ts`) and the missing quest
-"claim moment" (new persisted `claimedMilestones` + a reward-gold "Einlösen" card on Fortschritt).
-**(2) Frontend design/brand audit** (`docs/plans/DESIGN_AUDIT_2026-07-06.md`, doc-only) flagged missing
-social-preview meta, five parallel accent systems, a light-mode boot flash, Denglish copy, and contrast
-failures. Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED. The working
+_Last updated: 2026-07-06 (session 72: **game art direction BLESSED + title "Neuland" approved**.
+Eight zero-spend pixel mockups of the Anmeldung slice live in `preview/game-pixel-mockups/`; the
+modern restyle `scene7-modern-hell.png` is the locked style reference (GBA styling rejected as 90s,
+in-game dark mode deferred to backlog #31); record in `docs/DECISIONS.md`. Prior updates same day:
+session 62 continued drafted the detailed game design `docs/strategy/GAME_DESIGN.md` + slide deck
+(founder-reviewed: every chapter ends on its boss), and session 71 ran the UX redesign audit
+(`docs/plans/UX_AUDIT_2026-07-06.md`, two gaps fixed) and the design/brand audit
+(`docs/plans/DESIGN_AUDIT_2026-07-06.md`). Next: game G1. The working
 branch is reassigned every session, so **`main` is always the source of truth**. Product name:
 **Genauly** (domain `genauly.de`)._
 
@@ -185,10 +183,14 @@ generators committed alongside the PNGs). Founder decisions, recorded in full in
 Doc updates shipped with the blessing: `GAME_CONCEPT.md` Visuals pillar + open questions,
 `GAME_IMPLEMENTATION_PLAN.md` guardrail + founder-decision list, the mockup folder README verdict.
 
+Late-session addition: the founder also approved the game title **"Neuland"** from the
+`GAME_DESIGN.md` proposals ("neuland is good"); city "Neustadt" + NPC cast stay unobjected
+proposals, chapter-1 sign-off still open (recorded in `DECISIONS.md` and `GAME_DESIGN.md` §13).
+
 **Next step:** start game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`: Mission/Scene schema
 + `engine/mission.ts` + lint checks first, then scene renderers and the Anmeldung mission
 content), building game UI surfaces to the scene-7 style. The narrative layer for G1 is the
-freshly drafted `docs/strategy/GAME_DESIGN.md` (see the next handoff below).
+drafted `docs/strategy/GAME_DESIGN.md` (see the next handoff below).
 
 ---
 
@@ -214,8 +216,8 @@ Vorstellungsgespräch boss, K5 Im Büro 5 mapping the workplace themes with the 
 Gesund & Sozial 6, K7 Mein Ziel with 5 player-chosen endgame chains where the exam is one optional
 path per the scope guardrail; **structural rule from founder review: every chapter ends on its
 boss**), plus real-world side quests and tone/art rules. Of its three open decisions, the
-**art blessing is now resolved** (see the session-72 handoff above); names and chapter-1
-sign-off remain open. **Next step: game G1 per `GAME_IMPLEMENTATION_PLAN.md`.**
+**art blessing is resolved** and the title **"Neuland" is approved** (see the session-72
+handoff above); chapter-1 sign-off remains open. **Next step: game G1 per `GAME_IMPLEMENTATION_PLAN.md`.**
 
 ---
 
