@@ -210,12 +210,17 @@ interaction model (D/E on every line, tap→type→speak input ladder, register-
 parody documents); conversation battles (Geduld vs Standing bars, Redemittel moves, K-II crits, kind
 status effects); the bag item taxonomy (Wortkarten Lv1–5, Redemittel moves, Grammatik-Kräfte,
 Schlüssel-Dokumente, consumables, Fundstücke); failure-is-content rules restated; and the full
-authored spine: **seven chapters / ~40 described missions** (K1 Ankommen 6 incl. the Anmeldung boss
-= the vertical slice, K2 Wohnen 6, K3 Geld & Papierkram 5, K4 Die Jobsuche 7 ending on the
-Vorstellungsgespräch boss, K5 Im Büro 5 mapping the workplace themes with the Dienstreise boss, K6
-Gesund & Sozial 6, K7 Mein Ziel with 5 player-chosen endgame chains where the exam is one optional
-path per the scope guardrail; **structural rule from founder review: every chapter ends on its
-boss**), plus real-world side quests and tone/art rules. Of its three open decisions, the
+authored spine: **six chapters + a chosen ending / ~40 described missions** (K1 Ankommen 6 incl.
+the Anmeldung boss = the vertical slice, K2 Wohnen 6, K3 Geld & Papierkram 5, K4 Die Jobsuche 7
+ending on the Vorstellungsgespräch boss, K5 Gesund & Sozial 6, K6 Mein Ziel with 5 player-chosen
+endgame chains; **founder direction 2026-07-06: the Im Büro office arc is the CAREER endgame
+chain** (5 missions + boss: der unbefristete Vertrag with Frau Weber), not a spine chapter, and
+the exam stays one optional path per the scope guardrail; **structural rule from founder review:
+every chapter ends on its boss**), plus real-world side quests and tone/art rules. **Also founder
+direction 2026-07-06: Pfand is a real economy, not decoration**: bottles hide in scenes, the
+Leergutautomat return is a micro-review mini-game paying Pfandgeld (buys the consumables at the
+Späti), and it recurs as a cultural gag; full spec in `GAME_DESIGN.md` §6. Of the design's three
+open decisions, the
 **art blessing is resolved** and the title **"Neuland" is approved** (see the session-72
 handoff above); chapter-1 sign-off remains open. **Next step: game G1 per `GAME_IMPLEMENTATION_PLAN.md`.**
 

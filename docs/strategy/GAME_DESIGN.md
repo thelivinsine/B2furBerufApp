@@ -96,8 +96,29 @@ The Pokémon fight, rebuilt for language and without violence:
 | **Redemittel-Moves** | Conversation moves by function and register. | "Ich sehe das etwas anders, weil..." |
 | **Grammatik-Kräfte** | Unlockable powers that enable bigger moves. | Konjunktiv II (politeness crits), Passiv |
 | **Schlüssel-Dokumente** | Key items real missions genuinely require, mirroring real dependency chains. | Meldebestätigung (from 1.6, needed in 3.1), Mietvertrag, SIM-Vertrag |
-| **Verbrauchsgüter** | Mid-battle composure restores, jokey and rare. | Kaffee (small heal), Döner (revive after a lost battle, skips the walk back), Feierabendbier (rare full restore; alcohol stays a rare collectible, never the core heal) |
-| **Fundstücke** | Cultural collectibles with zero mechanical power, pure joy. | Pfandflaschen, a Wackeldackel, Kleingartenzwerg |
+| **Verbrauchsgüter** | Mid-battle composure restores, jokey and rare, bought with Pfandgeld. | Kaffee (small heal), Döner (revive after a lost battle, skips the walk back), Feierabendbier (rare full restore; alcohol stays a rare collectible, never the core heal) |
+| **Pfandflaschen** | The game's found currency and its longest-running gag (see the Pfand economy below). | Mehrweg 8 ct, Einweg 25 ct, the legendary full crate |
+| **Fundstücke** | Cultural collectibles with zero mechanical power, pure joy. | a Wackeldackel, Kleingartenzwerg |
+
+### The Pfand economy (founder direction, 2026-07-06: not decorative, culturally load-bearing)
+
+Pfand is the game's soft currency and a recurring cultural gag, because in Germany it is both:
+
+- **Bottles appear everywhere**: in the park after Das Wochenende, in the office kitchen, on
+  the S-Bahn platform, and as a glorious mountain after your own party. Tapping one bags it.
+- **The Leergutautomat is a recurring mini-game prop**: returning bottles at the supermarket
+  machine is rapid micro-review (each accepted bottle = one quick retrieval exercise; miss and
+  the machine spits the bottle back with the dreaded red X). Payout: **der Pfandbon**, which
+  converts to **Pfandgeld**.
+- **Pfandgeld buys things that matter**: the consumables (Kaffee, Döner, Feierabendbier) at
+  Herr Nguyen's Späti, plus cosmetics for the flat. The whole consumable economy runs on
+  bottles, so scavenging is never pointless.
+- **The gag recurs and teaches**: mission 1.4 introduces the system including the Einweg 25 ct
+  vs Mehrweg 8 ct lore (real cultural teaching); Ayşe delivers the "you do NOT throw away
+  Pfand" house rule in chapter 2; leaving bottles NEXT to the bin for collectors appears as
+  the quiet Pfandspende kindness scene; Herr Nguyen appraises rare bottles like an antiques
+  dealer; the post-party bottle mountain is the biggest payday in the game. Achievement:
+  **Pfandmillionär** (return 100 bottles; the joke is that it pays about 25 EUR).
 
 The bag reuses the existing facet system (theme, CEFR, word class, register, sub-theme) so loot
 is findable when a mission demands it.
@@ -126,7 +147,7 @@ is findable when a mission demands it.
 - **Prüfungsmodus** is a per-mission opt-in replay mode (typed answers, timers, no D/E) with
   better loot. Never the default. This also gives every mission natural replay value.
 
-## 9. The story: seven chapters, ~40 authored missions
+## 9. The story: six chapters plus a chosen ending, ~40 authored missions
 
 The authored spine below is v1. Within and after it, mission VARIANTS are procedurally composed
 from the content banks (same schema, FSRS-picked language), which is how "several hundred
@@ -145,7 +166,7 @@ what happens after a boss belongs to the next chapter.
    register-marked choices). Key item: SIM-Vertrag. Introduces contract-reading UI.
 4. **Der erste Einkauf.** Supermarket: find items by German labels, the Pfand system,
    the legendary checkout speed (a gentle timed mini-game with a self-deprecating fail state).
-   Loot: food/quantities, Pfandflasche collectible #1.
+   Loot: food/quantities, and your first Pfandbon: the Pfand economy opens here (see §6).
 5. **Ein Dach über dem Kopf.** Jonas arranges a temporary room; the landlord needs a signed
    Wohnungsgeberbestätigung. First real form. Sets up 1.6's document chain.
 6. **BOSS: Die Anmeldung.** The five-scene vertical slice (booking parody, bag loadout,
@@ -202,23 +223,10 @@ what happens after a boss belongs to the next chapter.
    Jonas coaches. The Stärken/Schwächen cards are forged here; bag loadout for the boss.
 7. **BOSS: Das Vorstellungsgespräch.** Interview battle with Frau Weber: strengths without
    bragging, weaknesses without self-destruction, salary Konjunktiv. Reward: der
-   Arbeitsvertrag key item; the Büropark district unlocks.
+   Arbeitsvertrag key item. Your working life continues in the background; the Büropark
+   district opens fully in the endgame's career path (below).
 
-### Kapitel 5 · Im Büro (district: Büropark) — 5 missions (maps onto the ten workplace themes)
-1. **Der erste Arbeitstag.** Onboarding maze: IT passwords, Kaffeeküche etiquette, the du/Sie
-   minefield mapped per colleague (a social graph the player fills in).
-2. **Das Meeting.** Meetings theme: agenda-following, interrupting politely, summarizing.
-   Introduces the "zusammenfassen" move class.
-3. **Der schwierige Kunde.** Customer theme: complaint call battle (patience bar in its purest
-   form), de-escalation Redemittel.
-4. **Der Streit ums Projekt.** Conflict + project themes: defend your plan diplomatically in
-   front of the team, then absorb a deadline change without losing standing.
-5. **BOSS: Die Dienstreise.** Travel theme capstone: book, ride, survive a delayed ICE,
-   present at the client site with everything the chapter taught. Afterwards office life
-   continues as recurring errands over all ten workplace themes
-   (scheduling/logistics/technology weave in here).
-
-### Kapitel 6 · Gesund & Sozial (districts: Kiez & Stadtpark) — 6 missions
+### Kapitel 5 · Gesund & Sozial (districts: Kiez & Stadtpark) — 6 missions
 1. **Der Arzttermin.** Call the Praxis (listening + speaking), describe symptoms with body
    vocab, navigate the Versichertenkarte ritual with Dr. Sommer.
 2. **In der Apotheke.** Pharmacy consultation: dosage language, generics question, the
@@ -232,12 +240,19 @@ what happens after a boss belongs to the next chapter.
 6. **BOSS: Das Einweihungsfest.** Host your own party: invite neighbors, colleagues and
    friends (written invitations), cook from a German recipe, handle Krause at the door and
    Frau Schmidt's surprise cameo. The chapter's whole cast on one stage; standing bar renamed
-   "Gastgeber-Ehre" for the night.
+   "Gastgeber-Ehre" for the night. The morning after, the bottle mountain is the biggest
+   Pfand payday in the game.
 
-### Kapitel 7 · Mein Ziel (endgame, player-chosen) — 4+ mission chains
-At the chapter-6 finale the player picks their life goal; each is an authored chain that
+### Kapitel 6 · Mein Ziel (endgame, player-chosen) — 5 mission chains
+At the chapter-5 finale the player picks their life goal; each is an authored chain that
 hardens earlier systems (all input rungs, thinner D/E, richer registers):
-- **Der unbefristete Vertrag** (career: negotiation arc with Frau Weber).
+- **Die Karriere: Im Büro** (moved here from the main spine, founder direction 2026-07-06;
+  maps onto the ten workplace themes and unlocks the Büropark district): Der erste
+  Arbeitstag (du/Sie minefield, Kaffeeküche etiquette), Das Meeting ("zusammenfassen" moves),
+  Der schwierige Kunde (patience bar in its purest form), Der Streit ums Projekt (diplomatic
+  defense, deadline hit), Die Dienstreise (delayed ICE, client-site presentation), then
+  **BOSS: Der unbefristete Vertrag**, the contract-and-salary negotiation with Frau Weber.
+  Afterwards office life continues as recurring errands over all ten workplace themes.
 - **Die Traumwohnung** (housing: the full apartment hunt at higher difficulty, solo).
 - **Die Einbürgerung** (citizenship: the paperwork summit; includes optional Einbürgerungstest
   content).
@@ -260,9 +275,10 @@ hardens earlier systems (all input rungs, thinner D/E, richer registers):
 
 - **Tone:** warm, funny, on the player's side. The game lovingly roasts German bureaucracy
   and never the learner. Humor is situational, not text-wall jokes.
-- **Visual style:** committed retro 2D pixel art (GBA-era Pokémon spirit), per the concept
-  doc; **direction still awaits founder blessing via 2–3 mockup scenes** (free assets, zero
-  spend). Until then all design is art-agnostic.
+- **Visual style:** committed 2D pixel art, **blessed by the founder 2026-07-06 (session 72)**
+  in its MODERN form: `preview/game-pixel-mockups/scene7-modern-hell.png` is the locked style
+  reference (muted contemporary palette, app-language UI, crisp half-size UI pixels; GBA-retro
+  styling rejected as dated). Record in `docs/DECISIONS.md` → "Game art direction".
 - **Language policy:** scene German is CEFR-banded per player level (the existing facet
   system); interface chrome follows the app's microcopy budget; D/E on every content line.
   No em dashes anywhere in copy.
