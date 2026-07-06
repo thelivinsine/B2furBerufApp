@@ -108,3 +108,46 @@ through two founder-feedback rounds. The resulting rules are locked; the "why":
 - **Review workflow.** The static sheet `preview/domain-buildings-preview.svg` (generator
   `preview/gen-domain-buildings-preview.mjs`, light/dark × unlit/lit) is the founder-review artifact;
   the TSX is the geometry source of truth and the two are kept in sync manually.
+
+## Game art direction (session 72, 2026-07-06) — modern pixel style blessed, GBA look rejected
+
+The pre-G1 art blessing for the German life story RPG (`docs/strategy/GAME_CONCEPT.md`) ran as
+three mockup rounds on the Anmeldung vertical slice, all zero-spend and hand-authored in code
+(the sandbox network policy blocks kenney.nl / OpenGameArt / itch.io, so no packs could be
+downloaded; the generators live next to the PNGs in `preview/game-pixel-mockups/`).
+
+**Round 1 (scenes 1–3):** GBA-authentic look (240x160, saturated primaries, black-bordered
+boxy chrome, ALL-CAPS bitmap text): Termin parody website, Bürgeramt waiting room, Frau
+Schmidt dialogue battle. **Round 2 (scenes 4–6, founder request):** three more takes on the
+Frau Schmidt boss — Schalter close-up with a 2x bust, Konjunktiv-II crit moment, victory loot
+card (the loot card is the one mockup using reward-gold, honoring the app's loot-only gold
+rule). **Round 3 (scenes 7–8, founder feedback):** the same battle restyled modern.
+
+**Founder verdicts (recorded so future sessions do not relitigate):**
+
+1. **2D pixel art form: APPROVED.** The founder called rounds 1–2 "good in being honest to
+   the art form". The pixel medium itself is settled.
+2. **GBA-era styling: REJECTED for shipping.** Verbatim: the "color and design language feels
+   quite outdated. It reminds me of the 90's." Do not ship the saturated primary palette,
+   hard black UI borders, boxy dialogue chrome, or ALL-CAPS-everywhere text of scenes 1–6.
+   Those mockups stay in the folder as the art-form proof, not as style reference.
+3. **Modern restyle: BLESSED.** Verbatim: "i love this new mock up style!" The reference
+   image is `preview/game-pixel-mockups/scene7-modern-hell.png` (generator: `scenes3.py`).
+   Its defining traits, which G1/G2 art and UI must match:
+   - muted contemporary palette (greige walls, light oak floor, sage plants, mustard/denim
+     clothing) with **brand indigo #5b5be6 as the single loud accent**;
+   - relatable modern set design (today's Bürgeramt: wood floor, monstera, bookshelf, white
+     desk with monitor), not 90s-institutional grey;
+   - sprite outlines in soft warm darks, never pure black;
+   - **app-language UI over the pixel world:** floating rounded cards with soft drop shadows,
+     thin rounded progress bars, level chips, pill buttons (primary action filled indigo),
+     bottom sheet with grab handle, sentence case (no ALL-CAPS chrome);
+   - UI rendered at half-size pixels (world 240x160, UI 480x320) — the crisp-UI-over-chunky-
+     world convention of modern indie pixel games (Eastward, Unpacking, Coffee Talk register);
+   - LimeZu "Modern Interiors/Exteriors" remains the reference register when packs are bought
+     in G2; select against scene 7, not scenes 1–6.
+4. **In-game dark mode: DEFERRED, future to-do.** The founder liked the dark variant
+   (`scene8-modern-dunkel.png`) but ruled it "a bit of a stretch because of limited budget".
+   v1 ships light-theme-only game scenes; dark mode is parked in the `PROJECT_REFERENCE.md`
+   backlog. Do not spend art or engineering budget on game dark mode without a new founder
+   go-ahead.

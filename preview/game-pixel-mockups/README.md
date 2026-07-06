@@ -1,9 +1,15 @@
 # Anmeldung mission: pixel-art direction mockups (pre-G1)
 
-Three mockup scenes of the Anmeldung vertical slice (`docs/strategy/GAME_CONCEPT.md`) in the
-proposed retro GBA-era pixel style, produced for the founder's art blessing per
-`docs/plans/GAME_IMPLEMENTATION_PLAN.md` (pre-G1 row of the task map). **Mockups only. No game
-code, no purchases.**
+**VERDICT (founder, 2026-07-06): the modern restyle in `scene7-modern-hell.png` is the blessed
+art direction.** The 2D pixel form is approved; the GBA-era styling of scenes 1–6 was rejected
+as dated ("reminds me of the 90's"); the dark-mode variant (scene 8) is liked but deferred as a
+future to-do for budget reasons. Full record: `docs/DECISIONS.md` → "Game art direction
+(session 72)". Scenes 1–6 remain here as the art-form proof and exploration history, not as
+style reference.
+
+Mockup scenes of the Anmeldung vertical slice (`docs/strategy/GAME_CONCEPT.md`), produced for
+the founder's art blessing per `docs/plans/GAME_IMPLEMENTATION_PLAN.md` (pre-G1 row of the task
+map). **Mockups only. No game code, no purchases.**
 
 ## The scenes
 

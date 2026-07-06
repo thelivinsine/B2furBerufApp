@@ -222,14 +222,24 @@ is a content routine, not an engineering task.
 - **Performance:** game chunk lazy, 400 kB main budget enforced by CI; pixel assets are small,
   but watch PWA precache growth when tilemaps land (exclude large game assets from precache if
   needed).
-- **Pixel-art blessing is still pending.** Buy no packs and ship no sprites before the founder
-  approves 2–3 mockup scenes (cheap to produce, next session if wanted).
+- **Pixel-art direction BLESSED (2026-07-06, session 72), with a styling correction.** Eight
+  mockups shipped in `preview/game-pixel-mockups/` (zero spend, hand-authored in code because
+  the sandbox blocks the free asset hosts). Founder verdict: the 2D pixel form stays, but the
+  GBA-authentic palette/chrome of scenes 1–6 read as "90s"; the approved shipping style is the
+  **modern restyle** of `scene7-modern-hell.png` — muted contemporary palette, modern relatable
+  set design, soft outlines, app-language UI (rounded floating cards, pills, bottom sheet,
+  brand indigo) drawn at half-size pixels over the chunky world. Light theme only for v1:
+  the dark-mode variant (`scene8-modern-dunkel.png`) was liked but deferred as a future to-do
+  for budget reasons (tracked in the `PROJECT_REFERENCE.md` backlog). When buying packs in G2,
+  select against the scene-7 reference (LimeZu modern register), not against scenes 1–6.
 
 ## What the founder decides now
 
 1. **Go-ahead order:** recommended path is redesign Phase 1 next, then G1. (Alternative: jump
    straight to G1 and fold the redesign in later; not recommended, the redesign is smaller,
    already specced, and every game surface reuses it.)
-2. **Pixel-art direction:** approve producing 2–3 mockup scenes for blessing.
+2. ~~**Pixel-art direction:** approve producing 2–3 mockup scenes for blessing.~~ DONE
+   2026-07-06: mockups produced and the modern pixel style blessed (see the risks/guardrails
+   bullet above for the full verdict).
 3. **Brand question** (Genauly feature vs. sister name): explicitly deferrable; revisit after
    the G2 playtest.

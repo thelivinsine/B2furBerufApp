@@ -117,8 +117,17 @@ a rendering convention, not a content rewrite.
 Pokémon GBA-era style: tilemaps, sprite characters, scene illustrations. Deliberate retro charm
 is achievable solo (high-quality affordable asset packs exist for exactly this style) and reads
 as a feature; imitating Clash-of-Clans production values is a nine-figure art budget and reads
-as cheap when underfunded. Pixel direction proposed, **awaiting explicit founder blessing**
-before any mockups.
+as cheap when underfunded.
+
+**BLESSED with a styling correction (founder, 2026-07-06, session 72).** Mockups of the
+Anmeldung slice settled the direction: the 2D pixel form stays, but the literal GBA-era
+palette and chrome read as "90s" to the founder and are rejected for shipping. The approved
+look is **modern indie pixel** (reference: `preview/game-pixel-mockups/scene7-modern-hell.png`
+and its README): muted contemporary palette, relatable modern set design, soft colored
+outlines instead of black, and app-language UI (floating rounded cards, pill buttons, bottom
+sheet, brand indigo accent) rendered at finer resolution over the chunky pixel world. Light
+theme only for v1; an in-game dark mode was liked but explicitly deferred as a future to-do
+(budget). Full record in `docs/DECISIONS.md`.
 
 ## Audience and tone
 
@@ -177,7 +186,8 @@ provenance-cleared content banks (1,111 items with license tracking, a real moat
 engine, the dialogue runner, the scoring engine, and the CEFR/theme/facet taxonomy. Open
 questions, not yet decided:
 - Does it ship under the Genauly brand or its own name?
-- Final blessing on the pixel-art direction.
+- ~~Final blessing on the pixel-art direction.~~ RESOLVED 2026-07-06: modern pixel style
+  blessed (see the Visuals pillar above); dark mode deferred.
 - Tech approach for the 2D layer: explored and PROPOSED in
   `docs/plans/GAME_IMPLEMENTATION_PLAN.md` (session 62, 2026-07-05): build inside Genauly as a
   lazy route, React renders all scenes, Phaser only for the later walkable overworld, missions

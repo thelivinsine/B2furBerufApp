@@ -165,28 +165,26 @@ under ~250 lines. This split was done in session 70 (the file had grown to 1,624
 
 ## Resume here (next session)
 
-**Handoff after session 72 (2026-07-06). Pre-G1 pixel-art mockups are DONE and awaiting the
-founder's approve/reject on the art direction (no game code, zero spend).** Six mockup scenes of
-the Anmeldung vertical slice in the proposed retro GBA style (240x160 native, 4x nearest-neighbor)
-live in `preview/game-pixel-mockups/`: the parody Termin website, the Bürgeramt waiting room, the
-Frau Schmidt dialogue battle (GEDULD/MUT bars, Redemittel moves, D/E chips, brand indigo dialogue
-chrome), plus three founder-requested Frau Schmidt variants: the Schalter close-up (2x boss bust
-behind glass, missing-document slot), the Konjunktiv-II crit moment (gold KRITISCH! banner), and
-the victory loot card (Meldebestätigung Schlüssel-Item, the one legitimate reward-gold use).
-Founder feedback on the first six: honest to the art form but the GBA palette/chrome read as 90s.
-Scenes 7–8 answer that with a **modern restyle of the same battle** (light + dark theme): muted
-contemporary palette, wood/plants Bürgeramt, soft outlines, floating rounded UI cards, pill
-buttons, crisp half-size UI pixels over the chunky world (`scenes3.py`). The modern direction is
-the one to test against next. Constraint note: the sandbox network policy blocks kenney.nl / OpenGameArt /
-itch.io, so instead of downloading free packs the art was **hand-authored in code** (original,
-license-clean; `scenes.py` + the bitmap pixel font `pixfont.py` in the same folder regenerate the
-PNGs). This satisfies the plan's "mockups with free assets, zero spend" rule; real packs are only
-bought after the blessing (G2).
+**Handoff after session 72 (2026-07-06). Pre-G1 art blessing is COMPLETE ✅: the founder BLESSED
+the modern pixel style and the game's art direction is now locked (no game code, zero spend).**
+Eight mockup scenes of the Anmeldung vertical slice live in `preview/game-pixel-mockups/` (all
+hand-authored in code because the sandbox blocks the free asset hosts; original + license-clean,
+generators committed alongside the PNGs). Founder decisions, recorded in full in
+`docs/DECISIONS.md` → "Game art direction (session 72)":
+- **2D pixel form approved**; the GBA-authentic styling of scenes 1–6 **rejected** as dated
+  ("reminds me of the 90's"). Those scenes stay as art-form proof, not style reference.
+- **`scene7-modern-hell.png` is the blessed reference** ("i love this new mock up style!"):
+  muted contemporary palette, modern Bürgeramt set, soft outlines, app-language UI (rounded
+  floating cards, pills, bottom sheet, brand indigo accent), crisp half-size UI pixels over the
+  chunky 240x160 world. G2 pack purchases must select against this reference.
+- **In-game dark mode deferred** (liked, but "a bit of a stretch because of limited budget");
+  tracked as backlog #31 in `docs/PROJECT_REFERENCE.md`. v1 game scenes are light-theme only.
+Doc updates shipped with the blessing: `GAME_CONCEPT.md` Visuals pillar + open questions,
+`GAME_IMPLEMENTATION_PLAN.md` guardrail + founder-decision list, the mockup folder README verdict.
 
-**Next step:** if the founder blesses the direction, start game plan G1
-(`docs/plans/GAME_IMPLEMENTATION_PLAN.md`: Mission/Scene schema + `engine/mission.ts` first). If
-rejected, iterate the mockups (the generator makes restyling cheap) or fall back to the flat-SVG
-direction mentioned in the plan.
+**Next step:** start game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`: Mission/Scene schema
++ `engine/mission.ts` + lint checks first, then scene renderers and the Anmeldung mission
+content), building game UI surfaces to the scene-7 style.
 
 ---
 
