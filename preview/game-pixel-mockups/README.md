@@ -14,6 +14,19 @@ code, no purchases.**
 - `scene3-frau-schmidt.png` — Scene 4, the boss dialogue battle: Frau Schmidt with a GEDULD
   bar, the player with a MUT bar, Redemittel moves (Konjunktiv II crits).
 
+Three additional takes on the Frau Schmidt boss (founder request, same session), each testing a
+different beat of the battle (`scenes2.py`):
+
+- `scene4-schalter-closeup.png` — close-up confrontation at the Schalter: a large 2x Frau
+  Schmidt bust looming behind the glass, your documents on the counter with the missing
+  Wohnungsgeberbestätigung as a red dashed slot.
+- `scene5-kritischer-treffer.png` — the crit moment: Konjunktiv II lands, gold KRITISCH!
+  banner, -18 GEDULD, her bar in the red.
+- `scene6-sieg-meldebestaetigung.png` — the victory screen: dither-dimmed room, gold-bordered
+  Schlüssel-Item card for the Meldebestätigung (+120 XP) and the chapter-3 bank hook. This is
+  the one place the app's reserved reward-gold token family is used, matching the loot-only
+  gold rule.
+
 Every scene carries the D/E chips (German explanation / English translation) and the brand
 indigo `#5b5be6` in the dialogue chrome.
 
@@ -26,7 +39,7 @@ indigo `#5b5be6` in the dialogue chrome.
   blocked by the sandbox network policy, so the mockups were hand-pixelled instead, imitating
   the Kenney / LimeZu modern-city reference style named in the implementation plan. Nothing
   here needs a license row beyond "authored".
-- Regenerate with `python3 scenes.py` (needs Pillow; writes to `out/`).
+- Regenerate with `python3 scenes.py` and `python3 scenes2.py` (needs Pillow; writes to `out/`).
 
 These images are direction mockups, not shipping assets. If the direction is blessed, G2 buys
 or sources the real packs per the plan's tooling table.

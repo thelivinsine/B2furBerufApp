@@ -166,11 +166,13 @@ under ~250 lines. This split was done in session 70 (the file had grown to 1,624
 ## Resume here (next session)
 
 **Handoff after session 72 (2026-07-06). Pre-G1 pixel-art mockups are DONE and awaiting the
-founder's approve/reject on the art direction (no game code, zero spend).** Three mockup scenes of
+founder's approve/reject on the art direction (no game code, zero spend).** Six mockup scenes of
 the Anmeldung vertical slice in the proposed retro GBA style (240x160 native, 4x nearest-neighbor)
-live in `preview/game-pixel-mockups/`: the parody Termin website, the Bürgeramt waiting room, and
-the Frau Schmidt dialogue battle (GEDULD/MUT bars, Redemittel moves, D/E chips, brand indigo
-dialogue chrome). Constraint note: the sandbox network policy blocks kenney.nl / OpenGameArt /
+live in `preview/game-pixel-mockups/`: the parody Termin website, the Bürgeramt waiting room, the
+Frau Schmidt dialogue battle (GEDULD/MUT bars, Redemittel moves, D/E chips, brand indigo dialogue
+chrome), plus three founder-requested Frau Schmidt variants: the Schalter close-up (2x boss bust
+behind glass, missing-document slot), the Konjunktiv-II crit moment (gold KRITISCH! banner), and
+the victory loot card (Meldebestätigung Schlüssel-Item, the one legitimate reward-gold use). Constraint note: the sandbox network policy blocks kenney.nl / OpenGameArt /
 itch.io, so instead of downloading free packs the art was **hand-authored in code** (original,
 license-clean; `scenes.py` + the bitmap pixel font `pixfont.py` in the same folder regenerate the
 PNGs). This satisfies the plan's "mockups with free assets, zero spend" rule; real packs are only
