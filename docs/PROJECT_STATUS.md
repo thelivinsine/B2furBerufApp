@@ -1,6 +1,8 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 71: two parallel audits. **(1) UX redesign audit + gap analysis**
+_Last updated: 2026-07-06 (session 62 continued: **detailed game design DRAFTED** in
+`docs/strategy/GAME_DESIGN.md` + a founder slide deck, awaiting review; see the top "Resume here"
+handoff. Prior update, session 71: two parallel audits. **(1) UX redesign audit + gap analysis**
 (report: `docs/plans/UX_AUDIT_2026-07-06.md`) confirmed redesign Phases 1–4 are faithfully implemented,
 all gates green; two gaps were found and fixed the same session: a latent eager-bundle landmine (dead
 `cardMeta`/`cefrRange` + `filterVocab` import removed from `intentCards.ts`) and the missing quest
@@ -166,6 +168,30 @@ under ~250 lines. This split was done in session 70 (the file had grown to 1,624
 
 ## Resume here (next session)
 
+**Handoff after session 62 continued (2026-07-06). Detailed game design DRAFTED, awaiting founder
+review: `docs/strategy/GAME_DESIGN.md`.** The founder asked for a detailed gameplan with storyline,
+per-mission descriptions, game elements and player interaction, delivered as a slide deck. The deck
+(21 slides) was delivered as a Claude Artifact; the durable source of truth is the new
+**`docs/strategy/GAME_DESIGN.md`**, the design layer between `GAME_CONCEPT.md` (pillars) and
+`GAME_IMPLEMENTATION_PLAN.md` (build). Contents: premise + character creation (you arrive with two
+suitcases and a reason; no villain, everyday Germany is the antagonist); the city **"Neustadt"** and
+game working title **"Neuland"** (both proposals); a six-NPC recurring cast (Jonas the wild-card
+friend, Frau Schmidt vom Bürgeramt, Ayşe the WG flatmate, Hausmeister Krause, Chefin Frau Weber,
+Späti-owner Herr Nguyen); the core loop (map → bag loadout → scenes → loot → FSRS recurrence); the
+interaction model (D/E on every line, tap→type→speak input ladder, register-marked choices, playable
+parody documents); conversation battles (Geduld vs Standing bars, Redemittel moves, K-II crits, kind
+status effects); the bag item taxonomy (Wortkarten Lv1–5, Redemittel moves, Grammatik-Kräfte,
+Schlüssel-Dokumente, consumables, Fundstücke); failure-is-content rules restated; and the full
+authored spine: **six chapters / ~36 described missions** (K1 Ankommen 6 incl. the Anmeldung boss =
+the vertical slice, K2 Wohnen 6, K3 Geld & Papierkram 5, K4 Arbeit 7 mapping the workplace themes,
+K5 Gesund & Sozial 6, K6 Mein Ziel with 5 player-chosen endgame chains where the exam is one
+optional path per the scope guardrail), plus real-world side quests and tone/art rules (pixel
+direction still awaiting blessing). **Next step: founder reviews the deck and answers the three
+open decisions (art-blessing mockups, names, chapter-1 sign-off); then game G1 can start per
+`GAME_IMPLEMENTATION_PLAN.md`.**
+
+---
+
 **Handoff after session 71 (2026-07-06). Frontend design/brand audit is DONE (doc-only, no code
 changed): `docs/plans/DESIGN_AUDIT_2026-07-06.md`.** The founder asked for a thorough audit of the
 frontend design, brand and visual assets with weaknesses + top 5 recommendations. Findings in short:
@@ -186,31 +212,7 @@ still PROPOSED). Phase 4 of the UX redesign is complete (session 70).
 
 ---
 
-**Handoff after session 71 (2026-07-06). UX redesign audit + gap analysis, plus two follow-up fixes.**
-A code-level audit of redesign Phases 1–4 (report: `docs/plans/UX_AUDIT_2026-07-06.md`) verified every
-task against the real code (not the docs) and re-ran all gates green. Verdict: faithfully implemented,
-locked invariants intact (persist migration, FSRS latency, mobile bar + iOS fixes, eager-bundle budget,
-no em dashes). Two gaps were found and fixed the same session:
-- **Eager-bundle de-risk:** `src/features/dashboard/intentCards.ts` statically imported `filterVocab`
-  from the 245 kB vocabulary bank, used only by dead `cardMeta`/`cefrRange` helpers (kept out of the
-  main chunk by tree-shaking alone). Removed the dead helpers + imports so Heute's ~78 kB eager-path
-  invariant is now structural, not accidental. Main chunk unchanged (79.1 kB).
-- **Quest claim moment:** the plan promised a Can-Do "claim moment"; achievement was silently passive.
-  Added persisted `claimedMilestones: string[]` + `claimMilestone(id)` to `useSettingsStore` (rides
-  cloudSync via the settings jsonb blob, no version bump). Fortschritt now shows a reward-gold,
-  spring-in "Quest geschafft · <Thema>" card with an "Einlösen" button for any achieved-but-unclaimed
-  milestone, advancing to the next win; reduced-motion honored. New `claimMilestone` idempotency test.
-- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **63**
-  (+1), `check:bundle` main chunk **79.1 kB**. Non-blocking gaps left documented in the audit report
-  (word-order quiz has no FSRS latency sample; `bank`/`wohnhaus` city buildings await content packs;
-  onboarding defers name/exam-date to Settings, which covers them).
-
-**Next step:** pivot to game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, still PROPOSED) or pick
-the next founder-backlog item in `docs/PROJECT_REFERENCE.md`.
-
----
-
-_Older handoffs (sessions 2–70) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
+_Older handoffs (sessions 2–71) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
 
 **Content counts (verified from `src/data/*` on 2026-07-03):**
 - Vocabulary: **528 words**
