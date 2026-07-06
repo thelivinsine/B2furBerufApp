@@ -2528,3 +2528,27 @@ scenes now have both the tolerant grading (4.1) and a typed-input block pattern 
 (gates/docs wrap). OR the standing alternative: pivot to game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`, still
 PROPOSED), whose formCloze / dialogue-battle scenes now have the tolerant typed grading (4.1), the typed
 block pattern (4.2), and the authentic-input block pattern (4.4) to build on.
+
+---
+
+**Handoff after session 71 (2026-07-06). UX redesign audit + gap analysis, plus two follow-up fixes.**
+A code-level audit of redesign Phases 1–4 (report: `docs/plans/UX_AUDIT_2026-07-06.md`) verified every
+task against the real code (not the docs) and re-ran all gates green. Verdict: faithfully implemented,
+locked invariants intact (persist migration, FSRS latency, mobile bar + iOS fixes, eager-bundle budget,
+no em dashes). Two gaps were found and fixed the same session:
+- **Eager-bundle de-risk:** `src/features/dashboard/intentCards.ts` statically imported `filterVocab`
+  from the 245 kB vocabulary bank, used only by dead `cardMeta`/`cefrRange` helpers (kept out of the
+  main chunk by tree-shaking alone). Removed the dead helpers + imports so Heute's ~78 kB eager-path
+  invariant is now structural, not accidental. Main chunk unchanged (79.1 kB).
+- **Quest claim moment:** the plan promised a Can-Do "claim moment"; achievement was silently passive.
+  Added persisted `claimedMilestones: string[]` + `claimMilestone(id)` to `useSettingsStore` (rides
+  cloudSync via the settings jsonb blob, no version bump). Fortschritt now shows a reward-gold,
+  spring-in "Quest geschafft · <Thema>" card with an "Einlösen" button for any achieved-but-unclaimed
+  milestone, advancing to the next win; reduced-motion honored. New `claimMilestone` idempotency test.
+- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **63**
+  (+1), `check:bundle` main chunk **79.1 kB**. Non-blocking gaps left documented in the audit report
+  (word-order quiz has no FSRS latency sample; `bank`/`wohnhaus` city buildings await content packs;
+  onboarding defers name/exam-date to Settings, which covers them).
+
+**Next step:** pivot to game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, still PROPOSED) or pick
+the next founder-backlog item in `docs/PROJECT_REFERENCE.md`.

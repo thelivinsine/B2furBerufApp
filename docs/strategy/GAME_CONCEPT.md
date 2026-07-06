@@ -41,6 +41,9 @@ The positioning against the market: most language apps are dry, text-based, cont
 practice tools with near-zero visuals and low personal involvement. This game is the answer to
 that gap.
 
+_Detailed design (storyline, cast, mission-by-mission chapters, battle/bag/interaction systems):
+`docs/strategy/GAME_DESIGN.md`, drafted 2026-07-06, awaiting founder review._
+
 ## The concept in one paragraph
 
 A 2D story-driven RPG (hero's journey, Pokémon-like in structure and spirit) where the player
