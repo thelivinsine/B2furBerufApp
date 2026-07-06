@@ -48,7 +48,7 @@ Notes: `.npmrc` sets `minimum-release-age` (24h supply-chain cooldown) and
 protection); the build does NOT need any allowlisted scripts — keep it that way.
 
 ## Layout (`src/`)
-- `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`, `domains.ts`, `collocations.ts`, `provenance.ts`, `canDo.ts` (Can-Do milestones, s47)
+- `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`, `domains.ts`, `collocations.ts`, `provenance.ts`, `canDo.ts` (Can-Do milestones, s47), `texts.ts` (Lesen/Hören texts, s69)
 - `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (FSRS-6 spaced repetition since s53; legacy SM-2 fields kept warm for rollback), `pronounce.ts` (tolerant spoken-answer matcher for the speaking block, s56), `quiz.ts`, `session.ts` (composed-session composer, s47; speaking pool added s56 behind the `recognitionEnabled` opt-in), `collection.ts` (redesign Phase 2.4: pure FSRS-stability→Lv 1-5 "collection level" mapping, the stable game contract for loot cards / Sammlung; unit-tested, do not drift the band boundaries)
 - `store/` — zustand stores: `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`, `useLibraryScope` (travelling library scope, s47)
 - `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47)
@@ -114,6 +114,7 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
 - **Collocations** (`src/data/collocations.ts`): currently **396 Nomen-Verb pairs** (~36 per theme; tripled in s40). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`|`diplomatic`, unified with Redemittel in s43), `themeId`, `example {de, en}`, plus the optional facets `cefr` (all tagged) and `subThemeId` (the three split themes). Keep ids unique (`c_` prefix + snake_case).
 - **Grammar** (`src/data/grammar.ts`): currently **10 topics / 47 drills**. Schema: `GrammarTopic` with `id`, `group`, `title`, `titleDe`, `purpose`, `purposeDe` (German added s47), `explanation`, `pattern`, `examples`, `pitfalls`, `drills[]`. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss`.
 - **Can-Do milestones** (`src/data/canDo.ts`, added s47 for UX overhaul Phase 4): currently **25 `CanDoStatement`s** (2–3 per theme, all 11 covered). Schema: `id` (`cd_` prefix), `themeId`, `cefr` (`ContentCefr`), `statement` (German, must start with "Ich kann"), `en` gloss, `threshold` (0..1 theme-mastery ratio at which the milestone is achieved). **Provenance:** AI-drafted, aligned to the CoE CEFR self-assessment descriptors (cited in `provenance.ts`, never reproduced); all 25 rows **founder-reviewed and approved 2026-07-02** (`review_status: "verified"`). When adding NEW statements: keep ids unique, ascending `cefr`/`threshold` within a theme, add a matching `can_do` provenance row (start it `review_status: "draft"` for the next review pass), run `pnpm lint:content`.
+- **Lese-/Hörtexte** (`src/data/texts.ts`, added s69 for redesign Phase 4.3): currently **10 `ReadingText`s / 30 checks** (2 Behörden letters, 2 workplace emails, 2 memos, 2 announcements, 2 voicemail scripts; voicemails double as TTS listening input in the 4.4 block). Schema: `id` (`tx_` prefix), `kind` (`TextKind`, closed enum: letter/email/memo/announcement/voicemail), `themeId`, `cefr`, `title`/`titleEn`, `de` (full text, blank-line paragraphs), `en` gloss, `checks` (2–3 `TextCheck` MCQs: German `question`, `options`, `answer` among options, optional English `explain`; check ids globally unique), optional `subThemeId`. All texts are authored authentic-STYLE (fictitious names/numbers), CEFR-calibrated against the CoE level descriptors (cited in provenance, never reproduced), one `text` provenance row each (`review_status: "draft"`, founder review pending). Results feed XP/theme progress, NOT vocab FSRS, so texts carry no SRS fields. When adding texts: match the schema, no em dashes, run `pnpm lint:content`.
 - **Content linter (`pnpm lint:content`, gate added 2026-06-14, provenance checks added 2026-06-15):**
   `scripts/lint-content.mjs` loads every `src/data/*` bank through Vite's `ssrLoadModule` (no extra
   dependency) and checks for duplicate ids, broken dialogue branches (bad `next` targets, orphan/
@@ -122,7 +123,8 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   registry completeness, theme `domain`/`context`, every closed-enum facet validated when present, and
   every `subThemeId` declared on its parent theme), **Can-Do integrity** (unique ids, valid `themeId`/
   `cefr`, the "Ich kann" statement prefix, `threshold` in `(0,1]`, and every theme covered by at least
-  one milestone), em dashes in copy, and
+  one milestone), **text-bank integrity** (closed `kind` enum, the 2–3-checks contract, answers among
+  options, globally unique check ids), em dashes in copy, and
   **provenance register integrity** (every content_id must have a register row; every row's license must
   be on the commercial-safe allowlist; authored/adapted items without a `reference` URL generate a
   warning). It runs in CI on every PR and on pushes to `main` (`.github/workflows/validate.yml`),
@@ -132,8 +134,8 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
 - **Provenance register (`src/data/provenance.ts`, added 2026-06-15):** one `ProvenanceEntry` row per
   content_id, tracking `origin` (authored/sourced/adapted), `reference` (Wiktionary/DWDS/Tatoeba URL),
   `license` (SPDX from the allowlist), `review_status` (draft/verified), and who added/verified it.
-  All 1,111 content items have provenance rows, every one carrying a non-empty `reference` (so the
-  back-fill queue is empty); 1,086 are `review_status: "draft"` and 25 are `"verified"` (the founder-
+  All 1,121 content items have provenance rows, every one carrying a non-empty `reference` (so the
+  back-fill queue is empty); 1,096 are `review_status: "draft"` and 25 are `"verified"` (the founder-
   approved Can-Do bank). The back-fill queue (items with empty
   `reference`) shows as linter warnings. **When adding new content:** add a corresponding row in
   `provenance.ts` at the same time — the linter errors if a content_id has no row. Use

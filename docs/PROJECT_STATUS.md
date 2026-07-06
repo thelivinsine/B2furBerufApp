@@ -1,6 +1,17 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-05 (session 68: UX redesign **Phase 4 task 4.2 shipped** (typed-recall block in
+_Last updated: 2026-07-06 (session 69: UX redesign **Phase 4 task 4.3 shipped** (Lesen/Hören text bank,
+PR #320, `f09da8e`). New `src/data/texts.ts`: **10 authored authentic-style B1–B2 texts** across 9 themes
+(2 Behörden letters, 2 workplace emails, 2 memos, 2 announcements, 2 voicemail scripts), each with a
+German title + full text, an English gloss and 2–3 German MCQ comprehension checks (**30 checks** total;
+voicemails double as TTS listening input in 4.4). New types `TextKind`/`TextCheck`/`ReadingText` +
+`"text"` in `ProvenanceContentType`; `lint-content.mjs` gained the `TEXT_KINDS` mirror and a `lintTexts`
+validator (enums, required fields, 2–3-checks contract, answer among options, globally unique check ids,
+`subThemeId` cross-check) and the bank rides the provenance cross-check (one authored/OWNED `draft` row
+per text, CoE level descriptors cited as CEFR calibration). `/sources` page labels the new type. No UI
+yet: nothing eager imports the bank (main chunk 78.9 kB unchanged); the composer block + renderer are
+task 4.4. Provenance register now **1,121 rows**.
+Prior: session 68: UX redesign **Phase 4 task 4.2 shipped** (typed-recall block in
 the loop). New `kind: "typing"` `SessionBlock`; the composer graduates due vocab from recognition
 flashcards to typed forward recall once a card is established (`graduatedToTyping`: reps ≥ 2 AND FSRS
 stability ≥ `TYPING_STABILITY_FLOOR` = 8 days, legacy cards fall back to `interval`), while new/young
@@ -633,6 +644,36 @@ do not burn Fable on them. Fable reappears only where new pedagogical content ge
 | 5. Anwenden + nav re-map + facet registry | Anwenden hub, `DEFAULT_PINNED_TABS`, `lib/facets.ts` | **Opus 4.8** | Touches the locked nav store + pinned-tab migration; careful, not big |
 
 ## Resume here (next session)
+
+**Handoff after session 69 (2026-07-06). UX redesign Phase 4 task 4.3 is SHIPPED ✅ (PR #320,
+squash SHA `f09da8e`): the Lesen/Hören content bank, the first half of Session B (plan:
+`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+- **`src/data/texts.ts` (new):** 10 authored authentic-style B1–B2 texts across 9 themes, in the five
+  genres the plan names: Behörden letters (`tx_behoerde_anmeldung_brief` B1.2 meldewesen,
+  `tx_behoerde_unterlagen_brief` B2.1 antrag), workplace emails (scheduling B1.2, customer/reklamation
+  B2.1), memos (meetings/entscheidung B2.1, project B2.2), announcements (technology B1.2, safety B2.1),
+  voicemail scripts (travel B1.2, logistics B2.1; these double as TTS listening input in 4.4). Each item:
+  `id`/`kind`/`themeId`/`cefr`/`title`/`titleEn`/`de`/`en` + 2–3 MCQ `checks` (30 total, German
+  questions, `explain` in English). All names/numbers/offices fictitious; no em dashes.
+- **Types (`src/types/index.ts`):** `TextKind` (letter/email/memo/announcement/voicemail), `TextCheck`,
+  `ReadingText`; `"text"` added to `ProvenanceContentType`.
+- **Linter (`scripts/lint-content.mjs`):** `TEXT_KINDS` closed-enum mirror + `lintTexts` (kind/themeId/
+  cefr enums, required fields, **checks length ≥ 2 is an error** (the 4.4 renderer contract), answer
+  among options, globally unique check ids via a `texts/checks` sweep, `subThemeId` declared on the
+  parent theme, `tx_` prefix warning). Bank loaded, counted (`texts`, `text checks`) and included in
+  the provenance cross-check (one row per text; embedded checks ride on the text's row).
+- **Provenance:** 10 authored/OWNED rows, `review_status: "draft"` for the founder pass; register now
+  **1,121 rows** (1,096 draft / 25 verified). `/sources` (`features/legal/Sources.tsx`) got the required
+  label + ordering entry for the new type.
+- **Gates:** all green — `build`, `lint` (0 errors), `lint:content` (0 errors/warnings), `test:unit` 59,
+  `check:bundle` main chunk **78.9 kB** (bank has no eager consumer; 4.4 must keep it in a lazy chunk).
+
+**Next step:** **task 4.4** (Opus per the plan): `kind: "reading"` composer block (+ listening variant
+via `engine/speech.ts` TTS), full-screen text card with tap-gloss + comprehension MCQ in `SessionPlayer`,
+results feeding XP/theme progress (NOT vocab FSRS), ~1 block per composed session. Then short Session C
+= 4.5 (progression chip) + 4.6 (docs/ship). The founder's pending priority call vs game-plan G1 stands.
+
+---
 
 **Handoff after session 68 (2026-07-05). UX redesign Phase 4 Session A is COMPLETE ✅: task 4.2
 (typed-recall block in the loop) shipped, so 4.1 + 4.2 together put tolerant typed forward recall into
@@ -1575,7 +1616,8 @@ bar" section for the locked behavior.
 - Exam sets: **10** (1 per theme · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
 - Can-Do milestones: **25** (all 11 themes; founder-verified provenance)
-- Provenance rows: **1,111** (all with a `reference`; 1,086 `draft` / 25 `verified`)
+- Lese-/Hörtexte: **10** texts / **30** comprehension checks (added s69; founder review pending)
+- Provenance rows: **1,121** (all with a `reference`; 1,096 `draft` / 25 `verified`)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is
 always the source of truth).
