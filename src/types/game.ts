@@ -215,14 +215,43 @@ export interface BattleMove {
   feedback?: BiText;
 }
 
+/**
+ * An item demand (founder feedback s74): when an NPC asks for a document,
+ * the player answers by opening the bag and TAPPING the item, not by picking
+ * a sentence. Wrong items cost patience (and earn a reaction line); a player
+ * who does not hold the item concedes, routing to `nextIfMissing` (the
+ * failure-as-content hook).
+ */
+export interface ItemRequest {
+  /** Key item that satisfies the demand. */
+  itemId: string;
+  /** Vocab id retrieved by recognizing the right document (graded into FSRS). */
+  vocabId?: string;
+  /** Bar deltas when the right item is handed over. */
+  geduld: number;
+  mut: number;
+  /** Node played after the correct handover. */
+  next: string;
+  /** Node routed to when the player concedes they do not hold the item. */
+  nextIfMissing: string;
+  /** Patience cost per wrong item offered (engine default when absent). */
+  wrongGeduld?: number;
+  /** Reaction when a wrong item is offered ("Das ist Ihr Bibliotheksausweis."). */
+  wrongFeedback?: BiText;
+  /** Coaching/flavor note after the correct handover. */
+  feedback?: BiText;
+}
+
 export interface BattleNode {
   id: string;
   /** What the opponent says at this node. */
   npcLine: BiText;
   /** Status-effect flavor shown on the line. */
   effect?: BattleEffect;
-  /** Player moves; absent on terminal nodes. */
+  /** Player moves; absent on terminal nodes and on `ask` nodes. */
   moves?: BattleMove[];
+  /** Item demand: the node is answered from the bag instead of via moves. */
+  ask?: ItemRequest;
   /** Terminal marker. "win" exits to the scene's `next`; "lose" to `onLose`. */
   outcome?: "win" | "lose";
 }
@@ -315,6 +344,8 @@ export interface Mission {
   requiresItems?: string[];
   /** Missions that must be completed first. */
   requiresMissions?: string[];
+  /** Wörterbuch charges for the run (engine default when absent). */
+  dictUses?: number;
   /** XP granted on completion (scene play adds more on top). */
   rewardXp: number;
   /** Key items granted on completion. */

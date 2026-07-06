@@ -9,9 +9,14 @@ import {
   finishLoadout,
   recordCheck,
   playMove,
+  handItem,
+  admitMissing,
+  useDictionary,
   resolveBattle,
   recordField,
   missionUnlocked,
+  ASK_WRONG_GEDULD,
+  DICT_USES_DEFAULT,
   type MissionRun,
 } from "@/engine/mission";
 import { missions } from "@/data/missions";
@@ -153,8 +158,9 @@ describe("mission runner: dialogue battle", () => {
   it("pays a victory bonus scaled by the remaining bars", () => {
     let run = reachBattle();
     run = playMove(run, "b1_ok");
-    run = playMove(run, "b2_doc");
-    run = playMove(run, "b3_doc");
+    run = handItem(run, "ki_personalausweis");
+    run = playMove(run, "b3_nachhaken");
+    run = handItem(run, "ki_wohnungsgeberbestaetigung");
     run = playMove(run, "b4_ok");
     const before = run.xp;
     const b = run.battle!;
@@ -168,8 +174,9 @@ describe("mission runner: dialogue battle", () => {
   it("wins through the graph and routes to the form scene", () => {
     let run = reachBattle();
     run = playMove(run, "b1_ok");
-    run = playMove(run, "b2_doc");
-    run = playMove(run, "b3_doc");
+    run = handItem(run, "ki_personalausweis");
+    run = playMove(run, "b3_nachhaken");
+    run = handItem(run, "ki_wohnungsgeberbestaetigung");
     run = playMove(run, "b4_ok");
     expect(currentBattleNode(run)!.outcome).toBe("win");
     run = resolveBattle(run);
@@ -177,24 +184,76 @@ describe("mission runner: dialogue battle", () => {
     expect(run.battle).toBeUndefined();
   });
 
-  it("records Redemittel practice and vocab grades on moves", () => {
+  it("records Redemittel practice on moves", () => {
     let run = reachBattle();
     run = playMove(run, "b1_ok");
-    run = playMove(run, "b2_nachfragen");
-    expect(run.effects).toContainEqual({ type: "redemittelPractice", redemittelId: "r_cla6" });
-    run = playMove(run, "b2_doc");
-    expect(run.effects).toContainEqual({ type: "vocabGrade", vocabId: "v_personalausweis", grade: 4 });
+    run = handItem(run, "ki_personalausweis");
+    run = playMove(run, "b3_nachhaken");
+    expect(run.effects).toContainEqual({ type: "redemittelPractice", redemittelId: "r_cla2" });
   });
 
-  it("misfires a document move when the key item is missing (fetch-quest hook)", () => {
-    // Walk in with an EMPTY bag: skip every loadout slot.
+  it("forces the bust node when Geduld drains to zero", () => {
+    let run = reachBattle();
+    run = playMove(run, "b1_du"); // -16
+    for (let i = 0; i < 12 && !currentBattleNode(run)!.outcome; i++) {
+      run = handItem(run, "ki_mietvertrag"); // wrong document, -8 each, stays on b2
+    }
+    const node = currentBattleNode(run)!;
+    expect(node.id).toBe("b_geduld_aus");
+    expect(node.outcome).toBe("lose");
+    expect(run.battle!.geduld).toBe(0);
+  });
+});
+
+describe("mission runner: ask nodes (hand over from the bag)", () => {
+  /** Sit at node b2 (Frau Schmidt demands the Personalausweis). */
+  function reachAsk(): MissionRun {
+    const run = reachBattle();
+    return playMove(run, "b1_ok");
+  }
+
+  it("advances on the right item, grading its vocab Good on the first offer", () => {
+    let run = reachAsk();
+    expect(currentBattleNode(run)!.ask?.itemId).toBe("ki_personalausweis");
+    run = handItem(run, "ki_personalausweis");
+    expect(run.battle!.nodeId).toBe("b3");
+    expect(run.effects).toContainEqual({ type: "vocabGrade", vocabId: "v_personalausweis", grade: 4 });
+    expect(run.battle!.last).toMatchObject({ geduld: -2, mut: 8 });
+  });
+
+  it("costs patience on a wrong item, stays on the node, then grades Hard", () => {
+    let run = reachAsk();
+    const before = run.battle!.geduld;
+    run = handItem(run, "ki_mietvertrag");
+    expect(run.battle!.nodeId).toBe("b2");
+    expect(run.battle!.geduld).toBe(before - ASK_WRONG_GEDULD);
+    expect(run.battle!.last).toMatchObject({ wrongItem: "ki_mietvertrag" });
+    run = handItem(run, "ki_personalausweis");
+    expect(run.battle!.nodeId).toBe("b3");
+    expect(run.effects).toContainEqual({ type: "vocabGrade", vocabId: "v_personalausweis", grade: 3 });
+  });
+
+  it("ignores an item the player does not hold", () => {
+    // Empty bag: skip the loadout entirely.
     let run = startMission(anmeldung, []);
     run = chooseChoice(run, "c_warten");
     run = completeScene(run);
     run = finishLoadout(run);
     run = completeScene(run);
     run = playMove(run, "b1_ok");
-    run = playMove(run, "b2_doc");
+    const after = handItem(run, "ki_personalausweis");
+    expect(after.battle!.nodeId).toBe("b2");
+    expect(after.effects).toHaveLength(0);
+  });
+
+  it("concedes a missing document into the fetch-quest branch, then retries scaffolded", () => {
+    let run = startMission(anmeldung, []);
+    run = chooseChoice(run, "c_warten");
+    run = completeScene(run);
+    run = finishLoadout(run); // walk in with an empty bag
+    run = completeScene(run);
+    run = playMove(run, "b1_ok");
+    run = admitMissing(run);
     const node = currentBattleNode(run)!;
     expect(node.id).toBe("b_ohne_ausweis");
     expect(node.outcome).toBe("lose");
@@ -208,28 +267,31 @@ describe("mission runner: dialogue battle", () => {
     expect(run.sceneId).toBe("schmidt");
     expect(run.battle).toMatchObject({ nodeId: "b1", geduld: 100, mut: 60 });
   });
+});
 
-  it("forces the bust node when Geduld drains to zero", () => {
-    let run = reachBattle();
-    run = playMove(run, "b1_du"); // -16
-    for (let i = 0; i < 12 && !currentBattleNode(run)!.outcome; i++) {
-      run = playMove(run, "b2_nachfragen"); // -8 each, loops on b2
-    }
-    const node = currentBattleNode(run)!;
-    expect(node.id).toBe("b_geduld_aus");
-    expect(node.outcome).toBe("lose");
-    expect(run.battle!.geduld).toBe(0);
+describe("mission runner: Wörterbuch charges", () => {
+  it("starts with the default charges and spends them down to zero", () => {
+    let run = startMission(anmeldung, []);
+    expect(run.dictUses).toBe(DICT_USES_DEFAULT);
+    run = useDictionary(run);
+    expect(run.dictUses).toBe(DICT_USES_DEFAULT - 1);
+    expect(run.effects).toHaveLength(0);
+    run = useDictionary(run);
+    run = useDictionary(run);
+    expect(run.dictUses).toBe(0);
+    const after = useDictionary(run);
+    expect(after.dictUses).toBe(0);
   });
 });
 
 describe("mission runner: form + completion", () => {
   it("completes the mission with reward XP, key item and completion effect", () => {
     let run = reachBattle();
-    run = playMove(run, "b1_krit");
-    run = playMove(run, "b2_doc");
+    run = playMove(run, "b1_krit", "correct");
+    run = handItem(run, "ki_personalausweis");
     run = playMove(run, "b3_nachhaken");
-    run = playMove(run, "b3b_doc");
-    run = playMove(run, "b4_krit");
+    run = handItem(run, "ki_wohnungsgeberbestaetigung");
+    run = playMove(run, "b4_krit", "correct");
     run = resolveBattle(run);
     expect(run.sceneId).toBe("formular");
     run = recordField(run, "correct");
@@ -255,8 +317,9 @@ describe("mission runner: replay", () => {
     run = packEverything(run);
     run = completeScene(run);
     run = playMove(run, "b1_ok");
-    run = playMove(run, "b2_doc");
-    run = playMove(run, "b3_doc");
+    run = handItem(run, "ki_personalausweis");
+    run = playMove(run, "b3_nachhaken");
+    run = handItem(run, "ki_wohnungsgeberbestaetigung");
     run = playMove(run, "b4_ok");
     run = resolveBattle(run);
     const beforeWin = run.xp;

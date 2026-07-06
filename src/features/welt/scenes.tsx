@@ -16,13 +16,13 @@ import { ttsSupported } from "@/engine/speech";
 import { vocabById } from "@/data/vocabulary";
 import { npcById } from "@/data/missions";
 import { shuffle, sample, cn } from "@/lib/utils";
-import { Gloss } from "@/features/shared/Gloss";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import {
   PixelStage,
   GameCard,
   SheetCard,
   Pill,
+  GameText,
   BAG_SPRITE,
   PLAYER_SPRITE,
   DOC_ICONS,
@@ -30,15 +30,20 @@ import {
 } from "@/features/welt/stage";
 
 /**
- * Scene renderers for the mission player (game G1), one per scene kind
- * (dialogue battle lives in BattleView.tsx). Each receives the current run
- * and an `act` callback that applies a pure runner transition and its
- * effects. Local UI state resets per scene because the player keys each
- * view by scene id.
+ * Scene renderers for the mission player (game G1; full-screen pixel pass
+ * s74), one per scene kind (dialogue battle lives in BattleView.tsx). Each
+ * receives the current run, an `act` callback that applies a pure runner
+ * transition and its effects, and `translate`: whether the Wörterbuch is
+ * active for this scene (English is a limited bag resource, never an
+ * always-on toggle). Local UI state resets per scene because the player keys
+ * each view by scene id. The stage renders edge-to-edge; panels carry their
+ * own horizontal padding.
  */
 
 export interface SceneViewProps {
   act: (fn: (run: MissionRun) => MissionRun) => void;
+  /** Wörterbuch active for the current scene: render the English layer. */
+  translate: boolean;
 }
 
 export function speakerName(speaker: string): string {
@@ -65,34 +70,20 @@ function useChoiceFlow(act: SceneViewProps["act"]) {
   };
 }
 
-/**
- * The "E" chip: toggles an English line under every option in a choice list.
- * Choices/moves are themselves buttons, so the tap-to-toggle Gloss (a button)
- * cannot nest inside them; one list-level toggle keeps the D/E promise.
- */
-export function TranslateToggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+function FeedbackCard({
+  feedback,
+  translate,
+  onNext,
+}: {
+  feedback: { de: string; en: string };
+  translate: boolean;
+  onNext: () => void;
+}) {
   return (
-    <button
-      type="button"
-      onClick={onToggle}
-      aria-pressed={on}
-      aria-label="Englische Übersetzung umschalten"
-      className={cn(
-        "rounded-lg px-2 py-0.5 text-xs font-bold transition-colors",
-        on ? "bg-teal-500 text-white" : "bg-teal-50 text-teal-600",
-      )}
-    >
-      E
-    </button>
-  );
-}
-
-function FeedbackCard({ feedback, onNext }: { feedback: { de: string; en: string }; onNext: () => void }) {
-  return (
-    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+    <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="px-3">
       <GameCard className="space-y-3 p-4">
         <p className="text-sm italic text-slate-600">
-          <Gloss de={feedback.de} en={feedback.en} />
+          <GameText de={feedback.de} en={feedback.en} translate={translate} />
         </p>
         <div className="flex justify-end">
           <Pill primary onClick={onNext}>
@@ -106,7 +97,7 @@ function FeedbackCard({ feedback, onNext }: { feedback: { de: string; en: string
 
 /* ---------------- cutscene ---------------- */
 
-export function CutsceneView({ scene, act }: SceneViewProps & { scene: CutsceneScene }) {
+export function CutsceneView({ scene, act, translate }: SceneViewProps & { scene: CutsceneScene }) {
   const [index, setIndex] = useState(0);
   const flow = useChoiceFlow(act);
   const line = scene.lines[index];
@@ -114,39 +105,38 @@ export function CutsceneView({ scene, act }: SceneViewProps & { scene: CutsceneS
   const name = speakerName(line.speaker);
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <PixelStage setting={scene.setting} />
       {flow.pending?.feedback ? (
-        <FeedbackCard feedback={flow.pending.feedback} onNext={flow.confirm} />
+        <FeedbackCard feedback={flow.pending.feedback} translate={translate} onNext={flow.confirm} />
       ) : (
-        <SheetCard className="space-y-3 p-4">
-          {name ? (
-            <p className="text-xs font-bold uppercase tracking-wide text-[#5b5be6]">{name}</p>
-          ) : null}
-          <motion.p
-            key={index}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className={cn("text-base leading-relaxed", !name && "italic text-slate-500")}
-          >
-            <Gloss de={line.de} en={line.en} />
-          </motion.p>
-          {!isLast ? (
-            <div className="flex justify-end">
-              <Pill primary onClick={() => setIndex((i) => i + 1)}>
-                Weiter <ChevronRight className="ml-1 inline h-4 w-4" />
-              </Pill>
-            </div>
-          ) : scene.choices?.length ? (
-            <ChoiceList choices={scene.choices} onChoose={flow.choose} />
-          ) : (
-            <div className="flex justify-end">
-              <Pill primary onClick={() => act(completeScene)}>
-                Weiter <ChevronRight className="ml-1 inline h-4 w-4" />
-              </Pill>
-            </div>
-          )}
-        </SheetCard>
+        <div className="px-3">
+          <SheetCard name={name || undefined} className="space-y-3 p-4">
+            <motion.p
+              key={index}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className={cn("text-base leading-relaxed", !name && "italic text-slate-500")}
+            >
+              <GameText de={line.de} en={line.en} translate={translate} />
+            </motion.p>
+            {!isLast ? (
+              <div className="flex justify-end">
+                <Pill primary onClick={() => setIndex((i) => i + 1)}>
+                  Weiter <ChevronRight className="ml-1 inline h-4 w-4" />
+                </Pill>
+              </div>
+            ) : scene.choices?.length ? (
+              <ChoiceList choices={scene.choices} translate={translate} onChoose={flow.choose} />
+            ) : (
+              <div className="flex justify-end">
+                <Pill primary onClick={() => act(completeScene)}>
+                  Weiter <ChevronRight className="ml-1 inline h-4 w-4" />
+                </Pill>
+              </div>
+            )}
+          </SheetCard>
+        </div>
       )}
     </div>
   );
@@ -154,63 +144,67 @@ export function CutsceneView({ scene, act }: SceneViewProps & { scene: CutsceneS
 
 /* ---------------- website parody ---------------- */
 
-export function WebsiteView({ scene, act }: SceneViewProps & { scene: WebsiteParodyScene }) {
+export function WebsiteView({ scene, act, translate }: SceneViewProps & { scene: WebsiteParodyScene }) {
   const flow = useChoiceFlow(act);
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 px-3 pt-3">
       <GameCard className="overflow-hidden">
         {/* browser chrome */}
-        <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50 px-4 py-2.5">
+        <div className="flex items-center gap-2 border-b-2 border-[#463c44]/20 bg-slate-100 px-4 py-2.5">
           <span className="flex gap-1.5">
             <i className="h-2.5 w-2.5 rounded-full bg-rose-300" />
             <i className="h-2.5 w-2.5 rounded-full bg-amber-300" />
             <i className="h-2.5 w-2.5 rounded-full bg-emerald-300" />
           </span>
-          <span className="flex min-w-0 flex-1 items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs text-slate-500 ring-1 ring-slate-200">
+          <span className="flex min-w-0 flex-1 items-center gap-1.5 rounded-md bg-white px-3 py-1 text-xs text-slate-500 ring-1 ring-slate-300">
             <Globe className="h-3 w-3 shrink-0" />
             <span className="truncate">{scene.url}</span>
           </span>
         </div>
         <div className="space-y-3 p-4">
           <h2 className="text-lg font-bold leading-snug">
-            <Gloss de={scene.heading} en={scene.headingEn} />
+            <GameText de={scene.heading} en={scene.headingEn} translate={translate} />
           </h2>
           {scene.lines.map((l, i) => (
             <p key={i} className="text-sm leading-relaxed text-slate-600">
-              <Gloss de={l.de} en={l.en} />
+              <GameText de={l.de} en={l.en} translate={translate} />
             </p>
           ))}
           {scene.notice && (
-            <div className="rounded-xl bg-amber-50 px-3 py-2.5 text-sm font-semibold text-amber-700">
-              <Gloss de={scene.notice.de} en={scene.notice.en} />
+            <div className="border-2 border-amber-500/50 bg-amber-50 px-3 py-2.5 text-sm font-semibold text-amber-700" style={{ borderRadius: 6 }}>
+              <GameText de={scene.notice.de} en={scene.notice.en} translate={translate} />
             </div>
           )}
         </div>
       </GameCard>
       {flow.pending?.feedback ? (
-        <FeedbackCard feedback={flow.pending.feedback} onNext={flow.confirm} />
+        <FeedbackCard feedback={flow.pending.feedback} translate={translate} onNext={flow.confirm} />
       ) : (
         <GameCard className="p-3">
-          <ChoiceList choices={scene.choices} onChoose={flow.choose} />
+          <ChoiceList choices={scene.choices} translate={translate} onChoose={flow.choose} />
         </GameCard>
       )}
     </div>
   );
 }
 
-/** Choice buttons with the list-level E toggle. */
-function ChoiceList({ choices, onChoose }: { choices: SceneChoice[]; onChoose: (c: SceneChoice) => void }) {
-  const [showEn, setShowEn] = useState(false);
+/** Choice buttons; English shows only while the Wörterbuch is active. */
+function ChoiceList({
+  choices,
+  translate,
+  onChoose,
+}: {
+  choices: SceneChoice[];
+  translate: boolean;
+  onChoose: (c: SceneChoice) => void;
+}) {
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-medium text-slate-400">Was tust du?</p>
-        <TranslateToggle on={showEn} onToggle={() => setShowEn((v) => !v)} />
-      </div>
+      <p className="text-xs font-bold text-slate-400">Was tust du?</p>
       {choices.map((c, i) => (
         <Pill key={c.id} primary={i === 0} onClick={() => onChoose(c)} className="w-full py-2.5">
           <span className="block">{c.de}</span>
-          {showEn && <span className="block text-xs font-normal opacity-80">{c.en}</span>}
+          {translate && <span className="block text-xs font-normal opacity-80">{c.en}</span>}
         </Pill>
       ))}
     </div>
@@ -226,7 +220,7 @@ const HOTSPOTS = [
   { x: 46, y: 55 }, // by the suitcase
   { x: 86, y: 58 },
 ];
-const PLAYER_START = { x: 6, y: 60 };
+const PLAYER_START = { x: 8, y: 62 };
 const BAG_POS = { x: 45, y: 76 };
 
 /**
@@ -235,6 +229,7 @@ const BAG_POS = { x: 45, y: 76 };
  * over, then the retrieval question packs it into the bag. The bag is the
  * exit: tap it to leave, thin bag allowed after a confirm.
  */
+// The loadout takes no `translate`: its retrieval prompt IS the English cue.
 export function LoadoutView({
   scene,
   run,
@@ -269,7 +264,7 @@ export function LoadoutView({
     setConfirmLeave(false);
     setWrongPicks([]);
     const spot = HOTSPOTS[i % HOTSPOTS.length];
-    const target = { x: spot.x - 3, y: spot.y + 6 };
+    const target = { x: spot.x - 3, y: spot.y - 4 };
     if (Math.abs(target.x - pos.x) < 1 && Math.abs(target.y - pos.y) < 1) {
       setAsking(slot); // already standing here (re-tap after cancel)
       return;
@@ -292,7 +287,7 @@ export function LoadoutView({
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <PixelStage setting={scene.setting}>
         {/* documents lying around the room */}
         {scene.slots.map((s, i) => {
@@ -313,8 +308,8 @@ export function LoadoutView({
                 animate={{ y: [0, -3, 0] }}
                 transition={{ repeat: Infinity, duration: 1.6, delay: i * 0.3 }}
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-soft ring-2",
-                  asking?.id === s.id ? "ring-[#5b5be6]" : "ring-[#5b5be6]/30",
+                  "flex h-10 w-10 items-center justify-center rounded-md border-2 bg-white/95",
+                  asking?.id === s.id ? "border-[#5b5be6]" : "border-[#463c44]/60",
                 )}
               >
                 <img
@@ -344,7 +339,7 @@ export function LoadoutView({
             className="w-16 select-none"
             style={{ imageRendering: "pixelated" }}
           />
-          <span className="absolute -right-2 -top-2 rounded-full bg-[#5b5be6] px-1.5 py-0.5 text-[10px] font-bold text-white shadow-soft">
+          <span className="absolute -right-2 -top-2 rounded-full bg-[#5b5be6] px-1.5 py-0.5 text-[10px] font-bold text-white">
             {packedCount}/{scene.slots.length}
           </span>
         </button>
@@ -373,67 +368,69 @@ export function LoadoutView({
         </motion.div>
       </PixelStage>
 
-      <SheetCard className="space-y-3 p-4">
-        {asking && activeVocab ? (
-          <>
+      <div className="px-3">
+        <SheetCard className="space-y-3 p-4">
+          {asking && activeVocab ? (
+            <>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm text-slate-500">
+                  Pack ein: <span className="font-semibold text-slate-700">{activeVocab.en}</span>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setAsking(null)}
+                  className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-slate-600"
+                >
+                  <SkipForward className="h-3.5 w-3.5" /> Liegenlassen
+                </button>
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {options.map((de) => {
+                  const wrong = wrongPicks.includes(de);
+                  return (
+                    <Pill
+                      key={de}
+                      onClick={() => pick(de)}
+                      disabled={wrong}
+                      className={cn("w-full py-2.5", wrong && "border-rose-400 bg-rose-50 text-rose-500")}
+                    >
+                      {de}
+                    </Pill>
+                  );
+                })}
+              </div>
+            </>
+          ) : confirmLeave ? (
             <div className="flex items-center justify-between gap-2">
-              <p className="text-sm text-slate-500">
-                Pack ein: <span className="font-semibold text-slate-700">{activeVocab.en}</span>
-              </p>
-              <button
-                type="button"
-                onClick={() => setAsking(null)}
-                className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-slate-600"
-              >
-                <SkipForward className="h-3.5 w-3.5" /> Liegenlassen
-              </button>
+              <p className="text-sm text-slate-500">Hier liegen noch Dokumente.</p>
+              <span className="flex gap-2">
+                <Pill onClick={() => setConfirmLeave(false)}>Weiter sammeln</Pill>
+                <Pill primary onClick={() => act(finishLoadout)}>
+                  Trotzdem los
+                </Pill>
+              </span>
             </div>
-            <div className="grid grid-cols-1 gap-2">
-              {options.map((de) => {
-                const wrong = wrongPicks.includes(de);
-                return (
-                  <Pill
-                    key={de}
-                    onClick={() => pick(de)}
-                    disabled={wrong}
-                    className={cn("w-full py-2.5", wrong && "border-rose-300 bg-rose-50 text-rose-500")}
-                  >
-                    {de}
-                  </Pill>
-                );
-              })}
-            </div>
-          </>
-        ) : confirmLeave ? (
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm text-slate-500">Hier liegen noch Dokumente.</p>
-            <span className="flex gap-2">
-              <Pill onClick={() => setConfirmLeave(false)}>Weiter sammeln</Pill>
+          ) : allPacked ? (
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm text-slate-500">Alles eingepackt.</p>
               <Pill primary onClick={() => act(finishLoadout)}>
-                Trotzdem los
+                {scene.cta?.de ?? "Weiter"} <ChevronRight className="ml-1 inline h-4 w-4" />
               </Pill>
-            </span>
-          </div>
-        ) : allPacked ? (
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-sm text-slate-500">Alles eingepackt.</p>
-            <Pill primary onClick={() => act(finishLoadout)}>
-              {scene.cta?.de ?? "Weiter"} <ChevronRight className="ml-1 inline h-4 w-4" />
-            </Pill>
-          </div>
-        ) : (
-          <p className="text-sm text-slate-500">
-            Sammle die Dokumente im Zimmer, dann tippe auf die Tasche.
-          </p>
-        )}
-      </SheetCard>
+            </div>
+          ) : (
+            <p className="text-sm text-slate-500">
+              Sammle die Dokumente im Zimmer, dann tippe auf die Tasche.
+            </p>
+          )}
+        </SheetCard>
+      </div>
     </div>
   );
 }
 
 /* ---------------- listening (waiting room) ---------------- */
 
-export function ListeningView({ scene, act }: SceneViewProps & { scene: ListeningScene }) {
+export function ListeningView({ scene, act, translate }: SceneViewProps & { scene: ListeningScene }) {
   const tts = ttsSupported();
   const [revealed, setRevealed] = useState(!tts);
   const [checkIndex, setCheckIndex] = useState(0);
@@ -442,11 +439,11 @@ export function ListeningView({ scene, act }: SceneViewProps & { scene: Listenin
   const checksDone = checkIndex >= scene.checks.length;
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <PixelStage setting={scene.setting}>
         {scene.ticker && (
           <GameCard className="absolute left-3 top-3 flex items-center gap-3 px-3 py-2">
-            <span className="text-xs font-medium text-slate-500">{scene.ticker.label}</span>
+            <span className="text-xs font-bold text-slate-500">{scene.ticker.label}</span>
             <span className="font-mono text-lg font-bold text-amber-500">{scene.ticker.current}</span>
             <span className="text-xs text-slate-400">
               Du: <span className="font-mono font-semibold text-[#5b5be6]">{scene.ticker.yours}</span>
@@ -455,86 +452,92 @@ export function ListeningView({ scene, act }: SceneViewProps & { scene: Listenin
         )}
       </PixelStage>
 
-      <SheetCard className="space-y-4 p-4">
-        {scene.intro && (
-          <p className="text-sm text-slate-500">
-            <Gloss de={scene.intro.de} en={scene.intro.en} />
-          </p>
-        )}
+      <div className="px-3">
+        <SheetCard className="space-y-4 p-4">
+          {scene.intro && (
+            <p className="text-sm text-slate-500">
+              <GameText de={scene.intro.de} en={scene.intro.en} translate={translate} />
+            </p>
+          )}
 
-        {/* announcements: listen first, read along on demand */}
-        <ul className="space-y-2">
-          {scene.audio.map((l, i) => (
-            <li key={i} className="flex items-start gap-2 rounded-xl bg-slate-50 px-3 py-2">
-              <SpeakButton text={l.de} className="mt-0.5 shrink-0" />
-              <span className="text-sm leading-relaxed text-slate-600">
-                {revealed ? <Gloss de={l.de} en={l.en} /> : <span className="italic text-slate-400">Durchsage {i + 1}</span>}
-              </span>
-            </li>
-          ))}
-        </ul>
-        {!revealed && (
-          <button
-            type="button"
-            onClick={() => setRevealed(true)}
-            className="text-xs font-medium text-[#5b5be6] hover:underline"
-          >
-            Text anzeigen
-          </button>
-        )}
+          {/* announcements: listen first, read along on demand */}
+          <ul className="space-y-2">
+            {scene.audio.map((l, i) => (
+              <li key={i} className="flex items-start gap-2 rounded-md border border-[#463c44]/20 bg-slate-50 px-3 py-2">
+                <SpeakButton text={l.de} className="mt-0.5 shrink-0" />
+                <span className="text-sm leading-relaxed text-slate-600">
+                  {revealed ? (
+                    <GameText de={l.de} en={l.en} translate={translate} />
+                  ) : (
+                    <span className="italic text-slate-400">Durchsage {i + 1}</span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {!revealed && (
+            <button
+              type="button"
+              onClick={() => setRevealed(true)}
+              className="text-xs font-medium text-[#5b5be6] hover:underline"
+            >
+              Text anzeigen
+            </button>
+          )}
 
-        {!checksDone && check ? (
-          <div className="space-y-2 border-t border-slate-100 pt-3">
-            <p className="text-sm font-semibold text-slate-700">{check.question}</p>
-            <div className="grid grid-cols-1 gap-2">
-              {check.options.map((opt) => {
-                const state =
-                  chosen === null ? "idle" : opt === check.answer ? "right" : opt === chosen ? "wrong" : "idle";
-                return (
-                  <Pill
-                    key={opt}
-                    disabled={chosen !== null}
-                    onClick={() => {
-                      setChosen(opt);
-                      act((r) => recordCheck(r, opt === check.answer));
-                    }}
-                    className={cn(
-                      "w-full py-2.5",
-                      state === "right" && "border-teal-300 bg-teal-50 text-teal-700",
-                      state === "wrong" && "border-rose-300 bg-rose-50 text-rose-600",
-                    )}
-                  >
-                    {opt}
-                  </Pill>
-                );
-              })}
-            </div>
-            {chosen !== null && (
-              <div className="flex items-center justify-between gap-2">
-                {/* explanation only when the answer was wrong (text budget) */}
-                <p className="flex-1 text-xs text-slate-500">
-                  {chosen !== check.answer ? check.explain : ""}
-                </p>
-                <Pill
-                  primary
-                  onClick={() => {
-                    setChosen(null);
-                    setCheckIndex((i) => i + 1);
-                  }}
-                >
-                  Weiter
-                </Pill>
+          {!checksDone && check ? (
+            <div className="space-y-2 border-t-2 border-dashed border-[#463c44]/20 pt-3">
+              <p className="text-sm font-semibold text-slate-700">{check.question}</p>
+              <div className="grid grid-cols-1 gap-2">
+                {check.options.map((opt) => {
+                  const state =
+                    chosen === null ? "idle" : opt === check.answer ? "right" : opt === chosen ? "wrong" : "idle";
+                  return (
+                    <Pill
+                      key={opt}
+                      disabled={chosen !== null}
+                      onClick={() => {
+                        setChosen(opt);
+                        act((r) => recordCheck(r, opt === check.answer));
+                      }}
+                      className={cn(
+                        "w-full py-2.5",
+                        state === "right" && "border-teal-500 bg-teal-50 text-teal-700",
+                        state === "wrong" && "border-rose-400 bg-rose-50 text-rose-600",
+                      )}
+                    >
+                      {opt}
+                    </Pill>
+                  );
+                })}
               </div>
-            )}
-          </div>
-        ) : (
-          <div className="flex justify-end border-t border-slate-100 pt-3">
-            <Pill primary onClick={() => act(completeScene)}>
-              {scene.ticker ? `Nummer ${scene.ticker.yours}: Du bist dran!` : "Weiter"}
-            </Pill>
-          </div>
-        )}
-      </SheetCard>
+              {chosen !== null && (
+                <div className="flex items-center justify-between gap-2">
+                  {/* explanation only when the answer was wrong (text budget) */}
+                  <p className="flex-1 text-xs text-slate-500">
+                    {chosen !== check.answer ? check.explain : ""}
+                  </p>
+                  <Pill
+                    primary
+                    onClick={() => {
+                      setChosen(null);
+                      setCheckIndex((i) => i + 1);
+                    }}
+                  >
+                    Weiter
+                  </Pill>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex justify-end border-t-2 border-dashed border-[#463c44]/20 pt-3">
+              <Pill primary onClick={() => act(completeScene)}>
+                {scene.ticker ? `Nummer ${scene.ticker.yours}: Du bist dran!` : "Weiter"}
+              </Pill>
+            </div>
+          )}
+        </SheetCard>
+      </div>
     </div>
   );
 }
@@ -543,7 +546,7 @@ export function ListeningView({ scene, act }: SceneViewProps & { scene: Listenin
 
 type FieldResult = { verdict: TypedVerdict; given: string };
 
-export function FormView({ scene, act }: SceneViewProps & { scene: FormClozeScene }) {
+export function FormView({ scene, act, translate }: SceneViewProps & { scene: FormClozeScene }) {
   const [results, setResults] = useState<Record<string, FieldResult>>({});
   const [input, setInput] = useState("");
   const activeIndex = scene.fields.findIndex((f) => !results[f.id]);
@@ -558,20 +561,20 @@ export function FormView({ scene, act }: SceneViewProps & { scene: FormClozeScen
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 px-3 pt-3">
       <GameCard className="space-y-4 p-4">
-        <div className="border-b border-slate-200 pb-3">
+        <div className="border-b-2 border-[#463c44]/20 pb-3">
           {scene.issuer && (
             <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
               {scene.issuer.de}
             </p>
           )}
           <h2 className="text-lg font-bold leading-snug">
-            <Gloss de={scene.title} en={scene.titleEn} />
+            <GameText de={scene.title} en={scene.titleEn} translate={translate} />
           </h2>
           {scene.intro && (
             <p className="mt-1 text-xs italic text-slate-500">
-              <Gloss de={scene.intro.de} en={scene.intro.en} />
+              <GameText de={scene.intro.de} en={scene.intro.en} translate={translate} />
             </p>
           )}
         </div>
@@ -589,12 +592,12 @@ export function FormView({ scene, act }: SceneViewProps & { scene: FormClozeScen
             return (
               <li key={f.id} className="space-y-2">
                 <p className={cn("text-sm", res ? "text-slate-500" : "font-semibold text-slate-700")}>
-                  {i + 1}. <Gloss de={f.label.de} en={f.label.en} />
+                  {i + 1}. <GameText de={f.label.de} en={f.label.en} translate={translate} />
                 </p>
                 {res ? (
                   <p
                     className={cn(
-                      "rounded-lg px-3 py-1.5 text-sm font-medium",
+                      "rounded-md px-3 py-1.5 text-sm font-medium",
                       res.verdict === "correct" && "bg-teal-50 text-teal-700",
                       res.verdict === "almost" && "bg-amber-50 text-amber-700",
                       res.verdict === "wrong" && "bg-rose-50 text-rose-600",
@@ -633,7 +636,7 @@ export function FormView({ scene, act }: SceneViewProps & { scene: FormClozeScen
                           autoCapitalize="none"
                           autoCorrect="off"
                           spellCheck={false}
-                          className="min-w-0 flex-1 rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-[#5b5be6]"
+                          className="min-w-0 flex-1 rounded-md border-2 border-[#463c44] bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-[#5b5be6]"
                           placeholder="Antwort eintragen"
                         />
                         <Pill primary disabled={!input.trim()} onClick={trySubmit}>
@@ -645,7 +648,7 @@ export function FormView({ scene, act }: SceneViewProps & { scene: FormClozeScen
                 )}
                 {isActive && f.hint && !res && (
                   <p className="text-xs text-slate-400">
-                    <Gloss de={f.hint.de} en={f.hint.en} />
+                    <GameText de={f.hint.de} en={f.hint.en} translate={translate} />
                   </p>
                 )}
               </li>
@@ -654,7 +657,7 @@ export function FormView({ scene, act }: SceneViewProps & { scene: FormClozeScen
         </ol>
 
         {allDone && (
-          <div className="flex justify-end border-t border-slate-200 pt-3">
+          <div className="flex justify-end border-t-2 border-[#463c44]/20 pt-3">
             <Pill primary onClick={() => act(completeScene)}>
               Formular abgeben <ChevronRight className="ml-1 inline h-4 w-4" />
             </Pill>
