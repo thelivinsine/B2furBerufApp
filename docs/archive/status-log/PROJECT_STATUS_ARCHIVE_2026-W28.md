@@ -165,3 +165,22 @@ impact.
 consolidation), or continue the standing alternative: game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`,
 still PROPOSED). Phase 4 of the UX redesign is complete (session 70).
 
+
+## Session 62 continued (2026-07-06) — condensed handoff: detailed game design drafted (v1-v3)
+
+**Detailed game design DRAFTED: `docs/strategy/GAME_DESIGN.md`** (+ the founder-facing slide deck
+`docs/strategy/GAME_DESIGN_DECK.html`), the design layer between `GAME_CONCEPT.md` (pillars) and
+`GAME_IMPLEMENTATION_PLAN.md` (build). Contents: premise + character creation; the city "Neustadt"
+and title "Neuland" (approved s72); the six-NPC recurring cast (Jonas, Frau Schmidt, Ayşe,
+Hausmeister Krause, Frau Weber, Herr Nguyen); the core loop (map → bag loadout → scenes → loot →
+FSRS recurrence); the interaction model (D/E on every line, tap→type→speak ladder, register-marked
+choices, playable parody documents); conversation battles (Geduld vs Standing bars, Redemittel
+moves, K-II crits, kind status effects); the bag item taxonomy; failure-is-content rules; and the
+authored spine, revised to v3 the same day: **six chapters + a chosen ending / ~40 missions**
+(K1 Ankommen · K2 Wohnen · K3 Geld & Papierkram · K4 Die Jobsuche · K5 Gesund & Sozial · K6 Mein
+Ziel), with two founder directions of 2026-07-06: the **Im Büro office arc is the CAREER endgame
+chain** in K6 (boss: der unbefristete Vertrag), not a spine chapter, and **Pfand is a real economy**
+(bottles hide in scenes, the Leergutautomat return is a micro-review mini-game paying Pfandgeld for
+Späti consumables; spec in `GAME_DESIGN.md` §6). Structural rule from founder review: **every
+chapter ends on its boss**. Its open decisions were resolved across s72 (art + title) and s73
+(chapter-1 mission list sign-off).

@@ -75,7 +75,10 @@ export function AppShell() {
   // Chrome returns on the end screen (the player clears the flag) and off-route.
   const focusMode = useSessionStore((s) => s.focusMode);
   const focus =
-    focusMode && (location.pathname === "/session" || location.pathname === "/revision");
+    focusMode &&
+    (location.pathname === "/session" ||
+      location.pathname === "/revision" ||
+      location.pathname === "/welt");
 
   // Resume Schreibtraining after sign-in. The Google OAuth flow redirects to
   // the app root, so when a learner signs in with a pending writing draft we

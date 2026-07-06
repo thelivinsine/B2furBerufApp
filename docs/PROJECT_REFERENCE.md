@@ -320,6 +320,12 @@ latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 pai
     a stretch because of limited budget"; v1 game scenes ship light-theme only. Revisit only on an
     explicit founder go-ahead, ideally after the G2 playtest. Full decision record in
     `docs/DECISIONS.md` → "Game art direction (session 72)".
+32. **Game progression cloud sync (G2 migration, added s73):** `useProgressStore.missionsDone` +
+    `keyItems` (game G1) are local-only because cloudSync's `progress` upsert has a fixed column
+    set; an unknown column fails the WHOLE progress upsert. G2 adds a Supabase migration (e.g. a
+    `game jsonb` or two array columns), then extends `progressRow`/`mergeRemoteProgress`
+    (union-merge, like `scenariosDone`). Effort: **S** (plus the founder's one-time SQL step,
+    PHASE2_SETUP pattern). Recommended model: **Sonnet**.
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 

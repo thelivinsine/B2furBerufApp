@@ -1,15 +1,13 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 72: **game art direction BLESSED + title "Neuland" approved**.
-Eight zero-spend pixel mockups of the Anmeldung slice live in `preview/game-pixel-mockups/`; the
-modern restyle `scene7-modern-hell.png` is the locked style reference (GBA styling rejected as 90s,
-in-game dark mode deferred to backlog #31); record in `docs/DECISIONS.md`. Prior updates same day:
-session 62 continued drafted the detailed game design `docs/strategy/GAME_DESIGN.md` + slide deck
-(founder-reviewed: every chapter ends on its boss), and session 71 ran the UX redesign audit
-(`docs/plans/UX_AUDIT_2026-07-06.md`, two gaps fixed) and the design/brand audit
-(`docs/plans/DESIGN_AUDIT_2026-07-06.md`). Next: game G1. The working
-branch is reassigned every session, so **`main` is always the source of truth**. Product name:
-**Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-06 (session 73: **game phase G1 SHIPPED**. The Neuland mission engine
+(`src/types/game.ts` + `engine/mission.ts` + mission checks in `lint-content.mjs` + Vitest suite),
+the six scene renderers under `src/features/welt/` styled to the blessed scene-7 reference, and the
+founder-approved chapter-1 Anmeldung boss mission (`src/data/missions.ts`) are live behind the lazy
+`/welt` route (Beta card on the Anwenden hub). Chapter-1 mission list founder-approved this session.
+Prior updates same day: session 72 blessed the modern pixel art direction + the "Neuland" title.
+The working branch is reassigned every session, so **`main` is always the source of truth**.
+Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
@@ -167,6 +165,45 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 73 (2026-07-06). Game phase G1 SHIPPED ✅: the Neuland mission engine and
+the Anmeldung vertical slice are live behind `/welt` (Beta).** What exists now:
+- **Schema + runner:** `src/types/game.ts` (Mission/Scene closed unions: cutscene, websiteParody,
+  loadout, listening, dialogueBattle, formCloze; NPC/key-item/chapter registries; every union
+  mirrored in the linter) and `engine/mission.ts` (pure immutable runner emitting effects the
+  player applies to the real stores: XP via `addXp`, retrieval grades via `reviewVocab` FSRS,
+  Redemittel practice, key items). Game state (`missionsDone`, `keyItems`) lives in
+  `useProgressStore`, **local-only for now**: cloudSync's `progress` table has a fixed column set,
+  so syncing game state needs a G2 Supabase migration (backlog).
+- **Lint gates:** `lint-content.mjs` now loads `src/data/missions.ts` and enforces mission graph
+  integrity (routing resolves + reachable win, battle node graphs, content-bank id references,
+  key-item obtainability, acyclic mission dependencies). `tests/mission.test.ts` covers the runner
+  (win path, fetch-quest loss, bar drain, loadout grading).
+- **Renderers:** `src/features/welt/` (stage atoms + 6 scene views + MissionPlayer + Welt hub),
+  styled to the blessed scene-7 reference: light-theme-only game cards, pixel backdrops
+  (code-authored placeholders in `src/features/welt/assets/`, generator
+  `preview/game-pixel-mockups/welt_assets.py`; G2 buys packs), focus mode hides chrome on `/welt`.
+  Entry: Anwenden hub "Neuland (Beta)" card + `/welt` deep link.
+- **Content:** the chapter-1 boss mission `m_kap1_anmeldung` (9 scenes: booking parody → loadout →
+  waiting room → Frau Schmidt battle → Anmeldeformular → victory; loses route through a scaffolded
+  retry that grants the missing papers). Two vocab adds (`v_mietvertrag`,
+  `v_wohnungsgeberbestaetigung`), provenance rows for all three new ids (1,124 total).
+  **Chapter-1 mission list (1.1–1.6) founder-approved this session**; the Anmeldung German awaits
+  the normal founder verify pass (provenance `draft`).
+- Verified end-to-end in the sandbox browser (full mission playthrough, zero console errors); all
+  gates green (typecheck, eslint, lint:content, 90+ unit tests, SRS/pronounce vectors, bundle
+  79.5 kB main / game in its own ~53 kB lazy chunk).
+- The game schema is aligned to **design v3** (PR #336, merged from a parallel session mid-build:
+  six-chapter spine, Im Büro inside the Mein Ziel career chain, Pfand economy): `ChapterId`, the
+  `chapters` registry and the linter mirror all carry the six chapters. Kapitel 1 was untouched
+  by v3, so the approved mission list stood. The Pfand economy + Jonas wild card are G2 systems.
+
+**Next step: G2** (`GAME_IMPLEMENTATION_PLAN.md`): missions 1.1–1.5 against the approved list,
+recurring NPCs, licensed pixel packs (select against scene 7), FSRS-driven recurrence, the
+playtest gate. Also G2: Supabase migration to sync `missionsDone`/`keyItems`. **Exit criterion
+for G1 stands: the founder plays the slice on their phone and it feels like a game.**
+
+---
+
 **Handoff after session 72 (2026-07-06). Pre-G1 art blessing is COMPLETE ✅: the founder BLESSED
 the modern pixel style and the game's art direction is now locked (no game code, zero spend).**
 Eight mockup scenes of the Anmeldung vertical slice live in `preview/game-pixel-mockups/` (all
@@ -195,43 +232,11 @@ drafted `docs/strategy/GAME_DESIGN.md` (see the next handoff below).
 
 ---
 
-**Handoff after session 62 continued (2026-07-06). Detailed game design DRAFTED, awaiting founder
-review: `docs/strategy/GAME_DESIGN.md`.** The founder asked for a detailed gameplan with storyline,
-per-mission descriptions, game elements and player interaction, delivered as a slide deck. The deck
-(21 slides) was delivered as a Claude Artifact AND committed as
-**`docs/strategy/GAME_DESIGN_DECK.html`** (self-contained, open in any browser; added after the
-Artifact link failed for the founder); the durable source of truth is the new
-**`docs/strategy/GAME_DESIGN.md`**, the design layer between `GAME_CONCEPT.md` (pillars) and
-`GAME_IMPLEMENTATION_PLAN.md` (build). Contents: premise + character creation (you arrive with two
-suitcases and a reason; no villain, everyday Germany is the antagonist); the city **"Neustadt"** and
-game working title **"Neuland"** (both proposals); a six-NPC recurring cast (Jonas the wild-card
-friend, Frau Schmidt vom Bürgeramt, Ayşe the WG flatmate, Hausmeister Krause, Chefin Frau Weber,
-Späti-owner Herr Nguyen); the core loop (map → bag loadout → scenes → loot → FSRS recurrence); the
-interaction model (D/E on every line, tap→type→speak input ladder, register-marked choices, playable
-parody documents); conversation battles (Geduld vs Standing bars, Redemittel moves, K-II crits, kind
-status effects); the bag item taxonomy (Wortkarten Lv1–5, Redemittel moves, Grammatik-Kräfte,
-Schlüssel-Dokumente, consumables, Fundstücke); failure-is-content rules restated; and the full
-authored spine: **six chapters + a chosen ending / ~40 described missions** (K1 Ankommen 6 incl.
-the Anmeldung boss = the vertical slice, K2 Wohnen 6, K3 Geld & Papierkram 5, K4 Die Jobsuche 7
-ending on the Vorstellungsgespräch boss, K5 Gesund & Sozial 6, K6 Mein Ziel with 5 player-chosen
-endgame chains; **founder direction 2026-07-06: the Im Büro office arc is the CAREER endgame
-chain** (5 missions + boss: der unbefristete Vertrag with Frau Weber), not a spine chapter, and
-the exam stays one optional path per the scope guardrail; **structural rule from founder review:
-every chapter ends on its boss**), plus real-world side quests and tone/art rules. **Also founder
-direction 2026-07-06: Pfand is a real economy, not decoration**: bottles hide in scenes, the
-Leergutautomat return is a micro-review mini-game paying Pfandgeld (buys the consumables at the
-Späti), and it recurs as a cultural gag; full spec in `GAME_DESIGN.md` §6. Of the design's three
-open decisions, the
-**art blessing is resolved** and the title **"Neuland" is approved** (see the session-72
-handoff above); chapter-1 sign-off remains open. **Next step: game G1 per `GAME_IMPLEMENTATION_PLAN.md`.**
+_Older handoffs (sessions 1–62 continued) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`)._
 
----
-
-_Older handoffs (sessions 1–71) are archived by ISO week under `docs/archive/status-log/` (index:
-`docs/archive/PROJECT_STATUS_ARCHIVE.md`)._
-
-**Content counts (verified from `src/data/*` on 2026-07-03):**
-- Vocabulary: **528 words**
+**Content counts (verified from `src/data/*` on 2026-07-06):**
+- Vocabulary: **530 words** (+2 Anmeldung documents in s73)
 - Collocations: **396 Nomen-Verb pairs** (~36/theme; tripled from 132 in s40)
 - Grammar: **47 drills** · **10 topics**
 - Dialogues (branching scenarios): **12** (incl. behoerde)
@@ -239,7 +244,8 @@ _Older handoffs (sessions 1–71) are archived by ISO week under `docs/archive/s
 - Redemittel: **72** entries
 - Can-Do milestones: **25** (all 11 themes; founder-verified provenance)
 - Lese-/Hörtexte: **10** texts / **30** comprehension checks (added s69; founder review pending)
-- Provenance rows: **1,121** (all with a `reference`; 1,096 `draft` / 25 `verified`)
+- Game missions (Neuland): **1** (the chapter-1 Anmeldung boss, 9 scenes) · 6 NPCs · 4 key items
+- Provenance rows: **1,124** (all with a `reference`; 1,099 `draft` / 25 `verified`)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is
 always the source of truth).

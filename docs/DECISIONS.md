@@ -158,3 +158,14 @@ The founder approved the game's title from the `GAME_DESIGN.md` naming proposals
 (verbatim: "neuland is good"). Use it as the game's name in design docs and content. The city
 name "Neustadt" and the NPC cast names remain proposals the founder has not objected to; treat
 them as defaults until renamed, not as locked.
+
+## Chapter-1 mission list (session 73, 2026-07-06) — approved as-is
+
+Before G1 content authoring (the open decision 3 in `GAME_DESIGN.md` §13), the six-mission
+Kapitel-1 "Ankommen" list was presented for sign-off and the founder chose **"Approved as-is"**:
+1.1 Willkommen in Neuland (airport tutorial, meet Jonas) · 1.2 Der Fahrkarten-Automat (first
+battle vs the parody DB Automat) · 1.3 Die SIM-Karte (SIM-Vertrag key item) · 1.4 Der erste
+Einkauf (supermarket, Pfand) · 1.5 Ein Dach über dem Kopf (Wohnungsgeberbestätigung setup) ·
+1.6 BOSS Die Anmeldung (the five-scene vertical slice, Meldebestätigung reward). G1 shipped 1.6
+playable (`src/data/missions.ts`); G2 authors 1.1-1.5 against this list. Do not re-litigate the
+list without a new founder request.

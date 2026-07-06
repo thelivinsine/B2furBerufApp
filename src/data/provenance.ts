@@ -15,7 +15,7 @@
  * DO NOT regenerate from scratch — it would overwrite back-filled references.
  * Add new rows manually as new content is added.
  *
- * Total rows: 1121
+ * Total rows: 1124
  */
 import type { ProvenanceEntry } from "@/types";
 
@@ -13521,5 +13521,41 @@ export const provenance: ProvenanceEntry[] = [
     added_by: "assistant",
     review_status: "draft",
     notes: "themeId=logistics; cefr=B2.1; kind=voicemail. Authored authentic-style voicemail script (fictitious names/numbers), doubles as TTS listening input; CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "v_mietvertrag",
+    content_type: "vocabulary",
+    label: "der Mietvertrag",
+    origin: "authored",
+    reference: "https://de.wiktionary.org/wiki/Mietvertrag",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "pos=noun; themeId=behoerde. Added for the Neuland Anmeldung mission loadout (game G1)."
+  },
+  {
+    content_id: "v_wohnungsgeberbestaetigung",
+    content_type: "vocabulary",
+    label: "die Wohnungsgeberbestätigung",
+    origin: "authored",
+    reference: "https://www.dwds.de/wb/Wohnungsgeberbest%C3%A4tigung",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "pos=noun; themeId=behoerde. Legal basis: section 19 Bundesmeldegesetz (gesetze-im-internet.de/bmg/__19.html). Added for the Neuland Anmeldung mission (game G1)."
+  },
+  {
+    content_id: "m_kap1_anmeldung",
+    content_type: "mission",
+    label: "Neuland Kapitel 1 Boss: Die Anmeldung",
+    origin: "authored",
+    reference: "https://www.gesetze-im-internet.de/bmg/__19.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "Game mission (chapter-1 boss; mission list founder-approved 2026-07-06). All German dialogue, website parody, announcements and form copy authored for this repo; bureaucratic facts (two-week deadline, Wohnungsgeberbestätigung requirement) verified against the Bundesmeldegesetz reference. Embedded checks and battle moves ride on this row like text-bank checks. Verify German accuracy in the founder pass."
   }
 ];

@@ -305,5 +305,8 @@ see `docs/plans/GAME_IMPLEMENTATION_PLAN.md`.
 2. ~~**Names (proposals):** game title "Neuland", city "Neustadt", the NPC cast. All
    renameable.~~ PARTIALLY RESOLVED 2026-07-06 (session 72): the founder approved the game
    title **"Neuland"**. City "Neustadt" and the NPC cast remain unobjected proposals.
-3. **Chapter-1 mission list sign-off** before G1 content authoring starts (the vertical slice
-   itself is already specced in the concept doc). STILL OPEN.
+3. ~~**Chapter-1 mission list sign-off** before G1 content authoring starts (the vertical slice
+   itself is already specced in the concept doc).~~ RESOLVED 2026-07-06 (session 73): the founder
+   approved the six-mission Kapitel-1 list **as-is** ("Approved as-is"). G1 shipped mission 1.6
+   (the Anmeldung boss) as the playable slice; 1.1-1.5 are authored in G2 against this list.
+   Record: `docs/DECISIONS.md` → "Chapter-1 mission list (session 73)".
