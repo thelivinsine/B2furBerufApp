@@ -168,6 +168,30 @@ under ~250 lines. This split was done in session 70 (the file had grown to 1,624
 
 ## Resume here (next session)
 
+**Handoff after session 72 (2026-07-06). Pre-G1 art blessing is COMPLETE ✅: the founder BLESSED
+the modern pixel style and the game's art direction is now locked (no game code, zero spend).**
+Eight mockup scenes of the Anmeldung vertical slice live in `preview/game-pixel-mockups/` (all
+hand-authored in code because the sandbox blocks the free asset hosts; original + license-clean,
+generators committed alongside the PNGs). Founder decisions, recorded in full in
+`docs/DECISIONS.md` → "Game art direction (session 72)":
+- **2D pixel form approved**; the GBA-authentic styling of scenes 1–6 **rejected** as dated
+  ("reminds me of the 90's"). Those scenes stay as art-form proof, not style reference.
+- **`scene7-modern-hell.png` is the blessed reference** ("i love this new mock up style!"):
+  muted contemporary palette, modern Bürgeramt set, soft outlines, app-language UI (rounded
+  floating cards, pills, bottom sheet, brand indigo accent), crisp half-size UI pixels over the
+  chunky 240x160 world. G2 pack purchases must select against this reference.
+- **In-game dark mode deferred** (liked, but "a bit of a stretch because of limited budget");
+  tracked as backlog #31 in `docs/PROJECT_REFERENCE.md`. v1 game scenes are light-theme only.
+Doc updates shipped with the blessing: `GAME_CONCEPT.md` Visuals pillar + open questions,
+`GAME_IMPLEMENTATION_PLAN.md` guardrail + founder-decision list, the mockup folder README verdict.
+
+**Next step:** start game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`: Mission/Scene schema
++ `engine/mission.ts` + lint checks first, then scene renderers and the Anmeldung mission
+content), building game UI surfaces to the scene-7 style. The narrative layer for G1 is the
+freshly drafted `docs/strategy/GAME_DESIGN.md` (see the next handoff below).
+
+---
+
 **Handoff after session 62 continued (2026-07-06). Detailed game design DRAFTED, awaiting founder
 review: `docs/strategy/GAME_DESIGN.md`.** The founder asked for a detailed gameplan with storyline,
 per-mission descriptions, game elements and player interaction, delivered as a slide deck. The deck
@@ -189,30 +213,9 @@ authored spine: **seven chapters / ~40 described missions** (K1 Ankommen 6 incl.
 Vorstellungsgespräch boss, K5 Im Büro 5 mapping the workplace themes with the Dienstreise boss, K6
 Gesund & Sozial 6, K7 Mein Ziel with 5 player-chosen endgame chains where the exam is one optional
 path per the scope guardrail; **structural rule from founder review: every chapter ends on its
-boss**), plus real-world side quests and tone/art rules (pixel
-direction still awaiting blessing). **Next step: founder reviews the deck and answers the three
-open decisions (art-blessing mockups, names, chapter-1 sign-off); then game G1 can start per
-`GAME_IMPLEMENTATION_PLAN.md`.**
-
----
-
-**Handoff after session 71 (2026-07-06). Frontend design/brand audit is DONE (doc-only, no code
-changed): `docs/plans/DESIGN_AUDIT_2026-07-06.md`.** The founder asked for a thorough audit of the
-frontend design, brand and visual assets with weaknesses + top 5 recommendations. Findings in short:
-the token/component architecture is strong (keep it), but (A) there are **zero social link-preview
-assets** (no `og:`/`twitter:` meta, no OG image, no canonical URL), (B) **five parallel accent
-systems** (tokens, nav hexes, theme gradients, hub/intent gradients, building hexes; three
-near-identical brand indigos `#5d52e0`/`#5b5be6`/`#6366f1`), (C) a **wrong-theme boot flash** for
-light-mode users (`index.html` hardcodes `class="dark"` + dark-only `theme-color`, default themeMode
-is `system`), (D) **unregulated Denglish** copy (CTA labels disagree, "a Arztbesuch", `lang="en"` vs
-manifest `lang: "de"`), and (E) **contrast failures** (`text-warning` ~2.2:1 on light) plus
-button-instead-of-link navigation on the landing page. The report's top-5 recommendations are ordered
-by impact ÷ effort; #1 (OG/social meta + share image) is roughly an hour and the highest external
-impact.
-
-**Next step:** pick recommendations off the audit (start with #1 social meta, then #2 palette
-consolidation), or continue the standing alternative: game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`,
-still PROPOSED). Phase 4 of the UX redesign is complete (session 70).
+boss**), plus real-world side quests and tone/art rules. Of its three open decisions, the
+**art blessing is now resolved** (see the session-72 handoff above); names and chapter-1
+sign-off remain open. **Next step: game G1 per `GAME_IMPLEMENTATION_PLAN.md`.**
 
 ---
 

@@ -2531,6 +2531,30 @@ block pattern (4.2), and the authentic-input block pattern (4.4) to build on.
 
 ---
 
+**Handoff after session 70 (2026-07-06). UX redesign Phase 4 is COMPLETE ✅: Session C shipped
+tasks 4.5 (visible progression chip, PR TBD) and 4.6 (this gates/docs wrap), closing out Phase 4
+(plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What 4.5 shipped:
+- **`src/lib/phase.ts` (new):** `themePhase(ratio)` maps a theme's existing mastery ratio to a
+  three-step **Aufbau → Festigen → Gemischt** label, reusing the app's two existing mastery bars
+  (`< 0.4` = Aufbau, `< 0.8` = Festigen matching the city `LIT_THRESHOLD`/engine `masteryLabel`
+  bands, `>= 0.8` = Gemischt matching the `mastery() >= 0.8` "mastered" bar). Pure derived function,
+  **no new state**: both call sites already compute the ratio.
+- **Fortschritt theme grid** (`features/analytics/Analytics.tsx`, "Beherrschung nach Thema" card):
+  each theme row now shows a phase `Badge` (muted/accent/success per phase) next to the theme title.
+- **City-building tap** (`components/city/CityStrip.tsx`): the accessible label and hover title on
+  each lit building now include the phase (e.g. "Büro · Festigen"), alongside the existing percentage.
+- **Gates (4.6):** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit`
+  **62** (unchanged, no new test surface for a pure derived-label helper), `test:srs` 323 checks,
+  `test:pronounce` 26 checks, `check:bundle` main chunk **79.0 kB**.
+
+**Next step:** Phase 4 (typed recall + authentic input + progression visibility) is done. The
+founder's standing priority call stands: pivot to the game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`,
+still PROPOSED), whose formCloze / dialogue-battle scenes build on 4.1's tolerant typed grading, 4.2's
+typed-block pattern, and 4.4's authentic-input block pattern; or pick the next item off the founder
+backlog in `docs/PROJECT_REFERENCE.md`.
+
+---
+
 **Handoff after session 71 (2026-07-06). UX redesign audit + gap analysis, plus two follow-up fixes.**
 A code-level audit of redesign Phases 1–4 (report: `docs/plans/UX_AUDIT_2026-07-06.md`) verified every
 task against the real code (not the docs) and re-ran all gates green. Verdict: faithfully implemented,
@@ -2552,3 +2576,23 @@ no em dashes). Two gaps were found and fixed the same session:
 
 **Next step:** pivot to game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, still PROPOSED) or pick
 the next founder-backlog item in `docs/PROJECT_REFERENCE.md`.
+
+---
+
+**Handoff after session 71 (2026-07-06). Frontend design/brand audit is DONE (doc-only, no code
+changed): `docs/plans/DESIGN_AUDIT_2026-07-06.md`.** The founder asked for a thorough audit of the
+frontend design, brand and visual assets with weaknesses + top 5 recommendations. Findings in short:
+the token/component architecture is strong (keep it), but (A) there are **zero social link-preview
+assets** (no `og:`/`twitter:` meta, no OG image, no canonical URL), (B) **five parallel accent
+systems** (tokens, nav hexes, theme gradients, hub/intent gradients, building hexes; three
+near-identical brand indigos `#5d52e0`/`#5b5be6`/`#6366f1`), (C) a **wrong-theme boot flash** for
+light-mode users (`index.html` hardcodes `class="dark"` + dark-only `theme-color`, default themeMode
+is `system`), (D) **unregulated Denglish** copy (CTA labels disagree, "a Arztbesuch", `lang="en"` vs
+manifest `lang: "de"`), and (E) **contrast failures** (`text-warning` ~2.2:1 on light) plus
+button-instead-of-link navigation on the landing page. The report's top-5 recommendations are ordered
+by impact ÷ effort; #1 (OG/social meta + share image) is roughly an hour and the highest external
+impact.
+
+**Next step:** pick recommendations off the audit (start with #1 social meta, then #2 palette
+consolidation), or continue the standing alternative: game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`,
+still PROPOSED). Phase 4 of the UX redesign is complete (session 70).

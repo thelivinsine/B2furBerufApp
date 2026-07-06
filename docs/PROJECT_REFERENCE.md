@@ -314,6 +314,12 @@ latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 pai
     speaker; the playbook flags multi-voice/speed exposure as a productive desirable difficulty. **MVP:**
     let `engine/speech.ts` rotate among available `speechSynthesis` voices per session block, plus a
     speed toggle in settings. Effort: **S.** Recommended model: **Sonnet**.
+31. **Game dark mode (DEFERRED by founder, 2026-07-06, session 72):** the dark-theme variant of the
+    blessed modern pixel style (`preview/game-pixel-mockups/scene8-modern-dunkel.png`: dusk scene,
+    night window, dithered lamp pool, dark UI surfaces). The founder liked it but ruled it "a bit of
+    a stretch because of limited budget"; v1 game scenes ship light-theme only. Revisit only on an
+    explicit founder go-ahead, ideally after the G2 playtest. Full decision record in
+    `docs/DECISIONS.md` → "Game art direction (session 72)".
 
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
