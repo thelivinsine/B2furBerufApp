@@ -165,6 +165,26 @@ under ~250 lines. This split was done in session 70 (the file had grown to 1,624
 
 ## Resume here (next session)
 
+**Handoff after session 71 (2026-07-06). Frontend design/brand audit is DONE (doc-only, no code
+changed): `docs/plans/DESIGN_AUDIT_2026-07-06.md`.** The founder asked for a thorough audit of the
+frontend design, brand and visual assets with weaknesses + top 5 recommendations. Findings in short:
+the token/component architecture is strong (keep it), but (A) there are **zero social link-preview
+assets** (no `og:`/`twitter:` meta, no OG image, no canonical URL), (B) **five parallel accent
+systems** (tokens, nav hexes, theme gradients, hub/intent gradients, building hexes; three
+near-identical brand indigos `#5d52e0`/`#5b5be6`/`#6366f1`), (C) a **wrong-theme boot flash** for
+light-mode users (`index.html` hardcodes `class="dark"` + dark-only `theme-color`, default themeMode
+is `system`), (D) **unregulated Denglish** copy (CTA labels disagree, "a Arztbesuch", `lang="en"` vs
+manifest `lang: "de"`), and (E) **contrast failures** (`text-warning` ~2.2:1 on light) plus
+button-instead-of-link navigation on the landing page. The report's top-5 recommendations are ordered
+by impact ÷ effort; #1 (OG/social meta + share image) is roughly an hour and the highest external
+impact.
+
+**Next step:** pick recommendations off the audit (start with #1 social meta, then #2 palette
+consolidation), or continue the standing alternative: game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`,
+still PROPOSED). Phase 4 of the UX redesign is complete (session 70).
+
+---
+
 **Handoff after session 70 (2026-07-06). UX redesign Phase 4 is COMPLETE ✅: Session C shipped
 tasks 4.5 (visible progression chip, PR TBD) and 4.6 (this gates/docs wrap), closing out Phase 4
 (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What 4.5 shipped:
@@ -186,33 +206,6 @@ founder's standing priority call stands: pivot to the game plan G1 (`docs/plans/
 still PROPOSED), whose formCloze / dialogue-battle scenes build on 4.1's tolerant typed grading, 4.2's
 typed-block pattern, and 4.4's authentic-input block pattern; or pick the next item off the founder
 backlog in `docs/PROJECT_REFERENCE.md`.
-
----
-
-**Handoff after session 69 (2026-07-06). UX redesign Phase 4 Session B is COMPLETE ✅: tasks 4.3
-(Lesen/Hören text bank, PR #320 `f09da8e`) AND 4.4 (reading/listening composer block + renderer, PR #322
-`98c4688`) shipped, so authentic reading/listening input is now live in the composed session (plan:
-`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What 4.4 shipped:
-- **New `kind: "reading"` `SessionBlock`** (`src/types/index.ts`): `textId` + a `listening` flag.
-- **Composer** (`src/engine/session.ts`): Pool 6 emits **exactly one** reading block per session; prefers a
-  text on the scoped/weak theme, else one in the active Mode lens, else any. A voicemail text plays as a
-  **listening** variant when the caller reports TTS (new pure `listening` opt, player passes
-  `ttsSupported()`); every other genre renders as readable text. `test:unit` gained 3 composer cases.
-- **`ReadingBlock` renderer** (`src/features/session/ReadingBlock.tsx`, new — extracted so `SessionPlayer`
-  stays under the ~1000-line line the plan flagged): a two-stage full-screen focus block. Read/listen stage
-  (genre + CEFR badges, tap-gloss title, `Übersetzung` toggle; listening = TTS play/replay with a
-  `Text anzeigen` reveal fallback), then the 2–3 comprehension MCQs one at a time (reuses the quiz MCQ
-  styling + `explain`). `XP.readingCheck` (8) per correct check; the block registers ONE aggregate tally
-  result (majority-correct) at completion, so it never inflates correct/total, and it **never touches vocab
-  FSRS** (comprehension practice, not a graded SRS card — keeps 4.5's "no new state" invariant intact).
-- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **62**,
-  `check:bundle` main chunk **78.9 kB** (bank + renderer ride the lazy session-route chunk).
-
-**Next step:** short Session C = **4.5** (visible per-theme progression chip on the Fortschritt theme grid
-+ city-building tap, derived from existing FSRS/theme-mastery state, **no new state** — Sonnet) + **4.6**
-(gates/docs wrap). OR the standing alternative: pivot to game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`, still
-PROPOSED), whose formCloze / dialogue-battle scenes now have the tolerant typed grading (4.1), the typed
-block pattern (4.2), and the authentic-input block pattern (4.4) to build on.
 
 ---
 
