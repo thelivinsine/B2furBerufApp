@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useProgressStore } from "@/store/useProgressStore";
+import { themePhaseLabel } from "@/lib/phase";
 import { DomainBuildingIcon } from "./domain-buildings";
 import { cityProgress } from "./mastery";
 
@@ -23,8 +24,8 @@ export default function CityStrip() {
             <Link
               key={p.building.id}
               to={`/session?theme=${p.weakestTheme}`}
-              aria-label={`${p.building.label}: ${Math.round(p.ratio * 100)}% gemeistert`}
-              title={p.building.label}
+              aria-label={`${p.building.label}: ${themePhaseLabel(p.ratio)}, ${Math.round(p.ratio * 100)}% gemeistert`}
+              title={`${p.building.label} · ${themePhaseLabel(p.ratio)}`}
               className="rounded-lg transition-transform hover:scale-105 active:scale-95"
             >
               <DomainBuildingIcon id={p.building.id} lit={p.lit} size={46} />
