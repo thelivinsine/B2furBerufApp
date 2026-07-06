@@ -1,13 +1,14 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 73: **game phase G1 SHIPPED**. The Neuland mission engine
-(`src/types/game.ts` + `engine/mission.ts` + mission checks in `lint-content.mjs` + Vitest suite),
-the six scene renderers under `src/features/welt/` styled to the blessed scene-7 reference, and the
-founder-approved chapter-1 Anmeldung boss mission (`src/data/missions.ts`) are live behind the lazy
-`/welt` route (Beta card on the Anwenden hub). Chapter-1 mission list founder-approved this session.
-Prior updates same day: session 72 blessed the modern pixel art direction + the "Neuland" title.
-The working branch is reassigned every session, so **`main` is always the source of truth**.
-Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-06 (session 73: **game phase G1 SHIPPED + two founder playtest rounds
+applied same-day** (PRs #338/#339/#340/#341). The Neuland mission engine, six scene renderers,
+and the founder-approved chapter-1 Anmeldung boss mission are live behind the lazy `/welt` route
+(Beta card on Anwenden), now with the walk-and-pick loadout, typed battle moves, live dual bars
+and a finish bonus. **The founder has MORE feedback/tweaks queued for the next session** (see
+"Resume here"), which runs on **Opus 4.8/Sonnet, not Fable**. Prior updates same day: session 72
+blessed the modern pixel art direction + the "Neuland" title. The working branch is reassigned
+every session, so **`main` is always the source of truth**. Product name: **Genauly**
+(domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
@@ -206,10 +207,13 @@ the Anmeldung vertical slice are live behind `/welt` (Beta).** What exists now:
   `chapters` registry and the linter mirror all carry the six chapters. Kapitel 1 was untouched
   by v3, so the approved mission list stood. The Pfand economy + Jonas wild card are G2 systems.
 
-**Next step: G2** (`GAME_IMPLEMENTATION_PLAN.md`): missions 1.1–1.5 against the approved list,
+**Next step, in order:** (1) **the founder announced MORE G1 feedback and tweaks at session
+close**; expect and apply that round first (the playtest-iteration loop: fix before scaling).
+(2) Then **G2** (`GAME_IMPLEMENTATION_PLAN.md`): missions 1.1–1.5 against the approved list,
 recurring NPCs, licensed pixel packs (select against scene 7), FSRS-driven recurrence, the
-playtest gate. Also G2: Supabase migration to sync `missionsDone`/`keyItems`. **Exit criterion
-for G1 stands: the founder plays the slice on their phone and it feels like a game.**
+playtest gate. Also G2: Supabase migration to sync `missionsDone`/`keyItems`, plus the two
+specced s73 systems (waiting-as-gameplay, Print-Prop-Quests). **Exit criterion for G1 stands:
+the founder plays the slice on their phone and it feels like a game.**
 
 **Model for G2 (founder decision s73, saving Fable budget): run G2 on Opus 4.8 / Sonnet 5,
 NOT Fable.** The Fable-tier work (schema architecture, art direction, chapter-1 narrative specs,
