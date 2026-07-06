@@ -1,0 +1,472 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neuland · Kapitel 1 Spielbuch</title>
+<style>
+  :root {
+    --night: #14162b;
+    --night-2: #1d2038;
+    --paper: #f1f2f7;
+    --paper-2: #ffffff;
+    --indigo: #5b5be6;
+    --gold: #d98a06;
+    --gold-soft: #f3e3c3;
+    --grass: #4f9e49;
+    --rose: #d95c6e;
+    --ink: #23253c;
+    --ink-soft: #5a5d78;
+    --line: #d9dbe8;
+    --bg: var(--paper);
+    --card: var(--paper-2);
+    --fg: var(--ink);
+    --muted: var(--ink-soft);
+    --bar-track: #dcdeeb;
+    --shadow-hard: #c3c6da;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: var(--night); --card: var(--night-2); --fg: #e9eaf4; --muted: #9a9db8;
+      --line: #32365550; --gold: #e8a33d; --gold-soft: #3a2f17; --grass: #6fbf59;
+      --rose: #e2687a; --bar-track: #23263f; --shadow-hard: #060714;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: var(--night); --card: var(--night-2); --fg: #e9eaf4; --muted: #9a9db8;
+    --line: #32365550; --gold: #e8a33d; --gold-soft: #3a2f17; --grass: #6fbf59;
+    --rose: #e2687a; --bar-track: #23263f; --shadow-hard: #060714;
+  }
+  :root[data-theme="light"] {
+    --bg: var(--paper); --card: var(--paper-2); --fg: var(--ink); --muted: var(--ink-soft);
+    --line: #d9dbe8; --gold: #d98a06; --gold-soft: #f3e3c3; --grass: #4f9e49;
+    --rose: #d95c6e; --bar-track: #dcdeeb; --shadow-hard: #c3c6da;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-snap-type: y proximity; }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55; font-size: 16px;
+  }
+  .mono { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+
+  .xpbar { position: fixed; top: 0; left: 0; right: 0; height: 8px; background: var(--bar-track); z-index: 50; }
+  .xpbar i { display: block; height: 100%; width: 0; background: repeating-linear-gradient(90deg, var(--gold) 0 12px, color-mix(in srgb, var(--gold) 78%, var(--bg)) 12px 16px); }
+  .hud { position: fixed; top: 14px; right: 14px; z-index: 50; font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .08em; color: var(--muted); background: color-mix(in srgb, var(--bg) 82%, transparent); padding: 4px 8px; border: 1px solid var(--line); }
+
+  .slide { min-height: 100svh; scroll-snap-align: start; display: flex; align-items: center; justify-content: center; padding: 64px 20px; border-bottom: 1px solid var(--line); }
+  .inner { width: 100%; max-width: 780px; }
+
+  .eyebrow { font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--gold); margin: 0 0 14px; display: flex; align-items: center; gap: 10px; }
+  .eyebrow::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  h1, h2 { font-family: ui-monospace, Menlo, monospace; text-transform: uppercase; letter-spacing: .02em; line-height: 1.12; text-wrap: balance; margin: 0 0 18px; }
+  h2 { font-size: clamp(24px, 4.6vw, 34px); }
+  p.lead { font-size: clamp(17px, 2.6vw, 20px); max-width: 62ch; }
+  p, li { color: var(--fg); max-width: 68ch; }
+  .dim { color: var(--muted); }
+  strong { font-weight: 650; }
+
+  .title-slide h1 { font-size: clamp(40px, 9vw, 84px); letter-spacing: .04em; text-shadow: 4px 4px 0 var(--shadow-hard); margin-bottom: 8px; }
+  .title-sub { font-size: clamp(16px, 2.6vw, 20px); color: var(--muted); margin: 0 0 26px; }
+  .press-start { display: inline-block; margin-top: 30px; font-family: ui-monospace, Menlo, monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); }
+  @media (prefers-reduced-motion: no-preference) {
+    .press-start { animation: blink 1.6s steps(2) infinite; }
+    @keyframes blink { 50% { opacity: .25; } }
+  }
+
+  .cards { display: grid; gap: 10px; margin-top: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); padding: 14px 16px; }
+  .card h3 { margin: 0 0 4px; font-size: 15px; font-family: ui-monospace, Menlo, monospace; letter-spacing: .02em; }
+  .card h3 .num { color: var(--gold); margin-right: 8px; }
+  .card p { margin: 0; font-size: 14.5px; color: var(--muted); max-width: none; }
+  .card.boss { border-left: 4px solid var(--gold); }
+  .card.boss h3 .num { color: var(--rose); }
+
+  .tag { display: inline-block; margin-left: 8px; padding: 1px 7px; font-family: ui-monospace, Menlo, monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); border: 1px solid var(--gold); vertical-align: 2px; }
+  .tag.da { color: var(--grass); border-color: var(--grass); }
+  .tag.g2 { color: var(--indigo); border-color: var(--indigo); }
+
+  table { border-collapse: collapse; width: 100%; margin-top: 18px; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border: 1px solid var(--line); vertical-align: top; }
+  th { font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  .tablewrap { overflow-x: auto; }
+
+  ul.tight { padding-left: 20px; margin: 14px 0 0; display: grid; gap: 8px; }
+
+  /* mission script blocks */
+  .scene { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--indigo); padding: 12px 14px; margin-top: 10px; font-size: 14.5px; }
+  .scene b.kind { font-family: ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--indigo); display: block; margin-bottom: 4px; }
+  .scene p { margin: 4px 0 0; max-width: none; }
+  .scene .de { font-style: italic; }
+  .meta { display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 14px; }
+  .meta .card p { font-size: 13.5px; }
+
+  .footer-note { font-size: 13px; color: var(--muted); margin-top: 26px; }
+  .kbd-hint { position: fixed; bottom: 12px; right: 14px; z-index: 50; font-size: 10px; letter-spacing: .1em; color: var(--muted); font-family: ui-monospace, Menlo, monospace; }
+  @media (max-width: 640px) { .kbd-hint { display: none; } }
+</style>
+
+<div class="xpbar"><i id="xp"></i></div>
+<div class="hud"><span id="hudnum">01</span>/<span id="hudtotal">19</span></div>
+<div class="kbd-hint">↑ ↓ NAVIGATE</div>
+
+<!-- 1 · TITLE -->
+<section class="slide title-slide">
+  <div class="inner">
+    <p class="eyebrow">Genauly · Neuland</p>
+    <h1>Kapitel 1<br>Spielbuch</h1>
+    <p class="title-sub">Part 1: what the research says players should DO.<br>
+    Part 2: the complete gameplay script for every chapter-1 mission, up to the boss.<br>
+    <span class="dim">Session 74 · four expert personas + a market sweep · durable copy in <span class="mono">MISSION_ACTIVITY_RESEARCH.md</span></span></p>
+    <span class="press-start">▶ Press Start · 2026-07-06</span>
+  </div>
+</section>
+
+<!-- 2 · METHOD -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Teil 1 · 01 · Die Methode</p>
+    <h2>Four experts, one question</h2>
+    <p class="lead">What should the player's hands and mouth actually do in a mission? Four independent personas answered in parallel, then their reports were merged.</p>
+    <div class="cards">
+      <div class="card"><h3><span class="num">P1</span>DaF-Didaktikerin</h3><p>20 years B1-B2 classroom, telc/Goethe examiner. Activity types by competence and SLA principle, choice design, error handling.</p></div>
+      <div class="card"><h3><span class="num">P2</span>Game designer</h3><p>15 years of 2D RPGs (Pokémon to Papers Please). Interaction verbs beyond multiple choice, choice architecture, bag design, screen grammar.</p></div>
+      <div class="card"><h3><span class="num">P3</span>Culture &amp; literature expert</h3><p>Authentic German text genres, comedy beats that roast the bureaucracy and never the learner, unwritten rules, NPC voices.</p></div>
+      <div class="card"><h3><span class="num">P4</span>Market researcher</h3><p>Web sweep of 11 shipped language games (Wagotabi, Noun Town, Influent, Duolingo Adventures, Terra Alia...): what players praise and pan.</p></div>
+    </div>
+    <p class="footer-note">The four reports agreed on one sentence: the answer must be an ACTION in the world before it is ever a sentence in a list.</p>
+  </div>
+</section>
+
+<!-- 3 · CATALOG -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Teil 1 · 02 · Der Katalog</p>
+    <h2>20 things a player can do</h2>
+    <p class="lead">The merged activity catalog. <span class="tag da">DA</span> ships today, <span class="tag g2">G2</span> is planned build. The full table with pedagogy notes lives in the markdown report.</p>
+    <div class="tablewrap"><table>
+      <tr><th>Activity</th><th>The player...</th><th>Status</th></tr>
+      <tr><td><strong>Dokument geben</strong></td><td>opens the bag, taps the demanded item (wrong item = deadpan comedy)</td><td><span class="tag da">DA</span></td></tr>
+      <tr><td><strong>Typ-Zug</strong></td><td>types the key word to land a battle move at full power</td><td><span class="tag da">DA</span></td></tr>
+      <tr><td><strong>Formular ausfüllen</strong></td><td>fills a real official form, typed and tapped</td><td><span class="tag da">DA</span></td></tr>
+      <tr><td><strong>Walk-and-pick</strong></td><td>walks the sprite to items lying in the room</td><td><span class="tag da">DA</span></td></tr>
+      <tr><td><strong>Register-Wahl</strong></td><td>picks du/Sie and watches the world react (bars, eyebrows)</td><td><span class="tag da">DA</span></td></tr>
+      <tr><td><strong>Hotspot antippen</strong></td><td>taps the answer inside the pixel scene: your number on the board, Schalter 2, the right shelf</td><td><span class="tag g2">G2</span></td></tr>
+      <tr><td><strong>Keypad / Automat</strong></td><td>presses real buttons on a machine (ticket zones, dialing)</td><td><span class="tag g2">G2</span></td></tr>
+      <tr><td><strong>Type-under-timer</strong></td><td>types against a gentle clock (the supermarket checkout)</td><td><span class="tag g2">G2</span></td></tr>
+      <tr><td><strong>Sortieren / Paare / Ordnen</strong></td><td>drags words into crates, Nomen onto Verben, process steps into order</td><td><span class="tag g2">G2</span></td></tr>
+      <tr><td><strong>Leergutautomat</strong></td><td>feeds Pfand bottles in; every accepted bottle is one micro-review</td><td><span class="tag g2">G2</span></td></tr>
+      <tr><td><strong>Listen-and-act</strong></td><td>acts DURING the audio (stand up at Gleis 4), not quizzed after</td><td><span class="tag g2">G2</span></td></tr>
+      <tr><td><strong>Anzeige entschlüsseln</strong></td><td>taps abbreviations in ads to unfold them (2er-WG, NK, WM)</td><td><span class="tag g2">G2</span></td></tr>
+      <tr><td><strong>Nachfrage-Geste</strong></td><td>plays "Wie bitte?" as a MOVE: not understanding becomes strategy, not failure</td><td><span class="tag da">DA</span></td></tr>
+      <tr><td><strong>Sprech-Zug</strong></td><td>says the move aloud, mic opt-in, the top XP rung</td><td><span class="tag g2">G2</span></td></tr>
+    </table></div>
+    <p class="footer-note">Mixing rule per mission: at least one act-in-the-world type, at least one productive type (typing/speaking), and at most one pure selection moment per scene.</p>
+  </div>
+</section>
+
+<!-- 4 · CHOICE RULES -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Teil 1 · 03 · Echte Entscheidungen</p>
+    <h2>Six levers that make a choice matter</h2>
+    <p class="lead">Your playtest note "two nice options make no difference" has a design answer. A choice is real only if it moves one of these:</p>
+    <div class="cards">
+      <div class="card"><h3><span class="num">1</span>Resource cost</h3><p>The plain-polite line costs a turn or Geduld headroom; queuing at 6 a.m. costs Müdigkeit (lower Mut start).</p></div>
+      <div class="card"><h3><span class="num">2</span>Time pressure</h3><p>At hard nodes, dithering itself drips Geduld. Exactly the real counter feeling.</p></div>
+      <div class="card"><h3><span class="num">3</span>Information gap</h3><p>The right move is only knowable if you read the notice or asked first. No more telegraphing the crit on the button.</p></div>
+      <div class="card"><h3><span class="num">4</span>Delayed consequence</h3><p>Goodwill spent early makes the boss pricklier later; the accepted SIM upsell costs money in chapter 3.</p></div>
+      <div class="card"><h3><span class="num">5</span>Reactive world</h3><p>Consequences render as the eyebrow, the sigh, denser Beamtendeutsch. Never a toast.</p></div>
+      <div class="card"><h3><span class="num">6</span>Bars first, text second</h3><p>The two bars and the NPC face are the primary readout of every move.</p></div>
+    </div>
+    <p class="footer-note">Error handling, from the examiner: recast instead of red X ("Sie MÖCHTEN sich also ANMELDEN. Gut."), one self-repair window, explicit correction only in the debrief or a Jonas text.</p>
+  </div>
+</section>
+
+<!-- 5 · MARKET -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Teil 1 · 04 · Der Markt</p>
+    <h2>What shipped games prove</h2>
+    <div class="tablewrap"><table>
+      <tr><th>Most praised</th><th>Most panned</th></tr>
+      <tr><td>Mixed exercise types inside one continuous scene (Duolingo Stories, the most loved feature)</td><td>The language check parked OUTSIDE the game verb (Terra Alia's "boring computer": players avoided battles)</td></tr>
+      <tr><td>Recall gated on just-taught content in an RPG frame (Wagotabi, Kagami)</td><td>No production demanded at all (Lingotopia: "very little language learning involved")</td></tr>
+      <tr><td>Translation withheld until requested (Influent's memory-palace rule)</td><td>Recognition ceiling: "finished the trilogy, still can't read a sentence"</td></tr>
+      <tr><td>Real communicative need (Crystallize, the only controlled study: more words AND more fun)</td><td>Content bugs in the target language (Newcomer): it teaches wrong forms. Our linter is a moat.</td></tr>
+    </table></div>
+    <ul class="tight">
+      <li><strong>Gaps nobody owns, we can:</strong> real fillable form props, typed free recall inside dialogue, register/politeness as a stat, a comedic composure meter attached to actual language production.</li>
+      <li><strong>Adoption order for G2:</strong> 1. hotspots, 2. Automat/keypad, 3. type-under-timer, 4. register consequence caps, 5. one drag-sort renderer (three skins), 6. Leergutautomat, 7. Anzeige decoding, 8. Sprech-Zug.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 6 · PART 2 DIVIDER -->
+<section class="slide title-slide">
+  <div class="inner">
+    <p class="eyebrow">Teil 2 · Das Spielbuch</p>
+    <h1>Die Missionen</h1>
+    <p class="title-sub">The complete script: opening, cast, help systems, then every mission 1.1 to the Frau-Schmidt boss.<br>
+    <span class="dim">Tags: <span class="tag da">DA</span> already playable · <span class="tag g2">G2</span> to build. German lines are B1-banded and final-draft quality, founder verify pass pending.</span></p>
+  </div>
+</section>
+
+<!-- 7 · OPENING -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · 01 · Der Anfang</p>
+    <h2>First launch: who are you?</h2>
+    <p class="lead">Before mission 1.1 the game asks four questions. Ninety seconds, no lecture, every answer echoes through the story.</p>
+    <div class="scene"><b class="kind">Charaktererstellung <span class="tag g2">G2</span></b>
+      <p>1. <strong>Dein Name</strong> (free text; NPCs use it).</p>
+      <p>2. <strong>Woher kommst du?</strong> (free text; flavors small talk: "Ah, aus Brasilien! Weit weg.")</p>
+      <p>3. <strong>Warum Deutschland?</strong> Arbeit · Studium · Liebe · Neuanfang. Sets the tone of recurring dream scenes and the chapter-6 ending offer.</p>
+      <p>4. <strong>Wie fühlt sich dein Deutsch an?</strong> "Ich verstehe einfache Sätze" (A2/B1.1) · "Ich komme im Alltag klar" (B1.2/B2.1) · "Ich diskutiere gern" (B2+). Seeds the CEFR band of every mission line; changeable anytime in settings.</p>
+    </div>
+    <div class="scene"><b class="kind">Intro-Cutscene · Flugzeugfenster <span class="tag g2">G2</span></b>
+      <p class="de">"Zwei Koffer. Ein Ticket. Und ein Wort, das du schon kennst: Willkommen."</p>
+      <p>The reason you picked flashes by as a half-dream (job letter, uni admission, a photo, an empty page). Landing thump. Cut to passport control: mission 1.1 begins. The game teaches by playing, not by tutorial screens: the first document demand IS the bag tutorial.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 8 · CAST -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · 02 · Die Leute</p>
+    <h2>Cast and backstory</h2>
+    <p class="lead">You: two suitcases, imperfect German, a reason. There is no villain, only everyday Germany. Continuity comes from six people:</p>
+    <div class="cards">
+      <div class="card"><h3><span class="num">J</span>Jonas · dein Freund hier</h3><p>Met at arrivals (eleven minutes late: "Die Ringbahn hatte mal wieder ihre Laune."). Your wild card: once per mission he rescues, translates or lends, and the game shows HOW. Arc: guide, then real friend, then YOU help HIM.</p></div>
+      <div class="card"><h3><span class="num">S</span>Frau Schmidt · Bürgeramt</h3><p>Chapter-1 boss. Rapid Beamtendeutsch, zero small talk, melts one degree at Konjunktiv II. Recurs at every Amt visit; by chapter 4 she greets you by name. The running gag and the warmest payoff.</p></div>
+      <div class="card"><h3><span class="num">A</span>Ayşe · Mitbewohnerin (Kap. 2)</h3><p>Berlin-born, switches Hochdeutsch, Kiezdeutsch and Turkish mid-sentence. Your window into real informal German.</p></div>
+      <div class="card"><h3><span class="num">K</span>Herr Krause · Hausmeister</h3><p>Speaks in complaints. Diplomacy training dummy. Previewed in 1.5 by a single knock from below at 13:05.</p></div>
+      <div class="card"><h3><span class="num">W</span>Frau Weber · Chefin (Kap. 4+)</h3><p>Fair but busy, loves Konjunktiv II. Carries the workplace arc.</p></div>
+      <div class="card"><h3><span class="num">N</span>Herr Nguyen · Späti</h3><p>The town crier: rumors, side quests, Pfand appraisal like an antiques dealer.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 9 · HELP SYSTEMS -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · 03 · Deine Hilfen</p>
+    <h2>The help the player carries</h2>
+    <div class="cards">
+      <div class="card"><h3>Die Tasche <span class="tag da">DA</span></h3><p>Always one tap away in the HUD, shaped like your backpack. Documents are handed over by tapping them; wrong items earn deadpan reactions, never a fail screen. It pulses when someone demands something.</p></div>
+      <div class="card"><h3>Das Wörterbuch <span class="tag da">DA</span></h3><p>English is a rationed lifeline, not a button: 3 charges per mission, one charge reveals English for the current scene only. Prüfungsmodus (later) simply removes it from the bag.</p></div>
+      <div class="card"><h3>Jonas' Joker <span class="tag g2">G2</span></h3><p>Once per mission: he rephrases the Beamter sentence, lends the missing paper, or steers the small talk back. The rescue always shows how he did it, so it is also the lesson.</p></div>
+      <div class="card"><h3>Scheitern ist Inhalt <span class="tag da">DA</span></h3><p>No hearts, no lockouts. A lost battle routes into a scaffolded retry that hands you exactly what you were missing, plus the hint that makes round two winnable.</p></div>
+      <div class="card"><h3>Dein Niveau <span class="tag da">DA</span></h3><p>The CEFR band you picked drives the German of every scene; the FSRS scheduler quietly decides which words come back and when.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 · MISSION 1.1 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · Mission 1.1</p>
+    <h2>Willkommen in Neuland</h2>
+    <p class="lead">Environment: Flughafen (Ankunftshalle, Zoll, Bahnsteig). New mechanic taught: the bag and D/E, by playing.</p>
+    <div class="scene"><b class="kind">Szene 1 · Passkontrolle · dialogueBattle <span class="tag da">DA</span></b>
+      <p>A gentle first battle: the Beamter has near-infinite Geduld (tutorial). W-Fragen: <span class="de">"Woher kommen Sie? Wie lange bleiben Sie? Arbeit oder Urlaub?"</span> Answers are simple moves; then the first demand: <span class="de">"Ihren Reisepass, bitte."</span> The bag pulses: hand it over. The pass is pre-packed; this teaches Dokument geben safely.</p></div>
+    <div class="scene"><b class="kind">Szene 2 · Zoll · hotspot <span class="tag g2">G2</span></b>
+      <p>Two lanes, two compound nouns: <span class="de">"Anmeldefreie Waren"</span> (grün) vs <span class="de">"Anmeldepflichtige Waren"</span> (rot). Tap the lane. Germany sorts you into a category before you say a word.</p></div>
+    <div class="scene"><b class="kind">Szene 3 · Jonas · cutscene <span class="tag da">DA</span></b>
+      <p>He arrives late, takes a suitcase: <span class="de">"Alter, entspann dich, das wird schon. Komm, dein Zug fährt gleich."</span> Warm, casual German against the official register of scene 1.</p></div>
+    <div class="scene"><b class="kind">Szene 4 · Bahnsteig · listen-and-act <span class="tag g2">G2</span></b>
+      <p>The Abfahrtstafel shows Zeit, Ziel, Gleis and a small orange <span class="de">"ca. 10 Min später"</span>. The announcement calls your train and platform; tap the right Gleis WHILE it plays. Fail path: miss it, next train in 20 minutes, Jonas grins, one slower replay.</p></div>
+    <div class="meta">
+      <div class="card"><h3>Challenge</h3><p>First contact under mild pressure: understand questions about yourself, act on one announcement.</p></div>
+      <div class="card"><h3>Loot</h3><p>Survival pack (Begrüßungen, Richtungen), key item Reisepass, achievement "Angekommen".</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 · MISSION 1.2 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · Mission 1.2</p>
+    <h2>Der Fahrkarten-Automat</h2>
+    <p class="lead">Environment: Bahnhofshalle, der parodierte DB-Automat. New mechanic: the battle UI, learned safely against a machine.</p>
+    <div class="scene"><b class="kind">Szene 1 · Auftrag · cutscene <span class="tag da">DA</span></b>
+      <p class="de">Jonas: "Du brauchst ein Ticket in die Innenstadt. Zone AB. Glaub mir, NUR Zone AB."</p></div>
+    <div class="scene"><b class="kind">Szene 2 · Der Automat · keypad-battle <span class="tag g2">G2</span></b>
+      <p>The machine has infinite Geduld but eats coins: every mistake costs. Screens: <span class="de">"Ziel eingeben"</span> (typed), <span class="de">"Tarifzone wählen"</span> (tap AB vs ABC on the ring map, the dartboard nobody explained), <span class="de">"Zahlung"</span>. The crumpled-note gag: <span class="de">"Bitte legen Sie den Schein glatt hin."</span> Four times. Behind you a silent queue forms, arms crossed: the pressure bar here is Blicke, not Geduld.</p></div>
+    <div class="scene"><b class="kind">Szene 3 · Entwerten · stamp <span class="tag g2">G2</span></b>
+      <p>On the tram the paper ticket still needs the little blue box. Press the stamp. Skip it and you meet the Kontrolleur later (the delayed-consequence hook chapter 5 replays).</p></div>
+    <div class="meta">
+      <div class="card"><h3>Challenge</h3><p>Decode a machine UI in official vocabulary; numbers and prices under queue pressure.</p></div>
+      <div class="card"><h3>Loot</h3><p>Cards "die Verbindung", "die Tarifzone"; the Fahrschein; your first spotted Pfand bottle under a bench (teaser for 1.4).</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 · MISSION 1.3 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · Mission 1.3</p>
+    <h2>Die SIM-Karte</h2>
+    <p class="lead">Environment: Handyladen im Bahnhofsviertel. New mechanic: register-marked choices with delayed, real consequences.</p>
+    <div class="scene"><b class="kind">Szene 1 · Der Verkäufer · dialogueBattle <span class="tag da">DA</span></b>
+      <p>The upsell, 70 percent Denglisch: <span class="de">"Unser Bestseller: die Flex-Flat XL, mit richtig viel Datenvolumen zum Fair-Use-Preis!"</span> Moves: polite-firm refusal (<span class="de">"Nein danke, ich brauche nur Prepaid."</span>), the clarifying question (<span class="de">"Was kostet das monatlich, ohne Rabatt?"</span>), or the soft yes: the trap. Saying yes binds a Vertrag that costs real in-game money in chapter 3 (lever 4: delayed consequence). Small-Talk-Falle when he drifts: <span class="de">"Soll ich Ihnen gleich noch eine Hülle mit dazu packen? Die ist gerade im Sale."</span></p></div>
+    <div class="scene"><b class="kind">Szene 2 · Das Kleingedruckte · websiteParody <span class="tag da">DA</span></b>
+      <p>The tariff poster: headline price big, truth in size-6 footnote. Tap the line that matters: <span class="de">"Anschlusspreis 19,99 einmalig"</span>.</p></div>
+    <div class="scene"><b class="kind">Szene 3 · Ausweispflicht · ask <span class="tag da">DA</span></b>
+      <p class="de">"Zur Identifizierung brauche ich ein gültiges Ausweisdokument. Ist doch nur ein Ausweis, dauert eine Minute."</p>
+      <p>Bag interaction: hand the Reisepass. Offer the Fahrschein instead and he blinks slowly. Even "no strings attached" has paperwork here: the cultural lesson plays itself.</p></div>
+    <div class="scene"><b class="kind">Szene 4 · Der Vertrag · formCloze <span class="tag da">DA</span></b>
+      <p>Name, Geburtsdatum, tick the right boxes, sign. Loot: key item SIM-Vertrag. Your phone works: Jonas can text you now, which becomes the game's channel for delayed corrections and hints.</p></div>
+    <div class="meta">
+      <div class="card"><h3>Challenge</h3><p>Resist a professional persuader in a register you must hold: friendly, firm, no rudeness.</p></div>
+      <div class="card"><h3>Fail path</h3><p>Accepted upsell = "Flex-Flat-Opfer" ribbing from Ayşe later and a refund side quest in chapter 3. Never a lockout.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 · MISSION 1.4 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · Mission 1.4</p>
+    <h2>Der erste Einkauf</h2>
+    <p class="lead">Environment: Supermarkt. New mechanics: hotspot shelf search, the timed checkout, and the Pfand economy opens.</p>
+    <div class="scene"><b class="kind">Szene 1 · Die Liste · cutscene + hotspot <span class="tag g2">G2</span></b>
+      <p>Jonas texts a German-only list: Brot, Milch, Äpfel, Kaffee. At the door, the Öffnungszeiten sign: <span class="de">"Mo-Sa 8-20 Uhr, Sonntag geschlossen"</span>. It is Saturday, 19:12. Run.</p></div>
+    <div class="scene"><b class="kind">Szene 2 · Regal-Suche · hotspot <span class="tag g2">G2</span></b>
+      <p>Find the four items by their German labels among distractors. The Kaffee teaches Grundpreis: the big number lies, the small <span class="de">"1,49 € / 100 g"</span> tells the truth. Pick the cheaper one.</p></div>
+    <div class="scene"><b class="kind">Szene 3 · Die Kasse · type-under-timer <span class="tag g2">G2</span></b>
+      <p>The legendary scan speed. Clipped cashier German: <span class="de">"Zwölf achtundvierzig. Haben Sie es passend?" · "Beutel brauchen Sie noch?"</span> Type/answer while bagging; fail state is social, not fatal: <span class="de">"Der Nächste kann schon einräumen."</span> Round two runs slower.</p></div>
+    <div class="scene"><b class="kind">Szene 4 · Der Leergutautomat · minigame <span class="tag g2">G2</span></b>
+      <p>Feed in the bottles you collected. Each accepted bottle is one micro-retrieval (word match, der/die/das); a miss and the machine spits it back with the dreaded red X and a beep that turns heads. Payout: <span class="de">der Pfandbon</span>. The receipt shows the one line where the store paid YOU: <span class="de">"Pfand 0,25"</span>.</p></div>
+    <div class="meta">
+      <div class="card"><h3>Challenge</h3><p>Read labels fast, survive the checkout, understand a system nobody explains (Pfand, Grundpreis, Sonntagsruhe).</p></div>
+      <div class="card"><h3>Loot</h3><p>First Pfandgeld (funds the Späti consumables later), cards "die Quittung", "der Grundpreis", achievement teaser "Pfandmillionär 1/100".</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 · MISSION 1.5 -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · Mission 1.5</p>
+    <h2>Ein Dach über dem Kopf</h2>
+    <p class="lead">Environment: Altbau, the temporary room Jonas arranged. New mechanic: the form ritual. This mission forges the documents the boss will demand.</p>
+    <div class="scene"><b class="kind">Szene 1 · Aufwärmen · Kollokations-Paare <span class="tag g2">G2</span></b>
+      <p>Drag Nomen onto Verben before the paperwork: Antrag <b>stellen</b>, Formular <b>ausfüllen</b>, Unterschrift <b>leisten</b>, Frist <b>einhalten</b>. Chunks first; the form then reads itself.</p></div>
+    <div class="scene"><b class="kind">Szene 2 · Der Vermieter · dialogueBattle <span class="tag da">DA</span></b>
+      <p>Herr Brandt hesitates over the free signature: <span class="de">"Das bringt mir doch nichts, oder?"</span> Moves: explain the law politely (<span class="de">"Ohne die Bestätigung kann ich mich nicht anmelden. Paragraf 19."</span>), the Nachfrage-Geste, or the crit that wins landlords everywhere: <span class="de">"Ich fülle alles aus. Sie müssen nur unterschreiben."</span> Making it easy for the other person IS the real-life skill.</p></div>
+    <div class="scene"><b class="kind">Szene 3 · Die Wohnungsgeberbestätigung · formCloze + sign <span class="tag da">DA</span></b>
+      <p>Fill the real fields: Einzugsdatum, Wohnungsgeber, Anschrift. Then the signature ritual (drag to sign <span class="tag g2">G2</span>). The document thunks into the bag.</p></div>
+    <div class="scene"><b class="kind">Szene 4 · Die Hausordnung · reading beat <span class="tag g2">G2</span></b>
+      <p>Pinned in the Treppenhaus: Ruhezeiten 13-15 und 22-6 Uhr, Mülltrennung, Kehrwoche grid. You vacuum at 13:05. One knock from below. No dialogue, no lecture: Herr Krause has been foreshadowed.</p></div>
+    <div class="meta">
+      <div class="card"><h3>Challenge</h3><p>Win a reluctant signer with register, then produce your first binding German document.</p></div>
+      <div class="card"><h3>Loot</h3><p>Key items Mietvertrag and unterschriebene Wohnungsgeberbestätigung: exactly what mission 1.6 demands at the door.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 · MISSION 1.6 BOSS -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · Mission 1.6 · BOSS</p>
+    <h2>Die Anmeldung</h2>
+    <p class="lead">Environment: Bürgeramt (Website, Wohnung, Wartezimmer, Schalter 2). The boss introduces NOTHING new: it is the exam of everything the chapter taught. Playable today.</p>
+    <div class="scene"><b class="kind">Szene 1 · Terminvergabe · websiteParody <span class="tag da">DA</span></b>
+      <p class="de">"Nächster freier Termin: in 8 Wochen." Frist: zwei Wochen. Willkommen in Neuland.</p>
+      <p>Choice with real stakes (G2 sharpening): waiting risks a Verwarnung side quest; queuing at 6 a.m. costs Müdigkeit (Mut starts lower).</p></div>
+    <div class="scene"><b class="kind">Szene 2 · Packen · walk-and-pick <span class="tag da">DA</span></b>
+      <p>The documents from 1.5 lie in your room; walk to each, name it, bag it. What you leave behind, Frau Schmidt will ask for.</p></div>
+    <div class="scene"><b class="kind">Szene 3 · Wartezimmer · listening <span class="tag da">DA</span></b>
+      <p>Announcements + the number board (107... yours is 112). G2 upgrade: Aufruf abfangen, tap YOUR number the moment it is called.</p></div>
+    <div class="scene"><b class="kind">Szene 4 · Frau Schmidt · dialogueBattle <span class="tag da">DA</span></b>
+      <p>Two bars: her Geduld, your Mut. The Beamtendeutsch status effect: <span class="de">"Ferner benötige ich die Wohnungsgeberbestätigung gemäß Paragraf 19 Bundesmeldegesetz."</span> Both document demands are bag handovers; the wrong item gets: <span class="de">"Das habe ich nicht verlangt."</span> Typed Konjunktiv-II crits: <span class="de">"Wären Sie so freundlich..." / "Hätten Sie vielleicht einen Kugelschreiber?"</span> A pen handed over wordlessly. By her standards, an embrace. Finish quality pays a bonus.</p></div>
+    <div class="scene"><b class="kind">Szene 5 · Das Formular · formCloze <span class="tag da">DA</span></b>
+      <p>The Anmeldeformular, block letters, no mistakes, including the long word you now own: <span class="de">Wohnungsgeberbestätigung</span>.</p></div>
+    <div class="meta">
+      <div class="card"><h3>Fail path</h3><p>Thrown out = the Rückschlag scene: Jonas hands you the signed papers plus the KII hint, and you walk back in stronger. Failure is content, never lockout.</p></div>
+      <div class="card"><h3>Loot</h3><p>Die Meldebestätigung: the key that chapter 3's bank will demand. Chapter 2 unlocks.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 16 · ENVIRONMENTS -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · 10 · Die Welt</p>
+    <h2>Where chapter 1 takes you</h2>
+    <p class="lead">One district, the Bahnhofsviertel, six sets. Every environment is also a text genre to read.</p>
+    <div class="tablewrap"><table>
+      <tr><th>Mission</th><th>Environment</th><th>Its native text genre</th></tr>
+      <tr><td>1.1</td><td>Flughafen: Ankunft, Zoll, Bahnsteig</td><td>Schilder, Abfahrtstafel (easiest)</td></tr>
+      <tr><td>1.2</td><td>Bahnhofshalle, der Automat, die Tram</td><td>Automaten-UI, Tarifzonenkarte, Fahrschein</td></tr>
+      <tr><td>1.3</td><td>Handyladen</td><td>Werbeplakat, AGB-Kleingedrucktes, Vertrag</td></tr>
+      <tr><td>1.4</td><td>Supermarkt + Leergutautomat</td><td>Preisschilder, Öffnungszeiten, Kassenzettel, Pfandbon</td></tr>
+      <tr><td>1.5</td><td>Altbau: Zimmer, Treppenhaus</td><td>Hausordnung, die Wohnungsgeberbestätigung (form)</td></tr>
+      <tr><td>1.6</td><td>Bürgeramt: Website, Wartezimmer, Schalter 2</td><td>Behörden-Website, Wartemarke, Anmeldeformular, Beamtendeutsch (hardest)</td></tr>
+    </table></div>
+    <p class="footer-note">The genre ladder ramps deliberately from Schild to Amtsdeutsch: reading difficulty and mission order are the same curve.</p>
+  </div>
+</section>
+
+<!-- 17 · RAMP -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · 11 · Die Rampe</p>
+    <h2>One new mechanic per mission</h2>
+    <p class="lead">The pacing rule from the research: each mission teaches exactly one new verb; the boss stacks all of them and teaches none.</p>
+    <div class="cards">
+      <div class="card"><h3><span class="num">1.1</span>Willkommen</h3><p>Teaches: the bag, D/E, listen-and-act. Set piece: acting on your first real announcement.</p></div>
+      <div class="card"><h3><span class="num">1.2</span>Fahrkarten-Automat</h3><p>Teaches: the battle UI, safely (a machine eats coins, not confidence). Set piece: the Tarifzonen riddle.</p></div>
+      <div class="card"><h3><span class="num">1.3</span>SIM-Karte</h3><p>Teaches: register choices that bind later. Set piece: the Flex-Flat XL pitch.</p></div>
+      <div class="card"><h3><span class="num">1.4</span>Erster Einkauf</h3><p>Teaches: timed production + the Pfand loop. Set piece: the checkout speed run.</p></div>
+      <div class="card"><h3><span class="num">1.5</span>Dach über dem Kopf</h3><p>Teaches: the form ritual + the document chain. Set piece: the landlord's signature.</p></div>
+      <div class="card boss"><h3><span class="num">1.6</span>BOSS: Die Anmeldung</h3><p>Teaches nothing. Demands everything. CEFR peak of the chapter (B1.2), scaffolded retry guaranteed.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 18 · WHAT G2 BUILDS -->
+<section class="slide">
+  <div class="inner">
+    <p class="eyebrow">Spielbuch · 12 · Der Bauplan</p>
+    <h2>What G2 builds from this book</h2>
+    <ul class="tight">
+      <li><strong>Missions 1.1 to 1.5 as data</strong> against these scripts (the boss is live). Everything tagged <span class="tag da">DA</span> in the scripts needs zero new renderers.</li>
+      <li><strong>Three renderers unlock most of the</strong> <span class="tag g2">G2</span> <strong>tags:</strong> the stage hotspot layer, the Automat/keypad prop, one drag-sort minigame (three skins: crates, pairs, steps).</li>
+      <li><strong>Systems:</strong> Jonas' Joker, the Leergutautomat + Pfandgeld, register consequence caps, Müdigkeit variant of the boss opening.</li>
+      <li><strong>Then the playtest gate</strong> (unchanged): 5 to 10 real learners; completion, next-day return, and laughter decide scale-up.</li>
+    </ul>
+    <p class="footer-note">Character creation ships with 1.1 so the chapter plays start to finish as one story. Supabase sync of game state rides the planned G2 migration.</p>
+  </div>
+</section>
+
+<!-- 19 · END -->
+<section class="slide title-slide">
+  <div class="inner">
+    <p class="eyebrow">Ende · Kapitel 1</p>
+    <h1>Danke</h1>
+    <p class="title-sub">Research: <span class="mono">docs/strategy/MISSION_ACTIVITY_RESEARCH.md</span><br>
+    This deck: <span class="mono">docs/strategy/CHAPTER1_GAMEPLAY_DECK.html</span><br>
+    <span class="dim">All German lines are drafts for your verify pass. Rename anything. The bureaucracy gets roasted, the learner never.</span></p>
+    <span class="press-start">▶ Weiter zu G2</span>
+  </div>
+</section>
+
+<script>
+  const slides = document.querySelectorAll(".slide");
+  document.getElementById("hudtotal").textContent = String(slides.length).padStart(2, "0");
+  const xp = document.getElementById("xp");
+  const num = document.getElementById("hudnum");
+  function update() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    xp.style.width = (max > 0 ? (scrollY / max) * 100 : 0) + "%";
+    let current = 1;
+    slides.forEach((s, i) => { if (s.getBoundingClientRect().top < innerHeight * 0.5) current = i + 1; });
+    num.textContent = String(current).padStart(2, "0");
+  }
+  addEventListener("scroll", update, { passive: true });
+  update();
+</script>
