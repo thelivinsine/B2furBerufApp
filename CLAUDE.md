@@ -79,7 +79,11 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
   `src/features/welt/assets/`); G2 replaces it with licensed packs selected against scene 7.
   Renderers live in `src/features/welt/`; `/welt` is in the AppShell focus-mode gate so missions
   play chrome-free. Failure is content, never lockout: battle losses route through `onLose`
-  scaffolded-retry scenes; no hearts or energy meters, ever.
+  scaffolded-retry scenes; no hearts or energy meters, ever. **Interaction-first (founder, s73):**
+  scenes must play like game missions with minimal on-screen text (the loadout is walk-and-pick in
+  the room; battles mix tap and typed cloze moves; both bars must stay high and the finish quality
+  pays a victory bonus). Waiting beats become gameplay and print-prop mini-quests (Werbung/Anzeige/
+  Flyer) are the recurring side-quest pattern; both specced in `GAME_DESIGN.md` §4/§10, built in G2.
 - **Game progression state** (`missionsDone`, `keyItems` on `useProgressStore`) is **local-only
   for now**: cloudSync's `progress` upsert has a fixed column set and an unknown column fails the
   whole upsert, so syncing game state needs the G2 Supabase migration first.

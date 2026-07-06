@@ -6,6 +6,7 @@ import type {
   FormClozeScene,
   ListeningScene,
   LoadoutScene,
+  LoadoutSlot,
   SceneChoice,
   WebsiteParodyScene,
 } from "@/types/game";
@@ -22,8 +23,8 @@ import {
   GameCard,
   SheetCard,
   Pill,
-  Chip,
   BAG_SPRITE,
+  PLAYER_SPRITE,
   DOC_ICONS,
   DOC_ICON_FALLBACK,
 } from "@/features/welt/stage";
@@ -218,96 +219,174 @@ function ChoiceList({ choices, onChoose }: { choices: SceneChoice[]; onChoose: (
 
 /* ---------------- loadout ---------------- */
 
+/** Item spots in the room (stage percents), one per slot in order. */
+const HOTSPOTS = [
+  { x: 72, y: 34 }, // on the desk
+  { x: 17, y: 46 }, // on the bed
+  { x: 46, y: 55 }, // by the suitcase
+  { x: 86, y: 58 },
+];
+const PLAYER_START = { x: 6, y: 60 };
+const BAG_POS = { x: 45, y: 76 };
+
+/**
+ * Walk-and-pick loadout (founder direction, s73: missions must PLAY, not
+ * read). The documents lie around the room; tapping one walks the player
+ * over, then the retrieval question packs it into the bag. The bag is the
+ * exit: tap it to leave, thin bag allowed after a confirm.
+ */
 export function LoadoutView({
   scene,
   run,
   act,
 }: SceneViewProps & { scene: LoadoutScene; run: MissionRun }) {
-  const [skipped, setSkipped] = useState<string[]>([]);
+  const [asking, setAsking] = useState<LoadoutSlot | null>(null);
+  const [walking, setWalking] = useState<LoadoutSlot | null>(null);
+  const [confirmLeave, setConfirmLeave] = useState(false);
   const [wrongPicks, setWrongPicks] = useState<string[]>([]);
+  const [pos, setPos] = useState(PLAYER_START);
 
-  const active = scene.slots.find((s) => !run.packed[s.id] && !skipped.includes(s.id));
-  const activeVocab = active ? vocabById(active.vocabId) : undefined;
+  const packedCount = scene.slots.filter((s) => run.packed[s.id]).length;
+  const allPacked = packedCount === scene.slots.length;
+  const activeVocab = asking ? vocabById(asking.vocabId) : undefined;
 
   // Four German options: the target + three distractors from the other slots
   // and the scene's distractor pool. Reshuffled per slot, stable per render.
   const options = useMemo(() => {
-    if (!active || !activeVocab) return [];
+    if (!asking || !activeVocab) return [];
     const pool = [
-      ...scene.slots.filter((s) => s.id !== active.id).map((s) => s.vocabId),
+      ...scene.slots.filter((s) => s.id !== asking.id).map((s) => s.vocabId),
       ...(scene.distractorVocabIds ?? []),
     ]
       .map((id) => vocabById(id)?.de)
       .filter((de): de is string => !!de && de !== activeVocab.de);
     return shuffle([activeVocab.de, ...sample(pool, 3)]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [active?.id]);
+  }, [asking?.id]);
 
-  const pick = (de: string) => {
-    if (!active || !activeVocab) return;
-    const correct = de === activeVocab.de;
-    if (!correct) setWrongPicks((w) => [...w, de]);
-    else setWrongPicks([]);
-    act((r) => attemptSlot(r, active.id, correct));
+  const goTo = (slot: LoadoutSlot, i: number) => {
+    if (run.packed[slot.id] || asking || walking) return;
+    setConfirmLeave(false);
+    setWrongPicks([]);
+    const spot = HOTSPOTS[i % HOTSPOTS.length];
+    const target = { x: spot.x - 3, y: spot.y + 6 };
+    if (Math.abs(target.x - pos.x) < 1 && Math.abs(target.y - pos.y) < 1) {
+      setAsking(slot); // already standing here (re-tap after cancel)
+      return;
+    }
+    setWalking(slot);
+    setPos(target);
   };
 
-  const packedCount = scene.slots.filter((s) => run.packed[s.id]).length;
+  const pick = (de: string) => {
+    if (!asking || !activeVocab) return;
+    const correct = de === activeVocab.de;
+    if (!correct) setWrongPicks((w) => [...w, de]);
+    else setAsking(null);
+    act((r) => attemptSlot(r, asking.id, correct));
+  };
+
+  const leave = () => {
+    if (allPacked) act(finishLoadout);
+    else setConfirmLeave(true);
+  };
 
   return (
     <div className="space-y-3">
-      {/* The stage IS the task: an open bag, one slot per document, filling
-          as the player packs. No text checklist; the picture carries it. */}
       <PixelStage setting={scene.setting}>
-        <div className="absolute inset-x-0 bottom-3 flex flex-col items-center gap-1.5">
-          <div className="flex items-end gap-2">
-            {scene.slots.map((s) => {
-              const packed = !!run.packed[s.id];
-              const isActive = active?.id === s.id;
-              const icon = (s.grantsItem && DOC_ICONS[s.grantsItem]) || DOC_ICON_FALLBACK;
-              return (
-                <motion.span
-                  key={s.id}
-                  animate={packed ? { scale: [1.4, 1] } : {}}
-                  className={cn(
-                    "flex h-12 w-11 items-center justify-center rounded-xl border-2 bg-white/85",
-                    packed
-                      ? "border-teal-400"
-                      : isActive
-                        ? "border-dashed border-[#5b5be6]"
-                        : "border-dashed border-slate-300",
-                  )}
-                >
-                  <img
-                    src={icon}
-                    alt=""
-                    className={cn("w-7 select-none", !packed && "opacity-25 grayscale")}
-                    style={{ imageRendering: "pixelated" }}
-                    draggable={false}
-                  />
-                </motion.span>
-              );
-            })}
-          </div>
+        {/* documents lying around the room */}
+        {scene.slots.map((s, i) => {
+          if (run.packed[s.id]) return null;
+          const spot = HOTSPOTS[i % HOTSPOTS.length];
+          const icon = (s.grantsItem && DOC_ICONS[s.grantsItem]) || DOC_ICON_FALLBACK;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => goTo(s, i)}
+              aria-label={`Gegenstand ${i + 1}`}
+              className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
+            >
+              {/* the tap target stays still; only the icon bobs */}
+              <motion.span
+                animate={{ y: [0, -3, 0] }}
+                transition={{ repeat: Infinity, duration: 1.6, delay: i * 0.3 }}
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-soft ring-2",
+                  asking?.id === s.id ? "ring-[#5b5be6]" : "ring-[#5b5be6]/30",
+                )}
+              >
+                <img
+                  src={icon}
+                  alt=""
+                  draggable={false}
+                  className="w-6 select-none"
+                  style={{ imageRendering: "pixelated" }}
+                />
+              </motion.span>
+            </button>
+          );
+        })}
+
+        {/* the bag is the exit */}
+        <button
+          type="button"
+          onClick={leave}
+          aria-label="Tasche: packen und losgehen"
+          className="absolute z-10 -translate-x-1/2"
+          style={{ left: `${BAG_POS.x}%`, top: `${BAG_POS.y}%` }}
+        >
           <img
             src={BAG_SPRITE}
             alt=""
-            className="w-20 select-none"
-            style={{ imageRendering: "pixelated" }}
             draggable={false}
+            className="w-16 select-none"
+            style={{ imageRendering: "pixelated" }}
           />
-        </div>
+          <span className="absolute -right-2 -top-2 rounded-full bg-[#5b5be6] px-1.5 py-0.5 text-[10px] font-bold text-white shadow-soft">
+            {packedCount}/{scene.slots.length}
+          </span>
+        </button>
+
+        {/* the player walks to whatever is tapped */}
+        <motion.div
+          className="pointer-events-none absolute z-10"
+          initial={false}
+          animate={{ left: `${pos.x}%`, top: `${pos.y}%` }}
+          transition={{ duration: 0.7, ease: "easeInOut" }}
+          onAnimationComplete={() => {
+            if (walking) {
+              setAsking(walking);
+              setWalking(null);
+            }
+          }}
+          style={{ left: `${PLAYER_START.x}%`, top: `${PLAYER_START.y}%`, width: "7%" }}
+        >
+          <img
+            src={PLAYER_SPRITE}
+            alt=""
+            draggable={false}
+            className="w-full select-none"
+            style={{ imageRendering: "pixelated" }}
+          />
+        </motion.div>
       </PixelStage>
 
       <SheetCard className="space-y-3 p-4">
-        {active && activeVocab ? (
+        {asking && activeVocab ? (
           <>
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm text-slate-500">
                 Pack ein: <span className="font-semibold text-slate-700">{activeVocab.en}</span>
               </p>
-              <Chip tone="slate">
-                {packedCount}/{scene.slots.length}
-              </Chip>
+              <button
+                type="button"
+                onClick={() => setAsking(null)}
+                className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-slate-600"
+              >
+                <SkipForward className="h-3.5 w-3.5" /> Liegenlassen
+              </button>
             </div>
             <div className="grid grid-cols-1 gap-2">
               {options.map((de) => {
@@ -324,30 +403,28 @@ export function LoadoutView({
                 );
               })}
             </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setSkipped((sk) => [...sk, active.id]);
-                  setWrongPicks([]);
-                }}
-                className="inline-flex items-center gap-1 text-xs font-medium text-slate-400 hover:text-slate-600"
-              >
-                <SkipForward className="h-3.5 w-3.5" /> Ohne Dokument weiter
-              </button>
-            </div>
           </>
-        ) : (
+        ) : confirmLeave ? (
           <div className="flex items-center justify-between gap-2">
-            <p className="text-sm text-slate-500">
-              {packedCount === scene.slots.length
-                ? "Alles eingepackt."
-                : "Die Tasche bleibt dünn. Mutig."}
-            </p>
+            <p className="text-sm text-slate-500">Hier liegen noch Dokumente.</p>
+            <span className="flex gap-2">
+              <Pill onClick={() => setConfirmLeave(false)}>Weiter sammeln</Pill>
+              <Pill primary onClick={() => act(finishLoadout)}>
+                Trotzdem los
+              </Pill>
+            </span>
+          </div>
+        ) : allPacked ? (
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-sm text-slate-500">Alles eingepackt.</p>
             <Pill primary onClick={() => act(finishLoadout)}>
               {scene.cta?.de ?? "Weiter"} <ChevronRight className="ml-1 inline h-4 w-4" />
             </Pill>
           </div>
+        ) : (
+          <p className="text-sm text-slate-500">
+            Sammle die Dokumente im Zimmer, dann tippe auf die Tasche.
+          </p>
         )}
       </SheetCard>
     </div>

@@ -633,6 +633,8 @@ function lintMissions(missions, refs) {
         if (!CEFR_LEVELS.includes(s.npcCefr)) error(ds, sw, `invalid npcCefr "${s.npcCefr}"`);
         if (!isNum(s.geduld) || s.geduld <= 0) error(ds, sw, "geduld must be positive");
         if (!isNum(s.mut) || s.mut <= 0) error(ds, sw, "mut must be positive");
+        if (s.mutStart !== undefined && (!isNum(s.mutStart) || s.mutStart <= 0 || s.mutStart > s.mut))
+          error(ds, sw, `mutStart must be in (0, mut], got ${s.mutStart}`);
         if (!sceneKeys.includes(s.onLose)) error(ds, sw, `onLose "${s.onLose}" is not a scene`);
         const nodes = s.nodes ?? {};
         const nodeKeys = Object.keys(nodes);
@@ -672,6 +674,8 @@ function lintMissions(missions, refs) {
               if (mv.nextIfMissing === undefined)
                 warn(ds, mw, "requiresItem without nextIfMissing: a missing item replays the same node");
             }
+            if (mv.cloze !== undefined && (!isStr(mv.cloze) || !String(mv.de ?? "").includes(mv.cloze)))
+              error(ds, mw, `cloze "${mv.cloze}" is not a substring of the move's de`);
             if (mv.redemittelId !== undefined && !redemittelIds.has(mv.redemittelId))
               error(ds, mw, `redemittelId "${mv.redemittelId}" not in redemittel bank`);
             if (mv.vocabId !== undefined && !vocabIds.has(mv.vocabId))

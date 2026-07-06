@@ -192,6 +192,13 @@ export interface BattleMove {
   vocabId?: string;
   /** A well-placed register/grammar hit (Konjunktiv II): crit presentation. */
   crit?: boolean;
+  /**
+   * Typed challenge (the input ladder's higher rung): this word of `de` is
+   * shown as a gap and must be typed to land the move at full strength. A
+   * near-miss weakens it, a wrong answer makes it misfire. Must be a
+   * substring of `de` (linted).
+   */
+  cloze?: string;
   /** Quality 0..1 (same scale as DialogueOption.quality). */
   quality: number;
   /** Delta to the opponent's Geduld bar. */
@@ -227,10 +234,16 @@ export interface DialogueBattleScene extends SceneBase {
   npc: string;
   /** Level chip on the opponent card. */
   npcCefr: ContentCefr;
-  /** Starting patience (opponent bar). */
+  /** Starting patience (opponent bar, also its maximum). */
   geduld: number;
-  /** Starting composure (player bar). */
+  /** Maximum composure (player bar). */
   mut: number;
+  /**
+   * Composure at battle start (defaults to `mut`). Starting below the max
+   * gives good moves visible headroom: both bars must be kept high, and the
+   * finish quality (remaining Geduld + Mut) scales the victory bonus.
+   */
+  mutStart?: number;
   start: string;
   nodes: Record<string, BattleNode>;
   /**
