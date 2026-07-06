@@ -49,8 +49,8 @@ export function Welt() {
               <Chip tone="amber">Beta</Chip>
             </header>
 
-            <PixelStage setting="strasse" label={null}>
-              <div className="absolute bottom-2 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-600 shadow-soft">
+            <PixelStage setting="strasse" label={null} className="rounded-xl">
+              <div className="absolute bottom-2 left-3 rounded-md border-2 border-[#463c44] bg-white/95 px-3 py-1 text-xs font-semibold text-slate-600">
                 {chapter.district}
               </div>
             </PixelStage>

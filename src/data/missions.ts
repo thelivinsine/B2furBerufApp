@@ -320,9 +320,13 @@ export const missions: Mission[] = [
                 quality: 0.7,
                 de: "Guten Morgen, ich möchte mich anmelden.",
                 en: "Good morning, I would like to register my address.",
-                geduld: -2,
+                geduld: -4,
                 mut: 6,
                 next: "b2",
+                feedback: {
+                  de: "Korrekt, aber sie sieht nicht mal auf. Der Bildschirm ist interessanter als du.",
+                  en: "Correct, but she does not even look up. The screen is more interesting than you.",
+                },
               },
               {
                 id: "b1_du",
@@ -340,52 +344,30 @@ export const missions: Mission[] = [
               },
             ],
           },
+          /* The demand is answered from the bag, not with a sentence
+           * (founder feedback s74): open the Tasche, tap the right document. */
           b2: {
             id: "b2",
             npcLine: {
               de: "Anmeldung. Dann brauche ich Ihren Personalausweis oder Reisepass.",
               en: "Registration. Then I need your identity card or passport.",
             },
-            moves: [
-              {
-                id: "b2_doc",
-                tag: "Dokument zeigen",
-                quality: 0.8,
-                vocabId: "v_personalausweis",
-                requiresItem: "ki_personalausweis",
-                de: "Hier ist mein Personalausweis.",
-                en: "Here is my identity card.",
-                geduld: -2,
-                mut: 8,
-                next: "b3",
-                nextIfMissing: "b_ohne_ausweis",
+            ask: {
+              itemId: "ki_personalausweis",
+              vocabId: "v_personalausweis",
+              geduld: -2,
+              mut: 8,
+              next: "b3",
+              nextIfMissing: "b_ohne_ausweis",
+              wrongFeedback: {
+                de: "Sie schiebt es wortlos zurück. „Das habe ich nicht verlangt.“",
+                en: "She slides it back without a word. 'That is not what I asked for.'",
               },
-              {
-                id: "b2_nachfragen",
-                tag: "Nachfragen",
-                quality: 0.5,
-                redemittelId: "r_cla6",
-                de: "Was genau meinen Sie mit „Reisepass“? Gilt auch eine Kopie?",
-                en: "What exactly do you mean by 'passport'? Does a copy count?",
-                geduld: -8,
-                mut: 2,
-                next: "b2",
-                feedback: {
-                  de: "„Im Original“, sagt sie. Natürlich im Original.",
-                  en: "'In the original,' she says. Of course in the original.",
-                },
+              feedback: {
+                de: "Sie prüft den Ausweis und nickt knapp. Weiter im Programm.",
+                en: "She checks the card and gives a short nod. Moving on.",
               },
-              {
-                id: "b2_zeit",
-                tag: "Zeit gewinnen",
-                quality: 0.4,
-                de: "Einen Moment bitte, ich habe ihn gleich gefunden.",
-                en: "One moment please, I will find it in a second.",
-                geduld: -8,
-                mut: -4,
-                next: "b2",
-              },
-            ],
+            },
           },
           b3: {
             id: "b3",
@@ -395,19 +377,6 @@ export const missions: Mission[] = [
               en: "Furthermore I require the landlord confirmation pursuant to section 19 of the Federal Registration Act.",
             },
             moves: [
-              {
-                id: "b3_doc",
-                tag: "Dokument zeigen",
-                quality: 0.8,
-                vocabId: "v_wohnungsgeberbestaetigung",
-                requiresItem: "ki_wohnungsgeberbestaetigung",
-                de: "Die Wohnungsgeberbestätigung habe ich hier, unterschrieben vom Vermieter.",
-                en: "I have the landlord confirmation here, signed by the landlord.",
-                geduld: -2,
-                mut: 10,
-                next: "b4",
-                nextIfMissing: "b_ohne_wgb",
-              },
               {
                 id: "b3_nachhaken",
                 tag: "Nachhaken",
@@ -421,6 +390,20 @@ export const missions: Mission[] = [
                 feedback: {
                   de: "Präzise nachgefragt. Das Beamtendeutsch verliert seinen Schrecken.",
                   en: "Precisely asked. The official German loses its terror.",
+                },
+              },
+              {
+                id: "b3_raten",
+                tag: "So tun als ob",
+                quality: 0.3,
+                de: "Ja, ja, natürlich. Kein Problem.",
+                en: "Yes, yes, of course. No problem.",
+                geduld: -10,
+                mut: -6,
+                next: "b3b",
+                feedback: {
+                  de: "Sie merkt sofort, dass du nur nickst. „Also. Wo ist sie?“",
+                  en: "She notices immediately that you are just nodding. 'Well. Where is it?'",
                 },
               },
               {
@@ -439,34 +422,26 @@ export const missions: Mission[] = [
               },
             ],
           },
+          /* Handover from the bag, same as b2: the WGB is a tap, not a line. */
           b3b: {
             id: "b3b",
             npcLine: { de: "Genau die. Haben Sie sie dabei?", en: "Exactly that one. Do you have it with you?" },
-            moves: [
-              {
-                id: "b3b_doc",
-                tag: "Dokument zeigen",
-                quality: 0.8,
-                vocabId: "v_wohnungsgeberbestaetigung",
-                requiresItem: "ki_wohnungsgeberbestaetigung",
-                de: "Ja, hier ist die Wohnungsgeberbestätigung.",
-                en: "Yes, here is the landlord confirmation.",
-                geduld: -2,
-                mut: 8,
-                next: "b4",
-                nextIfMissing: "b_ohne_wgb",
+            ask: {
+              itemId: "ki_wohnungsgeberbestaetigung",
+              vocabId: "v_wohnungsgeberbestaetigung",
+              geduld: -2,
+              mut: 10,
+              next: "b4",
+              nextIfMissing: "b_ohne_wgb",
+              wrongFeedback: {
+                de: "„Das ist keine Wohnungsgeberbestätigung.“ Ihr Blick könnte Akten lochen.",
+                en: "'That is not a landlord confirmation.' Her stare could hole-punch files.",
               },
-              {
-                id: "b3b_leider",
-                tag: "Zeit gewinnen",
-                quality: 0.3,
-                de: "Ich glaube schon. Irgendwo.",
-                en: "I think so. Somewhere.",
-                geduld: -10,
-                mut: -6,
-                next: "b3b",
+              feedback: {
+                de: "Unterschrift geprüft. Paragraf 19 ist zufrieden.",
+                en: "Signature checked. Section 19 is satisfied.",
               },
-            ],
+            },
           },
           b4: {
             id: "b4",
@@ -500,6 +475,10 @@ export const missions: Mission[] = [
                 geduld: -2,
                 mut: 4,
                 next: "b_sieg",
+                feedback: {
+                  de: "„Hm.“ Sie schiebt dir das Formular hin. Ihren Kugelschreiber behält sie.",
+                  en: "'Hm.' She slides the form over. Her pen, she keeps.",
+                },
               },
               {
                 id: "b4_online",

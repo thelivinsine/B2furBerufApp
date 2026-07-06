@@ -45,6 +45,8 @@ export interface BattleLast {
   missingItem?: string;
   /** Set when the move was a typed challenge. */
   typed?: TypedMoveVerdict;
+  /** Set when a wrong bag item was offered on an `ask` node. */
+  wrongItem?: string;
 }
 
 export interface BattleRuntime {
@@ -54,6 +56,8 @@ export interface BattleRuntime {
   mut: number;
   mutMax: number;
   turns: number;
+  /** Wrong bag items offered at the CURRENT ask node (drives the FSRS grade). */
+  askMisses: number;
   last?: BattleLast;
 }
 
@@ -74,6 +78,12 @@ export interface MissionRun {
   slotMisses: Record<string, number>;
   /** Live battle bars; present only while the current scene is a battle. */
   battle?: BattleRuntime;
+  /**
+   * Wörterbuch charges left this run (founder direction s74: English help is
+   * a limited bag resource, not an always-on button). Spending one reveals
+   * the English layer for the current scene only.
+   */
+  dictUses: number;
   /** XP accrued this run (always the sum of emitted xp effects). */
   xp: number;
   /** Effects emitted by the LAST transition. Apply them, then move on. */
@@ -110,6 +120,7 @@ function initBattle(scene: DialogueBattleScene): BattleRuntime {
     mut: scene.mutStart ?? scene.mut,
     mutMax: scene.mut,
     turns: 0,
+    askMisses: 0,
   };
 }
 
@@ -128,6 +139,9 @@ function enterScene(run: MissionRun, sceneId: string, effects: MissionEffect[]):
   );
 }
 
+/** Wörterbuch charges a mission starts with (data can override per mission). */
+export const DICT_USES_DEFAULT = 3;
+
 export function startMission(
   mission: Mission,
   ownedItems: string[],
@@ -140,11 +154,22 @@ export function startMission(
     bag: [...ownedItems],
     packed: {},
     slotMisses: {},
+    dictUses: mission.dictUses ?? DICT_USES_DEFAULT,
     xp: 0,
     effects: [],
     done: false,
   };
   return enterScene(base, mission.start, []);
+}
+
+/**
+ * Spend one Wörterbuch charge (the player component keys the reveal to the
+ * scene it was spent on). No XP, no grades: translation is a resource, not
+ * an exercise.
+ */
+export function useDictionary(run: MissionRun): MissionRun {
+  if (run.dictUses <= 0) return { ...run, effects: [] };
+  return withEffects(run, { dictUses: run.dictUses - 1 }, []);
 }
 
 /**
@@ -340,10 +365,113 @@ export function playMove(
         geduld,
         mut,
         turns: run.battle.turns + 1,
+        askMisses: nextNodeId === run.battle.nodeId ? run.battle.askMisses : 0,
         last,
       },
     },
     effects,
+  );
+}
+
+/** Patience cost of offering the wrong bag item (data can override per ask). */
+export const ASK_WRONG_GEDULD = 8;
+
+/**
+ * Answer an `ask` node from the bag: the player taps an item to hand it
+ * over. The right item advances (grading the document's vocab into FSRS:
+ * Good on the first offer, Hard after a fumble); a wrong item costs patience
+ * and earns the NPC's deadpan reaction, staying on the node. Failure is
+ * content: a drained bar still routes through `onBarEmpty`.
+ */
+export function handItem(run: MissionRun, itemId: string): MissionRun {
+  const scene = currentScene(run);
+  const node = currentBattleNode(run);
+  const ask = node?.ask;
+  if (scene.kind !== "dialogueBattle" || !run.battle || !ask || node.outcome) {
+    return { ...run, effects: [] };
+  }
+  if (!run.bag.includes(itemId)) return { ...run, effects: [] };
+
+  if (itemId !== ask.itemId) {
+    const dGeduld = -(ask.wrongGeduld ?? ASK_WRONG_GEDULD);
+    const geduld = clamp(run.battle.geduld + dGeduld, 0, run.battle.geduldMax);
+    const nodeId = geduld <= 0 ? scene.onBarEmpty : run.battle.nodeId;
+    return withEffects(
+      run,
+      {
+        battle: {
+          ...run.battle,
+          nodeId,
+          geduld,
+          turns: run.battle.turns + 1,
+          askMisses: run.battle.askMisses + 1,
+          last: {
+            moveId: itemId,
+            crit: false,
+            geduld: dGeduld,
+            mut: 0,
+            wrongItem: itemId,
+            feedback: ask.wrongFeedback,
+          },
+        },
+      },
+      [],
+    );
+  }
+
+  const firstTry = run.battle.askMisses === 0;
+  const effects: MissionEffect[] = [{ type: "xp", amount: XP.simulationTurn }];
+  if (ask.vocabId)
+    effects.push({ type: "vocabGrade", vocabId: ask.vocabId, grade: firstTry ? 4 : 3 });
+  const geduld = clamp(run.battle.geduld + ask.geduld, 0, run.battle.geduldMax);
+  const mut = clamp(run.battle.mut + ask.mut, 0, run.battle.mutMax);
+  const nodeId = geduld <= 0 || mut <= 0 ? scene.onBarEmpty : ask.next;
+  return withEffects(
+    run,
+    {
+      battle: {
+        ...run.battle,
+        nodeId,
+        geduld,
+        mut,
+        turns: run.battle.turns + 1,
+        askMisses: 0,
+        last: {
+          moveId: itemId,
+          crit: false,
+          geduld: ask.geduld,
+          mut: ask.mut,
+          feedback: ask.feedback,
+        },
+      },
+    },
+    effects,
+  );
+}
+
+/**
+ * Concede an `ask` node ("Das habe ich nicht dabei"): routes to the ask's
+ * `nextIfMissing` branch, the fetch-quest/failure-as-content hook.
+ */
+export function admitMissing(run: MissionRun): MissionRun {
+  const scene = currentScene(run);
+  const node = currentBattleNode(run);
+  const ask = node?.ask;
+  if (scene.kind !== "dialogueBattle" || !run.battle || !ask || node.outcome) {
+    return { ...run, effects: [] };
+  }
+  return withEffects(
+    run,
+    {
+      battle: {
+        ...run.battle,
+        nodeId: ask.nextIfMissing,
+        turns: run.battle.turns + 1,
+        askMisses: 0,
+        last: { moveId: "admit", crit: false, geduld: 0, mut: 0, missingItem: ask.itemId },
+      },
+    },
+    [],
   );
 }
 

@@ -518,6 +518,8 @@ function lintMissions(missions, refs) {
     for (const f of ["title", "titleEn"]) if (!isStr(m[f])) error(ds, w, `${f} empty`);
     checkBiText(m.brief, ds, w, "brief");
     if (!isNum(m.rewardXp) || m.rewardXp < 0) error(ds, w, "rewardXp must be a non-negative number");
+    if (m.dictUses !== undefined && (!isNum(m.dictUses) || m.dictUses < 0))
+      error(ds, w, "dictUses must be a non-negative number");
     for (const id of m.rewardItems ?? [])
       if (!keyItemIds.has(id)) error(ds, w, `rewardItems "${id}" not in key-item registry`);
     for (const id of m.requiresItems ?? [])
@@ -651,10 +653,27 @@ function lintMissions(missions, refs) {
             error(ds, nw, `invalid effect "${n.effect}"`);
           if (n.outcome !== undefined && n.outcome !== "win" && n.outcome !== "lose")
             error(ds, nw, `invalid outcome "${n.outcome}"`);
-          if (n.outcome === undefined && (!Array.isArray(n.moves) || n.moves.length === 0))
-            error(ds, nw, "non-terminal node has no moves");
-          if (n.outcome !== undefined && n.moves?.length)
-            warn(ds, nw, "terminal node has moves (they are unreachable)");
+          if (n.outcome === undefined && !n.ask && (!Array.isArray(n.moves) || n.moves.length === 0))
+            error(ds, nw, "non-terminal node has no moves and no ask");
+          if (n.ask && n.moves?.length)
+            error(ds, nw, "node has both ask and moves (ask nodes answer from the bag only)");
+          if (n.outcome !== undefined && (n.moves?.length || n.ask))
+            warn(ds, nw, "terminal node has moves/ask (they are unreachable)");
+          if (n.ask) {
+            const aw = `${nw}/ask`;
+            const a = n.ask;
+            if (!keyItemIds.has(a.itemId)) error(ds, aw, `ask.itemId "${a.itemId}" not in key-item registry`);
+            if (!isNum(a.geduld) || !isNum(a.mut)) error(ds, aw, "ask geduld/mut must be numbers");
+            if (!nodeKeys.includes(a.next)) error(ds, aw, `ask.next "${a.next}" is not a node`);
+            if (!nodeKeys.includes(a.nextIfMissing))
+              error(ds, aw, `ask.nextIfMissing "${a.nextIfMissing}" is not a node`);
+            if (a.wrongGeduld !== undefined && (!isNum(a.wrongGeduld) || a.wrongGeduld <= 0))
+              error(ds, aw, "ask.wrongGeduld must be a positive number (it is a cost)");
+            if (a.vocabId !== undefined && !vocabIds.has(a.vocabId))
+              error(ds, aw, `ask.vocabId "${a.vocabId}" not in vocabulary`);
+            for (const f of ["wrongFeedback", "feedback", "prompt"])
+              if (a[f] !== undefined) checkBiText(a[f], ds, aw, f);
+          }
           const moveIds = new Set();
           for (const mv of n.moves ?? []) {
             const mw = `${nw}/${mv.id ?? "?"}`;
@@ -694,6 +713,10 @@ function lintMissions(missions, refs) {
             for (const mv of nodes[k].moves ?? []) {
               stack.push(mv.next);
               if (mv.nextIfMissing) stack.push(mv.nextIfMissing);
+            }
+            if (nodes[k].ask) {
+              stack.push(nodes[k].ask.next);
+              stack.push(nodes[k].ask.nextIfMissing);
             }
           }
           for (const nk of nodeKeys)
@@ -756,10 +779,13 @@ function lintMissions(missions, refs) {
     for (const key of sceneKeys) {
       const s = scenes[key];
       if (s.kind !== "dialogueBattle") continue;
-      for (const n of Object.values(s.nodes ?? {}))
+      for (const n of Object.values(s.nodes ?? {})) {
         for (const mv of n.moves ?? [])
           if (mv.requiresItem !== undefined && !obtainable.has(mv.requiresItem))
             error(ds, `${w}/${key}`, `move needs "${mv.requiresItem}" but nothing in the mission grants it`);
+        if (n.ask && !obtainable.has(n.ask.itemId))
+          error(ds, `${w}/${key}`, `ask needs "${n.ask.itemId}" but nothing in the mission grants it`);
+      }
     }
   }
 

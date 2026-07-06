@@ -8,6 +8,17 @@
 # so the files stay tiny. All art is original, authored in code for this repo
 # (zero spend, no third-party assets); replace with licensed packs in G2.
 #
+# WORLD SCALE (locked after founder feedback s74: "chairs bigger than the
+# player, player squished"). On the 240x160 world:
+#   - a standing adult is 28-32 px tall and 14-16 px wide (3.5-4 heads tall)
+#   - a seated adult is ~20 px tall
+#   - a waiting-room chair is ~19 px tall including legs (below shoulder
+#     height of a standing adult), ~14 px wide
+#   - desks/counters are ~18-24 px tall in the 3/4 view (surface + depth)
+#   - doors are ~40-44 px
+# Every sprite and prop must respect these ratios; G2 pack purchases must be
+# checked against them too.
+#
 # Run: python3 welt_assets.py   (needs Pillow)
 from PIL import Image, ImageDraw
 import os
@@ -50,7 +61,8 @@ PLANT = [
 PLANT_CMAP = {'g': (134, 172, 128), 'G': (100, 144, 98), 't': (198, 142, 106),
               'k': (160, 110, 82)}
 
-# player, back view, 16x22 (scenes.py grid, modern palette)
+# player, back view, 16x30 (world scale: a standing adult; the old 16x22
+# grid read as vertically squished, founder feedback s74)
 PLAYER_BACK = [
     "....kkkkkkkk....",
     "...khhhhhhhhk...",
@@ -66,12 +78,20 @@ PLAYER_BACK = [
     ".kjkrrrrrrrrkjk.",
     ".kjkrrrrrrrrkjk.",
     ".kjkrrrrrrrrkjk.",
+    ".kjkrrrrrrrrkjk.",
     ".kjkrkkkkkkrkjk.",
+    ".kjkrrrrrrrrkjk.",
     "..kjkrrrrrrkjk..",
+    "..kjjjjjjjjjjk..",
     "...kjjjjjjjjk...",
+    "....kppppppk....",
     "....kppkkppk....",
     "....kppk.kppk...",
     "....kppk.kppk...",
+    "....kppk.kppk...",
+    "....kppk.kppk...",
+    "....kppk.kppk...",
+    "....kbbk.kbbk...",
     "....kbbk.kbbk...",
     "....kkkk.kkkk...",
 ]
@@ -112,23 +132,28 @@ SCHMIDT = [
     ".......kkkk.kkkk..........",
 ]
 
-# seated NPC, front, 12x15 (waiting-room extras)
+# seated NPC, front, 14x20 (world scale: a seated adult is ~2/3 of standing)
 NPC_SEAT = [
-    "...kkkkkk...",
-    "..khhhhhhk..",
-    ".khhhhhhhhk.",
-    ".khkssssskk.",
-    ".khksskssk..",
-    ".khsssssshk.",
-    "..ksssssk...",
-    ".kjjjjjjjjk.",
-    "kjjjjjjjjjjk",
-    "kjjksssskjjk",
-    "kjjjjjjjjjjk",
-    ".kppppppppk.",
-    ".kppk..kppk.",
-    ".kppk..kppk.",
-    ".kbbk..kbbk.",
+    "....kkkkkk....",
+    "...khhhhhhk...",
+    "..khhhhhhhhk..",
+    "..khkssssshk..",
+    "..khkssksshk..",
+    "..khsssssshk..",
+    "...kssssssk...",
+    "....kssssk....",
+    "..kjjjjjjjjk..",
+    ".kjjjjjjjjjjk.",
+    ".kjjjjjjjjjjk.",
+    ".kjjksssskjjk.",
+    ".kjjjjjjjjjjk.",
+    "..kppppppppk..",
+    "..kppppppppk..",
+    "..kppk..kppk..",
+    "..kppk..kppk..",
+    "..kppk..kppk..",
+    "..kbbk..kbbk..",
+    "..kkkk..kkkk..",
 ]
 
 def npc_cmap(hair, jacket, pants=(108, 114, 134)):
@@ -241,18 +266,20 @@ def backdrop_wartezimmer():
     rect(img, 216, 34, 14, 30, (120, 126, 148))
     rect(img, 218, 38, 10, 8, (219, 166, 77))
     rect(img, 220, 50, 6, 4, (250, 250, 248))
-    # two rows of modern chairs, some occupied
-    for row_y, seats in ((84, (16, 48, 80, 128, 160, 192)), (122, (32, 64, 112, 176))):
+    # two rows of modern chairs, some occupied (world scale: chair ~19 px
+    # incl. legs, clearly SMALLER than a 30 px standing adult)
+    for row_y, seats in ((88, (16, 46, 76, 130, 160, 190)), (124, (30, 62, 114, 178))):
         for sx in seats:
-            dim_ellipse(img, sx - 2, row_y + 26, sx + 22, row_y + 31, 0.94)
-            rect(img, sx, row_y, 20, 4, (150, 156, 176))      # backrest
-            rect(img, sx, row_y + 4, 20, 12, (170, 176, 196)) # back
-            rect(img, sx, row_y + 14, 20, 6, (150, 156, 176)) # seat
-            rect(img, sx + 1, row_y + 20, 3, 8, (110, 114, 132))
-            rect(img, sx + 16, row_y + 20, 3, 8, (110, 114, 132))
-    sprite(img, 52, 76, NPC_SEAT, npc_cmap((90, 62, 40), (168, 128, 84)))
-    sprite(img, 132, 76, NPC_SEAT, npc_cmap((200, 202, 210), (118, 132, 162)))
-    sprite(img, 68, 114, NPC_SEAT, npc_cmap((60, 46, 40), (100, 144, 98)))
+            dim_ellipse(img, sx - 2, row_y + 17, sx + 16, row_y + 21, 0.94)
+            rect(img, sx, row_y, 14, 3, (150, 156, 176))      # backrest
+            rect(img, sx, row_y + 3, 14, 7, (170, 176, 196))  # back
+            rect(img, sx, row_y + 10, 14, 4, (150, 156, 176)) # seat
+            rect(img, sx + 1, row_y + 14, 2, 5, (110, 114, 132))
+            rect(img, sx + 11, row_y + 14, 2, 5, (110, 114, 132))
+    # seated people: hips on the seat surface, heads above the chair backs
+    sprite(img, 46, 79, NPC_SEAT, npc_cmap((90, 62, 40), (168, 128, 84)))
+    sprite(img, 130, 79, NPC_SEAT, npc_cmap((200, 202, 210), (118, 132, 162)))
+    sprite(img, 62, 115, NPC_SEAT, npc_cmap((60, 46, 40), (100, 144, 98)))
     floor_plant(img, 6, 44)
     return img
 
@@ -269,19 +296,19 @@ def backdrop_wohnung():
     hline(img, 16, 96, 64, (128, 134, 190))
     rect(img, 14, 80, 4, 38, (198, 174, 138))
     rect(img, 78, 80, 4, 38, (198, 174, 138))
-    # desk with laptop, right
+    # desk with laptop, right (world scale: desk ~24 px in the 3/4 view)
     dim_ellipse(img, 158, 96, 224, 103, 0.94)
-    rect(img, 158, 66, 66, 6, (250, 249, 246))
-    hline(img, 158, 71, 66, (216, 212, 204))
-    rect(img, 160, 72, 4, 26, (218, 190, 150))
-    rect(img, 218, 72, 4, 26, (218, 190, 150))
-    rect(img, 178, 56, 20, 10, (52, 56, 72))
-    rect(img, 180, 58, 16, 6, (98, 112, 150))
-    # suitcase by the door
-    rect(img, 120, 100, 26, 18, (168, 84, 64))
-    hline(img, 120, 108, 26, (140, 66, 50))
-    rect(img, 130, 96, 6, 4, (140, 66, 50))
-    dim_ellipse(img, 118, 116, 148, 122, 0.94)
+    rect(img, 158, 74, 66, 6, (250, 249, 246))
+    hline(img, 158, 79, 66, (216, 212, 204))
+    rect(img, 160, 80, 4, 18, (218, 190, 150))
+    rect(img, 218, 80, 4, 18, (218, 190, 150))
+    rect(img, 180, 64, 18, 10, (52, 56, 72))
+    rect(img, 182, 66, 14, 6, (98, 112, 150))
+    # suitcase by the door (about knee-to-hip height on a 30 px adult)
+    rect(img, 122, 102, 22, 14, (168, 84, 64))
+    hline(img, 122, 108, 22, (140, 66, 50))
+    rect(img, 130, 98, 6, 4, (140, 66, 50))
+    dim_ellipse(img, 120, 114, 148, 120, 0.94)
     # plant + poster
     floor_plant(img, 8, 44)
     rect(img, 176, 12, 24, 30, (244, 242, 236))
@@ -392,6 +419,24 @@ DOC_WGB = [
 DOC_CMAP = {'k': OUT, 'w': (250, 250, 248), 'l': (196, 200, 210), 'j': INDIGO,
             's': SKIN, 'z': (90, 96, 140), 't': (100, 144, 98)}
 
+# Wörterbuch, 14x12: the bag's rationed English lifeline (indigo cover, D/E
+# page block)
+DICT = [
+    "..kkkkkkkkkk..",
+    ".kjjjjjjjjjjk.",
+    "kjjwwwwwwwwjjk",
+    "kjjwkkwwkkwjjk",
+    "kjjwwwwwwwwjjk",
+    "kjjwkkkkkkwjjk",
+    "kjjwwwwwwwwjjk",
+    "kjjwkkkwwwwjjk",
+    "kjjwwwwwwwwjjk",
+    ".kjjjjjjjjjjk.",
+    "..kkkkkkkkkk..",
+    "...kkkkkkkk...",
+]
+DICT_CMAP = {'k': OUT, 'j': INDIGO, 'w': (250, 250, 248)}
+
 def sprite_png(rows, cmap, name):
     img = Image.new('RGBA', (len(rows[0]), len(rows)), (0, 0, 0, 0))
     for ry, row in enumerate(rows):
@@ -412,4 +457,20 @@ sprite_png(BAG, BAG_CMAP, "bag.png")
 sprite_png(DOC_AUSWEIS, DOC_CMAP, "doc-ausweis.png")
 sprite_png(DOC_VERTRAG, DOC_CMAP, "doc-vertrag.png")
 sprite_png(DOC_WGB, DOC_CMAP, "doc-wgb.png")
+sprite_png(DICT, DICT_CMAP, "dict.png")
+
+# proportion check sheet (not shipped): player, chair row, Schmidt at 4x so
+# the world-scale ratios above are verifiable at a glance
+check = Image.new('RGB', (120, 50), (233, 229, 221))
+sprite(check, 6, 14, PLAYER_BACK, PLAYER_CMAP)
+rect(check, 30, 25, 14, 3, (150, 156, 176))
+rect(check, 30, 28, 14, 7, (170, 176, 196))
+rect(check, 30, 35, 14, 4, (150, 156, 176))
+rect(check, 31, 39, 2, 5, (110, 114, 132))
+rect(check, 41, 39, 2, 5, (110, 114, 132))
+sprite(check, 50, 24, NPC_SEAT, npc_cmap((90, 62, 40), (168, 128, 84)))
+sprite(check, 72, 12, SCHMIDT, SCHMIDT_CMAP)
+check = check.resize((480, 200), Image.NEAREST)
+check.save(os.path.join(os.path.dirname(__file__), "proportions-check.png"))
+
 print("welt assets written to", os.path.abspath(OUT_DIR))

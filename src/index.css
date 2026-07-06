@@ -201,6 +201,12 @@ input:-webkit-autofill {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
+  .pt-safe-3 {
+    padding-top: calc(0.75rem + env(safe-area-inset-top));
+  }
+  .pb-safe-2 {
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
   .pb-nav {
     /* Bottom bar = 63px icon rail + safe area (the old name strip was removed).
        Keep a comfortable gap so content never sits under the bar. */
