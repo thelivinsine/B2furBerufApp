@@ -6,6 +6,31 @@ concept, pillars, story spine) and `docs/plans/MINIMAL_UX_REDESIGN_PLAN.md` (the
 redesign whose Phase 3 already seeds the game world). Read the concept doc first; its scope
 guardrail (broad audience, exam prep is one optional side path) applies to everything below._
 
+## Executive summary (plain words, phase by phase)
+
+**G0, the facelift (done ✅, sessions 63–66).** The app redesign quietly built the game's
+foundations while making today's app nicer: tap-to-translate on every German line, reward cards
+at the end of a session, and a little city on the progress page that lights up as you learn.
+This gate is cleared; the game build can start whenever you say go.
+
+**G1, one playable mission.** Build the "mission machine" once, then use it to make one
+complete, playable mission: registering your address at the Bürgeramt, ending in the boss fight
+with Frau Schmidt. You play it on your phone. The bar: it must feel like a game, not a quiz in
+a costume. If it does not, we fix that before building anything more.
+
+**G2, the first chapter, then a reality check.** Five to eight missions covering arriving in
+Germany (airport, SIM card, supermarket, flat hunt, Anmeldung), with recurring characters and
+real pixel art. Then we deliberately stop building and let 5 to 10 real learners play. What
+they do (finish missions, come back the next day, laugh) decides whether we scale up.
+
+**G3, the walkable city.** The static city picture becomes a place you walk around, like the
+old Pokémon games: stroll the streets, enter the bank or the Arztpraxis, and the mission starts.
+This is the only phase that needs a real game engine, and it is free.
+
+**G4, growth as a writing job.** From here on, expanding the game means writing new chapters
+and side quests into the content pipeline, not building software. Money-wise the whole plan
+stays at roughly 30 to 60 EUR one-time (art packs, optional), with zero running costs.
+
 ## The question this answers
 
 The founder asked: what is the best way to implement the game idea, how to approach it, what
@@ -109,9 +134,44 @@ without a license-clean redraw. New runtime dependency total for the whole plan:
 (Phaser, at G3, in a lazy chunk). The 400 kB main-chunk budget is untouched because the entire
 game layer is lazy.
 
+## Claude model recommendations (how to run each phase)
+
+Same tiers and working pattern as `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`: open each
+session on the phase's strongest-model task, then downshift for the mechanical remainder, and
+run a `/code-review` pass before each phase's PR.
+
+| Model | Use for | Cost posture |
+|---|---|---|
+| **Haiku 4.5** | Mechanical, low-ambiguity edits: asset wiring, provenance rows, running gates + ship | Cheapest, fastest |
+| **Sonnet 5** | Standard component and data work inside a fixed schema | Default workhorse |
+| **Opus 4.8** | Multi-engine integration, composer/SRS-adjacent logic, perf-sensitive boundaries | When a subtle regression is expensive |
+| **Fable 5** | One-shot architecture, narrative/content design, visual direction | Highest capability, use sparingly |
+
+Per-task map:
+
+| Phase | Task | Model | Why this model |
+|---|---|---|---|
+| pre-G1 | 2–3 pixel mockup scenes for the art blessing (free assets) | **Fable 5** | Visual direction judgment; the cheapest moment to get the look right |
+| G1 | `Mission`/`Scene` schema + `engine/mission.ts` runner + lint graph checks | **Fable 5** | The schema must survive hundreds of missions; a wrong shape here is the most expensive mistake in the plan |
+| G1 | Scene renderers: website parody, loadout, waiting room, form cloze | **Sonnet 5** | Well-specified components on existing patterns (focus mode, Gloss, browse lists) |
+| G1 | Dialogue-battle renderer (dialogue engine + scoring + FSRS grading wired together) | **Opus 4.8** | Threads three engines; a subtle grading bug silently poisons the SRS data |
+| G1 | Anmeldung mission content (German dialogue, humor, cultural accuracy) | **Fable 5** | The content IS the product; tone- and pedagogy-critical, founder-verified |
+| G1 | Runner Vitest suite + mission checks in `lint-content.mjs` | **Sonnet 5** | Bounded test/validation work against a fixed schema |
+| G1/G2/G3 | Gates + ship (build, lint, tests, bundle, PR, realign) | **Haiku 4.5** | Mechanical |
+| G2 | Chapter 1 arc design: mission sequence, recurring NPCs, key-item chain | **Fable 5** | Narrative design quality decides the playtest outcome |
+| G2 | Mission data authoring at volume + provenance rows | **Sonnet 5** | Workhorse drafting inside the fixed schema; founder verifies per `DATA_GOVERNANCE.md` |
+| G2 | FSRS-as-dungeon-master recurrence in the mission composer | **Opus 4.8** | Touches session weighting and SRS state; classic silent-regression territory |
+| G2 | Failure/fetch-quest loop, opt-in Prüfungsmodus flag, pixel-asset wiring | **Sonnet 5** | Conventional feature work |
+| G3 | React↔Phaser bridge design + lazy-chunk/PWA-precache integration | **Opus 4.8** | A new dependency at a perf-sensitive boundary; bundle budget and PWA caching rules in play |
+| G3 | Tilemap city wiring: Tiled maps, districts, NPC placement | **Sonnet 5** | Conventional once the bridge exists |
+| G4 | New chapters via the pipeline | **Sonnet 5** draft + **Haiku 4.5** provenance/gates | Content routine; **Fable 5** only for each new chapter's arc design |
+
 ## Phases
 
 ### G0 (prerequisite): execute the minimal redesign first
+_Status update 2026-07-06: **COMPLETE ✅.** Redesign Phases 1–3 all shipped (sessions 63–66,
+PRs #305/#307 + the Phase-3 PRs), and Phase 4 Sessions A+B shipped too (typed recall,
+Lesen/Hören). **G1 is eligible now.**_
 `MINIMAL_UX_REDESIGN_PLAN.md` Phases 1–3 ARE the game's on-ramp: the D/E `<Gloss>` component,
 full-screen focus mode, the loot-drop end screen with FSRS card levels, the collection bag view,
 and the six SVG domain buildings / city strip. Every one ships standalone value to today's
