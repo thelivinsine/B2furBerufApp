@@ -30,6 +30,7 @@ export const XP = {
   quizHard: 16,
   grammarDrill: 10,
   speakingDrill: 12,
+  readingCheck: 8,
   redemittel: 12,
   simulationTurn: 8,
   scenarioComplete: 60,

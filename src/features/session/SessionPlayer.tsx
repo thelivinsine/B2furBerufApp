@@ -23,9 +23,10 @@ import { buildSession, difficultyForLevel } from "@/engine/session";
 import { cardLevel, leveledUp } from "@/engine/collection";
 import { quizXp } from "@/engine/quiz";
 import { XP } from "@/engine/scoring";
-import { listen, recognitionSupported, type RecognitionHandle } from "@/engine/speech";
+import { listen, recognitionSupported, ttsSupported, type RecognitionHandle } from "@/engine/speech";
 import { matchesSpoken } from "@/engine/pronounce";
 import { gradeTyped, type TypedGrade } from "@/engine/typing";
+import { ReadingBlock } from "@/features/session/ReadingBlock";
 import { useCountdown } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { QuestionView, kindLabel } from "@/features/quiz/QuestionViews";
@@ -103,6 +104,7 @@ function SessionRun({
       difficulty: difficultyForLevel(level),
       scope,
       speaking: recognitionEnabled && recognitionSupported(),
+      listening: ttsSupported(),
     }),
   );
 
@@ -219,6 +221,17 @@ function SessionRun({
   const onSttError = () => {
     sttErrorsRef.current += 1;
     if (sttErrorsRef.current >= 2) setSttDisabled(true);
+  };
+
+  // Lesen/Hören (4.4): authentic-input comprehension. XP per correct check;
+  // the whole block registers ONE aggregate tally result at completion (so a
+  // multi-check block never inflates the correct/total ratio). It never touches
+  // vocab FSRS: reading is comprehension practice, not a graded SRS card.
+  const onReadingCorrectCheck = () => award(XP.readingCheck);
+  const onReadingComplete = (passed: boolean) => {
+    if (answered) return;
+    setAnswered(true);
+    registerResult(passed);
   };
 
   const onFlashcardGrade = (correct: boolean, latencyMs?: number) => {
@@ -372,6 +385,13 @@ function SessionRun({
             )}
             {block.kind === "typing" && (
               <TypingBlock block={block} onResult={onTypingResult} />
+            )}
+            {block.kind === "reading" && (
+              <ReadingBlock
+                block={block}
+                onCorrectCheck={onReadingCorrectCheck}
+                onComplete={onReadingComplete}
+              />
             )}
           </motion.div>
         </AnimatePresence>

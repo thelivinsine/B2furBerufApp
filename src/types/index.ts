@@ -420,6 +420,18 @@ export type SessionBlock =
       en: string;
       /** English example for context (the German sentence would reveal the answer). */
       example?: string;
+    }
+  | {
+      kind: "reading";
+      key: string;
+      /** Text-bank id (`ReadingText`) whose passage + checks this block renders. */
+      textId: string;
+      /**
+       * Play the passage aloud via TTS (listening variant) with the text hidden
+       * until revealed, rather than showing it up front. Set by the composer only
+       * when the caller reports TTS support.
+       */
+      listening: boolean;
     };
 
 /** An ordered, composed session plus a preview line for the Heute hero. */
