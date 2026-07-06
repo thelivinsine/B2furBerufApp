@@ -2414,3 +2414,57 @@ bar" section for the locked behavior.
   banner** (functional-only storage is consent-exempt); GDPR rights are in-app self-service. Keep
   `CONSENT_VERSION` (`src/lib/consent.ts`) in lockstep with the legal `LAST_UPDATED`. `CLAUDE.md` → "Legal pages & consent".
 
+---
+
+**Handoff after session 69 (2026-07-06). UX redesign Phase 4 task 4.3 is SHIPPED ✅ (PR #320,
+squash SHA `f09da8e`): the Lesen/Hören content bank, the first half of Session B (plan:
+`docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+- **`src/data/texts.ts` (new):** 10 authored authentic-style B1–B2 texts across 9 themes, in the five
+  genres the plan names: Behörden letters (`tx_behoerde_anmeldung_brief` B1.2 meldewesen,
+  `tx_behoerde_unterlagen_brief` B2.1 antrag), workplace emails (scheduling B1.2, customer/reklamation
+  B2.1), memos (meetings/entscheidung B2.1, project B2.2), announcements (technology B1.2, safety B2.1),
+  voicemail scripts (travel B1.2, logistics B2.1; these double as TTS listening input in 4.4). Each item:
+  `id`/`kind`/`themeId`/`cefr`/`title`/`titleEn`/`de`/`en` + 2–3 MCQ `checks` (30 total, German
+  questions, `explain` in English). All names/numbers/offices fictitious; no em dashes.
+- **Types (`src/types/index.ts`):** `TextKind` (letter/email/memo/announcement/voicemail), `TextCheck`,
+  `ReadingText`; `"text"` added to `ProvenanceContentType`.
+- **Linter (`scripts/lint-content.mjs`):** `TEXT_KINDS` closed-enum mirror + `lintTexts` (kind/themeId/
+  cefr enums, required fields, **checks length ≥ 2 is an error** (the 4.4 renderer contract), answer
+  among options, globally unique check ids via a `texts/checks` sweep, `subThemeId` declared on the
+  parent theme, `tx_` prefix warning). Bank loaded, counted (`texts`, `text checks`) and included in
+  the provenance cross-check (one row per text; embedded checks ride on the text's row).
+- **Provenance:** 10 authored/OWNED rows, `review_status: "draft"` for the founder pass; register now
+  **1,121 rows** (1,096 draft / 25 verified). `/sources` (`features/legal/Sources.tsx`) got the required
+  label + ordering entry for the new type.
+- **Gates:** all green — `build`, `lint` (0 errors), `lint:content` (0 errors/warnings), `test:unit` 59,
+  `check:bundle` main chunk **78.9 kB** (bank has no eager consumer; 4.4 must keep it in a lazy chunk).
+
+**Next step:** **task 4.4** (Opus per the plan): `kind: "reading"` composer block (+ listening variant
+via `engine/speech.ts` TTS), full-screen text card with tap-gloss + comprehension MCQ in `SessionPlayer`,
+results feeding XP/theme progress (NOT vocab FSRS), ~1 block per composed session. Then short Session C
+= 4.5 (progression chip) + 4.6 (docs/ship). The founder's pending priority call vs game-plan G1 stands.
+
+---
+
+**Handoff after session 68 (2026-07-05). UX redesign Phase 4 Session A is COMPLETE ✅: task 4.2
+(typed-recall block in the loop) shipped, so 4.1 + 4.2 together put tolerant typed forward recall into
+the default session and feeding FSRS (plan: `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`).** What shipped:
+- **New `kind: "typing"` `SessionBlock`** (`src/types/index.ts`): vocab-only forward recall (EN → typed DE),
+  same shape as `speaking` (sourceId/de/en/example).
+- **Composer graduation rule** (`src/engine/session.ts`): `graduatedToTyping(card)` returns true when a
+  due card is `reps >= 2` AND `(stability ?? interval) >= TYPING_STABILITY_FLOOR` (8 days). Pool 1 maps
+  graduated due cards to `typing` blocks (`ty_` key), new/young cards stay recognition `flashcard`s. A
+  single lucky first answer never jumps a brand-new word to typing.
+- **`TypingBlock` renderer** (`SessionPlayer.tsx`): EN prompt display-size, a typed DE input graded by
+  4.1's `gradeTyped`, an "Anzeigen" give-up that grades as a miss, three-tier feedback (success/warning/
+  danger tones) with the correct answer + `SpeakButton` + example, latency captured mount→answer. The
+  verdict maps onto the SRS `Grade` scale (correct → 4 Good, almost → 3 Hard, wrong → 0 Again); combo/XP
+  reward only a clean "correct". `captureLoot` refactored to take an explicit `Grade` (all callers updated).
+- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **59**
+  (56 → 59: +3 composer cases for the graduation rule), `check:bundle` main chunk **78.9 kB**.
+
+**Next step:** Phase 4 **Session B = 4.3 + 4.4** (Lesen/Hören content bank `src/data/texts.ts` + the
+`reading`/`listening` composer block + renderer), then short Session C = 4.5 (progression chip) + 4.6
+(docs/ship). OR pivot to game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`), whose formCloze / dialogue-battle
+scenes now have both the tolerant grading (4.1) and a typed-input block pattern (4.2) to build on.
+
