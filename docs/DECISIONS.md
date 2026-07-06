@@ -169,3 +169,36 @@ Einkauf (supermarket, Pfand) · 1.5 Ein Dach über dem Kopf (Wohnungsgeberbestä
 1.6 BOSS Die Anmeldung (the five-scene vertical slice, Meldebestätigung reward). G1 shipped 1.6
 playable (`src/data/missions.ts`); G2 authors 1.1-1.5 against this list. Do not re-litigate the
 list without a new founder request.
+
+## Game interaction & pixel-UI rules (session 74, 2026-07-06) — founder playtest round 3
+
+Six-point founder feedback on the G1 slice, applied same-session (PRs #343/#344/#345). The
+rulings below are locked; the research that grounds them is `docs/strategy/
+MISSION_ACTIVITY_RESEARCH.md` and the founder-facing `CHAPTER1_GAMEPLAY_DECK.html`.
+
+1. **The bag is with the player at all times** (Pokemon rule): a HUD bag slot in every mission
+   scene, and bag items must be USEFUL. Document demands in battles are `ask` nodes answered by
+   opening the Tasche and tapping the item; a wrong item costs Geduld and earns a deadpan
+   reaction line; "Hab ich nicht dabei" concedes into the fetch-quest branch. Never render a
+   document demand as a sentence-choice list again.
+2. **The bag popup is drawn as the backpack itself** (founder: "outline of the pop up window in
+   the shape of a backpack"): carry handle, leather dome, amber zip band, cream interior.
+3. **English is a rationed game resource, not a button.** The always-on E toggle was removed;
+   the Wörterbuch bag item holds 3 charges per mission and one charge reveals English for the
+   CURRENT scene only (`MissionRun.dictUses`, `useDictionary`). This deliberately supersedes
+   the s63 "D/E on every line" promise INSIDE missions; the rest of the app keeps tap-to-gloss.
+4. **Full-screen, one visual language.** The founder rejected app-style cards floating around a
+   small stage as "a patchwork of different arts": the mission player is now a fixed full-screen
+   game layer (dark surround, edge-to-edge stage) and every in-game surface speaks the pixel
+   language (chunky outlines in the sprite outline color #463c44, hard offset shadows, near-
+   square corners, RPG name plates). This AMENDS the scene-7 blessing's "app-language UI" trait
+   (s72 record above): the layout conventions stay (cards, pills, sheet, indigo accent) but
+   their skin is pixel-game, not app chrome. Light-theme-only rule unchanged.
+5. **World scale is locked** (founder: chairs read bigger than the player, player squished):
+   on the 240x160 world a standing adult is 28-32 px (3.5-4 heads), seated ~20 px, waiting-room
+   chair ~19 px, desks 18-24 px in the 3/4 view, doors 40-44 px. The table lives at the top of
+   `preview/game-pixel-mockups/welt_assets.py` with a committed `proportions-check.png` sheet;
+   G2 pack purchases must be checked against it.
+6. **Battle composition:** opponent + her bar hold the TOP band, the player sprite + Mut bar
+   hold the BOTTOM band, and people stay at ONE human scale (an attempted foreground zoom of
+   the player was explicitly rejected: "keep the people's sizes more or less the same").

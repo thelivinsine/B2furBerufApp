@@ -54,8 +54,17 @@ emotional payoff):
 
 ## 4. How the player interacts
 
-- **Every German line carries D and E.** Tap D for a simple German explanation, E for English.
-  Tap any single word for its card (and bag it if it is new). No player is ever stuck.
+- **Translation is a bag resource, not a button (founder rule 2026-07-06, s74; supersedes the
+  original always-on D/E promise INSIDE missions).** The Wörterbuch item holds 3 charges per
+  mission; spending one reveals the English layer for the current scene only. Nobody is ever
+  stuck: charges refill each mission, the Nachfrage move triggers in-world rephrasing, and
+  failure always scaffolds a retry. Outside missions the app keeps tap-to-gloss everywhere.
+- **The bag answers demands (founder rule s74).** The bag is in the HUD at all times; when an
+  NPC demands a document, the player opens the Tasche and taps the item (battle `ask` nodes).
+  Wrong items earn deadpan world reactions; document demands are never sentence-choice lists.
+- **One human scale, opponent top / player bottom (s74).** Battle staging: the opponent and
+  their bar hold the top band, the player sprite and the Mut bar the bottom band, and all
+  people render at the same world scale (locked in `welt_assets.py`; no foreground zoom).
 - **The input ladder: tap → type → speak.** Every exercise moment supports three input levels.
   Tapping a choice is always available; typing earns more XP; saying it aloud (mic opt-in,
   existing speech engine) earns the most. The player picks their courage level per moment; the
