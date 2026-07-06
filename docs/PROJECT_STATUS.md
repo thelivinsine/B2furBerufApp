@@ -15,13 +15,14 @@ This file is the **lean, living** status doc: current state plus the two most re
 Start at the `## Resume here (next session)` section near the end. Companion files:
 - **`docs/PROJECT_REFERENCE.md`** — stable reference that rarely changes: the founder backlog,
   the product-evaluation findings, per-session model guidance, and reusable research findings.
-- **`docs/archive/PROJECT_STATUS_ARCHIVE.md`** — the append-only history: older session handoffs
-  (sessions 2–67) and accumulated deploy/ops notes.
+- **`docs/archive/PROJECT_STATUS_ARCHIVE.md`** — index into the append-only history, chunked by ISO week
+  under `docs/archive/status-log/` (sessions 1–71 + an `ops-notes` file).
 - **`docs/DECISIONS.md`** — the "why" behind locked decisions. Full design: `docs/archive/EXPANSION_PLAN.md`.
 
 **Doc-hygiene rule (keep this file lean):** when you append a new handoff to `## Resume here`, move any
-handoff older than the two most recent into `docs/archive/PROJECT_STATUS_ARCHIVE.md`. Keep this file
-under ~250 lines. This split was done in session 70 (the file had grown to 1,624 lines / 140 kB).
+handoff older than the two most recent into the current ISO-week chunk under `docs/archive/status-log/`
+(see the index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Keep this file under ~250 lines. This split
+was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Who I'm working with
 - **Founder is non-technical.** Operate as a seasoned CTO: be decisive and opinionated, minimize
@@ -226,7 +227,8 @@ handoff above); chapter-1 sign-off remains open. **Next step: game G1 per `GAME_
 
 ---
 
-_Older handoffs (sessions 2–71) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
+_Older handoffs (sessions 1–71) are archived by ISO week under `docs/archive/status-log/` (index:
+`docs/archive/PROJECT_STATUS_ARCHIVE.md`)._
 
 **Content counts (verified from `src/data/*` on 2026-07-03):**
 - Vocabulary: **528 words**

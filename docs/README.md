@@ -19,7 +19,7 @@ docs/
 
   strategy/    business, product, governance, and security research (advisory, current)
   plans/       engineering plans and runbooks (active + shipped design records)
-  archive/     superseded / historical plans + the old session-log archive
+  archive/     superseded / historical plans + the session-log archive (status-log/ + prompt-log/, both by ISO week)
   reference/   source material and binaries (playbook, decks, PDFs, raw logs)
 ```
 
@@ -61,7 +61,8 @@ authoritative current location of every file.
 
 | File | What it is | Status |
 |---|---|---|
-| `archive/PROJECT_STATUS_ARCHIVE.md` | Detailed session-by-session logs (sessions 2–46), plus the older "Resume here" handoffs (sessions 9–67) and accumulated deploy/ops notes moved out of the status file in s70. | 🗄 Archive |
+| `archive/PROJECT_STATUS_ARCHIVE.md` | **Index only** (since s70): maps to the weekly chunks in `archive/status-log/`. | 🗄 Archive |
+| `archive/status-log/` | Session logs chunked by **ISO week** (`PROJECT_STATUS_ARCHIVE_YYYY-Www.md`, sessions 1–71 across W23–W28) plus an `ops-notes` file for undated material, so a lookup loads only one week. Split from the flat archive in s70. | 🗄 Archive |
 | `archive/prompt-log/` | Prompt-log entries 1–109 (sessions 26–49), split by **ISO week** (`SESSION_PROMPT_LOG_YYYY-Www.md` + a `README.md` index) so a lookup loads only one week. Append-only history; left as written. | 🗄 Archive |
 | `archive/UX_OVERHAUL_PLAN.md` | Session-first redesign (s46). All phases 0–5 shipped. | ✅ Complete (archived s55) |
 | `archive/TAXONOMY_REDESIGN.md` | Faceted taxonomy strategy deck, "what/why" (slides in `reference/TAXONOMY_REDESIGN.pptx`). | ✅ Implemented (archived s55) |
@@ -101,8 +102,9 @@ caught with "not yet implemented" headers over shipped work; a reader who trusts
 be misled.
 
 **3. `PROJECT_STATUS.md` has a size budget (tightened s70).** Keep only the **two most recent** session
-handoffs in the live file; when you append a new one, move the now-third-oldest into
-`archive/PROJECT_STATUS_ARCHIVE.md`. Target under ~250 lines. Stable reference material (backlog,
+handoffs in the live file; when you append a new one, move the now-third-oldest into the current ISO-week
+chunk under `archive/status-log/` (create the week file + add a row to the index
+`archive/PROJECT_STATUS_ARCHIVE.md` if the week doesn't exist yet). Target under ~250 lines. Stable reference material (backlog,
 model guidance, research findings) belongs in `PROJECT_REFERENCE.md`, not the status file. Exactly ONE
 "Resume here" section (at the end) is authoritative; never add a second inline resume pointer.
 
