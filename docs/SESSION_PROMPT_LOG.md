@@ -916,3 +916,12 @@ Branch: `claude/whats-next-esga9u`.
   > document the second and provide me with prompts for next sessions
 - **Response summary:** Tidied the prompt log so each founder prompt owns one entry: entry 170 = "implement task 4.3", entry 171 rewritten to be the clean "continue" → task 4.4 entry (previously it redundantly re-documented 4.3). Confirmed task 4.4's substantive docs were already shipped in PR #323 (plan checkmark, PROJECT_STATUS session-69 handoff, CLAUDE.md session-engine anchor + ReadingBlock in the layout list). Provided the founder with ready-to-paste prompts for the next sessions (Session C: task 4.5 progression chip, then 4.6 wrap; plus the standing game-plan G1 alternative). Doc-only.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (modified). PR # + squash SHA recorded on merge.
+
+## Entry 173 — 2026-07-06 (session 62, continued)
+- **Branch:** `claude/game-idea-strategy-h4t8m3`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > does the plan provide model recommendations for the tasks? and also a phase wise non tech executive summary?
+- **Response summary:** Honest answer: it had neither (the game plan predates the session-63 convention set by `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md`). Both added to `docs/plans/GAME_IMPLEMENTATION_PLAN.md` in that plan's format: (1) a plain-words executive summary, one paragraph per phase G0–G4, non-technical; (2) a "Claude model recommendations" section with the shared four-tier table (Haiku 4.5 / Sonnet 5 / Opus 4.8 / Fable 5) and a per-task model map across the phases (Fable for the mission schema + Anmeldung content + chapter-arc design + pixel mockups; Opus for dialogue-battle wiring, FSRS-recurrence composer logic, and the React↔Phaser bridge; Sonnet as the workhorse for scene renderers and mission data at volume; Haiku for gates + ship), including the "open on the strongest-model task, then downshift" working pattern and a `/code-review` pass before each phase PR. Also refreshed the plan's G0 status while rebasing over the parallel sessions' work: redesign Phases 1–3 (plus Phase 4 Sessions A+B) are fully shipped, so the G0 prerequisite is COMPLETE and G1 is eligible now.
+- **Artifacts:** `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/SESSION_PROMPT_LOG.md` (modified). PR # + squash SHA recorded in git history.
