@@ -270,9 +270,19 @@ function BagSheet({
         className="mx-auto w-full max-w-2xl px-2 pb-safe-2"
         onClick={(e) => e.stopPropagation()}
       >
-        <GameCard className="space-y-3 p-4">
-          <div className="flex items-center justify-between gap-2">
-            <p className="flex items-center gap-2 text-sm font-bold text-slate-700">
+        {/* the popup IS the backpack (founder direction s74): carry handle,
+            leather dome, amber zip band, then the cream interior */}
+        <div
+          aria-hidden
+          className="mx-auto h-6 w-24 rounded-t-full border-2 border-b-0"
+          style={{ borderColor: GAME_OUT, backgroundColor: "#8c4232" }}
+        />
+        <div
+          className="relative -mt-px overflow-hidden rounded-t-[36px] rounded-b-lg border-2 shadow-[0_3px_0_rgba(70,60,68,0.30)]"
+          style={{ borderColor: GAME_OUT, backgroundColor: "#a8543f" }}
+        >
+          <div className="flex items-center justify-between gap-2 px-5 pb-2.5 pt-3.5">
+            <p className="flex items-center gap-2 text-sm font-bold text-white">
               <img
                 src={BAG_SPRITE}
                 alt=""
@@ -285,13 +295,17 @@ function BagSheet({
               type="button"
               onClick={onClose}
               aria-label="Tasche schließen"
-              className="flex h-7 w-7 items-center justify-center rounded-md border-2 bg-white text-slate-500"
+              className="flex h-7 w-7 items-center justify-center rounded-md border-2 bg-white/90 text-slate-600"
               style={{ borderColor: GAME_OUT }}
             >
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
-
+          <div
+            className="h-2.5 w-full border-y-2"
+            style={{ backgroundColor: "#dba64d", borderColor: GAME_OUT }}
+          />
+          <div className="space-y-3 bg-[#fdfcf8] p-4">
           {asking && (
             <p className="border-2 border-amber-500/60 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-800" style={{ borderRadius: 6 }}>
               {askNpcName ?? "Dein Gegenüber"} wartet. Gib das richtige Dokument.
@@ -367,7 +381,8 @@ function BagSheet({
               </Pill>
             )}
           </div>
-        </GameCard>
+          </div>
+        </div>
       </motion.div>
     </motion.div>
   );

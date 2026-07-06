@@ -93,7 +93,9 @@ export function BattleView({
             />
           </motion.div>
         )}
-        <StageSprite src={PLAYER_SPRITE} x={14} y={45} w={7} />
+        {/* the player holds the bottom band, foreground scale (opponent top,
+            player bottom: the founder's battle-composition rule, s74) */}
+        <StageSprite src={PLAYER_SPRITE} x={14.5} y={53} w={13} />
 
         {/* enemy card: HER Geduld delta floats here */}
         <GameCard className="absolute left-3 top-3 w-[54%] max-w-56 space-y-1.5 px-3 py-2.5">
