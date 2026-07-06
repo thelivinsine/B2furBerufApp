@@ -184,10 +184,12 @@ interaction model (D/E on every line, tap→type→speak input ladder, register-
 parody documents); conversation battles (Geduld vs Standing bars, Redemittel moves, K-II crits, kind
 status effects); the bag item taxonomy (Wortkarten Lv1–5, Redemittel moves, Grammatik-Kräfte,
 Schlüssel-Dokumente, consumables, Fundstücke); failure-is-content rules restated; and the full
-authored spine: **six chapters / ~36 described missions** (K1 Ankommen 6 incl. the Anmeldung boss =
-the vertical slice, K2 Wohnen 6, K3 Geld & Papierkram 5, K4 Arbeit 7 mapping the workplace themes,
-K5 Gesund & Sozial 6, K6 Mein Ziel with 5 player-chosen endgame chains where the exam is one
-optional path per the scope guardrail), plus real-world side quests and tone/art rules (pixel
+authored spine: **seven chapters / ~40 described missions** (K1 Ankommen 6 incl. the Anmeldung boss
+= the vertical slice, K2 Wohnen 6, K3 Geld & Papierkram 5, K4 Die Jobsuche 7 ending on the
+Vorstellungsgespräch boss, K5 Im Büro 5 mapping the workplace themes with the Dienstreise boss, K6
+Gesund & Sozial 6, K7 Mein Ziel with 5 player-chosen endgame chains where the exam is one optional
+path per the scope guardrail; **structural rule from founder review: every chapter ends on its
+boss**), plus real-world side quests and tone/art rules (pixel
 direction still awaiting blessing). **Next step: founder reviews the deck and answers the three
 open decisions (art-blessing mockups, names, chapter-1 sign-off); then game G1 can start per
 `GAME_IMPLEMENTATION_PLAN.md`.**
