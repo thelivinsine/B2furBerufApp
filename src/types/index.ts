@@ -534,6 +534,52 @@ export interface CanDoStatement {
   threshold: number;
 }
 
+/* ---------------- Lesen/Hören text bank (redesign Phase 4.3) ---------------- */
+
+/** Genre of an authentic-style text (closed enum, mirrored in lint-content.mjs). */
+export type TextKind = "letter" | "email" | "memo" | "announcement" | "voicemail";
+
+/** One multiple-choice comprehension check attached to a text. */
+export interface TextCheck {
+  /** Globally unique id, `<textId>_q<n>` convention. */
+  id: string;
+  /** German question about the text. */
+  question: string;
+  /** Answer options (German); exactly one is correct. */
+  options: string[];
+  /** The correct option; must be one of `options`. */
+  answer: string;
+  /** Short English explanation pointing at the evidence in the text. */
+  explain?: string;
+}
+
+/**
+ * A short authentic-style German text for the Lesen/Hören session block
+ * (Behörden letter, workplace email, memo, announcement, voicemail script).
+ * Voicemail scripts double as listening input via TTS in task 4.4. Results
+ * feed XP/theme progress, not vocab FSRS, so texts carry no SRS fields.
+ */
+export interface ReadingText {
+  /** Unique id with the `tx_` prefix. */
+  id: string;
+  kind: TextKind;
+  themeId: ThemeId;
+  /** CEFR band the text is pitched at. */
+  cefr: ContentCefr;
+  /** German title as it would appear in the wild (subject line, headline). */
+  title: string;
+  /** English gloss of the title. */
+  titleEn: string;
+  /** Full German text; paragraphs separated by blank lines. */
+  de: string;
+  /** English gloss of the full text (reveal layer, not shown by default). */
+  en: string;
+  /** Two to three comprehension checks. */
+  checks: TextCheck[];
+  /** Optional sub-theme link; must be declared on the parent theme. */
+  subThemeId?: SubThemeId;
+}
+
 /* ---------------- Data governance — provenance register ---------------- */
 
 export type ProvenanceContentType =
@@ -545,7 +591,8 @@ export type ProvenanceContentType =
   | "exam_set"
   | "redemittel"
   | "writing_prompt"
-  | "can_do";
+  | "can_do"
+  | "text";
 
 export type ProvenanceOrigin = "sourced" | "adapted" | "authored";
 

@@ -63,6 +63,7 @@ const WORK_SITUATIONS = [
   "onboarding", "sick-leave", "review",
 ];
 const TASK_TYPES = ["email", "phone-call", "report", "instruction", "presentation"];
+const TEXT_KINDS = ["letter", "email", "memo", "announcement", "voicemail"];
 
 /* ---- diagnostics collection ---- */
 const errors = [];
@@ -409,6 +410,40 @@ function lintCanDo(canDoStatements) {
     if (!themesCovered.has(id)) error(ds, id, "theme has no Can-Do statement");
 }
 
+function lintTexts(texts, subThemeIndex) {
+  const ds = "texts";
+  checkDuplicateIds(texts, ds);
+  const allChecks = [];
+  for (const t of texts) {
+    const w = t.id ?? "?";
+    if (isStr(t.id) && !t.id.startsWith("tx_")) warn(ds, w, "id should use the tx_ prefix");
+    if (!TEXT_KINDS.includes(t.kind)) error(ds, w, `invalid kind "${t.kind}"`);
+    if (!THEME_IDS.includes(t.themeId)) error(ds, w, `invalid themeId "${t.themeId}"`);
+    if (!CEFR_LEVELS.includes(t.cefr)) error(ds, w, `invalid cefr "${t.cefr}"`);
+    for (const f of ["title", "titleEn", "de", "en"]) if (!isStr(t[f])) error(ds, w, `${f} empty`);
+    checkSubTheme(t, t.themeId, subThemeIndex, ds, w);
+    // The 4.4 renderer shows a comprehension MCQ after every text, so the
+    // 2-3 checks per item are part of the content contract, not optional.
+    if (!Array.isArray(t.checks) || t.checks.length < 2) {
+      error(ds, w, "checks must have at least 2 entries");
+      continue;
+    }
+    if (t.checks.length > 3) warn(ds, w, `${t.checks.length} checks (contract is 2-3)`);
+    for (const c of t.checks) {
+      allChecks.push(c);
+      const cw = `${w}/${c.id ?? "?"}`;
+      if (!isStr(c.question)) error(ds, cw, "check question empty");
+      if (!Array.isArray(c.options) || c.options.length < 2)
+        error(ds, cw, "check options must have at least 2 entries");
+      else if (isStr(c.answer) && !c.options.includes(c.answer))
+        error(ds, cw, "check answer is not among its options");
+      if (!isStr(c.answer)) error(ds, cw, "check answer empty");
+    }
+  }
+  // Check ids must be globally unique so results / deep-links don't collide.
+  checkDuplicateIds(allChecks, "texts/checks");
+}
+
 function lintProvenance(provenance, allContentIds) {
   const ds = "provenance";
 
@@ -460,7 +495,7 @@ async function main() {
   let data;
   try {
     const load = (p) => server.ssrLoadModule(p);
-    const [vocab, colloc, gram, dia, exams, rede, themes, areas, writing, prov, dom, canDo] = await Promise.all([
+    const [vocab, colloc, gram, dia, exams, rede, themes, areas, writing, prov, dom, canDo, txts] = await Promise.all([
       load("/src/data/vocabulary.ts"),
       load("/src/data/collocations.ts"),
       load("/src/data/grammar.ts"),
@@ -473,6 +508,7 @@ async function main() {
       load("/src/data/provenance.ts"),
       load("/src/data/domains.ts"),
       load("/src/data/canDo.ts"),
+      load("/src/data/texts.ts"),
     ]);
     data = {
       vocabulary: vocab.vocabulary,
@@ -487,6 +523,7 @@ async function main() {
       provenance: prov.provenance,
       domains: dom.domains,
       canDoStatements: canDo.canDoStatements,
+      texts: txts.texts,
     };
   } finally {
     await server.close();
@@ -504,6 +541,7 @@ async function main() {
   lintPracticeAreas(data.practiceAreas);
   lintWritingPrompts(data.writingPrompts);
   lintCanDo(data.canDoStatements);
+  lintTexts(data.texts, subThemeIndex);
 
   // Build the full set of trackable content ids from all banks, then check
   // that the provenance register has exactly one row per id.
@@ -516,6 +554,8 @@ async function main() {
     ...data.examSets.map((e) => e.id),
     ...data.redemittel.map((r) => r.id),
     ...data.canDoStatements.map((c) => c.id),
+    // One provenance row per text; embedded checks ride on the text's row.
+    ...data.texts.map((t) => t.id),
     // Writing prompts are keyed by themeId, not individual ids.
     ...THEME_IDS.filter((id) => data.writingPrompts[id]).map((id) => `wp_${id}`),
   ]);
@@ -540,6 +580,8 @@ async function main() {
     redemittel: data.redemittel.length,
     practiceAreas: data.practiceAreas.length,
     "can-do milestones": data.canDoStatements.length,
+    texts: data.texts.length,
+    "text checks": data.texts.reduce((n, t) => n + (t.checks?.length ?? 0), 0),
     "provenance rows": data.provenance.length,
     "provenance verified": data.provenance.filter((e) => e.review_status === "verified").length,
   };

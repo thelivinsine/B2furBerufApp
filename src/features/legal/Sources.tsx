@@ -33,6 +33,7 @@ const TYPE_LABEL: Record<ProvenanceContentType, { de: string; en: string }> = {
   redemittel: { de: "Redemittel", en: "Set phrases" },
   writing_prompt: { de: "Schreibaufgaben", en: "Writing prompts" },
   can_do: { de: "Kann-Beschreibungen (Meilensteine)", en: "Can-do milestones" },
+  text: { de: "Lese- und Hörtexte", en: "Reading and listening texts" },
 };
 
 const TYPE_ORDER: ProvenanceContentType[] = [
@@ -45,6 +46,7 @@ const TYPE_ORDER: ProvenanceContentType[] = [
   "exam_set",
   "writing_prompt",
   "can_do",
+  "text",
 ];
 
 /* Upstream references we verify content against, keyed by hostname (no www.). */
