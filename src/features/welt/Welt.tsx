@@ -58,7 +58,9 @@ export function Welt() {
             <div className="space-y-3">
               {chapterMissions.map((m, i) => {
                 const done = missionsDone.includes(m.id);
-                const unlocked = missionUnlocked(m, missionsDone, ownedItems);
+                // A beaten mission is always replayable, even if its
+                // prerequisites were added after the player cleared it.
+                const unlocked = done || missionUnlocked(m, missionsDone, ownedItems);
                 return (
                   <motion.div
                     key={m.id}

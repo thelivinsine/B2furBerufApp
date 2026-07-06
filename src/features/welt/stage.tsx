@@ -5,6 +5,9 @@ import amtUrl from "./assets/amt.png";
 import wartezimmerUrl from "./assets/wartezimmer.png";
 import wohnungUrl from "./assets/wohnung.png";
 import strasseUrl from "./assets/strasse.png";
+import terminalUrl from "./assets/terminal.png";
+import ladenUrl from "./assets/laden.png";
+import supermarktUrl from "./assets/supermarkt.png";
 import schmidtUrl from "./assets/schmidt.png";
 import playerUrl from "./assets/player.png";
 import bagUrl from "./assets/bag.png";
@@ -12,6 +15,7 @@ import dictUrl from "./assets/dict.png";
 import docAusweisUrl from "./assets/doc-ausweis.png";
 import docVertragUrl from "./assets/doc-vertrag.png";
 import docWgbUrl from "./assets/doc-wgb.png";
+import docPassUrl from "./assets/doc-pass.png";
 
 /**
  * The Neuland stage + game-UI atoms (game G1; pixel-UI pass s74). The founder
@@ -32,15 +36,21 @@ const SETTING_ART: Record<SceneSetting, string | null> = {
   strasse: strasseUrl,
   wartezimmer: wartezimmerUrl,
   amt: amtUrl,
+  terminal: terminalUrl,
+  laden: ladenUrl,
+  supermarkt: supermarktUrl,
 };
 
-/** Where-am-I caption per setting, shown as a chip on the stage. */
+/** Where-am-I caption per setting; scene data can override via its `label`. */
 const SETTING_LABEL: Record<SceneSetting, string | null> = {
   website: null,
   wohnung: "Deine Wohnung",
   strasse: "Neustadt",
   wartezimmer: "Bürgeramt · Wartezimmer",
   amt: "Bürgeramt · Schalter 2",
+  terminal: "Terminal",
+  laden: "Im Laden",
+  supermarkt: "Supermarkt",
 };
 
 /** Character sprites (transparent PNGs) keyed by GameNpc.sprite. */
@@ -56,6 +66,7 @@ export const DOC_ICONS: Record<string, string> = {
   ki_personalausweis: docAusweisUrl,
   ki_mietvertrag: docVertragUrl,
   ki_wohnungsgeberbestaetigung: docWgbUrl,
+  ki_reisepass: docPassUrl,
 };
 export const DOC_ICON_FALLBACK = docVertragUrl;
 

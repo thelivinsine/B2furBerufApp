@@ -317,6 +317,116 @@ def backdrop_wohnung():
     rect(img, 180, 16, 16, 12, (219, 166, 77))
     return img
 
+def backdrop_terminal():
+    """Airport/station hall: glass wall, departure board, benches, pillars."""
+    img = Image.new('RGB', (W, H), WALL)
+    # glass upper wall with sky
+    rect(img, 0, 0, W, 56, (196, 220, 236))
+    for gx in range(0, W, 40):
+        rect(img, gx, 0, 2, 56, (170, 176, 196))
+    rect(img, 0, 54, W, 4, (150, 156, 176))
+    rect(img, 30, 8, 26, 5, (238, 244, 248))
+    rect(img, 168, 14, 34, 6, (238, 244, 248))
+    # departure board
+    rect(img, 88, 20, 64, 26, (52, 56, 72))
+    rect(img, 90, 22, 60, 22, (40, 44, 58))
+    for i, c in enumerate([(219, 166, 77), (98, 112, 150), (98, 112, 150)]):
+        rect(img, 94, 25 + i * 6, 34, 4, c)
+        rect(img, 132, 25 + i * 6, 14, 4, (150, 164, 198))
+    # concrete tile floor
+    rect(img, 0, 58, W, H - 58, (222, 219, 212))
+    for ty in range(58, H, 14):
+        hline(img, 0, ty, W, (206, 202, 194))
+    for tx in range(0, W, 28):
+        rect(img, tx, 58, 1, H - 58, (210, 206, 198))
+    # pillars
+    for px in (24, 204):
+        rect(img, px, 20, 10, 68, (200, 196, 188))
+        rect(img, px, 20, 2, 68, (216, 212, 204))
+    # platform sign (Gleis 4)
+    rect(img, 150, 60, 34, 12, INDIGO)
+    rect(img, 152, 62, 30, 8, (120, 120, 240))
+    rect(img, 165, 72, 3, 16, (110, 114, 132))
+    # benches
+    for bx, by in ((44, 100), (128, 118)):
+        dim_ellipse(img, bx - 2, by + 14, bx + 40, by + 19, 0.94)
+        rect(img, bx, by, 38, 4, (170, 176, 196))
+        rect(img, bx, by + 4, 38, 5, (150, 156, 176))
+        rect(img, bx + 2, by + 9, 3, 6, (110, 114, 132))
+        rect(img, bx + 33, by + 9, 3, 6, (110, 114, 132))
+    # suitcase by a bench
+    rect(img, 92, 108, 16, 11, (168, 84, 64))
+    hline(img, 92, 112, 16, (140, 66, 50))
+    floor_plant(img, 6, 44)
+    return img
+
+def backdrop_laden():
+    """Phone shop: display wall, counter, XL poster, neon warmth."""
+    img = Image.new('RGB', (W, H), WALL)
+    wall_and_wood(img, wall_h=60)
+    # phone display wall (grid of little phones)
+    rect(img, 14, 10, 88, 40, (218, 190, 150))
+    for row in range(2):
+        for col in range(5):
+            px, py = 20 + col * 17, 15 + row * 18
+            rect(img, px, py, 10, 14, (52, 56, 72))
+            rect(img, px + 1, py + 1, 8, 10, (98, 112, 150))
+    # XL sale poster
+    rect(img, 116, 10, 34, 42, (244, 242, 236))
+    rect(img, 120, 14, 26, 12, (219, 166, 77))
+    hline(img, 120, 32, 26, (200, 196, 188))
+    hline(img, 120, 38, 20, (200, 196, 188))
+    rect(img, 120, 42, 14, 6, (202, 128, 116))
+    # counter with card reader
+    dim_ellipse(img, 150, 92, 226, 100, 0.93)
+    rect(img, 152, 64, 72, 6, (250, 249, 246))
+    hline(img, 152, 69, 72, (216, 212, 204))
+    rect(img, 154, 70, 4, 22, (218, 190, 150))
+    rect(img, 216, 70, 4, 22, (218, 190, 150))
+    rect(img, 196, 54, 12, 10, (52, 56, 72))
+    rect(img, 198, 56, 8, 6, (98, 112, 150))
+    # SIM rack on the counter
+    rect(img, 162, 56, 18, 8, (170, 176, 196))
+    for i in range(3):
+        rect(img, 164 + i * 5, 58, 3, 4, (219, 166, 77))
+    floor_plant(img, 226, 46)
+    return img
+
+def backdrop_supermarkt():
+    """Supermarket: shelf rows, checkout belt, Leergutautomat."""
+    img = Image.new('RGB', (W, H), WALL)
+    # cool tile floor
+    rect(img, 0, 52, W, H - 52, (230, 232, 234))
+    hline(img, 0, 52, W, (206, 208, 212))
+    for ty in range(52, H, 12):
+        hline(img, 0, ty, W, (216, 218, 222))
+    # back shelf wall with products
+    rect(img, 8, 8, 140, 44, (218, 190, 150))
+    for srow in range(3):
+        sy = 12 + srow * 13
+        hline(img, 8, sy + 10, 140, (188, 158, 118))
+        for scol in range(10):
+            c = [(202, 128, 116), (100, 144, 98), (219, 166, 77), (120, 126, 190)][ (srow + scol) % 4 ]
+            rect(img, 12 + scol * 13, sy, 9, 9, c)
+    # price tags
+    for scol in range(5):
+        rect(img, 14 + scol * 26, 50, 10, 4, (250, 250, 248))
+    # Leergutautomat, right wall
+    rect(img, 196, 12, 30, 46, (150, 156, 176))
+    rect(img, 200, 18, 22, 10, (52, 56, 72))
+    rect(img, 202, 20, 18, 6, (98, 112, 150))
+    rect(img, 206, 34, 10, 8, (40, 44, 58))     # bottle slot
+    rect(img, 200, 48, 8, 5, (219, 166, 77))    # bon slot
+    # checkout: belt + register
+    dim_ellipse(img, 30, 118, 130, 128, 0.93)
+    rect(img, 32, 90, 96, 8, (170, 176, 196))   # belt
+    rect(img, 34, 92, 92, 4, (64, 64, 74))
+    rect(img, 32, 98, 96, 22, (200, 196, 188))  # body
+    rect(img, 110, 78, 16, 12, (52, 56, 72))    # register
+    rect(img, 112, 80, 12, 8, (98, 112, 150))
+    floor_plant(img, 226, 60)
+    return img
+
 def backdrop_strasse():
     """Outside the Bürgeramt: modern concrete-and-glass, morning light."""
     img = Image.new('RGB', (W, H), (196, 220, 236))
@@ -439,6 +549,25 @@ DICT = [
 ]
 DICT_CMAP = {'k': OUT, 'j': INDIGO, 'w': (250, 250, 248)}
 
+# Reisepass, 12x14: burgundy passport booklet with crest band
+DOC_PASS = [
+    "kkkkkkkkkkkk",
+    "krrrrrrrrrrk",
+    "krrrrrrrrrrk",
+    "krrkkkkkkrrk",
+    "krrkjjjjkrrk",
+    "krrkjjjjkrrk",
+    "krrkkkkkkrrk",
+    "krrrrrrrrrrk",
+    "krrllllllrrk",
+    "krrrrrrrrrrk",
+    "krrllllrrrrk",
+    "krrrrrrrrrrk",
+    "krrrrrrrrrrk",
+    "kkkkkkkkkkkk",
+]
+DOC_PASS_CMAP = {'k': OUT, 'r': (140, 66, 50), 'j': (219, 166, 77), 'l': (196, 200, 210)}
+
 def sprite_png(rows, cmap, name):
     img = Image.new('RGBA', (len(rows[0]), len(rows)), (0, 0, 0, 0))
     for ry, row in enumerate(rows):
@@ -453,6 +582,9 @@ backdrop_amt().save(os.path.join(OUT_DIR, "amt.png"))
 backdrop_wartezimmer().save(os.path.join(OUT_DIR, "wartezimmer.png"))
 backdrop_wohnung().save(os.path.join(OUT_DIR, "wohnung.png"))
 backdrop_strasse().save(os.path.join(OUT_DIR, "strasse.png"))
+backdrop_terminal().save(os.path.join(OUT_DIR, "terminal.png"))
+backdrop_laden().save(os.path.join(OUT_DIR, "laden.png"))
+backdrop_supermarkt().save(os.path.join(OUT_DIR, "supermarkt.png"))
 sprite_png(SCHMIDT, SCHMIDT_CMAP, "schmidt.png")
 sprite_png(PLAYER_BACK, PLAYER_CMAP, "player.png")
 sprite_png(BAG, BAG_CMAP, "bag.png")
@@ -460,6 +592,7 @@ sprite_png(DOC_AUSWEIS, DOC_CMAP, "doc-ausweis.png")
 sprite_png(DOC_VERTRAG, DOC_CMAP, "doc-vertrag.png")
 sprite_png(DOC_WGB, DOC_CMAP, "doc-wgb.png")
 sprite_png(DICT, DICT_CMAP, "dict.png")
+sprite_png(DOC_PASS, DOC_PASS_CMAP, "doc-pass.png")
 
 # proportion check sheet (not shipped): player, chair row, Schmidt at 4x so
 # the world-scale ratios above are verifiable at a glance

@@ -72,7 +72,10 @@ export type SceneSetting =
   | "wohnung" // the player's room
   | "strasse" // street / outdoors
   | "wartezimmer" // Amt waiting room
-  | "amt"; // Bürgeramt service room (the scene-7 reference room)
+  | "amt" // Bürgeramt service room (the scene-7 reference room)
+  | "terminal" // airport/station hall (arrivals, departure board, G2)
+  | "laden" // small shop interior (phone shop, Späti, G2)
+  | "supermarkt"; // supermarket (shelves, checkout, G2)
 
 /** Battle status-effect flavor (GAME_DESIGN.md section 5). Cosmetic in G1. */
 export type BattleEffect = "beamtendeutsch" | "missverstaendnis" | "smalltalk";
@@ -83,6 +86,8 @@ interface SceneBase {
   /** Unique within the mission. */
   id: string;
   setting: SceneSetting;
+  /** Override the stage's where-am-I chip ("Flughafen · Ankunft"). */
+  label?: string;
   /**
    * Scene played after this one completes. Omitted only on a scene that
    * ends the mission (`end: "win"`) or routes exclusively via choices.

@@ -70,7 +70,16 @@ const CHAPTER_IDS = ["kap1", "kap2", "kap3", "kap4", "kap5", "kap6"];
 const SCENE_KINDS = [
   "cutscene", "websiteParody", "loadout", "listening", "dialogueBattle", "formCloze",
 ];
-const SCENE_SETTINGS = ["website", "wohnung", "strasse", "wartezimmer", "amt"];
+const SCENE_SETTINGS = [
+  "website",
+  "wohnung",
+  "strasse",
+  "wartezimmer",
+  "amt",
+  "terminal",
+  "laden",
+  "supermarkt",
+];
 const BATTLE_EFFECTS = ["beamtendeutsch", "missverstaendnis", "smalltalk"];
 // Sprite keys with real art in src/features/welt/stage.tsx NPC_SPRITES; an
 // npc.sprite outside this list silently renders nothing, so keep in sync.
@@ -547,6 +556,7 @@ function lintMissions(missions, refs) {
         continue;
       }
       if (!SCENE_SETTINGS.includes(s.setting)) error(ds, sw, `invalid setting "${s.setting}"`);
+      if (s.label !== undefined && !isStr(s.label)) error(ds, sw, "label must be a non-empty string");
       if (s.next !== undefined && !sceneKeys.includes(s.next))
         error(ds, sw, `next "${s.next}" is not a scene`);
       if (s.end !== undefined && s.end !== "win") error(ds, sw, `invalid end "${s.end}"`);
