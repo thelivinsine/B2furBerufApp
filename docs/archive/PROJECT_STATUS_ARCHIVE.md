@@ -7,6 +7,39 @@ authoritative full authorship record remains git history + `docs/SESSION_PROMPT_
 
 ---
 
+## Session 70 (2026-07-06) — UX redesign Phase 4 Session C (progression chip + wrap)
+
+**Phase 4 COMPLETE: tasks 4.5 (visible progression chip) + 4.6 (gates/docs wrap).** What 4.5 shipped:
+- **`src/lib/phase.ts` (new):** `themePhase(ratio)` maps a theme's existing mastery ratio to a
+  three-step **Aufbau → Festigen → Gemischt** label, reusing the app's two existing mastery bars
+  (`< 0.4` = Aufbau, `< 0.8` = Festigen matching the city `LIT_THRESHOLD`/engine `masteryLabel` bands,
+  `>= 0.8` = Gemischt matching the `mastery() >= 0.8` "mastered" bar). Pure derived function, no new
+  state: both call sites already compute the ratio.
+- **Fortschritt theme grid** (`features/analytics/Analytics.tsx`): each theme row shows a phase `Badge`.
+- **City-building tap** (`components/city/CityStrip.tsx`): the aria-label/title include the phase.
+- **Gates:** all green; `test:unit` 62, `test:srs` 323, `test:pronounce` 26, `check:bundle` 79.0 kB.
+
+---
+
+## Session 69 (2026-07-06) — UX redesign Phase 4 Session B (Lesen/Hören authentic input)
+
+**Phase 4 Session B COMPLETE: tasks 4.3 (Lesen/Hören text bank, PR #320 `f09da8e`) AND 4.4
+(reading/listening composer block + renderer, PR #322 `98c4688`).** What 4.4 shipped:
+- **New `kind: "reading"` `SessionBlock`** (`src/types/index.ts`): `textId` + a `listening` flag.
+- **Composer** (`src/engine/session.ts`): Pool 6 emits **exactly one** reading block per session;
+  prefers a text on the scoped/weak theme, else one in the active Mode lens, else any. A voicemail
+  text plays as a **listening** variant when the caller reports TTS (new pure `listening` opt, player
+  passes `ttsSupported()`); every other genre renders as readable text. `test:unit` gained 3 cases.
+- **`ReadingBlock` renderer** (`src/features/session/ReadingBlock.tsx`, extracted so `SessionPlayer`
+  stays under ~1000 lines): a two-stage full-screen focus block. Read/listen stage (genre + CEFR
+  badges, tap-gloss title, `Übersetzung` toggle; listening = TTS play/replay with a `Text anzeigen`
+  reveal fallback), then the 2–3 comprehension MCQs one at a time. `XP.readingCheck` (8) per correct
+  check; the block registers ONE aggregate tally (majority-correct) at completion, so it never
+  inflates correct/total, and it **never touches vocab FSRS**.
+- **Gates:** all green; `check:bundle` main chunk **78.9 kB** (bank + renderer ride the lazy chunk).
+
+---
+
 ## Sessions 40 → 4 (detailed logs)
 
 ### Session 40 (2026-06-26) — Triple collocations bank + hide example translations + Select dropdown overlay
@@ -2519,3 +2552,47 @@ founder's standing priority call stands: pivot to the game plan G1 (`docs/plans/
 still PROPOSED), whose formCloze / dialogue-battle scenes build on 4.1's tolerant typed grading, 4.2's
 typed-block pattern, and 4.4's authentic-input block pattern; or pick the next item off the founder
 backlog in `docs/PROJECT_REFERENCE.md`.
+
+---
+
+**Handoff after session 71 (2026-07-06). UX redesign audit + gap analysis, plus two follow-up fixes.**
+A code-level audit of redesign Phases 1–4 (report: `docs/plans/UX_AUDIT_2026-07-06.md`) verified every
+task against the real code (not the docs) and re-ran all gates green. Verdict: faithfully implemented,
+locked invariants intact (persist migration, FSRS latency, mobile bar + iOS fixes, eager-bundle budget,
+no em dashes). Two gaps were found and fixed the same session:
+- **Eager-bundle de-risk:** `src/features/dashboard/intentCards.ts` statically imported `filterVocab`
+  from the 245 kB vocabulary bank, used only by dead `cardMeta`/`cefrRange` helpers (kept out of the
+  main chunk by tree-shaking alone). Removed the dead helpers + imports so Heute's ~78 kB eager-path
+  invariant is now structural, not accidental. Main chunk unchanged (79.1 kB).
+- **Quest claim moment:** the plan promised a Can-Do "claim moment"; achievement was silently passive.
+  Added persisted `claimedMilestones: string[]` + `claimMilestone(id)` to `useSettingsStore` (rides
+  cloudSync via the settings jsonb blob, no version bump). Fortschritt now shows a reward-gold,
+  spring-in "Quest geschafft · <Thema>" card with an "Einlösen" button for any achieved-but-unclaimed
+  milestone, advancing to the next win; reduced-motion honored. New `claimMilestone` idempotency test.
+- **Gates:** all green — `build`, `typecheck`, `lint` (0 errors), `lint:content`, `test:unit` **63**
+  (+1), `check:bundle` main chunk **79.1 kB**. Non-blocking gaps left documented in the audit report
+  (word-order quiz has no FSRS latency sample; `bank`/`wohnhaus` city buildings await content packs;
+  onboarding defers name/exam-date to Settings, which covers them).
+
+**Next step:** pivot to game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, still PROPOSED) or pick
+the next founder-backlog item in `docs/PROJECT_REFERENCE.md`.
+
+---
+
+**Handoff after session 71 (2026-07-06). Frontend design/brand audit is DONE (doc-only, no code
+changed): `docs/plans/DESIGN_AUDIT_2026-07-06.md`.** The founder asked for a thorough audit of the
+frontend design, brand and visual assets with weaknesses + top 5 recommendations. Findings in short:
+the token/component architecture is strong (keep it), but (A) there are **zero social link-preview
+assets** (no `og:`/`twitter:` meta, no OG image, no canonical URL), (B) **five parallel accent
+systems** (tokens, nav hexes, theme gradients, hub/intent gradients, building hexes; three
+near-identical brand indigos `#5d52e0`/`#5b5be6`/`#6366f1`), (C) a **wrong-theme boot flash** for
+light-mode users (`index.html` hardcodes `class="dark"` + dark-only `theme-color`, default themeMode
+is `system`), (D) **unregulated Denglish** copy (CTA labels disagree, "a Arztbesuch", `lang="en"` vs
+manifest `lang: "de"`), and (E) **contrast failures** (`text-warning` ~2.2:1 on light) plus
+button-instead-of-link navigation on the landing page. The report's top-5 recommendations are ordered
+by impact ÷ effort; #1 (OG/social meta + share image) is roughly an hour and the highest external
+impact.
+
+**Next step:** pick recommendations off the audit (start with #1 social meta, then #2 palette
+consolidation), or continue the standing alternative: game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`,
+still PROPOSED). Phase 4 of the UX redesign is complete (session 70).

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   AreaChart,
   Area,
@@ -229,8 +230,25 @@ export function Analytics() {
 
   const redemittelPractised = Object.keys(redemittelSeen).length;
 
-  // The next claimable Can-Do quest: the not-yet-achieved milestone closest to
-  // its threshold, so the quest card always points at the nearest win.
+  const claimedMilestones = useSettingsStore((s) => s.claimedMilestones);
+  const claimMilestone = useSettingsStore((s) => s.claimMilestone);
+
+  // Claimable quests: milestones already achieved (theme ratio >= threshold) but
+  // not yet acknowledged. Claiming one is the "reward moment" the redesign calls
+  // for; the card then advances to the next unclaimed win.
+  const claimable = useMemo(
+    () =>
+      canDoGroups.flatMap(({ theme, ratio, items }) =>
+        items
+          .filter((c) => ratio >= c.threshold && !claimedMilestones.includes(c.id))
+          .map((item) => ({ theme, item })),
+      ),
+    [canDoGroups, claimedMilestones],
+  );
+  const nextClaim = claimable[0] ?? null;
+
+  // The next quest to chase: the not-yet-achieved milestone closest to its
+  // threshold, so the quest card always points at the nearest win.
   const nextQuest = useMemo(() => {
     const upcoming = canDoGroups.flatMap(({ theme, ratio, items }) =>
       items
@@ -261,7 +279,42 @@ export function Analytics() {
       {/* City view — the quest board's map: mastery lights the skyline. */}
       <CityStrip />
 
-      {/* Next quest — the single nearest Can-Do milestone, claimable on tap. */}
+      {/* Claim moment — an achieved milestone waiting to be collected. Reward-gold,
+          spring-in; claiming advances to the next unclaimed win. */}
+      <AnimatePresence mode="popLayout">
+        {nextClaim && (
+          <motion.div
+            key={nextClaim.item.id}
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ type: "spring", stiffness: 320, damping: 26 }}
+          >
+            <Card className="border-reward/40 bg-reward-bg">
+              <CardContent className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-start gap-3">
+                  <Trophy className="mt-0.5 h-5 w-5 shrink-0 text-reward" />
+                  <div>
+                    <p className="text-sm font-medium text-reward">
+                      Quest geschafft · {nextClaim.theme.titleDe}
+                    </p>
+                    <p className="mt-1 text-base font-semibold">{nextClaim.item.statement}</p>
+                  </div>
+                </div>
+                <Button
+                  className="bg-reward text-white hover:bg-reward/90"
+                  onClick={() => claimMilestone(nextClaim.item.id)}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Einlösen{claimable.length > 1 ? ` (${claimable.length})` : ""}
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Next quest — the single nearest Can-Do milestone still to be reached. */}
       {nextQuest ? (
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">

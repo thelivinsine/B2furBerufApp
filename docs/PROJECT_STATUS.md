@@ -1,14 +1,17 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 70: UX redesign **Phase 4 is COMPLETE ✅**. Session C shipped the
-last two tasks: **4.5** the Aufbau/Festigen/Gemischt progression chip (`src/lib/phase.ts`, a pure
-derived label on the existing theme-mastery ratio, no new state) on the Fortschritt theme grid and the
-city-building tap label, and **4.6** this gates/docs wrap. Sessions A (4.1–4.2, typed recall) and B
-(4.3–4.4, Lesen/Hören authentic input) shipped in sessions 68–69; full detail for all of Phase 4 is in
-the "Resume here" handoffs below and the archive. Session 62's game plan,
-`docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED and is now the standing next-step candidate
-now that redesign Phases 1–4 are all shipped. The working branch is reassigned every session, so
-**`main` is always the source of truth**. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-06 (session 62 continued: **detailed game design DRAFTED** in
+`docs/strategy/GAME_DESIGN.md` + a founder slide deck, awaiting review; see the top "Resume here"
+handoff. Prior update, session 71: two parallel audits. **(1) UX redesign audit + gap analysis**
+(report: `docs/plans/UX_AUDIT_2026-07-06.md`) confirmed redesign Phases 1–4 are faithfully implemented,
+all gates green; two gaps were found and fixed the same session: a latent eager-bundle landmine (dead
+`cardMeta`/`cefrRange` + `filterVocab` import removed from `intentCards.ts`) and the missing quest
+"claim moment" (new persisted `claimedMilestones` + a reward-gold "Einlösen" card on Fortschritt).
+**(2) Frontend design/brand audit** (`docs/plans/DESIGN_AUDIT_2026-07-06.md`, doc-only) flagged missing
+social-preview meta, five parallel accent systems, a light-mode boot flash, Denglish copy, and contrast
+failures. Session 62's game plan, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, remains PROPOSED. The working
+branch is reassigned every session, so **`main` is always the source of truth**. Product name:
+**Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
@@ -184,31 +187,39 @@ Doc updates shipped with the blessing: `GAME_CONCEPT.md` Visuals pillar + open q
 
 **Next step:** start game plan G1 (`docs/plans/GAME_IMPLEMENTATION_PLAN.md`: Mission/Scene schema
 + `engine/mission.ts` + lint checks first, then scene renderers and the Anmeldung mission
-content), building game UI surfaces to the scene-7 style.
+content), building game UI surfaces to the scene-7 style. The narrative layer for G1 is the
+freshly drafted `docs/strategy/GAME_DESIGN.md` (see the next handoff below).
 
 ---
 
-**Handoff after session 71 (2026-07-06). Frontend design/brand audit is DONE (doc-only, no code
-changed): `docs/plans/DESIGN_AUDIT_2026-07-06.md`.** The founder asked for a thorough audit of the
-frontend design, brand and visual assets with weaknesses + top 5 recommendations. Findings in short:
-the token/component architecture is strong (keep it), but (A) there are **zero social link-preview
-assets** (no `og:`/`twitter:` meta, no OG image, no canonical URL), (B) **five parallel accent
-systems** (tokens, nav hexes, theme gradients, hub/intent gradients, building hexes; three
-near-identical brand indigos `#5d52e0`/`#5b5be6`/`#6366f1`), (C) a **wrong-theme boot flash** for
-light-mode users (`index.html` hardcodes `class="dark"` + dark-only `theme-color`, default themeMode
-is `system`), (D) **unregulated Denglish** copy (CTA labels disagree, "a Arztbesuch", `lang="en"` vs
-manifest `lang: "de"`), and (E) **contrast failures** (`text-warning` ~2.2:1 on light) plus
-button-instead-of-link navigation on the landing page. The report's top-5 recommendations are ordered
-by impact ÷ effort; #1 (OG/social meta + share image) is roughly an hour and the highest external
-impact.
-
-**Next step:** pick recommendations off the audit (start with #1 social meta, then #2 palette
-consolidation), or continue the standing alternative: game plan G1 (`GAME_IMPLEMENTATION_PLAN.md`,
-still PROPOSED). Phase 4 of the UX redesign is complete (session 70).
+**Handoff after session 62 continued (2026-07-06). Detailed game design DRAFTED, awaiting founder
+review: `docs/strategy/GAME_DESIGN.md`.** The founder asked for a detailed gameplan with storyline,
+per-mission descriptions, game elements and player interaction, delivered as a slide deck. The deck
+(21 slides) was delivered as a Claude Artifact AND committed as
+**`docs/strategy/GAME_DESIGN_DECK.html`** (self-contained, open in any browser; added after the
+Artifact link failed for the founder); the durable source of truth is the new
+**`docs/strategy/GAME_DESIGN.md`**, the design layer between `GAME_CONCEPT.md` (pillars) and
+`GAME_IMPLEMENTATION_PLAN.md` (build). Contents: premise + character creation (you arrive with two
+suitcases and a reason; no villain, everyday Germany is the antagonist); the city **"Neustadt"** and
+game working title **"Neuland"** (both proposals); a six-NPC recurring cast (Jonas the wild-card
+friend, Frau Schmidt vom Bürgeramt, Ayşe the WG flatmate, Hausmeister Krause, Chefin Frau Weber,
+Späti-owner Herr Nguyen); the core loop (map → bag loadout → scenes → loot → FSRS recurrence); the
+interaction model (D/E on every line, tap→type→speak input ladder, register-marked choices, playable
+parody documents); conversation battles (Geduld vs Standing bars, Redemittel moves, K-II crits, kind
+status effects); the bag item taxonomy (Wortkarten Lv1–5, Redemittel moves, Grammatik-Kräfte,
+Schlüssel-Dokumente, consumables, Fundstücke); failure-is-content rules restated; and the full
+authored spine: **seven chapters / ~40 described missions** (K1 Ankommen 6 incl. the Anmeldung boss
+= the vertical slice, K2 Wohnen 6, K3 Geld & Papierkram 5, K4 Die Jobsuche 7 ending on the
+Vorstellungsgespräch boss, K5 Im Büro 5 mapping the workplace themes with the Dienstreise boss, K6
+Gesund & Sozial 6, K7 Mein Ziel with 5 player-chosen endgame chains where the exam is one optional
+path per the scope guardrail; **structural rule from founder review: every chapter ends on its
+boss**), plus real-world side quests and tone/art rules. Of its three open decisions, the
+**art blessing is now resolved** (see the session-72 handoff above); names and chapter-1
+sign-off remain open. **Next step: game G1 per `GAME_IMPLEMENTATION_PLAN.md`.**
 
 ---
 
-_Older handoffs (sessions 2–70) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
+_Older handoffs (sessions 2–71) live in `docs/archive/PROJECT_STATUS_ARCHIVE.md`._
 
 **Content counts (verified from `src/data/*` on 2026-07-03):**
 - Vocabulary: **528 words**
