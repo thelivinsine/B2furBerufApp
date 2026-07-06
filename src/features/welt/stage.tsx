@@ -7,6 +7,10 @@ import wohnungUrl from "./assets/wohnung.png";
 import strasseUrl from "./assets/strasse.png";
 import schmidtUrl from "./assets/schmidt.png";
 import playerUrl from "./assets/player.png";
+import bagUrl from "./assets/bag.png";
+import docAusweisUrl from "./assets/doc-ausweis.png";
+import docVertragUrl from "./assets/doc-vertrag.png";
+import docWgbUrl from "./assets/doc-wgb.png";
 
 /**
  * The Neuland stage + game-UI atoms (game phase G1), styled to the blessed
@@ -28,11 +32,29 @@ const SETTING_ART: Record<SceneSetting, string | null> = {
   amt: amtUrl,
 };
 
+/** Where-am-I caption per setting, shown as a chip on the stage. */
+const SETTING_LABEL: Record<SceneSetting, string | null> = {
+  website: null,
+  wohnung: "Deine Wohnung",
+  strasse: "Neustadt",
+  wartezimmer: "Bürgeramt · Wartezimmer",
+  amt: "Bürgeramt · Schalter 2",
+};
+
 /** Character sprites (transparent PNGs) keyed by GameNpc.sprite. */
 export const NPC_SPRITES: Record<string, string> = {
   schmidt: schmidtUrl,
 };
 export const PLAYER_SPRITE = playerUrl;
+export const BAG_SPRITE = bagUrl;
+
+/** Pixel document icons for loadout slots, keyed by key-item id. */
+export const DOC_ICONS: Record<string, string> = {
+  ki_personalausweis: docAusweisUrl,
+  ki_mietvertrag: docVertragUrl,
+  ki_wohnungsgeberbestaetigung: docWgbUrl,
+};
+export const DOC_ICON_FALLBACK = docVertragUrl;
 
 /** Brand accents, mirroring the scene-7 mockup palette. */
 export const GAME_INDIGO = "#5b5be6";
@@ -42,12 +64,16 @@ export function PixelStage({
   setting,
   children,
   className,
+  label,
 }: {
   setting: SceneSetting;
   children?: ReactNode;
   className?: string;
+  /** Override the where-am-I chip; pass null to hide it. */
+  label?: string | null;
 }) {
   const src = SETTING_ART[setting];
+  const caption = label === undefined ? SETTING_LABEL[setting] : label;
   return (
     <div
       className={cn("relative w-full overflow-hidden rounded-2xl", className)}
@@ -61,6 +87,11 @@ export function PixelStage({
           className="absolute inset-0 h-full w-full select-none object-cover"
           style={{ imageRendering: "pixelated" }}
         />
+      )}
+      {caption && (
+        <span className="absolute right-2 top-2 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-500 shadow-soft">
+          {caption}
+        </span>
       )}
       {children}
     </div>

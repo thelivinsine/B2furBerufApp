@@ -192,6 +192,10 @@ the Anmeldung vertical slice are live behind `/welt` (Beta).** What exists now:
 - Verified end-to-end in the sandbox browser (full mission playthrough, zero console errors); all
   gates green (typecheck, eslint, lint:content, 90+ unit tests, SRS/pronounce vectors, bundle
   79.5 kB main / game in its own ~53 kB lazy chunk).
+- **First founder playtest feedback applied same-session** ("image unclear, too much text"): the
+  loadout stage now shows an open bag whose document slots visibly fill as you pack (new sprites),
+  every stage carries a where-am-I location chip, and per-scene text was cut (no loadout intro or
+  English checklist, listening explanation only on wrong answers, tighter website parody).
 - The game schema is aligned to **design v3** (PR #336, merged from a parallel session mid-build:
   six-chapter spine, Im Büro inside the Mein Ziel career chain, Pfand economy): `ChapterId`, the
   `chapters` registry and the linter mirror all carry the six chapters. Kapitel 1 was untouched

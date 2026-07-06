@@ -127,10 +127,6 @@ export const missions: Mission[] = [
         headingEn: "Appointment booking · Neustadt citizens' office",
         lines: [
           {
-            de: "Dienstleistung: Anmeldung einer Wohnung",
-            en: "Service: registering a residence",
-          },
-          {
             de: "Hinweis: Die Anmeldung ist innerhalb von zwei Wochen nach Einzug gesetzlich vorgeschrieben.",
             en: "Note: registration is legally required within two weeks of moving in.",
           },
@@ -231,10 +227,6 @@ export const missions: Mission[] = [
         kind: "loadout",
         setting: "wohnung",
         next: "wartezimmer",
-        intro: {
-          de: "Was braucht das Amt? Pack die Tasche.",
-          en: "What does the office need? Pack your bag.",
-        },
         cta: { de: "Zum Wartezimmer", en: "To the waiting room" },
         slots: [
           { id: "s_ausweis", vocabId: "v_personalausweis", grantsItem: "ki_personalausweis" },
@@ -254,10 +246,6 @@ export const missions: Mission[] = [
         kind: "listening",
         setting: "wartezimmer",
         next: "schmidt",
-        intro: {
-          de: "Deine Nummer: 112. Aktueller Aufruf: 107. Zeit, die Ohren zu spitzen.",
-          en: "Your number: 112. Now serving: 107. Time to prick up your ears.",
-        },
         ticker: { label: "Aufruf", current: "107", yours: "112" },
         audio: [
           {
