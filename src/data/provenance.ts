@@ -16943,6 +16943,54 @@ export const provenance: ProvenanceEntry[] = [
     notes: "themeId=bildung; cefr=B2.2; kind=letter. Authored authentic-style text (fictitious names/numbers); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
   },
   {
+    content_id: "tx_arzt_merkblatt_antibiotika",
+    content_type: "text",
+    label: "Merkblatt: Einnahme von Antibiotika",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=arzt; cefr=B2.1; kind=announcement; subThemeId=arzt.behandlung. Authored authentic-style text (fictitious names/numbers); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_wohnen_aushang_heizung",
+    content_type: "text",
+    label: "Aushang: Wartung der Heizungsanlage",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=wohnen; cefr=B1.2; kind=announcement; subThemeId=wohnen.probleme. Authored authentic-style text (fictitious names/numbers); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_bank_letter_lastschrift",
+    content_type: "text",
+    label: "Rückgabe einer Lastschrift",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bank; cefr=B2.1; kind=letter; subThemeId=bank.zahlung. Authored authentic-style text (fictitious names/numbers); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "tx_bildung_voicemail_pruefung",
+    content_type: "text",
+    label: "Nachricht: Ihr Prüfungstermin",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bildung; cefr=B1.2; kind=voicemail; subThemeId=bildung.pruefung. Authored authentic-style text (fictitious names/numbers); CEFR band calibrated against the CoE level descriptors (cited, not reproduced). Verify German accuracy in the founder pass."
+  },
+  {
     content_id: "sc_sprachkursberatung",
     content_type: "dialogue",
     label: "Szenario: Beratung zum Sprachkurs",

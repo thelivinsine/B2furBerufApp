@@ -1634,3 +1634,40 @@ Branch: `claude/whats-next-esga9u`.
   database plan). No product code touched.
 - **Artifacts:** `docs/PROJECT_REFERENCE.md` (backlog #33–#35), `docs/PROJECT_STATUS.md` (Resume-here
   pointer), `docs/SESSION_PROMPT_LOG.md` (entries 219–220).
+
+## Entry 221 — 2026-07-07 (session 80)
+- **Branch:** `claude/top-value-tasks-842u60`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > based on the project documentation what are the top 3 most value added tasks to work on next?
+- **Response summary:** Research-only answer. Read `PROJECT_STATUS.md` + `PROJECT_REFERENCE.md` and
+  recommended, ranked, as a CTO: (1) **EU AI Act Article 50 transparency (#21)** — hard 2 Aug 2026
+  deadline, cheap, de-risking; (2) **SEO + landing FAQ/copy (#10/#11/#12)** — the product is
+  feature-complete but has had no acquisition work; (3) **deepen the daily-life content + verify the draft
+  rows** — the repositioning's core differentiation, with the newest packs still shallow. Noted the built
+  roadmap's own next rung (Phase D, the AI jury) but ranked it below, since it is the first *paid* rung and
+  parked items #33–35 were deferred by the founder.
+- **Artifacts:** none (advice; no files changed).
+
+## Entry 222 — 2026-07-07 (session 80)
+- **Branch:** `claude/top-value-tasks-842u60`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > isn't the first point already done? if not, do it. work on all three now
+- **Response summary:** Verified and executed all three. **#21:** the Art. 50 *copy* was already live
+  (`WritingHub.tsx` point-of-use notice + "KI-generierte Rückmeldung" label + `PrivacyPolicy.tsx` DE/EN AI
+  section); the missing piece was the documented Article 6(3) risk assessment, now written as
+  **`docs/strategy/AI_ACT_RISK_ASSESSMENT.md`** (v1.0: not high-risk/limited-risk, Art. 6(3) derogation,
+  profiling flagged for counsel). **SEO:** added Open Graph + Twitter meta, canonical, and two JSON-LD
+  graphs (WebApplication + FAQPage) to `index.html`; added `public/robots.txt` + `public/sitemap.xml`; added
+  a "Wie funktioniert Genauly?" 3-step strip and a 6-item FAQ accordion to `LandingPage.tsx`. **Content:**
+  +4 reading texts (18→22, checks 54→66), one per newest daily-life theme covering a new sub-theme + new
+  kind, with +4 provenance rows (1408→1412, all draft). All gates green (`lint:content`, `build`,
+  `check:bundle` 83 kB, `lint` 0 errors, `test:unit` 85). Marked #21 CLOSED in `PROJECT_REFERENCE.md`.
+- **Artifacts:** `docs/strategy/AI_ACT_RISK_ASSESSMENT.md` (new), `index.html`, `public/robots.txt` (new),
+  `public/sitemap.xml` (new), `src/features/landing/LandingPage.tsx`, `src/data/texts.ts`,
+  `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/PROJECT_REFERENCE.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md` (entries
+  221–222). Commit SHAs + PR # to be filled on push/merge.

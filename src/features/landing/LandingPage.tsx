@@ -49,6 +49,51 @@ const features = [
   },
 ];
 
+const howItWorks = [
+  {
+    step: "1",
+    title: "Pick a real situation",
+    desc: "Choose a life domain: work, Behörde, Arzt, Wohnen, Bank or exam prep. Each one mirrors the German you actually need.",
+  },
+  {
+    step: "2",
+    title: "Practise, out loud and in writing",
+    desc: "Play branching dialogues, drill Wortschatz with spaced repetition, take leveled quizzes and speak with speech recognition.",
+  },
+  {
+    step: "3",
+    title: "Get feedback, track Fortschritt",
+    desc: "One clear AI tip on your biggest Schwäche, plus Can-Do milestones and progress that sync across your devices.",
+  },
+];
+
+const faqs = [
+  {
+    q: "Who is Genauly for?",
+    a: "Adults who already know basic German (around B1) and want to become confident in real-life situations at work and in daily life. It also suits anyone preparing for the telc Deutsch B2 Beruf or Goethe-Zertifikat B2 exam.",
+  },
+  {
+    q: "Is Genauly free?",
+    a: "Yes. You can start for free with no account. Signing in is optional and saves your Fortschritt across your devices.",
+  },
+  {
+    q: "What level is Genauly for?",
+    a: "The intermediate plateau, roughly B1 to B2. Content is tagged by CEFR level, so you can start where you are comfortable and level up at your own pace.",
+  },
+  {
+    q: "Does Genauly help with the telc B2 Beruf or Goethe B2 exam?",
+    a: "Yes. Exam preparation is one pillar of the app, with themed vocabulary, Redemittel, timed speaking simulations and reading and listening practice aligned to those exams.",
+  },
+  {
+    q: "How does the AI writing feedback work?",
+    a: "You write a short text and get one clear, prioritised tip on your biggest weakness. A grammar checker categorises errors first, and an AI model is used only when a deeper read helps. The feedback is AI-generated and clearly marked as such.",
+  },
+  {
+    q: "Do I need to install anything?",
+    a: "No. Genauly runs in your browser and can be added to your home screen as an app. It works on Handy, Tablet and Laptop.",
+  },
+];
+
 export function LandingPage() {
   const navigate = useNavigate();
   const onboarded = useSettingsStore((s) => s.onboarded);
@@ -188,6 +233,55 @@ export function LandingPage() {
               <h3 className="mt-3 font-semibold">{f.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{f.desc}</p>
             </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="relative z-10 mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+        <h2 className="text-center text-xl font-semibold tracking-tight sm:text-2xl">
+          Wie funktioniert Genauly?
+        </h2>
+        <p className="mx-auto mt-2 max-w-xl text-center text-sm text-muted-foreground sm:text-base">
+          Three steps, no textbook required. Learn by doing the things you actually need to do in
+          German.
+        </p>
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {howItWorks.map((s, i) => (
+            <motion.div
+              key={s.step}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.05 * i }}
+              className="rounded-2xl border border-border bg-surface/70 p-5 shadow-soft backdrop-blur"
+            >
+              <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent-gradient text-sm font-bold text-white">
+                {s.step}
+              </div>
+              <h3 className="mt-3 font-semibold">{s.title}</h3>
+              <p className="mt-1 text-sm text-muted-foreground">{s.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="relative z-10 mx-auto max-w-3xl px-4 pb-16 sm:px-6">
+        <h2 className="text-center text-xl font-semibold tracking-tight sm:text-2xl">
+          Häufige Fragen
+        </h2>
+        <div className="mt-6 space-y-3">
+          {faqs.map((f) => (
+            <details
+              key={f.q}
+              className="group rounded-2xl border border-border bg-surface/70 p-5 shadow-soft backdrop-blur [&_summary::-webkit-details-marker]:hidden"
+            >
+              <summary className="flex cursor-pointer items-center justify-between gap-3 font-semibold">
+                {f.q}
+                <ArrowRight className="h-4 w-4 shrink-0 text-primary transition-transform group-open:rotate-90" />
+              </summary>
+              <p className="mt-2 text-sm text-muted-foreground">{f.a}</p>
+            </details>
           ))}
         </div>
       </section>
