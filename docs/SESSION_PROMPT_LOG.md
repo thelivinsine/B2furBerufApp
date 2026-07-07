@@ -1481,4 +1481,18 @@ Branch: `claude/whats-next-esga9u`.
   `scripts/vendor/german-nouns-subset.json`, `package.json` (`build:nouns-subset` + `build:oracles`),
   `.github/workflows/validate.yml`, `docs/strategy/DATA_STRATEGY.md`,
   `docs/reports/verify-facts-report.md`, `docs/PROJECT_STATUS.md`,
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. PR + commit: see below.
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. Shipped via **PR #354**
+  (squash-merged, `37073b4`), then the post-merge branch realignment.
+
+## Entry 214 — 2026-07-07 (session 77)
+- **Branch:** `claude/data-strategy-plan-78r0jq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session and give me a prompt to continue the work in a new session
+- **Response summary:** The session's substantive docs were already updated and merged in entry 213
+  (`PROJECT_STATUS.md` handoff + header, `DATA_STRATEGY.md` v1.2, `CLAUDE.md` gate note, regenerated
+  report, W28 archive move). Appended this prompt-log entry and shipped the doc-only change, then handed
+  the founder a ready-to-paste continuation prompt for the next session (Phase B / Layer 3: LanguageTool
+  sentence grammar; plus optional Layer-2 coverage polish and the Phase C `verification` trust block).
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`. PR + commit: see below.
