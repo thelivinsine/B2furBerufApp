@@ -1670,4 +1670,21 @@ Branch: `claude/whats-next-esga9u`.
   `public/sitemap.xml` (new), `src/features/landing/LandingPage.tsx`, `src/data/texts.ts`,
   `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/PROJECT_REFERENCE.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md` (entries
-  221–222). Commit SHAs + PR # to be filled on push/merge.
+  221–222). Shipped as PR #360 (squash-merged to `main`, commit `cb7d9dc`).
+
+## Entry 223 — 2026-07-07 (session 80)
+- **Branch:** `claude/top-value-tasks-842u60`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > it's live now. What's next?
+- **Response summary:** Recommended the next push and offered four directions via a choice prompt; the
+  founder picked **"Deepen daily-life content."** Executed: added **5 exam sets** (`examSets` 10→15), one per
+  daily-life theme (behoerde/arzt/wohnen/bank/bildung), each a telc-style joint-planning speaking simulation
+  referencing the theme's existing scenario and reusing `sharedRubric`, so every life domain now has
+  exam-prep parity with the workplace themes (previously workplace-only). +5 `exam_set` provenance rows
+  (draft), 1412→1417. `ExamHub` maps over all sets unfiltered, so they surface immediately. Gates green
+  (`lint:content` 15 examSets / 1417 rows, `build`, `check:bundle` 83 kB, `test:unit` 85). Docs updated
+  (handoff follow-on, counts, CLAUDE.md provenance count).
+- **Artifacts:** `src/data/examSets.ts`, `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 223). Commit SHA + PR # to be filled on push/merge.

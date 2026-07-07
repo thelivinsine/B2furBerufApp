@@ -204,8 +204,8 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
 - **Provenance register (`src/data/provenance.ts`, added 2026-06-15):** one `ProvenanceEntry` row per
   content_id, tracking `origin` (authored/sourced/adapted), `reference` (Wiktionary/DWDS/Tatoeba URL),
   `license` (SPDX from the allowlist), `review_status` (draft/verified), and who added/verified it.
-  All 1,412 content items have provenance rows, every one carrying a non-empty `reference` (so the
-  back-fill queue is empty); 1,387 are `review_status: "draft"` and 25 are `"verified"` (the founder-
+  All 1,417 content items have provenance rows, every one carrying a non-empty `reference` (so the
+  back-fill queue is empty); 1,392 are `review_status: "draft"` and 25 are `"verified"` (the founder-
   approved Can-Do bank). Game missions get one row per mission id (scenes/moves/checks ride on it,
   like text-bank checks). The back-fill queue (items with empty
   `reference`) shows as linter warnings. **When adding new content:** add a corresponding row in

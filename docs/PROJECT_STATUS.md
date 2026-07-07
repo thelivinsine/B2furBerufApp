@@ -200,7 +200,18 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 `lint` (0 errors), `test:unit` (85 pass). **Follow-ups:** (a) the 4 new texts read as `unverified` tier
 until the next `build:verification` sweep (needs the grammar sidecar; deferred, not a gate); (b) a proper
 1200×630 OG image would beat the square PWA icon now referenced; (c) founder still verifies live SEO/FAQ
-and reviews the draft German. `#21` marked closed in `PROJECT_REFERENCE.md`.
+and reviews the draft German. `#21` marked closed in `PROJECT_REFERENCE.md`. **All merged live via PR #360.**
+
+**Follow-on (same session 80, after the founder confirmed live and picked "deepen daily-life content"):**
+added **5 exam sets** (`examSets` 10→**15**), one per daily-life theme (behoerde/arzt/wohnen/bank/bildung),
+so **every life domain now has an exam-prep speaking simulation** (previously workplace-only). Each is a
+telc-style **joint-planning** task referencing the theme's existing scenario (`ex_behoerde`→sc_anmeldung,
+`ex_arzt`→sc_arztbesuch, `ex_wohnen`→sc_wohnungsbesichtigung, `ex_bank`→sc_kontoeroeffnung,
+`ex_bildung`→sc_sprachkursberatung), reusing `sharedRubric`. +5 `exam_set` provenance rows (draft),
+1412→**1417**. `ExamHub` maps over all sets with no theme filter, so they surface immediately. Gates green
+again (`lint:content` 15 examSets / 1417 rows, `build`, `check:bundle` 83 kB, `test:unit` 85). **Next
+depth step for daily-life:** a 2nd branching dialogue per theme (each has only 1) and clearing the draft
+Can-Do/text/exam review queue (founder sign-off).
 
 ---
 
@@ -235,13 +246,13 @@ _Older handoffs (sessions 1–78) are archived by ISO week under `docs/archive/s
 - Collocations: **540 Nomen-Verb pairs** (~36/theme; +36 each for Arzt/Wohnen/Bank/Bildung in s75)
 - Grammar: **47 drills** · **10 topics**
 - Dialogues (branching scenarios): **16** (+Arztbesuch, +Wohnungsbesichtigung, +Kontoeröffnung, +Sprachkursberatung in s75)
-- Exam sets: **10** (1 per workplace theme · 6–7 min · sharedRubric)
+- Exam sets: **15** (10 workplace + 5 daily-life: behoerde/arzt/wohnen/bank/bildung, added s80 · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
 - Can-Do milestones: **37** (all 15 themes; workplace/behoerde founder-verified, daily-life packs draft)
 - Lese-/Hörtexte: **22** texts / **66** comprehension checks (+2 each for Arzt/Wohnen/Bank/Bildung in s75; +1 each in s80 covering a new sub-theme per daily-life theme)
 - Themes: **15** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank` + `bildung`; all six domains now populated)
 - Game missions (Neuland): **1** (the chapter-1 Anmeldung boss, 9 scenes) · 6 NPCs · 4 key items
-- Provenance rows: **1,412** (all with a `reference`; 1,387 `draft` / 25 `verified`)
+- Provenance rows: **1,417** (all with a `reference`; 1,392 `draft` / 25 `verified`)
 - Verification tiers (Layer C, generated `src/data/verification.ts`): **25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-attested)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is

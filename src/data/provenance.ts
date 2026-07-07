@@ -8265,6 +8265,66 @@ export const provenance: ProvenanceEntry[] = [
     notes: "themeId=travel; scenarioId=sc_dienstreise. Authored exam simulation; verify task sheet + rubric accuracy when back-filling."
   },
   {
+    content_id: "ex_behoerde",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Behördengänge organisieren",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=behoerde; scenarioId=sc_anmeldung. Authored joint-planning exam simulation (daily-life parity, s80); verify task sheet + rubric accuracy when back-filling."
+  },
+  {
+    content_id: "ex_arzt",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Arzttermine organisieren",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=arzt; scenarioId=sc_arztbesuch. Authored joint-planning exam simulation (daily-life parity, s80); verify task sheet + rubric accuracy when back-filling."
+  },
+  {
+    content_id: "ex_wohnen",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Wohnung gemeinsam entscheiden",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=wohnen; scenarioId=sc_wohnungsbesichtigung. Authored joint-planning exam simulation (daily-life parity, s80); verify task sheet + rubric accuracy when back-filling."
+  },
+  {
+    content_id: "ex_bank",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Finanzen gemeinsam planen",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bank; scenarioId=sc_kontoeroeffnung. Authored joint-planning exam simulation (daily-life parity, s80); verify task sheet + rubric accuracy when back-filling."
+  },
+  {
+    content_id: "ex_bildung",
+    content_type: "exam_set",
+    label: "Prüfungssimulation: Sprachkurs gemeinsam planen",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bildung; scenarioId=sc_sprachkursberatung. Authored joint-planning exam simulation (daily-life parity, s80); verify task sheet + rubric accuracy when back-filling."
+  },
+  {
     content_id: "r_sug1",
     content_type: "redemittel",
     label: "Ich würde vorschlagen, dass wir …",
