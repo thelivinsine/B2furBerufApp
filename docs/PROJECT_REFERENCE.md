@@ -190,13 +190,16 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       for Google's OAuth consent crop (not in the repo).
     - Recommended model: **Fable** for the design direction, then **Sonnet** for the mechanical
       asset regeneration + wiring.
-21. **EU AI Act Article 50 transparency (added 2026-06-15, from the #19 research):** before **2 Aug
-    2026**, add a clear disclosure wherever the app gives AI feedback that the feedback is AI-generated
-    and that the user is interacting with an AI. Small UI/copy change (likely a one-line note on the
-    Schreibtraining/feedback surfaces + a line in the privacy policy). Also write the documented
-    **Article 6(3) risk assessment** (are we high-risk? answer the profiling question) so it exists on
-    file. Detail and sources in `docs/strategy/CERTIFICATION_RESEARCH.md`. Confirm scope with the lawyer (#15).
-    Recommended model: **Sonnet** (mechanical), legal nuance to **Opus**.
+21. **EU AI Act Article 50 transparency (added 2026-06-15, from the #19 research) — CLOSED (s80,
+    2026-07-07).** Both parts done: (1) the Art. 50 transparency **copy** is live — a point-of-use
+    disclosure on `/writing` (`WritingHub.tsx`: text is sent to an AI, output is "KI-generierte
+    Rückmeldung" and may contain errors) plus a dedicated DE/EN "KI-Schreibfeedback: wohin dein Text
+    geht" section in `PrivacyPolicy.tsx`; (2) the documented **Article 6(3) risk assessment** now exists
+    on file at **`docs/strategy/AI_ACT_RISK_ASSESSMENT.md`** (v1.0): assesses Genauly as not high-risk /
+    limited-risk, relies on the Art. 6(3) narrow-task derogation, and flags **profiling** as the one
+    point counsel must confirm. **Still open:** lawyer sign-off on the risk class (folds into #15); a
+    machine-readable AI-output marking beyond the on-screen label if counsel wants it. Detail and sources
+    in `docs/strategy/CERTIFICATION_RESEARCH.md`.
 22. **Comprehensive end-to-end data strategy (added 2026-06-23):** produce a single coherent strategy
     document (e.g. `docs/DATA_STRATEGY.md`) covering the **full lifecycle of every kind of data in the
     app**, unifying threads currently spread across `DATA_GOVERNANCE.md`, `EXPANSION_PLAN.md`, and

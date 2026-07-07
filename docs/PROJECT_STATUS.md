@@ -175,6 +175,35 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 80 (2026-07-07). Top-3 value-add tasks shipped in one branch
+(`claude/top-value-tasks-842u60`).** The founder asked for the top-3 value-add tasks from the docs, then
+"work on all three now". Delivered, all gates green:
+1. **EU AI Act #21 fully closed.** The Art. 50 transparency *copy* was already live (WritingHub
+   point-of-use notice + "KI-generierte Rückmeldung" label + PrivacyPolicy DE/EN AI section). The missing
+   piece, the documented **Article 6(3) risk assessment**, is now on file:
+   **`docs/strategy/AI_ACT_RISK_ASSESSMENT.md`** (v1.0). Assesses Genauly as **not high-risk /
+   limited-risk**, relies on the Art. 6(3) narrow-task derogation, and flags **profiling** as the single
+   point counsel must confirm (#15); lists the flip conditions (profiling creep, institutional gating,
+   summative assessment) and maps our provenance work to Art. 10.
+2. **SEO + landing depth (#10/#11/#12).** `index.html` gained Open Graph + Twitter-card meta, canonical,
+   keywords/author, and two **JSON-LD** graphs (WebApplication + FAQPage; both validated, CSP-safe as
+   non-executable data blocks). Added **`public/robots.txt`** + **`public/sitemap.xml`** (5 public routes).
+   The landing page gained a **"Wie funktioniert Genauly?"** 3-step strip and a **6-item FAQ**
+   (`<details>` accordion mirroring the JSON-LD).
+3. **Daily-life content deepened.** +4 `ReadingText`s (18→**22**, checks 54→**66**), one per newest
+   daily-life theme, each covering a **new sub-theme** with a **new kind**: `tx_arzt_merkblatt_antibiotika`
+   (announcement, arzt.behandlung), `tx_wohnen_aushang_heizung` (announcement, wohnen.probleme),
+   `tx_bank_letter_lastschrift` (letter, bank.zahlung), `tx_bildung_voicemail_pruefung` (voicemail,
+   bildung.pruefung). +4 provenance rows (all `draft`, founder review pending), 1408→**1412**.
+
+**Gates green:** `lint:content` (22 texts / 66 checks / 1412 rows), `build`, `check:bundle` (83 kB),
+`lint` (0 errors), `test:unit` (85 pass). **Follow-ups:** (a) the 4 new texts read as `unverified` tier
+until the next `build:verification` sweep (needs the grammar sidecar; deferred, not a gate); (b) a proper
+1200×630 OG image would beat the square PWA icon now referenced; (c) founder still verifies live SEO/FAQ
+and reviews the draft German. `#21` marked closed in `PROJECT_REFERENCE.md`.
+
+---
+
 **Handoff after session 79 (2026-07-07). Data-strategy Q&A + backlog capture (no code).** The founder
 asked how the data strategy handles three things and said "we'll come back to these tasks later." Answered
 in chat and parked as backlog items (`docs/PROJECT_REFERENCE.md` #33–#35):
@@ -193,73 +222,13 @@ in chat and parked as backlog items (`docs/PROJECT_REFERENCE.md` #33–#35):
   **server-side metering/capping of AI-writing-coach token spend**, and clearing the `progress` fixed-column
   upsert debt (#32). Deliverable is a phased migration checklist.
 
-Nothing shipped this session; the next rung on the built roadmap is still **Phase D (the AI jury, Layer 4)
-+ golden set** (see the session-78 handoff below).
+Nothing shipped that session; the next rung on the built roadmap is still **Phase D (the AI jury, Layer 4)
++ golden set** (the session-78 handoff detailing Phase B + Phase C is now in the W28 archive file).
 
 ---
 
-**Handoff after session 78 (2026-07-07). DATA STRATEGY Phase B + Phase C SHIPPED ✅** (Layer 3 linguistic
-engine, then the per-item trust model). Two PRs. **Phase C (the trust model, PR to come):**
-- **`Verification` block on `ProvenanceEntry`** (`src/types/index.ts`): `tier` (unverified → structural →
-  provenance → facts → linguistic → jury → human), `checks[]`, `confidence`, `last_verified`, plus the
-  `VerificationTier`/`Layer`/`Result` enums. Optional/additive.
-- **`pnpm build:verification`** (`scripts/build-verification.mjs`) composes the Layer 2 fact verdicts +
-  Layer 3 grammar (via a new `docs/reports/verify-grammar.json` sidecar) + CEFR results into the
-  **generated** `src/data/verification.ts`, keyed by content_id. Every record shares one sweep-date const
-  `D`, so a re-run only diffs items whose tier moved. To avoid re-running LanguageTool, it reads the
-  grammar sidecar and recomputes facts/CEFR from the vendored subsets (the `verify-facts`/`verify-cefr`
-  compute helpers are now exported + their `main()` guarded).
-- **`/sources` surfaces it** (`src/features/legal/Sources.tsx`): a per-item **tier badge + confidence**
-  and a tier-distribution summary section; an inline `verification` on a row wins over the generated map.
-- **`lint:content`** validates the tier/layer/result enums (closed-enum rule) and prints the tier
-  distribution (records, does not gate).
-- **First sweep over 1,408 items: 25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292
-  machine-attested for facts or language, up from 25 human-verified). `DATA_STRATEGY.md` → **v1.4**.
-- **Only the one Phase-B typo touched content**; `verification.ts` is generated (404 KB, lazy `/sources`
-  chunk; main chunk stays 79.5 kB). Gates green: `lint:content` (+ tier summary), `verify:facts`, `build`,
-  `lint`, `test:unit/srs/pronounce`, `check:bundle`.
-- **Next rung:** Phase D (the AI jury, Layer 4) + golden set — the first paid rung (LLM tokens + ~150
-  human-labeled calibration items). It adds the `jury` tier on top of what Phase C now records.
-
----
-
-**Phase B (Layer 3, the offline linguistic engine ✅, warn-only reports, not gates).** What happened:
-- **Grammar/spelling over every sentence.** `pnpm verify:grammar` (`scripts/verify-grammar.mjs` + a
-  Java runner `scripts/lt/LtCheck.java`) runs **LanguageTool 6.8 `language-de`** over **2,315 German
-  sentences** — vocab examples, collocation examples, dialogue lines + option texts + model answers +
-  prompts, reading-text bodies + comprehension questions, and redemittel phrases + examples. Findings
-  bucket by LanguageTool's own issue type → `docs/reports/verify-grammar-report.md`. **Result: 0
-  grammar/agreement errors, 98.8% of sentences clean.** It caught **one real typo** (headword
-  `v_kulanzloesung` was "Kulanslösung", corrected to "Kulanzlösung" in all 3 places); the rest are
-  domain proper nouns (fictitious names in texts) and idiomatic hits. Warn-only by design (LanguageTool
-  over-flags idiomatic B2), so NOT a merge gate.
-- **LanguageTool is fetched, not vendored.** It is ~69 MB across 88 jars, so `pnpm build:languagetool`
-  (`scripts/build-languagetool.mjs`) resolves it **pinned (6.8) from Maven Central** — reachable through
-  the network policy, unlike the LT download host / kaikki / de.wiktionary (all 403). It runs fully
-  offline after resolve. `scripts/vendor/lt-lib/` is gitignored.
-- **CEFR plausibility tripwire.** `pnpm verify:cefr` (`scripts/verify-cefr.mjs`) compares each item's
-  claimed `cefr` to a measured difficulty from **word frequency** (`wordfreq` German Zipf, vendored
-  `scripts/vendor/german-frequency-subset.json` built by `pnpm build:frequency-subset`) + **sentence
-  complexity**. **Honest calibration:** German unigram frequency is a weak grader (compounds are
-  elementary yet rare), so it flags only the reliable direction — a **common word carrying an advanced
-  label** — and only for vocabulary. **Result: 6 FLAG + 72 WATCH of 1,182 items** (the 6 FLAGs are
-  sustainability-theme words like *die Umwelt* / *vermeiden* tagged B2.2 despite B1 frequency, worth a
-  glance); everything else is caveated info. Report: `docs/reports/verify-cefr-report.md`.
-- **Scheduled, not gated.** `.github/workflows/verify-sentences.yml` (monthly + dispatch) regenerates
-  both reports and uploads them as artifacts (no auto-commit → no deploy churn). `validate.yml` is
-  untouched; no new per-PR gate.
-- **Only content change:** the one typo fix (`vocabulary.ts`), so counts below are unchanged; oracle
-  subsets regenerated (1 line) to keep the corrected word covered. All gates green: `pnpm lint:content`,
-  `pnpm verify:facts` (0 gate errors), `pnpm build`, `pnpm lint`, `pnpm test:unit/srs/pronounce`,
-  `pnpm check:bundle`. `DATA_STRATEGY.md` → **v1.3**.
-- **Next rung:** Phase D (the AI jury, Layer 4) + golden set, and Phase C (the `verification` trust
-  block on `ProvenanceEntry`, surfaced on `/sources`) if not folded into D.
-- **Branch:** `claude/data-strategy-phase-b-wiw3mu`.
-
----
-
-_Older handoffs (sessions 1–77) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–77 are in the W28 file)._
+_Older handoffs (sessions 1–78) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–78 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)
@@ -269,10 +238,10 @@ _Older handoffs (sessions 1–77) are archived by ISO week under `docs/archive/s
 - Exam sets: **10** (1 per workplace theme · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
 - Can-Do milestones: **37** (all 15 themes; workplace/behoerde founder-verified, daily-life packs draft)
-- Lese-/Hörtexte: **18** texts / **54** comprehension checks (+2 each for Arzt/Wohnen/Bank/Bildung in s75)
+- Lese-/Hörtexte: **22** texts / **66** comprehension checks (+2 each for Arzt/Wohnen/Bank/Bildung in s75; +1 each in s80 covering a new sub-theme per daily-life theme)
 - Themes: **15** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank` + `bildung`; all six domains now populated)
 - Game missions (Neuland): **1** (the chapter-1 Anmeldung boss, 9 scenes) · 6 NPCs · 4 key items
-- Provenance rows: **1,408** (all with a `reference`; 1,383 `draft` / 25 `verified`)
+- Provenance rows: **1,412** (all with a `reference`; 1,387 `draft` / 25 `verified`)
 - Verification tiers (Layer C, generated `src/data/verification.ts`): **25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-attested)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is

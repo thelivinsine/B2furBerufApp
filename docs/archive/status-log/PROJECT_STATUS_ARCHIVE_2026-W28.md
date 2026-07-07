@@ -411,3 +411,53 @@ gate). What happened:
   them. Otherwise the ladder's next rung is **Phase B (Layer 3,
   LanguageTool sentence grammar)** and **Phase C (the `verification` trust block on `ProvenanceEntry`)**.
 - **Branch:** `claude/data-strategy-plan-78r0jq`.
+
+## Session 78 (2026-07-07) — DATA STRATEGY Phase B + Phase C SHIPPED ✅
+
+(Layer 3 linguistic engine, then the per-item trust model). Two PRs. **Phase C (the trust model):**
+- **`Verification` block on `ProvenanceEntry`** (`src/types/index.ts`): `tier` (unverified → structural →
+  provenance → facts → linguistic → jury → human), `checks[]`, `confidence`, `last_verified`, plus the
+  `VerificationTier`/`Layer`/`Result` enums. Optional/additive.
+- **`pnpm build:verification`** (`scripts/build-verification.mjs`) composes the Layer 2 fact verdicts +
+  Layer 3 grammar (via a new `docs/reports/verify-grammar.json` sidecar) + CEFR results into the
+  **generated** `src/data/verification.ts`, keyed by content_id. Every record shares one sweep-date const
+  `D`, so a re-run only diffs items whose tier moved. To avoid re-running LanguageTool, it reads the
+  grammar sidecar and recomputes facts/CEFR from the vendored subsets (the `verify-facts`/`verify-cefr`
+  compute helpers are now exported + their `main()` guarded).
+- **`/sources` surfaces it** (`src/features/legal/Sources.tsx`): a per-item **tier badge + confidence**
+  and a tier-distribution summary section; an inline `verification` on a row wins over the generated map.
+- **`lint:content`** validates the tier/layer/result enums (closed-enum rule) and prints the tier
+  distribution (records, does not gate).
+- **First sweep over 1,408 items: 25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292
+  machine-attested for facts or language, up from 25 human-verified). `DATA_STRATEGY.md` → **v1.4**.
+- **Only the one Phase-B typo touched content**; `verification.ts` is generated (404 KB, lazy `/sources`
+  chunk; main chunk stays 79.5 kB). Gates green: `lint:content` (+ tier summary), `verify:facts`, `build`,
+  `lint`, `test:unit/srs/pronounce`, `check:bundle`.
+- **Next rung:** Phase D (the AI jury, Layer 4) + golden set — the first paid rung (LLM tokens + ~150
+  human-labeled calibration items). It adds the `jury` tier on top of what Phase C now records.
+
+**Phase B (Layer 3, the offline linguistic engine ✅, warn-only reports, not gates).** What happened:
+- **Grammar/spelling over every sentence.** `pnpm verify:grammar` (`scripts/verify-grammar.mjs` + a
+  Java runner `scripts/lt/LtCheck.java`) runs **LanguageTool 6.8 `language-de`** over **2,315 German
+  sentences** — vocab examples, collocation examples, dialogue lines + option texts + model answers +
+  prompts, reading-text bodies + comprehension questions, and redemittel phrases + examples. Findings
+  bucket by LanguageTool's own issue type → `docs/reports/verify-grammar-report.md`. **Result: 0
+  grammar/agreement errors, 98.8% of sentences clean.** It caught **one real typo** (headword
+  `v_kulanzloesung` was "Kulanslösung", corrected to "Kulanzlösung" in all 3 places); the rest are
+  domain proper nouns (fictitious names in texts) and idiomatic hits. Warn-only by design (LanguageTool
+  over-flags idiomatic B2), so NOT a merge gate.
+- **LanguageTool is fetched, not vendored.** It is ~69 MB across 88 jars, so `pnpm build:languagetool`
+  (`scripts/build-languagetool.mjs`) resolves it **pinned (6.8) from Maven Central** — reachable through
+  the network policy, unlike the LT download host / kaikki / de.wiktionary (all 403). It runs fully
+  offline after resolve. `scripts/vendor/lt-lib/` is gitignored.
+- **CEFR plausibility tripwire.** `pnpm verify:cefr` (`scripts/verify-cefr.mjs`) compares each item's
+  claimed `cefr` to a measured difficulty from **word frequency** (`wordfreq` German Zipf, vendored
+  `scripts/vendor/german-frequency-subset.json` built by `pnpm build:frequency-subset`) + **sentence
+  complexity**. **Honest calibration:** German unigram frequency is a weak grader (compounds are
+  elementary yet rare), so it flags only the reliable direction — a **common word carrying an advanced
+  label** — and only for vocabulary. **Result: 6 FLAG + 72 WATCH of 1,182 items** (the 6 FLAGs are
+  sustainability-theme words like *die Umwelt* / *vermeiden* tagged B2.2 despite B1 frequency, worth a
+  glance); everything else is caveated info. Report: `docs/reports/verify-cefr-report.md`.
+- **Scheduled, not gated.** `.github/workflows/verify-sentences.yml` (monthly + dispatch) regenerates
+  both reports and uploads them as artifacts (no auto-commit → no deploy churn). `validate.yml` is
+  untouched; no new per-PR gate. `DATA_STRATEGY.md` → **v1.3**. **Branch:** `claude/data-strategy-phase-b-wiw3mu`.

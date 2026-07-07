@@ -37,6 +37,107 @@
       content="Genauly is a German learning app for adults who already know the basics but feel stuck between B1 and B2. Practise the real-life situations that actually matter: presentations at work, Behörde appointments, doctor visits and job interviews. It also helps you prepare for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams."
     />
     <title>Genauly: German for real life</title>
+    <link rel="canonical" href="https://genauly.de/" />
+    <meta name="author" content="Genauly" />
+    <meta name="keywords" content="German B1 B2, Deutsch lernen, telc Deutsch B2 Beruf, Goethe-Zertifikat B2, German for adults, Behörde Deutsch, business German, real-life German practice" />
+    <!-- Open Graph: rich link previews when the site is shared on social/chat.
+         og:image is fetched by external crawlers (not subject to this page's CSP);
+         an absolute URL to the self-hosted PWA icon is used. Follows the
+         no-em-dash writing rule (CLAUDE.md). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Genauly" />
+    <meta property="og:title" content="Genauly: German for real life (B1–B2)" />
+    <meta
+      property="og:description"
+      content="Break through the B1 to B2 plateau. Practise German for the situations that actually matter: work, Behörde appointments, doctor visits and job interviews, plus telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exam prep."
+    />
+    <meta property="og:url" content="https://genauly.de/" />
+    <meta property="og:image" content="https://genauly.de/pwa-512x512.png" />
+    <meta property="og:image:alt" content="Genauly logo" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <!-- Twitter/X card. summary (not summary_large_image) since the icon is square. -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Genauly: German for real life (B1–B2)" />
+    <meta
+      name="twitter:description"
+      content="Break through the B1 to B2 plateau. Practise German for real-life situations plus telc B2 Beruf and Goethe B2 exam prep."
+    />
+    <meta name="twitter:image" content="https://genauly.de/pwa-512x512.png" />
+    <!-- Structured data (JSON-LD). A <script type="application/ld+json"> is a data
+         block, not executed JavaScript, so it is not blocked by the script-src CSP.
+         Two graphs: the app/organisation, and the landing-page FAQ (mirrors the
+         on-page FAQ in src/features/landing/LandingPage.tsx). -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Genauly",
+        "url": "https://genauly.de/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "inLanguage": ["de", "en"],
+        "description": "Genauly is a German-learning app for adults who already know the basics but feel stuck between B1 and B2. It builds confidence through real-life situations (work, Behörde, doctor visits, job interviews) and helps prepare for the telc Deutsch B2 Beruf and Goethe-Zertifikat B2 exams.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+        "publisher": { "@type": "Organization", "name": "Genauly", "url": "https://genauly.de/" }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Who is Genauly for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Adults who already know basic German (around B1) and want to become confident in real-life situations at work and in daily life. It also suits anyone preparing for the telc Deutsch B2 Beruf or Goethe-Zertifikat B2 exam."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is Genauly free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. You can start for free with no account. Signing in (optional) saves your progress across your devices."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What level is Genauly for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The intermediate plateau, roughly B1 to B2. Content is tagged by CEFR level so you can start where you are comfortable and level up."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does Genauly help with the telc B2 Beruf or Goethe B2 exam?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Exam preparation is one pillar of the app, with themed vocabulary, Redemittel, timed speaking simulations and reading and listening practice aligned to those exams."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the AI writing feedback work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You write a short text and receive one clear, prioritised tip on your biggest weakness. A grammar checker categorises errors first, and an AI model is used only when a deeper read helps. The feedback is AI-generated and clearly marked as such."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need to install anything?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Genauly runs in your browser and can be added to your home screen as an app. It works on phone, tablet and laptop."
+            }
+          }
+        ]
+      }
+    </script>
     <!-- Boot splash control. The page CSP intentionally has no inline-script
          allowance (script-src 'self' only), so we must NOT rely on JavaScript
          to swap the boot fallback. Instead we default to the branded splash for
