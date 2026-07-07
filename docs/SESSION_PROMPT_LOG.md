@@ -1705,4 +1705,23 @@ Branch: `claude/whats-next-esga9u`.
   rules (start/next/reachability/no-orphans/valid speakers+redemittel). Gates green (`lint:content` 20
   dialogues / 1421 rows, `build`, `check:bundle` 83 kB, `test:unit` 85). Docs updated.
 - **Artifacts:** `src/data/dialogues.ts`, `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
-  `docs/SESSION_PROMPT_LOG.md` (entry 224). Commit SHA + PR # to be filled on push/merge.
+  `docs/SESSION_PROMPT_LOG.md` (entry 224). Shipped as PR #362 (squash-merged to `main`, commit `7ffe5ae`).
+
+## Entry 225 — 2026-07-07 (session 80)
+- **Branch:** `claude/top-value-tasks-842u60`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > work on seo task then
+- **Response summary:** Closed the one open SEO/growth follow-up: a proper **1200×630 Open Graph share
+  image** (previously the link preview used the square PWA icon). Built `public/og-image.png` as a branded
+  card (logo, "Break through the B1–B2 plateau", domain pills, genauly.de tagline) via a new generator
+  `preview/og-image/make-og.mjs` that writes a self-contained HTML card screenshotted with the pre-installed
+  Chromium (the repo has no headless-render dependency). Wired `index.html`: `og:image` + `twitter:image`
+  now point at it, added `og:image:width/height/type` + descriptive alt, and upgraded the Twitter card to
+  `summary_large_image`. Build green; the image ships to `dist/og-image.png`; main chunk holds at 83 kB.
+  This completes the SEO surface (meta/OG/Twitter/canonical/JSON-LD, robots, sitemap, landing FAQ, share
+  card); remaining growth work is non-code (real screenshots/testimonials) or a separate lane.
+- **Artifacts:** `public/og-image.png` (new), `preview/og-image/make-og.mjs` (new), `index.html`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 225). Commit SHA + PR # to be filled on
+  push/merge.

@@ -222,6 +222,16 @@ so the main chunk stays 83 kB. Gates green (`lint:content` 20 dialogues / 1421 r
 `check:bundle`, `test:unit` 85). **Remaining daily-life depth:** clearing the draft Can-Do/text/exam/dialogue
 review queue is founder sign-off work; further optional depth is more vocab/collocations per sub-theme.
 
+Then, on "work on the seo task", closed the OG-image follow-up: added a real **1200×630 share card**
+`public/og-image.png` (brand card: logo, "Break through the B1–B2 plateau", domain pills, genauly.de). It is
+generated from `preview/og-image/make-og.mjs` (writes a self-contained HTML card, screenshotted with the
+pre-installed Chromium, since the repo has no headless-render dep). `index.html` now points `og:image` +
+`twitter:image` at it, adds `og:image:width/height/type`, and upgrades the card to
+`twitter:card=summary_large_image` (was the square PWA icon + `summary`). Build green, image ships to
+`dist/og-image.png`. **SEO/growth now covered:** meta/OG/Twitter/canonical/JSON-LD (WebApplication+FAQPage),
+robots.txt, sitemap.xml, landing FAQ + how-it-works, and the share card. Remaining growth levers are
+non-code (real product screenshots / testimonials for social proof) or a separate lane (pricing, Phase D).
+
 ---
 
 **Handoff after session 79 (2026-07-07). Data-strategy Q&A + backlog capture (no code).** The founder
