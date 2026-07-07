@@ -1,6 +1,11 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-07 (session 75: **four daily-life content packs shipped** — Arzt &
+_Last updated: 2026-07-07 (session 76: **data strategy authored + Layer 2 fact-check spike shipped**.
+`docs/strategy/DATA_STRATEGY.md` (v1.0) defines a six-layer verification ladder to keep content
+source-verified, audit-ready, and automated without a native-speaker reviewer (PR #352). The Layer 2
+spike (`pnpm verify:facts`, `pnpm build:dict-subset`) machine-verified 224 noun genders + 174 plurals
+against an offline morphology lexicon and proved a single source can't gate. Prior, session 75:
+**four daily-life content packs shipped** — Arzt &
 Gesundheit (PR #349), Wohnen & Bank (PR #350), and Bildung & Sprache. Each is a full theme: ~28
 vocab, ~36 collocations, 3 Can-Do, 2 reading texts, 1 dialogue, all provenance-rowed and
 gate-green. Themes are now 15 (was 11), and **all six top-level domains are populated** (Bildung
@@ -166,6 +171,40 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 76 (2026-07-07). DATA STRATEGY authored + Layer 2 fact-check spike SHIPPED ✅.**
+What happened:
+- **`docs/strategy/DATA_STRATEGY.md` (new, v1.0)** answers the founder's ask: keep content
+  source-verified, audit-ready, and automated *without a native-speaker reviewer*. Centerpiece is a
+  six-layer **verification ladder** (structural → provenance → factual-match → linguistic → AI jury →
+  rationed human audit) that replaces one native reviewer with a panel of independent sources + models
+  (agreement = confidence, disagreement = the only thing a human sees). Adds a per-item `verification`
+  trust model extending `ProvenanceEntry`, a CI-vs-scheduled automation split, a cost envelope, a
+  decay/re-verification cadence, an EU AI Act Article 10 mapping, and a "scope: existing backlog +
+  future content" section. Cross-links `DATA_GOVERNANCE.md` (the legal/licensing layer) both ways.
+  Shipped via **PR #352** (squash-merged) plus a scope-clarification commit.
+- **Layer 2 fact-check spike SHIPPED** (the highest-ROI rung, built as a validation spike):
+  - `pnpm build:dict-subset` (`scripts/build-dict-subset.mjs`) fetches the German morphology lexicon
+    **`german-words-dict`** (Apache-2.0, derived from LanguageTool's `german-pos-dict`, CC-BY-SA-4.0 —
+    already on our allowlist) from npm, filters to our noun lemmas, writes a 12 KB committed subset
+    (`scripts/vendor/german-words-subset.json`). Fully offline thereafter.
+  - `pnpm verify:facts` (`scripts/verify-facts.mjs`) checks every noun's der/die/das + plural against
+    the lexicon; bucketed report → `docs/reports/verify-facts-report.md`. **Report tool, NOT a CI gate.**
+  - **Result over 489 nouns:** 224 genders + 174 plurals machine-verified with zero human effort; 3
+    plurale-tantum headwords auto-detected/skipped; **47% coverage** (compounds absent from the base
+    lexicon).
+  - **Key finding: a single lexicon cannot gate.** All 4 remaining disagreements were hand-checked as
+    lexicon-side issues (`der Husten` is correct; `Risiken`/`Visa` are the standard plurals), so
+    disagreements are *review signals*, not proven bugs. This validated the strategy's multi-source
+    thesis.
+  - **Next step (scoped, not built):** add a **second oracle** (Wiktionary/kaikki, runs in CI where
+    network is open) so agreement gates and coverage rises past 47%, plus a compound head-noun gender
+    rule. Wiktionary/kaikki are blocked by this environment's network policy (npm registry is the only
+    allowed host), so the richer oracle must run in CI / an unrestricted machine.
+- **No content added**, so the content counts below are unchanged. `pnpm lint:content` green.
+- **Branch:** `claude/app-data-strategy-oshuhs`. Shipped via PR #352 (strategy) + the fact-check spike PR.
+
+---
+
 **Handoff after session 75 (2026-07-07). FOUR daily-life content packs SHIPPED ✅ (Arzt PR #349,
 Wohnen+Bank PR #350, Bildung to follow); all six domains now populated; G2 still HALTED awaiting
 the founder's explicit go.** What happened:
@@ -199,56 +238,8 @@ the founder's explicit go.** What happened:
   remaining flat themes) or the founder verify pass on all the new `draft` German (arzt/wohnen/
   bank/bildung vocab, collocations, texts, dialogues, can-do).
 
----
-
-**Handoff after session 74 (2026-07-06). Playtest round 3 + activity research SHIPPED ✅;
-G2 is HALTED awaiting the founder's explicit go.** What happened:
-- **Founder feedback round 3 applied to the G1 slice** (PR #343, plus live hotfixes #344/#345):
-  1. **The bag** is with the player at all times (HUD slot with count, pulses on demands; popup
-     drawn as the backpack: handle, leather dome, zip band). 2. **English is a game resource**:
-  the always-on E toggle is gone; the Wörterbuch bag item has 3 charges/mission, one charge
-  reveals English for the current scene (`dictUses`/`useDictionary`). 3. **Bag-answered
-  demands**: battle `ask` nodes (engine `handItem`/`admitMissing`; wrong item = Geduld cost +
-  deadpan line; conceding = fetch-quest branch); both Schmidt document demands converted, the
-  remaining option lists differentiated (visible costs, reaction lines, a bluff path, no crit
-  telegraphing). 5. **World scale locked** in `welt_assets.py` (adult 28-32 px, chair ~19 px;
-  taller player sprite, `proportions-check.png`). 6. **Full-screen pixel UI**: fixed game layer,
-  edge-to-edge stage, all surfaces pixel-styled (outlined panels, hard shadows, name plates).
-  Battle composition rule (founder, #344/#345): opponent + bar top band, player + Mut bar bottom
-  band, ONE human scale (no foreground zoom). All in `DECISIONS.md` "Game interaction &
-  pixel-UI rules"; linter knows `ask`/`dictUses`; 85 unit tests; playthrough-verified.
-- **Feedback item 4, the multi-agent research, is DONE** (PR #346): four expert personas ran in
-  parallel as subagents (DaF-Didaktikerin/examiner, veteran game designer, German culture
-  expert, market researcher with a live web sweep of 11 shipped language games), two on Opus 4.8
-  and two on Sonnet 5 per the s73 budget decision, synthesized into
-  **`docs/strategy/MISSION_ACTIVITY_RESEARCH.md`** (20-entry activity catalog with engine fit,
-  six meaningful-choice levers, error-handling rules, market evidence, ranked G2 adoption order)
-  and **`docs/strategy/CHAPTER1_GAMEPLAY_DECK.html`** (two-part founder deck: research outcomes
-  + complete chapter-1 scripts: opening, character creation with language-level selection, cast,
-  help systems, missions 1.1-1.6 scene by scene, environments, ramp). Also delivered as an
-  Artifact. The COMPLETE verbatim persona briefs + reports are archived in
-  **`docs/strategy/MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md`** (founder request).
-  **New mission exercises must draft against the research catalog.**
-- **G2 STATUS: HALTED by the founder ("stop before proceeding with g2. Wait for my go").** G2
-  authoring had just begun when the stop arrived; the partial draft is PARKED as the **tip commit
-  of the session branch** `claude/neuland-g1-g2-feedback-wkf28n` (message prefix `wip(G2, PARKED,
-  DO NOT MERGE)`; UNMERGED, deliberately NOT on `main`). To resume after the founder's go:
-  `git checkout claude/neuland-g1-g2-feedback-wkf28n` and continue from that commit (or a fresh
-  branch cherry-picking it). It contains: three new scene settings (terminal/laden/supermarkt)
-  with a backdrop generator, scene `label` override, `doc-pass.png`, four chapter-1 NPCs, three
-  key items (ki_reisepass/ki_fahrschein/ki_sim_vertrag), and draft mission data for 1.1 + 1.2.
-  Still open when resumed: missions 1.3-1.5, provenance rows, boss `requiresMissions` gating +
-  replay-unlock in Welt.tsx (drafted), asset regeneration (`python3 welt_assets.py`), test
-  updates, all gates, a playthrough. **Do not merge or continue the WIP without the founder's go.**
-- **Plan position** (`GAME_IMPLEMENTATION_PLAN.md`): G0 ✅ (s63-66) · G1 ✅ shipped s73 with
-  three playtest rounds applied (s73 x2, s74 x1 + hotfixes) · s74 research ✅ (feeds G2) ·
-  **G2 ⏸ awaiting founder go** (scope when resumed: missions 1.1-1.5 per the deck scripts,
-  recurring NPCs, licensed pixel packs vs scene 7 + scale table, FSRS-driven recurrence,
-  Supabase migration for game-state sync, then the 5-10-learner playtest gate) · G3/G4 not
-  started. Model guidance for G2 stands: Opus 4.8 / Sonnet 5 / Haiku, not Fable.
-
-_Older handoffs (sessions 1–73) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; the session-73 G1 handoff is in the W28 file)._
+_Older handoffs (sessions 1–74) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; the session-73 G1 and session-74 handoffs are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)

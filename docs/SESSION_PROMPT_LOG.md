@@ -1370,3 +1370,89 @@ Branch: `claude/whats-next-esga9u`.
   `src/data/collocations.ts`, `src/data/canDo.ts`, `src/data/texts.ts`, `src/data/dialogues.ts`,
   `src/data/provenance.ts`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`, `CLAUDE.md`.
   Commit SHAs: see the branch.
+
+## Entry 207 — 2026-07-07 (session 76)
+- **Branch:** `claude/app-data-strategy-oshuhs`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > I want you to author a comprehensive and robust data strategy for the app. The challenge I have is neither am I a native German speaker nor do I possess the skill to manually verify each of the word in the app. this strategy should also adress the following among other important and relevant points: one of the important questions and challenges is that how do we make sure the data/content in the app is source verified, audit-ready but it should also be automated.
+- **Response summary:** Researched the existing provenance infrastructure (register, license
+  allowlist, `check:refs`, `lint-content.mjs`) and found the legal/licensing layer mature but the
+  German-accuracy layer explicitly unsolved (blocked on a native reviewer). Authored
+  **`docs/strategy/DATA_STRATEGY.md` (v1.0)**: a six-layer **verification ladder** (structural →
+  provenance → factual-match → linguistic → AI jury → rationed human audit) that replaces one native
+  reviewer with a panel of independent sources + models (agreement = confidence, disagreement = the
+  only thing a human sees). Added a per-item `verification` trust model extending `ProvenanceEntry`, a
+  CI-vs-scheduled automation split, cost envelope, decay/re-verification cadence, and an EU AI Act
+  Article 10 mapping. Cross-linked `DATA_GOVERNANCE.md` both ways (legal layer) without duplicating it.
+- **Artifacts:** `docs/strategy/DATA_STRATEGY.md` (new), `docs/strategy/DATA_GOVERNANCE.md`
+  (companion cross-link). Commit on the branch; later shipped via PR #352.
+
+## Entry 208 — 2026-07-07 (session 76)
+- **Branch:** `claude/app-data-strategy-oshuhs`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > so this strategy is applied for the existing content or the ones we would in future?
+- **Response summary:** Explained it is both by design: a one-time cleanup sweep over the ~1,170
+  `draft` backlog **and** a permanent CI gate on new content, with the AI jury as triage-only until
+  calibrated. Offered to make it explicit in the doc.
+
+## Entry 209 — 2026-07-07 (session 76)
+- **Branch:** `claude/app-data-strategy-oshuhs`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > yes
+- **Response summary:** Added a "Scope: existing vs. future content" subsection to
+  `DATA_STRATEGY.md` (one-time backlog sweep of Phases A–E + permanent CI gate for new content; the
+  jury is triage-only until golden-set-calibrated). Committed and pushed.
+- **Artifacts:** `docs/strategy/DATA_STRATEGY.md`.
+
+## Entry 210 — 2026-07-07 (session 76)
+- **Branch:** `claude/app-data-strategy-oshuhs`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > merge
+- **Response summary:** Opened **PR #352** (no PR template in repo) and squash-merged the data
+  strategy to `main` (`c0d3d1a`). Ran the post-merge housekeeping: realigned the dev branch to
+  `origin/main` (reset --hard + `--force-with-lease`).
+- **Artifacts:** PR #352 (merged).
+
+## Entry 211 — 2026-07-07 (session 76)
+- **Branch:** `claude/app-data-strategy-oshuhs`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > scope it
+- **Response summary:** Interpreted as "scope Phase A" (the Layer 2 fact-match gate). Ran plan mode
+  (Explore agents for the vocab/collocation schemas + lint/CI patterns; verified real counts of 642
+  vocab / 540 collocations after the agent undercounted), produced an approved plan, then **built the
+  spike**. Discovered kaikki/Wiktionary are blocked by the environment's network policy (npm is the
+  only allowed host), so pivoted the data source to **`german-words-dict`** (Apache-2.0, derived from
+  LanguageTool's `german-pos-dict`, CC-BY-SA-4.0) fetched from npm — fully offline and CI-capable, a
+  better outcome than the plan's network approach. Shipped `scripts/build-dict-subset.mjs`
+  (`pnpm build:dict-subset`), `scripts/verify-facts.mjs` (`pnpm verify:facts`), a 12 KB vendored
+  subset, and a generated report. **Result over 489 nouns:** 224 genders + 174 plurals machine-verified
+  with zero human effort; 3 plurale-tantum headwords auto-detected/skipped; 47% coverage. **Key
+  finding:** a single lexicon can't gate — all 4 remaining disagreements were hand-checked as
+  lexicon-side issues (`der Husten` correct; `Risiken`/`Visa` are the standard plurals), validating
+  the strategy's multi-source thesis. Scoped the next step (second oracle + compound gender rule).
+- **Artifacts:** `scripts/build-dict-subset.mjs`, `scripts/verify-facts.mjs`,
+  `scripts/vendor/german-words-subset.json`, `docs/reports/verify-facts-report.md`, `package.json`
+  (`build:dict-subset` + `verify:facts` scripts). Commit `b9fbbb2`.
+
+## Entry 212 — 2026-07-07 (session 76)
+- **Branch:** `claude/app-data-strategy-oshuhs`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > merge and document the session
+- **Response summary:** Documented the session (this `SESSION_PROMPT_LOG.md` entry set +
+  `docs/PROJECT_STATUS.md` handoff and header; moved the session-74 handoff to the W28 archive per the
+  doc-hygiene rule), then opened a PR folding the fact-check spike + docs and squash-merged it to
+  `main`, followed by the post-merge branch realignment.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. PR + commit: see below.

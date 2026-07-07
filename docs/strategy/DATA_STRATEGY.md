@@ -351,10 +351,17 @@ item, and re-verifies itself on a schedule — built by a founder who does not s
 because the authorities and the panel do the speaking, and the human only settles the ties.
 
 ## Change log
+- **v1.1 (2026-07-07):** Phase A (Layer 2) shipped as a validation spike. `pnpm verify:facts` +
+  `pnpm build:dict-subset` machine-verified noun article + plural against an offline morphology
+  lexicon (`german-words-dict`, Apache-2.0, derived from LanguageTool's `german-pos-dict`,
+  CC-BY-SA-4.0), since kaikki/Wiktionary are blocked by the environment's network policy (npm is the
+  only allowed host). Over 489 nouns: 224 genders + 174 plurals verified, 47% coverage. **Finding: a
+  single lexicon cannot gate** (its own errors + valid variants produced a high false-positive rate),
+  which validates §3's multi-source thesis. So the promote-to-gate step now requires a **second oracle
+  to agree** first. Report: `docs/reports/verify-facts-report.md`. (Also fixed stray closing tags
+  accidentally left at the end of v1.0.)
 - **v1.0 (2026-07-07):** initial data strategy. Framed the non-native-verification problem; defined
   the six-layer verification ladder (structural → provenance → factual match → linguistic → AI jury →
   human audit), the per-item trust model extending `ProvenanceEntry`, the automation/CI split, the
   cost envelope, decay/re-verification cadence, EU AI Act Article 10 mapping, and the A–F roadmap.
   Cross-links `DATA_GOVERNANCE.md` (legal layer) without duplicating it.
-</content>
-</invoke>
