@@ -14,7 +14,9 @@ export type ThemeId =
   | "safety"
   | "travel"
   | "behoerde"
-  | "arzt";
+  | "arzt"
+  | "wohnen"
+  | "bank";
 
 /* ---------------- Taxonomy: domains, modes, facets ---------------- */
 

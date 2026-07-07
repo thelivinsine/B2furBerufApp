@@ -227,6 +227,52 @@ export const themes: ExamTheme[] = [
       { id: "arzt.versicherung", title: "Pharmacy & insurance", titleDe: "Apotheke & Versicherung", situationsIndex: 3 },
     ],
   },
+  {
+    id: "wohnen",
+    title: "Housing & Home",
+    titleDe: "Wohnen & Zuhause",
+    blurb: "Find and keep a flat in Germany: search and view, sign the rental contract, understand your utility bills and sort out repairs with the landlord.",
+    blurbDe: "In Deutschland eine Wohnung finden und behalten: suchen und besichtigen, den Mietvertrag unterschreiben, die Nebenkosten verstehen und Reparaturen mit dem Vermieter klären.",
+    icon: "Home",
+    accent: "from-teal-500 to-emerald-500",
+    domain: "alltag",
+    context: "personal",
+    situations: [
+      "Eine Wohnung suchen und besichtigen",
+      "Den Mietvertrag verstehen und die Wohnung übernehmen",
+      "Die Nebenkostenabrechnung prüfen und Fragen klären",
+      "Mängel melden und eine Reparatur veranlassen",
+    ],
+    subThemes: [
+      { id: "wohnen.suche", title: "Search & viewing", titleDe: "Suche & Besichtigung", situationsIndex: 0 },
+      { id: "wohnen.vertrag", title: "Contract & move-in", titleDe: "Mietvertrag & Einzug", situationsIndex: 1 },
+      { id: "wohnen.nebenkosten", title: "Costs & utilities", titleDe: "Nebenkosten & Miete", situationsIndex: 2 },
+      { id: "wohnen.probleme", title: "Defects & repairs", titleDe: "Mängel & Reparaturen", situationsIndex: 3 },
+    ],
+  },
+  {
+    id: "bank",
+    title: "Banking & Finance",
+    titleDe: "Bank & Finanzen",
+    blurb: "Handle money matters in Germany: open a current account, make transfers and payments, use cards and online banking, and understand saving and credit.",
+    blurbDe: "Geldangelegenheiten in Deutschland regeln: ein Girokonto eröffnen, überweisen und bezahlen, Karten und Online-Banking nutzen und Sparen und Kredit verstehen.",
+    icon: "Banknote",
+    accent: "from-sky-500 to-blue-500",
+    domain: "alltag",
+    context: "personal",
+    situations: [
+      "Ein Girokonto bei der Bank eröffnen",
+      "Eine Überweisung tätigen und Zahlungen einrichten",
+      "Karte, PIN und Online-Banking sicher nutzen",
+      "Zu Sparen, Zinsen und Kredit beraten lassen",
+    ],
+    subThemes: [
+      { id: "bank.konto", title: "Account & opening", titleDe: "Konto & Eröffnung", situationsIndex: 0 },
+      { id: "bank.zahlung", title: "Payments & transfers", titleDe: "Zahlungen & Überweisungen", situationsIndex: 1 },
+      { id: "bank.karte", title: "Cards & online banking", titleDe: "Karten & Online-Banking", situationsIndex: 2 },
+      { id: "bank.finanzen", title: "Saving & credit", titleDe: "Sparen & Kredit", situationsIndex: 3 },
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);

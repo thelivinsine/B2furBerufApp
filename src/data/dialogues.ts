@@ -1672,7 +1672,145 @@ const arztbesuch: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch];
+const wohnungsbesichtigung: Scenario = {
+  id: "sc_wohnungsbesichtigung",
+  themeId: "wohnen",
+  title: "Wohnungsbesichtigung",
+  task: "Besichtigen Sie eine Wohnung, stellen Sie die wichtigen Fragen und zeigen Sie Interesse am Mietvertrag.",
+  context:
+    "Sie suchen eine Wohnung und haben einen Besichtigungstermin. Der Vermieter zeigt Ihnen eine Zweizimmerwohnung und beantwortet Ihre Fragen.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "w1",
+  nodes: {
+    w1: {
+      id: "w1",
+      speaker: "partner",
+      line: "Guten Tag, schön, dass Sie da sind. Das ist das Wohnzimmer. Haben Sie schon Fragen zur Wohnung?",
+      gloss: "Hello, nice that you're here. This is the living room. Do you have any questions about the flat yet?",
+      hints: ["Begrüße höflich.", "Stelle eine konkrete, sinnvolle Frage."],
+      options: [
+        { id: "w1a", text: "Guten Tag, vielen Dank. Ist die angegebene Miete die Kaltmiete oder die Warmmiete?", uses: "clarification", quality: 1, feedback: "Sehr gut: eine der wichtigsten Fragen bei jeder Besichtigung.", next: "w2" },
+        { id: "w1b", text: "Guten Tag. Wie hoch sind die Nebenkosten zusätzlich zur Kaltmiete?", uses: "clarification", quality: 0.9, feedback: "Stark: du denkst an die Gesamtkosten.", next: "w2" },
+        { id: "w1c", text: "Schön hier.", uses: "reactions", quality: 0.4, feedback: "Zu unverbindlich. Nutze die Zeit für echte Fragen.", next: "w2" },
+      ],
+    },
+    w2: {
+      id: "w2",
+      speaker: "partner",
+      line: "Die Kaltmiete beträgt 720 Euro, dazu kommen 180 Euro Nebenkosten. Die Kaution sind zwei Kaltmieten. Möchten Sie noch etwas wissen?",
+      gloss: "The base rent is 720 euros, plus 180 euros in utility costs. The deposit is two months' base rent. Would you like to know anything else?",
+      hints: ["Frag nach einem wichtigen Detail (Zustand, Einzug, Haustiere).", "Zeig echtes Interesse."],
+      options: [
+        { id: "w2a", text: "Verstehe, danke. Ab wann wäre die Wohnung denn frei?", uses: "clarification", quality: 1, feedback: "Perfekt: die Frage nach dem Einzugstermin ist genau richtig.", next: "w3" },
+        { id: "w2b", text: "Gibt es in der Wohnung irgendwelche Mängel, die ich kennen sollte?", uses: "clarification", quality: 0.9, feedback: "Gut: vorausschauend nach dem Zustand gefragt.", next: "w3" },
+        { id: "w2c", text: "Das ist teuer.", uses: "reactions", quality: 0.3, feedback: "Eine wertende Bemerkung bringt dich nicht weiter. Frag lieber konkret.", next: "w3" },
+      ],
+    },
+    w3: {
+      id: "w3",
+      speaker: "partner",
+      line: "Die Wohnung ist ab dem ersten des nächsten Monats frei. Es gibt viele Interessenten. Wenn Sie möchten, können Sie sich bewerben.",
+      gloss: "The flat is available from the first of next month. There are many interested people. If you like, you can apply.",
+      hints: ["Zeige klar dein Interesse.", "Frag, welche Unterlagen nötig sind."],
+      options: [
+        { id: "w3a", text: "Ich habe großes Interesse. Welche Unterlagen brauchen Sie für die Bewerbung?", uses: "suggestions", quality: 1, feedback: "Sehr gut: Interesse gezeigt und gleich den nächsten Schritt erfragt.", next: "w4" },
+        { id: "w3b", text: "Die Wohnung gefällt mir. Könnte ich noch das Übergabeprotokoll der Vormieter sehen?", uses: "clarification", quality: 0.9, feedback: "Stark und vorausschauend, auch wenn das nicht immer möglich ist.", next: "w4" },
+        { id: "w3c", text: "Ich überlege es mir.", uses: "reactions", quality: 0.4, feedback: "Bei vielen Interessenten solltest du klarer auftreten.", next: "w4" },
+      ],
+    },
+    w4: {
+      id: "w4",
+      speaker: "partner",
+      line: "Sehr gern. Ich brauche einen Einkommensnachweis, eine Kopie Ihres Ausweises und eine Selbstauskunft. Haben Sie noch Fragen?",
+      gloss: "Gladly. I need proof of income, a copy of your ID and a tenant self-disclosure form. Do you have any more questions?",
+      hints: ["Bedanke dich.", "Du kannst nach dem weiteren Ablauf fragen."],
+      options: [
+        { id: "w4a", text: "Vielen Dank. Bis wann sollte ich die Unterlagen einreichen?", uses: "clarification", quality: 1, feedback: "Top: nach der Frist gefragt, so bleibst du im Rennen.", next: "w_end" },
+        { id: "w4b", text: "Danke für die Besichtigung. Ich schicke Ihnen die Unterlagen bis morgen.", uses: "agree", quality: 0.9, feedback: "Sehr verbindlich und freundlich abgeschlossen.", next: "w_end" },
+        { id: "w4c", text: "Okay, danke.", uses: "reactions", quality: 0.5, feedback: "Freundlich, aber eine konkrete Nachfrage wäre stärker.", next: "w_end" },
+      ],
+    },
+    w_end: {
+      id: "w_end",
+      speaker: "narrator",
+      line: "Sie haben die wichtigen Fragen gestellt, klar Interesse gezeigt und den nächsten Schritt vereinbart. Gute Chancen!",
+      end: true,
+    },
+  },
+};
+
+const kontoeroeffnung: Scenario = {
+  id: "sc_kontoeroeffnung",
+  themeId: "bank",
+  title: "Girokonto eröffnen",
+  task: "Eröffnen Sie bei der Bank ein Girokonto, klären Sie die Kosten und verstehen Sie die nächsten Schritte.",
+  context:
+    "Sie sind neu in Deutschland und brauchen ein Girokonto für Ihr Gehalt. Beim Bankberater klären Sie die Konditionen.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "k1",
+  nodes: {
+    k1: {
+      id: "k1",
+      speaker: "partner",
+      line: "Guten Tag, was kann ich für Sie tun?",
+      gloss: "Hello, what can I do for you?",
+      hints: ["Begrüße höflich.", "Nenne klar dein Anliegen."],
+      options: [
+        { id: "k1a", text: "Guten Tag, ich möchte ein Girokonto eröffnen, weil ich hier arbeite.", uses: "clarification", quality: 1, feedback: "Sehr gut: klares Anliegen mit Grund.", next: "k2" },
+        { id: "k1b", text: "Guten Tag. Können Sie mir die verschiedenen Kontomodelle erklären?", uses: "clarification", quality: 0.9, feedback: "Gut: du fragst nach den Optionen.", next: "k2" },
+        { id: "k1c", text: "Konto.", uses: "reactions", quality: 0.3, feedback: "Zu knapp. In der Bank sprichst du besser in ganzen Sätzen.", next: "k2" },
+      ],
+    },
+    k2: {
+      id: "k2",
+      speaker: "partner",
+      line: "Gerne. Für die Eröffnung brauche ich Ihren Ausweis und eine Meldebescheinigung. Haben Sie beides dabei?",
+      gloss: "Gladly. For the opening I need your ID and a registration certificate. Do you have both with you?",
+      hints: ["Antworte klar.", "Frag nach, wenn dir ein Dokument fehlt."],
+      options: [
+        { id: "k2a", text: "Ja, ich habe meinen Reisepass und die Meldebescheinigung dabei.", uses: "agree", quality: 1, feedback: "Perfekt: vorbereitet und klar.", next: "k3" },
+        { id: "k2b", text: "Den Ausweis habe ich dabei. Reicht statt der Meldebescheinigung auch der Mietvertrag?", uses: "clarification", quality: 0.8, feedback: "Gute Nachfrage, auch wenn die Antwort oft Nein ist.", next: "k3" },
+        { id: "k2c", text: "Nein, ich habe nichts dabei.", uses: "reactions", quality: 0.3, feedback: "Ohne Unterlagen geht es nicht. Frag, was du nachreichen kannst.", next: "k3" },
+      ],
+    },
+    k3: {
+      id: "k3",
+      speaker: "partner",
+      line: "Wunderbar. Das Konto ist bei einem Gehaltseingang ab 700 Euro kostenlos, sonst kostet es 4,90 Euro im Monat. Ist das für Sie in Ordnung?",
+      gloss: "Wonderful. The account is free with a salary income from 700 euros, otherwise it costs 4.90 euros a month. Is that okay for you?",
+      hints: ["Stimme zu oder frag nach den Leistungen.", "Du kannst nach der Karte fragen."],
+      options: [
+        { id: "k3a", text: "Das passt. Ist eine Girocard dabei und wann bekomme ich sie?", uses: "suggestions", quality: 1, feedback: "Sehr gut: zugestimmt und gleich nach der Karte gefragt.", next: "k4" },
+        { id: "k3b", text: "In Ordnung. Kann ich das Konto auch fürs Online-Banking freischalten lassen?", uses: "clarification", quality: 0.9, feedback: "Stark: an das Online-Banking gedacht.", next: "k4" },
+        { id: "k3c", text: "Ja, ja.", uses: "reactions", quality: 0.4, feedback: "Ein bisschen mehr Interesse an den Details wäre gut.", next: "k4" },
+      ],
+    },
+    k4: {
+      id: "k4",
+      speaker: "partner",
+      line: "Ja, eine Girocard ist dabei. Sie und die PIN kommen in den nächsten Tagen getrennt per Post. Haben Sie noch Fragen?",
+      gloss: "Yes, a debit card is included. It and the PIN will arrive separately by post in the next few days. Do you have any more questions?",
+      hints: ["Bedanke dich.", "Du kannst nach dem Dispo oder den Gebühren fragen."],
+      options: [
+        { id: "k4a", text: "Vielen Dank. Gibt es zum Konto einen Dispokredit und welche Zinsen fallen dafür an?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende Frage zu Kosten und Dispo.", next: "k_end" },
+        { id: "k4b", text: "Nein, danke. Das war sehr verständlich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "k_end" },
+        { id: "k4c", text: "Alles klar.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "k_end" },
+      ],
+    },
+    k_end: {
+      id: "k_end",
+      speaker: "narrator",
+      line: "Sie haben ein Girokonto eröffnet, die Kosten geklärt und wissen, wie es weitergeht. Sehr gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>
