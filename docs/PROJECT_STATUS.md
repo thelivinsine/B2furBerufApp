@@ -209,9 +209,18 @@ telc-style **joint-planning** task referencing the theme's existing scenario (`e
 `ex_arzt`→sc_arztbesuch, `ex_wohnen`→sc_wohnungsbesichtigung, `ex_bank`→sc_kontoeroeffnung,
 `ex_bildung`→sc_sprachkursberatung), reusing `sharedRubric`. +5 `exam_set` provenance rows (draft),
 1412→**1417**. `ExamHub` maps over all sets with no theme filter, so they surface immediately. Gates green
-again (`lint:content` 15 examSets / 1417 rows, `build`, `check:bundle` 83 kB, `test:unit` 85). **Next
-depth step for daily-life:** a 2nd branching dialogue per theme (each has only 1) and clearing the draft
-Can-Do/text/exam review queue (founder sign-off).
+again (`lint:content` 15 examSets / 1417 rows, `build`, `check:bundle` 83 kB, `test:unit` 85).
+
+Then, continuing on the founder's "continue", added a **2nd branching dialogue per newest daily-life theme**
+(`dialogues` 16→**20**, all level 2, covering a new situation than the L1 scenario): `sc_apotheke` (arzt,
+Rezept in der Apotheke einlösen), `sc_wohnungsmangel` (wohnen, Heizungsmangel dem Vermieter melden),
+`sc_kartesperren` (bank, verlorene Karte sperren lassen), `sc_pruefungsanmeldung` (bildung, zur
+telc-Prüfung anmelden). Each is a 5-node graph (4 partner turns + narrator end, 3 scored options each)
+matching the existing schema; lint's dialogue graph-integrity checks (start/next/reachability/no-orphans)
+pass. +4 `dialogue` provenance rows (draft), 1417→**1421**. Dialogues load in the lazy `dialogues` chunk,
+so the main chunk stays 83 kB. Gates green (`lint:content` 20 dialogues / 1421 rows, `build`,
+`check:bundle`, `test:unit` 85). **Remaining daily-life depth:** clearing the draft Can-Do/text/exam/dialogue
+review queue is founder sign-off work; further optional depth is more vocab/collocations per sub-theme.
 
 ---
 
@@ -245,14 +254,14 @@ _Older handoffs (sessions 1–78) are archived by ISO week under `docs/archive/s
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)
 - Collocations: **540 Nomen-Verb pairs** (~36/theme; +36 each for Arzt/Wohnen/Bank/Bildung in s75)
 - Grammar: **47 drills** · **10 topics**
-- Dialogues (branching scenarios): **16** (+Arztbesuch, +Wohnungsbesichtigung, +Kontoeröffnung, +Sprachkursberatung in s75)
+- Dialogues (branching scenarios): **20** (s75 daily-life set + s80 2nd daily-life scenarios: Apotheke/arzt, Wohnungsmangel/wohnen, Karte sperren/bank, Prüfungsanmeldung/bildung, all level 2)
 - Exam sets: **15** (10 workplace + 5 daily-life: behoerde/arzt/wohnen/bank/bildung, added s80 · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
 - Can-Do milestones: **37** (all 15 themes; workplace/behoerde founder-verified, daily-life packs draft)
 - Lese-/Hörtexte: **22** texts / **66** comprehension checks (+2 each for Arzt/Wohnen/Bank/Bildung in s75; +1 each in s80 covering a new sub-theme per daily-life theme)
 - Themes: **15** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank` + `bildung`; all six domains now populated)
 - Game missions (Neuland): **1** (the chapter-1 Anmeldung boss, 9 scenes) · 6 NPCs · 4 key items
-- Provenance rows: **1,417** (all with a `reference`; 1,392 `draft` / 25 `verified`)
+- Provenance rows: **1,421** (all with a `reference`; 1,396 `draft` / 25 `verified`)
 - Verification tiers (Layer C, generated `src/data/verification.ts`): **25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-attested)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is

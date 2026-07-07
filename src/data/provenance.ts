@@ -14459,6 +14459,54 @@ export const provenance: ProvenanceEntry[] = [
     notes: "themeId=arzt; level 1. Authored branching dialogue; verify B2-level appropriateness when back-filling."
   },
   {
+    content_id: "sc_apotheke",
+    content_type: "dialogue",
+    label: "Szenario: In der Apotheke: Rezept einlösen",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=arzt; level 2. Authored branching dialogue (daily-life 2nd scenario, s80); verify B2-level appropriateness when back-filling."
+  },
+  {
+    content_id: "sc_wohnungsmangel",
+    content_type: "dialogue",
+    label: "Szenario: Einen Mangel dem Vermieter melden",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=wohnen; level 2. Authored branching dialogue (daily-life 2nd scenario, s80); verify B2-level appropriateness when back-filling."
+  },
+  {
+    content_id: "sc_kartesperren",
+    content_type: "dialogue",
+    label: "Szenario: Karte verloren: sperren lassen",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bank; level 2. Authored branching dialogue (daily-life 2nd scenario, s80); verify B2-level appropriateness when back-filling."
+  },
+  {
+    content_id: "sc_pruefungsanmeldung",
+    content_type: "dialogue",
+    label: "Szenario: Zur Prüfung anmelden",
+    origin: "authored",
+    reference: "https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=bildung; level 2. Authored branching dialogue (daily-life 2nd scenario, s80); verify B2-level appropriateness when back-filling."
+  },
+  {
     content_id: "wp_arzt",
     content_type: "writing_prompt",
     label: "Writing prompt: arzt",

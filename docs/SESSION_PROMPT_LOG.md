@@ -1687,4 +1687,22 @@ Branch: `claude/whats-next-esga9u`.
   (`lint:content` 15 examSets / 1417 rows, `build`, `check:bundle` 83 kB, `test:unit` 85). Docs updated
   (handoff follow-on, counts, CLAUDE.md provenance count).
 - **Artifacts:** `src/data/examSets.ts`, `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
-  `docs/SESSION_PROMPT_LOG.md` (entry 223). Commit SHA + PR # to be filled on push/merge.
+  `docs/SESSION_PROMPT_LOG.md` (entry 223). Shipped as PR #361 (squash-merged to `main`, commit `2b396de`).
+
+## Entry 224 — 2026-07-07 (session 80)
+- **Branch:** `claude/top-value-tasks-842u60`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > continue
+- **Response summary:** Continued the daily-life depth work with the next suggested step: a **2nd branching
+  dialogue per newest daily-life theme** (`dialogues` 16→20, all level 2). Added `sc_apotheke` (arzt,
+  redeeming a prescription at the pharmacy), `sc_wohnungsmangel` (wohnen, reporting a heating defect to the
+  landlord), `sc_kartesperren` (bank, blocking a lost card), and `sc_pruefungsanmeldung` (bildung,
+  registering for the telc exam). Each is a 5-node graph (4 partner turns + narrator end, 3 scored options
+  each) matching the existing schema and covering a different situation than the theme's L1 scenario. +4
+  `dialogue` provenance rows (draft), 1417→1421. Verified against the dialogue linter's graph-integrity
+  rules (start/next/reachability/no-orphans/valid speakers+redemittel). Gates green (`lint:content` 20
+  dialogues / 1421 rows, `build`, `check:bundle` 83 kB, `test:unit` 85). Docs updated.
+- **Artifacts:** `src/data/dialogues.ts`, `src/data/provenance.ts`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 224). Commit SHA + PR # to be filled on push/merge.

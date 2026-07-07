@@ -1879,7 +1879,283 @@ const sprachkursberatung: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung];
+const apotheke: Scenario = {
+  id: "sc_apotheke",
+  themeId: "arzt",
+  title: "In der Apotheke: Rezept einlösen",
+  task: "Lösen Sie Ihr Rezept ein, klären Sie die Einnahme und fragen Sie nach Nebenwirkungen und Kosten.",
+  context:
+    "Nach dem Arztbesuch gehen Sie in die Apotheke. Sie möchten Ihr Rezept einlösen und haben noch ein paar Fragen zum Medikament.",
+  level: 2,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "d1",
+  nodes: {
+    d1: {
+      id: "d1",
+      speaker: "partner",
+      line: "Guten Tag, was kann ich für Sie tun?",
+      gloss: "Hello, what can I do for you?",
+      hints: ["Begrüße und sag, dass du ein Rezept einlösen möchtest."],
+      options: [
+        { id: "d1a", text: "Guten Tag. Ich möchte dieses Rezept einlösen, das mir mein Hausarzt ausgestellt hat.", uses: "clarification", quality: 1, feedback: "Sehr gut: klar und höflich formuliert.", next: "d2" },
+        { id: "d1b", text: "Hallo, ich habe hier ein Rezept für ein Antibiotikum.", uses: "clarification", quality: 0.9, feedback: "Gut und verständlich.", next: "d2" },
+        { id: "d1c", text: "Das hier.", uses: "reactions", quality: 0.3, feedback: "Zu knapp. Sag in einem Satz, was du möchtest.", next: "d2" },
+      ],
+    },
+    d2: {
+      id: "d2",
+      speaker: "partner",
+      line: "Einen Moment, ich hole das Medikament. Wissen Sie schon, wie Sie es einnehmen sollen?",
+      gloss: "One moment, I'll get the medication. Do you already know how to take it?",
+      hints: ["Antworte, ob du es weißt, und frag nach, wenn nicht."],
+      options: [
+        { id: "d2a", text: "Der Arzt sagte dreimal täglich, aber vor oder nach dem Essen?", uses: "clarification", quality: 1, feedback: "Perfekt: gezielte Rückfrage zur Einnahme.", next: "d3" },
+        { id: "d2b", text: "Nicht genau. Können Sie mir das bitte erklären?", uses: "clarification", quality: 0.9, feedback: "Gut, du fragst aktiv nach.", next: "d3" },
+        { id: "d2c", text: "Ja, weiß ich.", uses: "agree", quality: 0.4, feedback: "Wenn du unsicher bist, frag lieber nach.", next: "d3" },
+      ],
+    },
+    d3: {
+      id: "d3",
+      speaker: "partner",
+      line: "Nehmen Sie es nach dem Essen mit etwas Wasser. Verzichten Sie auf Alkohol. Haben Sie sonst noch Fragen?",
+      gloss: "Take it after meals with some water. Avoid alcohol. Do you have any other questions?",
+      hints: ["Frag nach Nebenwirkungen oder Kosten."],
+      options: [
+        { id: "d3a", text: "Ja, mit welchen Nebenwirkungen muss ich rechnen?", uses: "clarification", quality: 1, feedback: "Sehr sinnvoll, nach Nebenwirkungen zu fragen.", next: "d4" },
+        { id: "d3b", text: "Muss ich für das Medikament etwas zuzahlen?", uses: "clarification", quality: 0.9, feedback: "Gute Frage zu den Kosten.", next: "d4" },
+        { id: "d3c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Eine kurze Nachfrage wäre hier nützlich.", next: "d4" },
+      ],
+    },
+    d4: {
+      id: "d4",
+      speaker: "partner",
+      line: "Selten kann Ihnen übel werden. Die Zuzahlung beträgt fünf Euro. Möchten Sie das Medikament so mitnehmen?",
+      gloss: "In rare cases you may feel nauseous. The co-payment is five euros. Would you like to take the medication like this?",
+      hints: ["Bedanke dich und schließe das Gespräch ab."],
+      options: [
+        { id: "d4a", text: "Ja, gern. Vielen Dank für die ausführliche Beratung.", uses: "agree", quality: 1, feedback: "Freundlich und höflich abgeschlossen.", next: "d_end" },
+        { id: "d4b", text: "Ja, bitte. Wo kann ich bezahlen?", uses: "clarification", quality: 0.9, feedback: "Gut, du klärst den nächsten Schritt.", next: "d_end" },
+        { id: "d4c", text: "Ja.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_end" },
+      ],
+    },
+    d_end: {
+      id: "d_end",
+      speaker: "narrator",
+      line: "Sie haben Ihr Rezept eingelöst, die Einnahme geklärt und wichtige Fragen gestellt. Gute Besserung!",
+      end: true,
+    },
+  },
+};
+
+const wohnungsmangel: Scenario = {
+  id: "sc_wohnungsmangel",
+  themeId: "wohnen",
+  title: "Einen Mangel dem Vermieter melden",
+  task: "Melden Sie der Hausverwaltung einen Mangel in Ihrer Wohnung und einigen Sie sich auf eine Lösung.",
+  context:
+    "In Ihrer Wohnung ist die Heizung seit zwei Tagen kalt. Sie rufen bei der Hausverwaltung an, um das Problem zu melden.",
+  level: 2,
+  minutes: 5,
+  targetRedemittel: ["clarification", "suggestions", "negotiation", "reactions"],
+  start: "d1",
+  nodes: {
+    d1: {
+      id: "d1",
+      speaker: "partner",
+      line: "Hausverwaltung Sonnenhof, guten Tag. Was kann ich für Sie tun?",
+      gloss: "Sonnenhof property management, hello. What can I do for you?",
+      hints: ["Nenne deinen Namen und beschreibe das Problem."],
+      options: [
+        { id: "d1a", text: "Guten Tag, hier spricht Frau Costa aus der Lindenstraße 12. Meine Heizung ist seit zwei Tagen kalt.", uses: "clarification", quality: 1, feedback: "Sehr gut: Name, Adresse und Problem klar genannt.", next: "d2" },
+        { id: "d1b", text: "Hallo, bei mir funktioniert die Heizung nicht mehr. Können Sie mir helfen?", uses: "clarification", quality: 0.85, feedback: "Verständlich, aber nenne auch deinen Namen und die Wohnung.", next: "d2" },
+        { id: "d1c", text: "Meine Heizung ist kaputt.", uses: "reactions", quality: 0.4, feedback: "Zu knapp fürs Telefon. Stell dich kurz vor.", next: "d2" },
+      ],
+    },
+    d2: {
+      id: "d2",
+      speaker: "partner",
+      line: "Das tut mir leid. Seit wann genau ist das Problem aufgetreten, und wird die Wohnung gar nicht mehr warm?",
+      gloss: "I'm sorry. Since when exactly has the problem occurred, and does the flat not get warm at all?",
+      hints: ["Beantworte beide Fragen genau."],
+      options: [
+        { id: "d2a", text: "Seit Montagabend. Die Heizkörper bleiben komplett kalt, obwohl ich sie voll aufdrehe.", uses: "clarification", quality: 1, feedback: "Perfekt: konkrete und genaue Angaben.", next: "d3" },
+        { id: "d2b", text: "Seit vorgestern. Ein bisschen warm wird es noch, aber viel zu wenig.", uses: "clarification", quality: 0.9, feedback: "Gut beschrieben.", next: "d3" },
+        { id: "d2c", text: "Weiß nicht genau, schon länger.", uses: "reactions", quality: 0.4, feedback: "Versuch, das Problem möglichst genau zu beschreiben.", next: "d3" },
+      ],
+    },
+    d3: {
+      id: "d3",
+      speaker: "partner",
+      line: "Verstehe. Ich schicke Ihnen einen Techniker. Passt es Ihnen morgen zwischen 9 und 12 Uhr?",
+      gloss: "I see. I'll send you a technician. Does tomorrow between 9 and 12 suit you?",
+      hints: ["Stimme zu oder schlag eine Alternative vor."],
+      options: [
+        { id: "d3a", text: "Morgen früh passt leider nicht, ich arbeite. Ginge es auch am Nachmittag?", uses: "negotiation", quality: 1, feedback: "Sehr gut: höflich eine Alternative ausgehandelt.", next: "d4" },
+        { id: "d3b", text: "Ja, das passt mir gut. Ich bin dann zu Hause.", uses: "agree", quality: 0.9, feedback: "Klar zugesagt.", next: "d4" },
+        { id: "d3c", text: "Muss das sein?", uses: "reactions", quality: 0.3, feedback: "Der Termin hilft dir, das Problem zu lösen. Reagiere kooperativ.", next: "d4" },
+      ],
+    },
+    d4: {
+      id: "d4",
+      speaker: "partner",
+      line: "Gut, dann kommt der Techniker morgen um 15 Uhr. Falls es bis dahin sehr kalt ist, stelle ich Ihnen einen Heizlüfter bereit. Ist das in Ordnung?",
+      gloss: "Good, then the technician will come at 3 p.m. tomorrow. If it gets very cold, I'll provide you a fan heater. Is that okay?",
+      hints: ["Bedanke dich und bestätige den Termin."],
+      options: [
+        { id: "d4a", text: "Das ist sehr freundlich, vielen Dank. Dann sehen wir uns morgen um 15 Uhr.", uses: "agree", quality: 1, feedback: "Freundlich und klar bestätigt.", next: "d_end" },
+        { id: "d4b", text: "Danke. Soll ich Ihnen den Mangel noch schriftlich per E-Mail bestätigen?", uses: "suggestions", quality: 0.95, feedback: "Stark: an die schriftliche Dokumentation gedacht.", next: "d_end" },
+        { id: "d4c", text: "Okay, tschüss.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank rundet das Gespräch ab.", next: "d_end" },
+      ],
+    },
+    d_end: {
+      id: "d_end",
+      speaker: "narrator",
+      line: "Sie haben den Mangel klar gemeldet, einen Termin ausgehandelt und das Wichtigste geklärt. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+const kartesperren: Scenario = {
+  id: "sc_kartesperren",
+  themeId: "bank",
+  title: "Karte verloren: sperren lassen",
+  task: "Melden Sie Ihre verlorene Karte, lassen Sie sie sperren und klären Sie die nächsten Schritte.",
+  context:
+    "Sie haben Ihre Bankkarte verloren und sind besorgt. Sie rufen bei Ihrer Bank an, um die Karte sperren zu lassen.",
+  level: 2,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "d1",
+  nodes: {
+    d1: {
+      id: "d1",
+      speaker: "partner",
+      line: "Volksbank Rheintal, Kundenservice. Guten Tag, wie kann ich Ihnen helfen?",
+      gloss: "Volksbank Rheintal, customer service. Hello, how can I help you?",
+      hints: ["Erkläre ruhig und klar dein Problem."],
+      options: [
+        { id: "d1a", text: "Guten Tag, ich habe meine Bankkarte verloren und möchte sie sofort sperren lassen.", uses: "clarification", quality: 1, feedback: "Sehr gut: klar gesagt, was du brauchst.", next: "d2" },
+        { id: "d1b", text: "Hallo, ich glaube, meine Karte ist weg. Was soll ich jetzt tun?", uses: "clarification", quality: 0.85, feedback: "Verständlich, aber du kannst direkt um die Sperrung bitten.", next: "d2" },
+        { id: "d1c", text: "Karte weg.", uses: "reactions", quality: 0.3, feedback: "Zu knapp. Formuliere einen vollständigen Satz.", next: "d2" },
+      ],
+    },
+    d2: {
+      id: "d2",
+      speaker: "partner",
+      line: "Das erledige ich sofort für Sie. Zur Sicherheit: Können Sie sich mit Ihrem Namen und Geburtsdatum ausweisen?",
+      gloss: "I'll take care of that right away. For security: can you identify yourself with your name and date of birth?",
+      hints: ["Gib die verlangten Daten an."],
+      options: [
+        { id: "d2a", text: "Natürlich. Mein Name ist Anna Nowak, geboren am 4. Mai 1990.", uses: "agree", quality: 1, feedback: "Perfekt: kooperativ und vollständig geantwortet.", next: "d3" },
+        { id: "d2b", text: "Ja, gern. Welche Angaben brauchen Sie genau?", uses: "clarification", quality: 0.8, feedback: "In Ordnung, aber die Frage war schon konkret.", next: "d3" },
+        { id: "d2c", text: "Warum brauchen Sie das?", uses: "reactions", quality: 0.4, feedback: "Die Identitätsprüfung schützt dich. Antworte ruhig.", next: "d3" },
+      ],
+    },
+    d3: {
+      id: "d3",
+      speaker: "partner",
+      line: "Danke, die Karte ist jetzt gesperrt. Möchten Sie eine neue Karte bestellen? Sie kommt in etwa einer Woche per Post.",
+      gloss: "Thank you, the card is now blocked. Would you like to order a new card? It will arrive by post in about a week.",
+      hints: ["Sag, ob du eine neue Karte möchtest, und frag nach Details."],
+      options: [
+        { id: "d3a", text: "Ja, bitte bestellen Sie eine neue. Fallen dafür Gebühren an?", uses: "clarification", quality: 1, feedback: "Sehr gut: zugestimmt und nach Kosten gefragt.", next: "d4" },
+        { id: "d3b", text: "Ja, gern. Kann ich bis dahin trotzdem an Bargeld kommen?", uses: "clarification", quality: 0.95, feedback: "Clever, an den Zugang zu Bargeld gedacht.", next: "d4" },
+        { id: "d3c", text: "Ja.", uses: "agree", quality: 0.4, feedback: "Eine Rückfrage zu Gebühren oder Bargeld wäre sinnvoll.", next: "d4" },
+      ],
+    },
+    d4: {
+      id: "d4",
+      speaker: "partner",
+      line: "Die neue Karte ist kostenlos. Bargeld können Sie in der Filiale mit Ihrem Ausweis abheben. Kann ich sonst noch etwas für Sie tun?",
+      gloss: "The new card is free. You can withdraw cash at the branch with your ID. Is there anything else I can do for you?",
+      hints: ["Bedanke dich und beende das Gespräch höflich."],
+      options: [
+        { id: "d4a", text: "Nein danke, das war sehr hilfreich. Vielen Dank für die schnelle Hilfe.", uses: "agree", quality: 1, feedback: "Freundlich abgeschlossen.", next: "d_end" },
+        { id: "d4b", text: "Eine Frage noch: Sollte ich die verlorene Karte auch der Polizei melden?", uses: "clarification", quality: 0.9, feedback: "Gute vorausschauende Frage.", next: "d_end" },
+        { id: "d4c", text: "Nein.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_end" },
+      ],
+    },
+    d_end: {
+      id: "d_end",
+      speaker: "narrator",
+      line: "Sie haben Ihre Karte sperren lassen, sich ausgewiesen und die nächsten Schritte geklärt. Alles erledigt!",
+      end: true,
+    },
+  },
+};
+
+const pruefungsanmeldung: Scenario = {
+  id: "sc_pruefungsanmeldung",
+  themeId: "bildung",
+  title: "Zur Prüfung anmelden",
+  task: "Melden Sie sich für die telc-Prüfung an, klären Sie Termin, Kosten und Unterlagen.",
+  context:
+    "Sie möchten die telc-Prüfung Deutsch B2 ablegen und sind im Sprachzentrum, um sich anzumelden.",
+  level: 2,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "d1",
+  nodes: {
+    d1: {
+      id: "d1",
+      speaker: "partner",
+      line: "Guten Tag, willkommen im Sprachzentrum Aurora. Wie kann ich Ihnen helfen?",
+      gloss: "Hello, welcome to the Aurora language centre. How can I help you?",
+      hints: ["Sag, für welche Prüfung du dich anmelden möchtest."],
+      options: [
+        { id: "d1a", text: "Guten Tag. Ich möchte mich für die telc-Prüfung Deutsch B2 anmelden.", uses: "clarification", quality: 1, feedback: "Sehr gut: klar dein Anliegen genannt.", next: "d2" },
+        { id: "d1b", text: "Hallo, ich interessiere mich für eine B2-Prüfung. Bieten Sie die an?", uses: "clarification", quality: 0.9, feedback: "Gut, du fragst gezielt nach.", next: "d2" },
+        { id: "d1c", text: "Prüfung machen.", uses: "reactions", quality: 0.3, feedback: "Zu knapp. Formuliere einen ganzen Satz.", next: "d2" },
+      ],
+    },
+    d2: {
+      id: "d2",
+      speaker: "partner",
+      line: "Gern. Der nächste Termin ist am 8. März. Haben Sie schon einen Kurs besucht oder bereiten Sie sich selbst vor?",
+      gloss: "Gladly. The next date is 8 March. Have you taken a course or are you preparing on your own?",
+      hints: ["Antworte auf die Frage und frag nach dem Ablauf."],
+      options: [
+        { id: "d2a", text: "Ich bereite mich selbst vor. Können Sie mir sagen, aus welchen Teilen die Prüfung besteht?", uses: "clarification", quality: 1, feedback: "Perfekt: geantwortet und sinnvoll nachgefragt.", next: "d3" },
+        { id: "d2b", text: "Ich habe einen Kurs besucht. Ist der 8. März ein Samstag?", uses: "clarification", quality: 0.9, feedback: "Gut, du klärst den Termin.", next: "d3" },
+        { id: "d2c", text: "Egal, Hauptsache bestanden.", uses: "reactions", quality: 0.3, feedback: "Antworte konkret auf die Frage.", next: "d3" },
+      ],
+    },
+    d3: {
+      id: "d3",
+      speaker: "partner",
+      line: "Die Prüfung hat einen schriftlichen und einen mündlichen Teil. Die Gebühr beträgt 180 Euro. Möchten Sie sich verbindlich anmelden?",
+      gloss: "The exam has a written and an oral part. The fee is 180 euros. Would you like to register bindingly?",
+      hints: ["Stimme zu und frag nach den nötigen Unterlagen."],
+      options: [
+        { id: "d3a", text: "Ja, gern. Welche Unterlagen brauchen Sie von mir für die Anmeldung?", uses: "clarification", quality: 1, feedback: "Sehr gut: zugestimmt und nach Unterlagen gefragt.", next: "d4" },
+        { id: "d3b", text: "Ja. Kann ich die Gebühr auch in zwei Raten zahlen?", uses: "clarification", quality: 0.9, feedback: "Legitime Frage zur Zahlung.", next: "d4" },
+        { id: "d3c", text: "Ja, passt.", uses: "agree", quality: 0.4, feedback: "Frag ruhig nach den Unterlagen, das spart dir einen Weg.", next: "d4" },
+      ],
+    },
+    d4: {
+      id: "d4",
+      speaker: "partner",
+      line: "Ich brauche nur Ihren Ausweis und das ausgefüllte Formular. Die Gebühr können Sie heute oder per Überweisung zahlen. Passt das für Sie?",
+      gloss: "I just need your ID and the completed form. You can pay the fee today or by bank transfer. Does that work for you?",
+      hints: ["Bedanke dich und bestätige die Anmeldung."],
+      options: [
+        { id: "d4a", text: "Das passt. Ich fülle das Formular gleich aus und überweise die Gebühr diese Woche.", uses: "agree", quality: 1, feedback: "Klar und verbindlich bestätigt.", next: "d_end" },
+        { id: "d4b", text: "Sehr gut. Bekomme ich vorher noch eine Bestätigung mit dem genauen Ablauf?", uses: "clarification", quality: 0.95, feedback: "Stark: an die schriftliche Bestätigung gedacht.", next: "d_end" },
+        { id: "d4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank rundet das Gespräch ab.", next: "d_end" },
+      ],
+    },
+    d_end: {
+      id: "d_end",
+      speaker: "narrator",
+      line: "Sie haben sich zur Prüfung angemeldet, Termin und Kosten geklärt und wissen, welche Unterlagen nötig sind. Viel Erfolg!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>
