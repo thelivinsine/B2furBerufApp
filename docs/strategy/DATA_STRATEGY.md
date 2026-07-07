@@ -39,6 +39,33 @@ So the strategy is not "hire a reviewer and grind through 1,195 items." It is:
 This is achievable because **most of what a reviewer would check is machine-checkable today**, and
 the residue that genuinely needs judgment is small enough to buy cheaply.
 
+### Scope: this applies to both existing and future content
+
+The strategy runs on two fronts at once, and it must be both — fixing only one leaves the other as a
+liability.
+
+- **Existing content (the backlog): a one-time cleanup sweep.** The ~1,170 `draft` items were
+  AI-drafted and never accuracy-verified. The ladder runs over all of them once: Phase A
+  machine-verifies every existing word's facts, Phase B grammar-checks every existing sentence, Phase
+  D's jury triages the remainder, and Phase E's rationed human review clears only the exceptions. This
+  is how the backlog moves from "1,170 draft" to "machine-verified + human-audited." It is the urgent
+  target.
+- **Future content: born verified.** The same checks become **CI gates on every new item** (see §7),
+  so the debt never re-accumulates. A new noun/verb whose article/plural/POS does not match Wiktextract
+  *fails the build*; the item enters at tier `facts` automatically, and the scheduled jury and reviewer
+  promote it from there. You never rebuild a backlog, because each future item is verified at the
+  moment it is added.
+
+**One caveat on the AI jury (Layer 4).** The deterministic layers (facts, grammar) apply identically to
+old and new content. The jury, though, is only a *final* verdict once it is calibrated against the
+golden set (§3, Layer 4). Until that calibration proves it matches a native speaker, the jury is a
+**triage tool that routes existing content to human review**, not an auto-pass. So for the backlog it
+accelerates the human; for future content, once calibrated, it promotes items on its own.
+
+Which phases serve which front: the **backlog cleanup** is a single full pass of Phases A–E; **future
+content** is Layers 0–2 gating merges continuously, Layers 3–4 running on a schedule, and Layer 5 as a
+light quarterly cadence.
+
 ## 2. Three requirements, one design
 
 The founder named three properties. They are not in tension; one pipeline delivers all three.
