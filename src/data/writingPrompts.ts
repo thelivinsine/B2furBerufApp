@@ -96,4 +96,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       "Schreibe eine kurze E-Mail an deine Bank: Bitte um einen Beratungstermin zur Eröffnung eines Girokontos und frage, welche Unterlagen du mitbringen musst.",
     long: "Verfasse eine formelle E-Mail an deine Bank. Beschwere dich höflich über eine falsch gebuchte Lastschrift, bitte um eine Rückbuchung und frage nach, wie du solche Abbuchungen künftig verhindern kannst.",
   },
+  bildung: {
+    themeId: "bildung",
+    short:
+      "Schreibe eine kurze E-Mail an eine Sprachschule: Frage nach einem passenden Kurs für dein Niveau, nach den Kosten und nach dem nächsten Kursbeginn.",
+    long: "Verfasse eine formelle E-Mail an eine zuständige Stelle. Bitte um die Anerkennung deines ausländischen Abschlusses, erkläre deinen bisherigen Werdegang und frage nach den nötigen Unterlagen und dem Ablauf des Verfahrens.",
+  },
 };

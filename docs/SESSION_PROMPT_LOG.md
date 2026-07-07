@@ -1347,3 +1347,26 @@ Branch: `claude/whats-next-esga9u`.
   `src/data/provenance.ts`, `src/components/city/domain-buildings.tsx`, `tests/city-mastery.test.ts`,
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`, `CLAUDE.md`. PR #349 (Arzt, merged);
   Wohnen+Bank PR to follow. Commit SHAs: see the branch.
+
+## Entry 206 — 2026-07-07 (session 75, cont.)
+- **Branch:** `claude/whats-next-l61ca3`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > continue
+- **Response summary:** Took "continue" as content expansion and built the highest-value next
+  move: **`bildung` (Bildung & Sprache)**, filling the last empty top-level domain (`bildung`), so
+  all six domains are now populated. Full theme on the same template: ThemeId + linter,
+  GraduationCap icon, ExamTheme (domain `bildung`, context `both`, 4 sub-themes
+  sprachkurs/anerkennung/pruefung/weiterbildung), writing prompt, 28 vocab, 36 collocations, 3
+  Can-Do, 2 reading texts (course-confirmation email + Anerkennung letter, 6 checks), 1 branching
+  dialogue (`sc_sprachkursberatung`), 71 provenance rows. `bildung` maps into the existing
+  `pruefungshalle` city building via the domain rollup (no building-registry change needed). Gates
+  green: lint:content (15 themes, 642 vocab, 540 collocations, 1,408 provenance), build, bundle
+  79.5 kB, 85 unit tests, eslint 0 errors. No em dashes. Squash-merged via PR (see below); ran the
+  post-merge branch realignment.
+- **Artifacts:** `src/types/index.ts`, `scripts/lint-content.mjs`, `src/lib/icons.ts`,
+  `src/data/themes.ts`, `src/data/writingPrompts.ts`, `src/data/vocabulary.ts`,
+  `src/data/collocations.ts`, `src/data/canDo.ts`, `src/data/texts.ts`, `src/data/dialogues.ts`,
+  `src/data/provenance.ts`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`, `CLAUDE.md`.
+  Commit SHAs: see the branch.

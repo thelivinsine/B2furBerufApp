@@ -1810,7 +1810,76 @@ const kontoeroeffnung: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung];
+const sprachkursberatung: Scenario = {
+  id: "sc_sprachkursberatung",
+  themeId: "bildung",
+  title: "Beratung zum Sprachkurs",
+  task: "Lassen Sie sich an der Volkshochschule zu einem Sprachkurs beraten, klären Sie Niveau, Kosten und Ablauf.",
+  context:
+    "Sie möchten Ihr Deutsch verbessern und lassen sich im Büro der Volkshochschule zu den Kursen beraten.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "b1",
+  nodes: {
+    b1: {
+      id: "b1",
+      speaker: "partner",
+      line: "Guten Tag, wie kann ich Ihnen helfen?",
+      gloss: "Hello, how can I help you?",
+      hints: ["Begrüße höflich.", "Sage klar, was du möchtest."],
+      options: [
+        { id: "b1a", text: "Guten Tag, ich möchte mein Deutsch verbessern und suche einen passenden Sprachkurs.", uses: "clarification", quality: 1, feedback: "Sehr gut: klares Ziel und Anliegen.", next: "b2" },
+        { id: "b1b", text: "Guten Tag. Können Sie mir sagen, welche Deutschkurse Sie anbieten?", uses: "clarification", quality: 0.9, feedback: "Gut: du fragst gezielt nach dem Angebot.", next: "b2" },
+        { id: "b1c", text: "Kurs suchen.", uses: "reactions", quality: 0.3, feedback: "Zu knapp. Formuliere dein Anliegen in einem ganzen Satz.", next: "b2" },
+      ],
+    },
+    b2: {
+      id: "b2",
+      speaker: "partner",
+      line: "Gern. Wissen Sie schon, auf welchem Niveau Sie sind? Sonst machen Sie am besten einen Einstufungstest.",
+      gloss: "Gladly. Do you already know your level? Otherwise it's best to take a placement test.",
+      hints: ["Antworte zu deinem Niveau.", "Frag nach dem Test, wenn du unsicher bist."],
+      options: [
+        { id: "b2a", text: "Ich glaube, ich bin auf B1. Aber ein Einstufungstest wäre sicher sinnvoll.", uses: "agree", quality: 1, feedback: "Perfekt: realistische Einschätzung und offen für den Test.", next: "b3" },
+        { id: "b2b", text: "Das weiß ich nicht genau. Wie läuft der Einstufungstest ab?", uses: "clarification", quality: 0.9, feedback: "Gut: ehrlich und mit einer sinnvollen Nachfrage.", next: "b3" },
+        { id: "b2c", text: "Ist mir egal.", uses: "reactions", quality: 0.3, feedback: "Für die richtige Kurswahl ist das Niveau wichtig. Zeig etwas Interesse.", next: "b3" },
+      ],
+    },
+    b3: {
+      id: "b3",
+      speaker: "partner",
+      line: "Alles klar. Für B2 haben wir einen Abendkurs, zweimal pro Woche. Die Kursgebühr beträgt 240 Euro. Passt Ihnen das?",
+      gloss: "All right. For B2 we have an evening course, twice a week. The course fee is 240 euros. Does that suit you?",
+      hints: ["Stimme zu oder frag nach Details (Zeiten, Förderung).", "Du kannst nach einer Förderung fragen."],
+      options: [
+        { id: "b3a", text: "Das klingt gut. Gibt es eine Möglichkeit, die Kursgebühr fördern zu lassen?", uses: "suggestions", quality: 1, feedback: "Sehr gut: an eine Förderung gedacht, das kann viel Geld sparen.", next: "b4" },
+        { id: "b3b", text: "In Ordnung. An welchen Tagen und zu welcher Uhrzeit findet der Kurs statt?", uses: "clarification", quality: 0.9, feedback: "Stark: wichtige praktische Nachfrage.", next: "b4" },
+        { id: "b3c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Eine kurze Rückfrage zu Zeiten oder Kosten wäre hier sinnvoll.", next: "b4" },
+      ],
+    },
+    b4: {
+      id: "b4",
+      speaker: "partner",
+      line: "Mit einem Bildungsgutschein entfällt die Gebühr. Der Kurs beginnt in zwei Wochen. Soll ich Sie anmelden? Haben Sie noch Fragen?",
+      gloss: "With an education voucher the fee is waived. The course starts in two weeks. Shall I enrol you? Do you have any more questions?",
+      hints: ["Bedanke dich.", "Du kannst nach dem Zertifikat am Ende fragen."],
+      options: [
+        { id: "b4a", text: "Ja, bitte melden Sie mich an. Bekomme ich am Ende ein Zertifikat?", uses: "clarification", quality: 1, feedback: "Top: klar zugesagt und an den Abschluss gedacht.", next: "b_end" },
+        { id: "b4b", text: "Vielen Dank. Ich bringe den Bildungsgutschein zum ersten Termin mit.", uses: "agree", quality: 0.9, feedback: "Sehr gut: konkret und verbindlich abgeschlossen.", next: "b_end" },
+        { id: "b4c", text: "Mal sehen.", uses: "reactions", quality: 0.4, feedback: "Wenn du interessiert bist, tritt ruhig etwas entschlossener auf.", next: "b_end" },
+      ],
+    },
+    b_end: {
+      id: "b_end",
+      speaker: "narrator",
+      line: "Sie haben sich gut beraten lassen, Niveau und Kosten geklärt und den nächsten Schritt vereinbart. Viel Erfolg im Kurs!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>

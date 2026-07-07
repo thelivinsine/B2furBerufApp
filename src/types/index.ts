@@ -16,7 +16,8 @@ export type ThemeId =
   | "behoerde"
   | "arzt"
   | "wohnen"
-  | "bank";
+  | "bank"
+  | "bildung";
 
 /* ---------------- Taxonomy: domains, modes, facets ---------------- */
 

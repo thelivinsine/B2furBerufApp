@@ -273,6 +273,29 @@ export const themes: ExamTheme[] = [
       { id: "bank.finanzen", title: "Saving & credit", titleDe: "Sparen & Kredit", situationsIndex: 3 },
     ],
   },
+  {
+    id: "bildung",
+    title: "Education & Language",
+    titleDe: "Bildung & Sprache",
+    blurb: "Navigate learning in Germany: enrol in a language or integration course, get a foreign qualification recognised, sit exams and plan further training for your career.",
+    blurbDe: "Sich in der deutschen Bildungswelt zurechtfinden: einen Sprach- oder Integrationskurs belegen, einen ausländischen Abschluss anerkennen lassen, Prüfungen ablegen und die berufliche Weiterbildung planen.",
+    icon: "GraduationCap",
+    accent: "from-violet-500 to-purple-500",
+    domain: "bildung",
+    context: "both",
+    situations: [
+      "Sich für einen Sprach- oder Integrationskurs anmelden",
+      "Einen ausländischen Abschluss anerkennen lassen",
+      "Eine Prüfung anmelden und das Zertifikat erhalten",
+      "Eine Weiterbildung oder Umschulung planen",
+    ],
+    subThemes: [
+      { id: "bildung.sprachkurs", title: "Language courses", titleDe: "Sprachkurs & Integrationskurs", situationsIndex: 0 },
+      { id: "bildung.anerkennung", title: "Recognition of qualifications", titleDe: "Anerkennung & Abschlüsse", situationsIndex: 1 },
+      { id: "bildung.pruefung", title: "Exams & certificates", titleDe: "Prüfung & Zertifikat", situationsIndex: 2 },
+      { id: "bildung.weiterbildung", title: "Further training", titleDe: "Weiterbildung & Beruf", situationsIndex: 3 },
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);

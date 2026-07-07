@@ -959,6 +959,124 @@ export const texts: ReadingText[] = [
       },
     ],
   },
+
+  /* ---------------- Bildung & Sprache ---------------- */
+  {
+    id: "tx_bildung_email_kurs",
+    kind: "email",
+    themeId: "bildung",
+    cefr: "B1.2",
+    subThemeId: "bildung.sprachkurs",
+    title: "Anmeldung zum Deutschkurs bestätigt",
+    titleEn: "Registration for the German course confirmed",
+    de: [
+      "Sehr geehrte Frau Haddad,",
+      "vielen Dank für Ihre Anmeldung zum Deutschkurs B2 an der Volkshochschule. Aufgrund Ihres Einstufungstests haben wir Sie dem Kurs am Dienstag- und Donnerstagabend von 18:00 bis 20:15 Uhr zugeteilt. Der Kurs beginnt am 2. September und umfasst 20 Termine.",
+      "Die Kursgebühr beträgt 240 Euro. Wenn Sie einen Bildungsgutschein haben, legen Sie ihn bitte vor dem ersten Termin im Büro vor, dann entfällt die Gebühr für Sie.",
+      "Das Lehrbuch bringen Sie bitte selbst mit. Den genauen Titel finden Sie im Anhang. Am Ende des Kurses können Sie eine Prüfung ablegen und ein Zertifikat erwerben.",
+      "Mit freundlichen Grüßen\nIhre Volkshochschule Mitte",
+    ].join("\n\n"),
+    en: [
+      "Dear Ms Haddad,",
+      "thank you for registering for the German course B2 at the adult education centre. Based on your placement test, we have assigned you to the course on Tuesday and Thursday evenings from 18:00 to 20:15. The course starts on 2 September and comprises 20 sessions.",
+      "The course fee is 240 euros. If you have an education voucher, please present it at the office before the first session; then the fee is waived for you.",
+      "Please bring the textbook yourself. You will find the exact title in the attachment. At the end of the course you can sit an exam and obtain a certificate.",
+      "Kind regards\nYour adult education centre Mitte",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_bildung_email_kurs_q1",
+        question: "Wie wurde Frau Haddad dem Kurs zugeteilt?",
+        options: [
+          "Aufgrund ihres Einstufungstests",
+          "Nach dem Zufallsprinzip",
+          "Nach ihrem Alter",
+        ],
+        answer: "Aufgrund ihres Einstufungstests",
+        explain: "She was assigned to the B2 course based on her placement test result.",
+      },
+      {
+        id: "tx_bildung_email_kurs_q2",
+        question: "Wie kann für Frau Haddad die Kursgebühr entfallen?",
+        options: [
+          "Wenn sie einen Bildungsgutschein vorlegt",
+          "Wenn sie den Kurs zweimal besucht",
+          "Wenn sie das Lehrbuch selbst kauft",
+        ],
+        answer: "Wenn sie einen Bildungsgutschein vorlegt",
+        explain: "If she presents an education voucher before the first session, the 240-euro fee is waived.",
+      },
+      {
+        id: "tx_bildung_email_kurs_q3",
+        question: "Was kann Frau Haddad am Ende des Kurses tun?",
+        options: [
+          "Eine Prüfung ablegen und ein Zertifikat erwerben",
+          "Den Kurs kostenlos wiederholen",
+          "Direkt an der Hochschule studieren",
+        ],
+        answer: "Eine Prüfung ablegen und ein Zertifikat erwerben",
+        explain: "At the end of the course she can sit an exam and obtain a certificate.",
+      },
+    ],
+  },
+  {
+    id: "tx_bildung_letter_anerkennung",
+    kind: "letter",
+    themeId: "bildung",
+    cefr: "B2.2",
+    subThemeId: "bildung.anerkennung",
+    title: "Ihr Antrag auf Anerkennung Ihres Abschlusses",
+    titleEn: "Your application for recognition of your qualification",
+    de: [
+      "Sehr geehrter Herr Okonkwo,",
+      "wir bestätigen den Eingang Ihres Antrags auf Anerkennung Ihres im Ausland erworbenen Abschlusses als Ingenieur.",
+      "Zur Bearbeitung fehlen uns noch zwei Unterlagen: eine beglaubigte Kopie Ihres Abschlusszeugnisses sowie eine beglaubigte Übersetzung ins Deutsche. Bitte reichen Sie diese innerhalb von sechs Wochen nach.",
+      "Nach vollständiger Prüfung erhalten Sie einen schriftlichen Bescheid. Dieser stellt fest, ob Ihr Abschluss als gleichwertig anerkannt wird oder ob eine Anpassungsqualifizierung nötig ist. Die Bearbeitung dauert in der Regel drei bis vier Monate.",
+      "Mit freundlichen Grüßen\nZentralstelle für ausländische Abschlüsse",
+    ].join("\n\n"),
+    en: [
+      "Dear Mr Okonkwo,",
+      "we confirm receipt of your application for recognition of your qualification as an engineer obtained abroad.",
+      "For processing we are still missing two documents: a certified copy of your final certificate and a certified translation into German. Please submit these within six weeks.",
+      "After a complete review you will receive a written decision. It states whether your qualification is recognised as equivalent or whether an adaptation course is necessary. Processing usually takes three to four months.",
+      "Kind regards\nCentral office for foreign qualifications",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_bildung_letter_anerkennung_q1",
+        question: "Welche Unterlagen fehlen noch?",
+        options: [
+          "Eine beglaubigte Kopie des Zeugnisses und eine beglaubigte Übersetzung",
+          "Ein neuer Lebenslauf und ein Foto",
+          "Ein Nachweis der Krankenversicherung",
+        ],
+        answer: "Eine beglaubigte Kopie des Zeugnisses und eine beglaubigte Übersetzung",
+        explain: "Two documents are still needed: a certified copy of the certificate and a certified German translation.",
+      },
+      {
+        id: "tx_bildung_letter_anerkennung_q2",
+        question: "Innerhalb welcher Frist soll Herr Okonkwo die Unterlagen nachreichen?",
+        options: [
+          "Innerhalb von sechs Wochen",
+          "Innerhalb von drei Tagen",
+          "Innerhalb eines Jahres",
+        ],
+        answer: "Innerhalb von sechs Wochen",
+        explain: "He is asked to submit the missing documents within six weeks.",
+      },
+      {
+        id: "tx_bildung_letter_anerkennung_q3",
+        question: "Was kann der Bescheid am Ende feststellen?",
+        options: [
+          "Ob der Abschluss gleichwertig ist oder eine Anpassungsqualifizierung nötig ist",
+          "Ob Herr Okonkwo einen Sprachkurs bestanden hat",
+          "Wie hoch sein künftiges Gehalt sein wird",
+        ],
+        answer: "Ob der Abschluss gleichwertig ist oder eine Anpassungsqualifizierung nötig ist",
+        explain: "The written decision states whether the qualification is equivalent or whether an adaptation course is required.",
+      },
+    ],
+  },
 ];
 
 export const textById = (id: string) => texts.find((t) => t.id === id);
