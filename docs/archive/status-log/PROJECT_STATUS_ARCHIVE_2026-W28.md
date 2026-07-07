@@ -261,3 +261,50 @@ Anmeldung content) is done and locked; per the plan's model map, Opus 4.8 handle
 FSRS-recurrence engine work, Sonnet 5 drafts missions 1.1-1.5 against the `GAME_DESIGN.md`
 scene-by-scene specs, Haiku ships. The mission linter + the 81-test runner suite are the safety
 net. Optional Fable spend later: one tone/humor pass over the finished chapter-1 German.
+
+
+**Handoff after session 74 (2026-07-06). Playtest round 3 + activity research SHIPPED ✅;
+G2 is HALTED awaiting the founder's explicit go.** What happened:
+- **Founder feedback round 3 applied to the G1 slice** (PR #343, plus live hotfixes #344/#345):
+  1. **The bag** is with the player at all times (HUD slot with count, pulses on demands; popup
+     drawn as the backpack: handle, leather dome, zip band). 2. **English is a game resource**:
+  the always-on E toggle is gone; the Wörterbuch bag item has 3 charges/mission, one charge
+  reveals English for the current scene (`dictUses`/`useDictionary`). 3. **Bag-answered
+  demands**: battle `ask` nodes (engine `handItem`/`admitMissing`; wrong item = Geduld cost +
+  deadpan line; conceding = fetch-quest branch); both Schmidt document demands converted, the
+  remaining option lists differentiated (visible costs, reaction lines, a bluff path, no crit
+  telegraphing). 5. **World scale locked** in `welt_assets.py` (adult 28-32 px, chair ~19 px;
+  taller player sprite, `proportions-check.png`). 6. **Full-screen pixel UI**: fixed game layer,
+  edge-to-edge stage, all surfaces pixel-styled (outlined panels, hard shadows, name plates).
+  Battle composition rule (founder, #344/#345): opponent + bar top band, player + Mut bar bottom
+  band, ONE human scale (no foreground zoom). All in `DECISIONS.md` "Game interaction &
+  pixel-UI rules"; linter knows `ask`/`dictUses`; 85 unit tests; playthrough-verified.
+- **Feedback item 4, the multi-agent research, is DONE** (PR #346): four expert personas ran in
+  parallel as subagents (DaF-Didaktikerin/examiner, veteran game designer, German culture
+  expert, market researcher with a live web sweep of 11 shipped language games), two on Opus 4.8
+  and two on Sonnet 5 per the s73 budget decision, synthesized into
+  **`docs/strategy/MISSION_ACTIVITY_RESEARCH.md`** (20-entry activity catalog with engine fit,
+  six meaningful-choice levers, error-handling rules, market evidence, ranked G2 adoption order)
+  and **`docs/strategy/CHAPTER1_GAMEPLAY_DECK.html`** (two-part founder deck: research outcomes
+  + complete chapter-1 scripts: opening, character creation with language-level selection, cast,
+  help systems, missions 1.1-1.6 scene by scene, environments, ramp). Also delivered as an
+  Artifact. The COMPLETE verbatim persona briefs + reports are archived in
+  **`docs/strategy/MISSION_ACTIVITY_IDEATION_TRANSCRIPTS.md`** (founder request).
+  **New mission exercises must draft against the research catalog.**
+- **G2 STATUS: HALTED by the founder ("stop before proceeding with g2. Wait for my go").** G2
+  authoring had just begun when the stop arrived; the partial draft is PARKED as the **tip commit
+  of the session branch** `claude/neuland-g1-g2-feedback-wkf28n` (message prefix `wip(G2, PARKED,
+  DO NOT MERGE)`; UNMERGED, deliberately NOT on `main`). To resume after the founder's go:
+  `git checkout claude/neuland-g1-g2-feedback-wkf28n` and continue from that commit (or a fresh
+  branch cherry-picking it). It contains: three new scene settings (terminal/laden/supermarkt)
+  with a backdrop generator, scene `label` override, `doc-pass.png`, four chapter-1 NPCs, three
+  key items (ki_reisepass/ki_fahrschein/ki_sim_vertrag), and draft mission data for 1.1 + 1.2.
+  Still open when resumed: missions 1.3-1.5, provenance rows, boss `requiresMissions` gating +
+  replay-unlock in Welt.tsx (drafted), asset regeneration (`python3 welt_assets.py`), test
+  updates, all gates, a playthrough. **Do not merge or continue the WIP without the founder's go.**
+- **Plan position** (`GAME_IMPLEMENTATION_PLAN.md`): G0 ✅ (s63-66) · G1 ✅ shipped s73 with
+  three playtest rounds applied (s73 x2, s74 x1 + hotfixes) · s74 research ✅ (feeds G2) ·
+  **G2 ⏸ awaiting founder go** (scope when resumed: missions 1.1-1.5 per the deck scripts,
+  recurring NPCs, licensed pixel packs vs scene 7 + scale table, FSRS-driven recurrence,
+  Supabase migration for game-state sync, then the 5-10-learner playtest gate) · G3/G4 not
+  started. Model guidance for G2 stands: Opus 4.8 / Sonnet 5 / Haiku, not Fable.
