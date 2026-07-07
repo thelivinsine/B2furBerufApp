@@ -306,6 +306,30 @@ export const canDoStatements: CanDoStatement[] = [
     en: "I can get advice on saving, interest and credit and ask targeted follow-up questions.",
     threshold: 0.75,
   },
+  {
+    id: "cd_bildung_1",
+    themeId: "bildung",
+    cefr: "A2",
+    statement: "Ich kann mich nach einem passenden Sprachkurs erkundigen und mich anmelden.",
+    en: "I can ask about a suitable language course and enrol.",
+    threshold: 0.25,
+  },
+  {
+    id: "cd_bildung_2",
+    themeId: "bildung",
+    cefr: "B2.1",
+    statement: "Ich kann erklären, welche Unterlagen ich für die Anerkennung meines Abschlusses brauche.",
+    en: "I can explain which documents I need for the recognition of my qualification.",
+    threshold: 0.5,
+  },
+  {
+    id: "cd_bildung_3",
+    themeId: "bildung",
+    cefr: "B2.2",
+    statement: "Ich kann mich zu einer Weiterbildung beraten lassen, eine Förderung erfragen und meinen Werdegang darstellen.",
+    en: "I can get advice on further training, ask about funding and present my educational and career background.",
+    threshold: 0.75,
+  },
 ];
 
 export const canDoByTheme = (themeId: string) =>

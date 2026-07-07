@@ -28,7 +28,7 @@ const LICENSE_ALLOWLIST = new Set([
 const THEME_IDS = [
   "meetings", "scheduling", "logistics", "customer", "conflict",
   "project", "technology", "sustainability", "safety", "travel",
-  "behoerde", "arzt", "wohnen", "bank",
+  "behoerde", "arzt", "wohnen", "bank", "bildung",
 ];
 const POS = ["noun", "verb", "adjective", "adverb", "phrase", "connector"];
 const REDEMITTEL_CATEGORIES = [
