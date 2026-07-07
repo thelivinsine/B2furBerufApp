@@ -1290,3 +1290,34 @@ Branch: `claude/whats-next-esga9u`.
   explicit go; its partial draft stays parked unmerged on the session branch.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (this entry), `docs/PROJECT_STATUS.md` (Resume-here
   pointer sharpened).
+
+## Entry 204 — 2026-07-07 (session 75)
+- **Branch:** `claude/whats-next-l61ca3`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim, in order):**
+  > what's next?
+
+  > 4
+
+  > I'd like you to work in content expansion
+- **Response summary:** (1) Briefed the founder on current state: session 74 shipped (playtest
+  round 3 + mission-activity research), the roadmap's next item G2 is HALTED on the founder's
+  explicit order, parked unmerged on `claude/neuland-g1-g2-feedback-wkf28n`. Offered the session's
+  options. (2) Founder picked "4" (just brief me), so walked through the G2 plan, the four-persona
+  research findings (market gaps we own, chapter-1 mission map, adoption order), and the honest
+  risk of scaling on an un-playtested slice. (3) Founder chose content expansion. Surveyed the
+  content banks (10 workplace themes + `behoerde`; the `gesundheit`/`bildung`/`pruefung` domains
+  had zero themes). The AskUserQuestion tool failed twice in this environment, so made the CTO call
+  to build the **Arzt & Gesundheit** pack (fills the empty `gesundheit` domain, most universal
+  daily-life situation), using `behoerde` as the reference template. Built the full theme: ThemeId
+  + linter, Stethoscope icon, ExamTheme with 4 sub-themes, writing prompt, 28 vocab, 36
+  collocations, 3 Can-Do milestones, 2 reading texts (6 checks), 1 branching dialogue, 71
+  provenance rows. All gates green (lint:content, build, bundle 79.5 kB, 85 unit tests, eslint 0
+  errors). No em dashes. Pushed to the session branch; NOT merged to `main` pending the founder's
+  OK on the domain choice (Arzt vs Wohnen/Bank).
+- **Artifacts:** `src/types/index.ts`, `scripts/lint-content.mjs`, `src/lib/icons.ts`,
+  `src/data/themes.ts`, `src/data/writingPrompts.ts`, `src/data/vocabulary.ts`,
+  `src/data/collocations.ts`, `src/data/canDo.ts`, `src/data/texts.ts`, `src/data/dialogues.ts`,
+  `src/data/provenance.ts`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. Commit SHA(s): see the branch.

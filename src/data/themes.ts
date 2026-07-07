@@ -204,6 +204,29 @@ export const themes: ExamTheme[] = [
       { id: "behoerde.bescheid", title: "Decisions & processing", titleDe: "Bescheide & Bearbeitung", situationsIndex: 3 },
     ],
   },
+  {
+    id: "arzt",
+    title: "Doctor & Health",
+    titleDe: "Arzt & Gesundheit",
+    blurb: "Handle German healthcare with confidence: book an appointment, describe symptoms, understand a diagnosis and deal with the pharmacy and your health insurance.",
+    blurbDe: "Das deutsche Gesundheitssystem sicher meistern: einen Termin machen, Beschwerden schildern, eine Diagnose verstehen und mit Apotheke und Krankenkasse umgehen.",
+    icon: "Stethoscope",
+    accent: "from-rose-500 to-red-500",
+    domain: "gesundheit",
+    context: "personal",
+    situations: [
+      "Einen Termin in der Arztpraxis vereinbaren",
+      "Dem Arzt die eigenen Beschwerden schildern",
+      "Eine Diagnose und die Behandlung verstehen",
+      "In der Apotheke ein Rezept einlösen und mit der Krankenkasse klären",
+    ],
+    subThemes: [
+      { id: "arzt.termin", title: "Appointments & practice", titleDe: "Termin & Praxis", situationsIndex: 0 },
+      { id: "arzt.symptome", title: "Symptoms & complaints", titleDe: "Beschwerden & Symptome", situationsIndex: 1 },
+      { id: "arzt.behandlung", title: "Diagnosis & treatment", titleDe: "Diagnose & Behandlung", situationsIndex: 2 },
+      { id: "arzt.versicherung", title: "Pharmacy & insurance", titleDe: "Apotheke & Versicherung", situationsIndex: 3 },
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);

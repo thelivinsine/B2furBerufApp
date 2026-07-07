@@ -78,4 +78,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       "Schreibe eine kurze E-Mail an das Bürgeramt: Bitte um einen Termin zur Anmeldung deines neuen Wohnsitzes und nenne deine Verfügbarkeit.",
     long: "Verfasse eine formelle E-Mail an die Ausländerbehörde. Erkläre, dass du deinen Aufenthaltstitel verlängern möchtest, frage nach den nötigen Unterlagen und bitte höflich um einen Termin.",
   },
+  arzt: {
+    themeId: "arzt",
+    short:
+      "Schreibe eine kurze E-Mail an eine Arztpraxis: Bitte um einen Termin, beschreibe kurz deine Beschwerden und nenne deine Verfügbarkeit.",
+    long: "Verfasse eine formelle E-Mail an deine Krankenkasse. Erkläre, dass du eine Rechnung einreichen möchtest, frage nach der Kostenübernahme für eine Behandlung und bitte höflich um eine schriftliche Bestätigung.",
+  },
 };
