@@ -189,6 +189,86 @@ export const examSets: ExamSet[] = [
     ],
     rubric: sharedRubric,
   },
+  {
+    id: "ex_behoerde",
+    title: "Prüfungssimulation: Behördengänge organisieren",
+    themeId: "behoerde",
+    scenarioId: "sc_anmeldung",
+    totalMinutes: 6,
+    taskSheet:
+      "Sie und Ihre Partnerin / Ihr Partner sind gerade nach Deutschland gezogen und müssen mehrere Behördengänge erledigen. Planen Sie gemeinsam, welche Termine Sie machen und wer welche Aufgabe übernimmt.",
+    aspects: [
+      "Welche Ämter müssen Sie zuerst aufsuchen (Anmeldung, Ausländerbehörde)?",
+      "In welcher Reihenfolge gehen Sie vor?",
+      "Wer besorgt welche Unterlagen?",
+      "Wer übernimmt welchen Termin?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_arzt",
+    title: "Prüfungssimulation: Arzttermine organisieren",
+    themeId: "arzt",
+    scenarioId: "sc_arztbesuch",
+    totalMinutes: 6,
+    taskSheet:
+      "Ein Familienmitglied ist krank und braucht in den nächsten Wochen Unterstützung. Planen Sie gemeinsam mit Ihrer Partnerin / Ihrem Partner, wie Sie Arztbesuche, Medikamente und Hilfe im Alltag organisieren.",
+    aspects: [
+      "Welche Arzttermine sind nötig und wer begleitet?",
+      "Wie organisieren Sie die Medikamente aus der Apotheke?",
+      "Wer hilft wann im Alltag (Einkäufe, Wege)?",
+      "Wie halten Sie wichtige Infos für die Krankenkasse fest?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_wohnen",
+    title: "Prüfungssimulation: Wohnung gemeinsam entscheiden",
+    themeId: "wohnen",
+    scenarioId: "sc_wohnungsbesichtigung",
+    totalMinutes: 6,
+    taskSheet:
+      "Sie und Ihre Partnerin / Ihr Partner haben eine Wohnung besichtigt und müssen sich entscheiden. Besprechen Sie die Vor- und Nachteile und einigen Sie sich, ob und wie Sie die Wohnung nehmen.",
+    aspects: [
+      "Was spricht für und gegen die Wohnung (Lage, Größe, Miete)?",
+      "Passen die Kosten in Ihr Budget?",
+      "Wer kümmert sich um Vertrag und Kaution?",
+      "Wie teilen Sie die Aufgaben beim Umzug auf?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_bank",
+    title: "Prüfungssimulation: Finanzen gemeinsam planen",
+    themeId: "bank",
+    scenarioId: "sc_kontoeroeffnung",
+    totalMinutes: 6,
+    taskSheet:
+      "Sie und Ihre Partnerin / Ihr Partner möchten Ihre Finanzen besser organisieren. Planen Sie gemeinsam, wie Sie Ihre Konten einrichten und Geld für ein gemeinsames Ziel sparen.",
+    aspects: [
+      "Getrenntes oder gemeinsames Konto: Was passt besser?",
+      "Wie viel können Sie monatlich sparen?",
+      "Für welches Ziel sparen Sie (Reise, Notgroschen)?",
+      "Wer behält welche Ausgaben im Blick?",
+    ],
+    rubric: sharedRubric,
+  },
+  {
+    id: "ex_bildung",
+    title: "Prüfungssimulation: Sprachkurs gemeinsam planen",
+    themeId: "bildung",
+    scenarioId: "sc_sprachkursberatung",
+    totalMinutes: 6,
+    taskSheet:
+      "Sie und eine Freundin / ein Freund möchten Ihr Deutsch gemeinsam verbessern. Planen Sie zusammen, welchen Kurs Sie besuchen, und einigen Sie sich auf einen gemeinsamen Plan.",
+    aspects: [
+      "Welches Kursformat passt (Abendkurs, Onlinekurs, Intensivkurs)?",
+      "Wie viel Zeit und Geld möchten Sie investieren?",
+      "Welches Ziel verfolgen Sie (Beruf, Prüfung, Alltag)?",
+      "Wie unterstützen Sie sich gegenseitig beim Lernen?",
+    ],
+    rubric: sharedRubric,
+  },
 ];
 
 export const examById = (id: string) => examSets.find((e) => e.id === id);
