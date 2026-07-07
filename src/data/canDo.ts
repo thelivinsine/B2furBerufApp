@@ -234,6 +234,30 @@ export const canDoStatements: CanDoStatement[] = [
     en: "I can respond to an official decision and file an objection if needed.",
     threshold: 0.75,
   },
+  {
+    id: "cd_arzt_1",
+    themeId: "arzt",
+    cefr: "B1.1",
+    statement: "Ich kann in einer Praxis anrufen und einen Arzttermin vereinbaren.",
+    en: "I can call a practice and arrange a doctor's appointment.",
+    threshold: 0.25,
+  },
+  {
+    id: "cd_arzt_2",
+    themeId: "arzt",
+    cefr: "B1.2",
+    statement: "Ich kann dem Arzt meine Beschwerden und Symptome verständlich schildern.",
+    en: "I can describe my complaints and symptoms to the doctor clearly.",
+    threshold: 0.5,
+  },
+  {
+    id: "cd_arzt_3",
+    themeId: "arzt",
+    cefr: "B2.1",
+    statement: "Ich kann eine Diagnose und die Behandlung nachvollziehen und in der Apotheke sowie mit der Krankenkasse das Nötige klären.",
+    en: "I can follow a diagnosis and the treatment and sort out what is needed at the pharmacy and with my health insurer.",
+    threshold: 0.75,
+  },
 ];
 
 export const canDoByTheme = (themeId: string) =>

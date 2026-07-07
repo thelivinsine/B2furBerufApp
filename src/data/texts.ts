@@ -609,6 +609,122 @@ export const texts: ReadingText[] = [
       },
     ],
   },
+
+  /* ---------------- Arzt & Gesundheit ---------------- */
+  {
+    id: "tx_arzt_email_termin",
+    kind: "email",
+    themeId: "arzt",
+    cefr: "B1.2",
+    subThemeId: "arzt.termin",
+    title: "Terminbestätigung Ihrer Hausarztpraxis",
+    titleEn: "Appointment confirmation from your GP practice",
+    de: [
+      "Sehr geehrte Frau Novak,",
+      "wir bestätigen Ihnen hiermit Ihren Termin in unserer Praxis am Donnerstag, den 16. Juli, um 8:45 Uhr bei Dr. Weber.",
+      "Bitte bringen Sie Ihre Versichertenkarte mit und kommen Sie etwa zehn Minuten früher, damit wir Sie an der Anmeldung aufnehmen können. Falls Sie derzeit Medikamente einnehmen, notieren Sie diese bitte vorab auf einem Zettel.",
+      "Sollten Sie den Termin nicht wahrnehmen können, sagen Sie ihn bitte spätestens 24 Stunden vorher telefonisch ab. So können wir den Termin an andere Patienten vergeben.",
+      "Mit freundlichen Grüßen\nIhr Praxisteam Dr. Weber",
+    ].join("\n\n"),
+    en: [
+      "Dear Ms Novak,",
+      "we hereby confirm your appointment at our practice on Thursday, 16 July, at 8:45 with Dr Weber.",
+      "Please bring your health insurance card and arrive about ten minutes early so we can check you in at reception. If you are currently taking any medication, please note it down on a piece of paper in advance.",
+      "If you cannot attend the appointment, please cancel it by phone at least 24 hours in advance. That way we can give the slot to other patients.",
+      "Kind regards\nYour practice team Dr Weber",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_arzt_email_termin_q1",
+        question: "Was soll Frau Novak zum Termin mitbringen?",
+        options: [
+          "Ihre Versichertenkarte",
+          "Eine Überweisung vom Facharzt",
+          "Ein Rezept aus der Apotheke",
+        ],
+        answer: "Ihre Versichertenkarte",
+        explain: "The email asks her to bring her health insurance card and to arrive about ten minutes early.",
+      },
+      {
+        id: "tx_arzt_email_termin_q2",
+        question: "Was soll die Patientin tun, wenn sie Medikamente einnimmt?",
+        options: [
+          "Die Medikamente vorab auf einem Zettel notieren",
+          "Die Medikamente in die Praxis mitbringen",
+          "Vorher die Krankenkasse informieren",
+        ],
+        answer: "Die Medikamente vorab auf einem Zettel notieren",
+        explain: "If she is currently taking medication, she should note it down on a piece of paper in advance.",
+      },
+      {
+        id: "tx_arzt_email_termin_q3",
+        question: "Bis wann muss ein Termin spätestens abgesagt werden?",
+        options: [
+          "Spätestens 24 Stunden vorher",
+          "Spätestens eine Woche vorher",
+          "Am selben Tag bis 8 Uhr",
+        ],
+        answer: "Spätestens 24 Stunden vorher",
+        explain: "The appointment must be cancelled by phone at least 24 hours in advance so it can be offered to other patients.",
+      },
+    ],
+  },
+  {
+    id: "tx_arzt_voicemail_apotheke",
+    kind: "voicemail",
+    themeId: "arzt",
+    cefr: "B2.1",
+    subThemeId: "arzt.versicherung",
+    title: "Voicemail: Ihr Medikament ist abholbereit",
+    titleEn: "Voicemail: your medication is ready to collect",
+    de: [
+      "Guten Tag, hier ist die Stadt-Apotheke am Markt, eine Nachricht für Herrn Aydin.",
+      "Sie haben gestern ein Rezept bei uns eingereicht. Das verschriebene Medikament war nicht vorrätig, deshalb mussten wir es bestellen. Es ist jetzt eingetroffen und liegt für Sie zur Abholung bereit.",
+      "Sie können es bis Samstag, 18 Uhr, bei uns abholen. Bringen Sie bitte das Rezept mit, falls Sie es noch nicht bei uns gelassen haben. Die Zuzahlung beträgt fünf Euro.",
+      "Bei Fragen zur Einnahme beraten wir Sie gern direkt am Schalter. Vielen Dank und gute Besserung!",
+    ].join("\n\n"),
+    en: [
+      "Hello, this is the Stadt-Apotheke am Markt, a message for Mr Aydin.",
+      "You submitted a prescription with us yesterday. The prescribed medication was not in stock, so we had to order it. It has now arrived and is ready for you to collect.",
+      "You can pick it up from us until Saturday, 6 pm. Please bring the prescription if you have not already left it with us. The co-payment is five euros.",
+      "If you have questions about how to take it, we are happy to advise you directly at the counter. Thank you and get well soon!",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_arzt_voicemail_apotheke_q1",
+        question: "Warum war das Medikament nicht sofort verfügbar?",
+        options: [
+          "Es war nicht vorrätig und musste bestellt werden",
+          "Das Rezept war ungültig",
+          "Die Krankenkasse hat die Kosten nicht übernommen",
+        ],
+        answer: "Es war nicht vorrätig und musste bestellt werden",
+        explain: "The medication was not in stock, so the pharmacy had to order it; it has now arrived.",
+      },
+      {
+        id: "tx_arzt_voicemail_apotheke_q2",
+        question: "Bis wann kann Herr Aydin das Medikament abholen?",
+        options: [
+          "Bis Samstag um 18 Uhr",
+          "Bis Freitag um 12 Uhr",
+          "Nur heute bis 20 Uhr",
+        ],
+        answer: "Bis Samstag um 18 Uhr",
+        explain: "He can collect it until Saturday at 6 pm.",
+      },
+      {
+        id: "tx_arzt_voicemail_apotheke_q3",
+        question: "Wie hoch ist die Zuzahlung?",
+        options: [
+          "Fünf Euro",
+          "Zehn Euro",
+          "Die Zuzahlung entfällt",
+        ],
+        answer: "Fünf Euro",
+        explain: "The co-payment for the medication is five euros.",
+      },
+    ],
+  },
 ];
 
 export const textById = (id: string) => texts.find((t) => t.id === id);

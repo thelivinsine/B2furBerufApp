@@ -211,3 +211,53 @@ content), building game UI surfaces to the scene-7 style. The narrative layer fo
 drafted `docs/strategy/GAME_DESIGN.md` (see the next handoff below).
 
 ---
+
+## Session 73 (2026-07-06) — Game phase G1 handoff (archived from PROJECT_STATUS in s75)
+
+**Handoff after session 73 (2026-07-06). Game phase G1 SHIPPED ✅: the Neuland mission engine and
+the Anmeldung vertical slice are live behind `/welt` (Beta).** What exists now:
+- **Schema + runner:** `src/types/game.ts` (Mission/Scene closed unions: cutscene, websiteParody,
+  loadout, listening, dialogueBattle, formCloze; NPC/key-item/chapter registries; every union
+  mirrored in the linter) and `engine/mission.ts` (pure immutable runner emitting effects the
+  player applies to the real stores: XP via `addXp`, retrieval grades via `reviewVocab` FSRS,
+  Redemittel practice, key items). Game state (`missionsDone`, `keyItems`) lives in
+  `useProgressStore`, **local-only for now**: cloudSync's `progress` table has a fixed column set,
+  so syncing game state needs a G2 Supabase migration (backlog).
+- **Lint gates:** `lint-content.mjs` now loads `src/data/missions.ts` and enforces mission graph
+  integrity (routing resolves + reachable win, battle node graphs, content-bank id references,
+  key-item obtainability, acyclic mission dependencies). `tests/mission.test.ts` covers the runner
+  (win path, fetch-quest loss, bar drain, loadout grading).
+- **Renderers:** `src/features/welt/` (stage atoms + 6 scene views + MissionPlayer + Welt hub),
+  styled to the blessed scene-7 reference: light-theme-only game cards, pixel backdrops
+  (code-authored placeholders in `src/features/welt/assets/`, generator
+  `preview/game-pixel-mockups/welt_assets.py`; G2 buys packs), focus mode hides chrome on `/welt`.
+  Entry: Anwenden hub "Neuland (Beta)" card + `/welt` deep link.
+- **Content:** the chapter-1 boss mission `m_kap1_anmeldung` (9 scenes: booking parody → loadout →
+  waiting room → Frau Schmidt battle → Anmeldeformular → victory; loses route through a scaffolded
+  retry that grants the missing papers). Two vocab adds (`v_mietvertrag`,
+  `v_wohnungsgeberbestaetigung`), provenance rows for all three new ids (1,124 total).
+  **Chapter-1 mission list (1.1–1.6) founder-approved this session**; the Anmeldung German awaits
+  the normal founder verify pass (provenance `draft`).
+- Verified end-to-end in the sandbox browser (full mission playthrough, zero console errors); all
+  gates green (typecheck, eslint, lint:content, 90+ unit tests, SRS/pronounce vectors, bundle
+  79.5 kB main / game in its own ~53 kB lazy chunk).
+- **Founder playtest feedback applied same-session, two rounds.** Round 1 ("image unclear, too
+  much text"): where-am-I chips on every stage, big text cuts per scene. Round 2 ("not engaged
+  enough, bar bug, more variety, finish should matter"): the loadout is now **walk-and-pick**
+  (documents lie in the room, the player sprite walks to each, the bag is the exit), the battle
+  bar bug is fixed (Geduld delta on Schmidt's card, Mut delta on the player's), Mut starts at
+  60/100 so every move visibly moves both bars, the two Konjunktiv-II crits are **typed cloze
+  challenges** (`BattleMove.cloze`), and a victory bonus scales with the remaining bars
+  (`BATTLE_FINISH_BONUS`). Recorded for G2 in `GAME_DESIGN.md` §4/§10 + backlog #32a/#32b:
+  **waiting-as-gameplay** and **Print-Prop-Quests** (Werbung/Anzeige/Flyer mini-exercises).
+- The game schema is aligned to **design v3** (PR #336, merged from a parallel session mid-build:
+  six-chapter spine, Im Büro inside the Mein Ziel career chain, Pfand economy): `ChapterId`, the
+  `chapters` registry and the linter mirror all carry the six chapters. Kapitel 1 was untouched
+  by v3, so the approved mission list stood. The Pfand economy + Jonas wild card are G2 systems.
+
+**Model for G2 (founder decision s73, saving Fable budget): run G2 on Opus 4.8 / Sonnet 5,
+NOT Fable.** The Fable-tier work (schema architecture, art direction, chapter-1 narrative specs,
+Anmeldung content) is done and locked; per the plan's model map, Opus 4.8 handles the
+FSRS-recurrence engine work, Sonnet 5 drafts missions 1.1-1.5 against the `GAME_DESIGN.md`
+scene-by-scene specs, Haiku ships. The mission linter + the 81-test runner suite are the safety
+net. Optional Fable spend later: one tone/humor pass over the finished chapter-1 German.

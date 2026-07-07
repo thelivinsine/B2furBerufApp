@@ -13,7 +13,8 @@ export type ThemeId =
   | "sustainability"
   | "safety"
   | "travel"
-  | "behoerde";
+  | "behoerde"
+  | "arzt";
 
 /* ---------------- Taxonomy: domains, modes, facets ---------------- */
 

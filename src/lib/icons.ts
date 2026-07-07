@@ -27,6 +27,7 @@ import {
   ArrowRightLeft,
   Boxes,
   Landmark,
+  Stethoscope,
   type LucideIcon,
 } from "lucide-react";
 
@@ -59,6 +60,7 @@ const map: Record<string, LucideIcon> = {
   ArrowRightLeft,
   Boxes,
   Landmark,
+  Stethoscope,
 };
 
 export function iconByName(name: string): LucideIcon {

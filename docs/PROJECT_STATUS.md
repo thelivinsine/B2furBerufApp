@@ -1,14 +1,12 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-06 (session 74: **founder playtest round 3 applied + multi-agent
-mission-activity research shipped** (PRs #343/#344/#345/#346). The Neuland slice now has the
-always-visible backpack (bag-answered document demands), English as a rationed Wörterbuch
-resource, a full-screen pixel-styled game frame, locked world/battle-composition scale rules,
-and a two-part research report + chapter-1 gameplay deck. **G2 is HALTED on founder order
-("Wait for my go")**: a small G2 groundwork draft (missions 1.1/1.2 + settings) sits PARKED
-UNMERGED as the session branch tip (commit `wip(G2, PARKED, DO NOT MERGE)`). The working branch
-is reassigned every session, so **`main` is always the source of truth**. Product name:
-**Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-07 (session 75: **Arzt & Gesundheit content pack** built. First theme in
+the `gesundheit` domain: 28 vocab, 36 collocations, 3 Can-Do milestones, 2 reading texts, 1
+branching dialogue, all provenance-rowed and gate-green. **G2 remains HALTED on founder order
+("Wait for my go")**: the G2 groundwork draft (missions 1.1/1.2 + settings) sits PARKED UNMERGED
+on the old session branch `claude/neuland-g1-g2-feedback-wkf28n` (commit `wip(G2, PARKED, DO NOT
+MERGE)`). The working branch is reassigned every session, so **`main` is always the source of
+truth**. Product name: **Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
@@ -166,6 +164,35 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 75 (2026-07-07). Arzt & Gesundheit content pack BUILT ✅ (gates green);
+G2 still HALTED awaiting the founder's explicit go.** What happened:
+- The founder chose **content expansion** over resuming/tweaking the game. Built a full new
+  daily-life theme, **`arzt` (Arzt & Gesundheit)**, the first theme in the previously-empty
+  `gesundheit` domain, using the `behoerde` pack as the reference template. Founder had not
+  explicitly confirmed the domain (the AskUserQuestion tool failed twice in this environment), so
+  Arzt was chosen as the CTO call: it fills an empty top-level domain and healthcare is the most
+  universal daily-life situation. The founder can redirect to Wohnen/Bank; structure is identical.
+- **What shipped in the pack:** `ThemeId` + linter `THEME_IDS` extended; `Stethoscope` icon; the
+  `arzt` ExamTheme (domain `gesundheit`, context `personal`, 4 sub-themes: termin/symptome/
+  behandlung/versicherung); writing prompt; **28 vocab** (v_arzttermin … v_notaufnahme), **36
+  collocations**, **3 Can-Do milestones** (cd_arzt_1..3), **2 reading texts** (a practice-email
+  Terminbestätigung + a pharmacy voicemail; 6 checks), **1 branching dialogue** (`sc_arztbesuch`,
+  4 decision nodes + narrator end), and **71 provenance rows** (all `draft`, founder review
+  pending). No em dashes in any copy.
+- **Gates all green:** `pnpm lint:content` (12 themes, 558 vocab, 432 collocations, 28 can-do, 12
+  texts, 1,195 provenance), `pnpm build`, `pnpm check:bundle` (main 79.5 kB / 400 kB), `pnpm
+  test:unit` (85 passed), `pnpm lint` (0 errors, the usual 32 react-hooks warnings). The theme
+  surfaces automatically everywhere that iterates the `themes` registry (Bibliothek, dashboard
+  intent cards, session composer, Fortschritt Can-Do grid).
+- **Status:** pushed to the session branch `claude/whats-next-l61ca3`. NOT yet merged to `main` —
+  awaiting the founder's OK on the domain choice before shipping live (Arzt vs Wohnen/Bank). Arzt
+  content is all provenance `draft` and wants the normal founder verify pass on the German.
+- **Obvious next content moves if Arzt is approved:** the roadmap's other named daily-life packs
+  (**Wohnen/Housing** — also feeds game chapter 2; **Bank & Finanzen**), then deepening Arzt
+  (dialogues, an exam set) or filling the other empty domains (`bildung`).
+
+---
+
 **Handoff after session 74 (2026-07-06). Playtest round 3 + activity research SHIPPED ✅;
 G2 is HALTED awaiting the founder's explicit go.** What happened:
 - **Founder feedback round 3 applied to the G1 slice** (PR #343, plus live hotfixes #344/#345):
@@ -212,78 +239,21 @@ G2 is HALTED awaiting the founder's explicit go.** What happened:
   Supabase migration for game-state sync, then the 5-10-learner playtest gate) · G3/G4 not
   started. Model guidance for G2 stands: Opus 4.8 / Sonnet 5 / Haiku, not Fable.
 
----
+_Older handoffs (sessions 1–73) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; the session-73 G1 handoff is in the W28 file)._
 
-**Handoff after session 73 (2026-07-06). Game phase G1 SHIPPED ✅: the Neuland mission engine and
-the Anmeldung vertical slice are live behind `/welt` (Beta).** What exists now:
-- **Schema + runner:** `src/types/game.ts` (Mission/Scene closed unions: cutscene, websiteParody,
-  loadout, listening, dialogueBattle, formCloze; NPC/key-item/chapter registries; every union
-  mirrored in the linter) and `engine/mission.ts` (pure immutable runner emitting effects the
-  player applies to the real stores: XP via `addXp`, retrieval grades via `reviewVocab` FSRS,
-  Redemittel practice, key items). Game state (`missionsDone`, `keyItems`) lives in
-  `useProgressStore`, **local-only for now**: cloudSync's `progress` table has a fixed column set,
-  so syncing game state needs a G2 Supabase migration (backlog).
-- **Lint gates:** `lint-content.mjs` now loads `src/data/missions.ts` and enforces mission graph
-  integrity (routing resolves + reachable win, battle node graphs, content-bank id references,
-  key-item obtainability, acyclic mission dependencies). `tests/mission.test.ts` covers the runner
-  (win path, fetch-quest loss, bar drain, loadout grading).
-- **Renderers:** `src/features/welt/` (stage atoms + 6 scene views + MissionPlayer + Welt hub),
-  styled to the blessed scene-7 reference: light-theme-only game cards, pixel backdrops
-  (code-authored placeholders in `src/features/welt/assets/`, generator
-  `preview/game-pixel-mockups/welt_assets.py`; G2 buys packs), focus mode hides chrome on `/welt`.
-  Entry: Anwenden hub "Neuland (Beta)" card + `/welt` deep link.
-- **Content:** the chapter-1 boss mission `m_kap1_anmeldung` (9 scenes: booking parody → loadout →
-  waiting room → Frau Schmidt battle → Anmeldeformular → victory; loses route through a scaffolded
-  retry that grants the missing papers). Two vocab adds (`v_mietvertrag`,
-  `v_wohnungsgeberbestaetigung`), provenance rows for all three new ids (1,124 total).
-  **Chapter-1 mission list (1.1–1.6) founder-approved this session**; the Anmeldung German awaits
-  the normal founder verify pass (provenance `draft`).
-- Verified end-to-end in the sandbox browser (full mission playthrough, zero console errors); all
-  gates green (typecheck, eslint, lint:content, 90+ unit tests, SRS/pronounce vectors, bundle
-  79.5 kB main / game in its own ~53 kB lazy chunk).
-- **Founder playtest feedback applied same-session, two rounds.** Round 1 ("image unclear, too
-  much text"): where-am-I chips on every stage, big text cuts per scene. Round 2 ("not engaged
-  enough, bar bug, more variety, finish should matter"): the loadout is now **walk-and-pick**
-  (documents lie in the room, the player sprite walks to each, the bag is the exit), the battle
-  bar bug is fixed (Geduld delta on Schmidt's card, Mut delta on the player's), Mut starts at
-  60/100 so every move visibly moves both bars, the two Konjunktiv-II crits are **typed cloze
-  challenges** (`BattleMove.cloze`), and a victory bonus scales with the remaining bars
-  (`BATTLE_FINISH_BONUS`). Recorded for G2 in `GAME_DESIGN.md` §4/§10 + backlog #32a/#32b:
-  **waiting-as-gameplay** and **Print-Prop-Quests** (Werbung/Anzeige/Flyer mini-exercises).
-- The game schema is aligned to **design v3** (PR #336, merged from a parallel session mid-build:
-  six-chapter spine, Im Büro inside the Mein Ziel career chain, Pfand economy): `ChapterId`, the
-  `chapters` registry and the linter mirror all carry the six chapters. Kapitel 1 was untouched
-  by v3, so the approved mission list stood. The Pfand economy + Jonas wild card are G2 systems.
-
-**Next step, in order:** (1) **the founder announced MORE G1 feedback and tweaks at session
-close**; expect and apply that round first (the playtest-iteration loop: fix before scaling).
-(2) Then **G2** (`GAME_IMPLEMENTATION_PLAN.md`): missions 1.1–1.5 against the approved list,
-recurring NPCs, licensed pixel packs (select against scene 7), FSRS-driven recurrence, the
-playtest gate. Also G2: Supabase migration to sync `missionsDone`/`keyItems`, plus the two
-specced s73 systems (waiting-as-gameplay, Print-Prop-Quests). **Exit criterion for G1 stands:
-the founder plays the slice on their phone and it feels like a game.**
-
-**Model for G2 (founder decision s73, saving Fable budget): run G2 on Opus 4.8 / Sonnet 5,
-NOT Fable.** The Fable-tier work (schema architecture, art direction, chapter-1 narrative specs,
-Anmeldung content) is done and locked; per the plan's model map, Opus 4.8 handles the
-FSRS-recurrence engine work, Sonnet 5 drafts missions 1.1-1.5 against the `GAME_DESIGN.md`
-scene-by-scene specs, Haiku ships. The mission linter + the 81-test runner suite are the safety
-net. Optional Fable spend later: one tone/humor pass over the finished chapter-1 German.
-
-_Older handoffs (sessions 1–72) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`)._
-
-**Content counts (verified from `src/data/*` on 2026-07-06):**
-- Vocabulary: **530 words** (+2 Anmeldung documents in s73)
-- Collocations: **396 Nomen-Verb pairs** (~36/theme; tripled from 132 in s40)
+**Content counts (verified from `src/data/*` on 2026-07-07):**
+- Vocabulary: **558 words** (+28 Arzt/Gesundheit pack in s75)
+- Collocations: **432 Nomen-Verb pairs** (~36/theme; +36 Arzt pack in s75)
 - Grammar: **47 drills** · **10 topics**
-- Dialogues (branching scenarios): **12** (incl. behoerde)
-- Exam sets: **10** (1 per theme · 6–7 min · sharedRubric)
+- Dialogues (branching scenarios): **13** (incl. behoerde + the s75 Arztbesuch)
+- Exam sets: **10** (1 per workplace theme · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
-- Can-Do milestones: **25** (all 11 themes; founder-verified provenance)
-- Lese-/Hörtexte: **10** texts / **30** comprehension checks (added s69; founder review pending)
+- Can-Do milestones: **28** (all 12 themes; behoerde/workplace founder-verified, arzt draft)
+- Lese-/Hörtexte: **12** texts / **36** comprehension checks (+2 Arzt texts in s75)
+- Themes: **12** (10 workplace + `behoerde` + `arzt`, the first `gesundheit`-domain theme)
 - Game missions (Neuland): **1** (the chapter-1 Anmeldung boss, 9 scenes) · 6 NPCs · 4 key items
-- Provenance rows: **1,124** (all with a `reference`; 1,099 `draft` / 25 `verified`)
+- Provenance rows: **1,195** (all with a `reference`; 1,170 `draft` / 25 `verified`)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is
 always the source of truth).

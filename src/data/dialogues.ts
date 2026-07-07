@@ -1603,7 +1603,76 @@ const auslaenderbehoerde: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde];
+const arztbesuch: Scenario = {
+  id: "sc_arztbesuch",
+  themeId: "arzt",
+  title: "Beim Hausarzt: Beschwerden schildern",
+  task: "Schildern Sie dem Hausarzt Ihre Beschwerden, verstehen Sie die Diagnose und klären Sie die weitere Behandlung.",
+  context:
+    "Sie fühlen sich seit einigen Tagen krank und sind zur Sprechstunde in Ihre Hausarztpraxis gekommen. Im Sprechzimmer fragt Sie der Arzt nach Ihren Beschwerden.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "d1",
+  nodes: {
+    d1: {
+      id: "d1",
+      speaker: "partner",
+      line: "Guten Tag, bitte nehmen Sie Platz. Was führt Sie zu mir?",
+      gloss: "Hello, please take a seat. What brings you to me?",
+      hints: ["Begrüße höflich.", "Beschreibe kurz und klar deine Beschwerden."],
+      options: [
+        { id: "d1a", text: "Guten Tag. Ich habe seit drei Tagen Halsschmerzen und Fieber.", uses: "clarification", quality: 1, feedback: "Sehr gut: klare Angabe von Symptom und Dauer.", next: "d2" },
+        { id: "d1b", text: "Guten Tag, mir geht es nicht gut. Ich fühle mich seit ein paar Tagen schlapp und habe Husten.", uses: "clarification", quality: 0.9, feedback: "Gut: du beschreibst mehrere Beschwerden verständlich.", next: "d2" },
+        { id: "d1c", text: "Krank.", uses: "reactions", quality: 0.3, feedback: "Zu knapp. Nenne konkret, welche Beschwerden du hast.", next: "d2" },
+      ],
+    },
+    d2: {
+      id: "d2",
+      speaker: "partner",
+      line: "Das tut mir leid. Haben Sie auch Schmerzen beim Schlucken? Und nehmen Sie zurzeit Medikamente?",
+      gloss: "I'm sorry to hear that. Do you also have pain when swallowing? And are you currently taking any medication?",
+      hints: ["Antworte auf beide Fragen.", "Frag nach, wenn du etwas nicht verstehst."],
+      options: [
+        { id: "d2a", text: "Ja, das Schlucken tut weh. Medikamente nehme ich keine, aber ich habe eine Allergie gegen Penicillin.", uses: "agree", quality: 1, feedback: "Perfekt: wichtige Information zur Allergie gleich mitgeteilt.", next: "d3" },
+        { id: "d2b", text: "Beim Schlucken tut es weh. Was meinen Sie genau mit Medikamenten?", uses: "clarification", quality: 0.8, feedback: "In Ordnung, aber die Frage war klar. Antworte ruhig direkt.", next: "d3" },
+        { id: "d2c", text: "Weiß ich nicht.", uses: "reactions", quality: 0.3, feedback: "Versuch, auf die Fragen konkret zu antworten.", next: "d3" },
+      ],
+    },
+    d3: {
+      id: "d3",
+      speaker: "partner",
+      line: "Ich schaue mir Ihren Hals kurz an. Das sieht nach einer Racheninfektion aus. Ich verschreibe Ihnen ein Medikament ohne Penicillin. Sind Sie damit einverstanden?",
+      gloss: "Let me take a quick look at your throat. This looks like a throat infection. I'll prescribe you a medication without penicillin. Are you okay with that?",
+      hints: ["Stimme zu oder frage nach der Einnahme.", "Du kannst nach einer Krankschreibung fragen."],
+      options: [
+        { id: "d3a", text: "Ja, einverstanden. Wie oft am Tag soll ich das Medikament einnehmen?", uses: "suggestions", quality: 1, feedback: "Sehr gut: zugestimmt und sinnvoll zur Einnahme nachgefragt.", next: "d4" },
+        { id: "d3b", text: "Danke. Könnten Sie mir auch eine Krankschreibung für die Arbeit ausstellen?", uses: "clarification", quality: 0.9, feedback: "Stark: an die Krankschreibung für den Arbeitgeber gedacht.", next: "d4" },
+        { id: "d3c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Eine kurze Rückfrage zur Einnahme wäre hier sinnvoll.", next: "d4" },
+      ],
+    },
+    d4: {
+      id: "d4",
+      speaker: "partner",
+      line: "Dreimal täglich nach dem Essen, für sieben Tage. Eine Krankschreibung für drei Tage gebe ich Ihnen mit. Das Rezept lösen Sie bitte in der Apotheke ein. Haben Sie noch Fragen?",
+      gloss: "Three times a day after meals, for seven days. I'll give you a sick note for three days. Please redeem the prescription at the pharmacy. Do you have any other questions?",
+      hints: ["Bedanke dich.", "Du kannst fragen, was du bei einer Verschlechterung tun sollst."],
+      options: [
+        { id: "d4a", text: "Vielen Dank. Was soll ich tun, wenn es nach drei Tagen nicht besser wird?", uses: "clarification", quality: 1, feedback: "Top: vorausschauende und wichtige Nachfrage.", next: "d_end" },
+        { id: "d4b", text: "Nein, danke. Das war sehr verständlich.", uses: "agree", quality: 0.9, feedback: "Höflich und freundlich abgeschlossen.", next: "d_end" },
+        { id: "d4c", text: "Alles klar.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wirkt freundlicher.", next: "d_end" },
+      ],
+    },
+    d_end: {
+      id: "d_end",
+      speaker: "narrator",
+      line: "Sie haben Ihre Beschwerden klar geschildert, die Behandlung verstanden und alles Wichtige geklärt. Gute Besserung!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>
