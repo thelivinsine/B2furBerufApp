@@ -21,7 +21,12 @@
     "build:dict-subset": "node scripts/build-dict-subset.mjs",
     "build:nouns-subset": "node scripts/build-nouns-subset.mjs",
     "build:oracles": "node scripts/build-dict-subset.mjs && node scripts/build-nouns-subset.mjs",
-    "verify:facts": "node scripts/verify-facts.mjs"
+    "verify:facts": "node scripts/verify-facts.mjs",
+    "build:languagetool": "node scripts/build-languagetool.mjs",
+    "build:frequency-subset": "node scripts/build-frequency-subset.mjs",
+    "verify:grammar": "node scripts/verify-grammar.mjs",
+    "verify:cefr": "node scripts/verify-cefr.mjs",
+    "verify:sentences": "node scripts/verify-grammar.mjs && node scripts/verify-cefr.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",

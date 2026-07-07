@@ -1,6 +1,6 @@
 # Data Strategy — source-verified, audit-ready, and automated
 
-_Status: **v1.2 (2026-07-07)**. Author: session `app-data-strategy`. This is the top-level data
+_Status: **v1.3 (2026-07-07)**. Author: session `app-data-strategy`. This is the top-level data
 strategy for Genauly. It sits above two existing documents and does not repeat them:_
 
 - _**`docs/strategy/DATA_GOVERNANCE.md`** — the legal / licensing / certification layer (provenance
@@ -161,6 +161,27 @@ resolve.
 Both are offline and free. LanguageTool findings are specific and actionable ("possible agreement
 error: *dem* → *den*") and, again, need no native fluency to act on because the tool cites the rule.
 
+> **SHIPPED (v1.3, 2026-07-07).** Layer 3 now runs both halves as **warn-only scheduled reports**
+> (never a merge gate, per §10 decision 4):
+> - **Grammar/spelling** — `pnpm verify:grammar` runs **LanguageTool 6.8** (`language-de`) over
+>   **2,315 German sentences** (vocab examples, collocation examples, dialogue lines + options +
+>   model answers, reading-text bodies + questions, redemittel phrases + examples). LanguageTool is
+>   ~69 MB across 88 jars, too large to vendor, so `pnpm build:languagetool` resolves it PINNED from
+>   **Maven Central** (reachable, unlike the blocked kaikki/de.wiktionary) and runs fully offline
+>   after. Result: **0 grammar/agreement errors, 98.8% of sentences clean**, and it caught one real
+>   typo (a misspelled headword, now fixed). Findings are bucketed by LanguageTool's own issue type
+>   in `docs/reports/verify-grammar-report.md`.
+> - **CEFR plausibility** — `pnpm verify:cefr` compares each item's claimed `cefr` to a measured
+>   difficulty from **word frequency** (`wordfreq` German Zipf, vendored subset built by
+>   `pnpm build:frequency-subset`) and **sentence complexity**. Honest calibration: German unigram
+>   frequency is a weak grader (compounds are elementary yet rare), so the tripwire flags only the
+>   **reliable** direction (a common word carrying an advanced label) and only for vocabulary,
+>   trading recall for precision. Result: **6 FLAG + 72 WATCH** out of 1,182 tagged items, the rest
+>   reported as caveated information in `docs/reports/verify-cefr-report.md`.
+>
+> A monthly `verify-sentences.yml` Action regenerates both reports and uploads them as artifacts (no
+> auto-commit, so no deploy churn). This is the ladder's grammar rung; the AI jury (Layer 4) is next.
+
 ### Layer 4 — AI jury: the native-speaker substitute — **build third**
 Layers 2–3 verify facts and grammar. They cannot judge the things that actually need a fluent human:
 *is this natural, is the register right, does the example genuinely illustrate the word, is the
@@ -310,8 +331,10 @@ Ordered by leverage-per-effort, cheapest and highest-impact first.
 Wire it as a CI gate for new nouns/verbs. _Outcome: the ~990-item lexical bulk becomes fact-verified
 with zero German skill and zero recurring cost. This alone retires most of the "unverified" risk._
 
-**Phase B — Linguistic engine (Layer 3).** Stand up a local LanguageTool; run all sentences; add the
-CEFR frequency heuristic. Findings → warnings on PR, full report on schedule.
+**Phase B — Linguistic engine (Layer 3). SHIPPED (v1.3).** LanguageTool 6.8 (resolved offline from
+Maven Central) runs over all 2,315 German sentences (0 grammar errors, 98.8% clean, one real typo
+caught); a precision-first CEFR frequency+complexity heuristic flags the grossest mislabels. Both are
+warn-only scheduled reports (`verify-sentences.yml`, monthly), never a gate.
 
 **Phase C — Trust model.** Add the `verification` block to `ProvenanceEntry`; have Phases A/B write
 tiers; surface tier + confidence on `/sources`; extend `lint-content.mjs` to record (not yet gate on)
@@ -362,6 +385,20 @@ item, and re-verifies itself on a schedule — built by a founder who does not s
 because the authorities and the panel do the speaking, and the human only settles the ties.
 
 ## Change log
+- **v1.3 (2026-07-07):** Phase B (Layer 3) **shipped as warn-only scheduled reports.** Grammar/
+  spelling: `pnpm verify:grammar` runs **LanguageTool 6.8** over **2,315 German sentences** (vocab
+  examples, collocation examples, dialogue lines/options/models, reading-text bodies/questions,
+  redemittel phrases/examples). LanguageTool is ~69 MB, too big to vendor, so `pnpm build:languagetool`
+  resolves it **pinned from Maven Central** (reachable, unlike the network-blocked kaikki/de.wiktionary
+  the LanguageTool download host was 403) and runs offline after. **Result: 0 grammar/agreement errors,
+  98.8% clean**, one real headword typo caught and fixed (`v_kulanzloesung`: "Kulanslösung" →
+  "Kulanzlösung"). CEFR heuristic: `pnpm verify:cefr` compares claimed `cefr` to word frequency
+  (`wordfreq` Zipf, vendored via `pnpm build:frequency-subset`) + sentence complexity; calibrated
+  precision-first (German unigram frequency can't grade compounds, so it flags only the reliable
+  "common word, advanced label" direction, vocabulary only) → **6 FLAG + 72 WATCH** of 1,182 items.
+  Reports: `docs/reports/verify-grammar-report.md`, `docs/reports/verify-cefr-report.md`; regenerated
+  monthly by `.github/workflows/verify-sentences.yml` (artifacts, no auto-commit). Neither gates a
+  merge (LanguageTool over-flags idiomatic B2, per §10 decision 4).
 - **v1.2 (2026-07-07):** Phase A (Layer 2) **completed and promoted to a CI gate.** Added the
   second oracle the v1.1 spike said was required: `german-nouns` (~100k nouns compiled from German
   Wiktionary, CC-BY-SA-4.0), fetched from **PyPI** (an allowed host) by `pnpm build:nouns-subset` →

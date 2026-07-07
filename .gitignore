@@ -9,3 +9,10 @@ dist-ssr
 *.log
 .vite
 coverage
+
+# Data-strategy Layer 3: the LanguageTool toolchain (~69 MB) is resolved from
+# Maven Central at build time, not vendored. Regenerate with `pnpm build:languagetool`.
+scripts/vendor/lt-lib/
+scripts/vendor/.lt-pom/
+scripts/vendor/.lt-tmp/
+scripts/vendor/.freq-tmp/
