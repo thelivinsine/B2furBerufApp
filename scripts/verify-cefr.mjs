@@ -25,7 +25,7 @@
  * precision so the flags are worth reading.
  */
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { createServer } from "vite";
 import { headToken } from "./build-frequency-subset.mjs";
@@ -66,6 +66,22 @@ function complexityBand({ words, commas }) {
   if (words <= 19 && commas <= 2) return 3;
   if (words <= 26 && commas <= 3) return 4;
   return 5;
+}
+
+/**
+ * Classify one vocabulary item's CEFR plausibility (shared with build-verification).
+ * Returns "flag" | "watch" | "rareEasy" | "ok" | "unmeasured".
+ */
+export function classifyVocabCefr(v, freq) {
+  const claimedIdx = CEFR_INDEX[v.cefr];
+  const tok = headToken(v.de);
+  const zipf = tok ? freq[tok] ?? 0 : 0;
+  if (zipf < MEASURABLE_FLOOR) return "unmeasured";
+  const fb = zipfToBand(zipf);
+  if (fb <= ELEMENTARY && claimedIdx >= ADVANCED) return "flag";
+  if (fb <= ELEMENTARY && claimedIdx === 3) return "watch";
+  if (fb >= ADVANCED && claimedIdx <= ELEMENTARY) return "rareEasy";
+  return "ok";
 }
 
 async function loadBanks() {
@@ -295,7 +311,9 @@ async function main() {
   console.log("Reminder: heuristic tripwire, not a grader — warn-only by design.");
 }
 
-main().catch((err) => {
-  console.error("verify-cefr failed:", err?.message ?? err);
-  process.exitCode = 1;
-});
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((err) => {
+    console.error("verify-cefr failed:", err?.message ?? err);
+    process.exitCode = 1;
+  });
+}

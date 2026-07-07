@@ -1540,4 +1540,43 @@ Branch: `claude/whats-next-esga9u`.
   `.github/workflows/verify-sentences.yml`, `docs/reports/verify-grammar-report.md`,
   `docs/reports/verify-cefr-report.md`, `docs/strategy/DATA_STRATEGY.md`, `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`,
-  `docs/SESSION_PROMPT_LOG.md`. PR + commit: see below.
+  `docs/SESSION_PROMPT_LOG.md`. Shipped via **PR #356** (squash-merged, `56e4225`), then branch realignment.
+
+## Entry 216 — 2026-07-07 (session 78)
+- **Branch:** `claude/data-strategy-phase-b-wiw3mu`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > what's next?
+- **Response summary:** Gave a CTO read of the remaining verification-ladder phases. Recommended **Phase C
+  (the trust model)** next as the highest-leverage free move: it turns the Layer 2/3 checks into a
+  per-item, auditable tier surfaced on `/sources` (the Article 10 payoff), needs no German and no spend.
+  Flagged the alternatives (small content cleanups from the Phase B reports; Phase D, the AI jury, as the
+  first paid rung needing ~150 human-labeled calibration items). Asked whether to build Phase C.
+- **Artifacts:** none (recommendation only).
+
+## Entry 217 — 2026-07-07 (session 78)
+- **Branch:** `claude/data-strategy-phase-b-wiw3mu`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > yes, implement phase c
+- **Response summary:** Built **Phase C (the trust model)**. Added the `Verification` block
+  (`tier`/`checks[]`/`confidence`/`last_verified` + `VerificationTier`/`Layer`/`Result` enums) to
+  `ProvenanceEntry`. Wrote `scripts/build-verification.mjs` (`pnpm build:verification`) that composes the
+  Layer 2 fact verdicts + Layer 3 grammar (via a new `docs/reports/verify-grammar.json` sidecar emitted by
+  `verify:grammar`) + CEFR results into the **generated** `src/data/verification.ts`, keyed by content_id,
+  every record sharing one sweep-date const so re-runs only diff moved items. Exported the compute helpers
+  from `verify-facts`/`verify-cefr` (and guarded their `main()`) so the aggregator reuses them without
+  re-running LanguageTool. `/sources` (`Sources.tsx`) now shows a per-item **tier badge + confidence** and
+  a tier-distribution section; `lint:content` validates the closed enums and prints the distribution
+  (records, not a gate). **First sweep over 1,408 items: 25 human · 1,266 linguistic · 1 facts · 116
+  provenance** (1,292 machine-attested). `DATA_STRATEGY.md` → **v1.4**. All gates green (`lint:content`
+  with the tier summary, `verify:facts`, `build`, `lint` 0 errors, `test:unit/srs/pronounce`,
+  `check:bundle` main 79.5 kB; `verification.ts` rides the lazy `/sources` chunk).
+- **Artifacts:** `src/types/index.ts`, `scripts/build-verification.mjs`, `src/data/verification.ts` (generated),
+  `scripts/verify-facts.mjs` + `scripts/verify-cefr.mjs` (export helpers + guard main),
+  `scripts/verify-grammar.mjs` (owner tags + `verify-grammar.json` sidecar), `scripts/lint-content.mjs`,
+  `src/features/legal/Sources.tsx`, `package.json`, `docs/reports/verify-grammar.json`,
+  `docs/strategy/DATA_STRATEGY.md`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+  PR + commit: see below.

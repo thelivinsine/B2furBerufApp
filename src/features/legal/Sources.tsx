@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink } from "lucide-react";
 import { provenance } from "@/data/provenance";
-import type { ProvenanceContentType, ProvenanceEntry } from "@/types";
+import { verification as verificationMap } from "@/data/verification";
+import type { ProvenanceContentType, ProvenanceEntry, VerificationTier } from "@/types";
 import { useAuthStore } from "@/store/useAuthStore";
 import { isFounder } from "@/lib/admin";
 import {
@@ -94,6 +95,23 @@ const LICENSE_LABEL: Record<string, { de: string; en: string }> = {
   "Public-Domain": { de: "Gemeinfrei", en: "Public domain" },
 };
 
+/* The machine-verification tier badge shown per item (data-strategy Layer C).
+   Ordered strongest-first; unverified/structural collapse into "sourced". */
+const TIER_META: Record<VerificationTier, { de: string; en: string; className: string }> = {
+  human: { de: "menschlich geprüft", en: "human-verified", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
+  jury: { de: "KI-Jury", en: "AI jury", className: "bg-violet-500/10 text-violet-600 dark:text-violet-400" },
+  linguistic: { de: "sprachlich geprüft", en: "grammar-checked", className: "bg-primary/10 text-primary" },
+  facts: { de: "Fakten geprüft", en: "facts-verified", className: "bg-sky-500/10 text-sky-600 dark:text-sky-400" },
+  provenance: { de: "Quelle belegt", en: "sourced", className: "bg-muted text-muted-foreground" },
+  structural: { de: "Quelle belegt", en: "sourced", className: "bg-muted text-muted-foreground" },
+  unverified: { de: "offen", en: "unverified", className: "bg-muted text-muted-foreground" },
+};
+
+/** The item's effective tier: an inline override on the row wins, else the generated map. */
+function tierOf(r: ProvenanceEntry): VerificationTier | undefined {
+  return r.verification?.tier ?? verificationMap[r.content_id]?.tier;
+}
+
 function hostOf(url: string): string {
   try {
     return new URL(url).hostname.replace(/^www\./, "");
@@ -145,10 +163,20 @@ function ItemRow({ r, lang, admin }: { r: ProvenanceEntry; lang: Lang; admin?: A
     setStatus(ok ? "idle" : "error");
   };
 
+  const tier = tierOf(r);
+  const tierMeta = tier ? TIER_META[tier] : undefined;
+
   return (
     <li className="px-4 py-2 text-sm">
       <div className="flex items-center justify-between gap-3">
-        <span className="min-w-0 truncate text-foreground/90">{r.label}</span>
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="min-w-0 truncate text-foreground/90">{r.label}</span>
+          {tierMeta && (
+            <span className={cn("shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium", tierMeta.className)}>
+              {tierMeta[lang]}
+            </span>
+          )}
+        </span>
         {r.reference ? (
           <a
             href={r.reference}
@@ -330,7 +358,9 @@ export function Sources() {
     const byType = new Map<ProvenanceContentType, ProvenanceEntry[]>();
     const byHost = new Map<string, number>();
     const byLicense = new Map<string, number>();
+    const byTier = new Map<VerificationTier, number>();
     let verified = 0;
+    let machineChecked = 0; // facts and/or linguistic (or higher)
     const attributions: ProvenanceEntry[] = [];
     for (const r of provenance) {
       if (!byType.has(r.content_type)) byType.set(r.content_type, []);
@@ -340,8 +370,11 @@ export function Sources() {
       byLicense.set(r.license, (byLicense.get(r.license) ?? 0) + 1);
       if (r.review_status === "verified") verified += 1;
       if (r.attribution_required) attributions.push(r);
+      const tier = tierOf(r);
+      if (tier) byTier.set(tier, (byTier.get(tier) ?? 0) + 1);
+      if (tier === "facts" || tier === "linguistic" || tier === "jury" || tier === "human") machineChecked += 1;
     }
-    return { byType, byHost, byLicense, verified, total: provenance.length, attributions };
+    return { byType, byHost, byLicense, byTier, verified, machineChecked, total: provenance.length, attributions };
   }, []);
 
   const t = (de: string, en: string) => (lang === "de" ? de : en);
@@ -395,6 +428,33 @@ export function Sources() {
           {t(
             `Aktuell: ${stats.total} Inhalte, ${stats.verified} davon menschlich geprüft. Alle Inhalte sind eigenerstellt und gegen die unten genannten Quellen verifiziert.`,
             `Currently: ${stats.total} items, ${stats.verified} human-verified. All content is authored in-house and verified against the references below.`,
+          )}
+        </p>
+      </Section>
+
+      <Section title={t("Prüfstufen (maschinell verifiziert)", "Verification tiers (machine-checked)")}>
+        <p>
+          {t(
+            `Jeder Inhalt durchläuft eine automatische Prüfleiter: Struktur, Quelle, Wortfakten (Artikel/Plural gegen zwei unabhängige Wörterbücher) und Sprache (Grammatik/Rechtschreibung mit LanguageTool, plus eine CEFR-Plausibilitätsprüfung). Die Stufe ist die höchste, die alle zutreffenden Prüfungen bestanden haben. ${stats.machineChecked} von ${stats.total} Inhalten sind maschinell auf Fakten oder Sprache geprüft; ${stats.verified} zusätzlich von einem Menschen.`,
+            `Every item climbs an automatic verification ladder: structure, source, word facts (article/plural against two independent dictionaries), and language (grammar/spelling via LanguageTool, plus a CEFR plausibility check). The tier is the highest rung all relevant checks passed. ${stats.machineChecked} of ${stats.total} items are machine-checked for facts or language; ${stats.verified} additionally by a human.`,
+          )}
+        </p>
+        <ul className="mt-2 space-y-1.5">
+          {(["human", "linguistic", "facts", "provenance"] as VerificationTier[])
+            .filter((tier) => stats.byTier.get(tier))
+            .map((tier) => (
+              <li key={tier} className="flex items-center justify-between gap-3">
+                <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", TIER_META[tier].className)}>
+                  {TIER_META[tier][lang]}
+                </span>
+                <span className="shrink-0 text-xs text-muted-foreground">{stats.byTier.get(tier)}</span>
+              </li>
+            ))}
+        </ul>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t(
+            "Eine bestandene Prüfung belegt Fakten und Grammatik, nicht Stil, Register oder das genaue Niveau. Diese folgen über eine KI-Jury und eine menschliche Stichprobe.",
+            "A passed check attests facts and grammar, not style, register, or the exact level. Those come via an AI jury and a human sample.",
           )}
         </p>
       </Section>

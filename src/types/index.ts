@@ -625,6 +625,47 @@ export type ProvenanceLicense =
 
 export type ProvenanceReviewStatus = "draft" | "verified" | "published" | "retired";
 
+/**
+ * Per-item machine-verification trust model (data-strategy Layer C, see
+ * docs/strategy/DATA_STRATEGY.md §4). The verification ladder climbs from
+ * `unverified` to `human`; `tier` is the highest rung all RELEVANT checks
+ * passed. `review_status` stays the human gate (only a Layer-5 sign-off flips
+ * an item to `"verified"`); everything below it is machine-attested.
+ */
+export type VerificationTier =
+  | "unverified"
+  | "structural"
+  | "provenance"
+  | "facts"
+  | "linguistic"
+  | "jury"
+  | "human";
+
+export type VerificationLayer = "structural" | "provenance" | "facts" | "linguistic" | "jury" | "human";
+
+export type VerificationResult = "pass" | "flag" | "fail";
+
+export interface VerificationCheck {
+  /** Which ladder rung this check belongs to. */
+  layer: VerificationLayer;
+  /** The tool/authority that ran it, e.g. "german-words-dict+german-nouns" | "languagetool-6.8". */
+  tool: string;
+  result: VerificationResult;
+  /** The specific finding, for the exception queue. */
+  detail?: string;
+  /** For jury reproducibility. */
+  prompt_version?: string;
+}
+
+export interface Verification {
+  tier: VerificationTier;
+  checks: VerificationCheck[];
+  /** 0..1 rollup, derived from the tier. */
+  confidence: number;
+  /** ISO date of the sweep that produced this record; drives the re-verify cadence. */
+  last_verified: string;
+}
+
 export interface ProvenanceEntry {
   content_id: string;
   content_type: ProvenanceContentType;
@@ -650,4 +691,11 @@ export interface ProvenanceEntry {
   verified_date?: string;
   review_status: ProvenanceReviewStatus;
   notes?: string;
+  /**
+   * Machine-verification trust block (Layer C). Optional and additive: rows
+   * without it are untouched. Written per-sweep to the generated map in
+   * `src/data/verification.ts` and merged onto the register for `/sources`; an
+   * inline value here (a human override) takes precedence over the generated map.
+   */
+  verification?: Verification;
 }

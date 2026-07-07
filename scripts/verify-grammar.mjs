@@ -33,6 +33,7 @@ import { createServer } from "vite";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const LIB = path.join(root, "scripts", "vendor", "lt-lib");
 const REPORT = path.join(root, "docs", "reports", "verify-grammar-report.md");
+const SIDECAR = path.join(root, "docs", "reports", "verify-grammar.json");
 const TMP = path.join(root, "scripts", "vendor", ".lt-tmp");
 const DRY = process.argv.includes("--dry");
 
@@ -90,36 +91,41 @@ async function ssr() {
   return banks;
 }
 
-/** Collect { id, kind, text } sentences from all banks. */
-function collectSentences(banks) {
+/**
+ * Collect { id, owner, kind, text } sentences from all banks. `owner` is the
+ * provenance content_id the sentence belongs to (vocab/collocation/redemittel id,
+ * dialogue scenario id, or reading-text id — text checks ride on the text row),
+ * so findings can be attributed to a registered item for the Layer C trust map.
+ */
+export function collectSentences(banks) {
   const out = [];
-  const push = (id, kind, text) => {
+  const push = (id, owner, kind, text) => {
     if (typeof text !== "string") return;
     // Strip our wire delimiters (RS/US) from content before framing.
     // eslint-disable-next-line no-control-regex
     const t = text.replace(/[\x1e\x1f]/g, " ").trim();
-    if (t.length >= 2) out.push({ id, kind, text: t });
+    if (t.length >= 2) out.push({ id, owner, kind, text: t });
   };
 
   for (const v of banks.vocabulary) {
-    (v.examples ?? []).forEach((ex, i) => push(`${v.id}#ex${i + 1}`, "vocab", ex?.de));
+    (v.examples ?? []).forEach((ex, i) => push(`${v.id}#ex${i + 1}`, v.id, "vocab", ex?.de));
   }
-  for (const c of banks.collocations) push(`${c.id}#ex`, "collocation", c.example?.de);
+  for (const c of banks.collocations) push(`${c.id}#ex`, c.id, "collocation", c.example?.de);
   for (const r of banks.redemittel) {
-    push(`${r.id}#phrase`, "redemittel", r.de);
-    push(`${r.id}#ex`, "redemittel", r.example?.de);
+    push(`${r.id}#phrase`, r.id, "redemittel", r.de);
+    push(`${r.id}#ex`, r.id, "redemittel", r.example?.de);
   }
   for (const d of banks.dialogues) {
     for (const n of Object.values(d.nodes ?? {})) {
-      push(`${d.id}:${n.id}#line`, "dialogue", n.line);
-      if (n.model) push(`${d.id}:${n.id}#model`, "dialogue", n.model);
-      if (n.prompt) push(`${d.id}:${n.id}#prompt`, "dialogue", n.prompt);
-      for (const o of n.options ?? []) push(`${d.id}:${n.id}:${o.id}#opt`, "dialogue", o.text);
+      push(`${d.id}:${n.id}#line`, d.id, "dialogue", n.line);
+      if (n.model) push(`${d.id}:${n.id}#model`, d.id, "dialogue", n.model);
+      if (n.prompt) push(`${d.id}:${n.id}#prompt`, d.id, "dialogue", n.prompt);
+      for (const o of n.options ?? []) push(`${d.id}:${n.id}:${o.id}#opt`, d.id, "dialogue", o.text);
     }
   }
   for (const tx of banks.texts) {
-    push(`${tx.id}#body`, "text", tx.de);
-    for (const ch of tx.checks ?? []) push(`${ch.id}#q`, "text", ch.question);
+    push(`${tx.id}#body`, tx.id, "text", tx.de);
+    for (const ch of tx.checks ?? []) push(`${ch.id}#q`, tx.id, "text", ch.question);
   }
   return out;
 }
@@ -268,6 +274,26 @@ async function main() {
 
   await mkdir(path.dirname(REPORT), { recursive: true });
   await writeFile(REPORT, L.join("\n"), "utf8");
+
+  // Structured sidecar for the Layer C trust map (scripts/build-verification.mjs):
+  // per owning content_id, a tally of findings by issue type. `checkedOwners` is
+  // every content_id that had at least one sentence checked, so the aggregator can
+  // tell "grammar-clean" (checked, no grammar finding) from "not checked".
+  const idToOwner = new Map(sentences.map((s) => [s.id, s.owner]));
+  const checkedOwners = [...new Set(sentences.map((s) => s.owner))].sort();
+  const byOwner = {};
+  for (const f of findings) {
+    const owner = idToOwner.get(f.id);
+    if (!owner) continue;
+    const bkt = bucketOf(f.issueType);
+    byOwner[owner] ??= {};
+    byOwner[owner][bkt] = (byOwner[owner][bkt] ?? 0) + 1;
+  }
+  await writeFile(
+    SIDECAR,
+    JSON.stringify({ tool: "languagetool-6.8", checkedOwners, byOwner }, null, 0) + "\n",
+    "utf8"
+  );
 
   console.log("");
   console.log(`Findings: ${findings.length} across ${flaggedSentences.size} sentences (${cleanPct}% clean).`);

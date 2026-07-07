@@ -42,6 +42,12 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   `docs/reports/verify-cefr-report.md`. Runs offline against the vendored
   `scripts/vendor/german-frequency-subset.json`; regenerate with `pnpm build:frequency-subset` (needs
   Python `wordfreq`) after adding vocab/collocations. Warn-only. `pnpm verify:sentences` runs both.
+- `pnpm build:verification` — Layer C trust model (data strategy, s78): composes the Layer 2 fact +
+  Layer 3 grammar/CEFR results into the **generated** `src/data/verification.ts` (per-item `tier` /
+  `checks` / `confidence`, keyed by content_id). Reads the `docs/reports/verify-grammar.json` sidecar
+  (so run `pnpm verify:grammar` first) and recomputes facts/CEFR from the vendored subsets. `/sources`
+  shows a tier badge per item; `lint:content` validates the enums + prints the tier distribution.
+  Regenerate after re-running the `verify:*` checks. See `docs/strategy/DATA_STRATEGY.md` §4.
 - `pnpm test:srs` — assert `engine/srs.ts` against FSRS golden vectors from py-fsrs (CI gate, s53).
   **Run it after any `engine/srs.ts` edit.** Vector provenance is in the `scripts/test-srs.mjs` header.
 - `pnpm test:pronounce` — assert the `engine/pronounce.ts` spoken/typed answer matcher (CI gate, s56).
@@ -64,7 +70,7 @@ Notes: `.npmrc` sets `minimum-release-age` (24h supply-chain cooldown) and
 protection); the build does NOT need any allowlisted scripts — keep it that way.
 
 ## Layout (`src/`)
-- `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`, `domains.ts`, `collocations.ts`, `provenance.ts`, `canDo.ts` (Can-Do milestones, s47), `texts.ts` (Lesen/Hören texts, s69), `missions.ts` (Neuland game mission bank + chapter/NPC/key-item registries, game G1, s73)
+- `data/` — content: `vocabulary.ts`, `redemittel.ts`, `dialogues.ts`, `examSets.ts`, `grammar.ts`, `themes.ts`, `domains.ts`, `collocations.ts`, `provenance.ts`, `canDo.ts` (Can-Do milestones, s47), `texts.ts` (Lesen/Hören texts, s69), `missions.ts` (Neuland game mission bank + chapter/NPC/key-item registries, game G1, s73), `verification.ts` (**generated** Layer C trust map, data strategy s78; per-item tier/confidence, written by `pnpm build:verification`, do not hand-edit)
 - `engine/` — logic: `dialogue.ts`, `scoring.ts`, `speech.ts`, `srs.ts` (FSRS-6 spaced repetition since s53; legacy SM-2 fields kept warm for rollback), `pronounce.ts` (tolerant spoken-answer matcher for the speaking block, s56), `quiz.ts`, `session.ts` (composed-session composer, s47; speaking pool added s56 behind the `recognitionEnabled` opt-in), `collection.ts` (redesign Phase 2.4: pure FSRS-stability→Lv 1-5 "collection level" mapping, the stable game contract for loot cards / Sammlung; unit-tested, do not drift the band boundaries)
 - `store/` — zustand stores: `useProgressStore`, `useSessionStore`, `useSettingsStore`, `useAuthStore`, `useLibraryScope` (travelling library scope, s47)
 - `lib/` — `hooks.ts`, `icons.ts`, `useTheme.ts`, `utils.ts`, `cefr.ts` (shared CEFR scale + level→band defaults), `search.ts` (global `searchAll`, s47), `phase.ts` (per-theme Aufbau/Festigen/Gemischt progression label derived from the existing mastery ratio, redesign Phase 4.5, no new state)
