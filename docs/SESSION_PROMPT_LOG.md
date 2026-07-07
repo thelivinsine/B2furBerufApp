@@ -1579,4 +1579,19 @@ Branch: `claude/whats-next-esga9u`.
   `scripts/verify-grammar.mjs` (owner tags + `verify-grammar.json` sidecar), `scripts/lint-content.mjs`,
   `src/features/legal/Sources.tsx`, `package.json`, `docs/reports/verify-grammar.json`,
   `docs/strategy/DATA_STRATEGY.md`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
-  PR + commit: see below.
+  Shipped via **PR #357** (squash-merged, `05d21fd`), then branch realignment.
+
+## Entry 218 — 2026-07-07 (session 78)
+- **Branch:** `claude/data-strategy-phase-b-wiw3mu`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** The session's substantive docs were already written and merged inline with the
+  work: `PROJECT_STATUS.md` (session-78 handoff covering Phase B + Phase C, header, content counts, W28
+  archive move of the session-76 handoff), `DATA_STRATEGY.md` → v1.4 (Phase B + C "SHIPPED" notes,
+  roadmap, changelog), `CLAUDE.md` (new `verify:grammar` / `verify:cefr` / `build:languagetool` /
+  `build:frequency-subset` / `build:verification` command docs + `verification.ts` in the data layout),
+  and prompt-log entries 215–217. This entry closes the paper trail for the "document the session"
+  request; shipped as a doc-only change.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`. PR + commit: see below.
