@@ -1595,3 +1595,42 @@ Branch: `claude/whats-next-esga9u`.
   and prompt-log entries 215–217. This entry closes the paper trail for the "document the session"
   request; shipped as a doc-only change.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`. PR + commit: see below.
+
+## Entry 219 — 2026-07-07 (session 79)
+- **Branch:** `claude/human-loop-data-strategy-scale-jp0lzf`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > following the data strategy implementation plan, how would a hum in the loop keep track of the content, share the data matched with sources to auditors and how would the database be managed when the app is scaled 100x from now?
+- **Response summary:** Research-and-answer only, no code changes. Read `DATA_STRATEGY.md` (v1.4),
+  `DATA_GOVERNANCE.md`, the provenance/verification infra (`provenance.ts`, generated `verification.ts`,
+  `Sources.tsx`), and the Supabase schema (`provenance_reviews` migration 0004 + `provenanceReviews.ts`,
+  the five migrations). Answered in three parts framed around Genauly's **two data planes** (static
+  content plane vs Supabase user plane). **(1) Human-in-the-loop tracking:** the verification ladder tracks
+  every item's `tier`/`confidence` in data; the human works only the machine-generated **exception queue**,
+  and verdicts persist via the founder-only `provenance_reviews` table + `/sources` admin overlay
+  (`review_status → verified`), with a staleness re-verification cadence. **(2) Auditor sharing:** the
+  reproducible per-item chain (source + license snapshot + fact/grammar/jury verdicts with tool/version/date
+  + human sign-off), surfaced on the auto-generated `/sources` page and mapped to EU AI Act Art. 10/12.
+  **(3) 100x DB:** content plane stays CDN-cheap (migrate files → content table only if the *library* grows
+  100x); user plane is standard Postgres scaling (Supavisor pooling → indexed/index-friendly RLS →
+  partition/archive `ai_usage`+writing → replicas) plus the real lever: **server-side metering/capping of
+  AI-writing-coach token spend**, and resolving the `progress` fixed-column upsert debt. Offered three
+  follow-up deliverables (now backlog #33–#35).
+- **Artifacts:** none (Q&A; no files changed).
+
+## Entry 220 — 2026-07-07 (session 79)
+- **Branch:** `claude/human-loop-data-strategy-scale-jp0lzf`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document this session. we'll come back to these tasks later
+  >
+  > also add the above tasks to backlog tiems
+- **Response summary:** Doc-only session close. Appended prompt-log entries 219–220; added a session-79
+  handoff pointer to `PROJECT_STATUS.md` "Resume here" (the three follow-ups are parked, no code shipped);
+  and added the three offered deliverables to the founder backlog in `PROJECT_REFERENCE.md` as **#33**
+  (human-in-the-loop exception-queue tooling), **#34** (auditor handoff package), and **#35** (scale-to-100x
+  database plan). No product code touched.
+- **Artifacts:** `docs/PROJECT_REFERENCE.md` (backlog #33–#35), `docs/PROJECT_STATUS.md` (Resume-here
+  pointer), `docs/SESSION_PROMPT_LOG.md` (entries 219–220).

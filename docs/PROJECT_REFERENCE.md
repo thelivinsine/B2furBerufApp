@@ -333,6 +333,38 @@ latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 pai
     (union-merge, like `scenariosDone`). Effort: **S** (plus the founder's one-time SQL step,
     PHASE2_SETUP pattern). Recommended model: **Sonnet**.
 
+33. **Human-in-the-loop content-tracking + exception-queue tooling (added 2026-07-07, from the data-strategy
+    Q&A):** the plumbing for the reviewer loop that `DATA_STRATEGY.md` §3 Layers 4–5 describe but hasn't
+    been built. Scope: generate the committed **exception queue** report (`docs/reports/verification-queue.md`)
+    from the machine sweeps (the items the fact/grammar/jury layers flag or disagree on, plus a random
+    confidence sample), and wire it to the existing founder-only review surface — the `provenance_reviews`
+    table (migration `0004`) + the `/sources` admin overlay (`src/lib/provenanceReviews.ts`) — so a reviewer
+    clears the queue and each verdict persists with `reviewed_by` + timestamp and flips
+    `review_status → verified`. This is the "how a human keeps track of content" answer made operational.
+    Depends on Phase D (the AI jury) landing to fully populate the queue, but the queue-generator + review
+    loop can be built against the Phase A/B (facts/grammar) flags now. Effort: **M**. Recommended model: **Opus**.
+34. **Auditor handoff package (added 2026-07-07, from the data-strategy Q&A):** a one-page, repeatable
+    "how to hand our data + sources to an auditor" doc/export that packages the reproducible per-item
+    verification chain for an EU AI Act Art. 10 / ISO 42001 examiner. It composes what already exists —
+    the `/sources` page (register + tier badge + confidence), the provenance register (typed + CSV export),
+    the committed `docs/reports/verify-*.md` reports, the jury golden-set calibration metrics, and the git
+    four-eyes trail — into a single sampling guide ("pick any content_id → here is its source, license
+    snapshot, fact/grammar/jury verdicts with tool+version+date, and human sign-off"). Cheap, doc-only,
+    strengthens the due-diligence story. Effort: **S**. Recommended model: **Fable** or **Opus**.
+35. **Scale-to-100x database plan (added 2026-07-07, from the data-strategy Q&A):** the DB-management story
+    the strategy docs don't yet cover, split by data plane. **Content plane:** trigger to migrate the
+    learning library out of static `src/data/*.ts` into a Supabase `content` table (or headless CMS) with
+    the provenance + verification fields as columns, CDN-cached at build time — only once the *library*
+    itself approaches ~100x (build/lint/sweep times, review UI ergonomics); the verification ladder is
+    already content_id-keyed so it moves unchanged. **User plane (the real 100x pressure):** a Supabase/
+    Postgres scaling checklist — Supavisor/PgBouncer connection pooling first, index + index-friendly RLS
+    predicates on every `user_id`, partition + archive the append-only tables (`ai_usage`, writing
+    submissions), read replicas + the existing client cache, and the product-specific lever: **meter and
+    server-side rate-limit/cap AI-writing-coach token spend** (`ai_usage` exists; the cap doesn't) so the
+    Claude bill can't scale 100x uncapped. Also resolve the `progress` fixed-column upsert debt (see #32)
+    before scale. Deliverable: a phased migration checklist with the specific Supabase migrations. Effort:
+    **M** (planning) / **L** (execution, staged). Recommended model: **Opus**.
+
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
 > **Fable available again (2026-07-02):** the earlier restriction (noted 2026-06-15) is lifted; Fable
