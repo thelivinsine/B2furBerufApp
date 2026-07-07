@@ -1,19 +1,18 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-07 (session 78: **data strategy Phase B + Phase C SHIPPED**. Phase B — Layer 3
-linguistic engine: `pnpm verify:grammar` runs **LanguageTool 6.8** over all 2,315 German sentences (0
-grammar errors, 98.8% clean, one real typo fixed); `pnpm verify:cefr` is a precision-first CEFR tripwire
-(6 FLAG). Both warn-only scheduled reports, never a gate; LanguageTool (~69 MB) resolves pinned from Maven
-Central. Phase C — the trust model: a `Verification` block on `ProvenanceEntry`, `pnpm build:verification`
-composes Layer 2/3 results into the generated `src/data/verification.ts` (per-item tier + confidence),
-surfaced as a badge on `/sources`; first sweep = 1,292 of 1,408 items machine-attested (25 human · 1,266
-linguistic · 1 facts · 116 provenance). `DATA_STRATEGY.md` → v1.4. Prior, session 77: Phase A COMPLETED —
-Layer 2 two-oracle fact gate (coverage 47% → 97%, 0 confirmed errors; v1.2). Prior, session 75:
-**four daily-life content packs shipped** — Arzt &
-Gesundheit (PR #349), Wohnen & Bank (PR #350), and Bildung & Sprache. Each is a full theme: ~28
-vocab, ~36 collocations, 3 Can-Do, 2 reading texts, 1 dialogue, all provenance-rowed and
-gate-green. Themes are now 15 (was 11), and **all six top-level domains are populated** (Bildung
-filled the last empty one). **G2 remains HALTED on founder order ("Wait for my go")**: the G2 groundwork
+_Last updated: 2026-07-07 (session 80: **top-value tasks + daily-life depth + SEO, 4 PRs to `main`**.
+**#360** closed EU AI Act #21 (documented Art. 6(3) risk assessment `docs/strategy/AI_ACT_RISK_ASSESSMENT.md`;
+not-high-risk/limited-risk) and shipped the full SEO surface (Open Graph + Twitter + canonical + JSON-LD
+WebApplication/FAQPage in `index.html`, `robots.txt`, `sitemap.xml`, landing FAQ + how-it-works) plus 4
+daily-life reading texts. **#361** added 5 daily-life exam sets (exam-prep parity across all life domains).
+**#362** added a 2nd branching dialogue per newest daily-life theme (dialogues 16→20). **#363** added a
+real 1200×630 OG share image (`public/og-image.png`, generator `preview/og-image/make-og.mjs`). Counts now:
+642 vocab · 540 collocations · 22 texts/66 checks · 15 exam sets · 20 dialogues · 1,421 provenance rows.
+Prior, session 78: **data strategy Phase B + Phase C SHIPPED** (Layer 3 linguistic engine `verify:grammar`
++ `verify:cefr`, warn-only; Phase C trust model → generated `src/data/verification.ts`, `/sources` tier
+badge; `DATA_STRATEGY.md` → v1.4). Prior, session 75: **four daily-life content packs shipped** (Arzt,
+Wohnen, Bank, Bildung), themes now 15 (was 11), **all six top-level domains populated**.
+**G2 remains HALTED on founder order ("Wait for my go")**: the G2 groundwork
 draft (missions 1.1/1.2 + settings) sits PARKED UNMERGED on the old session branch
 `claude/neuland-g1-g2-feedback-wkf28n` (commit `wip(G2, PARKED, DO NOT MERGE)`). The working
 branch is reassigned every session, so **`main` is always the source of truth**. Product name:
@@ -175,9 +174,12 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 80 (2026-07-07). Top-3 value-add tasks shipped in one branch
-(`claude/top-value-tasks-842u60`).** The founder asked for the top-3 value-add tasks from the docs, then
-"work on all three now". Delivered, all gates green:
+**Handoff after session 80 (2026-07-07). Top-value tasks + daily-life depth + SEO, 4 PRs shipped to
+`main` (branch `claude/top-value-tasks-842u60`).** PRs this session: **#360** (Art. 6(3) risk assessment +
+SEO meta/OG/JSON-LD/robots/sitemap + landing FAQ + 4 reading texts), **#361** (5 daily-life exam sets),
+**#362** (4 second daily-life dialogues), **#363** (1200×630 OG share image). The founder asked for the
+top-3 value-add tasks from the docs, then "work on all three now", then kept going with "continue" /
+"work on seo task". Delivered, all gates green:
 1. **EU AI Act #21 fully closed.** The Art. 50 transparency *copy* was already live (WritingHub
    point-of-use notice + "KI-generierte Rückmeldung" label + PrivacyPolicy DE/EN AI section). The missing
    piece, the documented **Article 6(3) risk assessment**, is now on file:
