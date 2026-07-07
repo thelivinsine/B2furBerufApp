@@ -84,4 +84,16 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       "Schreibe eine kurze E-Mail an eine Arztpraxis: Bitte um einen Termin, beschreibe kurz deine Beschwerden und nenne deine Verfügbarkeit.",
     long: "Verfasse eine formelle E-Mail an deine Krankenkasse. Erkläre, dass du eine Rechnung einreichen möchtest, frage nach der Kostenübernahme für eine Behandlung und bitte höflich um eine schriftliche Bestätigung.",
   },
+  wohnen: {
+    themeId: "wohnen",
+    short:
+      "Schreibe eine kurze E-Mail an einen Vermieter: Zeige Interesse an einer Wohnung, bitte um einen Besichtigungstermin und nenne deine Verfügbarkeit.",
+    long: "Verfasse eine formelle E-Mail an deine Hausverwaltung. Melde einen Mangel in der Wohnung (zum Beispiel Schimmel oder eine defekte Heizung), bitte um eine Reparatur mit Frist und weise höflich auf deine Rechte als Mieter hin.",
+  },
+  bank: {
+    themeId: "bank",
+    short:
+      "Schreibe eine kurze E-Mail an deine Bank: Bitte um einen Beratungstermin zur Eröffnung eines Girokontos und frage, welche Unterlagen du mitbringen musst.",
+    long: "Verfasse eine formelle E-Mail an deine Bank. Beschwere dich höflich über eine falsch gebuchte Lastschrift, bitte um eine Rückbuchung und frage nach, wie du solche Abbuchungen künftig verhindern kannst.",
+  },
 };

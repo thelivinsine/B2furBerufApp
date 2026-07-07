@@ -725,6 +725,240 @@ export const texts: ReadingText[] = [
       },
     ],
   },
+
+  /* ---------------- Wohnen & Zuhause ---------------- */
+  {
+    id: "tx_wohnen_email_besichtigung",
+    kind: "email",
+    themeId: "wohnen",
+    cefr: "B1.2",
+    subThemeId: "wohnen.suche",
+    title: "Einladung zur Wohnungsbesichtigung",
+    titleEn: "Invitation to a flat viewing",
+    de: [
+      "Sehr geehrte Frau Costa,",
+      "vielen Dank für Ihre Anfrage zu unserer Zweizimmerwohnung in der Lindenstraße 12. Gerne laden wir Sie zu einer Besichtigung am Samstag, den 19. Juli, um 11:00 Uhr ein.",
+      "Die Wohnung hat 58 Quadratmeter, einen Balkon und liegt im zweiten Stock ohne Aufzug. Die Kaltmiete beträgt 720 Euro, dazu kommen 180 Euro Nebenkosten. Die Kaution beträgt zwei Kaltmieten.",
+      "Bitte bringen Sie zur Besichtigung einen Nachweis über Ihr Einkommen und Ihren Personalausweis mit. Falls Ihnen der Termin nicht passt, schlagen Sie mir gern eine Alternative vor.",
+      "Mit freundlichen Grüßen\nA. Berger, Hausverwaltung Berger",
+    ].join("\n\n"),
+    en: [
+      "Dear Ms Costa,",
+      "thank you for your enquiry about our two-room flat at Lindenstraße 12. We are happy to invite you to a viewing on Saturday, 19 July, at 11:00.",
+      "The flat is 58 square metres, has a balcony and is on the second floor without a lift. The base rent is 720 euros, plus 180 euros in utility costs. The deposit is two months' base rent.",
+      "Please bring proof of your income and your ID card to the viewing. If the appointment does not suit you, feel free to suggest an alternative.",
+      "Kind regards\nA. Berger, Berger property management",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_wohnen_email_besichtigung_q1",
+        question: "Wie hoch ist die Kaltmiete für die Wohnung?",
+        options: [
+          "720 Euro",
+          "180 Euro",
+          "900 Euro",
+        ],
+        answer: "720 Euro",
+        explain: "The base rent is 720 euros; the 180 euros are the separate utility costs.",
+      },
+      {
+        id: "tx_wohnen_email_besichtigung_q2",
+        question: "Was soll Frau Costa zur Besichtigung mitbringen?",
+        options: [
+          "Einen Einkommensnachweis und ihren Personalausweis",
+          "Den unterschriebenen Mietvertrag",
+          "Die Kaution in bar",
+        ],
+        answer: "Einen Einkommensnachweis und ihren Personalausweis",
+        explain: "She is asked to bring proof of income and her ID card.",
+      },
+      {
+        id: "tx_wohnen_email_besichtigung_q3",
+        question: "Was kann Frau Costa tun, wenn ihr der Termin nicht passt?",
+        options: [
+          "Eine alternative Zeit vorschlagen",
+          "Die Wohnung trotzdem sofort mieten",
+          "Die Besichtigung absagen und aufgeben",
+        ],
+        answer: "Eine alternative Zeit vorschlagen",
+        explain: "If the appointment does not suit her, she may suggest an alternative time.",
+      },
+    ],
+  },
+  {
+    id: "tx_wohnen_letter_nebenkosten",
+    kind: "letter",
+    themeId: "wohnen",
+    cefr: "B2.1",
+    subThemeId: "wohnen.nebenkosten",
+    title: "Nebenkostenabrechnung für das Jahr 2025",
+    titleEn: "Utility cost statement for the year 2025",
+    de: [
+      "Sehr geehrter Herr Demir,",
+      "anbei erhalten Sie die Nebenkostenabrechnung für den Zeitraum vom 1. Januar bis 31. Dezember 2025.",
+      "Ihre monatliche Vorauszahlung betrug 150 Euro, insgesamt also 1.800 Euro. Die tatsächlichen Kosten für Heizung, Wasser und Müll lagen bei 2.040 Euro. Daraus ergibt sich eine Nachzahlung von 240 Euro.",
+      "Bitte überweisen Sie den Betrag innerhalb von vier Wochen auf das bekannte Konto. Sollten Sie Fragen zur Abrechnung haben, können Sie die Belege nach Vereinbarung bei uns einsehen.",
+      "Mit freundlichen Grüßen\nHausverwaltung Sonnenhof",
+    ].join("\n\n"),
+    en: [
+      "Dear Mr Demir,",
+      "please find enclosed the utility cost statement for the period from 1 January to 31 December 2025.",
+      "Your monthly advance payment was 150 euros, so 1,800 euros in total. The actual costs for heating, water and rubbish were 2,040 euros. This results in a back-payment of 240 euros.",
+      "Please transfer the amount within four weeks to the known account. If you have questions about the statement, you can inspect the receipts with us by appointment.",
+      "Kind regards\nSonnenhof property management",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_wohnen_letter_nebenkosten_q1",
+        question: "Warum muss Herr Demir Geld nachzahlen?",
+        options: [
+          "Die tatsächlichen Kosten waren höher als seine Vorauszahlungen",
+          "Er hat die Miete zu spät gezahlt",
+          "Die Kaution war zu niedrig",
+        ],
+        answer: "Die tatsächlichen Kosten waren höher als seine Vorauszahlungen",
+        explain: "His advance payments totalled 1,800 euros but the actual costs were 2,040 euros, so 240 euros are owed.",
+      },
+      {
+        id: "tx_wohnen_letter_nebenkosten_q2",
+        question: "Wie hoch ist die Nachzahlung?",
+        options: [
+          "240 Euro",
+          "150 Euro",
+          "2.040 Euro",
+        ],
+        answer: "240 Euro",
+        explain: "The back-payment is the difference: 2,040 euros minus 1,800 euros = 240 euros.",
+      },
+      {
+        id: "tx_wohnen_letter_nebenkosten_q3",
+        question: "Was kann Herr Demir tun, wenn er Fragen zur Abrechnung hat?",
+        options: [
+          "Nach Vereinbarung die Belege einsehen",
+          "Die Zahlung einfach verweigern",
+          "Sofort den Mietvertrag kündigen",
+        ],
+        answer: "Nach Vereinbarung die Belege einsehen",
+        explain: "If he has questions, he can inspect the receipts with the management by appointment.",
+      },
+    ],
+  },
+
+  /* ---------------- Bank & Finanzen ---------------- */
+  {
+    id: "tx_bank_email_konto",
+    kind: "email",
+    themeId: "bank",
+    cefr: "B1.2",
+    subThemeId: "bank.konto",
+    title: "Ihr Termin zur Kontoeröffnung",
+    titleEn: "Your appointment to open an account",
+    de: [
+      "Sehr geehrter Herr Ivanov,",
+      "vielen Dank für Ihr Interesse an einem Girokonto bei der Stadtbank. Wir bestätigen Ihren Beratungstermin am Mittwoch, den 16. Juli, um 15:30 Uhr in unserer Filiale am Marktplatz.",
+      "Bitte bringen Sie zu dem Termin Ihren Personalausweis oder Reisepass sowie eine aktuelle Meldebescheinigung mit. Wenn Sie Ihr Gehalt über das Konto empfangen möchten, ist auch Ihr Arbeitsvertrag hilfreich.",
+      "Das Girokonto ist bei Zahlungseingang ab 700 Euro im Monat kostenlos. Andernfalls fällt eine Kontoführungsgebühr von 4,90 Euro an. Ihre Girocard und die PIN erhalten Sie einige Tage nach der Eröffnung getrennt per Post.",
+      "Mit freundlichen Grüßen\nIhr Team der Stadtbank",
+    ].join("\n\n"),
+    en: [
+      "Dear Mr Ivanov,",
+      "thank you for your interest in a current account with Stadtbank. We confirm your advisory appointment on Wednesday, 16 July, at 15:30 in our branch at the market square.",
+      "Please bring your ID card or passport and a current registration certificate to the appointment. If you would like to receive your salary via the account, your employment contract is also helpful.",
+      "The current account is free with an incoming payment of at least 700 euros a month. Otherwise there is an account maintenance fee of 4.90 euros. You will receive your debit card and the PIN separately by post a few days after opening.",
+      "Kind regards\nYour Stadtbank team",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_bank_email_konto_q1",
+        question: "Was muss Herr Ivanov zum Termin mitbringen?",
+        options: [
+          "Einen Ausweis und eine aktuelle Meldebescheinigung",
+          "Nur seine Girocard",
+          "Die Kaution für das Konto",
+        ],
+        answer: "Einen Ausweis und eine aktuelle Meldebescheinigung",
+        explain: "He should bring his ID or passport and a current registration certificate (plus optionally his employment contract).",
+      },
+      {
+        id: "tx_bank_email_konto_q2",
+        question: "Wann ist das Girokonto kostenlos?",
+        options: [
+          "Bei einem Zahlungseingang ab 700 Euro im Monat",
+          "Immer, ohne Bedingungen",
+          "Nur im ersten Jahr",
+        ],
+        answer: "Bei einem Zahlungseingang ab 700 Euro im Monat",
+        explain: "The account is free with a monthly incoming payment of at least 700 euros; otherwise a 4.90 euro fee applies.",
+      },
+      {
+        id: "tx_bank_email_konto_q3",
+        question: "Wie bekommt Herr Ivanov seine Girocard und die PIN?",
+        options: [
+          "Einige Tage nach der Eröffnung getrennt per Post",
+          "Sofort am Termin in der Filiale",
+          "Per E-Mail als Datei",
+        ],
+        answer: "Einige Tage nach der Eröffnung getrennt per Post",
+        explain: "The card and the PIN are sent separately by post a few days after the account is opened.",
+      },
+    ],
+  },
+  {
+    id: "tx_bank_voicemail_karte",
+    kind: "voicemail",
+    themeId: "bank",
+    cefr: "B2.1",
+    subThemeId: "bank.karte",
+    title: "Voicemail: Auffällige Abbuchung von Ihrer Karte",
+    titleEn: "Voicemail: unusual charge on your card",
+    de: [
+      "Guten Tag, hier ist der Sicherheitsdienst Ihrer Stadtbank, eine Nachricht für Frau Kowalski.",
+      "Uns ist eine ungewöhnliche Abbuchung von Ihrer Kreditkarte aufgefallen: 480 Euro bei einem Online-Händler im Ausland. Zur Sicherheit haben wir Ihre Karte vorübergehend gesperrt.",
+      "Falls Sie diese Zahlung selbst getätigt haben, ist nichts weiter zu tun, die Karte wird morgen wieder freigeschaltet. Falls nicht, rufen Sie uns bitte umgehend unter der Nummer auf Ihrer Kartenrückseite an, damit wir die Abbuchung zurückbuchen und eine neue Karte ausstellen können.",
+      "Bitte nennen Sie am Telefon niemals Ihre PIN. Unsere Mitarbeiter fragen Sie niemals danach. Vielen Dank.",
+    ].join("\n\n"),
+    en: [
+      "Hello, this is the security service of your Stadtbank, a message for Ms Kowalski.",
+      "We have noticed an unusual charge on your credit card: 480 euros at an online retailer abroad. As a precaution we have temporarily blocked your card.",
+      "If you made this payment yourself, there is nothing further to do; the card will be reactivated tomorrow. If not, please call us immediately on the number on the back of your card so we can reverse the charge and issue a new card.",
+      "Please never state your PIN on the phone. Our staff will never ask you for it. Thank you.",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_bank_voicemail_karte_q1",
+        question: "Warum wurde die Karte gesperrt?",
+        options: [
+          "Wegen einer auffälligen Abbuchung im Ausland",
+          "Weil die PIN falsch eingegeben wurde",
+          "Weil das Konto überzogen war",
+        ],
+        answer: "Wegen einer auffälligen Abbuchung im Ausland",
+        explain: "An unusual 480-euro charge at a foreign online retailer led the bank to block the card as a precaution.",
+      },
+      {
+        id: "tx_bank_voicemail_karte_q2",
+        question: "Was soll Frau Kowalski tun, wenn sie die Zahlung nicht selbst getätigt hat?",
+        options: [
+          "Sofort die Nummer auf der Kartenrückseite anrufen",
+          "Nichts tun und abwarten",
+          "Die 480 Euro erneut überweisen",
+        ],
+        answer: "Sofort die Nummer auf der Kartenrückseite anrufen",
+        explain: "If she did not make the payment, she should call the number on the back of her card immediately.",
+      },
+      {
+        id: "tx_bank_voicemail_karte_q3",
+        question: "Was sagt die Nachricht über die PIN?",
+        options: [
+          "Man soll sie am Telefon niemals nennen",
+          "Man soll sie dem Mitarbeiter zur Prüfung nennen",
+          "Man soll sie in einer E-Mail schicken",
+        ],
+        answer: "Man soll sie am Telefon niemals nennen",
+        explain: "The message warns never to state the PIN on the phone; bank staff will never ask for it.",
+      },
+    ],
+  },
 ];
 
 export const textById = (id: string) => texts.find((t) => t.id === id);

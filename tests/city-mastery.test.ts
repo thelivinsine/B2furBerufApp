@@ -29,13 +29,16 @@ describe("cityProgress — building mastery resolution", () => {
     expect(total).toBe(vocabulary.length);
   });
 
-  it("keeps the future packs (bank, wohnhaus) empty and inert", () => {
-    for (const id of ["bank", "wohnhaus"]) {
-      const p = progressFor({}, id);
-      expect(p.total).toBe(0);
-      expect(p.weakestTheme).toBeNull();
-      expect(p.lit).toBe(false);
-    }
+  it("wires the bank and wohnhaus buildings to their packs (added s75)", () => {
+    const bank = progressFor({}, "bank");
+    expect(bank.themes).toEqual(["bank"]);
+    expect(bank.total).toBeGreaterThan(0);
+    expect(bank.lit).toBe(false); // unlit on a fresh profile
+
+    const wohnhaus = progressFor({}, "wohnhaus");
+    expect(wohnhaus.themes).toEqual(["wohnen"]);
+    expect(wohnhaus.total).toBeGreaterThan(0);
+    expect(wohnhaus.lit).toBe(false);
   });
 
   it("lights the Bürgeramt once the behoerde pack crosses the threshold", () => {

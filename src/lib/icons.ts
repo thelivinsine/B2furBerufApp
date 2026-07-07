@@ -28,6 +28,8 @@ import {
   Boxes,
   Landmark,
   Stethoscope,
+  Home,
+  Banknote,
   type LucideIcon,
 } from "lucide-react";
 
@@ -61,6 +63,8 @@ const map: Record<string, LucideIcon> = {
   Boxes,
   Landmark,
   Stethoscope,
+  Home,
+  Banknote,
 };
 
 export function iconByName(name: string): LucideIcon {

@@ -61,9 +61,9 @@ export interface DomainBuilding {
 export const DOMAIN_BUILDINGS: DomainBuilding[] = [
   { id: "buero", label: "Büro", color: "#5b5be6", domains: ["beruf", "arbeitswelt"], themeIds: [] },
   { id: "buergeramt", label: "Bürgeramt", color: "#64748b", domains: [], themeIds: ["behoerde"] },
-  { id: "bank", label: "Bank", color: "#0ea5e9", domains: [], themeIds: [] },
+  { id: "bank", label: "Bank", color: "#0ea5e9", domains: [], themeIds: ["bank"] },
   { id: "arztpraxis", label: "Arztpraxis", color: "#e11d48", domains: ["gesundheit"], themeIds: [] },
-  { id: "wohnhaus", label: "Wohnhaus", color: "#0d9488", domains: [], themeIds: [] },
+  { id: "wohnhaus", label: "Wohnhaus", color: "#0d9488", domains: [], themeIds: ["wohnen"] },
   { id: "pruefungshalle", label: "Prüfungshalle", color: "#c026d3", domains: ["pruefung", "bildung"], themeIds: [] },
 ];
 

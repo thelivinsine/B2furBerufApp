@@ -1,12 +1,13 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-07 (session 75: **Arzt & Gesundheit content pack** built. First theme in
-the `gesundheit` domain: 28 vocab, 36 collocations, 3 Can-Do milestones, 2 reading texts, 1
-branching dialogue, all provenance-rowed and gate-green. **G2 remains HALTED on founder order
-("Wait for my go")**: the G2 groundwork draft (missions 1.1/1.2 + settings) sits PARKED UNMERGED
-on the old session branch `claude/neuland-g1-g2-feedback-wkf28n` (commit `wip(G2, PARKED, DO NOT
-MERGE)`). The working branch is reassigned every session, so **`main` is always the source of
-truth**. Product name: **Genauly** (domain `genauly.de`)._
+_Last updated: 2026-07-07 (session 75: **three daily-life content packs shipped** — Arzt &
+Gesundheit (PR #349, merged), then Wohnen & Bank together. Each is a full theme: ~28 vocab, ~36
+collocations, 3 Can-Do, 2 reading texts, 1 dialogue, all provenance-rowed and gate-green. Themes
+are now 14 (was 11). **G2 remains HALTED on founder order ("Wait for my go")**: the G2 groundwork
+draft (missions 1.1/1.2 + settings) sits PARKED UNMERGED on the old session branch
+`claude/neuland-g1-g2-feedback-wkf28n` (commit `wip(G2, PARKED, DO NOT MERGE)`). The working
+branch is reassigned every session, so **`main` is always the source of truth**. Product name:
+**Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
 Start at the `## Resume here (next session)` section near the end. Companion files:
@@ -164,32 +165,33 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 75 (2026-07-07). Arzt & Gesundheit content pack BUILT ✅ (gates green);
-G2 still HALTED awaiting the founder's explicit go.** What happened:
-- The founder chose **content expansion** over resuming/tweaking the game. Built a full new
-  daily-life theme, **`arzt` (Arzt & Gesundheit)**, the first theme in the previously-empty
-  `gesundheit` domain, using the `behoerde` pack as the reference template. Founder had not
-  explicitly confirmed the domain (the AskUserQuestion tool failed twice in this environment), so
-  Arzt was chosen as the CTO call: it fills an empty top-level domain and healthcare is the most
-  universal daily-life situation. The founder can redirect to Wohnen/Bank; structure is identical.
-- **What shipped in the pack:** `ThemeId` + linter `THEME_IDS` extended; `Stethoscope` icon; the
-  `arzt` ExamTheme (domain `gesundheit`, context `personal`, 4 sub-themes: termin/symptome/
-  behandlung/versicherung); writing prompt; **28 vocab** (v_arzttermin … v_notaufnahme), **36
-  collocations**, **3 Can-Do milestones** (cd_arzt_1..3), **2 reading texts** (a practice-email
-  Terminbestätigung + a pharmacy voicemail; 6 checks), **1 branching dialogue** (`sc_arztbesuch`,
-  4 decision nodes + narrator end), and **71 provenance rows** (all `draft`, founder review
-  pending). No em dashes in any copy.
-- **Gates all green:** `pnpm lint:content` (12 themes, 558 vocab, 432 collocations, 28 can-do, 12
-  texts, 1,195 provenance), `pnpm build`, `pnpm check:bundle` (main 79.5 kB / 400 kB), `pnpm
-  test:unit` (85 passed), `pnpm lint` (0 errors, the usual 32 react-hooks warnings). The theme
-  surfaces automatically everywhere that iterates the `themes` registry (Bibliothek, dashboard
-  intent cards, session composer, Fortschritt Can-Do grid).
-- **Status:** pushed to the session branch `claude/whats-next-l61ca3`. NOT yet merged to `main` —
-  awaiting the founder's OK on the domain choice before shipping live (Arzt vs Wohnen/Bank). Arzt
-  content is all provenance `draft` and wants the normal founder verify pass on the German.
-- **Obvious next content moves if Arzt is approved:** the roadmap's other named daily-life packs
-  (**Wohnen/Housing** — also feeds game chapter 2; **Bank & Finanzen**), then deepening Arzt
-  (dialogues, an exam set) or filling the other empty domains (`bildung`).
+**Handoff after session 75 (2026-07-07). THREE daily-life content packs SHIPPED ✅ (Arzt merged
+via PR #349; Wohnen + Bank built and gate-green); G2 still HALTED awaiting the founder's explicit
+go.** What happened:
+- The founder chose **content expansion** over resuming/tweaking the game, then approved building
+  **all three** roadmap daily-life packs: **`arzt` (Arzt & Gesundheit)**, **`wohnen` (Wohnen &
+  Zuhause)**, **`bank` (Bank & Finanzen)**. Each is a full theme built on the `behoerde`/`arzt`
+  template. Themes went 11 → 14.
+- **Per-pack contents (each):** `ThemeId` + linter `THEME_IDS`; a lucide icon (Stethoscope / Home
+  / Banknote); an ExamTheme with 4 sub-themes; a writing prompt; **~28 vocab**, **~36
+  collocations**, **3 Can-Do milestones**, **2 reading texts** (6 checks), **1 branching
+  dialogue**, and full provenance rows (all `draft`, founder review pending). No em dashes.
+  Sub-themes: arzt = termin/symptome/behandlung/versicherung; wohnen = suche/vertrag/nebenkosten/
+  probleme; bank = konto/zahlung/karte/finanzen. arzt + bank are in scope for the previously-empty
+  `gesundheit` (arzt) and are `alltag` (wohnen, bank, alongside behoerde).
+- **City strip wired (`components/city/mastery.ts` + `domain-buildings.tsx`):** the placeholder
+  `bank` and `wohnhaus` domain buildings now own the `bank` and `wohnen` themes (`themeIds`); arzt
+  rolls into `arztpraxis` via the `gesundheit` domain. `tests/city-mastery.test.ts` updated (the
+  old "future packs empty" assertion became a "packs wired" assertion). Every vocab word still maps
+  to exactly one building.
+- **Gates all green (final):** `pnpm lint:content` (14 themes, 614 vocab, 504 collocations, 34
+  can-do, 16 texts, 1,337 provenance), `pnpm build`, `pnpm check:bundle` (main 79.5 kB / 400 kB),
+  `pnpm test:unit` (85 passed), `pnpm lint` (0 errors, the usual 32 react-hooks warnings). Themes
+  surface automatically everywhere that iterates the `themes` registry.
+- **Status:** Arzt shipped live via **PR #349** (squash-merged). Wohnen + Bank built on
+  `claude/whats-next-l61ca3` and ready to ship in a second PR.
+- **Obvious next content moves:** deepen these packs (exam sets, more dialogues/texts), fill the
+  last empty domain (`bildung`), or run the founder verify pass on all the new `draft` German.
 
 ---
 
@@ -243,17 +245,17 @@ _Older handoffs (sessions 1–73) are archived by ISO week under `docs/archive/s
 (index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; the session-73 G1 handoff is in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
-- Vocabulary: **558 words** (+28 Arzt/Gesundheit pack in s75)
-- Collocations: **432 Nomen-Verb pairs** (~36/theme; +36 Arzt pack in s75)
+- Vocabulary: **614 words** (+28 Arzt, +28 Wohnen, +28 Bank in s75)
+- Collocations: **504 Nomen-Verb pairs** (~36/theme; +36 Arzt, +36 Wohnen, +36 Bank in s75)
 - Grammar: **47 drills** · **10 topics**
-- Dialogues (branching scenarios): **13** (incl. behoerde + the s75 Arztbesuch)
+- Dialogues (branching scenarios): **15** (+Arztbesuch, +Wohnungsbesichtigung, +Kontoeröffnung in s75)
 - Exam sets: **10** (1 per workplace theme · 6–7 min · sharedRubric)
 - Redemittel: **72** entries
-- Can-Do milestones: **28** (all 12 themes; behoerde/workplace founder-verified, arzt draft)
-- Lese-/Hörtexte: **12** texts / **36** comprehension checks (+2 Arzt texts in s75)
-- Themes: **12** (10 workplace + `behoerde` + `arzt`, the first `gesundheit`-domain theme)
+- Can-Do milestones: **34** (all 14 themes; workplace/behoerde founder-verified, arzt/wohnen/bank draft)
+- Lese-/Hörtexte: **16** texts / **48** comprehension checks (+2 each for Arzt/Wohnen/Bank in s75)
+- Themes: **14** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank`; the last three added s75)
 - Game missions (Neuland): **1** (the chapter-1 Anmeldung boss, 9 scenes) · 6 NPCs · 4 key items
-- Provenance rows: **1,195** (all with a `reference`; 1,170 `draft` / 25 `verified`)
+- Provenance rows: **1,337** (all with a `reference`; 1,312 `draft` / 25 `verified`)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is
 always the source of truth).

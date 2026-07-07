@@ -1321,3 +1321,29 @@ Branch: `claude/whats-next-esga9u`.
   `src/data/collocations.ts`, `src/data/canDo.ts`, `src/data/texts.ts`, `src/data/dialogues.ts`,
   `src/data/provenance.ts`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. Commit SHA(s): see the branch.
+
+## Entry 205 — 2026-07-07 (session 75, cont.)
+- **Branch:** `claude/whats-next-l61ca3`; `main` is the source of truth.
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim, in order):**
+  > merge
+
+  > go ahead with wohnen and bank
+- **Response summary:** (1) "merge" → opened **PR #349** for the Arzt & Gesundheit pack and
+  squash-merged it to `main` (`fc35d60`); ran the post-merge housekeeping (realign dev branch to
+  `origin/main` via reset --hard + force-with-lease). (2) "go ahead with wohnen and bank" → built
+  two more full daily-life themes on the same template: **`wohnen` (Wohnen & Zuhause)** and
+  **`bank` (Bank & Finanzen)**, both `alltag` domain. Each: ThemeId + linter, icon (Home /
+  Banknote), ExamTheme with 4 sub-themes, writing prompt, 28 vocab, 36 collocations, 3 Can-Do, 2
+  reading texts (6 checks), 1 branching dialogue, provenance rows (142 across both). Also wired the
+  placeholder `bank`/`wohnhaus` city-strip domain buildings to their new themes
+  (`domain-buildings.tsx`) and updated the now-outdated `tests/city-mastery.test.ts` ("future packs
+  empty" → "packs wired"). Gates green: lint:content (14 themes, 614 vocab, 504 collocations, 1,337
+  provenance), build, bundle 79.5 kB, 85 unit tests, eslint 0 errors. No em dashes.
+- **Artifacts:** `src/types/index.ts`, `scripts/lint-content.mjs`, `src/lib/icons.ts`,
+  `src/data/themes.ts`, `src/data/writingPrompts.ts`, `src/data/vocabulary.ts`,
+  `src/data/collocations.ts`, `src/data/canDo.ts`, `src/data/texts.ts`, `src/data/dialogues.ts`,
+  `src/data/provenance.ts`, `src/components/city/domain-buildings.tsx`, `tests/city-mastery.test.ts`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`, `CLAUDE.md`. PR #349 (Arzt, merged);
+  Wohnen+Bank PR to follow. Commit SHAs: see the branch.
