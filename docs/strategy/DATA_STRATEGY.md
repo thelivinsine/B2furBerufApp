@@ -1,6 +1,6 @@
 # Data Strategy — source-verified, audit-ready, and automated
 
-_Status: **v1.0 (2026-07-07)**. Author: session `app-data-strategy`. This is the top-level data
+_Status: **v1.2 (2026-07-07)**. Author: session `app-data-strategy`. This is the top-level data
 strategy for Genauly. It sits above two existing documents and does not repeat them:_
 
 - _**`docs/strategy/DATA_GOVERNANCE.md`** — the legal / licensing / certification layer (provenance
@@ -131,6 +131,17 @@ verified by* it.
 > cached), joins it to `vocabulary.ts` / `collocations.ts` by headword, and emits per-item pass/flag
 > plus a machine verdict written to the register. Runs offline, so it can be a **CI gate** for new
 > nouns/verbs, not just an audit.
+
+> **SHIPPED (v1.1 → v1.2, 2026-07-07).** Layer 2 now runs on **two independent oracles** and is a
+> real CI gate. Oracle A (`german-words-dict`, LanguageTool morphology) plus oracle B (`german-nouns`,
+> ~100k nouns compiled from German Wiktionary, CC-BY-SA-4.0, fetched from **PyPI** — the "Wiktionary
+> route" the strategy wanted, delivered through an allowed host instead of the network-blocked
+> kaikki/de.wiktionary endpoints). Both subsets are vendored (`scripts/vendor/*.json`), so
+> `pnpm verify:facts` runs fully offline and gates in `validate.yml`. An error is reported **only when
+> both oracles reject a form and agree on the correction** (the `GATE` bucket); a lone or conflicting
+> disagreement is a review signal, never a build failure. A compound **head-noun gender rule** ("der
+> Behördentermin" ← "der Termin") lifts coverage. Result over 489 nouns: **coverage 47% → 97%**,
+> 458 articles + 260 plurals verified, and **0 two-oracle-confirmed errors** — the bank passes.
 
 ### Layer 3 — Offline linguistic engine — **build second**
 Facts are single words; sentences need grammar. **LanguageTool** is an open-source, self-hostable
@@ -351,6 +362,19 @@ item, and re-verifies itself on a schedule — built by a founder who does not s
 because the authorities and the panel do the speaking, and the human only settles the ties.
 
 ## Change log
+- **v1.2 (2026-07-07):** Phase A (Layer 2) **completed and promoted to a CI gate.** Added the
+  second oracle the v1.1 spike said was required: `german-nouns` (~100k nouns compiled from German
+  Wiktionary, CC-BY-SA-4.0), fetched from **PyPI** (an allowed host) by `pnpm build:nouns-subset` →
+  `scripts/vendor/german-nouns-subset.json`. This is the "Wiktionary route" §3 wanted, routed around
+  the blocked kaikki/de.wiktionary endpoints. `scripts/verify-facts.mjs` now has both oracles vote on
+  every fact and reports an error **only when both reject a form and agree on the fix** (`GATE`), which
+  fails the build; single-source or conflicting disagreements stay review-only. Added a compound
+  **head-noun gender fallback** ("der Behördentermin" ← "der Termin"). `pnpm verify:facts` is now wired
+  into `validate.yml` as an **offline gate** (reads the committed subsets; no network in CI). **Result
+  over 489 nouns: coverage 47% → 97%, 458 articles + 260 plurals verified, 0 two-oracle-confirmed
+  errors** — and every one of the 6 remaining review signals was hand-checked as a valid variant or a
+  head-heuristic hitting a paired feminine form, not a content bug. This closes the v1.1 finding: with
+  two independent authorities, agreement can safely gate. Report: `docs/reports/verify-facts-report.md`.
 - **v1.1 (2026-07-07):** Phase A (Layer 2) shipped as a validation spike. `pnpm verify:facts` +
   `pnpm build:dict-subset` machine-verified noun article + plural against an offline morphology
   lexicon (`german-words-dict`, Apache-2.0, derived from LanguageTool's `german-pos-dict`,

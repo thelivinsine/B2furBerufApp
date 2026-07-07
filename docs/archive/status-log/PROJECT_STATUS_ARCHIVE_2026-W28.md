@@ -308,3 +308,38 @@ G2 is HALTED awaiting the founder's explicit go.** What happened:
   recurring NPCs, licensed pixel packs vs scene 7 + scale table, FSRS-driven recurrence,
   Supabase migration for game-state sync, then the 5-10-learner playtest gate) · G3/G4 not
   started. Model guidance for G2 stands: Opus 4.8 / Sonnet 5 / Haiku, not Fable.
+
+---
+
+**Handoff after session 75 (2026-07-07). FOUR daily-life content packs SHIPPED ✅ (Arzt PR #349,
+Wohnen+Bank PR #350, Bildung to follow); all six domains now populated; G2 still HALTED awaiting
+the founder's explicit go.** What happened:
+- The founder chose **content expansion** over resuming/tweaking the game, then approved building
+  the roadmap daily-life packs plus filling the last empty domain: **`arzt` (Arzt & Gesundheit)**,
+  **`wohnen` (Wohnen & Zuhause)**, **`bank` (Bank & Finanzen)**, and **`bildung` (Bildung &
+  Sprache)**. Each is a full theme built on the `behoerde`/`arzt` template. Themes went 11 → 15,
+  and `bildung` fills the previously-empty `bildung` domain (rolls into the `pruefungshalle` city
+  building via domain rollup, so no building-registry change was needed for it).
+- **Per-pack contents (each):** `ThemeId` + linter `THEME_IDS`; a lucide icon (Stethoscope / Home
+  / Banknote); an ExamTheme with 4 sub-themes; a writing prompt; **~28 vocab**, **~36
+  collocations**, **3 Can-Do milestones**, **2 reading texts** (6 checks), **1 branching
+  dialogue**, and full provenance rows (all `draft`, founder review pending). No em dashes.
+  Sub-themes: arzt = termin/symptome/behandlung/versicherung; wohnen = suche/vertrag/nebenkosten/
+  probleme; bank = konto/zahlung/karte/finanzen; bildung = sprachkurs/anerkennung/pruefung/
+  weiterbildung. Domains: arzt → `gesundheit`, wohnen+bank → `alltag` (alongside behoerde),
+  bildung → `bildung`. All six domains are now populated.
+- **City strip wired (`components/city/mastery.ts` + `domain-buildings.tsx`):** the placeholder
+  `bank` and `wohnhaus` domain buildings now own the `bank` and `wohnen` themes (`themeIds`); arzt
+  rolls into `arztpraxis` via the `gesundheit` domain. `tests/city-mastery.test.ts` updated (the
+  old "future packs empty" assertion became a "packs wired" assertion). Every vocab word still maps
+  to exactly one building.
+- **Gates all green (final):** `pnpm lint:content` (15 themes, 642 vocab, 540 collocations, 37
+  can-do, 18 texts, 1,408 provenance), `pnpm build`, `pnpm check:bundle` (main 79.5 kB / 400 kB),
+  `pnpm test:unit` (85 passed), `pnpm lint` (0 errors, the usual 32 react-hooks warnings). Themes
+  surface automatically everywhere that iterates the `themes` registry.
+- **Status:** Arzt shipped via **PR #349**; Wohnen + Bank via **PR #350** (both squash-merged).
+  Bildung built on `claude/whats-next-l61ca3` and ready to ship in a third PR.
+- **Obvious next content moves:** with all six domains populated, the remaining depth work is
+  per-theme (exam sets for the daily-life themes, more dialogues/texts, sub-theme splits on the
+  remaining flat themes) or the founder verify pass on all the new `draft` German (arzt/wohnen/
+  bank/bildung vocab, collocations, texts, dialogues, can-do).

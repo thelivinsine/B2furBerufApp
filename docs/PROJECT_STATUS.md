@@ -1,10 +1,12 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-07 (session 76: **data strategy authored + Layer 2 fact-check spike shipped**.
-`docs/strategy/DATA_STRATEGY.md` (v1.0) defines a six-layer verification ladder to keep content
-source-verified, audit-ready, and automated without a native-speaker reviewer (PR #352). The Layer 2
-spike (`pnpm verify:facts`, `pnpm build:dict-subset`) machine-verified 224 noun genders + 174 plurals
-against an offline morphology lexicon and proved a single source can't gate. Prior, session 75:
+_Last updated: 2026-07-07 (session 77: **data strategy Phase A COMPLETED — Layer 2 is now a real
+two-oracle CI gate**. Added a second, independent oracle (`german-nouns`, ~100k nouns from German
+Wiktionary via PyPI) so `pnpm verify:facts` reports an error only when both oracles agree a der/die/das
+or plural is wrong (`GATE`, fails CI); it now runs offline in `validate.yml`. Coverage jumped 47% → 97%
+(458 articles + 260 plurals verified), with 0 two-oracle-confirmed errors. `DATA_STRATEGY.md` → v1.2.
+Prior, session 76: data strategy authored (`docs/strategy/DATA_STRATEGY.md`, six-layer verification
+ladder, PR #352) + the single-oracle Layer 2 spike that proved one source can't gate. Prior, session 75:
 **four daily-life content packs shipped** — Arzt &
 Gesundheit (PR #349), Wohnen & Bank (PR #350), and Bildung & Sprache. Each is a full theme: ~28
 vocab, ~36 collocations, 3 Can-Do, 2 reading texts, 1 dialogue, all provenance-rowed and
@@ -171,6 +173,40 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 77 (2026-07-07). DATA STRATEGY Phase A COMPLETED: Layer 2 is now a real
+two-oracle CI gate ✅.** This finishes the v1.1 spike's open item (a second oracle so agreement can
+gate). What happened:
+- **Second oracle added.** `pnpm build:nouns-subset` (`scripts/build-nouns-subset.mjs`) fetches
+  **`german-nouns`** from **PyPI** (~100k nouns compiled from German Wiktionary, CC-BY-SA-4.0 — already
+  allowlisted), filters to our lemmas, writes a 25 KB committed subset
+  (`scripts/vendor/german-nouns-subset.json`). This is the "Wiktionary route" the strategy wanted,
+  routed through an allowed host (kaikki/de.wiktionary are still 403-blocked by the network policy).
+  It is an *independent* lineage from oracle A (LanguageTool) and is multi-variant aware. Convenience:
+  `pnpm build:oracles` builds both.
+- **`verify:facts` rewritten to two-oracle voting + a real gate.** An error is reported **only when
+  both oracles cover a fact directly, both reject our value, AND agree on the same correction** (the
+  `GATE` bucket → fails CI). A lone or self-conflicting disagreement is a `REVIEW` signal, never a
+  build failure. Added a compound **head-noun gender fallback** ("der Behördentermin" ← "der Termin";
+  gender only, head votes are gate-excluded as heuristic).
+- **Result over 489 nouns: coverage 47% → 97%** (474/489), **458 articles + 260 plurals verified**
+  (221/167 by *both* oracles), **10** plurale-tantum auto-skipped, **0 two-oracle-confirmed errors**.
+  The 6 remaining review signals were all hand-checked as valid variants or the head-heuristic hitting
+  a paired feminine form (Ansprechpartner**in**), not bugs. The old 4 "disagreements" (Husten, Rollout,
+  Risiko, Visum) are all resolved: oracle B attests our forms.
+- **Wired into CI.** `pnpm verify:facts` now runs in `validate.yml` as an **offline gate** (reads the
+  committed vendored subsets; no network in CI). Regenerate subsets with `pnpm build:oracles` when the
+  vocab bank gains nouns.
+- **Docs:** `DATA_STRATEGY.md` → **v1.2** (changelog + Layer 2 "SHIPPED" note),
+  `docs/reports/verify-facts-report.md` regenerated. **No content/src changed**; counts below unchanged.
+  `pnpm lint:content` + `pnpm verify:facts` green.
+- **Next Layer-2 polish (optional):** 15 lemmas are covered by neither oracle (rare compounds/acronyms)
+  and 43 more have a gender but no oracle plural to compare; a third source or manual pass could close
+  them. Otherwise the ladder's next rung is **Phase B (Layer 3,
+  LanguageTool sentence grammar)** and **Phase C (the `verification` trust block on `ProvenanceEntry`)**.
+- **Branch:** `claude/data-strategy-plan-78r0jq`.
+
+---
+
 **Handoff after session 76 (2026-07-07). DATA STRATEGY authored + Layer 2 fact-check spike SHIPPED ✅.**
 What happened:
 - **`docs/strategy/DATA_STRATEGY.md` (new, v1.0)** answers the founder's ask: keep content
@@ -203,43 +239,8 @@ What happened:
 - **No content added**, so the content counts below are unchanged. `pnpm lint:content` green.
 - **Branch:** `claude/app-data-strategy-oshuhs`. Shipped via PR #352 (strategy) + the fact-check spike PR.
 
----
-
-**Handoff after session 75 (2026-07-07). FOUR daily-life content packs SHIPPED ✅ (Arzt PR #349,
-Wohnen+Bank PR #350, Bildung to follow); all six domains now populated; G2 still HALTED awaiting
-the founder's explicit go.** What happened:
-- The founder chose **content expansion** over resuming/tweaking the game, then approved building
-  the roadmap daily-life packs plus filling the last empty domain: **`arzt` (Arzt & Gesundheit)**,
-  **`wohnen` (Wohnen & Zuhause)**, **`bank` (Bank & Finanzen)**, and **`bildung` (Bildung &
-  Sprache)**. Each is a full theme built on the `behoerde`/`arzt` template. Themes went 11 → 15,
-  and `bildung` fills the previously-empty `bildung` domain (rolls into the `pruefungshalle` city
-  building via domain rollup, so no building-registry change was needed for it).
-- **Per-pack contents (each):** `ThemeId` + linter `THEME_IDS`; a lucide icon (Stethoscope / Home
-  / Banknote); an ExamTheme with 4 sub-themes; a writing prompt; **~28 vocab**, **~36
-  collocations**, **3 Can-Do milestones**, **2 reading texts** (6 checks), **1 branching
-  dialogue**, and full provenance rows (all `draft`, founder review pending). No em dashes.
-  Sub-themes: arzt = termin/symptome/behandlung/versicherung; wohnen = suche/vertrag/nebenkosten/
-  probleme; bank = konto/zahlung/karte/finanzen; bildung = sprachkurs/anerkennung/pruefung/
-  weiterbildung. Domains: arzt → `gesundheit`, wohnen+bank → `alltag` (alongside behoerde),
-  bildung → `bildung`. All six domains are now populated.
-- **City strip wired (`components/city/mastery.ts` + `domain-buildings.tsx`):** the placeholder
-  `bank` and `wohnhaus` domain buildings now own the `bank` and `wohnen` themes (`themeIds`); arzt
-  rolls into `arztpraxis` via the `gesundheit` domain. `tests/city-mastery.test.ts` updated (the
-  old "future packs empty" assertion became a "packs wired" assertion). Every vocab word still maps
-  to exactly one building.
-- **Gates all green (final):** `pnpm lint:content` (15 themes, 642 vocab, 540 collocations, 37
-  can-do, 18 texts, 1,408 provenance), `pnpm build`, `pnpm check:bundle` (main 79.5 kB / 400 kB),
-  `pnpm test:unit` (85 passed), `pnpm lint` (0 errors, the usual 32 react-hooks warnings). Themes
-  surface automatically everywhere that iterates the `themes` registry.
-- **Status:** Arzt shipped via **PR #349**; Wohnen + Bank via **PR #350** (both squash-merged).
-  Bildung built on `claude/whats-next-l61ca3` and ready to ship in a third PR.
-- **Obvious next content moves:** with all six domains populated, the remaining depth work is
-  per-theme (exam sets for the daily-life themes, more dialogues/texts, sub-theme splits on the
-  remaining flat themes) or the founder verify pass on all the new `draft` German (arzt/wohnen/
-  bank/bildung vocab, collocations, texts, dialogues, can-do).
-
-_Older handoffs (sessions 1–74) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; the session-73 G1 and session-74 handoffs are in the W28 file)._
+_Older handoffs (sessions 1–75) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–75 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)

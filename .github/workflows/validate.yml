@@ -37,6 +37,14 @@ jobs:
       - name: Lint content
         run: pnpm lint:content
 
+      # Layer 2 fact gate (data-strategy verification ladder): fail if BOTH
+      # independent morphology oracles agree a noun's der/die/das or plural is
+      # wrong. Runs fully offline against the committed vendored subsets
+      # (scripts/vendor/*.json), so no network is needed here; regenerate them
+      # with `pnpm build:oracles` when the vocabulary bank gains nouns.
+      - name: Verify noun facts
+        run: pnpm verify:facts
+
       # FSRS scheduler gate (Learning Engine 26b): asserts src/engine/srs.ts
       # against golden vectors from the py-fsrs reference implementation.
       - name: Test SRS engine
