@@ -1,0 +1,76 @@
+name: Verify sentences (Layer 3)
+
+# Data-strategy verification ladder, Layer 3 (docs/strategy/DATA_STRATEGY.md §3):
+# grammar/spelling over every German sentence (LanguageTool) + a CEFR
+# plausibility heuristic. WARN-ONLY, so this is a SCHEDULED report, never a merge
+# gate (LanguageTool false-positives on idiomatic B2, so it must not block PRs).
+# It regenerates the two reports and uploads them as artifacts; it does not push
+# to the repo (no deploy churn, no surprise commits). Refresh the committed
+# baselines under docs/reports/ by downloading the artifact, or by running
+# `pnpm verify:sentences` locally.
+on:
+  schedule:
+    - cron: "0 6 1 * *" # 06:00 UTC on the 1st of each month
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-sentences:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions pinned to commit SHAs (tag-hijack supply-chain hygiene), matching
+      # validate.yml / pages.yml.
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      # LanguageTool is a Java engine; resolve it from Maven Central at run time.
+      - name: Setup Java
+        uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Python
+        uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Layer 3a — grammar/spelling. Fetch the LanguageTool toolchain (Maven
+      # Central), then run it offline over every German sentence.
+      - name: Build LanguageTool toolchain
+        run: pnpm build:languagetool
+
+      - name: Verify grammar
+        run: pnpm verify:grammar
+
+      # Layer 3b — CEFR heuristic. The frequency subset is committed, so the
+      # check runs offline; regenerate the subset when the banks change.
+      - name: Refresh frequency subset
+        run: |
+          pip install wordfreq
+          pnpm build:frequency-subset
+
+      - name: Verify CEFR
+        run: pnpm verify:cefr
+
+      - name: Upload Layer 3 reports
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: layer3-sentence-reports
+          path: |
+            docs/reports/verify-grammar-report.md
+            docs/reports/verify-cefr-report.md

@@ -343,3 +343,37 @@ the founder's explicit go.** What happened:
   per-theme (exam sets for the daily-life themes, more dialogues/texts, sub-theme splits on the
   remaining flat themes) or the founder verify pass on all the new `draft` German (arzt/wohnen/
   bank/bildung vocab, collocations, texts, dialogues, can-do).
+
+---
+
+**Handoff after session 76 (2026-07-07). DATA STRATEGY authored + Layer 2 fact-check spike SHIPPED ✅.**
+What happened:
+- **`docs/strategy/DATA_STRATEGY.md` (new, v1.0)** answers the founder's ask: keep content
+  source-verified, audit-ready, and automated *without a native-speaker reviewer*. Centerpiece is a
+  six-layer **verification ladder** (structural → provenance → factual-match → linguistic → AI jury →
+  rationed human audit) that replaces one native reviewer with a panel of independent sources + models
+  (agreement = confidence, disagreement = the only thing a human sees). Adds a per-item `verification`
+  trust model extending `ProvenanceEntry`, a CI-vs-scheduled automation split, a cost envelope, a
+  decay/re-verification cadence, an EU AI Act Article 10 mapping, and a "scope: existing backlog +
+  future content" section. Cross-links `DATA_GOVERNANCE.md` (the legal/licensing layer) both ways.
+  Shipped via **PR #352** (squash-merged) plus a scope-clarification commit.
+- **Layer 2 fact-check spike SHIPPED** (the highest-ROI rung, built as a validation spike):
+  - `pnpm build:dict-subset` (`scripts/build-dict-subset.mjs`) fetches the German morphology lexicon
+    **`german-words-dict`** (Apache-2.0, derived from LanguageTool's `german-pos-dict`, CC-BY-SA-4.0 —
+    already on our allowlist) from npm, filters to our noun lemmas, writes a 12 KB committed subset
+    (`scripts/vendor/german-words-subset.json`). Fully offline thereafter.
+  - `pnpm verify:facts` (`scripts/verify-facts.mjs`) checks every noun's der/die/das + plural against
+    the lexicon; bucketed report → `docs/reports/verify-facts-report.md`. **Report tool, NOT a CI gate.**
+  - **Result over 489 nouns:** 224 genders + 174 plurals machine-verified with zero human effort; 3
+    plurale-tantum headwords auto-detected/skipped; **47% coverage** (compounds absent from the base
+    lexicon).
+  - **Key finding: a single lexicon cannot gate.** All 4 remaining disagreements were hand-checked as
+    lexicon-side issues (`der Husten` is correct; `Risiken`/`Visa` are the standard plurals), so
+    disagreements are *review signals*, not proven bugs. This validated the strategy's multi-source
+    thesis.
+  - **Next step (scoped, not built):** add a **second oracle** (Wiktionary/kaikki, runs in CI where
+    network is open) so agreement gates and coverage rises past 47%, plus a compound head-noun gender
+    rule. Wiktionary/kaikki are blocked by this environment's network policy (npm registry is the only
+    allowed host), so the richer oracle must run in CI / an unrestricted machine.
+- **No content added**, so the content counts were unchanged. `pnpm lint:content` green.
+- **Branch:** `claude/app-data-strategy-oshuhs`. Shipped via PR #352 (strategy) + the fact-check spike PR.

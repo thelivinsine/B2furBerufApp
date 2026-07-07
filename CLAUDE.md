@@ -31,6 +31,17 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   only when **both** agree a form is wrong. Runs offline against the committed subsets in
   `scripts/vendor/`. **After adding nouns, run `pnpm build:oracles` to refresh those subsets** (fetches
   npm + PyPI), then `pnpm verify:facts`. See `docs/strategy/DATA_STRATEGY.md` §3 / `docs/reports/verify-facts-report.md`.
+- `pnpm verify:grammar` — Layer 3 grammar/spelling (data strategy, s78): runs **LanguageTool 6.8** over
+  every German sentence in the banks (vocab/collocation examples, dialogue lines, reading texts,
+  redemittel), bucketed report → `docs/reports/verify-grammar-report.md`. **Warn-only, NOT a gate** (LT
+  over-flags idiomatic B2). LanguageTool is ~69 MB (not vendored); run `pnpm build:languagetool` first
+  (resolves it pinned from Maven Central, then runs offline). Scheduled monthly via `verify-sentences.yml`.
+- `pnpm verify:cefr` — Layer 3 CEFR plausibility heuristic (s78): flags items whose word-frequency
+  (`wordfreq` Zipf) + sentence complexity are far from the claimed `cefr` facet. Precision-first (German
+  compound frequency is a weak grader, so it flags only common-word/advanced-label, vocab only), report →
+  `docs/reports/verify-cefr-report.md`. Runs offline against the vendored
+  `scripts/vendor/german-frequency-subset.json`; regenerate with `pnpm build:frequency-subset` (needs
+  Python `wordfreq`) after adding vocab/collocations. Warn-only. `pnpm verify:sentences` runs both.
 - `pnpm test:srs` — assert `engine/srs.ts` against FSRS golden vectors from py-fsrs (CI gate, s53).
   **Run it after any `engine/srs.ts` edit.** Vector provenance is in the `scripts/test-srs.mjs` header.
 - `pnpm test:pronounce` — assert the `engine/pronounce.ts` spoken/typed answer matcher (CI gate, s56).

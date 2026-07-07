@@ -1,12 +1,13 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-07 (session 77: **data strategy Phase A COMPLETED — Layer 2 is now a real
-two-oracle CI gate**. Added a second, independent oracle (`german-nouns`, ~100k nouns from German
-Wiktionary via PyPI) so `pnpm verify:facts` reports an error only when both oracles agree a der/die/das
-or plural is wrong (`GATE`, fails CI); it now runs offline in `validate.yml`. Coverage jumped 47% → 97%
-(458 articles + 260 plurals verified), with 0 two-oracle-confirmed errors. `DATA_STRATEGY.md` → v1.2.
-Prior, session 76: data strategy authored (`docs/strategy/DATA_STRATEGY.md`, six-layer verification
-ladder, PR #352) + the single-oracle Layer 2 spike that proved one source can't gate. Prior, session 75:
+_Last updated: 2026-07-07 (session 78: **data strategy Phase B SHIPPED — Layer 3, the offline linguistic
+engine**. `pnpm verify:grammar` runs **LanguageTool 6.8** over all 2,315 German sentences (0 grammar
+errors, 98.8% clean, one real headword typo caught + fixed); `pnpm verify:cefr` is a precision-first
+CEFR frequency+complexity tripwire (6 FLAG + 72 WATCH of 1,182 items). Both are warn-only scheduled
+reports (`verify-sentences.yml`, monthly), never a merge gate. LanguageTool (~69 MB) resolves pinned from
+Maven Central (reachable; the LT download host + kaikki/de.wiktionary are 403-blocked). `DATA_STRATEGY.md`
+→ v1.3. Prior, session 77: Phase A COMPLETED — Layer 2 two-oracle fact gate (`german-nouns` PyPI oracle
+added; coverage 47% → 97%, 0 two-oracle-confirmed errors; `DATA_STRATEGY.md` → v1.2). Prior, session 75:
 **four daily-life content packs shipped** — Arzt &
 Gesundheit (PR #349), Wohnen & Bank (PR #350), and Bildung & Sprache. Each is a full theme: ~28
 vocab, ~36 collocations, 3 Can-Do, 2 reading texts, 1 dialogue, all provenance-rowed and
@@ -173,6 +174,42 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 78 (2026-07-07). DATA STRATEGY Phase B SHIPPED: Layer 3, the offline
+linguistic engine ✅ (warn-only reports, not gates).** Both halves of Layer 3 now run. What happened:
+- **Grammar/spelling over every sentence.** `pnpm verify:grammar` (`scripts/verify-grammar.mjs` + a
+  Java runner `scripts/lt/LtCheck.java`) runs **LanguageTool 6.8 `language-de`** over **2,315 German
+  sentences** — vocab examples, collocation examples, dialogue lines + option texts + model answers +
+  prompts, reading-text bodies + comprehension questions, and redemittel phrases + examples. Findings
+  bucket by LanguageTool's own issue type → `docs/reports/verify-grammar-report.md`. **Result: 0
+  grammar/agreement errors, 98.8% of sentences clean.** It caught **one real typo** (headword
+  `v_kulanzloesung` was "Kulanslösung", corrected to "Kulanzlösung" in all 3 places); the rest are
+  domain proper nouns (fictitious names in texts) and idiomatic hits. Warn-only by design (LanguageTool
+  over-flags idiomatic B2), so NOT a merge gate.
+- **LanguageTool is fetched, not vendored.** It is ~69 MB across 88 jars, so `pnpm build:languagetool`
+  (`scripts/build-languagetool.mjs`) resolves it **pinned (6.8) from Maven Central** — reachable through
+  the network policy, unlike the LT download host / kaikki / de.wiktionary (all 403). It runs fully
+  offline after resolve. `scripts/vendor/lt-lib/` is gitignored.
+- **CEFR plausibility tripwire.** `pnpm verify:cefr` (`scripts/verify-cefr.mjs`) compares each item's
+  claimed `cefr` to a measured difficulty from **word frequency** (`wordfreq` German Zipf, vendored
+  `scripts/vendor/german-frequency-subset.json` built by `pnpm build:frequency-subset`) + **sentence
+  complexity**. **Honest calibration:** German unigram frequency is a weak grader (compounds are
+  elementary yet rare), so it flags only the reliable direction — a **common word carrying an advanced
+  label** — and only for vocabulary. **Result: 6 FLAG + 72 WATCH of 1,182 items** (the 6 FLAGs are
+  sustainability-theme words like *die Umwelt* / *vermeiden* tagged B2.2 despite B1 frequency, worth a
+  glance); everything else is caveated info. Report: `docs/reports/verify-cefr-report.md`.
+- **Scheduled, not gated.** `.github/workflows/verify-sentences.yml` (monthly + dispatch) regenerates
+  both reports and uploads them as artifacts (no auto-commit → no deploy churn). `validate.yml` is
+  untouched; no new per-PR gate.
+- **Only content change:** the one typo fix (`vocabulary.ts`), so counts below are unchanged; oracle
+  subsets regenerated (1 line) to keep the corrected word covered. All gates green: `pnpm lint:content`,
+  `pnpm verify:facts` (0 gate errors), `pnpm build`, `pnpm lint`, `pnpm test:unit/srs/pronounce`,
+  `pnpm check:bundle`. `DATA_STRATEGY.md` → **v1.3**.
+- **Next rung:** Phase D (the AI jury, Layer 4) + golden set, and Phase C (the `verification` trust
+  block on `ProvenanceEntry`, surfaced on `/sources`) if not folded into D.
+- **Branch:** `claude/data-strategy-phase-b-wiw3mu`.
+
+---
+
 **Handoff after session 77 (2026-07-07). DATA STRATEGY Phase A COMPLETED: Layer 2 is now a real
 two-oracle CI gate ✅.** This finishes the v1.1 spike's open item (a second oracle so agreement can
 gate). What happened:
@@ -207,40 +244,8 @@ gate). What happened:
 
 ---
 
-**Handoff after session 76 (2026-07-07). DATA STRATEGY authored + Layer 2 fact-check spike SHIPPED ✅.**
-What happened:
-- **`docs/strategy/DATA_STRATEGY.md` (new, v1.0)** answers the founder's ask: keep content
-  source-verified, audit-ready, and automated *without a native-speaker reviewer*. Centerpiece is a
-  six-layer **verification ladder** (structural → provenance → factual-match → linguistic → AI jury →
-  rationed human audit) that replaces one native reviewer with a panel of independent sources + models
-  (agreement = confidence, disagreement = the only thing a human sees). Adds a per-item `verification`
-  trust model extending `ProvenanceEntry`, a CI-vs-scheduled automation split, a cost envelope, a
-  decay/re-verification cadence, an EU AI Act Article 10 mapping, and a "scope: existing backlog +
-  future content" section. Cross-links `DATA_GOVERNANCE.md` (the legal/licensing layer) both ways.
-  Shipped via **PR #352** (squash-merged) plus a scope-clarification commit.
-- **Layer 2 fact-check spike SHIPPED** (the highest-ROI rung, built as a validation spike):
-  - `pnpm build:dict-subset` (`scripts/build-dict-subset.mjs`) fetches the German morphology lexicon
-    **`german-words-dict`** (Apache-2.0, derived from LanguageTool's `german-pos-dict`, CC-BY-SA-4.0 —
-    already on our allowlist) from npm, filters to our noun lemmas, writes a 12 KB committed subset
-    (`scripts/vendor/german-words-subset.json`). Fully offline thereafter.
-  - `pnpm verify:facts` (`scripts/verify-facts.mjs`) checks every noun's der/die/das + plural against
-    the lexicon; bucketed report → `docs/reports/verify-facts-report.md`. **Report tool, NOT a CI gate.**
-  - **Result over 489 nouns:** 224 genders + 174 plurals machine-verified with zero human effort; 3
-    plurale-tantum headwords auto-detected/skipped; **47% coverage** (compounds absent from the base
-    lexicon).
-  - **Key finding: a single lexicon cannot gate.** All 4 remaining disagreements were hand-checked as
-    lexicon-side issues (`der Husten` is correct; `Risiken`/`Visa` are the standard plurals), so
-    disagreements are *review signals*, not proven bugs. This validated the strategy's multi-source
-    thesis.
-  - **Next step (scoped, not built):** add a **second oracle** (Wiktionary/kaikki, runs in CI where
-    network is open) so agreement gates and coverage rises past 47%, plus a compound head-noun gender
-    rule. Wiktionary/kaikki are blocked by this environment's network policy (npm registry is the only
-    allowed host), so the richer oracle must run in CI / an unrestricted machine.
-- **No content added**, so the content counts below are unchanged. `pnpm lint:content` green.
-- **Branch:** `claude/app-data-strategy-oshuhs`. Shipped via PR #352 (strategy) + the fact-check spike PR.
-
-_Older handoffs (sessions 1–75) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–75 are in the W28 file)._
+_Older handoffs (sessions 1–76) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–76 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)

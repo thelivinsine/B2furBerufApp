@@ -1496,3 +1496,48 @@ Branch: `claude/whats-next-esga9u`.
   the founder a ready-to-paste continuation prompt for the next session (Phase B / Layer 3: LanguageTool
   sentence grammar; plus optional Layer-2 coverage polish and the Phase C `verification` trust block).
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`. PR + commit: see below.
+
+## Entry 215 — 2026-07-07 (session 78)
+- **Branch:** `claude/data-strategy-phase-b-wiw3mu`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > Continue the data strategy plan (docs/strategy/DATA_STRATEGY.md). Phase A (Layer 2, the two-oracle
+  > noun-fact CI gate) is done and merged — start at the "Resume here" handoff in docs/PROJECT_STATUS.md
+  > (session 77). Build Phase B — Layer 3, the offline linguistic engine: run LanguageTool over every
+  > German sentence in the content banks (vocab examples, collocation example.de, dialogue lines,
+  > reading texts, redemittel) for grammar/spelling, plus a CEFR plausibility heuristic (word-frequency
+  > + sentence complexity) that flags items far from their claimed cefr facet. Constraints, mirroring
+  > Phase A: outbound HTTPS only reaches npm/PyPI/crates/Go/JSR (kaikki, de.wiktionary, DWDS are
+  > 403-blocked); check early whether a usable LanguageTool distribution is reachable, else fall back to
+  > an unrestricted CI machine. Layer 3 is warn-only / scheduled report, NOT a hard merge gate. Emit a
+  > bucketed report to docs/reports/. Work on branch claude/data-strategy-plan-78r0jq, keep gates green,
+  > auto-ship via a squash-merged PR into main, update docs + prompt log. If Phase B's tooling is
+  > blocked, fall back to Phase C instead.
+- **Response summary:** Built **Phase B (Layer 3)**. First proved the tooling is reachable: the
+  LanguageTool download host + kaikki/de.wiktionary are 403, but **Maven Central is reachable**, and
+  Java 21 + Maven are installed, so LanguageTool 6.8 `language-de` (88 jars, ~69 MB) resolves in-sandbox
+  — no fallback needed. **Grammar/spelling:** `scripts/build-languagetool.mjs` (resolves LT pinned from
+  Maven, gitignored) + a Java runner `scripts/lt/LtCheck.java` + `scripts/verify-grammar.mjs` run LT over
+  **2,315 German sentences** (vocab/collocation examples, dialogue lines/options/models/prompts,
+  reading-text bodies/questions, redemittel phrases/examples). **0 grammar errors, 98.8% clean**, one
+  real headword typo caught and fixed (`v_kulanzloesung`: "Kulanslösung" → "Kulanzlösung"). **CEFR
+  heuristic:** `scripts/build-frequency-subset.mjs` (vendors `wordfreq` German Zipf, offline) +
+  `scripts/verify-cefr.mjs` compare claimed `cefr` to word frequency + sentence complexity. First cut
+  flagged 44% (unigram frequency can't grade German compounds), so recalibrated to precision-first —
+  flags only the reliable "common word, advanced label" direction, vocab only → **6 FLAG + 72 WATCH** of
+  1,182 items. Both are **warn-only reports** (`docs/reports/verify-grammar-report.md`,
+  `verify-cefr-report.md`), regenerated monthly by `.github/workflows/verify-sentences.yml` (artifacts,
+  no auto-commit); `validate.yml` untouched. All gates green: `lint:content`, `verify:facts` (0 gate
+  errors), `build`, `lint` (0 errors), `test:unit/srs/pronounce`, `check:bundle`. Updated
+  `DATA_STRATEGY.md` → v1.3, `CLAUDE.md`, `PROJECT_STATUS.md` (+ moved the session-76 handoff to the W28
+  archive per the doc-hygiene rule). (Branch used: `claude/data-strategy-phase-b-wiw3mu`, the one this
+  session was assigned.)
+- **Artifacts:** `scripts/lt/LtCheck.java`, `scripts/build-languagetool.mjs`, `scripts/verify-grammar.mjs`,
+  `scripts/build-frequency-subset.mjs`, `scripts/verify-cefr.mjs`,
+  `scripts/vendor/german-frequency-subset.json`, `scripts/vendor/german-nouns-subset.json` (1-line
+  regen), `src/data/vocabulary.ts` (typo fix), `package.json`, `.gitignore`,
+  `.github/workflows/verify-sentences.yml`, `docs/reports/verify-grammar-report.md`,
+  `docs/reports/verify-cefr-report.md`, `docs/strategy/DATA_STRATEGY.md`, `CLAUDE.md`,
+  `docs/PROJECT_STATUS.md`, `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`,
+  `docs/SESSION_PROMPT_LOG.md`. PR + commit: see below.
