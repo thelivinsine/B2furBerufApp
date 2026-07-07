@@ -1723,5 +1723,22 @@ Branch: `claude/whats-next-esga9u`.
   This completes the SEO surface (meta/OG/Twitter/canonical/JSON-LD, robots, sitemap, landing FAQ, share
   card); remaining growth work is non-code (real screenshots/testimonials) or a separate lane.
 - **Artifacts:** `public/og-image.png` (new), `preview/og-image/make-og.mjs` (new), `index.html`,
-  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 225). Commit SHA + PR # to be filled on
-  push/merge.
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 225). Shipped as PR #363 (squash-merged to
+  `main`, commit `a6f0690`).
+
+## Entry 226 — 2026-07-07 (session 80)
+- **Branch:** `claude/top-value-tasks-842u60`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Session documentation pass. Prompt-log entries 221–225 were written as the work
+  shipped; this pass backfilled the PR/commit references on the last entry, added this entry (226), and
+  verified `docs/PROJECT_STATUS.md` (consolidated session-80 handoff + all content counts:
+  22 texts/66 checks, 15 exam sets, 20 dialogues, 1,421 provenance rows), `docs/PROJECT_REFERENCE.md`
+  (#21 marked closed), and `CLAUDE.md` (text/provenance counts) are current. **Session 80 shipped 4 PRs to
+  `main`:** #360 (EU AI Act Art. 6(3) risk assessment doc + full SEO meta/OG/JSON-LD/robots/sitemap +
+  landing FAQ/how-it-works + 4 daily-life reading texts), #361 (5 daily-life exam sets), #362 (4 second
+  daily-life dialogues), #363 (1200×630 OG share image). No code changed in this doc pass.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (entries 225–226), `docs/PROJECT_STATUS.md` (verified).
+  Commit SHA + PR # to be filled on push/merge.
