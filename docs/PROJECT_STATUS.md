@@ -175,6 +175,29 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 79 (2026-07-07). Data-strategy Q&A + backlog capture (no code).** The founder
+asked how the data strategy handles three things and said "we'll come back to these tasks later." Answered
+in chat and parked as backlog items (`docs/PROJECT_REFERENCE.md` #33–#35):
+- **#33 — human-in-the-loop tracking + exception-queue tooling.** The reviewer loop from `DATA_STRATEGY.md`
+  §3 Layers 4–5: generate the committed `docs/reports/verification-queue.md` from the machine sweeps and
+  wire it to the founder-only `provenance_reviews` table (migration 0004) + `/sources` admin overlay so a
+  reviewer clears the queue and flips `review_status → verified`. Builds on Phase A/B flags now; fully
+  populated once Phase D (jury) lands.
+- **#34 — auditor handoff package.** A repeatable one-pager/export that packages the reproducible per-item
+  chain (source + license snapshot + fact/grammar/jury verdicts w/ tool+version+date + human sign-off) for
+  an EU AI Act Art. 10 / ISO 42001 examiner; composes the existing `/sources` page, register CSV export,
+  and `verify-*` reports. Doc-only, cheap.
+- **#35 — scale-to-100x database plan.** Two planes: content stays CDN-cheap (files → Supabase content
+  table only if the *library* grows 100x); the user plane is standard Postgres scaling (Supavisor pooling →
+  indexed/index-friendly RLS → partition/archive `ai_usage`+writing → replicas) plus the real lever,
+  **server-side metering/capping of AI-writing-coach token spend**, and clearing the `progress` fixed-column
+  upsert debt (#32). Deliverable is a phased migration checklist.
+
+Nothing shipped this session; the next rung on the built roadmap is still **Phase D (the AI jury, Layer 4)
++ golden set** (see the session-78 handoff below).
+
+---
+
 **Handoff after session 78 (2026-07-07). DATA STRATEGY Phase B + Phase C SHIPPED ✅** (Layer 3 linguistic
 engine, then the per-item trust model). Two PRs. **Phase C (the trust model, PR to come):**
 - **`Verification` block on `ProvenanceEntry`** (`src/types/index.ts`): `tier` (unverified → structural →
@@ -235,42 +258,8 @@ engine, then the per-item trust model). Two PRs. **Phase C (the trust model, PR 
 
 ---
 
-**Handoff after session 77 (2026-07-07). DATA STRATEGY Phase A COMPLETED: Layer 2 is now a real
-two-oracle CI gate ✅.** This finishes the v1.1 spike's open item (a second oracle so agreement can
-gate). What happened:
-- **Second oracle added.** `pnpm build:nouns-subset` (`scripts/build-nouns-subset.mjs`) fetches
-  **`german-nouns`** from **PyPI** (~100k nouns compiled from German Wiktionary, CC-BY-SA-4.0 — already
-  allowlisted), filters to our lemmas, writes a 25 KB committed subset
-  (`scripts/vendor/german-nouns-subset.json`). This is the "Wiktionary route" the strategy wanted,
-  routed through an allowed host (kaikki/de.wiktionary are still 403-blocked by the network policy).
-  It is an *independent* lineage from oracle A (LanguageTool) and is multi-variant aware. Convenience:
-  `pnpm build:oracles` builds both.
-- **`verify:facts` rewritten to two-oracle voting + a real gate.** An error is reported **only when
-  both oracles cover a fact directly, both reject our value, AND agree on the same correction** (the
-  `GATE` bucket → fails CI). A lone or self-conflicting disagreement is a `REVIEW` signal, never a
-  build failure. Added a compound **head-noun gender fallback** ("der Behördentermin" ← "der Termin";
-  gender only, head votes are gate-excluded as heuristic).
-- **Result over 489 nouns: coverage 47% → 97%** (474/489), **458 articles + 260 plurals verified**
-  (221/167 by *both* oracles), **10** plurale-tantum auto-skipped, **0 two-oracle-confirmed errors**.
-  The 6 remaining review signals were all hand-checked as valid variants or the head-heuristic hitting
-  a paired feminine form (Ansprechpartner**in**), not bugs. The old 4 "disagreements" (Husten, Rollout,
-  Risiko, Visum) are all resolved: oracle B attests our forms.
-- **Wired into CI.** `pnpm verify:facts` now runs in `validate.yml` as an **offline gate** (reads the
-  committed vendored subsets; no network in CI). Regenerate subsets with `pnpm build:oracles` when the
-  vocab bank gains nouns.
-- **Docs:** `DATA_STRATEGY.md` → **v1.2** (changelog + Layer 2 "SHIPPED" note),
-  `docs/reports/verify-facts-report.md` regenerated. **No content/src changed**; counts below unchanged.
-  `pnpm lint:content` + `pnpm verify:facts` green.
-- **Next Layer-2 polish (optional):** 15 lemmas are covered by neither oracle (rare compounds/acronyms)
-  and 43 more have a gender but no oracle plural to compare; a third source or manual pass could close
-  them. Otherwise the ladder's next rung is **Phase B (Layer 3,
-  LanguageTool sentence grammar)** and **Phase C (the `verification` trust block on `ProvenanceEntry`)**.
-- **Branch:** `claude/data-strategy-plan-78r0jq`.
-
----
-
-_Older handoffs (sessions 1–76) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–76 are in the W28 file)._
+_Older handoffs (sessions 1–77) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–77 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)

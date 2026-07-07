@@ -377,3 +377,37 @@ What happened:
     allowed host), so the richer oracle must run in CI / an unrestricted machine.
 - **No content added**, so the content counts were unchanged. `pnpm lint:content` green.
 - **Branch:** `claude/app-data-strategy-oshuhs`. Shipped via PR #352 (strategy) + the fact-check spike PR.
+
+---
+
+**Handoff after session 77 (2026-07-07). DATA STRATEGY Phase A COMPLETED: Layer 2 is now a real
+two-oracle CI gate ✅.** This finishes the v1.1 spike's open item (a second oracle so agreement can
+gate). What happened:
+- **Second oracle added.** `pnpm build:nouns-subset` (`scripts/build-nouns-subset.mjs`) fetches
+  **`german-nouns`** from **PyPI** (~100k nouns compiled from German Wiktionary, CC-BY-SA-4.0 — already
+  allowlisted), filters to our lemmas, writes a 25 KB committed subset
+  (`scripts/vendor/german-nouns-subset.json`). This is the "Wiktionary route" the strategy wanted,
+  routed through an allowed host (kaikki/de.wiktionary are still 403-blocked by the network policy).
+  It is an *independent* lineage from oracle A (LanguageTool) and is multi-variant aware. Convenience:
+  `pnpm build:oracles` builds both.
+- **`verify:facts` rewritten to two-oracle voting + a real gate.** An error is reported **only when
+  both oracles cover a fact directly, both reject our value, AND agree on the same correction** (the
+  `GATE` bucket → fails CI). A lone or self-conflicting disagreement is a `REVIEW` signal, never a
+  build failure. Added a compound **head-noun gender fallback** ("der Behördentermin" ← "der Termin";
+  gender only, head votes are gate-excluded as heuristic).
+- **Result over 489 nouns: coverage 47% → 97%** (474/489), **458 articles + 260 plurals verified**
+  (221/167 by *both* oracles), **10** plurale-tantum auto-skipped, **0 two-oracle-confirmed errors**.
+  The 6 remaining review signals were all hand-checked as valid variants or the head-heuristic hitting
+  a paired feminine form (Ansprechpartner**in**), not bugs. The old 4 "disagreements" (Husten, Rollout,
+  Risiko, Visum) are all resolved: oracle B attests our forms.
+- **Wired into CI.** `pnpm verify:facts` now runs in `validate.yml` as an **offline gate** (reads the
+  committed vendored subsets; no network in CI). Regenerate subsets with `pnpm build:oracles` when the
+  vocab bank gains nouns.
+- **Docs:** `DATA_STRATEGY.md` → **v1.2** (changelog + Layer 2 "SHIPPED" note),
+  `docs/reports/verify-facts-report.md` regenerated. **No content/src changed**; counts below unchanged.
+  `pnpm lint:content` + `pnpm verify:facts` green.
+- **Next Layer-2 polish (optional):** 15 lemmas are covered by neither oracle (rare compounds/acronyms)
+  and 43 more have a gender but no oracle plural to compare; a third source or manual pass could close
+  them. Otherwise the ladder's next rung is **Phase B (Layer 3,
+  LanguageTool sentence grammar)** and **Phase C (the `verification` trust block on `ProvenanceEntry`)**.
+- **Branch:** `claude/data-strategy-plan-78r0jq`.
