@@ -1,5 +1,10 @@
 # Data Governance & Content Provenance
 
+_Companion doc: **`docs/strategy/DATA_STRATEGY.md`** (2026-07-07) is the top-level data strategy. This
+doc covers the **legal / licensing / certification** layer (is the content clean, who wrote it); the
+strategy doc covers the **accuracy verification** layer (is the German actually correct, and how do we
+verify it without a native speaker, via the automated verification ladder). Read them together._
+
 _Status: **v0.5 (2026-07-03)**. The certification deep-research pass (backlog #19) is now done:
 see **`docs/strategy/CERTIFICATION_RESEARCH.md`** for the cited findings. This doc's assumptions held; the
 refinements from the research are folded in below and flagged "(research-validated 2026-06-15)". The
