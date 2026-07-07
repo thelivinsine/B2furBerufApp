@@ -36,19 +36,19 @@
  * (those are higher rungs of the ladder).
  */
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { createServer } from "vite";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const SUBSET_A = path.join(root, "scripts", "vendor", "german-words-subset.json");
-const SUBSET_B = path.join(root, "scripts", "vendor", "german-nouns-subset.json");
+export const SUBSET_A = path.join(root, "scripts", "vendor", "german-words-subset.json");
+export const SUBSET_B = path.join(root, "scripts", "vendor", "german-nouns-subset.json");
 const REPORT = path.join(root, "docs", "reports", "verify-facts-report.md");
 const DRY = process.argv.includes("--dry");
 const REPORT_ONLY = process.argv.includes("--report");
 
 const GENDER_TO_ARTICLE = { M: "der", F: "die", N: "das" };
-const stripArticle = (s) => s.replace(/^(der|die|das)\s+/i, "").trim();
+export const stripArticle = (s) => s.replace(/^(der|die|das)\s+/i, "").trim();
 
 async function loadVocabulary() {
   const server = await createServer({
@@ -68,7 +68,7 @@ async function loadVocabulary() {
 }
 
 /** Load an oracle subset; returns null (with a warning) if missing. */
-async function loadSubset(file, buildCmd) {
+export async function loadSubset(file, buildCmd) {
   try {
     return JSON.parse(await readFile(file, "utf8")).words;
   } catch {
@@ -81,7 +81,7 @@ async function loadSubset(file, buildCmd) {
  * One oracle's view of a lemma, normalised to accepted-value ARRAYS.
  * `direct` is false for oracle-B compound-head fallbacks (heuristic, gate-excluded).
  */
-function oracleView(name, entry) {
+export function oracleView(name, entry) {
   if (!entry) return { name, articles: null, plurals: null, direct: false };
   if (name === "A") {
     const article = entry.G ? GENDER_TO_ARTICLE[entry.G] : null;
@@ -100,7 +100,7 @@ function oracleView(name, entry) {
  * Vote a single fact. `field` picks articles|plurals. Returns
  * { verdict, oursOk, correction } where verdict ∈ verified2|verified1|gate|review|nocover.
  */
-function voteFact(views, field, ours) {
+export function voteFact(views, field, ours) {
   const covering = views.filter((v) => v[field] !== null);
   if (covering.length === 0) return { verdict: "nocover" };
   const accepts = covering.filter((v) => v[field].includes(ours));
@@ -317,7 +317,9 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  console.error("verify-facts crashed:", err?.message ?? err);
-  process.exitCode = 1;
-});
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch((err) => {
+    console.error("verify-facts crashed:", err?.message ?? err);
+    process.exitCode = 1;
+  });
+}

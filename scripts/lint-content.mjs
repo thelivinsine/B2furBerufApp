@@ -55,6 +55,10 @@ const DOMAIN_IDS = [
 ];
 const CONTEXT_TAGS = ["work", "personal", "both"];
 const CEFR_LEVELS = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];
+// Verification trust model (data-strategy Layer C). Closed enums, validate-when-present.
+const VERIFICATION_TIERS = ["unverified", "structural", "provenance", "facts", "linguistic", "jury", "human"];
+const VERIFICATION_LAYERS = ["structural", "provenance", "facts", "linguistic", "jury", "human"];
+const VERIFICATION_RESULTS = ["pass", "flag", "fail"];
 const FREQUENCIES = ["core", "common", "specialized"];
 const WORK_SECTORS = ["care", "office", "trades", "it", "retail", "hospitality"];
 const COUNTERPARTS = ["manager", "colleague", "customer", "team"];
@@ -848,6 +852,28 @@ function lintProvenance(provenance, allContentIds) {
   }
 }
 
+/**
+ * Validate the generated Layer C trust map (src/data/verification.ts). Closed-enum
+ * rule: tiers/layers/results must be valid; keys must be known content_ids. Records
+ * a tier distribution for the summary. Not a gate on tier value, only on schema.
+ */
+function lintVerification(verification, allContentIds) {
+  const ds = "verification";
+  const tierHist = {};
+  for (const [id, v] of Object.entries(verification)) {
+    if (!allContentIds.has(id)) error(ds, id, "verification entry for unknown content_id");
+    if (!VERIFICATION_TIERS.includes(v?.tier)) error(ds, id, `invalid tier "${v?.tier}"`);
+    else tierHist[v.tier] = (tierHist[v.tier] ?? 0) + 1;
+    if (typeof v?.confidence !== "number" || v.confidence < 0 || v.confidence > 1)
+      error(ds, id, `confidence must be 0..1 (got ${v?.confidence})`);
+    for (const c of v?.checks ?? []) {
+      if (!VERIFICATION_LAYERS.includes(c?.layer)) error(ds, id, `invalid check layer "${c?.layer}"`);
+      if (!VERIFICATION_RESULTS.includes(c?.result)) error(ds, id, `invalid check result "${c?.result}"`);
+    }
+  }
+  return tierHist;
+}
+
 /* ------------------------------------------------------------------ */
 /* run                                                                 */
 /* ------------------------------------------------------------------ */
@@ -884,6 +910,8 @@ async function main() {
       load("/src/data/texts.ts"),
       load("/src/data/missions.ts"),
     ]);
+    // Generated Layer C trust map — optional, so its absence never breaks the lint.
+    const verif = await load("/src/data/verification.ts").catch(() => ({ verification: {} }));
     data = {
       vocabulary: vocab.vocabulary,
       collocations: colloc.collocations,
@@ -902,6 +930,7 @@ async function main() {
       gameNpcs: miss.gameNpcs,
       keyItems: miss.keyItems,
       chapters: miss.chapters,
+      verification: verif.verification ?? {},
     };
   } finally {
     await server.close();
@@ -947,6 +976,7 @@ async function main() {
     ...THEME_IDS.filter((id) => data.writingPrompts[id]).map((id) => `wp_${id}`),
   ]);
   lintProvenance(data.provenance, allContentIds);
+  const tierHist = lintVerification(data.verification, allContentIds);
 
   // Em-dash sweep across every user-facing string in every bank
   // (skip the provenance register — notes are internal, not user-facing copy).
@@ -979,6 +1009,13 @@ async function main() {
   };
   console.log("Content lint — checked:");
   for (const [k, v] of Object.entries(counts)) console.log(`  ${String(v).padStart(4)} ${k}`);
+
+  const tierTotal = Object.values(tierHist).reduce((a, b) => a + b, 0);
+  if (tierTotal) {
+    console.log("Verification tiers (Layer C):");
+    for (const t of ["human", "jury", "linguistic", "facts", "provenance", "structural", "unverified"])
+      if (tierHist[t]) console.log(`  ${String(tierHist[t]).padStart(4)} ${t}`);
+  }
 
   if (warnings.length) {
     console.log(`\n⚠ ${warnings.length} warning(s):`);

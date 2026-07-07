@@ -1,13 +1,14 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-07 (session 78: **data strategy Phase B SHIPPED — Layer 3, the offline linguistic
-engine**. `pnpm verify:grammar` runs **LanguageTool 6.8** over all 2,315 German sentences (0 grammar
-errors, 98.8% clean, one real headword typo caught + fixed); `pnpm verify:cefr` is a precision-first
-CEFR frequency+complexity tripwire (6 FLAG + 72 WATCH of 1,182 items). Both are warn-only scheduled
-reports (`verify-sentences.yml`, monthly), never a merge gate. LanguageTool (~69 MB) resolves pinned from
-Maven Central (reachable; the LT download host + kaikki/de.wiktionary are 403-blocked). `DATA_STRATEGY.md`
-→ v1.3. Prior, session 77: Phase A COMPLETED — Layer 2 two-oracle fact gate (`german-nouns` PyPI oracle
-added; coverage 47% → 97%, 0 two-oracle-confirmed errors; `DATA_STRATEGY.md` → v1.2). Prior, session 75:
+_Last updated: 2026-07-07 (session 78: **data strategy Phase B + Phase C SHIPPED**. Phase B — Layer 3
+linguistic engine: `pnpm verify:grammar` runs **LanguageTool 6.8** over all 2,315 German sentences (0
+grammar errors, 98.8% clean, one real typo fixed); `pnpm verify:cefr` is a precision-first CEFR tripwire
+(6 FLAG). Both warn-only scheduled reports, never a gate; LanguageTool (~69 MB) resolves pinned from Maven
+Central. Phase C — the trust model: a `Verification` block on `ProvenanceEntry`, `pnpm build:verification`
+composes Layer 2/3 results into the generated `src/data/verification.ts` (per-item tier + confidence),
+surfaced as a badge on `/sources`; first sweep = 1,292 of 1,408 items machine-attested (25 human · 1,266
+linguistic · 1 facts · 116 provenance). `DATA_STRATEGY.md` → v1.4. Prior, session 77: Phase A COMPLETED —
+Layer 2 two-oracle fact gate (coverage 47% → 97%, 0 confirmed errors; v1.2). Prior, session 75:
 **four daily-life content packs shipped** — Arzt &
 Gesundheit (PR #349), Wohnen & Bank (PR #350), and Bildung & Sprache. Each is a full theme: ~28
 vocab, ~36 collocations, 3 Can-Do, 2 reading texts, 1 dialogue, all provenance-rowed and
@@ -174,8 +175,32 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 78 (2026-07-07). DATA STRATEGY Phase B SHIPPED: Layer 3, the offline
-linguistic engine ✅ (warn-only reports, not gates).** Both halves of Layer 3 now run. What happened:
+**Handoff after session 78 (2026-07-07). DATA STRATEGY Phase B + Phase C SHIPPED ✅** (Layer 3 linguistic
+engine, then the per-item trust model). Two PRs. **Phase C (the trust model, PR to come):**
+- **`Verification` block on `ProvenanceEntry`** (`src/types/index.ts`): `tier` (unverified → structural →
+  provenance → facts → linguistic → jury → human), `checks[]`, `confidence`, `last_verified`, plus the
+  `VerificationTier`/`Layer`/`Result` enums. Optional/additive.
+- **`pnpm build:verification`** (`scripts/build-verification.mjs`) composes the Layer 2 fact verdicts +
+  Layer 3 grammar (via a new `docs/reports/verify-grammar.json` sidecar) + CEFR results into the
+  **generated** `src/data/verification.ts`, keyed by content_id. Every record shares one sweep-date const
+  `D`, so a re-run only diffs items whose tier moved. To avoid re-running LanguageTool, it reads the
+  grammar sidecar and recomputes facts/CEFR from the vendored subsets (the `verify-facts`/`verify-cefr`
+  compute helpers are now exported + their `main()` guarded).
+- **`/sources` surfaces it** (`src/features/legal/Sources.tsx`): a per-item **tier badge + confidence**
+  and a tier-distribution summary section; an inline `verification` on a row wins over the generated map.
+- **`lint:content`** validates the tier/layer/result enums (closed-enum rule) and prints the tier
+  distribution (records, does not gate).
+- **First sweep over 1,408 items: 25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292
+  machine-attested for facts or language, up from 25 human-verified). `DATA_STRATEGY.md` → **v1.4**.
+- **Only the one Phase-B typo touched content**; `verification.ts` is generated (404 KB, lazy `/sources`
+  chunk; main chunk stays 79.5 kB). Gates green: `lint:content` (+ tier summary), `verify:facts`, `build`,
+  `lint`, `test:unit/srs/pronounce`, `check:bundle`.
+- **Next rung:** Phase D (the AI jury, Layer 4) + golden set — the first paid rung (LLM tokens + ~150
+  human-labeled calibration items). It adds the `jury` tier on top of what Phase C now records.
+
+---
+
+**Phase B (Layer 3, the offline linguistic engine ✅, warn-only reports, not gates).** What happened:
 - **Grammar/spelling over every sentence.** `pnpm verify:grammar` (`scripts/verify-grammar.mjs` + a
   Java runner `scripts/lt/LtCheck.java`) runs **LanguageTool 6.8 `language-de`** over **2,315 German
   sentences** — vocab examples, collocation examples, dialogue lines + option texts + model answers +
@@ -259,6 +284,7 @@ _Older handoffs (sessions 1–76) are archived by ISO week under `docs/archive/s
 - Themes: **15** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank` + `bildung`; all six domains now populated)
 - Game missions (Neuland): **1** (the chapter-1 Anmeldung boss, 9 scenes) · 6 NPCs · 4 key items
 - Provenance rows: **1,408** (all with a `reference`; 1,383 `draft` / 25 `verified`)
+- Verification tiers (Layer C, generated `src/data/verification.ts`): **25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-attested)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is
 always the source of truth).

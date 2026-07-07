@@ -1,6 +1,6 @@
 # Data Strategy — source-verified, audit-ready, and automated
 
-_Status: **v1.3 (2026-07-07)**. Author: session `app-data-strategy`. This is the top-level data
+_Status: **v1.4 (2026-07-07)**. Author: session `app-data-strategy`. This is the top-level data
 strategy for Genauly. It sits above two existing documents and does not repeat them:_
 
 - _**`docs/strategy/DATA_GOVERNANCE.md`** — the legal / licensing / certification layer (provenance
@@ -253,6 +253,19 @@ This is what makes the whole thing **audit-ready**: an examiner samples any item
 chain — *facts matched Wiktextract dump X on date Y, grammar clean under LanguageTool Z, jury of two
 models passed on date W under rubric v3, human-audited in the Q3 sample* — reproducible on demand.
 
+> **SHIPPED (v1.4, 2026-07-07).** The trust model is live. The `Verification` block (`tier` / `checks[]`
+> / `confidence` / `last_verified`) is on `ProvenanceEntry` (`src/types/index.ts`). Because the register
+> is hand-maintained, the machine tiers live in a **generated map** `src/data/verification.ts` (written
+> by `pnpm build:verification` from the Layer 2/3 results, keyed by content_id, every record sharing one
+> sweep-date const so a re-run only diffs items whose tier moved); an inline `verification` on a row
+> still wins. `/sources` merges the map onto the register and shows a **tier badge + confidence per
+> item** plus a tier-distribution summary; `lint:content` validates the tier/layer/result enums
+> (closed-enum rule) and prints the distribution (records, does not gate). **First full sweep over 1,408
+> items: 25 human · 1,266 linguistic · 1 facts · 116 provenance** — i.e. **1,292 of 1,408 items now
+> carry a machine facts-or-language attestation**, up from 25 human-verified. Confidence rolls up from
+> the tier (provenance 0.5 → facts 0.65 → linguistic 0.8 → human 1.0). This is the reproducible per-item
+> chain an Article 10 auditor samples; the jury (Layer 4) will add the `jury` rung on top.
+
 ## 5. Automation: where each layer runs
 
 | Layer | Trigger | Blocks a merge? | Cost |
@@ -336,9 +349,11 @@ Maven Central) runs over all 2,315 German sentences (0 grammar errors, 98.8% cle
 caught); a precision-first CEFR frequency+complexity heuristic flags the grossest mislabels. Both are
 warn-only scheduled reports (`verify-sentences.yml`, monthly), never a gate.
 
-**Phase C — Trust model.** Add the `verification` block to `ProvenanceEntry`; have Phases A/B write
-tiers; surface tier + confidence on `/sources`; extend `lint-content.mjs` to record (not yet gate on)
-tiers.
+**Phase C — Trust model. SHIPPED (v1.4).** `Verification` block on `ProvenanceEntry`; `pnpm
+build:verification` composes Layer 2/3 results into the generated `src/data/verification.ts`; `/sources`
+shows a tier badge + confidence per item; `lint:content` validates the enums and prints the tier
+distribution (records, does not gate). First sweep: 1,292 of 1,408 items machine-attested (25 human ·
+1,266 linguistic · 1 facts · 116 provenance).
 
 **Phase D — AI jury (Layer 4) + golden set.** Build the ~150-item golden set (needs the first bit of
 paid native review); measure jury precision/recall; run the calibrated jury as a scheduled Action;
@@ -385,6 +400,18 @@ item, and re-verifies itself on a schedule — built by a founder who does not s
 because the authorities and the panel do the speaking, and the human only settles the ties.
 
 ## Change log
+- **v1.4 (2026-07-07):** Phase C (the trust model) **shipped.** Added the `Verification` block
+  (`tier`/`checks[]`/`confidence`/`last_verified`, plus `VerificationTier`/`Layer`/`Result`) to
+  `ProvenanceEntry`. `pnpm build:verification` (`scripts/build-verification.mjs`) composes the Layer 2
+  fact verdicts + Layer 3 grammar (via a new `docs/reports/verify-grammar.json` sidecar) + CEFR results
+  into a **generated** `src/data/verification.ts`, keyed by content_id, with every record sharing one
+  sweep-date const `D` so a re-run only diffs items whose tier changed. `/sources` merges the map onto
+  the register and renders a **per-item tier badge + confidence** and a tier-distribution summary;
+  `lint:content` validates the closed enums and prints the distribution (records, does not gate). To
+  avoid re-running LanguageTool, the aggregator reads the grammar sidecar and recomputes facts/CEFR from
+  the vendored subsets (the `verify-facts`/`verify-cefr` compute helpers are now exported). **First
+  sweep over 1,408 items: 25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-
+  attested for facts or language). Confidence rolls up from the tier.
 - **v1.3 (2026-07-07):** Phase B (Layer 3) **shipped as warn-only scheduled reports.** Grammar/
   spelling: `pnpm verify:grammar` runs **LanguageTool 6.8** over **2,315 German sentences** (vocab
   examples, collocation examples, dialogue lines/options/models, reading-text bodies/questions,
