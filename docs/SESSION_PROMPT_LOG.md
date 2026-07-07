@@ -1456,3 +1456,29 @@ Branch: `claude/whats-next-esga9u`.
   `main`, followed by the post-merge branch realignment.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`, `docs/PROJECT_STATUS.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. PR + commit: see below.
+
+## Entry 213 — 2026-07-07 (session 77)
+- **Branch:** `claude/data-strategy-plan-78r0jq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > continue the data strategy plan
+- **Response summary:** Completed Phase A of the verification ladder by shipping the **second oracle**
+  the v1.1 spike said was required. Confirmed kaikki/de.wiktionary/dwds are still 403-blocked by the
+  network policy, then found the "Wiktionary route" through an allowed host: **`german-nouns`** on PyPI
+  (~100k nouns compiled from German Wiktionary, CC-BY-SA-4.0, already allowlisted), an independent
+  lineage from oracle A (LanguageTool). Built `scripts/build-nouns-subset.mjs`
+  (`pnpm build:nouns-subset`, +`build:oracles`) writing a 25 KB vendored subset with a compound
+  **head-noun gender fallback**. Rewrote `scripts/verify-facts.mjs` to two-oracle voting: an error is
+  reported **only when both oracles reject a form and agree on the correction** (`GATE`), everything
+  else is a review signal. **Result over 489 nouns: coverage 47% → 97%, 458 articles + 260 plurals
+  verified (221/167 by both oracles), 0 two-oracle-confirmed errors**; the 6 review signals and the old
+  4 disagreements all hand-checked as valid variants/head-heuristic artefacts. Promoted `verify:facts`
+  to a real **offline CI gate** in `validate.yml`. Updated `DATA_STRATEGY.md` → v1.2, regenerated the
+  report, and did the doc handoff (moved the session-75 handoff to the W28 archive per the doc-hygiene
+  rule). Gates green: `pnpm lint:content`, `pnpm verify:facts` (exit 0).
+- **Artifacts:** `scripts/build-nouns-subset.mjs`, `scripts/verify-facts.mjs` (rewritten),
+  `scripts/vendor/german-nouns-subset.json`, `package.json` (`build:nouns-subset` + `build:oracles`),
+  `.github/workflows/validate.yml`, `docs/strategy/DATA_STRATEGY.md`,
+  `docs/reports/verify-facts-report.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. PR + commit: see below.

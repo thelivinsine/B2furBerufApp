@@ -19,6 +19,8 @@
     "generate:provenance": "node scripts/generate-provenance-stubs.mjs",
     "check:refs": "node scripts/check-provenance-refs.mjs",
     "build:dict-subset": "node scripts/build-dict-subset.mjs",
+    "build:nouns-subset": "node scripts/build-nouns-subset.mjs",
+    "build:oracles": "node scripts/build-dict-subset.mjs && node scripts/build-nouns-subset.mjs",
     "verify:facts": "node scripts/verify-facts.mjs"
   },
   "dependencies": {

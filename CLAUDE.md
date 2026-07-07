@@ -26,6 +26,11 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
 - `pnpm preview` — preview the production build
 - `pnpm audit` — check for dependency vulnerabilities (CI/security gate)
 - `pnpm lint:content` — validate the `src/data/*` content banks (CI gate, see below)
+- `pnpm verify:facts` — Layer 2 fact gate (data strategy, s77): checks every noun's der/die/das +
+  plural against **two independent morphology oracles** (LanguageTool + German Wiktionary), fails CI
+  only when **both** agree a form is wrong. Runs offline against the committed subsets in
+  `scripts/vendor/`. **After adding nouns, run `pnpm build:oracles` to refresh those subsets** (fetches
+  npm + PyPI), then `pnpm verify:facts`. See `docs/strategy/DATA_STRATEGY.md` §3 / `docs/reports/verify-facts-report.md`.
 - `pnpm test:srs` — assert `engine/srs.ts` against FSRS golden vectors from py-fsrs (CI gate, s53).
   **Run it after any `engine/srs.ts` edit.** Vector provenance is in the `scripts/test-srs.mjs` header.
 - `pnpm test:pronounce` — assert the `engine/pronounce.ts` spoken/typed answer matcher (CI gate, s56).
