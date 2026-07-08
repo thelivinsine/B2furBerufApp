@@ -1791,3 +1791,26 @@ Branch: `claude/whats-next-esga9u`.
   `scripts/lint-content.mjs`, `src/features/welt/stage.tsx`, `src/features/welt/scenes.tsx`,
   `src/features/welt/BattleView.tsx`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 227–229).
   Commit SHA + PR # to be filled on push/merge.
+
+## Entry 230 — 2026-07-08 (session 81)
+- **Branch:** `claude/game-plan-next-steps-aqhim3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > go ahead with 1.3 to 1.5
+- **Response summary:** Authored the remaining three chapter-1 Neuland missions (not in the parked draft, so
+  written fresh against the established scene patterns), completing **Kapitel 1 end-to-end**:
+  **1.3 "Die SIM-Karte"** (phone-shop upsell battle vs Milo, resist the Vertrag, tariff-page parody, grants
+  `ki_sim_vertrag`; theme `technology`), **1.4 "Der erste Einkauf"** (Leergutautomat/Pfand parody teaching
+  Mehrweg 8 ct / Einweg 25 ct + the legendary checkout-speed battle vs the Kassiererin; theme `sustainability`
+  via the recycling angle), **1.5 "Ein Dach über dem Kopf"** (landlord Herr Brandt polite-register battle +
+  the Wohnungsgeberbestätigung form-cloze, grants `ki_wohnungsgeberbestaetigung`, sets up the boss's document
+  chain; theme `wohnen`). Added a `laden` (shop) scene setting, NPCs `npc_milo`/`npc_kassiererin`/
+  `npc_herr_brandt`, key item `ki_sim_vertrag`, and 3 draft provenance rows. Chained 1.2→1.3→1.4→1.5 via
+  `requiresMissions`; **left the boss (1.6) ungated on purpose** (a `mission.test.ts` fixture pins it as the
+  standalone playtest slice) after briefly gating it broke that test. Neuland now has **6 missions** (full
+  Kapitel 1). Gates green: `lint:content` (6 missions / 35 scenes / 11 NPCs / 7 key items / 1426 rows),
+  `build`, `check:bundle` (83 kB, game stays lazy), `test:unit` (85), `lint` (0 errors).
+- **Artifacts:** `src/data/missions.ts`, `src/data/provenance.ts`, `src/types/game.ts`,
+  `scripts/lint-content.mjs`, `src/features/welt/stage.tsx`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 230). Commit SHA + PR # to be filled on push/merge.
