@@ -73,7 +73,8 @@ export type SceneSetting =
   | "strasse" // street / outdoors
   | "wartezimmer" // Amt waiting room
   | "amt" // Bürgeramt service room (the scene-7 reference room)
-  | "terminal"; // airport / station concourse (chapter-1 arrival)
+  | "terminal" // airport / station concourse (chapter-1 arrival)
+  | "laden"; // shop / store interior (Handyladen, Supermarkt)
 
 /** Battle status-effect flavor (GAME_DESIGN.md section 5). Cosmetic in G1. */
 export type BattleEffect = "beamtendeutsch" | "missverstaendnis" | "smalltalk";

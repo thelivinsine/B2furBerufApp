@@ -33,6 +33,7 @@ const SETTING_ART: Record<SceneSetting, string | null> = {
   wartezimmer: wartezimmerUrl,
   amt: amtUrl,
   terminal: null,
+  laden: null,
 };
 
 /** Where-am-I caption per setting, shown as a chip on the stage. */
@@ -43,6 +44,7 @@ const SETTING_LABEL: Record<SceneSetting, string | null> = {
   wartezimmer: "Bürgeramt · Wartezimmer",
   amt: "Bürgeramt · Schalter 2",
   terminal: "Bahnhof",
+  laden: "Geschäft",
 };
 
 /** Character sprites (transparent PNGs) keyed by GameNpc.sprite. */

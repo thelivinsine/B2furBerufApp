@@ -1,7 +1,8 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-08 (session 81: **G2 kicked off, founder gave the go. Ported chapter-1 missions
-1.1 (Willkommen) + 1.2 (Fahrkarten-Automat) from the parked draft onto `main`; Neuland now has 3 missions.**
+_Last updated: 2026-07-08 (session 81: **G2 kicked off, founder gave the go. Authored the rest of Neuland
+Kapitel 1 (missions 1.1–1.5): Willkommen, Fahrkarten-Automat, SIM-Karte, erster Einkauf, Dach über dem Kopf.
+Chapter 1 is now complete end-to-end (6 missions, 1.1→1.6 boss).**
 Prior, session 80: **top-value tasks + daily-life depth + SEO, 4 PRs to `main`**.
 **#360** closed EU AI Act #21 (documented Art. 6(3) risk assessment `docs/strategy/AI_ACT_RISK_ASSESSMENT.md`;
 not-high-risk/limited-risk) and shipped the full SEO surface (Open Graph + Twitter + canonical + JSON-LD
@@ -177,30 +178,38 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 ## Resume here (next session)
 
 **Handoff after session 81 (2026-07-08). G2 kicked off: founder greenlit the game build (zero-spend,
-incremental, playtest-first), and the first increment shipped.** After a Q&A on the game roadmap and the
-G2 cost boundary (only paid items are optional pixel-art packs + Aseprite, ~30–60 EUR one-time; free path
-exists), the founder said go. First increment: **ported chapter-1 missions 1.1 "Willkommen in Neuland"
-(airport arrival, passport-control battle, station-announcement listening, meet Jonas) and 1.2 "Der
-Fahrkarten-Automat" (ticket-machine battle, Zone-AB lesson) from the parked draft onto current `main`.**
-- **Did NOT rebase the parked branch** `claude/neuland-g1-g2-feedback-wkf28n` (189 files, diverged since
-  s74, almost all already on `main` via G1). Extracted only the two draft missions and re-authored them
-  against the CURRENT schema.
-- **Small contained schema extension:** added a `terminal` scene setting (airport/station; neutral stage +
-  "Bahnhof" caption for now, real backdrop is a later art task) and an optional per-scene `label` (stage
-  caption override). Mirrored `terminal` in `lint-content.mjs`, threaded `label` through the
-  Cutscene/Listening/Battle renderers. Added NPCs `npc_beamter`/`npc_automat`, key items
-  `ki_reisepass`/`ki_fahrschein`, 2 provenance rows (draft).
-- **Both missions:** travel-theme, B1.1, cutscene → dialogue battle → payoff, each with a scaffolded-retry
-  lose path (failure-as-content, no lockout). Neuland now has **3 missions** (1.1, 1.2, 1.6 boss).
-- **Gates green:** `lint:content` (3 missions / 18 scenes / 8 NPCs / 6 key items / 1423 rows), `build`,
+incremental, playtest-first), and Neuland Kapitel 1 is now COMPLETE end-to-end.** After a Q&A on the game
+roadmap and the G2 cost boundary (only paid items are optional pixel-art packs + Aseprite, ~30–60 EUR
+one-time; free path exists), the founder said go, then "go ahead with 1.3 to 1.5". Shipped in two PRs:
+- **PR #365 (increment 1):** ported the parked drafts **1.1 "Willkommen in Neuland"** (airport arrival,
+  passport-control battle, station-announcement listening, meet Jonas) and **1.2 "Der Fahrkarten-Automat"**
+  (ticket-machine battle, Zone-AB lesson) onto current `main`. Did NOT rebase the parked branch
+  `claude/neuland-g1-g2-feedback-wkf28n` (189 files, badly diverged since s74); extracted only the two
+  missions and re-authored against the current schema.
+- **Increment 2:** authored fresh **1.3 "Die SIM-Karte"** (phone-shop upsell battle vs Milo, resist the
+  Vertrag, tariff-page parody, `ki_sim_vertrag`), **1.4 "Der erste Einkauf"** (Leergutautomat/Pfand parody
+  + the legendary checkout-speed battle vs the Kassiererin, `sustainability`-theme via the recycling angle),
+  and **1.5 "Ein Dach über dem Kopf"** (landlord Herr Brandt polite-register battle + the Wohnungsgeberbestätigung
+  form-cloze, grants `ki_wohnungsgeberbestaetigung`, sets up the boss's document chain).
+- **Schema:** two small contained additions across the session, a `terminal` setting (airport/station) and a
+  `laden` setting (shop), plus an optional per-scene `label` caption override, all mirrored in
+  `lint-content.mjs` + threaded through the renderers. Missions themselves stay pure data. Added NPCs
+  `npc_beamter`/`npc_automat`/`npc_milo`/`npc_kassiererin`/`npc_herr_brandt`, key items
+  `ki_reisepass`/`ki_fahrschein`/`ki_sim_vertrag`, 5 provenance rows (draft).
+- **1.1–1.5 chain** via `requiresMissions` (1.2→1.3→1.4→1.5). The **boss (1.6) is deliberately left
+  ungated** so the founder can jump straight to it for playtesting (a `tests/mission.test.ts` fixture pins
+  this; do not gate the boss). Every mission has a scaffolded-retry lose path (failure-as-content, no lockout).
+- **Gates green:** `lint:content` (6 missions / 35 scenes / 11 NPCs / 7 key items / 1426 rows), `build`,
   `check:bundle` (83 kB, game stays lazy), `test:unit` (85), `lint` (0 errors).
 
-**G2 next rungs (not yet built):** missions **1.3 (Die SIM-Karte)**, **1.4 (Der erste Einkauf** + Pfand
-economy**)**, **1.5 (Ein Dach über dem Kopf** / Wohnungsgeberbestätigung**)** to complete Kapitel 1; then
-recurring NPCs polish, FSRS-driven recurring-mission composer, failure-as-fetch-quest loop. **Prerequisite
-for cloud-syncing game state:** the Supabase migration adding `missions_done`/`key_items` columns (an
-unknown column fails the whole `progress` upsert; game state is local-only until then). Playtest gate
-follows once Kapitel 1 is complete. Founder still verifies live and reviews the draft German.
+**G2 next rungs (not yet built):** the **FSRS-driven recurring-mission composer** (the scheduler brings a
+mission variant back when its vocab is due), the **failure-as-fetch-quest loop** (a missing key item spawns
+its acquisition mission), and licensed **pixel-art backdrops** for the `terminal`/`laden` settings (still
+neutral stages). **Prerequisite for cloud-syncing game state:** the Supabase migration adding
+`missions_done`/`key_items` columns (an unknown column fails the whole `progress` upsert; game state is
+local-only until then). **Playtest gate is now reachable** (Kapitel 1 is complete): 5–10 real learners play
+the chapter, and completion/return/"did they laugh" decides whether G3 (walkable city) proceeds. Founder
+still verifies live and reviews the draft German.
 
 ---
 
@@ -279,8 +288,8 @@ _Older handoffs (sessions 1–79) are archived by ISO week under `docs/archive/s
 - Can-Do milestones: **37** (all 15 themes; workplace/behoerde founder-verified, daily-life packs draft)
 - Lese-/Hörtexte: **22** texts / **66** comprehension checks (+2 each for Arzt/Wohnen/Bank/Bildung in s75; +1 each in s80 covering a new sub-theme per daily-life theme)
 - Themes: **15** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank` + `bildung`; all six domains now populated)
-- Game missions (Neuland): **3** (Kap-1: 1.1 Willkommen, 1.2 Fahrkarten-Automat, 1.6 Anmeldung boss; 18 scenes) · 8 NPCs · 6 key items
-- Provenance rows: **1,423** (all with a `reference`; 1,398 `draft` / 25 `verified`)
+- Game missions (Neuland): **6** = complete Kapitel 1 (1.1 Willkommen, 1.2 Fahrkarten-Automat, 1.3 SIM-Karte, 1.4 erster Einkauf, 1.5 Dach über dem Kopf, 1.6 Anmeldung boss; 35 scenes) · 11 NPCs · 7 key items
+- Provenance rows: **1,426** (all with a `reference`; 1,401 `draft` / 25 `verified`)
 - Verification tiers (Layer C, generated `src/data/verification.ts`): **25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-attested)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is

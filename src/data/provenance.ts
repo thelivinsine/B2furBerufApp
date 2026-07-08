@@ -13631,6 +13631,42 @@ export const provenance: ProvenanceEntry[] = [
     notes: "Game mission (chapter-1; mission list founder-approved 2026-07-06). All German dialogue, ticket-machine battle and narration authored for this repo. Battle moves reference vocab v_fahrkarte + redemittel r_cla1; embedded moves ride on this row like text-bank checks. Verify German accuracy in the founder pass."
   },
   {
+    content_id: "m_kap1_sim",
+    content_type: "mission",
+    label: "Neuland Kapitel 1.3: Die SIM-Karte",
+    origin: "authored",
+    reference: "https://www.verbraucherzentrale.de/wissen/digitale-welt/mobilfunkvertraege-und-tarife",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "Game mission (chapter-1; mission list founder-approved 2026-07-06). All German dialogue, phone-shop upsell battle and tariff-page parody authored for this repo. Prepaid-vs-Vertrag consumer facts reflect standard German mobile tariffs (Verbraucherzentrale reference). Battle moves reference vocab v_beratung + redemittel r_cla2/r_cla3/r_dis1; moves ride on this row like text-bank checks. Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "m_kap1_einkauf",
+    content_type: "mission",
+    label: "Neuland Kapitel 1.4: Der erste Einkauf",
+    origin: "authored",
+    reference: "https://www.umweltbundesamt.de/themen/abfall-ressourcen/produktverantwortung-in-der-abfallwirtschaft/mehrweg-einweggetraenkeverpackungen",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "Game mission (chapter-1; mission list founder-approved 2026-07-06). All German dialogue, Leergutautomat parody and checkout-speed battle authored for this repo. Pfand facts (Mehrweg 8 ct / Einweg 25 ct) verified against the Umweltbundesamt reference. Battle moves reference vocab v_kunde/v_rechnung + redemittel r_cla4; moves ride on this row like text-bank checks. Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "m_kap1_dach",
+    content_type: "mission",
+    label: "Neuland Kapitel 1.5: Ein Dach über dem Kopf",
+    origin: "authored",
+    reference: "https://www.gesetze-im-internet.de/bmg/__19.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "Game mission (chapter-1; mission list founder-approved 2026-07-06). All German dialogue, landlord battle and Wohnungsgeberbestätigung form-cloze authored for this repo. The § 19 BMG landlord-confirmation requirement verified against the Bundesmeldegesetz reference. Battle moves reference vocab v_wohnungsgeberbestaetigung + redemittel r_cla1/r_cla3; moves and form fields ride on this row like text-bank checks. Verify German accuracy in the founder pass."
+  },
+  {
     content_id: "m_kap1_anmeldung",
     content_type: "mission",
     label: "Neuland Kapitel 1 Boss: Die Anmeldung",
