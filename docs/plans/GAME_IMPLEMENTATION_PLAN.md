@@ -214,7 +214,11 @@ battle → cutscene, so the Geduld/Mut bars appear in all six missions and the b
 special (scene mix: 20 cutscenes, 6 battles, 3 websiteParody, 2 listening, 2 formCloze, 1 loadout).
 Since the playtest gate is the whole point of G2, testers must see the varied chapter, not the
 repetitive one. **New order of the remaining G2 rungs:**
-1. **Hotspot layer** (tappable stage: catalog #2/#7/#18; one generic renderer)
+1. **Hotspot layer** (tappable stage: catalog #2/#7/#18; one generic renderer) — **SHIPPED s83, PR #374.**
+   `hotspot` scene kind added to the closed union (`types/game.ts`), pure `tapHotspot`/`hotspotSolved`
+   transitions in `engine/mission.ts` (scene-scoped first-try FSRS grading + XP), `HotspotView` renderer
+   in the pixel-UI language, linter + 6 runner tests. Used in 1.1 (listen-and-act departure board) and
+   1.4 (shelf search), so the variety is visible in the two earliest-played missions.
 2. **Keypad/Automat scene kind** (catalog #8), then **re-skin mission 1.2** (ticket machine becomes a
    real machine, not a battle) and the 1.4 Leergutautomat beat
 3. **Type-under-timer** (catalog #9) for the 1.4 checkout

@@ -76,6 +76,10 @@ export interface MissionRun {
   packed: Record<string, boolean>;
   /** Retrieval misses per loadout slot (drives the FSRS grade on pack). */
   slotMisses: Record<string, number>;
+  /** Correct hotspot ids already found (a scene clears when all its are). */
+  hotspotsFound: Record<string, boolean>;
+  /** Wrong taps per hotspot id (summed per scene to grade the correct find). */
+  hotspotMisses: Record<string, number>;
   /** Live battle bars; present only while the current scene is a battle. */
   battle?: BattleRuntime;
   /**
@@ -154,6 +158,8 @@ export function startMission(
     bag: [...ownedItems],
     packed: {},
     slotMisses: {},
+    hotspotsFound: {},
+    hotspotMisses: {},
     dictUses: mission.dictUses ?? DICT_USES_DEFAULT,
     xp: 0,
     effects: [],
@@ -269,6 +275,48 @@ export function finishLoadout(run: MissionRun): MissionRun {
 export function recordCheck(run: MissionRun, correct: boolean): MissionRun {
   if (!correct) return { ...run, effects: [] };
   return withEffects(run, {}, [{ type: "xp", amount: XP.readingCheck }]);
+}
+
+/* ---------------- hotspot ---------------- */
+
+/**
+ * Tap a target on a hotspot stage. A wrong tap is recorded as a miss (no
+ * effects; the player component shows the deadpan reaction). A correct,
+ * not-yet-found spot is recorded and earns XP, grading its vocab into FSRS
+ * (Good on a clean scene, Hard if the player fumbled a wrong tap first, so
+ * the scheduler hears the gap). The scene advances when every correct spot is
+ * found (the component calls `completeScene`).
+ */
+export function tapHotspot(run: MissionRun, spotId: string): MissionRun {
+  const scene = currentScene(run);
+  if (scene.kind !== "hotspot" || run.hotspotsFound[spotId]) return { ...run, effects: [] };
+  const spot = scene.spots.find((s) => s.id === spotId);
+  if (!spot) return { ...run, effects: [] };
+
+  if (!spot.correct) {
+    return withEffects(
+      run,
+      { hotspotMisses: { ...run.hotspotMisses, [spotId]: (run.hotspotMisses[spotId] ?? 0) + 1 } },
+      [],
+    );
+  }
+  // First try = no wrong tap anywhere on THIS scene's spots yet (scene-scoped
+  // because spot ids are unique per mission, so the sum never leaks between
+  // two hotspot scenes in one mission).
+  const cleanSoFar = scene.spots.every((s) => (run.hotspotMisses[s.id] ?? 0) === 0);
+  const effects: MissionEffect[] = [
+    { type: "xp", amount: cleanSoFar ? XP.flashcard : XP.flashcardEasy },
+  ];
+  if (spot.vocabId)
+    effects.push({ type: "vocabGrade", vocabId: spot.vocabId, grade: cleanSoFar ? 4 : 3 });
+  return withEffects(run, { hotspotsFound: { ...run.hotspotsFound, [spotId]: true } }, effects);
+}
+
+/** Are all `correct` spots on the current hotspot scene found? */
+export function hotspotSolved(run: MissionRun): boolean {
+  const scene = currentScene(run);
+  if (scene.kind !== "hotspot") return false;
+  return scene.spots.filter((s) => s.correct).every((s) => run.hotspotsFound[s.id]);
 }
 
 /* ---------------- battle ---------------- */

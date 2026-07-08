@@ -546,3 +546,30 @@ pre-installed Chromium, since the repo has no headless-render dep). `index.html`
 `dist/og-image.png`. **SEO/growth now covered:** meta/OG/Twitter/canonical/JSON-LD (WebApplication+FAQPage),
 robots.txt, sitemap.xml, landing FAQ + how-it-works, and the share card. Remaining growth levers are
 non-code (real product screenshots / testimonials for social proof) or a separate lane (pricing, Phase D).
+
+---
+
+**Handoff after session 81 (2026-07-08). G2 kicked off: founder greenlit the game build (zero-spend,
+incremental, playtest-first), and Neuland Kapitel 1 is now COMPLETE end-to-end.** After a Q&A on the game
+roadmap and the G2 cost boundary (only paid items are optional pixel-art packs + Aseprite, ~30–60 EUR
+one-time; free path exists), the founder said go, then "go ahead with 1.3 to 1.5". Shipped in two PRs:
+- **PR #365 (increment 1):** ported the parked drafts **1.1 "Willkommen in Neuland"** (airport arrival,
+  passport-control battle, station-announcement listening, meet Jonas) and **1.2 "Der Fahrkarten-Automat"**
+  (ticket-machine battle, Zone-AB lesson) onto current `main`. Did NOT rebase the parked branch
+  `claude/neuland-g1-g2-feedback-wkf28n` (189 files, badly diverged since s74); extracted only the two
+  missions and re-authored against the current schema.
+- **Increment 2:** authored fresh **1.3 "Die SIM-Karte"** (phone-shop upsell battle vs Milo, resist the
+  Vertrag, tariff-page parody, `ki_sim_vertrag`), **1.4 "Der erste Einkauf"** (Leergutautomat/Pfand parody
+  + the legendary checkout-speed battle vs the Kassiererin, `sustainability`-theme via the recycling angle),
+  and **1.5 "Ein Dach über dem Kopf"** (landlord Herr Brandt polite-register battle + the Wohnungsgeberbestätigung
+  form-cloze, grants `ki_wohnungsgeberbestaetigung`, sets up the boss's document chain).
+- **Schema:** two small contained additions across the session, a `terminal` setting (airport/station) and a
+  `laden` setting (shop), plus an optional per-scene `label` caption override, all mirrored in
+  `lint-content.mjs` + threaded through the renderers. Missions themselves stay pure data. Added NPCs
+  `npc_beamter`/`npc_automat`/`npc_milo`/`npc_kassiererin`/`npc_herr_brandt`, key items
+  `ki_reisepass`/`ki_fahrschein`/`ki_sim_vertrag`, 5 provenance rows (draft).
+- **1.1–1.5 chain** via `requiresMissions` (1.2→1.3→1.4→1.5). The **boss (1.6) is deliberately left
+  ungated** so the founder can jump straight to it for playtesting (a `tests/mission.test.ts` fixture pins
+  this; do not gate the boss). Every mission has a scaffolded-retry lose path (failure-as-content, no lockout).
+- **Gates green:** `lint:content` (6 missions / 35 scenes / 11 NPCs / 7 key items / 1426 rows), `build`,
+  `check:bundle` (83 kB, game stays lazy), `test:unit` (85), `lint` (0 errors).

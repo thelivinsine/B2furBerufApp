@@ -17,7 +17,7 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { keyItemById, npcById } from "@/data/missions";
 import { cn } from "@/lib/utils";
 import { Gloss } from "@/features/shared/Gloss";
-import { CutsceneView, WebsiteView, LoadoutView, ListeningView, FormView } from "@/features/welt/scenes";
+import { CutsceneView, WebsiteView, LoadoutView, ListeningView, HotspotView, FormView } from "@/features/welt/scenes";
 import { BattleView } from "@/features/welt/BattleView";
 import {
   GameCard,
@@ -183,6 +183,7 @@ export function MissionPlayer({ mission, onExit }: { mission: Mission; onExit: (
             {scene.kind === "websiteParody" && <WebsiteView scene={scene} act={act} translate={translate} />}
             {scene.kind === "loadout" && <LoadoutView scene={scene} run={run} act={act} translate={translate} />}
             {scene.kind === "listening" && <ListeningView scene={scene} act={act} translate={translate} />}
+            {scene.kind === "hotspot" && <HotspotView scene={scene} run={run} act={act} translate={translate} />}
             {scene.kind === "dialogueBattle" && (
               <BattleView
                 scene={scene}

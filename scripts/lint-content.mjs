@@ -72,7 +72,7 @@ const TEXT_KINDS = ["letter", "email", "memo", "announcement", "voicemail"];
 /* ---- game enums (mirror of src/types/game.ts unions, game G1) ---- */
 const CHAPTER_IDS = ["kap1", "kap2", "kap3", "kap4", "kap5", "kap6"];
 const SCENE_KINDS = [
-  "cutscene", "websiteParody", "loadout", "listening", "dialogueBattle", "formCloze",
+  "cutscene", "websiteParody", "loadout", "listening", "hotspot", "dialogueBattle", "formCloze",
 ];
 const SCENE_SETTINGS = ["website", "wohnung", "strasse", "wartezimmer", "amt", "terminal", "laden"];
 const BATTLE_EFFECTS = ["beamtendeutsch", "missverstaendnis", "smalltalk"];
@@ -634,6 +634,31 @@ function lintMissions(missions, refs) {
               error(ds, cw, "check answer is not among its options");
             if (!isStr(c.answer)) error(ds, cw, "check answer empty");
           }
+      } else if (s.kind === "hotspot") {
+        checkBiText(s.prompt, ds, sw, "prompt");
+        if (s.audio !== undefined) checkBiText(s.audio, ds, sw, "audio");
+        if (s.cta !== undefined) checkBiText(s.cta, ds, sw, "cta");
+        if (!Array.isArray(s.spots) || s.spots.length === 0) error(ds, sw, "hotspot has no spots");
+        else {
+          const spotIds = new Set();
+          let hasCorrect = false;
+          for (const spot of s.spots) {
+            const pw = `${sw}/${spot.id ?? "?"}`;
+            if (!isStr(spot.id)) error(ds, sw, "spot missing id");
+            else if (spotIds.has(spot.id)) error(ds, sw, `duplicate spot id "${spot.id}"`);
+            else spotIds.add(spot.id);
+            for (const f of ["x", "y"])
+              if (!isNum(spot[f]) || spot[f] < 0 || spot[f] > 100)
+                error(ds, pw, `spot ${f} must be a percent in 0..100`);
+            if (spot.size !== undefined && (!isNum(spot.size) || spot.size <= 0))
+              error(ds, pw, "spot size must be a positive percent");
+            if (spot.correct === true) hasCorrect = true;
+            if (spot.vocabId !== undefined && !vocabIds.has(spot.vocabId))
+              error(ds, pw, `spot vocabId "${spot.vocabId}" not in vocabulary`);
+            if (spot.feedback !== undefined) checkBiText(spot.feedback, ds, pw, "feedback");
+          }
+          if (!hasCorrect) error(ds, sw, "hotspot has no correct spot (unclearable)");
+        }
       } else if (s.kind === "dialogueBattle") {
         if (!npcIds.has(s.npc)) error(ds, sw, `npc "${s.npc}" not in NPC registry`);
         if (!CEFR_LEVELS.includes(s.npcCefr)) error(ds, sw, `invalid npcCefr "${s.npcCefr}"`);

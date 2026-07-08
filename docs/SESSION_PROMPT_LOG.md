@@ -1953,3 +1953,29 @@ Branch: `claude/whats-next-esga9u`.
   to end of full build), #372 (model-map rows).
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md` (entry 237). Doc-only;
   shipped via PR → squash-merge → branch realign.
+
+## Entry 238 — 2026-07-08 (session 83)
+- **Branch:** `claude/g2-variety-work-0t6c9a`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > start the G2 variety work
+- **Response summary:** Read the s82-approved G2 reorder (scene variety before plumbing) and built
+  **rung 1: the `hotspot` scene kind** (activity catalog #2 "Hotspot antippen", one generic
+  tappable-stage layer that also carries #7 "Aufruf abfangen" and #18 "Listen-and-act" via an optional
+  TTS `audio` line). The player proves comprehension by TAPPING the right place on the pixel stage
+  instead of picking a sentence; wrong taps earn only a deadpan reaction (failure is content), the scene
+  clears once every `correct` spot is found. Missions stay data, not code: `types/game.ts` (`Hotspot` +
+  `HotspotScene` in the closed `MissionScene` union), `engine/mission.ts` (pure `tapHotspot`/
+  `hotspotSolved` with scene-scoped first-try FSRS grading + XP, two run-state maps), `HotspotView`
+  renderer in `features/welt/scenes.tsx` (blessed pixel-UI language, wired into `MissionPlayer`),
+  `lint-content.mjs` mirror + spot validation, 6 runner tests over an inline fixture. Used the kind in
+  the two earliest-played missions so the variety is visible: **1.1** gains a listen-and-act departure
+  board (tap Gleis 4), **1.4** gains the shelf search (tap Milch/Brot/Äpfel among distractors). Gates
+  green: `lint:content` (6 missions / 37 scenes), `test:unit` (91, +6), `build`, `check:bundle` (83 kB),
+  `lint` (0 errors). Shipped as PR #374.
+- **Artifacts:** `src/types/game.ts`, `src/engine/mission.ts`, `src/features/welt/scenes.tsx`,
+  `src/features/welt/MissionPlayer.tsx`, `scripts/lint-content.mjs`, `src/data/missions.ts`,
+  `tests/mission.test.ts`; docs `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/archive/PROJECT_STATUS_ARCHIVE.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 238). PR #374 → squash-merge → branch realign.

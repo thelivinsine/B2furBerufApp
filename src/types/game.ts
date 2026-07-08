@@ -297,6 +297,55 @@ export interface DialogueBattleScene extends SceneBase {
   onLose: string;
 }
 
+/**
+ * One tappable target on a hotspot stage (world percentages, like the
+ * loadout's room spots). A scene can have several correct targets (a shopping
+ * list) or one (your number on the board); wrong targets are the distractors.
+ */
+export interface Hotspot {
+  id: string;
+  /** Center X, percent of stage width. */
+  x: number;
+  /** Center Y, percent of stage height. */
+  y: number;
+  /** Tap-target diameter, percent of stage width (renderer default when absent). */
+  size?: number;
+  /** Caption drawn on the target (a board number, a shelf sign, a lane color). */
+  label?: string;
+  /** A target that satisfies the prompt (at least one per scene, linted). */
+  correct?: boolean;
+  /** Vocab id retrieved by tapping the right spot (graded into FSRS). */
+  vocabId?: string;
+  /** World reaction after this target is tapped (right or wrong). */
+  feedback?: BiText;
+}
+
+/**
+ * Tap-the-answer-in-the-world scene (activity catalog #2 "Hotspot antippen";
+ * the one generic tappable-stage layer that also carries #7 "Aufruf abfangen"
+ * and #18 "Listen-and-act" when an `audio` line is present). The player reads
+ * or hears the prompt, then proves comprehension by tapping the right place on
+ * the pixel stage: their number on the departure board, the green customs
+ * lane, the correct shelf product. Wrong taps cost nothing but a deadpan
+ * reaction (failure is content); the scene advances once every `correct` spot
+ * has been found. Comprehension proven by acting on the world, not by picking
+ * a sentence.
+ */
+export interface HotspotScene extends SceneBase {
+  kind: "hotspot";
+  /** The task ("Welche Schlange ist für EU-Bürger?"). */
+  prompt: BiText;
+  /**
+   * Optional line spoken via TTS on entry (turns the scene into "Aufruf
+   * abfangen" / "Listen-and-act": listen for your number, then act).
+   */
+  audio?: BiText;
+  /** Tappable targets; at least one must be `correct` (linted). */
+  spots: Hotspot[];
+  /** Continue-button label once solved (the renderer defaults to "Weiter"). */
+  cta?: BiText;
+}
+
 /** One field of a form-cloze finale. */
 export interface FormField {
   id: string;
@@ -326,6 +375,7 @@ export type MissionScene =
   | WebsiteParodyScene
   | LoadoutScene
   | ListeningScene
+  | HotspotScene
   | DialogueBattleScene
   | FormClozeScene;
 
