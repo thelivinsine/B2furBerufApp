@@ -1877,3 +1877,27 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `CLAUDE.md`, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/archive/PROJECT_STATUS_ARCHIVE.md`,
   `docs/SESSION_PROMPT_LOG.md` (entries 232–233). Doc-only; shipped via PR → squash-merge → branch realign.
+
+## Entry 234 — 2026-07-08 (session 82)
+- **Branch:** `claude/missing-game-visuals-qcmde6`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim):**
+  > why is every mission looking like final boss mission with energy bars? is there no variety?
+  > your explanation is too technical. can you brief me in simpler language and what's your recommendation?
+  > is it necessary to change the order? if we complete the game implementation plan, anyway everything will be in place, right?
+  > go with your recommendation
+- **Response summary:** Confirmed the founder's observation from the data: all 6 Kapitel-1 missions have
+  exactly one dialogueBattle as centerpiece (scene mix 20 cutscene / 6 battle / 3 websiteParody /
+  2 listening / 2 formCloze / 1 loadout), so the Geduld/Mut bars appear every mission. Cause: the battle is
+  the only fully-built interactive mechanic; the 20-type activity catalog in
+  `MISSION_ACTIVITY_RESEARCH.md` mostly needs renderers not yet built (mission 1.2 was always intended as
+  a Keypad/Automat scene, authored as a battle because that kind doesn't exist). Recommended, and the
+  founder approved after a plain-language briefing and an is-it-necessary check (answer: same total work,
+  re-sequenced so the playtest measures fun, not repetition): **build scene variety before the plumbing.**
+  New G2 order: (1) hotspot tappable-stage layer, (2) Keypad/Automat kind + re-skin 1.2 and the 1.4
+  Leergut beat, (3) type-under-timer for the 1.4 checkout, then (4) recurring-mission composer,
+  (5) fetch-quest loop, (6) Supabase game-state migration. Decision recorded in
+  `GAME_IMPLEMENTATION_PLAN.md` (G2 status block) and the s82 handoff in `PROJECT_STATUS.md`.
+- **Artifacts:** `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 234). Doc-only; shipped via PR → squash-merge → branch realign.
