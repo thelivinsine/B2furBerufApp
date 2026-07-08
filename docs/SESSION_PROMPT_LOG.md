@@ -1935,3 +1935,21 @@ Branch: `claude/whats-next-esga9u`.
   chapter (Fable 5), and Kapitel 2–6 mission authoring (Sonnet 5 draft + Haiku 4.5 gates).
 - **Artifacts:** `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/SESSION_PROMPT_LOG.md` (entry 236).
   Doc-only; shipped via PR → squash-merge → branch realign.
+
+## Entry 237 — 2026-07-08 (session 82)
+- **Branch:** `claude/missing-game-visuals-qcmde6`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim):**
+  > okay. document this session. I'll continue in another one
+  > continue
+- **Response summary:** Session-82 documentation wrap-up. Most of the record was written inline as the work
+  shipped (PROJECT_STATUS s82 header + handoff, the two decision notes in `GAME_IMPLEMENTATION_PLAN.md`, the
+  model-map rows, prompt-log entries 232–236, the s80 handoff moved to the W28 archive). This pass finished
+  it: rewrote the `PROJECT_STATUS.md` `_Last updated_` header to lead with the visuals fix + both G2
+  decisions, refreshed the stale game-layer header in `CLAUDE.md` (G2 GO → G2 in progress; added the s82
+  direction summary), and added this entry. Session shipped 5 PRs to `main`: #368 (terminal/laden
+  backdrops, the only code change), #369 (doc-accuracy), #370 (variety-first reorder), #371 (playtest gate
+  to end of full build), #372 (model-map rows).
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md` (entry 237). Doc-only;
+  shipped via PR → squash-merge → branch realign.
