@@ -106,7 +106,7 @@ export function CutsceneView({ scene, act, translate }: SceneViewProps & { scene
 
   return (
     <div className="space-y-4">
-      <PixelStage setting={scene.setting} />
+      <PixelStage setting={scene.setting} label={scene.label} />
       {flow.pending?.feedback ? (
         <FeedbackCard feedback={flow.pending.feedback} translate={translate} onNext={flow.confirm} />
       ) : (
@@ -440,7 +440,7 @@ export function ListeningView({ scene, act, translate }: SceneViewProps & { scen
 
   return (
     <div className="space-y-4">
-      <PixelStage setting={scene.setting}>
+      <PixelStage setting={scene.setting} label={scene.label}>
         {scene.ticker && (
           <GameCard className="absolute left-3 top-3 flex items-center gap-3 px-3 py-2">
             <span className="text-xs font-bold text-slate-500">{scene.ticker.label}</span>

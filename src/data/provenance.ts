@@ -13607,6 +13607,30 @@ export const provenance: ProvenanceEntry[] = [
     notes: "pos=noun; themeId=behoerde. Legal basis: section 19 Bundesmeldegesetz (gesetze-im-internet.de/bmg/__19.html). Added for the Neuland Anmeldung mission (game G1)."
   },
   {
+    content_id: "m_kap1_willkommen",
+    content_type: "mission",
+    label: "Neuland Kapitel 1.1: Willkommen in Neuland",
+    origin: "authored",
+    reference: "https://www.bmi.bund.de/DE/themen/verfassung/staatsangehoerigkeit/einreise/einreise-node.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "Game mission (chapter-1 opener; mission list founder-approved 2026-07-06). All German dialogue, passport-control battle, station announcement and narration authored for this repo. Embedded listening checks and battle moves ride on this row like text-bank checks. Verify German accuracy in the founder pass."
+  },
+  {
+    content_id: "m_kap1_automat",
+    content_type: "mission",
+    label: "Neuland Kapitel 1.2: Der Fahrkarten-Automat",
+    origin: "authored",
+    reference: "https://www.bmi.bund.de/DE/themen/verfassung/staatsangehoerigkeit/einreise/einreise-node.html",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "Game mission (chapter-1; mission list founder-approved 2026-07-06). All German dialogue, ticket-machine battle and narration authored for this repo. Battle moves reference vocab v_fahrkarte + redemittel r_cla1; embedded moves ride on this row like text-bank checks. Verify German accuracy in the founder pass."
+  },
+  {
     content_id: "m_kap1_anmeldung",
     content_type: "mission",
     label: "Neuland Kapitel 1 Boss: Die Anmeldung",
