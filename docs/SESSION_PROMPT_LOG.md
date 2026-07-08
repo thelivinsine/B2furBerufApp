@@ -1832,3 +1832,48 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (entries 229–231), `CLAUDE.md`,
   `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md` (verified current). Doc-only; shipped
   via PR → squash-merge → branch realign.
+
+## Entry 232 — 2026-07-08 (session 82)
+- **Branch:** `claude/missing-game-visuals-qcmde6`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** 2 screenshots of `/welt` (the Willkommen passport battle + the Fahrkarten-Automat cutscene), both showing a blank beige game stage
+- **Prompt (verbatim):**
+  > looks like there's no game visuals here..
+- **Response summary:** Diagnosed and fixed. Root cause: `SETTING_ART` in `src/features/welt/stage.tsx`
+  mapped the `terminal` (8 scenes) and `laden` (8 scenes) settings to `null`, so the two most-used
+  Chapter-1 backdrops rendered as the neutral paper stage. Authored two code-authored placeholder backdrops
+  in `preview/game-pixel-mockups/welt_assets.py` (blessed scene-7 pixel language, new polished-tile floor
+  helper): **terminal** (transit hall: split-flap board, passport/service counter under the battle-opponent
+  spot, self-service ticket machine, direction sign) and **laden** (shop: product shelves, checkout counter
+  with register + card terminal, sale poster). Installed Pillow, regenerated `terminal.png`/`laden.png`,
+  wired both into `SETTING_ART` (`website` stays `null` on purpose). Sent the founder upscaled previews.
+  Gates green: `pnpm build`, `check:bundle` (83 kB, game stays lazy).
+- **Artifacts:** `preview/game-pixel-mockups/welt_assets.py`, `src/features/welt/assets/terminal.png`,
+  `src/features/welt/assets/laden.png`, `src/features/welt/stage.tsx`. Shipped as **PR #368** (squash-merged
+  to `main`, commit `5445b79`).
+
+## Entry 233 — 2026-07-08 (session 82)
+- **Branch:** `claude/missing-game-visuals-qcmde6`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** 1 screenshot (Fahrkarten-Automat now rendering with the transit-hall backdrop after deploy)
+- **Prompts (verbatim):**
+  > yes.. automerge!!
+  > the visual is the same in 1.2, is that correct?
+  > will the character be able to walk in the game as per the plan?
+  > is g2 complete?
+  > should we continue g2 implementation here or in a fresh session?
+  > go ahead
+- **Response summary:** Opened + squash-merged **PR #368** into `main`, ran the post-merge branch realign
+  (reset to `origin/main`, force-with-lease push). Answered a run of roadmap questions: (1) the repeated
+  backdrop within mission 1.2 is correct, backdrops are per-location and 1.2 is all at the Hauptbahnhof;
+  the unoccupied counter is because the battle opponent (`npc_automat`) has no sprite. (2) Walking is
+  planned but phased, full free-roam is **G3** (Phaser overworld, playtest-gated); battle/cutscene scenes
+  are staged React tableaux by design; only the loadout scene walks today. (3) **G2 is in progress, not
+  complete**, remaining: recurring-mission composer, fetch-quest loop, Supabase game-state migration.
+  Recommended doing those in a fresh session (different subsystem, wants plan-first) and closing the
+  doc-accuracy update here. On "go ahead", updated the stale "neutral stages" lines in `CLAUDE.md` +
+  `GAME_IMPLEMENTATION_PLAN.md`, refreshed `PROJECT_STATUS.md` (s82 header + handoff, dropped backdrops
+  from the G2-pending list, moved the aged-out s80 handoff into the W28 archive), and added these entries.
+- **Artifacts:** `CLAUDE.md`, `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/archive/PROJECT_STATUS_ARCHIVE.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entries 232–233). Doc-only; shipped via PR → squash-merge → branch realign.

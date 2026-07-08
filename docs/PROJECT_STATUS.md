@@ -1,9 +1,11 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-08 (session 81: **G2 kicked off, founder gave the go. Authored the rest of Neuland
-Kapitel 1 (missions 1.1–1.5): Willkommen, Fahrkarten-Automat, SIM-Karte, erster Einkauf, Dach über dem Kopf.
-Chapter 1 is now complete end-to-end (6 missions, 1.1→1.6 boss).**
-Prior, session 80: **top-value tasks + daily-life depth + SEO, 4 PRs to `main`**.
+_Last updated: 2026-07-08 (session 82: **Neuland game visuals fix. The `terminal` and `laden` scene
+settings (16 of Chapter 1's scenes) rendered as blank paper stages, the founder reported "no game visuals".
+Authored code-authored placeholder backdrops for both (transit hall + shop) in `welt_assets.py`, wired
+into `SETTING_ART`. Shipped PR #368.** Prior, session 81: **G2 kicked off, founder gave the go. Authored
+the rest of Neuland Kapitel 1 (missions 1.1–1.5); Chapter 1 now complete end-to-end (6 missions, 1.1→1.6 boss).**
+Earlier, session 80: **top-value tasks + daily-life depth + SEO, 4 PRs to `main`**.
 **#360** closed EU AI Act #21 (documented Art. 6(3) risk assessment `docs/strategy/AI_ACT_RISK_ASSESSMENT.md`;
 not-high-risk/limited-risk) and shipped the full SEO surface (Open Graph + Twitter + canonical + JSON-LD
 WebApplication/FAQPage in `index.html`, `robots.txt`, `sitemap.xml`, landing FAQ + how-it-works) plus 4
@@ -177,6 +179,25 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 82 (2026-07-08). Neuland game-visuals fix (branch `claude/missing-game-visuals-qcmde6`).**
+The founder sent screenshots of the game (`/welt`) showing "no game visuals": the Willkommen passport battle
+and the Fahrkarten-Automat cutscene rendered over a blank beige stage. **Root cause:** `SETTING_ART` in
+`src/features/welt/stage.tsx` mapped `terminal` and `laden` to `null`, so the two most-used Chapter-1
+settings (8 scenes each, 16 total) had no backdrop. G2's licensed pixel-art packs were still pending, and
+the interim left those stages blank rather than placeholder-filled.
+- **Fix (PR #368, squash-merged):** authored two backdrops in `preview/game-pixel-mockups/welt_assets.py`
+  in the blessed scene-7 pixel language, a new polished-tile floor helper for public spaces: **`terminal`**
+  (transit hall: split-flap departure board, passport/service counter under the battle-opponent spot,
+  self-service ticket machine, direction sign) and **`laden`** (shop: stocked product shelves, checkout
+  counter with register + card terminal, sale poster). Regenerated `terminal.png`/`laden.png`, wired both
+  into `SETTING_ART`. `website` stays `null` on purpose (`WebsiteView` draws its own browser chrome).
+- **Gates green:** `pnpm build`, `check:bundle` (83 kB, game stays lazy). Founder confirmed the deploy
+  rendered correctly (screenshot of the Fahrkarten-Automat with the transit-hall backdrop).
+- **Follow-up Q&A (no code):** clarified the roadmap, walking is G3 (Phaser overworld, playtest-gated), the
+  battle scenes are staged React tableaux by design (not walkable); only the loadout scene walks today. G2
+  is **in progress**, not complete: recurring-mission composer, fetch-quest loop, and the Supabase game-state
+  migration remain. Recommended doing those in a fresh session (different subsystem, wants plan-first).
+
 **Handoff after session 81 (2026-07-08). G2 kicked off: founder greenlit the game build (zero-spend,
 incremental, playtest-first), and Neuland Kapitel 1 is now COMPLETE end-to-end.** After a Q&A on the game
 roadmap and the G2 cost boundary (only paid items are optional pixel-art packs + Aseprite, ~30–60 EUR
@@ -203,9 +224,10 @@ one-time; free path exists), the founder said go, then "go ahead with 1.3 to 1.5
   `check:bundle` (83 kB, game stays lazy), `test:unit` (85), `lint` (0 errors).
 
 **G2 next rungs (not yet built):** the **FSRS-driven recurring-mission composer** (the scheduler brings a
-mission variant back when its vocab is due), the **failure-as-fetch-quest loop** (a missing key item spawns
-its acquisition mission), and licensed **pixel-art backdrops** for the `terminal`/`laden` settings (still
-neutral stages). **Prerequisite for cloud-syncing game state:** the Supabase migration adding
+mission variant back when its vocab is due) and the **failure-as-fetch-quest loop** (a missing key item spawns
+its acquisition mission). (The `terminal`/`laden` backdrops that were blank are now filled with code-authored
+placeholder art in s82, PR #368; licensed pixel-art packs remain the eventual upgrade.) **Prerequisite for
+cloud-syncing game state:** the Supabase migration adding
 `missions_done`/`key_items` columns (an unknown column fails the whole `progress` upsert; game state is
 local-only until then). **Playtest gate is now reachable** (Kapitel 1 is complete): 5–10 real learners play
 the chapter, and completion/return/"did they laugh" decides whether G3 (walkable city) proceeds. Founder
@@ -213,70 +235,8 @@ still verifies live and reviews the draft German.
 
 ---
 
-**Handoff after session 80 (2026-07-07). Top-value tasks + daily-life depth + SEO, 4 PRs shipped to
-`main` (branch `claude/top-value-tasks-842u60`).** PRs this session: **#360** (Art. 6(3) risk assessment +
-SEO meta/OG/JSON-LD/robots/sitemap + landing FAQ + 4 reading texts), **#361** (5 daily-life exam sets),
-**#362** (4 second daily-life dialogues), **#363** (1200×630 OG share image). The founder asked for the
-top-3 value-add tasks from the docs, then "work on all three now", then kept going with "continue" /
-"work on seo task". Delivered, all gates green:
-1. **EU AI Act #21 fully closed.** The Art. 50 transparency *copy* was already live (WritingHub
-   point-of-use notice + "KI-generierte Rückmeldung" label + PrivacyPolicy DE/EN AI section). The missing
-   piece, the documented **Article 6(3) risk assessment**, is now on file:
-   **`docs/strategy/AI_ACT_RISK_ASSESSMENT.md`** (v1.0). Assesses Genauly as **not high-risk /
-   limited-risk**, relies on the Art. 6(3) narrow-task derogation, and flags **profiling** as the single
-   point counsel must confirm (#15); lists the flip conditions (profiling creep, institutional gating,
-   summative assessment) and maps our provenance work to Art. 10.
-2. **SEO + landing depth (#10/#11/#12).** `index.html` gained Open Graph + Twitter-card meta, canonical,
-   keywords/author, and two **JSON-LD** graphs (WebApplication + FAQPage; both validated, CSP-safe as
-   non-executable data blocks). Added **`public/robots.txt`** + **`public/sitemap.xml`** (5 public routes).
-   The landing page gained a **"Wie funktioniert Genauly?"** 3-step strip and a **6-item FAQ**
-   (`<details>` accordion mirroring the JSON-LD).
-3. **Daily-life content deepened.** +4 `ReadingText`s (18→**22**, checks 54→**66**), one per newest
-   daily-life theme, each covering a **new sub-theme** with a **new kind**: `tx_arzt_merkblatt_antibiotika`
-   (announcement, arzt.behandlung), `tx_wohnen_aushang_heizung` (announcement, wohnen.probleme),
-   `tx_bank_letter_lastschrift` (letter, bank.zahlung), `tx_bildung_voicemail_pruefung` (voicemail,
-   bildung.pruefung). +4 provenance rows (all `draft`, founder review pending), 1408→**1412**.
-
-**Gates green:** `lint:content` (22 texts / 66 checks / 1412 rows), `build`, `check:bundle` (83 kB),
-`lint` (0 errors), `test:unit` (85 pass). **Follow-ups:** (a) the 4 new texts read as `unverified` tier
-until the next `build:verification` sweep (needs the grammar sidecar; deferred, not a gate); (b) a proper
-1200×630 OG image would beat the square PWA icon now referenced; (c) founder still verifies live SEO/FAQ
-and reviews the draft German. `#21` marked closed in `PROJECT_REFERENCE.md`. **All merged live via PR #360.**
-
-**Follow-on (same session 80, after the founder confirmed live and picked "deepen daily-life content"):**
-added **5 exam sets** (`examSets` 10→**15**), one per daily-life theme (behoerde/arzt/wohnen/bank/bildung),
-so **every life domain now has an exam-prep speaking simulation** (previously workplace-only). Each is a
-telc-style **joint-planning** task referencing the theme's existing scenario (`ex_behoerde`→sc_anmeldung,
-`ex_arzt`→sc_arztbesuch, `ex_wohnen`→sc_wohnungsbesichtigung, `ex_bank`→sc_kontoeroeffnung,
-`ex_bildung`→sc_sprachkursberatung), reusing `sharedRubric`. +5 `exam_set` provenance rows (draft),
-1412→**1417**. `ExamHub` maps over all sets with no theme filter, so they surface immediately. Gates green
-again (`lint:content` 15 examSets / 1417 rows, `build`, `check:bundle` 83 kB, `test:unit` 85).
-
-Then, continuing on the founder's "continue", added a **2nd branching dialogue per newest daily-life theme**
-(`dialogues` 16→**20**, all level 2, covering a new situation than the L1 scenario): `sc_apotheke` (arzt,
-Rezept in der Apotheke einlösen), `sc_wohnungsmangel` (wohnen, Heizungsmangel dem Vermieter melden),
-`sc_kartesperren` (bank, verlorene Karte sperren lassen), `sc_pruefungsanmeldung` (bildung, zur
-telc-Prüfung anmelden). Each is a 5-node graph (4 partner turns + narrator end, 3 scored options each)
-matching the existing schema; lint's dialogue graph-integrity checks (start/next/reachability/no-orphans)
-pass. +4 `dialogue` provenance rows (draft), 1417→**1421**. Dialogues load in the lazy `dialogues` chunk,
-so the main chunk stays 83 kB. Gates green (`lint:content` 20 dialogues / 1421 rows, `build`,
-`check:bundle`, `test:unit` 85). **Remaining daily-life depth:** clearing the draft Can-Do/text/exam/dialogue
-review queue is founder sign-off work; further optional depth is more vocab/collocations per sub-theme.
-
-Then, on "work on the seo task", closed the OG-image follow-up: added a real **1200×630 share card**
-`public/og-image.png` (brand card: logo, "Break through the B1–B2 plateau", domain pills, genauly.de). It is
-generated from `preview/og-image/make-og.mjs` (writes a self-contained HTML card, screenshotted with the
-pre-installed Chromium, since the repo has no headless-render dep). `index.html` now points `og:image` +
-`twitter:image` at it, adds `og:image:width/height/type`, and upgrades the card to
-`twitter:card=summary_large_image` (was the square PWA icon + `summary`). Build green, image ships to
-`dist/og-image.png`. **SEO/growth now covered:** meta/OG/Twitter/canonical/JSON-LD (WebApplication+FAQPage),
-robots.txt, sitemap.xml, landing FAQ + how-it-works, and the share card. Remaining growth levers are
-non-code (real product screenshots / testimonials for social proof) or a separate lane (pricing, Phase D).
-
----
-
-_Older handoffs (sessions 1–79) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–79 are in the W28 file)._
+_Older handoffs (sessions 1–80) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–80 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)

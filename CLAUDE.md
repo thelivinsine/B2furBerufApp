@@ -88,7 +88,9 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
   1.2→1.5 via `requiresMissions`; the boss (1.6) is deliberately **ungated** as the standalone
   playtest slice (pinned by a `tests/mission.test.ts` fixture, do not gate it). Scene backdrops
   live in the `SceneSetting` enum (`website`/`wohnung`/`strasse`/`wartezimmer`/`amt`/`terminal`/
-  `laden`); new backdrops are neutral stages until licensed pixel art lands. **Missions are data,
+  `laden`); every setting except `website` (which renders its own browser chrome) now has a
+  code-authored placeholder backdrop from `preview/game-pixel-mockups/welt_assets.py` (s82 added
+  `terminal`/`laden`), licensed pixel art still the eventual G2 upgrade. **Missions are data,
   not code:** `src/data/missions.ts` (bank + `chapters`/
   `gameNpcs`/`keyItems` registries) is interpreted by the pure runner `src/engine/mission.ts`
   (immutable transitions emit effects; `MissionPlayer` applies them to the real stores, so the
