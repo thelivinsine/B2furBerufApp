@@ -195,8 +195,16 @@ the interim left those stages blank rather than placeholder-filled.
   rendered correctly (screenshot of the Fahrkarten-Automat with the transit-hall backdrop).
 - **Follow-up Q&A (no code):** clarified the roadmap, walking is G3 (Phaser overworld, playtest-gated), the
   battle scenes are staged React tableaux by design (not walkable); only the loadout scene walks today. G2
-  is **in progress**, not complete: recurring-mission composer, fetch-quest loop, and the Supabase game-state
-  migration remain. Recommended doing those in a fresh session (different subsystem, wants plan-first).
+  is **in progress**, not complete.
+- **Founder decision, G2 build order reshuffled (variety before plumbing):** the founder flagged that every
+  mission plays as cutscene → battle → cutscene (all 6 missions have exactly one dialogueBattle, so the
+  Geduld/Mut bars appear every time and the boss stops feeling special). Approved re-sequencing the
+  remaining G2 rungs so playtesters see a varied chapter: **(1) hotspot tappable-stage layer, (2)
+  Keypad/Automat scene kind + re-skin mission 1.2 (and the 1.4 Leergut beat), (3) type-under-timer for the
+  1.4 checkout, then (4) recurring-mission composer, (5) fetch-quest loop, (6) Supabase game-state
+  migration.** Nothing cut, same total work. Full rationale + catalog references recorded in
+  `GAME_IMPLEMENTATION_PLAN.md` (G2 status block). **Next session starts at rung 1** (plan-first; the
+  activity specs are in `MISSION_ACTIVITY_RESEARCH.md` §2).
 
 **Handoff after session 81 (2026-07-08). G2 kicked off: founder greenlit the game build (zero-spend,
 incremental, playtest-first), and Neuland Kapitel 1 is now COMPLETE end-to-end.** After a Q&A on the game
@@ -225,7 +233,8 @@ one-time; free path exists), the founder said go, then "go ahead with 1.3 to 1.5
 
 **G2 next rungs (not yet built):** the **FSRS-driven recurring-mission composer** (the scheduler brings a
 mission variant back when its vocab is due) and the **failure-as-fetch-quest loop** (a missing key item spawns
-its acquisition mission). (The `terminal`/`laden` backdrops that were blank are now filled with code-authored
+its acquisition mission). _(Superseded in s82: the founder re-sequenced G2 to build scene variety first;
+see the session-82 handoff above for the new order.)_ (The `terminal`/`laden` backdrops that were blank are now filled with code-authored
 placeholder art in s82, PR #368; licensed pixel-art packs remain the eventual upgrade.) **Prerequisite for
 cloud-syncing game state:** the Supabase migration adding
 `missions_done`/`key_items` columns (an unknown column fails the whole `progress` upsert; game state is

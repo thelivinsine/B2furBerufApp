@@ -202,9 +202,23 @@ playtest-first). **Kapitel 1 authored complete: 6 missions 1.1→1.6** (PR #365 
 parked draft; PR #366 authored 1.3 SIM-Karte, 1.4 erster Einkauf/Pfand, 1.5 Dach/Wohnungsgeberbestätigung).
 The `terminal`/`laden` settings now have code-authored placeholder backdrops (s82, PR #368: a transit
 hall and a shop, added to `welt_assets.py`); they were blank stages before, which read as missing art.
-Licensed pixel-art packs remain the eventual upgrade. **Remaining before/around the playtest gate:**
-FSRS-driven recurring-mission composer, failure-as-fetch-quest loop, and the Supabase migration for
-`missions_done`/`key_items` (game state is local-only until then)._
+Licensed pixel-art packs remain the eventual upgrade.
+**Build-order decision (2026-07-08, session 82, founder-approved): scene VARIETY comes before the
+plumbing.** The founder reviewed Kapitel 1 and flagged that every mission plays as cutscene → dialogue
+battle → cutscene, so the Geduld/Mut bars appear in all six missions and the boss no longer feels
+special (scene mix: 20 cutscenes, 6 battles, 3 websiteParody, 2 listening, 2 formCloze, 1 loadout).
+Since the playtest gate is the whole point of G2, testers must see the varied chapter, not the
+repetitive one. **New order of the remaining G2 rungs:**
+1. **Hotspot layer** (tappable stage: catalog #2/#7/#18; one generic renderer)
+2. **Keypad/Automat scene kind** (catalog #8), then **re-skin mission 1.2** (ticket machine becomes a
+   real machine, not a battle) and the 1.4 Leergutautomat beat
+3. **Type-under-timer** (catalog #9) for the 1.4 checkout
+4. FSRS-driven recurring-mission composer
+5. Failure-as-fetch-quest loop
+6. Supabase migration for `missions_done`/`key_items` (game state is local-only until then)
+Nothing is cut; this is the same work re-sequenced so the playtest measures fun, not repetition.
+Activity source: `docs/strategy/MISSION_ACTIVITY_RESEARCH.md` §2 catalog + §4 adoption order (which
+already ranked hotspot/automat first)._
 5–8 missions (airport, SIM card, supermarket, WG viewing, Anmeldung boss), recurring NPCs,
 key-item dependency chain, FSRS-driven recurring missions, failure-as-fetch-quest loop, pixel
 art scene stills from the licensed packs. Then **stop building and playtest with 5–10 real
