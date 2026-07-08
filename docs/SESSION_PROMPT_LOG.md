@@ -1790,7 +1790,7 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/data/missions.ts`, `src/data/provenance.ts`, `src/types/game.ts`,
   `scripts/lint-content.mjs`, `src/features/welt/stage.tsx`, `src/features/welt/scenes.tsx`,
   `src/features/welt/BattleView.tsx`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 227–229).
-  Commit SHA + PR # to be filled on push/merge.
+  Shipped as **PR #365** (squash-merged to `main`, commit `e4e00e7`).
 
 ## Entry 230 — 2026-07-08 (session 81)
 - **Branch:** `claude/game-plan-next-steps-aqhim3`
@@ -1813,4 +1813,22 @@ Branch: `claude/whats-next-esga9u`.
   `build`, `check:bundle` (83 kB, game stays lazy), `test:unit` (85), `lint` (0 errors).
 - **Artifacts:** `src/data/missions.ts`, `src/data/provenance.ts`, `src/types/game.ts`,
   `scripts/lint-content.mjs`, `src/features/welt/stage.tsx`, `docs/PROJECT_STATUS.md`,
-  `docs/SESSION_PROMPT_LOG.md` (entry 230). Commit SHA + PR # to be filled on push/merge.
+  `docs/SESSION_PROMPT_LOG.md` (entry 230). Shipped as **PR #366** (squash-merged to `main`, commit `bfd143b`).
+
+## Entry 231 — 2026-07-08 (session 81)
+- **Branch:** `claude/game-plan-next-steps-aqhim3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Documentation wrap-up for session 81 (G2 kickoff + Neuland Kapitel 1 completed across
+  PRs #365 and #366). Most of the record was written inline as the two increments shipped: the
+  `PROJECT_STATUS.md` header, content counts (game missions 1→6, scenes→35, NPCs→11, key items→7, provenance
+  →1,426) and the session-81 "Resume here" handoff (rewritten to reflect the complete chapter), plus
+  prompt-log entries 227–230 and the move of the session-79 handoff into the W28 status archive. This pass
+  backfilled the PR/commit references on entries 229 (**PR #365**, `e4e00e7`) and 230 (**PR #366**, `bfd143b`),
+  refreshed the stale game facts in `CLAUDE.md` (Kapitel 1 now complete, G2 is GO) and flipped the
+  `GAME_IMPLEMENTATION_PLAN.md` G2 phase status from not-started to in-progress, and added this entry.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (entries 229–231), `CLAUDE.md`,
+  `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md` (verified current). Doc-only; shipped
+  via PR → squash-merge → branch realign.

@@ -81,9 +81,15 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - `types/index.ts` — shared types; `types/game.ts` — the Neuland Mission/Scene schema (game G1, s73)
 - `router.tsx`, `App.tsx`, `main.tsx`
 
-## Neuland game layer (game G1 shipped s73; plan: `docs/plans/GAME_IMPLEMENTATION_PLAN.md`)
+## Neuland game layer (G1 shipped s73; **G2 GO s81, Kapitel 1 complete**; plan: `docs/plans/GAME_IMPLEMENTATION_PLAN.md`)
 - The life-story RPG ships INSIDE Genauly as the lazy **`/welt`** route (Beta; entry card on the
-  Anwenden hub). **Missions are data, not code:** `src/data/missions.ts` (bank + `chapters`/
+  Anwenden hub). **Chapter 1 "Ankommen" is complete (s81): 6 missions 1.1→1.6** (Willkommen,
+  Fahrkarten-Automat, SIM-Karte, erster Einkauf, Dach über dem Kopf, Anmeldung boss), chained
+  1.2→1.5 via `requiresMissions`; the boss (1.6) is deliberately **ungated** as the standalone
+  playtest slice (pinned by a `tests/mission.test.ts` fixture, do not gate it). Scene backdrops
+  live in the `SceneSetting` enum (`website`/`wohnung`/`strasse`/`wartezimmer`/`amt`/`terminal`/
+  `laden`); new backdrops are neutral stages until licensed pixel art lands. **Missions are data,
+  not code:** `src/data/missions.ts` (bank + `chapters`/
   `gameNpcs`/`keyItems` registries) is interpreted by the pure runner `src/engine/mission.ts`
   (immutable transitions emit effects; `MissionPlayer` applies them to the real stores, so the
   game shares ONE progression state with the app: `addXp`, FSRS grades via `reviewVocab`,

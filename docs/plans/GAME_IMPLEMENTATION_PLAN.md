@@ -197,6 +197,12 @@ mission runner. **Exit criterion: the founder plays the slice on their phone and
 game, not a quiz with a costume.**
 
 ### G2: Chapter 1 "Ankommen" + the playtest gate (3–5 sessions)
+_Status update 2026-07-08 (session 81): **IN PROGRESS.** Founder greenlit G2 (zero-spend, incremental,
+playtest-first). **Kapitel 1 authored complete: 6 missions 1.1→1.6** (PR #365 shipped 1.1/1.2 from the
+parked draft; PR #366 authored 1.3 SIM-Karte, 1.4 erster Einkauf/Pfand, 1.5 Dach/Wohnungsgeberbestätigung).
+Backdrops for the new `terminal`/`laden` settings are neutral stages (licensed pixel art still pending).
+**Remaining before/around the playtest gate:** FSRS-driven recurring-mission composer, failure-as-fetch-quest
+loop, and the Supabase migration for `missions_done`/`key_items` (game state is local-only until then)._
 5–8 missions (airport, SIM card, supermarket, WG viewing, Anmeldung boss), recurring NPCs,
 key-item dependency chain, FSRS-driven recurring missions, failure-as-fetch-quest loop, pixel
 art scene stills from the licensed packs. Then **stop building and playtest with 5–10 real
