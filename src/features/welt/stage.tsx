@@ -5,6 +5,8 @@ import amtUrl from "./assets/amt.png";
 import wartezimmerUrl from "./assets/wartezimmer.png";
 import wohnungUrl from "./assets/wohnung.png";
 import strasseUrl from "./assets/strasse.png";
+import terminalUrl from "./assets/terminal.png";
+import ladenUrl from "./assets/laden.png";
 import schmidtUrl from "./assets/schmidt.png";
 import playerUrl from "./assets/player.png";
 import bagUrl from "./assets/bag.png";
@@ -32,8 +34,8 @@ const SETTING_ART: Record<SceneSetting, string | null> = {
   strasse: strasseUrl,
   wartezimmer: wartezimmerUrl,
   amt: amtUrl,
-  terminal: null,
-  laden: null,
+  terminal: terminalUrl,
+  laden: ladenUrl,
 };
 
 /** Where-am-I caption per setting, shown as a chip on the stage. */
