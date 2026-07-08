@@ -1920,3 +1920,18 @@ Branch: `claude/whats-next-esga9u`.
   G2 variety rungs → Kapitel 2–6 → plumbing interleaved → chapter-select → G3 city → external playtest).
 - **Artifacts:** `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 235). Doc-only; shipped via PR → squash-merge → branch realign.
+
+## Entry 236 — 2026-07-08 (session 82)
+- **Branch:** `claude/missing-game-visuals-qcmde6`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > is model recommendations included in the plan?
+- **Response summary:** Yes: `GAME_IMPLEMENTATION_PLAN.md` has a "Claude model recommendations" section
+  (tier table + per-task map + the open-strong/downshift working pattern), and general per-session model
+  guidance lives in `PROJECT_REFERENCE.md`. The map predated the two s82 decisions, so added rows for the
+  newly approved work: variety scene-kind SCHEMA shape (Fable 5, closed-union longevity), variety
+  renderers + 1.2/1.4 re-skin (Sonnet 5), chapter-select entry (Sonnet 5), Kapitel 2–6 arc design per
+  chapter (Fable 5), and Kapitel 2–6 mission authoring (Sonnet 5 draft + Haiku 4.5 gates).
+- **Artifacts:** `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/SESSION_PROMPT_LOG.md` (entry 236).
+  Doc-only; shipped via PR → squash-merge → branch realign.

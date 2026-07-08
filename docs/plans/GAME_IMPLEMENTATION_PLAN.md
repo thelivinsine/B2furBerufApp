@@ -162,6 +162,11 @@ Per-task map:
 | G2 | Mission data authoring at volume + provenance rows | **Sonnet 5** | Workhorse drafting inside the fixed schema; founder verifies per `DATA_GOVERNANCE.md` |
 | G2 | FSRS-as-dungeon-master recurrence in the mission composer | **Opus 4.8** | Touches session weighting and SRS state; classic silent-regression territory |
 | G2 | Failure/fetch-quest loop, opt-in Prüfungsmodus flag, pixel-asset wiring | **Sonnet 5** | Conventional feature work |
+| G2 | New variety scene kinds (hotspot layer, Keypad/Automat, type-under-timer, drag-sort): the SCHEMA shape | **Fable 5** | Scene kinds live in the closed union + linter and must survive Kapitel 2–6; a wrong shape repeats G1's most expensive risk (s82 reorder) |
+| G2 | Variety renderers built on the settled schema + re-skinning missions 1.2/1.4 onto them | **Sonnet 5** | Component work on existing pixel-UI patterns; mission edits are data inside the fixed schema |
+| G2 | Chapter-select / start-at-your-level entry | **Sonnet 5** | Conventional UI over existing progression state (s82 full-build decision) |
+| G2–G3 | Kapitel 2–6 arc design (per chapter) | **Fable 5** | Same rationale as the Chapter-1 arc row; narrative quality decides the eventual B2 playtest |
+| G2–G3 | Kapitel 2–6 mission data authoring + provenance | **Sonnet 5** draft + **Haiku 4.5** gates | Content routine once each arc is designed; founder plays each chapter before the next is authored |
 | G3 | React↔Phaser bridge design + lazy-chunk/PWA-precache integration | **Opus 4.8** | A new dependency at a perf-sensitive boundary; bundle budget and PWA caching rules in play |
 | G3 | Tilemap city wiring: Tiled maps, districts, NPC placement | **Sonnet 5** | Conventional once the bridge exists |
 | G4 | New chapters via the pipeline | **Sonnet 5** draft + **Haiku 4.5** provenance/gates | Content routine; **Fable 5** only for each new chapter's arc design |
