@@ -1742,3 +1742,52 @@ Branch: `claude/whats-next-esga9u`.
   daily-life dialogues), #363 (1200×630 OG share image). No code changed in this doc pass.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (entries 225–226), `docs/PROJECT_STATUS.md` (verified).
   Commit SHA + PR # to be filled on push/merge.
+
+## Entry 227 — 2026-07-08 (session 81)
+- **Branch:** `claude/game-plan-next-steps-aqhim3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > What's next in the game plan?
+- **Response summary:** Explained the Neuland game roadmap state (`GAME_IMPLEMENTATION_PLAN.md`): G0/G1
+  shipped, **G2 is the next rung but HALTED on founder order**. Noted the parked G2 groundwork draft (missions
+  1.1/1.2 + settings) sitting unmerged on the old branch `claude/neuland-g1-g2-feedback-wkf28n`, the Supabase
+  game-state migration prerequisite, and that G2 = 5–8 Kapitel-1 missions + a real learner playtest. Asked
+  whether to unpark or keep on hold. No code.
+- **Artifacts:** none (chat only).
+
+## Entry 228 — 2026-07-08 (session 81)
+- **Branch:** `claude/game-plan-next-steps-aqhim3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > is ut really necessary to pay in g2? what is it I'm paying for?
+- **Response summary:** Clarified the cost boundary: the only paid items in the whole game plan are optional,
+  one-time, and ~30–60 EUR total (itch.io modern-city pixel art packs + Aseprite editor), with zero recurring
+  cost. Free path exists (Kenney CC0 packs + Pixelorama/LibreSprite). The trade-off is setting/consistency
+  and my patching time, not raw quality. Recommended: pay nothing yet, ship G2 with free/placeholder art,
+  run the playtest first, buy one matching pack only if the playtest succeeds. No code.
+- **Artifacts:** none (chat only).
+
+## Entry 229 — 2026-07-08 (session 81)
+- **Branch:** `claude/game-plan-next-steps-aqhim3`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > yes let's do that then
+- **Response summary:** Founder gave the go for G2 (zero-spend, incremental, playtest-first). Started G2 with
+  the first increment: **ported chapter-1 missions 1.1 (Willkommen in Neuland) and 1.2 (Der Fahrkarten-Automat)**
+  from the parked draft onto current `main`. Did NOT rebase the whole parked branch (189 files, diverged since
+  s74); extracted only the two draft missions and reconciled them against the current schema. Small contained
+  schema extension: added a `terminal` scene setting (airport/station backdrop, neutral stage + "Bahnhof"
+  caption for now) and an optional per-scene `label` (stage caption override), mirrored in `lint-content.mjs`
+  and threaded through the Cutscene/Listening/Battle renderers. Added NPCs `npc_beamter`/`npc_automat`, key
+  items `ki_reisepass`/`ki_fahrschein`, and 2 provenance rows (draft). Missions are travel-theme, B1.1, each a
+  cutscene → dialogue battle → payoff arc with a scaffolded-retry lose path (failure-as-content). Neuland now
+  has **3 missions** (1.1, 1.2, 1.6 boss); 1.3–1.5 remain for the next increments. Gates green:
+  `lint:content` (3 missions / 18 scenes / 8 NPCs / 6 key items / 1423 rows), `build`, `check:bundle` (83 kB,
+  game stays lazy), `test:unit` (85), `lint` (0 errors).
+- **Artifacts:** `src/data/missions.ts`, `src/data/provenance.ts`, `src/types/game.ts`,
+  `scripts/lint-content.mjs`, `src/features/welt/stage.tsx`, `src/features/welt/scenes.tsx`,
+  `src/features/welt/BattleView.tsx`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 227–229).
+  Commit SHA + PR # to be filled on push/merge.

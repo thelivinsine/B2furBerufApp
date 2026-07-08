@@ -461,3 +461,26 @@ gate). What happened:
 - **Scheduled, not gated.** `.github/workflows/verify-sentences.yml` (monthly + dispatch) regenerates
   both reports and uploads them as artifacts (no auto-commit → no deploy churn). `validate.yml` is
   untouched; no new per-PR gate. `DATA_STRATEGY.md` → **v1.3**. **Branch:** `claude/data-strategy-phase-b-wiw3mu`.
+
+---
+
+**Handoff after session 79 (2026-07-07). Data-strategy Q&A + backlog capture (no code).** The founder
+asked how the data strategy handles three things and said "we'll come back to these tasks later." Answered
+in chat and parked as backlog items (`docs/PROJECT_REFERENCE.md` #33–#35):
+- **#33 — human-in-the-loop tracking + exception-queue tooling.** The reviewer loop from `DATA_STRATEGY.md`
+  §3 Layers 4–5: generate the committed `docs/reports/verification-queue.md` from the machine sweeps and
+  wire it to the founder-only `provenance_reviews` table (migration 0004) + `/sources` admin overlay so a
+  reviewer clears the queue and flips `review_status → verified`. Builds on Phase A/B flags now; fully
+  populated once Phase D (jury) lands.
+- **#34 — auditor handoff package.** A repeatable one-pager/export that packages the reproducible per-item
+  chain (source + license snapshot + fact/grammar/jury verdicts w/ tool+version+date + human sign-off) for
+  an EU AI Act Art. 10 / ISO 42001 examiner; composes the existing `/sources` page, register CSV export,
+  and `verify-*` reports. Doc-only, cheap.
+- **#35 — scale-to-100x database plan.** Two planes: content stays CDN-cheap (files → Supabase content
+  table only if the *library* grows 100x); the user plane is standard Postgres scaling (Supavisor pooling →
+  indexed/index-friendly RLS → partition/archive `ai_usage`+writing → replicas) plus the real lever,
+  **server-side metering/capping of AI-writing-coach token spend**, and clearing the `progress` fixed-column
+  upsert debt (#32). Deliverable is a phased migration checklist.
+
+Nothing shipped that session; the next rung on the built roadmap is still **Phase D (the AI jury, Layer 4)
++ golden set**.

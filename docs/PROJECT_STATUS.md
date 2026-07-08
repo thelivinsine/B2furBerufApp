@@ -1,6 +1,8 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-07 (session 80: **top-value tasks + daily-life depth + SEO, 4 PRs to `main`**.
+_Last updated: 2026-07-08 (session 81: **G2 kicked off, founder gave the go. Ported chapter-1 missions
+1.1 (Willkommen) + 1.2 (Fahrkarten-Automat) from the parked draft onto `main`; Neuland now has 3 missions.**
+Prior, session 80: **top-value tasks + daily-life depth + SEO, 4 PRs to `main`**.
 **#360** closed EU AI Act #21 (documented Art. 6(3) risk assessment `docs/strategy/AI_ACT_RISK_ASSESSMENT.md`;
 not-high-risk/limited-risk) and shipped the full SEO surface (Open Graph + Twitter + canonical + JSON-LD
 WebApplication/FAQPage in `index.html`, `robots.txt`, `sitemap.xml`, landing FAQ + how-it-works) plus 4
@@ -12,10 +14,10 @@ Prior, session 78: **data strategy Phase B + Phase C SHIPPED** (Layer 3 linguist
 + `verify:cefr`, warn-only; Phase C trust model → generated `src/data/verification.ts`, `/sources` tier
 badge; `DATA_STRATEGY.md` → v1.4). Prior, session 75: **four daily-life content packs shipped** (Arzt,
 Wohnen, Bank, Bildung), themes now 15 (was 11), **all six top-level domains populated**.
-**G2 remains HALTED on founder order ("Wait for my go")**: the G2 groundwork
-draft (missions 1.1/1.2 + settings) sits PARKED UNMERGED on the old session branch
-`claude/neuland-g1-g2-feedback-wkf28n` (commit `wip(G2, PARKED, DO NOT MERGE)`). The working
-branch is reassigned every session, so **`main` is always the source of truth**. Product name:
+**G2 is GO (founder greenlit 2026-07-08, session 81)**: zero-spend, incremental, playtest-first. The
+parked groundwork branch `claude/neuland-g1-g2-feedback-wkf28n` was NOT rebased (189 files, badly diverged
+since s74); instead the two draft missions (1.1/1.2) were extracted and re-authored against current `main`.
+The working branch is reassigned every session, so **`main` is always the source of truth**. Product name:
 **Genauly** (domain `genauly.de`)._
 
 This file is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -174,6 +176,34 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 81 (2026-07-08). G2 kicked off: founder greenlit the game build (zero-spend,
+incremental, playtest-first), and the first increment shipped.** After a Q&A on the game roadmap and the
+G2 cost boundary (only paid items are optional pixel-art packs + Aseprite, ~30–60 EUR one-time; free path
+exists), the founder said go. First increment: **ported chapter-1 missions 1.1 "Willkommen in Neuland"
+(airport arrival, passport-control battle, station-announcement listening, meet Jonas) and 1.2 "Der
+Fahrkarten-Automat" (ticket-machine battle, Zone-AB lesson) from the parked draft onto current `main`.**
+- **Did NOT rebase the parked branch** `claude/neuland-g1-g2-feedback-wkf28n` (189 files, diverged since
+  s74, almost all already on `main` via G1). Extracted only the two draft missions and re-authored them
+  against the CURRENT schema.
+- **Small contained schema extension:** added a `terminal` scene setting (airport/station; neutral stage +
+  "Bahnhof" caption for now, real backdrop is a later art task) and an optional per-scene `label` (stage
+  caption override). Mirrored `terminal` in `lint-content.mjs`, threaded `label` through the
+  Cutscene/Listening/Battle renderers. Added NPCs `npc_beamter`/`npc_automat`, key items
+  `ki_reisepass`/`ki_fahrschein`, 2 provenance rows (draft).
+- **Both missions:** travel-theme, B1.1, cutscene → dialogue battle → payoff, each with a scaffolded-retry
+  lose path (failure-as-content, no lockout). Neuland now has **3 missions** (1.1, 1.2, 1.6 boss).
+- **Gates green:** `lint:content` (3 missions / 18 scenes / 8 NPCs / 6 key items / 1423 rows), `build`,
+  `check:bundle` (83 kB, game stays lazy), `test:unit` (85), `lint` (0 errors).
+
+**G2 next rungs (not yet built):** missions **1.3 (Die SIM-Karte)**, **1.4 (Der erste Einkauf** + Pfand
+economy**)**, **1.5 (Ein Dach über dem Kopf** / Wohnungsgeberbestätigung**)** to complete Kapitel 1; then
+recurring NPCs polish, FSRS-driven recurring-mission composer, failure-as-fetch-quest loop. **Prerequisite
+for cloud-syncing game state:** the Supabase migration adding `missions_done`/`key_items` columns (an
+unknown column fails the whole `progress` upsert; game state is local-only until then). Playtest gate
+follows once Kapitel 1 is complete. Founder still verifies live and reviews the draft German.
+
+---
+
 **Handoff after session 80 (2026-07-07). Top-value tasks + daily-life depth + SEO, 4 PRs shipped to
 `main` (branch `claude/top-value-tasks-842u60`).** PRs this session: **#360** (Art. 6(3) risk assessment +
 SEO meta/OG/JSON-LD/robots/sitemap + landing FAQ + 4 reading texts), **#361** (5 daily-life exam sets),
@@ -236,31 +266,8 @@ non-code (real product screenshots / testimonials for social proof) or a separat
 
 ---
 
-**Handoff after session 79 (2026-07-07). Data-strategy Q&A + backlog capture (no code).** The founder
-asked how the data strategy handles three things and said "we'll come back to these tasks later." Answered
-in chat and parked as backlog items (`docs/PROJECT_REFERENCE.md` #33–#35):
-- **#33 — human-in-the-loop tracking + exception-queue tooling.** The reviewer loop from `DATA_STRATEGY.md`
-  §3 Layers 4–5: generate the committed `docs/reports/verification-queue.md` from the machine sweeps and
-  wire it to the founder-only `provenance_reviews` table (migration 0004) + `/sources` admin overlay so a
-  reviewer clears the queue and flips `review_status → verified`. Builds on Phase A/B flags now; fully
-  populated once Phase D (jury) lands.
-- **#34 — auditor handoff package.** A repeatable one-pager/export that packages the reproducible per-item
-  chain (source + license snapshot + fact/grammar/jury verdicts w/ tool+version+date + human sign-off) for
-  an EU AI Act Art. 10 / ISO 42001 examiner; composes the existing `/sources` page, register CSV export,
-  and `verify-*` reports. Doc-only, cheap.
-- **#35 — scale-to-100x database plan.** Two planes: content stays CDN-cheap (files → Supabase content
-  table only if the *library* grows 100x); the user plane is standard Postgres scaling (Supavisor pooling →
-  indexed/index-friendly RLS → partition/archive `ai_usage`+writing → replicas) plus the real lever,
-  **server-side metering/capping of AI-writing-coach token spend**, and clearing the `progress` fixed-column
-  upsert debt (#32). Deliverable is a phased migration checklist.
-
-Nothing shipped that session; the next rung on the built roadmap is still **Phase D (the AI jury, Layer 4)
-+ golden set** (the session-78 handoff detailing Phase B + Phase C is now in the W28 archive file).
-
----
-
-_Older handoffs (sessions 1–78) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–78 are in the W28 file)._
+_Older handoffs (sessions 1–79) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–79 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)
@@ -272,8 +279,8 @@ _Older handoffs (sessions 1–78) are archived by ISO week under `docs/archive/s
 - Can-Do milestones: **37** (all 15 themes; workplace/behoerde founder-verified, daily-life packs draft)
 - Lese-/Hörtexte: **22** texts / **66** comprehension checks (+2 each for Arzt/Wohnen/Bank/Bildung in s75; +1 each in s80 covering a new sub-theme per daily-life theme)
 - Themes: **15** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank` + `bildung`; all six domains now populated)
-- Game missions (Neuland): **1** (the chapter-1 Anmeldung boss, 9 scenes) · 6 NPCs · 4 key items
-- Provenance rows: **1,421** (all with a `reference`; 1,396 `draft` / 25 `verified`)
+- Game missions (Neuland): **3** (Kap-1: 1.1 Willkommen, 1.2 Fahrkarten-Automat, 1.6 Anmeldung boss; 18 scenes) · 8 NPCs · 6 key items
+- Provenance rows: **1,423** (all with a `reference`; 1,398 `draft` / 25 `verified`)
 - Verification tiers (Layer C, generated `src/data/verification.ts`): **25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-attested)
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is

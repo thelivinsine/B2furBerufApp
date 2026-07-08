@@ -74,7 +74,7 @@ export function BattleView({
 
   return (
     <div className="space-y-4">
-      <PixelStage setting={scene.setting}>
+      <PixelStage setting={scene.setting} label={scene.label}>
         {/* stage sprites, anchored to the backdrop's shadow spots */}
         {sprite && (
           <motion.div

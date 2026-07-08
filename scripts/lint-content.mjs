@@ -74,7 +74,7 @@ const CHAPTER_IDS = ["kap1", "kap2", "kap3", "kap4", "kap5", "kap6"];
 const SCENE_KINDS = [
   "cutscene", "websiteParody", "loadout", "listening", "dialogueBattle", "formCloze",
 ];
-const SCENE_SETTINGS = ["website", "wohnung", "strasse", "wartezimmer", "amt"];
+const SCENE_SETTINGS = ["website", "wohnung", "strasse", "wartezimmer", "amt", "terminal"];
 const BATTLE_EFFECTS = ["beamtendeutsch", "missverstaendnis", "smalltalk"];
 // Sprite keys with real art in src/features/welt/stage.tsx NPC_SPRITES; an
 // npc.sprite outside this list silently renders nothing, so keep in sync.
