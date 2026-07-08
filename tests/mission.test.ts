@@ -14,6 +14,8 @@ import {
   useDictionary,
   resolveBattle,
   recordField,
+  tapHotspot,
+  hotspotSolved,
   missionUnlocked,
   ASK_WRONG_GEDULD,
   DICT_USES_DEFAULT,
@@ -21,6 +23,7 @@ import {
 } from "@/engine/mission";
 import { missions } from "@/data/missions";
 import { XP } from "@/engine/scoring";
+import type { Mission } from "@/types/game";
 
 /** The Anmeldung boss mission: the G1 vertical slice, also the test vehicle. */
 const anmeldung = missions.find((m) => m.id === "m_kap1_anmeldung")!;
@@ -345,5 +348,92 @@ describe("mission unlock gating", () => {
     expect(missionUnlocked(gated, ["m_other"], [])).toBe(false);
     expect(missionUnlocked(gated, ["m_other"], ["ki_mietvertrag"])).toBe(true);
     expect(missionUnlocked(anmeldung, [], [])).toBe(true);
+  });
+});
+
+/**
+ * The hotspot runner (G2 variety rung 1) is unit-tested against a small inline
+ * fixture so the assertions stay independent of content churn. The linter,
+ * not the runner, validates that a shipped hotspot's ids exist; the runner is
+ * pure and passes vocab ids straight through into effects.
+ */
+const hotspotFixture: Mission = {
+  id: "m_test_hotspot",
+  chapter: "kap1",
+  index: 99,
+  title: "Testszene",
+  titleEn: "Test scene",
+  themeId: "travel",
+  cefr: "B1.1",
+  brief: { de: "Test", en: "Test" },
+  rewardXp: 10,
+  start: "find",
+  scenes: {
+    find: {
+      id: "find",
+      kind: "hotspot",
+      setting: "terminal",
+      prompt: { de: "Finde die richtigen Stellen.", en: "Find the right spots." },
+      spots: [
+        { id: "a", x: 20, y: 30, correct: true, vocabId: "voc_x" },
+        { id: "b", x: 60, y: 40, correct: true },
+        { id: "wrong", x: 80, y: 50, feedback: { de: "Falsch.", en: "Wrong." } },
+      ],
+      end: "win",
+    },
+  },
+};
+
+describe("mission runner: hotspot", () => {
+  it("records a wrong tap without effects and does not solve the scene", () => {
+    const run = startMission(hotspotFixture, []);
+    const after = tapHotspot(run, "wrong");
+    expect(after.effects).toHaveLength(0);
+    expect(after.hotspotMisses.wrong).toBe(1);
+    expect(after.hotspotsFound.wrong).toBeUndefined();
+    expect(hotspotSolved(after)).toBe(false);
+  });
+
+  it("grades a clean correct tap Good with vocab FSRS + XP", () => {
+    const run = startMission(hotspotFixture, []);
+    const after = tapHotspot(run, "a");
+    expect(after.hotspotsFound.a).toBe(true);
+    expect(after.effects).toContainEqual({ type: "vocabGrade", vocabId: "voc_x", grade: 4 });
+    expect(after.effects).toContainEqual({ type: "xp", amount: XP.flashcard });
+  });
+
+  it("downgrades the correct tap to Hard after a wrong tap on the scene", () => {
+    let run = startMission(hotspotFixture, []);
+    run = tapHotspot(run, "wrong");
+    run = tapHotspot(run, "a");
+    expect(run.effects).toContainEqual({ type: "vocabGrade", vocabId: "voc_x", grade: 3 });
+    expect(run.effects).toContainEqual({ type: "xp", amount: XP.flashcardEasy });
+  });
+
+  it("solves only when every correct spot is found, wrong spots aside", () => {
+    let run = startMission(hotspotFixture, []);
+    run = tapHotspot(run, "a");
+    expect(hotspotSolved(run)).toBe(false);
+    run = tapHotspot(run, "b");
+    expect(hotspotSolved(run)).toBe(true);
+    // A correct spot with no vocabId emits XP only, no grade.
+    expect(run.effects).toContainEqual({ type: "xp", amount: XP.flashcard });
+    expect(run.effects.some((e) => e.type === "vocabGrade")).toBe(false);
+  });
+
+  it("treats a re-tap of an already-found spot as a no-op", () => {
+    let run = startMission(hotspotFixture, []);
+    run = tapHotspot(run, "a");
+    const again = tapHotspot(run, "a");
+    expect(again.effects).toHaveLength(0);
+  });
+
+  it("routes onward through completeScene once solved", () => {
+    let run = startMission(hotspotFixture, []);
+    run = tapHotspot(run, "a");
+    run = tapHotspot(run, "b");
+    run = completeScene(run);
+    expect(run.done).toBe(true);
+    expect(run.outcome).toBe("win");
   });
 });

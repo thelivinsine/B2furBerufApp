@@ -4,13 +4,14 @@ import { ChevronRight, Globe, SkipForward } from "lucide-react";
 import type {
   CutsceneScene,
   FormClozeScene,
+  HotspotScene,
   ListeningScene,
   LoadoutScene,
   LoadoutSlot,
   SceneChoice,
   WebsiteParodyScene,
 } from "@/types/game";
-import { chooseChoice, completeScene, attemptSlot, finishLoadout, recordCheck, recordField, type MissionRun } from "@/engine/mission";
+import { chooseChoice, completeScene, attemptSlot, finishLoadout, recordCheck, recordField, tapHotspot, hotspotSolved, type MissionRun } from "@/engine/mission";
 import { gradeTyped, type TypedVerdict } from "@/engine/typing";
 import { ttsSupported } from "@/engine/speech";
 import { vocabById } from "@/data/vocabulary";
@@ -27,6 +28,7 @@ import {
   PLAYER_SPRITE,
   DOC_ICONS,
   DOC_ICON_FALLBACK,
+  GAME_OUT,
 } from "@/features/welt/stage";
 
 /**
@@ -535,6 +537,116 @@ export function ListeningView({ scene, act, translate }: SceneViewProps & { scen
                 {scene.ticker ? `Nummer ${scene.ticker.yours}: Du bist dran!` : "Weiter"}
               </Pill>
             </div>
+          )}
+        </SheetCard>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- hotspot ---------------- */
+
+/**
+ * Tap-the-answer-in-the-world scene (activity catalog #2). The prompt (read,
+ * or heard via TTS for the "Aufruf abfangen" variant) names what to find; the
+ * player taps the right place on the pixel stage. Wrong taps only earn a
+ * deadpan reaction and a shake (failure is content); the scene clears once
+ * every correct spot is found. The runner owns correctness + FSRS grading, so
+ * this view just reads `run.hotspotsFound` and routes on solve.
+ */
+export function HotspotView({
+  scene,
+  run,
+  act,
+  translate,
+}: SceneViewProps & { scene: HotspotScene; run: MissionRun }) {
+  const [reaction, setReaction] = useState<{ spotId: string; wrong: boolean } | null>(null);
+  const solved = hotspotSolved(run);
+
+  const tap = (spotId: string, correct: boolean) => {
+    if (run.hotspotsFound[spotId]) return;
+    setReaction({ spotId, wrong: !correct });
+    act((r) => tapHotspot(r, spotId));
+  };
+
+  const reacted = reaction ? scene.spots.find((s) => s.id === reaction.spotId) : undefined;
+
+  return (
+    <div className="space-y-4">
+      <PixelStage setting={scene.setting} label={scene.label}>
+        {scene.spots.map((spot) => {
+          const found = !!run.hotspotsFound[spot.id];
+          const size = spot.size ?? 14;
+          const justWrong = reaction?.wrong && reaction.spotId === spot.id;
+          return (
+            <motion.button
+              key={spot.id}
+              type="button"
+              onClick={() => tap(spot.id, !!spot.correct)}
+              disabled={found}
+              aria-label={spot.label ?? `Stelle bei ${spot.x}, ${spot.y}`}
+              className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
+              style={{ left: `${spot.x}%`, top: `${spot.y}%`, width: `${size}%` }}
+              animate={justWrong ? { x: [0, -4, 4, -3, 0] } : undefined}
+              transition={{ duration: 0.32 }}
+            >
+              <span
+                className={cn(
+                  "flex aspect-square w-full items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
+                  found
+                    ? "border-teal-500 bg-teal-400/40 text-teal-900"
+                    : justWrong
+                      ? "border-rose-500 bg-rose-400/40 text-rose-900"
+                      : "border-white/70 bg-white/15 text-white",
+                )}
+                style={{ boxShadow: `0 0 0 2px ${GAME_OUT}44` }}
+              >
+                {spot.label ?? (found ? "✓" : "")}
+              </span>
+              {!found && !spot.label && (
+                <motion.span
+                  aria-hidden
+                  className="absolute inset-0 rounded-full border-2 border-white/60"
+                  animate={{ opacity: [0.7, 0.15, 0.7], scale: [1, 1.18, 1] }}
+                  transition={{ repeat: Infinity, duration: 1.8 }}
+                />
+              )}
+            </motion.button>
+          );
+        })}
+      </PixelStage>
+
+      <div className="px-3">
+        <SheetCard className="space-y-3 p-4">
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-base font-semibold leading-relaxed text-slate-700">
+              <GameText de={scene.prompt.de} en={scene.prompt.en} translate={translate} />
+            </p>
+            {scene.audio && <SpeakButton text={scene.audio.de} className="mt-0.5 shrink-0" />}
+          </div>
+
+          {reaction && reacted?.feedback && (
+            <motion.p
+              key={reaction.spotId + String(reaction.wrong)}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={cn(
+                "rounded-md px-3 py-2 text-sm",
+                reaction.wrong ? "bg-rose-50 text-rose-600" : "bg-teal-50 text-teal-700",
+              )}
+            >
+              <GameText de={reacted.feedback.de} en={reacted.feedback.en} translate={translate} />
+            </motion.p>
+          )}
+
+          {solved ? (
+            <div className="flex justify-end">
+              <Pill primary onClick={() => act(completeScene)}>
+                {scene.cta?.de ?? "Weiter"} <ChevronRight className="ml-1 inline h-4 w-4" />
+              </Pill>
+            </div>
+          ) : (
+            <p className="text-xs text-slate-400">Tippe die richtige Stelle im Bild an.</p>
           )}
         </SheetCard>
       </div>
