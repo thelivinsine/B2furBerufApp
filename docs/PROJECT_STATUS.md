@@ -1,6 +1,10 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-08 (session 82: **Neuland game-visuals fix + two G2 direction decisions.** The
+_Last updated: 2026-07-08 (session 83: **G2 variety rung 1 shipped: the `hotspot` scene kind (PR #374).
+One generic tappable-stage layer (catalog #2/#7/#18): the player proves comprehension by TAPPING the
+right place on the pixel stage, not picking a sentence. Added to the closed `MissionScene` union with a
+pure runner + renderer + linter + 6 tests; used in missions 1.1 (departure board) and 1.4 (shelf
+search).** Prior, session 82: **Neuland game-visuals fix + two G2 direction decisions.** The
 blank `terminal`/`laden` stages (16 of Kapitel 1's scenes) got code-authored placeholder backdrops,
 transit hall + shop in `welt_assets.py`, wired into `SETTING_ART` (PR #368). The founder then
 **re-sequenced G2, scene variety before plumbing** (hotspot layer → Keypad/Automat kind + 1.2 re-skin →
@@ -184,6 +188,29 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 83 (2026-07-08). G2 variety rung 1 SHIPPED: the `hotspot` scene kind (branch
+`claude/g2-variety-work-0t6c9a`, PR #374).** First rung of the s82-approved G2 reorder (scene variety
+before plumbing). Added **`hotspot`**, one generic tappable-stage layer (activity catalog #2 "Hotspot
+antippen"; also carries #7 "Aufruf abfangen" and #18 "Listen-and-act" via an optional TTS `audio` line):
+the player proves comprehension by TAPPING the right place on the pixel stage instead of picking a
+sentence. Wrong taps earn only a deadpan reaction (failure is content); the scene clears once every
+`correct` spot is found.
+- **Missions stay data, not code.** `types/game.ts`: `Hotspot` + `HotspotScene` in the closed
+  `MissionScene` union. `engine/mission.ts`: pure `tapHotspot`/`hotspotSolved` with scene-scoped
+  first-try grading (Good clean, Hard after a fumble) into FSRS + XP, plus two run-state maps.
+  `features/welt/scenes.tsx`: `HotspotView` renderer in the blessed pixel-UI language, wired into
+  `MissionPlayer`. `lint-content.mjs`: mirrors the kind + validates spots (unique ids, 0..100 percents,
+  ≥1 correct, vocab ids resolve). `tests/mission.test.ts`: 6 runner tests over an inline fixture.
+- **Used in the two earliest-played missions** so the variety is visible: **1.1** gains a listen-and-act
+  departure board (tap Gleis 4), **1.4** gains the shelf search (tap Milch/Brot/Äpfel among distractors)
+  between the Pfand return and the checkout battle. Hotspots are authored vocab-free (they train
+  Hören/Lesen, XP-only), which is pedagogically honest and avoids forcing unnatural vocab tags.
+- **Gates green:** `lint:content` (6 missions / 37 scenes), `test:unit` (91, +6), `build`, `check:bundle`
+  (83 kB, game stays lazy), `lint` (0 errors). Founder verifies live and reviews the draft German.
+- **G2 next rung: rung 2 (Keypad/Automat scene kind, then re-skin mission 1.2 + the 1.4 Leergut beat).**
+  Then rung 3 (type-under-timer for the 1.4 checkout), then the plumbing rungs. Full order in
+  `GAME_IMPLEMENTATION_PLAN.md` (G2 status block); rung 1 is marked SHIPPED there.
+
 **Handoff after session 82 (2026-07-08). Neuland game-visuals fix (branch `claude/missing-game-visuals-qcmde6`).**
 The founder sent screenshots of the game (`/welt`) showing "no game visuals": the Willkommen passport battle
 and the Fahrkarten-Automat cutscene rendered over a blank beige stage. **Root cause:** `SETTING_ART` in
@@ -222,46 +249,10 @@ the interim left those stages blank rather than placeholder-filled.
   founder-tested) → G2 plumbing (composer, fetch-quest, Supabase migration) interleaved as needed →
   chapter-select entry → G3 city → external B2 playtest.
 
-**Handoff after session 81 (2026-07-08). G2 kicked off: founder greenlit the game build (zero-spend,
-incremental, playtest-first), and Neuland Kapitel 1 is now COMPLETE end-to-end.** After a Q&A on the game
-roadmap and the G2 cost boundary (only paid items are optional pixel-art packs + Aseprite, ~30–60 EUR
-one-time; free path exists), the founder said go, then "go ahead with 1.3 to 1.5". Shipped in two PRs:
-- **PR #365 (increment 1):** ported the parked drafts **1.1 "Willkommen in Neuland"** (airport arrival,
-  passport-control battle, station-announcement listening, meet Jonas) and **1.2 "Der Fahrkarten-Automat"**
-  (ticket-machine battle, Zone-AB lesson) onto current `main`. Did NOT rebase the parked branch
-  `claude/neuland-g1-g2-feedback-wkf28n` (189 files, badly diverged since s74); extracted only the two
-  missions and re-authored against the current schema.
-- **Increment 2:** authored fresh **1.3 "Die SIM-Karte"** (phone-shop upsell battle vs Milo, resist the
-  Vertrag, tariff-page parody, `ki_sim_vertrag`), **1.4 "Der erste Einkauf"** (Leergutautomat/Pfand parody
-  + the legendary checkout-speed battle vs the Kassiererin, `sustainability`-theme via the recycling angle),
-  and **1.5 "Ein Dach über dem Kopf"** (landlord Herr Brandt polite-register battle + the Wohnungsgeberbestätigung
-  form-cloze, grants `ki_wohnungsgeberbestaetigung`, sets up the boss's document chain).
-- **Schema:** two small contained additions across the session, a `terminal` setting (airport/station) and a
-  `laden` setting (shop), plus an optional per-scene `label` caption override, all mirrored in
-  `lint-content.mjs` + threaded through the renderers. Missions themselves stay pure data. Added NPCs
-  `npc_beamter`/`npc_automat`/`npc_milo`/`npc_kassiererin`/`npc_herr_brandt`, key items
-  `ki_reisepass`/`ki_fahrschein`/`ki_sim_vertrag`, 5 provenance rows (draft).
-- **1.1–1.5 chain** via `requiresMissions` (1.2→1.3→1.4→1.5). The **boss (1.6) is deliberately left
-  ungated** so the founder can jump straight to it for playtesting (a `tests/mission.test.ts` fixture pins
-  this; do not gate the boss). Every mission has a scaffolded-retry lose path (failure-as-content, no lockout).
-- **Gates green:** `lint:content` (6 missions / 35 scenes / 11 NPCs / 7 key items / 1426 rows), `build`,
-  `check:bundle` (83 kB, game stays lazy), `test:unit` (85), `lint` (0 errors).
-
-**G2 next rungs (not yet built):** the **FSRS-driven recurring-mission composer** (the scheduler brings a
-mission variant back when its vocab is due) and the **failure-as-fetch-quest loop** (a missing key item spawns
-its acquisition mission). _(Superseded in s82: the founder re-sequenced G2 to build scene variety first;
-see the session-82 handoff above for the new order.)_ (The `terminal`/`laden` backdrops that were blank are now filled with code-authored
-placeholder art in s82, PR #368; licensed pixel-art packs remain the eventual upgrade.) **Prerequisite for
-cloud-syncing game state:** the Supabase migration adding
-`missions_done`/`key_items` columns (an unknown column fails the whole `progress` upsert; game state is
-local-only until then). **Playtest gate is now reachable** (Kapitel 1 is complete): 5–10 real learners play
-the chapter, and completion/return/"did they laugh" decides whether G3 (walkable city) proceeds. Founder
-still verifies live and reviews the draft German.
-
 ---
 
-_Older handoffs (sessions 1–80) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–80 are in the W28 file)._
+_Older handoffs (sessions 1–81) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–81 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)
@@ -273,7 +264,7 @@ _Older handoffs (sessions 1–80) are archived by ISO week under `docs/archive/s
 - Can-Do milestones: **37** (all 15 themes; workplace/behoerde founder-verified, daily-life packs draft)
 - Lese-/Hörtexte: **22** texts / **66** comprehension checks (+2 each for Arzt/Wohnen/Bank/Bildung in s75; +1 each in s80 covering a new sub-theme per daily-life theme)
 - Themes: **15** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank` + `bildung`; all six domains now populated)
-- Game missions (Neuland): **6** = complete Kapitel 1 (1.1 Willkommen, 1.2 Fahrkarten-Automat, 1.3 SIM-Karte, 1.4 erster Einkauf, 1.5 Dach über dem Kopf, 1.6 Anmeldung boss; 35 scenes) · 11 NPCs · 7 key items
+- Game missions (Neuland): **6** = complete Kapitel 1 (1.1 Willkommen, 1.2 Fahrkarten-Automat, 1.3 SIM-Karte, 1.4 erster Einkauf, 1.5 Dach über dem Kopf, 1.6 Anmeldung boss; **37 scenes**, +2 `hotspot` in s83) · 11 NPCs · 7 key items · scene kinds: cutscene/websiteParody/loadout/listening/**hotspot**/dialogueBattle/formCloze
 - Provenance rows: **1,426** (all with a `reference`; 1,401 `draft` / 25 `verified`)
 - Verification tiers (Layer C, generated `src/data/verification.ts`): **25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-attested)
 
