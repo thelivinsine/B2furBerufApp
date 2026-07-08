@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, Cpu, Globe, SkipForward } from "lucide-react";
+import { Check, ChevronRight, Cpu, Globe, SkipForward } from "lucide-react";
 import type {
   AutomatScene,
   CutsceneScene,
@@ -577,8 +577,12 @@ export function HotspotView({
       <PixelStage setting={scene.setting} label={scene.label}>
         {scene.spots.map((spot) => {
           const found = !!run.hotspotsFound[spot.id];
-          const size = spot.size ?? 14;
           const justWrong = reaction?.wrong && reaction.spotId === spot.id;
+          const labeled = !!spot.label;
+          const size = spot.size ?? 12;
+          // A labeled target reads as a tappable SIGN placed in the world (a
+          // platform sign, a shelf tag); a label-less one is a diegetic hotspot
+          // on the actual art (tap the real object), drawn as a pulsing ring.
           return (
             <motion.button
               key={spot.id}
@@ -587,30 +591,53 @@ export function HotspotView({
               disabled={found}
               aria-label={spot.label ?? `Stelle bei ${spot.x}, ${spot.y}`}
               className="absolute z-10 -translate-x-1/2 -translate-y-1/2"
-              style={{ left: `${spot.x}%`, top: `${spot.y}%`, width: `${size}%` }}
-              animate={justWrong ? { x: [0, -4, 4, -3, 0] } : undefined}
-              transition={{ duration: 0.32 }}
+              style={{ left: `${spot.x}%`, top: `${spot.y}%`, width: labeled ? undefined : `${size}%` }}
+              animate={
+                justWrong
+                  ? { x: [0, -4, 4, -3, 0] }
+                  : !found && labeled
+                    ? { y: [0, -3, 0] }
+                    : undefined
+              }
+              transition={justWrong ? { duration: 0.32 } : { repeat: Infinity, duration: 1.8 }}
             >
-              <span
-                className={cn(
-                  "flex aspect-square w-full items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
-                  found
-                    ? "border-teal-500 bg-teal-400/40 text-teal-900"
-                    : justWrong
-                      ? "border-rose-500 bg-rose-400/40 text-rose-900"
-                      : "border-white/70 bg-white/15 text-white",
-                )}
-                style={{ boxShadow: `0 0 0 2px ${GAME_OUT}44` }}
-              >
-                {spot.label ?? (found ? "✓" : "")}
-              </span>
-              {!found && !spot.label && (
-                <motion.span
-                  aria-hidden
-                  className="absolute inset-0 rounded-full border-2 border-white/60"
-                  animate={{ opacity: [0.7, 0.15, 0.7], scale: [1, 1.18, 1] }}
-                  transition={{ repeat: Infinity, duration: 1.8 }}
-                />
+              {labeled ? (
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1 whitespace-nowrap rounded-md border-2 px-3 py-1.5 text-sm font-bold shadow-[0_3px_0_rgba(70,60,68,0.35)] transition-colors",
+                    found
+                      ? "bg-teal-100 text-teal-800"
+                      : justWrong
+                        ? "bg-rose-100 text-rose-700"
+                        : "bg-[#fdfcf8] text-slate-700",
+                  )}
+                  style={{ borderColor: GAME_OUT }}
+                >
+                  {found && <Check className="h-3.5 w-3.5" />}
+                  {spot.label}
+                </span>
+              ) : (
+                <span
+                  className={cn(
+                    "flex aspect-square w-full items-center justify-center rounded-full border-2 text-xs font-bold transition-colors",
+                    found
+                      ? "border-teal-500 bg-teal-400/50 text-teal-900"
+                      : justWrong
+                        ? "border-rose-500 bg-rose-400/50 text-rose-900"
+                        : "border-white/80 bg-white/20 text-white",
+                  )}
+                  style={{ boxShadow: `0 0 0 2px ${GAME_OUT}44` }}
+                >
+                  {found ? "✓" : ""}
+                  {!found && (
+                    <motion.span
+                      aria-hidden
+                      className="absolute inset-0 rounded-full border-2 border-white/70"
+                      animate={{ opacity: [0.7, 0.15, 0.7], scale: [1, 1.18, 1] }}
+                      transition={{ repeat: Infinity, duration: 1.8 }}
+                    />
+                  )}
+                </span>
               )}
             </motion.button>
           );

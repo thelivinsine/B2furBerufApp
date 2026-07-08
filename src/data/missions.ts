@@ -387,9 +387,8 @@ export const missions: Mission[] = [
         spots: [
           {
             id: "g3",
-            x: 26,
-            y: 34,
-            size: 20,
+            x: 22,
+            y: 60,
             label: "Gleis 3",
             feedback: {
               de: "Gleis 3: das ist der Zug nach Altstadt. Nicht deiner.",
@@ -398,9 +397,8 @@ export const missions: Mission[] = [
           },
           {
             id: "g4",
-            x: 52,
-            y: 48,
-            size: 20,
+            x: 50,
+            y: 66,
             label: "Gleis 4",
             correct: true,
             feedback: {
@@ -411,8 +409,7 @@ export const missions: Mission[] = [
           {
             id: "g10",
             x: 78,
-            y: 62,
-            size: 20,
+            y: 60,
             label: "Gleis 10",
             feedback: {
               de: "Gleis 10 fährt zum Flughafen. Da kommst du gerade her.",
@@ -1101,9 +1098,8 @@ export const missions: Mission[] = [
         spots: [
           {
             id: "milch",
-            x: 18,
-            y: 32,
-            size: 16,
+            x: 22,
+            y: 34,
             label: "Milch",
             correct: true,
             feedback: { de: "Milch, abgehakt.", en: "Milk, checked off." },
@@ -1111,26 +1107,23 @@ export const missions: Mission[] = [
           {
             id: "brot",
             x: 50,
-            y: 30,
-            size: 16,
+            y: 32,
             label: "Brot",
             correct: true,
             feedback: { de: "Brot, abgehakt.", en: "Bread, checked off." },
           },
           {
             id: "aepfel",
-            x: 80,
-            y: 58,
-            size: 16,
+            x: 78,
+            y: 34,
             label: "Äpfel",
             correct: true,
             feedback: { de: "Äpfel, abgehakt. Der Zettel ist leer.", en: "Apples, checked off. The list is empty." },
           },
           {
             id: "chips",
-            x: 30,
-            y: 62,
-            size: 16,
+            x: 33,
+            y: 64,
             label: "Chips",
             feedback: {
               de: "Chips stehen nicht auf dem Zettel. Jonas sieht alles.",
@@ -1139,9 +1132,8 @@ export const missions: Mission[] = [
           },
           {
             id: "cola",
-            x: 66,
-            y: 60,
-            size: 16,
+            x: 65,
+            y: 64,
             label: "Cola",
             feedback: {
               de: "Cola? Später. Erst der Zettel.",
