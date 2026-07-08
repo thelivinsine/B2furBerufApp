@@ -38,6 +38,10 @@ PLANK_A = (227, 203, 165)
 PLANK_B = (221, 196, 158)
 PLANK_LINE = (205, 180, 142)
 PLANK_JOINT = (208, 184, 146)
+# polished public-floor tile (transit hall / shop), cooler than the wood
+TILE_A = (210, 214, 220)
+TILE_B = (218, 222, 228)
+TILE_LINE = (194, 198, 206)
 
 SCHMIDT_CMAP = {'k': OUT, 'h': (200, 202, 210), 's': SKIN, 'w': (250, 250, 248),
                 't': (219, 166, 77), 'p': (100, 106, 128), 'b': (64, 64, 74),
@@ -193,6 +197,20 @@ def wall_and_wood(img, wall_h=64):
         off = (py // 9 % 3) * 34
         for jx in range(off, W, 80):
             rect(img, jx, py + 1, 1, 8, PLANK_JOINT)
+
+def wall_and_tile(img, wall_h=64):
+    """Public-space variant of wall_and_wood: polished tile floor + grid, the
+    right read for a transit hall or a shop (wood floors read domestic)."""
+    rect(img, 0, 0, W, wall_h, WALL)
+    rect(img, 0, wall_h, W, 6, BASE)
+    hline(img, 0, wall_h, W, WALL_LINE)
+    hline(img, 0, wall_h + 5, W, BASE_LINE)
+    for i, py in enumerate(range(wall_h + 6, H, 12)):
+        shade = TILE_A if i % 2 == 0 else TILE_B
+        rect(img, 0, py, W, 12, shade)
+        hline(img, 0, py, W, TILE_LINE)
+    for col in range(0, W + 1, 30):
+        rect(img, col, wall_h + 6, 1, H - (wall_h + 6), TILE_LINE)
 
 def window(img, x=16, y=8, w=52, h=38):
     rect(img, x, y, w, h, BASE)
@@ -356,6 +374,105 @@ def backdrop_strasse():
     rect(img, 220, 90, 2, 8, (110, 114, 132))
     return img
 
+def backdrop_terminal():
+    """Transit hall: a split-flap board, a passport/service counter, and a
+    self-service ticket machine. Serves every `terminal` scene (airport
+    arrival, Passkontrolle battle, Bahnhof, ticket machine, Tram). The counter
+    sits under the battle's opponent spot; the player's shadow holds the
+    bottom-left band (battle composition s74)."""
+    img = Image.new('RGB', (W, H), WALL)
+    wall_and_tile(img)
+    # split-flap departure / info board, upper center
+    bx, by, bw, bh = 78, 8, 104, 32
+    rect(img, bx, by, bw, bh, (52, 56, 72))
+    rect(img, bx + 2, by + 2, bw - 4, bh - 4, (34, 38, 50))
+    rect(img, bx + 2, by + 2, bw - 4, 5, (70, 76, 96))          # header strip
+    row_cols = [(219, 166, 77), (120, 200, 150), (150, 170, 220)]
+    for i, ry in enumerate(range(by + 11, by + bh - 4, 7)):
+        rect(img, bx + 6, ry, 20, 3, (120, 126, 150))          # time
+        rect(img, bx + 30, ry, 46, 3, row_cols[i % 3])         # destination
+        rect(img, bx + bw - 24, ry, 16, 3, (206, 210, 220))    # gate
+    # hanging indigo direction sign, left wall
+    rect(img, 32, 6, 2, 6, (120, 126, 148))                    # hanger
+    rect(img, 14, 12, 40, 14, INDIGO)
+    rect(img, 16, 14, 30, 10, (120, 126, 220))
+    for i in range(5):                                          # arrow ›
+        rect(img, 40 + i, 18 - i, 1, 1 + i * 2, (245, 245, 250))
+    # service / passport counter, center (officer stands behind it in battle)
+    dim_ellipse(img, 128, 74, 194, 82, 0.93)
+    rect(img, 132, 54, 58, 20, (222, 216, 206))                # counter body
+    hline(img, 132, 73, 58, (196, 190, 180))
+    rect(img, 130, 48, 62, 6, (244, 242, 236))                 # counter top
+    hline(img, 130, 53, 62, (214, 210, 202))
+    rect(img, 138, 30, 20, 18, (176, 200, 216))                # booth glass
+    rect(img, 140, 32, 16, 14, (150, 180, 200))
+    rect(img, 166, 40, 12, 8, (44, 48, 62))                    # small monitor
+    rect(img, 168, 42, 8, 4, (98, 130, 170))
+    # self-service ticket machine, right
+    tm = 200
+    dim_ellipse(img, tm - 2, 128, tm + 30, 136, 0.93)
+    rect(img, tm, 44, 30, 88, (150, 156, 176))
+    hline(img, tm, 44, 30, (120, 126, 148))
+    rect(img, tm + 2, 46, 26, 84, (168, 174, 194))
+    rect(img, tm + 5, 50, 20, 20, (44, 48, 62))                # screen
+    rect(img, tm + 7, 52, 16, 16, (98, 130, 170))
+    hline(img, tm + 9, 56, 12, (150, 180, 210))
+    hline(img, tm + 9, 62, 8, (150, 180, 210))
+    rect(img, tm + 5, 74, 20, 6, INDIGO)                       # accent panel
+    rect(img, tm + 7, 86, 16, 3, (60, 64, 80))                 # ticket slot
+    rect(img, tm + 18, 96, 6, 6, (219, 166, 77))              # card reader
+    floor_plant(img, 8, 100)
+    dim_ellipse(img, 38, 134, 66, 142)                         # player spot
+    return img
+
+def gondola(img, x, y=40, h=76, rows=4):
+    """A shop shelf unit stacked with colorful product blocks."""
+    w = 34
+    rect(img, x, y, w, h, (206, 178, 140))
+    hline(img, x, y, w, (178, 150, 112))
+    shelf_cols = [
+        [(120, 126, 190), (219, 166, 77), (100, 150, 134), (200, 120, 120)],
+        [(100, 150, 134), (150, 120, 180), (219, 166, 77), (120, 126, 190)],
+        [(219, 166, 77), (120, 170, 200), (200, 120, 120), (100, 150, 134)],
+        [(160, 120, 130), (120, 126, 190), (219, 166, 77), (140, 180, 140)],
+    ]
+    gap = h // rows
+    for r in range(rows):
+        ry = y + 4 + r * gap
+        hline(img, x, ry + gap - 5, w, (178, 150, 112))        # shelf board
+        for i, c in enumerate(shelf_cols[r % len(shelf_cols)]):
+            rect(img, x + 3 + i * 8, ry, 6, gap - 7, c)
+
+def backdrop_laden():
+    """Shop interior: product shelves along the back wall + a checkout counter
+    with register and card terminal. Serves the `laden` scenes (Handyladen,
+    Supermarkt); the clerk stands behind the counter in the battle scenes."""
+    img = Image.new('RGB', (W, H), WALL)
+    wall_and_tile(img)
+    gondola(img, 6)
+    gondola(img, 44)
+    # aisle sign + sale poster
+    rect(img, 92, 10, 30, 12, INDIGO)
+    rect(img, 94, 12, 26, 8, (120, 126, 220))
+    rect(img, 210, 14, 24, 24, (244, 242, 236))
+    rect(img, 214, 18, 16, 8, (219, 100, 90))
+    hline(img, 214, 30, 16, (200, 196, 188))
+    # checkout counter, center-right (clerk stands behind it in battle)
+    dim_ellipse(img, 126, 96, 198, 104, 0.93)
+    rect(img, 132, 70, 58, 26, (198, 174, 138))                # counter body
+    hline(img, 132, 95, 58, (172, 148, 112))
+    rect(img, 130, 62, 62, 8, (244, 242, 236))                 # counter top
+    hline(img, 130, 69, 62, (214, 210, 202))
+    rect(img, 138, 50, 18, 12, (120, 126, 148))                # register
+    rect(img, 140, 52, 14, 8, (52, 56, 72))
+    hline(img, 141, 55, 10, (150, 180, 210))
+    rect(img, 168, 54, 8, 8, (100, 106, 128))                  # card terminal
+    rect(img, 169, 55, 6, 3, (219, 166, 77))
+    rect(img, 108, 92, 16, 10, (200, 120, 120))                # shopping basket
+    hline(img, 108, 96, 16, (170, 96, 96))
+    dim_ellipse(img, 38, 134, 66, 142)                         # player spot
+    return img
+
 # open travel bag, front view, 26x20 (loadout stage centerpiece)
 BAG = [
     "....kkkkkkkkkkkkkkkkkk....",
@@ -453,6 +570,8 @@ backdrop_amt().save(os.path.join(OUT_DIR, "amt.png"))
 backdrop_wartezimmer().save(os.path.join(OUT_DIR, "wartezimmer.png"))
 backdrop_wohnung().save(os.path.join(OUT_DIR, "wohnung.png"))
 backdrop_strasse().save(os.path.join(OUT_DIR, "strasse.png"))
+backdrop_terminal().save(os.path.join(OUT_DIR, "terminal.png"))
+backdrop_laden().save(os.path.join(OUT_DIR, "laden.png"))
 sprite_png(SCHMIDT, SCHMIDT_CMAP, "schmidt.png")
 sprite_png(PLAYER_BACK, PLAYER_CMAP, "player.png")
 sprite_png(BAG, BAG_CMAP, "bag.png")
