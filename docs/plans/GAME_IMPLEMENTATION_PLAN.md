@@ -218,7 +218,18 @@ repetitive one. **New order of the remaining G2 rungs:**
 6. Supabase migration for `missions_done`/`key_items` (game state is local-only until then)
 Nothing is cut; this is the same work re-sequenced so the playtest measures fun, not repetition.
 Activity source: `docs/strategy/MISSION_ACTIVITY_RESEARCH.md` §2 catalog + §4 adoption order (which
-already ranked hotspot/automat first)._
+already ranked hotspot/automat first).
+**Playtest-gate decision (2026-07-08, session 82, founder-decided): the EXTERNAL playtest moves to
+after the full plan is built (G2 complete + Kapitel 2–6 + the G3 walkable city).** The founder's
+playtest crowd is B2 learners; Kapitel 1 is B1.1–B1.2, so an early test would bore them on the easiest
+content and measure the wrong thing. The assistant recommended a middle path (Kapitel 2 + a
+start-at-your-level entry, city after feedback); the founder chose the full build knowingly. Risk
+management in exchange: the founder remains the internal per-chapter playtester (each chapter ships
+and is played on their phone before the next is authored), content comes before engine (all chapters
+before the Phaser city), zero-spend stays the rule, and a **chapter-select / start-at-your-level
+entry** is added to the build list so B2 testers can skip the easy opening when the test finally
+happens. The "stop and playtest with 5–10 learners" step below still happens, just at the end of G3
+instead of the end of G2._
 5–8 missions (airport, SIM card, supermarket, WG viewing, Anmeldung boss), recurring NPCs,
 key-item dependency chain, FSRS-driven recurring missions, failure-as-fetch-quest loop, pixel
 art scene stills from the licensed packs. Then **stop building and playtest with 5–10 real
@@ -227,6 +238,10 @@ ambition only gets funded with evidence: session completion, next-day return, an
 laugh" decide whether G3 proceeds or G2 iterates.
 
 ### G3: the walkable world (3–5 sessions)
+_Gating update (2026-07-08, session 82): G3 is no longer gated on an external playtest. Founder
+decision: the full plan (G2 + Kapitel 2–6 + G3) is built first, with the founder as the per-chapter
+internal tester; the 5–10-learner external playtest happens at the END of G3, before G4 scale. See
+the decision note in the G2 status block._
 Phaser overworld in a lazy chunk: one German city, tilemap districts per chapter, walk to
 buildings to enter missions, NPCs on the map. React↔Phaser bridge is a thin event interface
 (enter building → unmount map, mount mission; mission result → map state). Districts unlock per
