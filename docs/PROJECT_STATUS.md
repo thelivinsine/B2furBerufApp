@@ -1,9 +1,14 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-08 (session 82: **Neuland game visuals fix. The `terminal` and `laden` scene
-settings (16 of Chapter 1's scenes) rendered as blank paper stages, the founder reported "no game visuals".
-Authored code-authored placeholder backdrops for both (transit hall + shop) in `welt_assets.py`, wired
-into `SETTING_ART`. Shipped PR #368.** Prior, session 81: **G2 kicked off, founder gave the go. Authored
+_Last updated: 2026-07-08 (session 82: **Neuland game-visuals fix + two G2 direction decisions.** The
+blank `terminal`/`laden` stages (16 of Kapitel 1's scenes) got code-authored placeholder backdrops,
+transit hall + shop in `welt_assets.py`, wired into `SETTING_ART` (PR #368). The founder then
+**re-sequenced G2, scene variety before plumbing** (hotspot layer → Keypad/Automat kind + 1.2 re-skin →
+type-under-timer, then composer/fetch-quest/Supabase migration; PR #370) and **moved the external
+playtest to the END of the full build** (G2 + Kapitel 2–6 + G3 city; the playtest crowd is B2 learners
+and Kapitel 1 is B1.1–B1.2; founder stays the per-chapter internal tester; a chapter-select entry joined
+the build list; PR #371). The plan's model map now covers the new work (PR #372).
+Prior, session 81: **G2 kicked off, founder gave the go. Authored
 the rest of Neuland Kapitel 1 (missions 1.1–1.5); Chapter 1 now complete end-to-end (6 missions, 1.1→1.6 boss).**
 Earlier, session 80: **top-value tasks + daily-life depth + SEO, 4 PRs to `main`**.
 **#360** closed EU AI Act #21 (documented Art. 6(3) risk assessment `docs/strategy/AI_ACT_RISK_ASSESSMENT.md`;

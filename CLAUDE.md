@@ -81,7 +81,15 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
 - `types/index.ts` — shared types; `types/game.ts` — the Neuland Mission/Scene schema (game G1, s73)
 - `router.tsx`, `App.tsx`, `main.tsx`
 
-## Neuland game layer (G1 shipped s73; **G2 GO s81, Kapitel 1 complete**; plan: `docs/plans/GAME_IMPLEMENTATION_PLAN.md`)
+## Neuland game layer (G1 shipped s73; **G2 in progress, Kapitel 1 complete**; plan: `docs/plans/GAME_IMPLEMENTATION_PLAN.md`)
+**G2 direction (founder, s82):** (1) **scene variety before plumbing**, the next build rungs are the
+hotspot tappable-stage layer → Keypad/Automat scene kind (re-skinning mission 1.2 off the dialogueBattle)
+→ type-under-timer, THEN the composer / fetch-quest loop / Supabase game-state migration. Reason: all 6
+Kapitel-1 missions center on one dialogueBattle, so the Geduld/Mut bars repeat and the boss stops feeling
+special. (2) **The external 5–10-learner playtest moves to the END of the full build** (G2 + Kapitel 2–6 +
+the G3 city), because the playtest crowd is B2 learners and Kapitel 1 is B1.1–B1.2; the founder is the
+per-chapter internal tester until then, and a chapter-select / start-at-your-level entry is on the build
+list. Full rationale + per-task model map in the plan's G2 status block.
 - The life-story RPG ships INSIDE Genauly as the lazy **`/welt`** route (Beta; entry card on the
   Anwenden hub). **Chapter 1 "Ankommen" is complete (s81): 6 missions 1.1→1.6** (Willkommen,
   Fahrkarten-Automat, SIM-Karte, erster Einkauf, Dach über dem Kopf, Anmeldung boss), chained
