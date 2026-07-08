@@ -1901,3 +1901,22 @@ Branch: `claude/whats-next-esga9u`.
   `GAME_IMPLEMENTATION_PLAN.md` (G2 status block) and the s82 handoff in `PROJECT_STATUS.md`.
 - **Artifacts:** `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 234). Doc-only; shipped via PR → squash-merge → branch realign.
+
+## Entry 235 — 2026-07-08 (session 82)
+- **Branch:** `claude/missing-game-visuals-qcmde6`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > I'd like to complete the implementation of the game plan before showing it to a crowd because the crowd I'll be sharing with are b2 learners. if they don't have enough content to play with they'll be bored with the easy stuff in the beginning.
+- **Response summary:** Validated the concern with data (all Kapitel-1 missions are B1.1–B1.2, too easy
+  for a B2 crowd) and sized the options: the assistant recommended a middle path (G2 variety + Kapitel 2
+  + a start-at-your-level entry, city after external feedback), and offered "through Kapitel 3" and "full
+  plan incl. city" as alternatives. **The founder chose the full plan: complete G2 + author Kapitel 2–6 +
+  build the G3 walkable city before the external 5–10-learner playtest.** Risk management agreed: founder
+  remains the internal per-chapter tester, content before engine, zero-spend holds, and a chapter-select /
+  start-at-your-level entry joins the build list so B2 testers can skip the easy opening. Recorded in
+  `GAME_IMPLEMENTATION_PLAN.md` (G2 status block + a G3 gating note: G3 no longer playtest-gated; the
+  external test moves to the end of G3) and the s82 handoff in `PROJECT_STATUS.md` (long-road order:
+  G2 variety rungs → Kapitel 2–6 → plumbing interleaved → chapter-select → G3 city → external playtest).
+- **Artifacts:** `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 235). Doc-only; shipped via PR → squash-merge → branch realign.

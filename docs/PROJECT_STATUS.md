@@ -205,6 +205,17 @@ the interim left those stages blank rather than placeholder-filled.
   migration.** Nothing cut, same total work. Full rationale + catalog references recorded in
   `GAME_IMPLEMENTATION_PLAN.md` (G2 status block). **Next session starts at rung 1** (plan-first; the
   activity specs are in `MISSION_ACTIVITY_RESEARCH.md` §2).
+- **Founder decision, playtest gate moved to the END of the full build:** the founder's playtest crowd is
+  B2 learners, and Kapitel 1 is B1.1–B1.2; an early external test would bore them on the easiest content.
+  Decision (assistant recommended a middle path, founder chose the full build knowingly): **complete G2 +
+  author Kapitel 2–6 + build the G3 walkable city BEFORE the 5–10-learner external playtest.** Risk
+  management: founder stays the internal per-chapter tester (each chapter played on their phone before the
+  next is authored), content before engine (all chapters before the Phaser city), zero-spend rule holds,
+  and a **chapter-select / start-at-your-level entry** joins the build list so B2 testers can skip the easy
+  opening. Both decisions recorded in `GAME_IMPLEMENTATION_PLAN.md` (G2 status block + G3 gating note).
+  **The long road, in order:** G2 variety rungs 1–3 → Kapitel 2 (Wohnen) → Kapitel 3–6 (each
+  founder-tested) → G2 plumbing (composer, fetch-quest, Supabase migration) interleaved as needed →
+  chapter-select entry → G3 city → external B2 playtest.
 
 **Handoff after session 81 (2026-07-08). G2 kicked off: founder greenlit the game build (zero-spend,
 incremental, playtest-first), and Neuland Kapitel 1 is now COMPLETE end-to-end.** After a Q&A on the game
