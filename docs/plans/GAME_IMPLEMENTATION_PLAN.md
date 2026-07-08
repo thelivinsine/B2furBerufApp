@@ -220,7 +220,12 @@ repetitive one. **New order of the remaining G2 rungs:**
    in the pixel-UI language, linter + 6 runner tests. Used in 1.1 (listen-and-act departure board) and
    1.4 (shelf search), so the variety is visible in the two earliest-played missions.
 2. **Keypad/Automat scene kind** (catalog #8), then **re-skin mission 1.2** (ticket machine becomes a
-   real machine, not a battle) and the 1.4 Leergutautomat beat
+   real machine, not a battle) and the 1.4 Leergutautomat beat — **SHIPPED s83, PR #375.** `automat`
+   scene kind added to the closed union (`types/game.ts`: `AutomatKey`/`AutomatStep`/`AutomatScene`), pure
+   `pressKey`/`currentAutomatStep`/`automatDone` transitions in `engine/mission.ts` (per-step first-try
+   FSRS grading, `AutomatRuntime` on the run), `AutomatView` renderer (device plate + LCD screen +
+   keypad), linter step-graph checks + 6 runner tests. Re-skinned 1.2 (ticket machine) and the 1.4
+   Leergut beat off the dialogueBattle: one fewer battle, so the boss stands out.
 3. **Type-under-timer** (catalog #9) for the 1.4 checkout
 4. FSRS-driven recurring-mission composer
 5. Failure-as-fetch-quest loop
