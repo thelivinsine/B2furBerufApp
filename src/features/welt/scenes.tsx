@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight, Globe, SkipForward } from "lucide-react";
+import { ChevronRight, Cpu, Globe, SkipForward } from "lucide-react";
 import type {
+  AutomatScene,
   CutsceneScene,
   FormClozeScene,
   HotspotScene,
@@ -11,7 +12,7 @@ import type {
   SceneChoice,
   WebsiteParodyScene,
 } from "@/types/game";
-import { chooseChoice, completeScene, attemptSlot, finishLoadout, recordCheck, recordField, tapHotspot, hotspotSolved, type MissionRun } from "@/engine/mission";
+import { chooseChoice, completeScene, attemptSlot, finishLoadout, recordCheck, recordField, tapHotspot, hotspotSolved, pressKey, currentAutomatStep, automatDone, type MissionRun } from "@/engine/mission";
 import { gradeTyped, type TypedVerdict } from "@/engine/typing";
 import { ttsSupported } from "@/engine/speech";
 import { vocabById } from "@/data/vocabulary";
@@ -649,6 +650,107 @@ export function HotspotView({
             <p className="text-xs text-slate-400">Tippe die richtige Stelle im Bild an.</p>
           )}
         </SheetCard>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- automat (keypad machine) ---------------- */
+
+/**
+ * Press-the-buttons machine (activity catalog #8; G2 variety rung 2). Renders
+ * the current step as a device screen + a keypad; a correct key advances the
+ * machine, a wrong key only buzzes (no bars, no lockout). The runner owns
+ * step progression + FSRS grading, so this view reads `currentAutomatStep` and
+ * routes on `automatDone`.
+ */
+export function AutomatView({
+  scene,
+  run,
+  act,
+  translate,
+}: SceneViewProps & { scene: AutomatScene; run: MissionRun }) {
+  const step = currentAutomatStep(run);
+  const done = automatDone(run);
+  const last = run.automat?.last;
+  // Buzz only belongs to the step it happened on; a fresh step clears it.
+  const buzz = last?.wrong && step && run.automat && run.automat.misses[step.id];
+
+  return (
+    <div className="space-y-4">
+      <PixelStage setting={scene.setting} label={scene.label} />
+
+      <div className="px-3">
+        {/* the machine body */}
+        <GameCard className="space-y-3 p-4">
+          <div className="flex items-center justify-between">
+            <span
+              className="inline-flex items-center gap-1.5 border-2 bg-[#5b5be6] px-2 py-0.5 text-xs font-bold text-white"
+              style={{ borderColor: GAME_OUT, borderRadius: 4 }}
+            >
+              <Cpu className="h-3.5 w-3.5" />
+              <GameText de={scene.device.de} en={scene.device.en} translate={translate} />
+            </span>
+          </div>
+
+          {/* the display screen */}
+          <div
+            className="space-y-1 border-2 px-3 py-3"
+            style={{ borderColor: GAME_OUT, borderRadius: 6, backgroundColor: "#1c2b22" }}
+          >
+            <p className="font-mono text-sm font-bold uppercase leading-snug tracking-wide text-emerald-300">
+              {step && <GameText de={step.screen.de} en={step.screen.en} translate={translate} />}
+            </p>
+            {step?.hint && (
+              <p className="font-mono text-[11px] leading-snug text-emerald-400/70">
+                <GameText de={step.hint.de} en={step.hint.en} translate={translate} />
+              </p>
+            )}
+          </div>
+
+          {buzz && last?.feedback && (
+            <motion.p
+              key={last.keyId + String(run.automat?.misses[step!.id])}
+              initial={{ x: 0 }}
+              animate={{ x: [0, -4, 4, -3, 0] }}
+              transition={{ duration: 0.32 }}
+              className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-600"
+            >
+              <GameText de={last.feedback.de} en={last.feedback.en} translate={translate} />
+            </motion.p>
+          )}
+          {!buzz && last && !last.wrong && last.feedback && !done && (
+            <p className="rounded-md bg-teal-50 px-3 py-2 text-sm text-teal-700">
+              <GameText de={last.feedback.de} en={last.feedback.en} translate={translate} />
+            </p>
+          )}
+
+          {/* the keypad */}
+          {step && !done ? (
+            <div className="grid grid-cols-2 gap-2">
+              {step.keys.map((key) => (
+                <Pill
+                  key={key.id}
+                  onClick={() => act((r) => pressKey(r, key.id))}
+                  className="w-full py-3 font-semibold"
+                >
+                  {key.label}
+                </Pill>
+              ))}
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-2 border-t-2 border-dashed border-[#463c44]/20 pt-3">
+              {last?.feedback && (
+                <p className="flex-1 text-sm text-teal-700">
+                  <GameText de={last.feedback.de} en={last.feedback.en} translate={translate} />
+                </p>
+              )}
+              <Pill primary onClick={() => act(completeScene)} className="shrink-0">
+                Weiter <ChevronRight className="ml-1 inline h-4 w-4" />
+              </Pill>
+            </div>
+          )}
+        </GameCard>
       </div>
     </div>
   );

@@ -72,7 +72,7 @@ const TEXT_KINDS = ["letter", "email", "memo", "announcement", "voicemail"];
 /* ---- game enums (mirror of src/types/game.ts unions, game G1) ---- */
 const CHAPTER_IDS = ["kap1", "kap2", "kap3", "kap4", "kap5", "kap6"];
 const SCENE_KINDS = [
-  "cutscene", "websiteParody", "loadout", "listening", "hotspot", "dialogueBattle", "formCloze",
+  "cutscene", "websiteParody", "loadout", "listening", "hotspot", "automat", "dialogueBattle", "formCloze",
 ];
 const SCENE_SETTINGS = ["website", "wohnung", "strasse", "wartezimmer", "amt", "terminal", "laden"];
 const BATTLE_EFFECTS = ["beamtendeutsch", "missverstaendnis", "smalltalk"];
@@ -658,6 +658,58 @@ function lintMissions(missions, refs) {
             if (spot.feedback !== undefined) checkBiText(spot.feedback, ds, pw, "feedback");
           }
           if (!hasCorrect) error(ds, sw, "hotspot has no correct spot (unclearable)");
+        }
+      } else if (s.kind === "automat") {
+        checkBiText(s.device, ds, sw, "device");
+        const steps = s.steps ?? {};
+        const stepKeys = Object.keys(steps);
+        if (stepKeys.length === 0) error(ds, sw, "automat has no steps");
+        if (!stepKeys.includes(s.start)) error(ds, sw, `automat start "${s.start}" is not a step`);
+        for (const stk of stepKeys) {
+          const st = steps[stk];
+          const stw = `${sw}/${stk}`;
+          if (st.id !== stk) error(ds, stw, `step.id "${st.id}" does not match its key`);
+          checkBiText(st.screen, ds, stw, "screen");
+          if (st.hint !== undefined) checkBiText(st.hint, ds, stw, "hint");
+          if (st.done === true) {
+            if (st.next !== undefined && !stepKeys.includes(st.next))
+              error(ds, stw, `step.next "${st.next}" is not a step`);
+            continue; // terminal step: no keypad required
+          }
+          if (st.next === undefined) error(ds, stw, "non-terminal step needs a next step");
+          else if (!stepKeys.includes(st.next)) error(ds, stw, `step.next "${st.next}" is not a step`);
+          if (!Array.isArray(st.keys) || st.keys.length === 0) error(ds, stw, "step has no keys");
+          else {
+            const keyIds = new Set();
+            let hasCorrect = false;
+            for (const k of st.keys) {
+              const kw = `${stw}/${k.id ?? "?"}`;
+              if (!isStr(k.id)) error(ds, stw, "key missing id");
+              else if (keyIds.has(k.id)) error(ds, stw, `duplicate key id "${k.id}"`);
+              else keyIds.add(k.id);
+              if (!isStr(k.label)) error(ds, kw, "key label empty");
+              if (k.correct === true) hasCorrect = true;
+              if (k.vocabId !== undefined && !vocabIds.has(k.vocabId))
+                error(ds, kw, `key vocabId "${k.vocabId}" not in vocabulary`);
+              if (k.feedback !== undefined) checkBiText(k.feedback, ds, kw, "feedback");
+            }
+            if (!hasCorrect) error(ds, stw, "non-terminal step has no correct key (cannot advance)");
+          }
+        }
+        // Step reachability from start + a reachable done step.
+        if (stepKeys.includes(s.start)) {
+          const reached = new Set();
+          const stack = [s.start];
+          while (stack.length) {
+            const k = stack.pop();
+            if (reached.has(k) || !steps[k]) continue;
+            reached.add(k);
+            if (steps[k].next) stack.push(steps[k].next);
+          }
+          for (const stk of stepKeys)
+            if (!reached.has(stk)) error(ds, `${sw}/${stk}`, "orphan automat step (unreachable)");
+          if (!stepKeys.some((stk) => reached.has(stk) && steps[stk].done === true))
+            error(ds, sw, "automat has no reachable done step (never finishes)");
         }
       } else if (s.kind === "dialogueBattle") {
         if (!npcIds.has(s.npc)) error(ds, sw, `npc "${s.npc}" not in NPC registry`);

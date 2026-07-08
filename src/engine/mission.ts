@@ -1,5 +1,7 @@
 import type { Grade } from "@/types";
 import type {
+  AutomatScene,
+  AutomatStep,
   BattleNode,
   BiText,
   DialogueBattleScene,
@@ -49,6 +51,20 @@ export interface BattleLast {
   wrongItem?: string;
 }
 
+/** Presentation payload of the most recent machine key press. */
+export interface AutomatLast {
+  keyId: string;
+  wrong: boolean;
+  feedback?: BiText;
+}
+
+export interface AutomatRuntime {
+  stepId: string;
+  /** Wrong presses per step (drives the FSRS grade on the advancing key). */
+  misses: Record<string, number>;
+  last?: AutomatLast;
+}
+
 export interface BattleRuntime {
   nodeId: string;
   geduld: number;
@@ -82,6 +98,8 @@ export interface MissionRun {
   hotspotMisses: Record<string, number>;
   /** Live battle bars; present only while the current scene is a battle. */
   battle?: BattleRuntime;
+  /** Live machine state; present only while the current scene is an automat. */
+  automat?: AutomatRuntime;
   /**
    * Wörterbuch charges left this run (founder direction s74: English help is
    * a limited bag resource, not an always-on button). Spending one reveals
@@ -128,7 +146,11 @@ function initBattle(scene: DialogueBattleScene): BattleRuntime {
   };
 }
 
-/** Enter a scene: (re)initialise battle bars, collect scene-entry grants. */
+function initAutomat(scene: AutomatScene): AutomatRuntime {
+  return { stepId: scene.start, misses: {} };
+}
+
+/** Enter a scene: (re)initialise battle/machine state, collect entry grants. */
 function enterScene(run: MissionRun, sceneId: string, effects: MissionEffect[]): MissionRun {
   const scene = run.mission.scenes[sceneId];
   const grants = (scene.grantsItems ?? []).filter((id) => !run.bag.includes(id));
@@ -138,6 +160,7 @@ function enterScene(run: MissionRun, sceneId: string, effects: MissionEffect[]):
       sceneId,
       bag: grants.length ? [...run.bag, ...grants] : run.bag,
       battle: scene.kind === "dialogueBattle" ? initBattle(scene) : undefined,
+      automat: scene.kind === "automat" ? initAutomat(scene) : undefined,
     },
     effects,
   );
@@ -194,7 +217,7 @@ export function completeScene(run: MissionRun): MissionRun {
         effects.push({ type: "keyItems", itemIds: run.mission.rewardItems });
     }
     effects.push({ type: "missionComplete", missionId: run.mission.id });
-    return withEffects(run, { battle: undefined, done: true, outcome: "win" }, effects);
+    return withEffects(run, { battle: undefined, automat: undefined, done: true, outcome: "win" }, effects);
   }
   if (scene.next) return enterScene(run, scene.next, []);
   return { ...run, effects: [] };
@@ -317,6 +340,65 @@ export function hotspotSolved(run: MissionRun): boolean {
   const scene = currentScene(run);
   if (scene.kind !== "hotspot") return false;
   return scene.spots.filter((s) => s.correct).every((s) => run.hotspotsFound[s.id]);
+}
+
+/* ---------------- automat (keypad machine) ---------------- */
+
+export function currentAutomatStep(run: MissionRun): AutomatStep | undefined {
+  const scene = currentScene(run);
+  if (scene.kind !== "automat" || !run.automat) return undefined;
+  return scene.steps[run.automat.stepId];
+}
+
+/** Has the machine reached its terminal (`done`) step? */
+export function automatDone(run: MissionRun): boolean {
+  return currentAutomatStep(run)?.done === true;
+}
+
+/**
+ * Press a key on the current machine step. A wrong key only buzzes (records a
+ * miss, no effects, no advance: the machine has infinite patience, failure is
+ * content). A correct key advances to `step.next`, earns XP and grades its
+ * vocab into FSRS (Good if the step was pressed cleanly, Hard after a fumble).
+ * The terminal step routes onward via `completeScene`.
+ */
+export function pressKey(run: MissionRun, keyId: string): MissionRun {
+  const scene = currentScene(run);
+  const step = currentAutomatStep(run);
+  if (scene.kind !== "automat" || !run.automat || !step || step.done) return { ...run, effects: [] };
+  const key = step.keys.find((k) => k.id === keyId);
+  if (!key) return { ...run, effects: [] };
+  const stepId = run.automat.stepId;
+
+  if (!key.correct) {
+    return withEffects(
+      run,
+      {
+        automat: {
+          ...run.automat,
+          misses: { ...run.automat.misses, [stepId]: (run.automat.misses[stepId] ?? 0) + 1 },
+          last: { keyId, wrong: true, feedback: key.feedback },
+        },
+      },
+      [],
+    );
+  }
+
+  const firstTry = (run.automat.misses[stepId] ?? 0) === 0;
+  const effects: MissionEffect[] = [{ type: "xp", amount: firstTry ? XP.flashcard : XP.flashcardEasy }];
+  if (key.vocabId)
+    effects.push({ type: "vocabGrade", vocabId: key.vocabId, grade: firstTry ? 4 : 3 });
+  return withEffects(
+    run,
+    {
+      automat: {
+        ...run.automat,
+        stepId: step.next ?? stepId,
+        last: { keyId, wrong: false, feedback: key.feedback },
+      },
+    },
+    effects,
+  );
 }
 
 /* ---------------- battle ---------------- */

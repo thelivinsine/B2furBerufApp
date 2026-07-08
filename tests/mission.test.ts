@@ -16,6 +16,9 @@ import {
   recordField,
   tapHotspot,
   hotspotSolved,
+  pressKey,
+  currentAutomatStep,
+  automatDone,
   missionUnlocked,
   ASK_WRONG_GEDULD,
   DICT_USES_DEFAULT,
@@ -433,6 +436,103 @@ describe("mission runner: hotspot", () => {
     run = tapHotspot(run, "a");
     run = tapHotspot(run, "b");
     run = completeScene(run);
+    expect(run.done).toBe(true);
+    expect(run.outcome).toBe("win");
+  });
+});
+
+/** The automat (keypad) runner (G2 variety rung 2) over an inline fixture. */
+const automatFixture: Mission = {
+  id: "m_test_automat",
+  chapter: "kap1",
+  index: 98,
+  title: "Automat",
+  titleEn: "Machine",
+  themeId: "travel",
+  cefr: "B1.1",
+  brief: { de: "Test", en: "Test" },
+  rewardXp: 10,
+  start: "machine",
+  scenes: {
+    machine: {
+      id: "machine",
+      kind: "automat",
+      setting: "terminal",
+      next: "ende",
+      device: { de: "Automat", en: "Machine" },
+      start: "s1",
+      steps: {
+        s1: {
+          id: "s1",
+          screen: { de: "WÄHLEN", en: "SELECT" },
+          keys: [
+            { id: "ok", label: "AB", correct: true, vocabId: "voc_x", feedback: { de: "gut", en: "good" } },
+            { id: "no", label: "ABC", feedback: { de: "Buzz.", en: "Buzz." } },
+          ],
+          next: "s2",
+        },
+        s2: { id: "s2", screen: { de: "FERTIG", en: "DONE" }, keys: [], done: true },
+      },
+    },
+    ende: {
+      id: "ende",
+      kind: "cutscene",
+      setting: "terminal",
+      end: "win",
+      lines: [{ speaker: "erzaehler", de: "Fertig.", en: "Done." }],
+    },
+  },
+};
+
+describe("mission runner: automat", () => {
+  it("starts on the machine's start step, not done", () => {
+    const run = startMission(automatFixture, []);
+    expect(currentAutomatStep(run)?.id).toBe("s1");
+    expect(automatDone(run)).toBe(false);
+  });
+
+  it("buzzes on a wrong key: no effects, no advance, records a miss", () => {
+    const run = startMission(automatFixture, []);
+    const after = pressKey(run, "no");
+    expect(after.effects).toHaveLength(0);
+    expect(after.automat?.stepId).toBe("s1");
+    expect(after.automat?.misses.s1).toBe(1);
+    expect(after.automat?.last).toMatchObject({ keyId: "no", wrong: true });
+  });
+
+  it("advances on a clean correct key with Good FSRS + XP", () => {
+    const run = startMission(automatFixture, []);
+    const after = pressKey(run, "ok");
+    expect(after.automat?.stepId).toBe("s2");
+    expect(automatDone(after)).toBe(true);
+    expect(after.effects).toContainEqual({ type: "vocabGrade", vocabId: "voc_x", grade: 4 });
+    expect(after.effects).toContainEqual({ type: "xp", amount: XP.flashcard });
+  });
+
+  it("downgrades to Hard after a fumble on the step", () => {
+    let run = startMission(automatFixture, []);
+    run = pressKey(run, "no");
+    run = pressKey(run, "ok");
+    expect(run.effects).toContainEqual({ type: "vocabGrade", vocabId: "voc_x", grade: 3 });
+    expect(run.effects).toContainEqual({ type: "xp", amount: XP.flashcardEasy });
+  });
+
+  it("ignores presses on the terminal step and unknown keys", () => {
+    let run = startMission(automatFixture, []);
+    expect(pressKey(run, "ghost").effects).toHaveLength(0);
+    run = pressKey(run, "ok");
+    expect(automatDone(run)).toBe(true);
+    const after = pressKey(run, "ok");
+    expect(after.effects).toHaveLength(0);
+    expect(after.automat?.stepId).toBe("s2");
+  });
+
+  it("routes onward through completeScene once the machine is done", () => {
+    let run = startMission(automatFixture, []);
+    run = pressKey(run, "ok");
+    run = completeScene(run); // machine -> ende cutscene
+    expect(run.sceneId).toBe("ende");
+    run = completeScene(run); // ende ends the mission
     expect(run.done).toBe(true);
     expect(run.outcome).toBe("win");
   });

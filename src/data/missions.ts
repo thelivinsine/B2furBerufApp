@@ -492,217 +492,102 @@ export const missions: Mission[] = [
       },
       automat: {
         id: "automat",
-        kind: "dialogueBattle",
+        kind: "automat",
         setting: "terminal",
         label: "Der Fahrkartenautomat",
         next: "entwerten",
-        npc: "npc_automat",
-        npcCefr: "B1.1",
-        geduld: 100,
-        mut: 100,
-        mutStart: 60,
-        start: "a1",
-        onBarEmpty: "a_schlange",
-        onLose: "neustart",
-        nodes: {
-          a1: {
-            id: "a1",
-            npcLine: {
-              de: "WILLKOMMEN. BITTE WÄHLEN SIE: EINZELFAHRT ODER ZEITKARTE?",
-              en: "WELCOME. PLEASE SELECT: SINGLE JOURNEY OR SEASON TICKET?",
+        device: { de: "Fahrkartenautomat", en: "Ticket machine" },
+        start: "typ",
+        steps: {
+          typ: {
+            id: "typ",
+            screen: {
+              de: "BITTE WÄHLEN: EINZELFAHRT ODER ZEITKARTE?",
+              en: "PLEASE SELECT: SINGLE JOURNEY OR SEASON TICKET?",
             },
-            moves: [
+            keys: [
               {
-                id: "a1_einzel",
-                tag: "Wählen",
-                quality: 0.8,
+                id: "einzel",
+                label: "Einzelfahrt",
+                correct: true,
                 vocabId: "v_fahrkarte",
-                de: "Eine Einzelfahrt, bitte.",
-                en: "A single journey, please.",
-                geduld: -2,
-                mut: 6,
-                next: "a2",
+                feedback: { de: "Einzelfahrt. Genau richtig für heute.", en: "Single journey. Just right for today." },
               },
               {
-                id: "a1_hilfe",
-                tag: "Nachfragen",
-                quality: 0.6,
-                redemittelId: "r_cla1",
-                de: "Könnten Sie das näher erklären? Was ist eine Zeitkarte?",
-                en: "Could you explain that in more detail? What is a season ticket?",
-                geduld: -6,
-                mut: 2,
-                next: "a1",
+                id: "zeit",
+                label: "Zeitkarte",
                 feedback: {
-                  de: "Der Automat erklärt nichts. Er ist ein Automat.",
-                  en: "The machine explains nothing. It is a machine.",
-                },
-              },
-              {
-                id: "a1_zeit",
-                tag: "Riskant",
-                quality: 0.3,
-                de: "Eine Zeitkarte. Klingt wichtig.",
-                en: "A season ticket. Sounds important.",
-                geduld: -8,
-                mut: -4,
-                next: "a1b",
-                feedback: {
-                  de: "Die Monatskarte kostet 89 Euro. Hinter dir seufzt jemand.",
-                  en: "The monthly pass costs 89 euros. Someone behind you sighs.",
+                  de: "Die Zeitkarte kostet 89 Euro im Monat. Für eine Fahrt? Lieber nicht.",
+                  en: "The season ticket costs 89 euros a month. For one trip? Better not.",
                 },
               },
             ],
+            next: "zone",
           },
-          a1b: {
-            id: "a1b",
-            npcLine: {
-              de: "ZEITKARTE GEWÄHLT. PREIS: 89,00 EURO.",
-              en: "SEASON TICKET SELECTED. PRICE: 89.00 EUROS.",
-            },
-            moves: [
+          zone: {
+            id: "zone",
+            screen: { de: "TARIFZONE WÄHLEN", en: "SELECT FARE ZONE" },
+            hint: { de: "Jonas im Kopf: NUR Zone AB.", en: "Jonas in your head: ONLY zone AB." },
+            keys: [
               {
-                id: "a1b_zurueck",
-                tag: "Korrigieren",
-                quality: 0.7,
-                de: "Zurück. Ich meinte eine Einzelfahrt.",
-                en: "Back. I meant a single journey.",
-                geduld: -4,
-                mut: 4,
-                next: "a2",
+                id: "ab",
+                label: "AB",
+                correct: true,
+                feedback: { de: "Zone AB. Du hast Jonas zugehört.", en: "Zone AB. You listened to Jonas." },
+              },
+              {
+                id: "abc",
+                label: "ABC",
                 feedback: {
-                  de: "Der Zurück-Knopf: dein bester Freund.",
-                  en: "The back button: your best friend.",
+                  de: "ABC kostet drei Euro mehr und reicht bis zum Flughafen. Brauchst du nicht.",
+                  en: "ABC costs three euros more and reaches the airport. You do not need it.",
+                },
+              },
+              {
+                id: "a",
+                label: "A",
+                feedback: {
+                  de: "Nur Zone A reicht nicht bis in die Innenstadt.",
+                  en: "Zone A alone does not reach the city center.",
                 },
               },
             ],
+            next: "zahlen",
           },
-          a2: {
-            id: "a2",
-            npcLine: {
-              de: "TARIFZONE WÄHLEN: AB ODER ABC?",
-              en: "SELECT FARE ZONE: AB OR ABC?",
-            },
-            moves: [
+          zahlen: {
+            id: "zahlen",
+            screen: { de: "ZAHLUNG: 3,20 EURO", en: "PAYMENT: 3.20 EUROS" },
+            hint: { de: "Karte an das Feld halten oder Schein einlegen.", en: "Hold your card to the pad or insert a note." },
+            keys: [
               {
-                id: "a2_ab",
-                tag: "Zone AB",
-                crit: true,
-                cloze: "Innenstadt",
-                quality: 0.9,
-                de: "Zone AB, bitte. Die Innenstadt liegt in Zone AB.",
-                en: "Zone AB, please. The city center is in zone AB.",
-                geduld: 4,
-                mut: 10,
-                next: "a3",
-                feedback: {
-                  de: "Jonas' Stimme im Kopf: NUR Zone AB. Du hast zugehört.",
-                  en: "Jonas' voice in your head: ONLY zone AB. You listened.",
-                },
+                id: "karte",
+                label: "Karte",
+                correct: true,
+                vocabId: "v_rechnung",
+                feedback: { de: "Karte dran, Piep, fertig. Kein Kramen.", en: "Card on, beep, done. No fumbling." },
               },
               {
-                id: "a2_abc",
-                tag: "Riskant",
-                quality: 0.3,
-                de: "Zone ABC. Sicher ist sicher.",
-                en: "Zone ABC. Better safe than sorry.",
-                geduld: -8,
-                mut: -4,
-                next: "a3",
+                id: "schein",
+                label: "Schein",
+                correct: true,
                 feedback: {
-                  de: "Drei Euro zu viel bezahlt. Der Automat schweigt zufrieden.",
-                  en: "Three euros overpaid. The machine stays contentedly silent.",
-                },
-              },
-              {
-                id: "a2_karte",
-                tag: "Zeit gewinnen",
-                quality: 0.4,
-                de: "Moment, ich schaue kurz auf die Zonenkarte.",
-                en: "One moment, let me check the zone map.",
-                geduld: -8,
-                mut: 0,
-                next: "a2",
-                feedback: {
-                  de: "Die Zonenkarte sieht aus wie eine Dartscheibe. Hinter dir hustet jemand.",
-                  en: "The zone map looks like a dartboard. Someone behind you coughs.",
+                  de: "Du streichst den Schein glatt. Beim vierten Versuch nimmt er ihn. Ein kleines Wunder.",
+                  en: "You smooth the note flat. On the fourth try it accepts. A small miracle.",
                 },
               },
             ],
+            next: "fertig",
           },
-          a3: {
-            id: "a3",
-            npcLine: {
-              de: "ZAHLUNG: BITTE SCHEIN GLATT EINLEGEN.",
-              en: "PAYMENT: PLEASE INSERT NOTE FLAT.",
+          fertig: {
+            id: "fertig",
+            screen: {
+              de: "FAHRKARTE WIRD GEDRUCKT. BITTE ENTNEHMEN.",
+              en: "TICKET PRINTING. PLEASE TAKE IT.",
             },
-            moves: [
-              {
-                id: "a3_glatt",
-                tag: "Geduld",
-                quality: 0.8,
-                de: "Du streichst den Schein glatt. Ganz glatt. Noch glatter.",
-                en: "You smooth the note. Completely flat. Even flatter.",
-                geduld: -2,
-                mut: 6,
-                next: "a4",
-                feedback: {
-                  de: "Beim vierten Versuch nimmt er ihn. Ein kleines Wunder.",
-                  en: "On the fourth try it accepts. A small miracle.",
-                },
-              },
-              {
-                id: "a3_knuellen",
-                tag: "Riskant",
-                quality: 0.2,
-                de: "Du schiebst den Schein einfach so rein.",
-                en: "You just shove the note in as it is.",
-                geduld: -12,
-                mut: -8,
-                next: "a3",
-                feedback: {
-                  de: "SCHEIN NICHT LESBAR. Die Schlange hinter dir wächst.",
-                  en: "NOTE NOT READABLE. The queue behind you grows.",
-                },
-              },
-            ],
-          },
-          a4: {
-            id: "a4",
-            npcLine: {
-              de: "FAHRKARTE WIRD GEDRUCKT. BITTE ENTNEHMEN SIE IHR TICKET.",
-              en: "TICKET PRINTING. PLEASE TAKE YOUR TICKET.",
-            },
-            outcome: "win",
-          },
-          a_schlange: {
-            id: "a_schlange",
-            npcLine: {
-              de: "Der Mann hinter dir räuspert sich sehr deutlich. Du lässt ihn vor.",
-              en: "The man behind you clears his throat very audibly. You let him go first.",
-            },
-            outcome: "lose",
+            keys: [],
+            done: true,
           },
         },
-      },
-      neustart: {
-        id: "neustart",
-        kind: "cutscene",
-        setting: "terminal",
-        label: "Hauptbahnhof",
-        next: "automat",
-        lines: [
-          {
-            speaker: "npc_jonas",
-            de: "Alles gut. Der Automat hat schon stärkere Nerven gebrochen. Nochmal, ich sage dir die Zone vor.",
-            en: "All good. That machine has broken stronger nerves. Again, I will prompt you the zone.",
-          },
-          {
-            speaker: "du",
-            de: "Zone AB. Einzelfahrt. Schein glatt. Ich bin bereit.",
-            en: "Zone AB. Single journey. Note flat. I am ready.",
-          },
-        ],
       },
       entwerten: {
         id: "entwerten",
@@ -1127,66 +1012,80 @@ export const missions: Mission[] = [
       },
       pfand: {
         id: "pfand",
-        kind: "websiteParody",
-        setting: "website",
-        url: "leergut · rückgabeautomat",
-        heading: "LEERGUTRÜCKGABE",
-        headingEn: "BOTTLE RETURN",
-        lines: [
-          {
-            de: "Mehrwegflasche erkannt: 0,08 € pro Flasche.",
-            en: "Reusable bottle detected: 0.08 € per bottle.",
-          },
-          {
-            de: "Einwegflasche erkannt: 0,25 € pro Flasche.",
-            en: "Single-use bottle detected: 0.25 € per bottle.",
-          },
-          {
-            de: "Summe: 2,75 €. Bitte Bon entnehmen.",
-            en: "Total: 2.75 €. Please take the receipt.",
-          },
-        ],
-        notice: {
-          de: "Kein Bon, kein Geld. Der Bon gilt an der Kasse.",
-          en: "No receipt, no money. The receipt counts at the checkout.",
-        },
-        choices: [
-          {
-            id: "pf_bon",
-            de: "Pfandbon nehmen",
-            en: "Take the deposit receipt",
-            next: "regal",
-            feedback: {
-              de: "2,75 € gerettet. Herr Nguyen wäre stolz.",
-              en: "2.75 € saved. Herr Nguyen would be proud.",
-            },
-          },
-          {
-            id: "pf_weg",
-            de: "Ohne Bon weitergehen",
-            en: "Walk on without the receipt",
-            next: "vergessen",
-          },
-        ],
-      },
-      vergessen: {
-        id: "vergessen",
-        kind: "cutscene",
+        kind: "automat",
         setting: "laden",
-        label: "Supermarkt",
+        label: "Supermarkt · Leergutrückgabe",
         next: "regal",
-        lines: [
-          {
-            speaker: "erzaehler",
-            de: "Der Bon bleibt im Automaten. 2,75 € für den nächsten Menschen. Sehr großzügig.",
-            en: "The receipt stays in the machine. 2.75 € for the next person. Very generous.",
+        device: { de: "Leergutautomat", en: "Bottle return machine" },
+        start: "flasche1",
+        steps: {
+          flasche1: {
+            id: "flasche1",
+            screen: { de: "LEERGUT EINLEGEN", en: "INSERT EMPTIES" },
+            hint: { de: "Nur Pfandflaschen werden angenommen.", en: "Only deposit bottles are accepted." },
+            keys: [
+              {
+                id: "mehrweg",
+                label: "Mehrwegflasche",
+                correct: true,
+                feedback: { de: "Klonk. 0,08 € gutgeschrieben.", en: "Clonk. 0.08 € credited." },
+              },
+              {
+                id: "becher",
+                label: "Kaffeebecher",
+                feedback: {
+                  de: "FEHLER: Auf Pappbecher gibt es kein Pfand.",
+                  en: "ERROR: No deposit on paper cups.",
+                },
+              },
+            ],
+            next: "flasche2",
           },
-          {
-            speaker: "du",
-            de: "Beim nächsten Mal nehme ich den Bon. Versprochen.",
-            en: "Next time I will take the receipt. Promised.",
+          flasche2: {
+            id: "flasche2",
+            screen: { de: "NÄCHSTES LEERGUT", en: "NEXT EMPTY" },
+            keys: [
+              {
+                id: "einweg",
+                label: "Einwegflasche (PET)",
+                correct: true,
+                feedback: {
+                  de: "Klonk. 0,25 € gutgeschrieben. Summe: 2,75 €.",
+                  en: "Clonk. 0.25 € credited. Total: 2.75 €.",
+                },
+              },
+              {
+                id: "wein",
+                label: "Weinflasche",
+                feedback: {
+                  de: "FEHLER: Auf diese Flasche gibt es kein Pfand.",
+                  en: "ERROR: No deposit on this bottle.",
+                },
+              },
+            ],
+            next: "bon",
           },
-        ],
+          bon: {
+            id: "bon",
+            screen: { de: "GUTHABEN: 2,75 €. BON DRUCKEN?", en: "CREDIT: 2.75 €. PRINT RECEIPT?" },
+            hint: { de: "Kein Bon, kein Geld. Der Bon gilt an der Kasse.", en: "No receipt, no money. The receipt counts at the checkout." },
+            keys: [
+              {
+                id: "drucken",
+                label: "BON drucken",
+                correct: true,
+                feedback: { de: "2,75 € gerettet. Herr Nguyen wäre stolz.", en: "2.75 € saved. Herr Nguyen would be proud." },
+              },
+            ],
+            next: "raus",
+          },
+          raus: {
+            id: "raus",
+            screen: { de: "BITTE BON ENTNEHMEN. DANKE.", en: "PLEASE TAKE RECEIPT. THANK YOU." },
+            keys: [],
+            done: true,
+          },
+        },
       },
       regal: {
         id: "regal",

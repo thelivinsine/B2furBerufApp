@@ -1979,3 +1979,27 @@ Branch: `claude/whats-next-esga9u`.
   `tests/mission.test.ts`; docs `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/archive/PROJECT_STATUS_ARCHIVE.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 238). PR #374 → squash-merge → branch realign.
+
+## Entry 239 — 2026-07-08 (session 83)
+- **Branch:** `claude/g2-variety-work-0t6c9a`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > go ahead
+- **Response summary:** Built **G2 variety rung 2: the `automat` (Keypad/Automat) scene kind** (activity
+  catalog #8). A step-by-step rendered machine: the player reads the screen and presses the right key; a
+  correct key advances the machine, a wrong key only buzzes (infinite patience, no bars, no lockout).
+  Missions stay data, not code: `types/game.ts` (`AutomatKey`/`AutomatStep`/`AutomatScene` in the closed
+  union), `engine/mission.ts` (pure `pressKey`/`currentAutomatStep`/`automatDone` with per-step first-try
+  FSRS grading + XP, `AutomatRuntime` on the run, cleared on win), `AutomatView` renderer (device plate +
+  LCD screen + keypad) wired into `MissionPlayer`, `lint-content.mjs` step-graph validation, 6 runner
+  tests. **Re-skinned off the dialogueBattle per the founder's s82 reorder:** 1.2 Fahrkarten-Automat (the
+  ticket-machine battle becomes a real machine; removed the unused `neustart` retry scaffolding, one fewer
+  battle) and the 1.4 Leergut beat (the Pfand websiteParody becomes the Leergutautomat; removed the
+  `vergessen` branch). `npc_automat` now unused, left in the registry (harmless). Gates green:
+  `lint:content` (6 missions / 35 scenes), `test:unit` (97, +6), `build`, `check:bundle` (83 kB), `lint`
+  (0 errors). Shipped as PR #375.
+- **Artifacts:** `src/types/game.ts`, `src/engine/mission.ts`, `src/features/welt/scenes.tsx`,
+  `src/features/welt/MissionPlayer.tsx`, `scripts/lint-content.mjs`, `src/data/missions.ts`,
+  `tests/mission.test.ts`; docs `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 239). PR #375 → squash-merge → branch realign.
