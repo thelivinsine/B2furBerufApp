@@ -346,6 +346,51 @@ export interface HotspotScene extends SceneBase {
   cta?: BiText;
 }
 
+/** One key on a rendered machine keypad. */
+export interface AutomatKey {
+  id: string;
+  /** Button face ("Einzelfahrt", "AB", "BON drucken", "1"). */
+  label: string;
+  /** A key that advances the machine (a step needs at least one, linted). */
+  correct?: boolean;
+  /** Vocab id retrieved by pressing the right key (graded into FSRS). */
+  vocabId?: string;
+  /** Machine reaction on press (the buzz line for a wrong key). */
+  feedback?: BiText;
+}
+
+/** One step (screen) of a machine flow. */
+export interface AutomatStep {
+  id: string;
+  /** What the machine screen shows at this step ("TARIFZONE WÄHLEN"). */
+  screen: BiText;
+  /** Smaller support line under the screen (Jonas' whisper, a price). */
+  hint?: BiText;
+  /** Keypad for this step; a correct key advances, a wrong key just buzzes. */
+  keys: AutomatKey[];
+  /** Step shown after a correct key. Omitted only on the terminal (`done`) step. */
+  next?: string;
+  /** Terminal marker: the machine is finished; the scene routes via `next`. */
+  done?: boolean;
+}
+
+/**
+ * Press-the-buttons-on-a-machine scene (activity catalog #8 "Keypad/Automat";
+ * G2 variety rung 2). The player operates a rendered machine (ticket zones,
+ * bottle return, a PIN pad) step by step: reading the screen and pressing the
+ * right key advances it, a wrong key only buzzes (failure is content, no
+ * lockout, no bar to drain). Re-skins the mission-1.2 ticket machine and the
+ * 1.4 Leergutautomat off the dialogueBattle, so a machine finally feels like a
+ * machine instead of a conversation with a face.
+ */
+export interface AutomatScene extends SceneBase {
+  kind: "automat";
+  /** Machine name plate ("Fahrkartenautomat", "Leergutautomat"). */
+  device: BiText;
+  start: string;
+  steps: Record<string, AutomatStep>;
+}
+
 /** One field of a form-cloze finale. */
 export interface FormField {
   id: string;
@@ -376,6 +421,7 @@ export type MissionScene =
   | LoadoutScene
   | ListeningScene
   | HotspotScene
+  | AutomatScene
   | DialogueBattleScene
   | FormClozeScene;
 
