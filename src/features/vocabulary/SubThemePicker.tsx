@@ -33,22 +33,21 @@ export function SubThemePicker({
   theme,
   onPick,
   onPickAll,
+  totalLine,
 }: {
   theme: ExamTheme;
   onPick: (subId: string) => void;
   onPickAll: () => void;
+  /** Override for the escape-hatch subtitle (defaults to the vocab count). */
+  totalLine?: string;
 }) {
   const subs = theme.subThemes ?? [];
   const totalWords = vocabByTheme(theme.id).length;
 
   return (
     <div className="space-y-3">
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight">Wähle einen Bereich</h2>
-        <p className="text-sm text-muted-foreground">
-          Statt eines großen Stapels: klare Unterthemen, jedes einzeln übbar.
-        </p>
-      </div>
+      {/* Section header only (the explainer sentence was cut per the microcopy budget). */}
+      <h2 className="text-lg font-semibold tracking-tight">Wähle einen Bereich</h2>
 
       <div className="space-y-2.5">
         {subs.map((st, i) => (
@@ -86,7 +85,7 @@ export function SubThemePicker({
             <div className="min-w-0 flex-1">
               <p className="truncate font-semibold">Gesamtes Thema</p>
               <p className="truncate text-xs text-muted-foreground">
-                Alle {totalWords} Wörter auf einmal
+                {totalLine ?? `Alle ${totalWords} Wörter auf einmal`}
               </p>
             </div>
             <ChevronRight className="h-5 w-5 shrink-0 text-muted-foreground" />

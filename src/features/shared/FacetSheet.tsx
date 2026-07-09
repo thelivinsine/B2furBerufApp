@@ -188,14 +188,16 @@ export function FacetSheet<T>({
                         )}
                       >
                         {opt.label}
-                        <span
-                          className={cn(
-                            "text-xs",
-                            selected ? "text-primary-foreground/80" : "text-muted-foreground",
-                          )}
-                        >
-                          {count}
-                        </span>
+                        {!disabled && (
+                          <span
+                            className={cn(
+                              "text-xs",
+                              selected ? "text-primary-foreground/80" : "text-muted-foreground",
+                            )}
+                          >
+                            {count}
+                          </span>
+                        )}
                       </button>
                     );
                   })}

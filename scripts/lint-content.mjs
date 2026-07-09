@@ -35,8 +35,8 @@ const REDEMITTEL_CATEGORIES = [
   "suggestions", "agree", "disagree", "negotiation", "compromise",
   "clarification", "opinion", "prosCons", "reactions",
 ];
-const REDEMITTEL_REGISTERS = ["neutral", "formal", "diplomatic"];
-const COLLOCATION_REGISTERS = ["neutral", "formal", "diplomatic"];
+const REDEMITTEL_REGISTERS = ["neutral", "formal"]; // "diplomatic" folded into formal (audit 2026-07-09)
+const COLLOCATION_REGISTERS = ["neutral", "formal"];
 const GRAMMAR_GROUPS = [
   "connectors", "relativeClauses", "prepositionalPronouns", "collocations",
   "verbPosition", "konjunktiv2", "modals", "passive", "subordinate", "cases",
