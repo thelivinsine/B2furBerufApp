@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ChevronLeft, Combine, Zap } from "lucide-react";
 import { collocations, collocationsByTheme } from "@/data/collocations";
-import { themes, themeById } from "@/data/themes";
+import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SubThemePicker } from "@/features/vocabulary/SubThemePicker";
+import { themeGroupsForMode } from "@/lib/themeGroups";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { usePagedList } from "@/lib/usePagedList";
 
@@ -67,6 +68,9 @@ export function CollocationsBrowser() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const level = useSettingsStore((s) => s.level);
+  // Mode pre-selects which DOMAINS the grouped theme dropdown shows (founder
+  // decision 2026-07-09, "Mode on top").
+  const learningMode = useSettingsStore((s) => s.mode);
   const scope = useLibraryScope();
   const [showAllLevels, setShowAllLevels] = useState(false);
 
@@ -196,14 +200,11 @@ export function CollocationsBrowser() {
   // Incremental rendering: 60 cards now, the rest as you scroll.
   const { visible, hasMore, remaining, sentinelRef, showMore } = usePagedList(filtered);
 
-  const primaryOptions = [
-    { value: "all", label: "Alle Themen", count: collocations.length },
-    ...themes.map((t) => ({
-      value: t.id,
-      label: t.titleDe,
-      count: collocationsByTheme(t.id).length,
-    })),
-  ];
+  const primaryOptions = [{ value: "all", label: "Alle Themen", count: collocations.length }];
+  const primaryGroups = useMemo(
+    () => themeGroupsForMode(learningMode, themeParam, (id) => collocationsByTheme(id).length),
+    [learningMode, themeParam],
+  );
 
   return (
     <div className="space-y-5">
@@ -220,7 +221,7 @@ export function CollocationsBrowser() {
         search={search}
         onSearch={setSearch}
         searchPlaceholder="Suche nach Nomen, Verb, Übersetzung …"
-        primary={{ value: themeParam, onChange: setTheme, options: primaryOptions }}
+        primary={{ value: themeParam, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
         facetItems={scoped}
         facets={COLLOCATION_FACETS}
         facetSelection={selection}

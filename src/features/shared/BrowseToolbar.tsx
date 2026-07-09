@@ -3,7 +3,9 @@ import { Search, X } from "lucide-react";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
@@ -20,6 +22,11 @@ export interface PrimaryOption {
   count?: number;
 }
 
+export interface PrimaryGroup {
+  label: string;
+  options: PrimaryOption[];
+}
+
 export interface BrowseToolbarProps<T> {
   search: string;
   onSearch: (value: string) => void;
@@ -27,7 +34,11 @@ export interface BrowseToolbarProps<T> {
   primary?: {
     value: string;
     onChange: (value: string) => void;
+    /** Flat options, rendered first (e.g. "Alle Themen"). */
     options: PrimaryOption[];
+    /** Optional grouped options rendered after `options` with group headings
+     *  (the Domain-grouped theme dropdown, audit PR 4). */
+    groups?: PrimaryGroup[];
   };
   facetItems: T[];
   facets: FacetDef<T>[];
@@ -126,6 +137,17 @@ export function BrowseToolbar<T>({
                   {opt.label}
                   {opt.count != null ? ` (${opt.count})` : ""}
                 </SelectItem>
+              ))}
+              {primary.groups?.map((group) => (
+                <SelectGroup key={group.label}>
+                  <SelectLabel>{group.label}</SelectLabel>
+                  {group.options.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                      {opt.count != null ? ` (${opt.count})` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               ))}
             </SelectContent>
           </Select>
