@@ -1,6 +1,11 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-09 (session 84: **Bibliothek categorization audit + FULL implementation
+_Last updated: 2026-07-09 (session 85: **Heute page reworked into an Üben/Spielen start page**
+(from the founder's start-page sketch): a new segmented toggle where **Üben** (default) reuses the
+existing composed-session feature plus a store-only four-ring Fortschritt row, and **Spielen** is a
+lazy-loaded Neuland mission carousel deep-linking into `/welt?mission=<id>`. The sidebar + top row are
+untouched; the city strip and Situationen chips were removed from Heute (components kept in the repo).
+Prior, session 84: **Bibliothek categorization audit + FULL implementation
 shipped.** Audit doc + visual Artifact, then all five decisions locked with the founder and every planned
 unit built and merged the same session (PRs #379–#383 + the Redemittel CEFR backfill): facet coverage
 floor (Branche/Situation retired from UI, Büro deleted), Grammatik toolbar + B2-priority order, polish
@@ -201,7 +206,30 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 84 (2026-07-09). Bibliothek categorization: audit delivered AND the full
+**Handoff after session 85 (2026-07-09). Heute page reworked into an Üben/Spielen start page, shipped
+to `main` (branch `claude/genauly-start-page-preview-1ih2vi`).**
+
+Founder shared a hand-drawn "Start page" sketch (Willkommen header + a Spielen/Üben toggle driving either
+a Neuland carousel or a Last-Session + Fortschritt view). Iterated it as an HTML Artifact (Üben first +
+default, minimal Spielen card), then implemented it **scoped to the Dashboard body only** (founder:
+"keep the left sidebar and top row intact, only change the contents within the Heute page").
+- **`src/features/dashboard/Dashboard.tsx`:** kept the greeting/orientation ring row; added an
+  **Üben/Spielen** segmented toggle (Üben default). **Üben** = a session card reusing `/session`
+  (sized from daily goal + `dueCount`, label toggles Weitermachen/Session starten off the existing
+  `totalSessions` completion hook, **no new persisted state**) + a **four-ring Fortschritt row**
+  (Tagesziel/Serie/Wörter/Fällig) derived purely from the progress store, no vocab-bank walk.
+- **`src/features/dashboard/NeulandCarousel.tsx` (new, lazy):** minimal indigo mission carousel over the
+  authored Neuland missions (arrows + dots), same `React.lazy` pattern as the old CityStrip so the
+  mission bank stays off the eager path. "Spielen" → `navigate('/welt?mission=<id>')`.
+- **`src/features/welt/Welt.tsx`:** reads an optional `?mission=` param to auto-open that mission
+  (unchanged when absent; clears the param on exit).
+- **Removed from Heute (founder-confirmed):** the `CityStrip` city strip and the 3 Situationen chips.
+  Both components remain in the repo, just not rendered on Heute.
+- Verified in the real app via Chromium (both tabs render, no page errors). Gates green: build,
+  lint (0 errors), lint:content, test:unit (97), check:bundle (83.8 kB, budget 400). **Founder verifies
+  the live site.** CLAUDE.md bundle note updated (NeulandCarousel is the new lazy Dashboard element).
+
+**Prior handoff after session 84 (2026-07-09). Bibliothek categorization: audit delivered AND the full
 implementation shipped to `main` (branch `claude/bibliothek-categorization-analysis-mtqo5o`).**
 
 **Part 2 of the session (after the founder locked all five decisions): every planned unit shipped.**
@@ -265,69 +293,10 @@ and a visual Artifact, from a codebase fact-audit + a 7-agent expert panel + red
 - **Open founder decisions (doc §11):** park vs cut Branche; backfill Redemittel CEFR or not (no themeId
   either way); frequency badge-only vs badge+chart; Domain-under-Mode layering; Amtssprache axis later/never.
 
-**Handoff after session 83 (2026-07-08). G2 variety rungs 1–2 SHIPPED (branch
-`claude/g2-variety-work-0t6c9a`).**
-
-**Rung 2 (PR #375): the `automat` (Keypad/Automat) scene kind (activity catalog #8).** A step-by-step
-rendered machine: the player reads the screen and presses the right key; a correct key advances the
-machine, a wrong key only buzzes (infinite patience, no bar to drain, no lockout). A machine finally
-feels like a machine instead of a conversation with a face.
-- **Missions stay data, not code.** `types/game.ts`: `AutomatKey`/`AutomatStep`/`AutomatScene` in the
-  closed union. `engine/mission.ts`: pure `pressKey`/`currentAutomatStep`/`automatDone` with a per-step
-  first-try grade (Good clean, Hard after a fumble) into FSRS + XP, and an `AutomatRuntime` on MissionRun
-  (init on scene entry, cleared on win). `features/welt/scenes.tsx`: `AutomatView` (device plate + LCD
-  screen + keypad) in the pixel-UI language, wired into `MissionPlayer`. `lint-content.mjs`: validates the
-  step graph (unique ids, ≥1 correct key per non-terminal step, `next` resolves, a reachable `done`).
-  `tests/mission.test.ts`: 6 runner tests over an inline fixture.
-- **Re-skinned off the dialogueBattle (founder's s82 reorder):** **1.2 Fahrkarten-Automat** (the ticket
-  machine becomes a real machine: Einzelfahrt → Zone AB → pay → ticket; the battle lose/retry scaffolding
-  `neustart` is gone, so there is one fewer battle and the boss stands out) and the **1.4 Leergut beat**
-  (the Pfand websiteParody becomes the Leergutautomat: feed two deposit bottles, print the Bon; the
-  `vergessen` branch is gone). `npc_automat` is now unused but left in the registry (harmless).
-- **Gates green:** `lint:content` (6 missions / 35 scenes), `test:unit` (97, +6), `build`, `check:bundle`
-  (83 kB), `lint` (0 errors).
-
-**Rung 1 (PR #374): the `hotspot` scene kind.** Added **`hotspot`**, one generic tappable-stage layer (activity catalog #2 "Hotspot
-antippen"; also carries #7 "Aufruf abfangen" and #18 "Listen-and-act" via an optional TTS `audio` line):
-the player proves comprehension by TAPPING the right place on the pixel stage instead of picking a
-sentence. Wrong taps earn only a deadpan reaction (failure is content); the scene clears once every
-`correct` spot is found.
-- **Missions stay data, not code.** `types/game.ts`: `Hotspot` + `HotspotScene` in the closed
-  `MissionScene` union. `engine/mission.ts`: pure `tapHotspot`/`hotspotSolved` with scene-scoped
-  first-try grading (Good clean, Hard after a fumble) into FSRS + XP, plus two run-state maps.
-  `features/welt/scenes.tsx`: `HotspotView` renderer in the blessed pixel-UI language, wired into
-  `MissionPlayer`. `lint-content.mjs`: mirrors the kind + validates spots (unique ids, 0..100 percents,
-  ≥1 correct, vocab ids resolve). `tests/mission.test.ts`: 6 runner tests over an inline fixture.
-- **Used in the two earliest-played missions** so the variety is visible: **1.1** gains a listen-and-act
-  departure board (tap Gleis 4), **1.4** gains the shelf search (tap Milch/Brot/Äpfel among distractors).
-  Hotspots are authored vocab-free (they train Hören/Lesen, XP-only), which is pedagogically honest and
-  avoids forcing unnatural vocab tags.
-- **G2 next rung: rung 3 (type-under-timer for the 1.4 checkout, catalog #9).** Then the plumbing rungs
-  (FSRS-driven recurring-mission composer, failure-as-fetch-quest loop, Supabase game-state migration).
-  Full order in `GAME_IMPLEMENTATION_PLAN.md` (G2 status block); rungs 1–2 are marked SHIPPED there.
-  Founder verifies live and reviews the draft German.
-
-**Also this session (after rungs 1–2):**
-- **Hotspot polish (PR #376).** Founder screenshot of the 1.1 departure board: the labeled hotspot
-  targets rendered as big translucent circles that read as floating soap bubbles. Restyled labeled targets
-  as solid pixel sign-plates (opaque, bordered, hard shadow, idle bob); label-less spots keep the pulsing
-  ring. Tidied the 1.1 platform signs into a row and the 1.4 shelf tags into two rows. Verified with a
-  Chromium-rendered mock over the real backdrop.
-- **Neuland story research + brainstorm toolkit (PR #377, docs-only).** Founder flagged the storyline and
-  missions as weak and asked how to research/brainstorm with ChatGPT/Gemini. Delivered four
-  `docs/strategy/` docs: **`NEULAND_PRIMER.md`** (paste-ready context pack for external LLMs),
-  **`BRAINSTORM_TOOLKIT.md`** (method + copy-paste prompt pack + tool tactics),
-  **`STORY_MISSION_BRAINSTORM.md`** (worked multi-lens brainstorm: the keystone player *want* "stop being a
-  problem to be processed, become a person who belongs"; Chapter 1 mapped to the Dan Harmon story circle;
-  cast deepening; per-mission fixes), and **`LANGUAGE_RPG_RESEARCH.md`** (sourced survey of narrative
-  language games + SLA evidence, 10 recommendations). **Founder is taking these to other LLMs; the keystone
-  decision is the player WANT.** No story/mission content changed yet; the re-framing is mostly data edits
-  once a want is chosen. Every AI-drafted German stays a draft until `verify:grammar`/native review.
-
 ---
 
-_Older handoffs (sessions 1–82) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–82 are in the W28 file)._
+_Older handoffs (sessions 1–83) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–83 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)

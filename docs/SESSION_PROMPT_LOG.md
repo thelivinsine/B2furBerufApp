@@ -2189,3 +2189,33 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`,
   `docs/archive/PROJECT_STATUS_ARCHIVE.md`, `docs/SESSION_PROMPT_LOG.md` (entry 248). Doc-only; shipped
   via PR → squash-merge → branch realign.
+## Entry 249 — 2026-07-09 (session 85)
+- **Branch:** `claude/genauly-start-page-preview-1ih2vi`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** a hand-drawn notebook photo titled "Start page" (two variants: a Genauly sidebar +
+  Willkommen header + a Spielen/Üben toggle over either a "Neuland" carousel with < > arrows or a
+  "Last Session" card + "Fortschritt Verlauf" progress rings).
+- **Prompt (verbatim):**
+  > can you generate a preview of the start page of genauly app based on the attached drawing?
+- **Response summary:** Read the app's real tokens/nav and built a faithful interactive HTML Artifact of
+  the start page (sidebar + top row + Spielen/Üben toggle: Spielen → Neuland chapter carousel, Üben →
+  last-session + Fortschritt rings), light/dark aware, on brand indigo.
+- **Prompt (verbatim):**
+  > I like it, try to make the spielen part a bit more minimalistic. Also, switch the positions of
+  > spielen and uben. Uben should be first and oopened by default.
+- **Response summary:** Reordered the toggle (Üben first + default) and stripped the Spielen card to a
+  minimal indigo panel (dropped the pixel-scene band, Beta chip, redundant caption); redeployed the same
+  Artifact URL.
+- **Prompt (verbatim):**
+  > I see the left side vertical bar is gone and is on the top now but you can keep the left side bar and
+  > the existing elements on the top row intact. Only change the contents within the Heute page. I like
+  > the proposed design. Implement it with a robust plan.
+- **Response summary:** Implemented the design in-app, scoped to the Dashboard body. New Üben/Spielen
+  toggle; Üben reuses `/session` + a store-only four-ring Fortschritt row; Spielen is a new lazy
+  `NeulandCarousel` deep-linking into `/welt?mission=<id>`; `Welt.tsx` gained `?mission=` auto-open.
+  Kept the sidebar + greeting row. Verified both tabs in Chromium (no page errors); all gates green.
+  Via AskUserQuestion the founder confirmed removing the city strip + Situationen chips and merging to
+  production.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/NeulandCarousel.tsx`
+  (new), `src/features/welt/Welt.tsx` (commit d7e9bb8); updated `CLAUDE.md`, `docs/PROJECT_STATUS.md`;
+  `docs/SESSION_PROMPT_LOG.md` (entry 249). PR into `main` (squash) + branch realignment.
