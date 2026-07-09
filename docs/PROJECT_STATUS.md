@@ -6,7 +6,11 @@ TAPPING the right place on the pixel stage, used in 1.1 (departure board) + 1.4 
 (PR #375): the `automat` (Keypad) scene kind (catalog #8), a step-by-step rendered machine with a
 wrong-key buzz and no bars; **re-skinned mission 1.2 (ticket machine) and the 1.4 Leergut beat off the
 dialogueBattle**, so a machine feels like a machine and there is one fewer battle. Both kinds: closed-union
-member + pure runner + pixel renderer + linter + runner tests.** Prior, session 82: **Neuland game-visuals fix + two G2 direction decisions.** The
+member + pure runner + pixel renderer + linter + runner tests. Then a polish fix (PR #376): hotspot targets
+restyled from floating translucent bubbles to solid pixel sign-plates after founder feedback. Finally, on
+a founder "the story/missions are weak" prompt, shipped four Neuland story-research docs (PR #377):
+`NEULAND_PRIMER.md`, `BRAINSTORM_TOOLKIT.md`, `STORY_MISSION_BRAINSTORM.md`, `LANGUAGE_RPG_RESEARCH.md`.**
+Prior, session 82: **Neuland game-visuals fix + two G2 direction decisions.** The
 blank `terminal`/`laden` stages (16 of Kapitel 1's scenes) got code-authored placeholder backdrops,
 transit hall + shop in `welt_assets.py`, wired into `SETTING_ART` (PR #368). The founder then
 **re-sequenced G2, scene variety before plumbing** (hotspot layer → Keypad/Automat kind + 1.2 re-skin →
@@ -231,6 +235,23 @@ sentence. Wrong taps earn only a deadpan reaction (failure is content); the scen
   (FSRS-driven recurring-mission composer, failure-as-fetch-quest loop, Supabase game-state migration).
   Full order in `GAME_IMPLEMENTATION_PLAN.md` (G2 status block); rungs 1–2 are marked SHIPPED there.
   Founder verifies live and reviews the draft German.
+
+**Also this session (after rungs 1–2):**
+- **Hotspot polish (PR #376).** Founder screenshot of the 1.1 departure board: the labeled hotspot
+  targets rendered as big translucent circles that read as floating soap bubbles. Restyled labeled targets
+  as solid pixel sign-plates (opaque, bordered, hard shadow, idle bob); label-less spots keep the pulsing
+  ring. Tidied the 1.1 platform signs into a row and the 1.4 shelf tags into two rows. Verified with a
+  Chromium-rendered mock over the real backdrop.
+- **Neuland story research + brainstorm toolkit (PR #377, docs-only).** Founder flagged the storyline and
+  missions as weak and asked how to research/brainstorm with ChatGPT/Gemini. Delivered four
+  `docs/strategy/` docs: **`NEULAND_PRIMER.md`** (paste-ready context pack for external LLMs),
+  **`BRAINSTORM_TOOLKIT.md`** (method + copy-paste prompt pack + tool tactics),
+  **`STORY_MISSION_BRAINSTORM.md`** (worked multi-lens brainstorm: the keystone player *want* "stop being a
+  problem to be processed, become a person who belongs"; Chapter 1 mapped to the Dan Harmon story circle;
+  cast deepening; per-mission fixes), and **`LANGUAGE_RPG_RESEARCH.md`** (sourced survey of narrative
+  language games + SLA evidence, 10 recommendations). **Founder is taking these to other LLMs; the keystone
+  decision is the player WANT.** No story/mission content changed yet; the re-framing is mostly data edits
+  once a want is chosen. Every AI-drafted German stays a draft until `verify:grammar`/native review.
 
 **Handoff after session 82 (2026-07-08). Neuland game-visuals fix (branch `claude/missing-game-visuals-qcmde6`).**
 The founder sent screenshots of the game (`/welt`) showing "no game visuals": the Willkommen passport battle
