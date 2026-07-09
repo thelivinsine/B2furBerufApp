@@ -2003,3 +2003,69 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/welt/MissionPlayer.tsx`, `scripts/lint-content.mjs`, `src/data/missions.ts`,
   `tests/mission.test.ts`; docs `docs/plans/GAME_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 239). PR #375 → squash-merge → branch realign.
+
+## Entry 240 — 2026-07-08 (session 83)
+- **Branch:** `claude/g2-variety-work-0t6c9a`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the 1.1 departure-board hotspot scene (game `/welt`)
+- **Prompt (verbatim):**
+  > @".../7a56fccf-1000085657.png" is this what you intended? it looks weird. what are the bubbles supposed to mean in thr game world?
+- **Response summary:** Explained the "bubbles" are the hotspot tap targets (tap your platform, Gleis 4,
+  to advance) and agreed the presentation was poor: big translucent circles read as floating soap bubbles
+  disconnected from the world. **Fix (PR #376):** restyled labeled hotspot targets as solid pixel
+  sign-plates (opaque cream fill, `GAME_OUT` border, hard shadow, gentle idle bob) so they read as
+  tappable station/shelf signs; kept the translucent pulsing ring only for label-less "tap the real object"
+  spots; found → teal plate + check, wrong → rose shake. Tidied 1.1 platform signs into a row and 1.4 shelf
+  tags into two rows. Verified the look with a Chromium-rendered mock over the real `terminal.png` backdrop
+  and sent it to the founder. Gates green (lint:content, 97 tests, build, bundle 83 kB, lint 0 errors);
+  CI green; squash-merged; branch realigned.
+- **Artifacts:** `src/features/welt/scenes.tsx`, `src/data/missions.ts`; PR #376 → squash-merge → realign.
+  `docs/SESSION_PROMPT_LOG.md` (entry 240).
+
+## Entry 241 — 2026-07-08 (session 83)
+- **Branch:** `claude/g2-variety-work-0t6c9a`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the story line and the exercises/missions are weak. suggest me how can I research and brainstorm with various tools like chatgpt or Gemini
+- **Response summary:** Advisory answer (no code). Named the two real problems (story = no player *want* /
+  flat stakes / thin NPCs; missions = repeated shape + choices without consequence), gave the four-rule
+  method that makes LLM brainstorming work (prime with real docs → ask for a named artifact → force a
+  critique loop → cross-examine tools then synthesize), a tool-by-tool guide (Claude/ChatGPT deep
+  research/Gemini/NotebookLM), and a starter copy-paste prompt pack. Offered four concrete next actions
+  (primer pack, in-house brainstorm, deep-research report, expanded prompt pack). A follow-up
+  AskUserQuestion failed on a tool-permission error, so the options were restated in plain text.
+- **Artifacts:** none (advisory). `docs/SESSION_PROMPT_LOG.md` (entry 241).
+
+## Entry 242 — 2026-07-08 (session 83)
+- **Branch:** `claude/g2-variety-work-0t6c9a`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > i want all four
+- **Response summary:** Produced all four deliverables as `docs/strategy/` docs (PR #377, docs-only),
+  grounding them in `GAME_CONCEPT.md` + `GAME_DESIGN.md` and real web research (Wagotabi, Influent,
+  Duolingo Adventures, Terra Alia, the serious-games narrative review, Dan Harmon story circle, task-based
+  SLA): **`NEULAND_PRIMER.md`** (paste-ready context pack), **`BRAINSTORM_TOOLKIT.md`** (method + prompt
+  pack + tool tactics), **`STORY_MISSION_BRAINSTORM.md`** (worked multi-lens brainstorm: keystone want
+  "stop being a problem to be processed, become a person who belongs"; Chapter 1 on the Harmon circle
+  with 1.5 as false victory and 1.6 as the cost; cast want/flaw/tic; per-mission fixes for 1.1/1.3/1.5),
+  **`LANGUAGE_RPG_RESEARCH.md`** (cited survey + 10 prioritized recommendations). Sent all four to the
+  founder; committed and squash-merged; branch realigned. Recommended the keystone decision is the player
+  *want*, and flagged that all AI-drafted German stays a draft until `verify:grammar`/native review.
+- **Artifacts:** `docs/strategy/NEULAND_PRIMER.md`, `docs/strategy/BRAINSTORM_TOOLKIT.md`,
+  `docs/strategy/STORY_MISSION_BRAINSTORM.md`, `docs/strategy/LANGUAGE_RPG_RESEARCH.md`; PR #377 →
+  squash-merge → realign. `docs/SESSION_PROMPT_LOG.md` (entry 242).
+
+## Entry 243 — 2026-07-08 (session 83)
+- **Branch:** `claude/g2-variety-work-0t6c9a`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > I'll run it through other llms. document the session for now
+- **Response summary:** Session-documentation pass. Updated `docs/PROJECT_STATUS.md` (header + s83 handoff:
+  added the hotspot sign-plate polish and the four story-research docs, noting the founder is taking them
+  to other LLMs and the keystone decision is the player want) and appended prompt-log entries 240–243.
+  No code changes.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 243). Doc-only; shipped via
+  PR → squash-merge → branch realign.
