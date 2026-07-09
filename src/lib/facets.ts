@@ -1,7 +1,6 @@
 import { vocabulary } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
-import type { LearningMode } from "@/types";
 import type { FacetDef, FacetOption } from "@/features/shared/FacetSheet";
 import { CEFR_ORDER } from "@/lib/cefr";
 
@@ -20,13 +19,33 @@ import { CEFR_ORDER } from "@/lib/cefr";
 // already consumes, so nothing about the UI changes.
 // ─────────────────────────────────────────────────────────────────────────
 
-// ── Facet hygiene rule ───────────────────────────────────────────────────
-// A facet renders as a row of pills, so it must stay small. Any dimension with
-// more than MAX_FACET_OPTIONS distinct values does NOT belong as a facet:
-// global/scoped search covers long-tail lookup instead. The Verb dimension
-// (100+ values) was a facet before Phase 5 and is deliberately dropped here;
-// typing a verb into search finds every collocation that uses it.
+// ── Facet hygiene rules ──────────────────────────────────────────────────
+// (1) Size ceiling: a facet renders as a row of pills, so it must stay small.
+// Any dimension with more than MAX_FACET_OPTIONS distinct values does NOT
+// belong as a facet: global/scoped search covers long-tail lookup instead.
+// The Verb dimension (100+ values) was a facet before Phase 5 and is
+// deliberately dropped here; typing a verb into search finds every
+// collocation that uses it.
 export const MAX_FACET_OPTIONS = 12;
+
+// (2) Coverage floor (categorization audit 2026-07-09): a facet only renders
+// when the bank actually uses it. Below the floor, the WHOLE facet hides (not
+// just its empty options): a near-empty dimension looks broken, not filtered.
+// Visibility follows coverage, never the Mode lens: this is what retired the
+// Branche (4% tagged) and Situation (2.2%) facets. Coverage is computed over
+// the full bank, not the current scope, so facets don't flicker while
+// browsing. When a dimension (e.g. a future sector pack) crosses the floor,
+// its facet reappears on its own.
+export const MIN_FACET_COVERAGE = 0.15;
+export const MIN_FACET_VALUES = 2;
+
+/** True when the bank tags enough items (and enough distinct values) for the
+ *  facet to be an honest filter. */
+function passesFloor<T>(f: FacetDef<T>, items: T[]): boolean {
+  const present = items.map((i) => f.get(i)).filter((v) => v !== undefined);
+  const distinct = new Set(present).size;
+  return distinct >= MIN_FACET_VALUES && present.length / items.length >= MIN_FACET_COVERAGE;
+}
 
 // Inferred item types, so the accessors stay in lock-step with the data shape.
 type Vocab = (typeof vocabulary)[number];
@@ -61,23 +80,18 @@ const POS_OPTIONS: FacetOption[] = [
   { value: "connector", label: "Konnektor" },
 ];
 
+// Branche is a CONTEXT axis (the industry a learner works in), orthogonal to
+// Thema (what the words are about). It is PARKED (founder decision 2026-07-09):
+// the `sector` field and the Pflege tags stay in the data, but the facet stays
+// below the coverage floor until an industry has real depth, so it never
+// renders today. "Büro" was removed as a value: every industry has an office,
+// so it is a category error, not a sector.
 const SECTOR_OPTIONS: FacetOption[] = [
   { value: "care", label: "Pflege" },
-  { value: "office", label: "Büro" },
   { value: "trades", label: "Handwerk" },
   { value: "it", label: "IT" },
   { value: "retail", label: "Handel" },
   { value: "hospitality", label: "Gastgewerbe" },
-];
-
-const SITUATION_OPTIONS: FacetOption[] = [
-  { value: "meeting", label: "Besprechung" },
-  { value: "shift-handover", label: "Übergabe" },
-  { value: "customer-call", label: "Kundengespräch" },
-  { value: "instructions", label: "Unterweisung" },
-  { value: "onboarding", label: "Einarbeitung" },
-  { value: "sick-leave", label: "Krankmeldung" },
-  { value: "review", label: "Feedback" },
 ];
 
 const REGISTER_OPTIONS: FacetOption[] = [
@@ -99,21 +113,18 @@ const VOCAB_SECTOR: FacetDef<Vocab> = facet(
   { id: "sector", label: "Branche", options: SECTOR_OPTIONS, get: (v) => v.sector },
   vocabulary,
 );
-const VOCAB_SITUATION: FacetDef<Vocab> = facet(
-  { id: "workSituation", label: "Situation", options: SITUATION_OPTIONS, get: (v) => v.workSituation },
-  vocabulary,
-);
 
-/** Vocab facets. The Work-only facets (Branche, Situation) show only when the
- *  Mode lens is set to `work`; they roll up otherwise. */
-export function vocabFacets(mode: LearningMode): FacetDef<Vocab>[] {
-  return mode === "work"
-    ? [VOCAB_CEFR, VOCAB_POS, VOCAB_SECTOR, VOCAB_SITUATION]
-    : [VOCAB_CEFR, VOCAB_POS];
+const ALL_VOCAB_FACETS = [VOCAB_CEFR, VOCAB_POS, VOCAB_SECTOR];
+
+/** Vocab facets that clear the coverage floor. Visibility follows coverage
+ *  (never the Mode lens): today that is CEFR + Wortart; Branche stays parked
+ *  below the floor until a sector pack gives it real depth. */
+export function vocabFacets(): FacetDef<Vocab>[] {
+  return ALL_VOCAB_FACETS.filter((f) => passesFloor(f, vocabulary));
 }
 
-/** Every vocab facet id (mode-independent), for parsing/clearing URL params. */
-export const VOCAB_FACET_IDS = [VOCAB_CEFR, VOCAB_POS, VOCAB_SECTOR, VOCAB_SITUATION].map((f) => f.id);
+/** Every vocab facet id (including parked ones), for parsing/clearing URL params. */
+export const VOCAB_FACET_IDS = ALL_VOCAB_FACETS.map((f) => f.id);
 
 // ── Collocations (Verb dropped: it broke the ≤12-option rule) ─────────────
 const COLLOCATION_FACETS: FacetDef<Collocation>[] = [
@@ -125,7 +136,7 @@ const COLLOCATION_FACETS: FacetDef<Collocation>[] = [
 ];
 
 export function collocationFacets(): FacetDef<Collocation>[] {
-  return COLLOCATION_FACETS;
+  return COLLOCATION_FACETS.filter((f) => passesFloor(f, collocations));
 }
 export const COLLOCATION_FACET_IDS = COLLOCATION_FACETS.map((f) => f.id);
 
@@ -135,6 +146,6 @@ const REDEMITTEL_FACETS: FacetDef<Redemittel>[] = [
 ];
 
 export function redemittelFacets(): FacetDef<Redemittel>[] {
-  return REDEMITTEL_FACETS;
+  return REDEMITTEL_FACETS.filter((f) => passesFloor(f, redemittel));
 }
 export const REDEMITTEL_FACET_IDS = REDEMITTEL_FACETS.map((f) => f.id);

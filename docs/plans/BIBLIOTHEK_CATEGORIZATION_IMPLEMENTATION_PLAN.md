@@ -263,11 +263,18 @@ Small, mostly cosmetic, no decisions. Group them so the library reads finished.
 - **Branche as a real sector** / per-industry packs, and a Task/Can-Do cross-cutting browse engine: both
   rejected in the audit as off-strategy or over-build.
 
-## Founder decisions that gate the above
-1. **Branche park vs cut** → whether `sector` stays a hidden field (PR 1 keeps it hidden) or is deleted.
-2. **Redemittel CEFR backfill** → unlocks the deferred Redemittel PR.
-3. **Frequency badge-only vs badge + chart** → PR 3c.
-4. **Domain under Mode** → PR 4a's grouping behavior.
-5. **Amtssprache axis later/never** → keeps anyone from starting the register overhaul early.
+## Founder decisions — ALL LOCKED (2026-07-09)
+1. **Branche: PARKED.** `sector` stays as a hidden data field (with the 15 Pflege tags); the facet sits
+   below the coverage floor until an industry has real depth. Not cut, no Pflege pack authored now.
+2. **Redemittel CEFR backfill: YES.** AI-draft all ~82 tags, founder reviews. No `themeId` either way.
+3. **Frequency: badge + chart.** Ship the Häufigkeit badge/facet AND the Fortschritt composition chart
+   (FSRS-overlaid).
+4. **Domain/Mode: Mode on top.** Mode stays the app-wide lens and pre-selects which domains show; the
+   library theme dropdown groups by Domain underneath.
+5. **Amtssprache/politeness axis: PARKED** (no objection raised; revisit when Behörde content grows).
 
-None of decisions 1–5 block PRs 1, 2, or 5. Start there.
+Build status: **PR 1 implemented and shipped 2026-07-09** (coverage floor `MIN_FACET_COVERAGE`/
+`MIN_FACET_VALUES` in `lib/facets.ts`, mode gating removed, `office` deleted from `WorkSector` + 11 word
+tags, `WorkSituation` retired + 14 word tags stripped, linter now errors on any reintroduced
+`workSituation`). Next: PR 2 (Grammar toolbar), then PR 5 (polish), PR 3 (frequency), PR 4 (Domain + SRS),
+and the Redemittel backfill.

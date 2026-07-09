@@ -60,12 +60,10 @@ const VERIFICATION_TIERS = ["unverified", "structural", "provenance", "facts", "
 const VERIFICATION_LAYERS = ["structural", "provenance", "facts", "linguistic", "jury", "human"];
 const VERIFICATION_RESULTS = ["pass", "flag", "fail"];
 const FREQUENCIES = ["core", "common", "specialized"];
-const WORK_SECTORS = ["care", "office", "trades", "it", "retail", "hospitality"];
+// "office" removed + WorkSituation retired in the categorization audit
+// 2026-07-09 (Situation = sub-theme grain of Thema, not a separate axis).
+const WORK_SECTORS = ["care", "trades", "it", "retail", "hospitality"];
 const COUNTERPARTS = ["manager", "colleague", "customer", "team"];
-const WORK_SITUATIONS = [
-  "meeting", "shift-handover", "customer-call", "instructions",
-  "onboarding", "sick-leave", "review",
-];
 const TASK_TYPES = ["email", "phone-call", "report", "instruction", "presentation"];
 const TEXT_KINDS = ["letter", "email", "memo", "announcement", "voicemail"];
 
@@ -211,8 +209,8 @@ function lintVocabulary(vocab, subThemeIndex) {
       error(ds, w, `invalid frequency "${v.frequency}"`);
     if (v.sector !== undefined && !WORK_SECTORS.includes(v.sector))
       error(ds, w, `invalid sector "${v.sector}"`);
-    if (v.workSituation !== undefined && !WORK_SITUATIONS.includes(v.workSituation))
-      error(ds, w, `invalid workSituation "${v.workSituation}"`);
+    if (v.workSituation !== undefined)
+      error(ds, w, `workSituation was retired (audit 2026-07-09); use subThemeId`);
     checkSubTheme(v, v.themeId, subThemeIndex, ds, w);
   }
 }
@@ -235,8 +233,8 @@ function lintCollocations(collocations, subThemeIndex) {
       error(ds, w, `invalid frequency "${c.frequency}"`);
     if (c.sector !== undefined && !WORK_SECTORS.includes(c.sector))
       error(ds, w, `invalid sector "${c.sector}"`);
-    if (c.workSituation !== undefined && !WORK_SITUATIONS.includes(c.workSituation))
-      error(ds, w, `invalid workSituation "${c.workSituation}"`);
+    if (c.workSituation !== undefined)
+      error(ds, w, `workSituation was retired (audit 2026-07-09); use subThemeId`);
     if (c.themeId !== undefined) checkSubTheme(c, c.themeId, subThemeIndex, ds, w);
   }
 }
