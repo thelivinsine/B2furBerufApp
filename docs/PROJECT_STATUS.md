@@ -1,10 +1,13 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-09 (session 84: **Bibliothek categorization audit delivered** (analysis only, no
-app code changed): `docs/plans/BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09.md` + a visual Artifact, from a
-codebase fact-audit + a 7-agent expert panel + red-team. Verdict: taxonomy is sound but looks broken; P0
-quick wins (facet coverage floor, delete Büro, retire workSituation) and the roadmap are in the doc's §10.
-See the "Resume here" block. Prior: session 83: **G2 variety rungs 1–2 shipped.** Rung 1 (PR #374): the `hotspot`
+_Last updated: 2026-07-09 (session 84: **Bibliothek categorization audit + FULL implementation
+shipped.** Audit doc + visual Artifact, then all five decisions locked with the founder and every planned
+unit built and merged the same session (PRs #379–#383 + the Redemittel CEFR backfill): facet coverage
+floor (Branche/Situation retired from UI, Büro deleted), Grammatik toolbar + B2-priority order, polish
+batch (register fold, Redemittel restructure, Kollokationen parity, visible level chip), the generated
+Häufigkeit signal (facet/badge/chart + the black-charts CSS-var fix), Domain-grouped theme dropdown +
+Lernstand (SRS) filter, and 72 AI-drafted Redemittel CEFR tags pending founder review. See the "Resume
+here" block. Prior: session 83: **G2 variety rungs 1–2 shipped.** Rung 1 (PR #374): the `hotspot`
 scene kind, one generic tappable-stage layer (catalog #2/#7/#18) where the player proves comprehension by
 TAPPING the right place on the pixel stage, used in 1.1 (departure board) + 1.4 (shelf search). Rung 2
 (PR #375): the `automat` (Keypad) scene kind (catalog #8), a step-by-step rendered machine with a
@@ -198,8 +201,42 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 84 (2026-07-09). Bibliothek categorization AUDIT delivered (analysis only, no
-app code changed; branch `claude/bibliothek-categorization-analysis-mtqo5o`, not merged).**
+**Handoff after session 84 (2026-07-09). Bibliothek categorization: audit delivered AND the full
+implementation shipped to `main` (branch `claude/bibliothek-categorization-analysis-mtqo5o`).**
+
+**Part 2 of the session (after the founder locked all five decisions): every planned unit shipped.**
+- **Founder decisions (all locked, recorded in the implementation plan):** Branche parked (field stays,
+  UI hidden until a sector has depth); Redemittel CEFR backfill yes; Häufigkeit badge + chart; Domain
+  grouped under Mode ("Mode on top": Mode pre-selects which domains show); Amtssprache axis parked.
+- **PR #379:** facet coverage floor in `lib/facets.ts` (`MIN_FACET_COVERAGE` 15% / `MIN_FACET_VALUES` 2;
+  visibility follows coverage, never Mode), Büro deleted from `WorkSector` (+11 tags), `WorkSituation`
+  retired entirely (+14 tags; linter errors on reintroduction).
+- **PR #380:** Grammatik joins `BrowseToolbar` (search + Gruppe dropdown with counts, no facet sheet);
+  topics reordered by B2-marker priority; `FacetSheet` renders nothing at 0 groups.
+- **PR #381 (polish):** `diplomatic` register folded into `formal`; Redemittel inner tabs dropped, ONE
+  filter pipeline, Register as inline chips; Kollokationen got dropdown counts + `SubThemePicker`
+  (`?sub=`); the silent CEFR band default is now a removable "Stufe: bis X" chip on all three list tabs;
+  a11y/microcopy tidy (search aria-label, no "0" on disabled pills, ScopeChip removed).
+- **PR #382 (Häufigkeit):** new `pnpm build:frequency` generates `src/data/frequency.ts` from the vendored
+  wordfreq Zipf subset (1116/1182 binned core/häufig/Fachsprache; <1.5 Zipf incl. compounds honestly
+  unbinned); Häufigkeit facet + card label on Wörter/Kollokationen; Fortschritt "Wortschatz nach
+  Häufigkeit" chart (mastery-overlaid, tap deep-links). **Also fixed the pre-existing black-charts bug:**
+  every Analytics chart referenced non-existent `var(--color-*)` vars, now `hsl(var(--*))`.
+- **PR #383:** Domain-grouped theme dropdown on Wörter + Kollokationen (`lib/themeGroups.ts`, Mode
+  pre-selects domains; `SelectGroup`/`SelectLabel` added to ui/select; `BrowseToolbar` takes grouped
+  options) + the per-learner **Lernstand** facet (`?srs=`, neu/lernen/wiederholen/gemeistert mirroring
+  the card badges).
+- **Redemittel CEFR backfill (final PR):** all 72 phrases AI-draft-tagged (A2 3 · B1.1 19 · B1.2 27 ·
+  B2.1 20 · B2.2 3); each card shows its level badge so the founder can review in the UI. **FOUNDER
+  REVIEW PENDING** on these 72 draft tags. The level band default is now live on the tab (a B1 learner's
+  default hides only the 3 B2.2 phrases, escapable via the Stufe chip).
+- All PRs verified with Chromium smoke tests on the built app + full gates (build, lint:content,
+  test:unit 97, lint 0 errors, bundle 83 kB). **Founder verifies the live site.**
+- **Remaining from the audit (deliberately deferred):** `GrammarTopic.cefr` field + badge (P2); the
+  dropdown-vs-facet rule writeup in `facets.ts` header is partially done (floor documented); decide
+  `counterpart`/`taskType` cut-or-park (P3).
+
+**Part 1 of the session (the audit itself):**
 
 Founder asked for a thorough report on the Bibliothek's categorization/filters (define Thema vs Situation
 vs Branche, audit the weak/wrong filters, judge his ideas, make it marketplace-ready). Delivered

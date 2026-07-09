@@ -80,6 +80,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I would suggest that we …",
     category: "suggestions",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Ich würde vorschlagen, dass wir zuerst die Termine klären.", en: "I'd suggest we clarify the dates first." },
   },
   {
@@ -88,6 +89,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "How about we … ?",
     category: "suggestions",
     register: "neutral",
+    cefr: "B1.2",
     note: "Followed by Konjunktiv II for a polite, hypothetical tone.",
     example: { de: "Wie wäre es, wenn wir die Aufgaben aufteilen würden?", en: "How about we split up the tasks?" },
   },
@@ -97,6 +99,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "We could …",
     category: "suggestions",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Wir könnten doch einen früheren Termin wählen.", en: "We could choose an earlier date." },
   },
   {
@@ -105,6 +108,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "My suggestion would be …",
     category: "suggestions",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Mein Vorschlag wäre, die Lieferung zu splitten.", en: "My suggestion would be to split the delivery." },
   },
   {
@@ -113,6 +117,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "What do you think about … ?",
     category: "suggestions",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Was hältst du davon, wenn wir den Kunden anrufen?", en: "What do you think about calling the customer?" },
   },
 
@@ -123,6 +128,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I completely agree with you.",
     category: "agree",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Da bin ich ganz deiner Meinung, das sollten wir so machen.", en: "I completely agree, we should do it that way." },
   },
   {
@@ -131,6 +137,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I see it exactly the same way.",
     category: "agree",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Das sehe ich genauso – ein guter Punkt.", en: "I see it exactly the same way – a good point." },
   },
   {
@@ -139,6 +146,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That's a good / convincing suggestion.",
     category: "agree",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Das ist ein überzeugender Vorschlag, dem stimme ich zu.", en: "That's a convincing suggestion, I agree." },
   },
   {
@@ -147,6 +155,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "You're absolutely right there.",
     category: "agree",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Da hast du völlig recht, das spart Zeit.", en: "You're absolutely right, that saves time." },
   },
 
@@ -157,6 +166,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I take a different view.",
     category: "disagree",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Da bin ich anderer Meinung, das ist zu teuer.", en: "I take a different view, that's too expensive." },
   },
   {
@@ -165,6 +175,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I see it somewhat differently, because …",
     category: "disagree",
     register: "formal",
+    cefr: "B1.1",
     note: "Softening with 'etwas' keeps the disagreement polite.",
     example: { de: "Das sehe ich etwas anders, weil wir wenig Zeit haben.", en: "I see it a bit differently, because we have little time." },
   },
@@ -174,6 +185,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I'm not so sure about that.",
     category: "disagree",
     register: "formal",
+    cefr: "B1.1",
     example: { de: "Ich bin mir da nicht so sicher, ob das funktioniert.", en: "I'm not so sure whether that will work." },
   },
   {
@@ -182,6 +194,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That may be, but …",
     category: "disagree",
     register: "formal",
+    cefr: "B1.2",
     note: "Acknowledge first, then object. A key B2 strategy.",
     example: { de: "Das mag sein, aber wir müssen die Kosten bedenken.", en: "That may be, but we have to consider the costs." },
   },
@@ -193,6 +206,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "If you …, then we could …",
     category: "negotiation",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Wenn Sie etwas warten, dann könnten wir liefern.", en: "If you wait a little, then we could deliver." },
   },
   {
@@ -201,6 +215,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Let's find a middle ground.",
     category: "negotiation",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Lassen Sie uns einen Mittelweg finden, der für beide passt.", en: "Let's find a middle ground that works for both." },
   },
   {
@@ -209,6 +224,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Would it be possible that … ?",
     category: "negotiation",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Wäre es möglich, dass wir den Termin vorziehen?", en: "Would it be possible to bring the date forward?" },
   },
   {
@@ -217,6 +233,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I'll meet you halfway if …",
     category: "negotiation",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Ich komme Ihnen beim Preis entgegen, wenn Sie mehr abnehmen.", en: "I'll meet you on the price if you order more." },
   },
 
@@ -227,6 +244,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "As a compromise I suggest …",
     category: "compromise",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Als Kompromiss schlage ich vor, die Kosten zu teilen.", en: "As a compromise I suggest splitting the costs." },
   },
   {
@@ -235,6 +253,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "We could meet in the middle.",
     category: "compromise",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Wir könnten uns in der Mitte treffen: zwei Tage Homeoffice.", en: "We could meet in the middle: two days remote." },
   },
   {
@@ -243,6 +262,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I could live with that.",
     category: "compromise",
     register: "neutral",
+    cefr: "B2.1",
     example: { de: "Ein gemeinsamer Termin am Freitag – damit könnte ich leben.", en: "A joint date on Friday – I could live with that." },
   },
 
@@ -253,6 +273,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Could you explain that in more detail?",
     category: "clarification",
     register: "formal",
+    cefr: "B1.1",
     example: { de: "Könnten Sie das näher erklären? Ich bin nicht ganz sicher.", en: "Could you explain that in more detail? I'm not quite sure." },
   },
   {
@@ -261,6 +282,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "If I understand you correctly, you mean …",
     category: "clarification",
     register: "formal",
+    cefr: "B1.2",
     note: "Great for paraphrasing and showing active listening.",
     example: { de: "Wenn ich Sie richtig verstehe, meinen Sie einen späteren Termin?", en: "If I understand you correctly, you mean a later date?" },
   },
@@ -270,6 +292,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "What exactly do you mean by that?",
     category: "clarification",
     register: "neutral",
+    cefr: "A2",
     example: { de: "Wie meinst du das genau mit 'flexibel'?", en: "What exactly do you mean by 'flexible'?" },
   },
   {
@@ -278,6 +301,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Did I understand correctly that … ?",
     category: "clarification",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Habe ich das richtig verstanden, dass wir morgen starten?", en: "Did I understand correctly that we start tomorrow?" },
   },
 
@@ -288,6 +312,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "In my opinion …",
     category: "opinion",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Meiner Meinung nach ist die zweite Variante besser.", en: "In my opinion the second option is better." },
   },
   {
@@ -296,6 +321,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I take the view that …",
     category: "opinion",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Ich bin der Ansicht, dass wir handeln müssen.", en: "I take the view that we have to act." },
   },
   {
@@ -304,6 +330,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "From my perspective, a lot speaks in favour of …",
     category: "opinion",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Aus meiner Sicht spricht vieles dafür, früher zu starten.", en: "From my perspective, much speaks in favour of starting earlier." },
   },
   {
@@ -312,6 +339,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I think it's important that …",
     category: "opinion",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Ich finde es wichtig, dass alle informiert sind.", en: "I think it's important that everyone is informed." },
   },
 
@@ -322,6 +350,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "One advantage of this is that …",
     category: "prosCons",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Ein Vorteil davon ist, dass wir Zeit sparen.", en: "One advantage of this is that we save time." },
   },
   {
@@ -330,6 +359,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "The disadvantage here is that …",
     category: "prosCons",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Der Nachteil dabei ist, dass es mehr kostet.", en: "The disadvantage here is that it costs more." },
   },
   {
@@ -338,6 +368,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "On one hand …, on the other hand …",
     category: "prosCons",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Einerseits spart es Geld, andererseits dauert es länger.", en: "On one hand it saves money, on the other it takes longer." },
   },
   {
@@ -346,6 +377,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That has both advantages and disadvantages.",
     category: "prosCons",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Homeoffice hat sowohl Vor- als auch Nachteile.", en: "Remote work has both advantages and disadvantages." },
   },
 
@@ -356,6 +388,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That's a good point.",
     category: "reactions",
     register: "neutral",
+    cefr: "A2",
     example: { de: "Das ist ein guter Punkt, daran hatte ich nicht gedacht.", en: "That's a good point, I hadn't thought of that." },
   },
   {
@@ -364,6 +397,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I can fully understand that.",
     category: "reactions",
     register: "neutral",
+    cefr: "B2.1",
     example: { de: "Das kann ich gut nachvollziehen, das ist ärgerlich.", en: "I can fully understand that, it's annoying." },
   },
   {
@@ -372,6 +406,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Let's solve this together.",
     category: "reactions",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Kein Problem, lassen Sie uns das gemeinsam lösen.", en: "No problem, let's solve this together." },
   },
   {
@@ -380,6 +415,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Thanks for pointing that out.",
     category: "reactions",
     register: "formal",
+    cefr: "B1.1",
     example: { de: "Vielen Dank für den Hinweis, das prüfe ich.", en: "Thanks for pointing that out, I'll check it." },
   },
 
@@ -392,6 +428,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I suggest that we first …",
     category: "suggestions",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Ich schlage vor, dass wir zunächst die Fakten sammeln.", en: "I suggest that we first gather the facts." },
   },
   {
@@ -400,6 +437,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Shouldn't we rather … ?",
     category: "suggestions",
     register: "neutral",
+    cefr: "B1.2",
     note: "Konjunktiv II softens the proposal.",
     example: { de: "Sollten wir nicht lieber online tagen?", en: "Shouldn't we rather meet online?" },
   },
@@ -409,6 +447,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "One option would be to …",
     category: "suggestions",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Eine Möglichkeit wäre, die Aufgabe aufzuteilen.", en: "One option would be to split the task." },
   },
 
@@ -419,6 +458,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I fully agree with that.",
     category: "agree",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Dem stimme ich voll und ganz zu, das ist effizient.", en: "I fully agree with that, it's efficient." },
   },
   {
@@ -427,6 +467,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That makes sense to me.",
     category: "agree",
     register: "neutral",
+    cefr: "B2.1",
     example: { de: "Das leuchtet mir ein, so sparen wir Zeit.", en: "That makes sense to me, this way we save time." },
   },
   {
@@ -435,6 +476,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That's exactly what I wanted to say too.",
     category: "agree",
     register: "neutral",
+    cefr: "B1.1",
     example: { de: "Genau das wollte ich auch sagen – gute Idee.", en: "That's exactly what I wanted to say too – good idea." },
   },
   {
@@ -443,6 +485,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I can only second that.",
     category: "agree",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Ich kann mich dem nur anschließen, das ist sinnvoll.", en: "I can only second that, it's sensible." },
   },
 
@@ -453,6 +496,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I'm afraid I have to disagree with you there.",
     category: "disagree",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Da muss ich Ihnen leider widersprechen, das ist zu riskant.", en: "I'm afraid I have to disagree, that's too risky." },
   },
   {
@@ -461,6 +505,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I see your point, but …",
     category: "disagree",
     register: "formal",
+    cefr: "B1.1",
     note: "Acknowledge before objecting. A key B2 strategy.",
     example: { de: "Ich verstehe Ihren Punkt, aber das passt nicht ins Budget.", en: "I see your point, but it doesn't fit the budget." },
   },
@@ -470,6 +515,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I have mixed feelings about that.",
     category: "disagree",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Ich sehe das mit gemischten Gefühlen, es gibt Risiken.", en: "I have mixed feelings about that, there are risks." },
   },
   {
@@ -478,6 +524,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I don't think that's a good idea.",
     category: "disagree",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Das halte ich für keine gute Idee, das kostet zu viel.", en: "I don't think that's a good idea, it costs too much." },
   },
 
@@ -488,6 +535,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "On one condition that would be feasible: …",
     category: "negotiation",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Unter einer Bedingung wäre das machbar: Wir verlängern die Frist.", en: "On one condition that would be feasible: we extend the deadline." },
   },
   {
@@ -496,6 +544,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "What if we … ?",
     category: "negotiation",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Was wäre, wenn wir die Lieferung aufteilen?", en: "What if we split the delivery?" },
   },
   {
@@ -504,6 +553,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Let's move a step towards each other.",
     category: "negotiation",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Lassen Sie uns einen Schritt aufeinander zugehen.", en: "Let's move a step towards each other." },
   },
   {
@@ -512,6 +562,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That would help both sides.",
     category: "negotiation",
     register: "formal",
+    cefr: "B2.2",
     example: { de: "Ein Rabatt bei Großbestellung – damit wäre beiden Seiten geholfen.", en: "A discount on bulk orders – that would help both sides." },
   },
 
@@ -522,6 +573,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "How about an interim solution?",
     category: "compromise",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Wie wäre es mit einer Zwischenlösung bis zum Quartalsende?", en: "How about an interim solution until the end of the quarter?" },
   },
   {
@@ -530,6 +582,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I'm willing to give a little.",
     category: "compromise",
     register: "neutral",
+    cefr: "B2.1",
     example: { de: "Ich bin bereit, beim Termin einen Schritt nachzugeben.", en: "I'm willing to give a little on the date." },
   },
   {
@@ -538,6 +591,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Can we agree that … ?",
     category: "compromise",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Können wir uns darauf einigen, dass wir am Freitag starten?", en: "Can we agree that we start on Friday?" },
   },
   {
@@ -546,6 +600,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "That sounds like a fair compromise.",
     category: "compromise",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Halbe-halbe? Das klingt nach einem fairen Kompromiss.", en: "Fifty-fifty? That sounds like a fair compromise." },
   },
   {
@@ -554,6 +609,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Let's settle in the middle.",
     category: "compromise",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Einigen wir uns in der Mitte: drei Tage im Büro.", en: "Let's settle in the middle: three days in the office." },
   },
 
@@ -564,6 +620,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Sorry, I didn't quite catch that.",
     category: "clarification",
     register: "neutral",
+    cefr: "A2",
     example: { de: "Entschuldigung, das habe ich nicht ganz verstanden – können Sie das wiederholen?", en: "Sorry, I didn't quite catch that – could you repeat it?" },
   },
   {
@@ -572,6 +629,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "What exactly do you mean by … ?",
     category: "clarification",
     register: "formal",
+    cefr: "B1.1",
     example: { de: "Was genau meinen Sie mit „kurzfristig\"?", en: "What exactly do you mean by 'short-term'?" },
   },
   {
@@ -580,6 +638,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Could you give an example?",
     category: "clarification",
     register: "formal",
+    cefr: "B1.1",
     example: { de: "Können Sie ein Beispiel nennen, damit es klarer wird?", en: "Could you give an example to make it clearer?" },
   },
   {
@@ -588,6 +647,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Just so I understand correctly: …",
     category: "clarification",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Nur damit ich es richtig verstehe: Wir liefern erst nächste Woche?", en: "Just so I understand correctly: we deliver only next week?" },
   },
 
@@ -598,6 +658,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "I'm (firmly) convinced that …",
     category: "opinion",
     register: "formal",
+    cefr: "B2.1",
     example: { de: "Ich bin fest davon überzeugt, dass sich das lohnt.", en: "I'm firmly convinced that it's worth it." },
   },
   {
@@ -606,6 +667,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "If you ask me, …",
     category: "opinion",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Wenn Sie mich fragen, sollten wir zuerst testen.", en: "If you ask me, we should test first." },
   },
   {
@@ -614,6 +676,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Personally, I lean towards …",
     category: "opinion",
     register: "neutral",
+    cefr: "B2.1",
     example: { de: "Ich persönlich tendiere zur ersten Variante.", en: "Personally, I lean towards the first option." },
   },
   {
@@ -622,6 +685,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "There's a fair amount for / against …",
     category: "opinion",
     register: "formal",
+    cefr: "B2.2",
     example: { de: "Es spricht einiges dafür, früher anzufangen.", en: "There's a fair amount in favour of starting earlier." },
   },
 
@@ -632,6 +696,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "On the one side … on the other side …",
     category: "prosCons",
     register: "neutral",
+    cefr: "B1.2",
     example: { de: "Auf der einen Seite ist es schnell, auf der anderen Seite teuer.", en: "On the one side it's fast, on the other side expensive." },
   },
   {
@@ -640,6 +705,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "What speaks in favour is …",
     category: "prosCons",
     register: "neutral",
+    cefr: "B2.1",
     example: { de: "Was dafür spricht, ist die Zeitersparnis.", en: "What speaks in favour is the time saving." },
   },
   {
@@ -648,6 +714,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "A clear disadvantage, however, is …",
     category: "prosCons",
     register: "neutral",
+    cefr: "B2.1",
     example: { de: "Ein klarer Nachteil ist allerdings der Preis.", en: "A clear disadvantage, however, is the price." },
   },
   {
@@ -656,6 +723,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "On balance, the advantages outweigh.",
     category: "prosCons",
     register: "neutral",
+    cefr: "B2.2",
     example: { de: "Unterm Strich überwiegen die Vorteile dieser Lösung.", en: "On balance, the advantages of this solution outweigh." },
   },
 
@@ -666,6 +734,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Let me briefly summarise: …",
     category: "reactions",
     register: "formal",
+    cefr: "B1.2",
     note: "Useful for structuring and closing a discussion.",
     example: { de: "Lassen Sie mich kurz zusammenfassen: Wir starten am Freitag.", en: "Let me briefly summarise: we start on Friday." },
   },
@@ -675,6 +744,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "Let's move on to the next point.",
     category: "reactions",
     register: "neutral",
+    cefr: "B1.1",
     note: "Transition between agenda items.",
     example: { de: "Gut, kommen wir zum nächsten Punkt.", en: "Good, let's move on to the next point." },
   },
@@ -684,6 +754,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "May I briefly add something?",
     category: "reactions",
     register: "formal",
+    cefr: "B1.2",
     example: { de: "Darf ich kurz etwas ergänzen, bevor wir abstimmen?", en: "May I briefly add something before we vote?" },
   },
   {
@@ -692,6 +763,7 @@ export const redemittel: RedemittelPhrase[] = [
     en: "So let's note that …",
     category: "reactions",
     register: "formal",
+    cefr: "B2.1",
     note: "Summarising a result.",
     example: { de: "Halten wir also fest, dass alle einverstanden sind.", en: "So let's note that everyone agrees." },
   },
