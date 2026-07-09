@@ -2238,3 +2238,26 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/components/layout/AppShell.tsx`, `src/components/layout/Sidebar.tsx`,
   `src/features/auth/SaveProgressBanner.tsx`, `src/features/dashboard/Dashboard.tsx`;
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 250).
+
+## Entry 251 — 2026-07-09 (session 85)
+- **Branch:** `claude/genauly-start-page-preview-1ih2vi`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** a live mobile screenshot of Heute showing the 4 identical rings + the stacked header icon.
+- **Prompt (verbatim):**
+  > all the icons are similar with a round metered like graph. also, the icon in the top row has the fire
+  > emoji on top of the number which is weird - they should be beside each other horizontally. Generate a
+  > couple of previews on how would you improve this page when it comes to design and ux
+- **Response summary:** Built a comparison Artifact with two directions (A: each tile a distinct form;
+  B: one Tagesziel hero bar + week heatmap + a calm icon-stat strip), both fixing the stacked header icon
+  (horizontal flame+number chip).
+- **Prompt (verbatim):**
+  > i like option b. remove the icon tray in fortschritt page
+- **Response summary:** Implemented Option B in the app minus the icon-stat tray. `Dashboard.tsx`: the
+  four `StatRing`s are replaced by a single Tagesziel **hero bar** (gradient) + a **7-day activity
+  heatmap** (shaded by daily XP vs goal, today ringed, weekday initials), from the progress store only.
+  `AppShell.tsx`: the header streak becomes a **horizontal chip** (flame + number + "Tage", goal ring
+  around the flame). Verified desktop + mobile in Chromium (no page errors); build + lint (0 errors) green.
+  Shipped via PR → squash-merge → realign.
+- **Artifacts:** comparison Artifact (`scratchpad/heute-redesign-options.html`);
+  `src/features/dashboard/Dashboard.tsx`, `src/components/layout/AppShell.tsx`; `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 251).
