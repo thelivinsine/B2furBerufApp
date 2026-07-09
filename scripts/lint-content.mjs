@@ -63,8 +63,9 @@ const FREQUENCIES = ["core", "common", "specialized"];
 // "office" removed + WorkSituation retired in the categorization audit
 // 2026-07-09 (Situation = sub-theme grain of Thema, not a separate axis).
 const WORK_SECTORS = ["care", "trades", "it", "retail", "hospitality"];
-const COUNTERPARTS = ["manager", "colleague", "customer", "team"];
-const TASK_TYPES = ["email", "phone-call", "report", "instruction", "presentation"];
+// counterpart/taskType were CUT (audit P3 resolution, 2026-07-09): 0-tagged
+// forward-declares with no authoring plan. The checks below error if a row
+// reintroduces them without re-declaring the axis properly.
 const TEXT_KINDS = ["letter", "email", "memo", "announcement", "voicemail"];
 
 /* ---- game enums (mirror of src/types/game.ts unions, game G1) ---- */
@@ -248,6 +249,9 @@ function lintGrammar(grammar) {
     for (const f of ["title", "titleDe", "purpose", "purposeDe", "explanation", "pattern"])
       if (!isStr(t[f])) error(ds, w, `${f} empty`);
     if (!GRAMMAR_GROUPS.includes(t.group)) error(ds, w, `invalid group "${t.group}"`);
+    // Completeness, not validate-when-present: all 10 topics are tagged
+    // (audit P2), so a new topic without a level is a gap, not an option.
+    if (!CEFR_LEVELS.includes(t.cefr)) error(ds, w, `missing/invalid cefr "${t.cefr}"`);
     if (!Array.isArray(t.examples) || t.examples.length === 0) error(ds, w, "no examples");
     else t.examples.forEach((ex, i) => checkExample(ex, ds, `${w}.examples[${i}]`));
     if (!Array.isArray(t.drills) || t.drills.length === 0) error(ds, w, "no drills");
@@ -378,10 +382,8 @@ function lintRedemittel(redemittel) {
       error(ds, w, `invalid cefr "${r.cefr}"`);
     if (r.themeId !== undefined && !THEME_IDS.includes(r.themeId))
       error(ds, w, `invalid themeId "${r.themeId}"`);
-    if (r.counterpart !== undefined && !COUNTERPARTS.includes(r.counterpart))
-      error(ds, w, `invalid counterpart "${r.counterpart}"`);
-    if (r.taskType !== undefined && !TASK_TYPES.includes(r.taskType))
-      error(ds, w, `invalid taskType "${r.taskType}"`);
+    if (r.counterpart !== undefined || r.taskType !== undefined)
+      error(ds, w, "counterpart/taskType were cut (audit P3, 2026-07-09); re-declare the axis before tagging");
   }
 }
 

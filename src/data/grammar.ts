@@ -12,6 +12,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Konnektoren (expanded) ---------------- */
   {
     id: "g_konnektoren",
+    cefr: "B2.1",
     group: "connectors",
     title: "Connectors for structured arguments",
     titleDe: "Konnektoren",
@@ -76,6 +77,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Relativsätze ---------------- */
   {
     id: "g_relativsaetze",
+    cefr: "B1.2",
     group: "relativeClauses",
     title: "Relative clauses",
     titleDe: "Relativsätze",
@@ -141,6 +143,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Präpositionalpronomen (da-/wo-words) ---------------- */
   {
     id: "g_praepositionalpronomen",
+    cefr: "B2.1",
     group: "prepositionalPronouns",
     title: "Prepositional pronouns (da-/wo-words)",
     titleDe: "Präpositionalpronomen (da-/wo-Wörter)",
@@ -205,6 +208,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Verbstellung / Verbklammer (TeKaMoLo) ---------------- */
   {
     id: "g_verbstellung",
+    cefr: "B1.2",
     group: "verbPosition",
     title: "Verb position & sentence bracket",
     titleDe: "Verbstellung & Verbklammer (TeKaMoLo)",
@@ -269,6 +273,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Nebensätze: dass / weil / damit ---------------- */
   {
     id: "g_nebensatz",
+    cefr: "B1.1",
     group: "subordinate",
     title: "Subordinate clauses: dass / weil / damit",
     titleDe: "Nebensätze: dass / weil / damit",
@@ -333,6 +338,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Kasus & Wechselpräpositionen ---------------- */
   {
     id: "g_kasus",
+    cefr: "B1.2",
     group: "cases",
     title: "Cases & two-way prepositions",
     titleDe: "Kasus & Wechselpräpositionen",
@@ -397,6 +403,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Nomen-Verb-Verbindungen (explainer) ---------------- */
   {
     id: "g_nomen_verb",
+    cefr: "B2.2",
     group: "collocations",
     title: "Noun-verb combinations",
     titleDe: "Nomen-Verb-Verbindungen (Funktionsverbgefüge)",
@@ -461,6 +468,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Konjunktiv II ---------------- */
   {
     id: "g_konjunktiv2",
+    cefr: "B2.1",
     group: "konjunktiv2",
     title: "Konjunktiv II for polite suggestions",
     titleDe: "Konjunktiv II",
@@ -517,6 +525,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Modalverben ---------------- */
   {
     id: "g_modal",
+    cefr: "B1.1",
     group: "modals",
     title: "Modal verbs for negotiation",
     titleDe: "Modalverben",
@@ -572,6 +581,7 @@ export const grammar: GrammarTopic[] = [
   /* ---------------- Passiv ---------------- */
   {
     id: "g_passiv",
+    cefr: "B2.1",
     group: "passive",
     title: "Passive for processes",
     titleDe: "Passiv",
