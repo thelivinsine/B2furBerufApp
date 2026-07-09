@@ -2171,3 +2171,21 @@ Branch: `claude/whats-next-esga9u`.
   With this, EVERY item from the categorization audit roadmap is shipped or founder-review-pending.
 - **Artifacts:** PR #385 → squash-merge → realign; `docs/DECISIONS.md` (new locked section),
   `docs/SESSION_PROMPT_LOG.md` (entry 247).
+
+## Entry 248 — 2026-07-09 (session 84)
+- **Branch:** `claude/bibliothek-categorization-analysis-mtqo5o`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document this session.
+- **Response summary:** Session-documentation pass. Most docs were written incrementally during the
+  session (prompt-log entries 244–247; the PROJECT_STATUS session-84 handoff; CLAUDE.md taxonomy/grammar
+  facts; the locked "Bibliothek classification axes" section in `docs/DECISIONS.md`; the implementation
+  plan marked fully shipped). This pass applied the doc-hygiene rotation rule: moved the older
+  **session-82 handoff** out of PROJECT_STATUS "Resume here" into
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` (Resume here now holds only the two most
+  recent handoffs, 84 + 83; live doc trimmed 386→348 lines), updated the "Older handoffs" note (1–82 /
+  69–82 in W28) and the archive index row, and appended this entry. No app code changed.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`,
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md`, `docs/SESSION_PROMPT_LOG.md` (entry 248). Doc-only; shipped
+  via PR → squash-merge → branch realign.

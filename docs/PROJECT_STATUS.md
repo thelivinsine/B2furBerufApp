@@ -324,48 +324,10 @@ sentence. Wrong taps earn only a deadpan reaction (failure is content); the scen
   decision is the player WANT.** No story/mission content changed yet; the re-framing is mostly data edits
   once a want is chosen. Every AI-drafted German stays a draft until `verify:grammar`/native review.
 
-**Handoff after session 82 (2026-07-08). Neuland game-visuals fix (branch `claude/missing-game-visuals-qcmde6`).**
-The founder sent screenshots of the game (`/welt`) showing "no game visuals": the Willkommen passport battle
-and the Fahrkarten-Automat cutscene rendered over a blank beige stage. **Root cause:** `SETTING_ART` in
-`src/features/welt/stage.tsx` mapped `terminal` and `laden` to `null`, so the two most-used Chapter-1
-settings (8 scenes each, 16 total) had no backdrop. G2's licensed pixel-art packs were still pending, and
-the interim left those stages blank rather than placeholder-filled.
-- **Fix (PR #368, squash-merged):** authored two backdrops in `preview/game-pixel-mockups/welt_assets.py`
-  in the blessed scene-7 pixel language, a new polished-tile floor helper for public spaces: **`terminal`**
-  (transit hall: split-flap departure board, passport/service counter under the battle-opponent spot,
-  self-service ticket machine, direction sign) and **`laden`** (shop: stocked product shelves, checkout
-  counter with register + card terminal, sale poster). Regenerated `terminal.png`/`laden.png`, wired both
-  into `SETTING_ART`. `website` stays `null` on purpose (`WebsiteView` draws its own browser chrome).
-- **Gates green:** `pnpm build`, `check:bundle` (83 kB, game stays lazy). Founder confirmed the deploy
-  rendered correctly (screenshot of the Fahrkarten-Automat with the transit-hall backdrop).
-- **Follow-up Q&A (no code):** clarified the roadmap, walking is G3 (Phaser overworld, playtest-gated), the
-  battle scenes are staged React tableaux by design (not walkable); only the loadout scene walks today. G2
-  is **in progress**, not complete.
-- **Founder decision, G2 build order reshuffled (variety before plumbing):** the founder flagged that every
-  mission plays as cutscene → battle → cutscene (all 6 missions have exactly one dialogueBattle, so the
-  Geduld/Mut bars appear every time and the boss stops feeling special). Approved re-sequencing the
-  remaining G2 rungs so playtesters see a varied chapter: **(1) hotspot tappable-stage layer, (2)
-  Keypad/Automat scene kind + re-skin mission 1.2 (and the 1.4 Leergut beat), (3) type-under-timer for the
-  1.4 checkout, then (4) recurring-mission composer, (5) fetch-quest loop, (6) Supabase game-state
-  migration.** Nothing cut, same total work. Full rationale + catalog references recorded in
-  `GAME_IMPLEMENTATION_PLAN.md` (G2 status block). **Next session starts at rung 1** (plan-first; the
-  activity specs are in `MISSION_ACTIVITY_RESEARCH.md` §2).
-- **Founder decision, playtest gate moved to the END of the full build:** the founder's playtest crowd is
-  B2 learners, and Kapitel 1 is B1.1–B1.2; an early external test would bore them on the easiest content.
-  Decision (assistant recommended a middle path, founder chose the full build knowingly): **complete G2 +
-  author Kapitel 2–6 + build the G3 walkable city BEFORE the 5–10-learner external playtest.** Risk
-  management: founder stays the internal per-chapter tester (each chapter played on their phone before the
-  next is authored), content before engine (all chapters before the Phaser city), zero-spend rule holds,
-  and a **chapter-select / start-at-your-level entry** joins the build list so B2 testers can skip the easy
-  opening. Both decisions recorded in `GAME_IMPLEMENTATION_PLAN.md` (G2 status block + G3 gating note).
-  **The long road, in order:** G2 variety rungs 1–3 → Kapitel 2 (Wohnen) → Kapitel 3–6 (each
-  founder-tested) → G2 plumbing (composer, fetch-quest, Supabase migration) interleaved as needed →
-  chapter-select entry → G3 city → external B2 playtest.
-
 ---
 
-_Older handoffs (sessions 1–81) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–81 are in the W28 file)._
+_Older handoffs (sessions 1–82) are archived by ISO week under `docs/archive/status-log/`
+(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–82 are in the W28 file)._
 
 **Content counts (verified from `src/data/*` on 2026-07-07):**
 - Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)
