@@ -2152,3 +2152,22 @@ Branch: `claude/whats-next-esga9u`.
   `src/lib/themeGroups.ts` (new); updated `CLAUDE.md`, `docs/strategy/DATA_GOVERNANCE.md`,
   `docs/plans/BIBLIOTHEK_CATEGORIZATION_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`.
   `docs/SESSION_PROMPT_LOG.md` (entry 246). **Founder review pending: the 72 Redemittel cefr drafts.**
+
+## Entry 247 — 2026-07-09 (session 84)
+- **Branch:** `claude/bibliothek-categorization-analysis-mtqo5o`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > implement p2 and p3 too
+- **Response summary:** Shipped the audit's remaining P2 + P3 items as PR #385. P2: `GrammarTopic.cefr`
+  added and all 10 topics AI-draft-tagged (B1.1 Nebensätze/Modalverben · B1.2 Relativsätze/Verbstellung/
+  Kasus · B2.1 Konnektoren/da-Wörter/Konjunktiv II/Passiv · B2.2 Funktionsverbgefüge; founder verify
+  pending), shown as badges on the hub cards + topic view, with a linter COMPLETENESS check; the
+  control-choice rule + axis rule codified in the `lib/facets.ts` header and as a locked
+  "Bibliothek classification axes" section in `docs/DECISIONS.md`. P3 resolved as CUT (not park): the
+  0-tagged `counterpart`/`taskType` forward-declares deleted from types + linter mirrors (zero data
+  lost), with a linter error on reintroduction. CLAUDE.md taxonomy/grammar facts refreshed. All gates
+  green (build, lint:content, test:unit 97, lint 0 errors, bundle 83 kB) + Chromium smoke of the badges.
+  With this, EVERY item from the categorization audit roadmap is shipped or founder-review-pending.
+- **Artifacts:** PR #385 → squash-merge → realign; `docs/DECISIONS.md` (new locked section),
+  `docs/SESSION_PROMPT_LOG.md` (entry 247).

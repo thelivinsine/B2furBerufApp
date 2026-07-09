@@ -232,9 +232,12 @@ implementation shipped to `main` (branch `claude/bibliothek-categorization-analy
   default hides only the 3 B2.2 phrases, escapable via the Stufe chip).
 - All PRs verified with Chromium smoke tests on the built app + full gates (build, lint:content,
   test:unit 97, lint 0 errors, bundle 83 kB). **Founder verifies the live site.**
-- **Remaining from the audit (deliberately deferred):** `GrammarTopic.cefr` field + badge (P2); the
-  dropdown-vs-facet rule writeup in `facets.ts` header is partially done (floor documented); decide
-  `counterpart`/`taskType` cut-or-park (P3).
+- **P2 + P3 also shipped (PR #385, founder follow-up prompt):** `GrammarTopic.cefr` on all 10 topics
+  (AI-drafted, founder verify pending; badge on cards + topic view; linter completeness check); the
+  control-choice + axis rules codified in the `facets.ts` header and a locked `docs/DECISIONS.md`
+  section; `counterpart`/`taskType` CUT (0-tagged, no plan, zero data lost; linter errors on
+  reintroduction). **Nothing from the audit roadmap remains unshipped**; open items are founder
+  reviews only (72 Redemittel + 10 grammar cefr drafts).
 
 **Part 1 of the session (the audit itself):**
 
