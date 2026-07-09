@@ -234,6 +234,13 @@ default, minimal Spielen card), then implemented it **scoped to the Dashboard bo
   "Sichere deinen Fortschritt" nudge (`SaveProgressBanner`, new `variant="sidebar"`) moved to the
   bottom-left of the desktop `Sidebar` (mobile keeps the Heute-top banner via `lg:hidden`); the sidebar's
   "Bereit für die Prüfung?" card was removed.
+- **Fortschritt redesign (founder chose "Option B" from a comparison Artifact):** the four identical
+  Fortschritt rings were the problem (a count inside a meaningless ring). Replaced with a single
+  **Tagesziel hero bar** (gradient progress) + a **7-day activity heatmap** (shaded by each day's XP vs
+  goal, today ringed), all from the progress store (no bank walk). The founder asked to drop Option B's
+  icon-stat tray, so it's just the bar + heatmap. The header streak icon is now a **horizontal chip**
+  (flame + number + "Tage" side by side, goal ring around the flame) instead of the flame-stacked-on-
+  number ring.
 
 **Prior handoff after session 84 (2026-07-09). Bibliothek categorization: audit delivered AND the full
 implementation shipped to `main` (branch `claude/bibliothek-categorization-analysis-mtqo5o`).**

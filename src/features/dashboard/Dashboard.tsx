@@ -2,10 +2,10 @@ import { lazy, Suspense, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Zap, Play } from "lucide-react";
-import { useProgressStore, useTodayXp, useEffectiveStreak } from "@/store/useProgressStore";
+import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { dueCount } from "@/engine/srs";
-import { cn } from "@/lib/utils";
+import { cn, todayKey } from "@/lib/utils";
 
 // The Neuland carousel imports the mission bank, so it loads lazily to keep the
 // content bank off the Dashboard's eager path (bundle budget, CLAUDE.md), the
@@ -47,38 +47,13 @@ function Ring({
   );
 }
 
-/** One Fortschritt stat: a small ring with the exact figure in its centre. */
-function StatRing({
-  pct,
-  color,
-  value,
-  label,
-  sub,
-}: {
-  pct: number;
-  color: string;
-  value: string;
-  label: string;
-  sub: string;
-}) {
-  return (
-    <div className="card-hover flex flex-col items-center gap-2.5 rounded-2xl border border-border bg-surface p-4 text-center">
-      <Ring pct={pct} size={62} color={color}>
-        <span className="text-sm font-bold tabular-nums">{value}</span>
-      </Ring>
-      <span className="text-sm font-medium leading-none">{label}</span>
-      <span className="text-[11.5px] leading-none text-muted-foreground">{sub}</span>
-    </div>
-  );
-}
-
 const tag =
   "rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground";
 
 export function Dashboard() {
   const goal = useSettingsStore((s) => s.dailyGoalXp);
-  const streak = useEffectiveStreak();
   const srs = useProgressStore((s) => s.srs);
+  const dailyXp = useProgressStore((s) => s.dailyXp);
   const totalSessions = useProgressStore((s) => s.totalSessions);
   const todayXp = useTodayXp();
 
@@ -86,11 +61,24 @@ export function Dashboard() {
 
   const goalPercent = Math.round(Math.min(todayXp / goal, 1) * 100);
   const due = dueCount(srs);
-  const learned = Object.keys(srs).length;
 
   // Session length target, deterministic so the subtitle stays stable.
   const sessionMinutes = Math.max(5, Math.round(goal / 8));
   const started = totalSessions > 0 || todayXp > 0;
+
+  // Last 7 days (oldest first) for the activity heatmap: each cell is shaded by
+  // that day's XP against the daily goal, from the progress store (no bank walk).
+  const week = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (6 - i));
+    const key = todayKey(d);
+    return {
+      key,
+      ratio: Math.min((dailyXp[key] ?? 0) / goal, 1),
+      wd: ["S", "M", "D", "M", "D", "F", "S"][d.getDay()],
+      isToday: i === 6,
+    };
+  });
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -167,9 +155,8 @@ export function Dashboard() {
               </div>
             </Link>
 
-            {/* Fortschritt: four figures straight from the progress store, no
-                content-bank walk. Rings show progress to the next milestone;
-                the centred number is the exact figure. */}
+            {/* Fortschritt: one hero bar for the daily goal plus a 7-day activity
+                heatmap. All from the progress store, no content-bank walk. */}
             <div>
               <div className="mb-3 flex items-baseline justify-between">
                 <div>
@@ -180,35 +167,36 @@ export function Dashboard() {
                   Alle Statistiken →
                 </Link>
               </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <StatRing
-                  pct={goalPercent}
-                  color="hsl(var(--primary))"
-                  value={`${goalPercent}%`}
-                  label="Tagesziel"
-                  sub={`${todayXp} XP heute`}
-                />
-                <StatRing
-                  pct={Math.min(streak / 7, 1) * 100}
-                  color="hsl(var(--warning))"
-                  value={`${streak}`}
-                  label="Serie"
-                  sub="Tage in Folge"
-                />
-                <StatRing
-                  pct={((learned % 50) / 50) * 100}
-                  color="hsl(var(--accent))"
-                  value={`${learned}`}
-                  label="Wörter"
-                  sub="gelernt"
-                />
-                <StatRing
-                  pct={due === 0 ? 100 : Math.min(due / 25, 1) * 100}
-                  color={due === 0 ? "hsl(var(--success))" : "hsl(var(--primary))"}
-                  value={`${due}`}
-                  label="Fällig"
-                  sub={due === 0 ? "alles wiederholt" : "zum Wiederholen"}
-                />
+              <div className="rounded-2xl border border-border bg-surface p-5">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="text-sm font-bold">Tagesziel</span>
+                  <span className="text-sm tabular-nums text-muted-foreground">
+                    {todayXp} / {goal} XP · {goalPercent}%
+                  </span>
+                </div>
+                <div className="mt-3 h-3 overflow-hidden rounded-full bg-muted">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-[width] duration-500"
+                    style={{ width: `${goalPercent}%` }}
+                  />
+                </div>
+                <div className="mt-4 flex gap-1.5" aria-label="Aktivität der letzten 7 Tage">
+                  {week.map((d) => (
+                    <div key={d.key} className="flex flex-1 flex-col items-center gap-1.5">
+                      <div
+                        className="h-6 w-full rounded-md"
+                        style={{
+                          background:
+                            d.ratio > 0
+                              ? `hsl(var(--primary) / ${(0.3 + d.ratio * 0.6).toFixed(2)})`
+                              : "hsl(var(--muted))",
+                          boxShadow: d.isToday ? "0 0 0 2px hsl(var(--primary) / 0.35)" : undefined,
+                        }}
+                      />
+                      <span className="text-[9px] font-medium text-muted-foreground">{d.wd}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </motion.div>

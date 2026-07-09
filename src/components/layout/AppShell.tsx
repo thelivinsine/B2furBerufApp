@@ -184,23 +184,28 @@ export function AppShell() {
 
             <div className="flex items-center gap-1.5 sm:gap-2">
               <ModeSwitcher />
-              {/* Little progress graphic (moved out of the Heute body): a conic
-                  daily-goal ring with the streak in its centre. */}
+              {/* Streak chip: flame and number sit side by side (never stacked).
+                  The small ring around the flame doubles as the daily-goal
+                  gauge, so the header keeps both signals in one horizontal pill. */}
               <div
-                className="relative h-10 w-10 shrink-0"
+                className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-warning/10 pl-1 pr-3"
                 role="img"
-                aria-label={`${goalPercent}% des Tagesziels · Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
+                aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"} · ${goalPercent}% des Tagesziels`}
               >
                 <div
-                  className="h-full w-full rounded-full"
+                  className="relative h-7 w-7 shrink-0 rounded-full"
                   style={{
                     background: `conic-gradient(hsl(var(--primary)) ${goalPercent * 3.6}deg, hsl(var(--border)) ${goalPercent * 3.6}deg)`,
                   }}
-                />
-                <div className="absolute inset-[3px] flex flex-col items-center justify-center rounded-full bg-surface leading-none">
-                  <Flame className={cn("h-2.5 w-2.5 text-warning", streak > 0 && "fill-warning/30")} />
-                  <span className="text-[11px] font-bold tabular-nums">{streak}</span>
+                >
+                  <div className="absolute inset-[3px] grid place-items-center rounded-full bg-surface">
+                    <Flame className={cn("h-3 w-3 text-warning", streak > 0 && "fill-warning/30")} />
+                  </div>
                 </div>
+                <span className="text-sm font-bold tabular-nums text-warning">{streak}</span>
+                <span className="text-xs font-medium text-muted-foreground">
+                  {streak === 1 ? "Tag" : "Tage"}
+                </span>
               </div>
               <button
                 onClick={() => setSearchOpen(true)}
