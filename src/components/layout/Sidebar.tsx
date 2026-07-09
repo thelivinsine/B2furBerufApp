@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navItems } from "./nav-items";
 import { RouteIcon } from "./route-icons";
+import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 
 export function Sidebar({
   onNavigate,
@@ -69,11 +70,9 @@ export function Sidebar({
         ))}
       </nav>
 
-      <div className="mt-auto rounded-xl bg-mesh p-4">
-        <p className="text-sm font-semibold">Bereit für die Prüfung?</p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Übe täglich 10 Minuten und halte deine Serie am Leben.
-        </p>
+      {/* Sign-in nudge, pinned to the bottom-left of the nav panel. */}
+      <div className="mt-auto pt-4">
+        <SaveProgressBanner variant="sidebar" />
       </div>
     </div>
   );

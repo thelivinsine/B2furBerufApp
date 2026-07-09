@@ -7,7 +7,8 @@ import { ThemeToggle } from "./ThemeToggle";
 import { BottomTabBar } from "./BottomTabBar";
 import { MoreSheet } from "./MoreSheet";
 import { GlobalSearch } from "./GlobalSearch";
-import { useEffectiveStreak } from "@/store/useProgressStore";
+import { useEffectiveStreak, useTodayXp } from "@/store/useProgressStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Toaster } from "./Toaster";
@@ -66,6 +67,15 @@ export function AppShell() {
   // Effective streak (0 once broken) so the header never disagrees with the
   // dashboard after a missed day.
   const streak = useEffectiveStreak();
+
+  // Greeting + daily-goal progress now live in the top row (they moved out of
+  // the Heute body). Hour-based greeting keeps the header personal.
+  const name = useSettingsStore((s) => s.name);
+  const goal = useSettingsStore((s) => s.dailyGoalXp);
+  const todayXp = useTodayXp();
+  const goalPercent = Math.round(Math.min(todayXp / goal, 1) * 100);
+  const hour = new Date().getHours();
+  const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
 
   // Focus mode (Phase 2.1): the SessionPlayer flags an active composed session,
   // and we hide all chrome (header, bottom bar, sidebar) so it plays as a
@@ -161,19 +171,36 @@ export function AppShell() {
                 <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-8 w-8 rounded-lg shadow-glow" />
                 <span className="text-sm font-semibold tracking-tight">Genauly</span>
               </Link>
-              <p className="hidden text-sm text-muted-foreground lg:block">
-                Willkommen zurück 👋
-              </p>
+              <div className="hidden leading-tight lg:block">
+                <p className="text-sm font-semibold">
+                  {greeting}
+                  {name ? `, ${name}` : ""}
+                </p>
+                <p className="text-xs tabular-nums text-muted-foreground">
+                  {todayXp} / {goal} XP · {goalPercent}%
+                </p>
+              </div>
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
               <ModeSwitcher />
+              {/* Little progress graphic (moved out of the Heute body): a conic
+                  daily-goal ring with the streak in its centre. */}
               <div
-                className="flex h-9 items-center gap-1.5 rounded-full bg-warning/10 px-3 text-sm font-semibold text-warning"
-                aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
+                className="relative h-10 w-10 shrink-0"
+                role="img"
+                aria-label={`${goalPercent}% des Tagesziels · Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
               >
-                <Flame className={cn("h-4 w-4", streak > 0 && "fill-warning/30")} />
-                {streak}
+                <div
+                  className="h-full w-full rounded-full"
+                  style={{
+                    background: `conic-gradient(hsl(var(--primary)) ${goalPercent * 3.6}deg, hsl(var(--border)) ${goalPercent * 3.6}deg)`,
+                  }}
+                />
+                <div className="absolute inset-[3px] flex flex-col items-center justify-center rounded-full bg-surface leading-none">
+                  <Flame className={cn("h-2.5 w-2.5 text-warning", streak > 0 && "fill-warning/30")} />
+                  <span className="text-[11px] font-bold tabular-nums">{streak}</span>
+                </div>
               </div>
               <button
                 onClick={() => setSearchOpen(true)}
@@ -196,7 +223,13 @@ export function AppShell() {
               : "mx-auto w-full max-w-6xl px-4 pt-6 pb-nav sm:px-6 sm:pt-8 lg:pb-safe-8",
           )}
         >
-          {location.pathname === "/" && <SaveProgressBanner />}
+          {/* Desktop shows this nudge at the bottom of the sidebar instead; keep
+              a mobile-only copy on Heute where there is no sidebar. */}
+          {location.pathname === "/" && (
+            <div className="lg:hidden">
+              <SaveProgressBanner />
+            </div>
+          )}
           <AnimatePresence mode="wait">
             <motion.div key={location.pathname}>
               <Suspense
