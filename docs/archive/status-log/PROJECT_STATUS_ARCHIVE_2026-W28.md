@@ -613,3 +613,52 @@ the interim left those stages blank rather than placeholder-filled.
   **The long road, in order:** G2 variety rungs 1–3 → Kapitel 2 (Wohnen) → Kapitel 3–6 (each
   founder-tested) → G2 plumbing (composer, fetch-quest, Supabase migration) interleaved as needed →
   chapter-select entry → G3 city → external B2 playtest.
+
+---
+
+## Session 83 handoff (2026-07-08) — G2 variety rungs 1–2 SHIPPED (branch `claude/g2-variety-work-0t6c9a`)
+
+**Rung 2 (PR #375): the `automat` (Keypad/Automat) scene kind (activity catalog #8).** A step-by-step
+rendered machine: the player reads the screen and presses the right key; a correct key advances the
+machine, a wrong key only buzzes (infinite patience, no bar to drain, no lockout). A machine finally
+feels like a machine instead of a conversation with a face.
+- **Missions stay data, not code.** `types/game.ts`: `AutomatKey`/`AutomatStep`/`AutomatScene` in the
+  closed union. `engine/mission.ts`: pure `pressKey`/`currentAutomatStep`/`automatDone` with a per-step
+  first-try grade (Good clean, Hard after a fumble) into FSRS + XP, and an `AutomatRuntime` on MissionRun
+  (init on scene entry, cleared on win). `features/welt/scenes.tsx`: `AutomatView` (device plate + LCD
+  screen + keypad) in the pixel-UI language, wired into `MissionPlayer`. `lint-content.mjs`: validates the
+  step graph (unique ids, ≥1 correct key per non-terminal step, `next` resolves, a reachable `done`).
+  `tests/mission.test.ts`: 6 runner tests over an inline fixture.
+- **Re-skinned off the dialogueBattle (founder's s82 reorder):** **1.2 Fahrkarten-Automat** (the ticket
+  machine becomes a real machine: Einzelfahrt → Zone AB → pay → ticket; the battle lose/retry scaffolding
+  `neustart` is gone, so there is one fewer battle and the boss stands out) and the **1.4 Leergut beat**
+  (the Pfand websiteParody becomes the Leergutautomat: feed two deposit bottles, print the Bon; the
+  `vergessen` branch is gone). `npc_automat` is now unused but left in the registry (harmless).
+- **Gates green:** `lint:content` (6 missions / 35 scenes), `test:unit` (97, +6), `build`, `check:bundle`
+  (83 kB), `lint` (0 errors).
+
+**Rung 1 (PR #374): the `hotspot` scene kind.** Added **`hotspot`**, one generic tappable-stage layer (activity catalog #2 "Hotspot
+antippen"; also carries #7 "Aufruf abfangen" and #18 "Listen-and-act" via an optional TTS `audio` line):
+the player proves comprehension by TAPPING the right place on the pixel stage instead of picking a
+sentence. Wrong taps earn only a deadpan reaction (failure is content); the scene clears once every
+`correct` spot is found.
+- **Missions stay data, not code.** `types/game.ts`: `Hotspot` + `HotspotScene` in the closed
+  `MissionScene` union. `engine/mission.ts`: pure `tapHotspot`/`hotspotSolved` with scene-scoped
+  first-try grading (Good clean, Hard after a fumble) into FSRS + XP, plus two run-state maps.
+  `features/welt/scenes.tsx`: `HotspotView` renderer in the blessed pixel-UI language, wired into
+  `MissionPlayer`. `lint-content.mjs`: mirrors the kind + validates spots (unique ids, 0..100 percents,
+  ≥1 correct, vocab ids resolve). `tests/mission.test.ts`: 6 runner tests over an inline fixture.
+- **Used in the two earliest-played missions** so the variety is visible: **1.1** gains a listen-and-act
+  departure board (tap Gleis 4), **1.4** gains the shelf search (tap Milch/Brot/Äpfel among distractors).
+  Hotspots are authored vocab-free (they train Hören/Lesen, XP-only), which is pedagogically honest and
+  avoids forcing unnatural vocab tags.
+
+**Also this session (after rungs 1–2):**
+- **Hotspot polish (PR #376).** Founder screenshot of the 1.1 departure board: the labeled hotspot
+  targets rendered as big translucent circles that read as floating soap bubbles. Restyled labeled targets
+  as solid pixel sign-plates (opaque, bordered, hard shadow, idle bob); label-less spots keep the pulsing
+  ring. Tidied the 1.1 platform signs into a row and the 1.4 shelf tags into two rows.
+- **Neuland story research + brainstorm toolkit (PR #377, docs-only).** Four `docs/strategy/` docs:
+  `NEULAND_PRIMER.md`, `BRAINSTORM_TOOLKIT.md`, `STORY_MISSION_BRAINSTORM.md`, `LANGUAGE_RPG_RESEARCH.md`.
+  Founder is taking these to other LLMs; the keystone decision is the player WANT. No story/mission content
+  changed yet.

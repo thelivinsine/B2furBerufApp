@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Check, KeyRound, Lock, Play, Swords } from "lucide-react";
 import type { Mission } from "@/types/game";
@@ -18,12 +19,32 @@ import { GameCard, Chip, Pill, PixelStage } from "@/features/welt/stage";
  * tokens so it sits naturally in the shell.
  */
 export function Welt() {
-  const [active, setActive] = useState<Mission | null>(null);
+  const [params, setParams] = useSearchParams();
   const missionsDone = useProgressStore((s) => s.missionsDone);
   const ownedItems = useProgressStore((s) => s.keyItems);
 
+  // Deep link from the Heute → Spielen carousel: /welt?mission=<id> auto-opens
+  // that mission when it exists and is unlocked. Read once on mount; absent or
+  // invalid param leaves the hub untouched.
+  const [active, setActive] = useState<Mission | null>(() => {
+    const id = params.get("mission");
+    if (!id) return null;
+    const m = missions.find((mm) => mm.id === id);
+    if (!m) return null;
+    const { missionsDone: done, keyItems } = useProgressStore.getState();
+    return missionUnlocked(m, done, keyItems) ? m : null;
+  });
+
+  const exitMission = () => {
+    setActive(null);
+    if (params.has("mission")) {
+      params.delete("mission");
+      setParams(params, { replace: true });
+    }
+  };
+
   if (active) {
-    return <MissionPlayer key={active.id} mission={active} onExit={() => setActive(null)} />;
+    return <MissionPlayer key={active.id} mission={active} onExit={exitMission} />;
   }
 
   // Only chapters that already have authored missions render as sections.
