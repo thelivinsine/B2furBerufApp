@@ -79,6 +79,10 @@ export function FacetSheet<T>({
 
   const activeCount = activeFacetCount(selection);
 
+  // No facets at all (a tab with nothing orthogonal to filter, or every facet
+  // below the coverage floor): render no Filter chip rather than an empty sheet.
+  if (facets.length === 0) return null;
+
   const openSheet = () => {
     setDraft(selection);
     setOpen(true);

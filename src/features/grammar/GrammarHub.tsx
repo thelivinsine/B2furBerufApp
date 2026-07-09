@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, BookMarked, Lightbulb, Volume2, GraduationCap } from "lucide-react";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
+import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import type { GrammarGroup, GrammarTopic } from "@/types";
 import { grammar, grammarById } from "@/data/grammar";
 import { iconByName } from "@/lib/icons";
@@ -28,30 +29,57 @@ const groupMeta: Record<GrammarGroup, { labelDe: string; icon: string }> = {
   passive: { labelDe: "Passiv", icon: "Boxes" },
 };
 
+// Ordered by B2-marker priority (categorization audit 2026-07-09): the
+// structures that most distinguish B2 output come first, so the hub answers
+// "which rule is throttling my German" before "where is topic X".
 const groupOrder: GrammarGroup[] = [
   "connectors",
-  "relativeClauses",
-  "prepositionalPronouns",
-  "verbPosition",
-  "subordinate",
-  "cases",
-  "collocations",
   "konjunktiv2",
-  "modals",
   "passive",
+  "subordinate",
+  "relativeClauses",
+  "cases",
+  "verbPosition",
+  "prepositionalPronouns",
+  "modals",
+  "collocations",
 ];
+
+function normalise(s: string) {
+  return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
+}
 
 export function GrammarHub() {
   const [params, setParams] = useSearchParams();
   const topicId = params.get("topic");
   const topic = topicId ? grammarById(topicId) : undefined;
+  const group = params.get("group") ?? "all";
+  const [search, setSearch] = useState("");
 
-  // Hook must run unconditionally (before any early return).
+  // Hooks must run unconditionally (before any early return).
   const grouped = useMemo(() => {
     return groupOrder
       .map((g) => ({ group: g, topics: grammar.filter((t) => t.group === g) }))
       .filter((x) => x.topics.length > 0);
   }, []);
+
+  // Flattened card list, narrowed by the Gruppe dropdown + free-text search
+  // (over German/English title, purpose and the pattern line).
+  const items = useMemo(() => {
+    let list = grouped.flatMap(({ group, topics }) => topics.map((topic) => ({ topic, group })));
+    if (group !== "all") list = list.filter((x) => x.group === group);
+    if (search.trim()) {
+      const q = normalise(search.trim());
+      list = list.filter(
+        ({ topic }) =>
+          normalise(topic.titleDe).includes(q) ||
+          normalise(topic.title).includes(q) ||
+          normalise(topic.purposeDe).includes(q) ||
+          normalise(topic.pattern).includes(q),
+      );
+    }
+    return list;
+  }, [grouped, group, search]);
 
   // Keep `tab=grammatik` (and any other params) intact when opening/closing a
   // topic; replacing the whole param set bounced /library back to the default
@@ -72,6 +100,22 @@ export function GrammarHub() {
     setParams(p);
   };
 
+  const setGroup = (g: string) => {
+    const p = new URLSearchParams(params);
+    if (g === "all") p.delete("group");
+    else p.set("group", g);
+    setParams(p, { replace: true });
+  };
+
+  const primaryOptions = [
+    { value: "all", label: "Alle Gruppen", count: grammar.length },
+    ...grouped.map(({ group: g, topics }) => ({
+      value: g,
+      label: groupMeta[g].labelDe,
+      count: topics.length,
+    })),
+  ];
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <HubHero
@@ -83,9 +127,27 @@ export function GrammarHub() {
 
       <LibrarySwitcher />
 
+      <BrowseToolbar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Suche nach Thema, Muster …"
+        primary={{ value: group, onChange: setGroup, options: primaryOptions }}
+        facetItems={items}
+        facets={[]}
+        facetSelection={{}}
+        onFacetChange={() => {}}
+        resultLabel={(n) => `${n} Themen anzeigen`}
+        activeChips={[]}
+        onRemoveChip={() => {}}
+      />
+
+      {items.length === 0 ? (
+        <div className="py-16 text-center text-muted-foreground">
+          Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+        </div>
+      ) : (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {grouped
-          .flatMap(({ group, topics }) => topics.map((topic) => ({ topic, group })))
+        {items
           .map(({ topic, group }, i) => {
             const meta = groupMeta[group];
             const Icon = iconByName(meta.icon);
@@ -122,6 +184,7 @@ export function GrammarHub() {
             );
           })}
       </div>
+      )}
     </div>
   );
 }
