@@ -228,6 +228,12 @@ default, minimal Spielen card), then implemented it **scoped to the Dashboard bo
 - Verified in the real app via Chromium (both tabs render, no page errors). Gates green: build,
   lint (0 errors), lint:content, test:unit (97), check:bundle (83.8 kB, budget 400). **Founder verifies
   the live site.** CLAUDE.md bundle note updated (NeulandCarousel is the new lazy Dashboard element).
+- **Follow-up layout pass (same session):** the greeting + the little conic streak/goal ring moved OUT
+  of the Heute body INTO the global top row (`AppShell` header: greeting left, ring right, replacing the
+  old "Willkommen zurück" text + flat streak pill); the Üben/Spielen toggle is now centred; the
+  "Sichere deinen Fortschritt" nudge (`SaveProgressBanner`, new `variant="sidebar"`) moved to the
+  bottom-left of the desktop `Sidebar` (mobile keeps the Heute-top banner via `lg:hidden`); the sidebar's
+  "Bereit für die Prüfung?" card was removed.
 
 **Prior handoff after session 84 (2026-07-09). Bibliothek categorization: audit delivered AND the full
 implementation shipped to `main` (branch `claude/bibliothek-categorization-analysis-mtqo5o`).**

@@ -2219,3 +2219,22 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/NeulandCarousel.tsx`
   (new), `src/features/welt/Welt.tsx` (commit d7e9bb8); updated `CLAUDE.md`, `docs/PROJECT_STATUS.md`;
   `docs/SESSION_PROMPT_LOG.md` (entry 249). PR into `main` (squash) + branch realignment.
+
+## Entry 250 — 2026-07-09 (session 85)
+- **Branch:** `claude/genauly-start-page-preview-1ih2vi`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > move the sichere deine fortschritt to bottom left corner of the navigation panel on the leftm remove
+  > the bereit for prufung part. Also, remove the greeting with little progress graphic. Include that in
+  > the top row. Keep the spielen/uben toggle centred.
+- **Response summary:** Layout pass on the shell + Heute body. `SaveProgressBanner` gained a compact
+  `variant="sidebar"` and now sits at the bottom-left of the desktop `Sidebar` (mobile keeps the
+  Heute-top banner via `lg:hidden`); the sidebar's "Bereit für die Prüfung?" card was removed; the
+  greeting + the little conic streak/goal ring moved out of the Heute body into the global `AppShell`
+  header (greeting left, ring right, replacing the old "Willkommen zurück" text + flat streak pill); the
+  Üben/Spielen toggle is centred (`mx-auto flex w-fit`). Verified in Chromium (no page errors); build +
+  lint (0 errors) green. Shipped via PR → squash-merge → branch realign.
+- **Artifacts:** `src/components/layout/AppShell.tsx`, `src/components/layout/Sidebar.tsx`,
+  `src/features/auth/SaveProgressBanner.tsx`, `src/features/dashboard/Dashboard.tsx`;
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 250).
