@@ -2069,3 +2069,42 @@ Branch: `claude/whats-next-esga9u`.
   No code changes.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 243). Doc-only; shipped via
   PR → squash-merge → branch realign.
+
+## Entry 244 — 2026-07-09 (session 84)
+- **Branch:** `claude/bibliothek-categorization-analysis-mtqo5o`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the categorization of the items in the bibliothek needs a lot of improvement. Define what each
+  > filter or classification means (difference between Situation and Thema) and do a thorough analysis
+  > of the weak or vague or incorrect implementation of the various filters like Thema, Branche, etc. I
+  > personally think it's helpful to classify using filters like below (not comprehensive): * Thema/
+  > Situation - Teamarbeit, Besprechung, Transport, etc. * Branche - Pflege, Schule, Finanz, Bank, IT,
+  > etc. (currently, there is Buro in Branche which is redundant and wrong to keep it here because every
+  > Branche area has a Buro - if anything it should be in Thema but it's too vague to be there as there
+  > are already specific Buro situations there. ) * Why Kollocations and Redemittel have way too less
+  > filters? And Grammatik has no filter at all? * UI/UX elements like why should something be a dropdown
+  > vs filter tab? * Visual bugs and improvements * How can one know what are the most useful words - can
+  > there be some kind of graph to show most used words? I want you to spin up a panel of experts to
+  > validate, research, challenge above ideas, existing content and structure, identify missing aspects
+  > and finally provide a thorough and robust report with findings, gap analysis and recommendations to
+  > take the app to make it ready for marketplace that would be genuinely useful and extremely intuitive
+  > to work with for the users.
+- **Response summary:** Analysis-only session (no app code changed). Ran a codebase audit that established
+  the ground-truth facts (Branche `sector` 26/642 = 4%, only care+office live; Situation `workSituation`
+  14/642 = 2.2%; Redemittel 0/82 with cefr or themeId; Grammar has no level field; Register `diplomatic`
+  0 on collocations; `frequency` 0-tagged though `scripts/vendor/german-frequency-subset.json` wordfreq
+  data already ships build-time-only; Domain axis exists in `domains.ts` but is surfaced nowhere; the
+  theme `meetings` vs situation `meeting` naming collision). Then convened a 7-agent expert panel via a
+  Workflow (information architecture, DaF/CEFR pedagogy, UX/interaction, content-data strategy,
+  competitive/marketplace) + an adversarial red-team + a synthesis pass. Key conclusions: taxonomy is
+  sound but *looks* broken; Thema vs Situation is one axis at two grains (retire `workSituation`, keep
+  sub-themes); "Büro" removal is correct (category error); Branche should be hidden until a sector has
+  depth (do not author per-industry packs); Redemittel needs CEFR but NOT a single themeId; Grammar needs
+  search+group+level-badge not a facet sheet; "most useful words" ships as a generated frequency badge +
+  honest composition chart, never a leaderboard; two free high-value axes nobody proposed (surface Domain
+  as the spine, add an SRS-state filter). Delivered a full repo doc + a visual Artifact. No PR opened
+  (analysis deliverable; P0 quick wins offered to the founder as the next step).
+- **Artifacts:** `docs/plans/BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09.md` (full report + verbatim
+  red-team appendix); visual report Artifact (categorization audit). `docs/SESSION_PROMPT_LOG.md`
+  (entry 244). Committed to the dev branch; not merged (no code change).

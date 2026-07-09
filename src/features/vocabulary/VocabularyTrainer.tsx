@@ -36,7 +36,6 @@ const SHOW_PRACTICE_TABS = false;
 export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
-  const learningMode = useSettingsStore((s) => s.mode);
   const level = useSettingsStore((s) => s.level);
   const savedWords = useProgressStore((s) => s.savedWords);
   const scope = useLibraryScope();
@@ -68,7 +67,9 @@ export function VocabularyTrainer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, sub]);
 
-  const facets = useMemo(() => vocabFacets(learningMode), [learningMode]);
+  // Facet visibility follows the coverage floor in the registry, not the Mode
+  // lens (categorization audit 2026-07-09), so the list is static per bank.
+  const facets = useMemo(() => vocabFacets(), []);
 
   const activeTheme = theme !== "all" ? themeById(theme) : undefined;
   const subThemes = activeTheme?.subThemes ?? [];

@@ -52,9 +52,13 @@ export type ContentCefr =
 
 export type Frequency = "core" | "common" | "specialized";
 
+// Branche (industry the learner works in), a context axis orthogonal to Thema.
+// PARKED (categorization audit 2026-07-09): the field stays on vocab and
+// collocations, but the facet sits below the coverage floor in lib/facets.ts
+// until a sector has real content depth. "office" was removed as a value:
+// every industry has an office, so it is not a sector.
 export type WorkSector =
   | "care"
-  | "office"
   | "trades"
   | "it"
   | "retail"
@@ -66,14 +70,10 @@ export type Counterpart =
   | "customer"
   | "team";
 
-export type WorkSituation =
-  | "meeting"
-  | "shift-handover"
-  | "customer-call"
-  | "instructions"
-  | "onboarding"
-  | "sick-leave"
-  | "review";
+// (The former WorkSituation enum/facet was retired in the categorization audit
+// 2026-07-09: "Situation" is the fine grain of Thema, carried by subThemeId,
+// not a separate axis. Its values duplicated themes, e.g. "meeting" restated
+// the meetings theme.)
 
 export type TaskType =
   | "email"
@@ -133,7 +133,6 @@ export interface VocabItem {
   subThemeId?: SubThemeId;
   frequency?: Frequency;
   sector?: WorkSector;
-  workSituation?: WorkSituation;
 }
 
 export type RedemittelCategory =
@@ -307,7 +306,6 @@ export interface Collocation {
   subThemeId?: SubThemeId;
   frequency?: Frequency;
   sector?: WorkSector;
-  workSituation?: WorkSituation;
 }
 
 /* ---------------- Leveled quizzes ---------------- */
