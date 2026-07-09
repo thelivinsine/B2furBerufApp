@@ -50,7 +50,6 @@ import { Progress } from "@/components/ui/progress";
 import { SectionHeading, StreakBadge, XPBar } from "@/components/shared/misc";
 import { StatCard } from "@/components/shared/StatCard";
 import { recommendedNext } from "@/features/dashboard/recommend";
-import CityStrip from "@/components/city/CityStrip";
 import { cardLevel } from "@/engine/collection";
 
 const goalLabelDe: Record<LearningGoal, string> = {
@@ -294,9 +293,6 @@ export function Analytics() {
         eyebrow="Fortschritt"
         title="Deine Statistiken"
       />
-
-      {/* City view — the quest board's map: mastery lights the skyline. */}
-      <CityStrip />
 
       {/* Claim moment — an achieved milestone waiting to be collected. Reward-gold,
           spring-in; claiming advances to the next unclaimed win. */}

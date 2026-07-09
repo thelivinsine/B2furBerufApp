@@ -2261,3 +2261,20 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** comparison Artifact (`scratchpad/heute-redesign-options.html`);
   `src/features/dashboard/Dashboard.tsx`, `src/components/layout/AppShell.tsx`; `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 251).
+
+## Entry 252 — 2026-07-09 (session 85)
+- **Branch:** `claude/genauly-start-page-preview-1ih2vi`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > when I said remove icon tray in fortschritt.. I didn't mean to remove something from the fortschritt
+  > section of heute page in option b preview. I meant to remove the icon tray on the top in the dedicated
+  > fortschritt page.
+- **Response summary:** Corrected the prior misread. (1) Restored the full Option B on Heute: re-added the
+  3 icon-stat row (Serie/Wörter/Fällig) below the Tagesziel hero bar + heatmap in `Dashboard.tsx`.
+  (2) On the dedicated Fortschritt page (`/analytics`), removed the `CityStrip` icon tray (the row of six
+  domain-building icons) from the top, confirmed by screenshot as the element meant; `CityStrip` import
+  dropped from `Analytics.tsx` (component kept in the repo). Verified Heute + Fortschritt in Chromium (no
+  page errors); build + lint (0 errors) green. Shipped via PR → squash-merge → realign.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/analytics/Analytics.tsx`;
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 252).
