@@ -1,6 +1,10 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-08 (session 83: **G2 variety rungs 1–2 shipped.** Rung 1 (PR #374): the `hotspot`
+_Last updated: 2026-07-09 (session 84: **Bibliothek categorization audit delivered** (analysis only, no
+app code changed): `docs/plans/BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09.md` + a visual Artifact, from a
+codebase fact-audit + a 7-agent expert panel + red-team. Verdict: taxonomy is sound but looks broken; P0
+quick wins (facet coverage floor, delete Büro, retire workSituation) and the roadmap are in the doc's §10.
+See the "Resume here" block. Prior: session 83: **G2 variety rungs 1–2 shipped.** Rung 1 (PR #374): the `hotspot`
 scene kind, one generic tappable-stage layer (catalog #2/#7/#18) where the player proves comprehension by
 TAPPING the right place on the pixel stage, used in 1.1 (departure board) + 1.4 (shelf search). Rung 2
 (PR #375): the `automat` (Keypad) scene kind (catalog #8), a step-by-step rendered machine with a
@@ -193,6 +197,33 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 
 ## Resume here (next session)
+
+**Handoff after session 84 (2026-07-09). Bibliothek categorization AUDIT delivered (analysis only, no
+app code changed; branch `claude/bibliothek-categorization-analysis-mtqo5o`, not merged).**
+
+Founder asked for a thorough report on the Bibliothek's categorization/filters (define Thema vs Situation
+vs Branche, audit the weak/wrong filters, judge his ideas, make it marketplace-ready). Delivered
+**`docs/plans/BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09.md`** (full report + verbatim red-team appendix)
+and a visual Artifact, from a codebase fact-audit + a 7-agent expert panel + red-team.
+
+**Verdict: the taxonomy is sound but *looks* broken; fix the tells, do not redesign.** The settled calls
+(next session can implement the P0/P1 quick wins straight from the doc's §10 roadmap):
+- **P0, no content, no risk:** add a **facet coverage floor** to `lib/facets.ts` `facet()` (hide any facet
+  with <3 populated values / <15% coverage, not just empty options) and stop gating facets on
+  `mode==='work'`. This instantly retires the two broken-looking filters (Branche 4%, Situation 2.2%).
+- **P0:** delete the `office`/**Büro** value from the `WorkSector` union (+ `WORK_SECTORS` lint mirror),
+  retag its 11 words. Büro is a category error (every industry has an office).
+- **P0:** retire the `workSituation` facet (it duplicates Thema; `meeting` vs theme `meetings` is a naming
+  clash). Situation = sub-theme, one topic spine Domain → Thema → Sub-theme.
+- **P1:** Grammatik gets a search box + `group` dropdown + reorder-by-B2-priority (no facet sheet for 10
+  items); add the Thema dropdown to Kollokationen (data already present); visual-bug batch.
+- **P1 (the one net-new feature):** generated `frequency.ts` from the already-vendored
+  `scripts/vendor/german-frequency-subset.json` → a `Häufigkeit` badge + facet + one honest Fortschritt
+  composition chart. Never a "most-used words" leaderboard.
+- **Free high-value axes nobody had proposed:** surface the existing **Domain** layer as the spine, and add
+  an **SRS-state** filter ("fällig / lerne ich gerade / gemeistert") from FSRS data already on every card.
+- **Open founder decisions (doc §11):** park vs cut Branche; backfill Redemittel CEFR or not (no themeId
+  either way); frequency badge-only vs badge+chart; Domain-under-Mode layering; Amtssprache axis later/never.
 
 **Handoff after session 83 (2026-07-08). G2 variety rungs 1–2 SHIPPED (branch
 `claude/g2-variety-work-0t6c9a`).**
