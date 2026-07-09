@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText, Zap, Bookmark } from "lucide-react";
-import { themes, themeById } from "@/data/themes";
+import { themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useProgressStore } from "@/store/useProgressStore";
@@ -12,8 +12,10 @@ import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
-import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
+import { applyFacets, ActiveFilterChip, type FacetDef, type FacetSelection } from "@/features/shared/FacetSheet";
 import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
+import { themeGroupsForMode } from "@/lib/themeGroups";
+import { mastery, masteryLabel } from "@/engine/srs";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { cn } from "@/lib/utils";
 import { Flashcards } from "./Flashcards";
@@ -37,6 +39,9 @@ export function VocabularyTrainer() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const level = useSettingsStore((s) => s.level);
+  // Mode pre-selects which DOMAINS the grouped theme dropdown shows (founder
+  // decision 2026-07-09, "Mode on top"); it no longer gates any facet.
+  const learningMode = useSettingsStore((s) => s.mode);
   const savedWords = useProgressStore((s) => s.savedWords);
   const scope = useLibraryScope();
   const theme = params.get("theme") ?? "all";
@@ -67,9 +72,27 @@ export function VocabularyTrainer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme, sub]);
 
-  // Facet visibility follows the coverage floor in the registry, not the Mode
-  // lens (categorization audit 2026-07-09), so the list is static per bank.
-  const facets = useMemo(() => vocabFacets(), []);
+  // Content-facet visibility follows the coverage floor in the registry, not
+  // the Mode lens (categorization audit 2026-07-09). On top of those, the
+  // per-learner Lernstand facet (audit PR 4) is built HERE because its
+  // get() reads the learner's own SRS state, not a content field. Its values
+  // mirror the card badges exactly (neu/lernen/wiederholen/gemeistert).
+  const srs = useProgressStore((s) => s.srs);
+  const srsFacet: FacetDef<(typeof vocabulary)[number]> = useMemo(
+    () => ({
+      id: "srs",
+      label: "Lernstand",
+      options: [
+        { value: "new", label: "neu" },
+        { value: "learning", label: "lernen" },
+        { value: "review", label: "wiederholen" },
+        { value: "mastered", label: "gemeistert" },
+      ],
+      get: (v) => masteryLabel(mastery(srs[v.id])),
+    }),
+    [srs],
+  );
+  const facets = useMemo(() => [...vocabFacets(), srsFacet], [srsFacet]);
 
   const activeTheme = theme !== "all" ? themeById(theme) : undefined;
   const subThemes = activeTheme?.subThemes ?? [];
@@ -78,9 +101,11 @@ export function VocabularyTrainer() {
   const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
   const activeSub = subThemes.find((s) => s.id === sub);
 
+  const ALL_FACET_IDS = [...VOCAB_FACET_IDS, "srs"];
+
   const selection: FacetSelection = useMemo(() => {
     const s: FacetSelection = {};
-    for (const id of VOCAB_FACET_IDS) {
+    for (const id of ALL_FACET_IDS) {
       const raw = params.get(id);
       if (raw) s[id] = raw.split(",");
     }
@@ -130,7 +155,7 @@ export function VocabularyTrainer() {
   const hiddenLabel = bandActive && bandLimited.length < searched.length ? hiddenBandsLabel(level) : null;
 
   const items = useMemo(() => applyFacets(bandLimited, facets, selection), [bandLimited, facets, selection]);
-  const facetKey = VOCAB_FACET_IDS.map((id) => params.get(id) ?? "").join("|");
+  const facetKey = ALL_FACET_IDS.map((id) => params.get(id) ?? "").join("|");
 
   const activeChips = facets.flatMap((f) =>
     (selection[f.id] ?? []).map((v) => ({
@@ -151,7 +176,7 @@ export function VocabularyTrainer() {
 
   const setSelection = (next: FacetSelection) => {
     const p = new URLSearchParams(params);
-    for (const id of VOCAB_FACET_IDS) {
+    for (const id of ALL_FACET_IDS) {
       const v = next[id];
       if (v && v.length) p.set(id, v.join(","));
       else p.delete(id);
@@ -176,14 +201,11 @@ export function VocabularyTrainer() {
     setParams(p, { replace: true });
   };
 
-  const primaryOptions = [
-    { value: "all", label: "Alle Themen", count: vocabulary.length },
-    ...themes.map((t) => ({
-      value: t.id,
-      label: t.titleDe,
-      count: vocabByTheme(t.id).length,
-    })),
-  ];
+  const primaryOptions = [{ value: "all", label: "Alle Themen", count: vocabulary.length }];
+  const primaryGroups = useMemo(
+    () => themeGroupsForMode(learningMode, theme, (id) => vocabByTheme(id).length),
+    [learningMode, theme],
+  );
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -200,7 +222,7 @@ export function VocabularyTrainer() {
         search={search}
         onSearch={setSearch}
         searchPlaceholder="Suche nach Wort, Übersetzung …"
-        primary={{ value: theme, onChange: setTheme, options: primaryOptions }}
+        primary={{ value: theme, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
         facetItems={searched}
         facets={facets}
         facetSelection={selection}
