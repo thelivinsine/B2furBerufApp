@@ -64,23 +64,15 @@ export type WorkSector =
   | "retail"
   | "hospitality";
 
-export type Counterpart =
-  | "manager"
-  | "colleague"
-  | "customer"
-  | "team";
+// (The forward-declared Counterpart and TaskType facets were CUT in the
+// categorization audit P3 resolution, 2026-07-09: 0-tagged since s42 with no
+// authoring plan, so they only invited tagging against half-designed axes.
+// Zero data was lost; re-declare if a real authoring plan ever exists.)
 
 // (The former WorkSituation enum/facet was retired in the categorization audit
 // 2026-07-09: "Situation" is the fine grain of Thema, carried by subThemeId,
 // not a separate axis. Its values duplicated themes, e.g. "meeting" restated
 // the meetings theme.)
-
-export type TaskType =
-  | "email"
-  | "phone-call"
-  | "report"
-  | "instruction"
-  | "presentation";
 
 /** A sub-topic within a theme. Phase 2 promotes `situations[]` into these. */
 export interface SubTheme {
@@ -159,8 +151,6 @@ export interface RedemittelPhrase {
   example: { de: string; en: string };
   cefr?: ContentCefr;
   themeId?: ThemeId;
-  counterpart?: Counterpart;
-  taskType?: TaskType;
 }
 
 /* ---------------- Dialogue / simulation engine ---------------- */
@@ -280,6 +270,9 @@ export interface GrammarDrill {
 export interface GrammarTopic {
   id: string;
   group: GrammarGroup;
+  /** Level at which this structure becomes a realistic learning target
+   *  (audit P2, 2026-07-09). AI-drafted, founder verify pending. */
+  cefr?: ContentCefr;
   title: string;
   titleDe: string;
   purpose: string;

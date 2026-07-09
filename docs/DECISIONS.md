@@ -202,3 +202,44 @@ MISSION_ACTIVITY_RESEARCH.md` and the founder-facing `CHAPTER1_GAMEPLAY_DECK.htm
 6. **Battle composition:** opponent + her bar hold the TOP band, the player sprite + Mut bar
    hold the BOTTOM band, and people stay at ONE human scale (an attempted foreground zoom of
    the player was explicitly rejected: "keep the people's sizes more or less the same").
+
+## Bibliothek classification axes & control choices (session 84, 2026-07-09) — locked
+
+Source: `docs/plans/BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09.md` (expert panel + red-team) and the
+five founder decisions recorded in `docs/plans/BIBLIOTHEK_CATEGORIZATION_IMPLEMENTATION_PLAN.md`.
+Shipped across PRs #379–#385. Do not re-litigate these without a founder request.
+
+### The axis model (three families)
+- **TOPIC, one spine at three grains: Domain → Thema → Sub-theme.** "Situation" IS the sub-theme grain
+  of Thema, never a separate axis (the retired `workSituation` facet duplicated themes, e.g. its
+  `meeting` value restated the `meetings` theme). Domain groups themes and is surfaced as group
+  headings inside the theme dropdown; the Mode lens pre-selects which domains show ("Mode on top").
+- **CONTEXT: Branche** (`sector`) = the industry a learner is EMPLOYED in, orthogonal to Thema (the
+  same topic happens in every industry). Decide by ROLE: customer/citizen doing an errand → Thema;
+  the field you work in → Branche. So "Bank & Finanzen" is a Thema (Alltag errand); a finance
+  INDUSTRY would be a differently-named Branche value. Never reuse a label across the two axes.
+  "Büro" was deleted (every industry has an office: category error). Branche is PARKED: field + Pflege
+  tags stay, the facet sits below the coverage floor until a sector has real depth.
+- **ATTRIBUTES: CEFR, Register, Wortart, Häufigkeit, Lernstand.** Intrinsic properties, multi-select
+  refinements. CEFR ≠ Häufigkeit (difficulty is not commonness; a word can be easy but rare, or hard
+  but everyday). Register is 2-tier (neutral/formell; "diplomatisch" folded in: diplomacy is a
+  pragmatic function, not a register; an Amtssprache axis is PARKED as a v2 content project).
+  Lernstand is per-learner (reads the FSRS map), so it is built in the page, not the registry.
+
+### Control-choice rule (mirrored in the `lib/facets.ts` header)
+Segmented control = content kind (the 4 tabs). Primary dropdown = the one single-select "where am I"
+cut (Thema/Kategorie/Gruppe). Facet pills in the bottom sheet = orthogonal multi-select attributes,
+≤12 options; a page with exactly one small dimension gets an inline chip row instead of a modal
+(Redemittel Register). Sub-theme picker = the dependent topic grain, never a facet.
+
+### Honesty rules
+- **Coverage floor** (`MIN_FACET_COVERAGE` 15% / `MIN_FACET_VALUES` 2 in `lib/facets.ts`): a facet the
+  bank barely uses hides as a WHOLE; visibility follows coverage, never the Mode lens. A near-empty
+  filter reads as broken, not filtered.
+- **Häufigkeit** is machine-derived (generated `src/data/frequency.ts` from wordfreq Zipf). Items
+  below Zipf 1.5, including out-of-corpus compounds, get NO bin: absence of corpus evidence must never
+  be labelled "Fachsprache". Never claim "die häufigsten deutschen Wörter" (the bank is curated by
+  exam word-fields, not corpus rank); the axis is Häufigkeit, not Wichtigkeit.
+- **Cut, don't hoard, dead axes:** `counterpart`/`taskType` (0-tagged forward-declares with no
+  authoring plan) were cut in the P3 resolution; the linter errors if rows reintroduce them. Re-declare
+  properly if an authoring plan ever exists.

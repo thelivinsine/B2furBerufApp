@@ -20,6 +20,23 @@ import { CEFR_ORDER } from "@/lib/cefr";
 // already consumes, so nothing about the UI changes.
 // ─────────────────────────────────────────────────────────────────────────
 
+// ── Control-choice rule (audit P2, locked; why: docs/DECISIONS.md) ───────
+// Which UI control a dimension gets is NOT a taste call:
+//   • Segmented control  = switch WHICH KIND of content (the 4 library tabs).
+//   • Primary dropdown   = the ONE single-select "where am I" cut that
+//     re-scopes the page (Domain-grouped Thema, Kategorie, Gruppe). Never
+//     multi-select, never inside the sheet.
+//   • Facet pills (sheet)= orthogonal, multi-select, ≤12-option ATTRIBUTES
+//     that refine within the primary (CEFR, Wortart, Register, Häufigkeit,
+//     Lernstand). The sheet only mounts with ≥1 facet group; with exactly one
+//     small dimension on a page, prefer an inline chip row (Redemittel
+//     Register) over a modal.
+//   • Sub-theme picker   = the dependent finer TOPIC grain. Never a facet.
+// Axis rule (Thema vs Situation vs Branche): one topic spine at three grains
+// (Domain → Thema → Sub-theme; "Situation" IS the sub-theme grain), Branche
+// is an orthogonal CONTEXT axis (the industry you work in), and CEFR /
+// Register / Wortart / Häufigkeit / Lernstand are item ATTRIBUTES.
+
 // ── Facet hygiene rules ──────────────────────────────────────────────────
 // (1) Size ceiling: a facet renders as a row of pills, so it must stay small.
 // Any dimension with more than MAX_FACET_OPTIONS distinct values does NOT

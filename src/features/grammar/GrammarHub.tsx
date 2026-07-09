@@ -171,7 +171,10 @@ export function GrammarHub() {
                       ) : (
                         <Icon className="h-4 w-4 text-emerald-500" />
                       )}
-                      <Badge variant="muted">{topic.drills.length} Übg.</Badge>
+                      <div className="flex shrink-0 items-center gap-1">
+                        {topic.cefr && <Badge variant="muted">{topic.cefr}</Badge>}
+                        <Badge variant="muted">{topic.drills.length} Übg.</Badge>
+                      </div>
                     </div>
                     <p className="font-semibold leading-snug">{topic.titleDe}</p>
                     <p className="text-sm text-muted-foreground">{topic.purposeDe}</p>
@@ -196,7 +199,10 @@ function GrammarTopicView({ topic, onBack }: { topic: GrammarTopic; onBack: () =
         <Button variant="ghost" size="sm" onClick={onBack}>
           <ArrowLeft className="h-4 w-4" /> Übersicht
         </Button>
-        <Badge variant="muted" className="ml-auto">{groupMeta[topic.group].labelDe}</Badge>
+        <div className="ml-auto flex items-center gap-1">
+          {topic.cefr && <Badge variant="muted">{topic.cefr}</Badge>}
+          <Badge variant="muted">{groupMeta[topic.group].labelDe}</Badge>
+        </div>
       </div>
 
       <div>
