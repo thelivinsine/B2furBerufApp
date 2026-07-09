@@ -1,6 +1,7 @@
 import { vocabulary } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
+import { frequencyBin } from "@/data/frequency";
 import type { FacetDef, FacetOption } from "@/features/shared/FacetSheet";
 import { CEFR_ORDER } from "@/lib/cefr";
 
@@ -99,6 +100,16 @@ const REGISTER_OPTIONS: FacetOption[] = [
   { value: "formal", label: "formell" },
 ];
 
+// Häufigkeit (usefulness signal, audit PR 3): machine-derived from the
+// generated src/data/frequency.ts (wordfreq Zipf bins), with a hand-set
+// item `frequency` field as override if one is ever authored. This is
+// commonness in real German, deliberately distinct from CEFR difficulty.
+const FREQUENCY_OPTIONS: FacetOption[] = [
+  { value: "core", label: "Kernwortschatz" },
+  { value: "common", label: "häufig" },
+  { value: "specialized", label: "Fachsprache" },
+];
+
 // ── Vocabulary ───────────────────────────────────────────────────────────
 const VOCAB_CEFR: FacetDef<Vocab> = facet(
   { id: "cefr", label: "Stufe (CEFR)", hint: "Mehrfachauswahl", options: CEFR_OPTIONS, get: (v) => v.cefr },
@@ -113,7 +124,17 @@ const VOCAB_SECTOR: FacetDef<Vocab> = facet(
   vocabulary,
 );
 
-const ALL_VOCAB_FACETS = [VOCAB_CEFR, VOCAB_POS, VOCAB_SECTOR];
+const VOCAB_FREQUENCY: FacetDef<Vocab> = facet(
+  {
+    id: "frequency",
+    label: "Häufigkeit",
+    options: FREQUENCY_OPTIONS,
+    get: (v) => v.frequency ?? frequencyBin(v.id),
+  },
+  vocabulary,
+);
+
+const ALL_VOCAB_FACETS = [VOCAB_CEFR, VOCAB_POS, VOCAB_FREQUENCY, VOCAB_SECTOR];
 
 /** Vocab facets that clear the coverage floor. Visibility follows coverage
  *  (never the Mode lens): today that is CEFR + Wortart; Branche stays parked
@@ -132,6 +153,15 @@ const COLLOCATION_FACETS: FacetDef<Collocation>[] = [
     collocations,
   ),
   facet({ id: "register", label: "Register", options: REGISTER_OPTIONS, get: (c) => c.register }, collocations),
+  facet(
+    {
+      id: "frequency",
+      label: "Häufigkeit",
+      options: FREQUENCY_OPTIONS,
+      get: (c) => c.frequency ?? frequencyBin(c.id),
+    },
+    collocations,
+  ),
 ];
 
 export function collocationFacets(): FacetDef<Collocation>[] {

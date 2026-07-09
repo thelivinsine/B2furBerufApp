@@ -42,6 +42,12 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   `docs/reports/verify-cefr-report.md`. Runs offline against the vendored
   `scripts/vendor/german-frequency-subset.json`; regenerate with `pnpm build:frequency-subset` (needs
   Python `wordfreq`) after adding vocab/collocations. Warn-only. `pnpm verify:sentences` runs both.
+- `pnpm build:frequency` — regenerate the **generated** `src/data/frequency.ts` (categorization plan
+  PR 3, 2026-07-09): per-item Häufigkeit bins (core/common/specialized) from the vendored wordfreq Zipf
+  subset, behind the Häufigkeit facet/badge (Wörter + Kollokationen) and the Fortschritt frequency
+  chart. Items with Zipf < 1.5 (incl. out-of-corpus compounds) get NO bin on purpose; never label
+  absence of corpus evidence "Fachsprache". Run after adding vocab/collocations (after
+  `pnpm build:frequency-subset` refreshes the subset); `lint:content` errors on stale ids.
 - `pnpm build:verification` — Layer C trust model (data strategy, s78): composes the Layer 2 fact +
   Layer 3 grammar/CEFR results into the **generated** `src/data/verification.ts` (per-item `tier` /
   `checks` / `confidence`, keyed by content_id). Reads the `docs/reports/verify-grammar.json` sidecar

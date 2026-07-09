@@ -212,6 +212,14 @@ moment we ingest CC-BY content (e.g. **Tatoeba** example sentences) the credit s
 The page is linked from Settings and the landing footer. The mechanism now exists ahead of ingesting
 any externally licensed content, as required.
 
+**Word-frequency data (added 2026-07-09, categorization plan PR 3).** The shipped Häufigkeit
+badge/facet and the Fortschritt frequency chart read the generated `src/data/frequency.ts`, binned from
+Zipf frequencies in the **wordfreq** package (PyPI, Apache-2.0 / MIT; Robyn Speer et al.). Frequencies
+are uncopyrightable facts, and the map is a derived attribute of already-provenanced content_ids
+(exactly like `verification.ts`), so it carries no per-item provenance rows; this note plus the header
+credit in `frequency.ts` are the dataset-level attribution. Regenerate with `pnpm build:frequency`
+after content changes (the linter errors on dangling ids).
+
 ## Automated controls
 
 - **Already live (2026-06-14):** `pnpm lint:content` + the `validate.yml` CI gate validate structural

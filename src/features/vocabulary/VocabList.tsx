@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useProgressStore } from "@/store/useProgressStore";
 import { mastery, masteryLabel } from "@/engine/srs";
+import { frequencyBin } from "@/data/frequency";
 import { usePagedList } from "@/lib/usePagedList";
 import { cn } from "@/lib/utils";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
@@ -16,6 +17,14 @@ const labelMap = {
   learning: { text: "lernen", variant: "warning" as const },
   review: { text: "wiederholen", variant: "default" as const },
   mastered: { text: "gemeistert", variant: "success" as const },
+};
+
+// Häufigkeit badge (audit PR 3): quiet metadata from the generated frequency
+// map. Unbinned items (rare compounds, out-of-corpus) show nothing on purpose.
+const freqLabel: Record<string, string> = {
+  core: "Kernwortschatz",
+  common: "häufig",
+  specialized: "Fachsprache",
 };
 
 /**
@@ -51,6 +60,10 @@ const VocabCard = memo(function VocabCard({
             <p className="text-xs text-muted-foreground">
               {v.en}
               {v.plural && ` · Pl.: ${v.plural}`}
+              {(() => {
+                const bin = v.frequency ?? frequencyBin(v.id);
+                return bin ? ` · ${freqLabel[bin]}` : null;
+              })()}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-1">
