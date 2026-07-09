@@ -2278,3 +2278,16 @@ Branch: `claude/whats-next-esga9u`.
   page errors); build + lint (0 errors) green. Shipped via PR → squash-merge → realign.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/analytics/Analytics.tsx`;
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 252).
+
+## Entry 253 — 2026-07-09 (session 85)
+- **Branch:** `claude/genauly-start-page-preview-1ih2vi`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > okay, document the session
+- **Response summary:** Session-documentation pass. Most docs were already written incrementally through
+  the session (PROJECT_STATUS session-85 handoff; prompt-log entries 249–252; the CLAUDE.md bundle note).
+  This pass reconciled the handoff's first Dashboard bullet to the final state (greeting moved to the top
+  row; Fortschritt became the Option B hero-bar layout, not four rings) and appended this entry. Doc-only;
+  shipped via PR → squash-merge → branch realign.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 253).

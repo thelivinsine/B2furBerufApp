@@ -213,11 +213,12 @@ Founder shared a hand-drawn "Start page" sketch (Willkommen header + a Spielen/�
 a Neuland carousel or a Last-Session + Fortschritt view). Iterated it as an HTML Artifact (Üben first +
 default, minimal Spielen card), then implemented it **scoped to the Dashboard body only** (founder:
 "keep the left sidebar and top row intact, only change the contents within the Heute page").
-- **`src/features/dashboard/Dashboard.tsx`:** kept the greeting/orientation ring row; added an
-  **Üben/Spielen** segmented toggle (Üben default). **Üben** = a session card reusing `/session`
-  (sized from daily goal + `dueCount`, label toggles Weitermachen/Session starten off the existing
-  `totalSessions` completion hook, **no new persisted state**) + a **four-ring Fortschritt row**
-  (Tagesziel/Serie/Wörter/Fällig) derived purely from the progress store, no vocab-bank walk.
+- **`src/features/dashboard/Dashboard.tsx`:** added an **Üben/Spielen** segmented toggle (Üben default).
+  **Üben** = a session card reusing `/session` (sized from daily goal + `dueCount`, label toggles
+  Weitermachen/Session starten off the existing `totalSessions` completion hook, **no new persisted
+  state**) + a Fortschritt block. (Two things in this bullet changed in the follow-up passes below: the
+  greeting/orientation ring was initially kept here, then moved to the top row; and the Fortschritt block
+  started as four rings, then became the Option B hero-bar layout.)
 - **`src/features/dashboard/NeulandCarousel.tsx` (new, lazy):** minimal indigo mission carousel over the
   authored Neuland missions (arrows + dots), same `React.lazy` pattern as the old CityStrip so the
   mission bank stays off the eager path. "Spielen" → `navigate('/welt?mission=<id>')`.
