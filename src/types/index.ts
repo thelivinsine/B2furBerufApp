@@ -151,7 +151,10 @@ export interface RedemittelPhrase {
   de: string;
   en: string;
   category: RedemittelCategory;
-  register: "neutral" | "formal" | "diplomatic";
+  // "diplomatic" was folded into "formal" (audit 2026-07-09): with 5 tagged
+  // phrases it was a near-empty third tier, and diplomacy is a pragmatic
+  // function, not a register. Revisit only with the parked Amtssprache axis.
+  register: "neutral" | "formal";
   note?: string;
   example: { de: string; en: string };
   cefr?: ContentCefr;
@@ -299,7 +302,7 @@ export interface Collocation {
   /** The full collocation (e.g. "eine Entscheidung treffen"). */
   full: string;
   en: string;
-  register?: "neutral" | "formal" | "diplomatic";
+  register?: "neutral" | "formal";
   themeId?: ThemeId;
   example: { de: string; en: string };
   cefr?: ContentCefr;

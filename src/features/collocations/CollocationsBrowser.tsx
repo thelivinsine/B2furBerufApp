@@ -1,8 +1,8 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Combine, Zap } from "lucide-react";
-import { collocations } from "@/data/collocations";
+import { ChevronLeft, Combine, Zap } from "lucide-react";
+import { collocations, collocationsByTheme } from "@/data/collocations";
 import { themes, themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
@@ -11,10 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
-import { applyFacets, type FacetSelection } from "@/features/shared/FacetSheet";
+import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
-import { LibrarySwitcher, ScopeChip } from "@/features/library/LibrarySwitcher";
+import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
+import { SubThemePicker } from "@/features/vocabulary/SubThemePicker";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { usePagedList } from "@/lib/usePagedList";
 
@@ -44,9 +45,9 @@ const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation })
             </div>
             <p className="text-xs text-muted-foreground">{c.en}</p>
           </div>
-          {(c.register === "formal" || c.register === "diplomatic") && (
+          {c.register === "formal" && (
             <Badge variant="accent" className="shrink-0">
-              {c.register === "diplomatic" ? "diplomatisch" : "formell"}
+              formell
             </Badge>
           )}
         </div>
@@ -70,6 +71,7 @@ export function CollocationsBrowser() {
   const [showAllLevels, setShowAllLevels] = useState(false);
 
   const themeParam = params.get("theme") ?? "all";
+  const sub = params.get("sub") ?? "";
   const search = params.get("q") ?? "";
 
   // Tier-2 travelling scope: inherit the shared library scope when arriving
@@ -122,15 +124,33 @@ export function CollocationsBrowser() {
     const p = new URLSearchParams(params);
     if (val === "all") p.delete("theme");
     else p.set("theme", val);
+    p.delete("sub");
     setParams(p, { replace: true });
     scope.setScope(val, ""); // travelling scope: carry to the other segments
   };
 
+  const setSub = (s: string) => {
+    const p = new URLSearchParams(params);
+    if (!s) p.delete("sub");
+    else p.set("sub", s);
+    setParams(p, { replace: true });
+  };
+
   const setSearch = (q: string) => setParam("q", q || null);
+
+  // Sub-theme drill-down (parity with Wörter, audit 2026-07-09): themes with
+  // sub-themes show the picker first; "Gesamtes Thema" browses the whole pile.
+  const activeTheme = themeParam !== "all" ? themeById(themeParam) : null;
+  const subThemes = activeTheme?.subThemes ?? [];
+  const hasSubThemes = subThemes.length > 0;
+  const showPicker = hasSubThemes && !sub;
+  const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
+  const activeSub = subThemes.find((s) => s.id === sub);
 
   const scoped = useMemo(() => {
     let list =
       themeParam === "all" ? collocations : collocations.filter((c) => c.themeId === themeParam);
+    if (subFilter) list = list.filter((c) => c.subThemeId === subFilter);
     if (search.trim()) {
       const q = normalise(search.trim());
       list = list.filter(
@@ -142,7 +162,7 @@ export function CollocationsBrowser() {
       );
     }
     return list;
-  }, [themeParam, search]);
+  }, [themeParam, subFilter, search]);
 
   // Tier-0 personalized default (UX overhaul Phase 2): default to the
   // learner's CEFR band + one step up, with a quiet escape. Never activates
@@ -173,14 +193,16 @@ export function CollocationsBrowser() {
     })),
   );
 
-  const activeTheme = themeParam !== "all" ? themeById(themeParam) : null;
-
   // Incremental rendering: 60 cards now, the rest as you scroll.
   const { visible, hasMore, remaining, sentinelRef, showMore } = usePagedList(filtered);
 
   const primaryOptions = [
-    { value: "all", label: "Alle Themen" },
-    ...themes.map((t) => ({ value: t.id, label: t.titleDe })),
+    { value: "all", label: "Alle Themen", count: collocations.length },
+    ...themes.map((t) => ({
+      value: t.id,
+      label: t.titleDe,
+      count: collocationsByTheme(t.id).length,
+    })),
   ];
 
   return (
@@ -218,8 +240,27 @@ export function CollocationsBrowser() {
         }
       />
 
-      {activeTheme && (
-        <ScopeChip label={activeTheme.titleDe} onClear={() => setTheme("all")} />
+      {showPicker && activeTheme ? (
+        <SubThemePicker
+          theme={activeTheme}
+          onPick={(s) => setSub(s)}
+          onPickAll={() => setSub("all")}
+          totalLine={`Alle ${collocationsByTheme(activeTheme.id).length} Kollokationen auf einmal`}
+        />
+      ) : (
+      <>
+      {hasSubThemes && sub && (
+        <button
+          onClick={() => setSub("")}
+          className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ChevronLeft className="h-4 w-4" />
+          {activeTheme?.titleDe}
+          <span className="text-muted-foreground/60">/</span>
+          <span className="text-foreground">
+            {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
+          </span>
+        </button>
       )}
 
       <div className="flex flex-wrap items-center gap-3">
@@ -227,12 +268,10 @@ export function CollocationsBrowser() {
           {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
         </p>
         {hiddenLabel && (
-          <button
-            onClick={() => setShowAllLevels(true)}
-            className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground hover:underline"
-          >
-            Auch {hiddenLabel} zeigen ({scoped.length - bandLimited.length})
-          </button>
+          <ActiveFilterChip
+            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+            onRemove={() => setShowAllLevels(true)}
+          />
         )}
       </div>
 
@@ -245,7 +284,7 @@ export function CollocationsBrowser() {
           {/* The remount key deliberately excludes the search term: re-keying
               per query change remounted the entire grid on every search flush. */}
           <motion.div
-            key={`${themeParam}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${showAllLevels}`}
+            key={`${themeParam}__${sub}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${showAllLevels}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.15 }}
@@ -263,6 +302,8 @@ export function CollocationsBrowser() {
             </div>
           )}
         </>
+      )}
+      </>
       )}
     </div>
   );

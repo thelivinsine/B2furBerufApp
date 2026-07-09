@@ -1,58 +1,54 @@
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Dumbbell, Library, MessageSquareText } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { MessageSquareText, Zap } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
 import { iconByName } from "@/lib/icons";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { applyFacets, type FacetSelection } from "@/features/shared/FacetSheet";
-import { redemittelFacets } from "@/lib/facets";
+import { Button } from "@/components/ui/button";
+import { ActiveFilterChip } from "@/features/shared/FacetSheet";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
-import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
-import { RedemittelPractice } from "./RedemittelPractice";
+import { defaultVisibleBands } from "@/lib/cefr";
+import { cn } from "@/lib/utils";
 
 function normalise(s: string) {
   return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
 }
 
-const registerLabel: Record<string, { text: string; variant: "muted" | "default" | "accent" }> = {
+const registerLabel: Record<string, { text: string; variant: "muted" | "default" }> = {
   neutral: { text: "neutral", variant: "muted" },
   formal: { text: "formell", variant: "default" },
-  diplomatic: { text: "diplomatisch", variant: "accent" },
 };
 
-// Facets come from the central registry (Phase 5): Register only.
-const REDEMITTEL_FACETS = redemittelFacets();
+// Register is the single orthogonal dimension here, so it renders as an
+// inline chip row instead of a one-facet bottom sheet (audit 2026-07-09:
+// a modal needs at least two facet groups to earn itself).
+const REGISTER_CHIPS = [
+  { value: "neutral", label: "neutral" },
+  { value: "formal", label: "formell" },
+] as const;
 
+// The old in-page Wendungen/Üben tabs are gone (audit 2026-07-09): focused
+// practice flows through the trailing "Üben" button into the composed
+// session, matching Wörter and Kollokationen. RedemittelPractice stays in
+// the repo (the session engine's redemittel pool covers the practice loop).
 export function RedemittelTrainer() {
-  const [tab, setTab] = useState("browse");
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const level = useSettingsStore((s) => s.level);
   const [showAllLevels, setShowAllLevels] = useState(false);
 
   const category = params.get("cat") ?? "all";
-
-  const selection: FacetSelection = useMemo(() => {
-    const s: FacetSelection = {};
+  const registerSel = useMemo(() => {
     const raw = params.get("register");
-    if (raw) s.register = raw.split(",");
-    return s;
+    return raw ? raw.split(",") : [];
   }, [params]);
-
-  const setSelection = (next: FacetSelection) => {
-    const p = new URLSearchParams(params);
-    const v = next.register;
-    if (v && v.length) p.set("register", v.join(","));
-    else p.delete("register");
-    setParams(p, { replace: true });
-  };
 
   const setCategory = (cat: string) => {
     const p = new URLSearchParams(params);
@@ -61,19 +57,15 @@ export function RedemittelTrainer() {
     setParams(p, { replace: true });
   };
 
-  const removeFacetValue = (facetId: string, value: string) =>
-    setSelection({
-      ...selection,
-      [facetId]: (selection[facetId] ?? []).filter((v) => v !== value),
-    });
-
-  const activeChips = REDEMITTEL_FACETS.flatMap((f) =>
-    (selection[f.id] ?? []).map((v) => ({
-      facetId: f.id,
-      value: v,
-      label: f.options.find((o) => o.value === v)?.label ?? v,
-    })),
-  );
+  const toggleRegister = (value: string) => {
+    const next = registerSel.includes(value)
+      ? registerSel.filter((v) => v !== value)
+      : [...registerSel, value];
+    const p = new URLSearchParams(params);
+    if (next.length) p.set("register", next.join(","));
+    else p.delete("register");
+    setParams(p, { replace: true });
+  };
 
   const categoryScoped = useMemo(() => {
     if (category === "all") return redemittel;
@@ -81,34 +73,36 @@ export function RedemittelTrainer() {
   }, [category]);
 
   // Tier-0 personalized default (UX overhaul Phase 2): default to the
-  // learner's CEFR band + one step up, with a quiet escape. No CEFR facet
-  // exists here (Register is the only one), so the escape link is the only
-  // override. Never activates if it would leave nothing to show.
+  // learner's CEFR band + one step up. Since the audit the active cut shows
+  // as a removable chip instead of a quiet text link. Never activates if it
+  // would leave nothing to show.
   const visibleBands = useMemo(() => defaultVisibleBands(level), [level]);
   const bandNonEmpty = useMemo(
     () => categoryScoped.some((p) => !p.cefr || visibleBands.includes(p.cefr)),
     [categoryScoped, visibleBands],
   );
   const bandActive = !showAllLevels && !search.trim() && bandNonEmpty;
-  const inBand = (p: RedemittelPhrase) => !bandActive || !p.cefr || visibleBands.includes(p.cefr);
   const bandLimited = useMemo(
-    () => (bandActive ? categoryScoped.filter(inBand) : categoryScoped),
+    () =>
+      bandActive
+        ? categoryScoped.filter((p) => !p.cefr || visibleBands.includes(p.cefr))
+        : categoryScoped,
     [categoryScoped, bandActive, visibleBands],
   );
-  const hiddenLabel = bandActive && bandLimited.length < categoryScoped.length ? hiddenBandsLabel(level) : null;
+  const bandHiddenCount = bandActive ? categoryScoped.length - bandLimited.length : 0;
 
-  const searched = useMemo(() => {
-    if (!search.trim()) return bandLimited;
-    const q = normalise(search.trim());
-    return bandLimited.filter(
-      (p) => normalise(p.de).includes(q) || normalise(p.en).includes(q),
-    );
-  }, [bandLimited, search]);
-
-  const filtered = useMemo(
-    () => applyFacets(searched, REDEMITTEL_FACETS, selection),
-    [searched, selection],
-  );
+  // ONE filter pipeline: category scope -> level band -> search -> register.
+  // (The per-category re-filtering that used to live in the render path is
+  // gone; sections below just partition this list.)
+  const filtered = useMemo(() => {
+    let list = bandLimited;
+    if (search.trim()) {
+      const q = normalise(search.trim());
+      list = list.filter((p) => normalise(p.de).includes(q) || normalise(p.en).includes(q));
+    }
+    if (registerSel.length) list = list.filter((p) => registerSel.includes(p.register));
+    return list;
+  }, [bandLimited, search, registerSel]);
 
   const primaryOptions = [
     { value: "all", label: "Alle Kategorien", count: redemittel.length },
@@ -135,106 +129,107 @@ export function RedemittelTrainer() {
 
       <LibrarySwitcher />
 
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
-          <TabsTrigger value="browse"><Library className="h-4 w-4" /> Wendungen</TabsTrigger>
-          <TabsTrigger value="practice"><Dumbbell className="h-4 w-4" /> Üben</TabsTrigger>
-        </TabsList>
+      <BrowseToolbar
+        search={search}
+        onSearch={setSearch}
+        searchPlaceholder="Suche nach Wendung, Übersetzung …"
+        primary={{ value: category, onChange: setCategory, options: primaryOptions }}
+        facetItems={filtered}
+        facets={[]}
+        facetSelection={{}}
+        onFacetChange={() => {}}
+        resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
+        activeChips={[]}
+        onRemoveChip={() => {}}
+        trailing={
+          <Button
+            size="sm"
+            variant="gradient"
+            className="h-10 shrink-0"
+            onClick={() => navigate("/session")}
+          >
+            <Zap className="h-3.5 w-3.5" /> Üben
+          </Button>
+        }
+      />
 
-        <TabsContent value="browse" className="space-y-6">
-          <BrowseToolbar
-            search={search}
-            onSearch={setSearch}
-            searchPlaceholder="Suche nach Wendung, Übersetzung …"
-            primary={{ value: category, onChange: setCategory, options: primaryOptions }}
-            facetItems={searched}
-            facets={REDEMITTEL_FACETS}
-            facetSelection={selection}
-            onFacetChange={setSelection}
-            resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
-            activeChips={activeChips}
-            onRemoveChip={removeFacetValue}
-          />
-
-          {hiddenLabel && (
+      <div className="flex flex-wrap items-center gap-2">
+        {REGISTER_CHIPS.map((chip) => {
+          const active = registerSel.includes(chip.value);
+          return (
             <button
-              onClick={() => setShowAllLevels(true)}
-              className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground hover:underline"
+              key={chip.value}
+              onClick={() => toggleRegister(chip.value)}
+              aria-pressed={active}
+              className={cn(
+                "inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
+                active
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
+              )}
             >
-              Auch {hiddenLabel} zeigen ({categoryScoped.length - bandLimited.length})
+              {chip.label}
             </button>
-          )}
+          );
+        })}
+        {bandActive && bandHiddenCount > 0 && (
+          <ActiveFilterChip
+            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+            onRemove={() => setShowAllLevels(true)}
+          />
+        )}
+      </div>
 
-          {categoriesToRender.map((cat) => {
-            const Icon = iconByName(cat.icon);
-            const catPhrases = category === "all"
-              ? redemittelByCategory(cat.id).filter(inBand)
-              : searched;
-            const phrases = category === "all"
-              ? applyFacets(
-                  search.trim()
-                    ? catPhrases.filter((p) => {
-                        const q = normalise(search.trim());
-                        return normalise(p.de).includes(q) || normalise(p.en).includes(q);
-                      })
-                    : catPhrases,
-                  REDEMITTEL_FACETS,
-                  selection,
-                )
-              : filtered;
-            if (phrases.length === 0) return null;
-            return (
-              <section key={cat.id} className="space-y-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="rounded-lg bg-primary/10 p-2 text-primary">
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold leading-tight">{cat.labelDe}</h3>
-                    <p className="text-xs text-muted-foreground">{cat.description}</p>
-                  </div>
-                  <Badge variant="muted" className="ml-auto">{phrases.length}</Badge>
-                </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {phrases.map((p) => {
-                    const reg = registerLabel[p.register];
-                    return (
-                      <div key={p.id}>
-                        <Card className="card-hover h-full">
-                          <CardContent className="space-y-2 p-4">
-                            <div className="flex items-start justify-between gap-2">
-                              <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
-                              <SpeakButton text={p.de} />
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {p.en}
-                              {p.note && ` · 💡 ${p.note}`}
-                            </p>
-                            <div className="flex items-center justify-between border-t border-border pt-2">
-                              <p className="text-xs italic text-muted-foreground">„{p.example.de}"</p>
-                              <Badge variant={reg.variant}>{reg.text}</Badge>
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })}
-
-          {filtered.length === 0 && (
-            <div className="py-16 text-center text-muted-foreground">
-              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+      {categoriesToRender.map((cat) => {
+        const Icon = iconByName(cat.icon);
+        const phrases = filtered.filter((p) => p.category === cat.id);
+        if (phrases.length === 0) return null;
+        return (
+          <section key={cat.id} className="space-y-3">
+            <div className="flex items-center gap-2.5">
+              <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                <Icon className="h-4 w-4" />
+              </div>
+              <div>
+                <h3 className="font-semibold leading-tight">{cat.labelDe}</h3>
+                <p className="text-xs text-muted-foreground">{cat.description}</p>
+              </div>
+              <Badge variant="muted" className="ml-auto">{phrases.length}</Badge>
             </div>
-          )}
-        </TabsContent>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {phrases.map((p) => {
+                const reg = registerLabel[p.register];
+                return (
+                  <div key={p.id}>
+                    <Card className="card-hover h-full">
+                      <CardContent className="space-y-2 p-4">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
+                          <SpeakButton text={p.de} />
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {p.en}
+                          {p.note && ` · 💡 ${p.note}`}
+                        </p>
+                        <div className="flex items-center justify-between border-t border-border pt-2">
+                          <p className="text-xs italic text-muted-foreground">„{p.example.de}"</p>
+                          <Badge variant={reg.variant}>{reg.text}</Badge>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
 
-        <TabsContent value="practice">
-          <RedemittelPractice phrases={redemittel} />
-        </TabsContent>
-      </Tabs>
+      {filtered.length === 0 && (
+        <div className="py-16 text-center text-muted-foreground">
+          Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+        </div>
+      )}
     </div>
   );
 }

@@ -99,6 +99,7 @@ export function BrowseToolbar<T>({
             value={value}
             onChange={(e) => handleChange(e.target.value)}
             placeholder={searchPlaceholder}
+            aria-label={searchPlaceholder}
             className="h-10 w-full rounded-lg border border-input bg-surface py-2 pl-9 pr-9 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
           {value && (

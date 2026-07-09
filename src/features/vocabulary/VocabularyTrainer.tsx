@@ -11,8 +11,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
-import { LibrarySwitcher, ScopeChip } from "@/features/library/LibrarySwitcher";
-import { applyFacets, type FacetSelection } from "@/features/shared/FacetSheet";
+import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
+import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { cn } from "@/lib/utils";
@@ -235,17 +235,16 @@ export function VocabularyTrainer() {
         }
       />
 
-      {theme !== "all" && (
-        <ScopeChip label={activeTheme?.titleDe ?? theme} onClear={() => setTheme("all")} />
-      )}
-
+      {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
+          dropdown already shows the active theme, so the chip was redundant.
+          The silent level-band cut now shows as an explicit removable chip. */}
       {hiddenLabel && (
-        <button
-          onClick={() => setShowAllLevels(true)}
-          className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground hover:underline"
-        >
-          Auch {hiddenLabel} zeigen ({searched.length - bandLimited.length})
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <ActiveFilterChip
+            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+            onRemove={() => setShowAllLevels(true)}
+          />
+        </div>
       )}
 
       {showPicker && activeTheme ? (

@@ -97,7 +97,6 @@ const SECTOR_OPTIONS: FacetOption[] = [
 const REGISTER_OPTIONS: FacetOption[] = [
   { value: "neutral", label: "neutral" },
   { value: "formal", label: "formell" },
-  { value: "diplomatic", label: "diplomatisch" },
 ];
 
 // ── Vocabulary ───────────────────────────────────────────────────────────
