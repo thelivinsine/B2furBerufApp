@@ -987,6 +987,8 @@ async function main() {
     ]);
     // Generated Layer C trust map — optional, so its absence never breaks the lint.
     const verif = await load("/src/data/verification.ts").catch(() => ({ verification: {} }));
+    // Generated frequency map (pnpm build:frequency) — optional as well.
+    const freq = await load("/src/data/frequency.ts").catch(() => ({ frequency: {} }));
     data = {
       vocabulary: vocab.vocabulary,
       collocations: colloc.collocations,
@@ -1006,6 +1008,7 @@ async function main() {
       keyItems: miss.keyItems,
       chapters: miss.chapters,
       verification: verif.verification ?? {},
+      frequency: freq.frequency ?? {},
     };
   } finally {
     await server.close();
@@ -1052,6 +1055,16 @@ async function main() {
   ]);
   lintProvenance(data.provenance, allContentIds);
   const tierHist = lintVerification(data.verification, allContentIds);
+
+  // Generated frequency map integrity: every key must be a live content_id
+  // (a dangling key means src/data/frequency.ts is stale after a content
+  // change — regenerate with `pnpm build:frequency`), and bins must be valid.
+  for (const [id, entry] of Object.entries(data.frequency)) {
+    if (!allContentIds.has(id))
+      error("frequency", id, "frequency entry for unknown content_id (regenerate: pnpm build:frequency)");
+    if (!FREQUENCIES.includes(entry?.bin))
+      error("frequency", id, `invalid frequency bin "${entry?.bin}"`);
+  }
 
   // Em-dash sweep across every user-facing string in every bank
   // (skip the provenance register — notes are internal, not user-facing copy).

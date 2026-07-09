@@ -36,6 +36,7 @@ import { canDoByTheme } from "@/data/canDo";
 import { useProgressStore, useEffectiveStreak, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore, type LearningGoal } from "@/store/useSettingsStore";
 import { mastery, masteryLabel, dueCount } from "@/engine/srs";
+import { frequencyBin } from "@/data/frequency";
 import { weakestBand, weakestTheme } from "@/engine/session";
 import { levelFromXp, tierForLevel } from "@/engine/scoring";
 import { pct, cn, daysBetween, todayKey } from "@/lib/utils";
@@ -190,11 +191,29 @@ export function Analytics() {
   }, [srs]);
 
   const masteryData = [
-    { label: "Neu", value: masteryGroups.new, fill: "var(--color-muted-foreground)" },
-    { label: "Lernen", value: masteryGroups.learning, fill: "var(--color-warning)" },
-    { label: "Wiederholen", value: masteryGroups.review, fill: "var(--color-primary)" },
-    { label: "Gemeistert", value: masteryGroups.mastered, fill: "var(--color-success)" },
+    { label: "Neu", value: masteryGroups.new, fill: "hsl(var(--muted-foreground))" },
+    { label: "Lernen", value: masteryGroups.learning, fill: "hsl(var(--warning))" },
+    { label: "Wiederholen", value: masteryGroups.review, fill: "hsl(var(--primary))" },
+    { label: "Gemeistert", value: masteryGroups.mastered, fill: "hsl(var(--success))" },
   ];
+
+  // Wortschatz nach Häufigkeit (audit PR 3): per frequency bin, how much is
+  // already mastered. The "offen" share of Kernwortschatz is the learner's
+  // best lever ("high-value words you have not learned yet"). Deliberately
+  // labelled Häufigkeit (commonness in the bank), never "most-used German
+  // words": the bank is curated by exam word-fields, not corpus rank.
+  const frequencyData = useMemo(() => {
+    const bins = [
+      { key: "core", label: "Kernwortschatz" },
+      { key: "common", label: "häufig" },
+      { key: "specialized", label: "Fachsprache" },
+    ];
+    return bins.map(({ key, label }) => {
+      const words = vocabulary.filter((v) => (v.frequency ?? frequencyBin(v.id)) === key);
+      const done = words.filter((v) => masteryLabel(mastery(srs[v.id])) === "mastered").length;
+      return { key, label, gemeistert: done, offen: words.length - done };
+    });
+  }, [srs]);
 
   // Per-theme mastery — sorted least mastered first
   const themeStats = useMemo(() => {
@@ -502,8 +521,8 @@ export function Analytics() {
                 <AreaChart data={xpChartData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
                   <defs>
                     <linearGradient id="xpGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.25} />
-                      <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.25} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis
@@ -515,9 +534,9 @@ export function Analytics() {
                   />
                   <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip
-                    contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
+                    contentStyle={{ background: "hsl(var(--surface))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
                   />
-                  <Area type="monotone" dataKey="xp" stroke="var(--color-primary)" strokeWidth={2} fill="url(#xpGrad)" />
+                  <Area type="monotone" dataKey="xp" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#xpGrad)" />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
@@ -560,7 +579,7 @@ export function Analytics() {
                   <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip
-                    contentStyle={{ background: "var(--color-surface)", border: "1px solid var(--color-border)", borderRadius: 8, fontSize: 12 }}
+                    contentStyle={{ background: "hsl(var(--surface))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
                   />
                   <Bar dataKey="value" radius={[4, 4, 0, 0]}>
                     {masteryData.map((entry, i) => (
@@ -572,6 +591,47 @@ export function Analytics() {
               <div className="mt-3 flex flex-wrap gap-2">
                 {masteryData.map((d) => (
                   <Badge key={d.label} variant="muted">{d.label}: {d.value}</Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Vocab by frequency, mastery-overlaid (audit PR 3) */}
+          <Card>
+            <CardContent className="p-5">
+              <p className="mb-1 font-semibold">Wortschatz nach Häufigkeit</p>
+              <p className="mb-4 text-xs text-muted-foreground">
+                Tippe auf einen Balken und lerne zuerst, was im Alltag am häufigsten vorkommt.
+              </p>
+              <ResponsiveContainer width="100%" height={140}>
+                <BarChart data={frequencyData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                  <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+                  <Tooltip
+                    contentStyle={{ background: "hsl(var(--surface))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                  />
+                  <Bar
+                    dataKey="gemeistert"
+                    stackId="freq"
+                    fill="hsl(var(--success))"
+                    className="cursor-pointer"
+                    onClick={(d) => navigate(`/library?tab=woerter&frequency=${(d as { key?: string }).key ?? ""}`)}
+                  />
+                  <Bar
+                    dataKey="offen"
+                    stackId="freq"
+                    fill="hsl(var(--border))"
+                    radius={[4, 4, 0, 0]}
+                    className="cursor-pointer"
+                    onClick={(d) => navigate(`/library?tab=woerter&frequency=${(d as { key?: string }).key ?? ""}`)}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {frequencyData.map((d) => (
+                  <Badge key={d.key} variant="muted">
+                    {d.label}: {d.gemeistert}/{d.gemeistert + d.offen} gemeistert
+                  </Badge>
                 ))}
               </div>
             </CardContent>
