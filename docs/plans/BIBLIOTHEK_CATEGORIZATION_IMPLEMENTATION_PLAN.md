@@ -273,8 +273,22 @@ Small, mostly cosmetic, no decisions. Group them so the library reads finished.
    library theme dropdown groups by Domain underneath.
 5. **Amtssprache/politeness axis: PARKED** (no objection raised; revisit when Behörde content grows).
 
-Build status: **PR 1 implemented and shipped 2026-07-09** (coverage floor `MIN_FACET_COVERAGE`/
-`MIN_FACET_VALUES` in `lib/facets.ts`, mode gating removed, `office` deleted from `WorkSector` + 11 word
-tags, `WorkSituation` retired + 14 word tags stripped, linter now errors on any reintroduced
-`workSituation`). Next: PR 2 (Grammar toolbar), then PR 5 (polish), PR 3 (frequency), PR 4 (Domain + SRS),
-and the Redemittel backfill.
+Build status: **ALL UNITS SHIPPED 2026-07-09** (same session as the decisions):
+- **PR 1** (#379): coverage floor `MIN_FACET_COVERAGE`/`MIN_FACET_VALUES` in `lib/facets.ts`, mode
+  gating removed, `office` deleted (+11 word tags), `WorkSituation` retired (+14 tags stripped, linter
+  errors on reintroduction).
+- **PR 2** (#380): Grammatik gets BrowseToolbar (search + Gruppe dropdown with counts, no facet sheet),
+  B2-priority topic order; FacetSheet renders nothing at 0 facet groups.
+- **PR 5** (#381): diplomatic register folded into formal; Redemittel inner tabs dropped + single filter
+  pipeline + inline register chips; Kollokationen dropdown counts + SubThemePicker; visible removable
+  "Stufe: bis X" chip on all three list tabs; a11y/microcopy tidy.
+- **PR 3** (#382): generated `src/data/frequency.ts` via `pnpm build:frequency` (1116/1182 binned, 66
+  compounds honestly unbinned), Häufigkeit facet + card label, Fortschritt "Wortschatz nach Häufigkeit"
+  chart with mastery overlay + tap deep-link. Also fixed the pre-existing black-charts bug (all
+  Analytics charts referenced non-existent `var(--color-*)` vars).
+- **PR 4** (#383): Domain-grouped theme dropdown on Wörter + Kollokationen (`lib/themeGroups.ts`; Mode
+  pre-selects domains per decision 4; SelectGroup/SelectLabel added to ui/select), and the per-learner
+  **Lernstand** facet (`?srs=`, values mirror the card badges).
+- **Redemittel CEFR backfill** (final PR): all 72 phrases AI-draft-tagged (A2 3 · B1.1 19 · B1.2 27 ·
+  B2.1 20 · B2.2 3), founder review pending; the level band-default is now live on the tab (a B1
+  learner's default hides only the 3 B2.2 phrases) and each card shows its level badge for review.

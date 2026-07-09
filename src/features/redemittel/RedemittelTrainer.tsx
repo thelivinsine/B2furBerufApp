@@ -211,9 +211,12 @@ export function RedemittelTrainer() {
                           {p.en}
                           {p.note && ` · 💡 ${p.note}`}
                         </p>
-                        <div className="flex items-center justify-between border-t border-border pt-2">
+                        <div className="flex items-center justify-between gap-2 border-t border-border pt-2">
                           <p className="text-xs italic text-muted-foreground">„{p.example.de}"</p>
-                          <Badge variant={reg.variant}>{reg.text}</Badge>
+                          <div className="flex shrink-0 items-center gap-1">
+                            {p.cefr && <Badge variant="muted">{p.cefr}</Badge>}
+                            <Badge variant={reg.variant}>{reg.text}</Badge>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>

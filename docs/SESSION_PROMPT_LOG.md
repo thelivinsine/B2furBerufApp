@@ -2108,3 +2108,47 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `docs/plans/BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09.md` (full report + verbatim
   red-team appendix); visual report Artifact (categorization audit). `docs/SESSION_PROMPT_LOG.md`
   (entry 244). Committed to the dev branch; not merged (no code change).
+
+## Entry 245 — 2026-07-09 (session 84)
+- **Branch:** `claude/bibliothek-categorization-analysis-mtqo5o`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > go ahead and scope the implementation of the top priorities from the report
+- **Response summary:** Grounded the audit against the real code (found two audit corrections: the
+  Kollokationen Thema dropdown already exists; `ui/select` lacked group primitives; verified the enum
+  removals have no consumers outside data/types/facets) and wrote
+  `docs/plans/BIBLIOTHEK_CATEGORIZATION_IMPLEMENTATION_PLAN.md`: five shippable PRs (1 stop-looking-broken,
+  2 Grammar toolbar, 5 polish, 3 frequency, 4 Domain+SRS) with exact files, edge cases, backwards-compat,
+  gates and effort, plus the decision-gated Redemittel backfill. Recommended order 1→2→5→3→4; PRs 1/2/5
+  decision-independent.
+- **Artifacts:** `docs/plans/BIBLIOTHEK_CATEGORIZATION_IMPLEMENTATION_PLAN.md` (commit 903eb9d, pushed to
+  the dev branch). `docs/SESSION_PROMPT_LOG.md` (entry 245).
+
+## Entry 246 — 2026-07-09 (session 84)
+- **Branch:** `claude/bibliothek-categorization-analysis-mtqo5o`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > let's lock in more decisions
+- **Response summary:** Locked all five audit decisions via AskUserQuestion (founder answers): (1)
+  **Branche parked** (after a clarifying founder question "why will be deleted? there is domain which is
+  same as Branche isn't it?", answered with the Domain-vs-Branche role rule: Domain = life-sphere of the
+  topic, Branche = industry you work in, cutting across topics); (2) **Redemittel CEFR backfill: yes**,
+  AI-draft + founder review; (3) **Häufigkeit: badge + chart**; (4) **Domain/Mode: Mode on top**, Mode
+  pre-selects domains; (5) **Amtssprache: parked** (default, no objection). Then implemented and
+  squash-merged the ENTIRE plan in the same session: PR #379 (coverage floor + Büro deletion +
+  workSituation retirement), PR #380 (Grammatik search + Gruppe dropdown + B2-priority order), PR #381
+  (polish batch: diplomatic→formal fold, Redemittel restructure with inline register chips, Kollokationen
+  counts + sub-theme picker, visible "Stufe: bis X" level chip, a11y), PR #382 (generated Häufigkeit
+  signal: `pnpm build:frequency` → `src/data/frequency.ts`, facet + card label + Fortschritt chart with
+  mastery overlay; also fixed the pre-existing black-charts bug where all Analytics charts referenced
+  non-existent `var(--color-*)` vars), PR #383 (Domain-grouped theme dropdown via `lib/themeGroups.ts` +
+  per-learner Lernstand `?srs=` facet), and the final docs+backfill PR (all 72 Redemittel AI-draft-tagged
+  with cefr, level badge on each card for founder review). Every PR passed build, lint:content, test:unit
+  (97), lint (0 errors), check:bundle (83 kB) and was Chromium-smoke-tested before merge.
+- **Artifacts:** PRs #379, #380, #381, #382, #383 + the final docs/backfill PR (all squash-merged to
+  `main`, branch realigned each time); `src/data/frequency.ts` (generated), `scripts/build-frequency.mjs`,
+  `src/lib/themeGroups.ts` (new); updated `CLAUDE.md`, `docs/strategy/DATA_GOVERNANCE.md`,
+  `docs/plans/BIBLIOTHEK_CATEGORIZATION_IMPLEMENTATION_PLAN.md`, `docs/PROJECT_STATUS.md`.
+  `docs/SESSION_PROMPT_LOG.md` (entry 246). **Founder review pending: the 72 Redemittel cefr drafts.**
