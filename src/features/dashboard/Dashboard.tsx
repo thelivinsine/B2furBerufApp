@@ -1,8 +1,8 @@
 import { lazy, Suspense, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Zap, Play } from "lucide-react";
-import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
+import { ArrowRight, Zap, Play, Flame, BookOpen, Clock } from "lucide-react";
+import { useProgressStore, useTodayXp, useEffectiveStreak } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { dueCount } from "@/engine/srs";
 import { cn, todayKey } from "@/lib/utils";
@@ -56,11 +56,13 @@ export function Dashboard() {
   const dailyXp = useProgressStore((s) => s.dailyXp);
   const totalSessions = useProgressStore((s) => s.totalSessions);
   const todayXp = useTodayXp();
+  const streak = useEffectiveStreak();
 
   const [tab, setTab] = useState<HeuteTab>("ueben");
 
   const goalPercent = Math.round(Math.min(todayXp / goal, 1) * 100);
   const due = dueCount(srs);
+  const learned = Object.keys(srs).length;
 
   // Session length target, deterministic so the subtitle stays stable.
   const sessionMinutes = Math.max(5, Math.round(goal / 8));
@@ -197,6 +199,33 @@ export function Dashboard() {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Compact stats, told apart by icon + colour (Option B). */}
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                {(
+                  [
+                    { Icon: Flame, tint: "warning", value: streak, label: "Tage Serie" },
+                    { Icon: BookOpen, tint: "accent", value: learned, label: "Wörter gelernt" },
+                    { Icon: Clock, tint: "primary", value: due, label: "Fällig heute" },
+                  ] as const
+                ).map(({ Icon, tint, value, label }) => (
+                  <div
+                    key={label}
+                    className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-4"
+                  >
+                    <div
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+                      style={{ background: `hsl(var(--${tint}) / 0.14)`, color: `hsl(var(--${tint}))` }}
+                    >
+                      <Icon className="h-[18px] w-[18px]" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-lg font-bold leading-none tabular-nums">{value}</div>
+                      <div className="mt-1 truncate text-xs text-muted-foreground">{label}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>
