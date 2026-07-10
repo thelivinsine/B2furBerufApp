@@ -12,5 +12,5 @@ import { NeulandHub } from "@/features/welt/NeulandHub";
  */
 export default function SpielenHub() {
   const navigate = useNavigate();
-  return <NeulandHub onPlay={(mission) => navigate(`/welt?mission=${mission.id}`)} />;
+  return <NeulandHub compact onPlay={(mission) => navigate(`/welt?mission=${mission.id}`)} />;
 }
