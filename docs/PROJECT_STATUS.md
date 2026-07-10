@@ -222,8 +222,14 @@ carousel), and the **Neuland game tile should be removed from the Anwenden hub**
   Deep-link auto-open in `Welt.tsx` is unchanged. Kept lazy so the mission bank stays off Heute's eager path.
 - **`src/features/anwenden/AnwendenHub.tsx`:** removed the "Neuland" (`/welt`) card + its `Gamepad2`
   import; grid went `lg:grid-cols-4` → `lg:grid-cols-3` for the remaining 3 cards (Sprechen/Schreiben/Prüfung).
+- **`src/features/dashboard/UebenPath.tsx` (follow-up):** the Üben tab's "Als Nächstes" tile button used to
+  enter the game (`/welt?mission=<id>`). Founder: the Üben tab should let you **practise a mission's content,
+  not play it**. Button relabelled **"Üben"** and now opens a composed practice session scoped to the next
+  mission's theme (`/session?theme=<mission.themeId>`), reusing the existing session composer's theme scope
+  (biases the vocab/quiz/reading pools). Game entry stays under Heute → Spielen and `/welt`.
 - Gates green: build, typecheck, lint (0 errors), check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md
-  (bundle note + the locked mobile-bar Spielen line), this handoff, s85 handoff archived to W28, prompt log.
+  (bundle note + the locked mobile-bar Spielen + Üben-tile lines), this handoff, s85 handoff archived to W28,
+  prompt log.
 - **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
 
 **Prior handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch

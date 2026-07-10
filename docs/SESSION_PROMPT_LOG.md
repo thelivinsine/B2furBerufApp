@@ -2506,3 +2506,20 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/welt/Welt.tsx`, `src/features/dashboard/Dashboard.tsx`, `src/features/anwenden/AnwendenHub.tsx`,
   `src/features/dashboard/NeulandCarousel.tsx` (deleted); `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md` (entry 265).
+
+## Entry 266 — 2026-07-10 (session 87)
+- **Branch:** `claude/game-tile-removal-nav-hi37z5`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > when pressing continue button on üben page, the user enters the game directly. that's not the purpose of
+  > it. The user should be able to practice everything related to that particular mission but not enter the
+  > game. It should be just an üben session but with the content corresponding to the particular mission in
+  > the game.
+- **Response summary:** The Üben tab's "Als Nächstes" tile button navigated to `/welt?mission=<id>`, entering
+  the game. Changed it to start a **composed practice session scoped to the mission's theme**:
+  `navigate('/session?theme=<nextMission.themeId>')`, reusing the existing session composer's `scope` (which
+  biases the vocab/quiz/reading pools to that theme). Relabelled the button **"Üben"**. Game entry stays under
+  Heute → Spielen and `/welt`. One-line behavior change in `UebenPath.tsx`; build + typecheck green.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 266).
