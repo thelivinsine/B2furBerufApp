@@ -22,8 +22,20 @@ import { cn } from "@/lib/utils";
  * dense checklist where done rows pair the green check with a quiet replay
  * button. Only the next mission carries the loud gradient control. A locked
  * teaser card for the next unauthored chapter replaces the old footer note.
+ *
+ * `compact` (Heute → Spielen, s88 follow-up): fills the viewport below the tab
+ * toggle and crops the mission checklist into its own internally-scrollable
+ * region, so the header + hero + next-chapter teaser stay put and the WHOLE
+ * page never scrolls (only the mission tile does). The `/welt` route leaves it
+ * off and scrolls the page normally.
  */
-export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
+export function NeulandHub({
+  onPlay,
+  compact = false,
+}: {
+  onPlay: (mission: Mission) => void;
+  compact?: boolean;
+}) {
   const missionsDone = useProgressStore((s) => s.missionsDone);
   const ownedItems = useProgressStore((s) => s.keyItems);
 
@@ -33,8 +45,13 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
   const nextLockedIndex = nextLockedChapter ? chapters.indexOf(nextLockedChapter) : -1;
 
   return (
-    <div className="mx-auto max-w-lg space-y-3">
-      <header className="flex items-center justify-center gap-2.5">
+    <div
+      className={cn(
+        "mx-auto max-w-lg",
+        compact ? "flex h-[calc(100dvh-15rem)] flex-col gap-3 overflow-hidden" : "space-y-3",
+      )}
+    >
+      <header className={cn("flex items-center justify-center gap-2.5", compact && "shrink-0")}>
         <h1 className="text-2xl font-bold">Neuland</h1>
         <span className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
           Beta
@@ -51,11 +68,14 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
           (m) => !isDone(m) && missionUnlocked(m, missionsDone, ownedItems),
         );
         return (
-          <section key={chapter.id} className="space-y-3">
+          <section
+            key={chapter.id}
+            className={cn("space-y-3", compact && "flex min-h-0 flex-1 flex-col")}
+          >
             {/* Chapter hero: the scrim overlay gives the image a job (chapter,
                 count, play CTA) instead of a decorative dead zone. Framed by
                 the same surface mat as the Üben map. */}
-            <div className="rounded-2xl border border-border bg-surface p-2 shadow-soft">
+            <div className={cn("rounded-2xl border border-border bg-surface p-2 shadow-soft", compact && "shrink-0")}>
               <PixelStage setting="strasse" label={null} className="rounded-xl" themed>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#16142c]/75 via-[#16142c]/25 to-transparent" />
                 <div className="absolute inset-x-3.5 bottom-3 flex items-end justify-between gap-3">
@@ -84,8 +104,15 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
               </PixelStage>
             </div>
 
-            {/* Mission checklist: one dense card, states at a glance. */}
-            <div className="rounded-2xl border border-border bg-surface px-4 shadow-soft">
+            {/* Mission checklist: one dense card, states at a glance. In compact
+                (Heute) it's the single scrollable region so the page never
+                scrolls; the header/hero/teaser stay fixed around it. */}
+            <div
+              className={cn(
+                "rounded-2xl border border-border bg-surface px-4 shadow-soft",
+                compact && "min-h-0 flex-1 overflow-y-auto overscroll-contain",
+              )}
+            >
               {chapterMissions.map((m) => {
                 const done = isDone(m);
                 const unlocked = missionUnlocked(m, missionsDone, ownedItems);
@@ -162,7 +189,7 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
       {/* Next chapter teaser: a locked card says "more is coming" without a
           filler sentence (microcopy budget). */}
       {nextLockedChapter && (
-        <div className="flex items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-border bg-muted/40 px-4 py-3 text-muted-foreground">
+        <div className={cn("flex items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-border bg-muted/40 px-4 py-3 text-muted-foreground", compact && "shrink-0")}>
           <Lock className="h-4 w-4 shrink-0" />
           <div className="min-w-0">
             <p className="text-[13.5px] font-bold">
@@ -174,7 +201,7 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
       )}
 
       {ownedItems.length > 0 && (
-        <section className="space-y-2">
+        <section className={cn("space-y-2", compact && "shrink-0")}>
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Schlüssel-Dokumente
           </p>

@@ -132,7 +132,10 @@ list. Full rationale + per-task model map in the plan's G2 status block.
   H1 the moment Kapitel 2 is authored) + a chapter hero with a scrim overlay (Kapitel eyebrow, district
   title, n/6 count, "Mission spielen" CTA) over ONE dense checklist card (done = green check + quiet
   replay icon button, next = the single gradient play control, locked = Lock, boss tag inline, a locked
-  next-chapter teaser card instead of a footer sentence), and the Üben map
+  next-chapter teaser card instead of a footer sentence). In the Heute embed the hub takes a **`compact`
+  prop** (`SpielenHub` passes it, `/welt` does not): it fills the viewport below the toggle and crops the
+  **mission checklist into its own internally-scrollable region** (header + hero + teaser stay fixed) so the
+  page itself never scrolls; `/welt` scrolls the page normally. The Üben map
   (`features/dashboard/UebenPath`) is a soft illustrated SVG city map with `MAP_LIGHT`/`MAP_DARK`
   palettes (switched by `useIsDark` from `lib/useTheme`); `PixelStage` keeps an opt-in `themed` prop
   (hub only) that dims the bright backdrop art in dark mode. In-mission `MissionPlayer` scenes stay light-only (the

@@ -2806,3 +2806,22 @@ Branch: `claude/whats-next-esga9u`.
   screens. Gates green (build, lint 0 errors). Shipped as PR #406.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`
   (entry 282); PR #406.
+
+## Entry 283 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > can you also crop the tile below the spielen photo and make it such that we can scroll up and down within
+  > the cropped tile to see the missions. try to keep the contents below the photo such that the user doesn't
+  > have to scroll the page.
+- **Response summary:** Added a `compact` prop to `NeulandHub` (passed by `SpielenHub`, NOT by `/welt`):
+  the root becomes `flex h-[calc(100dvh-15rem)] flex-col overflow-hidden`, the chapter section a
+  `flex-1 min-h-0` column, the header + hero + Kapitel-2 teaser stay fixed (`shrink-0`), and the mission
+  checklist card becomes the single `flex-1 min-h-0 overflow-y-auto overscroll-contain` region — so the
+  mission tile scrolls internally to reveal all six missions while the whole page never scrolls. `/welt`
+  (no `compact`) keeps its normal full-page scroll. Verified via Playwright: page docScroll == viewport
+  (no page scroll), mission card scrolls (clientH 226 of scrollH 333), top shows 1.1–1.4, scrolled shows
+  1.3–1.6 boss; no page errors. Gates green (build, lint 0 errors). Shipped as PR #407.
+- **Artifacts:** `src/features/welt/NeulandHub.tsx`, `src/features/dashboard/SpielenHub.tsx`; `CLAUDE.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 283); PR #407.
