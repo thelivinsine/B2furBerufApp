@@ -78,7 +78,7 @@ export function AccountMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-full z-50 mt-2 w-60 rounded-xl border border-border bg-surface p-2 shadow-lg"
+          className="absolute right-0 top-full z-50 mt-2 w-72 rounded-xl border border-border bg-surface p-2 shadow-elevated-soft"
         >
           <div className="flex items-center gap-2 rounded-lg px-2 py-2">
             <UserCircle2 className="h-5 w-5 shrink-0 text-primary" />
@@ -105,7 +105,7 @@ export function AccountMenu() {
             <p className="pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               Design
             </p>
-            <div className="flex gap-1">
+            <div className="grid grid-cols-3 gap-1.5">
               {THEME_OPTIONS.map(({ value, icon: Icon, label }) => (
                 <button
                   key={value}
@@ -113,14 +113,14 @@ export function AccountMenu() {
                   onClick={() => setSettings({ themeMode: value })}
                   aria-pressed={themeMode === value}
                   className={cn(
-                    "flex flex-1 items-center justify-center gap-1.5 rounded-lg border py-2 text-xs font-medium transition-colors",
+                    "flex min-w-0 items-center justify-center gap-1.5 rounded-lg border px-1 py-2 text-xs font-medium transition-colors",
                     themeMode === value
                       ? "border-primary bg-primary/10 text-primary"
                       : "border-border text-muted-foreground hover:bg-muted/50",
                   )}
                 >
-                  <Icon className="h-3.5 w-3.5" />
-                  {label}
+                  <Icon className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{label}</span>
                 </button>
               ))}
             </div>
@@ -132,7 +132,7 @@ export function AccountMenu() {
             <>
               <Button
                 variant="gradient"
-                className="w-full justify-start"
+                className="w-full justify-start px-2"
                 onClick={() => openAuth("signup")}
                 disabled={busy}
               >
@@ -140,7 +140,7 @@ export function AccountMenu() {
               </Button>
               <Button
                 variant="ghost"
-                className="mt-1 w-full justify-start"
+                className="mt-1 w-full justify-start px-2"
                 onClick={() => openAuth("login")}
                 disabled={busy}
               >
@@ -150,7 +150,7 @@ export function AccountMenu() {
           )}
 
           <Link to="/settings" onClick={() => setOpen(false)}>
-            <Button variant="ghost" className="w-full justify-start">
+            <Button variant="ghost" className="w-full justify-start px-2">
               <SettingsIcon className="h-4 w-4" />
               Einstellungen
             </Button>
@@ -159,7 +159,7 @@ export function AccountMenu() {
           {synced && (
             <Button
               variant="ghost"
-              className="w-full justify-start text-danger hover:text-danger"
+              className="w-full justify-start px-2 text-danger/80 hover:text-danger"
               onClick={handleSignOut}
               disabled={busy}
             >
