@@ -1,30 +1,26 @@
 import { Suspense, useEffect, useState } from "react";
 import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Flame, Loader2, Search } from "lucide-react";
+import { Flame, Loader2 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
-import { ThemeToggle } from "./ThemeToggle";
 import { BottomTabBar } from "./BottomTabBar";
-import { MoreSheet } from "./MoreSheet";
 import { GlobalSearch } from "./GlobalSearch";
 import { useEffectiveStreak, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Toaster } from "./Toaster";
-import { ModeSwitcher } from "./ModeSwitcher";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { AccountMenu } from "@/features/auth/AccountMenu";
 import { loadWritingDraft } from "@/features/writing/resumeDraft";
 import { cn } from "@/lib/utils";
 
 export function AppShell() {
-  const [moreOpen, setMoreOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Universal shortcut (UX overhaul Phase 2, Tier 1): ⌘K / Ctrl+K opens global
-  // search from anywhere, alongside the header icon and the Sidebar entry.
+  // search from anywhere. The header no longer carries a search icon (s-polish);
+  // the desktop Sidebar keeps a visible entry, and ⌘K works app-wide.
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
@@ -36,40 +32,16 @@ export function AppShell() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  function enterEditMode() {
-    setEditMode(true);
-    setMoreOpen(true);
-  }
-  // Tapping the Mehr tab toggles the sheet: open it, or close it (and exit edit
-  // mode) if it is already open.
-  function toggleMore() {
-    setMoreOpen(prev => {
-      if (prev) setEditMode(false);
-      return !prev;
-    });
-  }
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Navigating to any route (e.g. tapping Home or another tab in the bar while
-  // the sheet is open) closes the More sheet and exits edit mode. This handles
-  // cross-route navigation; tapping the tab that is already active doesn't
-  // change the pathname, so the bar also calls closeMore() directly on tap.
-  useEffect(() => {
-    setMoreOpen(false);
-    setEditMode(false);
-  }, [location.pathname]);
-  function closeMore() {
-    setMoreOpen(false);
-    setEditMode(false);
-  }
   const authStatus = useAuthStore((s) => s.status);
   // Effective streak (0 once broken) so the header never disagrees with the
   // dashboard after a missed day.
   const streak = useEffectiveStreak();
 
-  // Greeting + daily-goal progress now live in the top row (they moved out of
-  // the Heute body). Hour-based greeting keeps the header personal.
+  // Greeting + daily-goal progress live in the desktop top row. Hour-based
+  // greeting keeps the header personal.
   const name = useSettingsStore((s) => s.name);
   const goal = useSettingsStore((s) => s.dailyGoalXp);
   const todayXp = useTodayXp();
@@ -82,7 +54,6 @@ export function AppShell() {
   // full-screen stage. Both routes that mount the player (`/session` and the
   // Schnellwiederholung preset `/revision`) qualify; gating on the route too
   // means a stale flag can never strand the app chromeless anywhere else.
-  // Chrome returns on the end screen (the player clears the flag) and off-route.
   const focusMode = useSessionStore((s) => s.focusMode);
   const focus =
     focusMode &&
@@ -132,27 +103,10 @@ export function AppShell() {
 
       <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
 
-      {/* Mobile bottom tab bar + "Mehr" sheet (hidden in focus mode) */}
-      {!focus && (
-        <>
-          <BottomTabBar
-            onMore={toggleMore}
-            onNavigate={closeMore}
-            onLongPress={enterEditMode}
-            editMode={editMode}
-            moreOpen={moreOpen}
-          />
-          <MoreSheet
-            open={moreOpen}
-            editMode={editMode}
-            onLongPress={enterEditMode}
-            onOpenChange={open => {
-              setMoreOpen(open);
-              if (!open) setEditMode(false); // auto-save: edit mode ends when sheet closes
-            }}
-          />
-        </>
-      )}
+      {/* Mobile bottom tab bar (hidden in focus mode). The "Mehr" sheet was
+          retired (s-polish): the bar now ends in a fixed Einstellungen tab, and
+          the middle sections reorder via a long-press easter egg. */}
+      {!focus && <BottomTabBar />}
 
       <div className={cn(!focus && "lg:pl-64")}>
         {/* Top bar */}
@@ -169,7 +123,6 @@ export function AppShell() {
                 aria-label="Zur Startseite"
               >
                 <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-8 w-8 rounded-lg shadow-glow" />
-                <span className="text-sm font-semibold tracking-tight">Genauly</span>
               </Link>
               <div className="hidden leading-tight lg:block">
                 <p className="text-sm font-semibold">
@@ -183,38 +136,20 @@ export function AppShell() {
             </div>
 
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <ModeSwitcher />
-              {/* Streak chip: flame and number sit side by side (never stacked).
-                  The small ring around the flame doubles as the daily-goal
-                  gauge, so the header keeps both signals in one horizontal pill. */}
+              {/* Streak chip: flame + day count. The daily-goal figure lives on
+                  the dashboard ring now, so the header carries the streak alone
+                  (no duplicated goal gauge). */}
               <div
-                className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-warning/10 pl-1 pr-3"
+                className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-warning/10 px-3"
                 role="img"
-                aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"} · ${goalPercent}% des Tagesziels`}
+                aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
               >
-                <div
-                  className="relative h-7 w-7 shrink-0 rounded-full"
-                  style={{
-                    background: `conic-gradient(hsl(var(--primary)) ${goalPercent * 3.6}deg, hsl(var(--border)) ${goalPercent * 3.6}deg)`,
-                  }}
-                >
-                  <div className="absolute inset-[3px] grid place-items-center rounded-full bg-surface">
-                    <Flame className={cn("h-3 w-3 text-warning", streak > 0 && "fill-warning/30")} />
-                  </div>
-                </div>
+                <Flame className={cn("h-4 w-4 text-warning", streak > 0 && "fill-warning/30")} />
                 <span className="text-sm font-bold tabular-nums text-warning">{streak}</span>
                 <span className="text-xs font-medium text-muted-foreground">
                   {streak === 1 ? "Tag" : "Tage"}
                 </span>
               </div>
-              <button
-                onClick={() => setSearchOpen(true)}
-                aria-label="Suche öffnen"
-                className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-              >
-                <Search className="h-4 w-4" />
-              </button>
-              <ThemeToggle />
               <AccountMenu />
             </div>
           </div>

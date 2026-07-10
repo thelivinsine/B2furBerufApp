@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-09 (session 85: **Heute page reworked into an Üben/Spielen start page**
+_Last updated: 2026-07-10 (session 86: **Heute polished into the Option-B start page + header/bottom-bar cleanup** — header slimmed to logo/streak/account (Search/Theme/Mode removed; Theme→account menu; Modus→Einstellungen), bottom bar Mehr→Einstellungen with the More sheet retired and a reorder-only easter egg, Dashboard rebuilt as the goal-ring Option B. Prior, session 85: **Heute page reworked into an Üben/Spielen start page**
 (from the founder's start-page sketch): a new segmented toggle where **Üben** (default) reuses the
 existing composed-session feature plus a store-only four-ring Fortschritt row, and **Spielen** is a
 lazy-loaded Neuland mission carousel deep-linking into `/welt?mission=<id>`. The sidebar + top row are
@@ -206,7 +206,33 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 85 (2026-07-09). Heute page reworked into an Üben/Spielen start page, shipped
+**Handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch
+`claude/page-polish-icon-review-dbmp0v`).**
+
+Founder ran a "panel of experts" brainstorm on the Heute screen, chose **Option B** from a 3-mockup HTML
+Artifact, and locked the top-row icon cleanup. Implemented across the app (gates green: typecheck, lint 0
+errors, test:unit 97, build, check:bundle **74.9 kB** / 400):
+- **Header (`AppShell.tsx`):** now only **logo · streak · account**. Removed the Search icon (⌘K +
+  desktop Sidebar search remain; mobile has no global-search entry, founder choice); removed `ThemeToggle`
+  (moved into the `AccountMenu` dropdown as a Hell/System/Dunkel row); removed `ModeSwitcher` (Modus moved to
+  **Einstellungen → Lernen**); dropped the "Genauly" wordmark on mobile. The streak pill lost its
+  goal-gauge ring (goal now lives on the dashboard ring).
+- **Bottom bar (`BottomTabBar.tsx`):** **Einstellungen replaced "Mehr"** as the fixed last slot (plain
+  NavLink to `/settings`); the **More sheet was retired** (`MoreSheet.tsx` deleted). The three content
+  sections are always visible and reorder via a **long-press easter egg** (jiggle + drag, no +/X badges; a
+  transparent layer means "tap anywhere to finish"). Home + Einstellungen fixed. `moreOrder` is now
+  legacy/unused.
+- **`Dashboard.tsx` (Option B):** one **goal-ring hero** (128px; deduped — streak in header, goal in the
+  ring) + 7-day heatmap + a **full-width "Weitermachen" button** (minutes-only subtitle, no due count) + one
+  slim "Wörter gelernt · Alle Statistiken" line. Kept the Üben/Spielen toggle. Removed the old
+  duplicated streak/goal/due tiles and the truncated stat labels.
+- **`Settings.tsx`:** added the Lernmodus selector to the Lernen card; removed the obsolete "Navigation
+  anpassen" pin-picker card (the new bar has no add/remove).
+- **Deleted:** `MoreSheet.tsx`, `ThemeToggle.tsx`, `ModeSwitcher.tsx`. Docs updated: CLAUDE.md (the locked
+  mobile-bar section + Modus line + bundle note), this handoff, `DECISIONS.md`, prompt-log 254–258.
+- **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
+
+**Prior handoff after session 85 (2026-07-09). Heute page reworked into an Üben/Spielen start page, shipped
 to `main` (branch `claude/genauly-start-page-preview-1ih2vi`).**
 
 Founder shared a hand-drawn "Start page" sketch (Willkommen header + a Spielen/Üben toggle driving either
@@ -246,90 +272,3 @@ default, minimal Spielen card), then implemented it **scoped to the Dashboard bo
   domain-building icons) from the top, at the founder's request. The `CityStrip` component stays in the
   repo; it is just no longer rendered on `/analytics`. (An earlier note here mis-stated that the Heute
   icon-stat row was dropped; it was not, it is the /analytics city strip that was removed.)
-
-**Prior handoff after session 84 (2026-07-09). Bibliothek categorization: audit delivered AND the full
-implementation shipped to `main` (branch `claude/bibliothek-categorization-analysis-mtqo5o`).**
-
-**Part 2 of the session (after the founder locked all five decisions): every planned unit shipped.**
-- **Founder decisions (all locked, recorded in the implementation plan):** Branche parked (field stays,
-  UI hidden until a sector has depth); Redemittel CEFR backfill yes; Häufigkeit badge + chart; Domain
-  grouped under Mode ("Mode on top": Mode pre-selects which domains show); Amtssprache axis parked.
-- **PR #379:** facet coverage floor in `lib/facets.ts` (`MIN_FACET_COVERAGE` 15% / `MIN_FACET_VALUES` 2;
-  visibility follows coverage, never Mode), Büro deleted from `WorkSector` (+11 tags), `WorkSituation`
-  retired entirely (+14 tags; linter errors on reintroduction).
-- **PR #380:** Grammatik joins `BrowseToolbar` (search + Gruppe dropdown with counts, no facet sheet);
-  topics reordered by B2-marker priority; `FacetSheet` renders nothing at 0 groups.
-- **PR #381 (polish):** `diplomatic` register folded into `formal`; Redemittel inner tabs dropped, ONE
-  filter pipeline, Register as inline chips; Kollokationen got dropdown counts + `SubThemePicker`
-  (`?sub=`); the silent CEFR band default is now a removable "Stufe: bis X" chip on all three list tabs;
-  a11y/microcopy tidy (search aria-label, no "0" on disabled pills, ScopeChip removed).
-- **PR #382 (Häufigkeit):** new `pnpm build:frequency` generates `src/data/frequency.ts` from the vendored
-  wordfreq Zipf subset (1116/1182 binned core/häufig/Fachsprache; <1.5 Zipf incl. compounds honestly
-  unbinned); Häufigkeit facet + card label on Wörter/Kollokationen; Fortschritt "Wortschatz nach
-  Häufigkeit" chart (mastery-overlaid, tap deep-links). **Also fixed the pre-existing black-charts bug:**
-  every Analytics chart referenced non-existent `var(--color-*)` vars, now `hsl(var(--*))`.
-- **PR #383:** Domain-grouped theme dropdown on Wörter + Kollokationen (`lib/themeGroups.ts`, Mode
-  pre-selects domains; `SelectGroup`/`SelectLabel` added to ui/select; `BrowseToolbar` takes grouped
-  options) + the per-learner **Lernstand** facet (`?srs=`, neu/lernen/wiederholen/gemeistert mirroring
-  the card badges).
-- **Redemittel CEFR backfill (final PR):** all 72 phrases AI-draft-tagged (A2 3 · B1.1 19 · B1.2 27 ·
-  B2.1 20 · B2.2 3); each card shows its level badge so the founder can review in the UI. **FOUNDER
-  REVIEW PENDING** on these 72 draft tags. The level band default is now live on the tab (a B1 learner's
-  default hides only the 3 B2.2 phrases, escapable via the Stufe chip).
-- All PRs verified with Chromium smoke tests on the built app + full gates (build, lint:content,
-  test:unit 97, lint 0 errors, bundle 83 kB). **Founder verifies the live site.**
-- **P2 + P3 also shipped (PR #385, founder follow-up prompt):** `GrammarTopic.cefr` on all 10 topics
-  (AI-drafted, founder verify pending; badge on cards + topic view; linter completeness check); the
-  control-choice + axis rules codified in the `facets.ts` header and a locked `docs/DECISIONS.md`
-  section; `counterpart`/`taskType` CUT (0-tagged, no plan, zero data lost; linter errors on
-  reintroduction). **Nothing from the audit roadmap remains unshipped**; open items are founder
-  reviews only (72 Redemittel + 10 grammar cefr drafts).
-
-**Part 1 of the session (the audit itself):**
-
-Founder asked for a thorough report on the Bibliothek's categorization/filters (define Thema vs Situation
-vs Branche, audit the weak/wrong filters, judge his ideas, make it marketplace-ready). Delivered
-**`docs/plans/BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09.md`** (full report + verbatim red-team appendix)
-and a visual Artifact, from a codebase fact-audit + a 7-agent expert panel + red-team.
-
-**Verdict: the taxonomy is sound but *looks* broken; fix the tells, do not redesign.** The settled calls
-(next session can implement the P0/P1 quick wins straight from the doc's §10 roadmap):
-- **P0, no content, no risk:** add a **facet coverage floor** to `lib/facets.ts` `facet()` (hide any facet
-  with <3 populated values / <15% coverage, not just empty options) and stop gating facets on
-  `mode==='work'`. This instantly retires the two broken-looking filters (Branche 4%, Situation 2.2%).
-- **P0:** delete the `office`/**Büro** value from the `WorkSector` union (+ `WORK_SECTORS` lint mirror),
-  retag its 11 words. Büro is a category error (every industry has an office).
-- **P0:** retire the `workSituation` facet (it duplicates Thema; `meeting` vs theme `meetings` is a naming
-  clash). Situation = sub-theme, one topic spine Domain → Thema → Sub-theme.
-- **P1:** Grammatik gets a search box + `group` dropdown + reorder-by-B2-priority (no facet sheet for 10
-  items); add the Thema dropdown to Kollokationen (data already present); visual-bug batch.
-- **P1 (the one net-new feature):** generated `frequency.ts` from the already-vendored
-  `scripts/vendor/german-frequency-subset.json` → a `Häufigkeit` badge + facet + one honest Fortschritt
-  composition chart. Never a "most-used words" leaderboard.
-- **Free high-value axes nobody had proposed:** surface the existing **Domain** layer as the spine, and add
-  an **SRS-state** filter ("fällig / lerne ich gerade / gemeistert") from FSRS data already on every card.
-- **Open founder decisions (doc §11):** park vs cut Branche; backfill Redemittel CEFR or not (no themeId
-  either way); frequency badge-only vs badge+chart; Domain-under-Mode layering; Amtssprache axis later/never.
-
----
-
-_Older handoffs (sessions 1–83) are archived by ISO week under `docs/archive/status-log/`
-(index: `docs/archive/PROJECT_STATUS_ARCHIVE.md`; sessions 69–83 are in the W28 file)._
-
-**Content counts (verified from `src/data/*` on 2026-07-07):**
-- Vocabulary: **642 words** (+28 each for Arzt, Wohnen, Bank, Bildung in s75)
-- Collocations: **540 Nomen-Verb pairs** (~36/theme; +36 each for Arzt/Wohnen/Bank/Bildung in s75)
-- Grammar: **47 drills** · **10 topics**
-- Dialogues (branching scenarios): **20** (s75 daily-life set + s80 2nd daily-life scenarios: Apotheke/arzt, Wohnungsmangel/wohnen, Karte sperren/bank, Prüfungsanmeldung/bildung, all level 2)
-- Exam sets: **15** (10 workplace + 5 daily-life: behoerde/arzt/wohnen/bank/bildung, added s80 · 6–7 min · sharedRubric)
-- Redemittel: **72** entries
-- Can-Do milestones: **37** (all 15 themes; workplace/behoerde founder-verified, daily-life packs draft)
-- Lese-/Hörtexte: **22** texts / **66** comprehension checks (+2 each for Arzt/Wohnen/Bank/Bildung in s75; +1 each in s80 covering a new sub-theme per daily-life theme)
-- Themes: **15** (10 workplace + `behoerde` + `arzt` + `wohnen` + `bank` + `bildung`; all six domains now populated)
-- Game missions (Neuland): **6** = complete Kapitel 1 (1.1 Willkommen, 1.2 Fahrkarten-Automat, 1.3 SIM-Karte, 1.4 erster Einkauf, 1.5 Dach über dem Kopf, 1.6 Anmeldung boss; **35 scenes**; s83 added 2 `hotspot` + 2 `automat` re-skins, removed 2 now-unused cutscenes) · 11 NPCs · 7 key items · scene kinds: cutscene/websiteParody/loadout/listening/**hotspot**/**automat**/dialogueBattle/formCloze
-- Provenance rows: **1,426** (all with a `reference`; 1,401 `draft` / 25 `verified`)
-- Verification tiers (Layer C, generated `src/data/verification.ts`): **25 human · 1,266 linguistic · 1 facts · 116 provenance** (1,292 machine-attested)
-
-**Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is
-always the source of truth).
-

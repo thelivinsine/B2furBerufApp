@@ -243,3 +243,27 @@ cut (Thema/Kategorie/Gruppe). Facet pills in the bottom sheet = orthogonal multi
 - **Cut, don't hoard, dead axes:** `counterpart`/`taskType` (0-tagged forward-declares with no
   authoring plan) were cut in the P3 resolution; the linter errors if rows reintroduce them. Re-declare
   properly if an authoring plan ever exists.
+
+## Heute polish + header/bottom-bar cleanup (session 86, 2026-07-10) — founder-approved
+
+A "panel of experts" review of the Heute screen led to a redesign. The founder approved **Option B**
+(a goal-ring "Momentum" layout) from a 3-mockup HTML Artifact and locked a set of chrome cuts.
+
+**Why these calls:**
+- **Header down to logo · streak · account.** The top row carried six controls; two (theme, mode) are
+  set-once and don't earn permanent header space. Search left the mobile header (⌘K + the desktop Sidebar
+  keep it there; the founder accepted no mobile global-search entry — Bibliothek has its own per-list
+  search). Theme moved into the `AccountMenu` dropdown; **Modus moved into Einstellungen → Lernen** (the
+  founder explicitly did NOT want it in the account dropdown). The "Genauly" wordmark is redundant on an
+  internal screen, so it's mobile-hidden.
+- **Mehr → Einstellungen; the More sheet is gone.** `navItems` has only 5 routes and Settings was the sole
+  unpinned one, so the sheet existed essentially to hold Settings. Making Settings the fixed last tab
+  orphans nothing. With no sheet there is no add/remove, so the three content sections are always visible;
+  the earlier "add a tab" affordance and the Settings "Navigation anpassen" pin-picker were removed. The
+  founder wanted reordering kept, so it survives as a hidden **long-press easter egg** (jiggle + drag only).
+  This is an authorized change to the otherwise-locked mobile bar (the locked rules in CLAUDE.md were
+  updated, not silently broken).
+- **Dedupe every number.** Streak/goal/due each appeared 2–3× and the stat labels truncated
+  ("Tag…/Wör…/Fälli…"). Option B shows each once: streak in the header, goal in the ring, and a real
+  full-width session button. Per the founder's final tweaks the session subtitle is **minutes only** (no
+  "~", no due count) and the account icon dropped its sync dot.
