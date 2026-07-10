@@ -3079,3 +3079,16 @@ Branch: `claude/whats-next-esga9u`.
   squash-merged; branch realigned.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx`, `src/features/welt/NeulandHub.tsx` (commit
   `0a36806`, PR #418 squash `862325e`).
+
+## Entry 301 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Final session-documentation pass. All substantive docs were written incrementally
+  during the session (PROJECT_STATUS s90 handoff folding in every layout/color/border/icon/heading round +
+  the #413–#419 ship trail, s88 handoff archived to W28, CLAUDE.md Üben layout + Spielen header + toggle
+  notes, prompt-log entries 291–300). This pass appended entry 301 and reconfirmed the s90 handoff +
+  CLAUDE.md reflect the final shipped state. Doc-only; merged to `main`.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (entry 301).
