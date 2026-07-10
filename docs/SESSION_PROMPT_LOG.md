@@ -2998,3 +2998,39 @@ Branch: `claude/whats-next-esga9u`.
   to **either active tab** (`tab === id && "fill-current"`), so the selected Üben Zap renders solid like the
   selected Spielen Play. Verified in both tabs.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx` (commit `add4b7f`); shipped in PR #413.
+
+## Entry 295 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > swap the colors of üben and spielen for the buttons. Also, the colored borders doesn't look good for the map/photo tile.. find a muted gray as a common border color.
+- **Response summary:** Swapped the toggle section colors (Üben → `text-accent` teal, Spielen →
+  `text-orange-500`) and reverted both tile mats (Üben map + Spielen hero) from the per-section colored
+  borders back to the shared muted `border-border` gray; the white surface mat is unchanged and the section
+  color now lives on the toggle only. Verified both tabs via screenshots. Shipped in PR #415.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx`,
+  `src/features/welt/NeulandHub.tsx` (commit `87d2895`, PR #415 squash `f172f73`).
+
+## Entry 296 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > instead of the current thunder icon for üben, use a muscle or dumbbell icon.
+- **Response summary:** Replaced Üben's `Zap` (thunderbolt) with lucide's `Dumbbell`. A filled dumbbell
+  renders as a solid blob, so I kept the active-fill for Spielen's `Play` only (via a `fillActive` flag) and
+  left the dumbbell stroked; the teal tint + lifted white pill still mark the active state. Verified via
+  screenshot. Shipped in the same PR #415.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx` (commit `87d2895`, PR #415).
+
+## Entry 297 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > (session documentation for the swap/border/dumbbell follow-ups)
+- **Response summary:** Updated `PROJECT_STATUS.md` (s90 handoff folded in the color-swap, neutral-border
+  and dumbbell follow-ups + PR #413/#414/#415 ship trail) and `CLAUDE.md` (Üben toggle = teal + dumbbell,
+  Spielen = orange + play, mats share `border-border`, Play-only fill). Doc-only; merged like the rest.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
