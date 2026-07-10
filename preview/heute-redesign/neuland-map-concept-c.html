@@ -1,0 +1,258 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Genauly · Üben — Neuland-Karte</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root { --ground:#0b0f16; --panel:#121826; --ink:#eef1f7; --ink-soft:#aeb6c6; --ink-faint:#6f7889; --rule:#202839; --accent:#7b78f0; --accent-soft:#a6a3f6; --shell-shadow:0 24px 60px -20px rgba(0,0,0,.65); color-scheme:dark; }
+  @media (prefers-color-scheme: light){ :root{ --ground:#f6f7fb; --panel:#fff; --ink:#171b24; --ink-soft:#4c5567; --ink-faint:#8b93a4; --rule:#e5e8f0; --accent:#5b5be6; --accent-soft:#6d6ded; --shell-shadow:0 24px 60px -24px rgba(40,44,80,.28); color-scheme:light; } }
+  :root[data-theme="dark"]{ --ground:#0b0f16; --panel:#121826; --ink:#eef1f7; --ink-soft:#aeb6c6; --ink-faint:#6f7889; --rule:#202839; --accent:#7b78f0; --accent-soft:#a6a3f6; --shell-shadow:0 24px 60px -20px rgba(0,0,0,.65); color-scheme:dark; }
+  :root[data-theme="light"]{ --ground:#f6f7fb; --panel:#fff; --ink:#171b24; --ink-soft:#4c5567; --ink-faint:#8b93a4; --rule:#e5e8f0; --accent:#5b5be6; --accent-soft:#6d6ded; --shell-shadow:0 24px 60px -24px rgba(40,44,80,.28); color-scheme:light; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5; }
+  .wrap { max-width:880px; margin:0 auto; padding:56px 24px 90px; }
+  .eyebrow { font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-soft); margin:0 0 14px; }
+  h1 { font-size:clamp(28px,4.6vw,40px); line-height:1.05; letter-spacing:-.025em; font-weight:800; margin:0 0 14px; text-wrap:balance; max-width:20ch; }
+  .lede { font-size:16.5px; color:var(--ink-soft); margin:0; max-width:60ch; }
+  .lede b { color:var(--ink); font-weight:600; }
+  .split { display:grid; grid-template-columns:320px 1fr; gap:48px; align-items:start; margin-top:48px; }
+  @media (max-width:760px){ .split{ grid-template-columns:1fr; gap:36px; justify-items:center; } }
+  .notes { display:grid; gap:22px; }
+  @media (max-width:760px){ .notes{ max-width:460px; } }
+  .grp .h { display:flex; align-items:center; gap:12px; font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 12px; }
+  .grp .h::after { content:""; flex:1; height:1px; background:var(--rule); }
+  .row { display:flex; gap:12px; align-items:flex-start; padding:2px 0; }
+  .row .dot { flex-shrink:0; margin-top:3px; width:16px; height:16px; border-radius:5px; background:color-mix(in srgb,var(--accent) 20%,transparent); display:grid; place-items:center; }
+  .row h4 { margin:0 0 2px; font-size:14.5px; font-weight:700; }
+  .row p { margin:0; font-size:13.5px; color:var(--ink-soft); }
+  .row p b { color:var(--ink); font-weight:600; }
+
+  .phone { --bg:hsl(223 38% 11%); --surface:hsl(223 34% 15%); --border:hsl(223 24% 27%); --muted:hsl(223 26% 23%); --mfg:hsl(220 20% 72%); --fg:hsl(220 24% 95%); --primary:hsl(245 84% 70%); --primary2:hsl(258 74% 62%); --accent:hsl(188 80% 55%); --warn:hsl(38 92% 58%); --success:hsl(152 60% 55%);
+    width:320px; flex-shrink:0; border-radius:46px; padding:11px; background:linear-gradient(160deg,#2a2f3e,#0c0f16); box-shadow:var(--shell-shadow), inset 0 0 0 1px rgba(255,255,255,.05); position:sticky; top:40px; }
+  @media (max-width:760px){ .phone{ position:static; } }
+  .screen { position:relative; border-radius:36px; overflow:hidden; background:radial-gradient(120% 78% at 50% -8%, hsl(245 40% 16%) 0%, var(--bg) 46%, hsl(224 40% 9%) 100%); color:var(--fg); height:662px; font-size:14px; display:flex; flex-direction:column; }
+  .notch { position:absolute; top:9px; left:50%; transform:translateX(-50%); width:96px; height:23px; background:#05070c; border-radius:20px; z-index:6; }
+  .statusbar { display:flex; justify-content:space-between; align-items:center; padding:13px 22px 6px; font-size:13px; font-weight:600; }
+  .apphdr { display:flex; align-items:center; justify-content:space-between; padding:8px 18px 8px; }
+  .logo { width:34px; height:34px; border-radius:11px; background:linear-gradient(150deg,var(--primary),var(--primary2)); display:grid; place-items:center; font-weight:800; font-size:18px; color:#fff; box-shadow:0 4px 14px -3px hsl(245 80% 60% /.6); }
+  .hdr-right { display:flex; align-items:center; gap:10px; }
+  .streak { display:flex; align-items:center; gap:6px; height:34px; padding:0 13px 0 9px; border-radius:999px; background:hsl(38 80% 55% /.13); }
+  .streak b { font-size:15px; font-weight:800; color:var(--warn); }
+  .streak span { font-size:12px; color:var(--mfg); font-weight:500; }
+  .avatar { width:34px; height:34px; border-radius:999px; background:var(--surface); display:grid; place-items:center; color:var(--mfg); border:1px solid var(--border); }
+  .body { flex:1; overflow:hidden; padding:2px 16px 12px; display:flex; flex-direction:column; }
+  .seg { display:flex; width:fit-content; margin:2px auto 12px; gap:3px; padding:3px; border-radius:999px; background:var(--muted); border:1px solid var(--border); }
+  .seg button { display:inline-flex; align-items:center; gap:6px; border:0; padding:7px 20px; border-radius:999px; font-size:13.5px; font-weight:700; background:transparent; color:var(--mfg); font-family:inherit; }
+  .seg button.on { background:var(--surface); color:var(--fg); box-shadow:0 2px 8px -2px rgba(0,0,0,.5); }
+
+  .mapcard { position:relative; border-radius:16px; overflow:hidden; border:2px solid #2b2433; box-shadow:0 12px 26px -14px rgba(0,0,0,.7); }
+  .mapcard canvas { display:block; width:100%; height:auto; image-rendering:pixelated; image-rendering:crisp-edges; }
+  .lay { position:absolute; inset:0; pointer-events:none; }
+  .here { position:absolute; transform:translate(-50%,-50%); font-family:ui-monospace,Menlo,monospace; font-size:8px; font-weight:800; letter-spacing:.06em; padding:3px 6px; border-radius:6px; background:#fff; color:#0c1424; border:1px solid #2b2433; box-shadow:0 4px 10px -3px rgba(0,0,0,.6); white-space:nowrap; animation:bob 1.7s ease-in-out infinite; z-index:3; }
+  .here::after { content:""; position:absolute; left:50%; bottom:-4px; transform:translateX(-50%); border:4px solid transparent; border-top-color:#fff; }
+  .pulse { position:absolute; width:14px; height:14px; transform:translate(-50%,-50%); border-radius:999px; border:2px solid hsl(188 80% 60%); animation:pulse 1.8s ease-out infinite; }
+  @keyframes bob { 0%,100%{ transform:translate(-50%,-50%) translateY(0);} 50%{ transform:translate(-50%,-50%) translateY(-2px);} }
+  @keyframes pulse { 0%{ transform:translate(-50%,-50%) scale(.5); opacity:.9;} 100%{ transform:translate(-50%,-50%) scale(2); opacity:0;} }
+  @media (prefers-reduced-motion: reduce){ .here,.pulse{ animation:none; } }
+
+  .legend { display:flex; flex-wrap:wrap; justify-content:center; gap:5px; margin-top:9px; }
+  .lg { display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700; padding:3px 7px; border-radius:999px; background:var(--surface); border:1px solid var(--border); color:var(--mfg); }
+  .lg .num { display:grid; place-items:center; width:12px; height:12px; border-radius:999px; font-size:8px; color:#0c1424; }
+  .lg.done .num { background:var(--success); } .lg.done { color:var(--fg); }
+  .lg.cur .num { background:var(--accent); } .lg.cur { color:var(--accent); border-color:hsl(188 80% 55% /.5); }
+  .lg.lock .num { background:hsl(220 10% 45%); color:#fff; } .lg.lock { opacity:.7; }
+
+  .hero { margin-top:13px; border:1px solid var(--border); border-radius:18px; background:linear-gradient(150deg,hsl(245 40% 20%),var(--surface)); padding:15px; }
+  .hrow { display:flex; align-items:center; justify-content:space-between; }
+  .hrow .chapter { font-size:11.5px; color:var(--mfg); font-weight:600; }
+  .pill { display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px; background:hsl(152 55% 45% /.16); color:var(--success); }
+  .htitle { font-size:18px; font-weight:800; letter-spacing:-.02em; margin-top:11px; }
+  .cta { display:flex; align-items:center; justify-content:center; gap:7px; width:100%; margin-top:13px; border:0; border-radius:13px; padding:13px; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; font-size:14.5px; font-weight:800; font-family:inherit; box-shadow:0 10px 22px -9px hsl(248 80% 55% /.7); }
+
+  .nav { display:flex; justify-content:space-around; align-items:center; padding:11px 20px calc(10px + 8px); border-top:1px solid var(--border); background:hsl(223 38% 11% /.72); }
+  .nav .item { position:relative; width:40px; height:34px; display:grid; place-items:center; }
+  .nav .item .u { position:absolute; bottom:-4px; left:50%; transform:translateX(-50%); width:22px; height:3px; border-radius:3px; }
+  .home-ind { width:112px; height:5px; border-radius:3px; background:rgba(255,255,255,.32); margin:5px auto 8px; }
+  .foot { margin-top:52px; padding-top:20px; border-top:1px solid var(--rule); color:var(--ink-faint); font-size:13.5px; }
+  code { font-size:12.5px; background:color-mix(in srgb,var(--accent) 14%,transparent); color:var(--accent-soft); padding:2px 6px; border-radius:5px; }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Genauly · Üben — Konzept C (überarbeitet)</p>
+  <h1>Neuland als richtige Stadtkarte.</h1>
+  <p class="lede">Ein Straßenraster mit Blocks und vielen Häusern drumherum. Fünf Fokus-Gebäude, verbunden von <b>einer</b> klaren Route, Namen als Legende unter der Karte statt auf den Häusern, weicher Nebel über dem Gesperrten. Der Tagesziel-Ring zieht nach Fortschritt um.</p>
+
+  <div class="split">
+    <div class="phone"><div class="screen">
+      <div class="notch"></div>
+      <div class="statusbar"><span>21:50</span>
+        <span style="display:flex;gap:5px;opacity:.9;">
+          <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+          <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="6" height="8" rx="1.5" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <div class="apphdr">
+        <div class="logo">G</div>
+        <div class="hdr-right">
+          <div class="streak"><svg width="16" height="16" viewBox="0 0 24 24" fill="hsl(38 92% 58%)"><path d="M12 2c1 3-1 5-2 6-2 2-3 4-3 6a5 5 0 0 0 10 0c0-1-.3-2-1-3 .2 1-.5 2-1 2 .5-2-1-4-2-5-1 2-2 2-2 4a2 2 0 0 0 4 0c1 2-.5 4-2 4a5 5 0 0 1-3-8c2-2 4-4 4-6Z"/></svg><b>2</b><span>Tage</span></div>
+          <div class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></div>
+        </div>
+      </div>
+
+      <div class="body">
+        <div class="seg"><button class="on">⚡ Üben</button><button>▶ Spielen</button></div>
+
+        <div class="mapcard">
+          <canvas id="nmap"></canvas>
+          <div class="lay" id="lay"></div>
+        </div>
+
+        <div class="legend">
+          <span class="lg done"><span class="num">✓</span>Hbf</span>
+          <span class="lg done"><span class="num">✓</span>Zuhause</span>
+          <span class="lg done"><span class="num">✓</span>Laden</span>
+          <span class="lg cur"><span class="num">4</span>Amt · hier</span>
+          <span class="lg lock"><span class="num">🔒</span>Bank</span>
+        </div>
+
+        <div class="hero">
+          <div class="hrow">
+            <span class="chapter">Kapitel 1 · Ankommen</span>
+            <span class="pill">● Aktuelles Level</span>
+          </div>
+          <div class="htitle">Automat-Dialog</div>
+          <button class="cta">Weiter <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </div>
+      </div>
+
+      <div class="nav">
+        <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill="hsl(245 84% 70%)"/><path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill="#22d3ee"/></svg><span class="u" style="background:#5b5be6;"></span></div>
+        <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><rect x="2.8" y="4" width="14.4" height="3.4" rx="1.1" fill="#2563eb"/><rect x="3.6" y="8.3" width="14.4" height="3.4" rx="1.1" fill="#22d3ee"/><rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill="#2563eb" opacity=".82"/></svg></div>
+        <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.6" stroke="#f97316" stroke-width="2.2" fill="none"/><circle cx="10" cy="10" r="3.4" fill="#fbbf24"/></svg></div>
+        <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="#0ea5e9"/><rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/><rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/></svg></div>
+        <div class="item"><svg width="25" height="25" viewBox="0 0 24 24"><path fill="#64748b" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/><circle cx="12" cy="12" r="2.9" fill="#38bdf8"/></svg></div>
+      </div>
+      <div class="home-ind"></div>
+    </div></div>
+
+    <div class="notes">
+      <div class="grp">
+        <p class="h">Was jetzt anders ist</p>
+        <div class="row"><span class="dot"><svg width="9" height="9" viewBox="0 0 10 10" stroke="#a6a3f6" stroke-width="1.8" stroke-linecap="round"><path d="M5 2v6M2 5h6"/></svg></span><div><h4>Echtes Stadtraster</h4><p>Straßen in einem Gitter, Blocks mit vielen Hintergrund-Häusern, ein Park und Wasser. Die fünf Fokus-Gebäude heben sich durch Farbe und Größe ab.</p></div></div>
+        <div class="row"><span class="dot"><svg width="9" height="9" viewBox="0 0 10 10" stroke="#a6a3f6" stroke-width="1.8" stroke-linecap="round"><path d="M5 2v6M2 5h6"/></svg></span><div><h4>Eine klare Route</h4><p>Eine leuchtende Linie entlang der Straßen von Hbf zum Amt, danach gestrichelt in den Nebel. Sofort klar, wo es langgeht.</p></div></div>
+        <div class="row"><span class="dot"><svg width="9" height="9" viewBox="0 0 10 10" stroke="#a6a3f6" stroke-width="1.8" stroke-linecap="round"><path d="M5 2v6M2 5h6"/></svg></span><div><h4>Namen unter der Karte</h4><p>Keine Schilder mehr auf den Häusern. Die Halte stehen als nummerierte Legende unter der Karte, der aktuelle als großer „Du bist hier“-Pin.</p></div></div>
+        <div class="row"><span class="dot"><svg width="9" height="9" viewBox="0 0 10 10" stroke="#a6a3f6" stroke-width="1.8" stroke-linecap="round"><path d="M5 2v6M2 5h6"/></svg></span><div><h4>Weicher Nebel</h4><p>Kein harter Kanten-Übergang mehr. Das Gesperrte liegt unter einem ausgefransten Nebel mit Verlauf.</p></div></div>
+      </div>
+      <div class="grp">
+        <p class="h">Kachel</p>
+        <div class="row"><span class="dot"><svg width="9" height="9" viewBox="0 0 10 10" stroke="#a6a3f6" stroke-width="1.8" stroke-linecap="round"><path d="M5 2v6M2 5h6"/></svg></span><div><h4>Unverändert wie gewünscht</h4><p>Untertitel raus, Kapitel links, grüner Status rechts.</p></div></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--ink-faint);margin:2px 0 0;">Verzahnung: die Halte sind Neuland-Orte, in der Umsetzung aus <code>src/data/missions.ts</code>.</p>
+    </div>
+  </div>
+
+  <p class="foot">Noch nichts im App-Code geändert. Passt die Stadtkarte so? Sag, was noch feilen soll (Gebäude, Farben, Halte, Nebel), dann verdrahte ich sie mit echten Missions- und Übungsdaten. <code>claude/page-polish-icon-review-dbmp0v</code></p>
+</div>
+
+<script>
+(function(){
+  var c=document.getElementById('nmap'); if(!c) return;
+  var W=176,H=132; c.width=W; c.height=H;
+  var g=c.getContext('2d'); g.imageSmoothingEnabled=false;
+  function R(x,y,w,h,col){ g.fillStyle=col; g.fillRect(x|0,y|0,w|0,h|0); }
+  var OUT='#2b2433';
+  function mk(s){ return function(){ s|=0; s=s+0x6D2B79F5|0; var t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+  var rnd=mk(11);
+
+  // ---- grass base ----
+  for(var y=0;y<H;y+=4) for(var x=0;x<W;x+=4){ R(x,y,4,4, (((x/4+y/4)&1)?'#79ac59':'#6fa350')); }
+
+  function tree(x,y){ R(x-2,y-4,6,5,'#2f6f34'); R(x-1,y-6,4,3,'#3c8443'); R(x-3,y-2,1,1,'#3c8443'); R(x+4,y-2,1,1,'#3c8443'); R(x,y-1,2,3,'#5b3d22'); }
+  function pave(x,y,w,h){ R(x,y,w,h,'#cdd1d8'); R(x,y,w,1,'#dadde3'); R(x,y+h-1,w,1,'#b7bac2'); }
+  function water(x,y,w,h){ R(x,y,w,h,'#4a90c2'); R(x,y,w,1,'#69a8d6'); R(x+2,y+2,3,1,'#8ec4e6'); R(x+w-6,y+h-4,4,1,'#8ec4e6'); }
+
+  // background building (top-down roof, slight facade)
+  var BG=[['#9a6b5f','#b5847a','#7d5348'],['#6f7787','#8a92a2','#59606f'],['#8a7f6a','#a49a84','#6f6554'],['#5f7f8a','#78a0ac','#4b6570'],['#7a6f8a','#948aa6','#61566f'],['#8f9a7a','#a8b295','#727c60']];
+  function bd(x,y,w,h,c){ R(x-1,y-1,w+2,h+2,OUT); R(x,y,w,h,c[0]); R(x,y,w,1,c[1]); R(x,y+h-1,w,1,c[2]); if(w>9&&h>9){ R(x+2,y+2,2,2,c[2]); } }
+  function fillBlock(bx,by,bw,bh){ pave(bx,by,bw,bh);
+    var cols=bw>26?2:1, rows=bh>21?2:1, cw=bw/cols, ch=bh/rows, ci, ri;
+    for(ci=0;ci<cols;ci++) for(ri=0;ri<rows;ri++){ if(rnd()<0.16) continue;
+      var x=Math.round(bx+ci*cw+2), yy=Math.round(by+ri*ch+2), w=Math.round(cw-5), h=Math.round(ch-5);
+      if(w<7||h<7) continue; bd(x,yy,w,h,BG[Math.floor(rnd()*BG.length)]); } }
+
+  // ---- blocks (cols x, widths / rows y, heights) ----
+  var CO=[[2,16],[30,30],[74,28],[116,28],[158,16]];
+  var RO=[[2,24],[38,26],[76,22],[110,20]];
+  var focus={ '1_3':1,'1_2':1,'2_2':1,'2_1':1,'3_1':1 };
+  for(var ci=0;ci<CO.length;ci++) for(var ri=0;ri<RO.length;ri++){
+    var key=ci+'_'+ri; if(focus[key]) continue;
+    var bx=CO[ci][0], bw=CO[ci][1], by=RO[ri][0], bh=RO[ri][1];
+    if((ci===0&&ri===0)||(ci===4&&ri===0)){ for(var t=0;t<3;t++){ tree(bx+3+Math.floor(rnd()*(bw-5)), by+4+Math.floor(rnd()*(bh-4))); } continue; }
+    if(ci===4&&ri===2){ water(bx,by,bw,bh); continue; }
+    fillBlock(bx,by,bw,bh);
+  }
+
+  // ---- roads (grid) ----
+  var VS=[[20,28],[62,70],[104,112],[146,154]];
+  var HS=[[28,36],[66,74],[100,108]];
+  function road(x,y,w,h){ R(x,y,w,h,'#8b8f99'); }
+  VS.forEach(function(v){ road(v[0],0,v[1]-v[0],H); R(v[0],0,1,H,'#767a84'); R(v[1]-1,0,1,H,'#767a84'); });
+  HS.forEach(function(h){ road(0,h[0],W,h[1]-h[0]); R(0,h[0],W,1,'#767a84'); R(0,h[1]-1,W,1,'#767a84'); });
+  // dashed lane markings
+  VS.forEach(function(v){ var xc=Math.round((v[0]+v[1])/2); for(var y=3;y<H;y+=8){ R(xc,y,1,4,'#e8d48a'); } });
+  HS.forEach(function(h){ var yc=Math.round((h[0]+h[1])/2); for(var x=3;x<W;x+=8){ R(x,yc,4,1,'#e8d48a'); } });
+
+  // ---- focus buildings ----
+  function froof(x,y,w,h,base,hi,lo){ R(x-1,y-1,w+2,h+2,OUT); R(x,y,w,h,base); R(x,y,w,2,hi); R(x,y+h-2,w,2,lo); }
+  // Hbf (red station)  block C1R3 (30,110,30,20)
+  pave(30,110,30,20); froof(31,112,28,16,'#c0504a','#d67d75','#8f3b36');
+  R(33,114,24,3,'#a7d3e6'); R(41,119,8,3,'#f2d98a'); R(35,124,4,4,'#3a3340'); R(51,124,4,4,'#3a3340');
+  // Zuhause (orange house)  C1R2 (30,76,30,22)
+  pave(30,76,30,22); froof(32,78,26,18,'#d98a3c','#eaa860','#b06f2c');
+  R(42,89,5,7,'#5b3d22'); R(35,84,3,3,'#a7d3e6'); R(51,84,3,3,'#a7d3e6');
+  // Laden (teal shop)  C2R2 (74,76,28,22)
+  pave(74,76,28,22); froof(76,78,24,18,'#3fa39a','#66c6bd','#2f7d76');
+  for(var i=0;i<24;i+=4){ R(76+i,90,2,2,'#d95555'); R(78+i,90,2,2,'#f2f2f2'); } R(85,84,6,3,'#f2d98a');
+  // Amt (indigo civic, CURRENT)  C2R1 (74,38,28,26)
+  pave(74,38,28,26); froof(76,40,24,22,'#6d6ae0','#928fee','#524fc0');
+  R(79,52,3,9,'#c3c0f0'); R(85,52,3,9,'#c3c0f0'); R(91,52,3,9,'#c3c0f0'); R(80,47,16,3,'#524fc0');
+  R(87,34,1,6,OUT); R(88,34,7,4,'#26cfe6');
+  // Bank (gold)  C3R1 (116,38,28,26)
+  pave(116,38,28,26); froof(118,40,24,22,'#c2a24a','#dcbf68','#9a7f38');
+  R(124,44,12,6,'#e6d59a'); R(122,55,3,7,'#6b5a2b'); R(135,55,3,7,'#6b5a2b');
+
+  // ---- route ----
+  function stamp(pts,w,col){ var i,j; for(i=0;i<pts.length-1;i++){ var a=pts[i],b=pts[i+1]; var s=Math.max(Math.abs(b[0]-a[0]),Math.abs(b[1]-a[1])); for(j=0;j<=s;j++){ var x=Math.round(a[0]+(b[0]-a[0])*j/s), y=Math.round(a[1]+(b[1]-a[1])*j/s); R(x-(w>>1),y-(w>>1),w,w,col); } } }
+  function dashed(pts,col){ var i,j,acc=0; for(i=0;i<pts.length-1;i++){ var a=pts[i],b=pts[i+1]; var s=Math.max(Math.abs(b[0]-a[0]),Math.abs(b[1]-a[1])); for(j=0;j<=s;j++){ acc++; if(acc%6<3){ var x=Math.round(a[0]+(b[0]-a[0])*j/s), y=Math.round(a[1]+(b[1]-a[1])*j/s); R(x-1,y-1,2,2,col); } } } }
+  var travel=[[55,104],[66,104],[66,70],[88,70],[108,70],[108,50]];
+  var locked=[[108,50],[108,32],[130,32]];
+  stamp(travel,5,'rgba(38,207,230,0.25)'); // glow
+  stamp(travel,3,'#26cfe6');                // core
+  dashed(locked,'#c3c7cf');                 // upcoming route, dotted (no fog)
+
+  // ---- done + locked pins ----
+  function mark(x,y,type){
+    R(x-4,y-4,8,8,OUT);
+    if(type==='done'){ R(x-3,y-3,6,6,'#2bb673'); R(x-2,y,1,1,'#fff'); R(x-1,y+1,1,1,'#fff'); R(x,y,1,1,'#fff'); R(x+1,y-1,1,1,'#fff'); R(x+2,y-2,1,1,'#fff'); }
+    else { R(x-3,y-3,6,6,'#7d828d'); R(x-1,y-3,2,2,'#3a3f49'); R(x-2,y-1,4,3,'#d7dbe6'); R(x-1,y,2,1,'#7d828d'); }
+  }
+  mark(55,104,'done'); mark(66,87,'done'); mark(88,70,'done');
+  mark(130,32,'lock');
+
+  // ---- current: tall teardrop pin at Amt (tail 108,50) ----
+  (function(){
+    var tx=108, ty=50;
+    // tail
+    R(tx-1,ty-8,3,8,OUT); R(tx-1,ty-6,2,6,'#1796ab');
+    // head
+    R(tx-6,ty-20,13,13,OUT); R(tx-5,ty-19,11,11,'#26cfe6'); R(tx-5,ty-19,11,2,'#7fe6f4');
+    // little person
+    R(tx-1,ty-16,3,3,'#0c3540'); R(tx-1,ty-13,3,3,'#0c3540');
+  })();
+
+  // ---- HTML overlays ----
+  var lay=document.getElementById('lay');
+  function pctL(x){ return (x/W*100)+'%'; } function pctT(y){ return (y/H*100)+'%'; }
+  var pr=document.createElement('div'); pr.className='pulse'; pr.style.left=pctL(108); pr.style.top=pctT(50); lay.appendChild(pr);
+  var hh=document.createElement('div'); hh.className='here'; hh.style.left=pctL(108); hh.style.top=pctT(20); hh.textContent='DU BIST HIER'; lay.appendChild(hh);
+})();
+</script>
