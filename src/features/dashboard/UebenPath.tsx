@@ -150,7 +150,11 @@ export default function UebenPath() {
   };
 
   return (
-    <div className="space-y-3">
+    // Fill the available height below the toggle and distribute the four blocks
+    // (title, map, card, pager) evenly down the page instead of clustering them
+    // at the top (founder s88). The min-height is tuned to stay just under the
+    // bottom nav so the tab still never scrolls.
+    <div className="flex min-h-[calc(100dvh-15rem)] flex-col justify-between gap-3">
       {/* Centered page title, mirroring the Spielen "Neuland" header row */}
       <h1 className="text-center text-2xl font-bold">Lernpfad</h1>
 
