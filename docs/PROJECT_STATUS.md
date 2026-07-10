@@ -266,8 +266,15 @@ styles incl. two reimagined pixel treatments) through founder feedback to a fina
   `space-y-4`); the pager's **chevrons are desktop-only**, on mobile the dots (32px tap targets) plus a new
   **horizontal swipe on the practice card** navigate modules; the hero overlay type was tightened so
   "Bahnhofsviertel" no longer truncates inside the mat.
-- **Ship status:** PR #401 + follow-ups #402 and #403 squash-merged to `main`, branch realigned. **Founder
-  verifies the live site.**
+- **Third follow-up (same session, founder):** the practice card's two buttons merged into **ONE
+  state-aware CTA**: "Jetzt üben" for a new module, "Wiederholen" (RotateCcw icon) for a completed one,
+  both opening the same mission-focused session (`/session?mission=<selected>`); the separate
+  "Wiederholen · N fällig" → `/revision` entry was removed from the card (founder: no need for a separate
+  5-min revision module when the practice session is roughly as short; `/revision` itself still exists,
+  reachable from Fortschritt). The module block (number, state chip, title, CTA) now **slides horizontally**
+  (framer-motion, direction-aware, `useReducedMotion`-guarded) when the pager/swipe changes modules.
+- **Ship status:** PR #401 + follow-ups #402, #403 and #404 squash-merged to `main`, branch realigned.
+  **Founder verifies the live site.**
 
 **Prior handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game
 tile removed from Anwenden (branch `claude/game-tile-removal-nav-hi37z5`).**

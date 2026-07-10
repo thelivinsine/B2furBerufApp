@@ -2755,3 +2755,23 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx`, `src/features/welt/NeulandHub.tsx`,
   `src/features/dashboard/Dashboard.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 279); PR #403.
+
+## Entry 280 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > okay, I think they both should be the same buttons. There's no need of a separate 5 min revision module
+  > if the actual practice session also lasts roughly the same time. for the completed exercise the button
+  > should show wiederholen and for the new one, jetzt üben. make sure to add an appropriate sliding
+  > animation to show the transition.
+- **Response summary:** Merged the practice card's two buttons into ONE state-aware CTA on the token
+  gradient: "Jetzt üben" (ArrowRight) for a new module, "Wiederholen" (RotateCcw) for a completed one, both
+  opening the same mission-focused session (`/session?mission=<selected>`). Removed the card's separate
+  "Wiederholen · N fällig" → `/revision` entry (the `/revision` route itself stays, reachable from
+  Fortschritt). The module block (number, state chip, title, CTA) now slides in horizontally on pager/swipe
+  change (framer-motion, direction-aware from navigation direction, disabled under `useReducedMotion`).
+  Verified via Playwright: swipe to 1.6 shows the gradient "Wiederholen" CTA, page still fits the viewport
+  with no scrolling; gates green (build, lint 0 errors, test:unit 99, bundle 71.9 kB). Shipped as PR #404.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 280); PR #404.
