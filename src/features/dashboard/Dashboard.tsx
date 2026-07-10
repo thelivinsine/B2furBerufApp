@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, Play } from "lucide-react";
+import { Dumbbell, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Both tabs import the mission bank, so they load lazily to keep the content
@@ -38,10 +38,10 @@ export function Dashboard() {
       >
         {(
           [
-            { id: "ueben", label: "Üben", Icon: Zap, tint: "text-orange-500" },
-            { id: "spielen", label: "Spielen", Icon: Play, tint: "text-accent" },
+            { id: "ueben", label: "Üben", Icon: Dumbbell, tint: "text-accent", fillActive: false },
+            { id: "spielen", label: "Spielen", Icon: Play, tint: "text-orange-500", fillActive: true },
           ] as const
-        ).map(({ id, label, Icon, tint }) => (
+        ).map(({ id, label, Icon, tint, fillActive }) => (
           <button
             key={id}
             type="button"
@@ -51,14 +51,20 @@ export function Dashboard() {
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition",
               // Active tab lifts on the white pill and picks up its section's
-              // subtle tint (Üben = orange, Spielen = teal/accent), matching
-              // the tinted tile-mat border on each tab.
+              // subtle tint (Üben = teal/accent + dumbbell icon, Spielen =
+              // orange + play icon). The tile mats keep a neutral gray border
+              // (founder: colored borders read poorly), so the color lives on
+              // the toggle only.
               tab === id
                 ? cn("bg-surface shadow-soft", tint)
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <Icon className={cn("h-4 w-4", tab === id && "fill-current")} />
+            {/* Play fills solid when active (matches its game feel); the
+                Dumbbell is a line icon that turns to a blob if filled, so it
+                stays stroked and relies on the tint + lifted pill for the
+                active state. */}
+            <Icon className={cn("h-4 w-4", fillActive && tab === id && "fill-current")} />
             {label}
           </button>
         ))}
