@@ -2905,3 +2905,40 @@ Branch: `claude/whats-next-esga9u`.
   `src/router.tsx`, `package.json`, `src/features/landing/LandingPage.tsx`,
   `src/features/settings/Settings.tsx`; `docs/PROJECT_STATUS.md` (s89 handoff + s87 archived to W28),
   `docs/SESSION_PROMPT_LOG.md` (entry 287).
+
+## Entry 288 — 2026-07-10 (session 89)
+- **Branch:** `claude/blog-help-uben-spielen-wtbnq8`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > is it live?
+- **Response summary:** Clarified that the work was only pushed to the feature branch, so it was NOT live:
+  Genauly deploys only on merge to `main` (the Pages workflow). Offered to open a PR into `main` and
+  squash-merge to deploy. No code change.
+- **Artifacts:** none.
+
+## Entry 289 — 2026-07-10 (session 89)
+- **Branch:** `claude/blog-help-uben-spielen-wtbnq8`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > yes
+- **Response summary:** Shipped the help section. Checked for a PR template (none found), created **PR #411**
+  into `main`, and **squash-merged** it (`4319758`). Ran the required post-merge realignment: fetched
+  `origin/main`, `git reset --hard origin/main`, force-with-lease pushed the dev branch (now level with
+  `main`, clean). The Pages deploy runs `pnpm build` (incl. the new prerender) automatically, so the static
+  `/hilfe` pages + `sitemap.xml` publish on deploy. Founder verifies the live site (sandbox can't reach the
+  live host/Actions tab).
+- **Artifacts:** PR #411 (squash-merge `4319758`); branch realigned to `origin/main`.
+
+## Entry 290 — 2026-07-10 (session 89)
+- **Branch:** `claude/blog-help-uben-spielen-wtbnq8`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Session-end documentation pass. Most docs were written incrementally (PROJECT_STATUS
+  s89 handoff, entry 287, CLAUDE.md build/layout notes, s87 archived to W28). This pass updated the
+  now-stale ship status: the s89 handoff header + "Ship status" bullet now record PR #411 squash-merged to
+  `main` and the branch realignment (was "not yet merged"), and appended prompt-log entries 288–290. Doc-only.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 288–290).
