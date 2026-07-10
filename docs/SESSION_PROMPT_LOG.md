@@ -3034,3 +3034,29 @@ Branch: `claude/whats-next-esga9u`.
   and dumbbell follow-ups + PR #413/#414/#415 ship trail) and `CLAUDE.md` (Üben toggle = teal + dumbbell,
   Spielen = orange + play, mats share `border-border`, Play-only fill). Doc-only; merged like the rest.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 298 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > are thr changes live?
+- **Response summary:** Checked the `pages.yml` workflow runs on `main` via the GitHub Actions API: the
+  deploy for the code commit `f172f73` (PR #415) and for the final `main` `d719203` (PR #416 docs) both
+  completed with conclusion **success**, so all of the session's Heute work is published. Noted the Pages
+  CDN can take a minute to propagate and the browser/PWA may serve a cached copy (hard-refresh / private
+  window to bust it). No code change.
+- **Artifacts:** none (read-only status check).
+
+## Entry 299 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > also document the session
+- **Response summary:** Session-end documentation pass. Most docs were written incrementally during the
+  session (PROJECT_STATUS s90 handoff folding in all the layout/color/border/icon rounds, s88 handoff
+  archived to W28, CLAUDE.md Üben layout + toggle notes, prompt-log entries 291–297). This pass appended the
+  two remaining prompt-log entries (298–299) and reconfirmed the s90 handoff + CLAUDE.md reflect the final
+  shipped state. Doc-only; merged to `main`.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (entries 298–299).
