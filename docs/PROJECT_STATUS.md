@@ -241,11 +241,16 @@ screen. Also add a subtle color theme for the toggle buttons and the border padd
 - **Tile parity (the core ask):** the tiles were already the same size (both 3:2 in a `p-2` surface mat,
   both inside the Dashboard `mx-auto max-w-md` wrapper), but their **screen position differed**: `UebenPath`
   used `flex … justify-between` (which pushed the map down) while the compact `NeulandHub` was top-aligned.
-  Fix: Üben's header + map are now **pinned to the top with a fixed `gap-4` (1rem)** matching Spielen, and
-  the module pager is pushed to the bottom with **`mt-auto`** so the tab still fills the viewport without
-  scrolling (the s88 "distribute evenly" rule is superseded by this explicit position request). Measured in
-  a headless browser at 390×844: **both tiles sit at `tileTop=353`, `245×358px`, `gap=16` below
-  identically-positioned (`h1Top=305`) titles** in both tabs. No jump on toggle.
+  Fix: Üben's header + map are **pinned to the top with a fixed `gap-4` (1rem)** matching Spielen (the s88
+  "distribute evenly" rule is superseded by this explicit position request). Measured in a headless browser:
+  **both tiles sit at the same top + `245×358px` below identically-positioned, page-centered titles** in
+  both tabs. No jump on toggle. (A later founder round replaced the pager's `mt-auto` bottom-pin with a
+  **`my-auto`-centered {card + pager} group + tight `space-y-3`** so the card drops down and the dots rise
+  to sit just below it, killing the stranded card↔dots gap; header + map stay pinned, parity intact.)
+- **Heading formatting (later founder round):** "Neuland" is now centered on the page **exactly like Üben's
+  "Lernpfad"** (same `text-2xl`/`font-bold`; measured horizontal center = viewport center for both). The
+  "Beta" chip is a **suffix, not part of the heading** — absolutely positioned off the h1's right edge and
+  out of flow, so it no longer shifts "Neuland" off-center.
 - **Subtle section color theme (final state after several founder rounds):** the active toggle button
   (`Dashboard.tsx`) lifts on the white pill and picks up a per-section tint. **Üben = teal/accent
   (`text-accent`) + a `Dumbbell` icon; Spielen = orange (`text-orange-500`) + a `Play` icon.** (History
@@ -261,9 +266,10 @@ screen. Also add a subtle color theme for the toggle buttons and the border padd
   stays stroked (see above).
 - Gates green: build, lint 0 errors, `check:bundle` **72.7 kB** / 400. Verified both tabs via Playwright
   (screenshots + measured bounding-box parity).
-- **Ship status:** shipped across **PRs #413 (core), #414 (docs), #415 (color swap + neutral borders +
-  dumbbell)**, all squash-merged to `main` (branch realigned after each; final `main` at `f172f73`).
-  **Founder verifies the live site** (Pages deploys on merge; sandbox can't reach `*.github.io`).
+- **Ship status:** shipped across **PRs #413 (core), #414/#416/#417 (docs), #415 (color swap + neutral
+  borders + dumbbell), #418 (center Neuland + tighten card/pager gap)**, all squash-merged to `main`
+  (branch realigned after each). **Founder verifies the live site** (Pages deploys on merge; sandbox can't
+  reach `*.github.io`; deploy runs confirmed green via the Actions API this session).
 
 **Prior handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
 (branch `claude/blog-help-uben-spielen-wtbnq8`).**

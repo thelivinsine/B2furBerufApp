@@ -3060,3 +3060,22 @@ Branch: `claude/whats-next-esga9u`.
   two remaining prompt-log entries (298–299) and reconfirmed the s90 handoff + CLAUDE.md reflect the final
   shipped state. Doc-only; merged to `main`.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (entries 298–299).
+
+## Entry 300 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > Lernpfad and Neuland should have save formatting. Beta is not part of the heading so don't consider it when keeping the heading centered. the word beta is more like a suffix. also, the bottom tile in üben and the dots below the tile have too much space in between. it looks weird. Move the tile a bit down and move the dots a bit above to keep them in optimum positions
+  > same formatting*
+- **Response summary:** (1) NeulandHub header restructured so "Neuland" is centered on the page exactly like
+  Üben's "Lernpfad" (same `text-2xl`/`font-bold`; measured horizontal center = viewport center = 195px for
+  both), with the "Beta" chip made a suffix (absolutely positioned off the h1's right edge, `left-full`,
+  out of flow) so it no longer shifts the word. (2) UebenPath: grouped the practice card + module pager and
+  vertically centered them below the map (`my-auto` + tight `space-y-3`), replacing the pager's `mt-auto`
+  bottom-pin, so the card drops down and the dots rise to sit just below it; header + map stay pinned so
+  tile parity with Spielen holds (both tiles measured identical top/height). Verified via Playwright
+  (banner-dismissed real state) + measurements. Gates green (lint 0, bundle 72.7 kB). Shipped as PR #418,
+  squash-merged; branch realigned.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx`, `src/features/welt/NeulandHub.tsx` (commit
+  `0a36806`, PR #418 squash `862325e`).
