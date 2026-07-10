@@ -25,7 +25,7 @@ export function Dashboard() {
   const [tab, setTab] = useState<HeuteTab>("ueben");
 
   return (
-    <div className="space-y-6 sm:space-y-8">
+    <div className="space-y-4 sm:space-y-6">
       {/* Üben / Spielen: the two ways into the day, centred. Üben opens by
           default. The greeting + streak live in the top row; the daily-goal ring
           moved to Fortschritt (s86), so Heute no longer repeats progress. */}
