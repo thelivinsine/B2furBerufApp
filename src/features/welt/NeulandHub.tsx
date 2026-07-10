@@ -1,16 +1,15 @@
-import { Check, KeyRound, Lock, Play, RotateCcw, Swords } from "lucide-react";
+import { Check, Lock, Play, RotateCcw, Swords } from "lucide-react";
 import type { Mission } from "@/types/game";
 import { missionUnlocked } from "@/engine/mission";
-import { missions, chapters, keyItemById } from "@/data/missions";
+import { missions, chapters } from "@/data/missions";
 import { useProgressStore } from "@/store/useProgressStore";
-import { Gloss } from "@/features/shared/Gloss";
 import { PixelStage } from "@/features/welt/stage";
 import { cn } from "@/lib/utils";
 
 /**
  * The Neuland world hub: chapter hero + mission checklist straight from the
  * mission bank (missions are data; a new chapter appears the moment its first
- * mission is authored), plus the owned Schlüssel-Dokumente shelf. Purely
+ * mission is authored). Purely
  * presentational, it takes an `onPlay` so the same view drives both surfaces:
  * on the `/welt` route it opens the inline MissionPlayer (full-screen focus
  * mode), and in Heute → Spielen it deep-links into `/welt?mission=<id>`, which
@@ -106,11 +105,13 @@ export function NeulandHub({
 
             {/* Mission checklist: one dense card, states at a glance. In compact
                 (Heute) it's the single scrollable region so the page never
-                scrolls; the header/hero/teaser stay fixed around it. */}
+                scrolls; the header/hero/teaser stay fixed around it. The
+                scrollbar is hidden (no-scrollbar) since the crop already implies
+                more content. */}
             <div
               className={cn(
                 "rounded-2xl border border-border bg-surface px-4 shadow-soft",
-                compact && "min-h-0 flex-1 overflow-y-auto overscroll-contain",
+                compact && "no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain",
               )}
             >
               {chapterMissions.map((m) => {
@@ -198,29 +199,6 @@ export function NeulandHub({
             <p className="text-[11.5px] font-semibold">Öffnet nach Kapitel {nextLockedIndex}</p>
           </div>
         </div>
-      )}
-
-      {ownedItems.length > 0 && (
-        <section className={cn("space-y-2", compact && "shrink-0")}>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Schlüssel-Dokumente
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {ownedItems.map((id) => {
-              const item = keyItemById.get(id);
-              if (!item) return null;
-              return (
-                <span
-                  key={id}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium"
-                >
-                  <KeyRound className="h-3.5 w-3.5 text-primary" />
-                  <Gloss de={item.de} en={item.en} />
-                </span>
-              );
-            })}
-          </div>
-        </section>
       )}
     </div>
   );
