@@ -1,6 +1,13 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-10 (session 87: **Heute → Spielen now shows the full Neuland world hub** (shared
+_Last updated: 2026-07-10 (session 88: **Heute design review implemented** — a 4-reviewer design panel +
+iterated mockup Artifact led to the founder's final direction, shipped as PR #401: the Üben tab's pixel
+canvas + stepper were replaced by a **soft illustrated SVG city map** (route solid to the current stop,
+white dots on completed stops, location pin + "Du bist hier" chip), the mission tile gained a real n/6
+badge + "Jetzt üben" token-gradient CTA + "Wiederholen · N fällig", and the Spielen hub (`NeulandHub`,
+shared with `/welt`) became a centered header + chapter hero with scrim overlay CTA + dense mission
+checklist (done = check + replay, locked Kapitel-2 teaser); AccountMenu alignment/overflow polish.
+Prior, session 87: **Heute → Spielen now shows the full Neuland world hub** (shared
 `NeulandHub` extracted from `/welt`, replacing the mission carousel; play still deep-links to `/welt`), and
 the **Neuland game tile was removed from the Anwenden hub**. Prior, session 86: **Heute redesign + header/bottom-bar cleanup** — header slimmed to logo/streak/account (Search/Theme/Mode removed; Theme→account menu; Modus→Einstellungen), bottom bar Mehr→Einstellungen with the More sheet retired and a reorder-only easter egg, and the **Heute Üben tab rebuilt as a pixel Neuland city-map learning path** (the daily-goal ring moved to Fortschritt). Prior, session 85: **Heute page reworked into an Üben/Spielen start page**
 (from the founder's start-page sketch): a new segmented toggle where **Üben** (default) reuses the
@@ -208,7 +215,47 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game
+**Handoff after session 88 (2026-07-10). Heute design review + final direction implemented (branch
+`claude/landing-page-design-review-ys5jck`, PR #401).**
+
+Founder asked for a senior-designer review of the logged-in start page (screenshots of Üben, Spielen and
+the account dropdown), explicitly requesting a **panel of subagents**. Ran 4 parallel reviewers (visual
+craft, UX/IA, detail polish, Spielen), each grounding findings in the actual code; synthesized a ranked
+top-10. Then iterated an HTML mockup Artifact (8 phone mockups: 3 Üben, 3 Spielen, 2 dropdown, plus 3 map
+styles incl. two reimagined pixel treatments) through founder feedback to a final direction, and shipped it:
+- **Üben (`UebenPath.tsx`, rewritten):** the green stepper is **retired** (founder); the map alone carries
+  the journey. The low-res pixel canvas was replaced by a **soft illustrated SVG map** (360×230 viewBox):
+  rounded streets, colored landmark tiles with white glyphs + labels (Bahnhof indigo, Laden coral, Zuhause
+  amber, Amt teal), all inside blocks, never on a street. The **indigo route runs solid to the current stop
+  and dotted onward**, every **completed stop gets a white route dot**, and a **location pin** (pulse ring +
+  app-chrome "Du bist hier" chip floating above it) replaced the pixel character. Theme-aware via
+  `MAP_LIGHT`/`MAP_DARK` + `hsl(var(--primary))` in-SVG. Mission tile: "Aktuelles Level" → real **"n / 6"**
+  badge in accent (green stays "done"), CTA relabelled **"Jetzt üben"** on the token gradient
+  (`bg-accent-gradient` + `shadow-glow`, replacing the hand-rolled indigo/violet + off-hue glow), plus a
+  ghost **"Wiederholen · N fällig"** button (`dueCount` → `/revision`). Radii/shadows tokenized.
+- **Spielen (`NeulandHub.tsx`, rewritten; shared with `/welt`):** header **hoisted out of the chapter loop**
+  (kills the duplicate-H1/hero trap when Kapitel 2 ships) and **centered** ("Neuland" + neutral Beta chip;
+  the amber chip sat on the reserved reward-gold hue). The hero got a **scrim overlay** (Kapitel eyebrow,
+  district title, "n / 6 Missionen" chip, **"Mission spielen"** CTA for the next unlocked mission). The
+  mission list is one dense **checklist card**: tabular number column (fixes mid-compound wraps), done rows
+  = green check **+ quiet replay icon button**, next = the single loud gradient play control, locked = Lock,
+  boss tag inline. Footer filler sentence → **locked "Kapitel 2 · Wohnen" teaser card** (chapters registry).
+- **`AccountMenu.tsx`:** card `w-60`→`w-72` + `shadow-elevated-soft`; theme pills → `grid-cols-3` with
+  `px-1`/`min-w-0`/truncate (can't clip under font scaling); Einstellungen/Abmelden/auth rows get `px-2`
+  so all left edges align; Abmelden calmed to `text-danger/80`.
+- **`Dashboard.tsx`:** Suspense fallback reshaped to the real Üben silhouette (3:2 map + tile), no jump.
+- Gates green: build, lint 0 errors, test:unit 99, bundle **71.9 kB** / 400. Verified light + dark + the
+  dropdown via headless Chromium with mid-journey progress seeded (route to the Zuhause pin, white dots on
+  Bahnhof/Laden/Amt); no page errors. Mockups live at the session Artifact (final direction + map styles).
+- **Review findings NOT yet implemented (follow-up candidates):** the sync-banner layout/fold cost and its
+  contradiction with the menu's "Synchronisiert" for anonymous users (incl. `useAuthStore.ts:79` falling
+  back to `signedOut` on a failed session restore, which can show the sign-in nag to a signed-in user),
+  mobile logo linking to `/welcome`, bottom-bar Bibliothek/Fortschritt icon twinning + optical size,
+  streak pill carrying today's XP, and a due-review chip on Heute (partially covered by the new
+  Wiederholen button).
+- **Ship status:** PR #401 squash-merged to `main`, branch realigned. **Founder verifies the live site.**
+
+**Prior handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game
 tile removed from Anwenden (branch `claude/game-tile-removal-nav-hi37z5`).**
 
 Founder: the `/welt`-style Kapitel/mission list should open under **Spielen** in Heute (not the minimal
@@ -268,46 +315,4 @@ carousel), and the **Neuland game tile should be removed from the Anwenden hub**
   Branch realigned to `origin/main` after each merge. **Founder verifies the live site** (the Pages deploy
   runs on each merge to `main`; the sandbox can't reach `*.github.io`).
 
-**Prior handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch
-`claude/page-polish-icon-review-dbmp0v`).**
-
-Founder ran a "panel of experts" brainstorm on the Heute screen, chose **Option B** from a 3-mockup HTML
-Artifact, and locked the top-row icon cleanup. Implemented across the app (gates green: typecheck, lint 0
-errors, test:unit 97, build, check:bundle **74.9 kB** / 400):
-- **Header (`AppShell.tsx`):** now only **logo · streak · account**. Removed the Search icon (⌘K +
-  desktop Sidebar search remain; mobile has no global-search entry, founder choice); removed `ThemeToggle`
-  (moved into the `AccountMenu` dropdown as a Hell/System/Dunkel row); removed `ModeSwitcher` (Modus moved to
-  **Einstellungen → Lernen**); dropped the "Genauly" wordmark on mobile. The streak pill lost its
-  goal-gauge ring (goal now lives on the dashboard ring).
-- **Bottom bar (`BottomTabBar.tsx`):** **Einstellungen replaced "Mehr"** as the fixed last slot (plain
-  NavLink to `/settings`); the **More sheet was retired** (`MoreSheet.tsx` deleted). The three content
-  sections are always visible and reorder via a **long-press easter egg** (jiggle + drag, no +/X badges; a
-  transparent layer means "tap anywhere to finish"). Home + Einstellungen fixed. `moreOrder` is now
-  legacy/unused.
-- **Heute Üben tab = Neuland city-map path** (`features/dashboard/UebenPath.tsx`, new, **lazy**). After a
-  round of HTML previews the founder chose a bird's-eye **pixel Neuland city map** as the Üben tab (progress
-  already lives in the header + Fortschritt, so Üben orients instead of repeating it). A low-res canvas
-  (176×132) upscaled crisp draws a street grid, background buildings, a park and pond, and four Kapitel-1
-  focus buildings (Bahnhof/Laden/Zuhause/Amt) bound to real mission ids; **stop state comes from
-  `missionsDone`** (done ✓ / current "Du bist hier" pin / locked). One glowing cyan route runs to the current
-  stop, the rest is a dotted upcoming leg (no fog, per founder). A **centered legend** names the stops, and
-  an **"Als Nächstes" tile** (Kapitel left, green status right, no subtitle) sends the next mission →
-  `/welt?mission=<id>`. `Dashboard.tsx` is now tiny (toggle + two lazy tabs); the **goal-ring moved to
-  Fortschritt** (`Analytics.tsx` Tagesziel card). Option B (goal-ring/heatmap/stat-tiles on Heute) was the
-  intermediate step and is gone.
-  - **Polish pass (same session, founder "looks unfinished/cheap"):** stood up headless-Chromium
-    screenshotting (`/opt/pw-browsers`, see the harnesses in scratchpad) to iterate on the real render.
-    The map was **simplified** (removed on-map flags/lock seals; state lives in the legend), the stops were
-    re-laid as a **tour (Bahnhof→Laden→Zuhause→Amt)** so none is stacked under another (fixed a
-    banner-collision bug in the fresh-user state), the pill legend became a proper **stepper** (connected
-    dots, done/current/locked), the tile was refined (green tag, no subtitle, bigger button), and the map
-    was made **taller** so the hero fills the screen. Verified mid + fresh states before porting. The
-    reviewed design previews are committed under **`preview/heute-redesign/`** (Option B, the 3 Üben
-    concepts, Concept C, and the final Üben-tab page).
-- **`Settings.tsx`:** added the Lernmodus selector to the Lernen card; removed the obsolete "Navigation
-  anpassen" pin-picker card (the new bar has no add/remove).
-- **Deleted:** `MoreSheet.tsx`, `ThemeToggle.tsx`, `ModeSwitcher.tsx`. Docs updated: CLAUDE.md (the locked
-  mobile-bar section + Modus line + bundle note), this handoff, `DECISIONS.md`, prompt-log 254–258.
-- **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
-
-_(Session 85's handoff moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
+_(Sessions 85-86's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_

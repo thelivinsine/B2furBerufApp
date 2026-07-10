@@ -2603,3 +2603,111 @@ Branch: `claude/whats-next-esga9u`.
   handoff "Ship status" to reflect the **4 squash-merged PRs** (#396–#399, all live on `main`, branch
   realigned after each), refreshed the doc-artifact list, and appended this entry. Doc-only.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 270).
+
+## Entry 271 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** 3 iPhone screenshots (Heute Üben with sync banner, Üben banner dismissed, account dropdown open)
+- **Prompt (verbatim):**
+  > this is the first page any user would see and it's extremely important that this looks as polished as
+  > possible with highest standards. Imagine if you're a senior expert in front end design and ux ui who
+  > works for billion dollar companies that has modern designs with exceptional ui. what are the top 5-10
+  > changes you'd recommend based on the screenshots? spin up a panel og subagents if necessary and provide
+  > a detailed analysis and recommendations.
+- **Response summary:** Ran a 4-agent review panel (visual craft, UX/IA, detail polish, later Spielen), each
+  reading the screenshots and verifying findings against the code. Synthesized a ranked top-10: sync-state
+  contradiction (menu "Synchronisiert" vs banner, `useAuthStore` signedOut fallback), banner size/fold cost,
+  one-loud-accent violations (two gradient recipes, triple "Üben"), map route contradicting "Du bist hier",
+  stepper glyph mix (emoji lock) + 1px connector misalignment, dead Spielen hero + duplicate-H1 trap,
+  identical "Nochmal" pills, token drift (shadows/radii/status colors), uninformative "Aktuelles Level",
+  amber Beta badge on the reward-gold hue. Plus a quick-win list (dropdown alignment/overflow, logo →
+  /welcome, Suspense fallback, bottom-bar icon twins).
+- **Artifacts:** analysis only (no code changes).
+
+## Entry 272 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** 1 iPhone screenshot (Heute Spielen tab)
+- **Prompt (verbatim):**
+  > in addition also analyse the spielen screen
+- **Response summary:** Added a fourth reviewer for the Spielen hub. Key findings: three identical loud
+  "Nochmal" gradient pills spend the brand accent on replays while the next mission is below the fold; the
+  hero carries one word of information (dead hero); the header + hero render INSIDE the chapter loop
+  (duplicate H1 the moment Kapitel 2 is authored); no current-state in the mission list; amber Beta badge
+  off-token and reward-gold-adjacent; mission titles wrap mid-compound against the fixed button column;
+  microcopy-budget-violating footer sentence.
+- **Artifacts:** analysis only.
+
+## Entry 273 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > taking the above analysis and recommendations into consideration, provide me with 3 mockups for each of
+  > the heute screen - üben and spielen. also include 2 mock ups of the account settings drop-down. provide
+  > them as a html artifact
+- **Response summary:** Built an HTML Artifact with 8 phone mockups on the app's real tokens: Üben U1
+  (card-first), U2 (current order, craft fixed), U3 (composed single card); Spielen S1 (hero with overlay
+  CTA), S2 (full path list), S3 (chapter card + checklist); dropdown D1 (current menu corrected), D2 (guest
+  state with honest sync story). Each captioned with the findings it applies.
+- **Artifacts:** session Artifact `genauly-heute-mockups.html` (claude.ai/code artifact).
+
+## Entry 274 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the html looks broken ans there are several mistakes in it. I also don't like the 2D pixelated maps -
+  > reimagine how the city should also look like and instead of the character being there on the map, a 📍
+  > could also be an option?
+- **Response summary:** Fixed two real rendering bugs (dropdown overlays had no `position: relative` anchor;
+  fixed phone heights let content overflow) and the internal mission-state inconsistencies. Reimagined the
+  map as a soft illustrated city (rounded streets, landmark tiles, smooth route, location pin; U3 shows the
+  📍 emoji option). Verified headlessly before republishing.
+- **Artifacts:** updated Artifact.
+
+## Entry 275 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > I want the html to also have a couple of reimagined 2D pixelated map
+- **Response summary:** Added a "Karten-Stile" section comparing three map directions: M1 soft illustrated,
+  M2 refined pixel city (muted brand-tuned palette, outlined buildings, pixel pin), M3 pixel path (winding
+  stone tour through green, Duolingo-journey feel).
+- **Artifacts:** updated Artifact.
+
+## Entry 276 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > For üben, I like the U2 but it's fine to remove the green horizontal milestone part - also currently on
+  > the map, some buildings are in the street fix it and add the white round dot (which is on the map for
+  > only one completed milestone in the U2) for all the completed milestones. for the Spielen, I like the
+  > picture part of S1 and the bottom half tile from S3 - make sure to also add a repeat icon beside the
+  > green ticks. Also keep the Neuland beta in the center.
+- **Response summary:** Rebuilt the Artifact around a "Finale Richtung" section: Üben = U2 without the
+  stepper (map re-laid so no building touches a street, white dots on every completed stop, pin current);
+  Spielen = S1 hero over S3 checklist with a replay icon beside every green check and "Neuland Beta"
+  centered. Map styles + dropdown sections kept for reference.
+- **Artifacts:** updated Artifact (final direction).
+
+## Entry 277 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > go ahead and implement it
+- **Response summary:** Implemented the final direction in the app. `UebenPath.tsx` rewritten: stepper
+  retired, pixel canvas → soft illustrated SVG map (landmark tiles inside blocks, route solid to the pin +
+  dotted onward, white done-dots, location pin + "Du bist hier" chip, `MAP_LIGHT`/`MAP_DARK`), mission tile
+  with real n/6 badge + "Jetzt üben" token-gradient CTA + "Wiederholen · N fällig" ghost button.
+  `NeulandHub.tsx` rewritten: centered header outside the chapter loop (neutral Beta chip), hero scrim
+  overlay with "Mission spielen" CTA, dense checklist (done = check + replay, next = single gradient play,
+  locked Kapitel-2 teaser). `AccountMenu.tsx` alignment/overflow/danger-weight polish; `Dashboard.tsx`
+  fallback reshaped. Gates green (build, lint 0 errors, test:unit 99, bundle 71.9 kB); verified light/dark/
+  dropdown via headless Chromium. Shipped as PR #401 (squash-merged), docs updated.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx`, `src/features/welt/NeulandHub.tsx`,
+  `src/features/auth/AccountMenu.tsx`, `src/features/dashboard/Dashboard.tsx`; `CLAUDE.md`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 271–277); PR #401.
