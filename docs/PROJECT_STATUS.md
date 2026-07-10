@@ -256,14 +256,14 @@ screen. Also add a subtle color theme for the toggle buttons and the border padd
   (`text-accent`) + a `Dumbbell` icon; Spielen = orange (`text-orange-500`) + a `Play` icon.** (History
   this session: first shipped Üben=indigo/Spielen=teal, then Üben recolored to orange on the founder's "not
   violet" note, then the two **swapped** to the final teal/orange, and Üben's `Zap` bolt replaced by the
-  dumbbell.) Only **Play** fills when active (`fillActive` flag) — a filled `Dumbbell` line icon becomes a
-  blob, so it stays stroked.
+  dumbbell.) Both active icons fill (`fillActive` flag): the Play triangle and the dumbbell's weight
+  plates (a later founder round turned the dumbbell fill on; it reads fine at 16px).
 - **Tile-mat border is neutral gray:** the s90 experiment with per-section colored mat borders was
   reverted at the founder's request ("colored borders don't look good"); both the Üben map mat and the
   Spielen hero mat use the shared muted **`border-border`**. The white `bg-surface` mat is preserved; the
   section color lives on the toggle only.
-- **Filled active icon:** Spielen's `Play` fills when active (matches its game feel); the Üben dumbbell
-  stays stroked (see above).
+- **Filled active icon:** both active toggle icons fill (`fillActive`) — Spielen's `Play` triangle and,
+  after a founder round, the Üben dumbbell's weight plates too (it reads fine filled at 16px).
 - Gates green: build, lint 0 errors, `check:bundle` **72.7 kB** / 400. Verified both tabs via Playwright
   (screenshots + measured bounding-box parity).
 - **Ship status:** shipped across **PRs #413 (core), #414/#416/#417 (docs), #415 (color swap + neutral
