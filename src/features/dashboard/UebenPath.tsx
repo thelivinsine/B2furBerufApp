@@ -20,7 +20,12 @@ import { cn } from "@/lib/utils";
  */
 
 const FIELD_W = 176;
-const FIELD_H = 158;
+const FIELD_H = 158; // full drawing field (map content is laid out in this space)
+// The map is cropped to a 3:2 view so it matches the Spielen backdrop image
+// (176 : 117 ≈ 3 : 2). CROP_TOP shifts the drawing up so the trimmed band is the
+// top decorative row, keeping every landmark building + the whole route visible.
+const VIEW_H = 117;
+const CROP_TOP = 24;
 const OUT = "#2b2433";
 
 type StopState = "done" | "current" | "locked";
@@ -85,11 +90,14 @@ const DARK_PAL: Palette = {
 
 function drawCity(canvas: HTMLCanvasElement, states: StopState[], currentIndex: number, isDark: boolean) {
   canvas.width = FIELD_W;
-  canvas.height = FIELD_H;
+  canvas.height = VIEW_H;
   const g = canvas.getContext("2d");
   if (!g) return;
   const P = isDark ? DARK_PAL : LIGHT_PAL;
   g.imageSmoothingEnabled = false;
+  // Crop to the 3:2 view: shift content up so the top decorative band falls off
+  // the top and rows below the view are clipped by the canvas bounds.
+  g.translate(0, -CROP_TOP);
   const R = (x: number, y: number, w: number, h: number, col: string) => {
     g.fillStyle = col;
     g.fillRect(x | 0, y | 0, w | 0, h | 0);
@@ -171,6 +179,9 @@ function drawCity(canvas: HTMLCanvasElement, states: StopState[], currentIndex: 
       const bw = CO[ci][1];
       const by = RO[ri][0];
       const bh = RO[ri][1];
+      // Skip rows cropped away by the 3:2 view (top decorative band + anything
+      // below the bottom edge), so neither end leaves a sliver of buildings.
+      if (by + bh <= CROP_TOP + 2 || by > CROP_TOP + VIEW_H - 6) continue;
       if ((ci === 0 && ri === 0) || (ci === 4 && ri === 0)) {
         for (let t = 0; t < 3; t++) tree(bx + 3 + Math.floor(rnd() * (bw - 5)), by + 5 + Math.floor(rnd() * (bh - 5)));
         continue;
@@ -346,42 +357,8 @@ export default function UebenPath() {
   ];
 
   return (
-    <div className="space-y-4">
-      {/* Pixel city map */}
-      <div className="relative overflow-hidden rounded-[20px] border border-border shadow-soft">
-        <canvas
-          ref={canvasRef}
-          className="block w-full"
-          style={{ imageRendering: "pixelated", height: "auto" }}
-          aria-label="Neuland-Karte mit deinem Lernweg"
-        />
-        <div className="pointer-events-none absolute inset-0">
-          <span
-            className="absolute rounded-full border-2 border-accent/70"
-            style={{
-              left: `${(cur.charX / FIELD_W) * 100}%`,
-              top: `${((cur.charY - 3) / FIELD_H) * 100}%`,
-              width: "8%",
-              aspectRatio: "1",
-              transform: "translate(-50%,-50%)",
-              animation: "uben-pulse 1.8s ease-out infinite",
-            }}
-          />
-          <span
-            className="absolute -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg border-2 border-[#2b2433] bg-white px-2 py-1 text-[11px] font-extrabold tracking-wide text-[#0c1424] shadow-md"
-            style={{
-              left: `${(cur.charX / FIELD_W) * 100}%`,
-              top: `${((cur.charY - 11) / FIELD_H) * 100}%`,
-            }}
-          >
-            Du bist hier
-            <span className="absolute left-1/2 top-full -translate-x-1/2" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "5px solid #2b2433" }} />
-            <span className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[2px]" style={{ borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: "4px solid #fff" }} />
-          </span>
-        </div>
-      </div>
-
-      {/* Stepper: the stops in order with progress */}
+    <div className="space-y-5">
+      {/* Stepper: the milestone icons sit ABOVE the map (founder s87) */}
       <div className="flex items-start justify-between px-1">
         {steps.map((s, i) => (
           <div key={i} className="relative flex flex-1 flex-col items-center gap-1.5">
@@ -416,8 +393,42 @@ export default function UebenPath() {
         ))}
       </div>
 
-      {/* Als Nächstes tile */}
-      <div className="rounded-[20px] border border-border bg-surface p-[18px]" style={{ boxShadow: "0 10px 30px -22px rgba(0,0,0,0.9)" }}>
+      {/* Pixel city map */}
+      <div className="relative overflow-hidden rounded-[20px] border border-border shadow-soft">
+        <canvas
+          ref={canvasRef}
+          className="block w-full"
+          style={{ imageRendering: "pixelated", height: "auto" }}
+          aria-label="Neuland-Karte mit deinem Lernweg"
+        />
+        <div className="pointer-events-none absolute inset-0">
+          <span
+            className="absolute rounded-full border-2 border-accent/70"
+            style={{
+              left: `${(cur.charX / FIELD_W) * 100}%`,
+              top: `${((cur.charY - 3 - CROP_TOP) / VIEW_H) * 100}%`,
+              width: "8%",
+              aspectRatio: "1",
+              transform: "translate(-50%,-50%)",
+              animation: "uben-pulse 1.8s ease-out infinite",
+            }}
+          />
+          <span
+            className="absolute -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg border-2 border-[#2b2433] bg-white px-2 py-1 text-[11px] font-extrabold tracking-wide text-[#0c1424] shadow-md"
+            style={{
+              left: `${(cur.charX / FIELD_W) * 100}%`,
+              top: `${((cur.charY - 11 - CROP_TOP) / VIEW_H) * 100}%`,
+            }}
+          >
+            Du bist hier
+            <span className="absolute left-1/2 top-full -translate-x-1/2" style={{ borderLeft: "5px solid transparent", borderRight: "5px solid transparent", borderTop: "5px solid #2b2433" }} />
+            <span className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[2px]" style={{ borderLeft: "4px solid transparent", borderRight: "4px solid transparent", borderTop: "4px solid #fff" }} />
+          </span>
+        </div>
+      </div>
+
+      {/* Als Nächstes tile (taller so it doesn't read cramped, founder s87) */}
+      <div className="rounded-[20px] border border-border bg-surface px-5 py-6" style={{ boxShadow: "0 10px 30px -22px rgba(0,0,0,0.9)" }}>
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-muted-foreground">Kapitel 1 · {chapterTitle}</span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-success/15 px-2.5 py-1 text-[11px] font-bold text-success">
@@ -425,7 +436,7 @@ export default function UebenPath() {
             Aktuelles Level
           </span>
         </div>
-        <h2 className="mt-3 text-xl font-extrabold leading-tight tracking-tight">
+        <h2 className="mt-4 text-xl font-extrabold leading-tight tracking-tight">
           {allDone ? "Kapitel 1 geschafft" : nextMission.title}
         </h2>
         {/* Üben opens a composed practice session scoped to this mission's theme
@@ -434,7 +445,7 @@ export default function UebenPath() {
         <button
           type="button"
           onClick={() => navigate(`/session?theme=${nextMission.themeId}`)}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 px-5 py-4 text-[15px] font-extrabold text-white transition active:scale-[0.99]"
+          className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 px-5 py-4 text-[15px] font-extrabold text-white transition active:scale-[0.99]"
           style={{ boxShadow: "0 12px 24px -10px hsl(248 80% 55% / 0.7)" }}
         >
           Üben

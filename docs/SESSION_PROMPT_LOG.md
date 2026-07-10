@@ -2544,3 +2544,27 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/welt/NeulandHub.tsx`, `src/features/welt/stage.tsx`,
   `src/features/dashboard/UebenPath.tsx`, `src/lib/useTheme.ts`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 267).
+
+## Entry 268 — 2026-07-10 (session 87)
+- **Branch:** `claude/game-tile-removal-nav-hi37z5`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > for spielen part: 1. Kapital 1. Ankommen should be below the image with a smaller text 2. Neuland should
+  > be the heading. 3. the inage has too little contrast and is not easily visible in the dark mode. 4. remove
+  > subtitles in spielen tiles and position the green tick appropriately. for the üben part: 1. move the
+  > milestone icons above the image 2. increase the height of the bottom tile by 10-15% so that it doesn't
+  > look cramped. 3. Crop the size of the map to match the dimensions of the image in Spielen. 4. Adjust the
+  > spacing between the components - legend , map and tile in appropriately.
+- **Response summary:** A layout-polish round on both Heute tabs. **Spielen** (`NeulandHub.tsx`): made
+  "Neuland" the section heading, moved "Kapitel 1 · Ankommen" below the backdrop as a smaller line, reduced
+  the dark-mode backdrop dim (`/45`→`/20`) and added a border so the image is clearly visible, removed the
+  mission-tile subtitles, and moved the green done-tick into a `bg-success/15` badge to the left of the play
+  button. **Üben** (`UebenPath.tsx`): moved the stepper above the map, made the "Als Nächstes" tile taller
+  (`p-[18px]`→`px-5 py-6` + bigger inner margins), cropped the map canvas to a **3:2 view**
+  (`VIEW_H=117`/`CROP_TOP=24` + a row-skip guard so neither end slivers) to match the Spielen backdrop
+  dimensions, and bumped the inter-component spacing. Verified light + dark on both tabs via headless
+  Chromium. Gates green: build, typecheck, lint 0 errors, bundle 71.7 kB.
+- **Artifacts:** `src/features/welt/NeulandHub.tsx`, `src/features/welt/stage.tsx`,
+  `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 268).
