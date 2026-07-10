@@ -791,3 +791,46 @@ default, minimal Spielen card), then implemented it **scoped to the Dashboard bo
   domain-building icons) from the top, at the founder's request. The `CityStrip` component stays in the
   repo; it is just no longer rendered on `/analytics`. (An earlier note here mis-stated that the Heute
   icon-stat row was dropped; it was not, it is the /analytics city strip that was removed.)
+
+**Handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch
+`claude/page-polish-icon-review-dbmp0v`).**
+
+Founder ran a "panel of experts" brainstorm on the Heute screen, chose **Option B** from a 3-mockup HTML
+Artifact, and locked the top-row icon cleanup. Implemented across the app (gates green: typecheck, lint 0
+errors, test:unit 97, build, check:bundle **74.9 kB** / 400):
+- **Header (`AppShell.tsx`):** now only **logo · streak · account**. Removed the Search icon (⌘K +
+  desktop Sidebar search remain; mobile has no global-search entry, founder choice); removed `ThemeToggle`
+  (moved into the `AccountMenu` dropdown as a Hell/System/Dunkel row); removed `ModeSwitcher` (Modus moved to
+  **Einstellungen → Lernen**); dropped the "Genauly" wordmark on mobile. The streak pill lost its
+  goal-gauge ring (goal now lives on the dashboard ring).
+- **Bottom bar (`BottomTabBar.tsx`):** **Einstellungen replaced "Mehr"** as the fixed last slot (plain
+  NavLink to `/settings`); the **More sheet was retired** (`MoreSheet.tsx` deleted). The three content
+  sections are always visible and reorder via a **long-press easter egg** (jiggle + drag, no +/X badges; a
+  transparent layer means "tap anywhere to finish"). Home + Einstellungen fixed. `moreOrder` is now
+  legacy/unused.
+- **Heute Üben tab = Neuland city-map path** (`features/dashboard/UebenPath.tsx`, new, **lazy**). After a
+  round of HTML previews the founder chose a bird's-eye **pixel Neuland city map** as the Üben tab (progress
+  already lives in the header + Fortschritt, so Üben orients instead of repeating it). A low-res canvas
+  (176×132) upscaled crisp draws a street grid, background buildings, a park and pond, and four Kapitel-1
+  focus buildings (Bahnhof/Laden/Zuhause/Amt) bound to real mission ids; **stop state comes from
+  `missionsDone`** (done ✓ / current "Du bist hier" pin / locked). One glowing cyan route runs to the current
+  stop, the rest is a dotted upcoming leg (no fog, per founder). A **centered legend** names the stops, and
+  an **"Als Nächstes" tile** (Kapitel left, green status right, no subtitle) sends the next mission →
+  `/welt?mission=<id>`. `Dashboard.tsx` is now tiny (toggle + two lazy tabs); the **goal-ring moved to
+  Fortschritt** (`Analytics.tsx` Tagesziel card). Option B (goal-ring/heatmap/stat-tiles on Heute) was the
+  intermediate step and is gone.
+  - **Polish pass (same session, founder "looks unfinished/cheap"):** stood up headless-Chromium
+    screenshotting (`/opt/pw-browsers`, see the harnesses in scratchpad) to iterate on the real render.
+    The map was **simplified** (removed on-map flags/lock seals; state lives in the legend), the stops were
+    re-laid as a **tour (Bahnhof→Laden→Zuhause→Amt)** so none is stacked under another (fixed a
+    banner-collision bug in the fresh-user state), the pill legend became a proper **stepper** (connected
+    dots, done/current/locked), the tile was refined (green tag, no subtitle, bigger button), and the map
+    was made **taller** so the hero fills the screen. Verified mid + fresh states before porting. The
+    reviewed design previews are committed under **`preview/heute-redesign/`** (Option B, the 3 Üben
+    concepts, Concept C, and the final Üben-tab page).
+- **`Settings.tsx`:** added the Lernmodus selector to the Lernen card; removed the obsolete "Navigation
+  anpassen" pin-picker card (the new bar has no add/remove).
+- **Deleted:** `MoreSheet.tsx`, `ThemeToggle.tsx`, `ModeSwitcher.tsx`. Docs updated: CLAUDE.md (the locked
+  mobile-bar section + Modus line + bundle note), this handoff, `DECISIONS.md`, prompt-log 254–258.
+- **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
+

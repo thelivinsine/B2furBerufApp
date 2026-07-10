@@ -12,8 +12,13 @@ const SpielenHub = lazy(() => import("./SpielenHub"));
 
 type HeuteTab = "ueben" | "spielen";
 
+// Shaped like the loaded Üben stack (map card + mission tile) so first paint
+// and loaded state share a silhouette instead of jumping.
 const fallback = (
-  <div className="h-[440px] animate-pulse rounded-2xl border border-border bg-surface" />
+  <div className="animate-pulse space-y-5">
+    <div className="aspect-[3/2] rounded-2xl border border-border bg-surface" />
+    <div className="h-44 rounded-2xl border border-border bg-surface" />
+  </div>
 );
 
 export function Dashboard() {
