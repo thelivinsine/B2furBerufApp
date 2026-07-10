@@ -458,6 +458,13 @@ export function Settings() {
 
         <p className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-xs text-muted-foreground">
           <button
+            onClick={() => navigate("/hilfe")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            Hilfe & Anleitungen
+          </button>
+          <span aria-hidden className="text-border">·</span>
+          <button
             onClick={() => navigate("/privacy")}
             className="underline-offset-2 hover:text-foreground hover:underline"
           >

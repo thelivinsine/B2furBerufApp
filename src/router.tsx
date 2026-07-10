@@ -87,6 +87,15 @@ const TermsOfService = lazyWithReload(() =>
 const About = lazyWithReload(() =>
   import("@/features/about/About").then((m) => ({ default: m.About })),
 );
+// Lazy: the public help/blog section (/hilfe). Off the eager path; it carries
+// its own bilingual content bank and is prerendered to static HTML at build
+// time (scripts/prerender-help.mjs) for SEO.
+const HelpHub = lazyWithReload(() =>
+  import("@/features/help/HelpHub").then((m) => ({ default: m.HelpHub })),
+);
+const HelpArticle = lazyWithReload(() =>
+  import("@/features/help/HelpArticle").then((m) => ({ default: m.HelpArticle })),
+);
 
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
@@ -163,6 +172,27 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={null}>
         <Sources />
+      </Suspense>
+    ),
+  },
+  // Public help/blog section. Login-free and outside the AppShell so crawlers
+  // and logged-out visitors can read it; each page is also prerendered to a
+  // static HTML file at build time for SEO (scripts/prerender-help.mjs).
+  {
+    path: "/hilfe",
+    errorElement: routeError,
+    element: (
+      <Suspense fallback={null}>
+        <HelpHub />
+      </Suspense>
+    ),
+  },
+  {
+    path: "/hilfe/:slug",
+    errorElement: routeError,
+    element: (
+      <Suspense fallback={null}>
+        <HelpArticle />
       </Suspense>
     ),
   },
