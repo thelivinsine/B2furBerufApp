@@ -2864,3 +2864,18 @@ Branch: `claude/whats-next-esga9u`.
   green (build, lint 0 errors). Shipped as PR #409.
 - **Artifacts:** `src/features/welt/NeulandHub.tsx`; `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md` (entry 285);
   PR #409.
+
+## Entry 286 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Documentation consistency pass at session end. Most docs were written incrementally
+  through the session (PROJECT_STATUS s88 handoff, prompt-log entries 271–285, the CLAUDE.md Heute-surface
+  facts). This pass: updated the PROJECT_STATUS s88 handoff "Ship status" to cover all **PRs #401–#409**
+  (was stale at #404) with a per-PR one-liner, added handoff bullets for the #405–#409 follow-up rounds
+  (grey Wiederholen + Erledigt-on-title, Üben even distribution, Spielen crop-scroll tile, hidden scrollbar
+  + shelf removal, exact-3-rows + centering), rewrote the top `_Last updated_` summary to frame the whole
+  multi-round session, and appended this entry. Doc-only.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 286).
