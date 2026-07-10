@@ -84,9 +84,9 @@ export function NeulandHub({
             {/* Chapter hero: the scrim overlay gives the image a job (chapter,
                 count, play CTA) instead of a decorative dead zone. Framed by
                 the same surface mat as the Üben map (same dimensions + screen
-                position), with a subtle accent-tinted border as the Spielen
-                section color. */}
-            <div className="rounded-2xl border border-accent/20 bg-surface p-2 shadow-soft">
+                position + neutral gray border; the section color lives on the
+                Heute toggle, not the mat). */}
+            <div className="rounded-2xl border border-border bg-surface p-2 shadow-soft">
               <PixelStage setting="strasse" label={null} className="rounded-xl" themed>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#16142c]/75 via-[#16142c]/25 to-transparent" />
                 <div className="absolute inset-x-3.5 bottom-3 flex items-end justify-between gap-3">

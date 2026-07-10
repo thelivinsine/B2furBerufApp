@@ -161,9 +161,10 @@ export default function UebenPath() {
 
       {/* Illustrated city map: the single journey surface (stepper retired s88).
           Native 3:2 (360x240) in a surface mat (the same mat, same dimensions
-          and screen position as the Spielen hero), with a subtle orange-tinted
-          border as the Üben section color. */}
-      <div className="rounded-2xl border border-orange-400/40 bg-surface p-2 shadow-soft">
+          and screen position as the Spielen hero), with a neutral gray
+          border shared with the Spielen hero mat (founder: colored borders
+          read poorly here; the section color lives on the toggle instead). */}
+      <div className="rounded-2xl border border-border bg-surface p-2 shadow-soft">
         <div className="relative overflow-hidden rounded-xl">
         <svg
           viewBox="0 0 360 240"
