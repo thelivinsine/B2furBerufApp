@@ -3092,3 +3092,17 @@ Branch: `claude/whats-next-esga9u`.
   notes, prompt-log entries 291–300). This pass appended entry 301 and reconfirmed the s90 handoff +
   CLAUDE.md reflect the final shipped state. Doc-only; merged to `main`.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` (entry 301).
+
+## Entry 302 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > everything looks good but the dumbell doesn't fill up when selected. fix it.
+- **Response summary:** Flipped the Üben tab's `fillActive` flag to `true` so the selected dumbbell fills
+  solid (its two weight plates) like Spielen's play triangle; both active toggle icons now read as filled.
+  (This reverses the earlier same-session decision to keep the dumbbell stroked; at 16px the filled dumbbell
+  is recognizable, verified via screenshot.) Gates green (lint 0). Shipped as PR #421, squash-merged; branch
+  realigned. Updated CLAUDE.md + the s90 handoff (both-icons-fill).
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx` (commit `211b5b4`, PR #421 squash `be4c40b`);
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
