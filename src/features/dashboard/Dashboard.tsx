@@ -38,10 +38,10 @@ export function Dashboard() {
       >
         {(
           [
-            { id: "ueben", label: "Üben", Icon: Zap },
-            { id: "spielen", label: "Spielen", Icon: Play },
+            { id: "ueben", label: "Üben", Icon: Zap, tint: "text-primary" },
+            { id: "spielen", label: "Spielen", Icon: Play, tint: "text-accent" },
           ] as const
-        ).map(({ id, label, Icon }) => (
+        ).map(({ id, label, Icon, tint }) => (
           <button
             key={id}
             type="button"
@@ -50,8 +50,11 @@ export function Dashboard() {
             onClick={() => setTab(id)}
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition",
+              // Active tab lifts on the white pill and picks up its section's
+              // subtle tint (Üben = indigo/primary, Spielen = teal/accent),
+              // matching the tinted tile-mat border on each tab.
               tab === id
-                ? "bg-surface text-foreground shadow-soft"
+                ? cn("bg-surface shadow-soft", tint)
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
