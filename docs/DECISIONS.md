@@ -267,3 +267,23 @@ A "panel of experts" review of the Heute screen led to a redesign. The founder a
   ("Tag…/Wör…/Fälli…"). Option B shows each once: streak in the header, goal in the ring, and a real
   full-width session button. Per the founder's final tweaks the session subtitle is **minutes only** (no
   "~", no due count) and the account icon dropped its sync dot.
+
+## Heute Üben tab → Neuland city-map path (session 86, 2026-07-10) — founder-approved
+
+Follow-up to the Heute polish. The founder felt the Option-B goal ring on the Üben tab **repeated
+progress** already shown in the header (streak) and the stats line, so progress moved to Fortschritt and
+the Üben tab was reimagined as a **learning path in sync with the Neuland game**.
+
+**Why these calls:**
+- **Üben orients, it doesn't re-report progress.** The daily-goal ring moved to Fortschritt (`/analytics`).
+  The Üben tab now answers "where am I on the journey, what's next" instead of showing XP again.
+- **A pixel bird's-eye city map (Concept C).** Chosen from a 3-concept preview, then iterated: the first
+  render was too crude (labels covering art, no legible route, hard-edged fog), so it became a **proper
+  street-grid city** with background buildings, one clear glowing route, numbered stop-pins with names in a
+  **legend below the map**, and a **"Du bist hier"** pin. Founder later cut the fog entirely (upcoming route
+  is just a dotted line) and centered the legend. Treatment stays flat top-down pixel (canvas drawn low-res,
+  upscaled crisp) to read as a city map.
+- **Synced to real missions.** Kapitel-1 stops (Bahnhof/Laden/Zuhause/Amt) are bound to real mission ids;
+  stop state derives from `missionsDone`, so the map advances as the learner plays. The "Als Nächstes" tile
+  routes the next mission into `/welt?mission=<id>`. Authored per-chapter for now (extend `STOPS`); the map
+  is lazy so Heute keeps no content bank on its eager path.

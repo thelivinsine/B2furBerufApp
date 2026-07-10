@@ -1,6 +1,6 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-10 (session 86: **Heute polished into the Option-B start page + header/bottom-bar cleanup** — header slimmed to logo/streak/account (Search/Theme/Mode removed; Theme→account menu; Modus→Einstellungen), bottom bar Mehr→Einstellungen with the More sheet retired and a reorder-only easter egg, Dashboard rebuilt as the goal-ring Option B. Prior, session 85: **Heute page reworked into an Üben/Spielen start page**
+_Last updated: 2026-07-10 (session 86: **Heute redesign + header/bottom-bar cleanup** — header slimmed to logo/streak/account (Search/Theme/Mode removed; Theme→account menu; Modus→Einstellungen), bottom bar Mehr→Einstellungen with the More sheet retired and a reorder-only easter egg, and the **Heute Üben tab rebuilt as a pixel Neuland city-map learning path** (the daily-goal ring moved to Fortschritt). Prior, session 85: **Heute page reworked into an Üben/Spielen start page**
 (from the founder's start-page sketch): a new segmented toggle where **Üben** (default) reuses the
 existing composed-session feature plus a store-only four-ring Fortschritt row, and **Spielen** is a
 lazy-loaded Neuland mission carousel deep-linking into `/welt?mission=<id>`. The sidebar + top row are
@@ -222,10 +222,17 @@ errors, test:unit 97, build, check:bundle **74.9 kB** / 400):
   sections are always visible and reorder via a **long-press easter egg** (jiggle + drag, no +/X badges; a
   transparent layer means "tap anywhere to finish"). Home + Einstellungen fixed. `moreOrder` is now
   legacy/unused.
-- **`Dashboard.tsx` (Option B):** one **goal-ring hero** (128px; deduped — streak in header, goal in the
-  ring) + 7-day heatmap + a **full-width "Weitermachen" button** (minutes-only subtitle, no due count) + one
-  slim "Wörter gelernt · Alle Statistiken" line. Kept the Üben/Spielen toggle. Removed the old
-  duplicated streak/goal/due tiles and the truncated stat labels.
+- **Heute Üben tab = Neuland city-map path** (`features/dashboard/UebenPath.tsx`, new, **lazy**). After a
+  round of HTML previews the founder chose a bird's-eye **pixel Neuland city map** as the Üben tab (progress
+  already lives in the header + Fortschritt, so Üben orients instead of repeating it). A low-res canvas
+  (176×132) upscaled crisp draws a street grid, background buildings, a park and pond, and four Kapitel-1
+  focus buildings (Bahnhof/Laden/Zuhause/Amt) bound to real mission ids; **stop state comes from
+  `missionsDone`** (done ✓ / current "Du bist hier" pin / locked). One glowing cyan route runs to the current
+  stop, the rest is a dotted upcoming leg (no fog, per founder). A **centered legend** names the stops, and
+  an **"Als Nächstes" tile** (Kapitel left, green status right, no subtitle) sends the next mission →
+  `/welt?mission=<id>`. `Dashboard.tsx` is now tiny (toggle + two lazy tabs); the **goal-ring moved to
+  Fortschritt** (`Analytics.tsx` Tagesziel card). Option B (goal-ring/heatmap/stat-tiles on Heute) was the
+  intermediate step and is gone. Design contract: the published Artifact `uben-roadmap-c.html`.
 - **`Settings.tsx`:** added the Lernmodus selector to the Lernen card; removed the obsolete "Navigation
   anpassen" pin-picker card (the new bar has no add/remove).
 - **Deleted:** `MoreSheet.tsx`, `ThemeToggle.tsx`, `ModeSwitcher.tsx`. Docs updated: CLAUDE.md (the locked

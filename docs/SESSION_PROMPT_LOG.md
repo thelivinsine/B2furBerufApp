@@ -2378,3 +2378,67 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/auth/AccountMenu.tsx`, `src/features/settings/Settings.tsx`,
   `src/features/dashboard/Dashboard.tsx`; deleted `MoreSheet.tsx`/`ThemeToggle.tsx`/`ModeSwitcher.tsx`;
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/DECISIONS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 254–258).
+
+## Entry 259 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the Option-B goal-ring on Heute.
+- **Prompt (verbatim):**
+  > i want you to move this to Fortschritt section and reimagine this section. I think the top row and the
+  > bottom row just above the navigation menu already talks about the progress. There's too much emphasis on
+  > progress here again. I want this section to show a graph or roadmap of the uben exercises. It's even
+  > better if these exercises are directly in sync with the Neuland game. This way the learner has a good
+  > orientation of where they are, and what's next with a high-level overview. Generate a preview considering
+  > this. [then] generate 3 previews
+- **Response summary:** Built a published Artifact with three Üben-tab concepts (all move the goal ring to
+  Fortschritt): **A Lernpfad** (winding Duolingo path), **B Kapitel-Roadmap** (Als-Nächstes hero + chapter
+  cards), **C Neuland-Karte** (stylized game map). Used the real Kapitel-1 mission structure.
+- **Artifacts:** Artifact `uben-roadmap.html`.
+
+## Entry 260 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > i prefer concept c layout. But with following details: 1. The map should show bird's eye view of the
+  > Neuland city map with a roadmap showing various stop points from hbf to home to amt, etc. Use the
+  > pixelated 2D theme within this map layout. 2. For the bottom tile, use the concept b's first tile - but
+  > remove the line "Übt mit mission 1.2..." and swap the positions of Kapital eins and the green text saying
+  > "current level". provide a preview now
+- **Response summary:** Refined Concept C into a single phone: a canvas-drawn pixel city map (buildings,
+  road, route, stops) upscaled crisp, plus the revised hero tile (subtitle removed, Kapitel left, green
+  status right). Republished to the same Artifact URL.
+- **Artifacts:** Artifact `uben-roadmap-c.html`.
+
+## Entry 261 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the rendered pixel map.
+- **Prompt (verbatim):**
+  > here's the screenshot. there are several things wrong with this design.
+  > [answers] fix all: art quality/composition, fog + weak current stop, no clear route, labels cover art;
+  > "it should be a proper city map with grid blocks and several other buildings around the focus buildings";
+  > art direction: "you decide".
+- **Response summary:** Named the concrete flaws, then rebuilt the map: a real street grid with blocks +
+  many background buildings, a park and pond, one clear glowing route, numbered stop-pins with the names in
+  a legend BELOW the map (off the art), a bold teardrop "Du bist hier" pin, and soft feathered fog. Kept the
+  pixel top-down treatment. Republished to the same URL.
+- **Artifacts:** Artifact `uben-roadmap-c.html` (rebuilt).
+
+## Entry 262 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > looks good. the location tags below the map should be centered. also, I don't understand why the fog is
+  > necessary - better to remove it abd show the upcoming route with a dotted line. continue to scope the
+  > work and implement the task
+- **Response summary:** Applied the two tweaks to the preview (centered legend, fog removed, upcoming route
+  dotted), then **implemented in the app**. New lazy `features/dashboard/UebenPath.tsx` ports the canvas
+  city map bound to real Kapitel-1 missions (`missions.ts`), state from `missionsDone`, centered legend,
+  "Du bist hier" pin, and the "Als Nächstes" tile (→ `/welt?mission=<id>`). `Dashboard.tsx` slimmed to the
+  toggle + two lazy tabs; the daily-goal ring moved to `Analytics.tsx` (Fortschritt). Gates green:
+  typecheck, lint (0 errors), test:unit (97), build, check:bundle (71.6 kB). Docs updated (CLAUDE.md,
+  PROJECT_STATUS, DECISIONS, this log). Shipped to the branch.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx` (new), `src/features/dashboard/Dashboard.tsx`,
+  `src/features/analytics/Analytics.tsx`; `docs/*`; Artifact `uben-roadmap-c.html`.
