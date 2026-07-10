@@ -2845,3 +2845,22 @@ Branch: `claude/whats-next-esga9u`.
   Gates green (build, lint 0 errors). Shipped as PR #408.
 - **Artifacts:** `src/features/welt/NeulandHub.tsx`; `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md` (entry 284);
   PR #408.
+
+## Entry 285 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** 1 screenshot (Heute Spielen)
+- **Prompt (verbatim):**
+  > shorten the height of missions list tile so that exactly three missions lines are visible. also make sure
+  > the next mission to be played stays in the center line already scrolled up when the user opens spielen
+  > page. keep appropriate spacing between various components of the page
+- **Response summary:** Reworked the compact (Heute) mission tile in `NeulandHub`: rows are now a uniform
+  fixed height (`ROW_H`=60px), the scroll tile is capped to exactly three rows (`COMPACT_LIST_H`=180), and a
+  `useLayoutEffect` sets the tile's `scrollTop` on open so the next unplayed mission sits on the CENTER line
+  (`offsetTop - (clientH - rowH)/2`, clamped ≥ 0). Dropped the earlier fill-viewport flex approach for
+  normal `space-y-4` flow now that the tile is short (better, even component spacing). Verified via
+  Playwright with the founder's state (5/6 done, next=1.5): exactly 3 rows visible (1.4/1.5/1.6), 1.5
+  centered and bold with the gradient play button, docScroll == viewport (no page scroll), no errors. Gates
+  green (build, lint 0 errors). Shipped as PR #409.
+- **Artifacts:** `src/features/welt/NeulandHub.tsx`; `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md` (entry 285);
+  PR #409.

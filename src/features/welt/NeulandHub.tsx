@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from "react";
 import { Check, Lock, Play, RotateCcw, Swords } from "lucide-react";
 import type { Mission } from "@/types/game";
 import { missionUnlocked } from "@/engine/mission";
@@ -5,6 +6,10 @@ import { missions, chapters } from "@/data/missions";
 import { useProgressStore } from "@/store/useProgressStore";
 import { PixelStage } from "@/features/welt/stage";
 import { cn } from "@/lib/utils";
+
+// Compact (Heute) mission-list crop: exactly three uniform rows tall.
+const ROW_H = 60;
+const COMPACT_LIST_H = ROW_H * 3;
 
 /**
  * The Neuland world hub: chapter hero + mission checklist straight from the
@@ -22,11 +27,11 @@ import { cn } from "@/lib/utils";
  * button. Only the next mission carries the loud gradient control. A locked
  * teaser card for the next unauthored chapter replaces the old footer note.
  *
- * `compact` (Heute → Spielen, s88 follow-up): fills the viewport below the tab
- * toggle and crops the mission checklist into its own internally-scrollable
- * region, so the header + hero + next-chapter teaser stay put and the WHOLE
- * page never scrolls (only the mission tile does). The `/welt` route leaves it
- * off and scrolls the page normally.
+ * `compact` (Heute → Spielen, s88 follow-up): crops the mission checklist to a
+ * fixed THREE-row internally-scrollable tile so the page fits without scrolling
+ * (only the tile does), and on open auto-scrolls the tile so the next mission
+ * sits on the CENTER line. The `/welt` route leaves it off and scrolls the page
+ * normally.
  */
 export function NeulandHub({
   onPlay,
@@ -43,14 +48,22 @@ export function NeulandHub({
   const nextLockedChapter = chapters.find((c) => !missions.some((m) => m.chapter === c.id));
   const nextLockedIndex = nextLockedChapter ? chapters.indexOf(nextLockedChapter) : -1;
 
+  // In compact, center the next unplayed mission in the 3-row crop on open.
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const nextRowRef = useRef<HTMLDivElement>(null);
+  const doneKey = missionsDone.join(",");
+  useLayoutEffect(() => {
+    if (!compact) return;
+    const c = scrollRef.current;
+    const r = nextRowRef.current;
+    if (!c || !r) return;
+    c.scrollTop = Math.max(0, r.offsetTop - (c.clientHeight - r.clientHeight) / 2);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [compact, doneKey]);
+
   return (
-    <div
-      className={cn(
-        "mx-auto max-w-lg",
-        compact ? "flex h-[calc(100dvh-15rem)] flex-col gap-3 overflow-hidden" : "space-y-3",
-      )}
-    >
-      <header className={cn("flex items-center justify-center gap-2.5", compact && "shrink-0")}>
+    <div className={cn("mx-auto max-w-lg", compact ? "space-y-4" : "space-y-3")}>
+      <header className="flex items-center justify-center gap-2.5">
         <h1 className="text-2xl font-bold">Neuland</h1>
         <span className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
           Beta
@@ -67,14 +80,11 @@ export function NeulandHub({
           (m) => !isDone(m) && missionUnlocked(m, missionsDone, ownedItems),
         );
         return (
-          <section
-            key={chapter.id}
-            className={cn("space-y-3", compact && "flex min-h-0 flex-1 flex-col")}
-          >
+          <section key={chapter.id} className={compact ? "space-y-4" : "space-y-3"}>
             {/* Chapter hero: the scrim overlay gives the image a job (chapter,
                 count, play CTA) instead of a decorative dead zone. Framed by
                 the same surface mat as the Üben map. */}
-            <div className={cn("rounded-2xl border border-border bg-surface p-2 shadow-soft", compact && "shrink-0")}>
+            <div className="rounded-2xl border border-border bg-surface p-2 shadow-soft">
               <PixelStage setting="strasse" label={null} className="rounded-xl" themed>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#16142c]/75 via-[#16142c]/25 to-transparent" />
                 <div className="absolute inset-x-3.5 bottom-3 flex items-end justify-between gap-3">
@@ -104,15 +114,16 @@ export function NeulandHub({
             </div>
 
             {/* Mission checklist: one dense card, states at a glance. In compact
-                (Heute) it's the single scrollable region so the page never
-                scrolls; the header/hero/teaser stay fixed around it. The
-                scrollbar is hidden (no-scrollbar) since the crop already implies
-                more content. */}
+                (Heute) it's cropped to exactly THREE uniform rows and scrolls
+                internally (scrollbar hidden) so the page never scrolls; the next
+                mission is auto-centered on open. */}
             <div
+              ref={compact ? scrollRef : undefined}
               className={cn(
                 "rounded-2xl border border-border bg-surface px-4 shadow-soft",
-                compact && "no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain",
+                compact && "no-scrollbar overflow-y-auto overscroll-contain",
               )}
+              style={compact ? { height: COMPACT_LIST_H } : undefined}
             >
               {chapterMissions.map((m) => {
                 const done = isDone(m);
@@ -121,7 +132,9 @@ export function NeulandHub({
                 return (
                   <div
                     key={m.id}
-                    className="flex items-center gap-2.5 border-b border-border py-3 last:border-b-0"
+                    ref={isNext ? nextRowRef : undefined}
+                    className="flex items-center gap-2.5 border-b border-border last:border-b-0"
+                    style={{ height: ROW_H }}
                   >
                     <span
                       className={cn(
@@ -190,7 +203,7 @@ export function NeulandHub({
       {/* Next chapter teaser: a locked card says "more is coming" without a
           filler sentence (microcopy budget). */}
       {nextLockedChapter && (
-        <div className={cn("flex items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-border bg-muted/40 px-4 py-3 text-muted-foreground", compact && "shrink-0")}>
+        <div className="flex items-center gap-3 rounded-2xl border-[1.5px] border-dashed border-border bg-muted/40 px-4 py-3 text-muted-foreground">
           <Lock className="h-4 w-4 shrink-0" />
           <div className="min-w-0">
             <p className="text-[13.5px] font-bold">
