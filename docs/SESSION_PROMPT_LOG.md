@@ -2711,3 +2711,24 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx`, `src/features/welt/NeulandHub.tsx`,
   `src/features/auth/AccountMenu.tsx`, `src/features/dashboard/Dashboard.tsx`; `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 271–277); PR #401.
+
+## Entry 278 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > add a title to uben page and add a left and right navigation to different uben modules on the bottom of
+  > the screen. Finally, make sure to keep the same dimensions for map in üben and photo tile of spielen and
+  > keep them in same position on the screen
+- **Response summary:** Üben follow-up round (`UebenPath.tsx`): added a centered **"Lernpfad"** title
+  mirroring the Spielen "Neuland" header row; made the map a **native 3:2 block** (viewBox 360×240, content
+  group shifted +5y, mat padding dropped) so it has the same dimensions and screen position as the Spielen
+  chapter hero (toggle → title → media, identical gaps); and added a **left/right module pager** at the
+  bottom (chevron buttons + per-mission dots: active = primary pill, done = success tint) that flips the
+  practice card through every Kapitel-1 mission. The card shows the selected module's number plus an
+  Als-Nächstes/Erledigt state chip and its CTA opens `/session?mission=<selected>`; the map pin stays
+  truthful to actual progress (paging never moves it). Verified via Playwright (pager click-through to 1.3
+  showing "Erledigt", dot states, tab position comparison); gates green (build, lint 0 errors, test:unit 99,
+  bundle 71.9 kB). Shipped as PR #402.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 278); PR #402.

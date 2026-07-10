@@ -253,7 +253,14 @@ styles incl. two reimagined pixel treatments) through founder feedback to a fina
   mobile logo linking to `/welcome`, bottom-bar Bibliothek/Fortschritt icon twinning + optical size,
   streak pill carrying today's XP, and a due-review chip on Heute (partially covered by the new
   Wiederholen button).
-- **Ship status:** PR #401 squash-merged to `main`, branch realigned. **Founder verifies the live site.**
+- **Follow-up round (same session, founder):** a centered **"Lernpfad" title** on Üben (mirrors the Spielen
+  "Neuland" header row), the map made a **native 3:2 block** (360×240 viewBox, mat padding dropped) so it has
+  the SAME dimensions + screen position as the Spielen hero, and a **left/right module pager** at the bottom
+  (chevrons + per-mission dots: active = primary pill, done = success) that flips the practice card through
+  every Kapitel-1 mission (number + Als-Nächstes/Erledigt state chip; CTA → `/session?mission=<selected>`;
+  the map pin never moves, progress truth). Verified via Playwright (pager click-through + tab comparison).
+- **Ship status:** PR #401 + the follow-up PR #402 squash-merged to `main`, branch realigned. **Founder
+  verifies the live site.**
 
 **Prior handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game
 tile removed from Anwenden (branch `claude/game-tile-removal-nav-hi37z5`).**
