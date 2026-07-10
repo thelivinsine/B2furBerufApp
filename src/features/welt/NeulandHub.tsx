@@ -63,11 +63,17 @@ export function NeulandHub({
 
   return (
     <div className={cn("mx-auto max-w-lg", compact ? "space-y-4" : "space-y-3")}>
-      <header className="flex items-center justify-center gap-2.5">
-        <h1 className="text-2xl font-bold">Neuland</h1>
-        <span className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
-          Beta
-        </span>
+      {/* "Neuland" is centered on the page exactly like Üben's "Lernpfad"
+          (same text-2xl/font-bold). "Beta" is a suffix, NOT part of the
+          heading, so it's absolutely positioned off the right edge and does
+          not shift the word off-center (founder). */}
+      <header className="text-center">
+        <h1 className="relative inline-block text-2xl font-bold">
+          Neuland
+          <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
+            Beta
+          </span>
+        </h1>
       </header>
 
       {authoredChapters.map((chapter, ci) => {
