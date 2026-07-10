@@ -133,9 +133,10 @@ list. Full rationale + per-task model map in the plan's G2 status block.
   title, n/6 count, "Mission spielen" CTA) over ONE dense checklist card (done = green check + quiet
   replay icon button, next = the single gradient play control, locked = Lock, boss tag inline, a locked
   next-chapter teaser card instead of a footer sentence). In the Heute embed the hub takes a **`compact`
-  prop** (`SpielenHub` passes it, `/welt` does not): it fills the viewport below the toggle and crops the
-  **mission checklist into its own internally-scrollable region** (header + hero + teaser stay fixed, scroll
-  region carries `no-scrollbar`, ~4 missions visible) so the page itself never scrolls; `/welt` scrolls the
+  prop** (`SpielenHub` passes it, `/welt` does not): the mission checklist is cropped to **exactly THREE
+  uniform rows** (`ROW_H`=60, `COMPACT_LIST_H`) and scrolls internally (`no-scrollbar`), and a
+  `useLayoutEffect` **auto-centers the next unplayed mission** in that 3-row tile on open; the rest of the
+  page is normal flow (`space-y-4`) and fits without scrolling. `/welt` leaves `compact` off and scrolls the
   page normally. The **owned-key-item "Schlüssel-Dokumente" shelf was removed from the hub** (both surfaces,
   s88; it's redundant with the in-mission bag/HUD). The Üben map
   (`features/dashboard/UebenPath`) is a soft illustrated SVG city map with `MAP_LIGHT`/`MAP_DARK`
