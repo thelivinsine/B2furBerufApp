@@ -259,7 +259,14 @@ styles incl. two reimagined pixel treatments) through founder feedback to a fina
   (chevrons + per-mission dots: active = primary pill, done = success) that flips the practice card through
   every Kapitel-1 mission (number + Als-Nächstes/Erledigt state chip; CTA → `/session?mission=<selected>`;
   the map pin never moves, progress truth). Verified via Playwright (pager click-through + tab comparison).
-- **Ship status:** PR #401 + the follow-up PR #402 squash-merged to `main`, branch realigned. **Founder
+- **Second follow-up (same session, founder):** the **white surface mat came back** around the Üben map AND
+  now frames the Spielen hero too (`bg-surface p-2 rounded-2xl` on both, so dimensions/positions stay
+  identical); spacing tightened so the whole Üben tab **fits a phone viewport with zero scrolling**
+  (verified: scrollHeight == viewport at 390×844; root `space-y-3`, compact card paddings, Dashboard
+  `space-y-4`); the pager's **chevrons are desktop-only**, on mobile the dots (32px tap targets) plus a new
+  **horizontal swipe on the practice card** navigate modules; the hero overlay type was tightened so
+  "Bahnhofsviertel" no longer truncates inside the mat.
+- **Ship status:** PR #401 + follow-ups #402 and #403 squash-merged to `main`, branch realigned. **Founder
   verifies the live site.**
 
 **Prior handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game

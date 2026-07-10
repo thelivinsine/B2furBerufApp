@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { missions, chapters } from "@/data/missions";
@@ -140,15 +140,21 @@ export default function UebenPath() {
   const selectedDone = missionsDone.includes(selected.id);
   const isNextModule = selected.id === nextMission.id && !selectedDone;
 
+  // Mobile module navigation: no arrows (founder), the dots plus a horizontal
+  // swipe on the practice card move between modules.
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const goTo = (i: number) => setSelectedIdx(Math.min(kap1.length - 1, Math.max(0, i)));
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-3">
       {/* Centered page title, mirroring the Spielen "Neuland" header row */}
       <h1 className="text-center text-2xl font-bold">Lernpfad</h1>
 
       {/* Illustrated city map: the single journey surface (stepper retired s88).
-          Native 3:2 (360x240) with no mat padding, so it matches the Spielen
-          chapter hero's dimensions and position exactly. */}
-      <div className="relative overflow-hidden rounded-2xl border border-border shadow-soft">
+          Native 3:2 (360x240) in a surface mat (the same mat frames the Spielen
+          hero), so both tiles share dimensions and screen position. */}
+      <div className="rounded-2xl border border-border bg-surface p-2 shadow-soft">
+        <div className="relative overflow-hidden rounded-xl">
         <svg
           viewBox="0 0 360 240"
           className="block h-auto w-full"
@@ -255,18 +261,33 @@ export default function UebenPath() {
           </g>
         </svg>
 
-        {/* "Du bist hier" chip floats above the pin, hiding nothing */}
-        <span
-          className="absolute -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-bold shadow-soft"
-          style={{ left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 30) / 240) * 100}%` }}
-        >
-          Du bist hier
-        </span>
+          {/* "Du bist hier" chip floats above the pin, hiding nothing */}
+          <span
+            className="absolute -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-bold shadow-soft"
+            style={{ left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 30) / 240) * 100}%` }}
+          >
+            Du bist hier
+          </span>
+        </div>
       </div>
 
       {/* Practice-module card: shows the mission selected in the pager below
-          (defaults to the next unplayed mission) */}
-      <div className="rounded-2xl border border-border bg-surface px-5 py-6 shadow-soft">
+          (defaults to the next unplayed mission). Swipe left/right to change
+          the module on touch. */}
+      <div
+        className="rounded-2xl border border-border bg-surface px-5 py-4 shadow-soft"
+        onTouchStart={(e) => {
+          touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }}
+        onTouchEnd={(e) => {
+          const t = touchStart.current;
+          touchStart.current = null;
+          if (!t) return;
+          const dx = e.changedTouches[0].clientX - t.x;
+          const dy = e.changedTouches[0].clientY - t.y;
+          if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) goTo(dx < 0 ? idx + 1 : idx - 1);
+        }}
+      >
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-muted-foreground">Kapitel 1 · {chapterTitle}</span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-accent">
@@ -274,7 +295,7 @@ export default function UebenPath() {
             {doneCount} / {kap1.length}
           </span>
         </div>
-        <div className="mt-3.5 flex items-center gap-2">
+        <div className="mt-3 flex items-center gap-2">
           <span className="text-[13px] font-bold tabular-nums text-muted-foreground">1.{selected.index}</span>
           {isNextModule && (
             <span className="inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
@@ -295,7 +316,7 @@ export default function UebenPath() {
         <button
           type="button"
           onClick={() => navigate(`/session?mission=${selected.id}`)}
-          className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-gradient px-5 py-4 text-[15px] font-extrabold text-white shadow-glow transition active:scale-[0.99]"
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-gradient px-5 py-3.5 text-[15px] font-extrabold text-white shadow-glow transition active:scale-[0.99]"
         >
           Jetzt üben
           <ArrowRight className="h-[18px] w-[18px]" />
@@ -303,7 +324,7 @@ export default function UebenPath() {
         <button
           type="button"
           onClick={() => navigate("/revision")}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-muted px-4 py-3 text-[13.5px] font-semibold text-foreground transition active:scale-[0.99]"
+          className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-muted px-4 py-2.5 text-[13.5px] font-semibold text-foreground transition active:scale-[0.99]"
         >
           <RotateCcw className="h-4 w-4 text-muted-foreground" />
           Wiederholen
@@ -311,42 +332,47 @@ export default function UebenPath() {
         </button>
       </div>
 
-      {/* Module pager: flip through every Kapitel-1 mission's practice module */}
-      <div className="flex items-center justify-center gap-4 pb-1">
+      {/* Module pager: dots for every Kapitel-1 practice module. Arrows only on
+          desktop (founder: on mobile the dots + card swipe are enough). */}
+      <div className="flex items-center justify-center gap-3">
         <button
           type="button"
           aria-label="Vorheriges Modul"
           disabled={idx === 0}
-          onClick={() => setSelectedIdx(Math.max(0, idx - 1))}
-          className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface text-foreground shadow-soft transition active:scale-95 disabled:opacity-35"
+          onClick={() => goTo(idx - 1)}
+          className="hidden h-9 w-9 place-items-center rounded-full border border-border bg-surface text-foreground shadow-soft transition active:scale-95 disabled:opacity-35 sm:grid"
         >
           <ChevronLeft className="h-[18px] w-[18px]" />
         </button>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center">
           {kap1.map((m, i) => (
             <button
               key={m.id}
               type="button"
               aria-label={`Modul 1.${m.index}`}
               aria-current={i === idx}
-              onClick={() => setSelectedIdx(i)}
-              className={cn(
-                "h-2 rounded-full transition-all",
-                i === idx
-                  ? "w-5 bg-primary"
-                  : missionsDone.includes(m.id)
-                    ? "w-2 bg-success/50"
-                    : "w-2 bg-border",
-              )}
-            />
+              onClick={() => goTo(i)}
+              className="grid h-8 place-items-center px-1.5"
+            >
+              <span
+                className={cn(
+                  "h-2 rounded-full transition-all",
+                  i === idx
+                    ? "w-5 bg-primary"
+                    : missionsDone.includes(m.id)
+                      ? "w-2 bg-success/50"
+                      : "w-2 bg-border",
+                )}
+              />
+            </button>
           ))}
         </div>
         <button
           type="button"
           aria-label="Nächstes Modul"
           disabled={idx === kap1.length - 1}
-          onClick={() => setSelectedIdx(Math.min(kap1.length - 1, idx + 1))}
-          className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface text-foreground shadow-soft transition active:scale-95 disabled:opacity-35"
+          onClick={() => goTo(idx + 1)}
+          className="hidden h-9 w-9 place-items-center rounded-full border border-border bg-surface text-foreground shadow-soft transition active:scale-95 disabled:opacity-35 sm:grid"
         >
           <ChevronRight className="h-[18px] w-[18px]" />
         </button>

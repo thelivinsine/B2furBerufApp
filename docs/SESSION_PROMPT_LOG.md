@@ -2732,3 +2732,26 @@ Branch: `claude/whats-next-esga9u`.
   bundle 71.9 kB). Shipped as PR #402.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 278); PR #402.
+
+## Entry 279 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > i like the white padding around the map in previous version. bring it back and apply the same to spielen
+  > tile as well. Can you make sure to adjust the spacing of components and bottom tile such that the user
+  > doesn't have to scroll? also for mobile there's no need of left and right arrows. the bottom dots are
+  > enough. if vertical space is contrained and difficult to keep it without scrolling, considering keeping
+  > the dots vertically to the side and the user can scroll up and down on the bottom tile to navigate the
+  > exercises.
+- **Response summary:** Brought the `bg-surface p-2` mat back around the Üben map and applied the identical
+  mat to the Spielen chapter hero (dimensions/positions stay matched). Tightened vertical rhythm so the
+  whole Üben tab fits a phone viewport with no scrolling (verified scrollHeight == viewport at 390×844:
+  root `space-y-3`, card `py-4` + compact CTA paddings, Dashboard wrapper `space-y-4`; NeulandHub matched).
+  The pager's chevrons are now desktop-only (`hidden sm:grid`); on mobile the dots (32px tap targets) plus a
+  new horizontal swipe gesture on the practice card navigate modules, so the side-dots fallback wasn't
+  needed. Also fixed "Bahnhofsviertel" truncating in the hero overlay after the mat narrowed it. Verified
+  via Playwright (fit measurement, swipe 1.5→1.6, both tabs light). Gates green; shipped as PR #403.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx`, `src/features/welt/NeulandHub.tsx`,
+  `src/features/dashboard/Dashboard.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 279); PR #403.

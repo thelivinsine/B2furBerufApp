@@ -33,7 +33,7 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
   const nextLockedIndex = nextLockedChapter ? chapters.indexOf(nextLockedChapter) : -1;
 
   return (
-    <div className="mx-auto max-w-lg space-y-5">
+    <div className="mx-auto max-w-lg space-y-3">
       <header className="flex items-center justify-center gap-2.5">
         <h1 className="text-2xl font-bold">Neuland</h1>
         <span className="rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
@@ -51,40 +51,38 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
           (m) => !isDone(m) && missionUnlocked(m, missionsDone, ownedItems),
         );
         return (
-          <section key={chapter.id} className="space-y-4">
+          <section key={chapter.id} className="space-y-3">
             {/* Chapter hero: the scrim overlay gives the image a job (chapter,
-                count, play CTA) instead of a decorative dead zone. */}
-            <PixelStage
-              setting="strasse"
-              label={null}
-              className="rounded-2xl border border-border shadow-soft"
-              themed
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-[#16142c]/75 via-[#16142c]/25 to-transparent" />
-              <div className="absolute inset-x-3.5 bottom-3 flex items-end justify-between gap-3">
+                count, play CTA) instead of a decorative dead zone. Framed by
+                the same surface mat as the Üben map. */}
+            <div className="rounded-2xl border border-border bg-surface p-2 shadow-soft">
+              <PixelStage setting="strasse" label={null} className="rounded-xl" themed>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#16142c]/75 via-[#16142c]/25 to-transparent" />
+                <div className="absolute inset-x-3.5 bottom-3 flex items-end justify-between gap-3">
                 <div className="min-w-0 text-white">
                   <p className="text-[11px] font-bold uppercase tracking-wide opacity-85">
                     Kapitel {ci + 1} · {chapter.title}
                   </p>
-                  <p className="mt-0.5 truncate text-lg font-extrabold leading-tight">
+                  <p className="mt-0.5 truncate text-base font-extrabold leading-tight">
                     {chapter.district}
                   </p>
                   <p className="mt-1.5 inline-flex items-center rounded-full bg-white/15 px-2.5 py-0.5 text-xs font-bold tabular-nums">
                     {doneCount} / {chapterMissions.length} Missionen
                   </p>
                 </div>
-                {next && (
-                  <button
-                    type="button"
-                    onClick={() => onPlay(next)}
-                    className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent-gradient px-4 py-2 text-sm font-bold text-white shadow-glow transition active:scale-[0.98]"
-                  >
-                    <Play className="h-3.5 w-3.5 fill-current" />
-                    Mission spielen
-                  </button>
-                )}
-              </div>
-            </PixelStage>
+                  {next && (
+                    <button
+                      type="button"
+                      onClick={() => onPlay(next)}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-accent-gradient px-3.5 py-2 text-[13px] font-bold text-white shadow-glow transition active:scale-[0.98]"
+                    >
+                      <Play className="h-3.5 w-3.5 fill-current" />
+                      Mission spielen
+                    </button>
+                  )}
+                </div>
+              </PixelStage>
+            </div>
 
             {/* Mission checklist: one dense card, states at a glance. */}
             <div className="rounded-2xl border border-border bg-surface px-4 shadow-soft">
