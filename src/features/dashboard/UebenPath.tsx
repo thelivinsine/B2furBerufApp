@@ -1,9 +1,9 @@
 import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { ArrowRight, Check, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { missions, chapters } from "@/data/missions";
 import { useProgressStore } from "@/store/useProgressStore";
-import { dueCount } from "@/engine/srs";
 import { useIsDark } from "@/lib/useTheme";
 import { cn } from "@/lib/utils";
 
@@ -101,7 +101,6 @@ function TileGlyph({ kind, color }: { kind: (typeof STOPS)[number]["key"]; color
 export default function UebenPath() {
   const navigate = useNavigate();
   const missionsDone = useProgressStore((s) => s.missionsDone);
-  const srs = useProgressStore((s) => s.srs);
   const isDark = useIsDark();
   const P = isDark ? MAP_DARK : MAP_LIGHT;
 
@@ -128,22 +127,27 @@ export default function UebenPath() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doneKey, kap1]);
 
-  const due = useMemo(() => dueCount(srs), [srs]);
   const [pinX, pinY] = STOPS[currentIndex].stop;
 
   // Module pager: which mission's content the practice card shows. Defaults to
   // the next unplayed mission; paging never moves the map pin (progress truth).
   const nextIdx = Math.max(0, kap1.findIndex((m) => m.id === nextMission.id));
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [slideDir, setSlideDir] = useState(1);
   const idx = selectedIdx ?? nextIdx;
   const selected = kap1[idx] ?? nextMission;
   const selectedDone = missionsDone.includes(selected.id);
   const isNextModule = selected.id === nextMission.id && !selectedDone;
+  const reducedMotion = useReducedMotion();
 
   // Mobile module navigation: no arrows (founder), the dots plus a horizontal
   // swipe on the practice card move between modules.
   const touchStart = useRef<{ x: number; y: number } | null>(null);
-  const goTo = (i: number) => setSelectedIdx(Math.min(kap1.length - 1, Math.max(0, i)));
+  const goTo = (i: number) => {
+    const target = Math.min(kap1.length - 1, Math.max(0, i));
+    setSlideDir(target >= idx ? 1 : -1);
+    setSelectedIdx(target);
+  };
 
   return (
     <div className="space-y-3">
@@ -295,41 +299,51 @@ export default function UebenPath() {
             {doneCount} / {kap1.length}
           </span>
         </div>
-        <div className="mt-3 flex items-center gap-2">
-          <span className="text-[13px] font-bold tabular-nums text-muted-foreground">1.{selected.index}</span>
-          {isNextModule && (
-            <span className="inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
-              Als Nächstes
-            </span>
-          )}
-          {selectedDone && (
-            <span className="inline-flex items-center gap-1 rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success">
-              <Check className="h-3 w-3" />
-              Erledigt
-            </span>
-          )}
-        </div>
-        <h2 className="mt-1 text-xl font-extrabold leading-tight tracking-tight">{selected.title}</h2>
-        {/* Üben opens a composed practice session focused on THIS mission (its
-            own vocab + Redemittel first, then theme-related fill), NOT the game
-            itself. Playing a mission lives under Heute → Spielen (and /welt). */}
-        <button
-          type="button"
-          onClick={() => navigate(`/session?mission=${selected.id}`)}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-gradient px-5 py-3.5 text-[15px] font-extrabold text-white shadow-glow transition active:scale-[0.99]"
+        {/* Module content slides horizontally when the pager changes modules */}
+        <motion.div
+          key={selected.id}
+          initial={reducedMotion ? false : { x: slideDir * 44, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
         >
-          Jetzt üben
-          <ArrowRight className="h-[18px] w-[18px]" />
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate("/revision")}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-muted px-4 py-2.5 text-[13.5px] font-semibold text-foreground transition active:scale-[0.99]"
-        >
-          <RotateCcw className="h-4 w-4 text-muted-foreground" />
-          Wiederholen
-          {due > 0 && <span className="font-medium text-muted-foreground">· {due} fällig</span>}
-        </button>
+          <div className="mt-3 flex items-center gap-2">
+            <span className="text-[13px] font-bold tabular-nums text-muted-foreground">1.{selected.index}</span>
+            {isNextModule && (
+              <span className="inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+                Als Nächstes
+              </span>
+            )}
+            {selectedDone && (
+              <span className="inline-flex items-center gap-1 rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success">
+                <Check className="h-3 w-3" />
+                Erledigt
+              </span>
+            )}
+          </div>
+          <h2 className="mt-1 text-xl font-extrabold leading-tight tracking-tight">{selected.title}</h2>
+          {/* ONE state-aware CTA (founder): "Jetzt üben" for a new module,
+              "Wiederholen" for a completed one. Both open the same composed
+              practice session focused on THIS mission (its own vocab +
+              Redemittel first, then theme-related fill), NOT the game itself.
+              Playing a mission lives under Heute → Spielen (and /welt). */}
+          <button
+            type="button"
+            onClick={() => navigate(`/session?mission=${selected.id}`)}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-gradient px-5 py-3.5 text-[15px] font-extrabold text-white shadow-glow transition active:scale-[0.99]"
+          >
+            {selectedDone ? (
+              <>
+                <RotateCcw className="h-[17px] w-[17px]" />
+                Wiederholen
+              </>
+            ) : (
+              <>
+                Jetzt üben
+                <ArrowRight className="h-[18px] w-[18px]" />
+              </>
+            )}
+          </button>
+        </motion.div>
       </div>
 
       {/* Module pager: dots for every Kapitel-1 practice module. Arrows only on
