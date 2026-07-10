@@ -2775,3 +2775,19 @@ Branch: `claude/whats-next-esga9u`.
   with no scrolling; gates green (build, lint 0 errors, test:unit 99, bundle 71.9 kB). Shipped as PR #404.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 280); PR #404.
+
+## Entry 281 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the wiederholen button can stay gray. also the erledigt green badge should appear on the same line as
+  > the title of the card to the right.
+- **Response summary:** Two small tweaks to the Üben practice card (`UebenPath.tsx`): the completed-module
+  CTA "Wiederholen" now renders on plain `bg-muted` grey (no gradient/glow, muted icon) while "Jetzt üben"
+  keeps the token gradient; and the "Erledigt" green badge moved out of the meta row onto the **title line,
+  right-aligned** (title + badge in a `flex items-start justify-between`). Verified via Playwright (module
+  1.6 shows the grey Wiederholen button + Erledigt badge beside "Die Anmeldung"; page still fits the
+  viewport). Gates green (build, lint 0 errors). Shipped as PR #405.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`
+  (entry 281); PR #405.

@@ -313,14 +313,16 @@ export default function UebenPath() {
                 Als Nächstes
               </span>
             )}
+          </div>
+          <div className="mt-1 flex items-start justify-between gap-3">
+            <h2 className="text-xl font-extrabold leading-tight tracking-tight">{selected.title}</h2>
             {selectedDone && (
-              <span className="inline-flex items-center gap-1 rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success">
+              <span className="mt-0.5 inline-flex shrink-0 items-center gap-1 rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success">
                 <Check className="h-3 w-3" />
                 Erledigt
               </span>
             )}
           </div>
-          <h2 className="mt-1 text-xl font-extrabold leading-tight tracking-tight">{selected.title}</h2>
           {/* ONE state-aware CTA (founder): "Jetzt üben" for a new module,
               "Wiederholen" for a completed one. Both open the same composed
               practice session focused on THIS mission (its own vocab +
@@ -329,11 +331,16 @@ export default function UebenPath() {
           <button
             type="button"
             onClick={() => navigate(`/session?mission=${selected.id}`)}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-gradient px-5 py-3.5 text-[15px] font-extrabold text-white shadow-glow transition active:scale-[0.99]"
+            className={cn(
+              "mt-4 flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3.5 text-[15px] font-extrabold transition active:scale-[0.99]",
+              selectedDone
+                ? "bg-muted text-foreground"
+                : "bg-accent-gradient text-white shadow-glow",
+            )}
           >
             {selectedDone ? (
               <>
-                <RotateCcw className="h-[17px] w-[17px]" />
+                <RotateCcw className="h-[17px] w-[17px] text-muted-foreground" />
                 Wiederholen
               </>
             ) : (
