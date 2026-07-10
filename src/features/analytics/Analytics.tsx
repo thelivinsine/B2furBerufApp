@@ -294,6 +294,34 @@ export function Analytics() {
         title="Deine Statistiken"
       />
 
+      {/* Tagesziel ring — moved here from Heute (s86): progress lives in
+          Fortschritt, so the Üben tab can focus on the learning path. */}
+      <Card>
+        <CardContent className="flex items-center gap-5 p-5">
+          <div
+            className="relative h-[88px] w-[88px] shrink-0 rounded-full"
+            style={{
+              background: `conic-gradient(hsl(var(--primary)) ${Math.min(todayXp / dailyGoalXp, 1) * 360}deg, hsl(var(--border)) 0deg)`,
+            }}
+          >
+            <div className="absolute inset-[9px] grid place-items-center rounded-full bg-surface">
+              <span className="text-lg font-bold tabular-nums">
+                {Math.round(Math.min(todayXp / dailyGoalXp, 1) * 100)}%
+              </span>
+            </div>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Heute
+            </p>
+            <p className="mt-0.5 text-lg font-bold leading-tight">Tagesziel</p>
+            <p className="mt-1 text-sm tabular-nums text-muted-foreground">
+              {todayXp} / {dailyGoalXp} XP
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Claim moment — an achieved milestone waiting to be collected. Reward-gold,
           spring-in; claiming advances to the next unclaimed win. */}
       <AnimatePresence mode="popLayout">

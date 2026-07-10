@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sun, Moon, Monitor, Volume2, VolumeX, Mic, MicOff, AlertTriangle, Download, Loader2, Trash2 } from "lucide-react";
+import { Sun, Moon, Monitor, Briefcase, Home as HomeIcon, Sparkles, Volume2, VolumeX, Mic, MicOff, AlertTriangle, Download, Loader2, Trash2 } from "lucide-react";
 import { useSettingsStore, type ThemeMode } from "@/store/useSettingsStore";
-import { navItems } from "@/components/layout/nav-items";
+import type { LearningMode } from "@/types";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -27,6 +27,14 @@ const themeModes: { id: ThemeMode; label: string; icon: typeof Sun }[] = [
   { id: "system", label: "System", icon: Monitor },
 ];
 
+// Lernmodus lens (moved off the header in s-polish). Filters the dashboard
+// intent cards; every learner can still switch it here.
+const learnModes: { id: LearningMode; label: string; icon: typeof Sun }[] = [
+  { id: "work", label: "Beruf", icon: Briefcase },
+  { id: "personal", label: "Alltag", icon: HomeIcon },
+  { id: "both", label: "Beides", icon: Sparkles },
+];
+
 export function Settings() {
   const navigate = useNavigate();
   const settings = useSettingsStore();
@@ -43,26 +51,6 @@ export function Settings() {
 
   const signedIn = status === "signedIn" || status === "anonymous";
   const voices = getGermanVoices();
-  const pinnedTabs = useSettingsStore(s => s.pinnedTabs);
-  const setPinnedTabs = useSettingsStore(s => s.setPinnedTabs);
-
-  const MAX_PINNED = 4;
-  // Items available for pinning (exclude settings itself from the list)
-  const pinnableItems = navItems.filter(i => i.to !== "/settings");
-
-  const togglePin = (path: string) => {
-    if (pinnedTabs.includes(path)) {
-      if (pinnedTabs.length > 1) {
-        setPinnedTabs(pinnedTabs.filter(p => p !== path));
-      }
-    } else {
-      if (pinnedTabs.length < MAX_PINNED) {
-        // Insert in natural navItems order
-        const next = pinnableItems.map(i => i.to).filter(p => [...pinnedTabs, path].includes(p));
-        setPinnedTabs(next);
-      }
-    }
-  };
 
   const handleReset = async () => {
     if (!confirmReset) {
@@ -177,7 +165,32 @@ export function Settings() {
         <Card>
           <CardContent className="space-y-4 p-5">
             <p className="font-semibold">Lernen</p>
-            <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <div>
+                <p className="text-sm font-medium">Lernmodus</p>
+                <p className="text-xs text-muted-foreground">
+                  Worauf dein Tag den Fokus legt: Beruf, Alltag oder beides.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                {learnModes.map(({ id, label, icon: Icon }) => (
+                  <button
+                    key={id}
+                    onClick={() => settings.setSettings({ mode: id })}
+                    className={cn(
+                      "flex flex-1 items-center justify-center gap-2 rounded-lg border py-2.5 text-sm font-medium transition-colors",
+                      settings.mode === id
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border hover:bg-muted/40",
+                    )}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="flex items-center justify-between border-t border-border pt-4">
               <div>
                 <p className="text-sm font-medium">Erst überlegen, dann Optionen</p>
                 <p className="text-xs text-muted-foreground">
@@ -257,91 +270,6 @@ export function Settings() {
                 onCheckedChange={(v) => settings.setSettings({ reducedMotion: v })}
               />
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Navigation customisation */}
-        <Card>
-          <CardContent className="space-y-4 p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="font-semibold">Navigation anpassen</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Wähle bis zu 4 Bereiche für die untere Leiste. "Mehr" ist immer sichtbar.
-                </p>
-              </div>
-              <span className={cn(
-                "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold tabular-nums",
-                pinnedTabs.length >= MAX_PINNED
-                  ? "bg-primary/15 text-primary"
-                  : "bg-muted text-muted-foreground"
-              )}>
-                {pinnedTabs.length}/{MAX_PINNED}
-              </span>
-            </div>
-
-            <div className="space-y-1">
-              {pinnableItems.map(({ to, label, icon: Icon, color, bg }) => {
-                const pinned = pinnedTabs.includes(to);
-                const atMax  = pinnedTabs.length >= MAX_PINNED;
-                const isLast = pinned && pinnedTabs.length === 1;
-                const disabled = isLast || (!pinned && atMax);
-
-                return (
-                  <button
-                    key={to}
-                    onClick={() => togglePin(to)}
-                    disabled={disabled}
-                    className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors",
-                      pinned
-                        ? "bg-[var(--item-bg)]"
-                        : "hover:bg-muted/50",
-                      disabled && "opacity-40 cursor-not-allowed",
-                    )}
-                    style={{ "--item-bg": pinned ? bg : "transparent" } as React.CSSProperties}
-                  >
-                    {/* Icon dot */}
-                    <span
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-                      style={{ background: pinned ? bg : "rgba(0,0,0,.04)" }}
-                    >
-                      <Icon className="h-4 w-4" style={{ color: pinned ? color : "#a0a3b8" }} />
-                    </span>
-
-                    <span className={cn(
-                      "flex-1 text-sm font-medium",
-                      pinned ? "text-foreground" : "text-muted-foreground",
-                    )}>
-                      {label}
-                    </span>
-
-                    {/* Checkbox indicator */}
-                    <span
-                      className={cn(
-                        "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                        pinned
-                          ? "border-[var(--item-color)] bg-[var(--item-color)]"
-                          : "border-border bg-transparent",
-                      )}
-                      style={{ "--item-color": color } as React.CSSProperties}
-                    >
-                      {pinned && (
-                        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                          <polyline points="1.5,5 4,7.5 8.5,2.5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      )}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {pinnedTabs.length >= MAX_PINNED && (
-              <p className="text-xs text-muted-foreground">
-                Maximum erreicht. Entferne einen Bereich, um einen anderen hinzuzufügen.
-              </p>
-            )}
           </CardContent>
         </Card>
 

@@ -243,3 +243,47 @@ cut (Thema/Kategorie/Gruppe). Facet pills in the bottom sheet = orthogonal multi
 - **Cut, don't hoard, dead axes:** `counterpart`/`taskType` (0-tagged forward-declares with no
   authoring plan) were cut in the P3 resolution; the linter errors if rows reintroduce them. Re-declare
   properly if an authoring plan ever exists.
+
+## Heute polish + header/bottom-bar cleanup (session 86, 2026-07-10) — founder-approved
+
+A "panel of experts" review of the Heute screen led to a redesign. The founder approved **Option B**
+(a goal-ring "Momentum" layout) from a 3-mockup HTML Artifact and locked a set of chrome cuts.
+
+**Why these calls:**
+- **Header down to logo · streak · account.** The top row carried six controls; two (theme, mode) are
+  set-once and don't earn permanent header space. Search left the mobile header (⌘K + the desktop Sidebar
+  keep it there; the founder accepted no mobile global-search entry — Bibliothek has its own per-list
+  search). Theme moved into the `AccountMenu` dropdown; **Modus moved into Einstellungen → Lernen** (the
+  founder explicitly did NOT want it in the account dropdown). The "Genauly" wordmark is redundant on an
+  internal screen, so it's mobile-hidden.
+- **Mehr → Einstellungen; the More sheet is gone.** `navItems` has only 5 routes and Settings was the sole
+  unpinned one, so the sheet existed essentially to hold Settings. Making Settings the fixed last tab
+  orphans nothing. With no sheet there is no add/remove, so the three content sections are always visible;
+  the earlier "add a tab" affordance and the Settings "Navigation anpassen" pin-picker were removed. The
+  founder wanted reordering kept, so it survives as a hidden **long-press easter egg** (jiggle + drag only).
+  This is an authorized change to the otherwise-locked mobile bar (the locked rules in CLAUDE.md were
+  updated, not silently broken).
+- **Dedupe every number.** Streak/goal/due each appeared 2–3× and the stat labels truncated
+  ("Tag…/Wör…/Fälli…"). Option B shows each once: streak in the header, goal in the ring, and a real
+  full-width session button. Per the founder's final tweaks the session subtitle is **minutes only** (no
+  "~", no due count) and the account icon dropped its sync dot.
+
+## Heute Üben tab → Neuland city-map path (session 86, 2026-07-10) — founder-approved
+
+Follow-up to the Heute polish. The founder felt the Option-B goal ring on the Üben tab **repeated
+progress** already shown in the header (streak) and the stats line, so progress moved to Fortschritt and
+the Üben tab was reimagined as a **learning path in sync with the Neuland game**.
+
+**Why these calls:**
+- **Üben orients, it doesn't re-report progress.** The daily-goal ring moved to Fortschritt (`/analytics`).
+  The Üben tab now answers "where am I on the journey, what's next" instead of showing XP again.
+- **A pixel bird's-eye city map (Concept C).** Chosen from a 3-concept preview, then iterated: the first
+  render was too crude (labels covering art, no legible route, hard-edged fog), so it became a **proper
+  street-grid city** with background buildings, one clear glowing route, numbered stop-pins with names in a
+  **legend below the map**, and a **"Du bist hier"** pin. Founder later cut the fog entirely (upcoming route
+  is just a dotted line) and centered the legend. Treatment stays flat top-down pixel (canvas drawn low-res,
+  upscaled crisp) to read as a city map.
+- **Synced to real missions.** Kapitel-1 stops (Bahnhof/Laden/Zuhause/Amt) are bound to real mission ids;
+  stop state derives from `missionsDone`, so the map advances as the learner plays. The "Als Nächstes" tile
+  routes the next mission into `/welt?mission=<id>`. Authored per-chapter for now (extend `STOPS`); the map
+  is lazy so Heute keeps no content bank on its eager path.

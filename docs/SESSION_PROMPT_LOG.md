@@ -2291,3 +2291,154 @@ Branch: `claude/whats-next-esga9u`.
   row; Fortschritt became the Option B hero-bar layout, not four rings) and appended this entry. Doc-only;
   shipped via PR → squash-merge → branch realign.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 253).
+
+## Entry 254 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the Heute/Dashboard (mobile, dark).
+- **Prompt (verbatim):**
+  > spin up a panel of experts to brainstorm how to improve this page for a beat quality user experience
+  > which looks like a product by a billion dollar technology giant and is highly polished. try to also see
+  > if any of the top row icons could be removed like search icon and alltag and beruf button.
+- **Response summary:** Traced the page (`AppShell` header + `Dashboard.tsx` + `ModeSwitcher`/`ThemeToggle`/
+  `AccountMenu`). Delivered a six-lens expert critique (product, visual, interaction, growth, a11y, perf)
+  grounded in code: identified the 6-control header, triplicated numbers (streak/due/goal), truncated stat
+  labels, and the invisible mobile CTA (`hidden sm:inline-flex`). Gave an icon-removal verdict table (remove
+  Search + Theme + Mode from header; keep streak/account) and a ranked build list. Asked the founder to lock
+  the icon decisions + scope via `AskUserQuestion`.
+- **Founder answers (via tool):** remove Search; move Theme → Account menu; drop "Genauly" wordmark; remove
+  the Beruf/Alltag/Beides icon from the page and do NOT add it to the account dropdown; scope = "just the
+  brainstorm for now".
+- **Artifacts:** none committed (analysis + decisions only).
+
+## Entry 255 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** image of the typed request.
+- **Prompt (verbatim):**
+  > provide a set of recommendations based on the brainstorming session and provide 3 mockups in a html by
+  > implementing those recommendations.
+- **Response summary:** Pulled the app's real dark tokens and built a published HTML Artifact: a
+  recommendations card set + three phone mockups of the redesigned Heute (Fokus / Momentum / Ruhe), all
+  sharing the cleaned 3-control header, deduped numbers, full-width CTA, and no truncated labels. Rendered
+  in the app palette; theme-aware shell.
+- **Artifacts:** Artifact `heute-mockups.html` (scratchpad; published).
+
+## Entry 256 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none (plus an interrupt message, logged inline).
+- **Prompt (verbatim):**
+  > I like option 2 with a few things to consider:
+  > 1. Reduce the circle size proportionally a little bit
+  > 2. No need of changing any bottom icons and replace the more icon with settings and no need of extra more
+  > menu. you can keep the option to reorder the middle icons as an easter egg. keep the home and settings
+  > icon in fixed position m
+  > 3. see if you can reduce some text compared to what's shown in preview by 10-15%.
+  > prepare a solid and thorough plan to implement this.
+  > [interrupt] also keep the uben/spielen toggle from option a
+- **Response summary:** Read the bottom-bar machinery (`BottomTabBar`, `nav-items`, `MoreSheet`,
+  `route-icons`, `Sidebar`, store, tests) to size the change. Key finding: `navItems` has only 5 routes with
+  Settings the sole unpinned one, so the More sheet exists essentially to hold Settings → replacing Mehr with
+  a Settings tab orphans nothing (desktop Sidebar keeps Settings + search). Delivered a thorough phased plan
+  (header slim-down; bar Settings-replaces-Mehr + reorder-only easter egg; Dashboard Option B; verify + docs)
+  with risks and open questions.
+- **Artifacts:** plan (chat); no code yet.
+
+## Entry 257 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the founder's answers to the plan's three questions.
+- **Prompt (verbatim, from the answer screenshot):**
+  > Modus → In Einstellungen. Mobile search → No, just remove it. Proceed → Refresh mockup first.
+- **Response summary:** Refreshed the published Artifact to the final Option B (single phone + changelog):
+  smaller 128px ring, kept Üben/Spielen toggle, ~12% less copy, header = logo/streak/account, bottom bar
+  Mehr→Einstellungen. Held for sign-off per the "refresh mockup first" choice.
+- **Artifacts:** Artifact `heute-mockups.html` (updated in place).
+
+## Entry 258 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > looks good. no need of x fälling beside the time. Just keep the number of minutes. no need of approx.
+  > character. also, no need of green dot on account settings icon.
+- **Response summary:** Implemented the redesign with the two tweaks baked in. **Header** (`AppShell.tsx`):
+  removed Search + `ThemeToggle` + `ModeSwitcher` + the mobile wordmark; simplified the streak pill (flame +
+  day count, no goal gauge). **`AccountMenu.tsx`:** removed the green sync dot; added a Hell/System/Dunkel
+  theme row. **`BottomTabBar.tsx`:** rewrote so Einstellungen replaces Mehr as the fixed last slot, the More
+  sheet is gone, the three content sections always show and reorder via a long-press easter egg (no +/X, tap
+  anywhere to finish); Home + Einstellungen fixed. **`AppShell`** stopped rendering `MoreSheet`. **Deleted**
+  `MoreSheet.tsx`, `ThemeToggle.tsx`, `ModeSwitcher.tsx`. **`Settings.tsx`:** added the Lernmodus selector to
+  the Lernen card, removed the obsolete "Navigation anpassen" card. **`Dashboard.tsx`:** Option B (goal-ring
+  hero + 7-day heatmap + full-width "Weitermachen" button with a minutes-only subtitle + one slim "Wörter
+  gelernt · Alle Statistiken" line); dropped the duplicated streak/goal/due tiles. Gates green: typecheck,
+  lint (0 errors), test:unit (97), build, check:bundle (74.9 kB, budget 400).
+- **Artifacts:** `src/components/layout/AppShell.tsx`, `src/components/layout/BottomTabBar.tsx`,
+  `src/features/auth/AccountMenu.tsx`, `src/features/settings/Settings.tsx`,
+  `src/features/dashboard/Dashboard.tsx`; deleted `MoreSheet.tsx`/`ThemeToggle.tsx`/`ModeSwitcher.tsx`;
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/DECISIONS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 254–258).
+
+## Entry 259 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the Option-B goal-ring on Heute.
+- **Prompt (verbatim):**
+  > i want you to move this to Fortschritt section and reimagine this section. I think the top row and the
+  > bottom row just above the navigation menu already talks about the progress. There's too much emphasis on
+  > progress here again. I want this section to show a graph or roadmap of the uben exercises. It's even
+  > better if these exercises are directly in sync with the Neuland game. This way the learner has a good
+  > orientation of where they are, and what's next with a high-level overview. Generate a preview considering
+  > this. [then] generate 3 previews
+- **Response summary:** Built a published Artifact with three Üben-tab concepts (all move the goal ring to
+  Fortschritt): **A Lernpfad** (winding Duolingo path), **B Kapitel-Roadmap** (Als-Nächstes hero + chapter
+  cards), **C Neuland-Karte** (stylized game map). Used the real Kapitel-1 mission structure.
+- **Artifacts:** Artifact `uben-roadmap.html`.
+
+## Entry 260 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > i prefer concept c layout. But with following details: 1. The map should show bird's eye view of the
+  > Neuland city map with a roadmap showing various stop points from hbf to home to amt, etc. Use the
+  > pixelated 2D theme within this map layout. 2. For the bottom tile, use the concept b's first tile - but
+  > remove the line "Übt mit mission 1.2..." and swap the positions of Kapital eins and the green text saying
+  > "current level". provide a preview now
+- **Response summary:** Refined Concept C into a single phone: a canvas-drawn pixel city map (buildings,
+  road, route, stops) upscaled crisp, plus the revised hero tile (subtitle removed, Kapitel left, green
+  status right). Republished to the same Artifact URL.
+- **Artifacts:** Artifact `uben-roadmap-c.html`.
+
+## Entry 261 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot of the rendered pixel map.
+- **Prompt (verbatim):**
+  > here's the screenshot. there are several things wrong with this design.
+  > [answers] fix all: art quality/composition, fog + weak current stop, no clear route, labels cover art;
+  > "it should be a proper city map with grid blocks and several other buildings around the focus buildings";
+  > art direction: "you decide".
+- **Response summary:** Named the concrete flaws, then rebuilt the map: a real street grid with blocks +
+  many background buildings, a park and pond, one clear glowing route, numbered stop-pins with the names in
+  a legend BELOW the map (off the art), a bold teardrop "Du bist hier" pin, and soft feathered fog. Kept the
+  pixel top-down treatment. Republished to the same URL.
+- **Artifacts:** Artifact `uben-roadmap-c.html` (rebuilt).
+
+## Entry 262 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > looks good. the location tags below the map should be centered. also, I don't understand why the fog is
+  > necessary - better to remove it abd show the upcoming route with a dotted line. continue to scope the
+  > work and implement the task
+- **Response summary:** Applied the two tweaks to the preview (centered legend, fog removed, upcoming route
+  dotted), then **implemented in the app**. New lazy `features/dashboard/UebenPath.tsx` ports the canvas
+  city map bound to real Kapitel-1 missions (`missions.ts`), state from `missionsDone`, centered legend,
+  "Du bist hier" pin, and the "Als Nächstes" tile (→ `/welt?mission=<id>`). `Dashboard.tsx` slimmed to the
+  toggle + two lazy tabs; the daily-goal ring moved to `Analytics.tsx` (Fortschritt). Gates green:
+  typecheck, lint (0 errors), test:unit (97), build, check:bundle (71.6 kB). Docs updated (CLAUDE.md,
+  PROJECT_STATUS, DECISIONS, this log). Shipped to the branch.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx` (new), `src/features/dashboard/Dashboard.tsx`,
+  `src/features/analytics/Analytics.tsx`; `docs/*`; Artifact `uben-roadmap-c.html`.
