@@ -2791,3 +2791,18 @@ Branch: `claude/whats-next-esga9u`.
   viewport). Gates green (build, lint 0 errors). Shipped as PR #405.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`
   (entry 281); PR #405.
+
+## Entry 282 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > distribute all the components in the page with proper spacing vertically.
+- **Response summary:** The four Üben blocks (title, map, card, pager) were clustering in the top ~65% with
+  dead space above the nav bar. Changed the UebenPath root from `space-y-3` to
+  `flex min-h-[calc(100dvh-15rem)] flex-col justify-between gap-3`, so the blocks distribute evenly down the
+  available height. Measured in-browser: content now fills 151→755px (was 151→681) with even ~37px gaps, and
+  scrollHeight still == viewport (844) so it never scrolls; `gap-3` is a floor so items never touch on short
+  screens. Gates green (build, lint 0 errors). Shipped as PR #406.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`
+  (entry 282); PR #406.
