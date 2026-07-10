@@ -2442,3 +2442,30 @@ Branch: `claude/whats-next-esga9u`.
   PROJECT_STATUS, DECISIONS, this log). Shipped to the branch.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx` (new), `src/features/dashboard/Dashboard.tsx`,
   `src/features/analytics/Analytics.tsx`; `docs/*`; Artifact `uben-roadmap-c.html`.
+
+## Entry 263 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** two live screenshots of the shipped Üben tab (map + account menu).
+- **Prompt (verbatim):**
+  > keeping the high standards and expectations in mind, make this more polished the current version here
+  > looks somewhat unfinished and cheap. take note of all the elements and make sure everything is of
+  > exceptional quality [then, after a first map-only pass:] You're overdoing it. when I said notice every
+  > small detail in the screen.. I meant to check all elements of the page and not the 2D map - for example
+  > the green check and lock need not be on the map, they're already on the legend. Make sure the basics are
+  > right in the map and things are legible and keep it simple - that's one of the main ideas of the 2D map.
+  > However be thorough for other items and components of the page like size and shape of the tiles, spacing
+  > between components, legend's size, etc. [then:] the page outside the 2D map should be top class billion
+  > dollar app
+- **Response summary:** Set up headless-Chromium screenshots (`/opt/pw-browsers`) to iterate on the real
+  render instead of guessing. **Map simplified** per direction: removed the on-map flags/lock seals (state
+  is in the legend), kept it to city + route + "Du bist hier" figure. **Fixed a real layout bug** (Bahnhof
+  was stacked under Laden, so the current-stop banner always collided) by re-laying the stops as a tour
+  (BL→BR→TR→TC) and gluing the banner a fixed gap above the figure with a tail. **Page chrome upgraded to
+  a premium bar:** replaced the pill legend with a proper **stepper** (connected dots, done/current/locked),
+  refined tile (green "Aktuelles Level" tag, no subtitle, larger button), consistent spacing, and made the
+  **map taller** so the hero fills the screen and kills the dead space. Verified the composition + both the
+  mid and fresh-user states via screenshots before porting. Gates green (typecheck, lint 0 errors,
+  test:unit 97, build, bundle 71.6 kB).
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx` (rewritten); `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 263).
