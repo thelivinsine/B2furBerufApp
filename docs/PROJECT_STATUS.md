@@ -232,7 +232,14 @@ errors, test:unit 97, build, check:bundle **74.9 kB** / 400):
   an **"Als Nächstes" tile** (Kapitel left, green status right, no subtitle) sends the next mission →
   `/welt?mission=<id>`. `Dashboard.tsx` is now tiny (toggle + two lazy tabs); the **goal-ring moved to
   Fortschritt** (`Analytics.tsx` Tagesziel card). Option B (goal-ring/heatmap/stat-tiles on Heute) was the
-  intermediate step and is gone. Design contract: the published Artifact `uben-roadmap-c.html`.
+  intermediate step and is gone.
+  - **Polish pass (same session, founder "looks unfinished/cheap"):** stood up headless-Chromium
+    screenshotting (`/opt/pw-browsers`, see the harnesses in scratchpad) to iterate on the real render.
+    The map was **simplified** (removed on-map flags/lock seals; state lives in the legend), the stops were
+    re-laid as a **tour (Bahnhof→Laden→Zuhause→Amt)** so none is stacked under another (fixed a
+    banner-collision bug in the fresh-user state), the pill legend became a proper **stepper** (connected
+    dots, done/current/locked), the tile was refined (green tag, no subtitle, bigger button), and the map
+    was made **taller** so the hero fills the screen. Verified mid + fresh states before porting.
 - **`Settings.tsx`:** added the Lernmodus selector to the Lernen card; removed the obsolete "Navigation
   anpassen" pin-picker card (the new bar has no add/remove).
 - **Deleted:** `MoreSheet.tsx`, `ThemeToggle.tsx`, `ModeSwitcher.tsx`. Docs updated: CLAUDE.md (the locked
