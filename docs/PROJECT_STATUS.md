@@ -1,12 +1,16 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-10 (session 88: **Heute design review implemented** — a 4-reviewer design panel +
-iterated mockup Artifact led to the founder's final direction, shipped as PR #401: the Üben tab's pixel
-canvas + stepper were replaced by a **soft illustrated SVG city map** (route solid to the current stop,
-white dots on completed stops, location pin + "Du bist hier" chip), the mission tile gained a real n/6
-badge + "Jetzt üben" token-gradient CTA + "Wiederholen · N fällig", and the Spielen hub (`NeulandHub`,
-shared with `/welt`) became a centered header + chapter hero with scrim overlay CTA + dense mission
-checklist (done = check + replay, locked Kapitel-2 teaser); AccountMenu alignment/overflow polish.
+_Last updated: 2026-07-10 (session 88: **Heute design review + iterative polish, PRs #401–#409.** A
+4-reviewer design panel + an iterated mockup Artifact set the founder's direction, then ~9 founder rounds
+refined it. **Üben** tab: pixel canvas + stepper replaced by a **soft illustrated SVG city map** (route
+solid to the current stop, white dots on completed stops, location pin + "Du bist hier"), a centered
+"Lernpfad" title, the map as a native 3:2 block matching the Spielen hero (both in a white surface mat), one
+state-aware CTA ("Jetzt üben" gradient / "Wiederholen" grey) with a slide transition, a mobile module pager
+(dots + card swipe, desktop chevrons), and the four blocks distributed evenly with no page scroll.
+**Spielen** hub (`NeulandHub`, shared with `/welt`): centered header + chapter hero with scrim-overlay CTA,
+a dense mission checklist that in the Heute embed is a **fixed 3-row scroll tile** (scrollbar hidden,
+next mission auto-centered on open), Kapitel-2 teaser, and the Schlüssel-Dokumente shelf removed. Plus
+AccountMenu alignment/overflow polish. All behind founder-verified light+dark Playwright checks.
 Prior, session 87: **Heute → Spielen now shows the full Neuland world hub** (shared
 `NeulandHub` extracted from `/welt`, replacing the mission carousel; play still deep-links to `/welt`), and
 the **Neuland game tile was removed from the Anwenden hub**. Prior, session 86: **Heute redesign + header/bottom-bar cleanup** — header slimmed to logo/streak/account (Search/Theme/Mode removed; Theme→account menu; Modus→Einstellungen), bottom bar Mehr→Einstellungen with the More sheet retired and a reorder-only easter egg, and the **Heute Üben tab rebuilt as a pixel Neuland city-map learning path** (the daily-goal ring moved to Fortschritt). Prior, session 85: **Heute page reworked into an Üben/Spielen start page**
@@ -273,8 +277,23 @@ styles incl. two reimagined pixel treatments) through founder feedback to a fina
   5-min revision module when the practice session is roughly as short; `/revision` itself still exists,
   reachable from Fortschritt). The module block (number, state chip, title, CTA) now **slides horizontally**
   (framer-motion, direction-aware, `useReducedMotion`-guarded) when the pager/swipe changes modules.
-- **Ship status:** PR #401 + follow-ups #402, #403 and #404 squash-merged to `main`, branch realigned.
-  **Founder verifies the live site.**
+- **More Üben-card polish (#405):** the completed-module CTA "Wiederholen" renders on plain **`bg-muted`
+  grey** (gradient reserved for "Jetzt üben"), and the green **"Erledigt" badge moved onto the title line**
+  (right-aligned).
+- **Üben vertical distribution (#406):** the Üben root became `flex min-h-[calc(100dvh-15rem)] flex-col
+  justify-between gap-3` so the four blocks (title, map, card, pager) **spread evenly** down the page instead
+  of clustering at the top; still no page scroll.
+- **Spielen crop-and-scroll (#407–#409):** the Heute Spielen mission checklist is now a **fixed 3-row
+  internally-scrollable tile** (`compact` prop on `NeulandHub`; `SpielenHub` passes it, `/welt` does not),
+  scrollbar hidden (`no-scrollbar`), with a `useLayoutEffect` that **auto-centers the next unplayed mission**
+  in the crop on open (uniform `ROW_H`=60, `COMPACT_LIST_H`=180). The header/hero/teaser stay in normal
+  `space-y-4` flow and the page fits without scrolling. The owned-key-item **"Schlüssel-Dokumente" shelf was
+  removed from the hub** (both surfaces; redundant with the in-mission bag).
+- **Ship status:** PRs **#401–#409** all squash-merged to `main` (branch realigned after each). #401 the
+  main redesign; #402 Lernpfad title + pager + map parity; #403 mat + no-scroll + mobile pager; #404 merged
+  state-aware CTA + slide; #405 grey Wiederholen + Erledigt on title line; #406 Üben even distribution;
+  #407 Spielen crop-scroll tile; #408 hidden scrollbar + shelf removal; #409 exact-3-rows + next-mission
+  centering. **Founder verifies the live site** (Pages deploys on each merge; sandbox can't reach `*.github.io`).
 
 **Prior handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game
 tile removed from Anwenden (branch `claude/game-tile-removal-nav-hi37z5`).**
