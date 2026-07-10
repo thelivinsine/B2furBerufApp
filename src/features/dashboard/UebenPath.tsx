@@ -439,12 +439,12 @@ export default function UebenPath() {
         <h2 className="mt-4 text-xl font-extrabold leading-tight tracking-tight">
           {allDone ? "Kapitel 1 geschafft" : nextMission.title}
         </h2>
-        {/* Üben opens a composed practice session scoped to this mission's theme
-            (its vocab/Redemittel/quiz), NOT the game itself. Playing a mission
-            lives under Heute → Spielen (and /welt). */}
+        {/* Üben opens a composed practice session focused on THIS mission (its
+            own vocab + Redemittel first, then theme-related fill), NOT the game
+            itself. Playing a mission lives under Heute → Spielen (and /welt). */}
         <button
           type="button"
-          onClick={() => navigate(`/session?theme=${nextMission.themeId}`)}
+          onClick={() => navigate(`/session?mission=${nextMission.id}`)}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 px-5 py-4 text-[15px] font-extrabold text-white transition active:scale-[0.99]"
           style={{ boxShadow: "0 12px 24px -10px hsl(248 80% 55% / 0.7)" }}
         >

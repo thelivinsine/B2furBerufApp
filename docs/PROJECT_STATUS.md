@@ -224,9 +224,18 @@ carousel), and the **Neuland game tile should be removed from the Anwenden hub**
   import; grid went `lg:grid-cols-4` → `lg:grid-cols-3` for the remaining 3 cards (Sprechen/Schreiben/Prüfung).
 - **`src/features/dashboard/UebenPath.tsx` (follow-up):** the Üben tab's "Als Nächstes" tile button used to
   enter the game (`/welt?mission=<id>`). Founder: the Üben tab should let you **practise a mission's content,
-  not play it**. Button relabelled **"Üben"** and now opens a composed practice session scoped to the next
-  mission's theme (`/session?theme=<mission.themeId>`), reusing the existing session composer's theme scope
-  (biases the vocab/quiz/reading pools). Game entry stays under Heute → Spielen and `/welt`.
+  not play it**. Button relabelled **"Üben"** and opens a composed practice session for the next mission
+  (`/session?mission=<id>`). Game entry stays under Heute → Spielen and `/welt`.
+- **Mission-focused sessions (founder rule: Üben mission N must mirror Spielen mission N):** an early pass
+  only scoped the session to the mission's *theme*, so the words/drills were unrelated to the mission's
+  actual game content. Now `engine/mission.ts` `missionContentIds(mission)` extracts the exact vocab +
+  Redemittel ids the mission's scenes reference (loadout slots, battle moves, item demands, hotspots,
+  automat keys), and `buildSession` gained a `focus` opt: those items are practised **first, regardless of
+  SRS due state**, the random grammar drill is **dropped**, and the rest fills from the mission's theme
+  (quiz/due vocab/reading). `Session.tsx` resolves `?mission=<id>` → `focus` + theme scope; `SessionPlayer`
+  threads it through. Verified in the app: `/session?mission=m_kap1_dach` leads with
+  "die Wohnungsgeberbestätigung" (the word that mission turns on). `tests/engine.test.ts` gained 2 cases
+  (99 total).
 - **Dark mode for the Neuland Heute surfaces (founder chose "Map + Heute tiles"):** in dark mode the Üben
   city map and the Spielen tiles/backdrop used to render as bright light surfaces against the dark app.
   Now theme-aware:
@@ -250,9 +259,10 @@ carousel), and the **Neuland game tile should be removed from the Anwenden hub**
   → `px-5 py-6` + larger inner margins); the **map is cropped to 3:2** (`VIEW_H=117`/`CROP_TOP=24`, with a
   row-skip guard so neither the top decorative band nor the bottom row leaves a sliver) to match the Spielen
   backdrop dimensions; container spacing bumped `space-y-4`→`space-y-5`. Re-verified light + dark, both tabs.
-- Gates green: build, typecheck, lint (0 errors), check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md
-  (bundle note + the locked mobile-bar Spielen + Üben-tile/stepper/3:2 lines + the game-art hub-theming note),
-  this handoff, s85 handoff archived to W28, prompt log 265–268.
+- Gates green: build, typecheck, lint (0 errors), test:unit **99** (2 new: mission focus + `missionContentIds`),
+  check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md (bundle note + the locked mobile-bar Spielen +
+  Üben-tile/stepper/3:2/mission-focus lines + the game-art hub-theming note), this handoff, s85 handoff
+  archived to W28, prompt log 265–269.
 - **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
 
 **Prior handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch

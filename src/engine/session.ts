@@ -102,6 +102,14 @@ export interface BuildSessionOpts {
   difficulty?: Difficulty;
   /** Optional situation scope (a Situationen chip) that biases theme selection. */
   scope?: ThemeId;
+  /**
+   * Mission focus (Heute → Üben "Als Nächstes"): the exact vocab + Redemittel
+   * the linked Neuland mission exercises. When set, these items are practised
+   * first (guaranteed, regardless of SRS due state), the random grammar drill is
+   * dropped, and the rest of the session fills from the mission's theme (quiz,
+   * due vocab, reading), so Üben mission N stays aligned with Spielen mission N.
+   */
+  focus?: { vocabIds: string[]; redemittelIds: string[] };
   /** Vocab ids in the learner's custom deck (#29); each gets a review boost. */
   savedWords?: string[];
   /**
@@ -270,14 +278,58 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
       ]
     : [];
 
-  const blocks = interleave(
-    [vocabBlocks, quizBlocks, grammarBlocks, redeBlocks, speakingBlocks, readingBlocks],
-    limit,
-  );
+  /* --- Mission focus: the exact items the linked mission exercises, practised
+     first and regardless of due state, so Üben mission N mirrors Spielen mission
+     N (founder rule). Missing ids (should not happen; linted) are dropped. --- */
+  const focusVocabBlocks: SessionBlock[] = (opts.focus?.vocabIds ?? [])
+    .map((id) => vocabulary.find((v) => v.id === id))
+    .filter((v): v is (typeof vocabulary)[number] => !!v)
+    .map((v): SessionBlock =>
+      graduatedToTyping(srs[v.id])
+        ? { kind: "typing", key: `ty_${v.id}`, sourceId: v.id, de: v.de, en: v.en, example: v.examples[0]?.de }
+        : {
+            kind: "flashcard",
+            key: `fc_${v.id}`,
+            source: "vocab",
+            sourceId: v.id,
+            de: v.de,
+            en: v.en,
+            example: v.examples[0]?.de,
+          },
+    );
+  const focusRedeBlocks: SessionBlock[] = (opts.focus?.redemittelIds ?? [])
+    .map((id) => redemittel.find((r) => r.id === id))
+    .filter((r): r is (typeof redemittel)[number] => !!r)
+    .map((r): SessionBlock => ({
+      kind: "flashcard",
+      key: `fc_rede_${r.id}`,
+      source: "redemittel",
+      sourceId: r.id,
+      de: r.de,
+      en: r.en,
+      example: r.example.de,
+    }));
+
+  // Focus mode leads with the mission's own items and fills from its theme
+  // (quiz, due vocab, reading); the untethered grammar drill + random Redemittel
+  // are dropped so nothing unrelated to the mission shows up.
+  const blocks = opts.focus
+    ? interleave(
+        [focusVocabBlocks, focusRedeBlocks, quizBlocks, vocabBlocks, readingBlocks, speakingBlocks],
+        limit,
+      )
+    : interleave(
+        [vocabBlocks, quizBlocks, grammarBlocks, redeBlocks, speakingBlocks, readingBlocks],
+        limit,
+      );
 
   const due = dueCount(srs);
-  const preview = buildPreview(due, band, redeBlocks.length);
-  const focus = grammarTopic ? grammarTopic.titleDe : weakLabel(srs, scopeTheme);
+  const preview = buildPreview(due, band, (opts.focus ? focusRedeBlocks : redeBlocks).length);
+  const focus = opts.focus
+    ? (themeById(scopeTheme)?.titleDe ?? weakLabel(srs, scopeTheme))
+    : grammarTopic
+      ? grammarTopic.titleDe
+      : weakLabel(srs, scopeTheme);
 
   return { blocks, minutes, preview, focus };
 }
