@@ -81,19 +81,30 @@ export function PixelStage({
   children,
   className,
   label,
+  themed,
 }: {
   setting: SceneSetting;
   children?: ReactNode;
   className?: string;
   /** Override the where-am-I chip; pass null to hide it. */
   label?: string | null;
+  /**
+   * App-theme aware (hub surfaces only, NOT in-mission scenes which are
+   * light-only): darkens the paper base and dims the bright daytime backdrop
+   * art in dark mode so it doesn't glare against the app shell.
+   */
+  themed?: boolean;
 }) {
   const src = SETTING_ART[setting];
   const caption = label === undefined ? SETTING_LABEL[setting] : label;
   return (
     <div
-      className={cn("relative w-full overflow-hidden", className)}
-      style={{ aspectRatio: "3 / 2", backgroundColor: "#e9e5dd" }}
+      className={cn(
+        "relative w-full overflow-hidden",
+        themed && "bg-[#e9e5dd] dark:bg-[#1b1f28]",
+        className,
+      )}
+      style={{ aspectRatio: "3 / 2", ...(themed ? {} : { backgroundColor: "#e9e5dd" }) }}
     >
       {src && (
         <img
@@ -103,6 +114,9 @@ export function PixelStage({
           className="absolute inset-0 h-full w-full select-none object-cover"
           style={{ imageRendering: "pixelated" }}
         />
+      )}
+      {themed && (
+        <div className="pointer-events-none absolute inset-0 hidden bg-[#0b1220]/45 dark:block" />
       )}
       {caption && (
         <span

@@ -2523,3 +2523,24 @@ Branch: `claude/whats-next-esga9u`.
   Heute → Spielen and `/welt`. One-line behavior change in `UebenPath.tsx`; build + typecheck green.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 266).
+
+## Entry 267 — 2026-07-10 (session 87)
+- **Branch:** `claude/game-tile-removal-nav-hi37z5`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** two dark-mode screenshots (Spielen mission list + Üben pixel city map).
+- **Prompt (verbatim):**
+  > [two screenshots] is it possible to adjust the maps and tiles to dark mode?
+  > [mid-turn] also adapt the tiles design of spielen section based on tile from Üben
+- **Response summary:** Yes. Asked one scoping question (touches the locked "game is light-theme-only"
+  decision); founder chose **Map + Heute tiles** (leave in-mission scenes light). Implemented:
+  (1) **Üben map** `drawCity` now takes `isDark` and switches `DARK_PAL`/`LIGHT_PAL` (deep muted
+  grass/roads/buildings; glowing route + landmarks stay vivid), theme read via a new reactive
+  `useIsDark()` hook in `lib/useTheme.ts`. (2) **Spielen tiles** re-styled from the pixel `GameCard` to the
+  **same app-tile language as the Üben "Als Nächstes" tile** (`bg-surface`/`border-border` + shared soft
+  shadow, gradient play button, theme-aware Boss/Beta badges), so they go dark for free and match Üben.
+  `PixelStage` gained an opt-in `themed` prop (hub only) that dims the bright backdrop art in dark mode;
+  in-mission scenes keep the fixed-light atoms. Verified light + dark on both tabs via headless Chromium.
+  Gates green: build, typecheck, lint 0 errors, bundle 71.7 kB.
+- **Artifacts:** `src/features/welt/NeulandHub.tsx`, `src/features/welt/stage.tsx`,
+  `src/features/dashboard/UebenPath.tsx`, `src/lib/useTheme.ts`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 267).

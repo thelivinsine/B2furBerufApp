@@ -5,7 +5,11 @@ import { missionUnlocked } from "@/engine/mission";
 import { missions, chapters, keyItemById } from "@/data/missions";
 import { useProgressStore } from "@/store/useProgressStore";
 import { Gloss } from "@/features/shared/Gloss";
-import { GameCard, Chip, Pill, PixelStage } from "@/features/welt/stage";
+import { PixelStage } from "@/features/welt/stage";
+
+// The soft, deep tile shadow shared with the Üben "Als Nächstes" tile, so the
+// Spielen mission list reads as the same app-tile language on both themes.
+const TILE_SHADOW = { boxShadow: "0 10px 30px -22px rgba(0,0,0,0.9)" } as const;
 
 /**
  * The Neuland world hub: chapter sections + mission lists straight from the
@@ -40,11 +44,13 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
                   Kapitel {ci + 1} · {chapter.title}
                 </h1>
               </div>
-              <Chip tone="amber">Beta</Chip>
+              <span className="inline-block rounded-lg bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
+                Beta
+              </span>
             </header>
 
-            <PixelStage setting="strasse" label={null} className="rounded-xl">
-              <div className="absolute bottom-2 left-3 rounded-md border-2 border-[#463c44] bg-white/95 px-3 py-1 text-xs font-semibold text-slate-600">
+            <PixelStage setting="strasse" label={null} className="rounded-[20px]" themed>
+              <div className="absolute bottom-2 left-3 rounded-lg border border-border bg-surface/95 px-3 py-1 text-xs font-semibold text-muted-foreground">
                 {chapter.district}
               </div>
             </PixelStage>
@@ -60,32 +66,40 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: Math.min(i * 0.05, 0.2) }}
                   >
-                    <GameCard className="flex items-center gap-3 p-4">
+                    <div
+                      className="flex items-center gap-3 rounded-[20px] border border-border bg-surface p-4"
+                      style={TILE_SHADOW}
+                    >
                       <div className="min-w-0 flex-1 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           {m.boss && (
-                            <Chip tone="indigo">
+                            <span className="inline-flex items-center rounded-lg bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400">
                               <Swords className="mr-1 h-3 w-3" /> Boss
-                            </Chip>
+                            </span>
                           )}
-                          <p className="font-semibold text-slate-800">
+                          <p className="font-semibold text-foreground">
                             {ci + 1}.{m.index} · {m.title}
                           </p>
-                          {done && <Check className="h-4 w-4 text-teal-600" />}
+                          {done && <Check className="h-4 w-4 text-success" />}
                         </div>
-                        <p className="text-sm text-slate-500">
+                        <p className="text-sm text-muted-foreground">
                           <Gloss de={m.brief.de} en={m.brief.en} />
                         </p>
                       </div>
                       {unlocked ? (
-                        <Pill primary onClick={() => onPlay(m)} className="shrink-0">
-                          <Play className="mr-1 inline h-3.5 w-3.5" />
+                        <button
+                          type="button"
+                          onClick={() => onPlay(m)}
+                          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 px-4 py-2 text-sm font-bold text-white transition active:scale-[0.98]"
+                          style={{ boxShadow: "0 8px 18px -8px hsl(248 80% 55% / 0.7)" }}
+                        >
+                          <Play className="h-3.5 w-3.5 fill-current" />
                           {done ? "Nochmal" : "Spielen"}
-                        </Pill>
+                        </button>
                       ) : (
-                        <Lock className="h-4 w-4 shrink-0 text-slate-300" />
+                        <Lock className="h-4 w-4 shrink-0 text-muted-foreground/50" />
                       )}
-                    </GameCard>
+                    </div>
                   </motion.div>
                 );
               })}
