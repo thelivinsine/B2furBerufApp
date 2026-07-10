@@ -1,6 +1,8 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-10 (session 86: **Heute redesign + header/bottom-bar cleanup** — header slimmed to logo/streak/account (Search/Theme/Mode removed; Theme→account menu; Modus→Einstellungen), bottom bar Mehr→Einstellungen with the More sheet retired and a reorder-only easter egg, and the **Heute Üben tab rebuilt as a pixel Neuland city-map learning path** (the daily-goal ring moved to Fortschritt). Prior, session 85: **Heute page reworked into an Üben/Spielen start page**
+_Last updated: 2026-07-10 (session 87: **Heute → Spielen now shows the full Neuland world hub** (shared
+`NeulandHub` extracted from `/welt`, replacing the mission carousel; play still deep-links to `/welt`), and
+the **Neuland game tile was removed from the Anwenden hub**. Prior, session 86: **Heute redesign + header/bottom-bar cleanup** — header slimmed to logo/streak/account (Search/Theme/Mode removed; Theme→account menu; Modus→Einstellungen), bottom bar Mehr→Einstellungen with the More sheet retired and a reorder-only easter egg, and the **Heute Üben tab rebuilt as a pixel Neuland city-map learning path** (the daily-goal ring moved to Fortschritt). Prior, session 85: **Heute page reworked into an Üben/Spielen start page**
 (from the founder's start-page sketch): a new segmented toggle where **Üben** (default) reuses the
 existing composed-session feature plus a store-only four-ring Fortschritt row, and **Spielen** is a
 lazy-loaded Neuland mission carousel deep-linking into `/welt?mission=<id>`. The sidebar + top row are
@@ -206,7 +208,31 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch
+**Handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game
+tile removed from Anwenden (branch `claude/game-tile-removal-nav-hi37z5`).**
+
+Founder: the `/welt`-style Kapitel/mission list should open under **Spielen** in Heute (not the minimal
+carousel), and the **Neuland game tile should be removed from the Anwenden hub**. Implemented:
+- **Extracted the shared `src/features/welt/NeulandHub.tsx`** (the presentational chapter-section +
+  mission-list + Schlüssel-Dokumente view, taking an `onPlay(mission)` callback). `Welt.tsx` now renders
+  it with `onPlay={setActive}` (inline full-screen `MissionPlayer`, focus mode) and is much smaller.
+- **`src/features/dashboard/SpielenHub.tsx` (new, lazy)** replaces `NeulandCarousel.tsx` (deleted): the
+  Spielen tab renders `NeulandHub` with `onPlay` = `navigate('/welt?mission=<id>')`, so play still happens
+  on the `/welt` route where the full-screen player + focus mode are wired (no chrome/z-index regression).
+  Deep-link auto-open in `Welt.tsx` is unchanged. Kept lazy so the mission bank stays off Heute's eager path.
+- **`src/features/anwenden/AnwendenHub.tsx`:** removed the "Neuland" (`/welt`) card + its `Gamepad2`
+  import; grid went `lg:grid-cols-4` → `lg:grid-cols-3` for the remaining 3 cards (Sprechen/Schreiben/Prüfung).
+- **`src/features/dashboard/UebenPath.tsx` (follow-up):** the Üben tab's "Als Nächstes" tile button used to
+  enter the game (`/welt?mission=<id>`). Founder: the Üben tab should let you **practise a mission's content,
+  not play it**. Button relabelled **"Üben"** and now opens a composed practice session scoped to the next
+  mission's theme (`/session?theme=<mission.themeId>`), reusing the existing session composer's theme scope
+  (biases the vocab/quiz/reading pools). Game entry stays under Heute → Spielen and `/welt`.
+- Gates green: build, typecheck, lint (0 errors), check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md
+  (bundle note + the locked mobile-bar Spielen + Üben-tile lines), this handoff, s85 handoff archived to W28,
+  prompt log.
+- **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
+
+**Prior handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch
 `claude/page-polish-icon-review-dbmp0v`).**
 
 Founder ran a "panel of experts" brainstorm on the Heute screen, chose **Option B** from a 3-mockup HTML
@@ -248,43 +274,4 @@ errors, test:unit 97, build, check:bundle **74.9 kB** / 400):
   mobile-bar section + Modus line + bundle note), this handoff, `DECISIONS.md`, prompt-log 254–258.
 - **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
 
-**Prior handoff after session 85 (2026-07-09). Heute page reworked into an Üben/Spielen start page, shipped
-to `main` (branch `claude/genauly-start-page-preview-1ih2vi`).**
-
-Founder shared a hand-drawn "Start page" sketch (Willkommen header + a Spielen/Üben toggle driving either
-a Neuland carousel or a Last-Session + Fortschritt view). Iterated it as an HTML Artifact (Üben first +
-default, minimal Spielen card), then implemented it **scoped to the Dashboard body only** (founder:
-"keep the left sidebar and top row intact, only change the contents within the Heute page").
-- **`src/features/dashboard/Dashboard.tsx`:** added an **Üben/Spielen** segmented toggle (Üben default).
-  **Üben** = a session card reusing `/session` (sized from daily goal + `dueCount`, label toggles
-  Weitermachen/Session starten off the existing `totalSessions` completion hook, **no new persisted
-  state**) + a Fortschritt block. (Two things in this bullet changed in the follow-up passes below: the
-  greeting/orientation ring was initially kept here, then moved to the top row; and the Fortschritt block
-  started as four rings, then became the Option B hero-bar layout.)
-- **`src/features/dashboard/NeulandCarousel.tsx` (new, lazy):** minimal indigo mission carousel over the
-  authored Neuland missions (arrows + dots), same `React.lazy` pattern as the old CityStrip so the
-  mission bank stays off the eager path. "Spielen" → `navigate('/welt?mission=<id>')`.
-- **`src/features/welt/Welt.tsx`:** reads an optional `?mission=` param to auto-open that mission
-  (unchanged when absent; clears the param on exit).
-- **Removed from Heute (founder-confirmed):** the `CityStrip` city strip and the 3 Situationen chips.
-  Both components remain in the repo, just not rendered on Heute.
-- Verified in the real app via Chromium (both tabs render, no page errors). Gates green: build,
-  lint (0 errors), lint:content, test:unit (97), check:bundle (83.8 kB, budget 400). **Founder verifies
-  the live site.** CLAUDE.md bundle note updated (NeulandCarousel is the new lazy Dashboard element).
-- **Follow-up layout pass (same session):** the greeting + the little conic streak/goal ring moved OUT
-  of the Heute body INTO the global top row (`AppShell` header: greeting left, ring right, replacing the
-  old "Willkommen zurück" text + flat streak pill); the Üben/Spielen toggle is now centred; the
-  "Sichere deinen Fortschritt" nudge (`SaveProgressBanner`, new `variant="sidebar"`) moved to the
-  bottom-left of the desktop `Sidebar` (mobile keeps the Heute-top banner via `lg:hidden`); the sidebar's
-  "Bereit für die Prüfung?" card was removed.
-- **Heute Fortschritt redesign (founder chose "Option B" from a comparison Artifact):** the four
-  identical Fortschritt rings were the problem (a count inside a meaningless ring). Replaced with the full
-  Option B: a **Tagesziel hero bar** (gradient progress) + a **7-day activity heatmap** (shaded by each
-  day's XP vs goal, today ringed) + a **3 icon-stat row** (Serie/Wörter/Fällig, told apart by icon +
-  colour), all from the progress store (no bank walk). The header streak icon is now a **horizontal chip**
-  (flame + number + "Tage" side by side, goal ring around the flame) instead of the flame-stacked-on-
-  number ring.
-- **Dedicated Fortschritt page (`/analytics`):** removed the **CityStrip icon tray** (the row of six
-  domain-building icons) from the top, at the founder's request. The `CityStrip` component stays in the
-  repo; it is just no longer rendered on `/analytics`. (An earlier note here mis-stated that the Heute
-  icon-stat row was dropped; it was not, it is the /analytics city strip that was removed.)
+_(Session 85's handoff moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_

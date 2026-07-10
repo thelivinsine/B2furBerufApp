@@ -748,3 +748,46 @@ _Older handoffs (sessions 1–83) are archived by ISO week under `docs/archive/s
 
 **Dev branch:** reassigned each session; realign to `origin/main` after each squash-merge (`main` is
 always the source of truth).
+
+## Session 85 (2026-07-09) — Heute page reworked into an Üben/Spielen start page
+
+**Handoff (shipped to `main`, branch `claude/genauly-start-page-preview-1ih2vi`).**
+
+Founder shared a hand-drawn "Start page" sketch (Willkommen header + a Spielen/Üben toggle driving either
+a Neuland carousel or a Last-Session + Fortschritt view). Iterated it as an HTML Artifact (Üben first +
+default, minimal Spielen card), then implemented it **scoped to the Dashboard body only** (founder:
+"keep the left sidebar and top row intact, only change the contents within the Heute page").
+- **`src/features/dashboard/Dashboard.tsx`:** added an **Üben/Spielen** segmented toggle (Üben default).
+  **Üben** = a session card reusing `/session` (sized from daily goal + `dueCount`, label toggles
+  Weitermachen/Session starten off the existing `totalSessions` completion hook, **no new persisted
+  state**) + a Fortschritt block. (Two things in this bullet changed in the follow-up passes below: the
+  greeting/orientation ring was initially kept here, then moved to the top row; and the Fortschritt block
+  started as four rings, then became the Option B hero-bar layout.)
+- **`src/features/dashboard/NeulandCarousel.tsx` (new, lazy):** minimal indigo mission carousel over the
+  authored Neuland missions (arrows + dots), same `React.lazy` pattern as the old CityStrip so the
+  mission bank stays off the eager path. "Spielen" → `navigate('/welt?mission=<id>')`. (Superseded s87:
+  replaced by `SpielenHub` rendering the shared `NeulandHub` mission list; `NeulandCarousel.tsx` deleted.)
+- **`src/features/welt/Welt.tsx`:** reads an optional `?mission=` param to auto-open that mission
+  (unchanged when absent; clears the param on exit).
+- **Removed from Heute (founder-confirmed):** the `CityStrip` city strip and the 3 Situationen chips.
+  Both components remain in the repo, just not rendered on Heute.
+- Verified in the real app via Chromium (both tabs render, no page errors). Gates green: build,
+  lint (0 errors), lint:content, test:unit (97), check:bundle (83.8 kB, budget 400). **Founder verifies
+  the live site.** CLAUDE.md bundle note updated (NeulandCarousel is the new lazy Dashboard element).
+- **Follow-up layout pass (same session):** the greeting + the little conic streak/goal ring moved OUT
+  of the Heute body INTO the global top row (`AppShell` header: greeting left, ring right, replacing the
+  old "Willkommen zurück" text + flat streak pill); the Üben/Spielen toggle is now centred; the
+  "Sichere deinen Fortschritt" nudge (`SaveProgressBanner`, new `variant="sidebar"`) moved to the
+  bottom-left of the desktop `Sidebar` (mobile keeps the Heute-top banner via `lg:hidden`); the sidebar's
+  "Bereit für die Prüfung?" card was removed.
+- **Heute Fortschritt redesign (founder chose "Option B" from a comparison Artifact):** the four
+  identical Fortschritt rings were the problem (a count inside a meaningless ring). Replaced with the full
+  Option B: a **Tagesziel hero bar** (gradient progress) + a **7-day activity heatmap** (shaded by each
+  day's XP vs goal, today ringed) + a **3 icon-stat row** (Serie/Wörter/Fällig, told apart by icon +
+  colour), all from the progress store (no bank walk). The header streak icon is now a **horizontal chip**
+  (flame + number + "Tage" side by side, goal ring around the flame) instead of the flame-stacked-on-
+  number ring.
+- **Dedicated Fortschritt page (`/analytics`):** removed the **CityStrip icon tray** (the row of six
+  domain-building icons) from the top, at the founder's request. The `CityStrip` component stays in the
+  repo; it is just no longer rendered on `/analytics`. (An earlier note here mis-stated that the Heute
+  icon-stat row was dropped; it was not, it is the /analytics city strip that was removed.)
