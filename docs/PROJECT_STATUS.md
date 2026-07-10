@@ -1,14 +1,18 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-10 (session 89: **Public help/blog section `/hilfe` with SEO prerendering.** A
-login-free, bilingual (DE/EN) help section explaining Üben and Spielen: a `/hilfe` hub + 6 articles
-(`src/features/help/`, all lazy), reached from the landing + Settings footers. Genuinely SEO-friendly via a
-new build-time prerender (`scripts/prerender-help.mjs`, chained into `pnpm build`) that emits a real static
-HTML file per page into `dist/hilfe/…` with unique title/description/canonical, OG/Twitter tags, Article +
-BreadcrumbList + FAQPage JSON-LD, the full German text baked into `#root`, and a regenerated `sitemap.xml`
-(12 URLs). One bilingual content bank (`content.ts`) feeds both the React reader and the prerender. Gates
-green (build+prerender, lint, lint:content, 99 tests, bundle 72.6 kB). Shipped as PR #411, squash-merged to
-`main` (Pages deploy runs the prerender in CI); founder verifies the live site.**
+_Last updated: 2026-07-10 (session 90: **Heute Üben/Spielen tile parity + subtle section color.** The Üben
+map tile and the Spielen chapter-hero tile now share the exact same dimensions AND screen position (both
+353px from top, 245×358px measured), so toggling tabs no longer shifts the tile: Üben's header + map are
+pinned to the top with a fixed 1rem gap and the module pager is pushed to the bottom (`mt-auto`), keeping
+the no-scroll phone fit. Added a subtle per-section color theme: the active toggle button + the tile-mat
+border are tinted (**Üben = orange**, distinct from Spielen's teal and the green done-cues; **Spielen =
+teal/accent**), and the active toggle icon is now **filled for either tab** (was Spielen-only). Shipped as
+PR #413, squash-merged to `main`; branch realigned.**
+Prior, session 89: **Public help/blog section `/hilfe` with SEO prerendering.** A login-free, bilingual
+(DE/EN) help section explaining Üben and Spielen (a `/hilfe` hub + 6 lazy articles), genuinely SEO-friendly
+via a build-time prerender (`scripts/prerender-help.mjs`, chained into `pnpm build`) emitting static HTML
+per page (unique meta + Article/BreadcrumbList/FAQPage JSON-LD + full text in `#root`) and a regenerated
+`sitemap.xml`. Shipped as PR #411, squash-merged to `main`.
 Prior, session 88: **Heute design review + iterative polish, PRs #401–#409.** A
 4-reviewer design panel + an iterated mockup Artifact set the founder's direction, then ~9 founder rounds
 refined it. **Üben** tab: pixel canvas + stepper replaced by a **soft illustrated SVG city map** (route
@@ -228,7 +232,35 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
+**Handoff after session 90 (2026-07-10). Heute Üben/Spielen tile parity + subtle section color theme
+(branch `claude/ueben-spielen-layout-styling-h7fsvm`, PR #413).**
+
+Founder: "keep the map/photo tile in üben/spielen same dimensions and fix them both in same position on the
+screen. Also add a subtle color theme for the toggle buttons and the border padding." Then two follow-ups:
+"use some other color instead of violet for üben" and "fill the üben icon when selected similar to spielen."
+- **Tile parity (the core ask):** the tiles were already the same size (both 3:2 in a `p-2` surface mat,
+  both inside the Dashboard `mx-auto max-w-md` wrapper), but their **screen position differed**: `UebenPath`
+  used `flex … justify-between` (which pushed the map down) while the compact `NeulandHub` was top-aligned.
+  Fix: Üben's header + map are now **pinned to the top with a fixed `gap-4` (1rem)** matching Spielen, and
+  the module pager is pushed to the bottom with **`mt-auto`** so the tab still fills the viewport without
+  scrolling (the s88 "distribute evenly" rule is superseded by this explicit position request). Measured in
+  a headless browser at 390×844: **both tiles sit at `tileTop=353`, `245×358px`, `gap=16` below
+  identically-positioned (`h1Top=305`) titles** in both tabs. No jump on toggle.
+- **Subtle section color theme:** the active toggle button (`Dashboard.tsx`) lifts on the white pill and
+  picks up a per-section tint, and the **tile-mat border** matches it. **Üben = orange** (`text-orange-500`
+  + `border-orange-400/40`) chosen over the original indigo/primary after the founder's "not violet" note,
+  and kept distinct from Spielen's teal and from the green done/Erledigt cues on the same screen. **Spielen =
+  teal/accent** (`text-accent` + `border-accent/20`, applied in `NeulandHub` so `/welt` gets it too). The
+  white `bg-surface` mat is preserved (only the border is tinted).
+- **Filled active toggle icon:** the selected tab's icon fill was Spielen-only; now `tab === id &&
+  "fill-current"` fills **either** tab, so the active Zap (Üben) matches the active Play (Spielen).
+- Gates green: build, lint 0 errors, `check:bundle` **72.7 kB** / 400. Verified both tabs via Playwright
+  (screenshots + measured bounding-box parity).
+- **Ship status:** shipped as **PR #413**, squash-merged to `main` (`2bbb055`); branch realigned to
+  `origin/main` after the merge (force-with-lease, clean). **Founder verifies the live site** (Pages deploys
+  on merge; sandbox can't reach `*.github.io`).
+
+**Prior handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
 (branch `claude/blog-help-uben-spielen-wtbnq8`).**
 
 Founder wanted "comprehensive blog/help pages explaining the Üben/Spielen part of the app," SEO-friendly
@@ -264,80 +296,4 @@ approach (`boot-seo`, JSON-LD, sitemap).
   client-side; could emit EN variants + `hreflang` if EN search matters); articles cover Kapitel 1 only
   (add per-Kapitel deep dives as Neuland grows); no per-article `og:image` (inherits the site card).
 
-**Prior handoff after session 88 (2026-07-10). Heute design review + final direction implemented (branch
-`claude/landing-page-design-review-ys5jck`, PR #401).**
-
-Founder asked for a senior-designer review of the logged-in start page (screenshots of Üben, Spielen and
-the account dropdown), explicitly requesting a **panel of subagents**. Ran 4 parallel reviewers (visual
-craft, UX/IA, detail polish, Spielen), each grounding findings in the actual code; synthesized a ranked
-top-10. Then iterated an HTML mockup Artifact (8 phone mockups: 3 Üben, 3 Spielen, 2 dropdown, plus 3 map
-styles incl. two reimagined pixel treatments) through founder feedback to a final direction, and shipped it:
-- **Üben (`UebenPath.tsx`, rewritten):** the green stepper is **retired** (founder); the map alone carries
-  the journey. The low-res pixel canvas was replaced by a **soft illustrated SVG map** (360×230 viewBox):
-  rounded streets, colored landmark tiles with white glyphs + labels (Bahnhof indigo, Laden coral, Zuhause
-  amber, Amt teal), all inside blocks, never on a street. The **indigo route runs solid to the current stop
-  and dotted onward**, every **completed stop gets a white route dot**, and a **location pin** (pulse ring +
-  app-chrome "Du bist hier" chip floating above it) replaced the pixel character. Theme-aware via
-  `MAP_LIGHT`/`MAP_DARK` + `hsl(var(--primary))` in-SVG. Mission tile: "Aktuelles Level" → real **"n / 6"**
-  badge in accent (green stays "done"), CTA relabelled **"Jetzt üben"** on the token gradient
-  (`bg-accent-gradient` + `shadow-glow`, replacing the hand-rolled indigo/violet + off-hue glow), plus a
-  ghost **"Wiederholen · N fällig"** button (`dueCount` → `/revision`). Radii/shadows tokenized.
-- **Spielen (`NeulandHub.tsx`, rewritten; shared with `/welt`):** header **hoisted out of the chapter loop**
-  (kills the duplicate-H1/hero trap when Kapitel 2 ships) and **centered** ("Neuland" + neutral Beta chip;
-  the amber chip sat on the reserved reward-gold hue). The hero got a **scrim overlay** (Kapitel eyebrow,
-  district title, "n / 6 Missionen" chip, **"Mission spielen"** CTA for the next unlocked mission). The
-  mission list is one dense **checklist card**: tabular number column (fixes mid-compound wraps), done rows
-  = green check **+ quiet replay icon button**, next = the single loud gradient play control, locked = Lock,
-  boss tag inline. Footer filler sentence → **locked "Kapitel 2 · Wohnen" teaser card** (chapters registry).
-- **`AccountMenu.tsx`:** card `w-60`→`w-72` + `shadow-elevated-soft`; theme pills → `grid-cols-3` with
-  `px-1`/`min-w-0`/truncate (can't clip under font scaling); Einstellungen/Abmelden/auth rows get `px-2`
-  so all left edges align; Abmelden calmed to `text-danger/80`.
-- **`Dashboard.tsx`:** Suspense fallback reshaped to the real Üben silhouette (3:2 map + tile), no jump.
-- Gates green: build, lint 0 errors, test:unit 99, bundle **71.9 kB** / 400. Verified light + dark + the
-  dropdown via headless Chromium with mid-journey progress seeded (route to the Zuhause pin, white dots on
-  Bahnhof/Laden/Amt); no page errors. Mockups live at the session Artifact (final direction + map styles).
-- **Review findings NOT yet implemented (follow-up candidates):** the sync-banner layout/fold cost and its
-  contradiction with the menu's "Synchronisiert" for anonymous users (incl. `useAuthStore.ts:79` falling
-  back to `signedOut` on a failed session restore, which can show the sign-in nag to a signed-in user),
-  mobile logo linking to `/welcome`, bottom-bar Bibliothek/Fortschritt icon twinning + optical size,
-  streak pill carrying today's XP, and a due-review chip on Heute (partially covered by the new
-  Wiederholen button).
-- **Follow-up round (same session, founder):** a centered **"Lernpfad" title** on Üben (mirrors the Spielen
-  "Neuland" header row), the map made a **native 3:2 block** (360×240 viewBox, mat padding dropped) so it has
-  the SAME dimensions + screen position as the Spielen hero, and a **left/right module pager** at the bottom
-  (chevrons + per-mission dots: active = primary pill, done = success) that flips the practice card through
-  every Kapitel-1 mission (number + Als-Nächstes/Erledigt state chip; CTA → `/session?mission=<selected>`;
-  the map pin never moves, progress truth). Verified via Playwright (pager click-through + tab comparison).
-- **Second follow-up (same session, founder):** the **white surface mat came back** around the Üben map AND
-  now frames the Spielen hero too (`bg-surface p-2 rounded-2xl` on both, so dimensions/positions stay
-  identical); spacing tightened so the whole Üben tab **fits a phone viewport with zero scrolling**
-  (verified: scrollHeight == viewport at 390×844; root `space-y-3`, compact card paddings, Dashboard
-  `space-y-4`); the pager's **chevrons are desktop-only**, on mobile the dots (32px tap targets) plus a new
-  **horizontal swipe on the practice card** navigate modules; the hero overlay type was tightened so
-  "Bahnhofsviertel" no longer truncates inside the mat.
-- **Third follow-up (same session, founder):** the practice card's two buttons merged into **ONE
-  state-aware CTA**: "Jetzt üben" for a new module, "Wiederholen" (RotateCcw icon) for a completed one,
-  both opening the same mission-focused session (`/session?mission=<selected>`); the separate
-  "Wiederholen · N fällig" → `/revision` entry was removed from the card (founder: no need for a separate
-  5-min revision module when the practice session is roughly as short; `/revision` itself still exists,
-  reachable from Fortschritt). The module block (number, state chip, title, CTA) now **slides horizontally**
-  (framer-motion, direction-aware, `useReducedMotion`-guarded) when the pager/swipe changes modules.
-- **More Üben-card polish (#405):** the completed-module CTA "Wiederholen" renders on plain **`bg-muted`
-  grey** (gradient reserved for "Jetzt üben"), and the green **"Erledigt" badge moved onto the title line**
-  (right-aligned).
-- **Üben vertical distribution (#406):** the Üben root became `flex min-h-[calc(100dvh-15rem)] flex-col
-  justify-between gap-3` so the four blocks (title, map, card, pager) **spread evenly** down the page instead
-  of clustering at the top; still no page scroll.
-- **Spielen crop-and-scroll (#407–#409):** the Heute Spielen mission checklist is now a **fixed 3-row
-  internally-scrollable tile** (`compact` prop on `NeulandHub`; `SpielenHub` passes it, `/welt` does not),
-  scrollbar hidden (`no-scrollbar`), with a `useLayoutEffect` that **auto-centers the next unplayed mission**
-  in the crop on open (uniform `ROW_H`=60, `COMPACT_LIST_H`=180). The header/hero/teaser stay in normal
-  `space-y-4` flow and the page fits without scrolling. The owned-key-item **"Schlüssel-Dokumente" shelf was
-  removed from the hub** (both surfaces; redundant with the in-mission bag).
-- **Ship status:** PRs **#401–#409** all squash-merged to `main` (branch realigned after each). #401 the
-  main redesign; #402 Lernpfad title + pager + map parity; #403 mat + no-scroll + mobile pager; #404 merged
-  state-aware CTA + slide; #405 grey Wiederholen + Erledigt on title line; #406 Üben even distribution;
-  #407 Spielen crop-scroll tile; #408 hidden scrollbar + shelf removal; #409 exact-3-rows + next-mission
-  centering. **Founder verifies the live site** (Pages deploys on each merge; sandbox can't reach `*.github.io`).
-
-_(Sessions 85-86's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
+_(Sessions 85-88's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
