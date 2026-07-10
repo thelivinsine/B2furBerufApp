@@ -38,7 +38,7 @@ export function Dashboard() {
       >
         {(
           [
-            { id: "ueben", label: "Üben", Icon: Dumbbell, tint: "text-accent", fillActive: false },
+            { id: "ueben", label: "Üben", Icon: Dumbbell, tint: "text-accent", fillActive: true },
             { id: "spielen", label: "Spielen", Icon: Play, tint: "text-orange-500", fillActive: true },
           ] as const
         ).map(({ id, label, Icon, tint, fillActive }) => (
@@ -60,10 +60,9 @@ export function Dashboard() {
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {/* Play fills solid when active (matches its game feel); the
-                Dumbbell is a line icon that turns to a blob if filled, so it
-                stays stroked and relies on the tint + lifted pill for the
-                active state. */}
+            {/* Both active icons fill solid (`fillActive`): the Play triangle
+                and the Dumbbell's weight plates, so the selected tab reads as
+                filled on the lifted white pill. */}
             <Icon className={cn("h-4 w-4", fillActive && tab === id && "fill-current")} />
             {label}
           </button>
