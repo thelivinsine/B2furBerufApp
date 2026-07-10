@@ -7,7 +7,8 @@ new build-time prerender (`scripts/prerender-help.mjs`, chained into `pnpm build
 HTML file per page into `dist/hilfe/…` with unique title/description/canonical, OG/Twitter tags, Article +
 BreadcrumbList + FAQPage JSON-LD, the full German text baked into `#root`, and a regenerated `sitemap.xml`
 (12 URLs). One bilingual content bank (`content.ts`) feeds both the React reader and the prerender. Gates
-green (build+prerender, lint, lint:content, 99 tests, bundle 72.6 kB). Pushed to the branch, not yet merged.**
+green (build+prerender, lint, lint:content, 99 tests, bundle 72.6 kB). Shipped as PR #411, squash-merged to
+`main` (Pages deploy runs the prerender in CI); founder verifies the live site.**
 Prior, session 88: **Heute design review + iterative polish, PRs #401–#409.** A
 4-reviewer design panel + an iterated mockup Artifact set the founder's direction, then ~9 founder rounds
 refined it. **Üben** tab: pixel canvas + stepper replaced by a **soft illustrated SVG city map** (route
@@ -255,10 +256,13 @@ approach (`boot-seo`, JSON-LD, sitemap).
 - **Discovery links:** landing footer + Settings footer both gained a "Hilfe" entry.
 - Gates green: build + prerender (7 pages), typecheck, ESLint 0, `lint:content` pass, `test:unit` 99/99,
   `check:bundle` **72.6 kB** / 400 (help is lazy, main chunk unchanged).
+- **Ship status:** shipped as **PR #411**, squash-merged to `main`; branch realigned to `origin/main`
+  after the merge. The Pages workflow runs `pnpm build` (which now includes the prerender), so the static
+  `/hilfe` pages + `sitemap.xml` publish automatically. **Founder verifies the live site** (sandbox can't
+  reach `*.github.io`; check `https://genauly.de/hilfe/ueben` "View source" shows the article text in raw HTML).
 - **NOT done / follow-up candidates:** prerender emits the German snapshot only (the `?lang` toggle is
   client-side; could emit EN variants + `hreflang` if EN search matters); articles cover Kapitel 1 only
   (add per-Kapitel deep dives as Neuland grows); no per-article `og:image` (inherits the site card).
-  **Not yet merged to `main`** (pushed to the branch; open a PR to deploy).
 
 **Prior handoff after session 88 (2026-07-10). Heute design review + final direction implemented (branch
 `claude/landing-page-design-review-ys5jck`, PR #401).**
