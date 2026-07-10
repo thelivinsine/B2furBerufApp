@@ -2485,3 +2485,24 @@ Branch: `claude/whats-next-esga9u`.
   via PR → squash-merge → branch realign.
 - **Artifacts:** `preview/heute-redesign/*` (5 files); `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 264).
+
+## Entry 265 — 2026-07-10 (session 87)
+- **Branch:** `claude/game-tile-removal-nav-hi37z5`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** one screenshot of the `/welt` Kapitel 1 · Ankommen mission list.
+- **Prompt (verbatim):**
+  > [screenshot] this screen should open under spielen in heute page. get rid of the game tile in Anwenden
+  > screen
+- **Response summary:** Made Heute → **Spielen** render the full Neuland world hub (the same chapter +
+  mission list as `/welt`, matching the screenshot) instead of the minimal mission carousel, and **removed
+  the "Neuland" game tile from the Anwenden hub**. Extracted the shared presentational
+  `src/features/welt/NeulandHub.tsx` (chapter sections + mission list + Schlüssel-Dokumente, `onPlay`
+  callback); `Welt.tsx` uses it with the inline full-screen `MissionPlayer`; new lazy
+  `src/features/dashboard/SpielenHub.tsx` uses it with `onPlay = navigate('/welt?mission=<id>')` so play
+  still happens on `/welt` (focus mode + full-screen player intact, no z-index/chrome regression).
+  `NeulandCarousel.tsx` deleted. `AnwendenHub.tsx` lost the `/welt` card (grid `lg:grid-cols-4`→`3`). Gates
+  green: build, typecheck, lint 0 errors, check:bundle 71.7 kB / 400.
+- **Artifacts:** `src/features/welt/NeulandHub.tsx` (new), `src/features/dashboard/SpielenHub.tsx` (new),
+  `src/features/welt/Welt.tsx`, `src/features/dashboard/Dashboard.tsx`, `src/features/anwenden/AnwendenHub.tsx`,
+  `src/features/dashboard/NeulandCarousel.tsx` (deleted); `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md` (entry 265).

@@ -5,9 +5,10 @@ import { cn } from "@/lib/utils";
 
 // Both tabs import the mission bank, so they load lazily to keep the content
 // bank off the Dashboard's eager path (bundle budget, CLAUDE.md). Üben is the
-// Neuland journey map; Spielen is the mission carousel.
+// Neuland journey map; Spielen is the Neuland world hub (the same mission list
+// as /welt), which deep-links back to /welt to play a mission full-screen.
 const UebenPath = lazy(() => import("./UebenPath"));
-const NeulandCarousel = lazy(() => import("./NeulandCarousel"));
+const SpielenHub = lazy(() => import("./SpielenHub"));
 
 type HeuteTab = "ueben" | "spielen";
 
@@ -65,7 +66,7 @@ export function Dashboard() {
           className="mx-auto max-w-md"
         >
           <Suspense fallback={fallback}>
-            {tab === "ueben" ? <UebenPath /> : <NeulandCarousel />}
+            {tab === "ueben" ? <UebenPath /> : <SpielenHub />}
           </Suspense>
         </motion.div>
       </AnimatePresence>

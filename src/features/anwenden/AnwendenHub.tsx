@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Target, Mic, PenLine, GraduationCap, Gamepad2, ChevronRight, type LucideIcon } from "lucide-react";
+import { Target, Mic, PenLine, GraduationCap, ChevronRight, type LucideIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { HubHero } from "@/components/shared/HubHero";
 import { cn } from "@/lib/utils";
@@ -38,14 +38,6 @@ const CARDS: {
     title: "Prüfung",
     desc: "Ein kompletter Prüfungsdurchlauf unter realistischen Bedingungen und mit Zeitdruck.",
   },
-  {
-    to: "/welt",
-    icon: Gamepad2,
-    gradient: "from-indigo-500 to-violet-500",
-    title: "Neuland",
-    desc: "Das Spiel: Lebe dein erstes Jahr in Deutschland. Kapitel 1 startet im Bürgeramt.",
-    badge: "Beta",
-  },
 ];
 
 export function AnwendenHub() {
@@ -58,7 +50,7 @@ export function AnwendenHub() {
         title="Wissen anwenden"
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CARDS.map((card, i) => (
           <motion.div
             key={card.to}
