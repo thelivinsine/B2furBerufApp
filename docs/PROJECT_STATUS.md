@@ -4,10 +4,10 @@ _Last updated: 2026-07-10 (session 90: **Heute Üben/Spielen tile parity + subtl
 map tile and the Spielen chapter-hero tile now share the exact same dimensions AND screen position (both
 353px from top, 245×358px measured), so toggling tabs no longer shifts the tile: Üben's header + map are
 pinned to the top with a fixed 1rem gap and the module pager is pushed to the bottom (`mt-auto`), keeping
-the no-scroll phone fit. Added a subtle per-section color theme: the active toggle button + the tile-mat
-border are tinted (**Üben = orange**, distinct from Spielen's teal and the green done-cues; **Spielen =
-teal/accent**), and the active toggle icon is now **filled for either tab** (was Spielen-only). Shipped as
-PR #413, squash-merged to `main`; branch realigned.**
+the no-scroll phone fit. Added a subtle per-section color theme on the toggle only (**Üben = teal/accent +
+a dumbbell icon, Spielen = orange + a play icon**; the tile mats keep a shared neutral gray `border-border`
+after the founder found colored borders read poorly). Shipped across PRs #413/#414/#415, squash-merged to
+`main`.**
 Prior, session 89: **Public help/blog section `/hilfe` with SEO prerendering.** A login-free, bilingual
 (DE/EN) help section explaining Üben and Spielen (a `/hilfe` hub + 6 lazy articles), genuinely SEO-friendly
 via a build-time prerender (`scripts/prerender-help.mjs`, chained into `pnpm build`) emitting static HTML
@@ -246,19 +246,24 @@ screen. Also add a subtle color theme for the toggle buttons and the border padd
   scrolling (the s88 "distribute evenly" rule is superseded by this explicit position request). Measured in
   a headless browser at 390×844: **both tiles sit at `tileTop=353`, `245×358px`, `gap=16` below
   identically-positioned (`h1Top=305`) titles** in both tabs. No jump on toggle.
-- **Subtle section color theme:** the active toggle button (`Dashboard.tsx`) lifts on the white pill and
-  picks up a per-section tint, and the **tile-mat border** matches it. **Üben = orange** (`text-orange-500`
-  + `border-orange-400/40`) chosen over the original indigo/primary after the founder's "not violet" note,
-  and kept distinct from Spielen's teal and from the green done/Erledigt cues on the same screen. **Spielen =
-  teal/accent** (`text-accent` + `border-accent/20`, applied in `NeulandHub` so `/welt` gets it too). The
-  white `bg-surface` mat is preserved (only the border is tinted).
-- **Filled active toggle icon:** the selected tab's icon fill was Spielen-only; now `tab === id &&
-  "fill-current"` fills **either** tab, so the active Zap (Üben) matches the active Play (Spielen).
+- **Subtle section color theme (final state after several founder rounds):** the active toggle button
+  (`Dashboard.tsx`) lifts on the white pill and picks up a per-section tint. **Üben = teal/accent
+  (`text-accent`) + a `Dumbbell` icon; Spielen = orange (`text-orange-500`) + a `Play` icon.** (History
+  this session: first shipped Üben=indigo/Spielen=teal, then Üben recolored to orange on the founder's "not
+  violet" note, then the two **swapped** to the final teal/orange, and Üben's `Zap` bolt replaced by the
+  dumbbell.) Only **Play** fills when active (`fillActive` flag) — a filled `Dumbbell` line icon becomes a
+  blob, so it stays stroked.
+- **Tile-mat border is neutral gray:** the s90 experiment with per-section colored mat borders was
+  reverted at the founder's request ("colored borders don't look good"); both the Üben map mat and the
+  Spielen hero mat use the shared muted **`border-border`**. The white `bg-surface` mat is preserved; the
+  section color lives on the toggle only.
+- **Filled active icon:** Spielen's `Play` fills when active (matches its game feel); the Üben dumbbell
+  stays stroked (see above).
 - Gates green: build, lint 0 errors, `check:bundle` **72.7 kB** / 400. Verified both tabs via Playwright
   (screenshots + measured bounding-box parity).
-- **Ship status:** shipped as **PR #413**, squash-merged to `main` (`2bbb055`); branch realigned to
-  `origin/main` after the merge (force-with-lease, clean). **Founder verifies the live site** (Pages deploys
-  on merge; sandbox can't reach `*.github.io`).
+- **Ship status:** shipped across **PRs #413 (core), #414 (docs), #415 (color swap + neutral borders +
+  dumbbell)**, all squash-merged to `main` (branch realigned after each; final `main` at `f172f73`).
+  **Founder verifies the live site** (Pages deploys on merge; sandbox can't reach `*.github.io`).
 
 **Prior handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
 (branch `claude/blog-help-uben-spielen-wtbnq8`).**
