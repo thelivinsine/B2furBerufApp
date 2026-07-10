@@ -1,6 +1,14 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-10 (session 88: **Heute design review + iterative polish, PRs #401–#409.** A
+_Last updated: 2026-07-10 (session 89: **Public help/blog section `/hilfe` with SEO prerendering.** A
+login-free, bilingual (DE/EN) help section explaining Üben and Spielen: a `/hilfe` hub + 6 articles
+(`src/features/help/`, all lazy), reached from the landing + Settings footers. Genuinely SEO-friendly via a
+new build-time prerender (`scripts/prerender-help.mjs`, chained into `pnpm build`) that emits a real static
+HTML file per page into `dist/hilfe/…` with unique title/description/canonical, OG/Twitter tags, Article +
+BreadcrumbList + FAQPage JSON-LD, the full German text baked into `#root`, and a regenerated `sitemap.xml`
+(12 URLs). One bilingual content bank (`content.ts`) feeds both the React reader and the prerender. Gates
+green (build+prerender, lint, lint:content, 99 tests, bundle 72.6 kB). Pushed to the branch, not yet merged.**
+Prior, session 88: **Heute design review + iterative polish, PRs #401–#409.** A
 4-reviewer design panel + an iterated mockup Artifact set the founder's direction, then ~9 founder rounds
 refined it. **Üben** tab: pixel canvas + stepper replaced by a **soft illustrated SVG city map** (route
 solid to the current stop, white dots on completed stops, location pin + "Du bist hier"), a centered
@@ -219,7 +227,40 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 88 (2026-07-10). Heute design review + final direction implemented (branch
+**Handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
+(branch `claude/blog-help-uben-spielen-wtbnq8`).**
+
+Founder wanted "comprehensive blog/help pages explaining the Üben/Spielen part of the app," SEO-friendly
+plus in-app support. Built a login-free help section outside the AppShell (like `/about`), bilingual
+DE/EN toggle, with **build-time prerendering to static HTML** so all crawlers (not just Google's JS
+renderer) and social previews see full content, matching the project's existing "raw HTML for crawlers"
+approach (`boot-seo`, JSON-LD, sitemap).
+- **Content bank `src/features/help/content.ts`** (one bilingual source for both the React reader and the
+  prerender script): a `/hilfe` hub (intro + FAQ) + **6 articles** grouped in 3 categories (Grundlagen /
+  Üben / Spielen): `erste-schritte`, `ueben`, `spielen-neuland`, `neuland-kapitel-missionen`,
+  `spaced-repetition`, `ueben-und-spielen`. Blocks are a small closed union (p/h2/h3/ul/steps/note) +
+  optional per-article FAQ + related links. No em dashes.
+- **React reader** (all lazy, off the eager path): `HelpChrome.tsx` (shared shell: logo header, breadcrumb,
+  DE/EN toggle, `HelpBlocks` renderer), `HelpHub.tsx` (`/hilfe`, grouped cards + FAQ), `HelpArticle.tsx`
+  (`/hilfe/:slug`, body + FAQ + related; unknown slug → redirect to `/hilfe`). Public routes added to
+  `router.tsx` outside `RequireOnboarding`/AppShell.
+- **Prerender `scripts/prerender-help.mjs`** (chained into `build`: `tsc -b && vite build && node
+  scripts/prerender-help.mjs`; loads the content bank via Vite `ssrLoadModule` like `lint-content.mjs`):
+  for the hub + each article it emits `dist/hilfe/<slug>/index.html` from the built `index.html` template
+  with a unique `<title>`, meta description, canonical, OG/Twitter tags, **Article + BreadcrumbList (+
+  FAQPage) JSON-LD**, and the full German article text baked into `#root` as semantic HTML (React clears it
+  on boot; real users get the SPA). It also **regenerates `dist/sitemap.xml`** (12 URLs: 5 static + hub + 6
+  articles). Verified generated HTML: correct per-page title/canonical/description/JSON-LD, root
+  `index.html` left untouched (WebApplication + landing FAQ intact).
+- **Discovery links:** landing footer + Settings footer both gained a "Hilfe" entry.
+- Gates green: build + prerender (7 pages), typecheck, ESLint 0, `lint:content` pass, `test:unit` 99/99,
+  `check:bundle` **72.6 kB** / 400 (help is lazy, main chunk unchanged).
+- **NOT done / follow-up candidates:** prerender emits the German snapshot only (the `?lang` toggle is
+  client-side; could emit EN variants + `hreflang` if EN search matters); articles cover Kapitel 1 only
+  (add per-Kapitel deep dives as Neuland grows); no per-article `og:image` (inherits the site card).
+  **Not yet merged to `main`** (pushed to the branch; open a PR to deploy).
+
+**Prior handoff after session 88 (2026-07-10). Heute design review + final direction implemented (branch
 `claude/landing-page-design-review-ys5jck`, PR #401).**
 
 Founder asked for a senior-designer review of the logged-in start page (screenshots of Üben, Spielen and
@@ -294,65 +335,5 @@ styles incl. two reimagined pixel treatments) through founder feedback to a fina
   state-aware CTA + slide; #405 grey Wiederholen + Erledigt on title line; #406 Üben even distribution;
   #407 Spielen crop-scroll tile; #408 hidden scrollbar + shelf removal; #409 exact-3-rows + next-mission
   centering. **Founder verifies the live site** (Pages deploys on each merge; sandbox can't reach `*.github.io`).
-
-**Prior handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game
-tile removed from Anwenden (branch `claude/game-tile-removal-nav-hi37z5`).**
-
-Founder: the `/welt`-style Kapitel/mission list should open under **Spielen** in Heute (not the minimal
-carousel), and the **Neuland game tile should be removed from the Anwenden hub**. Implemented:
-- **Extracted the shared `src/features/welt/NeulandHub.tsx`** (the presentational chapter-section +
-  mission-list + Schlüssel-Dokumente view, taking an `onPlay(mission)` callback). `Welt.tsx` now renders
-  it with `onPlay={setActive}` (inline full-screen `MissionPlayer`, focus mode) and is much smaller.
-- **`src/features/dashboard/SpielenHub.tsx` (new, lazy)** replaces `NeulandCarousel.tsx` (deleted): the
-  Spielen tab renders `NeulandHub` with `onPlay` = `navigate('/welt?mission=<id>')`, so play still happens
-  on the `/welt` route where the full-screen player + focus mode are wired (no chrome/z-index regression).
-  Deep-link auto-open in `Welt.tsx` is unchanged. Kept lazy so the mission bank stays off Heute's eager path.
-- **`src/features/anwenden/AnwendenHub.tsx`:** removed the "Neuland" (`/welt`) card + its `Gamepad2`
-  import; grid went `lg:grid-cols-4` → `lg:grid-cols-3` for the remaining 3 cards (Sprechen/Schreiben/Prüfung).
-- **`src/features/dashboard/UebenPath.tsx` (follow-up):** the Üben tab's "Als Nächstes" tile button used to
-  enter the game (`/welt?mission=<id>`). Founder: the Üben tab should let you **practise a mission's content,
-  not play it**. Button relabelled **"Üben"** and opens a composed practice session for the next mission
-  (`/session?mission=<id>`). Game entry stays under Heute → Spielen and `/welt`.
-- **Mission-focused sessions (founder rule: Üben mission N must mirror Spielen mission N):** an early pass
-  only scoped the session to the mission's *theme*, so the words/drills were unrelated to the mission's
-  actual game content. Now `engine/mission.ts` `missionContentIds(mission)` extracts the exact vocab +
-  Redemittel ids the mission's scenes reference (loadout slots, battle moves, item demands, hotspots,
-  automat keys), and `buildSession` gained a `focus` opt: those items are practised **first, regardless of
-  SRS due state**, the random grammar drill is **dropped**, and the rest fills from the mission's theme
-  (quiz/due vocab/reading). `Session.tsx` resolves `?mission=<id>` → `focus` + theme scope; `SessionPlayer`
-  threads it through. Verified in the app: `/session?mission=m_kap1_dach` leads with
-  "die Wohnungsgeberbestätigung" (the word that mission turns on). `tests/engine.test.ts` gained 2 cases
-  (99 total).
-- **Dark mode for the Neuland Heute surfaces (founder chose "Map + Heute tiles"):** in dark mode the Üben
-  city map and the Spielen tiles/backdrop used to render as bright light surfaces against the dark app.
-  Now theme-aware:
-  - **Üben map** (`UebenPath.tsx`): the `<canvas>` `drawCity` takes an `isDark` flag and picks `DARK_PAL`
-    vs `LIGHT_PAL` (deep muted grass/roads/pavement/water/background-buildings); the glowing cyan route and
-    the colour-coded landmark buildings stay vivid (a dark-map style). Theme read via a new reactive
-    `useIsDark()` hook in `lib/useTheme.ts`; redraws on theme change.
-  - **Spielen tiles** (`NeulandHub.tsx`): the mission cards were re-styled from the pixel `GameCard` to the
-    **same app-tile language as the Üben "Als Nächstes" tile** (`rounded-[20px] border-border bg-surface` +
-    the shared soft shadow, gradient play button, theme-aware Boss/Beta badges), so they're dark in dark
-    mode and consistent across both tabs. `PixelStage` gained an opt-in `themed` prop (hub only) that dims
-    the bright daytime backdrop art in dark mode.
-  - In-mission `MissionPlayer` scenes remain light-only (locked, backlog #31): the pixel atoms in
-    `stage.tsx` default to fixed light; only `NeulandHub` passes `themed`. Verified light + dark for both
-    tabs via headless Chromium screenshots before shipping.
-- **Layout polish round (founder, 8 asks):** *Spielen* (`NeulandHub.tsx`) — "Neuland" is now the section
-  heading; "Kapitel 1 · Ankommen" moved **below** the backdrop as a smaller line; the dark-mode backdrop
-  dim was reduced (`/45`→`/20`) + a border added so it's clearly visible; mission-tile **subtitles removed**
-  and the green done-tick moved into a `bg-success/15` badge to the left of the play button. *Üben*
-  (`UebenPath.tsx`) — the **stepper moved above the map**; the "Als Nächstes" tile is **taller** (`p-[18px]`
-  → `px-5 py-6` + larger inner margins); the **map is cropped to 3:2** (`VIEW_H=117`/`CROP_TOP=24`, with a
-  row-skip guard so neither the top decorative band nor the bottom row leaves a sliver) to match the Spielen
-  backdrop dimensions; container spacing bumped `space-y-4`→`space-y-5`. Re-verified light + dark, both tabs.
-- Gates green: build, typecheck, lint (0 errors), test:unit **99** (2 new: mission focus + `missionContentIds`),
-  check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md (bundle note + the locked mobile-bar Spielen +
-  Üben-tile/stepper/3:2/mission-focus lines + the game-art hub-theming note), this handoff, s85 handoff
-  archived to W28, prompt log 265–270.
-- **Ship status:** shipped to `main` across **4 squash-merged PRs** (#396 Spielen hub + Anwenden tile
-  removal + Üben-practises-mission; #397 dark mode; #398 layout polish; #399 mission-focused sessions).
-  Branch realigned to `origin/main` after each merge. **Founder verifies the live site** (the Pages deploy
-  runs on each merge to `main`; the sandbox can't reach `*.github.io`).
 
 _(Sessions 85-86's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_

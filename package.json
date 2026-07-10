@@ -7,7 +7,8 @@
   "description": "Genauly: German for real life. Interactive practice platform for intermediate German (B1 to B2), from workplace situations to everyday life, plus telc Deutsch B2 Beruf exam prep.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && node scripts/prerender-help.mjs",
+    "prerender:help": "node scripts/prerender-help.mjs",
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",

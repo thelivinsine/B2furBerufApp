@@ -2879,3 +2879,29 @@ Branch: `claude/whats-next-esga9u`.
   + shelf removal, exact-3-rows + centering), rewrote the top `_Last updated_` summary to frame the whole
   multi-round session, and appended this entry. Doc-only.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 286).
+
+## Entry 287 — 2026-07-10 (session 89)
+- **Branch:** `claude/blog-help-uben-spielen-wtbnq8`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > i want the app to have a comprehensive blog/help pages explaining the üben/spielen part of the app. the
+  > goal is to have an seo friendly site along with support for users seeking more info.
+- **Response summary:** Built a public, login-free help/blog section at `/hilfe` (outside the AppShell, like
+  `/about`), bilingual DE/EN, explaining Üben and Spielen. Since SEO was the explicit goal, chose
+  **build-time prerendering to static HTML** over runtime-only meta (so Bing/social crawlers, not just
+  Google's JS renderer, see full content), matching the project's existing `boot-seo`/JSON-LD/sitemap
+  approach. Shipped: one bilingual content bank `src/features/help/content.ts` (a hub + 6 articles in 3
+  categories, closed-union content blocks + per-article FAQ + related links); lazy React reader
+  (`HelpChrome`/`HelpHub`/`HelpArticle`) wired as public routes in `router.tsx`; and
+  `scripts/prerender-help.mjs` (chained into `build`) which loads the bank via Vite `ssrLoadModule` and
+  emits `dist/hilfe/<slug>/index.html` per page with unique title/description/canonical + OG/Twitter +
+  Article/BreadcrumbList/FAQPage JSON-LD + the full German text in `#root`, plus a regenerated
+  `dist/sitemap.xml` (12 URLs). Added "Hilfe" links to the landing + Settings footers. Verified generated
+  HTML (per-page meta/JSON-LD correct, root index.html untouched). Gates green: build+prerender (7 pages),
+  ESLint 0, lint:content pass, test:unit 99/99, check:bundle 72.6 kB/400. No em dashes in any copy.
+- **Artifacts:** `src/features/help/content.ts`, `src/features/help/HelpChrome.tsx`,
+  `src/features/help/HelpHub.tsx`, `src/features/help/HelpArticle.tsx`, `scripts/prerender-help.mjs`,
+  `src/router.tsx`, `package.json`, `src/features/landing/LandingPage.tsx`,
+  `src/features/settings/Settings.tsx`; `docs/PROJECT_STATUS.md` (s89 handoff + s87 archived to W28),
+  `docs/SESSION_PROMPT_LOG.md` (entry 287).

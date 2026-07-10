@@ -834,3 +834,66 @@ errors, test:unit 97, build, check:bundle **74.9 kB** / 400):
   mobile-bar section + Modus line + bundle note), this handoff, `DECISIONS.md`, prompt-log 254–258.
 - **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
 
+
+
+---
+
+**Prior handoff after session 87 (2026-07-10). Heute → Spielen now shows the full Neuland world hub; game
+tile removed from Anwenden (branch `claude/game-tile-removal-nav-hi37z5`).**
+
+Founder: the `/welt`-style Kapitel/mission list should open under **Spielen** in Heute (not the minimal
+carousel), and the **Neuland game tile should be removed from the Anwenden hub**. Implemented:
+- **Extracted the shared `src/features/welt/NeulandHub.tsx`** (the presentational chapter-section +
+  mission-list + Schlüssel-Dokumente view, taking an `onPlay(mission)` callback). `Welt.tsx` now renders
+  it with `onPlay={setActive}` (inline full-screen `MissionPlayer`, focus mode) and is much smaller.
+- **`src/features/dashboard/SpielenHub.tsx` (new, lazy)** replaces `NeulandCarousel.tsx` (deleted): the
+  Spielen tab renders `NeulandHub` with `onPlay` = `navigate('/welt?mission=<id>')`, so play still happens
+  on the `/welt` route where the full-screen player + focus mode are wired (no chrome/z-index regression).
+  Deep-link auto-open in `Welt.tsx` is unchanged. Kept lazy so the mission bank stays off Heute's eager path.
+- **`src/features/anwenden/AnwendenHub.tsx`:** removed the "Neuland" (`/welt`) card + its `Gamepad2`
+  import; grid went `lg:grid-cols-4` → `lg:grid-cols-3` for the remaining 3 cards (Sprechen/Schreiben/Prüfung).
+- **`src/features/dashboard/UebenPath.tsx` (follow-up):** the Üben tab's "Als Nächstes" tile button used to
+  enter the game (`/welt?mission=<id>`). Founder: the Üben tab should let you **practise a mission's content,
+  not play it**. Button relabelled **"Üben"** and opens a composed practice session for the next mission
+  (`/session?mission=<id>`). Game entry stays under Heute → Spielen and `/welt`.
+- **Mission-focused sessions (founder rule: Üben mission N must mirror Spielen mission N):** an early pass
+  only scoped the session to the mission's *theme*, so the words/drills were unrelated to the mission's
+  actual game content. Now `engine/mission.ts` `missionContentIds(mission)` extracts the exact vocab +
+  Redemittel ids the mission's scenes reference (loadout slots, battle moves, item demands, hotspots,
+  automat keys), and `buildSession` gained a `focus` opt: those items are practised **first, regardless of
+  SRS due state**, the random grammar drill is **dropped**, and the rest fills from the mission's theme
+  (quiz/due vocab/reading). `Session.tsx` resolves `?mission=<id>` → `focus` + theme scope; `SessionPlayer`
+  threads it through. Verified in the app: `/session?mission=m_kap1_dach` leads with
+  "die Wohnungsgeberbestätigung" (the word that mission turns on). `tests/engine.test.ts` gained 2 cases
+  (99 total).
+- **Dark mode for the Neuland Heute surfaces (founder chose "Map + Heute tiles"):** in dark mode the Üben
+  city map and the Spielen tiles/backdrop used to render as bright light surfaces against the dark app.
+  Now theme-aware:
+  - **Üben map** (`UebenPath.tsx`): the `<canvas>` `drawCity` takes an `isDark` flag and picks `DARK_PAL`
+    vs `LIGHT_PAL` (deep muted grass/roads/pavement/water/background-buildings); the glowing cyan route and
+    the colour-coded landmark buildings stay vivid (a dark-map style). Theme read via a new reactive
+    `useIsDark()` hook in `lib/useTheme.ts`; redraws on theme change.
+  - **Spielen tiles** (`NeulandHub.tsx`): the mission cards were re-styled from the pixel `GameCard` to the
+    **same app-tile language as the Üben "Als Nächstes" tile** (`rounded-[20px] border-border bg-surface` +
+    the shared soft shadow, gradient play button, theme-aware Boss/Beta badges), so they're dark in dark
+    mode and consistent across both tabs. `PixelStage` gained an opt-in `themed` prop (hub only) that dims
+    the bright daytime backdrop art in dark mode.
+  - In-mission `MissionPlayer` scenes remain light-only (locked, backlog #31): the pixel atoms in
+    `stage.tsx` default to fixed light; only `NeulandHub` passes `themed`. Verified light + dark for both
+    tabs via headless Chromium screenshots before shipping.
+- **Layout polish round (founder, 8 asks):** *Spielen* (`NeulandHub.tsx`) — "Neuland" is now the section
+  heading; "Kapitel 1 · Ankommen" moved **below** the backdrop as a smaller line; the dark-mode backdrop
+  dim was reduced (`/45`→`/20`) + a border added so it's clearly visible; mission-tile **subtitles removed**
+  and the green done-tick moved into a `bg-success/15` badge to the left of the play button. *Üben*
+  (`UebenPath.tsx`) — the **stepper moved above the map**; the "Als Nächstes" tile is **taller** (`p-[18px]`
+  → `px-5 py-6` + larger inner margins); the **map is cropped to 3:2** (`VIEW_H=117`/`CROP_TOP=24`, with a
+  row-skip guard so neither the top decorative band nor the bottom row leaves a sliver) to match the Spielen
+  backdrop dimensions; container spacing bumped `space-y-4`→`space-y-5`. Re-verified light + dark, both tabs.
+- Gates green: build, typecheck, lint (0 errors), test:unit **99** (2 new: mission focus + `missionContentIds`),
+  check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md (bundle note + the locked mobile-bar Spielen +
+  Üben-tile/stepper/3:2/mission-focus lines + the game-art hub-theming note), this handoff, s85 handoff
+  archived to W28, prompt log 265–270.
+- **Ship status:** shipped to `main` across **4 squash-merged PRs** (#396 Spielen hub + Anwenden tile
+  removal + Üben-practises-mission; #397 dark mode; #398 layout polish; #399 mission-focused sessions).
+  Branch realigned to `origin/main` after each merge. **Founder verifies the live site** (the Pages deploy
+  runs on each merge to `main`; the sandbox can't reach `*.github.io`).

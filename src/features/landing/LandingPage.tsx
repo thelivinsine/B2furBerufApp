@@ -341,6 +341,13 @@ export function LandingPage() {
           </button>
           <span aria-hidden className="text-border">·</span>
           <button
+            onClick={() => navigate("/hilfe")}
+            className="underline-offset-2 hover:text-foreground hover:underline"
+          >
+            Hilfe
+          </button>
+          <span aria-hidden className="text-border">·</span>
+          <button
             onClick={() => navigate("/privacy")}
             className="underline-offset-2 hover:text-foreground hover:underline"
           >
