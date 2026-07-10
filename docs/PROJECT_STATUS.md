@@ -239,7 +239,9 @@ errors, test:unit 97, build, check:bundle **74.9 kB** / 400):
     re-laid as a **tour (Bahnhof→Laden→Zuhause→Amt)** so none is stacked under another (fixed a
     banner-collision bug in the fresh-user state), the pill legend became a proper **stepper** (connected
     dots, done/current/locked), the tile was refined (green tag, no subtitle, bigger button), and the map
-    was made **taller** so the hero fills the screen. Verified mid + fresh states before porting.
+    was made **taller** so the hero fills the screen. Verified mid + fresh states before porting. The
+    reviewed design previews are committed under **`preview/heute-redesign/`** (Option B, the 3 Üben
+    concepts, Concept C, and the final Üben-tab page).
 - **`Settings.tsx`:** added the Lernmodus selector to the Lernen card; removed the obsolete "Navigation
   anpassen" pin-picker card (the new bar has no add/remove).
 - **Deleted:** `MoreSheet.tsx`, `ThemeToggle.tsx`, `ModeSwitcher.tsx`. Docs updated: CLAUDE.md (the locked

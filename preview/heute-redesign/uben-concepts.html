@@ -1,0 +1,325 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Genauly · Üben roadmap — 3 concepts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    --ground: #0b0f16; --panel: #121826; --ink: #eef1f7; --ink-soft: #aeb6c6;
+    --ink-faint: #6f7889; --rule: #202839; --accent: #7b78f0; --accent-soft: #a6a3f6;
+    --shell-shadow: 0 24px 60px -20px rgba(0,0,0,.65); color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root { --ground:#f6f7fb; --panel:#fff; --ink:#171b24; --ink-soft:#4c5567; --ink-faint:#8b93a4;
+      --rule:#e5e8f0; --accent:#5b5be6; --accent-soft:#6d6ded; --shell-shadow:0 24px 60px -24px rgba(40,44,80,.28); color-scheme:light; }
+  }
+  :root[data-theme="dark"]{ --ground:#0b0f16; --panel:#121826; --ink:#eef1f7; --ink-soft:#aeb6c6; --ink-faint:#6f7889; --rule:#202839; --accent:#7b78f0; --accent-soft:#a6a3f6; --shell-shadow:0 24px 60px -20px rgba(0,0,0,.65); color-scheme:dark; }
+  :root[data-theme="light"]{ --ground:#f6f7fb; --panel:#fff; --ink:#171b24; --ink-soft:#4c5567; --ink-faint:#8b93a4; --rule:#e5e8f0; --accent:#5b5be6; --accent-soft:#6d6ded; --shell-shadow:0 24px 60px -24px rgba(40,44,80,.28); color-scheme:light; }
+
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--ground); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5; }
+  .wrap { max-width:1120px; margin:0 auto; padding:56px 24px 90px; }
+  .eyebrow { font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--accent-soft); margin:0 0 14px; }
+  h1 { font-size:clamp(28px,4.6vw,42px); line-height:1.05; letter-spacing:-.025em; font-weight:800; margin:0 0 14px; text-wrap:balance; max-width:20ch; }
+  .lede { font-size:16.5px; color:var(--ink-soft); margin:0; max-width:64ch; }
+  .lede b { color:var(--ink); font-weight:600; }
+  .section-label { display:flex; align-items:center; gap:14px; font-size:12px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-faint); margin:54px 0 30px; }
+  .section-label::after { content:""; flex:1; height:1px; background:var(--rule); }
+
+  .rail { display:grid; grid-template-columns:repeat(3,1fr); gap:30px; }
+  @media (max-width:1000px){ .rail{ grid-auto-flow:column; grid-template-columns:none; grid-auto-columns:300px; overflow-x:auto; padding-bottom:18px; scroll-snap-type:x mandatory; } .col{ scroll-snap-align:center; } }
+  .col { display:flex; flex-direction:column; align-items:center; gap:20px; }
+  .cap { width:100%; max-width:300px; }
+  .cap .n { font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-soft); margin:0 0 6px; }
+  .cap h4 { margin:0 0 10px; font-size:20px; font-weight:800; letter-spacing:-.02em; }
+  .cap ul { margin:0; padding:0; list-style:none; display:grid; gap:7px; }
+  .cap li { font-size:13px; color:var(--ink-soft); padding-left:18px; position:relative; }
+  .cap li::before { content:""; position:absolute; left:0; top:8px; width:6px; height:6px; border-radius:2px; background:var(--accent); }
+
+  /* phone */
+  .phone { --bg:hsl(223 38% 11%); --bg2:hsl(224 40% 9%); --surface:hsl(223 34% 15%); --surface2:hsl(223 30% 19%);
+    --border:hsl(223 24% 27%); --muted:hsl(223 26% 23%); --mfg:hsl(220 20% 72%); --fg:hsl(220 24% 95%);
+    --primary:hsl(245 84% 70%); --primary2:hsl(258 74% 62%); --accent:hsl(188 80% 55%); --warn:hsl(38 92% 58%);
+    --success:hsl(152 60% 55%); --slate:hsl(215 16% 55%); --lock:hsl(223 16% 40%);
+    width:300px; flex-shrink:0; border-radius:46px; padding:11px;
+    background:linear-gradient(160deg,#2a2f3e,#0c0f16); box-shadow:var(--shell-shadow), inset 0 0 0 1px rgba(255,255,255,.05); }
+  .screen { position:relative; border-radius:36px; overflow:hidden;
+    background:radial-gradient(120% 78% at 50% -8%, hsl(245 40% 16%) 0%, var(--bg) 46%, var(--bg2) 100%);
+    color:var(--fg); height:662px; font-size:14px; display:flex; flex-direction:column; }
+  .notch { position:absolute; top:9px; left:50%; transform:translateX(-50%); width:96px; height:23px; background:#05070c; border-radius:20px; z-index:5; }
+  .statusbar { display:flex; justify-content:space-between; align-items:center; padding:13px 22px 6px; font-size:13px; font-weight:600; }
+  .apphdr { display:flex; align-items:center; justify-content:space-between; padding:8px 18px 10px; }
+  .logo { width:34px; height:34px; border-radius:11px; background:linear-gradient(150deg,var(--primary),var(--primary2)); display:grid; place-items:center; font-weight:800; font-size:18px; color:#fff; box-shadow:0 4px 14px -3px hsl(245 80% 60% /.6); }
+  .hdr-right { display:flex; align-items:center; gap:10px; }
+  .streak { display:flex; align-items:center; gap:6px; height:34px; padding:0 13px 0 9px; border-radius:999px; background:hsl(38 80% 55% /.13); }
+  .streak b { font-size:15px; font-weight:800; color:var(--warn); }
+  .streak span { font-size:12px; color:var(--mfg); font-weight:500; }
+  .avatar { width:34px; height:34px; border-radius:999px; background:var(--surface); display:grid; place-items:center; color:var(--mfg); border:1px solid var(--border); }
+  .seg { display:flex; width:fit-content; margin:2px auto 14px; gap:3px; padding:3px; border-radius:999px; background:var(--muted); border:1px solid var(--border); }
+  .seg button { display:inline-flex; align-items:center; gap:6px; border:0; padding:7px 20px; border-radius:999px; font-size:13.5px; font-weight:700; background:transparent; color:var(--mfg); font-family:inherit; }
+  .seg button.on { background:var(--surface); color:var(--fg); box-shadow:0 2px 8px -2px rgba(0,0,0,.5); }
+  .body { flex:1; overflow:hidden; padding:0 16px 12px; }
+  .kicker { display:flex; align-items:baseline; justify-content:space-between; padding:2px 4px 12px; }
+  .kicker .k1 { font-size:15px; font-weight:800; letter-spacing:-.01em; }
+  .kicker .k1 span { color:var(--accent); }
+  .kicker .k2 { font-size:11.5px; color:var(--mfg); font-weight:600; }
+  .cta { display:inline-flex; align-items:center; justify-content:center; gap:7px; border:0; border-radius:13px; padding:12px 18px; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; font-size:14px; font-weight:800; font-family:inherit; box-shadow:0 10px 22px -9px hsl(248 80% 55% /.7); }
+  .nav { display:flex; justify-content:space-around; align-items:center; padding:11px 20px calc(10px + 8px); border-top:1px solid var(--border); background:hsl(223 38% 11% /.72); }
+  .nav .item { position:relative; width:40px; height:34px; display:grid; place-items:center; }
+  .nav .item .u { position:absolute; bottom:-4px; left:50%; transform:translateX(-50%); width:22px; height:3px; border-radius:3px; }
+  .home-ind { width:112px; height:5px; border-radius:3px; background:rgba(255,255,255,.32); margin:5px auto 8px; }
+  svg { display:block; }
+  .foot { margin-top:56px; padding-top:22px; border-top:1px solid var(--rule); color:var(--ink-faint); font-size:13.5px; }
+  code { font-size:12.5px; background:color-mix(in srgb,var(--accent) 14%,transparent); color:var(--accent-soft); padding:2px 6px; border-radius:5px; }
+
+  /* concept B chapter cards */
+  .chap { border:1px solid var(--border); border-radius:16px; background:var(--surface); padding:13px 14px; margin-bottom:10px; }
+  .chap.locked { opacity:.6; }
+  .chap .ch-top { display:flex; align-items:center; justify-content:space-between; }
+  .chap .ch-name { font-size:14px; font-weight:800; letter-spacing:-.01em; }
+  .chap .ch-sub { font-size:11px; color:var(--mfg); margin-top:1px; }
+  .chap .pbar { height:6px; border-radius:6px; background:var(--muted); overflow:hidden; margin:11px 0 9px; }
+  .chap .pbar > i { display:block; height:100%; border-radius:6px; background:linear-gradient(90deg,var(--primary),var(--accent)); }
+  .stops { display:flex; gap:7px; align-items:center; }
+  .stops .s { flex:1; height:8px; border-radius:4px; background:var(--muted); }
+  .stops .s.done { background:var(--primary); }
+  .stops .s.cur { background:var(--accent); box-shadow:0 0 0 2px hsl(188 80% 55% /.3); }
+  .stops .s.game { background:var(--primary2); }
+  .pill { display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:999px; }
+  .pill.now { background:hsl(188 70% 50% /.16); color:var(--accent); }
+  .pill.game { background:hsl(258 60% 62% /.18); color:var(--primary2); }
+  .pill.soon { background:var(--muted); color:var(--mfg); }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Genauly · Üben neu gedacht</p>
+  <h1>Der Üben-Tab wird ein Lernpfad.</h1>
+  <p class="lede">Fortschritt steht schon im Kopf und in der Statistik-Zeile, hier wäre er dreimal. Also zeigt Üben stattdessen einen <b>Weg</b>: welche Übungen erledigt sind, wo du gerade stehst und was als Nächstes kommt, <b>Hand in Hand mit den Neuland-Kapiteln</b>. Der Tagesziel-Ring zieht in die Fortschritt-Seite um. Drei Richtungen:</p>
+
+  <div class="section-label">Drei Konzepte</div>
+  <div class="rail">
+
+    <!-- ============ A · LERNPFAD (winding path) ============ -->
+    <div class="col">
+      <div class="phone"><div class="screen">
+        <div class="notch"></div>
+        <div class="statusbar"><span>21:50</span>
+          <span style="display:flex;gap:5px;opacity:.9;">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="6" height="8" rx="1.5" fill="currentColor"/></svg>
+          </span>
+        </div>
+        <div class="apphdr">
+          <div class="logo">G</div>
+          <div class="hdr-right">
+            <div class="streak"><svg width="16" height="16" viewBox="0 0 24 24" fill="hsl(38 92% 58%)"><path d="M12 2c1 3-1 5-2 6-2 2-3 4-3 6a5 5 0 0 0 10 0c0-1-.3-2-1-3 .2 1-.5 2-1 2 .5-2-1-4-2-5-1 2-2 2-2 4a2 2 0 0 0 4 0c1 2-.5 4-2 4a5 5 0 0 1-3-8c2-2 4-4 4-6Z"/></svg><b>2</b><span>Tage</span></div>
+            <div class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></div>
+          </div>
+        </div>
+        <div class="body" style="padding-bottom:0;">
+          <div class="seg"><button class="on">⚡ Üben</button><button>▶ Spielen</button></div>
+          <div class="kicker"><div><div class="k1">Kapitel 1 · <span>Ankommen</span></div></div><div class="k2">3 / 6 Übungen</div></div>
+
+          <svg width="100%" viewBox="0 0 264 472" fill="none" style="overflow:visible;">
+            <!-- trail: done (solid) then locked (dashed) -->
+            <path d="M64,40 C64,73 132,73 132,106 C132,139 200,139 200,172 C200,205 132,205 132,238 C132,271 64,271 64,304" stroke="hsl(245 84% 70%)" stroke-width="5" stroke-linecap="round"/>
+            <path d="M64,304 C64,337 132,337 132,370 C132,403 200,403 200,436" stroke="hsl(223 24% 30%)" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 10"/>
+
+            <!-- node 1 done -->
+            <g><circle cx="64" cy="40" r="19" fill="hsl(245 84% 70%)"/><path d="M57,40 l4,4 l8,-8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="90" y="44" fill="hsl(220 20% 82%)" font-size="11.5" font-weight="600" font-family="inherit">Ankunft-Wörter</text></g>
+            <!-- node 2 done -->
+            <g><circle cx="132" cy="106" r="19" fill="hsl(245 84% 70%)"/><path d="M125,106 l4,4 l8,-8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="158" y="110" fill="hsl(220 20% 82%)" font-size="11.5" font-weight="600" font-family="inherit">Begrüßung</text></g>
+            <!-- node 3 done · NEULAND -->
+            <g><circle cx="200" cy="172" r="19" fill="hsl(258 74% 62%)"/><rect x="192" y="167" width="16" height="10" rx="3" fill="#fff"/><circle cx="196" cy="172" r="1.3" fill="hsl(258 74% 62%)"/><circle cx="204" cy="172" r="1.3" fill="hsl(258 74% 62%)"/><text x="174" y="176" text-anchor="end" fill="hsl(258 60% 78%)" font-size="11.5" font-weight="700" font-family="inherit">Neuland 1.1</text></g>
+            <!-- node 4 done -->
+            <g><circle cx="132" cy="238" r="19" fill="hsl(245 84% 70%)"/><path d="M125,238 l4,4 l8,-8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="158" y="242" fill="hsl(220 20% 82%)" font-size="11.5" font-weight="600" font-family="inherit">Fahrkarten</text></g>
+            <!-- node 5 CURRENT -->
+            <g>
+              <circle cx="64" cy="304" r="27" fill="none" stroke="hsl(188 80% 55% /.35)" stroke-width="3"/>
+              <circle cx="64" cy="304" r="22" fill="hsl(188 80% 55%)"/>
+              <path d="M60,298 l9,6 l-9,6 Z" fill="#06222a"/>
+              <rect x="92" y="290" width="98" height="30" rx="9" fill="hsl(188 80% 55%)"/>
+              <text x="106" y="303" fill="#06222a" font-size="11" font-weight="800" font-family="inherit">Automat-Dialog</text>
+              <text x="106" y="314" fill="#06414d" font-size="8.5" font-weight="700" font-family="inherit">DU BIST HIER · 6 MIN</text>
+            </g>
+            <!-- node 6 locked · NEULAND -->
+            <g opacity=".7"><circle cx="132" cy="370" r="19" fill="hsl(223 26% 26%)"/><rect x="124" y="365" width="16" height="10" rx="3" fill="hsl(223 16% 52%)"/><text x="158" y="374" fill="hsl(220 14% 58%)" font-size="11.5" font-weight="700" font-family="inherit">Neuland 1.2</text></g>
+            <!-- node 7 locked -->
+            <g opacity=".7"><circle cx="200" cy="436" r="19" fill="hsl(223 26% 26%)"/><path d="M195,435 v-2 a5 5 0 0 1 10 0 v2 M193,435 h14 v9 h-14 Z" stroke="hsl(223 16% 55%)" stroke-width="1.6" fill="none"/><text x="174" y="440" text-anchor="end" fill="hsl(220 14% 58%)" font-size="11.5" font-weight="600" font-family="inherit">SIM-Karte</text></g>
+          </svg>
+        </div>
+        <div class="nav">
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill="hsl(245 84% 70%)"/><path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill="#22d3ee"/></svg><span class="u" style="background:#5b5be6;"></span></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><rect x="2.8" y="4" width="14.4" height="3.4" rx="1.1" fill="#2563eb"/><rect x="3.6" y="8.3" width="14.4" height="3.4" rx="1.1" fill="#22d3ee"/><rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill="#2563eb" opacity=".82"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.6" stroke="#f97316" stroke-width="2.2" fill="none"/><circle cx="10" cy="10" r="3.4" fill="#fbbf24"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="#0ea5e9"/><rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/><rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 24 24"><path fill="#64748b" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/><circle cx="12" cy="12" r="2.9" fill="#38bdf8"/></svg></div>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="cap">
+        <p class="n">Konzept A</p>
+        <h4>Lernpfad</h4>
+        <ul>
+          <li>Ein gewundener Weg, Duolingo-Prinzip: erledigt, hier, gesperrt.</li>
+          <li>Neuland-Missionen liegen als Stationen mitten im Pfad.</li>
+          <li>„Du bist hier“ + der nächste Schritt sind sofort klar.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ============ B · KAPITEL-ROADMAP ============ -->
+    <div class="col">
+      <div class="phone"><div class="screen">
+        <div class="notch"></div>
+        <div class="statusbar"><span>21:50</span>
+          <span style="display:flex;gap:5px;opacity:.9;">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="6" height="8" rx="1.5" fill="currentColor"/></svg>
+          </span>
+        </div>
+        <div class="apphdr">
+          <div class="logo">G</div>
+          <div class="hdr-right">
+            <div class="streak"><svg width="16" height="16" viewBox="0 0 24 24" fill="hsl(38 92% 58%)"><path d="M12 2c1 3-1 5-2 6-2 2-3 4-3 6a5 5 0 0 0 10 0c0-1-.3-2-1-3 .2 1-.5 2-1 2 .5-2-1-4-2-5-1 2-2 2-2 4a2 2 0 0 0 4 0c1 2-.5 4-2 4a5 5 0 0 1-3-8c2-2 4-4 4-6Z"/></svg><b>2</b><span>Tage</span></div>
+            <div class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="seg"><button class="on">⚡ Üben</button><button>▶ Spielen</button></div>
+
+          <!-- Als Nächstes hero -->
+          <div style="border:1px solid var(--border); border-radius:18px; background:linear-gradient(150deg,hsl(245 40% 20%),var(--surface)); padding:15px; margin-bottom:16px;">
+            <div style="display:flex; align-items:center; justify-content:space-between;">
+              <span class="pill now">● Als Nächstes</span>
+              <span style="font-size:11px; color:var(--mfg); font-weight:600;">Kapitel 1 · 3/6</span>
+            </div>
+            <div style="font-size:17px; font-weight:800; letter-spacing:-.02em; margin-top:10px;">Automat-Dialog</div>
+            <div style="font-size:12.5px; color:var(--mfg); margin-top:2px;">Übt Mission 1.2 „Fahrkarten-Automat“ vor</div>
+            <button class="cta" style="width:100%; margin-top:13px;">Weiter <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div>
+
+          <!-- chapters -->
+          <div class="chap">
+            <div class="ch-top"><div><div class="ch-name">Kapitel 1 · Ankommen</div><div class="ch-sub">Ankunft, Automat, Amt</div></div><span class="pill now">läuft</span></div>
+            <div class="pbar"><i style="width:50%;"></i></div>
+            <div class="stops"><span class="s done"></span><span class="s done"></span><span class="s game"></span><span class="s cur"></span><span class="s"></span><span class="s game"></span></div>
+          </div>
+          <div class="chap locked">
+            <div class="ch-top"><div><div class="ch-name">Kapitel 2 · Alltag meistern</div><div class="ch-sub">Arzt, Wohnen, Bank</div></div><span class="pill soon">bald</span></div>
+            <div class="pbar"><i style="width:0;"></i></div>
+          </div>
+          <div class="chap locked" style="opacity:.4;">
+            <div class="ch-top"><div><div class="ch-name">Kapitel 3 · Arbeitswelt</div></div><span class="pill soon">gesperrt</span></div>
+          </div>
+        </div>
+        <div class="nav">
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill="hsl(245 84% 70%)"/><path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill="#22d3ee"/></svg><span class="u" style="background:#5b5be6;"></span></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><rect x="2.8" y="4" width="14.4" height="3.4" rx="1.1" fill="#2563eb"/><rect x="3.6" y="8.3" width="14.4" height="3.4" rx="1.1" fill="#22d3ee"/><rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill="#2563eb" opacity=".82"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.6" stroke="#f97316" stroke-width="2.2" fill="none"/><circle cx="10" cy="10" r="3.4" fill="#fbbf24"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="#0ea5e9"/><rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/><rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 24 24"><path fill="#64748b" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/><circle cx="12" cy="12" r="2.9" fill="#38bdf8"/></svg></div>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="cap">
+        <p class="n">Konzept B</p>
+        <h4>Kapitel-Roadmap</h4>
+        <ul>
+          <li>„Als Nächstes“ oben, dann Kapitel als aufklappbare Karten.</li>
+          <li>Mission-Stops als Balkenreihe zeigen den Stand pro Kapitel.</li>
+          <li>Strukturiert und ruhig, gute Vogelperspektive.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ============ C · NEULAND-KARTE ============ -->
+    <div class="col">
+      <div class="phone"><div class="screen">
+        <div class="notch"></div>
+        <div class="statusbar"><span>21:50</span>
+          <span style="display:flex;gap:5px;opacity:.9;">
+            <svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7" width="3" height="4" rx="1"/><rect x="4.5" y="5" width="3" height="6" rx="1"/><rect x="9" y="2.5" width="3" height="8.5" rx="1"/><rect x="13.5" y="0" width="3" height="11" rx="1"/></svg>
+            <svg width="26" height="12" viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="6" height="8" rx="1.5" fill="currentColor"/></svg>
+          </span>
+        </div>
+        <div class="apphdr">
+          <div class="logo">G</div>
+          <div class="hdr-right">
+            <div class="streak"><svg width="16" height="16" viewBox="0 0 24 24" fill="hsl(38 92% 58%)"><path d="M12 2c1 3-1 5-2 6-2 2-3 4-3 6a5 5 0 0 0 10 0c0-1-.3-2-1-3 .2 1-.5 2-1 2 .5-2-1-4-2-5-1 2-2 2-2 4a2 2 0 0 0 4 0c1 2-.5 4-2 4a5 5 0 0 1-3-8c2-2 4-4 4-6Z"/></svg><b>2</b><span>Tage</span></div>
+            <div class="avatar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.5-6 8-6s8 2 8 6"/></svg></div>
+          </div>
+        </div>
+        <div class="body">
+          <div class="seg"><button class="on">⚡ Üben</button><button>▶ Spielen</button></div>
+          <div class="kicker"><div class="k1">Deine Reise · <span>Neuland</span></div><div class="k2">Halt 3 von 6</div></div>
+
+          <!-- map -->
+          <div style="border:1px solid var(--border); border-radius:18px; overflow:hidden; background:linear-gradient(180deg,hsl(200 30% 16%),hsl(224 34% 12%));">
+            <svg width="100%" viewBox="0 0 268 300">
+              <!-- terrain blobs -->
+              <rect x="0" y="0" width="268" height="300" fill="hsl(206 28% 15%)"/>
+              <path d="M-10,210 Q60,180 130,205 T290,200 V310 H-10 Z" fill="hsl(150 24% 20%)" opacity=".55"/>
+              <path d="M-10,250 Q80,225 160,250 T290,245 V310 H-10 Z" fill="hsl(150 26% 17%)" opacity=".7"/>
+              <circle cx="212" cy="70" r="40" fill="hsl(206 24% 19%)"/><circle cx="40" cy="150" r="30" fill="hsl(206 24% 19%)"/>
+              <!-- road (dotted) -->
+              <path d="M40,255 C70,215 60,175 110,160 C150,148 150,110 195,100 C225,93 240,70 235,48" fill="none" stroke="hsl(220 16% 60%)" stroke-width="3" stroke-linecap="round" stroke-dasharray="1 9"/>
+              <!-- fog over locked area -->
+              <rect x="150" y="0" width="118" height="150" fill="hsl(224 34% 12% /.7)"/>
+              <text x="209" y="40" text-anchor="middle" fill="hsl(220 14% 55%)" font-size="9" font-weight="700" font-family="inherit" letter-spacing="1">NEBEL</text>
+
+              <!-- stop 1 done: Bahnhof -->
+              <g><circle cx="40" cy="255" r="13" fill="hsl(245 84% 70%)"/><path d="M35,255 l3.5,3.5 l6.5,-6.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="40" y="282" text-anchor="middle" fill="hsl(220 20% 78%)" font-size="9.5" font-weight="700" font-family="inherit">Bahnhof</text></g>
+              <!-- stop 2 done: Kiosk -->
+              <g><circle cx="110" cy="160" r="13" fill="hsl(245 84% 70%)"/><path d="M105,160 l3.5,3.5 l6.5,-6.5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="110" y="187" text-anchor="middle" fill="hsl(220 20% 78%)" font-size="9.5" font-weight="700" font-family="inherit">Kiosk</text></g>
+              <!-- stop 3 CURRENT: Amt, with avatar -->
+              <g>
+                <circle cx="110" cy="160" r="0"/>
+                <circle cx="150" cy="118" r="19" fill="none" stroke="hsl(188 80% 55% /.4)" stroke-width="3"/>
+                <circle cx="150" cy="118" r="14" fill="hsl(188 80% 55%)"/>
+                <circle cx="150" cy="114" r="3.4" fill="#06222a"/><path d="M144,124 a6 6 0 0 1 12 0 Z" fill="#06222a"/>
+                <rect x="118" y="82" width="64" height="18" rx="6" fill="hsl(188 80% 55%)"/>
+                <text x="150" y="94" text-anchor="middle" fill="#06222a" font-size="9" font-weight="800" font-family="inherit">DU BIST HIER</text>
+              </g>
+              <!-- locked stops in fog -->
+              <g opacity=".5"><circle cx="195" cy="100" r="12" fill="hsl(223 20% 30%)"/><path d="M191,99 v-1.5 a4 4 0 0 1 8 0 v1.5 M189,99 h12 v8 h-12 Z" stroke="hsl(220 14% 60%)" stroke-width="1.4" fill="none"/></g>
+              <g opacity=".4"><circle cx="235" cy="48" r="12" fill="hsl(223 20% 30%)"/></g>
+            </svg>
+          </div>
+
+          <!-- current stop card -->
+          <div style="border:1px solid var(--border); border-radius:14px; background:var(--surface); padding:12px 14px; margin-top:12px; display:flex; align-items:center; gap:12px;">
+            <div style="width:38px; height:38px; border-radius:11px; background:hsl(188 70% 50% /.16); color:var(--accent); display:grid; place-items:center; flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 21h18M5 21V8l7-4 7 4v13M9 21v-6h6v6"/></svg>
+            </div>
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:14px; font-weight:800;">Amt · Anmeldung</div>
+              <div style="font-size:11.5px; color:var(--mfg);">Übung + Neuland-Mission 1.6</div>
+            </div>
+            <button class="cta" style="padding:10px 14px;">Weiter</button>
+          </div>
+        </div>
+        <div class="nav">
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill="hsl(245 84% 70%)"/><path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill="#22d3ee"/></svg><span class="u" style="background:#5b5be6;"></span></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><rect x="2.8" y="4" width="14.4" height="3.4" rx="1.1" fill="#2563eb"/><rect x="3.6" y="8.3" width="14.4" height="3.4" rx="1.1" fill="#22d3ee"/><rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill="#2563eb" opacity=".82"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><circle cx="10" cy="10" r="7.6" stroke="#f97316" stroke-width="2.2" fill="none"/><circle cx="10" cy="10" r="3.4" fill="#fbbf24"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 20 20"><rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="#0ea5e9"/><rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/><rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/></svg></div>
+          <div class="item"><svg width="25" height="25" viewBox="0 0 24 24"><path fill="#64748b" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/><circle cx="12" cy="12" r="2.9" fill="#38bdf8"/></svg></div>
+        </div>
+        <div class="home-ind"></div>
+      </div></div>
+      <div class="cap">
+        <p class="n">Konzept C</p>
+        <h4>Neuland-Karte</h4>
+        <ul>
+          <li>Eine Spielkarte: Orte als Halte, Nebel über dem Gesperrten.</li>
+          <li>„Du bist hier“ mit Figur, direkt aus der Neuland-Welt.</li>
+          <li>Am stärksten mit dem Spiel verzahnt, sehr orientierend.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="foot">Alle drei ersetzen den Tagesziel-Ring im Üben-Tab (der zieht nach <b>Fortschritt</b> um) durch einen Weg mit Neuland-Bezug. Sag mir, welche Richtung, dann verdrahte ich sie mit den echten Missionsdaten (<code>src/data/missions.ts</code>) und dem Übungsfortschritt.</p>
+</div>

@@ -2469,3 +2469,19 @@ Branch: `claude/whats-next-esga9u`.
   test:unit 97, build, bundle 71.6 kB).
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx` (rewritten); `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 263).
+
+## Entry 264 — 2026-07-10 (session 86)
+- **Branch:** `claude/page-polish-icon-review-dbmp0v`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session along with saving the preview htmls in the repo.
+- **Response summary:** Documentation pass. Most docs were written incrementally through the session
+  (PROJECT_STATUS session-86 handoff, prompt-log entries 254–263, the CLAUDE.md locked mobile-bar + Üben-map
+  notes, the DECISIONS entries). This pass **saved the reviewed design previews into the repo** under
+  `preview/heute-redesign/` (`heute-option-b.html`, `uben-concepts.html`, `neuland-map-concept-c.html`,
+  `uben-tab-final.html`, + a `README.md` index; artifact fragments wrapped into standalone docs, the final
+  page copied as-is), noted their location in the handoff, and appended this entry. Doc/asset-only; shipped
+  via PR → squash-merge → branch realign.
+- **Artifacts:** `preview/heute-redesign/*` (5 files); `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (entry 264).
