@@ -262,8 +262,11 @@ carousel), and the **Neuland game tile should be removed from the Anwenden hub**
 - Gates green: build, typecheck, lint (0 errors), test:unit **99** (2 new: mission focus + `missionContentIds`),
   check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md (bundle note + the locked mobile-bar Spielen +
   Üben-tile/stepper/3:2/mission-focus lines + the game-art hub-theming note), this handoff, s85 handoff
-  archived to W28, prompt log 265–269.
-- **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
+  archived to W28, prompt log 265–270.
+- **Ship status:** shipped to `main` across **4 squash-merged PRs** (#396 Spielen hub + Anwenden tile
+  removal + Üben-practises-mission; #397 dark mode; #398 layout polish; #399 mission-focused sessions).
+  Branch realigned to `origin/main` after each merge. **Founder verifies the live site** (the Pages deploy
+  runs on each merge to `main`; the sandbox can't reach `*.github.io`).
 
 **Prior handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch
 `claude/page-polish-icon-review-dbmp0v`).**
