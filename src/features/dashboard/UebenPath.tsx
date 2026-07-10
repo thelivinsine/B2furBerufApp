@@ -1,10 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, RotateCcw } from "lucide-react";
+import { ArrowRight, Check, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { missions, chapters } from "@/data/missions";
 import { useProgressStore } from "@/store/useProgressStore";
 import { dueCount } from "@/engine/srs";
 import { useIsDark } from "@/lib/useTheme";
+import { cn } from "@/lib/utils";
 
 /**
  * Heute → "Üben": the Neuland journey as a soft illustrated city map (design
@@ -14,6 +15,13 @@ import { useIsDark } from "@/lib/useTheme";
  * white dot on every completed stop, and a location pin with a "Du bist hier"
  * chip marking where the learner is. Landmarks always sit inside their blocks,
  * never on a street.
+ *
+ * Layout parity with Spielen (founder, s88 follow-up): a centered "Lernpfad"
+ * title mirrors the Spielen "Neuland" header, and the map is a native 3:2
+ * block (360x240 viewBox, no mat padding) so it has the SAME dimensions and
+ * screen position as the Spielen chapter hero. A left/right module pager at
+ * the bottom flips the practice card through every Kapitel-1 mission (the pin
+ * stays truthful to actual progress; paging only changes what you practise).
  *
  * Lazy by design (imports the mission bank) so the Dashboard keeps NO content
  * bank on its eager path (bundle budget, CLAUDE.md). Adding a chapter = extend
@@ -121,28 +129,41 @@ export default function UebenPath() {
   }, [doneKey, kap1]);
 
   const due = useMemo(() => dueCount(srs), [srs]);
-  const allDone = doneCount >= kap1.length;
   const [pinX, pinY] = STOPS[currentIndex].stop;
+
+  // Module pager: which mission's content the practice card shows. Defaults to
+  // the next unplayed mission; paging never moves the map pin (progress truth).
+  const nextIdx = Math.max(0, kap1.findIndex((m) => m.id === nextMission.id));
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const idx = selectedIdx ?? nextIdx;
+  const selected = kap1[idx] ?? nextMission;
+  const selectedDone = missionsDone.includes(selected.id);
+  const isNextModule = selected.id === nextMission.id && !selectedDone;
 
   return (
     <div className="space-y-5">
-      {/* Illustrated city map: the single journey surface (stepper retired s88) */}
-      <div className="rounded-2xl border border-border bg-surface p-2 shadow-soft">
-        <div className="relative overflow-hidden rounded-xl">
-          <svg
-            viewBox="0 0 360 230"
-            className="block h-auto w-full"
-            role="img"
-            aria-label="Neuland-Karte mit deinem Lernweg"
-          >
+      {/* Centered page title, mirroring the Spielen "Neuland" header row */}
+      <h1 className="text-center text-2xl font-bold">Lernpfad</h1>
+
+      {/* Illustrated city map: the single journey surface (stepper retired s88).
+          Native 3:2 (360x240) with no mat padding, so it matches the Spielen
+          chapter hero's dimensions and position exactly. */}
+      <div className="relative overflow-hidden rounded-2xl border border-border shadow-soft">
+        <svg
+          viewBox="0 0 360 240"
+          className="block h-auto w-full"
+          role="img"
+          aria-label="Neuland-Karte mit deinem Lernweg"
+        >
+          <rect width={360} height={240} fill={P.ground} />
+          <g transform="translate(0 5)">
             <defs>
               <filter id="ueben-lm-shadow" x="-40%" y="-40%" width="180%" height="180%">
                 <feDropShadow dx="0" dy="2.5" stdDeviation="2.5" floodColor="#2a2e3f" floodOpacity="0.22" />
               </filter>
             </defs>
 
-            {/* ground, parks, ambient lots (all inside blocks, never on streets) */}
-            <rect width={360} height={230} fill={P.ground} />
+            {/* parks + ambient lots (all inside blocks, never on streets) */}
             <rect x={88} y={14} width={64} height={22} rx={11} fill={P.park} />
             <circle cx={104} cy={25} r={7} fill={P.parkDeep} />
             <circle cx={134} cy={26} r={8} fill={P.parkDeep} />
@@ -231,19 +252,20 @@ export default function UebenPath() {
               strokeWidth={2.5}
             />
             <circle cx={pinX} cy={pinY - 20.5} r={4.6} fill={P.pinRing} />
-          </svg>
+          </g>
+        </svg>
 
-          {/* "Du bist hier" chip floats above the pin, hiding nothing */}
-          <span
-            className="absolute -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-bold shadow-soft"
-            style={{ left: `${(pinX / 360) * 100}%`, top: `${((pinY - 30) / 230) * 100}%` }}
-          >
-            Du bist hier
-          </span>
-        </div>
+        {/* "Du bist hier" chip floats above the pin, hiding nothing */}
+        <span
+          className="absolute -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-bold shadow-soft"
+          style={{ left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 30) / 240) * 100}%` }}
+        >
+          Du bist hier
+        </span>
       </div>
 
-      {/* Als Nächstes tile */}
+      {/* Practice-module card: shows the mission selected in the pager below
+          (defaults to the next unplayed mission) */}
       <div className="rounded-2xl border border-border bg-surface px-5 py-6 shadow-soft">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-muted-foreground">Kapitel 1 · {chapterTitle}</span>
@@ -252,15 +274,27 @@ export default function UebenPath() {
             {doneCount} / {kap1.length}
           </span>
         </div>
-        <h2 className="mt-4 text-xl font-extrabold leading-tight tracking-tight">
-          {allDone ? "Kapitel 1 geschafft" : nextMission.title}
-        </h2>
+        <div className="mt-3.5 flex items-center gap-2">
+          <span className="text-[13px] font-bold tabular-nums text-muted-foreground">1.{selected.index}</span>
+          {isNextModule && (
+            <span className="inline-flex rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary">
+              Als Nächstes
+            </span>
+          )}
+          {selectedDone && (
+            <span className="inline-flex items-center gap-1 rounded-md bg-success/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-success">
+              <Check className="h-3 w-3" />
+              Erledigt
+            </span>
+          )}
+        </div>
+        <h2 className="mt-1 text-xl font-extrabold leading-tight tracking-tight">{selected.title}</h2>
         {/* Üben opens a composed practice session focused on THIS mission (its
             own vocab + Redemittel first, then theme-related fill), NOT the game
             itself. Playing a mission lives under Heute → Spielen (and /welt). */}
         <button
           type="button"
-          onClick={() => navigate(`/session?mission=${nextMission.id}`)}
+          onClick={() => navigate(`/session?mission=${selected.id}`)}
           className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-accent-gradient px-5 py-4 text-[15px] font-extrabold text-white shadow-glow transition active:scale-[0.99]"
         >
           Jetzt üben
@@ -274,6 +308,47 @@ export default function UebenPath() {
           <RotateCcw className="h-4 w-4 text-muted-foreground" />
           Wiederholen
           {due > 0 && <span className="font-medium text-muted-foreground">· {due} fällig</span>}
+        </button>
+      </div>
+
+      {/* Module pager: flip through every Kapitel-1 mission's practice module */}
+      <div className="flex items-center justify-center gap-4 pb-1">
+        <button
+          type="button"
+          aria-label="Vorheriges Modul"
+          disabled={idx === 0}
+          onClick={() => setSelectedIdx(Math.max(0, idx - 1))}
+          className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface text-foreground shadow-soft transition active:scale-95 disabled:opacity-35"
+        >
+          <ChevronLeft className="h-[18px] w-[18px]" />
+        </button>
+        <div className="flex items-center gap-1.5">
+          {kap1.map((m, i) => (
+            <button
+              key={m.id}
+              type="button"
+              aria-label={`Modul 1.${m.index}`}
+              aria-current={i === idx}
+              onClick={() => setSelectedIdx(i)}
+              className={cn(
+                "h-2 rounded-full transition-all",
+                i === idx
+                  ? "w-5 bg-primary"
+                  : missionsDone.includes(m.id)
+                    ? "w-2 bg-success/50"
+                    : "w-2 bg-border",
+              )}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          aria-label="Nächstes Modul"
+          disabled={idx === kap1.length - 1}
+          onClick={() => setSelectedIdx(Math.min(kap1.length - 1, idx + 1))}
+          className="grid h-9 w-9 place-items-center rounded-full border border-border bg-surface text-foreground shadow-soft transition active:scale-95 disabled:opacity-35"
+        >
+          <ChevronRight className="h-[18px] w-[18px]" />
         </button>
       </div>
 
