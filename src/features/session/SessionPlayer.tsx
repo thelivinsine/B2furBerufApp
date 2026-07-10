@@ -53,6 +53,8 @@ interface SessionPlayerProps {
   eyebrow?: string;
   title?: string;
   scope?: ThemeId;
+  /** Mission focus: the exact vocab + Redemittel a Neuland mission exercises. */
+  focus?: { vocabIds: string[]; redemittelIds: string[] };
 }
 
 /**
@@ -76,6 +78,7 @@ function SessionRun({
   minutes,
   eyebrow = "Session",
   scope,
+  focus,
   onRestart,
 }: SessionPlayerProps & { onRestart: () => void }) {
   const navigate = useNavigate();
@@ -103,6 +106,7 @@ function SessionRun({
       minutes,
       difficulty: difficultyForLevel(level),
       scope,
+      focus,
       speaking: recognitionEnabled && recognitionSupported(),
       listening: ttsSupported(),
     }),

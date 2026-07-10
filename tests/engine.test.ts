@@ -2,9 +2,11 @@ import { describe, it, expect } from "vitest";
 import { buildSession, graduatedToTyping } from "@/engine/session";
 import { sessionPreview, targetBlocks, weakestBand } from "@/engine/sessionPreview";
 import { freshCard, review, isDue, mastery } from "@/engine/srs";
+import { missionContentIds } from "@/engine/mission";
 import { searchAll } from "@/lib/search";
 import { daysBetween, shuffle, todayKey } from "@/lib/utils";
 import { vocabulary } from "@/data/vocabulary";
+import { missions } from "@/data/missions";
 import type { SrsCard } from "@/types";
 
 describe("session composer", () => {
@@ -26,6 +28,28 @@ describe("session composer", () => {
       .filter((b) => b.kind === "quiz")
       .map((b) => (b as Extract<(typeof plan.blocks)[number], { kind: "quiz" }>).question.themeId);
     for (const t of quizThemes) expect(["behoerde", "general"]).toContain(t);
+  });
+
+  it("surfaces a mission's own vocab + Redemittel when focused, and drops grammar", () => {
+    // Mission focus (Heute → Üben "Als Nächstes"): the mission's exact items must
+    // appear, regardless of SRS due state, and the untethered grammar drill is
+    // dropped so nothing unrelated to the mission shows up.
+    const focus = { vocabIds: ["v_wohnungsgeberbestaetigung"], redemittelIds: ["r_cla1"] };
+    const plan = buildSession({ srs: {}, mode: "both", minutes: 15, scope: "wohnen", focus });
+    const sourceIds = plan.blocks.map((b) =>
+      "sourceId" in b ? (b as { sourceId?: string }).sourceId : undefined,
+    );
+    expect(sourceIds).toContain("v_wohnungsgeberbestaetigung");
+    expect(sourceIds).toContain("r_cla1");
+    expect(plan.blocks.some((b) => b.kind === "grammar")).toBe(false);
+  });
+
+  it("extracts the vocab + Redemittel a mission exercises", () => {
+    const dach = missions.find((m) => m.id === "m_kap1_dach");
+    expect(dach).toBeTruthy();
+    const ids = missionContentIds(dach!);
+    expect(ids.vocabIds).toContain("v_wohnungsgeberbestaetigung");
+    expect(ids.redemittelIds.length).toBeGreaterThan(0);
   });
 
   it("adds speaking blocks only when the caller opts in", () => {

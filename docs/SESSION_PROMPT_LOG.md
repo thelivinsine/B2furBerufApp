@@ -2568,3 +2568,25 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/welt/NeulandHub.tsx`, `src/features/welt/stage.tsx`,
   `src/features/dashboard/UebenPath.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 268).
+
+## Entry 269 — 2026-07-10 (session 87)
+- **Branch:** `claude/game-tile-removal-nav-hi37z5`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > when i open the session under üben in heute menu, the practice words and drills are all unrelated items
+  > to the words used in the game. remember the rule - the practice item (e.g. 1.5) in üben should have items
+  > related to the corresponding mission in spielen (e.g. 1.5)
+- **Response summary:** The earlier pass only scoped the Üben session to the mission's *theme*, so the
+  words/drills weren't the mission's actual game content. Added `missionContentIds(mission)` to
+  `engine/mission.ts` (extracts the exact vocab + Redemittel ids a mission's scenes reference: loadout
+  slots, battle moves, item demands, hotspots, automat keys), and a `focus` opt to `buildSession`: those
+  items are practised **first, regardless of SRS due state**, the untethered grammar drill is **dropped**,
+  and the rest fills from the mission's theme (quiz/due vocab/reading). `Session.tsx` now resolves
+  `?mission=<id>` → focus + theme scope; `SessionPlayer` threads it through; the Üben button links to
+  `/session?mission=<id>`. Verified in the app: `/session?mission=m_kap1_dach` leads with
+  "die Wohnungsgeberbestätigung" (the word that mission turns on). Gates green: build, typecheck, lint 0
+  errors, test:unit 99 (2 new cases), bundle 71.7 kB.
+- **Artifacts:** `src/engine/mission.ts`, `src/engine/session.ts`, `src/features/session/Session.tsx`,
+  `src/features/session/SessionPlayer.tsx`, `src/features/dashboard/UebenPath.tsx`, `tests/engine.test.ts`;
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 269).

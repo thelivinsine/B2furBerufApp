@@ -659,3 +659,50 @@ export function missionUnlocked(
   const itemsOk = (mission.requiresItems ?? []).every((id) => keyItems.includes(id));
   return missionsOk && itemsOk;
 }
+
+/**
+ * The content-bank items a mission actually exercises in its scenes: the vocab
+ * and Redemittel ids referenced by loadout slots, battle moves, item demands,
+ * hotspots and machine keys. This is the "words used in the game" for a mission,
+ * so the Heute → Üben session for mission N can practise exactly those items
+ * (plus theme-related fill), keeping Üben and Spielen aligned. Order-preserving
+ * and de-duplicated; distractors are deliberately excluded (they are not the
+ * target items).
+ */
+export function missionContentIds(mission: Mission): {
+  vocabIds: string[];
+  redemittelIds: string[];
+} {
+  const vocab: string[] = [];
+  const rede: string[] = [];
+  const addV = (id?: string) => {
+    if (id && !vocab.includes(id)) vocab.push(id);
+  };
+  const addR = (id?: string) => {
+    if (id && !rede.includes(id)) rede.push(id);
+  };
+  for (const scene of Object.values(mission.scenes)) {
+    switch (scene.kind) {
+      case "loadout":
+        for (const slot of scene.slots) addV(slot.vocabId);
+        break;
+      case "dialogueBattle":
+        for (const node of Object.values(scene.nodes)) {
+          for (const move of node.moves ?? []) {
+            addV(move.vocabId);
+            addR(move.redemittelId);
+          }
+          addV(node.ask?.vocabId);
+        }
+        break;
+      case "hotspot":
+        for (const spot of scene.spots) addV(spot.vocabId);
+        break;
+      case "automat":
+        for (const step of Object.values(scene.steps))
+          for (const key of step.keys) addV(key.vocabId);
+        break;
+    }
+  }
+  return { vocabIds: vocab, redemittelIds: rede };
+}
