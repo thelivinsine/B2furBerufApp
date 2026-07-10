@@ -242,9 +242,17 @@ carousel), and the **Neuland game tile should be removed from the Anwenden hub**
   - In-mission `MissionPlayer` scenes remain light-only (locked, backlog #31): the pixel atoms in
     `stage.tsx` default to fixed light; only `NeulandHub` passes `themed`. Verified light + dark for both
     tabs via headless Chromium screenshots before shipping.
+- **Layout polish round (founder, 8 asks):** *Spielen* (`NeulandHub.tsx`) — "Neuland" is now the section
+  heading; "Kapitel 1 · Ankommen" moved **below** the backdrop as a smaller line; the dark-mode backdrop
+  dim was reduced (`/45`→`/20`) + a border added so it's clearly visible; mission-tile **subtitles removed**
+  and the green done-tick moved into a `bg-success/15` badge to the left of the play button. *Üben*
+  (`UebenPath.tsx`) — the **stepper moved above the map**; the "Als Nächstes" tile is **taller** (`p-[18px]`
+  → `px-5 py-6` + larger inner margins); the **map is cropped to 3:2** (`VIEW_H=117`/`CROP_TOP=24`, with a
+  row-skip guard so neither the top decorative band nor the bottom row leaves a sliver) to match the Spielen
+  backdrop dimensions; container spacing bumped `space-y-4`→`space-y-5`. Re-verified light + dark, both tabs.
 - Gates green: build, typecheck, lint (0 errors), check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md
-  (bundle note + the locked mobile-bar Spielen + Üben-tile lines + the game-art hub-theming note), this
-  handoff, s85 handoff archived to W28, prompt log 265–267.
+  (bundle note + the locked mobile-bar Spielen + Üben-tile/stepper/3:2 lines + the game-art hub-theming note),
+  this handoff, s85 handoff archived to W28, prompt log 265–268.
 - **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
 
 **Prior handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch

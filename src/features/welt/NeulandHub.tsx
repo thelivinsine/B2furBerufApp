@@ -34,26 +34,23 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
           .filter((m) => m.chapter === chapter.id)
           .sort((a, b) => a.index - b.index);
         return (
-          <section key={chapter.id} className="space-y-5">
+          <section key={chapter.id} className="space-y-4">
             <header className="flex items-center justify-between gap-2">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  Neuland
-                </p>
-                <h1 className="text-2xl font-bold">
-                  Kapitel {ci + 1} · {chapter.title}
-                </h1>
-              </div>
+              <h1 className="text-2xl font-bold">Neuland</h1>
               <span className="inline-block rounded-lg bg-amber-100 px-2 py-0.5 text-xs font-bold text-amber-700 dark:bg-amber-500/15 dark:text-amber-400">
                 Beta
               </span>
             </header>
 
-            <PixelStage setting="strasse" label={null} className="rounded-[20px]" themed>
+            <PixelStage setting="strasse" label={null} className="rounded-[20px] border border-border" themed>
               <div className="absolute bottom-2 left-3 rounded-lg border border-border bg-surface/95 px-3 py-1 text-xs font-semibold text-muted-foreground">
                 {chapter.district}
               </div>
             </PixelStage>
+
+            <p className="text-sm font-semibold text-muted-foreground">
+              Kapitel {ci + 1} · {chapter.title}
+            </p>
 
             <div className="space-y-3">
               {chapterMissions.map((m, i) => {
@@ -70,22 +67,21 @@ export function NeulandHub({ onPlay }: { onPlay: (mission: Mission) => void }) {
                       className="flex items-center gap-3 rounded-[20px] border border-border bg-surface p-4"
                       style={TILE_SHADOW}
                     >
-                      <div className="min-w-0 flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          {m.boss && (
-                            <span className="inline-flex items-center rounded-lg bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400">
-                              <Swords className="mr-1 h-3 w-3" /> Boss
-                            </span>
-                          )}
-                          <p className="font-semibold text-foreground">
-                            {ci + 1}.{m.index} · {m.title}
-                          </p>
-                          {done && <Check className="h-4 w-4 text-success" />}
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          <Gloss de={m.brief.de} en={m.brief.en} />
+                      <div className="flex min-w-0 flex-1 items-center gap-2">
+                        {m.boss && (
+                          <span className="inline-flex shrink-0 items-center rounded-lg bg-indigo-100 px-2 py-0.5 text-xs font-bold text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400">
+                            <Swords className="mr-1 h-3 w-3" /> Boss
+                          </span>
+                        )}
+                        <p className="font-semibold text-foreground">
+                          {ci + 1}.{m.index} · {m.title}
                         </p>
                       </div>
+                      {done && (
+                        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-success/15">
+                          <Check className="h-3.5 w-3.5 text-success" />
+                        </span>
+                      )}
                       {unlocked ? (
                         <button
                           type="button"

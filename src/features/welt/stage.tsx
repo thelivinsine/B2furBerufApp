@@ -116,7 +116,7 @@ export function PixelStage({
         />
       )}
       {themed && (
-        <div className="pointer-events-none absolute inset-0 hidden bg-[#0b1220]/45 dark:block" />
+        <div className="pointer-events-none absolute inset-0 hidden bg-[#0b1220]/20 dark:block" />
       )}
       {caption && (
         <span
