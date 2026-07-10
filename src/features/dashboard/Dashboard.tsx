@@ -38,7 +38,7 @@ export function Dashboard() {
       >
         {(
           [
-            { id: "ueben", label: "Üben", Icon: Zap, tint: "text-primary" },
+            { id: "ueben", label: "Üben", Icon: Zap, tint: "text-orange-500" },
             { id: "spielen", label: "Spielen", Icon: Play, tint: "text-accent" },
           ] as const
         ).map(({ id, label, Icon, tint }) => (
@@ -51,14 +51,14 @@ export function Dashboard() {
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition",
               // Active tab lifts on the white pill and picks up its section's
-              // subtle tint (Üben = indigo/primary, Spielen = teal/accent),
-              // matching the tinted tile-mat border on each tab.
+              // subtle tint (Üben = orange, Spielen = teal/accent), matching
+              // the tinted tile-mat border on each tab.
               tab === id
                 ? cn("bg-surface shadow-soft", tint)
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <Icon className={cn("h-4 w-4", id === "spielen" && tab === id && "fill-current")} />
+            <Icon className={cn("h-4 w-4", tab === id && "fill-current")} />
             {label}
           </button>
         ))}
