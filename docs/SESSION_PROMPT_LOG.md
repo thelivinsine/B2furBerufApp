@@ -2942,3 +2942,59 @@ Branch: `claude/whats-next-esga9u`.
   now-stale ship status: the s89 handoff header + "Ship status" bullet now record PR #411 squash-merged to
   `main` and the branch realignment (was "not yet merged"), and appended prompt-log entries 288–290. Doc-only.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entries 288–290).
+
+## Entry 291 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > make sure to keep the map/photo tile in üben/spielen same dimensions and fix them both in same position on the screen. Also add a subtle color theme for the toggle buttons and the border padding
+
+  (then, after an interrupt:)
+  > continue
+- **Response summary:** The tiles were already the same size (both 3:2 in a `p-2` surface mat, both inside
+  Dashboard's `mx-auto max-w-md`) but sat at different vertical positions: `UebenPath` used `justify-between`
+  (pushing the map down) while the compact `NeulandHub` was top-aligned. Pinned Üben's header + map to the
+  top with a fixed `gap-4` and pushed the pager to the bottom with `mt-auto` (keeps the no-scroll fit).
+  Measured parity in a headless browser (390×844): both tiles `tileTop=353`, `245×358px`, `gap=16`. Added a
+  subtle section color: active toggle button + tile-mat border tinted (initially Üben=primary/indigo,
+  Spielen=teal/accent; white mat kept). Verified with screenshots + bounding-box measurement.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx`,
+  `src/features/welt/NeulandHub.tsx` (commit `d1a4d5f`); shipped in PR #413.
+
+## Entry 292 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > yes
+- **Response summary:** Confirmation to open a PR into `main`, squash-merge, and update the docs. Created
+  **PR #413** (no template in repo), squash-merged to `main` (`2bbb055`), ran the post-merge realignment
+  (fetch `origin/main`, `git reset --hard`, force-with-lease push; branch clean and level), and updated
+  `PROJECT_STATUS.md` (s90 handoff + s88 handoff archived to W28), `CLAUDE.md` (Üben layout/toggle notes),
+  and this log. Founder verifies the live site.
+- **Artifacts:** PR #413 (squash `2bbb055`); `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 293 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > use some other color instead of violet for üben
+- **Response summary:** Switched Üben's section tint from indigo/primary to **orange** (`text-orange-500`
+  on the toggle, `border-orange-400/40` on the map mat), chosen to stay distinct from Spielen's teal and
+  from the green done/Erledigt cues on the same screen (and it echoes the map's Zuhause/Laden landmark
+  tiles). Spielen stays teal/accent. Re-verified via screenshot.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx`
+  (commit `add4b7f`); shipped in PR #413.
+
+## Entry 294 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > fill the üben icon when selected similar to spielen
+- **Response summary:** Changed the toggle icon fill from Spielen-only (`id === "spielen" && tab === id`)
+  to **either active tab** (`tab === id && "fill-current"`), so the selected Üben Zap renders solid like the
+  selected Spielen Play. Verified in both tabs.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx` (commit `add4b7f`); shipped in PR #413.
