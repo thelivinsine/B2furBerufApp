@@ -152,9 +152,10 @@ export default function UebenPath() {
   return (
     // Header + map are pinned to the TOP with a fixed 1rem gap so the map tile
     // lands at the exact same screen position as the Spielen chapter hero when
-    // toggling between tabs (founder). The pager is pushed to the bottom
-    // (`mt-auto`) so the tab still fills the viewport without scrolling; the
-    // min-height is tuned to stay just under the bottom nav.
+    // toggling between tabs (founder). The card + pager are grouped and
+    // vertically centered in the space below the map (`my-auto`) so they sit
+    // close together in the lower half instead of the dots being stranded at
+    // the very bottom; the tab still fills the viewport without scrolling.
     <div className="flex min-h-[calc(100dvh-15rem)] flex-col gap-4">
       {/* Centered page title, mirroring the Spielen "Neuland" header row */}
       <h1 className="text-center text-2xl font-bold">Lernpfad</h1>
@@ -282,6 +283,11 @@ export default function UebenPath() {
         </div>
       </div>
 
+      {/* Card + pager as one group, vertically centered in the leftover space
+          (`my-auto`) with a tight internal gap so the tile drops down and the
+          dots rise to sit just below it (founder: the old card↔dots gap looked
+          weird). */}
+      <div className="my-auto space-y-3">
       {/* Practice-module card: shows the mission selected in the pager below
           (defaults to the next unplayed mission). Swipe left/right to change
           the module on touch. */}
@@ -361,10 +367,9 @@ export default function UebenPath() {
       </div>
 
       {/* Module pager: dots for every Kapitel-1 practice module. Arrows only on
-          desktop (founder: on mobile the dots + card swipe are enough). Pushed
-          to the bottom so the page fills the viewport while the map stays pinned
-          to the top. */}
-      <div className="mt-auto flex items-center justify-center gap-3">
+          desktop (founder: on mobile the dots + card swipe are enough). Sits
+          just below the card inside the centered group. */}
+      <div className="flex items-center justify-center gap-3">
         <button
           type="button"
           aria-label="Vorheriges Modul"
@@ -406,6 +411,7 @@ export default function UebenPath() {
         >
           <ChevronRight className="h-[18px] w-[18px]" />
         </button>
+      </div>
       </div>
 
       <style>{`.uben-pulse{animation:uben-pulse 2.2s ease-in-out infinite}@keyframes uben-pulse{0%,100%{opacity:.45}50%{opacity:1}}@media (prefers-reduced-motion:reduce){.uben-pulse{animation:none}}`}</style>
