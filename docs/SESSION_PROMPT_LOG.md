@@ -2590,3 +2590,16 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/engine/mission.ts`, `src/engine/session.ts`, `src/features/session/Session.tsx`,
   `src/features/session/SessionPlayer.tsx`, `src/features/dashboard/UebenPath.tsx`, `tests/engine.test.ts`;
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 269).
+
+## Entry 270 — 2026-07-10 (session 87)
+- **Branch:** `claude/game-tile-removal-nav-hi37z5`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Documentation pass. Most docs were written incrementally through the session
+  (PROJECT_STATUS s87 handoff, prompt-log entries 265–269, the CLAUDE.md game-art hub-theming + mobile-bar
+  Spielen/Üben-tile/stepper/3:2/mission-focus lines). This pass verified consistency, corrected the s87
+  handoff "Ship status" to reflect the **4 squash-merged PRs** (#396–#399, all live on `main`, branch
+  realigned after each), refreshed the doc-artifact list, and appended this entry. Doc-only.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (entry 270).
