@@ -227,9 +227,24 @@ carousel), and the **Neuland game tile should be removed from the Anwenden hub**
   not play it**. Button relabelled **"Üben"** and now opens a composed practice session scoped to the next
   mission's theme (`/session?theme=<mission.themeId>`), reusing the existing session composer's theme scope
   (biases the vocab/quiz/reading pools). Game entry stays under Heute → Spielen and `/welt`.
+- **Dark mode for the Neuland Heute surfaces (founder chose "Map + Heute tiles"):** in dark mode the Üben
+  city map and the Spielen tiles/backdrop used to render as bright light surfaces against the dark app.
+  Now theme-aware:
+  - **Üben map** (`UebenPath.tsx`): the `<canvas>` `drawCity` takes an `isDark` flag and picks `DARK_PAL`
+    vs `LIGHT_PAL` (deep muted grass/roads/pavement/water/background-buildings); the glowing cyan route and
+    the colour-coded landmark buildings stay vivid (a dark-map style). Theme read via a new reactive
+    `useIsDark()` hook in `lib/useTheme.ts`; redraws on theme change.
+  - **Spielen tiles** (`NeulandHub.tsx`): the mission cards were re-styled from the pixel `GameCard` to the
+    **same app-tile language as the Üben "Als Nächstes" tile** (`rounded-[20px] border-border bg-surface` +
+    the shared soft shadow, gradient play button, theme-aware Boss/Beta badges), so they're dark in dark
+    mode and consistent across both tabs. `PixelStage` gained an opt-in `themed` prop (hub only) that dims
+    the bright daytime backdrop art in dark mode.
+  - In-mission `MissionPlayer` scenes remain light-only (locked, backlog #31): the pixel atoms in
+    `stage.tsx` default to fixed light; only `NeulandHub` passes `themed`. Verified light + dark for both
+    tabs via headless Chromium screenshots before shipping.
 - Gates green: build, typecheck, lint (0 errors), check:bundle **71.7 kB** / 400. Docs updated: CLAUDE.md
-  (bundle note + the locked mobile-bar Spielen + Üben-tile lines), this handoff, s85 handoff archived to W28,
-  prompt log.
+  (bundle note + the locked mobile-bar Spielen + Üben-tile lines + the game-art hub-theming note), this
+  handoff, s85 handoff archived to W28, prompt log 265–267.
 - **Ship status:** on the branch, gates green. **Founder verifies the live site after merge.**
 
 **Prior handoff after session 86 (2026-07-10). Heute page polished + header/bottom-bar cleanup (branch

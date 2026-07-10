@@ -119,12 +119,20 @@ list. Full rationale + per-task model map in the plan's G2 status block.
   dependencies). `tests/mission.test.ts` pins the runner; extend it when touching
   `engine/mission.ts`.
 - **Art/UI: scene-7 palette, PIXEL-GAME chrome, full-screen (s72 blessing as amended s74;
-  `docs/DECISIONS.md` "Game art direction" + "Game interaction & pixel-UI rules"):** game scenes
-  are light-theme-only (dark deferred, backlog #31), brand indigo the single loud accent,
+  `docs/DECISIONS.md` "Game art direction" + "Game interaction & pixel-UI rules"):** the in-mission
+  game scenes (the full-screen `MissionPlayer`) are light-theme-only (dark deferred, backlog #31),
+  brand indigo the single loud accent,
   reward-gold only on the victory loot screen. Since s74 the mission player is a FIXED
   full-screen layer (dark surround, edge-to-edge stage) and every in-game surface is
   pixel-styled (2px outlines in `GAME_OUT` #463c44, hard offset shadows, near-square corners,
-  RPG name plates); do not reintroduce app-chrome cards inside missions. **World scale is
+  RPG name plates); do not reintroduce app-chrome cards inside missions. **The Neuland HUB
+  surfaces are theme-aware, NOT the in-mission scenes (s87):** the Heute → Spielen mission list
+  (`features/welt/NeulandHub`, also `/welt`) uses app-theme tiles (`bg-surface`/`border-border` +
+  the shared Üben tile shadow, gradient play button) and the Üben bird's-eye map
+  (`features/dashboard/UebenPath`) has a dark canvas palette (`DARK_PAL`/`LIGHT_PAL`, switched by
+  `useIsDark` from `lib/useTheme`); `PixelStage` gained an opt-in `themed` prop (hub only) that dims
+  the bright backdrop art in dark mode. In-mission `MissionPlayer` scenes stay light-only (the
+  pixel atoms in `stage.tsx` default to fixed light; only the hub passes `themed`). **World scale is
   locked** at the top of `preview/game-pixel-mockups/welt_assets.py` (standing adult 28-32 px on
   the 240x160 world, chair ~19 px; `proportions-check.png` verifies), and battles stage
   opponent+bar top / player+Mut-bar bottom at ONE human scale (no foreground zoom). Placeholder

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { missions, chapters } from "@/data/missions";
 import { useProgressStore } from "@/store/useProgressStore";
+import { useIsDark } from "@/lib/useTheme";
 import { cn } from "@/lib/utils";
 
 /**
@@ -43,11 +44,51 @@ const SEGMENTS: { to: number; pts: [number, number][] }[] = [
   { to: -1, pts: [[88, 32], [45, 32]] },
 ];
 
-function drawCity(canvas: HTMLCanvasElement, states: StopState[], currentIndex: number) {
+// Scenery palette. The map is an app surface (Heute), so it follows the theme:
+// dark mode gets deep muted grass/roads/buildings while the glowing cyan route
+// and the colour-coded landmark buildings stay vivid (like a dark map style).
+type Palette = {
+  grassA: string; grassB: string; speckA: string; speckB: string;
+  pave: string; paveHi: string; paveLo: string;
+  water: string; waterHi: string; waterSpark: string;
+  road: string; roadEdge: string; lane: string;
+  bg: string[][];
+};
+const LIGHT_PAL: Palette = {
+  grassA: "#79ac59", grassB: "#6fa350", speckA: "#83b662", speckB: "#659845",
+  pave: "#c7cbd3", paveHi: "#d6d9df", paveLo: "#b2b5be",
+  water: "#4a90c2", waterHi: "#69a8d6", waterSpark: "#8ec4e6",
+  road: "#8b8f99", roadEdge: "#767a84", lane: "#e8d48a",
+  bg: [
+    ["#9a6b5f", "#b5847a", "#7d5348"],
+    ["#6f7787", "#8a92a2", "#59606f"],
+    ["#8a7f6a", "#a49a84", "#6f6554"],
+    ["#5f7f8a", "#78a0ac", "#4b6570"],
+    ["#7a6f8a", "#948aa6", "#61566f"],
+    ["#8f9a7a", "#a8b295", "#727c60"],
+  ],
+};
+const DARK_PAL: Palette = {
+  grassA: "#2f4a38", grassB: "#294231", speckA: "#39573f", speckB: "#22392b",
+  pave: "#3f4450", paveHi: "#4b515e", paveLo: "#353a45",
+  water: "#294f68", waterHi: "#356882", waterSpark: "#5090b0",
+  road: "#373d47", roadEdge: "#282d36", lane: "#b6a561",
+  bg: [
+    ["#5e463f", "#71564e", "#4a352f"],
+    ["#454b58", "#565d6b", "#363b46"],
+    ["#57503f", "#68604e", "#413b2e"],
+    ["#3b4e57", "#495f6b", "#2d3b43"],
+    ["#4a4356", "#585067", "#383144"],
+    ["#565c48", "#666d55", "#414636"],
+  ],
+};
+
+function drawCity(canvas: HTMLCanvasElement, states: StopState[], currentIndex: number, isDark: boolean) {
   canvas.width = FIELD_W;
   canvas.height = FIELD_H;
   const g = canvas.getContext("2d");
   if (!g) return;
+  const P = isDark ? DARK_PAL : LIGHT_PAL;
   g.imageSmoothingEnabled = false;
   const R = (x: number, y: number, w: number, h: number, col: string) => {
     g.fillStyle = col;
@@ -63,9 +104,9 @@ function drawCity(canvas: HTMLCanvasElement, states: StopState[], currentIndex: 
   const rnd = mk(9);
 
   for (let y = 0; y < FIELD_H; y += 4)
-    for (let x = 0; x < FIELD_W; x += 4) R(x, y, 4, 4, (x / 4 + y / 4) & 1 ? "#79ac59" : "#6fa350");
+    for (let x = 0; x < FIELD_W; x += 4) R(x, y, 4, 4, (x / 4 + y / 4) & 1 ? P.grassA : P.grassB);
   const sp = mk(5);
-  for (let i = 0; i < 90; i++) R(Math.floor(sp() * FIELD_W), Math.floor(sp() * FIELD_H), 1, 1, sp() < 0.5 ? "#83b662" : "#659845");
+  for (let i = 0; i < 90; i++) R(Math.floor(sp() * FIELD_W), Math.floor(sp() * FIELD_H), 1, 1, sp() < 0.5 ? P.speckA : P.speckB);
 
   const tree = (x: number, y: number) => {
     R(x - 1, y - 1, 5, 4, OUT);
@@ -80,24 +121,17 @@ function drawCity(canvas: HTMLCanvasElement, states: StopState[], currentIndex: 
     g.fillRect(x + w, y + 2, 2, h - 2);
   };
   const pave = (x: number, y: number, w: number, h: number) => {
-    R(x, y, w, h, "#c7cbd3");
-    R(x, y, w, 1, "#d6d9df");
-    R(x, y + h - 1, w, 1, "#b2b5be");
+    R(x, y, w, h, P.pave);
+    R(x, y, w, 1, P.paveHi);
+    R(x, y + h - 1, w, 1, P.paveLo);
   };
   const water = (x: number, y: number, w: number, h: number) => {
-    R(x, y, w, h, "#4a90c2");
-    R(x, y, w, 1, "#69a8d6");
-    R(x + 2, y + 2, 3, 1, "#8ec4e6");
-    R(x + w - 6, y + h - 4, 4, 1, "#8ec4e6");
+    R(x, y, w, h, P.water);
+    R(x, y, w, 1, P.waterHi);
+    R(x + 2, y + 2, 3, 1, P.waterSpark);
+    R(x + w - 6, y + h - 4, 4, 1, P.waterSpark);
   };
-  const BG = [
-    ["#9a6b5f", "#b5847a", "#7d5348"],
-    ["#6f7787", "#8a92a2", "#59606f"],
-    ["#8a7f6a", "#a49a84", "#6f6554"],
-    ["#5f7f8a", "#78a0ac", "#4b6570"],
-    ["#7a6f8a", "#948aa6", "#61566f"],
-    ["#8f9a7a", "#a8b295", "#727c60"],
-  ];
+  const BG = P.bg;
   const bd = (x: number, y: number, w: number, h: number, c: string[]) => {
     shadow(x, y, w, h);
     R(x - 1, y - 1, w + 2, h + 2, OUT);
@@ -156,22 +190,22 @@ function drawCity(canvas: HTMLCanvasElement, states: StopState[], currentIndex: 
   const VS = [[20, 28], [62, 70], [104, 112], [146, 154]];
   const HS = [[28, 36], [66, 74], [100, 108], [130, 138]];
   VS.forEach((v) => {
-    R(v[0], 0, v[1] - v[0], FIELD_H, "#8b8f99");
-    R(v[0], 0, 1, FIELD_H, "#767a84");
-    R(v[1] - 1, 0, 1, FIELD_H, "#767a84");
+    R(v[0], 0, v[1] - v[0], FIELD_H, P.road);
+    R(v[0], 0, 1, FIELD_H, P.roadEdge);
+    R(v[1] - 1, 0, 1, FIELD_H, P.roadEdge);
   });
   HS.forEach((h) => {
-    R(0, h[0], FIELD_W, h[1] - h[0], "#8b8f99");
-    R(0, h[0], FIELD_W, 1, "#767a84");
-    R(0, h[1] - 1, FIELD_W, 1, "#767a84");
+    R(0, h[0], FIELD_W, h[1] - h[0], P.road);
+    R(0, h[0], FIELD_W, 1, P.roadEdge);
+    R(0, h[1] - 1, FIELD_W, 1, P.roadEdge);
   });
   VS.forEach((v) => {
     const xc = Math.round((v[0] + v[1]) / 2);
-    for (let y = 3; y < FIELD_H; y += 8) R(xc, y, 1, 4, "#e8d48a");
+    for (let y = 3; y < FIELD_H; y += 8) R(xc, y, 1, 4, P.lane);
   });
   HS.forEach((h) => {
     const yc = Math.round((h[0] + h[1]) / 2);
-    for (let x = 3; x < FIELD_W; x += 8) R(x, yc, 4, 1, "#e8d48a");
+    for (let x = 3; x < FIELD_W; x += 8) R(x, yc, 4, 1, P.lane);
   });
 
   // focus landmark buildings (colour-coded; state shown in the stepper, not here)
@@ -270,6 +304,7 @@ function drawCity(canvas: HTMLCanvasElement, states: StopState[], currentIndex: 
 export default function UebenPath() {
   const navigate = useNavigate();
   const missionsDone = useProgressStore((s) => s.missionsDone);
+  const isDark = useIsDark();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const kap1 = useMemo(
@@ -297,9 +332,9 @@ export default function UebenPath() {
 
   const stateKey = states.join("|");
   useEffect(() => {
-    if (canvasRef.current) drawCity(canvasRef.current, states, currentIndex);
+    if (canvasRef.current) drawCity(canvasRef.current, states, currentIndex, isDark);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateKey, currentIndex]);
+  }, [stateKey, currentIndex, isDark]);
 
   const cur = STOPS[currentIndex] ?? STOPS[STOPS.length - 1];
   const allDone = doneCount >= kap1.length;
