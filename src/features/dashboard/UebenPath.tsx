@@ -150,18 +150,20 @@ export default function UebenPath() {
   };
 
   return (
-    // Fill the available height below the toggle and distribute the four blocks
-    // (title, map, card, pager) evenly down the page instead of clustering them
-    // at the top (founder s88). The min-height is tuned to stay just under the
-    // bottom nav so the tab still never scrolls.
-    <div className="flex min-h-[calc(100dvh-15rem)] flex-col justify-between gap-3">
+    // Header + map are pinned to the TOP with a fixed 1rem gap so the map tile
+    // lands at the exact same screen position as the Spielen chapter hero when
+    // toggling between tabs (founder). The pager is pushed to the bottom
+    // (`mt-auto`) so the tab still fills the viewport without scrolling; the
+    // min-height is tuned to stay just under the bottom nav.
+    <div className="flex min-h-[calc(100dvh-15rem)] flex-col gap-4">
       {/* Centered page title, mirroring the Spielen "Neuland" header row */}
       <h1 className="text-center text-2xl font-bold">Lernpfad</h1>
 
       {/* Illustrated city map: the single journey surface (stepper retired s88).
-          Native 3:2 (360x240) in a surface mat (the same mat frames the Spielen
-          hero), so both tiles share dimensions and screen position. */}
-      <div className="rounded-2xl border border-border bg-surface p-2 shadow-soft">
+          Native 3:2 (360x240) in a surface mat (the same mat, same dimensions
+          and screen position as the Spielen hero), with a subtle orange-tinted
+          border as the Üben section color. */}
+      <div className="rounded-2xl border border-orange-400/40 bg-surface p-2 shadow-soft">
         <div className="relative overflow-hidden rounded-xl">
         <svg
           viewBox="0 0 360 240"
@@ -358,8 +360,10 @@ export default function UebenPath() {
       </div>
 
       {/* Module pager: dots for every Kapitel-1 practice module. Arrows only on
-          desktop (founder: on mobile the dots + card swipe are enough). */}
-      <div className="flex items-center justify-center gap-3">
+          desktop (founder: on mobile the dots + card swipe are enough). Pushed
+          to the bottom so the page fills the viewport while the map stays pinned
+          to the top. */}
+      <div className="mt-auto flex items-center justify-center gap-3">
         <button
           type="button"
           aria-label="Vorheriges Modul"
