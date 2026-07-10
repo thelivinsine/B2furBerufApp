@@ -2825,3 +2825,23 @@ Branch: `claude/whats-next-esga9u`.
   1.3–1.6 boss; no page errors. Gates green (build, lint 0 errors). Shipped as PR #407.
 - **Artifacts:** `src/features/welt/NeulandHub.tsx`, `src/features/dashboard/SpielenHub.tsx`; `CLAUDE.md`,
   `docs/SESSION_PROMPT_LOG.md` (entry 283); PR #407.
+
+## Entry 284 — 2026-07-10 (session 88)
+- **Branch:** `claude/landing-page-design-review-ys5jck`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** 1 screenshot (Heute Spielen, scrollbar annotated)
+- **Prompt (verbatim):**
+  > get rid of the scroll bar to the right. see the annotation. Also expand the crop of the missions cell a
+  > bit more so that two missions would be visible comfortably.
+- **Follow-up prompt (verbatim, mid-turn):**
+  > get rid of the key documents items in the bottom. it's in the game bag anyway
+- **Response summary:** Applied the existing `.no-scrollbar` utility to the compact mission-list scroll
+  region (hides the right scrollbar). Removed the "Schlüssel-Dokumente" shelf from `NeulandHub` entirely
+  (both the Heute compact view and `/welt`, per the follow-up: it's redundant with the in-mission bag),
+  dropping the now-unused `KeyRound`/`Gloss`/`keyItemById` imports. With the shelf gone the compact mission
+  list's `flex-1` region grows so ~4 missions show comfortably (was ~1.5 when the shelf ate footer height),
+  scroll reveals the rest, and the page still doesn't scroll. Verified via Playwright with the founder's
+  state (5/6 done + 4 key items): shelf absent, docScroll == viewport, list clientH 226 of scrollH 345.
+  Gates green (build, lint 0 errors). Shipped as PR #408.
+- **Artifacts:** `src/features/welt/NeulandHub.tsx`; `CLAUDE.md`, `docs/SESSION_PROMPT_LOG.md` (entry 284);
+  PR #408.
