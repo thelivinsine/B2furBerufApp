@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MessageSquareText, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
 import { iconByName } from "@/lib/icons";
@@ -15,7 +15,6 @@ import { redemittelFacets } from "@/lib/facets";
 import { RedemittelTable, RedemittelCompactList } from "./RedemittelViews";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
-import { HubHero } from "@/components/shared/HubHero";
 import { defaultVisibleBands } from "@/lib/cefr";
 
 function normalise(s: string) {
@@ -150,6 +149,10 @@ export function RedemittelTrainer() {
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
     ),
+    count: {
+      value: filtered.length,
+      label: filtered.length !== 1 ? "Wendungen" : "Wendung",
+    },
   };
 
   const cardSections = categoriesToRender.map((cat) => {
@@ -202,13 +205,7 @@ export function RedemittelTrainer() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <HubHero
-        icon={MessageSquareText}
-        gradient="from-emerald-500 to-teal-500"
-        eyebrow="Redemittel"
-        title="Redemittel-Training"
-      />
-
+      {/* No page header: the Bibliothek tabs already name the section (s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
           follow-up s91), while the content and the filter tile share row 2 so
@@ -221,9 +218,6 @@ export function RedemittelTrainer() {
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
-            <span className="text-sm tabular-nums text-muted-foreground">
-              {filtered.length} Wendung{filtered.length !== 1 ? "en" : ""}
-            </span>
           </div>
 
           {bandActive && bandHiddenCount > 0 && (

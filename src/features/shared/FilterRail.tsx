@@ -129,6 +129,7 @@ export function FilterRail<T>({
   selection,
   onChange,
   footer,
+  count,
   pinScope,
   defaultOpen = true,
   open: controlledOpen,
@@ -147,6 +148,9 @@ export function FilterRail<T>({
   onChange: (next: FacetSelection) => void;
   /** Always-visible slot at the bottom of the tile (the Üben button). */
   footer?: React.ReactNode;
+  /** Result count shown stacked (number over noun) to the right of the footer
+   *  button. Omit to hide it (e.g. the Wörter graph view). */
+  count?: { value: number; label: string };
   /** localStorage scope for the section pins, e.g. "woerter". */
   pinScope: string;
   /** Whether the panel starts expanded (uncontrolled). Desktop defaults open. */
@@ -156,7 +160,7 @@ export function FilterRail<T>({
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   /** Hide the built-in "Filter" header/toggle row. Mobile passes this because
-   *  the toggle lives on the view-options line instead. */
+   *  the toggle lives inside the tile (top when open, footer when collapsed). */
   hideHeader?: boolean;
   className?: string;
 }) {
@@ -165,6 +169,40 @@ export function FilterRail<T>({
   const setOpen = (next: boolean) => (onOpenChange ? onOpenChange(next) : setInternalOpen(next));
   const [pins, setPins] = useState<string[]>(() => readPins(pinScope));
   const activeCount = activeFacetCount(selection);
+
+  // The Filter toggle for the headerless (mobile) tile. It moves between two
+  // spots by state: top-left next to the search when expanded, footer-left
+  // next to the Üben button when collapsed. Same control either way.
+  const filterToggle = (
+    <Button
+      type="button"
+      size="icon"
+      variant={open ? "default" : "outline"}
+      aria-expanded={open}
+      aria-label="Filter"
+      title="Filter"
+      className="relative h-10 w-10 shrink-0"
+      onClick={() => setOpen(!open)}
+    >
+      <SlidersHorizontal className="h-4 w-4" />
+      {activeCount > 0 && (
+        <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+          {activeCount}
+        </span>
+      )}
+    </Button>
+  );
+
+  // Result count, stacked (number over noun) so it fits the footer height to
+  // the right of the Üben button without changing the collapsed tile's size.
+  const countStack = count ? (
+    <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-tight">
+      <span className="text-sm font-semibold tabular-nums text-foreground">{count.value}</span>
+      <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+        {count.label}
+      </span>
+    </div>
+  ) : null;
 
   const togglePin = (id: string) => {
     const next = pins.includes(id) ? pins.filter((p) => p !== id) : [...pins, id];
@@ -325,11 +363,18 @@ export function FilterRail<T>({
             hideHeader ? "rounded-t-xl" : "border-t border-muted-foreground/10",
           )}
         >
-          <SearchField
-            value={search}
-            onChange={onSearch}
-            placeholder={searchPlaceholder ?? "Suchen …"}
-          />
+          {/* Expanded, headerless (mobile): the Filter toggle sits to the left
+              of the search field at the top of the tile. */}
+          <div className="flex items-center gap-2">
+            {hideHeader && filterToggle}
+            <div className="min-w-0 flex-1">
+              <SearchField
+                value={search}
+                onChange={onSearch}
+                placeholder={searchPlaceholder ?? "Suchen …"}
+              />
+            </div>
+          </div>
 
           {primarySection}
 
@@ -382,29 +427,13 @@ export function FilterRail<T>({
             hideHeader && !open && !showPinnedBody && "rounded-t-xl border-t-0",
           )}
         >
-          {/* Headerless (mobile) tile: the Filter toggle lives here, to the
-              left of the Üben button, so both actions sit inside the tile.
-              Desktop keeps its labelled header instead. */}
-          {hideHeader && (
-            <Button
-              type="button"
-              size="icon"
-              variant={open ? "default" : "outline"}
-              aria-expanded={open}
-              aria-label="Filter"
-              title="Filter"
-              className="relative h-10 w-10 shrink-0"
-              onClick={() => setOpen(!open)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              {activeCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
-                  {activeCount}
-                </span>
-              )}
-            </Button>
-          )}
+          {/* Collapsed headerless (mobile) tile: the Filter toggle sits to the
+              left of the Üben button. When expanded it moves up next to the
+              search field instead (so it is not duplicated here). Desktop keeps
+              its labelled header. */}
+          {hideHeader && !open && filterToggle}
           <div className="min-w-0 flex-1">{footer}</div>
+          {countStack}
         </div>
       )}
     </aside>

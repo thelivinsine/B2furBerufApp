@@ -12,7 +12,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
-import { HubHero } from "@/components/shared/HubHero";
 import { GrammarDrillCard } from "./GrammarDrillCard";
 
 /** Display metadata for each grammar group. */
@@ -118,13 +117,7 @@ export function GrammarHub() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <HubHero
-        icon={BookMarked}
-        gradient="from-emerald-500 to-teal-500"
-        eyebrow="Grammatik"
-        title="Grammatik-Werkstatt"
-      />
-
+      {/* No page header: the Bibliothek tabs already name the section (s92). */}
       <LibrarySwitcher />
 
       <BrowseToolbar
