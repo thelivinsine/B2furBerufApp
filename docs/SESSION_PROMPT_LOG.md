@@ -3405,3 +3405,53 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/collocations/CollocationsBrowser.tsx`,
   `src/features/redemittel/RedemittelTrainer.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (PR #439).
+
+## Entry 319 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > is everything live?
+- **Response summary:** Checked the GitHub Pages deploy history via the Actions API rather than assuming.
+  `main` is at `ab908dd` (PR #439) and its Pages deploy shows completed/success, as do all prior deploys
+  this session; confirmed all nine session PRs (#431–#439) are merged to `main` and deployed. Noted the
+  sandbox can't reach the live `genauly.de`/`*.github.io` site, so the final visual check (hard-refresh to
+  dodge the PWA cache) is the founder's. No code change.
+- **Artifacts:** none (status verification).
+
+## Entry 320 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Session docs were already updated + merged incrementally with each PR (the
+  PROJECT_STATUS s91 handoff with all founder follow-up rounds, CLAUDE.md's Bibliothek anchor, and
+  prompt-log entries 308–318). This pass appended the trailing prompt-log entries so every founder prompt of
+  the session has a record, and confirmed the status doc's "Last updated" summary reflects the final state.
+  (A new founder prompt — entry 321 — arrived during this pass, so the doc finalization shipped together
+  with that round-9 code in PR #440 rather than as a docs-only PR.)
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`, `docs/PROJECT_STATUS.md`, `CLAUDE.md` (PR #440).
+
+## Entry 321 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > üben should be always part of filter tile even in mobile
+- **Response summary:** Round 8 had put the mobile Üben in a separate floating `StickyUebenBar`; the founder
+  wants Üben to be part of the filter tile on mobile too (while still always visible). Removed the
+  `StickyUebenBar` component + usages, restored the Üben footer on the mobile FilterRail, and made the mobile
+  tile stay visible by (a) moving it OUT of the header column to be a **grid child** (so its sticky
+  containing block spans the card list, not the short header column) and (b) pinning it just below the app
+  header (`sticky top-[calc(4rem_+_env(safe-area-inset-top))] z-10 max-h-[70dvh] lg:hidden`). Made the
+  FilterRail's sticky header/footer + `overflow-y-auto` scroll apply on both breakpoints (removed the `lg:`
+  gating) so the mobile tile behaves like the desktop one. Verified via Playwright: on mobile Üben is
+  in-tile and inView at scroll 0/900/2500 (pinned ~118px) with the app header (bottom 65) sitting just above
+  the tile (top 64); desktop still visible at all scroll positions; only one Üben present. Gates green
+  (typecheck, lint 0 errors, test:unit 110/110, bundle 73.1 kB). Shipped as PR #440, squash-merged; branch
+  realigned.
+- **Artifacts:** `src/features/shared/FilterRail.tsx`, `src/features/shared/StickyUebenBar.tsx` (deleted),
+  `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/collocations/CollocationsBrowser.tsx`,
+  `src/features/redemittel/RedemittelTrainer.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (PR #440).

@@ -11,7 +11,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { StickyUebenBar } from "@/features/shared/StickyUebenBar";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { applyFacets, ActiveFilterChip, type FacetDef, type FacetSelection } from "@/features/shared/FacetSheet";
@@ -319,16 +318,6 @@ export function VocabularyTrainer() {
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          {/* Mobile shows the SAME filter tile (founder follow-up, s91),
-              starting collapsed; Üben floats via StickyUebenBar instead of the
-              tile footer here. Desktop renders its own sticky rail below. */}
-          <FilterRail
-            {...filterRailProps}
-            footer={undefined}
-            defaultOpen={false}
-            className="lg:hidden"
-          />
-
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
             {/* In the graph view the word count sits with the connection
@@ -354,6 +343,17 @@ export function VocabularyTrainer() {
             </div>
           )}
         </div>
+
+        {/* Mobile shows the SAME filter tile with Üben in its footer (founder
+            follow-up, s91): it is a grid child (so its sticky containing block
+            spans the card list), pinned just below the app header and capped,
+            so the tile — and the Üben button in it — stays visible while
+            scrolling. Desktop renders its own sticky rail in col 2. */}
+        <FilterRail
+          {...filterRailProps}
+          defaultOpen={false}
+          className="sticky top-[calc(4rem_+_env(safe-area-inset-top))] z-10 max-h-[70dvh] lg:hidden"
+        />
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {showPickerNow && activeTheme ? (
@@ -388,8 +388,6 @@ export function VocabularyTrainer() {
           className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)]"
         />
       </div>
-
-      <StickyUebenBar onClick={startSession} />
     </div>
   );
 }

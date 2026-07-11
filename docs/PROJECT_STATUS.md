@@ -325,10 +325,17 @@ mobile, zero console errors), and shipped:
   always visible.** On desktop the aside is a **capped scroll container** (`lg:overflow-y-auto` +
   `lg:max-h-[calc(100vh-22rem)]`) with the header `lg:sticky lg:top-0` and the Üben footer `lg:sticky
   lg:bottom-0`, so the facet body scrolls and Üben stays on screen at every scroll position (verified across
-  800/900/1080 viewport heights). On mobile the tile has no footer; a new shared `StickyUebenBar` floats the
-  Üben button just above the bottom nav (`lg:hidden`, offset clears the 63px nav + safe area), always
-  reachable while scrolling. (The earlier flex-1 body-scroll attempt let the footer overflow past the clipped
-  aside; the aside-scroll + sticky-footer pattern is the fix.)
+  800/900/1080 viewport heights). On mobile the tile initially had no footer; a shared `StickyUebenBar`
+  floated Üben above the bottom nav. (The earlier flex-1 body-scroll attempt let the footer overflow past the
+  clipped aside; the aside-scroll + sticky-footer pattern is the fix.)
+- **Founder follow-up round 9 (same session, PR #440):** "üben should be always part of filter tile even in
+  mobile." Removed the separate `StickyUebenBar`; the **mobile tile now carries the Üben footer** like
+  desktop. To keep it visible while scrolling, the mobile FilterRail is a **grid child** (moved out of the
+  header column, so its sticky containing block spans the card list) pinned just below the app header
+  (`sticky top-[calc(4rem_+_env(safe-area-inset-top))] z-10 max-h-[70dvh] lg:hidden`) and capped, and the
+  FilterRail's sticky header/footer + internal scroll now apply on both breakpoints. Verified: Üben is
+  in-tile and inView at scroll 0/900/2500 on mobile (pinned at ~118px) with the app header sitting above it,
+  and desktop still visible at all scroll positions.
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.

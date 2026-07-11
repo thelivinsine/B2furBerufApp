@@ -14,7 +14,6 @@ import { HubHero } from "@/components/shared/HubHero";
 import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { FilterRail } from "@/features/shared/FilterRail";
-import { StickyUebenBar } from "@/features/shared/StickyUebenBar";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { CollocationTable, CollocationCompactList } from "./CollocationViews";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
@@ -273,16 +272,6 @@ export function CollocationsBrowser() {
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          {/* Mobile shows the SAME filter tile (founder follow-up, s91),
-              starting collapsed; Üben floats via StickyUebenBar instead of the
-              tile footer here. Desktop renders its own sticky rail below. */}
-          <FilterRail
-            {...filterRailProps}
-            footer={undefined}
-            defaultOpen={false}
-            className="lg:hidden"
-          />
-
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
             <span className="text-sm tabular-nums text-muted-foreground">
@@ -299,6 +288,16 @@ export function CollocationsBrowser() {
             </div>
           )}
         </div>
+
+        {/* Mobile filter tile with Üben in its footer (founder follow-up, s91):
+            a grid child so its sticky containing block spans the card list,
+            pinned below the app header + capped, so Üben stays visible while
+            scrolling. Desktop renders its own sticky rail in col 2. */}
+        <FilterRail
+          {...filterRailProps}
+          defaultOpen={false}
+          className="sticky top-[calc(4rem_+_env(safe-area-inset-top))] z-10 max-h-[70dvh] lg:hidden"
+        />
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {showPicker && activeTheme ? (
@@ -344,8 +343,6 @@ export function CollocationsBrowser() {
           className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)]"
         />
       </div>
-
-      <StickyUebenBar onClick={startSession} />
     </div>
   );
 }
