@@ -59,7 +59,9 @@ export function ViewSwitcher({
       className={cn(
         // Same lifted-white-pill toggle language as the page toggle
         // (LibrarySwitcher): recessed grey track, active button on a white pill.
-        "inline-flex shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5",
+        // Sized so the whole control is 40px tall, matching the icon buttons in
+        // the toolbar row.
+        "inline-flex h-10 shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5",
         className,
       )}
     >
@@ -74,7 +76,7 @@ export function ViewSwitcher({
             aria-label={label}
             title={label}
             className={cn(
-              "relative inline-flex h-8 w-9 items-center justify-center rounded-md transition-colors",
+              "relative inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors",
               active ? "text-primary" : "text-muted-foreground hover:text-foreground",
             )}
           >

@@ -276,7 +276,7 @@ export function CollocationsBrowser() {
               aria-expanded={filtersOpen}
               aria-label="Filter"
               title="Filter"
-              className="relative shrink-0 lg:hidden"
+              className="relative shrink-0 rounded-lg lg:hidden"
               onClick={() => setFiltersOpen((o) => !o)}
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -295,7 +295,7 @@ export function CollocationsBrowser() {
                 aria-expanded={searchOpen}
                 aria-label="Suche"
                 title="Suche"
-                className="shrink-0"
+                className="shrink-0 rounded-lg"
                 onClick={() =>
                   setSearchOpen((o) => {
                     if (o) setSearch("");
@@ -320,7 +320,7 @@ export function CollocationsBrowser() {
 
           {/* Mobile-only: standalone Üben + plain count, then the sliding filter
               panel. Desktop keeps Üben/count inside the rail in col 2. */}
-          <Button variant="gradient" className="h-11 w-full lg:hidden" onClick={startSession}>
+          <Button variant="gradient" className="h-11 w-full rounded-xl text-base lg:hidden" onClick={startSession}>
             <Zap className="h-4 w-4" /> Üben
           </Button>
           <p className="text-center text-sm tabular-nums text-muted-foreground lg:hidden">
