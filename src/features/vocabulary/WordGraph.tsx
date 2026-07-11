@@ -557,8 +557,10 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
         )}
       </div>
 
-      {/* Legend + stats */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+      {/* Legend + connection count (the word count already sits in the meta
+          row above the view, so it is deliberately NOT repeated here).
+          Centered on mobile, left-aligned on desktop. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground lg:justify-start">
         {presentDomains.map((d) => (
           <span key={d.id} className="inline-flex items-center gap-1.5">
             <span
@@ -570,8 +572,8 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
             {d.titleDe}
           </span>
         ))}
-        <span className="ml-auto tabular-nums">
-          {graph.nodes.length} Wörter · {graph.links.length} Verbindungen
+        <span className="tabular-nums lg:ml-auto">
+          {graph.links.length} Verbindung{graph.links.length !== 1 ? "en" : ""}
         </span>
       </div>
     </div>

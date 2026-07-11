@@ -1,4 +1,5 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { ChevronDown, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   matchesFacets,
@@ -93,6 +94,7 @@ export function FilterRail<T>({
   onChange: (next: FacetSelection) => void;
   className?: string;
 }) {
+  const [open, setOpen] = useState(true);
   const activeCount = activeFacetCount(selection);
 
   const toggle = (facetId: string, value: string) => {
@@ -115,7 +117,32 @@ export function FilterRail<T>({
   }, [items, facets, selection]);
 
   return (
-    <aside className={cn("space-y-5", className)} aria-label="Filter">
+    <aside
+      className={cn("overflow-hidden rounded-xl border border-border bg-surface", className)}
+      aria-label="Filter"
+    >
+      {/* Tile header in the brand theme color; clicking collapses/expands
+          the whole panel (founder request, s91 follow-up). */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        className={cn(
+          "flex w-full items-center gap-2 bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/15",
+          open && "border-b border-border",
+        )}
+      >
+        <SlidersHorizontal className="h-4 w-4" />
+        Filter
+        {activeCount > 0 && (
+          <span className="rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+            {activeCount}
+          </span>
+        )}
+        <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", open && "rotate-180")} />
+      </button>
+
+      {open && (
+        <div className="space-y-5 p-3 lg:max-h-[calc(100vh-11rem)] lg:overflow-y-auto">
       <SearchField
         value={search}
         onChange={onSearch}
@@ -164,17 +191,17 @@ export function FilterRail<T>({
 
       {facets.length > 0 && (
         <div className="space-y-5">
-          <div className="flex items-baseline justify-between">
-            <p className="text-sm font-semibold">Filter</p>
-            {activeCount > 0 && (
+          {/* The tile header already says "Filter"; only the reset action lives here. */}
+          {activeCount > 0 && (
+            <div className="flex justify-end">
               <button
                 onClick={() => onChange({})}
                 className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
                 Zurücksetzen
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {facets.map((facet) => (
             <section key={facet.id}>
@@ -220,6 +247,8 @@ export function FilterRail<T>({
               </div>
             </section>
           ))}
+        </div>
+      )}
         </div>
       )}
     </aside>

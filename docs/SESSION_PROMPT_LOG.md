@@ -3250,3 +3250,25 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/redemittel/{RedemittelTrainer,RedemittelViews}.tsx`, `tests/wordgraph.test.ts`,
   `package.json`/`pnpm-lock.yaml` (d3-force) (commit `952a759`, PR #431); `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`, archive W28 chunk.
+
+## Entry 311 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the filter rail should be a proper collapsible and expandable tile with theme color. The vocabulary toggle buttons should be to the left of this filter tile/panel on the desktop. on mobile, the legend and view buttons should be centered. there's a redundancy of numberbof words- fix it.
+- **Response summary:** Four fixes on the fresh Bibliothek views. (1) `FilterRail` became a proper tile:
+  rounded card with a brand-tinted `bg-primary/10 text-primary` header row ("Filter" icon + label +
+  active-filter count badge + rotating chevron) that collapses/expands the whole panel; internal scroll
+  moved inside the tile body; the redundant inner "Filter" heading dropped (reset action kept). (2) The
+  `LibrarySwitcher` tab pills moved into the LEFT grid column on all three browse tabs, so on desktop they
+  sit beside the filter tile (mobile unchanged, still full-width above the toolbar). (3) The meta row
+  (view switcher + count) and the graph legend are centered on mobile (`justify-center lg:justify-start`).
+  (4) Removed the duplicated word count: the graph legend now shows only "n Verbindungen"; the word count
+  appears once, in the meta row. Verified via Playwright (desktop expanded + collapsed, mobile graph +
+  centered legend, zero console errors); gates green (typecheck, lint 0 errors, test:unit 110/110, bundle
+  73.1 kB). Shipped as PR #432, squash-merged; branch realigned.
+- **Artifacts:** `src/features/shared/FilterRail.tsx`, `src/features/vocabulary/{VocabularyTrainer.tsx,
+  WordGraph.tsx}`, `src/features/collocations/CollocationsBrowser.tsx`,
+  `src/features/redemittel/RedemittelTrainer.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (PR #432).
