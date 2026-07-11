@@ -62,15 +62,7 @@ export function NeulandHub({
   }, [compact, doneKey]);
 
   return (
-    <div
-      className={cn(
-        "mx-auto",
-        // Heute (compact) drops the max-width on desktop so the two-column
-        // layout can use the full Dashboard width; `/welt` keeps a readable
-        // single column.
-        compact ? "max-w-lg space-y-4 lg:max-w-none" : "max-w-lg space-y-3",
-      )}
-    >
+    <div className={cn("mx-auto max-w-lg", compact ? "space-y-4" : "space-y-3")}>
       {/* "Neuland" is centered on the page exactly like Üben's "Lernpfad"
           (same text-2xl/font-bold). "Beta" is a suffix, NOT part of the
           heading, so it's absolutely positioned off the right edge and does
@@ -94,17 +86,7 @@ export function NeulandHub({
           (m) => !isDone(m) && missionUnlocked(m, missionsDone, ownedItems),
         );
         return (
-          <section key={chapter.id}>
-            {/* Phone: hero + checklist stack. Desktop Heute (compact): two
-                columns, hero on the left, checklist on the right, so the wide
-                screen is used instead of a narrow stranded column (founder).
-                `/welt` (non-compact) stays a single scrolling column. */}
-            <div
-              className={cn(
-                compact ? "space-y-4" : "space-y-3",
-                compact && "lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:space-y-0",
-              )}
-            >
+          <section key={chapter.id} className={compact ? "space-y-4" : "space-y-3"}>
             {/* Chapter hero: the scrim overlay gives the image a job (chapter,
                 count, play CTA) instead of a decorative dead zone. Framed by
                 the same surface mat as the Üben map (same dimensions + screen
@@ -147,9 +129,7 @@ export function NeulandHub({
               ref={compact ? scrollRef : undefined}
               className={cn(
                 "rounded-2xl border border-border bg-surface px-4 shadow-soft",
-                // Phone: fixed 3-row scroll crop. Desktop: show all rows (the
-                // right column has the room), so drop the height + scroll.
-                compact && "no-scrollbar overflow-y-auto overscroll-contain lg:!h-auto lg:overflow-visible",
+                compact && "no-scrollbar overflow-y-auto overscroll-contain",
               )}
               style={compact ? { height: COMPACT_LIST_H } : undefined}
             >
@@ -223,7 +203,6 @@ export function NeulandHub({
                   </div>
                 );
               })}
-            </div>
             </div>
           </section>
         );
