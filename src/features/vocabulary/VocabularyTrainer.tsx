@@ -335,9 +335,14 @@ export function VocabularyTrainer() {
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
-            <span className="text-sm tabular-nums text-muted-foreground">
-              {items.length} {items.length === 1 ? "Wort" : "Wörter"}
-            </span>
+            {/* In the graph view the word count sits with the connection
+                count at the bottom of the canvas (founder follow-up), so it
+                is not repeated here. */}
+            {view !== "graph" && (
+              <span className="text-sm tabular-nums text-muted-foreground">
+                {items.length} {items.length === 1 ? "Wort" : "Wörter"}
+              </span>
+            )}
             <div className="ml-auto hidden items-center gap-2 lg:flex">{savedButton}</div>
           </div>
 
