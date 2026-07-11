@@ -211,10 +211,13 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   authored sources (`related` terms resolved to bank entries; collocations whose noun AND verb both
   resolve; unresolvable related terms are dropped, founder-confirmed 2026-07-11). The d3-force dep rides
   ONLY in the lazy WordGraph chunk (React.lazy in VocabularyTrainer); main chunk stays ~73 kB.
-  **Desktop filter rail (s91):** on lg+ the LibrarySwitcher tabs + the view-switcher meta row span the
-  full width at the top; **below them a two-column grid** (`lg:grid-cols-[minmax(0,1fr)_16rem]`) holds the
-  content and a persistent right rail, so the **filter tile starts level with the first content card**
-  (founder follow-up: measured rail-top = card-top). The rail is `features/shared/FilterRail.tsx`,
+  **Desktop filter rail (s91):** on lg+ the browse tabs are an **explicit 2-col × 2-row grid**
+  (`lg:grid-cols-[minmax(0,1fr)_16rem]`, `lg:gap-y-4 lg:space-y-0`): the LibrarySwitcher tabs +
+  view-switcher meta row sit in **row 1 / col 1 (content-column width, NOT full width)**, and the content
+  (`row-start-2 col-start-1`) + the persistent right rail (`col-start-2 row-start-2`) share row 2, so the
+  **filter tile starts level with the first content card** while the tabs stay at content width (founder
+  follow-up: measured rail-top = card-top; tabs are NOT stretched over the rail column). The rail is
+  `features/shared/FilterRail.tsx`,
   a **collapsible tile** (founder follow-up s91): brand-tinted `bg-primary/10 text-primary` header row
   ("Filter" + active-count badge + chevron) that expands/collapses the panel. The **Üben button is the
   tile's `footer` slot**, visible in EVERY state (mobile keeps Üben in the toolbar; the desktop meta row
@@ -225,9 +228,9 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as Domain-grouped rows
   (Thema; Kategorie on Redemittel) in a capped `max-h-72` scroll box, then every facet as always-visible
   pills with live counts (immediate commit, no draft/apply). Same URL params as mobile. The
-  **LibrarySwitcher tabs + the view-switcher meta row span the full width ABOVE the grid** (so the filter
-  tile lines up with the content, not with the tabs). **Mobile keeps the locked BrowseToolbar + FacetSheet
-  pattern untouched** (`lg:hidden` wrapper); the toolbar's trailing actions render in the meta row
+  **LibrarySwitcher tabs + the view-switcher meta row stay at the content-column width** (grid row 1 / col
+  1, NOT full width, founder follow-up), while the filter tile still lines up with the content cards (grid
+  row 2). **Mobile keeps the locked BrowseToolbar + FacetSheet pattern untouched** (`lg:hidden` wrapper); the toolbar's trailing actions render in the meta row
   (switcher + count) on desktop, and the meta row + the graph legend are **centered on mobile**
   (`justify-center lg:justify-start`). In the graph view both counts sit at the bottom of the canvas
   ("n Wörter · m Verbindungen") and the meta-row word count is hidden; other views keep the count in the
