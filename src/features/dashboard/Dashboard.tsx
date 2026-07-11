@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Dumbbell, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,8 @@ const SpielenHub = lazy(() => import("./SpielenHub"));
 
 type HeuteTab = "ueben" | "spielen";
 
+const TAB_INDEX: Record<HeuteTab, number> = { ueben: 0, spielen: 1 };
+
 // Shaped like the loaded Üben stack (map card + mission tile) so first paint
 // and loaded state share a silhouette instead of jumping.
 const fallback = (
@@ -23,16 +25,32 @@ const fallback = (
 
 export function Dashboard() {
   const [tab, setTab] = useState<HeuteTab>("ueben");
+  // Direction of the last tab change (+1 = moved right to Spielen, -1 = moved
+  // left to Üben) so the content slides in the matching direction.
+  const [dir, setDir] = useState(0);
+  const reduce = useReducedMotion();
+  const selectTab = (id: HeuteTab) => {
+    if (id === tab) return;
+    setDir(TAB_INDEX[id] > TAB_INDEX[tab] ? 1 : -1);
+    setTab(id);
+  };
+  // Horizontal slide: entering panel comes from the side you moved toward, the
+  // leaving panel exits the opposite side (right->left when going to Spielen,
+  // left->right when going back to Üben). Distance 0 under reduced motion.
+  const shift = reduce ? 0 : 36;
+  const slide = {
+    enter: (d: number) => ({ opacity: 0, x: d >= 0 ? shift : -shift }),
+    center: { opacity: 1, x: 0 },
+    exit: (d: number) => ({ opacity: 0, x: d >= 0 ? -shift : shift }),
+  };
 
   return (
-    // Single-column start page. On desktop (lg) the whole thing is vertically
-    // centered in the viewport so the focused column reads as deliberate rather
-    // than a narrow strip stranded at the top of a wide screen (founder: keep
-    // one column, adapt it to desktop). The min-height subtracts MORE than the
-    // chrome (header + main padding ~8.5rem) so the page always stays a few rem
-    // shorter than the viewport, i.e. never triggers a scrollbar from an
-    // exact-fit rounding edge (founder: scrollbar on Üben).
-    <div className="space-y-4 sm:space-y-6 lg:flex lg:min-h-[calc(100vh-11rem)] lg:flex-col lg:justify-center lg:space-y-6">
+    // Single-column start page at full width (max-w-md) on every size. On
+    // desktop (lg) the whole thing is vertically centered in the viewport so the
+    // focused column reads as deliberate rather than stranded at the top, and
+    // the toggle->content gap is tightened (lg:space-y-3) so the full-size stack
+    // still fits without a scrollbar.
+    <div className="space-y-4 sm:space-y-6 lg:flex lg:min-h-[calc(100vh-11rem)] lg:flex-col lg:justify-center lg:space-y-3">
       {/* Üben / Spielen: the two ways into the day, centred. Üben opens by
           default. The greeting + streak live in the top row; the daily-goal ring
           moved to Fortschritt (s86), so Heute no longer repeats progress. */}
@@ -55,7 +73,7 @@ export function Dashboard() {
             type="button"
             role="tab"
             aria-selected={tab === id}
-            onClick={() => setTab(id)}
+            onClick={() => selectTab(id)}
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition",
               // Active tab lifts on the white pill and picks up its section's
@@ -77,20 +95,20 @@ export function Dashboard() {
         ))}
       </motion.div>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" custom={dir} initial={false}>
         <motion.div
           key={tab}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.13, ease: "easeOut" }}
-          // A single focused column. On desktop it's slightly narrower than
-          // mobile's max-w-md: the tile is 3:2, so a wide column makes the whole
-          // stack (tile + card + pager) taller than a laptop viewport and forces
-          // a scrollbar. max-w-sm keeps the stack short enough to fit without
-          // scrolling; the vertical centering on the wrapper does the desktop
-          // framing, not extra width.
-          className="mx-auto w-full max-w-md lg:max-w-[22rem]"
+          custom={dir}
+          variants={slide}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.16, ease: "easeOut" }}
+          // A single focused column. Mobile: max-w-md (viewport-clamped). Desktop
+          // is only a touch smaller than that (26rem vs 28rem) so the components
+          // stay substantial while the whole stack (3:2 tile + card + pager)
+          // still fits a common ~800px viewport without a scrollbar.
+          className="mx-auto w-full max-w-md lg:max-w-[26rem]"
         >
           <Suspense fallback={fallback}>
             {tab === "ueben" ? <UebenPath /> : <SpielenHub />}
