@@ -212,12 +212,17 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   resolve; unresolvable related terms are dropped, founder-confirmed 2026-07-11). The d3-force dep rides
   ONLY in the lazy WordGraph chunk (React.lazy in VocabularyTrainer); main chunk stays ~73 kB.
   **Desktop filter rail (s91):** on lg+ the three browse tabs are a two-column grid
-  (`lg:grid-cols-[minmax(0,1fr)_16rem]`) with a persistent right rail (`features/shared/FilterRail.tsx`):
-  Suche (shared debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as
-  Domain-grouped rows (Thema; Kategorie on Redemittel) in a capped `max-h-72` scroll box, then every
-  facet as always-visible pills with live counts (immediate commit, no draft/apply). Same URL params as
-  mobile. **Mobile keeps the locked BrowseToolbar + FacetSheet pattern untouched** (`lg:hidden` wrapper);
-  the toolbar's trailing actions render in the meta row (switcher + count) on desktop. The rail and the
+  (`lg:grid-cols-[minmax(0,1fr)_16rem]`) with a persistent right rail (`features/shared/FilterRail.tsx`),
+  a **collapsible tile** (founder follow-up s91): brand-tinted `bg-primary/10 text-primary` header row
+  ("Filter" + active-count badge + chevron) that expands/collapses the whole panel. Inside: Suche (shared
+  debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as Domain-grouped rows
+  (Thema; Kategorie on Redemittel) in a capped `max-h-72` scroll box, then every facet as always-visible
+  pills with live counts (immediate commit, no draft/apply). Same URL params as mobile. The
+  **LibrarySwitcher renders inside the LEFT column** so the tab pills sit beside the filter tile on
+  desktop. **Mobile keeps the locked BrowseToolbar + FacetSheet pattern untouched** (`lg:hidden` wrapper);
+  the toolbar's trailing actions render in the meta row (switcher + count) on desktop, and the meta row +
+  the graph legend are **centered on mobile** (`justify-center lg:justify-start`). The graph legend shows
+  only the Verbindungen count (the word count lives in the meta row, never twice). The rail and the
   toolbar are alternate presentations of the same state and must never render together.
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt

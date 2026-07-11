@@ -284,6 +284,11 @@ mobile, zero console errors), and shipped:
   views render desktop + mobile, graph click-select works, zero console errors.
 - **Ship status:** shipped as **PR #431**, squash-merged to `main`; branch realigned after the merge.
   **Founder verifies the live site.**
+- **Founder follow-up round (same session, PR #432):** the rail is now a **collapsible tile** (brand-tinted
+  `bg-primary/10` header with "Filter" + active-count badge + chevron; whole panel expands/collapses), the
+  **LibrarySwitcher moved into the left column** so the tab pills sit beside the filter tile on desktop,
+  the **meta row + graph legend are centered on mobile**, and the duplicated word count was removed (the
+  graph legend now shows only "n Verbindungen"; the word count lives in the meta row alone).
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.

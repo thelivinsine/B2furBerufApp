@@ -303,14 +303,16 @@ export function VocabularyTrainer() {
         title="Vokabeltrainer"
       />
 
-      <LibrarySwitcher />
-
       {/* Desktop (lg+) is a two-column layout: content left, persistent
           filter rail right (Bibliothek desktop layout, session 91, from the
-          founder's mockup). Mobile keeps the locked toolbar + sheet pattern;
-          the two never render together. */}
+          founder's mockup). The tab switcher lives in the LEFT column so it
+          sits beside the filter tile on desktop (founder follow-up). Mobile
+          keeps the locked toolbar + sheet pattern; the two never render
+          together. */}
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
         <div className="min-w-0 space-y-4">
+          <LibrarySwitcher />
+
           <div className="lg:hidden">
             <BrowseToolbar
               search={search}
@@ -328,7 +330,7 @@ export function VocabularyTrainer() {
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
             <span className="text-sm tabular-nums text-muted-foreground">
               {items.length} {items.length === 1 ? "Wort" : "Wörter"}
@@ -376,7 +378,7 @@ export function VocabularyTrainer() {
         </div>
 
         <FilterRail
-          className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
+          className="hidden lg:sticky lg:top-24 lg:block"
           search={search}
           onSearch={setSearch}
           searchPlaceholder="Suche nach Wort, Übersetzung …"
