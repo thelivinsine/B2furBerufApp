@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Pin, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   matchesFacets,
@@ -13,13 +13,18 @@ import type { PrimaryGroup, PrimaryOption } from "@/features/shared/BrowseToolba
 /**
  * Desktop filter rail (Bibliothek desktop layout, session 91). On lg+ screens
  * the browse tabs show this persistent right-hand column instead of the
- * toolbar-plus-sheet pattern: Suche on top, the primary scope (Thema /
- * Kategorie) as a grouped row list, then every facet as an always-visible
- * pill group. Same state, same URL params, no draft/apply step: every tap
+ * toolbar-plus-sheet pattern. It is a proper collapsible tile (founder
+ * follow-up): a brand-tinted header row expands/collapses the panel, a
+ * `footer` slot (the Üben button) stays visible in EVERY state, and each
+ * filter section carries a pin: pinned sections keep rendering while the
+ * panel is collapsed. Pins persist per tab in localStorage (device-level UI
+ * preference; deliberately not in the synced settings store).
+ *
+ * Inside: Suche on top, the primary scope (Thema / Kategorie) as a grouped
+ * row list, then every facet as always-visible pill groups. Every tap
  * commits immediately, and option counts update live (count = what tapping
  * that pill would yield, given every OTHER active constraint). Zero-yield
- * options grey out exactly like the mobile FacetSheet, so the learner can
- * never tap into an empty list.
+ * options grey out exactly like the mobile FacetSheet.
  *
  * Mobile keeps BrowseToolbar + FacetSheet untouched; the two surfaces are
  * alternate presentations of the same state and never render together.
@@ -35,6 +40,30 @@ export interface RailPrimary {
   options?: PrimaryOption[];
   /** Grouped rows with group headings (the Domain-grouped themes). */
   groups?: PrimaryGroup[];
+}
+
+// One localStorage object maps a per-tab scope ("woerter", …) to its pinned
+// section ids ("primary" + facet ids). Storage failures (private mode) just
+// mean pins don't persist.
+const PINS_KEY = "b2beruf.railPins";
+
+function readPins(scope: string): string[] {
+  try {
+    const all = JSON.parse(localStorage.getItem(PINS_KEY) ?? "{}");
+    return Array.isArray(all[scope]) ? all[scope] : [];
+  } catch {
+    return [];
+  }
+}
+
+function writePins(scope: string, pins: string[]) {
+  try {
+    const all = JSON.parse(localStorage.getItem(PINS_KEY) ?? "{}");
+    all[scope] = pins;
+    localStorage.setItem(PINS_KEY, JSON.stringify(all));
+  } catch {
+    // non-fatal: pins just won't survive a reload
+  }
 }
 
 function PrimaryRow({
@@ -72,6 +101,46 @@ function PrimaryRow({
   );
 }
 
+/** Section heading row with the pin toggle. */
+function SectionHeader({
+  label,
+  eyebrow,
+  pinned,
+  onTogglePin,
+}: {
+  label: string;
+  /** Render the label in the quiet uppercase facet style. */
+  eyebrow?: boolean;
+  pinned: boolean;
+  onTogglePin: () => void;
+}) {
+  return (
+    <div className="mb-2 flex items-center justify-between gap-2">
+      <span
+        className={cn(
+          eyebrow
+            ? "text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+            : "text-sm font-semibold",
+        )}
+      >
+        {label}
+      </span>
+      <button
+        onClick={onTogglePin}
+        aria-pressed={pinned}
+        aria-label={pinned ? `${label} lösen` : `${label} anheften`}
+        title={pinned ? "Angeheftet: bleibt beim Einklappen sichtbar" : "Anheften"}
+        className={cn(
+          "rounded p-0.5 transition-colors",
+          pinned ? "text-primary" : "text-muted-foreground/40 hover:text-muted-foreground",
+        )}
+      >
+        <Pin className={cn("h-3.5 w-3.5", pinned && "fill-current")} />
+      </button>
+    </div>
+  );
+}
+
 export function FilterRail<T>({
   search,
   onSearch,
@@ -81,6 +150,8 @@ export function FilterRail<T>({
   facets,
   selection,
   onChange,
+  footer,
+  pinScope,
   className,
 }: {
   search: string;
@@ -92,10 +163,21 @@ export function FilterRail<T>({
   facets: FacetDef<T>[];
   selection: FacetSelection;
   onChange: (next: FacetSelection) => void;
+  /** Always-visible slot at the bottom of the tile (the Üben button). */
+  footer?: React.ReactNode;
+  /** localStorage scope for the section pins, e.g. "woerter". */
+  pinScope: string;
   className?: string;
 }) {
   const [open, setOpen] = useState(true);
+  const [pins, setPins] = useState<string[]>(() => readPins(pinScope));
   const activeCount = activeFacetCount(selection);
+
+  const togglePin = (id: string) => {
+    const next = pins.includes(id) ? pins.filter((p) => p !== id) : [...pins, id];
+    setPins(next);
+    writePins(pinScope, next);
+  };
 
   const toggle = (facetId: string, value: string) => {
     const cur = selection[facetId] ?? [];
@@ -116,20 +198,110 @@ export function FilterRail<T>({
     };
   }, [items, facets, selection]);
 
+  const primarySection = primary ? (
+    <section>
+      <SectionHeader
+        label={primary.label}
+        pinned={pins.includes("primary")}
+        onTogglePin={() => togglePin("primary")}
+      />
+      {/* Capped with internal scroll so the facet groups below stay
+          discoverable next to a 15-theme list. */}
+      <div className="max-h-72 space-y-0.5 overflow-y-auto overscroll-contain rounded-lg border border-border/60 bg-surface/60 p-1">
+        <PrimaryRow
+          option={primary.all}
+          selected={primary.value === primary.all.value}
+          onSelect={() => primary.onChange(primary.all.value)}
+        />
+        {primary.options?.map((opt) => (
+          <PrimaryRow
+            key={opt.value}
+            option={opt}
+            selected={primary.value === opt.value}
+            onSelect={() => primary.onChange(opt.value)}
+          />
+        ))}
+        {primary.groups?.map((group) => (
+          <div key={group.label} className="pt-1.5">
+            <p className="px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {group.label}
+            </p>
+            <div className="space-y-0.5">
+              {group.options.map((opt) => (
+                <PrimaryRow
+                  key={opt.value}
+                  option={opt}
+                  selected={primary.value === opt.value}
+                  onSelect={() => primary.onChange(opt.value)}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  ) : null;
+
+  const facetSection = (facet: FacetDef<T>) => (
+    <section key={facet.id}>
+      <SectionHeader
+        label={facet.label}
+        eyebrow
+        pinned={pins.includes(facet.id)}
+        onTogglePin={() => togglePin(facet.id)}
+      />
+      <div className="flex flex-wrap gap-1.5">
+        {facet.options.map((opt) => {
+          const selected = (selection[facet.id] ?? []).includes(opt.value);
+          const count = optionCount(facet, opt.value);
+          const disabled = count === 0 && !selected;
+          return (
+            <button
+              key={opt.value}
+              onClick={() => !disabled && toggle(facet.id, opt.value)}
+              disabled={disabled}
+              aria-pressed={selected}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm transition-colors",
+                selected
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : disabled
+                    ? "cursor-not-allowed border-border/50 bg-muted/40 text-muted-foreground/40"
+                    : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
+              )}
+            >
+              {opt.label}
+              {!disabled && (
+                <span
+                  className={cn(
+                    "text-xs tabular-nums",
+                    selected ? "text-primary-foreground/80" : "text-muted-foreground",
+                  )}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+
+  const pinnedFacets = facets.filter((f) => pins.includes(f.id));
+  const showPinnedBody = !open && ((primary && pins.includes("primary")) || pinnedFacets.length > 0);
+
   return (
     <aside
       className={cn("overflow-hidden rounded-xl border border-border bg-surface", className)}
       aria-label="Filter"
     >
       {/* Tile header in the brand theme color; clicking collapses/expands
-          the whole panel (founder request, s91 follow-up). */}
+          the panel (pinned sections + footer stay visible regardless). */}
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className={cn(
-          "flex w-full items-center gap-2 bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/15",
-          open && "border-b border-border",
-        )}
+        className="flex w-full items-center gap-2 bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/15"
       >
         <SlidersHorizontal className="h-4 w-4" />
         Filter
@@ -142,115 +314,45 @@ export function FilterRail<T>({
       </button>
 
       {open && (
-        <div className="space-y-5 p-3 lg:max-h-[calc(100vh-11rem)] lg:overflow-y-auto">
-      <SearchField
-        value={search}
-        onChange={onSearch}
-        placeholder={searchPlaceholder ?? "Suchen …"}
-      />
+        <div className="space-y-5 border-t border-border p-3 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto">
+          <SearchField
+            value={search}
+            onChange={onSearch}
+            placeholder={searchPlaceholder ?? "Suchen …"}
+          />
 
-      {primary && (
-        <section>
-          <p className="mb-2 text-sm font-semibold">{primary.label}</p>
-          {/* Capped with internal scroll so the facet groups below stay
-              discoverable next to a 15-theme list. */}
-          <div className="max-h-72 space-y-0.5 overflow-y-auto overscroll-contain rounded-lg border border-border/60 bg-surface/60 p-1">
-            <PrimaryRow
-              option={primary.all}
-              selected={primary.value === primary.all.value}
-              onSelect={() => primary.onChange(primary.all.value)}
-            />
-            {primary.options?.map((opt) => (
-              <PrimaryRow
-                key={opt.value}
-                option={opt}
-                selected={primary.value === opt.value}
-                onSelect={() => primary.onChange(opt.value)}
-              />
-            ))}
-            {primary.groups?.map((group) => (
-              <div key={group.label} className="pt-1.5">
-                <p className="px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {group.label}
-                </p>
-                <div className="space-y-0.5">
-                  {group.options.map((opt) => (
-                    <PrimaryRow
-                      key={opt.value}
-                      option={opt}
-                      selected={primary.value === opt.value}
-                      onSelect={() => primary.onChange(opt.value)}
-                    />
-                  ))}
+          {primarySection}
+
+          {facets.length > 0 && (
+            <div className="space-y-5">
+              {/* The tile header already says "Filter"; only the reset action lives here. */}
+              {activeCount > 0 && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => onChange({})}
+                    className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    Zurücksetzen
+                  </button>
                 </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+              )}
 
-      {facets.length > 0 && (
-        <div className="space-y-5">
-          {/* The tile header already says "Filter"; only the reset action lives here. */}
-          {activeCount > 0 && (
-            <div className="flex justify-end">
-              <button
-                onClick={() => onChange({})}
-                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Zurücksetzen
-              </button>
+              {facets.map(facetSection)}
             </div>
           )}
+        </div>
+      )}
 
-          {facets.map((facet) => (
-            <section key={facet.id}>
-              <div className="mb-2 flex items-baseline justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  {facet.label}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1.5">
-                {facet.options.map((opt) => {
-                  const selected = (selection[facet.id] ?? []).includes(opt.value);
-                  const count = optionCount(facet, opt.value);
-                  const disabled = count === 0 && !selected;
-                  return (
-                    <button
-                      key={opt.value}
-                      onClick={() => !disabled && toggle(facet.id, opt.value)}
-                      disabled={disabled}
-                      aria-pressed={selected}
-                      className={cn(
-                        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm transition-colors",
-                        selected
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : disabled
-                            ? "cursor-not-allowed border-border/50 bg-muted/40 text-muted-foreground/40"
-                            : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
-                      )}
-                    >
-                      {opt.label}
-                      {!disabled && (
-                        <span
-                          className={cn(
-                            "text-xs tabular-nums",
-                            selected ? "text-primary-foreground/80" : "text-muted-foreground",
-                          )}
-                        >
-                          {count}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-          ))}
+      {/* Collapsed: pinned sections stay visible. */}
+      {showPinnedBody && (
+        <div className="space-y-5 border-t border-border p-3 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto">
+          {primary && pins.includes("primary") && primarySection}
+          {pinnedFacets.map(facetSection)}
         </div>
       )}
-        </div>
-      )}
+
+      {/* Always-visible footer (the Üben button), in every state. */}
+      {footer && <div className="border-t border-border p-3">{footer}</div>}
     </aside>
   );
 }

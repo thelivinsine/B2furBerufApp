@@ -3272,3 +3272,23 @@ Branch: `claude/whats-next-esga9u`.
   WordGraph.tsx}`, `src/features/collocations/CollocationsBrowser.tsx`,
   `src/features/redemittel/RedemittelTrainer.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (PR #432).
+
+## Entry 312 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > üben button should be at the bottom of filter panel. it should be visible even when filter is collapsed. add a pin button for each of the filter section so that users can pin some filters to be visible even when collapsed.
+- **Response summary:** FilterRail gained a `footer` slot rendered below the collapsible body in every
+  state: on desktop the Üben button now lives there (full-width gradient), visible whether the panel is
+  expanded or collapsed. Mobile keeps Üben in the BrowseToolbar (no rail on mobile); the desktop meta row
+  keeps only the Gespeichert toggle on Wörter (dropped entirely on Kollokationen/Redemittel). Every rail
+  section (Thema/Kategorie primary + each facet group) got a pin toggle in its header: pinned sections
+  keep rendering while the panel is collapsed. Pins persist per tab in localStorage (`b2beruf.railPins`,
+  keyed by a new `pinScope` prop: woerter/kollokationen/redemittel; deliberately device-local, not in the
+  synced settings store). Verified via Playwright: pin CEFR → collapse → section + Üben still visible,
+  pin survives reload, footer Üben navigates to /session; zero console errors. Gates green (typecheck,
+  lint 0 errors, test:unit 110/110, bundle 73.1 kB). Shipped as PR #433, squash-merged; branch realigned.
+- **Artifacts:** `src/features/shared/FilterRail.tsx`, `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`;
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #433).
