@@ -306,58 +306,57 @@ export function VocabularyTrainer() {
         title="Vokabeltrainer"
       />
 
-      {/* Desktop (lg+) is a two-column layout: content left, persistent
-          filter rail right (Bibliothek desktop layout, session 91, from the
-          founder's mockup). The tab switcher lives in the LEFT column so it
-          sits beside the filter tile on desktop (founder follow-up). Mobile
-          keeps the locked toolbar + sheet pattern; the two never render
+      <LibrarySwitcher />
+
+      <div className="lg:hidden">
+        <BrowseToolbar
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Suche nach Wort, Übersetzung …"
+          primary={{ value: theme, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
+          facetItems={searched}
+          facets={facets}
+          facetSelection={selection}
+          onFacetChange={setSelection}
+          resultLabel={(n) => `${n} ${n === 1 ? "Wort" : "Wörter"} anzeigen`}
+          activeChips={activeChips}
+          onRemoveChip={removeFacetValue}
+          trailing={mobileActions}
+        />
+      </div>
+
+      {/* The tabs + view switcher span the top; below them the content grid
+          and the filter tile share a row, so on desktop the tile starts at
+          the same level as the first word card (founder follow-up, s91).
+          Mobile keeps the locked toolbar + sheet; the two never render
           together. */}
+      <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+        <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
+        {/* In the graph view the word count sits with the connection
+            count at the bottom of the canvas (founder follow-up), so it
+            is not repeated here. */}
+        {view !== "graph" && (
+          <span className="text-sm tabular-nums text-muted-foreground">
+            {items.length} {items.length === 1 ? "Wort" : "Wörter"}
+          </span>
+        )}
+        <div className="ml-auto hidden items-center gap-2 lg:flex">{savedButton}</div>
+      </div>
+
+      {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
+          dropdown already shows the active theme, so the chip was redundant.
+          The silent level-band cut now shows as an explicit removable chip. */}
+      {hiddenLabel && (
+        <div className="flex flex-wrap items-center gap-2">
+          <ActiveFilterChip
+            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+            onRemove={() => setShowAllLevels(true)}
+          />
+        </div>
+      )}
+
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
         <div className="min-w-0 space-y-4">
-          <LibrarySwitcher />
-
-          <div className="lg:hidden">
-            <BrowseToolbar
-              search={search}
-              onSearch={setSearch}
-              searchPlaceholder="Suche nach Wort, Übersetzung …"
-              primary={{ value: theme, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
-              facetItems={searched}
-              facets={facets}
-              facetSelection={selection}
-              onFacetChange={setSelection}
-              resultLabel={(n) => `${n} ${n === 1 ? "Wort" : "Wörter"} anzeigen`}
-              activeChips={activeChips}
-              onRemoveChip={removeFacetValue}
-              trailing={mobileActions}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-            <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
-            {/* In the graph view the word count sits with the connection
-                count at the bottom of the canvas (founder follow-up), so it
-                is not repeated here. */}
-            {view !== "graph" && (
-              <span className="text-sm tabular-nums text-muted-foreground">
-                {items.length} {items.length === 1 ? "Wort" : "Wörter"}
-              </span>
-            )}
-            <div className="ml-auto hidden items-center gap-2 lg:flex">{savedButton}</div>
-          </div>
-
-          {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
-              dropdown already shows the active theme, so the chip was redundant.
-              The silent level-band cut now shows as an explicit removable chip. */}
-          {hiddenLabel && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
-
           {showPickerNow && activeTheme ? (
             <SubThemePicker
               theme={activeTheme}

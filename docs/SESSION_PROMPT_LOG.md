@@ -3306,3 +3306,21 @@ Branch: `claude/whats-next-esga9u`.
   + bundle green (73.1 kB). Shipped as PR #434, squash-merged; branch realigned.
 - **Artifacts:** `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/vocabulary/WordGraph.tsx`;
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #434).
+
+## Entry 314 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > in the desktop view the filter tile should start from same level as the words tiles when in grid view to the right. it's a bit too to the top at the moment.
+- **Response summary:** The desktop filter tile aligned with the tab row (too high). Restructured all three
+  browse pages (Wörter/Kollokationen/Redemittel) so the LibrarySwitcher tabs, the mobile toolbar, the
+  view-switcher meta row and the level chip span the full width at the top, and only the content column +
+  the filter rail sit in the two-column grid below. Result: the filter tile top now equals the first
+  content-card top (measured 353px = 353px, delta 0 via Playwright), which also matches the founder's
+  original mockup (tabs across the top, filter panel beside the content). Mobile layout unchanged. Gates
+  green (typecheck, lint 0 errors, test:unit 110/110, bundle 73.1 kB). Shipped as PR #435, squash-merged;
+  branch realigned.
+- **Artifacts:** `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`;
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #435).

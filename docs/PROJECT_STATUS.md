@@ -299,6 +299,12 @@ mobile, zero console errors), and shipped:
   the top meta row and sits with the connection count at the bottom of the canvas ("586 Wörter · 673
   Verbindungen"); the meta row keeps only the view switcher + Gespeichert there. Other views (Tabelle/
   Karten/Liste) keep the word count in the meta row as before.
+- **Founder follow-up round 4 (same session, PR #435):** the desktop filter tile was **too high** (it
+  aligned with the tab row). Restructured all three browse pages so the **LibrarySwitcher tabs + the
+  view-switcher meta row span the full width at the top**, and only the content + rail share the
+  two-column grid below them, so the **filter tile now starts level with the first content card** (measured
+  rail-top = card-top = 353px). This also matches the founder's original mockup (tabs across the top, filter
+  panel beside the content).
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.
