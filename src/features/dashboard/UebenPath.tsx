@@ -317,9 +317,9 @@ export default function UebenPath() {
         {/* Module content slides horizontally when the pager changes modules */}
         <motion.div
           key={selected.id}
-          initial={reducedMotion ? false : { x: slideDir * 44, opacity: 0 }}
+          initial={reducedMotion ? false : { x: slideDir * 28, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.13, ease: "easeOut" }}
         >
           <div className="mt-3 flex items-center gap-2">
             <span className="text-[13px] font-bold tabular-nums text-muted-foreground">1.{selected.index}</span>

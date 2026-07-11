@@ -28,14 +28,18 @@ export function Dashboard() {
     // Single-column start page. On desktop (lg) the whole thing is vertically
     // centered in the viewport so the focused column reads as deliberate rather
     // than a narrow strip stranded at the top of a wide screen (founder: keep
-    // one column, adapt it to desktop).
-    <div className="space-y-4 sm:space-y-6 lg:flex lg:min-h-[calc(100vh-8.5rem)] lg:flex-col lg:justify-center lg:space-y-6">
+    // one column, adapt it to desktop). The min-height subtracts MORE than the
+    // chrome (header + main padding ~8.5rem) so the page always stays a few rem
+    // shorter than the viewport, i.e. never triggers a scrollbar from an
+    // exact-fit rounding edge (founder: scrollbar on Üben).
+    <div className="space-y-4 sm:space-y-6 lg:flex lg:min-h-[calc(100vh-11rem)] lg:flex-col lg:justify-center lg:space-y-6">
       {/* Üben / Spielen: the two ways into the day, centred. Üben opens by
           default. The greeting + streak live in the top row; the daily-goal ring
           moved to Fortschritt (s86), so Heute no longer repeats progress. */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
         role="tablist"
         aria-label="Modus"
         className="mx-auto flex w-fit gap-1 rounded-full border border-border bg-muted p-1"
@@ -76,15 +80,17 @@ export function Dashboard() {
       <AnimatePresence mode="wait">
         <motion.div
           key={tab}
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          // A single focused column. Kept at max-w-md on desktop too: a wider
-          // 3:2 tile makes the column too tall for the viewport (start page must
-          // not scroll). The desktop adaptation is the vertical centering on the
-          // wrapper above, not extra width.
-          className="mx-auto w-full max-w-md"
+          transition={{ duration: 0.13, ease: "easeOut" }}
+          // A single focused column. On desktop it's slightly narrower than
+          // mobile's max-w-md: the tile is 3:2, so a wide column makes the whole
+          // stack (tile + card + pager) taller than a laptop viewport and forces
+          // a scrollbar. max-w-sm keeps the stack short enough to fit without
+          // scrolling; the vertical centering on the wrapper does the desktop
+          // framing, not extra width.
+          className="mx-auto w-full max-w-md lg:max-w-[22rem]"
         >
           <Suspense fallback={fallback}>
             {tab === "ueben" ? <UebenPath /> : <SpielenHub />}
