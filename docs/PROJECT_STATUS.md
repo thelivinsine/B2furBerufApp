@@ -8,7 +8,7 @@ pill groups with live counts; mobile keeps the locked toolbar + sheet), a URL-pe
 list views per tab, and an **Obsidian-style force-directed word graph** on Wörter (canvas, d3-force in a
 lazy chunk; node size = wordfreq Zipf, color = domain, edges = authored `related` terms + collocation
 noun/verb pairs; pan/pinch/zoom, tap-to-select with neighbor highlighting). Main chunk unchanged at
-72.8 kB. Shipped as PR #427, squash-merged to `main`.**
+72.8 kB. Shipped as PR #431, squash-merged to `main`.**
 Prior, session 90: **Heute Üben/Spielen tile parity + subtle section color.** The Üben
 map tile and the Spielen chapter-hero tile now share the exact same dimensions AND screen position (both
 353px from top, 245×358px measured), so toggling tabs no longer shifts the tile: Üben's header + map are
@@ -242,7 +242,7 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 ## Resume here (next session)
 
 **Handoff after session 91 (2026-07-11). Bibliothek views: desktop filter rail + view switcher + word graph
-(branch `claude/bibliothek-mockup-review-rcghlq`, PR #427).**
+(branch `claude/bibliothek-mockup-review-rcghlq`, PR #431).**
 
 Founder shared a hand-drawn Bibliothek mockup (desktop: tab row, a 4-icon view switcher, card grid, right-hand
 search + filter rail) and confirmed the intent in Q&A: (1) the four views are Tabelle / **nodal graph like
@@ -282,7 +282,7 @@ mobile, zero console errors), and shipped:
 - Gates green: build + prerender, typecheck, ESLint 0 errors, `lint:content` pass, `test:unit` **110/110**,
   `check:bundle` 72.8 kB. Browser-verified: rail pill writes `?cefr=`, Thema row writes `?theme=`, all four
   views render desktop + mobile, graph click-select works, zero console errors.
-- **Ship status:** shipped as **PR #427**, squash-merged to `main`; branch realigned after the merge.
+- **Ship status:** shipped as **PR #431**, squash-merged to `main`; branch realigned after the merge.
   **Founder verifies the live site.**
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank

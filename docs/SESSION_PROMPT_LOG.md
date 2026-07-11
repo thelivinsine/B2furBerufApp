@@ -3242,11 +3242,11 @@ Branch: `claude/whats-next-esga9u`.
   zoom/fit controls, positions survive filter changes). Pages restructured to a two-column lg grid with the
   mobile toolbar untouched. Fixed "n Worte" to "n Wörter". Verified in a real browser (Playwright, desktop +
   mobile, all views, zero console errors, URL writes checked) plus all gates (build, lint 0 errors,
-  lint:content, test:unit 110/110, bundle 72.8 kB unchanged). Shipped as PR #427, squash-merged to `main`;
+  lint:content, test:unit 110/110, bundle 72.8 kB unchanged). Shipped as PR #431, squash-merged to `main`;
   branch realigned. Docs updated (CLAUDE.md, PROJECT_STATUS.md s91 handoff, this log).
 - **Artifacts:** `src/features/shared/{SearchField,FilterRail,ViewSwitcher,DataTable}.tsx`,
   `src/features/shared/BrowseToolbar.tsx`, `src/features/vocabulary/{VocabularyTrainer.tsx,VocabViews.tsx,
   WordGraph.tsx,wordGraph.ts}`, `src/features/collocations/{CollocationsBrowser,CollocationViews}.tsx`,
   `src/features/redemittel/{RedemittelTrainer,RedemittelViews}.tsx`, `tests/wordgraph.test.ts`,
-  `package.json`/`pnpm-lock.yaml` (d3-force) (commit `952a759`, PR #427); `CLAUDE.md`,
+  `package.json`/`pnpm-lock.yaml` (d3-force) (commit `952a759`, PR #431); `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`, archive W28 chunk.
