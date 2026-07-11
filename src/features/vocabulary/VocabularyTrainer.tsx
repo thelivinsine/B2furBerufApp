@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Layers, Sparkles, ChevronLeft, Zap, Bookmark } from "lucide-react";
+import { BookOpen, Layers, Sparkles, ChevronLeft, Zap, Bookmark, Search } from "lucide-react";
 import { themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -11,6 +11,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
+import { SearchField } from "@/features/shared/SearchField";
+import { fuzzyMatch, foldText } from "@/lib/fuzzy";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { applyFacets, ActiveFilterChip, type FacetDef, type FacetSelection } from "@/features/shared/FacetSheet";
 import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
@@ -31,9 +33,6 @@ const WordGraph = lazy(() => import("./WordGraph"));
 // Mockup order: Tabelle · Graph · Karten · Liste. Only Wörter has the graph.
 const WOERTER_VIEWS: LibraryView[] = ["tabelle", "graph", "karten", "liste"];
 
-function normalise(s: string) {
-  return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
-}
 
 // UX overhaul Phase 5: the in-page Karteikarten + Quiz tabs are retired here.
 // Focused practice now flows through the toolbar's "Üben" button, which launches
@@ -62,6 +61,10 @@ export function VocabularyTrainer() {
   // Mobile filter panel open state: the toggle lives on the view-options line
   // (an icon), the desktop rail keeps its own header/state.
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // Search lives outside the filter panel (founder s92): a transient input the
+  // search icon toggles open. Closing clears it, so it never lingers as a hidden
+  // filter. It starts open if the page was deep-linked with a query.
+  const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
 
   // Tier-2 travelling scope: when arriving without an explicit theme (e.g. via
   // the bottom bar), inherit the shared library scope so the learner's context
@@ -131,13 +134,20 @@ export function VocabularyTrainer() {
 
   const searchedRaw = useMemo(() => {
     if (!search.trim()) return scoped;
-    const q = normalise(search.trim());
-    return scoped.filter(
-      (v) =>
-        normalise(v.de).includes(q) ||
-        normalise(v.en).includes(q) ||
-        v.related.some((r) => normalise(r).includes(q)),
+    // Forgiving match (typo/umlaut/token-order tolerant) across the word, its
+    // gloss and its related terms.
+    const direct = scoped.filter((v) => fuzzyMatch(search, [v.de, v.en, ...v.related]));
+    if (!direct.length) return direct;
+    // Also surface each match's connections: the related terms that resolve to
+    // other entries in scope, so a search reveals the little cluster around the
+    // word (the same edges the graph draws), not just the word itself.
+    const directIds = new Set(direct.map((d) => d.id));
+    const relatedNames = new Set<string>();
+    direct.forEach((d) => d.related.forEach((r) => relatedNames.add(foldText(r))));
+    const connected = scoped.filter(
+      (v) => !directIds.has(v.id) && relatedNames.has(foldText(v.de)),
     );
+    return [...direct, ...connected];
   }, [scoped, search]);
 
   // "Gespeichert" filter (#29): a per-learner boolean, so it lives as a toolbar
@@ -226,13 +236,31 @@ export function VocabularyTrainer() {
     </Button>
   );
 
+  // Search toggle: same icon-only design as the bookmark, sitting to its right.
+  const searchButton = (
+    <Button
+      size="icon"
+      variant={searchOpen || search.trim() ? "default" : "outline"}
+      aria-pressed={searchOpen}
+      aria-expanded={searchOpen}
+      aria-label="Suche"
+      title="Suche"
+      className="shrink-0"
+      onClick={() =>
+        setSearchOpen((o) => {
+          if (o) setSearch("");
+          return !o;
+        })
+      }
+    >
+      <Search className="h-4 w-4" />
+    </Button>
+  );
+
   // The filter tile is now the single filter surface on BOTH breakpoints
   // (founder follow-up, s91): the desktop rail and the mobile tile share
   // these props; only className + defaultOpen differ.
   const filterRailProps = {
-    search,
-    onSearch: setSearch,
-    searchPlaceholder: "Suche nach Wort, Übersetzung …",
     primary: {
       label: "Thema",
       value: theme,
@@ -325,8 +353,23 @@ export function VocabularyTrainer() {
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
             {/* The word count moved into the tile footer (right of Üben). */}
-            <div className="flex items-center gap-2 lg:ml-auto">{savedButton}</div>
+            <div className="flex items-center gap-2 lg:ml-auto">
+              {savedButton}
+              {searchButton}
+            </div>
           </div>
+
+          {/* Search input lives OUTSIDE the filter panel (founder s92): a
+              transient full-width row the search icon toggles. It does not touch
+              the filter state. */}
+          {searchOpen && (
+            <SearchField
+              value={search}
+              onChange={setSearch}
+              placeholder="Suche nach Wort, Übersetzung …"
+              autoFocus
+            />
+          )}
 
           {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
               dropdown already shows the active theme, so the chip was redundant.

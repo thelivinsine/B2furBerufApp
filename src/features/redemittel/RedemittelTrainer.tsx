@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Zap } from "lucide-react";
+import { Zap, Search } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
 import { iconByName } from "@/lib/icons";
@@ -11,15 +11,13 @@ import { Button } from "@/components/ui/button";
 import { ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
+import { SearchField } from "@/features/shared/SearchField";
+import { fuzzyMatch } from "@/lib/fuzzy";
 import { redemittelFacets } from "@/lib/facets";
 import { RedemittelTable, RedemittelCompactList } from "./RedemittelViews";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { defaultVisibleBands } from "@/lib/cefr";
-
-function normalise(s: string) {
-  return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
-}
 
 const registerLabel: Record<string, { text: string; variant: "muted" | "default" }> = {
   neutral: { text: "neutral", variant: "muted" },
@@ -44,6 +42,8 @@ export function RedemittelTrainer() {
   const [view, setView] = useViewParam(REDEMITTEL_VIEWS);
   // Mobile filter panel open state: the toggle is an icon on the view line.
   const [filtersOpen, setFiltersOpen] = useState(false);
+  // Transient search, outside the filter panel (founder s92).
+  const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
 
   const category = params.get("cat") ?? "all";
   const registerSel = useMemo(() => {
@@ -88,8 +88,7 @@ export function RedemittelTrainer() {
   // feeds the FilterRail so its Register counts reflect what a tap yields.
   const searched = useMemo(() => {
     if (!search.trim()) return bandLimited;
-    const q = normalise(search.trim());
-    return bandLimited.filter((p) => normalise(p.de).includes(q) || normalise(p.en).includes(q));
+    return bandLimited.filter((p) => fuzzyMatch(search, [p.de, p.en]));
   }, [bandLimited, search]);
 
   const filtered = useMemo(
@@ -129,9 +128,6 @@ export function RedemittelTrainer() {
   // follow-up, s91): desktop rail + mobile tile share these props. Register is
   // a facet group in the tile, so the old mobile register chips are gone.
   const filterRailProps = {
-    search,
-    onSearch: setSearch,
-    searchPlaceholder: "Suche nach Wendung, Übersetzung …",
     primary: {
       label: "Kategorie",
       value: category,
@@ -218,7 +214,36 @@ export function RedemittelTrainer() {
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
+            <div className="flex items-center gap-2 lg:ml-auto">
+              <Button
+                size="icon"
+                variant={searchOpen || search.trim() ? "default" : "outline"}
+                aria-pressed={searchOpen}
+                aria-expanded={searchOpen}
+                aria-label="Suche"
+                title="Suche"
+                className="shrink-0"
+                onClick={() =>
+                  setSearchOpen((o) => {
+                    if (o) setSearch("");
+                    return !o;
+                  })
+                }
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
+
+          {/* Search input lives outside the filter panel (founder s92). */}
+          {searchOpen && (
+            <SearchField
+              value={search}
+              onChange={setSearch}
+              placeholder="Suche nach Wendung, Übersetzung …"
+              autoFocus
+            />
+          )}
 
           {bandActive && bandHiddenCount > 0 && (
             <div className="flex flex-wrap items-center gap-2">
