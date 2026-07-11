@@ -25,7 +25,11 @@ export function Dashboard() {
   const [tab, setTab] = useState<HeuteTab>("ueben");
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    // Single-column start page. On desktop (lg) the whole thing is vertically
+    // centered in the viewport so the focused column reads as deliberate rather
+    // than a narrow strip stranded at the top of a wide screen (founder: keep
+    // one column, adapt it to desktop).
+    <div className="space-y-4 sm:space-y-6 lg:flex lg:min-h-[calc(100vh-8.5rem)] lg:flex-col lg:justify-center lg:space-y-6">
       {/* Üben / Spielen: the two ways into the day, centred. Üben opens by
           default. The greeting + streak live in the top row; the daily-goal ring
           moved to Fortschritt (s86), so Heute no longer repeats progress. */}
@@ -76,9 +80,11 @@ export function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          // Phone: a single focused column. Desktop (lg): widen so the tab
-          // content can lay out as two columns (tile | practice·missions).
-          className="mx-auto max-w-md lg:max-w-4xl"
+          // A single focused column. Kept at max-w-md on desktop too: a wider
+          // 3:2 tile makes the column too tall for the viewport (start page must
+          // not scroll). The desktop adaptation is the vertical centering on the
+          // wrapper above, not extra width.
+          className="mx-auto w-full max-w-md"
         >
           <Suspense fallback={fallback}>
             {tab === "ueben" ? <UebenPath /> : <SpielenHub />}
