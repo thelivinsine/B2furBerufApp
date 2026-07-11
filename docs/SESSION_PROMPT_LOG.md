@@ -3359,3 +3359,26 @@ Branch: `claude/whats-next-esga9u`.
   test:unit 110/110, bundle 73.1 kB). Shipped as PR #437, squash-merged; branch realigned.
 - **Artifacts:** `src/features/shared/FilterRail.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (PR #437).
+
+## Entry 317 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the whole filter rail should be the same theme color. Apply same filter tile ui to mobile as well.
+- **Response summary:** Two changes to the Bibliothek filter. (1) The WHOLE FilterRail tile is now
+  brand-tinted (`bg-primary/10` body + `border-primary/20` + `border-primary/15` dividers), not just the
+  header; the white controls (search, Thema Select, facet pills) provide contrast. (2) The same collapsible
+  filter tile now renders on MOBILE too, replacing the mobile BrowseToolbar + FacetSheet on all three browse
+  pages. Extracted a single `filterRailProps` object per page and rendered it as two `<FilterRail>`
+  instances: desktop (grid col2/row2, sticky, default-open) and mobile (`lg:hidden`, inline in the header
+  column, new `defaultOpen={false}` prop so it starts as a compact Filter bar the user taps to expand).
+  Moved Gespeichert (Wörter) into the meta row on mobile; removed Redemittel's mobile register chips (Register
+  is a rail facet). Removed the now-dead BrowseToolbar imports + activeChips/removeFacetValue/primaryOptions
+  helpers from the three pages (BrowseToolbar/FacetSheet stay in the repo, just unused here). Verified via
+  Playwright: desktop themed tile, mobile collapsed → tap → expanded full tile (Suche/Thema dropdown/all
+  facet groups + pins + Üben footer), zero console errors. Gates green (typecheck, lint 0 errors, test:unit
+  110/110, bundle 73.1 kB). Shipped as PR #438, squash-merged; branch realigned.
+- **Artifacts:** `src/features/shared/FilterRail.tsx`, `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`;
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #438).

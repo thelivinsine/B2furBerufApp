@@ -9,7 +9,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
-import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { redemittelFacets } from "@/lib/facets";
@@ -18,7 +17,6 @@ import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
 import { defaultVisibleBands } from "@/lib/cefr";
-import { cn } from "@/lib/utils";
 
 function normalise(s: string) {
   return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
@@ -28,14 +26,6 @@ const registerLabel: Record<string, { text: string; variant: "muted" | "default"
   neutral: { text: "neutral", variant: "muted" },
   formal: { text: "formell", variant: "default" },
 };
-
-// Register is the single orthogonal dimension here, so it renders as an
-// inline chip row instead of a one-facet bottom sheet (audit 2026-07-09:
-// a modal needs at least two facet groups to earn itself).
-const REGISTER_CHIPS = [
-  { value: "neutral", label: "neutral" },
-  { value: "formal", label: "formell" },
-] as const;
 
 // Bibliothek views (session 91): the card view keeps its category sections;
 // Tabelle and Liste are flat lenses over the same filtered list.
@@ -64,16 +54,6 @@ export function RedemittelTrainer() {
     const p = new URLSearchParams(params);
     if (cat === "all") p.delete("cat");
     else p.set("cat", cat);
-    setParams(p, { replace: true });
-  };
-
-  const toggleRegister = (value: string) => {
-    const next = registerSel.includes(value)
-      ? registerSel.filter((v) => v !== value)
-      : [...registerSel, value];
-    const p = new URLSearchParams(params);
-    if (next.length) p.set("register", next.join(","));
-    else p.delete("register");
     setParams(p, { replace: true });
   };
 
@@ -144,18 +124,31 @@ export function RedemittelTrainer() {
       ? redemittelCategories
       : redemittelCategories.filter((c) => c.id === category);
 
-  // Mobile keeps Üben in the toolbar (no rail there); on desktop it lives at
-  // the bottom of the filter tile (founder follow-up, s91).
-  const mobileActions = (
-    <Button
-      size="sm"
-      variant="gradient"
-      className="h-10 shrink-0"
-      onClick={() => navigate("/session")}
-    >
-      <Zap className="h-3.5 w-3.5" /> Üben
-    </Button>
-  );
+  // The filter tile is the single filter surface on BOTH breakpoints (founder
+  // follow-up, s91): desktop rail + mobile tile share these props. Register is
+  // a facet group in the tile, so the old mobile register chips are gone.
+  const filterRailProps = {
+    search,
+    onSearch: setSearch,
+    searchPlaceholder: "Suche nach Wendung, Übersetzung …",
+    primary: {
+      label: "Kategorie",
+      value: category,
+      onChange: setCategory,
+      all: { value: "all", label: "Alle Kategorien", count: redemittel.length },
+      options: primaryOptions.slice(1),
+    },
+    items: searched,
+    facets: REDEMITTEL_FACETS,
+    selection: railSelection,
+    onChange: setRailSelection,
+    pinScope: "redemittel",
+    footer: (
+      <Button variant="gradient" className="h-10 w-full" onClick={() => navigate("/session")}>
+        <Zap className="h-3.5 w-3.5" /> Üben
+      </Button>
+    ),
+  };
 
   const cardSections = categoriesToRender.map((cat) => {
         const Icon = iconByName(cat.icon);
@@ -217,29 +210,16 @@ export function RedemittelTrainer() {
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
           follow-up s91), while the content and the filter tile share row 2 so
-          the tile still starts level with the first card. Mobile keeps the
-          locked toolbar + inline register chips; the two never render
-          together. */}
+          the tile still starts level with the first card. Mobile renders the
+          SAME filter tile inline (collapsed by default; Register is a facet
+          group in it now); only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          <div className="lg:hidden">
-            <BrowseToolbar
-              search={search}
-              onSearch={setSearch}
-              searchPlaceholder="Suche nach Wendung, Übersetzung …"
-              primary={{ value: category, onChange: setCategory, options: primaryOptions }}
-              facetItems={filtered}
-              facets={[]}
-              facetSelection={{}}
-              onFacetChange={() => {}}
-              resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
-              activeChips={[]}
-              onRemoveChip={() => {}}
-              trailing={mobileActions}
-            />
-          </div>
+          {/* Mobile shows the SAME filter tile (founder follow-up, s91),
+              starting collapsed; desktop renders its own sticky rail below. */}
+          <FilterRail {...filterRailProps} defaultOpen={false} className="lg:hidden" />
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
@@ -248,35 +228,14 @@ export function RedemittelTrainer() {
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Register is a rail group on desktop; the inline chips stay mobile-only. */}
-            <div className="flex flex-wrap items-center gap-2 lg:hidden">
-              {REGISTER_CHIPS.map((chip) => {
-                const active = registerSel.includes(chip.value);
-                return (
-                  <button
-                    key={chip.value}
-                    onClick={() => toggleRegister(chip.value)}
-                    aria-pressed={active}
-                    className={cn(
-                      "inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
-                      active
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
-                    )}
-                  >
-                    {chip.label}
-                  </button>
-                );
-              })}
-            </div>
-            {bandActive && bandHiddenCount > 0 && (
+          {bandActive && bandHiddenCount > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
               <ActiveFilterChip
                 label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
                 onRemove={() => setShowAllLevels(true)}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
@@ -297,27 +256,8 @@ export function RedemittelTrainer() {
         </div>
 
         <FilterRail
+          {...filterRailProps}
           className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block"
-          search={search}
-          onSearch={setSearch}
-          searchPlaceholder="Suche nach Wendung, Übersetzung …"
-          primary={{
-            label: "Kategorie",
-            value: category,
-            onChange: setCategory,
-            all: { value: "all", label: "Alle Kategorien", count: redemittel.length },
-            options: primaryOptions.slice(1),
-          }}
-          items={searched}
-          facets={REDEMITTEL_FACETS}
-          selection={railSelection}
-          onChange={setRailSelection}
-          pinScope="redemittel"
-          footer={
-            <Button variant="gradient" className="h-10 w-full" onClick={() => navigate("/session")}>
-              <Zap className="h-3.5 w-3.5" /> Üben
-            </Button>
-          }
         />
       </div>
     </div>

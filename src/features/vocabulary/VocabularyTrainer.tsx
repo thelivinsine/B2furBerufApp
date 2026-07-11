@@ -10,7 +10,6 @@ import { useLibraryScope } from "@/store/useLibraryScope";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
-import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
@@ -168,14 +167,6 @@ export function VocabularyTrainer() {
   const items = useMemo(() => applyFacets(bandLimited, facets, selection), [bandLimited, facets, selection]);
   const facetKey = ALL_FACET_IDS.map((id) => params.get(id) ?? "").join("|");
 
-  const activeChips = facets.flatMap((f) =>
-    (selection[f.id] ?? []).map((v) => ({
-      facetId: f.id,
-      value: v,
-      label: f.options.find((o) => o.value === v)?.label ?? v,
-    })),
-  );
-
   const setTheme = (t: string) => {
     const p = new URLSearchParams(params);
     if (t === "all") p.delete("theme");
@@ -195,9 +186,6 @@ export function VocabularyTrainer() {
     setParams(p, { replace: true });
   };
 
-  const removeFacetValue = (facetId: string, value: string) =>
-    setSelection({ ...selection, [facetId]: (selection[facetId] ?? []).filter((v) => v !== value) });
-
   const setSub = (s: string) => {
     const p = new URLSearchParams(params);
     if (!s) p.delete("sub");
@@ -212,7 +200,6 @@ export function VocabularyTrainer() {
     setParams(p, { replace: true });
   };
 
-  const primaryOptions = [{ value: "all", label: "Alle Themen", count: vocabulary.length }];
   const primaryGroups = useMemo(
     () => themeGroupsForMode(learningMode, theme, (id) => vocabByTheme(id).length),
     [learningMode, theme],
@@ -236,16 +223,31 @@ export function VocabularyTrainer() {
     </Button>
   );
 
-  // Mobile keeps Üben in the toolbar (there is no rail there); on desktop
-  // Üben lives at the bottom of the filter tile (founder follow-up, s91).
-  const mobileActions = (
-    <>
-      {savedButton}
-      <Button size="sm" variant="gradient" className="h-10 shrink-0" onClick={startSession}>
+  // The filter tile is now the single filter surface on BOTH breakpoints
+  // (founder follow-up, s91): the desktop rail and the mobile tile share
+  // these props; only className + defaultOpen differ.
+  const filterRailProps = {
+    search,
+    onSearch: setSearch,
+    searchPlaceholder: "Suche nach Wort, Übersetzung …",
+    primary: {
+      label: "Thema",
+      value: theme,
+      onChange: setTheme,
+      all: { value: "all", label: "Alle Themen", count: vocabulary.length },
+      groups: primaryGroups,
+    },
+    items: searched,
+    facets,
+    selection,
+    onChange: setSelection,
+    pinScope: "woerter",
+    footer: (
+      <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
-    </>
-  );
+    ),
+  };
 
   // The sub-theme picker replaces the card/table/list content, but never the
   // graph: the graph is at its best over the whole theme.
@@ -309,28 +311,16 @@ export function VocabularyTrainer() {
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
           follow-up s91), while the content and the filter tile share row 2 so
-          the tile still starts level with the first word card. Mobile keeps
-          the locked toolbar + sheet; the two never render together. */}
+          the tile still starts level with the first word card. Mobile renders
+          the SAME filter tile inline (collapsed by default) instead of a
+          toolbar + sheet; only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          <div className="lg:hidden">
-            <BrowseToolbar
-              search={search}
-              onSearch={setSearch}
-              searchPlaceholder="Suche nach Wort, Übersetzung …"
-              primary={{ value: theme, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
-              facetItems={searched}
-              facets={facets}
-              facetSelection={selection}
-              onFacetChange={setSelection}
-              resultLabel={(n) => `${n} ${n === 1 ? "Wort" : "Wörter"} anzeigen`}
-              activeChips={activeChips}
-              onRemoveChip={removeFacetValue}
-              trailing={mobileActions}
-            />
-          </div>
+          {/* Mobile shows the SAME filter tile (founder follow-up, s91),
+              starting collapsed; desktop renders its own sticky rail below. */}
+          <FilterRail {...filterRailProps} defaultOpen={false} className="lg:hidden" />
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
@@ -342,7 +332,7 @@ export function VocabularyTrainer() {
                 {items.length} {items.length === 1 ? "Wort" : "Wörter"}
               </span>
             )}
-            <div className="ml-auto hidden items-center gap-2 lg:flex">{savedButton}</div>
+            <div className="flex items-center gap-2 lg:ml-auto">{savedButton}</div>
           </div>
 
           {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
@@ -387,27 +377,8 @@ export function VocabularyTrainer() {
         </div>
 
         <FilterRail
+          {...filterRailProps}
           className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block"
-          search={search}
-          onSearch={setSearch}
-          searchPlaceholder="Suche nach Wort, Übersetzung …"
-          primary={{
-            label: "Thema",
-            value: theme,
-            onChange: setTheme,
-            all: { value: "all", label: "Alle Themen", count: vocabulary.length },
-            groups: primaryGroups,
-          }}
-          items={searched}
-          facets={facets}
-          selection={selection}
-          onChange={setSelection}
-          pinScope="woerter"
-          footer={
-            <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
-              <Zap className="h-3.5 w-3.5" /> Üben
-            </Button>
-          }
         />
       </div>
     </div>

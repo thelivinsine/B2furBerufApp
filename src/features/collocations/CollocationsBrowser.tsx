@@ -13,7 +13,6 @@ import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
 import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
-import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { CollocationTable, CollocationCompactList } from "./CollocationViews";
@@ -129,9 +128,6 @@ export function CollocationsBrowser() {
     setParams(p, { replace: true });
   };
 
-  const removeFacetValue = (facetId: string, value: string) =>
-    setSelection({ ...selection, [facetId]: (selection[facetId] ?? []).filter((v) => v !== value) });
-
   const setTheme = (val: string) => {
     const p = new URLSearchParams(params);
     if (val === "all") p.delete("theme");
@@ -197,18 +193,9 @@ export function CollocationsBrowser() {
     [bandLimited, selection],
   );
 
-  const activeChips = COLLOCATION_FACETS.flatMap((f) =>
-    (selection[f.id] ?? []).map((v) => ({
-      facetId: f.id,
-      value: v,
-      label: f.options.find((o) => o.value === v)?.label ?? v,
-    })),
-  );
-
   // Incremental rendering: 60 cards now, the rest as you scroll.
   const { visible, hasMore, remaining, sentinelRef, showMore } = usePagedList(filtered);
 
-  const primaryOptions = [{ value: "all", label: "Alle Themen", count: collocations.length }];
   const primaryGroups = useMemo(
     () => themeGroupsForMode(learningMode, themeParam, (id) => collocationsByTheme(id).length),
     [learningMode, themeParam],
@@ -216,13 +203,30 @@ export function CollocationsBrowser() {
 
   const startSession = () => navigate(`/session${activeTheme ? `?theme=${activeTheme.id}` : ""}`);
 
-  // Mobile keeps Üben in the toolbar (no rail there); on desktop it lives at
-  // the bottom of the filter tile (founder follow-up, s91).
-  const mobileActions = (
-    <Button size="sm" variant="gradient" className="h-10 shrink-0" onClick={startSession}>
-      <Zap className="h-3.5 w-3.5" /> Üben
-    </Button>
-  );
+  // The filter tile is the single filter surface on BOTH breakpoints (founder
+  // follow-up, s91): desktop rail + mobile tile share these props.
+  const filterRailProps = {
+    search,
+    onSearch: setSearch,
+    searchPlaceholder: "Suche nach Nomen, Verb, Übersetzung …",
+    primary: {
+      label: "Thema",
+      value: themeParam,
+      onChange: setTheme,
+      all: { value: "all", label: "Alle Themen", count: collocations.length },
+      groups: primaryGroups,
+    },
+    items: scoped,
+    facets: COLLOCATION_FACETS,
+    selection,
+    onChange: setSelection,
+    pinScope: "kollokationen",
+    footer: (
+      <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
+        <Zap className="h-3.5 w-3.5" /> Üben
+      </Button>
+    ),
+  };
 
   const cardGrid = (
     <>
@@ -261,28 +265,16 @@ export function CollocationsBrowser() {
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
           follow-up s91), while the content and the filter tile share row 2 so
-          the tile still starts level with the first card. Mobile keeps the
-          locked toolbar + sheet; the two never render together. */}
+          the tile still starts level with the first card. Mobile renders the
+          SAME filter tile inline (collapsed by default); only one FilterRail
+          is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          <div className="lg:hidden">
-            <BrowseToolbar
-              search={search}
-              onSearch={setSearch}
-              searchPlaceholder="Suche nach Nomen, Verb, Übersetzung …"
-              primary={{ value: themeParam, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
-              facetItems={scoped}
-              facets={COLLOCATION_FACETS}
-              facetSelection={selection}
-              onFacetChange={setSelection}
-              resultLabel={(n) => `${n} Kollokation${n !== 1 ? "en" : ""} anzeigen`}
-              activeChips={activeChips}
-              onRemoveChip={removeFacetValue}
-              trailing={mobileActions}
-            />
-          </div>
+          {/* Mobile shows the SAME filter tile (founder follow-up, s91),
+              starting collapsed; desktop renders its own sticky rail below. */}
+          <FilterRail {...filterRailProps} defaultOpen={false} className="lg:hidden" />
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
@@ -341,27 +333,8 @@ export function CollocationsBrowser() {
         </div>
 
         <FilterRail
+          {...filterRailProps}
           className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block"
-          search={search}
-          onSearch={setSearch}
-          searchPlaceholder="Suche nach Nomen, Verb, Übersetzung …"
-          primary={{
-            label: "Thema",
-            value: themeParam,
-            onChange: setTheme,
-            all: { value: "all", label: "Alle Themen", count: collocations.length },
-            groups: primaryGroups,
-          }}
-          items={scoped}
-          facets={COLLOCATION_FACETS}
-          selection={selection}
-          onChange={setSelection}
-          pinScope="kollokationen"
-          footer={
-            <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
-              <Zap className="h-3.5 w-3.5" /> Üben
-            </Button>
-          }
         />
       </div>
     </div>

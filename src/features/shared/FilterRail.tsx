@@ -129,6 +129,7 @@ export function FilterRail<T>({
   onChange,
   footer,
   pinScope,
+  defaultOpen = true,
   className,
 }: {
   search: string;
@@ -144,9 +145,12 @@ export function FilterRail<T>({
   footer?: React.ReactNode;
   /** localStorage scope for the section pins, e.g. "woerter". */
   pinScope: string;
+  /** Whether the panel starts expanded. Desktop defaults open; mobile passes
+   *  false so the tile starts as a compact "Filter" bar. */
+  defaultOpen?: boolean;
   className?: string;
 }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(defaultOpen);
   const [pins, setPins] = useState<string[]>(() => readPins(pinScope));
   const activeCount = activeFacetCount(selection);
 
@@ -262,15 +266,20 @@ export function FilterRail<T>({
 
   return (
     <aside
-      className={cn("overflow-hidden rounded-xl border border-border bg-surface", className)}
+      className={cn(
+        // The WHOLE tile carries the brand tint (founder follow-up), not just
+        // the header; the white controls inside provide the contrast.
+        "overflow-hidden rounded-xl border border-primary/20 bg-primary/10",
+        className,
+      )}
       aria-label="Filter"
     >
-      {/* Tile header in the brand theme color; clicking collapses/expands
-          the panel (pinned sections + footer stay visible regardless). */}
+      {/* Tile header; clicking collapses/expands the panel (pinned sections +
+          footer stay visible regardless). */}
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center gap-2 bg-primary/10 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/15"
+        className="flex w-full items-center gap-2 px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
       >
         <SlidersHorizontal className="h-4 w-4" />
         Filter
@@ -283,7 +292,7 @@ export function FilterRail<T>({
       </button>
 
       {open && (
-        <div className="space-y-5 border-t border-border p-3 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto">
+        <div className="space-y-5 border-t border-primary/15 p-3 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto">
           <SearchField
             value={search}
             onChange={onSearch}
@@ -314,14 +323,14 @@ export function FilterRail<T>({
 
       {/* Collapsed: pinned sections stay visible. */}
       {showPinnedBody && (
-        <div className="space-y-5 border-t border-border p-3 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto">
+        <div className="space-y-5 border-t border-primary/15 p-3 lg:max-h-[calc(100vh-14rem)] lg:overflow-y-auto">
           {primary && pins.includes("primary") && primarySection}
           {pinnedFacets.map(facetSection)}
         </div>
       )}
 
       {/* Always-visible footer (the Üben button), in every state. */}
-      {footer && <div className="border-t border-border p-3">{footer}</div>}
+      {footer && <div className="border-t border-primary/15 p-3">{footer}</div>}
     </aside>
   );
 }
