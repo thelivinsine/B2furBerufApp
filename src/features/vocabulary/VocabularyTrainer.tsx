@@ -306,57 +306,59 @@ export function VocabularyTrainer() {
         title="Vokabeltrainer"
       />
 
-      <LibrarySwitcher />
+      {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
+          stay at the CONTENT column width (row 1, not full width, founder
+          follow-up s91), while the content and the filter tile share row 2 so
+          the tile still starts level with the first word card. Mobile keeps
+          the locked toolbar + sheet; the two never render together. */}
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
+        <div className="space-y-4 lg:col-start-1 lg:row-start-1">
+          <LibrarySwitcher />
 
-      <div className="lg:hidden">
-        <BrowseToolbar
-          search={search}
-          onSearch={setSearch}
-          searchPlaceholder="Suche nach Wort, Übersetzung …"
-          primary={{ value: theme, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
-          facetItems={searched}
-          facets={facets}
-          facetSelection={selection}
-          onFacetChange={setSelection}
-          resultLabel={(n) => `${n} ${n === 1 ? "Wort" : "Wörter"} anzeigen`}
-          activeChips={activeChips}
-          onRemoveChip={removeFacetValue}
-          trailing={mobileActions}
-        />
-      </div>
+          <div className="lg:hidden">
+            <BrowseToolbar
+              search={search}
+              onSearch={setSearch}
+              searchPlaceholder="Suche nach Wort, Übersetzung …"
+              primary={{ value: theme, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
+              facetItems={searched}
+              facets={facets}
+              facetSelection={selection}
+              onFacetChange={setSelection}
+              resultLabel={(n) => `${n} ${n === 1 ? "Wort" : "Wörter"} anzeigen`}
+              activeChips={activeChips}
+              onRemoveChip={removeFacetValue}
+              trailing={mobileActions}
+            />
+          </div>
 
-      {/* The tabs + view switcher span the top; below them the content grid
-          and the filter tile share a row, so on desktop the tile starts at
-          the same level as the first word card (founder follow-up, s91).
-          Mobile keeps the locked toolbar + sheet; the two never render
-          together. */}
-      <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-        <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
-        {/* In the graph view the word count sits with the connection
-            count at the bottom of the canvas (founder follow-up), so it
-            is not repeated here. */}
-        {view !== "graph" && (
-          <span className="text-sm tabular-nums text-muted-foreground">
-            {items.length} {items.length === 1 ? "Wort" : "Wörter"}
-          </span>
-        )}
-        <div className="ml-auto hidden items-center gap-2 lg:flex">{savedButton}</div>
-      </div>
+          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
+            {/* In the graph view the word count sits with the connection
+                count at the bottom of the canvas (founder follow-up), so it
+                is not repeated here. */}
+            {view !== "graph" && (
+              <span className="text-sm tabular-nums text-muted-foreground">
+                {items.length} {items.length === 1 ? "Wort" : "Wörter"}
+              </span>
+            )}
+            <div className="ml-auto hidden items-center gap-2 lg:flex">{savedButton}</div>
+          </div>
 
-      {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
-          dropdown already shows the active theme, so the chip was redundant.
-          The silent level-band cut now shows as an explicit removable chip. */}
-      {hiddenLabel && (
-        <div className="flex flex-wrap items-center gap-2">
-          <ActiveFilterChip
-            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-            onRemove={() => setShowAllLevels(true)}
-          />
+          {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
+              dropdown already shows the active theme, so the chip was redundant.
+              The silent level-band cut now shows as an explicit removable chip. */}
+          {hiddenLabel && (
+            <div className="flex flex-wrap items-center gap-2">
+              <ActiveFilterChip
+                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                onRemove={() => setShowAllLevels(true)}
+              />
+            </div>
+          )}
         </div>
-      )}
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
-        <div className="min-w-0 space-y-4">
+        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {showPickerNow && activeTheme ? (
             <SubThemePicker
               theme={activeTheme}
@@ -385,7 +387,7 @@ export function VocabularyTrainer() {
         </div>
 
         <FilterRail
-          className="hidden lg:sticky lg:top-24 lg:block"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block"
           search={search}
           onSearch={setSearch}
           searchPlaceholder="Suche nach Wort, Übersetzung …"

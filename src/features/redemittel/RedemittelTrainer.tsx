@@ -214,69 +214,72 @@ export function RedemittelTrainer() {
         title="Redemittel-Training"
       />
 
-      <LibrarySwitcher />
+      {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
+          stay at the CONTENT column width (row 1, not full width, founder
+          follow-up s91), while the content and the filter tile share row 2 so
+          the tile still starts level with the first card. Mobile keeps the
+          locked toolbar + inline register chips; the two never render
+          together. */}
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
+        <div className="space-y-4 lg:col-start-1 lg:row-start-1">
+          <LibrarySwitcher />
 
-      <div className="lg:hidden">
-        <BrowseToolbar
-          search={search}
-          onSearch={setSearch}
-          searchPlaceholder="Suche nach Wendung, Übersetzung …"
-          primary={{ value: category, onChange: setCategory, options: primaryOptions }}
-          facetItems={filtered}
-          facets={[]}
-          facetSelection={{}}
-          onFacetChange={() => {}}
-          resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
-          activeChips={[]}
-          onRemoveChip={() => {}}
-          trailing={mobileActions}
-        />
-      </div>
+          <div className="lg:hidden">
+            <BrowseToolbar
+              search={search}
+              onSearch={setSearch}
+              searchPlaceholder="Suche nach Wendung, Übersetzung …"
+              primary={{ value: category, onChange: setCategory, options: primaryOptions }}
+              facetItems={filtered}
+              facets={[]}
+              facetSelection={{}}
+              onFacetChange={() => {}}
+              resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
+              activeChips={[]}
+              onRemoveChip={() => {}}
+              trailing={mobileActions}
+            />
+          </div>
 
-      {/* The tabs + view switcher span the top; below them the content grid
-          and the filter tile share a row, so on desktop the tile starts at
-          the same level as the first card (founder follow-up, s91). Mobile
-          keeps the locked toolbar + inline register chips; the two never
-          render together. */}
-      <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-        <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
-        <span className="text-sm tabular-nums text-muted-foreground">
-          {filtered.length} Wendung{filtered.length !== 1 ? "en" : ""}
-        </span>
-      </div>
+          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
+            <span className="text-sm tabular-nums text-muted-foreground">
+              {filtered.length} Wendung{filtered.length !== 1 ? "en" : ""}
+            </span>
+          </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        {/* Register is a rail group on desktop; the inline chips stay mobile-only. */}
-        <div className="flex flex-wrap items-center gap-2 lg:hidden">
-          {REGISTER_CHIPS.map((chip) => {
-            const active = registerSel.includes(chip.value);
-            return (
-              <button
-                key={chip.value}
-                onClick={() => toggleRegister(chip.value)}
-                aria-pressed={active}
-                className={cn(
-                  "inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
-                  active
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
-                )}
-              >
-                {chip.label}
-              </button>
-            );
-          })}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Register is a rail group on desktop; the inline chips stay mobile-only. */}
+            <div className="flex flex-wrap items-center gap-2 lg:hidden">
+              {REGISTER_CHIPS.map((chip) => {
+                const active = registerSel.includes(chip.value);
+                return (
+                  <button
+                    key={chip.value}
+                    onClick={() => toggleRegister(chip.value)}
+                    aria-pressed={active}
+                    className={cn(
+                      "inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
+                    )}
+                  >
+                    {chip.label}
+                  </button>
+                );
+              })}
+            </div>
+            {bandActive && bandHiddenCount > 0 && (
+              <ActiveFilterChip
+                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                onRemove={() => setShowAllLevels(true)}
+              />
+            )}
+          </div>
         </div>
-        {bandActive && bandHiddenCount > 0 && (
-          <ActiveFilterChip
-            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-            onRemove={() => setShowAllLevels(true)}
-          />
-        )}
-      </div>
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
-        <div className="min-w-0 space-y-4">
+        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {filtered.length > 0 &&
             (view === "tabelle" ? (
               <RedemittelTable items={filtered} />
@@ -294,7 +297,7 @@ export function RedemittelTrainer() {
         </div>
 
         <FilterRail
-          className="hidden lg:sticky lg:top-24 lg:block"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block"
           search={search}
           onSearch={setSearch}
           searchPlaceholder="Suche nach Wendung, Übersetzung …"

@@ -3324,3 +3324,23 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/vocabulary/VocabularyTrainer.tsx`,
   `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`;
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #435).
+
+## Entry 315 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the browse tabs should stay the way they were before.. no need for full width
+- **Response summary:** Round 4 (PR #435) had made the browse tabs span the full width to align the filter
+  tile with the cards. The founder wanted the tabs back at content-column width. Switched all three browse
+  pages from "full-width header above the grid" to an explicit 2-col × 2-row CSS grid: the tabs + mobile
+  toolbar + view-switcher meta row + level chip sit in row 1 / col 1 (content width only), and the content
+  (row 2 / col 1) + the filter rail (row 2 / col 2) share row 2. Result: the tabs no longer stretch over
+  the rail column (measured tabs-right 1112 < grid-right 1400) while the filter tile still starts level with
+  the first card (rail-top = card-top = 329, delta 0). `lg:space-y-0 lg:gap-y-4` keeps the mobile stack
+  spacing without margin-in-grid issues; mobile layout unchanged. Verified via Playwright (desktop
+  measurements + mobile screenshot, zero console errors); gates green (typecheck, lint 0 errors, test:unit
+  110/110, bundle 73.1 kB). Shipped as PR #436, squash-merged; branch realigned.
+- **Artifacts:** `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`;
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #436).

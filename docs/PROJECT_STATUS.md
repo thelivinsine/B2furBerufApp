@@ -300,11 +300,14 @@ mobile, zero console errors), and shipped:
   Verbindungen"); the meta row keeps only the view switcher + Gespeichert there. Other views (Tabelle/
   Karten/Liste) keep the word count in the meta row as before.
 - **Founder follow-up round 4 (same session, PR #435):** the desktop filter tile was **too high** (it
-  aligned with the tab row). Restructured all three browse pages so the **LibrarySwitcher tabs + the
-  view-switcher meta row span the full width at the top**, and only the content + rail share the
-  two-column grid below them, so the **filter tile now starts level with the first content card** (measured
-  rail-top = card-top = 353px). This also matches the founder's original mockup (tabs across the top, filter
-  panel beside the content).
+  aligned with the tab row). Restructured all three browse pages so the **filter tile now starts level with
+  the first content card** (measured rail-top = card-top).
+- **Founder follow-up round 5 (same session, PR #436):** round 4 had stretched the tabs to full width; the
+  founder wanted them back at content width. Switched all three pages to an **explicit 2-col × 2-row grid**:
+  the tabs + view-switcher meta row sit in row 1 / col 1 (content-column width, NOT full width), and the
+  content (row 2 / col 1) + the filter rail (row 2 / col 2) share row 2, so the tabs stay at content width
+  AND the filter tile still lines up with the first card (measured tabs-right 1112 < grid-right 1400;
+  rail-top = card-top = 329). Mobile unchanged.
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.
