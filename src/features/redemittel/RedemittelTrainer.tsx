@@ -214,68 +214,69 @@ export function RedemittelTrainer() {
         title="Redemittel-Training"
       />
 
-      {/* Desktop (lg+): content left, persistent filter rail right; the tab
-          switcher lives in the LEFT column so it sits beside the filter tile
-          (Bibliothek desktop layout, session 91). Mobile keeps the locked
-          toolbar + inline register chips; the two never render together. */}
+      <LibrarySwitcher />
+
+      <div className="lg:hidden">
+        <BrowseToolbar
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Suche nach Wendung, Übersetzung …"
+          primary={{ value: category, onChange: setCategory, options: primaryOptions }}
+          facetItems={filtered}
+          facets={[]}
+          facetSelection={{}}
+          onFacetChange={() => {}}
+          resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
+          activeChips={[]}
+          onRemoveChip={() => {}}
+          trailing={mobileActions}
+        />
+      </div>
+
+      {/* The tabs + view switcher span the top; below them the content grid
+          and the filter tile share a row, so on desktop the tile starts at
+          the same level as the first card (founder follow-up, s91). Mobile
+          keeps the locked toolbar + inline register chips; the two never
+          render together. */}
+      <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+        <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
+        <span className="text-sm tabular-nums text-muted-foreground">
+          {filtered.length} Wendung{filtered.length !== 1 ? "en" : ""}
+        </span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {/* Register is a rail group on desktop; the inline chips stay mobile-only. */}
+        <div className="flex flex-wrap items-center gap-2 lg:hidden">
+          {REGISTER_CHIPS.map((chip) => {
+            const active = registerSel.includes(chip.value);
+            return (
+              <button
+                key={chip.value}
+                onClick={() => toggleRegister(chip.value)}
+                aria-pressed={active}
+                className={cn(
+                  "inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
+                )}
+              >
+                {chip.label}
+              </button>
+            );
+          })}
+        </div>
+        {bandActive && bandHiddenCount > 0 && (
+          <ActiveFilterChip
+            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+            onRemove={() => setShowAllLevels(true)}
+          />
+        )}
+      </div>
+
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
         <div className="min-w-0 space-y-4">
-          <LibrarySwitcher />
-
-          <div className="lg:hidden">
-            <BrowseToolbar
-              search={search}
-              onSearch={setSearch}
-              searchPlaceholder="Suche nach Wendung, Übersetzung …"
-              primary={{ value: category, onChange: setCategory, options: primaryOptions }}
-              facetItems={filtered}
-              facets={[]}
-              facetSelection={{}}
-              onFacetChange={() => {}}
-              resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
-              activeChips={[]}
-              onRemoveChip={() => {}}
-              trailing={mobileActions}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-            <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
-            <span className="text-sm tabular-nums text-muted-foreground">
-              {filtered.length} Wendung{filtered.length !== 1 ? "en" : ""}
-            </span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Register is a rail group on desktop; the inline chips stay mobile-only. */}
-            <div className="flex flex-wrap items-center gap-2 lg:hidden">
-              {REGISTER_CHIPS.map((chip) => {
-                const active = registerSel.includes(chip.value);
-                return (
-                  <button
-                    key={chip.value}
-                    onClick={() => toggleRegister(chip.value)}
-                    aria-pressed={active}
-                    className={cn(
-                      "inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
-                      active
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
-                    )}
-                  >
-                    {chip.label}
-                  </button>
-                );
-              })}
-            </div>
-            {bandActive && bandHiddenCount > 0 && (
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            )}
-          </div>
-
           {filtered.length > 0 &&
             (view === "tabelle" ? (
               <RedemittelTable items={filtered} />

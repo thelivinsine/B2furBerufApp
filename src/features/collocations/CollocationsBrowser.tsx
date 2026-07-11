@@ -258,47 +258,47 @@ export function CollocationsBrowser() {
         title="Kollokationen"
       />
 
-      {/* Desktop (lg+): content left, persistent filter rail right; the tab
-          switcher lives in the LEFT column so it sits beside the filter tile
-          (Bibliothek desktop layout, session 91). Mobile keeps the locked
-          toolbar + sheet pattern; the two never render together. */}
+      <LibrarySwitcher />
+
+      <div className="lg:hidden">
+        <BrowseToolbar
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Suche nach Nomen, Verb, Übersetzung …"
+          primary={{ value: themeParam, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
+          facetItems={scoped}
+          facets={COLLOCATION_FACETS}
+          facetSelection={selection}
+          onFacetChange={setSelection}
+          resultLabel={(n) => `${n} Kollokation${n !== 1 ? "en" : ""} anzeigen`}
+          activeChips={activeChips}
+          onRemoveChip={removeFacetValue}
+          trailing={mobileActions}
+        />
+      </div>
+
+      {/* The tabs + view switcher span the top; below them the content grid
+          and the filter tile share a row, so on desktop the tile starts at
+          the same level as the first card (founder follow-up, s91). Mobile
+          keeps the locked toolbar + sheet; the two never render together. */}
+      <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+        <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
+        <span className="text-sm tabular-nums text-muted-foreground">
+          {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
+        </span>
+      </div>
+
+      {hiddenLabel && (
+        <div className="flex flex-wrap items-center gap-2">
+          <ActiveFilterChip
+            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+            onRemove={() => setShowAllLevels(true)}
+          />
+        </div>
+      )}
+
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
         <div className="min-w-0 space-y-4">
-          <LibrarySwitcher />
-
-          <div className="lg:hidden">
-            <BrowseToolbar
-              search={search}
-              onSearch={setSearch}
-              searchPlaceholder="Suche nach Nomen, Verb, Übersetzung …"
-              primary={{ value: themeParam, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
-              facetItems={scoped}
-              facets={COLLOCATION_FACETS}
-              facetSelection={selection}
-              onFacetChange={setSelection}
-              resultLabel={(n) => `${n} Kollokation${n !== 1 ? "en" : ""} anzeigen`}
-              activeChips={activeChips}
-              onRemoveChip={removeFacetValue}
-              trailing={mobileActions}
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-            <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
-            <span className="text-sm tabular-nums text-muted-foreground">
-              {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
-            </span>
-          </div>
-
-          {hiddenLabel && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ActiveFilterChip
-                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-                onRemove={() => setShowAllLevels(true)}
-              />
-            </div>
-          )}
-
           {showPicker && activeTheme ? (
             <SubThemePicker
               theme={activeTheme}
