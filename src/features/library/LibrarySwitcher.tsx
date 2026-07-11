@@ -1,4 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { useLibraryScope } from "@/store/useLibraryScope";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ export function LibrarySwitcher() {
   const [params] = useSearchParams();
   const current = params.get("tab") ?? DEFAULT_LIBRARY_TAB;
   const { theme, sub } = useLibraryScope();
+  const reduce = useReducedMotion();
 
   const linkFor = (seg: (typeof SEGMENTS)[number]) => {
     const p = new URLSearchParams();
@@ -35,22 +37,43 @@ export function LibrarySwitcher() {
     return `/library?${p.toString()}`;
   };
 
+  // Premium toggle language (matches the Dashboard Üben/Spielen toggle): a
+  // recessed grey track with a lifted white pill on the active tab. The pill is
+  // a shared-layout motion element, so it glides to the tapped tab instead of
+  // snapping. Type scales down on phones (`text-xs`) so all four labels fit
+  // without a horizontal scroll; `sm+` gets the roomier `text-sm`.
   return (
-    <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-surface p-1">
+    <div
+      role="tablist"
+      aria-label="Bibliothek"
+      className="flex w-full items-stretch gap-1 rounded-full border border-border bg-muted p-1"
+    >
       {SEGMENTS.map((seg) => {
         const active = current === seg.tab;
         return (
           <Link
             key={seg.tab}
             to={linkFor(seg)}
+            role="tab"
+            aria-selected={active}
+            aria-current={active ? "page" : undefined}
             className={cn(
-              "flex-1 whitespace-nowrap rounded-lg px-3 py-1.5 text-center text-sm font-medium transition-colors",
+              "relative flex-1 whitespace-nowrap rounded-full px-2 py-1.5 text-center text-xs font-semibold transition-colors sm:text-sm",
               active
-                ? "bg-primary text-primary-foreground shadow-soft"
-                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {seg.label}
+            {active && (
+              <motion.span
+                layoutId="library-tab-pill"
+                className="absolute inset-0 rounded-full bg-surface shadow-soft"
+                transition={
+                  reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }
+                }
+              />
+            )}
+            <span className="relative z-10">{seg.label}</span>
           </Link>
         );
       })}
