@@ -393,11 +393,12 @@ latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 pai
     the visualization plan (#23). Effort: **S–M**. Recommended model: **Sonnet**.
 39. **Email newsletter + Help/Blog on how to use the app (added 2026-07-11, founder note):** two parts. (a)
     An **email newsletter** signup + sending path (opt-in capture, GDPR marketing consent per the #14/#13
-    notes, a provider). (b) A **Help/Blog** explaining how to use the app. **Note:** part (b) is largely
-    **already shipped** as the public `/hilfe` help/blog section (s89, `features/help/`, bilingual DE/EN,
-    prerendered for SEO); this item is really the **newsletter** plus **expanding the help/blog content**
-    (more how-to articles). Effort: **M** (newsletter needs a provider + consent UI). Recommended model:
-    **Opus** for the newsletter/consent wiring, **Sonnet** for help-article content.
+    notes, a provider). (b) A **Help/Blog** explaining how to use the app. **Note (founder, 2026-07-11): the
+    Help/Blog part (b) is already DONE** — the public `/hilfe` help/blog section shipped in Phase 1 (s89,
+    `features/help/`, bilingual DE/EN hub + how-to articles, prerendered for SEO). So the remaining work on
+    this item is **only the email newsletter** (opt-in capture, marketing consent, a sending provider); add
+    more help articles over time as normal content work, not as a blocker here. Effort: **M** (newsletter
+    needs a provider + consent UI). Recommended model: **Opus** for the newsletter/consent wiring.
 40. **Feedback button (added 2026-07-11, founder note):** an in-app **feedback button** so users can send
     comments/bug reports/requests. Scope when picked up: where it lives (persistent affordance vs. in
     Settings), where feedback goes (a Supabase table, an email, or a third-party form), and whether to
