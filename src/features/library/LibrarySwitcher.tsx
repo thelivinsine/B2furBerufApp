@@ -46,7 +46,7 @@ export function LibrarySwitcher() {
     <div
       role="tablist"
       aria-label="Bibliothek"
-      className="flex w-full items-stretch gap-1 rounded-full border border-border bg-muted p-1"
+      className="flex w-full items-stretch gap-0.5 rounded-full border border-border bg-muted p-1 sm:gap-1"
     >
       {SEGMENTS.map((seg) => {
         const active = current === seg.tab;
@@ -58,10 +58,11 @@ export function LibrarySwitcher() {
             aria-selected={active}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "relative flex-1 whitespace-nowrap rounded-full px-2 py-1.5 text-center text-xs font-semibold transition-colors sm:text-sm",
-              active
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground",
+              // Bigger than before (text-[13px] + taller py-2) but still sized to
+              // fit four labels including "Kollokationen" on a phone without a
+              // scroll: tight px on mobile, roomier at sm+.
+              "relative flex-1 whitespace-nowrap rounded-full px-1.5 py-2 text-center text-[13px] font-semibold leading-none transition-colors sm:px-3 sm:text-sm",
+              active ? "text-primary" : "text-muted-foreground hover:text-foreground",
             )}
           >
             {active && (

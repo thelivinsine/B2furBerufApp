@@ -223,7 +223,7 @@ export function RedemittelTrainer() {
               aria-expanded={filtersOpen}
               aria-label="Filter"
               title="Filter"
-              className="relative shrink-0 lg:hidden"
+              className="relative shrink-0 rounded-lg lg:hidden"
               onClick={() => setFiltersOpen((o) => !o)}
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -242,7 +242,7 @@ export function RedemittelTrainer() {
                 aria-expanded={searchOpen}
                 aria-label="Suche"
                 title="Suche"
-                className="shrink-0"
+                className="shrink-0 rounded-lg"
                 onClick={() =>
                   setSearchOpen((o) => {
                     if (o) setSearch("");
@@ -269,7 +269,7 @@ export function RedemittelTrainer() {
               panel. Desktop keeps Üben/count inside the rail in col 2. */}
           <Button
             variant="gradient"
-            className="h-11 w-full lg:hidden"
+            className="h-11 w-full rounded-xl text-base lg:hidden"
             onClick={() => navigate("/session")}
           >
             <Zap className="h-4 w-4" /> Üben

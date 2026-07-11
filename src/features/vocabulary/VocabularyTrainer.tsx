@@ -245,7 +245,7 @@ export function VocabularyTrainer() {
       aria-pressed={savedActive}
       aria-label={savedActive ? "Nur gespeicherte Wörter" : "Gespeicherte Wörter"}
       title="Gespeichert"
-      className="shrink-0"
+      className="shrink-0 rounded-lg"
       onClick={toggleSaved}
     >
       <Bookmark className={cn("h-4 w-4", savedActive && "fill-current")} />
@@ -261,7 +261,7 @@ export function VocabularyTrainer() {
       aria-expanded={searchOpen}
       aria-label="Suche"
       title="Suche"
-      className="shrink-0"
+      className="shrink-0 rounded-lg"
       onClick={() =>
         setSearchOpen((o) => {
           if (o) setSearch("");
@@ -284,7 +284,7 @@ export function VocabularyTrainer() {
       aria-expanded={filtersOpen}
       aria-label="Filter"
       title="Filter"
-      className="relative shrink-0 lg:hidden"
+      className="relative shrink-0 rounded-lg lg:hidden"
       onClick={() => setFiltersOpen((o) => !o)}
     >
       <SlidersHorizontal className="h-4 w-4" />
@@ -417,7 +417,7 @@ export function VocabularyTrainer() {
               inside the rail. */}
           <Button
             variant="gradient"
-            className="h-11 w-full lg:hidden"
+            className="h-11 w-full rounded-xl text-base lg:hidden"
             onClick={startSession}
           >
             <Zap className="h-4 w-4" /> Üben
