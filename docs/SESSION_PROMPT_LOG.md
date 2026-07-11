@@ -3156,3 +3156,20 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx`,
   `src/features/welt/NeulandHub.tsx` (commit `2e6619f`, PR #425 squash `e65eb51`); `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 306 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > there's a scroll bar visible in the uben page - fix it. Make sure to keep the transition animations a bit more snappy, currenly the animation motion it feels heavy.
+- **Response summary:** Diagnosed the scrollbar by measuring scrollHeight across desktop viewport heights:
+  the single-column stack (3:2 tile + card + pager) at `max-w-md` was ~801px tall, just over common laptop
+  viewports, and the AppShell root `min-h-screen` then forced a scrollbar. Narrowed the desktop column to
+  `lg:max-w-[22rem]` (mobile stays `max-w-md`) so both Üben and Spielen fit scroll-free down to a 768px
+  viewport (measured 768/800/832/900 all NO-SCROLL; below ~760 it genuinely can't fit, acceptable). Also
+  made transitions snappier: tab-switch 0.2→0.13s (y 8→4), toggle mount 0.18s (y 10→6), Üben module slide
+  0.2→0.13s (x 44→28). Verified desktop + mobile via Playwright. Gates green (lint 0, unit 99/99, bundle
+  72.9 kB). Shipped as PR #427, squash-merged; branch realigned. Updated CLAUDE.md + s90 handoff.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx` (commit
+  `f4547e3`, PR #427 squash `2988121`); `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
