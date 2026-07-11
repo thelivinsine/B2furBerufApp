@@ -1,14 +1,15 @@
 # Project Status & Decision Log
 
 _Last updated: 2026-07-11 (session 91: **Bibliothek views: desktop filter rail + view switcher + word
-graph.** From the founder's hand-drawn mockup: the three browse tabs (Wörter/Kollokationen/Redemittel) got
-a persistent desktop (lg+) filter rail (Suche + Domain-grouped Thema/Kategorie rows + always-visible facet
-pill groups with live counts; mobile keeps the locked toolbar + sheet), a URL-persisted view switcher
-(`?view=` Tabelle · Graph · Karten · Liste; Karten stays default), a generic sortable `DataTable` + compact
-list views per tab, and an **Obsidian-style force-directed word graph** on Wörter (canvas, d3-force in a
-lazy chunk; node size = wordfreq Zipf, color = domain, edges = authored `related` terms + collocation
-noun/verb pairs; pan/pinch/zoom, tap-to-select with neighbor highlighting). Main chunk unchanged at
-72.8 kB. Shipped as PR #431, squash-merged to `main`.**
+graph, then 9 founder refinement rounds.** From the founder's hand-drawn mockup: the three browse tabs
+(Wörter/Kollokationen/Redemittel) got a URL-persisted view switcher (`?view=` Tabelle · Graph · Karten ·
+Liste; Karten default), a generic sortable `DataTable` + compact list views per tab, an **Obsidian-style
+force-directed word graph** on Wörter (canvas, d3-force in a lazy chunk; node size = wordfreq Zipf, color =
+domain, edges = authored `related` terms + collocation noun/verb pairs; pan/pinch/zoom, tap-to-select with
+neighbor highlighting), and a **grey collapsible filter tile** — the single filter surface on both
+breakpoints (Suche + Thema/Kategorie `Select` dropdown + always-visible facet pill groups with live counts +
+pinnable sections + an always-visible Üben footer). Main chunk unchanged (~73 kB). Shipped across **PRs
+#431–#440**, all squash-merged to `main`; the per-round detail is in the "Resume here" handoff below.**
 Prior, session 90: **Heute Üben/Spielen tile parity + subtle section color.** The Üben
 map tile and the Spielen chapter-hero tile now share the exact same dimensions AND screen position (both
 353px from top, 245×358px measured), so toggling tabs no longer shifts the tile: Üben's header + map are

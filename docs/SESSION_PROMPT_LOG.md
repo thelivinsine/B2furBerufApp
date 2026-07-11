@@ -3455,3 +3455,18 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/collocations/CollocationsBrowser.tsx`,
   `src/features/redemittel/RedemittelTrainer.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
   `docs/SESSION_PROMPT_LOG.md` (PR #440).
+
+## Entry 322 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > now document the session
+- **Response summary:** Final documentation pass. The substantive docs were already written + merged
+  incrementally through the session (PROJECT_STATUS s91 handoff = base build + 9 founder refinement rounds
+  with per-round PR numbers; CLAUDE.md Bibliothek anchor at final state; prompt-log entries 308–321). This
+  pass tightened the PROJECT_STATUS "Last updated" summary to reflect the FINAL state (grey collapsible tile,
+  view switcher, word graph) and the full PR range #431–#440, and logged this prompt (entry 322) so every
+  founder prompt of the session has a record. Confirmed session 91 is fully documented and shipped. Docs-only
+  update to `main`.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (docs-only PR).
