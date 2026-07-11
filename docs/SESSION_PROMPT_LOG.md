@@ -3191,3 +3191,62 @@ Branch: `claude/whats-next-esga9u`.
   realigned. Updated CLAUDE.md + s90 handoff.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx` (commit `6590d8c`, PR #429 squash `f28e44a`);
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+## Entry 308 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** photo of a hand-drawn Bibliothek desktop mockup (tab row Wörter/Redemittel/Kollokationen/
+  Grammatik, a 4-icon view-mode row, a two-column card grid, and a right-hand panel with Suche + three
+  labeled filter groups as pill rows)
+- **Prompt (verbatim):**
+  > what do you understand from the attached mockup drawing for bibliothek page?
+- **Response summary:** Read the sketch as a desktop redesign of `/library`: keep the four-tab hub, add a
+  view-mode switcher (read the icons as table / graph-or-relations / card grid / list), show content as a
+  card grid, and replace the toolbar+sheet pattern with an always-visible right-hand search + facet rail.
+  Flagged the open questions (meaning of the four icons, desktop-only vs mobile adaptation, masonry vs
+  sketch looseness, whether Thema joins the rail). No code changes.
+- **Artifacts:** none (analysis).
+
+## Entry 309 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > 1. The first view is a tabular view. the second view mode is a nodal graph which is one of the features in apps like obsidian. The idea is that all words of in the app should be shown in this way and shows how each word goes will with the others - that's the connection. And the size of the nodes can represent how often is the word used in real life. The third is the grid view which is the current situation. Fourth is a simple list.
+  > 2. this is desktop view but shold be adapted to mobile screen as well.
+  > 3. The filter rail should also contain the Thema/Katogorie filter in it
+  > Does it answer your questions?
+- **Response summary:** Confirmed feasibility against the code (node size can use the raw Zipf scores in the
+  generated `frequency.ts`; connections exist as authored `related` terms + collocation noun/verb pairs;
+  facet logic is reusable) and proposed a three-phase plan: (1) desktop filter rail with Thema grouped under
+  its 6 domains, mobile keeping the toolbar+sheet, (2) `?view=` switcher with Tabelle/Liste, (3) the
+  force-directed graph as a lazy d3-force canvas on Wörter first, with filters shrinking the graph on
+  mobile. Recommended dropping `related` terms that are not bank entries. No code changes yet.
+- **Artifacts:** none (plan).
+
+## Entry 310 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > Yes, go ahead full speed! Aim for the best output and excellent result. Think like billionaire tech company's app designers and tech experts and provide me with a polished result.
+- **Response summary:** Built and shipped all three phases. New shared pieces: `SearchField` (debounced input
+  extracted from BrowseToolbar), `FilterRail` (desktop lg+ right rail: Suche, Domain-grouped Thema/Kategorie
+  rows in a capped scroll box, always-visible facet pills with live counts + zero-yield greying, immediate
+  commit, same URL params as mobile), `ViewSwitcher` (`?view=`, per-tab whitelist, karten default),
+  `DataTable` (generic sortable table: German collation, missing-values-sink, paged rows). Per-tab table +
+  compact-list views (`VocabViews`, `CollocationViews`, `RedemittelViews`). The Wörter graph view:
+  `wordGraph.ts` pure builder (nodes = filtered vocab, radius from Zipf, edges from `related` matches +
+  collocation pairs; article/sich/bracket-stripping normalizer) pinned by `tests/wordgraph.test.ts`, and
+  `WordGraph.tsx`, an Obsidian-style canvas force graph (d3-force 3.0.0 new dependency, lazy chunk;
+  pan/pinch/wheel zoom, node drag, tap-select with neighbor highlight + word card, domain color legend,
+  zoom/fit controls, positions survive filter changes). Pages restructured to a two-column lg grid with the
+  mobile toolbar untouched. Fixed "n Worte" to "n Wörter". Verified in a real browser (Playwright, desktop +
+  mobile, all views, zero console errors, URL writes checked) plus all gates (build, lint 0 errors,
+  lint:content, test:unit 110/110, bundle 72.8 kB unchanged). Shipped as PR #427, squash-merged to `main`;
+  branch realigned. Docs updated (CLAUDE.md, PROJECT_STATUS.md s91 handoff, this log).
+- **Artifacts:** `src/features/shared/{SearchField,FilterRail,ViewSwitcher,DataTable}.tsx`,
+  `src/features/shared/BrowseToolbar.tsx`, `src/features/vocabulary/{VocabularyTrainer.tsx,VocabViews.tsx,
+  WordGraph.tsx,wordGraph.ts}`, `src/features/collocations/{CollocationsBrowser,CollocationViews}.tsx`,
+  `src/features/redemittel/{RedemittelTrainer,RedemittelViews}.tsx`, `tests/wordgraph.test.ts`,
+  `package.json`/`pnpm-lock.yaml` (d3-force) (commit `952a759`, PR #427); `CLAUDE.md`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`, archive W28 chunk.

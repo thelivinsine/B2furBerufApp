@@ -1,6 +1,15 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-10 (session 90: **Heute Üben/Spielen tile parity + subtle section color.** The Üben
+_Last updated: 2026-07-11 (session 91: **Bibliothek views: desktop filter rail + view switcher + word
+graph.** From the founder's hand-drawn mockup: the three browse tabs (Wörter/Kollokationen/Redemittel) got
+a persistent desktop (lg+) filter rail (Suche + Domain-grouped Thema/Kategorie rows + always-visible facet
+pill groups with live counts; mobile keeps the locked toolbar + sheet), a URL-persisted view switcher
+(`?view=` Tabelle · Graph · Karten · Liste; Karten stays default), a generic sortable `DataTable` + compact
+list views per tab, and an **Obsidian-style force-directed word graph** on Wörter (canvas, d3-force in a
+lazy chunk; node size = wordfreq Zipf, color = domain, edges = authored `related` terms + collocation
+noun/verb pairs; pan/pinch/zoom, tap-to-select with neighbor highlighting). Main chunk unchanged at
+72.8 kB. Shipped as PR #427, squash-merged to `main`.**
+Prior, session 90: **Heute Üben/Spielen tile parity + subtle section color.** The Üben
 map tile and the Spielen chapter-hero tile now share the exact same dimensions AND screen position (both
 353px from top, 245×358px measured), so toggling tabs no longer shifts the tile: Üben's header + map are
 pinned to the top with a fixed 1rem gap and the module pager is pushed to the bottom (`mt-auto`), keeping
@@ -232,7 +241,54 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 90 (2026-07-10). Heute Üben/Spielen tile parity + subtle section color theme
+**Handoff after session 91 (2026-07-11). Bibliothek views: desktop filter rail + view switcher + word graph
+(branch `claude/bibliothek-mockup-review-rcghlq`, PR #427).**
+
+Founder shared a hand-drawn Bibliothek mockup (desktop: tab row, a 4-icon view switcher, card grid, right-hand
+search + filter rail) and confirmed the intent in Q&A: (1) the four views are Tabelle / **nodal graph like
+Obsidian** (all words, connections = which words go well together, node size = real-life usage) / Karten
+(current) / Liste; (2) desktop-first but adapted to mobile; (3) the Thema/Kategorie filter belongs IN the
+rail. Then "go ahead full speed." All three phases built, verified in a real browser (Playwright, desktop +
+mobile, zero console errors), and shipped:
+- **`features/shared/FilterRail.tsx`:** persistent right rail on lg+ for Wörter/Kollokationen/Redemittel
+  inside a new two-column page grid (`lg:grid-cols-[minmax(0,1fr)_16rem]`, rail sticky with internal
+  scroll). Suche on top (shared debounced `SearchField.tsx`, extracted from BrowseToolbar), then the primary
+  scope as a row list (Domain-grouped Thema via `themeGroupsForMode`; Kategorie on Redemittel; capped
+  `max-h-72` box so facets below stay discoverable), then every facet as always-visible pills with live
+  what-a-tap-yields counts + zero-yield greying (same semantics as FacetSheet, but immediate commit, no
+  draft/apply). Same URL params as mobile. **Mobile keeps the locked BrowseToolbar + FacetSheet untouched**
+  (`lg:hidden` wrapper); the toolbar's trailing actions (Gespeichert/Üben) render in the meta row on desktop.
+- **`features/shared/ViewSwitcher.tsx` (`?view=`, whitelist per tab, `karten` default + kept out of the
+  URL):** Wörter = tabelle/graph/karten/liste; Kollokationen + Redemittel = tabelle/karten/liste; Grammatik
+  untouched. **`features/shared/DataTable.tsx`** is the generic sortable table (asc→desc→bank-order cycling,
+  German `Intl.Collator`, missing values sink, `usePagedList` incremental rows, own `overflow-x-auto` box;
+  note: sort-header buttons need their own `uppercase` because Tailwind preflight resets it on buttons).
+  Column defs + compact lists per tab: `vocabulary/VocabViews.tsx` (exports `SaveButton`),
+  `collocations/CollocationViews.tsx`, `redemittel/RedemittelViews.tsx`. Vocab table sorts Häufigkeit by raw
+  Zipf and strips articles for the Wort sort key.
+- **The word graph (`vocabulary/WordGraph.tsx` + pure builder `vocabulary/wordGraph.ts`, pinned by
+  `tests/wordgraph.test.ts`, 110 unit tests green):** graph of the CURRENTLY FILTERED vocab list. Edges from
+  two authored sources only (no inference): `related` strings resolved to bank entries (normalizer strips
+  der/die/das + ein-forms + "sich" + bracketed hints; unresolvable related terms are dropped, founder-confirmed)
+  and collocations whose noun AND verb both resolve. Node radius = wordfreq Zipf (`frequency.ts`; no corpus
+  evidence = min radius, never a fake claim), color = the 6 domains (legend under the canvas + n Wörter · m
+  Verbindungen). Canvas-rendered (642 nodes smooth), d3-force (**new dep, 3.0.0**) with weak x/y centering so
+  unlinked words stay in the cloud; sim pre-ticks 120 steps then settles gently; positions survive filter
+  changes. Pan/pinch/wheel-zoom/node-drag; zoom-fades labels; tap selects a word → neighbors highlight,
+  rest dims, and a detail card shows (word + SpeakButton + bookmark + CEFR/Häufigkeit/degree badges +
+  example). Zoom +/−/fit buttons. **Lazy chunk** (`React.lazy` inside VocabularyTrainer, ~12 kB incl.
+  d3-force); main chunk unchanged at **72.8 kB** / 400.
+- Also fixed German: "n Worte" → "n Wörter" (meta row + FacetSheet apply label).
+- Gates green: build + prerender, typecheck, ESLint 0 errors, `lint:content` pass, `test:unit` **110/110**,
+  `check:bundle` 72.8 kB. Browser-verified: rail pill writes `?cefr=`, Thema row writes `?theme=`, all four
+  views render desktop + mobile, graph click-select works, zero console errors.
+- **Ship status:** shipped as **PR #427**, squash-merged to `main`; branch realigned after the merge.
+  **Founder verifies the live site.**
+- **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
+  dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
+  could later render as satellite nodes; table column set per founder taste.
+
+**Prior handoff after session 90 (2026-07-10). Heute Üben/Spielen tile parity + subtle section color theme
 (branch `claude/ueben-spielen-layout-styling-h7fsvm`, PR #413).**
 
 Founder: "keep the map/photo tile in üben/spielen same dimensions and fix them both in same position on the
@@ -292,40 +348,4 @@ screen. Also add a subtle color theme for the toggle buttons and the border padd
   (Pages deploys on merge; sandbox can't reach `*.github.io`; deploy runs confirmed green via the Actions
   API this session).
 
-**Prior handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
-(branch `claude/blog-help-uben-spielen-wtbnq8`).**
-
-Founder wanted "comprehensive blog/help pages explaining the Üben/Spielen part of the app," SEO-friendly
-plus in-app support. Built a login-free help section outside the AppShell (like `/about`), bilingual
-DE/EN toggle, with **build-time prerendering to static HTML** so all crawlers (not just Google's JS
-renderer) and social previews see full content, matching the project's existing "raw HTML for crawlers"
-approach (`boot-seo`, JSON-LD, sitemap).
-- **Content bank `src/features/help/content.ts`** (one bilingual source for both the React reader and the
-  prerender script): a `/hilfe` hub (intro + FAQ) + **6 articles** grouped in 3 categories (Grundlagen /
-  Üben / Spielen): `erste-schritte`, `ueben`, `spielen-neuland`, `neuland-kapitel-missionen`,
-  `spaced-repetition`, `ueben-und-spielen`. Blocks are a small closed union (p/h2/h3/ul/steps/note) +
-  optional per-article FAQ + related links. No em dashes.
-- **React reader** (all lazy, off the eager path): `HelpChrome.tsx` (shared shell: logo header, breadcrumb,
-  DE/EN toggle, `HelpBlocks` renderer), `HelpHub.tsx` (`/hilfe`, grouped cards + FAQ), `HelpArticle.tsx`
-  (`/hilfe/:slug`, body + FAQ + related; unknown slug → redirect to `/hilfe`). Public routes added to
-  `router.tsx` outside `RequireOnboarding`/AppShell.
-- **Prerender `scripts/prerender-help.mjs`** (chained into `build`: `tsc -b && vite build && node
-  scripts/prerender-help.mjs`; loads the content bank via Vite `ssrLoadModule` like `lint-content.mjs`):
-  for the hub + each article it emits `dist/hilfe/<slug>/index.html` from the built `index.html` template
-  with a unique `<title>`, meta description, canonical, OG/Twitter tags, **Article + BreadcrumbList (+
-  FAQPage) JSON-LD**, and the full German article text baked into `#root` as semantic HTML (React clears it
-  on boot; real users get the SPA). It also **regenerates `dist/sitemap.xml`** (12 URLs: 5 static + hub + 6
-  articles). Verified generated HTML: correct per-page title/canonical/description/JSON-LD, root
-  `index.html` left untouched (WebApplication + landing FAQ intact).
-- **Discovery links:** landing footer + Settings footer both gained a "Hilfe" entry.
-- Gates green: build + prerender (7 pages), typecheck, ESLint 0, `lint:content` pass, `test:unit` 99/99,
-  `check:bundle` **72.6 kB** / 400 (help is lazy, main chunk unchanged).
-- **Ship status:** shipped as **PR #411**, squash-merged to `main`; branch realigned to `origin/main`
-  after the merge. The Pages workflow runs `pnpm build` (which now includes the prerender), so the static
-  `/hilfe` pages + `sitemap.xml` publish automatically. **Founder verifies the live site** (sandbox can't
-  reach `*.github.io`; check `https://genauly.de/hilfe/ueben` "View source" shows the article text in raw HTML).
-- **NOT done / follow-up candidates:** prerender emits the German snapshot only (the `?lang` toggle is
-  client-side; could emit EN variants + `hreflang` if EN search matters); articles cover Kapitel 1 only
-  (add per-Kapitel deep dives as Neuland grows); no per-article `og:image` (inherits the site card).
-
-_(Sessions 85-88's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
+_(Sessions 85-89's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_

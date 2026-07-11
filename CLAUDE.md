@@ -198,6 +198,27 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
 - **Bibliothek hub:** single `/library?tab=woerter|kollokationen|redemittel|grammatik`; old routes
   (`/vocabulary`, `/collocations`, `/redemittel`, `/grammar`) redirect in (query params preserved).
   Lists default to the learner's CEFR band + 1 (`defaultVisibleBands`).
+  **Bibliothek views (s91, from the founder's hand-drawn mockup):** the three browse tabs each have a
+  **view switcher** (`features/shared/ViewSwitcher.tsx`, `?view=`, `karten` default kept out of the URL):
+  Wörter = Tabelle · Graph · Karten · Liste, Kollokationen/Redemittel = Tabelle · Karten · Liste,
+  Grammatik untouched. Tabelle = generic sortable `features/shared/DataTable.tsx` (German collation,
+  missing values sink, paged rows; sort-header buttons need their own `uppercase`, Tailwind preflight
+  resets it on buttons) with per-tab columns + compact lists in `vocabulary/VocabViews.tsx` /
+  `collocations/CollocationViews.tsx` / `redemittel/RedemittelViews.tsx`. **Graph (Wörter only)** =
+  Obsidian-style force-directed canvas of the CURRENTLY FILTERED list (`vocabulary/WordGraph.tsx` +
+  pure builder `vocabulary/wordGraph.ts`, pinned by `tests/wordgraph.test.ts`): node radius = wordfreq
+  Zipf (no corpus evidence = min radius, never a fake claim), color = the 6 domains, edges ONLY from
+  authored sources (`related` terms resolved to bank entries; collocations whose noun AND verb both
+  resolve; unresolvable related terms are dropped, founder-confirmed 2026-07-11). The d3-force dep rides
+  ONLY in the lazy WordGraph chunk (React.lazy in VocabularyTrainer); main chunk stays ~73 kB.
+  **Desktop filter rail (s91):** on lg+ the three browse tabs are a two-column grid
+  (`lg:grid-cols-[minmax(0,1fr)_16rem]`) with a persistent right rail (`features/shared/FilterRail.tsx`):
+  Suche (shared debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as
+  Domain-grouped rows (Thema; Kategorie on Redemittel) in a capped `max-h-72` scroll box, then every
+  facet as always-visible pills with live counts (immediate commit, no draft/apply). Same URL params as
+  mobile. **Mobile keeps the locked BrowseToolbar + FacetSheet pattern untouched** (`lg:hidden` wrapper);
+  the toolbar's trailing actions render in the meta row (switcher + count) on desktop. The rail and the
+  toolbar are alternate presentations of the same state and must never render together.
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.

@@ -975,3 +975,41 @@ styles incl. two reimagined pixel treatments) through founder feedback to a fina
   state-aware CTA + slide; #405 grey Wiederholen + Erledigt on title line; #406 Üben even distribution;
   #407 Spielen crop-scroll tile; #408 hidden scrollbar + shelf removal; #409 exact-3-rows + next-mission
   centering. **Founder verifies the live site** (Pages deploys on each merge; sandbox can't reach `*.github.io`).
+
+---
+
+**Handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
+(branch `claude/blog-help-uben-spielen-wtbnq8`).**
+
+Founder wanted "comprehensive blog/help pages explaining the Üben/Spielen part of the app," SEO-friendly
+plus in-app support. Built a login-free help section outside the AppShell (like `/about`), bilingual
+DE/EN toggle, with **build-time prerendering to static HTML** so all crawlers (not just Google's JS
+renderer) and social previews see full content, matching the project's existing "raw HTML for crawlers"
+approach (`boot-seo`, JSON-LD, sitemap).
+- **Content bank `src/features/help/content.ts`** (one bilingual source for both the React reader and the
+  prerender script): a `/hilfe` hub (intro + FAQ) + **6 articles** grouped in 3 categories (Grundlagen /
+  Üben / Spielen): `erste-schritte`, `ueben`, `spielen-neuland`, `neuland-kapitel-missionen`,
+  `spaced-repetition`, `ueben-und-spielen`. Blocks are a small closed union (p/h2/h3/ul/steps/note) +
+  optional per-article FAQ + related links. No em dashes.
+- **React reader** (all lazy, off the eager path): `HelpChrome.tsx` (shared shell: logo header, breadcrumb,
+  DE/EN toggle, `HelpBlocks` renderer), `HelpHub.tsx` (`/hilfe`, grouped cards + FAQ), `HelpArticle.tsx`
+  (`/hilfe/:slug`, body + FAQ + related; unknown slug → redirect to `/hilfe`). Public routes added to
+  `router.tsx` outside `RequireOnboarding`/AppShell.
+- **Prerender `scripts/prerender-help.mjs`** (chained into `build`: `tsc -b && vite build && node
+  scripts/prerender-help.mjs`; loads the content bank via Vite `ssrLoadModule` like `lint-content.mjs`):
+  for the hub + each article it emits `dist/hilfe/<slug>/index.html` from the built `index.html` template
+  with a unique `<title>`, meta description, canonical, OG/Twitter tags, **Article + BreadcrumbList (+
+  FAQPage) JSON-LD**, and the full German article text baked into `#root` as semantic HTML (React clears it
+  on boot; real users get the SPA). It also **regenerates `dist/sitemap.xml`** (12 URLs: 5 static + hub + 6
+  articles). Verified generated HTML: correct per-page title/canonical/description/JSON-LD, root
+  `index.html` left untouched (WebApplication + landing FAQ intact).
+- **Discovery links:** landing footer + Settings footer both gained a "Hilfe" entry.
+- Gates green: build + prerender (7 pages), typecheck, ESLint 0, `lint:content` pass, `test:unit` 99/99,
+  `check:bundle` **72.6 kB** / 400 (help is lazy, main chunk unchanged).
+- **Ship status:** shipped as **PR #411**, squash-merged to `main`; branch realigned to `origin/main`
+  after the merge. The Pages workflow runs `pnpm build` (which now includes the prerender), so the static
+  `/hilfe` pages + `sitemap.xml` publish automatically. **Founder verifies the live site** (sandbox can't
+  reach `*.github.io`; check `https://genauly.de/hilfe/ueben` "View source" shows the article text in raw HTML).
+- **NOT done / follow-up candidates:** prerender emits the German snapshot only (the `?lang` toggle is
+  client-side; could emit EN variants + `hreflang` if EN search matters); articles cover Kapitel 1 only
+  (add per-Kapitel deep dives as Neuland grows); no per-article `og:image` (inherits the site card).
