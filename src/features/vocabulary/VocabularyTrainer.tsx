@@ -389,44 +389,57 @@ export function VocabularyTrainer() {
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          {/* Toolbar row: Filter toggle (mobile, left of the view icons) + view
-              switcher + bookmark/search on the right. */}
-          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-            {filterButton}
-            <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
-            <div className="flex items-center gap-2 lg:ml-auto">
-              {savedButton}
-              {searchButton}
+          {/* Toolbar + search + Üben/count share ONE width on mobile: the
+              wrapper is w-fit (so it hugs the widest row, the toolbar), and the
+              Üben row stretches to that width, so Üben + count together span
+              exactly the Filter/view/bookmark/search controls above. Desktop
+              drops the sizing (w-full) and keeps Üben/count in the rail. */}
+          <div className="mx-auto flex w-fit flex-col gap-2 lg:mx-0 lg:w-full">
+            {/* Toolbar row: Filter toggle (mobile, left of the view icons) + view
+                switcher + bookmark/search on the right. */}
+            <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+              {filterButton}
+              <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
+              <div className="flex items-center gap-2 lg:ml-auto">
+                {savedButton}
+                {searchButton}
+              </div>
+            </div>
+
+            {/* Search input lives OUTSIDE the filter panel (founder s92): a
+                transient row the search icon toggles. It does not touch the
+                filter state. */}
+            {searchOpen && (
+              <SearchField
+                value={search}
+                onChange={setSearch}
+                placeholder="Suche nach Wort, Übersetzung …"
+                autoFocus
+              />
+            )}
+
+            {/* Mobile-only: Üben fills the row, the count sits stacked at its
+                right (no grey tile). Desktop keeps Üben/count in the rail. */}
+            <div className="flex items-center gap-2 lg:hidden">
+              <Button
+                variant="gradient"
+                className="h-11 flex-1 rounded-xl text-base"
+                onClick={startSession}
+              >
+                <Zap className="h-4 w-4" /> Üben
+              </Button>
+              {view !== "graph" && (
+                <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+                  <span className="text-sm font-semibold tabular-nums text-foreground">
+                    {items.length}
+                  </span>
+                  <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                    {items.length === 1 ? "Wort" : "Wörter"}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
-
-          {/* Search input lives OUTSIDE the filter panel (founder s92): a
-              transient full-width row the search icon toggles. It does not touch
-              the filter state. */}
-          {searchOpen && (
-            <SearchField
-              value={search}
-              onChange={setSearch}
-              placeholder="Suche nach Wort, Übersetzung …"
-              autoFocus
-            />
-          )}
-
-          {/* Mobile-only: Üben is a standalone button below the toolbar, with the
-              plain word count under it (no grey tile). Desktop keeps Üben + count
-              inside the rail. */}
-          <Button
-            variant="gradient"
-            className="h-11 w-full rounded-xl text-base lg:hidden"
-            onClick={startSession}
-          >
-            <Zap className="h-4 w-4" /> Üben
-          </Button>
-          {view !== "graph" && (
-            <p className="text-center text-sm tabular-nums text-muted-foreground lg:hidden">
-              {items.length} {items.length === 1 ? "Wort" : "Wörter"}
-            </p>
-          )}
 
           {/* Mobile filter panel: slides open below the count, closed by default.
               Body-only grey tile (Thema + facets); the toggle/Üben/count live in
