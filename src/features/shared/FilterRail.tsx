@@ -269,11 +269,11 @@ export function FilterRail<T>({
       className={cn(
         // The WHOLE tile carries a grey shade (founder follow-up); the white
         // controls inside provide the contrast, the "Filter" label keeps the
-        // brand accent. On desktop the aside is the scroll container (the page
-        // className caps its height + makes it sticky): the header sticks to
-        // the top, the Üben footer to the bottom, and the middle scrolls, so
-        // Üben stays on screen at every scroll position (founder follow-up).
-        "overflow-hidden rounded-xl border border-border bg-muted lg:overflow-y-auto",
+        // brand accent. The aside is its own scroll container (the page
+        // className caps its height + makes it sticky, on BOTH breakpoints):
+        // the header sticks to the top, the Üben footer to the bottom, and the
+        // middle scrolls, so Üben stays on screen at every scroll position.
+        "overflow-hidden overflow-y-auto rounded-xl border border-border bg-muted",
         className,
       )}
       aria-label="Filter"
@@ -284,7 +284,7 @@ export function FilterRail<T>({
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center gap-2 bg-muted px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-foreground/5 lg:sticky lg:top-0 lg:z-10"
+        className="sticky top-0 z-10 flex w-full items-center gap-2 bg-muted px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-foreground/5"
       >
         <SlidersHorizontal className="h-4 w-4" />
         Filter
@@ -334,13 +334,11 @@ export function FilterRail<T>({
         </div>
       )}
 
-      {/* Footer (the Üben button). On desktop it sticks to the bottom of the
-          capped, scrolling aside (`lg:max-h-…` on the page className), so Üben
-          stays on screen at every scroll position. Mobile passes no footer
-          here and floats a separate sticky Üben bar instead (the tile itself
-          scrolls away). */}
+      {/* Footer (the Üben button) sticks to the bottom of the capped, scrolling
+          aside (the page className caps the height + makes the tile sticky), so
+          Üben stays on screen at every scroll position on BOTH breakpoints. */}
       {footer && (
-        <div className="border-t border-border bg-muted p-3 lg:sticky lg:bottom-0 lg:z-10">
+        <div className="sticky bottom-0 z-10 border-t border-border bg-muted p-3">
           {footer}
         </div>
       )}

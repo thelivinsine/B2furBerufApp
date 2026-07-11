@@ -225,18 +225,22 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   aside is itself the **capped scroll container** (`lg:overflow-y-auto` + `lg:max-h-[calc(100vh-22rem)]` on
   the page className) with the header `lg:sticky lg:top-0` and the **Üben footer `lg:sticky lg:bottom-0`**,
   so the middle scrolls and **Üben stays on screen at every scroll position** (verified across 800/900/1080
-  viewport heights). **On mobile the tile has NO footer**; a shared **`StickyUebenBar`** (`features/shared/`)
-  floats the Üben button just above the bottom nav (`bottom-[calc(4.4375rem_+_env(safe-area-inset-bottom))]`,
-  `lg:hidden`) so it is always reachable while scrolling cards. **Each section has a pin** (`Pin` icon in the
+  viewport heights). **On mobile the same tile carries the Üben footer** and is a **grid child** (not nested
+  in the header column, so its sticky containing block spans the card list) pinned just below the app header
+  (`sticky top-[calc(4rem_+_env(safe-area-inset-top))] z-10 max-h-[70dvh] lg:hidden`) and capped, so the
+  tile — and the Üben button inside it — stays visible while scrolling (founder: Üben must be part of the
+  tile on mobile, not a separate floating button; the earlier `StickyUebenBar` was removed). **Each section
+  has a pin** (`Pin` icon in the
   section header): pinned sections stay visible while collapsed. Pins persist per tab in localStorage
   (`b2beruf.railPins`, scoped by the `pinScope` prop; deliberately NOT in the synced settings store).
   Inside: Suche (shared
   debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as a **`Select` dropdown**
   (Thema Domain-grouped; Kategorie on Redemittel), then every
   facet as always-visible pills with live counts (immediate commit, no draft/apply). **One
-  `filterRailProps` object feeds two `<FilterRail>` instances**: a desktop one (grid
-  `col-start-2 row-start-2`, `hidden lg:block`, sticky, default-open, footer=Üben) and a mobile one
-  (`lg:hidden`, inline in the header column, `defaultOpen={false}` + `footer={undefined}`). The
+  `filterRailProps` object feeds two `<FilterRail>` instances** (both carry the Üben footer): a desktop one
+  (grid `col-start-2 row-start-2`, `hidden lg:block`, sticky, default-open) and a mobile one (`lg:hidden`,
+  a grid child between the header column and the content, `defaultOpen={false}`, sticky-pinned below the
+  app header). The
   **LibrarySwitcher tabs + the view-switcher meta row stay at the content-column width** (grid row 1 / col
   1, NOT full width, founder follow-up), while the filter tile lines up with the content cards (grid
   row 2). On mobile the meta row also shows the Gespeichert toggle (Wörter); Redemittel Register is now a
