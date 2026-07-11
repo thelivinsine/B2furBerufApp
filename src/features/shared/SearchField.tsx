@@ -15,11 +15,13 @@ export function SearchField({
   onChange,
   placeholder = "Suchen …",
   className,
+  autoFocus = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
+  autoFocus?: boolean;
 }) {
   const [value, setValue] = useState(external);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,6 +60,9 @@ export function SearchField({
     <div className={cn("relative", className)}>
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
       <input
+        // Opt-in only; the field mounts on an explicit search tap, so focusing
+        // it immediately is the expected behavior.
+        autoFocus={autoFocus}
         value={value}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}

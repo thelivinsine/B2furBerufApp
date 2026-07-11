@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, Zap } from "lucide-react";
+import { ChevronLeft, Zap, Search } from "lucide-react";
 import { collocations, collocationsByTheme } from "@/data/collocations";
 import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -13,6 +13,7 @@ import { SpeakButton } from "@/components/shared/SpeakButton";
 import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { FilterRail } from "@/features/shared/FilterRail";
+import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { CollocationTable, CollocationCompactList } from "./CollocationViews";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
@@ -20,10 +21,7 @@ import { SubThemePicker } from "@/features/vocabulary/SubThemePicker";
 import { themeGroupsForMode } from "@/lib/themeGroups";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { usePagedList } from "@/lib/usePagedList";
-
-function normalise(s: string) {
-  return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
-}
+import { fuzzyMatch } from "@/lib/fuzzy";
 
 // Facets come from the central registry (Phase 5): CEFR + Register. The old Verb
 // facet (100+ options) was dropped there; typing a verb into the search box
@@ -85,6 +83,8 @@ export function CollocationsBrowser() {
   const themeParam = params.get("theme") ?? "all";
   const sub = params.get("sub") ?? "";
   const search = params.get("q") ?? "";
+  // Transient search, outside the filter panel (founder s92).
+  const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
 
   // Tier-2 travelling scope: inherit the shared library scope when arriving
   // without an explicit theme; URL params still override for deep links.
@@ -161,14 +161,7 @@ export function CollocationsBrowser() {
       themeParam === "all" ? collocations : collocations.filter((c) => c.themeId === themeParam);
     if (subFilter) list = list.filter((c) => c.subThemeId === subFilter);
     if (search.trim()) {
-      const q = normalise(search.trim());
-      list = list.filter(
-        (c) =>
-          normalise(c.full).includes(q) ||
-          normalise(c.noun).includes(q) ||
-          normalise(c.verb).includes(q) ||
-          normalise(c.en).includes(q),
-      );
+      list = list.filter((c) => fuzzyMatch(search, [c.full, c.noun, c.verb, c.en]));
     }
     return list;
   }, [themeParam, subFilter, search]);
@@ -207,9 +200,6 @@ export function CollocationsBrowser() {
   // The filter tile is the single filter surface on BOTH breakpoints (founder
   // follow-up, s91): desktop rail + mobile tile share these props.
   const filterRailProps = {
-    search,
-    onSearch: setSearch,
-    searchPlaceholder: "Suche nach Nomen, Verb, Übersetzung …",
     primary: {
       label: "Thema",
       value: themeParam,
@@ -273,7 +263,36 @@ export function CollocationsBrowser() {
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
+            <div className="flex items-center gap-2 lg:ml-auto">
+              <Button
+                size="icon"
+                variant={searchOpen || search.trim() ? "default" : "outline"}
+                aria-pressed={searchOpen}
+                aria-expanded={searchOpen}
+                aria-label="Suche"
+                title="Suche"
+                className="shrink-0"
+                onClick={() =>
+                  setSearchOpen((o) => {
+                    if (o) setSearch("");
+                    return !o;
+                  })
+                }
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
+
+          {/* Search input lives outside the filter panel (founder s92). */}
+          {searchOpen && (
+            <SearchField
+              value={search}
+              onChange={setSearch}
+              placeholder="Suche nach Nomen, Verb, Übersetzung …"
+              autoFocus
+            />
+          )}
 
           {hiddenLabel && (
             <div className="flex flex-wrap items-center gap-2">

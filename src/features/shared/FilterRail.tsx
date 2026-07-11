@@ -16,7 +16,6 @@ import {
   type FacetSelection,
   activeFacetCount,
 } from "@/features/shared/FacetSheet";
-import { SearchField } from "@/features/shared/SearchField";
 import { Button } from "@/components/ui/button";
 import type { PrimaryGroup, PrimaryOption } from "@/features/shared/BrowseToolbar";
 
@@ -120,9 +119,6 @@ function SectionHeader({
 }
 
 export function FilterRail<T>({
-  search,
-  onSearch,
-  searchPlaceholder,
   primary,
   items,
   facets,
@@ -137,9 +133,6 @@ export function FilterRail<T>({
   hideHeader = false,
   className,
 }: {
-  search: string;
-  onSearch: (value: string) => void;
-  searchPlaceholder?: string;
   primary?: RailPrimary;
   /** Items in the current scope, for live option counts (same list the sheet gets). */
   items: T[];
@@ -171,8 +164,9 @@ export function FilterRail<T>({
   const activeCount = activeFacetCount(selection);
 
   // The Filter toggle for the headerless (mobile) tile. It moves between two
-  // spots by state: top-left next to the search when expanded, footer-left
-  // next to the Üben button when collapsed. Same control either way.
+  // spots by state: the top-left of the panel (beside the count) when expanded,
+  // and footer-left next to the Üben button when collapsed. Same control either
+  // way.
   const filterToggle = (
     <Button
       type="button"
@@ -363,18 +357,15 @@ export function FilterRail<T>({
             hideHeader ? "rounded-t-xl" : "border-t border-muted-foreground/10",
           )}
         >
-          {/* Expanded, headerless (mobile): the Filter toggle sits to the left
-              of the search field at the top of the tile. */}
-          <div className="flex items-center gap-2">
-            {hideHeader && filterToggle}
-            <div className="min-w-0 flex-1">
-              <SearchField
-                value={search}
-                onChange={onSearch}
-                placeholder={searchPlaceholder ?? "Suchen …"}
-              />
+          {/* Expanded first row: the Filter toggle on the left (mobile) and the
+              result count on the right. When expanded the count lives here, not
+              in the footer (founder s92). Search is no longer in the panel. */}
+          {(hideHeader || countStack) && (
+            <div className="flex items-center gap-2">
+              {hideHeader && filterToggle}
+              {countStack && <div className="ml-auto">{countStack}</div>}
             </div>
-          </div>
+          )}
 
           {primarySection}
 
@@ -428,12 +419,14 @@ export function FilterRail<T>({
           )}
         >
           {/* Collapsed headerless (mobile) tile: the Filter toggle sits to the
-              left of the Üben button. When expanded it moves up next to the
-              search field instead (so it is not duplicated here). Desktop keeps
-              its labelled header. */}
+              left of the Üben button. When expanded it moves up into the first
+              row of the panel instead (so it is not duplicated here). Desktop
+              keeps its labelled header. */}
           {hideHeader && !open && filterToggle}
           <div className="min-w-0 flex-1">{footer}</div>
-          {countStack}
+          {/* Count sits beside Üben only while collapsed; expanded, it is in
+              the first row of the panel instead. */}
+          {!open && countStack}
         </div>
       )}
     </aside>
