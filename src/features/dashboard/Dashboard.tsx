@@ -76,7 +76,9 @@ export function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="mx-auto max-w-md"
+          // Phone: a single focused column. Desktop (lg): widen so the tab
+          // content can lay out as two columns (tile | practice·missions).
+          className="mx-auto max-w-md lg:max-w-4xl"
         >
           <Suspense fallback={fallback}>
             {tab === "ueben" ? <UebenPath /> : <SpielenHub />}
