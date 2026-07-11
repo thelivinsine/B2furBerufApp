@@ -218,25 +218,27 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   **filter tile starts level with the first content card** while the tabs stay at content width (founder
   follow-up: measured rail-top = card-top; tabs are NOT stretched over the rail column). The rail is
   `features/shared/FilterRail.tsx`,
-  a **collapsible tile** (founder follow-up s91): brand-tinted `bg-primary/10 text-primary` header row
-  ("Filter" + active-count badge + chevron) that expands/collapses the panel. The **Üben button is the
-  tile's `footer` slot**, visible in EVERY state (mobile keeps Üben in the toolbar; the desktop meta row
-  keeps only Gespeichert on Wörter), and **each section has a pin** (`Pin` icon in the section header):
+  a **collapsible tile** (founder follow-up s91) that is now **the single filter surface on BOTH
+  breakpoints** (the old mobile BrowseToolbar + FacetSheet were retired on these three pages): the WHOLE
+  tile is brand-tinted (`bg-primary/10`, `border-primary/20`, `border-primary/15` dividers); the header row
+  ("Filter" + active-count badge + chevron) expands/collapses the panel. The **Üben button is the
+  tile's `footer` slot**, visible in EVERY state, and **each section has a pin** (`Pin` icon in the section header):
   pinned sections stay visible while collapsed. Pins persist per tab in localStorage
   (`b2beruf.railPins`, scoped by the `pinScope` prop; deliberately NOT in the synced settings store).
   Inside: Suche (shared
   debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as a **`Select` dropdown**
-  (Thema Domain-grouped; Kategorie on Redemittel; same options as the mobile toolbar dropdown), then every
-  facet as always-visible pills with live counts (immediate commit, no draft/apply). Same URL params as
-  mobile. The
+  (Thema Domain-grouped; Kategorie on Redemittel), then every
+  facet as always-visible pills with live counts (immediate commit, no draft/apply). **One
+  `filterRailProps` object feeds two `<FilterRail>` instances**: a desktop one (grid
+  `col-start-2 row-start-2`, `hidden lg:block`, sticky, default-open) and a mobile one (`lg:hidden`, inline
+  in the header column, `defaultOpen={false}` so it starts as a compact Filter bar). The
   **LibrarySwitcher tabs + the view-switcher meta row stay at the content-column width** (grid row 1 / col
-  1, NOT full width, founder follow-up), while the filter tile still lines up with the content cards (grid
-  row 2). **Mobile keeps the locked BrowseToolbar + FacetSheet pattern untouched** (`lg:hidden` wrapper); the toolbar's trailing actions render in the meta row
-  (switcher + count) on desktop, and the meta row + the graph legend are **centered on mobile**
-  (`justify-center lg:justify-start`). In the graph view both counts sit at the bottom of the canvas
-  ("n Wörter · m Verbindungen") and the meta-row word count is hidden; other views keep the count in the
-  meta row. The rail and the toolbar are alternate presentations of the same state and must never render
-  together.
+  1, NOT full width, founder follow-up), while the filter tile lines up with the content cards (grid
+  row 2). On mobile the meta row also shows the Gespeichert toggle (Wörter); Redemittel Register is now a
+  rail facet (the old mobile register chips are gone). The meta row + the graph legend are **centered on
+  mobile** (`justify-center lg:justify-start`). In the graph view both counts sit at the bottom of the
+  canvas ("n Wörter · m Verbindungen") and the meta-row word count is hidden; other views keep the count in
+  the meta row. (`BrowseToolbar`/`FacetSheet` stay in the repo but are no longer used by these three pages.)
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.

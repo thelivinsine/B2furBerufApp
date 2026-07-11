@@ -312,6 +312,14 @@ mobile, zero console errors), and shipped:
   now a `Select` dropdown** instead of the always-open row list, so the facet groups sit closer to the top.
   Reuses the same grouped options (Domain headings + counts) as the mobile toolbar; verified the dropdown
   opens and selecting a theme writes `?theme=`.
+- **Founder follow-up round 7 (same session, PR #438):** (1) the **whole filter tile is brand-tinted**
+  (`bg-primary/10` body + `border-primary/20` + `border-primary/15` dividers), not just the header; (2) the
+  **same collapsible filter tile now renders on mobile too**, retiring the mobile BrowseToolbar + FacetSheet
+  on these three pages. One `filterRailProps` object feeds a desktop `<FilterRail>` (sticky, default-open)
+  and a mobile one (`lg:hidden`, inline, `defaultOpen={false}` so it starts as a compact Filter bar you tap
+  to expand). Gespeichert (Wörter) moved into the meta row on mobile; Redemittel's mobile register chips
+  were removed (Register is a rail facet). Verified both breakpoints via Playwright (themed tile, mobile
+  collapse/expand, zero console errors). `BrowseToolbar`/`FacetSheet` remain in the repo, just unused here.
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.
