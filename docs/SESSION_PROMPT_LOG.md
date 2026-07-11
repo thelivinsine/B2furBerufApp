@@ -3292,3 +3292,17 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/shared/FilterRail.tsx`, `src/features/vocabulary/VocabularyTrainer.tsx`,
   `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`;
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #433).
+
+## Entry 313 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > the words count and connection count both can be at the bottom
+- **Response summary:** In the Wörter graph view the word count moved out of the top meta row and now sits
+  next to the connection count at the bottom of the canvas ("586 Wörter · 673 Verbindungen"). The meta row
+  hides the word count only when `view === "graph"` (Tabelle/Karten/Liste keep it as before), so nothing is
+  duplicated. Verified via Playwright (legend reads both counts, meta row clean, zero console errors); build
+  + bundle green (73.1 kB). Shipped as PR #434, squash-merged; branch realigned.
+- **Artifacts:** `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/vocabulary/WordGraph.tsx`;
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #434).

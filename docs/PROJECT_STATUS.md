@@ -295,6 +295,10 @@ mobile, zero console errors), and shipped:
   the pin icon in a section header keeps that section (Thema/Kategorie or any facet group) visible while
   the panel is collapsed. Pins persist per tab in localStorage (`b2beruf.railPins`), verified across
   reload via Playwright.
+- **Founder follow-up round 3 (same session, PR #434):** in the **graph view** the word count moved out of
+  the top meta row and sits with the connection count at the bottom of the canvas ("586 Wörter · 673
+  Verbindungen"); the meta row keeps only the view switcher + Gespeichert there. Other views (Tabelle/
+  Karten/Liste) keep the word count in the meta row as before.
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.
