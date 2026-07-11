@@ -150,16 +150,20 @@ export default function UebenPath() {
   };
 
   return (
-    // Header + map are pinned to the TOP with a fixed 1rem gap so the map tile
-    // lands at the exact same screen position as the Spielen chapter hero when
-    // toggling between tabs (founder). The card + pager are grouped and
-    // vertically centered in the space below the map (`my-auto`) so they sit
-    // close together in the lower half instead of the dots being stranded at
-    // the very bottom; the tab still fills the viewport without scrolling.
-    <div className="flex min-h-[calc(100dvh-15rem)] flex-col gap-4">
+    // Phone: header + map pinned to the top, the card + pager grouped and
+    // vertically centered in the space below the map (`my-auto`) so the map
+    // tile lands at the same screen position as the Spielen hero and the dots
+    // aren't stranded at the bottom; the tab fills the viewport without
+    // scrolling. Desktop (lg): a two-column layout, map on the left and the
+    // practice card + pager on the right (founder), so the wide screen is used
+    // instead of a narrow stranded column.
+    <div className="flex min-h-[calc(100dvh-15rem)] flex-col gap-4 lg:min-h-0">
       {/* Centered page title, mirroring the Spielen "Neuland" header row */}
       <h1 className="text-center text-2xl font-bold">Lernpfad</h1>
 
+      {/* Phone: map + practice stack (map, then centered card/pager group).
+          Desktop: two columns (map | practice), vertically centered together. */}
+      <div className="flex flex-1 flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-center lg:gap-8">
       {/* Illustrated city map: the single journey surface (stepper retired s88).
           Native 3:2 (360x240) in a surface mat (the same mat, same dimensions
           and screen position as the Spielen hero), with a neutral gray
@@ -283,11 +287,11 @@ export default function UebenPath() {
         </div>
       </div>
 
-      {/* Card + pager as one group, vertically centered in the leftover space
-          (`my-auto`) with a tight internal gap so the tile drops down and the
-          dots rise to sit just below it (founder: the old card↔dots gap looked
-          weird). */}
-      <div className="my-auto space-y-3">
+      {/* Card + pager as one group. Phone: vertically centered in the leftover
+          space (`my-auto`) with a tight internal gap so the tile drops down and
+          the dots rise to sit just below it. Desktop: the right column, natural
+          flow (`lg:my-0`). */}
+      <div className="my-auto space-y-3 lg:my-0">
       {/* Practice-module card: shows the mission selected in the pager below
           (defaults to the next unplayed mission). Swipe left/right to change
           the module on touch. */}
@@ -411,6 +415,7 @@ export default function UebenPath() {
         >
           <ChevronRight className="h-[18px] w-[18px]" />
         </button>
+      </div>
       </div>
       </div>
 
