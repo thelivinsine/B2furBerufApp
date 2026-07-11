@@ -368,6 +368,42 @@ latency logging, #28, #30), then the two big rocks (#27 then #26b), with #29 pai
     before scale. Deliverable: a phased migration checklist with the specific Supabase migrations. Effort:
     **M** (planning) / **L** (execution, staged). Recommended model: **Opus**.
 
+### Founder note batch (added 2026-07-11, handwritten task list)
+
+36. **Translation into Arabic and Ukrainian (added 2026-07-11, founder note):** offer the app's
+    translations/glosses in **Arabic and Ukrainian**, not only English. Today every content item carries
+    an `en` gloss (vocab, collocations, Redemittel, texts, Can-Do, etc.) and UI copy is DE-first with EN
+    as data; this adds two more target languages for learners whose bridge language is not English (a real
+    slice of the B1–B2 immigrant audience). Scope when picked up: decide whether this is content-data
+    (per-item `ar`/`uk` fields, a large authored/verified translation effort) or a runtime UI layer (ties
+    the "EN peek" idea #25); confirm right-to-left support for Arabic across the layout; sequence against
+    the translation-verification workflow so added glosses carry provenance. Likely large. Recommended
+    model: **Opus** (scope/architecture) then **Sonnet** for the mechanical translation wiring.
+37. **Grid / Anki-card view of vocabulary (added 2026-07-11, founder note):** a **grid view** of the
+    vocabulary presented as **Anki-style flip cards** with the **English translation on the back**. A
+    learner browses the bank as a card grid and taps a card to flip German front → English back. Relates to
+    the existing `Flashcards` component and the visualization plan (#23), but this is specifically a
+    browsable grid layout of the whole bank (not a session queue), so it fits alongside the Vokabeltrainer /
+    "Meine Sammlung" surfaces. Effort: **M**. Recommended model: **Sonnet**.
+38. **Source link beside each word with a good-looking button (added 2026-07-11, founder note):** surface
+    the provenance **source link directly next to the word**, via a well-designed button, so a learner can
+    jump straight to the reference. The data already exists: every content_id has a `provenance.ts` row with
+    a `reference` URL, exposed today only on the `/sources` page. This brings that link inline on the word
+    itself. Ties into the source-strategy pass (#24, which cleans up login-walled/unstable refs first) and
+    the visualization plan (#23). Effort: **S–M**. Recommended model: **Sonnet**.
+39. **Email newsletter + Help/Blog on how to use the app (added 2026-07-11, founder note):** two parts. (a)
+    An **email newsletter** signup + sending path (opt-in capture, GDPR marketing consent per the #14/#13
+    notes, a provider). (b) A **Help/Blog** explaining how to use the app. **Note:** part (b) is largely
+    **already shipped** as the public `/hilfe` help/blog section (s89, `features/help/`, bilingual DE/EN,
+    prerendered for SEO); this item is really the **newsletter** plus **expanding the help/blog content**
+    (more how-to articles). Effort: **M** (newsletter needs a provider + consent UI). Recommended model:
+    **Opus** for the newsletter/consent wiring, **Sonnet** for help-article content.
+40. **Feedback button (added 2026-07-11, founder note):** an in-app **feedback button** so users can send
+    comments/bug reports/requests. Scope when picked up: where it lives (persistent affordance vs. in
+    Settings), where feedback goes (a Supabase table, an email, or a third-party form), and whether to
+    capture context (current route, app version). Small, high-signal for a pre-launch product. Effort:
+    **S–M**. Recommended model: **Sonnet**.
+
 ## Model guidance — which Claude model to set per session (added 2026-06-11)
 
 > **Fable available again (2026-07-02):** the earlier restriction (noted 2026-06-15) is lifted; Fable

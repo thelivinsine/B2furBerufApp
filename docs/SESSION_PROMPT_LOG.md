@@ -3173,3 +3173,18 @@ Branch: `claude/whats-next-esga9u`.
   72.9 kB). Shipped as PR #427, squash-merged; branch realigned. Updated CLAUDE.md + s90 handoff.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx` (commit
   `f4547e3`, PR #427 squash `2988121`); `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 307 — 2026-07-11 (session 91)
+- **Branch:** `claude/tasks-to-do-lists-cgcbd6`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** one photo of a handwritten task list.
+- **Prompt (verbatim):**
+  > add these tasks to to-do lists
+- **Response summary:** Transcribed the five items from the handwritten note and appended them to the
+  founder backlog in `docs/PROJECT_REFERENCE.md` as items #36–#40 (new "Founder note batch" subsection),
+  matching the existing numbered-list style and no-em-dash rule: (36) translations into Arabic + Ukrainian,
+  (37) grid / Anki-card view of vocab with English on the back, (38) source link beside each word via a
+  good-looking button, (39) email newsletter + Help/Blog on how to use the app (noted the /hilfe help-blog
+  is largely already shipped, so this is really the newsletter + more help articles), (40) in-app feedback
+  button. Each entry notes existing related work, rough effort, and a recommended model. Docs-only change.
+- **Artifacts:** `docs/PROJECT_REFERENCE.md`, `docs/SESSION_PROMPT_LOG.md`.
