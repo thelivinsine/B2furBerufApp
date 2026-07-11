@@ -3138,3 +3138,21 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx`,
   `src/features/welt/NeulandHub.tsx` (commit `86802e0`, PR #423 squash `c0d23a5`); `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 305 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > I don't llike the two column design - revert to one column but adapt it to desktop
+- **Response summary:** Reverted the PR #423 two-column desktop layout back to a single column on all sizes,
+  and adapted it to desktop by vertically centering the whole start page in the viewport (`Dashboard` root
+  `lg:flex lg:min-h-[calc(100vh-8.5rem)] lg:flex-col lg:justify-center`) so the focused column sits centered
+  instead of stranded at the top. Kept the column at `max-w-md` on desktop (a wider 3:2 tile overflows the
+  viewport; measured NO-SCROLL on both tabs after tuning the min-height). `UebenPath` takes natural height
+  on desktop so the Dashboard can center it; `NeulandHub` two-column bits + `/welt` fully reverted. Verified
+  desktop (no scroll), mobile (unchanged) and `/welt` via Playwright. Gates green (lint 0, unit 99/99,
+  bundle 72.8 kB). Shipped as PR #425, squash-merged; branch realigned. Updated CLAUDE.md + s90 handoff.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx`,
+  `src/features/welt/NeulandHub.tsx` (commit `2e6619f`, PR #425 squash `e65eb51`); `CLAUDE.md`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
