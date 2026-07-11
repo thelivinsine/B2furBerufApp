@@ -225,9 +225,10 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   pinned sections stay visible while collapsed. Pins persist per tab in localStorage
   (`b2beruf.railPins`, scoped by the `pinScope` prop; deliberately NOT in the synced settings store).
   Inside: Suche (shared
-  debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as Domain-grouped rows
-  (Thema; Kategorie on Redemittel) in a capped `max-h-72` scroll box, then every facet as always-visible
-  pills with live counts (immediate commit, no draft/apply). Same URL params as mobile. The
+  debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as a **`Select` dropdown**
+  (Thema Domain-grouped; Kategorie on Redemittel; same options as the mobile toolbar dropdown), then every
+  facet as always-visible pills with live counts (immediate commit, no draft/apply). Same URL params as
+  mobile. The
   **LibrarySwitcher tabs + the view-switcher meta row stay at the content-column width** (grid row 1 / col
   1, NOT full width, founder follow-up), while the filter tile still lines up with the content cards (grid
   row 2). **Mobile keeps the locked BrowseToolbar + FacetSheet pattern untouched** (`lg:hidden` wrapper); the toolbar's trailing actions render in the meta row

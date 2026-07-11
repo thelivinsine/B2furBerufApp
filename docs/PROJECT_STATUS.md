@@ -308,6 +308,10 @@ mobile, zero console errors), and shipped:
   content (row 2 / col 1) + the filter rail (row 2 / col 2) share row 2, so the tabs stay at content width
   AND the filter tile still lines up with the first card (measured tabs-right 1112 < grid-right 1400;
   rail-top = card-top = 329). Mobile unchanged.
+- **Founder follow-up round 6 (same session, PR #437):** the rail's **primary scope (Thema/Kategorie) is
+  now a `Select` dropdown** instead of the always-open row list, so the facet groups sit closer to the top.
+  Reuses the same grouped options (Domain headings + counts) as the mobile toolbar; verified the dropdown
+  opens and selecting a theme writes `?theme=`.
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.
