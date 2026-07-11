@@ -3344,3 +3344,18 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/vocabulary/VocabularyTrainer.tsx`,
   `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`;
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #436).
+
+## Entry 316 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > alle themen should be a drop-down.
+- **Response summary:** Replaced the desktop filter rail's primary-scope row list (the "Alle Themen" +
+  Domain-grouped theme rows in a capped scroll box) with a `Select` dropdown, reusing the same grouped
+  options (Domain `SelectGroup` headings + counts) the mobile toolbar already renders. Removed the now-dead
+  `PrimaryRow` helper. Applies to Thema (Wörter/Kollokationen) and Kategorie (Redemittel). Verified the
+  dropdown opens and picking a theme writes `?theme=behoerde`; gates green (typecheck, lint 0 errors,
+  test:unit 110/110, bundle 73.1 kB). Shipped as PR #437, squash-merged; branch realigned.
+- **Artifacts:** `src/features/shared/FilterRail.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (PR #437).

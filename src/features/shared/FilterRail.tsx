@@ -2,6 +2,15 @@ import { useMemo, useState } from "react";
 import { ChevronDown, Pin, SlidersHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   matchesFacets,
   type FacetDef,
   type FacetSelection,
@@ -66,40 +75,8 @@ function writePins(scope: string, pins: string[]) {
   }
 }
 
-function PrimaryRow({
-  option,
-  selected,
-  onSelect,
-}: {
-  option: PrimaryOption;
-  selected: boolean;
-  onSelect: () => void;
-}) {
-  return (
-    <button
-      onClick={onSelect}
-      aria-pressed={selected}
-      className={cn(
-        "flex w-full items-center justify-between gap-2 rounded-lg px-2.5 py-1.5 text-left text-sm transition-colors",
-        selected
-          ? "bg-primary font-medium text-primary-foreground"
-          : "text-foreground hover:bg-muted/60",
-      )}
-    >
-      <span className="min-w-0 truncate">{option.label}</span>
-      {option.count != null && (
-        <span
-          className={cn(
-            "shrink-0 text-xs tabular-nums",
-            selected ? "text-primary-foreground/80" : "text-muted-foreground",
-          )}
-        >
-          {option.count}
-        </span>
-      )}
-    </button>
-  );
-}
+const withCount = (opt: PrimaryOption) =>
+  `${opt.label}${opt.count != null ? ` (${opt.count})` : ""}`;
 
 /** Section heading row with the pin toggle. */
 function SectionHeader({
@@ -205,40 +182,32 @@ export function FilterRail<T>({
         pinned={pins.includes("primary")}
         onTogglePin={() => togglePin("primary")}
       />
-      {/* Capped with internal scroll so the facet groups below stay
-          discoverable next to a 15-theme list. */}
-      <div className="max-h-72 space-y-0.5 overflow-y-auto overscroll-contain rounded-lg border border-border/60 bg-surface/60 p-1">
-        <PrimaryRow
-          option={primary.all}
-          selected={primary.value === primary.all.value}
-          onSelect={() => primary.onChange(primary.all.value)}
-        />
-        {primary.options?.map((opt) => (
-          <PrimaryRow
-            key={opt.value}
-            option={opt}
-            selected={primary.value === opt.value}
-            onSelect={() => primary.onChange(opt.value)}
-          />
-        ))}
-        {primary.groups?.map((group) => (
-          <div key={group.label} className="pt-1.5">
-            <p className="px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-              {group.label}
-            </p>
-            <div className="space-y-0.5">
+      {/* Dropdown (founder follow-up): the primary scope (Thema/Kategorie) is
+          a Select, not an always-open row list, so the facet groups below
+          stay close to the top. Same options as the mobile toolbar dropdown. */}
+      <Select value={primary.value} onValueChange={primary.onChange}>
+        <SelectTrigger className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={primary.all.value}>{withCount(primary.all)}</SelectItem>
+          {primary.options?.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {withCount(opt)}
+            </SelectItem>
+          ))}
+          {primary.groups?.map((group) => (
+            <SelectGroup key={group.label}>
+              <SelectLabel>{group.label}</SelectLabel>
               {group.options.map((opt) => (
-                <PrimaryRow
-                  key={opt.value}
-                  option={opt}
-                  selected={primary.value === opt.value}
-                  onSelect={() => primary.onChange(opt.value)}
-                />
+                <SelectItem key={opt.value} value={opt.value}>
+                  {withCount(opt)}
+                </SelectItem>
               ))}
-            </div>
-          </div>
-        ))}
-      </div>
+            </SelectGroup>
+          ))}
+        </SelectContent>
+      </Select>
     </section>
   ) : null;
 
