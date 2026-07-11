@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, Combine, Zap } from "lucide-react";
+import { ChevronLeft, Combine, Zap, SlidersHorizontal } from "lucide-react";
 import { collocations, collocationsByTheme } from "@/data/collocations";
 import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -11,7 +11,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
-import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
+import {
+  applyFacets,
+  ActiveFilterChip,
+  activeFacetCount,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
 import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
@@ -79,6 +84,8 @@ export function CollocationsBrowser() {
   const learningMode = useSettingsStore((s) => s.mode);
   const scope = useLibraryScope();
   const [showAllLevels, setShowAllLevels] = useState(false);
+  // Mobile filter panel open state: the toggle is an icon on the view line.
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useViewParam(KOLLOKATION_VIEWS);
 
   const themeParam = params.get("theme") ?? "all";
@@ -277,6 +284,25 @@ export function CollocationsBrowser() {
             <span className="text-sm tabular-nums text-muted-foreground">
               {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
             </span>
+            <div className="flex items-center gap-2 lg:ml-auto">
+              <Button
+                size="icon"
+                variant={filtersOpen ? "default" : "outline"}
+                aria-pressed={filtersOpen}
+                aria-expanded={filtersOpen}
+                aria-label="Filter"
+                title="Filter"
+                className="relative shrink-0 lg:hidden"
+                onClick={() => setFiltersOpen((o) => !o)}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFacetCount(selection) > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+                    {activeFacetCount(selection)}
+                  </span>
+                )}
+              </Button>
+            </div>
           </div>
 
           {hiddenLabel && (
@@ -295,7 +321,9 @@ export function CollocationsBrowser() {
             scrolling. Desktop renders its own sticky rail in col 2. */}
         <FilterRail
           {...filterRailProps}
-          defaultOpen={false}
+          hideHeader
+          open={filtersOpen}
+          onOpenChange={setFiltersOpen}
           className="lg:hidden"
         />
 

@@ -1,7 +1,16 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText, Zap, Bookmark } from "lucide-react";
+import {
+  BookOpen,
+  Layers,
+  Sparkles,
+  ChevronLeft,
+  BookOpenText,
+  Zap,
+  Bookmark,
+  SlidersHorizontal,
+} from "lucide-react";
 import { themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -13,7 +22,13 @@ import { HubHero } from "@/components/shared/HubHero";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
-import { applyFacets, ActiveFilterChip, type FacetDef, type FacetSelection } from "@/features/shared/FacetSheet";
+import {
+  applyFacets,
+  ActiveFilterChip,
+  activeFacetCount,
+  type FacetDef,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
 import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
 import { themeGroupsForMode } from "@/lib/themeGroups";
 import { mastery, masteryLabel } from "@/engine/srs";
@@ -60,6 +75,9 @@ export function VocabularyTrainer() {
   const [search, setSearch] = useState("");
   const [showAllLevels, setShowAllLevels] = useState(false);
   const [view, setView] = useViewParam(WOERTER_VIEWS);
+  // Mobile filter panel open state: the toggle lives on the view-options line
+  // (an icon), the desktop rail keeps its own header/state.
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   // Tier-2 travelling scope: when arriving without an explicit theme (e.g. via
   // the bottom bar), inherit the shared library scope so the learner's context
@@ -207,18 +225,41 @@ export function VocabularyTrainer() {
 
   const startSession = () => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`);
 
+  // Icon-only toolbar buttons (founder s92): the bookmark filter and the mobile
+  // Filter toggle sit on the view-options line as bare icons, no labels.
   const savedButton = (
     <Button
-      size="sm"
+      size="icon"
       variant={savedActive ? "default" : "outline"}
       aria-pressed={savedActive}
-      className="h-10 shrink-0"
+      aria-label={savedActive ? "Nur gespeicherte Wörter" : "Gespeicherte Wörter"}
+      title="Gespeichert"
+      className="shrink-0"
       onClick={toggleSaved}
     >
-      <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
-      Gespeichert
-      {savedWords.length > 0 && (
-        <span className="text-xs opacity-70">({savedWords.length})</span>
+      <Bookmark className={cn("h-4 w-4", savedActive && "fill-current")} />
+    </Button>
+  );
+
+  // Mobile-only Filter toggle (desktop keeps its persistent rail with its own
+  // header). The badge surfaces the active facet count even while collapsed.
+  const facetCount = activeFacetCount(selection);
+  const filterButton = (
+    <Button
+      size="icon"
+      variant={filtersOpen ? "default" : "outline"}
+      aria-pressed={filtersOpen}
+      aria-expanded={filtersOpen}
+      aria-label="Filter"
+      title="Filter"
+      className="relative shrink-0 lg:hidden"
+      onClick={() => setFiltersOpen((o) => !o)}
+    >
+      <SlidersHorizontal className="h-4 w-4" />
+      {facetCount > 0 && (
+        <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+          {facetCount}
+        </span>
       )}
     </Button>
   );
@@ -328,7 +369,10 @@ export function VocabularyTrainer() {
                 {items.length} {items.length === 1 ? "Wort" : "Wörter"}
               </span>
             )}
-            <div className="flex items-center gap-2 lg:ml-auto">{savedButton}</div>
+            <div className="flex items-center gap-2 lg:ml-auto">
+              {filterButton}
+              {savedButton}
+            </div>
           </div>
 
           {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
@@ -351,7 +395,9 @@ export function VocabularyTrainer() {
             scrolling. Desktop renders its own sticky rail in col 2. */}
         <FilterRail
           {...filterRailProps}
-          defaultOpen={false}
+          hideHeader
+          open={filtersOpen}
+          onOpenChange={setFiltersOpen}
           className="lg:hidden"
         />
 

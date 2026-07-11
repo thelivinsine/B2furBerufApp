@@ -130,6 +130,9 @@ export function FilterRail<T>({
   footer,
   pinScope,
   defaultOpen = true,
+  open: controlledOpen,
+  onOpenChange,
+  hideHeader = false,
   className,
 }: {
   search: string;
@@ -145,12 +148,20 @@ export function FilterRail<T>({
   footer?: React.ReactNode;
   /** localStorage scope for the section pins, e.g. "woerter". */
   pinScope: string;
-  /** Whether the panel starts expanded. Desktop defaults open; mobile passes
-   *  false so the tile starts as a compact "Filter" bar. */
+  /** Whether the panel starts expanded (uncontrolled). Desktop defaults open. */
   defaultOpen?: boolean;
+  /** Controlled open state. When provided (with `onOpenChange`), the panel is
+   *  driven from outside, e.g. a Filter icon in the toolbar (mobile). */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Hide the built-in "Filter" header/toggle row. Mobile passes this because
+   *  the toggle lives on the view-options line instead. */
+  hideHeader?: boolean;
   className?: string;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = controlledOpen ?? internalOpen;
+  const setOpen = (next: boolean) => (onOpenChange ? onOpenChange(next) : setInternalOpen(next));
   const [pins, setPins] = useState<string[]>(() => readPins(pinScope));
   const activeCount = activeFacetCount(selection);
 
@@ -267,40 +278,52 @@ export function FilterRail<T>({
   return (
     <aside
       className={cn(
-        // The WHOLE tile carries a grey shade (founder follow-up); the white
-        // controls inside provide the contrast, the "Filter" label keeps the
-        // brand accent. On DESKTOP the aside is its own capped scroll container
-        // (the instance className adds `lg:overflow-y-auto` + `lg:max-h-…`):
-        // the header sticks to its top, the Üben footer to its bottom, the
-        // middle scrolls. On MOBILE the tile grows naturally (no cap, no
-        // internal scroll, so no scrollbar); the Üben footer instead sticks to
-        // the viewport bottom (above the nav) so it stays visible while the
-        // filters are open.
-        "rounded-xl border border-border bg-muted",
+        // The WHOLE tile is one solid, higher-contrast grey (founder follow-up
+        // s92: `bg-border` reads clearly against the near-white page where the
+        // old `bg-muted` barely did), so every section shares the top row's
+        // shade. The white controls inside carry the contrast; the "Filter"
+        // label keeps the brand accent. On DESKTOP the aside is its own capped
+        // scroll container (the instance className adds `lg:overflow-y-auto` +
+        // `lg:max-h-…`): the header sticks to its top, the Üben footer to its
+        // bottom, the middle scrolls. On MOBILE the tile grows naturally (no
+        // cap, no internal scroll, so no scrollbar); the Üben footer instead
+        // sticks to the viewport bottom (above the nav) so it stays visible
+        // while the filters are open.
+        "rounded-xl border border-border bg-border",
         className,
       )}
       aria-label="Filter"
     >
       {/* Tile header; clicking collapses/expands the panel (pinned sections +
           footer stay visible regardless). Sticks to the top of the scroll on
-          desktop; scrolls with the tile on mobile. */}
-      <button
-        onClick={() => setOpen((o) => !o)}
-        aria-expanded={open}
-        className="z-10 flex w-full items-center gap-2 rounded-t-xl bg-muted px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-foreground/5 lg:sticky lg:top-0 lg:rounded-none"
-      >
-        <SlidersHorizontal className="h-4 w-4" />
-        Filter
-        {activeCount > 0 && (
-          <span className="rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
-            {activeCount}
-          </span>
-        )}
-        <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", open && "rotate-180")} />
-      </button>
+          desktop. Mobile hides it (`hideHeader`) because the Filter toggle
+          lives on the view-options line instead. */}
+      {!hideHeader && (
+        <button
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          className="z-10 flex w-full items-center gap-2 rounded-t-xl bg-border px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-foreground/5 lg:sticky lg:top-0 lg:rounded-none"
+        >
+          <SlidersHorizontal className="h-4 w-4" />
+          Filter
+          {activeCount > 0 && (
+            <span className="rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+              {activeCount}
+            </span>
+          )}
+          <ChevronDown
+            className={cn("ml-auto h-4 w-4 transition-transform", open && "rotate-180")}
+          />
+        </button>
+      )}
 
       {open && (
-        <div className="space-y-5 border-t border-border p-3">
+        <div
+          className={cn(
+            "space-y-5 p-3",
+            hideHeader ? "rounded-t-xl" : "border-t border-muted-foreground/10",
+          )}
+        >
           <SearchField
             value={search}
             onChange={onSearch}
@@ -331,7 +354,12 @@ export function FilterRail<T>({
 
       {/* Collapsed: pinned sections stay visible. */}
       {showPinnedBody && (
-        <div className="space-y-5 border-t border-border p-3">
+        <div
+          className={cn(
+            "space-y-5 p-3",
+            hideHeader ? "rounded-t-xl" : "border-t border-muted-foreground/10",
+          )}
+        >
           {primary && pins.includes("primary") && primarySection}
           {pinnedFacets.map(facetSection)}
         </div>
@@ -345,7 +373,14 @@ export function FilterRail<T>({
           Üben visible while the filters are open without an internal
           scrollbar. */}
       {footer && (
-        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 rounded-b-xl border-t border-border bg-muted p-3 lg:bottom-0 lg:rounded-none">
+        <div
+          className={cn(
+            "sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 rounded-b-xl border-t border-muted-foreground/10 bg-border p-3 lg:bottom-0 lg:rounded-none",
+            // Headerless + collapsed + no pinned sections: the footer is the
+            // whole tile, so round its top too and drop the divider.
+            hideHeader && !open && !showPinnedBody && "rounded-t-xl border-t-0",
+          )}
+        >
           {footer}
         </div>
       )}
