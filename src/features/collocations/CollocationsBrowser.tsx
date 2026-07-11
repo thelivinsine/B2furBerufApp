@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ChevronLeft, Combine, Zap } from "lucide-react";
+import { ChevronLeft, Zap } from "lucide-react";
 import { collocations, collocationsByTheme } from "@/data/collocations";
 import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -10,7 +10,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
-import { HubHero } from "@/components/shared/HubHero";
 import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { FilterRail } from "@/features/shared/FilterRail";
@@ -228,6 +227,10 @@ export function CollocationsBrowser() {
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
     ),
+    count: {
+      value: filtered.length,
+      label: filtered.length !== 1 ? "Kollokationen" : "Kollokation",
+    },
   };
 
   const cardGrid = (
@@ -257,13 +260,7 @@ export function CollocationsBrowser() {
 
   return (
     <div className="space-y-5">
-      <HubHero
-        icon={Combine}
-        gradient="from-violet-500 to-purple-500"
-        eyebrow="Nomen-Verb-Verbindungen"
-        title="Kollokationen"
-      />
-
+      {/* No page header: the Bibliothek tabs already name the section (s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
           follow-up s91), while the content and the filter tile share row 2 so
@@ -276,9 +273,6 @@ export function CollocationsBrowser() {
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
-            <span className="text-sm tabular-nums text-muted-foreground">
-              {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
-            </span>
           </div>
 
           {hiddenLabel && (

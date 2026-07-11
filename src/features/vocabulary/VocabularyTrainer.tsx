@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText, Zap, Bookmark } from "lucide-react";
+import { BookOpen, Layers, Sparkles, ChevronLeft, Zap, Bookmark } from "lucide-react";
 import { themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -9,7 +9,6 @@ import { useProgressStore } from "@/store/useProgressStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { HubHero } from "@/components/shared/HubHero";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
@@ -251,6 +250,12 @@ export function VocabularyTrainer() {
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
     ),
+    // Count sits stacked to the right of Üben in the tile footer. Hidden in the
+    // graph view, where the count lives on the canvas instead.
+    count:
+      view !== "graph"
+        ? { value: items.length, label: items.length === 1 ? "Wort" : "Wörter" }
+        : undefined,
   };
 
   // The sub-theme picker replaces the card/table/list content, but never the
@@ -305,13 +310,8 @@ export function VocabularyTrainer() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <HubHero
-        icon={BookOpenText}
-        gradient="from-indigo-500 to-violet-500"
-        eyebrow="Wortschatz"
-        title="Vokabeltrainer"
-      />
-
+      {/* No page header: the Bibliothek tabs (LibrarySwitcher) already say which
+          section this is (founder s92). */}
       {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
           stay at the CONTENT column width (row 1, not full width, founder
           follow-up s91), while the content and the filter tile share row 2 so
@@ -324,14 +324,7 @@ export function VocabularyTrainer() {
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
-            {/* In the graph view the word count sits with the connection
-                count at the bottom of the canvas (founder follow-up), so it
-                is not repeated here. */}
-            {view !== "graph" && (
-              <span className="text-sm tabular-nums text-muted-foreground">
-                {items.length} {items.length === 1 ? "Wort" : "Wörter"}
-              </span>
-            )}
+            {/* The word count moved into the tile footer (right of Üben). */}
             <div className="flex items-center gap-2 lg:ml-auto">{savedButton}</div>
           </div>
 
