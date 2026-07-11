@@ -273,19 +273,24 @@ screen. Also add a subtle color theme for the toggle buttons and the border padd
   (`lg:min-h-0`, card/pager `lg:my-0`) so the Dashboard can center it. Mobile and `/welt` unchanged.
 - **Desktop scrollbar fix + snappier motion (PR #427):** the single-column stack at `max-w-md` was ~801px
   tall on desktop, just over common laptop viewports, so the root `min-h-screen` forced a scrollbar.
-  Narrowed the **desktop** column to `lg:max-w-[22rem]` (mobile stays `max-w-md`) so both tabs fit
-  scroll-free down to a 768px viewport (below ~760 the tile+card+controls genuinely can't fit and it
-  scrolls, which is acceptable). Also made the transitions snappier (founder: motion felt heavy): tab-switch
-  0.2→0.13s, toggle mount 0.18s, Üben module slide 0.2→0.13s. Verified Üben + Spielen at 768/800/832/900
-  (no scroll) + mobile via Playwright.
-- Gates green: build, lint 0 errors, `test:unit` 99/99, `check:bundle` **72.9 kB** / 400. Verified via
+  Narrowed the **desktop** column (mobile stays `max-w-md`) and made transitions snappier.
+- **Size restore + directional tab slide (PR #429, later founder round):** the 22rem column from #427 read
+  as too small ("components got reduced"). Restored the desktop column to **`lg:max-w-[26rem]`** (near
+  mobile's `max-w-md`) and tightened the desktop toggle→content gap (`lg:space-y-3`) so the full-size stack
+  still fits: **Üben scroll-free ≥768px, Spielen ≥~800px** (bigger components need more room, so below that
+  Spielen can still scroll a little; inherent). Replaced the vertical fade on tab switch with a
+  **directional horizontal slide** (right→left to Spielen, left→right to Üben) via `AnimatePresence`
+  custom-direction + variants (~0.16s, reduced-motion safe). Verified both tabs at 768/800/832/900 + no page
+  errors on switching, mobile unchanged.
+- Gates green: build, lint 0 errors, `test:unit` 99/99, `check:bundle` **73.1 kB** / 400. Verified via
   Playwright (screenshots + measured scroll/bounding-box).
-- **Ship status:** shipped across **PRs #413 (core), #414/#416/#417/#420/#424/#426 (docs), #415 (color swap
-  + neutral borders + dumbbell), #418 (center Neuland + tighten card/pager gap), #421 (fill dumbbell), #423
-  (desktop two-column, later reverted), #425 (revert to single column + desktop vertical centering), #427
-  (desktop scrollbar fix + snappier motion)**, all squash-merged to `main` (branch realigned after each).
-  **Founder verifies the live site** (Pages deploys on merge; sandbox can't reach `*.github.io`; deploy runs
-  confirmed green via the Actions API this session).
+- **Ship status:** shipped across **PRs #413 (core), #414/#416/#417/#420/#424/#426/#428 (docs), #415 (color
+  swap + neutral borders + dumbbell), #418 (center Neuland + tighten card/pager gap), #421 (fill dumbbell),
+  #423 (desktop two-column, later reverted), #425 (revert to single column + desktop vertical centering),
+  #427 (desktop scrollbar fix + snappier motion), #429 (restore desktop tile size + directional tab
+  slide)**, all squash-merged to `main` (branch realigned after each). **Founder verifies the live site**
+  (Pages deploys on merge; sandbox can't reach `*.github.io`; deploy runs confirmed green via the Actions
+  API this session).
 
 **Prior handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
 (branch `claude/blog-help-uben-spielen-wtbnq8`).**
