@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { MessageSquareText, Zap, SlidersHorizontal } from "lucide-react";
+import { MessageSquareText, Zap } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
 import { iconByName } from "@/lib/icons";
@@ -8,7 +8,7 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ActiveFilterChip, activeFacetCount, type FacetSelection } from "@/features/shared/FacetSheet";
+import { ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { redemittelFacets } from "@/lib/facets";
@@ -224,25 +224,6 @@ export function RedemittelTrainer() {
             <span className="text-sm tabular-nums text-muted-foreground">
               {filtered.length} Wendung{filtered.length !== 1 ? "en" : ""}
             </span>
-            <div className="flex items-center gap-2 lg:ml-auto">
-              <Button
-                size="icon"
-                variant={filtersOpen ? "default" : "outline"}
-                aria-pressed={filtersOpen}
-                aria-expanded={filtersOpen}
-                aria-label="Filter"
-                title="Filter"
-                className="relative shrink-0 lg:hidden"
-                onClick={() => setFiltersOpen((o) => !o)}
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                {activeFacetCount(railSelection) > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
-                    {activeFacetCount(railSelection)}
-                  </span>
-                )}
-              </Button>
-            </div>
           </div>
 
           {bandActive && bandHiddenCount > 0 && (
