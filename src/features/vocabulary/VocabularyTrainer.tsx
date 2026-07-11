@@ -218,27 +218,30 @@ export function VocabularyTrainer() {
     [learningMode, theme],
   );
 
-  const actions = (
+  const startSession = () => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`);
+
+  const savedButton = (
+    <Button
+      size="sm"
+      variant={savedActive ? "default" : "outline"}
+      aria-pressed={savedActive}
+      className="h-10 shrink-0"
+      onClick={toggleSaved}
+    >
+      <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
+      Gespeichert
+      {savedWords.length > 0 && (
+        <span className="text-xs opacity-70">({savedWords.length})</span>
+      )}
+    </Button>
+  );
+
+  // Mobile keeps Üben in the toolbar (there is no rail there); on desktop
+  // Üben lives at the bottom of the filter tile (founder follow-up, s91).
+  const mobileActions = (
     <>
-      <Button
-        size="sm"
-        variant={savedActive ? "default" : "outline"}
-        aria-pressed={savedActive}
-        className="h-10 shrink-0"
-        onClick={toggleSaved}
-      >
-        <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
-        Gespeichert
-        {savedWords.length > 0 && (
-          <span className="text-xs opacity-70">({savedWords.length})</span>
-        )}
-      </Button>
-      <Button
-        size="sm"
-        variant="gradient"
-        className="h-10 shrink-0"
-        onClick={() => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`)}
-      >
+      {savedButton}
+      <Button size="sm" variant="gradient" className="h-10 shrink-0" onClick={startSession}>
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
     </>
@@ -326,7 +329,7 @@ export function VocabularyTrainer() {
               resultLabel={(n) => `${n} ${n === 1 ? "Wort" : "Wörter"} anzeigen`}
               activeChips={activeChips}
               onRemoveChip={removeFacetValue}
-              trailing={actions}
+              trailing={mobileActions}
             />
           </div>
 
@@ -335,7 +338,7 @@ export function VocabularyTrainer() {
             <span className="text-sm tabular-nums text-muted-foreground">
               {items.length} {items.length === 1 ? "Wort" : "Wörter"}
             </span>
-            <div className="ml-auto hidden items-center gap-2 lg:flex">{actions}</div>
+            <div className="ml-auto hidden items-center gap-2 lg:flex">{savedButton}</div>
           </div>
 
           {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
@@ -393,6 +396,12 @@ export function VocabularyTrainer() {
           facets={facets}
           selection={selection}
           onChange={setSelection}
+          pinScope="woerter"
+          footer={
+            <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
+              <Zap className="h-3.5 w-3.5" /> Üben
+            </Button>
+          }
         />
       </div>
     </div>

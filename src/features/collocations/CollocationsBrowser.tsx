@@ -214,13 +214,12 @@ export function CollocationsBrowser() {
     [learningMode, themeParam],
   );
 
-  const actions = (
-    <Button
-      size="sm"
-      variant="gradient"
-      className="h-10 shrink-0"
-      onClick={() => navigate(`/session${activeTheme ? `?theme=${activeTheme.id}` : ""}`)}
-    >
+  const startSession = () => navigate(`/session${activeTheme ? `?theme=${activeTheme.id}` : ""}`);
+
+  // Mobile keeps Üben in the toolbar (no rail there); on desktop it lives at
+  // the bottom of the filter tile (founder follow-up, s91).
+  const mobileActions = (
+    <Button size="sm" variant="gradient" className="h-10 shrink-0" onClick={startSession}>
       <Zap className="h-3.5 w-3.5" /> Üben
     </Button>
   );
@@ -280,7 +279,7 @@ export function CollocationsBrowser() {
               resultLabel={(n) => `${n} Kollokation${n !== 1 ? "en" : ""} anzeigen`}
               activeChips={activeChips}
               onRemoveChip={removeFacetValue}
-              trailing={actions}
+              trailing={mobileActions}
             />
           </div>
 
@@ -289,7 +288,6 @@ export function CollocationsBrowser() {
             <span className="text-sm tabular-nums text-muted-foreground">
               {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
             </span>
-            <div className="ml-auto hidden items-center gap-2 lg:flex">{actions}</div>
           </div>
 
           {hiddenLabel && (
@@ -355,6 +353,12 @@ export function CollocationsBrowser() {
           facets={COLLOCATION_FACETS}
           selection={selection}
           onChange={setSelection}
+          pinScope="kollokationen"
+          footer={
+            <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
+              <Zap className="h-3.5 w-3.5" /> Üben
+            </Button>
+          }
         />
       </div>
     </div>

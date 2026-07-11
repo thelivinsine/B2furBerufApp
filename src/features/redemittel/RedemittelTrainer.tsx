@@ -144,7 +144,9 @@ export function RedemittelTrainer() {
       ? redemittelCategories
       : redemittelCategories.filter((c) => c.id === category);
 
-  const actions = (
+  // Mobile keeps Üben in the toolbar (no rail there); on desktop it lives at
+  // the bottom of the filter tile (founder follow-up, s91).
+  const mobileActions = (
     <Button
       size="sm"
       variant="gradient"
@@ -233,7 +235,7 @@ export function RedemittelTrainer() {
               resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
               activeChips={[]}
               onRemoveChip={() => {}}
-              trailing={actions}
+              trailing={mobileActions}
             />
           </div>
 
@@ -242,7 +244,6 @@ export function RedemittelTrainer() {
             <span className="text-sm tabular-nums text-muted-foreground">
               {filtered.length} Wendung{filtered.length !== 1 ? "en" : ""}
             </span>
-            <div className="ml-auto hidden items-center gap-2 lg:flex">{actions}</div>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -307,6 +308,12 @@ export function RedemittelTrainer() {
           facets={REDEMITTEL_FACETS}
           selection={railSelection}
           onChange={setRailSelection}
+          pinScope="redemittel"
+          footer={
+            <Button variant="gradient" className="h-10 w-full" onClick={() => navigate("/session")}>
+              <Zap className="h-3.5 w-3.5" /> Üben
+            </Button>
+          }
         />
       </div>
     </div>

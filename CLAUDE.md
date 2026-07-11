@@ -214,7 +214,12 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   **Desktop filter rail (s91):** on lg+ the three browse tabs are a two-column grid
   (`lg:grid-cols-[minmax(0,1fr)_16rem]`) with a persistent right rail (`features/shared/FilterRail.tsx`),
   a **collapsible tile** (founder follow-up s91): brand-tinted `bg-primary/10 text-primary` header row
-  ("Filter" + active-count badge + chevron) that expands/collapses the whole panel. Inside: Suche (shared
+  ("Filter" + active-count badge + chevron) that expands/collapses the panel. The **Üben button is the
+  tile's `footer` slot**, visible in EVERY state (mobile keeps Üben in the toolbar; the desktop meta row
+  keeps only Gespeichert on Wörter), and **each section has a pin** (`Pin` icon in the section header):
+  pinned sections stay visible while collapsed. Pins persist per tab in localStorage
+  (`b2beruf.railPins`, scoped by the `pinScope` prop; deliberately NOT in the synced settings store).
+  Inside: Suche (shared
   debounced `SearchField.tsx`, extracted from BrowseToolbar), the primary scope as Domain-grouped rows
   (Thema; Kategorie on Redemittel) in a capped `max-h-72` scroll box, then every facet as always-visible
   pills with live counts (immediate commit, no draft/apply). Same URL params as mobile. The
