@@ -11,6 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { FilterRail } from "@/features/shared/FilterRail";
+import { StickyUebenBar } from "@/features/shared/StickyUebenBar";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { applyFacets, ActiveFilterChip, type FacetDef, type FacetSelection } from "@/features/shared/FacetSheet";
@@ -319,8 +320,14 @@ export function VocabularyTrainer() {
           <LibrarySwitcher />
 
           {/* Mobile shows the SAME filter tile (founder follow-up, s91),
-              starting collapsed; desktop renders its own sticky rail below. */}
-          <FilterRail {...filterRailProps} defaultOpen={false} className="lg:hidden" />
+              starting collapsed; Üben floats via StickyUebenBar instead of the
+              tile footer here. Desktop renders its own sticky rail below. */}
+          <FilterRail
+            {...filterRailProps}
+            footer={undefined}
+            defaultOpen={false}
+            className="lg:hidden"
+          />
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
             <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
@@ -378,9 +385,11 @@ export function VocabularyTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)]"
         />
       </div>
+
+      <StickyUebenBar onClick={startSession} />
     </div>
   );
 }
