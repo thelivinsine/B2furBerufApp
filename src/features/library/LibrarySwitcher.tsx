@@ -58,10 +58,10 @@ export function LibrarySwitcher() {
             aria-selected={active}
             aria-current={active ? "page" : undefined}
             className={cn(
-              // Bigger than before (text-[13px] + taller py-2) but still sized to
-              // fit four labels including "Kollokationen" on a phone without a
-              // scroll: tight px on mobile, roomier at sm+.
-              "relative flex-1 whitespace-nowrap rounded-full px-1.5 py-2 text-center text-[13px] font-semibold leading-none transition-colors sm:px-3 sm:text-sm",
+              // Bigger type (text-sm on mobile, text-base on desktop) with tight
+              // mobile padding/gap so the four labels including "Kollokationen"
+              // still fit a phone row without a horizontal scroll.
+              "relative flex-1 whitespace-nowrap rounded-full px-1.5 py-2 text-center text-sm font-semibold leading-none transition-colors sm:px-4 sm:py-2.5 sm:text-base",
               active ? "text-primary" : "text-muted-foreground hover:text-foreground",
             )}
           >

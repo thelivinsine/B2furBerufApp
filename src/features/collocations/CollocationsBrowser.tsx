@@ -267,65 +267,76 @@ export function CollocationsBrowser() {
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
-            {/* Mobile filter toggle, left of the view icons (founder s92). */}
-            <Button
-              size="icon"
-              variant={filtersOpen ? "default" : "outline"}
-              aria-pressed={filtersOpen}
-              aria-expanded={filtersOpen}
-              aria-label="Filter"
-              title="Filter"
-              className="relative shrink-0 rounded-lg lg:hidden"
-              onClick={() => setFiltersOpen((o) => !o)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              {activeFacetCount(selection) > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
-                  {activeFacetCount(selection)}
-                </span>
-              )}
-            </Button>
-            <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
-            <div className="flex items-center gap-2 lg:ml-auto">
+          {/* Toolbar + search + Üben/count share ONE width on mobile (see
+              Wörter): the wrapper hugs the toolbar and the Üben row stretches to
+              match it. Desktop drops the sizing and keeps Üben/count in the rail. */}
+          <div className="mx-auto flex w-fit flex-col gap-2 lg:mx-0 lg:w-full">
+            <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+              {/* Mobile filter toggle, left of the view icons (founder s92). */}
               <Button
                 size="icon"
-                variant={searchOpen || search.trim() ? "default" : "outline"}
-                aria-pressed={searchOpen}
-                aria-expanded={searchOpen}
-                aria-label="Suche"
-                title="Suche"
-                className="shrink-0 rounded-lg"
-                onClick={() =>
-                  setSearchOpen((o) => {
-                    if (o) setSearch("");
-                    return !o;
-                  })
-                }
+                variant={filtersOpen ? "default" : "outline"}
+                aria-pressed={filtersOpen}
+                aria-expanded={filtersOpen}
+                aria-label="Filter"
+                title="Filter"
+                className="relative shrink-0 rounded-lg lg:hidden"
+                onClick={() => setFiltersOpen((o) => !o)}
               >
-                <Search className="h-4 w-4" />
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFacetCount(selection) > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+                    {activeFacetCount(selection)}
+                  </span>
+                )}
               </Button>
+              <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
+              <div className="flex items-center gap-2 lg:ml-auto">
+                <Button
+                  size="icon"
+                  variant={searchOpen || search.trim() ? "default" : "outline"}
+                  aria-pressed={searchOpen}
+                  aria-expanded={searchOpen}
+                  aria-label="Suche"
+                  title="Suche"
+                  className="shrink-0 rounded-lg"
+                  onClick={() =>
+                    setSearchOpen((o) => {
+                      if (o) setSearch("");
+                      return !o;
+                    })
+                  }
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Search input lives outside the filter panel (founder s92). */}
+            {searchOpen && (
+              <SearchField
+                value={search}
+                onChange={setSearch}
+                placeholder="Suche nach Nomen, Verb, Übersetzung …"
+                autoFocus
+              />
+            )}
+
+            {/* Mobile-only: Üben fills the row, count stacked at its right. */}
+            <div className="flex items-center gap-2 lg:hidden">
+              <Button variant="gradient" className="h-11 flex-1 rounded-xl text-base" onClick={startSession}>
+                <Zap className="h-4 w-4" /> Üben
+              </Button>
+              <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+                <span className="text-sm font-semibold tabular-nums text-foreground">
+                  {filtered.length}
+                </span>
+                <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                  Kollokation{filtered.length !== 1 ? "en" : ""}
+                </span>
+              </div>
             </div>
           </div>
-
-          {/* Search input lives outside the filter panel (founder s92). */}
-          {searchOpen && (
-            <SearchField
-              value={search}
-              onChange={setSearch}
-              placeholder="Suche nach Nomen, Verb, Übersetzung …"
-              autoFocus
-            />
-          )}
-
-          {/* Mobile-only: standalone Üben + plain count, then the sliding filter
-              panel. Desktop keeps Üben/count inside the rail in col 2. */}
-          <Button variant="gradient" className="h-11 w-full rounded-xl text-base lg:hidden" onClick={startSession}>
-            <Zap className="h-4 w-4" /> Üben
-          </Button>
-          <p className="text-center text-sm tabular-nums text-muted-foreground lg:hidden">
-            {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
-          </p>
 
           <AnimatePresence initial={false}>
             {filtersOpen && (
