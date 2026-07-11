@@ -3382,3 +3382,26 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/shared/FilterRail.tsx`, `src/features/vocabulary/VocabularyTrainer.tsx`,
   `src/features/collocations/CollocationsBrowser.tsx`, `src/features/redemittel/RedemittelTrainer.tsx`;
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #438).
+
+## Entry 318 — 2026-07-11 (session 91)
+- **Branch:** `claude/bibliothek-mockup-review-rcghlq`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > apply a grey shade to filter tile. üben button should always be visible on the screen.
+- **Response summary:** (1) Recolored the FilterRail tile from the brand tint to a grey shade (`bg-muted` +
+  `border-border`; the "Filter" header label keeps the brand accent). (2) Made Üben always visible. Desktop:
+  the aside is now itself the capped scroll container (`lg:overflow-y-auto` + `lg:max-h-[calc(100vh-22rem)]`)
+  with the header `lg:sticky lg:top-0` and the Üben footer `lg:sticky lg:bottom-0`, so only the facet body
+  scrolls and Üben stays on screen at every scroll position (an earlier flex-1 body-scroll attempt let the
+  footer overflow past the clipped aside; measured false at scroll 0, so switched to aside-scroll + sticky
+  footer). Verified inView=true at scroll 0/600/3000 across 800/900/1080 viewport heights. Mobile: the tile
+  drops its footer and a new shared `StickyUebenBar` (`features/shared/StickyUebenBar.tsx`, `lg:hidden`)
+  floats the Üben button just above the bottom nav (offset `calc(4.4375rem + env(safe-area-inset-bottom))`
+  clears the 63px nav + safe area), always reachable while scrolling; verified the mobile button stays at
+  the bottom (top 729 of 844) with only one Üben present. Gates green (typecheck, lint 0 errors, test:unit
+  110/110, bundle 73.1 kB). Shipped as PR #439, squash-merged; branch realigned.
+- **Artifacts:** `src/features/shared/FilterRail.tsx`, `src/features/shared/StickyUebenBar.tsx` (new),
+  `src/features/vocabulary/VocabularyTrainer.tsx`, `src/features/collocations/CollocationsBrowser.tsx`,
+  `src/features/redemittel/RedemittelTrainer.tsx`; `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/SESSION_PROMPT_LOG.md` (PR #439).

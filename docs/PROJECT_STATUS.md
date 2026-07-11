@@ -320,6 +320,15 @@ mobile, zero console errors), and shipped:
   to expand). Gespeichert (Wörter) moved into the meta row on mobile; Redemittel's mobile register chips
   were removed (Register is a rail facet). Verified both breakpoints via Playwright (themed tile, mobile
   collapse/expand, zero console errors). `BrowseToolbar`/`FacetSheet` remain in the repo, just unused here.
+- **Founder follow-up round 8 (same session, PR #439):** (1) the filter tile switched from the brand tint to
+  a **grey shade** (`bg-muted` + `border-border`; "Filter" label keeps the brand accent). (2) **Üben is now
+  always visible.** On desktop the aside is a **capped scroll container** (`lg:overflow-y-auto` +
+  `lg:max-h-[calc(100vh-22rem)]`) with the header `lg:sticky lg:top-0` and the Üben footer `lg:sticky
+  lg:bottom-0`, so the facet body scrolls and Üben stays on screen at every scroll position (verified across
+  800/900/1080 viewport heights). On mobile the tile has no footer; a new shared `StickyUebenBar` floats the
+  Üben button just above the bottom nav (`lg:hidden`, offset clears the 63px nav + safe area), always
+  reachable while scrolling. (The earlier flex-1 body-scroll attempt let the footer overflow past the clipped
+  aside; the aside-scroll + sticky-footer pattern is the fix.)
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.
