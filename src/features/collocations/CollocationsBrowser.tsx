@@ -14,6 +14,9 @@ import { HubHero } from "@/components/shared/HubHero";
 import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
+import { FilterRail } from "@/features/shared/FilterRail";
+import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
+import { CollocationTable, CollocationCompactList } from "./CollocationViews";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SubThemePicker } from "@/features/vocabulary/SubThemePicker";
 import { themeGroupsForMode } from "@/lib/themeGroups";
@@ -29,6 +32,10 @@ function normalise(s: string) {
 // finds every collocation that uses it.
 const COLLOCATION_FACETS = collocationFacets();
 const ALL_FACET_IDS = COLLOCATION_FACET_IDS;
+
+// Bibliothek views (session 91): the same filtered list as table, cards or
+// compact list. The graph stays Wörter-only.
+const KOLLOKATION_VIEWS: LibraryView[] = ["tabelle", "karten", "liste"];
 
 type Collocation = (typeof collocations)[number];
 
@@ -73,6 +80,7 @@ export function CollocationsBrowser() {
   const learningMode = useSettingsStore((s) => s.mode);
   const scope = useLibraryScope();
   const [showAllLevels, setShowAllLevels] = useState(false);
+  const [view, setView] = useViewParam(KOLLOKATION_VIEWS);
 
   const themeParam = params.get("theme") ?? "all";
   const sub = params.get("sub") ?? "";
@@ -206,6 +214,42 @@ export function CollocationsBrowser() {
     [learningMode, themeParam],
   );
 
+  const actions = (
+    <Button
+      size="sm"
+      variant="gradient"
+      className="h-10 shrink-0"
+      onClick={() => navigate(`/session${activeTheme ? `?theme=${activeTheme.id}` : ""}`)}
+    >
+      <Zap className="h-3.5 w-3.5" /> Üben
+    </Button>
+  );
+
+  const cardGrid = (
+    <>
+      {/* The remount key deliberately excludes the search term: re-keying
+          per query change remounted the entire grid on every search flush. */}
+      <motion.div
+        key={`${themeParam}__${sub}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${showAllLevels}`}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.15 }}
+        className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+      >
+        {visible.map((c) => (
+          <CollocationCard key={c.id} c={c} />
+        ))}
+      </motion.div>
+      {hasMore && (
+        <div ref={sentinelRef} className="flex justify-center pt-2">
+          <Button variant="outline" size="sm" onClick={showMore}>
+            Mehr anzeigen ({remaining} weitere)
+          </Button>
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="space-y-5">
       <HubHero
@@ -217,95 +261,101 @@ export function CollocationsBrowser() {
 
       <LibrarySwitcher />
 
-      <BrowseToolbar
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Suche nach Nomen, Verb, Übersetzung …"
-        primary={{ value: themeParam, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
-        facetItems={scoped}
-        facets={COLLOCATION_FACETS}
-        facetSelection={selection}
-        onFacetChange={setSelection}
-        resultLabel={(n) => `${n} Kollokation${n !== 1 ? "en" : ""} anzeigen`}
-        activeChips={activeChips}
-        onRemoveChip={removeFacetValue}
-        trailing={
-          <Button
-            size="sm"
-            variant="gradient"
-            className="h-10 shrink-0"
-            onClick={() => navigate(`/session${activeTheme ? `?theme=${activeTheme.id}` : ""}`)}
-          >
-            <Zap className="h-3.5 w-3.5" /> Üben
-          </Button>
-        }
-      />
+      {/* Desktop (lg+): content left, persistent filter rail right
+          (Bibliothek desktop layout, session 91). Mobile keeps the locked
+          toolbar + sheet pattern; the two never render together. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
+        <div className="min-w-0 space-y-4">
+          <div className="lg:hidden">
+            <BrowseToolbar
+              search={search}
+              onSearch={setSearch}
+              searchPlaceholder="Suche nach Nomen, Verb, Übersetzung …"
+              primary={{ value: themeParam, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
+              facetItems={scoped}
+              facets={COLLOCATION_FACETS}
+              facetSelection={selection}
+              onFacetChange={setSelection}
+              resultLabel={(n) => `${n} Kollokation${n !== 1 ? "en" : ""} anzeigen`}
+              activeChips={activeChips}
+              onRemoveChip={removeFacetValue}
+              trailing={actions}
+            />
+          </div>
 
-      {showPicker && activeTheme ? (
-        <SubThemePicker
-          theme={activeTheme}
-          onPick={(s) => setSub(s)}
-          onPickAll={() => setSub("all")}
-          totalLine={`Alle ${collocationsByTheme(activeTheme.id).length} Kollokationen auf einmal`}
-        />
-      ) : (
-      <>
-      {hasSubThemes && sub && (
-        <button
-          onClick={() => setSub("")}
-          className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ChevronLeft className="h-4 w-4" />
-          {activeTheme?.titleDe}
-          <span className="text-muted-foreground/60">/</span>
-          <span className="text-foreground">
-            {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
-          </span>
-        </button>
-      )}
+          <div className="flex flex-wrap items-center gap-2">
+            <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
+            <span className="text-sm tabular-nums text-muted-foreground">
+              {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
+            </span>
+            <div className="ml-auto hidden items-center gap-2 lg:flex">{actions}</div>
+          </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <p className="text-sm text-muted-foreground">
-          {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
-        </p>
-        {hiddenLabel && (
-          <ActiveFilterChip
-            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-            onRemove={() => setShowAllLevels(true)}
-          />
-        )}
-      </div>
-
-      {filtered.length === 0 ? (
-        <div className="py-16 text-center text-muted-foreground">
-          Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
-        </div>
-      ) : (
-        <>
-          {/* The remount key deliberately excludes the search term: re-keying
-              per query change remounted the entire grid on every search flush. */}
-          <motion.div
-            key={`${themeParam}__${sub}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${showAllLevels}`}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.15 }}
-            className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-          >
-            {visible.map((c) => (
-              <CollocationCard key={c.id} c={c} />
-            ))}
-          </motion.div>
-          {hasMore && (
-            <div ref={sentinelRef} className="flex justify-center pt-2">
-              <Button variant="outline" size="sm" onClick={showMore}>
-                Mehr anzeigen ({remaining} weitere)
-              </Button>
+          {hiddenLabel && (
+            <div className="flex flex-wrap items-center gap-2">
+              <ActiveFilterChip
+                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                onRemove={() => setShowAllLevels(true)}
+              />
             </div>
           )}
-        </>
-      )}
-      </>
-      )}
+
+          {showPicker && activeTheme ? (
+            <SubThemePicker
+              theme={activeTheme}
+              onPick={(s) => setSub(s)}
+              onPickAll={() => setSub("all")}
+              totalLine={`Alle ${collocationsByTheme(activeTheme.id).length} Kollokationen auf einmal`}
+            />
+          ) : (
+            <>
+              {hasSubThemes && sub && (
+                <button
+                  onClick={() => setSub("")}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  {activeTheme?.titleDe}
+                  <span className="text-muted-foreground/60">/</span>
+                  <span className="text-foreground">
+                    {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
+                  </span>
+                </button>
+              )}
+
+              {filtered.length === 0 ? (
+                <div className="py-16 text-center text-muted-foreground">
+                  Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+                </div>
+              ) : view === "tabelle" ? (
+                <CollocationTable items={filtered} />
+              ) : view === "liste" ? (
+                <CollocationCompactList items={filtered} />
+              ) : (
+                cardGrid
+              )}
+            </>
+          )}
+        </div>
+
+        <FilterRail
+          className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Suche nach Nomen, Verb, Übersetzung …"
+          primary={{
+            label: "Thema",
+            value: themeParam,
+            onChange: setTheme,
+            all: { value: "all", label: "Alle Themen", count: collocations.length },
+            groups: primaryGroups,
+          }}
+          items={scoped}
+          facets={COLLOCATION_FACETS}
+          selection={selection}
+          onChange={setSelection}
+        />
+      </div>
     </div>
   );
 }

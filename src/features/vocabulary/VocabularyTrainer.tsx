@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Layers, Sparkles, ChevronLeft, BookOpenText, Zap, Bookmark } from "lucide-react";
@@ -11,6 +11,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { HubHero } from "@/components/shared/HubHero";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
+import { FilterRail } from "@/features/shared/FilterRail";
+import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { applyFacets, ActiveFilterChip, type FacetDef, type FacetSelection } from "@/features/shared/FacetSheet";
 import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
@@ -21,7 +23,15 @@ import { cn } from "@/lib/utils";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
 import { VocabList } from "./VocabList";
+import { VocabTable, VocabCompactList } from "./VocabViews";
 import { SubThemePicker } from "./SubThemePicker";
+
+// The graph view carries d3-force and the canvas renderer; it loads only when
+// someone actually opens it (Bibliothek views, session 91).
+const WordGraph = lazy(() => import("./WordGraph"));
+
+// Mockup order: Tabelle · Graph · Karten · Liste. Only Wörter has the graph.
+const WOERTER_VIEWS: LibraryView[] = ["tabelle", "graph", "karten", "liste"];
 
 function normalise(s: string) {
   return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
@@ -50,6 +60,7 @@ export function VocabularyTrainer() {
   const [mode, setMode] = useState("flashcards");
   const [search, setSearch] = useState("");
   const [showAllLevels, setShowAllLevels] = useState(false);
+  const [view, setView] = useViewParam(WOERTER_VIEWS);
 
   // Tier-2 travelling scope: when arriving without an explicit theme (e.g. via
   // the bottom bar), inherit the shared library scope so the learner's context
@@ -207,6 +218,82 @@ export function VocabularyTrainer() {
     [learningMode, theme],
   );
 
+  const actions = (
+    <>
+      <Button
+        size="sm"
+        variant={savedActive ? "default" : "outline"}
+        aria-pressed={savedActive}
+        className="h-10 shrink-0"
+        onClick={toggleSaved}
+      >
+        <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
+        Gespeichert
+        {savedWords.length > 0 && (
+          <span className="text-xs opacity-70">({savedWords.length})</span>
+        )}
+      </Button>
+      <Button
+        size="sm"
+        variant="gradient"
+        className="h-10 shrink-0"
+        onClick={() => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`)}
+      >
+        <Zap className="h-3.5 w-3.5" /> Üben
+      </Button>
+    </>
+  );
+
+  // The sub-theme picker replaces the card/table/list content, but never the
+  // graph: the graph is at its best over the whole theme.
+  const showPickerNow = showPicker && view !== "graph";
+
+  const listContent = SHOW_PRACTICE_TABS ? (
+    <Tabs value={mode} onValueChange={setMode}>
+      <TabsList className="flex-wrap">
+        <TabsTrigger value="flashcards">
+          <Layers className="h-4 w-4" /> Karteikarten
+        </TabsTrigger>
+        <TabsTrigger value="quiz">
+          <Sparkles className="h-4 w-4" /> Quiz
+        </TabsTrigger>
+        <TabsTrigger value="list">
+          <BookOpen className="h-4 w-4" /> Übersicht
+        </TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="flashcards">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
+        </motion.div>
+      </TabsContent>
+      <TabsContent value="quiz">
+        <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
+      </TabsContent>
+      <TabsContent value="list">
+        <VocabList items={items} />
+      </TabsContent>
+    </Tabs>
+  ) : savedActive && items.length === 0 ? (
+    <p className="rounded-lg border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-muted-foreground">
+      Noch keine gespeicherten Wörter. Tippe das Lesezeichen an einem Wort.
+    </p>
+  ) : view === "tabelle" ? (
+    <VocabTable items={items} />
+  ) : view === "liste" ? (
+    <VocabCompactList items={items} />
+  ) : view === "graph" ? (
+    <Suspense
+      fallback={
+        <div className="h-[60dvh] min-h-[420px] animate-pulse rounded-xl border border-border bg-surface" />
+      }
+    >
+      <WordGraph items={items} />
+    </Suspense>
+  ) : (
+    <VocabList items={items} />
+  );
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <HubHero
@@ -218,114 +305,94 @@ export function VocabularyTrainer() {
 
       <LibrarySwitcher />
 
-      <BrowseToolbar
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Suche nach Wort, Übersetzung …"
-        primary={{ value: theme, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
-        facetItems={searched}
-        facets={facets}
-        facetSelection={selection}
-        onFacetChange={setSelection}
-        resultLabel={(n) => `${n} Wort${n !== 1 ? "e" : ""} anzeigen`}
-        activeChips={activeChips}
-        onRemoveChip={removeFacetValue}
-        trailing={
-          <>
-            <Button
-              size="sm"
-              variant={savedActive ? "default" : "outline"}
-              aria-pressed={savedActive}
-              className="h-10 shrink-0"
-              onClick={toggleSaved}
-            >
-              <Bookmark className={cn("h-3.5 w-3.5", savedActive && "fill-current")} />
-              Gespeichert
-              {savedWords.length > 0 && (
-                <span className="text-xs opacity-70">({savedWords.length})</span>
-              )}
-            </Button>
-            <Button
-              size="sm"
-              variant="gradient"
-              className="h-10 shrink-0"
-              onClick={() => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`)}
-            >
-              <Zap className="h-3.5 w-3.5" /> Üben
-            </Button>
-          </>
-        }
-      />
+      {/* Desktop (lg+) is a two-column layout: content left, persistent
+          filter rail right (Bibliothek desktop layout, session 91, from the
+          founder's mockup). Mobile keeps the locked toolbar + sheet pattern;
+          the two never render together. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
+        <div className="min-w-0 space-y-4">
+          <div className="lg:hidden">
+            <BrowseToolbar
+              search={search}
+              onSearch={setSearch}
+              searchPlaceholder="Suche nach Wort, Übersetzung …"
+              primary={{ value: theme, onChange: setTheme, options: primaryOptions, groups: primaryGroups }}
+              facetItems={searched}
+              facets={facets}
+              facetSelection={selection}
+              onFacetChange={setSelection}
+              resultLabel={(n) => `${n} ${n === 1 ? "Wort" : "Wörter"} anzeigen`}
+              activeChips={activeChips}
+              onRemoveChip={removeFacetValue}
+              trailing={actions}
+            />
+          </div>
 
-      {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
-          dropdown already shows the active theme, so the chip was redundant.
-          The silent level-band cut now shows as an explicit removable chip. */}
-      {hiddenLabel && (
-        <div className="flex flex-wrap items-center gap-2">
-          <ActiveFilterChip
-            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-            onRemove={() => setShowAllLevels(true)}
-          />
-        </div>
-      )}
+          <div className="flex flex-wrap items-center gap-2">
+            <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
+            <span className="text-sm tabular-nums text-muted-foreground">
+              {items.length} {items.length === 1 ? "Wort" : "Wörter"}
+            </span>
+            <div className="ml-auto hidden items-center gap-2 lg:flex">{actions}</div>
+          </div>
 
-      {showPicker && activeTheme ? (
-        <SubThemePicker
-          theme={activeTheme}
-          onPick={(s) => setSub(s)}
-          onPickAll={() => setSub("all")}
-        />
-      ) : (
-        <>
-          {hasSubThemes && sub && (
-            <button
-              onClick={() => setSub("")}
-              className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              {activeTheme?.titleDe}
-              <span className="text-muted-foreground/60">/</span>
-              <span className="text-foreground">
-                {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
-              </span>
-            </button>
+          {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
+              dropdown already shows the active theme, so the chip was redundant.
+              The silent level-band cut now shows as an explicit removable chip. */}
+          {hiddenLabel && (
+            <div className="flex flex-wrap items-center gap-2">
+              <ActiveFilterChip
+                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                onRemove={() => setShowAllLevels(true)}
+              />
+            </div>
           )}
 
-          {SHOW_PRACTICE_TABS ? (
-            <Tabs value={mode} onValueChange={setMode}>
-              <TabsList className="flex-wrap">
-                <TabsTrigger value="flashcards">
-                  <Layers className="h-4 w-4" /> Karteikarten
-                </TabsTrigger>
-                <TabsTrigger value="quiz">
-                  <Sparkles className="h-4 w-4" /> Quiz
-                </TabsTrigger>
-                <TabsTrigger value="list">
-                  <BookOpen className="h-4 w-4" /> Übersicht
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="flashcards">
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                  <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
-                </motion.div>
-              </TabsContent>
-              <TabsContent value="quiz">
-                <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
-              </TabsContent>
-              <TabsContent value="list">
-                <VocabList items={items} />
-              </TabsContent>
-            </Tabs>
-          ) : savedActive && items.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-muted-foreground">
-              Noch keine gespeicherten Wörter. Tippe das Lesezeichen an einem Wort.
-            </p>
+          {showPickerNow && activeTheme ? (
+            <SubThemePicker
+              theme={activeTheme}
+              onPick={(s) => setSub(s)}
+              onPickAll={() => setSub("all")}
+            />
           ) : (
-            <VocabList items={items} />
+            <>
+              {hasSubThemes && sub && (
+                <button
+                  onClick={() => setSub("")}
+                  className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  {activeTheme?.titleDe}
+                  <span className="text-muted-foreground/60">/</span>
+                  <span className="text-foreground">
+                    {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
+                  </span>
+                </button>
+              )}
+
+              {listContent}
+            </>
           )}
-        </>
-      )}
+        </div>
+
+        <FilterRail
+          className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Suche nach Wort, Übersetzung …"
+          primary={{
+            label: "Thema",
+            value: theme,
+            onChange: setTheme,
+            all: { value: "all", label: "Alle Themen", count: vocabulary.length },
+            groups: primaryGroups,
+          }}
+          items={searched}
+          facets={facets}
+          selection={selection}
+          onChange={setSelection}
+        />
+      </div>
     </div>
   );
 }

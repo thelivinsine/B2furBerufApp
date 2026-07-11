@@ -8,8 +8,12 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ActiveFilterChip } from "@/features/shared/FacetSheet";
+import { ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
 import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
+import { FilterRail } from "@/features/shared/FilterRail";
+import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
+import { redemittelFacets } from "@/lib/facets";
+import { RedemittelTable, RedemittelCompactList } from "./RedemittelViews";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { HubHero } from "@/components/shared/HubHero";
@@ -33,6 +37,11 @@ const REGISTER_CHIPS = [
   { value: "formal", label: "formell" },
 ] as const;
 
+// Bibliothek views (session 91): the card view keeps its category sections;
+// Tabelle and Liste are flat lenses over the same filtered list.
+const REDEMITTEL_VIEWS: LibraryView[] = ["tabelle", "karten", "liste"];
+const REDEMITTEL_FACETS = redemittelFacets();
+
 // The old in-page Wendungen/Üben tabs are gone (audit 2026-07-09): focused
 // practice flows through the trailing "Üben" button into the composed
 // session, matching Wörter and Kollokationen. RedemittelPractice stays in
@@ -43,6 +52,7 @@ export function RedemittelTrainer() {
   const [search, setSearch] = useState("");
   const level = useSettingsStore((s) => s.level);
   const [showAllLevels, setShowAllLevels] = useState(false);
+  const [view, setView] = useViewParam(REDEMITTEL_VIEWS);
 
   const category = params.get("cat") ?? "all";
   const registerSel = useMemo(() => {
@@ -93,16 +103,32 @@ export function RedemittelTrainer() {
 
   // ONE filter pipeline: category scope -> level band -> search -> register.
   // (The per-category re-filtering that used to live in the render path is
-  // gone; sections below just partition this list.)
-  const filtered = useMemo(() => {
-    let list = bandLimited;
-    if (search.trim()) {
-      const q = normalise(search.trim());
-      list = list.filter((p) => normalise(p.de).includes(q) || normalise(p.en).includes(q));
-    }
-    if (registerSel.length) list = list.filter((p) => registerSel.includes(p.register));
-    return list;
-  }, [bandLimited, search, registerSel]);
+  // gone; sections below just partition this list.) `searched` (pre-register)
+  // feeds the FilterRail so its Register counts reflect what a tap yields.
+  const searched = useMemo(() => {
+    if (!search.trim()) return bandLimited;
+    const q = normalise(search.trim());
+    return bandLimited.filter((p) => normalise(p.de).includes(q) || normalise(p.en).includes(q));
+  }, [bandLimited, search]);
+
+  const filtered = useMemo(
+    () => (registerSel.length ? searched.filter((p) => registerSel.includes(p.register)) : searched),
+    [searched, registerSel],
+  );
+
+  const railSelection = useMemo(() => {
+    const s: FacetSelection = {};
+    if (registerSel.length) s.register = registerSel;
+    return s;
+  }, [registerSel]);
+
+  const setRailSelection = (next: FacetSelection) => {
+    const values = next.register ?? [];
+    const p = new URLSearchParams(params);
+    if (values.length) p.set("register", values.join(","));
+    else p.delete("register");
+    setParams(p, { replace: true });
+  };
 
   const primaryOptions = [
     { value: "all", label: "Alle Kategorien", count: redemittel.length },
@@ -118,69 +144,18 @@ export function RedemittelTrainer() {
       ? redemittelCategories
       : redemittelCategories.filter((c) => c.id === category);
 
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <HubHero
-        icon={MessageSquareText}
-        gradient="from-emerald-500 to-teal-500"
-        eyebrow="Redemittel"
-        title="Redemittel-Training"
-      />
+  const actions = (
+    <Button
+      size="sm"
+      variant="gradient"
+      className="h-10 shrink-0"
+      onClick={() => navigate("/session")}
+    >
+      <Zap className="h-3.5 w-3.5" /> Üben
+    </Button>
+  );
 
-      <LibrarySwitcher />
-
-      <BrowseToolbar
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Suche nach Wendung, Übersetzung …"
-        primary={{ value: category, onChange: setCategory, options: primaryOptions }}
-        facetItems={filtered}
-        facets={[]}
-        facetSelection={{}}
-        onFacetChange={() => {}}
-        resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
-        activeChips={[]}
-        onRemoveChip={() => {}}
-        trailing={
-          <Button
-            size="sm"
-            variant="gradient"
-            className="h-10 shrink-0"
-            onClick={() => navigate("/session")}
-          >
-            <Zap className="h-3.5 w-3.5" /> Üben
-          </Button>
-        }
-      />
-
-      <div className="flex flex-wrap items-center gap-2">
-        {REGISTER_CHIPS.map((chip) => {
-          const active = registerSel.includes(chip.value);
-          return (
-            <button
-              key={chip.value}
-              onClick={() => toggleRegister(chip.value)}
-              aria-pressed={active}
-              className={cn(
-                "inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
-                active
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
-              )}
-            >
-              {chip.label}
-            </button>
-          );
-        })}
-        {bandActive && bandHiddenCount > 0 && (
-          <ActiveFilterChip
-            label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
-            onRemove={() => setShowAllLevels(true)}
-          />
-        )}
-      </div>
-
-      {categoriesToRender.map((cat) => {
+  const cardSections = categoriesToRender.map((cat) => {
         const Icon = iconByName(cat.icon);
         const phrases = filtered.filter((p) => p.category === cat.id);
         if (phrases.length === 0) return null;
@@ -226,13 +201,113 @@ export function RedemittelTrainer() {
             </div>
           </section>
         );
-      })}
+      });
 
-      {filtered.length === 0 && (
-        <div className="py-16 text-center text-muted-foreground">
-          Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <HubHero
+        icon={MessageSquareText}
+        gradient="from-emerald-500 to-teal-500"
+        eyebrow="Redemittel"
+        title="Redemittel-Training"
+      />
+
+      <LibrarySwitcher />
+
+      {/* Desktop (lg+): content left, persistent filter rail right
+          (Bibliothek desktop layout, session 91). Mobile keeps the locked
+          toolbar + inline register chips; the two never render together. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-8">
+        <div className="min-w-0 space-y-4">
+          <div className="lg:hidden">
+            <BrowseToolbar
+              search={search}
+              onSearch={setSearch}
+              searchPlaceholder="Suche nach Wendung, Übersetzung …"
+              primary={{ value: category, onChange: setCategory, options: primaryOptions }}
+              facetItems={filtered}
+              facets={[]}
+              facetSelection={{}}
+              onFacetChange={() => {}}
+              resultLabel={(n) => `${n} Wendung${n !== 1 ? "en" : ""} anzeigen`}
+              activeChips={[]}
+              onRemoveChip={() => {}}
+              trailing={actions}
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
+            <span className="text-sm tabular-nums text-muted-foreground">
+              {filtered.length} Wendung{filtered.length !== 1 ? "en" : ""}
+            </span>
+            <div className="ml-auto hidden items-center gap-2 lg:flex">{actions}</div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Register is a rail group on desktop; the inline chips stay mobile-only. */}
+            <div className="flex flex-wrap items-center gap-2 lg:hidden">
+              {REGISTER_CHIPS.map((chip) => {
+                const active = registerSel.includes(chip.value);
+                return (
+                  <button
+                    key={chip.value}
+                    onClick={() => toggleRegister(chip.value)}
+                    aria-pressed={active}
+                    className={cn(
+                      "inline-flex items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
+                    )}
+                  >
+                    {chip.label}
+                  </button>
+                );
+              })}
+            </div>
+            {bandActive && bandHiddenCount > 0 && (
+              <ActiveFilterChip
+                label={`Stufe: bis ${visibleBands[visibleBands.length - 1]}`}
+                onRemove={() => setShowAllLevels(true)}
+              />
+            )}
+          </div>
+
+          {filtered.length > 0 &&
+            (view === "tabelle" ? (
+              <RedemittelTable items={filtered} />
+            ) : view === "liste" ? (
+              <RedemittelCompactList items={filtered} />
+            ) : (
+              cardSections
+            ))}
+
+          {filtered.length === 0 && (
+            <div className="py-16 text-center text-muted-foreground">
+              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+            </div>
+          )}
         </div>
-      )}
+
+        <FilterRail
+          className="hidden lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto lg:pr-1"
+          search={search}
+          onSearch={setSearch}
+          searchPlaceholder="Suche nach Wendung, Übersetzung …"
+          primary={{
+            label: "Kategorie",
+            value: category,
+            onChange: setCategory,
+            all: { value: "all", label: "Alle Kategorien", count: redemittel.length },
+            options: primaryOptions.slice(1),
+          }}
+          items={searched}
+          facets={REDEMITTEL_FACETS}
+          selection={railSelection}
+          onChange={setRailSelection}
+        />
+      </div>
     </div>
   );
 }
