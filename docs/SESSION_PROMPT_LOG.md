@@ -3106,3 +3106,35 @@ Branch: `claude/whats-next-esga9u`.
   realigned. Updated CLAUDE.md + the s90 handoff (both-icons-fill).
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx` (commit `211b5b4`, PR #421 squash `be4c40b`);
   `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 303 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > make sure to adapt the current start page design to be compatible with desktop site as well
+- **Response summary:** Screenshotted the Heute start page at desktop width (1280) and confirmed it rendered
+  as a narrow phone-width column stranded center-screen with large empty side margins. Since "compatible
+  with desktop" could mean a few different layouts and the founder has iterated carefully on this page,
+  tried to ask a clarifying question (centered column vs two-column vs wide single column); the question tool
+  failed to deliver, so I began implementing the most faithful default (centered column) but paused for the
+  founder's pick (next entry). No code shipped under this prompt.
+- **Artifacts:** none (investigation + screenshots).
+
+## Entry 304 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > go with the second option you suggested - two column
+- **Response summary:** Implemented the desktop two-column start-page layout (`lg`), mobile + `/welt`
+  unchanged. Dashboard tab-content widened to `lg:max-w-4xl`; `UebenPath` → `lg:grid lg:grid-cols-2` (map |
+  card+pager, vertically centered); `NeulandHub` (compact only) → hero | checklist two columns with the
+  `max-w-lg` cap dropped on `lg` and the checklist un-cropped (`lg:!h-auto`, all 6 rows). Content stays
+  top-aligned so the tile doesn't jump on tab toggle. Fixed the initial Spielen-hero-cramped bug (the inner
+  `max-w-lg` was clamping the columns). Verified desktop + mobile + `/welt` via Playwright; gates green
+  (lint 0, unit 99/99, bundle 72.7 kB). Shipped as PR #423, squash-merged; branch realigned. Updated
+  CLAUDE.md + the s90 handoff.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx`,
+  `src/features/welt/NeulandHub.tsx` (commit `86802e0`, PR #423 squash `c0d23a5`); `CLAUDE.md`,
+  `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
