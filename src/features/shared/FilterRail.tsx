@@ -17,6 +17,7 @@ import {
   activeFacetCount,
 } from "@/features/shared/FacetSheet";
 import { SearchField } from "@/features/shared/SearchField";
+import { Button } from "@/components/ui/button";
 import type { PrimaryGroup, PrimaryOption } from "@/features/shared/BrowseToolbar";
 
 /**
@@ -375,13 +376,35 @@ export function FilterRail<T>({
       {footer && (
         <div
           className={cn(
-            "sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 rounded-b-xl border-t border-muted-foreground/10 bg-border p-3 lg:bottom-0 lg:rounded-none",
+            "sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 flex items-center gap-2 rounded-b-xl border-t border-muted-foreground/10 bg-border p-3 lg:bottom-0 lg:rounded-none",
             // Headerless + collapsed + no pinned sections: the footer is the
             // whole tile, so round its top too and drop the divider.
             hideHeader && !open && !showPinnedBody && "rounded-t-xl border-t-0",
           )}
         >
-          {footer}
+          {/* Headerless (mobile) tile: the Filter toggle lives here, to the
+              left of the Üben button, so both actions sit inside the tile.
+              Desktop keeps its labelled header instead. */}
+          {hideHeader && (
+            <Button
+              type="button"
+              size="icon"
+              variant={open ? "default" : "outline"}
+              aria-expanded={open}
+              aria-label="Filter"
+              title="Filter"
+              className="relative h-10 w-10 shrink-0"
+              onClick={() => setOpen(!open)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+                  {activeCount}
+                </span>
+              )}
+            </Button>
+          )}
+          <div className="min-w-0 flex-1">{footer}</div>
         </div>
       )}
     </aside>
