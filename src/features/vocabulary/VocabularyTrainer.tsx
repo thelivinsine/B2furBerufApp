@@ -389,18 +389,17 @@ export function VocabularyTrainer() {
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          {/* Toolbar + search + Üben/count share ONE width on mobile: the
-              wrapper is w-fit (so it hugs the widest row, the toolbar), and the
-              Üben row stretches to that width, so Üben + count together span
-              exactly the Filter/view/bookmark/search controls above. Desktop
-              drops the sizing (w-full) and keeps Üben/count in the rail. */}
-          <div className="mx-auto flex w-fit flex-col gap-2 lg:mx-0 lg:w-full">
+          {/* Toolbar + search + Üben/count, grouped and full-width on mobile:
+              Filter + view on the left, bookmark/search pushed right; Üben fills
+              its row with the count at the far right. Desktop keeps Üben/count
+              in the rail. */}
+          <div className="flex w-full flex-col gap-2">
             {/* Toolbar row: Filter toggle (mobile, left of the view icons) + view
                 switcher + bookmark/search on the right. */}
-            <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            <div className="flex w-full items-center justify-between gap-2">
               {filterButton}
               <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
-              <div className="flex items-center gap-2 lg:ml-auto">
+              <div className="flex items-center gap-2">
                 {savedButton}
                 {searchButton}
               </div>

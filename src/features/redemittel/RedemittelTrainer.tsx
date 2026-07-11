@@ -214,11 +214,10 @@ export function RedemittelTrainer() {
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
-          {/* Toolbar + search + Üben/count share ONE width on mobile (see
-              Wörter): the wrapper hugs the toolbar and the Üben row stretches to
-              match it. Desktop drops the sizing and keeps Üben/count in the rail. */}
-          <div className="mx-auto flex w-fit flex-col gap-2 lg:mx-0 lg:w-full">
-            <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+          {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
+              Wörter). Desktop keeps Üben/count in the rail. */}
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full items-center justify-between gap-2">
               {/* Mobile filter toggle, left of the view icons (founder s92). */}
               <Button
                 size="icon"
@@ -238,7 +237,7 @@ export function RedemittelTrainer() {
                 )}
               </Button>
               <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
-              <div className="flex items-center gap-2 lg:ml-auto">
+              <div className="flex items-center gap-2">
                 <Button
                   size="icon"
                   variant={searchOpen || search.trim() ? "default" : "outline"}
