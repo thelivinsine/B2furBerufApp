@@ -84,12 +84,16 @@ function SectionHeader({
   eyebrow,
   pinned,
   onTogglePin,
+  pinnable = true,
 }: {
   label: string;
   /** Render the label in the quiet uppercase facet style. */
   eyebrow?: boolean;
   pinned: boolean;
   onTogglePin: () => void;
+  /** Pins keep a section visible while the rail is collapsed; the mobile panel
+   *  has no collapse, so it hides them. */
+  pinnable?: boolean;
 }) {
   return (
     <div className="mb-2 flex items-center justify-between gap-2">
@@ -102,6 +106,7 @@ function SectionHeader({
       >
         {label}
       </span>
+      {pinnable && (
       <button
         onClick={onTogglePin}
         aria-pressed={pinned}
@@ -114,6 +119,7 @@ function SectionHeader({
       >
         <Pin className={cn("h-3.5 w-3.5", pinned && "fill-current")} />
       </button>
+      )}
     </div>
   );
 }
@@ -131,6 +137,7 @@ export function FilterRail<T>({
   open: controlledOpen,
   onOpenChange,
   hideHeader = false,
+  layout = "rail",
   className,
 }: {
   primary?: RailPrimary;
@@ -155,6 +162,14 @@ export function FilterRail<T>({
   /** Hide the built-in "Filter" header/toggle row. Mobile passes this because
    *  the toggle lives inside the tile (top when open, footer when collapsed). */
   hideHeader?: boolean;
+  /**
+   * "rail" (default, desktop): the full persistent rail with header, footer
+   * (Üben), count and collapse/pin behavior. "panel" (mobile): a body-only grey
+   * tile with just the Thema dropdown + facets, meant to be mounted/unmounted
+   * with a slide by the caller. The toolbar owns the toggle, Üben and count, so
+   * none of footer/count/open/hideHeader/pins apply here.
+   */
+  layout?: "rail" | "panel";
   className?: string;
 }) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -223,12 +238,15 @@ export function FilterRail<T>({
     };
   }, [items, facets, selection]);
 
+  const panel = layout === "panel";
+
   const primarySection = primary ? (
     <section>
       <SectionHeader
         label={primary.label}
         pinned={pins.includes("primary")}
         onTogglePin={() => togglePin("primary")}
+        pinnable={!panel}
       />
       {/* Dropdown (founder follow-up): the primary scope (Thema/Kategorie) is
           a Select, not an always-open row list, so the facet groups below
@@ -266,6 +284,7 @@ export function FilterRail<T>({
         eyebrow
         pinned={pins.includes(facet.id)}
         onTogglePin={() => togglePin(facet.id)}
+        pinnable={!panel}
       />
       <div className="flex flex-wrap gap-1.5">
         {facet.options.map((opt) => {
@@ -307,6 +326,43 @@ export function FilterRail<T>({
 
   const pinnedFacets = facets.filter((f) => pins.includes(f.id));
   const showPinnedBody = !open && ((primary && pins.includes("primary")) || pinnedFacets.length > 0);
+
+  // The filter controls proper (Thema/Kategorie + facet pills + reset), shared
+  // by the desktop rail's open body and the mobile panel.
+  const filterBody = (
+    <>
+      {primarySection}
+      {facets.length > 0 && (
+        <div className="space-y-5">
+          {activeCount > 0 && (
+            <div className="flex justify-end">
+              <button
+                onClick={() => onChange({})}
+                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+              >
+                Zurücksetzen
+              </button>
+            </div>
+          )}
+          {facets.map(facetSection)}
+        </div>
+      )}
+    </>
+  );
+
+  // Mobile panel: a body-only grey tile. The toolbar owns the toggle, Üben and
+  // count; the caller mounts/unmounts this with a slide.
+  if (panel) {
+    return (
+      <div
+        role="region"
+        aria-label="Filter"
+        className={cn("space-y-5 rounded-xl border border-border bg-border p-3", className)}
+      >
+        {filterBody}
+      </div>
+    );
+  }
 
   return (
     <aside
@@ -367,25 +423,7 @@ export function FilterRail<T>({
             </div>
           )}
 
-          {primarySection}
-
-          {facets.length > 0 && (
-            <div className="space-y-5">
-              {/* The tile header already says "Filter"; only the reset action lives here. */}
-              {activeCount > 0 && (
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => onChange({})}
-                    className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    Zurücksetzen
-                  </button>
-                </div>
-              )}
-
-              {facets.map(facetSection)}
-            </div>
-          )}
+          {filterBody}
         </div>
       )}
 

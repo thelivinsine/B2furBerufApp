@@ -1,7 +1,16 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { BookOpen, Layers, Sparkles, ChevronLeft, Zap, Bookmark, Search } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import {
+  BookOpen,
+  Layers,
+  Sparkles,
+  ChevronLeft,
+  Zap,
+  Bookmark,
+  Search,
+  SlidersHorizontal,
+} from "lucide-react";
 import { themeById } from "@/data/themes";
 import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -14,7 +23,13 @@ import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch, foldText } from "@/lib/fuzzy";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
-import { applyFacets, ActiveFilterChip, type FacetDef, type FacetSelection } from "@/features/shared/FacetSheet";
+import {
+  applyFacets,
+  ActiveFilterChip,
+  activeFacetCount,
+  type FacetDef,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
 import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
 import { themeGroupsForMode } from "@/lib/themeGroups";
 import { mastery, masteryLabel } from "@/engine/srs";
@@ -65,6 +80,7 @@ export function VocabularyTrainer() {
   // search icon toggles open. Closing clears it, so it never lingers as a hidden
   // filter. It starts open if the page was deep-linked with a query.
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
+  const reduce = useReducedMotion();
 
   // Tier-2 travelling scope: when arriving without an explicit theme (e.g. via
   // the bottom bar), inherit the shared library scope so the learner's context
@@ -257,6 +273,29 @@ export function VocabularyTrainer() {
     </Button>
   );
 
+  // Mobile filter toggle: sits at the LEFT of the view switcher (founder s92).
+  // Desktop uses the persistent rail instead, so this is mobile-only.
+  const facetCount = activeFacetCount(selection);
+  const filterButton = (
+    <Button
+      size="icon"
+      variant={filtersOpen ? "default" : "outline"}
+      aria-pressed={filtersOpen}
+      aria-expanded={filtersOpen}
+      aria-label="Filter"
+      title="Filter"
+      className="relative shrink-0 lg:hidden"
+      onClick={() => setFiltersOpen((o) => !o)}
+    >
+      <SlidersHorizontal className="h-4 w-4" />
+      {facetCount > 0 && (
+        <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+          {facetCount}
+        </span>
+      )}
+    </Button>
+  );
+
   // The filter tile is now the single filter surface on BOTH breakpoints
   // (founder follow-up, s91): the desktop rail and the mobile tile share
   // these props; only className + defaultOpen differ.
@@ -350,9 +389,11 @@ export function VocabularyTrainer() {
         <div className="space-y-4 lg:col-start-1 lg:row-start-1">
           <LibrarySwitcher />
 
+          {/* Toolbar row: Filter toggle (mobile, left of the view icons) + view
+              switcher + bookmark/search on the right. */}
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            {filterButton}
             <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
-            {/* The word count moved into the tile footer (right of Üben). */}
             <div className="flex items-center gap-2 lg:ml-auto">
               {savedButton}
               {searchButton}
@@ -371,6 +412,40 @@ export function VocabularyTrainer() {
             />
           )}
 
+          {/* Mobile-only: Üben is a standalone button below the toolbar, with the
+              plain word count under it (no grey tile). Desktop keeps Üben + count
+              inside the rail. */}
+          <Button
+            variant="gradient"
+            className="h-11 w-full lg:hidden"
+            onClick={startSession}
+          >
+            <Zap className="h-4 w-4" /> Üben
+          </Button>
+          {view !== "graph" && (
+            <p className="text-center text-sm tabular-nums text-muted-foreground lg:hidden">
+              {items.length} {items.length === 1 ? "Wort" : "Wörter"}
+            </p>
+          )}
+
+          {/* Mobile filter panel: slides open below the count, closed by default.
+              Body-only grey tile (Thema + facets); the toggle/Üben/count live in
+              the toolbar above. Desktop uses the persistent rail in col 2. */}
+          <AnimatePresence initial={false}>
+            {filtersOpen && (
+              <motion.div
+                key="filter-panel"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+                className="overflow-hidden lg:hidden"
+              >
+                <FilterRail {...filterRailProps} layout="panel" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
               dropdown already shows the active theme, so the chip was redundant.
               The silent level-band cut now shows as an explicit removable chip. */}
@@ -383,19 +458,6 @@ export function VocabularyTrainer() {
             </div>
           )}
         </div>
-
-        {/* Mobile shows the SAME filter tile with Üben in its footer (founder
-            follow-up, s91): it is a grid child (so its sticky containing block
-            spans the card list), pinned just below the app header and capped,
-            so the tile — and the Üben button in it — stays visible while
-            scrolling. Desktop renders its own sticky rail in col 2. */}
-        <FilterRail
-          {...filterRailProps}
-          hideHeader
-          open={filtersOpen}
-          onOpenChange={setFiltersOpen}
-          className="lg:hidden"
-        />
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {showPickerNow && activeTheme ? (

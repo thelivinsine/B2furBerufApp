@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ChevronLeft, Zap, Search } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { ChevronLeft, Zap, Search, SlidersHorizontal } from "lucide-react";
 import { collocations, collocationsByTheme } from "@/data/collocations";
 import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -10,7 +10,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
-import { applyFacets, ActiveFilterChip, type FacetSelection } from "@/features/shared/FacetSheet";
+import {
+  applyFacets,
+  ActiveFilterChip,
+  activeFacetCount,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
 import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { SearchField } from "@/features/shared/SearchField";
@@ -85,6 +90,7 @@ export function CollocationsBrowser() {
   const search = params.get("q") ?? "";
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
+  const reduce = useReducedMotion();
 
   // Tier-2 travelling scope: inherit the shared library scope when arriving
   // without an explicit theme; URL params still override for deep links.
@@ -262,6 +268,24 @@ export function CollocationsBrowser() {
           <LibrarySwitcher />
 
           <div className="flex flex-wrap items-center justify-center gap-2 lg:justify-start">
+            {/* Mobile filter toggle, left of the view icons (founder s92). */}
+            <Button
+              size="icon"
+              variant={filtersOpen ? "default" : "outline"}
+              aria-pressed={filtersOpen}
+              aria-expanded={filtersOpen}
+              aria-label="Filter"
+              title="Filter"
+              className="relative shrink-0 lg:hidden"
+              onClick={() => setFiltersOpen((o) => !o)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              {activeFacetCount(selection) > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+                  {activeFacetCount(selection)}
+                </span>
+              )}
+            </Button>
             <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
             <div className="flex items-center gap-2 lg:ml-auto">
               <Button
@@ -294,6 +318,30 @@ export function CollocationsBrowser() {
             />
           )}
 
+          {/* Mobile-only: standalone Üben + plain count, then the sliding filter
+              panel. Desktop keeps Üben/count inside the rail in col 2. */}
+          <Button variant="gradient" className="h-11 w-full lg:hidden" onClick={startSession}>
+            <Zap className="h-4 w-4" /> Üben
+          </Button>
+          <p className="text-center text-sm tabular-nums text-muted-foreground lg:hidden">
+            {filtered.length} Kollokation{filtered.length !== 1 ? "en" : ""}
+          </p>
+
+          <AnimatePresence initial={false}>
+            {filtersOpen && (
+              <motion.div
+                key="filter-panel"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+                className="overflow-hidden lg:hidden"
+              >
+                <FilterRail {...filterRailProps} layout="panel" />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           {hiddenLabel && (
             <div className="flex flex-wrap items-center gap-2">
               <ActiveFilterChip
@@ -303,18 +351,6 @@ export function CollocationsBrowser() {
             </div>
           )}
         </div>
-
-        {/* Mobile filter tile with Üben in its footer (founder follow-up, s91):
-            a grid child so its sticky containing block spans the card list,
-            pinned below the app header + capped, so Üben stays visible while
-            scrolling. Desktop renders its own sticky rail in col 2. */}
-        <FilterRail
-          {...filterRailProps}
-          hideHeader
-          open={filtersOpen}
-          onOpenChange={setFiltersOpen}
-          className="lg:hidden"
-        />
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {showPicker && activeTheme ? (

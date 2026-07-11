@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom";
+import { motion, useReducedMotion } from "framer-motion";
 import { Table2, Waypoints, LayoutGrid, List } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -50,12 +51,15 @@ export function ViewSwitcher({
   onChange: (view: LibraryView) => void;
   className?: string;
 }) {
+  const reduce = useReducedMotion();
   return (
     <div
       role="group"
       aria-label="Ansicht"
       className={cn(
-        "inline-flex shrink-0 items-center gap-0.5 rounded-lg border border-border bg-surface p-0.5",
+        // Same lifted-white-pill toggle language as the page toggle
+        // (LibrarySwitcher): recessed grey track, active button on a white pill.
+        "inline-flex shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5",
         className,
       )}
     >
@@ -70,13 +74,20 @@ export function ViewSwitcher({
             aria-label={label}
             title={label}
             className={cn(
-              "inline-flex h-8 w-9 items-center justify-center rounded-md transition-colors",
-              active
-                ? "bg-primary text-primary-foreground shadow-soft"
-                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+              "relative inline-flex h-8 w-9 items-center justify-center rounded-md transition-colors",
+              active ? "text-primary" : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <Icon className="h-4 w-4" />
+            {active && (
+              <motion.span
+                layoutId="view-tab-pill"
+                className="absolute inset-0 rounded-md bg-surface shadow-soft"
+                transition={
+                  reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }
+                }
+              />
+            )}
+            <Icon className="relative z-10 h-4 w-4" />
           </button>
         );
       })}
