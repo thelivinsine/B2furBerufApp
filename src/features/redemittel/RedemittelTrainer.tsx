@@ -241,7 +241,7 @@ export function RedemittelTrainer() {
         <FilterRail
           {...filterRailProps}
           defaultOpen={false}
-          className="sticky top-[calc(4rem_+_env(safe-area-inset-top))] z-10 max-h-[70dvh] lg:hidden"
+          className="lg:hidden"
         />
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
@@ -263,7 +263,7 @@ export function RedemittelTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)]"
+          className="no-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)] lg:overflow-hidden lg:overflow-y-auto"
         />
       </div>
     </div>

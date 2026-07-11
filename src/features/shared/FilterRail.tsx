@@ -269,22 +269,25 @@ export function FilterRail<T>({
       className={cn(
         // The WHOLE tile carries a grey shade (founder follow-up); the white
         // controls inside provide the contrast, the "Filter" label keeps the
-        // brand accent. The aside is its own scroll container (the page
-        // className caps its height + makes it sticky, on BOTH breakpoints):
-        // the header sticks to the top, the Üben footer to the bottom, and the
-        // middle scrolls, so Üben stays on screen at every scroll position.
-        "overflow-hidden overflow-y-auto rounded-xl border border-border bg-muted",
+        // brand accent. On DESKTOP the aside is its own capped scroll container
+        // (the instance className adds `lg:overflow-y-auto` + `lg:max-h-…`):
+        // the header sticks to its top, the Üben footer to its bottom, the
+        // middle scrolls. On MOBILE the tile grows naturally (no cap, no
+        // internal scroll, so no scrollbar); the Üben footer instead sticks to
+        // the viewport bottom (above the nav) so it stays visible while the
+        // filters are open.
+        "rounded-xl border border-border bg-muted",
         className,
       )}
       aria-label="Filter"
     >
       {/* Tile header; clicking collapses/expands the panel (pinned sections +
           footer stay visible regardless). Sticks to the top of the scroll on
-          desktop. */}
+          desktop; scrolls with the tile on mobile. */}
       <button
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="sticky top-0 z-10 flex w-full items-center gap-2 bg-muted px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-foreground/5"
+        className="z-10 flex w-full items-center gap-2 rounded-t-xl bg-muted px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-foreground/5 lg:sticky lg:top-0 lg:rounded-none"
       >
         <SlidersHorizontal className="h-4 w-4" />
         Filter
@@ -334,11 +337,15 @@ export function FilterRail<T>({
         </div>
       )}
 
-      {/* Footer (the Üben button) sticks to the bottom of the capped, scrolling
-          aside (the page className caps the height + makes the tile sticky), so
-          Üben stays on screen at every scroll position on BOTH breakpoints. */}
+      {/* Footer (the Üben button) stays on screen at every scroll position on
+          BOTH breakpoints, but via different sticky contexts: on desktop it
+          sticks to the bottom of the capped, scrolling aside (`lg:bottom-0`);
+          on mobile the aside is not a scroll container, so it sticks to the
+          viewport bottom just above the 63px bottom nav (+ safe area), keeping
+          Üben visible while the filters are open without an internal
+          scrollbar. */}
       {footer && (
-        <div className="sticky bottom-0 z-10 border-t border-border bg-muted p-3">
+        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 rounded-b-xl border-t border-border bg-muted p-3 lg:bottom-0 lg:rounded-none">
           {footer}
         </div>
       )}
