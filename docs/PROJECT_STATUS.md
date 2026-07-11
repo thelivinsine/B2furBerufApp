@@ -264,12 +264,21 @@ screen. Also add a subtle color theme for the toggle buttons and the border padd
   section color lives on the toggle only.
 - **Filled active icon:** both active toggle icons fill (`fillActive`) — Spielen's `Play` triangle and,
   after a founder round, the Üben dumbbell's weight plates too (it reads fine filled at 16px).
-- Gates green: build, lint 0 errors, `check:bundle` **72.7 kB** / 400. Verified both tabs via Playwright
-  (screenshots + measured bounding-box parity).
-- **Ship status:** shipped across **PRs #413 (core), #414/#416/#417 (docs), #415 (color swap + neutral
-  borders + dumbbell), #418 (center Neuland + tighten card/pager gap)**, all squash-merged to `main`
-  (branch realigned after each). **Founder verifies the live site** (Pages deploys on merge; sandbox can't
-  reach `*.github.io`; deploy runs confirmed green via the Actions API this session).
+- **Desktop two-column (later founder round, PR #423):** on desktop the start page was a narrow phone-width
+  column stranded center-screen with big empty side margins. Adapted it to a **two-column layout on `lg`**
+  (founder picked two-column over a wider/centered single column): tile on the left, the practice card+pager
+  (Üben) / mission checklist (Spielen) on the right, vertically centered together. Dashboard tab-content
+  widens to `lg:max-w-4xl`; `UebenPath` becomes `lg:grid lg:grid-cols-2`; `NeulandHub` (compact only) drops
+  its `max-w-lg` cap on `lg` and un-crops the checklist (`lg:!h-auto`, all 6 rows). Content stays
+  **top-aligned** so the tile doesn't jump when toggling tabs. Mobile unchanged; `/welt` (non-compact) stays
+  a single centered column. Verified desktop + mobile + `/welt` via Playwright.
+- Gates green: build, lint 0 errors, `test:unit` 99/99, `check:bundle` **72.7 kB** / 400. Verified both tabs
+  via Playwright (screenshots + measured bounding-box parity).
+- **Ship status:** shipped across **PRs #413 (core), #414/#416/#417/#420 (docs), #415 (color swap + neutral
+  borders + dumbbell), #418 (center Neuland + tighten card/pager gap), #421 (fill dumbbell), #423 (desktop
+  two-column)**, all squash-merged to `main` (branch realigned after each). **Founder verifies the live
+  site** (Pages deploys on merge; sandbox can't reach `*.github.io`; deploy runs confirmed green via the
+  Actions API this session).
 
 **Prior handoff after session 89 (2026-07-10). Public help/blog section (`/hilfe`) with SEO prerendering
 (branch `claude/blog-help-uben-spielen-wtbnq8`).**
