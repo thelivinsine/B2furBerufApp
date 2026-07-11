@@ -3173,3 +3173,21 @@ Branch: `claude/whats-next-esga9u`.
   72.9 kB). Shipped as PR #427, squash-merged; branch realigned. Updated CLAUDE.md + s90 handoff.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx`, `src/features/dashboard/UebenPath.tsx` (commit
   `f4547e3`, PR #427 squash `2988121`); `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 307 — 2026-07-10 (session 90)
+- **Branch:** `claude/ueben-spielen-layout-styling-h7fsvm`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > For some reason, the components size got reduced and the animations doesn't look that snappy! For the animation when switching between uben/spielen, make it right to left and left to right slide motion
+- **Response summary:** The #427 scrollbar fix had shrunk the desktop column to 22rem, which read as too
+  small. Restored the desktop column to `lg:max-w-[26rem]` (near mobile's max-w-md) and tightened the
+  desktop toggle->content gap (`lg:space-y-3`) so the full-size stack still fits: measured Üben scroll-free
+  ≥768px, Spielen ≥800px (bigger components need more room, so below that Spielen can still scroll slightly,
+  inherent). Replaced the vertical fade on tab switch with a directional horizontal slide (right→left to
+  Spielen, left→right to Üben) via AnimatePresence custom-direction + slide variants (0.16s easeOut,
+  reduced-motion safe). Verified both tabs at 768/800/832/900 + no page errors on switching; mobile
+  unchanged. Gates green (lint 0, unit 99/99, bundle 73.1 kB). Shipped as PR #429, squash-merged; branch
+  realigned. Updated CLAUDE.md + s90 handoff.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx` (commit `6590d8c`, PR #429 squash `f28e44a`);
+  `CLAUDE.md`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
