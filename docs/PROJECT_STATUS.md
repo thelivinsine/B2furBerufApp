@@ -1,12 +1,10 @@
 # Project Status
 
-_Last updated: 2026-07-12 (session 101). **Üben UI-refinements plan, Work item 1 SHIPPED (Opus 4.8):**
-Üben now tailors the session to where the learner is (Grammatik lesson pins its topic via `?grammar=`,
-Redemittel by category via `?cat=`, Bibliothek by the active `?sub`/`?cefr`/`?sector` facets, all via
-a new `libraryFocus` helper + a `grammarTopicId` composer opt), and the speaking block gained an
-"Anzeigen" give-up so a learner who does not know a word can move on (graded a miss). Items 2/3/4+5/6
-of `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` remain. Detail in the s101 handoff at the bottom.
-Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-12 (session 102). **Branche filter overhaul IMPLEMENTED and shipped**
+(the founder presents the app 2026-07-13 and named the Branche filter a core demo feature): `sectors[]`
+multi-tag with untagged = universal, rail hierarchy Branche → Thema → Unterthema, 15 sectors (4 new,
+full packs + Lager boost), 562-item retag audit, Branche chips, tests + E2E. Follows the same-day s101
+ship of Üben-refinements item 1 (see its handoff below). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -36,12 +34,13 @@ architectural decisions, and backend/infra setup are documented in `docs/PROJECT
 read that for the "what's built and how." The living detail of every feature area (mobile bar, the
 session engine, Bibliothek views, the game layer, content conventions) is in `../CLAUDE.md`.
 
-**Content banks (as of 2026-07-12, session 95 — re-verify with `pnpm lint:content` before quoting):**
-vocab **1,022** · collocations **701** · Redemittel **149** · grammar **24 topics / 117 drills** ·
-Lese-/Hörtexte **26** (78 checks) · Can-Do **37** · provenance **2,132 rows** · themes **15** ·
-exam sets **15** · dialogues **20**. All six top-level domains are populated. The `sector` (Branche)
-facet is active on Wörter + Kollokationen (11 sectors). Standing governance debt: ~98% of provenance
-rows are AI-drafted, not yet human-verified (see `strategy/DATA_GOVERNANCE.md`).
+**Content banks (as of 2026-07-12, session 102 — re-verify with `pnpm lint:content` before quoting):**
+vocab **1,113** · collocations **741** · Redemittel **149** · grammar **24 topics / 117 drills** ·
+Lese-/Hörtexte **26** (78 checks) · Can-Do **37** · provenance **2,263 rows** · themes **15** ·
+exam sets **15** · dialogues **20**. All six top-level domains are populated. **Branche is a scope
+since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
+Standing governance debt: ~98% of provenance rows are AI-drafted, not yet human-verified (see
+`strategy/DATA_GOVERNANCE.md`).
 
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
@@ -58,36 +57,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
-
-**Handoff after session 100 (2026-07-12). Üben UI-refinements round: PLANNED AND APPROVED, deliberately
-NOT implemented (founder instruction).** Six founder requests explored (3 parallel codebase passes),
-designed, and written up as **`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`**, which the founder approved
-verbatim with "don't implement it now". Zero app-source or content changes this session; the plan doc
-is the deliverable. Start the next session by picking a chunk from that plan.
-- **The six requests (chunk → recommended model, full map in the plan):** (1a) Üben relevance:
-  `?grammar=<topicId>` pins the session's grammar pool to the studied lesson, and a new pure
-  `libraryFocus` helper translates Bibliothek facets (`?sub/?cefr/?sector`) and the Redemittel
-  category (`?cat=`) into the existing mission-style `focus` opt → **Opus 4.8** (composer/SRS-adjacent);
-  (1b) speaking block gets the typing block's "Anzeigen" give-up (grades wrong, unlocks Weiter) →
-  **Sonnet 5**; (2) graph view: word count moves beside Üben like every view, only "n Verbindungen"
-  stays under the canvas → **Sonnet 5**; (4+5) FilterRail desktop: restyle the grey `bg-border` slab
-  as a standard `bg-surface shadow-soft` card (muted pills, eyebrow labels) and keep the count beside
-  Üben in the footer even when expanded (reset icon moves into a restructured header) → **Sonnet 5**,
-  escalate on taste rounds; (6) grammar lesson: Muster + explanation become a 2fr/3fr lg grid →
-  **Sonnet 5**; (3) Üben city map: tappable building stops that slide the practice card via the
-  existing `goTo` pager + a real beautification pass (two-tone building illustrations, gradient
-  ground/parks, tree clusters, stronger route glow, both palettes, no reward-gold) → **Fable 5**
-  first choice, **Opus 4.8** fallback.
-- **Key code anchors verified this session:** TypingBlock already has "Anzeigen"
-  (`SessionPlayer.tsx:846-853`), SpeakingBlock has none; the count jump lives in
-  `FilterRail.tsx` L458-465 + the `!open` guard at L509; graph counts in `WordGraph.tsx:575-578`;
-  the map stops are not tappable today (`UebenPath.tsx:246-263`, SVG `role="img"`).
-- **Constraints folded into the plan:** mission-player/mat/s90 parity untouched, focus-mode
-  semantics reused not re-invented, 400 kB bundle unaffected (all touched chunks lazy), all new
-  copy em-dash-free.
-- **NOT done:** all six chunks (the whole plan); plus the carried-over items: the founder's human
-  `verified` pass, extending the AI-jury pass to Waves 1-2, Wave-2 tranche 2 (after the 2026-07-13
-  classmate feedback), the Playwright grammar smoke.
 
 **Handoff after session 101 (2026-07-12). Üben-refinements Work item 1 SHIPPED (Opus 4.8).** The
 founder said "go ahead with first point" against `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`. Two
@@ -123,6 +92,46 @@ things: Üben is now specific to where the learner is, and the speaking block ca
   grammar smoke). Browser E2E walk-through of the tailored sessions is left to the founder (sandbox
   can't reach the live site).
 
-_(Sessions 85-99's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+**Handoff after session 102 (2026-07-12). Branche filter overhaul IMPLEMENTED and shipped (plan
+`docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`, approved s99), Fable 5.** Context: the founder presents
+the app to an audience 2026-07-13 and named the Branche filter a core demo feature, so the deferred
+plan was executed same-day and merged to `main`.
+- **Data model:** `sector?: WorkSector` → `sectors?: WorkSector[]` on VocabItem/Collocation/ReadingText
+  (mechanical migration of all 575 tagged rows); `WorkSector` extended to **15** (`chemicals`, `pharma`,
+  `cleaning`, `security`; `transport` relabeled "Transport & Logistik"); linter validates `sectors[]`
+  (non-empty, unique, enum) and ERRORS on the retired singular `sector`. `vocabulary.ts` is now two
+  concatenated literals (`vocabularyPart1/2`, TS2590 limit, same split as provenance s95).
+- **Root-cause fix:** `matchesSector` in `lib/facets.ts` (untagged = universal: general words show
+  under EVERY Branche; tagged hide only under other Branchen), applied as a scope cut in
+  VocabularyTrainer + CollocationsBrowser with **sector-first ordering** (Fachwörter lead, general
+  follow). Branche left the pill facets (no ≤12 cap, no coverage floor); `?sector=` is a single-value
+  scope param (old comma-list URLs degrade to first value).
+- **FilterRail** generalized from `primary`/`secondary` to an ordered **`scopes: RailPrimary[]`**
+  (stable `pinId` per scope keeps saved pins); Wörter/Kollokationen pass [Branche, Thema, Unterthema?],
+  Redemittel/Grammatik unchanged. Branche dropdown shows per-sector dedicated-content counts within
+  the current Thema scope. **Branche chips** (`features/shared/SectorChips.tsx`) on Wörter
+  Tabelle/Karten + Kollokationen Tabelle (sortable column; untagged shows nothing = general).
+- **Retag audit of all 562 tagged items** (393 words, 165 collocations, 4 texts): **117 untagged**
+  (shift vocabulary, PPE basics, everyday/general German: das Werkzeug, die Schicht, der Führerschein),
+  **162 widened** to 2-4 sectors (die Wartung → production+trades+engineering+chemicals), **279
+  confirmed**. Founder-review artifact: `docs/reports/sector-audit-report.md` (old → new + rationale
+  per item, grouped by decision).
+- **New content:** ~20-word packs for chemicals/pharma/cleaning/security + ~9 collocations each, a
+  10-word + 4-pair Lager boost (5 existing warehouse words tagged transport). Banks now **1,113 words /
+  741 collocations / 2,263 provenance rows** (all new rows `draft` with DWDS references).
+- **Gates all green:** lint:content ✔, typecheck ✔, lint 0 errors, **test:unit 124/124** (new
+  `tests/sectors.test.ts` pins matchesSector semantics, sector-first sort, and the v_projekt/v_bauzaun
+  regression pair), build + prerender ✔, bundle **73.0 kB**/400, `build:oracles` + `verify:facts` **0
+  two-oracle errors** (new nouns verified). **E2E in-browser (Playwright, dev server):** das Projekt
+  visible under IT AND Bau, der Bauzaun only under Bau, new sectors list their packs, `?sector=`
+  round-trips, mobile filter panel intact.
+- **NOT done / follow-up:** `pnpm build:frequency-subset` + `build:frequency` for the ~91 new words
+  (needs Python `wordfreq`; absent bins are fine, linter only errors on stale ids); founder review of
+  `sector-audit-report.md`; the human `verified` pass via `pnpm review:queue`; jury-pass extension to
+  Waves 1-2; Wave-2 tranche 2 after the 2026-07-13 classmate feedback; Playwright grammar smoke.
+
+_(Sessions 85-100's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
+`docs/PROJECT_FOUNDATION.md` in s95.)_
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_

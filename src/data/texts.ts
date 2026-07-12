@@ -1315,7 +1315,7 @@ export const texts: ReadingText[] = [
     kind: "memo",
     themeId: "technology",
     cefr: "B2.2",
-    sector: "engineering",
+    sectors: ["engineering", "production"],
     title: "Wartungsprotokoll: Hydraulikpresse P-04",
     titleEn: "Maintenance report: hydraulic press P-04",
     de: [
@@ -1375,7 +1375,7 @@ export const texts: ReadingText[] = [
     kind: "email",
     themeId: "project",
     cefr: "B2.1",
-    sector: "it",
+    sectors: ["it"],
     title: "Einladung: Sprint-Review am Donnerstag",
     titleEn: "Invitation: sprint review on Thursday",
     de: [
@@ -1433,7 +1433,7 @@ export const texts: ReadingText[] = [
     kind: "announcement",
     themeId: "safety",
     cefr: "B2.1",
-    sector: "construction",
+    sectors: ["construction"],
     title: "Baustellenordnung: Neubau Schulzentrum",
     titleEn: "Site rules: new school centre construction",
     de: [
@@ -1491,7 +1491,7 @@ export const texts: ReadingText[] = [
     kind: "voicemail",
     themeId: "scheduling",
     cefr: "B2.1",
-    sector: "production",
+    sectors: ["production"],
     title: "Ansage der Schichtleitung: Änderung im Schichtplan",
     titleEn: "Shift lead voicemail: change to the shift schedule",
     de: [

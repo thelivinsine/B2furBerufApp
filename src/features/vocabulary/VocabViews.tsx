@@ -10,6 +10,8 @@ import { mastery, masteryLabel } from "@/engine/srs";
 import { frequency as frequencyMap, frequencyBin } from "@/data/frequency";
 import { usePagedList } from "@/lib/usePagedList";
 import { CEFR_ORDER } from "@/lib/cefr";
+import { SECTOR_LABEL } from "@/lib/facets";
+import { SectorChips } from "@/features/shared/SectorChips";
 import { cn } from "@/lib/utils";
 
 /**
@@ -115,6 +117,14 @@ const VOCAB_COLUMNS: DataColumn<VocabItem>[] = [
     },
     // Raw Zipf, so "häufig" sorts by actual corpus commonness, not bin order.
     sortValue: (v) => frequencyMap[v.id]?.zipf,
+  },
+  {
+    id: "branche",
+    label: "Branche",
+    cell: (v) => <SectorChips sectors={v.sectors} />,
+    // Sort by the first Branche label; untagged (general) rows sink.
+    sortValue: (v) => (v.sectors?.length ? SECTOR_LABEL[v.sectors[0]] : undefined),
+    className: "min-w-[10rem]",
   },
   {
     id: "lernstand",

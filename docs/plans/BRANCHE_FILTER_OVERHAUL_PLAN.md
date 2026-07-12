@@ -1,7 +1,11 @@
 # Branche filter overhaul: hierarchy, multi-sector tagging, new industries
 
-_Status: **approved by the founder 2026-07-12 (session 99), NOT yet implemented.** This is the
-execution plan for a follow-up session. No code or content in this plan has shipped._
+_Status: **IMPLEMENTED in session 102 (2026-07-12)**, one day after approval, because the founder
+named the Branche filter a core feature of the next-day presentation. All six sections shipped:
+`sectors[]` migration + linter guard, `matchesSector` scope semantics, the FilterRail `scopes[]`
+hierarchy, the 562-item retag audit (report: `docs/reports/sector-audit-report.md`), the 4 new
+sector packs + Logistik boost, and the Branche chips. E2E-verified per §Verification (das Projekt
+visible under IT and Bau; der Bauzaun construction-only)._
 
 ## Context
 

@@ -122,13 +122,16 @@ export function GrammarHub() {
   // The filter tile is the single filter surface on BOTH breakpoints: desktop
   // rail + mobile panel share these props (same pattern as the sibling tabs).
   const filterRailProps = {
-    primary: {
-      label: "Gruppe",
-      value: group,
-      onChange: setGroup,
-      all: { value: "all", label: "Alle Gruppen", count: grammar.length },
-      options: groupOptions,
-    },
+    scopes: [
+      {
+        pinId: "primary",
+        label: "Gruppe",
+        value: group,
+        onChange: setGroup,
+        all: { value: "all", label: "Alle Gruppen", count: grammar.length },
+        options: groupOptions,
+      },
+    ],
     items: searched,
     facets: GRAMMAR_FACETS,
     selection: railSelection,

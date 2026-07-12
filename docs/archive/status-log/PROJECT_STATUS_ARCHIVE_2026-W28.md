@@ -1447,3 +1447,33 @@ das Projekt) look tied to a single Branche and demanded a root-cause fix plus mi
   STALE ids, so new words without a Häufigkeit bin don't block if `wordfreq` regen is unavailable.
 - **NOT done:** all implementation. Carried over: human `verified` pass via `pnpm review:queue`,
   jury pass extension to Waves 1–2, Wave-2 tranche 2, Playwright grammar smoke.
+
+**Handoff after session 100 (2026-07-12). Üben UI-refinements round: PLANNED AND APPROVED, deliberately
+NOT implemented (founder instruction).** Six founder requests explored (3 parallel codebase passes),
+designed, and written up as **`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`**, which the founder approved
+verbatim with "don't implement it now". Zero app-source or content changes this session; the plan doc
+is the deliverable. Start the next session by picking a chunk from that plan.
+- **The six requests (chunk → recommended model, full map in the plan):** (1a) Üben relevance:
+  `?grammar=<topicId>` pins the session's grammar pool to the studied lesson, and a new pure
+  `libraryFocus` helper translates Bibliothek facets (`?sub/?cefr/?sector`) and the Redemittel
+  category (`?cat=`) into the existing mission-style `focus` opt → **Opus 4.8** (composer/SRS-adjacent);
+  (1b) speaking block gets the typing block's "Anzeigen" give-up (grades wrong, unlocks Weiter) →
+  **Sonnet 5**; (2) graph view: word count moves beside Üben like every view, only "n Verbindungen"
+  stays under the canvas → **Sonnet 5**; (4+5) FilterRail desktop: restyle the grey `bg-border` slab
+  as a standard `bg-surface shadow-soft` card (muted pills, eyebrow labels) and keep the count beside
+  Üben in the footer even when expanded (reset icon moves into a restructured header) → **Sonnet 5**,
+  escalate on taste rounds; (6) grammar lesson: Muster + explanation become a 2fr/3fr lg grid →
+  **Sonnet 5**; (3) Üben city map: tappable building stops that slide the practice card via the
+  existing `goTo` pager + a real beautification pass (two-tone building illustrations, gradient
+  ground/parks, tree clusters, stronger route glow, both palettes, no reward-gold) → **Fable 5**
+  first choice, **Opus 4.8** fallback.
+- **Key code anchors verified this session:** TypingBlock already has "Anzeigen"
+  (`SessionPlayer.tsx:846-853`), SpeakingBlock has none; the count jump lives in
+  `FilterRail.tsx` L458-465 + the `!open` guard at L509; graph counts in `WordGraph.tsx:575-578`;
+  the map stops are not tappable today (`UebenPath.tsx:246-263`, SVG `role="img"`).
+- **Constraints folded into the plan:** mission-player/mat/s90 parity untouched, focus-mode
+  semantics reused not re-invented, 400 kB bundle unaffected (all touched chunks lazy), all new
+  copy em-dash-free.
+- **NOT done:** all six chunks (the whole plan); plus the carried-over items: the founder's human
+  `verified` pass, extending the AI-jury pass to Waves 1-2, Wave-2 tranche 2 (after the 2026-07-13
+  classmate feedback), the Playwright grammar smoke.

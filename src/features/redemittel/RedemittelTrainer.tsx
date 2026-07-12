@@ -130,13 +130,16 @@ export function RedemittelTrainer() {
   // follow-up, s91): desktop rail + mobile tile share these props. Register is
   // a facet group in the tile, so the old mobile register chips are gone.
   const filterRailProps = {
-    primary: {
-      label: "Kategorie",
-      value: category,
-      onChange: setCategory,
-      all: { value: "all", label: "Alle Kategorien", count: redemittel.length },
-      options: primaryOptions.slice(1),
-    },
+    scopes: [
+      {
+        pinId: "primary",
+        label: "Kategorie",
+        value: category,
+        onChange: setCategory,
+        all: { value: "all", label: "Alle Kategorien", count: redemittel.length },
+        options: primaryOptions.slice(1),
+      },
+    ],
     items: searched,
     facets: REDEMITTEL_FACETS,
     selection: railSelection,

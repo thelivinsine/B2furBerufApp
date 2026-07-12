@@ -124,7 +124,10 @@ export function libraryFocus(opts: {
       (!opts.theme || opts.theme === "all" || v.themeId === opts.theme) &&
       (!opts.sub || v.subThemeId === opts.sub) &&
       (!opts.cefr?.length || (!!v.cefr && opts.cefr.includes(v.cefr))) &&
-      (!opts.sector?.length || (!!v.sector && opts.sector.includes(v.sector))),
+      // Branche carries sectors[] since the s102 overhaul: the focus leads with
+      // the tagged Fachwörter of the selected Branche (general words still fill
+      // the session via the theme pools).
+      (!opts.sector?.length || !!v.sectors?.some((s) => opts.sector!.includes(s))),
   );
   return pool.length
     ? { vocabIds: sample(pool, FOCUS_VOCAB_CAP).map((v) => v.id), redemittelIds: [] }

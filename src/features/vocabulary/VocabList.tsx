@@ -9,6 +9,7 @@ import { useProgressStore } from "@/store/useProgressStore";
 import { mastery, masteryLabel } from "@/engine/srs";
 import { frequencyBin } from "@/data/frequency";
 import { usePagedList } from "@/lib/usePagedList";
+import { SectorChips } from "@/features/shared/SectorChips";
 import { cn } from "@/lib/utils";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
 
@@ -85,6 +86,13 @@ const VocabCard = memo(function VocabCard({
             </Button>
           </div>
         </div>
+        {/* Branche chips (s102): sector applicability is inspectable on the
+            card; untagged = general, shows nothing. */}
+        {v.sectors?.length ? (
+          <div className="mt-2">
+            <SectorChips sectors={v.sectors} />
+          </div>
+        ) : null}
         <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
           „{v.examples[0].de}"
         </p>
