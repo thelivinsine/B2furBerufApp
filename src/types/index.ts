@@ -278,9 +278,16 @@ export interface GrammarTopic {
   purpose: string;
   purposeDe: string;
   explanation: string;
+  /** German-first lesson text (s93): shown by default in the Grammatik lesson;
+   *  `explanation` (EN) becomes the hold-to-peek translation. AI-drafted,
+   *  founder verify pending. */
+  explanationDe?: string;
   pattern: string;
   examples: GrammarExample[];
   pitfalls?: string[];
+  /** German pitfalls, parallel to `pitfalls` (same order and length); the EN
+   *  originals show on peek. AI-drafted, founder verify pending. */
+  pitfallsDe?: string[];
   drills: GrammarDrill[];
 }
 

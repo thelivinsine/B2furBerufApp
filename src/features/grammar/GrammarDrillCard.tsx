@@ -7,6 +7,7 @@ import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useProgressStore } from "@/store/useProgressStore";
 import { XP } from "@/engine/scoring";
 import { cn, normalize, shuffle } from "@/lib/utils";
+import { EnPeek } from "./EnPeek";
 
 /**
  * A single inline grammar drill: multiple-choice when `options` exist,
@@ -23,10 +24,15 @@ export function GrammarDrillCard({
   drill,
   onResult,
   suppressXp = false,
+  glossPeek = false,
 }: {
   drill: GrammarDrill;
   onResult?: (correct: boolean) => void;
   suppressXp?: boolean;
+  /** German-first mode (the Grammatik lesson, s93): hide the English gloss
+   *  behind a hold-to-peek EN chip instead of showing it by default. The
+   *  composed session keeps the always-visible gloss. */
+  glossPeek?: boolean;
 }) {
   const addXp = useProgressStore((s) => s.addXp);
   const [picked, setPicked] = useState<string | null>(null);
@@ -34,6 +40,7 @@ export function GrammarDrillCard({
   const [checked, setChecked] = useState(false);
   const [awarded, setAwarded] = useState(false);
   const [reported, setReported] = useState(false);
+  const [peekGloss, setPeekGloss] = useState(false);
 
   const options = useMemo(() => (drill.options ? shuffle(drill.options) : null), [drill.options]);
   const solved = drill.prompt.replace("___", drill.answer);
@@ -68,8 +75,13 @@ export function GrammarDrillCard({
 
   return (
     <div className="rounded-xl border border-border bg-surface p-4">
-      <p className="text-sm font-medium">{drill.prompt}</p>
-      {drill.gloss && <p className="mt-1 text-xs text-muted-foreground">{drill.gloss}</p>}
+      <div className="flex items-start justify-between gap-2">
+        <p className="min-w-0 text-sm font-medium">{drill.prompt}</p>
+        {glossPeek && drill.gloss && <EnPeek active={peekGloss} onChange={setPeekGloss} />}
+      </div>
+      {drill.gloss && (!glossPeek || peekGloss) && (
+        <p className="mt-1 text-xs text-muted-foreground">{drill.gloss}</p>
+      )}
 
       {options ? (
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">

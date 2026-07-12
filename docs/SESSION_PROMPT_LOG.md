@@ -3689,3 +3689,16 @@ Branch: `claude/whats-next-esga9u`.
   sentence bullets: the first point up front, the rest behind the existing "Mehr anzeigen" expander.
   Re-verified at 390px on Konnektoren and Relativsätze; gates green. Shipped as PR #460.
 - **Artifacts:** `src/features/grammar/GrammarTopicView.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md` (PR #460).
+
+## Entry 345 — 2026-07-12 (session 93)
+- **Prompt (verbatim):**
+  > keep the text in German but add a translation button like EN on the top right corner of the paragraph (not the tile), whenever user needs translation, they should keep it clicked or tapped to have a peek. this should be the case across Grammatik section. move the expand and collapse button to the right side bottom corner in the tile.
+- **Response summary:** Made the Grammatik lesson German-first with hold-to-peek English. Added
+  explanationDe + pitfallsDe to all 10 grammar topics (AI-drafted German, founder verify pending) and a
+  new EnPeek chip component (shows English only while pressed, pointer or keyboard, never sticky): on the
+  explanation paragraph's top-right, the Typische-Fehler header, each example card (gloss hidden until
+  held) and each drill (new glossPeek prop, lesson only; sessions keep visible glosses). Moved the
+  Mehr/Weniger-anzeigen expander to the tile's bottom-right corner. Verified hold/release in a real
+  browser; lint:content + all gates green. Shipped as PR #461.
+- **Artifacts:** `src/data/grammar.ts`, `src/types/index.ts`, `src/features/grammar/EnPeek.tsx` (new),
+  `GrammarTopicView.tsx`, `GrammarDrillCard.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md` (PR #461).
