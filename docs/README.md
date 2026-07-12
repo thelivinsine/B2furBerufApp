@@ -3,17 +3,22 @@
 A map of everything in `docs/`, so a new session (or a new person) knows where to start and which
 documents are live vs. historical. **Start with `PROJECT_STATUS.md` → its `## Resume here` section.**
 
-_Last reviewed: 2026-07-06 (token-efficiency: split `PROJECT_STATUS.md` (had grown to 1,624 lines) into
-the lean living status doc, a new `PROJECT_REFERENCE.md`, and the append-only archive). Prior 2026-07-05:
-split `DECISIONS.md` out of `CLAUDE.md`, rotated the two big logs into `archive/`, moved four completed
-plans to `archive/`._
+_Last reviewed: 2026-07-12 (session 95: doc-optimization pass — split the stable technical baseline
+(shipped Phase 1/2, locked architectural decisions, infra, completed setup items) out of the bloated
+`PROJECT_STATUS.md` into a new `PROJECT_FOUNDATION.md`; trimmed the status file's `_Last updated_` block
+from an 18-session narrative back to the latest session; flipped misleading "PROPOSED/IN PROGRESS"
+headers on shipped plans; refreshed stale content counts and removed durable branch names). Prior
+2026-07-06: split `PROJECT_STATUS.md` (had grown to 1,624 lines) into the lean status doc, a new
+`PROJECT_REFERENCE.md`, and the append-only archive. Prior 2026-07-05: split `DECISIONS.md` out of
+`CLAUDE.md`, rotated the two big logs into `archive/`, moved four completed plans to `archive/`._
 
 ## Folder structure
 
 ```
 docs/
   README.md                 this index
-  PROJECT_STATUS.md         live status + decisions + "Resume here" (start here)
+  PROJECT_STATUS.md         live status + current counts + "Resume here" (start here)
+  PROJECT_FOUNDATION.md     stable technical baseline: shipped architecture, locked decisions, infra
   PROJECT_REFERENCE.md      stable reference: backlog, model guidance, research findings
   SESSION_PROMPT_LOG.md     append-only authorship trail
 
@@ -23,8 +28,8 @@ docs/
   reference/   source material and binaries (playbook, decks, PDFs, raw logs)
 ```
 
-The three files at the root are the ones you touch every session. Everything else is grouped by
-purpose. **Note on old paths:** documents were flat until 2026-07-03. Historical entries in
+The files at the root are the ones you touch every session (`PROJECT_STATUS.md` most, the rest on
+demand). Everything else is grouped by purpose. **Note on old paths:** documents were flat until 2026-07-03. Historical entries in
 `SESSION_PROMPT_LOG.md` and `archive/PROJECT_STATUS_ARCHIVE.md` still name the pre-reorg flat paths
 (e.g. `docs/EXPANSION_PLAN.md`); those are left as written (append-only history). This index is the
 authoritative current location of every file.
@@ -33,7 +38,8 @@ authoritative current location of every file.
 
 | File | What it is | Status |
 |---|---|---|
-| **`PROJECT_STATUS.md`** | The lean re-orientation point: current status, locked decisions, and the authoritative **"Resume here"** handoff (two most recent sessions). Split in s70; kept under ~250 lines. | 🟢 Live, read first |
+| **`PROJECT_STATUS.md`** | The lean re-orientation point: current status, current content counts, and the authoritative **"Resume here"** handoff (two most recent sessions). Split in s70; the stable baseline moved to `PROJECT_FOUNDATION.md` in s95; kept under ~250 lines. | 🟢 Live, read first |
+| **`PROJECT_FOUNDATION.md`** | The stable technical baseline consulted on demand: shipped architecture (Phase 1/2), locked architectural decisions, backend/infra, and completed founder setup items. Split out of `PROJECT_STATUS.md` in s95 so the status file holds only living state. | 🟢 Live |
 | **`PROJECT_REFERENCE.md`** | Stable, low-churn reference consulted on demand: the founder backlog, product-evaluation findings, per-session model guidance, and reusable research findings. Split out of `PROJECT_STATUS.md` in s70. | 🟢 Live |
 | `SESSION_PROMPT_LOG.md` | Append-only paper trail of every founder prompt + response (authorship record for a possible copyright filing). Live file holds session 50+ and rotates at ~1,200 lines; older entries archived by ISO week in `archive/prompt-log/`. | 🟢 Live; append every session |
 | `DECISIONS.md` | The "why" behind locked decisions (UX-overhaul phase history, mobile-bar mechanism/mockup detail). Split out of `CLAUDE.md` so that file stays lean; read before undoing a "locked" rule. | 🟢 Live |
@@ -104,9 +110,13 @@ be misled.
 **3. `PROJECT_STATUS.md` has a size budget (tightened s70).** Keep only the **two most recent** session
 handoffs in the live file; when you append a new one, move the now-third-oldest into the current ISO-week
 chunk under `archive/status-log/` (create the week file + add a row to the index
-`archive/PROJECT_STATUS_ARCHIVE.md` if the week doesn't exist yet). Target under ~250 lines. Stable reference material (backlog,
-model guidance, research findings) belongs in `PROJECT_REFERENCE.md`, not the status file. Exactly ONE
-"Resume here" section (at the end) is authoritative; never add a second inline resume pointer.
+`archive/PROJECT_STATUS_ARCHIVE.md` if the week doesn't exist yet). Target under ~250 lines. Stable
+reference material (backlog, model guidance, research findings) belongs in `PROJECT_REFERENCE.md`, and
+stable "what's built" material (shipped architecture, locked architectural decisions, infra, completed
+setup items) belongs in `PROJECT_FOUNDATION.md` — neither in the status file. The `_Last updated_` block
+at the top of `PROJECT_STATUS.md` is for the **latest session only**; do not let it grow into a
+session-by-session narrative (it had ballooned to 18 sessions before the s95 pass). Exactly ONE "Resume
+here" section (at the end) is authoritative; never add a second inline resume pointer.
 
 **4. The two logs have different jobs; don't duplicate.** `SESSION_PROMPT_LOG.md` is the
 append-only authorship trail (verbatim prompts, never edited: it is the copyright evidence).

@@ -3779,3 +3779,28 @@ Branch: `claude/whats-next-esga9u`.
   onto the post-#463 main. Verified the s95 grammar canon adopted the German-first schema (24/24 topics
   carry explanationDe + pitfallsDe). Shipped as PR #464.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #464).
+
+## Entry 351 — 2026-07-12 (session 96)
+- **Prompt (verbatim):**
+  > the project status file seems to have a lot of technical info is too bulky. optimize it by splitting it as another doc or moving the info to other relevant areas and cite it well.
+- **Follow-up (verbatim):**
+  > along with this file, also check all other docs to optimize them well.
+- **Response summary:** Documentation-optimization pass. `PROJECT_STATUS.md` had ballooned to 361 lines,
+  chiefly from an 18-session narrative in the top `_Last updated_` block and stable shipped-architecture
+  sections (Original SPA / Phase 1 / Phase 2 / Branding / locked decisions / completed setup items).
+  Split the stable technical baseline out to a new **`docs/PROJECT_FOUNDATION.md`** (shipped architecture,
+  locked architectural decisions, backend/infra, completed founder setup items) and slimmed the status
+  file to current state + current counts + the two live handoffs (**361 → 122 lines**). Ran a read-only
+  audit across the other live docs (plans/, strategy/, root) and applied the safe high-value fixes:
+  flipped misleading "PROPOSED/IN PROGRESS/Nothing implemented" headers on shipped plans
+  (GAME_IMPLEMENTATION_PLAN, MINIMAL_UX_REDESIGN_PLAN, UX_REDESIGN_IMPLEMENTATION_PLAN, both
+  BIBLIOTHEK_CATEGORIZATION docs), removed durable `claude/...` branch names (AI_PRODUCT_STRATEGY + the
+  two BIBLIOTHEK docs), refreshed stale content counts (BUSINESS_PLAN, DATA_STRATEGY, GAME_IMPLEMENTATION,
+  PROJECT_REFERENCE) with as-of dates, fixed the SM-2→FSRS-6 factual error in PROJECT_REFERENCE, and
+  updated the README index + CLAUDE.md roadmap pointer + best-practice rule #3 for the new FOUNDATION doc.
+  Physical archive-moves of shipped plans were deliberately skipped (they are still cross-referenced by
+  live docs; header flips solve the confusion without churning ~8 references). Append-only logs/archives
+  left untouched.
+- **Artifacts:** new `docs/PROJECT_FOUNDATION.md`; edited `docs/PROJECT_STATUS.md`, `docs/README.md`,
+  `docs/PROJECT_REFERENCE.md`, `CLAUDE.md`, `docs/plans/{GAME_IMPLEMENTATION_PLAN,MINIMAL_UX_REDESIGN_PLAN,UX_REDESIGN_IMPLEMENTATION_PLAN,BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09,BIBLIOTHEK_CATEGORIZATION_IMPLEMENTATION_PLAN}.md`,
+  `docs/strategy/{AI_PRODUCT_STRATEGY,BUSINESS_PLAN,DATA_STRATEGY}.md`.

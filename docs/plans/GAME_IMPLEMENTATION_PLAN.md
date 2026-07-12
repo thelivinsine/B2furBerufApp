@@ -1,7 +1,8 @@
 # Game implementation plan: how to actually build the life-story RPG
 
-_Status: **PROPOSED**, awaiting founder go-ahead (session 62, 2026-07-05). Nothing here is
-implemented. This is the engineering companion to `docs/strategy/GAME_CONCEPT.md` (the WHAT: the
+_Status: **G0 + G1 shipped; G2 in progress** (Kapitel 1 complete). Originally proposed s62
+(2026-07-05); see the in-body status blocks (G0 COMPLETE, G1 SHIPPED, G2 IN PROGRESS) for the live
+state. This is the engineering companion to `docs/strategy/GAME_CONCEPT.md` (the WHAT: the
 concept, pillars, story spine) and `docs/plans/MINIMAL_UX_REDESIGN_PLAN.md` (the on-ramp: the
 redesign whose Phase 3 already seeds the game world). Read the concept doc first; its scope
 guardrail (broad audience, exam prep is one optional side path) applies to everything below._
@@ -45,7 +46,7 @@ that wants a game engine; all of it is exactly what React (plus framer-motion) i
 the app already owns the hard parts: a branching dialogue runner (`engine/dialogue.ts`), scoring
 (`engine/scoring.ts`), FSRS memory (`engine/srs.ts`), a tolerant answer matcher
 (`engine/pronounce.ts`), TTS/STT (`engine/speech.ts`), a session composer (`engine/session.ts`),
-and 1,111 provenance-cleared content items with a CEFR/theme/facet taxonomy.
+and 2,000+ provenance-cleared content items with a CEFR/theme/facet taxonomy.
 
 The only genuinely game-engine-shaped part is the **walkable pixel city**. That is one feature,
 and it can arrive last. Getting this order right is the difference between shipping a playable
