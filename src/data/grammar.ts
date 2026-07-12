@@ -20,6 +20,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Ideen verknüpfen, damit du beim Abwägen von Optionen zusammenhängend klingst.",
     explanation:
       "Connectors signal how two ideas relate: cause (deshalb, deswegen), concession (trotzdem, dennoch), addition (außerdem, zudem) and contrast (jedoch, allerdings). Most of these are adverbial connectors that occupy position 1, so the conjugated verb stays in position 2.",
+    explanationDe:
+      "Konnektoren zeigen, wie zwei Aussagen zusammenhängen: Grund (deshalb, deswegen), Einräumung (trotzdem, dennoch), Ergänzung (außerdem, zudem) und Kontrast (jedoch, allerdings). Die meisten sind adverbiale Konnektoren auf Position 1, das konjugierte Verb bleibt also auf Position 2.",
     pattern: "…, deshalb + Verb + … · zwar … aber … · einerseits … andererseits …",
     examples: [
       { de: "Wir haben wenig Zeit, deshalb müssen wir uns entscheiden.", en: "We have little time, that's why we have to decide." },
@@ -29,6 +31,10 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "After 'deshalb', 'trotzdem', 'außerdem' the verb comes next (V2): „Es regnet, trotzdem gehen wir.\"",
       "'weil' (subordinating) sends the verb to the end; 'denn' (coordinating) does not.",
+    ],
+    pitfallsDe: [
+      "Nach 'deshalb', 'trotzdem', 'außerdem' folgt sofort das Verb (V2): „Es regnet, trotzdem gehen wir.\"",
+      "'weil' (Nebensatz) schickt das Verb ans Ende; 'denn' (Hauptsatz) nicht.",
     ],
     drills: [
       {
@@ -85,6 +91,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Präzise Details zu einer Person oder Sache in einem einzigen flüssigen Satz ergänzen.",
     explanation:
       "A relative clause describes a noun. The relative pronoun (der/die/das …) matches the noun in gender and number, but its CASE comes from its role inside the relative clause. The verb goes to the end of the relative clause.",
+    explanationDe:
+      "Ein Relativsatz beschreibt ein Nomen. Das Relativpronomen (der/die/das …) richtet sich in Genus und Numerus nach dem Nomen, sein KASUS kommt aber von seiner Rolle im Relativsatz. Das Verb steht am Ende des Relativsatzes.",
     pattern: "Nom: der/die/das · Akk: den/die/das · Dat: dem/der/dem/denen · Gen: dessen/deren",
     examples: [
       { de: "Der Kollege, der das Projekt leitet, ist im Urlaub.", en: "The colleague who leads the project is on holiday." },
@@ -95,6 +103,11 @@ export const grammar: GrammarTopic[] = [
       "Gender/number come from the noun; case comes from the role in the relative clause.",
       "Dative plural is 'denen', not 'denen' ↔ 'die': „die Kollegen, denen ich danke\".",
       "With a preposition, it goes in front of the pronoun: „das Team, mit dem ich arbeite\".",
+    ],
+    pitfallsDe: [
+      "Genus/Numerus kommen vom Nomen; der Kasus kommt von der Rolle im Relativsatz.",
+      "Dativ Plural ist 'denen', nicht 'die': „die Kollegen, denen ich danke\".",
+      "Eine Präposition steht vor dem Pronomen: „das Team, mit dem ich arbeite\".",
     ],
     drills: [
       {
@@ -151,6 +164,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Auf ganze Sachverhalte zurückverweisen und natürlich nach Präpositionalobjekten fragen.",
     explanation:
       "When a preposition refers to a thing or idea (not a person), German fuses it: da + preposition (darüber, damit, dafür) for statements, wo + preposition (worüber, womit, wofür) for questions. An -r- is inserted before a vowel: da+auf → darauf, wo+an → woran.",
+    explanationDe:
+      "Wenn sich eine Präposition auf eine Sache oder Idee bezieht (nicht auf eine Person), verschmilzt das Deutsche sie zu einem Wort: da + Präposition (darüber, damit, dafür) für Aussagen, wo + Präposition (worüber, womit, wofür) für Fragen. Vor Vokal wird ein -r- eingefügt: da+auf → darauf, wo+an → woran.",
     pattern: "da(r) + Präposition → darauf, damit, dafür · wo(r) + Präposition → worauf, womit, wofür",
     examples: [
       { de: "Wir sprechen über das Projekt. → Wir sprechen darüber.", en: "We talk about the project. → We talk about it." },
@@ -160,6 +175,10 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "Use da-/wo-words only for things/ideas. For people use preposition + pronoun: „mit ihm\", „auf wen?\".",
       "Insert -r- before a vowel: darauf, daran, worauf, woran (not da-auf).",
+    ],
+    pitfallsDe: [
+      "Da-/wo-Wörter nur für Sachen und Ideen. Für Personen: Präposition + Pronomen: „mit ihm\", „auf wen?\".",
+      "Vor Vokal ein -r- einfügen: darauf, daran, worauf, woran (nicht da-auf).",
     ],
     drills: [
       {
@@ -216,6 +235,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Korrekte, natürliche Wortstellung bilden, ein wichtiges Merkmal für B2-Genauigkeit.",
     explanation:
       "In a main clause the conjugated verb is always second; any second verb part (Infinitiv/Partizip) goes to the very end, forming the 'Verbklammer' (sentence bracket). Mid-field adverbials follow TeKaMoLo order: Temporal – Kausal – Modal – Lokal (when – why – how – where).",
+    explanationDe:
+      "Im Hauptsatz steht das konjugierte Verb immer an zweiter Stelle; ein zweiter Verbteil (Infinitiv/Partizip) geht ganz ans Ende und bildet die 'Verbklammer'. Angaben im Mittelfeld folgen der TeKaMoLo-Regel: Temporal – Kausal – Modal – Lokal (wann – warum – wie – wo).",
     pattern: "Pos.1 + Verb(2) + … Te-Ka-Mo-Lo … + Verbteil(Ende)",
     examples: [
       { de: "Wir haben gestern die Lieferung verschickt.", en: "We sent the delivery yesterday." },
@@ -225,6 +246,10 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "The second verb part goes to the end: „Wir wollen den Plan morgen besprechen.\"",
       "Order is Temporal–Kausal–Modal–Lokal: „heute (Te) wegen des Staus (Ka) schnell (Mo) ins Büro (Lo)\".",
+    ],
+    pitfallsDe: [
+      "Der zweite Verbteil geht ans Ende: „Wir wollen den Plan morgen besprechen.\"",
+      "Reihenfolge ist Temporal–Kausal–Modal–Lokal: „heute (Te) wegen des Staus (Ka) schnell (Mo) ins Büro (Lo)\".",
     ],
     drills: [
       {
@@ -281,6 +306,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Meinungen begründen und Gründe erklären. Das Verb steht am Ende.",
     explanation:
       "Subordinating conjunctions (dass, weil, damit, obwohl, wenn, dass) push the conjugated verb to the end of their clause. If the subordinate clause comes first, the main clause starts with its verb (because position 1 is filled by the whole clause).",
+    explanationDe:
+      "Subjunktionen (dass, weil, damit, obwohl, wenn) schieben das konjugierte Verb ans Ende ihres Satzes. Steht der Nebensatz zuerst, beginnt der Hauptsatz mit dem Verb (denn Position 1 ist schon durch den ganzen Nebensatz besetzt).",
     pattern: "Ich denke, dass … (Verb am Ende) · …, weil … · …, damit …",
     examples: [
       { de: "Ich glaube, dass wir die Frist einhalten können.", en: "I think that we can meet the deadline." },
@@ -291,6 +318,11 @@ export const grammar: GrammarTopic[] = [
       "Verb to the very end after dass/weil/damit: „…, weil es Zeit spart.\"",
       "'weil' + verb-final vs. 'denn' + normal order. Don't mix them.",
       "Fronted subordinate clause → main clause is verb-first: „Weil … regnet, fahren wir …\".",
+    ],
+    pitfallsDe: [
+      "Verb ganz ans Ende nach dass/weil/damit: „…, weil es Zeit spart.\"",
+      "'weil' + Verb am Ende vs. 'denn' + normale Wortstellung. Nicht mischen.",
+      "Nebensatz vorn → Hauptsatz beginnt mit dem Verb: „Weil … regnet, fahren wir …\".",
     ],
     drills: [
       {
@@ -346,6 +378,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Die richtige Artikelendung wählen, das Rückgrat von korrektem Deutsch.",
     explanation:
       "Cases mark a noun's role: Nominativ (subject), Akkusativ (direct object), Dativ (indirect object), Genitiv (possession). Two-way prepositions (in, an, auf, über, unter, vor, hinter, neben, zwischen) take the accusative for movement/direction (wohin?) and the dative for location (wo?).",
+    explanationDe:
+      "Der Kasus zeigt die Rolle eines Nomens: Nominativ (Subjekt), Akkusativ (direktes Objekt), Dativ (indirektes Objekt), Genitiv (Besitz). Wechselpräpositionen (in, an, auf, über, unter, vor, hinter, neben, zwischen) nehmen bei Bewegung/Richtung (wohin?) den Akkusativ und bei Ort (wo?) den Dativ.",
     pattern: "wohin? → Akkusativ (in den Raum) · wo? → Dativ (in dem Raum)",
     examples: [
       { de: "Ich lege den Bericht auf den Tisch. (wohin? → Akk.)", en: "I put the report on the table. (direction)" },
@@ -355,6 +389,10 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "Movement → accusative, position → dative: „in die Besprechung gehen\" vs. „in der Besprechung sein\".",
       "Some verbs always take dative: helfen, danken, gratulieren, gehören, passen.",
+    ],
+    pitfallsDe: [
+      "Bewegung → Akkusativ, Position → Dativ: „in die Besprechung gehen\" vs. „in der Besprechung sein\".",
+      "Manche Verben brauchen immer den Dativ: helfen, danken, gratulieren, gehören, passen.",
     ],
     drills: [
       {
@@ -411,6 +449,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Natürlich und präzise klingen, indem du Verben und Nomen als feste Wendungen lernst.",
     explanation:
       "Many ideas are expressed by a fixed noun + verb pair where the verb carries little meaning on its own: eine Entscheidung treffen, Maßnahmen ergreifen, Rücksicht nehmen. Learn them as units; the wrong verb sounds foreign even if each word is correct.",
+    explanationDe:
+      "Viele Ideen werden durch ein festes Nomen-Verb-Paar ausgedrückt, bei dem das Verb allein wenig Bedeutung trägt: eine Entscheidung treffen, Maßnahmen ergreifen, Rücksicht nehmen. Lerne sie als Einheiten; das falsche Verb klingt fremd, auch wenn jedes Wort für sich korrekt ist.",
     pattern: "Nomen + festes Verb → eine Entscheidung treffen · in Frage stellen · zur Verfügung stehen",
     examples: [
       { de: "Wir müssen eine Entscheidung treffen.", en: "We have to make a decision." },
@@ -420,6 +460,10 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "It's „eine Entscheidung treffen\", not „machen\". The verb is fixed.",
       "Many take a fixed preposition too: „in Frage stellen\", „zur Verfügung stehen\".",
+    ],
+    pitfallsDe: [
+      "Es heißt „eine Entscheidung treffen\", nicht „machen\". Das Verb ist fest.",
+      "Viele haben auch eine feste Präposition: „in Frage stellen\", „zur Verfügung stehen\".",
     ],
     drills: [
       {
@@ -476,6 +520,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Vorschläge und Bitten abschwächen, damit sie diplomatisch klingen.",
     explanation:
       "Konjunktiv II expresses politeness and hypotheticals. The everyday form is 'würde + Infinitiv'; common modals have their own forms: könnte, sollte, müsste, dürfte. Use it to make suggestions and requests less direct.",
+    explanationDe:
+      "Der Konjunktiv II drückt Höflichkeit und Hypothetisches aus. Die Alltagsform ist 'würde + Infinitiv'; häufige Modalverben haben eigene Formen: könnte, sollte, müsste, dürfte. Nutze ihn, um Vorschläge und Bitten weniger direkt zu machen.",
     pattern: "würde + Infinitiv · könnte / sollte / müsste / dürfte",
     examples: [
       { de: "Wir könnten den Termin verschieben.", en: "We could postpone the appointment." },
@@ -485,6 +531,10 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "Prefer 'könnte/würde' over the plain present for polite requests.",
       "'hätte' and 'wäre' are used directly (not with würde): „Ich hätte eine Frage.\"",
+    ],
+    pitfallsDe: [
+      "Für höfliche Bitten lieber 'könnte/würde' als das einfache Präsens.",
+      "'hätte' und 'wäre' stehen direkt (nicht mit würde): „Ich hätte eine Frage.\"",
     ],
     drills: [
       {
@@ -533,6 +583,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Möglichkeit, Notwendigkeit und Erlaubnis präzise ausdrücken.",
     explanation:
       "Modal verbs (können, müssen, sollen, dürfen, wollen, mögen) are conjugated in position 2; the main verb stays as an infinitive at the end. They shade meaning: müssen (necessity), dürfen (permission), sollen (recommendation/others' wish).",
+    explanationDe:
+      "Modalverben (können, müssen, sollen, dürfen, wollen, mögen) werden auf Position 2 konjugiert; das Hauptverb bleibt als Infinitiv am Ende. Sie nuancieren die Bedeutung: müssen (Notwendigkeit), dürfen (Erlaubnis), sollen (Empfehlung oder Wunsch anderer).",
     pattern: "Subjekt + Modalverb(2) + … + Infinitiv (Ende)",
     examples: [
       { de: "Wir müssen eine Lösung finden.", en: "We have to find a solution." },
@@ -542,6 +594,10 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "Infinitive goes to the end: „Wir müssen den Kunden informieren.\"",
       "'dürfen' = permission, 'müssen' = necessity; 'nicht müssen' ≠ 'nicht dürfen'.",
+    ],
+    pitfallsDe: [
+      "Der Infinitiv geht ans Ende: „Wir müssen den Kunden informieren.\"",
+      "'dürfen' = Erlaubnis, 'müssen' = Notwendigkeit; 'nicht müssen' ≠ 'nicht dürfen'.",
     ],
     drills: [
       {
@@ -589,6 +645,8 @@ export const grammar: GrammarTopic[] = [
     purposeDe: "Arbeitsabläufe neutral beschreiben, ohne eine handelnde Person zu nennen.",
     explanation:
       "The passive (werden + Partizip II) focuses on the action or process rather than who does it, which is ideal for describing procedures. The agent is often omitted or added with 'von'. With modals: modal + Partizip II + werden.",
+    explanationDe:
+      "Das Passiv (werden + Partizip II) rückt die Handlung oder den Prozess in den Fokus statt der handelnden Person, ideal für Abläufe. Der Handelnde wird oft weggelassen oder mit 'von' ergänzt. Mit Modalverb: Modal + Partizip II + werden.",
     pattern: "werden + Partizip II · (Modal) … + Partizip II + werden",
     examples: [
       { de: "Die Lieferung wird morgen verschickt.", en: "The delivery will be sent tomorrow." },
@@ -598,6 +656,10 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "Word order with modal: „Der Bericht muss heute geschrieben werden.\"",
       "Use the agent sparingly: „… wird von der IT geprüft.\"",
+    ],
+    pitfallsDe: [
+      "Wortstellung mit Modalverb: „Der Bericht muss heute geschrieben werden.\"",
+      "Den Handelnden sparsam nennen: „… wird von der IT geprüft.\"",
     ],
     drills: [
       {

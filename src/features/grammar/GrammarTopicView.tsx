@@ -13,13 +13,14 @@ import {
   TriangleAlert,
   Zap,
 } from "lucide-react";
-import type { GrammarTopic } from "@/types";
+import type { GrammarExample, GrammarTopic } from "@/types";
 import { iconByName } from "@/lib/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
+import { EnPeek } from "./EnPeek";
 import { GrammarDrillCard } from "./GrammarDrillCard";
 import { groupMeta, orderedGrammar } from "./grammarMeta";
 
@@ -68,15 +69,21 @@ function Lesson({
   const [explainOpen, setExplainOpen] = useState(false);
   const answered = Object.keys(results).length;
 
+  // Hold-to-peek English (founder s93: the lesson text is German-first, the
+  // EN chip reveals the translation only while pressed). One peek state per
+  // block; examples and drills manage their own.
+  const [peekExplain, setPeekExplain] = useState(false);
+  const [peekPitfalls, setPeekPitfalls] = useState(false);
+
   // Render-time structure (founder s93 follow-up: the Muster read as one mush
   // and the explanation as one chunk). The bank authors `pattern` as variants
-  // separated by " · " and `explanation` as compact prose; split both into
+  // separated by " · " and the explanation as compact prose; split both into
   // scannable lines. Sentence split is safe for the bank's authored style (no
   // dotted abbreviations); anything unsplittable falls back to one line.
   const patternVariants = topic.pattern.split(" · ");
-  const explainPoints = topic.explanation.match(/[^.!?]+[.!?]+/g)?.map((s) => s.trim()) ?? [
-    topic.explanation,
-  ];
+  const explainText = peekExplain ? topic.explanation : (topic.explanationDe ?? topic.explanation);
+  const explainPoints = explainText.match(/[^.!?]+[.!?]+/g)?.map((s) => s.trim()) ?? [explainText];
+  const pitfallList = peekPitfalls ? topic.pitfalls : (topic.pitfallsDe ?? topic.pitfalls);
   const correct = Object.values(results).filter(Boolean).length;
   const total = topic.drills.length;
   const done = total > 0 && answered === total;
@@ -144,8 +151,10 @@ function Lesson({
               ))}
             </div>
           </div>
-          <div>
-            <ul className="space-y-2">
+          {/* Paragraph block: German bullets, the EN chip in ITS top-right
+              corner (founder: on the paragraph, not the tile). */}
+          <div className="flex items-start gap-2">
+            <ul className="min-w-0 flex-1 space-y-2">
               {(explainOpen ? explainPoints : explainPoints.slice(0, 1)).map((s, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed">
                   <span
@@ -156,11 +165,15 @@ function Lesson({
                 </li>
               ))}
             </ul>
-            {explainPoints.length > 1 && (
+            {topic.explanationDe && <EnPeek active={peekExplain} onChange={setPeekExplain} />}
+          </div>
+          {/* Expander in the tile's bottom-right corner (founder follow-up). */}
+          {explainPoints.length > 1 && (
+            <div className="flex justify-end">
               <button
                 onClick={() => setExplainOpen((o) => !o)}
                 aria-expanded={explainOpen}
-                className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary"
+                className="inline-flex items-center gap-1 text-xs font-semibold text-primary"
               >
                 {explainOpen ? (
                   <>
@@ -172,8 +185,8 @@ function Lesson({
                   </>
                 )}
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -184,27 +197,22 @@ function Lesson({
         </h2>
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           {topic.examples.map((ex, i) => (
-            <Card key={i}>
-              <CardContent className="flex items-start justify-between gap-2 p-4">
-                <div>
-                  <p className="font-medium">{ex.de}</p>
-                  <p className="mt-0.5 text-sm text-muted-foreground">{ex.en}</p>
-                </div>
-                <SpeakButton text={ex.de} />
-              </CardContent>
-            </Card>
+            <ExampleCard key={i} example={ex} />
           ))}
         </div>
       </section>
 
       {/* Pitfalls */}
-      {topic.pitfalls && topic.pitfalls.length > 0 && (
+      {pitfallList && pitfallList.length > 0 && (
         <section className="space-y-3">
-          <h2 className="flex items-center gap-2 font-semibold">
-            <TriangleAlert className="h-4 w-4 text-warning" /> Typische Fehler
-          </h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 font-semibold">
+              <TriangleAlert className="h-4 w-4 text-warning" /> Typische Fehler
+            </h2>
+            {topic.pitfallsDe && <EnPeek active={peekPitfalls} onChange={setPeekPitfalls} />}
+          </div>
           <ul className="space-y-2">
-            {topic.pitfalls.map((p, i) => (
+            {pitfallList.map((p, i) => (
               <li
                 key={i}
                 className="flex items-start gap-2.5 rounded-xl border border-warning/30 bg-warning/5 px-3.5 py-2.5 text-sm"
@@ -246,6 +254,7 @@ function Lesson({
                 </p>
                 <GrammarDrillCard
                   drill={d}
+                  glossPeek
                   onResult={(correct) =>
                     setResults((r) => (d.id in r ? r : { ...r, [d.id]: correct }))
                   }
@@ -347,5 +356,25 @@ function Lesson({
         </Button>
       </div>
     </motion.div>
+  );
+}
+
+/** One example sentence: German by default, the English gloss only while the
+ *  EN chip is held (founder s93: English is a peek across the lesson). */
+function ExampleCard({ example }: { example: GrammarExample }) {
+  const [peek, setPeek] = useState(false);
+  return (
+    <Card>
+      <CardContent className="flex items-start justify-between gap-2 p-4">
+        <div className="min-w-0">
+          <p className="font-medium">{example.de}</p>
+          {peek && <p className="mt-0.5 text-sm text-muted-foreground">{example.en}</p>}
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <EnPeek active={peek} onChange={setPeek} />
+          <SpeakButton text={example.de} />
+        </div>
+      </CardContent>
+    </Card>
   );
 }

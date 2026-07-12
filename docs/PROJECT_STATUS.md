@@ -371,6 +371,18 @@ but with design freedom, and make it highly useful and intuitive for adult learn
   becomes a 4-row Nom/Akk/Dat/Gen list), and `explanation` splits into **sentence bullets** with the
   first point shown and the rest behind the "Mehr anzeigen" expander (regex fallback keeps unsplittable
   text as one line). If future explanations use dotted abbreviations, revisit the sentence split.
+- **Founder follow-up round 4 (same session, PR #461): German-first lesson + hold-to-peek EN.** The
+  lesson text is now German by default with English as a press-and-hold peek, across the section:
+  (1) new bank fields **`explanationDe` + `pitfallsDe`** on all 10 topics (AI-drafted German, EN
+  originals kept parallel in order/length; **founder verify pending**, flagged in the type comments);
+  (2) new **`grammar/EnPeek.tsx`** chip (pointer-capture hold, Space/Enter hold on keyboard, never a
+  sticky toggle) placed top-right of the explanation paragraph (NOT the tile), on the pitfalls header,
+  per example card (beside the SpeakButton, gloss hidden until held), and on each drill via a new
+  `glossPeek` prop on GrammarDrillCard (**lesson only; the composed session keeps always-visible
+  glosses**); (3) the "Mehr anzeigen"/"Weniger anzeigen" expander moved to the **bottom-right corner of
+  the tile**. Peek verified in-browser (hold shows EN, release reverts to German); `lint:content` clean
+  (no em dashes in the new German); all gates green. Drill `explain` feedback stays English (open
+  question for the founder: author `explainDe` for 47 drills?).
 - **NOT done / follow-up candidates:** per-topic drill progress is session-local only (persisting
   "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
   (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.
