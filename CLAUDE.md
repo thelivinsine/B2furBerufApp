@@ -276,24 +276,29 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   `?topic=` all URL-persisted). Feature split: `grammar/grammarMeta.ts` (group labels/icons, the
   B2-marker `groupOrder`, `orderedGrammar` spine, `topicRank`), `grammar/GrammarViews.tsx` (Karten cards
   with emerald group tile + priority-rank chip + mono pattern strip, compact Liste rows), and
-  `grammar/GrammarTopicView.tsx`, the **lesson page**: hero (group tile, English eyebrow, purpose,
-  badges), explanation card with an emerald **Muster** formula panel, Beispiele, Typische Fehler,
-  numbered Übungen with a **live progress bar**, a **completion panel** ("Thema abgeschlossen · k von n
-  richtig" + "Weiter: <next>") and prev/next cards along the priority spine ("Thema n von 10"), so a
-  time-poor learner is always handed the next-biggest B2 lever. Emerald stays the quiet Grammatik accent
-  (icon tiles/Muster only); brand indigo stays the action color. The lesson keeps the "Wissen im Quiz
-  testen" `/quiz` deep link (that intent keeps the retired route alive, see below).
+  `grammar/GrammarTopicView.tsx`, the **lesson page**: the LibrarySwitcher tabs stay on top (founder
+  follow-up: a lesson must keep the section navigation), then a text-light hero (group tile, German
+  title + one-line purpose + badges; NO English eyebrow), the emerald **Muster** formula panel FIRST
+  with the explanation clamped to three lines behind a "Mehr anzeigen" expander, Beispiele, Typische
+  Fehler, numbered Übungen with a **live progress bar**, a **completion panel** ("Thema abgeschlossen ·
+  k von n richtig" + "Weiter: <next>") and prev/next cards along the priority spine ("Thema n von 10"),
+  so a time-poor learner is always handed the next-biggest B2 lever. **Üben is on the lesson too**
+  (inline gradient button on desktop, sticky bottom action bar above the nav on mobile), replacing the
+  old "Wissen im Quiz testen" `/quiz` CTA (the retired `/quiz` route stays reachable via practiceAreas,
+  see below). Emerald stays the quiet Grammatik accent (icon tiles/Muster only); brand indigo stays the
+  action color.
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
 - **Four-zone nav:** `DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"]`; settings-store
   persist migration (`version: 1` + `ROUTE_SUCCESSOR` in `nav-items.ts`) forwards old pins to their new
   zone. The s26–28 bottom-bar **mechanics stay locked**.
-- **Facet registry:** `src/lib/facets.ts` (`vocab`/`collocation`/`redemittel` facets + `*_FACET_IDS`) is
-  the single source; the **≤12-option rule** (`MAX_FACET_OPTIONS`) is codified there.
-- **Standalone `/quiz` status:** off the nav ("retired") but still a **live route**, reached via deep
-  links (GrammarHub "Wissen im Quiz testen" + `practiceAreas`). A hard redirect was deliberately NOT
-  added so those intents keep working. The Vokabeltrainer's in-page Karteikarten/Quiz tabs are hidden
+- **Facet registry:** `src/lib/facets.ts` (`vocab`/`collocation`/`redemittel`/`grammar` facets +
+  `*_FACET_IDS`) is the single source; the **≤12-option rule** (`MAX_FACET_OPTIONS`) is codified there.
+- **Standalone `/quiz` status:** off the nav ("retired") but still a **live route**, reached via the
+  `practiceAreas` deep link (the Grammatik lesson's "Wissen im Quiz testen" CTA was replaced by the
+  standard Üben in s93). A hard redirect was deliberately NOT
+  added so that intent keeps working. The Vokabeltrainer's in-page Karteikarten/Quiz tabs are hidden
   behind the reversible `SHOW_PRACTICE_TABS = false` flag; `Flashcards`/`VocabQuiz` stay in the repo
   (used by the session engine).
 

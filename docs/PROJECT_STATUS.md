@@ -350,6 +350,15 @@ but with design freedom, and make it highly useful and intuitive for adult learn
   Liste on desktop + mobile, filter rail counts, lesson desktop + mobile, and the full drill loop (5/5
   answered → XP in header → completion panel → "Weiter: Konjunktiv II" navigates). Gates green:
   typecheck, ESLint 0 errors, `test:unit` 116/116, build + prerender, `check:bundle` **73.0 kB**/400.
+- **Founder follow-up round (same session, PR #458, from a live phone screenshot):** three lesson fixes.
+  (1) No navigation → the **LibrarySwitcher tabs now render on top of the lesson** too (tapping
+  Grammatik doubles as back-to-overview). (2) No Üben → **Üben added to the lesson** (inline gradient
+  button on desktop, sticky bottom action bar above the nav on mobile), replacing the "Wissen im Quiz
+  testen" `/quiz` CTA (`/quiz` stays reachable via practiceAreas). (3) Too much text → the English
+  all-caps eyebrow was dropped from the hero, and the **Muster panel now leads** the card with the
+  explanation **clamped to three lines** behind a "Mehr anzeigen"/"Weniger anzeigen" expander.
+  Re-verified on the 390px viewport (tabs navigate out, Üben bar sticks while scrolling, expander
+  toggles); all gates green again.
 - **NOT done / follow-up candidates:** per-topic drill progress is session-local only (persisting
   "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
   (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.

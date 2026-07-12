@@ -3655,3 +3655,16 @@ Branch: `claude/whats-next-esga9u`.
   k von n richtig") with a one-tap "Weiter: <next topic>" CTA, so the section always answers "where do I
   start, what's next" without the learner deciding. Same PR #457.
 - **Artifacts:** `grammarMeta.ts` (`topicRank`), `GrammarViews.tsx`, `GrammarTopicView.tsx` (PR #457).
+
+## Entry 342 — 2026-07-12 (session 93)
+- **Attachments:** screenshot (mobile Grammatik lesson, Konnektoren topic)
+- **Prompt (verbatim):**
+  > @screenshot this section has no navigation, no üben button and there's too much text - fix these three
+- **Response summary:** Three lesson-page fixes: (1) the LibrarySwitcher tabs now render on top of the
+  lesson (navigation restored; tapping Grammatik returns to the topic grid); (2) Üben added to the lesson,
+  inline gradient on desktop and a sticky bottom action bar above the nav on mobile, replacing the
+  "Wissen im Quiz testen" /quiz CTA (/quiz stays reachable via practiceAreas); (3) less text up front: the
+  English all-caps eyebrow was dropped from the hero and the Muster formula panel now leads the card, with
+  the explanation clamped to three lines behind a "Mehr anzeigen" expander. Re-verified at 390px in a real
+  browser; all gates green. Shipped as PR #458.
+- **Artifacts:** `src/features/grammar/GrammarTopicView.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md` (PR #458).
