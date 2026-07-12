@@ -3668,3 +3668,13 @@ Branch: `claude/whats-next-esga9u`.
   the explanation clamped to three lines behind a "Mehr anzeigen" expander. Re-verified at 390px in a real
   browser; all gates green. Shipped as PR #458.
 - **Artifacts:** `src/features/grammar/GrammarTopicView.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md` (PR #458).
+
+## Entry 343 — 2026-07-12 (session 93)
+- **Prompt (verbatim):**
+  > there's a redundancy of text both in English and German. and below the text there's meta info like b2 and 5 Übungen. it's not necessary. review and fix
+- **Response summary:** The lesson hero described the topic twice (German purposeDe line + the English
+  explanation card below) and carried a meta badge row (CEFR, group, "n Übungen"). Removed both: the hero
+  is now group tile + German title only; the clamped explanation card is the single description, and the
+  drill count already shows in the Übungen progress bar. CEFR and purpose stay on the hub topic cards
+  where they inform the choice. Re-verified at 390px; gates green. Shipped as PR #459.
+- **Artifacts:** `src/features/grammar/GrammarTopicView.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md` (PR #459).
