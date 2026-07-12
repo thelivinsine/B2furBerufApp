@@ -1,6 +1,7 @@
 # UX/UI Redesign — Phase-wise Implementation Plan (with Claude model recommendations)
 
-_Status: **IN PROGRESS**, session 66 (2026-07-05). **Phase 1 "The Diet" shipped** (PR #305),
+_Status: **COMPLETE** — all 4 phases / 22 tasks shipped across sessions 66–70 (see the "EXECUTED (s70)"
+note in the body). **Phase 1 "The Diet" shipped** (PR #305),
 **Phase 2 "The Stage" shipped** (PR #307), and **Phase 3 "The World Seed" shipped in full**
 (tasks 3.1–3.6): the six domain-building SVGs (`src/components/city/domain-buildings.tsx`), the lazy
 city strip on Heute (`CityStrip.tsx` + `mastery.ts`), Fortschritt rebuilt as a quest board (city strip +

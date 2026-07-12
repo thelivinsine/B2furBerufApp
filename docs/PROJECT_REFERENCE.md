@@ -32,7 +32,7 @@ Only use content under these licenses — anything else blocks monetization:
 - **Deutsche Welle (DW)** — free for personal/educational use only; *not* universally CC-licensed for commercial redistribution. Check specific file metadata before using any DW asset; contact their distribution team if in doubt.
 
 ### Open-source infrastructure worth evaluating
-- **AnkiDroid / AnkiCore ecosystem** — underlying SRS algorithm and app variants are open-source. Could inform future SRS improvements (the current `engine/srs.ts` implements SM-2 independently).
+- **AnkiDroid / AnkiCore ecosystem** — underlying SRS algorithm and app variants are open-source. Could inform future SRS improvements (the current `engine/srs.ts` implements FSRS-6 since s53; SM-2 fields kept warm for rollback).
 - **LARA (Learning and Reading Assistant)** — open-source platform for building interactive reading materials with audio + translation. Relevant if we add a reading-comprehension module later.
 
 ### Writing eval infrastructure
@@ -401,8 +401,8 @@ Backlog items mapped to a recommended model (see "Backlog — founder ideas" and
 | Draft legal enforceability additions (Widerrufsrecht, liability, language-precedence) | **Fable** | German/EU legal reasoning, binding DE version |
 | Content QC pipeline — CI lint (dup IDs, broken nodes) | **Sonnet** | Bounded script + CI wiring |
 | Content QC — pedagogical / German accuracy review | **Fable** | B2-level correctness judgment |
-| Grammar drills 47 → 80 | **Sonnet** | Follows established schema; Fable for a final accuracy pass |
-| Vocabulary 504 → 600+ | **Sonnet** | Bulk schema-following content |
+| Grammar drills (shipped: now 24 topics / 117 drills) | **Sonnet** | Follows established schema; Fable for a final accuracy pass |
+| Vocabulary (shipped: now 1,022 words) | **Sonnet** | Bulk schema-following content |
 | FAQ section (landing) | **Sonnet** | Straightforward copy + UI |
 | Expand landing copy | **Fable** | Persuasive, on-voice copy; Sonnet if budget-conscious |
 | Visual mnemonics for vocab (der/die/das) | **Sonnet** | Asset wiring against existing schema |

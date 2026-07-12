@@ -5,8 +5,9 @@
 > `docs/plans/UX_REDESIGN_IMPLEMENTATION_PLAN.md` (session 63). Use that doc to run the phases;
 > this doc remains the screen-by-screen design spec.
 
-_Status: **PROPOSED**, awaiting founder go-ahead (session 61, 2026-07-05). Nothing here is
-implemented yet. This is the engineering companion to the visual strategy report delivered to the
+_Status: **SHIPPED** (Phases 1–3, sessions 63–70). Originally proposed s61 (2026-07-05); retained as
+the screen-by-screen design spec (execution record in the companion implementation plan). This is the
+engineering companion to the visual strategy report delivered to the
 founder in session 61; it builds directly on `docs/reference/GENAULY_UX_UI_ANALYSIS.md` (the 7-dimension
 UX audit) and `docs/strategy/GAME_CONCEPT.md` (the unified-world RPG vision). Read both before
 executing._

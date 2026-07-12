@@ -1,6 +1,6 @@
 # Bibliothek Categorization: Implementation Plan
 
-_Last updated: 2026-07-09 · Branch: `claude/bibliothek-categorization-analysis-mtqo5o`_
+_Plan dated 2026-07-09 · Status: **all units shipped** (s84; see the per-unit notes in the body)._
 
 Companion to **`docs/plans/BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09.md`** (the findings). This is the
 scoped build plan for the top priorities, grounded in the real code. Each unit below is one shippable PR

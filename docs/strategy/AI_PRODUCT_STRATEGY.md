@@ -5,7 +5,7 @@ high-value features for Genauly: helping B1–B2 learners break through the inte
 plateau and reach usable fluency for real-life situations (workplace **plus** bureaucracy, banking,
 healthcare, and housing), with certification exam prep as one pillar._
 
-_Prepared: 2026-06-20 (rev. 3) · Branch `claude/genauly-ai-strategy-8wrlcz` · Audience: non-technical founder + small build team (currently the founder + Claude Code as CTO)._
+_Prepared: 2026-06-20 (rev. 3) · Audience: non-technical founder + small build team (currently the founder + Claude Code as CTO)._
 
 > **Revision 3 (2026-06-20).** Refreshed all research to the June 2026 landscape and corrected dated
 > claims: model/tool names and prices are now current (Claude Opus 4.8 / Sonnet 4.6 / Haiku 4.5,

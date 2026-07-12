@@ -1,6 +1,7 @@
 # Bibliothek Categorization Audit & Marketplace-Readiness Report
 
-_Last updated: 2026-07-09 · Branch: `claude/bibliothek-categorization-analysis-mtqo5o`_
+_Audit dated 2026-07-09 · Status: **implemented** (all five decisions shipped s84; the Bibliothek
+scale-up in s94–95 built on it). Retained as the findings record._
 
 ## Scope & method
 

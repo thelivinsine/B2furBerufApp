@@ -593,11 +593,14 @@ Squash-merging rewrites history: `main` gets one new commit while the long-lived
 Also: don't pre-write the next PR's `_Last updated`/log entry against a stale branch — realign first, then make new edits. The founder still verifies the live result; the sandbox can't reach the `*.github.io` site or the Actions tab.
 
 ## Roadmap & status (read these when resuming)
-- **`docs/PROJECT_STATUS.md`** — the **lean, living** status doc: current state, locked decisions, and
-  the "Resume here" pointer with the two most recent handoffs. Start here. (Split for token efficiency
-  in s70; keep it under ~250 lines, and when appending a handoff move any older than the two most
-  recent into the current ISO-week chunk under `docs/archive/status-log/` — the rule is restated at the
-  top of the file.)
+- **`docs/PROJECT_STATUS.md`** — the **lean, living** status doc: current state, current content
+  counts, and the "Resume here" pointer with the two most recent handoffs. Start here. (Split for token
+  efficiency in s70; the stable technical baseline moved to `PROJECT_FOUNDATION.md` in s95; keep it
+  under ~250 lines, and when appending a handoff move any older than the two most recent into the
+  current ISO-week chunk under `docs/archive/status-log/` — the rule is restated at the top of the file.)
+- **`docs/PROJECT_FOUNDATION.md`** — the **stable technical baseline** consulted on demand: shipped
+  architecture (Phase 1/2), locked architectural decisions, backend/infra setup, and completed founder
+  setup items. Split out of `PROJECT_STATUS.md` in s95 so the status file holds only living state.
 - **`docs/PROJECT_REFERENCE.md`** — stable, low-churn reference consulted on demand: the founder
   backlog, product-evaluation findings, per-session model guidance, and reusable research findings.
 - **`docs/archive/PROJECT_STATUS_ARCHIVE.md`** — index into the append-only history, chunked by ISO week

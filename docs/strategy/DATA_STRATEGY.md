@@ -15,10 +15,11 @@ native speaker checking every word by hand?"** It is desk strategy, not legal ad
 
 ## 1. The problem, stated honestly
 
-Genauly ships **1,195+ content items** (558 vocabulary, 432 collocations, 47 grammar drills,
-dialogues, exam sets, redemittel, texts, missions). The register already proves each item is
-**legally clean** (allowlisted license) and **has a reference URL**. But of those 1,195 rows,
-**~1,170 are still `review_status: "draft"`**. Only the 25 Can-Do statements are `"verified"`.
+Genauly ships **2,100+ content items** (1,022 vocabulary, 701 collocations, 117 grammar drills,
+dialogues, exam sets, redemittel, texts, missions; as of s95, 2026-07-12). The register already proves
+each item is **legally clean** (allowlisted license) and **has a reference URL**. But of the 2,132
+provenance rows, **~2,107 are still `review_status: "draft"`**. Only the 25 Can-Do statements are
+`"verified"`. (Re-verify counts against `pnpm lint:content` before quoting; they drift every content session.)
 
 The reason is a single hard constraint the founder has named directly:
 
