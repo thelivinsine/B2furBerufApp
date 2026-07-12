@@ -94,6 +94,43 @@ function weakLabel(srs: Record<string, SrsCard>, themeId: ThemeId): string {
   return themeById(themeId)?.titleDe ?? "neue Wörter";
 }
 
+/** How many of a narrowed slice a Bibliothek Üben session leads with. */
+export const FOCUS_VOCAB_CAP = 8;
+export const FOCUS_REDE_CAP = 4;
+
+/**
+ * Bibliothek Üben focus: translate a browse page's narrowed state (sub-theme,
+ * CEFR, Branche, or a Redemittel category) into the existing mission-style
+ * `focus` (lead with these exact items, drop the random grammar/Redemittel).
+ * Returns undefined when nothing narrows past the theme, so a bare-theme Üben
+ * keeps today's scope-only session. Capped + sampled so a large facet slice
+ * still yields a normal mixed session rather than a wall of one facet.
+ */
+export function libraryFocus(opts: {
+  theme?: string;
+  sub?: string;
+  cefr?: string[];
+  sector?: string[];
+  category?: string;
+}): { vocabIds: string[]; redemittelIds: string[] } | undefined {
+  if (opts.category) {
+    const ids = redemittel.filter((r) => r.category === opts.category).map((r) => r.id);
+    return ids.length ? { vocabIds: [], redemittelIds: sample(ids, FOCUS_REDE_CAP) } : undefined;
+  }
+  const narrowed = !!opts.sub || !!opts.cefr?.length || !!opts.sector?.length;
+  if (!narrowed) return undefined;
+  const pool = vocabulary.filter(
+    (v) =>
+      (!opts.theme || opts.theme === "all" || v.themeId === opts.theme) &&
+      (!opts.sub || v.subThemeId === opts.sub) &&
+      (!opts.cefr?.length || (!!v.cefr && opts.cefr.includes(v.cefr))) &&
+      (!opts.sector?.length || (!!v.sector && opts.sector.includes(v.sector))),
+  );
+  return pool.length
+    ? { vocabIds: sample(pool, FOCUS_VOCAB_CAP).map((v) => v.id), redemittelIds: [] }
+    : undefined;
+}
+
 export interface BuildSessionOpts {
   srs: Record<string, SrsCard>;
   mode: LearningMode;
@@ -110,6 +147,12 @@ export interface BuildSessionOpts {
    * due vocab, reading), so Üben mission N stays aligned with Spielen mission N.
    */
   focus?: { vocabIds: string[]; redemittelIds: string[] };
+  /**
+   * Pin the grammar micro-drill pool to one topic (the Grammatik lesson's Üben,
+   * `?grammar=`). The studied topic is guaranteed in the session, with more
+   * drills than the random pick, and the session header labels itself with it.
+   */
+  grammarTopicId?: string;
   /** Vocab ids in the learner's custom deck (#29); each gets a review boost. */
   savedWords?: string[];
   /**
@@ -220,10 +263,16 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
     (question): SessionBlock => ({ kind: "quiz", key: `qz_${question.id}`, question }),
   );
 
-  /* --- Pool 3: one or two grammar micro-drills --- */
-  const grammarTopic = sample(grammar, 1)[0];
+  /* --- Pool 3: grammar micro-drills. Pinned to the studied topic when the
+     Grammatik lesson launched the session (?grammar=), with more drills so the
+     lesson's own topic leads; otherwise one random topic. --- */
+  const pinnedTopic = opts.grammarTopicId
+    ? grammar.find((g) => g.id === opts.grammarTopicId)
+    : undefined;
+  const grammarTopic = pinnedTopic ?? sample(grammar, 1)[0];
+  const grammarDrillCount = pinnedTopic ? 4 : 2;
   const grammarBlocks: SessionBlock[] = grammarTopic
-    ? sample(grammarTopic.drills, Math.min(2, grammarTopic.drills.length)).map(
+    ? sample(grammarTopic.drills, Math.min(grammarDrillCount, grammarTopic.drills.length)).map(
         (drill): SessionBlock => ({
           kind: "grammar",
           key: `gr_${drill.id}`,

@@ -55,6 +55,8 @@ interface SessionPlayerProps {
   scope?: ThemeId;
   /** Mission focus: the exact vocab + Redemittel a Neuland mission exercises. */
   focus?: { vocabIds: string[]; redemittelIds: string[] };
+  /** Grammatik lesson Üben (`?grammar=`): pin the studied grammar topic. */
+  grammarTopicId?: string;
 }
 
 /**
@@ -79,6 +81,7 @@ function SessionRun({
   eyebrow = "Session",
   scope,
   focus,
+  grammarTopicId,
   onRestart,
 }: SessionPlayerProps & { onRestart: () => void }) {
   const navigate = useNavigate();
@@ -107,6 +110,7 @@ function SessionRun({
       difficulty: difficultyForLevel(level),
       scope,
       focus,
+      grammarTopicId,
       speaking: recognitionEnabled && recognitionSupported(),
       listening: ttsSupported(),
     }),
@@ -512,6 +516,9 @@ const LISTEN_SECONDS = 8;
  * is matched tolerantly against the German target, instant feedback, grade.
  * Fallback ladder: no ctor / permission denied / hard error flips this block to
  * a typed input; `sttDisabled` (repeated failures) starts there directly.
+ * "Anzeigen" reveals the answer and grades it as a miss (evaluate("")), so a
+ * learner who does not know the word can always move on; a give-up must not feed
+ * the scheduler a pass, mirroring the typed block's reveal.
  */
 function SpeakingBlock({
   block,
@@ -698,6 +705,9 @@ function SpeakingBlock({
           <Button variant="ghost" size="sm" className="w-full gap-2" onClick={flipToTyped}>
             <Keyboard className="h-4 w-4" /> Lieber tippen
           </Button>
+          <Button variant="ghost" size="sm" className="w-full" onClick={() => evaluate("")}>
+            Anzeigen
+          </Button>
         </div>
       ) : stage === "listening" ? (
         <Button
@@ -727,6 +737,9 @@ function SpeakingBlock({
               Prüfen
             </Button>
           </div>
+          <Button variant="ghost" size="sm" className="w-full" onClick={() => evaluate("")}>
+            Anzeigen
+          </Button>
         </div>
       )}
     </div>

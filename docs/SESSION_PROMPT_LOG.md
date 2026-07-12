@@ -3973,3 +3973,32 @@ Branch: `claude/whats-next-esga9u`.
   branch realigned.
 - **Artifacts:** `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`, `docs/PROJECT_STATUS.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 359 — 2026-07-12 (session 101)
+- **Branch:** `claude/uben-ui-refinements-dibbiz`
+- **Model:** Opus 4.8 (the plan's tier for the composer/SRS-adjacent chunk)
+- **Prompt (verbatim):**
+  > go ahead with first point
+- **Response summary:** Implemented Work item 1 of `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`
+  (Üben relevance + speaking "Anzeigen"). Engine (`src/engine/session.ts`): added the `grammarTopicId`
+  build opt (Pool 3 pins the studied grammar topic, 4 drills vs the random 2) and an exported pure
+  helper `libraryFocus({theme, sub, cefr[], sector[], category})` that maps a browse page's narrowed
+  state onto the existing mission-style `focus` (caps `FOCUS_VOCAB_CAP=8`/`FOCUS_REDE_CAP=4`, returns
+  undefined when nothing narrows past the theme). Route wrapper (`Session.tsx`): parses `?grammar=`/
+  `?cat=`/`?sub=`/`?cefr=`/`?sector=` (priority mission > grammar > libraryFocus), forwards a new
+  `SessionPlayer` `grammarTopicId` prop, and extends the remount key. Callers rewired: Grammatik
+  lesson (`?grammar=${topic.id}`), Redemittel (`?cat=` when a category is active), Wörter +
+  Kollokationen `startSession` (build the URL from live theme/sub/cefr/sector). Speaking block
+  (`SessionPlayer.tsx`) gained an "Anzeigen" ghost button in the prompt + typed stages calling the
+  existing `evaluate("")` (reveals the answer, grades FSRS 0, unlocks Weiter). Added 5
+  `tests/engine.test.ts` cases. Gates: typecheck ✔, test:unit 121/121, lint 0 errors, build +
+  prerender ✔, check:bundle 73.0 kB. Updated the plan doc (item 1 marked shipped), `PROJECT_STATUS.md`
+  (s101 handoff, s99 archived), `CLAUDE.md` (session-engine note), and this log. Committed, pushed,
+  PR into `main`, squash-merged, branch realigned.
+- **Artifacts:** `src/engine/session.ts`, `src/features/session/Session.tsx`,
+  `src/features/session/SessionPlayer.tsx`, `src/features/grammar/GrammarTopicView.tsx`,
+  `src/features/redemittel/RedemittelTrainer.tsx`, `src/features/vocabulary/VocabularyTrainer.tsx`,
+  `src/features/collocations/CollocationsBrowser.tsx`, `tests/engine.test.ts`,
+  `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `CLAUDE.md`,
+  `docs/SESSION_PROMPT_LOG.md`.

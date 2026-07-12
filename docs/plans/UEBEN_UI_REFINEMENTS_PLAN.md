@@ -1,8 +1,16 @@
 # Üben UI refinements plan (founder round, 2026-07-12, s100)
 
-**Status: APPROVED by the founder on 2026-07-12, NOT yet implemented.** This session (s100) planned
-only; implementation is future work, chunked below with a model recommendation per chunk. Line
-numbers are anchors as of s100 and may drift; re-locate by the quoted code, not the number.
+**Status: APPROVED by the founder on 2026-07-12.** Planned in s100; implementation is chunked below
+with a model recommendation per chunk. Line numbers are anchors and may drift; re-locate by the
+quoted code, not the number.
+
+**Progress:**
+- ✅ **Work item 1 (Üben relevance + speaking "Anzeigen") — SHIPPED s101 (Opus 4.8).** `grammarTopicId`
+  opt + `libraryFocus` helper in `engine/session.ts`, `Session.tsx` param parsing (`?grammar=`/`?cat=`/
+  `?sub=`/`?cefr=`/`?sector=`), caller wiring (Grammatik lesson, Redemittel, Wörter, Kollokationen),
+  the speaking-block give-up, and 5 new `tests/engine.test.ts` cases. Gates green (typecheck, test:unit
+  121/121, lint 0 errors, build, bundle 73.0 kB).
+- ⬜ Work items 2, 3, 4+5, 6 — not started.
 
 ## Context
 

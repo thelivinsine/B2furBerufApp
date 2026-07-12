@@ -341,7 +341,7 @@ function Lesson({
       <Button
         variant="gradient"
         className="hidden w-full sm:w-auto lg:inline-flex"
-        onClick={() => navigate("/session")}
+        onClick={() => navigate(`/session?grammar=${topic.id}`)}
       >
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
@@ -350,7 +350,7 @@ function Lesson({
         <Button
           variant="gradient"
           className="h-11 w-full rounded-xl text-base"
-          onClick={() => navigate("/session")}
+          onClick={() => navigate(`/session?grammar=${topic.id}`)}
         >
           <Zap className="h-4 w-4" /> Üben
         </Button>
