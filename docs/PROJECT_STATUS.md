@@ -1,11 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-12 (session 99). **Branche filter overhaul PLANNED, not implemented:**
-founder-approved plan saved to `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md` (root-cause fix for
-common words vanishing under Branche filters via `sectors[]` multi-tagging with untagged =
-universal, dropdown hierarchy Branche → Thema → Unterthema, 4 new sectors + Logistik boost with
-full starter packs, retag audit + verification). Plan-only session, no code/content changes.
-Detail in the s99 handoff at the bottom. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-12 (session 100). **Üben UI-refinements round PLANNED, not implemented:** six
+founder requests (Üben relevance + speaking "Anzeigen", graph count placement, Üben-map beautification
++ tappable stops, FilterRail desktop redesign, count beside Üben when expanded, Muster/explanation
+side by side) explored, designed, and founder-approved as
+`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` with a per-chunk model map. Zero app-code changes. Detail
+in the s100 handoff at the bottom. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -58,37 +58,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 98 (2026-07-12). First AI-jury review pass EXECUTED (scale-up plan §7),
-Opus 4.8.** The founder chose (via AskUserQuestion) to record the review as the honest machine-layer
-**`jury` tier**, NOT to flip `review_status` (on `/sources`, `review_status: "verified"` reads as
-"menschlich geprüft / human-verified", so an AI must not set it). Scope: Wave 3 Redemittel + Wave 4
-grammar.
-- **Reviewed 149 ids for German correctness** (grammar, spelling, article/plural, sense-match to the
-  English gloss, register + CEFR plausibility): 65 Redemittel (telephoning/emails/presentations/
-  jobInterview/smallTalk) + 14 grammar topics + 70 drills. Redemittel were **65/65 clean**; grammar
-  had **4 real defects, all fixed** in `src/data/grammar.ts`: (1) Genitiv pitfalls contained literal
-  `**s**` markdown that renders as visible asterisks (pitfalls are plain-text `<span>`, no markdown);
-  (2) Infinitivsätze pitfall #3 EN was about modals while the German was about commas — the `EnPeek`
-  swaps the list DE↔EN by index, so they must match; (3) Vergleichssätze drill d5 modeled `als ob` +
-  indicative, contradicting the topic's own Konjunktiv-II rule; (4) brauchen+zu drill d5 had a doubled
-  "nur" (the explain even apologized for it).
-- **Mechanism (new, honest, reproducible):** a committed sidecar `docs/reports/jury-review.json`
-  (`{ promptVersion, reviewer, pass: [content_id…] }`) lists the passed ids; `scripts/build-verification.mjs`
-  reads it and elevates each (no failing check, not already `human`) to the **`jury`** tier
-  (confidence 0.9, "KI-Jury/AI jury" badge on `/sources`, above `linguistic`, below `human`).
-  `verification.ts` stays fully generated (never hand-edited); append ids + regenerate for later waves.
-  `Sources.tsx` tier-summary list got `"jury"` added so the 149 show in the breakdown.
-- **Pipeline (all green):** `build:verification` → tiers **human 25 · jury 149 · linguistic 1831 ·
-  facts 1 · provenance 126**; `lint:content` ✔ (validates jury enum + prints distribution);
-  `verify:facts` **0 two-oracle errors**; `typecheck` ✔; `test:unit` **116/116**; `build` + prerender
-  ✔; `check:bundle` **73.0 kB**/400. No content-bank counts changed (edits were fixes, not additions);
-  `review_status` unchanged, so headline **verified % stays 25/2,132 = 1.2%** (the human loop is still
-  the founder's to run).
-- **NOT done / follow-up:** the human `verified` pass (founder flips real rows via `pnpm review:queue`);
-  extend the jury pass to Waves 1–2 vocab/collocations + texts (append to the sidecar); Wave-2 tranche 2
-  (care/trades/retail/hospitality/transport/beauty/sports) after 2026-07-13 classmate feedback; the
-  Playwright grammar-lesson smoke (carried over).
-
 **Handoff after session 99 (2026-07-12). Branche filter overhaul PLANNED and approved, NOT
 implemented (founder: "save it on the repo", implementation is a follow-up session).** Full plan:
 **`docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`**. The founder reported that common words (e.g.
@@ -116,6 +85,36 @@ das Projekt) look tied to a single Branche and demanded a root-cause fix plus mi
 - **NOT done:** all implementation. Carried over: human `verified` pass via `pnpm review:queue`,
   jury pass extension to Waves 1–2, Wave-2 tranche 2, Playwright grammar smoke.
 
-_(Sessions 85-97's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+**Handoff after session 100 (2026-07-12). Üben UI-refinements round: PLANNED AND APPROVED, deliberately
+NOT implemented (founder instruction).** Six founder requests explored (3 parallel codebase passes),
+designed, and written up as **`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`**, which the founder approved
+verbatim with "don't implement it now". Zero app-source or content changes this session; the plan doc
+is the deliverable. Start the next session by picking a chunk from that plan.
+- **The six requests (chunk → recommended model, full map in the plan):** (1a) Üben relevance:
+  `?grammar=<topicId>` pins the session's grammar pool to the studied lesson, and a new pure
+  `libraryFocus` helper translates Bibliothek facets (`?sub/?cefr/?sector`) and the Redemittel
+  category (`?cat=`) into the existing mission-style `focus` opt → **Opus 4.8** (composer/SRS-adjacent);
+  (1b) speaking block gets the typing block's "Anzeigen" give-up (grades wrong, unlocks Weiter) →
+  **Sonnet 5**; (2) graph view: word count moves beside Üben like every view, only "n Verbindungen"
+  stays under the canvas → **Sonnet 5**; (4+5) FilterRail desktop: restyle the grey `bg-border` slab
+  as a standard `bg-surface shadow-soft` card (muted pills, eyebrow labels) and keep the count beside
+  Üben in the footer even when expanded (reset icon moves into a restructured header) → **Sonnet 5**,
+  escalate on taste rounds; (6) grammar lesson: Muster + explanation become a 2fr/3fr lg grid →
+  **Sonnet 5**; (3) Üben city map: tappable building stops that slide the practice card via the
+  existing `goTo` pager + a real beautification pass (two-tone building illustrations, gradient
+  ground/parks, tree clusters, stronger route glow, both palettes, no reward-gold) → **Fable 5**
+  first choice, **Opus 4.8** fallback.
+- **Key code anchors verified this session:** TypingBlock already has "Anzeigen"
+  (`SessionPlayer.tsx:846-853`), SpeakingBlock has none; the count jump lives in
+  `FilterRail.tsx` L458-465 + the `!open` guard at L509; graph counts in `WordGraph.tsx:575-578`;
+  the map stops are not tappable today (`UebenPath.tsx:246-263`, SVG `role="img"`).
+- **Constraints folded into the plan:** mission-player/mat/s90 parity untouched, focus-mode
+  semantics reused not re-invented, 400 kB bundle unaffected (all touched chunks lazy), all new
+  copy em-dash-free.
+- **NOT done:** all six chunks (the whole plan); plus the carried-over items: the founder's human
+  `verified` pass, extending the AI-jury pass to Waves 1-2, Wave-2 tranche 2 (after the 2026-07-13
+  classmate feedback), the Playwright grammar smoke.
+
+_(Sessions 85-98's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_
