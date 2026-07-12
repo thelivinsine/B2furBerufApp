@@ -1,6 +1,16 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-12 (session 92: **Bibliothek browse pages — 14 founder UI-refinement rounds
+_Last updated: 2026-07-12 (session 93: **Grammatik tab redesigned onto the shared Bibliothek browse
+skeleton (PR #457).** The fourth Bibliothek tab now matches the other three at the structural level
+(LibrarySwitcher header → toolbar with mobile filter toggle + Karten/Liste view switcher + transient fuzzy
+search → content → Üben in the FilterRail footer / sticky mobile bar), with **Gruppe** as the primary
+dropdown and **Stufe (CEFR)** as a facet (`grammarFacets()` in `lib/facets.ts`). Topic cards were redesigned
+(emerald group tile, priority-rank chip, mono pattern strip, "Lernen →"), a compact Liste view added, and
+the topic page became a focused **lesson**: hero, emerald Muster formula panel, Beispiele, Typische Fehler,
+numbered Übungen with a live progress bar, a completion panel that hands over the next topic, and prev/next
+navigation along the B2-marker priority spine ("Thema n von 10"). Browser-verified both breakpoints incl.
+the full drill loop; gates green, main chunk 73.0 kB. Detail in the s93 handoff below.**
+Prior, session 92: **Bibliothek browse pages — 14 founder UI-refinement rounds
 (PRs #442–#455), all squash-merged.** The three browse tabs (Wörter/Kollokationen/Redemittel) were reworked
 from the founder's phone screenshots: **search moved OUT of the filter panel** into a transient toggle (icon
 by the bookmark) backed by a new forgiving matcher (`src/lib/fuzzy.ts`, Damerau edit-1 + umlaut/token
@@ -311,103 +321,37 @@ each).** A long chain of screenshot-driven mobile/desktop polish on the three br
   is wanted); mobile pins persist a preference but don't visually collapse sections the way desktop does
   (no mobile collapse state); `BrowseToolbar`/`FacetSheet` remain in the repo but unused on these pages.
 
-**Handoff after session 91 (2026-07-11). Bibliothek views: desktop filter rail + view switcher + word graph
-(branch `claude/bibliothek-mockup-review-rcghlq`, PR #431).**
+**Handoff after session 93 (2026-07-12). Grammatik tab redesigned onto the shared Bibliothek skeleton
+(branch `claude/grammatik-section-redesign-v3gmv7`, PR #457).** Founder asked for a "complete
+re-imagination" of Grammatik: follow the other three tabs' high-level concept (filters → content → Üben)
+but with design freedom, and make it highly useful and intuitive for adult learners and job holders.
+- **Hub = the s92 skeleton, exactly:** LibrarySwitcher page header, toolbar row `[Filter icon (mobile) ·
+  ViewSwitcher · Suche icon]`, transient full-width fuzzy `SearchField` (over titleDe/title/purposeDe/
+  pattern/group label), `FilterRail` on both breakpoints from ONE `filterRailProps` (desktop sticky rail,
+  mobile AnimatePresence slide panel), sticky mobile bottom bar with Üben + "n Themen". **Gruppe** is the
+  primary dropdown (control-choice rule: it's the "where am I" cut) and **Stufe (CEFR)** the facet, added
+  as `grammarFacets()`/`GRAMMAR_FACET_IDS` in `lib/facets.ts` (100% coverage, cefr required since s84).
+  Params `?group=`/`?cefr=`/`?view=`/`?topic=` are URL-persisted; `/grammar?topic=` deep links (search)
+  still resolve.
+- **Views (new `grammar/GrammarViews.tsx`):** Karten (default) = redesigned topic cards (emerald group
+  icon tile, **priority-rank chip**, CEFR badge, purpose, truncated mono pattern strip, "n Übungen" +
+  "Lernen →" affordance); Liste = numbered compact rows. No Tabelle (a lesson is not a row of atomic
+  facts). Shared metadata moved to `grammar/grammarMeta.ts`: `groupMeta`, the B2-marker `groupOrder`,
+  `orderedGrammar` (the flattened priority spine) and `topicRank`.
+- **Lesson page (new `grammar/GrammarTopicView.tsx`):** hero (group tile, English eyebrow, titleDe,
+  purpose, badges) → explanation card with an emerald **Muster** formula panel → Beispiele (speakable) →
+  Typische Fehler (warning list) → **numbered Übungen with a live progress bar** (first-answer results,
+  local state remounted per topic) → a **completion panel** ("Thema abgeschlossen · k von n richtig" +
+  one-tap "Weiter: <next topic>") → prev/next cards along the spine + the kept "Wissen im Quiz testen"
+  `/quiz` CTA. "Thema n von 10" in the top row; lesson scrolls to top on open. Rationale for the rank/
+  spine emphasis: the audience is time-poor working adults, so the section answers "where do I start,
+  what's next" without them deciding (top of the list = biggest B2 lever).
+- **Verified in a real browser** (Playwright + the preinstalled Chromium against `pnpm dev`): hub Karten/
+  Liste on desktop + mobile, filter rail counts, lesson desktop + mobile, and the full drill loop (5/5
+  answered → XP in header → completion panel → "Weiter: Konjunktiv II" navigates). Gates green:
+  typecheck, ESLint 0 errors, `test:unit` 116/116, build + prerender, `check:bundle` **73.0 kB**/400.
+- **NOT done / follow-up candidates:** per-topic drill progress is session-local only (persisting
+  "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
+  (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.
 
-Founder shared a hand-drawn Bibliothek mockup (desktop: tab row, a 4-icon view switcher, card grid, right-hand
-search + filter rail) and confirmed the intent in Q&A: (1) the four views are Tabelle / **nodal graph like
-Obsidian** (all words, connections = which words go well together, node size = real-life usage) / Karten
-(current) / Liste; (2) desktop-first but adapted to mobile; (3) the Thema/Kategorie filter belongs IN the
-rail. Then "go ahead full speed." All three phases built, verified in a real browser (Playwright, desktop +
-mobile, zero console errors), and shipped:
-- **`features/shared/FilterRail.tsx`:** persistent right rail on lg+ for Wörter/Kollokationen/Redemittel
-  inside a new two-column page grid (`lg:grid-cols-[minmax(0,1fr)_16rem]`, rail sticky with internal
-  scroll). Suche on top (shared debounced `SearchField.tsx`, extracted from BrowseToolbar), then the primary
-  scope as a row list (Domain-grouped Thema via `themeGroupsForMode`; Kategorie on Redemittel; capped
-  `max-h-72` box so facets below stay discoverable), then every facet as always-visible pills with live
-  what-a-tap-yields counts + zero-yield greying (same semantics as FacetSheet, but immediate commit, no
-  draft/apply). Same URL params as mobile. **Mobile keeps the locked BrowseToolbar + FacetSheet untouched**
-  (`lg:hidden` wrapper); the toolbar's trailing actions (Gespeichert/Üben) render in the meta row on desktop.
-- **`features/shared/ViewSwitcher.tsx` (`?view=`, whitelist per tab, `karten` default + kept out of the
-  URL):** Wörter = tabelle/graph/karten/liste; Kollokationen + Redemittel = tabelle/karten/liste; Grammatik
-  untouched. **`features/shared/DataTable.tsx`** is the generic sortable table (asc→desc→bank-order cycling,
-  German `Intl.Collator`, missing values sink, `usePagedList` incremental rows, own `overflow-x-auto` box;
-  note: sort-header buttons need their own `uppercase` because Tailwind preflight resets it on buttons).
-  Column defs + compact lists per tab: `vocabulary/VocabViews.tsx` (exports `SaveButton`),
-  `collocations/CollocationViews.tsx`, `redemittel/RedemittelViews.tsx`. Vocab table sorts Häufigkeit by raw
-  Zipf and strips articles for the Wort sort key.
-- **The word graph (`vocabulary/WordGraph.tsx` + pure builder `vocabulary/wordGraph.ts`, pinned by
-  `tests/wordgraph.test.ts`, 110 unit tests green):** graph of the CURRENTLY FILTERED vocab list. Edges from
-  two authored sources only (no inference): `related` strings resolved to bank entries (normalizer strips
-  der/die/das + ein-forms + "sich" + bracketed hints; unresolvable related terms are dropped, founder-confirmed)
-  and collocations whose noun AND verb both resolve. Node radius = wordfreq Zipf (`frequency.ts`; no corpus
-  evidence = min radius, never a fake claim), color = the 6 domains (legend under the canvas + n Wörter · m
-  Verbindungen). Canvas-rendered (642 nodes smooth), d3-force (**new dep, 3.0.0**) with weak x/y centering so
-  unlinked words stay in the cloud; sim pre-ticks 120 steps then settles gently; positions survive filter
-  changes. Pan/pinch/wheel-zoom/node-drag; zoom-fades labels; tap selects a word → neighbors highlight,
-  rest dims, and a detail card shows (word + SpeakButton + bookmark + CEFR/Häufigkeit/degree badges +
-  example). Zoom +/−/fit buttons. **Lazy chunk** (`React.lazy` inside VocabularyTrainer, ~12 kB incl.
-  d3-force); main chunk unchanged at **72.8 kB** / 400.
-- Also fixed German: "n Worte" → "n Wörter" (meta row + FacetSheet apply label).
-- Gates green: build + prerender, typecheck, ESLint 0 errors, `lint:content` pass, `test:unit` **110/110**,
-  `check:bundle` 72.8 kB. Browser-verified: rail pill writes `?cefr=`, Thema row writes `?theme=`, all four
-  views render desktop + mobile, graph click-select works, zero console errors.
-- **Ship status:** shipped as **PR #431**, squash-merged to `main`; branch realigned after the merge.
-  **Founder verifies the live site.**
-- **Founder follow-up round (same session, PR #432):** the rail is now a **collapsible tile** (brand-tinted
-  `bg-primary/10` header with "Filter" + active-count badge + chevron; whole panel expands/collapses), the
-  **LibrarySwitcher moved into the left column** so the tab pills sit beside the filter tile on desktop,
-  the **meta row + graph legend are centered on mobile**, and the duplicated word count was removed (the
-  graph legend now shows only "n Verbindungen"; the word count lives in the meta row alone).
-- **Founder follow-up round 2 (same session, PR #433):** the **Üben button moved to the bottom of the
-  filter tile** as an always-visible `footer` slot (shows in collapsed state too; mobile keeps Üben in the
-  toolbar, the desktop meta row keeps only Gespeichert on Wörter), and **every rail section got a pin**:
-  the pin icon in a section header keeps that section (Thema/Kategorie or any facet group) visible while
-  the panel is collapsed. Pins persist per tab in localStorage (`b2beruf.railPins`), verified across
-  reload via Playwright.
-- **Founder follow-up round 3 (same session, PR #434):** in the **graph view** the word count moved out of
-  the top meta row and sits with the connection count at the bottom of the canvas ("586 Wörter · 673
-  Verbindungen"); the meta row keeps only the view switcher + Gespeichert there. Other views (Tabelle/
-  Karten/Liste) keep the word count in the meta row as before.
-- **Founder follow-up round 4 (same session, PR #435):** the desktop filter tile was **too high** (it
-  aligned with the tab row). Restructured all three browse pages so the **filter tile now starts level with
-  the first content card** (measured rail-top = card-top).
-- **Founder follow-up round 5 (same session, PR #436):** round 4 had stretched the tabs to full width; the
-  founder wanted them back at content width. Switched all three pages to an **explicit 2-col × 2-row grid**:
-  the tabs + view-switcher meta row sit in row 1 / col 1 (content-column width, NOT full width), and the
-  content (row 2 / col 1) + the filter rail (row 2 / col 2) share row 2, so the tabs stay at content width
-  AND the filter tile still lines up with the first card (measured tabs-right 1112 < grid-right 1400;
-  rail-top = card-top = 329). Mobile unchanged.
-- **Founder follow-up round 6 (same session, PR #437):** the rail's **primary scope (Thema/Kategorie) is
-  now a `Select` dropdown** instead of the always-open row list, so the facet groups sit closer to the top.
-  Reuses the same grouped options (Domain headings + counts) as the mobile toolbar; verified the dropdown
-  opens and selecting a theme writes `?theme=`.
-- **Founder follow-up round 7 (same session, PR #438):** (1) the **whole filter tile is brand-tinted**
-  (`bg-primary/10` body + `border-primary/20` + `border-primary/15` dividers), not just the header; (2) the
-  **same collapsible filter tile now renders on mobile too**, retiring the mobile BrowseToolbar + FacetSheet
-  on these three pages. One `filterRailProps` object feeds a desktop `<FilterRail>` (sticky, default-open)
-  and a mobile one (`lg:hidden`, inline, `defaultOpen={false}` so it starts as a compact Filter bar you tap
-  to expand). Gespeichert (Wörter) moved into the meta row on mobile; Redemittel's mobile register chips
-  were removed (Register is a rail facet). Verified both breakpoints via Playwright (themed tile, mobile
-  collapse/expand, zero console errors). `BrowseToolbar`/`FacetSheet` remain in the repo, just unused here.
-- **Founder follow-up round 8 (same session, PR #439):** (1) the filter tile switched from the brand tint to
-  a **grey shade** (`bg-muted` + `border-border`; "Filter" label keeps the brand accent). (2) **Üben is now
-  always visible.** On desktop the aside is a **capped scroll container** (`lg:overflow-y-auto` +
-  `lg:max-h-[calc(100vh-22rem)]`) with the header `lg:sticky lg:top-0` and the Üben footer `lg:sticky
-  lg:bottom-0`, so the facet body scrolls and Üben stays on screen at every scroll position (verified across
-  800/900/1080 viewport heights). On mobile the tile initially had no footer; a shared `StickyUebenBar`
-  floated Üben above the bottom nav. (The earlier flex-1 body-scroll attempt let the footer overflow past the
-  clipped aside; the aside-scroll + sticky-footer pattern is the fix.)
-- **Founder follow-up round 9 (same session, PR #440):** "üben should be always part of filter tile even in
-  mobile." Removed the separate `StickyUebenBar`; the **mobile tile now carries the Üben footer** like
-  desktop. To keep it visible while scrolling, the mobile FilterRail is a **grid child** (moved out of the
-  header column, so its sticky containing block spans the card list) pinned just below the app header
-  (`sticky top-[calc(4rem_+_env(safe-area-inset-top))] z-10 max-h-[70dvh] lg:hidden`) and capped, and the
-  FilterRail's sticky header/footer + internal scroll now apply on both breakpoints. Verified: Üben is
-  in-tile and inView at scroll 0/900/2500 on mobile (pinned at ~118px) with the app header sitting above it,
-  and desktop still visible at all scroll positions.
-- **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
-  dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
-  could later render as satellite nodes; table column set per founder taste.
-
-_(Sessions 85-90's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
+_(Sessions 85-91's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
