@@ -1,11 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { buildSession, graduatedToTyping } from "@/engine/session";
+import {
+  buildSession,
+  graduatedToTyping,
+  libraryFocus,
+  FOCUS_VOCAB_CAP,
+  FOCUS_REDE_CAP,
+} from "@/engine/session";
 import { sessionPreview, targetBlocks, weakestBand } from "@/engine/sessionPreview";
 import { freshCard, review, isDue, mastery } from "@/engine/srs";
 import { missionContentIds } from "@/engine/mission";
 import { searchAll } from "@/lib/search";
 import { daysBetween, shuffle, todayKey } from "@/lib/utils";
 import { vocabulary } from "@/data/vocabulary";
+import { redemittel } from "@/data/redemittel";
+import { grammar } from "@/data/grammar";
 import { missions } from "@/data/missions";
 import type { SrsCard } from "@/types";
 
@@ -50,6 +58,31 @@ describe("session composer", () => {
     const ids = missionContentIds(dach!);
     expect(ids.vocabIds).toContain("v_wohnungsgeberbestaetigung");
     expect(ids.redemittelIds.length).toBeGreaterThan(0);
+  });
+
+  it("pins the grammar pool to a studied topic when grammarTopicId is set", () => {
+    // Grammatik lesson Üben (?grammar=): the studied topic must lead, so every
+    // grammar block belongs to it and the session labels itself with it.
+    const topic = grammar[0];
+    const plan = buildSession({ srs: {}, mode: "both", minutes: 20, grammarTopicId: topic.id });
+    const grammarBlocks = plan.blocks.filter((b) => b.kind === "grammar") as Extract<
+      (typeof plan.blocks)[number],
+      { kind: "grammar" }
+    >[];
+    expect(grammarBlocks.length).toBeGreaterThan(0);
+    const topicDrillIds = new Set(topic.drills.map((d) => d.id));
+    for (const b of grammarBlocks) {
+      expect(b.groupLabel).toBe(topic.titleDe);
+      expect(topicDrillIds.has(b.drill.id)).toBe(true);
+    }
+    expect(plan.focus).toBe(topic.titleDe);
+  });
+
+  it("falls back to a random grammar topic for an unknown grammarTopicId", () => {
+    const plan = buildSession({
+      srs: {}, mode: "both", minutes: 20, grammarTopicId: "does_not_exist",
+    });
+    expect(plan.blocks.length).toBeGreaterThan(0);
   });
 
   it("adds speaking blocks only when the caller opts in", () => {
@@ -147,6 +180,41 @@ describe("session composer", () => {
 
   it("weakestBand ignores unstarted cards", () => {
     expect(weakestBand({})).toBeNull();
+  });
+});
+
+describe("libraryFocus (Bibliothek Üben)", () => {
+  it("returns undefined when nothing narrows past the theme", () => {
+    expect(libraryFocus({})).toBeUndefined();
+    expect(libraryFocus({ theme: "behoerde" })).toBeUndefined();
+    expect(libraryFocus({ theme: "all" })).toBeUndefined();
+  });
+
+  it("leads with the sub-theme's own words, capped and Redemittel-free", () => {
+    const tagged = vocabulary.find((v) => v.subThemeId);
+    expect(tagged).toBeTruthy();
+    const focus = libraryFocus({ theme: tagged!.themeId, sub: tagged!.subThemeId });
+    expect(focus).toBeTruthy();
+    expect(focus!.redemittelIds).toEqual([]);
+    expect(focus!.vocabIds.length).toBeGreaterThan(0);
+    expect(focus!.vocabIds.length).toBeLessThanOrEqual(FOCUS_VOCAB_CAP);
+    const byId = new Map(vocabulary.map((v) => [v.id, v]));
+    for (const id of focus!.vocabIds) {
+      expect(byId.get(id)?.subThemeId).toBe(tagged!.subThemeId);
+    }
+  });
+
+  it("maps a Redemittel category to a Redemittel-only focus", () => {
+    const cat = redemittel[0].category;
+    const focus = libraryFocus({ category: cat });
+    expect(focus).toBeTruthy();
+    expect(focus!.vocabIds).toEqual([]);
+    expect(focus!.redemittelIds.length).toBeGreaterThan(0);
+    expect(focus!.redemittelIds.length).toBeLessThanOrEqual(FOCUS_REDE_CAP);
+    const byId = new Map(redemittel.map((r) => [r.id, r]));
+    for (const id of focus!.redemittelIds) {
+      expect(byId.get(id)?.category).toBe(cat);
+    }
   });
 });
 

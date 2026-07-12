@@ -202,6 +202,15 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   `engine/session.ts` Pool 6 emits ~1 per session, `features/session/ReadingBlock.tsx` renders a text +
   its comprehension MCQs, a voicemail plays via TTS when `ttsSupported()`; feeds XP + the session tally,
   **never vocab FSRS**).
+  **Üben is scoped to where the learner is (s101, Üben-refinements plan item 1):** `Session.tsx` parses
+  `?grammar=` (Grammatik lesson pins its topic via the `grammarTopicId` opt, Pool 3 uses 4 drills of
+  that topic), `?cat=` (Redemittel category), and the Bibliothek facets `?sub=`/`?cefr=`/`?sector=`
+  (the pure `libraryFocus` helper in `engine/session.ts` maps them onto the existing mission-style
+  `focus`, so the session leads with that narrowed slice; `undefined` when nothing narrows past the
+  theme, so a bare-theme Üben is unchanged). Priority mission > grammar > libraryFocus; GrammarHub +
+  bare theme stay generic. The **speaking block has an "Anzeigen" give-up** (calls `evaluate("")`:
+  reveals the answer, grades FSRS 0, unlocks Weiter), mirroring the typed block, so a learner who does
+  not know a word can always move on.
   **Focus mode (redesign Phase 2.1):** `SessionPlayer` sets `useSessionStore.focusMode` while a block
   is on screen, and `AppShell` hides all chrome (header, bottom bar, sidebar) on `/session` + `/revision`
   so the session plays as a full-screen stage; chrome returns on the end screen. The locked bottom-bar

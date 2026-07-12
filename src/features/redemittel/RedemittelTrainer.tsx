@@ -143,7 +143,7 @@ export function RedemittelTrainer() {
     onChange: setRailSelection,
     pinScope: "redemittel",
     footer: (
-      <Button variant="gradient" className="h-10 w-full" onClick={() => navigate("/session")}>
+      <Button variant="gradient" className="h-10 w-full" onClick={() => navigate(category !== "all" ? `/session?cat=${category}` : "/session")}>
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
     ),
@@ -321,7 +321,7 @@ export function RedemittelTrainer() {
           <Button
             variant="gradient"
             className="h-11 flex-1 rounded-xl text-base"
-            onClick={() => navigate("/session")}
+            onClick={() => navigate(category !== "all" ? `/session?cat=${category}` : "/session")}
           >
             <Zap className="h-4 w-4" /> Üben
           </Button>

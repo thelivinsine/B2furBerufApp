@@ -231,7 +231,19 @@ export function VocabularyTrainer() {
     [learningMode, theme],
   );
 
-  const startSession = () => navigate(`/session${theme !== "all" ? `?theme=${theme}` : ""}`);
+  // Carry the learner's active learning scope into the session, so Üben
+  // practises what they are looking at (theme, sub-theme, CEFR, Branche).
+  // pos/srs/frequency are browse lenses, not learning scopes, so they are
+  // deliberately not forwarded.
+  const startSession = () => {
+    const p = new URLSearchParams();
+    if (theme !== "all") p.set("theme", theme);
+    if (subFilter) p.set("sub", subFilter);
+    if (selection.cefr?.length) p.set("cefr", selection.cefr.join(","));
+    if (selection.sector?.length) p.set("sector", selection.sector.join(","));
+    const q = p.toString();
+    navigate(`/session${q ? `?${q}` : ""}`);
+  };
 
   // Icon-only bookmark filter (founder s92): sits on the view-options line as a
   // bare icon, no label. The Filter toggle now lives inside the tile footer

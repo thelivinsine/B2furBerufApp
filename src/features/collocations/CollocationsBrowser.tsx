@@ -199,7 +199,18 @@ export function CollocationsBrowser() {
     [learningMode, themeParam],
   );
 
-  const startSession = () => navigate(`/session${activeTheme ? `?theme=${activeTheme.id}` : ""}`);
+  // Carry the active scope into the session. Collocations have no session block
+  // kind, so the sub/CEFR/Branche narrowing lands on the matching vocab slice
+  // (via libraryFocus). pos/srs are browse lenses and are not forwarded.
+  const startSession = () => {
+    const p = new URLSearchParams();
+    if (activeTheme) p.set("theme", activeTheme.id);
+    if (subFilter) p.set("sub", subFilter);
+    if (selection.cefr?.length) p.set("cefr", selection.cefr.join(","));
+    if (selection.sector?.length) p.set("sector", selection.sector.join(","));
+    const q = p.toString();
+    navigate(`/session${q ? `?${q}` : ""}`);
+  };
 
   // The filter tile is the single filter surface on BOTH breakpoints (founder
   // follow-up, s91): desktop rail + mobile tile share these props.

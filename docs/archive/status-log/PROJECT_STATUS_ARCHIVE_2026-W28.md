@@ -1420,3 +1420,30 @@ grammar.
   extend the jury pass to Waves 1–2 vocab/collocations + texts (append to the sidecar); Wave-2 tranche 2
   (care/trades/retail/hospitality/transport/beauty/sports) after 2026-07-13 classmate feedback; the
   Playwright grammar-lesson smoke (carried over).
+
+**Handoff after session 99 (2026-07-12). Branche filter overhaul PLANNED and approved, NOT
+implemented (founder: "save it on the repo", implementation is a follow-up session).** Full plan:
+**`docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`**. The founder reported that common words (e.g.
+das Projekt) look tied to a single Branche and demanded a root-cause fix plus missing industries.
+- **Root cause diagnosed (verified in code):** `sector?: WorkSector` is single-valued and only
+  ~406/1,022 words + 165/701 collocations are tagged; the facet filter is strict, so selecting any
+  Branche hides EVERY untagged word (das Projekt has no tag at all) and pins tagged cross-industry
+  words (die Wartung, das Werkzeug, der Schichtplan) to exactly one industry. Systemic, not
+  per-word. There is also currently NO UI surface showing a word's Branche.
+- **Approved design (see the plan for detail):** (1) `sectors?: WorkSector[]` with **untagged =
+  universal** semantics (`matchesSector`: untagged shows under every Branche, tagged hides only
+  under other Branchen), Branche moves out of the pill facets into a **scope dropdown**, rail
+  hierarchy **Branche → Thema → Unterthema** (FilterRail generalized to an ordered `scopes[]`);
+  (2) retag audit of all 571 tagged items (1–4 sectors typical, 5+ = untag) with a founder-review
+  report `docs/reports/sector-audit-report.md`; (3) **4 new sectors** — `chemicals` (Chemie &
+  Kunststoff), `pharma` (Pharma & Medizintechnik), `cleaning` (Reinigung), `security`
+  (Sicherheitsdienste), 15 total — plus `transport` relabeled "Transport & Logistik" with a ~10-word
+  Lager boost, each new sector with a full ~20-word + ~9-collocation starter pack (founder chose
+  all options + full packs via AskUserQuestion); (4) Branche chips on Tabelle/Karten so
+  applicability is inspectable; (5) new `tests/sectors.test.ts` + linter `sectors[]` validation +
+  E2E checklist (das Projekt visible under IT AND Bau; Bauzaun only under Bau).
+- **Freed constraints:** as a scope, Branche escapes the ≤12-option facet cap and the 15% coverage
+  floor (which is what makes 15 sectors possible). The linter's frequency check only errors on
+  STALE ids, so new words without a Häufigkeit bin don't block if `wordfreq` regen is unavailable.
+- **NOT done:** all implementation. Carried over: human `verified` pass via `pnpm review:queue`,
+  jury pass extension to Waves 1–2, Wave-2 tranche 2, Playwright grammar smoke.

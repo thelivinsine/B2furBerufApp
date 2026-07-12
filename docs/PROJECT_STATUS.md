@@ -1,11 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-12 (session 100). **Üben UI-refinements round PLANNED, not implemented:** six
-founder requests (Üben relevance + speaking "Anzeigen", graph count placement, Üben-map beautification
-+ tappable stops, FilterRail desktop redesign, count beside Üben when expanded, Muster/explanation
-side by side) explored, designed, and founder-approved as
-`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` with a per-chunk model map. Zero app-code changes. Detail
-in the s100 handoff at the bottom. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-12 (session 101). **Üben UI-refinements plan, Work item 1 SHIPPED (Opus 4.8):**
+Üben now tailors the session to where the learner is (Grammatik lesson pins its topic via `?grammar=`,
+Redemittel by category via `?cat=`, Bibliothek by the active `?sub`/`?cefr`/`?sector` facets, all via
+a new `libraryFocus` helper + a `grammarTopicId` composer opt), and the speaking block gained an
+"Anzeigen" give-up so a learner who does not know a word can move on (graded a miss). Items 2/3/4+5/6
+of `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` remain. Detail in the s101 handoff at the bottom.
+Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -58,33 +59,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 99 (2026-07-12). Branche filter overhaul PLANNED and approved, NOT
-implemented (founder: "save it on the repo", implementation is a follow-up session).** Full plan:
-**`docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`**. The founder reported that common words (e.g.
-das Projekt) look tied to a single Branche and demanded a root-cause fix plus missing industries.
-- **Root cause diagnosed (verified in code):** `sector?: WorkSector` is single-valued and only
-  ~406/1,022 words + 165/701 collocations are tagged; the facet filter is strict, so selecting any
-  Branche hides EVERY untagged word (das Projekt has no tag at all) and pins tagged cross-industry
-  words (die Wartung, das Werkzeug, der Schichtplan) to exactly one industry. Systemic, not
-  per-word. There is also currently NO UI surface showing a word's Branche.
-- **Approved design (see the plan for detail):** (1) `sectors?: WorkSector[]` with **untagged =
-  universal** semantics (`matchesSector`: untagged shows under every Branche, tagged hides only
-  under other Branchen), Branche moves out of the pill facets into a **scope dropdown**, rail
-  hierarchy **Branche → Thema → Unterthema** (FilterRail generalized to an ordered `scopes[]`);
-  (2) retag audit of all 571 tagged items (1–4 sectors typical, 5+ = untag) with a founder-review
-  report `docs/reports/sector-audit-report.md`; (3) **4 new sectors** — `chemicals` (Chemie &
-  Kunststoff), `pharma` (Pharma & Medizintechnik), `cleaning` (Reinigung), `security`
-  (Sicherheitsdienste), 15 total — plus `transport` relabeled "Transport & Logistik" with a ~10-word
-  Lager boost, each new sector with a full ~20-word + ~9-collocation starter pack (founder chose
-  all options + full packs via AskUserQuestion); (4) Branche chips on Tabelle/Karten so
-  applicability is inspectable; (5) new `tests/sectors.test.ts` + linter `sectors[]` validation +
-  E2E checklist (das Projekt visible under IT AND Bau; Bauzaun only under Bau).
-- **Freed constraints:** as a scope, Branche escapes the ≤12-option facet cap and the 15% coverage
-  floor (which is what makes 15 sectors possible). The linter's frequency check only errors on
-  STALE ids, so new words without a Häufigkeit bin don't block if `wordfreq` regen is unavailable.
-- **NOT done:** all implementation. Carried over: human `verified` pass via `pnpm review:queue`,
-  jury pass extension to Waves 1–2, Wave-2 tranche 2, Playwright grammar smoke.
-
 **Handoff after session 100 (2026-07-12). Üben UI-refinements round: PLANNED AND APPROVED, deliberately
 NOT implemented (founder instruction).** Six founder requests explored (3 parallel codebase passes),
 designed, and written up as **`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`**, which the founder approved
@@ -115,6 +89,33 @@ is the deliverable. Start the next session by picking a chunk from that plan.
   `verified` pass, extending the AI-jury pass to Waves 1-2, Wave-2 tranche 2 (after the 2026-07-13
   classmate feedback), the Playwright grammar smoke.
 
-_(Sessions 85-98's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+**Handoff after session 101 (2026-07-12). Üben-refinements Work item 1 SHIPPED (Opus 4.8).** The
+founder said "go ahead with first point" against `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`. Two
+things: Üben is now specific to where the learner is, and the speaking block can be skipped.
+- **Üben relevance (engine + wiring):** new composer opt `grammarTopicId` (`engine/session.ts`) pins
+  Pool 3 to a studied grammar topic with 4 drills instead of the random topic's 2, and a new exported
+  pure helper **`libraryFocus({theme, sub, cefr[], sector[], category})`** translates a browse page's
+  narrowed state into the existing mission-style `focus` (lead with those exact items, drop the random
+  grammar/Redemittel), returning `undefined` when nothing narrows past the theme (bare-theme Üben is
+  unchanged). Caps `FOCUS_VOCAB_CAP=8` / `FOCUS_REDE_CAP=4`. `Session.tsx` parses `?grammar=`/`?cat=`/
+  `?sub=`/`?cefr=`/`?sector=` (priority mission > grammar > libraryFocus) and forwards `grammarTopicId`
+  through a new `SessionPlayer` prop; the remount key now includes every tailoring param. Callers:
+  Grammatik lesson → `?grammar=${topic.id}`, Redemittel → `?cat=` when a category is picked, Wörter +
+  Kollokationen `startSession` build the URL from live theme/sub/cefr/sector (pos/srs/frequency stay
+  browse-only). GrammarHub stays bare `/session` (browsing is not a location).
+- **Speaking give-up:** the speaking block gained an "Anzeigen" ghost button (prompt + typed stages,
+  `SessionPlayer.tsx`) that calls the existing `evaluate("")` → reveals the answer, grades FSRS 0
+  (never a pass), unlocks Weiter. Mirrors the typed block; no listening-stage button (Fertig already
+  routes back).
+- **Tests + gates:** 5 new `tests/engine.test.ts` cases (grammar-pin honored, unknown-id fallback,
+  `libraryFocus` undefined/sub/category). `pnpm typecheck` ✔, `test:unit` **121/121**, `lint` **0
+  errors** (42 pre-existing warnings), `build` + prerender ✔, `check:bundle` **73.0 kB**/400.
+- **NOT done:** Üben-plan Work items 2 (graph count), 3 (map beautify + tappable stops), 4+5
+  (FilterRail desktop + count), 6 (Muster/explanation grid); the Branche-overhaul plan (s99); and the
+  standing content follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2, Playwright
+  grammar smoke). Browser E2E walk-through of the tailored sessions is left to the founder (sandbox
+  can't reach the live site).
+
+_(Sessions 85-99's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_
