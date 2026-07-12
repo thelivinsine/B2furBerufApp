@@ -430,27 +430,6 @@ export function VocabularyTrainer() {
               />
             )}
 
-            {/* Mobile-only: Üben fills the row, the count sits stacked at its
-                right (no grey tile). Desktop keeps Üben/count in the rail. */}
-            <div className="flex items-center gap-2 lg:hidden">
-              <Button
-                variant="gradient"
-                className="h-11 flex-1 rounded-xl text-base"
-                onClick={startSession}
-              >
-                <Zap className="h-4 w-4" /> Üben
-              </Button>
-              {view !== "graph" && (
-                <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
-                  <span className="text-sm font-semibold tabular-nums text-foreground">
-                    {items.length}
-                  </span>
-                  <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                    {items.length === 1 ? "Wort" : "Wörter"}
-                  </span>
-                </div>
-              )}
-            </div>
           </div>
 
           {/* Mobile filter panel: slides open below the count, closed by default.
@@ -507,6 +486,29 @@ export function VocabularyTrainer() {
           )}
 
           {listContent}
+        </div>
+
+        {/* Mobile action bar: Üben + word count stay pinned at the bottom of the
+            screen (above the nav) so the list scrolls above them. Desktop keeps
+            Üben/count in the rail. */}
+        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+          <Button
+            variant="gradient"
+            className="h-11 flex-1 rounded-xl text-base"
+            onClick={startSession}
+          >
+            <Zap className="h-4 w-4" /> Üben
+          </Button>
+          {view !== "graph" && (
+            <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+              <span className="text-sm font-semibold tabular-nums text-foreground">
+                {items.length}
+              </span>
+              <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                {items.length === 1 ? "Wort" : "Wörter"}
+              </span>
+            </div>
+          )}
         </div>
 
         <FilterRail
