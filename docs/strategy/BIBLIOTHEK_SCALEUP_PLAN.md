@@ -4,6 +4,11 @@ _Created 2026-07-12 (session 94). Founder decision: activate the sector (Branche
 _Updated 2026-07-12 (session 95): Waves 2 (first tranche), 3 and 4 EXECUTED; founder review pending._
 _Updated 2026-07-12 (session 98): first AI-jury review pass (§7) EXECUTED over Wave 3 Redemittel +
 Wave 4 grammar (149 ids → `jury` tier); 4 content defects fixed. review_status unchanged._
+_Updated 2026-07-12 (session 102): the Branche filter overhaul (`docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`)
+supersedes this plan's facet mechanics: Branche is now a SCOPE dropdown with `sectors[]` multi-tags and
+untagged = universal, so the ≤12-option cap and the 15% coverage floor no longer constrain the sector
+axis. 15 sectors (4 new: chemicals/pharma/cleaning/security + packs); all 562 s94/s95 tags re-audited
+(report: `docs/reports/sector-audit-report.md`)._
 
 ## 0. Non-technical summary (for the founder)
 

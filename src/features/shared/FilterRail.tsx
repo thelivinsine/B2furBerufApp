@@ -39,6 +39,9 @@ import type { PrimaryGroup, PrimaryOption } from "@/features/shared/BrowseToolba
  * alternate presentations of the same state and never render together.
  */
 export interface RailPrimary {
+  /** Stable id for pin persistence (e.g. "primary", "secondary", "sector").
+   *  Keep existing ids stable so saved pins survive; new scopes pick fresh ids. */
+  pinId: string;
   /** Section heading, e.g. "Thema" or "Kategorie" (microcopy budget: ≤2 words). */
   label: string;
   value: string;
@@ -125,8 +128,7 @@ function SectionHeader({
 }
 
 export function FilterRail<T>({
-  primary,
-  secondary,
+  scopes,
   items,
   facets,
   selection,
@@ -142,10 +144,10 @@ export function FilterRail<T>({
   layout = "rail",
   className,
 }: {
-  primary?: RailPrimary;
-  /** Optional second scope dropdown (the sub-theme), shown right under the
-   *  primary. Provided only when the active theme has sub-themes. */
-  secondary?: RailPrimary;
+  /** Ordered scope dropdowns, rendered top to bottom (Branche overhaul s102):
+   *  Wörter/Kollokationen pass [Branche, Thema, Unterthema?], Redemittel
+   *  [Kategorie], Grammatik [Gruppe]. Each carries a stable `pinId`. */
+  scopes?: RailPrimary[];
   /** Items in the current scope, for live option counts (same list the sheet gets). */
   items: T[];
   facets: FacetDef<T>[];
@@ -279,14 +281,14 @@ export function FilterRail<T>({
 
   const panel = layout === "panel";
 
-  // A scope dropdown (Thema / Unterthema / Kategorie). Rendered once for the
-  // primary scope and, when present, once for the secondary (sub-theme) scope.
-  const scopeSelect = (p: RailPrimary, pinId: string) => (
-    <section>
+  // A scope dropdown (Branche / Thema / Unterthema / Kategorie). Rendered once
+  // per entry of the ordered `scopes` array.
+  const scopeSelect = (p: RailPrimary) => (
+    <section key={p.pinId}>
       <SectionHeader
         label={p.label}
-        pinned={pins.includes(pinId)}
-        onTogglePin={() => togglePin(pinId)}
+        pinned={pins.includes(p.pinId)}
+        onTogglePin={() => togglePin(p.pinId)}
       />
       {/* Dropdown (founder follow-up): the scope (Thema/Unterthema/Kategorie) is
           a Select, not an always-open row list, so the facet groups below
@@ -317,11 +319,10 @@ export function FilterRail<T>({
     </section>
   );
 
-  const primarySection = primary ? scopeSelect(primary, "primary") : null;
-  // The sub-theme scope (Unterthema), shown right under Thema when the active
-  // theme has sub-themes, so drilling in is part of the filter, not a separate
-  // full-page picker.
-  const secondarySection = secondary ? scopeSelect(secondary, "secondary") : null;
+  // Ordered scope sections (Branche → Thema → Unterthema on Wörter/
+  // Kollokationen); the sub-theme entry only exists when the active theme has
+  // sub-themes, so drilling in is part of the filter, not a separate page.
+  const scopeSections = (scopes ?? []).map(scopeSelect);
 
   const facetSection = (facet: FacetDef<T>) => (
     <section key={facet.id}>
@@ -370,14 +371,14 @@ export function FilterRail<T>({
   );
 
   const pinnedFacets = facets.filter((f) => pins.includes(f.id));
-  const showPinnedBody = !open && ((primary && pins.includes("primary")) || pinnedFacets.length > 0);
+  const pinnedScopes = (scopes ?? []).filter((p) => pins.includes(p.pinId));
+  const showPinnedBody = !open && (pinnedScopes.length > 0 || pinnedFacets.length > 0);
 
-  // The filter controls proper (Thema/Kategorie + facet pills + reset), shared
-  // by the desktop rail's open body and the mobile panel.
+  // The filter controls proper (scopes + facet pills + reset), shared by the
+  // desktop rail's open body and the mobile panel.
   const filterBody = (
     <>
-      {primarySection}
-      {secondarySection}
+      {scopeSections}
       {facets.length > 0 && <div className="space-y-5">{facets.map(facetSection)}</div>}
     </>
   );
@@ -476,8 +477,7 @@ export function FilterRail<T>({
             hideHeader ? "rounded-t-xl" : "border-t border-muted-foreground/10",
           )}
         >
-          {primary && pins.includes("primary") && primarySection}
-          {secondary && pins.includes("secondary") && secondarySection}
+          {pinnedScopes.map(scopeSelect)}
           {pinnedFacets.map(facetSection)}
         </div>
       )}

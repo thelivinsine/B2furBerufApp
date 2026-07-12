@@ -64,11 +64,30 @@ const VERIFICATION_RESULTS = ["pass", "flag", "fail"];
 const FREQUENCIES = ["core", "common", "specialized"];
 // "office" removed + WorkSituation retired in the categorization audit
 // 2026-07-09 (Situation = sub-theme grain of Thema, not a separate axis).
-// ACTIVE since the Bibliothek scale-up (founder decision 2026-07-12).
+// Since the Branche overhaul (s102) items carry a `sectors[]` array (untagged
+// = universal); the singular `sector` field is retired and errors below.
 const WORK_SECTORS = [
   "care", "trades", "it", "retail", "hospitality",
   "engineering", "construction", "production", "transport", "beauty", "sports",
+  "chemicals", "pharma", "cleaning", "security",
 ];
+
+/** Validate an optional `sectors` array: non-empty, unique, enum values only.
+ *  Also errors if the retired singular `sector` field reappears (same guard
+ *  pattern as workSituation). */
+function checkSectors(item, ds, w) {
+  if (item.sector !== undefined)
+    error(ds, w, `singular "sector" was retired (Branche overhaul s102); use sectors: [...]`);
+  if (item.sectors === undefined) return;
+  if (!Array.isArray(item.sectors) || item.sectors.length === 0) {
+    error(ds, w, `sectors must be a non-empty array when present`);
+    return;
+  }
+  if (new Set(item.sectors).size !== item.sectors.length)
+    error(ds, w, `duplicate values in sectors [${item.sectors}]`);
+  for (const s of item.sectors)
+    if (!WORK_SECTORS.includes(s)) error(ds, w, `invalid sector "${s}"`);
+}
 // counterpart/taskType were CUT (audit P3 resolution, 2026-07-09): 0-tagged
 // forward-declares with no authoring plan. The checks below error if a row
 // reintroduces them without re-declaring the axis properly.
@@ -214,8 +233,7 @@ function lintVocabulary(vocab, subThemeIndex) {
       error(ds, w, `invalid cefr "${v.cefr}"`);
     if (v.frequency !== undefined && !FREQUENCIES.includes(v.frequency))
       error(ds, w, `invalid frequency "${v.frequency}"`);
-    if (v.sector !== undefined && !WORK_SECTORS.includes(v.sector))
-      error(ds, w, `invalid sector "${v.sector}"`);
+    checkSectors(v, ds, w);
     if (v.workSituation !== undefined)
       error(ds, w, `workSituation was retired (audit 2026-07-09); use subThemeId`);
     checkSubTheme(v, v.themeId, subThemeIndex, ds, w);
@@ -238,8 +256,7 @@ function lintCollocations(collocations, subThemeIndex) {
       error(ds, w, `invalid cefr "${c.cefr}"`);
     if (c.frequency !== undefined && !FREQUENCIES.includes(c.frequency))
       error(ds, w, `invalid frequency "${c.frequency}"`);
-    if (c.sector !== undefined && !WORK_SECTORS.includes(c.sector))
-      error(ds, w, `invalid sector "${c.sector}"`);
+    checkSectors(c, ds, w);
     if (c.workSituation !== undefined)
       error(ds, w, `workSituation was retired (audit 2026-07-09); use subThemeId`);
     if (c.themeId !== undefined) checkSubTheme(c, c.themeId, subThemeIndex, ds, w);
@@ -443,8 +460,7 @@ function lintTexts(texts, subThemeIndex) {
     if (!CEFR_LEVELS.includes(t.cefr)) error(ds, w, `invalid cefr "${t.cefr}"`);
     for (const f of ["title", "titleEn", "de", "en"]) if (!isStr(t[f])) error(ds, w, `${f} empty`);
     checkSubTheme(t, t.themeId, subThemeIndex, ds, w);
-    if (t.sector !== undefined && !WORK_SECTORS.includes(t.sector))
-      error(ds, w, `invalid sector "${t.sector}"`);
+    checkSectors(t, ds, w);
     // The 4.4 renderer shows a comprehension MCQ after every text, so the
     // 2-3 checks per item are part of the content contract, not optional.
     if (!Array.isArray(t.checks) || t.checks.length < 2) {

@@ -4023,3 +4023,41 @@ Branch: `claude/whats-next-esga9u`.
   "What did you discuss?". Gates: `lint:content` ✔ (no errors), completeness audit clean, `build` +
   prerender ✔. Committed, pushed, PR into `main`, squash-merged, branch realigned.
 - **Artifacts:** `src/data/grammar.ts`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 361 — 2026-07-12 (session 102)
+- **Branch:** `claude/fable-time-prioritization-126bp4`
+- **Prompt (verbatim):**
+  > I'm presenting this app to an audience tomorrow. Today is the last day I have Fable available.
+  > What should I prioritize and how can I make sure I use the last hour of fable?
+- **Follow-up (verbatim):**
+  > how should I make sure I make the best use of Fable*
+- **Follow-up (verbatim):**
+  > but the branch filter overhaul is one of the core features I want to present
+- **Follow-up (verbatim):**
+  > continue
+- **Response summary:** Prioritization session that turned into the Branche filter overhaul
+  implementation (Fable 5, the founder's last Fable day). Initial recommendation was to freeze main before the demo and spend the
+  model's last day on the AI-jury German review, treating the s99 overhaul plan as post-demo work;
+  the founder countered that the Branche filter is a core feature of the presentation, which
+  reversed the priority. Executed the full approved plan same-day: (1) `sectors[]` data-model
+  migration (575 rows), 15 sectors (4 new: Chemie & Kunststoff, Pharma & Medizintechnik, Reinigung,
+  Sicherheitsdienste; Transport relabeled Transport & Logistik), linter guard against the retired
+  singular field; (2) the untagged-= universal `matchesSector` scope semantics + sector-first
+  ordering in both browse pages (the das-Projekt root-cause fix); (3) FilterRail generalized to
+  ordered scopes (Branche → Thema → Unterthema) with per-sector dedicated-content counts;
+  (4) Branche chips on Tabelle/Karten; (5) retag audit of all 562 tagged items (117 untagged,
+  162 widened, 279 confirmed) with the founder-review report `docs/reports/sector-audit-report.md`;
+  (6) four ~20-word + ~9-collocation starter packs plus the Lager boost (+91 words, +40 pairs,
+  +131 provenance rows); (7) `tests/sectors.test.ts` with the v_projekt/v_bauzaun regression pair.
+  vocabulary.ts split into two concatenated literals (TS2590). All gates green (124/124 unit tests,
+  bundle 73.0 kB, verify:facts 0 errors with refreshed oracles) and the plan's browser E2E checklist
+  verified against the dev server on desktop + mobile viewports. Docs updated and shipped to main
+  per the auto-ship preference so the feature is live for the 2026-07-13 presentation.
+- **Artifacts:** `src/types/index.ts` · `src/lib/facets.ts` · `src/features/shared/FilterRail.tsx` ·
+  `src/features/shared/SectorChips.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx` +
+  `VocabViews.tsx` + `VocabList.tsx` · `src/features/collocations/CollocationsBrowser.tsx` +
+  `CollocationViews.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `src/features/grammar/GrammarHub.tsx` · `src/data/vocabulary.ts` / `collocations.ts` / `texts.ts` /
+  `provenance.ts` · `scripts/lint-content.mjs` · `tests/sectors.test.ts` ·
+  `docs/reports/sector-audit-report.md` · `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · scripts/vendor oracle subsets.

@@ -7,6 +7,8 @@ import { DataTable, type DataColumn } from "@/features/shared/DataTable";
 import { frequency as frequencyMap, frequencyBin } from "@/data/frequency";
 import { usePagedList } from "@/lib/usePagedList";
 import { CEFR_ORDER } from "@/lib/cefr";
+import { SECTOR_LABEL } from "@/lib/facets";
+import { SectorChips } from "@/features/shared/SectorChips";
 
 /**
  * Tabelle + Liste presentations of the Kollokationen tab (Bibliothek views,
@@ -67,6 +69,14 @@ const COLLOCATION_COLUMNS: DataColumn<Collocation>[] = [
       return bin ? <span className="text-muted-foreground">{FREQ_LABEL[bin]}</span> : null;
     },
     sortValue: (c) => frequencyMap[c.id]?.zipf,
+  },
+  {
+    id: "branche",
+    label: "Branche",
+    cell: (c) => <SectorChips sectors={c.sectors} />,
+    // Sort by the first Branche label; untagged (general) rows sink.
+    sortValue: (c) => (c.sectors?.length ? SECTOR_LABEL[c.sectors[0]] : undefined),
+    className: "min-w-[10rem]",
   },
 ];
 

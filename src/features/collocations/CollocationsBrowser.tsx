@@ -16,7 +16,14 @@ import {
   activeFacetCount,
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
-import { collocationFacets, COLLOCATION_FACET_IDS } from "@/lib/facets";
+import {
+  collocationFacets,
+  COLLOCATION_FACET_IDS,
+  SECTOR_OPTIONS,
+  matchesSector,
+  sectorFirst,
+} from "@/lib/facets";
+import type { WorkSector } from "@/types";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
@@ -86,6 +93,9 @@ export function CollocationsBrowser() {
 
   const themeParam = params.get("theme") ?? "all";
   const sub = params.get("sub") ?? "";
+  // Branche is a single-value SCOPE param since the s102 overhaul (old
+  // comma-list facet URLs degrade to their first value).
+  const sector = (params.get("sector") ?? "").split(",")[0];
   const search = params.get("q") ?? "";
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
@@ -151,6 +161,7 @@ export function CollocationsBrowser() {
   };
 
   const setSearch = (q: string) => setParam("q", q || null);
+  const setSector = (s: string) => setParam("sector", !s || s === "all" ? null : s);
 
   // Sub-theme drill-down (parity with Wörter, audit 2026-07-09): themes with
   // sub-themes show the picker first; "Gesamtes Thema" browses the whole pile.
@@ -160,15 +171,24 @@ export function CollocationsBrowser() {
   const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
   const activeSub = subThemes.find((s) => s.id === sub);
 
-  const scoped = useMemo(() => {
+  // Theme-scoped list BEFORE the Branche cut, for the dropdown's per-sector
+  // dedicated-content counts.
+  const themeScoped = useMemo(() => {
     let list =
       themeParam === "all" ? collocations : collocations.filter((c) => c.themeId === themeParam);
     if (subFilter) list = list.filter((c) => c.subThemeId === subFilter);
+    return list;
+  }, [themeParam, subFilter]);
+
+  const scoped = useMemo(() => {
+    // Branche scope cut (root-cause fix, s102): untagged pairs are general and
+    // show under every Branche; tagged pairs hide only under other Branchen.
+    let list = sector ? themeScoped.filter((c) => matchesSector(c, sector)) : themeScoped;
     if (search.trim()) {
       list = list.filter((c) => fuzzyMatch(search, [c.full, c.noun, c.verb, c.en]));
     }
     return list;
-  }, [themeParam, subFilter, search]);
+  }, [themeScoped, sector, search]);
 
   // Tier-0 personalized default (UX overhaul Phase 2): default to the
   // learner's CEFR band + one step up, with a quiet escape. Never activates
@@ -186,9 +206,10 @@ export function CollocationsBrowser() {
   );
   const hiddenLabel = bandActive && bandLimited.length < scoped.length ? hiddenBandsLabel(level) : null;
 
+  // Sector-tagged pairs lead the list when a Branche is selected (s102).
   const filtered = useMemo(
-    () => applyFacets(bandLimited, COLLOCATION_FACETS, selection),
-    [bandLimited, selection],
+    () => sectorFirst(applyFacets(bandLimited, COLLOCATION_FACETS, selection), sector),
+    [bandLimited, selection, sector],
   );
 
   // Incremental rendering: 60 cards now, the rest as you scroll.
@@ -207,7 +228,8 @@ export function CollocationsBrowser() {
     if (activeTheme) p.set("theme", activeTheme.id);
     if (subFilter) p.set("sub", subFilter);
     if (selection.cefr?.length) p.set("cefr", selection.cefr.join(","));
-    if (selection.sector?.length) p.set("sector", selection.sector.join(","));
+    // Branche is a single-value scope since the s102 overhaul, not a facet.
+    if (sector) p.set("sector", sector);
     const q = p.toString();
     navigate(`/session${q ? `?${q}` : ""}`);
   };
@@ -215,32 +237,53 @@ export function CollocationsBrowser() {
   // The filter tile is the single filter surface on BOTH breakpoints (founder
   // follow-up, s91): desktop rail + mobile tile share these props.
   const filterRailProps = {
-    primary: {
-      label: "Thema",
-      value: themeParam,
-      onChange: setTheme,
-      all: { value: "all", label: "Alle Themen", count: collocations.length },
-      groups: primaryGroups,
-    },
-    // Sub-theme drill-down as a second dropdown (founder s92): replaces the old
-    // full-page picker.
-    secondary: hasSubThemes
-      ? {
-          label: "Unterthema",
-          value: sub && sub !== "" ? sub : "all",
-          onChange: setSub,
-          all: {
-            value: "all",
-            label: "Gesamtes Thema",
-            count: collocationsByTheme(themeParam).length,
-          },
-          options: subThemes.map((s) => ({
-            value: s.id,
-            label: s.titleDe,
-            count: collocationsBySubTheme(s.id).length,
-          })),
-        }
-      : undefined,
+    // Ordered scope hierarchy (founder, s102): Branche → Thema → Unterthema.
+    scopes: [
+      {
+        pinId: "sector",
+        label: "Branche",
+        value: sector || "all",
+        onChange: setSector,
+        // Count = sector-tagged pairs in the current Thema scope (dedicated
+        // content); zero-count Branchen stay selectable (general pairs show).
+        all: { value: "all", label: "Alle Branchen", count: themeScoped.length },
+        options: SECTOR_OPTIONS.map((o) => ({
+          value: o.value,
+          label: o.label,
+          count: themeScoped.filter((c) => c.sectors?.includes(o.value as WorkSector)).length,
+        })),
+      },
+      {
+        pinId: "primary",
+        label: "Thema",
+        value: themeParam,
+        onChange: setTheme,
+        all: { value: "all", label: "Alle Themen", count: collocations.length },
+        groups: primaryGroups,
+      },
+      // Sub-theme drill-down as a third dropdown (founder s92): replaces the
+      // old full-page picker.
+      ...(hasSubThemes
+        ? [
+            {
+              pinId: "secondary",
+              label: "Unterthema",
+              value: sub && sub !== "" ? sub : "all",
+              onChange: setSub,
+              all: {
+                value: "all",
+                label: "Gesamtes Thema",
+                count: collocationsByTheme(themeParam).length,
+              },
+              options: subThemes.map((s) => ({
+                value: s.id,
+                label: s.titleDe,
+                count: collocationsBySubTheme(s.id).length,
+              })),
+            },
+          ]
+        : []),
+    ],
     items: scoped,
     facets: COLLOCATION_FACETS,
     selection,

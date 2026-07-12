@@ -30,8 +30,15 @@ import {
   type FacetDef,
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
-import { vocabFacets, VOCAB_FACET_IDS } from "@/lib/facets";
+import {
+  vocabFacets,
+  VOCAB_FACET_IDS,
+  SECTOR_OPTIONS,
+  matchesSector,
+  sectorFirst,
+} from "@/lib/facets";
 import { themeGroupsForMode } from "@/lib/themeGroups";
+import type { WorkSector } from "@/types";
 import { mastery, masteryLabel } from "@/engine/srs";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { cn } from "@/lib/utils";
@@ -67,6 +74,9 @@ export function VocabularyTrainer() {
   const scope = useLibraryScope();
   const theme = params.get("theme") ?? "all";
   const sub = params.get("sub") ?? "";
+  // Branche is a single-value SCOPE param since the s102 overhaul (it used to
+  // be a comma-list facet; old URLs degrade to their first value).
+  const sector = (params.get("sector") ?? "").split(",")[0];
   const savedActive = params.get("saved") === "1";
   const [mode, setMode] = useState("flashcards");
   const [search, setSearch] = useState("");
@@ -141,9 +151,18 @@ export function VocabularyTrainer() {
     return s;
   }, [params]);
 
-  const scoped = useMemo(
+  // Theme-scoped list BEFORE the Branche cut, so the Branche dropdown can show
+  // per-sector dedicated-content counts within the current Thema scope.
+  const themeScoped = useMemo(
     () => filterVocab({ theme, sub: subFilter }),
     [theme, subFilter],
+  );
+  // The Branche scope cut (root-cause fix, s102): untagged words are general
+  // vocabulary and stay visible under EVERY Branche; tagged words hide only
+  // under other Branchen (matchesSector).
+  const scoped = useMemo(
+    () => (sector ? themeScoped.filter((v) => matchesSector(v, sector)) : themeScoped),
+    [themeScoped, sector],
   );
 
   const searchedRaw = useMemo(() => {
@@ -190,7 +209,12 @@ export function VocabularyTrainer() {
   );
   const hiddenLabel = bandActive && bandLimited.length < searched.length ? hiddenBandsLabel(level) : null;
 
-  const items = useMemo(() => applyFacets(bandLimited, facets, selection), [bandLimited, facets, selection]);
+  // With a Branche selected, the sector-tagged Fachwörter lead the list and
+  // the general words follow (s102 overhaul).
+  const items = useMemo(
+    () => sectorFirst(applyFacets(bandLimited, facets, selection), sector),
+    [bandLimited, facets, selection, sector],
+  );
   const facetKey = ALL_FACET_IDS.map((id) => params.get(id) ?? "").join("|");
 
   const setTheme = (t: string) => {
@@ -200,6 +224,13 @@ export function VocabularyTrainer() {
     p.delete("sub");
     setParams(p, { replace: true });
     // scope stays in sync via the effect above (covers both dropdown + deep links)
+  };
+
+  const setSector = (s: string) => {
+    const p = new URLSearchParams(params);
+    if (!s || s === "all") p.delete("sector");
+    else p.set("sector", s);
+    setParams(p, { replace: true });
   };
 
   const setSelection = (next: FacetSelection) => {
@@ -240,7 +271,8 @@ export function VocabularyTrainer() {
     if (theme !== "all") p.set("theme", theme);
     if (subFilter) p.set("sub", subFilter);
     if (selection.cefr?.length) p.set("cefr", selection.cefr.join(","));
-    if (selection.sector?.length) p.set("sector", selection.sector.join(","));
+    // Branche is a single-value scope since the s102 overhaul, not a facet.
+    if (sector) p.set("sector", sector);
     const q = p.toString();
     navigate(`/session${q ? `?${q}` : ""}`);
   };
@@ -310,32 +342,54 @@ export function VocabularyTrainer() {
   // (founder follow-up, s91): the desktop rail and the mobile tile share
   // these props; only className + defaultOpen differ.
   const filterRailProps = {
-    primary: {
-      label: "Thema",
-      value: theme,
-      onChange: setTheme,
-      all: { value: "all", label: "Alle Themen", count: vocabulary.length },
-      groups: primaryGroups,
-    },
-    // Sub-theme drill-down as a second dropdown (founder s92): replaces the old
-    // full-page SubThemePicker so narrowing to a sub-theme is part of the filter.
-    secondary: hasSubThemes
-      ? {
-          label: "Unterthema",
-          value: sub && sub !== "" ? sub : "all",
-          onChange: setSub,
-          all: {
-            value: "all",
-            label: "Gesamtes Thema",
-            count: vocabByTheme(theme).length,
-          },
-          options: subThemes.map((s) => ({
-            value: s.id,
-            label: s.titleDe,
-            count: vocabBySubTheme(s.id).length,
-          })),
-        }
-      : undefined,
+    // Ordered scope hierarchy (founder, s102): Branche → Thema → Unterthema.
+    scopes: [
+      {
+        pinId: "sector",
+        label: "Branche",
+        value: sector || "all",
+        onChange: setSector,
+        // The count is the DEDICATED-content signal (sector-tagged items in the
+        // current Thema scope); zero-count Branchen stay selectable because
+        // general words always show.
+        all: { value: "all", label: "Alle Branchen", count: themeScoped.length },
+        options: SECTOR_OPTIONS.map((o) => ({
+          value: o.value,
+          label: o.label,
+          count: themeScoped.filter((v) => v.sectors?.includes(o.value as WorkSector)).length,
+        })),
+      },
+      {
+        pinId: "primary",
+        label: "Thema",
+        value: theme,
+        onChange: setTheme,
+        all: { value: "all", label: "Alle Themen", count: vocabulary.length },
+        groups: primaryGroups,
+      },
+      // Sub-theme drill-down as a third dropdown (founder s92): replaces the old
+      // full-page SubThemePicker so narrowing to a sub-theme is part of the filter.
+      ...(hasSubThemes
+        ? [
+            {
+              pinId: "secondary",
+              label: "Unterthema",
+              value: sub && sub !== "" ? sub : "all",
+              onChange: setSub,
+              all: {
+                value: "all",
+                label: "Gesamtes Thema",
+                count: vocabByTheme(theme).length,
+              },
+              options: subThemes.map((s) => ({
+                value: s.id,
+                label: s.titleDe,
+                count: vocabBySubTheme(s.id).length,
+              })),
+            },
+          ]
+        : []),
+    ],
     items: searched,
     facets,
     selection,

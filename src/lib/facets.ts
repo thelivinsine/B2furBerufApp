@@ -101,12 +101,13 @@ const POS_OPTIONS: FacetOption[] = [
 ];
 
 // Branche is a CONTEXT axis (the industry a learner works in), orthogonal to
-// Thema (what the words are about). ACTIVE since the Bibliothek scale-up
-// (founder decision 2026-07-12, supersedes the 2026-07-09 park): every sector
-// carries a starter pack, so the facet clears the coverage floor and renders
-// on its own. "Büro" stays removed: every industry has an office, so it is a
-// category error, not a sector. 11 values, within the ≤12-option rule.
-const SECTOR_OPTIONS: FacetOption[] = [
+// Thema (what the words are about). Since the Branche filter overhaul
+// (2026-07-12, s102) it is a SCOPE dropdown (Branche → Thema → Unterthema in
+// the rail), NOT a pill facet, so the ≤12-option cap and the coverage floor
+// no longer apply to it: 15 sectors are fine. Items carry `sectors[]` with
+// untagged = universal (see matchesSector below). "Büro" stays removed: every
+// industry has an office, so it is a category error, not a sector.
+export const SECTOR_OPTIONS: FacetOption[] = [
   { value: "care", label: "Medizin & Pflege" },
   { value: "trades", label: "Handwerk" },
   { value: "it", label: "IT & Software" },
@@ -115,10 +116,43 @@ const SECTOR_OPTIONS: FacetOption[] = [
   { value: "engineering", label: "Ingenieurwesen" },
   { value: "construction", label: "Bau & Architektur" },
   { value: "production", label: "Produktion" },
-  { value: "transport", label: "Transport & Verkehr" },
+  { value: "transport", label: "Transport & Logistik" },
   { value: "beauty", label: "Beauty & Kosmetik" },
   { value: "sports", label: "Sport & Fitness" },
+  { value: "chemicals", label: "Chemie & Kunststoff" },
+  { value: "pharma", label: "Pharma & Medizintechnik" },
+  { value: "cleaning", label: "Reinigung" },
+  { value: "security", label: "Sicherheitsdienste" },
 ];
+
+/** Branche label lookup for chips and dropdowns. */
+export const SECTOR_LABEL: Record<string, string> = Object.fromEntries(
+  SECTOR_OPTIONS.map((o) => [o.value, o.label]),
+);
+
+/** The root-cause Branche semantics (overhaul s102): untagged = universal.
+ *  An item with no `sectors` is general vocabulary and shows under EVERY
+ *  Branche; a tagged item hides only under OTHER Branchen. `sector` empty
+ *  ("Alle Branchen") matches everything. */
+export function matchesSector(
+  item: { sectors?: readonly string[] },
+  sector: string | undefined | null,
+): boolean {
+  return !sector || !item.sectors?.length || item.sectors.includes(sector);
+}
+
+/** With a Branche selected, the learner's Fachwörter lead the list and the
+ *  general (untagged) words follow. Stable within each group. */
+export function sectorFirst<T extends { sectors?: readonly string[] }>(
+  items: T[],
+  sector: string | undefined | null,
+): T[] {
+  if (!sector) return items;
+  const tagged: T[] = [];
+  const general: T[] = [];
+  for (const i of items) (i.sectors?.length ? tagged : general).push(i);
+  return [...tagged, ...general];
+}
 
 const REGISTER_OPTIONS: FacetOption[] = [
   { value: "neutral", label: "neutral" },
@@ -144,11 +178,6 @@ const VOCAB_POS: FacetDef<Vocab> = facet(
   { id: "pos", label: "Wortart", options: POS_OPTIONS, get: (v) => v.pos },
   vocabulary,
 );
-const VOCAB_SECTOR: FacetDef<Vocab> = facet(
-  { id: "sector", label: "Branche", options: SECTOR_OPTIONS, get: (v) => v.sector },
-  vocabulary,
-);
-
 const VOCAB_FREQUENCY: FacetDef<Vocab> = facet(
   {
     id: "frequency",
@@ -159,11 +188,13 @@ const VOCAB_FREQUENCY: FacetDef<Vocab> = facet(
   vocabulary,
 );
 
-const ALL_VOCAB_FACETS = [VOCAB_CEFR, VOCAB_POS, VOCAB_FREQUENCY, VOCAB_SECTOR];
+// Branche left the facet list in the s102 overhaul: it is a scope dropdown
+// (see SECTOR_OPTIONS/matchesSector above), so `?sector=` is a single-value
+// scope param owned by the pages, not a facet id here.
+const ALL_VOCAB_FACETS = [VOCAB_CEFR, VOCAB_POS, VOCAB_FREQUENCY];
 
 /** Vocab facets that clear the coverage floor. Visibility follows coverage
- *  (never the Mode lens): since the sector scale-up (2026-07-12) that is
- *  CEFR + Wortart + Häufigkeit + Branche. */
+ *  (never the Mode lens): CEFR + Wortart + Häufigkeit. */
 export function vocabFacets(): FacetDef<Vocab>[] {
   return ALL_VOCAB_FACETS.filter((f) => passesFloor(f, vocabulary));
 }
@@ -185,10 +216,6 @@ const COLLOCATION_FACETS: FacetDef<Collocation>[] = [
       options: FREQUENCY_OPTIONS,
       get: (c) => c.frequency ?? frequencyBin(c.id),
     },
-    collocations,
-  ),
-  facet(
-    { id: "sector", label: "Branche", options: SECTOR_OPTIONS, get: (c) => c.sector },
     collocations,
   ),
 ];

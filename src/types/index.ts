@@ -53,9 +53,11 @@ export type ContentCefr =
 export type Frequency = "core" | "common" | "specialized";
 
 // Branche (industry the learner works in), a context axis orthogonal to Thema.
-// ACTIVE since the Bibliothek scale-up (founder decision 2026-07-12, supersedes
-// the 2026-07-09 audit's park): every sector now carries a starter pack, so the
-// facet clears the coverage floor in lib/facets.ts and renders on its own.
+// Since the Branche filter overhaul (2026-07-12, s102) it is a SCOPE dropdown,
+// not a pill facet, so it escapes the ≤12-option cap and the coverage floor.
+// Items carry `sectors?: WorkSector[]` with untagged = universal (general
+// vocabulary shows under every Branche); a tag means notably sector-specific
+// (typically 1 to 4 sectors; applicable to 5+ means untag).
 // "office" stays removed: every industry has an office, so it is not a sector.
 // Rule: Branche = where you work, Thema = what you are doing; never reuse a
 // label across both axes ("transport" vs the "logistics" theme is deliberate).
@@ -70,7 +72,11 @@ export type WorkSector =
   | "production"
   | "transport"
   | "beauty"
-  | "sports";
+  | "sports"
+  | "chemicals"
+  | "pharma"
+  | "cleaning"
+  | "security";
 
 // (The forward-declared Counterpart and TaskType facets were CUT in the
 // categorization audit P3 resolution, 2026-07-09: 0-tagged since s42 with no
@@ -132,7 +138,9 @@ export interface VocabItem {
   cefr?: ContentCefr;
   subThemeId?: SubThemeId;
   frequency?: Frequency;
-  sector?: WorkSector;
+  /** Branchen this item is notably specific to (1-4 typical). Absent/empty =
+   *  general vocabulary, applicable in every Branche. */
+  sectors?: WorkSector[];
 }
 
 export type RedemittelCategory =
@@ -329,7 +337,9 @@ export interface Collocation {
   cefr?: ContentCefr;
   subThemeId?: SubThemeId;
   frequency?: Frequency;
-  sector?: WorkSector;
+  /** Branchen this pair is notably specific to (1-4 typical). Absent/empty =
+   *  general, applicable in every Branche. */
+  sectors?: WorkSector[];
 }
 
 /* ---------------- Leveled quizzes ---------------- */
@@ -616,10 +626,10 @@ export interface ReadingText {
   checks: TextCheck[];
   /** Optional sub-theme link; must be declared on the parent theme. */
   subThemeId?: SubThemeId;
-  /** Optional Branche tag (scale-up Wave 2, 2026-07-12): authentic-style
-   *  workplace texts per sector, e.g. a Wartungsprotokoll memo. Enables
-   *  sector-targeted sessions; rolls up like every facet. */
-  sector?: WorkSector;
+  /** Optional Branche tags (scale-up Wave 2, 2026-07-12; array since the
+   *  Branche overhaul s102): authentic-style workplace texts per sector,
+   *  e.g. a Wartungsprotokoll memo. Absent/empty = general. */
+  sectors?: WorkSector[];
 }
 
 /* ---------------- Data governance — provenance register ---------------- */

@@ -16,14 +16,14 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **782**
-- Covered by ≥1 oracle: **762** (97%)  ·  not covered: **20**
-- ✔ Article verified: **746**  (352 by both oracles, 394 by one)
-- ✔ Plural verified: **467**  (270 by both oracles, 197 by one)
+- Nouns checked: **867**
+- Covered by ≥1 oracle: **844** (97%)  ·  not covered: **23**
+- ✔ Article verified: **828**  (381 by both oracles, 447 by one)
+- ✔ Plural verified: **513**  (294 by both oracles, 219 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
 - ⚑ Review signals (one oracle only, or oracles disagree): **6**
 - ◑ Plural-form headwords (gender not comparable): **10**
-- ~ We assert a plural, but no oracle lists one to compare: **71**
+- ~ We assert a plural, but no oracle lists one to compare: **85**
 
 ## ⛔ GATE — two independent authorities agree our form is wrong
 
@@ -69,7 +69,7 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>20 items</summary>
+<details><summary>23 items</summary>
 
 | id | headword |
 |---|---|
@@ -83,9 +83,12 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_lkw` | der LKW |
 | `v_nachbereitung` | die Nachbereitung |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
+| `v_probenahme` | die Probenahme |
 | `v_ressourcen` | die Ressourcen |
+| `v_rezeptur` | die Rezeptur |
 | `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
+| `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt |
 | `v_sicherheitsschuhe` | die Sicherheitsschuhe |
 | `v_spliss` | der Spliss |
 | `v_stakeholder` | die Stakeholder (Pl.) |
@@ -101,10 +104,11 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 Gender is covered; only the plural could not be checked (no oracle lists a plural form for the
 lemma, or coverage came via the gender-only compound head fallback).
 
-<details><summary>71 items</summary>
+<details><summary>85 items</summary>
 
 | id | headword |
 |---|---|
+| `v_abfuellung` | die Abfüllung |
 | `v_absturzsicherung` | die Absturzsicherung |
 | `v_aktionspunkt` | der Aktionspunkt |
 | `v_angehoerigengespraech` | das Angehörigengespräch |
@@ -116,6 +120,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_buergeramt` | das Bürgeramt |
 | `v_dienstplan` | der Dienstplan |
 | `v_digital_prozess` | der digitale Prozess |
+| `v_einlasskontrolle` | die Einlasskontrolle |
 | `v_einstufungstest` | der Einstufungstest |
 | `v_endgeraet` | das Endgerät |
 | `v_endkontrolle` | die Endkontrolle |
@@ -126,9 +131,11 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_fehlerbericht` | der Fehlerbericht |
 | `v_fortschrittsbericht` | der Fortschrittsbericht |
 | `v_garantieanspruch` | der Garantieanspruch |
+| `v_gefahrstoff` | der Gefahrstoff |
 | `v_geschaeftsessen` | das Geschäftsessen |
 | `v_gesichtsbehandlung` | die Gesichtsbehandlung |
 | `v_hautanalyse` | die Hautanalyse |
+| `v_hygieneplan` | der Hygieneplan |
 | `v_ich_botschaft` | die Ich-Botschaft |
 | `v_klaerungsgespraech` | das Klärungsgespräch |
 | `v_kontoeroeffnung` | die Kontoeröffnung |
@@ -141,18 +148,26 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_losgroesse` | die Losgröße |
 | `v_materialpruefung` | die Materialprüfung |
 | `v_meldebescheinigung` | die Meldebescheinigung |
+| `v_mikrofasertuch` | das Mikrofasertuch |
 | `v_nachhaltigkeitsbericht` | der Nachhaltigkeitsbericht |
+| `v_objektleitung` | die Objektleitung |
 | `v_pflegegrad` | der Pflegegrad |
 | `v_probestunde` | die Probestunde |
 | `v_produktionslinie` | die Produktionslinie |
 | `v_projektphase` | die Projektphase |
 | `v_pruefprotokoll` | das Prüfprotokoll |
+| `v_reinigungsdienst` | der Reinigungsdienst |
+| `v_reinigungsmaschine` | die Reinigungsmaschine |
+| `v_reinigungsplan` | der Reinigungsplan |
 | `v_reisebuchung` | die Reisebuchung |
+| `v_roentgengeraet` | das Röntgengerät |
 | `v_ruestzeit` | die Rüstzeit |
 | `v_schichtleitung` | die Schichtleitung |
 | `v_schichtplan` | der Schichtplan |
+| `v_sicherheitskonzept` | das Sicherheitskonzept |
 | `v_sicherheitsregel` | die Sicherheitsregel |
 | `v_sicherheitsunterweisung` | die Sicherheitsunterweisung |
+| `v_staplerschein` | der Staplerschein |
 | `v_stoerfall` | der Störfall |
 | `v_systemausfall` | der Systemausfall |
 | `v_tagegeld` | das Tagegeld |
@@ -162,6 +177,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_trainingsplan` | der Trainingsplan |
 | `v_transportschaden` | der Transportschaden |
 | `v_uebergabeprotokoll` | das Übergabeprotokoll |
+| `v_ultraschallgeraet` | das Ultraschallgerät |
 | `v_umlaufverfahren` | das Umlaufverfahren |
 | `v_ummeldung` | die Ummeldung |
 | `v_umsetzungsplan` | der Umsetzungsplan |
@@ -175,6 +191,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_wohnungsanzeige` | die Wohnungsanzeige |
 | `v_wohnungsgeberbestaetigung` | die Wohnungsgeberbestätigung |
 | `v_zeitwaechterin` | die Zeitwächterin / der Zeitwächter |
+| `v_zutrittskontrolle` | die Zutrittskontrolle |
 | `v_zwischenschritt` | der Zwischenschritt |
 
 </details>
