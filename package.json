@@ -29,7 +29,8 @@
     "verify:cefr": "node scripts/verify-cefr.mjs",
     "verify:sentences": "node scripts/verify-grammar.mjs && node scripts/verify-cefr.mjs",
     "build:verification": "node scripts/build-verification.mjs",
-    "build:frequency": "node scripts/build-frequency.mjs"
+    "build:frequency": "node scripts/build-frequency.mjs",
+    "review:queue": "node scripts/review-queue.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.2.8",

@@ -1,10 +1,10 @@
 # Project Status
 
-_Last updated: 2026-07-12 (session 95). **Bibliothek scale-up Waves 2–4 executed and MERGED (PR #463).**
-Wave 2 deepened engineering/it/construction/production (~60 words + ~26 collocations each + one sector
-reading text; `ReadingText.sector` added), Wave 3 grew Redemittel to **149** across 5 new speech-act
-categories, Wave 4 completed the B1–B2 grammar canon to **24 topics / 117 drills**. Full pipeline green.
-Detail in the s95 handoff at the bottom. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-12 (session 97). **Review-queue tooling shipped:** `pnpm review:queue`
+dumps `draft` provenance rows grouped by bank/sector/category/group for offline founder review
+(`docs/reports/review-queue.md`); current headline is **25/2,132 rows verified (1.2%)**. No
+content or app-source changes this session. Detail in the s97 handoff at the bottom. Product
+name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -57,33 +57,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 94 (2026-07-12). Bibliothek scale-up Wave 1: the Branche (sector) axis is
-ACTIVE.** The founder presents Genauly to German-course classmates from all major professional sectors
-on 2026-07-13 and wants the Bibliothek to be their single source of truth after the course; this
-**un-parks the sector facet** (founder decision 2026-07-12, superseding the 2026-07-09 audit's park;
-recorded in `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §1 and `DECISIONS.md`).
-- **Taxonomy:** `WorkSector` 5 → **11 values** (`+engineering`, `+construction`, `+production`,
-  `+transport`, `+beauty`, `+sports`), mirrored in `lint-content.mjs`; labels in `facets.ts`
-  (`SECTOR_OPTIONS`, care relabelled "Medizin & Pflege", hospitality "Gastronomie"); a sector facet was
-  added to `COLLOCATION_FACETS` (vocab already had one). Rule kept: Branche = where you work, Thema =
-  what you are doing; `transport` deliberately not named "Logistik" (theme-label clash).
-- **Content Wave 1 (even spread, founder choice):** **+220 vocab** (20/sector, care extends the s43
-  Pflege pack) and **+96 collocations** authored + 3 existing tagged, all with `cefr` + `sector` + full
-  schema, spread across existing themes (care-pack pattern). Coverage cleared the 15% floor, so the
-  **Branche facet renders on Wörter AND Kollokationen automatically** (11 pill options, `?sector=`).
-  **+12 Redemittel** in the new sector-neutral `professionalIntro` category ("Über Beruf & Fachgebiet
-  sprechen", Briefcase icon added to `lib/icons.ts`). **+328 provenance rows** (DWDS references, draft).
-- **Verification (all green):** `lint:content` ✔; `build:oracles` refreshed → `verify:facts` **0
-  two-oracle errors**; wordfreq installed → `build:frequency-subset` + `build:frequency` regenerated;
-  LanguageTool resolved → `verify:grammar` **0 grammar flags**; `verify:cefr` + `build:verification`
-  regenerated; typecheck, ESLint 0 errors, `test:unit` 116/116, build + prerender, `check:bundle`
-  **73.0 kB**/400.
-- **Strategy doc:** `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` — the 11-sector taxonomy, Waves 2–4,
-  the per-wave quality gate, and the floor math.
-- **NOT done / follow-up candidates:** all 328 new provenance rows are `draft` (founder/native review
-  pass pending); sector `ReadingText`s were Wave 2; Wave 2 prioritization waits on classmate feedback
-  after the 2026-07-13 presentation.
-
 **Handoff after session 95 (2026-07-12). Scale-up Waves 2–4 EXECUTED and MERGED to `main`
 (PR #463, squash; the founder reviewed the staged draft PR and gave the merge go-ahead).** One
 wave per commit on the branch (b1c0766 W2, 8c0df08 W3, 2bfb57f W4 + docs commits). The approved plan
@@ -117,6 +90,33 @@ wave per commit on the branch (b1c0766 W2, 8c0df08 W3, 2bfb57f W4 + docs commits
   classmate feedback from the 2026-07-13 presentation; a Playwright smoke of one new grammar
   lesson in a real browser.
 
-_(Sessions 85-93's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+**Handoff after session 97 (2026-07-12). Review-queue tooling shipped (scale-up plan §7.6's
+named next step).** `scripts/review-queue.mjs` + `pnpm review:queue`: a read-only dump of
+`draft` provenance rows, grouped by content type then by sector (vocab/collocation/text) /
+category (Redemittel) / group (grammar) / theme (Can-Do, dialogues, exam sets, writing prompts) /
+chapter (missions), written to `docs/reports/review-queue.md`. Mechanical tooling (Haiku-tier per
+the plan's model policy), no content or app-source changes.
+- **Usage:** `pnpm review:queue` for the full draft queue; scope a session with
+  `--type=vocabulary`, `--sector=it,engineering`, `--group=meetings`, or inspect what's already
+  verified with `--status=verified|all`. `--dry` prints the console summary only, no report file.
+  The headline summary (total rows, verified %) always covers the **whole register**, regardless
+  of filters, so a scoped session never loses sight of the overall trust metric.
+- **Current headline (unchanged by this session, now visible in one command):** **25 / 2,132 rows
+  verified (1.2%)** — only the founder-approved Can-Do bank. Everything from Waves 1–4 (vocab,
+  collocations, redemittel, grammar, texts, dialogues, exam sets, writing prompts, missions) is
+  still `draft`.
+- **Implementation note:** content_id → group lookup is built by cross-referencing the actual bank
+  items (not the provenance `notes` free text, which isn't populated consistently across banks);
+  grammar drills resolve to their parent topic's `group` field, missions to `chapter`.
+- **Verification:** `lint:content` ✔ (unaffected, script is read-only); `typecheck` ✔; `eslint`
+  0 errors (pre-existing hook warnings only); `test:unit` 116/116; full unfiltered run completes
+  in ~2s and produces the counts matching the s95 handoff exactly (2,132 total / 25 verified /
+  2,107 draft).
+- **NOT done:** actually running a review pass with the tool (flipping any rows to `verified`) —
+  this session shipped the tool only, per the plan's "Next step (first verification session)"
+  wording; the review pass itself is the next session's work. Wave-2 tranche 2 and the Playwright
+  grammar smoke (carried over from s95) are still open too.
+
+_(Sessions 85-94's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_

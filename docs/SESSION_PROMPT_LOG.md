@@ -3804,3 +3804,33 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** new `docs/PROJECT_FOUNDATION.md`; edited `docs/PROJECT_STATUS.md`, `docs/README.md`,
   `docs/PROJECT_REFERENCE.md`, `CLAUDE.md`, `docs/plans/{GAME_IMPLEMENTATION_PLAN,MINIMAL_UX_REDESIGN_PLAN,UX_REDESIGN_IMPLEMENTATION_PLAN,BIBLIOTHEK_CATEGORIZATION_AUDIT_2026-07-09,BIBLIOTHEK_CATEGORIZATION_IMPLEMENTATION_PLAN}.md`,
   `docs/strategy/{AI_PRODUCT_STRATEGY,BUSINESS_PLAN,DATA_STRATEGY}.md`.
+
+## Entry 352 — 2026-07-12 (session 97)
+- **Prompt (verbatim):**
+  > what's next in the scale up plan?
+- **Follow-up (verbatim):**
+  > yes, which model should I select for this?
+- **Follow-up (verbatim):**
+  > go ahead
+- **Response summary:** Answered the "what's next" question by reading
+  `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` and the s95 handoff: content Waves 1-4 are all shipped,
+  the plan's own named next step is the first verification session (build the review-queue tool, then
+  run a review pass), gated on nothing; Wave-2 tranche 2 is deliberately gated on 2026-07-13 classmate
+  feedback. Recommended Haiku 4.5 per the plan's model policy (mechanical tooling, no authoring/wiring),
+  founder picked Sonnet 5 for headroom on new code. Shipped **`scripts/review-queue.mjs`** (+
+  `pnpm review:queue`): loads every content bank plus `provenance.ts` via `ssrLoadModule`, cross-
+  references each provenance row's `content_id` against the real bank item (not the free-text `notes`
+  field, which isn't populated consistently) to resolve its sector/category/group/theme/chapter, then
+  dumps `draft` rows grouped by content type and that axis to `docs/reports/review-queue.md`. Supports
+  `--type=`/`--sector=`/`--group=` (comma lists) to scope a session and `--status=verified|all`; the
+  headline verified % always covers the whole register regardless of filters. Verified output against
+  the s95 handoff numbers (2,132 total / 25 verified / 2,107 draft, exact match) and that Wave-2's
+  `it` vocab tranche resolves to 60 rows. Ran the full quality gate available for a script-only change:
+  `lint:content` clean, `typecheck` clean, `eslint` 0 errors, `test:unit` 116/116. Updated
+  `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §7.6 and `CLAUDE.md`'s command list, archived the s94
+  handoff into the W28 weekly file per the doc-hygiene rule, and added the s97 handoff to
+  `docs/PROJECT_STATUS.md`. Did NOT run an actual review pass (flip any row to `verified`) — that is
+  explicitly next session's work, this session shipped the tool only. Not yet committed/pushed/merged.
+- **Artifacts:** `scripts/review-queue.mjs`, `package.json`, `docs/reports/review-queue.md`,
+  `docs/PROJECT_STATUS.md`, `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`, `CLAUDE.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md`.
