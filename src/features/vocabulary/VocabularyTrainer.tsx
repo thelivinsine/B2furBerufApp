@@ -400,12 +400,9 @@ export function VocabularyTrainer() {
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
     ),
-    // Count sits stacked to the right of Üben in the tile footer. Hidden in the
-    // graph view, where the count lives on the canvas instead.
-    count:
-      view !== "graph"
-        ? { value: items.length, label: items.length === 1 ? "Wort" : "Wörter" }
-        : undefined,
+    // Count sits stacked to the right of Üben in the tile footer, same as
+    // every other view (the graph canvas keeps its own connection count).
+    count: { value: items.length, label: items.length === 1 ? "Wort" : "Wörter" },
   };
 
   const listContent = SHOW_PRACTICE_TABS ? (
@@ -565,16 +562,14 @@ export function VocabularyTrainer() {
           >
             <Zap className="h-4 w-4" /> Üben
           </Button>
-          {view !== "graph" && (
-            <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
-              <span className="text-sm font-semibold tabular-nums text-foreground">
-                {items.length}
-              </span>
-              <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                {items.length === 1 ? "Wort" : "Wörter"}
-              </span>
-            </div>
-          )}
+          <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+            <span className="text-sm font-semibold tabular-nums text-foreground">
+              {items.length}
+            </span>
+            <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+              {items.length === 1 ? "Wort" : "Wörter"}
+            </span>
+          </div>
         </div>
 
         <FilterRail

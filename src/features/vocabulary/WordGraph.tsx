@@ -557,9 +557,9 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
         )}
       </div>
 
-      {/* Legend + both counts (word + connection) at the bottom of the
-          canvas, so the meta row above stays uncluttered in the graph view
-          (founder follow-up). Centered on mobile, left-aligned on desktop. */}
+      {/* Legend + connection count at the bottom of the canvas (the word
+          count now sits beside Üben like every other view, founder
+          follow-up). Centered on mobile, left-aligned on desktop. */}
       <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground lg:justify-start">
         {presentDomains.map((d) => (
           <span key={d.id} className="inline-flex items-center gap-1.5">
@@ -573,7 +573,6 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
           </span>
         ))}
         <span className="tabular-nums lg:ml-auto">
-          {graph.nodes.length} {graph.nodes.length === 1 ? "Wort" : "Wörter"} ·{" "}
           {graph.links.length} Verbindung{graph.links.length !== 1 ? "en" : ""}
         </span>
       </div>

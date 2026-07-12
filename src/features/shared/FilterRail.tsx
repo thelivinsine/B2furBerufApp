@@ -156,7 +156,7 @@ export function FilterRail<T>({
   /** Always-visible slot at the bottom of the tile (the Üben button). */
   footer?: React.ReactNode;
   /** Result count shown stacked (number over noun) to the right of the footer
-   *  button. Omit to hide it (e.g. the Wörter graph view). */
+   *  button. Omit to hide it. */
   count?: { value: number; label: string };
   /** localStorage scope for the section pins, e.g. "woerter". */
   pinScope: string;
@@ -287,6 +287,7 @@ export function FilterRail<T>({
     <section key={p.pinId}>
       <SectionHeader
         label={p.label}
+        eyebrow
         pinned={pins.includes(p.pinId)}
         onTogglePin={() => togglePin(p.pinId)}
       />
@@ -348,8 +349,8 @@ export function FilterRail<T>({
                 selected
                   ? "border-primary bg-primary text-primary-foreground"
                   : disabled
-                    ? "cursor-not-allowed border-border/50 bg-muted/40 text-muted-foreground/40"
-                    : "border-border/60 bg-white text-foreground hover:border-primary/40 dark:bg-white/10 dark:border-white/15",
+                    ? "cursor-not-allowed border-border/50 bg-transparent text-muted-foreground/40"
+                    : "border-border bg-muted text-foreground hover:border-primary/40 hover:bg-muted/70",
               )}
             >
               {opt.label}
@@ -390,7 +391,10 @@ export function FilterRail<T>({
       <div
         role="region"
         aria-label="Filter"
-        className={cn("space-y-4 rounded-xl border border-border bg-border p-3", className)}
+        className={cn(
+          "space-y-4 rounded-xl border border-border bg-surface p-3 shadow-soft",
+          className,
+        )}
       >
         {/* Panel header: label on the left, reset + close icons top-right. */}
         <div className="flex items-center justify-between gap-2">
@@ -410,61 +414,58 @@ export function FilterRail<T>({
   return (
     <aside
       className={cn(
-        // The WHOLE tile is one solid, higher-contrast grey (founder follow-up
-        // s92: `bg-border` reads clearly against the near-white page where the
-        // old `bg-muted` barely did), so every section shares the top row's
-        // shade. The white controls inside carry the contrast; the "Filter"
-        // label keeps the brand accent. On DESKTOP the aside is its own capped
-        // scroll container (the instance className adds `lg:overflow-y-auto` +
-        // `lg:max-h-…`): the header sticks to its top, the Üben footer to its
-        // bottom, the middle scrolls. On MOBILE the tile grows naturally (no
-        // cap, no internal scroll, so no scrollbar); the Üben footer instead
-        // sticks to the viewport bottom (above the nav) so it stays visible
-        // while the filters are open.
-        "rounded-xl border border-border bg-border",
+        // Standard content-card recipe (founder follow-up s103: the old flat
+        // `bg-border` slab read as an ugly grey block against every other
+        // card on the page). Visible border + a soft shadow, same as any
+        // other content tile; the white/muted controls inside carry the
+        // hierarchy, and the "Filter" label keeps the brand accent. On
+        // DESKTOP the aside is its own capped scroll container (the instance
+        // className adds `lg:overflow-y-auto` + `lg:max-h-…`): the header
+        // sticks to its top, the Üben footer to its bottom, the middle
+        // scrolls. On MOBILE the tile grows naturally (no cap, no internal
+        // scroll, so no scrollbar); the Üben footer instead sticks to the
+        // viewport bottom (above the nav) so it stays visible while the
+        // filters are open.
+        "rounded-xl border border-border bg-surface shadow-soft",
         className,
       )}
       aria-label="Filter"
     >
-      {/* Tile header; clicking collapses/expands the panel (pinned sections +
-          footer stay visible regardless). Sticks to the top of the scroll on
-          desktop. Mobile hides it (`hideHeader`) because the Filter toggle
-          lives on the view-options line instead. */}
+      {/* Tile header: the expand/collapse toggle (flex-1, so it still reads
+          as one clickable row) plus the reset icon beside it, always visible
+          (founder follow-up: reset no longer hides behind an expanded-only
+          first row). Sticks to the top of the scroll on desktop. Mobile
+          hides it (`hideHeader`) because the Filter toggle lives on the
+          view-options line instead. */}
       {!hideHeader && (
-        <button
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          className="z-10 flex w-full items-center gap-2 rounded-t-xl bg-border px-3 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-foreground/5 lg:sticky lg:top-0 lg:rounded-none"
-        >
-          <SlidersHorizontal className="h-4 w-4" />
-          Filter
-          {activeCount > 0 && (
-            <span className="rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
-              {activeCount}
-            </span>
-          )}
-          <ChevronDown
-            className={cn("ml-auto h-4 w-4 transition-transform", open && "rotate-180")}
-          />
-        </button>
+        <div className="z-10 flex w-full items-center gap-1 rounded-t-xl bg-surface px-3 py-2.5 lg:sticky lg:top-0 lg:rounded-none">
+          <button
+            onClick={() => setOpen(!open)}
+            aria-expanded={open}
+            className="flex flex-1 items-center gap-2 text-sm font-semibold text-primary transition-colors hover:opacity-80"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Filter
+            {activeCount > 0 && (
+              <span className="rounded-full bg-primary px-1.5 text-xs font-semibold text-primary-foreground">
+                {activeCount}
+              </span>
+            )}
+            <ChevronDown
+              className={cn("ml-auto h-4 w-4 transition-transform", open && "rotate-180")}
+            />
+          </button>
+          {resetButton}
+        </div>
       )}
 
       {open && (
         <div
           className={cn(
             "space-y-5 p-3",
-            hideHeader ? "rounded-t-xl" : "border-t border-muted-foreground/10",
+            hideHeader ? "rounded-t-xl" : "border-t border-border",
           )}
         >
-          {/* Expanded first row: the result count on the left, the icon reset on
-              the right (replaces the old "Zurücksetzen" word button). */}
-          {(countStack || activeCount > 0) && (
-            <div className="flex items-center justify-end gap-2">
-              {countStack && <div className="mr-auto">{countStack}</div>}
-              {resetButton}
-            </div>
-          )}
-
           {filterBody}
         </div>
       )}
@@ -474,7 +475,7 @@ export function FilterRail<T>({
         <div
           className={cn(
             "space-y-5 p-3",
-            hideHeader ? "rounded-t-xl" : "border-t border-muted-foreground/10",
+            hideHeader ? "rounded-t-xl" : "border-t border-border",
           )}
         >
           {pinnedScopes.map(scopeSelect)}
@@ -492,7 +493,7 @@ export function FilterRail<T>({
       {footer && (
         <div
           className={cn(
-            "sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 flex items-center gap-2 rounded-b-xl border-t border-muted-foreground/10 bg-border p-3 lg:bottom-0 lg:rounded-none",
+            "sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 flex items-center gap-2 rounded-b-xl border-t border-border bg-surface p-3 lg:bottom-0 lg:rounded-none",
             // Headerless + collapsed + no pinned sections: the footer is the
             // whole tile, so round its top too and drop the divider.
             hideHeader && !open && !showPinnedBody && "rounded-t-xl border-t-0",
@@ -504,9 +505,9 @@ export function FilterRail<T>({
               keeps its labelled header. */}
           {hideHeader && !open && filterToggle}
           <div className="min-w-0 flex-1">{footer}</div>
-          {/* Count sits beside Üben only while collapsed; expanded, it is in
-              the first row of the panel instead. */}
-          {!open && countStack}
+          {/* Count sits beside Üben at every state (founder follow-up:
+              previously it jumped to the top of the panel when expanded). */}
+          {countStack}
         </div>
       )}
     </aside>

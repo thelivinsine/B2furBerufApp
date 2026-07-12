@@ -317,7 +317,19 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   (inline gradient button on desktop, sticky bottom action bar above the nav on mobile), replacing the
   old "Wissen im Quiz testen" `/quiz` CTA (the retired `/quiz` route stays reachable via practiceAreas,
   see below). Emerald stays the quiet Grammatik accent (icon tiles/Muster only); brand indigo stays the
-  action color.
+  action color. **Desktop the Muster panel and the explanation sit side by side** (s103,
+  `CardContent` gains `lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]`; mobile keeps the s93 stacked
+  order untouched).
+  **FilterRail + graph counts (s103, Üben-refinements plan items 2/4/5, supersedes the s91/s92 grey-tile
+  language above):** the tile (both the desktop rail and the mobile panel) is now a standard content
+  card, `bg-surface` + visible `border-border` + `shadow-soft`, not the old flat `bg-border` slab the
+  founder called ugly; unselected facet pills are `bg-muted` (not stark white) and the scope section
+  labels (Branche/Thema/Unterthema/Kategorie/Gruppe) share the same uppercase eyebrow style as the
+  facets. The header is a toggle (Filter + active-count badge + chevron) plus a permanent reset icon
+  beside it (no longer hidden inside an expanded-only first row). **The result count sits beside Üben
+  in every state** (open, collapsed, and the mobile sticky bar), not just collapsed. The **Wörter graph
+  view's word count moved off the canvas to sit beside Üben like every other view**; the canvas legend
+  keeps only the connections count ("m Verbindungen").
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
