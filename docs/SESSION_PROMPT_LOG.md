@@ -3765,3 +3765,17 @@ Branch: `claude/whats-next-esga9u`.
   24 topics / 117 drills, provenance 2,132 rows), then the branch realigned onto origin/main per the
   post-merge housekeeping rule.
 - **Artifacts:** PR #463 (squash-merged), `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 350 — 2026-07-12 (session 93)
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Documentation pass for session 93 (the Grammatik redesign, PRs #457–#461). Most of
+  the paper trail shipped incrementally with each PR: prompt-log entries 340–345, the s93 handoff with
+  per-round bullets (later archived to W28 by session 95's doc pass), and CLAUDE.md kept current each round
+  (Bibliothek views line, Grammatik redesign block, grammar bank schema with explanationDe/pitfallsDe + the
+  EnPeek pattern, the /quiz status note, the facet registry line). This pass refreshed the status doc's
+  "Prior, session 93" header block to cover the full session arc and added this closing entry. Sessions 94
+  and 95 (Bibliothek scale-up) landed in parallel; their doc updates were reconciled by rebasing this pass
+  onto the post-#463 main. Verified the s95 grammar canon adopted the German-first schema (24/24 topics
+  carry explanationDe + pitfallsDe). Shipped as PR #464.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (PR #464).

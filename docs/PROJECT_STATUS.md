@@ -20,16 +20,20 @@ sprechen"), provenance 1,426 → **1,754 rows** (all new rows draft). Full pipel
 verify:facts 0 two-oracle errors, frequency subset + bins regenerated, verify:grammar 0 grammar flags,
 verification tiers rebuilt, 116/116 tests, main chunk 73.0 kB. Waves 2–4 (sector depth, Redemittel
 phrasebook, grammar canon) specced in the plan. Detail in the s94 handoff below.**
-Prior, session 93: **Grammatik tab redesigned onto the shared Bibliothek browse
-skeleton (PR #457).** The fourth Bibliothek tab now matches the other three at the structural level
-(LibrarySwitcher header → toolbar with mobile filter toggle + Karten/Liste view switcher + transient fuzzy
-search → content → Üben in the FilterRail footer / sticky mobile bar), with **Gruppe** as the primary
-dropdown and **Stufe (CEFR)** as a facet (`grammarFacets()` in `lib/facets.ts`). Topic cards were redesigned
-(emerald group tile, priority-rank chip, mono pattern strip, "Lernen →"), a compact Liste view added, and
-the topic page became a focused **lesson**: hero, emerald Muster formula panel, Beispiele, Typische Fehler,
-numbered Übungen with a live progress bar, a completion panel that hands over the next topic, and prev/next
-navigation along the B2-marker priority spine ("Thema n von 10"). Browser-verified both breakpoints incl.
-the full drill loop; gates green, main chunk 73.0 kB. Detail in the s93 handoff below.**
+Prior, session 93: **Grammatik tab fully redesigned onto the shared Bibliothek browse
+skeleton + 4 founder refinement rounds (PRs #457–#461, all squash-merged).** The fourth Bibliothek tab now
+matches the other three at the structural level (LibrarySwitcher header → toolbar with mobile filter toggle
++ Karten/Liste view switcher + transient fuzzy search → content → Üben in the FilterRail footer / sticky
+mobile bar), with **Gruppe** as the primary dropdown and **Stufe (CEFR)** as a facet (`grammarFacets()` in
+`lib/facets.ts`). Topic cards were redesigned (emerald group tile, priority-rank chip, mono pattern strip,
+"Lernen →"), a compact Liste view added, and the topic page became a focused **lesson** with a completion
+panel and prev/next navigation along the B2-marker priority spine. The founder rounds then shaped the
+lesson: tabs restored on top + Üben added, replacing the /quiz CTA (#458); a minimal single-description
+hero, no meta badges (#459); Muster variants ONE PER ROW + the explanation as sentence bullets behind a
+bottom-right "Mehr anzeigen" expander (#460); and **German-first text with hold-to-peek English** (#461):
+`explanationDe`/`pitfallsDe` on all topics (AI-drafted, founder verify pending) + the `EnPeek` chip on the
+explanation, pitfalls, examples and drill glosses (lesson only). Browser-verified throughout; gates green.
+Detail in the s93 handoff, archived to the W28 file.**
 Prior, session 92: **Bibliothek browse pages — 14 founder UI-refinement rounds
 (PRs #442–#455), all squash-merged.** The three browse tabs (Wörter/Kollokationen/Redemittel) were reworked
 from the founder's phone screenshots: **search moved OUT of the filter panel** into a transient toggle (icon
