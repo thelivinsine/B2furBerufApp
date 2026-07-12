@@ -287,7 +287,6 @@ export function FilterRail<T>({
         label={p.label}
         pinned={pins.includes(pinId)}
         onTogglePin={() => togglePin(pinId)}
-        pinnable={!panel}
       />
       {/* Dropdown (founder follow-up): the scope (Thema/Unterthema/Kategorie) is
           a Select, not an always-open row list, so the facet groups below
@@ -331,7 +330,6 @@ export function FilterRail<T>({
         eyebrow
         pinned={pins.includes(facet.id)}
         onTogglePin={() => togglePin(facet.id)}
-        pinnable={!panel}
       />
       <div className="flex flex-wrap gap-1.5">
         {facet.options.map((opt) => {

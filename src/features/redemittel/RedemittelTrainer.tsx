@@ -268,24 +268,6 @@ export function RedemittelTrainer() {
               />
             )}
 
-            {/* Mobile-only: Üben fills the row, count stacked at its right. */}
-            <div className="flex items-center gap-2 lg:hidden">
-              <Button
-                variant="gradient"
-                className="h-11 flex-1 rounded-xl text-base"
-                onClick={() => navigate("/session")}
-              >
-                <Zap className="h-4 w-4" /> Üben
-              </Button>
-              <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
-                <span className="text-sm font-semibold tabular-nums text-foreground">
-                  {filtered.length}
-                </span>
-                <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-                  Wendung{filtered.length !== 1 ? "en" : ""}
-                </span>
-              </div>
-            </div>
           </div>
 
           <AnimatePresence initial={false}>
@@ -332,6 +314,25 @@ export function RedemittelTrainer() {
               Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
             </div>
           )}
+        </div>
+
+        {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
+        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+          <Button
+            variant="gradient"
+            className="h-11 flex-1 rounded-xl text-base"
+            onClick={() => navigate("/session")}
+          >
+            <Zap className="h-4 w-4" /> Üben
+          </Button>
+          <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+            <span className="text-sm font-semibold tabular-nums text-foreground">
+              {filtered.length}
+            </span>
+            <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+              Wendung{filtered.length !== 1 ? "en" : ""}
+            </span>
+          </div>
         </div>
 
         <FilterRail
