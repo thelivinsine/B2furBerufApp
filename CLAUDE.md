@@ -248,6 +248,27 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   mobile** (`justify-center lg:justify-start`). In the graph view both counts sit at the bottom of the
   canvas ("n Wörter · m Verbindungen") and the meta-row word count is hidden; other views keep the count in
   the meta row. (`BrowseToolbar`/`FacetSheet` stay in the repo but are no longer used by these three pages.)
+  **Bibliothek s92 update (14 founder rounds, PRs #442–#455; supersedes several s91 specifics above):**
+  (1) **Search lives OUTSIDE the filter tile.** A search icon on the toolbar (right of the Wörter bookmark,
+  icon-only) toggles a transient full-width `SearchField` (autofocus); opening/closing never touches filter
+  state, closing clears. Backed by **`src/lib/fuzzy.ts`** (`fuzzyMatch`/`foldText`: umlaut/case-insensitive,
+  token-order-independent, Damerau edit-1 for 4+ char tokens), pinned by `tests/fuzzy.test.ts`. Wörter search
+  also appends a match's **connections** (its `related` terms that resolve to in-scope entries). (2) **The
+  HubHero page headers were dropped from all four Bibliothek tabs; `LibrarySwitcher` IS the page header** —
+  a lifted `shadow-soft` bar, **active tab bold + brand** (reads as the section title), quiet inactive, with
+  a framer **`layoutId` sliding white pill** (reduced-motion safe). `text-sm` on ALL breakpoints (an earlier
+  `sm:text-base` was reverted as oversized). **`ViewSwitcher` got the same sliding pill** (`h-10`). (3)
+  **Mobile toolbar is a full-width `justify-between` row** `[Filter icon · ViewSwitcher · bookmark/search]`;
+  the Filter icon is a page-owned toggle and the filter tile is a body-only **`FilterRail` `layout="panel"`**
+  that slides open/closed via **AnimatePresence** (height/opacity). The desktop persistent rail (`layout`
+  default `"rail"`) is unchanged. (4) **Sub-themes are a filter dropdown, not a page:** the full-page
+  `SubThemePicker` interstitial is gone; `FilterRail` gained an optional **`secondary`** scope ("Unterthema",
+  per-sub-theme counts + "Gesamtes Thema") under Thema when the theme has sub-themes (Wörter + Kollokationen).
+  `SubThemePicker` is now unused (kept in repo). (5) **Filter tile controls are icons:** a reset (RotateCcw,
+  disabled when nothing to clear) + close (X, mobile panel only) in the top-right; the word "Zurücksetzen"
+  button was removed. **Section pins show on BOTH breakpoints** again. (6) **Üben + word count are a sticky
+  bottom action bar on mobile** (full-bleed, `sticky bottom-[nav]`, backdrop-blur, after the content so the
+  list scrolls above them); desktop keeps Üben/count in the rail. `test:unit` 116/116; main chunk ~73 kB.
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
