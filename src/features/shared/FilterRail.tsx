@@ -126,6 +126,7 @@ function SectionHeader({
 
 export function FilterRail<T>({
   primary,
+  secondary,
   items,
   facets,
   selection,
@@ -141,6 +142,9 @@ export function FilterRail<T>({
   className,
 }: {
   primary?: RailPrimary;
+  /** Optional second scope dropdown (the sub-theme), shown right under the
+   *  primary. Provided only when the active theme has sub-themes. */
+  secondary?: RailPrimary;
   /** Items in the current scope, for live option counts (same list the sheet gets). */
   items: T[];
   facets: FacetDef<T>[];
@@ -240,29 +244,31 @@ export function FilterRail<T>({
 
   const panel = layout === "panel";
 
-  const primarySection = primary ? (
+  // A scope dropdown (Thema / Unterthema / Kategorie). Rendered once for the
+  // primary scope and, when present, once for the secondary (sub-theme) scope.
+  const scopeSelect = (p: RailPrimary, pinId: string) => (
     <section>
       <SectionHeader
-        label={primary.label}
-        pinned={pins.includes("primary")}
-        onTogglePin={() => togglePin("primary")}
+        label={p.label}
+        pinned={pins.includes(pinId)}
+        onTogglePin={() => togglePin(pinId)}
         pinnable={!panel}
       />
-      {/* Dropdown (founder follow-up): the primary scope (Thema/Kategorie) is
+      {/* Dropdown (founder follow-up): the scope (Thema/Unterthema/Kategorie) is
           a Select, not an always-open row list, so the facet groups below
           stay close to the top. Same options as the mobile toolbar dropdown. */}
-      <Select value={primary.value} onValueChange={primary.onChange}>
+      <Select value={p.value} onValueChange={p.onChange}>
         <SelectTrigger className="w-full">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={primary.all.value}>{withCount(primary.all)}</SelectItem>
-          {primary.options?.map((opt) => (
+          <SelectItem value={p.all.value}>{withCount(p.all)}</SelectItem>
+          {p.options?.map((opt) => (
             <SelectItem key={opt.value} value={opt.value}>
               {withCount(opt)}
             </SelectItem>
           ))}
-          {primary.groups?.map((group) => (
+          {p.groups?.map((group) => (
             <SelectGroup key={group.label}>
               <SelectLabel>{group.label}</SelectLabel>
               {group.options.map((opt) => (
@@ -275,7 +281,13 @@ export function FilterRail<T>({
         </SelectContent>
       </Select>
     </section>
-  ) : null;
+  );
+
+  const primarySection = primary ? scopeSelect(primary, "primary") : null;
+  // The sub-theme scope (Unterthema), shown right under Thema when the active
+  // theme has sub-themes, so drilling in is part of the filter, not a separate
+  // full-page picker.
+  const secondarySection = secondary ? scopeSelect(secondary, "secondary") : null;
 
   const facetSection = (facet: FacetDef<T>) => (
     <section key={facet.id}>
@@ -332,6 +344,7 @@ export function FilterRail<T>({
   const filterBody = (
     <>
       {primarySection}
+      {secondarySection}
       {facets.length > 0 && (
         <div className="space-y-5">
           {activeCount > 0 && (
@@ -436,6 +449,7 @@ export function FilterRail<T>({
           )}
         >
           {primary && pins.includes("primary") && primarySection}
+          {secondary && pins.includes("secondary") && secondarySection}
           {pinnedFacets.map(facetSection)}
         </div>
       )}

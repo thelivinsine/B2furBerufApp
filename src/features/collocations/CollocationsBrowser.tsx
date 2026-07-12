@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronLeft, Zap, Search, SlidersHorizontal } from "lucide-react";
-import { collocations, collocationsByTheme } from "@/data/collocations";
+import { collocations, collocationsByTheme, collocationsBySubTheme } from "@/data/collocations";
 import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
@@ -22,7 +22,6 @@ import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { CollocationTable, CollocationCompactList } from "./CollocationViews";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
-import { SubThemePicker } from "@/features/vocabulary/SubThemePicker";
 import { themeGroupsForMode } from "@/lib/themeGroups";
 import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { usePagedList } from "@/lib/usePagedList";
@@ -158,7 +157,6 @@ export function CollocationsBrowser() {
   const activeTheme = themeParam !== "all" ? themeById(themeParam) : null;
   const subThemes = activeTheme?.subThemes ?? [];
   const hasSubThemes = subThemes.length > 0;
-  const showPicker = hasSubThemes && !sub;
   const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
   const activeSub = subThemes.find((s) => s.id === sub);
 
@@ -213,6 +211,25 @@ export function CollocationsBrowser() {
       all: { value: "all", label: "Alle Themen", count: collocations.length },
       groups: primaryGroups,
     },
+    // Sub-theme drill-down as a second dropdown (founder s92): replaces the old
+    // full-page picker.
+    secondary: hasSubThemes
+      ? {
+          label: "Unterthema",
+          value: sub && sub !== "" ? sub : "all",
+          onChange: setSub,
+          all: {
+            value: "all",
+            label: "Gesamtes Thema",
+            count: collocationsByTheme(themeParam).length,
+          },
+          options: subThemes.map((s) => ({
+            value: s.id,
+            label: s.titleDe,
+            count: collocationsBySubTheme(s.id).length,
+          })),
+        }
+      : undefined,
     items: scoped,
     facets: COLLOCATION_FACETS,
     selection,
@@ -363,41 +380,33 @@ export function CollocationsBrowser() {
         </div>
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
-          {showPicker && activeTheme ? (
-            <SubThemePicker
-              theme={activeTheme}
-              onPick={(s) => setSub(s)}
-              onPickAll={() => setSub("all")}
-              totalLine={`Alle ${collocationsByTheme(activeTheme.id).length} Kollokationen auf einmal`}
-            />
-          ) : (
-            <>
-              {hasSubThemes && sub && (
-                <button
-                  onClick={() => setSub("")}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  {activeTheme?.titleDe}
-                  <span className="text-muted-foreground/60">/</span>
-                  <span className="text-foreground">
-                    {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
-                  </span>
-                </button>
-              )}
+          {/* Sub-theme drill-down now lives in the filter (the Unterthema
+              dropdown), not a separate picker page. This breadcrumb shows the
+              active sub-theme context and jumps back to the whole theme. */}
+          {hasSubThemes && sub && sub !== "all" && (
+            <button
+              onClick={() => setSub("")}
+              className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {activeTheme?.titleDe}
+              <span className="text-muted-foreground/60">/</span>
+              <span className="text-foreground">
+                {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
+              </span>
+            </button>
+          )}
 
-              {filtered.length === 0 ? (
-                <div className="py-16 text-center text-muted-foreground">
-                  Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
-                </div>
-              ) : view === "tabelle" ? (
-                <CollocationTable items={filtered} />
-              ) : view === "liste" ? (
-                <CollocationCompactList items={filtered} />
-              ) : (
-                cardGrid
-              )}
-            </>
+          {filtered.length === 0 ? (
+            <div className="py-16 text-center text-muted-foreground">
+              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+            </div>
+          ) : view === "tabelle" ? (
+            <CollocationTable items={filtered} />
+          ) : view === "liste" ? (
+            <CollocationCompactList items={filtered} />
+          ) : (
+            cardGrid
           )}
         </div>
 

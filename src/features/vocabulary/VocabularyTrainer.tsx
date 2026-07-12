@@ -12,7 +12,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { themeById } from "@/data/themes";
-import { vocabulary, vocabByTheme, filterVocab } from "@/data/vocabulary";
+import { vocabulary, vocabByTheme, vocabBySubTheme, filterVocab } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
@@ -39,7 +39,6 @@ import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
 import { VocabList } from "./VocabList";
 import { VocabTable, VocabCompactList } from "./VocabViews";
-import { SubThemePicker } from "./SubThemePicker";
 
 // The graph view carries d3-force and the canvas renderer; it loads only when
 // someone actually opens it (Bibliothek views, session 91).
@@ -128,7 +127,6 @@ export function VocabularyTrainer() {
   const activeTheme = theme !== "all" ? themeById(theme) : undefined;
   const subThemes = activeTheme?.subThemes ?? [];
   const hasSubThemes = subThemes.length > 0;
-  const showPicker = hasSubThemes && !sub;
   const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
   const activeSub = subThemes.find((s) => s.id === sub);
 
@@ -307,6 +305,25 @@ export function VocabularyTrainer() {
       all: { value: "all", label: "Alle Themen", count: vocabulary.length },
       groups: primaryGroups,
     },
+    // Sub-theme drill-down as a second dropdown (founder s92): replaces the old
+    // full-page SubThemePicker so narrowing to a sub-theme is part of the filter.
+    secondary: hasSubThemes
+      ? {
+          label: "Unterthema",
+          value: sub && sub !== "" ? sub : "all",
+          onChange: setSub,
+          all: {
+            value: "all",
+            label: "Gesamtes Thema",
+            count: vocabByTheme(theme).length,
+          },
+          options: subThemes.map((s) => ({
+            value: s.id,
+            label: s.titleDe,
+            count: vocabBySubTheme(s.id).length,
+          })),
+        }
+      : undefined,
     items: searched,
     facets,
     selection,
@@ -324,10 +341,6 @@ export function VocabularyTrainer() {
         ? { value: items.length, label: items.length === 1 ? "Wort" : "Wörter" }
         : undefined,
   };
-
-  // The sub-theme picker replaces the card/table/list content, but never the
-  // graph: the graph is at its best over the whole theme.
-  const showPickerNow = showPicker && view !== "graph";
 
   const listContent = SHOW_PRACTICE_TABS ? (
     <Tabs value={mode} onValueChange={setMode}>
@@ -472,31 +485,24 @@ export function VocabularyTrainer() {
         </div>
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
-          {showPickerNow && activeTheme ? (
-            <SubThemePicker
-              theme={activeTheme}
-              onPick={(s) => setSub(s)}
-              onPickAll={() => setSub("all")}
-            />
-          ) : (
-            <>
-              {hasSubThemes && sub && (
-                <button
-                  onClick={() => setSub("")}
-                  className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  {activeTheme?.titleDe}
-                  <span className="text-muted-foreground/60">/</span>
-                  <span className="text-foreground">
-                    {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
-                  </span>
-                </button>
-              )}
-
-              {listContent}
-            </>
+          {/* Sub-theme drill-down now lives in the filter (the Unterthema
+              dropdown), not a separate picker page. When a sub-theme is active
+              this breadcrumb shows the context and jumps back to the whole theme. */}
+          {hasSubThemes && sub && sub !== "all" && (
+            <button
+              onClick={() => setSub("")}
+              className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <ChevronLeft className="h-4 w-4" />
+              {activeTheme?.titleDe}
+              <span className="text-muted-foreground/60">/</span>
+              <span className="text-foreground">
+                {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
+              </span>
+            </button>
           )}
+
+          {listContent}
         </div>
 
         <FilterRail
