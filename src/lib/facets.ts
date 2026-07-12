@@ -1,6 +1,7 @@
 import { vocabulary } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
+import { grammar } from "@/data/grammar";
 import { frequencyBin } from "@/data/frequency";
 import type { FacetDef, FacetOption } from "@/features/shared/FacetSheet";
 import { CEFR_ORDER } from "@/lib/cefr";
@@ -69,6 +70,7 @@ function passesFloor<T>(f: FacetDef<T>, items: T[]): boolean {
 type Vocab = (typeof vocabulary)[number];
 type Collocation = (typeof collocations)[number];
 type Redemittel = (typeof redemittel)[number];
+type Grammar = (typeof grammar)[number];
 
 /** Build a FacetDef, keeping only option values that actually occur in the
  *  dataset and enforcing the ≤12-option hygiene rule (dev-time warning). */
@@ -195,3 +197,19 @@ export function redemittelFacets(): FacetDef<Redemittel>[] {
   return REDEMITTEL_FACETS.filter((f) => passesFloor(f, redemittel));
 }
 export const REDEMITTEL_FACET_IDS = REDEMITTEL_FACETS.map((f) => f.id);
+
+// ── Grammatik (Bibliothek redesign, s93) ─────────────────────────────────
+// Gruppe is the primary dropdown (the "where am I" cut, per the control-choice
+// rule above); Stufe is the one item ATTRIBUTE the bank carries (`cefr` is
+// required on every topic since the audit P2 pass, so coverage is 100%).
+const GRAMMAR_FACETS: FacetDef<Grammar>[] = [
+  facet(
+    { id: "cefr", label: "Stufe (CEFR)", hint: "Mehrfachauswahl", options: CEFR_OPTIONS, get: (t) => t.cefr },
+    grammar,
+  ),
+];
+
+export function grammarFacets(): FacetDef<Grammar>[] {
+  return GRAMMAR_FACETS.filter((f) => passesFloor(f, grammar));
+}
+export const GRAMMAR_FACET_IDS = GRAMMAR_FACETS.map((f) => f.id);

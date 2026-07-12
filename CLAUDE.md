@@ -201,7 +201,7 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   **Bibliothek views (s91, from the founder's hand-drawn mockup):** the three browse tabs each have a
   **view switcher** (`features/shared/ViewSwitcher.tsx`, `?view=`, `karten` default kept out of the URL):
   Wörter = Tabelle · Graph · Karten · Liste, Kollokationen/Redemittel = Tabelle · Karten · Liste,
-  Grammatik untouched. Tabelle = generic sortable `features/shared/DataTable.tsx` (German collation,
+  Grammatik = Karten · Liste (added s93, see below). Tabelle = generic sortable `features/shared/DataTable.tsx` (German collation,
   missing values sink, paged rows; sort-header buttons need their own `uppercase`, Tailwind preflight
   resets it on buttons) with per-tab columns + compact lists in `vocabulary/VocabViews.tsx` /
   `collocations/CollocationViews.tsx` / `redemittel/RedemittelViews.tsx`. **Graph (Wörter only)** =
@@ -269,6 +269,20 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   button was removed. **Section pins show on BOTH breakpoints** again. (6) **Üben + word count are a sticky
   bottom action bar on mobile** (full-bleed, `sticky bottom-[nav]`, backdrop-blur, after the content so the
   list scrolls above them); desktop keeps Üben/count in the rail. `test:unit` 116/116; main chunk ~73 kB.
+  **Grammatik redesign (s93):** the fourth tab now shares the SAME s92 skeleton (toolbar with mobile
+  filter toggle + Karten/Liste ViewSwitcher + transient fuzzy search; `FilterRail` on both breakpoints
+  with **Gruppe** as the primary dropdown and **Stufe (CEFR)** as the facet, `grammarFacets()` in
+  `lib/facets.ts`; Üben in the rail footer / sticky mobile bar; params `?group=`/`?cefr=`/`?view=`/
+  `?topic=` all URL-persisted). Feature split: `grammar/grammarMeta.ts` (group labels/icons, the
+  B2-marker `groupOrder`, `orderedGrammar` spine, `topicRank`), `grammar/GrammarViews.tsx` (Karten cards
+  with emerald group tile + priority-rank chip + mono pattern strip, compact Liste rows), and
+  `grammar/GrammarTopicView.tsx`, the **lesson page**: hero (group tile, English eyebrow, purpose,
+  badges), explanation card with an emerald **Muster** formula panel, Beispiele, Typische Fehler,
+  numbered Übungen with a **live progress bar**, a **completion panel** ("Thema abgeschlossen · k von n
+  richtig" + "Weiter: <next>") and prev/next cards along the priority spine ("Thema n von 10"), so a
+  time-poor learner is always handed the next-biggest B2 lever. Emerald stays the quiet Grammatik accent
+  (icon tiles/Muster only); brand indigo stays the action color. The lesson keeps the "Wissen im Quiz
+  testen" `/quiz` deep link (that intent keeps the retired route alive, see below).
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.

@@ -3631,3 +3631,27 @@ Branch: `claude/whats-next-esga9u`.
   toolbar, header-like toggle with sliding pills, icon reset/close, sticky bottom Üben bar).
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`, `docs/PROJECT_STATUS.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `CLAUDE.md`.
+
+## Entry 340 — 2026-07-12 (session 93)
+- **Prompt (verbatim):**
+  > grammatik section needs a complete re imagination. Check the other three sections of bibliothek and follow the concept of these sections on a high-level like visual hierarchy of filter icons then content and at the bottom üben button. But for all other things take all the freedom you want to redesign this section to be a worldclass billion dollar app designed by tech experts from various departments of a tech company. I want to see a page of highest quality and standard that's fully polished.
+- **Response summary:** Rebuilt the Grammatik tab onto the shared s92 browse skeleton: LibrarySwitcher
+  header, toolbar (mobile filter toggle + Karten/Liste ViewSwitcher + transient fuzzy search), FilterRail
+  on both breakpoints (Gruppe primary dropdown + Stufe/CEFR facet via a new `grammarFacets()` registry
+  entry, Üben footer), sticky mobile Üben + count bar. Redesigned topic cards (emerald group tile,
+  priority-rank chip, CEFR badge, mono pattern strip, "Lernen" affordance), added a compact Liste view,
+  and rebuilt the topic page as a focused lesson (hero, emerald Muster panel, Beispiele, Typische Fehler,
+  numbered drills with a live progress bar, prev/next navigation along the B2-marker spine). Verified in
+  a real browser at both breakpoints; all gates green. Shipped as PR #457.
+- **Artifacts:** `src/features/grammar/GrammarHub.tsx` (rewrite), new `GrammarViews.tsx` /
+  `GrammarTopicView.tsx` / `grammarMeta.ts`, `src/lib/facets.ts` (PR #457).
+
+## Entry 341 — 2026-07-12 (session 93)
+- **Prompt (verbatim):**
+  > make sure the grammatik section is highly useful and intuitive to use for adult learners and job holders. read the purpose of the app for better clarity and understanding
+- **Response summary:** Folded the audience lens (time-poor working adults on the B1–B2 plateau) into the
+  redesign: the B2-marker priority order is now an explicit guided path (rank chips on cards/rows, "Thema
+  n von 10" in the lesson), and finishing a topic's drills shows a completion panel ("Thema abgeschlossen ·
+  k von n richtig") with a one-tap "Weiter: <next topic>" CTA, so the section always answers "where do I
+  start, what's next" without the learner deciding. Same PR #457.
+- **Artifacts:** `grammarMeta.ts` (`topicRank`), `GrammarViews.tsx`, `GrammarTopicView.tsx` (PR #457).
