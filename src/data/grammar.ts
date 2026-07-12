@@ -870,7 +870,7 @@ export const grammar: GrammarTopic[] = [
     pitfalls: [
       "Separable verbs take 'zu' in the middle: anzurufen, NOT zu anrufen.",
       "'um … zu' only works with the same subject; different subjects need 'damit': Ich erkläre es, damit ihr es versteht.",
-      "Modal verbs do not form zu-infinitives after other verbs; say 'Ich hoffe, kommen zu können', never 'zu müssen wollen'.",
+      "After verbs like vergessen or vorhaben, do not forget the comma when the infinitive clause is extended: Ich habe vor, den Vertrag zu kündigen.",
     ],
     pitfallsDe: [
       "Trennbare Verben: 'zu' in der Mitte: anzurufen, NICHT zu anrufen.",
@@ -1130,10 +1130,10 @@ export const grammar: GrammarTopic[] = [
       },
       {
         id: "g_vergleichssaetze_d5",
-        prompt: "Es sieht so aus, ___ die Lieferung sich verspätet.",
+        prompt: "Es sieht so aus, ___ die Lieferung sich verspäten würde.",
         answer: "als ob",
         options: ["als ob", "wie", "als", "damit"],
-        explain: "Appearance/speculation: als ob + subordinate clause.",
+        explain: "Appearance/speculation: als ob + Konjunktiv II at the end (verspäten würde).",
         gloss: "It looks as if the delivery is going to be late.",
       },
     ],
@@ -1232,12 +1232,12 @@ export const grammar: GrammarTopic[] = [
       { de: "Bitte antworten Sie innerhalb einer Woche.", en: "Please reply within one week." },
     ],
     pitfalls: [
-      "Masculine/neuter nouns need -(e)s: wegen des Umbau**s**, während des Meeting**s**.",
+      "Masculine/neuter nouns need -(e)s: wegen des Umbaus, während des Meetings.",
       "'wegen dem Wetter' is colloquial; write 'wegen des Wetters'.",
       "Time phrases like 'eines Tages' are fixed genitives worth memorising.",
     ],
     pitfallsDe: [
-      "Maskulin/Neutrum brauchen -(e)s: wegen des Umbau**s**, während des Meeting**s**.",
+      "Maskulin/Neutrum brauchen -(e)s: wegen des Umbaus, während des Meetings.",
       "'wegen dem Wetter' ist umgangssprachlich; schreib 'wegen des Wetters'.",
       "Feste Wendungen wie 'eines Tages' sind Genitive zum Auswendiglernen.",
     ],
@@ -1567,10 +1567,10 @@ export const grammar: GrammarTopic[] = [
       },
       {
         id: "g_brauchen_zu_d5",
-        prompt: "Sie brauchen ___ die Anlage nur anzuschließen, alles andere ist fertig.",
+        prompt: "Sie brauchen ___ die Anlage anzuschließen, alles andere ist fertig.",
         answer: "nur",
         options: ["nur", "nicht", "kaum", "noch nicht"],
-        explain: "Restriction: nur brauchen zu = the only required step. ('nur' repeats for emphasis in the drill sentence.)",
+        explain: "Restriction: nur brauchen zu = the only required step.",
         gloss: "You only need to connect the unit, everything else is done.",
       },
     ],

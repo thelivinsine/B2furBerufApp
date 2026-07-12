@@ -3855,3 +3855,31 @@ Branch: `claude/whats-next-esga9u`.
   PROJECT_STATUS.md`'s s97 handoff got a short addendum recording the model decision so the next
   session (which starts cold) knows to run on Opus 4.8 without re-deriving the reasoning.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 354 — 2026-07-12 (session 98)
+- **Branch:** `claude/bibliothek-scale-up-yfzekq`
+- **Prompt (verbatim):**
+  > continue with the next step in bibliothek scale up plan
+- **Response summary:** Ran the scale-up plan's named next step, the first review pass, on Opus 4.8.
+  Found a product-honesty conflict first: the plan's "flip rows to `verified`" step surfaces on
+  `/sources` as "menschlich geprüft / human-verified" (Sources.tsx counts `review_status: "verified"`
+  as human-verified, all such rows `verified_by: "founder"`), so an AI flipping them would make a
+  false claim. Surfaced two decisions via AskUserQuestion; founder chose to **feed the honest
+  machine-layer `jury` tier** (the reserved "KI-Jury/AI jury" rung, already in `TIER_META` + the type
+  ladder but never populated) and scoped the pass to **Wave 3 Redemittel + Wave 4 grammar**. Reviewed
+  all 149 ids (65 Redemittel, 14 grammar topics, 70 drills) for German correctness. Redemittel 65/65
+  clean; grammar had 4 real defects, all fixed: literal `**s**` markdown in Genitiv pitfalls (plain-text
+  render), an Infinitivsätze EN/DE pitfall mismatch that breaks the hold-to-peek swap, a Vergleichssätze
+  drill using `als ob` + indicative against its own Konjunktiv-II rule, and a doubled "nur" in a
+  brauchen+zu drill. Built a committed sidecar `docs/reports/jury-review.json` (the passed ids) and
+  wired `scripts/build-verification.mjs` to read it and elevate those ids to the `jury` tier (conf 0.9),
+  keeping `verification.ts` fully generated. Added `"jury"` to the `Sources.tsx` tier-summary list so the
+  149 show in the breakdown. Deliberately left `review_status` untouched (that is the human loop). Full
+  gate green: build:verification (jury 149), lint:content, verify:facts 0 errors, typecheck, test:unit
+  116/116, build + prerender, check:bundle 73.0 kB. Updated the plan §7 (two-loop review model),
+  `CLAUDE.md` (jury-sidecar mechanism), `docs/PROJECT_STATUS.md` (s98 handoff, s95 archived), and this
+  log. Committed, pushed, PR into `main`, squash-merged, branch realigned.
+- **Artifacts:** `src/data/grammar.ts`, `src/data/verification.ts`, `scripts/build-verification.mjs`,
+  `src/features/legal/Sources.tsx`, `docs/reports/jury-review.json`,
+  `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`, `CLAUDE.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md`.

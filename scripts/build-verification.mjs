@@ -20,6 +20,9 @@
  * recomputed here from the shared helpers; grammar comes from the sidecar
  * `docs/reports/verify-grammar.json` (so LanguageTool is not re-run). Run the
  * three `verify:*` scripts first; grammar needs `pnpm build:languagetool`.
+ * The `jury` rung is fed by `docs/reports/jury-review.json` (an AI-jury review
+ * pass, scale-up plan §7): any content_id listed there with no failing check is
+ * elevated to the `jury` tier. The sidecar is optional; absent, no item is jury.
  *
  * TIER LADDER: unverified < structural < provenance < facts < linguistic < jury
  * < human. `tier` is the highest rung all RELEVANT checks passed; a review_status
@@ -35,6 +38,7 @@ import { classifyVocabCefr } from "./verify-cefr.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const FREQ = path.join(root, "scripts", "vendor", "german-frequency-subset.json");
 const GRAMMAR_SIDECAR = path.join(root, "docs", "reports", "verify-grammar.json");
+const JURY_SIDECAR = path.join(root, "docs", "reports", "jury-review.json");
 const OUT = path.join(root, "src", "data", "verification.ts");
 
 const CONFIDENCE = {
@@ -105,6 +109,17 @@ async function main() {
   const grammarChecked = new Set(grammar.checkedOwners ?? []);
   const grammarIssues = grammar.byOwner ?? {};
 
+  // Optional AI-jury review pass (scale-up plan §7). Absent sidecar -> no jury items.
+  let juryPass = new Set();
+  let juryPromptVersion = "jury-1";
+  try {
+    const jury = JSON.parse(await readFile(JURY_SIDECAR, "utf8"));
+    juryPass = new Set(jury.pass ?? []);
+    if (jury.promptVersion) juryPromptVersion = jury.promptVersion;
+  } catch {
+    /* no jury sidecar yet */
+  }
+
   const vocabById = new Map(vocabulary.map((v) => [v.id, v]));
   const D = new Date().toISOString().slice(0, 10); // sweep date (node script, not a Workflow)
 
@@ -157,6 +172,11 @@ async function main() {
     let tier;
     if (row.review_status === "verified") {
       tier = "human";
+    } else if (juryPass.has(id) && !checks.some((c) => c.result === "fail")) {
+      // AI-jury review pass (docs/reports/jury-review.json): a holistic LLM read
+      // of German correctness, above the automated linguistic rung, below human.
+      checks.push({ layer: "jury", tool: "ai-jury", result: "pass", prompt_version: juryPromptVersion });
+      tier = "jury";
     } else {
       const factsOk = factsResult === "na" || factsResult === "pass";
       const cefrOk = cefrResult !== "flag";
@@ -190,7 +210,7 @@ async function main() {
   await mkdir(path.dirname(OUT), { recursive: true });
   await writeFile(OUT, lines.join("\n"), "utf8");
 
-  const TIERS = ["human", "linguistic", "facts", "provenance", "structural", "unverified"];
+  const TIERS = ["human", "jury", "linguistic", "facts", "provenance", "structural", "unverified"];
   console.log(`Composed ${records.length} verification records -> ${path.relative(root, OUT)} (sweep ${D}).`);
   for (const t of TIERS) if (tierHist[t]) console.log(`  ${t.padEnd(12)} ${tierHist[t]}`);
 }

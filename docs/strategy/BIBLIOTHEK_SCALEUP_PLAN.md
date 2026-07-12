@@ -2,6 +2,8 @@
 
 _Created 2026-07-12 (session 94). Founder decision: activate the sector (Branche) axis._
 _Updated 2026-07-12 (session 95): Waves 2 (first tranche), 3 and 4 EXECUTED; founder review pending._
+_Updated 2026-07-12 (session 98): first AI-jury review pass (§7) EXECUTED over Wave 3 Redemittel +
+Wave 4 grammar (149 ids → `jury` tier); 4 content defects fixed. review_status unchanged._
 
 ## 0. Non-technical summary (for the founder)
 
@@ -144,14 +146,25 @@ This is what makes the library a *source of truth* rather than a word list:
    the Layer C trust tiers shown on `/sources`.
 5. `pnpm typecheck && pnpm test:unit && pnpm build && pnpm check:bundle` — the banks ride only
    in lazy chunks; the ~75 kB main chunk must not move.
-6. Human loop: all new rows start `review_status: "draft"`; the founder (or a native-speaker
-   reviewer) flips them to `verified` in review passes. AI-drafted ≠ verified, and `/sources`
-   says so honestly per item. **Tooling shipped (s97):** `scripts/review-queue.mjs` (+
-   `pnpm review:queue`) dumps draft items grouped by bank, then sector/category/group/theme/
-   chapter, to `docs/reports/review-queue.md`; scope with `--type=`/`--sector=`/`--group=`. The
-   headline verified % (currently **25/2,132 = 1.2%**, only the Can-Do bank) always covers the
-   whole register regardless of filters. **Next step:** actually run a review session with it —
-   one pass after each content wave, tracking verified % as the headline quality metric.
+6. Two-loop review model:
+   - **Human loop (the `verified` gate):** rows start `review_status: "draft"`; the founder (or a
+     native-speaker reviewer) flips them to `verified` by hand. `/sources` counts and shows those
+     as **"menschlich geprüft / human-verified"** (`verified_by: "founder"`), so an AI must never
+     flip them. Tooling: `scripts/review-queue.mjs` (+ `pnpm review:queue`) dumps draft items
+     grouped by bank/sector/category/group; scope with `--type=`/`--sector=`/`--group=`. Headline
+     verified % (**25/2,132 = 1.2%**, only the Can-Do bank) is unchanged by AI review.
+   - **AI-jury loop (the `jury` machine tier, first pass EXECUTED s98):** a strong LLM reads each
+     item for German correctness (grammar, spelling, article/plural, sense-match to the English
+     gloss, register + CEFR plausibility). Passed ids are listed in `docs/reports/jury-review.json`;
+     `pnpm build:verification` reads that sidecar and elevates them to the honest **"KI-Jury / AI
+     jury"** tier on `/sources` (confidence 0.9, above the automated linguistic rung, below human).
+     This is NOT human verification and does not touch `review_status`. **First pass:** Wave 3
+     Redemittel (65) + Wave 4 grammar (14 topics + 70 drills) = **149 ids** reviewed → jury tier;
+     4 defects found and fixed (a Genitiv pitfall rendered literal `**` markdown; an Infinitivsätze
+     EN peek mismatched its German; a Vergleichssätze drill used `als ob` + indicative against its
+     own Konjunktiv-II rule; a brauchen+zu drill had a doubled "nur").
+   - **Next:** extend the jury pass wave-by-wave (append ids to the sidecar), and run the human loop
+     to move real `verified` % as the founder finds review time.
 
 ## 8. Content sourcing rules (unchanged, see DATA_GOVERNANCE.md)
 

@@ -57,6 +57,13 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   (so run `pnpm verify:grammar` first) and recomputes facts/CEFR from the vendored subsets. `/sources`
   shows a tier badge per item; `lint:content` validates the enums + prints the tier distribution.
   Regenerate after re-running the `verify:*` checks. See `docs/strategy/DATA_STRATEGY.md` §4.
+  **AI-jury tier (s98):** the `jury` rung ("KI-Jury"/"AI jury", confidence 0.9, above `linguistic`,
+  below `human`) is fed by the committed sidecar `docs/reports/jury-review.json` — a `{ promptVersion,
+  reviewer, pass: [content_id, …] }` record of an AI review pass for German correctness. Any listed id
+  with no failing check is elevated to `jury` (unless `review_status: "verified"`, which stays `human`).
+  This is an honest **machine** tier and does NOT touch `review_status`; only a human flips that (see
+  the two-loop model in `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §7). Append ids to the sidecar as
+  later waves are reviewed, then regenerate. Sidecar absent → no item is jury (non-breaking).
 - `pnpm review:queue` — read-only dump of `draft` provenance rows grouped by bank, then by sector
   (vocab/collocation/text) / category (Redemittel) / group (grammar) / theme / chapter, written to
   `docs/reports/review-queue.md`, for offline founder/reviewer passes (scale-up plan §7.6, s97).
