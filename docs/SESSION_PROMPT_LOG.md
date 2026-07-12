@@ -3723,3 +3723,35 @@ Branch: `claude/whats-next-esga9u`.
   `src/lib/icons.ts`, `src/data/{vocabulary,collocations,redemittel,provenance,frequency,verification}.ts`,
   `scripts/vendor/*` (regenerated subsets), `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`,
   `docs/DECISIONS.md`, `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/reports/*` (PR pending).
+
+## Entry 347 — 2026-07-12 (session 95)
+- **Prompt (verbatim):**
+  > create a solid plan for wave 2 to 4
+- **Follow-up (verbatim):**
+  > opus 4.8 prepared the model. I don't trust it enough and I want the highest quality output possible. I switched to Fable now. review the plan and make necessary changes to it. Include model recommendations for each chunk of the three waves and a non tech summary. provide a revised plan now.
+- **Response summary:** Plan-mode session. Drafted and revised the Waves 2-4 execution plan (approved):
+  Wave 2 feedback-driven sector deepening with sector reading texts (ReadingText.sector), Wave 3
+  Redemittel phrasebook via 5 speech-act categories, Wave 4 the missing B1-B2 grammar canon, plus a
+  verification workstream (review-queue tooling, draft-to-verified flow) and per-chunk model
+  recommendations (Fable 5 for all German authoring, Sonnet 5 wiring, Haiku 4.5 mechanics) and a
+  non-technical summary.
+- **Artifacts:** plan approved; folded into `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` (see entry 348).
+
+## Entry 348 — 2026-07-12 (session 95)
+- **Prompt (verbatim):**
+  > go ahead until the fable tasks are done in w4 as per the plan and then wait for my review.
+- **Follow-up (verbatim):**
+  > save your work on to the current branch after each wave
+- **Response summary:** Executed Waves 2-4 end to end, one commit per wave, PR opened but NOT merged
+  (awaiting founder review). Wave 2 first tranche: engineering/it/construction/production +40 vocab
+  each (bank 1,022), +65 collocations + 1 tagged (bank 701), 4 sector reading texts one per kind
+  (bank 26), ReadingText.sector schema + linter. Wave 3: 5 new Redemittel categories, 65 phrases
+  (bank 149). Wave 4: 14 German-first grammar topics + 70 drills across 6 new groups (bank 24/117),
+  grammarMeta spine extended. +378 provenance rows (2,132 total; provenance.ts split into two
+  concatenated literals to stay under TS2590). Pipeline green: verify:facts 0 two-oracle errors,
+  verify:grammar 0 grammar flags (no warn signal touches the ~800 new sentences), frequency + trust
+  tiers regenerated, typecheck/ESLint/116 tests/build/73.0 kB. Docs: strategy doc updated with the
+  executed state + model policy + non-tech summary; CLAUDE.md counts; s95 status handoff (s93
+  archived).
+- **Artifacts:** commits b1c0766 (W2) · 8c0df08 (W3) · 2bfb57f (W4) + docs commit on
+  `claude/bibliothek-scaleup-german-pros-slcnh5`; PR pending founder review.

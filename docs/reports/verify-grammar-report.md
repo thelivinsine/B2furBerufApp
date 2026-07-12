@@ -9,18 +9,18 @@ its rule so it can be judged without native fluency._
 
 ## Summary
 
-- German sentences checked: **2959**  (vocab 1724, collocation 636, redemittel 168, dialogue 343, text 88)
-- Sentences with at least one finding: **31**  ·  clean: **99.0%**
-- Total findings (after ignore-list): **34**
+- German sentences checked: **3490**  (vocab 2044, collocation 701, redemittel 298, dialogue 343, text 104)
+- Sentences with at least one finding: **35**  ·  clean: **99.0%**
+- Total findings (after ignore-list): **38**
 
 Findings by bucket:
 
 | bucket | count |
 |---|---|
 | Grammar & agreement | 0 |
-| Spelling | 19 |
-| Punctuation & typography | 2 |
-| Style & register | 4 |
+| Spelling | 20 |
+| Punctuation & typography | 4 |
+| Style & register | 5 |
 | Duplication | 0 |
 | Whitespace | 0 |
 | Other | 9 |
@@ -29,9 +29,10 @@ Most-fired rules (top 15):
 
 | rule | count |
 |---|---|
-| `GERMAN_SPELLER_RULE` | 18 |
+| `GERMAN_SPELLER_RULE` | 19 |
 | `H2O` | 3 |
 | `DASS_STATT_DAS_RELATIVPRONOMEN` | 2 |
+| `UPPERCASE_SENTENCE_START` | 2 |
 | `DEN_DEM` | 2 |
 | `DURCHEINANDER` | 1 |
 | `DE_UNPAIRED_QUOTES` | 1 |
@@ -42,12 +43,13 @@ Most-fired rules (top 15):
 | `DE_MULTITOKEN_SPELLING_TWO` | 1 |
 | `GERMAN_WORD_REPEAT_BEGINNING_RULE` | 1 |
 | `DE_WORD_COHERENCY` | 1 |
+| `MATHE` | 1 |
 
 ## Grammar & agreement (0)
 
 _None._
 
-## Spelling (19)
+## Spelling (20)
 
 _Many spelling hits are domain proper nouns, brand names, or valid compounds absent from
 LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
@@ -57,6 +59,7 @@ LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
 | `c_lessons_learned_auswerten#ex` | collocation | Lessons | Möglicher Tippfehler gefunden. | Hessens \| Lessing \| Messens \| Lesbos \| Lessings |
 | `c_lessons_learned_auswerten#ex` | collocation | Learned | Möglicher Tippfehler gefunden. | Learjet \| Lernen \| Learneo \| Leugnet \| Lerner |
 | `c_maut_bezahlen#ex` | collocation | Onboard-Unit | Möglicher Tippfehler gefunden. | Anbohrt-Unit \| Anbohrt-Unix \| Anbohrt-Uni \| Anbohrt-Unis \| Anbohrt-Unkt |
+| `r_mail10#ex` | redemittel | Marquez | Möglicher Tippfehler gefunden. | Marquis \| Jacques \| Márquez \| Marines \| Marktes |
 | `sc_homeoffice:h2:h2a#opt` | dialogue | stellenbezogene | Möglicher Tippfehler gefunden. | stellen bezogene \| stellen Bezogene |
 | `sc_pruefungsanmeldung:d1:d1a#opt` | dialogue | telc-Prüfung | Möglicher Tippfehler gefunden. | Pelz-Prüfung \| Balz-Prüfung \| Deck-Prüfung \| Denk-Prüfung \| Feld-Prüfung |
 | `tx_behoerde_unterlagen_brief_q3#q` | text | Rahimi | Möglicher Tippfehler gefunden. | Tahiti \| Rahm \| Sashimi \| Rahms \| Rahme |
@@ -74,17 +77,20 @@ LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
 | `v_scope_creep#ex1` | vocab | Scope-Creep | Möglicher Tippfehler gefunden. | Scope-Trieb \| Scope-Jeep \| Scope-Krepp \| Scope-Kreuz \| Scope-Creme |
 | `v_scope_creep#ex2` | vocab | Scope-Creep | Möglicher Tippfehler gefunden. | Scope-Trieb \| Scope-Jeep \| Scope-Krepp \| Scope-Kreuz \| Scope-Creme |
 
-## Punctuation & typography (2)
+## Punctuation & typography (4)
 
 | id | kind | flagged | message | suggestions |
 |---|---|---|---|---|
 | `r_cla6#ex` | redemittel | „ | Zeichen ohne sein Gegenstück: '“' scheint zu fehlen | — |
 | `r_cla6#ex` | redemittel | " | Möchten Sie ein schließendes typografisches Anführungszeichen verwenden? | “ |
+| `r_mail2#phrase` | redemittel | vielen | Dieser Satz fängt nicht mit einem großgeschriebenen Wort an. | Vielen |
+| `tx_engineering_memo_wartungsprotokoll#body` | text | gez | Dieser Satz fängt nicht mit einem großgeschriebenen Wort an. | Gez |
 
-## Style & register (4)
+## Style & register (5)
 
 | id | kind | flagged | message | suggestions |
 |---|---|---|---|---|
+| `tx_production_voicemail_schichtaenderung#body` | text | Info | 'Info' ist umgangssprachlich. | Information \| Informationsblatt \| Informatik |
 | `tx_wohnen_email_besichtigung#body` | text | Die | Drei aufeinanderfolgende Sätze beginnen mit dem gleichen Wort. Evtl. können Sie den Satz umformulieren, zum Beispiel, indem Sie ein Synonym nutzen. | — |
 | `v_co2_ausstoss#ex1` | vocab | CO2-Ausstoß | Möchten Sie die typografisch schönere Schreibweise "CO₂" verwenden? | CO₂-Ausstoß |
 | `v_co2_ausstoss#ex2` | vocab | CO2-Ausstoß | Möchten Sie die typografisch schönere Schreibweise "CO₂" verwenden? | CO₂-Ausstoß |

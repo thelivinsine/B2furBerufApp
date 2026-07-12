@@ -1,6 +1,26 @@
 # Bibliothek Scale-Up Plan: Branchen-Fachwortschatz für alle Berufsfelder
 
 _Created 2026-07-12 (session 94). Founder decision: activate the sector (Branche) axis._
+_Updated 2026-07-12 (session 95): Waves 2 (first tranche), 3 and 4 EXECUTED; founder review pending._
+
+## 0. Non-technical summary (for the founder)
+
+Wave 1 gave every profession a small starter set. Waves 2 to 4 turn those starters into a bank
+professionals keep using after the course:
+- **Wave 2, go deep per profession:** deepened sectors grow to ~60 words + ~26 word-pairs, plus a
+  short authentic workplace text (memo, email, notice, voicemail) so people read and listen, not
+  just memorise. Sectors are deepened in the order users ask for them.
+- **Wave 3, a phrasebook for work life:** Redemittel grew from 84 to 149 phrases across phone
+  calls, emails, presentations, job interviews and small talk. These fit every profession.
+- **Wave 4, finish the grammar:** 10 → 24 lessons now cover the core B1–B2 grammar canon, each
+  German-first with practice drills.
+- **Trust runs through all of it:** everything AI-drafted starts as "draft"; a human review flips
+  checked items to "verified" on the Sources page. Rising verified % is the quality headline.
+
+**Model policy:** the German writing IS the product and runs on the strongest model (Fable 5;
+Opus 4.8 only as fallback). Schema/enum wiring runs on Sonnet 5; mechanical steps (provenance
+script, regenerating generated files, running gates) on Haiku 4.5. If a session mixes authoring
+with wiring, the whole session runs on Fable 5, language work is never split down.
 
 ## 1. Why (the founder decision, superseding the 2026-07-09 audit)
 
@@ -61,55 +81,55 @@ pills to a dropdown (discuss with the founder first). Enum lives in `src/types/i
 - Every item: full schema (article/plural on nouns, 2 authored examples, `cefr`, related terms),
   one provenance row (`origin: authored`, DWDS corpus-search reference, `review_status: draft`).
 
-## 4. Wave 2 — depth where it is used (next 2–4 sessions)
+## 4. Wave 2 — depth where it is used (FIRST TRANCHE EXECUTED s95; review pending)
 
-Target: the 3–5 sectors with real users (start with the course classmates' feedback after the
-2026-07-13 presentation) grow from 20 to **60–80 words + 25–35 collocations** each.
+Target per prioritized sector: 20 → **60–80 words + 25–35 collocations + 1–2 reading texts**.
+Priority is feedback-driven (founder decision): deepen what classmates request after the
+2026-07-13 presentation; default order absent a signal: engineering → it → construction →
+production → care → the remaining service sectors.
 
-Per-sector deepening checklist:
-1. Vocab to 60–80, keeping the theme spread (a sector pack must never collapse into one theme).
+**Executed (s95, first tranche): engineering, it, construction, production** each grew +40 vocab
+(to ~60), +17/16 collocations (to ~26) and got one sector `ReadingText` (Wartungsprotokoll memo,
+Sprint-Review email, Baustellenordnung announcement, Schichtplan voicemail; one per `kind`).
+`ReadingText` gained the optional **`sector`** field (linter validates when present). Bank now:
+1,022 vocab · 701 collocations · 26 texts.
+
+Remaining per-sector checklist (care, trades, retail, hospitality, transport, beauty, sports):
+1. Vocab to 60–80, keeping the theme spread (never collapse into one theme).
 2. Collocations to 25–35 (the Nomen-Verb pairs are the highest-value B2 asset).
-3. **1–2 `ReadingText`s per sector** (`src/data/texts.ts`): an authentic-style workplace text
-   (Dienstplan-Aushang, Wartungsprotokoll-Memo, Baustellenordnung, Hygieneschulung-Einladung),
-   each with 2–3 comprehension checks. Texts carry `themeId`, not sector, until a `sector` field
-   is added to `ReadingText` (do that when the first sector text lands; mirror in the linter).
-4. Re-run the full data pipeline (§7) and check the Häufigkeit distribution: sector Fachwörter
-   legitimately skew "specialized"/no-bin; that is correct, never force-bin them.
+3. 1–2 sector `ReadingText`s with 2–3 checks each.
+4. Re-run the full pipeline (§7); sector Fachwörter legitimately skew "specialized"/no-bin.
 
 Prioritization signal order: (1) direct user requests, (2) which `?sector=` filters get used
 (no analytics yet, so ask users directly), (3) German labour-market size of the sector.
 
-## 5. Wave 3 — Redemittel as a professional phrasebook (72 → ~150)
+## 5. Wave 3 — Redemittel as a professional phrasebook (EXECUTED s95: 84 → 149; review pending)
 
-The thinnest bank. Growth is by **speech-act category**, never by sector:
-- `telephoning` (Telefonieren: anrufen, verbinden, Rückruf, Anrufbeantworter)
-- `emails` (E-Mails schreiben: Betreff, Anrede, Bezug nehmen, Anhang, Grußformel)
-- `presentations` (Präsentieren: einleiten, Folien, Zwischenfragen, zusammenfassen)
-- `jobInterview` (Vorstellungsgespräch: Stärken, Erfahrung, Rückfragen, Gehalt)
-- `smallTalk` (Small Talk am Arbeitsplatz: Pausengespräche, Wochenende, Wetter, Feiern)
+Growth by **speech-act category**, never by sector. Shipped: `telephoning` (Telefonieren),
+`emails` (E-Mails schreiben), `presentations` (Präsentieren), `jobInterview`
+(Vorstellungsgespräch incl. Gehaltsvorstellung/Rückfragen) and `smallTalk` (incl. Feierabend/
+Daumen drücken), 13 phrases each, every phrase with `cefr`, register and a realised example.
+Wiring followed the `professionalIntro` template exactly (union + linter mirror + registry +
+icons Phone/Mail/Presentation/UserCheck/Coffee).
 
-~12–16 phrases each, `cefr` on every phrase, register split neutral/formal. Each new category:
-extend `RedemittelCategory` union + linter mirror + `redemittelCategories` registry (label,
-labelDe, icon from `lib/icons.ts`) + provenance rows. `professionalIntro` (Wave 1) is the
-template. When Redemittel pass ~120 phrases, revisit the audit's parked idea of a pragmatic
-politeness tag (direkt/höflich/diplomatisch), which was banked as a v2 content project.
+Follow-up: now that the bank passed ~120 phrases, the audit's parked pragmatic politeness tag
+(direkt/höflich/diplomatisch) may be revisited as a separate content project.
 
-## 6. Wave 4 — Grammar: complete the B1–B2 canon (10 → ~24 topics)
+## 6. Wave 4 — Grammar: complete the B1–B2 canon (EXECUTED s95: 10 → 24 topics; review pending)
 
-Grammar stays sector-neutral (a Konjunktiv II is a Konjunktiv II in every industry). Missing
-B1–B2 topics, in priority order along the existing B2-marker spine:
-n-Deklination · Genitiv & Präpositionen mit Genitiv · Partizipien als Attribute
-(Partizipialattribute) · indirekte Rede (Konjunktiv I) · Nominalisierung ↔ Verbalstil ·
-zweiteilige Konnektoren (je…desto, sowohl…als auch, entweder…oder) · Infinitivsätze (zu, um…zu,
-ohne…zu, statt…zu) · Finalsätze (damit) · Temporalsätze (während, bevor, nachdem, seitdem) ·
-Vergleichssätze (als/wie, als ob) · lassen + Infinitiv · brauchen + zu · Futur I/II für
-Vermutungen · es-Konstruktionen.
+Grammar stays sector-neutral. Shipped, on the B2-marker spine (new groups in brackets):
+indirekte Rede/Konjunktiv I [reportedSpeech] · zweiteilige Konnektoren [connectors] ·
+Infinitivsätze [infinitives] · Finalsätze + Temporalsätze + Vergleichssätze [subordinate] ·
+Partizipialattribute [attributes] · Genitiv & Genitiv-Präpositionen [cases] · n-Deklination
+[nouns] · Nominalisierung [wordFormation] · lassen + Infinitiv + es-Konstruktionen
+[verbPosition] · brauchen + zu [modals] · Futur I/II für Vermutungen [future].
 
-Each topic follows the `GrammarTopic` schema (required `cefr`, 4–6 drills with `explain` +
-`gloss`, Typische Fehler section). 2–3 topics per session is a sustainable authoring pace with
-founder review. The s93 lesson page (priority spine, prev/next, completion panel) absorbs new
-topics automatically via `grammarMeta.ts` (`groupOrder`/`topicRank`: place each new topic on the
-spine deliberately).
+Every topic follows the full schema: required `cefr`, German-first `explanationDe` +
+`pitfallsDe` (EN on hold-to-peek), " · "-separated `pattern` variants, 3 examples, 5 drills
+with `explain` + `gloss`. Bank: **24 topics / 117 drills**. `grammarMeta.ts` `groupOrder` was
+extended so the s93 lesson page, spine rank, prev/next and completion panel absorbed everything
+automatically. Note: `provenance.ts` is now two concatenated array literals (a single 2,000+ row
+literal exceeds TypeScript's TS2590 union-complexity limit); the append pattern is unchanged.
 
 ## 7. The quality gate (every wave, non-negotiable)
 
@@ -126,7 +146,10 @@ This is what makes the library a *source of truth* rather than a word list:
    in lazy chunks; the ~75 kB main chunk must not move.
 6. Human loop: all new rows start `review_status: "draft"`; the founder (or a native-speaker
    reviewer) flips them to `verified` in review passes. AI-drafted ≠ verified, and `/sources`
-   says so honestly per item.
+   says so honestly per item. **Next step (first verification session):** build
+   `scripts/review-queue.mjs` (+ `pnpm review:queue`), a read-only dump of draft items grouped
+   by bank/sector/category for offline founder review; one review session after each content
+   wave, tracking verified % as the headline quality metric.
 
 ## 8. Content sourcing rules (unchanged, see DATA_GOVERNANCE.md)
 
