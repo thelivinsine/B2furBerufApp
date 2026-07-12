@@ -33,7 +33,7 @@ const THEME_IDS = [
 const POS = ["noun", "verb", "adjective", "adverb", "phrase", "connector"];
 const REDEMITTEL_CATEGORIES = [
   "suggestions", "agree", "disagree", "negotiation", "compromise",
-  "clarification", "opinion", "prosCons", "reactions",
+  "clarification", "opinion", "prosCons", "reactions", "professionalIntro",
 ];
 const REDEMITTEL_REGISTERS = ["neutral", "formal"]; // "diplomatic" folded into formal (audit 2026-07-09)
 const COLLOCATION_REGISTERS = ["neutral", "formal"];
@@ -62,7 +62,11 @@ const VERIFICATION_RESULTS = ["pass", "flag", "fail"];
 const FREQUENCIES = ["core", "common", "specialized"];
 // "office" removed + WorkSituation retired in the categorization audit
 // 2026-07-09 (Situation = sub-theme grain of Thema, not a separate axis).
-const WORK_SECTORS = ["care", "trades", "it", "retail", "hospitality"];
+// ACTIVE since the Bibliothek scale-up (founder decision 2026-07-12).
+const WORK_SECTORS = [
+  "care", "trades", "it", "retail", "hospitality",
+  "engineering", "construction", "production", "transport", "beauty", "sports",
+];
 // counterpart/taskType were CUT (audit P3 resolution, 2026-07-09): 0-tagged
 // forward-declares with no authoring plan. The checks below error if a row
 // reintroduces them without re-declaring the axis properly.

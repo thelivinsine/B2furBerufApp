@@ -53,16 +53,24 @@ export type ContentCefr =
 export type Frequency = "core" | "common" | "specialized";
 
 // Branche (industry the learner works in), a context axis orthogonal to Thema.
-// PARKED (categorization audit 2026-07-09): the field stays on vocab and
-// collocations, but the facet sits below the coverage floor in lib/facets.ts
-// until a sector has real content depth. "office" was removed as a value:
-// every industry has an office, so it is not a sector.
+// ACTIVE since the Bibliothek scale-up (founder decision 2026-07-12, supersedes
+// the 2026-07-09 audit's park): every sector now carries a starter pack, so the
+// facet clears the coverage floor in lib/facets.ts and renders on its own.
+// "office" stays removed: every industry has an office, so it is not a sector.
+// Rule: Branche = where you work, Thema = what you are doing; never reuse a
+// label across both axes ("transport" vs the "logistics" theme is deliberate).
 export type WorkSector =
   | "care"
   | "trades"
   | "it"
   | "retail"
-  | "hospitality";
+  | "hospitality"
+  | "engineering"
+  | "construction"
+  | "production"
+  | "transport"
+  | "beauty"
+  | "sports";
 
 // (The forward-declared Counterpart and TaskType facets were CUT in the
 // categorization audit P3 resolution, 2026-07-09: 0-tagged since s42 with no
@@ -136,7 +144,8 @@ export type RedemittelCategory =
   | "clarification"
   | "opinion"
   | "prosCons"
-  | "reactions";
+  | "reactions"
+  | "professionalIntro";
 
 export interface RedemittelPhrase {
   id: string;

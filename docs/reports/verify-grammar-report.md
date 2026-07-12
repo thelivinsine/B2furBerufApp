@@ -9,16 +9,16 @@ its rule so it can be judged without native fluency._
 
 ## Summary
 
-- German sentences checked: **2315**  (vocab 1284, collocation 540, redemittel 144, dialogue 275, text 72)
-- Sentences with at least one finding: **28**  ·  clean: **98.8%**
-- Total findings (after ignore-list): **31**
+- German sentences checked: **2959**  (vocab 1724, collocation 636, redemittel 168, dialogue 343, text 88)
+- Sentences with at least one finding: **31**  ·  clean: **99.0%**
+- Total findings (after ignore-list): **34**
 
 Findings by bucket:
 
 | bucket | count |
 |---|---|
 | Grammar & agreement | 0 |
-| Spelling | 16 |
+| Spelling | 19 |
 | Punctuation & typography | 2 |
 | Style & register | 4 |
 | Duplication | 0 |
@@ -29,7 +29,7 @@ Most-fired rules (top 15):
 
 | rule | count |
 |---|---|
-| `GERMAN_SPELLER_RULE` | 15 |
+| `GERMAN_SPELLER_RULE` | 18 |
 | `H2O` | 3 |
 | `DASS_STATT_DAS_RELATIVPRONOMEN` | 2 |
 | `DEN_DEM` | 2 |
@@ -47,7 +47,7 @@ Most-fired rules (top 15):
 
 _None._
 
-## Spelling (16)
+## Spelling (19)
 
 _Many spelling hits are domain proper nouns, brand names, or valid compounds absent from
 LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
@@ -56,7 +56,9 @@ LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
 |---|---|---|---|---|
 | `c_lessons_learned_auswerten#ex` | collocation | Lessons | Möglicher Tippfehler gefunden. | Hessens \| Lessing \| Messens \| Lesbos \| Lessings |
 | `c_lessons_learned_auswerten#ex` | collocation | Learned | Möglicher Tippfehler gefunden. | Learjet \| Lernen \| Learneo \| Leugnet \| Lerner |
+| `c_maut_bezahlen#ex` | collocation | Onboard-Unit | Möglicher Tippfehler gefunden. | Anbohrt-Unit \| Anbohrt-Unix \| Anbohrt-Uni \| Anbohrt-Unis \| Anbohrt-Unkt |
 | `sc_homeoffice:h2:h2a#opt` | dialogue | stellenbezogene | Möglicher Tippfehler gefunden. | stellen bezogene \| stellen Bezogene |
+| `sc_pruefungsanmeldung:d1:d1a#opt` | dialogue | telc-Prüfung | Möglicher Tippfehler gefunden. | Pelz-Prüfung \| Balz-Prüfung \| Deck-Prüfung \| Denk-Prüfung \| Feld-Prüfung |
 | `tx_behoerde_unterlagen_brief_q3#q` | text | Rahimi | Möglicher Tippfehler gefunden. | Tahiti \| Rahm \| Sashimi \| Rahms \| Rahme |
 | `tx_behoerde_unterlagen_brief#body` | text | Rahimi | Möglicher Tippfehler gefunden. | Tahiti \| Rahm \| Sashimi \| Rahms \| Rahme |
 | `tx_bildung_email_kurs_q1#q` | text | Haddad | Möglicher Tippfehler gefunden. | Mandat \| Hattet \| Bagdad \| Hättet \| Saddam |
@@ -65,6 +67,7 @@ LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
 | `tx_bildung_email_kurs#body` | text | Haddad | Möglicher Tippfehler gefunden. | Mandat \| Hattet \| Bagdad \| Hättet \| Saddam |
 | `tx_bildung_letter_anerkennung_q2#q` | text | Okonkwo | Möglicher Tippfehler gefunden. | — |
 | `tx_bildung_letter_anerkennung#body` | text | Okonkwo | Möglicher Tippfehler gefunden. | — |
+| `tx_bildung_voicemail_pruefung#body` | text | telc-Prüfung | Möglicher Tippfehler gefunden. | Pelz-Prüfung \| Balz-Prüfung \| Deck-Prüfung \| Denk-Prüfung \| Feld-Prüfung |
 | `tx_project_memo_status#body` | text | Duman | Möglicher Tippfehler gefunden. | Du man \| Dumas \| Human \| Duma \| Dumen |
 | `tx_scheduling_email_verschiebung#body` | text | Tomas | Möglicher Tippfehler gefunden. | Thomas \| Komas \| Themas \| Topas \| Das |
 | `tx_travel_voicemail_flug#body` | text | Markus Lang | Hier liegt möglicherweise ein Tippfehler vor. | Markus Lanz |

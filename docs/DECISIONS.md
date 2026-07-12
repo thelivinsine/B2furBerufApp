@@ -287,3 +287,26 @@ the Üben tab was reimagined as a **learning path in sync with the Neuland game*
   stop state derives from `missionsDone`, so the map advances as the learner plays. The "Als Nächstes" tile
   routes the next mission into `/welt?mission=<id>`. Authored per-chapter for now (extend `STOPS`); the map
   is lazy so Heute keeps no content bank on its eager path.
+
+## Branche (sector) axis ACTIVATED (session 94, 2026-07-12) — founder decision, supersedes the audit park
+
+The 2026-07-09 categorization audit parked the `sector` facet (§5, §11 Q1: 4% coverage, per-industry
+packs judged off-strategy for a sector-neutral exam product). On 2026-07-12 the founder un-parked it:
+Genauly's audience (starting with the founder's German course: architecture, software engineering,
+material science, mechanical engineering, manufacturing, gastronomy, beauty, medicine, sports,
+transportation) needs the Bibliothek as their single source of truth for professional German, which an
+office-only library cannot be. Full plan: `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`.
+
+- **What stays law from the audit:** Branche = where you work, Thema = what you are doing; sector packs
+  are tags spread across existing themes (the care-pack pattern), never new themes; no label reused
+  across the two axes (`transport` is deliberately not "Logistik"); visibility follows the coverage
+  floor, never a manual toggle. The activation worked exactly as the floor was designed to: content
+  crossed 15% and the facet reappeared on its own, zero UI changes.
+- **The taxonomy:** 11 values (care, trades, it, retail, hospitality + new engineering, construction,
+  production, transport, beauty, sports), within the ≤12-option rule. A 12th is fine; a 13th forces a
+  merge or a dropdown (ask the founder).
+- **Redemittel stay sector-free.** Professionals need phrases to talk ABOUT their field, not per-field
+  phrase variants; the new `professionalIntro` category delivers that. No `sector`/`themeId` on
+  Redemittel (audit rationale unchanged).
+- **Floor watch:** collocations sit at 15.6% sector coverage, just above the 15% floor. Bulk-adding
+  untagged collocations without tagged ones would silently hide the Branche facet again.

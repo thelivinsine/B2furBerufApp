@@ -1,6 +1,17 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-12 (session 93: **Grammatik tab redesigned onto the shared Bibliothek browse
+_Last updated: 2026-07-12 (session 94: **Bibliothek scale-up Wave 1 — the Branche (sector) axis is
+ACTIVE.** Founder decision un-parking the sector facet (supersedes the 2026-07-09 audit's park; plan in
+`docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`): `WorkSector` grew 5 → **11 values** (engineering,
+construction, production, transport, beauty, sports added) and every sector got a starter pack, so the
+**Branche filter now renders automatically on Wörter AND Kollokationen** (coverage floor cleared). Counts:
+vocab 642 → **862** (+220, 20/sector), collocations 540 → **636** (+96 authored, 3 existing tagged),
+Redemittel 72 → **84** (new sector-neutral `professionalIntro` category "Über Beruf & Fachgebiet
+sprechen"), provenance 1,426 → **1,754 rows** (all new rows draft). Full pipeline re-run and green:
+verify:facts 0 two-oracle errors, frequency subset + bins regenerated, verify:grammar 0 grammar flags,
+verification tiers rebuilt, 116/116 tests, main chunk 73.0 kB. Waves 2–4 (sector depth, Redemittel
+phrasebook, grammar canon) specced in the plan. Detail in the s94 handoff below.**
+Prior, session 93: **Grammatik tab redesigned onto the shared Bibliothek browse
 skeleton (PR #457).** The fourth Bibliothek tab now matches the other three at the structural level
 (LibrarySwitcher header → toolbar with mobile filter toggle + Karten/Liste view switcher + transient fuzzy
 search → content → Üben in the FilterRail footer / sticky mobile bar), with **Gruppe** as the primary
@@ -265,62 +276,6 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 92 (2026-07-12). Bibliothek browse pages — 14 founder UI-refinement rounds
-(branch `claude/uben-visibility-scrollbar-251zch`, PRs #442–#455, all squash-merged; branch realigned after
-each).** A long chain of screenshot-driven mobile/desktop polish on the three browse pages
-(Wörter/Kollokationen/Redemittel). **Final state (what's live):**
-- **Search lives OUTSIDE the filter panel.** A search icon sits on the toolbar (right of the Wörter
-  bookmark, same icon-only design); tapping it reveals a transient full-width `SearchField` (autofocus).
-  Opening/closing never touches filter state; closing clears the query. Backed by **`src/lib/fuzzy.ts`**
-  (`foldText` + `fuzzyMatch`): umlaut/case-insensitive, punctuation-ignoring, token-order-independent, and
-  **Damerau edit-distance-1** tolerant for tokens ≥4 chars (adjacent transposition included). Pinned by
-  **`tests/fuzzy.test.ts`**. Wörter search also **surfaces connections**: a matched word's `related` terms
-  that resolve to other in-scope entries are appended (feeds the graph edges too). Redemittel/Kollokationen
-  get the forgiving match only (no connection data there).
-- **LibrarySwitcher = the page header** (HubHero dropped from all four Bibliothek tabs). A lifted
-  `shadow-soft` recessed-grey bar; the **active tab is bold + brand** (reads as the section title), the
-  others quiet; a framer **`layoutId="library-tab-pill"`** white pill slides between tabs (reduced-motion
-  safe). `text-sm` on ALL breakpoints (an earlier `sm:text-base` bump read as oversized on desktop and was
-  removed); tight mobile padding keeps four labels incl. "Kollokationen" on one phone row (no scroll).
-  **ViewSwitcher** got the same sliding white-pill treatment (`layoutId="view-tab-pill"`, `h-10` to match
-  the icon buttons).
-- **Toolbar row (mobile), full width `justify-between`:** `[Filter icon] · [ViewSwitcher] · [bookmark
-  (Wörter) + search]`. Icon buttons are `rounded-lg` 40px. Desktop hides the Filter icon (it uses the
-  persistent rail) and the row is view-left / actions-right.
-- **Filter tile:** `FilterRail` now has a body-only **`layout="panel"`** mode (Thema + Unterthema + facets
-  only) used on mobile, mounted/unmounted with an **AnimatePresence height/opacity slide**; the desktop rail
-  ("rail" layout) is unchanged (sticky right column, header + chevron, footer Üben, count). The tile is one
-  solid **`bg-border`** grey. **Reset + close are icons** in the top-right (RotateCcw reset — disabled when
-  nothing to clear — + X close on the mobile panel; reset only, top-right of the body, on desktop). The
-  word **"Zurücksetzen" button was removed**. **Section pins are shown on both breakpoints** (the
-  panel-mode gating that briefly hid them on mobile was removed).
-- **Sub-themes are a filter dropdown, not a page.** The full-page `SubThemePicker` interstitial is gone;
-  `FilterRail` gained an optional **`secondary`** scope dropdown ("Unterthema", per-sub-theme counts +
-  "Gesamtes Thema"), rendered right under Thema when the active theme has sub-themes (Wörter + Kollokationen).
-  The list shows the whole theme by default; a small breadcrumb shows the active sub-theme. `SubThemePicker`
-  is now **unused** (kept in the repo; safe to delete in a follow-up once the founder confirms).
-- **Üben + word count = a sticky bottom action bar on mobile** (full-bleed `-mx-4 sm:-mx-6`,
-  `sticky bottom-[calc(3.9375rem+env(safe-area-inset-bottom))] z-30`, `bg-background/90` + `backdrop-blur`,
-  border-top), placed after the content so it stays pinned above the nav while the list scrolls above it.
-  Count is stacked (number over noun) at the bar's right, hidden in the Wörter graph view. **Desktop keeps
-  Üben/count in the rail.**
-- **Gates green throughout:** typecheck, ESLint (only the pre-existing react-hooks warning), `pnpm build`,
-  `check:bundle` **73.1 kB**/400, `test:unit` **116/116** (fuzzy tests added). No Playwright this session
-  (no browser driver in the sandbox; sized against known-fitting baselines and the founder verifies live).
-- **Per-round PRs:** #442 (mobile tile: no scrollbar, Üben visible) · #443 (bg-border contrast, icon-only
-  Filter/Bookmark on the view line) · #444 (Filter toggle into the footer, left of Üben) · #445 (drop
-  HubHero headers, count stacked right of Üben, toggle repositions by state) · #446 (search out of panel +
-  fuzzy + connections) · #447 (polish page toggle → sliding pill) · #448 (ViewSwitcher slide + mobile
-  restructure: Filter on toolbar, standalone Üben, sliding panel) · #449 (bigger toggle + toolbar cohesion)
-  · #450 (`text-sm`/`text-base` toggle, count beside Üben, `w-fit` width-match) · #451 (full-width toolbar +
-  Üben rows) · #452 (drop oversized desktop toggle font) · #453 (sub-theme dropdown replaces picker page) ·
-  #454 (header-like toggle + icon reset/close) · #455 (restore mobile pins + sticky bottom Üben bar).
-- **NOT done / follow-up candidates:** delete the now-unused `SubThemePicker` once confirmed; the mobile
-  sticky Üben bar is `sticky` (glued to the bottom while the list is long enough to scroll; a very short
-  filtered list sits under its results instead of the viewport bottom — switch to `fixed` if "always glued"
-  is wanted); mobile pins persist a preference but don't visually collapse sections the way desktop does
-  (no mobile collapse state); `BrowseToolbar`/`FacetSheet` remain in the repo but unused on these pages.
-
 **Handoff after session 93 (2026-07-12). Grammatik tab redesigned onto the shared Bibliothek skeleton
 (branch `claude/grammatik-section-redesign-v3gmv7`, PR #457).** Founder asked for a "complete
 re-imagination" of Grammatik: follow the other three tabs' high-level concept (filters → content → Üben)
@@ -387,4 +342,39 @@ but with design freedom, and make it highly useful and intuitive for adult learn
   "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
   (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.
 
-_(Sessions 85-91's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
+**Handoff after session 94 (2026-07-12). Bibliothek scale-up Wave 1: the Branche (sector) axis is
+ACTIVE (branch `claude/bibliothek-scaleup-german-pros-slcnh5`).** The founder presents Genauly to
+German-course classmates from all major professional sectors on 2026-07-13 and wants the Bibliothek to
+be their single source of truth after the course; this **un-parks the sector facet** (founder decision
+2026-07-12, superseding the 2026-07-09 audit's park; recorded in `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`
+§1 and `DECISIONS.md`).
+- **Taxonomy:** `WorkSector` 5 → **11 values** (`+engineering`, `+construction`, `+production`,
+  `+transport`, `+beauty`, `+sports`), mirrored in `lint-content.mjs`; labels in `facets.ts`
+  (`SECTOR_OPTIONS`, care relabelled "Medizin & Pflege", hospitality "Gastronomie"); a sector facet was
+  added to `COLLOCATION_FACETS` (vocab already had one). Rule kept: Branche = where you work, Thema =
+  what you are doing; `transport` deliberately not named "Logistik" (theme-label clash).
+- **Content Wave 1 (even spread, founder choice):** **+220 vocab** (20/sector, care extends the s43
+  Pflege pack; bank 642 → **862**) and **+96 collocations** authored + 3 existing tagged
+  (`c_sicherheitsluecke_schliessen`/`c_backup_erstellen` → it, `c_bestand_pruefen` → retail; bank
+  540 → **636**), all with `cefr` + `sector` + full schema, spread across existing themes (care-pack
+  pattern). Coverage: vocab 235/862 = 27%, collocations 99/636 = 15.6% — both clear the 15% floor, so
+  the **Branche facet renders on Wörter AND Kollokationen automatically** (11 pill options, `?sector=`).
+  **+12 Redemittel** in the new sector-neutral `professionalIntro` category ("Über Beruf & Fachgebiet
+  sprechen", Briefcase icon added to `lib/icons.ts`), Redemittel 72 → **84**. **+328 provenance rows**
+  (DWDS corpus-search references, draft) → **1,754 rows** total.
+- **Verification (all green):** `lint:content` ✔; `build:oracles` refreshed → `verify:facts` **0
+  two-oracle errors** (654 nouns, 98% coverage; the 6 review signals are pre-existing dual-gender
+  headwords); wordfreq installed → `build:frequency-subset` + `build:frequency` regenerated (1429/1498
+  binned); LanguageTool resolved → `verify:grammar` **0 grammar flags** (no warn signal touches the new
+  items); `verify:cefr` + `build:verification` regenerated (linguistic tier 1266 → 1602); typecheck,
+  ESLint 0 errors, `test:unit` 116/116, build + prerender, `check:bundle` **73.0 kB**/400.
+- **Strategy doc:** `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` — the 11-sector taxonomy, Wave 2
+  (deepen used sectors to 60–80 words + sector reading texts), Wave 3 (Redemittel 84 → ~150 via new
+  speech-act categories: telephoning, emails, presentations, jobInterview, smallTalk), Wave 4 (grammar
+  10 → ~24 topics, the missing B1–B2 canon list), the per-wave quality gate, and the floor math.
+- **NOT done / follow-up candidates:** all 328 new provenance rows are `draft` (founder/native review
+  pass pending); sector `ReadingText`s are Wave 2 (needs a `sector` field on the text schema + linter
+  mirror when the first one lands); Wave 2 prioritization waits on classmate feedback after the
+  2026-07-13 presentation.
+
+_(Sessions 85-92's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_

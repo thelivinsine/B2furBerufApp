@@ -3702,3 +3702,24 @@ Branch: `claude/whats-next-esga9u`.
   browser; lint:content + all gates green. Shipped as PR #461.
 - **Artifacts:** `src/data/grammar.ts`, `src/types/index.ts`, `src/features/grammar/EnPeek.tsx` (new),
   `GrammarTopicView.tsx`, `GrammarDrillCard.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md` (PR #461).
+
+## Entry 346 — 2026-07-12 (session 94)
+- **Prompt (verbatim):**
+  > I'm going to present to my German classmates this app tomorrow. they're from different professions like architecture, software engineering, material science, mechanical engineering, manufacturing and production, gastronomy, beauty and personal care, medicine, sports, transportation, etc and so on. Basically from all relevant sectors in Germany. I want you to prepare a robust and thorough scale up plan of Bibliothek's content. It should be highly relevant and useful for them even after our German course ends. This app should be the single source of truth they should refer to for vocabulary, redemittel, collocations and grammar.
+- **Follow-up (verbatim):**
+  > aim for billion dollar app quality and standards
+- **Response summary:** Plan-mode session; the approved plan un-parked the Branche/sector axis (founder
+  decision superseding the 2026-07-09 audit park) and shipped Wave 1: `WorkSector` extended 5 → 11
+  (engineering, construction, production, transport, beauty, sports), 220 new vocab (20 per sector,
+  care extends the Pflege pack), 96 new collocations + 3 existing tagged (9 per sector), 12 new
+  Redemittel in the sector-neutral `professionalIntro` category, 328 provenance rows (DWDS references,
+  draft). The Branche facet now renders automatically on Wörter and Kollokationen (coverage floor
+  cleared: 27% / 15.6%). Long-term strategy doc `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` written
+  (Waves 2–4: sector depth, Redemittel phrasebook to ~150, grammar canon to ~24 topics). Full pipeline
+  green: verify:facts 0 two-oracle errors (oracles rebuilt), frequency subset + bins regenerated
+  (wordfreq installed), verify:grammar 0 grammar flags on ~700 new sentences, verification tiers
+  rebuilt, typecheck/ESLint/116 tests/build/bundle 73.0 kB.
+- **Artifacts:** `src/types/index.ts`, `scripts/lint-content.mjs`, `src/lib/facets.ts`,
+  `src/lib/icons.ts`, `src/data/{vocabulary,collocations,redemittel,provenance,frequency,verification}.ts`,
+  `scripts/vendor/*` (regenerated subsets), `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`,
+  `docs/DECISIONS.md`, `docs/PROJECT_STATUS.md`, `CLAUDE.md`, `docs/reports/*` (PR pending).

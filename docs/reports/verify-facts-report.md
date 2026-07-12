@@ -16,14 +16,14 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **489**
-- Covered by ≥1 oracle: **474** (97%)  ·  not covered: **15**
-- ✔ Article verified: **458**  (221 by both oracles, 237 by one)
-- ✔ Plural verified: **260**  (167 by both oracles, 93 by one)
+- Nouns checked: **654**
+- Covered by ≥1 oracle: **638** (98%)  ·  not covered: **16**
+- ✔ Article verified: **622**  (294 by both oracles, 328 by one)
+- ✔ Plural verified: **380**  (224 by both oracles, 156 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
 - ⚑ Review signals (one oracle only, or oracles disagree): **6**
 - ◑ Plural-form headwords (gender not comparable): **10**
-- ~ We assert a plural, but no oracle lists one to compare: **43**
+- ~ We assert a plural, but no oracle lists one to compare: **58**
 
 ## ⛔ GATE — two independent authorities agree our form is wrong
 
@@ -69,7 +69,7 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>15 items</summary>
+<details><summary>16 items</summary>
 
 | id | headword |
 |---|---|
@@ -83,6 +83,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
 | `v_ressourcen` | die Ressourcen |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
+| `v_spliss` | der Spliss |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
 | `v_tan` | die TAN |
@@ -96,7 +97,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 Gender is covered; only the plural could not be checked (no oracle lists a plural form for the
 lemma, or coverage came via the gender-only compound head fallback).
 
-<details><summary>43 items</summary>
+<details><summary>58 items</summary>
 
 | id | headword |
 |---|---|
@@ -104,40 +105,55 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_angehoerigengespraech` | das Angehörigengespräch |
 | `v_bankberater` | der Bankberater |
 | `v_behoerdentermin` | der Behördentermin |
+| `v_berufskraftfahrer` | der Berufskraftfahrer |
 | `v_bildungsabschluss` | der Bildungsabschluss |
 | `v_buergeramt` | das Bürgeramt |
+| `v_dienstplan` | der Dienstplan |
 | `v_digital_prozess` | der digitale Prozess |
 | `v_einstufungstest` | der Einstufungstest |
 | `v_ergebnisprotokoll` | das Ergebnisprotokoll |
+| `v_ernaehrungsberatung` | die Ernährungsberatung |
 | `v_eskalationsstufe` | die Eskalationsstufe |
 | `v_fallbesprechung` | die Fallbesprechung |
 | `v_fortschrittsbericht` | der Fortschrittsbericht |
 | `v_garantieanspruch` | der Garantieanspruch |
 | `v_geschaeftsessen` | das Geschäftsessen |
+| `v_gesichtsbehandlung` | die Gesichtsbehandlung |
+| `v_hautanalyse` | die Hautanalyse |
 | `v_ich_botschaft` | die Ich-Botschaft |
 | `v_klaerungsgespraech` | das Klärungsgespräch |
 | `v_kontoeroeffnung` | die Kontoeröffnung |
+| `v_kostenvoranschlag` | der Kostenvoranschlag |
 | `v_kursgebuehr` | die Kursgebühr |
 | `v_ladeliste` | die Ladeliste |
 | `v_lagerbestand` | der Lagerbestand |
 | `v_liefertermin` | der Liefertermin |
 | `v_meldebescheinigung` | die Meldebescheinigung |
 | `v_nachhaltigkeitsbericht` | der Nachhaltigkeitsbericht |
+| `v_pflegegrad` | der Pflegegrad |
+| `v_probestunde` | die Probestunde |
+| `v_produktionslinie` | die Produktionslinie |
 | `v_projektphase` | die Projektphase |
 | `v_reisebuchung` | die Reisebuchung |
+| `v_schichtleitung` | die Schichtleitung |
+| `v_schichtplan` | der Schichtplan |
 | `v_sicherheitsregel` | die Sicherheitsregel |
 | `v_sicherheitsunterweisung` | die Sicherheitsunterweisung |
+| `v_stoerfall` | der Störfall |
 | `v_tagegeld` | das Tagegeld |
 | `v_teilnahmebescheinigung` | die Teilnahmebescheinigung |
 | `v_terminvorschlag` | der Terminvorschlag |
+| `v_trainingsplan` | der Trainingsplan |
 | `v_transportschaden` | der Transportschaden |
 | `v_uebergabeprotokoll` | das Übergabeprotokoll |
 | `v_umlaufverfahren` | das Umlaufverfahren |
 | `v_ummeldung` | die Ummeldung |
 | `v_umsetzungsplan` | der Umsetzungsplan |
 | `v_unfallmeldung` | die Unfallmeldung |
+| `v_verbandswechsel` | der Verbandswechsel |
 | `v_vermittlungsgespraech` | das Vermittlungsgespräch |
 | `v_versichertenkarte` | die Versichertenkarte |
+| `v_warenbestand` | der Warenbestand |
 | `v_wartenummer` | die Wartenummer |
 | `v_wohnungsanzeige` | die Wohnungsanzeige |
 | `v_wohnungsgeberbestaetigung` | die Wohnungsgeberbestätigung |
