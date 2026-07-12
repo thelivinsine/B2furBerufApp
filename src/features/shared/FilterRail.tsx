@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ChevronDown, Pin, SlidersHorizontal } from "lucide-react";
+import { ChevronDown, Pin, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Select,
@@ -137,6 +137,7 @@ export function FilterRail<T>({
   defaultOpen = true,
   open: controlledOpen,
   onOpenChange,
+  onClose,
   hideHeader = false,
   layout = "rail",
   className,
@@ -163,6 +164,8 @@ export function FilterRail<T>({
    *  driven from outside, e.g. a Filter icon in the toolbar (mobile). */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** Collapse handler for the panel's close icon (mobile). */
+  onClose?: () => void;
   /** Hide the built-in "Filter" header/toggle row. Mobile passes this because
    *  the toggle lives inside the tile (top when open, footer when collapsed). */
   hideHeader?: boolean;
@@ -215,6 +218,38 @@ export function FilterRail<T>({
         {count.label}
       </span>
     </div>
+  ) : null;
+
+  // Corner controls (founder s92): an icon reset (replaces the old "Zurücksetzen"
+  // word button) and, in the mobile panel, a close icon. Reset is disabled when
+  // there is nothing to clear.
+  const resetButton = (
+    <button
+      type="button"
+      onClick={() => onChange({})}
+      disabled={activeCount === 0}
+      aria-label="Filter zurücksetzen"
+      title="Filter zurücksetzen"
+      className={cn(
+        "inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+        activeCount === 0
+          ? "cursor-not-allowed text-muted-foreground/30"
+          : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground",
+      )}
+    >
+      <RotateCcw className="h-4 w-4" />
+    </button>
+  );
+  const closeButton = onClose ? (
+    <button
+      type="button"
+      onClick={onClose}
+      aria-label="Filter schließen"
+      title="Schließen"
+      className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+    >
+      <X className="h-4 w-4" />
+    </button>
   ) : null;
 
   const togglePin = (id: string) => {
@@ -345,21 +380,7 @@ export function FilterRail<T>({
     <>
       {primarySection}
       {secondarySection}
-      {facets.length > 0 && (
-        <div className="space-y-5">
-          {activeCount > 0 && (
-            <div className="flex justify-end">
-              <button
-                onClick={() => onChange({})}
-                className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                Zurücksetzen
-              </button>
-            </div>
-          )}
-          {facets.map(facetSection)}
-        </div>
-      )}
+      {facets.length > 0 && <div className="space-y-5">{facets.map(facetSection)}</div>}
     </>
   );
 
@@ -370,8 +391,18 @@ export function FilterRail<T>({
       <div
         role="region"
         aria-label="Filter"
-        className={cn("space-y-5 rounded-xl border border-border bg-border p-3", className)}
+        className={cn("space-y-4 rounded-xl border border-border bg-border p-3", className)}
       >
+        {/* Panel header: label on the left, reset + close icons top-right. */}
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-sm font-semibold text-primary">
+            Filter{activeCount > 0 ? ` (${activeCount})` : ""}
+          </span>
+          <div className="-mr-1 flex items-center gap-0.5">
+            {resetButton}
+            {closeButton}
+          </div>
+        </div>
         {filterBody}
       </div>
     );
@@ -426,13 +457,12 @@ export function FilterRail<T>({
             hideHeader ? "rounded-t-xl" : "border-t border-muted-foreground/10",
           )}
         >
-          {/* Expanded first row: the Filter toggle on the left (mobile) and the
-              result count on the right. When expanded the count lives here, not
-              in the footer (founder s92). Search is no longer in the panel. */}
-          {(hideHeader || countStack) && (
-            <div className="flex items-center gap-2">
-              {hideHeader && filterToggle}
-              {countStack && <div className="ml-auto">{countStack}</div>}
+          {/* Expanded first row: the result count on the left, the icon reset on
+              the right (replaces the old "Zurücksetzen" word button). */}
+          {(countStack || activeCount > 0) && (
+            <div className="flex items-center justify-end gap-2">
+              {countStack && <div className="mr-auto">{countStack}</div>}
+              {resetButton}
             </div>
           )}
 
