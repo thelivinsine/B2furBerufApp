@@ -41,6 +41,7 @@ const COLLOCATION_REGISTERS = ["neutral", "formal"];
 const GRAMMAR_GROUPS = [
   "connectors", "relativeClauses", "prepositionalPronouns", "collocations",
   "verbPosition", "konjunktiv2", "modals", "passive", "subordinate", "cases",
+  "nouns", "attributes", "reportedSpeech", "wordFormation", "infinitives", "future",
 ];
 const WEAKNESS_CATEGORIES = [
   "verbPosition", "cases", "vocabularyRange", "cohesion", "relativeClauses",

@@ -17,6 +17,13 @@ export const groupMeta: Record<GrammarGroup, { labelDe: string; icon: string }> 
   konjunktiv2: { labelDe: "Konjunktiv II", icon: "Layers" },
   modals: { labelDe: "Modalverben", icon: "KeyRound" },
   passive: { labelDe: "Passiv", icon: "Boxes" },
+  // Scale-up Wave 4 (2026-07-12): the missing B1-B2 canon groups.
+  nouns: { labelDe: "Nomen & Deklination", icon: "Tag" },
+  attributes: { labelDe: "Partizipialattribute", icon: "AlignLeft" },
+  reportedSpeech: { labelDe: "Indirekte Rede", icon: "Quote" },
+  wordFormation: { labelDe: "Nominalstil", icon: "Shuffle" },
+  infinitives: { labelDe: "Infinitivsätze", icon: "ArrowRight" },
+  future: { labelDe: "Futur & Vermutung", icon: "Clock" },
 };
 
 // Ordered by B2-marker priority (categorization audit 2026-07-09): the
@@ -26,12 +33,18 @@ export const groupOrder: GrammarGroup[] = [
   "connectors",
   "konjunktiv2",
   "passive",
+  "reportedSpeech",
   "subordinate",
+  "infinitives",
   "relativeClauses",
+  "attributes",
   "cases",
+  "nouns",
+  "wordFormation",
   "verbPosition",
   "prepositionalPronouns",
   "modals",
+  "future",
   "collocations",
 ];
 

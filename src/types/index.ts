@@ -258,7 +258,14 @@ export type GrammarGroup =
   | "modals"
   | "passive"
   | "subordinate"
-  | "cases";
+  | "cases"
+  // Scale-up Wave 4 (2026-07-12): the missing B1-B2 canon groups.
+  | "nouns"
+  | "attributes"
+  | "reportedSpeech"
+  | "wordFormation"
+  | "infinitives"
+  | "future";
 
 export interface GrammarExample {
   de: string;
