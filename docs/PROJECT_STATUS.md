@@ -1,11 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-12 (session 98). **First AI-jury review pass (scale-up plan §7):** 149 ids
-(Wave 3 Redemittel + Wave 4 grammar) reviewed for German correctness and elevated to the honest
-machine-layer **`jury` tier** ("KI-Jury" badge on `/sources`) via the new committed sidecar
-`docs/reports/jury-review.json`; 4 grammar defects found and fixed. `review_status` untouched, so
-human-verified headline stays **25/2,132 = 1.2%**. Detail in the s98 handoff at the bottom. Product
-name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-12 (session 99). **Branche filter overhaul PLANNED, not implemented:**
+founder-approved plan saved to `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md` (root-cause fix for
+common words vanishing under Branche filters via `sectors[]` multi-tagging with untagged =
+universal, dropdown hierarchy Branche → Thema → Unterthema, 4 new sectors + Logistik boost with
+full starter packs, retag audit + verification). Plan-only session, no code/content changes.
+Detail in the s99 handoff at the bottom. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -58,38 +58,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 97 (2026-07-12). Review-queue tooling shipped (scale-up plan §7.6's
-named next step).** `scripts/review-queue.mjs` + `pnpm review:queue`: a read-only dump of
-`draft` provenance rows, grouped by content type then by sector (vocab/collocation/text) /
-category (Redemittel) / group (grammar) / theme (Can-Do, dialogues, exam sets, writing prompts) /
-chapter (missions), written to `docs/reports/review-queue.md`. Mechanical tooling (Haiku-tier per
-the plan's model policy), no content or app-source changes.
-- **Usage:** `pnpm review:queue` for the full draft queue; scope a session with
-  `--type=vocabulary`, `--sector=it,engineering`, `--group=meetings`, or inspect what's already
-  verified with `--status=verified|all`. `--dry` prints the console summary only, no report file.
-  The headline summary (total rows, verified %) always covers the **whole register**, regardless
-  of filters, so a scoped session never loses sight of the overall trust metric.
-- **Current headline (unchanged by this session, now visible in one command):** **25 / 2,132 rows
-  verified (1.2%)** — only the founder-approved Can-Do bank. Everything from Waves 1–4 (vocab,
-  collocations, redemittel, grammar, texts, dialogues, exam sets, writing prompts, missions) is
-  still `draft`.
-- **Implementation note:** content_id → group lookup is built by cross-referencing the actual bank
-  items (not the provenance `notes` free text, which isn't populated consistently across banks);
-  grammar drills resolve to their parent topic's `group` field, missions to `chapter`.
-- **Verification:** `lint:content` ✔ (unaffected, script is read-only); `typecheck` ✔; `eslint`
-  0 errors (pre-existing hook warnings only); `test:unit` 116/116; full unfiltered run completes
-  in ~2s and produces the counts matching the s95 handoff exactly (2,132 total / 25 verified /
-  2,107 draft).
-- **NOT done:** actually running a review pass with the tool (flipping any rows to `verified`) —
-  this session shipped the tool only, per the plan's "Next step (first verification session)"
-  wording; the review pass itself is the next session's work. Wave-2 tranche 2 and the Playwright
-  grammar smoke (carried over from s95) are still open too.
-- **Model for the review pass (decided end of s97, next session starts fresh):** this is judgment
-  work on German correctness (article/plural, sense-match to the reference, register, CEFR
-  plausibility), not mechanical wiring, so it sits in the plan's authoring tier alongside German
-  writing, not the Haiku/Sonnet tier this session's tooling used. Recommended **Fable 5** first
-  choice, **Opus 4.8** fallback; Fable 5 was unavailable, so the **next session runs on Opus 4.8**.
-
 **Handoff after session 98 (2026-07-12). First AI-jury review pass EXECUTED (scale-up plan §7),
 Opus 4.8.** The founder chose (via AskUserQuestion) to record the review as the honest machine-layer
 **`jury` tier**, NOT to flip `review_status` (on `/sources`, `review_status: "verified"` reads as
@@ -121,6 +89,33 @@ grammar.
   (care/trades/retail/hospitality/transport/beauty/sports) after 2026-07-13 classmate feedback; the
   Playwright grammar-lesson smoke (carried over).
 
-_(Sessions 85-95's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+**Handoff after session 99 (2026-07-12). Branche filter overhaul PLANNED and approved, NOT
+implemented (founder: "save it on the repo", implementation is a follow-up session).** Full plan:
+**`docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`**. The founder reported that common words (e.g.
+das Projekt) look tied to a single Branche and demanded a root-cause fix plus missing industries.
+- **Root cause diagnosed (verified in code):** `sector?: WorkSector` is single-valued and only
+  ~406/1,022 words + 165/701 collocations are tagged; the facet filter is strict, so selecting any
+  Branche hides EVERY untagged word (das Projekt has no tag at all) and pins tagged cross-industry
+  words (die Wartung, das Werkzeug, der Schichtplan) to exactly one industry. Systemic, not
+  per-word. There is also currently NO UI surface showing a word's Branche.
+- **Approved design (see the plan for detail):** (1) `sectors?: WorkSector[]` with **untagged =
+  universal** semantics (`matchesSector`: untagged shows under every Branche, tagged hides only
+  under other Branchen), Branche moves out of the pill facets into a **scope dropdown**, rail
+  hierarchy **Branche → Thema → Unterthema** (FilterRail generalized to an ordered `scopes[]`);
+  (2) retag audit of all 571 tagged items (1–4 sectors typical, 5+ = untag) with a founder-review
+  report `docs/reports/sector-audit-report.md`; (3) **4 new sectors** — `chemicals` (Chemie &
+  Kunststoff), `pharma` (Pharma & Medizintechnik), `cleaning` (Reinigung), `security`
+  (Sicherheitsdienste), 15 total — plus `transport` relabeled "Transport & Logistik" with a ~10-word
+  Lager boost, each new sector with a full ~20-word + ~9-collocation starter pack (founder chose
+  all options + full packs via AskUserQuestion); (4) Branche chips on Tabelle/Karten so
+  applicability is inspectable; (5) new `tests/sectors.test.ts` + linter `sectors[]` validation +
+  E2E checklist (das Projekt visible under IT AND Bau; Bauzaun only under Bau).
+- **Freed constraints:** as a scope, Branche escapes the ≤12-option facet cap and the 15% coverage
+  floor (which is what makes 15 sectors possible). The linter's frequency check only errors on
+  STALE ids, so new words without a Häufigkeit bin don't block if `wordfreq` regen is unavailable.
+- **NOT done:** all implementation. Carried over: human `verified` pass via `pnpm review:queue`,
+  jury pass extension to Waves 1–2, Wave-2 tranche 2, Playwright grammar smoke.
+
+_(Sessions 85-97's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_
