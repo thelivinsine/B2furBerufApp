@@ -146,10 +146,12 @@ This is what makes the library a *source of truth* rather than a word list:
    in lazy chunks; the ~75 kB main chunk must not move.
 6. Human loop: all new rows start `review_status: "draft"`; the founder (or a native-speaker
    reviewer) flips them to `verified` in review passes. AI-drafted ≠ verified, and `/sources`
-   says so honestly per item. **Next step (first verification session):** build
-   `scripts/review-queue.mjs` (+ `pnpm review:queue`), a read-only dump of draft items grouped
-   by bank/sector/category for offline founder review; one review session after each content
-   wave, tracking verified % as the headline quality metric.
+   says so honestly per item. **Tooling shipped (s97):** `scripts/review-queue.mjs` (+
+   `pnpm review:queue`) dumps draft items grouped by bank, then sector/category/group/theme/
+   chapter, to `docs/reports/review-queue.md`; scope with `--type=`/`--sector=`/`--group=`. The
+   headline verified % (currently **25/2,132 = 1.2%**, only the Can-Do bank) always covers the
+   whole register regardless of filters. **Next step:** actually run a review session with it —
+   one pass after each content wave, tracking verified % as the headline quality metric.
 
 ## 8. Content sourcing rules (unchanged, see DATA_GOVERNANCE.md)
 

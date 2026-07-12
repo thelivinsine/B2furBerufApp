@@ -57,6 +57,13 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   (so run `pnpm verify:grammar` first) and recomputes facts/CEFR from the vendored subsets. `/sources`
   shows a tier badge per item; `lint:content` validates the enums + prints the tier distribution.
   Regenerate after re-running the `verify:*` checks. See `docs/strategy/DATA_STRATEGY.md` §4.
+- `pnpm review:queue` — read-only dump of `draft` provenance rows grouped by bank, then by sector
+  (vocab/collocation/text) / category (Redemittel) / group (grammar) / theme / chapter, written to
+  `docs/reports/review-queue.md`, for offline founder/reviewer passes (scale-up plan §7.6, s97).
+  Scope a session with `--type=`, `--sector=`, `--group=` (comma lists) and `--status=verified|all`;
+  the headline verified % always covers the whole register regardless of filters. Flips nothing —
+  a reviewer edits `review_status: "draft" → "verified"` by hand in `src/data/provenance.ts` after
+  checking a row against its `reference`. Rising verified % is the trust-model quality headline.
 - `pnpm test:srs` — assert `engine/srs.ts` against FSRS golden vectors from py-fsrs (CI gate, s53).
   **Run it after any `engine/srs.ts` edit.** Vector provenance is in the `scripts/test-srs.mjs` header.
 - `pnpm test:pronounce` — assert the `engine/pronounce.ts` spoken/typed answer matcher (CI gate, s56).

@@ -1296,3 +1296,31 @@ but with design freedom, and make it highly useful and intuitive for adult learn
 - **NOT done / follow-up candidates:** per-topic drill progress is session-local only (persisting
   "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
   (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.
+
+## Session 94 (2026-07-12) — Bibliothek scale-up Wave 1: the Branche (sector) axis is ACTIVE
+
+The founder presents Genauly to German-course classmates from all major professional sectors on
+2026-07-13 and wants the Bibliothek to be their single source of truth after the course; this
+**un-parks the sector facet** (founder decision 2026-07-12, superseding the 2026-07-09 audit's park;
+recorded in `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §1 and `DECISIONS.md`).
+- **Taxonomy:** `WorkSector` 5 → **11 values** (`+engineering`, `+construction`, `+production`,
+  `+transport`, `+beauty`, `+sports`), mirrored in `lint-content.mjs`; labels in `facets.ts`
+  (`SECTOR_OPTIONS`, care relabelled "Medizin & Pflege", hospitality "Gastronomie"); a sector facet was
+  added to `COLLOCATION_FACETS` (vocab already had one). Rule kept: Branche = where you work, Thema =
+  what you are doing; `transport` deliberately not named "Logistik" (theme-label clash).
+- **Content Wave 1 (even spread, founder choice):** **+220 vocab** (20/sector, care extends the s43
+  Pflege pack) and **+96 collocations** authored + 3 existing tagged, all with `cefr` + `sector` + full
+  schema, spread across existing themes (care-pack pattern). Coverage cleared the 15% floor, so the
+  **Branche facet renders on Wörter AND Kollokationen automatically** (11 pill options, `?sector=`).
+  **+12 Redemittel** in the new sector-neutral `professionalIntro` category ("Über Beruf & Fachgebiet
+  sprechen", Briefcase icon added to `lib/icons.ts`). **+328 provenance rows** (DWDS references, draft).
+- **Verification (all green):** `lint:content` ✔; `build:oracles` refreshed → `verify:facts` **0
+  two-oracle errors**; wordfreq installed → `build:frequency-subset` + `build:frequency` regenerated;
+  LanguageTool resolved → `verify:grammar` **0 grammar flags**; `verify:cefr` + `build:verification`
+  regenerated; typecheck, ESLint 0 errors, `test:unit` 116/116, build + prerender, `check:bundle`
+  **73.0 kB**/400.
+- **Strategy doc:** `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` — the 11-sector taxonomy, Waves 2–4,
+  the per-wave quality gate, and the floor math.
+- **NOT done / follow-up candidates:** all 328 new provenance rows are `draft` (founder/native review
+  pass pending); sector `ReadingText`s were Wave 2; Wave 2 prioritization waits on classmate feedback
+  after the 2026-07-13 presentation.
