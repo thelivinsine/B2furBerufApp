@@ -604,6 +604,10 @@ export interface ReadingText {
   checks: TextCheck[];
   /** Optional sub-theme link; must be declared on the parent theme. */
   subThemeId?: SubThemeId;
+  /** Optional Branche tag (scale-up Wave 2, 2026-07-12): authentic-style
+   *  workplace texts per sector, e.g. a Wartungsprotokoll memo. Enables
+   *  sector-targeted sessions; rolls up like every facet. */
+  sector?: WorkSector;
 }
 
 /* ---------------- Data governance — provenance register ---------------- */

@@ -441,6 +441,8 @@ function lintTexts(texts, subThemeIndex) {
     if (!CEFR_LEVELS.includes(t.cefr)) error(ds, w, `invalid cefr "${t.cefr}"`);
     for (const f of ["title", "titleEn", "de", "en"]) if (!isStr(t[f])) error(ds, w, `${f} empty`);
     checkSubTheme(t, t.themeId, subThemeIndex, ds, w);
+    if (t.sector !== undefined && !WORK_SECTORS.includes(t.sector))
+      error(ds, w, `invalid sector "${t.sector}"`);
     // The 4.4 renderer shows a comprehension MCQ after every text, so the
     // 2-3 checks per item are part of the content contract, not optional.
     if (!Array.isArray(t.checks) || t.checks.length < 2) {
