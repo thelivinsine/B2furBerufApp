@@ -1324,3 +1324,36 @@ recorded in `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §1 and `DECISIONS.md`).
 - **NOT done / follow-up candidates:** all 328 new provenance rows are `draft` (founder/native review
   pass pending); sector `ReadingText`s were Wave 2; Wave 2 prioritization waits on classmate feedback
   after the 2026-07-13 presentation.
+
+**Handoff after session 95 (2026-07-12). Scale-up Waves 2–4 EXECUTED and MERGED to `main`
+(PR #463, squash; the founder reviewed the staged draft PR and gave the merge go-ahead).** One
+wave per commit on the branch (b1c0766 W2, 8c0df08 W3, 2bfb57f W4 + docs commits). The approved plan
+(with model policy: Fable 5 for German authoring, Sonnet 5 wiring, Haiku 4.5 mechanics) is folded into
+`docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §0/§4–6.
+- **Wave 2 (first tranche, feedback-driven default order):** engineering, it, construction,
+  production each +40 vocab (to ~60), +17/16 collocations (to ~26), +1 sector `ReadingText`
+  (Wartungsprotokoll memo · Sprint-Review email · Baustellenordnung announcement · Schichtplan
+  voicemail, one per `kind`). Schema: **`ReadingText.sector`** added (validate-when-present).
+  Banks: vocab 862 → **1,022**, collocations 636 → **701**, texts 22 → **26**.
+- **Wave 3 (Redemittel phrasebook):** +5 sector-neutral categories (telephoning, emails,
+  presentations, jobInterview, smallTalk; icons Phone/Mail/Presentation/UserCheck/Coffee),
+  13 phrases each with cefr/register/example. Redemittel 84 → **149**.
+- **Wave 4 (grammar canon):** +14 German-first topics on the B2-marker spine across **6 new
+  groups** (nouns, attributes, reportedSpeech, wordFormation, infinitives, future): indirekte
+  Rede, zweiteilige Konnektoren, Infinitivsätze, Finalsätze, Temporalsätze, Vergleichssätze,
+  Partizipialattribute, Genitiv, n-Deklination, Nominalisierung, lassen, brauchen + zu,
+  Futur I/II Vermutung, es-Konstruktionen. Grammar 10 → **24 topics / 117 drills**. The s93
+  lesson page absorbed everything via `grammarMeta.ts` (`groupOrder` extended).
+- **Provenance:** +378 rows (Waves 2–4), register 1,754 → **2,132**, all new rows `draft`.
+  **`provenance.ts` is now two concatenated literals** (`provenancePart1/2`): a single 2,000+ row
+  array literal exceeds TS2590; append to the second literal (script pattern unchanged).
+- **Pipeline (all green):** lint:content clean; `build:oracles` → `verify:facts` **0 two-oracle
+  errors** (781 noun lemmas); frequency subset + bins regenerated; `verify:grammar` **0
+  grammar/agreement flags**; `verify:cefr` + `build:verification` (linguistic tier 1602 → **1,896**);
+  typecheck, ESLint 0 errors, `test:unit` 116/116, build + prerender, `check:bundle` **73.0 kB**/400;
+  floor smoke: Branche renders on Wörter AND Kollokationen, spine 24/24.
+- **NOT done / follow-up:** the first verification session (build `scripts/review-queue.mjs` +
+  `pnpm review:queue`, flip reviewed items draft → verified; all 2,107 non-Can-Do rows are still
+  `draft`); Wave-2 tranche 2 (care, trades, retail, hospitality, transport, beauty, sports) after
+  classmate feedback from the 2026-07-13 presentation; a Playwright smoke of one new grammar
+  lesson in a real browser.

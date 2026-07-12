@@ -440,7 +440,7 @@ export function Sources() {
           )}
         </p>
         <ul className="mt-2 space-y-1.5">
-          {(["human", "linguistic", "facts", "provenance"] as VerificationTier[])
+          {(["human", "jury", "linguistic", "facts", "provenance"] as VerificationTier[])
             .filter((tier) => stats.byTier.get(tier))
             .map((tier) => (
               <li key={tier} className="flex items-center justify-between gap-3">
