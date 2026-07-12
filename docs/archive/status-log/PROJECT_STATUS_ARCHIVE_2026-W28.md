@@ -1389,3 +1389,34 @@ the plan's model policy), no content or app-source changes.
   plausibility), not mechanical wiring, so it sits in the plan's authoring tier alongside German
   writing, not the Haiku/Sonnet tier this session's tooling used. Recommended **Fable 5** first
   choice, **Opus 4.8** fallback; Fable 5 was unavailable, so the **next session runs on Opus 4.8**.
+
+**Handoff after session 98 (2026-07-12). First AI-jury review pass EXECUTED (scale-up plan §7),
+Opus 4.8.** The founder chose (via AskUserQuestion) to record the review as the honest machine-layer
+**`jury` tier**, NOT to flip `review_status` (on `/sources`, `review_status: "verified"` reads as
+"menschlich geprüft / human-verified", so an AI must not set it). Scope: Wave 3 Redemittel + Wave 4
+grammar.
+- **Reviewed 149 ids for German correctness** (grammar, spelling, article/plural, sense-match to the
+  English gloss, register + CEFR plausibility): 65 Redemittel (telephoning/emails/presentations/
+  jobInterview/smallTalk) + 14 grammar topics + 70 drills. Redemittel were **65/65 clean**; grammar
+  had **4 real defects, all fixed** in `src/data/grammar.ts`: (1) Genitiv pitfalls contained literal
+  `**s**` markdown that renders as visible asterisks (pitfalls are plain-text `<span>`, no markdown);
+  (2) Infinitivsätze pitfall #3 EN was about modals while the German was about commas — the `EnPeek`
+  swaps the list DE↔EN by index, so they must match; (3) Vergleichssätze drill d5 modeled `als ob` +
+  indicative, contradicting the topic's own Konjunktiv-II rule; (4) brauchen+zu drill d5 had a doubled
+  "nur" (the explain even apologized for it).
+- **Mechanism (new, honest, reproducible):** a committed sidecar `docs/reports/jury-review.json`
+  (`{ promptVersion, reviewer, pass: [content_id…] }`) lists the passed ids; `scripts/build-verification.mjs`
+  reads it and elevates each (no failing check, not already `human`) to the **`jury`** tier
+  (confidence 0.9, "KI-Jury/AI jury" badge on `/sources`, above `linguistic`, below `human`).
+  `verification.ts` stays fully generated (never hand-edited); append ids + regenerate for later waves.
+  `Sources.tsx` tier-summary list got `"jury"` added so the 149 show in the breakdown.
+- **Pipeline (all green):** `build:verification` → tiers **human 25 · jury 149 · linguistic 1831 ·
+  facts 1 · provenance 126**; `lint:content` ✔ (validates jury enum + prints distribution);
+  `verify:facts` **0 two-oracle errors**; `typecheck` ✔; `test:unit` **116/116**; `build` + prerender
+  ✔; `check:bundle` **73.0 kB**/400. No content-bank counts changed (edits were fixes, not additions);
+  `review_status` unchanged, so headline **verified % stays 25/2,132 = 1.2%** (the human loop is still
+  the founder's to run).
+- **NOT done / follow-up:** the human `verified` pass (founder flips real rows via `pnpm review:queue`);
+  extend the jury pass to Waves 1–2 vocab/collocations + texts (append to the sidecar); Wave-2 tranche 2
+  (care/trades/retail/hospitality/transport/beauty/sports) after 2026-07-13 classmate feedback; the
+  Playwright grammar-lesson smoke (carried over).

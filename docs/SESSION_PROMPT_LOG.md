@@ -3934,3 +3934,42 @@ Branch: `claude/whats-next-esga9u`.
   archived to the W28 chunk, this log entry), and merged to `main`. No code or content changes.
 - **Artifacts:** `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`, `docs/PROJECT_STATUS.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 357 — 2026-07-12 (session 100)
+- **Branch:** `claude/uben-ui-refinements-dibbiz`
+- **Prompt (verbatim):**
+  > [7/12, 10:26] Suhas: Üben should be specific and relevant to where in the learner is in the app. In practice sessions, add an option to show answer for speaking/typing questions as currently the user has no way to move on if they don't know the answer.
+  > [7/12, 10:28] Suhas: Even in the graph view the words count should be in the same place as in other views beside the üben button. Keep the connectors count in the same location as it is currently.
+  > [7/12, 10:46] Suhas: The map should have the most beautiful design as it's the first thing a user sees when opening the app. Currently the colors and design of the app is average. Also, make sure an interactive element to the app - when the user taps on the building icons, the bottom tile should be get in sync with it by sliding to the corresponding session.
+  > [7/12, 10:47] Suhas: The filter tray looks ugly in desktop view.
+  > [7/12, 10:49] Suhas: In desktop view - The word count can stay beside the üben button to the right even when expanded.
+  > [7/12, 10:51] Suhas: The muster and explanation can stay side by side in desktop view.
+- **Response summary:** Plan-mode session. Explored the six request areas with three parallel
+  read-only codebase passes (session player speaking/typing blocks + every Üben entry point and
+  `buildSession`'s options; FilterRail desktop anatomy + the count/Üben placement per view incl.
+  the graph legend; the UebenPath map SVG + GrammarTopicView's Muster/explanation card), then
+  designed one implementation plan covering all six: (1a) Üben relevance via a `?grammar=` param
+  pinning the lesson's topic in the session composer plus a pure `libraryFocus` helper mapping
+  Bibliothek facets and the Redemittel category onto the existing mission-style `focus` opt;
+  (1b) a speaking-block "Anzeigen" give-up mirroring the typing block's (grades wrong, never a
+  pass); (2) graph word count relocated beside Üben, connections count staying under the canvas;
+  (4+5) FilterRail desktop restyled as a standard surface card with the count kept beside Üben in
+  the sticky footer in both states; (6) a lg two-column grid for Muster + explanation; (3) tappable
+  map stops driving the existing card pager plus a concrete SVG beautification recipe. Founder
+  approved the plan (see Entry 358) with the instruction to save rather than implement.
+- **Artifacts:** exploration only; the plan file ships in Entry 358.
+
+## Entry 358 — 2026-07-12 (session 100, continued)
+- **Branch:** `claude/uben-ui-refinements-dibbiz`
+- **Prompt (verbatim):**
+  > i approve the plan but don't implement it now - include model recommendations for each chunk. Then, save it on the repo and merge to main. Document the session.
+- **Response summary:** Wrote the approved plan to **`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`**
+  with a per-chunk model map in the house tiering (Opus 4.8 for the composer/SRS-adjacent Üben
+  relevance chunk; Sonnet 5 for the speaking "Anzeigen", graph count, FilterRail redesign, and
+  grammar-lesson grid; Fable 5 first choice with Opus 4.8 fallback for the map beautification;
+  Haiku 4.5 for docs/gates). No app-source changes. Documented the session: s100 handoff appended
+  to `docs/PROJECT_STATUS.md` (s98 handoff archived to the W28 chunk per the two-handoff rule,
+  `_Last updated_` block refreshed) and this log. Committed, pushed, PR into `main`, squash-merged,
+  branch realigned.
+- **Artifacts:** `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md`.
