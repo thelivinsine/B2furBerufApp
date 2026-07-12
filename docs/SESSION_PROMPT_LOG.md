@@ -4002,3 +4002,24 @@ Branch: `claude/whats-next-esga9u`.
   `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`, `docs/PROJECT_STATUS.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `CLAUDE.md`,
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 360 — 2026-07-12 (session 101, continued)
+- **Branch:** `claude/uben-ui-refinements-dibbiz`
+- **Model:** Opus 4.8
+- **Prompt (verbatim):**
+  > Once you're done with it, check for any inaccuracies in Grammatik section, perform completeness
+  > checks and fix them.
+- **Response summary:** Audited the whole grammar bank (`src/data/grammar.ts`, 24 topics / 117 drills).
+  (1) **Mechanical completeness** via a scratchpad script (loaded the real module through Vite
+  `ssrLoadModule`): confirmed every topic has `explanationDe`/`purposeDe`/`pitfalls`/`pitfallsDe`
+  (with `pitfalls` and `pitfallsDe` the same length, since `EnPeek` swaps them by index), every drill
+  has `explain`+`gloss`, no em dashes anywhere, every MCQ answer is among its options. No structural
+  gaps. (2) **German-correctness read** of all 24 topics: the content is high quality (Wave 4 was
+  jury-reviewed in s98); found and fixed 4 inaccuracies: g_relativsaetze pitfall[1] EN was garbled
+  ("not 'denen' ↔ 'die'" → "not 'die'", shows on the EN peek); g_nebensatz explanation EN listed
+  "dass" twice in the conjunction list (removed the duplicate); g_futur_vermutung `purposeDe` read
+  awkwardly ("wahrscheinlich ist er es JETZT" → "wahrscheinlich ist er gerade dort", rendered in the
+  card/list views); g_praepositionalpronomen example EN "What did you discuss about?" →
+  "What did you discuss?". Gates: `lint:content` ✔ (no errors), completeness audit clean, `build` +
+  prerender ✔. Committed, pushed, PR into `main`, squash-merged, branch realigned.
+- **Artifacts:** `src/data/grammar.ts`, `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.
