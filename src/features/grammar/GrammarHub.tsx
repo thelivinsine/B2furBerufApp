@@ -1,103 +1,85 @@
 import { useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, BookMarked, Lightbulb, Volume2, GraduationCap } from "lucide-react";
-import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
-import { BrowseToolbar } from "@/features/shared/BrowseToolbar";
-import type { GrammarGroup, GrammarTopic } from "@/types";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Search, SlidersHorizontal, Zap } from "lucide-react";
 import { grammar, grammarById } from "@/data/grammar";
-import { iconByName } from "@/lib/icons";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { SpeakButton } from "@/components/shared/SpeakButton";
-import { EmptyState } from "@/components/shared/misc";
-import { GrammarDrillCard } from "./GrammarDrillCard";
+import {
+  activeFacetCount,
+  matchesFacets,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
+import { FilterRail } from "@/features/shared/FilterRail";
+import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
+import { SearchField } from "@/features/shared/SearchField";
+import { fuzzyMatch } from "@/lib/fuzzy";
+import { grammarFacets, GRAMMAR_FACET_IDS } from "@/lib/facets";
+import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
+import { groupMeta, groupOrder, orderedGrammar } from "./grammarMeta";
+import { GrammarTopicCards, GrammarCompactList } from "./GrammarViews";
+import { GrammarTopicView } from "./GrammarTopicView";
 
-/** Display metadata for each grammar group. */
-const groupMeta: Record<GrammarGroup, { labelDe: string; icon: string }> = {
-  connectors: { labelDe: "Konnektoren", icon: "Link2" },
-  relativeClauses: { labelDe: "Relativsätze", icon: "GitBranch" },
-  prepositionalPronouns: { labelDe: "da-/wo-Wörter", icon: "CornerDownRight" },
-  collocations: { labelDe: "Nomen-Verb-Verbindungen", icon: "Combine" },
-  verbPosition: { labelDe: "Verbstellung", icon: "MoveHorizontal" },
-  subordinate: { labelDe: "Nebensätze", icon: "CornerDownRight" },
-  cases: { labelDe: "Kasus", icon: "ArrowRightLeft" },
-  konjunktiv2: { labelDe: "Konjunktiv II", icon: "Layers" },
-  modals: { labelDe: "Modalverben", icon: "KeyRound" },
-  passive: { labelDe: "Passiv", icon: "Boxes" },
-};
-
-// Ordered by B2-marker priority (categorization audit 2026-07-09): the
-// structures that most distinguish B2 output come first, so the hub answers
-// "which rule is throttling my German" before "where is topic X".
-const groupOrder: GrammarGroup[] = [
-  "connectors",
-  "konjunktiv2",
-  "passive",
-  "subordinate",
-  "relativeClauses",
-  "cases",
-  "verbPosition",
-  "prepositionalPronouns",
-  "modals",
-  "collocations",
-];
-
-function normalise(s: string) {
-  return s.toLowerCase().replace(/[äöüß]/g, (c) => ({ ä: "ae", ö: "oe", ü: "ue", ß: "ss" }[c] ?? c));
-}
+// Bibliothek views (redesign s93): the Grammatik tab joins the shared browse
+// skeleton of the other three tabs (toolbar -> content -> Üben). Karten is the
+// default lens, Liste the fast scan; there is no Tabelle (a lesson is not a
+// row of atomic facts).
+const GRAMMAR_VIEWS: LibraryView[] = ["karten", "liste"];
+const GRAMMAR_FACETS = grammarFacets();
 
 export function GrammarHub() {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [view, setView] = useViewParam(GRAMMAR_VIEWS);
+  // Mobile filter panel open state: the toggle is an icon on the view line.
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  // Transient search, outside the filter panel (founder s92).
+  const [searchOpen, setSearchOpen] = useState(false);
+  const reduce = useReducedMotion();
+
   const topicId = params.get("topic");
   const topic = topicId ? grammarById(topicId) : undefined;
   const group = params.get("group") ?? "all";
-  const [search, setSearch] = useState("");
 
-  // Hooks must run unconditionally (before any early return).
-  const grouped = useMemo(() => {
-    return groupOrder
-      .map((g) => ({ group: g, topics: grammar.filter((t) => t.group === g) }))
-      .filter((x) => x.topics.length > 0);
-  }, []);
-
-  // Flattened card list, narrowed by the Gruppe dropdown + free-text search
-  // (over German/English title, purpose and the pattern line).
-  const items = useMemo(() => {
-    let list = grouped.flatMap(({ group, topics }) => topics.map((topic) => ({ topic, group })));
-    if (group !== "all") list = list.filter((x) => x.group === group);
-    if (search.trim()) {
-      const q = normalise(search.trim());
-      list = list.filter(
-        ({ topic }) =>
-          normalise(topic.titleDe).includes(q) ||
-          normalise(topic.title).includes(q) ||
-          normalise(topic.purposeDe).includes(q) ||
-          normalise(topic.pattern).includes(q),
-      );
+  // Facet selection rides in the URL (`?cefr=B1.2,B2.1`), like the sibling tabs.
+  const railSelection = useMemo(() => {
+    const s: FacetSelection = {};
+    for (const id of GRAMMAR_FACET_IDS) {
+      const raw = params.get(id);
+      if (raw) s[id] = raw.split(",");
     }
-    return list;
-  }, [grouped, group, search]);
+    return s;
+  }, [params]);
 
-  // Keep `tab=grammatik` (and any other params) intact when opening/closing a
-  // topic; replacing the whole param set bounced /library back to the default
-  // Wörter tab.
-  const close = () => {
+  const setRailSelection = (next: FacetSelection) => {
     const p = new URLSearchParams(params);
-    p.delete("topic");
+    for (const id of GRAMMAR_FACET_IDS) {
+      const values = next[id] ?? [];
+      if (values.length) p.set(id, values.join(","));
+      else p.delete(id);
+    }
     setParams(p, { replace: true });
   };
 
-  if (topicId && topic) {
-    return <GrammarTopicView topic={topic} onBack={close} />;
-  }
+  // ONE filter pipeline: Gruppe scope -> search -> facets. `searched`
+  // (pre-facet) feeds the FilterRail so its Stufe counts reflect what a tap
+  // would yield. Order is the B2-marker priority spine, not the bank order.
+  const scoped = useMemo(
+    () => (group === "all" ? orderedGrammar : orderedGrammar.filter((t) => t.group === group)),
+    [group],
+  );
 
-  const open = (id: string) => {
-    const p = new URLSearchParams(params);
-    p.set("topic", id);
-    setParams(p);
-  };
+  const searched = useMemo(() => {
+    if (!search.trim()) return scoped;
+    return scoped.filter((t) =>
+      fuzzyMatch(search, [t.titleDe, t.title, t.purposeDe, t.pattern, groupMeta[t.group].labelDe]),
+    );
+  }, [scoped, search]);
+
+  const filtered = useMemo(
+    () => searched.filter((t) => matchesFacets(t, GRAMMAR_FACETS, railSelection)),
+    [searched, railSelection],
+  );
 
   const setGroup = (g: string) => {
     const p = new URLSearchParams(params);
@@ -106,162 +88,184 @@ export function GrammarHub() {
     setParams(p, { replace: true });
   };
 
-  const primaryOptions = [
-    { value: "all", label: "Alle Gruppen", count: grammar.length },
-    ...grouped.map(({ group: g, topics }) => ({
-      value: g,
-      label: groupMeta[g].labelDe,
-      count: topics.length,
-    })),
-  ];
+  // Keep `tab=grammatik` (and any other params) intact when opening/closing a
+  // topic; replacing the whole param set bounced /library back to the default
+  // Wörter tab.
+  const openTopic = (id: string) => {
+    const p = new URLSearchParams(params);
+    p.set("topic", id);
+    setParams(p);
+  };
+
+  const closeTopic = () => {
+    const p = new URLSearchParams(params);
+    p.delete("topic");
+    setParams(p, { replace: true });
+  };
+
+  const groupOptions = useMemo(
+    () =>
+      groupOrder
+        .map((g) => ({
+          value: g,
+          label: groupMeta[g].labelDe,
+          count: grammar.filter((t) => t.group === g).length,
+        }))
+        .filter((o) => o.count > 0),
+    [],
+  );
+
+  if (topicId && topic) {
+    return <GrammarTopicView topic={topic} onBack={closeTopic} onOpenTopic={openTopic} />;
+  }
+
+  // The filter tile is the single filter surface on BOTH breakpoints: desktop
+  // rail + mobile panel share these props (same pattern as the sibling tabs).
+  const filterRailProps = {
+    primary: {
+      label: "Gruppe",
+      value: group,
+      onChange: setGroup,
+      all: { value: "all", label: "Alle Gruppen", count: grammar.length },
+      options: groupOptions,
+    },
+    items: searched,
+    facets: GRAMMAR_FACETS,
+    selection: railSelection,
+    onChange: setRailSelection,
+    pinScope: "grammatik",
+    footer: (
+      <Button variant="gradient" className="h-10 w-full" onClick={() => navigate("/session")}>
+        <Zap className="h-3.5 w-3.5" /> Üben
+      </Button>
+    ),
+    count: {
+      value: filtered.length,
+      label: filtered.length !== 1 ? "Themen" : "Thema",
+    },
+  };
 
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* No page header: the Bibliothek tabs already name the section (s92). */}
-      <LibrarySwitcher />
+      {/* Desktop (lg+) is an explicit two-row grid: the tabs + view switcher
+          stay at the CONTENT column width (row 1), while the content and the
+          filter tile share row 2 so the tile starts level with the first card.
+          Mobile renders the SAME filter tile inline as a slide-open panel. */}
+      <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
+        <div className="space-y-4 lg:col-start-1 lg:row-start-1">
+          <LibrarySwitcher />
 
-      <BrowseToolbar
-        search={search}
-        onSearch={setSearch}
-        searchPlaceholder="Suche nach Thema, Muster …"
-        primary={{ value: group, onChange: setGroup, options: primaryOptions }}
-        facetItems={items}
-        facets={[]}
-        facetSelection={{}}
-        onFacetChange={() => {}}
-        resultLabel={(n) => `${n} Themen anzeigen`}
-        activeChips={[]}
-        onRemoveChip={() => {}}
-      />
-
-      {items.length === 0 ? (
-        <div className="py-16 text-center text-muted-foreground">
-          Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
-        </div>
-      ) : (
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {items
-          .map(({ topic, group }, i) => {
-            const meta = groupMeta[group];
-            const Icon = iconByName(meta.icon);
-            const showGroupTag = meta.labelDe !== topic.titleDe;
-            return (
-              <motion.button
-                key={topic.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: Math.min(i * 0.025, 0.2) }}
-                onClick={() => open(topic.id)}
-                className="text-left"
+          {/* Toolbar: mobile filter toggle · view switcher · search icon. */}
+          <div className="flex w-full flex-col gap-2">
+            <div className="flex w-full items-center justify-between gap-2">
+              <Button
+                size="icon"
+                variant={filtersOpen ? "default" : "outline"}
+                aria-pressed={filtersOpen}
+                aria-expanded={filtersOpen}
+                aria-label="Filter"
+                title="Filter"
+                className="relative shrink-0 rounded-lg lg:hidden"
+                onClick={() => setFiltersOpen((o) => !o)}
               >
-                <Card className="card-hover h-full">
-                  <CardContent className="flex h-full flex-col gap-2 p-4">
-                    <div className="flex items-center justify-between gap-2">
-                      {showGroupTag ? (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
-                          <Icon className="h-3.5 w-3.5 text-emerald-500" /> {meta.labelDe}
-                        </span>
-                      ) : (
-                        <Icon className="h-4 w-4 text-emerald-500" />
-                      )}
-                      <div className="flex shrink-0 items-center gap-1">
-                        {topic.cefr && <Badge variant="muted">{topic.cefr}</Badge>}
-                        <Badge variant="muted">{topic.drills.length} Übg.</Badge>
-                      </div>
-                    </div>
-                    <p className="font-semibold leading-snug">{topic.titleDe}</p>
-                    <p className="text-sm text-muted-foreground">{topic.purposeDe}</p>
-                    <p className="mt-auto line-clamp-2 rounded-md bg-muted/50 px-2 py-1 font-mono text-xs text-muted-foreground">
-                      {topic.pattern}
-                    </p>
-                  </CardContent>
-                </Card>
-              </motion.button>
-            );
-          })}
-      </div>
-      )}
-    </div>
-  );
-}
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFacetCount(railSelection) > 0 && (
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+                    {activeFacetCount(railSelection)}
+                  </span>
+                )}
+              </Button>
+              <ViewSwitcher views={GRAMMAR_VIEWS} value={view} onChange={setView} />
+              <Button
+                size="icon"
+                variant={searchOpen || search.trim() ? "default" : "outline"}
+                aria-pressed={searchOpen}
+                aria-expanded={searchOpen}
+                aria-label="Suche"
+                title="Suche"
+                className="shrink-0 rounded-lg"
+                onClick={() =>
+                  setSearchOpen((o) => {
+                    if (o) setSearch("");
+                    return !o;
+                  })
+                }
+              >
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
 
-function GrammarTopicView({ topic, onBack }: { topic: GrammarTopic; onBack: () => void }) {
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" onClick={onBack}>
-          <ArrowLeft className="h-4 w-4" /> Übersicht
-        </Button>
-        <div className="ml-auto flex items-center gap-1">
-          {topic.cefr && <Badge variant="muted">{topic.cefr}</Badge>}
-          <Badge variant="muted">{groupMeta[topic.group].labelDe}</Badge>
-        </div>
-      </div>
-
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-primary">{topic.title}</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-3xl">{topic.titleDe}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{topic.purposeDe}</p>
-      </div>
-
-      <Card>
-        <CardContent className="space-y-4 p-5">
-          <p className="text-sm leading-relaxed">{topic.explanation}</p>
-          <div className="rounded-lg bg-muted/50 px-3 py-2">
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Muster</p>
-            <p className="mt-0.5 font-mono text-sm">{topic.pattern}</p>
+            {/* Search input lives outside the filter panel (founder s92). */}
+            {searchOpen && (
+              <SearchField
+                value={search}
+                onChange={setSearch}
+                placeholder="Suche nach Thema, Muster …"
+                autoFocus
+              />
+            )}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* Examples */}
-      <section className="space-y-3">
-        <h2 className="flex items-center gap-2 font-semibold"><BookMarked className="h-4 w-4 text-primary" /> Beispiele</h2>
-        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-          {topic.examples.map((ex, i) => (
-            <Card key={i}>
-              <CardContent className="flex items-start justify-between gap-2 p-4">
-                <div>
-                  <p className="font-medium">{ex.de}</p>
-                  <p className="mt-0.5 text-sm text-muted-foreground">{ex.en}</p>
-                </div>
-                <SpeakButton text={ex.de} />
-              </CardContent>
-            </Card>
-          ))}
+          <AnimatePresence initial={false}>
+            {filtersOpen && (
+              <motion.div
+                key="filter-panel"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+                className="overflow-hidden lg:hidden"
+              >
+                <FilterRail
+                  {...filterRailProps}
+                  layout="panel"
+                  onClose={() => setFiltersOpen(false)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-      </section>
 
-      {/* Pitfalls */}
-      {topic.pitfalls && topic.pitfalls.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="flex items-center gap-2 font-semibold"><Lightbulb className="h-4 w-4 text-warning" /> Typische Fehler</h2>
-          <ul className="space-y-2">
-            {topic.pitfalls.map((p, i) => (
-              <li key={i} className="flex items-start gap-2 rounded-lg border border-warning/30 bg-warning/5 px-3 py-2 text-sm">
-                <span className="mt-0.5 text-warning">⚠</span>
-                <span>{p}</span>
-              </li>
+        <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
+          {filtered.length > 0 &&
+            (view === "liste" ? (
+              <GrammarCompactList items={filtered} onOpen={openTopic} />
+            ) : (
+              <GrammarTopicCards items={filtered} onOpen={openTopic} />
             ))}
-          </ul>
-        </section>
-      )}
 
-      {/* Drills */}
-      <section className="space-y-3">
-        <h2 className="flex items-center gap-2 font-semibold"><GraduationCap className="h-4 w-4 text-primary" /> Übungen</h2>
-        <div className="space-y-3">
-          {topic.drills.length > 0 ? (
-            topic.drills.map((d) => <GrammarDrillCard key={d.id} drill={d} />)
-          ) : (
-            <EmptyState icon={Volume2} title="Keine Übungen" description="Für dieses Thema gibt es noch keine Übungen." />
+          {filtered.length === 0 && (
+            <div className="py-16 text-center text-muted-foreground">
+              Keine Ergebnisse. Versuche einen anderen Filter oder Begriff.
+            </div>
           )}
         </div>
-      </section>
 
-      <Button asChild variant="gradient" className="w-full sm:w-auto">
-        <Link to="/quiz">Wissen im Quiz testen</Link>
-      </Button>
+        {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
+        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+          <Button
+            variant="gradient"
+            className="h-11 flex-1 rounded-xl text-base"
+            onClick={() => navigate("/session")}
+          >
+            <Zap className="h-4 w-4" /> Üben
+          </Button>
+          <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+            <span className="text-sm font-semibold tabular-nums text-foreground">
+              {filtered.length}
+            </span>
+            <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+              Them{filtered.length !== 1 ? "en" : "a"}
+            </span>
+          </div>
+        </div>
+
+        <FilterRail
+          {...filterRailProps}
+          className="no-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)] lg:overflow-hidden lg:overflow-y-auto"
+        />
+      </div>
     </div>
   );
 }
