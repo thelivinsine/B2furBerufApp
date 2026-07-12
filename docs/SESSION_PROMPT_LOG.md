@@ -4061,3 +4061,23 @@ Branch: `claude/whats-next-esga9u`.
   `provenance.ts` · `scripts/lint-content.mjs` · `tests/sectors.test.ts` ·
   `docs/reports/sector-audit-report.md` · `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · scripts/vendor oracle subsets.
+
+## Entry 362 — 2026-07-12 (session 102, continued)
+
+- **Branch:** `claude/fable-time-prioritization-126bp4`
+- **Prompt (verbatim):**
+  > what should be the next task to do with fable?
+- **Follow-up (verbatim):**
+  > document the session
+- **Response summary:** Post-merge advisory + documentation turn (recommendation given on Fable 5;
+  this doc pass run on Opus 4.8 after the founder switched models). Recommended the **Üben city-map
+  redesign** (item 3 of `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`) as the next Fable task: that
+  plan's own per-task model map already assigns it to Fable 5 (Opus 4.8 fallback), it is the first
+  screen the demo audience sees ("the map should have the most beautiful design"), and the tappable
+  building-stop interaction reads well live. Named the AI-jury German-correctness review (the 131
+  items authored in s102 plus dialogues/texts) as the zero-risk runner-up, and flagged that Üben
+  items 2/4+5/6 are Sonnet-tier per the plan so Fable should not be spent on them. Then documented
+  the session: this log entry. The s102 handoff in `PROJECT_STATUS.md`, the `CLAUDE.md` content
+  counts/Branche notes, and the plan status line were all already refreshed and shipped inside the
+  merged PR #473 (Entry 361), so no further status/CLAUDE edits were needed.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
