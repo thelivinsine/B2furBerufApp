@@ -16,14 +16,14 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **654**
-- Covered by ≥1 oracle: **638** (98%)  ·  not covered: **16**
-- ✔ Article verified: **622**  (294 by both oracles, 328 by one)
-- ✔ Plural verified: **380**  (224 by both oracles, 156 by one)
+- Nouns checked: **782**
+- Covered by ≥1 oracle: **762** (97%)  ·  not covered: **20**
+- ✔ Article verified: **746**  (352 by both oracles, 394 by one)
+- ✔ Plural verified: **467**  (270 by both oracles, 197 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
 - ⚑ Review signals (one oracle only, or oracles disagree): **6**
 - ◑ Plural-form headwords (gender not comparable): **10**
-- ~ We assert a plural, but no oracle lists one to compare: **58**
+- ~ We assert a plural, but no oracle lists one to compare: **71**
 
 ## ⛔ GATE — two independent authorities agree our form is wrong
 
@@ -69,12 +69,14 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>16 items</summary>
+<details><summary>20 items</summary>
 
 | id | headword |
 |---|---|
+| `v_auslastung` | die Auslastung |
 | `v_beschwerden` | die Beschwerden |
 | `v_daten` | die Daten |
+| `v_datenblatt` | das Datenblatt |
 | `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
 | `v_girocard` | die Girocard |
 | `v_iban` | die IBAN |
@@ -82,7 +84,9 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_nachbereitung` | die Nachbereitung |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
 | `v_ressourcen` | die Ressourcen |
+| `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
+| `v_sicherheitsschuhe` | die Sicherheitsschuhe |
 | `v_spliss` | der Spliss |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
@@ -97,13 +101,15 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 Gender is covered; only the plural could not be checked (no oracle lists a plural form for the
 lemma, or coverage came via the gender-only compound head fallback).
 
-<details><summary>58 items</summary>
+<details><summary>71 items</summary>
 
 | id | headword |
 |---|---|
+| `v_absturzsicherung` | die Absturzsicherung |
 | `v_aktionspunkt` | der Aktionspunkt |
 | `v_angehoerigengespraech` | das Angehörigengespräch |
 | `v_bankberater` | der Bankberater |
+| `v_bauphase` | die Bauphase |
 | `v_behoerdentermin` | der Behördentermin |
 | `v_berufskraftfahrer` | der Berufskraftfahrer |
 | `v_bildungsabschluss` | der Bildungsabschluss |
@@ -111,10 +117,13 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_dienstplan` | der Dienstplan |
 | `v_digital_prozess` | der digitale Prozess |
 | `v_einstufungstest` | der Einstufungstest |
+| `v_endgeraet` | das Endgerät |
+| `v_endkontrolle` | die Endkontrolle |
 | `v_ergebnisprotokoll` | das Ergebnisprotokoll |
 | `v_ernaehrungsberatung` | die Ernährungsberatung |
 | `v_eskalationsstufe` | die Eskalationsstufe |
 | `v_fallbesprechung` | die Fallbesprechung |
+| `v_fehlerbericht` | der Fehlerbericht |
 | `v_fortschrittsbericht` | der Fortschrittsbericht |
 | `v_garantieanspruch` | der Garantieanspruch |
 | `v_geschaeftsessen` | das Geschäftsessen |
@@ -126,21 +135,28 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_kostenvoranschlag` | der Kostenvoranschlag |
 | `v_kursgebuehr` | die Kursgebühr |
 | `v_ladeliste` | die Ladeliste |
+| `v_ladezeit` | die Ladezeit |
 | `v_lagerbestand` | der Lagerbestand |
 | `v_liefertermin` | der Liefertermin |
+| `v_losgroesse` | die Losgröße |
+| `v_materialpruefung` | die Materialprüfung |
 | `v_meldebescheinigung` | die Meldebescheinigung |
 | `v_nachhaltigkeitsbericht` | der Nachhaltigkeitsbericht |
 | `v_pflegegrad` | der Pflegegrad |
 | `v_probestunde` | die Probestunde |
 | `v_produktionslinie` | die Produktionslinie |
 | `v_projektphase` | die Projektphase |
+| `v_pruefprotokoll` | das Prüfprotokoll |
 | `v_reisebuchung` | die Reisebuchung |
+| `v_ruestzeit` | die Rüstzeit |
 | `v_schichtleitung` | die Schichtleitung |
 | `v_schichtplan` | der Schichtplan |
 | `v_sicherheitsregel` | die Sicherheitsregel |
 | `v_sicherheitsunterweisung` | die Sicherheitsunterweisung |
 | `v_stoerfall` | der Störfall |
+| `v_systemausfall` | der Systemausfall |
 | `v_tagegeld` | das Tagegeld |
+| `v_taktzeit` | die Taktzeit |
 | `v_teilnahmebescheinigung` | die Teilnahmebescheinigung |
 | `v_terminvorschlag` | der Terminvorschlag |
 | `v_trainingsplan` | der Trainingsplan |
@@ -155,6 +171,7 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_versichertenkarte` | die Versichertenkarte |
 | `v_warenbestand` | der Warenbestand |
 | `v_wartenummer` | die Wartenummer |
+| `v_wartungsfenster` | das Wartungsfenster |
 | `v_wohnungsanzeige` | die Wohnungsanzeige |
 | `v_wohnungsgeberbestaetigung` | die Wohnungsgeberbestätigung |
 | `v_zeitwaechterin` | die Zeitwächterin / der Zeitwächter |

@@ -145,7 +145,12 @@ export type RedemittelCategory =
   | "opinion"
   | "prosCons"
   | "reactions"
-  | "professionalIntro";
+  | "professionalIntro"
+  | "telephoning"
+  | "emails"
+  | "presentations"
+  | "jobInterview"
+  | "smallTalk";
 
 export interface RedemittelPhrase {
   id: string;
@@ -253,7 +258,14 @@ export type GrammarGroup =
   | "modals"
   | "passive"
   | "subordinate"
-  | "cases";
+  | "cases"
+  // Scale-up Wave 4 (2026-07-12): the missing B1-B2 canon groups.
+  | "nouns"
+  | "attributes"
+  | "reportedSpeech"
+  | "wordFormation"
+  | "infinitives"
+  | "future";
 
 export interface GrammarExample {
   de: string;
@@ -604,6 +616,10 @@ export interface ReadingText {
   checks: TextCheck[];
   /** Optional sub-theme link; must be declared on the parent theme. */
   subThemeId?: SubThemeId;
+  /** Optional Branche tag (scale-up Wave 2, 2026-07-12): authentic-style
+   *  workplace texts per sector, e.g. a Wartungsprotokoll memo. Enables
+   *  sector-targeted sessions; rolls up like every facet. */
+  sector?: WorkSector;
 }
 
 /* ---------------- Data governance — provenance register ---------------- */

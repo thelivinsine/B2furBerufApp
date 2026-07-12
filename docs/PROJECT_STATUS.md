@@ -1,6 +1,15 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-12 (session 94: **Bibliothek scale-up Wave 1 — the Branche (sector) axis is
+_Last updated: 2026-07-12 (session 95: **Scale-up Waves 2–4 executed and MERGED (PR #463) after
+founder review.** Wave 2 first tranche deepened engineering/it/construction/
+production (~60 words + ~26 collocations each + one sector reading text; `ReadingText.sector`
+added), Wave 3 grew Redemittel 84 → **149** across 5 new speech-act categories (Telefonieren,
+E-Mails, Präsentieren, Vorstellungsgespräch, Small Talk), Wave 4 completed the B1–B2 grammar canon
+10 → **24 topics / 117 drills** across 6 new groups. Banks: vocab **1,022**, collocations **701**,
+texts **26**, provenance **2,132 rows** (`provenance.ts` split into two literals, TS2590). Full
+pipeline green (facts 0 errors, grammar 0 flags on new sentences, 116/116, 73.0 kB). One commit per
+wave on the branch. Detail in the s95 handoff below.**
+Prior, session 94: **Bibliothek scale-up Wave 1 — the Branche (sector) axis is
 ACTIVE.** Founder decision un-parking the sector facet (supersedes the 2026-07-09 audit's park; plan in
 `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`): `WorkSector` grew 5 → **11 values** (engineering,
 construction, production, transport, beauty, sports added) and every sector got a starter pack, so the
@@ -276,72 +285,6 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
-**Handoff after session 93 (2026-07-12). Grammatik tab redesigned onto the shared Bibliothek skeleton
-(branch `claude/grammatik-section-redesign-v3gmv7`, PR #457).** Founder asked for a "complete
-re-imagination" of Grammatik: follow the other three tabs' high-level concept (filters → content → Üben)
-but with design freedom, and make it highly useful and intuitive for adult learners and job holders.
-- **Hub = the s92 skeleton, exactly:** LibrarySwitcher page header, toolbar row `[Filter icon (mobile) ·
-  ViewSwitcher · Suche icon]`, transient full-width fuzzy `SearchField` (over titleDe/title/purposeDe/
-  pattern/group label), `FilterRail` on both breakpoints from ONE `filterRailProps` (desktop sticky rail,
-  mobile AnimatePresence slide panel), sticky mobile bottom bar with Üben + "n Themen". **Gruppe** is the
-  primary dropdown (control-choice rule: it's the "where am I" cut) and **Stufe (CEFR)** the facet, added
-  as `grammarFacets()`/`GRAMMAR_FACET_IDS` in `lib/facets.ts` (100% coverage, cefr required since s84).
-  Params `?group=`/`?cefr=`/`?view=`/`?topic=` are URL-persisted; `/grammar?topic=` deep links (search)
-  still resolve.
-- **Views (new `grammar/GrammarViews.tsx`):** Karten (default) = redesigned topic cards (emerald group
-  icon tile, **priority-rank chip**, CEFR badge, purpose, truncated mono pattern strip, "n Übungen" +
-  "Lernen →" affordance); Liste = numbered compact rows. No Tabelle (a lesson is not a row of atomic
-  facts). Shared metadata moved to `grammar/grammarMeta.ts`: `groupMeta`, the B2-marker `groupOrder`,
-  `orderedGrammar` (the flattened priority spine) and `topicRank`.
-- **Lesson page (new `grammar/GrammarTopicView.tsx`):** hero (group tile, English eyebrow, titleDe,
-  purpose, badges) → explanation card with an emerald **Muster** formula panel → Beispiele (speakable) →
-  Typische Fehler (warning list) → **numbered Übungen with a live progress bar** (first-answer results,
-  local state remounted per topic) → a **completion panel** ("Thema abgeschlossen · k von n richtig" +
-  one-tap "Weiter: <next topic>") → prev/next cards along the spine + the kept "Wissen im Quiz testen"
-  `/quiz` CTA. "Thema n von 10" in the top row; lesson scrolls to top on open. Rationale for the rank/
-  spine emphasis: the audience is time-poor working adults, so the section answers "where do I start,
-  what's next" without them deciding (top of the list = biggest B2 lever).
-- **Verified in a real browser** (Playwright + the preinstalled Chromium against `pnpm dev`): hub Karten/
-  Liste on desktop + mobile, filter rail counts, lesson desktop + mobile, and the full drill loop (5/5
-  answered → XP in header → completion panel → "Weiter: Konjunktiv II" navigates). Gates green:
-  typecheck, ESLint 0 errors, `test:unit` 116/116, build + prerender, `check:bundle` **73.0 kB**/400.
-- **Founder follow-up round (same session, PR #458, from a live phone screenshot):** three lesson fixes.
-  (1) No navigation → the **LibrarySwitcher tabs now render on top of the lesson** too (tapping
-  Grammatik doubles as back-to-overview). (2) No Üben → **Üben added to the lesson** (inline gradient
-  button on desktop, sticky bottom action bar above the nav on mobile), replacing the "Wissen im Quiz
-  testen" `/quiz` CTA (`/quiz` stays reachable via practiceAreas). (3) Too much text → the English
-  all-caps eyebrow was dropped from the hero, and the **Muster panel now leads** the card with the
-  explanation **clamped to three lines** behind a "Mehr anzeigen"/"Weniger anzeigen" expander.
-  Re-verified on the 390px viewport (tabs navigate out, Üben bar sticks while scrolling, expander
-  toggles); all gates green again.
-- **Founder follow-up round 2 (same session, PR #459):** the lesson hero still described the topic twice
-  (German `purposeDe` in the hero + the English explanation in the card below) and carried a meta badge
-  row (CEFR + group + "n Übungen"). Both removed: the hero is now **group tile + German title only**;
-  the topic is described ONCE (the clamped explanation card) and the drill count already shows in the
-  Übungen progress. CEFR/purpose remain on the hub topic cards, where they inform the choice.
-- **Founder follow-up round 3 (same session, PR #460):** the Muster read as one mush (multiple pattern
-  variants wrapping into each other) and the explanation as one paragraph chunk. Both are now split at
-  RENDER time, no content-bank change: `pattern` splits on the authored `" · "` separator into **one
-  variant per row** (emerald dot markers when >1; verified against all 10 patterns, e.g. Relativsätze
-  becomes a 4-row Nom/Akk/Dat/Gen list), and `explanation` splits into **sentence bullets** with the
-  first point shown and the rest behind the "Mehr anzeigen" expander (regex fallback keeps unsplittable
-  text as one line). If future explanations use dotted abbreviations, revisit the sentence split.
-- **Founder follow-up round 4 (same session, PR #461): German-first lesson + hold-to-peek EN.** The
-  lesson text is now German by default with English as a press-and-hold peek, across the section:
-  (1) new bank fields **`explanationDe` + `pitfallsDe`** on all 10 topics (AI-drafted German, EN
-  originals kept parallel in order/length; **founder verify pending**, flagged in the type comments);
-  (2) new **`grammar/EnPeek.tsx`** chip (pointer-capture hold, Space/Enter hold on keyboard, never a
-  sticky toggle) placed top-right of the explanation paragraph (NOT the tile), on the pitfalls header,
-  per example card (beside the SpeakButton, gloss hidden until held), and on each drill via a new
-  `glossPeek` prop on GrammarDrillCard (**lesson only; the composed session keeps always-visible
-  glosses**); (3) the "Mehr anzeigen"/"Weniger anzeigen" expander moved to the **bottom-right corner of
-  the tile**. Peek verified in-browser (hold shows EN, release reverts to German); `lint:content` clean
-  (no em dashes in the new German); all gates green. Drill `explain` feedback stays English (open
-  question for the founder: author `explainDe` for 47 drills?).
-- **NOT done / follow-up candidates:** per-topic drill progress is session-local only (persisting
-  "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
-  (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.
-
 **Handoff after session 94 (2026-07-12). Bibliothek scale-up Wave 1: the Branche (sector) axis is
 ACTIVE (branch `claude/bibliothek-scaleup-german-pros-slcnh5`).** The founder presents Genauly to
 German-course classmates from all major professional sectors on 2026-07-13 and wants the Bibliothek to
@@ -377,4 +320,38 @@ be their single source of truth after the course; this **un-parks the sector fac
   mirror when the first one lands); Wave 2 prioritization waits on classmate feedback after the
   2026-07-13 presentation.
 
-_(Sessions 85-92's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
+**Handoff after session 95 (2026-07-12). Scale-up Waves 2–4 EXECUTED and MERGED to `main`
+(PR #463, squash; the founder reviewed the staged draft PR and gave the merge go-ahead).** One
+wave per commit on the branch (b1c0766 W2, 8c0df08 W3, 2bfb57f W4 + docs commits). The approved Waves 2–4 plan (with model
+policy: Fable 5 for all German authoring, Sonnet 5 wiring, Haiku 4.5 mechanics) is folded into
+`docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §0/§4–6.
+- **Wave 2 (first tranche, feedback-driven default order):** engineering, it, construction,
+  production each +40 vocab (to ~60), +17/16 collocations (to ~26), +1 sector `ReadingText`
+  (Wartungsprotokoll memo · Sprint-Review email · Baustellenordnung announcement · Schichtplan
+  voicemail, one per `kind`). Schema: **`ReadingText.sector`** added (validate-when-present).
+  Banks: vocab 862 → **1,022**, collocations 636 → **701**, texts 22 → **26**.
+- **Wave 3 (Redemittel phrasebook):** +5 sector-neutral categories (telephoning, emails,
+  presentations, jobInterview, smallTalk; icons Phone/Mail/Presentation/UserCheck/Coffee),
+  13 phrases each with cefr/register/example. Redemittel 84 → **149**.
+- **Wave 4 (grammar canon):** +14 German-first topics on the B2-marker spine across **6 new
+  groups** (nouns, attributes, reportedSpeech, wordFormation, infinitives, future): indirekte
+  Rede, zweiteilige Konnektoren, Infinitivsätze, Finalsätze, Temporalsätze, Vergleichssätze,
+  Partizipialattribute, Genitiv, n-Deklination, Nominalisierung, lassen, brauchen + zu,
+  Futur I/II Vermutung, es-Konstruktionen. Grammar 10 → **24 topics / 117 drills**. The s93
+  lesson page absorbed everything via `grammarMeta.ts` (`groupOrder` extended).
+- **Provenance:** +378 rows (Waves 2–4), register 1,754 → **2,132**, all new rows `draft`.
+  **`provenance.ts` is now two concatenated literals** (`provenancePart1/2`): a single 2,000+ row
+  array literal exceeds TS2590; append to the second literal (script pattern unchanged).
+- **Pipeline (all green):** lint:content clean; `build:oracles` → `verify:facts` **0 two-oracle
+  errors** (781 noun lemmas); frequency subset + bins regenerated; `verify:grammar` **0
+  grammar/agreement flags**, none of the 38 warn signals touch the ~800 new sentences;
+  `verify:cefr` + `build:verification` (linguistic tier 1602 → **1,896**); typecheck, ESLint 0
+  errors, `test:unit` 116/116, build + prerender, `check:bundle` **73.0 kB**/400; floor smoke:
+  Branche renders on Wörter AND Kollokationen, spine 24/24.
+- **NOT done / follow-up:** the first verification session (build `scripts/review-queue.mjs` +
+  `pnpm review:queue`, flip reviewed items draft → verified; all 2,107 non-Can-Do rows are still
+  `draft`); Wave-2 tranche 2 (care, trades, retail, hospitality, transport, beauty, sports) after
+  classmate feedback from the 2026-07-13 presentation; a Playwright smoke of one new grammar
+  lesson in a real browser.
+
+_(Sessions 85-93's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_

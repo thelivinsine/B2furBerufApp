@@ -32,6 +32,17 @@ import {
   Banknote,
   GraduationCap,
   Briefcase,
+  Phone,
+  Mail,
+  Presentation,
+  UserCheck,
+  Coffee,
+  Tag,
+  AlignLeft,
+  Quote,
+  Shuffle,
+  ArrowRight,
+  Clock,
   type LucideIcon,
 } from "lucide-react";
 
@@ -69,6 +80,17 @@ const map: Record<string, LucideIcon> = {
   Banknote,
   GraduationCap,
   Briefcase,
+  Phone,
+  Mail,
+  Presentation,
+  UserCheck,
+  Coffee,
+  Tag,
+  AlignLeft,
+  Quote,
+  Shuffle,
+  ArrowRight,
+  Clock,
 };
 
 export function iconByName(name: string): LucideIcon {

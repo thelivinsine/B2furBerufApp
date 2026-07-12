@@ -34,12 +34,14 @@ const POS = ["noun", "verb", "adjective", "adverb", "phrase", "connector"];
 const REDEMITTEL_CATEGORIES = [
   "suggestions", "agree", "disagree", "negotiation", "compromise",
   "clarification", "opinion", "prosCons", "reactions", "professionalIntro",
+  "telephoning", "emails", "presentations", "jobInterview", "smallTalk",
 ];
 const REDEMITTEL_REGISTERS = ["neutral", "formal"]; // "diplomatic" folded into formal (audit 2026-07-09)
 const COLLOCATION_REGISTERS = ["neutral", "formal"];
 const GRAMMAR_GROUPS = [
   "connectors", "relativeClauses", "prepositionalPronouns", "collocations",
   "verbPosition", "konjunktiv2", "modals", "passive", "subordinate", "cases",
+  "nouns", "attributes", "reportedSpeech", "wordFormation", "infinitives", "future",
 ];
 const WEAKNESS_CATEGORIES = [
   "verbPosition", "cases", "vocabularyRange", "cohesion", "relativeClauses",
@@ -441,6 +443,8 @@ function lintTexts(texts, subThemeIndex) {
     if (!CEFR_LEVELS.includes(t.cefr)) error(ds, w, `invalid cefr "${t.cefr}"`);
     for (const f of ["title", "titleEn", "de", "en"]) if (!isStr(t[f])) error(ds, w, `${f} empty`);
     checkSubTheme(t, t.themeId, subThemeIndex, ds, w);
+    if (t.sector !== undefined && !WORK_SECTORS.includes(t.sector))
+      error(ds, w, `invalid sector "${t.sector}"`);
     // The 4.4 renderer shows a comprehension MCQ after every text, so the
     // 2-3 checks per item are part of the content contract, not optional.
     if (!Array.isArray(t.checks) || t.checks.length < 2) {

@@ -1230,3 +1230,69 @@ each).** A long chain of screenshot-driven mobile/desktop polish on the three br
   filtered list sits under its results instead of the viewport bottom — switch to `fixed` if "always glued"
   is wanted); mobile pins persist a preference but don't visually collapse sections the way desktop does
   (no mobile collapse state); `BrowseToolbar`/`FacetSheet` remain in the repo but unused on these pages.
+
+**Handoff after session 93 (2026-07-12). Grammatik tab redesigned onto the shared Bibliothek skeleton
+(branch `claude/grammatik-section-redesign-v3gmv7`, PR #457).** Founder asked for a "complete
+re-imagination" of Grammatik: follow the other three tabs' high-level concept (filters → content → Üben)
+but with design freedom, and make it highly useful and intuitive for adult learners and job holders.
+- **Hub = the s92 skeleton, exactly:** LibrarySwitcher page header, toolbar row `[Filter icon (mobile) ·
+  ViewSwitcher · Suche icon]`, transient full-width fuzzy `SearchField` (over titleDe/title/purposeDe/
+  pattern/group label), `FilterRail` on both breakpoints from ONE `filterRailProps` (desktop sticky rail,
+  mobile AnimatePresence slide panel), sticky mobile bottom bar with Üben + "n Themen". **Gruppe** is the
+  primary dropdown (control-choice rule: it's the "where am I" cut) and **Stufe (CEFR)** the facet, added
+  as `grammarFacets()`/`GRAMMAR_FACET_IDS` in `lib/facets.ts` (100% coverage, cefr required since s84).
+  Params `?group=`/`?cefr=`/`?view=`/`?topic=` are URL-persisted; `/grammar?topic=` deep links (search)
+  still resolve.
+- **Views (new `grammar/GrammarViews.tsx`):** Karten (default) = redesigned topic cards (emerald group
+  icon tile, **priority-rank chip**, CEFR badge, purpose, truncated mono pattern strip, "n Übungen" +
+  "Lernen →" affordance); Liste = numbered compact rows. No Tabelle (a lesson is not a row of atomic
+  facts). Shared metadata moved to `grammar/grammarMeta.ts`: `groupMeta`, the B2-marker `groupOrder`,
+  `orderedGrammar` (the flattened priority spine) and `topicRank`.
+- **Lesson page (new `grammar/GrammarTopicView.tsx`):** hero (group tile, English eyebrow, titleDe,
+  purpose, badges) → explanation card with an emerald **Muster** formula panel → Beispiele (speakable) →
+  Typische Fehler (warning list) → **numbered Übungen with a live progress bar** (first-answer results,
+  local state remounted per topic) → a **completion panel** ("Thema abgeschlossen · k von n richtig" +
+  one-tap "Weiter: <next topic>") → prev/next cards along the spine + the kept "Wissen im Quiz testen"
+  `/quiz` CTA. "Thema n von 10" in the top row; lesson scrolls to top on open. Rationale for the rank/
+  spine emphasis: the audience is time-poor working adults, so the section answers "where do I start,
+  what's next" without them deciding (top of the list = biggest B2 lever).
+- **Verified in a real browser** (Playwright + the preinstalled Chromium against `pnpm dev`): hub Karten/
+  Liste on desktop + mobile, filter rail counts, lesson desktop + mobile, and the full drill loop (5/5
+  answered → XP in header → completion panel → "Weiter: Konjunktiv II" navigates). Gates green:
+  typecheck, ESLint 0 errors, `test:unit` 116/116, build + prerender, `check:bundle` **73.0 kB**/400.
+- **Founder follow-up round (same session, PR #458, from a live phone screenshot):** three lesson fixes.
+  (1) No navigation → the **LibrarySwitcher tabs now render on top of the lesson** too (tapping
+  Grammatik doubles as back-to-overview). (2) No Üben → **Üben added to the lesson** (inline gradient
+  button on desktop, sticky bottom action bar above the nav on mobile), replacing the "Wissen im Quiz
+  testen" `/quiz` CTA (`/quiz` stays reachable via practiceAreas). (3) Too much text → the English
+  all-caps eyebrow was dropped from the hero, and the **Muster panel now leads** the card with the
+  explanation **clamped to three lines** behind a "Mehr anzeigen"/"Weniger anzeigen" expander.
+  Re-verified on the 390px viewport (tabs navigate out, Üben bar sticks while scrolling, expander
+  toggles); all gates green again.
+- **Founder follow-up round 2 (same session, PR #459):** the lesson hero still described the topic twice
+  (German `purposeDe` in the hero + the English explanation in the card below) and carried a meta badge
+  row (CEFR + group + "n Übungen"). Both removed: the hero is now **group tile + German title only**;
+  the topic is described ONCE (the clamped explanation card) and the drill count already shows in the
+  Übungen progress. CEFR/purpose remain on the hub topic cards, where they inform the choice.
+- **Founder follow-up round 3 (same session, PR #460):** the Muster read as one mush (multiple pattern
+  variants wrapping into each other) and the explanation as one paragraph chunk. Both are now split at
+  RENDER time, no content-bank change: `pattern` splits on the authored `" · "` separator into **one
+  variant per row** (emerald dot markers when >1; verified against all 10 patterns, e.g. Relativsätze
+  becomes a 4-row Nom/Akk/Dat/Gen list), and `explanation` splits into **sentence bullets** with the
+  first point shown and the rest behind the "Mehr anzeigen" expander (regex fallback keeps unsplittable
+  text as one line). If future explanations use dotted abbreviations, revisit the sentence split.
+- **Founder follow-up round 4 (same session, PR #461): German-first lesson + hold-to-peek EN.** The
+  lesson text is now German by default with English as a press-and-hold peek, across the section:
+  (1) new bank fields **`explanationDe` + `pitfallsDe`** on all 10 topics (AI-drafted German, EN
+  originals kept parallel in order/length; **founder verify pending**, flagged in the type comments);
+  (2) new **`grammar/EnPeek.tsx`** chip (pointer-capture hold, Space/Enter hold on keyboard, never a
+  sticky toggle) placed top-right of the explanation paragraph (NOT the tile), on the pitfalls header,
+  per example card (beside the SpeakButton, gloss hidden until held), and on each drill via a new
+  `glossPeek` prop on GrammarDrillCard (**lesson only; the composed session keeps always-visible
+  glosses**); (3) the "Mehr anzeigen"/"Weniger anzeigen" expander moved to the **bottom-right corner of
+  the tile**. Peek verified in-browser (hold shows EN, release reverts to German); `lint:content` clean
+  (no em dashes in the new German); all gates green. Drill `explain` feedback stays English (open
+  question for the founder: author `explainDe` for 47 drills?).
+- **NOT done / follow-up candidates:** per-topic drill progress is session-local only (persisting
+  "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
+  (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.
