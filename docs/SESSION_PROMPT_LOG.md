@@ -3678,3 +3678,14 @@ Branch: `claude/whats-next-esga9u`.
   drill count already shows in the Übungen progress bar. CEFR and purpose stay on the hub topic cards
   where they inform the choice. Re-verified at 390px; gates green. Shipped as PR #459.
 - **Artifacts:** `src/features/grammar/GrammarTopicView.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md` (PR #459).
+
+## Entry 344 — 2026-07-12 (session 93)
+- **Attachments:** screenshot (mobile Grammatik lesson, Konnektoren, Muster panel + explanation)
+- **Prompt (verbatim):**
+  > @screenshot in muster it's not very clear whether there are two or more different connectors's pattern given. Make the format clear for user to understand. Another complaint is that the text below is like a big chunk of paragraph. It needs improvement for readability and digestion of info clearly.
+- **Response summary:** Both fixed at render time (no content-bank change). The Muster panel now splits the
+  authored " · " separator into one pattern variant per row with emerald dot markers (verified across all
+  10 topics; Relativsätze becomes a 4-row Nom/Akk/Dat/Gen list). The explanation paragraph now renders as
+  sentence bullets: the first point up front, the rest behind the existing "Mehr anzeigen" expander.
+  Re-verified at 390px on Konnektoren and Relativsätze; gates green. Shipped as PR #460.
+- **Artifacts:** `src/features/grammar/GrammarTopicView.tsx`, `CLAUDE.md`, `docs/PROJECT_STATUS.md` (PR #460).

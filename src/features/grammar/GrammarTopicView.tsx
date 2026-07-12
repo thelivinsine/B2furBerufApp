@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import type { GrammarTopic } from "@/types";
 import { iconByName } from "@/lib/icons";
-import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
@@ -64,10 +63,20 @@ function Lesson({
   // progress. Never persisted: the lesson is a reading/practice surface, the
   // durable loop is the composed session.
   const [results, setResults] = useState<Record<string, boolean>>({});
-  // The explanation paragraph starts clamped (founder s93 follow-up: the
-  // lesson had too much text up front); the Muster formula leads instead.
+  // The explanation starts collapsed (founder s93 follow-up: the lesson had
+  // too much text up front); the Muster formula leads instead.
   const [explainOpen, setExplainOpen] = useState(false);
   const answered = Object.keys(results).length;
+
+  // Render-time structure (founder s93 follow-up: the Muster read as one mush
+  // and the explanation as one chunk). The bank authors `pattern` as variants
+  // separated by " · " and `explanation` as compact prose; split both into
+  // scannable lines. Sentence split is safe for the bank's authored style (no
+  // dotted abbreviations); anything unsplittable falls back to one line.
+  const patternVariants = topic.pattern.split(" · ");
+  const explainPoints = topic.explanation.match(/[^.!?]+[.!?]+/g)?.map((s) => s.trim()) ?? [
+    topic.explanation,
+  ];
   const correct = Object.values(results).filter(Boolean).length;
   const total = topic.drills.length;
   const done = total > 0 && answered === total;
@@ -112,35 +121,58 @@ function Lesson({
         <h1 className="min-w-0 text-2xl font-bold tracking-tight sm:text-3xl">{topic.titleDe}</h1>
       </div>
 
-      {/* Muster first (the fastest-scan artifact), then the explanation
-          clamped to three lines behind a quiet expander. */}
+      {/* Muster first (the fastest-scan artifact), one variant per row, then
+          the explanation as sentence bullets: the first point up front, the
+          rest behind a quiet expander. */}
       <Card>
         <CardContent className="space-y-3 p-5">
           <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
               Muster
             </p>
-            <p className="mt-1 font-mono text-sm leading-relaxed">{topic.pattern}</p>
+            <div className="mt-1.5 space-y-1.5">
+              {patternVariants.map((v, i) => (
+                <p key={i} className="flex items-start gap-2 font-mono text-sm leading-relaxed">
+                  {patternVariants.length > 1 && (
+                    <span
+                      aria-hidden
+                      className="mt-2 h-1 w-1 shrink-0 rounded-full bg-emerald-500/70"
+                    />
+                  )}
+                  <span className="min-w-0">{v}</span>
+                </p>
+              ))}
+            </div>
           </div>
           <div>
-            <p className={cn("text-sm leading-relaxed", !explainOpen && "line-clamp-3")}>
-              {topic.explanation}
-            </p>
-            <button
-              onClick={() => setExplainOpen((o) => !o)}
-              aria-expanded={explainOpen}
-              className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-primary"
-            >
-              {explainOpen ? (
-                <>
-                  Weniger anzeigen <ChevronUp className="h-3.5 w-3.5" />
-                </>
-              ) : (
-                <>
-                  Mehr anzeigen <ChevronDown className="h-3.5 w-3.5" />
-                </>
-              )}
-            </button>
+            <ul className="space-y-2">
+              {(explainOpen ? explainPoints : explainPoints.slice(0, 1)).map((s, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed">
+                  <span
+                    aria-hidden
+                    className="mt-2 h-1 w-1 shrink-0 rounded-full bg-muted-foreground/50"
+                  />
+                  <span className="min-w-0">{s}</span>
+                </li>
+              ))}
+            </ul>
+            {explainPoints.length > 1 && (
+              <button
+                onClick={() => setExplainOpen((o) => !o)}
+                aria-expanded={explainOpen}
+                className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-primary"
+              >
+                {explainOpen ? (
+                  <>
+                    Weniger anzeigen <ChevronUp className="h-3.5 w-3.5" />
+                  </>
+                ) : (
+                  <>
+                    Mehr anzeigen <ChevronDown className="h-3.5 w-3.5" />
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </CardContent>
       </Card>
