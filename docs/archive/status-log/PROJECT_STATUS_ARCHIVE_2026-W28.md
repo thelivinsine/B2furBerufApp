@@ -1174,3 +1174,59 @@ mobile, zero console errors), and shipped:
 - **NOT done / follow-up candidates:** graph for Kollokationen (decide after founder feedback); graph
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.
+
+**Handoff after session 92 (2026-07-12). Bibliothek browse pages — 14 founder UI-refinement rounds
+(branch `claude/uben-visibility-scrollbar-251zch`, PRs #442–#455, all squash-merged; branch realigned after
+each).** A long chain of screenshot-driven mobile/desktop polish on the three browse pages
+(Wörter/Kollokationen/Redemittel). **Final state (what's live):**
+- **Search lives OUTSIDE the filter panel.** A search icon sits on the toolbar (right of the Wörter
+  bookmark, same icon-only design); tapping it reveals a transient full-width `SearchField` (autofocus).
+  Opening/closing never touches filter state; closing clears the query. Backed by **`src/lib/fuzzy.ts`**
+  (`foldText` + `fuzzyMatch`): umlaut/case-insensitive, punctuation-ignoring, token-order-independent, and
+  **Damerau edit-distance-1** tolerant for tokens ≥4 chars (adjacent transposition included). Pinned by
+  **`tests/fuzzy.test.ts`**. Wörter search also **surfaces connections**: a matched word's `related` terms
+  that resolve to other in-scope entries are appended (feeds the graph edges too). Redemittel/Kollokationen
+  get the forgiving match only (no connection data there).
+- **LibrarySwitcher = the page header** (HubHero dropped from all four Bibliothek tabs). A lifted
+  `shadow-soft` recessed-grey bar; the **active tab is bold + brand** (reads as the section title), the
+  others quiet; a framer **`layoutId="library-tab-pill"`** white pill slides between tabs (reduced-motion
+  safe). `text-sm` on ALL breakpoints (an earlier `sm:text-base` bump read as oversized on desktop and was
+  removed); tight mobile padding keeps four labels incl. "Kollokationen" on one phone row (no scroll).
+  **ViewSwitcher** got the same sliding white-pill treatment (`layoutId="view-tab-pill"`, `h-10` to match
+  the icon buttons).
+- **Toolbar row (mobile), full width `justify-between`:** `[Filter icon] · [ViewSwitcher] · [bookmark
+  (Wörter) + search]`. Icon buttons are `rounded-lg` 40px. Desktop hides the Filter icon (it uses the
+  persistent rail) and the row is view-left / actions-right.
+- **Filter tile:** `FilterRail` now has a body-only **`layout="panel"`** mode (Thema + Unterthema + facets
+  only) used on mobile, mounted/unmounted with an **AnimatePresence height/opacity slide**; the desktop rail
+  ("rail" layout) is unchanged (sticky right column, header + chevron, footer Üben, count). The tile is one
+  solid **`bg-border`** grey. **Reset + close are icons** in the top-right (RotateCcw reset — disabled when
+  nothing to clear — + X close on the mobile panel; reset only, top-right of the body, on desktop). The
+  word **"Zurücksetzen" button was removed**. **Section pins are shown on both breakpoints** (the
+  panel-mode gating that briefly hid them on mobile was removed).
+- **Sub-themes are a filter dropdown, not a page.** The full-page `SubThemePicker` interstitial is gone;
+  `FilterRail` gained an optional **`secondary`** scope dropdown ("Unterthema", per-sub-theme counts +
+  "Gesamtes Thema"), rendered right under Thema when the active theme has sub-themes (Wörter + Kollokationen).
+  The list shows the whole theme by default; a small breadcrumb shows the active sub-theme. `SubThemePicker`
+  is now **unused** (kept in the repo; safe to delete in a follow-up once the founder confirms).
+- **Üben + word count = a sticky bottom action bar on mobile** (full-bleed `-mx-4 sm:-mx-6`,
+  `sticky bottom-[calc(3.9375rem+env(safe-area-inset-bottom))] z-30`, `bg-background/90` + `backdrop-blur`,
+  border-top), placed after the content so it stays pinned above the nav while the list scrolls above it.
+  Count is stacked (number over noun) at the bar's right, hidden in the Wörter graph view. **Desktop keeps
+  Üben/count in the rail.**
+- **Gates green throughout:** typecheck, ESLint (only the pre-existing react-hooks warning), `pnpm build`,
+  `check:bundle` **73.1 kB**/400, `test:unit` **116/116** (fuzzy tests added). No Playwright this session
+  (no browser driver in the sandbox; sized against known-fitting baselines and the founder verifies live).
+- **Per-round PRs:** #442 (mobile tile: no scrollbar, Üben visible) · #443 (bg-border contrast, icon-only
+  Filter/Bookmark on the view line) · #444 (Filter toggle into the footer, left of Üben) · #445 (drop
+  HubHero headers, count stacked right of Üben, toggle repositions by state) · #446 (search out of panel +
+  fuzzy + connections) · #447 (polish page toggle → sliding pill) · #448 (ViewSwitcher slide + mobile
+  restructure: Filter on toolbar, standalone Üben, sliding panel) · #449 (bigger toggle + toolbar cohesion)
+  · #450 (`text-sm`/`text-base` toggle, count beside Üben, `w-fit` width-match) · #451 (full-width toolbar +
+  Üben rows) · #452 (drop oversized desktop toggle font) · #453 (sub-theme dropdown replaces picker page) ·
+  #454 (header-like toggle + icon reset/close) · #455 (restore mobile pins + sticky bottom Üben bar).
+- **NOT done / follow-up candidates:** delete the now-unused `SubThemePicker` once confirmed; the mobile
+  sticky Üben bar is `sticky` (glued to the bottom while the list is long enough to scroll; a very short
+  filtered list sits under its results instead of the viewport bottom — switch to `fixed` if "always glued"
+  is wanted); mobile pins persist a preference but don't visually collapse sections the way desktop does
+  (no mobile collapse state); `BrowseToolbar`/`FacetSheet` remain in the repo but unused on these pages.

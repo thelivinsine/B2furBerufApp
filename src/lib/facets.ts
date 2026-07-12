@@ -101,17 +101,23 @@ const POS_OPTIONS: FacetOption[] = [
 ];
 
 // Branche is a CONTEXT axis (the industry a learner works in), orthogonal to
-// Thema (what the words are about). It is PARKED (founder decision 2026-07-09):
-// the `sector` field and the Pflege tags stay in the data, but the facet stays
-// below the coverage floor until an industry has real depth, so it never
-// renders today. "Büro" was removed as a value: every industry has an office,
-// so it is a category error, not a sector.
+// Thema (what the words are about). ACTIVE since the Bibliothek scale-up
+// (founder decision 2026-07-12, supersedes the 2026-07-09 park): every sector
+// carries a starter pack, so the facet clears the coverage floor and renders
+// on its own. "Büro" stays removed: every industry has an office, so it is a
+// category error, not a sector. 11 values, within the ≤12-option rule.
 const SECTOR_OPTIONS: FacetOption[] = [
-  { value: "care", label: "Pflege" },
+  { value: "care", label: "Medizin & Pflege" },
   { value: "trades", label: "Handwerk" },
-  { value: "it", label: "IT" },
+  { value: "it", label: "IT & Software" },
   { value: "retail", label: "Handel" },
-  { value: "hospitality", label: "Gastgewerbe" },
+  { value: "hospitality", label: "Gastronomie" },
+  { value: "engineering", label: "Ingenieurwesen" },
+  { value: "construction", label: "Bau & Architektur" },
+  { value: "production", label: "Produktion" },
+  { value: "transport", label: "Transport & Verkehr" },
+  { value: "beauty", label: "Beauty & Kosmetik" },
+  { value: "sports", label: "Sport & Fitness" },
 ];
 
 const REGISTER_OPTIONS: FacetOption[] = [
@@ -156,8 +162,8 @@ const VOCAB_FREQUENCY: FacetDef<Vocab> = facet(
 const ALL_VOCAB_FACETS = [VOCAB_CEFR, VOCAB_POS, VOCAB_FREQUENCY, VOCAB_SECTOR];
 
 /** Vocab facets that clear the coverage floor. Visibility follows coverage
- *  (never the Mode lens): today that is CEFR + Wortart; Branche stays parked
- *  below the floor until a sector pack gives it real depth. */
+ *  (never the Mode lens): since the sector scale-up (2026-07-12) that is
+ *  CEFR + Wortart + Häufigkeit + Branche. */
 export function vocabFacets(): FacetDef<Vocab>[] {
   return ALL_VOCAB_FACETS.filter((f) => passesFloor(f, vocabulary));
 }
@@ -179,6 +185,10 @@ const COLLOCATION_FACETS: FacetDef<Collocation>[] = [
       options: FREQUENCY_OPTIONS,
       get: (c) => c.frequency ?? frequencyBin(c.id),
     },
+    collocations,
+  ),
+  facet(
+    { id: "sector", label: "Branche", options: SECTOR_OPTIONS, get: (c) => c.sector },
     collocations,
   ),
 ];
