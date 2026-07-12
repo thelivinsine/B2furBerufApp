@@ -32,9 +32,12 @@
   .card { border-radius: 16px; padding: 16px; border: 1px solid; }
   .card.light { background: #fbfbf7; border-color: #e0dfd3; }
   .card.dark { background: #0d1117; border-color: #242d3a; }
-  .card .tag { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px; }
+  .card .tag { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
   .card.light .tag { color: #8b917f; }
-  .card.dark .tag { color: #667286; }
+  .card.dark .tag { color: #7d89a0; }
+  .card .cap { font-size: 12.5px; line-height: 1.5; margin-bottom: 10px; }
+  .card.light .cap { color: #68705f; }
+  .card.dark .cap { color: #97a1b4; }
   /* the app's surface mat (unchanged) */
   .mat { border-radius: 14px; padding: 8px; }
   .card.light .mat { background: #ffffff; border: 1px solid #e5e5da; box-shadow: 0 1px 3px rgba(35,40,32,0.07); }
@@ -46,7 +49,7 @@
     border-radius: 999px; padding: 4px 11px; font-size: 11px; font-weight: 700;
   }
   .card.light .chip { background: #fff; border: 1px solid #e2e1d5; color: #232820; box-shadow: 0 2px 5px rgba(35,40,32,0.14); }
-  .card.dark .chip { background: #1a2230; border: 1px solid #2e3848; color: #e8ecf4; box-shadow: 0 2px 5px rgba(0,0,0,0.45); }
+  .card.dark .chip { background: #232a3c; border: 1px solid #3a4358; color: #eef0f8; box-shadow: 0 2px 5px rgba(0,0,0,0.45); }
   .stop { cursor: pointer; transition: transform 0.16s ease-out; transform-box: fill-box; transform-origin: center; }
   .stop:hover { transform: scale(1.07); }
   .stop:focus-visible { outline: none; }
@@ -63,29 +66,26 @@
 <body>
 <div class="wrap">
   <div class="eyebrow">Üben UI-Refinements · Punkt 3</div>
-  <h1>Lernpfad-Karte: Abstände + Farbstimmungen</h1>
+  <h1>Brand-Ton: Dunkel-Varianten</h1>
   <p class="sub">
-    Die Live-Karte, unverändert in der Formensprache, aber mit <b>neu gesetztem Raster</b>: alle vier
-    Stations-Kacheln sind von den Rändern weggerückt (Bahnhof war 13 px, das Amt unten 10 px vom Rand;
-    jetzt hat jede Kachel Luft). Darunter vier Farbstimmungen für die Flächen (Boden, Parks, Blöcke,
-    Straßen), jeweils Hell und Dunkel. Zustand: Bahnhof und Laden erledigt, Zuhause aktuell.
-    Mit der Maus über eine Kachel fahren zeigt die geplanten tippbaren Stationen.
+    Stimmung 3 (Brand-Ton) ist gesetzt. Oben die Referenz: das fixe Hell plus der bisherige
+    Dunkel-Entwurf, der zu dunkel und kontrastarm war. Darunter <b>vier hellere Dunkel-Varianten</b>
+    mit unterschiedlichen Kontrast-Strategien. Alle nutzen dasselbe neue Raster mit Luft um die
+    Kacheln; mit der Maus über eine Kachel fahren zeigt die tippbaren Stationen.
   </p>
   <div id="root"></div>
   <div class="note">
-    <b>Umsetzungsnotizen:</b> Nur Koordinaten und Palette ändern sich in UebenPath.tsx (STOPS, SEG_PATHS,
-    Straßenraster, MAP_LIGHT/MAP_DARK); Kacheln, Glyphen, Route, Pin und Chip bleiben der Live-Code.
-    ViewBox bleibt 360x240 in der bestehenden Matte, die Stationsfarben (Indigo, Rot, Orange, Petrol)
-    bleiben die Identität der Stops. Die Stimmungen lassen sich pro Theme mischen, z. B. Hell aus
-    Stimmung 2 mit Dunkel aus Stimmung 3.
+    <b>Umsetzungsnotizen:</b> Es ändert sich jeweils nur MAP_DARK in UebenPath.tsx (acht Flächen-Töne,
+    Label- und Routenfarbe); Geometrie, Kacheln und Pin sind bei allen Varianten identisch. Die
+    Stationsfarben bleiben unverändert, damit die vier Stops in Hell und Dunkel dieselbe Identität
+    haben. Sag einfach, welche Variante es wird (oder was du mischen willst), dann setze ich sie
+    zusammen mit dem Hell aus Stimmung 3 um.
   </div>
 </div>
 
 <script>
 "use strict";
-// ── Geometry: the live map, re-spaced ────────────────────────────────────
-// Streets moved to y=88/170 and x=76/176/276 so every tile sits inside a
-// block with clear margin to the map edge.
+// ── Geometry: the live map, re-spaced (unchanged from the last round) ────
 const STOPS = [
   { key: "bahnhof", label: "Bahnhof", stop: [44, 88],   tile: [44, 48],   color: "#5b5be6", labelPos: "below" },
   { key: "laden",   label: "Laden",   stop: [120, 88],  tile: [120, 48],  color: "#f0705f", labelPos: "below" },
@@ -96,47 +96,43 @@ const SEG_PATHS = ["M44 88 H120", "M120 88 H276 V128", "M276 128 V170 H216"];
 const H_STREETS = [88, 170], V_STREETS = [76, 176, 276];
 const CURRENT = 2; // zuhause
 
-// ── Color moods (shapes only; tiles/route/pin identical to live) ─────────
-const MOODS = [
+// ── Fixed light palette (Stimmung 3) + the rejected dark, as reference ──
+const S3_LIGHT = { ground: "#eef0f7", park: "#d6e6cf", parkDeep: "#bfd9b4", lotA: "#e5e4f1", lotB: "#dbd9ea",
+  casing: "#dee0ee", street: "#ffffff", dash: "#d3d5e7", label: "#5a5e78", dotFill: "#ffffff",
+  pinRing: "#ffffff", primary: "#5b5be6" };
+const S3_DARK_OLD = { ground: "#1d2030", park: "#243429", parkDeep: "#2e4636", lotA: "#2a2e46", lotB: "#24273b",
+  casing: "#14161f", street: "#3c4158", dash: "#585f7e", label: "#a6abc4", dotFill: "#e9ebf6",
+  pinRing: "#e9ebf6", primary: "#8a8af6" };
+
+// ── Four brighter dark treatments ────────────────────────────────────────
+const DARKS = [
   {
-    id: "live", title: "Stimmung 1: Live-Farben, neue Abstände",
-    desc: "Die heutige Palette, nur mit dem neuen Raster. Der direkte Vergleichspunkt: was allein die Luft um die Kacheln ausmacht.",
-    light: { ground: "#eef1e9", park: "#dcead0", parkDeep: "#c8dfb8", lotA: "#e7e2d6", lotB: "#ded8ca",
-             casing: "#dfe3d8", street: "#ffffff", dash: "#d9ddd2", label: "#5d6358", dotFill: "#ffffff",
-             pinRing: "#ffffff", primary: "#5b5be6" },
-    dark:  { ground: "#1c222d", park: "#243428", parkDeep: "#2d4234", lotA: "#2b3242", lotB: "#252c3a",
-             casing: "#151a23", street: "#3a4351", dash: "#556074", label: "#a3adbd", dotFill: "#e8ecf4",
-             pinRing: "#e8ecf4", primary: "#7b7bf0" },
+    id: "a", title: "Dunkel A: Angehoben",
+    cap: "Dieselbe Palette, zwei Stufen heller: Boden, Blöcke und Straßen rücken auseinander, Striche und Labels leuchten mehr. Der konservative Fix.",
+    P: { ground: "#272c42", park: "#31493a", parkDeep: "#40604b", lotA: "#3a3f61", lotB: "#323753",
+         casing: "#1d2133", street: "#4e5578", dash: "#7d85ab", label: "#ccd1e8", dotFill: "#f1f3fb",
+         pinRing: "#f1f3fb", primary: "#9b9bfa" },
   },
   {
-    id: "gruen", title: "Stimmung 2: Frisches Grün",
-    desc: "Die Wiese wird spürbar grüner, die Parks satter, die Blöcke wärmer (Sandton). Freundlich und lebendig, die Karte liest sich mehr als Landschaft, weniger als Stadtplan.",
-    light: { ground: "#e9f2df", park: "#cde7b4", parkDeep: "#b2da94", lotA: "#f0e8d4", lotB: "#e6dbc0",
-             casing: "#d7e2ca", street: "#ffffff", dash: "#cbdabc", label: "#54614b", dotFill: "#ffffff",
-             pinRing: "#ffffff", primary: "#5b5be6" },
-    dark:  { ground: "#1a2420", park: "#223a28", parkDeep: "#2d4d34", lotA: "#2c3229", lotB: "#262b22",
-             casing: "#121915", street: "#39443a", dash: "#576b58", label: "#a2b0a0", dotFill: "#e9f0e6",
-             pinRing: "#e9f0e6", primary: "#8484f4" },
+    id: "b", title: "Dunkel B: Helle Straßen",
+    cap: "Der Boden bleibt ruhig, aber die Straßen werden helle Bänder: die Stadtstruktur springt sofort ins Auge, die Route liegt auf hellem Grund wie im Hell-Modus.",
+    P: { ground: "#232739", park: "#2d4536", parkDeep: "#3c5c47", lotA: "#343a58", lotB: "#2c314a",
+         casing: "#1a1d2c", street: "#666e93", dash: "#9aa2c6", label: "#ced3ea", dotFill: "#f2f4fc",
+         pinRing: "#f2f4fc", primary: "#a2a2fc" },
   },
   {
-    id: "brand", title: "Stimmung 3: Brand-Ton",
-    desc: "Die Flächen bekommen einen leichten Indigo-Unterton (Boden kühl, Blöcke lavendel-grau), die Parks bleiben der grüne Kontrast. Am nächsten an der App-Marke; die indigo Route wirkt hier am ruhigsten eingebettet.",
-    light: { ground: "#eef0f7", park: "#d6e6cf", parkDeep: "#bfd9b4", lotA: "#e5e4f1", lotB: "#dbd9ea",
-             casing: "#dee0ee", street: "#ffffff", dash: "#d3d5e7", label: "#5a5e78", dotFill: "#ffffff",
-             pinRing: "#ffffff", primary: "#5b5be6" },
-    dark:  { ground: "#1d2030", park: "#243429", parkDeep: "#2e4636", lotA: "#2a2e46", lotB: "#24273b",
-             casing: "#14161f", street: "#3c4158", dash: "#585f7e", label: "#a6abc4", dotFill: "#e9ebf6",
-             pinRing: "#e9ebf6", primary: "#8a8af6" },
+    id: "c", title: "Dunkel C: Lavendel-Blöcke",
+    cap: "Der Kontrast sitzt auf den Blöcken: deutlich aufgehellte Lavendel-Flächen auf gedecktem Boden, Straßen mittig. Am nächsten am Hell-Modus, wo die Blöcke auch die hellsten Flächen sind.",
+    P: { ground: "#242840", park: "#33503e", parkDeep: "#446852", lotA: "#454b74", lotB: "#3a3f63",
+         casing: "#1b1e30", street: "#4a5172", dash: "#8189af", label: "#d0d4ec", dotFill: "#f1f3fb",
+         pinRing: "#f1f3fb", primary: "#9e9efb" },
   },
   {
-    id: "warm", title: "Stimmung 4: Warm & Hell",
-    desc: "Cremiger Boden, Peach-Sand-Blöcke, frische Parks: die Spielzeugstadt-Richtung. Die vier Stationsfarben leuchten auf dem warmen Grund am stärksten. Dunkel wird zum warmen Abend statt zur kühlen Nacht.",
-    light: { ground: "#f7f1e3", park: "#d6e8bf", parkDeep: "#c0dba2", lotA: "#f3e2cb", lotB: "#ebd6b8",
-             casing: "#eadfc9", street: "#fffdf7", dash: "#dfd3ba", label: "#6d6250", dotFill: "#ffffff",
-             pinRing: "#ffffff", primary: "#5b5be6" },
-    dark:  { ground: "#252019", park: "#28381f", parkDeep: "#33472a", lotA: "#342b1e", lotB: "#2c2418",
-             casing: "#191510", street: "#463d2f", dash: "#615641", label: "#b3a790", dotFill: "#f2ecdf",
-             pinRing: "#f2ecdf", primary: "#8a8af6" },
+    id: "d", title: "Dunkel D: Klarer Abend",
+    cap: "Die hellste Variante: blaugrauer Boden statt Nachtblau, kräftige Parks, fast weiße Labels. Maximale Lesbarkeit, wirkt eher wie Abenddämmerung als tiefe Nacht.",
+    P: { ground: "#2e3450", park: "#3a5545", parkDeep: "#4b7058", lotA: "#42486e", lotB: "#393f60",
+         casing: "#232841", street: "#5a6187", dash: "#8f97bd", label: "#dde1f2", dotFill: "#f4f5fc",
+         pinRing: "#f4f5fc", primary: "#a6a6fd" },
   },
 ];
 
@@ -161,8 +157,6 @@ const GLYPHS = {
     <rect x="-9" y="8" width="18" height="2.5" rx="1.2" fill="#fff"/>`,
 };
 
-// Ambient blocks re-laid for the new street grid (parks + lots, all inside
-// blocks, clear of tiles and labels).
 function scenery(P) {
   return `
     <rect x="92" y="12" width="64" height="18" rx="9" fill="${P.park}"/>
@@ -237,22 +231,34 @@ function drawMap(P, uid) {
 
 // ── Page assembly ────────────────────────────────────────────────────────
 const root = document.getElementById("root");
-let html = "", uidN = 0;
 const chipLeft = (STOPS[CURRENT].stop[0] / 360) * 100;
 const chipTop = ((STOPS[CURRENT].stop[1] + 5 - 30) / 240) * 100;
-for (const m of MOODS) {
-  html += `<section><h2>${m.title}</h2><p class="desc">${m.desc}</p><div class="pair">`;
-  for (const [themeName, P] of [["Hell", m.light], ["Dunkel", m.dark]]) {
-    const uid = "u" + uidN++;
-    html += `<div class="card ${themeName === "Hell" ? "light" : "dark"}">
-      <div class="tag">${themeName}</div>
-      <div class="mat"><div class="stage">${drawMap(P, uid)}
-        <span class="chip" style="left:${chipLeft}%;top:${chipTop}%">Du bist hier</span>
-      </div></div>
-    </div>`;
-  }
-  html += `</div></section>`;
-}
+let uidN = 0;
+const mapCard = (theme, tag, cap, P) => {
+  const uid = "u" + uidN++;
+  return `<div class="card ${theme}">
+    <div class="tag">${tag}</div>
+    ${cap ? `<div class="cap">${cap}</div>` : `<div class="cap">&nbsp;</div>`}
+    <div class="mat"><div class="stage">${drawMap(P, uid)}
+      <span class="chip" style="left:${chipLeft}%;top:${chipTop}%">Du bist hier</span>
+    </div></div>
+  </div>`;
+};
+
+let html = `<section>
+  <h2>Referenz</h2>
+  <p class="desc">Links das gesetzte Hell (Stimmung 3). Rechts der bisherige Dunkel-Entwurf: zu dunkel, Blöcke und Boden kaum zu unterscheiden.</p>
+  <div class="pair">
+    ${mapCard("light", "Hell · gesetzt", "", S3_LIGHT)}
+    ${mapCard("dark", "Dunkel · bisher (zu dunkel)", "", S3_DARK_OLD)}
+  </div>
+</section>
+<section>
+  <h2>Dunkel-Varianten</h2>
+  <p class="desc">Vier Wege zu mehr Kontrast, von konservativ bis deutlich heller. Der Unterschied liegt darin, WO die Helligkeit sitzt: überall (A), auf den Straßen (B), auf den Blöcken (C) oder im ganzen Boden (D).</p>
+  <div class="pair">`;
+for (const d of DARKS) html += mapCard("dark", d.title, d.cap, d.P);
+html += `</div></section>`;
 root.innerHTML = html;
 </script>
 </body>
