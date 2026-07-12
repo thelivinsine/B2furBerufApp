@@ -310,3 +310,28 @@ office-only library cannot be. Full plan: `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN
   Redemittel (audit rationale unchanged).
 - **Floor watch:** collocations sit at 15.6% sector coverage, just above the 15% floor. Bulk-adding
   untagged collocations without tagged ones would silently hide the Branche facet again.
+
+## FilterRail visual redesign + count-beside-Üben (session 103, 2026-07-12) — founder-approved
+
+The s91/s92 rounds settled on a flat, solid-grey `bg-border` tile for the Bibliothek filter rail
+("every section shares the top row's shade" — see the CLAUDE.md Bibliothek section for the full
+s91/s92 history). In the s100 UI-refinements review the founder called that slab ugly against every
+other white content card on the page, and separately asked why the result count jumps to the top of
+the panel when it expands instead of staying beside the Üben button.
+
+- **The fix (`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` work items 4+5, shipped s103):** the tile
+  (both the desktop rail and the mobile panel) became a standard content card, `bg-surface` + a
+  visible `border-border` + `shadow-soft`, the same recipe every other card on the page already
+  uses. Unselected facet pills moved from stark `bg-white` to `bg-muted` so they read as part of the
+  card, not a separate layer. Scope section labels (Branche/Thema/Unterthema/Kategorie/Gruppe) picked
+  up the same uppercase eyebrow style as the facet labels, for one label voice down the tile.
+- **Count beside Üben, always:** the old layout hid the result count in an expanded-only first row
+  and only showed it beside the Üben button while collapsed (so it visibly jumped position on
+  expand/collapse). The expanded first row was deleted; the count now renders unconditionally in the
+  footer next to Üben in every state. The reset icon moved out of that deleted row into the header
+  (a `<div>` wrapping the expand/collapse toggle plus the reset icon beside it, mirroring the mobile
+  panel header's "label left, icons right" layout), so it too is now always reachable instead of only
+  while expanded.
+- **Not a re-litigation of s91/s92:** the collapsible-tile mechanism, the per-section pins, the
+  sticky Üben footer, and the panel/rail layout split are all unchanged. This is a visual reskin of
+  the tile plus a control-placement fix, not a structural rework.

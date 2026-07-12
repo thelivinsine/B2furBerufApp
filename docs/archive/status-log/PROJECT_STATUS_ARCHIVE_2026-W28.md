@@ -1477,3 +1477,37 @@ is the deliverable. Start the next session by picking a chunk from that plan.
 - **NOT done:** all six chunks (the whole plan); plus the carried-over items: the founder's human
   `verified` pass, extending the AI-jury pass to Waves 1-2, Wave-2 tranche 2 (after the 2026-07-13
   classmate feedback), the Playwright grammar smoke.
+
+**Handoff after session 101 (2026-07-12). Üben-refinements Work item 1 SHIPPED (Opus 4.8).** The
+founder said "go ahead with first point" against `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`. Two
+things: Üben is now specific to where the learner is, and the speaking block can be skipped.
+- **Üben relevance (engine + wiring):** new composer opt `grammarTopicId` (`engine/session.ts`) pins
+  Pool 3 to a studied grammar topic with 4 drills instead of the random topic's 2, and a new exported
+  pure helper **`libraryFocus({theme, sub, cefr[], sector[], category})`** translates a browse page's
+  narrowed state into the existing mission-style `focus` (lead with those exact items, drop the random
+  grammar/Redemittel), returning `undefined` when nothing narrows past the theme (bare-theme Üben is
+  unchanged). Caps `FOCUS_VOCAB_CAP=8` / `FOCUS_REDE_CAP=4`. `Session.tsx` parses `?grammar=`/`?cat=`/
+  `?sub=`/`?cefr=`/`?sector=` (priority mission > grammar > libraryFocus) and forwards `grammarTopicId`
+  through a new `SessionPlayer` prop; the remount key now includes every tailoring param. Callers:
+  Grammatik lesson → `?grammar=${topic.id}`, Redemittel → `?cat=` when a category is picked, Wörter +
+  Kollokationen `startSession` build the URL from live theme/sub/cefr/sector (pos/srs/frequency stay
+  browse-only). GrammarHub stays bare `/session` (browsing is not a location).
+- **Speaking give-up:** the speaking block gained an "Anzeigen" ghost button (prompt + typed stages,
+  `SessionPlayer.tsx`) that calls the existing `evaluate("")` → reveals the answer, grades FSRS 0
+  (never a pass), unlocks Weiter. Mirrors the typed block; no listening-stage button (Fertig already
+  routes back).
+- **Tests + gates:** 5 new `tests/engine.test.ts` cases (grammar-pin honored, unknown-id fallback,
+  `libraryFocus` undefined/sub/category). `pnpm typecheck` ✔, `test:unit` **121/121**, `lint` **0
+  errors** (42 pre-existing warnings), `build` + prerender ✔, `check:bundle` **73.0 kB**/400.
+- **Grammatik correctness pass (same session, follow-up prompt):** audited `src/data/grammar.ts` (24
+  topics / 117 drills). Mechanical completeness clean (explanationDe/purposeDe/pitfalls/pitfallsDe
+  present, `pitfalls`/`pitfallsDe` lengths matched for the EnPeek index-swap, every drill has
+  explain+gloss, no em dashes, all MCQ answers valid). Read every topic for German correctness; fixed
+  4 inaccuracies (a garbled relative-clause EN pitfall, a duplicated "dass" in the Nebensatz EN
+  explanation, an awkward Futur `purposeDe`, and a non-idiomatic "discuss about" example gloss).
+  `lint:content` ✔, build ✔.
+- **NOT done:** Üben-plan Work items 2 (graph count), 3 (map beautify + tappable stops), 4+5
+  (FilterRail desktop + count), 6 (Muster/explanation grid); the Branche-overhaul plan (s99); and the
+  standing content follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2, Playwright
+  grammar smoke). Browser E2E walk-through of the tailored sessions is left to the founder (sandbox
+  can't reach the live site).

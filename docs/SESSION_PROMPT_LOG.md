@@ -4080,4 +4080,31 @@ Branch: `claude/whats-next-esga9u`.
   the session: this log entry. The s102 handoff in `PROJECT_STATUS.md`, the `CLAUDE.md` content
   counts/Branche notes, and the plan status line were all already refreshed and shipped inside the
   merged PR #473 (Entry 361), so no further status/CLAUDE edits were needed.
+
+## Entry 363 — 2026-07-12 (session 103)
+
+- **Branch:** `claude/sonnet-5-ui-refinement-7w4z1v`
+- **Prompt (verbatim):**
+  > go ahead with sonnet 5 items in the ui refinement plan
+- **Response summary:** Implemented the three remaining Sonnet-5-tier chunks of
+  `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` (work item 1 was already shipped s101; item 3 stays for
+  Fable 5 / Opus 4.8). (2) `WordGraph.tsx` + `VocabularyTrainer.tsx`: moved the graph view's word
+  count off the canvas legend to sit beside Üben like every other view (rail + mobile sticky bar);
+  the canvas keeps only the connections count. (4+5) `FilterRail.tsx`: restyled the tile (desktop
+  rail and mobile panel) from the flat `bg-border` slab to a standard content card (`bg-surface` +
+  `border-border` + `shadow-soft`), muted unselected facet pills, eyebrow-style scope labels,
+  restructured the header into a toggle + a permanent reset icon, and made the result count sit
+  beside Üben in every state (open, collapsed, mobile) instead of only when collapsed. (6)
+  `GrammarTopicView.tsx`: grid-split the lesson's Muster panel and explanation side by side at
+  `lg:`, mobile unchanged. Ran the full gate sequence after installing deps (`pnpm lint` 0 errors,
+  `pnpm typecheck`, `pnpm test:unit` 129/129, `pnpm build` + prerender, `pnpm check:bundle` 73.0 kB)
+  and browser-verified all three changes with Playwright against the local dev server (light + dark,
+  desktop + mobile viewports, including the grammar lesson at 1280px and 390px). Updated the plan's
+  progress block, `CLAUDE.md`'s Bibliothek section, and `docs/PROJECT_STATUS.md` (archived the s101
+  handoff to the W28 weekly file, added the s103 handoff).
+- **Artifacts:** `src/features/vocabulary/WordGraph.tsx` · `src/features/vocabulary/
+  VocabularyTrainer.tsx` · `src/features/shared/FilterRail.tsx` ·
+  `src/features/grammar/GrammarTopicView.tsx` · `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` ·
+  `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` ·
+  `docs/SESSION_PROMPT_LOG.md`.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.

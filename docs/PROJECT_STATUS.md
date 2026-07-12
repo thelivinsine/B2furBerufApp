@@ -1,10 +1,9 @@
 # Project Status
 
-_Last updated: 2026-07-12 (session 102). **Branche filter overhaul IMPLEMENTED and shipped**
-(the founder presents the app 2026-07-13 and named the Branche filter a core demo feature): `sectors[]`
-multi-tag with untagged = universal, rail hierarchy Branche → Thema → Unterthema, 15 sectors (4 new,
-full packs + Lager boost), 562-item retag audit, Branche chips, tests + E2E. Follows the same-day s101
-ship of Üben-refinements item 1 (see its handoff below). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-12 (session 103). **Üben-refinements Work items 2, 4+5, 6 SHIPPED** (Sonnet 5):
+graph word count moved beside Üben, FilterRail restyled as a standard content card with the count
+always beside Üben, grammar lesson Muster/explanation side by side on desktop. Follows the same-day
+s102 Branche filter overhaul ship (see its handoff below). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -58,40 +57,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 101 (2026-07-12). Üben-refinements Work item 1 SHIPPED (Opus 4.8).** The
-founder said "go ahead with first point" against `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`. Two
-things: Üben is now specific to where the learner is, and the speaking block can be skipped.
-- **Üben relevance (engine + wiring):** new composer opt `grammarTopicId` (`engine/session.ts`) pins
-  Pool 3 to a studied grammar topic with 4 drills instead of the random topic's 2, and a new exported
-  pure helper **`libraryFocus({theme, sub, cefr[], sector[], category})`** translates a browse page's
-  narrowed state into the existing mission-style `focus` (lead with those exact items, drop the random
-  grammar/Redemittel), returning `undefined` when nothing narrows past the theme (bare-theme Üben is
-  unchanged). Caps `FOCUS_VOCAB_CAP=8` / `FOCUS_REDE_CAP=4`. `Session.tsx` parses `?grammar=`/`?cat=`/
-  `?sub=`/`?cefr=`/`?sector=` (priority mission > grammar > libraryFocus) and forwards `grammarTopicId`
-  through a new `SessionPlayer` prop; the remount key now includes every tailoring param. Callers:
-  Grammatik lesson → `?grammar=${topic.id}`, Redemittel → `?cat=` when a category is picked, Wörter +
-  Kollokationen `startSession` build the URL from live theme/sub/cefr/sector (pos/srs/frequency stay
-  browse-only). GrammarHub stays bare `/session` (browsing is not a location).
-- **Speaking give-up:** the speaking block gained an "Anzeigen" ghost button (prompt + typed stages,
-  `SessionPlayer.tsx`) that calls the existing `evaluate("")` → reveals the answer, grades FSRS 0
-  (never a pass), unlocks Weiter. Mirrors the typed block; no listening-stage button (Fertig already
-  routes back).
-- **Tests + gates:** 5 new `tests/engine.test.ts` cases (grammar-pin honored, unknown-id fallback,
-  `libraryFocus` undefined/sub/category). `pnpm typecheck` ✔, `test:unit` **121/121**, `lint` **0
-  errors** (42 pre-existing warnings), `build` + prerender ✔, `check:bundle` **73.0 kB**/400.
-- **Grammatik correctness pass (same session, follow-up prompt):** audited `src/data/grammar.ts` (24
-  topics / 117 drills). Mechanical completeness clean (explanationDe/purposeDe/pitfalls/pitfallsDe
-  present, `pitfalls`/`pitfallsDe` lengths matched for the EnPeek index-swap, every drill has
-  explain+gloss, no em dashes, all MCQ answers valid). Read every topic for German correctness; fixed
-  4 inaccuracies (a garbled relative-clause EN pitfall, a duplicated "dass" in the Nebensatz EN
-  explanation, an awkward Futur `purposeDe`, and a non-idiomatic "discuss about" example gloss).
-  `lint:content` ✔, build ✔.
-- **NOT done:** Üben-plan Work items 2 (graph count), 3 (map beautify + tappable stops), 4+5
-  (FilterRail desktop + count), 6 (Muster/explanation grid); the Branche-overhaul plan (s99); and the
-  standing content follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2, Playwright
-  grammar smoke). Browser E2E walk-through of the tailored sessions is left to the founder (sandbox
-  can't reach the live site).
-
 **Handoff after session 102 (2026-07-12). Branche filter overhaul IMPLEMENTED and shipped (plan
 `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`, approved s99), Fable 5.** Context: the founder presents
 the app to an audience 2026-07-13 and named the Branche filter a core demo feature, so the deferred
@@ -130,8 +95,40 @@ plan was executed same-day and merged to `main`.
   `sector-audit-report.md`; the human `verified` pass via `pnpm review:queue`; jury-pass extension to
   Waves 1-2; Wave-2 tranche 2 after the 2026-07-13 classmate feedback; Playwright grammar smoke.
 
-_(Sessions 85-100's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
-shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
-`docs/PROJECT_FOUNDATION.md` in s95.)_
+**Handoff after session 103 (2026-07-12). Üben-refinements Work items 2, 4+5, 6 SHIPPED (Sonnet 5).**
+The founder said "go ahead with sonnet 5 items in the ui refinement plan" against
+`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`; work item 1 was already shipped (s101, Opus 4.8), item 3
+(map beautification) stays for Fable 5 / Opus 4.8.
+- **Item 2 (graph word count):** `WordGraph.tsx` canvas legend now shows only "m Verbindungen"; the
+  word count moved to the shared `count` prop, so it sits beside Üben in the rail (desktop) and the
+  sticky mobile action bar in `VocabularyTrainer.tsx`, exactly like every other Wörter view. Dropped
+  the `view !== "graph"` guards that used to hide it there.
+- **Items 4+5 (FilterRail desktop redesign + count always beside Üben), `FilterRail.tsx`:** restyled
+  both the desktop rail and the mobile panel as a standard content card (`bg-surface` + visible
+  `border-border` + `shadow-soft`, replacing the flat `bg-border` slab the founder called ugly);
+  dividers moved from `border-muted-foreground/10` to `border-border`; unselected facet pills went
+  from hard `bg-white` to `bg-muted` (with a `hover:bg-muted/70` + `hover:border-primary/40`); scope
+  section labels (Branche/Thema/Unterthema/Kategorie/Gruppe) now use the same uppercase eyebrow style
+  as the facet labels. The header changed from a single full-width button into a flex row: the
+  expand/collapse toggle (flex-1) plus a permanent reset icon beside it (previously the reset only
+  showed in an expanded-only first row, which is now deleted). The result count sits beside the Üben
+  button in **every** state (open, collapsed, mobile), not just collapsed.
+- **Item 6 (grammar lesson Muster/explanation side by side), `GrammarTopicView.tsx`:** the lesson
+  Card's `CardContent` gains `lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-stretch
+  lg:gap-5 lg:space-y-0` at ≥1024px, splitting the emerald Muster panel (left, `lg:h-full`) from the
+  explanation + "Mehr anzeigen" expander (right, wrapped in one `space-y-3 lg:min-w-0` div). Mobile
+  keeps the s93-locked stacked order (Muster first) untouched.
+- **Gates + verification:** `pnpm typecheck` ✔, `lint` **0 errors** (42 pre-existing warnings),
+  `test:unit` **129/129**, `build` + prerender ✔, `check:bundle` **73.0 kB**/400 (unchanged, all
+  touched files ride lazy chunks). Browser-verified with Playwright against the local dev server in
+  both themes: Wörter graph (word count beside Üben, only "n Verbindungen" under the canvas), Wörter
+  Tabelle FilterRail open/collapsed (card look, header reset icon, count beside Üben in both states,
+  dark mode), and the Konnektoren grammar lesson at 1280px (Muster left / explanation right) and
+  390px (stacked, unchanged).
+- **NOT done:** Üben-plan Work item 3 (map beautification + tappable stops, reserved for Fable 5 /
+  Opus 4.8); the standing content follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2,
+  Playwright grammar smoke); founder review of `sector-audit-report.md`.
+
+_(Sessions 85-101's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_

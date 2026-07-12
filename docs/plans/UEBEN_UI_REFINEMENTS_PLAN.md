@@ -10,7 +10,16 @@ quoted code, not the number.
   `?sub=`/`?cefr=`/`?sector=`), caller wiring (Grammatik lesson, Redemittel, Wörter, Kollokationen),
   the speaking-block give-up, and 5 new `tests/engine.test.ts` cases. Gates green (typecheck, test:unit
   121/121, lint 0 errors, build, bundle 73.0 kB).
-- ⬜ Work items 2, 3, 4+5, 6 — not started.
+- ✅ **Work items 2, 4+5, 6 — SHIPPED s103 (Sonnet 5).** Graph word-count moved beside Üben (rail +
+  mobile bar), the canvas legend keeps only the connections count. FilterRail restyled as a standard
+  content card (`bg-surface shadow-soft`, visible `border-border` dividers, muted unselected pills,
+  eyebrow-style scope labels) on both the desktop rail and the mobile panel; the header is now a
+  toggle + a permanent reset icon, and the result count sits beside Üben in every state (open,
+  collapsed, mobile). Grammar lesson `CardContent` grid-splits Muster (left) from the explanation
+  (right) at `lg:`, mobile stays stacked. Gates green (typecheck, lint 0 errors, test:unit 129/129,
+  build, bundle 73.0 kB); browser-verified in light + dark at desktop and mobile widths.
+- ⬜ Work item 3 (Üben map beautification + tappable stops) — not started (Fable 5 / Opus 4.8, not
+  Sonnet 5 territory).
 
 ## Context
 
