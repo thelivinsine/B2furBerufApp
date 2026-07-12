@@ -101,7 +101,7 @@ export const grammar: GrammarTopic[] = [
     ],
     pitfalls: [
       "Gender/number come from the noun; case comes from the role in the relative clause.",
-      "Dative plural is 'denen', not 'denen' ↔ 'die': „die Kollegen, denen ich danke\".",
+      "Dative plural is 'denen', not 'die': „die Kollegen, denen ich danke\".",
       "With a preposition, it goes in front of the pronoun: „das Team, mit dem ich arbeite\".",
     ],
     pitfallsDe: [
@@ -169,7 +169,7 @@ export const grammar: GrammarTopic[] = [
     pattern: "da(r) + Präposition → darauf, damit, dafür · wo(r) + Präposition → worauf, womit, wofür",
     examples: [
       { de: "Wir sprechen über das Projekt. → Wir sprechen darüber.", en: "We talk about the project. → We talk about it." },
-      { de: "Worüber habt ihr diskutiert?", en: "What did you discuss about?" },
+      { de: "Worüber habt ihr diskutiert?", en: "What did you discuss?" },
       { de: "Ich freue mich darauf, dich zu sehen.", en: "I'm looking forward to seeing you." },
     ],
     pitfalls: [
@@ -305,7 +305,7 @@ export const grammar: GrammarTopic[] = [
     purpose: "Justify opinions and explain reasons. The verb goes to the end.",
     purposeDe: "Meinungen begründen und Gründe erklären. Das Verb steht am Ende.",
     explanation:
-      "Subordinating conjunctions (dass, weil, damit, obwohl, wenn, dass) push the conjugated verb to the end of their clause. If the subordinate clause comes first, the main clause starts with its verb (because position 1 is filled by the whole clause).",
+      "Subordinating conjunctions (dass, weil, damit, obwohl, wenn) push the conjugated verb to the end of their clause. If the subordinate clause comes first, the main clause starts with its verb (because position 1 is filled by the whole clause).",
     explanationDe:
       "Subjunktionen (dass, weil, damit, obwohl, wenn) schieben das konjugierte Verb ans Ende ihres Satzes. Steht der Nebensatz zuerst, beginnt der Hauptsatz mit dem Verb (denn Position 1 ist schon durch den ganzen Nebensatz besetzt).",
     pattern: "Ich denke, dass … (Verb am Ende) · …, weil … · …, damit …",
@@ -1584,7 +1584,7 @@ export const grammar: GrammarTopic[] = [
     title: "Futur I and II for assumptions",
     titleDe: "Futur I/II für Vermutungen",
     purpose: "Speculate like a native: 'Er wird im Meeting sein' means he probably IS.",
-    purposeDe: "Vermuten wie Muttersprachler: 'Er wird im Meeting sein' heißt: wahrscheinlich ist er es JETZT.",
+    purposeDe: "Vermuten wie Muttersprachler: 'Er wird im Meeting sein' heißt: wahrscheinlich ist er gerade dort.",
     explanation:
       "Beyond future time, 'werden' expresses assumption. Futur I (werden + infinitive) speculates about NOW: Sie wird im Zug sitzen = she is probably on the train. Futur II (werden + Partizip II + haben/sein) speculates about a COMPLETED event: Er wird die E-Mail übersehen haben = he probably missed the email. Particles like 'wohl', 'sicher', 'vermutlich' reinforce the reading: Das wird wohl stimmen. For plain future time, German usually prefers the present tense plus a time phrase (Ich komme morgen).",
     explanationDe:

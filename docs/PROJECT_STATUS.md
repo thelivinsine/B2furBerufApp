@@ -110,6 +110,13 @@ things: Üben is now specific to where the learner is, and the speaking block ca
 - **Tests + gates:** 5 new `tests/engine.test.ts` cases (grammar-pin honored, unknown-id fallback,
   `libraryFocus` undefined/sub/category). `pnpm typecheck` ✔, `test:unit` **121/121**, `lint` **0
   errors** (42 pre-existing warnings), `build` + prerender ✔, `check:bundle` **73.0 kB**/400.
+- **Grammatik correctness pass (same session, follow-up prompt):** audited `src/data/grammar.ts` (24
+  topics / 117 drills). Mechanical completeness clean (explanationDe/purposeDe/pitfalls/pitfallsDe
+  present, `pitfalls`/`pitfallsDe` lengths matched for the EnPeek index-swap, every drill has
+  explain+gloss, no em dashes, all MCQ answers valid). Read every topic for German correctness; fixed
+  4 inaccuracies (a garbled relative-clause EN pitfall, a duplicated "dass" in the Nebensatz EN
+  explanation, an awkward Futur `purposeDe`, and a non-idiomatic "discuss about" example gloss).
+  `lint:content` ✔, build ✔.
 - **NOT done:** Üben-plan Work items 2 (graph count), 3 (map beautify + tappable stops), 4+5
   (FilterRail desktop + count), 6 (Muster/explanation grid); the Branche-overhaul plan (s99); and the
   standing content follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2, Playwright
