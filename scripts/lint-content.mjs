@@ -34,6 +34,7 @@ const POS = ["noun", "verb", "adjective", "adverb", "phrase", "connector"];
 const REDEMITTEL_CATEGORIES = [
   "suggestions", "agree", "disagree", "negotiation", "compromise",
   "clarification", "opinion", "prosCons", "reactions", "professionalIntro",
+  "telephoning", "emails", "presentations", "jobInterview", "smallTalk",
 ];
 const REDEMITTEL_REGISTERS = ["neutral", "formal"]; // "diplomatic" folded into formal (audit 2026-07-09)
 const COLLOCATION_REGISTERS = ["neutral", "formal"];

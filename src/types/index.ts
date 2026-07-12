@@ -145,7 +145,12 @@ export type RedemittelCategory =
   | "opinion"
   | "prosCons"
   | "reactions"
-  | "professionalIntro";
+  | "professionalIntro"
+  | "telephoning"
+  | "emails"
+  | "presentations"
+  | "jobInterview"
+  | "smallTalk";
 
 export interface RedemittelPhrase {
   id: string;
