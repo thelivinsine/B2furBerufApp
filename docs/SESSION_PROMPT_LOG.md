@@ -3755,3 +3755,13 @@ Branch: `claude/whats-next-esga9u`.
   archived).
 - **Artifacts:** commits b1c0766 (W2) · 8c0df08 (W3) · 2bfb57f (W4) + docs commit on
   `claude/bibliothek-scaleup-german-pros-slcnh5`; PR pending founder review.
+
+## Entry 349 — 2026-07-12 (session 95)
+- **Prompt (verbatim):**
+  > document the session and merge to main
+- **Response summary:** Final documentation pass (this entry; s95 handoff and status header updated
+  from "PR open, awaiting review" to merged state) and shipped: PR #463 marked ready for review and
+  squash-merged to main (Waves 2-4: vocab 1,022, collocations 701, Redemittel 149, texts 26, grammar
+  24 topics / 117 drills, provenance 2,132 rows), then the branch realigned onto origin/main per the
+  post-merge housekeeping rule.
+- **Artifacts:** PR #463 (squash-merged), `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.

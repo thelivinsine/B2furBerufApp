@@ -1,7 +1,7 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-12 (session 95: **Scale-up Waves 2–4 executed, PR open and awaiting founder
-review (deliberately NOT merged).** Wave 2 first tranche deepened engineering/it/construction/
+_Last updated: 2026-07-12 (session 95: **Scale-up Waves 2–4 executed and MERGED (PR #463) after
+founder review.** Wave 2 first tranche deepened engineering/it/construction/
 production (~60 words + ~26 collocations each + one sector reading text; `ReadingText.sector`
 added), Wave 3 grew Redemittel 84 → **149** across 5 new speech-act categories (Telefonieren,
 E-Mails, Präsentieren, Vorstellungsgespräch, Small Talk), Wave 4 completed the B1–B2 grammar canon
@@ -320,10 +320,9 @@ be their single source of truth after the course; this **un-parks the sector fac
   mirror when the first one lands); Wave 2 prioritization waits on classmate feedback after the
   2026-07-13 presentation.
 
-**Handoff after session 95 (2026-07-12). Scale-up Waves 2–4 EXECUTED on
-`claude/bibliothek-scaleup-german-pros-slcnh5`; PR open, NOT merged, founder review pending
-(explicit founder instruction: wait for review).** One wave per commit on the branch
-(b1c0766 W2, 8c0df08 W3, 2bfb57f W4 + a docs commit). The approved Waves 2–4 plan (with model
+**Handoff after session 95 (2026-07-12). Scale-up Waves 2–4 EXECUTED and MERGED to `main`
+(PR #463, squash; the founder reviewed the staged draft PR and gave the merge go-ahead).** One
+wave per commit on the branch (b1c0766 W2, 8c0df08 W3, 2bfb57f W4 + docs commits). The approved Waves 2–4 plan (with model
 policy: Fable 5 for all German authoring, Sonnet 5 wiring, Haiku 4.5 mechanics) is folded into
 `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §0/§4–6.
 - **Wave 2 (first tranche, feedback-driven default order):** engineering, it, construction,
@@ -349,10 +348,10 @@ policy: Fable 5 for all German authoring, Sonnet 5 wiring, Haiku 4.5 mechanics) 
   `verify:cefr` + `build:verification` (linguistic tier 1602 → **1,896**); typecheck, ESLint 0
   errors, `test:unit` 116/116, build + prerender, `check:bundle` **73.0 kB**/400; floor smoke:
   Branche renders on Wörter AND Kollokationen, spine 24/24.
-- **NOT done / follow-up:** founder review of the PR (deliberately unmerged), then the first
-  verification session (build `scripts/review-queue.mjs` + `pnpm review:queue`, flip reviewed
-  items draft → verified); Wave-2 tranche 2 (care, trades, retail, hospitality, transport,
-  beauty, sports) after classmate feedback; Playwright lesson smoke of a new grammar topic
-  in a real browser is still worth doing at review time.
+- **NOT done / follow-up:** the first verification session (build `scripts/review-queue.mjs` +
+  `pnpm review:queue`, flip reviewed items draft → verified; all 2,107 non-Can-Do rows are still
+  `draft`); Wave-2 tranche 2 (care, trades, retail, hospitality, transport, beauty, sports) after
+  classmate feedback from the 2026-07-13 presentation; a Playwright smoke of one new grammar
+  lesson in a real browser.
 
 _(Sessions 85-93's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
