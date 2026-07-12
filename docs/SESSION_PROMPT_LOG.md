@@ -3834,3 +3834,24 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `scripts/review-queue.mjs`, `package.json`, `docs/reports/review-queue.md`,
   `docs/PROJECT_STATUS.md`, `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md`, `CLAUDE.md`,
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 353 — 2026-07-12 (session 97, continued)
+- **Prompt (verbatim):**
+  > what is the model recommendation for the next task?
+- **Follow-up (verbatim):**
+  > you need to explain me in plain language what you recommend.
+- **Follow-up (verbatim):**
+  > okay, I'll go with opus in a new session because Fable isn't available for today. Document the
+  > session, I'll start with another new session for this task
+- **Response summary:** Recommended a model for the actual review pass (checking `draft` provenance
+  rows against their `reference` and flipping them to `verified`) that this session's tool
+  (`pnpm review:queue`) was built to support. Judged it belongs in the plan's authoring tier, not
+  the Haiku/Sonnet mechanical tier used for the tool itself: verifying German correctness (article/
+  plural, sense-match, register, CEFR plausibility) requires the same command of German as writing
+  it, and a wrong "verified" flag is worse than an unreviewed row. Recommended Fable 5 first choice,
+  Opus 4.8 fallback, then re-explained the same reasoning in plain language on request. Founder
+  confirmed Opus 4.8 for the next session (Fable 5 unavailable today) and asked for this exchange
+  documented before starting a fresh session for the review pass. No code changes; `docs/
+  PROJECT_STATUS.md`'s s97 handoff got a short addendum recording the model decision so the next
+  session (which starts cold) knows to run on Opus 4.8 without re-deriving the reasoning.
+- **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md`.

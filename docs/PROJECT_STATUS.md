@@ -116,6 +116,11 @@ the plan's model policy), no content or app-source changes.
   this session shipped the tool only, per the plan's "Next step (first verification session)"
   wording; the review pass itself is the next session's work. Wave-2 tranche 2 and the Playwright
   grammar smoke (carried over from s95) are still open too.
+- **Model for the review pass (decided end of s97, next session starts fresh):** this is judgment
+  work on German correctness (article/plural, sense-match to the reference, register, CEFR
+  plausibility), not mechanical wiring, so it sits in the plan's authoring tier alongside German
+  writing, not the Haiku/Sonnet tier this session's tooling used. Recommended **Fable 5** first
+  choice, **Opus 4.8** fallback; Fable 5 was unavailable, so the **next session runs on Opus 4.8**.
 
 _(Sessions 85-94's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
