@@ -1,22 +1,27 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowLeft,
   BookMarked,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   CircleCheck,
   GraduationCap,
   TriangleAlert,
+  Zap,
 } from "lucide-react";
 import type { GrammarTopic } from "@/types";
 import { iconByName } from "@/lib/icons";
+import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
+import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { GrammarDrillCard } from "./GrammarDrillCard";
 import { groupMeta, orderedGrammar } from "./grammarMeta";
 
@@ -50,6 +55,7 @@ function Lesson({
   onOpenTopic: (id: string) => void;
 }) {
   const reduce = useReducedMotion();
+  const navigate = useNavigate();
   const meta = groupMeta[topic.group];
   const idx = orderedGrammar.findIndex((t) => t.id === topic.id);
   const prev = idx > 0 ? orderedGrammar[idx - 1] : undefined;
@@ -59,6 +65,9 @@ function Lesson({
   // progress. Never persisted: the lesson is a reading/practice surface, the
   // durable loop is the composed session.
   const [results, setResults] = useState<Record<string, boolean>>({});
+  // The explanation paragraph starts clamped (founder s93 follow-up: the
+  // lesson had too much text up front); the Muster formula leads instead.
+  const [explainOpen, setExplainOpen] = useState(false);
   const answered = Object.keys(results).length;
   const correct = Object.values(results).filter(Boolean).length;
   const total = topic.drills.length;
@@ -78,6 +87,11 @@ function Lesson({
       animate={{ opacity: 1, y: 0 }}
       className="space-y-5 sm:space-y-6"
     >
+      {/* The Bibliothek tabs stay on top inside the lesson too (founder s93
+          follow-up: the lesson had no navigation). Tapping Grammatik doubles
+          as a way back to the topic grid (the link drops `?topic=`). */}
+      <LibrarySwitcher />
+
       {/* Top row: back to the topic grid + position on the topic spine. */}
       <div className="flex items-center justify-between gap-2">
         <Button variant="ghost" size="sm" onClick={onBack} className="-ml-2">
@@ -88,16 +102,14 @@ function Lesson({
         </span>
       </div>
 
-      {/* Hero */}
+      {/* Hero. Deliberately light on text (founder s93 follow-up): no English
+          eyebrow line; German title + the one-line purpose + badges. */}
       <div className="flex items-start gap-3.5">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 sm:h-12 sm:w-12">
           <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </span>
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-            {topic.title}
-          </p>
-          <h1 className="mt-0.5 text-2xl font-bold tracking-tight sm:text-3xl">{topic.titleDe}</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{topic.titleDe}</h1>
           <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{topic.purposeDe}</p>
           <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
             {topic.cefr && <Badge variant="muted">{topic.cefr}</Badge>}
@@ -109,15 +121,35 @@ function Lesson({
         </div>
       </div>
 
-      {/* Explanation + the Muster formula panel */}
+      {/* Muster first (the fastest-scan artifact), then the explanation
+          clamped to three lines behind a quiet expander. */}
       <Card>
-        <CardContent className="space-y-4 p-5">
-          <p className="text-sm leading-relaxed">{topic.explanation}</p>
+        <CardContent className="space-y-3 p-5">
           <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 px-3.5 py-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400">
               Muster
             </p>
             <p className="mt-1 font-mono text-sm leading-relaxed">{topic.pattern}</p>
+          </div>
+          <div>
+            <p className={cn("text-sm leading-relaxed", !explainOpen && "line-clamp-3")}>
+              {topic.explanation}
+            </p>
+            <button
+              onClick={() => setExplainOpen((o) => !o)}
+              aria-expanded={explainOpen}
+              className="mt-1.5 inline-flex items-center gap-1 text-xs font-semibold text-primary"
+            >
+              {explainOpen ? (
+                <>
+                  Weniger anzeigen <ChevronUp className="h-3.5 w-3.5" />
+                </>
+              ) : (
+                <>
+                  Mehr anzeigen <ChevronDown className="h-3.5 w-3.5" />
+                </>
+              )}
+            </button>
           </div>
         </CardContent>
       </Card>
@@ -270,9 +302,27 @@ function Lesson({
         </div>
       )}
 
-      <Button asChild variant="gradient" className="w-full sm:w-auto">
-        <Link to="/quiz">Wissen im Quiz testen</Link>
+      {/* Üben, same placement language as the hub (founder s93 follow-up: the
+          lesson had no Üben button): inline on desktop, a sticky bottom action
+          bar above the nav on mobile. Replaces the old /quiz CTA (the retired
+          /quiz route stays reachable via practiceAreas). */}
+      <Button
+        variant="gradient"
+        className="hidden w-full sm:w-auto lg:inline-flex"
+        onClick={() => navigate("/session")}
+      >
+        <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
+
+      <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+        <Button
+          variant="gradient"
+          className="h-11 w-full rounded-xl text-base"
+          onClick={() => navigate("/session")}
+        >
+          <Zap className="h-4 w-4" /> Üben
+        </Button>
+      </div>
     </motion.div>
   );
 }
