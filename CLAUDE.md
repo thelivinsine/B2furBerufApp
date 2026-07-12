@@ -280,7 +280,9 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   follow-up: a lesson must keep the section navigation), then a minimal hero (group tile + German title
   ONLY; founder follow-ups removed the English eyebrow, the German purpose line, and the meta badge row
   as redundant: the topic is described once, in the card below), the emerald **Muster** formula panel FIRST
-  with the explanation clamped to three lines behind a "Mehr anzeigen" expander, Beispiele, Typische
+  (the authored " · "-separated `pattern` variants render ONE PER ROW with dot markers, never as one
+  wrapped line) with the explanation rendered as sentence bullets, first point up front and the rest
+  behind a "Mehr anzeigen" expander (render-time split, content bank untouched), Beispiele, Typische
   Fehler, numbered Übungen with a **live progress bar**, a **completion panel** ("Thema abgeschlossen ·
   k von n richtig" + "Weiter: <next>") and prev/next cards along the priority spine ("Thema n von 10"),
   so a time-poor learner is always handed the next-biggest B2 lever. **Üben is on the lesson too**

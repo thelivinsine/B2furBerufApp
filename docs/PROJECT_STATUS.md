@@ -364,6 +364,13 @@ but with design freedom, and make it highly useful and intuitive for adult learn
   row (CEFR + group + "n Übungen"). Both removed: the hero is now **group tile + German title only**;
   the topic is described ONCE (the clamped explanation card) and the drill count already shows in the
   Übungen progress. CEFR/purpose remain on the hub topic cards, where they inform the choice.
+- **Founder follow-up round 3 (same session, PR #460):** the Muster read as one mush (multiple pattern
+  variants wrapping into each other) and the explanation as one paragraph chunk. Both are now split at
+  RENDER time, no content-bank change: `pattern` splits on the authored `" · "` separator into **one
+  variant per row** (emerald dot markers when >1; verified against all 10 patterns, e.g. Relativsätze
+  becomes a 4-row Nom/Akk/Dat/Gen list), and `explanation` splits into **sentence bullets** with the
+  first point shown and the rest behind the "Mehr anzeigen" expander (regex fallback keeps unsplittable
+  text as one line). If future explanations use dotted abbreviations, revisit the sentence split.
 - **NOT done / follow-up candidates:** per-topic drill progress is session-local only (persisting
   "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
   (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.
