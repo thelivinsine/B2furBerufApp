@@ -3470,3 +3470,164 @@ Branch: `claude/whats-next-esga9u`.
   founder prompt of the session has a record. Confirmed session 91 is fully documented and shipped. Docs-only
   update to `main`.
 - **Artifacts:** `docs/PROJECT_STATUS.md`, `docs/SESSION_PROMPT_LOG.md` (docs-only PR).
+
+## Entry 323 — 2026-07-12 (session 92)
+- **Branch:** `claude/uben-visibility-scrollbar-251zch` (all of session 92)
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** screenshot (mobile Vokabeltrainer, filter tile expanded with a right-hand scrollbar)
+- **Prompt (verbatim):**
+  > @screenshot üben is not visible here - fix it. also get rid of the scroll bar to the right
+- **Response summary:** The mobile filter tile was capped `max-h-[70dvh]` with internal scroll, which pushed
+  the sticky Üben footer below the bottom nav (invisible) and showed a scrollbar. Made the mobile tile grow
+  naturally (no cap, no internal scroll → no scrollbar) with the Üben footer sticking to the viewport bottom
+  above the nav; desktop kept its capped scroll rail with the scrollbar hidden (`no-scrollbar`). Shipped as
+  PR #442.
+- **Artifacts:** `src/features/shared/FilterRail.tsx`, `VocabularyTrainer.tsx`, `RedemittelTrainer.tsx`,
+  `CollocationsBrowser.tsx` (PR #442).
+
+## Entry 324 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > yes, if you knew I have an auto-ship preference, why did you not do it?
+- **Response summary:** Fair callout — I had asked to confirm the merge instead of auto-shipping per the
+  standing preference. Acknowledged, merged PR #442 into `main` (squash), realigned the branch, and adopted
+  auto-ship for green changes going forward without asking each time.
+- **Artifacts:** PR #442 merged.
+
+## Entry 325 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > there's very little contrast for filter tile, increase it - perhaps better to keep the same shade as the top section of the filter tile. also, filter doesn't need to have a word, just the icon would suffice - same applies to bookmarks. put the filter and bookmark icon in the same line along with the view options.
+- **Response summary:** The filter tile used `bg-muted` (95% L) on a near-white page — barely any contrast.
+  Switched the whole tile to one solid `bg-border` shade (header/body/footer), made the Filter toggle + the
+  Gespeichert bookmark icon-only, and moved the Filter toggle onto the view-options line. Shipped as PR #443.
+- **Artifacts:** `FilterRail.tsx`, the three trainer pages (PR #443).
+
+## Entry 326 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > is it live?
+- **Response summary:** Checked the Pages deploy via the Actions API — the latest `pages.yml` runs for the
+  merged commits completed successfully, so the changes were live (modulo PWA cache).
+- **Artifacts:** none (status check).
+
+## Entry 327 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > can you add the filter button beside the üben button to the left? it should be inside the filter tile.
+- **Response summary:** Relocated the mobile Filter toggle from the view line into the tile footer, to the
+  left of the Üben button (`[Filter][Üben]`), keeping the active-facet-count badge; removed it from the meta
+  row. Shipped as PR #444.
+- **Artifacts:** `FilterRail.tsx`, the three trainer pages (PR #444).
+
+## Entry 328 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > get rid of the headers with icons. The toggle buttons is enough to know what the user is looking at. And, without changing the dimensions of the filter tile when it's collapsed collapsed, work with the üben botton in such a way to keep the words count to the right side of üben button. ideally adjust the font size in a way that the number and the word Wörter are sitting on top of the other respectively. lastly, when the filter is expanded, keep the filter icon to the left of the search button in the top of the filter tile.
+- **Response summary:** Removed the `HubHero` page header from all four Bibliothek tabs (the LibrarySwitcher
+  identifies the section). Moved the word count into the tile footer, stacked (number over noun) to the right
+  of Üben, sized to keep the collapsed tile's dimensions. Made the Filter toggle reposition by state:
+  top-left next to the search when expanded, footer-left next to Üben when collapsed. Added `FilterRail`
+  `count` prop. Shipped as PR #445.
+- **Artifacts:** `FilterRail.tsx`, `GrammarHub.tsx`, the three trainer pages (PR #445).
+
+## Entry 329 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > search should live outside of filter panel. the search function should be more forgiving and it should also show the connections for the searched word as well. The search is a temporary thing so nothing should change in filter when it's being used. the icon should be yo the right side of bookmark similar to bookmark icon's design. another specific thing is that when the filter is expanded the words count should be shown in the first row - it should only be shown beside üben button when collapsed.
+- **Response summary:** Moved search OUT of the filter panel into a transient toggle (search icon right of
+  the bookmark; opening/closing never touches filter state, closing clears). Added a forgiving matcher
+  `src/lib/fuzzy.ts` (umlaut/case-insensitive, token-order-independent, Damerau edit-1 for 4+ char tokens) +
+  `tests/fuzzy.test.ts`, wired into all three pages. Wörter search now also surfaces a matched word's
+  connections (related terms resolved to in-scope entries, feeding the graph edges). Count shows in the
+  panel's first row when expanded, beside Üben only when collapsed. Shipped as PR #446.
+- **Artifacts:** `src/lib/fuzzy.ts` (new), `tests/fuzzy.test.ts` (new), `SearchField.tsx` (autoFocus),
+  `FilterRail.tsx`, the three trainer pages (PR #446).
+
+## Entry 330 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > can you optimise and polish the page toggle button design?
+- **Response summary:** Reworked LibrarySwitcher to the app's premium toggle language (recessed grey track +
+  lifted white active pill) with a framer `layoutId` sliding indicator (reduced-motion safe), and made it fit
+  four labels on a phone without a scroll (`text-xs`→`sm:text-sm`, full-pill rounding, tablist/aria roles).
+  Shipped as PR #447.
+- **Artifacts:** `src/features/library/LibrarySwitcher.tsx` (PR #447).
+
+## Entry 331 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > apply the same sliding animation to the view buttons as the page toggle. when collapsed - no need of filter tile concept - it's only applicable when expanded. move the filter icon to the same row with other buttons and to the left of view icons. üben button can be a stand alone button below these buttons. xxx wörter can also be moved to outside to the buttom of üben button without any gray tile surrounding it. When expanded: the filter tile opens below the xx wörter. the wörter count need not be repeated inside the gray tile again. add a neat sliding animation for opening and closing of filter rail.
+- **Response summary:** Big mobile restructure. ViewSwitcher got the same sliding white-pill indicator.
+  Added a body-only `layout="panel"` mode to FilterRail (Thema + facets only). On mobile: Filter toggle
+  moved onto the toolbar row (left of the view icons); Üben became a standalone full-width button; the count
+  became plain text under it; and the filter panel slides open (AnimatePresence height/opacity) below the
+  count. Shipped as PR #448.
+- **Artifacts:** `ViewSwitcher.tsx`, `FilterRail.tsx`, the three trainer pages (PR #448).
+
+## Entry 332 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > increase the size of the page toggles a bit but there should be no scroll - it should fit within the screen. Optimise and polish all the buttons, icons in all the bibliothek pages.
+- **Response summary:** Bumped the toggle to `text-[13px]` + taller with tight mobile padding (same
+  footprint, still fits). Cohesion pass on the toolbar: all controls at 40px height (ViewSwitcher `h-10`
+  matching the icon buttons), consistent `rounded-lg` on Filter/Bookmark/Search, `rounded-xl` + `text-base`
+  Üben CTA. Shipped as PR #449.
+- **Artifacts:** `LibrarySwitcher.tsx`, `ViewSwitcher.tsx`, the three trainer pages (PR #449).
+
+## Entry 333 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > increase the font size of the toggle page buttons. rhe xx wörter can go to the right side of the üben button as before. the horizontal width of the üben button and word count combined should be same the horizontal width of the filter/view/search buttons
+- **Response summary:** Toggle → `text-sm` mobile / `text-base` desktop. Count moved back to the right of
+  Üben (stacked). Grouped toolbar + search + Üben/count in a `w-fit` column so Üben + count together spanned
+  exactly the toolbar controls' width. Shipped as PR #450. (The `w-fit` width-match was reverted next round.)
+- **Artifacts:** `LibrarySwitcher.tsx`, the three trainer pages (PR #450).
+
+## Entry 334 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > actually for the icon row and üben row.. feel free to use the full width on mobile. the compressed rows doesn't look good. it's your call on how to optimise the ui here.
+- **Response summary:** Dropped the `w-fit` centering: the toolbar is a full-width `justify-between` row
+  (Filter left, view centered, bookmark/search right) and the Üben row fills full-width with the count at the
+  far right. Shipped as PR #451.
+- **Artifacts:** the three trainer pages (PR #451).
+
+## Entry 335 — 2026-07-12 (session 92)
+- **Attachments:** screenshot (wide viewport, toggle font oversized)
+- **Prompt (verbatim):**
+  > @screenshot the size of font for the page toggle buttons is abnormally big in desktop view. when I was asking you to increase the size earlier, I was talking about mobile screen.
+- **Response summary:** The `sm:text-base` (16px) + taller padding I'd added for wide screens read as
+  oversized. Dropped the desktop bump so the toggle stays `text-sm` (14px) across all breakpoints. Shipped as
+  PR #452.
+- **Artifacts:** `LibrarySwitcher.tsx` (PR #452).
+
+## Entry 336 — 2026-07-12 (session 92)
+- **Attachments:** screenshot (mobile Wörter, bildung theme showing the sub-theme picker page)
+- **Prompt (verbatim):**
+  > @screenshot here's the mobile screenshot. Is the font size changed? Also, why are the subthemes appearing as a separate page, it should be part of the filter.
+- **Response summary:** Confirmed the font did change (16→14px on wide screens; if unchanged it's the PWA
+  cache). Replaced the full-page `SubThemePicker` interstitial with an **"Unterthema" dropdown inside the
+  filter** (new `FilterRail` `secondary` scope, with per-sub-theme counts + "Gesamtes Thema"); the list shows
+  the whole theme by default and a breadcrumb shows the active sub-theme. Wörter + Kollokationen dropped the
+  picker. Shipped as PR #453.
+- **Artifacts:** `FilterRail.tsx`, `VocabularyTrainer.tsx`, `CollocationsBrowser.tsx` (PR #453).
+
+## Entry 337 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > the top page toggle section should both look like a header and also be functional - optimize it. Also, add a reset and close icons on the top right corner of the filter tile when expanded. Discard the word-based reset button.
+- **Response summary:** Made LibrarySwitcher read as the page header (lifted `shadow-soft` bar; active tab
+  bold + brand like a title, others quiet) while staying a tab row. Removed the word "Zurücksetzen" button;
+  added icon controls: a reset (RotateCcw, disabled when nothing to clear) + close (X) in the top-right of
+  the mobile filter panel (close collapses it), and the reset icon top-right of the desktop rail body.
+  Shipped as PR #454.
+- **Artifacts:** `LibrarySwitcher.tsx`, `FilterRail.tsx`, the three trainer pages (PR #454).
+
+## Entry 338 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > the pin buttons are gone in mobile from the filter tile for some reason. fix it. Also, keep the üben and word count at the bottom of the screen and always visible. So, the scrolling should happen above it.
+- **Response summary:** Restored the section pin buttons in the mobile panel (removed the `pinnable={!panel}`
+  gating). Moved mobile Üben + count out of the toolbar into a **sticky bottom action bar** (full-bleed,
+  above the nav, backdrop-blur) that stays visible while the list scrolls above it; desktop keeps Üben/count
+  in the rail. Shipped as PR #455.
+- **Artifacts:** `FilterRail.tsx`, the three trainer pages (PR #455).
+
+## Entry 339 — 2026-07-12 (session 92)
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Documentation pass for session 92: appended prompt-log entries 323–339 (verbatim
+  prompts + response summaries tied to PRs #442–#455), added the session-92 handoff to `PROJECT_STATUS.md`
+  (moving the s90 handoff to the W28 archive), and refreshed the stale Bibliothek/mobile-layout facts in
+  `CLAUDE.md` to the final state (search outside the panel + fuzzy matcher, sub-theme dropdown, full-width
+  toolbar, header-like toggle with sliding pills, icon reset/close, sticky bottom Üben bar).
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `CLAUDE.md`.

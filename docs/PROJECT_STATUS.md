@@ -1,6 +1,19 @@
 # Project Status & Decision Log
 
-_Last updated: 2026-07-11 (session 91: **Bibliothek views: desktop filter rail + view switcher + word
+_Last updated: 2026-07-12 (session 92: **Bibliothek browse pages — 14 founder UI-refinement rounds
+(PRs #442–#455), all squash-merged.** The three browse tabs (Wörter/Kollokationen/Redemittel) were reworked
+from the founder's phone screenshots: **search moved OUT of the filter panel** into a transient toggle (icon
+by the bookmark) backed by a new forgiving matcher (`src/lib/fuzzy.ts`, Damerau edit-1 + umlaut/token
+tolerant; Wörter search also surfaces a word's authored connections); the **HubHero page headers were
+dropped** so the **LibrarySwitcher doubles as the page header** (lifted `shadow-soft` bar, active tab
+bold+brand like a title, framer `layoutId` sliding pill — same on the ViewSwitcher); the full-page
+SubThemePicker was replaced by an **"Unterthema" dropdown in the filter** (`FilterRail` `secondary` scope);
+the filter tile gained **icon reset + close** controls (the word "Zurücksetzen" button removed) plus a
+body-only `layout="panel"` mode; and on mobile the toolbar is a full-width `justify-between` row
+[Filter · views · bookmark/search] with **Üben + word count in a sticky bottom action bar** so the list
+scrolls above them. `src/lib/fuzzy.ts` + `tests/fuzzy.test.ts` added; `SubThemePicker` now unused (kept in
+repo). Main chunk unchanged (~73 kB); `test:unit` 116/116. Per-round detail in the s92 handoff below.**
+Prior, session 91: **Bibliothek views: desktop filter rail + view switcher + word
 graph, then 9 founder refinement rounds.** From the founder's hand-drawn mockup: the three browse tabs
 (Wörter/Kollokationen/Redemittel) got a URL-persisted view switcher (`?view=` Tabelle · Graph · Karten ·
 Liste; Karten default), a generic sortable `DataTable` + compact list views per tab, an **Obsidian-style
@@ -242,6 +255,62 @@ was done in session 70 (the file had grown to 1,624 lines / 140 kB).
 
 ## Resume here (next session)
 
+**Handoff after session 92 (2026-07-12). Bibliothek browse pages — 14 founder UI-refinement rounds
+(branch `claude/uben-visibility-scrollbar-251zch`, PRs #442–#455, all squash-merged; branch realigned after
+each).** A long chain of screenshot-driven mobile/desktop polish on the three browse pages
+(Wörter/Kollokationen/Redemittel). **Final state (what's live):**
+- **Search lives OUTSIDE the filter panel.** A search icon sits on the toolbar (right of the Wörter
+  bookmark, same icon-only design); tapping it reveals a transient full-width `SearchField` (autofocus).
+  Opening/closing never touches filter state; closing clears the query. Backed by **`src/lib/fuzzy.ts`**
+  (`foldText` + `fuzzyMatch`): umlaut/case-insensitive, punctuation-ignoring, token-order-independent, and
+  **Damerau edit-distance-1** tolerant for tokens ≥4 chars (adjacent transposition included). Pinned by
+  **`tests/fuzzy.test.ts`**. Wörter search also **surfaces connections**: a matched word's `related` terms
+  that resolve to other in-scope entries are appended (feeds the graph edges too). Redemittel/Kollokationen
+  get the forgiving match only (no connection data there).
+- **LibrarySwitcher = the page header** (HubHero dropped from all four Bibliothek tabs). A lifted
+  `shadow-soft` recessed-grey bar; the **active tab is bold + brand** (reads as the section title), the
+  others quiet; a framer **`layoutId="library-tab-pill"`** white pill slides between tabs (reduced-motion
+  safe). `text-sm` on ALL breakpoints (an earlier `sm:text-base` bump read as oversized on desktop and was
+  removed); tight mobile padding keeps four labels incl. "Kollokationen" on one phone row (no scroll).
+  **ViewSwitcher** got the same sliding white-pill treatment (`layoutId="view-tab-pill"`, `h-10` to match
+  the icon buttons).
+- **Toolbar row (mobile), full width `justify-between`:** `[Filter icon] · [ViewSwitcher] · [bookmark
+  (Wörter) + search]`. Icon buttons are `rounded-lg` 40px. Desktop hides the Filter icon (it uses the
+  persistent rail) and the row is view-left / actions-right.
+- **Filter tile:** `FilterRail` now has a body-only **`layout="panel"`** mode (Thema + Unterthema + facets
+  only) used on mobile, mounted/unmounted with an **AnimatePresence height/opacity slide**; the desktop rail
+  ("rail" layout) is unchanged (sticky right column, header + chevron, footer Üben, count). The tile is one
+  solid **`bg-border`** grey. **Reset + close are icons** in the top-right (RotateCcw reset — disabled when
+  nothing to clear — + X close on the mobile panel; reset only, top-right of the body, on desktop). The
+  word **"Zurücksetzen" button was removed**. **Section pins are shown on both breakpoints** (the
+  panel-mode gating that briefly hid them on mobile was removed).
+- **Sub-themes are a filter dropdown, not a page.** The full-page `SubThemePicker` interstitial is gone;
+  `FilterRail` gained an optional **`secondary`** scope dropdown ("Unterthema", per-sub-theme counts +
+  "Gesamtes Thema"), rendered right under Thema when the active theme has sub-themes (Wörter + Kollokationen).
+  The list shows the whole theme by default; a small breadcrumb shows the active sub-theme. `SubThemePicker`
+  is now **unused** (kept in the repo; safe to delete in a follow-up once the founder confirms).
+- **Üben + word count = a sticky bottom action bar on mobile** (full-bleed `-mx-4 sm:-mx-6`,
+  `sticky bottom-[calc(3.9375rem+env(safe-area-inset-bottom))] z-30`, `bg-background/90` + `backdrop-blur`,
+  border-top), placed after the content so it stays pinned above the nav while the list scrolls above it.
+  Count is stacked (number over noun) at the bar's right, hidden in the Wörter graph view. **Desktop keeps
+  Üben/count in the rail.**
+- **Gates green throughout:** typecheck, ESLint (only the pre-existing react-hooks warning), `pnpm build`,
+  `check:bundle` **73.1 kB**/400, `test:unit` **116/116** (fuzzy tests added). No Playwright this session
+  (no browser driver in the sandbox; sized against known-fitting baselines and the founder verifies live).
+- **Per-round PRs:** #442 (mobile tile: no scrollbar, Üben visible) · #443 (bg-border contrast, icon-only
+  Filter/Bookmark on the view line) · #444 (Filter toggle into the footer, left of Üben) · #445 (drop
+  HubHero headers, count stacked right of Üben, toggle repositions by state) · #446 (search out of panel +
+  fuzzy + connections) · #447 (polish page toggle → sliding pill) · #448 (ViewSwitcher slide + mobile
+  restructure: Filter on toolbar, standalone Üben, sliding panel) · #449 (bigger toggle + toolbar cohesion)
+  · #450 (`text-sm`/`text-base` toggle, count beside Üben, `w-fit` width-match) · #451 (full-width toolbar +
+  Üben rows) · #452 (drop oversized desktop toggle font) · #453 (sub-theme dropdown replaces picker page) ·
+  #454 (header-like toggle + icon reset/close) · #455 (restore mobile pins + sticky bottom Üben bar).
+- **NOT done / follow-up candidates:** delete the now-unused `SubThemePicker` once confirmed; the mobile
+  sticky Üben bar is `sticky` (glued to the bottom while the list is long enough to scroll; a very short
+  filtered list sits under its results instead of the viewport bottom — switch to `fixed` if "always glued"
+  is wanted); mobile pins persist a preference but don't visually collapse sections the way desktop does
+  (no mobile collapse state); `BrowseToolbar`/`FacetSheet` remain in the repo but unused on these pages.
+
 **Handoff after session 91 (2026-07-11). Bibliothek views: desktop filter rail + view switcher + word graph
 (branch `claude/bibliothek-mockup-review-rcghlq`, PR #431).**
 
@@ -341,64 +410,4 @@ mobile, zero console errors), and shipped:
   dark-canvas is theme-aware but in-graph label contrast could get a pass; `related` terms not in the bank
   could later render as satellite nodes; table column set per founder taste.
 
-**Prior handoff after session 90 (2026-07-10). Heute Üben/Spielen tile parity + subtle section color theme
-(branch `claude/ueben-spielen-layout-styling-h7fsvm`, PR #413).**
-
-Founder: "keep the map/photo tile in üben/spielen same dimensions and fix them both in same position on the
-screen. Also add a subtle color theme for the toggle buttons and the border padding." Then two follow-ups:
-"use some other color instead of violet for üben" and "fill the üben icon when selected similar to spielen."
-- **Tile parity (the core ask):** the tiles were already the same size (both 3:2 in a `p-2` surface mat,
-  both inside the Dashboard `mx-auto max-w-md` wrapper), but their **screen position differed**: `UebenPath`
-  used `flex … justify-between` (which pushed the map down) while the compact `NeulandHub` was top-aligned.
-  Fix: Üben's header + map are **pinned to the top with a fixed `gap-4` (1rem)** matching Spielen (the s88
-  "distribute evenly" rule is superseded by this explicit position request). Measured in a headless browser:
-  **both tiles sit at the same top + `245×358px` below identically-positioned, page-centered titles** in
-  both tabs. No jump on toggle. (A later founder round replaced the pager's `mt-auto` bottom-pin with a
-  **`my-auto`-centered {card + pager} group + tight `space-y-3`** so the card drops down and the dots rise
-  to sit just below it, killing the stranded card↔dots gap; header + map stay pinned, parity intact.)
-- **Heading formatting (later founder round):** "Neuland" is now centered on the page **exactly like Üben's
-  "Lernpfad"** (same `text-2xl`/`font-bold`; measured horizontal center = viewport center for both). The
-  "Beta" chip is a **suffix, not part of the heading** — absolutely positioned off the h1's right edge and
-  out of flow, so it no longer shifts "Neuland" off-center.
-- **Subtle section color theme (final state after several founder rounds):** the active toggle button
-  (`Dashboard.tsx`) lifts on the white pill and picks up a per-section tint. **Üben = teal/accent
-  (`text-accent`) + a `Dumbbell` icon; Spielen = orange (`text-orange-500`) + a `Play` icon.** (History
-  this session: first shipped Üben=indigo/Spielen=teal, then Üben recolored to orange on the founder's "not
-  violet" note, then the two **swapped** to the final teal/orange, and Üben's `Zap` bolt replaced by the
-  dumbbell.) Both active icons fill (`fillActive` flag): the Play triangle and the dumbbell's weight
-  plates (a later founder round turned the dumbbell fill on; it reads fine at 16px).
-- **Tile-mat border is neutral gray:** the s90 experiment with per-section colored mat borders was
-  reverted at the founder's request ("colored borders don't look good"); both the Üben map mat and the
-  Spielen hero mat use the shared muted **`border-border`**. The white `bg-surface` mat is preserved; the
-  section color lives on the toggle only.
-- **Filled active icon:** both active toggle icons fill (`fillActive`) — Spielen's `Play` triangle and,
-  after a founder round, the Üben dumbbell's weight plates too (it reads fine filled at 16px).
-- **Desktop adaptation (later founder rounds, PRs #423 then #425):** on desktop the start page was a narrow
-  phone-width column stranded center-screen with big empty side margins. First shipped a **two-column** `lg`
-  layout (#423, tile | practice·missions), but the **founder rejected it**. Reverted to **one column on all
-  sizes** and adapted to desktop by **vertically centering** the whole start page instead (#425): the
-  `Dashboard` root is `lg:flex lg:min-h-[calc(100vh-8.5rem)] lg:flex-col lg:justify-center`, so the focused
-  column sits centered in the viewport rather than top-stranded. `UebenPath` takes natural height on desktop
-  (`lg:min-h-0`, card/pager `lg:my-0`) so the Dashboard can center it. Mobile and `/welt` unchanged.
-- **Desktop scrollbar fix + snappier motion (PR #427):** the single-column stack at `max-w-md` was ~801px
-  tall on desktop, just over common laptop viewports, so the root `min-h-screen` forced a scrollbar.
-  Narrowed the **desktop** column (mobile stays `max-w-md`) and made transitions snappier.
-- **Size restore + directional tab slide (PR #429, later founder round):** the 22rem column from #427 read
-  as too small ("components got reduced"). Restored the desktop column to **`lg:max-w-[26rem]`** (near
-  mobile's `max-w-md`) and tightened the desktop toggle→content gap (`lg:space-y-3`) so the full-size stack
-  still fits: **Üben scroll-free ≥768px, Spielen ≥~800px** (bigger components need more room, so below that
-  Spielen can still scroll a little; inherent). Replaced the vertical fade on tab switch with a
-  **directional horizontal slide** (right→left to Spielen, left→right to Üben) via `AnimatePresence`
-  custom-direction + variants (~0.16s, reduced-motion safe). Verified both tabs at 768/800/832/900 + no page
-  errors on switching, mobile unchanged.
-- Gates green: build, lint 0 errors, `test:unit` 99/99, `check:bundle` **73.1 kB** / 400. Verified via
-  Playwright (screenshots + measured scroll/bounding-box).
-- **Ship status:** shipped across **PRs #413 (core), #414/#416/#417/#420/#424/#426/#428 (docs), #415 (color
-  swap + neutral borders + dumbbell), #418 (center Neuland + tighten card/pager gap), #421 (fill dumbbell),
-  #423 (desktop two-column, later reverted), #425 (revert to single column + desktop vertical centering),
-  #427 (desktop scrollbar fix + snappier motion), #429 (restore desktop tile size + directional tab
-  slide)**, all squash-merged to `main` (branch realigned after each). **Founder verifies the live site**
-  (Pages deploys on merge; sandbox can't reach `*.github.io`; deploy runs confirmed green via the Actions
-  API this session).
-
-_(Sessions 85-89's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_
+_(Sessions 85-90's handoffs moved to `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.)_

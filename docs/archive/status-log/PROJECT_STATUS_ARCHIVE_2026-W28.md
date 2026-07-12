@@ -1013,3 +1013,65 @@ approach (`boot-seo`, JSON-LD, sitemap).
 - **NOT done / follow-up candidates:** prerender emits the German snapshot only (the `?lang` toggle is
   client-side; could emit EN variants + `hreflang` if EN search matters); articles cover Kapitel 1 only
   (add per-Kapitel deep dives as Neuland grows); no per-article `og:image` (inherits the site card).
+
+---
+
+**Prior handoff after session 90 (2026-07-10). Heute Üben/Spielen tile parity + subtle section color theme
+(branch `claude/ueben-spielen-layout-styling-h7fsvm`, PR #413).**
+
+Founder: "keep the map/photo tile in üben/spielen same dimensions and fix them both in same position on the
+screen. Also add a subtle color theme for the toggle buttons and the border padding." Then two follow-ups:
+"use some other color instead of violet for üben" and "fill the üben icon when selected similar to spielen."
+- **Tile parity (the core ask):** the tiles were already the same size (both 3:2 in a `p-2` surface mat,
+  both inside the Dashboard `mx-auto max-w-md` wrapper), but their **screen position differed**: `UebenPath`
+  used `flex … justify-between` (which pushed the map down) while the compact `NeulandHub` was top-aligned.
+  Fix: Üben's header + map are **pinned to the top with a fixed `gap-4` (1rem)** matching Spielen (the s88
+  "distribute evenly" rule is superseded by this explicit position request). Measured in a headless browser:
+  **both tiles sit at the same top + `245×358px` below identically-positioned, page-centered titles** in
+  both tabs. No jump on toggle. (A later founder round replaced the pager's `mt-auto` bottom-pin with a
+  **`my-auto`-centered {card + pager} group + tight `space-y-3`** so the card drops down and the dots rise
+  to sit just below it, killing the stranded card↔dots gap; header + map stay pinned, parity intact.)
+- **Heading formatting (later founder round):** "Neuland" is now centered on the page **exactly like Üben's
+  "Lernpfad"** (same `text-2xl`/`font-bold`; measured horizontal center = viewport center for both). The
+  "Beta" chip is a **suffix, not part of the heading** — absolutely positioned off the h1's right edge and
+  out of flow, so it no longer shifts "Neuland" off-center.
+- **Subtle section color theme (final state after several founder rounds):** the active toggle button
+  (`Dashboard.tsx`) lifts on the white pill and picks up a per-section tint. **Üben = teal/accent
+  (`text-accent`) + a `Dumbbell` icon; Spielen = orange (`text-orange-500`) + a `Play` icon.** (History
+  this session: first shipped Üben=indigo/Spielen=teal, then Üben recolored to orange on the founder's "not
+  violet" note, then the two **swapped** to the final teal/orange, and Üben's `Zap` bolt replaced by the
+  dumbbell.) Both active icons fill (`fillActive` flag): the Play triangle and the dumbbell's weight
+  plates (a later founder round turned the dumbbell fill on; it reads fine at 16px).
+- **Tile-mat border is neutral gray:** the s90 experiment with per-section colored mat borders was
+  reverted at the founder's request ("colored borders don't look good"); both the Üben map mat and the
+  Spielen hero mat use the shared muted **`border-border`**. The white `bg-surface` mat is preserved; the
+  section color lives on the toggle only.
+- **Filled active icon:** both active toggle icons fill (`fillActive`) — Spielen's `Play` triangle and,
+  after a founder round, the Üben dumbbell's weight plates too (it reads fine filled at 16px).
+- **Desktop adaptation (later founder rounds, PRs #423 then #425):** on desktop the start page was a narrow
+  phone-width column stranded center-screen with big empty side margins. First shipped a **two-column** `lg`
+  layout (#423, tile | practice·missions), but the **founder rejected it**. Reverted to **one column on all
+  sizes** and adapted to desktop by **vertically centering** the whole start page instead (#425): the
+  `Dashboard` root is `lg:flex lg:min-h-[calc(100vh-8.5rem)] lg:flex-col lg:justify-center`, so the focused
+  column sits centered in the viewport rather than top-stranded. `UebenPath` takes natural height on desktop
+  (`lg:min-h-0`, card/pager `lg:my-0`) so the Dashboard can center it. Mobile and `/welt` unchanged.
+- **Desktop scrollbar fix + snappier motion (PR #427):** the single-column stack at `max-w-md` was ~801px
+  tall on desktop, just over common laptop viewports, so the root `min-h-screen` forced a scrollbar.
+  Narrowed the **desktop** column (mobile stays `max-w-md`) and made transitions snappier.
+- **Size restore + directional tab slide (PR #429, later founder round):** the 22rem column from #427 read
+  as too small ("components got reduced"). Restored the desktop column to **`lg:max-w-[26rem]`** (near
+  mobile's `max-w-md`) and tightened the desktop toggle→content gap (`lg:space-y-3`) so the full-size stack
+  still fits: **Üben scroll-free ≥768px, Spielen ≥~800px** (bigger components need more room, so below that
+  Spielen can still scroll a little; inherent). Replaced the vertical fade on tab switch with a
+  **directional horizontal slide** (right→left to Spielen, left→right to Üben) via `AnimatePresence`
+  custom-direction + variants (~0.16s, reduced-motion safe). Verified both tabs at 768/800/832/900 + no page
+  errors on switching, mobile unchanged.
+- Gates green: build, lint 0 errors, `test:unit` 99/99, `check:bundle` **73.1 kB** / 400. Verified via
+  Playwright (screenshots + measured scroll/bounding-box).
+- **Ship status:** shipped across **PRs #413 (core), #414/#416/#417/#420/#424/#426/#428 (docs), #415 (color
+  swap + neutral borders + dumbbell), #418 (center Neuland + tighten card/pager gap), #421 (fill dumbbell),
+  #423 (desktop two-column, later reverted), #425 (revert to single column + desktop vertical centering),
+  #427 (desktop scrollbar fix + snappier motion), #429 (restore desktop tile size + directional tab
+  slide)**, all squash-merged to `main` (branch realigned after each). **Founder verifies the live site**
+  (Pages deploys on merge; sandbox can't reach `*.github.io`; deploy runs confirmed green via the Actions
+  API this session).
