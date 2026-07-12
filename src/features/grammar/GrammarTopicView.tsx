@@ -17,7 +17,6 @@ import type { GrammarTopic } from "@/types";
 import { iconByName } from "@/lib/icons";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
@@ -102,23 +101,15 @@ function Lesson({
         </span>
       </div>
 
-      {/* Hero. Deliberately light on text (founder s93 follow-up): no English
-          eyebrow line; German title + the one-line purpose + badges. */}
-      <div className="flex items-start gap-3.5">
+      {/* Hero: icon + German title, nothing else (founder s93 follow-ups: no
+          duplicate German/English description, no meta badge row; the topic is
+          described ONCE, in the card below, and the drill count already shows
+          in the Übungen progress). */}
+      <div className="flex items-center gap-3.5">
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 sm:h-12 sm:w-12">
           <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </span>
-        <div className="min-w-0">
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{topic.titleDe}</h1>
-          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">{topic.purposeDe}</p>
-          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-            {topic.cefr && <Badge variant="muted">{topic.cefr}</Badge>}
-            {meta.labelDe !== topic.titleDe && <Badge variant="muted">{meta.labelDe}</Badge>}
-            <Badge variant="muted">
-              {total} Übung{total !== 1 ? "en" : ""}
-            </Badge>
-          </div>
-        </div>
+        <h1 className="min-w-0 text-2xl font-bold tracking-tight sm:text-3xl">{topic.titleDe}</h1>
       </div>
 
       {/* Muster first (the fastest-scan artifact), then the explanation

@@ -359,6 +359,11 @@ but with design freedom, and make it highly useful and intuitive for adult learn
   explanation **clamped to three lines** behind a "Mehr anzeigen"/"Weniger anzeigen" expander.
   Re-verified on the 390px viewport (tabs navigate out, Üben bar sticks while scrolling, expander
   toggles); all gates green again.
+- **Founder follow-up round 2 (same session, PR #459):** the lesson hero still described the topic twice
+  (German `purposeDe` in the hero + the English explanation in the card below) and carried a meta badge
+  row (CEFR + group + "n Übungen"). Both removed: the hero is now **group tile + German title only**;
+  the topic is described ONCE (the clamped explanation card) and the drill count already shows in the
+  Übungen progress. CEFR/purpose remain on the hub topic cards, where they inform the choice.
 - **NOT done / follow-up candidates:** per-topic drill progress is session-local only (persisting
   "topic mastered" would need progress-store/cloudSync thought); `BrowseToolbar` lost its last consumer
   (kept in repo like `FacetSheet`/`SubThemePicker`); Grammatik group icons could get bespoke marks later.

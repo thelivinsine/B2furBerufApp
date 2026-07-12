@@ -277,8 +277,9 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   B2-marker `groupOrder`, `orderedGrammar` spine, `topicRank`), `grammar/GrammarViews.tsx` (Karten cards
   with emerald group tile + priority-rank chip + mono pattern strip, compact Liste rows), and
   `grammar/GrammarTopicView.tsx`, the **lesson page**: the LibrarySwitcher tabs stay on top (founder
-  follow-up: a lesson must keep the section navigation), then a text-light hero (group tile, German
-  title + one-line purpose + badges; NO English eyebrow), the emerald **Muster** formula panel FIRST
+  follow-up: a lesson must keep the section navigation), then a minimal hero (group tile + German title
+  ONLY; founder follow-ups removed the English eyebrow, the German purpose line, and the meta badge row
+  as redundant: the topic is described once, in the card below), the emerald **Muster** formula panel FIRST
   with the explanation clamped to three lines behind a "Mehr anzeigen" expander, Beispiele, Typische
   Fehler, numbered Übungen with a **live progress bar**, a **completion panel** ("Thema abgeschlossen ·
   k von n richtig" + "Weiter: <next>") and prev/next cards along the priority spine ("Thema n von 10"),
