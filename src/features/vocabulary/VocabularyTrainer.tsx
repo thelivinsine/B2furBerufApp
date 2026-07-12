@@ -466,7 +466,11 @@ export function VocabularyTrainer() {
                 transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
                 className="overflow-hidden lg:hidden"
               >
-                <FilterRail {...filterRailProps} layout="panel" />
+                <FilterRail
+                  {...filterRailProps}
+                  layout="panel"
+                  onClose={() => setFiltersOpen(false)}
+                />
               </motion.div>
             )}
           </AnimatePresence>

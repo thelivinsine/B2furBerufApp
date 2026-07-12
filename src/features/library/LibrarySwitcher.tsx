@@ -46,7 +46,11 @@ export function LibrarySwitcher() {
     <div
       role="tablist"
       aria-label="Bibliothek"
-      className="flex w-full items-stretch gap-0.5 rounded-full border border-border bg-muted p-1 sm:gap-1"
+      // Doubles as the page header now that the HubHero is gone (founder s92):
+      // a lifted bar (shadow) anchors the top of the page, while the active tab
+      // reads as the current section title (bold + brand) and the others stay
+      // quiet. Still a fully functional tab row.
+      className="flex w-full items-stretch gap-0.5 rounded-full border border-border bg-muted p-1 shadow-soft sm:gap-1"
     >
       {SEGMENTS.map((seg) => {
         const active = current === seg.tab;
@@ -62,8 +66,10 @@ export function LibrarySwitcher() {
               // asked for; wider screens are NOT bumped to text-base, which read
               // as oversized). Tight mobile padding so the four labels including
               // "Kollokationen" still fit a phone row without a horizontal scroll.
-              "relative flex-1 whitespace-nowrap rounded-full px-1.5 py-2 text-center text-sm font-semibold leading-none transition-colors sm:px-3",
-              active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+              "relative flex-1 whitespace-nowrap rounded-full px-1.5 py-2.5 text-center text-sm leading-none transition-colors sm:px-3",
+              active
+                ? "font-bold text-primary"
+                : "font-medium text-muted-foreground hover:text-foreground",
             )}
           >
             {active && (
