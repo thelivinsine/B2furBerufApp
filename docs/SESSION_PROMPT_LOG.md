@@ -3895,3 +3895,42 @@ Branch: `claude/whats-next-esga9u`.
   Entry 354. This entry closes the paper trail for the explicit "document the session" prompt. No
   further code or content changes; log-only, shipped on the dev branch.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 356 — 2026-07-12 (session 99)
+- **Branch:** `claude/filter-hierarchy-branches-e35yxg`
+- **Prompt (verbatim):**
+  > Subtheme and Branche should be drop downs and the default heriarhy should be - Branche, Thema,
+  > Sub-thema. I need you to check the filter selecions and the words visible. There are common
+  > words for Branche and Thema which are not always visible. For example, when I select the word
+  > das Projekt, it's only showing it's applicable for IT Branche. Why is that? Projekt is
+  > applicable widely in several sectors/Branchen - fix such connection errors.
+  >
+  > also, common industries like Plastics, Chemicals or pharmaceuticals is missing in Branches.
+  > Look for such obvious sectors missing in the app. Prepare a robust plan including verification
+  > for the above items.
+- **Follow-up (verbatim):**
+  > it's not just isolated case of Projekt. The problem for it may persist for several words. if
+  > not for all of them. You need to fix the root cause of it.
+- **Follow-up (verbatim):**
+  > i approve the plan but don't implement it now. Just save it on the repo and merge to main.
+  > Document the session.
+- **Response summary:** Plan-mode session (Fable 5). Investigated the Branche filter end to end and
+  diagnosed the root cause: `sector` is a single optional value, only ~406/1,022 words and 165/701
+  collocations carry one, and the facet filter is strict, so selecting any Branche hides every
+  untagged word (das Projekt carries no tag at all) and pins tagged cross-industry words (die
+  Wartung, das Werkzeug, der Schichtplan) to the one sector of the pack they were authored in.
+  Confirmed systemic, exactly as the founder's second prompt insisted, and that no UI surface shows
+  a word's Branche today. Via AskUserQuestion the founder chose the maximum sector expansion
+  (Chemie & Kunststoff and Pharma & Medizintechnik as separate sectors, plus Reinigung,
+  Sicherheitsdienste, and a Transport → Transport & Logistik expansion) with full ~20-word +
+  ~9-collocation starter packs each. Wrote the approved plan: `sectors[]` multi-tagging with
+  untagged = universal semantics, Branche as a scope dropdown above Thema and Unterthema
+  (FilterRail generalized to ordered `scopes[]`, escaping the 12-option facet cap and the 15%
+  coverage floor), a retag audit of all 571 tagged items with a founder-review report, Branche
+  chips on the Tabelle/Karten views, and a verification section (new `tests/sectors.test.ts`,
+  linter `sectors[]` checks, gate suite, browser E2E checklist). Founder approved the plan but
+  deferred implementation: this session only saved the plan to
+  `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`, documented the session (status handoff s99, s97
+  archived to the W28 chunk, this log entry), and merged to `main`. No code or content changes.
+- **Artifacts:** `docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`, `docs/PROJECT_STATUS.md`,
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`, `docs/SESSION_PROMPT_LOG.md`.

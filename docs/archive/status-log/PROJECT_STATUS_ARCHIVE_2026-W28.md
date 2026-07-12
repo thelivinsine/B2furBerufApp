@@ -1357,3 +1357,35 @@ wave per commit on the branch (b1c0766 W2, 8c0df08 W3, 2bfb57f W4 + docs commits
   `draft`); Wave-2 tranche 2 (care, trades, retail, hospitality, transport, beauty, sports) after
   classmate feedback from the 2026-07-13 presentation; a Playwright smoke of one new grammar
   lesson in a real browser.
+
+**Handoff after session 97 (2026-07-12). Review-queue tooling shipped (scale-up plan §7.6's
+named next step).** `scripts/review-queue.mjs` + `pnpm review:queue`: a read-only dump of
+`draft` provenance rows, grouped by content type then by sector (vocab/collocation/text) /
+category (Redemittel) / group (grammar) / theme (Can-Do, dialogues, exam sets, writing prompts) /
+chapter (missions), written to `docs/reports/review-queue.md`. Mechanical tooling (Haiku-tier per
+the plan's model policy), no content or app-source changes.
+- **Usage:** `pnpm review:queue` for the full draft queue; scope a session with
+  `--type=vocabulary`, `--sector=it,engineering`, `--group=meetings`, or inspect what's already
+  verified with `--status=verified|all`. `--dry` prints the console summary only, no report file.
+  The headline summary (total rows, verified %) always covers the **whole register**, regardless
+  of filters, so a scoped session never loses sight of the overall trust metric.
+- **Current headline (unchanged by this session, now visible in one command):** **25 / 2,132 rows
+  verified (1.2%)** — only the founder-approved Can-Do bank. Everything from Waves 1–4 (vocab,
+  collocations, redemittel, grammar, texts, dialogues, exam sets, writing prompts, missions) is
+  still `draft`.
+- **Implementation note:** content_id → group lookup is built by cross-referencing the actual bank
+  items (not the provenance `notes` free text, which isn't populated consistently across banks);
+  grammar drills resolve to their parent topic's `group` field, missions to `chapter`.
+- **Verification:** `lint:content` ✔ (unaffected, script is read-only); `typecheck` ✔; `eslint`
+  0 errors (pre-existing hook warnings only); `test:unit` 116/116; full unfiltered run completes
+  in ~2s and produces the counts matching the s95 handoff exactly (2,132 total / 25 verified /
+  2,107 draft).
+- **NOT done:** actually running a review pass with the tool (flipping any rows to `verified`) —
+  this session shipped the tool only, per the plan's "Next step (first verification session)"
+  wording; the review pass itself is the next session's work. Wave-2 tranche 2 and the Playwright
+  grammar smoke (carried over from s95) are still open too.
+- **Model for the review pass (decided end of s97, next session starts fresh):** this is judgment
+  work on German correctness (article/plural, sense-match to the reference, register, CEFR
+  plausibility), not mechanical wiring, so it sits in the plan's authoring tier alongside German
+  writing, not the Haiku/Sonnet tier this session's tooling used. Recommended **Fable 5** first
+  choice, **Opus 4.8** fallback; Fable 5 was unavailable, so the **next session runs on Opus 4.8**.
