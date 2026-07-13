@@ -26,36 +26,51 @@ import { cn } from "@/lib/utils";
  * Lazy by design (imports the mission bank) so the Dashboard keeps NO content
  * bank on its eager path (bundle budget, CLAUDE.md). Adding a chapter = extend
  * STOPS + SEG_PATHS.
+ *
+ * s104 (founder-picked from preview/ueben-map-mockups.html): the street grid
+ * was re-spaced so no landmark tile hugs a map edge, and the palettes moved to
+ * the brand-tinted "Stimmung 3" (light) + "Dunkel D: Klarer Abend" (dark,
+ * deliberately bright with near-white labels; the old night palette was too
+ * dark). The route color rides the palette (`P.route`), not --primary.
  */
 
 type StopState = "done" | "current" | "locked";
 
 // Kapitel-1 stops in mission order, bound to their missions. `stop` is the
 // route point on the street grid, `tile` the landmark tile center (inside a
-// block). Coordinates live in the 360 x 230 map viewBox.
+// block). Coordinates live in the 360 x 230 map viewBox. Re-spaced in s104
+// (founder-picked mockup): the street grid sits at y 88/170 and x 76/176/276
+// so every tile keeps clear margin to the map edges.
 const STOPS = [
-  { key: "bahnhof", label: "Bahnhof", missions: ["m_kap1_willkommen", "m_kap1_automat"], stop: [30, 92], tile: [30, 52], color: "#5b5be6", labelPos: "below" },
-  { key: "laden", label: "Laden", missions: ["m_kap1_sim", "m_kap1_einkauf"], stop: [120, 92], tile: [120, 52], color: "#f0705f", labelPos: "below" },
-  { key: "zuhause", label: "Zuhause", missions: ["m_kap1_dach"], stop: [288, 131], tile: [322, 131], color: "#f2a03d", labelPos: "below" },
-  { key: "amt", label: "Amt", missions: ["m_kap1_anmeldung"], stop: [216, 178], tile: [216, 208], color: "#2fa8a0", labelPos: "right" },
+  { key: "bahnhof", label: "Bahnhof", missions: ["m_kap1_willkommen", "m_kap1_automat"], stop: [44, 88], tile: [44, 48], color: "#5b5be6", labelPos: "below" },
+  { key: "laden", label: "Laden", missions: ["m_kap1_sim", "m_kap1_einkauf"], stop: [120, 88], tile: [120, 48], color: "#f0705f", labelPos: "below" },
+  { key: "zuhause", label: "Zuhause", missions: ["m_kap1_dach"], stop: [276, 128], tile: [310, 128], color: "#f2a03d", labelPos: "below" },
+  { key: "amt", label: "Amt", missions: ["m_kap1_anmeldung"], stop: [216, 170], tile: [216, 205], color: "#2fa8a0", labelPos: "right" },
 ] as const;
 
 // Route legs between consecutive stops, along the street grid. Leg i arrives at
 // stop i+1; it renders solid when that stop is at or before the current one.
-const SEG_PATHS = ["M30 92 H120", "M120 92 H288 V131", "M288 131 V178 H216"];
+const SEG_PATHS = ["M44 88 H120", "M120 88 H276 V128", "M276 128 V170 H216"];
 
 // Map scenery palette (theme-aware: the map is an app surface on Heute).
+// s104 founder pick: light = "Brand-Ton" (indigo-tinted ground and blocks,
+// green parks), dark = "Klarer Abend" (the brightest of the dark candidates;
+// blue-grey ground, near-white labels, dusk rather than deep night). `route`
+// rides the palette because the dark map needs a brighter indigo than the
+// --primary token to keep contrast on the lifted ground.
 const MAP_LIGHT = {
-  ground: "#eef1e9", park: "#dcead0", parkDeep: "#c8dfb8",
-  lotA: "#e7e2d6", lotB: "#ded8ca",
-  casing: "#dfe3d8", street: "#ffffff", dash: "#d9ddd2",
-  label: "#5d6358", dotFill: "#ffffff", pinRing: "#ffffff",
+  ground: "#eef0f7", park: "#d6e6cf", parkDeep: "#bfd9b4",
+  lotA: "#e5e4f1", lotB: "#dbd9ea",
+  casing: "#dee0ee", street: "#ffffff", dash: "#d3d5e7",
+  label: "#5a5e78", dotFill: "#ffffff", pinRing: "#ffffff",
+  route: "#5b5be6",
 };
 const MAP_DARK = {
-  ground: "#1c222d", park: "#243428", parkDeep: "#2d4234",
-  lotA: "#2b3242", lotB: "#252c3a",
-  casing: "#151a23", street: "#3a4351", dash: "#556074",
-  label: "#a3adbd", dotFill: "#e8ecf4", pinRing: "#e8ecf4",
+  ground: "#2e3450", park: "#3a5545", parkDeep: "#4b7058",
+  lotA: "#42486e", lotB: "#393f60",
+  casing: "#232841", street: "#5a6187", dash: "#8f97bd",
+  label: "#dde1f2", dotFill: "#f4f5fc", pinRing: "#f4f5fc",
+  route: "#a6a6fd",
 };
 
 // White glyphs inside the landmark tiles (drawn at the tile center).
@@ -184,62 +199,63 @@ export default function UebenPath() {
             </defs>
 
             {/* parks + ambient lots (all inside blocks, never on streets) */}
-            <rect x={88} y={14} width={64} height={22} rx={11} fill={P.park} />
-            <circle cx={104} cy={25} r={7} fill={P.parkDeep} />
-            <circle cx={134} cy={26} r={8} fill={P.parkDeep} />
-            <rect x={196} y={106} width={72} height={50} rx={12} fill={P.park} />
-            <circle cx={216} cy={124} r={9} fill={P.parkDeep} />
-            <circle cx={246} cy={140} r={11} fill={P.parkDeep} />
-            <rect x={84} y={196} width={80} height={22} rx={11} fill={P.park} />
-            <rect x={14} y={14} width={32} height={18} rx={6} fill={P.lotA} />
-            <rect x={196} y={16} width={42} height={34} rx={7} fill={P.lotA} />
-            <rect x={248} y={16} width={26} height={56} rx={7} fill={P.lotB} />
-            <rect x={312} y={16} width={32} height={42} rx={7} fill={P.lotA} />
-            <rect x={16} y={112} width={34} height={50} rx={7} fill={P.lotB} />
-            <rect x={84} y={112} width={42} height={50} rx={7} fill={P.lotA} />
-            <rect x={136} y={112} width={26} height={34} rx={7} fill={P.lotB} />
-            <rect x={306} y={196} width={38} height={22} rx={7} fill={P.lotA} />
-            <rect x={240} y={196} width={46} height={22} rx={7} fill={P.lotB} />
+            <rect x={92} y={12} width={64} height={18} rx={9} fill={P.park} />
+            <circle cx={106} cy={21} r={5.5} fill={P.parkDeep} />
+            <circle cx={134} cy={21} r={6.5} fill={P.parkDeep} />
+            <rect x={192} y={104} width={68} height={48} rx={12} fill={P.park} />
+            <circle cx={212} cy={120} r={9} fill={P.parkDeep} />
+            <circle cx={242} cy={136} r={10} fill={P.parkDeep} />
+            <rect x={92} y={188} width={68} height={24} rx={11} fill={P.park} />
+            <rect x={10} y={12} width={26} height={14} rx={6} fill={P.lotA} />
+            <rect x={192} y={14} width={40} height={28} rx={7} fill={P.lotA} />
+            <rect x={240} y={20} width={20} height={44} rx={7} fill={P.lotB} />
+            <rect x={294} y={14} width={50} height={24} rx={7} fill={P.lotA} />
+            <rect x={300} y={48} width={28} height={16} rx={6} fill={P.lotB} />
+            <rect x={12} y={104} width={40} height={48} rx={7} fill={P.lotB} />
+            <rect x={92} y={104} width={44} height={48} rx={7} fill={P.lotA} />
+            <rect x={144} y={104} width={16} height={30} rx={6} fill={P.lotB} />
+            <rect x={10} y={186} width={44} height={24} rx={7} fill={P.lotA} />
+            <rect x={294} y={186} width={50} height={26} rx={7} fill={P.lotB} />
 
             {/* streets: casing, surface, center dashes */}
             <g fill="none" stroke={P.casing} strokeWidth={20} strokeLinecap="round">
-              <path d="M-10 92 H370" />
-              <path d="M-10 178 H370" />
-              <path d="M64 -10 V240" />
+              <path d="M-10 88 H370" />
+              <path d="M-10 170 H370" />
+              <path d="M76 -10 V240" />
               <path d="M176 -10 V240" />
-              <path d="M288 -10 V240" />
+              <path d="M276 -10 V240" />
             </g>
             <g fill="none" stroke={P.street} strokeWidth={13} strokeLinecap="round">
-              <path d="M-10 92 H370" />
-              <path d="M-10 178 H370" />
-              <path d="M64 -10 V240" />
+              <path d="M-10 88 H370" />
+              <path d="M-10 170 H370" />
+              <path d="M76 -10 V240" />
               <path d="M176 -10 V240" />
-              <path d="M288 -10 V240" />
+              <path d="M276 -10 V240" />
             </g>
             <g fill="none" stroke={P.dash} strokeWidth={1.6} strokeDasharray="7 9">
-              <path d="M0 92 H360" />
-              <path d="M0 178 H360" />
-              <path d="M64 0 V230" />
+              <path d="M0 88 H360" />
+              <path d="M0 170 H360" />
+              <path d="M76 0 V230" />
               <path d="M176 0 V230" />
-              <path d="M288 0 V230" />
+              <path d="M276 0 V230" />
             </g>
 
             {/* route: solid (with glow) up to the current stop, dotted onward */}
             {SEG_PATHS.map((d, i) =>
               i + 1 <= currentIndex ? (
                 <g key={d}>
-                  <path d={d} fill="none" stroke="hsl(var(--primary))" strokeWidth={12} strokeOpacity={0.14} strokeLinecap="round" strokeLinejoin="round" />
-                  <path d={d} fill="none" stroke="hsl(var(--primary))" strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round" />
+                  <path d={d} fill="none" stroke={P.route} strokeWidth={12} strokeOpacity={0.14} strokeLinecap="round" strokeLinejoin="round" />
+                  <path d={d} fill="none" stroke={P.route} strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round" />
                 </g>
               ) : (
-                <path key={d} d={d} fill="none" stroke="hsl(var(--primary))" strokeOpacity={0.45} strokeWidth={5} strokeLinecap="round" strokeDasharray="0.5 11" />
+                <path key={d} d={d} fill="none" stroke={P.route} strokeOpacity={0.45} strokeWidth={5} strokeLinecap="round" strokeDasharray="0.5 11" />
               ),
             )}
 
             {/* a white dot on every completed stop */}
             {STOPS.map((s, i) =>
               states[i] === "done" && i !== currentIndex ? (
-                <circle key={s.key} cx={s.stop[0]} cy={s.stop[1]} r={5.5} fill={P.dotFill} stroke="hsl(var(--primary))" strokeWidth={3} />
+                <circle key={s.key} cx={s.stop[0]} cy={s.stop[1]} r={5.5} fill={P.dotFill} stroke={P.route} strokeWidth={3} />
               ) : null,
             )}
 
@@ -263,11 +279,11 @@ export default function UebenPath() {
             ))}
 
             {/* current stop: pulse ring + location pin */}
-            <circle cx={pinX} cy={pinY} r={12} fill="none" stroke="hsl(var(--primary))" strokeWidth={2} className="uben-pulse" />
+            <circle cx={pinX} cy={pinY} r={12} fill="none" stroke={P.route} strokeWidth={2} className="uben-pulse" />
             <ellipse cx={pinX} cy={pinY + 3} rx={7} ry={2.4} fill="#3b3f4a" opacity={0.18} />
             <path
               d={`M${pinX} ${pinY + 2} c-8 -10.5 -12 -16 -12 -22.5 a12 12 0 1 1 24 0 c0 6.5 -4 12 -12 22.5 z`}
-              fill="hsl(var(--primary))"
+              fill={P.route}
               stroke={P.pinRing}
               strokeWidth={2.5}
             />

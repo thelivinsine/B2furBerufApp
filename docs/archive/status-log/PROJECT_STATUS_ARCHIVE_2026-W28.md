@@ -1511,3 +1511,41 @@ things: Üben is now specific to where the learner is, and the speaking block ca
   standing content follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2, Playwright
   grammar smoke). Browser E2E walk-through of the tailored sessions is left to the founder (sandbox
   can't reach the live site).
+
+**Handoff after session 102 (2026-07-12). Branche filter overhaul IMPLEMENTED and shipped (plan
+`docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`, approved s99), Fable 5.** Context: the founder presents
+the app to an audience 2026-07-13 and named the Branche filter a core demo feature, so the deferred
+plan was executed same-day and merged to `main`.
+- **Data model:** `sector?: WorkSector` → `sectors?: WorkSector[]` on VocabItem/Collocation/ReadingText
+  (mechanical migration of all 575 tagged rows); `WorkSector` extended to **15** (`chemicals`, `pharma`,
+  `cleaning`, `security`; `transport` relabeled "Transport & Logistik"); linter validates `sectors[]`
+  (non-empty, unique, enum) and ERRORS on the retired singular `sector`. `vocabulary.ts` is now two
+  concatenated literals (`vocabularyPart1/2`, TS2590 limit, same split as provenance s95).
+- **Root-cause fix:** `matchesSector` in `lib/facets.ts` (untagged = universal: general words show
+  under EVERY Branche; tagged hide only under other Branchen), applied as a scope cut in
+  VocabularyTrainer + CollocationsBrowser with **sector-first ordering** (Fachwörter lead, general
+  follow). Branche left the pill facets (no ≤12 cap, no coverage floor); `?sector=` is a single-value
+  scope param (old comma-list URLs degrade to first value).
+- **FilterRail** generalized from `primary`/`secondary` to an ordered **`scopes: RailPrimary[]`**
+  (stable `pinId` per scope keeps saved pins); Wörter/Kollokationen pass [Branche, Thema, Unterthema?],
+  Redemittel/Grammatik unchanged. Branche dropdown shows per-sector dedicated-content counts within
+  the current Thema scope. **Branche chips** (`features/shared/SectorChips.tsx`) on Wörter
+  Tabelle/Karten + Kollokationen Tabelle (sortable column; untagged shows nothing = general).
+- **Retag audit of all 562 tagged items** (393 words, 165 collocations, 4 texts): **117 untagged**
+  (shift vocabulary, PPE basics, everyday/general German: das Werkzeug, die Schicht, der Führerschein),
+  **162 widened** to 2-4 sectors (die Wartung → production+trades+engineering+chemicals), **279
+  confirmed**. Founder-review artifact: `docs/reports/sector-audit-report.md` (old → new + rationale
+  per item, grouped by decision).
+- **New content:** ~20-word packs for chemicals/pharma/cleaning/security + ~9 collocations each, a
+  10-word + 4-pair Lager boost (5 existing warehouse words tagged transport). Banks now **1,113 words /
+  741 collocations / 2,263 provenance rows** (all new rows `draft` with DWDS references).
+- **Gates all green:** lint:content ✔, typecheck ✔, lint 0 errors, **test:unit 124/124** (new
+  `tests/sectors.test.ts` pins matchesSector semantics, sector-first sort, and the v_projekt/v_bauzaun
+  regression pair), build + prerender ✔, bundle **73.0 kB**/400, `build:oracles` + `verify:facts` **0
+  two-oracle errors** (new nouns verified). **E2E in-browser (Playwright, dev server):** das Projekt
+  visible under IT AND Bau, der Bauzaun only under Bau, new sectors list their packs, `?sector=`
+  round-trips, mobile filter panel intact.
+- **NOT done / follow-up:** `pnpm build:frequency-subset` + `build:frequency` for the ~91 new words
+  (needs Python `wordfreq`; absent bins are fine, linter only errors on stale ids); founder review of
+  `sector-audit-report.md`; the human `verified` pass via `pnpm review:queue`; jury-pass extension to
+  Waves 1-2; Wave-2 tranche 2 after the 2026-07-13 classmate feedback; Playwright grammar smoke.

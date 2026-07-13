@@ -4108,3 +4108,43 @@ Branch: `claude/whats-next-esga9u`.
   `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` ·
   `docs/SESSION_PROMPT_LOG.md`.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 364 — 2026-07-12 (session 104)
+
+- **Branch:** `claude/map-mockup-generation-t0bsl6`
+- **Prompt (verbatim):**
+  > go ahead with the map mock-up generation as per the ui refinement plan. Provide a few mock-ups in a html file for preview
+- **Follow-up (verbatim, with 3 attached pixel-art village reference images):**
+  > The previews doesn't look good in your html. I'm attaching some style references. The thumbnail map can be inspired from these but not necessarily heavily detailed. Try again to generate some beauties and provide me a preview link
+- **Follow-up (verbatim, interrupting the pixel round mid-review):**
+  > stop with the current preview generations - let's not waste resources going in that path. Take the current map live and add enough spacing such that the active icons are not too much to the edge, and play with the colors of the shapes within and provide me with a few mock-ups in a preview link
+- **Follow-up (verbatim):**
+  > I like stimmung 3 but the dark mode is too dark with low contrast. Provide a couple of previews for dark mode
+- **Follow-up (verbatim):**
+  > I like dunkel D
+- **Follow-up (verbatim, mid-implementation):**
+  > Once done with the task, save the previews and reference images shared on the repo and document the session.
+- **Response summary:** Üben map mockup session (Fable 5, run in parallel with s103; rebased onto its merge) that converged on a shipped redesign of
+  `UebenPath.tsx` (Üben-refinements plan, Work item 3, re-scoped by the founder along the way).
+  Round 1: the plan's illustrated-buildings recipe as 3 SVG variants (plan spec / lively / depth),
+  light + dark; rejected. Round 2: a code-generated pixel-art village renderer (canvas, seeded,
+  day/night palettes) against the founder's Zelda/Pokemon-style references; the founder stopped this
+  direction mid-review to save resources (never committed; the reference images arrived inline in
+  chat and could not be exported to repo files). Round 3: the live map's design language kept, street
+  grid re-spaced so no landmark tile hugs an edge, four color moods (Live / Frisches Grün / Brand-Ton
+  / Warm & Hell), each light + dark, delivered as a claude.ai artifact link. Founder picked Stimmung
+  3 but rejected its dark as too dark, so a fourth sheet offered four brighter dark treatments
+  differing in where the brightness sits (lifted / light streets / light blocks / brightest ground);
+  founder picked "Dunkel D: Klarer Abend". Implemented in `UebenPath.tsx`: re-spaced grid (streets
+  y 88/170, x 76/176/276; tiles at [44,48]/[120,48]/[310,128]/[216,205]), re-laid parks/lots,
+  MAP_LIGHT = Brand-Ton, MAP_DARK = Klarer Abend, and a new `route` palette field replacing
+  `hsl(var(--primary))` on the journey line/pin (the dark map needs a brighter indigo than the dark
+  --primary token). Gates green (typecheck, lint 0 errors, test:unit 129/129, build + prerender,
+  bundle 73.0 kB) and verified in the built app via Playwright in both themes. Mockup rounds 1 and 3
+  archived beside the final dark-variants sheet under `preview/`. Shipped to `main` per the
+  auto-ship preference; docs updated (this entry, the s104 handoff, CLAUDE.md map notes, plan
+  progress block).
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx` · `preview/ueben-map-mockups.html` (final,
+  dark variants) · `preview/ueben-map-mockups-r1-beautify.html` ·
+  `preview/ueben-map-mockups-r2-farbstimmungen.html` · `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · `CLAUDE.md`.
