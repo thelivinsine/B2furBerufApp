@@ -472,6 +472,49 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     scheduleDraw();
   };
 
+  // Zoom into a random, frequently-used word: pick a node weighted by its area
+  // (radius ∝ wordfreq Zipf, so common words are far likelier than rare ones),
+  // center it, zoom in, and select it so its card + connections light up.
+  const zoomToFrequentWord = () => {
+    const container = containerRef.current;
+    const live = simRef.current;
+    if (!container || !live || live.nodes.length === 0) return;
+    const rect = container.getBoundingClientRect();
+    const nodes = live.nodes;
+    let total = 0;
+    for (const n of nodes) total += n.r * n.r;
+    let pick = nodes[0];
+    let r = Math.random() * total;
+    for (const n of nodes) {
+      r -= n.r * n.r;
+      if (r <= 0) {
+        pick = n;
+        break;
+      }
+    }
+    const targetK = clampK(2.6);
+    transformRef.current = {
+      k: targetK,
+      x: rect.width / 2 - (pick.x ?? 0) * targetK,
+      y: rect.height / 2 - (pick.y ?? 0) * targetK,
+    };
+    setSelectedId(pick.id);
+    scheduleDraw();
+  };
+
+  // The fit-to-screen button toggles (founder 2026-07-13): first press fits the
+  // whole graph, the next press zooms into a random often-used word, and so on.
+  const fitOrZoomRef = useRef<"fit" | "word">("fit");
+  const onFitButton = () => {
+    if (fitOrZoomRef.current === "fit") {
+      fitView();
+      fitOrZoomRef.current = "word";
+    } else {
+      zoomToFrequentWord();
+      fitOrZoomRef.current = "fit";
+    }
+  };
+
   const selected = selectedId ? itemById.get(selectedId) : undefined;
   const selectedNode = selectedId ? graph.nodes.find((n) => n.id === selectedId) : undefined;
 
@@ -510,8 +553,9 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
             <Minus className="h-4 w-4" />
           </button>
           <button
-            onClick={fitView}
-            aria-label="Ansicht einpassen"
+            onClick={onFitButton}
+            aria-label="Einpassen, erneut tippen für ein zufälliges häufiges Wort"
+            title="Einpassen · nochmal für ein zufälliges häufiges Wort"
             className="rounded-lg border border-border bg-surface/90 p-1.5 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:text-foreground"
           >
             <Maximize className="h-4 w-4" />

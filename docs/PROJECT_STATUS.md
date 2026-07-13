@@ -184,6 +184,15 @@ feedback button (emails founder), Fortschritt redesign, flippable Bibliothek til
   the preview build (0 runtime errors on Praktisch/Theorie Wörter+Grammatik/Fortschritt, desktop +
   mobile): nav rename, dumbbell icon, feedback pill placement (clears the mobile Üben bar), flip-card
   fronts, dropped tags, grammar group pills + "Mehr anzeigen (8)", centered toolbar, Fortschritt groups.
+- **Bibliothek follow-ups (same session, second turn):** (a) **all filter-duplicating tile tags
+  removed** — the Lernstand/mastery badge off Wörter cards and the group-label subtitle off Grammatik
+  cards (only plural + bookmark stay on Wörter); (b) **flip icon removed** from every tile (`FlipHint`
+  kept in `FlipCard.tsx` but unused; tiles still flip on click); (c) **filter-rail white items smaller
+  on desktop** (`lg:text-xs` + tighter padding on facet pills + scope triggers; mobile tap size kept);
+  (d) **graph fit-to-screen now toggles** — first press fits, next press zooms into a random often-used
+  word (weighted by wordfreq); (e) **tag audit**: all 1,113 vocab + 741 collocations have valid
+  themeId + sectors (0 issues); the untagged majority is universal by design, so no content edits; (f)
+  backlog #26 added (`PROJECT_REFERENCE.md`): **Verbs + Articles hubs** in Theorie.
 - **NOT done / deferred:** the founder's "reorderable list" phrasing for the filter groups was read as
   the pill-list + Mehr/Weniger presentation; **drag-to-reorder of filter categories was NOT built**
   (no functional purpose for OR-filters, deferred). Standing content follow-ups + Üben map tappable

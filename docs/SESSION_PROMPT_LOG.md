@@ -4226,3 +4226,30 @@ Branch: `claude/whats-next-esga9u`.
   `supabase/functions/submit-feedback/index.ts` (new) · `supabase/migrations/0006_feedback.sql` (new) ·
   `supabase/config.toml` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 367 — 2026-07-13 (session 105 continued, Bibliothek follow-ups)
+
+- **Branch:** `claude/demo-prep-feedback-rename-sl1jqq` (Opus 4.8)
+- **Prompts (verbatim):**
+  > can you make sure the tags for all the themas and Branches are applied properly for all the words and collocations.
+  > When clicked on fit to screen button a second time, the graph should zoom in into a random often used word. Add to do-do list in the documentation to add a Verbs and Articles hubs in Bibliothek somewhere. The size (both font and pill size) of white items in filter rail are a bit too big on the desktop - make them smaller. No need of keeping any tags on the tiles that are already part of filter (check this across the bibliothek) and also no need of flip icon (keep them in the code but make it obsolete).
+- **Response summary:** (1) **Tag audit** (scratch script via Vite ssrLoadModule): all 1,113 vocab +
+  741 collocations have a **valid themeId (0 missing/invalid)** and **valid sectors (0 invalid)**; every
+  theme has items; each of the 15 Branchen is populated. 35% of vocab / 25% of collocations are
+  Branche-tagged, the rest **untagged = universal by design** (s102). Nothing broken → no content
+  edits (mass-tagging the universal words would be wrong). (2) **Graph fit-to-screen toggle**
+  (`WordGraph.tsx`): first press fits, the next press **zooms into a random often-used word** (weighted
+  by node area ∝ wordfreq Zipf), centering + selecting it; verified in-app (zoomed to "die Garantie").
+  (3) **Backlog to-do** added to `PROJECT_REFERENCE.md` (#26): Verbs + Articles hubs in Theorie. (4)
+  **Filter-rail white items smaller on desktop** (`FilterRail.tsx`, `lg:` only so mobile tap size is
+  kept): facet pills + scope dropdown triggers → `lg:text-xs` + tighter padding. (5) **All
+  filter-duplicating tile tags removed** across Bibliothek: the **Lernstand/mastery badge** off Wörter
+  cards and the **group-label subtitle** off Grammatik cards (Häufigkeit/Branche/Register/CEFR were
+  already gone). (6) **Flip icon removed** from every tile (`FlipHint` no longer rendered; the component
+  stays in `FlipCard.tsx`, unused; tiles still flip on click). Gates: typecheck ✔, lint 0 errors,
+  content-lint ✔, test:unit 130/130, build ✔, bundle 75.8 kB. Playwright-verified (Wörter tiles,
+  filter pills, graph zoom). Merged to `main`.
+- **Artifacts:** `src/features/vocabulary/VocabList.tsx` · `src/features/vocabulary/WordGraph.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `src/features/grammar/GrammarViews.tsx` · `src/features/shared/FilterRail.tsx` ·
+  `docs/PROJECT_REFERENCE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.

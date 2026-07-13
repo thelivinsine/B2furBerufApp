@@ -7,7 +7,7 @@ import { redemittel, redemittelCategories } from "@/data/redemittel";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FlipCard, FlipHint } from "@/features/shared/FlipCard";
+import { FlipCard } from "@/features/shared/FlipCard";
 import {
   applyFacets,
   ActiveFilterChip,
@@ -160,9 +160,6 @@ export function RedemittelTrainer() {
               <p className="border-t border-border pt-2 text-xs italic text-muted-foreground">
                 „{p.example.de}"
               </p>
-              <div className="mt-auto flex justify-end pt-1">
-                <FlipHint />
-              </div>
             </CardContent>
           </Card>
         );
@@ -179,9 +176,6 @@ export function RedemittelTrainer() {
                   „{p.example.en}"
                 </p>
               )}
-              <div className="mt-auto flex justify-end pt-1">
-                <FlipHint />
-              </div>
             </CardContent>
           </Card>
         );

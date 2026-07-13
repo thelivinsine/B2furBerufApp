@@ -2,22 +2,13 @@ import { memo, useCallback, useState } from "react";
 import { ChevronDown, Bookmark } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useProgressStore } from "@/store/useProgressStore";
-import { mastery, masteryLabel } from "@/engine/srs";
 import { usePagedList } from "@/lib/usePagedList";
-import { FlipCard, FlipHint } from "@/features/shared/FlipCard";
+import { FlipCard } from "@/features/shared/FlipCard";
 import { cn } from "@/lib/utils";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
-
-const labelMap = {
-  new: { text: "neu", variant: "muted" as const },
-  learning: { text: "lernen", variant: "warning" as const },
-  review: { text: "wiederholen", variant: "default" as const },
-  mastered: { text: "gemeistert", variant: "success" as const },
-};
 
 /**
  * One word card, memoized and subscribed to its OWN slice of the progress
@@ -34,17 +25,16 @@ const VocabCard = memo(function VocabCard({
   open: boolean;
   onToggleOpen: (id: string) => void;
 }) {
-  const label = useProgressStore((s) => masteryLabel(mastery(s.srs[v.id])));
   const saved = useProgressStore((s) => s.savedWords.includes(v.id));
   const toggleSavedWord = useProgressStore((s) => s.toggleSavedWord);
-  const badge = labelMap[label];
   const hasRelated = relatedRows(v).length > 0;
 
-  // Front face: the German word + example. English lives on the flip side now
-  // (founder 2026-07-13), and "Verbunden" moved to the bottom-right corner.
-  // Häufigkeit and Branche tags were dropped from the tile (founder 2026-07-13):
-  // both are filter-tile facets/scopes, so repeating them on the card is
-  // redundant. The Lernstand badge stays — it is live per-card SRS state.
+  // Front face: the German word + example. English lives on the flip side.
+  // NO filter-facet tags on the tile (founder 2026-07-13): Häufigkeit, Branche
+  // AND the Lernstand/mastery badge were all dropped because each is a filter in
+  // the rail, so repeating it on the card is redundant. Only the plural (not a
+  // facet) and the bookmark action remain. The flip hint icon was removed too;
+  // the whole tile still flips on click.
   const front = (
     <Card className="card-hover h-full">
       <CardContent className="flex h-full flex-col p-4">
@@ -60,33 +50,30 @@ const VocabCard = memo(function VocabCard({
               <p className="text-xs text-muted-foreground">Pl.: {v.plural}</p>
             )}
           </div>
-          <div className="flex shrink-0 items-center gap-1">
-            <Badge variant={badge.variant}>{badge.text}</Badge>
-            <Button
-              type="button"
-              size="icon-sm"
-              variant="ghost"
-              aria-label={saved ? "Gespeichert" : "Wort speichern"}
-              aria-pressed={saved}
-              title={saved ? "Gespeichert" : "Wort speichern"}
-              className={cn(saved && "text-primary")}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleSavedWord(v.id);
-              }}
-            >
-              <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
-            </Button>
-          </div>
+          <Button
+            type="button"
+            size="icon-sm"
+            variant="ghost"
+            aria-label={saved ? "Gespeichert" : "Wort speichern"}
+            aria-pressed={saved}
+            title={saved ? "Gespeichert" : "Wort speichern"}
+            className={cn("shrink-0", saved && "text-primary")}
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSavedWord(v.id);
+            }}
+          >
+            <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
+          </Button>
         </div>
         <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
           „{v.examples[0].de}"
         </p>
 
-        {/* Bottom-right corner: the "Verbunden" toggle (founder 2026-07-13) plus
-            a quiet flip hint. Both stop propagation so they don't flip the tile. */}
-        <div className="mt-auto flex items-center justify-end gap-2 pt-2">
-          {hasRelated && (
+        {/* Bottom-right corner: the "Verbunden" toggle. Stops propagation so it
+            does not flip the tile. */}
+        {hasRelated && (
+          <div className="mt-auto flex items-center justify-end pt-2">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -98,9 +85,8 @@ const VocabCard = memo(function VocabCard({
               <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
               {open ? "Weniger" : "Verbunden"}
             </button>
-          )}
-          <FlipHint />
-        </div>
+          </div>
+        )}
         {open && (
           <div onClick={(e) => e.stopPropagation()}>
             <RelatedPanel item={v} />
@@ -124,9 +110,6 @@ const VocabCard = memo(function VocabCard({
             „{v.examples[0].en}"
           </p>
         )}
-        <div className="mt-auto flex items-center justify-end pt-2">
-          <FlipHint />
-        </div>
       </CardContent>
     </Card>
   );

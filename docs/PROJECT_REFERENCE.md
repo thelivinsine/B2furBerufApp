@@ -269,6 +269,14 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
       budget, nothing)? Accessibility (reduced motion, screen readers).
     - Recommended model: **Fable** for the interaction-design brainstorm, **Sonnet** for the build.
 
+26. **Verben- und Artikel-Hubs in der Bibliothek/Theorie (added 2026-07-13, founder to-do):** add a
+    dedicated **Verbs hub** and a **Articles (der/die/das) hub** somewhere in the Theorie section
+    (`/library`). Not yet scoped — likely new browse surfaces (or filtered lenses over the existing
+    vocab bank) focused on (a) verb conjugation/valency practice and (b) noun-gender + article drilling
+    (pairs naturally with backlog #4, the der/die/das visual mnemonics). Decide placement (a fifth
+    LibrarySwitcher tab vs. entry cards vs. facet lenses), data source (derive from the vocab bank's
+    articles/plurals + a verb-forms field, or a new bank), and whether it reuses the session engine.
+
 ### Product-evaluation findings (added 2026-07-03, from `docs/strategy/PRODUCT_EVALUATION.md`)
 
 The five items below (#26–#30) are the recommendations from scoring Genauly against the learning-science
