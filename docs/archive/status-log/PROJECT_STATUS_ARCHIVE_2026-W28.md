@@ -1838,3 +1838,30 @@ showed one account's progress under another.
   `test:unit` **134/134**.
 - **NOT done:** live verification on a real phone (offline crash no longer appears; graph zoom feel) is
   left to the founder (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain.
+
+## Session 110 (2026-07-13) — Bibliothek tab-switch slide animation (archived from PROJECT_STATUS s112)
+
+**Handoff after session 110 (2026-07-13). Bibliothek tab-switch slide animation (Opus 4.8), on branch
+`claude/bibliothek-slide-animations-hdf738`.** Founder: switching between the four Bibliothek/Theorie
+tabs loaded the content abruptly; wanted a snappy left/right slide. (Code shipped as PR #495 / `43761a3`,
+which merged just before the session-109 fixes above; documented here as a distinct handoff.)
+- **Change:** `LibraryHub` (`src/features/library/LibraryHub.tsx`) computes the tab-index direction
+  (target vs. previous, via a `useRef`) and wraps the segment in `<div key={tab}>` with a
+  `.lib-slide-in-right` / `.lib-slide-in-left` class. The four segments already remount per `?tab=`, so
+  the mount-time keyframe replays each switch: the incoming panel slides in ~220ms from the side tapped
+  toward (forward = from the right) and fades up (`cubic-bezier(0.22,1,0.36,1)`). Enter-only (the old
+  panel is swapped out instantly), which keeps it snappy and avoids double-mounting two heavy lazy lists.
+- **Why a CSS keyframe, not a framer transform wrapper:** the tab bar (`LibrarySwitcher`) lives INSIDE
+  each segment, and the segments rely on `position: sticky`/`fixed` descendants (desktop filter rail,
+  mobile sticky Üben action bar, fixed scroll-top button). A persistent `transform` at rest establishes a
+  containing block and would trap all of those. The keyframe (`.lib-slide-in-*` in `index.css`) uses the
+  **default `none` fill-mode**, so the transform exists only during the slide and reverts to none at rest.
+  Global `html`/`body` `overflow-x: clip` means the 1.25rem offset adds no scrollbar; the existing global
+  `prefers-reduced-motion` rule already neutralises it.
+- **Gates:** typecheck ✔, `pnpm build` + prerender ✔, `check:bundle` **77.4 kB**/400, `test:unit`
+  **134/134**. **Shipped:** PR #495 squash-merged to `main` (`43761a3`).
+- **NOT done / consider next:** it is enter-only, not a full swipe (old panel doesn't slide out); a true
+  swipe would need AnimatePresence keeping both segments mounted, which double-mounts the heavy lists and
+  reintroduces the `library-tab-pill` layoutId collision, so it was deliberately skipped. The whole panel
+  (incl. the tab bar, since the bar is inside each segment) slides subtly; offset kept small (~20px) so it
+  reads as content, not a bar jump. Live visual confirm on the deployed site is the founder's.

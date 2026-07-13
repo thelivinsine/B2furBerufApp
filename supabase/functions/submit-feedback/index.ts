@@ -63,6 +63,62 @@ const MAX_MESSAGE_LEN = 4000;
 const MAX_EMAIL_LEN = 200;
 const MAX_PAGE_LEN = 300;
 
+// ── Abuse hardening (s112, demo shared-link prep) ──────────────────────────
+// The demo audience gets the public URL, so the write path needs a speed limit
+// so no one can flood the founder's inbox via Resend. Two independent guards,
+// both migration-free (no schema change → the founder only redeploys the
+// function):
+//   1. Per-IP burst limit — in-memory, catches a single source hammering the
+//      form. Best-effort: module state is per warm isolate and resets on cold
+//      start, so guard 2 is the hard ceiling.
+//   2. Global hourly email ceiling — a DB count over the existing feedback
+//      table. Once reached we STOP sending email (across every source) but
+//      still STORE the row, so nothing is lost and the inbox can never be
+//      flooded regardless of where the traffic originates.
+const IP_WINDOW_MS = 10 * 60_000; // 10 minutes
+const IP_MAX_PER_WINDOW = 5; // ≤5 submissions per IP per window
+const GLOBAL_HOURLY_EMAIL_CAP = 60; // stop emailing past this many rows/hour
+const RATE_LIMIT_MSG = "Zu viele Anfragen. Bitte versuche es in ein paar Minuten erneut.";
+
+/** Recent accepted submission timestamps per hashed IP (in-memory, transient). */
+const RECENT = new Map<string, number[]>();
+
+function sweep(now: number): void {
+  for (const [k, v] of RECENT) {
+    if (v.every((t) => now - t >= IP_WINDOW_MS)) RECENT.delete(k);
+  }
+}
+
+/** Check-and-record: true if this IP is over the burst limit (reject), else records the hit. */
+function ipBurstHit(hash: string): boolean {
+  const now = Date.now();
+  const arr = (RECENT.get(hash) ?? []).filter((t) => now - t < IP_WINDOW_MS);
+  if (arr.length >= IP_MAX_PER_WINDOW) {
+    RECENT.set(hash, arr);
+    return true;
+  }
+  arr.push(now);
+  RECENT.set(hash, arr);
+  if (RECENT.size > 5000) sweep(now);
+  return false;
+}
+
+function clientIp(req: Request): string {
+  const xff = req.headers.get("x-forwarded-for") ?? "";
+  const first = xff.split(",")[0]?.trim();
+  return first || req.headers.get("x-real-ip") || "unknown";
+}
+
+/** Hash the client IP so raw addresses are never held even in transient memory. */
+async function hashIp(ip: string): Promise<string> {
+  const salt = Deno.env.get("FEEDBACK_IP_SALT") ?? "genauly-feedback";
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(`${salt}|${ip}`),
+  );
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, 32);
+}
+
 function escapeHtml(s: string): string {
   return s
     .replace(/&/g, "&amp;")
@@ -149,6 +205,13 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const admin = createClient(supabaseUrl, serviceKey);
+
+  // Abuse guard 1: per-IP burst limit (in-memory, best-effort). A single source
+  // that exceeds the window is turned away with the friendly error and nothing
+  // is stored or emailed.
+  const ipHash = await hashIp(clientIp(req));
+  if (ipBurstHit(ipHash)) return json({ ok: false, message: RATE_LIMIT_MSG }, 429);
 
   // Auth is OPTIONAL: attach the user id if a valid token is present, else the
   // row is anonymous. A missing/invalid token is not an error here.
@@ -166,12 +229,27 @@ Deno.serve(async (req) => {
     }
   }
 
-  // Send the notification first so we can record whether it went out.
-  const emailed = await sendEmail({ message, email, page, userId });
+  // Abuse guard 2: global hourly email ceiling (DB count over the existing
+  // table, no schema change). Past the cap we stop emailing but still store the
+  // row, so the inbox is hard-capped while no feedback is ever lost. On a count
+  // error we allow the email (guard 1 still applies) rather than drop a legit one.
+  let emailAllowed: boolean;
+  try {
+    const since = new Date(Date.now() - 3_600_000).toISOString();
+    const { count } = await admin
+      .from("feedback")
+      .select("id", { count: "exact", head: true })
+      .gte("created_at", since);
+    emailAllowed = (count ?? 0) < GLOBAL_HOURLY_EMAIL_CAP;
+  } catch {
+    emailAllowed = true;
+  }
+
+  // Send the notification (best-effort) so we can record whether it went out.
+  const emailed = emailAllowed ? await sendEmail({ message, email, page, userId }) : false;
 
   // Persist the row (service role → bypasses RLS). This is the durable record;
   // the email is best-effort on top of it.
-  const admin = createClient(supabaseUrl, serviceKey);
   const { error } = await admin.from("feedback").insert({
     user_id: userId,
     email,
