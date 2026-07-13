@@ -1,6 +1,6 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { DEFAULT_LIBRARY_TAB } from "./LibrarySwitcher";
+import { DEFAULT_LIBRARY_TAB, LIBRARY_TABS } from "./LibrarySwitcher";
 
 // The four library surfaces, lazy so each tab only pulls its own chunk. Every
 // segment renders its own <HubHero/> + <LibrarySwitcher/>, so the hub itself is
@@ -32,9 +32,24 @@ export function LibraryHub() {
   const tab = params.get("tab") ?? DEFAULT_LIBRARY_TAB;
   const Segment = TAB_COMPONENTS[tab] ?? TAB_COMPONENTS[DEFAULT_LIBRARY_TAB];
 
+  // Direction of the tab move (index of the target vs. where we came from), so a
+  // tab to the right slides the new panel in from the right and vice-versa. The
+  // segment already remounts on every tab change, so `key={tab}` makes the
+  // mount-time CSS enter animation replay each switch. See `.lib-slide-in-*` in
+  // index.css for why this is a self-clearing keyframe rather than a transform
+  // wrapper (sticky/fixed descendants must not be trapped).
+  const index = LIBRARY_TABS.indexOf(tab);
+  const prevIndex = useRef(index);
+  const forward = index >= prevIndex.current;
+  useEffect(() => {
+    prevIndex.current = index;
+  }, [index]);
+
   return (
-    <Suspense fallback={null}>
-      <Segment />
-    </Suspense>
+    <div key={tab} className={forward ? "lib-slide-in-right" : "lib-slide-in-left"}>
+      <Suspense fallback={null}>
+        <Segment />
+      </Suspense>
+    </div>
   );
 }
