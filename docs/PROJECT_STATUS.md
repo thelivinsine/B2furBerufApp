@@ -1,11 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-12 (session 104). **Üben map re-spaced + recolored** (Üben-refinements Work
-item 3, founder-picked from three mockup rounds): street grid moved so no landmark tile hugs a map
-edge, MAP_LIGHT = brand-tinted "Stimmung 3", MAP_DARK = the deliberately bright "Klarer Abend",
-route/pin color rides the palette. Mockup sheets live under `preview/ueben-map-mockups*.html`.
-Follows the same-day s103 ship of Üben items 2, 4+5, 6 (see its handoff below). Product name:
-**Genauly** (`genauly.de`)._
+_Last updated: 2026-07-13 (session 104, two parallel work-streams). **Bibliothek pre-demo round
+SHIPPED** (Opus 4.8): scope dropdowns (Branche/Thema/Unterthema/Kategorie/Gruppe) are now MULTI-select
+checkbox popovers, the reset clears them, the filter tile is subtle grey with white controls, the rail
+fills the viewport with a slim scrollbar, dropdown numbers show the option count, desktop search is
+inline, Wörter facet order (Wortart up / Stufe last), Redemittel lost its card section headers for a
+flat grid + Kategorie pills, and the Grammatik hub cards + drills were cleaned up. In parallel the
+**Üben map was re-spaced + recolored** (Fable 5, Work item 3 partial: street grid moved off the edges,
+MAP_LIGHT = brand-tinted "Stimmung 3", MAP_DARK = the bright "Klarer Abend"). Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -123,6 +126,49 @@ map mock-ups, iterated three rounds, and picked a direction that was then shippe
   for ~91 new words, founder review of `sector-audit-report.md`, human `verified` pass, jury Waves
   1-2, Playwright grammar smoke). With s103's items 2/4+5/6 shipped in parallel, the Üben plan is now
   fully shipped except item 3's tappable stops.
+
+**Handoff after session 104 (2026-07-13). Bibliothek pre-demo round SHIPPED (Opus 4.8, mid-session
+model switch from Sonnet 5).** A same-day founder round the day of the presentation, in two batches.
+Batch 1 (two founder lines): scope dropdowns must be multi-select, and the reset must clear them.
+Batch 2 (one long mid-turn message): a grab-bag of visual/UX fixes. All shipped together.
+- **Multi-select scope dropdowns (reverses the s84 single-select lock; `AskUserQuestion` → "All scope
+  dropdowns"):** `FilterRail.tsx` grew a hand-built checkbox popover `ScopeMultiSelect` (Radix `Select`
+  is single-value); `RailPrimary` moved from `value`/`onChange(v)` to `values: string[]`/
+  `onChange(values)`. `matchesSector`/`sectorFirst` (`lib/facets.ts`) + `themeGroupsForMode`
+  (`lib/themeGroups.ts`) now take arrays (OR-within). Every browse page
+  (Wörter/Kollokationen/Redemittel/Grammatik) reads its scope params as comma-lists. Sub-theme
+  drill-down + travelling `useLibraryScope` engage only with exactly one active Thema; `startSession`
+  collapses multi-Thema/Unterthema to the first value (composer biases one theme) but forwards every
+  Branche. `tests/sectors.test.ts` updated to the array API + an OR-within case (130/130).
+- **Reset clears scopes too** (was `onChange({})` only) and the active-count badge counts scopes +
+  facets.
+- **Filter tile is subtle grey again** (`bg-muted`, reversing s103's `bg-surface`): the founder found
+  white-on-white too low-contrast. Controls inside stay white (`bg-surface` scope triggers + unselected
+  facet pills) so they pop. See DECISIONS.md s104 for the s92→s103→s104 contrast arc.
+- **Rail fills the viewport** (`lg:max-h-[calc(100vh-7rem)]`, was `-22rem`) with a **slim visible
+  scrollbar** (`.slim-scrollbar` in `index.css`, replaced `no-scrollbar`).
+- **Dropdown "Alle X" numbers show the option count** (15 Branchen / 15 Themen), not the item total,
+  in the muted pill-number format; per-option counts unchanged.
+- **Desktop search grows inline in the toolbar row** (`hidden lg:block lg:flex-1`); mobile keeps its
+  own second row.
+- **Wörter facet order:** Wortart moved up (after Thema/Unterthema), Stufe (CEFR) moved to the end.
+- **Redemittel:** per-category card section headers removed → flat card grid; **Kategorie is now a
+  16-pill multi-select facet** in the filter (`CATEGORY_FACET`), not a scope dropdown; `?cat=`/
+  `?register=` both ride the facet selection; facets apply last over the full bank.
+- **Grammatik hub cards** show ONE clean pattern (`pattern.split(" · ")[0]`) in the emerald Muster tint
+  (was a truncated " · " fragment) + a bigger icon tile; **drill options** (`GrammarDrillCard.tsx`) got
+  a `bg-muted/50` idle fill so they read as tappable answers, not disabled fields. (The lesson layout
+  itself was already solid post-s93/s103; this was the "pre-demo sweep".)
+- **Gates:** typecheck ✔, lint **0 errors** (42 pre-existing warnings), test:unit **130/130**, build +
+  prerender ✔, bundle **73.0 kB**/400. Browser-verified (Playwright, dev server): grey tile + white
+  pills/dropdowns, Branche multi-select checkbox popover with per-option counts, "15" option counts,
+  inline desktop search, gray mobile filter panel, Grammatik cards. Founder verifies the live result.
+- **NOT done:** Üben-plan Work item 3's **tappable stops** (the map re-space/recolor shipped in the
+  parallel s104 handoff above; only the tap-to-slide-card sub-task remains); the standing content
+  follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2, Playwright grammar smoke);
+  founder review of `sector-audit-report.md`. Note: 16 Kategorie pills exceeds the ≤12 facet-hygiene
+  guideline (a dev-only warning), accepted because the founder explicitly wanted the group names as
+  pills.
 
 _(Sessions 85-102's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to

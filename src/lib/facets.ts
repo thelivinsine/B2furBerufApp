@@ -21,18 +21,23 @@ import { CEFR_ORDER } from "@/lib/cefr";
 // already consumes, so nothing about the UI changes.
 // ─────────────────────────────────────────────────────────────────────────
 
-// ── Control-choice rule (audit P2, locked; why: docs/DECISIONS.md) ───────
+// ── Control-choice rule (audit P2; multi-select amendment s104; why: docs/DECISIONS.md) ──
 // Which UI control a dimension gets is NOT a taste call:
 //   • Segmented control  = switch WHICH KIND of content (the 4 library tabs).
-//   • Primary dropdown   = the ONE single-select "where am I" cut that
-//     re-scopes the page (Domain-grouped Thema, Kategorie, Gruppe). Never
-//     multi-select, never inside the sheet.
+//   • Primary dropdown   = the "where am I" cut that re-scopes the page
+//     (Branche, Domain-grouped Thema, Unterthema, Kategorie, Gruppe). Since
+//     s104 these are MULTI-select (OR-within, same semantics as a facet); an
+//     empty selection means "Alle X". Still never inside the sheet — it stays
+//     a dedicated dropdown, not a pill row, because the option lists are long
+//     and often grouped.
 //   • Facet pills (sheet)= orthogonal, multi-select, ≤12-option ATTRIBUTES
 //     that refine within the primary (CEFR, Wortart, Register, Häufigkeit,
 //     Lernstand). The sheet only mounts with ≥1 facet group; with exactly one
 //     small dimension on a page, prefer an inline chip row (Redemittel
 //     Register) over a modal.
 //   • Sub-theme picker   = the dependent finer TOPIC grain. Never a facet.
+//     Since s104 it only renders when EXACTLY ONE Thema is selected (a
+//     multi-theme selection has no single sub-theme spine to drill into).
 // Axis rule (Thema vs Situation vs Branche): one topic spine at three grains
 // (Domain → Thema → Sub-theme; "Situation" IS the sub-theme grain), Branche
 // is an orthogonal CONTEXT axis (the industry you work in), and CEFR /
@@ -130,24 +135,27 @@ export const SECTOR_LABEL: Record<string, string> = Object.fromEntries(
   SECTOR_OPTIONS.map((o) => [o.value, o.label]),
 );
 
-/** The root-cause Branche semantics (overhaul s102): untagged = universal.
- *  An item with no `sectors` is general vocabulary and shows under EVERY
- *  Branche; a tagged item hides only under OTHER Branchen. `sector` empty
- *  ("Alle Branchen") matches everything. */
+/** The root-cause Branche semantics (overhaul s102, multi-select s104): untagged
+ *  = universal. An item with no `sectors` is general vocabulary and shows
+ *  under EVERY Branche; a tagged item hides only under Branchen NOT in the
+ *  selection. An empty `sectors` selection ("Alle Branchen") matches
+ *  everything. Multiple selected Branchen are OR-within, same as a facet. */
 export function matchesSector(
   item: { sectors?: readonly string[] },
-  sector: string | undefined | null,
+  sectors: readonly string[] | undefined | null,
 ): boolean {
-  return !sector || !item.sectors?.length || item.sectors.includes(sector);
+  return (
+    !sectors?.length || !item.sectors?.length || item.sectors.some((s) => sectors.includes(s))
+  );
 }
 
-/** With a Branche selected, the learner's Fachwörter lead the list and the
- *  general (untagged) words follow. Stable within each group. */
+/** With one or more Branchen selected, the learner's Fachwörter lead the list
+ *  and the general (untagged) words follow. Stable within each group. */
 export function sectorFirst<T extends { sectors?: readonly string[] }>(
   items: T[],
-  sector: string | undefined | null,
+  sectors: readonly string[] | undefined | null,
 ): T[] {
-  if (!sector) return items;
+  if (!sectors?.length) return items;
   const tagged: T[] = [];
   const general: T[] = [];
   for (const i of items) (i.sectors?.length ? tagged : general).push(i);

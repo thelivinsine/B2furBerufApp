@@ -12,7 +12,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { themeById } from "@/data/themes";
-import { vocabulary, vocabByTheme, vocabBySubTheme, filterVocab } from "@/data/vocabulary";
+import { vocabulary, vocabByTheme, vocabBySubTheme } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
@@ -72,11 +72,22 @@ export function VocabularyTrainer() {
   const learningMode = useSettingsStore((s) => s.mode);
   const savedWords = useProgressStore((s) => s.savedWords);
   const scope = useLibraryScope();
-  const theme = params.get("theme") ?? "all";
-  const sub = params.get("sub") ?? "";
-  // Branche is a single-value SCOPE param since the s102 overhaul (it used to
-  // be a comma-list facet; old URLs degrade to their first value).
-  const sector = (params.get("sector") ?? "").split(",")[0];
+  // Scope dropdowns are multi-select (s104, founder decision): each rides a
+  // comma-list URL param, empty/absent = "everything". `theme`/`sector` were
+  // briefly single-value scope params after the s102 Branche overhaul; s104
+  // reverted that so multiple Themen/Branchen can be picked together.
+  const themes = useMemo(() => {
+    const raw = params.get("theme");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  }, [params]);
+  const subs = useMemo(() => {
+    const raw = params.get("sub");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  }, [params]);
+  const sectors = useMemo(() => {
+    const raw = params.get("sector");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  }, [params]);
   const savedActive = params.get("saved") === "1";
   const [mode, setMode] = useState("flashcards");
   const [search, setSearch] = useState("");
@@ -104,13 +115,13 @@ export function VocabularyTrainer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep the shared scope in sync with the page's effective theme (whether set
-  // via the dropdown or arrived at through a deep link) so it travels to the
-  // other segments.
+  // Keep the shared scope in sync with the page's effective theme, but only
+  // when it resolves to exactly ONE theme (`useLibraryScope` is a single
+  // "where am I" choice; a multi-Thema selection has no one value to travel).
   useEffect(() => {
-    scope.setScope(theme, sub);
+    if (themes.length === 1) scope.setScope(themes[0], subs[0] ?? "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme, sub]);
+  }, [themes, subs]);
 
   // Content-facet visibility follows the coverage floor in the registry, not
   // the Mode lens (categorization audit 2026-07-09). On top of those, the
@@ -132,13 +143,26 @@ export function VocabularyTrainer() {
     }),
     [srs],
   );
-  const facets = useMemo(() => [...vocabFacets(), srsFacet], [srsFacet]);
+  // Facet order (founder follow-up s104): Wortart moves up to sit right after
+  // Thema/Unterthema, Häufigkeit and Lernstand keep following it, and Stufe
+  // (CEFR) moves to the true end of the tile instead of leading. `vocabFacets()`
+  // still gates on the coverage floor; CEFR is pulled out of its registry
+  // order and appended last (after the per-learner Lernstand facet, which the
+  // registry doesn't know about).
+  const facets = useMemo(() => {
+    const registry = vocabFacets();
+    const cefr = registry.find((f) => f.id === "cefr");
+    const rest = registry.filter((f) => f.id !== "cefr");
+    return cefr ? [...rest, srsFacet, cefr] : [...rest, srsFacet];
+  }, [srsFacet]);
 
-  const activeTheme = theme !== "all" ? themeById(theme) : undefined;
+  // Sub-theme drill-down only makes sense with exactly ONE active Thema (a
+  // multi-theme selection has no single sub-theme spine, s104).
+  const activeTheme = themes.length === 1 ? themeById(themes[0]) : undefined;
   const subThemes = activeTheme?.subThemes ?? [];
   const hasSubThemes = subThemes.length > 0;
-  const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
-  const activeSub = subThemes.find((s) => s.id === sub);
+  const subFilter = hasSubThemes && subs.length ? subs : undefined;
+  const activeSub = subThemes.find((s) => subs.includes(s.id));
 
   const ALL_FACET_IDS = [...VOCAB_FACET_IDS, "srs"];
 
@@ -153,16 +177,17 @@ export function VocabularyTrainer() {
 
   // Theme-scoped list BEFORE the Branche cut, so the Branche dropdown can show
   // per-sector dedicated-content counts within the current Thema scope.
-  const themeScoped = useMemo(
-    () => filterVocab({ theme, sub: subFilter }),
-    [theme, subFilter],
-  );
-  // The Branche scope cut (root-cause fix, s102): untagged words are general
-  // vocabulary and stay visible under EVERY Branche; tagged words hide only
-  // under other Branchen (matchesSector).
+  const themeScoped = useMemo(() => {
+    let list = themes.length ? vocabulary.filter((v) => themes.includes(v.themeId)) : vocabulary;
+    if (subFilter) list = list.filter((v) => !!v.subThemeId && subFilter.includes(v.subThemeId));
+    return list;
+  }, [themes, subFilter]);
+  // The Branche scope cut (root-cause fix, s102; multi-select s104): untagged
+  // words are general vocabulary and stay visible under EVERY selected
+  // Branche; tagged words hide only under Branchen NOT in the selection.
   const scoped = useMemo(
-    () => (sector ? themeScoped.filter((v) => matchesSector(v, sector)) : themeScoped),
-    [themeScoped, sector],
+    () => (sectors.length ? themeScoped.filter((v) => matchesSector(v, sectors)) : themeScoped),
+    [themeScoped, sectors],
   );
 
   const searchedRaw = useMemo(() => {
@@ -209,27 +234,27 @@ export function VocabularyTrainer() {
   );
   const hiddenLabel = bandActive && bandLimited.length < searched.length ? hiddenBandsLabel(level) : null;
 
-  // With a Branche selected, the sector-tagged Fachwörter lead the list and
-  // the general words follow (s102 overhaul).
+  // With one or more Branchen selected, the sector-tagged Fachwörter lead the
+  // list and the general words follow (s102 overhaul, multi-select s104).
   const items = useMemo(
-    () => sectorFirst(applyFacets(bandLimited, facets, selection), sector),
-    [bandLimited, facets, selection, sector],
+    () => sectorFirst(applyFacets(bandLimited, facets, selection), sectors),
+    [bandLimited, facets, selection, sectors],
   );
   const facetKey = ALL_FACET_IDS.map((id) => params.get(id) ?? "").join("|");
 
-  const setTheme = (t: string) => {
+  const setThemes = (next: string[]) => {
     const p = new URLSearchParams(params);
-    if (t === "all") p.delete("theme");
-    else p.set("theme", t);
+    if (next.length) p.set("theme", next.join(","));
+    else p.delete("theme");
     p.delete("sub");
     setParams(p, { replace: true });
     // scope stays in sync via the effect above (covers both dropdown + deep links)
   };
 
-  const setSector = (s: string) => {
+  const setSectors = (next: string[]) => {
     const p = new URLSearchParams(params);
-    if (!s || s === "all") p.delete("sector");
-    else p.set("sector", s);
+    if (next.length) p.set("sector", next.join(","));
+    else p.delete("sector");
     setParams(p, { replace: true });
   };
 
@@ -243,10 +268,10 @@ export function VocabularyTrainer() {
     setParams(p, { replace: true });
   };
 
-  const setSub = (s: string) => {
+  const setSubs = (next: string[]) => {
     const p = new URLSearchParams(params);
-    if (!s) p.delete("sub");
-    else p.set("sub", s);
+    if (next.length) p.set("sub", next.join(","));
+    else p.delete("sub");
     setParams(p, { replace: true });
   };
 
@@ -258,8 +283,8 @@ export function VocabularyTrainer() {
   };
 
   const primaryGroups = useMemo(
-    () => themeGroupsForMode(learningMode, theme, (id) => vocabByTheme(id).length),
-    [learningMode, theme],
+    () => themeGroupsForMode(learningMode, themes, (id) => vocabByTheme(id).length),
+    [learningMode, themes],
   );
 
   // Carry the learner's active learning scope into the session, so Üben
@@ -268,11 +293,16 @@ export function VocabularyTrainer() {
   // deliberately not forwarded.
   const startSession = () => {
     const p = new URLSearchParams();
-    if (theme !== "all") p.set("theme", theme);
-    if (subFilter) p.set("sub", subFilter);
+    // The session engine's `libraryFocus` (engine/session.ts) still takes a
+    // single `theme`/`sub` (it biases ONE session, not several themes at
+    // once); a multi-Thema/Unterthema browse selection collapses to its
+    // first value here rather than teaching the session composer a new
+    // multi-theme mode. Branche already accepts a comma list there, so every
+    // selected Branche is forwarded.
+    if (themes.length) p.set("theme", themes[0]);
+    if (subFilter?.length) p.set("sub", subFilter[0]);
     if (selection.cefr?.length) p.set("cefr", selection.cefr.join(","));
-    // Branche is a single-value scope since the s102 overhaul, not a facet.
-    if (sector) p.set("sector", sector);
+    if (sectors.length) p.set("sector", sectors.join(","));
     const q = p.toString();
     navigate(`/session${q ? `?${q}` : ""}`);
   };
@@ -342,13 +372,14 @@ export function VocabularyTrainer() {
   // (founder follow-up, s91): the desktop rail and the mobile tile share
   // these props; only className + defaultOpen differ.
   const filterRailProps = {
-    // Ordered scope hierarchy (founder, s102): Branche → Thema → Unterthema.
+    // Ordered scope hierarchy (founder, s102; multi-select s104): Branche →
+    // Thema → Unterthema.
     scopes: [
       {
         pinId: "sector",
         label: "Branche",
-        value: sector || "all",
-        onChange: setSector,
+        values: sectors,
+        onChange: setSectors,
         // The count is the DEDICATED-content signal (sector-tagged items in the
         // current Thema scope); zero-count Branchen stay selectable because
         // general words always show.
@@ -362,24 +393,25 @@ export function VocabularyTrainer() {
       {
         pinId: "primary",
         label: "Thema",
-        value: theme,
-        onChange: setTheme,
+        values: themes,
+        onChange: setThemes,
         all: { value: "all", label: "Alle Themen", count: vocabulary.length },
         groups: primaryGroups,
       },
       // Sub-theme drill-down as a third dropdown (founder s92): replaces the old
-      // full-page SubThemePicker so narrowing to a sub-theme is part of the filter.
+      // full-page SubThemePicker so narrowing to a sub-theme is part of the
+      // filter. Only rendered when exactly one Thema is active (`hasSubThemes`).
       ...(hasSubThemes
         ? [
             {
               pinId: "secondary",
               label: "Unterthema",
-              value: sub && sub !== "" ? sub : "all",
-              onChange: setSub,
+              values: subs,
+              onChange: setSubs,
               all: {
                 value: "all",
                 label: "Gesamtes Thema",
-                count: vocabByTheme(theme).length,
+                count: vocabByTheme(themes[0]).length,
               },
               options: subThemes.map((s) => ({
                 value: s.id,
@@ -421,11 +453,11 @@ export function VocabularyTrainer() {
 
       <TabsContent value="flashcards">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <Flashcards items={items} key={`fc-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
+          <Flashcards items={items} key={`fc-${themes.join(",")}-${subs.join(",")}-${facetKey}-${search}-${showAllLevels}`} />
         </motion.div>
       </TabsContent>
       <TabsContent value="quiz">
-        <VocabQuiz items={items} key={`q-${theme}-${sub}-${facetKey}-${search}-${showAllLevels}`} />
+        <VocabQuiz items={items} key={`q-${themes.join(",")}-${subs.join(",")}-${facetKey}-${search}-${showAllLevels}`} />
       </TabsContent>
       <TabsContent value="list">
         <VocabList items={items} />
@@ -471,25 +503,37 @@ export function VocabularyTrainer() {
               in the rail. */}
           <div className="flex w-full flex-col gap-2">
             {/* Toolbar row: Filter toggle (mobile, left of the view icons) + view
-                switcher + bookmark/search on the right. */}
+                switcher + bookmark/search on the right. On DESKTOP an open
+                search grows inline in THIS row (founder s104: no third line),
+                pushing the icons to the right edge; mobile keeps the second
+                row below. */}
             <div className="flex w-full items-center justify-between gap-2">
               {filterButton}
               <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
+              {searchOpen && (
+                <SearchField
+                  value={search}
+                  onChange={setSearch}
+                  placeholder="Suche nach Wort, Übersetzung …"
+                  autoFocus
+                  className="hidden min-w-0 lg:block lg:flex-1"
+                />
+              )}
               <div className="flex items-center gap-2">
                 {savedButton}
                 {searchButton}
               </div>
             </div>
 
-            {/* Search input lives OUTSIDE the filter panel (founder s92): a
-                transient row the search icon toggles. It does not touch the
-                filter state. */}
+            {/* Mobile-only second row: the same transient search input. Desktop
+                shows it inline in the toolbar row above instead. */}
             {searchOpen && (
               <SearchField
                 value={search}
                 onChange={setSearch}
                 placeholder="Suche nach Wort, Übersetzung …"
                 autoFocus
+                className="lg:hidden"
               />
             )}
 
@@ -532,18 +576,21 @@ export function VocabularyTrainer() {
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {/* Sub-theme drill-down now lives in the filter (the Unterthema
-              dropdown), not a separate picker page. When a sub-theme is active
-              this breadcrumb shows the context and jumps back to the whole theme. */}
-          {hasSubThemes && sub && sub !== "all" && (
+              dropdown), not a separate picker page. When one or more sub-themes
+              are active this breadcrumb shows the context and jumps back to the
+              whole theme. */}
+          {hasSubThemes && subs.length > 0 && (
             <button
-              onClick={() => setSub("")}
+              onClick={() => setSubs([])}
               className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               <ChevronLeft className="h-4 w-4" />
               {activeTheme?.titleDe}
               <span className="text-muted-foreground/60">/</span>
               <span className="text-foreground">
-                {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
+                {subs.length === 1
+                  ? (activeSub?.titleDe ?? "Gesamtes Thema")
+                  : `${subs.length} Unterthemen`}
               </span>
             </button>
           )}
@@ -574,7 +621,7 @@ export function VocabularyTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="no-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)] lg:overflow-hidden lg:overflow-y-auto"
+          className="slim-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden lg:overflow-y-auto"
         />
       </div>
     </div>

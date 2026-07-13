@@ -96,7 +96,10 @@ export function GrammarDrillCard({
                 onClick={() => choose(opt)}
                 className={cn(
                   "flex items-center justify-between rounded-lg border px-3.5 py-2.5 text-left text-sm font-medium transition-colors",
-                  state === "idle" && "border-border bg-background hover:border-primary/40 hover:bg-muted/40",
+                  // Idle options carry a subtle fill so they read as tappable
+                  // answer chips, not disabled input fields (founder s104).
+                  state === "idle" &&
+                    "border-border bg-muted/50 hover:border-primary/50 hover:bg-muted",
                   state === "correct" && "border-success bg-success/10 text-success",
                   state === "wrong" && "border-danger bg-danger/10 text-danger",
                   state === "dim" && "border-border opacity-50",

@@ -91,11 +91,20 @@ export function CollocationsBrowser() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [view, setView] = useViewParam(KOLLOKATION_VIEWS);
 
-  const themeParam = params.get("theme") ?? "all";
-  const sub = params.get("sub") ?? "";
-  // Branche is a single-value SCOPE param since the s102 overhaul (old
-  // comma-list facet URLs degrade to their first value).
-  const sector = (params.get("sector") ?? "").split(",")[0];
+  // Scope dropdowns are multi-select (s104, founder decision): each rides a
+  // comma-list URL param, empty/absent = "everything".
+  const themes = useMemo(() => {
+    const raw = params.get("theme");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  }, [params]);
+  const subs = useMemo(() => {
+    const raw = params.get("sub");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  }, [params]);
+  const sectors = useMemo(() => {
+    const raw = params.get("sector");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  }, [params]);
   const search = params.get("q") ?? "";
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
@@ -112,11 +121,13 @@ export function CollocationsBrowser() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Keep the shared scope in sync with the effective theme so it travels.
+  // Keep the shared scope in sync with the effective theme, but only when it
+  // resolves to exactly ONE theme (`useLibraryScope` is a single "where am I"
+  // choice; a multi-Thema selection has no one value to travel, s104).
   useEffect(() => {
-    scope.setScope(themeParam, "");
+    if (themes.length === 1) scope.setScope(themes[0], "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [themeParam]);
+  }, [themes]);
 
   const selection: FacetSelection = useMemo(() => {
     const s: FacetSelection = {};
@@ -144,51 +155,60 @@ export function CollocationsBrowser() {
     setParams(p, { replace: true });
   };
 
-  const setTheme = (val: string) => {
+  const setThemes = (next: string[]) => {
     const p = new URLSearchParams(params);
-    if (val === "all") p.delete("theme");
-    else p.set("theme", val);
+    if (next.length) p.set("theme", next.join(","));
+    else p.delete("theme");
     p.delete("sub");
     setParams(p, { replace: true });
-    scope.setScope(val, ""); // travelling scope: carry to the other segments
+    // travelling scope: carry to the other segments when exactly one is picked
+    if (next.length === 1) scope.setScope(next[0], "");
   };
 
-  const setSub = (s: string) => {
+  const setSubs = (next: string[]) => {
     const p = new URLSearchParams(params);
-    if (!s) p.delete("sub");
-    else p.set("sub", s);
+    if (next.length) p.set("sub", next.join(","));
+    else p.delete("sub");
     setParams(p, { replace: true });
   };
 
   const setSearch = (q: string) => setParam("q", q || null);
-  const setSector = (s: string) => setParam("sector", !s || s === "all" ? null : s);
+  const setSectors = (next: string[]) => {
+    const p = new URLSearchParams(params);
+    if (next.length) p.set("sector", next.join(","));
+    else p.delete("sector");
+    setParams(p, { replace: true });
+  };
 
-  // Sub-theme drill-down (parity with Wörter, audit 2026-07-09): themes with
-  // sub-themes show the picker first; "Gesamtes Thema" browses the whole pile.
-  const activeTheme = themeParam !== "all" ? themeById(themeParam) : null;
+  // Sub-theme drill-down (parity with Wörter, audit 2026-07-09): only rendered
+  // with exactly ONE active Thema (a multi-theme selection has no single
+  // sub-theme spine, s104).
+  const activeTheme = themes.length === 1 ? themeById(themes[0]) : null;
   const subThemes = activeTheme?.subThemes ?? [];
   const hasSubThemes = subThemes.length > 0;
-  const subFilter = hasSubThemes && sub && sub !== "all" ? sub : undefined;
-  const activeSub = subThemes.find((s) => s.id === sub);
+  const subFilter = hasSubThemes && subs.length ? subs : undefined;
+  const activeSub = subThemes.find((s) => subs.includes(s.id));
 
   // Theme-scoped list BEFORE the Branche cut, for the dropdown's per-sector
   // dedicated-content counts.
   const themeScoped = useMemo(() => {
-    let list =
-      themeParam === "all" ? collocations : collocations.filter((c) => c.themeId === themeParam);
-    if (subFilter) list = list.filter((c) => c.subThemeId === subFilter);
+    let list = themes.length
+      ? collocations.filter((c) => !!c.themeId && themes.includes(c.themeId))
+      : collocations;
+    if (subFilter) list = list.filter((c) => !!c.subThemeId && subFilter.includes(c.subThemeId));
     return list;
-  }, [themeParam, subFilter]);
+  }, [themes, subFilter]);
 
   const scoped = useMemo(() => {
-    // Branche scope cut (root-cause fix, s102): untagged pairs are general and
-    // show under every Branche; tagged pairs hide only under other Branchen.
-    let list = sector ? themeScoped.filter((c) => matchesSector(c, sector)) : themeScoped;
+    // Branche scope cut (root-cause fix, s102; multi-select s104): untagged
+    // pairs are general and show under every selected Branche; tagged pairs
+    // hide only under Branchen NOT in the selection.
+    let list = sectors.length ? themeScoped.filter((c) => matchesSector(c, sectors)) : themeScoped;
     if (search.trim()) {
       list = list.filter((c) => fuzzyMatch(search, [c.full, c.noun, c.verb, c.en]));
     }
     return list;
-  }, [themeScoped, sector, search]);
+  }, [themeScoped, sectors, search]);
 
   // Tier-0 personalized default (UX overhaul Phase 2): default to the
   // learner's CEFR band + one step up, with a quiet escape. Never activates
@@ -206,30 +226,33 @@ export function CollocationsBrowser() {
   );
   const hiddenLabel = bandActive && bandLimited.length < scoped.length ? hiddenBandsLabel(level) : null;
 
-  // Sector-tagged pairs lead the list when a Branche is selected (s102).
+  // Sector-tagged pairs lead the list when one or more Branchen are selected
+  // (s102, multi-select s104).
   const filtered = useMemo(
-    () => sectorFirst(applyFacets(bandLimited, COLLOCATION_FACETS, selection), sector),
-    [bandLimited, selection, sector],
+    () => sectorFirst(applyFacets(bandLimited, COLLOCATION_FACETS, selection), sectors),
+    [bandLimited, selection, sectors],
   );
 
   // Incremental rendering: 60 cards now, the rest as you scroll.
   const { visible, hasMore, remaining, sentinelRef, showMore } = usePagedList(filtered);
 
   const primaryGroups = useMemo(
-    () => themeGroupsForMode(learningMode, themeParam, (id) => collocationsByTheme(id).length),
-    [learningMode, themeParam],
+    () => themeGroupsForMode(learningMode, themes, (id) => collocationsByTheme(id).length),
+    [learningMode, themes],
   );
 
   // Carry the active scope into the session. Collocations have no session block
   // kind, so the sub/CEFR/Branche narrowing lands on the matching vocab slice
-  // (via libraryFocus). pos/srs are browse lenses and are not forwarded.
+  // (via libraryFocus). pos/srs are browse lenses and are not forwarded. A
+  // multi-Thema/Unterthema selection collapses to its first value (the
+  // session engine biases ONE session, not several themes, s104); every
+  // selected Branche is forwarded since `libraryFocus`'s sector is a list.
   const startSession = () => {
     const p = new URLSearchParams();
     if (activeTheme) p.set("theme", activeTheme.id);
-    if (subFilter) p.set("sub", subFilter);
+    if (subFilter?.length) p.set("sub", subFilter[0]);
     if (selection.cefr?.length) p.set("cefr", selection.cefr.join(","));
-    // Branche is a single-value scope since the s102 overhaul, not a facet.
-    if (sector) p.set("sector", sector);
+    if (sectors.length) p.set("sector", sectors.join(","));
     const q = p.toString();
     navigate(`/session${q ? `?${q}` : ""}`);
   };
@@ -237,13 +260,14 @@ export function CollocationsBrowser() {
   // The filter tile is the single filter surface on BOTH breakpoints (founder
   // follow-up, s91): desktop rail + mobile tile share these props.
   const filterRailProps = {
-    // Ordered scope hierarchy (founder, s102): Branche → Thema → Unterthema.
+    // Ordered scope hierarchy (founder, s102; multi-select s104): Branche →
+    // Thema → Unterthema.
     scopes: [
       {
         pinId: "sector",
         label: "Branche",
-        value: sector || "all",
-        onChange: setSector,
+        values: sectors,
+        onChange: setSectors,
         // Count = sector-tagged pairs in the current Thema scope (dedicated
         // content); zero-count Branchen stay selectable (general pairs show).
         all: { value: "all", label: "Alle Branchen", count: themeScoped.length },
@@ -256,24 +280,24 @@ export function CollocationsBrowser() {
       {
         pinId: "primary",
         label: "Thema",
-        value: themeParam,
-        onChange: setTheme,
+        values: themes,
+        onChange: setThemes,
         all: { value: "all", label: "Alle Themen", count: collocations.length },
         groups: primaryGroups,
       },
       // Sub-theme drill-down as a third dropdown (founder s92): replaces the
-      // old full-page picker.
+      // old full-page picker. Only rendered when exactly one Thema is active.
       ...(hasSubThemes
         ? [
             {
               pinId: "secondary",
               label: "Unterthema",
-              value: sub && sub !== "" ? sub : "all",
-              onChange: setSub,
+              values: subs,
+              onChange: setSubs,
               all: {
                 value: "all",
                 label: "Gesamtes Thema",
-                count: collocationsByTheme(themeParam).length,
+                count: collocationsByTheme(themes[0]).length,
               },
               options: subThemes.map((s) => ({
                 value: s.id,
@@ -305,7 +329,7 @@ export function CollocationsBrowser() {
       {/* The remount key deliberately excludes the search term: re-keying
           per query change remounted the entire grid on every search flush. */}
       <motion.div
-        key={`${themeParam}__${sub}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${showAllLevels}`}
+        key={`${themes.join(",")}__${subs.join(",")}__${params.get("cefr") ?? ""}__${params.get("register") ?? ""}__${showAllLevels}`}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.15 }}
@@ -361,6 +385,17 @@ export function CollocationsBrowser() {
                 )}
               </Button>
               <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
+              {/* Desktop: an open search grows inline in this row (founder
+                  s104: no third line). Mobile keeps the second row below. */}
+              {searchOpen && (
+                <SearchField
+                  value={search}
+                  onChange={setSearch}
+                  placeholder="Suche nach Nomen, Verb, Übersetzung …"
+                  autoFocus
+                  className="hidden min-w-0 lg:block lg:flex-1"
+                />
+              )}
               <div className="flex items-center gap-2">
                 <Button
                   size="icon"
@@ -382,13 +417,14 @@ export function CollocationsBrowser() {
               </div>
             </div>
 
-            {/* Search input lives outside the filter panel (founder s92). */}
+            {/* Mobile-only second row (desktop shows it inline above). */}
             {searchOpen && (
               <SearchField
                 value={search}
                 onChange={setSearch}
                 placeholder="Suche nach Nomen, Verb, Übersetzung …"
                 autoFocus
+                className="lg:hidden"
               />
             )}
 
@@ -427,16 +463,18 @@ export function CollocationsBrowser() {
           {/* Sub-theme drill-down now lives in the filter (the Unterthema
               dropdown), not a separate picker page. This breadcrumb shows the
               active sub-theme context and jumps back to the whole theme. */}
-          {hasSubThemes && sub && sub !== "all" && (
+          {hasSubThemes && subs.length > 0 && (
             <button
-              onClick={() => setSub("")}
+              onClick={() => setSubs([])}
               className="inline-flex items-center gap-1 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               <ChevronLeft className="h-4 w-4" />
               {activeTheme?.titleDe}
               <span className="text-muted-foreground/60">/</span>
               <span className="text-foreground">
-                {activeSub ? activeSub.titleDe : "Gesamtes Thema"}
+                {subs.length === 1
+                  ? (activeSub?.titleDe ?? "Gesamtes Thema")
+                  : `${subs.length} Unterthemen`}
               </span>
             </button>
           )}
@@ -471,7 +509,7 @@ export function CollocationsBrowser() {
 
         <FilterRail
           {...filterRailProps}
-          className="no-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)] lg:overflow-hidden lg:overflow-y-auto"
+          className="slim-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden lg:overflow-y-auto"
         />
       </div>
     </div>

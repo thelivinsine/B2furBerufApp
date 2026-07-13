@@ -39,7 +39,12 @@ export function GrammarHub() {
 
   const topicId = params.get("topic");
   const topic = topicId ? grammarById(topicId) : undefined;
-  const group = params.get("group") ?? "all";
+  // Gruppe is multi-select (s104, founder decision): a comma-list URL param,
+  // empty/absent = "everything".
+  const groups = useMemo(() => {
+    const raw = params.get("group");
+    return raw ? raw.split(",").filter(Boolean) : [];
+  }, [params]);
 
   // Facet selection rides in the URL (`?cefr=B1.2,B2.1`), like the sibling tabs.
   const railSelection = useMemo(() => {
@@ -65,8 +70,8 @@ export function GrammarHub() {
   // (pre-facet) feeds the FilterRail so its Stufe counts reflect what a tap
   // would yield. Order is the B2-marker priority spine, not the bank order.
   const scoped = useMemo(
-    () => (group === "all" ? orderedGrammar : orderedGrammar.filter((t) => t.group === group)),
-    [group],
+    () => (groups.length ? orderedGrammar.filter((t) => groups.includes(t.group)) : orderedGrammar),
+    [groups],
   );
 
   const searched = useMemo(() => {
@@ -81,10 +86,10 @@ export function GrammarHub() {
     [searched, railSelection],
   );
 
-  const setGroup = (g: string) => {
+  const setGroups = (next: string[]) => {
     const p = new URLSearchParams(params);
-    if (g === "all") p.delete("group");
-    else p.set("group", g);
+    if (next.length) p.set("group", next.join(","));
+    else p.delete("group");
     setParams(p, { replace: true });
   };
 
@@ -126,8 +131,8 @@ export function GrammarHub() {
       {
         pinId: "primary",
         label: "Gruppe",
-        value: group,
-        onChange: setGroup,
+        values: groups,
+        onChange: setGroups,
         all: { value: "all", label: "Alle Gruppen", count: grammar.length },
         options: groupOptions,
       },
@@ -180,6 +185,17 @@ export function GrammarHub() {
                 )}
               </Button>
               <ViewSwitcher views={GRAMMAR_VIEWS} value={view} onChange={setView} />
+              {/* Desktop: an open search grows inline in this row (founder
+                  s104: no third line). Mobile keeps the second row below. */}
+              {searchOpen && (
+                <SearchField
+                  value={search}
+                  onChange={setSearch}
+                  placeholder="Suche nach Thema, Muster …"
+                  autoFocus
+                  className="hidden min-w-0 lg:block lg:flex-1"
+                />
+              )}
               <Button
                 size="icon"
                 variant={searchOpen || search.trim() ? "default" : "outline"}
@@ -199,13 +215,14 @@ export function GrammarHub() {
               </Button>
             </div>
 
-            {/* Search input lives outside the filter panel (founder s92). */}
+            {/* Mobile-only second row (desktop shows it inline above). */}
             {searchOpen && (
               <SearchField
                 value={search}
                 onChange={setSearch}
                 placeholder="Suche nach Thema, Muster …"
                 autoFocus
+                className="lg:hidden"
               />
             )}
           </div>
@@ -266,7 +283,7 @@ export function GrammarHub() {
 
         <FilterRail
           {...filterRailProps}
-          className="no-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)] lg:overflow-hidden lg:overflow-y-auto"
+          className="slim-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden lg:overflow-y-auto"
         />
       </div>
     </div>
