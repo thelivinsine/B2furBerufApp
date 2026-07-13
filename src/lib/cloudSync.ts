@@ -21,6 +21,63 @@ let settingsTimer: ReturnType<typeof setTimeout> | null = null;
 
 const DEBOUNCE_MS = 1500;
 
+/**
+ * The account id whose data currently sits in the device-global localStorage
+ * cache. Persisted so that switching accounts on a SHARED DEVICE is detected
+ * across reloads: if the incoming account differs from this, the local cache
+ * belongs to someone else and must be wiped before we pull/merge/push, so one
+ * account's progress can never leak into (or be uploaded to) another's row.
+ */
+const SYNC_UID_KEY = "b2beruf.syncUid";
+
+function readSyncedUid(): string | null {
+  try {
+    return localStorage.getItem(SYNC_UID_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeSyncedUid(uid: string) {
+  try {
+    localStorage.setItem(SYNC_UID_KEY, uid);
+  } catch {
+    /* ignore storage errors (private mode, quota) */
+  }
+}
+
+function clearSyncedUid() {
+  try {
+    localStorage.removeItem(SYNC_UID_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Wipe the device-global local caches back to a clean slate. Used when a
+ * different account starts syncing on the same device and on sign-out, so no
+ * trace of the previous account's progress/settings can merge into or be shown
+ * under the next one. Resets in-memory store state (UI updates immediately) and,
+ * via zustand persist, the localStorage rows too.
+ */
+function resetLocalStores() {
+  applyingRemote = true;
+  useProgressStore.getState().resetProgress();
+  useSettingsStore.getState().resetSettings();
+  applyingRemote = false;
+}
+
+/**
+ * Clear all locally-cached account data and forget which account owned it.
+ * Called on sign-out so the sign-in screen (and the next account to log in on a
+ * shared device) never sees the previous user's progress or profile.
+ */
+export function clearLocalAccountData() {
+  resetLocalStores();
+  clearSyncedUid();
+}
+
 type ProgressSnapshot = ReturnType<typeof useProgressStore.getState>;
 type SettingsSnapshot = ReturnType<typeof useSettingsStore.getState>;
 
@@ -242,6 +299,21 @@ function onVisibilityHidden() {
 export async function startCloudSync(uid: string) {
   if (userId === uid) return; // already syncing this user
   stopCloudSync();
+
+  // Account isolation on a shared device: if the local cache belongs to a
+  // DIFFERENT account, wipe it before doing anything else. Otherwise the merge
+  // below (Math.max / union / mergeSrs) would fold the previous account's
+  // progress into this one AND the step-2 push would write it up to this
+  // account's cloud row, contaminating it on every device. A missing marker
+  // (first sync ever, or a pre-existing install upgrading to this build) is
+  // treated as "same owner" so genuine offline/guest progress is preserved; the
+  // guest→account upgrade keeps the same uid and never reaches this branch.
+  const prevUid = readSyncedUid();
+  if (prevUid && prevUid !== uid) {
+    resetLocalStores();
+  }
+  writeSyncedUid(uid);
+
   userId = uid;
 
   // 1) Pull + merge remote → local.

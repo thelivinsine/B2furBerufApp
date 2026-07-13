@@ -1,6 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 107, demo-prep polish continued, Opus 4.8). **SHIPPED (PRs #486,
+_Last updated: 2026-07-13 (session 108, **critical account data-isolation fix**, Opus 4.8). **FIX:**
+switching accounts on one device leaked one account's progress into another (and pushed it up to the
+other's cloud row). Root cause: the device-global localStorage caches were **merged** into every account
+on login and never cleared on sign-out. Fix in `lib/cloudSync.ts`: a persisted `b2beruf.syncUid` marker
+binds the local cache to one account; `startCloudSync` wipes the cache before pulling when the incoming
+uid differs, and sign-out/delete now `clearLocalAccountData()`. Guest-upgrade (same uid) and first/offline
+sync are preserved. Pinned by `tests/cloudSync.test.ts` (4 cases). On branch
+`claude/account-data-isolation-bug-s517d1`. Prior session (107, demo-prep polish continued, Opus 4.8). **SHIPPED (PRs #486,
 #488):** Praktisch nav icon → **compass**; the feedback button reworked into a store-controlled dialog
 with three surfaces (desktop bottom-right pill, mobile action-bar icon left of Üben, full "Feedback
 geben" in practice sessions), all on the **MessageSquareText** icon; **content-scoped Bibliothek Üben**
@@ -68,33 +75,35 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 106 (2026-07-13). Üben-map pin polish: sizing/color fix + a toggle/heading
-layout-shift bug (Sonnet 5), shipped straight from two founder screenshots/reports on branch
-`claude/pin-sizing-color-6lofhi`, merged to `main`.**
-- **"Du bist hier" pin (`UebenPath.tsx`):** the pulse ring (r 12→8, stroke 2→1.5) and the chip
-  (`px-3 py-1 text-[11px]` → `px-2 py-0.5 text-[9px]`) were oversized relative to the small pin glyph;
-  both shrunk to hug it. The pin (and its pulse ring) switched from the route indigo to a dedicated
-  red (`PIN_COLOR = "#e5484d"`) per founder request, so the live-location marker reads distinctly from
-  the indigo journey line; the pin's white inner ring/dot are unchanged.
-- **Heute toggle/heading layout-shift bug (`Dashboard.tsx`):** on desktop the Üben/Spielen toggle sits
-  above the tab content inside a `justify-center`d flex column, and the two panels render at different
-  natural heights (Üben ~581px, Spielen ~607px), so the whole stack's centered position — and thus the
-  toggle's screen position — shifted on every Üben ↔ Spielen switch. Diagnosed with a headless
-  Playwright probe against the dev server (bypassing onboarding via a seeded `b2beruf.settings.v1`
-  localStorage key): the toggle moved ~13px and both panels' own `<h1>` moved with it on every switch
-  (confirmed before/after with real bounding-box measurements, not just code reading). Fix: the sliding
-  content wrapper now reserves the taller panel's height (`lg:min-h-[38rem]`, Spielen's ~607px) so the
-  toggle+content stack's total height — and therefore its `justify-center`d position — stays constant
-  regardless of which tab is active. Mobile was already unaffected (normal document flow, not
-  flex-centered).
-- **Gates:** typecheck ✔, lint 0 errors (pre-existing warnings only), `pnpm build` + prerender ✔,
-  `check:bundle` **76.9 kB**/400. Browser-verified with Playwright against the dev server at mobile
-  (390×844) and multiple desktop widths (1024–1920px): toggle and heading now sit at identical
-  bounding-box coordinates before/after every tab switch.
-- **Shipped:** PR opened and squash-merged into `main` (was previously only on the feature branch;
-  per this repo's rule, feature-branch pushes never go live on their own).
-- **NOT done:** no other follow-up requested this session; standing content/Üben-map follow-ups from
-  prior sessions (human `verified` pass, jury Waves, sector-audit review) remain untouched.
+**Handoff after session 108 (2026-07-13). CRITICAL account data-isolation bug (Opus 4.8), on branch
+`claude/account-data-isolation-bug-s517d1`.** Founder report: on a phone, switching between accounts
+showed one account's progress under another.
+- **Root cause:** `useProgressStore`/`useSettingsStore` persist to **device-global** localStorage keys
+  (`b2beruf.progress.v1` / `.settings.v1`) shared by every account on the device. `startCloudSync(uid)`
+  **merges** the incoming account's cloud row into whatever local cache is left from the previous account
+  (`Math.max` / union / `mergeSrs`), then in step 2 **pushes that merged result up to the new account's
+  cloud row**. Nothing cleared the cache on sign-out or account switch. So account A's XP/streak/SRS/saved
+  words leaked into account B's view **and were written into B's cloud row**, propagating to all of B's
+  devices. Settings leaked too (`mergeRemoteSettings` bails out when `local.onboarded` is already true, so
+  B kept A's name/level).
+- **Fix (`lib/cloudSync.ts`):** a persisted `b2beruf.syncUid` marker records which account owns the local
+  cache. `startCloudSync` reads it first; if the incoming uid differs, it `resetLocalStores()` (wipes
+  progress + settings back to defaults) **before** the pull/merge/push, so nothing cross-account can merge
+  or upload. The marker is (re)written on every sync. A missing marker (first-ever sync, or an install
+  predating this build) is treated as "same owner" so genuine offline/guest progress is preserved, and the
+  guest→account upgrade keeps the same uid so it never hits the wipe branch. New exported
+  `clearLocalAccountData()` (reset stores + forget the marker) is called from `useAuthStore.signOut` and
+  `deleteAccount`, so the sign-in screen and the next account on a shared device never see stale data.
+- **Tests:** `tests/cloudSync.test.ts` (new, mocks `@/lib/supabase`) pins four invariants: a different
+  account wipes the previous cache before syncing and never pushes the old data up; the first/guest sync
+  preserves local progress (merge, not wipe); the same account re-syncing does not wipe; and
+  `clearLocalAccountData` zeroes both stores + the marker.
+- **Gates:** typecheck ✔, lint **0 errors** (43 pre-existing warnings), `test:unit` **134/134**, `pnpm
+  build` + prerender ✔, `check:bundle` **77.4 kB**/400, `lint:content` ✔.
+- **NOT done / consider next:** the local cache is still a single device-global key that is wiped-and-
+  reloaded on switch (correct + robust, but a future hardening could namespace the persist key per uid to
+  avoid any wipe entirely). Live verification on a real phone with two accounts is left to the founder
+  (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain untouched.
 
 **Handoff after session 107 (2026-07-13). Demo-prep polish continued: compass Praktisch icon, feedback
 placement, content-scoped Üben, mobile scroll UX, graph zoom, centered Üben label, Lernen/Blau toggle,

@@ -1,9 +1,7 @@
 import { create } from "zustand";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
-import { startCloudSync, stopCloudSync, flushCloudSync } from "@/lib/cloudSync";
-import { useProgressStore } from "@/store/useProgressStore";
-import { useSettingsStore } from "@/store/useSettingsStore";
+import { startCloudSync, stopCloudSync, flushCloudSync, clearLocalAccountData } from "@/lib/cloudSync";
 
 type AuthStatus = "loading" | "anonymous" | "signedIn" | "signedOut";
 
@@ -162,6 +160,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     // valid; stopCloudSync alone would silently drop it.
     await flushCloudSync();
     stopCloudSync();
+    // Wipe the device-global local caches so the next account to sign in on a
+    // shared device never sees (or merges in) this account's progress/profile.
+    clearLocalAccountData();
     await supabase.auth.signOut();
     set({ busy: false, session: null, user: null, status: "signedOut" });
   },
@@ -191,8 +192,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     } catch {
       /* ignore storage errors */
     }
-    useProgressStore.getState().resetProgress();
-    useSettingsStore.getState().resetSettings();
+    // Reset the in-memory stores and forget which account owned the local cache.
+    clearLocalAccountData();
     try {
       await supabase.auth.signOut();
     } catch {
