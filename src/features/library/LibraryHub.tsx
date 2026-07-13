@@ -119,7 +119,7 @@ export function LibraryHub() {
             initial="enter"
             animate="center"
             exit="exit"
-            transition={{ duration: 0.13, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
           >
             <Suspense fallback={fallback}>
               <Segment />
