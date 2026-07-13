@@ -1650,3 +1650,60 @@ Batch 2 (one long mid-turn message): a grab-bag of visual/UX fixes. All shipped 
   founder review of `sector-audit-report.md`. Note: 16 Kategorie pills exceeds the ≤12 facet-hygiene
   guideline (a dev-only warning), accepted because the founder explicitly wanted the group names as
   pills.
+
+**Handoff after session 105 (2026-07-13). Demo-prep sweep: nav rename + hide Anwenden, AI-disclaimer
+feedback button (emails founder), Fortschritt redesign, flippable Bibliothek tiles, filter polish
+(Opus 4.8).** A single long turn against many interleaved founder prompts (branch
+`claude/demo-prep-feedback-rename-sl1jqq`, merged to `main`).
+- **Nav (`nav-items.ts`, `BottomTabBar.tsx`, `LibrarySwitcher.tsx`, `route-icons.tsx`):** "Heute" →
+  **"Praktisch"**, "Bibliothek" → **"Theorie"** (routes `/` and `/library` unchanged). **Anwenden is
+  HIDDEN from the nav** (removed from `navItems`, `CONTENT`, `DEFAULT_PINNED_TABS`) but its route stays
+  mounted so `/welt` + deep links still resolve; re-add the `navItems` entry to restore it. The
+  Praktisch mark changed from a house to a **dumbbell** (`route-icons.tsx` "/" renderer + NORM box; the
+  lucide fallback is now `Dumbbell`).
+- **Feedback + AI disclaimer (`FeedbackButton.tsx` in AppShell, `lib/feedback.ts`,
+  `supabase/functions/submit-feedback/`, migration `0006_feedback.sql`, `config.toml`):** a subtle
+  fixed "Mit KI gebaut · Feedback" pill on every non-focus page (bottom-right desktop, above the nav +
+  Üben bar on mobile). Opens a dialog (message + optional email); posts to the new `submit-feedback`
+  Edge Function (`verify_jwt=false`, anonymous-OK), which **stores a `feedback` row AND emails the
+  founder via Resend**. **Founder deploy step needed for emails** (see `docs/plans/PHASE2_SETUP.md`
+  new section): run the migration, `supabase functions deploy submit-feedback`, set `RESEND_API_KEY`.
+  Without it the UI still works and rows still store once deployed; email is best-effort.
+- **Fortschritt redesign (`Analytics.tsx`):** the chaotic ~11-card stack became a calm grouped
+  hierarchy: an **Überblick** card (goal ring + Level + XP bar) then a 2×2 lifetime stat grid; a
+  **Dranbleiben** subsection with the weakness diagnose + next quest as a side-by-side pair (was two
+  stacked full-width alert cards); **Was du schon kannst** (Can-Do); Meine Sammlung; and a **Details**
+  collapsible that now also holds the writing-weakness + exam-history cards. New `Subheading` helper.
+- **Bibliothek/Theorie tiles + filter (founder ran ~10 follow-ups):** (1) **Flippable Karten tiles**
+  (`FlipCard.tsx`): Wörter/Kollokationen/Redemittel grid cards flip on click to show the **English on
+  the back**; German front. Grammatik cards stay lesson-launchers (not flipped). (2) **Verbunden moved
+  to the bottom-right** of Wörter cards. (3) **Redundant tags dropped** from tiles (Häufigkeit + Branche
+  on Wörter, Register on Kollokationen, CEFR + Register on Redemittel, CEFR on Grammatik) since they
+  duplicate filter facets; the live Lernstand badge stays. (4) **FilterRail rebuilt as a flex column**
+  (`FilterRail.tsx`): fixed header + fixed Üben footer + ONE inner scroll region, so the tile is
+  strictly viewport-capped and the auto-hiding `.scrollbar-hover` (new, in `index.css`) starts **below**
+  the header separator; **pins hidden on the mobile panel**. (5) **"Mehr/Weniger anzeigen"** on facets
+  with > 8 options (Redemittel Kategorie, Grammatik Gruppe). (6) **Grammatik Gruppe converted from a
+  scope dropdown to a multi-select PILL facet** (`GROUP_FACET`) matching Redemittel Kategorie — both are
+  multi-select. (7) **Toolbar row centered when search is closed; opens with a framer slide** (icon
+  groups slide apart for the inline search field) across all four browse tabs. (8) The desktop-header
+  XP line under the greeting was removed.
+- **Gates + verification:** typecheck ✔, lint **0 errors** (42 pre-existing warnings), content-lint ✔,
+  `test:unit` **130/130**, build + prerender ✔, `check:bundle` **75.8 kB**/400. Playwright-verified on
+  the preview build (0 runtime errors on Praktisch/Theorie Wörter+Grammatik/Fortschritt, desktop +
+  mobile): nav rename, dumbbell icon, feedback pill placement (clears the mobile Üben bar), flip-card
+  fronts, dropped tags, grammar group pills + "Mehr anzeigen (8)", centered toolbar, Fortschritt groups.
+- **Bibliothek follow-ups (same session, second turn):** (a) **all filter-duplicating tile tags
+  removed** — the Lernstand/mastery badge off Wörter cards and the group-label subtitle off Grammatik
+  cards (only plural + bookmark stay on Wörter); (b) **flip icon removed** from every tile (`FlipHint`
+  kept in `FlipCard.tsx` but unused; tiles still flip on click); (c) **filter-rail white items smaller
+  on desktop** (`lg:text-xs` + tighter padding on facet pills + scope triggers; mobile tap size kept);
+  (d) **graph fit-to-screen now toggles** — first press fits, next press zooms into a random often-used
+  word (weighted by wordfreq); (e) **tag audit**: all 1,113 vocab + 741 collocations have valid
+  themeId + sectors (0 issues); the untagged majority is universal by design, so no content edits; (f)
+  backlog #26 added (`PROJECT_REFERENCE.md`): **Verbs + Articles hubs** in Theorie.
+- **NOT done / deferred:** the founder's "reorderable list" phrasing for the filter groups was read as
+  the pill-list + Mehr/Weniger presentation; **drag-to-reorder of filter categories was NOT built**
+  (no functional purpose for OR-filters, deferred). Standing content follow-ups + Üben map tappable
+  stops + sector-audit review remain from prior sessions.
+

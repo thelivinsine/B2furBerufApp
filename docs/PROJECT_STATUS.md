@@ -1,18 +1,17 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 106, Üben-map pin polish + toggle/heading layout-shift fix, Sonnet
-5). **SHIPPED:** the Üben-map "Du bist hier" pin's oversized pulse ring/chip were shrunk to match the
-small pin glyph, and the pin recolored to a dedicated red (was route indigo); the Heute Üben/Spielen
-toggle and each panel's own heading no longer jump vertically on desktop when switching tabs (a
-`justify-center`d stack was reacting to the two panels' differing natural heights). Prior session
-(105): nav renamed "Heute"->**Praktisch** / "Bibliothek"->**Theorie**, **Anwenden hidden** from the
-nav; a subtle **"Mit KI gebaut · Feedback"** pill on every page that emails the founder via a new
-`submit-feedback` Edge Function (founder deploy + `RESEND_API_KEY` needed, see `PHASE2_SETUP.md`); the
-**Fortschritt page was redesigned** into calm groups; and a **Theorie tiles/filter** round: flippable
-Karten tiles (EN on the back), redundant tile tags removed, FilterRail rebuilt as a viewport-capped
-flex column with an auto-hiding scrollbar, Mehr/Weniger on long facets, Grammatik Gruppe as a
-multi-select pill facet, and a centered toolbar that slides open for search. Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-13 (session 107, demo-prep polish continued, Opus 4.8). **SHIPPED (PRs #486,
+#488):** Praktisch nav icon → **compass**; the feedback button reworked into a store-controlled dialog
+with three surfaces (desktop bottom-right pill, mobile action-bar icon left of Üben, full "Feedback
+geben" in practice sessions), all on the **MessageSquareText** icon; **content-scoped Bibliothek Üben**
+(each tab drills its own content type only, via `buildScopedSession`); mobile browse tabs+toolbar that
+**collapse on scroll-down / restore on scroll-up** with a centered go-to-top button; the desktop
+**at-rest white block beside the sticky tabs removed** (masking bg only paints when scrolled); the
+Wörter **graph opens zoomed into a readable random node** with an interactive mobile legend; the "Üben"
+label **centered with the icon floating left**; and the Praktisch toggle's left mode renamed **"Üben" →
+Lernen** (blue + book icon) to stop clashing with the Theorie Üben button (Spielen stays orange). Prior
+session (106): Üben-map pin sizing/color + Heute toggle/heading layout-shift fix. Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -66,62 +65,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 105 (2026-07-13). Demo-prep sweep: nav rename + hide Anwenden, AI-disclaimer
-feedback button (emails founder), Fortschritt redesign, flippable Bibliothek tiles, filter polish
-(Opus 4.8).** A single long turn against many interleaved founder prompts (branch
-`claude/demo-prep-feedback-rename-sl1jqq`, merged to `main`).
-- **Nav (`nav-items.ts`, `BottomTabBar.tsx`, `LibrarySwitcher.tsx`, `route-icons.tsx`):** "Heute" →
-  **"Praktisch"**, "Bibliothek" → **"Theorie"** (routes `/` and `/library` unchanged). **Anwenden is
-  HIDDEN from the nav** (removed from `navItems`, `CONTENT`, `DEFAULT_PINNED_TABS`) but its route stays
-  mounted so `/welt` + deep links still resolve; re-add the `navItems` entry to restore it. The
-  Praktisch mark changed from a house to a **dumbbell** (`route-icons.tsx` "/" renderer + NORM box; the
-  lucide fallback is now `Dumbbell`).
-- **Feedback + AI disclaimer (`FeedbackButton.tsx` in AppShell, `lib/feedback.ts`,
-  `supabase/functions/submit-feedback/`, migration `0006_feedback.sql`, `config.toml`):** a subtle
-  fixed "Mit KI gebaut · Feedback" pill on every non-focus page (bottom-right desktop, above the nav +
-  Üben bar on mobile). Opens a dialog (message + optional email); posts to the new `submit-feedback`
-  Edge Function (`verify_jwt=false`, anonymous-OK), which **stores a `feedback` row AND emails the
-  founder via Resend**. **Founder deploy step needed for emails** (see `docs/plans/PHASE2_SETUP.md`
-  new section): run the migration, `supabase functions deploy submit-feedback`, set `RESEND_API_KEY`.
-  Without it the UI still works and rows still store once deployed; email is best-effort.
-- **Fortschritt redesign (`Analytics.tsx`):** the chaotic ~11-card stack became a calm grouped
-  hierarchy: an **Überblick** card (goal ring + Level + XP bar) then a 2×2 lifetime stat grid; a
-  **Dranbleiben** subsection with the weakness diagnose + next quest as a side-by-side pair (was two
-  stacked full-width alert cards); **Was du schon kannst** (Can-Do); Meine Sammlung; and a **Details**
-  collapsible that now also holds the writing-weakness + exam-history cards. New `Subheading` helper.
-- **Bibliothek/Theorie tiles + filter (founder ran ~10 follow-ups):** (1) **Flippable Karten tiles**
-  (`FlipCard.tsx`): Wörter/Kollokationen/Redemittel grid cards flip on click to show the **English on
-  the back**; German front. Grammatik cards stay lesson-launchers (not flipped). (2) **Verbunden moved
-  to the bottom-right** of Wörter cards. (3) **Redundant tags dropped** from tiles (Häufigkeit + Branche
-  on Wörter, Register on Kollokationen, CEFR + Register on Redemittel, CEFR on Grammatik) since they
-  duplicate filter facets; the live Lernstand badge stays. (4) **FilterRail rebuilt as a flex column**
-  (`FilterRail.tsx`): fixed header + fixed Üben footer + ONE inner scroll region, so the tile is
-  strictly viewport-capped and the auto-hiding `.scrollbar-hover` (new, in `index.css`) starts **below**
-  the header separator; **pins hidden on the mobile panel**. (5) **"Mehr/Weniger anzeigen"** on facets
-  with > 8 options (Redemittel Kategorie, Grammatik Gruppe). (6) **Grammatik Gruppe converted from a
-  scope dropdown to a multi-select PILL facet** (`GROUP_FACET`) matching Redemittel Kategorie — both are
-  multi-select. (7) **Toolbar row centered when search is closed; opens with a framer slide** (icon
-  groups slide apart for the inline search field) across all four browse tabs. (8) The desktop-header
-  XP line under the greeting was removed.
-- **Gates + verification:** typecheck ✔, lint **0 errors** (42 pre-existing warnings), content-lint ✔,
-  `test:unit` **130/130**, build + prerender ✔, `check:bundle` **75.8 kB**/400. Playwright-verified on
-  the preview build (0 runtime errors on Praktisch/Theorie Wörter+Grammatik/Fortschritt, desktop +
-  mobile): nav rename, dumbbell icon, feedback pill placement (clears the mobile Üben bar), flip-card
-  fronts, dropped tags, grammar group pills + "Mehr anzeigen (8)", centered toolbar, Fortschritt groups.
-- **Bibliothek follow-ups (same session, second turn):** (a) **all filter-duplicating tile tags
-  removed** — the Lernstand/mastery badge off Wörter cards and the group-label subtitle off Grammatik
-  cards (only plural + bookmark stay on Wörter); (b) **flip icon removed** from every tile (`FlipHint`
-  kept in `FlipCard.tsx` but unused; tiles still flip on click); (c) **filter-rail white items smaller
-  on desktop** (`lg:text-xs` + tighter padding on facet pills + scope triggers; mobile tap size kept);
-  (d) **graph fit-to-screen now toggles** — first press fits, next press zooms into a random often-used
-  word (weighted by wordfreq); (e) **tag audit**: all 1,113 vocab + 741 collocations have valid
-  themeId + sectors (0 issues); the untagged majority is universal by design, so no content edits; (f)
-  backlog #26 added (`PROJECT_REFERENCE.md`): **Verbs + Articles hubs** in Theorie.
-- **NOT done / deferred:** the founder's "reorderable list" phrasing for the filter groups was read as
-  the pill-list + Mehr/Weniger presentation; **drag-to-reorder of filter categories was NOT built**
-  (no functional purpose for OR-filters, deferred). Standing content follow-ups + Üben map tappable
-  stops + sector-audit review remain from prior sessions.
-
 **Handoff after session 106 (2026-07-13). Üben-map pin polish: sizing/color fix + a toggle/heading
 layout-shift bug (Sonnet 5), shipped straight from two founder screenshots/reports on branch
 `claude/pin-sizing-color-6lofhi`, merged to `main`.**
@@ -150,6 +93,44 @@ layout-shift bug (Sonnet 5), shipped straight from two founder screenshots/repor
 - **NOT done:** no other follow-up requested this session; standing content/Üben-map follow-ups from
   prior sessions (human `verified` pass, jury Waves, sector-audit review) remain untouched.
 
-_(Sessions 85-103's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
+**Handoff after session 107 (2026-07-13). Demo-prep polish continued: compass Praktisch icon, feedback
+placement, content-scoped Üben, mobile scroll UX, graph zoom, centered Üben label, Lernen/Blau toggle,
+desktop white-block fix (Opus 4.8).** Continuation of the s105 demo sweep on branch
+`claude/demo-prep-feedback-rename-sl1jqq`, shipped as two squash-merged PRs (#486, #488).
+- **Praktisch nav icon → compass** (`route-icons.tsx` "/" renderer + NORM box, `nav-items.ts` lucide
+  fallback `Compass`), replacing the dumbbell; founder wanted a "real-life orientation" mark.
+- **Feedback button reworked (`FeedbackButton.tsx`, store-controlled via `useSessionStore.feedbackOpen`):**
+  one app-mounted `FeedbackDialog` + three trigger surfaces — desktop bottom-right pill (skips `/`),
+  mobile action-bar **icon** left of Üben (no floating pill over content), and a full "Feedback geben"
+  button inside practice sessions (`SessionPlayer`). All use the **MessageSquareText** icon so the
+  affordance reads as feedback.
+- **Content-scoped Bibliothek Üben (`engine/session.ts` `buildScopedSession` + `ContentScope`,
+  `useSessionStore.librarySession`, `Session.tsx` `?src=lib`, `SessionPlayer` contentScope/libraryIds):**
+  each browse tab hands its filtered ids to a content-PURE session, so Üben on Redemittel drills
+  Redemittel only, a Grammatik group drills that group only, etc. (was leaking generic vocab before).
+  `SessionBlock` flashcard source union gained `"collocation"` (XP-only grade, no vocab FSRS).
+- **Mobile browse scroll UX (`features/shared/browseScroll.tsx`, new):** `useScrollDirection` collapses
+  the tabs+toolbar on scroll-down / restores on scroll-up (mobile only via `max-lg:` guard) and drives a
+  centered `ScrollTopButton` above the Üben bar. `browseHeaderClass(hidden, scrolled)` now applies the
+  opaque masking background **only when scrolled**, on both breakpoints.
+- **Desktop "white block" fix:** the sticky tabs+toolbar header used to paint an always-on
+  `bg-background/90` rectangle, showing a hard-cornered white block beside the tabs (above the filter
+  rail) at rest. Now transparent at rest, backdrop fades in on scroll to mask pinned-header content.
+  Reproduced + verified fixed with Playwright at 1280×900.
+- **Wörter graph (`WordGraph.tsx`):** opens **zoomed into a readable random node** (k≈2.2) instead of
+  fit-to-all; the legend is visible by default on mobile and doubles as domain filters.
+- **Centered Üben label (`UebenLabel` in browseScroll):** the word "Üben" is centered in the button with
+  the bolt icon floating to its left (absolute, no layout space), across all four trainers.
+- **Praktisch toggle rename + recolor (`Dashboard.tsx`):** left mode "Üben" → **Lernen** (blue
+  `text-blue-600` + `BookOpen` icon) so it no longer clashes with the Theorie Üben button; "Lernen /
+  Spielen" reads as a pair. Spielen stays orange. Founder picked Lernen + Blau from preview options.
+- **Gates:** typecheck ✔, lint **0 errors** (43 warnings), content-lint ✔, `test:unit` **130/130**,
+  build + prerender ✔, `check:bundle` **76.7 kB**/400. Playwright-verified: white-block gone at rest +
+  masks on scroll, toggle Lernen/blue live.
+- **NOT done:** standing content/Üben-map follow-ups (human `verified` pass, jury Waves, sector-audit
+  review) remain; the s105 "reorderable filter list" is still read as pill-list + Mehr/Weniger (no
+  drag-reorder).
+
+_(Sessions 85-105's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
 and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_
