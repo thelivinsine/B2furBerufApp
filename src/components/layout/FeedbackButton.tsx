@@ -111,6 +111,15 @@ export function FeedbackDialog() {
  * compact icon inside each Üben action bar / the in-session button instead, so
  * the pill never floats over content cards. Skipped on the dashboard `/`
  * (Praktisch → Üben/Spielen), a sparse page.
+ *
+ * Desktop horizontal position (founder, 2026-07-13): centered under the
+ * Bibliothek `FilterRail` column, not flush against the viewport edge. The
+ * rail lives in a `max-w-6xl` main column (sidebar 16rem + content, capped at
+ * 72rem = 88rem total) as the last `16rem` track of a `[1fr_16rem]` grid with
+ * `sm:px-6` (1.5rem) main padding, so its center sits `9.5rem` in from that
+ * column's right edge, plus half of whatever margin appears once the viewport
+ * exceeds the 88rem cap. `right` mirrors that: a fixed `9.5rem` below the cap,
+ * growing with the centering margin above it.
  */
 export function FeedbackPill() {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
@@ -121,7 +130,7 @@ export function FeedbackPill() {
       type="button"
       onClick={() => setOpen(true)}
       aria-label="Feedback geben"
-      className="fixed bottom-4 right-4 z-40 hidden items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground lg:flex"
+      className="fixed bottom-4 right-4 z-40 hidden items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground lg:flex lg:right-[calc(9.5rem_+_max(0px,(100vw_-_88rem)/2))]"
     >
       <MessageSquareText className="h-3.5 w-3.5 text-primary" />
       <span>Mit KI gebaut · Feedback</span>
