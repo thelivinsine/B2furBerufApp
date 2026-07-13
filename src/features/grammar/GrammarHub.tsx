@@ -151,7 +151,7 @@ export function GrammarHub() {
           filter tile share row 2 so the tile starts level with the first card.
           Mobile renders the SAME filter tile inline as a slide-open panel. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:bg-background/90 lg:pb-3 lg:backdrop-blur`}>
+        <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
           <LibrarySwitcher />
 
           {/* Toolbar: mobile filter toggle · view switcher · search icon. */}

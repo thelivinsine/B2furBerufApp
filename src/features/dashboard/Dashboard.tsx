@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Dumbbell, Play } from "lucide-react";
+import { BookOpen, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Both tabs import the mission bank, so they load lazily to keep the content
@@ -51,7 +51,7 @@ export function Dashboard() {
     // the toggle->content gap is tightened (lg:space-y-3) so the full-size stack
     // still fits without a scrollbar.
     <div className="space-y-4 sm:space-y-6 lg:flex lg:min-h-[calc(100vh-11rem)] lg:flex-col lg:justify-center lg:space-y-3">
-      {/* Üben / Spielen: the two ways into the day, centred. Üben opens by
+      {/* Lernen / Spielen: the two ways into the day, centred. Lernen opens by
           default. The greeting + streak live in the top row; the daily-goal ring
           moved to Fortschritt (s86), so Heute no longer repeats progress. */}
       <motion.div
@@ -64,7 +64,7 @@ export function Dashboard() {
       >
         {(
           [
-            { id: "ueben", label: "Üben", Icon: Dumbbell, tint: "text-accent", fillActive: true },
+            { id: "ueben", label: "Lernen", Icon: BookOpen, tint: "text-blue-600", fillActive: false },
             { id: "spielen", label: "Spielen", Icon: Play, tint: "text-orange-500", fillActive: true },
           ] as const
         ).map(({ id, label, Icon, tint, fillActive }) => (
@@ -77,8 +77,9 @@ export function Dashboard() {
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition",
               // Active tab lifts on the white pill and picks up its section's
-              // subtle tint (Üben = teal/accent + dumbbell icon, Spielen =
-              // orange + play icon). The tile mats keep a neutral gray border
+              // subtle tint (Lernen = blue + book icon, Spielen = orange + play
+              // icon; renamed from "Üben" in s105 to avoid clashing with the
+              // Theorie Üben button). The tile mats keep a neutral gray border
               // (founder: colored borders read poorly), so the color lives on
               // the toggle only.
               tab === id
@@ -86,9 +87,9 @@ export function Dashboard() {
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {/* Both active icons fill solid (`fillActive`): the Play triangle
-                and the Dumbbell's weight plates, so the selected tab reads as
-                filled on the lifted white pill. */}
+            {/* Spielen's active Play triangle fills solid (`fillActive`) so it
+                reads as filled on the lifted white pill; the Lernen book stays
+                an outline (a filled book blob reads worse than the open book). */}
             <Icon className={cn("h-4 w-4", fillActive && tab === id && "fill-current")} />
             {label}
           </button>
