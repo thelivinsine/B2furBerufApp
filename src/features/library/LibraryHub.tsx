@@ -1,25 +1,27 @@
-import { Suspense, lazy, useRef } from "react";
+import { Suspense, lazy, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { DEFAULT_LIBRARY_TAB, LIBRARY_TABS } from "./LibrarySwitcher";
+import { DEFAULT_LIBRARY_TAB, LIBRARY_TABS, LibrarySwitcher } from "./LibrarySwitcher";
 
-// The four library surfaces, lazy so each tab only pulls its own chunk. Every
-// segment renders its own <LibrarySwitcher/>, so the hub itself is just the
-// router: it reads `?tab=` and mounts the matching surface. This is the Phase-5
-// hard merge that folds /vocabulary, /collocations, /redemittel and /grammar
-// into the single /library URL (old routes redirect in, params kept).
-const VocabularyTrainer = lazy(() =>
-  import("@/features/vocabulary/VocabularyTrainer").then((m) => ({ default: m.VocabularyTrainer })),
-);
-const CollocationsBrowser = lazy(() =>
-  import("@/features/collocations/CollocationsBrowser").then((m) => ({ default: m.CollocationsBrowser })),
-);
-const RedemittelTrainer = lazy(() =>
-  import("@/features/redemittel/RedemittelTrainer").then((m) => ({ default: m.RedemittelTrainer })),
-);
-const GrammarHub = lazy(() =>
-  import("@/features/grammar/GrammarHub").then((m) => ({ default: m.GrammarHub })),
-);
+// The four library surfaces, lazy so each tab only pulls its own chunk. The
+// import thunks are named so we can BOTH lazy() them AND preload them on mount
+// (see below), which keeps a tab switch from ever hitting the Suspense fallback
+// once the hub is open. This is the Phase-5 hard merge that folds /vocabulary,
+// /collocations, /redemittel and /grammar into the single /library URL (old
+// routes redirect in, params kept).
+const loadVocab = () =>
+  import("@/features/vocabulary/VocabularyTrainer").then((m) => ({ default: m.VocabularyTrainer }));
+const loadColloc = () =>
+  import("@/features/collocations/CollocationsBrowser").then((m) => ({ default: m.CollocationsBrowser }));
+const loadRedemittel = () =>
+  import("@/features/redemittel/RedemittelTrainer").then((m) => ({ default: m.RedemittelTrainer }));
+const loadGrammar = () =>
+  import("@/features/grammar/GrammarHub").then((m) => ({ default: m.GrammarHub }));
+
+const VocabularyTrainer = lazy(loadVocab);
+const CollocationsBrowser = lazy(loadColloc);
+const RedemittelTrainer = lazy(loadRedemittel);
+const GrammarHub = lazy(loadGrammar);
 
 const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   woerter: VocabularyTrainer,
@@ -28,13 +30,14 @@ const TAB_COMPONENTS: Record<string, React.ComponentType> = {
   grammatik: GrammarHub,
 };
 
-// A light silhouette so a cold tab shows a shaped skeleton instead of a blank
-// flash while its chunk loads (mirrors the Dashboard fallback). The tab bar +
-// toolbar bars keep the top of the page steady, and the card grid stands in for
-// the list, so the empty and loaded states share a rough shape.
+const PRELOADERS = [loadVocab, loadColloc, loadRedemittel, loadGrammar];
+
+// Skeleton for a genuine first load only (the tab bar is hoisted + static above,
+// so it is NOT part of this): a toolbar bar + a card grid so the empty and
+// loaded states share a rough shape. After the mount-time preload warms every
+// chunk, switching tabs never suspends, so this does not flash on toggles.
 const fallback = (
   <div className="animate-pulse space-y-4">
-    <div className="h-11 rounded-full border border-border bg-surface" />
     <div className="mx-auto h-9 w-40 rounded-full border border-border bg-surface" />
     <div className="grid gap-3 sm:grid-cols-2">
       {Array.from({ length: 6 }).map((_, i) => (
@@ -50,28 +53,37 @@ export function LibraryHub() {
   const Segment = TAB_COMPONENTS[tab] ?? TAB_COMPONENTS[DEFAULT_LIBRARY_TAB];
   const reduce = useReducedMotion();
 
+  // Warm every tab's chunk once the hub opens, so a later switch renders the
+  // trainer synchronously instead of dropping to the loading skeleton (the
+  // "lazy load" flash the founder saw). Fire-and-forget; failures just mean the
+  // normal Suspense path handles that tab.
+  useEffect(() => {
+    PRELOADERS.forEach((load) => {
+      load().catch(() => {});
+    });
+  }, []);
+
   // Direction of the tab move (index of the target vs. where we came from) so a
   // tab to the right slides the new panel in from the right and the old one out
   // to the left, and vice-versa, matching the Praktisch (Dashboard) toggle. We
-  // derive it from the index change during render (the "store the previous prop"
-  // pattern) and keep it stable across the transition's re-renders via a ref, so
-  // AnimatePresence's exit reads the right direction.
+  // read the previous index during render and advance it in an effect, so the
+  // change-render computes the right direction while the ref is only WRITTEN in
+  // the effect (no ref mutation during render).
   const index = LIBRARY_TABS.indexOf(tab);
   const prevIndex = useRef(index);
-  const dirRef = useRef(1);
-  if (index !== prevIndex.current) {
-    dirRef.current = index >= prevIndex.current ? 1 : -1;
+  const dir = index >= prevIndex.current ? 1 : -1;
+  useEffect(() => {
     prevIndex.current = index;
-  }
-  const dir = dirRef.current;
+  }, [index]);
 
-  // Horizontal slide (Praktisch parity): the entering panel comes from the side
-  // you moved toward, the leaving one exits the opposite side. `mode="wait"`
-  // sequences them so it reads as one panel replacing another, not a cross-fade.
-  // At rest the panel settles to `x: 0`, which framer resolves to
-  // `transform: none` (no lingering transform), so the sticky filter rail / Üben
-  // bar inside each trainer are not trapped in a containing block. Distance 0
-  // under reduced motion.
+  // Only the CONTENT slides; the tab bar is hoisted here and stays put (true
+  // Praktisch parity, where the toggle is static and the panel slides). Because
+  // the switcher never unmounts, its shared-layout pill also glides between tabs
+  // instead of re-appearing. Horizontal slide: the entering panel comes from the
+  // side you moved toward, the leaving one exits the opposite side; `mode="wait"`
+  // sequences them. At rest the panel settles to `x: 0`, which framer resolves to
+  // `transform: none`, so the sticky filter rail / Üben bar inside each trainer
+  // are not trapped in a containing block. Distance 0 under reduced motion.
   const shift = reduce ? 0 : 24;
   const slide = {
     enter: (d: number) => ({ opacity: 0, x: d >= 0 ? shift : -shift }),
@@ -80,20 +92,31 @@ export function LibraryHub() {
   };
 
   return (
-    <AnimatePresence mode="wait" custom={dir} initial={false}>
-      <motion.div
-        key={tab}
-        custom={dir}
-        variants={slide}
-        initial="enter"
-        animate="center"
-        exit="exit"
-        transition={{ duration: 0.16, ease: "easeOut" }}
-      >
-        <Suspense fallback={fallback}>
-          <Segment />
-        </Suspense>
-      </motion.div>
-    </AnimatePresence>
+    <div className="space-y-4 sm:space-y-6">
+      {/* Static page header. On desktop it sits at the content-column width (col
+          1 of the same [1fr, 16rem] grid the trainers use for their content +
+          filter rail), so the tabs line up with the cards, not the rail. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
+        <div className="lg:col-start-1">
+          <LibrarySwitcher />
+        </div>
+      </div>
+
+      <AnimatePresence mode="wait" custom={dir} initial={false}>
+        <motion.div
+          key={tab}
+          custom={dir}
+          variants={slide}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: 0.16, ease: "easeOut" }}
+        >
+          <Suspense fallback={fallback}>
+            <Segment />
+          </Suspense>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 }

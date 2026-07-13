@@ -19,7 +19,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
-import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { EnPeek } from "./EnPeek";
 import { GrammarDrillCard } from "./GrammarDrillCard";
 import { groupMeta, orderedGrammar } from "./grammarMeta";
@@ -102,11 +101,10 @@ function Lesson({
       animate={{ opacity: 1, y: 0 }}
       className="space-y-5 sm:space-y-6"
     >
-      {/* The Bibliothek tabs stay on top inside the lesson too (founder s93
-          follow-up: the lesson had no navigation). Tapping Grammatik doubles
-          as a way back to the topic grid (the link drops `?topic=`). */}
-      <LibrarySwitcher />
-
+      {/* The Bibliothek tabs (LibrarySwitcher) are rendered once by LibraryHub
+          above this segment now, so the lesson keeps its section navigation
+          without rendering its own copy (tapping Grammatik there drops `?topic=`
+          and returns to the topic grid). */}
       {/* Top row: back to the topic grid + position on the topic spine. */}
       <div className="flex items-center justify-between gap-2">
         <Button variant="ghost" size="sm" onClick={onBack} className="-ml-2">
