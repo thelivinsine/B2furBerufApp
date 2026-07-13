@@ -1,14 +1,19 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 108, **critical account data-isolation fix**, Opus 4.8). **FIX:**
-switching accounts on one device leaked one account's progress into another (and pushed it up to the
-other's cloud row). Root cause: the device-global localStorage caches were **merged** into every account
-on login and never cleared on sign-out. Fix in `lib/cloudSync.ts`: a persisted `b2beruf.syncUid` marker
-binds the local cache to one account; `startCloudSync` wipes the cache before pulling when the incoming
-uid differs, and sign-out/delete now `clearLocalAccountData()`, so **logging out resets the on-device
-progress + settings** (after flushing pending changes to the cloud first). Guest-upgrade (same uid) and
-first/offline sync are preserved. Pinned by `tests/cloudSync.test.ts` (4 cases). **SHIPPED: PR #493
-squash-merged to `main` (`64df253`).** Prior session (107, demo-prep polish continued, Opus 4.8). **SHIPPED (PRs #486,
+_Last updated: 2026-07-13 (session 109, **two phone-screenshot bug fixes**, Opus 4.8). **FIX 1:** the
+ugly monospace "App failed to load" screen was a false crash. In airplane mode / on a transient network
+blip, the background Service Worker update check (`reg.update()`, no `.catch()`) rejects with "Failed to
+update a ServiceWorker …", and that unhandled rejection tripped the global handler over an app that runs
+fine from the precache. Fix: swallow the SW-update rejection, make both global handlers ignore SW
+registration/update failures (`isServiceWorkerError`), and repaint the genuine-fatal fallback as a calm
+branded card (headline + Neu laden) with the stack behind a "Technische Details" expander. **FIX 2:** the
+Wörter graph opened too zoomed-out (k 2.2); raised to k 3.4 and centered on an area-weighted frequent
+node. **SHIPPED: PR #496 squash-merged to `main` (`b6998ee`).** Prior session (108, **critical account
+data-isolation fix**, Opus 4.8): switching accounts on one device leaked one account's progress into
+another (and pushed it up to the other's cloud row). Fix in `lib/cloudSync.ts`: a persisted
+`b2beruf.syncUid` marker binds the local cache to one account; `startCloudSync` wipes the cache before
+pulling when the incoming uid differs, and sign-out/delete now `clearLocalAccountData()`. Pinned by
+`tests/cloudSync.test.ts`. **SHIPPED: PR #493 (`64df253`).** Prior session (107, demo-prep polish continued, Opus 4.8). **SHIPPED (PRs #486,
 #488):** Praktisch nav icon → **compass**; the feedback button reworked into a store-controlled dialog
 with three surfaces (desktop bottom-right pill, mobile action-bar icon left of Üben, full "Feedback
 geben" in practice sessions), all on the **MessageSquareText** icon; **content-scoped Bibliothek Üben**
@@ -76,6 +81,29 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 109 (2026-07-13). Two founder bug reports from phone screenshots: the ugly
+"App failed to load" screen + the Wörter graph opening too zoomed-out (Opus 4.8), on branch
+`claude/app-loading-screen-5av7dt`, shipped as PR #496 (squash-merged `b6998ee`).**
+- **"App failed to load" screen (offline SW-update crash):** the reported screenshot was taken in
+  **airplane mode**. On app resume, `lib/swUpdate.ts` calls `reg.update()` (no `.catch()`) to check for a
+  new deploy; offline / on any transient network blip the browser can't fetch `sw.js`, so `update()`
+  rejects with *"Failed to update a ServiceWorker … An unknown error occurred when fetching the script"*.
+  That unhandled rejection tripped `main.tsx`'s global handler → the raw monospace `paintFatal` screen,
+  **over a working app** (it runs from the precache). Fix: (1) `swUpdate.ts` swallows the best-effort
+  `update()` rejection with `.catch()`; (2) new `isServiceWorkerError()` in `lib/recover.ts`, and both
+  global `error`/`unhandledrejection` handlers in `main.tsx` now ignore SW registration/update failures
+  (non-fatal); (3) `paintFatal` repainted as a calm branded card (headline + *Neu laden* button) with the
+  raw error/stack behind a collapsed *Technische Details* expander (mobile-debug net preserved).
+- **Wörter graph default zoom (`features/vocabulary/WordGraph.tsx`):** opened at `k=2.2` (max node radius
+  is only 12 world units, so the biggest circle was ~26px). Raised the initial open zoom to `k=3.4` and
+  centered the opening view on an **area-weighted (frequent)** node (r² ∝ wordfreq) so it lands among
+  common, well-connected words instead of a lone rare word in an empty corner. The fit button's
+  zoom-to-frequent-word target was matched to the same `k` (was 2.6).
+- **Gates:** typecheck ✔, lint **0 errors** (43 pre-existing warnings), `pnpm build` + prerender ✔,
+  `test:unit` **134/134**.
+- **NOT done:** live verification on a real phone (offline crash no longer appears; graph zoom feel) is
+  left to the founder (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain.
+
 **Handoff after session 108 (2026-07-13). CRITICAL account data-isolation bug (Opus 4.8), on branch
 `claude/account-data-isolation-bug-s517d1`.** Founder report: on a phone, switching between accounts
 showed one account's progress under another.
@@ -106,54 +134,6 @@ showed one account's progress under another.
   avoid any wipe entirely). Live verification on a real phone with two accounts is left to the founder
   (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain untouched.
 
-**Handoff after session 107 (2026-07-13). Demo-prep polish continued: compass Praktisch icon, feedback
-placement, content-scoped Üben, mobile scroll UX, graph zoom, centered Üben label, Lernen/Blau toggle,
-desktop white-block fix (Opus 4.8).** Continuation of the s105 demo sweep on branch
-`claude/demo-prep-feedback-rename-sl1jqq`, shipped as two squash-merged PRs (#486, #488).
-- **Praktisch nav icon → compass** (`route-icons.tsx` "/" renderer + NORM box, `nav-items.ts` lucide
-  fallback `Compass`), replacing the dumbbell; founder wanted a "real-life orientation" mark.
-- **Feedback button reworked (`FeedbackButton.tsx`, store-controlled via `useSessionStore.feedbackOpen`):**
-  one app-mounted `FeedbackDialog` + three trigger surfaces — desktop bottom-right pill (skips `/`),
-  mobile action-bar **icon** left of Üben (no floating pill over content), and a full "Feedback geben"
-  button inside practice sessions (`SessionPlayer`). All use the **MessageSquareText** icon so the
-  affordance reads as feedback.
-- **Content-scoped Bibliothek Üben (`engine/session.ts` `buildScopedSession` + `ContentScope`,
-  `useSessionStore.librarySession`, `Session.tsx` `?src=lib`, `SessionPlayer` contentScope/libraryIds):**
-  each browse tab hands its filtered ids to a content-PURE session, so Üben on Redemittel drills
-  Redemittel only, a Grammatik group drills that group only, etc. (was leaking generic vocab before).
-  `SessionBlock` flashcard source union gained `"collocation"` (XP-only grade, no vocab FSRS).
-- **Mobile browse scroll UX (`features/shared/browseScroll.tsx`, new):** `useScrollDirection` collapses
-  the tabs+toolbar on scroll-down / restores on scroll-up (mobile only via `max-lg:` guard) and drives a
-  centered `ScrollTopButton` above the Üben bar. `browseHeaderClass(hidden, scrolled)` now applies the
-  opaque masking background **only when scrolled**, on both breakpoints.
-- **Desktop "white block" fix:** the sticky tabs+toolbar header used to paint an always-on
-  `bg-background/90` rectangle, showing a hard-cornered white block beside the tabs (above the filter
-  rail) at rest. Now transparent at rest, backdrop fades in on scroll to mask pinned-header content.
-  Reproduced + verified fixed with Playwright at 1280×900.
-- **Wörter graph (`WordGraph.tsx`):** opens **zoomed into a readable random node** (k≈2.2) instead of
-  fit-to-all; the legend is visible by default on mobile and doubles as domain filters.
-- **Centered Üben label (`UebenLabel` in browseScroll):** the word "Üben" is centered in the button with
-  the bolt icon floating to its left (absolute, no layout space), across all four trainers.
-- **Praktisch toggle rename + recolor (`Dashboard.tsx`):** left mode "Üben" → **Lernen** (blue
-  `text-blue-600` + `BookOpen` icon) so it no longer clashes with the Theorie Üben button; "Lernen /
-  Spielen" reads as a pair. Spielen stays orange. Founder picked Lernen + Blau from preview options.
-- **Post-ship follow-ups (same session, PRs #490, #491):** (a) the **compass** route accent moved to the
-  nav blue `#2563eb` (so the ring AND the active-tab underline match the other nav marks) with a
-  **thicker ring** (r8/stroke 2.7); (b) the **Üben-map onward route** is drawn per straight run with its
-  dash pattern **phase-locked to the street lane dashes** (opaque, "7 9" period, offset = start-coord mod
-  16, in `SEG_RUNS`) so route dashes land exactly on the lane markings instead of scattering as dots;
-  (c) the pin's **pulse ring is a muted theme-aware gray** (`pulseRing`, was red) while the pin stays red;
-  (d) the **Lernen toggle book fills when active** and, per a follow-up, uses a **custom open-book mark
-  (`LernenBook`) with a ~2px transparent center gutter** so the two pages stay distinct when filled
-  (lucide `BookOpen` dropped from the toggle). All Playwright-verified; gates green each ship.
-- **Gates:** typecheck ✔, lint **0 errors** (43 warnings), content-lint ✔, `test:unit` **130/130**,
-  build + prerender ✔, `check:bundle` **~77 kB**/400. Playwright-verified: white-block gone at rest +
-  masks on scroll, toggle Lernen/blue live, compass blue, map dashes aligned, gray pulse ring, filled
-  book with center gutter.
-- **NOT done:** standing content/Üben-map follow-ups (human `verified` pass, jury Waves, sector-audit
-  review) remain; the s105 "reorderable filter list" is still read as pill-list + Mehr/Weniger (no
-  drag-reorder).
-
-_(Sessions 85-105's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
+_(Sessions 85-107's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
 and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_

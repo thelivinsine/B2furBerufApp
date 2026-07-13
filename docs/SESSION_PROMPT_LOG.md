@@ -4457,3 +4457,36 @@ Branch: `claude/whats-next-esga9u`.
   commit `9d7147f` → PR #493 squash-merged (`64df253`) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` (s106 handoff moved here) ·
   `docs/SESSION_PROMPT_LOG.md`.
+
+---
+
+## Session 109 — 2026-07-13 (two phone-screenshot bug fixes)
+- **Branch:** `claude/app-loading-screen-5av7dt` (Opus 4.8)
+- **Prompts (verbatim):**
+  > [screenshot: "App failed to load" — ServiceWorker fetch error, airplane mode] sometimes, the app shows this screen when loading. it doesn't look professional or nice. Can you fix this?
+  > [screenshot: Wörter graph, zoomed-in nodes] the zoom level isn't enough. It should be something like this. see attached screenshot
+- **Response summary:** Two unrelated founder bug reports, both diagnosed from the screenshots.
+  (1) **"App failed to load" false crash.** The status bar in the screenshot showed **airplane mode**.
+  Root cause: on app resume `lib/swUpdate.ts` calls `reg.update()` (no `.catch()`) to poll for a new
+  deploy; offline / on any transient network blip the browser cannot fetch `sw.js`, so `update()` rejects
+  with "Failed to update a ServiceWorker for scope … An unknown error occurred when fetching the script".
+  That unhandled rejection tripped the global `unhandledrejection` handler in `main.tsx` → the raw
+  monospace `paintFatal` "App failed to load" screen, painted over a fully working app (it serves from the
+  precache). Fix: `swUpdate.ts` swallows the best-effort `update()` rejection with `.catch(() => {})`;
+  new `isServiceWorkerError()` in `lib/recover.ts` and both global `error`/`unhandledrejection` handlers
+  in `main.tsx` now early-return on SW registration/update failures (non-fatal); and `paintFatal` was
+  rewritten from a monospace error dump into a calm, branded centered card (gradient "G" badge, German
+  headline "Kurz nicht erreichbar", a "Neu laden" button) with the raw message + stack kept behind a
+  collapsed "Technische Details" `<details>` expander, so the mobile-debug net survives without scaring a
+  learner. (2) **Wörter graph opened too zoomed-out.** `features/vocabulary/WordGraph.tsx` opened at
+  `k=2.2`; since the max node radius is only 12 world units the biggest circle was ~26px. Raised the
+  initial open zoom to `k=3.4` and changed the opening center-node pick from uniform-random to
+  **area-weighted** (r² ∝ wordfreq Zipf) so the first view lands among common, well-connected words rather
+  than a lone rare word in an empty corner; the fit button's zoom-to-frequent-word target was bumped 2.6
+  → 3.4 to match. Gates: typecheck ✔, lint 0 errors (43 pre-existing warnings), `pnpm build` + prerender
+  ✔, `test:unit` 134/134. **Shipped:** PR #496 squash-merged to `main` (SHA `b6998ee`), post-merge branch
+  realignment done. Then this doc pass.
+- **Artifacts:** `src/lib/swUpdate.ts` · `src/lib/recover.ts` · `src/main.tsx` ·
+  `src/features/vocabulary/WordGraph.tsx` · commit `8d7aeb6` → PR #496 squash-merged (`b6998ee`) ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` (s107 handoff
+  moved here) · `docs/SESSION_PROMPT_LOG.md`.
