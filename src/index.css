@@ -176,48 +176,11 @@ input:-webkit-autofill {
        candidate, which is wasted style-recalc work on card-heavy lists). */
     @apply transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-elevated;
   }
-
-  /* Bibliothek tab-switch slide (LibraryHub). The four segments each remount on
-     tab change, so this is a mount-time ENTER animation: the incoming panel
-     slides in from the side it was tapped toward and fades up. It is a keyframe
-     (not a transition) with the default fill-mode `none`, so the transform is
-     applied ONLY for the ~220ms slide and reverts to none at rest, which keeps
-     the segments' `position: sticky`/`fixed` descendants (filter rail, mobile
-     Üben bar, scroll-top button) working (a resting transform would trap them).
-     The document already clips horizontal overflow, so the offset adds no
-     scrollbar. Reduced motion is neutralised by the global rule above. */
-  .lib-slide-in-right {
-    /* fill-mode intentionally `none` (the default): the transform must NOT
-       persist at rest, or it would establish a containing block and trap the
-       sticky/fixed descendants. */
-    animation: lib-slide-in-right 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .lib-slide-in-left {
-    animation: lib-slide-in-left 0.22s cubic-bezier(0.22, 1, 0.36, 1);
-  }
 }
 
-@keyframes lib-slide-in-right {
-  from {
-    opacity: 0;
-    transform: translate3d(1.25rem, 0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@keyframes lib-slide-in-left {
-  from {
-    opacity: 0;
-    transform: translate3d(-1.25rem, 0, 0);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
+/* The Bibliothek tab-switch slide moved to framer-motion (LibraryHub uses an
+   AnimatePresence mode="wait" directional slide, matching the Praktisch toggle).
+   The old `.lib-slide-in-*` keyframes were removed with it. */
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
