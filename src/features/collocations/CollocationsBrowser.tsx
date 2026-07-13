@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { ChevronLeft, Zap, Search, SlidersHorizontal } from "lucide-react";
+import { ChevronLeft, Search, SlidersHorizontal } from "lucide-react";
 import { collocations, collocationsByTheme, collocationsBySubTheme } from "@/data/collocations";
 import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -27,6 +27,7 @@ import {
 import type { WorkSector } from "@/types";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { useScrollDirection, browseHeaderClass, ScrollTopButton, UebenLabel } from "@/features/shared/browseScroll";
 import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { CollocationTable, CollocationCompactList } from "./CollocationViews";
@@ -125,6 +126,7 @@ export function CollocationsBrowser() {
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
   const reduce = useReducedMotion();
+  const { hidden: headerHidden, scrolled } = useScrollDirection();
 
   // Tier-2 travelling scope: inherit the shared library scope when arriving
   // without an explicit theme; URL params still override for deep links.
@@ -329,7 +331,7 @@ export function CollocationsBrowser() {
     pinScope: "kollokationen",
     footer: (
       <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
-        <Zap className="h-3.5 w-3.5" /> Üben
+        <UebenLabel iconClass="h-3.5 w-3.5" />
       </Button>
     ),
     count: {
@@ -373,7 +375,7 @@ export function CollocationsBrowser() {
           SAME filter tile inline (collapsed by default); only one FilterRail
           is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className="space-y-4 lg:col-start-1 lg:row-start-1">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:bg-background/90 lg:pb-3 lg:backdrop-blur`}>
           <LibrarySwitcher />
 
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
@@ -526,12 +528,13 @@ export function CollocationsBrowser() {
         </div>
 
         {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
+        <ScrollTopButton show={scrolled} />
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
           <FeedbackIconButton />
           <Button variant="gradient" className="h-11 flex-1 rounded-xl text-base" onClick={startSession}>
-            <Zap className="h-4 w-4" /> Üben
+            <UebenLabel iconClass="h-4 w-4" />
           </Button>
-          <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+          <div className="flex w-20 shrink-0 flex-col items-center justify-center px-1 leading-none">
             <span className="text-sm font-semibold tabular-nums text-foreground">
               {filtered.length}
             </span>

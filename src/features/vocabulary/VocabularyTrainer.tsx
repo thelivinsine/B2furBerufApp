@@ -6,7 +6,6 @@ import {
   Layers,
   Sparkles,
   ChevronLeft,
-  Zap,
   Bookmark,
   Search,
   SlidersHorizontal,
@@ -21,6 +20,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { useScrollDirection, browseHeaderClass, ScrollTopButton, UebenLabel } from "@/features/shared/browseScroll";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch, foldText } from "@/lib/fuzzy";
@@ -104,6 +104,7 @@ export function VocabularyTrainer() {
   // filter. It starts open if the page was deep-linked with a query.
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
   const reduce = useReducedMotion();
+  const { hidden: headerHidden, scrolled } = useScrollDirection();
 
   // Tier-2 travelling scope: when arriving without an explicit theme (e.g. via
   // the bottom bar), inherit the shared library scope so the learner's context
@@ -424,7 +425,7 @@ export function VocabularyTrainer() {
     pinScope: "woerter",
     footer: (
       <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
-        <Zap className="h-3.5 w-3.5" /> Üben
+        <UebenLabel iconClass="h-3.5 w-3.5" />
       </Button>
     ),
     // Count sits stacked to the right of Üben in the tile footer, same as
@@ -489,7 +490,7 @@ export function VocabularyTrainer() {
           the SAME filter tile inline (collapsed by default) instead of a
           toolbar + sheet; only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className="space-y-4 lg:col-start-1 lg:row-start-1">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:bg-background/90 lg:pb-3 lg:backdrop-blur`}>
           <LibrarySwitcher />
 
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile:
@@ -618,6 +619,7 @@ export function VocabularyTrainer() {
         {/* Mobile action bar: Üben + word count stay pinned at the bottom of the
             screen (above the nav) so the list scrolls above them. Desktop keeps
             Üben/count in the rail. */}
+        <ScrollTopButton show={scrolled} />
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
           <FeedbackIconButton />
           <Button
@@ -625,9 +627,9 @@ export function VocabularyTrainer() {
             className="h-11 flex-1 rounded-xl text-base"
             onClick={startSession}
           >
-            <Zap className="h-4 w-4" /> Üben
+            <UebenLabel iconClass="h-4 w-4" />
           </Button>
-          <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+          <div className="flex w-20 shrink-0 flex-col items-center justify-center px-1 leading-none">
             <span className="text-sm font-semibold tabular-nums text-foreground">
               {items.length}
             </span>
