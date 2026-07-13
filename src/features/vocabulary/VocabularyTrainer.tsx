@@ -24,7 +24,6 @@ import { useScrollDirection, browseHeaderClass, ScrollTopButton, UebenLabel } fr
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch, foldText } from "@/lib/fuzzy";
-import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import {
   applyFacets,
   ActiveFilterChip,
@@ -491,8 +490,6 @@ export function VocabularyTrainer() {
           toolbar + sheet; only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
         <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
-          <LibrarySwitcher />
-
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile:
               Filter + view on the left, bookmark/search pushed right; Üben fills
               its row with the count at the far right. Desktop keeps Üben/count

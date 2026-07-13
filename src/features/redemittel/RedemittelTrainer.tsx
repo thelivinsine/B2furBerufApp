@@ -24,7 +24,6 @@ import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch } from "@/lib/fuzzy";
 import { redemittelFacets } from "@/lib/facets";
 import { RedemittelTable, RedemittelCompactList } from "./RedemittelViews";
-import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { defaultVisibleBands } from "@/lib/cefr";
 
@@ -201,8 +200,6 @@ export function RedemittelTrainer() {
           group in it now); only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
         <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
-          <LibrarySwitcher />
-
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">

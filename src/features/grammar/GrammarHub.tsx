@@ -19,7 +19,6 @@ import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch } from "@/lib/fuzzy";
 import { grammarFacets } from "@/lib/facets";
 import type { GrammarTopic } from "@/types";
-import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { groupMeta, groupOrder, orderedGrammar } from "./grammarMeta";
 import { GrammarTopicCards, GrammarCompactList } from "./GrammarViews";
 import { GrammarTopicView } from "./GrammarTopicView";
@@ -152,8 +151,6 @@ export function GrammarHub() {
           Mobile renders the SAME filter tile inline as a slide-open panel. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
         <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
-          <LibrarySwitcher />
-
           {/* Toolbar: mobile filter toggle · view switcher · search icon. */}
           <div className="flex w-full flex-col gap-2">
             {/* Items are centered while search is closed; opening search slides
