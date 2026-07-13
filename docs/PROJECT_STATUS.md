@@ -61,13 +61,18 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 **Handoff after session 113 (2026-07-13). Theorie tab-transition + compass-icon polish (Opus 4.8), on
 branch `claude/theory-toggle-transitions-hloi6s`, merged to `main` (PR #506).** Two small UX fixes,
 no logic/data change.
-- **Theorie tab slide:** switching Wörter/Kollokationen/Redemittel/Grammatik used to flash blank
-  (`LibraryHub` remounted the segment behind `Suspense fallback={null}` + an enter-only CSS keyframe).
-  Replaced with the Praktisch pattern: `AnimatePresence mode="wait"` directional `x`-slide (dir from the
-  tab-index change) + a shaped skeleton fallback, so panels slide the way you moved and never flash.
-  framer resolves the resting `x:0` to `transform:none`, so the sticky filter rail / Üben bar are not
-  trapped (why the old CSS used `fill-mode:none`; Dashboard already proves this at rest). Removed the
-  dead `.lib-slide-in-*` keyframes from `index.css`.
+- **Theorie tab slide (took two rounds):** switching Wörter/Kollokationen/Redemittel/Grammatik used to
+  flash blank + reload. Round 1 swapped the enter-only CSS keyframe + `Suspense fallback={null}` for the
+  Praktisch `AnimatePresence mode="wait"` directional `x`-slide + skeleton (removed the dead
+  `.lib-slide-in-*` keyframes). Round 2 (the real fix): the `LibrarySwitcher` (tab bar) was rendered
+  INSIDE each trainer, so it sat in the animated subtree and the tabs themselves reloaded on every
+  toggle. **Hoisted the switcher into `LibraryHub` as one static element** (only the content slides now,
+  true Praktisch parity; the shared-layout pill glides between tabs), removed `<LibrarySwitcher/>` from
+  the 4 trainers + `GrammarTopicView` (else the lesson doubles the bar), and **preload all 4 tab chunks
+  on mount** so a switch never hits the loading skeleton. Desktop tabs sit at content-column width (col 1
+  of the same `[1fr,16rem]` grid). Verified in Chromium (1280×900 + 390×844): one bar per surface,
+  static tabs + pill glide mid-transition, no skeleton flash. framer resolves the resting `x:0` to
+  `transform:none`, so the sticky filter rail / Üben bar are not trapped.
 - **Compass icon:** the Praktisch route mark is a thin outline ring that read smaller than its neighbors;
   bumped its optical weight `0.95→1.05` in `route-icons.tsx` `NORM` so it matches
   Theorie/Fortschritt/Einstellungen.
