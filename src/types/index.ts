@@ -418,8 +418,11 @@ export type SessionBlock =
   | {
       kind: "flashcard";
       key: string;
-      /** Which bank the card came from (drives how the result is recorded). */
-      source: "vocab" | "redemittel";
+      /** Which bank the card came from (drives how the result is recorded).
+       *  "collocation" (Bibliothek Üben, 2026-07-13) is a recognition-only card:
+       *  it awards XP but writes no SRS (collocations carry no spaced-repetition
+       *  state), so it never touches the vocab loot / Redemittel-seen tracking. */
+      source: "vocab" | "redemittel" | "collocation";
       /** SRS / practice id used to record the result. */
       sourceId: string;
       de: string;

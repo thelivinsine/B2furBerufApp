@@ -16,9 +16,11 @@ import { vocabulary, vocabByTheme, vocabBySubTheme } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
+import { useSessionStore } from "@/store/useSessionStore";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { FilterRail } from "@/features/shared/FilterRail";
+import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch, foldText } from "@/lib/fuzzy";
@@ -72,6 +74,7 @@ export function VocabularyTrainer() {
   const learningMode = useSettingsStore((s) => s.mode);
   const savedWords = useProgressStore((s) => s.savedWords);
   const scope = useLibraryScope();
+  const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
   // Scope dropdowns are multi-select (s104, founder decision): each rides a
   // comma-list URL param, empty/absent = "everything". `theme`/`sector` were
   // briefly single-value scope params after the s102 Branche overhaul; s104
@@ -291,20 +294,12 @@ export function VocabularyTrainer() {
   // practises what they are looking at (theme, sub-theme, CEFR, Branche).
   // pos/srs/frequency are browse lenses, not learning scopes, so they are
   // deliberately not forwarded.
+  // Üben practises EXACTLY the currently filtered words (founder 2026-07-13):
+  // hand the tab's filtered ids to the session store, so the composed session is
+  // vocab-only and scoped to this view, then launch it with `?src=lib`.
   const startSession = () => {
-    const p = new URLSearchParams();
-    // The session engine's `libraryFocus` (engine/session.ts) still takes a
-    // single `theme`/`sub` (it biases ONE session, not several themes at
-    // once); a multi-Thema/Unterthema browse selection collapses to its
-    // first value here rather than teaching the session composer a new
-    // multi-theme mode. Branche already accepts a comma list there, so every
-    // selected Branche is forwarded.
-    if (themes.length) p.set("theme", themes[0]);
-    if (subFilter?.length) p.set("sub", subFilter[0]);
-    if (selection.cefr?.length) p.set("cefr", selection.cefr.join(","));
-    if (sectors.length) p.set("sector", sectors.join(","));
-    const q = p.toString();
-    navigate(`/session${q ? `?${q}` : ""}`);
+    setLibrarySession({ type: "vocab", ids: items.map((v) => v.id) });
+    navigate("/session?src=lib");
   };
 
   // Icon-only bookmark filter (founder s92): sits on the view-options line as a
@@ -624,6 +619,7 @@ export function VocabularyTrainer() {
             screen (above the nav) so the list scrolls above them. Desktop keeps
             Üben/count in the rail. */}
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+          <FeedbackIconButton />
           <Button
             variant="gradient"
             className="h-11 flex-1 rounded-xl text-base"
@@ -643,7 +639,7 @@ export function VocabularyTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-11rem)] lg:overflow-hidden"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-21rem)] lg:overflow-hidden"
         />
       </div>
     </div>

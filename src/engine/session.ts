@@ -9,6 +9,7 @@ import type {
 import { vocabulary, vocabByTheme } from "@/data/vocabulary";
 import { themes, themeById } from "@/data/themes";
 import { redemittel } from "@/data/redemittel";
+import { collocations } from "@/data/collocations";
 import { grammar } from "@/data/grammar";
 import { texts } from "@/data/texts";
 import { isDue, mastery, reviewWeight, dueCount } from "@/engine/srs";
@@ -132,6 +133,98 @@ export function libraryFocus(opts: {
   return pool.length
     ? { vocabIds: sample(pool, FOCUS_VOCAB_CAP).map((v) => v.id), redemittelIds: [] }
     : undefined;
+}
+
+/**
+ * Which Bibliothek tab launched Üben. When set (via `?src=lib` + the session
+ * store), the session is built from ONLY that content type + the tab's exact
+ * filtered items, so "Üben" on the Redemittel tab practises Redemittel only,
+ * "Üben" on a Grammatik group drills that group only, etc. (founder 2026-07-13).
+ */
+export type ContentScope = "vocab" | "collocation" | "redemittel" | "grammar";
+
+const CONTENT_SCOPE_LABEL: Record<ContentScope, string> = {
+  vocab: "Wörter",
+  collocation: "Kollokationen",
+  redemittel: "Redemittel",
+  grammar: "Grammatik",
+};
+
+/**
+ * Build a content-PURE session for a Bibliothek tab's Üben button: only blocks
+ * of the given type, drawn from `ids` (the tab's exact filtered items; empty
+ * falls back to the whole bank of that type). Sampled + capped to the target
+ * length. No interleaving with other content types, so the learner practises
+ * exactly what the page shows.
+ */
+export function buildScopedSession(
+  type: ContentScope,
+  ids: string[],
+  opts: { srs: Record<string, SrsCard>; minutes: number },
+): SessionPlan {
+  const limit = targetBlocks(opts.minutes);
+  const idSet = new Set(ids);
+  const has = (id: string) => idSet.size === 0 || idSet.has(id);
+  let blocks: SessionBlock[];
+  let label = CONTENT_SCOPE_LABEL[type];
+
+  if (type === "vocab") {
+    const pool = vocabulary.filter((v) => has(v.id));
+    blocks = sample(pool, Math.min(limit, pool.length)).map((v): SessionBlock =>
+      graduatedToTyping(opts.srs[v.id])
+        ? { kind: "typing", key: `ty_${v.id}`, sourceId: v.id, de: v.de, en: v.en, example: v.examples[0]?.de }
+        : {
+            kind: "flashcard",
+            key: `fc_${v.id}`,
+            source: "vocab",
+            sourceId: v.id,
+            de: v.de,
+            en: v.en,
+            example: v.examples[0]?.de,
+          },
+    );
+  } else if (type === "collocation") {
+    const pool = collocations.filter((c) => has(c.id));
+    blocks = sample(pool, Math.min(limit, pool.length)).map((c): SessionBlock => ({
+      kind: "flashcard",
+      key: `fc_col_${c.id}`,
+      source: "collocation",
+      sourceId: c.id,
+      de: c.full,
+      en: c.en,
+      example: c.example.de,
+    }));
+  } else if (type === "redemittel") {
+    const pool = redemittel.filter((r) => has(r.id));
+    blocks = sample(pool, Math.min(limit, pool.length)).map((r): SessionBlock => ({
+      kind: "flashcard",
+      key: `fc_rede_${r.id}`,
+      source: "redemittel",
+      sourceId: r.id,
+      de: r.de,
+      en: r.en,
+      example: r.example.de,
+    }));
+  } else {
+    const topics = grammar.filter((g) => has(g.id));
+    const drillBlocks: SessionBlock[] = topics.flatMap((t) =>
+      t.drills.map((d): SessionBlock => ({
+        kind: "grammar",
+        key: `gr_${d.id}`,
+        drill: d,
+        groupLabel: t.titleDe,
+      })),
+    );
+    blocks = sample(drillBlocks, Math.min(limit, drillBlocks.length));
+    if (topics.length === 1) label = topics[0].titleDe;
+  }
+
+  return {
+    blocks,
+    minutes: opts.minutes,
+    preview: `${blocks.length} ${label} zum Üben`,
+    focus: label,
+  };
 }
 
 export interface BuildSessionOpts {

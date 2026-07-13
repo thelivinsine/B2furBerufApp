@@ -19,7 +19,7 @@ import type { Grade, SessionBlock } from "@/types";
 import { useProgressStore, useTodayXp } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
-import { buildSession, difficultyForLevel } from "@/engine/session";
+import { buildSession, buildScopedSession, difficultyForLevel, type ContentScope } from "@/engine/session";
 import { cardLevel, leveledUp } from "@/engine/collection";
 import { quizXp } from "@/engine/quiz";
 import { XP } from "@/engine/scoring";
@@ -37,6 +37,7 @@ import { Progress } from "@/components/ui/progress";
 import { SectionHeading, EmptyState } from "@/components/shared/misc";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { Gloss } from "@/features/shared/Gloss";
+import { FeedbackFullButton } from "@/components/layout/FeedbackButton";
 import type { ThemeId } from "@/types";
 
 /** A word practiced this session, rendered as a collectible card on the end
@@ -57,6 +58,14 @@ interface SessionPlayerProps {
   focus?: { vocabIds: string[]; redemittelIds: string[] };
   /** Grammatik lesson Üben (`?grammar=`): pin the studied grammar topic. */
   grammarTopicId?: string;
+  /**
+   * Bibliothek Üben (`?src=lib`): practise ONLY this content type, drawn from
+   * `libraryIds` (the tab's exact filtered items). Takes over the whole session
+   * when set, so Redemittel Üben is Redemittel-only, a Grammatik group is its
+   * drills only, etc. (founder 2026-07-13).
+   */
+  contentScope?: ContentScope;
+  libraryIds?: string[];
 }
 
 /**
@@ -82,6 +91,8 @@ function SessionRun({
   scope,
   focus,
   grammarTopicId,
+  contentScope,
+  libraryIds,
   onRestart,
 }: SessionPlayerProps & { onRestart: () => void }) {
   const navigate = useNavigate();
@@ -102,18 +113,20 @@ function SessionRun({
   // Build once on mount: the composer samples, so re-building each render would
   // reshuffle the deck under the learner.
   const [plan] = useState(() =>
-    buildSession({
-      srs,
-      savedWords,
-      mode,
-      minutes,
-      difficulty: difficultyForLevel(level),
-      scope,
-      focus,
-      grammarTopicId,
-      speaking: recognitionEnabled && recognitionSupported(),
-      listening: ttsSupported(),
-    }),
+    contentScope
+      ? buildScopedSession(contentScope, libraryIds ?? [], { srs, minutes })
+      : buildSession({
+          srs,
+          savedWords,
+          mode,
+          minutes,
+          difficulty: difficultyForLevel(level),
+          scope,
+          focus,
+          grammarTopicId,
+          speaking: recognitionEnabled && recognitionSupported(),
+          listening: ttsSupported(),
+        }),
   );
 
   const [index, setIndex] = useState(0);
@@ -246,9 +259,10 @@ function SessionRun({
     const b = block as Extract<SessionBlock, { kind: "flashcard" }>;
     registerResult(correct);
     // Latency + loot only attribute to a real SRS card (the vocab branch); the
-    // Redemittel branch has no card, so the sample is dropped and it isn't loot.
+    // Redemittel branch records a "seen"; collocation cards are recognition-only
+    // (Bibliothek Üben) and write no progress state, just XP.
     if (b.source === "vocab") captureLoot(b.sourceId, b.de, b.en, correct ? 4 : 0, latencyMs);
-    else practiceRedemittel(b.sourceId);
+    else if (b.source === "redemittel") practiceRedemittel(b.sourceId);
     if (correct) award(XP.flashcard);
     advance();
   };
@@ -414,6 +428,12 @@ function SessionRun({
             </Button>
           </motion.div>
         )}
+      </div>
+
+      {/* Feedback stays reachable inside a practice session (founder 2026-07-13):
+          there is room here, so it shows the full labelled button. */}
+      <div className="flex justify-center pb-safe pt-1">
+        <FeedbackFullButton />
       </div>
 
       {/* Exit confirm overlay (uses the locked dialog-overlay token). */}
@@ -647,7 +667,7 @@ function SpeakingBlock({
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Sag es auf Deutsch:
         </p>
-        <p className="text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
+        <p className="w-full break-words text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
         {block.example && (
           <p className="text-center text-sm italic text-muted-foreground">„{block.example}"</p>
         )}
@@ -805,7 +825,7 @@ function TypingBlock({
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
           Schreib es auf Deutsch:
         </p>
-        <p className="text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
+        <p className="w-full break-words text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
       </div>
 
       {outcome ? (
@@ -893,7 +913,9 @@ function FlashcardBlock({
   return (
     <div className="space-y-5">
       <div className="flex justify-end">
-        <Badge variant="muted">{block.source === "vocab" ? "Vokabel" : "Redemittel"}</Badge>
+        <Badge variant="muted">
+          {block.source === "vocab" ? "Vokabel" : block.source === "redemittel" ? "Redemittel" : "Kollokation"}
+        </Badge>
       </div>
 
       <div
@@ -916,17 +938,19 @@ function FlashcardBlock({
         <motion.div
           animate={{ rotateY: flipped ? 180 : 0 }}
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="grid min-h-[13rem] w-full cursor-pointer [transform-style:preserve-3d]"
+          className="grid min-h-[13rem] w-full cursor-pointer grid-cols-1 [transform-style:preserve-3d]"
         >
           {/* Front */}
-          <div className="[grid-area:1/1] flex flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-surface p-6 shadow-soft [backface-visibility:hidden]">
-            <p className="text-center text-3xl font-semibold sm:text-4xl">{block.de}</p>
+          <div className="[grid-area:1/1] flex min-w-0 flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-surface p-6 shadow-soft [backface-visibility:hidden]">
+            {/* break-words so a long compound (e.g. Wohnungsgeberbestätigung)
+                wraps inside the card instead of overflowing to the right. */}
+            <p className="w-full break-words text-center text-3xl font-semibold sm:text-4xl">{block.de}</p>
             <SpeakButton text={block.de} />
             <p className="text-xs text-muted-foreground">Tippen zum Umdrehen</p>
           </div>
           {/* Back */}
-          <div className="[grid-area:1/1] flex flex-col items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-surface p-6 shadow-glow [backface-visibility:hidden] [transform:rotateY(180deg)]">
-            <Gloss de={block.de} en={block.en} initial="en" className="text-center text-xl font-semibold text-primary" />
+          <div className="[grid-area:1/1] flex min-w-0 flex-col items-center justify-center gap-2 rounded-2xl border border-primary/30 bg-surface p-6 shadow-glow [backface-visibility:hidden] [transform:rotateY(180deg)]">
+            <Gloss de={block.de} en={block.en} initial="en" className="w-full break-words text-center text-xl font-semibold text-primary" />
             {block.example && (
               <p className="text-center text-sm italic text-muted-foreground">„{block.example}"</p>
             )}

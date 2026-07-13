@@ -1,5 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useSessionStore } from "@/store/useSessionStore";
 import { themeById } from "@/data/themes";
 import { missions } from "@/data/missions";
 import { missionContentIds } from "@/engine/mission";
@@ -20,10 +21,28 @@ import { SessionPlayer } from "./SessionPlayer";
 export function Session() {
   const [params] = useSearchParams();
   const dailyGoalXp = useSettingsStore((s) => s.dailyGoalXp);
+  const librarySession = useSessionStore((s) => s.librarySession);
 
   const minParam = Number(params.get("min"));
   const minutes =
     Number.isFinite(minParam) && minParam > 0 ? minParam : Math.max(5, Math.round(dailyGoalXp / 8));
+
+  // Bibliothek Üben (`?src=lib`): the launching tab stashed its content type +
+  // filtered ids in the session store, so this session practises ONLY that
+  // tab's filtered content. Takes priority over every other tailoring path.
+  // A refresh with an empty hand-off falls through to a normal session.
+  if (params.get("src") === "lib" && librarySession) {
+    return (
+      <SessionPlayer
+        key={`lib-${librarySession.type}-${librarySession.ids.length}-${minutes}`}
+        minutes={minutes}
+        contentScope={librarySession.type}
+        libraryIds={librarySession.ids}
+        eyebrow="Üben"
+        title="Deine Session"
+      />
+    );
+  }
 
   // Mission focus takes priority: it scopes the session to the mission's theme
   // AND surfaces the mission's own vocab + Redemittel. A pinned grammar topic
