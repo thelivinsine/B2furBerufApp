@@ -1,9 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-12 (session 103). **Üben-refinements Work items 2, 4+5, 6 SHIPPED** (Sonnet 5):
-graph word count moved beside Üben, FilterRail restyled as a standard content card with the count
-always beside Üben, grammar lesson Muster/explanation side by side on desktop. Follows the same-day
-s102 Branche filter overhaul ship (see its handoff below). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-12 (session 104). **Üben map re-spaced + recolored** (Üben-refinements Work
+item 3, founder-picked from three mockup rounds): street grid moved so no landmark tile hugs a map
+edge, MAP_LIGHT = brand-tinted "Stimmung 3", MAP_DARK = the deliberately bright "Klarer Abend",
+route/pin color rides the palette. Mockup sheets live under `preview/ueben-map-mockups*.html`.
+Follows the same-day s103 ship of Üben items 2, 4+5, 6 (see its handoff below). Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -57,44 +59,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 102 (2026-07-12). Branche filter overhaul IMPLEMENTED and shipped (plan
-`docs/plans/BRANCHE_FILTER_OVERHAUL_PLAN.md`, approved s99), Fable 5.** Context: the founder presents
-the app to an audience 2026-07-13 and named the Branche filter a core demo feature, so the deferred
-plan was executed same-day and merged to `main`.
-- **Data model:** `sector?: WorkSector` → `sectors?: WorkSector[]` on VocabItem/Collocation/ReadingText
-  (mechanical migration of all 575 tagged rows); `WorkSector` extended to **15** (`chemicals`, `pharma`,
-  `cleaning`, `security`; `transport` relabeled "Transport & Logistik"); linter validates `sectors[]`
-  (non-empty, unique, enum) and ERRORS on the retired singular `sector`. `vocabulary.ts` is now two
-  concatenated literals (`vocabularyPart1/2`, TS2590 limit, same split as provenance s95).
-- **Root-cause fix:** `matchesSector` in `lib/facets.ts` (untagged = universal: general words show
-  under EVERY Branche; tagged hide only under other Branchen), applied as a scope cut in
-  VocabularyTrainer + CollocationsBrowser with **sector-first ordering** (Fachwörter lead, general
-  follow). Branche left the pill facets (no ≤12 cap, no coverage floor); `?sector=` is a single-value
-  scope param (old comma-list URLs degrade to first value).
-- **FilterRail** generalized from `primary`/`secondary` to an ordered **`scopes: RailPrimary[]`**
-  (stable `pinId` per scope keeps saved pins); Wörter/Kollokationen pass [Branche, Thema, Unterthema?],
-  Redemittel/Grammatik unchanged. Branche dropdown shows per-sector dedicated-content counts within
-  the current Thema scope. **Branche chips** (`features/shared/SectorChips.tsx`) on Wörter
-  Tabelle/Karten + Kollokationen Tabelle (sortable column; untagged shows nothing = general).
-- **Retag audit of all 562 tagged items** (393 words, 165 collocations, 4 texts): **117 untagged**
-  (shift vocabulary, PPE basics, everyday/general German: das Werkzeug, die Schicht, der Führerschein),
-  **162 widened** to 2-4 sectors (die Wartung → production+trades+engineering+chemicals), **279
-  confirmed**. Founder-review artifact: `docs/reports/sector-audit-report.md` (old → new + rationale
-  per item, grouped by decision).
-- **New content:** ~20-word packs for chemicals/pharma/cleaning/security + ~9 collocations each, a
-  10-word + 4-pair Lager boost (5 existing warehouse words tagged transport). Banks now **1,113 words /
-  741 collocations / 2,263 provenance rows** (all new rows `draft` with DWDS references).
-- **Gates all green:** lint:content ✔, typecheck ✔, lint 0 errors, **test:unit 124/124** (new
-  `tests/sectors.test.ts` pins matchesSector semantics, sector-first sort, and the v_projekt/v_bauzaun
-  regression pair), build + prerender ✔, bundle **73.0 kB**/400, `build:oracles` + `verify:facts` **0
-  two-oracle errors** (new nouns verified). **E2E in-browser (Playwright, dev server):** das Projekt
-  visible under IT AND Bau, der Bauzaun only under Bau, new sectors list their packs, `?sector=`
-  round-trips, mobile filter panel intact.
-- **NOT done / follow-up:** `pnpm build:frequency-subset` + `build:frequency` for the ~91 new words
-  (needs Python `wordfreq`; absent bins are fine, linter only errors on stale ids); founder review of
-  `sector-audit-report.md`; the human `verified` pass via `pnpm review:queue`; jury-pass extension to
-  Waves 1-2; Wave-2 tranche 2 after the 2026-07-13 classmate feedback; Playwright grammar smoke.
-
 **Handoff after session 103 (2026-07-12). Üben-refinements Work items 2, 4+5, 6 SHIPPED (Sonnet 5).**
 The founder said "go ahead with sonnet 5 items in the ui refinement plan" against
 `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`; work item 1 was already shipped (s101, Opus 4.8), item 3
@@ -129,6 +93,37 @@ The founder said "go ahead with sonnet 5 items in the ui refinement plan" agains
   Opus 4.8); the standing content follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2,
   Playwright grammar smoke); founder review of `sector-audit-report.md`.
 
-_(Sessions 85-101's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+**Handoff after session 104 (2026-07-12, parallel to s103 and rebased onto it). Üben map re-spaced +
+recolored via mockup rounds (Fable 5, Üben-refinements Work item 3 partial).** The founder asked for
+map mock-ups, iterated three rounds, and picked a direction that was then shipped to `main`.
+- **Mockup rounds (preview sheet `preview/ueben-map-mockups.html`, delivered as a claude.ai artifact
+  link):** R1 = the plan's illustrated-buildings recipe in 3 variants (rejected: "doesn't look good");
+  a pixel-art village round against founder-shared Zelda/Pokemon-style references was **abandoned
+  mid-review by founder choice** ("let's not waste resources"; never committed); R2 = the live map
+  re-spaced + 4 color moods (`-r2-farbstimmungen.html`); R3 = founder picked Stimmung 3 (Brand-Ton)
+  but its dark was too dark → 4 brighter dark variants (final sheet). **Founder picks: Stimmung 3
+  light + "Dunkel D: Klarer Abend" dark.** R1/R2 are archived beside the final sheet
+  (`preview/ueben-map-mockups-r1-beautify.html`, `-r2-farbstimmungen.html`). The pixel-art reference
+  images were shared inline in chat and could not be exported to files; drop them into
+  `preview/references/` if they should be kept.
+- **Shipped in `UebenPath.tsx`:** street grid re-spaced (H y=88/170, V x=76/176/276; tiles Bahnhof
+  [44,48], Laden [120,48], Zuhause [310,128], Amt [216,205]) so **no landmark tile hugs a map edge**
+  (Bahnhof was 13 px, Amt 10 px from the edge); SEG_PATHS + parks/lots re-laid to the new blocks.
+  **MAP_LIGHT = Brand-Ton** (indigo-tinted ground `#eef0f7` + lavender lots, green parks stay the
+  contrast), **MAP_DARK = Klarer Abend** (deliberately bright blue-grey ground `#2e3450`, near-white
+  labels `#dde1f2`; the old night palette was rejected as too dark/low contrast). New palette field
+  **`route`**: the journey line/pin now use `P.route` instead of `hsl(var(--primary))` because the
+  dark map needs a brighter indigo (`#a6a6fd`) than the dark `--primary` token on the lifted ground.
+- **Gates:** typecheck ✔, lint 0 errors, test:unit **129/129**, build + prerender ✔, bundle **73.0
+  kB**/400. **Verified in the real app** (vite preview + Playwright, 390x844): light + dark dashboards
+  render the picked palettes exactly as mocked.
+- **NOT done:** the rest of Work item 3 (tappable stops that slide the practice card, and any further
+  in-tile illustration work; the founder chose re-space + recolor over the plan's illustrated-buildings
+  recipe, so re-scope item 3 before building more); the standing content follow-ups (frequency subset
+  for ~91 new words, founder review of `sector-audit-report.md`, human `verified` pass, jury Waves
+  1-2, Playwright grammar smoke). With s103's items 2/4+5/6 shipped in parallel, the Üben plan is now
+  fully shipped except item 3's tappable stops.
+
+_(Sessions 85-102's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_

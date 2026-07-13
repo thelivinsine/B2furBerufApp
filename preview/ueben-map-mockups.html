@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Lernpfad-Karte: Farb-Mockups</title>
+<style>
+  :root {
+    --bg: #f0efe9; --ink: #232820; --muted: #68705f; --card: #fbfbf7; --border: #e0dfd3;
+    --accent: #5b5be6;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #12161d; --ink: #e8ebe2; --muted: #99a292; --card: #181d26; --border: #29303c; }
+  }
+  :root[data-theme="dark"] { --bg: #12161d; --ink: #e8ebe2; --muted: #99a292; --card: #181d26; --border: #29303c; }
+  :root[data-theme="light"] { --bg: #f0efe9; --ink: #232820; --muted: #68705f; --card: #fbfbf7; --border: #e0dfd3; }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--ink); padding: 36px 20px 72px;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  .eyebrow { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--accent); }
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.01em; margin-top: 6px; text-wrap: balance; }
+  .sub { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.6; max-width: 66ch; }
+  section { margin-top: 48px; }
+  h2 { font-size: 18px; font-weight: 800; }
+  .desc { margin-top: 6px; color: var(--muted); font-size: 13.5px; line-height: 1.6; max-width: 70ch; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
+  @media (max-width: 880px) { .pair { grid-template-columns: 1fr; } }
+  .card { border-radius: 16px; padding: 16px; border: 1px solid; }
+  .card.light { background: #fbfbf7; border-color: #e0dfd3; }
+  .card.dark { background: #0d1117; border-color: #242d3a; }
+  .card .tag { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 4px; }
+  .card.light .tag { color: #8b917f; }
+  .card.dark .tag { color: #7d89a0; }
+  .card .cap { font-size: 12.5px; line-height: 1.5; margin-bottom: 10px; }
+  .card.light .cap { color: #68705f; }
+  .card.dark .cap { color: #97a1b4; }
+  /* the app's surface mat (unchanged) */
+  .mat { border-radius: 14px; padding: 8px; }
+  .card.light .mat { background: #ffffff; border: 1px solid #e5e5da; box-shadow: 0 1px 3px rgba(35,40,32,0.07); }
+  .card.dark .mat { background: #161d29; border: 1px solid #2a3342; }
+  .stage { position: relative; overflow: hidden; border-radius: 10px; }
+  .stage svg { display: block; width: 100%; height: auto; }
+  .chip {
+    position: absolute; transform: translate(-50%, -100%); white-space: nowrap;
+    border-radius: 999px; padding: 4px 11px; font-size: 11px; font-weight: 700;
+  }
+  .card.light .chip { background: #fff; border: 1px solid #e2e1d5; color: #232820; box-shadow: 0 2px 5px rgba(35,40,32,0.14); }
+  .card.dark .chip { background: #232a3c; border: 1px solid #3a4358; color: #eef0f8; box-shadow: 0 2px 5px rgba(0,0,0,0.45); }
+  .stop { cursor: pointer; transition: transform 0.16s ease-out; transform-box: fill-box; transform-origin: center; }
+  .stop:hover { transform: scale(1.07); }
+  .stop:focus-visible { outline: none; }
+  .uben-pulse { animation: uben-pulse 2.2s ease-in-out infinite; }
+  @keyframes uben-pulse { 0%,100% { opacity: 0.45; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .uben-pulse { animation: none; } .stop { transition: none; } }
+  .note {
+    margin-top: 52px; background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 10px; padding: 16px 20px; font-size: 13.5px; color: var(--muted); line-height: 1.65; max-width: 76ch;
+  }
+  .note b { color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Üben UI-Refinements · Punkt 3</div>
+  <h1>Brand-Ton: Dunkel-Varianten</h1>
+  <p class="sub">
+    Stimmung 3 (Brand-Ton) ist gesetzt. Oben die Referenz: das fixe Hell plus der bisherige
+    Dunkel-Entwurf, der zu dunkel und kontrastarm war. Darunter <b>vier hellere Dunkel-Varianten</b>
+    mit unterschiedlichen Kontrast-Strategien. Alle nutzen dasselbe neue Raster mit Luft um die
+    Kacheln; mit der Maus über eine Kachel fahren zeigt die tippbaren Stationen.
+  </p>
+  <div id="root"></div>
+  <div class="note">
+    <b>Umsetzungsnotizen:</b> Es ändert sich jeweils nur MAP_DARK in UebenPath.tsx (acht Flächen-Töne,
+    Label- und Routenfarbe); Geometrie, Kacheln und Pin sind bei allen Varianten identisch. Die
+    Stationsfarben bleiben unverändert, damit die vier Stops in Hell und Dunkel dieselbe Identität
+    haben. Sag einfach, welche Variante es wird (oder was du mischen willst), dann setze ich sie
+    zusammen mit dem Hell aus Stimmung 3 um.
+  </div>
+</div>
+
+<script>
+"use strict";
+// ── Geometry: the live map, re-spaced (unchanged from the last round) ────
+const STOPS = [
+  { key: "bahnhof", label: "Bahnhof", stop: [44, 88],   tile: [44, 48],   color: "#5b5be6", labelPos: "below" },
+  { key: "laden",   label: "Laden",   stop: [120, 88],  tile: [120, 48],  color: "#f0705f", labelPos: "below" },
+  { key: "zuhause", label: "Zuhause", stop: [276, 128], tile: [310, 128], color: "#f2a03d", labelPos: "below" },
+  { key: "amt",     label: "Amt",     stop: [216, 170], tile: [216, 205], color: "#2fa8a0", labelPos: "right" },
+];
+const SEG_PATHS = ["M44 88 H120", "M120 88 H276 V128", "M276 128 V170 H216"];
+const H_STREETS = [88, 170], V_STREETS = [76, 176, 276];
+const CURRENT = 2; // zuhause
+
+// ── Fixed light palette (Stimmung 3) + the rejected dark, as reference ──
+const S3_LIGHT = { ground: "#eef0f7", park: "#d6e6cf", parkDeep: "#bfd9b4", lotA: "#e5e4f1", lotB: "#dbd9ea",
+  casing: "#dee0ee", street: "#ffffff", dash: "#d3d5e7", label: "#5a5e78", dotFill: "#ffffff",
+  pinRing: "#ffffff", primary: "#5b5be6" };
+const S3_DARK_OLD = { ground: "#1d2030", park: "#243429", parkDeep: "#2e4636", lotA: "#2a2e46", lotB: "#24273b",
+  casing: "#14161f", street: "#3c4158", dash: "#585f7e", label: "#a6abc4", dotFill: "#e9ebf6",
+  pinRing: "#e9ebf6", primary: "#8a8af6" };
+
+// ── Four brighter dark treatments ────────────────────────────────────────
+const DARKS = [
+  {
+    id: "a", title: "Dunkel A: Angehoben",
+    cap: "Dieselbe Palette, zwei Stufen heller: Boden, Blöcke und Straßen rücken auseinander, Striche und Labels leuchten mehr. Der konservative Fix.",
+    P: { ground: "#272c42", park: "#31493a", parkDeep: "#40604b", lotA: "#3a3f61", lotB: "#323753",
+         casing: "#1d2133", street: "#4e5578", dash: "#7d85ab", label: "#ccd1e8", dotFill: "#f1f3fb",
+         pinRing: "#f1f3fb", primary: "#9b9bfa" },
+  },
+  {
+    id: "b", title: "Dunkel B: Helle Straßen",
+    cap: "Der Boden bleibt ruhig, aber die Straßen werden helle Bänder: die Stadtstruktur springt sofort ins Auge, die Route liegt auf hellem Grund wie im Hell-Modus.",
+    P: { ground: "#232739", park: "#2d4536", parkDeep: "#3c5c47", lotA: "#343a58", lotB: "#2c314a",
+         casing: "#1a1d2c", street: "#666e93", dash: "#9aa2c6", label: "#ced3ea", dotFill: "#f2f4fc",
+         pinRing: "#f2f4fc", primary: "#a2a2fc" },
+  },
+  {
+    id: "c", title: "Dunkel C: Lavendel-Blöcke",
+    cap: "Der Kontrast sitzt auf den Blöcken: deutlich aufgehellte Lavendel-Flächen auf gedecktem Boden, Straßen mittig. Am nächsten am Hell-Modus, wo die Blöcke auch die hellsten Flächen sind.",
+    P: { ground: "#242840", park: "#33503e", parkDeep: "#446852", lotA: "#454b74", lotB: "#3a3f63",
+         casing: "#1b1e30", street: "#4a5172", dash: "#8189af", label: "#d0d4ec", dotFill: "#f1f3fb",
+         pinRing: "#f1f3fb", primary: "#9e9efb" },
+  },
+  {
+    id: "d", title: "Dunkel D: Klarer Abend",
+    cap: "Die hellste Variante: blaugrauer Boden statt Nachtblau, kräftige Parks, fast weiße Labels. Maximale Lesbarkeit, wirkt eher wie Abenddämmerung als tiefe Nacht.",
+    P: { ground: "#2e3450", park: "#3a5545", parkDeep: "#4b7058", lotA: "#42486e", lotB: "#393f60",
+         casing: "#232841", street: "#5a6187", dash: "#8f97bd", label: "#dde1f2", dotFill: "#f4f5fc",
+         pinRing: "#f4f5fc", primary: "#a6a6fd" },
+  },
+];
+
+// ── The live tile glyphs (unchanged from UebenPath.tsx) ──────────────────
+const GLYPHS = {
+  bahnhof: (c) => `
+    <rect x="-7" y="-9" width="14" height="14" rx="3.5" fill="#fff"/>
+    <rect x="-4.5" y="-6" width="9" height="4.5" rx="1.5" fill="${c}"/>
+    <circle cx="-3.2" cy="1.8" r="1.6" fill="${c}"/><circle cx="3.2" cy="1.8" r="1.6" fill="${c}"/>
+    <path d="M-5 9 L-2 5.5 M5 9 L2 5.5" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>`,
+  laden: () => `
+    <path d="M-7 -3 h14 l-1.6 11 a2.5 2.5 0 0 1 -2.5 2 h-5.8 a2.5 2.5 0 0 1 -2.5 -2 z" fill="#fff"/>
+    <path d="M-3.5 -3 v-2 a3.5 3.5 0 0 1 7 0 v2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>`,
+  zuhause: (c) => `
+    <path d="M-8 0 L0 -8 L8 0 V8 a1.5 1.5 0 0 1 -1.5 1.5 h-13 A1.5 1.5 0 0 1 -8 8 z" fill="#fff"/>
+    <rect x="-2.2" y="2.5" width="4.4" height="7" rx="1.4" fill="${c}"/>`,
+  amt: () => `
+    <path d="M-9 -3 L0 -9 L9 -3 z" fill="#fff"/>
+    <rect x="-8" y="-1.5" width="3" height="8.5" rx="1" fill="#fff"/>
+    <rect x="-1.5" y="-1.5" width="3" height="8.5" rx="1" fill="#fff"/>
+    <rect x="5" y="-1.5" width="3" height="8.5" rx="1" fill="#fff"/>
+    <rect x="-9" y="8" width="18" height="2.5" rx="1.2" fill="#fff"/>`,
+};
+
+function scenery(P) {
+  return `
+    <rect x="92" y="12" width="64" height="18" rx="9" fill="${P.park}"/>
+    <circle cx="106" cy="21" r="5.5" fill="${P.parkDeep}"/>
+    <circle cx="134" cy="21" r="6.5" fill="${P.parkDeep}"/>
+    <rect x="192" y="104" width="68" height="48" rx="12" fill="${P.park}"/>
+    <circle cx="212" cy="120" r="9" fill="${P.parkDeep}"/>
+    <circle cx="242" cy="136" r="10" fill="${P.parkDeep}"/>
+    <rect x="92" y="188" width="68" height="24" rx="11" fill="${P.park}"/>
+    <rect x="10" y="12" width="26" height="14" rx="6" fill="${P.lotA}"/>
+    <rect x="192" y="14" width="40" height="28" rx="7" fill="${P.lotA}"/>
+    <rect x="240" y="20" width="20" height="44" rx="7" fill="${P.lotB}"/>
+    <rect x="294" y="14" width="50" height="24" rx="7" fill="${P.lotA}"/>
+    <rect x="300" y="48" width="28" height="16" rx="6" fill="${P.lotB}"/>
+    <rect x="12" y="104" width="40" height="48" rx="7" fill="${P.lotB}"/>
+    <rect x="92" y="104" width="44" height="48" rx="7" fill="${P.lotA}"/>
+    <rect x="144" y="104" width="16" height="30" rx="6" fill="${P.lotB}"/>
+    <rect x="10" y="186" width="44" height="24" rx="7" fill="${P.lotA}"/>
+    <rect x="294" y="186" width="50" height="26" rx="7" fill="${P.lotB}"/>`;
+}
+
+function drawMap(P, uid) {
+  const hs = H_STREETS.map((y) => `M-10 ${y} H370`);
+  const vs = V_STREETS.map((x) => `M${x} -10 V240`);
+  let s = `<svg viewBox="0 0 360 240" role="img" aria-label="Neuland-Karte mit deinem Lernweg">`;
+  s += `<defs><filter id="${uid}-lm" x="-40%" y="-40%" width="180%" height="180%">
+    <feDropShadow dx="0" dy="2.5" stdDeviation="2.5" flood-color="#2a2e3f" flood-opacity="0.22"/>
+  </filter></defs>`;
+  s += `<rect width="360" height="240" fill="${P.ground}"/>`;
+  s += `<g transform="translate(0 5)">`;
+  s += scenery(P);
+  s += `<g fill="none" stroke="${P.casing}" stroke-width="20" stroke-linecap="round">${[...hs, ...vs].map((d) => `<path d="${d}"/>`).join("")}</g>`;
+  s += `<g fill="none" stroke="${P.street}" stroke-width="13" stroke-linecap="round">${[...hs, ...vs].map((d) => `<path d="${d}"/>`).join("")}</g>`;
+  s += `<g fill="none" stroke="${P.dash}" stroke-width="1.6" stroke-dasharray="7 9">
+    ${H_STREETS.map((y) => `<path d="M0 ${y} H360"/>`).join("")}
+    ${V_STREETS.map((x) => `<path d="M${x} 0 V230"/>`).join("")}</g>`;
+
+  SEG_PATHS.forEach((d, i) => {
+    if (i + 1 <= CURRENT) {
+      s += `<g><path d="${d}" fill="none" stroke="${P.primary}" stroke-width="12" stroke-opacity="0.14" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="${d}" fill="none" stroke="${P.primary}" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+    } else {
+      s += `<path d="${d}" fill="none" stroke="${P.primary}" stroke-opacity="0.45" stroke-width="5" stroke-linecap="round" stroke-dasharray="0.5 11"/>`;
+    }
+  });
+
+  STOPS.forEach((st, i) => {
+    if (i < CURRENT) s += `<circle cx="${st.stop[0]}" cy="${st.stop[1]}" r="5.5" fill="${P.dotFill}" stroke="${P.primary}" stroke-width="3"/>`;
+  });
+
+  for (const st of STOPS) {
+    const [tx, ty] = st.tile;
+    s += `<g class="stop" tabindex="0" role="button" aria-label="${st.label}: Übungsmodul wählen">
+      <rect x="${tx - 17}" y="${ty - 17}" width="34" height="34" rx="10" fill="${st.color}" filter="url(#${uid}-lm)"/>
+      <g transform="translate(${tx} ${ty})">${GLYPHS[st.key](st.color)}</g>`;
+    if (st.labelPos === "right") {
+      s += `<text x="${tx + 23}" y="${ty + 4}" font-size="10.5" font-weight="700" fill="${P.label}" font-family="inherit">${st.label}</text>`;
+    } else {
+      s += `<text x="${tx}" y="${ty + 29}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${P.label}" font-family="inherit">${st.label}</text>`;
+    }
+    s += `</g>`;
+  }
+
+  const [px, py] = STOPS[CURRENT].stop;
+  s += `<circle cx="${px}" cy="${py}" r="12" fill="none" stroke="${P.primary}" stroke-width="2" class="uben-pulse"/>
+    <ellipse cx="${px}" cy="${py + 3}" rx="7" ry="2.4" fill="#3b3f4a" opacity="0.18"/>
+    <path d="M${px} ${py + 2} c-8 -10.5 -12 -16 -12 -22.5 a12 12 0 1 1 24 0 c0 6.5 -4 12 -12 22.5 z" fill="${P.primary}" stroke="${P.pinRing}" stroke-width="2.5"/>
+    <circle cx="${px}" cy="${py - 20.5}" r="4.6" fill="${P.pinRing}"/>`;
+  s += `</g></svg>`;
+  return s;
+}
+
+// ── Page assembly ────────────────────────────────────────────────────────
+const root = document.getElementById("root");
+const chipLeft = (STOPS[CURRENT].stop[0] / 360) * 100;
+const chipTop = ((STOPS[CURRENT].stop[1] + 5 - 30) / 240) * 100;
+let uidN = 0;
+const mapCard = (theme, tag, cap, P) => {
+  const uid = "u" + uidN++;
+  return `<div class="card ${theme}">
+    <div class="tag">${tag}</div>
+    ${cap ? `<div class="cap">${cap}</div>` : `<div class="cap">&nbsp;</div>`}
+    <div class="mat"><div class="stage">${drawMap(P, uid)}
+      <span class="chip" style="left:${chipLeft}%;top:${chipTop}%">Du bist hier</span>
+    </div></div>
+  </div>`;
+};
+
+let html = `<section>
+  <h2>Referenz</h2>
+  <p class="desc">Links das gesetzte Hell (Stimmung 3). Rechts der bisherige Dunkel-Entwurf: zu dunkel, Blöcke und Boden kaum zu unterscheiden.</p>
+  <div class="pair">
+    ${mapCard("light", "Hell · gesetzt", "", S3_LIGHT)}
+    ${mapCard("dark", "Dunkel · bisher (zu dunkel)", "", S3_DARK_OLD)}
+  </div>
+</section>
+<section>
+  <h2>Dunkel-Varianten</h2>
+  <p class="desc">Vier Wege zu mehr Kontrast, von konservativ bis deutlich heller. Der Unterschied liegt darin, WO die Helligkeit sitzt: überall (A), auf den Straßen (B), auf den Blöcken (C) oder im ganzen Boden (D).</p>
+  <div class="pair">`;
+for (const d of DARKS) html += mapCard("dark", d.title, d.cap, d.P);
+html += `</div></section>`;
+root.innerHTML = html;
+</script>
+</body>
+</html>
