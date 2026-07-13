@@ -1549,3 +1549,20 @@ plan was executed same-day and merged to `main`.
   (needs Python `wordfreq`; absent bins are fine, linter only errors on stale ids); founder review of
   `sector-audit-report.md`; the human `verified` pass via `pnpm review:queue`; jury-pass extension to
   Waves 1-2; Wave-2 tranche 2 after the 2026-07-13 classmate feedback; Playwright grammar smoke.
+
+## Handoff after session 103 (2026-07-12). Üben-refinements Work items 2, 4+5, 6 SHIPPED (Sonnet 5).
+The founder said "go ahead with sonnet 5 items in the ui refinement plan" against
+`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`; work item 1 was already shipped (s101, Opus 4.8), item 3
+(map beautification) stays for Fable 5 / Opus 4.8.
+- **Item 2 (graph word count):** `WordGraph.tsx` canvas legend now shows only "m Verbindungen"; the
+  word count moved to the shared `count` prop, so it sits beside Üben in the rail (desktop) and the
+  sticky mobile action bar in `VocabularyTrainer.tsx`, exactly like every other Wörter view.
+- **Items 4+5 (FilterRail desktop redesign + count always beside Üben):** restyled both the desktop
+  rail and the mobile panel as a standard content card; header became a flex row (toggle + permanent
+  reset icon); the result count sits beside Üben in every state. (Superseded in part by s104's grey
+  tile and 2026-07-13's flex-column scroll rebuild.)
+- **Item 6 (grammar lesson Muster/explanation side by side), `GrammarTopicView.tsx`:** `CardContent`
+  gains a `lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]` at ≥1024px; mobile keeps the stacked
+  order.
+- **Gates:** typecheck ✔, lint 0 errors, test:unit 129/129, build ✔, bundle 73.0 kB. NOT done at the
+  time: Üben-plan item 3 (map), content follow-ups, sector-audit review.

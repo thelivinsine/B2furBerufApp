@@ -507,23 +507,45 @@ export function VocabularyTrainer() {
                 search grows inline in THIS row (founder s104: no third line),
                 pushing the icons to the right edge; mobile keeps the second
                 row below. */}
-            <div className="flex w-full items-center justify-between gap-2">
-              {filterButton}
-              <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
-              {searchOpen && (
-                <SearchField
-                  value={search}
-                  onChange={setSearch}
-                  placeholder="Suche nach Wort, Übersetzung …"
-                  autoFocus
-                  className="hidden min-w-0 lg:block lg:flex-1"
-                />
+            {/* Toolbar items are centered while search is closed; opening
+                search slides the icon groups apart to make room for the field
+                (founder 2026-07-13). */}
+            <motion.div
+              layout={!reduce}
+              className={cn(
+                "flex w-full items-center gap-2",
+                searchOpen ? "justify-between" : "justify-center",
               )}
-              <div className="flex items-center gap-2">
+            >
+              <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
+                {filterButton}
+                <ViewSwitcher views={WOERTER_VIEWS} value={view} onChange={setView} />
+              </motion.div>
+              <AnimatePresence initial={false}>
+                {searchOpen && (
+                  <motion.div
+                    key="search-inline"
+                    layout={!reduce}
+                    initial={{ opacity: 0, scaleX: 0.9 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    exit={{ opacity: 0, scaleX: 0.9 }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
+                    className="hidden min-w-0 flex-1 origin-left lg:block"
+                  >
+                    <SearchField
+                      value={search}
+                      onChange={setSearch}
+                      placeholder="Suche nach Wort, Übersetzung …"
+                      autoFocus
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
                 {savedButton}
                 {searchButton}
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Mobile-only second row: the same transient search input. Desktop
                 shows it inline in the toolbar row above instead. */}
@@ -621,7 +643,7 @@ export function VocabularyTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="slim-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden lg:overflow-y-auto"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden"
         />
       </div>
     </div>

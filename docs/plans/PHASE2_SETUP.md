@@ -228,6 +228,36 @@ the Supabase dashboard. Do these once after the GDPR PR is live:
      re-enable: fill the placeholders, then uncomment the import + `/impressum`
      route in `router.tsx` and restore the footer/Settings/privacy/terms links.
 
+## In-app feedback → your inbox: founder setup steps (session 105, 2026-07-13)
+
+The subtle "Mit KI gebaut · Feedback" button on every page posts to the
+`submit-feedback` Edge Function, which stores each message in a `feedback` table
+**and** emails you. The button + storage work as soon as the function is
+deployed; the email needs one API key. Do this once:
+
+1. **Create the feedback table.** Run `supabase/migrations/0006_feedback.sql` in
+   the Supabase SQL editor. It creates `public.feedback` (service-role only, like
+   `ai_usage`), so nothing is ever lost even if email is down.
+2. **Deploy the function.** `supabase functions deploy submit-feedback`. It is
+   registered with `verify_jwt = false` (in `supabase/config.toml`) so anonymous
+   visitors can send feedback; the function attaches the user id only when a
+   valid login token is present. The shared `ALLOWED_ORIGINS` secret applies.
+3. **Turn on the email (Resend, free tier, no domain setup needed).** Sign up at
+   <https://resend.com>, create an API key, then:
+   ```bash
+   supabase secrets set RESEND_API_KEY=re_...your-key...
+   ```
+   By default the mail is sent **from** Resend's shared `onboarding@resend.dev`
+   **to** `thelivinsine@gmail.com` — Resend delivers to the account owner's own
+   verified email with no domain verification, so this works out of the box. To
+   change the recipient or use your own domain later:
+   ```bash
+   supabase secrets set FEEDBACK_TO_EMAIL=you@example.com
+   supabase secrets set "FEEDBACK_FROM_EMAIL=Genauly Feedback <feedback@genauly.de>"
+   ```
+   Without `RESEND_API_KEY` the feedback is still stored in the table (read it in
+   the Supabase dashboard), it just isn't emailed.
+
 ## Admin source review (provenance QC): founder setup step
 
 The `/sources` page has a founder-only overlay for marking each content item as

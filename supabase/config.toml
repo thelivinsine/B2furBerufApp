@@ -33,3 +33,9 @@ enable_confirmations = false
 
 [functions.evaluate-writing]
 verify_jwt = true
+
+# Feedback is allowed from anyone (signed in or not), so the platform JWT gate
+# is off; the function itself attaches the user id only when a valid token is
+# present. Founder, 2026-07-13.
+[functions.submit-feedback]
+verify_jwt = false

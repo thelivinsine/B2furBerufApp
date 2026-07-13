@@ -62,40 +62,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 103 (2026-07-12). Üben-refinements Work items 2, 4+5, 6 SHIPPED (Sonnet 5).**
-The founder said "go ahead with sonnet 5 items in the ui refinement plan" against
-`docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md`; work item 1 was already shipped (s101, Opus 4.8), item 3
-(map beautification) stays for Fable 5 / Opus 4.8.
-- **Item 2 (graph word count):** `WordGraph.tsx` canvas legend now shows only "m Verbindungen"; the
-  word count moved to the shared `count` prop, so it sits beside Üben in the rail (desktop) and the
-  sticky mobile action bar in `VocabularyTrainer.tsx`, exactly like every other Wörter view. Dropped
-  the `view !== "graph"` guards that used to hide it there.
-- **Items 4+5 (FilterRail desktop redesign + count always beside Üben), `FilterRail.tsx`:** restyled
-  both the desktop rail and the mobile panel as a standard content card (`bg-surface` + visible
-  `border-border` + `shadow-soft`, replacing the flat `bg-border` slab the founder called ugly);
-  dividers moved from `border-muted-foreground/10` to `border-border`; unselected facet pills went
-  from hard `bg-white` to `bg-muted` (with a `hover:bg-muted/70` + `hover:border-primary/40`); scope
-  section labels (Branche/Thema/Unterthema/Kategorie/Gruppe) now use the same uppercase eyebrow style
-  as the facet labels. The header changed from a single full-width button into a flex row: the
-  expand/collapse toggle (flex-1) plus a permanent reset icon beside it (previously the reset only
-  showed in an expanded-only first row, which is now deleted). The result count sits beside the Üben
-  button in **every** state (open, collapsed, mobile), not just collapsed.
-- **Item 6 (grammar lesson Muster/explanation side by side), `GrammarTopicView.tsx`:** the lesson
-  Card's `CardContent` gains `lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-stretch
-  lg:gap-5 lg:space-y-0` at ≥1024px, splitting the emerald Muster panel (left, `lg:h-full`) from the
-  explanation + "Mehr anzeigen" expander (right, wrapped in one `space-y-3 lg:min-w-0` div). Mobile
-  keeps the s93-locked stacked order (Muster first) untouched.
-- **Gates + verification:** `pnpm typecheck` ✔, `lint` **0 errors** (42 pre-existing warnings),
-  `test:unit` **129/129**, `build` + prerender ✔, `check:bundle` **73.0 kB**/400 (unchanged, all
-  touched files ride lazy chunks). Browser-verified with Playwright against the local dev server in
-  both themes: Wörter graph (word count beside Üben, only "n Verbindungen" under the canvas), Wörter
-  Tabelle FilterRail open/collapsed (card look, header reset icon, count beside Üben in both states,
-  dark mode), and the Konnektoren grammar lesson at 1280px (Muster left / explanation right) and
-  390px (stacked, unchanged).
-- **NOT done:** Üben-plan Work item 3 (map beautification + tappable stops, reserved for Fable 5 /
-  Opus 4.8); the standing content follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2,
-  Playwright grammar smoke); founder review of `sector-audit-report.md`.
-
 **Handoff after session 104 (2026-07-12, parallel to s103 and rebased onto it). Üben map re-spaced +
 recolored via mockup rounds (Fable 5, Üben-refinements Work item 3 partial).** The founder asked for
 map mock-ups, iterated three rounds, and picked a direction that was then shipped to `main`.
@@ -177,6 +143,53 @@ Batch 2 (one long mid-turn message): a grab-bag of visual/UX fixes. All shipped 
   guideline (a dev-only warning), accepted because the founder explicitly wanted the group names as
   pills.
 
-_(Sessions 85-102's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+**Handoff after session 105 (2026-07-13). Demo-prep sweep: nav rename + hide Anwenden, AI-disclaimer
+feedback button (emails founder), Fortschritt redesign, flippable Bibliothek tiles, filter polish
+(Opus 4.8).** A single long turn against many interleaved founder prompts (branch
+`claude/demo-prep-feedback-rename-sl1jqq`, merged to `main`).
+- **Nav (`nav-items.ts`, `BottomTabBar.tsx`, `LibrarySwitcher.tsx`, `route-icons.tsx`):** "Heute" →
+  **"Praktisch"**, "Bibliothek" → **"Theorie"** (routes `/` and `/library` unchanged). **Anwenden is
+  HIDDEN from the nav** (removed from `navItems`, `CONTENT`, `DEFAULT_PINNED_TABS`) but its route stays
+  mounted so `/welt` + deep links still resolve; re-add the `navItems` entry to restore it. The
+  Praktisch mark changed from a house to a **dumbbell** (`route-icons.tsx` "/" renderer + NORM box; the
+  lucide fallback is now `Dumbbell`).
+- **Feedback + AI disclaimer (`FeedbackButton.tsx` in AppShell, `lib/feedback.ts`,
+  `supabase/functions/submit-feedback/`, migration `0006_feedback.sql`, `config.toml`):** a subtle
+  fixed "Mit KI gebaut · Feedback" pill on every non-focus page (bottom-right desktop, above the nav +
+  Üben bar on mobile). Opens a dialog (message + optional email); posts to the new `submit-feedback`
+  Edge Function (`verify_jwt=false`, anonymous-OK), which **stores a `feedback` row AND emails the
+  founder via Resend**. **Founder deploy step needed for emails** (see `docs/plans/PHASE2_SETUP.md`
+  new section): run the migration, `supabase functions deploy submit-feedback`, set `RESEND_API_KEY`.
+  Without it the UI still works and rows still store once deployed; email is best-effort.
+- **Fortschritt redesign (`Analytics.tsx`):** the chaotic ~11-card stack became a calm grouped
+  hierarchy: an **Überblick** card (goal ring + Level + XP bar) then a 2×2 lifetime stat grid; a
+  **Dranbleiben** subsection with the weakness diagnose + next quest as a side-by-side pair (was two
+  stacked full-width alert cards); **Was du schon kannst** (Can-Do); Meine Sammlung; and a **Details**
+  collapsible that now also holds the writing-weakness + exam-history cards. New `Subheading` helper.
+- **Bibliothek/Theorie tiles + filter (founder ran ~10 follow-ups):** (1) **Flippable Karten tiles**
+  (`FlipCard.tsx`): Wörter/Kollokationen/Redemittel grid cards flip on click to show the **English on
+  the back**; German front. Grammatik cards stay lesson-launchers (not flipped). (2) **Verbunden moved
+  to the bottom-right** of Wörter cards. (3) **Redundant tags dropped** from tiles (Häufigkeit + Branche
+  on Wörter, Register on Kollokationen, CEFR + Register on Redemittel, CEFR on Grammatik) since they
+  duplicate filter facets; the live Lernstand badge stays. (4) **FilterRail rebuilt as a flex column**
+  (`FilterRail.tsx`): fixed header + fixed Üben footer + ONE inner scroll region, so the tile is
+  strictly viewport-capped and the auto-hiding `.scrollbar-hover` (new, in `index.css`) starts **below**
+  the header separator; **pins hidden on the mobile panel**. (5) **"Mehr/Weniger anzeigen"** on facets
+  with > 8 options (Redemittel Kategorie, Grammatik Gruppe). (6) **Grammatik Gruppe converted from a
+  scope dropdown to a multi-select PILL facet** (`GROUP_FACET`) matching Redemittel Kategorie — both are
+  multi-select. (7) **Toolbar row centered when search is closed; opens with a framer slide** (icon
+  groups slide apart for the inline search field) across all four browse tabs. (8) The desktop-header
+  XP line under the greeting was removed.
+- **Gates + verification:** typecheck ✔, lint **0 errors** (42 pre-existing warnings), content-lint ✔,
+  `test:unit` **130/130**, build + prerender ✔, `check:bundle` **75.8 kB**/400. Playwright-verified on
+  the preview build (0 runtime errors on Praktisch/Theorie Wörter+Grammatik/Fortschritt, desktop +
+  mobile): nav rename, dumbbell icon, feedback pill placement (clears the mobile Üben bar), flip-card
+  fronts, dropped tags, grammar group pills + "Mehr anzeigen (8)", centered toolbar, Fortschritt groups.
+- **NOT done / deferred:** the founder's "reorderable list" phrasing for the filter groups was read as
+  the pill-list + Mehr/Weniger presentation; **drag-to-reorder of filter categories was NOT built**
+  (no functional purpose for OR-filters, deferred). Standing content follow-ups + Üben map tappable
+  stops + sector-audit review remain from prior sessions.
+
+_(Sessions 85-103's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_

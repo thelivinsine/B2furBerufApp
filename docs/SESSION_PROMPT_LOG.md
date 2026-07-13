@@ -4186,3 +4186,43 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/grammar/GrammarDrillCard.tsx` · `tests/sectors.test.ts` · `CLAUDE.md` ·
   `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 366 — 2026-07-13 (session 105, demo-prep sweep)
+
+- **Branch:** `claude/demo-prep-feedback-rename-sl1jqq` (Opus 4.8)
+- **Prompts (verbatim):**
+  > Hide the Anwendung section at the moment - it's not needed for the demo tomorrow. Add a disclaimer that it's built with AI and ask for feedback with a subtle button (google style) in every page at the bottom of the screen and make sure the founder gets an email when someone submits a feedback. Rename the Start page as Praktisch (whatever the german word for practical is), and Bibliothek as Theorie (theory). Redesign fortschritt section - it's chaotic at the moment.
+  > The filter tile overflowing beyonf the screen size. Strictly constrain it within the screen size and keep the interanl screen enabled. The scroll bar should start below the line separating first row with "Filter" and items below and the scroll bar should disappear when not hovered over in desktop view and shouldnot be there in mobile screen. Keep the second row icons below the page toggle buttons centered and when the scroll bar is clicked they are moved around to expand until the length of the above toggle buttons to enable search.
+  > the pin buttons in filter tile are doing nothing in mobile - either give them a purpose or leave them out on mobile
+  > assign an appropriate icon for "Praktisch" page instead of the home icon.
+  > get rid of the line below good morning <user> line with xp points info on the top row. It's not needed there.
+  > For all the tiles in grid view, make them flippable and add the english translation (wherever available at the moment) to the backside. Also where there are 'verbindung' option available on the tile, move them to bottom right corner within the tile.
+  > make the redemittel groups as a list of items that can be reordered and add a mehr anzeigena nd weniger anzeigen within the filter. Apply the same styling to grammar categories.
+  > wherever there are tags on the tiles which are redundant from what's already in filter tile, get rid of them on tiles.
+  > when search bar is not there all the second row items should be in the center, and only when the search bar is clicked, then they must slide away with a neat animation to make space for the search bar.
+  > add multiple selection possibility for redemittel and grammatik categories/groups
+- **Response summary:** Demo-prep sweep in one long turn. Core: (1) renamed nav "Heute"→**Praktisch**,
+  "Bibliothek"→**Theorie**; (2) **hid Anwenden** from the nav (route stays mounted); (3) added a subtle
+  **"Mit KI gebaut · Feedback"** pill on every non-focus page → dialog → new `submit-feedback` Edge
+  Function that stores a `feedback` row AND **emails the founder via Resend** (deploy + `RESEND_API_KEY`
+  needed, documented in PHASE2_SETUP); (4) **redesigned Fortschritt** into calm groups (Überblick /
+  Dranbleiben pair / Was du schon kannst / Details collapsible). Then ~9 follow-ups: **flippable Karten
+  tiles** (`FlipCard.tsx`, EN on the back) for Wörter/Kollokationen/Redemittel, **Verbunden → bottom-
+  right**, **redundant facet tags removed** from tiles, **FilterRail rebuilt as a flex column** with a
+  header-anchored auto-hiding scrollbar (`.scrollbar-hover`) strictly capped to the viewport, **pins
+  hidden on mobile**, **Mehr/Weniger anzeigen** on long facets, **Grammatik Gruppe → multi-select pill
+  facet** (matches Redemittel Kategorie; both multi-select), **centered toolbar with a search-slide
+  animation** across all four tabs, **Praktisch dumbbell icon**, and **removed the header XP line**.
+  Deferred: drag-reorder of filter categories (no functional purpose for OR-filters). Gates: typecheck
+  ✔, lint 0 errors, content-lint ✔, test:unit **130/130**, build ✔, bundle **75.8 kB**/400.
+  Playwright-verified (desktop + mobile, 0 runtime errors). Merged to `main` per auto-ship.
+- **Artifacts:** `src/components/layout/nav-items.ts` · `BottomTabBar.tsx` · `AppShell.tsx` ·
+  `route-icons.tsx` · `FeedbackButton.tsx` (new) · `src/lib/feedback.ts` (new) ·
+  `src/features/shared/FlipCard.tsx` (new) · `FilterRail.tsx` · `src/index.css` ·
+  `src/features/analytics/Analytics.tsx` · `src/features/library/LibrarySwitcher.tsx` ·
+  `src/features/vocabulary/VocabList.tsx` · `VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `src/features/grammar/GrammarHub.tsx` · `GrammarViews.tsx` ·
+  `supabase/functions/submit-feedback/index.ts` (new) · `supabase/migrations/0006_feedback.sql` (new) ·
+  `supabase/config.toml` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.

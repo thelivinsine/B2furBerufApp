@@ -7,9 +7,8 @@ import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useProgressStore } from "@/store/useProgressStore";
 import { mastery, masteryLabel } from "@/engine/srs";
-import { frequencyBin } from "@/data/frequency";
 import { usePagedList } from "@/lib/usePagedList";
-import { SectorChips } from "@/features/shared/SectorChips";
+import { FlipCard, FlipHint } from "@/features/shared/FlipCard";
 import { cn } from "@/lib/utils";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
 
@@ -18,14 +17,6 @@ const labelMap = {
   learning: { text: "lernen", variant: "warning" as const },
   review: { text: "wiederholen", variant: "default" as const },
   mastered: { text: "gemeistert", variant: "success" as const },
-};
-
-// Häufigkeit badge (audit PR 3): quiet metadata from the generated frequency
-// map. Unbinned items (rare compounds, out-of-corpus) show nothing on purpose.
-const freqLabel: Record<string, string> = {
-  core: "Kernwortschatz",
-  common: "häufig",
-  specialized: "Fachsprache",
 };
 
 /**
@@ -49,23 +40,25 @@ const VocabCard = memo(function VocabCard({
   const badge = labelMap[label];
   const hasRelated = relatedRows(v).length > 0;
 
-  return (
+  // Front face: the German word + example. English lives on the flip side now
+  // (founder 2026-07-13), and "Verbunden" moved to the bottom-right corner.
+  // Häufigkeit and Branche tags were dropped from the tile (founder 2026-07-13):
+  // both are filter-tile facets/scopes, so repeating them on the card is
+  // redundant. The Lernstand badge stays — it is live per-card SRS state.
+  const front = (
     <Card className="card-hover h-full">
-      <CardContent className="p-4">
+      <CardContent className="flex h-full flex-col p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
               <p className="truncate text-base font-semibold sm:text-lg">{v.de}</p>
-              <SpeakButton text={v.de} />
+              <span onClick={(e) => e.stopPropagation()}>
+                <SpeakButton text={v.de} />
+              </span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {v.en}
-              {v.plural && ` · Pl.: ${v.plural}`}
-              {(() => {
-                const bin = v.frequency ?? frequencyBin(v.id);
-                return bin ? ` · ${freqLabel[bin]}` : null;
-              })()}
-            </p>
+            {v.plural && (
+              <p className="text-xs text-muted-foreground">Pl.: {v.plural}</p>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <Badge variant={badge.variant}>{badge.text}</Badge>
@@ -86,31 +79,59 @@ const VocabCard = memo(function VocabCard({
             </Button>
           </div>
         </div>
-        {/* Branche chips (s102): sector applicability is inspectable on the
-            card; untagged = general, shows nothing. */}
-        {v.sectors?.length ? (
-          <div className="mt-2">
-            <SectorChips sectors={v.sectors} />
-          </div>
-        ) : null}
         <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
           „{v.examples[0].de}"
         </p>
 
-        {hasRelated && (
-          <button
-            onClick={() => onToggleOpen(v.id)}
-            className="mt-2 flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
-            aria-expanded={open}
-          >
-            <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
-            {open ? "Weniger" : "Verbunden"}
-          </button>
+        {/* Bottom-right corner: the "Verbunden" toggle (founder 2026-07-13) plus
+            a quiet flip hint. Both stop propagation so they don't flip the tile. */}
+        <div className="mt-auto flex items-center justify-end gap-2 pt-2">
+          {hasRelated && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleOpen(v.id);
+              }}
+              className="flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+              aria-expanded={open}
+            >
+              <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
+              {open ? "Weniger" : "Verbunden"}
+            </button>
+          )}
+          <FlipHint />
+        </div>
+        {open && (
+          <div onClick={(e) => e.stopPropagation()}>
+            <RelatedPanel item={v} />
+          </div>
         )}
-        {open && <RelatedPanel item={v} />}
       </CardContent>
     </Card>
   );
+
+  // Back face: the English translation + its example gloss.
+  const back = (
+    <Card className="h-full border-primary/30 bg-primary/[0.03]">
+      <CardContent className="flex h-full flex-col p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
+          Englisch
+        </p>
+        <p className="mt-1 text-base font-semibold sm:text-lg">{v.en}</p>
+        {v.plural && <p className="mt-1 text-xs text-muted-foreground">Plural: {v.plural}</p>}
+        {v.examples[0].en && (
+          <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
+            „{v.examples[0].en}"
+          </p>
+        )}
+        <div className="mt-auto flex items-center justify-end pt-2">
+          <FlipHint />
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  return <FlipCard front={front} back={back} label={`Übersetzung von ${v.de}`} />;
 });
 
 export function VocabList({ items }: { items: VocabItem[] }) {

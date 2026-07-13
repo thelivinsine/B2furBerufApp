@@ -1,7 +1,6 @@
 import {
-  LayoutDashboard,
+  Dumbbell,
   Library,
-  Target,
   LineChart,
   Settings,
 } from "lucide-react";
@@ -31,15 +30,22 @@ export interface NavItem {
 // tools (Sprechen/Schreiben/Prüfung) inside Anwenden, so they are no longer
 // top-level nav destinations. Their routes still resolve (redirected into the
 // hub or reachable via deep links); they are just off the nav rail.
+// The Anwenden (transfer) zone is temporarily HIDDEN from the nav (founder,
+// 2026-07-13: not needed for the demo). Its route stays mounted in router.tsx
+// so deep links (and the /welt game entry) keep working; it is just off the
+// nav rail. Re-add the entry below to restore it.
+//
+// Labels: "Heute" was renamed to "Praktisch" and "Bibliothek" to "Theorie"
+// (founder, 2026-07-13) so the two learning zones read as a Praktisch/Theorie
+// pairing. The routes are unchanged (/ and /library).
 export const navItems: NavItem[] = [
-  { to: "/",          label: "Heute",        icon: LayoutDashboard, end: true, color: "#5b5be6", bg: "rgba(91,91,230,.08)",  desc: "Deine Session und dein Tag" },
-  { to: "/library",   label: "Bibliothek",   icon: Library,                    color: "#2563eb", bg: "rgba(37,99,235,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
-  { to: "/anwenden",  label: "Anwenden",     icon: Target,                     color: "#f97316", bg: "rgba(249,115,22,.08)", desc: "Sprechen, Schreiben, Prüfung" },
+  { to: "/",          label: "Praktisch",    icon: Dumbbell,        end: true, color: "#5b5be6", bg: "rgba(91,91,230,.08)",  desc: "Deine Session und dein Tag" },
+  { to: "/library",   label: "Theorie",      icon: Library,                    color: "#2563eb", bg: "rgba(37,99,235,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
   { to: "/analytics", label: "Fortschritt",  icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Meilensteine und Statistiken" },
   { to: "/settings",  label: "Einstellungen",icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },
 ];
 
-export const DEFAULT_PINNED_TABS = ["/", "/library", "/anwenden", "/analytics"];
+export const DEFAULT_PINNED_TABS = ["/", "/library", "/analytics"];
 
 // Removed top-level routes → their successor zone. Used by the settings-store
 // migration so an existing learner's custom pins / More-sheet order remap onto
