@@ -138,7 +138,7 @@ function ScopeMultiSelect({ p }: { p: RailPrimary }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={p.label}
-        className="flex w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-left text-sm transition-colors hover:border-primary/40"
+        className="flex w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-left text-sm transition-colors hover:border-primary/40 lg:px-2.5 lg:py-1.5 lg:text-xs"
       >
         <span className="min-w-0 flex-1 truncate">{triggerLabel}</span>
         {/* Nothing selected: show the number of options (Branchen/Themen), in
@@ -491,7 +491,10 @@ export function FilterRail<T>({
               disabled={disabled}
               aria-pressed={selected}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm transition-colors",
+                // Slightly smaller on desktop (founder 2026-07-13: the white
+                // pills read a touch big in the rail). Only lg is the desktop
+                // rail; the mobile panel keeps the roomier tap size.
+                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm transition-colors lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs",
                 selected
                   ? "border-primary bg-primary text-primary-foreground"
                   : disabled
@@ -503,7 +506,7 @@ export function FilterRail<T>({
               {!disabled && (
                 <span
                   className={cn(
-                    "text-xs tabular-nums",
+                    "text-xs tabular-nums lg:text-[11px]",
                     selected ? "text-primary-foreground/80" : "text-muted-foreground",
                   )}
                 >

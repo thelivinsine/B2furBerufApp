@@ -9,7 +9,7 @@ import { useLibraryScope } from "@/store/useLibraryScope";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
-import { FlipCard, FlipHint } from "@/features/shared/FlipCard";
+import { FlipCard } from "@/features/shared/FlipCard";
 import {
   applyFacets,
   ActiveFilterChip,
@@ -70,9 +70,6 @@ const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation })
             </span>
           </div>
         </div>
-        <div className="mt-auto flex justify-end pt-2">
-          <FlipHint />
-        </div>
       </CardContent>
     </Card>
   );
@@ -88,9 +85,6 @@ const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation })
             „{c.example.en}"
           </p>
         )}
-        <div className="mt-auto flex justify-end pt-2">
-          <FlipHint />
-        </div>
       </CardContent>
     </Card>
   );

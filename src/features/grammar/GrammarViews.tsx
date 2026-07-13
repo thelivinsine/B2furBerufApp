@@ -46,7 +46,6 @@ const TopicCard = memo(function TopicCard({
 }) {
   const reduce = useReducedMotion();
   const meta = groupMeta[topic.group];
-  const showGroupTag = meta.labelDe !== topic.titleDe;
   // Show ONE clean pattern on the card face, not the full " · "-joined list
   // (which truncated mid-expression to unreadable fragments like "A · B…",
   // founder s104). The lesson's Muster panel shows every variant.
@@ -75,9 +74,9 @@ const TopicCard = memo(function TopicCard({
             </div>
 
             <p className="mt-3 font-semibold leading-snug">{topic.titleDe}</p>
-            {showGroupTag && (
-              <p className="mt-0.5 text-xs font-medium text-muted-foreground">{meta.labelDe}</p>
-            )}
+            {/* The group label subtitle was dropped (founder 2026-07-13): Gruppe
+                is a filter facet, so it is redundant on the tile. The emerald
+                group icon tile stays as quiet visual identity. */}
             <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">{topic.purposeDe}</p>
 
             <div className="mt-auto space-y-2.5 pt-3">
