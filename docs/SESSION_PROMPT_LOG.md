@@ -4430,6 +4430,8 @@ Branch: `claude/whats-next-esga9u`.
 - **Branch:** `claude/account-data-isolation-bug-s517d1` (Opus 4.8)
 - **Prompts (verbatim):**
   > there's a serious bug I found regarding user authentication on my phone. When switching between accounts, the progress of one account is being shown in another account. this should be treated with absolute criticality and dealt in a way this never happens and every account's data is synced properly no matter in which device they log in and no matter how many accounts are logged in the same device.
+  > when a user logs out the progress should be reset.
+  > document the session
 - **Response summary:** Diagnosed and fixed a cross-account data-leak on shared devices. Root cause:
   the progress + settings zustand stores persist to **device-global** localStorage keys, and
   `cloudSync.startCloudSync(uid)` **merged** the incoming account's cloud row into whatever local cache
@@ -4445,6 +4447,13 @@ Branch: `claude/whats-next-esga9u`.
   wipes + never uploads old data, first/guest sync merges, same-account re-sync preserves,
   `clearLocalAccountData` zeroes both stores + the marker. Gates: typecheck ✔, lint 0 errors (43
   pre-existing warnings), `test:unit` 134/134, `pnpm build` + prerender ✔, `check:bundle` 77.4 kB/400,
-  `lint:content` ✔.
+  `lint:content` ✔. **Shipped:** PR #493, squash-merged to `main` (SHA `64df253`), post-merge branch
+  realignment done. Follow-up prompt "when a user logs out the progress should be reset" needed **no new
+  code** — the same fix already routes `signOut` (and `deleteAccount`) through `clearLocalAccountData()`,
+  which resets the progress + settings stores to defaults after first flushing pending changes to the
+  signed-in user's cloud row; confirmed against the shipped `useAuthStore.signOut` and reassured the
+  founder (local wipe only, cloud data untouched, reloaded on next login). Final prompt: this doc pass.
 - **Artifacts:** `src/lib/cloudSync.ts` · `src/store/useAuthStore.ts` · `tests/cloudSync.test.ts` ·
-  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · commit + branch push pending.
+  commit `9d7147f` → PR #493 squash-merged (`64df253`) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` (s106 handoff moved here) ·
+  `docs/SESSION_PROMPT_LOG.md`.
