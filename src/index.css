@@ -187,6 +187,27 @@ input:-webkit-autofill {
     scrollbar-width: none;
   }
 
+  /* Neat thin scrollbar for capped internal-scroll panels (the filter rail):
+     a slim always-available track on the right, so it reads as scrollable
+     rather than cut off (founder s104). */
+  .slim-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.3) transparent;
+  }
+  .slim-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .slim-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .slim-scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-muted-foreground/30;
+  }
+  .slim-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+
   /* Safe-area helpers for notch / home-indicator devices. We opt into
      `viewport-fit=cover` in index.html, which extends content under the
      status bar, home indicator and side cutouts — these honour the OS insets

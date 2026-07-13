@@ -3,13 +3,18 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Zap, Search, SlidersHorizontal } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
-import { redemittel, redemittelByCategory, redemittelCategories } from "@/data/redemittel";
-import { iconByName } from "@/lib/icons";
+import { redemittel, redemittelCategories } from "@/data/redemittel";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ActiveFilterChip, activeFacetCount, type FacetSelection } from "@/features/shared/FacetSheet";
+import {
+  applyFacets,
+  ActiveFilterChip,
+  activeFacetCount,
+  type FacetDef,
+  type FacetSelection,
+} from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
@@ -25,10 +30,26 @@ const registerLabel: Record<string, { text: string; variant: "muted" | "default"
   formal: { text: "formell", variant: "default" },
 };
 
-// Bibliothek views (session 91): the card view keeps its category sections;
-// Tabelle and Liste are flat lenses over the same filtered list.
+// Bibliothek views (session 91): a flat card grid, table, or compact list over
+// the SAME filtered list. The card view used to carry per-category section
+// headers (icon + title + description), but those read as page headers, which
+// the other Bibliothek tabs deliberately don't have (founder s104). The
+// category is now a filter-pill facet instead, so the card view is a plain
+// grid like Wörter/Kollokationen.
 const REDEMITTEL_VIEWS: LibraryView[] = ["tabelle", "karten", "liste"];
-const REDEMITTEL_FACETS = redemittelFacets();
+
+// Kategorie is a multi-select PILL facet in the filter (founder s104): the
+// group names live as pills, not a dropdown scope and not card section
+// headers. Register follows it. `?cat=` / `?register=` both ride the facet
+// selection.
+const CATEGORY_FACET: FacetDef<RedemittelPhrase> = {
+  id: "cat",
+  label: "Kategorie",
+  options: redemittelCategories.map((c) => ({ value: c.id, label: c.labelDe })),
+  get: (p) => p.category,
+};
+const REDEMITTEL_FACETS: FacetDef<RedemittelPhrase>[] = [CATEGORY_FACET, ...redemittelFacets()];
+const REDEMITTEL_FACET_IDS = REDEMITTEL_FACETS.map((f) => f.id);
 
 // The old in-page Wendungen/Üben tabs are gone (audit 2026-07-09): focused
 // practice flows through the trailing "Üben" button into the composed
@@ -47,106 +68,75 @@ export function RedemittelTrainer() {
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
   const reduce = useReducedMotion();
 
-  const category = params.get("cat") ?? "all";
-  const registerSel = useMemo(() => {
-    const raw = params.get("register");
-    return raw ? raw.split(",") : [];
+  // Facet selection (Kategorie + Register) rides the URL, exactly like the
+  // sibling tabs. `?cat=` is now a facet param, not a scope.
+  const railSelection = useMemo(() => {
+    const s: FacetSelection = {};
+    for (const id of REDEMITTEL_FACET_IDS) {
+      const raw = params.get(id);
+      if (raw) s[id] = raw.split(",");
+    }
+    return s;
   }, [params]);
 
-  const setCategory = (cat: string) => {
+  const setRailSelection = (next: FacetSelection) => {
     const p = new URLSearchParams(params);
-    if (cat === "all") p.delete("cat");
-    else p.set("cat", cat);
+    for (const id of REDEMITTEL_FACET_IDS) {
+      const v = next[id];
+      if (v && v.length) p.set(id, v.join(","));
+      else p.delete(id);
+    }
     setParams(p, { replace: true });
   };
 
-  const categoryScoped = useMemo(() => {
-    if (category === "all") return redemittel;
-    return redemittelByCategory(category as RedemittelPhrase["category"]);
-  }, [category]);
-
   // Tier-0 personalized default (UX overhaul Phase 2): default to the
-  // learner's CEFR band + one step up. Since the audit the active cut shows
-  // as a removable chip instead of a quiet text link. Never activates if it
-  // would leave nothing to show.
+  // learner's CEFR band + one step up, over the full bank (facets apply
+  // last, like Wörter/Kollokationen). Never activates if it would leave
+  // nothing to show.
   const visibleBands = useMemo(() => defaultVisibleBands(level), [level]);
   const bandNonEmpty = useMemo(
-    () => categoryScoped.some((p) => !p.cefr || visibleBands.includes(p.cefr)),
-    [categoryScoped, visibleBands],
+    () => redemittel.some((p) => !p.cefr || visibleBands.includes(p.cefr)),
+    [visibleBands],
   );
   const bandActive = !showAllLevels && !search.trim() && bandNonEmpty;
   const bandLimited = useMemo(
     () =>
-      bandActive
-        ? categoryScoped.filter((p) => !p.cefr || visibleBands.includes(p.cefr))
-        : categoryScoped,
-    [categoryScoped, bandActive, visibleBands],
+      bandActive ? redemittel.filter((p) => !p.cefr || visibleBands.includes(p.cefr)) : redemittel,
+    [bandActive, visibleBands],
   );
-  const bandHiddenCount = bandActive ? categoryScoped.length - bandLimited.length : 0;
+  const bandHiddenCount = bandActive ? redemittel.length - bandLimited.length : 0;
 
-  // ONE filter pipeline: category scope -> level band -> search -> register.
-  // (The per-category re-filtering that used to live in the render path is
-  // gone; sections below just partition this list.) `searched` (pre-register)
-  // feeds the FilterRail so its Register counts reflect what a tap yields.
+  // ONE filter pipeline: level band -> search -> facets (Kategorie + Register).
+  // `searched` (pre-facet) feeds the FilterRail so its pill counts reflect
+  // what a tap would yield.
   const searched = useMemo(() => {
     if (!search.trim()) return bandLimited;
     return bandLimited.filter((p) => fuzzyMatch(search, [p.de, p.en]));
   }, [bandLimited, search]);
 
   const filtered = useMemo(
-    () => (registerSel.length ? searched.filter((p) => registerSel.includes(p.register)) : searched),
-    [searched, registerSel],
+    () => applyFacets(searched, REDEMITTEL_FACETS, railSelection),
+    [searched, railSelection],
   );
 
-  const railSelection = useMemo(() => {
-    const s: FacetSelection = {};
-    if (registerSel.length) s.register = registerSel;
-    return s;
-  }, [registerSel]);
-
-  const setRailSelection = (next: FacetSelection) => {
-    const values = next.register ?? [];
-    const p = new URLSearchParams(params);
-    if (values.length) p.set("register", values.join(","));
-    else p.delete("register");
-    setParams(p, { replace: true });
-  };
-
-  const primaryOptions = [
-    { value: "all", label: "Alle Kategorien", count: redemittel.length },
-    ...redemittelCategories.map((cat) => ({
-      value: cat.id,
-      label: cat.labelDe,
-      count: redemittelByCategory(cat.id).length,
-    })),
-  ];
-
-  const categoriesToRender =
-    category === "all"
-      ? redemittelCategories
-      : redemittelCategories.filter((c) => c.id === category);
+  // The session engine's `libraryFocus` category is a single value, so a
+  // multi-Kategorie selection collapses to its first pick here rather than
+  // teaching the session composer a multi-category mode (s104).
+  const catSel = railSelection.cat ?? [];
+  const startSession = () =>
+    navigate(catSel.length === 1 ? `/session?cat=${catSel[0]}` : "/session");
 
   // The filter tile is the single filter surface on BOTH breakpoints (founder
-  // follow-up, s91): desktop rail + mobile tile share these props. Register is
-  // a facet group in the tile, so the old mobile register chips are gone.
+  // follow-up, s91): desktop rail + mobile tile share these props. Kategorie +
+  // Register are both pill facets; there is no scope dropdown.
   const filterRailProps = {
-    scopes: [
-      {
-        pinId: "primary",
-        label: "Kategorie",
-        value: category,
-        onChange: setCategory,
-        all: { value: "all", label: "Alle Kategorien", count: redemittel.length },
-        options: primaryOptions.slice(1),
-      },
-    ],
     items: searched,
     facets: REDEMITTEL_FACETS,
     selection: railSelection,
     onChange: setRailSelection,
     pinScope: "redemittel",
     footer: (
-      <Button variant="gradient" className="h-10 w-full" onClick={() => navigate(category !== "all" ? `/session?cat=${category}` : "/session")}>
+      <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
     ),
@@ -156,53 +146,36 @@ export function RedemittelTrainer() {
     },
   };
 
-  const cardSections = categoriesToRender.map((cat) => {
-        const Icon = iconByName(cat.icon);
-        const phrases = filtered.filter((p) => p.category === cat.id);
-        if (phrases.length === 0) return null;
+  // Flat card grid (no section headers, founder s104): one card per phrase,
+  // same language as the Kollokationen cards.
+  const cardGrid = (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {filtered.map((p) => {
+        const reg = registerLabel[p.register];
         return (
-          <section key={cat.id} className="space-y-3">
-            <div className="flex items-center gap-2.5">
-              <div className="rounded-lg bg-primary/10 p-2 text-primary">
-                <Icon className="h-4 w-4" />
+          <Card key={p.id} className="card-hover h-full">
+            <CardContent className="space-y-2 p-4">
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
+                <SpeakButton text={p.de} />
               </div>
-              <div>
-                <h3 className="font-semibold leading-tight">{cat.labelDe}</h3>
-                <p className="text-xs text-muted-foreground">{cat.description}</p>
+              <p className="text-xs text-muted-foreground">
+                {p.en}
+                {p.note && ` · 💡 ${p.note}`}
+              </p>
+              <div className="flex items-center justify-between gap-2 border-t border-border pt-2">
+                <p className="text-xs italic text-muted-foreground">„{p.example.de}"</p>
+                <div className="flex shrink-0 items-center gap-1">
+                  {p.cefr && <Badge variant="muted">{p.cefr}</Badge>}
+                  <Badge variant={reg.variant}>{reg.text}</Badge>
+                </div>
               </div>
-              <Badge variant="muted" className="ml-auto">{phrases.length}</Badge>
-            </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              {phrases.map((p) => {
-                const reg = registerLabel[p.register];
-                return (
-                  <div key={p.id}>
-                    <Card className="card-hover h-full">
-                      <CardContent className="space-y-2 p-4">
-                        <div className="flex items-start justify-between gap-2">
-                          <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
-                          <SpeakButton text={p.de} />
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                          {p.en}
-                          {p.note && ` · 💡 ${p.note}`}
-                        </p>
-                        <div className="flex items-center justify-between gap-2 border-t border-border pt-2">
-                          <p className="text-xs italic text-muted-foreground">„{p.example.de}"</p>
-                          <div className="flex shrink-0 items-center gap-1">
-                            {p.cefr && <Badge variant="muted">{p.cefr}</Badge>}
-                            <Badge variant={reg.variant}>{reg.text}</Badge>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
+            </CardContent>
+          </Card>
         );
-      });
+      })}
+    </div>
+  );
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -240,6 +213,17 @@ export function RedemittelTrainer() {
                 )}
               </Button>
               <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
+              {/* Desktop: an open search grows inline in this row (founder
+                  s104: no third line). Mobile keeps the second row below. */}
+              {searchOpen && (
+                <SearchField
+                  value={search}
+                  onChange={setSearch}
+                  placeholder="Suche nach Wendung, Übersetzung …"
+                  autoFocus
+                  className="hidden min-w-0 lg:block lg:flex-1"
+                />
+              )}
               <div className="flex items-center gap-2">
                 <Button
                   size="icon"
@@ -261,13 +245,14 @@ export function RedemittelTrainer() {
               </div>
             </div>
 
-            {/* Search input lives outside the filter panel (founder s92). */}
+            {/* Mobile-only second row (desktop shows it inline above). */}
             {searchOpen && (
               <SearchField
                 value={search}
                 onChange={setSearch}
                 placeholder="Suche nach Wendung, Übersetzung …"
                 autoFocus
+                className="lg:hidden"
               />
             )}
 
@@ -309,7 +294,7 @@ export function RedemittelTrainer() {
             ) : view === "liste" ? (
               <RedemittelCompactList items={filtered} />
             ) : (
-              cardSections
+              cardGrid
             ))}
 
           {filtered.length === 0 && (
@@ -324,7 +309,7 @@ export function RedemittelTrainer() {
           <Button
             variant="gradient"
             className="h-11 flex-1 rounded-xl text-base"
-            onClick={() => navigate(category !== "all" ? `/session?cat=${category}` : "/session")}
+            onClick={startSession}
           >
             <Zap className="h-4 w-4" /> Üben
           </Button>
@@ -340,7 +325,7 @@ export function RedemittelTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="no-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-22rem)] lg:overflow-hidden lg:overflow-y-auto"
+          className="slim-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden lg:overflow-y-auto"
         />
       </div>
     </div>

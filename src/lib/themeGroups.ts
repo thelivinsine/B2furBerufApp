@@ -1,6 +1,6 @@
 import { themes, themeById } from "@/data/themes";
 import { domains } from "@/data/domains";
-import type { LearningMode } from "@/types";
+import type { DomainId, LearningMode } from "@/types";
 
 /**
  * Domain-grouped theme options for the library's primary dropdown
@@ -16,15 +16,17 @@ export interface ThemeGroup {
 
 export function themeGroupsForMode(
   mode: LearningMode,
-  activeThemeId: string | undefined,
+  activeThemeIds: string[],
   countFor: (themeId: string) => number,
 ): ThemeGroup[] {
   // A deep-linked theme outside the mode's domains must stay selectable, so
-  // its domain is kept visible rather than orphaning the Select value.
-  const activeDomain =
-    activeThemeId && activeThemeId !== "all" ? themeById(activeThemeId)?.domain : undefined;
+  // every active theme's domain is kept visible rather than orphaning the
+  // selection (s104: a multi-select Thema can span several domains at once).
+  const activeDomains = new Set(
+    activeThemeIds.map((id) => themeById(id)?.domain).filter((d): d is DomainId => !!d),
+  );
   const visible = domains.filter(
-    (d) => mode === "both" || d.context === "both" || d.context === mode || d.id === activeDomain,
+    (d) => mode === "both" || d.context === "both" || d.context === mode || activeDomains.has(d.id),
   );
   return visible
     .map((d) => ({

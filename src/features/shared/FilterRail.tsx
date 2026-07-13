@@ -1,15 +1,6 @@
-import { useMemo, useState } from "react";
-import { ChevronDown, Pin, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Check, ChevronDown, Pin, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   matchesFacets,
   type FacetDef,
@@ -44,14 +35,159 @@ export interface RailPrimary {
   pinId: string;
   /** Section heading, e.g. "Thema" or "Kategorie" (microcopy budget: ≤2 words). */
   label: string;
-  value: string;
-  onChange: (value: string) => void;
-  /** The "everything" row rendered first, e.g. "Alle Themen". */
+  /** Selected option values. Empty = "everything" (the `all` row). Multi-select
+   *  (s104, founder decision): OR-within, same semantics as a facet. */
+  values: string[];
+  onChange: (values: string[]) => void;
+  /** The "everything" row rendered first, e.g. "Alle Themen". Selecting it
+   *  clears `values` back to []. */
   all: PrimaryOption;
   /** Flat rows (Redemittel categories). */
   options?: PrimaryOption[];
   /** Grouped rows with group headings (the Domain-grouped themes). */
   groups?: PrimaryGroup[];
+}
+
+/** Find a selected value's label across the flat + grouped option lists (for
+ *  the trigger button, which shows the single chosen label). */
+function scopeOptionLabel(p: RailPrimary, value: string): string {
+  const flat = p.options?.find((o) => o.value === value);
+  if (flat) return flat.label;
+  for (const g of p.groups ?? []) {
+    const found = g.options.find((o) => o.value === value);
+    if (found) return found.label;
+  }
+  return value;
+}
+
+/** Multi-select scope dropdown (Branche/Thema/Unterthema/Kategorie/Gruppe,
+ *  s104): a trigger button opens a checkbox popover, closing on outside click
+ *  or Escape (same pattern as `AccountMenu`). Radix `Select` only supports a
+ *  single value, so this is a small hand-built listbox instead. */
+function ScopeMultiSelect({ p }: { p: RailPrimary }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onClick);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onClick);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const toggleValue = (value: string) => {
+    p.onChange(
+      p.values.includes(value) ? p.values.filter((v) => v !== value) : [...p.values, value],
+    );
+  };
+
+  // The "Alle X" row's number shows how many DIFFERENT options there are
+  // (Branchen / Themen / …), not the total item count behind them (founder
+  // s104: "Alle Branchen (1113)" read as a word total, which is meaningless
+  // as an aggregate). Grouped scopes (Thema) sum their group option counts.
+  const optionTotal =
+    (p.options?.length ?? 0) + (p.groups?.reduce((n, g) => n + g.options.length, 0) ?? 0);
+
+  const triggerLabel =
+    p.values.length === 1
+      ? scopeOptionLabel(p, p.values[0])
+      : p.values.length > 1
+        ? `${p.values.length} ausgewählt`
+        : p.all.label;
+
+  const row = (opt: PrimaryOption) => {
+    const checked = p.values.includes(opt.value);
+    return (
+      <button
+        key={opt.value}
+        type="button"
+        role="option"
+        aria-selected={checked}
+        onClick={() => toggleValue(opt.value)}
+        className={cn(
+          "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm transition-colors",
+          checked ? "bg-primary/10 text-primary" : "hover:bg-muted/60",
+        )}
+      >
+        <span
+          className={cn(
+            "flex h-4 w-4 shrink-0 items-center justify-center rounded border",
+            checked ? "border-primary bg-primary text-primary-foreground" : "border-border",
+          )}
+        >
+          {checked && <Check className="h-3 w-3" />}
+        </span>
+        <span className="min-w-0 flex-1 truncate">{opt.label}</span>
+        {opt.count != null && <CountBadge value={opt.count} />}
+      </button>
+    );
+  };
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={p.label}
+        className="flex w-full items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-left text-sm transition-colors hover:border-primary/40"
+      >
+        <span className="min-w-0 flex-1 truncate">{triggerLabel}</span>
+        {/* Nothing selected: show the number of options (Branchen/Themen), in
+            the same muted pill format as the facet counts. */}
+        {p.values.length === 0 && <CountBadge value={optionTotal} />}
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 shrink-0 text-muted-foreground transition-transform",
+            open && "rotate-180",
+          )}
+        />
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          aria-multiselectable
+          aria-label={p.label}
+          className="slim-scrollbar absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft"
+        >
+          <button
+            type="button"
+            role="option"
+            aria-selected={p.values.length === 0}
+            onClick={() => {
+              p.onChange([]);
+              setOpen(false);
+            }}
+            className={cn(
+              "flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-sm font-medium transition-colors",
+              p.values.length === 0 ? "bg-primary/10 text-primary" : "hover:bg-muted/60",
+            )}
+          >
+            <span className="min-w-0 flex-1 truncate">{p.all.label}</span>
+            <CountBadge value={optionTotal} />
+          </button>
+          {(p.options?.length ?? 0) > 0 && <div className="my-1 h-px bg-border" />}
+          {p.options?.map(row)}
+          {p.groups?.map((group) => (
+            <div key={group.label}>
+              <p className="mt-1.5 px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                {group.label}
+              </p>
+              {group.options.map(row)}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 // One localStorage object maps a per-tab scope ("woerter", …) to its pinned
@@ -78,8 +214,11 @@ function writePins(scope: string, pins: string[]) {
   }
 }
 
-const withCount = (opt: PrimaryOption) =>
-  `${opt.label}${opt.count != null ? ` (${opt.count})` : ""}`;
+/** A muted count chip in the same visual language as the facet pills below
+ *  (a small tabular number after the label, no parentheses). */
+function CountBadge({ value }: { value: number }) {
+  return <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{value}</span>;
+}
 
 /** Section heading row with the pin toggle. */
 function SectionHeader({
@@ -185,7 +324,11 @@ export function FilterRail<T>({
   const open = controlledOpen ?? internalOpen;
   const setOpen = (next: boolean) => (onOpenChange ? onOpenChange(next) : setInternalOpen(next));
   const [pins, setPins] = useState<string[]>(() => readPins(pinScope));
-  const activeCount = activeFacetCount(selection);
+  // Active count now covers BOTH the facet pills AND the scope dropdowns
+  // (s104 follow-up: the badge undercounted, and the reset button couldn't
+  // clear a selected Branche/Thema/etc. because it only looked at `selection`).
+  const scopeActiveCount = (scopes ?? []).reduce((sum, s) => sum + s.values.length, 0);
+  const activeCount = activeFacetCount(selection) + scopeActiveCount;
 
   // The Filter toggle for the headerless (mobile) tile. It moves between two
   // spots by state: the top-left of the panel (beside the count) when expanded,
@@ -223,12 +366,17 @@ export function FilterRail<T>({
   ) : null;
 
   // Corner controls (founder s92): an icon reset (replaces the old "Zurücksetzen"
-  // word button) and, in the mobile panel, a close icon. Reset is disabled when
-  // there is nothing to clear.
+  // word button) and, in the mobile panel, a close icon. Reset clears BOTH the
+  // facet pills AND every scope dropdown (s104 follow-up: it used to only call
+  // `onChange({})`, so a selected Branche/Thema/Kategorie/Gruppe survived a
+  // reset). Disabled when there is nothing to clear.
   const resetButton = (
     <button
       type="button"
-      onClick={() => onChange({})}
+      onClick={() => {
+        onChange({});
+        scopes?.forEach((s) => s.values.length && s.onChange([]));
+      }}
       disabled={activeCount === 0}
       aria-label="Filter zurücksetzen"
       title="Filter zurücksetzen"
@@ -281,8 +429,11 @@ export function FilterRail<T>({
 
   const panel = layout === "panel";
 
-  // A scope dropdown (Branche / Thema / Unterthema / Kategorie). Rendered once
-  // per entry of the ordered `scopes` array.
+  // A scope dropdown (Branche / Thema / Unterthema / Kategorie / Gruppe).
+  // Rendered once per entry of the ordered `scopes` array. Multi-select
+  // (s104): a checkbox popover, not a single-value Select, so the facet
+  // groups below stay close to the top and picking several values (e.g. two
+  // Branchen) does not require repeated re-opening.
   const scopeSelect = (p: RailPrimary) => (
     <section key={p.pinId}>
       <SectionHeader
@@ -291,32 +442,7 @@ export function FilterRail<T>({
         pinned={pins.includes(p.pinId)}
         onTogglePin={() => togglePin(p.pinId)}
       />
-      {/* Dropdown (founder follow-up): the scope (Thema/Unterthema/Kategorie) is
-          a Select, not an always-open row list, so the facet groups below
-          stay close to the top. Same options as the mobile toolbar dropdown. */}
-      <Select value={p.value} onValueChange={p.onChange}>
-        <SelectTrigger className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={p.all.value}>{withCount(p.all)}</SelectItem>
-          {p.options?.map((opt) => (
-            <SelectItem key={opt.value} value={opt.value}>
-              {withCount(opt)}
-            </SelectItem>
-          ))}
-          {p.groups?.map((group) => (
-            <SelectGroup key={group.label}>
-              <SelectLabel>{group.label}</SelectLabel>
-              {group.options.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {withCount(opt)}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          ))}
-        </SelectContent>
-      </Select>
+      <ScopeMultiSelect p={p} />
     </section>
   );
 
@@ -350,7 +476,7 @@ export function FilterRail<T>({
                   ? "border-primary bg-primary text-primary-foreground"
                   : disabled
                     ? "cursor-not-allowed border-border/50 bg-transparent text-muted-foreground/40"
-                    : "border-border bg-muted text-foreground hover:border-primary/40 hover:bg-muted/70",
+                    : "border-border bg-surface text-foreground hover:border-primary/40 hover:bg-surface/70",
               )}
             >
               {opt.label}
@@ -392,7 +518,7 @@ export function FilterRail<T>({
         role="region"
         aria-label="Filter"
         className={cn(
-          "space-y-4 rounded-xl border border-border bg-surface p-3 shadow-soft",
+          "space-y-4 rounded-xl border border-border bg-muted p-3 shadow-soft",
           className,
         )}
       >
@@ -414,19 +540,17 @@ export function FilterRail<T>({
   return (
     <aside
       className={cn(
-        // Standard content-card recipe (founder follow-up s103: the old flat
-        // `bg-border` slab read as an ugly grey block against every other
-        // card on the page). Visible border + a soft shadow, same as any
-        // other content tile; the white/muted controls inside carry the
-        // hierarchy, and the "Filter" label keeps the brand accent. On
-        // DESKTOP the aside is its own capped scroll container (the instance
-        // className adds `lg:overflow-y-auto` + `lg:max-h-…`): the header
-        // sticks to its top, the Üben footer to its bottom, the middle
-        // scrolls. On MOBILE the tile grows naturally (no cap, no internal
-        // scroll, so no scrollbar); the Üben footer instead sticks to the
-        // viewport bottom (above the nav) so it stays visible while the
-        // filters are open.
-        "rounded-xl border border-border bg-surface shadow-soft",
+        // Subtle-grey tile (founder follow-up s104): `bg-muted`, the same
+        // recessed grey the ViewSwitcher / page toggle track uses, so the
+        // filter tile reads as a distinct surface against the white content
+        // cards. The controls INSIDE stay white (the scope dropdowns and the
+        // unselected facet pills are `bg-surface`), so they pop off the grey.
+        // On DESKTOP the aside is its own capped scroll container (the
+        // instance className adds `lg:overflow-y-auto` + `lg:max-h-…` + the
+        // slim scrollbar): the header sticks to its top, the Üben footer to
+        // its bottom, the middle scrolls. On MOBILE the tile grows naturally
+        // (no cap); the Üben footer sticks to the viewport bottom instead.
+        "rounded-xl border border-border bg-muted shadow-soft",
         className,
       )}
       aria-label="Filter"
@@ -438,7 +562,7 @@ export function FilterRail<T>({
           hides it (`hideHeader`) because the Filter toggle lives on the
           view-options line instead. */}
       {!hideHeader && (
-        <div className="z-10 flex w-full items-center gap-1 rounded-t-xl bg-surface px-3 py-2.5 lg:sticky lg:top-0 lg:rounded-none">
+        <div className="z-10 flex w-full items-center gap-1 rounded-t-xl bg-muted px-3 py-2.5 lg:sticky lg:top-0 lg:rounded-none">
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -493,7 +617,7 @@ export function FilterRail<T>({
       {footer && (
         <div
           className={cn(
-            "sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 flex items-center gap-2 rounded-b-xl border-t border-border bg-surface p-3 lg:bottom-0 lg:rounded-none",
+            "sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 flex items-center gap-2 rounded-b-xl border-t border-border bg-muted p-3 lg:bottom-0 lg:rounded-none",
             // Headerless + collapsed + no pinned sections: the footer is the
             // whole tile, so round its top too and drop the divider.
             hideHeader && !open && !showPinnedBody && "rounded-t-xl border-t-0",

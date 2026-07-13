@@ -335,3 +335,36 @@ the panel when it expands instead of staying beside the Üben button.
 - **Not a re-litigation of s91/s92:** the collapsible-tile mechanism, the per-section pins, the
   sticky Üben footer, and the panel/rail layout split are all unchanged. This is a visual reskin of
   the tile plus a control-placement fix, not a structural rework.
+
+## Multi-select scope dropdowns + Bibliothek filter polish (session 104, 2026-07-13) — founder-approved
+
+A pre-demo founder round the day of the presentation. Two structural decisions plus a batch of
+visual fixes.
+
+- **Scope dropdowns are now MULTI-select. This reverses the s84 lock** ("Primary dropdown = the ONE
+  single-select 'where am I' cut … never multi-select"). The founder asked directly for multi-select
+  on Branche/Thema/Unterthema/Kategorie/Gruppe, and picking `AskUserQuestion` chose "All scope
+  dropdowns". Radix `Select` is single-value, so `FilterRail` grew a hand-built checkbox popover
+  (`ScopeMultiSelect`); `RailPrimary` moved from `value`/`onChange(v)` to `values: string[]`/
+  `onChange(values)`. Semantics are OR-within (an item matches if it carries ANY selected value), the
+  same as a facet, so the dropdown/facet distinction is now purely about control shape (long/grouped
+  option lists get a dropdown; short attribute lists get pills), not single-vs-multi. `matchesSector`/
+  `sectorFirst`/`themeGroupsForMode` all take arrays. **Dependent single-value machinery degrades
+  gracefully:** sub-theme drill-down and the travelling `useLibraryScope` only engage with exactly one
+  active Thema, and a library Üben session collapses multi-Thema to the first value (the composer
+  biases one theme) while forwarding every Branche. The s84 control-choice rule text in
+  `lib/facets.ts` was amended in place.
+- **The filter tile went back to subtle grey (`bg-muted`), reversing the s103 `bg-surface`.** s103
+  made it white to stop it reading as an "ugly grey slab"; the founder then found white-on-white gave
+  too little contrast against the white content cards. The resolution keeps BOTH concerns: the tile is
+  the recessed `bg-muted` grey (the same shade the ViewSwitcher / page-toggle track uses, so it is a
+  familiar surface, not a slab), while every control INSIDE it is white (`bg-surface` scope dropdowns
+  and unselected facet pills), so the controls pop off the grey. This is the stable answer to the
+  contrast question that s92→s103 kept flipping on.
+- **The rest of the round (no decisions, just fixes):** reset clears scope dropdowns too; the rail
+  fills the viewport vertically with a slim visible scrollbar on overflow; the "Alle X" dropdown
+  numbers show the option count (15 Branchen) not the item total; desktop search grows inline in the
+  toolbar row (no third line); Wörter facet order puts Wortart up top and Stufe last; Redemittel lost
+  its per-category card section headers (they read as page headers) for a flat grid, with Kategorie
+  moved into the filter as pill facets; Grammatik hub cards show one clean emerald pattern instead of a
+  truncated variant list, and drill options got a fill so they read as tappable.

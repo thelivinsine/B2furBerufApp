@@ -4107,7 +4107,6 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/grammar/GrammarTopicView.tsx` · `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` ·
   `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` ·
   `docs/SESSION_PROMPT_LOG.md`.
-- **Artifacts:** `docs/SESSION_PROMPT_LOG.md`.
 
 ## Entry 364 — 2026-07-12 (session 104)
 
@@ -4148,3 +4147,35 @@ Branch: `claude/whats-next-esga9u`.
   dark variants) · `preview/ueben-map-mockups-r1-beautify.html` ·
   `preview/ueben-map-mockups-r2-farbstimmungen.html` · `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · `CLAUDE.md`.
+
+## Entry 365 — 2026-07-13 (session 104, parallel Bibliothek work-stream)
+
+- **Branch:** `claude/sonnet-5-ui-refinement-7w4z1v` (Sonnet 5, mid-session switch to Opus 4.8)
+- **Prompts (verbatim):**
+  > the reset button should work even to reset the drop-down items in the filter. For the drop-down items, multiple selection should be possible.
+  > Also, move up the WOrt art to third in heirarchy in filter tile and the Stufe as last.
+  > continue now
+  > Add the same subtle gray to the filter tile as the page toggle buttons have, as there is not much contrast between the content tiles and filter tile - the filter pills and dropdown fields can stay white. Also, the attached picture shows clearly there are more items in the filter, so the expanded tile should extend until it fills the screen until down filling the empty space. Once it fills the screen vertically downward and if there are still items in the filter not visible, then there should be internal scroll. Add a neat little scroll bar to the right. The numbers within drop down menus should not show the total word count - it should show the number of different branches or themas and the numbers can have the same format as in the pills below. For the search bar, it should use the second row itself in the desktop view by moving the other icons around and no need of third line for it. The Redemittel has headers which go against the design language in other pages within Bibliothek - get rid of the titles and instead make the group names visible as pills in the filter. Finally, you need to do a full UI pre-demo sweep for Grammatik section as the UI/UX is quite below average at the moment. [+ attached screenshot of the Wörter filter rail]
+- **Response summary:** A pre-demo Bibliothek round shipped in one turn (started on Sonnet 5, founder
+  switched the session to Opus 4.8 partway). (1) **Multi-select scope dropdowns** across all four
+  browse tabs: a hand-built `ScopeMultiSelect` checkbox popover in `FilterRail.tsx` (Radix `Select` is
+  single-value), `RailPrimary` → `values: string[]`; `matchesSector`/`sectorFirst`/`themeGroupsForMode`
+  take arrays; sub-theme/scope machinery degrades to single-Thema; `AskUserQuestion` confirmed "all
+  scope dropdowns" (reverses the s84 single-select lock). (2) **Reset clears scopes**, badge counts
+  scopes+facets. (3) **Filter tile back to subtle grey** `bg-muted` with white controls inside
+  (reverses s103 white). (4) **Rail fills the viewport** + `.slim-scrollbar`. (5) **Dropdown "Alle X"
+  numbers = option count** (15). (6) **Inline desktop search** (no third line). (7) **Wortart up,
+  Stufe last** on Wörter. (8) **Redemittel:** removed per-category card section headers → flat grid;
+  Kategorie became a 16-pill multi-select facet. (9) **Grammatik pre-demo sweep:** hub cards show one
+  clean emerald pattern (was truncated fragments) + bigger icon tile; drill options got a fill so they
+  read as tappable. Gates: typecheck ✔, lint 0 errors, test:unit **130/130**, build ✔, bundle 73.0 kB.
+  Browser-verified with Playwright (grey tile + white controls, Branche multi-select popover, option
+  counts, inline search, mobile panel, Grammatik cards). Docs updated (CLAUDE.md, DECISIONS.md s104,
+  PROJECT_STATUS.md handoff + s102 archived, this log). Merged to `main` per auto-ship.
+- **Artifacts:** `src/features/shared/FilterRail.tsx` · `src/lib/facets.ts` · `src/lib/themeGroups.ts` ·
+  `src/index.css` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `src/features/grammar/GrammarHub.tsx` · `src/features/grammar/GrammarViews.tsx` ·
+  `src/features/grammar/GrammarDrillCard.tsx` · `tests/sectors.test.ts` · `CLAUDE.md` ·
+  `docs/DECISIONS.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.

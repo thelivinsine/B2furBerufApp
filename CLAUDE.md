@@ -330,6 +330,34 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   in every state** (open, collapsed, and the mobile sticky bar), not just collapsed. The **Wörter graph
   view's word count moved off the canvas to sit beside Üben like every other view**; the canvas legend
   keeps only the connections count ("m Verbindungen").
+  **s104 Bibliothek round (founder, supersedes several s102/s103 specifics above):** (1) **Scope
+  dropdowns are MULTI-select** (Branche/Thema/Unterthema/Kategorie/Gruppe): `RailPrimary` now carries
+  `values: string[]` + `onChange(values)`, rendered by a hand-built checkbox popover `ScopeMultiSelect`
+  in `FilterRail.tsx` (Radix `Select` is single-value only). Each rides a comma-list URL param
+  (empty/absent = "everything"); OR-within, same as a facet. `matchesSector`/`sectorFirst`
+  (`lib/facets.ts`) + `themeGroupsForMode` (`lib/themeGroups.ts`) now take arrays. Sub-theme drill-down
+  + the travelling `useLibraryScope` only apply when EXACTLY ONE Thema is active; `startSession`
+  collapses multi-Thema/Unterthema to the first value (the composer biases ONE session) but forwards
+  every Branche (`libraryFocus` sector is a list). This reverses the s84 "primary dropdown = single
+  select" lock (see DECISIONS.md s104). (2) **Reset clears the scope dropdowns too** (was facet-only) and
+  the active-count badge counts scopes + facets. (3) **The filter tile is subtle grey again** (`bg-muted`,
+  the ViewSwitcher-track shade, NOT the s103 `bg-surface`): the founder found white-on-white too low
+  contrast. Controls INSIDE stay white, so they pop, unselected facet pills went back to `bg-surface`,
+  scope dropdown triggers are `bg-surface`. (4) **The desktop rail fills the viewport vertically**
+  (`lg:max-h-[calc(100vh-7rem)]`, was `-22rem`) with a **slim visible scrollbar** (`.slim-scrollbar` in
+  `index.css`, replaced `no-scrollbar`) once the filters overflow. (5) **Dropdown "Alle X" numbers show
+  the OPTION count** (15 Branchen / 15 Themen), not the item total, in the muted pill-number format. (6)
+  **Desktop search grows inline in the toolbar row** (`hidden lg:block lg:flex-1`, no third line); mobile
+  keeps its own second row (`lg:hidden`). (7) **Wortart moved up** (right after Thema/Unterthema) and
+  **Stufe (CEFR) moved to the END** of the Wörter facet order (`VocabularyTrainer` pulls CEFR out of the
+  registry order and appends it after Lernstand). (8) **Redemittel: the per-category card SECTION HEADERS
+  were removed** (they read as page headers, against the tab design language) → a flat card grid like
+  Wörter/Kollokationen; **Kategorie became a multi-select PILL facet** (`CATEGORY_FACET` in
+  `RedemittelTrainer.tsx`, 16 group-name pills), no longer a scope dropdown; `?cat=`/`?register=` both
+  ride the facet selection. (9) **Grammatik hub cards cleaned up** (`GrammarViews.tsx`): the card pattern
+  strip shows ONE variant (`pattern.split(" · ")[0]`) in the emerald Muster tint instead of a truncated
+  " · "-joined fragment, bigger icon tile; drill options (`GrammarDrillCard.tsx`) got a `bg-muted/50` idle
+  fill so they read as tappable answers, not disabled fields.
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.

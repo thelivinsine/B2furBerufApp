@@ -47,6 +47,10 @@ const TopicCard = memo(function TopicCard({
   const reduce = useReducedMotion();
   const meta = groupMeta[topic.group];
   const showGroupTag = meta.labelDe !== topic.titleDe;
+  // Show ONE clean pattern on the card face, not the full " · "-joined list
+  // (which truncated mid-expression to unreadable fragments like "A · B…",
+  // founder s104). The lesson's Muster panel shows every variant.
+  const firstPattern = topic.pattern.split(" · ")[0].trim();
   return (
     <motion.div
       initial={reduce ? false : { opacity: 0, y: 8 }}
@@ -57,8 +61,8 @@ const TopicCard = memo(function TopicCard({
       <button onClick={() => onOpen(topic.id)} className="group h-full w-full text-left">
         <Card className="card-hover flex h-full flex-col">
           <CardContent className="flex flex-1 flex-col p-4">
-            <div className="flex items-center justify-between gap-2">
-              <GroupIconTile icon={meta.icon} />
+            <div className="flex items-start justify-between gap-2">
+              <GroupIconTile icon={meta.icon} className="h-10 w-10 rounded-xl" iconClassName="h-5 w-5" />
               <span className="flex items-center gap-1.5">
                 {/* Rank on the B2-marker priority spine: the recommended order
                     for a learner who does not want to decide where to start. */}
@@ -76,8 +80,11 @@ const TopicCard = memo(function TopicCard({
             <p className="mt-1.5 line-clamp-2 text-sm text-muted-foreground">{topic.purposeDe}</p>
 
             <div className="mt-auto space-y-2.5 pt-3">
-              <p className="truncate rounded-lg bg-muted/60 px-2.5 py-1.5 font-mono text-xs text-muted-foreground">
-                {topic.pattern}
+              {/* One representative pattern in the emerald Muster language (echoes
+                  the lesson panel), so the card reads as a grammar form at a
+                  glance instead of a cut-off mono fragment. */}
+              <p className="truncate rounded-lg bg-emerald-500/[0.07] px-2.5 py-1.5 font-mono text-xs text-emerald-700 dark:text-emerald-300">
+                {firstPattern}
               </p>
               <div className="flex items-center justify-between border-t border-border/60 pt-2.5">
                 <span className="text-xs text-muted-foreground">
