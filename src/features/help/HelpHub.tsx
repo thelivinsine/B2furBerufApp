@@ -91,8 +91,8 @@ export function HelpHub() {
         <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted-foreground">
             {lang === "de"
-              ? "Bereit? Leg direkt los und probiere Üben und Spielen aus."
-              : "Ready? Jump in and try Üben and Spielen for yourself."}
+              ? "Bereit? Leg direkt los und probiere Lernen und Spielen aus."
+              : "Ready? Jump in and try Lernen and Spielen for yourself."}
           </p>
           <button
             onClick={() => navigate("/")}

@@ -37,13 +37,17 @@ export function useScrollDirection() {
 }
 
 /**
- * The mobile sticky/collapsing classes for the tabs+toolbar row. Combined with
- * the page's own `lg:sticky …` (desktop) classes. `hidden` slides it up under
- * the app header; desktop (`max-lg:` guard) never collapses.
+ * The sticky/collapsing classes for the tabs+toolbar row (both breakpoints).
+ * `hidden` slides it up under the app header on mobile (desktop never collapses
+ * via the `max-lg:` guard). The opaque masking background is applied ONLY once
+ * the page is `scrolled`, so at rest the header is transparent (no white block
+ * beside the tabs, founder 2026-07-13); when content scrolls under the sticky
+ * header the backdrop fades in to mask it.
  */
-export function browseHeaderClass(hidden: boolean): string {
+export function browseHeaderClass(hidden: boolean, scrolled: boolean): string {
   return [
-    "sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 bg-background/90 backdrop-blur transition-transform duration-200",
+    "sticky top-[calc(4rem+env(safe-area-inset-top))] z-20 transition-[transform,background-color] duration-200 lg:top-16",
+    scrolled ? "bg-background/90 backdrop-blur" : "",
     hidden ? "max-lg:-translate-y-[112%]" : "",
   ].join(" ");
 }
