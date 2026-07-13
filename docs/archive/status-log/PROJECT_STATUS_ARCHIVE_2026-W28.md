@@ -1885,3 +1885,20 @@ plan routes every implementation chunk to Opus 4.8 / Sonnet 5 and defers Fable-g
   hardening (Opus 4.8) · 4 UI polish (Sonnet 5) · 5 `docs/DEMO_RUNBOOK.md` + demo states (Sonnet 5). P1:
   6 perf sanity. P2 next week: Fable content proofread (done s112) + full security review.
 - **Artifacts:** `docs/plans/DEMO_READINESS_PLAN.md` (new) + doc updates.
+
+**Handoff after session 112 (2026-07-13). Demo-readiness P2 content-accuracy pass shipped (Fable →
+Opus 4.8), on branch `claude/predemo-plan-fable-tasks-gdray4`.** The plan's P2 "content accuracy pass"
+(proofread demo-visible German beyond the automated checkers). Content-only; no app logic changed.
+- **verify:grammar fixes (real findings only):** `r_neg7` `auf einander`→`aufeinander`; `r_cla6`
+  straight→curly closing quote; dialogue `k3a` `Dieses`→`dieses` after a colon; dialogue `s4b`
+  `du`→`Du` after a colon; 4 texts `den`→`dem` ("am Dienstag, dem 14. Juli");
+  `tx_wohnen_email_besichtigung` `gern`→`gerne` clash + "Die Kaution beträgt"→"Als Kaution verlangen wir".
+- **verify:cefr FLAG retags:** `v_umwelt`→B1.1, `v_vermeiden`→B1.2, `v_muell_vermeiden`→B1.2,
+  `v_energie_sparen`→B1.1, `v_bewusst`→B2.1, `v_zudem`→B2.1.
+- **Proofread clean (no edits):** all 6 Kapitel-1 mission scripts, the 6 top-spine grammar lessons,
+  the 7 help articles.
+- **Jury sidecar + verification map:** +39 reviewed ids to `jury-review.json`; `pnpm build:verification`
+  regen also fixed a stale generated `verification.ts` (2,110→2,263 records, jury 149→188; the s102
+  Branche collocation packs were missing).
+- **Gates:** all 9 green (typecheck; lint 0 err/44 warn; lint:content; test:unit 134/134; test:srs 323;
+  test:pronounce 26; audit 0; build+prerender; bundle 79.5 kB/400).

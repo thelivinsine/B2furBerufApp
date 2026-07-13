@@ -1,14 +1,10 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 112 ran as two parallel branches). **Demo-readiness Chunks 2+3
-(Opus 4.8):** regression review of the s102–110 demo-prep rounds + abuse hardening for the shared demo
-link (stale "(Heute)" copy fixed, returning-user migration verified, two migration-free rate-limit
-guards on `submit-feedback`, RLS re-check). **Demo-readiness P2 content-accuracy pass (Fable → Opus
-4.8):** proofread the demo-visible German (6 Kapitel-1 missions, top-spine grammar lessons, help
-articles), fixed the real `verify:grammar` findings, retagged the 6 `verify:cefr` FLAG items, grew the
-AI-jury sidecar +39 ids, and **regenerated the stale `src/data/verification.ts`** (was missing the s102
-Branche packs; now 2,263 records, jury tier 149→188). All 9 gates green. Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-13 (session 113). **Theorie tab-transition polish (Opus 4.8):** the Bibliothek
+(Theorie) tab switch flashed blank on every toggle; replaced the enter-only CSS keyframe + `null`
+Suspense fallback in `LibraryHub` with the Praktisch-style `AnimatePresence mode="wait"` directional
+slide + a shaped skeleton, and bumped the Praktisch compass route mark's optical weight `0.95→1.05` so
+it matches its nav neighbors (PR #506). All gates green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -62,6 +58,22 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 113 (2026-07-13). Theorie tab-transition + compass-icon polish (Opus 4.8), on
+branch `claude/theory-toggle-transitions-hloi6s`, merged to `main` (PR #506).** Two small UX fixes,
+no logic/data change.
+- **Theorie tab slide:** switching Wörter/Kollokationen/Redemittel/Grammatik used to flash blank
+  (`LibraryHub` remounted the segment behind `Suspense fallback={null}` + an enter-only CSS keyframe).
+  Replaced with the Praktisch pattern: `AnimatePresence mode="wait"` directional `x`-slide (dir from the
+  tab-index change) + a shaped skeleton fallback, so panels slide the way you moved and never flash.
+  framer resolves the resting `x:0` to `transform:none`, so the sticky filter rail / Üben bar are not
+  trapped (why the old CSS used `fill-mode:none`; Dashboard already proves this at rest). Removed the
+  dead `.lib-slide-in-*` keyframes from `index.css`.
+- **Compass icon:** the Praktisch route mark is a thin outline ring that read smaller than its neighbors;
+  bumped its optical weight `0.95→1.05` in `route-icons.tsx` `NORM` so it matches
+  Theorie/Fortschritt/Einstellungen.
+- **Files:** `src/features/library/LibraryHub.tsx` · `src/index.css` · `src/components/layout/route-icons.tsx`.
+- **Gates:** build+prerender green; check:bundle 79.5 kB/400; no remaining `.lib-slide-in-*` refs.
+
 **Handoff after session 112 (2026-07-13). Demo-readiness Chunks 2 + 3 shipped (Opus 4.8), on branch
 `claude/predemo-opus-tasks-ek5qhz`.** The two Opus "Tonight A" chunks of `DEMO_READINESS_PLAN.md`:
 regression review of the s102–110 demo-prep rounds + abuse hardening of the public feedback path.
@@ -88,36 +100,7 @@ regression review of the s102–110 demo-prep rounds + abuse hardening of the pu
 - **Remaining plan chunks:** 1 Playwright smoke test (Sonnet 5), 4 UI polish (Sonnet 5), 5 demo runbook
   `docs/DEMO_RUNBOOK.md` (Sonnet 5), 6 perf sanity (Sonnet 5, P1). See `DEMO_READINESS_PLAN.md`.
 
-**Handoff after session 112 (2026-07-13). Demo-readiness P2 content-accuracy pass shipped (Fable →
-Opus 4.8), on branch `claude/predemo-plan-fable-tasks-gdray4`.** The task was the plan's P2 "content
-accuracy pass" (proofread demo-visible German beyond the automated checkers). This is content-only; no
-app logic changed. **The other DEMO_READINESS_PLAN chunks (P0 1–5, P1 6) are still open** for the
-recommended models (Opus 4.8 / Sonnet 5); start there next by reading
-`docs/plans/DEMO_READINESS_PLAN.md`.
-- **verify:grammar fixes (real findings only, the rest are LanguageTool noise on proper nouns):**
-  `r_neg7` `auf einander`→`aufeinander`; `r_cla6` straight→curly closing quote; dialogue `k3a`
-  `Dieses`→`dieses` after a colon; dialogue `s4b` `du`→`Du` after a colon; 4 texts `den`→`dem`
-  ("am Dienstag, dem 14. Juli"); `tx_wohnen_email_besichtigung` `gern`→`gerne` clash + "Die Kaution
-  beträgt"→"Als Kaution verlangen wir" (three-sentence-start repeat).
-- **verify:cefr FLAG retags (common word carrying an advanced B2.2 label):** `v_umwelt`→B1.1,
-  `v_vermeiden`→B1.2, `v_muell_vermeiden`→B1.2, `v_energie_sparen`→B1.1, `v_bewusst`→B2.1,
-  `v_zudem`→B2.1. (The 77 WATCH/B2.1 items are info-only, left as-is.)
-- **Proofread clean (no edits needed):** all 6 Kapitel-1 mission scripts (`missions.ts`), the 6
-  top-spine grammar lessons (Konnektoren/Relativsätze/Konjunktiv II/Modalverben/Passiv/Nebensätze),
-  and the 7 help articles (`features/help/content.ts`) all read correct, no em dashes.
-- **Jury sidecar + verification map:** appended +39 reviewed ids to `docs/reports/jury-review.json`
-  (6 top-spine grammar topics + their drills, the 6 mission ids) and ran `pnpm build:verification`.
-  **That regen also fixed a stale generated file:** the committed `verification.ts` had only 2,110
-  records and was missing the s102 Branche collocation packs; it now has 2,263 (jury 149→188, and the
-  Branche packs get proper provenance/facts tiers). A prior session added s102 content without
-  regenerating it, so this was overdue.
-- **Gates:** all 9 green — typecheck; lint 0 errors/44 deliberate warnings; lint:content; test:unit
-  134/134; test:srs 323; test:pronounce 26; audit 0 vulns; build + prerender; bundle 79.5 kB/400.
-- **NOT done (deliberate):** deeper LanguageTool triage and jury waves beyond the spine (optional
-  polish); all P0/P1 plan chunks (run on the recommended models). No `review_status` flips (that is a
-  human-only action; the jury tier is an honest machine tier).
-
-_(Session 111's handoff (demo-readiness plan authored + baseline verified) and sessions 85-110's
+_(Session 112's P2 content-accuracy handoff, session 111's handoff (demo-readiness plan authored + baseline verified) and sessions 85-110's
 handoffs, plus the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
 and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_

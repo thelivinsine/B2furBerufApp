@@ -4640,3 +4640,25 @@ Branch: `claude/whats-next-esga9u`.
   `src/data/vocabulary.ts` · `docs/reports/jury-review.json` · `src/data/verification.ts` (regenerated) ·
   `docs/plans/DEMO_READINESS_PLAN.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 380 — 2026-07-13 (session 113, Theorie tab-transition + compass-icon polish)
+
+- **Branch:** `claude/theory-toggle-transitions-hloi6s` (Opus 4.8)
+- **Prompts (verbatim):**
+  > In Theory page, whenever I'm switching between the lage toggles like worter or Redemittel.. the page loads all the time.. it looks ugly. Ideally the content should slide side to side similar to Praktisch pages. find the issue and fix it.
+  > continue with what you're up to and when done, also increase the compass icon size to visually match the other icons' sizes.
+- **Response summary:** Root-caused the Theorie (`/library`) tab switch feeling like a reload: `LibraryHub`
+  remounted the whole segment behind `Suspense fallback={null}` (blank flash on cold chunks) and an
+  enter-only CSS keyframe (`.lib-slide-in-*`) with no coordinated exit. Replaced it with the Praktisch
+  (Dashboard) pattern: `AnimatePresence mode="wait"` directional `x`-slide (direction derived from the
+  tab-index change, kept stable via a ref) + a shaped skeleton fallback, so panels slide the way you
+  moved and never flash. Verified the sticky-descendant safety the original CSS `fill-mode:none` guarded:
+  framer resolves the resting `x:0` to `transform:none`, and Dashboard already runs the same pattern with
+  a sticky child in production. Removed the now-dead `.lib-slide-in-*` keyframes from `index.css`. Second
+  task: the Praktisch compass route mark is a thin outline ring that read smaller than its solid/airy
+  neighbors, so bumped its `NORM` optical weight `0.95→1.05` in `route-icons.tsx` to match
+  Theorie/Fortschritt/Einstellungen. `pnpm build` + prerender green, `check:bundle` 79.5 kB/400, no
+  remaining `.lib-slide-in-*` references. Merged to `main` per auto-ship (PR #506), branch realigned.
+- **Artifacts:** `src/features/library/LibraryHub.tsx` · `src/index.css` ·
+  `src/components/layout/route-icons.tsx` (PR #506, squash `05a12ca`) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
