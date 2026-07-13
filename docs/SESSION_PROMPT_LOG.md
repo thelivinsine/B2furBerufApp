@@ -4490,3 +4490,31 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/vocabulary/WordGraph.tsx` · commit `8d7aeb6` → PR #496 squash-merged (`b6998ee`) ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` (s107 handoff
   moved here) · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 375 — 2026-07-13 (session 110, Bibliothek tab-switch slide animation)
+
+- **Branch:** `claude/bibliothek-slide-animations-hdf738` (Opus 4.8)
+- **Prompts (verbatim):**
+  > when switching between the items in bibliothek, the content seems to abruptly loads. can you add nice left and right sliding animations which is snappy?
+  > yes
+- **Response summary:** Added a snappy, direction-aware enter slide to the four Bibliothek/Theorie tabs
+  (Wörter · Kollokationen · Redemittel · Grammatik). `LibraryHub` computes the tab-index direction (target
+  vs. previous, held in a `useRef`) and wraps the segment in `<div key={tab}>` with a
+  `.lib-slide-in-right` / `.lib-slide-in-left` class; the four lazy segments already remount on `?tab=`
+  change, so the mount-time keyframe replays each switch, sliding the incoming panel in ~220ms from the
+  side tapped toward (`cubic-bezier(0.22,1,0.36,1)`) and fading up. Chose a **CSS keyframe with the
+  default `none` fill-mode** over a framer transform wrapper on purpose: the tab bar (`LibrarySwitcher`)
+  lives inside each segment and the segments rely on `position: sticky`/`fixed` descendants (desktop
+  filter rail, mobile sticky Üben action bar, fixed scroll-top button), so a transform that persisted at
+  rest would establish a containing block and trap them; `none` fill-mode applies the transform only
+  during the slide. Global `html`/`body` `overflow-x: clip` means the 1.25rem offset adds no scrollbar,
+  and the existing global `prefers-reduced-motion` rule neutralises it. Enter-only (old panel swapped out
+  instantly) to stay snappy and avoid double-mounting the heavy lists / a `library-tab-pill` layoutId
+  collision. Gates: typecheck ✔, `pnpm build` + prerender ✔, `check:bundle` 77.4 kB/400, `test:unit`
+  134/134. **Shipped:** PR #495 squash-merged to `main` (SHA `43761a3`), before this session's doc pass;
+  parallel sessions 108/109 merged in between, so the doc updates were rebased onto their state and this
+  work is logged as session 110. Second prompt ("yes") = this documentation pass (`PROJECT_STATUS.md` +
+  this log; s108 handoff moved to the W28 archive chunk).
+- **Artifacts:** `src/features/library/LibraryHub.tsx` · `src/index.css` · commit `43761a3` (squash) →
+  PR #495 · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`
+  (s108 handoff moved here) · `docs/SESSION_PROMPT_LOG.md`.

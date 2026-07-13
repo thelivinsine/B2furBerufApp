@@ -1,6 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 109, **two phone-screenshot bug fixes**, Opus 4.8). **FIX 1:** the
+_Last updated: 2026-07-13 (session 110, **Bibliothek tab-switch slide animation**, Opus 4.8). Switching
+between the four Theorie/Bibliothek tabs (Wörter · Kollokationen · Redemittel · Grammatik) popped in
+abruptly. Added a direction-aware enter slide: `LibraryHub` tracks the tab-index direction and applies a
+self-clearing `.lib-slide-in-right`/`-left` CSS keyframe (in `index.css`) keyed by `?tab=`, so the
+incoming panel slides in ~220ms from the side tapped toward and fades up. Deliberately a keyframe with
+`none` fill-mode, NOT a persistent transform wrapper, because a resting transform would establish a
+containing block and trap the segments' sticky/fixed descendants (filter rail, mobile Üben bar,
+scroll-top button). Global `overflow-x: clip` means no scrollbar; global reduced-motion rule neutralises
+it. **SHIPPED: PR #495 squash-merged to `main` (`43761a3`).** Prior session (109, **two phone-screenshot
+bug fixes**, Opus 4.8). **FIX 1:** the
 ugly monospace "App failed to load" screen was a false crash. In airplane mode / on a transient network
 blip, the background Service Worker update check (`reg.update()`, no `.catch()`) rejects with "Failed to
 update a ServiceWorker …", and that unhandled rejection tripped the global handler over an app that runs
@@ -81,6 +90,31 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 110 (2026-07-13). Bibliothek tab-switch slide animation (Opus 4.8), on branch
+`claude/bibliothek-slide-animations-hdf738`.** Founder: switching between the four Bibliothek/Theorie
+tabs loaded the content abruptly; wanted a snappy left/right slide. (Code shipped as PR #495 / `43761a3`,
+which merged just before the session-109 fixes above; documented here as a distinct handoff.)
+- **Change:** `LibraryHub` (`src/features/library/LibraryHub.tsx`) computes the tab-index direction
+  (target vs. previous, via a `useRef`) and wraps the segment in `<div key={tab}>` with a
+  `.lib-slide-in-right` / `.lib-slide-in-left` class. The four segments already remount per `?tab=`, so
+  the mount-time keyframe replays each switch: the incoming panel slides in ~220ms from the side tapped
+  toward (forward = from the right) and fades up (`cubic-bezier(0.22,1,0.36,1)`). Enter-only (the old
+  panel is swapped out instantly), which keeps it snappy and avoids double-mounting two heavy lazy lists.
+- **Why a CSS keyframe, not a framer transform wrapper:** the tab bar (`LibrarySwitcher`) lives INSIDE
+  each segment, and the segments rely on `position: sticky`/`fixed` descendants (desktop filter rail,
+  mobile sticky Üben action bar, fixed scroll-top button). A persistent `transform` at rest establishes a
+  containing block and would trap all of those. The keyframe (`.lib-slide-in-*` in `index.css`) uses the
+  **default `none` fill-mode**, so the transform exists only during the slide and reverts to none at rest.
+  Global `html`/`body` `overflow-x: clip` means the 1.25rem offset adds no scrollbar; the existing global
+  `prefers-reduced-motion` rule already neutralises it.
+- **Gates:** typecheck ✔, `pnpm build` + prerender ✔, `check:bundle` **77.4 kB**/400, `test:unit`
+  **134/134**. **Shipped:** PR #495 squash-merged to `main` (`43761a3`).
+- **NOT done / consider next:** it is enter-only, not a full swipe (old panel doesn't slide out); a true
+  swipe would need AnimatePresence keeping both segments mounted, which double-mounts the heavy lists and
+  reintroduces the `library-tab-pill` layoutId collision, so it was deliberately skipped. The whole panel
+  (incl. the tab bar, since the bar is inside each segment) slides subtly; offset kept small (~20px) so it
+  reads as content, not a bar jump. Live visual confirm on the deployed site is the founder's.
+
 **Handoff after session 109 (2026-07-13). Two founder bug reports from phone screenshots: the ugly
 "App failed to load" screen + the Wörter graph opening too zoomed-out (Opus 4.8), on branch
 `claude/app-loading-screen-5av7dt`, shipped as PR #496 (squash-merged `b6998ee`).**
@@ -104,36 +138,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 - **NOT done:** live verification on a real phone (offline crash no longer appears; graph zoom feel) is
   left to the founder (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain.
 
-**Handoff after session 108 (2026-07-13). CRITICAL account data-isolation bug (Opus 4.8), on branch
-`claude/account-data-isolation-bug-s517d1`.** Founder report: on a phone, switching between accounts
-showed one account's progress under another.
-- **Root cause:** `useProgressStore`/`useSettingsStore` persist to **device-global** localStorage keys
-  (`b2beruf.progress.v1` / `.settings.v1`) shared by every account on the device. `startCloudSync(uid)`
-  **merges** the incoming account's cloud row into whatever local cache is left from the previous account
-  (`Math.max` / union / `mergeSrs`), then in step 2 **pushes that merged result up to the new account's
-  cloud row**. Nothing cleared the cache on sign-out or account switch. So account A's XP/streak/SRS/saved
-  words leaked into account B's view **and were written into B's cloud row**, propagating to all of B's
-  devices. Settings leaked too (`mergeRemoteSettings` bails out when `local.onboarded` is already true, so
-  B kept A's name/level).
-- **Fix (`lib/cloudSync.ts`):** a persisted `b2beruf.syncUid` marker records which account owns the local
-  cache. `startCloudSync` reads it first; if the incoming uid differs, it `resetLocalStores()` (wipes
-  progress + settings back to defaults) **before** the pull/merge/push, so nothing cross-account can merge
-  or upload. The marker is (re)written on every sync. A missing marker (first-ever sync, or an install
-  predating this build) is treated as "same owner" so genuine offline/guest progress is preserved, and the
-  guest→account upgrade keeps the same uid so it never hits the wipe branch. New exported
-  `clearLocalAccountData()` (reset stores + forget the marker) is called from `useAuthStore.signOut` and
-  `deleteAccount`, so the sign-in screen and the next account on a shared device never see stale data.
-- **Tests:** `tests/cloudSync.test.ts` (new, mocks `@/lib/supabase`) pins four invariants: a different
-  account wipes the previous cache before syncing and never pushes the old data up; the first/guest sync
-  preserves local progress (merge, not wipe); the same account re-syncing does not wipe; and
-  `clearLocalAccountData` zeroes both stores + the marker.
-- **Gates:** typecheck ✔, lint **0 errors** (43 pre-existing warnings), `test:unit` **134/134**, `pnpm
-  build` + prerender ✔, `check:bundle` **77.4 kB**/400, `lint:content` ✔.
-- **NOT done / consider next:** the local cache is still a single device-global key that is wiped-and-
-  reloaded on switch (correct + robust, but a future hardening could namespace the persist key per uid to
-  avoid any wipe entirely). Live verification on a real phone with two accounts is left to the founder
-  (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain untouched.
-
-_(Sessions 85-107's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
+_(Sessions 85-108's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
 and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_
