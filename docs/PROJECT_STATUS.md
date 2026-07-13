@@ -98,8 +98,14 @@ regression review of the s102–110 demo-prep rounds + abuse hardening of the pu
   founder-email gate; `feedback` + `ai_usage` service-role-only; no public SELECT). `delete-account` +
   `evaluate-writing` re-confirmed JWT-gated + CORS-allowlisted; evaluate-writing keeps its daily/
   monthly/per-user caps. Founder console steps added to `docs/plans/PHASE2_SETUP.md`.
-- **⚠️ Founder action:** run `supabase functions deploy submit-feedback` for the rate limit to go live
-  (no new migration or secret needed; optional `FEEDBACK_IP_SALT`).
+- **Follow-up (post-merge, same day): the feedback backend was never deployed.** Activating the rate
+  limit surfaced that `submit-feedback` had never been deployed at all (authored s105, deploy step never
+  ran), so the table + function + Resend key did not exist in Supabase and the live feedback button was
+  non-functional. The founder has no local terminal (repo-only), so they set it up **via the dashboard**:
+  created `public.feedback` (migration 0006 SQL in the SQL Editor), created the `submit-feedback` Edge
+  Function with **Verify JWT OFF** (anonymous feedback allowed), and set `RESEND_API_KEY`. **Feedback is
+  now live end-to-end, including the s112 rate limit.** (A GitHub-Actions auto-deploy workflow was offered
+  as a future convenience, not built.)
 - **Gates:** all green — typecheck ✔, lint 0 errors/44 warnings, lint:content ✔, test:unit 134/134,
   test:srs 323, test:pronounce 26, build+prerender ✔, check:bundle 79.5 kB/400.
 - **Remaining plan chunks:** 1 Playwright smoke test (Sonnet 5), 4 UI polish (Sonnet 5), 5 demo runbook
