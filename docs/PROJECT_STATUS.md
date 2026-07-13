@@ -1,13 +1,18 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 105, demo-prep sweep, Opus 4.8). **SHIPPED:** nav renamed
-"Heute"->**Praktisch** / "Bibliothek"->**Theorie**, **Anwenden hidden** from the nav; a subtle
-**"Mit KI gebaut · Feedback"** pill on every page that emails the founder via a new `submit-feedback`
-Edge Function (founder deploy + `RESEND_API_KEY` needed, see `PHASE2_SETUP.md`); the **Fortschritt page
-was redesigned** into calm groups; and a **Theorie tiles/filter** round: flippable Karten tiles (EN on
-the back), redundant tile tags removed, FilterRail rebuilt as a viewport-capped flex column with an
-auto-hiding scrollbar, Mehr/Weniger on long facets, Grammatik Gruppe as a multi-select pill facet, and
-a centered toolbar that slides open for search. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-13 (session 106, Üben-map pin polish + toggle/heading layout-shift fix, Sonnet
+5). **SHIPPED:** the Üben-map "Du bist hier" pin's oversized pulse ring/chip were shrunk to match the
+small pin glyph, and the pin recolored to a dedicated red (was route indigo); the Heute Üben/Spielen
+toggle and each panel's own heading no longer jump vertically on desktop when switching tabs (a
+`justify-center`d stack was reacting to the two panels' differing natural heights). Prior session
+(105): nav renamed "Heute"->**Praktisch** / "Bibliothek"->**Theorie**, **Anwenden hidden** from the
+nav; a subtle **"Mit KI gebaut · Feedback"** pill on every page that emails the founder via a new
+`submit-feedback` Edge Function (founder deploy + `RESEND_API_KEY` needed, see `PHASE2_SETUP.md`); the
+**Fortschritt page was redesigned** into calm groups; and a **Theorie tiles/filter** round: flippable
+Karten tiles (EN on the back), redundant tile tags removed, FilterRail rebuilt as a viewport-capped
+flex column with an auto-hiding scrollbar, Mehr/Weniger on long facets, Grammatik Gruppe as a
+multi-select pill facet, and a centered toolbar that slides open for search. Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -60,49 +65,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
-
-**Handoff after session 104 (2026-07-13). Bibliothek pre-demo round SHIPPED (Opus 4.8, mid-session
-model switch from Sonnet 5).** A same-day founder round the day of the presentation, in two batches.
-Batch 1 (two founder lines): scope dropdowns must be multi-select, and the reset must clear them.
-Batch 2 (one long mid-turn message): a grab-bag of visual/UX fixes. All shipped together.
-- **Multi-select scope dropdowns (reverses the s84 single-select lock; `AskUserQuestion` → "All scope
-  dropdowns"):** `FilterRail.tsx` grew a hand-built checkbox popover `ScopeMultiSelect` (Radix `Select`
-  is single-value); `RailPrimary` moved from `value`/`onChange(v)` to `values: string[]`/
-  `onChange(values)`. `matchesSector`/`sectorFirst` (`lib/facets.ts`) + `themeGroupsForMode`
-  (`lib/themeGroups.ts`) now take arrays (OR-within). Every browse page
-  (Wörter/Kollokationen/Redemittel/Grammatik) reads its scope params as comma-lists. Sub-theme
-  drill-down + travelling `useLibraryScope` engage only with exactly one active Thema; `startSession`
-  collapses multi-Thema/Unterthema to the first value (composer biases one theme) but forwards every
-  Branche. `tests/sectors.test.ts` updated to the array API + an OR-within case (130/130).
-- **Reset clears scopes too** (was `onChange({})` only) and the active-count badge counts scopes +
-  facets.
-- **Filter tile is subtle grey again** (`bg-muted`, reversing s103's `bg-surface`): the founder found
-  white-on-white too low-contrast. Controls inside stay white (`bg-surface` scope triggers + unselected
-  facet pills) so they pop. See DECISIONS.md s104 for the s92→s103→s104 contrast arc.
-- **Rail fills the viewport** (`lg:max-h-[calc(100vh-7rem)]`, was `-22rem`) with a **slim visible
-  scrollbar** (`.slim-scrollbar` in `index.css`, replaced `no-scrollbar`).
-- **Dropdown "Alle X" numbers show the option count** (15 Branchen / 15 Themen), not the item total,
-  in the muted pill-number format; per-option counts unchanged.
-- **Desktop search grows inline in the toolbar row** (`hidden lg:block lg:flex-1`); mobile keeps its
-  own second row.
-- **Wörter facet order:** Wortart moved up (after Thema/Unterthema), Stufe (CEFR) moved to the end.
-- **Redemittel:** per-category card section headers removed → flat card grid; **Kategorie is now a
-  16-pill multi-select facet** in the filter (`CATEGORY_FACET`), not a scope dropdown; `?cat=`/
-  `?register=` both ride the facet selection; facets apply last over the full bank.
-- **Grammatik hub cards** show ONE clean pattern (`pattern.split(" · ")[0]`) in the emerald Muster tint
-  (was a truncated " · " fragment) + a bigger icon tile; **drill options** (`GrammarDrillCard.tsx`) got
-  a `bg-muted/50` idle fill so they read as tappable answers, not disabled fields. (The lesson layout
-  itself was already solid post-s93/s103; this was the "pre-demo sweep".)
-- **Gates:** typecheck ✔, lint **0 errors** (42 pre-existing warnings), test:unit **130/130**, build +
-  prerender ✔, bundle **73.0 kB**/400. Browser-verified (Playwright, dev server): grey tile + white
-  pills/dropdowns, Branche multi-select checkbox popover with per-option counts, "15" option counts,
-  inline desktop search, gray mobile filter panel, Grammatik cards. Founder verifies the live result.
-- **NOT done:** Üben-plan Work item 3's **tappable stops** (the map re-space/recolor shipped in the
-  parallel s104 handoff above; only the tap-to-slide-card sub-task remains); the standing content
-  follow-ups (human `verified` pass, jury Waves 1-2, Wave-2 tranche 2, Playwright grammar smoke);
-  founder review of `sector-audit-report.md`. Note: 16 Kategorie pills exceeds the ≤12 facet-hygiene
-  guideline (a dev-only warning), accepted because the founder explicitly wanted the group names as
-  pills.
 
 **Handoff after session 105 (2026-07-13). Demo-prep sweep: nav rename + hide Anwenden, AI-disclaimer
 feedback button (emails founder), Fortschritt redesign, flippable Bibliothek tiles, filter polish
@@ -160,6 +122,34 @@ feedback button (emails founder), Fortschritt redesign, flippable Bibliothek til
   (no functional purpose for OR-filters, deferred). Standing content follow-ups + Üben map tappable
   stops + sector-audit review remain from prior sessions.
 
-_(Sessions 85-103's handoffs, and the s104 Üben-map round, are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
-shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
-`docs/PROJECT_FOUNDATION.md` in s95.)_
+**Handoff after session 106 (2026-07-13). Üben-map pin polish: sizing/color fix + a toggle/heading
+layout-shift bug (Sonnet 5), shipped straight from two founder screenshots/reports on branch
+`claude/pin-sizing-color-6lofhi`, merged to `main`.**
+- **"Du bist hier" pin (`UebenPath.tsx`):** the pulse ring (r 12→8, stroke 2→1.5) and the chip
+  (`px-3 py-1 text-[11px]` → `px-2 py-0.5 text-[9px]`) were oversized relative to the small pin glyph;
+  both shrunk to hug it. The pin (and its pulse ring) switched from the route indigo to a dedicated
+  red (`PIN_COLOR = "#e5484d"`) per founder request, so the live-location marker reads distinctly from
+  the indigo journey line; the pin's white inner ring/dot are unchanged.
+- **Heute toggle/heading layout-shift bug (`Dashboard.tsx`):** on desktop the Üben/Spielen toggle sits
+  above the tab content inside a `justify-center`d flex column, and the two panels render at different
+  natural heights (Üben ~581px, Spielen ~607px), so the whole stack's centered position — and thus the
+  toggle's screen position — shifted on every Üben ↔ Spielen switch. Diagnosed with a headless
+  Playwright probe against the dev server (bypassing onboarding via a seeded `b2beruf.settings.v1`
+  localStorage key): the toggle moved ~13px and both panels' own `<h1>` moved with it on every switch
+  (confirmed before/after with real bounding-box measurements, not just code reading). Fix: the sliding
+  content wrapper now reserves the taller panel's height (`lg:min-h-[38rem]`, Spielen's ~607px) so the
+  toggle+content stack's total height — and therefore its `justify-center`d position — stays constant
+  regardless of which tab is active. Mobile was already unaffected (normal document flow, not
+  flex-centered).
+- **Gates:** typecheck ✔, lint 0 errors (pre-existing warnings only), `pnpm build` + prerender ✔,
+  `check:bundle` **76.9 kB**/400. Browser-verified with Playwright against the dev server at mobile
+  (390×844) and multiple desktop widths (1024–1920px): toggle and heading now sit at identical
+  bounding-box coordinates before/after every tab switch.
+- **Shipped:** PR opened and squash-merged into `main` (was previously only on the feature branch;
+  per this repo's rule, feature-branch pushes never go live on their own).
+- **NOT done:** no other follow-up requested this session; standing content/Üben-map follow-ups from
+  prior sessions (human `verified` pass, jury Waves, sector-audit review) remain untouched.
+
+_(Sessions 85-103's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
+and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_
