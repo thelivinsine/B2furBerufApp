@@ -649,11 +649,11 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
 
       {/* Legend + connection count at the bottom of the canvas (the word
           count now sits beside Üben like every other view, founder
-          follow-up). Centered on mobile, left-aligned on desktop. */}
+          follow-up). Centered on both mobile and desktop. */}
       {/* Legend doubles as a domain filter (founder 2026-07-13): tap a domain to
           show only it (tap again to clear); several can be active. Always shown
           in full (flex-wrap), so no scroll is needed to see every domain. */}
-      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-muted-foreground lg:justify-start">
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
         {presentDomains.map((d) => {
           const color = (DOMAIN_COLORS[d.id] ?? FALLBACK_COLOR)[isDark ? "dark" : "light"];
           const selectedDom = domainFilter.has(d.id);
@@ -677,7 +677,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
             </button>
           );
         })}
-        <span className="tabular-nums lg:ml-auto">
+        <span className="tabular-nums">
           {graph.links.length} Verbindung{graph.links.length !== 1 ? "en" : ""}
         </span>
       </div>
