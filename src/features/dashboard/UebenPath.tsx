@@ -59,6 +59,18 @@ const STOPS = [
 // stop i+1; it renders solid when that stop is at or before the current one.
 const SEG_PATHS = ["M44 88 H120", "M120 88 H276 V128", "M276 128 V170 H216"];
 
+// The SAME legs broken into axis-aligned straight RUNS ([x1,y1,x2,y2]). The
+// dotted (onward) route is drawn per-run so each run can align its dash pattern
+// to the street's lane dashes (`strokeDasharray="7 9"`, lanes originate at 0),
+// making the route dashes sit exactly on top of the lane markings instead of
+// floating as scattered dots (founder 2026-07-13). Solid (travelled) legs keep
+// using SEG_PATHS above (one smooth glowing stroke through the corner).
+const SEG_RUNS: [number, number, number, number][][] = [
+  [[44, 88, 120, 88]],
+  [[120, 88, 276, 88], [276, 88, 276, 128]],
+  [[276, 128, 276, 170], [276, 170, 216, 170]],
+];
+
 // Map scenery palette (theme-aware: the map is an app surface on Heute).
 // s104 founder pick: light = "Brand-Ton" (indigo-tinted ground and blocks,
 // green parks), dark = "Klarer Abend" (the brightest of the dark candidates;
@@ -70,14 +82,14 @@ const MAP_LIGHT = {
   lotA: "#e5e4f1", lotB: "#dbd9ea",
   casing: "#dee0ee", street: "#ffffff", dash: "#d3d5e7",
   label: "#5a5e78", dotFill: "#ffffff", pinRing: "#ffffff",
-  route: "#5b5be6",
+  route: "#5b5be6", pulseRing: "#4b5563",
 };
 const MAP_DARK = {
   ground: "#2e3450", park: "#3a5545", parkDeep: "#4b7058",
   lotA: "#42486e", lotB: "#393f60",
   casing: "#232841", street: "#5a6187", dash: "#8f97bd",
   label: "#dde1f2", dotFill: "#f4f5fc", pinRing: "#f4f5fc",
-  route: "#a6a6fd",
+  route: "#a6a6fd", pulseRing: "#c7cce0",
 };
 
 // The "you are here" pin is a dedicated red (distinct from the indigo route
@@ -261,7 +273,11 @@ export default function UebenPath() {
               <path d="M276 0 V230" />
             </g>
 
-            {/* route: solid (with glow) up to the current stop, dotted onward */}
+            {/* route: solid (with glow) up to the current stop, dotted onward.
+                The dotted legs are drawn per straight run with the dash pattern
+                phase-locked to the street lane dashes (opaque, butt caps, same
+                "7 9" period, offset = start-coord mod 16) so each route dash
+                lands exactly on a lane dash. */}
             {SEG_PATHS.map((d, i) =>
               i + 1 <= currentIndex ? (
                 <g key={d}>
@@ -269,7 +285,28 @@ export default function UebenPath() {
                   <path d={d} fill="none" stroke={P.route} strokeWidth={5.5} strokeLinecap="round" strokeLinejoin="round" />
                 </g>
               ) : (
-                <path key={d} d={d} fill="none" stroke={P.route} strokeOpacity={0.45} strokeWidth={5} strokeLinecap="round" strokeDasharray="0.5 11" />
+                <g key={d}>
+                  {SEG_RUNS[i].map(([x1, y1, x2, y2], j) => {
+                    const horiz = y1 === y2;
+                    // Draw each run in the +coordinate direction so a single
+                    // dash offset (= start mod the 16-unit lane period) keeps the
+                    // whole run phase-locked to the lane dashes underneath.
+                    const lo = horiz ? Math.min(x1, x2) : Math.min(y1, y2);
+                    const hi = horiz ? Math.max(x1, x2) : Math.max(y1, y2);
+                    const runD = horiz ? `M${lo} ${y1} H${hi}` : `M${x1} ${lo} V${hi}`;
+                    return (
+                      <path
+                        key={j}
+                        d={runD}
+                        fill="none"
+                        stroke={P.route}
+                        strokeWidth={3.2}
+                        strokeDasharray="7 9"
+                        strokeDashoffset={lo % 16}
+                      />
+                    );
+                  })}
+                </g>
               ),
             )}
 
@@ -323,9 +360,11 @@ export default function UebenPath() {
               </g>
             ))}
 
-            {/* current stop: pulse ring + location pin, both in the pin's red
-                so the ring reads as "part of the marker", not the route */}
-            <circle cx={pinX} cy={pinY} r={8} fill="none" stroke={PIN_COLOR} strokeWidth={1.5} className="uben-pulse" />
+            {/* current stop: pulse ring + location pin. The ring is a muted
+                dark gray (theme-aware `pulseRing`) so it reads as a neutral
+                locator halo, while the pin itself stays red (founder
+                2026-07-13). */}
+            <circle cx={pinX} cy={pinY} r={8} fill="none" stroke={P.pulseRing} strokeWidth={1.5} className="uben-pulse" />
             {/* pin at 70% (founder s104 follow-up), scaled about its tip so it
                 still points exactly at the stop */}
             <g transform={`translate(${pinX} ${pinY}) scale(0.7)`}>
