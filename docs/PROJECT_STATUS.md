@@ -61,44 +61,6 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 104 (2026-07-12, parallel to s103 and rebased onto it). Üben map re-spaced +
-recolored via mockup rounds (Fable 5, Üben-refinements Work item 3 partial).** The founder asked for
-map mock-ups, iterated three rounds, and picked a direction that was then shipped to `main`.
-- **Mockup rounds (preview sheet `preview/ueben-map-mockups.html`, delivered as a claude.ai artifact
-  link):** R1 = the plan's illustrated-buildings recipe in 3 variants (rejected: "doesn't look good");
-  a pixel-art village round against founder-shared Zelda/Pokemon-style references was **abandoned
-  mid-review by founder choice** ("let's not waste resources"; never committed); R2 = the live map
-  re-spaced + 4 color moods (`-r2-farbstimmungen.html`); R3 = founder picked Stimmung 3 (Brand-Ton)
-  but its dark was too dark → 4 brighter dark variants (final sheet). **Founder picks: Stimmung 3
-  light + "Dunkel D: Klarer Abend" dark.** R1/R2 are archived beside the final sheet
-  (`preview/ueben-map-mockups-r1-beautify.html`, `-r2-farbstimmungen.html`). The pixel-art reference
-  images were shared inline in chat and could not be exported to files; drop them into
-  `preview/references/` if they should be kept.
-- **Shipped in `UebenPath.tsx`:** street grid re-spaced (H y=88/170, V x=76/176/276; tiles Bahnhof
-  [44,48], Laden [120,48], Zuhause [310,128], Amt [216,205]) so **no landmark tile hugs a map edge**
-  (Bahnhof was 13 px, Amt 10 px from the edge); SEG_PATHS + parks/lots re-laid to the new blocks.
-  **MAP_LIGHT = Brand-Ton** (indigo-tinted ground `#eef0f7` + lavender lots, green parks stay the
-  contrast), **MAP_DARK = Klarer Abend** (deliberately bright blue-grey ground `#2e3450`, near-white
-  labels `#dde1f2`; the old night palette was rejected as too dark/low contrast). New palette field
-  **`route`**: the journey line/pin now use `P.route` instead of `hsl(var(--primary))` because the
-  dark map needs a brighter indigo (`#a6a6fd`) than the dark `--primary` token on the lifted ground.
-- **Gates:** typecheck ✔, lint 0 errors, test:unit **129/129**, build + prerender ✔, bundle **73.0
-  kB**/400. **Verified in the real app** (vite preview + Playwright, 390x844): light + dark dashboards
-  render the picked palettes exactly as mocked.
-- **Follow-up (same session, from the founder's live screenshot):** at a fresh state the pin +
-  pulse ring landed exactly on the Bahnhof label and the chip covered the tile. Fix: per-stop
-  `labelPos`/`chipPos` (top-row stops label ABOVE the tile, chip RIGHT of the pin; Zuhause/Amt keep
-  below/right labels and the above-chip), the Laden park reshaped to a vertical strip right of the
-  tile + the top-left lot shrunk so the above-labels sit on clean ground. The founder kept the
-  dotted future-route at full strength (a proposed quieter dotting was reverted on their call).
-  Re-verified in-app across fresh/boss-done/mid states, light + dark.
-- **NOT done:** the rest of Work item 3 (tappable stops that slide the practice card, and any further
-  in-tile illustration work; the founder chose re-space + recolor over the plan's illustrated-buildings
-  recipe, so re-scope item 3 before building more); the standing content follow-ups (frequency subset
-  for ~91 new words, founder review of `sector-audit-report.md`, human `verified` pass, jury Waves
-  1-2, Playwright grammar smoke). With s103's items 2/4+5/6 shipped in parallel, the Üben plan is now
-  fully shipped except item 3's tappable stops.
-
 **Handoff after session 104 (2026-07-13). Bibliothek pre-demo round SHIPPED (Opus 4.8, mid-session
 model switch from Sonnet 5).** A same-day founder round the day of the presentation, in two batches.
 Batch 1 (two founder lines): scope dropdowns must be multi-select, and the reset must clear them.
@@ -198,6 +160,6 @@ feedback button (emails founder), Fortschritt redesign, flippable Bibliothek til
   (no functional purpose for OR-filters, deferred). Standing content follow-ups + Üben map tappable
   stops + sector-audit review remain from prior sessions.
 
-_(Sessions 85-103's handoffs are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
+_(Sessions 85-103's handoffs, and the s104 Üben-map round, are in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The
 shipped-architecture, locked-decisions, and completed-setup sections that used to live here moved to
 `docs/PROJECT_FOUNDATION.md` in s95.)_

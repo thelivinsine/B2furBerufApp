@@ -171,6 +171,15 @@ export default function UebenPath() {
     setSelectedIdx(target);
   };
 
+  // Tappable stops (s104 follow-up): tapping a landmark slides the practice
+  // card to that stop's first unplayed mission (else its first mission). The
+  // pin never moves; like the pager, tapping only changes what you practise.
+  const stopTarget = (s: (typeof STOPS)[number]) => {
+    const ids = s.missions as readonly string[];
+    const unplayed = kap1.findIndex((m) => ids.includes(m.id) && !missionsDone.includes(m.id));
+    return unplayed !== -1 ? unplayed : kap1.findIndex((m) => m.id === ids[0]);
+  };
+
   return (
     // Single column on both phone and desktop (founder). Phone: header + map
     // pinned to the top, the card + pager grouped and vertically centered in
@@ -194,7 +203,7 @@ export default function UebenPath() {
         <svg
           viewBox="0 0 360 240"
           className="block h-auto w-full"
-          role="img"
+          role="group"
           aria-label="Neuland-Karte mit deinem Lernweg"
         >
           <rect width={360} height={240} fill={P.ground} />
@@ -267,9 +276,25 @@ export default function UebenPath() {
               ) : null,
             )}
 
-            {/* landmark tiles (inside blocks) + labels */}
+            {/* landmark tiles (inside blocks) + labels; each is a button that
+                slides the practice card to that stop's module (stopTarget) */}
             {STOPS.map((s) => (
-              <g key={s.key}>
+              <g
+                key={s.key}
+                role="button"
+                tabIndex={0}
+                aria-label={`${s.label}: Übungsmodul wählen`}
+                className="ueben-stop"
+                onClick={() => goTo(stopTarget(s))}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    goTo(stopTarget(s));
+                  }
+                }}
+              >
+                {/* invisible hit area (~44px tap target incl. the label zone) */}
+                <rect x={s.tile[0] - 22} y={s.tile[1] - 22} width={44} height={44} rx={12} fill="transparent" />
                 <rect x={s.tile[0] - 17} y={s.tile[1] - 17} width={34} height={34} rx={10} fill={s.color} filter="url(#ueben-lm-shadow)" />
                 <g transform={`translate(${s.tile[0]} ${s.tile[1]})`}>
                   <TileGlyph kind={s.key} color={s.color} />
@@ -296,14 +321,18 @@ export default function UebenPath() {
 
             {/* current stop: pulse ring + location pin */}
             <circle cx={pinX} cy={pinY} r={12} fill="none" stroke={P.route} strokeWidth={2} className="uben-pulse" />
-            <ellipse cx={pinX} cy={pinY + 3} rx={7} ry={2.4} fill="#3b3f4a" opacity={0.18} />
-            <path
-              d={`M${pinX} ${pinY + 2} c-8 -10.5 -12 -16 -12 -22.5 a12 12 0 1 1 24 0 c0 6.5 -4 12 -12 22.5 z`}
-              fill={P.route}
-              stroke={P.pinRing}
-              strokeWidth={2.5}
-            />
-            <circle cx={pinX} cy={pinY - 20.5} r={4.6} fill={P.pinRing} />
+            {/* pin at 70% (founder s104 follow-up), scaled about its tip so it
+                still points exactly at the stop */}
+            <g transform={`translate(${pinX} ${pinY}) scale(0.7)`}>
+              <ellipse cx={0} cy={3} rx={7} ry={2.4} fill="#3b3f4a" opacity={0.18} />
+              <path
+                d="M0 2 c-8 -10.5 -12 -16 -12 -22.5 a12 12 0 1 1 24 0 c0 6.5 -4 12 -12 22.5 z"
+                fill={P.route}
+                stroke={P.pinRing}
+                strokeWidth={2.5}
+              />
+              <circle cx={0} cy={-20.5} r={4.6} fill={P.pinRing} />
+            </g>
           </g>
         </svg>
 
@@ -316,8 +345,8 @@ export default function UebenPath() {
             )}
             style={
               STOPS[currentIndex].chipPos === "right"
-                ? { left: `${((pinX + 15) / 360) * 100}%`, top: `${((pinY + 5 - 11) / 240) * 100}%` }
-                : { left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 30) / 240) * 100}%` }
+                ? { left: `${((pinX + 12) / 360) * 100}%`, top: `${((pinY + 5 - 8) / 240) * 100}%` }
+                : { left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 23) / 240) * 100}%` }
             }
           >
             Du bist hier
@@ -456,7 +485,7 @@ export default function UebenPath() {
       </div>
       </div>
 
-      <style>{`.uben-pulse{animation:uben-pulse 2.2s ease-in-out infinite}@keyframes uben-pulse{0%,100%{opacity:.45}50%{opacity:1}}@media (prefers-reduced-motion:reduce){.uben-pulse{animation:none}}`}</style>
+      <style>{`.uben-pulse{animation:uben-pulse 2.2s ease-in-out infinite}@keyframes uben-pulse{0%,100%{opacity:.45}50%{opacity:1}}.ueben-stop{cursor:pointer;transform-box:fill-box;transform-origin:center;transition:transform .16s ease-out;outline:none}.ueben-stop:hover,.ueben-stop:focus-visible{transform:scale(1.08)}.ueben-stop:focus-visible rect:first-of-type{stroke:hsl(var(--primary));stroke-width:2}@media (prefers-reduced-motion:reduce){.uben-pulse{animation:none}.ueben-stop{transition:none}.ueben-stop:hover,.ueben-stop:focus-visible{transform:none}}`}</style>
     </div>
   );
 }

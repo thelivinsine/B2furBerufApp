@@ -18,15 +18,16 @@ quoted code, not the number.
   collapsed, mobile). Grammar lesson `CardContent` grid-splits Muster (left) from the explanation
   (right) at `lg:`, mobile stays stacked. Gates green (typecheck, lint 0 errors, test:unit 129/129,
   build, bundle 73.0 kB); browser-verified in light + dark at desktop and mobile widths.
-- 🟨 **Work item 3 (Üben map) — PARTIALLY SHIPPED s104 (Fable 5, parallel to s103), RE-SCOPED by the
+- ✅ **Work item 3 (Üben map) — SHIPPED s104 (Fable 5, parallel to s103), RE-SCOPED by the
   founder.** The founder rejected the illustrated-buildings recipe below after a mockup round (and
   stopped a pixel-art direction mid-review); what shipped instead, picked from mockup sheets
   (`preview/ueben-map-mockups*.html`): the street grid **re-spaced** so no landmark tile hugs a map
   edge, parks/lots re-laid, **MAP_LIGHT = brand-tinted "Stimmung 3"**, **MAP_DARK = the deliberately
   bright "Klarer Abend"**, and a `route` palette field replacing `hsl(var(--primary))` on the
-  journey line/pin. The **tappable-stops sub-task below is still open and still applies**; the
+  journey line/pin. The **tappable stops shipped in the s104 follow-up** (per-stop button groups with
+  `stopTarget` sliding the practice card, 44px hit rects, hover/focus scale, pin at 70%); the
   Beautification sub-section (gradients, buildings, trees) is superseded — do not build it without
-  a fresh founder ask.
+  a fresh founder ask. With s103's items this closes the plan.
 
 ## Context
 
