@@ -4313,3 +4313,44 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
   `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 370 — 2026-07-13 (session 106, Üben-map pin sizing/color)
+
+- **Branch:** `claude/pin-sizing-color-6lofhi` (Sonnet 5)
+- **Prompts (verbatim):**
+  > [attached screenshot] the circle around the pin and du bist here pill are too big compared to the pin. Reduce their sizees to keep them proportionate to the pin. Also, use a red shade for the pin
+  > use red shade for the pin circle as well
+- **Response summary:** In the Üben-map "Du bist hier" marker (`UebenPath.tsx`): shrunk the pulse ring
+  (radius 12→8, stroke 2→1.5) and the chip (`px-3 py-1 text-[11px]` → `px-2 py-0.5 text-[9px]`) so
+  both stay proportionate to the small pin glyph instead of dwarfing it. Recolored the pin fill AND
+  the pulse ring from the route indigo (`P.route`) to a new dedicated red constant (`PIN_COLOR =
+  "#e5484d"`), per the founder's follow-up that the ring should match. The pin's white inner
+  ring/dot (contrast detail) were left unchanged. `pnpm typecheck` clean.
+- **Artifacts:** `src/features/dashboard/UebenPath.tsx` · commit `806195c`.
+
+## Entry 371 — 2026-07-13 (session 106 continued, toggle/heading layout-shift fix + ship)
+
+- **Branch:** `claude/pin-sizing-color-6lofhi` (Sonnet 5)
+- **Prompts (verbatim):**
+  > for some reason when switching between ueben and spielen, the page toggle button is bomving up and down. Keep the button fixed in one position, same with the heading.
+  > are the changes live? if not push them. Also, document the session
+- **Response summary:** Reproduced the bug with a headless Playwright probe against the dev server
+  (onboarding bypassed via a seeded `b2beruf.settings.v1` localStorage entry) rather than guessing:
+  measured the Üben/Spielen toggle's bounding box before and after a tab switch and confirmed a ~13px
+  vertical jump on desktop widths (1024–1920px; mobile was already stable). Root cause: the Üben and
+  Spielen panels render at different natural heights (~581px vs ~607px), and the toggle sits above
+  them inside a `justify-center`d flex column on desktop, so the differing panel height shifted the
+  whole column's centered position, moving both the toggle and each panel's own `<h1>` heading. Fix
+  (`Dashboard.tsx`): the sliding content wrapper now reserves the taller panel's height
+  (`lg:min-h-[38rem]`) so the stack's total height, and therefore its centered position, stays
+  constant regardless of which tab is active. Re-verified with the same Playwright probe: toggle and
+  both headings now sit at identical coordinates before/after every switch, at mobile and desktop
+  widths. Gates: typecheck ✔, lint 0 errors (pre-existing warnings only), `pnpm build` + prerender ✔,
+  `check:bundle` 76.9 kB/400. On the "are changes live" question: the two commits above were already
+  pushed to the feature branch but `main` (production, per this repo's deploy model) did not yet have
+  them, so opened PR #487 and squash-merged it into `main` to ship both fixes; also updated
+  `docs/PROJECT_STATUS.md` (moved the s104 Bibliothek pre-demo handoff into the W28 archive, added the
+  s106 handoff) and this log per the standing documentation rule.
+- **Artifacts:** `src/features/dashboard/Dashboard.tsx` · commit `fe39da9` · PR #487 (squash-merged to
+  `main`) · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` ·
+  `docs/SESSION_PROMPT_LOG.md`.

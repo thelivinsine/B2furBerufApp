@@ -80,6 +80,10 @@ const MAP_DARK = {
   route: "#a6a6fd",
 };
 
+// The "you are here" pin is a dedicated red (distinct from the indigo route
+// line) so it reads as a live location marker, not part of the path itself.
+const PIN_COLOR = "#e5484d";
+
 // White glyphs inside the landmark tiles (drawn at the tile center).
 function TileGlyph({ kind, color }: { kind: (typeof STOPS)[number]["key"]; color: string }) {
   switch (kind) {
@@ -319,15 +323,16 @@ export default function UebenPath() {
               </g>
             ))}
 
-            {/* current stop: pulse ring + location pin */}
-            <circle cx={pinX} cy={pinY} r={12} fill="none" stroke={P.route} strokeWidth={2} className="uben-pulse" />
+            {/* current stop: pulse ring + location pin, both in the pin's red
+                so the ring reads as "part of the marker", not the route */}
+            <circle cx={pinX} cy={pinY} r={8} fill="none" stroke={PIN_COLOR} strokeWidth={1.5} className="uben-pulse" />
             {/* pin at 70% (founder s104 follow-up), scaled about its tip so it
                 still points exactly at the stop */}
             <g transform={`translate(${pinX} ${pinY}) scale(0.7)`}>
               <ellipse cx={0} cy={3} rx={7} ry={2.4} fill="#3b3f4a" opacity={0.18} />
               <path
                 d="M0 2 c-8 -10.5 -12 -16 -12 -22.5 a12 12 0 1 1 24 0 c0 6.5 -4 12 -12 22.5 z"
-                fill={P.route}
+                fill={PIN_COLOR}
                 stroke={P.pinRing}
                 strokeWidth={2.5}
               />
@@ -337,16 +342,18 @@ export default function UebenPath() {
         </svg>
 
           {/* "Du bist hier" chip floats beside the pin, per-stop placement so
-              it never covers the current stop's tile (chipPos in STOPS) */}
+              it never covers the current stop's tile (chipPos in STOPS);
+              sized down (s106 follow-up) so it stays proportionate to the
+              now-smaller pin instead of dwarfing it */}
           <span
             className={cn(
-              "absolute whitespace-nowrap rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-bold shadow-soft",
+              "absolute whitespace-nowrap rounded-full border border-border bg-surface px-2 py-0.5 text-[9px] font-bold shadow-soft",
               STOPS[currentIndex].chipPos === "right" ? "-translate-y-1/2" : "-translate-x-1/2 -translate-y-full",
             )}
             style={
               STOPS[currentIndex].chipPos === "right"
-                ? { left: `${((pinX + 12) / 360) * 100}%`, top: `${((pinY + 5 - 8) / 240) * 100}%` }
-                : { left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 23) / 240) * 100}%` }
+                ? { left: `${((pinX + 9) / 360) * 100}%`, top: `${((pinY + 5 - 6) / 240) * 100}%` }
+                : { left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 20) / 240) * 100}%` }
             }
           >
             Du bist hier
