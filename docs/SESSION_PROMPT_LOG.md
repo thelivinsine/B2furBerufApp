@@ -4687,3 +4687,29 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
   `src/features/grammar/GrammarHub.tsx` · `src/features/grammar/GrammarTopicView.tsx` (PR #509, squash
   `3c8b179`) · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 382 — 2026-07-13 (session 112 cont., feedback backend never deployed → founder set it up)
+
+- **Branch:** `claude/predemo-opus-tasks-ek5qhz` (Opus 4.8; follow-up to entry 377)
+- **Prompts (verbatim):**
+  > tell me what exactly to do clearly in supabase
+  > my project folder is in github repo. I can't open terminal there to run the edge function - what to do?
+  > there's no submit-feedback function in the list
+  > it's done
+  > document the session.
+- **Response summary:** After entry 377 shipped the `submit-feedback` rate-limit change, the founder
+  asked how to activate it. **Key discovery: the `submit-feedback` Edge Function was never deployed at
+  all** (it was authored in s105 but the CLI deploy step never ran), so the feedback backend — table,
+  function, and Resend key — did not exist in Supabase and the live feedback button was non-functional.
+  The founder cannot use a local terminal (project lives only in the GitHub repo), so I gave a
+  **dashboard-only setup path**: (1) create the `public.feedback` table by pasting migration 0006's SQL
+  into the SQL Editor; (2) create a new Edge Function named exactly `submit-feedback`, paste the code
+  from the repo, deploy, and **turn OFF "Verify JWT"** (anonymous feedback must be allowed); (3) add the
+  `RESEND_API_KEY` secret so the email actually sends. Founder completed all three ("it's done"), so the
+  feedback feature — including the s112 rate limit — is now live end-to-end. Suggested a one-message
+  self-test (toast "Danke für dein Feedback!" + an email within a minute) and offered a future
+  GitHub-Actions auto-deploy workflow so functions redeploy on merge (not built; offered). Docs updated
+  per policy (this entry + a follow-up bullet on the s112 handoff in `PROJECT_STATUS.md`). No app code
+  changed in this follow-up.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` (docs only; the Supabase setup
+  was done by the founder in the dashboard, no repo change).
