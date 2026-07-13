@@ -51,6 +51,15 @@ export function watchSwUpdates(): void {
     const now = Date.now();
     if (now - lastCheck < 60_000) return;
     lastCheck = now;
-    void navigator.serviceWorker.getRegistration().then((reg) => reg?.update());
+    // A background update check is best-effort: offline / airplane mode / a
+    // transient network blip makes `update()` reject with "Failed to update a
+    // ServiceWorker ... An unknown error occurred when fetching the script".
+    // That is harmless (the app runs from the precache), so swallow it — an
+    // unhandled rejection here would otherwise trip the global error handler
+    // and paint the fatal "App failed to load" screen over a working app.
+    void navigator.serviceWorker
+      .getRegistration()
+      .then((reg) => reg?.update())
+      .catch(() => {});
   });
 }

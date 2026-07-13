@@ -49,3 +49,20 @@ export function isChunkLoadError(error: unknown): boolean {
     msg.includes("Unable to preload CSS")
   );
 }
+
+/**
+ * True if an error is a Service Worker registration/update failure. These are
+ * NON-FATAL: the app is already running from the precache, so a failed
+ * background SW fetch (offline, airplane mode, a transient network blip, or a
+ * momentary hiccup serving `sw.js`) must never crash the UI into the fatal
+ * error screen. We swallow them; the SW simply updates on the next try.
+ */
+export function isServiceWorkerError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error);
+  return (
+    msg.includes("ServiceWorker") ||
+    msg.includes("Service Worker") ||
+    msg.includes("service worker") ||
+    msg.includes("/sw.js")
+  );
+}
