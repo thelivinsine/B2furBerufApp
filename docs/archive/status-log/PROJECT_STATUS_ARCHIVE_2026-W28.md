@@ -1815,3 +1815,26 @@ showed one account's progress under another.
   reloaded on switch (correct + robust, but a future hardening could namespace the persist key per uid to
   avoid any wipe entirely). Live verification on a real phone with two accounts is left to the founder
   (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain untouched.
+
+**Handoff after session 109 (2026-07-13). Two founder bug reports from phone screenshots: the ugly
+"App failed to load" screen + the Wörter graph opening too zoomed-out (Opus 4.8), on branch
+`claude/app-loading-screen-5av7dt`, shipped as PR #496 (squash-merged `b6998ee`).**
+- **"App failed to load" screen (offline SW-update crash):** the reported screenshot was taken in
+  **airplane mode**. On app resume, `lib/swUpdate.ts` calls `reg.update()` (no `.catch()`) to check for a
+  new deploy; offline / on any transient network blip the browser can't fetch `sw.js`, so `update()`
+  rejects with *"Failed to update a ServiceWorker … An unknown error occurred when fetching the script"*.
+  That unhandled rejection tripped `main.tsx`'s global handler → the raw monospace `paintFatal` screen,
+  **over a working app** (it runs from the precache). Fix: (1) `swUpdate.ts` swallows the best-effort
+  `update()` rejection with `.catch()`; (2) new `isServiceWorkerError()` in `lib/recover.ts`, and both
+  global `error`/`unhandledrejection` handlers in `main.tsx` now ignore SW registration/update failures
+  (non-fatal); (3) `paintFatal` repainted as a calm branded card (headline + *Neu laden* button) with the
+  raw error/stack behind a collapsed *Technische Details* expander (mobile-debug net preserved).
+- **Wörter graph default zoom (`features/vocabulary/WordGraph.tsx`):** opened at `k=2.2` (max node radius
+  is only 12 world units, so the biggest circle was ~26px). Raised the initial open zoom to `k=3.4` and
+  centered the opening view on an **area-weighted (frequent)** node (r² ∝ wordfreq) so it lands among
+  common, well-connected words instead of a lone rare word in an empty corner. The fit button's
+  zoom-to-frequent-word target was matched to the same `k` (was 2.6).
+- **Gates:** typecheck ✔, lint **0 errors** (43 pre-existing warnings), `pnpm build` + prerender ✔,
+  `test:unit` **134/134**.
+- **NOT done:** live verification on a real phone (offline crash no longer appears; graph zoom feel) is
+  left to the founder (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain.
