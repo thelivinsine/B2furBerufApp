@@ -5,7 +5,7 @@ import { Flame, Loader2 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { BottomTabBar } from "./BottomTabBar";
 import { GlobalSearch } from "./GlobalSearch";
-import { FeedbackButton } from "./FeedbackButton";
+import { FeedbackDialog, FeedbackPill } from "./FeedbackButton";
 import { useEffectiveStreak } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
@@ -106,9 +106,12 @@ export function AppShell() {
           the middle sections reorder via a long-press easter egg. */}
       {!focus && <BottomTabBar />}
 
-      {/* AI-built disclaimer + feedback entry, on every page except focus mode
-          (a full-screen session shouldn't be interrupted). */}
-      {!focus && <FeedbackButton />}
+      {/* The single feedback dialog is mounted app-wide (even in focus mode, so
+          the in-session feedback button can open it). The quiet floating pill
+          (desktop bottom-right) shows only outside focus mode; mobile + the
+          session use their own triggers (icon beside Üben / in-session button). */}
+      <FeedbackDialog />
+      {!focus && <FeedbackPill />}
 
       <div className={cn(!focus && "lg:pl-64")}>
         {/* Top bar */}

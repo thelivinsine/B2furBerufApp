@@ -6,6 +6,7 @@ import { collocations, collocationsByTheme, collocationsBySubTheme } from "@/dat
 import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
+import { useSessionStore } from "@/store/useSessionStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
@@ -25,6 +26,7 @@ import {
 } from "@/lib/facets";
 import type { WorkSector } from "@/types";
 import { FilterRail } from "@/features/shared/FilterRail";
+import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
 import { SearchField } from "@/features/shared/SearchField";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { CollocationTable, CollocationCompactList } from "./CollocationViews";
@@ -99,6 +101,7 @@ export function CollocationsBrowser() {
   // decision 2026-07-09, "Mode on top").
   const learningMode = useSettingsStore((s) => s.mode);
   const scope = useLibraryScope();
+  const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
   const [showAllLevels, setShowAllLevels] = useState(false);
   // Mobile filter panel open state: the toggle is an icon on the view line.
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -260,14 +263,12 @@ export function CollocationsBrowser() {
   // multi-Thema/Unterthema selection collapses to its first value (the
   // session engine biases ONE session, not several themes, s104); every
   // selected Branche is forwarded since `libraryFocus`'s sector is a list.
+  // Üben practises EXACTLY the filtered collocations (founder 2026-07-13): hand
+  // the tab's filtered ids to the session store, launch a collocation-only
+  // session with `?src=lib`.
   const startSession = () => {
-    const p = new URLSearchParams();
-    if (activeTheme) p.set("theme", activeTheme.id);
-    if (subFilter?.length) p.set("sub", subFilter[0]);
-    if (selection.cefr?.length) p.set("cefr", selection.cefr.join(","));
-    if (sectors.length) p.set("sector", sectors.join(","));
-    const q = p.toString();
-    navigate(`/session${q ? `?${q}` : ""}`);
+    setLibrarySession({ type: "collocation", ids: filtered.map((c) => c.id) });
+    navigate("/session?src=lib");
   };
 
   // The filter tile is the single filter surface on BOTH breakpoints (founder
@@ -526,6 +527,7 @@ export function CollocationsBrowser() {
 
         {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+          <FeedbackIconButton />
           <Button variant="gradient" className="h-11 flex-1 rounded-xl text-base" onClick={startSession}>
             <Zap className="h-4 w-4" /> Üben
           </Button>
@@ -541,7 +543,7 @@ export function CollocationsBrowser() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-11rem)] lg:overflow-hidden"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-21rem)] lg:overflow-hidden"
         />
       </div>
     </div>

@@ -5,6 +5,7 @@ import { Zap, Search, SlidersHorizontal } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelCategories } from "@/data/redemittel";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useSessionStore } from "@/store/useSessionStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FlipCard } from "@/features/shared/FlipCard";
@@ -16,6 +17,7 @@ import {
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
+import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch } from "@/lib/fuzzy";
@@ -53,6 +55,7 @@ const REDEMITTEL_FACET_IDS = REDEMITTEL_FACETS.map((f) => f.id);
 export function RedemittelTrainer() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
+  const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
   const [search, setSearch] = useState("");
   const level = useSettingsStore((s) => s.level);
   const [showAllLevels, setShowAllLevels] = useState(false);
@@ -114,12 +117,13 @@ export function RedemittelTrainer() {
     [searched, railSelection],
   );
 
-  // The session engine's `libraryFocus` category is a single value, so a
-  // multi-Kategorie selection collapses to its first pick here rather than
-  // teaching the session composer a multi-category mode (s104).
-  const catSel = railSelection.cat ?? [];
-  const startSession = () =>
-    navigate(catSel.length === 1 ? `/session?cat=${catSel[0]}` : "/session");
+  // Üben practises EXACTLY the filtered Redemittel (founder 2026-07-13): hand the
+  // tab's filtered ids to the session store and launch a Redemittel-only session
+  // with `?src=lib`, so "Üben" on this tab is never a generic vocab session.
+  const startSession = () => {
+    setLibrarySession({ type: "redemittel", ids: filtered.map((r) => r.id) });
+    navigate("/session?src=lib");
+  };
 
   // The filter tile is the single filter surface on BOTH breakpoints (founder
   // follow-up, s91): desktop rail + mobile tile share these props. Kategorie +
@@ -332,6 +336,7 @@ export function RedemittelTrainer() {
 
         {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+          <FeedbackIconButton />
           <Button
             variant="gradient"
             className="h-11 flex-1 rounded-xl text-base"
@@ -351,7 +356,7 @@ export function RedemittelTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-11rem)] lg:overflow-hidden"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-21rem)] lg:overflow-hidden"
         />
       </div>
     </div>

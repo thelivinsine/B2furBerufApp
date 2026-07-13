@@ -11,6 +11,8 @@ import {
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
+import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { useSessionStore } from "@/store/useSessionStore";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch } from "@/lib/fuzzy";
@@ -45,6 +47,7 @@ const FACET_IDS = GRAMMAR_FACETS.map((f) => f.id);
 export function GrammarHub() {
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
+  const setLibrarySession = useSessionStore((s) => s.setLibrarySession);
   const [search, setSearch] = useState("");
   const [view, setView] = useViewParam(GRAMMAR_VIEWS);
   // Mobile filter panel open state: the toggle is an icon on the view line.
@@ -92,6 +95,14 @@ export function GrammarHub() {
     [searched, railSelection],
   );
 
+  // Üben drills EXACTLY the filtered grammar topics (founder 2026-07-13): hand the
+  // filtered topic ids to the session store and launch a grammar-only session
+  // with `?src=lib`, so "Üben" on a group practises that group's drills only.
+  const startSession = () => {
+    setLibrarySession({ type: "grammar", ids: filtered.map((t) => t.id) });
+    navigate("/session?src=lib");
+  };
+
   // Keep `tab=grammatik` (and any other params) intact when opening/closing a
   // topic; replacing the whole param set bounced /library back to the default
   // Wörter tab.
@@ -120,7 +131,7 @@ export function GrammarHub() {
     onChange: setRailSelection,
     pinScope: "grammatik",
     footer: (
-      <Button variant="gradient" className="h-10 w-full" onClick={() => navigate("/session")}>
+      <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
         <Zap className="h-3.5 w-3.5" /> Üben
       </Button>
     ),
@@ -262,10 +273,11 @@ export function GrammarHub() {
 
         {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
+          <FeedbackIconButton />
           <Button
             variant="gradient"
             className="h-11 flex-1 rounded-xl text-base"
-            onClick={() => navigate("/session")}
+            onClick={startSession}
           >
             <Zap className="h-4 w-4" /> Üben
           </Button>
@@ -281,7 +293,7 @@ export function GrammarHub() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-11rem)] lg:overflow-hidden"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-21rem)] lg:overflow-hidden"
         />
       </div>
     </div>

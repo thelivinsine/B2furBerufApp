@@ -4276,3 +4276,33 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
   `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 369 — 2026-07-13 (session 105 continued, Üben scoping + rail overlap + feedback rework)
+
+- **Branch:** `claude/demo-prep-feedback-rename-sl1jqq` (Opus 4.8)
+- **Prompts (verbatim):**
+  > In your desktop screenshots, the filter rail is still too long and overflows on to the feedback pill - why do you say it clears it? You need to fix it without hallucinations. the customized ueben doesn't seem to work. I clicked on ueben when in Redemittel page but the practice session shows something else. Fix it. When I'm on Redemittel page, I should get quiz about Redemittel only. When I'm in Konnektors page in Redemittel, I should get practice exercises only about Konnektors. Apply the same logic for the whole bibliothek
+  > [screenshot] the feedback button is overlapping the content cells. on mobile, it should just be an icon/button which always should stay to the left of Ueben button. When clicked on ueben in ueben page of Praktisch, attached is what I see. The the cell is overflowing. also, here, the feedback button can be longer saying developed with KI feedback geben. there's enough space in ueben practice sessions, so this should always be available there.
+- **Response summary:** (1) **Rail overlap fixed for real (measured, not guessed):** Playwright
+  showed the sticky rail's UNSCROLLED top is 255px (not the 96px sticky-top I assumed), so
+  `max-h:100vh-11rem` still gave `railBottom 879 > pillTop 750` = overlap. Re-measured → set
+  `100vh-21rem` across the 4 tabs; re-measured **overlap:false** at 700/800/900 (31px gap). (2)
+  **Bibliothek Üben is now content-scoped:** each tab's Üben hands its exact filtered ids +
+  content type to the session store (`librarySession`) and launches `/session?src=lib`; a new
+  `buildScopedSession` builds a session of ONLY that type — Redemittel→Redemittel flashcards,
+  a Grammatik group→that group's drills, Wörter→vocab, Kollokationen→collocation flashcards (new
+  `"collocation"` flashcard source, recognition-only/XP). Verified: Redemittel Üben → "Redemittel"
+  badge, Konnektoren → "Grammatik · Zweiteilige Konnektoren", Wörter → "Vokabel". (3) **Flashcard
+  overflow fixed:** the session flashcard grid had no column template + no word-break, so a long
+  compound (Wohnungsgeberbestätigung) overflowed; added `grid-cols-1` + `break-words` (0 px overflow).
+  (4) **Feedback rework:** one store-controlled `FeedbackDialog` (mounted app-wide, even in focus);
+  the desktop bottom-right pill stays; on **mobile** the affordance is a compact **icon to the left
+  of the Üben button** in each browse action bar (no more floating pill over cards); **inside a
+  practice session** the full "Mit KI gebaut · Feedback geben" button is always shown. Gates:
+  typecheck ✔, lint 0 errors, test:unit 130/130, build ✔, bundle 76.8 kB. Merged to `main`.
+- **Artifacts:** `src/engine/session.ts` · `src/features/session/SessionPlayer.tsx` ·
+  `src/features/session/Session.tsx` · `src/store/useSessionStore.ts` · `src/types/index.ts` ·
+  `src/components/layout/FeedbackButton.tsx` · `src/components/layout/AppShell.tsx` ·
+  `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
+  `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
+  `docs/SESSION_PROMPT_LOG.md`.
