@@ -4647,6 +4647,7 @@ Branch: `claude/whats-next-esga9u`.
 - **Prompts (verbatim):**
   > In Theory page, whenever I'm switching between the lage toggles like worter or Redemittel.. the page loads all the time.. it looks ugly. Ideally the content should slide side to side similar to Praktisch pages. find the issue and fix it.
   > continue with what you're up to and when done, also increase the compass icon size to visually match the other icons' sizes.
+  > document the session
 - **Response summary:** Root-caused the Theorie (`/library`) tab switch feeling like a reload: `LibraryHub`
   remounted the whole segment behind `Suspense fallback={null}` (blank flash on cold chunks) and an
   enter-only CSS keyframe (`.lib-slide-in-*`) with no coordinated exit. Replaced it with the Praktisch
