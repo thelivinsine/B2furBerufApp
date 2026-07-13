@@ -368,7 +368,7 @@ const nachhaltigkeit: Scenario = {
       options: [
         {
           id: "k3a",
-          text: "Lass uns einen Stufenplan machen: Dieses Jahr die günstigen Maßnahmen, nächstes Jahr Ökostrom. So bleiben wir im Budget.",
+          text: "Lass uns einen Stufenplan machen: dieses Jahr die günstigen Maßnahmen, nächstes Jahr Ökostrom. So bleiben wir im Budget.",
           uses: "compromise",
           quality: 1,
           feedback: "Ausgezeichnet: ein tragfähiger Kompromiss mit Zeitplan.",
@@ -983,7 +983,7 @@ const sicherheit: Scenario = {
         },
         {
           id: "s4b",
-          text: "Wir teilen das auf: du kümmerst dich um das Geländer, ich um die anderen beiden Punkte.",
+          text: "Wir teilen das auf: Du kümmerst dich um das Geländer, ich um die anderen beiden Punkte.",
           uses: "compromise",
           quality: 0.8,
           feedback: "Gut – klare Aufteilung, aber ohne Deadlines bleibt die Verbindlichkeit unklar.",

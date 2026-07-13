@@ -591,7 +591,7 @@ export const redemittel: RedemittelPhrase[] = [
   },
   {
     id: "r_neg7",
-    de: "Lassen Sie uns einen Schritt auf einander zugehen.",
+    de: "Lassen Sie uns einen Schritt aufeinander zugehen.",
     en: "Let's move a step towards each other.",
     category: "negotiation",
     register: "formal",
@@ -672,7 +672,7 @@ export const redemittel: RedemittelPhrase[] = [
     category: "clarification",
     register: "formal",
     cefr: "B1.1",
-    example: { de: "Was genau meinen Sie mit „kurzfristig\"?", en: "What exactly do you mean by 'short-term'?" },
+    example: { de: "Was genau meinen Sie mit „kurzfristig“?", en: "What exactly do you mean by 'short-term'?" },
   },
   {
     id: "r_cla7",
