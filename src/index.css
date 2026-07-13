@@ -208,6 +208,36 @@ input:-webkit-autofill {
     @apply bg-muted-foreground/50;
   }
 
+  /* Auto-hiding slim scrollbar for the desktop filter-rail body: the thumb is
+     invisible until the container is hovered, then a slim thumb fades in
+     (founder 2026-07-13). Keeps the constrained tile calm while still clearly
+     scrollable on hover. Mobile never uses this (the mobile filter panel grows
+     naturally and is not a scroll container). */
+  .scrollbar-hover {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  .scrollbar-hover:hover {
+    scrollbar-color: hsl(var(--muted-foreground) / 0.35) transparent;
+  }
+  .scrollbar-hover::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-hover::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-hover::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 9999px;
+  }
+  .scrollbar-hover:hover::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/40;
+  }
+  .scrollbar-hover:hover::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/60;
+  }
+
   /* Safe-area helpers for notch / home-indicator devices. We opt into
      `viewport-fit=cover` in index.html, which extends content under the
      status bar, home indicator and side cutouts — these honour the OS insets

@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import {
   activeFacetCount,
   matchesFacets,
+  type FacetDef,
   type FacetSelection,
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch } from "@/lib/fuzzy";
-import { grammarFacets, GRAMMAR_FACET_IDS } from "@/lib/facets";
+import { grammarFacets } from "@/lib/facets";
+import type { GrammarTopic } from "@/types";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { groupMeta, groupOrder, orderedGrammar } from "./grammarMeta";
 import { GrammarTopicCards, GrammarCompactList } from "./GrammarViews";
@@ -24,7 +26,21 @@ import { GrammarTopicView } from "./GrammarTopicView";
 // default lens, Liste the fast scan; there is no Tabelle (a lesson is not a
 // row of atomic facts).
 const GRAMMAR_VIEWS: LibraryView[] = ["karten", "liste"];
-const GRAMMAR_FACETS = grammarFacets();
+
+// Gruppe is a multi-select PILL facet (founder 2026-07-13), unified with the
+// Redemittel Kategorie facet: it renders as pills with "Mehr anzeigen", allows
+// several groups at once, and still rides the `?group=` param. (It used to be a
+// single scope dropdown.)
+const GROUP_FACET: FacetDef<GrammarTopic> = {
+  id: "group",
+  label: "Gruppe",
+  options: groupOrder
+    .filter((g) => grammar.some((t) => t.group === g))
+    .map((g) => ({ value: g, label: groupMeta[g].labelDe })),
+  get: (t) => t.group,
+};
+const GRAMMAR_FACETS = [GROUP_FACET, ...grammarFacets()];
+const FACET_IDS = GRAMMAR_FACETS.map((f) => f.id);
 
 export function GrammarHub() {
   const [params, setParams] = useSearchParams();
@@ -39,17 +55,12 @@ export function GrammarHub() {
 
   const topicId = params.get("topic");
   const topic = topicId ? grammarById(topicId) : undefined;
-  // Gruppe is multi-select (s104, founder decision): a comma-list URL param,
-  // empty/absent = "everything".
-  const groups = useMemo(() => {
-    const raw = params.get("group");
-    return raw ? raw.split(",").filter(Boolean) : [];
-  }, [params]);
 
-  // Facet selection rides in the URL (`?cefr=B1.2,B2.1`), like the sibling tabs.
+  // Facet selection rides in the URL (`?group=…&cefr=B1.2,B2.1`), like the
+  // sibling tabs. `group` is now one of the facet ids (see GROUP_FACET).
   const railSelection = useMemo(() => {
     const s: FacetSelection = {};
-    for (const id of GRAMMAR_FACET_IDS) {
+    for (const id of FACET_IDS) {
       const raw = params.get(id);
       if (raw) s[id] = raw.split(",");
     }
@@ -58,7 +69,7 @@ export function GrammarHub() {
 
   const setRailSelection = (next: FacetSelection) => {
     const p = new URLSearchParams(params);
-    for (const id of GRAMMAR_FACET_IDS) {
+    for (const id of FACET_IDS) {
       const values = next[id] ?? [];
       if (values.length) p.set(id, values.join(","));
       else p.delete(id);
@@ -66,32 +77,20 @@ export function GrammarHub() {
     setParams(p, { replace: true });
   };
 
-  // ONE filter pipeline: Gruppe scope -> search -> facets. `searched`
-  // (pre-facet) feeds the FilterRail so its Stufe counts reflect what a tap
+  // ONE filter pipeline: search -> facets (Gruppe + Stufe). `searched`
+  // (pre-facet) feeds the FilterRail so its facet counts reflect what a tap
   // would yield. Order is the B2-marker priority spine, not the bank order.
-  const scoped = useMemo(
-    () => (groups.length ? orderedGrammar.filter((t) => groups.includes(t.group)) : orderedGrammar),
-    [groups],
-  );
-
   const searched = useMemo(() => {
-    if (!search.trim()) return scoped;
-    return scoped.filter((t) =>
+    if (!search.trim()) return orderedGrammar;
+    return orderedGrammar.filter((t) =>
       fuzzyMatch(search, [t.titleDe, t.title, t.purposeDe, t.pattern, groupMeta[t.group].labelDe]),
     );
-  }, [scoped, search]);
+  }, [search]);
 
   const filtered = useMemo(
     () => searched.filter((t) => matchesFacets(t, GRAMMAR_FACETS, railSelection)),
     [searched, railSelection],
   );
-
-  const setGroups = (next: string[]) => {
-    const p = new URLSearchParams(params);
-    if (next.length) p.set("group", next.join(","));
-    else p.delete("group");
-    setParams(p, { replace: true });
-  };
 
   // Keep `tab=grammatik` (and any other params) intact when opening/closing a
   // topic; replacing the whole param set bounced /library back to the default
@@ -108,18 +107,6 @@ export function GrammarHub() {
     setParams(p, { replace: true });
   };
 
-  const groupOptions = useMemo(
-    () =>
-      groupOrder
-        .map((g) => ({
-          value: g,
-          label: groupMeta[g].labelDe,
-          count: grammar.filter((t) => t.group === g).length,
-        }))
-        .filter((o) => o.count > 0),
-    [],
-  );
-
   if (topicId && topic) {
     return <GrammarTopicView topic={topic} onBack={closeTopic} onOpenTopic={openTopic} />;
   }
@@ -127,16 +114,6 @@ export function GrammarHub() {
   // The filter tile is the single filter surface on BOTH breakpoints: desktop
   // rail + mobile panel share these props (same pattern as the sibling tabs).
   const filterRailProps = {
-    scopes: [
-      {
-        pinId: "primary",
-        label: "Gruppe",
-        values: groups,
-        onChange: setGroups,
-        all: { value: "all", label: "Alle Gruppen", count: grammar.length },
-        options: groupOptions,
-      },
-    ],
     items: searched,
     facets: GRAMMAR_FACETS,
     selection: railSelection,
@@ -166,54 +143,75 @@ export function GrammarHub() {
 
           {/* Toolbar: mobile filter toggle · view switcher · search icon. */}
           <div className="flex w-full flex-col gap-2">
-            <div className="flex w-full items-center justify-between gap-2">
-              <Button
-                size="icon"
-                variant={filtersOpen ? "default" : "outline"}
-                aria-pressed={filtersOpen}
-                aria-expanded={filtersOpen}
-                aria-label="Filter"
-                title="Filter"
-                className="relative shrink-0 rounded-lg lg:hidden"
-                onClick={() => setFiltersOpen((o) => !o)}
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                {activeFacetCount(railSelection) > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
-                    {activeFacetCount(railSelection)}
-                  </span>
-                )}
-              </Button>
-              <ViewSwitcher views={GRAMMAR_VIEWS} value={view} onChange={setView} />
+            {/* Items are centered while search is closed; opening search slides
+                the icon groups apart to make room for the field (founder
+                2026-07-13). */}
+            <motion.div
+              layout={!reduce}
+              className={`flex w-full items-center gap-2 ${searchOpen ? "justify-between" : "justify-center"}`}
+            >
+              <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
+                <Button
+                  size="icon"
+                  variant={filtersOpen ? "default" : "outline"}
+                  aria-pressed={filtersOpen}
+                  aria-expanded={filtersOpen}
+                  aria-label="Filter"
+                  title="Filter"
+                  className="relative shrink-0 rounded-lg lg:hidden"
+                  onClick={() => setFiltersOpen((o) => !o)}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {activeFacetCount(railSelection) > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+                      {activeFacetCount(railSelection)}
+                    </span>
+                  )}
+                </Button>
+                <ViewSwitcher views={GRAMMAR_VIEWS} value={view} onChange={setView} />
+              </motion.div>
               {/* Desktop: an open search grows inline in this row (founder
                   s104: no third line). Mobile keeps the second row below. */}
-              {searchOpen && (
-                <SearchField
-                  value={search}
-                  onChange={setSearch}
-                  placeholder="Suche nach Thema, Muster …"
-                  autoFocus
-                  className="hidden min-w-0 lg:block lg:flex-1"
-                />
-              )}
-              <Button
-                size="icon"
-                variant={searchOpen || search.trim() ? "default" : "outline"}
-                aria-pressed={searchOpen}
-                aria-expanded={searchOpen}
-                aria-label="Suche"
-                title="Suche"
-                className="shrink-0 rounded-lg"
-                onClick={() =>
-                  setSearchOpen((o) => {
-                    if (o) setSearch("");
-                    return !o;
-                  })
-                }
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
+              <AnimatePresence initial={false}>
+                {searchOpen && (
+                  <motion.div
+                    key="search-inline"
+                    layout={!reduce}
+                    initial={{ opacity: 0, scaleX: 0.9 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    exit={{ opacity: 0, scaleX: 0.9 }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
+                    className="hidden min-w-0 flex-1 origin-left lg:block"
+                  >
+                    <SearchField
+                      value={search}
+                      onChange={setSearch}
+                      placeholder="Suche nach Thema, Muster …"
+                      autoFocus
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
+                <Button
+                  size="icon"
+                  variant={searchOpen || search.trim() ? "default" : "outline"}
+                  aria-pressed={searchOpen}
+                  aria-expanded={searchOpen}
+                  aria-label="Suche"
+                  title="Suche"
+                  className="shrink-0 rounded-lg"
+                  onClick={() =>
+                    setSearchOpen((o) => {
+                      if (o) setSearch("");
+                      return !o;
+                    })
+                  }
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </motion.div>
+            </motion.div>
 
             {/* Mobile-only second row (desktop shows it inline above). */}
             {searchOpen && (
@@ -283,7 +281,7 @@ export function GrammarHub() {
 
         <FilterRail
           {...filterRailProps}
-          className="slim-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden lg:overflow-y-auto"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden"
         />
       </div>
     </div>

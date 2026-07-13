@@ -16,11 +16,16 @@ const BRAND = "#5b5be6";
 type Render = (c: string) => React.ReactNode;
 
 const RENDERERS: Record<string, Render> = {
-  // Dashboard / Home — a house (indigo roof + neon-cyan body)
+  // Praktisch (the practical / hands-on zone: Üben + Spielen) — a dumbbell
+  // (indigo handle + end caps, neon-cyan plates). Replaced the old house glyph
+  // when "Heute" was renamed "Praktisch" (founder, 2026-07-13).
   "/": c => (
     <>
-      <path d="M10 2.2 1.5 9.3H18.5L10 2.2Z" fill={c} />
-      <path d="M3.3 9.3V17.8H7.7V13H12.3V17.8H16.7V9.3Z" fill="#22d3ee" />
+      <rect x="5.5"  y="8.9" width="9"   height="2.2" rx="1.1" fill={c} />
+      <rect x="3.4"  y="5.8" width="2.9" height="8.4" rx="1.2" fill="#22d3ee" />
+      <rect x="13.7" y="5.8" width="2.9" height="8.4" rx="1.2" fill="#22d3ee" />
+      <rect x="1.6"  y="7.4" width="2"   height="5.2" rx="1"   fill={c} />
+      <rect x="16.4" y="7.4" width="2"   height="5.2" rx="1"   fill={c} />
     </>
   ),
   // Wortschatz — two-tone open book (indigo spine + cyan right page), matching
@@ -146,7 +151,7 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 
 // [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
-  "/":             { box: [1.5, 2.2, 17, 15.6],     weight: 1.07 },
+  "/":             { box: [1.6, 5.8, 16.8, 8.4],    weight: 1.04 },
   "/library":      { box: [2.8, 4, 15.2, 12],       weight: 1.05 },
   "/anwenden":     { box: [1.3, 1.3, 17.4, 17.4],   weight: 0.94 },
   "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },

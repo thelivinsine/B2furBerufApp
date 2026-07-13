@@ -65,11 +65,12 @@ const TopicCard = memo(function TopicCard({
               <GroupIconTile icon={meta.icon} className="h-10 w-10 rounded-xl" iconClassName="h-5 w-5" />
               <span className="flex items-center gap-1.5">
                 {/* Rank on the B2-marker priority spine: the recommended order
-                    for a learner who does not want to decide where to start. */}
+                    for a learner who does not want to decide where to start.
+                    The CEFR badge was dropped from the card (founder 2026-07-13):
+                    Stufe is a filter facet, so it is redundant on the tile. */}
                 <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-muted px-1.5 text-[11px] font-semibold tabular-nums text-muted-foreground">
                   {topicRank.get(topic.id)}
                 </span>
-                {topic.cefr && <Badge variant="muted">{topic.cefr}</Badge>}
               </span>
             </div>
 

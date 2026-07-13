@@ -5,7 +5,8 @@ import { Flame, Loader2 } from "lucide-react";
 import { Sidebar } from "./Sidebar";
 import { BottomTabBar } from "./BottomTabBar";
 import { GlobalSearch } from "./GlobalSearch";
-import { useEffectiveStreak, useTodayXp } from "@/store/useProgressStore";
+import { FeedbackButton } from "./FeedbackButton";
+import { useEffectiveStreak } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -40,12 +41,9 @@ export function AppShell() {
   // dashboard after a missed day.
   const streak = useEffectiveStreak();
 
-  // Greeting + daily-goal progress live in the desktop top row. Hour-based
-  // greeting keeps the header personal.
+  // Greeting only in the desktop top row (the XP line was removed, founder
+  // 2026-07-13). Hour-based greeting keeps the header personal.
   const name = useSettingsStore((s) => s.name);
-  const goal = useSettingsStore((s) => s.dailyGoalXp);
-  const todayXp = useTodayXp();
-  const goalPercent = Math.round(Math.min(todayXp / goal, 1) * 100);
   const hour = new Date().getHours();
   const greeting = hour < 11 ? "Guten Morgen" : hour < 18 ? "Hallo" : "Guten Abend";
 
@@ -108,6 +106,10 @@ export function AppShell() {
           the middle sections reorder via a long-press easter egg. */}
       {!focus && <BottomTabBar />}
 
+      {/* AI-built disclaimer + feedback entry, on every page except focus mode
+          (a full-screen session shouldn't be interrupted). */}
+      {!focus && <FeedbackButton />}
+
       <div className={cn(!focus && "lg:pl-64")}>
         {/* Top bar */}
         {/* Mobile gets a lighter blur + more opaque surface: backdrop-filter on
@@ -128,9 +130,6 @@ export function AppShell() {
                 <p className="text-sm font-semibold">
                   {greeting}
                   {name ? `, ${name}` : ""}
-                </p>
-                <p className="text-xs tabular-nums text-muted-foreground">
-                  {todayXp} / {goal} XP · {goalPercent}%
                 </p>
               </div>
             </div>

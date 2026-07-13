@@ -190,6 +190,9 @@ function ScopeMultiSelect({ p }: { p: RailPrimary }) {
   );
 }
 
+// Facets longer than this collapse behind "Mehr anzeigen" in the rail.
+const FACET_COLLAPSE_AT = 8;
+
 // One localStorage object maps a per-tab scope ("woerter", …) to its pinned
 // section ids ("primary" + facet ids). Storage failures (private mode) just
 // mean pins don't persist.
@@ -321,6 +324,11 @@ export function FilterRail<T>({
   className?: string;
 }) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  // Per-facet "Mehr/Weniger anzeigen" expansion (founder 2026-07-13): a facet
+  // with many options (e.g. Redemittel Kategorie, Grammatik Gruppe) shows only
+  // the first FACET_COLLAPSE_AT pills until expanded, so a long group list no
+  // longer floods the tile. Selected options always stay visible.
+  const [expandedFacets, setExpandedFacets] = useState<Set<string>>(new Set());
   const open = controlledOpen ?? internalOpen;
   const setOpen = (next: boolean) => (onOpenChange ? onOpenChange(next) : setInternalOpen(next));
   const [pins, setPins] = useState<string[]>(() => readPins(pinScope));
@@ -429,6 +437,16 @@ export function FilterRail<T>({
 
   const panel = layout === "panel";
 
+  // Collapsed facets show the first N pills plus any selected value beyond N
+  // (so an active filter is never hidden behind "Mehr anzeigen").
+  const facetVisibleOptions = (facet: FacetDef<T>) => {
+    if (facet.options.length <= FACET_COLLAPSE_AT || expandedFacets.has(facet.id)) {
+      return facet.options;
+    }
+    const selected = new Set(selection[facet.id] ?? []);
+    return facet.options.filter((o, i) => i < FACET_COLLAPSE_AT || selected.has(o.value));
+  };
+
   // A scope dropdown (Branche / Thema / Unterthema / Kategorie / Gruppe).
   // Rendered once per entry of the ordered `scopes` array. Multi-select
   // (s104): a checkbox popover, not a single-value Select, so the facet
@@ -441,6 +459,7 @@ export function FilterRail<T>({
         eyebrow
         pinned={pins.includes(p.pinId)}
         onTogglePin={() => togglePin(p.pinId)}
+        pinnable={!panel}
       />
       <ScopeMultiSelect p={p} />
     </section>
@@ -458,9 +477,10 @@ export function FilterRail<T>({
         eyebrow
         pinned={pins.includes(facet.id)}
         onTogglePin={() => togglePin(facet.id)}
+        pinnable={!panel}
       />
       <div className="flex flex-wrap gap-1.5">
-        {facet.options.map((opt) => {
+        {facetVisibleOptions(facet).map((opt) => {
           const selected = (selection[facet.id] ?? []).includes(opt.value);
           const count = optionCount(facet, opt.value);
           const disabled = count === 0 && !selected;
@@ -494,6 +514,24 @@ export function FilterRail<T>({
           );
         })}
       </div>
+      {facet.options.length > FACET_COLLAPSE_AT && (
+        <button
+          type="button"
+          onClick={() =>
+            setExpandedFacets((prev) => {
+              const next = new Set(prev);
+              if (next.has(facet.id)) next.delete(facet.id);
+              else next.add(facet.id);
+              return next;
+            })
+          }
+          className="mt-2 text-xs font-medium text-primary transition-colors hover:opacity-80"
+        >
+          {expandedFacets.has(facet.id)
+            ? "Weniger anzeigen"
+            : `Mehr anzeigen (${facet.options.length - FACET_COLLAPSE_AT})`}
+        </button>
+      )}
     </section>
   );
 
@@ -545,11 +583,15 @@ export function FilterRail<T>({
         // filter tile reads as a distinct surface against the white content
         // cards. The controls INSIDE stay white (the scope dropdowns and the
         // unselected facet pills are `bg-surface`), so they pop off the grey.
-        // On DESKTOP the aside is its own capped scroll container (the
-        // instance className adds `lg:overflow-y-auto` + `lg:max-h-…` + the
-        // slim scrollbar): the header sticks to its top, the Üben footer to
-        // its bottom, the middle scrolls. On MOBILE the tile grows naturally
-        // (no cap); the Üben footer sticks to the viewport bottom instead.
+        //
+        // On DESKTOP (the instance className adds `lg:flex lg:flex-col` +
+        // `lg:max-h-…` + `lg:overflow-hidden`) the tile is a strictly capped
+        // flex column: a fixed header, a fixed Üben footer, and ONE scroll
+        // region in between. The scrollbar therefore starts BELOW the header's
+        // separator line and never overlaps the header or footer (founder
+        // 2026-07-13), and it auto-hides until the region is hovered. On MOBILE
+        // this rail layout is never shown (the mobile panel is a separate
+        // `layout="panel"` tile); the Üben footer there lives in the toolbar.
         "rounded-xl border border-border bg-muted shadow-soft",
         className,
       )}
@@ -558,11 +600,10 @@ export function FilterRail<T>({
       {/* Tile header: the expand/collapse toggle (flex-1, so it still reads
           as one clickable row) plus the reset icon beside it, always visible
           (founder follow-up: reset no longer hides behind an expanded-only
-          first row). Sticks to the top of the scroll on desktop. Mobile
-          hides it (`hideHeader`) because the Filter toggle lives on the
-          view-options line instead. */}
+          first row). Fixed at the top of the flex column so the scroll region
+          below it owns the scrollbar. */}
       {!hideHeader && (
-        <div className="z-10 flex w-full items-center gap-1 rounded-t-xl bg-muted px-3 py-2.5 lg:sticky lg:top-0 lg:rounded-none">
+        <div className="z-10 flex w-full shrink-0 items-center gap-1 rounded-t-xl bg-muted px-3 py-2.5 lg:rounded-none">
           <button
             onClick={() => setOpen(!open)}
             aria-expanded={open}
@@ -583,41 +624,36 @@ export function FilterRail<T>({
         </div>
       )}
 
-      {open && (
+      {/* Scroll region: the ONLY part that scrolls, so the auto-hiding
+          scrollbar sits below the header separator and clear of the footer.
+          `border-t` here is the fixed separator line under the header (it is on
+          the scroll container, not the scrolling content, so it stays put).
+          Only mounted when there is body content, so a collapsed tile is just
+          header + footer. */}
+      {(open || showPinnedBody) && (
         <div
           className={cn(
-            "space-y-5 p-3",
-            hideHeader ? "rounded-t-xl" : "border-t border-border",
+            "scrollbar-hover lg:min-h-0 lg:flex-1 lg:overflow-y-auto",
+            !hideHeader && "border-t border-border",
           )}
         >
-          {filterBody}
+          {open && <div className="space-y-5 p-3">{filterBody}</div>}
+          {/* Collapsed: pinned sections stay visible. */}
+          {!open && showPinnedBody && (
+            <div className="space-y-5 p-3">
+              {pinnedScopes.map(scopeSelect)}
+              {pinnedFacets.map(facetSection)}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Collapsed: pinned sections stay visible. */}
-      {showPinnedBody && (
-        <div
-          className={cn(
-            "space-y-5 p-3",
-            hideHeader ? "rounded-t-xl" : "border-t border-border",
-          )}
-        >
-          {pinnedScopes.map(scopeSelect)}
-          {pinnedFacets.map(facetSection)}
-        </div>
-      )}
-
-      {/* Footer (the Üben button) stays on screen at every scroll position on
-          BOTH breakpoints, but via different sticky contexts: on desktop it
-          sticks to the bottom of the capped, scrolling aside (`lg:bottom-0`);
-          on mobile the aside is not a scroll container, so it sticks to the
-          viewport bottom just above the 63px bottom nav (+ safe area), keeping
-          Üben visible while the filters are open without an internal
-          scrollbar. */}
+      {/* Footer (the Üben button), fixed at the bottom of the flex column so it
+          stays visible while the region above scrolls. */}
       {footer && (
         <div
           className={cn(
-            "sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-10 flex items-center gap-2 rounded-b-xl border-t border-border bg-muted p-3 lg:bottom-0 lg:rounded-none",
+            "z-10 flex shrink-0 items-center gap-2 rounded-b-xl border-t border-border bg-muted p-3 lg:rounded-none",
             // Headerless + collapsed + no pinned sections: the footer is the
             // whole tile, so round its top too and drop the divider.
             hideHeader && !open && !showPinnedBody && "rounded-t-xl border-t-0",

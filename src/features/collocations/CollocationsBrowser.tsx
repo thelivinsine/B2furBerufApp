@@ -7,9 +7,9 @@ import { themeById } from "@/data/themes";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
+import { FlipCard, FlipHint } from "@/features/shared/FlipCard";
 import {
   applyFacets,
   ActiveFilterChip,
@@ -49,33 +49,52 @@ type Collocation = (typeof collocations)[number];
 // Memoized: cards come from the static bank, so a filter change re-renders
 // only the cards whose identity actually changed, not all ~400.
 const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation }) {
-  return (
+  // Flip tile (founder 2026-07-13): German front, English on the back. The
+  // register badge was dropped from the tile (Register is a filter facet, so
+  // it is redundant here).
+  const front = (
     <Card className="card-hover h-full">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <div className="flex min-w-0 items-center gap-1.5">
-              <p className="min-w-0 truncate text-base font-semibold sm:text-lg">{c.full}</p>
-              <SpeakButton text={c.full} className="shrink-0" />
-            </div>
-            <p className="text-xs text-muted-foreground">{c.en}</p>
-          </div>
-          {c.register === "formal" && (
-            <Badge variant="accent" className="shrink-0">
-              formell
-            </Badge>
-          )}
+      <CardContent className="flex h-full flex-col p-4">
+        <div className="flex min-w-0 items-center gap-1.5">
+          <p className="min-w-0 truncate text-base font-semibold sm:text-lg">{c.full}</p>
+          <span onClick={(e) => e.stopPropagation()}>
+            <SpeakButton text={c.full} className="shrink-0" />
+          </span>
         </div>
 
         <div className="mt-2 border-t border-border pt-2">
           <div className="flex items-start gap-1.5">
             <p className="min-w-0 flex-1 text-sm italic text-muted-foreground">„{c.example.de}"</p>
-            <SpeakButton text={c.example.de} className="shrink-0" />
+            <span onClick={(e) => e.stopPropagation()}>
+              <SpeakButton text={c.example.de} className="shrink-0" />
+            </span>
           </div>
+        </div>
+        <div className="mt-auto flex justify-end pt-2">
+          <FlipHint />
         </div>
       </CardContent>
     </Card>
   );
+  const back = (
+    <Card className="h-full border-primary/30 bg-primary/[0.03]">
+      <CardContent className="flex h-full flex-col p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
+          Englisch
+        </p>
+        <p className="mt-1 text-base font-semibold sm:text-lg">{c.en}</p>
+        {c.example.en && (
+          <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
+            „{c.example.en}"
+          </p>
+        )}
+        <div className="mt-auto flex justify-end pt-2">
+          <FlipHint />
+        </div>
+      </CardContent>
+    </Card>
+  );
+  return <FlipCard front={front} back={back} label={`Übersetzung von ${c.full}`} />;
 });
 
 export function CollocationsBrowser() {
@@ -365,38 +384,57 @@ export function CollocationsBrowser() {
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">
-            <div className="flex w-full items-center justify-between gap-2">
-              {/* Mobile filter toggle, left of the view icons (founder s92). */}
-              <Button
-                size="icon"
-                variant={filtersOpen ? "default" : "outline"}
-                aria-pressed={filtersOpen}
-                aria-expanded={filtersOpen}
-                aria-label="Filter"
-                title="Filter"
-                className="relative shrink-0 rounded-lg lg:hidden"
-                onClick={() => setFiltersOpen((o) => !o)}
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                {activeFacetCount(selection) > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
-                    {activeFacetCount(selection)}
-                  </span>
-                )}
-              </Button>
-              <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
+            {/* Items are centered while search is closed; opening search slides
+                the icon groups apart to make room for the field (founder
+                2026-07-13). */}
+            <motion.div
+              layout={!reduce}
+              className={`flex w-full items-center gap-2 ${searchOpen ? "justify-between" : "justify-center"}`}
+            >
+              <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
+                {/* Mobile filter toggle, left of the view icons (founder s92). */}
+                <Button
+                  size="icon"
+                  variant={filtersOpen ? "default" : "outline"}
+                  aria-pressed={filtersOpen}
+                  aria-expanded={filtersOpen}
+                  aria-label="Filter"
+                  title="Filter"
+                  className="relative shrink-0 rounded-lg lg:hidden"
+                  onClick={() => setFiltersOpen((o) => !o)}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {activeFacetCount(selection) > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+                      {activeFacetCount(selection)}
+                    </span>
+                  )}
+                </Button>
+                <ViewSwitcher views={KOLLOKATION_VIEWS} value={view} onChange={setView} />
+              </motion.div>
               {/* Desktop: an open search grows inline in this row (founder
                   s104: no third line). Mobile keeps the second row below. */}
-              {searchOpen && (
-                <SearchField
-                  value={search}
-                  onChange={setSearch}
-                  placeholder="Suche nach Nomen, Verb, Übersetzung …"
-                  autoFocus
-                  className="hidden min-w-0 lg:block lg:flex-1"
-                />
-              )}
-              <div className="flex items-center gap-2">
+              <AnimatePresence initial={false}>
+                {searchOpen && (
+                  <motion.div
+                    key="search-inline"
+                    layout={!reduce}
+                    initial={{ opacity: 0, scaleX: 0.9 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    exit={{ opacity: 0, scaleX: 0.9 }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
+                    className="hidden min-w-0 flex-1 origin-left lg:block"
+                  >
+                    <SearchField
+                      value={search}
+                      onChange={setSearch}
+                      placeholder="Suche nach Nomen, Verb, Übersetzung …"
+                      autoFocus
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
                 <Button
                   size="icon"
                   variant={searchOpen || search.trim() ? "default" : "outline"}
@@ -414,8 +452,8 @@ export function CollocationsBrowser() {
                 >
                   <Search className="h-4 w-4" />
                 </Button>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Mobile-only second row (desktop shows it inline above). */}
             {searchOpen && (
@@ -509,7 +547,7 @@ export function CollocationsBrowser() {
 
         <FilterRail
           {...filterRailProps}
-          className="slim-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden lg:overflow-y-auto"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden"
         />
       </div>
     </div>

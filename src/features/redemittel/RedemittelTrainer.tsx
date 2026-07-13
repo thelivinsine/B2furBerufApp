@@ -6,8 +6,8 @@ import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelCategories } from "@/data/redemittel";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FlipCard, FlipHint } from "@/features/shared/FlipCard";
 import {
   applyFacets,
   ActiveFilterChip,
@@ -24,11 +24,6 @@ import { RedemittelTable, RedemittelCompactList } from "./RedemittelViews";
 import { LibrarySwitcher } from "@/features/library/LibrarySwitcher";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { defaultVisibleBands } from "@/lib/cefr";
-
-const registerLabel: Record<string, { text: string; variant: "muted" | "default" }> = {
-  neutral: { text: "neutral", variant: "muted" },
-  formal: { text: "formell", variant: "default" },
-};
 
 // Bibliothek views (session 91): a flat card grid, table, or compact list over
 // the SAME filtered list. The card view used to carry per-category section
@@ -147,32 +142,50 @@ export function RedemittelTrainer() {
   };
 
   // Flat card grid (no section headers, founder s104): one card per phrase,
-  // same language as the Kollokationen cards.
+  // same language as the Kollokationen cards. Flip tile (founder 2026-07-13):
+  // German front, English on the back. The CEFR + Register badges were dropped
+  // from the tile (both are filter facets, so repeating them here is redundant).
   const cardGrid = (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {filtered.map((p) => {
-        const reg = registerLabel[p.register];
-        return (
-          <Card key={p.id} className="card-hover h-full">
-            <CardContent className="space-y-2 p-4">
+        const front = (
+          <Card className="card-hover h-full">
+            <CardContent className="flex h-full flex-col gap-2 p-4">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-base font-semibold leading-snug sm:text-lg">{p.de}</p>
-                <SpeakButton text={p.de} />
+                <span onClick={(e) => e.stopPropagation()}>
+                  <SpeakButton text={p.de} />
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {p.en}
-                {p.note && ` · 💡 ${p.note}`}
+              <p className="border-t border-border pt-2 text-xs italic text-muted-foreground">
+                „{p.example.de}"
               </p>
-              <div className="flex items-center justify-between gap-2 border-t border-border pt-2">
-                <p className="text-xs italic text-muted-foreground">„{p.example.de}"</p>
-                <div className="flex shrink-0 items-center gap-1">
-                  {p.cefr && <Badge variant="muted">{p.cefr}</Badge>}
-                  <Badge variant={reg.variant}>{reg.text}</Badge>
-                </div>
+              <div className="mt-auto flex justify-end pt-1">
+                <FlipHint />
               </div>
             </CardContent>
           </Card>
         );
+        const back = (
+          <Card className="h-full border-primary/30 bg-primary/[0.03]">
+            <CardContent className="flex h-full flex-col gap-2 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
+                Englisch
+              </p>
+              <p className="text-sm font-medium">{p.en}</p>
+              {p.note && <p className="text-xs text-muted-foreground">💡 {p.note}</p>}
+              {p.example.en && (
+                <p className="border-t border-border pt-2 text-xs italic text-muted-foreground">
+                  „{p.example.en}"
+                </p>
+              )}
+              <div className="mt-auto flex justify-end pt-1">
+                <FlipHint />
+              </div>
+            </CardContent>
+          </Card>
+        );
+        return <FlipCard key={p.id} front={front} back={back} label={`Übersetzung von ${p.de}`} />;
       })}
     </div>
   );
@@ -193,38 +206,57 @@ export function RedemittelTrainer() {
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">
-            <div className="flex w-full items-center justify-between gap-2">
-              {/* Mobile filter toggle, left of the view icons (founder s92). */}
-              <Button
-                size="icon"
-                variant={filtersOpen ? "default" : "outline"}
-                aria-pressed={filtersOpen}
-                aria-expanded={filtersOpen}
-                aria-label="Filter"
-                title="Filter"
-                className="relative shrink-0 rounded-lg lg:hidden"
-                onClick={() => setFiltersOpen((o) => !o)}
-              >
-                <SlidersHorizontal className="h-4 w-4" />
-                {activeFacetCount(railSelection) > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
-                    {activeFacetCount(railSelection)}
-                  </span>
-                )}
-              </Button>
-              <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
+            {/* Items are centered while search is closed; opening search slides
+                the icon groups apart to make room for the field (founder
+                2026-07-13). */}
+            <motion.div
+              layout={!reduce}
+              className={`flex w-full items-center gap-2 ${searchOpen ? "justify-between" : "justify-center"}`}
+            >
+              <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
+                {/* Mobile filter toggle, left of the view icons (founder s92). */}
+                <Button
+                  size="icon"
+                  variant={filtersOpen ? "default" : "outline"}
+                  aria-pressed={filtersOpen}
+                  aria-expanded={filtersOpen}
+                  aria-label="Filter"
+                  title="Filter"
+                  className="relative shrink-0 rounded-lg lg:hidden"
+                  onClick={() => setFiltersOpen((o) => !o)}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {activeFacetCount(railSelection) > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
+                      {activeFacetCount(railSelection)}
+                    </span>
+                  )}
+                </Button>
+                <ViewSwitcher views={REDEMITTEL_VIEWS} value={view} onChange={setView} />
+              </motion.div>
               {/* Desktop: an open search grows inline in this row (founder
                   s104: no third line). Mobile keeps the second row below. */}
-              {searchOpen && (
-                <SearchField
-                  value={search}
-                  onChange={setSearch}
-                  placeholder="Suche nach Wendung, Übersetzung …"
-                  autoFocus
-                  className="hidden min-w-0 lg:block lg:flex-1"
-                />
-              )}
-              <div className="flex items-center gap-2">
+              <AnimatePresence initial={false}>
+                {searchOpen && (
+                  <motion.div
+                    key="search-inline"
+                    layout={!reduce}
+                    initial={{ opacity: 0, scaleX: 0.9 }}
+                    animate={{ opacity: 1, scaleX: 1 }}
+                    exit={{ opacity: 0, scaleX: 0.9 }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.2, ease: "easeOut" }}
+                    className="hidden min-w-0 flex-1 origin-left lg:block"
+                  >
+                    <SearchField
+                      value={search}
+                      onChange={setSearch}
+                      placeholder="Suche nach Wendung, Übersetzung …"
+                      autoFocus
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              <motion.div layout={!reduce ? "position" : false} className="flex items-center gap-2">
                 <Button
                   size="icon"
                   variant={searchOpen || search.trim() ? "default" : "outline"}
@@ -242,8 +274,8 @@ export function RedemittelTrainer() {
                 >
                   <Search className="h-4 w-4" />
                 </Button>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
 
             {/* Mobile-only second row (desktop shows it inline above). */}
             {searchOpen && (
@@ -325,7 +357,7 @@ export function RedemittelTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="slim-scrollbar hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:block lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden lg:overflow-y-auto"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden"
         />
       </div>
     </div>

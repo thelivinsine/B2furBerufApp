@@ -45,7 +45,7 @@ export function LibrarySwitcher() {
   return (
     <div
       role="tablist"
-      aria-label="Bibliothek"
+      aria-label="Theorie"
       // Doubles as the page header now that the HubHero is gone (founder s92):
       // a lifted bar (shadow) anchors the top of the page, while the active tab
       // reads as the current section title (bold + brand) and the others stay
