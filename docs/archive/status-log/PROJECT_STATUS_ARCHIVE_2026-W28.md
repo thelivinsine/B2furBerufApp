@@ -1735,3 +1735,51 @@ layout-shift bug (Sonnet 5), shipped straight from two founder screenshots/repor
   per this repo's rule, feature-branch pushes never go live on their own).
 - **NOT done:** no other follow-up requested this session; standing content/Üben-map follow-ups from
   prior sessions (human `verified` pass, jury Waves, sector-audit review) remain untouched.
+
+**Handoff after session 107 (2026-07-13). Demo-prep polish continued: compass Praktisch icon, feedback
+placement, content-scoped Üben, mobile scroll UX, graph zoom, centered Üben label, Lernen/Blau toggle,
+desktop white-block fix (Opus 4.8).** Continuation of the s105 demo sweep on branch
+`claude/demo-prep-feedback-rename-sl1jqq`, shipped as two squash-merged PRs (#486, #488).
+- **Praktisch nav icon → compass** (`route-icons.tsx` "/" renderer + NORM box, `nav-items.ts` lucide
+  fallback `Compass`), replacing the dumbbell; founder wanted a "real-life orientation" mark.
+- **Feedback button reworked (`FeedbackButton.tsx`, store-controlled via `useSessionStore.feedbackOpen`):**
+  one app-mounted `FeedbackDialog` + three trigger surfaces — desktop bottom-right pill (skips `/`),
+  mobile action-bar **icon** left of Üben (no floating pill over content), and a full "Feedback geben"
+  button inside practice sessions (`SessionPlayer`). All use the **MessageSquareText** icon so the
+  affordance reads as feedback.
+- **Content-scoped Bibliothek Üben (`engine/session.ts` `buildScopedSession` + `ContentScope`,
+  `useSessionStore.librarySession`, `Session.tsx` `?src=lib`, `SessionPlayer` contentScope/libraryIds):**
+  each browse tab hands its filtered ids to a content-PURE session, so Üben on Redemittel drills
+  Redemittel only, a Grammatik group drills that group only, etc. (was leaking generic vocab before).
+  `SessionBlock` flashcard source union gained `"collocation"` (XP-only grade, no vocab FSRS).
+- **Mobile browse scroll UX (`features/shared/browseScroll.tsx`, new):** `useScrollDirection` collapses
+  the tabs+toolbar on scroll-down / restores on scroll-up (mobile only via `max-lg:` guard) and drives a
+  centered `ScrollTopButton` above the Üben bar. `browseHeaderClass(hidden, scrolled)` now applies the
+  opaque masking background **only when scrolled**, on both breakpoints.
+- **Desktop "white block" fix:** the sticky tabs+toolbar header used to paint an always-on
+  `bg-background/90` rectangle, showing a hard-cornered white block beside the tabs (above the filter
+  rail) at rest. Now transparent at rest, backdrop fades in on scroll to mask pinned-header content.
+  Reproduced + verified fixed with Playwright at 1280×900.
+- **Wörter graph (`WordGraph.tsx`):** opens **zoomed into a readable random node** (k≈2.2) instead of
+  fit-to-all; the legend is visible by default on mobile and doubles as domain filters.
+- **Centered Üben label (`UebenLabel` in browseScroll):** the word "Üben" is centered in the button with
+  the bolt icon floating to its left (absolute, no layout space), across all four trainers.
+- **Praktisch toggle rename + recolor (`Dashboard.tsx`):** left mode "Üben" → **Lernen** (blue
+  `text-blue-600` + `BookOpen` icon) so it no longer clashes with the Theorie Üben button; "Lernen /
+  Spielen" reads as a pair. Spielen stays orange. Founder picked Lernen + Blau from preview options.
+- **Post-ship follow-ups (same session, PRs #490, #491):** (a) the **compass** route accent moved to the
+  nav blue `#2563eb` (so the ring AND the active-tab underline match the other nav marks) with a
+  **thicker ring** (r8/stroke 2.7); (b) the **Üben-map onward route** is drawn per straight run with its
+  dash pattern **phase-locked to the street lane dashes** (opaque, "7 9" period, offset = start-coord mod
+  16, in `SEG_RUNS`) so route dashes land exactly on the lane markings instead of scattering as dots;
+  (c) the pin's **pulse ring is a muted theme-aware gray** (`pulseRing`, was red) while the pin stays red;
+  (d) the **Lernen toggle book fills when active** and, per a follow-up, uses a **custom open-book mark
+  (`LernenBook`) with a ~2px transparent center gutter** so the two pages stay distinct when filled
+  (lucide `BookOpen` dropped from the toggle). All Playwright-verified; gates green each ship.
+- **Gates:** typecheck ✔, lint **0 errors** (43 warnings), content-lint ✔, `test:unit` **130/130**,
+  build + prerender ✔, `check:bundle` **~77 kB**/400. Playwright-verified: white-block gone at rest +
+  masks on scroll, toggle Lernen/blue live, compass blue, map dashes aligned, gray pulse ring, filled
+  book with center gutter.
+- **NOT done:** standing content/Üben-map follow-ups (human `verified` pass, jury Waves, sector-audit
+  review) remain; the s105 "reorderable filter list" is still read as pill-list + Mehr/Weniger (no
+  drag-reorder).
