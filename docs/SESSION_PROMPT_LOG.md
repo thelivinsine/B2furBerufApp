@@ -4663,3 +4663,27 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/library/LibraryHub.tsx` · `src/index.css` ·
   `src/components/layout/route-icons.tsx` (PR #506, squash `05a12ca`) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 381 — 2026-07-13 (session 113 cont., Theorie tab slide round 2: hoist the tab bar)
+
+- **Branch:** `claude/theory-toggle-transitions-hloi6s` (Opus 4.8)
+- **Prompt (verbatim):**
+  > the toggle transition is still lazy load like and is quite harsh on the eye. fix it!
+- **Response summary:** Round 1 (entry 380) added the Praktisch-style slide but the switch still read as
+  a full-page reload. Root-caused it: `LibrarySwitcher` (the tab bar) is rendered INSIDE each trainer, so
+  it lived in the animated/remounting subtree, the tabs themselves faded/slid out and back on every toggle
+  and the Suspense skeleton could flash. Fix: **hoisted the tab bar into `LibraryHub`** as one static
+  element (only the content slides now; the shared-layout pill glides between tabs), removed
+  `<LibrarySwitcher/>` + its import from the 4 trainers (`VocabularyTrainer`/`CollocationsBrowser`/
+  `RedemittelTrainer`/`GrammarHub`) AND `GrammarTopicView` (else the lesson would render two bars now that
+  the hub always renders one), and **preload all 4 tab chunks on mount** so a switch never drops to the
+  loading skeleton. Desktop tabs sit at content-column width (col 1 of the trainers' `[1fr,16rem]` grid).
+  **Verified end-to-end in Chromium** (playwright-core against the pre-installed browser, seeded onboarded
+  localStorage) at 1280×900 + 390×844: exactly one tab bar per surface incl. the grammar lesson, a
+  mid-transition frame showing solid/static tabs + the pill gliding while only content fades, no skeleton
+  flash, filter rail unaffected. Gates: typecheck; lint 0 err/44 warn; test:unit 134/134; build+prerender;
+  bundle 79.5 kB/400. Merged to `main` (PR #509), branch realigned.
+- **Artifacts:** `src/features/library/LibraryHub.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `src/features/grammar/GrammarHub.tsx` · `src/features/grammar/GrammarTopicView.tsx` (PR #509, squash
+  `3c8b179`) · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
