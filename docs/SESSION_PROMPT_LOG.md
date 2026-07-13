@@ -4123,6 +4123,10 @@ Branch: `claude/whats-next-esga9u`.
   > I like dunkel D
 - **Follow-up (verbatim, mid-implementation):**
   > Once done with the task, save the previews and reference images shared on the repo and document the session.
+- **Follow-up (verbatim, with a live screenshot of the fresh-state map):**
+  > this is how it looks at after the changes are live - clearly there's more improvement needed here
+- **Follow-up (verbatim, interrupting a proposed quieter dotted-route change):**
+  > the dotten chain is fine. Leave it as is. Anyway, the user sees a thick line (as per the preview) after traveling so that's okay.
 - **Response summary:** Üben map mockup session (Fable 5, run in parallel with s103; rebased onto its merge) that converged on a shipped redesign of
   `UebenPath.tsx` (Üben-refinements plan, Work item 3, re-scoped by the founder along the way).
   Round 1: the plan's illustrated-buildings recipe as 3 SVG variants (plan spec / lively / depth),
@@ -4142,7 +4146,10 @@ Branch: `claude/whats-next-esga9u`.
   bundle 73.0 kB) and verified in the built app via Playwright in both themes. Mockup rounds 1 and 3
   archived beside the final dark-variants sheet under `preview/`. Shipped to `main` per the
   auto-ship preference; docs updated (this entry, the s104 handoff, CLAUDE.md map notes, plan
-  progress block).
+  progress block). Post-ship follow-up from the founder's live screenshot: per-stop
+  `labelPos`/`chipPos` collision fixes (top-row labels above the tile, chip right of the pin),
+  scenery reshaped under the new labels; the dotted future-route stayed at full strength on the
+  founder's call. Re-verified across fresh/boss-done/mid states in both themes and shipped.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx` · `preview/ueben-map-mockups.html` (final,
   dark variants) · `preview/ueben-map-mockups-r1-beautify.html` ·
   `preview/ueben-map-mockups-r2-farbstimmungen.html` · `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` ·
