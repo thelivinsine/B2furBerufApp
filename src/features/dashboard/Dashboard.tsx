@@ -108,7 +108,14 @@ export function Dashboard() {
           // is only a touch smaller than that (26rem vs 28rem) so the components
           // stay substantial while the whole stack (3:2 tile + card + pager)
           // still fits a common ~800px viewport without a scrollbar.
-          className="mx-auto w-full max-w-md lg:max-w-[26rem]"
+          // `lg:min-h` reserves the taller panel's height (Spielen, ~607px)
+          // regardless of which tab is active: without it the toggle above sits
+          // in a `justify-center`d column whose total height changes with the
+          // panel, so switching tabs visibly moved the toggle (and the panel's
+          // own heading) up and down. Reserving the max keeps that column height
+          // constant so both stay put; update this if either panel's height
+          // changes materially.
+          className="mx-auto w-full max-w-md lg:max-w-[26rem] lg:min-h-[38rem]"
         >
           <Suspense fallback={fallback}>
             {tab === "ueben" ? <UebenPath /> : <SpielenHub />}
