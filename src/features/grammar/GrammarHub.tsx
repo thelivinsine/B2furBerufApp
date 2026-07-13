@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Search, SlidersHorizontal, Zap } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import { grammar, grammarById } from "@/data/grammar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { useScrollDirection, browseHeaderClass, ScrollTopButton, UebenLabel } from "@/features/shared/browseScroll";
 import { useSessionStore } from "@/store/useSessionStore";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
@@ -55,6 +56,7 @@ export function GrammarHub() {
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(false);
   const reduce = useReducedMotion();
+  const { hidden: headerHidden, scrolled } = useScrollDirection();
 
   const topicId = params.get("topic");
   const topic = topicId ? grammarById(topicId) : undefined;
@@ -132,7 +134,7 @@ export function GrammarHub() {
     pinScope: "grammatik",
     footer: (
       <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
-        <Zap className="h-3.5 w-3.5" /> Üben
+        <UebenLabel iconClass="h-3.5 w-3.5" />
       </Button>
     ),
     count: {
@@ -149,7 +151,7 @@ export function GrammarHub() {
           filter tile share row 2 so the tile starts level with the first card.
           Mobile renders the SAME filter tile inline as a slide-open panel. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className="space-y-4 lg:col-start-1 lg:row-start-1">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:bg-background/90 lg:pb-3 lg:backdrop-blur`}>
           <LibrarySwitcher />
 
           {/* Toolbar: mobile filter toggle · view switcher · search icon. */}
@@ -272,6 +274,7 @@ export function GrammarHub() {
         </div>
 
         {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
+        <ScrollTopButton show={scrolled} />
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
           <FeedbackIconButton />
           <Button
@@ -279,9 +282,9 @@ export function GrammarHub() {
             className="h-11 flex-1 rounded-xl text-base"
             onClick={startSession}
           >
-            <Zap className="h-4 w-4" /> Üben
+            <UebenLabel iconClass="h-4 w-4" />
           </Button>
-          <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+          <div className="flex w-20 shrink-0 flex-col items-center justify-center px-1 leading-none">
             <span className="text-sm font-semibold tabular-nums text-foreground">
               {filtered.length}
             </span>

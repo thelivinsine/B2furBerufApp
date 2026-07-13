@@ -16,16 +16,14 @@ const BRAND = "#5b5be6";
 type Render = (c: string) => React.ReactNode;
 
 const RENDERERS: Record<string, Render> = {
-  // Praktisch (the practical / hands-on zone: Üben + Spielen) — a dumbbell
-  // (indigo handle + end caps, neon-cyan plates). Replaced the old house glyph
-  // when "Heute" was renamed "Praktisch" (founder, 2026-07-13).
+  // Praktisch (using German in real life) — a compass: finding your way in real
+  // situations. Indigo ring + two-tone needle (neon-cyan north, indigo south).
+  // Founder pick, 2026-07-13.
   "/": c => (
     <>
-      <rect x="5.5"  y="8.9" width="9"   height="2.2" rx="1.1" fill={c} />
-      <rect x="3.4"  y="5.8" width="2.9" height="8.4" rx="1.2" fill="#22d3ee" />
-      <rect x="13.7" y="5.8" width="2.9" height="8.4" rx="1.2" fill="#22d3ee" />
-      <rect x="1.6"  y="7.4" width="2"   height="5.2" rx="1"   fill={c} />
-      <rect x="16.4" y="7.4" width="2"   height="5.2" rx="1"   fill={c} />
+      <circle cx="10" cy="10" r="8.3" stroke={c} strokeWidth="2.1" fill="none" />
+      <polygon points="13.6,6.4 11.4,11.4 8.6,8.6" fill="#22d3ee" />
+      <polygon points="6.4,13.6 11.4,11.4 8.6,8.6" fill={c} />
     </>
   ),
   // Wortschatz — two-tone open book (indigo spine + cyan right page), matching
@@ -151,7 +149,7 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 
 // [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
-  "/":             { box: [1.6, 5.8, 16.8, 8.4],    weight: 1.04 },
+  "/":             { box: [1.7, 1.7, 16.6, 16.6],   weight: 0.95 },
   "/library":      { box: [2.8, 4, 15.2, 12],       weight: 1.05 },
   "/anwenden":     { box: [1.3, 1.3, 17.4, 17.4],   weight: 0.94 },
   "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },

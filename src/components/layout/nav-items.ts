@@ -1,5 +1,5 @@
 import {
-  Dumbbell,
+  Compass,
   Library,
   LineChart,
   Settings,
@@ -39,7 +39,7 @@ export interface NavItem {
 // (founder, 2026-07-13) so the two learning zones read as a Praktisch/Theorie
 // pairing. The routes are unchanged (/ and /library).
 export const navItems: NavItem[] = [
-  { to: "/",          label: "Praktisch",    icon: Dumbbell,        end: true, color: "#5b5be6", bg: "rgba(91,91,230,.08)",  desc: "Deine Session und dein Tag" },
+  { to: "/",          label: "Praktisch",    icon: Compass,         end: true, color: "#5b5be6", bg: "rgba(91,91,230,.08)",  desc: "Deine Session und dein Tag" },
   { to: "/library",   label: "Theorie",      icon: Library,                    color: "#2563eb", bg: "rgba(37,99,235,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
   { to: "/analytics", label: "Fortschritt",  icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Meilensteine und Statistiken" },
   { to: "/settings",  label: "Einstellungen",icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },

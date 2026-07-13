@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Zap, Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal } from "lucide-react";
 import type { RedemittelPhrase } from "@/types";
 import { redemittel, redemittelCategories } from "@/data/redemittel";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -18,6 +18,7 @@ import {
 } from "@/features/shared/FacetSheet";
 import { FilterRail } from "@/features/shared/FilterRail";
 import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
+import { useScrollDirection, browseHeaderClass, ScrollTopButton, UebenLabel } from "@/features/shared/browseScroll";
 import { ViewSwitcher, useViewParam, type LibraryView } from "@/features/shared/ViewSwitcher";
 import { SearchField } from "@/features/shared/SearchField";
 import { fuzzyMatch } from "@/lib/fuzzy";
@@ -65,6 +66,7 @@ export function RedemittelTrainer() {
   // Transient search, outside the filter panel (founder s92).
   const [searchOpen, setSearchOpen] = useState(() => search.trim().length > 0);
   const reduce = useReducedMotion();
+  const { hidden: headerHidden, scrolled } = useScrollDirection();
 
   // Facet selection (Kategorie + Register) rides the URL, exactly like the
   // sibling tabs. `?cat=` is now a facet param, not a scope.
@@ -136,7 +138,7 @@ export function RedemittelTrainer() {
     pinScope: "redemittel",
     footer: (
       <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
-        <Zap className="h-3.5 w-3.5" /> Üben
+        <UebenLabel iconClass="h-3.5 w-3.5" />
       </Button>
     ),
     count: {
@@ -198,7 +200,7 @@ export function RedemittelTrainer() {
           SAME filter tile inline (collapsed by default; Register is a facet
           group in it now); only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className="space-y-4 lg:col-start-1 lg:row-start-1">
+        <div className={`${browseHeaderClass(headerHidden)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:bg-background/90 lg:pb-3 lg:backdrop-blur`}>
           <LibrarySwitcher />
 
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
@@ -335,6 +337,7 @@ export function RedemittelTrainer() {
         </div>
 
         {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
+        <ScrollTopButton show={scrolled} />
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
           <FeedbackIconButton />
           <Button
@@ -342,9 +345,9 @@ export function RedemittelTrainer() {
             className="h-11 flex-1 rounded-xl text-base"
             onClick={startSession}
           >
-            <Zap className="h-4 w-4" /> Üben
+            <UebenLabel iconClass="h-4 w-4" />
           </Button>
-          <div className="flex shrink-0 flex-col items-center justify-center px-1 leading-none">
+          <div className="flex w-20 shrink-0 flex-col items-center justify-center px-1 leading-none">
             <span className="text-sm font-semibold tabular-nums text-foreground">
               {filtered.length}
             </span>

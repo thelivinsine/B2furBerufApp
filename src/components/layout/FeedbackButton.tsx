@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Sparkles, Send, Loader2 } from "lucide-react";
+import { MessageSquareText, Send, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -123,7 +123,7 @@ export function FeedbackPill() {
       aria-label="Feedback geben"
       className="fixed bottom-4 right-4 z-40 hidden items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground lg:flex"
     >
-      <Sparkles className="h-3.5 w-3.5 text-primary" />
+      <MessageSquareText className="h-3.5 w-3.5 text-primary" />
       <span>Mit KI gebaut · Feedback</span>
     </button>
   );
@@ -143,7 +143,7 @@ export function FeedbackIconButton({ className }: { className?: string }) {
         className,
       )}
     >
-      <Sparkles className="h-5 w-5 text-primary" />
+      <MessageSquareText className="h-5 w-5 text-primary" />
     </button>
   );
 }
@@ -164,7 +164,7 @@ export function FeedbackFullButton({ className }: { className?: string }) {
         className,
       )}
     >
-      <Sparkles className="h-3.5 w-3.5 text-primary" />
+      <MessageSquareText className="h-3.5 w-3.5 text-primary" />
       Mit KI gebaut · Feedback geben
     </button>
   );

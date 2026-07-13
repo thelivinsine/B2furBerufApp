@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
 import { useIsDark } from "@/lib/useTheme";
+import { cn } from "@/lib/utils";
 import { frequencyBin } from "@/data/frequency";
 import { buildWordGraph, type GraphNode } from "./wordGraph";
 import { SaveButton } from "./VocabViews";
@@ -73,6 +74,17 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // Domain legend doubles as a filter (founder 2026-07-13): tapping a domain
+  // toggles it; an empty set means "all domains". Non-selected domains dim on
+  // the canvas. A ref mirrors it so draw() reads it without a React re-render.
+  const [domainFilter, setDomainFilter] = useState<Set<string>>(new Set());
+  const toggleDomain = (id: string) =>
+    setDomainFilter((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
 
   const graph = useMemo(() => buildWordGraph(items, collocations), [items]);
   const itemById = useMemo(() => new Map(items.map((v) => [v.id, v])), [items]);
@@ -102,6 +114,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
   const hoverRef = useRef<string | null>(null);
   const selectedRef = useRef<string | null>(null);
   const darkRef = useRef(isDark);
+  const domainFilterRef = useRef(domainFilter);
   const neighborsRef = useRef(neighbors);
   const rafRef = useRef<number | null>(null);
   const drawRef = useRef<() => void>(() => {});
@@ -193,7 +206,16 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
 
     if (!fittedRef.current && nodes.length > 0) {
       fittedRef.current = true;
-      fitToNodes(nodes, width, height);
+      // Open zoomed INTO a random area at a readable zoom (founder 2026-07-13),
+      // not the fit-all overview: word labels appear once k > ~0.85, so k≈2.2
+      // makes them legible. Centered on a random node (not selected, so no card).
+      const pick = nodes[Math.floor(Math.random() * nodes.length)];
+      const k = clampK(2.2);
+      transformRef.current = {
+        k,
+        x: width / 2 - (pick.x ?? 0) * k,
+        y: height / 2 - (pick.y ?? 0) * k,
+      };
     }
 
     const draw = () => {
@@ -207,6 +229,11 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       const focusSet = focus
         ? new Set([focus, ...(neighborsRef.current.get(focus) ?? [])])
         : null;
+
+      // Domain legend filter: when non-empty, nodes/links outside the selected
+      // domains dim out (like the focus dimming).
+      const domFilter = domainFilterRef.current;
+      const domActive = (n: SimNode) => domFilter.size === 0 || domFilter.has(domainOf(n.themeId) ?? "");
 
       // Viewport in world coordinates, for culling.
       const worldLeft = -tx / k;
@@ -223,7 +250,8 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
         const t = l.target as SimNode;
         const lit =
           focusSet !== null && (s.id === focus || t.id === focus);
-        ctx.strokeStyle = focusSet === null ? baseLink : lit ? litLink : dimLink;
+        const domOk = domActive(s) && domActive(t);
+        ctx.strokeStyle = !domOk ? dimLink : focusSet === null ? baseLink : lit ? litLink : dimLink;
         ctx.lineWidth = (lit ? 1.6 : 1) / k;
         ctx.beginPath();
         ctx.moveTo(s.x ?? 0, s.y ?? 0);
@@ -238,7 +266,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
         const y = n.y ?? 0;
         if (x + n.r < worldLeft || x - n.r > worldRight || y + n.r < worldTop || y - n.r > worldBottom)
           continue;
-        const dimmed = focusSet !== null && !focusSet.has(n.id);
+        const dimmed = (focusSet !== null && !focusSet.has(n.id)) || !domActive(n);
         ctx.globalAlpha = dimmed ? 0.12 : 1;
         ctx.fillStyle = nodeColor(n, dark);
         ctx.beginPath();
@@ -270,6 +298,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
           const x = n.x ?? 0;
           const y = n.y ?? 0;
           if (x < worldLeft || x > worldRight || y < worldTop || y > worldBottom) continue;
+          if (!domActive(n)) continue;
           const inFocus = focusSet?.has(n.id) ?? false;
           const alpha = focusSet ? (inFocus ? 1 : 0) : zoomAlpha;
           if (alpha <= 0) continue;
@@ -447,7 +476,10 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
   useEffect(() => {
     scheduleDraw();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDark, selectedId]);
+  }, [isDark, selectedId, domainFilter]);
+
+  // Keep the draw-time ref in sync with the filter state.
+  domainFilterRef.current = domainFilter;
 
   const zoomBy = (factor: number) => {
     const container = containerRef.current;
@@ -532,7 +564,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     <div className="space-y-2">
       <div
         ref={containerRef}
-        className="relative h-[60dvh] min-h-[420px] w-full touch-none overflow-hidden rounded-xl border border-border bg-surface"
+        className="relative h-[42dvh] min-h-[280px] w-full touch-none overflow-hidden rounded-xl border border-border bg-surface sm:h-[60dvh] sm:min-h-[420px]"
       >
         <canvas ref={canvasRef} className="block h-full w-full" />
 
@@ -604,18 +636,33 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       {/* Legend + connection count at the bottom of the canvas (the word
           count now sits beside Üben like every other view, founder
           follow-up). Centered on mobile, left-aligned on desktop. */}
-      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground lg:justify-start">
-        {presentDomains.map((d) => (
-          <span key={d.id} className="inline-flex items-center gap-1.5">
-            <span
-              className="h-2 w-2 rounded-full"
-              style={{
-                backgroundColor: (DOMAIN_COLORS[d.id] ?? FALLBACK_COLOR)[isDark ? "dark" : "light"],
-              }}
-            />
-            {d.titleDe}
-          </span>
-        ))}
+      {/* Legend doubles as a domain filter (founder 2026-07-13): tap a domain to
+          show only it (tap again to clear); several can be active. Always shown
+          in full (flex-wrap), so no scroll is needed to see every domain. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-muted-foreground lg:justify-start">
+        {presentDomains.map((d) => {
+          const color = (DOMAIN_COLORS[d.id] ?? FALLBACK_COLOR)[isDark ? "dark" : "light"];
+          const selectedDom = domainFilter.has(d.id);
+          const dimmed = domainFilter.size > 0 && !selectedDom;
+          return (
+            <button
+              key={d.id}
+              type="button"
+              onClick={() => toggleDomain(d.id)}
+              aria-pressed={selectedDom}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 transition-colors",
+                selectedDom
+                  ? "border-primary/40 bg-primary/10 text-foreground"
+                  : "border-transparent hover:bg-muted/60",
+                dimmed && "opacity-40",
+              )}
+            >
+              <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: color }} />
+              {d.titleDe}
+            </button>
+          );
+        })}
         <span className="tabular-nums lg:ml-auto">
           {graph.links.length} Verbindung{graph.links.length !== 1 ? "en" : ""}
         </span>
