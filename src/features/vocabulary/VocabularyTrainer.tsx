@@ -643,7 +643,7 @@ export function VocabularyTrainer() {
 
         <FilterRail
           {...filterRailProps}
-          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-7rem)] lg:overflow-hidden"
+          className="hidden lg:col-start-2 lg:row-start-2 lg:sticky lg:top-24 lg:flex lg:flex-col lg:max-h-[calc(100vh-11rem)] lg:overflow-hidden"
         />
       </div>
     </div>
