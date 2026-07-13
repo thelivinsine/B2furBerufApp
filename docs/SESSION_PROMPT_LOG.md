@@ -4518,3 +4518,35 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/library/LibraryHub.tsx` · `src/index.css` · commit `43761a3` (squash) →
   PR #495 · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`
   (s108 handoff moved here) · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 376 — 2026-07-13 (session 111, demo-readiness plan)
+
+- **Branch:** `claude/pre-demo-app-sweep-0yh6je` (Fable 5; plan-only session by founder design)
+- **Prompts (verbatim):**
+  > Run a pre-demo sweep of the entire app. Keep everything ready - security, bugs, UI - everything in check.
+  > continue
+  > write a thorough and robust plan to review, check, analyse all sorts of refinements, improvements, security fixes and other aspects I may have not mentioned or forgot so that the app is ready to be presented to an audience. Write the plan now with fable but the implementation should be with other models as I'm running out of Fable for this week. Provide model recommendations in the plan and include non tech summary for each chunk of work.
+  > looks good, save it to the repo. I'll implement the plan in a new session. Document the session.
+- **Response summary:** Started the sweep hands-on, then pivoted to plan-authoring on the founder's
+  third prompt (plan mode). **Baseline verified TWICE** (first at `906cf7a`, re-run after parallel
+  sessions 107–110 moved `main` to `ae0c2fc`): all 9 gates green (typecheck; lint 0 errors / 44
+  deliberate warnings; content-lint; test:unit 134/134; test:srs 323; test:pronounce 26; audit 0
+  vulnerabilities; build + prerender; bundle 79.5 kB/400) plus a clean security-grep pass (no
+  secrets, no XSS sinks, `rel="noreferrer"` on every `target="_blank"`, only public keys
+  client-side). Found ONE real gap: **`submit-feedback` has no rate limit** (input caps + CORS
+  only). `AskUserQuestion` fixed the demo parameters: **demo is 2026-07-14**, format "Both" (present
+  live, then share the link), demo state "Both states ready" (seeded account + clean profile).
+  Authored **`docs/plans/DEMO_READINESS_PLAN.md`**: 6 chunks with per-chunk model recommendations
+  and non-technical founder summaries. P0: 1 Playwright smoke test of the demo path (Sonnet 5) ·
+  2 regression review of PRs #477–#500 incl. the `pinnedTabs` migration (Opus 4.8) · 3 abuse
+  hardening / feedback rate limit + RLS re-check (Opus 4.8) · 4 demo-visible UI polish (Sonnet 5) ·
+  5 `docs/DEMO_RUNBOOK.md` + both demo states (Sonnet 5). P1: 6 perf sanity (Sonnet 5). P2 next
+  week: Fable content proofread + full security review. Implementation deliberately NOT started
+  (founder runs the chunks in fresh sessions on the recommended models). A first docs commit
+  (numbered s106) raced sessions 107–110; the branch was reset onto `ae0c2fc` and everything
+  re-applied as session 111. Docs updated per policy (status handoff s111; s109 handoff archived to
+  W28; archive index row refreshed; this log). Merged to `main` per auto-ship so the plan is on the
+  default branch for the next sessions.
+- **Artifacts:** `docs/plans/DEMO_READINESS_PLAN.md` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` (s109 handoff moved here) ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`.
