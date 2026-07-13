@@ -79,12 +79,20 @@ export function LibraryHub() {
   // Only the CONTENT slides; the tab bar is hoisted here and stays put (true
   // Praktisch parity, where the toggle is static and the panel slides). Because
   // the switcher never unmounts, its shared-layout pill also glides between tabs
-  // instead of re-appearing. Horizontal slide: the entering panel comes from the
-  // side you moved toward, the leaving one exits the opposite side; `mode="wait"`
-  // sequences them. At rest the panel settles to `x: 0`, which framer resolves to
-  // `transform: none`, so the sticky filter rail / Üben bar inside each trainer
-  // are not trapped in a containing block. Distance 0 under reduced motion.
-  const shift = reduce ? 0 : 24;
+  // instead of re-appearing.
+  //
+  // `mode="popLayout"`, NOT `"wait"`: wait plays the exit fully and only THEN the
+  // enter, which is what made the switch feel slow and heavy (a blank fade-out
+  // gap between panels). popLayout pops the leaving panel out of flow so the new
+  // one is in place immediately and the two cross at once, no empty beat, no
+  // vertical jump. Timing is short + snappy and the horizontal slide carries the
+  // motion (the entering panel comes from the side you moved toward, the leaving
+  // one exits the opposite side); the fade is a light, quick accent, not the main
+  // event. At rest the panel settles to `x: 0` (framer resolves to
+  // `transform: none`), so the sticky filter rail / Üben bar are not trapped.
+  // popLayout absolutely-positions the exiting panel, so the outer wrapper is
+  // `relative` to contain it. Distance 0 under reduced motion.
+  const shift = reduce ? 0 : 32;
   const slide = {
     enter: (d: number) => ({ opacity: 0, x: d >= 0 ? shift : -shift }),
     center: { opacity: 1, x: 0 },
@@ -102,21 +110,23 @@ export function LibraryHub() {
         </div>
       </div>
 
-      <AnimatePresence mode="wait" custom={dir} initial={false}>
-        <motion.div
-          key={tab}
-          custom={dir}
-          variants={slide}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{ duration: 0.16, ease: "easeOut" }}
-        >
-          <Suspense fallback={fallback}>
-            <Segment />
-          </Suspense>
-        </motion.div>
-      </AnimatePresence>
+      <div className="relative">
+        <AnimatePresence mode="popLayout" custom={dir} initial={false}>
+          <motion.div
+            key={tab}
+            custom={dir}
+            variants={slide}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.13, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Suspense fallback={fallback}>
+              <Segment />
+            </Suspense>
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
