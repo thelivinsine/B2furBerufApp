@@ -257,6 +257,33 @@ deployed; the email needs one API key. Do this once:
    ```
    Without `RESEND_API_KEY` the feedback is still stored in the table (read it in
    the Supabase dashboard), it just isn't emailed.
+4. **Redeploy after the rate-limit change (session 112, demo prep).** The
+   `submit-feedback` function now has abuse protection for the public demo link:
+   a per-IP burst limit (≤5 submissions per 10 minutes) and a global ceiling that
+   stops the notification email once 60 messages arrive in an hour (rows are still
+   stored, so nothing is lost). It needs **no new migration or secret** — just
+   redeploy so the new code is live:
+   ```bash
+   supabase functions deploy submit-feedback
+   ```
+   Optional: `supabase secrets set FEEDBACK_IP_SALT=some-random-string` sets the
+   salt used to hash IPs for the in-memory burst check (a sensible default is
+   built in, so this is not required).
+
+### Optional extra abuse protection for the shared demo link
+
+Neither is required for the demo (the in-code feedback rate limit above is the
+real fix), but both are one-click hardening if you want them:
+
+- **Turnstile on guest sign-in** — see section 4 above. Enabling the Cloudflare
+  Turnstile CAPTCHA stops bots from mass-creating guest accounts. Set the site
+  key env for the client (`VITE_TURNSTILE_SITE_KEY`) and the secret in the
+  Supabase Auth dashboard.
+- **Resend SMTP for magic-link/auth email rate-limiting** — Supabase's built-in
+  email sender has a low shared rate limit. Wiring your Resend account as the
+  custom SMTP provider (Supabase dashboard → Auth → SMTP Settings) gives you a
+  higher, dedicated limit for sign-in emails. Uses the same `RESEND_API_KEY`
+  account you set above.
 
 ## Admin source review (provenance QC): founder setup step
 

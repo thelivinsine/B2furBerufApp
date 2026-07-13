@@ -1,11 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 111, **demo-readiness plan**, Fable 5). Verified all 9 CI gates
-green on `main` (ae0c2fc) plus a clean security-grep pass, then authored
-**`docs/plans/DEMO_READINESS_PLAN.md`**: the chunked pre-demo sweep (smoke test, regression review,
-abuse hardening, UI polish, demo runbook) for the **2026-07-14 demo**, with a model recommendation per
-chunk (implementation on Opus 4.8 / Sonnet 5; founder low on Fable this week). Docs-only session, no
-app code changed. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-13 (session 112, **demo-readiness Chunks 2+3 (Opus 4.8)**). Regression review
+of the s102–110 demo-prep rounds + abuse hardening for the shared demo link. Fixed stale "(Heute)"
+copy (session eyebrow + the `erste-schritte` help article); verified the returning-user `pinnedTabs`
+migration, the feedback surfaces, and `/session` junk-param handling are all safe. Added two
+migration-free rate-limit guards to `submit-feedback` (per-IP burst + global hourly email ceiling),
+re-checked RLS across migrations 0001–0006, and re-confirmed the `delete-account`/`evaluate-writing`
+auth gates. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -59,6 +60,32 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 112 (2026-07-13). Demo-readiness Chunks 2 + 3 shipped (Opus 4.8), on branch
+`claude/predemo-opus-tasks-ek5qhz`.** The two Opus "Tonight A" chunks of `DEMO_READINESS_PLAN.md`:
+regression review of the s102–110 demo-prep rounds + abuse hardening of the public feedback path.
+- **Chunk 2 (regression review) — findings:** fixed the two stale "(Heute)" strings the rename left
+  behind (`Session.tsx` session-empty-state eyebrow → "Praktisch"; the `hilfe/erste-schritte` help
+  article DE+EN → "(Praktisch)", reprerendered). Verified SAFE with no change needed: (a) the
+  returning-user `pinnedTabs`/`ROUTE_SUCCESSOR` migration — `BottomTabBar` filters pins to
+  `CONTENT=["/library","/analytics"]` and `BarTab` returns null for unknown paths, and `Sidebar`
+  renders `navItems` directly, so a stale `/anwenden` pin from a pre-s105 device can't break either
+  bar; (b) the feedback surfaces (pill desktop-only + off `/` + off focus/missions, dialog mounted
+  app-wide, graceful failure); (c) `/session` junk-param handling (`mission`/`grammar`/`theme`/`cefr`/
+  `sector`/`cat`/`sub`/`min` all fall back, never crash).
+- **Chunk 3 (abuse hardening) — shipped:** `submit-feedback` (`supabase/functions/submit-feedback/`)
+  now has two **migration-free** guards: a per-IP burst limit (≤5 / 10 min, in-memory, hashed IP) and
+  a DB-backed global hourly email ceiling (≤60/hr stops the email but still stores the row). Friendly
+  German error preserved. RLS re-checked across 0001–0006 (all owner-scoped to `auth.uid()` or the
+  founder-email gate; `feedback` + `ai_usage` service-role-only; no public SELECT). `delete-account` +
+  `evaluate-writing` re-confirmed JWT-gated + CORS-allowlisted; evaluate-writing keeps its daily/
+  monthly/per-user caps. Founder console steps added to `docs/plans/PHASE2_SETUP.md`.
+- **⚠️ Founder action:** run `supabase functions deploy submit-feedback` for the rate limit to go live
+  (no new migration or secret needed; optional `FEEDBACK_IP_SALT`).
+- **Gates:** all green — typecheck ✔, lint 0 errors/44 warnings, lint:content ✔, test:unit 134/134,
+  test:srs 323, test:pronounce 26, build+prerender ✔, check:bundle 79.5 kB/400.
+- **Remaining plan chunks:** 1 Playwright smoke test (Sonnet 5), 4 UI polish (Sonnet 5), 5 demo runbook
+  `docs/DEMO_RUNBOOK.md` (Sonnet 5), 6 perf sanity (Sonnet 5, P1). See `DEMO_READINESS_PLAN.md`.
+
 **Handoff after session 111 (2026-07-13). Demo-readiness PLAN authored + baseline verified (Fable 5);
 implementation intentionally NOT started.** The demo is **2026-07-14** (founder presents live, then
 shares the link; both a seeded account and a clean profile are wanted). The founder is nearly out of
@@ -82,31 +109,6 @@ model via `/model` first).**
 - **NOT done:** all implementation chunks (deliberate; the founder runs them in fresh sessions on the
   recommended models). Standing content/Üben-map follow-ups unchanged from prior sessions.
 
-**Handoff after session 110 (2026-07-13). Bibliothek tab-switch slide animation (Opus 4.8), on branch
-`claude/bibliothek-slide-animations-hdf738`.** Founder: switching between the four Bibliothek/Theorie
-tabs loaded the content abruptly; wanted a snappy left/right slide. (Code shipped as PR #495 / `43761a3`,
-which merged just before the session-109 fixes above; documented here as a distinct handoff.)
-- **Change:** `LibraryHub` (`src/features/library/LibraryHub.tsx`) computes the tab-index direction
-  (target vs. previous, via a `useRef`) and wraps the segment in `<div key={tab}>` with a
-  `.lib-slide-in-right` / `.lib-slide-in-left` class. The four segments already remount per `?tab=`, so
-  the mount-time keyframe replays each switch: the incoming panel slides in ~220ms from the side tapped
-  toward (forward = from the right) and fades up (`cubic-bezier(0.22,1,0.36,1)`). Enter-only (the old
-  panel is swapped out instantly), which keeps it snappy and avoids double-mounting two heavy lazy lists.
-- **Why a CSS keyframe, not a framer transform wrapper:** the tab bar (`LibrarySwitcher`) lives INSIDE
-  each segment, and the segments rely on `position: sticky`/`fixed` descendants (desktop filter rail,
-  mobile sticky Üben action bar, fixed scroll-top button). A persistent `transform` at rest establishes a
-  containing block and would trap all of those. The keyframe (`.lib-slide-in-*` in `index.css`) uses the
-  **default `none` fill-mode**, so the transform exists only during the slide and reverts to none at rest.
-  Global `html`/`body` `overflow-x: clip` means the 1.25rem offset adds no scrollbar; the existing global
-  `prefers-reduced-motion` rule already neutralises it.
-- **Gates:** typecheck ✔, `pnpm build` + prerender ✔, `check:bundle` **77.4 kB**/400, `test:unit`
-  **134/134**. **Shipped:** PR #495 squash-merged to `main` (`43761a3`).
-- **NOT done / consider next:** it is enter-only, not a full swipe (old panel doesn't slide out); a true
-  swipe would need AnimatePresence keeping both segments mounted, which double-mounts the heavy lists and
-  reintroduces the `library-tab-pill` layoutId collision, so it was deliberately skipped. The whole panel
-  (incl. the tab bar, since the bar is inside each segment) slides subtly; offset kept small (~20px) so it
-  reads as content, not a bar jump. Live visual confirm on the deployed site is the founder's.
-
-_(Sessions 85-109's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
+_(Sessions 85-110's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
 and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_

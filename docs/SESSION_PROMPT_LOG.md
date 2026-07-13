@@ -4550,3 +4550,35 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `docs/plans/DEMO_READINESS_PLAN.md` (new) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` (s109 handoff moved here) ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 377 — 2026-07-13 (session 112, demo-readiness Chunks 2+3, Opus 4.8)
+
+- **Branch:** `claude/predemo-opus-tasks-ek5qhz` (Opus 4.8; the "Tonight A" session of the plan)
+- **Prompts (verbatim):**
+  > go ahead with predemo plan's opus tasks
+- **Response summary:** Implemented the two Opus-assigned chunks of `DEMO_READINESS_PLAN.md`.
+  **Chunk 2 (regression review of s102–110):** grepped the whole `src/` tree for stale
+  "Heute"/"Bibliothek"/"Anwenden" nav copy; the only user-facing stale strings were two "(Heute)"
+  references (the `Session.tsx` empty-state eyebrow and the `hilfe/erste-schritte` help article
+  DE+EN), both fixed to "Praktisch" and the help HTML reprerendered. Verified (no change needed): the
+  returning-user `pinnedTabs`/`ROUTE_SUCCESSOR` migration is safe (`BottomTabBar` filters pins to
+  `CONTENT`, `BarTab` null-guards unknown paths, `Sidebar` renders `navItems` directly, so a stale
+  pre-s105 `/anwenden` pin cannot break either bar); the feedback surfaces render on the right pages,
+  hide in focus/missions, and fail gracefully; `/session` junk-param handling
+  (`mission`/`grammar`/`theme`/`cefr`/`sector`/`cat`/`sub`/`min`) all fall back without crashing.
+  **Chunk 3 (abuse hardening):** added two migration-free rate-limit guards to `submit-feedback` — a
+  per-IP burst limit (≤5 / 10 min, in-memory, hashed IP) and a DB-backed global hourly email ceiling
+  (≤60/hr stops the email but still stores the row), preserving the friendly German error. Re-checked
+  RLS across migrations 0001–0006 (all owner-scoped to `auth.uid()` or the founder-email gate;
+  `feedback`+`ai_usage` service-role-only; no public SELECT; `bump_ai_usage` revoked from
+  public/anon/authenticated) and re-confirmed `delete-account`/`evaluate-writing` are JWT-gated (401)
+  + CORS-allowlisted with the writing caps intact. Documented the founder console steps (redeploy
+  command, optional `FEEDBACK_IP_SALT`, optional Turnstile + Resend SMTP) in `PHASE2_SETUP.md`. All
+  gates green (typecheck; lint 0 errors/44 warnings; lint:content; test:unit 134/134; test:srs 323;
+  test:pronounce 26; build+prerender; bundle 79.5 kB/400). Chunks 2+3 checked off in the plan; docs
+  updated per policy (status handoff s112; s110 handoff archived to W28; this log). Founder must run
+  `supabase functions deploy submit-feedback` to activate the rate limit.
+- **Artifacts:** `src/features/session/Session.tsx` · `src/features/help/content.ts` ·
+  `supabase/functions/submit-feedback/index.ts` · `docs/plans/PHASE2_SETUP.md` ·
+  `docs/plans/DEMO_READINESS_PLAN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.

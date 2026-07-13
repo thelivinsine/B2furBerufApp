@@ -66,7 +66,19 @@ repo. Two viewports (390×844 mobile, 1440×900 desktop) × light + dark theme:
 and a laptop, in light and dark mode, and reports anything broken so no one discovers it on
 stage.*
 
-### - [ ] Chunk 2: Regression review of the last demo-prep rounds — **Opus 4.8**
+### - [x] Chunk 2: Regression review of the last demo-prep rounds — **Opus 4.8** ✅ s112
+
+Findings: stale "(Heute)" copy fixed in `Session.tsx` (session eyebrow) + the
+`hilfe/erste-schritte` help article (DE+EN, reprerendered). Returning-user
+migration verified SAFE: `BottomTabBar` filters `pinnedTabs` down to
+`CONTENT=["/library","/analytics"]` and `BarTab` returns null for unknown paths,
+and the desktop `Sidebar` renders `navItems` directly, so a stale `/anwenden`
+pin from a pre-s105 device can never break either bar. Feedback surfaces
+verified correct (pill desktop-only + hidden on `/` + hidden in focus/missions;
+dialog mounted app-wide; `submitFeedback` degrades gracefully when the function
+is unreachable/unconfigured). `?`-param junk handling on `/session` verified
+robust: unknown `mission`/`grammar`/`theme`/`cefr`/`sector`/`cat`/`sub` all fall
+back (undefined focus / random grammar topic / default scope), `min` clamps.
 
 Sessions 102–110 changed a lot fast (nav rename Praktisch/Theorie, Anwenden hidden, the feedback
 dialog rework, Fortschritt redesign, Bibliothek multi-select filters/tiles/scoped Üben,
@@ -91,7 +103,23 @@ SW-update crash fix, graph zoom, tab slide). Review the diffs of PRs #477–#500
 double-checks those fresh changes for side effects, especially for a device that has used the
 app before and still carries old saved settings, like the founder's own phone.*
 
-### - [ ] Chunk 3: Abuse hardening for the shared link — **Opus 4.8** (same session as Chunk 2)
+### - [x] Chunk 3: Abuse hardening for the shared link — **Opus 4.8** (same session as Chunk 2) ✅ s112
+
+Done: `submit-feedback` now has two migration-free abuse guards — a per-IP burst
+limit (≤5 / 10 min, in-memory, hashed IP) and a DB-backed global hourly email
+ceiling (≤60/hr stops the email but still stores the row, so nothing is lost and
+the inbox is hard-capped across all sources). Returns the existing friendly
+German error. RLS re-checked across migrations 0001–0006: every policy is
+owner-scoped to `auth.uid()` (or the founder-email gate on `provenance_reviews`);
+`feedback` + `ai_usage` are service-role-only with no client policies; no public
+SELECT anywhere; `bump_ai_usage` revoked from public/anon/authenticated.
+`delete-account` + `evaluate-writing` re-confirmed: JWT-gated (401 when
+unauthenticated) + CORS allowlist; evaluate-writing keeps daily(5)/monthly($5)/
+per-user(50) caps. Founder console steps (redeploy command, optional
+`FEEDBACK_IP_SALT`, optional Turnstile + Resend SMTP) documented in
+`docs/plans/PHASE2_SETUP.md` for the Chunk 5 runbook. **Founder must run
+`supabase functions deploy submit-feedback`** for the rate limit to go live (no
+migration/secret needed).
 
 The audience gets the URL, so the public write-paths need minimal abuse protection:
 

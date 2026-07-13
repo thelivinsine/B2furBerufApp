@@ -114,8 +114,8 @@ export const helpArticles: HelpArticle[] = [
       },
       {
         type: "p",
-        de: "Auf dem Startbildschirm (Heute) findest du zwei Tabs. Üben ist dein tägliches Training. Spielen führt dich in die Story-Welt Neuland. Du kannst frei zwischen beiden wechseln, denn sie teilen sich denselben Lernfortschritt.",
-        en: "On the home screen (Heute) you will find two tabs. Üben is your daily training. Spielen takes you into the story world Neuland. You can switch freely between them, because they share the same learning progress.",
+        de: "Auf dem Startbildschirm (Praktisch) findest du zwei Tabs. Üben ist dein tägliches Training. Spielen führt dich in die Story-Welt Neuland. Du kannst frei zwischen beiden wechseln, denn sie teilen sich denselben Lernfortschritt.",
+        en: "On the home screen (Praktisch) you will find two tabs. Üben is your daily training. Spielen takes you into the story world Neuland. You can switch freely between them, because they share the same learning progress.",
       },
       {
         type: "ul",

@@ -81,7 +81,7 @@ export function Session() {
       scope={scope}
       focus={focus}
       grammarTopicId={grammarTopicId}
-      eyebrow="Heute"
+      eyebrow="Praktisch"
       title="Deine Session"
     />
   );
