@@ -44,8 +44,11 @@ export function FlipCard({
         }
       }}
     >
+      {/* `grid-cols-1` (= minmax(0,1fr)) constrains the stacked faces to the
+          container width so wide inner content (e.g. an expanded RelatedPanel)
+          wraps/truncates instead of overflowing to the right. */}
       <div
-        className="grid h-full"
+        className="grid h-full grid-cols-1"
         style={{
           transformStyle: "preserve-3d",
           transition: reduce ? "none" : "transform 450ms cubic-bezier(0.2,0.7,0.2,1)",
@@ -53,14 +56,14 @@ export function FlipCard({
         }}
       >
         <div
-          className="h-full [grid-area:1/1]"
+          className="h-full min-w-0 [grid-area:1/1]"
           style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
           aria-hidden={flipped}
         >
           {front}
         </div>
         <div
-          className="h-full [grid-area:1/1]"
+          className="h-full min-w-0 [grid-area:1/1]"
           style={{
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",

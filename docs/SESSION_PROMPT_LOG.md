@@ -4253,3 +4253,26 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
   `src/features/grammar/GrammarViews.tsx` · `src/features/shared/FilterRail.tsx` ·
   `docs/PROJECT_REFERENCE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 368 — 2026-07-13 (session 105 continued, feedback-pill + overflow fixes)
+
+- **Branch:** `claude/demo-prep-feedback-rename-sl1jqq` (Opus 4.8)
+- **Prompts (verbatim):**
+  > in your screenshots, the filter seems to be too long vertically that the developed by KI/ feedback button overlaps the filter rail. reduce ghe height of it for desktop view. Also, for mobile view, developed with Ki should be to the center and at the bottom of the screen just above the navigation bottom bar. this line/button can be skipped in some places like Ueben /Spielen page where there's no content shown yet.
+  > [attached screenshot] the tile seems to be cutting of to the right here. Fix it.
+- **Response summary:** (1) **Desktop filter-rail height reduced** — the four rail instances went from
+  `lg:max-h-[calc(100vh-7rem)]` to `-11rem` so the rail no longer extends into the bottom-right
+  "Mit KI gebaut" pill. (2) **Feedback pill repositioned** (`FeedbackButton.tsx`): on **mobile it is
+  centered** (`left-1/2 -translate-x-1/2`) just above the nav bar, raised above the Theorie `/library`
+  sticky Üben action bar where present; **skipped entirely on the dashboard `/`** (Praktisch →
+  Üben/Spielen, the sparse page the founder named); desktop stays bottom-right. (3) **Flip-card
+  horizontal overflow fixed** (`FlipCard.tsx`): the stacked faces' grid had no column template, so an
+  expanded RelatedPanel ("Verbunden") sized the cell to its content and bled off the right edge; added
+  `grid-cols-1` (minmax(0,1fr)) + `min-w-0` so the inner `truncate` works. Verified in-app (Playwright):
+  **0 px horizontal overflow** with the panel expanded, feedback pill count = 0 on the dashboard,
+  centered above the nav on Fortschritt, desktop rail clears the pill. Gates: typecheck ✔, lint 0
+  errors, test:unit 130/130, build ✔. Merged to `main`.
+- **Artifacts:** `src/features/shared/FlipCard.tsx` · `src/components/layout/FeedbackButton.tsx` ·
+  `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `docs/SESSION_PROMPT_LOG.md`.

@@ -27,6 +27,7 @@ export function FeedbackButton() {
   const [sending, setSending] = useState(false);
   const location = useLocation();
   const showToast = useSessionStore((s) => s.showToast);
+  const path = location.pathname;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,18 +49,29 @@ export function FeedbackButton() {
     }
   }
 
+  // Skip on the dashboard (Praktisch → Üben/Spielen): it's a focused, sparse
+  // single-column layout where a floating pill just hangs over empty space
+  // (founder 2026-07-13). Other pages still show it.
+  if (path === "/") return null;
+
+  // The Theorie browse tabs (/library) pin a sticky ~52px "Üben" action bar to
+  // the bottom on mobile, so raise the pill above it there; everywhere else it
+  // sits just above the nav bar.
+  const hasBottomBar = path.startsWith("/library");
+  const mobileBottom = hasBottomBar
+    ? "bottom-[calc(3.9375rem+env(safe-area-inset-bottom)+3.25rem)]"
+    : "bottom-[calc(3.9375rem+env(safe-area-inset-bottom)+0.5rem)]";
+
   return (
     <>
-      {/* Fixed, subtle pill. On mobile it sits just above the bottom tab bar;
-          on desktop it floats in the bottom-right corner. */}
+      {/* Fixed, subtle pill. On mobile it is centered just above the bottom tab
+          bar (founder 2026-07-13); on desktop it floats in the bottom-right
+          corner. */}
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label="Feedback geben"
-        // Mobile: sit above the bottom tab bar AND clear the ~52px sticky
-        // "Üben" action bar that the Theorie browse pages pin to the bottom, so
-        // the pill never covers a page's primary CTA. Desktop: bottom-right.
-        className="fixed right-3 z-40 flex items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground bottom-[calc(3.9375rem+env(safe-area-inset-bottom)+3.25rem)] lg:bottom-4 lg:right-4"
+        className={`fixed left-1/2 -translate-x-1/2 ${mobileBottom} z-40 flex items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground lg:left-auto lg:right-4 lg:translate-x-0 lg:bottom-4`}
       >
         <Sparkles className="h-3.5 w-3.5 text-primary" />
         <span>
