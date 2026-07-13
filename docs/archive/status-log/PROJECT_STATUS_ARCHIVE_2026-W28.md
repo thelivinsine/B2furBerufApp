@@ -1707,3 +1707,31 @@ feedback button (emails founder), Fortschritt redesign, flippable Bibliothek til
   (no functional purpose for OR-filters, deferred). Standing content follow-ups + Üben map tappable
   stops + sector-audit review remain from prior sessions.
 
+
+**Handoff after session 106 (2026-07-13). Üben-map pin polish: sizing/color fix + a toggle/heading
+layout-shift bug (Sonnet 5), shipped straight from two founder screenshots/reports on branch
+`claude/pin-sizing-color-6lofhi`, merged to `main`.**
+- **"Du bist hier" pin (`UebenPath.tsx`):** the pulse ring (r 12→8, stroke 2→1.5) and the chip
+  (`px-3 py-1 text-[11px]` → `px-2 py-0.5 text-[9px]`) were oversized relative to the small pin glyph;
+  both shrunk to hug it. The pin (and its pulse ring) switched from the route indigo to a dedicated
+  red (`PIN_COLOR = "#e5484d"`) per founder request, so the live-location marker reads distinctly from
+  the indigo journey line; the pin's white inner ring/dot are unchanged.
+- **Heute toggle/heading layout-shift bug (`Dashboard.tsx`):** on desktop the Üben/Spielen toggle sits
+  above the tab content inside a `justify-center`d flex column, and the two panels render at different
+  natural heights (Üben ~581px, Spielen ~607px), so the whole stack's centered position — and thus the
+  toggle's screen position — shifted on every Üben ↔ Spielen switch. Diagnosed with a headless
+  Playwright probe against the dev server (bypassing onboarding via a seeded `b2beruf.settings.v1`
+  localStorage key): the toggle moved ~13px and both panels' own `<h1>` moved with it on every switch
+  (confirmed before/after with real bounding-box measurements, not just code reading). Fix: the sliding
+  content wrapper now reserves the taller panel's height (`lg:min-h-[38rem]`, Spielen's ~607px) so the
+  toggle+content stack's total height — and therefore its `justify-center`d position — stays constant
+  regardless of which tab is active. Mobile was already unaffected (normal document flow, not
+  flex-centered).
+- **Gates:** typecheck ✔, lint 0 errors (pre-existing warnings only), `pnpm build` + prerender ✔,
+  `check:bundle` **76.9 kB**/400. Browser-verified with Playwright against the dev server at mobile
+  (390×844) and multiple desktop widths (1024–1920px): toggle and heading now sit at identical
+  bounding-box coordinates before/after every tab switch.
+- **Shipped:** PR opened and squash-merged into `main` (was previously only on the feature branch;
+  per this repo's rule, feature-branch pushes never go live on their own).
+- **NOT done:** no other follow-up requested this session; standing content/Üben-map follow-ups from
+  prior sessions (human `verified` pass, jury Waves, sector-audit review) remain untouched.

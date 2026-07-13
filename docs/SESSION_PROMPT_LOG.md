@@ -4424,3 +4424,27 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/dashboard/UebenPath.tsx` · `src/features/dashboard/Dashboard.tsx` · commits `dde8285`,
   `8687c71` · PRs #490, #491 (squash-merged to `main`) · `docs/PROJECT_STATUS.md` ·
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 374 — 2026-07-13 (session 108, critical account data-isolation bug)
+
+- **Branch:** `claude/account-data-isolation-bug-s517d1` (Opus 4.8)
+- **Prompts (verbatim):**
+  > there's a serious bug I found regarding user authentication on my phone. When switching between accounts, the progress of one account is being shown in another account. this should be treated with absolute criticality and dealt in a way this never happens and every account's data is synced properly no matter in which device they log in and no matter how many accounts are logged in the same device.
+- **Response summary:** Diagnosed and fixed a cross-account data-leak on shared devices. Root cause:
+  the progress + settings zustand stores persist to **device-global** localStorage keys, and
+  `cloudSync.startCloudSync(uid)` **merged** the incoming account's cloud row into whatever local cache
+  the previous account left behind (`Math.max`/union/`mergeSrs`), then pushed that merged, contaminated
+  state up to the new account's cloud row (propagating cross-account, cross-device). Sign-out never
+  cleared the cache. Fix (`src/lib/cloudSync.ts`): a persisted `b2beruf.syncUid` marker binds the local
+  cache to one account; `startCloudSync` wipes the stores (`resetLocalStores`) before pull/merge/push
+  when the incoming uid differs, and always (re)writes the marker. First-ever/guest sync (no marker) and
+  the same-uid guest→account upgrade are untouched, so legitimate offline/guest progress is preserved.
+  Added exported `clearLocalAccountData()` (reset stores + forget marker), called from
+  `useAuthStore.signOut` and `deleteAccount` (the two now-unused store imports in `useAuthStore` were
+  removed). Added `tests/cloudSync.test.ts` (mocks `@/lib/supabase`) pinning four invariants: switch
+  wipes + never uploads old data, first/guest sync merges, same-account re-sync preserves,
+  `clearLocalAccountData` zeroes both stores + the marker. Gates: typecheck ✔, lint 0 errors (43
+  pre-existing warnings), `test:unit` 134/134, `pnpm build` + prerender ✔, `check:bundle` 77.4 kB/400,
+  `lint:content` ✔.
+- **Artifacts:** `src/lib/cloudSync.ts` · `src/store/useAuthStore.ts` · `tests/cloudSync.test.ts` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · commit + branch push pending.
