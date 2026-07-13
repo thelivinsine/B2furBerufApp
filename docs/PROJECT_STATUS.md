@@ -1,14 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 104, two parallel work-streams). **Bibliothek pre-demo round
-SHIPPED** (Opus 4.8): scope dropdowns (Branche/Thema/Unterthema/Kategorie/Gruppe) are now MULTI-select
-checkbox popovers, the reset clears them, the filter tile is subtle grey with white controls, the rail
-fills the viewport with a slim scrollbar, dropdown numbers show the option count, desktop search is
-inline, Wörter facet order (Wortart up / Stufe last), Redemittel lost its card section headers for a
-flat grid + Kategorie pills, and the Grammatik hub cards + drills were cleaned up. In parallel the
-**Üben map was re-spaced + recolored** (Fable 5, Work item 3 partial: street grid moved off the edges,
-MAP_LIGHT = brand-tinted "Stimmung 3", MAP_DARK = the bright "Klarer Abend"). Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-13 (session 105, demo-prep sweep, Opus 4.8). **SHIPPED:** nav renamed
+"Heute"->**Praktisch** / "Bibliothek"->**Theorie**, **Anwenden hidden** from the nav; a subtle
+**"Mit KI gebaut · Feedback"** pill on every page that emails the founder via a new `submit-feedback`
+Edge Function (founder deploy + `RESEND_API_KEY` needed, see `PHASE2_SETUP.md`); the **Fortschritt page
+was redesigned** into calm groups; and a **Theorie tiles/filter** round: flippable Karten tiles (EN on
+the back), redundant tile tags removed, FilterRail rebuilt as a viewport-capped flex column with an
+auto-hiding scrollbar, Mehr/Weniger on long facets, Grammatik Gruppe as a multi-select pill facet, and
+a centered toolbar that slides open for search. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
