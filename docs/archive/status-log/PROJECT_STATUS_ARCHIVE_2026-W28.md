@@ -1566,3 +1566,44 @@ The founder said "go ahead with sonnet 5 items in the ui refinement plan" agains
   order.
 - **Gates:** typecheck ✔, lint 0 errors, test:unit 129/129, build ✔, bundle 73.0 kB. NOT done at the
   time: Üben-plan item 3 (map), content follow-ups, sector-audit review.
+
+**Handoff after session 104 (2026-07-12, parallel to s103 and rebased onto it). Üben map re-spaced +
+recolored via mockup rounds (Fable 5, Üben-refinements Work item 3, completed by the follow-ups).** The founder asked for
+map mock-ups, iterated three rounds, and picked a direction that was then shipped to `main`.
+- **Mockup rounds (preview sheet `preview/ueben-map-mockups.html`, delivered as a claude.ai artifact
+  link):** R1 = the plan's illustrated-buildings recipe in 3 variants (rejected: "doesn't look good");
+  a pixel-art village round against founder-shared Zelda/Pokemon-style references was **abandoned
+  mid-review by founder choice** ("let's not waste resources"; never committed); R2 = the live map
+  re-spaced + 4 color moods (`-r2-farbstimmungen.html`); R3 = founder picked Stimmung 3 (Brand-Ton)
+  but its dark was too dark → 4 brighter dark variants (final sheet). **Founder picks: Stimmung 3
+  light + "Dunkel D: Klarer Abend" dark.** R1/R2 are archived beside the final sheet
+  (`preview/ueben-map-mockups-r1-beautify.html`, `-r2-farbstimmungen.html`). The pixel-art reference
+  images were shared inline in chat and could not be exported to files; drop them into
+  `preview/references/` if they should be kept.
+- **Shipped in `UebenPath.tsx`:** street grid re-spaced (H y=88/170, V x=76/176/276; tiles Bahnhof
+  [44,48], Laden [120,48], Zuhause [310,128], Amt [216,205]) so **no landmark tile hugs a map edge**
+  (Bahnhof was 13 px, Amt 10 px from the edge); SEG_PATHS + parks/lots re-laid to the new blocks.
+  **MAP_LIGHT = Brand-Ton** (indigo-tinted ground `#eef0f7` + lavender lots, green parks stay the
+  contrast), **MAP_DARK = Klarer Abend** (deliberately bright blue-grey ground `#2e3450`, near-white
+  labels `#dde1f2`; the old night palette was rejected as too dark/low contrast). New palette field
+  **`route`**: the journey line/pin now use `P.route` instead of `hsl(var(--primary))` because the
+  dark map needs a brighter indigo (`#a6a6fd`) than the dark `--primary` token on the lifted ground.
+- **Gates:** typecheck ✔, lint 0 errors, test:unit **129/129**, build + prerender ✔, bundle **73.0
+  kB**/400. **Verified in the real app** (vite preview + Playwright, 390x844): light + dark dashboards
+  render the picked palettes exactly as mocked.
+- **Follow-up (same session, from the founder's live screenshot):** at a fresh state the pin +
+  pulse ring landed exactly on the Bahnhof label and the chip covered the tile. Fix: per-stop
+  `labelPos`/`chipPos` (top-row stops label ABOVE the tile, chip RIGHT of the pin; Zuhause/Amt keep
+  below/right labels and the above-chip), the Laden park reshaped to a vertical strip right of the
+  tile + the top-left lot shrunk so the above-labels sit on clean ground. The founder kept the
+  dotted future-route at full strength (a proposed quieter dotting was reverted on their call).
+  Second follow-up: **the landmark tiles are now tappable** (per-stop `role="button"` groups; tap
+  slides the practice card to that stop's first unplayed mission via `stopTarget` + the existing
+  `goTo`, 44px invisible hit rects, hover/focus scale + focus ring, Enter/Space; the pin never
+  moves) and the **pin was shrunk to 70%** (scaled about its tip; chip offsets retuned).
+  Re-verified in-app across fresh/boss-done/mid states, light + dark; tap-routing checked per stop
+  (Bahnhof with 1.1 done goes to 1.2, done stops go to their first mission).
+- **NOT done:** the standing content follow-ups (frequency subset for ~91 new words, founder review
+  of `sector-audit-report.md`, human `verified` pass, jury Waves 1-2, Playwright grammar smoke).
+  With s103's items 2/4+5/6 shipped in parallel and the tappable stops in this session's follow-up,
+  **the Üben UI-refinements plan is fully shipped**.

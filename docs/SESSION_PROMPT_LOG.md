@@ -4127,6 +4127,8 @@ Branch: `claude/whats-next-esga9u`.
   > this is how it looks at after the changes are live - clearly there's more improvement needed here
 - **Follow-up (verbatim, interrupting a proposed quieter dotted-route change):**
   > the dotten chain is fine. Leave it as is. Anyway, the user sees a thick line (as per the preview) after traveling so that's okay.
+- **Follow-up (verbatim):**
+  > the icons aren't interactive on the map. clicking on them doesn't do anything - fix it. Also, reduce the size of pin by 30%. 
 - **Response summary:** Üben map mockup session (Fable 5, run in parallel with s103; rebased onto its merge) that converged on a shipped redesign of
   `UebenPath.tsx` (Üben-refinements plan, Work item 3, re-scoped by the founder along the way).
   Round 1: the plan's illustrated-buildings recipe as 3 SVG variants (plan spec / lively / depth),
@@ -4150,6 +4152,11 @@ Branch: `claude/whats-next-esga9u`.
   `labelPos`/`chipPos` collision fixes (top-row labels above the tile, chip right of the pin),
   scenery reshaped under the new labels; the dotted future-route stayed at full strength on the
   founder's call. Re-verified across fresh/boss-done/mid states in both themes and shipped.
+  Third round: made the landmark tiles tappable (the plan's remaining work-item-3 sub-task:
+  per-stop button groups, stopTarget slides the practice card to the stop's first unplayed
+  mission, 44px hit rects, hover/focus scale, keyboard support, pin untouched by taps) and shrunk
+  the pin to 70% scaled about its tip (chip offsets retuned). Tap-routing verified per stop in the
+  built app; all gates green; shipped. This closes the Üben UI-refinements plan.
 - **Artifacts:** `src/features/dashboard/UebenPath.tsx` · `preview/ueben-map-mockups.html` (final,
   dark variants) · `preview/ueben-map-mockups-r1-beautify.html` ·
   `preview/ueben-map-mockups-r2-farbstimmungen.html` · `docs/plans/UEBEN_UI_REFINEMENTS_PLAN.md` ·
