@@ -4390,3 +4390,37 @@ Branch: `claude/whats-next-esga9u`.
   `src/features/session/{Session,SessionPlayer}.tsx` · commits `5f87721`, `2ab5909` · PRs #486, #488
   (both squash-merged to `main`) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 373 — 2026-07-13 (session 107 continued, icon + Üben-map polish)
+
+- **Branch:** `claude/demo-prep-feedback-rename-sl1jqq` (Opus 4.8)
+- **Prompts (verbatim):**
+  > make the compass ring a bit more thicker and make its color to match the blue used in other icons of the naivgation panel/bar. Make sure the compass's design is matching other icons
+  > for the map, the dotted route should have opaque dashes that exactly overlaps the lane dashes on the street so that it looks clean
+  > the ring surrounding the pin on the map should be muted dark gray/black - pick the most suitable shade here
+  > the book icon on lernen button isn't filled when selected - fix it.
+  > for the lernen icon when filled can you add a small subtle line in the middle to differenciate two open pages?
+  > document the session
+- **Response summary:** A rapid round of visual polish, each shipped and verified with Playwright.
+  (1) **Compass** (`nav-items.ts`, `route-icons.tsx`): moved the Praktisch route accent to the nav blue
+  `#2563eb` so the icon ring AND the active-tab underline (which reads `item.color`) match the other
+  nav marks, and thickened the ring (r8 / stroke 2.7) + refit its NORM box. (2) **Üben-map route dashes**
+  (`UebenPath.tsx`): the onward/dotted legs were scattered dots (`0.5 11`) floating over the street; added
+  `SEG_RUNS` (the legs broken into axis-aligned straight runs) and drew each run with the dash pattern
+  phase-locked to the street lane dashes (opaque, same `7 9` period, butt caps, `strokeDashoffset =
+  start-coord mod 16`), so each route dash lands exactly on a lane dash. Solid travelled legs still use
+  the smooth `SEG_PATHS`. (3) **Pin pulse ring**: added a theme-aware `pulseRing` to both map palettes
+  (muted charcoal `#4b5563` on light, muted light `#c7cce0` on dark) and switched the ring from the pin's
+  red to it; the pin body stays red. (4) **Lernen toggle book** (`Dashboard.tsx`): first set the book to
+  fill when active; then, because a solid `BookOpen` merged into one blob, replaced it with a small
+  custom `LernenBook` SVG whose two pages are separate shapes with a ~2px transparent center gutter, so
+  when filled the pill background shows through as a subtle dividing line keeping the two open pages
+  distinct (unfilled = a stroked open book; gutter transparent so it adapts to light/dark). Verified both
+  toggle states at 3× and the map/compass at mobile + desktop. Gates each ship: typecheck ✔, lint 0
+  errors, `test:unit` 130/130, build + prerender ✔, `check:bundle` ~77 kB/400. Shipped as PRs #490 and
+  #491 (both squash-merged to `main`, post-merge realignment each time); updated `docs/PROJECT_STATUS.md`
+  and this log.
+- **Artifacts:** `src/components/layout/nav-items.ts` · `src/components/layout/route-icons.tsx` ·
+  `src/features/dashboard/UebenPath.tsx` · `src/features/dashboard/Dashboard.tsx` · commits `dde8285`,
+  `8687c71` · PRs #490, #491 (squash-merged to `main`) · `docs/PROJECT_STATUS.md` ·
+  `docs/SESSION_PROMPT_LOG.md`.

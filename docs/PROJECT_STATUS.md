@@ -9,8 +9,11 @@ geben" in practice sessions), all on the **MessageSquareText** icon; **content-s
 **at-rest white block beside the sticky tabs removed** (masking bg only paints when scrolled); the
 Wörter **graph opens zoomed into a readable random node** with an interactive mobile legend; the "Üben"
 label **centered with the icon floating left**; and the Praktisch toggle's left mode renamed **"Üben" →
-Lernen** (blue + book icon) to stop clashing with the Theorie Üben button (Spielen stays orange). Prior
-session (106): Üben-map pin sizing/color + Heute toggle/heading layout-shift fix. Product name:
+Lernen** (blue + book icon) to stop clashing with the Theorie Üben button (Spielen stays orange). A
+follow-up polish round (PRs #490, #491): compass recolored to the nav blue + thicker ring, the Üben-map
+onward route dashes phase-locked to the street lane markings, the pin's pulse ring muted gray, and the
+Lernen book given a subtle center gutter so its two open pages stay distinct when filled. Prior session
+(106): Üben-map pin sizing/color + Heute toggle/heading layout-shift fix. Product name:
 **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -124,9 +127,19 @@ desktop white-block fix (Opus 4.8).** Continuation of the s105 demo sweep on bra
 - **Praktisch toggle rename + recolor (`Dashboard.tsx`):** left mode "Üben" → **Lernen** (blue
   `text-blue-600` + `BookOpen` icon) so it no longer clashes with the Theorie Üben button; "Lernen /
   Spielen" reads as a pair. Spielen stays orange. Founder picked Lernen + Blau from preview options.
+- **Post-ship follow-ups (same session, PRs #490, #491):** (a) the **compass** route accent moved to the
+  nav blue `#2563eb` (so the ring AND the active-tab underline match the other nav marks) with a
+  **thicker ring** (r8/stroke 2.7); (b) the **Üben-map onward route** is drawn per straight run with its
+  dash pattern **phase-locked to the street lane dashes** (opaque, "7 9" period, offset = start-coord mod
+  16, in `SEG_RUNS`) so route dashes land exactly on the lane markings instead of scattering as dots;
+  (c) the pin's **pulse ring is a muted theme-aware gray** (`pulseRing`, was red) while the pin stays red;
+  (d) the **Lernen toggle book fills when active** and, per a follow-up, uses a **custom open-book mark
+  (`LernenBook`) with a ~2px transparent center gutter** so the two pages stay distinct when filled
+  (lucide `BookOpen` dropped from the toggle). All Playwright-verified; gates green each ship.
 - **Gates:** typecheck ✔, lint **0 errors** (43 warnings), content-lint ✔, `test:unit` **130/130**,
-  build + prerender ✔, `check:bundle` **76.7 kB**/400. Playwright-verified: white-block gone at rest +
-  masks on scroll, toggle Lernen/blue live.
+  build + prerender ✔, `check:bundle` **~77 kB**/400. Playwright-verified: white-block gone at rest +
+  masks on scroll, toggle Lernen/blue live, compass blue, map dashes aligned, gray pulse ring, filled
+  book with center gutter.
 - **NOT done:** standing content/Üben-map follow-ups (human `verified` pass, jury Waves, sector-audit
   review) remain; the s105 "reorderable filter list" is still read as pill-list + Mehr/Weniger (no
   drag-reorder).
