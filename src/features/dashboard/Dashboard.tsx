@@ -64,7 +64,7 @@ export function Dashboard() {
       >
         {(
           [
-            { id: "ueben", label: "Lernen", Icon: BookOpen, tint: "text-blue-600", fillActive: false },
+            { id: "ueben", label: "Lernen", Icon: BookOpen, tint: "text-blue-600", fillActive: true },
             { id: "spielen", label: "Spielen", Icon: Play, tint: "text-orange-500", fillActive: true },
           ] as const
         ).map(({ id, label, Icon, tint, fillActive }) => (

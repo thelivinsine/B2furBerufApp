@@ -17,11 +17,12 @@ type Render = (c: string) => React.ReactNode;
 
 const RENDERERS: Record<string, Render> = {
   // Praktisch (using German in real life) — a compass: finding your way in real
-  // situations. Indigo ring + two-tone needle (neon-cyan north, indigo south).
-  // Founder pick, 2026-07-13.
+  // situations. Blue ring (matching the nav-bar blue family) + two-tone needle
+  // (neon-cyan north, blue south). Ring thickened to sit with the other marks.
+  // Founder tweak, 2026-07-13.
   "/": c => (
     <>
-      <circle cx="10" cy="10" r="8.3" stroke={c} strokeWidth="2.1" fill="none" />
+      <circle cx="10" cy="10" r="8" stroke={c} strokeWidth="2.7" fill="none" />
       <polygon points="13.6,6.4 11.4,11.4 8.6,8.6" fill="#22d3ee" />
       <polygon points="6.4,13.6 11.4,11.4 8.6,8.6" fill={c} />
     </>
@@ -149,7 +150,7 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 
 // [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
-  "/":             { box: [1.7, 1.7, 16.6, 16.6],   weight: 0.95 },
+  "/":             { box: [0.65, 0.65, 18.7, 18.7], weight: 0.95 },
   "/library":      { box: [2.8, 4, 15.2, 12],       weight: 1.05 },
   "/anwenden":     { box: [1.3, 1.3, 17.4, 17.4],   weight: 0.94 },
   "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },
