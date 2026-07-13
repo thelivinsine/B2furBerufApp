@@ -1,7 +1,29 @@
 import { lazy, Suspense, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { BookOpen, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// Lernen (Praktisch toggle) open-book mark. The two pages are separate shapes
+// with a ~2px gutter down the middle, so when the icon is FILLED the pill
+// background shows through that gutter as a subtle center line keeping the two
+// open pages distinct (founder 2026-07-13); the gutter is transparent so it
+// adapts to the light/dark pill automatically. Unfilled = a stroked open book.
+function LernenBook({ className, filled }: { className?: string; filled: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill={filled ? "currentColor" : "none"}
+      stroke="currentColor"
+      strokeWidth={filled ? 0 : 2}
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M11 6C8.5 4.7 5.6 4.5 3 4.8a.9.9 0 0 0-.9.9v11.6a.9.9 0 0 0 .9.9c2.6-.2 5.5 0 8 1.4Z" />
+      <path d="M13 6c2.5-1.3 5.4-1.5 8-1.2a.9.9 0 0 1 .9.9v11.6a.9.9 0 0 1-.9.9c-2.6-.2-5.5 0-8 1.4Z" />
+    </svg>
+  );
+}
 
 // Both tabs import the mission bank, so they load lazily to keep the content
 // bank off the Dashboard's eager path (bundle budget, CLAUDE.md). Üben is the
@@ -64,10 +86,10 @@ export function Dashboard() {
       >
         {(
           [
-            { id: "ueben", label: "Lernen", Icon: BookOpen, tint: "text-blue-600", fillActive: true },
-            { id: "spielen", label: "Spielen", Icon: Play, tint: "text-orange-500", fillActive: true },
+            { id: "ueben", label: "Lernen", tint: "text-blue-600" },
+            { id: "spielen", label: "Spielen", tint: "text-orange-500" },
           ] as const
-        ).map(({ id, label, Icon, tint, fillActive }) => (
+        ).map(({ id, label, tint }) => (
           <button
             key={id}
             type="button"
@@ -87,10 +109,14 @@ export function Dashboard() {
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {/* Spielen's active Play triangle fills solid (`fillActive`) so it
-                reads as filled on the lifted white pill; the Lernen book stays
-                an outline (a filled book blob reads worse than the open book). */}
-            <Icon className={cn("h-4 w-4", fillActive && tab === id && "fill-current")} />
+            {/* Both active icons fill on the lifted white pill: the Play
+                triangle fills solid, and the Lernen book fills with a subtle
+                center gutter separating its two open pages (LernenBook). */}
+            {id === "ueben" ? (
+              <LernenBook filled={tab === id} className="h-4 w-4" />
+            ) : (
+              <Play className={cn("h-4 w-4", tab === id && "fill-current")} />
+            )}
             {label}
           </button>
         ))}
