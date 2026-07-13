@@ -66,9 +66,14 @@ input:-webkit-autofill {
 
     --border: 223 24% 27%;
     --input: 223 24% 29%;
-    --ring: 245 80% 68%;
+    /* Lightened from 68% so purple text (eyebrows, active tab labels, the
+       `text-primary` section headers) clears WCAG AA contrast on the dark
+       background; at 68% it measured ~4.3:1, just under the 4.5:1 floor for the
+       small bold uppercase labels. Primary-as-button-fill is unaffected (its
+       dark `primary-foreground` text only gains contrast). */
+    --ring: 245 84% 74%;
 
-    --primary: 245 80% 68%;
+    --primary: 245 84% 74%;
     --primary-foreground: 240 30% 8%;
     --accent: 188 80% 52%;
     --accent-foreground: 240 30% 8%;

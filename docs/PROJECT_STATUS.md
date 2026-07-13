@@ -1,10 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 113). **Theorie tab-transition polish (Opus 4.8):** the Bibliothek
-(Theorie) tab switch flashed blank on every toggle; replaced the enter-only CSS keyframe + `null`
-Suspense fallback in `LibraryHub` with the Praktisch-style `AnimatePresence mode="wait"` directional
-slide + a shaped skeleton, and bumped the Praktisch compass route mark's optical weight `0.95→1.05` so
-it matches its nav neighbors (PR #506). All gates green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-13 (session 114). **Theorie pill animation robustness + dark-mode contrast
+(Opus 4.8):** the tab bar and view switcher animated their active pill with framer's `layoutId`
+mount/unmount crossfade, which stuttered against the trainer re-render; replaced it with a single
+always-mounted pill measured to the active segment (new `useSlidingPill` hook) that glides on a pure
+transform. Also lifted dark `--primary` `68%→74%` so purple eyebrows/tab labels/`text-primary` links
+clear WCAG AA on the dark background. Pushed to `claude/theroie-toggle-animation-t5c86i` (not yet
+merged). All gates green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -58,6 +60,34 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 114 (2026-07-13). Theorie pill animation robustness + dark-mode purple
+contrast (Opus 4.8), on branch `claude/theroie-toggle-animation-t5c86i` — pushed, NOT yet merged
+(commit `688bd0d`; asked the founder before opening a PR).** Follow-up to s113's tab-slide work,
+fixing the *pill* jerk specifically (s113 fixed the content-panel slide; the pill glide was still
+stuttering). No logic/data change.
+- **Pill animation (the real fix):** both `LibrarySwitcher` (tab bar) and `ViewSwitcher` (Tabelle/
+  Graph/Karten/Liste) animated their active pill with framer's `layoutId` **shared-layout crossfade** —
+  the pill rendered ONLY on the active segment (`{active && <motion.span layoutId=…/>}`), so each switch
+  unmounted the old pill + mounted a new one, forcing framer to re-measure both and cross-fade. On the
+  library tabs the same click also renders a whole trainer (walks a content bank), so that measurement
+  competed for the main thread and the pill stuttered. Replaced with new
+  **`src/features/shared/useSlidingPill.ts`**: ONE always-mounted pill measured to the active segment
+  from the live DOM (`offsetLeft`/`offsetWidth`, re-measured on active change + `ResizeObserver`,
+  positioned pre-paint via `useLayoutEffect`), animating only `x`/`width` (compositor-friendly transform
+  for the equal-width segments), decoupled from the rest of the frame. Robust to gaps/padding/responsive/
+  unequal widths. If you touch either switcher, keep the single-pill pattern; do NOT reintroduce the
+  per-segment `layoutId` crossfade.
+- **Dark-mode purple contrast:** dark `--primary` was `245 80% 68%` (~4.3:1 on the dark bg, under the
+  WCAG AA 4.5:1 floor for the small bold uppercase eyebrows / active-tab labels / `text-primary` links);
+  lifted to `245 84% 74%` (~5.6:1), `--ring` matched. Primary-as-button-fill unaffected (its dark
+  `primary-foreground` text only gains contrast).
+- **Verified in Chromium** (playwright-core, seeded onboarded localStorage, light + dark at 900×700): pill
+  lands pixel-accurately on both the first (Wörter) and far (Grammatik) tabs, ViewSwitcher pill correct,
+  purple labels/links clearly legible in dark, no light-mode regression.
+- **Files:** `src/features/shared/useSlidingPill.ts` (new) · `src/features/library/LibrarySwitcher.tsx` ·
+  `src/features/shared/ViewSwitcher.tsx` · `src/index.css`.
+- **Gates:** typecheck ✔; build+prerender ✔; test:unit 134/134; check:bundle 79.5 kB/400.
+
 **Handoff after session 113 (2026-07-13). Theorie tab-transition + compass-icon polish (Opus 4.8), on
 branch `claude/theory-toggle-transitions-hloi6s`, merged to `main` (PR #506).** Two small UX fixes,
 no logic/data change.
@@ -79,39 +109,8 @@ no logic/data change.
 - **Files:** `src/features/library/LibraryHub.tsx` · `src/index.css` · `src/components/layout/route-icons.tsx`.
 - **Gates:** build+prerender green; check:bundle 79.5 kB/400; no remaining `.lib-slide-in-*` refs.
 
-**Handoff after session 112 (2026-07-13). Demo-readiness Chunks 2 + 3 shipped (Opus 4.8), on branch
-`claude/predemo-opus-tasks-ek5qhz`.** The two Opus "Tonight A" chunks of `DEMO_READINESS_PLAN.md`:
-regression review of the s102–110 demo-prep rounds + abuse hardening of the public feedback path.
-- **Chunk 2 (regression review) — findings:** fixed the two stale "(Heute)" strings the rename left
-  behind (`Session.tsx` session-empty-state eyebrow → "Praktisch"; the `hilfe/erste-schritte` help
-  article DE+EN → "(Praktisch)", reprerendered). Verified SAFE with no change needed: (a) the
-  returning-user `pinnedTabs`/`ROUTE_SUCCESSOR` migration — `BottomTabBar` filters pins to
-  `CONTENT=["/library","/analytics"]` and `BarTab` returns null for unknown paths, and `Sidebar`
-  renders `navItems` directly, so a stale `/anwenden` pin from a pre-s105 device can't break either
-  bar; (b) the feedback surfaces (pill desktop-only + off `/` + off focus/missions, dialog mounted
-  app-wide, graceful failure); (c) `/session` junk-param handling (`mission`/`grammar`/`theme`/`cefr`/
-  `sector`/`cat`/`sub`/`min` all fall back, never crash).
-- **Chunk 3 (abuse hardening) — shipped:** `submit-feedback` (`supabase/functions/submit-feedback/`)
-  now has two **migration-free** guards: a per-IP burst limit (≤5 / 10 min, in-memory, hashed IP) and
-  a DB-backed global hourly email ceiling (≤60/hr stops the email but still stores the row). Friendly
-  German error preserved. RLS re-checked across 0001–0006 (all owner-scoped to `auth.uid()` or the
-  founder-email gate; `feedback` + `ai_usage` service-role-only; no public SELECT). `delete-account` +
-  `evaluate-writing` re-confirmed JWT-gated + CORS-allowlisted; evaluate-writing keeps its daily/
-  monthly/per-user caps. Founder console steps added to `docs/plans/PHASE2_SETUP.md`.
-- **Follow-up (post-merge, same day): the feedback backend was never deployed.** Activating the rate
-  limit surfaced that `submit-feedback` had never been deployed at all (authored s105, deploy step never
-  ran), so the table + function + Resend key did not exist in Supabase and the live feedback button was
-  non-functional. The founder has no local terminal (repo-only), so they set it up **via the dashboard**:
-  created `public.feedback` (migration 0006 SQL in the SQL Editor), created the `submit-feedback` Edge
-  Function with **Verify JWT OFF** (anonymous feedback allowed), and set `RESEND_API_KEY`. **Feedback is
-  now live end-to-end, including the s112 rate limit.** (A GitHub-Actions auto-deploy workflow was offered
-  as a future convenience, not built.)
-- **Gates:** all green — typecheck ✔, lint 0 errors/44 warnings, lint:content ✔, test:unit 134/134,
-  test:srs 323, test:pronounce 26, build+prerender ✔, check:bundle 79.5 kB/400.
-- **Remaining plan chunks:** 1 Playwright smoke test (Sonnet 5), 4 UI polish (Sonnet 5), 5 demo runbook
-  `docs/DEMO_RUNBOOK.md` (Sonnet 5), 6 perf sanity (Sonnet 5, P1). See `DEMO_READINESS_PLAN.md`.
-
-_(Session 112's P2 content-accuracy handoff, session 111's handoff (demo-readiness plan authored + baseline verified) and sessions 85-110's
+_(Session 112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff, session 111's handoff
+(demo-readiness plan authored + baseline verified) and sessions 85-110's
 handoffs, plus the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
 and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_

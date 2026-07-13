@@ -2,6 +2,7 @@ import { useSearchParams } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { Table2, Waypoints, LayoutGrid, List } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import { cn } from "@/lib/utils";
 
 /**
@@ -52,44 +53,51 @@ export function ViewSwitcher({
   className?: string;
 }) {
   const reduce = useReducedMotion();
+  const { trackRef, registerItem, rect } = useSlidingPill(value);
   return (
     <div
+      ref={trackRef as React.RefObject<HTMLDivElement>}
       role="group"
       aria-label="Ansicht"
       className={cn(
         // Same lifted-white-pill toggle language as the page toggle
         // (LibrarySwitcher): recessed grey track, active button on a white pill.
         // Sized so the whole control is 40px tall, matching the icon buttons in
-        // the toolbar row.
-        "inline-flex h-10 shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5",
+        // the toolbar row. `relative` is the pill's positioning context.
+        "relative inline-flex h-10 shrink-0 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5",
         className,
       )}
     >
+      {/* One always-mounted pill measured to the active button; glides on a pure
+          transform instead of a mount/unmount crossfade (see useSlidingPill). */}
+      {rect && (
+        <motion.span
+          aria-hidden
+          className="absolute top-0.5 bottom-0.5 left-0 rounded-md bg-surface shadow-soft"
+          initial={false}
+          animate={{ x: rect.left, width: rect.width }}
+          transition={
+            reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }
+          }
+        />
+      )}
       {views.map((v) => {
         const { label, icon: Icon } = VIEW_META[v];
         const active = v === value;
         return (
           <button
             key={v}
+            ref={registerItem(v)}
             onClick={() => onChange(v)}
             aria-pressed={active}
             aria-label={label}
             title={label}
             className={cn(
-              "relative inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors",
+              "relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors",
               active ? "text-primary" : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {active && (
-              <motion.span
-                layoutId="view-tab-pill"
-                className="absolute inset-0 rounded-md bg-surface shadow-soft"
-                transition={
-                  reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }
-                }
-              />
-            )}
-            <Icon className="relative z-10 h-4 w-4" />
+            <Icon className="h-4 w-4" />
           </button>
         );
       })}
