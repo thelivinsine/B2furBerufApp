@@ -5,9 +5,10 @@ switching accounts on one device leaked one account's progress into another (and
 other's cloud row). Root cause: the device-global localStorage caches were **merged** into every account
 on login and never cleared on sign-out. Fix in `lib/cloudSync.ts`: a persisted `b2beruf.syncUid` marker
 binds the local cache to one account; `startCloudSync` wipes the cache before pulling when the incoming
-uid differs, and sign-out/delete now `clearLocalAccountData()`. Guest-upgrade (same uid) and first/offline
-sync are preserved. Pinned by `tests/cloudSync.test.ts` (4 cases). On branch
-`claude/account-data-isolation-bug-s517d1`. Prior session (107, demo-prep polish continued, Opus 4.8). **SHIPPED (PRs #486,
+uid differs, and sign-out/delete now `clearLocalAccountData()`, so **logging out resets the on-device
+progress + settings** (after flushing pending changes to the cloud first). Guest-upgrade (same uid) and
+first/offline sync are preserved. Pinned by `tests/cloudSync.test.ts` (4 cases). **SHIPPED: PR #493
+squash-merged to `main` (`64df253`).** Prior session (107, demo-prep polish continued, Opus 4.8). **SHIPPED (PRs #486,
 #488):** Praktisch nav icon → **compass**; the feedback button reworked into a store-controlled dialog
 with three surfaces (desktop bottom-right pill, mobile action-bar icon left of Üben, full "Feedback
 geben" in practice sessions), all on the **MessageSquareText** icon; **content-scoped Bibliothek Üben**
