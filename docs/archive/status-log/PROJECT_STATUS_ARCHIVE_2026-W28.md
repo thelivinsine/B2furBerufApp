@@ -1783,3 +1783,35 @@ desktop white-block fix (Opus 4.8).** Continuation of the s105 demo sweep on bra
 - **NOT done:** standing content/Üben-map follow-ups (human `verified` pass, jury Waves, sector-audit
   review) remain; the s105 "reorderable filter list" is still read as pill-list + Mehr/Weniger (no
   drag-reorder).
+
+## Session 108 (2026-07-13) — CRITICAL account data-isolation bug (Resume-here handoff, archived from PROJECT_STATUS s110)
+
+**Handoff after session 108 (2026-07-13). CRITICAL account data-isolation bug (Opus 4.8), on branch
+`claude/account-data-isolation-bug-s517d1`.** Founder report: on a phone, switching between accounts
+showed one account's progress under another.
+- **Root cause:** `useProgressStore`/`useSettingsStore` persist to **device-global** localStorage keys
+  (`b2beruf.progress.v1` / `.settings.v1`) shared by every account on the device. `startCloudSync(uid)`
+  **merges** the incoming account's cloud row into whatever local cache is left from the previous account
+  (`Math.max` / union / `mergeSrs`), then in step 2 **pushes that merged result up to the new account's
+  cloud row**. Nothing cleared the cache on sign-out or account switch. So account A's XP/streak/SRS/saved
+  words leaked into account B's view **and were written into B's cloud row**, propagating to all of B's
+  devices. Settings leaked too (`mergeRemoteSettings` bails out when `local.onboarded` is already true, so
+  B kept A's name/level).
+- **Fix (`lib/cloudSync.ts`):** a persisted `b2beruf.syncUid` marker records which account owns the local
+  cache. `startCloudSync` reads it first; if the incoming uid differs, it `resetLocalStores()` (wipes
+  progress + settings back to defaults) **before** the pull/merge/push, so nothing cross-account can merge
+  or upload. The marker is (re)written on every sync. A missing marker (first-ever sync, or an install
+  predating this build) is treated as "same owner" so genuine offline/guest progress is preserved, and the
+  guest→account upgrade keeps the same uid so it never hits the wipe branch. New exported
+  `clearLocalAccountData()` (reset stores + forget the marker) is called from `useAuthStore.signOut` and
+  `deleteAccount`, so the sign-in screen and the next account on a shared device never see stale data.
+- **Tests:** `tests/cloudSync.test.ts` (new, mocks `@/lib/supabase`) pins four invariants: a different
+  account wipes the previous cache before syncing and never pushes the old data up; the first/guest sync
+  preserves local progress (merge, not wipe); the same account re-syncing does not wipe; and
+  `clearLocalAccountData` zeroes both stores + the marker.
+- **Gates:** typecheck ✔, lint **0 errors** (43 pre-existing warnings), `test:unit` **134/134**, `pnpm
+  build` + prerender ✔, `check:bundle` **77.4 kB**/400, `lint:content` ✔.
+- **NOT done / consider next:** the local cache is still a single device-global key that is wiped-and-
+  reloaded on switch (correct + robust, but a future hardening could namespace the persist key per uid to
+  avoid any wipe entirely). Live verification on a real phone with two accounts is left to the founder
+  (sandbox can't reach the deployed site). Standing content/Üben-map follow-ups remain untouched.
