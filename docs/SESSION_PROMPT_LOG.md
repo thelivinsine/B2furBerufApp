@@ -4582,3 +4582,33 @@ Branch: `claude/whats-next-esga9u`.
   `supabase/functions/submit-feedback/index.ts` · `docs/plans/PHASE2_SETUP.md` ·
   `docs/plans/DEMO_READINESS_PLAN.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 378 — 2026-07-13 (parallel centering-polish work-stream, desktop feedback pill + graph legend)
+
+- **Branch:** `claude/lucid-hawking-e16neg` (Opus 4.8 / Sonnet). Ran in parallel with the demo-readiness
+  stream (Entries 376–377), so its session numbers are not reused here; this is logged as its own stream.
+- **Prompts (verbatim):**
+  > on desktop view, the feedback pill should be moved so that it's center is in line with the filter rail's center line
+  > IN desktop view, the legend and xx connections should be centered aligned
+  > does it look like centred to you? [+ screenshot of the Wörter graph legend row]
+  > check if all the tasks in this session are done properly
+- **Response summary:** Two desktop-only alignment fixes on the Bibliothek/Theorie pages.
+  **(1) Feedback pill** (`FeedbackButton.tsx` `FeedbackPill`): was flush bottom-right (`right-4`); now
+  `lg:right-[calc(9.5rem_+_max(0px,(100vw_-_88rem)/2))]` so its center sits on the `FilterRail` column's
+  center line. Derived from the shared Bibliothek layout geometry, not eyeballed: every browse tab renders
+  inside a `max-w-6xl` main column offset by the 16rem desktop sidebar, with the rail as the last `16rem`
+  track of a `lg:grid-cols-[minmax(0,1fr)_16rem]` grid and `sm:px-6` padding, so the rail center is 9.5rem
+  in from that column's right edge plus half the centering margin once the viewport passes the 88rem
+  (sidebar + max-w-6xl) cap. **Shipped as PR #499 (`67367d2`).** **(2) Graph legend** (`WordGraph.tsx`):
+  the domain legend + "n Verbindungen" count were left-aligned on desktop (`lg:justify-start` on the row +
+  `lg:ml-auto` pushing the count to the far right); both overrides removed so the row is `justify-center`
+  on all breakpoints, matching mobile. **Shipped as PR #500 (`ae0c2fc`).** The founder's "does it look
+  centred?" screenshot was a **stale/cached load** taken after PR #500's Pages deploy for `ae0c2fc` had
+  already completed (Actions run = success); the deployed source has both items centered with no leftover
+  overrides, so no further code change was needed. **Verification pass (4th prompt):** confirmed working
+  tree clean, both PRs merged to `main` + deployed green, and both edits present in source; the only
+  outstanding item was this documentation trail. Gates: typecheck ✔, `pnpm build` + prerender ✔,
+  `check:bundle` 79.5 kB/400. (Docs landed after the demo-readiness stream had merged PRs #501–#502 to
+  `main`, so this entry is appended on top of that state rather than renumbering the shared history.)
+- **Artifacts:** `src/components/layout/FeedbackButton.tsx` (PR #499, `67367d2`) ·
+  `src/features/vocabulary/WordGraph.tsx` (PR #500, `ae0c2fc`) · `docs/SESSION_PROMPT_LOG.md`.
