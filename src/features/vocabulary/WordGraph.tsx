@@ -206,11 +206,25 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
 
     if (!fittedRef.current && nodes.length > 0) {
       fittedRef.current = true;
-      // Open zoomed INTO a random area at a readable zoom (founder 2026-07-13),
-      // not the fit-all overview: word labels appear once k > ~0.85, so k≈2.2
-      // makes them legible. Centered on a random node (not selected, so no card).
-      const pick = nodes[Math.floor(Math.random() * nodes.length)];
-      const k = clampK(2.2);
+      // Open zoomed INTO a dense area at a readable zoom (founder 2026-07-13),
+      // not the fit-all overview. k≈3.4 makes the big nodes and their labels
+      // read comfortably on a phone (the whole-graph fit sits behind the
+      // fit-to-screen button). Center on a node picked WEIGHTED BY AREA
+      // (r² ∝ wordfreq), so the opening view reliably lands among common,
+      // well-connected words instead of a lone rare word in an empty corner.
+      // Not selected on open, so no card covers the map.
+      let total = 0;
+      for (const n of nodes) total += n.r * n.r;
+      let pick = nodes[0];
+      let r = Math.random() * total;
+      for (const n of nodes) {
+        r -= n.r * n.r;
+        if (r <= 0) {
+          pick = n;
+          break;
+        }
+      }
+      const k = clampK(3.4);
       transformRef.current = {
         k,
         x: width / 2 - (pick.x ?? 0) * k,
@@ -524,7 +538,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
         break;
       }
     }
-    const targetK = clampK(2.6);
+    const targetK = clampK(3.4);
     transformRef.current = {
       k: targetK,
       x: rect.width / 2 - (pick.x ?? 0) * targetK,
