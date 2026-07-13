@@ -1865,3 +1865,23 @@ which merged just before the session-109 fixes above; documented here as a disti
   reintroduces the `library-tab-pill` layoutId collision, so it was deliberately skipped. The whole panel
   (incl. the tab bar, since the bar is inside each segment) slides subtly; offset kept small (~20px) so it
   reads as content, not a bar jump. Live visual confirm on the deployed site is the founder's.
+
+---
+
+## Session 111 (2026-07-13) — Demo-readiness plan authored + baseline verified (archived from PROJECT_STATUS s112)
+
+**Handoff after session 111. Demo-readiness PLAN authored + baseline verified (Fable 5); implementation
+intentionally NOT started.** The demo is 2026-07-14 (founder presents live, then shares the link; both a
+seeded account and a clean profile are wanted). The founder is nearly out of Fable for the week, so the
+plan routes every implementation chunk to Opus 4.8 / Sonnet 5 and defers Fable-grade work to next week.
+- **Baseline verified on `main` (ae0c2fc):** all 9 gates green (typecheck; lint 0 errors / 44 deliberate
+  warnings; lint:content; test:unit 134/134; test:srs 323; test:pronounce 26; audit 0 vulnerabilities;
+  build + prerender; bundle 79.5 kB/400). Security greps clean (no secrets, no XSS sinks, every
+  `target="_blank"` carries `rel="noreferrer"`, only public keys reach the client). Confirmed:
+  `public/404.html` SPA fallback exists; the PWA is `autoUpdate`; `evaluate-writing` has daily + monthly
+  cost caps.
+- **Known gap found:** `submit-feedback` had NO rate limit (fixed in s112 Chunk 3).
+- **Plan chunks (P0):** 1 Playwright smoke test (Sonnet 5) · 2 regression review (Opus 4.8) · 3 abuse
+  hardening (Opus 4.8) · 4 UI polish (Sonnet 5) · 5 `docs/DEMO_RUNBOOK.md` + demo states (Sonnet 5). P1:
+  6 perf sanity. P2 next week: Fable content proofread (done s112) + full security review.
+- **Artifacts:** `docs/plans/DEMO_READINESS_PLAN.md` (new) + doc updates.

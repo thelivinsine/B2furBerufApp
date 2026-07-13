@@ -1,12 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 112, **demo-readiness Chunks 2+3 (Opus 4.8)**). Regression review
-of the s102–110 demo-prep rounds + abuse hardening for the shared demo link. Fixed stale "(Heute)"
-copy (session eyebrow + the `erste-schritte` help article); verified the returning-user `pinnedTabs`
-migration, the feedback surfaces, and `/session` junk-param handling are all safe. Added two
-migration-free rate-limit guards to `submit-feedback` (per-IP burst + global hourly email ceiling),
-re-checked RLS across migrations 0001–0006, and re-confirmed the `delete-account`/`evaluate-writing`
-auth gates. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-13 (session 112 ran as two parallel branches). **Demo-readiness Chunks 2+3
+(Opus 4.8):** regression review of the s102–110 demo-prep rounds + abuse hardening for the shared demo
+link (stale "(Heute)" copy fixed, returning-user migration verified, two migration-free rate-limit
+guards on `submit-feedback`, RLS re-check). **Demo-readiness P2 content-accuracy pass (Fable → Opus
+4.8):** proofread the demo-visible German (6 Kapitel-1 missions, top-spine grammar lessons, help
+articles), fixed the real `verify:grammar` findings, retagged the 6 `verify:cefr` FLAG items, grew the
+AI-jury sidecar +39 ids, and **regenerated the stale `src/data/verification.ts`** (was missing the s102
+Branche packs; now 2,263 records, jury tier 149→188). All 9 gates green. Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -86,29 +88,36 @@ regression review of the s102–110 demo-prep rounds + abuse hardening of the pu
 - **Remaining plan chunks:** 1 Playwright smoke test (Sonnet 5), 4 UI polish (Sonnet 5), 5 demo runbook
   `docs/DEMO_RUNBOOK.md` (Sonnet 5), 6 perf sanity (Sonnet 5, P1). See `DEMO_READINESS_PLAN.md`.
 
-**Handoff after session 111 (2026-07-13). Demo-readiness PLAN authored + baseline verified (Fable 5);
-implementation intentionally NOT started.** The demo is **2026-07-14** (founder presents live, then
-shares the link; both a seeded account and a clean profile are wanted). The founder is nearly out of
-Fable for the week, so the plan routes every implementation chunk to Opus 4.8 / Sonnet 5 and defers
-Fable-grade work to next week. **Start the next session by reading
-`docs/plans/DEMO_READINESS_PLAN.md` and picking a chunk from its Session-packaging table (set the
-model via `/model` first).**
-- **Baseline verified on `main` (ae0c2fc) — do NOT redo:** all 9 gates green (typecheck; lint 0
-  errors / 44 deliberate warnings; lint:content; test:unit 134/134; test:srs 323; test:pronounce 26;
-  audit 0 vulnerabilities; build + prerender; bundle 79.5 kB/400). Security greps clean (no secrets,
-  no XSS sinks, every `target="_blank"` carries `rel="noreferrer"`, only public keys reach the
-  client). Confirmed: `public/404.html` SPA fallback exists; the PWA is `autoUpdate` (demo devices
-  need a hard refresh after the final merge); `evaluate-writing` has daily + monthly cost caps.
-- **Known gap found:** `submit-feedback` has NO rate limit (input caps + CORS allowlist only), so an
-  audience member could spam the founder's inbox via Resend. Fix is plan Chunk 3 (Opus 4.8).
-- **Plan chunks (P0):** 1 Playwright smoke test of the demo path (Sonnet 5) · 2 regression review of
-  PRs #477–#500 incl. the `pinnedTabs`/`ROUTE_SUCCESSOR` migration for returning devices (Opus 4.8) ·
-  3 abuse hardening (Opus 4.8) · 4 demo-visible UI polish (Sonnet 5) · 5 `docs/DEMO_RUNBOOK.md` +
-  seeded/clean demo states (Sonnet 5). P1: 6 perf sanity (Sonnet 5). P2 next week: Fable content
-  proofread + a full security-review session. Each chunk carries a non-technical founder summary.
-- **NOT done:** all implementation chunks (deliberate; the founder runs them in fresh sessions on the
-  recommended models). Standing content/Üben-map follow-ups unchanged from prior sessions.
+**Handoff after session 112 (2026-07-13). Demo-readiness P2 content-accuracy pass shipped (Fable →
+Opus 4.8), on branch `claude/predemo-plan-fable-tasks-gdray4`.** The task was the plan's P2 "content
+accuracy pass" (proofread demo-visible German beyond the automated checkers). This is content-only; no
+app logic changed. **The other DEMO_READINESS_PLAN chunks (P0 1–5, P1 6) are still open** for the
+recommended models (Opus 4.8 / Sonnet 5); start there next by reading
+`docs/plans/DEMO_READINESS_PLAN.md`.
+- **verify:grammar fixes (real findings only, the rest are LanguageTool noise on proper nouns):**
+  `r_neg7` `auf einander`→`aufeinander`; `r_cla6` straight→curly closing quote; dialogue `k3a`
+  `Dieses`→`dieses` after a colon; dialogue `s4b` `du`→`Du` after a colon; 4 texts `den`→`dem`
+  ("am Dienstag, dem 14. Juli"); `tx_wohnen_email_besichtigung` `gern`→`gerne` clash + "Die Kaution
+  beträgt"→"Als Kaution verlangen wir" (three-sentence-start repeat).
+- **verify:cefr FLAG retags (common word carrying an advanced B2.2 label):** `v_umwelt`→B1.1,
+  `v_vermeiden`→B1.2, `v_muell_vermeiden`→B1.2, `v_energie_sparen`→B1.1, `v_bewusst`→B2.1,
+  `v_zudem`→B2.1. (The 77 WATCH/B2.1 items are info-only, left as-is.)
+- **Proofread clean (no edits needed):** all 6 Kapitel-1 mission scripts (`missions.ts`), the 6
+  top-spine grammar lessons (Konnektoren/Relativsätze/Konjunktiv II/Modalverben/Passiv/Nebensätze),
+  and the 7 help articles (`features/help/content.ts`) all read correct, no em dashes.
+- **Jury sidecar + verification map:** appended +39 reviewed ids to `docs/reports/jury-review.json`
+  (6 top-spine grammar topics + their drills, the 6 mission ids) and ran `pnpm build:verification`.
+  **That regen also fixed a stale generated file:** the committed `verification.ts` had only 2,110
+  records and was missing the s102 Branche collocation packs; it now has 2,263 (jury 149→188, and the
+  Branche packs get proper provenance/facts tiers). A prior session added s102 content without
+  regenerating it, so this was overdue.
+- **Gates:** all 9 green — typecheck; lint 0 errors/44 deliberate warnings; lint:content; test:unit
+  134/134; test:srs 323; test:pronounce 26; audit 0 vulns; build + prerender; bundle 79.5 kB/400.
+- **NOT done (deliberate):** deeper LanguageTool triage and jury waves beyond the spine (optional
+  polish); all P0/P1 plan chunks (run on the recommended models). No `review_status` flips (that is a
+  human-only action; the jury tier is an honest machine tier).
 
-_(Sessions 85-110's handoffs, and the s104 Üben-map round + Bibliothek pre-demo round, are in
+_(Session 111's handoff (demo-readiness plan authored + baseline verified) and sessions 85-110's
+handoffs, plus the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
 and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_

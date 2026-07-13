@@ -4612,3 +4612,30 @@ Branch: `claude/whats-next-esga9u`.
   `main`, so this entry is appended on top of that state rather than renumbering the shared history.)
 - **Artifacts:** `src/components/layout/FeedbackButton.tsx` (PR #499, `67367d2`) ·
   `src/features/vocabulary/WordGraph.tsx` (PR #500, `ae0c2fc`) · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 379 — 2026-07-13 (session 112, demo-readiness P2 content-accuracy pass)
+
+- **Branch:** `claude/predemo-plan-fable-tasks-gdray4` (started Fable 5, model switched to Opus 4.8 mid-session)
+- **Prompts (verbatim):**
+  > go ahead with predemo plan fable tasks
+  > continue
+- **Response summary:** Executed the DEMO_READINESS_PLAN P2 "content accuracy pass" (the Fable-tagged
+  content proofread). Triaged the warn-only `verify:grammar` report: fixed the genuine findings
+  (`r_neg7` `auf einander`→`aufeinander`; `r_cla6` straight→curly closing quote; dialogue `k3a`
+  `Dieses`→`dieses` and `s4b` `du`→`Du` after a colon; 4 texts `den`→`dem` in "am Dienstag, dem 14.
+  Juli"; `tx_wohnen_email_besichtigung` `gern`→`gerne` clash + "Die Kaution beträgt"→"Als Kaution
+  verlangen wir"), left the LanguageTool proper-noun noise. Triaged `verify:cefr`: retagged the 6 FLAG
+  items down from B2.2 (`v_umwelt`→B1.1, `v_vermeiden`→B1.2, `v_muell_vermeiden`→B1.2,
+  `v_energie_sparen`→B1.1, `v_bewusst`→B2.1, `v_zudem`→B2.1). Proofread all 6 Kapitel-1 mission scripts,
+  the 6 top-spine grammar lessons and the 7 help articles: all read clean, no edits. Grew
+  `docs/reports/jury-review.json` +39 reviewed ids (6 top-spine grammar topics + drills, 6 mission ids)
+  and ran `pnpm build:verification`, which also **fixed a stale generated file**: committed
+  `verification.ts` had 2,110 records and was missing the s102 Branche collocation packs; regen produced
+  2,263 records (jury tier 149→188). All 9 gates green (typecheck; lint 0 errors/44 warnings;
+  lint:content; test:unit 134/134; test:srs 323; test:pronounce 26; audit 0 vulns; build+prerender;
+  bundle 79.5 kB/400). Docs updated (status handoff s112, s110 handoff archived to W28, plan P2 bullet
+  marked done, this log). Merged to `main` per auto-ship.
+- **Artifacts:** `src/data/redemittel.ts` · `src/data/dialogues.ts` · `src/data/texts.ts` ·
+  `src/data/vocabulary.ts` · `docs/reports/jury-review.json` · `src/data/verification.ts` (regenerated) ·
+  `docs/plans/DEMO_READINESS_PLAN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.

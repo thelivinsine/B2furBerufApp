@@ -215,10 +215,17 @@ still opens fast and every section loads when tapped.*
 
 ## P2 — post-demo, next week (needs Fable or is not demo-blocking)
 
-- **Content accuracy pass (Fable when quota resets):** proofread demo-visible German (Kapitel-1
-  mission scripts, top grammar lessons, help articles) beyond the automated checkers; triage the
-  warn-only `verify:grammar`/`verify:cefr` reports; grow the jury sidecar. The linter +
-  two-oracle fact gate already ran green, so this is refinement, not risk.
+- **Content accuracy pass — DONE (s112, started Fable, finished Opus 4.8):** proofread demo-visible
+  German (Kapitel-1 mission scripts, top grammar lessons, help articles) beyond the automated
+  checkers; triaged the warn-only `verify:grammar`/`verify:cefr` reports and grew the jury sidecar.
+  Fixed the real `verify:grammar` findings (`aufeinander`, "am Dienstag, dem 14. Juli", the two
+  closing-quote/`Dieses`→`dieses` cases, `gern`/`gerne` clash, `Kaution beträgt`→`verlangen wir`);
+  retagged the 6 `verify:cefr` FLAG items down from B2.2 (Umwelt/vermeiden→B1, bewusst/zudem→B2.1,
+  Müll/Energie sparen→B1). Missions, top grammar lessons and help articles read clean (no German
+  errors). Grew `docs/reports/jury-review.json` +39 ids (6 top-spine grammar topics + drills, 6
+  Kapitel-1 missions) and regenerated `src/data/verification.ts` (which was **stale**: it was missing
+  the s102 Branche packs, now 2,263 records; jury tier 149→188). All 9 gates green. Remaining P2
+  refinement (deeper LanguageTool triage, jury waves beyond the spine) is optional polish, not risk.
 - **Full security review session (Opus 4.8):** run the repo `/security-review` skill over the
   whole app (not just a diff), Turnstile enablement, Resend SMTP, and the standing `pnpm audit`
   + `.npmrc` supply-chain posture re-check.

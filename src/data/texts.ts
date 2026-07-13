@@ -27,7 +27,7 @@ export const texts: ReadingText[] = [
     titleEn: "Your appointment for address registration at the citizens' office",
     de: [
       "Sehr geehrte Frau Yilmaz,",
-      "vielen Dank für Ihre Terminanfrage. Ihr Termin zur Anmeldung Ihrer neuen Wohnung findet am Dienstag, den 14. Juli, um 9:30 Uhr im Bürgeramt Mitte statt (Zimmer 204).",
+      "vielen Dank für Ihre Terminanfrage. Ihr Termin zur Anmeldung Ihrer neuen Wohnung findet am Dienstag, dem 14. Juli, um 9:30 Uhr im Bürgeramt Mitte statt (Zimmer 204).",
       "Bitte bringen Sie folgende Unterlagen mit: Ihren Reisepass oder Personalausweis, die Wohnungsgeberbestätigung Ihres Vermieters und das ausgefüllte Anmeldeformular. Ohne diese Unterlagen können wir die Anmeldung nicht bearbeiten.",
       "Falls Sie den Termin nicht wahrnehmen können, sagen Sie ihn bitte spätestens 24 Stunden vorher online ab.",
       "Mit freundlichen Grüßen\nIhr Bürgeramt Mitte",
@@ -388,7 +388,7 @@ export const texts: ReadingText[] = [
     titleEn: "Maintenance of the IT systems on Saturday",
     de: [
       "Liebe Kolleginnen und Kollegen,",
-      "am kommenden Samstag, den 12. Juli, werden unsere IT-Systeme zwischen 8 und 16 Uhr gewartet. In dieser Zeit sind das E-Mail-Programm, das Kundenportal und die gemeinsamen Laufwerke nicht erreichbar.",
+      "am kommenden Samstag, dem 12. Juli, werden unsere IT-Systeme zwischen 8 und 16 Uhr gewartet. In dieser Zeit sind das E-Mail-Programm, das Kundenportal und die gemeinsamen Laufwerke nicht erreichbar.",
       "Bitte speichert alle offenen Dokumente bis Freitagabend und meldet euch aus allen Systemen ab. Nicht gespeicherte Änderungen können bei der Wartung verloren gehen.",
       "Ab Sonntagmorgen stehen alle Systeme wieder normal zur Verfügung. Bei Problemen nach der Wartung wendet euch bitte an den IT-Support unter der Durchwahl 4500.",
       "Euer IT-Team",
@@ -621,7 +621,7 @@ export const texts: ReadingText[] = [
     titleEn: "Appointment confirmation from your GP practice",
     de: [
       "Sehr geehrte Frau Novak,",
-      "wir bestätigen Ihnen hiermit Ihren Termin in unserer Praxis am Donnerstag, den 16. Juli, um 8:45 Uhr bei Dr. Weber.",
+      "wir bestätigen Ihnen hiermit Ihren Termin in unserer Praxis am Donnerstag, dem 16. Juli, um 8:45 Uhr bei Dr. Weber.",
       "Bitte bringen Sie Ihre Versichertenkarte mit und kommen Sie etwa zehn Minuten früher, damit wir Sie an der Anmeldung aufnehmen können. Falls Sie derzeit Medikamente einnehmen, notieren Sie diese bitte vorab auf einem Zettel.",
       "Sollten Sie den Termin nicht wahrnehmen können, sagen Sie ihn bitte spätestens 24 Stunden vorher telefonisch ab. So können wir den Termin an andere Patienten vergeben.",
       "Mit freundlichen Grüßen\nIhr Praxisteam Dr. Weber",
@@ -737,9 +737,9 @@ export const texts: ReadingText[] = [
     titleEn: "Invitation to a flat viewing",
     de: [
       "Sehr geehrte Frau Costa,",
-      "vielen Dank für Ihre Anfrage zu unserer Zweizimmerwohnung in der Lindenstraße 12. Gerne laden wir Sie zu einer Besichtigung am Samstag, den 19. Juli, um 11:00 Uhr ein.",
-      "Die Wohnung hat 58 Quadratmeter, einen Balkon und liegt im zweiten Stock ohne Aufzug. Die Kaltmiete beträgt 720 Euro, dazu kommen 180 Euro Nebenkosten. Die Kaution beträgt zwei Kaltmieten.",
-      "Bitte bringen Sie zur Besichtigung einen Nachweis über Ihr Einkommen und Ihren Personalausweis mit. Falls Ihnen der Termin nicht passt, schlagen Sie mir gern eine Alternative vor.",
+      "vielen Dank für Ihre Anfrage zu unserer Zweizimmerwohnung in der Lindenstraße 12. Gerne laden wir Sie zu einer Besichtigung am Samstag, dem 19. Juli, um 11:00 Uhr ein.",
+      "Die Wohnung hat 58 Quadratmeter, einen Balkon und liegt im zweiten Stock ohne Aufzug. Die Kaltmiete beträgt 720 Euro, dazu kommen 180 Euro Nebenkosten. Als Kaution verlangen wir zwei Kaltmieten.",
+      "Bitte bringen Sie zur Besichtigung einen Nachweis über Ihr Einkommen und Ihren Personalausweis mit. Falls Ihnen der Termin nicht passt, schlagen Sie mir gerne eine Alternative vor.",
       "Mit freundlichen Grüßen\nA. Berger, Hausverwaltung Berger",
     ].join("\n\n"),
     en: [
@@ -1145,7 +1145,7 @@ export const texts: ReadingText[] = [
     titleEn: "Notice: maintenance of the heating system",
     de: [
       "Liebe Hausbewohnerinnen und Hausbewohner,",
-      "am Dienstag, den 22. Oktober, wird die Heizungsanlage im Haus gewartet. Die Arbeiten dauern voraussichtlich von 8:00 bis 14:00 Uhr.",
+      "am Dienstag, dem 22. Oktober, wird die Heizungsanlage im Haus gewartet. Die Arbeiten dauern voraussichtlich von 8:00 bis 14:00 Uhr.",
       "In dieser Zeit fällt die Heizung aus, und es gibt vorübergehend kein warmes Wasser. Bitte stellen Sie sich darauf ein und drehen Sie die Heizkörper vorher nicht auf.",
       "Der Techniker muss in jede Wohnung, um die Heizkörper zu prüfen. Falls Sie an diesem Tag nicht zu Hause sind, geben Sie bitte einen Schlüssel bei der Hausverwaltung oder bei einem Nachbarn ab.",
       "Vielen Dank für Ihr Verständnis.\nIhre Hausverwaltung",
