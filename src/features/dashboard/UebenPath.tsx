@@ -41,11 +41,18 @@ type StopState = "done" | "current" | "locked";
 // block). Coordinates live in the 360 x 230 map viewBox. Re-spaced in s104
 // (founder-picked mockup): the street grid sits at y 88/170 and x 76/176/276
 // so every tile keeps clear margin to the map edges.
+//
+// `labelPos` and `chipPos` are collision-authored per stop (s104 follow-up):
+// the top-row stops (tile ABOVE the stop point) label ABOVE the tile and put
+// the "Du bist hier" chip to the RIGHT of the pin, because a below-label and
+// an above-chip both land exactly where the pin + pulse ring render when that
+// stop is current (the founder's live screenshot showed the pin slicing
+// through "Bahnhof" and the chip covering the tile).
 const STOPS = [
-  { key: "bahnhof", label: "Bahnhof", missions: ["m_kap1_willkommen", "m_kap1_automat"], stop: [44, 88], tile: [44, 48], color: "#5b5be6", labelPos: "below" },
-  { key: "laden", label: "Laden", missions: ["m_kap1_sim", "m_kap1_einkauf"], stop: [120, 88], tile: [120, 48], color: "#f0705f", labelPos: "below" },
-  { key: "zuhause", label: "Zuhause", missions: ["m_kap1_dach"], stop: [276, 128], tile: [310, 128], color: "#f2a03d", labelPos: "below" },
-  { key: "amt", label: "Amt", missions: ["m_kap1_anmeldung"], stop: [216, 170], tile: [216, 205], color: "#2fa8a0", labelPos: "right" },
+  { key: "bahnhof", label: "Bahnhof", missions: ["m_kap1_willkommen", "m_kap1_automat"], stop: [44, 88], tile: [44, 48], color: "#5b5be6", labelPos: "above", chipPos: "right" },
+  { key: "laden", label: "Laden", missions: ["m_kap1_sim", "m_kap1_einkauf"], stop: [120, 88], tile: [120, 48], color: "#f0705f", labelPos: "above", chipPos: "right" },
+  { key: "zuhause", label: "Zuhause", missions: ["m_kap1_dach"], stop: [276, 128], tile: [310, 128], color: "#f2a03d", labelPos: "below", chipPos: "above" },
+  { key: "amt", label: "Amt", missions: ["m_kap1_anmeldung"], stop: [216, 170], tile: [216, 205], color: "#2fa8a0", labelPos: "right", chipPos: "above" },
 ] as const;
 
 // Route legs between consecutive stops, along the street grid. Leg i arrives at
@@ -198,15 +205,16 @@ export default function UebenPath() {
               </filter>
             </defs>
 
-            {/* parks + ambient lots (all inside blocks, never on streets) */}
-            <rect x={92} y={12} width={64} height={18} rx={9} fill={P.park} />
-            <circle cx={106} cy={21} r={5.5} fill={P.parkDeep} />
-            <circle cx={134} cy={21} r={6.5} fill={P.parkDeep} />
+            {/* parks + ambient lots (all inside blocks, never on streets; the
+                zones above the Bahnhof/Laden tiles stay clear for the above-labels) */}
+            <rect x={140} y={10} width={20} height={52} rx={10} fill={P.park} />
+            <circle cx={150} cy={22} r={5.5} fill={P.parkDeep} />
+            <circle cx={150} cy={44} r={6} fill={P.parkDeep} />
             <rect x={192} y={104} width={68} height={48} rx={12} fill={P.park} />
             <circle cx={212} cy={120} r={9} fill={P.parkDeep} />
             <circle cx={242} cy={136} r={10} fill={P.parkDeep} />
             <rect x={92} y={188} width={68} height={24} rx={11} fill={P.park} />
-            <rect x={10} y={12} width={26} height={14} rx={6} fill={P.lotA} />
+            <rect x={8} y={6} width={20} height={10} rx={5} fill={P.lotA} />
             <rect x={192} y={14} width={40} height={28} rx={7} fill={P.lotA} />
             <rect x={240} y={20} width={20} height={44} rx={7} fill={P.lotB} />
             <rect x={294} y={14} width={50} height={24} rx={7} fill={P.lotA} />
@@ -271,7 +279,15 @@ export default function UebenPath() {
                     {s.label}
                   </text>
                 ) : (
-                  <text x={s.tile[0]} y={s.tile[1] + 29} textAnchor="middle" fontSize={10.5} fontWeight={700} fill={P.label} fontFamily="inherit">
+                  <text
+                    x={s.tile[0]}
+                    y={s.tile[1] + (s.labelPos === "above" ? -24 : 29)}
+                    textAnchor="middle"
+                    fontSize={10.5}
+                    fontWeight={700}
+                    fill={P.label}
+                    fontFamily="inherit"
+                  >
                     {s.label}
                   </text>
                 )}
@@ -291,10 +307,18 @@ export default function UebenPath() {
           </g>
         </svg>
 
-          {/* "Du bist hier" chip floats above the pin, hiding nothing */}
+          {/* "Du bist hier" chip floats beside the pin, per-stop placement so
+              it never covers the current stop's tile (chipPos in STOPS) */}
           <span
-            className="absolute -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-bold shadow-soft"
-            style={{ left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 30) / 240) * 100}%` }}
+            className={cn(
+              "absolute whitespace-nowrap rounded-full border border-border bg-surface px-3 py-1 text-[11px] font-bold shadow-soft",
+              STOPS[currentIndex].chipPos === "right" ? "-translate-y-1/2" : "-translate-x-1/2 -translate-y-full",
+            )}
+            style={
+              STOPS[currentIndex].chipPos === "right"
+                ? { left: `${((pinX + 15) / 360) * 100}%`, top: `${((pinY + 5 - 11) / 240) * 100}%` }
+                : { left: `${(pinX / 360) * 100}%`, top: `${((pinY + 5 - 30) / 240) * 100}%` }
+            }
           >
             Du bist hier
           </span>

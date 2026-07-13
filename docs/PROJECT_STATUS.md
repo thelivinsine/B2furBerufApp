@@ -117,6 +117,13 @@ map mock-ups, iterated three rounds, and picked a direction that was then shippe
 - **Gates:** typecheck ✔, lint 0 errors, test:unit **129/129**, build + prerender ✔, bundle **73.0
   kB**/400. **Verified in the real app** (vite preview + Playwright, 390x844): light + dark dashboards
   render the picked palettes exactly as mocked.
+- **Follow-up (same session, from the founder's live screenshot):** at a fresh state the pin +
+  pulse ring landed exactly on the Bahnhof label and the chip covered the tile. Fix: per-stop
+  `labelPos`/`chipPos` (top-row stops label ABOVE the tile, chip RIGHT of the pin; Zuhause/Amt keep
+  below/right labels and the above-chip), the Laden park reshaped to a vertical strip right of the
+  tile + the top-left lot shrunk so the above-labels sit on clean ground. The founder kept the
+  dotted future-route at full strength (a proposed quieter dotting was reverted on their call).
+  Re-verified in-app across fresh/boss-done/mid states, light + dark.
 - **NOT done:** the rest of Work item 3 (tappable stops that slide the practice card, and any further
   in-tile illustration work; the founder chose re-space + recolor over the plan's illustrated-buildings
   recipe, so re-scope item 3 before building more); the standing content follow-ups (frequency subset
