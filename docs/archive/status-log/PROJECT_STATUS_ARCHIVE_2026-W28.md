@@ -1902,3 +1902,35 @@ Opus 4.8), on branch `claude/predemo-plan-fable-tasks-gdray4`.** The plan's P2 "
   Branche collocation packs were missing).
 - **Gates:** all 9 green (typecheck; lint 0 err/44 warn; lint:content; test:unit 134/134; test:srs 323;
   test:pronounce 26; audit 0; build+prerender; bundle 79.5 kB/400).
+
+**Handoff after session 112 (2026-07-13). Demo-readiness Chunks 2 + 3 shipped (Opus 4.8), on branch
+`claude/predemo-opus-tasks-ek5qhz`.** The two Opus "Tonight A" chunks of `DEMO_READINESS_PLAN.md`:
+regression review of the s102–110 demo-prep rounds + abuse hardening of the public feedback path.
+- **Chunk 2 (regression review) — findings:** fixed the two stale "(Heute)" strings the rename left
+  behind (`Session.tsx` session-empty-state eyebrow → "Praktisch"; the `hilfe/erste-schritte` help
+  article DE+EN → "(Praktisch)", reprerendered). Verified SAFE with no change needed: (a) the
+  returning-user `pinnedTabs`/`ROUTE_SUCCESSOR` migration — `BottomTabBar` filters pins to
+  `CONTENT=["/library","/analytics"]` and `BarTab` returns null for unknown paths, and `Sidebar`
+  renders `navItems` directly, so a stale `/anwenden` pin from a pre-s105 device can't break either
+  bar; (b) the feedback surfaces (pill desktop-only + off `/` + off focus/missions, dialog mounted
+  app-wide, graceful failure); (c) `/session` junk-param handling (`mission`/`grammar`/`theme`/`cefr`/
+  `sector`/`cat`/`sub`/`min` all fall back, never crash).
+- **Chunk 3 (abuse hardening) — shipped:** `submit-feedback` (`supabase/functions/submit-feedback/`)
+  now has two **migration-free** guards: a per-IP burst limit (≤5 / 10 min, in-memory, hashed IP) and
+  a DB-backed global hourly email ceiling (≤60/hr stops the email but still stores the row). Friendly
+  German error preserved. RLS re-checked across 0001–0006 (all owner-scoped to `auth.uid()` or the
+  founder-email gate; `feedback` + `ai_usage` service-role-only; no public SELECT). `delete-account` +
+  `evaluate-writing` re-confirmed JWT-gated + CORS-allowlisted; evaluate-writing keeps its daily/
+  monthly/per-user caps. Founder console steps added to `docs/plans/PHASE2_SETUP.md`.
+- **Follow-up (post-merge, same day): the feedback backend was never deployed.** Activating the rate
+  limit surfaced that `submit-feedback` had never been deployed at all (authored s105, deploy step never
+  ran), so the table + function + Resend key did not exist in Supabase and the live feedback button was
+  non-functional. The founder has no local terminal (repo-only), so they set it up **via the dashboard**:
+  created `public.feedback` (migration 0006 SQL in the SQL Editor), created the `submit-feedback` Edge
+  Function with **Verify JWT OFF** (anonymous feedback allowed), and set `RESEND_API_KEY`. **Feedback is
+  now live end-to-end, including the s112 rate limit.** (A GitHub-Actions auto-deploy workflow was offered
+  as a future convenience, not built.)
+- **Gates:** all green — typecheck ✔, lint 0 errors/44 warnings, lint:content ✔, test:unit 134/134,
+  test:srs 323, test:pronounce 26, build+prerender ✔, check:bundle 79.5 kB/400.
+- **Remaining plan chunks:** 1 Playwright smoke test (Sonnet 5), 4 UI polish (Sonnet 5), 5 demo runbook
+  `docs/DEMO_RUNBOOK.md` (Sonnet 5), 6 perf sanity (Sonnet 5, P1). See `DEMO_READINESS_PLAN.md`.

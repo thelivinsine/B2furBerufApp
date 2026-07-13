@@ -279,8 +279,14 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   also appends a match's **connections** (its `related` terms that resolve to in-scope entries). (2) **The
   HubHero page headers were dropped from all four Bibliothek tabs; `LibrarySwitcher` IS the page header** —
   a lifted `shadow-soft` bar, **active tab bold + brand** (reads as the section title), quiet inactive, with
-  a framer **`layoutId` sliding white pill** (reduced-motion safe). `text-sm` on ALL breakpoints (an earlier
+  a **sliding white pill** (reduced-motion safe). `text-sm` on ALL breakpoints (an earlier
   `sm:text-base` was reverted as oversized). **`ViewSwitcher` got the same sliding pill** (`h-10`). (3)
+  **Sliding-pill mechanism (s114, supersedes the earlier framer `layoutId` approach):** both switchers use
+  the shared **`src/features/shared/useSlidingPill.ts`** hook — ONE always-mounted pill measured to the
+  active segment via `offsetLeft`/`offsetWidth` (`useLayoutEffect` pre-paint + `ResizeObserver`), animating
+  only `x`/`width` on a compositor-friendly transform. This replaced framer's `layoutId` shared-layout
+  crossfade, which mounted/unmounted a pill per switch and stuttered against the trainer re-render. Keep
+  the single-pill pattern; do NOT reintroduce the per-segment `layoutId` crossfade.
   **Mobile toolbar is a full-width `justify-between` row** `[Filter icon · ViewSwitcher · bookmark/search]`;
   the Filter icon is a page-owned toggle and the filter tile is a body-only **`FilterRail` `layout="panel"`**
   that slides open/closed via **AnimatePresence** (height/opacity). The desktop persistent rail (`layout`

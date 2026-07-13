@@ -4713,3 +4713,34 @@ Branch: `claude/whats-next-esga9u`.
   changed in this follow-up.
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` (docs only; the Supabase setup
   was done by the founder in the dashboard, no repo change).
+
+## Entry 383 — 2026-07-13 (session 114, Theorie pill animation robustness + dark-mode purple contrast)
+
+- **Branch:** `claude/theroie-toggle-animation-t5c86i` (Opus 4.8)
+- **Prompt (verbatim):**
+  > the Theroie page toggle transition looks jerky rather than smooth sliding. do a proper check and do a proper robust implementation of the animation
+- **Prompt (verbatim, mid-turn):**
+  > Some of the headers with purple text are not clearly visible in dark mode - it needs to be fixed
+- **Prompt (verbatim):**
+  > document the session
+- **Response summary:** Follow-up to s113's tab-slide work. Root-caused the *pill* jerk (distinct from the
+  panel slide s113 fixed): the `LibrarySwitcher` tab bar AND the `ViewSwitcher` view toggle animated their
+  active pill with framer's `layoutId` **shared-layout crossfade** — the pill was rendered only on the
+  active segment (`{active && <motion.span layoutId=…/>}`), so every switch unmounted the old pill and
+  mounted a new one, forcing framer to re-measure both nodes and cross-fade. On the library tabs the same
+  click also renders a whole trainer (walks a content bank), so that measurement competed for the main
+  thread and the pill stuttered. Fix: new **`src/features/shared/useSlidingPill.ts`** hook — one
+  always-mounted pill measured to the active segment from the live DOM (`offsetLeft`/`offsetWidth`,
+  re-measured on active change + `ResizeObserver`, positioned pre-paint via `useLayoutEffect`), animating
+  only `x`/`width` (a compositor-friendly transform for the equal-width segments), decoupled from whatever
+  else renders that frame. Rewired both switchers to it. Second task: dark `--primary` was `245 80% 68%`,
+  ~4.3:1 on the dark bg — under the WCAG AA 4.5:1 floor for the small bold uppercase eyebrows / active-tab
+  labels / `text-primary` links; lifted to `245 84% 74%` (~5.6:1, `--ring` too). Primary-as-button-fill
+  unaffected (dark foreground only gains contrast). **Verified end-to-end in Chromium** (playwright-core,
+  seeded onboarded localStorage, light + dark at 900×700): pill lands pixel-accurately on both the first
+  and far tabs, ViewSwitcher pill correct, purple labels/links clearly legible in dark, no light-mode
+  regression. Gates: typecheck; build+prerender; test:unit 134/134; check:bundle 79.5 kB/400. **Pushed to
+  the branch; NOT merged** (asked the founder whether to open + squash-merge a PR).
+- **Artifacts:** `src/features/shared/useSlidingPill.ts` (new) · `src/features/library/LibrarySwitcher.tsx` ·
+  `src/features/shared/ViewSwitcher.tsx` · `src/index.css` (commit `688bd0d`) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
