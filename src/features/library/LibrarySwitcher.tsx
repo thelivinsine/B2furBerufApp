@@ -2,6 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import { useLibraryScope } from "@/store/useLibraryScope";
+import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import { cn } from "@/lib/utils";
 
 /**
@@ -26,6 +27,7 @@ export function LibrarySwitcher() {
   const current = params.get("tab") ?? DEFAULT_LIBRARY_TAB;
   const { theme, sub } = useLibraryScope();
   const reduce = useReducedMotion();
+  const { trackRef, registerItem, rect } = useSlidingPill(current);
 
   const linkFor = (seg: (typeof SEGMENTS)[number]) => {
     const p = new URLSearchParams();
@@ -39,24 +41,42 @@ export function LibrarySwitcher() {
 
   // Premium toggle language (matches the Dashboard Üben/Spielen toggle): a
   // recessed grey track with a lifted white pill on the active tab. The pill is
-  // a shared-layout motion element, so it glides to the tapped tab instead of
-  // snapping. Type scales down on phones (`text-xs`) so all four labels fit
-  // without a horizontal scroll; `sm+` gets the roomier `text-sm`.
+  // a SINGLE always-mounted element measured to the active tab (useSlidingPill),
+  // so it glides on a pure transform instead of a mount/unmount crossfade that
+  // stutters against the trainer re-render. Type stays `text-sm` so all four
+  // labels fit a phone row without a horizontal scroll.
   return (
     <div
+      ref={trackRef as React.RefObject<HTMLDivElement>}
       role="tablist"
       aria-label="Theorie"
       // Doubles as the page header now that the HubHero is gone (founder s92):
       // a lifted bar (shadow) anchors the top of the page, while the active tab
       // reads as the current section title (bold + brand) and the others stay
-      // quiet. Still a fully functional tab row.
-      className="flex w-full items-stretch gap-0.5 rounded-full border border-border bg-muted p-1 shadow-soft sm:gap-1"
+      // quiet. Still a fully functional tab row. `relative` is the positioning
+      // context the pill measures against (offsetLeft/offsetWidth).
+      className="relative flex w-full items-stretch gap-0.5 rounded-full border border-border bg-muted p-1 shadow-soft sm:gap-1"
     >
+      {/* The one shared pill. Rendered once measured (useLayoutEffect sets `rect`
+          before paint, so no flash). `initial={false}` means it appears in place
+          and only animates on subsequent tab changes. */}
+      {rect && (
+        <motion.span
+          aria-hidden
+          className="absolute top-1 bottom-1 left-0 rounded-full bg-surface shadow-soft"
+          initial={false}
+          animate={{ x: rect.left, width: rect.width }}
+          transition={
+            reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }
+          }
+        />
+      )}
       {SEGMENTS.map((seg) => {
         const active = current === seg.tab;
         return (
           <Link
             key={seg.tab}
+            ref={registerItem(seg.tab) as React.Ref<HTMLAnchorElement>}
             to={linkFor(seg)}
             role="tab"
             aria-selected={active}
@@ -66,22 +86,13 @@ export function LibrarySwitcher() {
               // asked for; wider screens are NOT bumped to text-base, which read
               // as oversized). Tight mobile padding so the four labels including
               // "Kollokationen" still fit a phone row without a horizontal scroll.
-              "relative flex-1 whitespace-nowrap rounded-full px-1.5 py-2.5 text-center text-sm leading-none transition-colors sm:px-3",
+              "relative z-10 flex-1 whitespace-nowrap rounded-full px-1.5 py-2.5 text-center text-sm leading-none transition-colors sm:px-3",
               active
                 ? "font-bold text-primary"
                 : "font-medium text-muted-foreground hover:text-foreground",
             )}
           >
-            {active && (
-              <motion.span
-                layoutId="library-tab-pill"
-                className="absolute inset-0 rounded-full bg-surface shadow-soft"
-                transition={
-                  reduce ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 34 }
-                }
-              />
-            )}
-            <span className="relative z-10">{seg.label}</span>
+            {seg.label}
           </Link>
         );
       })}
