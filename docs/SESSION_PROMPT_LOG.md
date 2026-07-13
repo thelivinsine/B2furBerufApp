@@ -4354,3 +4354,39 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/dashboard/Dashboard.tsx` · commit `fe39da9` · PR #487 (squash-merged to
   `main`) · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` ·
   `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 372 — 2026-07-13 (session 107, demo-prep polish continued)
+
+- **Branch:** `claude/demo-prep-feedback-rename-sl1jqq` (Opus 4.8)
+- **Prompts (verbatim):**
+  > in the ueben button, the word ueben should be in the center and don't take icon into consideration when centering. The icon should move as per the word's position.
+  > use compass
+  > I don't like the color for ueben - can you suggest other colors? provide few previews as images in the chat here.
+  > I didn't meeant tjhis ueben button. I meant the ueben toggle in Praktisch. To avoid confusion also suggest alternate names for this ueben mode in Praktisch
+  > when clicked on graph view in worter, the graph should be zoomed-in to any random place on the graph but enoguh zoomed that the wrods are readable.
+  > It appears to be a white block here - fix the bug here
+- **Response summary:** Continued the demo-prep sweep. (1) **Centered Üben label**: new `UebenLabel`
+  in `features/shared/browseScroll.tsx` centers the word "Üben" via the button's `justify-center` and
+  floats the bolt icon to its left with `absolute right-full` (no layout space), wired into both Üben
+  buttons across all four trainers. (2) **Praktisch icon → compass** (`route-icons.tsx` "/" renderer +
+  NORM box, `nav-items.ts` `Compass`). (3) **Wörter graph opens zoomed into a readable random node**
+  (k≈2.2) instead of fit-to-all (`WordGraph.tsx`). (4) **Praktisch toggle**: sent the founder a rendered
+  color preview and a name/color option image; the founder picked **Lernen + Blau**, so the left mode
+  was renamed "Üben" → **Lernen** (`text-blue-600` + `BookOpen`) in `Dashboard.tsx` (help-hub CTA copy
+  updated to match). (5) **Desktop "white block" bug**: reproduced with Playwright at 1280×900 — the
+  sticky tabs+toolbar header painted an always-on `bg-background/90` rectangle, showing a hard-cornered
+  white block beside the tabs at rest. Changed `browseHeaderClass(hidden, scrolled)` to apply the
+  masking background **only when scrolled**; verified the block is gone at rest and the backdrop still
+  fades in to mask content on scroll. Gates each ship: typecheck ✔, lint 0 errors (43 warnings),
+  content-lint ✔, `test:unit` 130/130, build + prerender ✔, `check:bundle` 76.7 kB/400. Shipped as two
+  squash-merged PRs with post-merge realignment; updated `docs/PROJECT_STATUS.md` (archived the s105
+  handoff, added the s107 handoff) and this log.
+- **Artifacts:** `src/features/shared/browseScroll.tsx` · `src/features/vocabulary/VocabularyTrainer.tsx`
+  · `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx`
+  · `src/features/grammar/GrammarHub.tsx` · `src/components/layout/nav-items.ts` ·
+  `src/components/layout/route-icons.tsx` · `src/components/layout/FeedbackButton.tsx` ·
+  `src/features/vocabulary/WordGraph.tsx` · `src/features/dashboard/Dashboard.tsx` ·
+  `src/features/help/HelpHub.tsx` · `src/engine/session.ts` · `src/store/useSessionStore.ts` ·
+  `src/features/session/{Session,SessionPlayer}.tsx` · commits `5f87721`, `2ab5909` · PRs #486, #488
+  (both squash-merged to `main`) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
