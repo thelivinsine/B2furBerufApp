@@ -4878,3 +4878,13 @@ Branch: `claude/whats-next-esga9u`.
   SMTP remain the standing pre-public-launch founder items (not done here). No source touched.
 - **Artifacts:** `docs/reports/security-review-2026-07-14.md` (new) · `docs/plans/DEMO_READINESS_PLAN.md`
   (P2 security item marked done) · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+- **Follow-up prompt (verbatim):**
+  > document the session
+- **Follow-up response:** Final documentation pass (the session's docs were kept current inline as each
+  chunk landed). Refreshed the `PROJECT_STATUS.md` `_Last updated_` block so it reflects the completed
+  security review (it had still listed it as pending), confirmed the s115 Resume-here handoff + this log
+  entry cover all four prompts (demo-sweep chunks, feedback-deploy correction, security review, this
+  documentation pass), and verified `DEMO_READINESS_PLAN.md` (all P0/P1 chunks + the P2 security item
+  checked off) and the two new report/runbook files are in place. Shipped as the session's final doc
+  commit.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
