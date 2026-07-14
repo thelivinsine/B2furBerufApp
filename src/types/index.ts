@@ -23,7 +23,6 @@ export type ThemeId =
 
 export type DomainId =
   | "beruf"
-  | "arbeitswelt"
   | "alltag"
   | "gesundheit"
   | "bildung"

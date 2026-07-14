@@ -53,7 +53,7 @@ const EM_DASH = "—";
 
 /* ---- taxonomy facets (mirror of src/types/index.ts unions, Phase 0) ---- */
 const DOMAIN_IDS = [
-  "beruf", "arbeitswelt", "alltag", "gesundheit", "bildung", "pruefung",
+  "beruf", "alltag", "gesundheit", "bildung", "pruefung",
 ];
 const CONTEXT_TAGS = ["work", "personal", "both"];
 const CEFR_LEVELS = ["A2", "B1.1", "B1.2", "B2.1", "B2.2", "C1"];

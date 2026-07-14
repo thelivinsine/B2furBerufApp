@@ -121,7 +121,7 @@ export const themes: ExamTheme[] = [
     blurbDe: "Über neue Tools, Software-Einführungen und den Wandel zu digitalen Arbeitsabläufen sprechen.",
     icon: "Laptop",
     accent: "from-blue-500 to-indigo-500",
-    domain: "arbeitswelt",
+    domain: "beruf",
     context: "both",
     situations: [
       "Eine neue Software einführen",
@@ -138,7 +138,7 @@ export const themes: ExamTheme[] = [
     blurbDe: "Umweltfreundlichere Praktiken vorschlagen und Nachhaltigkeitsmaßnahmen im Beruf abwägen.",
     icon: "Leaf",
     accent: "from-green-500 to-emerald-500",
-    domain: "arbeitswelt",
+    domain: "beruf",
     context: "both",
     situations: [
       "Müll im Betrieb reduzieren",
@@ -155,7 +155,7 @@ export const themes: ExamTheme[] = [
     blurbDe: "Über Arbeitssicherheit, Wohlbefinden und Gesundheitsschutz am Arbeitsplatz sprechen.",
     icon: "ShieldCheck",
     accent: "from-red-500 to-rose-500",
-    domain: "arbeitswelt",
+    domain: "beruf",
     context: "work",
     situations: [
       "Sicherheitsregeln besprechen",
@@ -172,7 +172,7 @@ export const themes: ExamTheme[] = [
     blurbDe: "Dienstreisen organisieren, Unterkünfte buchen und Reiseprobleme professionell lösen.",
     icon: "Plane",
     accent: "from-cyan-500 to-blue-500",
-    domain: "arbeitswelt",
+    domain: "beruf",
     context: "work",
     situations: [
       "Eine Dienstreise planen",

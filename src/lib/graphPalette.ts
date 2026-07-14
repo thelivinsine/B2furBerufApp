@@ -8,7 +8,6 @@
  */
 export const DOMAIN_COLORS: Record<string, { light: string; dark: string }> = {
   beruf: { light: "#5b5be6", dark: "#8a8af2" },
-  arbeitswelt: { light: "#8b5cf6", dark: "#a78bfa" },
   alltag: { light: "#0d9488", dark: "#2dd4bf" },
   gesundheit: { light: "#e11d48", dark: "#fb7185" },
   bildung: { light: "#d97706", dark: "#fbbf24" },
