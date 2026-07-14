@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from "react";
+import { lazy, memo, Suspense, useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { ChevronLeft, Search, SlidersHorizontal } from "lucide-react";
@@ -36,15 +36,19 @@ import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { usePagedList } from "@/lib/usePagedList";
 import { fuzzyMatch } from "@/lib/fuzzy";
 
+// The graph view carries d3-force + the canvas renderer; it loads only when
+// the learner switches to it, so it never rides the main bundle.
+const CollocationGraph = lazy(() => import("./CollocationGraph"));
+
 // Facets come from the central registry (Phase 5): CEFR + Register. The old Verb
 // facet (100+ options) was dropped there; typing a verb into the search box
 // finds every collocation that uses it.
 const COLLOCATION_FACETS = collocationFacets();
 const ALL_FACET_IDS = COLLOCATION_FACET_IDS;
 
-// Bibliothek views (session 91): the same filtered list as table, cards or
-// compact list. The graph stays Wörter-only.
-const KOLLOKATION_VIEWS: LibraryView[] = ["tabelle", "karten", "liste"];
+// Bibliothek views: the same filtered list as table, graph, cards or compact
+// list. Mockup order: Tabelle · Graph · Karten · Liste.
+const KOLLOKATION_VIEWS: LibraryView[] = ["tabelle", "graph", "karten", "liste"];
 
 type Collocation = (typeof collocations)[number];
 
@@ -519,6 +523,14 @@ export function CollocationsBrowser() {
             <CollocationTable items={filtered} />
           ) : view === "liste" ? (
             <CollocationCompactList items={filtered} />
+          ) : view === "graph" ? (
+            <Suspense
+              fallback={
+                <div className="h-[62dvh] min-h-[440px] animate-pulse rounded-xl border border-border bg-surface" />
+              }
+            >
+              <CollocationGraph items={filtered} />
+            </Suspense>
           ) : (
             cardGrid
           )}

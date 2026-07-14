@@ -912,3 +912,36 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   label). Verified headless at 390 wide: "✨ Feedback" sits left of "⚡ Üben mit 858 Wörtern" with no
   crowding. Gates green (typecheck, build, lint 0 err). Shipped to `main` (PR #526).
 - **Artifacts:** `src/components/layout/FeedbackButton.tsx` · commit `<mobile-feedback>` · PR #526.
+## Entry 390 — 2026-07-14 (session 118, Kollokationen nodal graph)
+
+- **Branch:** `claude/kollokations-nodal-graph-080jt7`. **Model:** Opus 4.8.
+- **Prompt (verbatim):**
+  > is it possible to add a nodal graph for kollokations similar to the one in worter? what are pros and
+  > cons and what features could one expect for this? provide a brief summary
+- **Response summary:** Researched the existing Wörter graph (`WordGraph.tsx` + pure `wordGraph.ts`,
+  lazy d3-force canvas) and the Kollokationen tab (which shipped deliberately graph-less,
+  `KOLLOKATION_VIEWS` excluded `graph` with the comment "The graph stays Wörter-only"). Answered: yes,
+  very feasible and the engine is ~80% reusable; the natural model is a **bipartite noun ↔ verb** graph
+  (edges = the authored collocations). Laid out pros (cheap, instructive, honest data, consistent UX),
+  cons (reverses a deliberate scoping call, weaker size/color signal since frequency is keyed by
+  content_id, hub density), and expected features.
+- **Follow-up prompt (verbatim):**
+  > write an implementation plan for it. I want the graph to look visually stunning when zoomed out. Aim
+  > for the highest standards of usefulness, accuracy, quality and finesse of the graph.
+- **Follow-up response:** Confirmed two foundational calls via `AskUserQuestion` (both recommended
+  options chosen): **bipartite noun ↔ verb** model + **theme-island** layout. Wrote a plan
+  (`graphPalette.ts` shared palette · pure `collocationGraph.ts` + test · lazy `CollocationGraph.tsx`
+  renderer tuned for zoomed-out beauty · wire into `CollocationsBrowser`). Approved.
+- **Follow-up response (build):** Implemented all five deliverables. Node size = degree, color =
+  majority-theme domain, theme-centroid forces form islands; fit-to-all on open; cached radial glow
+  sprites (additive in dark), curved source-tinted edges, vignette background; nouns = solid discs,
+  verbs = rings; bipartite selected-node card with clickable partner chips; legend doubles as
+  Nomen/Verben + domain filter. Wörter graph untouched beyond the palette import. Verified: typecheck
+  clean, lint 0 errors, `test:unit` 142/142 (8 new), `build` green, `check:bundle` main 79.5 kB,
+  Playwright browser check over `pnpm preview` (fit-to-all, selection, zoom, legend filters; light +
+  dark; desktop + mobile; zero console errors). Committed + pushed to the branch (PR/merge deferred to
+  the founder per the no-PR-unless-asked rule).
+- **Artifacts:** `src/lib/graphPalette.ts` (new) · `src/features/collocations/collocationGraph.ts` (new) ·
+  `src/features/collocations/CollocationGraph.tsx` (new) · `tests/collocationGraph.test.ts` (new) ·
+  `src/features/collocations/CollocationsBrowser.tsx` · `src/features/vocabulary/WordGraph.tsx` ·
+  `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`.

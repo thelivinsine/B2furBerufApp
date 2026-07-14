@@ -1,14 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-14 (session 117). **Üben session navigation + Bibliothek Üben-button copy
-(Opus 4.8).** Two founder-reported fixes: (1) exiting a composed Üben session now returns the learner
-to wherever they launched it from (Bibliothek with filters intact, Heute, a Grammatik lesson,
-Fortschritt, Sammlung) via the router history index, with a safe fallback to the overview for deep
-links / fresh loads — previously every exit dumped them on the dashboard. (2) The filtered-set word
-count is now folded INTO the Bibliothek Üben button ("Üben mit 858 Wörtern" / "Üben mit 24 Themen",
-correct dative noun per tab, singular fallbacks, shown regardless of filter status) so it is obvious
-that filtering tailors the session; the now-redundant stacked count was removed from both the desktop
-rail footer and the mobile action bar. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-14 (session 118). **Kollokationen nodal graph shipped (Opus 4.8), on branch
+`claude/kollokations-nodal-graph-080jt7`.** Added a Graph view to the Bibliothek Kollokationen tab
+(parity with Wörter, reversing the old "graph stays Wörter-only" scoping): a **bipartite noun ↔ verb**
+force-directed canvas of the filtered collocation list, built to look striking fully zoomed out (theme
+islands, cached glow sprites, curved edges, vignette). Model + layout confirmed with the founder before
+building. New files: `lib/graphPalette.ts` (shared domain palette, lifted out of WordGraph),
+`collocations/collocationGraph.ts` (pure builder) + `tests/collocationGraph.test.ts`,
+`collocations/CollocationGraph.tsx` (lazy renderer); wired into `CollocationsBrowser.tsx`. All gates
+green (typecheck, lint 0 errors, test:unit 142/142, build, check:bundle main 79.5 kB, browser-verified
+light+dark, desktop+mobile). (Parallel session 117 shipped Üben-exit navigation + Üben-button copy,
+already on `main`.) Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -62,6 +64,38 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 118 (2026-07-14). Kollokationen nodal graph (Opus 4.8), on branch
+`claude/kollokations-nodal-graph-080jt7`.** Shipped a Graph view for the Bibliothek **Kollokationen**
+tab, matching the Wörter graph's slot but purpose-built for collocations.
+- **Model (founder-confirmed before building):** a **bipartite noun ↔ verb** graph. Every distinct noun
+  and verb is a node; every collocation is an edge. Tap a verb → its nouns; tap a noun → its verbs. Hub
+  verbs (machen/treffen) surface naturally. Edges are the authored collocations, nothing inferred.
+- **Layout (founder-confirmed):** **theme islands** — nodes are pulled to per-theme centroids
+  (`forceX/forceY`) so themes form glowing clusters, shared verbs bridge between them.
+- **"Stunning zoomed out" finesse:** opens **fit-to-all** (not zoomed into a hub like Wörter); cached
+  radial **glow sprites** (additive in dark) instead of per-frame shadowBlur; **curved** quadratic
+  edges tinted by source domain; a **vignette** background; **nouns = solid discs, verbs = rings**
+  (annuli) so the bipartite structure reads without a legend; labels fade in with zoom, hubs a touch
+  earlier. Node size = **degree** (frequency.ts is keyed by content_id, not surface form, so degree is
+  both available and more meaningful). Domain color = the node's majority theme's domain.
+- **Files:** `src/lib/graphPalette.ts` (shared `DOMAIN_COLORS`/`domainColor`, lifted out of
+  `WordGraph.tsx`, which now imports it — behavior unchanged); `src/features/collocations/collocationGraph.ts`
+  (pure builder) + `tests/collocationGraph.test.ts` (8 tests); `src/features/collocations/CollocationGraph.tsx`
+  (lazy canvas renderer, mirrors WordGraph's interaction/camera); wired into `CollocationsBrowser.tsx`
+  (`KOLLOKATION_VIEWS` gained `graph`, `React.lazy` + Suspense, passes the `filtered` list). The
+  bipartite selected-node card lists partner chips (clickable) + one example + SpeakButton; the legend
+  doubles as a Nomen/Verben + domain filter.
+- **Wörter graph untouched** except the one-line palette import swap. d3-force stays in the shared
+  `vendor-misc` chunk (both graph chunks import it), so the main chunk is unaffected (79.5 kB/400).
+- **Gates:** typecheck clean, lint 0 errors (pre-existing warnings only), `test:unit` 142/142, `build`
+  green, `check:bundle` pass. Browser-verified via Playwright over `pnpm preview`: fit-to-all opens on
+  the constellation, node selection dims + shows the partner card, zoom/pan/legend-filters work, light
+  + dark + mobile all coherent, zero console errors. Screenshots in the session scratchpad.
+- **Not yet shipped to `main`:** committed + pushed to the branch; PR/merge left for the founder to
+  review the visuals first (per the "no PR unless asked" harness rule).
+- **Possible follow-ups if the founder wants:** stronger island separation (raise centroid strength /
+  ring radius), a "focus a theme" tap on the domain legend that recenters, or an Üben hook from the card.
+
 **Handoff after session 117 (2026-07-14). Üben navigation + Bibliothek Üben-button copy (Opus 4.8),
 on branch `claude/uben-session-navigation-q4pfs0`. Two small, self-contained founder fixes; both
 shipped to `main`.**
@@ -82,69 +116,10 @@ shipped to `main`.**
 - **Gates:** `pnpm typecheck` / `build` / `lint` (0 errors) / `test:unit` (134/134) all green. No
   content or engine changes, so no `lint:content` / `test:srs` impact.
 
-**Handoff after session 116 (2026-07-14). Branding-redesign support (Opus 4.8), on branch
-`claude/branding-redesign-color-palette-dqkvtd`. Docs + previews only; no `src/` touched.** The founder
-is choosing a new brand off the s113 catalogue and asked to see the **Umlaut / "Cobalt & Butter"**
-palette (direction 03) applied to the app.
-- **Approach that worked:** rather than hand-drawn mockups (the founder rightly called those out for
-  changing layout, not just color), rendered the **real app** headless (Playwright via global
-  `/opt/node22/lib/node_modules/playwright`, `pnpm dev` on :5199, seed `localStorage
-  b2beruf.settings.v1 = {state:{onboarded:true},version:1}` to skip onboarding) and swapped **only** the
-  CSS color tokens via an injected `:root`/`.dark` style tag, screenshotting Praktisch/Theorie/Fortschritt
-  in light+dark. Scripts live in the session scratchpad, not the repo.
-- **Two preview rounds, both rejected:** (1) token-swap options (Hue-swap / Warm-cream / Cobalt-led);
-  (2) after the founder said "no gradients on logo or buttons, use colorful flat accents" — flat variants
-  (Flat cobalt / Warm cream / Butter buttons / Confetti-coral) + 8 flat logo color combos, flattening
-  `.bg-accent-gradient` + `.bg-mesh`. Delivered as Claude artifacts + sent PNGs.
-- **Palette mapping (kept here in case a token swap is ever chosen):** Cobalt → `--primary` `228 75% 52%`,
-  Butter → `--accent` `39 100% 65%` (with a dark `--accent-foreground`), Cream → `--background`
-  `45 33% 93%`, Ink → `--foreground` `223 17% 9%`, Sky `225 100% 90%`. Semantic green/red + der/die/das
-  stay. NB: the header **logo is a PNG** (a token swap can't recolor it) and the **nav-mark colors are
-  hard-set in `src/components/layout/route-icons.tsx`**, not the token — both are separate manual steps.
-- **Landed deliverable:** the founder pivoted to generating mockups themselves, so shipped
-  `docs/branding/genauly-ai-mockup-guide.pdf` + `.html` source (PR #522, squash-merged): the brief, a
-  tool-for-job table (Recraft/Ideogram for logos → SVG, v0.dev for screens → React+Tailwind, Midjourney
-  for style), copy-paste prompts (wordmark, app icon, 3 concepts, **ground-up logo rework §4d**, 4 app
-  screens, icon set, moodboard, screenshot-recolor), sizes/negative-prompt tips, and a hand-back
-  checklist. Regenerate the PDF from the HTML via headless-chromium `page.pdf()`.
-- **Next:** waiting on the founder to generate a logo/palette they like and hand back **SVG + final hex
-  codes**; then wire the tokens (light+dark) + regenerate logo/favicons/PWA icons in the real app.
-  Offered to export clean screenshots of any screen for them to feed the tools.
-- **Gates:** none run (docs + PDF only; no source or gated files changed).
-
-**Handoff after session 115 (2026-07-14). Demo-readiness sweep finished (Opus 4.8), on branch
-`claude/predemo-sweep-tasks-25oejy`.** Closed the remaining open chunks of
-`docs/plans/DEMO_READINESS_PLAN.md`: P0 Chunk 1 (smoke test), Chunk 4 (UI polish), Chunk 5 (runbook),
-and P1 Chunk 6 (perf). Chunks 2+3 were already done s112. **The whole P0+P1 plan is now complete.**
-- **Chunk 1 — smoke test (clean sweep):** Playwright over `pnpm preview`, 4 combos (390×844 mobile +
-  1440×900 desktop) × (light + dark), 28 routes each + cold-start onboarding + a core-interaction pass
-  (session blocks, mission scenes, filter-rail facet+reset, Graph view, Grammatik lesson). Zero
-  console errors, zero error boundaries, zero blank pages, zero dead routes, zero horizontal overflow.
-  Redirects preserve params; `/anwenden`+`/welt` resolve; junk `?`-params fall back. Scripts in the
-  session scratchpad, not the repo.
-- **Chunk 4 — UI polish:** reviewed screenshots of every demo-visible screen (light+dark, mobile+
-  desktop). No blemishes: consistent nav labels, no em dashes, dark mode solid (missions light-only +
-  hub theme-aware both by design), clean empty states, no overflow. **No code changes needed.**
-- **Chunk 5 — runbook:** wrote `docs/DEMO_RUNBOOK.md` (device prep, two demo states, tour order,
-  failure fallbacks, founder console checklist). The s112 feedback function + rate-limit are **already
-  deployed and live** (founder confirmed), so no deploy step is pending for the demo.
-- **Chunk 6 — perf:** main chunk 79.5 kB/400; throttled (1.6 Mbps/4× CPU) first paint ~3.3–3.5s on
-  `/`, `/library`, Graph, `/welt`, `/sammlung`; lazy chunks load without an error flash.
-- **Also ran the P2 whole-app security review** (Opus 4.8): manual audit of the 3 Edge Functions, all
-  6 RLS migrations, client config, cloudSync isolation, XSS/CSP, and supply chain. **No critical/high
-  findings** — RLS owner-scoped everywhere, service-role-only `ai_usage`/`feedback`, JWT-gated
-  functions with ids from the token, rate-limited feedback, only the publishable anon key client-side,
-  strong CSP (no `unsafe-inline`/`unsafe-eval` on `script-src`), `pnpm audit` 0 vulns. A few
-  low-severity defense-in-depth notes documented, none demo/launch-blocking. Report:
-  `docs/reports/security-review-2026-07-14.md`.
-- **Only doc changes** this session (`DEMO_READINESS_PLAN.md` checkboxes + findings, new
-  `DEMO_RUNBOOK.md` + security-review report, this status + the prompt log). No source touched.
-  All 9 gates green.
-- **Remaining (P2):** Turnstile enablement + Resend SMTP (standing pre-public-launch founder items),
-  and post-demo feedback triage from the `public.feedback` table. Both next-week, not demo-blocking.
-
-_(Session 113's brand-identity-exploration handoff (the 20-direction catalogue) is now in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 114's Theorie pill-animation +
+_(Session 116's branding-redesign-support handoff (Cobalt & Butter previews + the AI mockup guide) and
+session 115's demo-readiness-sweep handoff are now in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 113's brand-identity-exploration
+handoff (the 20-direction catalogue) is also in W29. Session 114's Theorie pill-animation +
 dark-mode contrast handoff, session 113's Theorie tab-transition/compass/feedback-pill polish handoff,
 session 112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff, session 111's handoff
 (demo-readiness plan authored + baseline verified) and sessions 85-110's handoffs, plus the s104

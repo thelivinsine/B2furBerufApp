@@ -29,3 +29,52 @@ a browser; index in that folder's `README.md`).
 _Follow-on: session 116 (2026-07-14) picked up this thread — explored applying direction 03's
 "Cobalt & Butter" palette to the real app (rejected) and shipped `docs/branding/genauly-ai-mockup-guide.pdf`.
 See that session's handoff in `docs/PROJECT_STATUS.md`._
+
+## Session 115 (2026-07-14) — Demo-readiness sweep finished (condensed handoff)
+
+**Handoff after session 115 (2026-07-14). Demo-readiness sweep finished (Opus 4.8), on branch
+`claude/predemo-sweep-tasks-25oejy`.** Closed the remaining open chunks of
+`docs/plans/DEMO_READINESS_PLAN.md`: P0 Chunk 1 (smoke test), Chunk 4 (UI polish), Chunk 5 (runbook),
+and P1 Chunk 6 (perf). Chunks 2+3 were already done s112. **The whole P0+P1 plan is now complete.**
+- **Chunk 1 — smoke test (clean sweep):** Playwright over `pnpm preview`, 4 combos (390×844 mobile +
+  1440×900 desktop) × (light + dark), 28 routes each + cold-start onboarding + a core-interaction pass
+  (session blocks, mission scenes, filter-rail facet+reset, Graph view, Grammatik lesson). Zero
+  console errors, zero error boundaries, zero blank pages, zero dead routes, zero horizontal overflow.
+  Redirects preserve params; `/anwenden`+`/welt` resolve; junk `?`-params fall back.
+- **Chunk 4 — UI polish:** reviewed screenshots of every demo-visible screen (light+dark, mobile+
+  desktop). No blemishes; **no code changes needed.**
+- **Chunk 5 — runbook:** wrote `docs/DEMO_RUNBOOK.md` (device prep, two demo states, tour order,
+  failure fallbacks, founder console checklist). The s112 feedback function + rate-limit are already
+  deployed and live.
+- **Chunk 6 — perf:** main chunk 79.5 kB/400; throttled (1.6 Mbps/4× CPU) first paint ~3.3–3.5s on
+  `/`, `/library`, Graph, `/welt`, `/sammlung`; lazy chunks load without an error flash.
+- **Also ran the P2 whole-app security review:** manual audit of the 3 Edge Functions, all 6 RLS
+  migrations, client config, cloudSync isolation, XSS/CSP, supply chain. **No critical/high findings.**
+  Report: `docs/reports/security-review-2026-07-14.md`. `pnpm audit` 0 vulns.
+- **Only doc changes** this session. All 9 gates green.
+- **Remaining (P2):** Turnstile enablement + Resend SMTP (standing pre-public-launch founder items),
+  and post-demo feedback triage from the `public.feedback` table. Both next-week, not demo-blocking.
+
+## Session 116 (2026-07-14) — Branding-redesign support (condensed handoff)
+
+**Handoff after session 116 (2026-07-14). Branding-redesign support (Opus 4.8), on branch
+`claude/branding-redesign-color-palette-dqkvtd`. Docs + previews only; no `src/` touched.** The founder
+is choosing a new brand off the s113 catalogue and asked to see the **Umlaut / "Cobalt & Butter"**
+palette (direction 03) applied to the app.
+- **Approach that worked:** rather than hand-drawn mockups, rendered the **real app** headless
+  (Playwright via global playwright, `pnpm dev`, seed `localStorage b2beruf.settings.v1` to skip
+  onboarding) and swapped **only** the CSS color tokens via an injected `:root`/`.dark` style tag,
+  screenshotting Praktisch/Theorie/Fortschritt in light+dark.
+- **Two preview rounds, both rejected:** token-swap options, then flat variants (no gradients) + 8 flat
+  logo color combos. Delivered as Claude artifacts + sent PNGs.
+- **Palette mapping (if a token swap is ever chosen):** Cobalt → `--primary` `228 75% 52%`, Butter →
+  `--accent` `39 100% 65%`, Cream → `--background` `45 33% 93%`, Ink → `--foreground` `223 17% 9%`, Sky
+  `225 100% 90%`. NB: the header logo is a PNG and the nav-mark colors are hard-set in
+  `route-icons.tsx`, not the token — both are separate manual steps.
+- **Landed deliverable:** shipped `docs/branding/genauly-ai-mockup-guide.pdf` + `.html` source (PR #522,
+  squash-merged): the brief, a tool-for-job table, copy-paste prompts (incl. a ground-up logo rework
+  §4d), sizes/negative-prompt tips, and a hand-back checklist. Regenerate the PDF from the HTML via
+  headless-chromium `page.pdf()`.
+- **Next:** waiting on the founder to hand back **SVG + final hex codes**; then wire the tokens
+  (light+dark) + regenerate logo/favicons/PWA icons.
+- **Gates:** none run (docs + PDF only).
