@@ -1,15 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-14 (session 115). **Demo-readiness sweep finished (Opus 4.8):** completed the
-last open chunks of `docs/plans/DEMO_READINESS_PLAN.md` (P0 Chunks 1/4/5, P1 Chunk 6). A Playwright
-smoke test over the production preview (mobile + desktop × light + dark × 28 routes + core
-interactions) came back completely clean (no console errors, error boundaries, dead routes, blank
-pages, or horizontal overflow), so Chunk 4 had no blemishes to fix. Perf sanity: main chunk 79.5 kB,
-throttled first paint ~3.3–3.5s, lazy chunks load without error flash. Wrote `docs/DEMO_RUNBOOK.md`.
-Also ran the **P2 whole-app security review** (no critical/high findings; report at
-`docs/reports/security-review-2026-07-14.md`). The demo-readiness plan is now closed except the two
-optional pre-launch founder items (Turnstile, Resend SMTP) and post-demo feedback triage. All 9 gates
-green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-14 (session 116). **Branding-redesign support (Opus 4.8), docs + previews only,
+no `src/` touched.** The founder is reworking the brand off the s113 catalogue. Explored applying the
+**Umlaut / "Cobalt & Butter" palette** (direction 03: Cobalt `#2B4FE0`, Butter `#FFC24D`, plus Coral
+`#FF6B54`, Sky, Ink, Cream) to the app by screenshotting the **real pages** headless with only the
+color tokens swapped and gradients flattened (not hand-drawn mockups); the founder rejected all applied
+variations. Pivoted to a **self-serve AI mockup guide** shipped to the repo:
+`docs/branding/genauly-ai-mockup-guide.pdf` (+ `.html` source) — the brief, a tool-for-job table, and
+copy-paste prompts for logos, app screens and icons, including a ground-up logo-rework section. Merged
+to `main` (PR #522 + this doc pass). The demo-readiness plan stays closed (s115) except the two optional
+pre-launch founder items (Turnstile, Resend SMTP) and post-demo feedback triage. Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -63,6 +64,36 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 116 (2026-07-14). Branding-redesign support (Opus 4.8), on branch
+`claude/branding-redesign-color-palette-dqkvtd`. Docs + previews only; no `src/` touched.** The founder
+is choosing a new brand off the s113 catalogue and asked to see the **Umlaut / "Cobalt & Butter"**
+palette (direction 03) applied to the app.
+- **Approach that worked:** rather than hand-drawn mockups (the founder rightly called those out for
+  changing layout, not just color), rendered the **real app** headless (Playwright via global
+  `/opt/node22/lib/node_modules/playwright`, `pnpm dev` on :5199, seed `localStorage
+  b2beruf.settings.v1 = {state:{onboarded:true},version:1}` to skip onboarding) and swapped **only** the
+  CSS color tokens via an injected `:root`/`.dark` style tag, screenshotting Praktisch/Theorie/Fortschritt
+  in light+dark. Scripts live in the session scratchpad, not the repo.
+- **Two preview rounds, both rejected:** (1) token-swap options (Hue-swap / Warm-cream / Cobalt-led);
+  (2) after the founder said "no gradients on logo or buttons, use colorful flat accents" — flat variants
+  (Flat cobalt / Warm cream / Butter buttons / Confetti-coral) + 8 flat logo color combos, flattening
+  `.bg-accent-gradient` + `.bg-mesh`. Delivered as Claude artifacts + sent PNGs.
+- **Palette mapping (kept here in case a token swap is ever chosen):** Cobalt → `--primary` `228 75% 52%`,
+  Butter → `--accent` `39 100% 65%` (with a dark `--accent-foreground`), Cream → `--background`
+  `45 33% 93%`, Ink → `--foreground` `223 17% 9%`, Sky `225 100% 90%`. Semantic green/red + der/die/das
+  stay. NB: the header **logo is a PNG** (a token swap can't recolor it) and the **nav-mark colors are
+  hard-set in `src/components/layout/route-icons.tsx`**, not the token — both are separate manual steps.
+- **Landed deliverable:** the founder pivoted to generating mockups themselves, so shipped
+  `docs/branding/genauly-ai-mockup-guide.pdf` + `.html` source (PR #522, squash-merged): the brief, a
+  tool-for-job table (Recraft/Ideogram for logos → SVG, v0.dev for screens → React+Tailwind, Midjourney
+  for style), copy-paste prompts (wordmark, app icon, 3 concepts, **ground-up logo rework §4d**, 4 app
+  screens, icon set, moodboard, screenshot-recolor), sizes/negative-prompt tips, and a hand-back
+  checklist. Regenerate the PDF from the HTML via headless-chromium `page.pdf()`.
+- **Next:** waiting on the founder to generate a logo/palette they like and hand back **SVG + final hex
+  codes**; then wire the tokens (light+dark) + regenerate logo/favicons/PWA icons in the real app.
+  Offered to export clean screenshots of any screen for them to feed the tools.
+- **Gates:** none run (docs + PDF only; no source or gated files changed).
+
 **Handoff after session 115 (2026-07-14). Demo-readiness sweep finished (Opus 4.8), on branch
 `claude/predemo-sweep-tasks-25oejy`.** Closed the remaining open chunks of
 `docs/plans/DEMO_READINESS_PLAN.md`: P0 Chunk 1 (smoke test), Chunk 4 (UI polish), Chunk 5 (runbook),
@@ -94,31 +125,11 @@ and P1 Chunk 6 (perf). Chunks 2+3 were already done s112. **The whole P0+P1 plan
 - **Remaining (P2):** Turnstile enablement + Resend SMTP (standing pre-public-launch founder items),
   and post-demo feedback triage from the `public.feedback` table. Both next-week, not demo-blocking.
 
-**Handoff after session 113 (2026-07-13). Brand identity exploration (Opus 4.8), on branch
-`claude/branding-logo-redesign-947e61`, merged to `main` (PR #516). Parallel to the demo work; no app
-code changed.** The founder wants to replace the branding (logo, visual assets, colour scheme): the
-current gradient rounded-square "G" reads as a Canva lookalike. Deliverable = a **catalogue of 20
-logo/identity directions** for founder review, saved under `preview/branding/` (open the HTML files in
-a browser; index in that folder's `README.md`).
-- **What was produced:** three self-contained HTML "studio spec-sheet" pages, each direction a live
-  SVG/CSS mark + a 5-colour palette (hex) + a licensable type pairing. `genauly-identity-vol1.html` +
-  `vol2.html` (foundation *genau* = precision): Genau., Wasserwaage, Umlaut, Zielband, Neuland, „Genau",
-  Der·Die·Das, Fokus, Roter Faden, Stempel. `vol3.html` (three new brand *philosophies*):
-  Ankommen/belonging (Schwelle, Der Tisch, Schlüssel, Heimat), Durchbruch/momentum (Durchbruch, Schwung,
-  Sprung), Klarheit/clarity (Prisma, Sonnenaufgang, Klartext).
-- **Assistant shortlist:** Der·Die·Das (brand = the gender-colour teaching system), Neuland (one world
-  with the game), Durchbruch (owns the plateau story), Ankommen/Schwelle (warmest, most distinctive).
-- **NOT done (deliberate):** nothing in `src/` touched. No palette/token edit in `src/index.css` or
-  `tailwind.config.ts`, no logo/favicon/PWA-icon regen. **That is the next step, and it only starts once
-  the founder picks a direction** (belief + mark + palette, mixes allowed): lock one spec, wire the
-  tokens (light + dark), regenerate all icons from the mark, `pnpm build`, ship to `main`. Also published
-  as private Claude artifacts (Vol. I `fed14c61`, II `02c0d954`, III `dc5d3da7`).
-- **Gates:** none run (no code change); docs + preview HTML only.
-
-_(Session 114's Theorie pill-animation + dark-mode contrast handoff, session 113's Theorie
-tab-transition/compass/feedback-pill polish handoff, session 112's Demo-readiness Chunks 2+3 handoff,
-its P2 content-accuracy handoff, session 111's handoff
-(demo-readiness plan authored + baseline verified) and sessions 85-110's
-handoffs, plus the s104 Üben-map round + Bibliothek pre-demo round, are in
+_(Session 113's brand-identity-exploration handoff (the 20-direction catalogue) is now in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 114's Theorie pill-animation +
+dark-mode contrast handoff, session 113's Theorie tab-transition/compass/feedback-pill polish handoff,
+session 112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff, session 111's handoff
+(demo-readiness plan authored + baseline verified) and sessions 85-110's handoffs, plus the s104
+Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
 and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_

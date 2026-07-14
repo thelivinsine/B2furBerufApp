@@ -4888,3 +4888,76 @@ Branch: `claude/whats-next-esga9u`.
   checked off) and the two new report/runbook files are in place. Shipped as the session's final doc
   commit.
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 388 — 2026-07-14 (session 116, branding palette previews → AI mockup guide)
+
+- **Branch:** `claude/branding-redesign-color-palette-dqkvtd`. **Model:** Opus 4.8. Docs + previews
+  only; no `src/` touched.
+- **Prompt (verbatim):**
+  > for branding redesign.. can you apply the color palette of 3rd one in the preview files where there
+  > umlaut on G? the idea just to take the color palette but not the logo suggested in the previews. The
+  > entire app's color including the current logo's color should be adapted with the color palette in the
+  > preview. Can you generate a few previews of how it would look like when the color scheme is applied?
+- **Response summary:** The referenced files were not yet in the working tree; they had been merged to
+  `main` via PR #516 (session 113). After the founder supplied the paths (see next prompt), reset the
+  branch to `origin/main` to pull them in. Direction 03 = **"Umlaut", palette "Cobalt & Butter"**
+  (Cobalt `#2B4FE0`, Butter `#FFC24D`, Ink `#111318`, Cream `#F3F0E7`, Sky `#CBD8FF`). Built a first
+  hand-drawn HTML preview artifact showing the palette mapped onto the app.
+- **Follow-up prompt (verbatim):**
+  > check again now
+- **Follow-up prompt (verbatim), supplying the file locations:**
+  > preview/branding/genauly-identity-vol1.html   — directions 01–05 (precision: Genau., Wasserwaage,
+  > Umlaut, Zielband, Neuland) [+ vol2/vol3 + README]
+- **Follow-up prompt (verbatim):**
+  > the preview aggressively changes a lot of design elements and not just color. I put a lot of time
+  > into designing various pages, menus and icons. So, I want multiple options to see how the color
+  > scheme can be applied. Provide a few examples of how the logo color would look with this color scheme
+  > including multiple options for each page.
+- **Follow-up response:** Corrected course. Instead of hand-drawn mockups, rendered the **real app**
+  headless: `pnpm install`, `pnpm dev` on :5199, global Playwright
+  (`/opt/node22/lib/node_modules/playwright`), seeded `localStorage b2beruf.settings.v1
+  {state:{onboarded:true},version:1}` to reach the real screens, and injected a `:root`/`.dark` style
+  tag that swaps **only** the CSS color tokens (`!important` on the custom props). Screenshot matrix over
+  Praktisch/Theorie/Fortschritt in light+dark under 3 token-swap options (Hue-swap / Warm-cream /
+  Cobalt-led) + a Current reference; composited into side-by-side comparison strips with Playwright and
+  published as a Claude artifact + sent PNGs. Flagged that the header logo is a PNG (not token-recolored)
+  and the nav-mark colors are hard-set in `route-icons.tsx`.
+- **Follow-up prompt (verbatim):**
+  > don't use gradient so much - not in logo. not on buttons! use variety of colors from the palette to
+  > generate fun looking variations with colorful accents.
+- **Follow-up response:** Regenerated with all gradients flattened (injected CSS neutralizing
+  `.bg-accent-gradient` + `.bg-mesh`), producing four flat treatments (A Flat cobalt / B Warm cream /
+  C Butter buttons / D Confetti with a Coral `#FF6B54` accent pop) across the real screens, plus **8 flat
+  logo color combos** (no gradient). Delivered as a new artifact + sent strips.
+- **Follow-up prompt (verbatim):**
+  > I don't like any of these designs. can you give me a set of prompt and some ai tools to generate the
+  > mock ups? I want the guidance as a pdf and keep it saved in the repo.
+- **Follow-up response:** Pivoted to a self-serve guide. Authored
+  `docs/branding/genauly-ai-mockup-guide.html` (print-optimized A4) and rendered it to
+  `docs/branding/genauly-ai-mockup-guide.pdf` via headless-chromium `page.pdf()`. Contents: the brief to
+  paste into any tool, palette + type reference, a "which tool for which job" table (Recraft/Ideogram →
+  SVG logos, v0.dev → React+Tailwind screens, Midjourney → style, Uizard/Galileo → UI, ChatGPT/Gemini →
+  restyle), copy-paste prompts (wordmark, app icon, 3 concepts, 4 app screens, icon set, moodboard,
+  screenshot-recolor), pro tips (sizes, flat/no-gradient phrasing, negative prompts), and a hand-back
+  checklist mapping results onto the app's design tokens. Committed + pushed to the branch.
+- **Follow-up prompt (verbatim):**
+  > I'm open to logo rework. Add a prompt for that as well in the document
+- **Follow-up response:** Added **section 4d · Ground-up logo rework**: a wide-exploration prompt across
+  six mark archetypes (wordmark, lettermark, umlaut device, precision symbol, breakthrough, conversation),
+  a "refine the winner" prompt that builds a full lockup system (horizontal/stacked/app-icon/one-color/
+  reversed/16px favicon on cream + cobalt grounds), and SVG-export guidance (Recraft/Ideogram; Looka/
+  Brandmark alternatives). Re-rendered the PDF, committed, pushed.
+- **Follow-up prompt (verbatim):**
+  > yes, merge to main
+- **Follow-up response:** Opened PR #522 (`docs(branding): AI mockup generation guide`) and squash-merged
+  it into `main` (commit `0513dd4`). Ran the required post-merge housekeeping:
+  `git reset --hard origin/main` + `git push --force-with-lease` to realign the dev branch.
+- **Follow-up prompt (verbatim):**
+  > document the session
+- **Follow-up response:** This documentation pass — appended this Entry 388, refreshed the
+  `PROJECT_STATUS.md` `_Last updated_` block + added the session-116 Resume-here handoff, moved the
+  aged-out session-113 handoff into a new `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`
+  chunk (with an index row), and shipped it to `main`.
+- **Artifacts:** `docs/branding/genauly-ai-mockup-guide.pdf` (new) · `docs/branding/genauly-ai-mockup-guide.html`
+  (new) · PR #522 (`0513dd4`) · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`
+  (new) · `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`.
