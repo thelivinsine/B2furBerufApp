@@ -961,7 +961,21 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   re-centers on toggle, light+dark, desktop+mobile, zero console errors. Gates: typecheck, lint (0
   errors), test:unit 142/142, build, check:bundle 79.6 kB.
 - **Artifacts:** `src/features/collocations/CollocationGraph.tsx` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
-  PR #527 (`b71617a`) + the toggle follow-up PR.
+  PR #527 (`b71617a`) + PR #528 (`a823a8a`, the toggle).
+- **Follow-up prompt (verbatim):**
+  > the nodes should be moveable similar to the worter graph. also, when tapped on a word the nide is
+  > zoomed in a bit too much but the text isn't readable. it needs adjusting.
+- **Follow-up response:** Three fixes in `CollocationGraph.tsx`. (1) **Draggable nodes:** the drag was
+  already wired like Wörter, but the strong theme-centroid force snapped a released node straight back;
+  now the node **pins where dropped** (keep `fx`/`fy` on release). (2) **Gentler zoom on select:** the
+  fit button's hub jump went to `k=2.8` ("too much"); replaced with a shared `focusNode` at
+  `READABLE_K=1.55` that centers the selected node in the card-free area, fired from a `selectedId`
+  effect so tap / partner-chip / hub-jump all frame consistently. (3) **Readable labels:** the focus
+  labels overlapped into an unreadable pile; rewrote the label pass to rank candidates (selected first,
+  then by degree), **skip any that would overlap an already-placed label**, and draw each on a
+  translucent rounded pill (11px/600). Verified headless (fit→hub framing, precise node-drag, zoomed-out
+  tap): labels legible, gentle zoom, node moves + stays, zero console errors. Gates: typecheck, lint (0
+  errors), test:unit 142/142, build, check:bundle 79.6 kB. (Session 118 follow-up, PR #532.)
 
 ## Entry 391 — 2026-07-14 (session 119, account-dropdown z-index bug fix)
 

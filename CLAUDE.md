@@ -246,8 +246,12 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   (s118): the card is either a full-width bar along the bottom (`horizontal`, default) or a full-height
   panel down the right (`vertical`); toggling re-fits the constellation into the area the card leaves
   free via `fitToRect`/`freeRect` (`cardExtent` keeps the fit math in lockstep with the card's CSS
-  size). The d3-force dep rides ONLY in the two lazy graph chunks (shared `vendor-misc`, React.lazy);
-  main chunk stays ~80 kB.
+  size). **Nodes are draggable and pin where dropped** (`fx`/`fy` kept on release, since the strong
+  theme-centroid force would otherwise snap them back). **Selecting a node frames it** (tap / partner
+  chip / the fit button's hub jump) at a gentle readable zoom (`READABLE_K` 1.55, `focusNode`), and
+  canvas **labels are collision-culled onto translucent pills** (selected-first, then by degree) so they
+  stay legible instead of overlapping. The d3-force dep rides ONLY in the two lazy graph chunks (shared
+  `vendor-misc`, React.lazy); main chunk stays ~80 kB.
   **Desktop filter rail (s91):** on lg+ the browse tabs are an **explicit 2-col × 2-row grid**
   (`lg:grid-cols-[minmax(0,1fr)_16rem]`, `lg:gap-y-4 lg:space-y-0`): the LibrarySwitcher tabs +
   view-switcher meta row sit in **row 1 / col 1 (content-column width, NOT full width)**, and the content
