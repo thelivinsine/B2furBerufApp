@@ -6,8 +6,10 @@ smoke test over the production preview (mobile + desktop × light + dark × 28 r
 interactions) came back completely clean (no console errors, error boundaries, dead routes, blank
 pages, or horizontal overflow), so Chunk 4 had no blemishes to fix. Perf sanity: main chunk 79.5 kB,
 throttled first paint ~3.3–3.5s, lazy chunks load without error flash. Wrote `docs/DEMO_RUNBOOK.md`.
-The whole plan (P0 + P1) is now done; only the explicitly next-week P2 items (full security review,
-post-demo feedback triage) remain. All 9 gates green. Product name: **Genauly** (`genauly.de`)._
+Also ran the **P2 whole-app security review** (no critical/high findings; report at
+`docs/reports/security-review-2026-07-14.md`). The demo-readiness plan is now closed except the two
+optional pre-launch founder items (Turnstile, Resend SMTP) and post-demo feedback triage. All 9 gates
+green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
