@@ -1,14 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-14 (session 120). **Content-library coverage review + deepening (Opus 4.8), on
-branch `claude/content-library-coverage-lih2fp`.** Reviewed vocab/collocation coverage across every
-theme, sub-theme and Branche and found the imbalance was the everyday consumer/service world (the
-plateau-learner audience), not the industrial sectors. Deepened the thinnest slices with genuinely
-common, high-frequency words: **+133 vocab and +56 collocations** across the thin service Branchen
-(hospitality/retail/beauty/cleaning/security/sports) and the thin daily-life themes
-(bank/behoerde/bildung/wohnen + arzt.versicherung), filling starved sub-themes like
-`behoerde.aufenthalt`/`bescheid` and every `bank`/`bildung` sub-theme. Provenance rows added, frequency
-map regenerated, fact gate passes (0 two-oracle errors). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-14 (session 121). **Merged the `arbeitswelt` domain into `beruf` (Opus 4.8), on
+branch `claude/berufsleben-arbeitsumfeld-overlap-itmpeg`, shipped to `main` (PR #535).** The founder
+noticed the `beruf` ("Berufsleben") and `arbeitswelt` ("Arbeitswelt & Umfeld") domains read as
+redundant near-synonyms and their graph node colors (indigo vs adjacent violet) were nearly
+indistinguishable. Collapsed the two work domains into a single `beruf`: the 10 workplace themes now all
+carry `domain: "beruf"`, so the taxonomy is **5 domains** (was 6). Six code sites + CLAUDE.md; the
+library primary dropdown re-groups with no code change (`themeGroupsForMode` is data-driven). All gates
+green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -41,7 +40,8 @@ session engine, Bibliothek views, the game layer, content conventions) is in `..
 **Content banks (as of 2026-07-14, session 120 — re-verify with `pnpm lint:content` before quoting):**
 vocab **1,246** · collocations **797** · Redemittel **149** · grammar **24 topics / 117 drills** ·
 Lese-/Hörtexte **26** (78 checks) · Can-Do **37** · provenance **2,452 rows** · themes **15** ·
-exam sets **15** · dialogues **20**. All six top-level domains are populated. **Branche is a scope
+exam sets **15** · dialogues **20**. Taxonomy is **5 top-level domains** (the `beruf`/`arbeitswelt`
+work split was merged into one `beruf` in s121), all populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
 Standing governance debt: ~98% of provenance rows are AI-drafted, not yet human-verified (see
 `strategy/DATA_GOVERNANCE.md`).
@@ -61,6 +61,30 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 121 (2026-07-14). Merged the `arbeitswelt` domain into `beruf` (Opus 4.8), on
+branch `claude/berufsleben-arbeitsumfeld-overlap-itmpeg`, shipped to `main` (PR #535, squash-merged).**
+The founder asked, looking at a Bibliothek graph, what the difference between the "Berufsleben" and
+"Arbeitswelt" categories was, since they had near-identical colors and read as redundant to a learner,
+then said "merge".
+- **The two domains:** `beruf` ("Berufsleben") grouped the 6 communication-heavy workplace themes
+  (meetings, scheduling, logistics, customer, conflict, project); `arbeitswelt` ("Arbeitswelt & Umfeld")
+  grouped 4 topical ones (technology, sustainability, safety, travel). Both were `context: "work"`. The
+  split was a taxonomist's cut (comms vs. topics), invisible to learners, and their graph colors
+  (`#5b5be6` indigo vs `#8b5cf6` violet, ~30° apart) read as one color on the dense force-directed canvas.
+- **The merge (6 code sites + CLAUDE.md):** dropped the `arbeitswelt` entry from `src/data/domains.ts`;
+  retagged technology/sustainability/safety/travel to `domain: "beruf"` in `src/data/themes.ts` (all 10
+  workplace themes now in `beruf`); removed the `arbeitswelt` color from `src/lib/graphPalette.ts`;
+  removed `"arbeitswelt"` from the `DomainId` union (`src/types/index.ts`) and from `DOMAIN_IDS`
+  (`scripts/lint-content.mjs`); set the Büro building rollup to `domains: ["beruf"]`
+  (`src/components/city/domain-buildings.tsx`). `themeGroupsForMode` (`lib/themeGroups.ts`) is
+  data-driven, so the library primary dropdown now shows one "Berufsleben" group covering all 10
+  workplace themes with no code change.
+- **Gates:** `lint:content` OK, `typecheck` OK, `build` OK, `test:unit` 142/142. Content counts
+  unchanged (this was a taxonomy edit, not a content edit).
+- **Note for next session:** the domain count is now 5, but `pruefung` still has no themes mapped to it
+  (exam prep lives separately), so 4 domains actually carry the 15 themes. Pre-existing, unrelated to
+  this merge.
 
 **Handoff after session 120 (2026-07-14). Content-library coverage review + deepening (Opus 4.8), on
 branch `claude/content-library-coverage-lih2fp`. Shipped to `main`.** The founder asked for a thorough
@@ -90,28 +114,8 @@ then to add genuinely useful, commonly-used items for those fields.
   `verify:facts` OK (0 two-oracle-confirmed errors; the one new signal, `die Betriebskosten`, is a correct
   plurale tantum). Everything AI-drafted, founder-verify pending like the rest of the bank.
 
-**Handoff after session 119 (2026-07-14). Account-dropdown z-index bug fix (Opus 4.8), on branch
-`claude/account-settings-dropdown-icons-b8feg6`, shipped to `main` (PR #529, squash-merged).** A
-one-line founder bug fix.
-- **Symptom (founder screenshot):** on a Bibliothek browse page (e.g. Kollokationen), opening the
-  account menu showed the page's toolbar (the `ViewSwitcher` icons + the search magnifier) painting on
-  top of the dropdown's **DESIGN** theme-toggle row. The dropdown background is opaque, so it was not a
-  transparency issue.
-- **Root cause:** the app header (`AppShell.tsx`, `sticky top-0 z-20`, a stacking context via its
-  `backdrop-blur`) and the sticky Bibliothek browse toolbar (`browseHeaderClass` in
-  `src/features/shared/browseScroll.tsx`, `sticky ... z-20`) were **both `z-20`**. Equal z-index →
-  paint order decides, and the toolbar comes later in DOM order, so it painted over the account
-  dropdown wherever the dropdown overflows below the header. The dropdown's own `z-50` only applies
-  inside the header's stacking context, so it could not beat the sibling toolbar.
-- **Fix:** header `z-20` → `z-30` (`src/components/layout/AppShell.tsx`). Layer order stays correct:
-  header/dropdown now above the browse toolbar (`z-20`) but still below FeedbackPill (`z-40`), Toaster
-  (`z-50`), and the mobile bottom nav (`z-[55]`/`z-[60]`); the desktop sidebar (also `z-30`) never
-  overlaps the header spatially (header lives inside `lg:pl-64`). Bonus: makes the intended "toolbar
-  slides under the header on scroll" behavior a real z-order instead of a DOM-order coincidence.
-- **Gates:** `pnpm build` green (only gate relevant to a className change; no content/engine/type
-  impact). Live verification (Actions tab + `*.github.io`) is the founder's, per the usual note.
-
-_(Session 118's Kollokationen-nodal-graph handoff, session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
+_(Session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph handoff,
+session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
 handoff (Cobalt & Butter previews + the AI mockup guide) and session 115's demo-readiness-sweep handoff
 are now in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 113's brand-identity-exploration
 handoff (the 20-direction catalogue) is also in W29. Session 114's Theorie pill-animation +
