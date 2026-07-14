@@ -865,3 +865,39 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
 - **Artifacts:** `docs/branding/genauly-ai-mockup-guide.pdf` (new) · `docs/branding/genauly-ai-mockup-guide.html`
   (new) · PR #522 (`0513dd4`) · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`
   (new) · `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 389 — 2026-07-14 (session 117, Üben session navigation + Bibliothek Üben-button copy)
+
+- **Branch:** `claude/uben-session-navigation-q4pfs0` (Opus 4.8)
+- **Prompt (verbatim):**
+  > there's an issues with navigation - whenever the user opens a üben session and exits, they have to
+  > stay at where they were in the app before the session. But they come back to home page at the moment
+  > which is not ideal - fix it. Another things is that I'd like to make it very clear to users that
+  > whenever they filter something andnrhe word count changes, the üben session is tailored as per the
+  > filter. One idea that I have is to integrate the word count into the üben button to say something
+  > like the üben session is for these apps specifically.. something like " Üben mit xxx Worter". I'm
+  > open for your thoughts on this. First fix the navigation and riuting issue and then we can talk
+  > about the next point
+- **Response summary:** Two-part change. **(1) Navigation:** traced that every Üben entry point
+  (`navigate("/session?...")` from the four Bibliothek trainers, Heute → `UebenPath`, Grammatik
+  lessons, `Analytics`, `Sammlung`) pushes a history entry, but `SessionPlayer` always exited via
+  `navigate("/")`. Added an `exit()` helper — `(window.history.state?.idx ?? 0) > 0 ? navigate(-1) :
+  navigate("/")` — so exiting returns the learner to the exact prior route (filters + scroll intact),
+  falling back to the overview only for a deep link / fresh load with no in-app history. Wired into all
+  three exit paths (empty-state, done-screen, exit-confirm); relabelled the two "Zur Übersicht" buttons
+  "Zurück". Shipped this part first per the founder's instruction. **(2) Üben-button copy:** flagged
+  that the count beside Üben is the *pool the session samples from* (`buildScopedSession` draws a
+  ~5-min subset), and that "mit" needs the dative; recommended folding the count into the button with
+  correct per-tab nouns. Founder chose "Üben mit xxx Wörtern" and "show the count always". Extended
+  `UebenLabel` (`browseScroll.tsx`) with optional `count`+`noun` → "Üben mit {n} {noun}"; the four
+  trainers pass the filtered count with the dative noun (Wörtern / Kollokationen / Wendungen / Themen,
+  singular fallbacks) at both the desktop rail footer and the mobile sticky bar; removed the redundant
+  stacked count block + the `count` prop from each `filterRailProps` (`FilterRail`'s count/countStack
+  kept as an unused optional no-op). Verified headless (seed `localStorage b2beruf.settings.v1` to skip
+  onboarding, global Playwright) at 1280 + 390 wide: "Üben mit 858 Wörtern" / "Üben mit 24 Themen"
+  render centered with the bolt, no clipping. Gates green: typecheck, build, lint (0 err/44 warn),
+  test:unit 134/134.
+- **Artifacts:** `src/features/session/SessionPlayer.tsx` · `src/features/shared/browseScroll.tsx` ·
+  `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
+  `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · commits `36cb4c0`, `d097853` · PR # (pending).

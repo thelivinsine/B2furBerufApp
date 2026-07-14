@@ -1,16 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-14 (session 116). **Branding-redesign support (Opus 4.8), docs + previews only,
-no `src/` touched.** The founder is reworking the brand off the s113 catalogue. Explored applying the
-**Umlaut / "Cobalt & Butter" palette** (direction 03: Cobalt `#2B4FE0`, Butter `#FFC24D`, plus Coral
-`#FF6B54`, Sky, Ink, Cream) to the app by screenshotting the **real pages** headless with only the
-color tokens swapped and gradients flattened (not hand-drawn mockups); the founder rejected all applied
-variations. Pivoted to a **self-serve AI mockup guide** shipped to the repo:
-`docs/branding/genauly-ai-mockup-guide.pdf` (+ `.html` source) — the brief, a tool-for-job table, and
-copy-paste prompts for logos, app screens and icons, including a ground-up logo-rework section. Merged
-to `main` (PR #522 + this doc pass). The demo-readiness plan stays closed (s115) except the two optional
-pre-launch founder items (Turnstile, Resend SMTP) and post-demo feedback triage. Product name:
-**Genauly** (`genauly.de`)._
+_Last updated: 2026-07-14 (session 117). **Üben session navigation + Bibliothek Üben-button copy
+(Opus 4.8).** Two founder-reported fixes: (1) exiting a composed Üben session now returns the learner
+to wherever they launched it from (Bibliothek with filters intact, Heute, a Grammatik lesson,
+Fortschritt, Sammlung) via the router history index, with a safe fallback to the overview for deep
+links / fresh loads — previously every exit dumped them on the dashboard. (2) The filtered-set word
+count is now folded INTO the Bibliothek Üben button ("Üben mit 858 Wörtern" / "Üben mit 24 Themen",
+correct dative noun per tab, singular fallbacks, shown regardless of filter status) so it is obvious
+that filtering tailors the session; the now-redundant stacked count was removed from both the desktop
+rail footer and the mobile action bar. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -63,6 +61,26 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 117 (2026-07-14). Üben navigation + Bibliothek Üben-button copy (Opus 4.8),
+on branch `claude/uben-session-navigation-q4pfs0`. Two small, self-contained founder fixes; both
+shipped to `main`.**
+- **(1) Exit-returns-to-origin.** `SessionPlayer` (`src/features/session/SessionPlayer.tsx`) added an
+  `exit()` helper: `(window.history.state?.idx ?? 0) > 0 ? navigate(-1) : navigate("/")`. Every Üben
+  entry point pushes a history entry (`navigate("/session?...")` from the Bibliothek trainers, Heute →
+  `UebenPath`, Grammatik lessons, `Analytics`, `Sammlung`), so `navigate(-1)` lands back on the exact
+  prior route with its filters/scroll intact; a deep link or fresh load (history idx 0) falls back to
+  `/`. Wired into all three exit paths (empty-state button, done-screen "Zurück", exit-confirm
+  "Beenden"); the two "Zur Übersicht" labels became "Zurück".
+- **(2) Count in the Üben button.** `UebenLabel` (`src/features/shared/browseScroll.tsx`) now takes
+  optional `count` + `noun` and renders "Üben mit {count} {noun}". The four Bibliothek trainers
+  (`VocabularyTrainer`, `CollocationsBrowser`, `RedemittelTrainer`, `GrammarHub`) pass the filtered
+  count with the correct **dative** noun (Wörtern / Kollokationen / Wendungen / Themen; singular
+  fallbacks) at BOTH the desktop rail footer and the mobile sticky bar, and dropped the separate
+  stacked count block (+ the `count` prop from each `filterRailProps`). `FilterRail`'s `count`/
+  `countStack` are now unused but kept as an optional no-op API. Verified headless at 1280 + 390 wide.
+- **Gates:** `pnpm typecheck` / `build` / `lint` (0 errors) / `test:unit` (134/134) all green. No
+  content or engine changes, so no `lint:content` / `test:srs` impact.
 
 **Handoff after session 116 (2026-07-14). Branding-redesign support (Opus 4.8), on branch
 `claude/branding-redesign-color-palette-dqkvtd`. Docs + previews only; no `src/` touched.** The founder
