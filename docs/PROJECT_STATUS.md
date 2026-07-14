@@ -93,6 +93,11 @@ tab, matching the Wörter graph's slot but purpose-built for collocations.
   + dark + mobile all coherent, zero console errors. Screenshots in the session scratchpad.
 - **Not yet shipped to `main`:** committed + pushed to the branch; PR/merge left for the founder to
   review the visuals first (per the "no PR unless asked" harness rule).
+- **Shipped (PR #527, `b71617a`), then a follow-up:** added a **card shape toggle** (button beside the
+  card's close): the selected-node card is either a full-width bottom bar (`horizontal`, default) or a
+  full-height right panel (`vertical`), and toggling **re-fits the constellation into the free area**
+  (`fitToRect`/`freeRect`/`cardExtent` in `CollocationGraph.tsx`). Verified headless (both shapes,
+  re-center on toggle, light+dark, desktop+mobile); gates green.
 - **Possible follow-ups if the founder wants:** stronger island separation (raise centroid strength /
   ring radius), a "focus a theme" tap on the domain legend that recenters, or an Üben hook from the card.
 

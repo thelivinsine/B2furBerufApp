@@ -10,7 +10,7 @@ import {
   type SimulationLinkDatum,
   type SimulationNodeDatum,
 } from "d3-force";
-import { Maximize, Minus, Plus, Waypoints, X } from "lucide-react";
+import { Maximize, Minus, PanelBottom, PanelRight, Plus, Waypoints, X } from "lucide-react";
 import type { Collocation } from "@/types";
 import { domains } from "@/data/domains";
 import { SpeakButton } from "@/components/shared/SpeakButton";
@@ -56,6 +56,10 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  // The selected-node card takes one of two shapes: a full-width bar across the
+  // bottom ("horizontal") or a full-height panel down the right ("vertical").
+  // Toggled from a button beside the card's close, re-centering the graph.
+  const [cardLayout, setCardLayout] = useState<"horizontal" | "vertical">("horizontal");
 
   // Legend filters (parity with the Wörter graph): tap a domain to isolate it,
   // or toggle Nomen/Verben. Empty set = show all. Refs mirror them so draw()
@@ -137,6 +141,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   const fittedRef = useRef(false);
   const hoverRef = useRef<string | null>(null);
   const selectedRef = useRef<string | null>(null);
+  const cardLayoutRef = useRef(cardLayout);
   const darkRef = useRef(isDark);
   const domainFilterRef = useRef(domainFilter);
   const kindFilterRef = useRef(kindFilter);
@@ -146,6 +151,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   const drawRef = useRef<() => void>(() => {});
 
   selectedRef.current = selectedId;
+  cardLayoutRef.current = cardLayout;
   darkRef.current = isDark;
   neighborsRef.current = neighbors;
   domainFilterRef.current = domainFilter;
@@ -186,7 +192,8 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     return c;
   };
 
-  const fitToNodes = (nodes: SimNode[], width: number, height: number) => {
+  // Fit all nodes centered into a target rectangle (in screen/canvas space).
+  const fitToRect = (nodes: SimNode[], rx: number, ry: number, rw: number, rh: number) => {
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
@@ -197,15 +204,47 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       minY = Math.min(minY, (n.y ?? 0) - n.r);
       maxY = Math.max(maxY, (n.y ?? 0) + n.r);
     }
-    const pad = 48;
-    const k = clampK(
-      Math.min((width - pad) / Math.max(maxX - minX, 1), (height - pad) / Math.max(maxY - minY, 1)),
-    );
+    const k = clampK(Math.min(rw / Math.max(maxX - minX, 1), rh / Math.max(maxY - minY, 1)));
     transformRef.current = {
       k,
-      x: width / 2 - ((minX + maxX) / 2) * k,
-      y: height / 2 - ((minY + maxY) / 2) * k,
+      x: rx + rw / 2 - ((minX + maxX) / 2) * k,
+      y: ry + rh / 2 - ((minY + maxY) / 2) * k,
     };
+  };
+
+  // Card size constants: kept in lockstep with the card's CSS so the fit math
+  // knows which slice of the canvas the pop-up tile occupies.
+  const cardExtent = (w: number, h: number, layout: "horizontal" | "vertical") =>
+    layout === "horizontal" ? Math.min(h * 0.42, 260) : Math.min(w * 0.42, 360);
+
+  // The rectangle left free by the selected-node card, so the constellation can
+  // re-center into the visible area when the card is shown/toggled.
+  const freeRect = (
+    w: number,
+    h: number,
+    hasCard: boolean,
+    layout: "horizontal" | "vertical",
+  ): [number, number, number, number] => {
+    const pad = 44;
+    let rw = w - 2 * pad;
+    let rh = h - 2 * pad;
+    if (hasCard) {
+      if (layout === "horizontal") rh -= cardExtent(w, h, layout);
+      else rw -= cardExtent(w, h, layout);
+    }
+    return [pad, pad, Math.max(rw, 40), Math.max(rh, 40)];
+  };
+
+  // Re-fit the constellation into the area not covered by the card (used on open
+  // and whenever the card shape is toggled, so the graph "refocuses to center").
+  const refitForLayout = (layout: "horizontal" | "vertical", hasCard: boolean) => {
+    const container = containerRef.current;
+    const live = simRef.current;
+    if (!container || !live || live.nodes.length === 0) return;
+    const rect = container.getBoundingClientRect();
+    const [rx, ry, rw, rh] = freeRect(rect.width, rect.height, hasCard, layout);
+    fitToRect(live.nodes, rx, ry, rw, rh);
+    scheduleDraw();
   };
 
   // ── Simulation + rendering ──────────────────────────────────────────────
@@ -271,7 +310,8 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     // not zoomed into a hub. Fit-to-all with padding.
     if (!fittedRef.current && nodes.length > 0) {
       fittedRef.current = true;
-      fitToNodes(nodes, width, height);
+      // No card on open, so fit into the whole canvas.
+      fitToRect(nodes, ...freeRect(width, height, false, cardLayoutRef.current));
     }
 
     const draw = () => {
@@ -619,12 +659,20 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   };
 
   const fitView = () => {
-    const container = containerRef.current;
-    const live = simRef.current;
-    if (!container || !live || live.nodes.length === 0) return;
-    const rect = container.getBoundingClientRect();
-    fitToNodes(live.nodes, rect.width, rect.height);
-    scheduleDraw();
+    // Fit into the area the card leaves free, so "Einpassen" frames nicely
+    // whether or not a node is selected.
+    refitForLayout(cardLayoutRef.current, !!selectedRef.current);
+  };
+
+  // Switch the card between the bottom-bar and side-panel shapes, then
+  // re-center the constellation into the newly-free area (founder request).
+  const toggleLayout = () => {
+    setCardLayout((l) => {
+      const next = l === "horizontal" ? "vertical" : "horizontal";
+      cardLayoutRef.current = next;
+      refitForLayout(next, true);
+      return next;
+    });
   };
 
   // Fit button toggles: whole-constellation overview ↔ zoom into the biggest hub.
@@ -704,10 +752,20 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
           </button>
         </div>
 
-        {/* Selected node card: its partners on the other side of the bipartite map. */}
+        {/* Selected node card: its partners on the other side of the bipartite
+            map. Two shapes, toggled from the button beside the close: a full-width
+            bar along the bottom ("horizontal") or a full-height panel down the
+            right ("vertical"). Keep these sizes in lockstep with cardExtent(). */}
         {selected && (
-          <div className="absolute bottom-3 left-3 right-3 rounded-xl border border-border bg-surface/95 p-3 shadow-elevated-soft backdrop-blur sm:right-auto sm:w-96">
-            <div className="flex items-start justify-between gap-2">
+          <div
+            className={cn(
+              "absolute z-10 flex flex-col border-border bg-surface/95 shadow-elevated-soft backdrop-blur",
+              cardLayout === "horizontal"
+                ? "inset-x-0 bottom-0 h-[42%] max-h-[260px] rounded-t-xl border-t"
+                : "inset-y-0 right-0 w-[42%] max-w-[360px] rounded-l-xl border-l",
+            )}
+          >
+            <div className="flex shrink-0 items-start justify-between gap-2 p-3 pb-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
                   <p className="truncate text-base font-semibold">{selected.label}</p>
@@ -718,41 +776,61 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
                   {selectedPartners.length} Verbindung{selectedPartners.length !== 1 ? "en" : ""}
                 </p>
               </div>
-              <button
-                onClick={() => setSelectedId(null)}
-                aria-label="Auswahl schließen"
-                className="shrink-0 rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <X className="h-4 w-4" />
-              </button>
+              <div className="flex shrink-0 items-center gap-0.5">
+                <button
+                  onClick={toggleLayout}
+                  aria-label={
+                    cardLayout === "horizontal"
+                      ? "Als Seitenleiste anzeigen"
+                      : "Als Leiste unten anzeigen"
+                  }
+                  title="Ausrichtung wechseln"
+                  className="rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {cardLayout === "horizontal" ? (
+                    <PanelRight className="h-4 w-4" />
+                  ) : (
+                    <PanelBottom className="h-4 w-4" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setSelectedId(null)}
+                  aria-label="Auswahl schließen"
+                  className="rounded p-1 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
-            <div className="mt-2 flex flex-wrap gap-1.5 border-t border-border pt-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {selected.kind === "noun" ? "Verben" : "Nomen"}
-              </span>
-            </div>
-            <div className="mt-1 flex max-h-24 flex-wrap gap-1.5 overflow-y-auto">
-              {selectedPartners.slice(0, 24).map((p) => {
-                const pn = nodeById.get(p.partnerId);
-                if (!pn) return null;
-                return (
-                  <button
-                    key={p.partnerId}
-                    onClick={() => setSelectedId(p.partnerId)}
-                    className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
-                  >
-                    {pn.label}
-                  </button>
-                );
-              })}
-            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-3">
+              <div className="flex flex-wrap gap-1.5 border-t border-border pt-2">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  {selected.kind === "noun" ? "Verben" : "Nomen"}
+                </span>
+              </div>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {selectedPartners.map((p) => {
+                  const pn = nodeById.get(p.partnerId);
+                  if (!pn) return null;
+                  return (
+                    <button
+                      key={p.partnerId}
+                      onClick={() => setSelectedId(p.partnerId)}
+                      className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
+                    >
+                      {pn.label}
+                    </button>
+                  );
+                })}
+              </div>
 
-            {exampleColl && (
-              <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
-                „{exampleColl.example.de}"
-              </p>
-            )}
+              {exampleColl && (
+                <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
+                  „{exampleColl.example.de}"
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>
