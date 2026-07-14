@@ -8,12 +8,6 @@ export const domains: Domain[] = [
     context: "work",
   },
   {
-    id: "arbeitswelt",
-    title: "Work Environment",
-    titleDe: "Arbeitswelt & Umfeld",
-    context: "work",
-  },
-  {
     id: "alltag",
     title: "Daily Life & Errands",
     titleDe: "Alltag & Erledigungen",
