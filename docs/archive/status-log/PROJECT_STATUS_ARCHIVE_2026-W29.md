@@ -116,3 +116,7 @@ Bibliothek **Kollokationen** tab, matching the Wörter graph's slot but purpose-
   `CollocationsBrowser.tsx`. d3-force stays in the shared `vendor-misc` chunk (main chunk unaffected).
 - **Follow-up (#528):** a **card shape toggle** (horizontal bottom bar ↔ vertical right panel) that
   re-fits the constellation into the free area. Gates green; browser-verified light+dark, desktop+mobile.
+- **Follow-up (#532):** nodes are now **draggable and pin where dropped** (the strong centroid force was
+  snapping them back); selecting a node **frames it at a gentle `READABLE_K=1.55`** (`focusNode`,
+  replacing the too-strong `k=2.8` hub jump); canvas **labels are collision-culled onto translucent
+  pills** so they stay legible. All verified headless; gates green.
