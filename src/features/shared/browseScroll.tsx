@@ -53,17 +53,31 @@ export function browseHeaderClass(hidden: boolean, scrolled: boolean): string {
 }
 
 /**
- * Contents for the Bibliothek "Üben" button (founder 2026-07-13): the WORD
- * "Üben" is centered in the button and the bolt icon floats to its left without
- * shifting the word off-center. The label span is what the button's
- * `justify-center` centers; the icon is absolutely positioned at the span's
- * left edge (`right-full`), so it takes no layout space.
+ * Contents for the Bibliothek "Üben" button (founder 2026-07-13): the label is
+ * centered in the button and the bolt icon floats to its left without shifting
+ * the label off-center. The span is what the button's `justify-center` centers;
+ * the icon is absolutely positioned at the span's left edge (`right-full`), so
+ * it takes no layout space.
+ *
+ * When `count` + `noun` are given the label folds the filtered-set size into the
+ * button ("Üben mit 47 Wörtern"), so it is always obvious that Üben practises
+ * exactly what the filters narrowed to (founder 2026-07-14). `noun` must already
+ * be in the DATIVE case the caller's count needs (mit + Dativ), e.g. singular
+ * "Wort" vs plural "Wörtern". Without them it falls back to the bare "Üben".
  */
-export function UebenLabel({ iconClass = "h-4 w-4" }: { iconClass?: string }) {
+export function UebenLabel({
+  iconClass = "h-4 w-4",
+  count,
+  noun,
+}: {
+  iconClass?: string;
+  count?: number;
+  noun?: string;
+}) {
   return (
     <span className="relative inline-flex items-center justify-center">
       <Zap className={`absolute right-full mr-1.5 ${iconClass}`} />
-      Üben
+      {count != null && noun ? `Üben mit ${count} ${noun}` : "Üben"}
     </span>
   );
 }

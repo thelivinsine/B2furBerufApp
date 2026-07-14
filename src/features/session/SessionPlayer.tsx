@@ -96,6 +96,15 @@ function SessionRun({
   onRestart,
 }: SessionPlayerProps & { onRestart: () => void }) {
   const navigate = useNavigate();
+  // Exit returns the learner to wherever they launched Üben from (Bibliothek,
+  // Heute, a Grammatik lesson, Fortschritt, …), not always the dashboard. Every
+  // in-app entry point pushes a history entry, so React Router's history index
+  // is > 0 when there is a previous route to go back to; a deep link or fresh
+  // load (index 0, no app history) falls back to the overview.
+  const exit = () => {
+    if ((window.history.state?.idx ?? 0) > 0) navigate(-1);
+    else navigate("/");
+  };
   const srs = useProgressStore((s) => s.srs);
   const savedWords = useProgressStore((s) => s.savedWords);
   const mode = useSettingsStore((s) => s.mode);
@@ -278,8 +287,8 @@ function SessionRun({
           title="Keine fälligen Übungen"
           description="Du bist für heute durch. Komm später wieder für eine neue Runde."
           action={
-            <Button variant="gradient" onClick={() => navigate("/")}>
-              Zur Übersicht
+            <Button variant="gradient" onClick={exit}>
+              Zurück
             </Button>
           }
         />
@@ -326,8 +335,8 @@ function SessionRun({
           <Button variant="gradient" onClick={onRestart}>
             <RotateCw className="h-4 w-4" /> Neue Runde
           </Button>
-          <Button variant="outline" onClick={() => navigate("/")}>
-            Zur Übersicht
+          <Button variant="outline" onClick={exit}>
+            Zurück
           </Button>
         </div>
       </div>
@@ -459,7 +468,7 @@ function SessionRun({
                 <Button variant="outline" onClick={() => setExitConfirm(false)}>
                   Weiter üben
                 </Button>
-                <Button variant="gradient" onClick={() => navigate("/")}>
+                <Button variant="gradient" onClick={exit}>
                   Beenden
                 </Button>
               </div>
