@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { MessageSquareText, Send, Loader2 } from "lucide-react";
+import { MessageSquareText, Sparkles, Send, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
  * even during a focus-mode session); every affordance just opens it via the
  * `feedbackOpen` session-store flag:
  *   - <FeedbackPill/>   the quiet floating pill (desktop bottom-right).
- *   - <FeedbackIconButton/> a compact icon for the mobile Üben action bars.
+ *   - <FeedbackIconButton/> a compact labelled "Feedback" pill for the mobile Üben action bars.
  *   - <FeedbackFullButton/>  the full labelled button inside a practice session.
  */
 
@@ -140,7 +140,13 @@ export function FeedbackPill() {
   );
 }
 
-/** Compact icon trigger for the mobile Üben action bars (left of the Üben button). */
+/**
+ * Compact labelled "Feedback" pill for the mobile Üben action bars (left of the
+ * Üben button). Deliberately NOT a bare message-bubble icon: a lone chat glyph
+ * read as a live-chat / support widget (founder, 2026-07-14). The Sparkles mark
+ * ties it to the "Mit KI gebaut" disclaimer and the visible label makes the
+ * purpose unambiguous.
+ */
 export function FeedbackIconButton({ className }: { className?: string }) {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
   return (
@@ -150,11 +156,12 @@ export function FeedbackIconButton({ className }: { className?: string }) {
       aria-label="Mit KI gebaut · Feedback geben"
       title="Mit KI gebaut · Feedback geben"
       className={cn(
-        "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-surface text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground",
+        "flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-border bg-surface px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground",
         className,
       )}
     >
-      <MessageSquareText className="h-5 w-5 text-primary" />
+      <Sparkles className="h-4 w-4 text-primary" />
+      Feedback
     </button>
   );
 }
