@@ -9,6 +9,7 @@ to the week file matching each entry's date.
 |---|---|---|
 | `SESSION_PROMPT_LOG_2026-W25.md` | 2026-06-15 – 2026-06-21 | 26–29 |
 | `SESSION_PROMPT_LOG_2026-W26.md` | 2026-06-22 – 2026-06-28 | 30–44 |
-| `SESSION_PROMPT_LOG_2026-W27.md` | 2026-06-29 – 2026-07-05 | 45–49 (early July) |
+| `SESSION_PROMPT_LOG_2026-W27.md` | 2026-06-29 – 2026-07-05 | 45–49, 50–68 (entries 110–169) |
+| `SESSION_PROMPT_LOG_2026-W28.md` | 2026-07-06 – 2026-07-12 | 69–103 (entries 170–364) |
 
 New week files follow the same name pattern: `SESSION_PROMPT_LOG_YYYY-Www.md`.
