@@ -1003,3 +1003,38 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   prompt-log entry.
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   `docs/SESSION_PROMPT_LOG.md`.
+
+---
+
+## Session 120 — 2026-07-14 — Content-library coverage review + deepening
+
+**Branch:** `claude/content-library-coverage-lih2fp` · **Model:** Opus 4.8 · **Attachments:** none
+
+- **Prompt (verbatim):**
+  > in the current content library, there's sometimes clearly way too less numbers of words or
+  > collocations for some themes or sub themes or branches. can you do a thorough review of the library
+  > and see what can be improved? also the potential new ones to add should be genuinely useful and
+  > commonly used for the users interested in those fields ir branches.
+- **Clarifying question (AskUserQuestion):** asked where to focus the expansion. Founder selected all
+  three: **Service Branchen + Daily-life themes + Both, in waves.**
+- **Response summary:** Wrote a throwaway coverage script (loads the banks via Vite `ssrLoadModule`,
+  same as the linter) to quantify vocab/collocation counts per theme, sub-theme and Branche. Finding:
+  the industrial Branchen are well-covered (s94/s95/s102 packs); the gap is the **service/consumer
+  world** (sports 17 / beauty 19 / hospitality 19 / retail 21 vocab) and the **daily-life themes**
+  (bank 29 / behoerde 33 / bildung 34 / wohnen 47) with several near-empty sub-themes. Deepened them in
+  two waves of genuinely common, high-frequency words. **Wave 1 (service Branchen):** +76 vocab / +48
+  collocations across hospitality/retail/beauty/cleaning/security/sports (each `sectors`-tagged on the
+  natural theme, mostly `customer`/`safety`/`arzt`; fewer for cleaning/security which were less thin).
+  **Wave 2 (daily-life):** +57 vocab / +8 collocations across bank/behoerde/bildung/wohnen +
+  arzt.versicherung, sub-theme-tagged to fill `behoerde.aufenthalt`/`bescheid`, all `bank`/`bildung`
+  subs, `wohnen.nebenkosten`/`probleme`. Added all 189 provenance rows (DWDS refs, draft status;
+  `content_type: "vocabulary"`). Regenerated `frequency.ts` after `pip install wordfreq` +
+  `build:frequency-subset` (unbinned 342→86). Refreshed morphology oracle subsets; fact gate passes
+  with **0 two-oracle-confirmed errors**. Totals now vocab **1,246** · collocations **797** ·
+  provenance **2,452**. Gates: lint:content, typecheck, build, test:unit 142/142, check:bundle 79.6 kB,
+  verify:facts all green. (Rebased twice onto main across parallel sessions 118/119; data files merged
+  cleanly, docs re-applied, renumbered to session 120.)
+- **Artifacts:** `src/data/vocabulary.ts` · `src/data/collocations.ts` · `src/data/provenance.ts` ·
+  `src/data/frequency.ts` · `scripts/vendor/*subset.json` · `docs/reports/verify-facts-report.md` ·
+  `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · PR #530.

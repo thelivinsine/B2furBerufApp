@@ -1,13 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-14 (session 119). **Account-dropdown z-index bug fixed (Opus 4.8), shipped to
-`main` (PR #529).** On the Bibliothek browse pages the account menu dropdown had the page's sticky
-browse toolbar (ViewSwitcher icons + search) bleeding through its DESIGN row. Root cause: the app
-header and that toolbar (`browseHeaderClass`) were both `z-20` stacking contexts, and the toolbar
-paints later in DOM order, so it beat the dropdown (whose `z-50` is scoped inside the header context).
-Fix: raise the header to `z-30` (one-line className change in `AppShell.tsx`), still below FeedbackPill
-`z-40` / Toaster `z-50` / bottom nav `z-[55]/[60]` and non-overlapping with the desktop sidebar `z-30`.
-`pnpm build` green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-14 (session 120). **Content-library coverage review + deepening (Opus 4.8), on
+branch `claude/content-library-coverage-lih2fp`.** Reviewed vocab/collocation coverage across every
+theme, sub-theme and Branche and found the imbalance was the everyday consumer/service world (the
+plateau-learner audience), not the industrial sectors. Deepened the thinnest slices with genuinely
+common, high-frequency words: **+133 vocab and +56 collocations** across the thin service Branchen
+(hospitality/retail/beauty/cleaning/security/sports) and the thin daily-life themes
+(bank/behoerde/bildung/wohnen + arzt.versicherung), filling starved sub-themes like
+`behoerde.aufenthalt`/`bescheid` and every `bank`/`bildung` sub-theme. Provenance rows added, frequency
+map regenerated, fact gate passes (0 two-oracle errors). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -37,9 +38,9 @@ architectural decisions, and backend/infra setup are documented in `docs/PROJECT
 read that for the "what's built and how." The living detail of every feature area (mobile bar, the
 session engine, Bibliothek views, the game layer, content conventions) is in `../CLAUDE.md`.
 
-**Content banks (as of 2026-07-12, session 102 — re-verify with `pnpm lint:content` before quoting):**
-vocab **1,113** · collocations **741** · Redemittel **149** · grammar **24 topics / 117 drills** ·
-Lese-/Hörtexte **26** (78 checks) · Can-Do **37** · provenance **2,263 rows** · themes **15** ·
+**Content banks (as of 2026-07-14, session 120 — re-verify with `pnpm lint:content` before quoting):**
+vocab **1,246** · collocations **797** · Redemittel **149** · grammar **24 topics / 117 drills** ·
+Lese-/Hörtexte **26** (78 checks) · Can-Do **37** · provenance **2,452 rows** · themes **15** ·
 exam sets **15** · dialogues **20**. All six top-level domains are populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
 Standing governance debt: ~98% of provenance rows are AI-drafted, not yet human-verified (see
@@ -60,6 +61,34 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 120 (2026-07-14). Content-library coverage review + deepening (Opus 4.8), on
+branch `claude/content-library-coverage-lih2fp`. Shipped to `main`.** The founder asked for a thorough
+review of the content library to find themes/sub-themes/Branchen with too few words or collocations,
+then to add genuinely useful, commonly-used items for those fields.
+- **What the review found (quantified via a throwaway coverage script):** the industrial Branchen
+  (production 80 / engineering 71 / construction 65 / it 55 / chemicals 49 vocab) are well-covered from
+  the s94/s95/s102 packs; the imbalance was the **service/consumer world** where most B1-B2 immigrant
+  learners actually work — sports 17, beauty 19, hospitality 19, retail 21 vocab. Thin daily-life
+  themes: bank 29 (lowest), behoerde 33, bildung 34, wohnen 47. Starved sub-themes: `behoerde.bescheid`
+  3, `behoerde.aufenthalt` 4, `arzt.versicherung` 4, all `bank`/`bildung` subs 6-8.
+- **Wave 1 (service Branchen, +76 vocab / +48 colloc):** hospitality (Kellner, Vorspeise, Getränkekarte,
+  abräumen, zapfen…), retail (Wechselgeld, Umtausch, Rückgaberecht, Warenkorb, Anprobe…), beauty (Frisur,
+  Spülung, Tönung, Wimpernverlängerung, zupfen…), plus cleaning/security/sports top-ups (they were less
+  thin, so fewer). Each rides `sectors:[…]` on the natural theme (mostly `customer`/`safety`/`arzt`).
+- **Wave 2 (daily-life themes, +57 vocab / +8 colloc):** bank (Überweisen, Einzahlung, Buchung, Mahnung,
+  Zahlungsverzug…), behoerde (Wohnsitz, an/abmelden, Niederlassungserlaubnis, Einbürgerung, Widerspruch,
+  Rechtsmittel…), bildung (Wortschatz, Aussprache, mündlich/schriftlich, durchfallen, Praktikum,
+  Bildungsgutschein…), wohnen (Betriebskosten, Nachzahlung, Zählerstand, Wasserschaden, Rohrbruch…),
+  arzt.versicherung (Zuzahlung, Überweisungsschein, Attest, Zusatzversicherung…). Sub-theme-tagged so the
+  starved slices fill.
+- **Mechanics:** appended to `vocabularyPart2` / the collocations array; provenance rows added (DWDS
+  refs, `review_status:"draft"` for the next founder review pass); `content_type` is `"vocabulary"` (not
+  `"vocab"` — TS enum, caught at build). Regenerated `frequency.ts` after `pip install wordfreq` +
+  `build:frequency-subset` (unbinned dropped 342 to 86). Refreshed the morphology oracle subsets.
+- **Gates:** `lint:content` OK, `typecheck` OK, `build` OK, `test:unit` 142/142, `check:bundle` 79.6 kB,
+  `verify:facts` OK (0 two-oracle-confirmed errors; the one new signal, `die Betriebskosten`, is a correct
+  plurale tantum). Everything AI-drafted, founder-verify pending like the rest of the bank.
 
 **Handoff after session 119 (2026-07-14). Account-dropdown z-index bug fix (Opus 4.8), on branch
 `claude/account-settings-dropdown-icons-b8feg6`, shipped to `main` (PR #529, squash-merged).** A
@@ -82,47 +111,7 @@ one-line founder bug fix.
 - **Gates:** `pnpm build` green (only gate relevant to a className change; no content/engine/type
   impact). Live verification (Actions tab + `*.github.io`) is the founder's, per the usual note.
 
-**Handoff after session 118 (2026-07-14). Kollokationen nodal graph (Opus 4.8), on branch
-`claude/kollokations-nodal-graph-080jt7`.** Shipped a Graph view for the Bibliothek **Kollokationen**
-tab, matching the Wörter graph's slot but purpose-built for collocations.
-- **Model (founder-confirmed before building):** a **bipartite noun ↔ verb** graph. Every distinct noun
-  and verb is a node; every collocation is an edge. Tap a verb → its nouns; tap a noun → its verbs. Hub
-  verbs (machen/treffen) surface naturally. Edges are the authored collocations, nothing inferred.
-- **Layout (founder-confirmed):** **theme islands** — nodes are pulled to per-theme centroids
-  (`forceX/forceY`) so themes form glowing clusters, shared verbs bridge between them.
-- **"Stunning zoomed out" finesse:** opens **fit-to-all** (not zoomed into a hub like Wörter); cached
-  radial **glow sprites** (additive in dark) instead of per-frame shadowBlur; **curved** quadratic
-  edges tinted by source domain; a **vignette** background; **nouns = solid discs, verbs = rings**
-  (annuli) so the bipartite structure reads without a legend; labels fade in with zoom, hubs a touch
-  earlier. Node size = **degree** (frequency.ts is keyed by content_id, not surface form, so degree is
-  both available and more meaningful). Domain color = the node's majority theme's domain.
-- **Files:** `src/lib/graphPalette.ts` (shared `DOMAIN_COLORS`/`domainColor`, lifted out of
-  `WordGraph.tsx`, which now imports it — behavior unchanged); `src/features/collocations/collocationGraph.ts`
-  (pure builder) + `tests/collocationGraph.test.ts` (8 tests); `src/features/collocations/CollocationGraph.tsx`
-  (lazy canvas renderer, mirrors WordGraph's interaction/camera); wired into `CollocationsBrowser.tsx`
-  (`KOLLOKATION_VIEWS` gained `graph`, `React.lazy` + Suspense, passes the `filtered` list). The
-  bipartite selected-node card lists partner chips (clickable) + one example + SpeakButton; the legend
-  doubles as a Nomen/Verben + domain filter.
-- **Wörter graph untouched** except the one-line palette import swap. d3-force stays in the shared
-  `vendor-misc` chunk (both graph chunks import it), so the main chunk is unaffected (79.5 kB/400).
-- **Gates:** typecheck clean, lint 0 errors (pre-existing warnings only), `test:unit` 142/142, `build`
-  green, `check:bundle` pass. Browser-verified via Playwright over `pnpm preview`: fit-to-all opens on
-  the constellation, node selection dims + shows the partner card, zoom/pan/legend-filters work, light
-  + dark + mobile all coherent, zero console errors. Screenshots in the session scratchpad.
-- **Not yet shipped to `main`:** committed + pushed to the branch; PR/merge left for the founder to
-  review the visuals first (per the "no PR unless asked" harness rule).
-- **Shipped (PR #527, `b71617a`), then follow-ups:** (a) a **card shape toggle** (button beside the
-  card's close): the selected-node card is either a full-width bottom bar (`horizontal`, default) or a
-  full-height right panel (`vertical`), and toggling **re-fits the constellation into the free area**
-  (`fitToRect`/`freeRect`/`cardExtent` in `CollocationGraph.tsx`, PR #528 `a823a8a`). (b) **Drag +
-  readability round:** nodes now **pin where dropped** (drag was springing back under the centroid
-  force); selecting a node **frames it at a gentle `READABLE_K=1.55`** (`focusNode`, replacing the too-
-  strong `k=2.8` hub jump); canvas **labels are collision-culled onto translucent pills** so they stay
-  legible. All verified headless (light+dark, desktop+mobile); gates green.
-- **Possible follow-ups if the founder wants:** stronger island separation (raise centroid strength /
-  ring radius), a "focus a theme" tap on the domain legend that recenters, or an Üben hook from the card.
-
-_(Session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
+_(Session 118's Kollokationen-nodal-graph handoff, session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
 handoff (Cobalt & Butter previews + the AI mockup guide) and session 115's demo-readiness-sweep handoff
 are now in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 113's brand-identity-exploration
 handoff (the 20-direction catalogue) is also in W29. Session 114's Theorie pill-animation +

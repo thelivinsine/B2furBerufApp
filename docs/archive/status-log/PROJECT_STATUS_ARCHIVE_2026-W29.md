@@ -100,3 +100,19 @@ shipped to `main`.**
   `countStack` are now unused but kept as an optional no-op API. Verified headless at 1280 + 390 wide.
 - **Gates:** `pnpm typecheck` / `build` / `lint` (0 errors) / `test:unit` (134/134) all green. No
   content or engine changes, so no `lint:content` / `test:srs` impact.
+
+## Session 118 (2026-07-14) — Kollokationen nodal graph (condensed handoff)
+
+**Handoff after session 118 (2026-07-14). Kollokationen nodal graph (Opus 4.8), on branch
+`claude/kollokations-nodal-graph-080jt7`, shipped (PR #527 + follow-up #528).** Added a Graph view to the
+Bibliothek **Kollokationen** tab, matching the Wörter graph's slot but purpose-built for collocations.
+- **Model + layout (founder-confirmed):** a **bipartite noun ↔ verb** graph (every noun/verb a node,
+  every collocation an edge; hub verbs surface naturally), laid out as **theme islands** via per-theme
+  `forceX/forceY` centroids. Opens **fit-to-all**; cached radial glow sprites, curved domain-tinted
+  edges, vignette; **nouns = discs, verbs = rings**; node size = degree; domain color = majority theme.
+- **Files:** `src/lib/graphPalette.ts` (shared `DOMAIN_COLORS`/`domainColor`, lifted out of `WordGraph`),
+  `src/features/collocations/collocationGraph.ts` (pure builder) + `tests/collocationGraph.test.ts` (8
+  tests), `src/features/collocations/CollocationGraph.tsx` (lazy renderer), wired into
+  `CollocationsBrowser.tsx`. d3-force stays in the shared `vendor-misc` chunk (main chunk unaffected).
+- **Follow-up (#528):** a **card shape toggle** (horizontal bottom bar ↔ vertical right panel) that
+  re-fits the constellation into the free area. Gates green; browser-verified light+dark, desktop+mobile.
