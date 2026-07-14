@@ -119,7 +119,7 @@ export function AppShell() {
             fixed/sticky layers repaints on every scroll frame and was a scroll-
             jank source on phones (audit B3). Desktop keeps the original look. */}
         {!focus && (
-        <header className="sticky top-0 z-20 border-b border-border bg-surface/90 pt-safe backdrop-blur-md lg:bg-surface/70 lg:backdrop-blur-xl">
+        <header className="sticky top-0 z-30 border-b border-border bg-surface/90 pt-safe backdrop-blur-md lg:bg-surface/70 lg:backdrop-blur-xl">
           <div className="flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
             <div className="flex items-center gap-2">
               <Link
