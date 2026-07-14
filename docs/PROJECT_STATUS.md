@@ -1,15 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-14 (session 115). **Demo-readiness sweep finished (Opus 4.8):** completed the
-last open chunks of `docs/plans/DEMO_READINESS_PLAN.md` (P0 Chunks 1/4/5, P1 Chunk 6). A Playwright
-smoke test over the production preview (mobile + desktop × light + dark × 28 routes + core
-interactions) came back completely clean (no console errors, error boundaries, dead routes, blank
-pages, or horizontal overflow), so Chunk 4 had no blemishes to fix. Perf sanity: main chunk 79.5 kB,
-throttled first paint ~3.3–3.5s, lazy chunks load without error flash. Wrote `docs/DEMO_RUNBOOK.md`.
-Also ran the **P2 whole-app security review** (no critical/high findings; report at
-`docs/reports/security-review-2026-07-14.md`). The demo-readiness plan is now closed except the two
-optional pre-launch founder items (Turnstile, Resend SMTP) and post-demo feedback triage. All 9 gates
-green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-14 (session 116). **Demo dress-rehearsal verification (Opus 4.8):** confirmed
+`docs/plans/DEMO_READINESS_PLAN.md` is already fully executed on `main` (all P0/P1 chunks + the two
+actionable P2 items merged through PR #522). Re-ran the full 9-gate set from a clean `pnpm install` as
+the plan's final dress-rehearsal step, all green (typecheck · lint 0 err/44 warn · lint:content ·
+test:unit 134/134 · test:srs 323 · test:pronounce 26 · audit 0 vulns · build+prerender ·
+check:bundle 79.5 kB/400). No source, plan, or checkbox changes (nothing left to fix); discarded a
+`tsconfig.app.tsbuildinfo` build-cache churn. Only remaining plan items are founder-console ops
+(Turnstile, Resend SMTP) and post-demo feedback triage. Doc-only session. Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -63,6 +62,28 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 116 (2026-07-14). Demo dress-rehearsal verification (Opus 4.8), on branch
+`claude/predemo-plan-steps-3gc981`. No changes to ship — verification-only.** The prompt was "complete
+as many steps from the predemo plan as possible". Finding: `docs/plans/DEMO_READINESS_PLAN.md` was
+**already fully executed and merged to `main`** (HEAD = `0513dd4` / PR #522) — every P0/P1 chunk (1–6)
+plus both actionable P2 items (content-accuracy s112, security-review s115) checked off. The only
+genuinely actionable step left was the plan's own closing line, "re-run the full gate set as the demo
+dress rehearsal", so that is what this session did.
+- **Ran all 9 gates from a fresh `pnpm install`, all green:** `pnpm typecheck` ✔ · `pnpm lint` 0
+  errors / 44 deliberate react-hooks warnings ✔ · `pnpm lint:content` ✔ (tiers 25 human / 188 jury /
+  1837 linguistic / 82 facts / 131 provenance) · `pnpm test:unit` 134/134 ✔ · `pnpm test:srs` 323 ✔ ·
+  `pnpm test:pronounce` 26 ✔ · `pnpm audit` 0 vulns ✔ · `pnpm build` ✔ (7 prerendered help pages +
+  sitemap, PWA precache 97 entries) · `pnpm check:bundle` 79.5 kB / 400 kB ✔. Matches the s111 baseline
+  exactly.
+- **No source / plan / checkbox changes** (nothing was broken or unfinished). The only working-tree
+  diff was `tsconfig.app.tsbuildinfo` (a tracked TS build-cache file rewritten by running the gates);
+  discarded it rather than commit artifact churn. This session touches docs only (status + prompt log).
+- **Remaining (all outside what an automation session can do):** Turnstile enablement + Resend SMTP
+  (standing pre-public-launch founder-console items) and post-demo feedback triage from the
+  `public.feedback` table. Both next-week, neither demo-blocking. The app is demo-ready; the founder's
+  live-site verification (hard-refresh + one runbook tour on the demo device) is the last step the
+  sandbox cannot do.
+
 **Handoff after session 115 (2026-07-14). Demo-readiness sweep finished (Opus 4.8), on branch
 `claude/predemo-sweep-tasks-25oejy`.** Closed the remaining open chunks of
 `docs/plans/DEMO_READINESS_PLAN.md`: P0 Chunk 1 (smoke test), Chunk 4 (UI polish), Chunk 5 (runbook),
@@ -94,30 +115,9 @@ and P1 Chunk 6 (perf). Chunks 2+3 were already done s112. **The whole P0+P1 plan
 - **Remaining (P2):** Turnstile enablement + Resend SMTP (standing pre-public-launch founder items),
   and post-demo feedback triage from the `public.feedback` table. Both next-week, not demo-blocking.
 
-**Handoff after session 113 (2026-07-13). Brand identity exploration (Opus 4.8), on branch
-`claude/branding-logo-redesign-947e61`, merged to `main` (PR #516). Parallel to the demo work; no app
-code changed.** The founder wants to replace the branding (logo, visual assets, colour scheme): the
-current gradient rounded-square "G" reads as a Canva lookalike. Deliverable = a **catalogue of 20
-logo/identity directions** for founder review, saved under `preview/branding/` (open the HTML files in
-a browser; index in that folder's `README.md`).
-- **What was produced:** three self-contained HTML "studio spec-sheet" pages, each direction a live
-  SVG/CSS mark + a 5-colour palette (hex) + a licensable type pairing. `genauly-identity-vol1.html` +
-  `vol2.html` (foundation *genau* = precision): Genau., Wasserwaage, Umlaut, Zielband, Neuland, „Genau",
-  Der·Die·Das, Fokus, Roter Faden, Stempel. `vol3.html` (three new brand *philosophies*):
-  Ankommen/belonging (Schwelle, Der Tisch, Schlüssel, Heimat), Durchbruch/momentum (Durchbruch, Schwung,
-  Sprung), Klarheit/clarity (Prisma, Sonnenaufgang, Klartext).
-- **Assistant shortlist:** Der·Die·Das (brand = the gender-colour teaching system), Neuland (one world
-  with the game), Durchbruch (owns the plateau story), Ankommen/Schwelle (warmest, most distinctive).
-- **NOT done (deliberate):** nothing in `src/` touched. No palette/token edit in `src/index.css` or
-  `tailwind.config.ts`, no logo/favicon/PWA-icon regen. **That is the next step, and it only starts once
-  the founder picks a direction** (belief + mark + palette, mixes allowed): lock one spec, wire the
-  tokens (light + dark), regenerate all icons from the mark, `pnpm build`, ship to `main`. Also published
-  as private Claude artifacts (Vol. I `fed14c61`, II `02c0d954`, III `dc5d3da7`).
-- **Gates:** none run (no code change); docs + preview HTML only.
-
-_(Session 114's Theorie pill-animation + dark-mode contrast handoff, session 113's Theorie
-tab-transition/compass/feedback-pill polish handoff, session 112's Demo-readiness Chunks 2+3 handoff,
-its P2 content-accuracy handoff, session 111's handoff
+_(Session 113's brand-identity exploration handoff, session 114's Theorie pill-animation + dark-mode
+contrast handoff, session 113's Theorie tab-transition/compass/feedback-pill polish handoff, session
+112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff, session 111's handoff
 (demo-readiness plan authored + baseline verified) and sessions 85-110's
 handoffs, plus the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,

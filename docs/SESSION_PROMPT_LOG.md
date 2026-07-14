@@ -4888,3 +4888,33 @@ Branch: `claude/whats-next-esga9u`.
   checked off) and the two new report/runbook files are in place. Shipped as the session's final doc
   commit.
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 388 — 2026-07-14 (session 116, demo dress-rehearsal verification)
+- **Branch:** `claude/predemo-plan-steps-3gc981`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompt (verbatim):**
+  > complete as many steps from the predemo plan as possible
+- **Response summary:** Located the "predemo plan" (`docs/plans/DEMO_READINESS_PLAN.md`) and found it
+  **already fully executed and merged to `main`** (HEAD `0513dd4` = `origin/main` via PR #522): every
+  P0/P1 chunk (1 smoke test, 2 regression review, 3 abuse hardening, 4 UI polish, 5 runbook, 6 perf)
+  plus both actionable P2 items (content-accuracy s112, whole-app security-review s115) checked off.
+  The only actionable step left was the plan's own closing dress-rehearsal line, so re-ran the full
+  9-gate set from a fresh `pnpm install`: all green — `pnpm typecheck` ✔, `pnpm lint` 0 err / 44 warn ✔,
+  `pnpm lint:content` ✔ (tiers 25 human / 188 jury / 1837 linguistic / 82 facts / 131 provenance),
+  `pnpm test:unit` 134/134 ✔, `pnpm test:srs` 323 ✔, `pnpm test:pronounce` 26 ✔, `pnpm audit` 0 vulns ✔,
+  `pnpm build` ✔ (7 prerendered help pages + sitemap, PWA precache 97 entries), `pnpm check:bundle`
+  79.5 kB/400 ✔. Matches the s111 baseline exactly. No source/plan/checkbox changes (nothing was broken
+  or unfinished). The app is demo-ready; the only remaining items are founder-console ops (Turnstile,
+  Resend SMTP) and post-demo feedback triage, neither demo-blocking.
+- **Follow-up (stop-hook):** the git stop-hook flagged an uncommitted change — a tracked
+  `tsconfig.app.tsbuildinfo` build-cache file rewritten by running the gates. Discarded it
+  (`git checkout --`) rather than commit meaningless artifact churn; working tree clean, nothing to push.
+- **Follow-up prompt (verbatim):**
+  > document the session
+- **Follow-up response:** Doc-only pass. Added this log entry; updated `docs/PROJECT_STATUS.md`
+  (`_Last updated_` block → s116; new s116 Resume-here handoff at top; rotated the older s113
+  brand-identity handoff into `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` per the
+  two-most-recent rule and updated the closing parenthetical). No source touched.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`.
