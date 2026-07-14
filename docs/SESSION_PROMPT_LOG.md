@@ -901,3 +901,14 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collocations/CollocationsBrowser.tsx` ·
   `src/features/redemittel/RedemittelTrainer.tsx` · `src/features/grammar/GrammarHub.tsx` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · commits `36cb4c0`, `d097853` · PR # (pending).
+- **Follow-up prompt (verbatim):**
+  > can you rework the feedback button on mobile view.. as the current one looks like a chat button
+- **Follow-up response:** The mobile feedback affordance was `FeedbackIconButton` (in the four
+  Bibliothek Üben action bars) rendered as a bare `h-11 w-11` rounded square with a `MessageSquareText`
+  glyph, i.e. the universal live-chat icon, so it read as a support/chat widget. Reworked it into a
+  compact labelled **"Feedback" pill** (auto width, `px-3`, `Sparkles` mark in brand + the word
+  "Feedback") so it ties to the "Mit KI gebaut" disclaimer and its purpose is unambiguous. Desktop
+  `FeedbackPill` and in-session `FeedbackFullButton` were left unchanged (they already carry a text
+  label). Verified headless at 390 wide: "✨ Feedback" sits left of "⚡ Üben mit 858 Wörtern" with no
+  crowding. Gates green (typecheck, build, lint 0 err). Shipped to `main` (PR #526).
+- **Artifacts:** `src/components/layout/FeedbackButton.tsx` · commit `<mobile-feedback>` · PR #526.
