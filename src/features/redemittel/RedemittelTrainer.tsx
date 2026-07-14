@@ -137,13 +137,13 @@ export function RedemittelTrainer() {
     pinScope: "redemittel",
     footer: (
       <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
-        <UebenLabel iconClass="h-3.5 w-3.5" />
+        <UebenLabel
+          iconClass="h-3.5 w-3.5"
+          count={filtered.length}
+          noun={filtered.length === 1 ? "Wendung" : "Wendungen"}
+        />
       </Button>
     ),
-    count: {
-      value: filtered.length,
-      label: filtered.length !== 1 ? "Wendungen" : "Wendung",
-    },
   };
 
   // Flat card grid (no section headers, founder s104): one card per phrase,
@@ -333,7 +333,8 @@ export function RedemittelTrainer() {
           )}
         </div>
 
-        {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
+        {/* Mobile action bar: Üben (count folded into the label) pinned at the
+            bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
           <FeedbackIconButton />
@@ -342,16 +343,12 @@ export function RedemittelTrainer() {
             className="h-11 flex-1 rounded-xl text-base"
             onClick={startSession}
           >
-            <UebenLabel iconClass="h-4 w-4" />
+            <UebenLabel
+              iconClass="h-4 w-4"
+              count={filtered.length}
+              noun={filtered.length === 1 ? "Wendung" : "Wendungen"}
+            />
           </Button>
-          <div className="flex w-20 shrink-0 flex-col items-center justify-center px-1 leading-none">
-            <span className="text-sm font-semibold tabular-nums text-foreground">
-              {filtered.length}
-            </span>
-            <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-              Wendung{filtered.length !== 1 ? "en" : ""}
-            </span>
-          </div>
         </div>
 
         <FilterRail

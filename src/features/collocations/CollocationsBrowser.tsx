@@ -330,13 +330,13 @@ export function CollocationsBrowser() {
     pinScope: "kollokationen",
     footer: (
       <Button variant="gradient" className="h-10 w-full" onClick={startSession}>
-        <UebenLabel iconClass="h-3.5 w-3.5" />
+        <UebenLabel
+          iconClass="h-3.5 w-3.5"
+          count={filtered.length}
+          noun={filtered.length === 1 ? "Kollokation" : "Kollokationen"}
+        />
       </Button>
     ),
-    count: {
-      value: filtered.length,
-      label: filtered.length !== 1 ? "Kollokationen" : "Kollokation",
-    },
   };
 
   const cardGrid = (
@@ -524,21 +524,18 @@ export function CollocationsBrowser() {
           )}
         </div>
 
-        {/* Mobile action bar: Üben + count pinned at the bottom, list scrolls above. */}
+        {/* Mobile action bar: Üben (count folded into the label) pinned at the
+            bottom, list scrolls above. */}
         <ScrollTopButton show={scrolled} />
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden">
           <FeedbackIconButton />
           <Button variant="gradient" className="h-11 flex-1 rounded-xl text-base" onClick={startSession}>
-            <UebenLabel iconClass="h-4 w-4" />
+            <UebenLabel
+              iconClass="h-4 w-4"
+              count={filtered.length}
+              noun={filtered.length === 1 ? "Kollokation" : "Kollokationen"}
+            />
           </Button>
-          <div className="flex w-20 shrink-0 flex-col items-center justify-center px-1 leading-none">
-            <span className="text-sm font-semibold tabular-nums text-foreground">
-              {filtered.length}
-            </span>
-            <span className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
-              Kollokation{filtered.length !== 1 ? "en" : ""}
-            </span>
-          </div>
         </div>
 
         <FilterRail
