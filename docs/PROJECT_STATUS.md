@@ -75,8 +75,8 @@ and P1 Chunk 6 (perf). Chunks 2+3 were already done s112. **The whole P0+P1 plan
   desktop). No blemishes: consistent nav labels, no em dashes, dark mode solid (missions light-only +
   hub theme-aware both by design), clean empty states, no overflow. **No code changes needed.**
 - **Chunk 5 — runbook:** wrote `docs/DEMO_RUNBOOK.md` (device prep, two demo states, tour order,
-  failure fallbacks, founder console checklist). **Founder must run `supabase functions deploy
-  submit-feedback`** for the s112 feedback rate-limit to go live (no migration/secret needed).
+  failure fallbacks, founder console checklist). The s112 feedback function + rate-limit are **already
+  deployed and live** (founder confirmed), so no deploy step is pending for the demo.
 - **Chunk 6 — perf:** main chunk 79.5 kB/400; throttled (1.6 Mbps/4× CPU) first paint ~3.3–3.5s on
   `/`, `/library`, Graph, `/welt`, `/sammlung`; lazy chunks load without an error flash.
 - **Only doc changes** this session (`DEMO_READINESS_PLAN.md` checkboxes + findings, new

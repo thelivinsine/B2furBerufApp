@@ -9,11 +9,12 @@ and `docs/plans/PHASE2_SETUP.md` (Supabase console steps)._
 
 - [ ] The final change is **merged to `main`** and the Pages deploy is green (Actions tab).
       Only merges to `main` update the live site.
-- [ ] **Deploy the feedback function** so the live "Feedback" button works AND is rate-limited:
-      `supabase functions deploy submit-feedback` (no migration, no new secret needed).
-- [ ] Confirm the Resend email secret is set so feedback emails actually arrive:
-      `supabase secrets list` should show `RESEND_API_KEY`. If missing:
-      `supabase secrets set RESEND_API_KEY=re_...` then redeploy the function.
+- [x] **Feedback function is already deployed and live** (done in the s112 follow-up via the
+      Supabase dashboard: `public.feedback` table + `submit-feedback` Edge Function with Verify JWT
+      OFF + `RESEND_API_KEY` set), **including the abuse rate-limit**. Nothing to deploy for the demo.
+      Just confirm it works: submit one test message from the live site and check the email arrives.
+      _(Only if you later change `submit-feedback`'s code: redeploy with `supabase functions deploy
+      submit-feedback` — no migration/secret needed.)_
 - [ ] (Optional, not required for tomorrow) Enable Turnstile on guest sign-in and set
       `FEEDBACK_IP_SALT` — steps in `docs/plans/PHASE2_SETUP.md`.
 

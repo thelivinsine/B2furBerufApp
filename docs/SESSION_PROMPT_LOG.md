@@ -4848,3 +4848,11 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `docs/DEMO_RUNBOOK.md` (new) · `docs/plans/DEMO_READINESS_PLAN.md` (Chunks 1/4/5/6
   checked off + findings) · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`
   (s113 + s114 handoffs moved in) · `docs/SESSION_PROMPT_LOG.md`.
+- **Follow-up prompt (verbatim):**
+  > the feedback rate limit task is done already
+- **Follow-up response:** Corrected the runbook + status handoff, which had listed
+  `supabase functions deploy submit-feedback` as a pending pre-flight step. The founder confirmed the
+  `submit-feedback` function + rate-limit are **already deployed and live** (matching the s112
+  follow-up record in the W28 archive: table + function with Verify JWT off + `RESEND_API_KEY` set).
+  Changed the runbook pre-flight item to a checked "already live, just verify" note and removed the
+  "must deploy" line from the status handoff. Docs only.
