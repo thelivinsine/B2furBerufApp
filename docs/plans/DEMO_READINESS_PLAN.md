@@ -265,9 +265,20 @@ still opens fast and every section loads when tapped.*
   Kapitel-1 missions) and regenerated `src/data/verification.ts` (which was **stale**: it was missing
   the s102 Branche packs, now 2,263 records; jury tier 149→188). All 9 gates green. Remaining P2
   refinement (deeper LanguageTool triage, jury waves beyond the spine) is optional polish, not risk.
-- **Full security review session (Opus 4.8):** run the repo `/security-review` skill over the
-  whole app (not just a diff), Turnstile enablement, Resend SMTP, and the standing `pnpm audit`
-  + `.npmrc` supply-chain posture re-check.
+- **Full security review session — DONE (s115, Opus 4.8):** whole-app pass (the repo
+  `/security-review` skill is diff-based and the branch was clean, so this was a manual audit of the
+  full surface). **No critical/high findings.** Verified: RLS owner-scoped on every user table +
+  service-role-only `ai_usage`/`feedback` (no public SELECT) + founder-email-gated `provenance_reviews`
+  + `search_path`-pinned SECURITY DEFINER funcs; all 3 Edge Functions CORS-allowlisted, `evaluate-writing`
+  /`delete-account` JWT-gated with ids from the token (never the body), `submit-feedback` anon-OK but
+  per-IP + global-hourly rate-limited with an HTML-escaped email body; only the publishable anon key
+  reaches the browser (no secrets in `src/`, `.env*` gitignored); no XSS sinks + a strong enforcing CSP
+  (`script-src` has no `unsafe-inline`/`unsafe-eval`, `object-src 'none'`); s108 cloudSync account
+  isolation correct; `.npmrc` 24h cooldown + `pnpm audit` 0 vulns. A few low-severity/defense-in-depth
+  notes (feedback DB growth under distributed abuse, optional Turnstile, unvalidated reply-to email
+  format) are documented but not demo/launch-blocking. Full report:
+  `docs/reports/security-review-2026-07-14.md`. **Turnstile enablement + Resend SMTP stay as the
+  standing pre-public-launch founder items** (still open, not done here).
 - **Founder feedback triage:** whatever the audience submits through the feedback button becomes
   the next backlog; the `public.feedback` table + email trail is the source.
 - Anything Chunks 1–5 found but deferred as "structural".

@@ -4856,3 +4856,25 @@ Branch: `claude/whats-next-esga9u`.
   follow-up record in the W28 archive: table + function with Verify JWT off + `RESEND_API_KEY` set).
   Changed the runbook pre-flight item to a checked "already live, just verify" note and removed the
   "must deploy" line from the status handoff. Docs only.
+- **Follow-up prompt (verbatim):**
+  > go ahead with security review then
+- **Follow-up response:** Ran the P2 whole-app security review (Opus 4.8). The repo `/security-review`
+  skill is diff-based and the branch was clean, so did a manual audit of the full surface: the 3 Supabase
+  Edge Functions (`submit-feedback`, `evaluate-writing`, `delete-account`), all 6 RLS migrations, the
+  client Supabase config + auth store + cloudSync isolation, XSS/injection sinks, the CSP, and the
+  supply-chain posture. **No critical or high-severity findings.** Verified RLS is owner-scoped on every
+  user table with `ai_usage`/`feedback` service-role-only (no public SELECT) and `provenance_reviews`
+  founder-email-gated; all SECURITY DEFINER funcs pin `search_path`; the two sensitive functions are
+  JWT-gated with the user id taken from the token not the body; `submit-feedback` is anon-OK but per-IP +
+  global-hourly rate-limited with an HTML-escaped email body; only the publishable anon key reaches the
+  browser (no secrets in `src/`, `.env*` gitignored); no `dangerouslySetInnerHTML`/`eval`; a genuinely
+  strong enforcing CSP ships in `index.html` (`script-src` has no `unsafe-inline`/`unsafe-eval`,
+  `object-src 'none'`, `base-uri`/`form-action 'self'`); every `target=_blank` has `rel=noreferrer`; the
+  s108 cloudSync account-isolation wipe is correct; `.npmrc` enforces a 24h release cooldown +
+  store-integrity + strict PM and `pnpm audit` is clean. Documented 5 low-severity/defense-in-depth notes
+  (feedback DB growth under distributed abuse, unvalidated reply-to email format, optional Turnstile, CSP
+  `style-src 'unsafe-inline'`, bounded prompt-injection in evaluate-writing), none demo- or
+  launch-blocking. Wrote the full report and marked the plan's P2 security item done. Turnstile + Resend
+  SMTP remain the standing pre-public-launch founder items (not done here). No source touched.
+- **Artifacts:** `docs/reports/security-review-2026-07-14.md` (new) · `docs/plans/DEMO_READINESS_PLAN.md`
+  (P2 security item marked done) · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.

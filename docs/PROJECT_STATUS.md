@@ -79,10 +79,18 @@ and P1 Chunk 6 (perf). Chunks 2+3 were already done s112. **The whole P0+P1 plan
   deployed and live** (founder confirmed), so no deploy step is pending for the demo.
 - **Chunk 6 — perf:** main chunk 79.5 kB/400; throttled (1.6 Mbps/4× CPU) first paint ~3.3–3.5s on
   `/`, `/library`, Graph, `/welt`, `/sammlung`; lazy chunks load without an error flash.
+- **Also ran the P2 whole-app security review** (Opus 4.8): manual audit of the 3 Edge Functions, all
+  6 RLS migrations, client config, cloudSync isolation, XSS/CSP, and supply chain. **No critical/high
+  findings** — RLS owner-scoped everywhere, service-role-only `ai_usage`/`feedback`, JWT-gated
+  functions with ids from the token, rate-limited feedback, only the publishable anon key client-side,
+  strong CSP (no `unsafe-inline`/`unsafe-eval` on `script-src`), `pnpm audit` 0 vulns. A few
+  low-severity defense-in-depth notes documented, none demo/launch-blocking. Report:
+  `docs/reports/security-review-2026-07-14.md`.
 - **Only doc changes** this session (`DEMO_READINESS_PLAN.md` checkboxes + findings, new
-  `DEMO_RUNBOOK.md`, this status + the prompt log). No source touched. All 9 gates green.
-- **Remaining (P2, next week, not demo-blocking):** full `/security-review` pass (Opus/Fable) and
-  post-demo feedback triage from the `public.feedback` table.
+  `DEMO_RUNBOOK.md` + security-review report, this status + the prompt log). No source touched.
+  All 9 gates green.
+- **Remaining (P2):** Turnstile enablement + Resend SMTP (standing pre-public-launch founder items),
+  and post-demo feedback triage from the `public.feedback` table. Both next-week, not demo-blocking.
 
 **Handoff after session 113 (2026-07-13). Brand identity exploration (Opus 4.8), on branch
 `claude/branding-logo-redesign-947e61`, merged to `main` (PR #516). Parallel to the demo work; no app
