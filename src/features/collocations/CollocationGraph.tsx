@@ -458,26 +458,63 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       }
       ctx.globalAlpha = 1;
 
-      // ── Labels (screen space, crisp). Fade in with zoom; focus always shows.
+      // ── Labels (screen space, crisp). Collision-avoided so they stay legible:
+      // candidates are ranked (selected first, then by degree) and a label is
+      // skipped if its box would overlap one already placed. Each sits on a
+      // translucent pill so it reads over edges and glow.
       const zoomAlpha = Math.min(Math.max((k - 0.7) / 0.6, 0), 1);
       if (zoomAlpha > 0 || focusSet) {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         const labelColor = dark ? "226,232,240" : "51,65,85";
+        const bgColor = dark ? "12,20,34" : "255,255,255";
+        const sel = selectedRef.current;
+
+        // Gather visible candidates with their opacity.
+        const cands: { n: SimNode; alpha: number }[] = [];
         for (const n of nodes) {
           const x = n.x ?? 0;
           const y = n.y ?? 0;
           if (x < worldLeft || x > worldRight || y < worldTop || y > worldBottom) continue;
           if (!isActive(n)) continue;
           const inFocus = focusSet?.has(n.id) ?? false;
-          // Big hubs label a touch earlier so the map reads at zoom-out.
           const hubBoost = Math.min(n.degree / 40, 0.5);
           const alpha = focusSet ? (inFocus ? 1 : 0) : Math.min(zoomAlpha + hubBoost, 1);
           if (alpha <= 0.02) continue;
-          ctx.font = `${n.kind === "verb" ? "italic " : ""}500 10px ${fontFamily}`;
+          cands.push({ n, alpha });
+        }
+        // Selected wins, then denser hubs, so the important words survive culling.
+        cands.sort((a, b) => {
+          if (a.n.id === sel) return -1;
+          if (b.n.id === sel) return 1;
+          return b.n.degree - a.n.degree;
+        });
+
+        const placed: { l: number; t: number; r: number; b: number }[] = [];
+        const hits = (r: { l: number; t: number; r: number; b: number }) =>
+          placed.some((d) => !(r.r < d.l || r.l > d.r || r.b < d.t || r.t > d.b));
+        const padX = 5;
+        const padY = 2;
+        for (const { n, alpha } of cands) {
+          ctx.font = `${n.kind === "verb" ? "italic " : ""}600 11px ${fontFamily}`;
+          const w = ctx.measureText(n.label).width;
+          const sx = (n.x ?? 0) * k + tx;
+          const sy = ((n.y ?? 0) + n.r) * k + ty + 4;
+          const bl = sx - w / 2 - padX;
+          const bt = sy - padY;
+          const bw = w + padX * 2;
+          const bh = 11 + padY * 2;
+          const box = { l: bl - 2, t: bt - 2, r: bl + bw + 2, b: bt + bh + 2 };
+          if (hits(box)) continue;
+          placed.push(box);
+          ctx.fillStyle = `rgba(${bgColor},${0.72 * alpha})`;
+          ctx.beginPath();
+          if (ctx.roundRect) ctx.roundRect(bl, bt, bw, bh, 4);
+          else ctx.rect(bl, bt, bw, bh);
+          ctx.fill();
           ctx.fillStyle = `rgba(${labelColor},${alpha})`;
-          ctx.fillText(n.label, x * k + tx, (y + n.r) * k + ty + 3);
+          ctx.fillText(n.label, sx, sy);
         }
       }
     };
@@ -586,8 +623,8 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       pointers.delete(e.pointerId);
       pinchDist = 0;
       if (dragNode) {
-        dragNode.fx = null;
-        dragNode.fy = null;
+        // Pin the node where it was dropped (fx/fy kept), so a moved node stays
+        // put instead of being yanked back by the theme-centroid force.
         sim.alphaTarget(0);
       }
       if (p && moved < 5) {
@@ -644,6 +681,36 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDark, selectedId, domainFilter, kindFilter]);
 
+  // A comfortable reading zoom: enough that a word and its neighbors are
+  // legible, but never a hard zoom-in (the founder found the old hub jump too
+  // strong). Only zooms IN toward this when the user is further out.
+  const READABLE_K = 1.55;
+
+  // Center a node in the area the card leaves free, at a readable zoom. Used
+  // whenever a node becomes selected (tap, partner-chip hop, or the fit button's
+  // hub jump), so the focused word is framed and its label is easy to read.
+  const focusNode = (node: SimNode) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const [rx, ry, rw, rh] = freeRect(rect.width, rect.height, true, cardLayoutRef.current);
+    const k = clampK(Math.max(transformRef.current.k, READABLE_K));
+    transformRef.current = {
+      k,
+      x: rx + rw / 2 - (node.x ?? 0) * k,
+      y: ry + rh / 2 - (node.y ?? 0) * k,
+    };
+    scheduleDraw();
+  };
+
+  // Frame the selected node (tap / chip hop / hub jump) at a readable zoom.
+  useEffect(() => {
+    if (!selectedId) return;
+    const node = simRef.current?.nodes.find((n) => n.id === selectedId);
+    if (node) focusNode(node);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
+
   const zoomBy = (factor: number) => {
     const container = containerRef.current;
     if (!container) return;
@@ -675,23 +742,15 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     });
   };
 
-  // Fit button toggles: whole-constellation overview ↔ zoom into the biggest hub.
+  // Fit button toggles: whole-constellation overview ↔ frame the biggest hub.
   const fitOrZoomRef = useRef<"fit" | "hub">("fit");
   const zoomToHub = () => {
-    const container = containerRef.current;
     const live = simRef.current;
-    if (!container || !live || live.nodes.length === 0) return;
-    const rect = container.getBoundingClientRect();
+    if (!live || live.nodes.length === 0) return;
     let pick = live.nodes[0];
     for (const n of live.nodes) if (n.degree > pick.degree) pick = n;
-    const k = clampK(2.8);
-    transformRef.current = {
-      k,
-      x: rect.width / 2 - (pick.x ?? 0) * k,
-      y: rect.height / 2 - (pick.y ?? 0) * k,
-    };
+    // Selecting it frames it at the readable zoom via the focusNode effect.
     setSelectedId(pick.id);
-    scheduleDraw();
   };
   const onFitButton = () => {
     if (fitOrZoomRef.current === "fit") {

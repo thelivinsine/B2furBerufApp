@@ -111,11 +111,14 @@ tab, matching the Wörter graph's slot but purpose-built for collocations.
   + dark + mobile all coherent, zero console errors. Screenshots in the session scratchpad.
 - **Not yet shipped to `main`:** committed + pushed to the branch; PR/merge left for the founder to
   review the visuals first (per the "no PR unless asked" harness rule).
-- **Shipped (PR #527, `b71617a`), then a follow-up:** added a **card shape toggle** (button beside the
+- **Shipped (PR #527, `b71617a`), then follow-ups:** (a) a **card shape toggle** (button beside the
   card's close): the selected-node card is either a full-width bottom bar (`horizontal`, default) or a
   full-height right panel (`vertical`), and toggling **re-fits the constellation into the free area**
-  (`fitToRect`/`freeRect`/`cardExtent` in `CollocationGraph.tsx`). Verified headless (both shapes,
-  re-center on toggle, light+dark, desktop+mobile); gates green.
+  (`fitToRect`/`freeRect`/`cardExtent` in `CollocationGraph.tsx`, PR #528 `a823a8a`). (b) **Drag +
+  readability round:** nodes now **pin where dropped** (drag was springing back under the centroid
+  force); selecting a node **frames it at a gentle `READABLE_K=1.55`** (`focusNode`, replacing the too-
+  strong `k=2.8` hub jump); canvas **labels are collision-culled onto translucent pills** so they stay
+  legible. All verified headless (light+dark, desktop+mobile); gates green.
 - **Possible follow-ups if the founder wants:** stronger island separation (raise centroid strength /
   ring radius), a "focus a theme" tap on the domain legend that recenters, or an Üben hook from the card.
 
