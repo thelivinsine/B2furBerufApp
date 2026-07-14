@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genauly — Identity Exploration, Vol. III</title>
+</head>
+<body>
+<style>
+  :root {
+    --ground:#F7F5F0; --surface:#FFFFFF; --surface-2:#FBFAF6; --ink:#191917;
+    --muted:#6B6A63; --faint:#9C998E; --line:#E6E2D9; --line-strong:#D6D1C5;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --maxw:1080px; --r:14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ground:#131412; --surface:#1C1D1A; --surface-2:#212320; --ink:#F1EFE8; --muted:#A5A39A; --faint:#77756D; --line:#2C2E2A; --line-strong:#3B3D37; }
+  }
+  :root[data-theme="light"] { --ground:#F7F5F0; --surface:#FFFFFF; --surface-2:#FBFAF6; --ink:#191917; --muted:#6B6A63; --faint:#9C998E; --line:#E6E2D9; --line-strong:#D6D1C5; }
+  :root[data-theme="dark"] { --ground:#131412; --surface:#1C1D1A; --surface-2:#212320; --ink:#F1EFE8; --muted:#A5A39A; --faint:#77756D; --line:#2C2E2A; --line-strong:#3B3D37; }
+
+  * { box-sizing:border-box; } body { margin:0; }
+  .page { background:var(--ground); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; padding:clamp(20px,5vw,64px) clamp(16px,4vw,40px) 96px; }
+  .wrap { max-width:var(--maxw); margin:0 auto; }
+  .eyebrow { font-family:var(--mono); font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); margin:0; }
+  h1,h2,h3 { text-wrap:balance; margin:0; }
+
+  .masthead { border-bottom:1px solid var(--line); padding-bottom:clamp(28px,5vw,48px); margin-bottom:clamp(20px,4vw,36px); }
+  .masthead .toprow { display:flex; justify-content:space-between; align-items:baseline; gap:16px; flex-wrap:wrap; margin-bottom:clamp(24px,5vw,44px); }
+  h1.title { font-size:clamp(34px,7vw,66px); line-height:1.03; letter-spacing:-0.022em; font-weight:620; max-width:17ch; }
+  h1.title .accentword { font-family:var(--serif); font-style:italic; font-weight:500; letter-spacing:-0.01em; }
+  .lede { margin-top:22px; font-size:clamp(16px,2vw,19px); color:var(--muted); max-width:64ch; line-height:1.62; }
+  .lede strong { color:var(--ink); font-weight:600; }
+
+  /* philosophy header */
+  .philo { margin:clamp(52px,8vw,92px) 0 clamp(18px,3vw,26px); padding-top:clamp(20px,3vw,28px); border-top:1px solid var(--line-strong); }
+  .philo .pk { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .philo .pk .idx { font-family:var(--mono); font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--faint); }
+  .philo .pk .word { font-family:var(--serif); font-style:italic; font-size:clamp(15px,2vw,18px); color:var(--muted); }
+  .philo h2 { font-size:clamp(26px,4.4vw,44px); letter-spacing:-0.02em; font-weight:640; line-height:1.05; max-width:18ch; }
+  .philo .thesis { margin-top:16px; font-size:clamp(15px,1.9vw,17.5px); color:var(--muted); max-width:66ch; line-height:1.6; }
+  .philo .thesis b { color:var(--ink); font-weight:600; }
+
+  .sectionlead { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin:clamp(28px,4vw,40px) 0 clamp(16px,2vw,22px); }
+  .sectionlead .num { font-family:var(--mono); font-size:13px; color:var(--faint); letter-spacing:0.08em; }
+  .sectionlead h3 { font-size:clamp(18px,2.6vw,23px); letter-spacing:-0.01em; }
+
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:18px; overflow:clip; margin-bottom:clamp(20px,3vw,30px); display:grid; grid-template-columns:minmax(280px,340px) 1fr; }
+  @media (max-width:780px) { .card { grid-template-columns:1fr; } }
+  .lab { background:var(--d-paper); color:var(--d-ink); padding:clamp(22px,3vw,30px); display:flex; flex-direction:column; gap:20px; border-right:1px solid var(--line); }
+  @media (max-width:780px) { .lab { border-right:none; border-bottom:1px solid var(--line); } }
+  .lab-code { font-family:var(--mono); font-size:11.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--d-ink); opacity:0.55; }
+  .stage { aspect-ratio:16/10; border-radius:12px; display:grid; place-items:center; position:relative; background:radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--d-ink) 5%, transparent), transparent 62%), var(--d-paper); box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--d-ink) 10%, transparent); overflow:hidden; }
+  .markrow { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .mark-small-label { font-family:var(--mono); font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; opacity:0.5; }
+  .chip { width:40px; height:40px; border-radius:9px; flex:none; display:grid; place-items:center; position:relative; overflow:hidden; }
+  .wordmark { font-size:clamp(25px,4vw,33px); line-height:1; display:inline-flex; align-items:baseline; gap:8px; }
+
+  .detail { padding:clamp(22px,3vw,32px); display:flex; flex-direction:column; gap:20px; }
+  .detail-head h3 { font-size:clamp(21px,3vw,27px); letter-spacing:-0.015em; margin-bottom:6px; }
+  .detail-head .gloss { font-family:var(--mono); font-size:12px; color:var(--muted); letter-spacing:0.04em; }
+  .detail p.rationale { margin:0; color:var(--muted); font-size:15px; line-height:1.62; max-width:60ch; }
+  .detail p.rationale b { color:var(--ink); font-weight:600; }
+  .tags { display:flex; flex-wrap:wrap; gap:7px; }
+  .tag { font-family:var(--mono); font-size:11px; letter-spacing:0.05em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line-strong); border-radius:100px; padding:4px 10px; }
+  .blockgrid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+  @media (max-width:560px) { .blockgrid { grid-template-columns:1fr; } }
+  .subhead { font-family:var(--mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); margin-bottom:10px; }
+  .swatches { display:flex; border-radius:10px; overflow:hidden; border:1px solid var(--line); }
+  .swatches .sw { flex:1; height:52px; }
+  .swatchmeta { display:flex; flex-direction:column; gap:6px; margin-top:10px; }
+  .swrow { display:flex; align-items:center; gap:9px; font-size:12px; }
+  .swrow .dotc { width:11px; height:11px; border-radius:3px; flex:none; border:1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+  .swrow .role { color:var(--muted); min-width:74px; }
+  .swrow .hex { font-family:var(--mono); font-size:11.5px; color:var(--ink); text-transform:uppercase; letter-spacing:0.02em; }
+  .typespec { display:flex; flex-direction:column; gap:14px; }
+  .typerow .label { font-family:var(--mono); font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--faint); }
+  .typerow .name { font-size:15px; color:var(--ink); font-weight:600; }
+  .typerow .name .role2 { color:var(--muted); font-weight:400; font-size:13px; }
+  .typesample-serif { font-family:var(--serif); font-size:20px; letter-spacing:-0.01em; }
+  .typesample-sans { font-family:var(--sans); font-size:18px; font-weight:650; letter-spacing:-0.01em; }
+  .typesample-mono { font-family:var(--mono); font-size:15px; letter-spacing:0.06em; text-transform:uppercase; }
+  .usebox { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:560px) { .usebox { grid-template-columns:1fr; } }
+  .usecell { border-top:1px solid var(--line); padding-top:12px; }
+  .usecell .k { font-family:var(--mono); font-size:10.5px; letter-spacing:0.1em; text-transform:uppercase; color:var(--faint); margin-bottom:5px; }
+  .usecell .v { font-size:13.5px; color:var(--muted); line-height:1.5; }
+  .usecell .v b { color:var(--ink); font-weight:600; }
+
+  .close { margin-top:clamp(44px,6vw,72px); border-top:1px solid var(--line); padding-top:clamp(28px,4vw,40px); }
+  .close h2 { font-size:clamp(22px,3vw,30px); letter-spacing:-0.018em; margin-bottom:14px; }
+  .mapgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:24px; }
+  @media (max-width:720px) { .mapgrid { grid-template-columns:1fr; } }
+  .mapcard { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:20px; }
+  .mapcard .n { font-family:var(--mono); font-size:11px; color:var(--faint); letter-spacing:0.1em; text-transform:uppercase; }
+  .mapcard h4 { margin:8px 0 6px; font-size:16px; letter-spacing:-0.01em; }
+  .mapcard p { margin:0; font-size:13.5px; color:var(--muted); line-height:1.55; }
+  .foot { margin-top:40px; font-family:var(--mono); font-size:11.5px; color:var(--faint); letter-spacing:0.04em; }
+
+  .fade { opacity:0; transform:translateY(14px); animation:rise 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+  @keyframes rise { to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation:none; opacity:1; transform:none; } }
+</style>
+
+<div class="page">
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="toprow">
+      <p class="eyebrow">Identity Exploration · Genauly</p>
+      <p class="eyebrow">Vol. III · three new philosophies</p>
+    </div>
+    <h1 class="title">A logo is easy. Decide what the brand <span class="accentword">believes</span> first.</h1>
+    <p class="lede">
+      The first ten directions all stood on one idea: <strong>genau</strong>, precision, being correct. That is a
+      real foundation, but it is not the only one. Below are <strong>three different beliefs</strong> about what
+      Genauly is actually for, each with its own set of marks. Pick the sentence that feels most true and the visual
+      language follows from it. Same spec per direction: mark, palette, type, and where it wins.
+    </p>
+  </header>
+
+  <!-- ==================== PHILOSOPHY A — ANKOMMEN ==================== -->
+  <section class="philo">
+    <div class="pk"><span class="idx">Philosophy A</span><span class="word">ankommen · to arrive, to settle in</span></div>
+    <h2>The goal was never grammar. It was belonging.</h2>
+    <p class="thesis">
+      Nobody learns German for the dative case. They learn it to <b>be understood at the doctor, to get the flat,
+      to be included at the table</b>. If the brand believes this, it stops looking like a study tool and starts
+      looking like a door held open. Warm, human, and about the person on the other side of the language, not the
+      language itself.
+    </p>
+  </section>
+
+  <!-- A1 SCHWELLE -->
+  <div class="sectionlead"><span class="num">A1</span><h3>Schwelle — the lit doorway</h3></div>
+  <div class="card fade" style="--d-paper:#F1EBDC; --d-ink:#1E2340; --d-primary:#F0A93C; --d-accent:#C6543A; --d-support:#40497A;">
+    <div class="lab">
+      <span class="lab-code">mark / warm · threshold</span>
+      <div class="stage">
+        <svg width="40%" viewBox="0 0 80 104" aria-hidden="true">
+          <path d="M20 98 L20 42 A20 20 0 0 1 60 42 L60 98 Z" fill="var(--d-primary)"/>
+          <path d="M20 98 L20 42 A20 20 0 0 1 60 42 L60 98" fill="none" stroke="var(--d-ink)" stroke-width="5" stroke-linejoin="round"/>
+          <line x1="12" y1="98" x2="68" y2="98" stroke="var(--d-ink)" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="22" viewBox="0 0 80 104" aria-hidden="true"><path d="M20 98 L20 42 A20 20 0 0 1 60 42 L60 98 Z" fill="var(--d-primary)"/></svg></span>
+        <span class="chip" style="background:var(--d-primary)"><svg width="22" viewBox="0 0 80 104" aria-hidden="true"><path d="M20 98 L20 42 A20 20 0 0 1 60 42 L60 98 Z" fill="var(--d-ink)"/></svg></span>
+        <span class="mark-small-label">favicon · reversed</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--serif);font-weight:600;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Schwelle</h3><span class="gloss">the doorway, warm light spilling out at dusk</span></div>
+      <p class="rationale">
+        An open doorway glowing amber against the blue of evening: the moment you are let in. It reframes the whole
+        product as <b>arrival</b>, not testing. The lit interior becomes the brand's warmth, and the arch is a
+        simple, ownable silhouette that works down to a favicon.
+      </p>
+      <div class="tags"><span class="tag">Warm</span><span class="tag">Human</span><span class="tag">Inviting</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Dusk & Lamplight</div>
+          <div class="swatches"><div class="sw" style="background:#1E2340"></div><div class="sw" style="background:#F1EBDC"></div><div class="sw" style="background:#F0A93C"></div><div class="sw" style="background:#C6543A"></div><div class="sw" style="background:#40497A"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#1E2340"></span><span class="role">Night</span><span class="hex">#1E2340</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F1EBDC"></span><span class="role">Cream</span><span class="hex">#F1EBDC</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F0A93C"></span><span class="role">Lamplight</span><span class="hex">#F0A93C</span></div>
+            <div class="swrow"><span class="dotc" style="background:#C6543A"></span><span class="role">Brick</span><span class="hex">#C6543A</span></div>
+            <div class="swrow"><span class="dotc" style="background:#40497A"></span><span class="role">Dusk</span><span class="hex">#40497A</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-serif">Hedvig Letters</div><div class="name">Hedvig Letters Serif <span class="role2">· warm serif</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">Mulish</div><div class="name">Mulish <span class="role2">· soft humanist</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">An emotional, <b>welcoming</b> brand for newcomers and integration.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Doorways are used elsewhere; the dusk palette is what keeps it yours.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A2 TISCH -->
+  <div class="sectionlead"><span class="num">A2</span><h3>Der Tisch — a place at the table</h3></div>
+  <div class="card fade" style="--d-paper:#F3EEE3; --d-ink:#221D18; --d-primary:#D89A3E; --d-accent:#1F7A6E; --d-support:#C77C57;">
+    <div class="lab">
+      <span class="lab-code">mark / communal · seat</span>
+      <div class="stage">
+        <svg width="46%" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="52" r="20" fill="var(--d-support)" stroke="var(--d-ink)" stroke-width="3"/>
+          <circle cx="82.9" cy="71" r="6" fill="var(--d-ink)"/>
+          <circle cx="50" cy="90" r="6" fill="var(--d-ink)"/>
+          <circle cx="17.1" cy="71" r="6" fill="var(--d-ink)"/>
+          <circle cx="17.1" cy="33" r="6" fill="var(--d-ink)"/>
+          <circle cx="82.9" cy="33" r="6" fill="var(--d-ink)"/>
+          <circle cx="50" cy="14" r="7.5" fill="var(--d-accent)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-paper)"><svg width="26" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="52" r="20" fill="var(--d-support)" stroke="var(--d-ink)" stroke-width="4"/><circle cx="50" cy="16" r="9" fill="var(--d-accent)"/></svg></span>
+        <span class="chip" style="background:var(--d-ink)"><svg width="26" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="52" r="20" fill="var(--d-primary)"/><circle cx="50" cy="16" r="9" fill="var(--d-accent)"/></svg></span>
+        <span class="mark-small-label">favicon · on dark</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--sans);font-weight:750;letter-spacing:-0.02em;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Der Tisch</h3><span class="gloss">the table, with one seat kept for you</span></div>
+      <p class="rationale">
+        A table seen from above, seats around it, <b>one seat in teal held open</b>: your place in the
+        conversation. It speaks straight to the product's real promise, being included when people talk, and it
+        makes a natural motif for the speaking and dialogue features.
+      </p>
+      <div class="tags"><span class="tag">Communal</span><span class="tag">Conversation</span><span class="tag">Belonging</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Table & Seat</div>
+          <div class="swatches"><div class="sw" style="background:#221D18"></div><div class="sw" style="background:#F3EEE3"></div><div class="sw" style="background:#D89A3E"></div><div class="sw" style="background:#1F7A6E"></div><div class="sw" style="background:#C77C57"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#221D18"></span><span class="role">Ink</span><span class="hex">#221D18</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F3EEE3"></span><span class="role">Cream</span><span class="hex">#F3EEE3</span></div>
+            <div class="swrow"><span class="dotc" style="background:#D89A3E"></span><span class="role">Ochre</span><span class="hex">#D89A3E</span></div>
+            <div class="swrow"><span class="dotc" style="background:#1F7A6E"></span><span class="role">Your seat</span><span class="hex">#1F7A6E</span></div>
+            <div class="swrow"><span class="dotc" style="background:#C77C57"></span><span class="role">Clay</span><span class="hex">#C77C57</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-sans" style="font-weight:800;letter-spacing:-0.02em">Bricolage Grotesque</div><div class="name">Bricolage Grotesque <span class="role2">· warm, characterful</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-serif">Literata</div><div class="name">Literata <span class="role2">· readable serif</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">Leaning into <b>speaking and community</b>. The friendliest of the belonging set.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Reads as abstract dots until explained. Needs the "your seat" story told once.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A3 SCHLÜSSEL -->
+  <div class="sectionlead"><span class="num">A3</span><h3>Schlüssel — the key</h3></div>
+  <div class="card fade" style="--d-paper:#EDEEE6; --d-ink:#17201E; --d-primary:#D7A93F; --d-accent:#137A6B; --d-support:#5C7C74;">
+    <div class="lab">
+      <span class="lab-code">mark / hopeful · object</span>
+      <div class="stage">
+        <svg width="62%" viewBox="0 0 120 60" fill="none" aria-hidden="true" stroke-linecap="round">
+          <circle cx="30" cy="30" r="16" stroke="var(--d-primary)" stroke-width="6"/>
+          <circle cx="30" cy="30" r="4.5" fill="var(--d-accent)"/>
+          <line x1="46" y1="30" x2="104" y2="30" stroke="var(--d-primary)" stroke-width="6"/>
+          <line x1="90" y1="30" x2="90" y2="44" stroke="var(--d-primary)" stroke-width="6"/>
+          <line x1="100" y1="30" x2="100" y2="41" stroke="var(--d-primary)" stroke-width="6"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="30" viewBox="0 0 120 60" fill="none" stroke-linecap="round" aria-hidden="true"><circle cx="34" cy="30" r="15" stroke="var(--d-primary)" stroke-width="7"/><line x1="49" y1="30" x2="100" y2="30" stroke="var(--d-primary)" stroke-width="7"/><line x1="88" y1="30" x2="88" y2="43" stroke="var(--d-primary)" stroke-width="7"/></svg></span>
+        <span class="chip" style="background:var(--d-primary)"><svg width="30" viewBox="0 0 120 60" fill="none" stroke-linecap="round" aria-hidden="true"><circle cx="34" cy="30" r="15" stroke="var(--d-ink)" stroke-width="7"/><line x1="49" y1="30" x2="100" y2="30" stroke="var(--d-ink)" stroke-width="7"/><line x1="88" y1="30" x2="88" y2="43" stroke="var(--d-ink)" stroke-width="7"/></svg></span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--serif);font-weight:600;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Schlüssel</h3><span class="gloss">language as the key that unlocks a place</span></div>
+      <p class="rationale">
+        The oldest metaphor for language, made specific: <b>der Schlüssel</b>, the key that unlocks a country, a
+        job, a life. It also rhymes with the game layer, where key documents are literally the items you collect.
+        Hopeful and concrete, with a warm brass-and-forest palette.
+      </p>
+      <div class="tags"><span class="tag">Hopeful</span><span class="tag">Concrete</span><span class="tag">Ties to the game</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Brass & Forest</div>
+          <div class="swatches"><div class="sw" style="background:#17201E"></div><div class="sw" style="background:#EDEEE6"></div><div class="sw" style="background:#D7A93F"></div><div class="sw" style="background:#137A6B"></div><div class="sw" style="background:#5C7C74"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#17201E"></span><span class="role">Forest-ink</span><span class="hex">#17201E</span></div>
+            <div class="swrow"><span class="dotc" style="background:#EDEEE6"></span><span class="role">Paper</span><span class="hex">#EDEEE6</span></div>
+            <div class="swrow"><span class="dotc" style="background:#D7A93F"></span><span class="role">Brass</span><span class="hex">#D7A93F</span></div>
+            <div class="swrow"><span class="dotc" style="background:#137A6B"></span><span class="role">Teal</span><span class="hex">#137A6B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#5C7C74"></span><span class="role">Sage</span><span class="hex">#5C7C74</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-serif" style="font-style:italic">Instrument Serif</div><div class="name">Instrument Serif <span class="role2">· elegant display</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:600">Hanken Grotesk</div><div class="name">Hanken Grotesk <span class="role2">· clean</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A brand about <b>opportunity and access</b>, bridging app and game.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">The key is a common icon. The brass palette and bow-hole detail carry the distinction.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A4 HEIMAT -->
+  <div class="sectionlead"><span class="num">A4</span><h3>Heimat — home is a pin on the map</h3></div>
+  <div class="card fade" style="--d-paper:#F4F1E8; --d-ink:#20201C; --d-primary:#F06A4E; --d-accent:#1C6B4A; --d-support:#EBD9BE;">
+    <div class="lab">
+      <span class="lab-code">mark / homey · map pin</span>
+      <div class="stage">
+        <svg width="40%" viewBox="0 0 80 104" aria-hidden="true">
+          <path d="M40 98 L16 54 A26 26 0 1 1 64 54 Z" fill="var(--d-primary)" stroke="var(--d-ink)" stroke-width="3.5" stroke-linejoin="round"/>
+          <path d="M28 48 L28 36 L40 27 L52 36 L52 48 Z" fill="var(--d-paper)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="22" viewBox="0 0 80 104" aria-hidden="true"><path d="M40 98 L16 54 A26 26 0 1 1 64 54 Z" fill="var(--d-primary)"/><path d="M28 48 L28 36 L40 27 L52 36 L52 48 Z" fill="var(--d-ink)"/></svg></span>
+        <span class="chip" style="background:var(--d-accent)"><svg width="22" viewBox="0 0 80 104" aria-hidden="true"><path d="M40 98 L16 54 A26 26 0 1 1 64 54 Z" fill="var(--d-paper)"/><path d="M28 48 L28 36 L40 27 L52 36 L52 48 Z" fill="var(--d-accent)"/></svg></span>
+        <span class="mark-small-label">favicon · on green</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--sans);font-weight:700;letter-spacing:-0.01em;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Heimat</h3><span class="gloss">a location pin whose heart is a home</span></div>
+      <p class="rationale">
+        A map pin with a little house inside: <b>this place is now home</b>. It plugs directly into the app's
+        Neuland city map, where pins already mark where you are. Bright and optimistic, the most openly friendly of
+        the belonging set without tipping into cute.
+      </p>
+      <div class="tags"><span class="tag">Optimistic</span><span class="tag">Ties to the map UI</span><span class="tag">Friendly</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Coral & Green</div>
+          <div class="swatches"><div class="sw" style="background:#20201C"></div><div class="sw" style="background:#F4F1E8"></div><div class="sw" style="background:#F06A4E"></div><div class="sw" style="background:#1C6B4A"></div><div class="sw" style="background:#EBD9BE"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#20201C"></span><span class="role">Ink</span><span class="hex">#20201C</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F4F1E8"></span><span class="role">Cream</span><span class="hex">#F4F1E8</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F06A4E"></span><span class="role">Coral</span><span class="hex">#F06A4E</span></div>
+            <div class="swrow"><span class="dotc" style="background:#1C6B4A"></span><span class="role">Green</span><span class="hex">#1C6B4A</span></div>
+            <div class="swrow"><span class="dotc" style="background:#EBD9BE"></span><span class="role">Sand</span><span class="hex">#EBD9BE</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-sans" style="font-weight:700">Familjen Grotesk</div><div class="name">Familjen Grotesk <span class="role2">· friendly</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">Figtree</div><div class="name">Figtree <span class="role2">· soft, modern</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A <b>bright consumer</b> brand tightly bound to the in-app city map.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Map-pin logos are everywhere. The house-cutout is the thing that saves it.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PHILOSOPHY B — DURCHBRUCH ==================== -->
+  <section class="philo">
+    <div class="pk"><span class="idx">Philosophy B</span><span class="word">durchbruch · breakthrough</span></div>
+    <h2>The whole product exists to end one specific stuckness.</h2>
+    <p class="thesis">
+      This is the sharpest strategic truth you have: learners are <b>trapped on the B1 to B2 plateau</b>, and
+      Genauly is the thing that gets them off it. A brand built on this belief is about <b>threshold and motion</b>,
+      the line you break through, the leap you finally make. It is the most energetic, most product-honest
+      foundation of the three.
+    </p>
+  </section>
+
+  <!-- B1 DURCHBRUCH -->
+  <div class="sectionlead"><span class="num">B1</span><h3>Durchbruch — breaking the line</h3></div>
+  <div class="card fade" style="--d-paper:#EDEFE9; --d-ink:#141A2E; --d-primary:#57B84A; --d-accent:#FF6A2B; --d-support:#38415C;">
+    <div class="lab">
+      <span class="lab-code">mark / energetic · threshold</span>
+      <div class="stage">
+        <svg width="48%" viewBox="0 0 100 100" fill="none" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="64" x2="36" y2="64" stroke="var(--d-support)" stroke-width="5.5"/>
+          <line x1="64" y1="64" x2="92" y2="64" stroke="var(--d-support)" stroke-width="5.5"/>
+          <line x1="50" y1="90" x2="50" y2="40" stroke="var(--d-primary)" stroke-width="7"/>
+          <polygon points="50,16 64,42 36,42" fill="var(--d-primary)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="28" viewBox="0 0 100 100" fill="none" stroke-linecap="round" aria-hidden="true"><line x1="10" y1="64" x2="36" y2="64" stroke="var(--d-support)" stroke-width="7"/><line x1="64" y1="64" x2="90" y2="64" stroke="var(--d-support)" stroke-width="7"/><line x1="50" y1="88" x2="50" y2="44" stroke="var(--d-primary)" stroke-width="8"/><polygon points="50,18 66,46 34,46" fill="var(--d-primary)"/></svg></span>
+        <span class="chip" style="background:var(--d-primary)"><svg width="28" viewBox="0 0 100 100" fill="none" stroke-linecap="round" aria-hidden="true"><line x1="10" y1="64" x2="36" y2="64" stroke="var(--d-ink)" stroke-width="7"/><line x1="64" y1="64" x2="90" y2="64" stroke="var(--d-ink)" stroke-width="7"/><line x1="50" y1="88" x2="50" y2="44" stroke="var(--d-ink)" stroke-width="8"/><polygon points="50,18 66,46 34,46" fill="var(--d-ink)"/></svg></span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--sans);font-weight:800;letter-spacing:-0.02em;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Durchbruch</h3><span class="gloss">an arrow punching up through the plateau line</span></div>
+      <p class="rationale">
+        The plateau drawn literally as a broken horizontal line, with a bold arrow <b>bursting up through the
+        gap</b>. It is the clearest possible picture of the product's job. Deep navy holds the energy of the
+        green so it reads as confident momentum, not a toy.
+      </p>
+      <div class="tags"><span class="tag">Energetic</span><span class="tag">Product-honest</span><span class="tag">Motivating</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Navy & Signal</div>
+          <div class="swatches"><div class="sw" style="background:#141A2E"></div><div class="sw" style="background:#EDEFE9"></div><div class="sw" style="background:#57B84A"></div><div class="sw" style="background:#FF6A2B"></div><div class="sw" style="background:#38415C"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#141A2E"></span><span class="role">Navy</span><span class="hex">#141A2E</span></div>
+            <div class="swrow"><span class="dotc" style="background:#EDEFE9"></span><span class="role">Off-white</span><span class="hex">#EDEFE9</span></div>
+            <div class="swrow"><span class="dotc" style="background:#57B84A"></span><span class="role">Signal green</span><span class="hex">#57B84A</span></div>
+            <div class="swrow"><span class="dotc" style="background:#FF6A2B"></span><span class="role">Flare</span><span class="hex">#FF6A2B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#38415C"></span><span class="role">Slate</span><span class="hex">#38415C</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-sans" style="font-weight:800;letter-spacing:-0.02em">Hubot Sans</div><div class="name">Hubot Sans <span class="role2">· energetic grotesque</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">Geist Sans</div><div class="name">Geist Sans <span class="role2">· clean</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">Marketing that <b>names the plateau</b> and sells the escape. Great for ads.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Arrows-through-lines can feel corporate. The broken plateau keeps it specific.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B2 SCHWUNG -->
+  <div class="sectionlead"><span class="num">B2</span><h3>Schwung — momentum</h3></div>
+  <div class="card fade" style="--d-paper:#F0ECF4; --d-ink:#1A1526; --d-primary:#FF5A5F; --d-accent:#7A3CF0; --d-support:#C9B8E8;">
+    <div class="lab">
+      <span class="lab-code">mark / kinetic · flow</span>
+      <div class="stage">
+        <svg width="52%" viewBox="0 0 100 100" fill="none" aria-hidden="true" stroke-linecap="round">
+          <line x1="8" y1="72" x2="24" y2="70" stroke="var(--d-accent)" stroke-width="5"/>
+          <line x1="6" y1="88" x2="26" y2="86" stroke="var(--d-accent)" stroke-width="5"/>
+          <path d="M14 82 C 36 82 46 58 56 42 S 78 16 90 12" stroke="var(--d-primary)" stroke-width="9"/>
+          <circle cx="90" cy="12" r="5.5" fill="var(--d-primary)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="30" viewBox="0 0 100 100" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M14 82 C 36 82 46 58 56 42 S 78 16 90 12" stroke="var(--d-primary)" stroke-width="11"/><circle cx="90" cy="12" r="7" fill="var(--d-primary)"/></svg></span>
+        <span class="chip" style="background:var(--d-primary)"><svg width="30" viewBox="0 0 100 100" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M14 82 C 36 82 46 58 56 42 S 78 16 90 12" stroke="#fff" stroke-width="11"/><circle cx="90" cy="12" r="7" fill="#fff"/></svg></span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--sans);font-style:italic;font-weight:750;letter-spacing:-0.02em;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Schwung</h3><span class="gloss">the upward sweep of building momentum</span></div>
+      <p class="rationale">
+        <b>Schwung</b> is the German word for swing, verve, forward momentum, the feeling of a streak that is
+        finally carrying you. One accelerating stroke launching off two speed lines. It is the direction that best
+        fits the habit and streak loop, all energy and flow.
+      </p>
+      <div class="tags"><span class="tag">Kinetic</span><span class="tag">Streak / habit</span><span class="tag">Youthful</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Violet & Coral</div>
+          <div class="swatches"><div class="sw" style="background:#1A1526"></div><div class="sw" style="background:#F0ECF4"></div><div class="sw" style="background:#FF5A5F"></div><div class="sw" style="background:#7A3CF0"></div><div class="sw" style="background:#C9B8E8"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#1A1526"></span><span class="role">Ink-violet</span><span class="hex">#1A1526</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F0ECF4"></span><span class="role">Mist</span><span class="hex">#F0ECF4</span></div>
+            <div class="swrow"><span class="dotc" style="background:#FF5A5F"></span><span class="role">Coral</span><span class="hex">#FF5A5F</span></div>
+            <div class="swrow"><span class="dotc" style="background:#7A3CF0"></span><span class="role">Violet</span><span class="hex">#7A3CF0</span></div>
+            <div class="swrow"><span class="dotc" style="background:#C9B8E8"></span><span class="role">Lilac</span><span class="hex">#C9B8E8</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-sans" style="font-weight:700;letter-spacing:-0.02em">General Sans</div><div class="name">General Sans <span class="role2">· modern, active</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">Satoshi</div><div class="name">Satoshi <span class="role2">· neo-grotesque</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A <b>young, high-energy</b> brand built around streaks and daily wins.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Swooshes are the most generic sports-brand shape. Push it or it reads stock.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B3 SPRUNG -->
+  <div class="sectionlead"><span class="num">B3</span><h3>Sprung — the leap from B1 to B2</h3></div>
+  <div class="card fade" style="--d-paper:#EDF2EA; --d-ink:#12261F; --d-primary:#28C46B; --d-accent:#F0B429; --d-support:#7FB79A;">
+    <div class="lab">
+      <span class="lab-code">mark / achievement · level-up</span>
+      <div class="stage">
+        <svg width="54%" viewBox="0 0 100 100" fill="none" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="8" y="70" width="26" height="20" rx="4" fill="var(--d-support)"/>
+          <rect x="66" y="42" width="26" height="48" rx="4" fill="var(--d-primary)"/>
+          <path d="M28 68 Q 52 18 78 40" stroke="var(--d-accent)" stroke-width="4" stroke-dasharray="4 5.5"/>
+          <circle cx="53.5" cy="30" r="6" fill="var(--d-accent)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="28" viewBox="0 0 100 100" fill="none" stroke-linecap="round" aria-hidden="true"><rect x="10" y="70" width="24" height="20" rx="4" fill="var(--d-support)"/><rect x="66" y="44" width="24" height="46" rx="4" fill="var(--d-primary)"/><path d="M28 68 Q 52 20 78 42" stroke="var(--d-accent)" stroke-width="5" stroke-dasharray="4 5"/></svg></span>
+        <span class="chip" style="background:var(--d-primary)"><svg width="28" viewBox="0 0 100 100" fill="none" stroke-linecap="round" aria-hidden="true"><rect x="10" y="70" width="24" height="20" rx="4" fill="#fff" opacity="0.6"/><rect x="66" y="44" width="24" height="46" rx="4" fill="#fff"/><path d="M28 68 Q 52 20 78 42" stroke="var(--d-accent)" stroke-width="5" stroke-dasharray="4 5"/></svg></span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--sans);font-weight:750;letter-spacing:-0.02em;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Sprung</h3><span class="gloss">the arc from the low block (B1) to the high one (B2)</span></div>
+      <p class="rationale">
+        Two platforms at different heights and a dashed leap between them: <b>B1 down here, B2 up there</b>, and
+        the jump you make. The gap is the plateau, the arc is the win. It maps cleanly onto CEFR levels and onto
+        the game's mission-to-mission progression.
+      </p>
+      <div class="tags"><span class="tag">Achievement</span><span class="tag">Level-up</span><span class="tag">Clear story</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Green & Gold</div>
+          <div class="swatches"><div class="sw" style="background:#12261F"></div><div class="sw" style="background:#EDF2EA"></div><div class="sw" style="background:#28C46B"></div><div class="sw" style="background:#F0B429"></div><div class="sw" style="background:#7FB79A"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#12261F"></span><span class="role">Ink-green</span><span class="hex">#12261F</span></div>
+            <div class="swrow"><span class="dotc" style="background:#EDF2EA"></span><span class="role">Off-white</span><span class="hex">#EDF2EA</span></div>
+            <div class="swrow"><span class="dotc" style="background:#28C46B"></span><span class="role">Green</span><span class="hex">#28C46B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F0B429"></span><span class="role">Gold</span><span class="hex">#F0B429</span></div>
+            <div class="swrow"><span class="dotc" style="background:#7FB79A"></span><span class="role">Mint</span><span class="hex">#7FB79A</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-sans" style="font-weight:800;letter-spacing:-0.03em">Cabinet Grotesk</div><div class="name">Cabinet Grotesk <span class="role2">· geometric, bold</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">Figtree</div><div class="name">Figtree <span class="role2">· soft, legible</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A <b>gamified, progress-driven</b> brand. Reads instantly as leveling up.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Green + gold is common in edtech. The two-height blocks are what make it Genauly.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PHILOSOPHY C — KLARHEIT ==================== -->
+  <section class="philo">
+    <div class="pk"><span class="idx">Philosophy C</span><span class="word">klarheit · clarity</span></div>
+    <h2>Intermediate German is fog. We are the moment it clears.</h2>
+    <p class="thesis">
+      At B1 you understand roughly half of everything, which is its own kind of exhausting. The product's real gift
+      is <b>the click when the fog lifts</b>: the sentence that suddenly parses, the announcement you finally catch.
+      A brand on this belief is about <b>light and comprehension</b>, turning noise into signal. Calm, intelligent,
+      and quietly premium.
+    </p>
+  </section>
+
+  <!-- C1 PRISMA -->
+  <div class="sectionlead"><span class="num">C1</span><h3>Prisma — language, split into its parts</h3></div>
+  <div class="card fade" style="--d-paper:#F0F0F2; --d-ink:#15161B; --d-primary:#3B7BFF; --d-accent:#EC4B8A; --d-support:#3A3D46;">
+    <div class="lab">
+      <span class="lab-code">mark / luminous · refraction</span>
+      <div class="stage">
+        <svg width="52%" viewBox="0 0 100 100" fill="none" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="50,20 79,70 21,70" fill="color-mix(in srgb, var(--d-support) 14%, transparent)" stroke="var(--d-ink)" stroke-width="3"/>
+          <line x1="6" y1="52" x2="38" y2="57" stroke="var(--d-ink)" stroke-width="4"/>
+          <line x1="62" y1="57" x2="95" y2="40" stroke="var(--d-primary)" stroke-width="4"/>
+          <line x1="62" y1="59" x2="95" y2="56" stroke="#17B39A" stroke-width="4"/>
+          <line x1="62" y1="61" x2="95" y2="72" stroke="var(--d-accent)" stroke-width="4"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="28" viewBox="0 0 100 100" fill="none" stroke-linejoin="round" aria-hidden="true"><polygon points="50,24 76,68 24,68" stroke="var(--d-paper)" stroke-width="4" fill="none"/><line x1="60" y1="56" x2="92" y2="42" stroke="var(--d-primary)" stroke-width="5"/><line x1="60" y1="60" x2="92" y2="70" stroke="var(--d-accent)" stroke-width="5"/></svg></span>
+        <span class="chip" style="background:var(--d-primary)"><svg width="28" viewBox="0 0 100 100" fill="none" stroke-linejoin="round" aria-hidden="true"><polygon points="50,24 76,68 24,68" fill="#fff"/></svg></span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--sans);font-weight:700;letter-spacing:-0.02em;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Prisma</h3><span class="gloss">white light in, an understandable spectrum out</span></div>
+      <p class="rationale">
+        A prism takes one confusing beam and <b>separates it into parts you can see</b>, exactly what grammar and
+        breakdown do to a wall of German. It is a smart, luminous mark, and the spectrum can quietly reuse the
+        der/die/das colors so the system ties together. Premium without being cold.
+      </p>
+      <div class="tags"><span class="tag">Intelligent</span><span class="tag">Luminous</span><span class="tag">Systemic color</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Light & Spectrum</div>
+          <div class="swatches"><div class="sw" style="background:#15161B"></div><div class="sw" style="background:#F0F0F2"></div><div class="sw" style="background:#3B7BFF"></div><div class="sw" style="background:#17B39A"></div><div class="sw" style="background:#EC4B8A"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#15161B"></span><span class="role">Ink</span><span class="hex">#15161B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F0F0F2"></span><span class="role">Light</span><span class="hex">#F0F0F2</span></div>
+            <div class="swrow"><span class="dotc" style="background:#3B7BFF"></span><span class="role">Blue ray</span><span class="hex">#3B7BFF</span></div>
+            <div class="swrow"><span class="dotc" style="background:#17B39A"></span><span class="role">Teal ray</span><span class="hex">#17B39A</span></div>
+            <div class="swrow"><span class="dotc" style="background:#EC4B8A"></span><span class="role">Pink ray</span><span class="hex">#EC4B8A</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display / UI</div><div class="typesample-sans" style="letter-spacing:-0.02em">Instrument Sans</div><div class="name">Instrument Sans <span class="role2">· clean, modern</span></div></div>
+            <div class="typerow"><div class="label">Data / caption</div><div class="typesample-mono">Space Mono</div><div class="name">Space Mono <span class="role2">· characterful mono</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A <b>smart, modern</b> brand about understanding, not memorizing.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Prism = one famous album cover. Keep the beam-and-rays specific to dodge it.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C2 SONNENAUFGANG -->
+  <div class="sectionlead"><span class="num">C2</span><h3>Sonnenaufgang — the fog lifts</h3></div>
+  <div class="card fade" style="--d-paper:#F6ECDD; --d-ink:#20263D; --d-primary:#F5B33C; --d-accent:#EE7B5A; --d-support:#4A5580;">
+    <div class="lab">
+      <span class="lab-code">mark / optimistic · dawn</span>
+      <div class="stage">
+        <svg width="56%" viewBox="0 0 100 74" fill="none" aria-hidden="true" stroke-linecap="round">
+          <path d="M28 56 A22 22 0 0 1 72 56 Z" fill="var(--d-primary)"/>
+          <line x1="50" y1="14" x2="50" y2="22" stroke="var(--d-accent)" stroke-width="3.5"/>
+          <line x1="26" y1="22" x2="31" y2="28" stroke="var(--d-accent)" stroke-width="3.5"/>
+          <line x1="74" y1="22" x2="69" y2="28" stroke="var(--d-accent)" stroke-width="3.5"/>
+          <line x1="14" y1="40" x2="21" y2="42" stroke="var(--d-accent)" stroke-width="3.5"/>
+          <line x1="86" y1="40" x2="79" y2="42" stroke="var(--d-accent)" stroke-width="3.5"/>
+          <line x1="8" y1="56" x2="92" y2="56" stroke="var(--d-support)" stroke-width="5"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="30" viewBox="0 0 100 74" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M28 56 A22 22 0 0 1 72 56 Z" fill="var(--d-primary)"/><line x1="10" y1="56" x2="90" y2="56" stroke="var(--d-paper)" stroke-width="6"/></svg></span>
+        <span class="chip" style="background:var(--d-primary)"><svg width="30" viewBox="0 0 100 74" fill="none" stroke-linecap="round" aria-hidden="true"><path d="M28 56 A22 22 0 0 1 72 56 Z" fill="var(--d-ink)"/><line x1="10" y1="56" x2="90" y2="56" stroke="var(--d-ink)" stroke-width="6"/></svg></span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--serif);font-weight:600;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Sonnenaufgang</h3><span class="gloss">a sun rising over the same plateau line</span></div>
+      <p class="rationale">
+        A sun cresting a horizon, where the horizon is <b>the plateau you were stuck on</b>: the fog lifts, the day
+        starts, you can see. It is the warmest read on clarity and it shares the plateau-line motif with the
+        momentum set, so the two philosophies could even blend.
+      </p>
+      <div class="tags"><span class="tag">Optimistic</span><span class="tag">Warm</span><span class="tag">Hopeful</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Dawn</div>
+          <div class="swatches"><div class="sw" style="background:#20263D"></div><div class="sw" style="background:#F6ECDD"></div><div class="sw" style="background:#F5B33C"></div><div class="sw" style="background:#EE7B5A"></div><div class="sw" style="background:#4A5580"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#20263D"></span><span class="role">Night</span><span class="hex">#20263D</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F6ECDD"></span><span class="role">Peach-cream</span><span class="hex">#F6ECDD</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F5B33C"></span><span class="role">Sun</span><span class="hex">#F5B33C</span></div>
+            <div class="swrow"><span class="dotc" style="background:#EE7B5A"></span><span class="role">Rose</span><span class="hex">#EE7B5A</span></div>
+            <div class="swrow"><span class="dotc" style="background:#4A5580"></span><span class="role">Dawn-blue</span><span class="hex">#4A5580</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-serif" style="font-style:italic">Fraunces</div><div class="name">Fraunces <span class="role2">· soft optical serif</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">Mulish</div><div class="name">Mulish <span class="role2">· warm humanist</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A <b>gentle, hopeful</b> brand about relief and progress.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Sunrise logos are a startup default. The plateau-as-horizon idea is the twist.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C3 KLARTEXT -->
+  <div class="sectionlead"><span class="num">C3</span><h3>Klartext — noise becomes signal</h3></div>
+  <div class="card fade" style="--d-paper:#E8EFEF; --d-ink:#10222A; --d-primary:#12A5C9; --d-accent:#F0684E; --d-support:#5C8A94;">
+    <div class="lab">
+      <span class="lab-code">mark / audio · comprehension</span>
+      <div class="stage">
+        <svg width="66%" viewBox="0 0 110 60" fill="none" aria-hidden="true">
+          <g fill="var(--d-support)">
+            <rect x="6" y="9" width="6" height="42" rx="3"/>
+            <rect x="15" y="22" width="6" height="16" rx="3"/>
+            <rect x="24" y="6" width="6" height="48" rx="3"/>
+            <rect x="33" y="19" width="6" height="22" rx="3"/>
+            <rect x="42" y="10" width="6" height="40" rx="3"/>
+            <rect x="51" y="21" width="6" height="18" rx="3"/>
+          </g>
+          <g fill="var(--d-primary)">
+            <rect x="66" y="18" width="6" height="24" rx="3"/>
+            <rect x="75" y="18" width="6" height="24" rx="3"/>
+            <rect x="84" y="18" width="6" height="24" rx="3"/>
+            <rect x="93" y="18" width="6" height="24" rx="3"/>
+          </g>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)"><svg width="30" viewBox="0 0 110 60" aria-hidden="true"><g fill="var(--d-support)"><rect x="14" y="10" width="8" height="40" rx="4"/><rect x="28" y="22" width="8" height="16" rx="4"/></g><g fill="var(--d-primary)"><rect x="52" y="18" width="8" height="24" rx="4"/><rect x="66" y="18" width="8" height="24" rx="4"/><rect x="80" y="18" width="8" height="24" rx="4"/></g></svg></span>
+        <span class="chip" style="background:var(--d-primary)"><svg width="30" viewBox="0 0 110 60" aria-hidden="true"><g fill="#fff"><rect x="34" y="18" width="8" height="24" rx="4"/><rect x="50" y="18" width="8" height="24" rx="4"/><rect x="66" y="18" width="8" height="24" rx="4"/></g></svg></span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span style="font-family:var(--sans);font-weight:700;letter-spacing:-0.01em;color:var(--d-ink)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Klartext</h3><span class="gloss">a jagged waveform resolving into a calm, even one</span></div>
+      <p class="rationale">
+        <b>Klartext reden</b> means to speak plainly. The mark shows a chaotic waveform on the left settling into a
+        steady rhythm on the right: <b>noise becoming something you can follow</b>. It is the most literal picture
+        of catching what people say, and a perfect fit for the listening and speaking blocks.
+      </p>
+      <div class="tags"><span class="tag">Audio-first</span><span class="tag">Listening / speaking</span><span class="tag">Calm</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Signal & Cyan</div>
+          <div class="swatches"><div class="sw" style="background:#10222A"></div><div class="sw" style="background:#E8EFEF"></div><div class="sw" style="background:#12A5C9"></div><div class="sw" style="background:#F0684E"></div><div class="sw" style="background:#5C8A94"></div></div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#10222A"></span><span class="role">Deep teal</span><span class="hex">#10222A</span></div>
+            <div class="swrow"><span class="dotc" style="background:#E8EFEF"></span><span class="role">Cool paper</span><span class="hex">#E8EFEF</span></div>
+            <div class="swrow"><span class="dotc" style="background:#12A5C9"></span><span class="role">Cyan</span><span class="hex">#12A5C9</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F0684E"></span><span class="role">Coral</span><span class="hex">#F0684E</span></div>
+            <div class="swrow"><span class="dotc" style="background:#5C8A94"></span><span class="role">Slate-teal</span><span class="hex">#5C8A94</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display / UI</div><div class="typesample-sans" style="font-weight:700">Hanken Grotesk</div><div class="name">Hanken Grotesk <span class="role2">· clear grotesque</span></div></div>
+            <div class="typerow"><div class="label">Data / caption</div><div class="typesample-mono">IBM Plex Mono</div><div class="name">IBM Plex Mono <span class="role2">· technical</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A brand that foregrounds <b>listening and real speech</b>, the plateau's hardest part.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Waveforms say "audio app" broadly. The noise-to-calm transition is the meaning.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== CLOSE ==================== -->
+  <div class="close">
+    <h2>Three beliefs, three different companies</h2>
+    <p class="lede" style="margin-top:6px">
+      These are not just ten more logos. Each philosophy would make Genauly a <strong>different kind of product</strong>,
+      so the real choice is the belief, and the mark follows. Here is how I read them:
+    </p>
+    <div class="mapgrid">
+      <div class="mapcard"><div class="n">Philosophy A</div><h4>Ankommen → warmth</h4><p>Positions you against cold, gamified apps. Best if the mission is integration and real life. Softest, most human.</p></div>
+      <div class="mapcard"><div class="n">Philosophy B</div><h4>Durchbruch → momentum</h4><p>The sharpest marketing story: it names the exact pain (the plateau) and sells the escape. Most energetic, most direct.</p></div>
+      <div class="mapcard"><div class="n">Philosophy C</div><h4>Klarheit → intelligence</h4><p>The most premium and defensible. Positions Genauly as the smart, calm tool for understanding, not drilling.</p></div>
+    </div>
+    <p class="lede" style="margin-top:24px">
+      My instinct: <strong>Durchbruch</strong> is the strongest <em>story</em> (it owns the plateau, which is your
+      whole reason to exist), while <strong>Ankommen / Schwelle</strong> is the warmest <em>feeling</em> and the
+      furthest from every competitor. If you tell me which belief rings true, I will pair it with the sharpest mark
+      in its set, lock a single spec, wire the tokens into the app, and regenerate every icon.
+    </p>
+    <p class="foot">Genauly identity exploration · Vol. III · 3 philosophies · 10 directions · rendered live · 2026-07-13</p>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

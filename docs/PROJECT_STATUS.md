@@ -60,6 +60,27 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 113 (2026-07-13). Brand identity exploration (Opus 4.8), on branch
+`claude/branding-logo-redesign-947e61`, merged to `main` (PR #516). Parallel to the Theorie work below;
+no app code changed.** The founder wants to replace the branding (logo, visual assets, colour scheme):
+the current gradient rounded-square "G" reads as a Canva lookalike. Deliverable = a **catalogue of 20
+logo/identity directions** for founder review, saved under `preview/branding/` (open the HTML files in
+a browser; index in that folder's `README.md`).
+- **What was produced:** three self-contained HTML "studio spec-sheet" pages, each direction a live
+  SVG/CSS mark + a 5-colour palette (hex) + a licensable type pairing. `genauly-identity-vol1.html` +
+  `vol2.html` (foundation *genau* = precision): Genau., Wasserwaage, Umlaut, Zielband, Neuland, „Genau",
+  Der·Die·Das, Fokus, Roter Faden, Stempel. `vol3.html` (three new brand *philosophies*):
+  Ankommen/belonging (Schwelle, Der Tisch, Schlüssel, Heimat), Durchbruch/momentum (Durchbruch, Schwung,
+  Sprung), Klarheit/clarity (Prisma, Sonnenaufgang, Klartext).
+- **Assistant shortlist:** Der·Die·Das (brand = the gender-colour teaching system), Neuland (one world
+  with the game), Durchbruch (owns the plateau story), Ankommen/Schwelle (warmest, most distinctive).
+- **NOT done (deliberate):** nothing in `src/` touched. No palette/token edit in `src/index.css` or
+  `tailwind.config.ts`, no logo/favicon/PWA-icon regen. **That is the next step, and it only starts once
+  the founder picks a direction** (belief + mark + palette, mixes allowed): lock one spec, wire the
+  tokens (light + dark), regenerate all icons from the mark, `pnpm build`, ship to `main`. Also published
+  as private Claude artifacts (Vol. I `fed14c61`, II `02c0d954`, III `dc5d3da7`).
+- **Gates:** none run (no code change); docs + preview HTML only.
+
 **Handoff after session 114 (2026-07-13). Theorie pill animation robustness + dark-mode purple
 contrast (Opus 4.8), on branch `claude/theroie-toggle-animation-t5c86i` — pushed, NOT yet merged
 (commit `688bd0d`; asked the founder before opening a PR).** Follow-up to s113's tab-slide work,
@@ -88,37 +109,9 @@ stuttering). No logic/data change.
   `src/features/shared/ViewSwitcher.tsx` · `src/index.css`.
 - **Gates:** typecheck ✔; build+prerender ✔; test:unit 134/134; check:bundle 79.5 kB/400.
 
-**Handoff after session 113 (2026-07-13). Theorie tab-transition + compass-icon + feedback-pill polish
-(Opus 4.8), on branch `claude/theory-toggle-transitions-hloi6s`, merged to `main` across PRs
-#506/#509/#511/#512.** UX-only, no logic/data change. (Session 114 later refined the tab *pill* glide on
-top of this, see the handoff above.)
-- **Theorie tab slide (four founder rounds):** switching Wörter/Kollokationen/Redemittel/Grammatik used
-  to flash blank + reload. **R1** swapped the enter-only CSS keyframe + `Suspense fallback={null}` for the
-  Praktisch `AnimatePresence` directional `x`-slide + skeleton (removed the dead `.lib-slide-in-*`
-  keyframes). **R2 (the structural fix):** the `LibrarySwitcher` (tab bar) was rendered INSIDE each
-  trainer, so it sat in the animated subtree and the tabs themselves reloaded on every toggle. **Hoisted
-  the switcher into `LibraryHub` as one static element** (only the content slides now, true Praktisch
-  parity), removed `<LibrarySwitcher/>` from the 4 trainers + `GrammarTopicView` (else the lesson doubles
-  the bar), and **preload all 4 tab chunks on mount** so a switch never hits the loading skeleton. Desktop
-  tabs sit at content-column width (col 1 of the same `[1fr,16rem]` grid). **R3 (feel):** `mode="wait"`
-  felt slow and its blank fade-out gap read as heavy, so switched to **`mode="popLayout"`** (leaving panel
-  popped out of flow, panels cross at once, no empty beat, no jump; presence wrapped in a `relative`
-  container), duration 0.16→0.13, snappy ease `[0.22,1,0.36,1]`, slide carries the motion. **R4:** eased
-  0.13→**0.15** (a touch too snappy). framer resolves the resting `x:0` to `transform:none`, so the sticky
-  filter rail / Üben bar are not trapped. Verified in Chromium (1280/1600/390-wide): one bar per surface,
-  static tabs, no skeleton flash, no horizontal scrollbar, no jump.
-- **Compass icon:** the Praktisch route mark is a thin outline ring that read smaller than its neighbors;
-  bumped its optical weight `0.95→1.05` in `route-icons.tsx` `NORM` so it matches
-  Theorie/Fortschritt/Einstellungen.
-- **Feedback pill (R4):** the desktop "Mit KI gebaut · Feedback" pill was anchored by its right EDGE at
-  the FilterRail's center, so it hung half its width to the left. Added `lg:translate-x-1/2` in
-  `FeedbackButton.tsx` so its center lands on the rail center (measured 0px diff at 1280 + 1600 wide).
-- **Files:** `src/features/library/LibraryHub.tsx` · `src/index.css` · `route-icons.tsx` ·
-  `src/features/{vocabulary,collocations,redemittel,grammar}/*` + `grammar/GrammarTopicView.tsx` (removed
-  in-tree `LibrarySwitcher`) · `src/components/layout/FeedbackButton.tsx`.
-- **Gates:** typecheck; lint 0 err/44 warn; test:unit 134/134; build+prerender; check:bundle 79.5 kB/400.
-
-_(Session 112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff, session 111's handoff
+_(Session 113's Theorie tab-transition + compass-icon + feedback-pill polish handoff (PRs
+#506/#509/#511/#512), session 112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff,
+session 111's handoff
 (demo-readiness plan authored + baseline verified) and sessions 85-110's
 handoffs, plus the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,

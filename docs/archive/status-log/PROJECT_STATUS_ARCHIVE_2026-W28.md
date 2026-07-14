@@ -1934,3 +1934,34 @@ regression review of the s102–110 demo-prep rounds + abuse hardening of the pu
   test:srs 323, test:pronounce 26, build+prerender ✔, check:bundle 79.5 kB/400.
 - **Remaining plan chunks:** 1 Playwright smoke test (Sonnet 5), 4 UI polish (Sonnet 5), 5 demo runbook
   `docs/DEMO_RUNBOOK.md` (Sonnet 5), 6 perf sanity (Sonnet 5, P1). See `DEMO_READINESS_PLAN.md`.
+
+## Handoff after session 113 (2026-07-13) — Theorie tab-transition + compass-icon + feedback-pill polish (Opus 4.8)
+
+**On branch `claude/theory-toggle-transitions-hloi6s`, merged to `main` across PRs
+#506/#509/#511/#512.** UX-only, no logic/data change. (Session 114 later refined the tab *pill* glide on
+top of this. Moved out of `PROJECT_STATUS.md` Resume-here in s113-branding per the two-handoff rule.)
+- **Theorie tab slide (four founder rounds):** switching Wörter/Kollokationen/Redemittel/Grammatik used
+  to flash blank + reload. **R1** swapped the enter-only CSS keyframe + `Suspense fallback={null}` for the
+  Praktisch `AnimatePresence` directional `x`-slide + skeleton (removed the dead `.lib-slide-in-*`
+  keyframes). **R2 (the structural fix):** the `LibrarySwitcher` (tab bar) was rendered INSIDE each
+  trainer, so it sat in the animated subtree and the tabs themselves reloaded on every toggle. **Hoisted
+  the switcher into `LibraryHub` as one static element** (only the content slides now, true Praktisch
+  parity), removed `<LibrarySwitcher/>` from the 4 trainers + `GrammarTopicView` (else the lesson doubles
+  the bar), and **preload all 4 tab chunks on mount** so a switch never hits the loading skeleton. Desktop
+  tabs sit at content-column width (col 1 of the same `[1fr,16rem]` grid). **R3 (feel):** `mode="wait"`
+  felt slow and its blank fade-out gap read as heavy, so switched to **`mode="popLayout"`** (leaving panel
+  popped out of flow, panels cross at once, no empty beat, no jump; presence wrapped in a `relative`
+  container), duration 0.16→0.13, snappy ease `[0.22,1,0.36,1]`, slide carries the motion. **R4:** eased
+  0.13→**0.15** (a touch too snappy). framer resolves the resting `x:0` to `transform:none`, so the sticky
+  filter rail / Üben bar are not trapped. Verified in Chromium (1280/1600/390-wide): one bar per surface,
+  static tabs, no skeleton flash, no horizontal scrollbar, no jump.
+- **Compass icon:** the Praktisch route mark is a thin outline ring that read smaller than its neighbors;
+  bumped its optical weight `0.95→1.05` in `route-icons.tsx` `NORM` so it matches
+  Theorie/Fortschritt/Einstellungen.
+- **Feedback pill (R4):** the desktop "Mit KI gebaut · Feedback" pill was anchored by its right EDGE at
+  the FilterRail's center, so it hung half its width to the left. Added `lg:translate-x-1/2` in
+  `FeedbackButton.tsx` so its center lands on the rail center (measured 0px diff at 1280 + 1600 wide).
+- **Files:** `src/features/library/LibraryHub.tsx` · `src/index.css` · `route-icons.tsx` ·
+  `src/features/{vocabulary,collocations,redemittel,grammar}/*` + `grammar/GrammarTopicView.tsx` (removed
+  in-tree `LibrarySwitcher`) · `src/components/layout/FeedbackButton.tsx`.
+- **Gates:** typecheck; lint 0 err/44 warn; test:unit 134/134; build+prerender; check:bundle 79.5 kB/400.

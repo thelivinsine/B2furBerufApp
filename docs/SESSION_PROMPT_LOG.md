@@ -4784,3 +4784,38 @@ Branch: `claude/whats-next-esga9u`.
   update against the current docs.
 - **Artifacts:** `src/features/library/LibraryHub.tsx` · `src/components/layout/FeedbackButton.tsx`
   (PR #512, squash `4bc3daf`) · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 386 — 2026-07-13 (session 113, brand identity exploration)
+
+- **Branch:** `claude/branding-logo-redesign-947e61`
+- **Assistant:** Claude Code (Anthropic)
+- **Attachments:** none
+- **Prompts (verbatim):**
+  > I want to change the branding including logo, visual assets and color schemes. The current logo looks like a direct copy of canva logo. Can you provide me with a catalogue of options in the form of a html artifact?
+  > I like the thinking process. generate 5 more ideas
+  > can you generate 10 more with 2-3 other core philosophical based?
+  > document the session and save the artifacts in the repo
+  > yes open a pr and merge
+- **Response summary:** A branding-exploration session (no app code changed; the current gradient
+  rounded-square "G" reads as a Canva lookalike and is what the founder wants replaced). Produced a
+  catalogue of **20 logo/identity directions** for Genauly across three HTML sheets, each direction
+  rendered as a live concept (real SVG/CSS mark, a 5-colour palette with hex, and a licensable type
+  pairing), in a neutral "studio spec-sheet" page style so each brand palette pops. **Vol. I + II
+  (foundation *genau* = precision):** Genau. (period), Wasserwaage (spirit level), Umlaut (two dots),
+  Zielband (target), Neuland (contour peak), „Genau" (German quotes), Der·Die·Das (gender colour
+  system), Fokus (camera aperture), Roter Faden (single red thread), Stempel (approval stamp). **Vol.
+  III (three new *philosophies*):** Ankommen/belonging (Schwelle, Der Tisch, Schlüssel, Heimat),
+  Durchbruch/momentum (Durchbruch, Schwung, Sprung), Klarheit/clarity (Prisma, Sonnenaufgang,
+  Klartext). Assistant shortlist: Der·Die·Das, Neuland, Durchbruch, Ankommen/Schwelle. Each sheet was
+  published as a private Claude artifact (Vol. I `fed14c61`, Vol. II `02c0d954`, Vol. III `dc5d3da7`),
+  then wrapped as standalone HTML and committed under `preview/branding/` with an index README. No
+  `src/` change, no palette/token/logo-asset change yet; that follows once the founder picks a
+  direction. On the final prompt, opened **PR #516** into `main` and squash-merged it. (First merge
+  attempt hit conflicts because the parallel session-114 Theorie merges had advanced `main`; reset the
+  branch to latest `main`, kept the conflict-free `preview/branding/` files, and re-applied the doc
+  edits, renumbered to entry 386, with the fully-merged s113 Theorie polish handoff relocated to the W28
+  archive per the two-handoff rule.)
+- **Artifacts:** `preview/branding/genauly-identity-vol1.html` ·
+  `preview/branding/genauly-identity-vol2.html` · `preview/branding/genauly-identity-vol3.html` ·
+  `preview/branding/README.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md` (PR #516).

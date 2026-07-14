@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genauly — Identity Exploration, Vol. I</title>
+</head>
+<body>
+<style>
+  :root {
+    --ground: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface-2: #FBFAF6;
+    --ink: #191917;
+    --muted: #6B6A63;
+    --faint: #9C998E;
+    --line: #E6E2D9;
+    --line-strong: #D6D1C5;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --maxw: 1080px;
+    --r: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #131412;
+      --surface: #1C1D1A;
+      --surface-2: #212320;
+      --ink: #F1EFE8;
+      --muted: #A5A39A;
+      --faint: #77756D;
+      --line: #2C2E2A;
+      --line-strong: #3B3D37;
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #F7F5F0; --surface: #FFFFFF; --surface-2: #FBFAF6; --ink: #191917;
+    --muted: #6B6A63; --faint: #9C998E; --line: #E6E2D9; --line-strong: #D6D1C5;
+  }
+  :root[data-theme="dark"] {
+    --ground: #131412; --surface: #1C1D1A; --surface-2: #212320; --ink: #F1EFE8;
+    --muted: #A5A39A; --faint: #77756D; --line: #2C2E2A; --line-strong: #3B3D37;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding: clamp(20px, 5vw, 64px) clamp(16px, 4vw, 40px) 96px;
+  }
+  .wrap { max-width: var(--maxw); margin: 0 auto; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0;
+  }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+  /* ---------- Masthead ---------- */
+  .masthead {
+    border-bottom: 1px solid var(--line);
+    padding-bottom: clamp(28px, 5vw, 48px);
+    margin-bottom: clamp(32px, 5vw, 56px);
+  }
+  .masthead .toprow {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 16px; flex-wrap: wrap; margin-bottom: clamp(24px, 5vw, 44px);
+  }
+  h1.title {
+    font-size: clamp(34px, 7vw, 68px);
+    line-height: 1.02;
+    letter-spacing: -0.022em;
+    font-weight: 620;
+    max-width: 15ch;
+  }
+  h1.title .accentword {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .lede {
+    margin-top: 22px;
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--muted);
+    max-width: 62ch;
+    line-height: 1.62;
+  }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Insight / problem strip ---------- */
+  .strip {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 3vw, 28px);
+    margin: clamp(32px, 5vw, 52px) 0;
+  }
+  @media (max-width: 720px) { .strip { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    padding: clamp(20px, 3vw, 28px);
+  }
+  .panel h3 { font-size: 17px; letter-spacing: -0.01em; margin-bottom: 8px; }
+  .panel p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .panel .kicker { margin-bottom: 14px; }
+
+  .problem-row { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+  .canva-tile {
+    width: 62px; height: 62px; flex: none; border-radius: 15px;
+    background: linear-gradient(135deg, #6366F1 0%, #22D3EE 100%);
+    display: grid; place-items: center;
+    color: #fff; font-weight: 800; font-size: 34px; font-family: var(--sans);
+    box-shadow: 0 6px 18px rgba(60,90,220,0.28);
+  }
+  .problem-note { font-size: 13.5px; color: var(--muted); }
+  .problem-note b { color: var(--ink); }
+
+  .insight-word {
+    font-family: var(--serif);
+    font-size: clamp(30px, 5vw, 46px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .insight-word .dot { color: #E23B2E; }
+
+  /* ---------- Section header ---------- */
+  .sectionlead {
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    margin: clamp(48px, 7vw, 80px) 0 clamp(20px, 3vw, 28px);
+  }
+  .sectionlead .num {
+    font-family: var(--mono); font-size: 13px; color: var(--faint); letter-spacing: 0.08em;
+  }
+  .sectionlead h2 { font-size: clamp(20px, 3vw, 26px); letter-spacing: -0.01em; }
+
+  /* ---------- Direction card ---------- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: clip;
+    margin-bottom: clamp(20px, 3vw, 30px);
+    display: grid;
+    grid-template-columns: minmax(280px, 340px) 1fr;
+  }
+  @media (max-width: 780px) { .card { grid-template-columns: 1fr; } }
+
+  /* left: the mark lab, painted in the direction's own paper */
+  .lab {
+    background: var(--d-paper);
+    color: var(--d-ink);
+    padding: clamp(22px, 3vw, 30px);
+    display: flex; flex-direction: column; gap: 20px;
+    border-right: 1px solid var(--line);
+  }
+  @media (max-width: 780px) { .lab { border-right: none; border-bottom: 1px solid var(--line); } }
+  .lab-code {
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--d-ink); opacity: 0.55;
+  }
+  .stage {
+    aspect-ratio: 16 / 10;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    position: relative;
+    background:
+      radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--d-ink) 5%, transparent), transparent 62%),
+      var(--d-paper);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--d-ink) 10%, transparent);
+    overflow: hidden;
+  }
+  .markrow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .mark-small-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+  .chip {
+    width: 40px; height: 40px; border-radius: 9px; flex: none;
+    display: grid; place-items: center; position: relative; overflow: hidden;
+  }
+  .chip.ondark { background: var(--d-ink); }
+
+  /* wordmark */
+  .wordmark { font-size: clamp(26px, 4vw, 34px); line-height: 1; display: inline-flex; align-items: baseline; }
+
+  /* --- Mark: Genau (letter + dot) --- */
+  .m-genau .letterG {
+    font-family: var(--serif); font-weight: 600; font-size: 72px; line-height: 0.8;
+    letter-spacing: -0.02em; color: var(--d-ink);
+  }
+  .m-genau .bigdot { color: var(--d-primary); }
+  .wm-genau { font-family: var(--serif); font-weight: 600; letter-spacing: -0.015em; color: var(--d-ink); }
+  .wm-genau .p { color: var(--d-primary); }
+  .chip .miniG-genau { font-family: var(--serif); font-weight: 700; font-size: 22px; color: var(--d-paper); }
+  .chip .miniG-genau .p { color: var(--d-primary); }
+
+  /* --- Mark: Umlaut (G + two dots) --- */
+  .m-umlaut { position: relative; display: inline-block; }
+  .m-umlaut .letterG {
+    font-family: var(--sans); font-weight: 800; font-size: 66px; line-height: 0.9;
+    letter-spacing: -0.03em; color: var(--d-primary);
+  }
+  .m-umlaut .dots { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; }
+  .m-umlaut .dots i { width: 11px; height: 11px; border-radius: 50%; background: var(--d-primary); display: block; }
+  .m-umlaut .dots i.two { background: var(--d-accent); }
+  .wm-umlaut { font-family: var(--sans); font-weight: 800; letter-spacing: -0.03em; color: var(--d-ink); position: relative; }
+  .wm-umlaut .udots { position: absolute; top: -0.42em; right: -0.05em; display: flex; gap: 5px; }
+  .wm-umlaut .udots i { width: 6px; height: 6px; border-radius: 50%; background: var(--d-primary); }
+  .wm-umlaut .udots i.two { background: var(--d-accent); }
+
+  /* --- Mark: Wasserwaage (level device) --- */
+  .wm-level { font-family: var(--mono); font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; font-size: clamp(19px, 3vw, 24px); color: var(--d-ink); }
+
+  /* --- Mark: Zielband (target) --- */
+  .wm-ziel { font-family: var(--serif); font-weight: 600; letter-spacing: -0.012em; color: var(--d-ink); }
+
+  /* --- Mark: Neuland (contour) --- */
+  .wm-neu { font-family: var(--serif); font-weight: 700; letter-spacing: 0.005em; color: var(--d-ink); }
+
+  /* right: details */
+  .detail { padding: clamp(22px, 3vw, 32px); display: flex; flex-direction: column; gap: 22px; }
+  .detail-head h3 { font-size: clamp(21px, 3vw, 27px); letter-spacing: -0.015em; margin-bottom: 6px; }
+  .detail-head .gloss { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+  .detail p.rationale { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.62; max-width: 60ch; }
+  .detail p.rationale b { color: var(--ink); font-weight: 600; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .tag {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+    color: var(--muted); border: 1px solid var(--line-strong); border-radius: 100px; padding: 4px 10px;
+  }
+
+  .blockgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media (max-width: 560px) { .blockgrid { grid-template-columns: 1fr; } }
+  .subhead { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+
+  /* palette */
+  .swatches { display: flex; gap: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+  .swatches .sw { flex: 1; height: 52px; }
+  .swatchmeta { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .swrow { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+  .swrow .dotc { width: 11px; height: 11px; border-radius: 3px; flex: none; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+  .swrow .role { color: var(--muted); min-width: 62px; }
+  .swrow .hex { font-family: var(--mono); font-size: 11.5px; color: var(--ink); text-transform: uppercase; letter-spacing: 0.02em; }
+
+  /* type spec */
+  .typespec { display: flex; flex-direction: column; gap: 14px; }
+  .typerow .label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+  .typerow .name { font-size: 15px; color: var(--ink); font-weight: 600; }
+  .typerow .name .role2 { color: var(--muted); font-weight: 400; font-size: 13px; }
+  .typesample-serif { font-family: var(--serif); font-size: 20px; letter-spacing: -0.01em; }
+  .typesample-sans { font-family: var(--sans); font-size: 18px; font-weight: 650; letter-spacing: -0.01em; }
+  .typesample-mono { font-family: var(--mono); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; }
+
+  .usebox { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .usebox { grid-template-columns: 1fr; } }
+  .usecell { border-top: 1px solid var(--line); padding-top: 12px; }
+  .usecell .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 5px; }
+  .usecell .v { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+  .usecell .v b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- Comparison matrix ---------- */
+  .matrixwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+  table.matrix { border-collapse: collapse; width: 100%; min-width: 640px; }
+  table.matrix th, table.matrix td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--line); }
+  table.matrix thead th {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--faint); font-weight: 500;
+  }
+  table.matrix tbody th { font-weight: 600; font-size: 14.5px; letter-spacing: -0.01em; }
+  table.matrix tbody th .g { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0.02em; margin-top: 2px; }
+  table.matrix tr:last-child td, table.matrix tr:last-child th { border-bottom: none; }
+  .meter { display: inline-flex; gap: 4px; }
+  .meter i { width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); }
+  .meter i.on { background: var(--ink); }
+  .swrail { display: inline-flex; gap: 4px; }
+  .swrail i { width: 14px; height: 14px; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
+
+  /* ---------- Close ---------- */
+  .close {
+    margin-top: clamp(44px, 6vw, 72px);
+    border-top: 1px solid var(--line);
+    padding-top: clamp(28px, 4vw, 40px);
+  }
+  .close h2 { font-size: clamp(22px, 3vw, 30px); letter-spacing: -0.018em; margin-bottom: 14px; }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+  @media (max-width: 720px) { .steps { grid-template-columns: 1fr; } }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  .step .n { font-family: var(--mono); font-size: 12px; color: var(--faint); letter-spacing: 0.1em; }
+  .step h4 { margin: 8px 0 6px; font-size: 15.5px; letter-spacing: -0.01em; }
+  .step p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+
+  .foot { margin-top: 40px; font-family: var(--mono); font-size: 11.5px; color: var(--faint); letter-spacing: 0.04em; }
+
+  .fade { opacity: 0; transform: translateY(14px); animation: rise 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+  .fade:nth-child(2) { animation-delay: 0.05s; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1; transform: none; } }
+</style>
+
+<div class="page">
+<div class="wrap">
+
+  <!-- ============ MASTHEAD ============ -->
+  <header class="masthead">
+    <div class="toprow">
+      <p class="eyebrow">Identity Exploration · Genauly</p>
+      <p class="eyebrow">Five directions · v1</p>
+    </div>
+    <h1 class="title">Five ways to look <span class="accentword">exactly</span> right.</h1>
+    <p class="lede">
+      The current mark is a gradient rounded-square "G". It is competent, but it reads as a
+      <strong>Canva lookalike</strong>: the same tile, the same blue-to-cyan gradient, the same soft corners
+      that a hundred other apps already wear. Low ownability is the real cost. Below are five distinct identity
+      directions, each with a logo mark, a full color palette, and a type pairing you can actually license.
+      Every one is built from one idea the name hands us for free.
+    </p>
+  </header>
+
+  <!-- ============ PROBLEM + INSIGHT ============ -->
+  <div class="strip">
+    <div class="panel">
+      <p class="eyebrow kicker">Where we are</p>
+      <div class="problem-row">
+        <div class="canva-tile">G</div>
+        <div class="problem-note">
+          <b>Gradient rounded-square G.</b><br>Indigo → cyan, soft corners.
+        </div>
+      </div>
+      <p>
+        The tile-plus-gradient-letter format is the most copied logo shape of the last decade. It signals
+        "an app" but says nothing about German, precision, or the plateau these learners are trying to break.
+        Every direction below deliberately steps away from the gradient tile.
+      </p>
+    </div>
+    <div class="panel">
+      <p class="eyebrow kicker">The idea the name gives us</p>
+      <div class="insight-word">Genau<span class="dot">.</span></div>
+      <p>
+        <b style="color:var(--ink)">Genauly</b> is built on <b style="color:var(--ink)">genau</b>, the German
+        word for "exactly / precisely", and the affirmation you say out loud the moment something clicks:
+        "Genau!" So the brand's spine is precision and the satisfying snap of getting it right. Each direction
+        below is a different way to draw that.
+      </p>
+    </div>
+  </div>
+
+  <!-- ============ DIRECTION 01 — GENAU ============ -->
+  <div class="sectionlead">
+    <span class="num">01</span>
+    <h2>Genau. — the affirmation</h2>
+  </div>
+  <div class="card fade" style="--d-paper:#F6F2EA; --d-ink:#181613; --d-primary:#E23B2E; --d-accent:#3A4256; --d-support:#E4DCCB;">
+    <div class="lab">
+      <span class="lab-code">mark / editorial · wordmark-led</span>
+      <div class="stage">
+        <div class="m-genau"><span class="letterG">G<span class="bigdot">.</span></span></div>
+      </div>
+      <div class="markrow">
+        <span class="chip"><span class="miniG-genau">G<span class="p">.</span></span></span>
+        <span class="chip ondark"><span class="miniG-genau" style="color:var(--d-paper)">G<span class="p">.</span></span></span>
+        <span class="mark-small-label">favicon · on dark</span>
+      </div>
+      <div class="wordmark"><span class="wm-genau">Genauly<span class="p">.</span></span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head">
+        <h3>Genau.</h3>
+        <span class="gloss">the confident full stop</span>
+      </div>
+      <p class="rationale">
+        No tile at all. The mark is the letterform plus a single <b>red period</b>, the punctuation of certainty.
+        It reads as a considered editorial brand, closer to a publisher than an app, which suits adult learners and
+        exam candidates who want to be taken seriously. The dot is the whole system: it ends the wordmark, dots the
+        favicon, and becomes the "correct" tick inside the product.
+      </p>
+      <div class="tags"><span class="tag">Editorial</span><span class="tag">Grown-up</span><span class="tag">Minimal</span><span class="tag">High ownability</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Ink & Signal</div>
+          <div class="swatches">
+            <div class="sw" style="background:#181613"></div>
+            <div class="sw" style="background:#F6F2EA"></div>
+            <div class="sw" style="background:#E23B2E"></div>
+            <div class="sw" style="background:#3A4256"></div>
+            <div class="sw" style="background:#E4DCCB"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#181613"></span><span class="role">Ink</span><span class="hex">#181613</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F6F2EA"></span><span class="role">Paper</span><span class="hex">#F6F2EA</span></div>
+            <div class="swrow"><span class="dotc" style="background:#E23B2E"></span><span class="role">Signal</span><span class="hex">#E23B2E</span></div>
+            <div class="swrow"><span class="dotc" style="background:#3A4256"></span><span class="role">Slate</span><span class="hex">#3A4256</span></div>
+            <div class="swrow"><span class="dotc" style="background:#E4DCCB"></span><span class="role">Sand</span><span class="hex">#E4DCCB</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow">
+              <div class="label">Display</div>
+              <div class="typesample-serif">Fraunces</div>
+              <div class="name">Fraunces <span class="role2">· optical serif</span></div>
+            </div>
+            <div class="typerow">
+              <div class="label">Body / UI</div>
+              <div class="typesample-sans">Geist Sans</div>
+              <div class="name">Geist Sans <span class="role2">· clean grotesque</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">Positioning Genauly as a <b>serious study brand</b> for exam prep and professionals.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Leans quiet. The game layer (Neuland) would need its own louder sub-palette.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DIRECTION 02 — WASSERWAAGE ============ -->
+  <div class="sectionlead">
+    <span class="num">02</span>
+    <h2>Wasserwaage — the precision instrument</h2>
+  </div>
+  <div class="card fade" style="--d-paper:#ECECE8; --d-ink:#1B1D1E; --d-primary:#F2560A; --d-accent:#5B5F63; --d-support:#B7BDC1;">
+    <div class="lab">
+      <span class="lab-code">mark / industrial · device-led</span>
+      <div class="stage">
+        <svg width="72%" viewBox="0 0 120 60" fill="none" aria-hidden="true">
+          <rect x="5" y="17" width="110" height="26" rx="13" stroke="var(--d-ink)" stroke-width="3"/>
+          <line x1="52" y1="21" x2="52" y2="39" stroke="var(--d-ink)" stroke-width="2.4"/>
+          <line x1="68" y1="21" x2="68" y2="39" stroke="var(--d-ink)" stroke-width="2.4"/>
+          <circle cx="60" cy="30" r="7.5" fill="var(--d-primary)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)">
+          <svg width="26" viewBox="0 0 120 60" fill="none" aria-hidden="true">
+            <rect x="8" y="20" width="104" height="20" rx="10" stroke="var(--d-paper)" stroke-width="5"/>
+            <circle cx="60" cy="30" r="7" fill="var(--d-primary)"/>
+          </svg>
+        </span>
+        <span class="chip" style="background:var(--d-primary)">
+          <svg width="26" viewBox="0 0 120 60" fill="none" aria-hidden="true">
+            <rect x="8" y="20" width="104" height="20" rx="10" stroke="#fff" stroke-width="5"/>
+            <circle cx="60" cy="30" r="7" fill="#fff"/>
+          </svg>
+        </span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span class="wm-level">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head">
+        <h3>Wasserwaage</h3>
+        <span class="gloss">the bubble sits dead-center — perfectly level, genau</span>
+      </div>
+      <p class="rationale">
+        A spirit-level vial with the bubble resting <b>exactly between the two etched lines</b>. "Level" and
+        "exact" are the same gesture, and it is a real object, so it is instantly legible at 16px. The language is
+        Braun / Dieter Rams: matte, flat, one safety-orange accent doing all the talking. No gradient anywhere, which
+        is the sharpest possible break from the current tile.
+      </p>
+      <div class="tags"><span class="tag">Industrial</span><span class="tag">Precise</span><span class="tag">Flat / no gradient</span><span class="tag">Object mark</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Concrete & Safety</div>
+          <div class="swatches">
+            <div class="sw" style="background:#1B1D1E"></div>
+            <div class="sw" style="background:#ECECE8"></div>
+            <div class="sw" style="background:#F2560A"></div>
+            <div class="sw" style="background:#5B5F63"></div>
+            <div class="sw" style="background:#B7BDC1"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#1B1D1E"></span><span class="role">Ink</span><span class="hex">#1B1D1E</span></div>
+            <div class="swrow"><span class="dotc" style="background:#ECECE8"></span><span class="role">Fog</span><span class="hex">#ECECE8</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F2560A"></span><span class="role">Safety</span><span class="hex">#F2560A</span></div>
+            <div class="swrow"><span class="dotc" style="background:#5B5F63"></span><span class="role">Concrete</span><span class="hex">#5B5F63</span></div>
+            <div class="swrow"><span class="dotc" style="background:#B7BDC1"></span><span class="role">Steel</span><span class="hex">#B7BDC1</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow">
+              <div class="label">Display / UI</div>
+              <div class="typesample-sans">Hanken Grotesk</div>
+              <div class="name">Hanken Grotesk <span class="role2">· neutral grotesque</span></div>
+            </div>
+            <div class="typerow">
+              <div class="label">Data / caption</div>
+              <div class="typesample-mono">IBM Plex Mono</div>
+              <div class="name">IBM Plex Mono <span class="role2">· measured, technical</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A confident, no-nonsense tool feel. Pairs well with the app's <b>facet/spec-sheet UI</b>.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Coolest of the five. Add warmth in illustration so it does not feel clinical.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DIRECTION 03 — UMLAUT ============ -->
+  <div class="sectionlead">
+    <span class="num">03</span>
+    <h2>Umlaut — unmistakably German</h2>
+  </div>
+  <div class="card fade" style="--d-paper:#F3F0E7; --d-ink:#111318; --d-primary:#2B4FE0; --d-accent:#FFC24D; --d-support:#CBD8FF;">
+    <div class="lab">
+      <span class="lab-code">mark / geometric · monogram + device</span>
+      <div class="stage">
+        <div class="m-umlaut">
+          <span class="dots"><i></i><i class="two"></i></span>
+          <span class="letterG">G</span>
+        </div>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-primary)">
+          <span style="position:relative; color:#fff; font-family:var(--sans); font-weight:800; font-size:22px; line-height:1">
+            G
+            <span style="position:absolute; top:-7px; left:50%; transform:translateX(-50%); display:flex; gap:4px">
+              <i style="width:4px;height:4px;border-radius:50%;background:#fff;display:block"></i>
+              <i style="width:4px;height:4px;border-radius:50%;background:var(--d-accent);display:block"></i>
+            </span>
+          </span>
+        </span>
+        <span class="chip" style="background:var(--d-accent)">
+          <span style="position:relative; color:var(--d-primary); font-family:var(--sans); font-weight:800; font-size:22px; line-height:1">G
+            <span style="position:absolute; top:-7px; left:50%; transform:translateX(-50%); display:flex; gap:4px">
+              <i style="width:4px;height:4px;border-radius:50%;background:var(--d-primary);display:block"></i>
+              <i style="width:4px;height:4px;border-radius:50%;background:var(--d-primary);display:block"></i>
+            </span>
+          </span>
+        </span>
+        <span class="mark-small-label">favicon · reversed</span>
+      </div>
+      <div class="wordmark"><span class="wm-umlaut">Genauly<span class="udots"><i></i><i class="two"></i></span></span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head">
+        <h3>Umlaut</h3>
+        <span class="gloss">the two dots — the most German mark there is</span>
+      </div>
+      <p class="rationale">
+        German owns a symbol almost no other brand uses: the <b>umlaut, two dots</b>. Here they float over the G
+        and hover above the wordmark, doubling as a <b>progress pair</b> inside the product (one filled = halfway,
+        two filled = mastered). It is playful and smart without being childish, and it plants a flag: this app is
+        about <b>German specifically</b>, not "languages" in general.
+      </p>
+      <div class="tags"><span class="tag">Distinctly German</span><span class="tag">Playful-smart</span><span class="tag">Systemic</span><span class="tag">Bold color</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Cobalt & Butter</div>
+          <div class="swatches">
+            <div class="sw" style="background:#111318"></div>
+            <div class="sw" style="background:#F3F0E7"></div>
+            <div class="sw" style="background:#2B4FE0"></div>
+            <div class="sw" style="background:#FFC24D"></div>
+            <div class="sw" style="background:#CBD8FF"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#111318"></span><span class="role">Ink</span><span class="hex">#111318</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F3F0E7"></span><span class="role">Cream</span><span class="hex">#F3F0E7</span></div>
+            <div class="swrow"><span class="dotc" style="background:#2B4FE0"></span><span class="role">Cobalt</span><span class="hex">#2B4FE0</span></div>
+            <div class="swrow"><span class="dotc" style="background:#FFC24D"></span><span class="role">Butter</span><span class="hex">#FFC24D</span></div>
+            <div class="swrow"><span class="dotc" style="background:#CBD8FF"></span><span class="role">Sky</span><span class="hex">#CBD8FF</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow">
+              <div class="label">Display</div>
+              <div class="typesample-sans" style="letter-spacing:-0.03em">Clash Display</div>
+              <div class="name">Clash Display <span class="role2">· geometric, characterful</span></div>
+            </div>
+            <div class="typerow">
+              <div class="label">Body / UI</div>
+              <div class="typesample-sans" style="font-weight:500">Satoshi</div>
+              <div class="name">Satoshi <span class="role2">· modern neo-grotesque</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A modern, confident consumer brand that <b>owns "German"</b> and scales into a mascot-free system.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Cobalt is close to the current indigo. Push it bluer so it does not feel like a re-skin.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DIRECTION 04 — ZIELBAND ============ -->
+  <div class="sectionlead">
+    <span class="num">04</span>
+    <h2>Zielband — hitting your level</h2>
+  </div>
+  <div class="card fade" style="--d-paper:#FBF3EC; --d-ink:#33193A; --d-primary:#FF6B54; --d-accent:#E6A93B; --d-support:#E9BFC6;">
+    <div class="lab">
+      <span class="lab-code">mark / warm · target device</span>
+      <div class="stage">
+        <svg width="46%" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <circle cx="50" cy="52" r="38" stroke="var(--d-ink)" stroke-width="4"/>
+          <circle cx="50" cy="52" r="24" stroke="var(--d-primary)" stroke-width="4"/>
+          <circle cx="50" cy="52" r="11" fill="var(--d-primary)"/>
+          <path d="M50 3 L57 16 L43 16 Z" fill="var(--d-accent)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-paper)">
+          <svg width="30" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+            <circle cx="50" cy="52" r="36" stroke="var(--d-ink)" stroke-width="7"/>
+            <circle cx="50" cy="52" r="14" fill="var(--d-primary)"/>
+            <path d="M50 4 L60 20 L40 20 Z" fill="var(--d-accent)"/>
+          </svg>
+        </span>
+        <span class="chip" style="background:var(--d-ink)">
+          <svg width="30" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+            <circle cx="50" cy="52" r="36" stroke="var(--d-paper)" stroke-width="7"/>
+            <circle cx="50" cy="52" r="14" fill="var(--d-primary)"/>
+            <path d="M50 4 L60 20 L40 20 Z" fill="var(--d-accent)"/>
+          </svg>
+        </span>
+        <span class="mark-small-label">favicon · on dark</span>
+      </div>
+      <div class="wordmark"><span class="wm-ziel">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head">
+        <h3>Zielband</h3>
+        <span class="gloss">the target, with a marker pinned at B2</span>
+      </div>
+      <p class="rationale">
+        A target with a bullseye and a small marker notch at the top: <b>your level, hit exactly</b>. This is the
+        warmest, most motivating direction. Where the plateau story is "you are stuck at B1", the target says
+        "here is the ring you are aiming for, and you can land in it". The concentric rings map naturally onto
+        <b>CEFR bands</b> (A2 → B1 → B2 → C1) as a progress motif.
+      </p>
+      <div class="tags"><span class="tag">Warm</span><span class="tag">Motivating</span><span class="tag">Goal-driven</span><span class="tag">Consumer</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Aubergine & Coral</div>
+          <div class="swatches">
+            <div class="sw" style="background:#33193A"></div>
+            <div class="sw" style="background:#FBF3EC"></div>
+            <div class="sw" style="background:#FF6B54"></div>
+            <div class="sw" style="background:#E6A93B"></div>
+            <div class="sw" style="background:#E9BFC6"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#33193A"></span><span class="role">Aubergine</span><span class="hex">#33193A</span></div>
+            <div class="swrow"><span class="dotc" style="background:#FBF3EC"></span><span class="role">Cream</span><span class="hex">#FBF3EC</span></div>
+            <div class="swrow"><span class="dotc" style="background:#FF6B54"></span><span class="role">Coral</span><span class="hex">#FF6B54</span></div>
+            <div class="swrow"><span class="dotc" style="background:#E6A93B"></span><span class="role">Gold</span><span class="hex">#E6A93B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#E9BFC6"></span><span class="role">Rose</span><span class="hex">#E9BFC6</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow">
+              <div class="label">Display</div>
+              <div class="typesample-serif" style="font-style:italic">Fraunces Soft</div>
+              <div class="name">Fraunces <span class="role2">· soft optical serif</span></div>
+            </div>
+            <div class="typerow">
+              <div class="label">Body / UI</div>
+              <div class="typesample-sans" style="font-weight:600">Mulish</div>
+              <div class="name">Mulish <span class="role2">· warm humanist sans</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">Leaning into <b>motivation and progress</b>. The friendliest fit for the game + streak layer.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Target logos are common. The B2 marker notch is what keeps it specific, keep it.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DIRECTION 05 — NEULAND ============ -->
+  <div class="sectionlead">
+    <span class="num">05</span>
+    <h2>Neuland — breaking the plateau</h2>
+  </div>
+  <div class="card fade" style="--d-paper:#EDE6D3; --d-ink:#123B34; --d-primary:#1E8A7B; --d-accent:#D9A441; --d-support:#5C7A6E;">
+    <div class="lab">
+      <span class="lab-code">mark / terrain · ascent device</span>
+      <div class="stage">
+        <svg width="66%" viewBox="0 0 120 84" fill="none" aria-hidden="true">
+          <line x1="10" y1="70" x2="110" y2="70" stroke="var(--d-support)" stroke-width="3" stroke-dasharray="5 6" stroke-linecap="round"/>
+          <path d="M18 68 L60 24 L102 68" stroke="var(--d-primary)" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M34 68 L60 40 L86 68" stroke="var(--d-accent)" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="60" cy="24" r="6" fill="var(--d-accent)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)">
+          <svg width="30" viewBox="0 0 120 84" fill="none" aria-hidden="true">
+            <path d="M18 66 L60 26 L102 66" stroke="var(--d-primary)" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="60" cy="26" r="8" fill="var(--d-accent)"/>
+          </svg>
+        </span>
+        <span class="chip" style="background:var(--d-primary)">
+          <svg width="30" viewBox="0 0 120 84" fill="none" aria-hidden="true">
+            <path d="M18 66 L60 26 L102 66" stroke="#fff" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="60" cy="26" r="8" fill="var(--d-accent)"/>
+          </svg>
+        </span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span class="wm-neu">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head">
+        <h3>Neuland</h3>
+        <span class="gloss">the summit above the plateau line</span>
+      </div>
+      <p class="rationale">
+        A contour peak rising off a dashed <b>plateau line</b>, the exact story of the product: B1 to B2 is a flat
+        stretch, and this is the climb out with the summit in gold. It is the only direction that ties directly to
+        the in-app <b>Neuland game world</b>, so brand and game speak one visual language. Earthy, warm, and
+        outdoorsy without a single cliché mountain-outline startup vibe, because the plateau line is the twist.
+      </p>
+      <div class="tags"><span class="tag">Journey</span><span class="tag">Ties to the game</span><span class="tag">Earthy / warm</span><span class="tag">Story-led</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Forest & Summit</div>
+          <div class="swatches">
+            <div class="sw" style="background:#123B34"></div>
+            <div class="sw" style="background:#EDE6D3"></div>
+            <div class="sw" style="background:#1E8A7B"></div>
+            <div class="sw" style="background:#D9A441"></div>
+            <div class="sw" style="background:#5C7A6E"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#123B34"></span><span class="role">Forest</span><span class="hex">#123B34</span></div>
+            <div class="swrow"><span class="dotc" style="background:#EDE6D3"></span><span class="role">Sand</span><span class="hex">#EDE6D3</span></div>
+            <div class="swrow"><span class="dotc" style="background:#1E8A7B"></span><span class="role">Teal</span><span class="hex">#1E8A7B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#D9A441"></span><span class="role">Summit</span><span class="hex">#D9A441</span></div>
+            <div class="swrow"><span class="dotc" style="background:#5C7A6E"></span><span class="role">Slate-green</span><span class="hex">#5C7A6E</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow">
+              <div class="label">Display</div>
+              <div class="typesample-serif" style="font-weight:700">Zodiak</div>
+              <div class="name">Zodiak <span class="role2">· contemporary display serif</span></div>
+            </div>
+            <div class="typerow">
+              <div class="label">Body / UI</div>
+              <div class="typesample-sans" style="font-weight:600">Familjen Grotesk</div>
+              <div class="name">Familjen Grotesk <span class="role2">· friendly grotesque</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">One unified world across app, brand, and the <b>Neuland RPG</b>. Strongest narrative.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Most illustration-dependent. It needs the terrain style carried through to shine.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ COMPARISON ============ -->
+  <div class="sectionlead">
+    <span class="num">—</span>
+    <h2>Side by side</h2>
+  </div>
+  <div class="matrixwrap fade">
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>Direction</th>
+          <th>Palette</th>
+          <th>Warmth</th>
+          <th>Formality</th>
+          <th>Ownability</th>
+          <th>Build effort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th>Genau. <span class="g">the affirmation</span></th>
+          <td><span class="swrail"><i style="background:#181613"></i><i style="background:#F6F2EA"></i><i style="background:#E23B2E"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i></i><i></i><i></i></span></td>
+        </tr>
+        <tr>
+          <th>Wasserwaage <span class="g">precision instrument</span></th>
+          <td><span class="swrail"><i style="background:#1B1D1E"></i><i style="background:#ECECE8"></i><i style="background:#F2560A"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+        </tr>
+        <tr>
+          <th>Umlaut <span class="g">unmistakably German</span></th>
+          <td><span class="swrail"><i style="background:#111318"></i><i style="background:#F3F0E7"></i><i style="background:#2B4FE0"></i><i style="background:#FFC24D"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+        </tr>
+        <tr>
+          <th>Zielband <span class="g">hitting your level</span></th>
+          <td><span class="swrail"><i style="background:#33193A"></i><i style="background:#FBF3EC"></i><i style="background:#FF6B54"></i><i style="background:#E6A93B"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+        </tr>
+        <tr>
+          <th>Neuland <span class="g">breaking the plateau</span></th>
+          <td><span class="swrail"><i style="background:#123B34"></i><i style="background:#EDE6D3"></i><i style="background:#1E8A7B"></i><i style="background:#D9A441"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ CLOSE ============ -->
+  <div class="close">
+    <h2>How I'd choose</h2>
+    <p class="lede" style="margin-top:6px">
+      If you want the app to feel <strong>credible and grown-up</strong> for exam prep, go
+      <strong>Genau.</strong> or <strong>Wasserwaage</strong>. If you want it to feel like a
+      <strong>warm consumer product</strong> with a strong game hook, go <strong>Zielband</strong> or
+      <strong>Neuland</strong>. <strong>Umlaut</strong> is the boldest middle path and the most ownable
+      "this is a German app" statement. My single pick: <strong>Neuland</strong>, because it is the only one
+      that unifies the brand with the game you are already building.
+    </p>
+    <div class="steps">
+      <div class="step">
+        <div class="n">→ 01</div>
+        <h4>Pick a direction</h4>
+        <p>Tell me which one (or a mix, say Neuland's mark with Umlaut's color) and I will tighten it into a single locked spec.</p>
+      </div>
+      <div class="step">
+        <div class="n">→ 02</div>
+        <h4>Wire the tokens</h4>
+        <p>I swap the palette into <span style="font-family:var(--mono);font-size:12px">index.css</span> and <span style="font-family:var(--mono);font-size:12px">tailwind.config.ts</span>, replacing the indigo/cyan tokens across light and dark.</p>
+      </div>
+      <div class="step">
+        <div class="n">→ 03</div>
+        <h4>Regenerate assets</h4>
+        <p>New logo, favicons (16/32), and the PWA / Apple touch icons, all from the chosen mark, then ship it to <span style="font-family:var(--mono);font-size:12px">main</span>.</p>
+      </div>
+    </div>
+    <p class="foot">Genauly identity exploration · 5 directions · concepts rendered live in this page · 2026-07-13</p>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

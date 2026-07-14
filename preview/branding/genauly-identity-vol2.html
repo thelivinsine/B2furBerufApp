@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genauly — Identity Exploration, Vol. II</title>
+</head>
+<body>
+<style>
+  :root {
+    --ground: #F7F5F0;
+    --surface: #FFFFFF;
+    --surface-2: #FBFAF6;
+    --ink: #191917;
+    --muted: #6B6A63;
+    --faint: #9C998E;
+    --line: #E6E2D9;
+    --line-strong: #D6D1C5;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --maxw: 1080px;
+    --r: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground: #131412; --surface: #1C1D1A; --surface-2: #212320; --ink: #F1EFE8;
+      --muted: #A5A39A; --faint: #77756D; --line: #2C2E2A; --line-strong: #3B3D37;
+    }
+  }
+  :root[data-theme="light"] {
+    --ground: #F7F5F0; --surface: #FFFFFF; --surface-2: #FBFAF6; --ink: #191917;
+    --muted: #6B6A63; --faint: #9C998E; --line: #E6E2D9; --line-strong: #D6D1C5;
+  }
+  :root[data-theme="dark"] {
+    --ground: #131412; --surface: #1C1D1A; --surface-2: #212320; --ink: #F1EFE8;
+    --muted: #A5A39A; --faint: #77756D; --line: #2C2E2A; --line-strong: #3B3D37;
+  }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  .page { background: var(--ground); color: var(--ink); font-family: var(--sans); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; padding: clamp(20px, 5vw, 64px) clamp(16px, 4vw, 40px) 96px; }
+  .wrap { max-width: var(--maxw); margin: 0 auto; }
+  .eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0; }
+  h1, h2, h3 { text-wrap: balance; margin: 0; }
+
+  .masthead { border-bottom: 1px solid var(--line); padding-bottom: clamp(28px, 5vw, 48px); margin-bottom: clamp(32px, 5vw, 56px); }
+  .masthead .toprow { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: clamp(24px, 5vw, 44px); }
+  h1.title { font-size: clamp(34px, 7vw, 66px); line-height: 1.03; letter-spacing: -0.022em; font-weight: 620; max-width: 16ch; }
+  h1.title .accentword { font-family: var(--serif); font-style: italic; font-weight: 500; letter-spacing: -0.01em; }
+  .lede { margin-top: 22px; font-size: clamp(16px, 2vw, 19px); color: var(--muted); max-width: 64ch; line-height: 1.62; }
+  .lede strong { color: var(--ink); font-weight: 600; }
+
+  .sectionlead { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin: clamp(48px, 7vw, 80px) 0 clamp(20px, 3vw, 28px); }
+  .sectionlead .num { font-family: var(--mono); font-size: 13px; color: var(--faint); letter-spacing: 0.08em; }
+  .sectionlead h2 { font-size: clamp(20px, 3vw, 26px); letter-spacing: -0.01em; }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: clip; margin-bottom: clamp(20px, 3vw, 30px); display: grid; grid-template-columns: minmax(280px, 340px) 1fr; }
+  @media (max-width: 780px) { .card { grid-template-columns: 1fr; } }
+  .lab { background: var(--d-paper); color: var(--d-ink); padding: clamp(22px, 3vw, 30px); display: flex; flex-direction: column; gap: 20px; border-right: 1px solid var(--line); }
+  @media (max-width: 780px) { .lab { border-right: none; border-bottom: 1px solid var(--line); } }
+  .lab-code { font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--d-ink); opacity: 0.55; }
+  .stage { aspect-ratio: 16 / 10; border-radius: 12px; display: grid; place-items: center; position: relative; background: radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--d-ink) 5%, transparent), transparent 62%), var(--d-paper); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--d-ink) 10%, transparent); overflow: hidden; }
+  .markrow { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .mark-small-label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+  .chip { width: 40px; height: 40px; border-radius: 9px; flex: none; display: grid; place-items: center; position: relative; overflow: hidden; }
+  .wordmark { font-size: clamp(26px, 4vw, 34px); line-height: 1; display: inline-flex; align-items: baseline; }
+
+  .detail { padding: clamp(22px, 3vw, 32px); display: flex; flex-direction: column; gap: 22px; }
+  .detail-head h3 { font-size: clamp(21px, 3vw, 27px); letter-spacing: -0.015em; margin-bottom: 6px; }
+  .detail-head .gloss { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+  .detail p.rationale { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.62; max-width: 60ch; }
+  .detail p.rationale b { color: var(--ink); font-weight: 600; }
+  .tags { display: flex; flex-wrap: wrap; gap: 7px; }
+  .tag { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line-strong); border-radius: 100px; padding: 4px 10px; }
+  .blockgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  @media (max-width: 560px) { .blockgrid { grid-template-columns: 1fr; } }
+  .subhead { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); margin-bottom: 10px; }
+  .swatches { display: flex; gap: 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+  .swatches .sw { flex: 1; height: 52px; }
+  .swatchmeta { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .swrow { display: flex; align-items: center; gap: 9px; font-size: 12px; }
+  .swrow .dotc { width: 11px; height: 11px; border-radius: 3px; flex: none; border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); }
+  .swrow .role { color: var(--muted); min-width: 68px; }
+  .swrow .hex { font-family: var(--mono); font-size: 11.5px; color: var(--ink); text-transform: uppercase; letter-spacing: 0.02em; }
+  .typespec { display: flex; flex-direction: column; gap: 14px; }
+  .typerow .label { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+  .typerow .name { font-size: 15px; color: var(--ink); font-weight: 600; }
+  .typerow .name .role2 { color: var(--muted); font-weight: 400; font-size: 13px; }
+  .typesample-serif { font-family: var(--serif); font-size: 20px; letter-spacing: -0.01em; }
+  .typesample-sans { font-family: var(--sans); font-size: 18px; font-weight: 650; letter-spacing: -0.01em; }
+  .typesample-mono { font-family: var(--mono); font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .usebox { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .usebox { grid-template-columns: 1fr; } }
+  .usecell { border-top: 1px solid var(--line); padding-top: 12px; }
+  .usecell .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 5px; }
+  .usecell .v { font-size: 13.5px; color: var(--muted); line-height: 1.5; }
+  .usecell .v b { color: var(--ink); font-weight: 600; }
+
+  /* mark-specific */
+  .quotemark { font-family: var(--serif); font-weight: 600; font-size: 78px; line-height: 0.7; letter-spacing: -0.02em; color: var(--d-ink); }
+  .quotemark .q { color: var(--d-primary); }
+  .wm-quote { font-family: var(--serif); font-weight: 600; font-style: italic; letter-spacing: -0.01em; color: var(--d-ink); }
+  .wm-quote .q { color: var(--d-primary); font-style: normal; }
+
+  .genderbars { display: flex; gap: 8px; align-items: flex-end; }
+  .genderbars i { width: 18px; border-radius: 6px; display: block; }
+  .genderlabels { display: flex; gap: 8px; margin-top: 10px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.62; }
+  .genderlabels span { width: 18px; text-align: center; }
+  .wm-gender { font-family: var(--sans); font-weight: 750; letter-spacing: -0.02em; color: var(--d-ink); display: inline-flex; align-items: center; gap: 8px; }
+  .wm-gender .g3 { display: inline-flex; gap: 4px; }
+  .wm-gender .g3 i { width: 7px; height: 14px; border-radius: 3px; }
+
+  .wm-fokus { font-family: var(--sans); font-weight: 700; letter-spacing: -0.02em; color: var(--d-ink); display: inline-flex; align-items: baseline; }
+  .wm-fokus .fp { color: var(--d-primary); }
+
+  .wm-faden { font-family: var(--serif); font-style: italic; font-weight: 600; letter-spacing: -0.005em; color: var(--d-ink); position: relative; padding-bottom: 6px; border-bottom: 2.5px solid var(--d-primary); }
+
+  .wm-stempel { font-family: var(--sans); font-weight: 800; letter-spacing: -0.01em; color: var(--d-ink); display: inline-flex; align-items: center; gap: 10px; }
+
+  .matrixwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+  table.matrix { border-collapse: collapse; width: 100%; min-width: 640px; }
+  table.matrix th, table.matrix td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--line); }
+  table.matrix thead th { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); font-weight: 500; }
+  table.matrix tbody th { font-weight: 600; font-size: 14.5px; letter-spacing: -0.01em; }
+  table.matrix tbody th .g { display: block; font-family: var(--mono); font-size: 11px; color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0.02em; margin-top: 2px; }
+  table.matrix tr:last-child td, table.matrix tr:last-child th { border-bottom: none; }
+  .meter { display: inline-flex; gap: 4px; }
+  .meter i { width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); }
+  .meter i.on { background: var(--ink); }
+  .swrail { display: inline-flex; gap: 4px; }
+  .swrail i { width: 14px; height: 14px; border-radius: 4px; border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent); }
+
+  .close { margin-top: clamp(44px, 6vw, 72px); border-top: 1px solid var(--line); padding-top: clamp(28px, 4vw, 40px); }
+  .close h2 { font-size: clamp(22px, 3vw, 30px); letter-spacing: -0.018em; margin-bottom: 14px; }
+  .shortlist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+  @media (max-width: 720px) { .shortlist { grid-template-columns: 1fr; } }
+  .slcard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  .slcard .n { font-family: var(--mono); font-size: 11px; color: var(--faint); letter-spacing: 0.1em; text-transform: uppercase; }
+  .slcard h4 { margin: 8px 0 6px; font-size: 16px; letter-spacing: -0.01em; }
+  .slcard p { margin: 0; font-size: 13.5px; color: var(--muted); line-height: 1.55; }
+  .foot { margin-top: 40px; font-family: var(--mono); font-size: 11.5px; color: var(--faint); letter-spacing: 0.04em; }
+
+  .fade { opacity: 0; transform: translateY(14px); animation: rise 0.6s cubic-bezier(0.2,0.7,0.2,1) forwards; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fade { animation: none; opacity: 1; transform: none; } }
+</style>
+
+<div class="page">
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="toprow">
+      <p class="eyebrow">Identity Exploration · Genauly</p>
+      <p class="eyebrow">Vol. II · directions 06–10</p>
+    </div>
+    <h1 class="title">Five more, from a <span class="accentword">different</span> angle.</h1>
+    <p class="lede">
+      Volume I drew precision as an object: a period, a level, a target. This set goes after the parts of
+      German learning that are <strong>harder to fake</strong>: its punctuation, its grammar, its idioms, its
+      paperwork. Each mark still says <strong>genau</strong>, but from a place a generic language app cannot reach.
+      Same five-part spec per direction: mark, palette, type, and where it wins.
+    </p>
+  </header>
+
+  <!-- ============ 06 — GÄNSEFÜSSCHEN ============ -->
+  <div class="sectionlead"><span class="num">06</span><h2>„Genau" — the spoken word, in quotes</h2></div>
+  <div class="card fade" style="--d-paper:#F5F0E7; --d-ink:#17150F; --d-primary:#EC2E6B; --d-accent:#0FB5A6; --d-support:#F7C9D8;">
+    <div class="lab">
+      <span class="lab-code">mark / typographic · German quotes</span>
+      <div class="stage">
+        <div class="quotemark"><span class="q">„</span>G<span class="q">"</span></div>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-paper)"><span style="font-family:var(--serif);font-weight:700;font-size:26px;color:var(--d-ink);line-height:0.7"><span style="color:var(--d-primary)">„</span>G<span style="color:var(--d-primary)">"</span></span></span>
+        <span class="chip" style="background:var(--d-ink)"><span style="font-family:var(--serif);font-weight:700;font-size:26px;color:var(--d-paper);line-height:0.7"><span style="color:var(--d-primary)">„</span>G<span style="color:var(--d-primary)">"</span></span></span>
+        <span class="mark-small-label">favicon · on dark</span>
+      </div>
+      <div class="wordmark"><span class="wm-quote"><span class="q">„</span>Genauly<span class="q">"</span></span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>„Genau"</h3><span class="gloss">the low-high German quotation marks</span></div>
+      <p class="rationale">
+        German does not use plain "quotes". It uses <b>Gänsefüßchen</b>: a mark low, a mark high, „like this".
+        Almost no brand outside Germany uses them, so they are instantly ownable and instantly correct to anyone
+        who knows the language. Wrapping the G says the quiet part out loud: this is the app where you finally get
+        to <b>say "Genau"</b> and mean it. Warm, conversational, and unmistakably native.
+      </p>
+      <div class="tags"><span class="tag">Typographic</span><span class="tag">Conversational</span><span class="tag">Very German</span><span class="tag">Zero-cost mark</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Ink & Magenta</div>
+          <div class="swatches">
+            <div class="sw" style="background:#17150F"></div><div class="sw" style="background:#F5F0E7"></div><div class="sw" style="background:#EC2E6B"></div><div class="sw" style="background:#0FB5A6"></div><div class="sw" style="background:#F7C9D8"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#17150F"></span><span class="role">Ink</span><span class="hex">#17150F</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F5F0E7"></span><span class="role">Cream</span><span class="hex">#F5F0E7</span></div>
+            <div class="swrow"><span class="dotc" style="background:#EC2E6B"></span><span class="role">Magenta</span><span class="hex">#EC2E6B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#0FB5A6"></span><span class="role">Teal</span><span class="hex">#0FB5A6</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F7C9D8"></span><span class="role">Blush</span><span class="hex">#F7C9D8</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-serif" style="font-style:italic">Instrument Serif</div><div class="name">Instrument Serif <span class="role2">· high-contrast display</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:600">Hanken Grotesk</div><div class="name">Hanken Grotesk <span class="role2">· clean, readable</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A <b>friendly, verbal, human</b> brand that celebrates actually speaking. Great social presence.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Quote marks are tiny at favicon size. The G carrier keeps it legible, do not drop it.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 07 — DER DIE DAS ============ -->
+  <div class="sectionlead"><span class="num">07</span><h2>Der·Die·Das — grammar as a color system</h2></div>
+  <div class="card fade" style="--d-paper:#F3F3EF; --d-ink:#151719; --d-primary:#2F6BFF; --d-accent:#F0483C; --d-support:#12A66B;">
+    <div class="lab">
+      <span class="lab-code">mark / systemic · tri-color</span>
+      <div class="stage">
+        <div style="display:flex;flex-direction:column;align-items:center">
+          <div class="genderbars">
+            <i style="height:38px;background:#2F6BFF"></i>
+            <i style="height:56px;background:#F0483C"></i>
+            <i style="height:46px;background:#12A66B"></i>
+          </div>
+          <div class="genderlabels"><span>der</span><span>die</span><span>das</span></div>
+        </div>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-paper);gap:2px;display:flex;align-items:flex-end;padding:8px 7px">
+          <i style="width:6px;height:14px;border-radius:2px;background:#2F6BFF"></i><i style="width:6px;height:22px;border-radius:2px;background:#F0483C"></i><i style="width:6px;height:18px;border-radius:2px;background:#12A66B"></i>
+        </span>
+        <span class="chip" style="background:var(--d-ink);gap:2px;display:flex;align-items:flex-end;padding:8px 7px">
+          <i style="width:6px;height:14px;border-radius:2px;background:#2F6BFF"></i><i style="width:6px;height:22px;border-radius:2px;background:#F0483C"></i><i style="width:6px;height:18px;border-radius:2px;background:#12A66B"></i>
+        </span>
+        <span class="mark-small-label">favicon · on dark</span>
+      </div>
+      <div class="wordmark"><span class="wm-gender">Genauly <span class="g3"><i style="background:#2F6BFF"></i><i style="background:#F0483C"></i><i style="background:#12A66B"></i></span></span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Der·Die·Das</h3><span class="gloss">masculine, feminine, neuter, one color each</span></div>
+      <p class="rationale">
+        The single hardest thing in German is <b>gender</b>, and the mark turns that pain into the identity. Three
+        articles, three colors, always in the same order: der (blue), die (red), das (green). It is not just a logo,
+        it is a <b>system you use inside the product</b>, colour-coding every noun so learners absorb gender by
+        sight. No other language app can borrow this, because no other language needs it this badly.
+      </p>
+      <div class="tags"><span class="tag">Systemic</span><span class="tag">Teaching-first</span><span class="tag">Ownable</span><span class="tag">Useful in-app</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · The three genders</div>
+          <div class="swatches">
+            <div class="sw" style="background:#2F6BFF"></div><div class="sw" style="background:#F0483C"></div><div class="sw" style="background:#12A66B"></div><div class="sw" style="background:#151719"></div><div class="sw" style="background:#F3F3EF"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#2F6BFF"></span><span class="role">der / blue</span><span class="hex">#2F6BFF</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F0483C"></span><span class="role">die / red</span><span class="hex">#F0483C</span></div>
+            <div class="swrow"><span class="dotc" style="background:#12A66B"></span><span class="role">das / green</span><span class="hex">#12A66B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#151719"></span><span class="role">Ink</span><span class="hex">#151719</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F3F3EF"></span><span class="role">Paper</span><span class="hex">#F3F3EF</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-sans" style="font-weight:750;letter-spacing:-0.03em">Schibsted Grotesk</div><div class="name">Schibsted Grotesk <span class="role2">· confident, neutral</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">Figtree</div><div class="name">Figtree <span class="role2">· soft, legible</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">Making the brand and the <b>core teaching mechanic one and the same</b>. Strongest product tie-in.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Three loud colors need a strict neutral around them, or it turns into confetti.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 08 — FOKUS ============ -->
+  <div class="sectionlead"><span class="num">08</span><h2>Fokus — German, brought into focus</h2></div>
+  <div class="card fade" style="--d-paper:#ECECEE; --d-ink:#16181C; --d-primary:#E8A54B; --d-accent:#3B4048; --d-support:#C9CCD1;">
+    <div class="lab">
+      <span class="lab-code">mark / premium · aperture</span>
+      <div class="stage">
+        <svg width="48%" viewBox="0 0 100 100" fill="none" aria-hidden="true" stroke-linejoin="round" stroke-linecap="round">
+          <circle cx="50" cy="50" r="45" stroke="var(--d-accent)" stroke-width="2"/>
+          <line x1="65" y1="50" x2="82.2" y2="77" stroke="var(--d-ink)" stroke-width="2.6"/>
+          <line x1="57.5" y1="63" x2="42.7" y2="91.4" stroke="var(--d-ink)" stroke-width="2.6"/>
+          <line x1="42.5" y1="63" x2="10.5" y2="64.4" stroke="var(--d-ink)" stroke-width="2.6"/>
+          <line x1="35" y1="50" x2="17.8" y2="23" stroke="var(--d-ink)" stroke-width="2.6"/>
+          <line x1="42.5" y1="37" x2="57.3" y2="8.6" stroke="var(--d-ink)" stroke-width="2.6"/>
+          <line x1="57.5" y1="37" x2="89.5" y2="35.6" stroke="var(--d-ink)" stroke-width="2.6"/>
+          <polygon points="65,50 57.5,63 42.5,63 35,50 42.5,37 57.5,37" fill="var(--d-primary)" stroke="var(--d-ink)" stroke-width="2.6"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-ink)">
+          <svg width="28" viewBox="0 0 100 100" fill="none" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="65,50 57.5,63 42.5,63 35,50 42.5,37 57.5,37" fill="var(--d-primary)"/>
+            <line x1="65" y1="50" x2="80" y2="74" stroke="var(--d-paper)" stroke-width="4"/>
+            <line x1="35" y1="50" x2="20" y2="26" stroke="var(--d-paper)" stroke-width="4"/>
+            <line x1="42.5" y1="63" x2="27" y2="88" stroke="var(--d-paper)" stroke-width="4"/>
+            <line x1="57.5" y1="37" x2="73" y2="12" stroke="var(--d-paper)" stroke-width="4"/>
+          </svg>
+        </span>
+        <span class="chip" style="background:var(--d-primary)">
+          <svg width="28" viewBox="0 0 100 100" fill="none" stroke-linejoin="round" aria-hidden="true">
+            <polygon points="65,50 57.5,63 42.5,63 35,50 42.5,37 57.5,37" fill="var(--d-ink)"/>
+          </svg>
+        </span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span class="wm-fokus">Genau<span class="fp">·</span>ly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Fokus</h3><span class="gloss">the aperture closing to a precise point</span></div>
+      <p class="rationale">
+        A camera aperture: six blades resolving to one clean opening, the exact moment a blurred thing snaps sharp.
+        That is the promise, taking the fog of intermediate German and <b>bringing it into focus</b>. This is the
+        most premium, most grown-up direction, a graphite-and-brass palette that reads like a precision instrument
+        or a good camera. It signals quality and seriousness without a single word.
+      </p>
+      <div class="tags"><span class="tag">Premium</span><span class="tag">Photographic</span><span class="tag">Sophisticated</span><span class="tag">Geometric</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Graphite & Brass</div>
+          <div class="swatches">
+            <div class="sw" style="background:#16181C"></div><div class="sw" style="background:#ECECEE"></div><div class="sw" style="background:#E8A54B"></div><div class="sw" style="background:#3B4048"></div><div class="sw" style="background:#C9CCD1"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#16181C"></span><span class="role">Blue-black</span><span class="hex">#16181C</span></div>
+            <div class="swrow"><span class="dotc" style="background:#ECECEE"></span><span class="role">Silver</span><span class="hex">#ECECEE</span></div>
+            <div class="swrow"><span class="dotc" style="background:#E8A54B"></span><span class="role">Brass</span><span class="hex">#E8A54B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#3B4048"></span><span class="role">Graphite</span><span class="hex">#3B4048</span></div>
+            <div class="swrow"><span class="dotc" style="background:#C9CCD1"></span><span class="role">Fog</span><span class="hex">#C9CCD1</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display / UI</div><div class="typesample-sans" style="letter-spacing:-0.03em">Geist Sans</div><div class="name">Geist Sans <span class="role2">· precise, modern</span></div></div>
+            <div class="typerow"><div class="label">Data / caption</div><div class="typesample-mono">Geist Mono</div><div class="name">Geist Mono <span class="role2">· technical companion</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A <b>premium, paid-feeling</b> product. The most "serious software" of all ten.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Coolest and least playful. The Neuland game would need a warm counter-palette.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 09 — ROTER FADEN ============ -->
+  <div class="sectionlead"><span class="num">09</span><h2>Roter Faden — the through-line</h2></div>
+  <div class="card fade" style="--d-paper:#F4EFE6; --d-ink:#1B1813; --d-primary:#D83A2C; --d-accent:#243044; --d-support:#E3D3BE;">
+    <div class="lab">
+      <span class="lab-code">mark / minimal · one continuous stroke</span>
+      <div class="stage">
+        <svg width="52%" viewBox="0 0 100 100" fill="none" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M71.4 32 A28 28 0 1 0 71.4 68 L71.4 52 L56 52" stroke="var(--d-primary)" stroke-width="5"/>
+          <path d="M71.4 32 C 80 26 88 30 92 23" stroke="var(--d-primary)" stroke-width="5"/>
+          <circle cx="92" cy="23" r="3.6" fill="var(--d-primary)"/>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-paper)">
+          <svg width="30" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M71.4 32 A28 28 0 1 0 71.4 68 L71.4 52 L56 52" stroke="var(--d-primary)" stroke-width="7"/>
+          </svg>
+        </span>
+        <span class="chip" style="background:var(--d-ink)">
+          <svg width="30" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M71.4 32 A28 28 0 1 0 71.4 68 L71.4 52 L56 52" stroke="var(--d-primary)" stroke-width="7"/>
+          </svg>
+        </span>
+        <span class="mark-small-label">favicon · on dark</span>
+      </div>
+      <div class="wordmark"><span class="wm-faden">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Roter Faden</h3><span class="gloss">the red thread that ties it together</span></div>
+      <p class="rationale">
+        <b>Roter Faden</b> is the German idiom for the guiding thread, the through-line that makes a story hold
+        together. The mark is exactly that: a single unbroken red stroke that loops into a G and trails off into a
+        needle-end, one continuous line of progress. It is the most restrained, most confident direction here, the
+        kind of mark that ages well because there is almost nothing to date it.
+      </p>
+      <div class="tags"><span class="tag">Minimal</span><span class="tag">Idiom-rooted</span><span class="tag">Timeless</span><span class="tag">Single-stroke</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Thread on paper</div>
+          <div class="swatches">
+            <div class="sw" style="background:#1B1813"></div><div class="sw" style="background:#F4EFE6"></div><div class="sw" style="background:#D83A2C"></div><div class="sw" style="background:#243044"></div><div class="sw" style="background:#E3D3BE"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#1B1813"></span><span class="role">Ink</span><span class="hex">#1B1813</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F4EFE6"></span><span class="role">Paper</span><span class="hex">#F4EFE6</span></div>
+            <div class="swrow"><span class="dotc" style="background:#D83A2C"></span><span class="role">Thread</span><span class="hex">#D83A2C</span></div>
+            <div class="swrow"><span class="dotc" style="background:#243044"></span><span class="role">Navy</span><span class="hex">#243044</span></div>
+            <div class="swrow"><span class="dotc" style="background:#E3D3BE"></span><span class="role">Linen</span><span class="hex">#E3D3BE</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-serif" style="font-style:italic">Newsreader</div><div class="name">Newsreader <span class="role2">· literary serif</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">Figtree</div><div class="name">Figtree <span class="role2">· quiet, modern</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A <b>calm, editorial, timeless</b> brand. The safest to grow into over years.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Understated by design. It needs strong photography or type around it to feel rich.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 10 — STEMPEL ============ -->
+  <div class="sectionlead"><span class="num">10</span><h2>Stempel — approved, genehmigt, correct</h2></div>
+  <div class="card fade" style="--d-paper:#F1ECE0; --d-ink:#1C1A17; --d-primary:#B5372B; --d-accent:#2E3A66; --d-support:#DED3BE;">
+    <div class="lab">
+      <span class="lab-code">mark / characterful · official stamp</span>
+      <div class="stage">
+        <svg width="50%" viewBox="0 0 100 100" fill="none" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">
+          <g transform="rotate(-7 50 50)">
+            <circle cx="50" cy="50" r="44" stroke="var(--d-primary)" stroke-width="3.4"/>
+            <circle cx="50" cy="50" r="33" stroke="var(--d-primary)" stroke-width="1.6"/>
+            <circle cx="50" cy="50" r="38.5" stroke="var(--d-primary)" stroke-width="3" stroke-dasharray="1.6 4.2"/>
+            <path d="M37 51 L46 61 L65 38" stroke="var(--d-primary)" stroke-width="5.5"/>
+          </g>
+        </svg>
+      </div>
+      <div class="markrow">
+        <span class="chip" style="background:var(--d-paper)">
+          <svg width="30" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <g transform="rotate(-7 50 50)"><circle cx="50" cy="50" r="42" stroke="var(--d-primary)" stroke-width="6"/><path d="M35 51 L46 63 L67 36" stroke="var(--d-primary)" stroke-width="8"/></g>
+          </svg>
+        </span>
+        <span class="chip" style="background:var(--d-primary)">
+          <svg width="30" viewBox="0 0 100 100" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <g transform="rotate(-7 50 50)"><circle cx="50" cy="50" r="42" stroke="#fff" stroke-width="6"/><path d="M35 51 L46 63 L67 36" stroke="#fff" stroke-width="8"/></g>
+          </svg>
+        </span>
+        <span class="mark-small-label">favicon · on brand</span>
+      </div>
+      <div class="wordmark"><span class="wm-stempel" style="color:var(--d-primary)">Genauly</span></div>
+    </div>
+    <div class="detail">
+      <div class="detail-head"><h3>Stempel</h3><span class="gloss">the satisfying thud of the approval stamp</span></div>
+      <p class="rationale">
+        German bureaucracy runs on the <b>Stempel</b>, the official stamp that means genehmigt, approved, done. It
+        is the enemy every learner meets at the Amt, so this direction flips it: the stamp is now <b>your</b> mark
+        of getting it right, pressed slightly off-angle like the real thing, check in the middle. It ties straight
+        into the app's Behörden and Amt content, and it is the most characterful, most memorable option of the set.
+      </p>
+      <div class="tags"><span class="tag">Characterful</span><span class="tag">Ties to Behörde content</span><span class="tag">Memorable</span><span class="tag">Satisfying</span></div>
+      <div class="blockgrid">
+        <div>
+          <div class="subhead">Palette · Stamp & Document</div>
+          <div class="swatches">
+            <div class="sw" style="background:#1C1A17"></div><div class="sw" style="background:#F1ECE0"></div><div class="sw" style="background:#B5372B"></div><div class="sw" style="background:#2E3A66"></div><div class="sw" style="background:#DED3BE"></div>
+          </div>
+          <div class="swatchmeta">
+            <div class="swrow"><span class="dotc" style="background:#1C1A17"></span><span class="role">Ink</span><span class="hex">#1C1A17</span></div>
+            <div class="swrow"><span class="dotc" style="background:#F1ECE0"></span><span class="role">Document</span><span class="hex">#F1ECE0</span></div>
+            <div class="swrow"><span class="dotc" style="background:#B5372B"></span><span class="role">Stamp red</span><span class="hex">#B5372B</span></div>
+            <div class="swrow"><span class="dotc" style="background:#2E3A66"></span><span class="role">Amtsblau</span><span class="hex">#2E3A66</span></div>
+            <div class="swrow"><span class="dotc" style="background:#DED3BE"></span><span class="role">Manila</span><span class="hex">#DED3BE</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="subhead">Typography</div>
+          <div class="typespec">
+            <div class="typerow"><div class="label">Display</div><div class="typesample-sans" style="font-weight:800;letter-spacing:-0.02em">Bricolage Grotesque</div><div class="name">Bricolage Grotesque <span class="role2">· characterful</span></div></div>
+            <div class="typerow"><div class="label">Body / UI</div><div class="typesample-sans" style="font-weight:500">IBM Plex Sans</div><div class="name">IBM Plex Sans <span class="role2">· administrative, precise</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="usebox">
+        <div class="usecell"><div class="k">Best for</div><div class="v">A brand with <b>personality and a wink</b>, built around the daily-life / Amt content.</div></div>
+        <div class="usecell"><div class="k">Watch-out</div><div class="v">Strong flavor. It commits hard to "German life", less so to pure exam prep.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ COMPARISON ============ -->
+  <div class="sectionlead"><span class="num">—</span><h2>Side by side</h2></div>
+  <div class="matrixwrap fade">
+    <table class="matrix">
+      <thead><tr><th>Direction</th><th>Palette</th><th>Warmth</th><th>Formality</th><th>Ownability</th><th>Build effort</th></tr></thead>
+      <tbody>
+        <tr>
+          <th>„Genau" <span class="g">spoken, in quotes</span></th>
+          <td><span class="swrail"><i style="background:#17150F"></i><i style="background:#F5F0E7"></i><i style="background:#EC2E6B"></i><i style="background:#0FB5A6"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i></i><i></i><i></i></span></td>
+        </tr>
+        <tr>
+          <th>Der·Die·Das <span class="g">grammar as color</span></th>
+          <td><span class="swrail"><i style="background:#2F6BFF"></i><i style="background:#F0483C"></i><i style="background:#12A66B"></i><i style="background:#151719"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+        </tr>
+        <tr>
+          <th>Fokus <span class="g">into focus</span></th>
+          <td><span class="swrail"><i style="background:#16181C"></i><i style="background:#ECECEE"></i><i style="background:#E8A54B"></i><i style="background:#3B4048"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+        </tr>
+        <tr>
+          <th>Roter Faden <span class="g">the through-line</span></th>
+          <td><span class="swrail"><i style="background:#1B1813"></i><i style="background:#F4EFE6"></i><i style="background:#D83A2C"></i><i style="background:#243044"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i></i><i></i><i></i></span></td>
+        </tr>
+        <tr>
+          <th>Stempel <span class="g">approved, correct</span></th>
+          <td><span class="swrail"><i style="background:#1C1A17"></i><i style="background:#F1ECE0"></i><i style="background:#B5372B"></i><i style="background:#2E3A66"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+          <td><span class="meter"><i class="on"></i><i class="on"></i><i></i><i></i></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ============ CLOSE ============ -->
+  <div class="close">
+    <h2>Ten on the table. Three I'd shortlist.</h2>
+    <p class="lede" style="margin-top:6px">
+      Across both volumes, the directions that are truly <strong>un-copyable</strong>, the ones a generic app
+      literally cannot use, are the German-native ones. If I had to hand you a shortlist to decide between, it
+      would be these three:
+    </p>
+    <div class="shortlist">
+      <div class="slcard"><div class="n">Vol II · 07</div><h4>Der·Die·Das</h4><p>The boldest bet. The brand and the hardest teaching problem become one system. Highest ceiling.</p></div>
+      <div class="slcard"><div class="n">Vol I · 05</div><h4>Neuland</h4><p>The best story. Unifies brand, app, and the game you are already building into one world.</p></div>
+      <div class="slcard"><div class="n">Vol II · 10</div><h4>Stempel</h4><p>The most memorable. Turns German bureaucracy, your daily-life content, into the joke that lands.</p></div>
+    </div>
+    <p class="lede" style="margin-top:24px">
+      Mixing is on the table too. <strong>Der·Die·Das color</strong> under a <strong>Roter Faden mark</strong>, or
+      the <strong>Fokus palette</strong> with the <strong>„Genau" wordmark</strong>, are both real options. Tell me
+      which mark and which palette speak to you and I will lock one spec, wire the tokens into the app, and
+      regenerate every icon.
+    </p>
+    <p class="foot">Genauly identity exploration · Vol. II · directions 06–10 · concepts rendered live · 2026-07-13</p>
+  </div>
+
+</div>
+</div>
+</body>
+</html>
