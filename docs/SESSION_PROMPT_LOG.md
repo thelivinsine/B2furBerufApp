@@ -962,3 +962,30 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   errors), test:unit 142/142, build, check:bundle 79.6 kB.
 - **Artifacts:** `src/features/collocations/CollocationGraph.tsx` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
   PR #527 (`b71617a`) + the toggle follow-up PR.
+
+## Entry 391 — 2026-07-14 (session 119, account-dropdown z-index bug fix)
+
+- **Branch:** `claude/account-settings-dropdown-icons-b8feg6`. **Model:** Opus 4.8.
+- **Prompt (verbatim):**
+  > [screenshot attached] there seems to be a bug with the account settings dropdown and the icons. fix it
+- **Attachment:** phone screenshot of a Bibliothek Kollokationen page with the account menu open; the
+  page's browse toolbar (ViewSwitcher icons + search magnifier) is bleeding through the dropdown's
+  DESIGN theme-toggle row.
+- **Response summary:** Diagnosed it as a z-index stacking bug, not transparency (the dropdown bg is
+  opaque `bg-surface`). The app header (`AppShell.tsx`, `sticky top-0 z-20`, a stacking context via its
+  `backdrop-blur`) and the sticky Bibliothek browse toolbar (`browseHeaderClass` in
+  `src/features/shared/browseScroll.tsx`, `sticky ... z-20`) were both `z-20`; equal z-index resolves by
+  DOM order, and the toolbar comes later, so it painted over the account dropdown wherever the dropdown
+  overflows below the header (the dropdown's `z-50` is scoped inside the header context, so it can't win
+  against a sibling context). Fix: raise the header to `z-30`, one-line className change, still below
+  FeedbackPill `z-40` / Toaster `z-50` / bottom nav `z-[55]/[60]` and non-overlapping with the desktop
+  sidebar `z-30`. `pnpm build` green. Committed, opened PR #529, squash-merged to `main`, ran the
+  post-merge branch realignment.
+- **Artifacts:** `src/components/layout/AppShell.tsx` · PR #529 (`9a51e27`).
+- **Follow-up prompt (verbatim):**
+  > document the session
+- **Follow-up response:** Updated `docs/PROJECT_STATUS.md` (`_Last updated_` block + new session-119
+  handoff; aged session 117's handoff into the W29 archive per the doc-hygiene rule) and appended this
+  prompt-log entry.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/SESSION_PROMPT_LOG.md`.

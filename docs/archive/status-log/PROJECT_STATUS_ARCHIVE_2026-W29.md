@@ -78,3 +78,25 @@ palette (direction 03) applied to the app.
 - **Next:** waiting on the founder to hand back **SVG + final hex codes**; then wire the tokens
   (light+dark) + regenerate logo/favicons/PWA icons.
 - **Gates:** none run (docs + PDF only).
+
+## Session 117 (2026-07-14) — Üben navigation + Bibliothek Üben-button copy (condensed handoff)
+
+**Handoff after session 117 (2026-07-14). Üben navigation + Bibliothek Üben-button copy (Opus 4.8),
+on branch `claude/uben-session-navigation-q4pfs0`. Two small, self-contained founder fixes; both
+shipped to `main`.**
+- **(1) Exit-returns-to-origin.** `SessionPlayer` (`src/features/session/SessionPlayer.tsx`) added an
+  `exit()` helper: `(window.history.state?.idx ?? 0) > 0 ? navigate(-1) : navigate("/")`. Every Üben
+  entry point pushes a history entry (`navigate("/session?...")` from the Bibliothek trainers, Heute →
+  `UebenPath`, Grammatik lessons, `Analytics`, `Sammlung`), so `navigate(-1)` lands back on the exact
+  prior route with its filters/scroll intact; a deep link or fresh load (history idx 0) falls back to
+  `/`. Wired into all three exit paths (empty-state button, done-screen "Zurück", exit-confirm
+  "Beenden"); the two "Zur Übersicht" labels became "Zurück".
+- **(2) Count in the Üben button.** `UebenLabel` (`src/features/shared/browseScroll.tsx`) now takes
+  optional `count` + `noun` and renders "Üben mit {count} {noun}". The four Bibliothek trainers
+  (`VocabularyTrainer`, `CollocationsBrowser`, `RedemittelTrainer`, `GrammarHub`) pass the filtered
+  count with the correct **dative** noun (Wörtern / Kollokationen / Wendungen / Themen; singular
+  fallbacks) at BOTH the desktop rail footer and the mobile sticky bar, and dropped the separate
+  stacked count block (+ the `count` prop from each `filterRailProps`). `FilterRail`'s `count`/
+  `countStack` are now unused but kept as an optional no-op API. Verified headless at 1280 + 390 wide.
+- **Gates:** `pnpm typecheck` / `build` / `lint` (0 errors) / `test:unit` (134/134) all green. No
+  content or engine changes, so no `lint:content` / `test:srs` impact.
