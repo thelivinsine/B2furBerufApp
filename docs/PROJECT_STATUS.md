@@ -1,16 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-14 (session 118). **Kollokationen nodal graph shipped (Opus 4.8), on branch
-`claude/kollokations-nodal-graph-080jt7`.** Added a Graph view to the Bibliothek Kollokationen tab
-(parity with Wörter, reversing the old "graph stays Wörter-only" scoping): a **bipartite noun ↔ verb**
-force-directed canvas of the filtered collocation list, built to look striking fully zoomed out (theme
-islands, cached glow sprites, curved edges, vignette). Model + layout confirmed with the founder before
-building. New files: `lib/graphPalette.ts` (shared domain palette, lifted out of WordGraph),
-`collocations/collocationGraph.ts` (pure builder) + `tests/collocationGraph.test.ts`,
-`collocations/CollocationGraph.tsx` (lazy renderer); wired into `CollocationsBrowser.tsx`. All gates
-green (typecheck, lint 0 errors, test:unit 142/142, build, check:bundle main 79.5 kB, browser-verified
-light+dark, desktop+mobile). (Parallel session 117 shipped Üben-exit navigation + Üben-button copy,
-already on `main`.) Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-14 (session 119). **Account-dropdown z-index bug fixed (Opus 4.8), shipped to
+`main` (PR #529).** On the Bibliothek browse pages the account menu dropdown had the page's sticky
+browse toolbar (ViewSwitcher icons + search) bleeding through its DESIGN row. Root cause: the app
+header and that toolbar (`browseHeaderClass`) were both `z-20` stacking contexts, and the toolbar
+paints later in DOM order, so it beat the dropdown (whose `z-50` is scoped inside the header context).
+Fix: raise the header to `z-30` (one-line className change in `AppShell.tsx`), still below FeedbackPill
+`z-40` / Toaster `z-50` / bottom nav `z-[55]/[60]` and non-overlapping with the desktop sidebar `z-30`.
+`pnpm build` green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -64,6 +61,27 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 119 (2026-07-14). Account-dropdown z-index bug fix (Opus 4.8), on branch
+`claude/account-settings-dropdown-icons-b8feg6`, shipped to `main` (PR #529, squash-merged).** A
+one-line founder bug fix.
+- **Symptom (founder screenshot):** on a Bibliothek browse page (e.g. Kollokationen), opening the
+  account menu showed the page's toolbar (the `ViewSwitcher` icons + the search magnifier) painting on
+  top of the dropdown's **DESIGN** theme-toggle row. The dropdown background is opaque, so it was not a
+  transparency issue.
+- **Root cause:** the app header (`AppShell.tsx`, `sticky top-0 z-20`, a stacking context via its
+  `backdrop-blur`) and the sticky Bibliothek browse toolbar (`browseHeaderClass` in
+  `src/features/shared/browseScroll.tsx`, `sticky ... z-20`) were **both `z-20`**. Equal z-index →
+  paint order decides, and the toolbar comes later in DOM order, so it painted over the account
+  dropdown wherever the dropdown overflows below the header. The dropdown's own `z-50` only applies
+  inside the header's stacking context, so it could not beat the sibling toolbar.
+- **Fix:** header `z-20` → `z-30` (`src/components/layout/AppShell.tsx`). Layer order stays correct:
+  header/dropdown now above the browse toolbar (`z-20`) but still below FeedbackPill (`z-40`), Toaster
+  (`z-50`), and the mobile bottom nav (`z-[55]`/`z-[60]`); the desktop sidebar (also `z-30`) never
+  overlaps the header spatially (header lives inside `lg:pl-64`). Bonus: makes the intended "toolbar
+  slides under the header on scroll" behavior a real z-order instead of a DOM-order coincidence.
+- **Gates:** `pnpm build` green (only gate relevant to a className change; no content/engine/type
+  impact). Live verification (Actions tab + `*.github.io`) is the founder's, per the usual note.
+
 **Handoff after session 118 (2026-07-14). Kollokationen nodal graph (Opus 4.8), on branch
 `claude/kollokations-nodal-graph-080jt7`.** Shipped a Graph view for the Bibliothek **Kollokationen**
 tab, matching the Wörter graph's slot but purpose-built for collocations.
@@ -101,29 +119,9 @@ tab, matching the Wörter graph's slot but purpose-built for collocations.
 - **Possible follow-ups if the founder wants:** stronger island separation (raise centroid strength /
   ring radius), a "focus a theme" tap on the domain legend that recenters, or an Üben hook from the card.
 
-**Handoff after session 117 (2026-07-14). Üben navigation + Bibliothek Üben-button copy (Opus 4.8),
-on branch `claude/uben-session-navigation-q4pfs0`. Two small, self-contained founder fixes; both
-shipped to `main`.**
-- **(1) Exit-returns-to-origin.** `SessionPlayer` (`src/features/session/SessionPlayer.tsx`) added an
-  `exit()` helper: `(window.history.state?.idx ?? 0) > 0 ? navigate(-1) : navigate("/")`. Every Üben
-  entry point pushes a history entry (`navigate("/session?...")` from the Bibliothek trainers, Heute →
-  `UebenPath`, Grammatik lessons, `Analytics`, `Sammlung`), so `navigate(-1)` lands back on the exact
-  prior route with its filters/scroll intact; a deep link or fresh load (history idx 0) falls back to
-  `/`. Wired into all three exit paths (empty-state button, done-screen "Zurück", exit-confirm
-  "Beenden"); the two "Zur Übersicht" labels became "Zurück".
-- **(2) Count in the Üben button.** `UebenLabel` (`src/features/shared/browseScroll.tsx`) now takes
-  optional `count` + `noun` and renders "Üben mit {count} {noun}". The four Bibliothek trainers
-  (`VocabularyTrainer`, `CollocationsBrowser`, `RedemittelTrainer`, `GrammarHub`) pass the filtered
-  count with the correct **dative** noun (Wörtern / Kollokationen / Wendungen / Themen; singular
-  fallbacks) at BOTH the desktop rail footer and the mobile sticky bar, and dropped the separate
-  stacked count block (+ the `count` prop from each `filterRailProps`). `FilterRail`'s `count`/
-  `countStack` are now unused but kept as an optional no-op API. Verified headless at 1280 + 390 wide.
-- **Gates:** `pnpm typecheck` / `build` / `lint` (0 errors) / `test:unit` (134/134) all green. No
-  content or engine changes, so no `lint:content` / `test:srs` impact.
-
-_(Session 116's branding-redesign-support handoff (Cobalt & Butter previews + the AI mockup guide) and
-session 115's demo-readiness-sweep handoff are now in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 113's brand-identity-exploration
+_(Session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
+handoff (Cobalt & Butter previews + the AI mockup guide) and session 115's demo-readiness-sweep handoff
+are now in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 113's brand-identity-exploration
 handoff (the 20-direction catalogue) is also in W29. Session 114's Theorie pill-animation +
 dark-mode contrast handoff, session 113's Theorie tab-transition/compass/feedback-pill polish handoff,
 session 112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff, session 111's handoff
