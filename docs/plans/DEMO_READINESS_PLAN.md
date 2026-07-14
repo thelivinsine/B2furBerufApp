@@ -41,7 +41,18 @@ can spam the founder's inbox via Resend).
 
 ## P0 — must land before the demo
 
-### - [ ] Chunk 1: Runtime smoke test of the demo path — **Sonnet 5**
+### - [x] Chunk 1: Runtime smoke test of the demo path — **Opus 4.8** ✅ s115
+
+Done. Playwright over `pnpm preview` of the production build, **4 combos** (390×844 mobile +
+1440×900 desktop) × (light + dark), **28 routes each** plus a cold-start onboarding pass and a
+core-interaction pass (played session blocks, played mission scenes, toggled filter-rail facets +
+reset, opened the Graph view, opened a Grammatik lesson). **Result: a completely clean sweep** —
+zero uncaught console errors, zero error boundaries, zero blank pages, zero dead routes, zero
+horizontal overflow. Cold start correctly gates fresh storage `/` → `/welcome` → `/start`. All
+old-route redirects land with params preserved (`/vocabulary`, `/collocations`, `/redemittel`,
+`/grammar`), `/anwenden` + `/welt` still resolve, and junk `?`-params (`mission`/`grammar`/`cefr`/
+`sector`) all fall back gracefully. Scripts in the session scratchpad (`smoke.mjs`/`interact.mjs`),
+not the repo. **No punch list produced** (nothing broke), so Chunk 4 had no fixes to apply.
 
 Playwright (pre-installed Chromium at `/opt/pw-browsers/chromium`, do not `playwright install`)
 against `pnpm preview` of the production build. Script it in the session scratchpad, not the
@@ -146,7 +157,17 @@ founder's inbox, or hammer the sign-in. This adds a speed limit to the feedback 
 re-verifies that each user's data is only accessible to that user. Total cost stays capped: the
 AI writing coach already has daily and monthly spending limits.*
 
-### - [ ] Chunk 4: Demo-visible UI polish — **Sonnet 5**
+### - [x] Chunk 4: Demo-visible UI polish — **Opus 4.8** ✅ s115
+
+Done. Reviewed Chunk 1's screenshots of every demo-visible screen in **light + dark, mobile +
+desktop**: Dashboard (Lernen map + Spielen), Theorie all tabs incl. Graph + Grammatik lesson,
+filter rail open/facet/reset, Fortschritt (fresh account), Sammlung (fresh), a mission scene, a
+composed-session block, and the mobile filter tile + sticky Üben bar. **No blemishes found:** nav
+labels consistent post-rename (Praktisch/Theorie/Fortschritt/Einstellungen), no em dashes in any
+visible string, dark mode solid on every non-game surface (missions correctly light-only, hub
+theme-aware, both left as designed), empty states clean, no horizontal scroll anywhere. The
+in-session "Feedback geben" pill and the hidden Anwenden nav row are both by-design, not defects.
+Nothing structural touched the night before the demo. **No code changes required.**
 
 Only screens the audience will actually see; use Chunk 1's screenshots as the punch list.
 Checks, per the locked rules in `CLAUDE.md`:
@@ -165,7 +186,17 @@ Checks, per the locked rules in `CLAUDE.md`:
 flaws (wrong label, awkward wording, a dark-mode glitch, a misaligned card) so nothing looks
 unfinished on the projector. No redesigns, only touch-ups.*
 
-### - [ ] Chunk 5: Demo runbook + both demo states — **Sonnet 5** (same session as Chunk 4)
+### - [x] Chunk 5: Demo runbook + both demo states — **Opus 4.8** ✅ s115
+
+Done. Wrote **`docs/DEMO_RUNBOOK.md`**: pre-flight checklist (merge to `main` + deploy
+`submit-feedback` + confirm `RESEND_API_KEY`), device prep (hard-refresh / close-reopen-twice to
+beat the auto-update SW), the two demo states (recommended manual seed = 2–3 sessions + missions
+1.1–1.2 the evening before, cloud-sync-portable; clean incognito profile for onboarding), the
+happy-path tour order (landing/onboarding → seeded Dashboard Lernen → Spielen mission → Theorie
+filters + Graph → Fortschritt → feedback-button closer), failure fallbacks (local-only PWA cache,
+hotspot backup, feedback still stored if email fails), a known-rough-edges steer-around list
+(none broken; only the two by-design items), and the founder console checklist. Reflects the
+Chunk 1/4/6 findings (all clean).
 
 Write `docs/DEMO_RUNBOOK.md`:
 
@@ -199,7 +230,15 @@ screens to show, and what to do if the network or backend misbehaves mid-present
 
 ## P1 — do if time remains before the demo
 
-### - [ ] Chunk 6: Performance sanity on the preview build — **Sonnet 5**
+### - [x] Chunk 6: Performance sanity on the preview build — **Opus 4.8** ✅ s115
+
+Done. `pnpm check:bundle` = **79.5 kB / 400 kB** main chunk (no content bank leaked eager). The
+big banks are correctly in lazy chunks (vocabulary 540 kB, collocations 232 kB, Sources 1.46 MB
+all separate). Throttled-load pass (Playwright CDP, ~1.6 Mbps + 4× CPU) on `/`, `/library`,
+`/library?view=graph`, `/welt`, `/sammlung`: **first meaningful paint ~3.3–3.5s** on every route,
+acceptable for conference wifi, then instant from the ~5.4 MB background precache. Lazy-chunk spot
+check (Graph, SpielenHub/`/welt`, Sammlung, session) all loaded on demand with **no error flash**
+(the Chunk 1 interaction pass exercised each and logged zero errors).
 
 - Confirm no content bank leaked into the eager path (build output: the main chunk must stay
   ~80 kB; the check is automated but eyeball the chunk graph once).
