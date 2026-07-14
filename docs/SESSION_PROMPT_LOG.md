@@ -976,6 +976,16 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   translucent rounded pill (11px/600). Verified headless (fit→hub framing, precise node-drag, zoomed-out
   tap): labels legible, gentle zoom, node moves + stays, zero console errors. Gates: typecheck, lint (0
   errors), test:unit 142/142, build, check:bundle 79.6 kB. (Session 118 follow-up, PR #532.)
+- **Follow-up prompt (verbatim):**
+  > document the session
+- **Follow-up response:** This documentation pass. The session was documented incrementally across the
+  three PRs (#527 graph, #528 shape toggle, #532 drag+labels); this final pass verifies coherence and
+  logs this prompt. Also refreshed `CLAUDE.md` (Kollokationen Graph paragraph: toggle, drag-pin,
+  `focusNode`/`READABLE_K`, collision-culled label pills) and the session-118 `PROJECT_STATUS.md`
+  handoff (graph + both follow-ups). NB two parallel same-day sessions (117 Üben-nav, 119
+  account-dropdown) landed on `main` while this ran; each was rebased through and this session was
+  renumbered 117→**118** to avoid the collision.
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md` · `docs/PROJECT_STATUS.md` · `CLAUDE.md`.
 
 ## Entry 391 — 2026-07-14 (session 119, account-dropdown z-index bug fix)
 
