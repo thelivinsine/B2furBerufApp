@@ -1048,3 +1048,41 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   `src/data/frequency.ts` · `scripts/vendor/*subset.json` · `docs/reports/verify-facts-report.md` ·
   `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · PR #530.
+
+---
+
+## Session 121 — 2026-07-14 — Merge the `arbeitswelt` domain into `beruf`
+
+**Branch:** `claude/berufsleben-arbeitsumfeld-overlap-itmpeg` · **Model:** Opus 4.8 · **Attachments:** none
+
+- **Prompt 1 (verbatim):**
+  > what's the difference between berufsleben and arbeitsumfeld categories in the graph? they both seem
+  > like they hve same color and are also redundant to a learner.
+- **Response 1 (question, no code change):** Explained that these are two of the taxonomy **domains**
+  (`src/data/domains.ts`), which the Bibliothek graph views color nodes by. `beruf` ("Berufsleben",
+  indigo `#5b5be6`) grouped the 6 communication-heavy workplace themes (meetings, scheduling, logistics,
+  customer, conflict, project); `arbeitswelt` ("Arbeitswelt & Umfeld", violet `#8b5cf6`) grouped the 4
+  topical ones (technology, sustainability, safety, travel). Confirmed both founder observations: the
+  two colors are ~30° apart and read as one on the dense graph, and the comms-vs-topics split is a
+  taxonomist's cut invisible to learners (the German labels are near-synonyms). Offered merge vs.
+  keep-but-differentiate; recommended merge given the branch name.
+- **Prompt 2 (verbatim):**
+  > merge
+- **Response 2:** Merged `arbeitswelt` into `beruf` across 6 code sites + CLAUDE.md. Dropped the
+  `arbeitswelt` entry from `domains.ts`; retagged technology/sustainability/safety/travel to
+  `domain: "beruf"` in `themes.ts` (all 10 workplace themes now in `beruf`); removed the `arbeitswelt`
+  color from `graphPalette.ts`; removed `"arbeitswelt"` from the `DomainId` union (`types/index.ts`) and
+  `DOMAIN_IDS` (`lint-content.mjs`); set the Büro building rollup to `domains: ["beruf"]`
+  (`domain-buildings.tsx`). `themeGroupsForMode` is data-driven, so the library primary dropdown
+  re-groups with no code change. Gates: `lint:content` OK, `typecheck` OK, `build` OK, `test:unit`
+  142/142. Opened PR #535, squash-merged to `main`, ran the post-merge branch realignment.
+- **Artifacts:** `src/data/domains.ts` · `src/data/themes.ts` · `src/lib/graphPalette.ts` ·
+  `src/types/index.ts` · `scripts/lint-content.mjs` · `src/components/city/domain-buildings.tsx` ·
+  `CLAUDE.md` · PR #535 (`d4393da`).
+- **Follow-up prompt (verbatim):**
+  > document the session
+- **Follow-up response:** Updated `docs/PROJECT_STATUS.md` (`_Last updated_` block + the content-banks
+  domain count + a new session-121 handoff; aged session 119's z-index-fix handoff into the W29 archive
+  per the doc-hygiene rule) and appended this prompt-log entry.
+- **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/SESSION_PROMPT_LOG.md`.

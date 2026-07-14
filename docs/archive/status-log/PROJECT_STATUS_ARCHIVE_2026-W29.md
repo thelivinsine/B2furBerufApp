@@ -120,3 +120,26 @@ Bibliothek **Kollokationen** tab, matching the Wörter graph's slot but purpose-
   snapping them back); selecting a node **frames it at a gentle `READABLE_K=1.55`** (`focusNode`,
   replacing the too-strong `k=2.8` hub jump); canvas **labels are collision-culled onto translucent
   pills** so they stay legible. All verified headless; gates green.
+
+## Session 119 (2026-07-14) — Account-dropdown z-index bug fix (condensed handoff)
+
+**Handoff after session 119 (2026-07-14). Account-dropdown z-index bug fix (Opus 4.8), on branch
+`claude/account-settings-dropdown-icons-b8feg6`, shipped to `main` (PR #529, squash-merged).** A
+one-line founder bug fix.
+- **Symptom (founder screenshot):** on a Bibliothek browse page (e.g. Kollokationen), opening the
+  account menu showed the page's toolbar (the `ViewSwitcher` icons + the search magnifier) painting on
+  top of the dropdown's **DESIGN** theme-toggle row. The dropdown background is opaque, so it was not a
+  transparency issue.
+- **Root cause:** the app header (`AppShell.tsx`, `sticky top-0 z-20`, a stacking context via its
+  `backdrop-blur`) and the sticky Bibliothek browse toolbar (`browseHeaderClass` in
+  `src/features/shared/browseScroll.tsx`, `sticky ... z-20`) were **both `z-20`**. Equal z-index →
+  paint order decides, and the toolbar comes later in DOM order, so it painted over the account
+  dropdown wherever the dropdown overflows below the header. The dropdown's own `z-50` only applies
+  inside the header's stacking context, so it could not beat the sibling toolbar.
+- **Fix:** header `z-20` → `z-30` (`src/components/layout/AppShell.tsx`). Layer order stays correct:
+  header/dropdown now above the browse toolbar (`z-20`) but still below FeedbackPill (`z-40`), Toaster
+  (`z-50`), and the mobile bottom nav (`z-[55]`/`z-[60]`); the desktop sidebar (also `z-30`) never
+  overlaps the header spatially (header lives inside `lg:pl-64`). Bonus: makes the intended "toolbar
+  slides under the header on scroll" behavior a real z-order instead of a DOM-order coincidence.
+- **Gates:** `pnpm build` green (only gate relevant to a className change; no content/engine/type
+  impact). Live verification (Actions tab + `*.github.io`) is the founder's, per the usual note.
