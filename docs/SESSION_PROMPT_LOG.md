@@ -945,3 +945,20 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   `src/features/collocations/CollocationGraph.tsx` (new) · `tests/collocationGraph.test.ts` (new) ·
   `src/features/collocations/CollocationsBrowser.tsx` · `src/features/vocabulary/WordGraph.tsx` ·
   `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`.
+- **Follow-up prompt (verbatim):**
+  > Okay looks good. merge to main. can you add a toggle button to change the shape of the pop up tile
+  > on the graph? it should either occupy the width of the graph horizontally or height of graph window.
+  > the pop up tile should not be like how it is currently. when the pop up tile is being toggled, the
+  > graph should refocus itself to center. [...] also, the new toggle button should be beside the close button.
+- **Follow-up response:** Squash-merged the graph to `main` (PR #527, `b71617a`; rebased first, resolving
+  parallel-session-117 doc collisions — main's Üben-nav work — by renumbering this session to **118**),
+  then ran the post-merge realignment. Then added the card **shape toggle**: `CollocationGraph` gained a
+  `cardLayout` state (`horizontal` full-width bottom bar, default | `vertical` full-height right panel),
+  a `PanelRight`/`PanelBottom` toggle button placed beside the card's close `X`, and refactored the old
+  `fitToNodes` into `fitToRect` + `freeRect`/`cardExtent` so toggling re-fits the constellation into the
+  area the card leaves free (the "refocus to center" ask); the card became a flex column with a
+  scrollable body (partner-chip cap removed). Verified headless: both shapes render, the graph
+  re-centers on toggle, light+dark, desktop+mobile, zero console errors. Gates: typecheck, lint (0
+  errors), test:unit 142/142, build, check:bundle 79.6 kB.
+- **Artifacts:** `src/features/collocations/CollocationGraph.tsx` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  PR #527 (`b71617a`) + the toggle follow-up PR.

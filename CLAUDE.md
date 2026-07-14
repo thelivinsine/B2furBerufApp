@@ -242,8 +242,12 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   to form glowing **theme islands**, tuned to look striking fully zoomed out (fit-to-all on open, cached
   radial glow sprites, curved gradient-tinted edges, vignette background, nouns = solid discs / verbs =
   rings). The domain palette is shared via `lib/graphPalette.ts`; the selected-node card is bipartite
-  (tap a noun → its verbs, tap a verb → its nouns). The d3-force dep rides ONLY in the two lazy graph
-  chunks (shared `vendor-misc`, React.lazy); main chunk stays ~80 kB.
+  (tap a noun → its verbs, tap a verb → its nouns) and has a **shape toggle beside its close button**
+  (s118): the card is either a full-width bar along the bottom (`horizontal`, default) or a full-height
+  panel down the right (`vertical`); toggling re-fits the constellation into the area the card leaves
+  free via `fitToRect`/`freeRect` (`cardExtent` keeps the fit math in lockstep with the card's CSS
+  size). The d3-force dep rides ONLY in the two lazy graph chunks (shared `vendor-misc`, React.lazy);
+  main chunk stays ~80 kB.
   **Desktop filter rail (s91):** on lg+ the browse tabs are an **explicit 2-col × 2-row grid**
   (`lg:grid-cols-[minmax(0,1fr)_16rem]`, `lg:gap-y-4 lg:space-y-0`): the LibrarySwitcher tabs +
   view-switcher meta row sit in **row 1 / col 1 (content-column width, NOT full width)**, and the content
