@@ -4819,3 +4819,31 @@ Branch: `claude/whats-next-esga9u`.
   `preview/branding/genauly-identity-vol2.html` · `preview/branding/genauly-identity-vol3.html` ·
   `preview/branding/README.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md` (PR #516).
+
+## Entry 387 — 2026-07-14 (session 115, finish the remaining Demo-readiness sweep chunks)
+
+- **Branch:** `claude/predemo-sweep-tasks-25oejy` (Opus 4.8)
+- **Prompt (verbatim):**
+  > what other tasks are remaining in predemo sweep plan? finish them off and check if the whole plan's tasks are well done or not.
+- **Response summary:** Identified the pre-demo sweep plan as `docs/plans/DEMO_READINESS_PLAN.md` and
+  the open chunks as P0 Chunk 1 (smoke test), Chunk 4 (UI polish), Chunk 5 (runbook) and P1 Chunk 6
+  (perf); Chunks 2+3 were already done s112. **Chunk 1:** built + previewed the production bundle and
+  ran a Playwright sweep (installed `playwright` in the scratchpad, Chromium at
+  `/opt/pw-browsers/chromium-1194`) over 4 combos (390×844 + 1440×900 × light + dark), 28 routes each,
+  plus a cold-start onboarding pass and a core-interaction pass (session blocks, mission scenes,
+  filter-rail facet+reset, Graph view, Grammatik lesson). **Completely clean:** zero console errors,
+  error boundaries, blank pages, dead routes, or horizontal overflow; redirects preserve params;
+  `/anwenden`+`/welt` resolve; junk `?`-params fall back. **Chunk 4:** reviewed screenshots of every
+  demo-visible screen (light+dark, mobile+desktop) — no blemishes, no em dashes, dark mode solid,
+  clean empty states; no code changes needed. **Chunk 5:** wrote `docs/DEMO_RUNBOOK.md` (device prep,
+  two demo states, tour order, failure fallbacks, founder console checklist; flags the required
+  `supabase functions deploy submit-feedback`). **Chunk 6:** main chunk 79.5 kB/400; throttled
+  (1.6 Mbps/4× CPU) first paint ~3.3–3.5s on `/`, `/library`, Graph, `/welt`, `/sammlung`; lazy chunks
+  load without an error flash. Verdict: the whole P0+P1 plan is now done and well-executed; only the
+  explicitly next-week P2 items (full `/security-review`, post-demo feedback triage) remain. Checked
+  off Chunks 1/4/5/6 in the plan with findings, and ran all 9 gates green (typecheck, lint 0 err/44
+  warn, lint:content, test:unit 134/134, test:srs 323, test:pronounce 26, build+prerender,
+  check:bundle, audit 0 vulns). Doc-only session; no source touched.
+- **Artifacts:** `docs/DEMO_RUNBOOK.md` (new) · `docs/plans/DEMO_READINESS_PLAN.md` (Chunks 1/4/5/6
+  checked off + findings) · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`
+  (s113 + s114 handoffs moved in) · `docs/SESSION_PROMPT_LOG.md`.

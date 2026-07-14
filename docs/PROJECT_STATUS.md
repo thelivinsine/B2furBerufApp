@@ -1,12 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-13 (session 114). **Theorie pill animation robustness + dark-mode contrast
-(Opus 4.8):** the tab bar and view switcher animated their active pill with framer's `layoutId`
-mount/unmount crossfade, which stuttered against the trainer re-render; replaced it with a single
-always-mounted pill measured to the active segment (new `useSlidingPill` hook) that glides on a pure
-transform. Also lifted dark `--primary` `68%→74%` so purple eyebrows/tab labels/`text-primary` links
-clear WCAG AA on the dark background. Pushed to `claude/theroie-toggle-animation-t5c86i` (not yet
-merged). All gates green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-14 (session 115). **Demo-readiness sweep finished (Opus 4.8):** completed the
+last open chunks of `docs/plans/DEMO_READINESS_PLAN.md` (P0 Chunks 1/4/5, P1 Chunk 6). A Playwright
+smoke test over the production preview (mobile + desktop × light + dark × 28 routes + core
+interactions) came back completely clean (no console errors, error boundaries, dead routes, blank
+pages, or horizontal overflow), so Chunk 4 had no blemishes to fix. Perf sanity: main chunk 79.5 kB,
+throttled first paint ~3.3–3.5s, lazy chunks load without error flash. Wrote `docs/DEMO_RUNBOOK.md`.
+The whole plan (P0 + P1) is now done; only the explicitly next-week P2 items (full security review,
+post-demo feedback triage) remain. All 9 gates green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -60,10 +61,33 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 115 (2026-07-14). Demo-readiness sweep finished (Opus 4.8), on branch
+`claude/predemo-sweep-tasks-25oejy`.** Closed the remaining open chunks of
+`docs/plans/DEMO_READINESS_PLAN.md`: P0 Chunk 1 (smoke test), Chunk 4 (UI polish), Chunk 5 (runbook),
+and P1 Chunk 6 (perf). Chunks 2+3 were already done s112. **The whole P0+P1 plan is now complete.**
+- **Chunk 1 — smoke test (clean sweep):** Playwright over `pnpm preview`, 4 combos (390×844 mobile +
+  1440×900 desktop) × (light + dark), 28 routes each + cold-start onboarding + a core-interaction pass
+  (session blocks, mission scenes, filter-rail facet+reset, Graph view, Grammatik lesson). Zero
+  console errors, zero error boundaries, zero blank pages, zero dead routes, zero horizontal overflow.
+  Redirects preserve params; `/anwenden`+`/welt` resolve; junk `?`-params fall back. Scripts in the
+  session scratchpad, not the repo.
+- **Chunk 4 — UI polish:** reviewed screenshots of every demo-visible screen (light+dark, mobile+
+  desktop). No blemishes: consistent nav labels, no em dashes, dark mode solid (missions light-only +
+  hub theme-aware both by design), clean empty states, no overflow. **No code changes needed.**
+- **Chunk 5 — runbook:** wrote `docs/DEMO_RUNBOOK.md` (device prep, two demo states, tour order,
+  failure fallbacks, founder console checklist). **Founder must run `supabase functions deploy
+  submit-feedback`** for the s112 feedback rate-limit to go live (no migration/secret needed).
+- **Chunk 6 — perf:** main chunk 79.5 kB/400; throttled (1.6 Mbps/4× CPU) first paint ~3.3–3.5s on
+  `/`, `/library`, Graph, `/welt`, `/sammlung`; lazy chunks load without an error flash.
+- **Only doc changes** this session (`DEMO_READINESS_PLAN.md` checkboxes + findings, new
+  `DEMO_RUNBOOK.md`, this status + the prompt log). No source touched. All 9 gates green.
+- **Remaining (P2, next week, not demo-blocking):** full `/security-review` pass (Opus/Fable) and
+  post-demo feedback triage from the `public.feedback` table.
+
 **Handoff after session 113 (2026-07-13). Brand identity exploration (Opus 4.8), on branch
-`claude/branding-logo-redesign-947e61`, merged to `main` (PR #516). Parallel to the Theorie work below;
-no app code changed.** The founder wants to replace the branding (logo, visual assets, colour scheme):
-the current gradient rounded-square "G" reads as a Canva lookalike. Deliverable = a **catalogue of 20
+`claude/branding-logo-redesign-947e61`, merged to `main` (PR #516). Parallel to the demo work; no app
+code changed.** The founder wants to replace the branding (logo, visual assets, colour scheme): the
+current gradient rounded-square "G" reads as a Canva lookalike. Deliverable = a **catalogue of 20
 logo/identity directions** for founder review, saved under `preview/branding/` (open the HTML files in
 a browser; index in that folder's `README.md`).
 - **What was produced:** three self-contained HTML "studio spec-sheet" pages, each direction a live
@@ -81,37 +105,9 @@ a browser; index in that folder's `README.md`).
   as private Claude artifacts (Vol. I `fed14c61`, II `02c0d954`, III `dc5d3da7`).
 - **Gates:** none run (no code change); docs + preview HTML only.
 
-**Handoff after session 114 (2026-07-13). Theorie pill animation robustness + dark-mode purple
-contrast (Opus 4.8), on branch `claude/theroie-toggle-animation-t5c86i` — pushed, NOT yet merged
-(commit `688bd0d`; asked the founder before opening a PR).** Follow-up to s113's tab-slide work,
-fixing the *pill* jerk specifically (s113 fixed the content-panel slide; the pill glide was still
-stuttering). No logic/data change.
-- **Pill animation (the real fix):** both `LibrarySwitcher` (tab bar) and `ViewSwitcher` (Tabelle/
-  Graph/Karten/Liste) animated their active pill with framer's `layoutId` **shared-layout crossfade** —
-  the pill rendered ONLY on the active segment (`{active && <motion.span layoutId=…/>}`), so each switch
-  unmounted the old pill + mounted a new one, forcing framer to re-measure both and cross-fade. On the
-  library tabs the same click also renders a whole trainer (walks a content bank), so that measurement
-  competed for the main thread and the pill stuttered. Replaced with new
-  **`src/features/shared/useSlidingPill.ts`**: ONE always-mounted pill measured to the active segment
-  from the live DOM (`offsetLeft`/`offsetWidth`, re-measured on active change + `ResizeObserver`,
-  positioned pre-paint via `useLayoutEffect`), animating only `x`/`width` (compositor-friendly transform
-  for the equal-width segments), decoupled from the rest of the frame. Robust to gaps/padding/responsive/
-  unequal widths. If you touch either switcher, keep the single-pill pattern; do NOT reintroduce the
-  per-segment `layoutId` crossfade.
-- **Dark-mode purple contrast:** dark `--primary` was `245 80% 68%` (~4.3:1 on the dark bg, under the
-  WCAG AA 4.5:1 floor for the small bold uppercase eyebrows / active-tab labels / `text-primary` links);
-  lifted to `245 84% 74%` (~5.6:1), `--ring` matched. Primary-as-button-fill unaffected (its dark
-  `primary-foreground` text only gains contrast).
-- **Verified in Chromium** (playwright-core, seeded onboarded localStorage, light + dark at 900×700): pill
-  lands pixel-accurately on both the first (Wörter) and far (Grammatik) tabs, ViewSwitcher pill correct,
-  purple labels/links clearly legible in dark, no light-mode regression.
-- **Files:** `src/features/shared/useSlidingPill.ts` (new) · `src/features/library/LibrarySwitcher.tsx` ·
-  `src/features/shared/ViewSwitcher.tsx` · `src/index.css`.
-- **Gates:** typecheck ✔; build+prerender ✔; test:unit 134/134; check:bundle 79.5 kB/400.
-
-_(Session 113's Theorie tab-transition + compass-icon + feedback-pill polish handoff (PRs
-#506/#509/#511/#512), session 112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff,
-session 111's handoff
+_(Session 114's Theorie pill-animation + dark-mode contrast handoff, session 113's Theorie
+tab-transition/compass/feedback-pill polish handoff, session 112's Demo-readiness Chunks 2+3 handoff,
+its P2 content-accuracy handoff, session 111's handoff
 (demo-readiness plan authored + baseline verified) and sessions 85-110's
 handoffs, plus the s104 Üben-map round + Bibliothek pre-demo round, are in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,

@@ -1965,3 +1965,34 @@ top of this. Moved out of `PROJECT_STATUS.md` Resume-here in s113-branding per t
   `src/features/{vocabulary,collocations,redemittel,grammar}/*` + `grammar/GrammarTopicView.tsx` (removed
   in-tree `LibrarySwitcher`) · `src/components/layout/FeedbackButton.tsx`.
 - **Gates:** typecheck; lint 0 err/44 warn; test:unit 134/134; build+prerender; check:bundle 79.5 kB/400.
+
+---
+
+**Handoff after session 114 (2026-07-13). Theorie pill animation robustness + dark-mode purple
+contrast (Opus 4.8), on branch `claude/theroie-toggle-animation-t5c86i` — pushed, NOT yet merged
+(commit `688bd0d`; asked the founder before opening a PR).** Follow-up to s113's tab-slide work,
+fixing the *pill* jerk specifically (s113 fixed the content-panel slide; the pill glide was still
+stuttering). No logic/data change. (Moved out of `PROJECT_STATUS.md` Resume-here in s115 per the
+two-handoff rule.)
+- **Pill animation (the real fix):** both `LibrarySwitcher` (tab bar) and `ViewSwitcher` (Tabelle/
+  Graph/Karten/Liste) animated their active pill with framer's `layoutId` **shared-layout crossfade** —
+  the pill rendered ONLY on the active segment (`{active && <motion.span layoutId=…/>}`), so each switch
+  unmounted the old pill + mounted a new one, forcing framer to re-measure both and cross-fade. On the
+  library tabs the same click also renders a whole trainer (walks a content bank), so that measurement
+  competed for the main thread and the pill stuttered. Replaced with new
+  **`src/features/shared/useSlidingPill.ts`**: ONE always-mounted pill measured to the active segment
+  from the live DOM (`offsetLeft`/`offsetWidth`, re-measured on active change + `ResizeObserver`,
+  positioned pre-paint via `useLayoutEffect`), animating only `x`/`width` (compositor-friendly transform
+  for the equal-width segments), decoupled from the rest of the frame. Robust to gaps/padding/responsive/
+  unequal widths. If you touch either switcher, keep the single-pill pattern; do NOT reintroduce the
+  per-segment `layoutId` crossfade.
+- **Dark-mode purple contrast:** dark `--primary` was `245 80% 68%` (~4.3:1 on the dark bg, under the
+  WCAG AA 4.5:1 floor for the small bold uppercase eyebrows / active-tab labels / `text-primary` links);
+  lifted to `245 84% 74%` (~5.6:1), `--ring` matched. Primary-as-button-fill unaffected (its dark
+  `primary-foreground` text only gains contrast).
+- **Verified in Chromium** (playwright-core, seeded onboarded localStorage, light + dark at 900×700): pill
+  lands pixel-accurately on both the first (Wörter) and far (Grammatik) tabs, ViewSwitcher pill correct,
+  purple labels/links clearly legible in dark, no light-mode regression.
+- **Files:** `src/features/shared/useSlidingPill.ts` (new) · `src/features/library/LibrarySwitcher.tsx` ·
+  `src/features/shared/ViewSwitcher.tsx` · `src/index.css`.
+- **Gates:** typecheck ✔; build+prerender ✔; test:unit 134/134; check:bundle 79.5 kB/400.
