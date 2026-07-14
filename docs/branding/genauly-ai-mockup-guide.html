@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Genauly · AI Mockup Generation Guide</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm; }
+  :root{
+    --cobalt:#2B4FE0; --butter:#FFC24D; --coral:#FF6B54; --sky:#CBD8FF;
+    --ink:#111318; --cream:#F3F0E7; --sub:#5b5e6a; --line:#e3ddce; --panel:#f7f4ec;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{margin:0;font-family:"Segoe UI",-apple-system,system-ui,Helvetica,Arial,sans-serif;color:var(--ink);line-height:1.5;font-size:10.5pt}
+  h1,h2,h3{letter-spacing:-.01em;line-height:1.15}
+  h2{font-size:16pt;margin:0 0 3mm;padding-bottom:2mm;border-bottom:2px solid var(--cobalt)}
+  h3{font-size:11.5pt;margin:5mm 0 1.5mm;color:var(--cobalt)}
+  p{margin:0 0 2.5mm}
+  a{color:var(--cobalt);text-decoration:none}
+  code{font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;font-size:9pt;background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:0 3px}
+  .muted{color:var(--sub)}
+  section{page-break-inside:auto}
+  .page-break{page-break-before:always}
+  ul{margin:0 0 3mm;padding-left:5mm}
+  li{margin-bottom:1mm}
+
+  /* Cover */
+  .cover{height:calc(100vh - 40mm);display:flex;flex-direction:column;justify-content:center;page-break-after:always}
+  .cover .kick{font-size:10pt;letter-spacing:.22em;text-transform:uppercase;color:var(--sub);font-weight:700}
+  .cover h1{font-size:34pt;margin:4mm 0 3mm;max-width:16cm}
+  .cover h1 .c{color:var(--cobalt)} .cover h1 .b{color:#d69a1e} .cover h1 .r{color:var(--coral)}
+  .cover .lede{font-size:12pt;color:var(--sub);max-width:15cm}
+  .swrail{display:flex;gap:0;margin:8mm 0 0;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+  .swrail div{flex:1;height:16mm;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2mm;font-size:7.5pt;font-weight:700}
+  .cover .meta{margin-top:8mm;font-size:9pt;color:var(--sub)}
+
+  /* boxes */
+  .prompt{background:#0e1017;color:#e9e6df;border-radius:6px;padding:4mm 5mm;margin:2mm 0 4mm;font-family:"SFMono-Regular",Consolas,monospace;font-size:8.6pt;line-height:1.55;white-space:pre-wrap;page-break-inside:avoid}
+  .prompt .lbl{display:block;color:#8fd0ff;font-weight:700;margin-bottom:2mm;font-size:8pt;letter-spacing:.04em;text-transform:uppercase}
+  .prompt .neg{color:#ff9b8a}
+  .note{background:var(--panel);border-left:3px solid var(--butter);border-radius:4px;padding:3mm 4mm;margin:3mm 0;font-size:9.6pt}
+  .callout{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:4mm;margin:3mm 0}
+
+  /* tables */
+  table{width:100%;border-collapse:collapse;margin:2mm 0 4mm;font-size:9pt}
+  th,td{text-align:left;padding:2mm 2.5mm;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--panel);font-size:8pt;text-transform:uppercase;letter-spacing:.04em;color:var(--sub)}
+  td b{color:var(--ink)}
+  .tag{display:inline-block;font-size:7.5pt;font-weight:700;padding:.5mm 2mm;border-radius:3px;background:var(--sky);color:#1e3a8a}
+  .tag.free{background:#dcfce7;color:#166534}.tag.paid{background:#fee2e2;color:#991b1b}.tag.svg{background:#fef3c7;color:#92400e}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
+  .toc{columns:2;column-gap:8mm;font-size:10pt}
+  .toc a{display:block;margin-bottom:1.5mm}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="cover">
+  <div class="kick">Genauly · Branding redesign</div>
+  <h1>How to generate your own <span class="c">mockups</span> with <span class="r">AI</span></h1>
+  <p class="lede">A practical toolkit: which AI tools to use for logos, app screens and icons, plus copy-paste prompts tuned to Genauly and the Cobalt / Butter / Coral palette. Generate, pick what you love, hand it back to be built into the real app.</p>
+  <div class="swrail">
+    <div style="background:#2B4FE0;color:#fff">Cobalt<br>2B4FE0</div>
+    <div style="background:#FFC24D;color:#3a2f12">Butter<br>FFC24D</div>
+    <div style="background:#FF6B54;color:#fff">Coral<br>FF6B54</div>
+    <div style="background:#CBD8FF;color:#1e3a8a">Sky<br>CBD8FF</div>
+    <div style="background:#111318;color:#fff">Ink<br>111318</div>
+    <div style="background:#F3F0E7;color:#3a382f">Cream<br>F3F0E7</div>
+  </div>
+  <p class="meta">Genauly &mdash; German for the B1&ndash;B2 plateau &middot; internal guide &middot; v1</p>
+</section>
+
+<!-- CONTENTS -->
+<section>
+  <h2>What's inside</h2>
+  <div class="toc">
+    <a href="#brief">1 &middot; The brief (paste this into any tool first)</a>
+    <a href="#palette">2 &middot; Palette &amp; type reference</a>
+    <a href="#tools">3 &middot; Which tool for which job</a>
+    <a href="#logo">4 &middot; Prompts: logo &amp; app icon</a>
+    <a href="#screens">5 &middot; Prompts: app screens</a>
+    <a href="#icons">6 &middot; Prompts: icon set &amp; moodboard</a>
+    <a href="#restyle">7 &middot; Restyle your real screenshots</a>
+    <a href="#tips">8 &middot; Pro tips &amp; settings</a>
+    <a href="#handback">9 &middot; Handing results back to build</a>
+  </div>
+  <div class="note"><b>How to use this:</b> start with the tool table (section 3), pick a tool for the job you want, then copy the matching prompt from sections 4&ndash;7. Always paste <b>the brief (section 1)</b> first so the tool has the context and the exact colors. Generate 4&ndash;6 variations, keep what you love, then see section 9 to hand it back.</div>
+</section>
+
+<!-- 1 BRIEF -->
+<section class="page-break" id="brief">
+  <h2>1 · The brief</h2>
+  <p class="muted">Paste this block at the top of any chat-based tool (ChatGPT, Gemini, v0) or use it as the description in an image tool. It carries the product, the feeling, the exact palette, and the hard rules.</p>
+  <div class="prompt"><span class="lbl">Master brief · paste first</span>Genauly is a mobile-first web app that helps adults break through the B1&ndash;B2 German
+"plateau" and build real-life fluency for the workplace and everyday admin (Behörde,
+bank, doctor, housing), plus exam prep (telc B2 Beruf, Goethe B2). Audience: adults
+25&ndash;45 learning German as immigrants and professionals.
+
+Brand feeling: encouraging, modern, precise, a little playful. Confident but warm.
+NOT childish, NOT corporate-SaaS, NOT a generic language-app mascot.
+
+Design language:
+- FLAT color. NO gradients anywhere (not on the logo, not on buttons, not on backgrounds).
+- Bold and colorful, with crisp rounded shapes and generous spacing.
+- Solid-color fills, clean 2px line icons, strong type hierarchy.
+
+Exact palette (use only these):
+- Cobalt   #2B4FE0  primary / brand / buttons
+- Butter   #FFC24D  warm highlight
+- Coral    #FF6B54  playful accent
+- Sky      #CBD8FF  soft fill / chips
+- Ink      #111318  text
+- Cream    #F3F0E7  background
+(Keep a success-green and error-red only for status, used sparingly.)
+
+<span class="neg">Avoid: gradients, glossy 3D, bevels/embossing, drop-shadow skeuomorphism, generic
+SaaS purple, a rounded-square gradient "G" that looks like the Canva logo, stock
+blobs, neon cyberpunk, lorem ipsum text.</span></div>
+  <div class="note">The name comes from <b>genau</b> ("exactly"). If you want the mark to say something, precision / exactness / "the click of getting it right" is the core idea. A German <b>umlaut</b> (two dots) is a distinctive, ownable device if you want to lean German.</div>
+</section>
+
+<!-- 2 PALETTE -->
+<section id="palette">
+  <h2>2 · Palette &amp; type reference</h2>
+  <table>
+    <tr><th>Role</th><th>Name</th><th>Hex</th><th>Notes</th></tr>
+    <tr><td>Primary / buttons</td><td><b>Cobalt</b></td><td>#2B4FE0</td><td>The one dominant brand color. Solid fills only.</td></tr>
+    <tr><td>Warm highlight</td><td><b>Butter</b></td><td>#FFC24D</td><td>Streaks, rewards, a warm secondary. Ink text on top.</td></tr>
+    <tr><td>Playful accent</td><td><b>Coral</b></td><td>#FF6B54</td><td>Optional fun pop for badges/tags. Use sparingly.</td></tr>
+    <tr><td>Soft fill</td><td><b>Sky</b></td><td>#CBD8FF</td><td>Chip backgrounds, quiet surfaces, level tags.</td></tr>
+    <tr><td>Text</td><td><b>Ink</b></td><td>#111318</td><td>Near-black with a blue bias.</td></tr>
+    <tr><td>Background</td><td><b>Cream</b></td><td>#F3F0E7</td><td>Warm off-white ground (or keep a cool white if preferred).</td></tr>
+  </table>
+  <h3>Type pairings to try (all free / licensable)</h3>
+  <ul>
+    <li><b>Clash Display</b> (headings) + <b>Inter</b> (body) &mdash; geometric, characterful, modern.</li>
+    <li><b>Space Grotesk</b> (headings) + <b>Inter</b> &mdash; techy-precise, friendly.</li>
+    <li><b>Fraunces</b> (headings, "soft serif") + <b>Inter</b> &mdash; warmer, editorial.</li>
+    <li><b>Geist</b> (Vercel) for a clean all-in-one sans.</li>
+  </ul>
+  <p class="muted">The app currently ships Inter. Keeping Inter for body and adding one display face for headings/logo is the lowest-friction upgrade.</p>
+</section>
+
+<!-- 3 TOOLS -->
+<section class="page-break" id="tools">
+  <h2>3 · Which tool for which job</h2>
+  <p class="muted">Pick by <b>what you want to make</b> and <b>what format you need back</b>. For a logo you want a vector (SVG); for an app screen a clean image or, better, editable UI or code.</p>
+  <table>
+    <tr><th>Job</th><th>Best tools</th><th>Output</th><th>Cost</th></tr>
+    <tr><td><b>Logo &amp; wordmark</b></td><td>Recraft, Ideogram, Midjourney, ChatGPT (image)</td><td>Recraft/Ideogram export <span class="tag svg">SVG</span></td><td><span class="tag free">freemium</span></td></tr>
+    <tr><td><b>App icon (the "G" tile)</b></td><td>Recraft, Ideogram, ChatGPT</td><td>PNG 1024², SVG in Recraft</td><td><span class="tag free">freemium</span></td></tr>
+    <tr><td><b>App screen mockups</b> (as code)</td><td><b>v0.dev</b> (React+Tailwind, matches our stack)</td><td>Live React/Tailwind code</td><td><span class="tag free">freemium</span></td></tr>
+    <tr><td><b>App screen mockups</b> (as UI)</td><td>Uizard, Galileo AI, Lovable, Bolt.new</td><td>Editable UI / app</td><td><span class="tag free">freemium</span></td></tr>
+    <tr><td><b>Screenshot &rarr; editable UI</b></td><td>Figma + Visual Copilot (Builder.io), html.to.design</td><td>Editable Figma</td><td><span class="tag free">freemium</span></td></tr>
+    <tr><td><b>Icon set</b></td><td>Recraft, Midjourney, ChatGPT</td><td>SVG (Recraft) / PNG</td><td><span class="tag free">freemium</span></td></tr>
+    <tr><td><b>Moodboard / style</b></td><td>Midjourney, Krea, Leonardo</td><td>Image boards</td><td>MJ <span class="tag paid">paid</span> · Krea <span class="tag free">freemium</span></td></tr>
+    <tr><td><b>Recolor a screenshot</b></td><td>ChatGPT (GPT-4o), Gemini, Krea image-to-image</td><td>PNG</td><td><span class="tag free">freemium</span></td></tr>
+  </table>
+  <table>
+    <tr><th>Tool</th><th>Link</th><th>Why</th></tr>
+    <tr><td><b>v0.dev</b></td><td>v0.dev</td><td>Text&rarr;React+Tailwind UI. Output is <b>close to our real stack</b>, easiest to actually ship.</td></tr>
+    <tr><td><b>Recraft</b></td><td>recraft.ai</td><td>True vector/SVG output, brand-palette lock, great for logos + icon sets.</td></tr>
+    <tr><td><b>Ideogram</b></td><td>ideogram.ai</td><td>Best at rendering real <b>text/letters</b> correctly &mdash; ideal for the "Genauly" wordmark.</td></tr>
+    <tr><td><b>Midjourney</b></td><td>midjourney.com</td><td>Strongest style/aesthetic + moodboards. Raster only (concepts, not final vectors).</td></tr>
+    <tr><td><b>Uizard / Galileo</b></td><td>uizard.io · usegalileo.ai</td><td>Text&rarr;app-screen mockups, quick to explore whole flows.</td></tr>
+    <tr><td><b>ChatGPT / Gemini</b></td><td>chatgpt.com · gemini.google.com</td><td>Paste the brief + upload a screenshot to recolor or restyle conversationally.</td></tr>
+  </table>
+  <div class="note"><b>Fastest path to something buildable:</b> use <b>Recraft/Ideogram for the logo</b> and <b>v0.dev for one or two screens</b>. Both give me artifacts I can convert straight into the app (SVG + hex codes, or Tailwind classes).</div>
+</section>
+
+<!-- 4 LOGO -->
+<section class="page-break" id="logo">
+  <h2>4 · Prompts: logo &amp; app icon</h2>
+  <p class="muted">Run each in Recraft or Ideogram (both export vectors). For Midjourney, append the parameters shown. Generate 4&ndash;6, then iterate on your favourite with "same but&hellip;".</p>
+
+  <h3>4a · Wordmark "Genauly"</h3>
+  <div class="prompt"><span class="lbl">Recraft / Ideogram</span>Flat vector logotype of the word "Genauly", lowercase geometric sans-serif,
+solid cobalt #2B4FE0 letters on a cream #F3F0E7 background, tight modern letter
+spacing, one small coral #FF6B54 dot as the only accent, high contrast, crisp edges,
+no gradient, no shadow, no icon, balanced and confident. German language-learning brand.</div>
+
+  <h3>4b · Monogram / app icon (keep the "G")</h3>
+  <div class="prompt"><span class="lbl">Recraft / Ideogram</span>Flat app icon, single letter "G" in a bold geometric sans, centered on a solid
+cobalt #2B4FE0 rounded-square, white letter, NO gradient, NO bevel, NO inner shadow,
+completely flat, crisp, iOS app icon style, 1024x1024.
+
+Then generate these variants: (1) butter #FFC24D square with ink #111318 G,
+(2) ink #111318 square with butter G, (3) coral #FF6B54 square with white G,
+(4) cream square with cobalt G and a thin cobalt border.</div>
+
+  <h3>4c · Three concept directions (if you want the mark to mean something)</h3>
+  <div class="prompt"><span class="lbl">Midjourney / Recraft</span>Concept A &mdash; PRECISION: minimal flat logo mark suggesting exactness, a crisp
+target notch or a level/alignment mark, cobalt + coral, flat vector, no gradient.
+
+Concept B &mdash; UMLAUT: a letter "G" with two dots (umlaut) floating above it, the
+dots in cobalt and butter, playful-smart, unmistakably German, flat, no gradient.
+
+Concept C &mdash; BREAKTHROUGH: an upward arrow or step breaking through a flat
+horizontal "plateau" line, cobalt with a coral tip, flat geometric, no gradient.
+
+<span class="neg">--no gradient, glossy, 3d, bevel, shadow, canva, photograph  --ar 1:1 --style raw</span></div>
+  <div class="note">Ask for a <b>logo lockup sheet</b>: "show the mark at large size, as a small favicon, in one color (all cobalt), and reversed (white on ink)." That reveals whether it survives at 16px.</div>
+</section>
+
+<!-- 5 SCREENS -->
+<section class="page-break" id="screens">
+  <h2>5 · Prompts: app screens</h2>
+  <p class="muted"><b>Best in v0.dev</b> (output is React + Tailwind, our stack). Paste the master brief first, then one screen prompt. Ask for a 390px-wide mobile frame.</p>
+
+  <h3>5a · Praktisch (Dashboard / home)</h3>
+  <div class="prompt"><span class="lbl">v0.dev</span>Design a 390px-wide mobile screen for Genauly. Flat, no gradients, palette as briefed
+(cobalt buttons, cream background, butter/coral accents, ink text). Layout, top to bottom:
+- App bar: round logo tile left; a streak pill (flame + number) and a round avatar right.
+- A segmented toggle with two options "Üben" and "Spielen", the active one on a white pill.
+- A centered title "Lernpfad".
+- A card holding a simple flat illustrated city map (a few rounded landmark tiles, a
+  dotted route, a location pin labeled "Du bist hier").
+- A mission card: a small "3 / 6" badge, a title "SIM-Karte kaufen", a subtitle, and one
+  solid cobalt button "Jetzt üben" (flat, no gradient).
+- A bottom tab bar with 4 flat line icons.
+Rounded cards, crisp borders, generous spacing, playful but clean.</div>
+
+  <h3>5b · Theorie (vocabulary library)</h3>
+  <div class="prompt"><span class="lbl">v0.dev</span>Genauly mobile screen, flat, palette as briefed. A word-library browser:
+- Top: 4 tabs "Wörter / Kollokationen / Redemittel / Grammatik", active tab in cobalt.
+- A row of small view-switcher buttons and a filter + search icon.
+- A scroll list of word cards. Each card: the German word bold, a der/die/das article
+  chip color-coded (der = cobalt, die = coral, das = green), an example sentence in
+  italics, small tag chips (a CEFR level on a sky #CBD8FF chip, a theme tag).
+- A sticky bottom bar: a solid cobalt "Üben" button (flat) and a word count.
+No gradients anywhere. Colorful, friendly, crisp.</div>
+
+  <h3>5c · Study session (flashcard, full-screen)</h3>
+  <div class="prompt"><span class="lbl">v0.dev</span>Genauly full-screen study card, flat, palette as briefed. A thin progress bar
+(solid cobalt, no gradient) with "Karte 8 / 13". A large centered card showing a German
+word, a pronunciation hint, and an English gloss. Below, four flat answer buttons in a
+row: "Nochmal" (coral outline), "Schwer", "Gut" (cobalt), "Leicht" (green), each with a
+small interval label. Calm, focused, lots of whitespace.</div>
+
+  <h3>5d · Neuland game mission (optional, "pixel" style)</h3>
+  <div class="prompt"><span class="lbl">Midjourney / v0.dev</span>A mobile game scene for a German learning RPG called Neuland. Flat 2D, bold outlines,
+retro-modern (not 8-bit noise). A shop counter scene, a shopkeeper NPC, a speech box at
+the bottom with a German line and two answer choices as flat buttons. HUD: a small
+"patience" bar top-left, a backpack icon top-right. Palette: cobalt UI, butter/coral
+accents, cream. No gradient.</div>
+</section>
+
+<!-- 6 ICONS + MOOD -->
+<section class="page-break" id="icons">
+  <h2>6 · Prompts: icon set &amp; moodboard</h2>
+  <h3>6a · Domain icon set</h3>
+  <div class="prompt"><span class="lbl">Recraft (SVG) / Midjourney</span>A set of 6 matching flat line icons on a 24px grid, 2px strokes, rounded joins,
+two-tone (cobalt #2B4FE0 with a coral #FF6B54 highlight), no gradient, consistent weight
+and style. The six: a meeting/handshake, a calendar appointment, a bank building, a
+doctor/stethoscope, a house, a government office (Amt). Simple, friendly, legible small.</div>
+
+  <h3>6b · Style moodboard</h3>
+  <div class="prompt"><span class="lbl">Midjourney / Krea</span>Brand moodboard for a flat, colorful German learning app: solid cobalt, butter,
+coral and cream, bold geometric type, rounded flat UI cards, flat line icons, confident
+and friendly, editorial layout, lots of whitespace. No gradients, no 3D.
+<span class="neg">--ar 16:9 --style raw --no gradient, glossy, photograph</span></div>
+  <div class="note">A moodboard first is a good way to lock the <b>feeling</b> before committing to a logo or screens. Save the one you like and paste it back as reference into the logo/screen tools.</div>
+</section>
+
+<!-- 7 RESTYLE -->
+<section class="page-break" id="restyle">
+  <h2>7 · Restyle your real screenshots</h2>
+  <p class="muted">If you want to keep your existing layouts and only explore <b>color</b>, feed a screenshot as reference. Best in ChatGPT (GPT-4o image), Gemini, or Krea (image-to-image). Upload the screenshot, then:</p>
+  <div class="prompt"><span class="lbl">ChatGPT / Gemini · with a screenshot attached</span>Here is a screenshot of my app screen. Recolor it to this flat palette, keeping the
+exact same layout, icons, spacing and text: cobalt #2B4FE0 for primary buttons and the
+active state, cream #F3F0E7 background, butter #FFC24D and coral #FF6B54 as accents, ink
+#111318 text, sky #CBD8FF for chips. Make all buttons a solid flat color (no gradient).
+Do not redesign anything, only change the colors. Return the same screen restyled.</div>
+  <div class="note"><b>Reality check:</b> image tools will <i>redraw</i> the screen and often drift from your real layout (fonts, spacing). They're great for a <b>color vibe</b>, not pixel-accurate specs. For a pixel-accurate recolor of the real app, just tell me the hex codes you landed on and I'll apply them to the live app in minutes (that path is exact).</div>
+  <p>You can export fresh screenshots of any current screen to feed these tools; ask and I'll generate clean PNGs of any page (light or dark) for you to upload.</p>
+</section>
+
+<!-- 8 TIPS -->
+<section class="page-break" id="tips">
+  <h2>8 · Pro tips &amp; settings</h2>
+  <h3>Sizes to request</h3>
+  <ul>
+    <li><b>App icon:</b> 1024 &times; 1024 px, square.</li>
+    <li><b>Wordmark:</b> wide, ~3:1 (e.g. 1800 &times; 600).</li>
+    <li><b>Mobile screen:</b> 390 &times; 844 (or 1290 &times; 2796 for @3x retina).</li>
+    <li><b>Moodboard:</b> 16:9.</li>
+  </ul>
+  <h3>Getting flat, on-brand results</h3>
+  <ul>
+    <li>Always include the words <b>"flat, solid color, no gradient, no shadow, no bevel"</b>. Models love gradients by default.</li>
+    <li>Paste <b>exact hex codes</b> every time. Without them you'll get "close-ish" colors.</li>
+    <li>In Midjourney add <code>--style raw</code> (less decorative) and a <code>--no gradient, 3d, glossy, canva</code> negative.</li>
+    <li>In <b>Recraft</b>, set a <b>brand palette</b> and pick the "Flat illustration" / "Icon" style so every generation stays on-palette and exportable as SVG.</li>
+    <li>Generate <b>4&ndash;6 variations</b>, choose one, then refine with "keep everything, change only X".</li>
+  </ul>
+  <h3>Keeping your layout</h3>
+  <ul>
+    <li>For screens you designed, upload a <b>screenshot as a reference/structure image</b> and say "match this layout".</li>
+    <li>Or skip the redraw entirely: choose colors here, and I apply them to the real app so nothing about your layout changes.</li>
+  </ul>
+  <h3>Avoiding the "AI look"</h3>
+  <ul>
+    <li>No generic SaaS purple, no glowing gradients, no 3D blobs, no mascot unless you want one.</li>
+    <li>One dominant color (cobalt) + one or two accents beats a rainbow. Let whitespace do work.</li>
+  </ul>
+</section>
+
+<!-- 9 HANDBACK -->
+<section id="handback">
+  <h2>9 · Handing results back to build</h2>
+  <p>Once you've generated things you love, give me the following and I'll implement it in the real app (tokens, logo assets, favicons, PWA icons), no redesign of your layouts:</p>
+  <ul>
+    <li><b>Final palette:</b> the hex codes you settled on (even if they differ from this guide).</li>
+    <li><b>Logo:</b> the chosen mark as <b>SVG</b> if possible (Recraft/Ideogram export it), otherwise a high-res PNG, plus which color combo for the small favicon.</li>
+    <li><b>Screens:</b> either the image you like (as a visual target) <b>or</b> the v0.dev link / code &mdash; code is ideal because I can adapt it directly.</li>
+    <li><b>Type:</b> the display font name if you picked one.</li>
+  </ul>
+  <div class="callout">
+    <b>The exact, reversible path:</b> the app's colors live in a few design-token variables
+    (<code>src/index.css</code> + <code>tailwind.config.ts</code>, light + dark). Once you give me final hex codes and a logo,
+    I wire them in, regenerate the logo / favicons / PWA icons, run the build, and show you the real app.
+    Everything stays flat and gradient-free, and every screen re-themes at once.
+  </div>
+  <p class="muted" style="margin-top:6mm">Genauly &middot; AI mockup generation guide &middot; v1. Regenerate this PDF from <code>docs/branding/genauly-ai-mockup-guide.html</code>.</p>
+</section>
+
+</body>
+</html>
