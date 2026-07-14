@@ -4744,3 +4744,43 @@ Branch: `claude/whats-next-esga9u`.
 - **Artifacts:** `src/features/shared/useSlidingPill.ts` (new) · `src/features/library/LibrarySwitcher.tsx` ·
   `src/features/shared/ViewSwitcher.tsx` · `src/index.css` (commit `688bd0d`) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Entry 384 — 2026-07-13 (session 113 cont., Theorie tab slide round 3: snappier, popLayout)
+
+> **Numbering note:** my session-113 rounds 3–4 were logged live as 382/383, but the parallel session
+> 112 (feedback-backend) and session 114 (pill animation) landed on `main` first and claimed 382/383, so
+> these two entries are renumbered 384/385. Content unchanged.
+
+- **Branch:** `claude/theory-toggle-transitions-hloi6s` (Opus 4.8)
+- **Prompt (verbatim):**
+  > it's working well but the sliding motion isn't snappy enough. The fade animation is heavy on the eye
+- **Response summary:** The round-2 slide used `AnimatePresence mode="wait"`, which plays the exit fully
+  and only then the enter, so it felt slow and the blank fade-out gap between panels read as a heavy fade.
+  Switched to **`mode="popLayout"`** (leaving panel popped out of flow, incoming panel in place
+  immediately, the two cross at once, no empty beat, no vertical jump; presence wrapped in a `relative`
+  container to contain the absolutely-positioned exiting panel). Shortened duration 0.16→0.13 with a snappy
+  ease `[0.22,1,0.36,1]`, slide carries the motion, fade a light accent. Confirmed `<html>`/`<body>` both
+  `overflow-x: clip` so the slide adds no horizontal scrollbar. Verified in Chromium (1280×900): no
+  horizontal scrollbar, no jump, exiting panel positioned correctly. Gates green. Merged (PR #511).
+- **Artifacts:** `src/features/library/LibraryHub.tsx` (PR #511, squash `4e5435e`).
+
+## Entry 385 — 2026-07-13 (session 113 cont., ease the slide ~15% + center the feedback pill)
+
+- **Branch:** `claude/theory-toggle-transitions-hloi6s` (Opus 4.8)
+- **Prompts (verbatim):**
+  > I like the effect now. It's a bit too snappy now. reduce the speed by 10-15% and that should do. Also see the attached screenshot. The feedback button is not center-aligned with the filter rail - fix it!
+  > document the session
+- **Attachments:** screenshot of the Bibliothek bottom-right showing the "Mit KI gebaut · Feedback" pill
+  left of the FilterRail column instead of centered under it.
+- **Response summary:** (1) Eased the tab-slide duration 0.13→**0.15s** (~15% slower), same popLayout +
+  ease. (2) **Feedback pill:** the `FeedbackPill` set `right` (which anchors the pill's right EDGE) to the
+  FilterRail's center value, so the pill hung half its own width to the left of the rail. Added
+  **`lg:translate-x-1/2`** so its center lands on the rail center. Verified in Chromium: pill center ==
+  rail center to **0px** at 1280 and 1600 wide (the latter exercises the wide-viewport centering margin).
+  Gates green. Merged (PR #512). (3) Documented the session; on the doc PR I hit a merge conflict because
+  the parallel session-112 (#513) and session-114 (#514) merges had landed on `main` in between, reset the
+  branch to latest `main` (my slide code was already merged + intact; 114 only refined the *pill* glide,
+  not the content slide), then re-applied these entries (renumbered 384/385) and the s113 status handoff
+  update against the current docs.
+- **Artifacts:** `src/features/library/LibraryHub.tsx` · `src/components/layout/FeedbackButton.tsx`
+  (PR #512, squash `4bc3daf`) · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
