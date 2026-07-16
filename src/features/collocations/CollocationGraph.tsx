@@ -44,6 +44,34 @@ const MIN_K = 0.1;
 const MAX_K = 6;
 const clampK = (k: number) => Math.min(MAX_K, Math.max(MIN_K, k));
 
+// Spread a set of angles so clustered ones fan out to use the whole circle,
+// while preserving their circular ORDER (so the arrangement still matches the
+// original layout). Each angle is blended toward an even slot, where the even
+// slots are rotation-aligned to the originals to move them as little as needed.
+// Used by the focus layout so a hub whose partners all pointed one way still
+// fills the space left and right instead of stacking in a central column.
+function spreadAngles(raw: number[], blend = 0.7): number[] {
+  const N = raw.length;
+  if (N <= 1) return raw.slice();
+  const step = (2 * Math.PI) / N;
+  const order = raw.map((a, i) => ({ a, i })).sort((x, y) => x.a - y.a);
+  let sc = 0;
+  let cc = 0;
+  order.forEach((o, k) => {
+    const diff = o.a - k * step;
+    sc += Math.sin(diff);
+    cc += Math.cos(diff);
+  });
+  const base = Math.atan2(sc, cc);
+  const out = new Array<number>(N);
+  order.forEach((o, k) => {
+    const target = base + k * step;
+    const delta = Math.atan2(Math.sin(target - o.a), Math.cos(target - o.a));
+    out[o.i] = o.a + delta * blend;
+  });
+  return out;
+}
+
 // Focus-layout timing + zoom guards (word-selection distribution): on select a
 // node's partners fan out onto even rings around it and the view zooms to a
 // comfortable, readable level; on deselect every displaced node animates home.
@@ -860,48 +888,48 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   ): Map<string, { x: number; y: number }> => {
     const targets = new Map<string, { x: number; y: number }>();
     if (neigh.length === 0) return targets;
-    // Each partner's unit direction + its current distance from the center.
-    const spokes = neigh.map((n) => {
+    // Each partner's original angle + distance from the center.
+    const items = neigh.map((n) => {
       const dx = (n.x ?? 0) - center.x;
       const dy = (n.y ?? 0) - center.y;
-      const d = Math.hypot(dx, dy) || 1;
-      return { n, ux: dx / d, uy: dy / d, d };
+      return { n, angle: Math.atan2(dy, dx), d: Math.hypot(dx, dy) || 1 };
     });
     let maxNodeR = centerR;
     let dmin = Infinity;
     let dmax = 0;
-    for (const s of spokes) {
-      maxNodeR = Math.max(maxNodeR, s.n.r);
-      dmin = Math.min(dmin, s.d);
-      dmax = Math.max(dmax, s.d);
+    for (const it of items) {
+      maxNodeR = Math.max(maxNodeR, it.n.r);
+      dmin = Math.min(dmin, it.d);
+      dmax = Math.max(dmax, it.d);
     }
+    // Fan clustered angles out so the partners use the whole ellipse (left and
+    // right included), not just the sector they happened to sit in.
+    const angles = spreadAngles(items.map((it) => it.angle));
     // Ellipse semi-axes (world units) that fill ~fillFrac of the free area at the
-    // target zoom, so partners spread around the node instead of bunching near
-    // the core (even a single partner lands out near the edge). Per-axis, so a
-    // wide-but-short free area still fills across; it re-fits when that area
-    // changes (a card-shape toggle).
+    // target zoom. Per-axis, so a wide-but-short free area still fills across; it
+    // re-fits when that area changes (a card-shape toggle).
     const fillFrac = 0.82;
     const floor = centerR + maxNodeR + 22;
     const rx = Math.max(floor, (fillFrac * freeW) / (2 * TARGET_FOCUS_K) - maxNodeR);
     const ry = Math.max(floor, (fillFrac * freeH) / (2 * TARGET_FOCUS_K) - maxNodeR);
     const denom = dmax - dmin;
-    for (const s of spokes) {
-      // Place on the ellipse at the partner's own angle: (rx·cosθ, ry·sinθ) with
-      // (ux,uy) = (cosθ,sinθ). Pull inner ones in a little to keep relative order,
-      // but never below 0.66 of the ellipse so nothing stays bunched at the core.
-      const f = denom > 1 ? 0.66 + 0.34 * ((s.d - dmin) / denom) : 1;
-      let px = center.x + s.ux * rx * f;
-      let py = center.y + s.uy * ry * f;
+    items.forEach((it, i) => {
+      const a = angles[i];
+      // Radial factor keeps relative order (farther stays farther) but never
+      // below 0.72 of the ellipse, so nothing bunches near the core.
+      const f = denom > 1 ? 0.72 + 0.28 * ((it.d - dmin) / denom) : 1;
+      let px = center.x + Math.cos(a) * rx * f;
+      let py = center.y + Math.sin(a) * ry * f;
       const ex = px - center.x;
       const ey = py - center.y;
       const ed = Math.hypot(ex, ey) || 1;
-      const minD = centerR + s.n.r + 10;
+      const minD = centerR + it.n.r + 10;
       if (ed < minD) {
         px = center.x + (ex / ed) * minD;
         py = center.y + (ey / ed) * minD;
       }
-      targets.set(s.n.id, { x: px, y: py });
-    }
+      targets.set(it.n.id, { x: px, y: py });
+    });
     relaxLabels(targets, neigh, center, centerR, centerLabel);
     return targets;
   };
