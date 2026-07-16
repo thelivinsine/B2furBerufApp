@@ -860,45 +860,42 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   ): Map<string, { x: number; y: number }> => {
     const targets = new Map<string, { x: number; y: number }>();
     if (neigh.length === 0) return targets;
-    // Each partner's spoke offset from the selected node.
-    const spokes = neigh.map((n) => ({
-      n,
-      dx: (n.x ?? 0) - center.x,
-      dy: (n.y ?? 0) - center.y,
-    }));
-    // Arrangement extent at scale 1 (spoke positions) + the biggest node radius.
-    let halfW = centerR;
-    let halfH = centerR;
+    // Each partner's unit direction + its current distance from the center.
+    const spokes = neigh.map((n) => {
+      const dx = (n.x ?? 0) - center.x;
+      const dy = (n.y ?? 0) - center.y;
+      const d = Math.hypot(dx, dy) || 1;
+      return { n, ux: dx / d, uy: dy / d, d };
+    });
     let maxNodeR = centerR;
+    let dmin = Infinity;
+    let dmax = 0;
     for (const s of spokes) {
-      halfW = Math.max(halfW, Math.abs(s.dx));
-      halfH = Math.max(halfH, Math.abs(s.dy));
       maxNodeR = Math.max(maxNodeR, s.n.r);
+      dmin = Math.min(dmin, s.d);
+      dmax = Math.max(dmax, s.d);
     }
-    // Scale the arrangement to fill ~fillFrac of the free area at the target
-    // zoom, so the selection uses most of the window instead of leaving big
-    // empty margins. The scale is per-axis (so a wide-but-short free area still
-    // fills across), but the two axes are kept within RATIO of each other so the
-    // spokes only stretch mildly and still read like the original directions.
-    // Because it keys off the free area it re-fits whenever that area changes
-    // (a card-shape toggle), keeping every partner visible.
+    // Ellipse semi-axes (world units) that fill ~fillFrac of the free area at the
+    // target zoom, so partners spread around the node instead of bunching near
+    // the core (even a single partner lands out near the edge). Per-axis, so a
+    // wide-but-short free area still fills across; it re-fits when that area
+    // changes (a card-shape toggle).
     const fillFrac = 0.82;
-    const availW = (fillFrac * freeW) / (2 * TARGET_FOCUS_K) - maxNodeR;
-    const availH = (fillFrac * freeH) / (2 * TARGET_FOCUS_K) - maxNodeR;
-    let sx = halfW > 1 ? availW / halfW : 8;
-    let sy = halfH > 1 ? availH / halfH : 8;
-    const RATIO = 2.0;
-    if (sx > sy * RATIO) sx = sy * RATIO;
-    if (sy > sx * RATIO) sy = sx * RATIO;
-    sx = Number.isFinite(sx) && sx > 0 ? Math.min(sx, 8) : 1;
-    sy = Number.isFinite(sy) && sy > 0 ? Math.min(sy, 8) : 1;
+    const floor = centerR + maxNodeR + 22;
+    const rx = Math.max(floor, (fillFrac * freeW) / (2 * TARGET_FOCUS_K) - maxNodeR);
+    const ry = Math.max(floor, (fillFrac * freeH) / (2 * TARGET_FOCUS_K) - maxNodeR);
+    const denom = dmax - dmin;
     for (const s of spokes) {
-      let px = center.x + s.dx * sx;
-      let py = center.y + s.dy * sy;
+      // Place on the ellipse at the partner's own angle: (rx·cosθ, ry·sinθ) with
+      // (ux,uy) = (cosθ,sinθ). Pull inner ones in a little to keep relative order,
+      // but never below 0.66 of the ellipse so nothing stays bunched at the core.
+      const f = denom > 1 ? 0.66 + 0.34 * ((s.d - dmin) / denom) : 1;
+      let px = center.x + s.ux * rx * f;
+      let py = center.y + s.uy * ry * f;
       const ex = px - center.x;
       const ey = py - center.y;
       const ed = Math.hypot(ex, ey) || 1;
-      const minD = centerR + s.n.r + 8;
+      const minD = centerR + s.n.r + 10;
       if (ed < minD) {
         px = center.x + (ex / ed) * minD;
         py = center.y + (ey / ed) * minD;
