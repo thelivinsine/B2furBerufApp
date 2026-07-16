@@ -1226,3 +1226,92 @@ ellipsis, e.g. "die Aufgaben vertei...")
 - **Artifacts:** `src/features/collocations/CollocationsBrowser.tsx` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md` · PR #545.
+
+## Session 125 — 2026-07-16 — Theorie graph word-selection distribution + focus polish
+
+**Branch:** `claude/graph-word-selection-distribution-5av8xk` · **Model:** Opus 4.8 · **Attachments:**
+7 phone screenshots across the thread (Kollokationen/Wörter graph selections). A long single-branch
+thread iterating on how the Wörter (`WordGraph.tsx`) and Kollokationen (`CollocationGraph.tsx`) graph
+views behave when a word is selected. Nine squash-merges to `main` (PRs #542, #543, #544, #546, #547,
+#548, #549, #550).
+
+- **Prompt 1 (verbatim):**
+  > can you make sure that whenever a word is selected on the graph, all the other selections are also
+  > equally distributed in the open space in the graph no matter their initial position. Do it with
+  > satisfying animations. And when they are unselected by clicking or tapping in background space, they
+  > should go back to their original positions. Also, check that sometimes, in different selecctions, the
+  > words are too zoomed out - fix it
+- **Response 1:** Built the focus layout in `WordGraph.tsx`: on select, a word's neighbors animate into
+  an arrangement and the view frames at a readable zoom (clamped, fixing "too zoomed out"); on deselect
+  they animate back to stored home positions. `homePosRef` + `focusRafRef` easeOut tween pinning `fx/fy`;
+  prefers-reduced-motion respected. Verified with a Playwright smoke test on the built preview. Shipped
+  PR #542 and merged.
+- **Prompt 2 (verbatim):** `> merge it to main`
+- **Response 2:** Confirmed PR #542 was already squash-merged; showed the merged state.
+- **Prompt 3 (verbatim, with a `beantragen` Kollokationen screenshot):**
+  > when I click on the fit to screen button, this is what I see. doesn't look like what I asked was done
+  > here
+- **Response 3:** Identified the screenshot as the **Kollokationen** graph (separate component), which
+  didn't have the behavior yet. Ported the focus fan-out + restore + readable framing to
+  `CollocationGraph.tsx`. PR #543, merged.
+- **Prompt 4 (verbatim, with before/after `die Cloud` Wörter screenshots; plus a mid-turn follow-up):**
+  > Here's another example of a word in Worter graph. Attached are the before and after clicking
+  > screenshots. I feel like too much of rearranging is happening when clicked which isn't necessary. the
+  > position from which each connecting word come need not be altered too much. I just want all of them to
+  > be visible on the screen by pulling the connecting words closer when clicked on a word and still seem
+  > like the words are part of a bigger nodal graph.
+  > the space between the pop up winow and graph wondow borders in kollokations graph should be same as in
+  > the worter graph.
+- **Response 4:** Replaced the even-ring rebuild with a **direction-preserving pull-in** (keep each
+  connection's angle, only contract over-long spokes) in both graphs; also floated the Kollokationen
+  selected-node card off the canvas edges by the same `bottom-3/left-3/right-3` gap the Wörter card uses.
+  PR #544, merged.
+- **Prompt 5 (verbatim; plus a mid-turn follow-up):**
+  > make sure to use the 70-80% of the space of the window so that there's not too much background space
+  > left out and doesn't invoke the need for suer to zoom in again.
+  > when the dimesnipns of the pop up window is toggled, the graph has to adapt in such a way that again
+  > all of the selected nodes are all visible.
+- **Response 5:** Changed the placement to scale the arrangement to fill ~82% of the free area at the
+  target zoom (per-axis) so small selections aren't left in empty space; card-shape toggle re-fits since
+  the sizing keys off the free area. PR #546, merged.
+- **Prompt 6 (verbatim, with a self-correction):**
+  > * the fit to screen button should work the same way in kollokation as in worter.
+  > * make sure when the views are switching when pressing the fit to screen button, there's always
+  > animations.
+- **Response 6:** Made the Kollokationen fit button pick a **random well-connected node** (like Wörter,
+  not the fixed biggest hub) and made every fit-button view switch animate (fit-all tweens the camera;
+  word-jump animates via the focus effect). `fitToNodes`/`fitToRect` refactored to return the transform.
+  Verified different words on repeated presses + a mid-animation frame differing from the settled frame.
+  PR #547, merged.
+- **Prompt 7 (verbatim):**
+  > be sure that the distribution of the nodes are such that the words are clearly legible, if not move
+  > them around a little until they're readable.
+- **Response 7:** Root cause: the layout only separated the node dots, not the wider text labels, so
+  overlapping labels got culled by the draw pass. Added label-box-aware spacing (`relaxLabels` AABB pass
+  with the selected word immovable), expanded `frameFocus` bounds by label extents, and disabled label
+  culling while focused so no connection word can vanish. Verified 1-, 2-, 8-, 13-connection selections.
+  PR #548, merged.
+- **Prompt 8 (verbatim, with 4 dark-mode phone screenshots):**
+  > some of the words are still not appearing. also, for the smaller connections with 2-3 words, they are
+  > not enough spread out to occupy the space around and instead looking cramped to the center
+- **Response 8:** Reworked placement to put each connection on an **ellipse sized to fill the space**
+  (direction preserved, radial factor floored at 0.72) so even a single connection spreads out. Verified
+  the missing labels were already fixed in code (`der Termin`'s 9 all render) — the screenshots were a
+  cached PWA build. PR #549, merged. Flagged the service-worker caching caveat to the founder.
+- **Prompt 9 (verbatim, with a `beantragen` screenshot):**
+  > in this case for example, why isn't the space to the left snd right not being used properly? it's
+  > still cramped
+- **Response 9:** Cause: preserving original angles kept a hub whose connections all pointed one way
+  bunched in a central column. Added `spreadAngles()` (blend each angle toward an even slot, preserving
+  circular order) so clustered connections fan across the whole ellipse and use the left/right space.
+  Verified numerically (16 angles in ~80° → ~260° arc) and visually (`stellen` × 5 reaches all
+  directions). PR #550, merged.
+- **Prompt 10 (verbatim):** `> document the session`
+- **Response 10:** Wrote this log entry, added the session-125 handoff to `docs/PROJECT_STATUS.md`
+  (aging session 123's handoff out to the W29 archive), and refreshed the Wörter/Kollokationen graph
+  descriptions in `CLAUDE.md` with the selection/focus model.
+- **Artifacts:** `src/features/vocabulary/WordGraph.tsx` · `src/features/collocations/CollocationGraph.tsx`
+  · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/SESSION_PROMPT_LOG.md` · `../CLAUDE.md` · PRs #542, #543, #544, #546, #547, #548, #549, #550.
+- **Maintenance note:** this live prompt-log file has passed the ~1,200-line rotation budget; a future
+  session should rotate the oldest entries into `docs/archive/prompt-log/` per the rotation policy.
