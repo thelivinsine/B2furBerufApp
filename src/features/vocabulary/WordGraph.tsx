@@ -79,6 +79,9 @@ const FOCUS_MS = 480;
 const RETURN_MS = 420;
 const MIN_FOCUS_K = 1.5;
 const MAX_FOCUS_K = 3.4;
+// Comfortable zoom the pull-in layout sizes its fit-radius against, so a
+// selection lands neither cramped nor tiny.
+const TARGET_FOCUS_K = 2.3;
 
 export default function WordGraph({ items }: { items: VocabItem[] }) {
   const isDark = useIsDark();
@@ -633,50 +636,79 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDark, selectedId, domainFilter]);
 
-  // ── Focus layout: fan a word's connections out over the open space ────────
-  // Selecting a word animates its neighbors onto evenly-spaced rings around it
-  // (so the connections read clearly no matter where they sat in the raw
-  // layout) and zooms the view to a comfortable level; deselecting animates
-  // every displaced node back to its stored home. This replaces the old
-  // pan-only "clear the card" nudge.
+  // ── Focus layout: pull a word's connections in so they all fit on screen ──
+  // Selecting a word keeps each connection in the SAME DIRECTION it already sat
+  // (so the map still reads like one big nodal graph) and only contracts the
+  // spokes that reach off-screen, pulling them inward until every neighbor is
+  // visible. The view then zooms to a comfortable level; deselecting animates
+  // every displaced node back to its stored home.
   const prefersReducedMotion = () =>
     typeof window !== "undefined" &&
     !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  // Even concentric-ring target positions around a center point. Each ring
-  // holds as many nodes as its circumference allows (spacing keyed to the
-  // biggest node), so the fan-out never overlaps and reads as a clean burst.
-  const ringTargets = (
+  // Target positions that preserve each neighbor's direction from the selected
+  // word and only shorten over-long spokes so the whole set fits the free area.
+  // A light collision pass separates any neighbors that end up overlapping,
+  // without disturbing the overall (organic) arrangement.
+  const focusTargets = (
     center: { x: number; y: number },
     neigh: SimNode[],
     centerR: number,
+    freeW: number,
+    freeH: number,
   ): Map<string, { x: number; y: number }> => {
     const targets = new Map<string, { x: number; y: number }>();
     if (neigh.length === 0) return targets;
-    const sorted = [...neigh].sort((a, b) => b.r - a.r);
-    const maxR = sorted[0].r;
-    const gap = 12;
-    const slot = 2 * maxR + gap;
-    let idx = 0;
-    let ring = 1;
-    while (idx < sorted.length) {
-      const remaining = sorted.length - idx;
-      const radius = centerR + maxR + gap + (ring - 1) * slot;
-      const circumference = 2 * Math.PI * radius;
-      const capacity = Math.min(remaining, Math.max(1, Math.floor(circumference / slot)));
-      // Rotate alternate rings so outer nodes fall into the inner ring's gaps.
-      const offset = (ring % 2 === 0 ? Math.PI / capacity : 0) - Math.PI / 2;
-      for (let i = 0; i < capacity; i++) {
-        const a = offset + (2 * Math.PI * i) / capacity;
-        const n = sorted[idx++];
-        targets.set(n.id, {
-          x: center.x + Math.cos(a) * radius,
-          y: center.y + Math.sin(a) * radius,
-        });
-      }
-      ring++;
+    // Each neighbor's spoke: unit direction + current distance from the center.
+    const spokes = neigh.map((n) => {
+      const dx = (n.x ?? 0) - center.x;
+      const dy = (n.y ?? 0) - center.y;
+      const d = Math.hypot(dx, dy) || 1;
+      return { n, ux: dx / d, uy: dy / d, d };
+    });
+    const dmax = Math.max(...spokes.map((s) => s.d));
+    // Largest world radius that still fits comfortably in the free area at a
+    // readable zoom (leaving headroom for the node and its label). Only ever
+    // contract (scale <= 1): a neighbor that already sits close is left alone.
+    const margin = 46;
+    const fitR = Math.max(40, Math.min(freeW, freeH) / (2 * TARGET_FOCUS_K) - margin);
+    const scale = dmax > fitR ? fitR / dmax : 1;
+    for (const s of spokes) {
+      const dist = Math.max(s.d * scale, centerR + s.n.r + 8);
+      targets.set(s.n.id, { x: center.x + s.ux * dist, y: center.y + s.uy * dist });
     }
+    relaxCollisions(targets, neigh);
     return targets;
+  };
+
+  // Nudge overlapping neighbor targets apart (a few symmetric passes). Only
+  // acts on pairs that actually collide, so spokes keep their direction.
+  const relaxCollisions = (
+    targets: Map<string, { x: number; y: number }>,
+    neigh: SimNode[],
+  ) => {
+    const arr = neigh.map((n) => ({ r: n.r, p: targets.get(n.id)! })).filter((a) => a.p);
+    for (let it = 0; it < 6; it++) {
+      for (let i = 0; i < arr.length; i++) {
+        for (let j = i + 1; j < arr.length; j++) {
+          const a = arr[i];
+          const b = arr[j];
+          const dx = b.p.x - a.p.x;
+          const dy = b.p.y - a.p.y;
+          const d = Math.hypot(dx, dy) || 0.01;
+          const min = a.r + b.r + 7;
+          if (d < min) {
+            const push = (min - d) / 2;
+            const ux = dx / d;
+            const uy = dy / d;
+            a.p.x -= ux * push;
+            a.p.y -= uy * push;
+            b.p.x += ux * push;
+            b.p.y += uy * push;
+          }
+        }
+      }
+    }
   };
 
   // A transform that frames the selected node and its fanned-out ring inside the
@@ -803,7 +835,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       .filter((n): n is SimNode => !!n);
 
     const center = { x: sel.x ?? 0, y: sel.y ?? 0 };
-    const targets = ringTargets(center, neigh, sel.r);
+    const targets = focusTargets(center, neigh, sel.r, rect.width, rect.height - CARD_CLEARANCE);
 
     // Record the selected node's true home once; if it is already displaced
     // (it was a neighbor of a prior selection) keep that earlier original.
