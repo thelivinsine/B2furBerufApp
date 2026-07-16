@@ -34,7 +34,7 @@ describe("buildCollocationGraph — bipartite noun/verb model", () => {
       [nounId("entscheidung"), verbId("treffen")].sort(),
     );
     expect(g.links).toEqual([
-      { source: nounId("entscheidung"), target: verbId("treffen"), register: undefined, collocationId: "c1" },
+      { source: nounId("entscheidung"), target: verbId("treffen"), collocationId: "c1" },
     ]);
   });
 
@@ -82,13 +82,6 @@ describe("buildCollocationGraph — bipartite noun/verb model", () => {
     const noun = g.nodes.find((n) => n.id === nounId("termin"));
     expect(noun?.themeId).toBe("meetings");
     expect(noun?.domain).toBe("beruf");
-  });
-
-  it("carries register onto the edge", () => {
-    const g = buildCollocationGraph([
-      colloc("c1", "einen Antrag", "stellen", { register: "formal" }),
-    ]);
-    expect(g.links[0].register).toBe("formal");
   });
 });
 

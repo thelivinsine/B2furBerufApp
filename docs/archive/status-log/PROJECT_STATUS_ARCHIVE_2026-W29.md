@@ -173,3 +173,29 @@ then to add genuinely useful, commonly-used items for those fields.
 - **Gates:** `lint:content` OK, `typecheck` OK, `build` OK, `test:unit` 142/142, `check:bundle` 79.6 kB,
   `verify:facts` OK (0 two-oracle-confirmed errors; the one new signal, `die Betriebskosten`, is a correct
   plurale tantum). Everything AI-drafted, founder-verify pending like the rest of the bank.
+
+## Session 121 (2026-07-14) — Merged the `arbeitswelt` domain into `beruf` (condensed handoff)
+
+**Handoff after session 121 (2026-07-14). Merged the `arbeitswelt` domain into `beruf` (Opus 4.8), on
+branch `claude/berufsleben-arbeitsumfeld-overlap-itmpeg`, shipped to `main` (PR #535, squash-merged).**
+The founder asked, looking at a Bibliothek graph, what the difference between the "Berufsleben" and
+"Arbeitswelt" categories was, since they had near-identical colors and read as redundant to a learner,
+then said "merge".
+- **The two domains:** `beruf` ("Berufsleben") grouped the 6 communication-heavy workplace themes
+  (meetings, scheduling, logistics, customer, conflict, project); `arbeitswelt` ("Arbeitswelt & Umfeld")
+  grouped 4 topical ones (technology, sustainability, safety, travel). Both were `context: "work"`. The
+  split was a taxonomist's cut (comms vs. topics), invisible to learners, and their graph colors
+  (`#5b5be6` indigo vs `#8b5cf6` violet, ~30° apart) read as one color on the dense force-directed canvas.
+- **The merge (6 code sites + CLAUDE.md):** dropped the `arbeitswelt` entry from `src/data/domains.ts`;
+  retagged technology/sustainability/safety/travel to `domain: "beruf"` in `src/data/themes.ts` (all 10
+  workplace themes now in `beruf`); removed the `arbeitswelt` color from `src/lib/graphPalette.ts`;
+  removed `"arbeitswelt"` from the `DomainId` union (`src/types/index.ts`) and from `DOMAIN_IDS`
+  (`scripts/lint-content.mjs`); set the Büro building rollup to `domains: ["beruf"]`
+  (`src/components/city/domain-buildings.tsx`). `themeGroupsForMode` (`lib/themeGroups.ts`) is
+  data-driven, so the library primary dropdown now shows one "Berufsleben" group covering all 10
+  workplace themes with no code change.
+- **Gates:** `lint:content` OK, `typecheck` OK, `build` OK, `test:unit` 142/142. Content counts
+  unchanged (this was a taxonomy edit, not a content edit).
+- **Note for next session:** the domain count is now 5, but `pruefung` still has no themes mapped to it
+  (exam prep lives separately), so 4 domains actually carry the 15 themes. Pre-existing, unrelated to
+  this merge.

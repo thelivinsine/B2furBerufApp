@@ -1,13 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-16 (session 122). **Theorie graph-view audit + P0/P1 fixes (Fable 5), on branch
-`claude/bibliothek-theorie-graphs-sk0dr3`, shipped to `main` (PR #539).** A comprehensive quality audit
-of the Wörter + Kollokationen graph views found four user-visible defects, all fixed: the synchronous
-sim warmup froze the main thread ~1s per open/filter change (now rAF-chunked with a warm-restart fast
-path), a pinch starting on a node left the simulation permanently hot (battery drain + jitter), a
-filtered-out selection ghosted the whole canvas, and the Kollokationen zoomed-out view rendered zero
-labels below k=0.7 (hubs now label at any zoom). Verified end-to-end with Playwright; all gates green.
-Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-16 (session 123). **Theorie graph-view P2/P3 batch (the rest of the session-122
+audit), on branch `claude/graphs-troubleshooting-plan-2f6p4s`.** Finished the remaining fix list from the
+session-122 P0–P3 audit report: label collision culling and the card-covers-node bug ported/fixed on the
+Wörter graph, a wheel-hijacks-page-scroll bug fixed on both graphs (wheel now only zooms with ctrl/cmd
+held, matching trackpad-pinch convention), the legend connection count now respects the active domain/
+kind filter on both graphs (was always the unfiltered total), a resize no longer leaves either graph
+off-center, and the fit-button's random-word/hub-jump picks now respect the active filter too. Plus a
+P3 hygiene pass: removed the dead `register` field from the Kollokationen graph link plumbing, fixed a
+setState-in-updater in `toggleLayout`, capped the position-cache growth, fixed a stale "6-domain" palette
+comment (5 since the s121 merge), and added canvas aria-labels. Verified end-to-end with Playwright; all
+gates green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -62,6 +65,51 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 123 (2026-07-16). Theorie graph-view P2/P3 batch (Sonnet 5), on branch
+`claude/graphs-troubleshooting-plan-2f6p4s`.** Picked up the session-122 audit's leftover fix list
+("Remaining P2/P3 batch... is scoped in the session-122 prompt-log entry") and finished it.
+- **P2 (user-visible, Wörter graph unless noted):** (1) label collision culling ported from the
+  Kollokationen graph into `WordGraph.tsx`'s draw loop (candidates ranked focused-first then by radius,
+  skip a label whose box overlaps one already placed). (2) The selected-word card (bottom overlay) could
+  cover the very node it describes; a new effect pans the view up just enough to clear it whenever the
+  tapped node's screen position falls under the card, without touching zoom (unlike Kollokationen's
+  forced-zoom `focusNode`, which was intentionally left alone). (3) **Wheel hijacked page scroll on BOTH
+  graphs** (every wheel tick called `preventDefault`, so a user scrolling the Bibliothek page with the
+  cursor over a graph got stuck zooming instead): wheel now only zooms with ctrl/cmd held (the same
+  convention as trackpad pinch-zoom and Google Maps/Figma), otherwise it's left alone so the page scrolls;
+  canvases got a `title` hint. (4) **Legend connection count ignored the domain/kind filter on BOTH
+  graphs** (always showed the unfiltered total): now counts only edges whose both ends pass the active
+  filter, computed via a `useMemo` mirroring the draw-time `domActive`/`isActive` check. (5) **Resize left
+  both graphs off-center** (only the canvas pixel size updated, not the transform): the resize handler now
+  shifts the transform by half the width/height delta so the visual center stays anchored across a window
+  resize or phone rotation. (6) **Fit-button random-word/hub-jump ignored the active filter on BOTH
+  graphs**, so it could jump to a domain/kind the user had just dimmed out; both now pick only among
+  filter-passing nodes (falling back to the full set if the filter empties it).
+- **P3 (hygiene, Haiku-tier per the session-122 model map):** removed the `register` field from
+  `CollocationLink`/`SimLink` (carried through the builder and a test, never read by the renderer) plus
+  the now-pointless test; moved `toggleLayout`'s side effects (ref write + `refitForLayout`) out of the
+  `setCardLayout` functional updater, which must stay pure; capped the `posRef` position-cache growth at
+  4000 entries (LRU-ish eviction) as a safety net (real bank sizes never approach it); fixed a stale
+  "6-domain taxonomy spine" comment in `graphPalette.ts` (5 since the s121 arbeitswelt→beruf merge, and
+  the file literally lists 5); added `role="img"` + a descriptive `aria-label` to both canvases. Left
+  "node seeding" un-touched: Kollokationen's centroid-jitter seeding is deliberate (forms the theme
+  islands) and porting it to Wörter would fight that graph's intentionally different "one global cloud"
+  design (see CLAUDE.md); no other seeding bug was found on inspection.
+- **Not done (explicitly out of scope):** the P1-5 content-curation follow-up (494/2,514 unresolved
+  `related` refs, 118/797 Wörter-graph edge resolution) is a separate content-authoring task, not a
+  graph-code bug; still open for a future session.
+- **Verification:** Playwright end-to-end against `pnpm dev` (onboarding skipped via seeded
+  localStorage): plain wheel scrolls the page (`scrollY` 0→95/0→131) instead of zooming; ctrl+wheel still
+  zooms and the culled labels stay legible and non-overlapping at a close zoom; tapping a word near the
+  bottom edge of the Wörter canvas pans the view so the selected node lands clearly above the card instead
+  of behind it; the Kollokationen legend count went 786→0 under a Nomen-only filter (correct: every edge
+  is noun-verb, so an all-noun filter has zero valid edges) and the Wörter count went 1712→1281 under a
+  Berufsleben-only filter; the fit button's hub-jump under a Verben-only filter landed on "beantragen" (a
+  verb); the Kollokationen card-layout toggle (horizontal↔vertical) still refits correctly after the
+  `toggleLayout` purity fix. Zero console errors across both views. Gates: `typecheck` clean, `lint` at
+  the exact pre-change 53-warning baseline, `test:unit` 146/146 (147 minus the deleted dead-register
+  test), `lint:content` clean, `build` + `check:bundle` 79.6 kB.
+
 **Handoff after session 122 (2026-07-16). Theorie graph-view quality audit + P0/P1 fixes (Fable 5), on
 branch `claude/bibliothek-theorie-graphs-sk0dr3`, shipped to `main` (PR #539, squash-merged).** The
 founder asked for a comprehensive bug/quality analysis of the Bibliothek/Theorie graph views, then a
@@ -92,32 +140,9 @@ P0–P3 report with per-action Claude-model routing, then approved the Opus-tier
   Theorie) merged between s121 and this session without status-doc entries; s122 numbering continues
   from the last documented session.
 
-**Handoff after session 121 (2026-07-14). Merged the `arbeitswelt` domain into `beruf` (Opus 4.8), on
-branch `claude/berufsleben-arbeitsumfeld-overlap-itmpeg`, shipped to `main` (PR #535, squash-merged).**
-The founder asked, looking at a Bibliothek graph, what the difference between the "Berufsleben" and
-"Arbeitswelt" categories was, since they had near-identical colors and read as redundant to a learner,
-then said "merge".
-- **The two domains:** `beruf` ("Berufsleben") grouped the 6 communication-heavy workplace themes
-  (meetings, scheduling, logistics, customer, conflict, project); `arbeitswelt` ("Arbeitswelt & Umfeld")
-  grouped 4 topical ones (technology, sustainability, safety, travel). Both were `context: "work"`. The
-  split was a taxonomist's cut (comms vs. topics), invisible to learners, and their graph colors
-  (`#5b5be6` indigo vs `#8b5cf6` violet, ~30° apart) read as one color on the dense force-directed canvas.
-- **The merge (6 code sites + CLAUDE.md):** dropped the `arbeitswelt` entry from `src/data/domains.ts`;
-  retagged technology/sustainability/safety/travel to `domain: "beruf"` in `src/data/themes.ts` (all 10
-  workplace themes now in `beruf`); removed the `arbeitswelt` color from `src/lib/graphPalette.ts`;
-  removed `"arbeitswelt"` from the `DomainId` union (`src/types/index.ts`) and from `DOMAIN_IDS`
-  (`scripts/lint-content.mjs`); set the Büro building rollup to `domains: ["beruf"]`
-  (`src/components/city/domain-buildings.tsx`). `themeGroupsForMode` (`lib/themeGroups.ts`) is
-  data-driven, so the library primary dropdown now shows one "Berufsleben" group covering all 10
-  workplace themes with no code change.
-- **Gates:** `lint:content` OK, `typecheck` OK, `build` OK, `test:unit` 142/142. Content counts
-  unchanged (this was a taxonomy edit, not a content edit).
-- **Note for next session:** the domain count is now 5, but `pruefung` still has no themes mapped to it
-  (exam prep lives separately), so 4 domains actually carry the 15 themes. Pre-existing, unrelated to
-  this merge.
-
-_(Session 120's content-coverage-deepening handoff, session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph handoff,
-session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
+_(Session 121's arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
+handoff, session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph
+handoff, session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
 handoff (Cobalt & Butter previews + the AI mockup guide) and session 115's demo-readiness-sweep handoff
 are now in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 113's brand-identity-exploration
 handoff (the 20-direction catalogue) is also in W29. Session 114's Theorie pill-animation +
