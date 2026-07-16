@@ -41,6 +41,9 @@ interface SimLink extends SimulationLinkDatum<SimNode> {
   kind: "related" | "collocation";
 }
 
+// One node's animated move from its current spot to a target (ring or home).
+type PosMove = { node: SimNode; from: { x: number; y: number }; to: { x: number; y: number } };
+
 // Domain colors are shared with the Kollokationen graph via graphPalette.ts.
 
 const FREQ_LABEL: Record<string, string> = {
@@ -67,6 +70,15 @@ const MAX_CACHED_POSITIONS = 4000;
 // Estimated height of the selected-word card (badges + example line) so the
 // view can pan clear of it instead of letting it cover the tapped node.
 const CARD_CLEARANCE = 190;
+
+// Focus-layout timing + zoom guards (word-selection distribution): on select a
+// word's connections fan out onto even rings around it and the view zooms to a
+// comfortable level (never the too-far-out overview a prior fit-to-screen would
+// otherwise keep); on deselect every displaced node animates back home.
+const FOCUS_MS = 480;
+const RETURN_MS = 420;
+const MIN_FOCUS_K = 1.5;
+const MAX_FOCUS_K = 3.4;
 
 export default function WordGraph({ items }: { items: VocabItem[] }) {
   const isDark = useIsDark();
@@ -134,6 +146,10 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
   const neighborsRef = useRef(neighbors);
   const rafRef = useRef<number | null>(null);
   const drawRef = useRef<() => void>(() => {});
+  // Original ("home") position of every node the focus layout has displaced, so
+  // a deselect can animate them back. focusRafRef owns the focus/return tween.
+  const homePosRef = useRef(new Map<string, { x: number; y: number }>());
+  const focusRafRef = useRef<number | null>(null);
 
   selectedRef.current = selectedId;
   darkRef.current = isDark;
@@ -575,7 +591,19 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     canvas.style.cursor = "grab";
 
     return () => {
-      for (const n of nodes) posRef.current.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
+      // Cache each node's HOME position (not its transient focus-ring spot) so a
+      // filter change / remount restores the un-displaced layout rather than
+      // baking a fanned-out selection into the next graph.
+      const home = homePosRef.current;
+      for (const n of nodes) {
+        const h = home.get(n.id);
+        posRef.current.set(n.id, h ? { x: h.x, y: h.y } : { x: n.x ?? 0, y: n.y ?? 0 });
+      }
+      // The old node objects are discarded; drop the displacement bookkeeping so
+      // the rebuilt graph starts fresh.
+      homePosRef.current = new Map();
+      if (focusRafRef.current != null) cancelAnimationFrame(focusRafRef.current);
+      focusRafRef.current = null;
       // Safety cap: the cache is meant to survive filter changes (bounded by
       // the vocab bank size in practice), but evict the oldest entries if it
       // ever grows past a generous ceiling instead of growing unbounded.
@@ -605,25 +633,217 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDark, selectedId, domainFilter]);
 
-  // The selected-word card sits at the bottom of the canvas and can cover the
-  // very node it describes. Pan the view up just enough to clear it, keeping
-  // whatever zoom level the tap already had (unlike the Kollokationen graph,
-  // tapping a word here does not force a zoom change).
+  // ── Focus layout: fan a word's connections out over the open space ────────
+  // Selecting a word animates its neighbors onto evenly-spaced rings around it
+  // (so the connections read clearly no matter where they sat in the raw
+  // layout) and zooms the view to a comfortable level; deselecting animates
+  // every displaced node back to its stored home. This replaces the old
+  // pan-only "clear the card" nudge.
+  const prefersReducedMotion = () =>
+    typeof window !== "undefined" &&
+    !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+
+  // Even concentric-ring target positions around a center point. Each ring
+  // holds as many nodes as its circumference allows (spacing keyed to the
+  // biggest node), so the fan-out never overlaps and reads as a clean burst.
+  const ringTargets = (
+    center: { x: number; y: number },
+    neigh: SimNode[],
+    centerR: number,
+  ): Map<string, { x: number; y: number }> => {
+    const targets = new Map<string, { x: number; y: number }>();
+    if (neigh.length === 0) return targets;
+    const sorted = [...neigh].sort((a, b) => b.r - a.r);
+    const maxR = sorted[0].r;
+    const gap = 12;
+    const slot = 2 * maxR + gap;
+    let idx = 0;
+    let ring = 1;
+    while (idx < sorted.length) {
+      const remaining = sorted.length - idx;
+      const radius = centerR + maxR + gap + (ring - 1) * slot;
+      const circumference = 2 * Math.PI * radius;
+      const capacity = Math.min(remaining, Math.max(1, Math.floor(circumference / slot)));
+      // Rotate alternate rings so outer nodes fall into the inner ring's gaps.
+      const offset = (ring % 2 === 0 ? Math.PI / capacity : 0) - Math.PI / 2;
+      for (let i = 0; i < capacity; i++) {
+        const a = offset + (2 * Math.PI * i) / capacity;
+        const n = sorted[idx++];
+        targets.set(n.id, {
+          x: center.x + Math.cos(a) * radius,
+          y: center.y + Math.sin(a) * radius,
+        });
+      }
+      ring++;
+    }
+    return targets;
+  };
+
+  // A transform that frames the selected node and its fanned-out ring inside the
+  // space the card leaves free, at a readable zoom clamped to [MIN,MAX]. The min
+  // clamp is the "too zoomed out" fix: a selection is never left tiny.
+  const frameFocus = (
+    center: { x: number; y: number },
+    centerR: number,
+    targets: Map<string, { x: number; y: number }>,
+    nodesById: Map<string, SimNode>,
+    width: number,
+    height: number,
+  ) => {
+    let minX = center.x - centerR;
+    let maxX = center.x + centerR;
+    let minY = center.y - centerR;
+    let maxY = center.y + centerR;
+    for (const [id, p] of targets) {
+      const r = nodesById.get(id)?.r ?? 4;
+      minX = Math.min(minX, p.x - r);
+      maxX = Math.max(maxX, p.x + r);
+      minY = Math.min(minY, p.y - r);
+      maxY = Math.max(maxY, p.y + r);
+    }
+    const padX = 40;
+    const padTop = 32;
+    const freeW = Math.max(width - 2 * padX, 40);
+    const freeH = Math.max(height - CARD_CLEARANCE - padTop, 40);
+    const fitK = Math.min(freeW / Math.max(maxX - minX, 1), freeH / Math.max(maxY - minY, 1));
+    const k = clampK(Math.min(MAX_FOCUS_K, Math.max(MIN_FOCUS_K, fitK)));
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    return { k, x: width / 2 - cx * k, y: padTop + freeH / 2 - cy * k };
+  };
+
+  // Tween node positions (and the camera) with an easeOut curve, pinning every
+  // moved node (fx/fy) so the simulation cannot fight the animation. onDone
+  // releases whichever nodes have finished returning home.
+  const runFocusTween = (
+    moves: PosMove[],
+    fromT: { x: number; y: number; k: number },
+    toT: { x: number; y: number; k: number },
+    duration: number,
+    onDone?: () => void,
+  ) => {
+    if (focusRafRef.current != null) cancelAnimationFrame(focusRafRef.current);
+    // Freeze the simulation for the duration: it is asleep or barely warm, and
+    // letting it tick would fight the pinned tween.
+    simRef.current?.sim.stop();
+    const apply = (e: number) => {
+      for (const m of moves) {
+        const x = m.from.x + (m.to.x - m.from.x) * e;
+        const y = m.from.y + (m.to.y - m.from.y) * e;
+        m.node.x = x;
+        m.node.y = y;
+        m.node.fx = x;
+        m.node.fy = y;
+      }
+      transformRef.current = {
+        k: fromT.k + (toT.k - fromT.k) * e,
+        x: fromT.x + (toT.x - fromT.x) * e,
+        y: fromT.y + (toT.y - fromT.y) * e,
+      };
+      drawRef.current();
+    };
+    if (prefersReducedMotion() || duration <= 0) {
+      apply(1);
+      onDone?.();
+      return;
+    }
+    const start = performance.now();
+    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+    const step = () => {
+      const p = Math.min((performance.now() - start) / duration, 1);
+      apply(ease(p));
+      if (p < 1) {
+        focusRafRef.current = requestAnimationFrame(step);
+      } else {
+        focusRafRef.current = null;
+        onDone?.();
+      }
+    };
+    focusRafRef.current = requestAnimationFrame(step);
+  };
+
+  // Drive the focus layout whenever the selection changes.
   useEffect(() => {
-    if (!selectedId) return;
     const live = simRef.current;
     const container = containerRef.current;
     if (!live || !container) return;
-    const node = live.nodes.find((n) => n.id === selectedId);
-    if (!node) return;
     const rect = container.getBoundingClientRect();
-    const t = transformRef.current;
-    const sy = (node.y ?? 0) * t.k + t.y;
-    const cardTop = rect.height - CARD_CLEARANCE;
-    if (sy > cardTop) {
-      transformRef.current = { ...t, y: t.y - (sy - cardTop) };
-      scheduleDraw();
+    const nodesById = new Map(live.nodes.map((n) => [n.id, n]));
+    const home = homePosRef.current;
+
+    // Deselect (tap on empty space): send every displaced node home, release it.
+    if (!selectedId) {
+      if (home.size === 0) return;
+      const moves: PosMove[] = [];
+      const ids: string[] = [];
+      for (const [id, h] of home) {
+        const n = nodesById.get(id);
+        if (!n) continue;
+        ids.push(id);
+        moves.push({ node: n, from: { x: n.x ?? 0, y: n.y ?? 0 }, to: { x: h.x, y: h.y } });
+      }
+      const t = transformRef.current;
+      runFocusTween(moves, t, t, RETURN_MS, () => {
+        for (const id of ids) {
+          const n = nodesById.get(id);
+          if (n) {
+            n.fx = null;
+            n.fy = null;
+          }
+        }
+        home.clear();
+      });
+      return;
     }
+
+    const sel = nodesById.get(selectedId);
+    if (!sel) return; // dormant selection (filtered out): nothing to arrange.
+    const neigh = [...(neighborsRef.current.get(selectedId) ?? [])]
+      .map((id) => nodesById.get(id))
+      .filter((n): n is SimNode => !!n);
+
+    const center = { x: sel.x ?? 0, y: sel.y ?? 0 };
+    const targets = ringTargets(center, neigh, sel.r);
+
+    // Record the selected node's true home once; if it is already displaced
+    // (it was a neighbor of a prior selection) keep that earlier original.
+    if (!home.has(sel.id)) home.set(sel.id, { x: center.x, y: center.y });
+
+    const keep = new Set<string>([sel.id, ...neigh.map((n) => n.id)]);
+    const moves: PosMove[] = [];
+
+    // Neighbors fan out onto the rings; snapshot each one's home the first time
+    // it moves so a later deselect can bring it back.
+    for (const n of neigh) {
+      if (!home.has(n.id)) home.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
+      moves.push({ node: n, from: { x: n.x ?? 0, y: n.y ?? 0 }, to: targets.get(n.id)! });
+    }
+    // The selected word stays put, pinned so nothing nudges it off center.
+    moves.push({ node: sel, from: center, to: center });
+
+    // Nodes displaced by a previous selection that are not part of this one
+    // animate home in the same pass and are released when the tween ends.
+    const returning: string[] = [];
+    for (const [id, h] of home) {
+      if (keep.has(id)) continue;
+      const n = nodesById.get(id);
+      if (!n) continue;
+      returning.push(id);
+      moves.push({ node: n, from: { x: n.x ?? 0, y: n.y ?? 0 }, to: { x: h.x, y: h.y } });
+    }
+
+    const toT = frameFocus(center, sel.r, targets, nodesById, rect.width, rect.height);
+    runFocusTween(moves, transformRef.current, toT, FOCUS_MS, () => {
+      for (const id of returning) {
+        const n = nodesById.get(id);
+        if (n) {
+          n.fx = null;
+          n.fy = null;
+        }
+        home.delete(id);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
   // Keep the draw-time ref in sync with the filter state.
