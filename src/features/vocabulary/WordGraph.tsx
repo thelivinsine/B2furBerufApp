@@ -60,6 +60,14 @@ const MIN_K = 0.15;
 const MAX_K = 6;
 const clampK = (k: number) => Math.min(MAX_K, Math.max(MIN_K, k));
 
+// Safety cap on the cross-filter position cache (see posRef); real bank sizes
+// stay far under this, it only guards against unbounded growth.
+const MAX_CACHED_POSITIONS = 4000;
+
+// Estimated height of the selected-word card (badges + example line) so the
+// view can pan clear of it instead of letting it cover the tapped node.
+const CARD_CLEARANCE = 190;
+
 export default function WordGraph({ items }: { items: VocabItem[] }) {
   const isDark = useIsDark();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -79,6 +87,23 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
 
   const graph = useMemo(() => buildWordGraph(items, collocations), [items]);
   const itemById = useMemo(() => new Map(items.map((v) => [v.id, v])), [items]);
+  const nodeThemeById = useMemo(
+    () => new Map(graph.nodes.map((n) => [n.id, n.themeId])),
+    [graph],
+  );
+  // The legend count only counts edges whose BOTH ends pass the active domain
+  // filter, so it matches what's actually lit up on screen instead of the raw
+  // (unfiltered) total.
+  const visibleLinkCount = useMemo(() => {
+    if (domainFilter.size === 0) return graph.links.length;
+    let count = 0;
+    for (const l of graph.links) {
+      const sd = domainOf(nodeThemeById.get(l.source) ?? "");
+      const td = domainOf(nodeThemeById.get(l.target) ?? "");
+      if (sd && td && domainFilter.has(sd) && domainFilter.has(td)) count++;
+    }
+    return count;
+  }, [graph, domainFilter, nodeThemeById]);
   const neighbors = useMemo(() => {
     const m = new Map<string, Set<string>>();
     for (const l of graph.links) {
@@ -161,10 +186,22 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     let height = 0;
     const resize = () => {
       const rect = container.getBoundingClientRect();
+      const prevWidth = width;
+      const prevHeight = height;
       width = rect.width;
       height = rect.height;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
+      // Keep the visual center anchored across a resize (window resize, phone
+      // rotation): without this the view stayed pinned to its old top-left
+      // corner and the graph appeared to jump off-center.
+      if (fittedRef.current && (width !== prevWidth || height !== prevHeight)) {
+        transformRef.current = {
+          ...transformRef.current,
+          x: transformRef.current.x + (width - prevWidth) / 2,
+          y: transformRef.current.y + (height - prevHeight) / 2,
+        };
+      }
       scheduleDraw();
     };
     resize();
@@ -271,7 +308,11 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       ctx.globalAlpha = 1;
 
       // Labels in screen space (crisp at any zoom). They fade in as you zoom;
-      // the focused word and its neighbors always read.
+      // the focused word and its neighbors always read. Collision-culled (same
+      // approach as the Kollokationen graph) so labels never overlap at busy
+      // zoom levels: candidates are ranked (focused first, then bigger/more
+      // frequent words) and a label is skipped once its box would overlap one
+      // already placed.
       const zoomAlpha = Math.min(Math.max((k - 0.85) / 0.5, 0), 1);
       if (zoomAlpha > 0 || focusSet) {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -279,6 +320,8 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         const labelColor = dark ? "203,213,225" : "51,65,85";
+
+        const cands: { n: SimNode; alpha: number }[] = [];
         for (const n of nodes) {
           const x = n.x ?? 0;
           const y = n.y ?? 0;
@@ -287,8 +330,26 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
           const inFocus = focusSet?.has(n.id) ?? false;
           const alpha = focusSet ? (inFocus ? 1 : 0) : zoomAlpha;
           if (alpha <= 0) continue;
+          cands.push({ n, alpha });
+        }
+        cands.sort((a, b) => {
+          if (a.n.id === selectedRef.current) return -1;
+          if (b.n.id === selectedRef.current) return 1;
+          return b.n.r - a.n.r;
+        });
+
+        const placed: { l: number; t: number; r: number; b: number }[] = [];
+        const hits = (r: { l: number; t: number; r: number; b: number }) =>
+          placed.some((d) => !(r.r < d.l || r.l > d.r || r.b < d.t || r.t > d.b));
+        for (const { n, alpha } of cands) {
+          const w = ctx.measureText(n.label).width;
+          const sx = (n.x ?? 0) * k + tx;
+          const sy = ((n.y ?? 0) + n.r) * k + ty + 3;
+          const box = { l: sx - w / 2 - 2, t: sy - 2, r: sx + w / 2 + 2, b: sy + 12 + 2 };
+          if (hits(box)) continue;
+          placed.push(box);
           ctx.fillStyle = `rgba(${labelColor},${alpha})`;
-          ctx.fillText(n.label, x * k + tx, (y + n.r) * k + ty + 3);
+          ctx.fillText(n.label, sx, sy);
         }
       }
     };
@@ -483,6 +544,11 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     };
 
     const onWheel = (e: WheelEvent) => {
+      // Only hijack the wheel for an explicit zoom gesture (trackpad pinch
+      // reports as wheel + ctrlKey, the same convention browsers use for
+      // page-zoom). A plain wheel/two-finger scroll is left alone so the page
+      // scrolls normally instead of getting stuck zooming the canvas.
+      if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
       const t = transformRef.current;
       const nextK = clampK(t.k * Math.exp(-e.deltaY * 0.0018));
@@ -510,6 +576,14 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
 
     return () => {
       for (const n of nodes) posRef.current.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
+      // Safety cap: the cache is meant to survive filter changes (bounded by
+      // the vocab bank size in practice), but evict the oldest entries if it
+      // ever grows past a generous ceiling instead of growing unbounded.
+      if (posRef.current.size > MAX_CACHED_POSITIONS) {
+        const excess = posRef.current.size - MAX_CACHED_POSITIONS;
+        const it = posRef.current.keys();
+        for (let i = 0; i < excess; i++) posRef.current.delete(it.next().value as string);
+      }
       sim.stop();
       ro.disconnect();
       if (warmRaf != null) cancelAnimationFrame(warmRaf);
@@ -530,6 +604,27 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     scheduleDraw();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDark, selectedId, domainFilter]);
+
+  // The selected-word card sits at the bottom of the canvas and can cover the
+  // very node it describes. Pan the view up just enough to clear it, keeping
+  // whatever zoom level the tap already had (unlike the Kollokationen graph,
+  // tapping a word here does not force a zoom change).
+  useEffect(() => {
+    if (!selectedId) return;
+    const live = simRef.current;
+    const container = containerRef.current;
+    if (!live || !container) return;
+    const node = live.nodes.find((n) => n.id === selectedId);
+    if (!node) return;
+    const rect = container.getBoundingClientRect();
+    const t = transformRef.current;
+    const sy = (node.y ?? 0) * t.k + t.y;
+    const cardTop = rect.height - CARD_CLEARANCE;
+    if (sy > cardTop) {
+      transformRef.current = { ...t, y: t.y - (sy - cardTop) };
+      scheduleDraw();
+    }
+  }, [selectedId]);
 
   // Keep the draw-time ref in sync with the filter state.
   domainFilterRef.current = domainFilter;
@@ -559,13 +654,19 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
 
   // Zoom into a random, frequently-used word: pick a node weighted by its area
   // (radius ∝ wordfreq Zipf, so common words are far likelier than rare ones),
-  // center it, zoom in, and select it so its card + connections light up.
+  // center it, zoom in, and select it so its card + connections light up. Picks
+  // only among domains the legend filter currently allows, so this never lands
+  // on a word the filter itself just dimmed out.
   const zoomToFrequentWord = () => {
     const container = containerRef.current;
     const live = simRef.current;
     if (!container || !live || live.nodes.length === 0) return;
     const rect = container.getBoundingClientRect();
-    const nodes = live.nodes;
+    const pool =
+      domainFilter.size === 0
+        ? live.nodes
+        : live.nodes.filter((n) => domainFilter.has(domainOf(n.themeId) ?? ""));
+    const nodes = pool.length > 0 ? pool : live.nodes;
     let total = 0;
     for (const n of nodes) total += n.r * n.r;
     let pick = nodes[0];
@@ -619,7 +720,13 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
         ref={containerRef}
         className="relative h-[42dvh] min-h-[280px] w-full touch-none overflow-hidden rounded-xl border border-border bg-surface sm:h-[60dvh] sm:min-h-[420px]"
       >
-        <canvas ref={canvasRef} className="block h-full w-full" />
+        <canvas
+          ref={canvasRef}
+          className="block h-full w-full"
+          role="img"
+          aria-label={`Interaktiver Wortgraph: ${graph.nodes.length} Wörter, ${graph.links.length} Verbindungen. Tippen wählt ein Wort aus, Ziehen verschiebt die Ansicht.`}
+          title="Strg/Cmd + Scrollen zum Zoomen"
+        />
 
         {/* Zoom controls */}
         <div className="absolute right-3 top-3 flex flex-col gap-1">
@@ -717,7 +824,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
           );
         })}
         <span className="tabular-nums">
-          {graph.links.length} Verbindung{graph.links.length !== 1 ? "en" : ""}
+          {visibleLinkCount} Verbindung{visibleLinkCount !== 1 ? "en" : ""}
         </span>
       </div>
     </div>

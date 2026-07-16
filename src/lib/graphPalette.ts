@@ -1,7 +1,7 @@
 /**
  * Shared color palette for the Bibliothek graph views (Wörter + Kollokationen).
  *
- * One color per domain (the 6-domain taxonomy spine): brand indigo for
+ * One color per domain (the 5-domain taxonomy spine): brand indigo for
  * Berufsleben, distinct calm hues for the rest, brightened for dark mode so
  * jewel tones stay luminous on a near-black canvas. Lifted out of WordGraph so
  * both graphs agree on domain colors (the Kollokationen graph reuses these).

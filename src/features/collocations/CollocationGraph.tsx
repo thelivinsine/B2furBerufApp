@@ -34,13 +34,16 @@ import { buildCollocationGraph, type CollocationNode } from "./collocationGraph"
  */
 interface SimNode extends SimulationNodeDatum, CollocationNode {}
 interface SimLink extends SimulationLinkDatum<SimNode> {
-  register?: "neutral" | "formal";
   collocationId: string;
 }
 
 const MIN_K = 0.1;
 const MAX_K = 6;
 const clampK = (k: number) => Math.min(MAX_K, Math.max(MIN_K, k));
+
+// Safety cap on the cross-filter position cache (see posRef); real bank sizes
+// stay far under this, it only guards against unbounded growth.
+const MAX_CACHED_POSITIONS = 4000;
 
 // Leading article stripped when grouping a merged node's surface forms in the
 // card, so "die Beschwerden" and "Beschwerden" read as one plural group.
@@ -88,6 +91,23 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   const graph = useMemo(() => buildCollocationGraph(items), [items]);
   const collById = useMemo(() => new Map(items.map((c) => [c.id, c])), [items]);
   const nodeById = useMemo(() => new Map(graph.nodes.map((n) => [n.id, n])), [graph]);
+
+  // The legend count only counts edges whose BOTH ends pass the active domain
+  // + Nomen/Verben filters, so it matches what's actually lit up on screen
+  // instead of the raw (unfiltered) total.
+  const visibleLinkCount = useMemo(() => {
+    if (domainFilter.size === 0 && kindFilter.size === 0) return graph.links.length;
+    const passes = (n: CollocationNode) =>
+      (domainFilter.size === 0 || domainFilter.has(n.domain ?? "")) &&
+      (kindFilter.size === 0 || kindFilter.has(n.kind));
+    let count = 0;
+    for (const l of graph.links) {
+      const s = nodeById.get(l.source as string);
+      const t = nodeById.get(l.target as string);
+      if (s && t && passes(s) && passes(t)) count++;
+    }
+    return count;
+  }, [graph, domainFilter, kindFilter, nodeById]);
 
   // Partner index: node id -> [{ partnerId, collocationId }]. Drives the card.
   const partners = useMemo(() => {
@@ -268,10 +288,22 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     let height = 0;
     const resize = () => {
       const rect = container.getBoundingClientRect();
+      const prevWidth = width;
+      const prevHeight = height;
       width = rect.width;
       height = rect.height;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
+      // Keep the visual center anchored across a resize (window resize, phone
+      // rotation): without this the view stayed pinned to its old top-left
+      // corner and the constellation appeared to jump off-center.
+      if (fittedRef.current && (width !== prevWidth || height !== prevHeight)) {
+        transformRef.current = {
+          ...transformRef.current,
+          x: transformRef.current.x + (width - prevWidth) / 2,
+          y: transformRef.current.y + (height - prevHeight) / 2,
+        };
+      }
       scheduleDraw();
     };
     resize();
@@ -689,6 +721,11 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       dragNode = null;
     };
     const onWheel = (e: WheelEvent) => {
+      // Only hijack the wheel for an explicit zoom gesture (trackpad pinch
+      // reports as wheel + ctrlKey, the same convention browsers use for
+      // page-zoom). A plain wheel/two-finger scroll is left alone so the page
+      // scrolls normally instead of getting stuck zooming the canvas.
+      if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
       const t = transformRef.current;
       const nextK = clampK(t.k * Math.exp(-e.deltaY * 0.0018));
@@ -715,6 +752,14 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
 
     return () => {
       for (const n of nodes) posRef.current.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
+      // Safety cap: the cache is meant to survive filter changes (bounded by
+      // the collocation bank size in practice), but evict the oldest entries
+      // if it ever grows past a generous ceiling instead of growing unbounded.
+      if (posRef.current.size > MAX_CACHED_POSITIONS) {
+        const excess = posRef.current.size - MAX_CACHED_POSITIONS;
+        const it = posRef.current.keys();
+        for (let i = 0; i < excess; i++) posRef.current.delete(it.next().value as string);
+      }
       sim.stop();
       ro.disconnect();
       if (warmRaf != null) cancelAnimationFrame(warmRaf);
@@ -790,22 +835,30 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
 
   // Switch the card between the bottom-bar and side-panel shapes, then
   // re-center the constellation into the newly-free area (founder request).
+  // The side effects run outside the state updater (a functional setState
+  // updater must stay pure; React may invoke it more than once per commit).
   const toggleLayout = () => {
-    setCardLayout((l) => {
-      const next = l === "horizontal" ? "vertical" : "horizontal";
-      cardLayoutRef.current = next;
-      refitForLayout(next, true);
-      return next;
-    });
+    const next = cardLayout === "horizontal" ? "vertical" : "horizontal";
+    cardLayoutRef.current = next;
+    setCardLayout(next);
+    refitForLayout(next, true);
   };
 
   // Fit button toggles: whole-constellation overview ↔ frame the biggest hub.
+  // The hub search only considers nodes the active legend filter allows, so
+  // this never jumps to a noun/verb/domain the filter itself just dimmed out.
   const fitOrZoomRef = useRef<"fit" | "hub">("fit");
   const zoomToHub = () => {
     const live = simRef.current;
     if (!live || live.nodes.length === 0) return;
-    let pick = live.nodes[0];
-    for (const n of live.nodes) if (n.degree > pick.degree) pick = n;
+    const pool = live.nodes.filter(
+      (n) =>
+        (domainFilter.size === 0 || domainFilter.has(n.domain ?? "")) &&
+        (kindFilter.size === 0 || kindFilter.has(n.kind)),
+    );
+    const candidates = pool.length > 0 ? pool : live.nodes;
+    let pick = candidates[0];
+    for (const n of candidates) if (n.degree > pick.degree) pick = n;
     // Selecting it frames it at the readable zoom via the focusNode effect.
     setSelectedId(pick.id);
   };
@@ -875,7 +928,13 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         ref={containerRef}
         className="relative h-[46dvh] min-h-[300px] w-full touch-none overflow-hidden rounded-xl border border-border bg-surface sm:h-[62dvh] sm:min-h-[440px]"
       >
-        <canvas ref={canvasRef} className="block h-full w-full" />
+        <canvas
+          ref={canvasRef}
+          className="block h-full w-full"
+          role="img"
+          aria-label={`Interaktiver Kollokationen-Graph: ${graph.nodes.length} Nomen und Verben, ${graph.links.length} Verbindungen. Tippen wählt einen Knoten aus, Ziehen verschiebt die Ansicht.`}
+          title="Strg/Cmd + Scrollen zum Zoomen"
+        />
 
         {/* Zoom controls */}
         <div className="absolute right-3 top-3 flex flex-col gap-1">
@@ -1046,7 +1105,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
           );
         })}
         <span className="tabular-nums">
-          {graph.links.length} Verbindung{graph.links.length !== 1 ? "en" : ""}
+          {visibleLinkCount} Verbindung{visibleLinkCount !== 1 ? "en" : ""}
         </span>
       </div>
     </div>

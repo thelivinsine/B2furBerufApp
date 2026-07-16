@@ -49,7 +49,6 @@ export interface CollocationLink {
   source: string;
   /** Verb node id. */
   target: string;
-  register?: "neutral" | "formal";
   collocationId: string;
 }
 
@@ -188,7 +187,7 @@ export function buildCollocationGraph(
     const pairKey = `${nId}|${vId}`;
     if (seenPair.has(pairKey)) continue;
     seenPair.add(pairKey);
-    links.push({ source: nId, target: vId, register: c.register, collocationId: c.id });
+    links.push({ source: nId, target: vId, collocationId: c.id });
     degree.set(nId, (degree.get(nId) ?? 0) + 1);
     degree.set(vId, (degree.get(vId) ?? 0) + 1);
   }

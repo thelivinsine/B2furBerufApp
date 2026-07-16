@@ -1147,3 +1147,47 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   PR #539 itself, squash-merged as `6486a32`; branch realigned). Verified main contains the code fixes
   + `PROJECT_STATUS.md` + this log, then appended this follow-up entry and merged it (PR #540).
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` · PR #540.
+
+## Session 123 — 2026-07-16 — Theorie graph-view P2/P3 batch (the rest of the session-122 audit)
+
+**Branch:** `claude/graphs-troubleshooting-plan-2f6p4s` · **Model:** Sonnet 5 · **Attachments:** none
+
+- **Prompt 1 (verbatim):**
+  > finish off the remaining tasks in graphs troubleshooting plan
+- **Response 1:** No plan file exists under this name; the actual "remaining tasks" pointer is the
+  `docs/PROJECT_STATUS.md` s122 handoff's "Remaining P2/P3 batch... is scoped in the session-122
+  prompt-log entry" line (Entry — session 122 above), so read that report's P2/P3 list (label-culling +
+  card-refit ports to Wörter, wheel scroll-trap, count-vs-filter mismatch, resize refit, fit-button
+  quirks, data nits, hygiene) and implemented it. Data nits (`konferenzraum` duplicate + pair-form
+  labels) were already fixed by the intervening PR #538, so skipped. Implemented, in
+  `src/features/vocabulary/WordGraph.tsx` + `src/features/collocations/CollocationGraph.tsx` (+
+  `collocationGraph.ts`, `graphPalette.ts`, `tests/collocationGraph.test.ts`): (1) collision-culled
+  label placement ported into the Wörter draw loop; (2) a card-covers-node pan-into-view effect for
+  Wörter (Kollokationen already had this via its card-aware `focusNode`); (3) wheel now only zooms with
+  ctrl/cmd held on both graphs (was hijacking page scroll on every tick); (4) the legend connection count
+  now reflects the active domain/kind filter on both graphs instead of the raw total; (5) a resize
+  handler that keeps the visual center anchored on both graphs instead of leaving the view off-center;
+  (6) the fit button's random-word/hub-jump now only picks among filter-passing nodes on both graphs.
+  P3 hygiene: dropped the dead `register` field from the Kollokationen graph link plumbing (builder,
+  component, and the now-pointless test); moved `toggleLayout`'s side effects out of the `setCardLayout`
+  functional updater (must stay pure); capped `posRef` position-cache growth at 4000 entries; fixed a
+  stale "6-domain" palette comment (5 since the s121 merge); added `role="img"` + `aria-label` to both
+  canvases. Left "node seeding" alone (Kollokationen's centroid seeding is deliberate island-forming
+  behavior; porting it to Wörter would fight that graph's intentionally different "cloud" layout).
+  Left the P1-5 content-curation item (494/2,514 unresolved `related` refs) as an explicitly separate,
+  still-open follow-up, not a graph-code bug.
+  Verified end-to-end with Playwright against `pnpm dev` (onboarding seeded via localStorage): plain
+  wheel scrolls the page instead of zooming (`scrollY` 0→95/0→131), ctrl+wheel still zooms with
+  non-overlapping culled labels; a tap near the bottom edge of the Wörter canvas pans the selected node
+  clear of the card; the Kollokationen legend count went 786→0 under a Nomen-only filter (correct
+  bipartite math) and the Wörter count went 1712→1281 under a Berufsleben-only filter; the fit button's
+  hub-jump under a Verben-only filter landed on a verb ("beantragen"); the Kollokationen layout toggle
+  still refits correctly after the purity fix; zero console errors. Gates: `typecheck` clean, `lint` at
+  the exact pre-change 53-warning baseline, `test:unit` 146/146 (147 minus the deleted dead test),
+  `lint:content` clean, `build` + `check:bundle` 79.6 kB. Updated `docs/PROJECT_STATUS.md` (new s123
+  handoff, s121's handoff aged into the W29 archive) and this log.
+- **Artifacts:** `src/features/vocabulary/WordGraph.tsx` · `src/features/collocations/CollocationGraph.tsx` ·
+  `src/features/collocations/collocationGraph.ts` · `src/lib/graphPalette.ts` ·
+  `tests/collocationGraph.test.ts` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`.
