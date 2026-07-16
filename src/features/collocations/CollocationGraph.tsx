@@ -259,6 +259,10 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // The graph was rebuilt: a hover id from the previous node set would dim
+    // everything against a node that no longer exists.
+    hoverRef.current = null;
+
     const dpr = window.devicePixelRatio || 1;
     let width = 0;
     let height = 0;
@@ -307,16 +311,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       .stop();
     simRef.current = { sim, nodes, links };
 
-    // Settle past the initial motion off-screen, then animate gently.
-    sim.tick(160);
-
-    // Open on the WHOLE constellation, fully zoomed out (the headline goal),
-    // not zoomed into a hub. Fit-to-all with padding.
-    if (!fittedRef.current && nodes.length > 0) {
-      fittedRef.current = true;
-      // No card on open, so fit into the whole canvas.
-      fitToRect(nodes, ...freeRect(width, height, false, cardLayoutRef.current));
-    }
+    const nodeIds = new Set(nodes.map((n) => n.id));
 
     const draw = () => {
       const { x: tx, y: ty, k } = transformRef.current;
@@ -343,7 +338,12 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       ctx.fillStyle = vg;
       ctx.fillRect(0, 0, width, height);
 
-      const focus = hoverRef.current ?? selectedRef.current;
+      // Ignore a selection that is not in the current graph (a filter change
+      // can remove the selected node): the dead id has no card but would still
+      // drive the focus dimming, ghosting the whole canvas. The selection
+      // simply goes dormant and revives if the node comes back into filter.
+      const rawFocus = hoverRef.current ?? selectedRef.current;
+      const focus = rawFocus !== null && nodeIds.has(rawFocus) ? rawFocus : null;
       const focusSet = focus
         ? new Set([focus, ...(neighborsRef.current.get(focus) ?? [])])
         : null;
@@ -467,7 +467,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       // skipped if its box would overlap one already placed. Each sits on a
       // translucent pill so it reads over edges and glow.
       const zoomAlpha = Math.min(Math.max((k - 0.7) / 0.6, 0), 1);
-      if (zoomAlpha > 0 || focusSet) {
+      {
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
@@ -475,7 +475,12 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         const bgColor = dark ? "12,20,34" : "255,255,255";
         const sel = selectedRef.current;
 
-        // Gather visible candidates with their opacity.
+        // Gather visible candidates with their opacity. Hubs keep a readable
+        // label even fully zoomed out: on phones the fit-to-all zoom sits well
+        // below the k=0.7 label threshold, so without the hub ramp the flagship
+        // zoomed-out constellation showed no words at all. From degree 5 the
+        // label alpha ramps 0.4 -> 0.9 (degree 16, the radius cap in the
+        // builder); collision culling keeps the count on screen small.
         const cands: { n: SimNode; alpha: number }[] = [];
         for (const n of nodes) {
           const x = n.x ?? 0;
@@ -483,8 +488,9 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
           if (x < worldLeft || x > worldRight || y < worldTop || y > worldBottom) continue;
           if (!isActive(n)) continue;
           const inFocus = focusSet?.has(n.id) ?? false;
-          const hubBoost = Math.min(n.degree / 40, 0.5);
-          const alpha = focusSet ? (inFocus ? 1 : 0) : Math.min(zoomAlpha + hubBoost, 1);
+          const hubAlpha =
+            n.degree >= 5 ? Math.min(0.4 + ((n.degree - 5) / 11) * 0.5, 0.9) : 0;
+          const alpha = focusSet ? (inFocus ? 1 : 0) : Math.max(zoomAlpha, hubAlpha);
           if (alpha <= 0.02) continue;
           cands.push({ n, alpha });
         }
@@ -524,9 +530,44 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     };
     drawRef.current = draw;
 
-    sim.on("tick", scheduleDraw);
-    sim.alpha(0.08).restart();
-    scheduleDraw();
+    // ── Warmup: settle past the initial motion, then animate gently ────────
+    // This used to be one synchronous sim.tick(160), which froze the main
+    // thread for ~1s on desktop (multi-second on phones) on every open AND
+    // every filter change. The warmup now runs in requestAnimationFrame
+    // slices with a per-frame time budget, so the page stays responsive.
+    // A rebuild where most nodes kept their previous positions (a filter
+    // tweak) is already settled and only needs a short warmup.
+    const cachedShare =
+      nodes.length > 0
+        ? nodes.filter((n) => posRef.current.has(n.id)).length / nodes.length
+        : 0;
+    let warmTicksLeft = cachedShare > 0.5 ? 20 : 160;
+    let warmRaf: number | null = null;
+    const finishWarmup = () => {
+      // Open on the WHOLE constellation, fully zoomed out (the headline goal),
+      // not zoomed into a hub. Fit-to-all with padding; no card on open.
+      if (!fittedRef.current && nodes.length > 0) {
+        fittedRef.current = true;
+        fitToRect(nodes, ...freeRect(width, height, false, cardLayoutRef.current));
+      }
+      sim.on("tick", scheduleDraw);
+      sim.alpha(0.08).restart();
+      scheduleDraw();
+    };
+    const runWarmup = () => {
+      warmRaf = null;
+      const start = performance.now();
+      while (warmTicksLeft > 0 && performance.now() - start < 10) {
+        sim.tick();
+        warmTicksLeft -= 1;
+      }
+      if (warmTicksLeft > 0) warmRaf = requestAnimationFrame(runWarmup);
+      else finishWarmup();
+    };
+    // A warm rebuild can draw right away (positions are near their old spots);
+    // a cold start stays blank until the layout has settled off-screen.
+    if (cachedShare > 0.5) scheduleDraw();
+    runWarmup();
 
     // ── Interaction: pan / pinch / drag / tap / hover ─────────────────────
     const pointers = new Map<number, { x: number; y: number }>();
@@ -568,7 +609,16 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       if (pointers.size === 2) {
         const [a, b] = [...pointers.values()];
         pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
-        dragNode = null;
+        // A pinch is not a deliberate drag-drop: unpin the barely-touched node
+        // and let the sim cool down. Without this the touched node kept fx/fy
+        // and alphaTarget stayed at 0.25, so the sim never slept again
+        // (permanent jitter + battery drain).
+        if (dragNode) {
+          dragNode.fx = null;
+          dragNode.fy = null;
+          sim.alphaTarget(0);
+          dragNode = null;
+        }
         return;
       }
       dragNode = hitTest(p.x, p.y);
@@ -626,11 +676,11 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       const p = pointers.get(e.pointerId);
       pointers.delete(e.pointerId);
       pinchDist = 0;
-      if (dragNode) {
-        // Pin the node where it was dropped (fx/fy kept), so a moved node stays
-        // put instead of being yanked back by the theme-centroid force.
-        sim.alphaTarget(0);
-      }
+      // A dropped node stays pinned where it was dropped (fx/fy kept), so the
+      // theme-centroid force does not yank it back. The cool-down runs whenever
+      // the last pointer lifts, drag or not, so the sim always goes back to
+      // sleep (belt and braces against a hot alphaTarget leaking).
+      if (pointers.size === 0) sim.alphaTarget(0);
       if (p && moved < 5) {
         const hit = hitTest(p.x, p.y);
         setSelectedId(hit ? hit.id : null);
@@ -667,6 +717,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       for (const n of nodes) posRef.current.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
       sim.stop();
       ro.disconnect();
+      if (warmRaf != null) cancelAnimationFrame(warmRaf);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
       canvas.removeEventListener("pointerdown", onPointerDown);
@@ -731,8 +782,10 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
 
   const fitView = () => {
     // Fit into the area the card leaves free, so "Einpassen" frames nicely
-    // whether or not a node is selected.
-    refitForLayout(cardLayoutRef.current, !!selectedRef.current);
+    // whether or not a node is selected. A dormant selection (filtered out of
+    // the graph, no card showing) does not count.
+    const hasCard = !!(selectedRef.current && nodeById.has(selectedRef.current));
+    refitForLayout(cardLayoutRef.current, hasCard);
   };
 
   // Switch the card between the bottom-bar and side-panel shapes, then
