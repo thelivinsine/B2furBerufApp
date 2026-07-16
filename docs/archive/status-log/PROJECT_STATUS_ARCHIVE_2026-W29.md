@@ -143,3 +143,33 @@ one-line founder bug fix.
   slides under the header on scroll" behavior a real z-order instead of a DOM-order coincidence.
 - **Gates:** `pnpm build` green (only gate relevant to a className change; no content/engine/type
   impact). Live verification (Actions tab + `*.github.io`) is the founder's, per the usual note.
+
+## Session 120 (2026-07-14) — Content-library coverage review + deepening (condensed handoff)
+
+**Handoff after session 120 (2026-07-14). Content-library coverage review + deepening (Opus 4.8), on
+branch `claude/content-library-coverage-lih2fp`. Shipped to `main`.** The founder asked for a thorough
+review of the content library to find themes/sub-themes/Branchen with too few words or collocations,
+then to add genuinely useful, commonly-used items for those fields.
+- **What the review found (quantified via a throwaway coverage script):** the industrial Branchen
+  (production 80 / engineering 71 / construction 65 / it 55 / chemicals 49 vocab) are well-covered from
+  the s94/s95/s102 packs; the imbalance was the **service/consumer world** where most B1-B2 immigrant
+  learners actually work — sports 17, beauty 19, hospitality 19, retail 21 vocab. Thin daily-life
+  themes: bank 29 (lowest), behoerde 33, bildung 34, wohnen 47. Starved sub-themes: `behoerde.bescheid`
+  3, `behoerde.aufenthalt` 4, `arzt.versicherung` 4, all `bank`/`bildung` subs 6-8.
+- **Wave 1 (service Branchen, +76 vocab / +48 colloc):** hospitality (Kellner, Vorspeise, Getränkekarte,
+  abräumen, zapfen…), retail (Wechselgeld, Umtausch, Rückgaberecht, Warenkorb, Anprobe…), beauty (Frisur,
+  Spülung, Tönung, Wimpernverlängerung, zupfen…), plus cleaning/security/sports top-ups (they were less
+  thin, so fewer). Each rides `sectors:[…]` on the natural theme (mostly `customer`/`safety`/`arzt`).
+- **Wave 2 (daily-life themes, +57 vocab / +8 colloc):** bank (Überweisen, Einzahlung, Buchung, Mahnung,
+  Zahlungsverzug…), behoerde (Wohnsitz, an/abmelden, Niederlassungserlaubnis, Einbürgerung, Widerspruch,
+  Rechtsmittel…), bildung (Wortschatz, Aussprache, mündlich/schriftlich, durchfallen, Praktikum,
+  Bildungsgutschein…), wohnen (Betriebskosten, Nachzahlung, Zählerstand, Wasserschaden, Rohrbruch…),
+  arzt.versicherung (Zuzahlung, Überweisungsschein, Attest, Zusatzversicherung…). Sub-theme-tagged so the
+  starved slices fill.
+- **Mechanics:** appended to `vocabularyPart2` / the collocations array; provenance rows added (DWDS
+  refs, `review_status:"draft"` for the next founder review pass); `content_type` is `"vocabulary"` (not
+  `"vocab"` — TS enum, caught at build). Regenerated `frequency.ts` after `pip install wordfreq` +
+  `build:frequency-subset` (unbinned dropped 342 to 86). Refreshed the morphology oracle subsets.
+- **Gates:** `lint:content` OK, `typecheck` OK, `build` OK, `test:unit` 142/142, `check:bundle` 79.6 kB,
+  `verify:facts` OK (0 two-oracle-confirmed errors; the one new signal, `die Betriebskosten`, is a correct
+  plurale tantum). Everything AI-drafted, founder-verify pending like the rest of the bank.

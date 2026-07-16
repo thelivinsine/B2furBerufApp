@@ -152,6 +152,10 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // The graph was rebuilt: a hover id from the previous node set would dim
+    // everything against a node that no longer exists.
+    hoverRef.current = null;
+
     const dpr = window.devicePixelRatio || 1;
     let width = 0;
     let height = 0;
@@ -192,36 +196,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       .stop();
     simRef.current = { sim, nodes, links };
 
-    // Settle past the initial explosion off-screen, then animate gently.
-    sim.tick(120);
-
-    if (!fittedRef.current && nodes.length > 0) {
-      fittedRef.current = true;
-      // Open zoomed INTO a dense area at a readable zoom (founder 2026-07-13),
-      // not the fit-all overview. k≈3.4 makes the big nodes and their labels
-      // read comfortably on a phone (the whole-graph fit sits behind the
-      // fit-to-screen button). Center on a node picked WEIGHTED BY AREA
-      // (r² ∝ wordfreq), so the opening view reliably lands among common,
-      // well-connected words instead of a lone rare word in an empty corner.
-      // Not selected on open, so no card covers the map.
-      let total = 0;
-      for (const n of nodes) total += n.r * n.r;
-      let pick = nodes[0];
-      let r = Math.random() * total;
-      for (const n of nodes) {
-        r -= n.r * n.r;
-        if (r <= 0) {
-          pick = n;
-          break;
-        }
-      }
-      const k = clampK(3.4);
-      transformRef.current = {
-        k,
-        x: width / 2 - (pick.x ?? 0) * k,
-        y: height / 2 - (pick.y ?? 0) * k,
-      };
-    }
+    const nodeIds = new Set(nodes.map((n) => n.id));
 
     const draw = () => {
       const { x: tx, y: ty, k } = transformRef.current;
@@ -230,7 +205,12 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.setTransform(dpr * k, 0, 0, dpr * k, dpr * tx, dpr * ty);
 
-      const focus = hoverRef.current ?? selectedRef.current;
+      // Ignore a selection that is not in the current graph (a filter change
+      // can remove the selected word): the dead id has no card but would still
+      // drive the focus dimming, ghosting the whole canvas. The selection
+      // simply goes dormant and revives if the word comes back into filter.
+      const rawFocus = hoverRef.current ?? selectedRef.current;
+      const focus = rawFocus !== null && nodeIds.has(rawFocus) ? rawFocus : null;
       const focusSet = focus
         ? new Set([focus, ...(neighborsRef.current.get(focus) ?? [])])
         : null;
@@ -314,9 +294,65 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     };
     drawRef.current = draw;
 
-    sim.on("tick", scheduleDraw);
-    sim.alpha(0.08).restart();
-    scheduleDraw();
+    // ── Warmup: settle past the initial explosion, then animate gently ─────
+    // This used to be one synchronous sim.tick(120), which froze the main
+    // thread for ~1s on desktop (multi-second on phones) on every open AND
+    // every filter change. The warmup now runs in requestAnimationFrame
+    // slices with a per-frame time budget, so the page stays responsive.
+    // A rebuild where most nodes kept their previous positions (a filter
+    // tweak) is already settled and only needs a short warmup.
+    const cachedShare =
+      nodes.length > 0
+        ? nodes.filter((n) => posRef.current.has(n.id)).length / nodes.length
+        : 0;
+    let warmTicksLeft = cachedShare > 0.5 ? 20 : 120;
+    let warmRaf: number | null = null;
+    const finishWarmup = () => {
+      if (!fittedRef.current && nodes.length > 0) {
+        fittedRef.current = true;
+        // Open zoomed INTO a dense area at a readable zoom (founder 2026-07-13),
+        // not the fit-all overview. k≈3.4 makes the big nodes and their labels
+        // read comfortably on a phone (the whole-graph fit sits behind the
+        // fit-to-screen button). Center on a node picked WEIGHTED BY AREA
+        // (r² ∝ wordfreq), so the opening view reliably lands among common,
+        // well-connected words instead of a lone rare word in an empty corner.
+        // Not selected on open, so no card covers the map.
+        let total = 0;
+        for (const n of nodes) total += n.r * n.r;
+        let pick = nodes[0];
+        let r = Math.random() * total;
+        for (const n of nodes) {
+          r -= n.r * n.r;
+          if (r <= 0) {
+            pick = n;
+            break;
+          }
+        }
+        const k = clampK(3.4);
+        transformRef.current = {
+          k,
+          x: width / 2 - (pick.x ?? 0) * k,
+          y: height / 2 - (pick.y ?? 0) * k,
+        };
+      }
+      sim.on("tick", scheduleDraw);
+      sim.alpha(0.08).restart();
+      scheduleDraw();
+    };
+    const runWarmup = () => {
+      warmRaf = null;
+      const start = performance.now();
+      while (warmTicksLeft > 0 && performance.now() - start < 10) {
+        sim.tick();
+        warmTicksLeft -= 1;
+      }
+      if (warmTicksLeft > 0) warmRaf = requestAnimationFrame(runWarmup);
+      else finishWarmup();
+    };
+    // A warm rebuild can draw right away (positions are near their old spots);
+    // a cold start stays blank until the layout has settled off-screen.
+    if (cachedShare > 0.5) scheduleDraw();
+    runWarmup();
 
     // ── Interaction: pan / pinch / drag / tap / hover ─────────────────────
     const pointers = new Map<number, { x: number; y: number }>();
@@ -360,7 +396,16 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       if (pointers.size === 2) {
         const [a, b] = [...pointers.values()];
         pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
-        dragNode = null;
+        // Release a half-started node drag properly. Without this the touched
+        // node kept fx/fy forever (permanently pinned in a graph that does not
+        // pin) and alphaTarget stayed at 0.25, so the sim never slept again
+        // (permanent jitter + battery drain).
+        if (dragNode) {
+          dragNode.fx = null;
+          dragNode.fy = null;
+          sim.alphaTarget(0);
+          dragNode = null;
+        }
         return;
       }
       dragNode = hitTest(p.x, p.y);
@@ -424,8 +469,10 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       if (dragNode) {
         dragNode.fx = null;
         dragNode.fy = null;
-        sim.alphaTarget(0);
       }
+      // Cool down whenever the last pointer lifts, drag or not, so the sim
+      // always goes back to sleep (belt and braces against a hot alphaTarget).
+      if (pointers.size === 0) sim.alphaTarget(0);
       // A tap (barely moved): select the word, or clear on empty space.
       if (p && moved < 5) {
         const hit = hitTest(p.x, p.y);
@@ -465,6 +512,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       for (const n of nodes) posRef.current.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
       sim.stop();
       ro.disconnect();
+      if (warmRaf != null) cancelAnimationFrame(warmRaf);
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
       canvas.removeEventListener("pointerdown", onPointerDown);

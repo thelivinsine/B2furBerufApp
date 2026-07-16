@@ -1086,3 +1086,58 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   per the doc-hygiene rule) and appended this prompt-log entry.
 - **Artifacts:** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   `docs/SESSION_PROMPT_LOG.md`.
+
+---
+
+## Session 122 — 2026-07-16 — Theorie graph-view quality audit + P0/P1 fixes
+
+**Branch:** `claude/bibliothek-theorie-graphs-sk0dr3` · **Model:** Fable 5 · **Attachments:** none
+
+- **Prompt 1 (verbatim):**
+  > check the graphs in bibliothek/theorie. I think they have a lot of bugs and quality issues. Do a
+  > comprehensive analysis and provide me a report with priority actions p0 to p3
+- **Response 1 (analysis, no code change):** Read both graph views (`WordGraph.tsx`,
+  `CollocationGraph.tsx`), both pure builders, palette, tests and the trainer mounting; ran the real
+  builders + a d3-force benchmark against the live banks. Delivered a P0–P3 report in chat. P0: the
+  synchronous sim warmup (`tick(120)`/`tick(160)`) freezes the main thread 951ms/1019ms (desktop-class
+  CPU) per open and per filter change; a pinch starting on a node leaves `alphaTarget` hot forever
+  (permanent jitter + battery drain, plus a permanently pinned node in Wörter). P1: a filtered-out
+  selection ghosts the whole canvas (dead focus id dims everything, no card); the Kollokationen
+  zoomed-out view renders zero labels below k=0.7 (fit-to-all is k≈0.21 phone / 0.55 laptop, the
+  authored `hubBoost` was dead code); only 118/797 collocations resolve into Wörter-graph edges and
+  494/2,514 `related` refs drop unresolved (content-authoring follow-up). P2: no label collision
+  culling in Wörter, card covers the selected node in Wörter, wheel hijacks page scroll, legend count
+  ignores filters, no resize refit, fit-button quirks, `konferenzraum` duplicate + 6 pair-form labels.
+  P3: unused `register` plumbing, setState-in-updater in `toggleLayout`, `posRef` growth, stale palette
+  comment, a11y, node seeding. Also noted what is healthy (tested pure builders, memoized items, lazy
+  d3 chunks).
+- **Prompt 2 (verbatim):**
+  > add in the report, which actions should be done by which claude llm models
+- **Response 2:** Added a per-action model map aligned with `docs/PROJECT_REFERENCE.md` routing: Opus
+  4.8 for the warmup rework + pinch fix (and P1-3/P1-4 riding along, same files) and the P1-5 curation
+  list; Sonnet 5 for the P2 ports/lifecycle fixes and content authoring; Haiku 4.5 for the mechanical
+  batch. Suggested session batching (one session per tier) since Claude Code runs one model per session.
+- **Prompt 3 (verbatim):**
+  > can you explain why is Fable left out and what tasks are fable suitable for in simpler words?
+- **Response 3 (explanation only):** Fable is the design/judgment tier; the fix list is already
+  diagnosed and specified, so build tiers execute it better per euro. Fable earns its cost on
+  "figure out what to build" work (e.g. rethinking the graphs as a learning surface), research-heavy or
+  high-stakes judgment calls. Gave the rule of thumb: unknown-answer → Fable, tricky build → Opus,
+  spec'd build → Sonnet, trivial → Haiku.
+- **Prompt 4 (verbatim):**
+  > alright go ahead with opus tasks
+- **Response 4:** Implemented the four fixes in the two view components (pure builders + unit tests
+  untouched): rAF-chunked sim warmup with a 10ms/frame budget and a 20-tick warm-restart fast path
+  (>50% cached positions → draw immediately; cold start settles blank then reveals); pinch branch
+  releases a half-started drag and `alphaTarget(0)` runs whenever the last pointer lifts; draw ignores
+  focus ids absent from the current graph (dormant selection revives when the node returns; `fitView`
+  ignores a dormant card); Kollokationen hub labels (degree ≥ 5) stay readable at any zoom with alpha
+  ramping 0.4→0.9 by degree. Verified end-to-end with Playwright against the dev server (both views
+  paint post-warmup with zero >200ms long tasks; tap opens card; no ghosting after filter change; hub
+  labels screenshot-verified at fit-to-all; no page errors). Gates: typecheck clean, lint at the exact
+  pre-change warning baseline, test:unit 147/147, build + check:bundle 79.6 kB. Opened PR #539,
+  squash-merged to `main`, ran the post-merge branch realignment, and updated the docs (status handoff
+  s122; s120 handoff aged into the W29 archive).
+- **Artifacts:** `src/features/vocabulary/WordGraph.tsx` · `src/features/collocations/CollocationGraph.tsx` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/SESSION_PROMPT_LOG.md` · PR #539.
