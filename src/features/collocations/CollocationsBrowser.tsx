@@ -61,8 +61,8 @@ const CollocationCard = memo(function CollocationCard({ c }: { c: Collocation })
   const front = (
     <Card className="card-hover h-full">
       <CardContent className="flex h-full flex-col p-4">
-        <div className="flex min-w-0 items-center gap-1.5">
-          <p className="min-w-0 truncate text-base font-semibold sm:text-lg">{c.full}</p>
+        <div className="flex min-w-0 items-start gap-1.5">
+          <p className="min-w-0 flex-1 text-base font-semibold leading-snug sm:text-lg">{c.full}</p>
           <span onClick={(e) => e.stopPropagation()}>
             <SpeakButton text={c.full} className="shrink-0" />
           </span>

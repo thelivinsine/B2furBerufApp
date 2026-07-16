@@ -18,7 +18,7 @@ This file is now just the **index**. The session logs live in the weekly chunks 
 | `PROJECT_STATUS_ARCHIVE_2026-W26.md` | 2026-W26 | Jun 22–28 | 31–44 (detailed logs) |
 | `PROJECT_STATUS_ARCHIVE_2026-W27.md` | 2026-W27 | Jun 29 – Jul 5 | 45–46 (detailed logs) + 49–68 (condensed handoffs) |
 | `PROJECT_STATUS_ARCHIVE_2026-W28.md` | 2026-W28 | Jul 6–12 | 69–109 (detailed logs + condensed handoffs; the 07-13-dated s104–s109 handoffs live here too, keeping the demo-prep series together) |
-| `PROJECT_STATUS_ARCHIVE_2026-W29.md` | 2026-W29 | Jul 13–19 | 113, 115–121 (condensed handoffs) |
+| `PROJECT_STATUS_ARCHIVE_2026-W29.md` | 2026-W29 | Jul 13–19 | 113, 115–122 (condensed handoffs) |
 | `PROJECT_STATUS_ARCHIVE_ops-notes.md` | — | undated | Evergreen deploy/ops notes, early auth/landing branch notes, and the cross-week condensed recaps (sessions 9–28) |
 
 Notes on the split:

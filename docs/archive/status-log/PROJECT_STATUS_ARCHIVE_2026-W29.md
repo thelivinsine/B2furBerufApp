@@ -199,3 +199,35 @@ then said "merge".
 - **Note for next session:** the domain count is now 5, but `pruefung` still has no themes mapped to it
   (exam prep lives separately), so 4 domains actually carry the 15 themes. Pre-existing, unrelated to
   this merge.
+
+## Session 122 (2026-07-16) — Theorie graph-view quality audit + P0/P1 fixes (condensed handoff)
+
+**Handoff after session 122 (2026-07-16). Theorie graph-view quality audit + P0/P1 fixes (Fable 5), on
+branch `claude/bibliothek-theorie-graphs-sk0dr3`, shipped to `main` (PR #539, squash-merged).** The
+founder asked for a comprehensive bug/quality analysis of the Bibliothek/Theorie graph views, then a
+P0–P3 report with per-action Claude-model routing, then approved the Opus-tier batch.
+- **The audit (delivered in-chat):** ran the pure builders + a d3-force benchmark against the real
+  banks. Key numbers: sim warmup froze the main thread **951ms (Wörter) / 1019ms (Kollokationen)** on a
+  desktop-class CPU per open AND per filter change; Kollokationen fit-to-all zoom is k≈0.21 (phone) /
+  0.55 (laptop), both under the old k>0.7 label gate → zero labels at the flagship zoomed-out view; only
+  118/797 collocations resolve noun+verb into Wörter-graph edges (350 noun-only, 234 neither) and 494/
+  2,514 `related` refs drop unresolved — that content gap is the **open P1-5 follow-up** (Opus curation
+  list → Sonnet authoring). Remaining P2/P3 batch (label-culling + card-refit ports to Wörter, wheel
+  scroll-trap, count-vs-filter mismatch, resize refit, data nits, hygiene) is scoped in the session-122
+  prompt-log entry; fix order and model routing per action are recorded there too.
+- **The four fixes shipped (components only; pure builders + tests untouched):** (1) warmup now runs in
+  rAF slices with a 10ms/frame budget; a rebuild where >50% of nodes kept cached positions (filter
+  tweak) needs only 20 ticks and draws immediately, cold starts settle blank-then-reveal (design
+  intent kept, freeze gone). (2) The pinch branch releases a half-started node drag and the cool-down
+  (`alphaTarget(0)`) runs whenever the last pointer lifts, so the sim always sleeps again (was: permanent
+  jitter + a pinned node in Wörter). (3) Draw ignores focus ids not in the current graph (dormant
+  selection revives if the node returns; `fitView` ignores a dormant selection's card). (4) Kollokationen
+  hub labels: degree ≥ 5 keeps a readable label at any zoom, alpha ramping 0.4→0.9 by degree (the old
+  dead `hubBoost` removed); collision culling keeps the canvas clean.
+- **Verification:** Playwright end-to-end (onboarding skipped via seeded localStorage): both views paint
+  after chunked warmup with zero >200ms long tasks, tap opens the card, filter change with active
+  selection no longer ghosts, hub labels screenshot-verified at fit-to-all. `typecheck` clean, `lint` at
+  the exact pre-change warning baseline, `test:unit` 147/147, `build` + `check:bundle` 79.6 kB.
+- **Note:** PRs #537 (backlog-item doc tick) and #538 (singular/plural noun merge onto one graph node,
+  Theorie) merged between s121 and this session without status-doc entries; s122 numbering continues
+  from the last documented session.

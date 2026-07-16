@@ -1191,3 +1191,38 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
   `tests/collocationGraph.test.ts` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Session 124 — 2026-07-16 — Kollokationen Karten card text-cutoff + speak-button alignment fix
+
+**Branch:** `claude/card-text-alignment-fixes-cc3k0r` · **Model:** Sonnet 5 · **Attachments:** 1
+screenshot (Bibliothek/Theorie Kollokationen Karten grid, titles cut off mid-word with a trailing
+ellipsis, e.g. "die Aufgaben vertei...")
+
+- **Prompt 1 (verbatim, with the attached screenshot):**
+  > sometimes the words are being cut-off due to spacing issue. Adjust the cards' dimensons or the
+  > space within the cards so that no text is cut-off. Also, the speak out loud buttons are not
+  > algined properly in some cards. Fix that such that they are perfeclty aligned to the right.
+- **Response 1:** Identified the exact view from the screenshot's Nomen-Verb phrases (e.g. "eine
+  Frist einhalten", "einen Termin absagen") as the Bibliothek → Theorie → Kollokationen tab's
+  "Karten" grid, `CollocationCard` in `src/features/collocations/CollocationsBrowser.tsx`. Root
+  cause: the title row was `flex items-center` with the title `<p>` carrying `truncate` and no
+  `flex-1`, so a long title filled the row via flex-shrink and got ellipsis-truncated, while a short
+  title (e.g. "Zeit sparen") left the `SpeakButton` sitting immediately after the text instead of
+  anchored to the card's right edge. The example-sentence row directly below already used the correct
+  pattern (`min-w-0 flex-1`, no truncate) and never had this bug. Fix: changed the title row to
+  `flex items-start gap-1.5` and the title `<p>` to `min-w-0 flex-1 ... leading-snug` (dropped
+  `truncate`/`items-center`), mirroring the example row, so titles wrap instead of truncating and the
+  speak icon always sits flush right. Verified `pnpm typecheck` clean, `pnpm lint` clean, `pnpm build`
+  + `pnpm check:bundle` green (79.6 kB), then built + served `pnpm preview`, seeded
+  `b2beruf.settings.v1` in localStorage to skip onboarding, and took a Playwright screenshot of
+  `/library?tab=kollokationen&view=karten` confirming every previously-truncated title (e.g. "etwas
+  zur Sprache bringen") now renders in full and every speak button (including on "Zeit sparen") sits
+  flush right. Committed and pushed to the branch.
+- **Prompt 2 (verbatim):**
+  > go ahead and open a pr then merge
+- **Response 2:** Opened PR #545 into `main`. Interrupted mid-turn by a follow-up "document the
+  session" prompt, so wrote this log entry plus the `docs/PROJECT_STATUS.md` handoff (aging session
+  122's handoff out to the W29 archive) before merging, so both land in the same squash-merge.
+- **Artifacts:** `src/features/collocations/CollocationsBrowser.tsx` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md` · PR #545.
