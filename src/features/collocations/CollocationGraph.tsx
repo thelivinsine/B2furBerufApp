@@ -190,6 +190,22 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   // a deselect can animate them back. focusRafRef owns the focus/return tween.
   const homePosRef = useRef(new Map<string, { x: number; y: number }>());
   const focusRafRef = useRef<number | null>(null);
+  // Offscreen ctx to measure label widths (same font as draw), so the focus
+  // layout can space nodes by their LABEL box, not just the dot, keeping every
+  // partner word legible instead of letting the draw pass cull overlaps.
+  const labelCtxRef = useRef<CanvasRenderingContext2D | null>(null);
+  const measureLabel = (text: string) => {
+    let ctx = labelCtxRef.current;
+    if (!ctx) {
+      ctx = document.createElement("canvas").getContext("2d");
+      if (ctx) {
+        const fam = getComputedStyle(document.body).fontFamily || "system-ui, sans-serif";
+        ctx.font = `600 11px ${fam}`;
+      }
+      labelCtxRef.current = ctx;
+    }
+    return ctx ? ctx.measureText(text).width : text.length * 6.5;
+  };
 
   selectedRef.current = selectedId;
   cardLayoutRef.current = cardLayout;
@@ -569,7 +585,10 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
           const bw = w + padX * 2;
           const bh = 11 + padY * 2;
           const box = { l: bl - 2, t: bt - 2, r: bl + bw + 2, b: bt + bh + 2 };
-          if (hits(box)) continue;
+          // While a node is focused its partners were laid out so their labels
+          // do not overlap, so draw every one (never cull a partner word).
+          // Outside focus, cull overlaps as before to keep the map clean.
+          if (!focusSet && hits(box)) continue;
           placed.push(box);
           ctx.fillStyle = `rgba(${bgColor},${0.72 * alpha})`;
           ctx.beginPath();
@@ -835,6 +854,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     center: { x: number; y: number },
     neigh: SimNode[],
     centerR: number,
+    centerLabel: string,
     freeW: number,
     freeH: number,
   ): Map<string, { x: number; y: number }> => {
@@ -885,37 +905,67 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       }
       targets.set(s.n.id, { x: px, y: py });
     }
-    relaxCollisions(targets, neigh);
+    relaxLabels(targets, neigh, center, centerR, centerLabel);
     return targets;
   };
 
-  // Nudge overlapping partner targets apart (a few symmetric passes). Only acts
-  // on pairs that actually collide, so spokes keep their direction.
-  const relaxCollisions = (
+  // Separate nodes so their LABEL boxes (not just the dots) never overlap, so the
+  // draw pass never has to cull a partner word. Each node is an axis-aligned box
+  // sized to its label (label sits under the dot); overlapping pairs are pushed
+  // apart along the axis of least penetration (minimal nudge, so the arrangement
+  // keeps its shape). The selected node is an immovable box so partners clear its
+  // label too. Label widths are screen px, converted to world units at the target
+  // zoom (the max zoom a focus ever uses).
+  const relaxLabels = (
     targets: Map<string, { x: number; y: number }>,
     neigh: SimNode[],
+    center: { x: number; y: number },
+    centerR: number,
+    centerLabel: string,
   ) => {
-    const arr = neigh.map((n) => ({ r: n.r, p: targets.get(n.id)! })).filter((a) => a.p);
-    for (let it = 0; it < 6; it++) {
+    const G = (5 + 13) / TARGET_FOCUS_K; // label gap + line height, world units
+    const boxOf = (r: number, label: string, p: { x: number; y: number }, movable: boolean) => ({
+      p,
+      movable,
+      halfW: Math.max(r, measureLabel(label) / (2 * TARGET_FOCUS_K) + 1),
+      halfH: r + G / 2,
+    });
+    const arr = neigh
+      .filter((n) => targets.get(n.id))
+      .map((n) => boxOf(n.r, n.label, targets.get(n.id)!, true));
+    arr.unshift(boxOf(centerR, centerLabel, { x: center.x, y: center.y }, false));
+
+    for (let it = 0; it < 12; it++) {
+      let moved = false;
       for (let i = 0; i < arr.length; i++) {
         for (let j = i + 1; j < arr.length; j++) {
           const a = arr[i];
           const b = arr[j];
+          if (!a.movable && !b.movable) continue;
           const dx = b.p.x - a.p.x;
           const dy = b.p.y - a.p.y;
-          const d = Math.hypot(dx, dy) || 0.01;
-          const min = a.r + b.r + 7;
-          if (d < min) {
-            const push = (min - d) / 2;
-            const ux = dx / d;
-            const uy = dy / d;
-            a.p.x -= ux * push;
-            a.p.y -= uy * push;
-            b.p.x += ux * push;
-            b.p.y += uy * push;
+          const ox = a.halfW + b.halfW - Math.abs(dx);
+          const oy = a.halfH + b.halfH - Math.abs(dy);
+          if (ox <= 0 || oy <= 0) continue;
+          moved = true;
+          if (ox < oy) {
+            const s = dx >= 0 ? 1 : -1;
+            if (a.movable && b.movable) {
+              a.p.x -= (s * ox) / 2;
+              b.p.x += (s * ox) / 2;
+            } else if (a.movable) a.p.x -= s * ox;
+            else b.p.x += s * ox;
+          } else {
+            const s = dy >= 0 ? 1 : -1;
+            if (a.movable && b.movable) {
+              a.p.y -= (s * oy) / 2;
+              b.p.y += (s * oy) / 2;
+            } else if (a.movable) a.p.y -= s * oy;
+            else b.p.y += s * oy;
           }
         }
       }
+      if (!moved) break;
     }
   };
 
@@ -927,21 +977,30 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   const frameFocus = (
     center: { x: number; y: number },
     centerR: number,
+    centerLabel: string,
     targets: Map<string, { x: number; y: number }>,
     nodesById: Map<string, SimNode>,
     width: number,
     height: number,
   ) => {
-    let minX = center.x - centerR;
-    let maxX = center.x + centerR;
-    let minY = center.y - centerR;
-    let maxY = center.y + centerR;
+    // Bounds include each node's LABEL (wider than the dot, and sitting below
+    // it), so the fit never clips a word at the edge of the view.
+    const G = (5 + 13) / TARGET_FOCUS_K;
+    let minX = Infinity;
+    let maxX = -Infinity;
+    let minY = Infinity;
+    let maxY = -Infinity;
+    const extend = (px: number, py: number, r: number, label: string) => {
+      const hx = Math.max(r, measureLabel(label) / (2 * TARGET_FOCUS_K) + 1);
+      minX = Math.min(minX, px - hx);
+      maxX = Math.max(maxX, px + hx);
+      minY = Math.min(minY, py - r);
+      maxY = Math.max(maxY, py + r + G);
+    };
+    extend(center.x, center.y, centerR, centerLabel);
     for (const [id, p] of targets) {
-      const r = nodesById.get(id)?.r ?? 4;
-      minX = Math.min(minX, p.x - r);
-      maxX = Math.max(maxX, p.x + r);
-      minY = Math.min(minY, p.y - r);
-      maxY = Math.max(maxY, p.y + r);
+      const n = nodesById.get(id);
+      extend(p.x, p.y, n?.r ?? 4, n?.label ?? "");
     }
     const [rx, ry, rw, rh] = freeRect(width, height, true, cardLayoutRef.current);
     const fitK = Math.min(rw / Math.max(maxX - minX, 1), rh / Math.max(maxY - minY, 1));
@@ -1019,7 +1078,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
 
     const center = { x: sel.x ?? 0, y: sel.y ?? 0 };
     const [, , frw, frh] = freeRect(rect.width, rect.height, true, cardLayoutRef.current);
-    const targets = focusTargets(center, neigh, sel.r, frw, frh);
+    const targets = focusTargets(center, neigh, sel.r, sel.label, frw, frh);
     if (!home.has(sel.id)) home.set(sel.id, { x: center.x, y: center.y });
 
     const keep = new Set<string>([sel.id, ...neigh.map((n) => n.id)]);
@@ -1041,7 +1100,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       moves.push({ node: n, from: { x: n.x ?? 0, y: n.y ?? 0 }, to: { x: h.x, y: h.y } });
     }
 
-    const toT = frameFocus(center, sel.r, targets, nodesById, rect.width, rect.height);
+    const toT = frameFocus(center, sel.r, sel.label, targets, nodesById, rect.width, rect.height);
     runFocusTween(moves, transformRef.current, toT, FOCUS_MS, () => {
       for (const id of returning) {
         const n = nodesById.get(id);
