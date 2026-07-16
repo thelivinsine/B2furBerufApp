@@ -1,15 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-16 (session 124). **Kollokationen Karten card text-cutoff + speak-button
-alignment fix, on branch `claude/card-text-alignment-fixes-cc3k0r`, shipped to `main` (PR #545).** The
-founder shared a screenshot of the Bibliothek/Theorie Kollokationen "Karten" grid showing titles cut off
-mid-word ("die Aufgaben vertei...") and the speak-out-loud icon sitting at inconsistent horizontal
-positions across cards. Root cause: `CollocationsBrowser.tsx`'s card title had a hard `truncate` class
-with no `flex-1`, so a long phrase got ellipsis-cut while a short one left the icon hugging the text
-instead of anchored to the card's right edge. Fix: let the title wrap (matching the example-sentence row
-already below it) and gave it `flex-1` so the icon always sits flush right. Verified against a built
-preview server with a headless screenshot; typecheck/lint/build/check:bundle all green. Product name:
-**Genauly** (`genauly.de`)._
+_Last updated: 2026-07-16 (session 125). **Theorie graph word-selection distribution + focus polish, on
+branch `claude/graph-word-selection-distribution-5av8xk`, shipped to `main` across PRs #542–#544, #546–#550
+(nine squash-merges).** The founder iterated on how the Wörter and Kollokationen graphs behave when a word
+is selected. End state: selecting a node keeps each connection's DIRECTION but fans clustered angles out
+and places them on an ellipse sized to fill ~80% of the free area (so nothing is cramped near the center,
+even a single connection, and the left/right space is used); nodes are spaced by their LABEL box so every
+connection word stays legible (draw pass no longer culls focus labels); the view frames at a readable zoom;
+deselecting animates every node home. The Kollokationen fit-to-screen button now matches the Wörter one
+(random well-connected node), all fit-button view switches animate, and the Kollokationen card floats with
+the same edge gap as the Wörter card. All animations respect prefers-reduced-motion. Two files only:
+`WordGraph.tsx` + `CollocationGraph.tsx`. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -64,6 +65,50 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 125 (2026-07-16). Theorie graph word-selection distribution + focus polish
+(Opus 4.8), on branch `claude/graph-word-selection-distribution-5av8xk`, shipped to `main` across nine
+squash-merges (PRs #542, #543, #544, #546, #547, #548, #549, #550).** A long founder-iterated thread on
+how the **Wörter** and **Kollokationen** graph views (`/library?tab=…&view=graph`) behave when a word is
+selected. All work is in two files: `src/features/vocabulary/WordGraph.tsx` +
+`src/features/collocations/CollocationGraph.tsx`. The final selection/focus model (identical in both
+graphs):
+- **Fan-out on select, restore on deselect (#542/#543).** Selecting a node animates its connections into
+  a focused arrangement and frames them at a readable zoom (clamped, so a selection is never left too
+  zoomed out after a fit-to-all); deselecting (empty-space tap or card ✕) animates every displaced node
+  back to its stored **home** position. Implemented with a `homePosRef` (true home per displaced node) +
+  a `focusRafRef` easeOut tween that pins moved nodes (`fx/fy`) so the d3 sim can't fight it; home
+  positions (not the transient focus spots) are what get cached to `posRef` on rebuild/unmount.
+- **Direction-preserving pull-in, not a rebuilt ring (#544).** Rejected the first "even symmetric ring"
+  because it rearranged too much. Each connection keeps its **direction**; the founder then asked for the
+  space to be used, so the final placement (#549) puts each connection on an **ellipse sized to fill
+  ~82% of the free area** at the target zoom (`TARGET_FOCUS_K = 2.3`, per-axis rx/ry so a wide-but-short
+  free area still fills across), at a radial factor that keeps relative order but never below 0.72 of the
+  ellipse — so even a **single** connection spreads out instead of cramping at center.
+- **Angle spreading (#550).** A hub whose connections all pointed one way (e.g. `beantragen`, 16) still
+  stacked in a central column. `spreadAngles()` (module-scope pure fn in both files) blends each angle
+  toward an even slot (slots rotation-aligned to the originals to minimize movement), preserving circular
+  ORDER, so clustered connections fan around the whole ellipse and use the left/right space.
+- **Label legibility (#548).** Nodes are spaced by their **label box** (measured width + the line under
+  the dot) via an AABB `relaxLabels` pass with the selected word as an immovable box; `frameFocus`
+  expands its bounds by label extents so nothing clips; and while focused the draw pass **no longer culls
+  overlapping labels**, so a connection word can never silently disappear.
+- **Fit button + animation parity (#547).** The Kollokationen fit-to-screen button now behaves like the
+  Wörter one (second press zooms into a **random well-connected node**, weighted by area, excluding the
+  current selection, instead of always the biggest hub). Every fit-button view switch animates (the
+  fit-all press tweens the camera via the focus tween; the word-jump animates through the focus effect).
+  `fitToNodes`/`fitToRect` were refactored to **return** the transform (`computeFit`/`computeFitRect`).
+- **Card spacing (#544).** The Kollokationen selected-node card (both horizontal bar + vertical panel
+  shapes) now floats clear of the canvas edges by the same `bottom-3/left-3/right-3` gap the Wörter card
+  uses, instead of sitting flush.
+- All tweens respect `prefers-reduced-motion` (instant). Verified with dark-mode mobile Playwright
+  screenshots across 1-, 2-, 5-, 9-, and 16-connection selections + a numerical check of `spreadAngles`.
+  Gates each PR: typecheck clean, lint at the 53-warning baseline (0 errors), `test:unit` 146/146, build +
+  check:bundle 79.6 kB, 0 console errors.
+- **Caching caveat surfaced repeatedly:** several founder screenshots showed already-fixed behavior,
+  i.e. the installed PWA was serving a **cached** service-worker build. If a graph change doesn't appear
+  after deploy, hard-refresh / reopen the app so the new SW activates. If `beantragen` still looks
+  cramped after that, `spreadAngles`' `blend` (0.7) is the one knob to push harder.
+
 **Handoff after session 124 (2026-07-16). Kollokationen Karten card text-cutoff + speak-button
 alignment fix (Sonnet 5), on branch `claude/card-text-alignment-fixes-cc3k0r`, shipped to `main`
 (PR #545, squash-merged).** Founder-reported bug via screenshot: in the Bibliothek/Theorie →
@@ -90,52 +135,8 @@ speak-out-loud icon next to the title sat at inconsistent horizontal positions f
   as broken and was left untouched (single vocab words rarely overflow at card width); worth the same
   fix if it's ever reported.
 
-**Handoff after session 123 (2026-07-16). Theorie graph-view P2/P3 batch (Sonnet 5), on branch
-`claude/graphs-troubleshooting-plan-2f6p4s`.** Picked up the session-122 audit's leftover fix list
-("Remaining P2/P3 batch... is scoped in the session-122 prompt-log entry") and finished it.
-- **P2 (user-visible, Wörter graph unless noted):** (1) label collision culling ported from the
-  Kollokationen graph into `WordGraph.tsx`'s draw loop (candidates ranked focused-first then by radius,
-  skip a label whose box overlaps one already placed). (2) The selected-word card (bottom overlay) could
-  cover the very node it describes; a new effect pans the view up just enough to clear it whenever the
-  tapped node's screen position falls under the card, without touching zoom (unlike Kollokationen's
-  forced-zoom `focusNode`, which was intentionally left alone). (3) **Wheel hijacked page scroll on BOTH
-  graphs** (every wheel tick called `preventDefault`, so a user scrolling the Bibliothek page with the
-  cursor over a graph got stuck zooming instead): wheel now only zooms with ctrl/cmd held (the same
-  convention as trackpad pinch-zoom and Google Maps/Figma), otherwise it's left alone so the page scrolls;
-  canvases got a `title` hint. (4) **Legend connection count ignored the domain/kind filter on BOTH
-  graphs** (always showed the unfiltered total): now counts only edges whose both ends pass the active
-  filter, computed via a `useMemo` mirroring the draw-time `domActive`/`isActive` check. (5) **Resize left
-  both graphs off-center** (only the canvas pixel size updated, not the transform): the resize handler now
-  shifts the transform by half the width/height delta so the visual center stays anchored across a window
-  resize or phone rotation. (6) **Fit-button random-word/hub-jump ignored the active filter on BOTH
-  graphs**, so it could jump to a domain/kind the user had just dimmed out; both now pick only among
-  filter-passing nodes (falling back to the full set if the filter empties it).
-- **P3 (hygiene, Haiku-tier per the session-122 model map):** removed the `register` field from
-  `CollocationLink`/`SimLink` (carried through the builder and a test, never read by the renderer) plus
-  the now-pointless test; moved `toggleLayout`'s side effects (ref write + `refitForLayout`) out of the
-  `setCardLayout` functional updater, which must stay pure; capped the `posRef` position-cache growth at
-  4000 entries (LRU-ish eviction) as a safety net (real bank sizes never approach it); fixed a stale
-  "6-domain taxonomy spine" comment in `graphPalette.ts` (5 since the s121 arbeitswelt→beruf merge, and
-  the file literally lists 5); added `role="img"` + a descriptive `aria-label` to both canvases. Left
-  "node seeding" un-touched: Kollokationen's centroid-jitter seeding is deliberate (forms the theme
-  islands) and porting it to Wörter would fight that graph's intentionally different "one global cloud"
-  design (see CLAUDE.md); no other seeding bug was found on inspection.
-- **Not done (explicitly out of scope):** the P1-5 content-curation follow-up (494/2,514 unresolved
-  `related` refs, 118/797 Wörter-graph edge resolution) is a separate content-authoring task, not a
-  graph-code bug; still open for a future session.
-- **Verification:** Playwright end-to-end against `pnpm dev` (onboarding skipped via seeded
-  localStorage): plain wheel scrolls the page (`scrollY` 0→95/0→131) instead of zooming; ctrl+wheel still
-  zooms and the culled labels stay legible and non-overlapping at a close zoom; tapping a word near the
-  bottom edge of the Wörter canvas pans the view so the selected node lands clearly above the card instead
-  of behind it; the Kollokationen legend count went 786→0 under a Nomen-only filter (correct: every edge
-  is noun-verb, so an all-noun filter has zero valid edges) and the Wörter count went 1712→1281 under a
-  Berufsleben-only filter; the fit button's hub-jump under a Verben-only filter landed on "beantragen" (a
-  verb); the Kollokationen card-layout toggle (horizontal↔vertical) still refits correctly after the
-  `toggleLayout` purity fix. Zero console errors across both views. Gates: `typecheck` clean, `lint` at
-  the exact pre-change 53-warning baseline, `test:unit` 146/146 (147 minus the deleted dead-register
-  test), `lint:content` clean, `build` + `check:bundle` 79.6 kB.
-
-_(Session 122's Theorie graph-view quality audit + P0/P1 fixes handoff, session 121's
+_(Session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
++ P0/P1 fixes handoff, session 121's
 arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
 handoff, session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph
 handoff, session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support

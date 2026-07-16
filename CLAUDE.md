@@ -247,11 +247,30 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   panel down the right (`vertical`); toggling re-fits the constellation into the area the card leaves
   free via `fitToRect`/`freeRect` (`cardExtent` keeps the fit math in lockstep with the card's CSS
   size). **Nodes are draggable and pin where dropped** (`fx`/`fy` kept on release, since the strong
-  theme-centroid force would otherwise snap them back). **Selecting a node frames it** (tap / partner
-  chip / the fit button's hub jump) at a gentle readable zoom (`READABLE_K` 1.55, `focusNode`), and
-  canvas **labels are collision-culled onto translucent pills** (selected-first, then by degree) so they
-  stay legible instead of overlapping. The d3-force dep rides ONLY in the two lazy graph chunks (shared
-  `vendor-misc`, React.lazy); main chunk stays ~80 kB.
+  theme-centroid force would otherwise snap them back). Canvas **labels are collision-culled onto
+  translucent pills** (selected-first, then by degree) when NOT focused, so they stay legible instead of
+  overlapping. The d3-force dep rides ONLY in the two lazy graph chunks (shared `vendor-misc`,
+  React.lazy); main chunk stays ~80 kB.
+  **Graph selection / focus model (s125, IDENTICAL in both graphs; `WordGraph.tsx` +
+  `CollocationGraph.tsx`, the old Kollokationen `READABLE_K`/`focusNode` is superseded):** selecting a
+  node animates its connections into a **focused arrangement** and frames it at a readable zoom;
+  deselecting (empty-space tap or card ✕) animates every displaced node back to its stored **home**.
+  Mechanism: `homePosRef` stores each moved node's true home; `focusRafRef` runs an easeOut tween that
+  pins moved nodes (`fx/fy`) so the sim can't fight it; on graph rebuild/unmount the HOME positions (not
+  the transient focus spots) are cached to `posRef`. Placement rules (all founder-iterated): each
+  connection **keeps its direction** (angle), but (1) `spreadAngles()` fans clustered angles toward even
+  slots preserving circular ORDER so a one-sided hub still uses the left/right space; (2) each lands on an
+  **ellipse sized to fill ~82% of the free area** at `TARGET_FOCUS_K` (2.3), per-axis rx/ry, radial
+  factor floored at 0.72 so even a single connection spreads out (never cramped at center); (3)
+  `relaxLabels` (AABB, selected word immovable) separates nodes by their **label box** (measured width +
+  the line under the dot) and `frameFocus` pads its bounds by label extents, so no label clips; (4) while
+  focused the draw pass does **not** cull labels, so no connection word can vanish. The fit-to-screen
+  button toggles fit-all ↔ zoom into a **random well-connected node** (weighted by area, excludes the
+  current selection) in BOTH graphs; **every fit-button view switch animates** (`fitToNodes`/`fitToRect`
+  return the transform as `computeFit`/`computeFitRect`, tweened via the focus tween). The Kollokationen
+  card floats off the canvas edges by the same `bottom-3/left-3/right-3` gap the Wörter card uses. All
+  tweens respect `prefers-reduced-motion`. (The graphs are a PWA-cached surface: if a change doesn't show
+  after deploy, the service worker is serving a stale build; hard-refresh.)
   **Desktop filter rail (s91):** on lg+ the browse tabs are an **explicit 2-col × 2-row grid**
   (`lg:grid-cols-[minmax(0,1fr)_16rem]`, `lg:gap-y-4 lg:space-y-0`): the LibrarySwitcher tabs +
   view-switcher meta row sit in **row 1 / col 1 (content-column width, NOT full width)**, and the content

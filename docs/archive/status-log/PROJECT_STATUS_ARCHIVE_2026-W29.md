@@ -231,3 +231,17 @@ P0–P3 report with per-action Claude-model routing, then approved the Opus-tier
 - **Note:** PRs #537 (backlog-item doc tick) and #538 (singular/plural noun merge onto one graph node,
   Theorie) merged between s121 and this session without status-doc entries; s122 numbering continues
   from the last documented session.
+
+## Session 123 (2026-07-16) — Theorie graph-view P2/P3 batch (condensed handoff)
+
+**Branch `claude/graphs-troubleshooting-plan-2f6p4s` (Sonnet 5).** Finished the session-122 audit's
+leftover fix list. **P2 (user-visible):** ported label-collision culling into `WordGraph.tsx`; a new
+effect pans the Wörter view up so the selected-word card never covers its own node (no zoom change);
+wheel now only zooms with ctrl/cmd held on BOTH graphs (plain wheel scrolls the page); the legend
+connection count now respects the domain/kind filter on BOTH graphs; resize re-centers both graphs
+(transform shifted by half the size delta); the fit-button random/hub jump only picks filter-passing
+nodes. **P3 (hygiene):** removed the unused `register` field from `CollocationLink`/`SimLink` + its dead
+test; moved `toggleLayout` side effects out of the `setCardLayout` updater; capped `posRef` at 4000
+entries; fixed a stale "6-domain" comment in `graphPalette.ts`; added `role="img"` + aria-labels to both
+canvases. **Out of scope:** the content-curation follow-up (unresolved `related` refs / edge resolution).
+Gates: typecheck clean, lint at 53-warning baseline, `test:unit` 146/146, build + check:bundle 79.6 kB.
