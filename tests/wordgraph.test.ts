@@ -66,6 +66,17 @@ describe("buildWordGraph — edges", () => {
     expect(g.links).toEqual([{ source: "n", target: "v", kind: "collocation" }]);
   });
 
+  it("resolves a collocation written in the plural to its singular vocab node", () => {
+    const items = [
+      { ...word("n", "die Beschwerde"), plural: "die Beschwerden" } as VocabItem,
+      word("v", "schildern"),
+    ];
+    // The collocation noun is the plural "die Beschwerden"; without the plural
+    // alias this edge would silently drop.
+    const g = buildWordGraph(items, [colloc("c1", "die Beschwerden", "schildern")]);
+    expect(g.links).toEqual([{ source: "n", target: "v", kind: "collocation" }]);
+  });
+
   it("creates no collocation edge when one side is filtered out", () => {
     const items = [word("n", "die Entscheidung")];
     const g = buildWordGraph(items, [colloc("c1", "eine Entscheidung", "treffen")]);
