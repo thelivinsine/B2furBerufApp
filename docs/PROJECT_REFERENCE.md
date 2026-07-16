@@ -44,7 +44,12 @@ Only use content under these licenses — anything else blocks monetization:
 Raw list from the founder, for future planning sessions to scope, sequence, and break into
 phases. None of these are started; treat as candidates for the next `EXPANSION_PLAN.md` revision.
 
-1. **Redesign the Dashboard** (the home/progress screen).
+1. **Redesign the Dashboard** (the home/progress screen) — **DONE**, iterated across many sessions:
+   the UX-overhaul Phase 5 rebuild (sessions 47-49, the Heute/Bibliothek/Anwenden/Fortschritt zones)
+   and the subsequent Neuland Üben/Spielen rework (s86-s90 map + hub redesign, s104 map re-spacing,
+   s105 nav relabel) are all live on `main`. See `CLAUDE.md` "Mobile bottom tab bar" section for the
+   current locked layout. Treat any further Dashboard work as a new, separately scoped backlog item
+   rather than reopening this one.
 2. **Gate Schreibtraining behind sign-in:** show the login/sign-up popup (`AuthDialog`) when a
    signed-out guest tries to use Schreibtraining, instead of letting them in freely.
 3. **Animated-character scenario simulations:** visual, contextual practice — simulate real
