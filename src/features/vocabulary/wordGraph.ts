@@ -72,10 +72,18 @@ export function radiusForZipf(zipf: number | undefined): number {
 export function buildWordGraph(items: VocabItem[], collocationBank: Collocation[]): WordGraphData {
   // First form wins on collisions (e.g. two senses of one surface form):
   // stable and cheap, and the duplicate still gets its own node.
+  // The authored `plural` form is registered as an alias to the same node, so a
+  // collocation or related term written in the plural ("Beschwerden") still
+  // resolves to its singular entry instead of silently dropping the edge.
   const byForm = new Map<string, string>();
   for (const v of items) {
     const key = normalizeForm(v.de);
     if (key && !byForm.has(key)) byForm.set(key, v.id);
+  }
+  for (const v of items) {
+    if (!v.plural) continue;
+    const pk = normalizeForm(v.plural);
+    if (pk && !byForm.has(pk)) byForm.set(pk, v.id);
   }
 
   const degree = new Map<string, number>();

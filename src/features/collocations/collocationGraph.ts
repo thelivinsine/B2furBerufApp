@@ -1,5 +1,6 @@
-import type { Collocation } from "@/types";
+import type { Collocation, VocabItem } from "@/types";
 import { themeById } from "@/data/themes";
+import { vocabulary } from "@/data/vocabulary";
 import { normalizeForm } from "../vocabulary/wordGraph";
 
 /**
@@ -60,6 +61,51 @@ export interface CollocationGraphData {
 export const nounId = (norm: string) => `n:${norm}`;
 export const verbId = (norm: string) => `v:${norm}`;
 
+/** A canonical noun lemma: the singular match key + a display label. */
+export interface NounLemma {
+  key: string;
+  label: string;
+}
+
+/**
+ * Surface-form → canonical-lemma index built from the vocab bank, so the graph
+ * can merge singular and plural forms of ONE noun onto a single node
+ * ("eine Beschwerde" and "Beschwerden" are the same word, just different number).
+ * Both the singular (`de`) and the authored `plural` map to the singular as the
+ * canonical form. This is authored evidence (the plural field a human wrote),
+ * never morphological inference, so it stays inside the project's "no inferred
+ * data" rule. Nouns absent from the bank simply fall back to their own surface
+ * form (no merge, no regression).
+ */
+export function buildNounLemmaIndex(vocab: VocabItem[]): Map<string, NounLemma> {
+  const map = new Map<string, NounLemma>();
+  // Pass 1: every singular headword becomes its own lemma. First definite-
+  // singular entry wins on collision.
+  for (const v of vocab) {
+    if (v.pos !== "noun") continue;
+    const key = normalizeForm(v.de);
+    if (key && !map.has(key)) map.set(key, { key, label: v.de.trim() });
+  }
+  // Pass 2: point every authored `plural` at its own singular lemma. The plural
+  // form and the singular are the same lexeme (authored evidence, not inferred),
+  // so this alias unifies them. It intentionally OVERRIDES a pass-1 self-entry
+  // when the plural is also its own headword (e.g. "die Beschwerden" exists as a
+  // medical-plural headword AND is the plural of "die Beschwerde"): the founder
+  // wants those on one node, differentiated in the pop-up, not two nodes. A
+  // singular is never redirected, only a plural key, so no lexeme loses its base.
+  for (const v of vocab) {
+    if (v.pos !== "noun" || !v.plural) continue;
+    const key = normalizeForm(v.de);
+    const lemma = map.get(key);
+    if (!lemma || lemma.key !== key) continue; // skip entries whose singular is itself an alias
+    const pk = normalizeForm(v.plural);
+    if (pk && pk !== key) map.set(pk, lemma);
+  }
+  return map;
+}
+
+const defaultNounLemma = buildNounLemmaIndex(vocabulary);
+
 const MIN_R = 4;
 const MAX_R = 16;
 // Degree at/above which a node reaches the max radius. Caps the visual weight of
@@ -88,7 +134,10 @@ function majorityTheme(votes: Map<string, number>): string | undefined {
   return best;
 }
 
-export function buildCollocationGraph(items: Collocation[]): CollocationGraphData {
+export function buildCollocationGraph(
+  items: Collocation[],
+  lemmaIndex: Map<string, NounLemma> = defaultNounLemma,
+): CollocationGraphData {
   interface Acc {
     id: string;
     label: string;
@@ -96,11 +145,16 @@ export function buildCollocationGraph(items: Collocation[]): CollocationGraphDat
     themeVotes: Map<string, number>;
   }
   const acc = new Map<string, Acc>();
-  const ensure = (id: string, label: string, kind: NodeKind): Acc => {
+  // `canonical` marks a label as the vocab-bank singular form; it overrides a
+  // plural form that happened to be seen first, so a merged node always shows
+  // the dictionary form ("die Beschwerde", not "Beschwerden").
+  const ensure = (id: string, label: string, kind: NodeKind, canonical = false): Acc => {
     let n = acc.get(id);
     if (!n) {
       n = { id, label, kind, themeVotes: new Map() };
       acc.set(id, n);
+    } else if (canonical) {
+      n.label = label;
     }
     return n;
   };
@@ -110,12 +164,16 @@ export function buildCollocationGraph(items: Collocation[]): CollocationGraphDat
   const degree = new Map<string, number>();
 
   for (const c of items) {
-    const nNorm = normalizeForm(c.noun);
+    const nSurface = normalizeForm(c.noun);
     const vNorm = normalizeForm(c.verb);
-    if (!nNorm || !vNorm) continue;
+    if (!nSurface || !vNorm) continue;
+    // Collapse singular/plural onto the canonical lemma key when the bank knows
+    // this noun; otherwise the raw surface form is its own node.
+    const lemma = lemmaIndex.get(nSurface);
+    const nNorm = lemma ? lemma.key : nSurface;
     const nId = nounId(nNorm);
     const vId = verbId(vNorm);
-    const nNode = ensure(nId, c.noun.trim(), "noun");
+    const nNode = ensure(nId, lemma ? lemma.label : c.noun.trim(), "noun", !!lemma);
     const vNode = ensure(vId, c.verb.trim(), "verb");
 
     // Theme votes count every collocation (even duplicate pairs), so a node's

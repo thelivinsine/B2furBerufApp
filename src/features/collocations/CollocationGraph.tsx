@@ -42,6 +42,10 @@ const MIN_K = 0.1;
 const MAX_K = 6;
 const clampK = (k: number) => Math.min(MAX_K, Math.max(MIN_K, k));
 
+// Leading article stripped when grouping a merged node's surface forms in the
+// card, so "die Beschwerden" and "Beschwerden" read as one plural group.
+const ARTICLE_RE = /^(?:der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines)\s+/i;
+
 // Convert a hex color to an rgba() string (glow sprites + focus tints).
 function hexToRgba(hex: string, a: number): string {
   const h = hex.replace("#", "");
@@ -767,6 +771,41 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   const exampleColl =
     selectedPartners.length > 0 ? collById.get(selectedPartners[0].collocationId) : undefined;
 
+  // Group the partner chips by the SELECTED node's own surface form in each
+  // collocation. A merged singular/plural node ("die Beschwerde" + "Beschwerden")
+  // is one node now, but the card still shows which verbs each form takes, so the
+  // number distinction stays visible (founder: merge, but differentiate in the
+  // pop-up). The leading article is stripped for grouping so "die Beschwerden"
+  // and "Beschwerden" fall into ONE group (they differ only by article); only a
+  // real singular vs plural difference splits into two. 2+ groups → rendered as
+  // labelled sections; insertion order preserved.
+  const partnerGroups = useMemo(() => {
+    if (!selected) return [];
+    const groups = new Map<string, { partnerId: string; collocationId: string }[]>();
+    for (const p of selectedPartners) {
+      const c = collById.get(p.collocationId);
+      const raw = (selected.kind === "noun" ? c?.noun : c?.verb)?.trim() || selected.label;
+      const surface = raw.replace(ARTICLE_RE, "").trim() || raw;
+      if (!groups.has(surface)) groups.set(surface, []);
+      groups.get(surface)!.push(p);
+    }
+    return Array.from(groups, ([surface, ps]) => ({ surface, partners: ps }));
+  }, [selected, selectedPartners, collById]);
+
+  const renderPartnerChip = (p: { partnerId: string; collocationId: string }) => {
+    const pn = nodeById.get(p.partnerId);
+    if (!pn) return null;
+    return (
+      <button
+        key={p.partnerId}
+        onClick={() => setSelectedId(p.partnerId)}
+        className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
+      >
+        {pn.label}
+      </button>
+    );
+  };
+
   if (items.length === 0) {
     return (
       <EmptyState
@@ -868,21 +907,29 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
                   {selected.kind === "noun" ? "Verben" : "Nomen"}
                 </span>
               </div>
-              <div className="mt-1 flex flex-wrap gap-1.5">
-                {selectedPartners.map((p) => {
-                  const pn = nodeById.get(p.partnerId);
-                  if (!pn) return null;
-                  return (
-                    <button
-                      key={p.partnerId}
-                      onClick={() => setSelectedId(p.partnerId)}
-                      className="rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-foreground transition-colors hover:border-primary/40 hover:bg-primary/10"
-                    >
-                      {pn.label}
-                    </button>
-                  );
-                })}
-              </div>
+              {partnerGroups.length > 1 ? (
+                // Merged node with more than one surface form (e.g. singular +
+                // plural): show each form and the partners it takes.
+                <div className="mt-1 space-y-2">
+                  {partnerGroups.map((grp) => (
+                    <div key={grp.surface}>
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-xs font-semibold text-foreground">{grp.surface}</span>
+                        <span className="text-[11px] tabular-nums text-muted-foreground">
+                          {grp.partners.length}
+                        </span>
+                      </div>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        {grp.partners.map(renderPartnerChip)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-1 flex flex-wrap gap-1.5">
+                  {selectedPartners.map(renderPartnerChip)}
+                </div>
+              )}
 
               {exampleColl && (
                 <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">

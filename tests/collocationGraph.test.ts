@@ -3,10 +3,12 @@ import type { Collocation } from "@/types";
 import { collocations } from "@/data/collocations";
 import {
   buildCollocationGraph,
+  buildNounLemmaIndex,
   nodeRadiusForDegree,
   nounId,
   verbId,
 } from "@/features/collocations/collocationGraph";
+import type { VocabItem } from "@/types";
 
 function colloc(
   id: string,
@@ -87,6 +89,60 @@ describe("buildCollocationGraph — bipartite noun/verb model", () => {
       colloc("c1", "einen Antrag", "stellen", { register: "formal" }),
     ]);
     expect(g.links[0].register).toBe("formal");
+  });
+});
+
+describe("buildCollocationGraph — singular/plural merge via the lemma index", () => {
+  const vocab = [
+    { id: "v_beschwerde", de: "die Beschwerde", pos: "noun", plural: "die Beschwerden" },
+  ] as VocabItem[];
+  const lemma = buildNounLemmaIndex(vocab);
+
+  it("maps both the singular and the authored plural to one canonical key", () => {
+    expect(lemma.get("beschwerde")?.key).toBe("beschwerde");
+    expect(lemma.get("beschwerden")?.key).toBe("beschwerde");
+    expect(lemma.get("beschwerden")?.label).toBe("die Beschwerde");
+  });
+
+  it("merges 'eine Beschwerde' and 'Beschwerden' onto a single noun node", () => {
+    const g = buildCollocationGraph(
+      [
+        colloc("c1", "eine Beschwerde", "bearbeiten"),
+        colloc("c2", "Beschwerden", "haben"),
+        colloc("c3", "die Beschwerden", "schildern"),
+      ],
+      lemma,
+    );
+    const nouns = g.nodes.filter((n) => n.kind === "noun");
+    expect(nouns).toHaveLength(1);
+    expect(nouns[0].id).toBe(nounId("beschwerde"));
+    // Canonical dictionary label wins even though a plural form appeared too.
+    expect(nouns[0].label).toBe("die Beschwerde");
+    // One edge to each distinct verb.
+    expect(nouns[0].degree).toBe(3);
+  });
+
+  it("leaves nouns absent from the bank on their own surface form (no merge)", () => {
+    const g = buildCollocationGraph(
+      [colloc("c1", "das Dingsbums", "machen"), colloc("c2", "Dingsbumse", "zählen")],
+      lemma,
+    );
+    expect(g.nodes.filter((n) => n.kind === "noun")).toHaveLength(2);
+  });
+
+  it("unifies a plural that is ALSO its own headword onto the singular lemma", () => {
+    // Real bank shape: "die Beschwerden" exists both as the plural of
+    // "die Beschwerde" AND as a standalone (medical) headword. The authored
+    // plural is evidence they are one lexeme, so they share one node.
+    const v = [
+      { id: "v_sg", de: "die Beschwerde", pos: "noun", plural: "die Beschwerden" },
+      { id: "v_pl", de: "die Beschwerden", pos: "noun" },
+    ] as VocabItem[];
+    const idx = buildNounLemmaIndex(v);
+    expect(idx.get("beschwerden")?.key).toBe("beschwerde");
+    expect(idx.get("beschwerden")?.label).toBe("die Beschwerde");
+    // Only the plural key is redirected; the singular keeps its own base node.
+    expect(idx.get("beschwerde")?.key).toBe("beschwerde");
   });
 });
 
