@@ -1,13 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-14 (session 121). **Merged the `arbeitswelt` domain into `beruf` (Opus 4.8), on
-branch `claude/berufsleben-arbeitsumfeld-overlap-itmpeg`, shipped to `main` (PR #535).** The founder
-noticed the `beruf` ("Berufsleben") and `arbeitswelt` ("Arbeitswelt & Umfeld") domains read as
-redundant near-synonyms and their graph node colors (indigo vs adjacent violet) were nearly
-indistinguishable. Collapsed the two work domains into a single `beruf`: the 10 workplace themes now all
-carry `domain: "beruf"`, so the taxonomy is **5 domains** (was 6). Six code sites + CLAUDE.md; the
-library primary dropdown re-groups with no code change (`themeGroupsForMode` is data-driven). All gates
-green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-16 (session 122). **Theorie graph-view audit + P0/P1 fixes (Fable 5), on branch
+`claude/bibliothek-theorie-graphs-sk0dr3`, shipped to `main` (PR #539).** A comprehensive quality audit
+of the Wörter + Kollokationen graph views found four user-visible defects, all fixed: the synchronous
+sim warmup froze the main thread ~1s per open/filter change (now rAF-chunked with a warm-restart fast
+path), a pinch starting on a node left the simulation permanently hot (battery drain + jitter), a
+filtered-out selection ghosted the whole canvas, and the Kollokationen zoomed-out view rendered zero
+labels below k=0.7 (hubs now label at any zoom). Verified end-to-end with Playwright; all gates green.
+Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -62,6 +62,36 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 122 (2026-07-16). Theorie graph-view quality audit + P0/P1 fixes (Fable 5), on
+branch `claude/bibliothek-theorie-graphs-sk0dr3`, shipped to `main` (PR #539, squash-merged).** The
+founder asked for a comprehensive bug/quality analysis of the Bibliothek/Theorie graph views, then a
+P0–P3 report with per-action Claude-model routing, then approved the Opus-tier batch.
+- **The audit (delivered in-chat):** ran the pure builders + a d3-force benchmark against the real
+  banks. Key numbers: sim warmup froze the main thread **951ms (Wörter) / 1019ms (Kollokationen)** on a
+  desktop-class CPU per open AND per filter change; Kollokationen fit-to-all zoom is k≈0.21 (phone) /
+  0.55 (laptop), both under the old k>0.7 label gate → zero labels at the flagship zoomed-out view; only
+  118/797 collocations resolve noun+verb into Wörter-graph edges (350 noun-only, 234 neither) and 494/
+  2,514 `related` refs drop unresolved — that content gap is the **open P1-5 follow-up** (Opus curation
+  list → Sonnet authoring). Remaining P2/P3 batch (label-culling + card-refit ports to Wörter, wheel
+  scroll-trap, count-vs-filter mismatch, resize refit, data nits, hygiene) is scoped in the session-122
+  prompt-log entry; fix order and model routing per action are recorded there too.
+- **The four fixes shipped (components only; pure builders + tests untouched):** (1) warmup now runs in
+  rAF slices with a 10ms/frame budget; a rebuild where >50% of nodes kept cached positions (filter
+  tweak) needs only 20 ticks and draws immediately, cold starts settle blank-then-reveal (design
+  intent kept, freeze gone). (2) The pinch branch releases a half-started node drag and the cool-down
+  (`alphaTarget(0)`) runs whenever the last pointer lifts, so the sim always sleeps again (was: permanent
+  jitter + a pinned node in Wörter). (3) Draw ignores focus ids not in the current graph (dormant
+  selection revives if the node returns; `fitView` ignores a dormant selection's card). (4) Kollokationen
+  hub labels: degree ≥ 5 keeps a readable label at any zoom, alpha ramping 0.4→0.9 by degree (the old
+  dead `hubBoost` removed); collision culling keeps the canvas clean.
+- **Verification:** Playwright end-to-end (onboarding skipped via seeded localStorage): both views paint
+  after chunked warmup with zero >200ms long tasks, tap opens the card, filter change with active
+  selection no longer ghosts, hub labels screenshot-verified at fit-to-all. `typecheck` clean, `lint` at
+  the exact pre-change warning baseline, `test:unit` 147/147, `build` + `check:bundle` 79.6 kB.
+- **Note:** PRs #537 (backlog-item doc tick) and #538 (singular/plural noun merge onto one graph node,
+  Theorie) merged between s121 and this session without status-doc entries; s122 numbering continues
+  from the last documented session.
+
 **Handoff after session 121 (2026-07-14). Merged the `arbeitswelt` domain into `beruf` (Opus 4.8), on
 branch `claude/berufsleben-arbeitsumfeld-overlap-itmpeg`, shipped to `main` (PR #535, squash-merged).**
 The founder asked, looking at a Bibliothek graph, what the difference between the "Berufsleben" and
@@ -86,35 +116,7 @@ then said "merge".
   (exam prep lives separately), so 4 domains actually carry the 15 themes. Pre-existing, unrelated to
   this merge.
 
-**Handoff after session 120 (2026-07-14). Content-library coverage review + deepening (Opus 4.8), on
-branch `claude/content-library-coverage-lih2fp`. Shipped to `main`.** The founder asked for a thorough
-review of the content library to find themes/sub-themes/Branchen with too few words or collocations,
-then to add genuinely useful, commonly-used items for those fields.
-- **What the review found (quantified via a throwaway coverage script):** the industrial Branchen
-  (production 80 / engineering 71 / construction 65 / it 55 / chemicals 49 vocab) are well-covered from
-  the s94/s95/s102 packs; the imbalance was the **service/consumer world** where most B1-B2 immigrant
-  learners actually work — sports 17, beauty 19, hospitality 19, retail 21 vocab. Thin daily-life
-  themes: bank 29 (lowest), behoerde 33, bildung 34, wohnen 47. Starved sub-themes: `behoerde.bescheid`
-  3, `behoerde.aufenthalt` 4, `arzt.versicherung` 4, all `bank`/`bildung` subs 6-8.
-- **Wave 1 (service Branchen, +76 vocab / +48 colloc):** hospitality (Kellner, Vorspeise, Getränkekarte,
-  abräumen, zapfen…), retail (Wechselgeld, Umtausch, Rückgaberecht, Warenkorb, Anprobe…), beauty (Frisur,
-  Spülung, Tönung, Wimpernverlängerung, zupfen…), plus cleaning/security/sports top-ups (they were less
-  thin, so fewer). Each rides `sectors:[…]` on the natural theme (mostly `customer`/`safety`/`arzt`).
-- **Wave 2 (daily-life themes, +57 vocab / +8 colloc):** bank (Überweisen, Einzahlung, Buchung, Mahnung,
-  Zahlungsverzug…), behoerde (Wohnsitz, an/abmelden, Niederlassungserlaubnis, Einbürgerung, Widerspruch,
-  Rechtsmittel…), bildung (Wortschatz, Aussprache, mündlich/schriftlich, durchfallen, Praktikum,
-  Bildungsgutschein…), wohnen (Betriebskosten, Nachzahlung, Zählerstand, Wasserschaden, Rohrbruch…),
-  arzt.versicherung (Zuzahlung, Überweisungsschein, Attest, Zusatzversicherung…). Sub-theme-tagged so the
-  starved slices fill.
-- **Mechanics:** appended to `vocabularyPart2` / the collocations array; provenance rows added (DWDS
-  refs, `review_status:"draft"` for the next founder review pass); `content_type` is `"vocabulary"` (not
-  `"vocab"` — TS enum, caught at build). Regenerated `frequency.ts` after `pip install wordfreq` +
-  `build:frequency-subset` (unbinned dropped 342 to 86). Refreshed the morphology oracle subsets.
-- **Gates:** `lint:content` OK, `typecheck` OK, `build` OK, `test:unit` 142/142, `check:bundle` 79.6 kB,
-  `verify:facts` OK (0 two-oracle-confirmed errors; the one new signal, `die Betriebskosten`, is a correct
-  plurale tantum). Everything AI-drafted, founder-verify pending like the rest of the bank.
-
-_(Session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph handoff,
+_(Session 120's content-coverage-deepening handoff, session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph handoff,
 session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
 handoff (Cobalt & Butter previews + the AI mockup guide) and session 115's demo-readiness-sweep handoff
 are now in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 113's brand-identity-exploration
