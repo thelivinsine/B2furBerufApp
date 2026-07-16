@@ -37,9 +37,20 @@ interface SimLink extends SimulationLinkDatum<SimNode> {
   collocationId: string;
 }
 
+// One node's animated move from its current spot to a target (ring or home).
+type PosMove = { node: SimNode; from: { x: number; y: number }; to: { x: number; y: number } };
+
 const MIN_K = 0.1;
 const MAX_K = 6;
 const clampK = (k: number) => Math.min(MAX_K, Math.max(MIN_K, k));
+
+// Focus-layout timing + zoom guards (word-selection distribution): on select a
+// node's partners fan out onto even rings around it and the view zooms to a
+// comfortable, readable level; on deselect every displaced node animates home.
+const FOCUS_MS = 480;
+const RETURN_MS = 420;
+const MIN_FOCUS_K = 1.55;
+const MAX_FOCUS_K = 3.2;
 
 // Safety cap on the cross-filter position cache (see posRef); real bank sizes
 // stay far under this, it only guards against unbounded growth.
@@ -173,6 +184,10 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   const glowCache = useRef(new Map<string, HTMLCanvasElement>());
   const rafRef = useRef<number | null>(null);
   const drawRef = useRef<() => void>(() => {});
+  // Original ("home") position of every node the focus layout has displaced, so
+  // a deselect can animate them back. focusRafRef owns the focus/return tween.
+  const homePosRef = useRef(new Map<string, { x: number; y: number }>());
+  const focusRafRef = useRef<number | null>(null);
 
   selectedRef.current = selectedId;
   cardLayoutRef.current = cardLayout;
@@ -751,7 +766,17 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     canvas.style.cursor = "grab";
 
     return () => {
-      for (const n of nodes) posRef.current.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
+      // Cache each node's HOME position (not its transient focus-ring spot) so a
+      // filter change / remount restores the un-displaced layout rather than
+      // baking a fanned-out selection into the next graph.
+      const home = homePosRef.current;
+      for (const n of nodes) {
+        const h = home.get(n.id);
+        posRef.current.set(n.id, h ? { x: h.x, y: h.y } : { x: n.x ?? 0, y: n.y ?? 0 });
+      }
+      homePosRef.current = new Map();
+      if (focusRafRef.current != null) cancelAnimationFrame(focusRafRef.current);
+      focusRafRef.current = null;
       // Safety cap: the cache is meant to survive filter changes (bounded by
       // the collocation bank size in practice), but evict the oldest entries
       // if it ever grows past a generous ceiling instead of growing unbounded.
@@ -781,33 +806,218 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDark, selectedId, domainFilter, kindFilter]);
 
-  // A comfortable reading zoom: enough that a word and its neighbors are
-  // legible, but never a hard zoom-in (the founder found the old hub jump too
-  // strong). Only zooms IN toward this when the user is further out.
-  const READABLE_K = 1.55;
+  // ── Focus layout: fan a node's partners out over the open space ───────────
+  // Selecting a node (tap, partner-chip hop, or the fit button's hub jump)
+  // animates its partners onto evenly-spaced rings around it, so the connections
+  // read clearly no matter where they sat in the raw force layout, and zooms the
+  // view to a comfortable, readable level. Deselecting animates every displaced
+  // node back to its stored home. This replaces the old pan-only framing that
+  // left partners scattered (and often off-screen) on one side of the node.
+  const prefersReducedMotion = () =>
+    typeof window !== "undefined" &&
+    !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  // Center a node in the area the card leaves free, at a readable zoom. Used
-  // whenever a node becomes selected (tap, partner-chip hop, or the fit button's
-  // hub jump), so the focused word is framed and its label is easy to read.
-  const focusNode = (node: SimNode) => {
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const [rx, ry, rw, rh] = freeRect(rect.width, rect.height, true, cardLayoutRef.current);
-    const k = clampK(Math.max(transformRef.current.k, READABLE_K));
-    transformRef.current = {
-      k,
-      x: rx + rw / 2 - (node.x ?? 0) * k,
-      y: ry + rh / 2 - (node.y ?? 0) * k,
-    };
-    scheduleDraw();
+  // Even concentric-ring target positions around a center point. Each ring holds
+  // as many nodes as its circumference allows (spacing keyed to the biggest
+  // node), so the fan-out never overlaps and reads as a clean burst.
+  const ringTargets = (
+    center: { x: number; y: number },
+    neigh: SimNode[],
+    centerR: number,
+  ): Map<string, { x: number; y: number }> => {
+    const targets = new Map<string, { x: number; y: number }>();
+    if (neigh.length === 0) return targets;
+    const sorted = [...neigh].sort((a, b) => b.r - a.r);
+    const maxR = sorted[0].r;
+    const gap = 14;
+    const slot = 2 * maxR + gap;
+    let idx = 0;
+    let ring = 1;
+    while (idx < sorted.length) {
+      const remaining = sorted.length - idx;
+      const radius = centerR + maxR + gap + (ring - 1) * slot;
+      const circumference = 2 * Math.PI * radius;
+      const capacity = Math.min(remaining, Math.max(1, Math.floor(circumference / slot)));
+      // Rotate alternate rings so outer nodes fall into the inner ring's gaps.
+      const offset = (ring % 2 === 0 ? Math.PI / capacity : 0) - Math.PI / 2;
+      for (let i = 0; i < capacity; i++) {
+        const a = offset + (2 * Math.PI * i) / capacity;
+        const n = sorted[idx++];
+        targets.set(n.id, {
+          x: center.x + Math.cos(a) * radius,
+          y: center.y + Math.sin(a) * radius,
+        });
+      }
+      ring++;
+    }
+    return targets;
   };
 
-  // Frame the selected node (tap / chip hop / hub jump) at a readable zoom.
+  // A transform that frames the selected node and its fanned-out ring inside the
+  // space the card leaves free (its shape depends on cardLayout), at a readable
+  // zoom clamped to [MIN,MAX]. The min clamp keeps a selection from being tiny.
+  const frameFocus = (
+    center: { x: number; y: number },
+    centerR: number,
+    targets: Map<string, { x: number; y: number }>,
+    nodesById: Map<string, SimNode>,
+    width: number,
+    height: number,
+  ) => {
+    let minX = center.x - centerR;
+    let maxX = center.x + centerR;
+    let minY = center.y - centerR;
+    let maxY = center.y + centerR;
+    for (const [id, p] of targets) {
+      const r = nodesById.get(id)?.r ?? 4;
+      minX = Math.min(minX, p.x - r);
+      maxX = Math.max(maxX, p.x + r);
+      minY = Math.min(minY, p.y - r);
+      maxY = Math.max(maxY, p.y + r);
+    }
+    const [rx, ry, rw, rh] = freeRect(width, height, true, cardLayoutRef.current);
+    const fitK = Math.min(rw / Math.max(maxX - minX, 1), rh / Math.max(maxY - minY, 1));
+    const k = clampK(Math.min(MAX_FOCUS_K, Math.max(MIN_FOCUS_K, fitK)));
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    return { k, x: rx + rw / 2 - cx * k, y: ry + rh / 2 - cy * k };
+  };
+
+  // Tween node positions (and the camera) with an easeOut curve, pinning every
+  // moved node (fx/fy) so the simulation cannot fight the animation. onDone
+  // releases whichever nodes have finished returning home.
+  const runFocusTween = (
+    moves: PosMove[],
+    fromT: { x: number; y: number; k: number },
+    toT: { x: number; y: number; k: number },
+    duration: number,
+    onDone?: () => void,
+  ) => {
+    if (focusRafRef.current != null) cancelAnimationFrame(focusRafRef.current);
+    // Freeze the simulation for the duration: its theme-centroid pull would
+    // otherwise fight the pinned tween.
+    simRef.current?.sim.stop();
+    const apply = (e: number) => {
+      for (const m of moves) {
+        const x = m.from.x + (m.to.x - m.from.x) * e;
+        const y = m.from.y + (m.to.y - m.from.y) * e;
+        m.node.x = x;
+        m.node.y = y;
+        m.node.fx = x;
+        m.node.fy = y;
+      }
+      transformRef.current = {
+        k: fromT.k + (toT.k - fromT.k) * e,
+        x: fromT.x + (toT.x - fromT.x) * e,
+        y: fromT.y + (toT.y - fromT.y) * e,
+      };
+      drawRef.current();
+    };
+    if (prefersReducedMotion() || duration <= 0) {
+      apply(1);
+      onDone?.();
+      return;
+    }
+    const start = performance.now();
+    const ease = (t: number) => 1 - Math.pow(1 - t, 3);
+    const step = () => {
+      const p = Math.min((performance.now() - start) / duration, 1);
+      apply(ease(p));
+      if (p < 1) {
+        focusRafRef.current = requestAnimationFrame(step);
+      } else {
+        focusRafRef.current = null;
+        onDone?.();
+      }
+    };
+    focusRafRef.current = requestAnimationFrame(step);
+  };
+
+  // Fan the current selection's partners out and frame them. Reads the live
+  // selection via ref, so it can also re-run on a card-layout toggle.
+  const layoutFocus = () => {
+    const live = simRef.current;
+    const container = containerRef.current;
+    const selId = selectedRef.current;
+    if (!live || !container || !selId) return;
+    const nodesById = new Map(live.nodes.map((n) => [n.id, n]));
+    const sel = nodesById.get(selId);
+    if (!sel) return; // dormant selection (filtered out): nothing to arrange.
+    const rect = container.getBoundingClientRect();
+    const home = homePosRef.current;
+    const neigh = [...(neighborsRef.current.get(selId) ?? [])]
+      .map((id) => nodesById.get(id))
+      .filter((n): n is SimNode => !!n);
+
+    const center = { x: sel.x ?? 0, y: sel.y ?? 0 };
+    const targets = ringTargets(center, neigh, sel.r);
+    if (!home.has(sel.id)) home.set(sel.id, { x: center.x, y: center.y });
+
+    const keep = new Set<string>([sel.id, ...neigh.map((n) => n.id)]);
+    const moves: PosMove[] = [];
+    for (const n of neigh) {
+      if (!home.has(n.id)) home.set(n.id, { x: n.x ?? 0, y: n.y ?? 0 });
+      moves.push({ node: n, from: { x: n.x ?? 0, y: n.y ?? 0 }, to: targets.get(n.id)! });
+    }
+    moves.push({ node: sel, from: center, to: center });
+
+    // Nodes displaced by a previous selection that are not part of this one
+    // animate home in the same pass and are released when the tween ends.
+    const returning: string[] = [];
+    for (const [id, h] of home) {
+      if (keep.has(id)) continue;
+      const n = nodesById.get(id);
+      if (!n) continue;
+      returning.push(id);
+      moves.push({ node: n, from: { x: n.x ?? 0, y: n.y ?? 0 }, to: { x: h.x, y: h.y } });
+    }
+
+    const toT = frameFocus(center, sel.r, targets, nodesById, rect.width, rect.height);
+    runFocusTween(moves, transformRef.current, toT, FOCUS_MS, () => {
+      for (const id of returning) {
+        const n = nodesById.get(id);
+        if (n) {
+          n.fx = null;
+          n.fy = null;
+        }
+        home.delete(id);
+      }
+    });
+  };
+
+  // Send every displaced node home, then release its pin (deselect).
+  const restoreHome = () => {
+    const live = simRef.current;
+    if (!live) return;
+    const home = homePosRef.current;
+    if (home.size === 0) return;
+    const nodesById = new Map(live.nodes.map((n) => [n.id, n]));
+    const moves: PosMove[] = [];
+    const ids: string[] = [];
+    for (const [id, h] of home) {
+      const n = nodesById.get(id);
+      if (!n) continue;
+      ids.push(id);
+      moves.push({ node: n, from: { x: n.x ?? 0, y: n.y ?? 0 }, to: { x: h.x, y: h.y } });
+    }
+    const t = transformRef.current;
+    runFocusTween(moves, t, t, RETURN_MS, () => {
+      for (const id of ids) {
+        const n = nodesById.get(id);
+        if (n) {
+          n.fx = null;
+          n.fy = null;
+        }
+      }
+      home.clear();
+    });
+  };
+
+  // Drive the focus layout whenever the selection changes.
   useEffect(() => {
-    if (!selectedId) return;
-    const node = simRef.current?.nodes.find((n) => n.id === selectedId);
-    if (node) focusNode(node);
+    const present = !!(selectedId && simRef.current?.nodes.some((n) => n.id === selectedId));
+    if (present) layoutFocus();
+    else restoreHome();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId]);
 
@@ -841,7 +1051,11 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     const next = cardLayout === "horizontal" ? "vertical" : "horizontal";
     cardLayoutRef.current = next;
     setCardLayout(next);
-    refitForLayout(next, true);
+    // With a node selected, its partners are already fanned out; just re-frame
+    // that ring into the area the new card shape leaves free. Otherwise fit the
+    // whole constellation.
+    if (selectedRef.current && nodeById.has(selectedRef.current)) layoutFocus();
+    else refitForLayout(next, true);
   };
 
   // Fit button toggles: whole-constellation overview ↔ frame the biggest hub.
