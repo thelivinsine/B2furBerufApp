@@ -165,7 +165,9 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     });
   };
 
-  const fitToNodes = (nodes: SimNode[], width: number, height: number) => {
+  // The transform that fits every node into the viewport (does not apply it, so
+  // callers can animate the camera to it).
+  const computeFit = (nodes: SimNode[], width: number, height: number) => {
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
@@ -180,7 +182,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     const k = clampK(
       Math.min((width - pad) / Math.max(maxX - minX, 1), (height - pad) / Math.max(maxY - minY, 1)),
     );
-    transformRef.current = {
+    return {
       k,
       x: width / 2 - ((minX + maxX) / 2) * k,
       y: height / 2 - ((minY + maxY) / 2) * k,
@@ -928,25 +930,28 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     const live = simRef.current;
     if (!container || !live || live.nodes.length === 0) return;
     const rect = container.getBoundingClientRect();
-    fitToNodes(live.nodes, rect.width, rect.height);
-    scheduleDraw();
+    // Animate the camera to the fit (empty move-set = camera-only tween), so the
+    // switch from a focused word back to the overview is never an instant jump.
+    const to = computeFit(live.nodes, rect.width, rect.height);
+    runFocusTween([], transformRef.current, to, FOCUS_MS);
   };
 
   // Zoom into a random, frequently-used word: pick a node weighted by its area
-  // (radius ∝ wordfreq Zipf, so common words are far likelier than rare ones),
-  // center it, zoom in, and select it so its card + connections light up. Picks
-  // only among domains the legend filter currently allows, so this never lands
-  // on a word the filter itself just dimmed out.
+  // (radius ∝ wordfreq Zipf, so common words are far likelier than rare ones)
+  // and select it, so the focus effect animates the pull-in + zoom from the
+  // current view. Picks only among domains the legend filter allows, and never
+  // the word already selected, so the button always lands on a new word (and so
+  // always animates).
   const zoomToFrequentWord = () => {
-    const container = containerRef.current;
     const live = simRef.current;
-    if (!container || !live || live.nodes.length === 0) return;
-    const rect = container.getBoundingClientRect();
+    if (!live || live.nodes.length === 0) return;
     const pool =
       domainFilter.size === 0
         ? live.nodes
         : live.nodes.filter((n) => domainFilter.has(domainOf(n.themeId) ?? ""));
-    const nodes = pool.length > 0 ? pool : live.nodes;
+    const base = pool.length > 0 ? pool : live.nodes;
+    const fresh = base.filter((n) => n.id !== selectedRef.current);
+    const nodes = fresh.length > 0 ? fresh : base;
     let total = 0;
     for (const n of nodes) total += n.r * n.r;
     let pick = nodes[0];
@@ -958,14 +963,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
         break;
       }
     }
-    const targetK = clampK(3.4);
-    transformRef.current = {
-      k: targetK,
-      x: rect.width / 2 - (pick.x ?? 0) * targetK,
-      y: rect.height / 2 - (pick.y ?? 0) * targetK,
-    };
     setSelectedId(pick.id);
-    scheduleDraw();
   };
 
   // The fit-to-screen button toggles (founder 2026-07-13): first press fits the

@@ -234,7 +234,9 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   };
 
   // Fit all nodes centered into a target rectangle (in screen/canvas space).
-  const fitToRect = (nodes: SimNode[], rx: number, ry: number, rw: number, rh: number) => {
+  // The transform that fits every node into a target rectangle (does not apply
+  // it, so callers can animate the camera to it).
+  const computeFitRect = (nodes: SimNode[], rx: number, ry: number, rw: number, rh: number) => {
     let minX = Infinity;
     let maxX = -Infinity;
     let minY = Infinity;
@@ -246,7 +248,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       maxY = Math.max(maxY, (n.y ?? 0) + n.r);
     }
     const k = clampK(Math.min(rw / Math.max(maxX - minX, 1), rh / Math.max(maxY - minY, 1)));
-    transformRef.current = {
+    return {
       k,
       x: rx + rw / 2 - ((minX + maxX) / 2) * k,
       y: ry + rh / 2 - ((minY + maxY) / 2) * k,
@@ -284,8 +286,10 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     if (!container || !live || live.nodes.length === 0) return;
     const rect = container.getBoundingClientRect();
     const [rx, ry, rw, rh] = freeRect(rect.width, rect.height, hasCard, layout);
-    fitToRect(live.nodes, rx, ry, rw, rh);
-    scheduleDraw();
+    // Animate the camera to the fit (empty move-set = camera-only tween), so a
+    // fit / card-toggle re-center always animates instead of jumping.
+    const to = computeFitRect(live.nodes, rx, ry, rw, rh);
+    runFocusTween([], transformRef.current, to, FOCUS_MS);
   };
 
   // ── Simulation + rendering ──────────────────────────────────────────────
@@ -597,7 +601,11 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       // not zoomed into a hub. Fit-to-all with padding; no card on open.
       if (!fittedRef.current && nodes.length > 0) {
         fittedRef.current = true;
-        fitToRect(nodes, ...freeRect(width, height, false, cardLayoutRef.current));
+        // Initial view is applied instantly (nothing to animate from yet).
+        transformRef.current = computeFitRect(
+          nodes,
+          ...freeRect(width, height, false, cardLayoutRef.current),
+        );
       }
       sim.on("tick", scheduleDraw);
       sim.alpha(0.08).restart();
@@ -1119,11 +1127,13 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     else refitForLayout(next, true);
   };
 
-  // Fit button toggles: whole-constellation overview ↔ frame the biggest hub.
-  // The hub search only considers nodes the active legend filter allows, so
-  // this never jumps to a noun/verb/domain the filter itself just dimmed out.
-  const fitOrZoomRef = useRef<"fit" | "hub">("fit");
-  const zoomToHub = () => {
+  // Fit button toggles (same behavior as the Wörter graph): whole-constellation
+  // overview ↔ zoom into a random, well-connected node. The pick is weighted by
+  // node area (bigger = more connections here) among the nodes the active legend
+  // filter allows, and never the node already selected, so each press lands on a
+  // new node and always animates the transition.
+  const fitOrZoomRef = useRef<"fit" | "word">("fit");
+  const zoomToWord = () => {
     const live = simRef.current;
     if (!live || live.nodes.length === 0) return;
     const pool = live.nodes.filter(
@@ -1131,18 +1141,29 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         (domainFilter.size === 0 || domainFilter.has(n.domain ?? "")) &&
         (kindFilter.size === 0 || kindFilter.has(n.kind)),
     );
-    const candidates = pool.length > 0 ? pool : live.nodes;
-    let pick = candidates[0];
-    for (const n of candidates) if (n.degree > pick.degree) pick = n;
-    // Selecting it frames it at the readable zoom via the focusNode effect.
+    const base = pool.length > 0 ? pool : live.nodes;
+    const fresh = base.filter((n) => n.id !== selectedRef.current);
+    const nodes = fresh.length > 0 ? fresh : base;
+    let total = 0;
+    for (const n of nodes) total += n.r * n.r;
+    let pick = nodes[0];
+    let r = Math.random() * total;
+    for (const n of nodes) {
+      r -= n.r * n.r;
+      if (r <= 0) {
+        pick = n;
+        break;
+      }
+    }
+    // Selecting it runs the focus effect, which animates the pull-in + zoom.
     setSelectedId(pick.id);
   };
   const onFitButton = () => {
     if (fitOrZoomRef.current === "fit") {
       fitView();
-      fitOrZoomRef.current = "hub";
+      fitOrZoomRef.current = "word";
     } else {
-      zoomToHub();
+      zoomToWord();
       fitOrZoomRef.current = "fit";
     }
   };
@@ -1229,8 +1250,8 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
           </button>
           <button
             onClick={onFitButton}
-            aria-label="Einpassen, erneut tippen für den größten Knoten"
-            title="Einpassen · nochmal für den größten Knoten"
+            aria-label="Einpassen, erneut tippen für einen zufälligen Knoten"
+            title="Einpassen · nochmal für einen zufälligen Knoten"
             className="rounded-lg border border-border bg-surface/90 p-1.5 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:text-foreground"
           >
             <Maximize className="h-4 w-4" />
