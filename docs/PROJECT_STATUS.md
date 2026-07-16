@@ -1,16 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-16 (session 123). **Theorie graph-view P2/P3 batch (the rest of the session-122
-audit), on branch `claude/graphs-troubleshooting-plan-2f6p4s`.** Finished the remaining fix list from the
-session-122 P0–P3 audit report: label collision culling and the card-covers-node bug ported/fixed on the
-Wörter graph, a wheel-hijacks-page-scroll bug fixed on both graphs (wheel now only zooms with ctrl/cmd
-held, matching trackpad-pinch convention), the legend connection count now respects the active domain/
-kind filter on both graphs (was always the unfiltered total), a resize no longer leaves either graph
-off-center, and the fit-button's random-word/hub-jump picks now respect the active filter too. Plus a
-P3 hygiene pass: removed the dead `register` field from the Kollokationen graph link plumbing, fixed a
-setState-in-updater in `toggleLayout`, capped the position-cache growth, fixed a stale "6-domain" palette
-comment (5 since the s121 merge), and added canvas aria-labels. Verified end-to-end with Playwright; all
-gates green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-16 (session 124). **Kollokationen Karten card text-cutoff + speak-button
+alignment fix, on branch `claude/card-text-alignment-fixes-cc3k0r`, shipped to `main` (PR #545).** The
+founder shared a screenshot of the Bibliothek/Theorie Kollokationen "Karten" grid showing titles cut off
+mid-word ("die Aufgaben vertei...") and the speak-out-loud icon sitting at inconsistent horizontal
+positions across cards. Root cause: `CollocationsBrowser.tsx`'s card title had a hard `truncate` class
+with no `flex-1`, so a long phrase got ellipsis-cut while a short one left the icon hugging the text
+instead of anchored to the card's right edge. Fix: let the title wrap (matching the example-sentence row
+already below it) and gave it `flex-1` so the icon always sits flush right. Verified against a built
+preview server with a headless screenshot; typecheck/lint/build/check:bundle all green. Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -65,6 +64,32 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 124 (2026-07-16). Kollokationen Karten card text-cutoff + speak-button
+alignment fix (Sonnet 5), on branch `claude/card-text-alignment-fixes-cc3k0r`, shipped to `main`
+(PR #545, squash-merged).** Founder-reported bug via screenshot: in the Bibliothek/Theorie →
+Kollokationen "Karten" view, some card titles were cut off mid-word with an ellipsis, and the
+speak-out-loud icon next to the title sat at inconsistent horizontal positions from card to card.
+- **Root cause:** `CollocationCard` in `src/features/collocations/CollocationsBrowser.tsx` rendered
+  the title (`c.full`) in a `flex items-center` row with a hard `truncate` class and no `flex-1`. A
+  short title (e.g. "Zeit sparen") left the `<p>` at its natural content width, so the `SpeakButton`
+  sat immediately after the text instead of at the card's right edge; a long title filled the row via
+  flex-shrink and got ellipsis-truncated. The example-sentence row directly below it already used the
+  correct pattern (`min-w-0 flex-1`, no truncate) and never had this bug.
+- **Fix (one file, 2 lines):** changed the title row to `flex items-start gap-1.5` and the title `<p>`
+  to `min-w-0 flex-1 ... leading-snug` (dropped `truncate`, dropped `items-center`), mirroring the
+  example row. Titles now wrap onto a second line when needed instead of truncating, and the speak
+  icon is always flush against the card's right edge regardless of title length.
+- **Verification:** `pnpm typecheck` clean, `pnpm lint` clean on the file, `pnpm build` +
+  `pnpm check:bundle` green (main chunk 79.6 kB). Visually verified end-to-end: built + served
+  `pnpm preview`, seeded `localStorage b2beruf.settings.v1` to skip onboarding, Playwright screenshot of
+  `/library?tab=kollokationen&view=karten` at 1200px wide confirmed every title (including previously
+  truncated ones like "etwas zur Sprache bringen" and "einen Termin verschieben") renders in full and
+  every speak button aligns flush right, from long titles down to the shortest ("Zeit sparen").
+- **Scope note:** only the Kollokationen Karten tile was reported/fixed. The Wörter card
+  (`VocabList.tsx`) has the same `truncate`-without-`flex-1` pattern on its title but was not reported
+  as broken and was left untouched (single vocab words rarely overflow at card width); worth the same
+  fix if it's ever reported.
+
 **Handoff after session 123 (2026-07-16). Theorie graph-view P2/P3 batch (Sonnet 5), on branch
 `claude/graphs-troubleshooting-plan-2f6p4s`.** Picked up the session-122 audit's leftover fix list
 ("Remaining P2/P3 batch... is scoped in the session-122 prompt-log entry") and finished it.
@@ -110,37 +135,8 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
   the exact pre-change 53-warning baseline, `test:unit` 146/146 (147 minus the deleted dead-register
   test), `lint:content` clean, `build` + `check:bundle` 79.6 kB.
 
-**Handoff after session 122 (2026-07-16). Theorie graph-view quality audit + P0/P1 fixes (Fable 5), on
-branch `claude/bibliothek-theorie-graphs-sk0dr3`, shipped to `main` (PR #539, squash-merged).** The
-founder asked for a comprehensive bug/quality analysis of the Bibliothek/Theorie graph views, then a
-P0–P3 report with per-action Claude-model routing, then approved the Opus-tier batch.
-- **The audit (delivered in-chat):** ran the pure builders + a d3-force benchmark against the real
-  banks. Key numbers: sim warmup froze the main thread **951ms (Wörter) / 1019ms (Kollokationen)** on a
-  desktop-class CPU per open AND per filter change; Kollokationen fit-to-all zoom is k≈0.21 (phone) /
-  0.55 (laptop), both under the old k>0.7 label gate → zero labels at the flagship zoomed-out view; only
-  118/797 collocations resolve noun+verb into Wörter-graph edges (350 noun-only, 234 neither) and 494/
-  2,514 `related` refs drop unresolved — that content gap is the **open P1-5 follow-up** (Opus curation
-  list → Sonnet authoring). Remaining P2/P3 batch (label-culling + card-refit ports to Wörter, wheel
-  scroll-trap, count-vs-filter mismatch, resize refit, data nits, hygiene) is scoped in the session-122
-  prompt-log entry; fix order and model routing per action are recorded there too.
-- **The four fixes shipped (components only; pure builders + tests untouched):** (1) warmup now runs in
-  rAF slices with a 10ms/frame budget; a rebuild where >50% of nodes kept cached positions (filter
-  tweak) needs only 20 ticks and draws immediately, cold starts settle blank-then-reveal (design
-  intent kept, freeze gone). (2) The pinch branch releases a half-started node drag and the cool-down
-  (`alphaTarget(0)`) runs whenever the last pointer lifts, so the sim always sleeps again (was: permanent
-  jitter + a pinned node in Wörter). (3) Draw ignores focus ids not in the current graph (dormant
-  selection revives if the node returns; `fitView` ignores a dormant selection's card). (4) Kollokationen
-  hub labels: degree ≥ 5 keeps a readable label at any zoom, alpha ramping 0.4→0.9 by degree (the old
-  dead `hubBoost` removed); collision culling keeps the canvas clean.
-- **Verification:** Playwright end-to-end (onboarding skipped via seeded localStorage): both views paint
-  after chunked warmup with zero >200ms long tasks, tap opens the card, filter change with active
-  selection no longer ghosts, hub labels screenshot-verified at fit-to-all. `typecheck` clean, `lint` at
-  the exact pre-change warning baseline, `test:unit` 147/147, `build` + `check:bundle` 79.6 kB.
-- **Note:** PRs #537 (backlog-item doc tick) and #538 (singular/plural noun merge onto one graph node,
-  Theorie) merged between s121 and this session without status-doc entries; s122 numbering continues
-  from the last documented session.
-
-_(Session 121's arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
+_(Session 122's Theorie graph-view quality audit + P0/P1 fixes handoff, session 121's
+arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
 handoff, session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph
 handoff, session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
 handoff (Cobalt & Butter previews + the AI mockup guide) and session 115's demo-readiness-sweep handoff
