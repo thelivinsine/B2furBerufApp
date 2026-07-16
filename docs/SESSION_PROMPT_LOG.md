@@ -1141,3 +1141,9 @@ Entries **1–364 (through 2026-07-12)** are archived by ISO week under **`docs/
 - **Artifacts:** `src/features/vocabulary/WordGraph.tsx` · `src/features/collocations/CollocationGraph.tsx` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   `docs/SESSION_PROMPT_LOG.md` · PR #539.
+- **Follow-up prompt (verbatim):**
+  > document the session and merge the changes to main
+- **Follow-up response:** Both were already done in the prior turn (the s122 docs shipped inside
+  PR #539 itself, squash-merged as `6486a32`; branch realigned). Verified main contains the code fixes
+  + `PROJECT_STATUS.md` + this log, then appended this follow-up entry and merged it (PR #540).
+- **Artifacts:** `docs/SESSION_PROMPT_LOG.md` · PR #540.
