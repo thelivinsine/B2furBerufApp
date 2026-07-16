@@ -50,9 +50,8 @@ const clampK = (k: number) => Math.min(MAX_K, Math.max(MIN_K, k));
 const FOCUS_MS = 480;
 const RETURN_MS = 420;
 const MIN_FOCUS_K = 1.55;
-const MAX_FOCUS_K = 3.2;
-// Comfortable zoom the pull-in layout sizes its fit-radius against, so a
-// selection lands neither cramped nor tiny.
+// Comfortable zoom the pull-in layout sizes its arrangement against, so a
+// selection fills most of the window and lands neither cramped nor tiny.
 const TARGET_FOCUS_K = 2.3;
 
 // Safety cap on the cross-filter position cache (see posRef); real bank sizes
@@ -833,19 +832,50 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   ): Map<string, { x: number; y: number }> => {
     const targets = new Map<string, { x: number; y: number }>();
     if (neigh.length === 0) return targets;
-    const spokes = neigh.map((n) => {
-      const dx = (n.x ?? 0) - center.x;
-      const dy = (n.y ?? 0) - center.y;
-      const d = Math.hypot(dx, dy) || 1;
-      return { n, ux: dx / d, uy: dy / d, d };
-    });
-    const dmax = Math.max(...spokes.map((s) => s.d));
-    const margin = 46;
-    const fitR = Math.max(40, Math.min(freeW, freeH) / (2 * TARGET_FOCUS_K) - margin);
-    const scale = dmax > fitR ? fitR / dmax : 1;
+    // Each partner's spoke offset from the selected node.
+    const spokes = neigh.map((n) => ({
+      n,
+      dx: (n.x ?? 0) - center.x,
+      dy: (n.y ?? 0) - center.y,
+    }));
+    // Arrangement extent at scale 1 (spoke positions) + the biggest node radius.
+    let halfW = centerR;
+    let halfH = centerR;
+    let maxNodeR = centerR;
     for (const s of spokes) {
-      const dist = Math.max(s.d * scale, centerR + s.n.r + 8);
-      targets.set(s.n.id, { x: center.x + s.ux * dist, y: center.y + s.uy * dist });
+      halfW = Math.max(halfW, Math.abs(s.dx));
+      halfH = Math.max(halfH, Math.abs(s.dy));
+      maxNodeR = Math.max(maxNodeR, s.n.r);
+    }
+    // Scale the arrangement to fill ~fillFrac of the free area at the target
+    // zoom, so the selection uses most of the window instead of leaving big
+    // empty margins. The scale is per-axis (so a wide-but-short free area still
+    // fills across), but the two axes are kept within RATIO of each other so the
+    // spokes only stretch mildly and still read like the original directions.
+    // Because it keys off the free area it re-fits whenever that area changes
+    // (a card-shape toggle), keeping every partner visible.
+    const fillFrac = 0.82;
+    const availW = (fillFrac * freeW) / (2 * TARGET_FOCUS_K) - maxNodeR;
+    const availH = (fillFrac * freeH) / (2 * TARGET_FOCUS_K) - maxNodeR;
+    let sx = halfW > 1 ? availW / halfW : 8;
+    let sy = halfH > 1 ? availH / halfH : 8;
+    const RATIO = 2.0;
+    if (sx > sy * RATIO) sx = sy * RATIO;
+    if (sy > sx * RATIO) sy = sx * RATIO;
+    sx = Number.isFinite(sx) && sx > 0 ? Math.min(sx, 8) : 1;
+    sy = Number.isFinite(sy) && sy > 0 ? Math.min(sy, 8) : 1;
+    for (const s of spokes) {
+      let px = center.x + s.dx * sx;
+      let py = center.y + s.dy * sy;
+      const ex = px - center.x;
+      const ey = py - center.y;
+      const ed = Math.hypot(ex, ey) || 1;
+      const minD = centerR + s.n.r + 8;
+      if (ed < minD) {
+        px = center.x + (ex / ed) * minD;
+        py = center.y + (ey / ed) * minD;
+      }
+      targets.set(s.n.id, { x: px, y: py });
     }
     relaxCollisions(targets, neigh);
     return targets;
@@ -881,9 +911,11 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     }
   };
 
-  // A transform that frames the selected node and its fanned-out ring inside the
-  // space the card leaves free (its shape depends on cardLayout), at a readable
-  // zoom clamped to [MIN,MAX]. The min clamp keeps a selection from being tiny.
+  // A transform that centers the selected node and its pulled-in partners in the
+  // space the card leaves free (its shape depends on cardLayout). Uses the target
+  // zoom (so the selection fills ~78% of that area, matching how focusTargets
+  // sized it), but zooms out to fit if the arrangement is larger, so every
+  // partner stays visible, including after a card-shape toggle.
   const frameFocus = (
     center: { x: number; y: number },
     centerR: number,
@@ -905,7 +937,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     }
     const [rx, ry, rw, rh] = freeRect(width, height, true, cardLayoutRef.current);
     const fitK = Math.min(rw / Math.max(maxX - minX, 1), rh / Math.max(maxY - minY, 1));
-    const k = clampK(Math.min(MAX_FOCUS_K, Math.max(MIN_FOCUS_K, fitK)));
+    const k = clampK(Math.max(MIN_FOCUS_K, Math.min(TARGET_FOCUS_K, fitK)));
     const cx = (minX + maxX) / 2;
     const cy = (minY + maxY) / 2;
     return { k, x: rx + rw / 2 - cx * k, y: ry + rh / 2 - cy * k };
