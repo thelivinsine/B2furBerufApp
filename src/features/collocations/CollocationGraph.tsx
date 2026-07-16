@@ -51,6 +51,9 @@ const FOCUS_MS = 480;
 const RETURN_MS = 420;
 const MIN_FOCUS_K = 1.55;
 const MAX_FOCUS_K = 3.2;
+// Comfortable zoom the pull-in layout sizes its fit-radius against, so a
+// selection lands neither cramped nor tiny.
+const TARGET_FOCUS_K = 2.3;
 
 // Safety cap on the cross-filter position cache (see posRef); real bank sizes
 // stay far under this, it only guards against unbounded growth.
@@ -817,40 +820,65 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     typeof window !== "undefined" &&
     !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 
-  // Even concentric-ring target positions around a center point. Each ring holds
-  // as many nodes as its circumference allows (spacing keyed to the biggest
-  // node), so the fan-out never overlaps and reads as a clean burst.
-  const ringTargets = (
+  // Target positions that preserve each partner's direction from the selected
+  // node and only shorten over-long spokes so the whole set fits the free area,
+  // so the map still reads like one big nodal graph instead of a rebuilt ring.
+  // A light collision pass separates any partners that end up overlapping.
+  const focusTargets = (
     center: { x: number; y: number },
     neigh: SimNode[],
     centerR: number,
+    freeW: number,
+    freeH: number,
   ): Map<string, { x: number; y: number }> => {
     const targets = new Map<string, { x: number; y: number }>();
     if (neigh.length === 0) return targets;
-    const sorted = [...neigh].sort((a, b) => b.r - a.r);
-    const maxR = sorted[0].r;
-    const gap = 14;
-    const slot = 2 * maxR + gap;
-    let idx = 0;
-    let ring = 1;
-    while (idx < sorted.length) {
-      const remaining = sorted.length - idx;
-      const radius = centerR + maxR + gap + (ring - 1) * slot;
-      const circumference = 2 * Math.PI * radius;
-      const capacity = Math.min(remaining, Math.max(1, Math.floor(circumference / slot)));
-      // Rotate alternate rings so outer nodes fall into the inner ring's gaps.
-      const offset = (ring % 2 === 0 ? Math.PI / capacity : 0) - Math.PI / 2;
-      for (let i = 0; i < capacity; i++) {
-        const a = offset + (2 * Math.PI * i) / capacity;
-        const n = sorted[idx++];
-        targets.set(n.id, {
-          x: center.x + Math.cos(a) * radius,
-          y: center.y + Math.sin(a) * radius,
-        });
-      }
-      ring++;
+    const spokes = neigh.map((n) => {
+      const dx = (n.x ?? 0) - center.x;
+      const dy = (n.y ?? 0) - center.y;
+      const d = Math.hypot(dx, dy) || 1;
+      return { n, ux: dx / d, uy: dy / d, d };
+    });
+    const dmax = Math.max(...spokes.map((s) => s.d));
+    const margin = 46;
+    const fitR = Math.max(40, Math.min(freeW, freeH) / (2 * TARGET_FOCUS_K) - margin);
+    const scale = dmax > fitR ? fitR / dmax : 1;
+    for (const s of spokes) {
+      const dist = Math.max(s.d * scale, centerR + s.n.r + 8);
+      targets.set(s.n.id, { x: center.x + s.ux * dist, y: center.y + s.uy * dist });
     }
+    relaxCollisions(targets, neigh);
     return targets;
+  };
+
+  // Nudge overlapping partner targets apart (a few symmetric passes). Only acts
+  // on pairs that actually collide, so spokes keep their direction.
+  const relaxCollisions = (
+    targets: Map<string, { x: number; y: number }>,
+    neigh: SimNode[],
+  ) => {
+    const arr = neigh.map((n) => ({ r: n.r, p: targets.get(n.id)! })).filter((a) => a.p);
+    for (let it = 0; it < 6; it++) {
+      for (let i = 0; i < arr.length; i++) {
+        for (let j = i + 1; j < arr.length; j++) {
+          const a = arr[i];
+          const b = arr[j];
+          const dx = b.p.x - a.p.x;
+          const dy = b.p.y - a.p.y;
+          const d = Math.hypot(dx, dy) || 0.01;
+          const min = a.r + b.r + 7;
+          if (d < min) {
+            const push = (min - d) / 2;
+            const ux = dx / d;
+            const uy = dy / d;
+            a.p.x -= ux * push;
+            a.p.y -= uy * push;
+            b.p.x += ux * push;
+            b.p.y += uy * push;
+          }
+        }
+      }
+    }
   };
 
   // A transform that frames the selected node and its fanned-out ring inside the
@@ -950,7 +978,8 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       .filter((n): n is SimNode => !!n);
 
     const center = { x: sel.x ?? 0, y: sel.y ?? 0 };
-    const targets = ringTargets(center, neigh, sel.r);
+    const [, , frw, frh] = freeRect(rect.width, rect.height, true, cardLayoutRef.current);
+    const targets = focusTargets(center, neigh, sel.r, frw, frh);
     if (!home.has(sel.id)) home.set(sel.id, { x: center.x, y: center.y });
 
     const keep = new Set<string>([sel.id, ...neigh.map((n) => n.id)]);
@@ -1183,10 +1212,12 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         {selected && (
           <div
             className={cn(
-              "absolute z-10 flex flex-col border-border bg-surface/95 shadow-elevated-soft backdrop-blur",
+              // Float clear of the canvas edges by the same gap the Wörter graph
+              // card uses (bottom-3 / left-3 / right-3), fully rounded + bordered.
+              "absolute z-10 flex flex-col rounded-xl border border-border bg-surface/95 shadow-elevated-soft backdrop-blur",
               cardLayout === "horizontal"
-                ? "inset-x-0 bottom-0 h-[42%] max-h-[260px] rounded-t-xl border-t"
-                : "inset-y-0 right-0 w-[42%] max-w-[360px] rounded-l-xl border-l",
+                ? "bottom-3 left-3 right-3 h-[42%] max-h-[260px]"
+                : "bottom-3 right-3 top-3 w-[42%] max-w-[360px]",
             )}
           >
             <div className="flex shrink-0 items-start justify-between gap-2 p-3 pb-2">
