@@ -2155,7 +2155,145 @@ const pruefungsanmeldung: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung];
+const supermarkteinkauf: Scenario = {
+  id: "sc_supermarkt_einkauf",
+  themeId: "einkaufen",
+  title: "Einkauf im Supermarkt",
+  task: "Finden Sie ein Produkt, fragen Sie das Personal um Hilfe und bezahlen Sie an der Kasse.",
+  context:
+    "Sie sind im Supermarkt und suchen ein bestimmtes Produkt. Sie sprechen einen Mitarbeiter an und gehen danach zur Kasse.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "smallTalk", "reactions"],
+  start: "s1",
+  nodes: {
+    s1: {
+      id: "s1",
+      speaker: "partner",
+      line: "Kann ich Ihnen helfen? Sie sehen aus, als würden Sie etwas suchen.",
+      gloss: "Can I help you? You look as if you are searching for something.",
+      hints: ["Sag höflich, was du suchst.", "Ein ganzer Satz wirkt freundlicher."],
+      options: [
+        { id: "s1a", text: "Ja, gern. Ich suche glutenfreie Nudeln. Können Sie mir sagen, wo die stehen?", uses: "clarification", quality: 1, feedback: "Sehr gut: klares Anliegen und eine höfliche Frage.", next: "s2" },
+        { id: "s1b", text: "Ja, wo finde ich die Nudeln?", uses: "clarification", quality: 0.8, feedback: "Gut, aber ein bisschen mehr Höflichkeit wirkt besser.", next: "s2" },
+        { id: "s1c", text: "Nudeln.", uses: "reactions", quality: 0.4, feedback: "Zu knapp. Sprich in ganzen Sätzen.", next: "s2" },
+      ],
+    },
+    s2: {
+      id: "s2",
+      speaker: "partner",
+      line: "Die glutenfreien Nudeln stehen in Gang 4, im unteren Regal. Brauchen Sie sonst noch etwas?",
+      gloss: "The gluten-free pasta is in aisle 4, on the lower shelf. Do you need anything else?",
+      hints: ["Bedanke dich.", "Du kannst nach einem weiteren Produkt fragen."],
+      options: [
+        { id: "s2a", text: "Vielen Dank. Haben Sie die Nudeln auch im Sonderangebot?", uses: "clarification", quality: 1, feedback: "Top: freundlich und eine sinnvolle Nachfrage.", next: "s3" },
+        { id: "s2b", text: "Danke. Wo finde ich denn frisches Obst?", uses: "clarification", quality: 0.9, feedback: "Gut: höflich und gleich die nächste Frage.", next: "s3" },
+        { id: "s2c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre netter.", next: "s3" },
+      ],
+    },
+    s3: {
+      id: "s3",
+      speaker: "partner",
+      line: "Diese Woche sind die Nudeln tatsächlich im Angebot. Möchten Sie an der Kasse bar oder mit Karte zahlen?",
+      gloss: "This week the pasta is indeed on offer. Would you like to pay cash or by card at the checkout?",
+      hints: ["Sag klar, wie du zahlen möchtest.", "Du kannst nach einer Tüte fragen."],
+      options: [
+        { id: "s3a", text: "Mit Karte, bitte. Und könnte ich noch eine Tüte bekommen?", uses: "clarification", quality: 1, feedback: "Sehr gut: klar formuliert und höflich um eine Tüte gebeten.", next: "s4" },
+        { id: "s3b", text: "Ich zahle bar. Danke für Ihre Hilfe.", uses: "agree", quality: 0.9, feedback: "Gut: klar und freundlich.", next: "s4" },
+        { id: "s3c", text: "Egal.", uses: "reactions", quality: 0.3, feedback: "Zu unklar. Sag konkret, wie du zahlen willst.", next: "s4" },
+      ],
+    },
+    s4: {
+      id: "s4",
+      speaker: "partner",
+      line: "Das macht dann 8,50 Euro. Möchten Sie den Kassenzettel?",
+      gloss: "That comes to 8.50 euros. Would you like the receipt?",
+      hints: ["Antworte höflich.", "Ein Kassenzettel ist bei einem Umtausch nützlich."],
+      options: [
+        { id: "s4a", text: "Ja, gern. Den Kassenzettel hebe ich lieber auf.", uses: "agree", quality: 1, feedback: "Top: sinnvoll, falls du etwas umtauschen musst.", next: "s_end" },
+        { id: "s4b", text: "Nein, danke, das ist nicht nötig. Schönen Tag noch!", uses: "smallTalk", quality: 0.9, feedback: "Freundlich abgeschlossen.", next: "s_end" },
+        { id: "s4c", text: "Nein.", uses: "reactions", quality: 0.4, feedback: "Etwas kurz. Ein freundlicher Abschluss wirkt besser.", next: "s_end" },
+      ],
+    },
+    s_end: {
+      id: "s_end",
+      speaker: "narrator",
+      line: "Sie haben Ihr Produkt gefunden, ein Angebot genutzt und höflich bezahlt. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+const umtauschreklamation: Scenario = {
+  id: "sc_umtausch_reklamation",
+  themeId: "einkaufen",
+  title: "Umtausch im Geschäft",
+  task: "Reklamieren Sie ein defektes Produkt und finden Sie eine Lösung (Ersatz oder Erstattung).",
+  context:
+    "Sie haben vor drei Tagen einen Wasserkocher gekauft, der nicht mehr funktioniert. Sie gehen mit dem Kassenzettel zurück ins Geschäft.",
+  level: 2,
+  minutes: 6,
+  targetRedemittel: ["clarification", "compromise", "suggestions", "agree"],
+  start: "r1",
+  nodes: {
+    r1: {
+      id: "r1",
+      speaker: "partner",
+      line: "Guten Tag, was kann ich für Sie tun?",
+      gloss: "Hello, what can I do for you?",
+      hints: ["Erkläre ruhig das Problem.", "Nenne, was du gekauft hast."],
+      options: [
+        { id: "r1a", text: "Guten Tag. Ich habe hier einen Wasserkocher gekauft, aber er funktioniert leider nicht mehr.", uses: "clarification", quality: 1, feedback: "Sehr gut: sachlich und klar das Problem genannt.", next: "r2" },
+        { id: "r1b", text: "Guten Tag. Dieser Wasserkocher ist kaputt. Hier ist mein Kassenzettel.", uses: "clarification", quality: 0.9, feedback: "Gut: klar und gleich den Beleg gezeigt.", next: "r2" },
+        { id: "r1c", text: "Das Ding ist kaputt.", uses: "reactions", quality: 0.4, feedback: "Zu unhöflich. Bleib sachlich und höflich.", next: "r2" },
+      ],
+    },
+    r2: {
+      id: "r2",
+      speaker: "partner",
+      line: "Das tut mir leid. Haben Sie den Kaufbeleg dabei? Wann haben Sie das Gerät gekauft?",
+      gloss: "I am sorry about that. Do you have the proof of purchase with you? When did you buy the device?",
+      hints: ["Bestätige, dass du den Beleg hast.", "Nenne das Kaufdatum."],
+      options: [
+        { id: "r2a", text: "Ja, hier ist der Kassenzettel. Ich habe ihn vor drei Tagen gekauft.", uses: "clarification", quality: 1, feedback: "Perfekt: vorbereitet und mit allen Angaben.", next: "r3" },
+        { id: "r2b", text: "Ja, den Beleg habe ich dabei. Der Kauf war diese Woche.", uses: "agree", quality: 0.9, feedback: "Gut: klar und kooperativ.", next: "r3" },
+        { id: "r2c", text: "Brauchen Sie den wirklich?", uses: "clarification", quality: 0.5, feedback: "Der Beleg ist wichtig. Zeig ihn ruhig gleich.", next: "r3" },
+      ],
+    },
+    r3: {
+      id: "r3",
+      speaker: "partner",
+      line: "Alles klar, der Kauf ist noch ganz frisch. Möchten Sie einen Ersatz oder lieber eine Erstattung?",
+      gloss: "All right, the purchase is very recent. Would you like a replacement or rather a refund?",
+      hints: ["Sag klar, was du möchtest.", "Du kannst freundlich einen Vorschlag machen."],
+      options: [
+        { id: "r3a", text: "Am liebsten hätte ich einen Ersatz. Haben Sie das gleiche Modell noch da?", uses: "suggestions", quality: 1, feedback: "Sehr gut: klarer Wunsch und eine praktische Frage.", next: "r4" },
+        { id: "r3b", text: "Wenn es möglich ist, hätte ich lieber mein Geld zurück.", uses: "compromise", quality: 0.9, feedback: "Gut: höflich und eindeutig.", next: "r4" },
+        { id: "r3c", text: "Ist mir egal, Hauptsache schnell.", uses: "reactions", quality: 0.4, feedback: "Ein klarer Wunsch hilft der Mitarbeiterin weiter.", next: "r4" },
+      ],
+    },
+    r4: {
+      id: "r4",
+      speaker: "partner",
+      line: "Das gleiche Modell ist vorrätig. Ich tausche das Gerät sofort um. Ist das für Sie in Ordnung?",
+      gloss: "The same model is in stock. I will exchange the device right away. Is that all right for you?",
+      hints: ["Stimme freundlich zu.", "Bedanke dich für die Lösung."],
+      options: [
+        { id: "r4a", text: "Ja, das ist super. Vielen Dank für die schnelle Lösung!", uses: "agree", quality: 1, feedback: "Top: freundlich und wertschätzend abgeschlossen.", next: "r_end" },
+        { id: "r4b", text: "Das passt gut, danke. Dann nehme ich den Ersatz.", uses: "agree", quality: 0.9, feedback: "Gut: klar zugestimmt.", next: "r_end" },
+        { id: "r4c", text: "Na gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre freundlicher.", next: "r_end" },
+      ],
+    },
+    r_end: {
+      id: "r_end",
+      speaker: "narrator",
+      line: "Sie haben das defekte Gerät ruhig reklamiert und einen Ersatz bekommen. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>

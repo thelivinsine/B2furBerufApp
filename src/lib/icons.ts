@@ -43,6 +43,7 @@ import {
   Shuffle,
   ArrowRight,
   Clock,
+  ShoppingCart,
   type LucideIcon,
 } from "lucide-react";
 
@@ -91,6 +92,7 @@ const map: Record<string, LucideIcon> = {
   Shuffle,
   ArrowRight,
   Clock,
+  ShoppingCart,
 };
 
 export function iconByName(name: string): LucideIcon {
