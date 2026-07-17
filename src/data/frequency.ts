@@ -7,7 +7,7 @@
 // "Fachsprache". Regenerate with `pnpm build:frequency` after content changes.
 import type { Frequency } from "@/types";
 
-export const frequencyGeneratedAt = "2026-07-14";
+export const frequencyGeneratedAt = "2026-07-17";
 
 export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_besprechung": { bin: "common", zipf: 3.75 },
@@ -1142,6 +1142,8 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_kontaktlos": { bin: "specialized", zipf: 2.74 },
   "v_mahnung": { bin: "specialized", zipf: 3.43 },
   "v_zahlungsverzug": { bin: "specialized", zipf: 2.24 },
+  "v_bankingapp": { bin: "common", zipf: 3.67 },
+  "v_zweifaktorauth": { bin: "specialized", zipf: 2.91 },
   "v_wohnsitz": { bin: "common", zipf: 3.86 },
   "v_anmelden": { bin: "common", zipf: 4.23 },
   "v_abmelden": { bin: "specialized", zipf: 3.04 },
@@ -1967,6 +1969,10 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "c_miete_ueberweisen": { bin: "common", zipf: 4.35 },
   "c_schaden_melden": { bin: "core", zipf: 4.8 },
   "c_zuzahlung_leisten": { bin: "specialized", zipf: 2.65 },
+  "c_konto_wechseln": { bin: "common", zipf: 4.44 },
+  "c_beleg_aufbewahren": { bin: "common", zipf: 3.87 },
+  "c_karte_entsperren": { bin: "core", zipf: 4.85 },
+  "c_authentifizierung_aktivieren": { bin: "specialized", zipf: 2.91 },
 };
 
 /** Frequency bin for a content id (vocab or collocation), if binnable. */

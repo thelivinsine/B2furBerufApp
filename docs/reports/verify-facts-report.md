@@ -16,8 +16,8 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **975**
-- Covered by ≥1 oracle: **951** (98%)  ·  not covered: **24**
+- Nouns checked: **1013**
+- Covered by ≥1 oracle: **951** (94%)  ·  not covered: **62**
 - ✔ Article verified: **934**  (439 by both oracles, 495 by one)
 - ✔ Plural verified: **599**  (346 by both oracles, 253 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
@@ -70,34 +70,72 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>24 items</summary>
+<details><summary>62 items</summary>
 
 | id | headword |
 |---|---|
+| `v_ablaufdatum` | das Ablaufdatum |
+| `v_auftraggeber` | der Auftraggeber |
 | `v_auslastung` | die Auslastung |
+| `v_bankingapp` | die Banking-App |
+| `v_bankkarte` | die Bankkarte |
 | `v_beschwerden` | die Beschwerden |
+| `v_bonitaet` | die Bonität |
+| `v_buergschaft` | die Bürgschaft |
+| `v_darlehen` | das Darlehen |
 | `v_daten` | die Daten |
 | `v_datenblatt` | das Datenblatt |
+| `v_debitkarte` | die Debitkarte |
+| `v_echtzeitueberweisung` | die Echtzeitüberweisung |
 | `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
+| `v_finanzierung` | die Finanzierung |
+| `v_freistellungsauftrag` | der Freistellungsauftrag |
+| `v_gemeinschaftskonto` | das Gemeinschaftskonto |
 | `v_girocard` | die Girocard |
+| `v_hausbank` | die Hausbank |
 | `v_iban` | die IBAN |
+| `v_kartenlesegeraet` | das Kartenlesegerät |
+| `v_kartennummer` | die Kartennummer |
+| `v_kartensperrung` | die Kartensperrung |
+| `v_kontovollmacht` | die Kontovollmacht |
+| `v_kontowechsel` | der Kontowechsel |
 | `v_lkw` | der LKW |
 | `v_nachbereitung` | die Nachbereitung |
 | `v_oeffnungszeiten` | die Öffnungszeiten |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
+| `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probenahme` | die Probenahme |
+| `v_quittung` | die Quittung |
+| `v_rate` | die Rate |
+| `v_rendite` | die Rendite |
 | `v_ressourcen` | die Ressourcen |
 | `v_rezeptur` | die Rezeptur |
+| `v_ruecklage` | die Rücklage |
+| `v_ruecklastschrift` | die Rücklastschrift |
 | `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
+| `v_schuldnerberatung` | die Schuldnerberatung |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
 | `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt |
 | `v_sicherheitsschuhe` | die Sicherheitsschuhe |
+| `v_sparkasse` | die Sparkasse |
+| `v_sparziel` | das Sparziel |
+| `v_sperrhotline` | die Sperrhotline |
 | `v_spliss` | der Spliss |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
+| `v_tagesgeldkonto` | das Tagesgeldkonto |
+| `v_tageslimit` | das Tageslimit |
 | `v_tan` | die TAN |
+| `v_tilgung` | die Tilgung |
 | `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) |
+| `v_verfuegungsrahmen` | der Verfügungsrahmen |
+| `v_wertstellung` | die Wertstellung |
+| `v_zahlungsausgang` | der Zahlungsausgang |
+| `v_zahlungseingang` | der Zahlungseingang |
+| `v_zahlungsverkehr` | der Zahlungsverkehr |
+| `v_zinssatz` | der Zinssatz |
 | `v_zugriffsrechte` | die Zugriffsrechte (Pl.) |
+| `v_zweifaktorauth` | die Zwei-Faktor-Authentifizierung |
 
 </details>
 
