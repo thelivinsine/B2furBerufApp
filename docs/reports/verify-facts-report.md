@@ -16,8 +16,8 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **1013**
-- Covered by ≥1 oracle: **951** (94%)  ·  not covered: **62**
+- Nouns checked: **1047**
+- Covered by ≥1 oracle: **951** (91%)  ·  not covered: **96**
 - ✔ Article verified: **934**  (439 by both oracles, 495 by one)
 - ✔ Plural verified: **599**  (346 by both oracles, 253 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
@@ -70,41 +70,65 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>62 items</summary>
+<details><summary>96 items</summary>
 
 | id | headword |
 |---|---|
+| `v_abendkurs` | der Abendkurs |
 | `v_ablaufdatum` | das Ablaufdatum |
+| `v_anerkennungsverfahren` | das Anerkennungsverfahren |
+| `v_anpassungsqualifizierung` | die Anpassungsqualifizierung |
+| `v_aufstieg` | der Aufstieg |
 | `v_auftraggeber` | der Auftraggeber |
 | `v_auslastung` | die Auslastung |
 | `v_bankingapp` | die Banking-App |
 | `v_bankkarte` | die Bankkarte |
+| `v_berufsabschluss` | der Berufsabschluss |
+| `v_berufserfahrung` | die Berufserfahrung |
 | `v_beschwerden` | die Beschwerden |
+| `v_bildungspraemie` | die Bildungsprämie |
+| `v_bildungsurlaub` | der Bildungsurlaub |
 | `v_bonitaet` | die Bonität |
 | `v_buergschaft` | die Bürgschaft |
 | `v_darlehen` | das Darlehen |
 | `v_daten` | die Daten |
 | `v_datenblatt` | das Datenblatt |
 | `v_debitkarte` | die Debitkarte |
+| `v_diplom` | das Diplom |
 | `v_echtzeitueberweisung` | die Echtzeitüberweisung |
 | `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
+| `v_fernstudium` | das Fernstudium |
 | `v_finanzierung` | die Finanzierung |
 | `v_freistellungsauftrag` | der Freistellungsauftrag |
 | `v_gemeinschaftskonto` | das Gemeinschaftskonto |
 | `v_girocard` | die Girocard |
+| `v_gleichwertigkeit` | die Gleichwertigkeit |
+| `v_grammatik` | die Grammatik |
 | `v_hausbank` | die Hausbank |
+| `v_hoerverstehen` | das Hörverstehen |
 | `v_iban` | die IBAN |
 | `v_kartenlesegeraet` | das Kartenlesegerät |
 | `v_kartennummer` | die Kartennummer |
 | `v_kartensperrung` | die Kartensperrung |
+| `v_kompetenz` | die Kompetenz |
 | `v_kontovollmacht` | die Kontovollmacht |
 | `v_kontowechsel` | der Kontowechsel |
+| `v_konversation` | die Konversation |
+| `v_lehrgang` | der Lehrgang |
+| `v_lektion` | die Lektion |
+| `v_leseverstehen` | das Leseverstehen |
 | `v_lkw` | der LKW |
+| `v_musterpruefung` | die Musterprüfung |
+| `v_muttersprachler` | der Muttersprachler |
 | `v_nachbereitung` | die Nachbereitung |
+| `v_nachhilfe` | die Nachhilfe |
 | `v_oeffnungszeiten` | die Öffnungszeiten |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
 | `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probenahme` | die Probenahme |
+| `v_pruefer` | der Prüfer |
+| `v_pruefungsangst` | die Prüfungsangst |
+| `v_punktzahl` | die Punktzahl |
 | `v_quittung` | die Quittung |
 | `v_rate` | die Rate |
 | `v_rendite` | die Rendite |
@@ -114,6 +138,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_ruecklastschrift` | die Rücklastschrift |
 | `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
 | `v_schuldnerberatung` | die Schuldnerberatung |
+| `v_seminar` | das Seminar |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
 | `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt |
 | `v_sicherheitsschuhe` | die Sicherheitsschuhe |
@@ -121,6 +146,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_sparziel` | das Sparziel |
 | `v_sperrhotline` | die Sperrhotline |
 | `v_spliss` | der Spliss |
+| `v_sprachnachweis` | der Sprachnachweis |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
 | `v_tagesgeldkonto` | das Tagesgeldkonto |
@@ -128,14 +154,22 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_tan` | die TAN |
 | `v_tilgung` | die Tilgung |
 | `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) |
+| `v_uebersetzung` | die Übersetzung |
+| `v_urkunde` | die Urkunde |
 | `v_verfuegungsrahmen` | der Verfügungsrahmen |
+| `v_vokabelheft` | das Vokabelheft |
+| `v_werdegang` | der Werdegang |
 | `v_wertstellung` | die Wertstellung |
+| `v_workshop` | der Workshop |
 | `v_zahlungsausgang` | der Zahlungsausgang |
 | `v_zahlungseingang` | der Zahlungseingang |
 | `v_zahlungsverkehr` | der Zahlungsverkehr |
+| `v_zeugnisbewertung` | die Zeugnisbewertung |
 | `v_zinssatz` | der Zinssatz |
 | `v_zugriffsrechte` | die Zugriffsrechte (Pl.) |
+| `v_zulassung` | die Zulassung |
 | `v_zweifaktorauth` | die Zwei-Faktor-Authentifizierung |
+| `v_zwischenzeugnis` | das Zwischenzeugnis |
 
 </details>
 

@@ -1171,6 +1171,7 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_praktikum": { bin: "common", zipf: 4.03 },
   "v_bildungsgutschein": { bin: "specialized", zipf: 1.94 },
   "v_berufsbegleitend": { bin: "specialized", zipf: 2.79 },
+  "v_urkunde": { bin: "common", zipf: 4.08 },
   "v_betriebskosten": { bin: "specialized", zipf: 3.48 },
   "v_nachzahlung": { bin: "specialized", zipf: 2.92 },
   "v_zaehlerstand": { bin: "specialized", zipf: 2.24 },
@@ -1973,6 +1974,7 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "c_beleg_aufbewahren": { bin: "common", zipf: 3.87 },
   "c_karte_entsperren": { bin: "core", zipf: 4.85 },
   "c_authentifizierung_aktivieren": { bin: "specialized", zipf: 2.91 },
+  "c_urkunde_vorlegen": { bin: "common", zipf: 4.08 },
 };
 
 /** Frequency bin for a content id (vocab or collocation), if binnable. */
