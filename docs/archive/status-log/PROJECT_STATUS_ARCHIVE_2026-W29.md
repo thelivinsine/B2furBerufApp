@@ -245,3 +245,27 @@ test; moved `toggleLayout` side effects out of the `setCardLayout` updater; capp
 entries; fixed a stale "6-domain" comment in `graphPalette.ts`; added `role="img"` + aria-labels to both
 canvases. **Out of scope:** the content-curation follow-up (unresolved `related` refs / edge resolution).
 Gates: typecheck clean, lint at 53-warning baseline, `test:unit` 146/146, build + check:bundle 79.6 kB.
+
+## Handoff after session 124 (2026-07-16) — Kollokationen Karten card text-cutoff + speak-button alignment fix
+
+Kollokationen Karten card text-cutoff + speak-button alignment fix (Sonnet 5), on branch
+`claude/card-text-alignment-fixes-cc3k0r`, shipped to `main` (PR #545, squash-merged). Founder-reported
+bug via screenshot: in the Bibliothek/Theorie → Kollokationen "Karten" view, some card titles were cut
+off mid-word with an ellipsis, and the speak-out-loud icon next to the title sat at inconsistent
+horizontal positions from card to card.
+- **Root cause:** `CollocationCard` in `src/features/collocations/CollocationsBrowser.tsx` rendered
+  the title (`c.full`) in a `flex items-center` row with a hard `truncate` class and no `flex-1`. A
+  short title (e.g. "Zeit sparen") left the `<p>` at its natural content width, so the `SpeakButton`
+  sat immediately after the text instead of at the card's right edge; a long title filled the row via
+  flex-shrink and got ellipsis-truncated. The example-sentence row directly below it already used the
+  correct pattern (`min-w-0 flex-1`, no truncate) and never had this bug.
+- **Fix (one file, 2 lines):** changed the title row to `flex items-start gap-1.5` and the title `<p>`
+  to `min-w-0 flex-1 ... leading-snug` (dropped `truncate`, dropped `items-center`), mirroring the
+  example row. Titles now wrap onto a second line when needed instead of truncating, and the speak
+  icon is always flush against the card's right edge regardless of title length.
+- **Verification:** `pnpm typecheck` clean, `pnpm lint` clean on the file, `pnpm build` +
+  `pnpm check:bundle` green (main chunk 79.6 kB). Visually verified end-to-end via `pnpm preview` +
+  Playwright screenshot of `/library?tab=kollokationen&view=karten` at 1200px wide.
+- **Scope note:** only the Kollokationen Karten tile was reported/fixed. The Wörter card
+  (`VocabList.tsx`) has the same `truncate`-without-`flex-1` pattern on its title but was left untouched
+  (single vocab words rarely overflow at card width); worth the same fix if it's ever reported.

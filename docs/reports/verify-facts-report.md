@@ -16,10 +16,10 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **975**
-- Covered by ≥1 oracle: **951** (98%)  ·  not covered: **24**
-- ✔ Article verified: **934**  (439 by both oracles, 495 by one)
-- ✔ Plural verified: **599**  (346 by both oracles, 253 by one)
+- Nouns checked: **1107**
+- Covered by ≥1 oracle: **952** (86%)  ·  not covered: **155**
+- ✔ Article verified: **935**  (439 by both oracles, 496 by one)
+- ✔ Plural verified: **600**  (346 by both oracles, 254 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
 - ⚑ Review signals (one oracle only, or oracles disagree): **7**
 - ◑ Plural-form headwords (gender not comparable): **10**
@@ -70,34 +70,165 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>24 items</summary>
+<details><summary>155 items</summary>
 
 | id | headword |
 |---|---|
+| `v_abendkurs` | der Abendkurs |
+| `v_ablaufdatum` | das Ablaufdatum |
+| `v_anerkennungsverfahren` | das Anerkennungsverfahren |
+| `v_anhoerung` | die Anhörung |
+| `v_anpassungsqualifizierung` | die Anpassungsqualifizierung |
+| `v_antragsfrist` | die Antragsfrist |
+| `v_asylantrag` | der Asylantrag |
+| `v_aufenthaltsdauer` | die Aufenthaltsdauer |
+| `v_aufenthaltsgestattung` | die Aufenthaltsgestattung |
+| `v_aufenthaltskarte` | die Aufenthaltskarte |
+| `v_aufenthaltsstatus` | der Aufenthaltsstatus |
+| `v_aufstieg` | der Aufstieg |
+| `v_auftraggeber` | der Auftraggeber |
 | `v_auslastung` | die Auslastung |
+| `v_ausreise` | die Ausreise |
+| `v_ausschlag` | der Ausschlag |
+| `v_bankingapp` | die Banking-App |
+| `v_bankkarte` | die Bankkarte |
+| `v_befristung` | die Befristung |
+| `v_berufsabschluss` | der Berufsabschluss |
+| `v_berufserfahrung` | die Berufserfahrung |
 | `v_beschwerden` | die Beschwerden |
+| `v_bewilligung` | die Bewilligung |
+| `v_bewilligungsbescheid` | der Bewilligungsbescheid |
+| `v_bildungspraemie` | die Bildungsprämie |
+| `v_bildungsurlaub` | der Bildungsurlaub |
+| `v_bonitaet` | die Bonität |
+| `v_buergschaft` | die Bürgschaft |
+| `v_darlehen` | das Darlehen |
 | `v_daten` | die Daten |
 | `v_datenblatt` | das Datenblatt |
+| `v_debitkarte` | die Debitkarte |
+| `v_diplom` | das Diplom |
+| `v_echtzeitueberweisung` | die Echtzeitüberweisung |
+| `v_eigenanteil` | der Eigenanteil |
+| `v_eigenbedarf` | der Eigenbedarf |
+| `v_einreise` | die Einreise |
+| `v_einwohnermeldeamt` | das Einwohnermeldeamt |
 | `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
+| `v_expose` | das Exposé |
+| `v_fernstudium` | das Fernstudium |
+| `v_fiktionsbescheinigung` | die Fiktionsbescheinigung |
+| `v_finanzierung` | die Finanzierung |
+| `v_freistellungsauftrag` | der Freistellungsauftrag |
+| `v_fuehrungszeugnis` | das Führungszeugnis |
+| `v_geburtsurkunde` | die Geburtsurkunde |
+| `v_gemeinschaftskonto` | das Gemeinschaftskonto |
+| `v_gesundheitskarte` | die Gesundheitskarte |
 | `v_girocard` | die Girocard |
+| `v_gleichwertigkeit` | die Gleichwertigkeit |
+| `v_grammatik` | die Grammatik |
+| `v_grundsteuer` | die Grundsteuer |
+| `v_hauptwohnsitz` | der Hauptwohnsitz |
+| `v_hausbank` | die Hausbank |
+| `v_heiratsurkunde` | die Heiratsurkunde |
+| `v_heizkosten` | die Heizkosten |
+| `v_hoerverstehen` | das Hörverstehen |
 | `v_iban` | die IBAN |
+| `v_indexmiete` | die Indexmiete |
+| `v_kartenlesegeraet` | das Kartenlesegerät |
+| `v_kartennummer` | die Kartennummer |
+| `v_kartensperrung` | die Kartensperrung |
+| `v_klage` | die Klage |
+| `v_kompetenz` | die Kompetenz |
+| `v_kontovollmacht` | die Kontovollmacht |
+| `v_kontowechsel` | der Kontowechsel |
+| `v_konversation` | die Konversation |
+| `v_laermbelaestigung` | die Lärmbelästigung |
+| `v_lehrgang` | der Lehrgang |
+| `v_lektion` | die Lektion |
+| `v_leseverstehen` | das Leseverstehen |
 | `v_lkw` | der LKW |
+| `v_meldeadresse` | die Meldeadresse |
+| `v_meldepflicht` | die Meldepflicht |
+| `v_mietinteressent` | der Mietinteressent |
+| `v_mietspiegel` | der Mietspiegel |
+| `v_mietwohnung` | die Mietwohnung |
+| `v_modernisierung` | die Modernisierung |
+| `v_muellabfuhr` | die Müllabfuhr |
+| `v_musterpruefung` | die Musterprüfung |
+| `v_muttersprachler` | der Muttersprachler |
 | `v_nachbereitung` | die Nachbereitung |
+| `v_nachforderung` | die Nachforderung |
+| `v_nachhilfe` | die Nachhilfe |
+| `v_nachmieter` | der Nachmieter |
+| `v_nachsorge` | die Nachsorge |
+| `v_nebenwohnsitz` | der Nebenwohnsitz |
 | `v_oeffnungszeiten` | die Öffnungszeiten |
+| `v_passfoto` | das Passfoto |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
+| `v_physiotherapie` | die Physiotherapie |
+| `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probenahme` | die Probenahme |
+| `v_provision` | die Provision |
+| `v_pruefer` | der Prüfer |
+| `v_pruefungsangst` | die Prüfungsangst |
+| `v_punktzahl` | die Punktzahl |
+| `v_quittung` | die Quittung |
+| `v_raeumungsklage` | die Räumungsklage |
+| `v_rate` | die Rate |
+| `v_rechtsbehelfsbelehrung` | die Rechtsbehelfsbelehrung |
+| `v_rechtskraft` | die Rechtskraft |
+| `v_rendite` | die Rendite |
 | `v_ressourcen` | die Ressourcen |
 | `v_rezeptur` | die Rezeptur |
+| `v_ruecklage` | die Rücklage |
+| `v_ruecklastschrift` | die Rücklastschrift |
 | `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
+| `v_schoenheitsreparatur` | die Schönheitsreparatur |
+| `v_schuldnerberatung` | die Schuldnerberatung |
+| `v_schwindel` | der Schwindel |
+| `v_selbstauskunft` | die Selbstauskunft |
+| `v_seminar` | das Seminar |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
 | `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt |
 | `v_sicherheitsschuhe` | die Sicherheitsschuhe |
+| `v_sparkasse` | die Sparkasse |
+| `v_sparziel` | das Sparziel |
+| `v_sperrhotline` | die Sperrhotline |
 | `v_spliss` | der Spliss |
+| `v_sprachnachweis` | der Sprachnachweis |
+| `v_staffelmiete` | die Staffelmiete |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
+| `v_steuernummer` | die Steuernummer |
+| `v_stromzaehler` | der Stromzähler |
+| `v_tagesgeldkonto` | das Tagesgeldkonto |
+| `v_tageslimit` | das Tageslimit |
 | `v_tan` | die TAN |
+| `v_tilgung` | die Tilgung |
 | `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) |
+| `v_uebersetzung` | die Übersetzung |
+| `v_untermieter` | der Untermieter |
+| `v_urkunde` | die Urkunde |
+| `v_verfuegungsrahmen` | der Verfügungsrahmen |
+| `v_verwaltungsakt` | der Verwaltungsakt |
+| `v_vokabelheft` | das Vokabelheft |
+| `v_vorauszahlung` | die Vorauszahlung |
+| `v_wegzug` | der Wegzug |
+| `v_werdegang` | der Werdegang |
+| `v_wertstellung` | die Wertstellung |
+| `v_widerspruchsbescheid` | der Widerspruchsbescheid |
+| `v_wohnberechtigungsschein` | der Wohnberechtigungsschein |
+| `v_wohnflaeche` | die Wohnfläche |
+| `v_workshop` | der Workshop |
+| `v_zahlungsausgang` | der Zahlungsausgang |
+| `v_zahlungseingang` | der Zahlungseingang |
+| `v_zahlungsverkehr` | der Zahlungsverkehr |
+| `v_zeugnisbewertung` | die Zeugnisbewertung |
+| `v_zinssatz` | der Zinssatz |
 | `v_zugriffsrechte` | die Zugriffsrechte (Pl.) |
+| `v_zulassung` | die Zulassung |
+| `v_zuzug` | der Zuzug |
+| `v_zweifaktorauth` | die Zwei-Faktor-Authentifizierung |
+| `v_zwischenzeugnis` | das Zwischenzeugnis |
 
 </details>
 

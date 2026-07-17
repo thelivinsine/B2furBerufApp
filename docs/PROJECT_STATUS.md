@@ -1,16 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-16 (session 125). **Theorie graph word-selection distribution + focus polish, on
-branch `claude/graph-word-selection-distribution-5av8xk`, shipped to `main` across PRs #542–#544, #546–#550
-(nine squash-merges).** The founder iterated on how the Wörter and Kollokationen graphs behave when a word
-is selected. End state: selecting a node keeps each connection's DIRECTION but fans clustered angles out
-and places them on an ellipse sized to fill ~80% of the free area (so nothing is cramped near the center,
-even a single connection, and the left/right space is used); nodes are spaced by their LABEL box so every
-connection word stays legible (draw pass no longer culls focus labels); the view frames at a readable zoom;
-deselecting animates every node home. The Kollokationen fit-to-screen button now matches the Wörter one
-(random well-connected node), all fit-button view switches animate, and the Kollokationen card floats with
-the same edge gap as the Wörter card. All animations respect prefers-reduced-motion. Two files only:
-`WordGraph.tsx` + `CollocationGraph.tsx`. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-17 (session 126). **Daily-life content scale-up Phase A, on branch
+`claude/scale-words-domains-qjv9x4`.** The founder asked to scale up vocabulary beyond the workplace
+(Berufsleben was ~78% of the bank). Scoped a two-phase plan (`docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`) and
+executed **Phase A: deepen the five existing daily-life themes to workplace depth.** Bank, Bildung, Behörde,
+Wohnen each reach ~80 vocab / ~50 collocations and Arzt reaches 80 vocab: **+132 words, +36 collocations,
++168 provenance rows**, all CEFR-tagged B1–B2, spread across each theme's four sub-themes (lifting the thin
+ones). New bank totals: **1,378 vocabulary / 811 collocations**. Every theme passed `lint:content`,
+`verify:facts` (0 two-oracle-confirmed errors), and `pnpm build`. Shipped as four commits on the branch.
+**Phase B (add new everyday-life themes: Einkaufen, Essen, Mobilität, Freizeit, Digitales) is not yet
+started.** Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -65,6 +64,34 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 126 (2026-07-17). Daily-life content scale-up Phase A, on branch
+`claude/scale-words-domains-qjv9x4`.** The founder: _"currently the app has mainly berufsleben words. Can
+you scope a task to scale up words from other domains?"_ → then _"go ahead with the plan"_ (both Phase A and
+Phase B chosen).
+- **Scoped** `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`: Phase A deepens the 5 existing daily-life themes to
+  workplace parity; Phase B adds new everyday-life themes. Committed on the branch.
+- **Executed Phase A (four theme commits on the branch, NOT yet merged to `main`):**
+  - `bank`: 43 → **81 vocab**, 38 → **50 colloc** (+38 v / +12 c).
+  - `bildung`: 46 → **80 vocab**, 39 → **50 colloc** (+34 v / +11 c).
+  - `behoerde`: 49 → **80 vocab**, 42 → **50 colloc** (+31 v / +8 c).
+  - `wohnen`: 57 → **80 vocab**, 45 → **50 colloc** (+23 v / +5 c); `arzt`: 74 → **80 vocab** (+6 v).
+  - Every item CEFR-tagged B1–B2, spread across the theme's 4 sub-themes (deliberately lifting the thin
+    ones, e.g. behoerde.bescheid/aufenthalt, bildung.anerkennung/weiterbildung, wohnen.suche/vertrag). One
+    `provenance.ts` row per id (all `review_status: "draft"`, DWDS/Wiktionary references). New bank totals:
+    **1,378 vocabulary / 811 collocations / 2,620 provenance rows.**
+  - Gates per theme: `pnpm lint:content` ✔, `pnpm build:frequency` (regenerated), `pnpm verify:facts`
+    (0 two-oracle-confirmed errors; the 7 review signals are all pre-existing dual-gender headwords, none
+    from this work), `pnpm build` ✔. Docs updated (this file, `CLAUDE.md` counts, prompt log).
+  - **Recurring gotcha:** ~9 planned ids collided with existing entries in other themes (e.g. `die
+    Überweisung`=referral in arzt, `der Nachweis`/`der Antragsteller` in behoerde, `die Schulung` in
+    technology). Fixed by renaming to a distinct daily-life word each time. **Pre-check candidate ids with
+    `grep -c 'id: "v_X"'` across the whole bank BEFORE authoring** to avoid the rework.
+- **Next:** (1) open a PR into `main` and squash-merge Phase A to deploy it, then realign the branch
+  (`git reset --hard origin/main`). (2) Start **Phase B Wave 1** (`einkaufen`, `essen`, `mobilitaet`) — each
+  a full `behoerde`-shape pack that also touches `types/index.ts` `ThemeId`, `scripts/lint-content.mjs`
+  `THEME_IDS`, `src/lib/icons.ts`, `src/data/themes.ts`, plus dialogues/texts/canDo/writing prompts. The
+  proposed theme names + sub-theme slugs in the plan doc are a starting point the founder may want to adjust.
+
 **Handoff after session 125 (2026-07-16). Theorie graph word-selection distribution + focus polish
 (Opus 4.8), on branch `claude/graph-word-selection-distribution-5av8xk`, shipped to `main` across nine
 squash-merges (PRs #542, #543, #544, #546, #547, #548, #549, #550).** A long founder-iterated thread on
@@ -109,33 +136,8 @@ graphs):
   after deploy, hard-refresh / reopen the app so the new SW activates. If `beantragen` still looks
   cramped after that, `spreadAngles`' `blend` (0.7) is the one knob to push harder.
 
-**Handoff after session 124 (2026-07-16). Kollokationen Karten card text-cutoff + speak-button
-alignment fix (Sonnet 5), on branch `claude/card-text-alignment-fixes-cc3k0r`, shipped to `main`
-(PR #545, squash-merged).** Founder-reported bug via screenshot: in the Bibliothek/Theorie →
-Kollokationen "Karten" view, some card titles were cut off mid-word with an ellipsis, and the
-speak-out-loud icon next to the title sat at inconsistent horizontal positions from card to card.
-- **Root cause:** `CollocationCard` in `src/features/collocations/CollocationsBrowser.tsx` rendered
-  the title (`c.full`) in a `flex items-center` row with a hard `truncate` class and no `flex-1`. A
-  short title (e.g. "Zeit sparen") left the `<p>` at its natural content width, so the `SpeakButton`
-  sat immediately after the text instead of at the card's right edge; a long title filled the row via
-  flex-shrink and got ellipsis-truncated. The example-sentence row directly below it already used the
-  correct pattern (`min-w-0 flex-1`, no truncate) and never had this bug.
-- **Fix (one file, 2 lines):** changed the title row to `flex items-start gap-1.5` and the title `<p>`
-  to `min-w-0 flex-1 ... leading-snug` (dropped `truncate`, dropped `items-center`), mirroring the
-  example row. Titles now wrap onto a second line when needed instead of truncating, and the speak
-  icon is always flush against the card's right edge regardless of title length.
-- **Verification:** `pnpm typecheck` clean, `pnpm lint` clean on the file, `pnpm build` +
-  `pnpm check:bundle` green (main chunk 79.6 kB). Visually verified end-to-end: built + served
-  `pnpm preview`, seeded `localStorage b2beruf.settings.v1` to skip onboarding, Playwright screenshot of
-  `/library?tab=kollokationen&view=karten` at 1200px wide confirmed every title (including previously
-  truncated ones like "etwas zur Sprache bringen" and "einen Termin verschieben") renders in full and
-  every speak button aligns flush right, from long titles down to the shortest ("Zeit sparen").
-- **Scope note:** only the Kollokationen Karten tile was reported/fixed. The Wörter card
-  (`VocabList.tsx`) has the same `truncate`-without-`flex-1` pattern on its title but was not reported
-  as broken and was left untouched (single vocab words rarely overflow at card width); worth the same
-  fix if it's ever reported.
-
-_(Session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
+_(Session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
+session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
 + P0/P1 fixes handoff, session 121's
 arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
 handoff, session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph

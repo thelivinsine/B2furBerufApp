@@ -7,7 +7,7 @@
 // "Fachsprache". Regenerate with `pnpm build:frequency` after content changes.
 import type { Frequency } from "@/types";
 
-export const frequencyGeneratedAt = "2026-07-14";
+export const frequencyGeneratedAt = "2026-07-17";
 
 export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_besprechung": { bin: "common", zipf: 3.75 },
@@ -1142,6 +1142,8 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_kontaktlos": { bin: "specialized", zipf: 2.74 },
   "v_mahnung": { bin: "specialized", zipf: 3.43 },
   "v_zahlungsverzug": { bin: "specialized", zipf: 2.24 },
+  "v_bankingapp": { bin: "common", zipf: 3.67 },
+  "v_zweifaktorauth": { bin: "specialized", zipf: 2.91 },
   "v_wohnsitz": { bin: "common", zipf: 3.86 },
   "v_anmelden": { bin: "common", zipf: 4.23 },
   "v_abmelden": { bin: "specialized", zipf: 3.04 },
@@ -1157,6 +1159,11 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_ablehnen": { bin: "common", zipf: 3.94 },
   "v_begruendung": { bin: "common", zipf: 4.46 },
   "v_antragsteller": { bin: "specialized", zipf: 3.48 },
+  "v_meldepflicht": { bin: "specialized", zipf: 2.93 },
+  "v_fuehrungszeugnis": { bin: "specialized", zipf: 2.78 },
+  "v_passfoto": { bin: "specialized", zipf: 2.33 },
+  "v_reisepass": { bin: "specialized", zipf: 3.43 },
+  "v_steuernummer": { bin: "specialized", zipf: 2.47 },
   "v_hausaufgabe": { bin: "specialized", zipf: 3.04 },
   "v_wortschatz": { bin: "common", zipf: 3.6 },
   "v_aussprache": { bin: "common", zipf: 3.88 },
@@ -1169,6 +1176,7 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_praktikum": { bin: "common", zipf: 4.03 },
   "v_bildungsgutschein": { bin: "specialized", zipf: 1.94 },
   "v_berufsbegleitend": { bin: "specialized", zipf: 2.79 },
+  "v_urkunde": { bin: "common", zipf: 4.08 },
   "v_betriebskosten": { bin: "specialized", zipf: 3.48 },
   "v_nachzahlung": { bin: "specialized", zipf: 2.92 },
   "v_zaehlerstand": { bin: "specialized", zipf: 2.24 },
@@ -1179,6 +1187,7 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_verstopft": { bin: "specialized", zipf: 3.34 },
   "v_tropfen": { bin: "common", zipf: 4.15 },
   "v_hausmeister": { bin: "common", zipf: 3.67 },
+  "v_vorauszahlung": { bin: "specialized", zipf: 2.64 },
   "v_zuzahlung": { bin: "specialized", zipf: 2.65 },
   "v_versicherungsschutz": { bin: "specialized", zipf: 3.08 },
   "v_ueberweisungsschein": { bin: "specialized", zipf: 1.58 },
@@ -1967,6 +1976,15 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "c_miete_ueberweisen": { bin: "common", zipf: 4.35 },
   "c_schaden_melden": { bin: "core", zipf: 4.8 },
   "c_zuzahlung_leisten": { bin: "specialized", zipf: 2.65 },
+  "c_konto_wechseln": { bin: "common", zipf: 4.44 },
+  "c_beleg_aufbewahren": { bin: "common", zipf: 3.87 },
+  "c_karte_entsperren": { bin: "core", zipf: 4.85 },
+  "c_authentifizierung_aktivieren": { bin: "specialized", zipf: 2.91 },
+  "c_urkunde_vorlegen": { bin: "common", zipf: 4.08 },
+  "c_einbuergerung_beantragen": { bin: "specialized", zipf: 3.09 },
+  "c_widerspruch_begruenden": { bin: "common", zipf: 4.29 },
+  "c_frist_wahren": { bin: "common", zipf: 4.1 },
+  "c_bescheid_zustellen": { bin: "common", zipf: 4.45 },
 };
 
 /** Frequency bin for a content id (vocab or collocation), if binnable. */
