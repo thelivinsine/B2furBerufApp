@@ -16,8 +16,8 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **1078**
-- Covered by ≥1 oracle: **952** (88%)  ·  not covered: **126**
+- Nouns checked: **1107**
+- Covered by ≥1 oracle: **952** (86%)  ·  not covered: **155**
 - ✔ Article verified: **935**  (439 by both oracles, 496 by one)
 - ✔ Plural verified: **600**  (346 by both oracles, 254 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
@@ -70,7 +70,7 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>126 items</summary>
+<details><summary>155 items</summary>
 
 | id | headword |
 |---|---|
@@ -89,8 +89,10 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_auftraggeber` | der Auftraggeber |
 | `v_auslastung` | die Auslastung |
 | `v_ausreise` | die Ausreise |
+| `v_ausschlag` | der Ausschlag |
 | `v_bankingapp` | die Banking-App |
 | `v_bankkarte` | die Bankkarte |
+| `v_befristung` | die Befristung |
 | `v_berufsabschluss` | der Berufsabschluss |
 | `v_berufserfahrung` | die Berufserfahrung |
 | `v_beschwerden` | die Beschwerden |
@@ -106,9 +108,12 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_debitkarte` | die Debitkarte |
 | `v_diplom` | das Diplom |
 | `v_echtzeitueberweisung` | die Echtzeitüberweisung |
+| `v_eigenanteil` | der Eigenanteil |
+| `v_eigenbedarf` | der Eigenbedarf |
 | `v_einreise` | die Einreise |
 | `v_einwohnermeldeamt` | das Einwohnermeldeamt |
 | `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
+| `v_expose` | das Exposé |
 | `v_fernstudium` | das Fernstudium |
 | `v_fiktionsbescheinigung` | die Fiktionsbescheinigung |
 | `v_finanzierung` | die Finanzierung |
@@ -116,14 +121,18 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_fuehrungszeugnis` | das Führungszeugnis |
 | `v_geburtsurkunde` | die Geburtsurkunde |
 | `v_gemeinschaftskonto` | das Gemeinschaftskonto |
+| `v_gesundheitskarte` | die Gesundheitskarte |
 | `v_girocard` | die Girocard |
 | `v_gleichwertigkeit` | die Gleichwertigkeit |
 | `v_grammatik` | die Grammatik |
+| `v_grundsteuer` | die Grundsteuer |
 | `v_hauptwohnsitz` | der Hauptwohnsitz |
 | `v_hausbank` | die Hausbank |
 | `v_heiratsurkunde` | die Heiratsurkunde |
+| `v_heizkosten` | die Heizkosten |
 | `v_hoerverstehen` | das Hörverstehen |
 | `v_iban` | die IBAN |
+| `v_indexmiete` | die Indexmiete |
 | `v_kartenlesegeraet` | das Kartenlesegerät |
 | `v_kartennummer` | die Kartennummer |
 | `v_kartensperrung` | die Kartensperrung |
@@ -132,27 +141,38 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_kontovollmacht` | die Kontovollmacht |
 | `v_kontowechsel` | der Kontowechsel |
 | `v_konversation` | die Konversation |
+| `v_laermbelaestigung` | die Lärmbelästigung |
 | `v_lehrgang` | der Lehrgang |
 | `v_lektion` | die Lektion |
 | `v_leseverstehen` | das Leseverstehen |
 | `v_lkw` | der LKW |
 | `v_meldeadresse` | die Meldeadresse |
 | `v_meldepflicht` | die Meldepflicht |
+| `v_mietinteressent` | der Mietinteressent |
+| `v_mietspiegel` | der Mietspiegel |
+| `v_mietwohnung` | die Mietwohnung |
+| `v_modernisierung` | die Modernisierung |
+| `v_muellabfuhr` | die Müllabfuhr |
 | `v_musterpruefung` | die Musterprüfung |
 | `v_muttersprachler` | der Muttersprachler |
 | `v_nachbereitung` | die Nachbereitung |
 | `v_nachforderung` | die Nachforderung |
 | `v_nachhilfe` | die Nachhilfe |
+| `v_nachmieter` | der Nachmieter |
+| `v_nachsorge` | die Nachsorge |
 | `v_nebenwohnsitz` | der Nebenwohnsitz |
 | `v_oeffnungszeiten` | die Öffnungszeiten |
 | `v_passfoto` | das Passfoto |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
+| `v_physiotherapie` | die Physiotherapie |
 | `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probenahme` | die Probenahme |
+| `v_provision` | die Provision |
 | `v_pruefer` | der Prüfer |
 | `v_pruefungsangst` | die Prüfungsangst |
 | `v_punktzahl` | die Punktzahl |
 | `v_quittung` | die Quittung |
+| `v_raeumungsklage` | die Räumungsklage |
 | `v_rate` | die Rate |
 | `v_rechtsbehelfsbelehrung` | die Rechtsbehelfsbelehrung |
 | `v_rechtskraft` | die Rechtskraft |
@@ -162,7 +182,10 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_ruecklage` | die Rücklage |
 | `v_ruecklastschrift` | die Rücklastschrift |
 | `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
+| `v_schoenheitsreparatur` | die Schönheitsreparatur |
 | `v_schuldnerberatung` | die Schuldnerberatung |
+| `v_schwindel` | der Schwindel |
+| `v_selbstauskunft` | die Selbstauskunft |
 | `v_seminar` | das Seminar |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
 | `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt |
@@ -172,23 +195,29 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_sperrhotline` | die Sperrhotline |
 | `v_spliss` | der Spliss |
 | `v_sprachnachweis` | der Sprachnachweis |
+| `v_staffelmiete` | die Staffelmiete |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
 | `v_steuernummer` | die Steuernummer |
+| `v_stromzaehler` | der Stromzähler |
 | `v_tagesgeldkonto` | das Tagesgeldkonto |
 | `v_tageslimit` | das Tageslimit |
 | `v_tan` | die TAN |
 | `v_tilgung` | die Tilgung |
 | `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) |
 | `v_uebersetzung` | die Übersetzung |
+| `v_untermieter` | der Untermieter |
 | `v_urkunde` | die Urkunde |
 | `v_verfuegungsrahmen` | der Verfügungsrahmen |
 | `v_verwaltungsakt` | der Verwaltungsakt |
 | `v_vokabelheft` | das Vokabelheft |
+| `v_vorauszahlung` | die Vorauszahlung |
 | `v_wegzug` | der Wegzug |
 | `v_werdegang` | der Werdegang |
 | `v_wertstellung` | die Wertstellung |
 | `v_widerspruchsbescheid` | der Widerspruchsbescheid |
+| `v_wohnberechtigungsschein` | der Wohnberechtigungsschein |
+| `v_wohnflaeche` | die Wohnfläche |
 | `v_workshop` | der Workshop |
 | `v_zahlungsausgang` | der Zahlungsausgang |
 | `v_zahlungseingang` | der Zahlungseingang |

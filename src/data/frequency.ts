@@ -1187,6 +1187,7 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_verstopft": { bin: "specialized", zipf: 3.34 },
   "v_tropfen": { bin: "common", zipf: 4.15 },
   "v_hausmeister": { bin: "common", zipf: 3.67 },
+  "v_vorauszahlung": { bin: "specialized", zipf: 2.64 },
   "v_zuzahlung": { bin: "specialized", zipf: 2.65 },
   "v_versicherungsschutz": { bin: "specialized", zipf: 3.08 },
   "v_ueberweisungsschein": { bin: "specialized", zipf: 1.58 },
