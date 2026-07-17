@@ -342,6 +342,29 @@ export const themes: ExamTheme[] = [
       { id: "essen.kochen", title: "Cooking & ingredients", titleDe: "Kochen & Zutaten", situationsIndex: 3 },
     ],
   },
+  {
+    id: "mobilitaet",
+    title: "Getting Around",
+    titleDe: "Mobilität & Verkehr",
+    blurb: "Get around Germany: use buses and trains, buy the right ticket, drive and park a car, and ask for and follow directions.",
+    blurbDe: "In Deutschland mobil sein: Bus und Bahn nutzen, die richtige Fahrkarte kaufen, Auto fahren und parken und nach dem Weg fragen.",
+    icon: "Bus",
+    accent: "from-cyan-500 to-blue-500",
+    domain: "alltag",
+    context: "personal",
+    situations: [
+      "Mit Bus und Bahn fahren und umsteigen",
+      "Eine Fahrkarte kaufen und den richtigen Tarif finden",
+      "Mit dem Auto fahren, tanken und parken",
+      "Nach dem Weg fragen und eine Wegbeschreibung verstehen",
+    ],
+    subThemes: [
+      { id: "mobilitaet.oepnv", title: "Public transport", titleDe: "Bus & Bahn", situationsIndex: 0 },
+      { id: "mobilitaet.ticket", title: "Tickets & fares", titleDe: "Fahrkarten & Tarife", situationsIndex: 1 },
+      { id: "mobilitaet.auto", title: "Driving & car", titleDe: "Auto & Fahren", situationsIndex: 2 },
+      { id: "mobilitaet.wegbeschreibung", title: "Directions & orientation", titleDe: "Wegbeschreibung & Orientierung", situationsIndex: 3 },
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);
