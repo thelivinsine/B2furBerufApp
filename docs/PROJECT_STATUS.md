@@ -80,9 +80,16 @@ accents; don't bulldoze the already-designed pages/menus/icons).
   Stimmen** (two speech bubbles, teal + tangerine like the Heute tabs), **Bauhaus Pause** (G from
   circle/bar/dot primitives), **Neonschild** (neon-tube G on night ink, marketing face only),
   **Der Dachs** (geometric badger mascot, brand surfaces only).
-- **Next:** the founder picks a kit or a mix; then lock the spec, wire the palette into
-  `src/index.css` + `tailwind.config.ts` (light + dark), regenerate logo/favicons/PWA icons from the
-  mark, `pnpm build`, ship to `main`. Until then nothing brand-related changes in the app.
+- **Vol. V follow-up (same session):** the founder asked for real-app previews of Kits 1 + 6 and more
+  kits in Kit 6's geometric philosophy. Delivered `preview/branding/genauly-identity-vol5.html` + seven
+  preview strips in `preview/branding/vol5-screens/` (Kit 1, Kit 6, new kits **6A Bauklötze / 6B Ulm /
+  6C Plakat / 6D Neubau**, plus an "Aktuell" reference), produced with the s116-proven token-swap method
+  (real app headless, only CSS tokens + header logo swapped, gradients flattened; method documented in
+  `preview/branding/README.md` for reuse). Still no `src/` change.
+- **Next:** the founder picks a kit or a mix (e.g. "6A but with the Kit-6 mark", or "6C with red only
+  in the logo"); then lock the spec, wire the palette into `src/index.css` + `tailwind.config.ts`
+  (light + dark), regenerate logo/favicons/PWA icons from the mark, `pnpm build`, ship to `main`.
+  Dark-mode previews of a favorite on request. Until then nothing brand-related changes in the app.
 
 **Handoff after session 126 (2026-07-17). Daily-life content scale-up (Phase A + Phase B, COMPLETE), on
 branch `claude/scale-words-domains-qjv9x4`, shipped to `main` across PRs #553–#558.** The founder:
