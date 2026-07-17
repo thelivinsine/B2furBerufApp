@@ -1,15 +1,17 @@
 # Project Status
 
-_Last updated: 2026-07-17 (session 126). **Daily-life content scale-up Phase A, on branch
-`claude/scale-words-domains-qjv9x4`.** The founder asked to scale up vocabulary beyond the workplace
-(Berufsleben was ~78% of the bank). Scoped a two-phase plan (`docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`) and
-executed **Phase A: deepen the five existing daily-life themes to workplace depth.** Bank, Bildung, Behörde,
-Wohnen each reach ~80 vocab / ~50 collocations and Arzt reaches 80 vocab: **+132 words, +36 collocations,
-+168 provenance rows**, all CEFR-tagged B1–B2, spread across each theme's four sub-themes (lifting the thin
-ones). New bank totals: **1,378 vocabulary / 811 collocations**. Every theme passed `lint:content`,
-`verify:facts` (0 two-oracle-confirmed errors), and `pnpm build`. Shipped as four commits on the branch.
-**Phase B (add new everyday-life themes: Einkaufen, Essen, Mobilität, Freizeit, Digitales) is not yet
-started.** Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-17 (session 126). **Daily-life content scale-up (COMPLETE), branch
+`claude/scale-words-domains-qjv9x4`, shipped to `main` across PRs #553–#558 (six squash-merges).** The
+founder asked to scale up vocabulary beyond the workplace (Berufsleben was ~78% of the bank) and approved a
+two-phase plan (`docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`). **Phase A** deepened the five original daily-life
+themes (bank/bildung/behoerde/wohnen/arzt) to ~80 vocab / ~50 collocations (#553). **Phase B** added five
+NEW everyday-life `alltag` themes — einkaufen (#554), essen (#555), mobilitaet (#556), freizeit (#557),
+digitales (#558) — each a full pack (49 vocab / 40 collocations / 2 dialogues / 2 texts / 3 Can-Do / 1
+writing prompt / full provenance, new lucide icon + ThemeId wiring). New alltag themes fold into the
+Wohnhaus city building via an `alltag` domain rollup. New bank totals: **1,623 vocabulary / 1,011
+collocations / 3,105 provenance rows / 20 themes**. Every theme/PR passed lint:content, verify:facts (0
+two-oracle-confirmed errors), build, test:unit 146/146, check:bundle 79.6 kB, eslint 0 errors. Product
+name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -64,10 +66,10 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 126 (2026-07-17). Daily-life content scale-up Phase A, on branch
-`claude/scale-words-domains-qjv9x4`.** The founder: _"currently the app has mainly berufsleben words. Can
-you scope a task to scale up words from other domains?"_ → then _"go ahead with the plan"_ (both Phase A and
-Phase B chosen).
+**Handoff after session 126 (2026-07-17). Daily-life content scale-up (Phase A + Phase B, COMPLETE), on
+branch `claude/scale-words-domains-qjv9x4`, shipped to `main` across PRs #553–#558.** The founder:
+_"currently the app has mainly berufsleben words. Can you scope a task to scale up words from other
+domains?"_ → _"i chose both phase a and b"_ → _"go ahead with the plan"_ → _"yes go ahead with phase b"_.
 - **Scoped** `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`: Phase A deepens the 5 existing daily-life themes to
   workplace parity; Phase B adds new everyday-life themes. Committed on the branch.
 - **Executed Phase A (four theme commits on the branch, NOT yet merged to `main`):**
@@ -81,16 +83,30 @@ Phase B chosen).
     **1,378 vocabulary / 811 collocations / 2,620 provenance rows.**
   - Gates per theme: `pnpm lint:content` ✔, `pnpm build:frequency` (regenerated), `pnpm verify:facts`
     (0 two-oracle-confirmed errors; the 7 review signals are all pre-existing dual-gender headwords, none
-    from this work), `pnpm build` ✔. Docs updated (this file, `CLAUDE.md` counts, prompt log).
-  - **Recurring gotcha:** ~9 planned ids collided with existing entries in other themes (e.g. `die
-    Überweisung`=referral in arzt, `der Nachweis`/`der Antragsteller` in behoerde, `die Schulung` in
-    technology). Fixed by renaming to a distinct daily-life word each time. **Pre-check candidate ids with
-    `grep -c 'id: "v_X"'` across the whole bank BEFORE authoring** to avoid the rework.
-- **Next:** (1) open a PR into `main` and squash-merge Phase A to deploy it, then realign the branch
-  (`git reset --hard origin/main`). (2) Start **Phase B Wave 1** (`einkaufen`, `essen`, `mobilitaet`) — each
-  a full `behoerde`-shape pack that also touches `types/index.ts` `ThemeId`, `scripts/lint-content.mjs`
-  `THEME_IDS`, `src/lib/icons.ts`, `src/data/themes.ts`, plus dialogues/texts/canDo/writing prompts. The
-  proposed theme names + sub-theme slugs in the plan doc are a starting point the founder may want to adjust.
+    from this work), `pnpm build` ✔.
+- **Phase B (COMPLETE): five NEW `alltag` themes, one PR each, all squash-merged to `main`:**
+  - `einkaufen` (Einkaufen & Geschäfte, #554), `essen` (Essen & Restaurant, #555), `mobilitaet` (Mobilität
+    & Verkehr, #556), `freizeit` (Freizeit & Soziales, #557), `digitales` (Handy, Internet & Digitales,
+    #558). Each is a full `behoerde`-shape pack: **49 vocab / 40 collocations / 2 dialogues / 2 texts /
+    3 Can-Do / 1 writing prompt / ~97 provenance rows**, spread across 4 sub-themes, CEFR-tagged B1–B2.
+  - Per theme, wired: `types/index.ts` `ThemeId` + `scripts/lint-content.mjs` `THEME_IDS` (kept in sync),
+    a new lucide icon in `src/lib/icons.ts` (ShoppingCart/UtensilsCrossed/Bus/PartyPopper/Smartphone), the
+    `src/data/themes.ts` record, and the required `writingPrompts` entry (the `Record<ThemeId>` type forces
+    it). **Locked success metric held:** no feature/component code changed except the one-line city rollup.
+  - **City buildings:** einkaufen's PR added `domains: ["alltag"]` to the **Wohnhaus** building so all five
+    new (and any future) unclaimed `alltag` themes fold in by domain rollup; bank/behoerde/wohnen stay
+    explicitly claimed first. Updated `tests/city-mastery.test.ts` (`toContain("wohnen")`) for the
+    full-coverage invariant. A dedicated "consumer/town-life" building is a possible future founder call.
+  - Gates each PR: lint:content, build:frequency, verify:facts (0 errors), build, **test:unit 146/146**,
+    check:bundle 79.6 kB, eslint 0 errors.
+- **Recurring gotcha (both phases):** many planned ids collided with existing entries in OTHER themes
+  (shopping ↔ customer, food ↔ customer, transport ↔ travel/logistics, digital ↔ technology). **Pre-check
+  every candidate id with `grep -c 'id: "v_X"'` / `'id: "c_X"'` across the whole bank BEFORE authoring** to
+  avoid rework; pick theme-distinct words rather than duplicating a concept already tagged elsewhere.
+- **Next / follow-ups:** the whole scale-up plan is done. Natural continuations: (1) founder review pass to
+  flip the new `draft` provenance rows to `verified` (use `pnpm review:queue`); (2) exam sets / more
+  dialogues for the new themes if depth is wanted; (3) a dedicated city building for the consumer themes if
+  the Wohnhaus fold feels wrong. Nothing is blocking.
 
 **Handoff after session 125 (2026-07-16). Theorie graph word-selection distribution + focus polish
 (Opus 4.8), on branch `claude/graph-word-selection-distribution-5av8xk`, shipped to `main` across nine
