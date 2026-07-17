@@ -1,6 +1,13 @@
 # Daily-life content scale-up plan (non-workplace domains)
 
-**Created:** 2026-07-17 · **Branch:** `claude/scale-words-domains-qjv9x4` · **Status:** scoped, not started
+**Created:** 2026-07-17 · **Branch:** `claude/scale-words-domains-qjv9x4` · **Status:** ✅ COMPLETE (s126, 2026-07-17)
+
+> **Done.** Phase A deepened all five original daily-life themes to ~80 vocab / ~50 collocations (PR #553).
+> Phase B added five new `alltag` themes at full pack shape: einkaufen (#554), essen (#555), mobilitaet
+> (#556), freizeit (#557), digitales (#558) — each 49 vocab / 40 collocations / 2 dialogues / 2 texts /
+> 3 Can-Do / 1 writing prompt / full provenance. New bank totals: **1,623 vocabulary / 1,011
+> collocations / 3,105 provenance rows / 20 themes**. New alltag themes fold into the Wohnhaus city
+> building via an `alltag` domain rollup. All PRs squash-merged to `main`; all gates green each time.
 
 ## Why
 

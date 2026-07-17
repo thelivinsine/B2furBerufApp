@@ -400,20 +400,25 @@ as a continuation entry rather than editing the session-125 entry above).
   > i chose both phase a and b
 - **Prompt 3 (verbatim):**
   > go ahead with the plan
-- **Response:** Analysed the content distribution (workplace = ~78% of the 1,246-word bank; the five
+- **Prompt 4 (verbatim):**
+  > yes go ahead with phase b
+- **Response:** Analysed the content distribution (workplace = ~78% of the then-1,246-word bank; the five
   daily-life themes were ~half the depth of workplace themes, and the `alltag` domain covered only
-  bureaucracy). Scoped a two-phase plan `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md` (Phase A: deepen the five
-  existing daily-life themes to workplace parity; Phase B: add new everyday-life themes) and, on the
-  founder's "both phases" + "go ahead", executed **Phase A** in four theme commits on the branch:
-  bank (43→81 vocab, +12 colloc), bildung (46→80, +11), behoerde (49→80, +8), wohnen (57→80, +5) and a
-  6-word arzt top-up to 80. Total **+132 vocab / +36 collocations / +168 provenance rows**, all CEFR-tagged
-  B1–B2 and spread across each theme's four sub-themes to lift the thin ones. New bank totals: **1,378
-  vocabulary / 811 collocations / 2,620 provenance rows.** Each theme passed `pnpm lint:content`,
-  `pnpm verify:facts` (0 two-oracle-confirmed errors), and `pnpm build`; frequency map regenerated per
-  theme. Updated `CLAUDE.md` counts, this log, and the `PROJECT_STATUS.md` handoff. **Phase B not yet
-  started** (needs the new-theme names/structural scaffolding; proposed in the plan doc).
-- **Artifacts:** `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md` (new) · `src/data/vocabulary.ts` ·
-  `src/data/collocations.ts` · `src/data/provenance.ts` · `src/data/frequency.ts` (generated) ·
-  `docs/reports/verify-facts-report.md` (generated) · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
-  `docs/SESSION_PROMPT_LOG.md`. Commits pushed to `claude/scale-words-domains-qjv9x4` (plan doc + four
-  Phase A theme commits + this doc update).
+  bureaucracy). Scoped a two-phase plan `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md` and executed the whole
+  thing. **Phase A** (PR #553) deepened the five original daily-life themes in four theme commits: bank
+  (43→81 vocab, +12 colloc), bildung (46→80, +11), behoerde (49→80, +8), wohnen (57→80, +5) and a 6-word
+  arzt top-up to 80 (+132 vocab / +36 collocations total). **Phase B** added five NEW everyday-life
+  `alltag` themes, one PR each: `einkaufen` (#554), `essen` (#555), `mobilitaet` (#556), `freizeit`
+  (#557), `digitales` (#558) — each a full `behoerde`-shape pack (49 vocab / 40 collocations / 2 dialogues
+  / 2 texts / 3 Can-Do / 1 writing prompt / ~97 provenance rows, plus `ThemeId` + `THEME_IDS` + a new
+  lucide icon + `themes.ts` record + `writingPrompts` entry). New alltag themes fold into the Wohnhaus city
+  building via an added `alltag` domain rollup (`domain-buildings.tsx`), with `tests/city-mastery.test.ts`
+  updated for the full-coverage invariant. **New bank totals: 1,623 vocabulary / 1,011 collocations /
+  3,105 provenance rows / 20 themes.** Every theme/PR passed lint:content, verify:facts (0
+  two-oracle-confirmed errors), build, test:unit 146/146, check:bundle 79.6 kB, eslint 0 errors, and was
+  squash-merged to `main` with the branch realigned after each.
+- **Artifacts:** `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md` (new) · `src/data/{vocabulary,collocations,
+  provenance,themes,canDo,writingPrompts,dialogues,texts,frequency}.ts` · `src/types/index.ts` ·
+  `scripts/lint-content.mjs` · `src/lib/icons.ts` · `src/components/city/domain-buildings.tsx` ·
+  `tests/city-mastery.test.ts` · `docs/reports/verify-facts-report.md` (generated) · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`. PRs #553–#558 (all squash-merged to `main`).
