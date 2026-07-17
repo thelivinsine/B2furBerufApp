@@ -1,17 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-17 (session 126). **Daily-life content scale-up (COMPLETE), branch
-`claude/scale-words-domains-qjv9x4`, shipped to `main` across PRs #553–#558 (six squash-merges).** The
-founder asked to scale up vocabulary beyond the workplace (Berufsleben was ~78% of the bank) and approved a
-two-phase plan (`docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`). **Phase A** deepened the five original daily-life
-themes (bank/bildung/behoerde/wohnen/arzt) to ~80 vocab / ~50 collocations (#553). **Phase B** added five
-NEW everyday-life `alltag` themes — einkaufen (#554), essen (#555), mobilitaet (#556), freizeit (#557),
-digitales (#558) — each a full pack (49 vocab / 40 collocations / 2 dialogues / 2 texts / 3 Can-Do / 1
-writing prompt / full provenance, new lucide icon + ThemeId wiring). New alltag themes fold into the
-Wohnhaus city building via an `alltag` domain rollup. New bank totals: **1,623 vocabulary / 1,011
-collocations / 3,105 provenance rows / 20 themes**. Every theme/PR passed lint:content, verify:facts (0
-two-oracle-confirmed errors), build, test:unit 146/146, check:bundle 79.6 kB, eslint 0 errors. Product
-name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-17 (session 127). **Brand kit catalogue Vol. IV, on branch
+`claude/epic-ramanujan-p049i8`.** The founder liked none of the session-113 20-direction catalogue and
+asked for a fresh set of 5–10 brand kits honoring the recorded preferences (flat, no gradients on logo
+or buttons, colorful accents, respect the built app). Delivered
+`preview/branding/genauly-identity-vol4.html`: **8 complete kits** (Textmarker, Haken dran,
+Sticker-Klub, Linie B2, Zwei Stimmen, Bauhaus Pause, Neonschild, Der Dachs), each with mark, wordmark,
+app icon, palette, type pairing, and UI probe. Preview + docs only, no `src/` change. Awaiting the
+founder's pick (mixes allowed); then wire tokens + regenerate icons per the `preview/branding/README.md`
+protocol. (Session 126's daily-life scale-up is COMPLETE: Phase A + B shipped via PRs #553-#558, five new
+`alltag` themes; new bank totals **1,623 vocabulary / 1,011 collocations / 20 themes**. See the handoff
+below.) Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -66,13 +65,32 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 127 (2026-07-17). Brand kit catalogue Vol. IV, on branch
+`claude/epic-ramanujan-p049i8`. Preview + docs only; no `src/` touched, no gates run.** The founder
+rejected all 20 of session 113's brand directions and asked Fable for 5–10 fresh brand kits built on
+the recorded preferences (s116 verbatim: no gradients on logo or buttons; a variety of colorful
+accents; don't bulldoze the already-designed pages/menus/icons).
+- **Delivered `preview/branding/genauly-identity-vol4.html`** (indexed in that folder's `README.md`,
+  also published as private Claude artifact `b4bd024b`): 8 complete kits, each a live SVG mark +
+  wordmark + 64/40/20 px app icon + hex palette + free Google-Fonts type pairing + flat UI probe +
+  a "Passt zum Bestand" line mapping it onto the existing app. The set: **Textmarker** (highlighter
+  over the *genau* in "genauly", Cobalt & Butter), **Haken dran** (keeps existing indigo, lime check
+  through the open G, cheapest to ship), **Sticker-Klub** (die-cut sticker G in the game's
+  `GAME_OUT #463C44`), **Linie B2** (transit-line G, five line colors = five domains), **Zwei
+  Stimmen** (two speech bubbles, teal + tangerine like the Heute tabs), **Bauhaus Pause** (G from
+  circle/bar/dot primitives), **Neonschild** (neon-tube G on night ink, marketing face only),
+  **Der Dachs** (geometric badger mascot, brand surfaces only).
+- **Next:** the founder picks a kit or a mix; then lock the spec, wire the palette into
+  `src/index.css` + `tailwind.config.ts` (light + dark), regenerate logo/favicons/PWA icons from the
+  mark, `pnpm build`, ship to `main`. Until then nothing brand-related changes in the app.
+
 **Handoff after session 126 (2026-07-17). Daily-life content scale-up (Phase A + Phase B, COMPLETE), on
 branch `claude/scale-words-domains-qjv9x4`, shipped to `main` across PRs #553–#558.** The founder:
 _"currently the app has mainly berufsleben words. Can you scope a task to scale up words from other
 domains?"_ → _"i chose both phase a and b"_ → _"go ahead with the plan"_ → _"yes go ahead with phase b"_.
 - **Scoped** `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`: Phase A deepens the 5 existing daily-life themes to
   workplace parity; Phase B adds new everyday-life themes. Committed on the branch.
-- **Executed Phase A (four theme commits on the branch, NOT yet merged to `main`):**
+- **Executed Phase A (four theme commits, PR #553, squash-merged to `main`):**
   - `bank`: 43 → **81 vocab**, 38 → **50 colloc** (+38 v / +12 c).
   - `bildung`: 46 → **80 vocab**, 39 → **50 colloc** (+34 v / +11 c).
   - `behoerde`: 49 → **80 vocab**, 42 → **50 colloc** (+31 v / +8 c).
@@ -108,51 +126,7 @@ domains?"_ → _"i chose both phase a and b"_ → _"go ahead with the plan"_ →
   dialogues for the new themes if depth is wanted; (3) a dedicated city building for the consumer themes if
   the Wohnhaus fold feels wrong. Nothing is blocking.
 
-**Handoff after session 125 (2026-07-16). Theorie graph word-selection distribution + focus polish
-(Opus 4.8), on branch `claude/graph-word-selection-distribution-5av8xk`, shipped to `main` across nine
-squash-merges (PRs #542, #543, #544, #546, #547, #548, #549, #550).** A long founder-iterated thread on
-how the **Wörter** and **Kollokationen** graph views (`/library?tab=…&view=graph`) behave when a word is
-selected. All work is in two files: `src/features/vocabulary/WordGraph.tsx` +
-`src/features/collocations/CollocationGraph.tsx`. The final selection/focus model (identical in both
-graphs):
-- **Fan-out on select, restore on deselect (#542/#543).** Selecting a node animates its connections into
-  a focused arrangement and frames them at a readable zoom (clamped, so a selection is never left too
-  zoomed out after a fit-to-all); deselecting (empty-space tap or card ✕) animates every displaced node
-  back to its stored **home** position. Implemented with a `homePosRef` (true home per displaced node) +
-  a `focusRafRef` easeOut tween that pins moved nodes (`fx/fy`) so the d3 sim can't fight it; home
-  positions (not the transient focus spots) are what get cached to `posRef` on rebuild/unmount.
-- **Direction-preserving pull-in, not a rebuilt ring (#544).** Rejected the first "even symmetric ring"
-  because it rearranged too much. Each connection keeps its **direction**; the founder then asked for the
-  space to be used, so the final placement (#549) puts each connection on an **ellipse sized to fill
-  ~82% of the free area** at the target zoom (`TARGET_FOCUS_K = 2.3`, per-axis rx/ry so a wide-but-short
-  free area still fills across), at a radial factor that keeps relative order but never below 0.72 of the
-  ellipse — so even a **single** connection spreads out instead of cramping at center.
-- **Angle spreading (#550).** A hub whose connections all pointed one way (e.g. `beantragen`, 16) still
-  stacked in a central column. `spreadAngles()` (module-scope pure fn in both files) blends each angle
-  toward an even slot (slots rotation-aligned to the originals to minimize movement), preserving circular
-  ORDER, so clustered connections fan around the whole ellipse and use the left/right space.
-- **Label legibility (#548).** Nodes are spaced by their **label box** (measured width + the line under
-  the dot) via an AABB `relaxLabels` pass with the selected word as an immovable box; `frameFocus`
-  expands its bounds by label extents so nothing clips; and while focused the draw pass **no longer culls
-  overlapping labels**, so a connection word can never silently disappear.
-- **Fit button + animation parity (#547).** The Kollokationen fit-to-screen button now behaves like the
-  Wörter one (second press zooms into a **random well-connected node**, weighted by area, excluding the
-  current selection, instead of always the biggest hub). Every fit-button view switch animates (the
-  fit-all press tweens the camera via the focus tween; the word-jump animates through the focus effect).
-  `fitToNodes`/`fitToRect` were refactored to **return** the transform (`computeFit`/`computeFitRect`).
-- **Card spacing (#544).** The Kollokationen selected-node card (both horizontal bar + vertical panel
-  shapes) now floats clear of the canvas edges by the same `bottom-3/left-3/right-3` gap the Wörter card
-  uses, instead of sitting flush.
-- All tweens respect `prefers-reduced-motion` (instant). Verified with dark-mode mobile Playwright
-  screenshots across 1-, 2-, 5-, 9-, and 16-connection selections + a numerical check of `spreadAngles`.
-  Gates each PR: typecheck clean, lint at the 53-warning baseline (0 errors), `test:unit` 146/146, build +
-  check:bundle 79.6 kB, 0 console errors.
-- **Caching caveat surfaced repeatedly:** several founder screenshots showed already-fixed behavior,
-  i.e. the installed PWA was serving a **cached** service-worker build. If a graph change doesn't appear
-  after deploy, hard-refresh / reopen the app so the new SW activates. If `beantragen` still looks
-  cramped after that, `spreadAngles`' `blend` (0.7) is the one knob to push harder.
-
-_(Session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
+_(Session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
 + P0/P1 fixes handoff, session 121's
 arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening

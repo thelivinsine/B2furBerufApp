@@ -1,0 +1,648 @@
+<!-- Genauly brand catalogue Vol. IV (session 127) — 8 flat, colorful kits. Open in a browser. -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genauly Markenkatalog · Vol. IV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Baloo+2:wght@700;800&family=Barlow:wght@500;600;700&family=Bricolage+Grotesque:wght@600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Fredoka:wght@500;600&family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700&family=Unbounded:wght@500;600&display=swap">
+<style>
+  :root {
+    --page: #EFEDE8;
+    --page-ink: #1B1A22;
+    --page-mut: #6D6B75;
+    --ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--page); color: var(--page-ink); font-family: var(--ui); line-height: 1.55; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- intro ---------- */
+  .intro { padding: 72px 0 56px; }
+  .intro .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--page-mut); }
+  .intro h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; letter-spacing: -.02em; margin: 10px 0 14px; text-wrap: balance; }
+  .intro p { max-width: 62ch; color: #3A3942; }
+  .intro p + p { margin-top: 10px; }
+  .brief { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+  .brief span { font-size: 13px; font-weight: 600; background: #fff; border: 1.5px solid #D9D6CE; border-radius: 999px; padding: 6px 14px; }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+  .toc a { font-size: 13px; font-weight: 600; color: var(--page-ink); text-decoration: none; background: #E2DFD8; border-radius: 999px; padding: 6px 14px; }
+  .toc a:hover, .toc a:focus-visible { background: #D3D0C8; outline: none; }
+
+  /* ---------- kit band skeleton ---------- */
+  .kit { background: var(--bg); color: var(--ink); padding: 64px 0 72px; }
+  .kit .dex { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--bg); background: var(--ink); border-radius: 6px; padding: 4px 10px; }
+  .kit h2 { font-size: clamp(26px, 4vw, 36px); font-weight: 800; letter-spacing: -.015em; margin: 14px 0 6px; }
+  .kit .claim { max-width: 60ch; font-size: 16px; opacity: .82; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 30px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 22px; }
+  .card .lbl { font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; opacity: .55; margin-bottom: 14px; }
+  .span2 { grid-column: 1 / -1; }
+
+  /* stage */
+  .stage { display: flex; align-items: center; gap: 34px; flex-wrap: wrap; }
+  .stage svg.mark { width: 128px; height: 128px; flex: none; }
+  .lockup { display: flex; align-items: center; gap: 16px; }
+  .lockup svg { width: 52px; height: 52px; flex: none; }
+  .wordmark { font-size: clamp(34px, 6vw, 52px); letter-spacing: -.02em; white-space: nowrap; }
+
+  /* app icons */
+  .icons { display: flex; align-items: flex-end; gap: 18px; flex-wrap: wrap; }
+  .appicon { border-radius: 22.5%; overflow: hidden; flex: none; display: grid; place-items: center; }
+  .appicon svg { width: 78%; height: 78%; }
+  .i64 { width: 64px; height: 64px; } .i40 { width: 40px; height: 40px; } .i20 { width: 20px; height: 20px; }
+  .icons .note { font-size: 12px; opacity: .6; max-width: 22ch; }
+
+  /* palette */
+  .swatches { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 10px; }
+  .sw { border-radius: 12px; border: 1.5px solid var(--line); overflow: hidden; }
+  .sw .chip { height: 52px; }
+  .sw .meta { padding: 7px 9px; background: var(--card); }
+  .sw .nm { font-size: 12px; font-weight: 700; }
+  .sw .hx { font-size: 11px; opacity: .6; font-variant-numeric: tabular-nums; }
+
+  /* type spec */
+  .typespec .pair { font-size: 13px; font-weight: 600; opacity: .75; margin-bottom: 10px; }
+  .typespec .sample { font-size: clamp(22px, 3.4vw, 30px); line-height: 1.2; text-wrap: balance; }
+  .typespec .body-sample { font-size: 14px; margin-top: 10px; opacity: .8; max-width: 52ch; }
+
+  /* UI probe */
+  .probe { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .btn { font-family: var(--ui); font-size: 14px; font-weight: 700; border: none; border-radius: 13px; padding: 11px 20px; cursor: pointer; }
+  .btn.sec { background: transparent; border: 2px solid currentColor; }
+  .pill { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 5px 12px; }
+  .bar { flex: 1 1 160px; min-width: 140px; height: 10px; border-radius: 999px; overflow: hidden; display: flex; }
+  .bar i { display: block; height: 100%; }
+
+  .fit { margin-top: 20px; font-size: 13.5px; opacity: .78; max-width: 78ch; }
+  .fit b { font-weight: 700; }
+
+  /* ---------- outro ---------- */
+  .outro { padding: 64px 0 80px; }
+  .outro h2 { font-size: 26px; font-weight: 800; letter-spacing: -.015em; margin-bottom: 10px; }
+  .outro p { max-width: 64ch; color: #3A3942; }
+  .outro p + p { margin-top: 10px; }
+  .hidden-defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+</style>
+
+<!-- ======================= mark symbols ======================= -->
+<svg class="hidden-defs" aria-hidden="true">
+  <defs>
+    <!-- K1 Textmarker: butter swipe + lowercase g -->
+    <symbol id="m-k1" viewBox="0 0 64 64">
+      <path d="M 12 24 L 52 20 Q 57 23 55 30 L 54 40 L 13 44 Q 9 40 10 32 Z" fill="#FFC94D" transform="rotate(-3 32 32)"/>
+      <text x="32" y="47" text-anchor="middle" font-family="'Bricolage Grotesque','DejaVu Sans',Verdana,sans-serif" font-size="46" font-weight="800" fill="#201D29">g</text>
+    </symbol>
+    <!-- K2 Haken dran: indigo G-ring, lime check through the opening -->
+    <symbol id="m-k2" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="22" fill="none" stroke="#5B5BE6" stroke-width="9" pathLength="100" stroke-dasharray="78 22" stroke-dashoffset="89" stroke-linecap="round"/>
+      <path d="M 28 35 L 38 45 L 59 21" fill="none" stroke="#6FBF1A" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+    </symbol>
+    <!-- K3 Sticker-Klub: die-cut sticker G with hard offset shadow + pixel spark -->
+    <symbol id="m-k3" viewBox="0 0 72 72">
+      <text x="39" y="53" text-anchor="middle" font-family="'Baloo 2','DejaVu Sans',system-ui,sans-serif" font-size="46" font-weight="800" fill="#463C44" stroke="#463C44" stroke-width="11" stroke-linejoin="round">G</text>
+      <text x="35" y="49" text-anchor="middle" font-family="'Baloo 2','DejaVu Sans',system-ui,sans-serif" font-size="46" font-weight="800" fill="#fff" stroke="#fff" stroke-width="11" stroke-linejoin="round">G</text>
+      <text x="35" y="49" text-anchor="middle" font-family="'Baloo 2','DejaVu Sans',system-ui,sans-serif" font-size="46" font-weight="800" fill="#FFC94D" stroke="#463C44" stroke-width="3" stroke-linejoin="round" paint-order="stroke">G</text>
+      <g fill="#7C5CE0"><rect x="55" y="8" width="6" height="6"/><rect x="61" y="14" width="6" height="6"/><rect x="49" y="14" width="6" height="6"/><rect x="55" y="20" width="6" height="6"/></g>
+    </symbol>
+    <!-- K4 Linie B2: transit-line G, stations, amber terminus -->
+    <symbol id="m-k4" viewBox="0 0 64 64">
+      <path d="M 48 12 H 24 Q 12 12 12 24 V 40 Q 12 52 24 52 H 40 Q 48 52 48 44 V 36 H 36" fill="none" stroke="#1E4FD8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <g fill="#fff" stroke="#1E4FD8" stroke-width="2.6">
+        <circle cx="36" cy="12" r="3.6"/><circle cx="12" cy="32" r="3.6"/><circle cx="30" cy="52" r="3.6"/>
+      </g>
+      <circle cx="34" cy="36" r="6" fill="#F5A623"/>
+      <circle cx="34" cy="36" r="2.2" fill="#fff"/>
+    </symbol>
+    <!-- K5 Zwei Stimmen: two bubbles, typing dots -->
+    <symbol id="m-k5" viewBox="0 0 72 64">
+      <rect x="6" y="6" width="46" height="32" rx="16" fill="#12958A"/>
+      <path d="M 18 36 Q 14 48 8 52 Q 20 48 27 37 Z" fill="#12958A"/>
+      <g fill="#FBF1EA"><circle cx="21" cy="22" r="3.4"/><circle cx="29" cy="22" r="3.4"/><circle cx="37" cy="22" r="3.4"/></g>
+      <g stroke="#FBF1EA" stroke-width="2.6">
+        <rect x="40" y="30" width="26" height="20" rx="10" fill="#F97A3C"/>
+        <path d="M 58 49 Q 62 56 66 59 Q 57 56 51 50 Z" fill="#F97A3C"/>
+      </g>
+    </symbol>
+    <!-- K6 Bauhaus Pause: ring + bar + dot -->
+    <symbol id="m-k6" viewBox="0 0 64 64">
+      <circle cx="32" cy="32" r="21" fill="none" stroke="#2547D0" stroke-width="10" pathLength="100" stroke-dasharray="75 25"/>
+      <rect x="30" y="27" width="26" height="10" rx="2" fill="#E8442E"/>
+      <circle cx="47" cy="17" r="6" fill="#F2B92E"/>
+    </symbol>
+    <!-- K7 Neonschild: neon tube G on night -->
+    <symbol id="m-k7" viewBox="0 0 64 64">
+      <rect x="0" y="0" width="64" height="64" rx="14" fill="#14121C"/>
+      <circle cx="32" cy="32" r="21" fill="none" stroke="#8F7BFF" stroke-width="13" opacity=".16" pathLength="100" stroke-dasharray="30 3 30 3 14 20" stroke-dashoffset="90" stroke-linecap="round"/>
+      <circle cx="32" cy="32" r="21" fill="none" stroke="#8F7BFF" stroke-width="6" pathLength="100" stroke-dasharray="30 3 30 3 14 20" stroke-dashoffset="90" stroke-linecap="round"/>
+      <path d="M 54 36 H 38" stroke="#C8F135" stroke-width="6" stroke-linecap="round"/>
+    </symbol>
+    <!-- K8 Der Dachs: geometric badger -->
+    <symbol id="m-k8" viewBox="0 0 64 64">
+      <circle cx="18" cy="17" r="5.5" fill="#24211C"/><circle cx="46" cy="17" r="5.5" fill="#24211C"/>
+      <ellipse cx="32" cy="36" rx="19" ry="21" fill="#FAF7F0" stroke="#24211C" stroke-width="2.4"/>
+      <rect x="20" y="14" width="8" height="30" rx="4" fill="#24211C" transform="rotate(7 24 29)"/>
+      <rect x="36" y="14" width="8" height="30" rx="4" fill="#24211C" transform="rotate(-7 40 29)"/>
+      <circle cx="25" cy="31" r="2.1" fill="#FAF7F0"/><circle cx="39.2" cy="31" r="2.1" fill="#FAF7F0"/>
+      <ellipse cx="32" cy="49.5" rx="8" ry="5.5" fill="#F2B92E"/>
+      <ellipse cx="32" cy="46.5" rx="3" ry="2.2" fill="#24211C"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ======================= intro ======================= -->
+<header class="intro">
+  <div class="wrap">
+    <p class="eyebrow">Genauly · Markenkatalog · Vol. IV</p>
+    <h1>Acht neue Markenkits, flach und mit Farbe</h1>
+    <p>Vol. I bis III haben nicht gezündet, also ist hier nichts davon wiederaufgewärmt. Diese acht Kits sind gegen dein Feedback aus den letzten Runden gebaut: keine Verläufe im Logo, keine Verläufe auf Buttons, dafür echte Farbvielfalt und ein Ton, der zu der App passt, die du schon gebaut hast (Zwei-Ton-Icons, weiche Ecken, Pixel-Spiel, Stadtkarte).</p>
+    <p>Jedes Kit ist komplett: Zeichen, Wortmarke, App-Icon in drei Größen, Palette mit Hex-Codes, Schriftpaar (alle kostenlos über Google Fonts) und eine UI-Probe. Mischen ist erlaubt.</p>
+    <div class="brief">
+      <span>flach, keine Verläufe</span>
+      <span>bunte Akzente statt Monochrom</span>
+      <span>respektiert das bestehende App-Design</span>
+      <span>kein Canva-Tile</span>
+    </div>
+    <nav class="toc">
+      <a href="#k1">1 · Textmarker</a>
+      <a href="#k2">2 · Haken dran</a>
+      <a href="#k3">3 · Sticker-Klub</a>
+      <a href="#k4">4 · Linie B2</a>
+      <a href="#k5">5 · Zwei Stimmen</a>
+      <a href="#k6">6 · Bauhaus Pause</a>
+      <a href="#k7">7 · Neonschild</a>
+      <a href="#k8">8 · Der Dachs</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ======================= Kit 1 · Textmarker ======================= -->
+<section class="kit" id="k1" style="--bg:#FAF5EA; --ink:#201D29; --card:#FFFFFF; --line:#E7DFCE;">
+  <div class="wrap">
+    <span class="dex">Kit 1</span>
+    <h2>Textmarker</h2>
+    <p class="claim">In <b>genauly</b> steckt <b>genau</b>, und der Textmarker macht es sichtbar. Jeder Lerner kennt den Leuchtstift: markieren heißt „das ist wichtig, das merke ich mir". Die Marke ist dieser Moment.</p>
+    <div class="grid">
+      <div class="card span2">
+        <p class="lbl">Zeichen &amp; Wortmarke</p>
+        <div class="stage">
+          <svg class="mark"><use href="#m-k1"/></svg>
+          <div class="wordmark" style="font-family:'Bricolage Grotesque','DejaVu Sans',Verdana,sans-serif; font-weight:800; color:#201D29;">
+            <span style="background:#FFC94D; border-radius:6px 12px 8px 14px; padding:0 .10em; box-decoration-break:clone;">genau</span><span style="color:#FF6B54;">ly</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">App-Icon · 64 / 40 / 20 px</p>
+        <div class="icons">
+          <span class="appicon i64" style="background:#FAF5EA; border:1.5px solid #E7DFCE;"><svg><use href="#m-k1"/></svg></span>
+          <span class="appicon i40" style="background:#FAF5EA; border:1.5px solid #E7DFCE;"><svg><use href="#m-k1"/></svg></span>
+          <span class="appicon i20" style="background:#FAF5EA;"><svg><use href="#m-k1"/></svg></span>
+          <p class="note">Das g auf dem Swipe bleibt auch als 16px-Favicon lesbar.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">Schrift</p>
+        <div class="typespec">
+          <p class="pair">Display: Bricolage Grotesque · Text: Inter</p>
+          <p class="sample" style="font-family:'Bricolage Grotesque','DejaVu Sans',Verdana,sans-serif; font-weight:700;">Markier dir, was wichtig ist.</p>
+          <p class="body-sample">Deutsch für den Alltag, der wirklich stattfindet: Amt, Arzt, Arbeit. Genau das, was du morgen brauchst.</p>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">Palette</p>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#FAF5EA;"></div><div class="meta"><p class="nm">Papier</p><p class="hx">#FAF5EA · Grund</p></div></div>
+          <div class="sw"><div class="chip" style="background:#201D29;"></div><div class="meta"><p class="nm">Tinte</p><p class="hx">#201D29 · Text</p></div></div>
+          <div class="sw"><div class="chip" style="background:#2B4FE0;"></div><div class="meta"><p class="nm">Kobalt</p><p class="hx">#2B4FE0 · Primär</p></div></div>
+          <div class="sw"><div class="chip" style="background:#FFC94D;"></div><div class="meta"><p class="nm">Butter</p><p class="hx">#FFC94D · Marker</p></div></div>
+          <div class="sw"><div class="chip" style="background:#FF6B54;"></div><div class="meta"><p class="nm">Koralle</p><p class="hx">#FF6B54 · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#2E9E6B;"></div><div class="meta"><p class="nm">Blatt</p><p class="hx">#2E9E6B · Erfolg</p></div></div>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">UI-Probe · flach, ohne Verlauf</p>
+        <div class="probe">
+          <button class="btn" style="background:#2B4FE0; color:#fff;">Üben starten</button>
+          <button class="btn sec" style="color:#201D29;">Weiter lernen</button>
+          <span class="pill" style="background:#FFC94D; color:#201D29;">B1 → B2</span>
+          <span class="pill" style="background:#FF6B54; color:#fff;">Serie 12</span>
+          <span class="bar" style="background:#EDE4D2;"><i style="width:55%; background:#2B4FE0;"></i><i style="width:15%; background:#FFC94D;"></i></span>
+        </div>
+      </div>
+    </div>
+    <p class="fit"><b>Passt zum Bestand:</b> Kobalt und Butter sind die Palette, zu der du in Runde 116 selbst gegriffen hast, hier ohne die abgelehnten Anwendungsfehler. Kobalt wird <code>--primary</code>, Butter ersetzt Gold als Marker-Akzent, die Zwei-Ton-Icons bleiben unangetastet.</p>
+  </div>
+</section>
+
+<!-- ======================= Kit 2 · Haken dran ======================= -->
+<section class="kit" id="k2" style="--bg:#FFFFFF; --ink:#1C1B27; --card:#F4F5F9; --line:#E2E4EE;">
+  <div class="wrap">
+    <span class="dex">Kit 2</span>
+    <h2>Haken dran</h2>
+    <p class="claim">Die Evolution statt Revolution: dein Indigo bleibt, der Verlauf stirbt. Das G öffnet sich, und ein limettengrüner Haken schießt durch die Öffnung: der Moment, in dem die Antwort sitzt. „Genau" als Geste.</p>
+    <div class="grid">
+      <div class="card span2">
+        <p class="lbl">Zeichen &amp; Wortmarke</p>
+        <div class="stage">
+          <svg class="mark"><use href="#m-k2"/></svg>
+          <div class="wordmark" style="font-family:'Sora',system-ui,sans-serif; font-weight:700; color:#1C1B27;">genauly</div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">App-Icon · 64 / 40 / 20 px</p>
+        <div class="icons">
+          <span class="appicon i64" style="background:#fff; border:1.5px solid #E2E4EE;"><svg><use href="#m-k2"/></svg></span>
+          <span class="appicon i40" style="background:#fff; border:1.5px solid #E2E4EE;"><svg><use href="#m-k2"/></svg></span>
+          <span class="appicon i20" style="background:#fff;"><svg><use href="#m-k2"/></svg></span>
+          <p class="note">Ring + Haken funktionieren auf Weiß und auf Indigo.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">Schrift</p>
+        <div class="typespec">
+          <p class="pair">Display: Sora · Text: Inter</p>
+          <p class="sample" style="font-family:'Sora',system-ui,sans-serif; font-weight:700;">Genau. Das sitzt.</p>
+          <p class="body-sample">Kein neues Blau, kein neuer Ton. Nur ein echtes Zeichen statt eines Farbverlaufs auf einer Kachel.</p>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">Palette</p>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#FFFFFF; border-bottom:1px solid #E2E4EE;"></div><div class="meta"><p class="nm">Schnee</p><p class="hx">#FFFFFF · Grund</p></div></div>
+          <div class="sw"><div class="chip" style="background:#1C1B27;"></div><div class="meta"><p class="nm">Tinte</p><p class="hx">#1C1B27 · Text</p></div></div>
+          <div class="sw"><div class="chip" style="background:#5B5BE6;"></div><div class="meta"><p class="nm">Indigo</p><p class="hx">#5B5BE6 · Primär, Bestand</p></div></div>
+          <div class="sw"><div class="chip" style="background:#6FBF1A;"></div><div class="meta"><p class="nm">Limette</p><p class="hx">#6FBF1A · Haken</p></div></div>
+          <div class="sw"><div class="chip" style="background:#F4F5F9;"></div><div class="meta"><p class="nm">Nebel</p><p class="hx">#F4F5F9 · Fläche</p></div></div>
+          <div class="sw"><div class="chip" style="background:#FF8A3C;"></div><div class="meta"><p class="nm">Orange</p><p class="hx">#FF8A3C · Spielen</p></div></div>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">UI-Probe · flach, ohne Verlauf</p>
+        <div class="probe">
+          <button class="btn" style="background:#5B5BE6; color:#fff;">Üben starten</button>
+          <button class="btn sec" style="color:#1C1B27;">Weiter lernen</button>
+          <span class="pill" style="background:#6FBF1A; color:#fff;">Richtig!</span>
+          <span class="pill" style="background:#EDEDFB; color:#5B5BE6;">B2 · Beruf</span>
+          <span class="bar" style="background:#E2E4EE;"><i style="width:62%; background:#5B5BE6;"></i><i style="width:12%; background:#6FBF1A;"></i></span>
+        </div>
+      </div>
+    </div>
+    <p class="fit"><b>Passt zum Bestand:</b> das billigste Kit im Umbau. Null Token-Änderung, Indigo <code>#5B5BE6</code> bleibt Primärfarbe, nur die Logo-Assets werden neu erzeugt und Limette wird der Erfolgs-Akzent. Nav-Icons, Karten, Buttons: alles bleibt, nur der Canva-Verdacht verschwindet.</p>
+  </div>
+</section>
+
+<!-- ======================= Kit 3 · Sticker-Klub ======================= -->
+<section class="kit" id="k3" style="--bg:#FDF3E7; --ink:#463C44; --card:#FFFFFF; --line:#EBD9C4;">
+  <div class="wrap">
+    <span class="dex">Kit 3</span>
+    <h2>Sticker-Klub</h2>
+    <p class="claim">Deine App hat schon eine Spielsprache: das Neuland-Pixel-UI mit Outlines und harten Schatten. Dieses Kit macht sie zur Marke. Ein ausgestanzter Sticker als Logo, Bonbonfarben, und alles fühlt sich nach Sammeln und Spielen an.</p>
+    <div class="grid">
+      <div class="card span2">
+        <p class="lbl">Zeichen &amp; Wortmarke</p>
+        <div class="stage">
+          <svg class="mark"><use href="#m-k3"/></svg>
+          <div class="wordmark" style="font-family:'Baloo 2','DejaVu Sans',system-ui,sans-serif; font-weight:800; color:#FFC94D; -webkit-text-stroke:1.5px #463C44; text-shadow:3px 3px 0 #463C44;">Genauly</div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">App-Icon · 64 / 40 / 20 px</p>
+        <div class="icons">
+          <span class="appicon i64" style="background:#58C7F3;"><svg><use href="#m-k3"/></svg></span>
+          <span class="appicon i40" style="background:#FF7BAC;"><svg><use href="#m-k3"/></svg></span>
+          <span class="appicon i20" style="background:#58D8A3;"><svg><use href="#m-k3"/></svg></span>
+          <p class="note">Ein Sticker, viele Untergründe: das Icon darf die Farbe wechseln.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">Schrift</p>
+        <div class="typespec">
+          <p class="pair">Display: Baloo 2 · Text: Nunito Sans</p>
+          <p class="sample" style="font-family:'Baloo 2','DejaVu Sans',system-ui,sans-serif; font-weight:700;">Lernen darf sich wie Spielen anfühlen.</p>
+          <p class="body-sample">Missionen, Loot, Sammlung: die Marke verspricht genau das, was die App längst kann.</p>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">Palette</p>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#FDF3E7;"></div><div class="meta"><p class="nm">Vanille</p><p class="hx">#FDF3E7 · Grund</p></div></div>
+          <div class="sw"><div class="chip" style="background:#463C44;"></div><div class="meta"><p class="nm">Outline</p><p class="hx">#463C44 · Spiel-Tinte</p></div></div>
+          <div class="sw"><div class="chip" style="background:#FFC94D;"></div><div class="meta"><p class="nm">Butter</p><p class="hx">#FFC94D · Marke</p></div></div>
+          <div class="sw"><div class="chip" style="background:#FF7BAC;"></div><div class="meta"><p class="nm">Kaugummi</p><p class="hx">#FF7BAC · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#58C7F3;"></div><div class="meta"><p class="nm">Himmel</p><p class="hx">#58C7F3 · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#7C5CE0;"></div><div class="meta"><p class="nm">Traube</p><p class="hx">#7C5CE0 · Akzent</p></div></div>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">UI-Probe · Sticker-Stil (Outline + harter Schatten, kein Verlauf)</p>
+        <div class="probe">
+          <button class="btn" style="background:#FFC94D; color:#463C44; border:2px solid #463C44; box-shadow:3px 3px 0 #463C44; border-radius:10px;">Mission spielen</button>
+          <button class="btn" style="background:#fff; color:#463C44; border:2px solid #463C44; box-shadow:3px 3px 0 #463C44; border-radius:10px;">Sammlung</button>
+          <span class="pill" style="background:#FF7BAC; color:#fff; border:2px solid #463C44;">Neu!</span>
+          <span class="pill" style="background:#58D8A3; color:#463C44; border:2px solid #463C44;">Level 3</span>
+          <span class="bar" style="background:#fff; border:2px solid #463C44; height:14px;"><i style="width:48%; background:#58C7F3;"></i><i style="width:16%; background:#FFC94D;"></i></span>
+        </div>
+      </div>
+    </div>
+    <p class="fit"><b>Passt zum Bestand:</b> die Outline ist wörtlich <code>GAME_OUT #463C44</code> aus dem Missions-UI. Eine Welt von der Landingpage bis zum Bosskampf; das App-Chrome selbst bleibt ruhig und weiß, die Sticker leben in Logo, Icons, Onboarding und Belohnungen.</p>
+  </div>
+</section>
+
+<!-- ======================= Kit 4 · Linie B2 ======================= -->
+<section class="kit" id="k4" style="--bg:#FFFFFF; --ink:#17171E; --card:#F6F6F8; --line:#E4E4EA;">
+  <div class="wrap">
+    <span class="dex">Kit 4</span>
+    <h2>Linie B2</h2>
+    <p class="claim">Das Leben in Deutschland fährt Bahn, und dein Deutsch auch: von B1 nach B2, Station für Station. Das G ist eine Linie mit Haltepunkten, der Endhalt liegt in der Mitte. Fünf Linienfarben, fünf Lebensbereiche.</p>
+    <div class="grid">
+      <div class="card span2">
+        <p class="lbl">Zeichen &amp; Wortmarke</p>
+        <div class="stage">
+          <svg class="mark"><use href="#m-k4"/></svg>
+          <div class="lockup">
+            <div class="wordmark" style="font-family:'Barlow','Arial Narrow','Liberation Sans',sans-serif; font-weight:700; letter-spacing:.06em; color:#17171E;">GENAULY</div>
+            <span style="width:16px; height:16px; background:#F5A623; border-radius:4px; flex:none;"></span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">App-Icon · 64 / 40 / 20 px</p>
+        <div class="icons">
+          <span class="appicon i64" style="background:#fff; border:1.5px solid #E4E4EA;"><svg><use href="#m-k4"/></svg></span>
+          <span class="appicon i40" style="background:#fff; border:1.5px solid #E4E4EA;"><svg><use href="#m-k4"/></svg></span>
+          <span class="appicon i20" style="background:#fff;"><svg><use href="#m-k4"/></svg></span>
+          <p class="note">Der Endhalt-Punkt in Bernstein trägt das Icon auch klein.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">Schrift</p>
+        <div class="typespec">
+          <p class="pair">Display: Barlow (DIN-Charakter) · Text: Inter</p>
+          <p class="sample" style="font-family:'Barlow','Arial Narrow','Liberation Sans',sans-serif; font-weight:600;">Nächster Halt: B2.</p>
+          <p class="body-sample">Beruf, Alltag, Gesundheit, Bildung, Prüfung: jede Linie hat ihre Farbe, dein Netzplan wächst mit.</p>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">Palette · fünf Linien, fünf Bereiche</p>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#1E4FD8;"></div><div class="meta"><p class="nm">Linie Beruf</p><p class="hx">#1E4FD8 · Primär</p></div></div>
+          <div class="sw"><div class="chip" style="background:#F5A623;"></div><div class="meta"><p class="nm">Linie Alltag</p><p class="hx">#F5A623</p></div></div>
+          <div class="sw"><div class="chip" style="background:#E0356B;"></div><div class="meta"><p class="nm">Linie Gesundheit</p><p class="hx">#E0356B</p></div></div>
+          <div class="sw"><div class="chip" style="background:#1FA363;"></div><div class="meta"><p class="nm">Linie Bildung</p><p class="hx">#1FA363</p></div></div>
+          <div class="sw"><div class="chip" style="background:#7B4FD8;"></div><div class="meta"><p class="nm">Linie Prüfung</p><p class="hx">#7B4FD8</p></div></div>
+          <div class="sw"><div class="chip" style="background:#17171E;"></div><div class="meta"><p class="nm">Tinte</p><p class="hx">#17171E · Text</p></div></div>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">UI-Probe · flach, ohne Verlauf</p>
+        <div class="probe">
+          <button class="btn" style="background:#1E4FD8; color:#fff;">Üben starten</button>
+          <button class="btn sec" style="color:#17171E;">Netzplan ansehen</button>
+          <span class="pill" style="background:#F5A623; color:#17171E;">Alltag</span>
+          <span class="pill" style="background:#E0356B; color:#fff;">Arzt &amp; Gesundheit</span>
+          <span class="bar" style="background:#E4E4EA;"><i style="width:22%; background:#1E4FD8;"></i><i style="width:18%; background:#F5A623;"></i><i style="width:12%; background:#E0356B;"></i><i style="width:10%; background:#1FA363;"></i><i style="width:6%; background:#7B4FD8;"></i></span>
+        </div>
+      </div>
+    </div>
+    <p class="fit"><b>Passt zum Bestand:</b> die fünf Domains haben in der App schon eigene Farben (Graph-Inseln, Gebäude); dieses Kit erhebt sie zum System. Die Üben-Stadtkarte mit Route und Haltepunkten ist praktisch schon das Markenbild.</p>
+  </div>
+</section>
+
+<!-- ======================= Kit 5 · Zwei Stimmen ======================= -->
+<section class="kit" id="k5" style="--bg:#FBF1EA; --ink:#241F1E; --card:#FFFFFF; --line:#EBD9CC;">
+  <div class="wrap">
+    <span class="dex">Kit 5</span>
+    <h2>Zwei Stimmen</h2>
+    <p class="claim">Deutsch lernst du nicht für die Prüfung, sondern für das Gespräch: beim Amt, beim Arzt, im Meeting. Zwei Sprechblasen, eine große, die gerade tippt, und eine kleine, die antwortet. Kein Buchstabe nötig.</p>
+    <div class="grid">
+      <div class="card span2">
+        <p class="lbl">Zeichen &amp; Wortmarke</p>
+        <div class="stage">
+          <svg class="mark" viewBox="0 0 72 64" style="width:140px;"><use href="#m-k5"/></svg>
+          <div class="wordmark" style="font-family:'Fraunces',Georgia,'DejaVu Serif',serif; font-weight:650; color:#241F1E;"><span style="color:#12958A;">g</span>enaul<span style="color:#F97A3C;">y</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">App-Icon · 64 / 40 / 20 px</p>
+        <div class="icons">
+          <span class="appicon i64" style="background:#FBF1EA; border:1.5px solid #EBD9CC;"><svg viewBox="0 0 72 64"><use href="#m-k5"/></svg></span>
+          <span class="appicon i40" style="background:#FBF1EA; border:1.5px solid #EBD9CC;"><svg viewBox="0 0 72 64"><use href="#m-k5"/></svg></span>
+          <span class="appicon i20" style="background:#FBF1EA;"><svg viewBox="0 0 72 64"><use href="#m-k5"/></svg></span>
+          <p class="note">Erster und letzter Buchstabe der Wortmarke tragen die zwei Stimmen.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">Schrift</p>
+        <div class="typespec">
+          <p class="pair">Display: Fraunces · Text: Karla</p>
+          <p class="sample" style="font-family:'Fraunces',Georgia,'DejaVu Serif',serif; font-weight:650;">Sag es einfach auf Deutsch.</p>
+          <p class="body-sample">Warm und menschlich statt technisch: die einzige Serifen-Richtung im Katalog, weit weg von jedem Tech-Logo.</p>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">Palette</p>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#FBF1EA;"></div><div class="meta"><p class="nm">Creme</p><p class="hx">#FBF1EA · Grund</p></div></div>
+          <div class="sw"><div class="chip" style="background:#241F1E;"></div><div class="meta"><p class="nm">Tinte</p><p class="hx">#241F1E · Text</p></div></div>
+          <div class="sw"><div class="chip" style="background:#12958A;"></div><div class="meta"><p class="nm">Teal</p><p class="hx">#12958A · Primär</p></div></div>
+          <div class="sw"><div class="chip" style="background:#F97A3C;"></div><div class="meta"><p class="nm">Mandarine</p><p class="hx">#F97A3C · Antwort</p></div></div>
+          <div class="sw"><div class="chip" style="background:#EAD9C5;"></div><div class="meta"><p class="nm">Sand</p><p class="hx">#EAD9C5 · Fläche</p></div></div>
+          <div class="sw"><div class="chip" style="background:#8A4FBF;"></div><div class="meta"><p class="nm">Pflaume</p><p class="hx">#8A4FBF · Akzent</p></div></div>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">UI-Probe · flach, ohne Verlauf</p>
+        <div class="probe">
+          <button class="btn" style="background:#12958A; color:#fff;">Üben starten</button>
+          <button class="btn sec" style="color:#241F1E;">Dialog ansehen</button>
+          <span class="pill" style="background:#F97A3C; color:#fff;">Sprechen</span>
+          <span class="pill" style="background:#EAD9C5; color:#241F1E;">Beim Arzt</span>
+          <span class="bar" style="background:#EAD9C5;"><i style="width:50%; background:#12958A;"></i><i style="width:14%; background:#F97A3C;"></i></span>
+        </div>
+      </div>
+    </div>
+    <p class="fit"><b>Passt zum Bestand:</b> Teal ist bereits dein Üben-Akzent und Mandarine liegt neben dem Spielen-Orange: die zwei Heute-Tabs sind wörtlich die zwei Stimmen. Die Sprechblase passt zum Sprech-Block der Sessions und den Dialog-Missionen.</p>
+  </div>
+</section>
+
+<!-- ======================= Kit 6 · Bauhaus Pause ======================= -->
+<section class="kit" id="k6" style="--bg:#F4EFE6; --ink:#191621; --card:#FFFFFF; --line:#E2DACA;">
+  <div class="wrap">
+    <span class="dex">Kit 6</span>
+    <h2>Bauhaus Pause</h2>
+    <p class="claim">Deutschland hat das beste Design-Erbe der Welt, warum ausgerechnet Kalifornien imitieren? Ein G aus drei Grundformen: Kreis, Balken, Punkt. Streng gebaut, verspielt gefärbt. Ernsthaft, aber nie langweilig.</p>
+    <div class="grid">
+      <div class="card span2">
+        <p class="lbl">Zeichen &amp; Wortmarke</p>
+        <div class="stage">
+          <svg class="mark"><use href="#m-k6"/></svg>
+          <div class="wordmark" style="font-family:'Archivo Black','Arial Black','DejaVu Sans',sans-serif; font-weight:900; letter-spacing:-.01em; color:#191621;">genauly</div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">App-Icon · 64 / 40 / 20 px</p>
+        <div class="icons">
+          <span class="appicon i64" style="background:#F4EFE6; border:1.5px solid #E2DACA;"><svg><use href="#m-k6"/></svg></span>
+          <span class="appicon i40" style="background:#F4EFE6; border:1.5px solid #E2DACA;"><svg><use href="#m-k6"/></svg></span>
+          <span class="appicon i20" style="background:#F4EFE6;"><svg><use href="#m-k6"/></svg></span>
+          <p class="note">Drei Formen, drei Farben: bleibt bei jeder Größe eindeutig.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">Schrift</p>
+        <div class="typespec">
+          <p class="pair">Display: Archivo Black · Text: Archivo</p>
+          <p class="sample" style="font-family:'Archivo Black','Arial Black','DejaVu Sans',sans-serif;">Form. Farbe. Deutsch.</p>
+          <p class="body-sample">Geometrisch und selbstbewusst: eine Marke, die aussieht, als wüsste sie genau, was sie tut. Weil sie es weiß.</p>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">Palette</p>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#F4EFE6;"></div><div class="meta"><p class="nm">Papier</p><p class="hx">#F4EFE6 · Grund</p></div></div>
+          <div class="sw"><div class="chip" style="background:#191621;"></div><div class="meta"><p class="nm">Tinte</p><p class="hx">#191621 · Text</p></div></div>
+          <div class="sw"><div class="chip" style="background:#2547D0;"></div><div class="meta"><p class="nm">Kobalt</p><p class="hx">#2547D0 · Primär</p></div></div>
+          <div class="sw"><div class="chip" style="background:#E8442E;"></div><div class="meta"><p class="nm">Tomate</p><p class="hx">#E8442E · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#F2B92E;"></div><div class="meta"><p class="nm">Sonne</p><p class="hx">#F2B92E · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#2F9E68;"></div><div class="meta"><p class="nm">Blatt</p><p class="hx">#2F9E68 · Erfolg</p></div></div>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">UI-Probe · flach, ohne Verlauf</p>
+        <div class="probe">
+          <button class="btn" style="background:#2547D0; color:#fff; border-radius:10px;">Üben starten</button>
+          <button class="btn sec" style="color:#191621; border-radius:10px;">Weiter lernen</button>
+          <span class="pill" style="background:#E8442E; color:#fff;">Typische Fehler</span>
+          <span class="pill" style="background:#F2B92E; color:#191621;">Muster</span>
+          <span class="bar" style="background:#E2DACA; border-radius:0;"><i style="width:40%; background:#2547D0;"></i><i style="width:20%; background:#F2B92E;"></i><i style="width:10%; background:#E8442E;"></i></span>
+        </div>
+      </div>
+    </div>
+    <p class="fit"><b>Passt zum Bestand:</b> Kobalt ersetzt Indigo als <code>--primary</code>, Tomate und Sonne werden Feedback-Farben in Drills und Karten. Die Stadtkarten-Gebäude sind schon geometrische Grundformen, dieselbe Familie.</p>
+  </div>
+</section>
+
+<!-- ======================= Kit 7 · Neonschild ======================= -->
+<section class="kit" id="k7" style="--bg:#14121C; --ink:#EDEBFF; --card:#1D1A2A; --line:#322D45;">
+  <div class="wrap">
+    <span class="dex">Kit 7</span>
+    <h2>Neonschild</h2>
+    <p class="claim">Deine Lerner lernen abends, nach der Schicht. Dieses Kit gehört ihnen: das G als Neonröhre über dem Späti, mit Stromlücken im Glas. Kein Verlauf, nur Licht auf Nacht. Die mutigste Richtung im Katalog.</p>
+    <div class="grid">
+      <div class="card span2">
+        <p class="lbl">Zeichen &amp; Wortmarke</p>
+        <div class="stage">
+          <svg class="mark"><use href="#m-k7"/></svg>
+          <div class="wordmark" style="font-family:'Unbounded','DejaVu Sans',sans-serif; font-weight:600; letter-spacing:.12em; color:#EDEBFF; text-shadow:0 0 18px rgba(143,123,255,.55);">GENAULY</div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">App-Icon · 64 / 40 / 20 px</p>
+        <div class="icons">
+          <span class="appicon i64"><svg style="width:100%; height:100%;"><use href="#m-k7"/></svg></span>
+          <span class="appicon i40"><svg style="width:100%; height:100%;"><use href="#m-k7"/></svg></span>
+          <span class="appicon i20"><svg style="width:100%; height:100%;"><use href="#m-k7"/></svg></span>
+          <p class="note">Das einzige dunkle Icon im App-Store-Raster: fällt sofort auf.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">Schrift</p>
+        <div class="typespec">
+          <p class="pair">Display: Unbounded · Text: Chivo</p>
+          <p class="sample" style="font-family:'Unbounded','DejaVu Sans',sans-serif; font-weight:500;">Für alle, die abends lernen.</p>
+          <p class="body-sample">Jede Sprachlern-Marke ist hell, rund und brav. Diese hier ist die Kneipe an der Ecke, in der man wirklich Deutsch spricht.</p>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">Palette</p>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#14121C;"></div><div class="meta"><p class="nm">Nacht</p><p class="hx">#14121C · Grund</p></div></div>
+          <div class="sw"><div class="chip" style="background:#EDEBFF;"></div><div class="meta"><p class="nm">Eis</p><p class="hx">#EDEBFF · Text</p></div></div>
+          <div class="sw"><div class="chip" style="background:#8F7BFF;"></div><div class="meta"><p class="nm">Violett</p><p class="hx">#8F7BFF · Röhre</p></div></div>
+          <div class="sw"><div class="chip" style="background:#C8F135;"></div><div class="meta"><p class="nm">Säure</p><p class="hx">#C8F135 · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#FF6E8E;"></div><div class="meta"><p class="nm">Koralle</p><p class="hx">#FF6E8E · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#1D1A2A;"></div><div class="meta"><p class="nm">Karte</p><p class="hx">#1D1A2A · Fläche</p></div></div>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">UI-Probe · flach, ohne Verlauf</p>
+        <div class="probe">
+          <button class="btn" style="background:#8F7BFF; color:#14121C;">Üben starten</button>
+          <button class="btn sec" style="color:#EDEBFF;">Weiter lernen</button>
+          <span class="pill" style="background:#C8F135; color:#14121C;">Serie 12</span>
+          <span class="pill" style="background:#FF6E8E; color:#14121C;">Boss-Mission</span>
+          <span class="bar" style="background:#322D45;"><i style="width:58%; background:#8F7BFF;"></i><i style="width:14%; background:#C8F135;"></i></span>
+        </div>
+      </div>
+    </div>
+    <p class="fit"><b>Passt zum Bestand:</b> als Marketing-Gesicht (Landing, Icons, Social) über der bestehenden hellen App; in-App bleibt alles wie designt. Die Zwei-Ton-plus-Neon-Logik deiner Nav-Icons ist hier schon Programm.</p>
+  </div>
+</section>
+
+<!-- ======================= Kit 8 · Der Dachs ======================= -->
+<section class="kit" id="k8" style="--bg:#F8F3E9; --ink:#24211C; --card:#FFFFFF; --line:#E6DCC8;">
+  <div class="wrap">
+    <span class="dex">Kit 8</span>
+    <h2>Der Dachs</h2>
+    <p class="claim">Ein Maskottchen mit Haltung: der Dachs ist gründlich, bodenständig und gräbt sich durch jedes Plateau. Kein Eulen-Klon, sondern ein Tier, das im deutschen Wald wirklich wohnt. Freundlich im Onboarding, geduldig bei Fehlern.</p>
+    <div class="grid">
+      <div class="card span2">
+        <p class="lbl">Zeichen &amp; Wortmarke</p>
+        <div class="stage">
+          <svg class="mark"><use href="#m-k8"/></svg>
+          <div class="wordmark" style="font-family:'Fredoka','DejaVu Sans',system-ui,sans-serif; font-weight:600; color:#24211C;">genauly</div>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">App-Icon · 64 / 40 / 20 px</p>
+        <div class="icons">
+          <span class="appicon i64" style="background:#3E7C5B;"><svg><use href="#m-k8"/></svg></span>
+          <span class="appicon i40" style="background:#F2B92E;"><svg><use href="#m-k8"/></svg></span>
+          <span class="appicon i20" style="background:#3E7C5B;"><svg><use href="#m-k8"/></svg></span>
+          <p class="note">Der Kopf allein ist das Icon; die Streifen bleiben bei 20 px erkennbar.</p>
+        </div>
+      </div>
+      <div class="card">
+        <p class="lbl">Schrift</p>
+        <div class="typespec">
+          <p class="pair">Display: Fredoka · Text: Figtree</p>
+          <p class="sample" style="font-family:'Fredoka','DejaVu Sans',system-ui,sans-serif; font-weight:600;">Gründlich. Freundlich. Genau.</p>
+          <p class="body-sample">Ein Charakter gibt der Marke Stimme und Geduld: der Dachs erklärt, lobt und gräbt weiter, wenn es schwer wird.</p>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">Palette</p>
+        <div class="swatches">
+          <div class="sw"><div class="chip" style="background:#F8F3E9;"></div><div class="meta"><p class="nm">Creme</p><p class="hx">#F8F3E9 · Grund</p></div></div>
+          <div class="sw"><div class="chip" style="background:#24211C;"></div><div class="meta"><p class="nm">Tinte</p><p class="hx">#24211C · Text, Streifen</p></div></div>
+          <div class="sw"><div class="chip" style="background:#3E7C5B;"></div><div class="meta"><p class="nm">Wald</p><p class="hx">#3E7C5B · Primär</p></div></div>
+          <div class="sw"><div class="chip" style="background:#F2B92E;"></div><div class="meta"><p class="nm">Butter</p><p class="hx">#F2B92E · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#C96F4A;"></div><div class="meta"><p class="nm">Lehm</p><p class="hx">#C96F4A · Akzent</p></div></div>
+          <div class="sw"><div class="chip" style="background:#FAF7F0;"></div><div class="meta"><p class="nm">Kreide</p><p class="hx">#FAF7F0 · Fläche</p></div></div>
+        </div>
+      </div>
+      <div class="card span2">
+        <p class="lbl">UI-Probe · flach, ohne Verlauf</p>
+        <div class="probe">
+          <button class="btn" style="background:#3E7C5B; color:#fff;">Üben starten</button>
+          <button class="btn sec" style="color:#24211C;">Weiter lernen</button>
+          <span class="pill" style="background:#F2B92E; color:#24211C;">Gut gemacht!</span>
+          <span class="pill" style="background:#C96F4A; color:#fff;">Grab dich durch</span>
+          <span class="bar" style="background:#E6DCC8;"><i style="width:52%; background:#3E7C5B;"></i><i style="width:12%; background:#F2B92E;"></i></span>
+        </div>
+      </div>
+    </div>
+    <p class="fit"><b>Passt zum Bestand:</b> das Maskottchen lebt nur auf Markenflächen (Onboarding, Empty States, 404, Landing), das App-UI bleibt unberührt. Und im Neuland-Spiel wäre der Dachs ein natürlicher NPC.</p>
+  </div>
+</section>
+
+<!-- ======================= outro ======================= -->
+<footer class="outro">
+  <div class="wrap">
+    <h2>Mischen erlaubt</h2>
+    <p>Die Kits sind Baukästen: das Häkchen-Zeichen aus Kit 2 verträgt die Kobalt-Butter-Palette aus Kit 1; die Linienfarben aus Kit 4 können unter jedem Zeichen als Domain-System dienen; der Dachs aus Kit 8 kann als stiller Sidekick in jedes andere Kit einziehen.</p>
+    <p>Nächster Schritt, sobald eine Richtung (oder eine Mischung) gefällt: ich fixiere die Spezifikation, verdrahte die Farb-Tokens in <code>src/index.css</code> + <code>tailwind.config.ts</code> (hell + dunkel), erzeuge Logo, Favicons und PWA-Icons neu aus dem Zeichen und liefere alles über einen PR nach <code>main</code>.</p>
+  </div>
+</footer>

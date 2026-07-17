@@ -269,3 +269,50 @@ horizontal positions from card to card.
 - **Scope note:** only the Kollokationen Karten tile was reported/fixed. The Wörter card
   (`VocabList.tsx`) has the same `truncate`-without-`flex-1` pattern on its title but was left untouched
   (single vocab words rarely overflow at card width); worth the same fix if it's ever reported.
+
+## Session 125 (2026-07-16) — Theorie graph word-selection distribution + focus polish (condensed handoff)
+
+**Handoff after session 125 (2026-07-16). Theorie graph word-selection distribution + focus polish
+(Opus 4.8), on branch `claude/graph-word-selection-distribution-5av8xk`, shipped to `main` across nine
+squash-merges (PRs #542, #543, #544, #546, #547, #548, #549, #550).** A long founder-iterated thread on
+how the **Wörter** and **Kollokationen** graph views (`/library?tab=…&view=graph`) behave when a word is
+selected. All work is in two files: `src/features/vocabulary/WordGraph.tsx` +
+`src/features/collocations/CollocationGraph.tsx`. The final selection/focus model (identical in both
+graphs):
+- **Fan-out on select, restore on deselect (#542/#543).** Selecting a node animates its connections into
+  a focused arrangement and frames them at a readable zoom (clamped, so a selection is never left too
+  zoomed out after a fit-to-all); deselecting (empty-space tap or card ✕) animates every displaced node
+  back to its stored **home** position. Implemented with a `homePosRef` (true home per displaced node) +
+  a `focusRafRef` easeOut tween that pins moved nodes (`fx/fy`) so the d3 sim can't fight it; home
+  positions (not the transient focus spots) are what get cached to `posRef` on rebuild/unmount.
+- **Direction-preserving pull-in, not a rebuilt ring (#544).** Rejected the first "even symmetric ring"
+  because it rearranged too much. Each connection keeps its **direction**; the founder then asked for the
+  space to be used, so the final placement (#549) puts each connection on an **ellipse sized to fill
+  ~82% of the free area** at the target zoom (`TARGET_FOCUS_K = 2.3`, per-axis rx/ry so a wide-but-short
+  free area still fills across), at a radial factor that keeps relative order but never below 0.72 of the
+  ellipse — so even a **single** connection spreads out instead of cramping at center.
+- **Angle spreading (#550).** A hub whose connections all pointed one way (e.g. `beantragen`, 16) still
+  stacked in a central column. `spreadAngles()` (module-scope pure fn in both files) blends each angle
+  toward an even slot (slots rotation-aligned to the originals to minimize movement), preserving circular
+  ORDER, so clustered connections fan around the whole ellipse and use the left/right space.
+- **Label legibility (#548).** Nodes are spaced by their **label box** (measured width + the line under
+  the dot) via an AABB `relaxLabels` pass with the selected word as an immovable box; `frameFocus`
+  expands its bounds by label extents so nothing clips; and while focused the draw pass **no longer culls
+  overlapping labels**, so a connection word can never silently disappear.
+- **Fit button + animation parity (#547).** The Kollokationen fit-to-screen button now behaves like the
+  Wörter one (second press zooms into a **random well-connected node**, weighted by area, excluding the
+  current selection, instead of always the biggest hub). Every fit-button view switch animates (the
+  fit-all press tweens the camera via the focus tween; the word-jump animates through the focus effect).
+  `fitToNodes`/`fitToRect` were refactored to **return** the transform (`computeFit`/`computeFitRect`).
+- **Card spacing (#544).** The Kollokationen selected-node card (both horizontal bar + vertical panel
+  shapes) now floats clear of the canvas edges by the same `bottom-3/left-3/right-3` gap the Wörter card
+  uses, instead of sitting flush.
+- All tweens respect `prefers-reduced-motion` (instant). Verified with dark-mode mobile Playwright
+  screenshots across 1-, 2-, 5-, 9-, and 16-connection selections + a numerical check of `spreadAngles`.
+  Gates each PR: typecheck clean, lint at the 53-warning baseline (0 errors), `test:unit` 146/146, build +
+  check:bundle 79.6 kB, 0 console errors.
+- **Caching caveat surfaced repeatedly:** several founder screenshots showed already-fixed behavior,
+  i.e. the installed PWA was serving a **cached** service-worker build. If a graph change doesn't appear
+  after deploy, hard-refresh / reopen the app so the new SW activates. If `beantragen` still looks
+  cramped after that, `spreadAngles`' `blend` (0.7) is the one knob to push harder.
+
