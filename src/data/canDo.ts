@@ -378,6 +378,30 @@ export const canDoStatements: CanDoStatement[] = [
     en: "I can explain a recipe, recommend a dish and talk about healthy eating.",
     threshold: 0.7,
   },
+  {
+    id: "cd_mobilitaet_1",
+    themeId: "mobilitaet",
+    cefr: "B1.1",
+    statement: "Ich kann mit Bus und Bahn fahren und nach der richtigen Haltestelle fragen.",
+    en: "I can travel by bus and train and ask for the right stop.",
+    threshold: 0.25,
+  },
+  {
+    id: "cd_mobilitaet_2",
+    themeId: "mobilitaet",
+    cefr: "B1.2",
+    statement: "Ich kann eine Fahrkarte kaufen, den passenden Tarif wählen und nach dem Weg fragen.",
+    en: "I can buy a ticket, choose the right fare and ask for directions.",
+    threshold: 0.5,
+  },
+  {
+    id: "cd_mobilitaet_3",
+    themeId: "mobilitaet",
+    cefr: "B2.1",
+    statement: "Ich kann eine Verspätung melden, eine Umleitung verstehen und eine Panne beschreiben.",
+    en: "I can report a delay, understand a diversion and describe a breakdown.",
+    threshold: 0.7,
+  },
 ];
 
 export const canDoByTheme = (themeId: string) =>

@@ -114,4 +114,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       "Schreibe eine kurze E-Mail an ein Restaurant: Reserviere einen Tisch für vier Personen, nenne Datum und Uhrzeit und frage nach vegetarischen Gerichten.",
     long: "Verfasse eine formelle E-Mail an ein Restaurant. Reserviere einen Tisch für eine Feier, nenne die Personenzahl und den Anlass, frage nach einem Menü mit vegetarischen und veganen Optionen und bitte um eine Bestätigung der Reservierung.",
   },
+  mobilitaet: {
+    themeId: "mobilitaet",
+    short:
+      "Schreibe eine kurze E-Mail an den Verkehrsverbund: Du hast wegen einer Verspätung deinen Anschluss verpasst und möchtest die Kosten für ein Ersatzticket zurück.",
+    long: "Verfasse eine formelle Beschwerde-E-Mail an ein Verkehrsunternehmen. Beschreibe, welche Verbindung du nutzen wolltest, wie es zur Verspätung kam und welche Folgen das hatte, und bitte höflich um eine Erstattung oder Entschädigung mit einer klaren Frist.",
+  },
 };

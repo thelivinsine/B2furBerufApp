@@ -2431,7 +2431,145 @@ const restaurantbestellen: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation, tischreservieren, restaurantbestellen];
+const fahrkartekaufen: Scenario = {
+  id: "sc_fahrkarte_kaufen",
+  themeId: "mobilitaet",
+  title: "Eine Fahrkarte kaufen",
+  task: "Kaufen Sie am Schalter die richtige Fahrkarte und klären Sie Tarif und Verbindung.",
+  context:
+    "Sie sind neu in der Stadt und möchten zum Flughafen fahren. Am Schalter im Bahnhof fragen Sie nach der richtigen Fahrkarte.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "suggestions", "reactions"],
+  start: "f1",
+  nodes: {
+    f1: {
+      id: "f1",
+      speaker: "partner",
+      line: "Guten Tag, wie kann ich Ihnen helfen?",
+      gloss: "Hello, how can I help you?",
+      hints: ["Sag, wohin du möchtest.", "Frag nach der richtigen Fahrkarte."],
+      options: [
+        { id: "f1a", text: "Guten Tag, ich möchte zum Flughafen. Welche Fahrkarte brauche ich?", uses: "clarification", quality: 1, feedback: "Sehr gut: Ziel genannt und klar gefragt.", next: "f2" },
+        { id: "f1b", text: "Guten Tag, fährt von hier eine Bahn zum Flughafen?", uses: "clarification", quality: 0.9, feedback: "Gut: eine passende Einstiegsfrage.", next: "f2" },
+        { id: "f1c", text: "Flughafen.", uses: "reactions", quality: 0.4, feedback: "Zu knapp. Sprich in ganzen Sätzen.", next: "f2" },
+      ],
+    },
+    f2: {
+      id: "f2",
+      speaker: "partner",
+      line: "Zum Flughafen fahren Sie mit der Linie S1. Möchten Sie einen Einzelfahrschein oder eine Tageskarte?",
+      gloss: "To the airport you take line S1. Would you like a single ticket or a day ticket?",
+      hints: ["Entscheide dich für ein Ticket.", "Du kannst nach dem Preis fragen."],
+      options: [
+        { id: "f2a", text: "Einen Einzelfahrschein, bitte. Was kostet der zum Flughafen?", uses: "clarification", quality: 1, feedback: "Top: klare Wahl und eine sinnvolle Frage zum Preis.", next: "f3" },
+        { id: "f2b", text: "Ich fahre heute nur hin und zurück, dann nehme ich eine Tageskarte.", uses: "suggestions", quality: 0.9, feedback: "Gut: mitgedacht und begründet.", next: "f3" },
+        { id: "f2c", text: "Egal, irgendwas.", uses: "reactions", quality: 0.3, feedback: "Eine klare Wahl macht es einfacher.", next: "f3" },
+      ],
+    },
+    f3: {
+      id: "f3",
+      speaker: "partner",
+      line: "Der Einzelfahrschein kostet 3,60 Euro. Er gilt zwei Stunden, auch wenn Sie umsteigen müssen. Zahlen Sie bar oder mit Karte?",
+      gloss: "The single ticket costs 3.60 euros. It is valid for two hours, even if you have to change. Do you pay cash or by card?",
+      hints: ["Sag, wie du zahlst.", "Du kannst zur Sicherheit nach dem Gleis fragen."],
+      options: [
+        { id: "f3a", text: "Mit Karte, bitte. Von welchem Gleis fährt die S1 ab?", uses: "clarification", quality: 1, feedback: "Sehr gut: klar bezahlt und vorausschauend nach dem Gleis gefragt.", next: "f4" },
+        { id: "f3b", text: "Ich zahle bar. Muss ich den Fahrschein noch entwerten?", uses: "clarification", quality: 0.9, feedback: "Gut: eine wichtige Nachfrage zum Entwerten.", next: "f4" },
+        { id: "f3c", text: "Karte.", uses: "reactions", quality: 0.5, feedback: "Ein ganzer Satz wirkt freundlicher.", next: "f4" },
+      ],
+    },
+    f4: {
+      id: "f4",
+      speaker: "partner",
+      line: "Die S1 fährt von Gleis 2. In fünf Minuten kommt die nächste Bahn. Gute Fahrt!",
+      gloss: "The S1 leaves from track 2. The next train comes in five minutes. Have a good journey!",
+      hints: ["Bedanke dich.", "Du kannst den Weg zum Gleis bestätigen."],
+      options: [
+        { id: "f4a", text: "Vielen Dank für Ihre Hilfe! Dann gehe ich schnell zu Gleis 2.", uses: "agree", quality: 1, feedback: "Top: freundlich bedankt und den nächsten Schritt genannt.", next: "f_end" },
+        { id: "f4b", text: "Danke schön, das war sehr hilfreich.", uses: "agree", quality: 0.9, feedback: "Gut: höflich abgeschlossen.", next: "f_end" },
+        { id: "f4c", text: "Okay.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre netter.", next: "f_end" },
+      ],
+    },
+    f_end: {
+      id: "f_end",
+      speaker: "narrator",
+      line: "Sie haben die richtige Fahrkarte gekauft, den Tarif verstanden und wissen, von welchem Gleis Sie fahren. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+const nachdemwegfragen: Scenario = {
+  id: "sc_nach_dem_weg_fragen",
+  themeId: "mobilitaet",
+  title: "Nach dem Weg fragen",
+  task: "Fragen Sie einen Passanten nach dem Weg und verstehen Sie die Wegbeschreibung.",
+  context:
+    "Sie suchen die Stadtbibliothek und finden sie nicht. Sie sprechen höflich eine Passantin auf der Straße an.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["clarification", "agree", "reactions", "smallTalk"],
+  start: "w1",
+  nodes: {
+    w1: {
+      id: "w1",
+      speaker: "partner",
+      line: "Entschuldigung, kann ich Ihnen helfen? Sie sehen etwas verloren aus.",
+      gloss: "Excuse me, can I help you? You look a bit lost.",
+      hints: ["Sag höflich, was du suchst.", "Frag nach dem Weg."],
+      options: [
+        { id: "w1a", text: "Ja, gern. Entschuldigung, wie komme ich zur Stadtbibliothek?", uses: "clarification", quality: 1, feedback: "Sehr gut: höflich und klar nach dem Weg gefragt.", next: "w2" },
+        { id: "w1b", text: "Guten Tag, ist die Stadtbibliothek hier in der Nähe?", uses: "clarification", quality: 0.9, feedback: "Gut: eine passende Frage.", next: "w2" },
+        { id: "w1c", text: "Bibliothek?", uses: "reactions", quality: 0.4, feedback: "Zu knapp. Ein ganzer Satz ist höflicher.", next: "w2" },
+      ],
+    },
+    w2: {
+      id: "w2",
+      speaker: "partner",
+      line: "Die ist ganz in der Nähe. Gehen Sie hier geradeaus und an der zweiten Kreuzung nach links.",
+      gloss: "It is very close. Go straight ahead here and turn left at the second junction.",
+      hints: ["Bestätige, dass du folgst.", "Frag nach, wenn etwas unklar ist."],
+      options: [
+        { id: "w2a", text: "Also geradeaus und an der zweiten Kreuzung links. Habe ich das richtig verstanden?", uses: "clarification", quality: 1, feedback: "Top: die Wegbeschreibung zur Sicherheit wiederholt.", next: "w3" },
+        { id: "w2b", text: "Alles klar, geradeaus und dann links. Und wie weit ist es ungefähr?", uses: "clarification", quality: 0.9, feedback: "Gut: bestätigt und nach der Entfernung gefragt.", next: "w3" },
+        { id: "w2c", text: "Aha.", uses: "reactions", quality: 0.4, feedback: "Wiederhole lieber kurz, damit du sicher bist.", next: "w3" },
+      ],
+    },
+    w3: {
+      id: "w3",
+      speaker: "partner",
+      line: "Genau. Nach dem Abbiegen sehen Sie die Bibliothek schon. Zu Fuß sind es etwa fünf Minuten.",
+      gloss: "Exactly. After turning you will already see the library. On foot it is about five minutes.",
+      hints: ["Bedanke dich.", "Du kannst nach einer Haltestelle fragen, falls nötig."],
+      options: [
+        { id: "w3a", text: "Super, vielen Dank! Dann gehe ich einfach zu Fuß.", uses: "agree", quality: 1, feedback: "Sehr gut: freundlich bedankt und Entscheidung genannt.", next: "w4" },
+        { id: "w3b", text: "Danke! Gibt es auch eine Haltestelle in der Nähe?", uses: "clarification", quality: 0.9, feedback: "Gut: höflich und eine sinnvolle Zusatzfrage.", next: "w4" },
+        { id: "w3c", text: "Ok, danke.", uses: "reactions", quality: 0.6, feedback: "Freundlich, aber ein ganzer Satz wirkt wärmer.", next: "w4" },
+      ],
+    },
+    w4: {
+      id: "w4",
+      speaker: "partner",
+      line: "Gern geschehen. Einen schönen Tag noch!",
+      gloss: "You are welcome. Have a nice day!",
+      hints: ["Erwidere den Gruß.", "Ein freundlicher Abschluss rundet das Gespräch ab."],
+      options: [
+        { id: "w4a", text: "Danke, Ihnen auch einen schönen Tag!", uses: "smallTalk", quality: 1, feedback: "Perfekt: freundlich und natürlich abgeschlossen.", next: "w_end" },
+        { id: "w4b", text: "Vielen Dank, tschüss!", uses: "agree", quality: 0.9, feedback: "Gut: höflich verabschiedet.", next: "w_end" },
+        { id: "w4c", text: "Tschüss.", uses: "reactions", quality: 0.5, feedback: "Ein kurzer Dank dazu wäre noch netter.", next: "w_end" },
+      ],
+    },
+    w_end: {
+      id: "w_end",
+      speaker: "narrator",
+      line: "Sie haben höflich nach dem Weg gefragt, die Wegbeschreibung verstanden und sich bedankt. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation, tischreservieren, restaurantbestellen, fahrkartekaufen, nachdemwegfragen];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>

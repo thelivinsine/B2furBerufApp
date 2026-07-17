@@ -1198,6 +1198,9 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_tisch": { bin: "core", zipf: 4.83 },
   "v_getraenk": { bin: "common", zipf: 3.83 },
   "v_empfehlung": { bin: "common", zipf: 4.24 },
+  "v_fahrplan": { bin: "common", zipf: 3.61 },
+  "v_bahncard": { bin: "specialized", zipf: 3.08 },
+  "v_fahrrad": { bin: "common", zipf: 4.48 },
   "c_entscheidung_treffen": { bin: "core", zipf: 5.03 },
   "c_vorschlag_machen": { bin: "core", zipf: 4.57 },
   "c_protokoll_führen": { bin: "common", zipf: 4.12 },
@@ -2023,6 +2026,14 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "c_rezept_folgen": { bin: "common", zipf: 4.36 },
   "c_zutaten_besorgen": { bin: "common", zipf: 3.9 },
   "c_essen_wuerzen": { bin: "core", zipf: 5.33 },
+  "c_den_fahrplan_lesen": { bin: "common", zipf: 3.61 },
+  "c_den_anschluss_verpassen": { bin: "core", zipf: 4.74 },
+  "c_eine_fahrkarte_kaufen": { bin: "specialized", zipf: 3.38 },
+  "c_ticket_ziehen": { bin: "common", zipf: 4.27 },
+  "c_die_fahrkarte_vorzeigen": { bin: "specialized", zipf: 3.38 },
+  "c_ohne_ticket_fahren": { bin: "common", zipf: 4.27 },
+  "c_die_verbindung_suchen": { bin: "core", zipf: 4.98 },
+  "c_den_motor_starten": { bin: "common", zipf: 4.47 },
 };
 
 /** Frequency bin for a content id (vocab or collocation), if binnable. */
