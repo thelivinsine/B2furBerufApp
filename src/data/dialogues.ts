@@ -2293,7 +2293,145 @@ const umtauschreklamation: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation];
+const tischreservieren: Scenario = {
+  id: "sc_tisch_reservieren",
+  themeId: "essen",
+  title: "Einen Tisch reservieren",
+  task: "Reservieren Sie telefonisch einen Tisch und klären Sie Datum, Uhrzeit und Personenzahl.",
+  context:
+    "Sie möchten am Wochenende essen gehen und rufen im Restaurant an, um einen Tisch zu reservieren.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["telephoning", "clarification", "agree", "smallTalk"],
+  start: "t1",
+  nodes: {
+    t1: {
+      id: "t1",
+      speaker: "partner",
+      line: "Restaurant Adler, guten Tag. Was kann ich für Sie tun?",
+      gloss: "Restaurant Adler, hello. What can I do for you?",
+      hints: ["Sag höflich, warum du anrufst.", "Nenne, dass du reservieren möchtest."],
+      options: [
+        { id: "t1a", text: "Guten Tag, ich würde gern einen Tisch für Samstagabend reservieren.", uses: "telephoning", quality: 1, feedback: "Sehr gut: klar und höflich das Anliegen genannt.", next: "t2" },
+        { id: "t1b", text: "Guten Tag, haben Sie am Samstag noch einen Tisch frei?", uses: "clarification", quality: 0.9, feedback: "Gut: eine passende Einstiegsfrage.", next: "t2" },
+        { id: "t1c", text: "Tisch, Samstag.", uses: "reactions", quality: 0.4, feedback: "Zu knapp. Am Telefon sind ganze Sätze wichtig.", next: "t2" },
+      ],
+    },
+    t2: {
+      id: "t2",
+      speaker: "partner",
+      line: "Sehr gern. Für wie viele Personen und um wie viel Uhr darf ich reservieren?",
+      gloss: "Gladly. For how many people and at what time may I reserve?",
+      hints: ["Nenne die Personenzahl.", "Nenne eine Uhrzeit."],
+      options: [
+        { id: "t2a", text: "Für vier Personen um 19 Uhr, bitte.", uses: "clarification", quality: 1, feedback: "Perfekt: alle nötigen Angaben auf einmal.", next: "t3" },
+        { id: "t2b", text: "Wir sind zu viert. Geht es um halb acht?", uses: "clarification", quality: 0.9, feedback: "Gut: klar und mit einer höflichen Rückfrage.", next: "t3" },
+        { id: "t2c", text: "Ein paar Leute, mal sehen.", uses: "reactions", quality: 0.3, feedback: "Zu vage. Nenne eine konkrete Zahl.", next: "t3" },
+      ],
+    },
+    t3: {
+      id: "t3",
+      speaker: "partner",
+      line: "Alles klar, ein Tisch für vier um 19 Uhr. Haben Sie besondere Wünsche, zum Beispiel einen Tisch am Fenster?",
+      gloss: "All right, a table for four at 7 pm. Do you have any special requests, for example a table by the window?",
+      hints: ["Nenne einen Wunsch oder sag, dass alles passt.", "Du kannst nach vegetarischen Gerichten fragen."],
+      options: [
+        { id: "t3a", text: "Ein Tisch am Fenster wäre schön. Und haben Sie auch vegetarische Gerichte?", uses: "clarification", quality: 1, feedback: "Top: höflicher Wunsch und eine sinnvolle Zusatzfrage.", next: "t4" },
+        { id: "t3b", text: "Nein danke, für uns ist jeder Tisch in Ordnung.", uses: "agree", quality: 0.9, feedback: "Gut: freundlich und unkompliziert.", next: "t4" },
+        { id: "t3c", text: "Egal.", uses: "reactions", quality: 0.4, feedback: "Ein ganzer Satz wirkt freundlicher.", next: "t4" },
+      ],
+    },
+    t4: {
+      id: "t4",
+      speaker: "partner",
+      line: "Wunderbar, die Reservierung steht. Auf welchen Namen darf ich sie eintragen?",
+      gloss: "Wonderful, the reservation is set. Under what name may I enter it?",
+      hints: ["Nenne deinen Namen.", "Bedanke dich zum Abschluss."],
+      options: [
+        { id: "t4a", text: "Auf den Namen Keller, vielen Dank für Ihre Hilfe!", uses: "smallTalk", quality: 1, feedback: "Sehr gut: klar und freundlich abgeschlossen.", next: "t_end" },
+        { id: "t4b", text: "Keller. Bis Samstag dann.", uses: "agree", quality: 0.9, feedback: "Gut: kurz und höflich.", next: "t_end" },
+        { id: "t4c", text: "Keller.", uses: "reactions", quality: 0.5, feedback: "Ein kurzer Dank wäre noch netter.", next: "t_end" },
+      ],
+    },
+    t_end: {
+      id: "t_end",
+      speaker: "narrator",
+      line: "Sie haben einen Tisch für vier Personen reserviert und Ihre Wünsche geklärt. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+const restaurantbestellen: Scenario = {
+  id: "sc_restaurant_bestellen",
+  themeId: "essen",
+  title: "Im Restaurant bestellen",
+  task: "Bestellen Sie Ihr Essen, fragen Sie nach den Zutaten und bezahlen Sie am Ende.",
+  context:
+    "Sie sitzen im Restaurant. Der Kellner kommt an den Tisch und nimmt Ihre Bestellung auf.",
+  level: 2,
+  minutes: 6,
+  targetRedemittel: ["clarification", "suggestions", "agree", "reactions"],
+  start: "b1",
+  nodes: {
+    b1: {
+      id: "b1",
+      speaker: "partner",
+      line: "Guten Abend. Haben Sie schon gewählt, oder darf ich Ihnen etwas empfehlen?",
+      gloss: "Good evening. Have you already chosen, or may I recommend something to you?",
+      hints: ["Frag nach einer Empfehlung oder bestelle.", "Sprich in ganzen Sätzen."],
+      options: [
+        { id: "b1a", text: "Was können Sie denn heute besonders empfehlen?", uses: "clarification", quality: 1, feedback: "Sehr gut: eine natürliche, höfliche Frage.", next: "b2" },
+        { id: "b1b", text: "Ich nehme gern das Hauptgericht mit Fisch.", uses: "suggestions", quality: 0.9, feedback: "Gut: klar bestellt.", next: "b2" },
+        { id: "b1c", text: "Keine Ahnung.", uses: "reactions", quality: 0.3, feedback: "Zu knapp. Frag ruhig nach einer Empfehlung.", next: "b2" },
+      ],
+    },
+    b2: {
+      id: "b2",
+      speaker: "partner",
+      line: "Unsere Spezialität ist heute der Braten mit Beilagen. Möchten Sie dazu Kartoffeln oder Reis?",
+      gloss: "Our specialty today is the roast with side dishes. Would you like potatoes or rice with it?",
+      hints: ["Wähle eine Beilage.", "Du kannst nach den Zutaten fragen."],
+      options: [
+        { id: "b2a", text: "Reis, bitte. Ist in der Soße Knoblauch? Ich vertrage das nicht so gut.", uses: "clarification", quality: 1, feedback: "Top: klare Wahl und eine wichtige Nachfrage zu den Zutaten.", next: "b3" },
+        { id: "b2b", text: "Ich nehme Kartoffeln. Gibt es das Gericht auch vegetarisch?", uses: "clarification", quality: 0.9, feedback: "Gut: klar und mit einer sinnvollen Frage.", next: "b3" },
+        { id: "b2c", text: "Ist mir egal.", uses: "reactions", quality: 0.4, feedback: "Eine klare Wahl macht es dem Kellner leichter.", next: "b3" },
+      ],
+    },
+    b3: {
+      id: "b3",
+      speaker: "partner",
+      line: "Die Soße ist ohne Knoblauch, kein Problem. Möchten Sie auch etwas trinken?",
+      gloss: "The sauce is without garlic, no problem. Would you like something to drink as well?",
+      hints: ["Bestelle ein Getränk.", "Sag höflich, was du möchtest."],
+      options: [
+        { id: "b3a", text: "Ja, ein Glas Wasser und eine Apfelschorle, bitte.", uses: "suggestions", quality: 1, feedback: "Sehr gut: klar und höflich bestellt.", next: "b4" },
+        { id: "b3b", text: "Nur ein Wasser, danke.", uses: "agree", quality: 0.9, feedback: "Gut: kurz und klar.", next: "b4" },
+        { id: "b3c", text: "Nein.", uses: "reactions", quality: 0.5, feedback: "Ein ganzer Satz klingt freundlicher.", next: "b4" },
+      ],
+    },
+    b4: {
+      id: "b4",
+      speaker: "partner",
+      line: "Sehr gern. Hat es Ihnen geschmeckt? Möchten Sie noch einen Nachtisch oder gleich zahlen?",
+      gloss: "With pleasure. Did you enjoy it? Would you like a dessert or to pay right away?",
+      hints: ["Antworte höflich.", "Sag, ob du zahlen möchtest, und wie."],
+      options: [
+        { id: "b4a", text: "Es hat sehr gut geschmeckt, danke. Wir möchten bitte zahlen, getrennt.", uses: "clarification", quality: 1, feedback: "Top: freundliches Lob und klar gesagt, wie ihr zahlen wollt.", next: "b_end" },
+        { id: "b4b", text: "Danke, es war lecker. Die Rechnung, bitte.", uses: "agree", quality: 0.9, feedback: "Gut: höflich und klar.", next: "b_end" },
+        { id: "b4c", text: "Zahlen.", uses: "reactions", quality: 0.4, feedback: "Ein bisschen mehr Höflichkeit wirkt besser.", next: "b_end" },
+      ],
+    },
+    b_end: {
+      id: "b_end",
+      speaker: "narrator",
+      line: "Sie haben bestellt, nach den Zutaten gefragt und höflich bezahlt. Guten Appetit und gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation, tischreservieren, restaurantbestellen];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>

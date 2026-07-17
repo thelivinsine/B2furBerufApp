@@ -354,6 +354,30 @@ export const canDoStatements: CanDoStatement[] = [
     en: "I can complain about a product, request an exchange and explain my right of return.",
     threshold: 0.7,
   },
+  {
+    id: "cd_essen_1",
+    themeId: "essen",
+    cefr: "B1.1",
+    statement: "Ich kann im Restaurant einen Tisch reservieren und ein Getränk bestellen.",
+    en: "I can reserve a table at the restaurant and order a drink.",
+    threshold: 0.25,
+  },
+  {
+    id: "cd_essen_2",
+    themeId: "essen",
+    cefr: "B1.2",
+    statement: "Ich kann von der Speisekarte bestellen, nach Zutaten fragen und die Rechnung bezahlen.",
+    en: "I can order from the menu, ask about ingredients and pay the bill.",
+    threshold: 0.5,
+  },
+  {
+    id: "cd_essen_3",
+    themeId: "essen",
+    cefr: "B2.1",
+    statement: "Ich kann ein Rezept erklären, ein Gericht empfehlen und über gesunde Ernährung sprechen.",
+    en: "I can explain a recipe, recommend a dish and talk about healthy eating.",
+    threshold: 0.7,
+  },
 ];
 
 export const canDoByTheme = (themeId: string) =>

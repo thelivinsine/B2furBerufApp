@@ -319,6 +319,29 @@ export const themes: ExamTheme[] = [
       { id: "einkaufen.online", title: "Online shopping & delivery", titleDe: "Onlineshopping & Lieferung", situationsIndex: 3 },
     ],
   },
+  {
+    id: "essen",
+    title: "Food & Dining",
+    titleDe: "Essen & Restaurant",
+    blurb: "Eat out and cook in Germany: reserve a table and order from the menu, ask about ingredients, pay and tip, and cook a meal at home.",
+    blurbDe: "In Deutschland essen gehen und selbst kochen: einen Tisch reservieren und von der Karte bestellen, nach Zutaten fragen, bezahlen und Trinkgeld geben und zu Hause eine Mahlzeit kochen.",
+    icon: "UtensilsCrossed",
+    accent: "from-orange-500 to-red-500",
+    domain: "alltag",
+    context: "personal",
+    situations: [
+      "Einen Tisch reservieren und im Restaurant Platz nehmen",
+      "Von der Speisekarte bestellen und nach Zutaten fragen",
+      "Die Rechnung bezahlen und Trinkgeld geben",
+      "Zu Hause kochen und Zutaten besorgen",
+    ],
+    subThemes: [
+      { id: "essen.restaurant", title: "At the restaurant", titleDe: "Im Restaurant", situationsIndex: 0 },
+      { id: "essen.bestellen", title: "Ordering & menu", titleDe: "Bestellen & Speisekarte", situationsIndex: 1 },
+      { id: "essen.bezahlen", title: "Paying & tipping", titleDe: "Bezahlen & Trinkgeld", situationsIndex: 2 },
+      { id: "essen.kochen", title: "Cooking & ingredients", titleDe: "Kochen & Zutaten", situationsIndex: 3 },
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);
