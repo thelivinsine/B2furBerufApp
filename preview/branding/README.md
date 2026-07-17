@@ -1,5 +1,25 @@
 # Brand identity exploration
 
+## Vol. V (session 127 cont., 2026-07-17) — Bauhaus family + real-app previews
+
+Founder follow-up on Vol. IV: previews of Kit 1 (Textmarker) and Kit 6 (Bauhaus Pause) applied to the
+app, plus more kits in Kit 6's philosophy, also previewed.
+
+`genauly-identity-vol5.html` — four new geometric kits, each a full spec (mark, wordmark, palette,
+type, UI probe) with an embedded real-app preview strip:
+
+- **6A Bauklötze** — Fröbel building blocks; the friendliest reading, closest to the game
+- **6B Ulm** — HfG-Ulm systematic; steel blue + signal orange, the "serious tool" positioning
+- **6C Plakat** — Sachplakat poster; one dominant red, the loudest and most distinctive
+- **6D Neubau** — same forms in contemporary colors (violet/rosé/grass); smallest jump from today
+
+**Preview method (reuse this):** render the REAL app headless (Playwright + `pnpm dev`, seed
+`localStorage b2beruf.settings.v1` to skip onboarding), inject a `:root` style tag overriding only the
+CSS color tokens (`!important`), flatten `.bg-accent-gradient`/`.bg-mesh`, and swap the header logo
+`<img>` to a data-URI mark. Screenshots: Praktisch / Theorie (Wörter) / Fortschritt at 390x844 light.
+Strips live in `vol5-screens/` (incl. `aktuell.png` as the unmodified reference); nothing in `src/`
+changed. What a preview shows is exactly what the real token swap would ship.
+
 ## Vol. IV (session 127, 2026-07-17) — 8 flat, colorful kits
 
 Founder brief: the founder liked none of the 20 Vol. I–III directions and asked for a fresh set of

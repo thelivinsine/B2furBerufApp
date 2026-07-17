@@ -448,3 +448,17 @@ as a continuation entry rather than editing the session-125 entry above).
 - **Artifacts:** `preview/branding/genauly-identity-vol4.html` (new) · `preview/branding/README.md` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   `docs/SESSION_PROMPT_LOG.md`.
+- **Prompt 4 (verbatim):**
+  > can you generate a preview of some screenshots of the app using kit 1 and 6? Can you create more mockups with similar philosophy of kit 6, and also previews of those with app's screenshots?
+- **Response:** Reused the s116-proven method (real app headless via Playwright + `pnpm dev`, seeded
+  onboarding, `:root` token-override style tag, flattened gradients, header logo swapped to a data-URI
+  mark; NO hand-drawn mockups, layouts untouched). Shot Praktisch/Theorie/Fortschritt at 390x844 light
+  for Kit 1, Kit 6, and four NEW Bauhaus-family kits designed for this round: **6A Bauklötze** (Fröbel
+  blocks), **6B Ulm** (HfG-Ulm systematic), **6C Plakat** (Sachplakat red), **6D Neubau** (contemporary
+  violet/rosé/grass), plus an unmodified "Aktuell" reference. Composited seven labeled strips to
+  `preview/branding/vol5-screens/` and authored `preview/branding/genauly-identity-vol5.html` (full kit
+  specs + embedded strips + per-kit "Gegenüber Kit 6" notes). Sent all strips to the founder; updated
+  the branding README with the Vol. V index + the reusable preview method.
+- **Artifacts (prompt 4):** `preview/branding/genauly-identity-vol5.html` (new) ·
+  `preview/branding/vol5-screens/*.png` (7 strips, new) · `preview/branding/README.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
