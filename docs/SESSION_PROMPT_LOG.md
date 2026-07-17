@@ -422,3 +422,29 @@ as a continuation entry rather than editing the session-125 entry above).
   `scripts/lint-content.mjs` · `src/lib/icons.ts` · `src/components/city/domain-buildings.tsx` ·
   `tests/city-mastery.test.ts` · `docs/reports/verify-facts-report.md` (generated) · `CLAUDE.md` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`. PRs #553–#558 (all squash-merged to `main`).
+
+## Session 127 — 2026-07-17 — Brand kit catalogue Vol. IV
+
+**Branch:** `claude/epic-ramanujan-p049i8` · **Attachments:** none.
+
+- **Prompt 1 (verbatim):**
+  > previously I asked opus to generate a few mock ups for logo and brand kit, but I didn't like any of them. Can you as Fable give it a go and provide me with 5-10 brand kits ideas? Remember my preferences from previous sessions for this task.
+- **Prompt 2 (verbatim, mid-work):**
+  > are you done? you seem to be working for a while now
+- **Prompt 3 (verbatim, after an accidental tool rejection):**
+  > I didn;t decline
+- **Response:** Researched the recorded branding history first: session 113's 20-direction catalogue
+  (Vol. I–III, none chosen) and session 116's rejected Cobalt & Butter previews with the founder's
+  verbatim constraints ("don't use gradient so much - not in logo. not on buttons!", "use variety of
+  colors ... fun looking variations with colorful accents", plus "I put a lot of time into designing
+  various pages, menus and icons"). Authored `preview/branding/genauly-identity-vol4.html`: **eight new
+  kits** (Textmarker, Haken dran, Sticker-Klub, Linie B2, Zwei Stimmen, Bauhaus Pause, Neonschild,
+  Der Dachs), each a live SVG mark + wordmark + 64/40/20 px app icon + hex palette + free Google-Fonts
+  type pairing + flat UI probe + a "Passt zum Bestand" mapping note. Deliberately no retreads of the 20
+  rejected directions; every kit flat, multi-accent, and compatible with the existing app design.
+  Verified visually via headless-Chromium screenshots. Delivered as a file + a private Claude artifact
+  (`b4bd024b`); updated `preview/branding/README.md` with a Vol. IV index. Docs + preview only, no
+  `src/` change, no gates run.
+- **Artifacts:** `preview/branding/genauly-identity-vol4.html` (new) · `preview/branding/README.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/SESSION_PROMPT_LOG.md`.

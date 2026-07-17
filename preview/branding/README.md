@@ -1,4 +1,30 @@
-# Brand identity exploration (session 113, 2026-07-13)
+# Brand identity exploration
+
+## Vol. IV (session 127, 2026-07-17) — 8 flat, colorful kits
+
+Founder brief: the founder liked none of the 20 Vol. I–III directions and asked for a fresh set of
+5–10 brand kits honoring the recorded preferences: **flat (no gradients on logo or buttons), a real
+variety of colorful accents, nothing resembling a Canva tile, and respect for the already-designed
+app** (two-tone neon nav icons, soft corners, the Neuland pixel game, the city map).
+
+`genauly-identity-vol4.html` — eight complete kits, each with mark, wordmark, app icon at
+64/40/20 px, palette with hex codes, a free Google-Fonts type pairing, a flat UI probe, and a
+"Passt zum Bestand" note on how cheaply it maps onto the existing app:
+
+1. **Textmarker** — highlighter swipe over the *genau* hidden inside "genauly"; Cobalt & Butter warmth
+2. **Haken dran** — evolution kit: keeps the existing indigo, a lime check through the open G
+3. **Sticker-Klub** — die-cut sticker G in the game's outline ink `#463C44`, candy palette
+4. **Linie B2** — the G as a transit line with stations; five line colors = the five domains
+5. **Zwei Stimmen** — two speech bubbles, no letter; teal + tangerine (the two Heute tabs)
+6. **Bauhaus Pause** — G from circle, bar, and dot in softened primaries on paper
+7. **Neonschild** — neon-tube G on night ink, for after-work learners; marketing face only
+8. **Der Dachs** — a geometric badger mascot: gründlich, digs through the plateau; brand surfaces only
+
+Mixing is allowed (e.g. Kit 2's mark under Kit 1's palette). Published as a private Claude artifact
+(`b4bd024b`). Next step when a direction is chosen: same protocol as below (lock the spec, wire the
+tokens light + dark, regenerate logo/favicons/PWA icons, ship via PR to `main`).
+
+## Vol. I–III (session 113, 2026-07-13)
 
 Founder brief: *"I want to change the branding including logo, visual assets and color schemes. The
 current logo looks like a direct copy of the Canva logo. Can you provide me with a catalogue of
