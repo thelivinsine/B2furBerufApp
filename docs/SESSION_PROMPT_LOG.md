@@ -389,3 +389,31 @@ as a continuation entry rather than editing the session-125 entry above).
   368 lines.
 - **Artifacts:** `docs/SESSION_PROMPT_LOG.md` · `docs/archive/prompt-log/SESSION_PROMPT_LOG_2026-W29.md`
   (new) · `docs/archive/prompt-log/README.md`.
+
+## Session 126 — 2026-07-17 — Daily-life content scale-up (Phase A)
+
+**Branch:** `claude/scale-words-domains-qjv9x4` · **Model:** Opus 4.8 · **Attachments:** none.
+
+- **Prompt 1 (verbatim):**
+  > currently the app has mainly berufsleben words. Can you scope a task to scale up words from other domains?
+- **Prompt 2 (verbatim, answering a direction question):**
+  > i chose both phase a and b
+- **Prompt 3 (verbatim):**
+  > go ahead with the plan
+- **Response:** Analysed the content distribution (workplace = ~78% of the 1,246-word bank; the five
+  daily-life themes were ~half the depth of workplace themes, and the `alltag` domain covered only
+  bureaucracy). Scoped a two-phase plan `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md` (Phase A: deepen the five
+  existing daily-life themes to workplace parity; Phase B: add new everyday-life themes) and, on the
+  founder's "both phases" + "go ahead", executed **Phase A** in four theme commits on the branch:
+  bank (43→81 vocab, +12 colloc), bildung (46→80, +11), behoerde (49→80, +8), wohnen (57→80, +5) and a
+  6-word arzt top-up to 80. Total **+132 vocab / +36 collocations / +168 provenance rows**, all CEFR-tagged
+  B1–B2 and spread across each theme's four sub-themes to lift the thin ones. New bank totals: **1,378
+  vocabulary / 811 collocations / 2,620 provenance rows.** Each theme passed `pnpm lint:content`,
+  `pnpm verify:facts` (0 two-oracle-confirmed errors), and `pnpm build`; frequency map regenerated per
+  theme. Updated `CLAUDE.md` counts, this log, and the `PROJECT_STATUS.md` handoff. **Phase B not yet
+  started** (needs the new-theme names/structural scaffolding; proposed in the plan doc).
+- **Artifacts:** `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md` (new) · `src/data/vocabulary.ts` ·
+  `src/data/collocations.ts` · `src/data/provenance.ts` · `src/data/frequency.ts` (generated) ·
+  `docs/reports/verify-facts-report.md` (generated) · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/SESSION_PROMPT_LOG.md`. Commits pushed to `claude/scale-words-domains-qjv9x4` (plan doc + four
+  Phase A theme commits + this doc update).
