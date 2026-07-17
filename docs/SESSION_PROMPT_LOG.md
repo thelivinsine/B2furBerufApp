@@ -462,3 +462,18 @@ as a continuation entry rather than editing the session-125 entry above).
 - **Artifacts (prompt 4):** `preview/branding/genauly-identity-vol5.html` (new) ·
   `preview/branding/vol5-screens/*.png` (7 strips, new) · `preview/branding/README.md` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+- **Prompt 5 (verbatim):**
+  > can you publish the html as an artifact so that I can view it here?
+- **Prompt 6 (verbatim):**
+  > why does 6a, 6b, and 6c logos looking like random pieces of grometric blocks without any alphabet G?
+- **Response:** (5) Published Vol. V as a Claude artifact (`c34244cd`); artifacts are self-contained, so
+  the strips were inlined as 1400px JPEG data URIs (canvas re-encode, ~1.5 MB page). (6) Valid critique:
+  the 6A/6B/6D marks were G-less abstract compositions and 6C's G was a typed font glyph. Redesigned all
+  four as geometric G letterforms (iterated via test renders at 150px + 32px): 6A = one continuous blue
+  toy-track G with a gable + block resting on it, 6B = modular right-angled G with the signal-orange
+  crossbar, 6C = heavy poster "G." drawn as paths (no font), 6D = open violet ring-G with a rosé wedge
+  crossbar + acid dot. Updated the vol5 symbols + copy, the header-logo data URIs, re-shot the 12 app
+  screenshots, rebuilt the strips, republished the artifact at the same URL.
+- **Artifacts (prompts 5-6):** `preview/branding/genauly-identity-vol5.html` ·
+  `preview/branding/vol5-screens/kit6[a-d]-*.png` (re-rendered) · artifact `c34244cd` ·
+  `docs/SESSION_PROMPT_LOG.md`.
