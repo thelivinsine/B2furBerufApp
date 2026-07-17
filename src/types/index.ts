@@ -18,7 +18,8 @@ export type ThemeId =
   | "wohnen"
   | "bank"
   | "bildung"
-  | "einkaufen";
+  | "einkaufen"
+  | "essen";
 
 /* ---------------- Taxonomy: domains, modes, facets ---------------- */
 
