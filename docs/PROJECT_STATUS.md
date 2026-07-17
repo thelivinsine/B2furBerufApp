@@ -86,6 +86,13 @@ accents; don't bulldoze the already-designed pages/menus/icons).
   6C Plakat / 6D Neubau**, plus an "Aktuell" reference), produced with the s116-proven token-swap method
   (real app headless, only CSS tokens + header logo swapped, gradients flattened; method documented in
   `preview/branding/README.md` for reuse). Still no `src/` change.
+- **Vol. VI follow-up (same session, model switched to Opus 4.8):** the founder asked to lean into the
+  two favorites (Kit 1, Kit 6) with more color variations, aiming for a stunning/premium/trust feel.
+  Delivered `preview/branding/genauly-identity-vol6.html` + 9 strips in `preview/branding/vol6-screens/`:
+  eight premium variations (Kit 1: Kobalt & Butter / Tinte & Messing / Aubergine & Aprikose / Marine &
+  Koralle; Kit 6: Bauhaus / Graphit & Messing / Bordeaux & Marine / **Mitternacht** dark-mode) with the
+  core marks intact, deep considered palettes, previewed on the real app (the harness now also drives the
+  app's real `.dark` mode). Artifact `dfcad5f6`. Still no `src/` change.
 - **Next:** the founder picks a kit or a mix (e.g. "6A but with the Kit-6 mark", or "6C with red only
   in the logo"); then lock the spec, wire the palette into `src/index.css` + `tailwind.config.ts`
   (light + dark), regenerate logo/favicons/PWA icons from the mark, `pnpm build`, ship to `main`.

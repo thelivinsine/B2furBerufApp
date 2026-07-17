@@ -1,5 +1,23 @@
 # Brand identity exploration
 
+## Vol. VI (session 127 cont., 2026-07-17) — premium color variations of Kit 1 + Kit 6
+
+Founder direction: lean into the two favorites (Kit 1 Textmarker, Kit 6 Bauhaus), play with color while
+keeping each core mark intact, goal = a **visually stunning app that builds trust and feels highly
+premium**. So the palettes move away from candy-bright toward deep, considered tones and warm chosen
+neutrals; the marks are unchanged (Kit 1 = g-on-highlighter, Kit 6 = circle/bar/dot G).
+
+`genauly-identity-vol6.html` — eight variations, all previewed on the real app:
+- **Kit 1 family:** `1` Kobalt & Butter (refined signature) · `1B` Tinte & Messing (ink + brass, bank/
+  Behörde-premium) · `1C` Aubergine & Aprikose (editorial) · `1D` Marine & Koralle (navy = trust)
+- **Kit 6 family:** `6` Bauhaus (refined signature) · `6E` Graphit & Messing (Braun/Vitra museum) ·
+  `6F` Bordeaux & Marine (old-world) · `6G` **Mitternacht** (dark-mode: sapphire + gold on midnight)
+
+Same token-swap method as Vol. V (documented below), extended to drive the app's real **dark mode**
+(`.dark` class on the root) for the Mitternacht variant. Kits are defined once as hex-per-token-role and
+converted to the app's HSL vars by a helper, so palettes stay single-source. Strips in `vol6-screens/`
+(+ `aktuell.png` reference). Published as a self-contained Claude artifact. No `src/` change.
+
 ## Vol. V (session 127 cont., 2026-07-17) — Bauhaus family + real-app previews
 
 Founder follow-up on Vol. IV: previews of Kit 1 (Textmarker) and Kit 6 (Bauhaus Pause) applied to the
