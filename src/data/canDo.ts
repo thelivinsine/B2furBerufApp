@@ -402,6 +402,30 @@ export const canDoStatements: CanDoStatement[] = [
     en: "I can report a delay, understand a diversion and describe a breakdown.",
     threshold: 0.7,
   },
+  {
+    id: "cd_freizeit_1",
+    themeId: "freizeit",
+    cefr: "B1.1",
+    statement: "Ich kann über meine Hobbys sprechen und mich mit jemandem verabreden.",
+    en: "I can talk about my hobbies and arrange to meet someone.",
+    threshold: 0.25,
+  },
+  {
+    id: "cd_freizeit_2",
+    themeId: "freizeit",
+    cefr: "B1.2",
+    statement: "Ich kann eine Einladung annehmen oder absagen und einen Vorschlag für ein Treffen machen.",
+    en: "I can accept or decline an invitation and suggest a meeting.",
+    threshold: 0.5,
+  },
+  {
+    id: "cd_freizeit_3",
+    themeId: "freizeit",
+    cefr: "B2.1",
+    statement: "Ich kann Smalltalk führen, ins Gespräch kommen und über Veranstaltungen sprechen.",
+    en: "I can make small talk, start a conversation and talk about events.",
+    threshold: 0.7,
+  },
 ];
 
 export const canDoByTheme = (themeId: string) =>

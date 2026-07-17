@@ -120,4 +120,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       "Schreibe eine kurze E-Mail an den Verkehrsverbund: Du hast wegen einer Verspätung deinen Anschluss verpasst und möchtest die Kosten für ein Ersatzticket zurück.",
     long: "Verfasse eine formelle Beschwerde-E-Mail an ein Verkehrsunternehmen. Beschreibe, welche Verbindung du nutzen wolltest, wie es zur Verspätung kam und welche Folgen das hatte, und bitte höflich um eine Erstattung oder Entschädigung mit einer klaren Frist.",
   },
+  freizeit: {
+    themeId: "freizeit",
+    short:
+      "Schreibe eine kurze Nachricht an einen Freund: Lade ihn zu einem gemeinsamen Ausflug am Wochenende ein und schlage Zeit und Treffpunkt vor.",
+    long: "Verfasse eine Einladung an mehrere Freunde zu einer kleinen Feier. Nenne den Anlass, Datum und Ort, beschreibe kurz, was geplant ist, und bitte um eine Zu- oder Absage bis zu einem bestimmten Termin.",
+  },
 };

@@ -1874,6 +1874,118 @@ export const texts: ReadingText[] = [
       },
     ],
   },
+  {
+    id: "tx_freizeit_einladung_nachricht",
+    kind: "email",
+    themeId: "freizeit",
+    cefr: "B1.2",
+    subThemeId: "freizeit.verabredung",
+    title: "Einladung zum Grillfest",
+    titleEn: "Invitation to a barbecue",
+    de: [
+      "Hallo zusammen,",
+      "am Samstag, dem 26. Juli, mache ich ein kleines Grillfest bei mir im Garten. Es geht um 16 Uhr los, kommt einfach vorbei, wann ihr könnt.",
+      "Für Fleisch, Salat und Getränke ist gesorgt. Wenn ihr möchtet, bringt gern euren Lieblingssalat oder einen Nachtisch mit. Sagt mir bitte bis Donnerstag Bescheid, ob ihr kommt, damit ich genug einkaufen kann.",
+      "Falls es regnet, feiern wir einfach drinnen. Ich freue mich auf euch!",
+      "Liebe Grüße\nMarie",
+    ].join("\n\n"),
+    en: [
+      "Hi everyone,",
+      "On Saturday, 26 July, I'm having a small barbecue in my garden. It starts at 4 pm, just come by whenever you can.",
+      "Meat, salad and drinks are taken care of. If you like, feel free to bring your favourite salad or a dessert. Please let me know by Thursday whether you're coming, so I can buy enough.",
+      "If it rains, we'll simply celebrate indoors. I'm looking forward to seeing you!",
+      "Best wishes\nMarie",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_freizeit_einladung_nachricht_q1",
+        question: "Wann beginnt das Grillfest?",
+        options: ["Um 16 Uhr", "Um 12 Uhr", "Am Sonntagabend"],
+        answer: "Um 16 Uhr",
+        explain: "The barbecue starts at 4 pm (16 Uhr).",
+      },
+      {
+        id: "tx_freizeit_einladung_nachricht_q2",
+        question: "Was sollen die Gäste bis Donnerstag tun?",
+        options: [
+          "Bescheid sagen, ob sie kommen",
+          "Das Fleisch einkaufen",
+          "Einen Tisch reservieren",
+        ],
+        answer: "Bescheid sagen, ob sie kommen",
+        explain: "Guests should confirm by Thursday whether they are coming.",
+      },
+      {
+        id: "tx_freizeit_einladung_nachricht_q3",
+        question: "Was passiert, wenn es regnet?",
+        options: [
+          "Es wird drinnen gefeiert",
+          "Das Fest fällt aus",
+          "Es wird verschoben",
+        ],
+        answer: "Es wird drinnen gefeiert",
+        explain: "If it rains, they will celebrate indoors.",
+      },
+    ],
+  },
+  {
+    id: "tx_freizeit_kursangebot_aushang",
+    kind: "announcement",
+    themeId: "freizeit",
+    cefr: "B2.1",
+    subThemeId: "freizeit.hobbys",
+    title: "Neue Kurse im Nachbarschaftstreff",
+    titleEn: "New courses at the community centre",
+    de: [
+      "Liebe Nachbarinnen und Nachbarn,",
+      "ab September bieten wir im Nachbarschaftstreff neue Freizeitkurse an. Neu im Programm sind ein Chor, ein Malkurs und eine wöchentliche Wandergruppe.",
+      "Die Kurse sind offen für alle, Vorkenntnisse sind nicht nötig. Die Teilnahme ist kostenlos, um Anmeldung wird aber gebeten, da die Plätze begrenzt sind.",
+      "Wer sich ehrenamtlich einbringen möchte, ist ebenfalls herzlich willkommen. Melden Sie sich einfach im Büro oder per E-Mail an.",
+      "Wir freuen uns auf viele neue Gesichter\nIhr Team vom Nachbarschaftstreff",
+    ].join("\n\n"),
+    en: [
+      "Dear neighbours,",
+      "From September we are offering new leisure courses at the community centre. New in the programme are a choir, a painting course and a weekly hiking group.",
+      "The courses are open to everyone, no prior knowledge is needed. Participation is free, but registration is requested, as places are limited.",
+      "Anyone who would like to get involved as a volunteer is also warmly welcome. Simply register at the office or by email.",
+      "We look forward to many new faces\nYour community centre team",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_freizeit_kursangebot_aushang_q1",
+        question: "Welche Kurse sind neu im Programm?",
+        options: [
+          "Ein Chor, ein Malkurs und eine Wandergruppe",
+          "Ein Kochkurs und ein Sprachkurs",
+          "Ein Fitnesskurs und ein Tanzkurs",
+        ],
+        answer: "Ein Chor, ein Malkurs und eine Wandergruppe",
+        explain: "The new courses are a choir, a painting course and a weekly hiking group.",
+      },
+      {
+        id: "tx_freizeit_kursangebot_aushang_q2",
+        question: "Was kostet die Teilnahme?",
+        options: [
+          "Nichts, sie ist kostenlos",
+          "Zehn Euro pro Monat",
+          "Nur der Eintritt",
+        ],
+        answer: "Nichts, sie ist kostenlos",
+        explain: "Participation is free, but registration is requested.",
+      },
+      {
+        id: "tx_freizeit_kursangebot_aushang_q3",
+        question: "Warum soll man sich anmelden?",
+        options: [
+          "Weil die Plätze begrenzt sind",
+          "Weil man Vorkenntnisse braucht",
+          "Weil die Kurse teuer sind",
+        ],
+        answer: "Weil die Plätze begrenzt sind",
+        explain: "Registration is requested because places are limited.",
+      },
+    ],
+  },
 ];
 
 export const textById = (id: string) => texts.find((t) => t.id === id);

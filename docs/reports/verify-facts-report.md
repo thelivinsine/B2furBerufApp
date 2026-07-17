@@ -16,8 +16,8 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **1233**
-- Covered by ≥1 oracle: **952** (77%)  ·  not covered: **281**
+- Nouns checked: **1281**
+- Covered by ≥1 oracle: **952** (74%)  ·  not covered: **329**
 - ✔ Article verified: **935**  (439 by both oracles, 496 by one)
 - ✔ Plural verified: **600**  (346 by both oracles, 254 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
@@ -70,13 +70,14 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>281 items</summary>
+<details><summary>329 items</summary>
 
 | id | headword |
 |---|---|
 | `v_abendkurs` | der Abendkurs |
 | `v_abfahrt` | die Abfahrt |
 | `v_ablaufdatum` | das Ablaufdatum |
+| `v_absage` | die Absage |
 | `v_aermel` | der Ärmel |
 | `v_ampel` | die Ampel |
 | `v_anerkennungsverfahren` | das Anerkennungsverfahren |
@@ -90,9 +91,11 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_aufenthaltsstatus` | der Aufenthaltsstatus |
 | `v_aufstieg` | der Aufstieg |
 | `v_auftraggeber` | der Auftraggeber |
+| `v_ausflug` | der Ausflug |
 | `v_auslastung` | die Auslastung |
 | `v_ausreise` | die Ausreise |
 | `v_ausschlag` | der Ausschlag |
+| `v_ausstellung` | die Ausstellung |
 | `v_ausverkauf` | der Ausverkauf |
 | `v_auswahl` | die Auswahl |
 | `v_autobahn` | die Autobahn |
@@ -108,7 +111,9 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_beanstandung` | die Beanstandung |
 | `v_bedienungszuschlag` | der Bedienungszuschlag |
 | `v_befristung` | die Befristung |
+| `v_begegnung` | die Begegnung |
 | `v_beilage` | die Beilage |
+| `v_bekannter` | der Bekannte |
 | `v_benzin` | das Benzin |
 | `v_berufsabschluss` | der Berufsabschluss |
 | `v_berufserfahrung` | die Berufserfahrung |
@@ -120,9 +125,12 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_bildungspraemie` | die Bildungsprämie |
 | `v_bildungsurlaub` | der Bildungsurlaub |
 | `v_bonitaet` | die Bonität |
+| `v_brettspiel` | das Brettspiel |
 | `v_brot` | das Brot |
+| `v_buehne` | die Bühne |
 | `v_buergschaft` | die Bürgschaft |
 | `v_bussgeld` | das Bußgeld |
+| `v_chor` | der Chor |
 | `v_darlehen` | das Darlehen |
 | `v_daten` | die Daten |
 | `v_datenblatt` | das Datenblatt |
@@ -135,11 +143,15 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_drogerie` | die Drogerie |
 | `v_echtzeitueberweisung` | die Echtzeitüberweisung |
 | `v_ecke` | die Ecke |
+| `v_ehrenamt` | das Ehrenamt |
 | `v_eigenanteil` | der Eigenanteil |
 | `v_eigenbedarf` | der Eigenbedarf |
 | `v_einkaufskorb` | der Einkaufskorb |
 | `v_einkaufsliste` | die Einkaufsliste |
+| `v_einladung` | die Einladung |
 | `v_einreise` | die Einreise |
+| `v_eintritt` | der Eintritt |
+| `v_eintrittskarte` | die Eintrittskarte |
 | `v_einwohnermeldeamt` | das Einwohnermeldeamt |
 | `v_einzelfahrschein` | der Einzelfahrschein |
 | `v_empfehlung` | die Empfehlung |
@@ -154,20 +166,27 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_fahrplan` | der Fahrplan |
 | `v_fahrrad` | das Fahrrad |
 | `v_fahrschein` | der Fahrschein |
+| `v_feier` | die Feier |
 | `v_fernstudium` | das Fernstudium |
+| `v_festival` | das Festival |
 | `v_fiktionsbescheinigung` | die Fiktionsbescheinigung |
 | `v_finanzierung` | die Finanzierung |
 | `v_fisch` | der Fisch |
 | `v_fleisch` | das Fleisch |
 | `v_freistellungsauftrag` | der Freistellungsauftrag |
+| `v_freizeitangebot` | das Freizeitangebot |
 | `v_fuehrungszeugnis` | das Führungszeugnis |
 | `v_fussgaenger` | der Fußgänger |
 | `v_gabel` | die Gabel |
+| `v_gastgeber` | der Gastgeber |
 | `v_geburtsurkunde` | die Geburtsurkunde |
 | `v_gedeck` | das Gedeck |
+| `v_gelegenheit` | die Gelegenheit |
+| `v_gemeinsamkeit` | die Gemeinsamkeit |
 | `v_gemeinschaftskonto` | das Gemeinschaftskonto |
 | `v_gemuese` | das Gemüse |
 | `v_geschwindigkeit` | die Geschwindigkeit |
+| `v_gespraechsthema` | das Gesprächsthema |
 | `v_gesundheitskarte` | die Gesundheitskarte |
 | `v_getraenk` | das Getränk |
 | `v_gewuerz` | das Gewürz |
@@ -176,6 +195,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_gleichwertigkeit` | die Gleichwertigkeit |
 | `v_gleis` | das Gleis |
 | `v_grammatik` | die Grammatik |
+| `v_grillen` | das Grillen |
 | `v_grundsteuer` | die Grundsteuer |
 | `v_haltbarkeitsdatum` | das Haltbarkeitsdatum |
 | `v_haltestelle` | die Haltestelle |
@@ -184,10 +204,13 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_heiratsurkunde` | die Heiratsurkunde |
 | `v_heizkosten` | die Heizkosten |
 | `v_herd` | der Herd |
+| `v_hobby` | das Hobby |
+| `v_hobbyraum` | der Hobbyraum |
 | `v_hoerverstehen` | das Hörverstehen |
 | `v_iban` | die IBAN |
 | `v_imbiss` | der Imbiss |
 | `v_indexmiete` | die Indexmiete |
+| `v_interesse` | das Interesse |
 | `v_kartenlesegeraet` | das Kartenlesegerät |
 | `v_kartennummer` | die Kartennummer |
 | `v_kartensperrung` | die Kartensperrung |
@@ -196,6 +219,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_kassierer` | der Kassierer |
 | `v_kaufbeleg` | der Kaufbeleg |
 | `v_kennzeichen` | das Kennzeichen |
+| `v_kino` | das Kino |
 | `v_klage` | die Klage |
 | `v_kleiderbuegel` | der Kleiderbügel |
 | `v_kleidergroesse` | die Kleidergröße |
@@ -203,9 +227,11 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_kleingeld` | das Kleingeld |
 | `v_knopf` | der Knopf |
 | `v_kompetenz` | die Kompetenz |
+| `v_kompliment` | das Kompliment |
 | `v_kontovollmacht` | die Kontovollmacht |
 | `v_kontowechsel` | der Kontowechsel |
 | `v_konversation` | die Konversation |
+| `v_konzert` | das Konzert |
 | `v_kreuzung` | die Kreuzung |
 | `v_kueche` | die Küche |
 | `v_laermbelaestigung` | die Lärmbelästigung |
@@ -213,6 +239,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_lehrgang` | der Lehrgang |
 | `v_lektion` | die Lektion |
 | `v_leseverstehen` | das Leseverstehen |
+| `v_lesung` | die Lesung |
 | `v_lieferadresse` | die Lieferadresse |
 | `v_lieferdienst` | der Lieferdienst |
 | `v_lieferzeit` | die Lieferzeit |
@@ -228,9 +255,12 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_mietspiegel` | der Mietspiegel |
 | `v_mietwohnung` | die Mietwohnung |
 | `v_mitfahrgelegenheit` | die Mitfahrgelegenheit |
+| `v_mitspieler` | der Mitspieler |
 | `v_modernisierung` | die Modernisierung |
 | `v_monatskarte` | die Monatskarte |
 | `v_muellabfuhr` | die Müllabfuhr |
+| `v_museum` | das Museum |
+| `v_musikinstrument` | das Musikinstrument |
 | `v_musterpruefung` | die Musterprüfung |
 | `v_muttersprachler` | der Muttersprachler |
 | `v_nachbereitung` | die Nachbereitung |
@@ -255,11 +285,13 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_pfand` | das Pfand |
 | `v_pfanne` | die Pfanne |
 | `v_physiotherapie` | die Physiotherapie |
+| `v_plauderei` | die Plauderei |
 | `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probenahme` | die Probenahme |
 | `v_provision` | die Provision |
 | `v_pruefer` | der Prüfer |
 | `v_pruefungsangst` | die Prüfungsangst |
+| `v_publikum` | das Publikum |
 | `v_punktzahl` | die Punktzahl |
 | `v_quittung` | die Quittung |
 | `v_raeumungsklage` | die Räumungsklage |
@@ -283,6 +315,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_schuessel` | die Schüssel |
 | `v_schuldnerberatung` | die Schuldnerberatung |
 | `v_schwarzfahren` | das Schwarzfahren |
+| `v_schwimmbad` | das Schwimmbad |
 | `v_schwindel` | der Schwindel |
 | `v_selbstauskunft` | die Selbstauskunft |
 | `v_selbstbedienungskasse` | die Selbstbedienungskasse |
@@ -290,20 +323,24 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
 | `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt |
 | `v_sicherheitsschuhe` | die Sicherheitsschuhe |
+| `v_smalltalk` | der Smalltalk |
 | `v_snack` | der Snack |
 | `v_sosse` | die Soße |
 | `v_sparkasse` | die Sparkasse |
 | `v_sparziel` | das Sparziel |
+| `v_spaziergang` | der Spaziergang |
 | `v_speise` | die Speise |
 | `v_sperrhotline` | die Sperrhotline |
 | `v_spezialitaet` | die Spezialität |
 | `v_spliss` | der Spliss |
+| `v_sportart` | die Sportart |
 | `v_sprachnachweis` | der Sprachnachweis |
 | `v_staffelmiete` | die Staffelmiete |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
 | `v_stau` | der Stau |
 | `v_steuernummer` | die Steuernummer |
+| `v_stimmung` | die Stimmung |
 | `v_stoff` | der Stoff |
 | `v_strassenbahn` | die Straßenbahn |
 | `v_stromzaehler` | der Stromzähler |
@@ -316,10 +353,13 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_tarif` | der Tarif |
 | `v_tasse` | die Tasse |
 | `v_teller` | der Teller |
+| `v_theater` | das Theater |
 | `v_ticketautomat` | der Ticketautomat |
 | `v_tilgung` | die Tilgung |
 | `v_tisch` | der Tisch |
 | `v_topf` | der Topf |
+| `v_training` | das Training |
+| `v_treffen` | das Treffen |
 | `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) |
 | `v_tuete` | die Tüte |
 | `v_ubahn` | die U-Bahn |
@@ -328,17 +368,24 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_umtauschschein` | der Umtauschschein |
 | `v_untermieter` | der Untermieter |
 | `v_urkunde` | die Urkunde |
+| `v_verabredung` | die Verabredung |
+| `v_veranstaltung` | die Veranstaltung |
+| `v_verein` | der Verein |
 | `v_verfuegungsrahmen` | der Verfügungsrahmen |
 | `v_verwaltungsakt` | der Verwaltungsakt |
 | `v_vokabelheft` | das Vokabelheft |
 | `v_vorauszahlung` | die Vorauszahlung |
 | `v_vorkasse` | die Vorkasse |
+| `v_vorstellung` | die Vorstellung |
 | `v_waage` | die Waage |
+| `v_wanderung` | die Wanderung |
 | `v_wegzug` | der Wegzug |
 | `v_werdegang` | der Werdegang |
 | `v_wertstellung` | die Wertstellung |
+| `v_wetter` | das Wetter |
 | `v_widerruf` | der Widerruf |
 | `v_widerspruchsbescheid` | der Widerspruchsbescheid |
+| `v_witz` | der Witz |
 | `v_wohnberechtigungsschein` | der Wohnberechtigungsschein |
 | `v_wohnflaeche` | die Wohnfläche |
 | `v_workshop` | der Workshop |
@@ -351,6 +398,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_zinssatz` | der Zinssatz |
 | `v_zugriffsrechte` | die Zugriffsrechte (Pl.) |
 | `v_zulassung` | die Zulassung |
+| `v_zusage` | die Zusage |
 | `v_zuschlag` | der Zuschlag |
 | `v_zuzug` | der Zuzug |
 | `v_zweifaktorauth` | die Zwei-Faktor-Authentifizierung |
