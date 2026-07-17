@@ -426,6 +426,30 @@ export const canDoStatements: CanDoStatement[] = [
     en: "I can make small talk, start a conversation and talk about events.",
     threshold: 0.7,
   },
+  {
+    id: "cd_digitales_1",
+    themeId: "digitales",
+    cefr: "B1.2",
+    statement: "Ich kann mein Handy einrichten und eine App installieren.",
+    en: "I can set up my phone and install an app.",
+    threshold: 0.25,
+  },
+  {
+    id: "cd_digitales_2",
+    themeId: "digitales",
+    cefr: "B2.1",
+    statement: "Ich kann einen Handy- oder Internetvertrag vergleichen und eine Störung melden.",
+    en: "I can compare a mobile or internet contract and report a fault.",
+    threshold: 0.5,
+  },
+  {
+    id: "cd_digitales_3",
+    themeId: "digitales",
+    cefr: "B2.2",
+    statement: "Ich kann einen Vertrag kündigen, ein Online-Konto verwalten und meine Daten schützen.",
+    en: "I can cancel a contract, manage an online account and protect my data.",
+    threshold: 0.7,
+  },
 ];
 
 export const canDoByTheme = (themeId: string) =>

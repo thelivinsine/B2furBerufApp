@@ -21,7 +21,8 @@ export type ThemeId =
   | "einkaufen"
   | "essen"
   | "mobilitaet"
-  | "freizeit";
+  | "freizeit"
+  | "digitales";
 
 /* ---------------- Taxonomy: domains, modes, facets ---------------- */
 

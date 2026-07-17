@@ -388,6 +388,29 @@ export const themes: ExamTheme[] = [
       { id: "freizeit.veranstaltung", title: "Events & culture", titleDe: "Veranstaltungen & Kultur", situationsIndex: 3 },
     ],
   },
+  {
+    id: "digitales",
+    title: "Phone & Internet",
+    titleDe: "Handy, Internet & Digitales",
+    blurb: "Manage digital life in Germany: pick a mobile or internet contract, set up a connection, deal with device problems, and handle online accounts and data safely.",
+    blurbDe: "Das digitale Leben in Deutschland regeln: einen Handy- oder Internetvertrag wählen, eine Verbindung einrichten, Geräteprobleme lösen und Online-Konten und Daten sicher verwalten.",
+    icon: "Smartphone",
+    accent: "from-blue-500 to-indigo-500",
+    domain: "alltag",
+    context: "personal",
+    situations: [
+      "Einen Handy- oder Internetvertrag abschließen",
+      "Das Internet einrichten und eine Störung melden",
+      "Ein Geräteproblem lösen und eine App einrichten",
+      "Ein Online-Konto verwalten und Daten schützen",
+    ],
+    subThemes: [
+      { id: "digitales.vertrag", title: "Contracts & providers", titleDe: "Verträge & Anbieter", situationsIndex: 0 },
+      { id: "digitales.internet", title: "Internet & connection", titleDe: "Internet & Verbindung", situationsIndex: 1 },
+      { id: "digitales.geraete", title: "Devices & problems", titleDe: "Geräte & Probleme", situationsIndex: 2 },
+      { id: "digitales.konto", title: "Accounts & data", titleDe: "Konten & Daten", situationsIndex: 3 },
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);
