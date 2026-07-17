@@ -1159,6 +1159,11 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_ablehnen": { bin: "common", zipf: 3.94 },
   "v_begruendung": { bin: "common", zipf: 4.46 },
   "v_antragsteller": { bin: "specialized", zipf: 3.48 },
+  "v_meldepflicht": { bin: "specialized", zipf: 2.93 },
+  "v_fuehrungszeugnis": { bin: "specialized", zipf: 2.78 },
+  "v_passfoto": { bin: "specialized", zipf: 2.33 },
+  "v_reisepass": { bin: "specialized", zipf: 3.43 },
+  "v_steuernummer": { bin: "specialized", zipf: 2.47 },
   "v_hausaufgabe": { bin: "specialized", zipf: 3.04 },
   "v_wortschatz": { bin: "common", zipf: 3.6 },
   "v_aussprache": { bin: "common", zipf: 3.88 },
@@ -1975,6 +1980,10 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "c_karte_entsperren": { bin: "core", zipf: 4.85 },
   "c_authentifizierung_aktivieren": { bin: "specialized", zipf: 2.91 },
   "c_urkunde_vorlegen": { bin: "common", zipf: 4.08 },
+  "c_einbuergerung_beantragen": { bin: "specialized", zipf: 3.09 },
+  "c_widerspruch_begruenden": { bin: "common", zipf: 4.29 },
+  "c_frist_wahren": { bin: "common", zipf: 4.1 },
+  "c_bescheid_zustellen": { bin: "common", zipf: 4.45 },
 };
 
 /** Frequency bin for a content id (vocab or collocation), if binnable. */

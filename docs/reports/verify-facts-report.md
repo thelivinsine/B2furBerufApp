@@ -16,10 +16,10 @@ level (higher rungs of the ladder)._
 
 ## Summary
 
-- Nouns checked: **1047**
-- Covered by ≥1 oracle: **951** (91%)  ·  not covered: **96**
-- ✔ Article verified: **934**  (439 by both oracles, 495 by one)
-- ✔ Plural verified: **599**  (346 by both oracles, 253 by one)
+- Nouns checked: **1078**
+- Covered by ≥1 oracle: **952** (88%)  ·  not covered: **126**
+- ✔ Article verified: **935**  (439 by both oracles, 496 by one)
+- ✔ Plural verified: **600**  (346 by both oracles, 254 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
 - ⚑ Review signals (one oracle only, or oracles disagree): **7**
 - ◑ Plural-form headwords (gender not comparable): **10**
@@ -70,22 +70,32 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>96 items</summary>
+<details><summary>126 items</summary>
 
 | id | headword |
 |---|---|
 | `v_abendkurs` | der Abendkurs |
 | `v_ablaufdatum` | das Ablaufdatum |
 | `v_anerkennungsverfahren` | das Anerkennungsverfahren |
+| `v_anhoerung` | die Anhörung |
 | `v_anpassungsqualifizierung` | die Anpassungsqualifizierung |
+| `v_antragsfrist` | die Antragsfrist |
+| `v_asylantrag` | der Asylantrag |
+| `v_aufenthaltsdauer` | die Aufenthaltsdauer |
+| `v_aufenthaltsgestattung` | die Aufenthaltsgestattung |
+| `v_aufenthaltskarte` | die Aufenthaltskarte |
+| `v_aufenthaltsstatus` | der Aufenthaltsstatus |
 | `v_aufstieg` | der Aufstieg |
 | `v_auftraggeber` | der Auftraggeber |
 | `v_auslastung` | die Auslastung |
+| `v_ausreise` | die Ausreise |
 | `v_bankingapp` | die Banking-App |
 | `v_bankkarte` | die Bankkarte |
 | `v_berufsabschluss` | der Berufsabschluss |
 | `v_berufserfahrung` | die Berufserfahrung |
 | `v_beschwerden` | die Beschwerden |
+| `v_bewilligung` | die Bewilligung |
+| `v_bewilligungsbescheid` | der Bewilligungsbescheid |
 | `v_bildungspraemie` | die Bildungsprämie |
 | `v_bildungsurlaub` | der Bildungsurlaub |
 | `v_bonitaet` | die Bonität |
@@ -96,20 +106,28 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_debitkarte` | die Debitkarte |
 | `v_diplom` | das Diplom |
 | `v_echtzeitueberweisung` | die Echtzeitüberweisung |
+| `v_einreise` | die Einreise |
+| `v_einwohnermeldeamt` | das Einwohnermeldeamt |
 | `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
 | `v_fernstudium` | das Fernstudium |
+| `v_fiktionsbescheinigung` | die Fiktionsbescheinigung |
 | `v_finanzierung` | die Finanzierung |
 | `v_freistellungsauftrag` | der Freistellungsauftrag |
+| `v_fuehrungszeugnis` | das Führungszeugnis |
+| `v_geburtsurkunde` | die Geburtsurkunde |
 | `v_gemeinschaftskonto` | das Gemeinschaftskonto |
 | `v_girocard` | die Girocard |
 | `v_gleichwertigkeit` | die Gleichwertigkeit |
 | `v_grammatik` | die Grammatik |
+| `v_hauptwohnsitz` | der Hauptwohnsitz |
 | `v_hausbank` | die Hausbank |
+| `v_heiratsurkunde` | die Heiratsurkunde |
 | `v_hoerverstehen` | das Hörverstehen |
 | `v_iban` | die IBAN |
 | `v_kartenlesegeraet` | das Kartenlesegerät |
 | `v_kartennummer` | die Kartennummer |
 | `v_kartensperrung` | die Kartensperrung |
+| `v_klage` | die Klage |
 | `v_kompetenz` | die Kompetenz |
 | `v_kontovollmacht` | die Kontovollmacht |
 | `v_kontowechsel` | der Kontowechsel |
@@ -118,11 +136,16 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_lektion` | die Lektion |
 | `v_leseverstehen` | das Leseverstehen |
 | `v_lkw` | der LKW |
+| `v_meldeadresse` | die Meldeadresse |
+| `v_meldepflicht` | die Meldepflicht |
 | `v_musterpruefung` | die Musterprüfung |
 | `v_muttersprachler` | der Muttersprachler |
 | `v_nachbereitung` | die Nachbereitung |
+| `v_nachforderung` | die Nachforderung |
 | `v_nachhilfe` | die Nachhilfe |
+| `v_nebenwohnsitz` | der Nebenwohnsitz |
 | `v_oeffnungszeiten` | die Öffnungszeiten |
+| `v_passfoto` | das Passfoto |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
 | `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probenahme` | die Probenahme |
@@ -131,6 +154,8 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_punktzahl` | die Punktzahl |
 | `v_quittung` | die Quittung |
 | `v_rate` | die Rate |
+| `v_rechtsbehelfsbelehrung` | die Rechtsbehelfsbelehrung |
+| `v_rechtskraft` | die Rechtskraft |
 | `v_rendite` | die Rendite |
 | `v_ressourcen` | die Ressourcen |
 | `v_rezeptur` | die Rezeptur |
@@ -149,6 +174,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_sprachnachweis` | der Sprachnachweis |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
+| `v_steuernummer` | die Steuernummer |
 | `v_tagesgeldkonto` | das Tagesgeldkonto |
 | `v_tageslimit` | das Tageslimit |
 | `v_tan` | die TAN |
@@ -157,9 +183,12 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_uebersetzung` | die Übersetzung |
 | `v_urkunde` | die Urkunde |
 | `v_verfuegungsrahmen` | der Verfügungsrahmen |
+| `v_verwaltungsakt` | der Verwaltungsakt |
 | `v_vokabelheft` | das Vokabelheft |
+| `v_wegzug` | der Wegzug |
 | `v_werdegang` | der Werdegang |
 | `v_wertstellung` | die Wertstellung |
+| `v_widerspruchsbescheid` | der Widerspruchsbescheid |
 | `v_workshop` | der Workshop |
 | `v_zahlungsausgang` | der Zahlungsausgang |
 | `v_zahlungseingang` | der Zahlungseingang |
@@ -168,6 +197,7 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 | `v_zinssatz` | der Zinssatz |
 | `v_zugriffsrechte` | die Zugriffsrechte (Pl.) |
 | `v_zulassung` | die Zulassung |
+| `v_zuzug` | der Zuzug |
 | `v_zweifaktorauth` | die Zwei-Faktor-Authentifizierung |
 | `v_zwischenzeugnis` | das Zwischenzeugnis |
 
