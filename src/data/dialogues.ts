@@ -2569,7 +2569,145 @@ const nachdemwegfragen: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation, tischreservieren, restaurantbestellen, fahrkartekaufen, nachdemwegfragen];
+const freundeverabreden: Scenario = {
+  id: "sc_freunde_verabreden",
+  themeId: "freizeit",
+  title: "Sich mit Freunden verabreden",
+  task: "Verabreden Sie sich mit einer Freundin und einigen Sie sich auf Aktivität, Zeit und Treffpunkt.",
+  context:
+    "Eine Freundin ruft Sie an. Sie möchten am Wochenende gemeinsam etwas unternehmen und müssen die Details klären.",
+  level: 1,
+  minutes: 5,
+  targetRedemittel: ["suggestions", "agree", "clarification", "smallTalk"],
+  start: "v1",
+  nodes: {
+    v1: {
+      id: "v1",
+      speaker: "partner",
+      line: "Hallo! Hast du am Wochenende Zeit? Ich hätte Lust, etwas zu unternehmen.",
+      gloss: "Hi! Do you have time at the weekend? I feel like doing something.",
+      hints: ["Sag, ob du Zeit hast.", "Mach einen Vorschlag."],
+      options: [
+        { id: "v1a", text: "Ja, gern! Wollen wir vielleicht ins Kino gehen oder einen Ausflug machen?", uses: "suggestions", quality: 1, feedback: "Sehr gut: zugesagt und gleich einen Vorschlag gemacht.", next: "v2" },
+        { id: "v1b", text: "Klar, ich habe Zeit. Was möchtest du denn machen?", uses: "clarification", quality: 0.9, feedback: "Gut: offen und freundlich nachgefragt.", next: "v2" },
+        { id: "v1c", text: "Mal sehen.", uses: "reactions", quality: 0.4, feedback: "Zu unverbindlich. Sag klar, ob du Zeit hast.", next: "v2" },
+      ],
+    },
+    v2: {
+      id: "v2",
+      speaker: "partner",
+      line: "Ein Ausflug klingt super! Bei dem schönen Wetter könnten wir wandern gehen. Was meinst du?",
+      gloss: "An outing sounds great! With this nice weather we could go hiking. What do you think?",
+      hints: ["Reagiere auf den Vorschlag.", "Du kannst zustimmen oder eine Alternative nennen."],
+      options: [
+        { id: "v2a", text: "Wandern finde ich toll. Ich bringe etwas zu essen für ein Picknick mit.", uses: "agree", quality: 1, feedback: "Top: zugestimmt und einen netten Beitrag angeboten.", next: "v3" },
+        { id: "v2b", text: "Wandern ist mir zu anstrengend. Wie wäre es mit einem Spaziergang am See?", uses: "suggestions", quality: 0.9, feedback: "Gut: höflich abgelehnt und eine Alternative vorgeschlagen.", next: "v3" },
+        { id: "v2c", text: "Meinetwegen.", uses: "reactions", quality: 0.4, feedback: "Etwas mehr Begeisterung wirkt freundlicher.", next: "v3" },
+      ],
+    },
+    v3: {
+      id: "v3",
+      speaker: "partner",
+      line: "Perfekt! Wann sollen wir uns treffen und wo?",
+      gloss: "Perfect! When shall we meet and where?",
+      hints: ["Nenne eine Uhrzeit.", "Schlage einen Treffpunkt vor."],
+      options: [
+        { id: "v3a", text: "Sagen wir um 10 Uhr am Bahnhof? Von dort fahren wir zusammen los.", uses: "suggestions", quality: 1, feedback: "Sehr gut: konkrete Zeit und ein klarer Treffpunkt.", next: "v4" },
+        { id: "v3b", text: "Am Samstag Vormittag passt mir gut. Treffen wir uns bei dir?", uses: "clarification", quality: 0.9, feedback: "Gut: Zeit genannt und einen Treffpunkt vorgeschlagen.", next: "v4" },
+        { id: "v3c", text: "Ist mir egal.", uses: "reactions", quality: 0.3, feedback: "Ein konkreter Vorschlag hilft beim Planen.", next: "v4" },
+      ],
+    },
+    v4: {
+      id: "v4",
+      speaker: "partner",
+      line: "Abgemacht, Samstag um 10 Uhr am Bahnhof. Ich freue mich schon!",
+      gloss: "Agreed, Saturday at 10 at the station. I am looking forward to it!",
+      hints: ["Bestätige die Verabredung.", "Ein freundlicher Abschluss ist schön."],
+      options: [
+        { id: "v4a", text: "Ich freue mich auch! Bis Samstag dann, meld dich, falls etwas dazwischenkommt.", uses: "smallTalk", quality: 1, feedback: "Perfekt: bestätigt und freundlich abgeschlossen.", next: "v_end" },
+        { id: "v4b", text: "Super, bis Samstag!", uses: "agree", quality: 0.9, feedback: "Gut: kurz und herzlich.", next: "v_end" },
+        { id: "v4c", text: "Ok, tschüss.", uses: "reactions", quality: 0.5, feedback: "Ein bisschen wärmer wäre noch netter.", next: "v_end" },
+      ],
+    },
+    v_end: {
+      id: "v_end",
+      speaker: "narrator",
+      line: "Sie haben sich auf eine Aktivität geeinigt und Zeit und Treffpunkt geklärt. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+const smalltalkparty: Scenario = {
+  id: "sc_smalltalk_party",
+  themeId: "freizeit",
+  title: "Smalltalk auf einer Feier",
+  task: "Kommen Sie mit einer unbekannten Person ins Gespräch und finden Sie Gemeinsamkeiten.",
+  context:
+    "Sie sind auf der Geburtstagsfeier einer Kollegin und kennen kaum jemanden. Neben Ihnen steht eine Person, die Sie noch nicht kennen.",
+  level: 2,
+  minutes: 5,
+  targetRedemittel: ["smallTalk", "clarification", "agree", "reactions"],
+  start: "p1",
+  nodes: {
+    p1: {
+      id: "p1",
+      speaker: "partner",
+      line: "Hallo, ich glaube, wir kennen uns noch nicht. Ich bin Nadia.",
+      gloss: "Hi, I don't think we've met yet. I'm Nadia.",
+      hints: ["Stell dich vor.", "Beginne freundlich das Gespräch."],
+      options: [
+        { id: "p1a", text: "Hallo Nadia, ich bin Tom. Woher kennst du die Gastgeberin?", uses: "smallTalk", quality: 1, feedback: "Sehr gut: vorgestellt und gleich eine offene Frage gestellt.", next: "p2" },
+        { id: "p1b", text: "Hallo, ich bin Tom. Schöne Feier, oder?", uses: "smallTalk", quality: 0.9, feedback: "Gut: freundlicher Einstieg über die Feier.", next: "p2" },
+        { id: "p1c", text: "Hi.", uses: "reactions", quality: 0.4, feedback: "Zu knapp. Stell dich kurz vor.", next: "p2" },
+      ],
+    },
+    p2: {
+      id: "p2",
+      speaker: "partner",
+      line: "Wir haben früher zusammen studiert. Und du? Arbeitest du mit ihr zusammen?",
+      gloss: "We studied together back then. And you? Do you work with her?",
+      hints: ["Antworte auf die Frage.", "Zeig Interesse und frag zurück."],
+      options: [
+        { id: "p2a", text: "Genau, wir sind im selben Team. Was hast du denn studiert?", uses: "clarification", quality: 1, feedback: "Top: geantwortet und Interesse mit einer Rückfrage gezeigt.", next: "p3" },
+        { id: "p2b", text: "Ja, wir arbeiten zusammen. Studieren klingt interessant, erzähl mal.", uses: "smallTalk", quality: 0.9, feedback: "Gut: freundlich und offen.", next: "p3" },
+        { id: "p2c", text: "Ja.", uses: "reactions", quality: 0.4, feedback: "Frag ruhig zurück, das hält das Gespräch am Laufen.", next: "p3" },
+      ],
+    },
+    p3: {
+      id: "p3",
+      speaker: "partner",
+      line: "Ich habe Musik studiert und spiele in einer Band. In meiner Freizeit mache ich viel Musik.",
+      gloss: "I studied music and play in a band. In my free time I make a lot of music.",
+      hints: ["Reagiere interessiert.", "Nenne eine Gemeinsamkeit oder frag nach."],
+      options: [
+        { id: "p3a", text: "Wie schön! Ich spiele auch Gitarre, aber nur als Hobby. Wo tretet ihr auf?", uses: "clarification", quality: 1, feedback: "Sehr gut: eine Gemeinsamkeit genannt und weiter nachgefragt.", next: "p4" },
+        { id: "p3b", text: "Das klingt spannend. Welche Musik macht ihr denn?", uses: "smallTalk", quality: 0.9, feedback: "Gut: echtes Interesse gezeigt.", next: "p4" },
+        { id: "p3c", text: "Aha, okay.", uses: "reactions", quality: 0.3, feedback: "Zeig etwas mehr Interesse, dann wird es ein echtes Gespräch.", next: "p4" },
+      ],
+    },
+    p4: {
+      id: "p4",
+      speaker: "partner",
+      line: "Wir spielen nächsten Monat in einem kleinen Club. Komm doch vorbei, es wird bestimmt lustig!",
+      gloss: "We're playing in a small club next month. Come along, it'll surely be fun!",
+      hints: ["Reagiere auf die Einladung.", "Bedanke dich freundlich."],
+      options: [
+        { id: "p4a", text: "Sehr gern, das mache ich! Gib mir einfach kurz die Daten.", uses: "agree", quality: 1, feedback: "Perfekt: die Einladung angenommen und praktisch weitergedacht.", next: "p_end" },
+        { id: "p4b", text: "Das klingt toll, danke für die Einladung! Ich versuche zu kommen.", uses: "agree", quality: 0.9, feedback: "Gut: freundlich und offen reagiert.", next: "p_end" },
+        { id: "p4c", text: "Mal schauen.", uses: "reactions", quality: 0.4, feedback: "Ein bisschen mehr Begeisterung wirkt netter.", next: "p_end" },
+      ],
+    },
+    p_end: {
+      id: "p_end",
+      speaker: "narrator",
+      line: "Sie sind mit einer unbekannten Person ins Gespräch gekommen, haben eine Gemeinsamkeit gefunden und wurden sogar eingeladen. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation, tischreservieren, restaurantbestellen, fahrkartekaufen, nachdemwegfragen, freundeverabreden, smalltalkparty];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>

@@ -365,6 +365,29 @@ export const themes: ExamTheme[] = [
       { id: "mobilitaet.wegbeschreibung", title: "Directions & orientation", titleDe: "Wegbeschreibung & Orientierung", situationsIndex: 3 },
     ],
   },
+  {
+    id: "freizeit",
+    title: "Leisure & Social Life",
+    titleDe: "Freizeit & Soziales",
+    blurb: "Build a life outside work: pursue hobbies and sport, make plans with people, handle small talk, and go to events and cultural venues.",
+    blurbDe: "Ein Leben neben der Arbeit gestalten: Hobbys und Sport nachgehen, sich mit Menschen verabreden, Smalltalk führen und Veranstaltungen und Kultur besuchen.",
+    icon: "PartyPopper",
+    accent: "from-fuchsia-500 to-pink-500",
+    domain: "alltag",
+    context: "personal",
+    situations: [
+      "Einem Hobby oder Sport nachgehen",
+      "Sich mit Freunden verabreden und Pläne machen",
+      "Smalltalk führen und ins Gespräch kommen",
+      "Eine Veranstaltung oder Kulturangebot besuchen",
+    ],
+    subThemes: [
+      { id: "freizeit.hobbys", title: "Hobbies & sport", titleDe: "Hobbys & Sport", situationsIndex: 0 },
+      { id: "freizeit.verabredung", title: "Making plans", titleDe: "Verabredungen & Treffen", situationsIndex: 1 },
+      { id: "freizeit.smalltalk", title: "Small talk", titleDe: "Smalltalk & Gespräche", situationsIndex: 2 },
+      { id: "freizeit.veranstaltung", title: "Events & culture", titleDe: "Veranstaltungen & Kultur", situationsIndex: 3 },
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);

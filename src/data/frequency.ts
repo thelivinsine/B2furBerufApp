@@ -1201,6 +1201,8 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "v_fahrplan": { bin: "common", zipf: 3.61 },
   "v_bahncard": { bin: "specialized", zipf: 3.08 },
   "v_fahrrad": { bin: "common", zipf: 4.48 },
+  "v_training": { bin: "core", zipf: 4.63 },
+  "v_einladung": { bin: "common", zipf: 4.39 },
   "c_entscheidung_treffen": { bin: "core", zipf: 5.03 },
   "c_vorschlag_machen": { bin: "core", zipf: 4.57 },
   "c_protokoll_führen": { bin: "common", zipf: 4.12 },
@@ -2034,6 +2036,16 @@ export const frequency: Record<string, { bin: Frequency; zipf: number }> = {
   "c_ohne_ticket_fahren": { bin: "common", zipf: 4.27 },
   "c_die_verbindung_suchen": { bin: "core", zipf: 4.98 },
   "c_den_motor_starten": { bin: "common", zipf: 4.47 },
+  "c_am_training_teilnehmen": { bin: "core", zipf: 4.63 },
+  "c_eine_einladung_annehmen": { bin: "common", zipf: 4.39 },
+  "c_einen_termin_absagen": { bin: "core", zipf: 4.6 },
+  "c_zeit_verbringen": { bin: "core", zipf: 5.99 },
+  "c_gaeste_einladen": { bin: "core", zipf: 4.73 },
+  "c_gemeinsam_kochen": { bin: "core", zipf: 5.1 },
+  "c_einen_witz_erzaehlen": { bin: "core", zipf: 6.48 },
+  "c_ins_gespraech_kommen": { bin: "core", zipf: 4.8 },
+  "c_kontakte_knuepfen": { bin: "common", zipf: 4.39 },
+  "c_das_gespraech_beginnen": { bin: "core", zipf: 4.8 },
 };
 
 /** Frequency bin for a content id (vocab or collocation), if binnable. */
