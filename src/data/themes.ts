@@ -296,6 +296,29 @@ export const themes: ExamTheme[] = [
       { id: "bildung.weiterbildung", title: "Further training", titleDe: "Weiterbildung & Beruf", situationsIndex: 3 },
     ],
   },
+  {
+    id: "einkaufen",
+    title: "Shopping & Stores",
+    titleDe: "Einkaufen & Geschäfte",
+    blurb: "Handle everyday shopping in Germany: buy groceries, find the right clothing size, return or complain about a product and order online.",
+    blurbDe: "Den Alltag beim Einkaufen meistern: Lebensmittel kaufen, die richtige Kleidergröße finden, ein Produkt umtauschen oder reklamieren und online bestellen.",
+    icon: "ShoppingCart",
+    accent: "from-rose-500 to-orange-500",
+    domain: "alltag",
+    context: "personal",
+    situations: [
+      "Im Supermarkt einkaufen und an der Kasse bezahlen",
+      "Kleidung anprobieren und die richtige Größe finden",
+      "Ein Produkt umtauschen oder reklamieren",
+      "Online bestellen und die Lieferung verfolgen",
+    ],
+    subThemes: [
+      { id: "einkaufen.supermarkt", title: "Groceries & supermarket", titleDe: "Supermarkt & Lebensmittel", situationsIndex: 0 },
+      { id: "einkaufen.kleidung", title: "Clothes & sizes", titleDe: "Kleidung & Größen", situationsIndex: 1 },
+      { id: "einkaufen.umtausch", title: "Returns & complaints", titleDe: "Umtausch & Reklamation", situationsIndex: 2 },
+      { id: "einkaufen.online", title: "Online shopping & delivery", titleDe: "Onlineshopping & Lieferung", situationsIndex: 3 },
+    ],
+  },
 ];
 
 export const themeById = (id: string) => themes.find((t) => t.id === id);

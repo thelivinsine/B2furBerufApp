@@ -330,6 +330,30 @@ export const canDoStatements: CanDoStatement[] = [
     en: "I can get advice on further training, ask about funding and present my educational and career background.",
     threshold: 0.75,
   },
+  {
+    id: "cd_einkaufen_1",
+    themeId: "einkaufen",
+    cefr: "B1.1",
+    statement: "Ich kann im Supermarkt nach Produkten fragen und an der Kasse bezahlen.",
+    en: "I can ask for products in the supermarket and pay at the checkout.",
+    threshold: 0.25,
+  },
+  {
+    id: "cd_einkaufen_2",
+    themeId: "einkaufen",
+    cefr: "B1.2",
+    statement: "Ich kann Kleidung anprobieren, nach einer anderen Größe fragen und mich beraten lassen.",
+    en: "I can try on clothes, ask for a different size and get advice.",
+    threshold: 0.5,
+  },
+  {
+    id: "cd_einkaufen_3",
+    themeId: "einkaufen",
+    cefr: "B2.1",
+    statement: "Ich kann eine Ware reklamieren, den Umtausch verlangen und mein Rückgaberecht erklären.",
+    en: "I can complain about a product, request an exchange and explain my right of return.",
+    threshold: 0.7,
+  },
 ];
 
 export const canDoByTheme = (themeId: string) =>

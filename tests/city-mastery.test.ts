@@ -36,7 +36,9 @@ describe("cityProgress — building mastery resolution", () => {
     expect(bank.lit).toBe(false); // unlit on a fresh profile
 
     const wohnhaus = progressFor({}, "wohnhaus");
-    expect(wohnhaus.themes).toEqual(["wohnen"]);
+    // wohnen is claimed explicitly; new daily-life (alltag) themes fold in by
+    // domain rollup (e.g. einkaufen, added s126), so wohnhaus carries wohnen + those.
+    expect(wohnhaus.themes).toContain("wohnen");
     expect(wohnhaus.total).toBeGreaterThan(0);
     expect(wohnhaus.lit).toBe(false);
   });

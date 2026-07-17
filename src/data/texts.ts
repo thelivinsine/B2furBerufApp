@@ -1542,6 +1542,122 @@ export const texts: ReadingText[] = [
       },
     ],
   },
+  {
+    id: "tx_einkaufen_lieferung_email",
+    kind: "email",
+    themeId: "einkaufen",
+    cefr: "B1.2",
+    subThemeId: "einkaufen.online",
+    title: "Ihre Bestellung ist unterwegs",
+    titleEn: "Your order is on its way",
+    de: [
+      "Sehr geehrte Frau Novak,",
+      "vielen Dank für Ihre Bestellung Nr. 48213. Ihr Paket wurde heute versandt und wird voraussichtlich am Donnerstag, dem 17. Juli, zugestellt.",
+      "Sie können die Lieferung jederzeit mit der Sendungsnummer auf unserer Webseite verfolgen. Sollten Sie zum Zeitpunkt der Zustellung nicht zu Hause sein, legt der Paketbote das Paket beim Nachbarn ab oder bringt es in den Paketshop in Ihrer Nähe.",
+      "Falls ein Artikel nicht passt, können Sie ihn innerhalb von 14 Tagen kostenlos zurücksenden. Das Rücksendeetikett finden Sie in Ihrem Kundenkonto.",
+      "Mit freundlichen Grüßen\nIhr Kundenservice",
+    ].join("\n\n"),
+    en: [
+      "Dear Ms Novak,",
+      "Thank you for your order no. 48213. Your parcel was dispatched today and is expected to be delivered on Thursday, 17 July.",
+      "You can track the delivery at any time with the tracking number on our website. If you are not at home at the time of delivery, the delivery driver will leave the parcel with a neighbour or take it to the parcel shop near you.",
+      "If an item does not fit, you can return it free of charge within 14 days. You will find the return label in your customer account.",
+      "Kind regards\nYour customer service",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_einkaufen_lieferung_email_q1",
+        question: "Wann soll das Paket ankommen?",
+        options: [
+          "Am Donnerstag, dem 17. Juli",
+          "Noch am selben Tag",
+          "Innerhalb von 14 Tagen",
+        ],
+        answer: "Am Donnerstag, dem 17. Juli",
+        explain: "The email says the parcel is expected on Thursday, 17 July.",
+      },
+      {
+        id: "tx_einkaufen_lieferung_email_q2",
+        question: "Was passiert, wenn Frau Novak nicht zu Hause ist?",
+        options: [
+          "Das Paket geht zum Nachbarn oder in den Paketshop",
+          "Das Paket wird sofort zurückgeschickt",
+          "Sie muss das Paket selbst im Lager abholen",
+        ],
+        answer: "Das Paket geht zum Nachbarn oder in den Paketshop",
+        explain: "If she is not home, the driver leaves it with a neighbour or at the nearby parcel shop.",
+      },
+      {
+        id: "tx_einkaufen_lieferung_email_q3",
+        question: "Wie lange kann sie einen Artikel zurücksenden?",
+        options: [
+          "Innerhalb von 14 Tagen",
+          "Innerhalb von 3 Tagen",
+          "Nur am Tag der Lieferung",
+        ],
+        answer: "Innerhalb von 14 Tagen",
+        explain: "Items can be returned free of charge within 14 days.",
+      },
+    ],
+  },
+  {
+    id: "tx_einkaufen_umtausch_aushang",
+    kind: "announcement",
+    themeId: "einkaufen",
+    cefr: "B2.1",
+    subThemeId: "einkaufen.umtausch",
+    title: "Umtausch und Rückgabe",
+    titleEn: "Exchange and return",
+    de: [
+      "Liebe Kundinnen und Kunden,",
+      "gekaufte Ware können Sie innerhalb von 30 Tagen umtauschen oder zurückgeben. Bitte bringen Sie dazu den Kassenzettel oder einen anderen Kaufbeleg mit.",
+      "Die Ware sollte ungetragen und mit Etikett sein. Aus hygienischen Gründen sind Unterwäsche und geöffnete Kosmetik vom Umtausch ausgeschlossen.",
+      "Bei einem Defekt haben Sie unabhängig von dieser Frist ein gesetzliches Recht auf Nachbesserung oder Ersatz. Wenden Sie sich in diesem Fall bitte an die Information im Erdgeschoss.",
+      "Ihr Team vom Kaufhaus Mitte",
+    ].join("\n\n"),
+    en: [
+      "Dear customers,",
+      "You can exchange or return purchased goods within 30 days. Please bring the receipt or another proof of purchase with you.",
+      "The goods should be unworn and have their tag. For hygiene reasons, underwear and opened cosmetics are excluded from exchange.",
+      "In the case of a defect you have a statutory right to repair or replacement regardless of this deadline. In that case please contact the information desk on the ground floor.",
+      "Your team at Kaufhaus Mitte",
+    ].join("\n\n"),
+    checks: [
+      {
+        id: "tx_einkaufen_umtausch_aushang_q1",
+        question: "Wie lange kann man Ware normalerweise umtauschen?",
+        options: [
+          "Innerhalb von 30 Tagen",
+          "Innerhalb von 14 Tagen",
+          "Nur am Kauftag",
+        ],
+        answer: "Innerhalb von 30 Tagen",
+        explain: "Goods can be exchanged or returned within 30 days.",
+      },
+      {
+        id: "tx_einkaufen_umtausch_aushang_q2",
+        question: "Was ist vom Umtausch ausgeschlossen?",
+        options: [
+          "Unterwäsche und geöffnete Kosmetik",
+          "Schuhe und Jacken",
+          "Alle reduzierten Artikel",
+        ],
+        answer: "Unterwäsche und geöffnete Kosmetik",
+        explain: "For hygiene reasons, underwear and opened cosmetics are excluded.",
+      },
+      {
+        id: "tx_einkaufen_umtausch_aushang_q3",
+        question: "Was gilt bei einem Defekt?",
+        options: [
+          "Ein gesetzliches Recht auf Nachbesserung oder Ersatz",
+          "Gar kein Umtausch mehr möglich",
+          "Nur eine Erstattung als Gutschein",
+        ],
+        answer: "Ein gesetzliches Recht auf Nachbesserung oder Ersatz",
+        explain: "For a defect you have a statutory right to repair or replacement, regardless of the 30-day deadline.",
+      },
+    ],
+  },
 ];
 
 export const textById = (id: string) => texts.find((t) => t.id === id);

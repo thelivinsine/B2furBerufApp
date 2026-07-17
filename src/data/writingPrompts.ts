@@ -102,4 +102,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       "Schreibe eine kurze E-Mail an eine Sprachschule: Frage nach einem passenden Kurs für dein Niveau, nach den Kosten und nach dem nächsten Kursbeginn.",
     long: "Verfasse eine formelle E-Mail an eine zuständige Stelle. Bitte um die Anerkennung deines ausländischen Abschlusses, erkläre deinen bisherigen Werdegang und frage nach den nötigen Unterlagen und dem Ablauf des Verfahrens.",
   },
+  einkaufen: {
+    themeId: "einkaufen",
+    short:
+      "Schreibe eine kurze E-Mail an einen Onlineshop: Ein Artikel ist beschädigt angekommen. Beschreibe das Problem und frage nach Umtausch oder Erstattung.",
+    long: "Verfasse eine formelle Reklamations-E-Mail an einen Onlineshop. Erkläre, welchen Artikel du bestellt hast und was mit der Lieferung nicht stimmt, nenne deine Bestellnummer und bitte höflich um eine Erstattung oder einen Ersatz mit einer klaren Frist.",
+  },
 };
