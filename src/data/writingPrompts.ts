@@ -126,4 +126,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       "Schreibe eine kurze Nachricht an einen Freund: Lade ihn zu einem gemeinsamen Ausflug am Wochenende ein und schlage Zeit und Treffpunkt vor.",
     long: "Verfasse eine Einladung an mehrere Freunde zu einer kleinen Feier. Nenne den Anlass, Datum und Ort, beschreibe kurz, was geplant ist, und bitte um eine Zu- oder Absage bis zu einem bestimmten Termin.",
   },
+  digitales: {
+    themeId: "digitales",
+    short:
+      "Schreibe eine kurze E-Mail an deinen Internetanbieter: Deine Verbindung fällt ständig aus. Beschreibe das Problem und bitte um eine schnelle Lösung.",
+    long: "Verfasse eine formelle E-Mail an deinen Mobilfunk- oder Internetanbieter. Erkläre, seit wann und wie oft die Störung auftritt, welche Schritte du schon versucht hast, nenne deine Kundennummer und bitte um eine Lösung oder eine Minderung der Gebühr mit einer klaren Frist.",
+  },
 };

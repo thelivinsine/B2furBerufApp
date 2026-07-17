@@ -47,6 +47,7 @@ import {
   UtensilsCrossed,
   Bus,
   PartyPopper,
+  Smartphone,
   type LucideIcon,
 } from "lucide-react";
 
@@ -99,6 +100,7 @@ const map: Record<string, LucideIcon> = {
   UtensilsCrossed,
   Bus,
   PartyPopper,
+  Smartphone,
 };
 
 export function iconByName(name: string): LucideIcon {

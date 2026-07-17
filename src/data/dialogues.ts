@@ -2707,7 +2707,145 @@ const smalltalkparty: Scenario = {
   },
 };
 
-export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation, tischreservieren, restaurantbestellen, fahrkartekaufen, nachdemwegfragen, freundeverabreden, smalltalkparty];
+const handyvertragabschliessen: Scenario = {
+  id: "sc_handyvertrag_abschliessen",
+  themeId: "digitales",
+  title: "Einen Handyvertrag abschließen",
+  task: "Lassen Sie sich zu einem Handytarif beraten und klären Sie Kosten und Laufzeit.",
+  context:
+    "Sie brauchen einen neuen Handyvertrag und lassen sich im Geschäft beraten. Achten Sie auf Datenvolumen, Grundgebühr und Laufzeit.",
+  level: 2,
+  minutes: 6,
+  targetRedemittel: ["clarification", "suggestions", "compromise", "agree"],
+  start: "h1",
+  nodes: {
+    h1: {
+      id: "h1",
+      speaker: "partner",
+      line: "Guten Tag, wie kann ich Ihnen helfen?",
+      gloss: "Hello, how can I help you?",
+      hints: ["Sag, was du suchst.", "Nenne, was dir wichtig ist."],
+      options: [
+        { id: "h1a", text: "Guten Tag, ich suche einen Handyvertrag mit viel Datenvolumen. Was können Sie mir empfehlen?", uses: "clarification", quality: 1, feedback: "Sehr gut: klares Anliegen und ein wichtiges Kriterium genannt.", next: "h2" },
+        { id: "h1b", text: "Guten Tag, ich möchte einen neuen Vertrag. Welche Tarife haben Sie?", uses: "clarification", quality: 0.9, feedback: "Gut: offene Frage zum Einstieg.", next: "h2" },
+        { id: "h1c", text: "Vertrag.", uses: "reactions", quality: 0.4, feedback: "Zu knapp. Sag genauer, was du brauchst.", next: "h2" },
+      ],
+    },
+    h2: {
+      id: "h2",
+      speaker: "partner",
+      line: "Wir haben einen Tarif mit 20 Gigabyte und Telefon-Flatrate für 25 Euro im Monat. Die Laufzeit beträgt 24 Monate.",
+      gloss: "We have a plan with 20 gigabytes and a call flat rate for 25 euros a month. The term is 24 months.",
+      hints: ["Frag nach den Details, die dir wichtig sind.", "Du kannst nach einer kürzeren Laufzeit fragen."],
+      options: [
+        { id: "h2a", text: "24 Monate sind mir zu lang. Gibt es den Tarif auch mit kürzerer Laufzeit?", uses: "compromise", quality: 1, feedback: "Top: einen wichtigen Punkt angesprochen und nach einer Alternative gefragt.", next: "h3" },
+        { id: "h2b", text: "Sind in den 25 Euro alle Kosten enthalten, oder kommt noch etwas dazu?", uses: "clarification", quality: 0.9, feedback: "Gut: nach versteckten Kosten gefragt.", next: "h3" },
+        { id: "h2c", text: "Okay, klingt gut.", uses: "agree", quality: 0.5, feedback: "Frag lieber nach, bevor du zustimmst.", next: "h3" },
+      ],
+    },
+    h3: {
+      id: "h3",
+      speaker: "partner",
+      line: "Mit monatlicher Laufzeit kostet der Tarif 30 Euro. Möchten Sie Ihre alte Nummer mitnehmen?",
+      gloss: "With a monthly term the plan costs 30 euros. Would you like to keep your old number?",
+      hints: ["Entscheide dich.", "Sag, ob du die Nummer mitnehmen möchtest."],
+      options: [
+        { id: "h3a", text: "Ja, meine Nummer möchte ich gern behalten. Ist die Rufnummernmitnahme kostenlos?", uses: "clarification", quality: 1, feedback: "Sehr gut: klar entschieden und nach den Kosten gefragt.", next: "h4" },
+        { id: "h3b", text: "Ja, bitte mit Rufnummernmitnahme. Dann nehme ich den monatlichen Tarif.", uses: "agree", quality: 0.9, feedback: "Gut: klar zugestimmt.", next: "h4" },
+        { id: "h3c", text: "Egal.", uses: "reactions", quality: 0.3, feedback: "Eine klare Antwort hilft weiter.", next: "h4" },
+      ],
+    },
+    h4: {
+      id: "h4",
+      speaker: "partner",
+      line: "Die Rufnummernmitnahme ist kostenlos. Ich brauche nur noch Ihren Ausweis, dann können wir den Vertrag abschließen.",
+      gloss: "Number portability is free. I just need your ID, then we can conclude the contract.",
+      hints: ["Bestätige und gib die nötigen Angaben.", "Bedanke dich."],
+      options: [
+        { id: "h4a", text: "Sehr gern, hier ist mein Ausweis. Vielen Dank für die gute Beratung!", uses: "agree", quality: 1, feedback: "Perfekt: kooperativ und freundlich abgeschlossen.", next: "h_end" },
+        { id: "h4b", text: "Alles klar, hier bitte. Wann ist die SIM-Karte freigeschaltet?", uses: "clarification", quality: 0.9, feedback: "Gut: mitgedacht und praktisch nachgefragt.", next: "h_end" },
+        { id: "h4c", text: "Hier.", uses: "reactions", quality: 0.4, feedback: "Ein freundliches Wort dazu wäre netter.", next: "h_end" },
+      ],
+    },
+    h_end: {
+      id: "h_end",
+      speaker: "narrator",
+      line: "Sie haben sich beraten lassen, Laufzeit und Kosten geklärt und einen passenden Vertrag abgeschlossen. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+const internetstoerung: Scenario = {
+  id: "sc_internet_stoerung",
+  themeId: "digitales",
+  title: "Eine Internetstörung melden",
+  task: "Melden Sie telefonisch eine Störung und finden Sie mit der Hotline eine Lösung.",
+  context:
+    "Ihr Internet zu Hause funktioniert seit gestern nicht mehr. Sie rufen die Hotline Ihres Anbieters an.",
+  level: 2,
+  minutes: 6,
+  targetRedemittel: ["telephoning", "clarification", "compromise", "agree"],
+  start: "i1",
+  nodes: {
+    i1: {
+      id: "i1",
+      speaker: "partner",
+      line: "Kundenservice, guten Tag. Was kann ich für Sie tun?",
+      gloss: "Customer service, hello. What can I do for you?",
+      hints: ["Nenne dein Problem.", "Sag höflich, warum du anrufst."],
+      options: [
+        { id: "i1a", text: "Guten Tag, mein Internet funktioniert seit gestern nicht mehr. Ich möchte eine Störung melden.", uses: "telephoning", quality: 1, feedback: "Sehr gut: klar das Problem und den Grund des Anrufs genannt.", next: "i2" },
+        { id: "i1b", text: "Guten Tag, bei mir ist das WLAN ausgefallen. Können Sie mir helfen?", uses: "clarification", quality: 0.9, feedback: "Gut: das Problem klar beschrieben.", next: "i2" },
+        { id: "i1c", text: "Internet kaputt.", uses: "reactions", quality: 0.4, feedback: "Zu knapp. Beschreibe das Problem in einem Satz.", next: "i2" },
+      ],
+    },
+    i2: {
+      id: "i2",
+      speaker: "partner",
+      line: "Das tut mir leid. Nennen Sie mir bitte Ihre Kundennummer. Haben Sie den Router schon neu gestartet?",
+      gloss: "I am sorry. Please tell me your customer number. Have you already restarted the router?",
+      hints: ["Nenne deine Kundennummer.", "Sag, was du schon versucht hast."],
+      options: [
+        { id: "i2a", text: "Meine Kundennummer ist 4477123. Den Router habe ich schon zweimal neu gestartet, ohne Erfolg.", uses: "clarification", quality: 1, feedback: "Top: alle Angaben und die schon versuchten Schritte genannt.", next: "i3" },
+        { id: "i2b", text: "Einen Moment, hier ist meine Kundennummer. Was soll ich als Nächstes probieren?", uses: "clarification", quality: 0.8, feedback: "Gut, aber sag ruhig gleich, was du schon versucht hast.", next: "i3" },
+        { id: "i2c", text: "Router? Was ist das?", uses: "clarification", quality: 0.6, feedback: "Nachfragen ist okay, hilft hier aber nicht sofort weiter.", next: "i3" },
+      ],
+    },
+    i3: {
+      id: "i3",
+      speaker: "partner",
+      line: "Ich sehe im System eine Störung in Ihrem Gebiet. Unsere Technik arbeitet daran. Voraussichtlich ist es morgen behoben.",
+      gloss: "I see a fault in your area in the system. Our technical team is working on it. It should be fixed by tomorrow.",
+      hints: ["Reagiere und frag nach einer Lösung.", "Du kannst nach einer Entschädigung fragen."],
+      options: [
+        { id: "i3a", text: "Verstehe. Bekomme ich für die Ausfallzeit eine Gutschrift auf der Rechnung?", uses: "compromise", quality: 1, feedback: "Sehr gut: ruhig geblieben und nach einer fairen Lösung gefragt.", next: "i4" },
+        { id: "i3b", text: "Okay, danke. Können Sie mir Bescheid geben, wenn es wieder läuft?", uses: "clarification", quality: 0.9, feedback: "Gut: eine sinnvolle Bitte.", next: "i4" },
+        { id: "i3c", text: "Das ist ja ärgerlich.", uses: "reactions", quality: 0.5, feedback: "Verständlich, aber frag lieber nach einer konkreten Lösung.", next: "i4" },
+      ],
+    },
+    i4: {
+      id: "i4",
+      speaker: "partner",
+      line: "Für den Ausfall schreibe ich Ihnen einen Tag gut. Ich melde mich, sobald die Störung behoben ist. Ist das in Ordnung?",
+      gloss: "For the outage I will credit you one day. I will get in touch as soon as the fault is fixed. Is that all right?",
+      hints: ["Stimme zu.", "Bedanke dich freundlich."],
+      options: [
+        { id: "i4a", text: "Ja, das ist fair. Vielen Dank für Ihre Hilfe!", uses: "agree", quality: 1, feedback: "Perfekt: die Lösung angenommen und freundlich bedankt.", next: "i_end" },
+        { id: "i4b", text: "Das passt, danke. Dann warte ich auf Ihre Nachricht.", uses: "agree", quality: 0.9, feedback: "Gut: klar zugestimmt.", next: "i_end" },
+        { id: "i4c", text: "Na gut.", uses: "reactions", quality: 0.4, feedback: "Ein kurzer Dank wäre freundlicher.", next: "i_end" },
+      ],
+    },
+    i_end: {
+      id: "i_end",
+      speaker: "narrator",
+      line: "Sie haben die Störung ruhig gemeldet, alle Angaben gemacht und eine faire Lösung mit einer Gutschrift erreicht. Gut gemacht!",
+      end: true,
+    },
+  },
+};
+
+export const scenarios: Scenario[] = [sommerfest, reklamation, nachhaltigkeit, projektplanung, homeoffice, konflikt, sicherheit, teambesprechung, lieferproblem, dienstreise, anmeldung, auslaenderbehoerde, arztbesuch, wohnungsbesichtigung, kontoeroeffnung, sprachkursberatung, apotheke, wohnungsmangel, kartesperren, pruefungsanmeldung, supermarkteinkauf, umtauschreklamation, tischreservieren, restaurantbestellen, fahrkartekaufen, nachdemwegfragen, freundeverabreden, smalltalkparty, handyvertragabschliessen, internetstoerung];
 
 export const scenarioById = (id: string) => scenarios.find((s) => s.id === id);
 export const scenariosByTheme = (themeId: string) =>
