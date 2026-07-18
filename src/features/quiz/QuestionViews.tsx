@@ -236,7 +236,9 @@ export function MatchingView({
       <Card>
         <CardContent className="p-5">
           <p className="text-sm font-medium">{q.prompt}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Wähle links ein Wort, dann rechts die Übersetzung.</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {q.hint ?? "Wähle links ein Wort, dann rechts die Übersetzung."}
+          </p>
         </CardContent>
       </Card>
 
@@ -316,6 +318,7 @@ export function kindLabel(kind: QuizQuestion["kind"]): string {
     article: "Artikel",
     plural: "Plural",
     cloze: "Lückentext",
+    redemittelCloze: "Redemittel-Lücke",
     wordOrder: "Satzbau",
     matching: "Zuordnung",
     collocationFill: "Nomen-Verb",

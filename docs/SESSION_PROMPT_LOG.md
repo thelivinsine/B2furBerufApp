@@ -780,3 +780,24 @@ from 126 to 128.)
   `src/features/session/SessionPlayer.tsx` · `tests/scopedSession.test.ts` (new) ·
   `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` (Appendix A + Phase 0/1 shipped markers) ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 5 (verbatim):**
+  > go ahead with pr2 tasks
+- **Response 5 (Opus 4.8; plan recommended Sonnet 5, founder chose to continue on Opus):** Shipped
+  PR 2 = Phase 2a + 2e. **2a noun→verb match grid:** `collocationMatchQ` in `engine/quiz.ts` reuses
+  the `MatchingQuestion` renderer (kind stays `"matching"`), with a `distinctCols` dedupe on both
+  noun and verb (MatchingView keys left by `pair.left`, right buttons by `pair.right`, so a repeat
+  either side is ambiguous + a duplicate React key); wired into `buildPoolQuiz` difficulty 1 + 2
+  (reaches the Kollokationen scope, composed Pool 2, and `/quiz`); the MatchingView sub-line now
+  falls back through `q.hint` so the grid reads "Wähle links ein Nomen …". **2e Redemittel cloze:**
+  new MCQ kind `redemittelCloze` (added to `QuizKind` + `MCQQuestion.kind` + `kindLabel`);
+  `redemittelClozeQ` blanks the longest content word via an umlaut-safe whole-word regex (small
+  function-word stoplist, modal/Konjunktiv verbs kept as targets), distractors from the full
+  Redemittel bank; `buildRedemittelQuiz` drives the Redemittel scope, now interleaving cloze (~0.35)
+  with cards; the FSRS guard already skips the `r_*` sourceId so it awards XP + combo only. Extended
+  `tests/scopedSession.test.ts` (grid shape/distinctness, cloze shape, redemittel scope mixes quiz).
+  Spot-checked the generated German (clozes + grids) for correctness before shipping. Gates:
+  typecheck, test:unit 211, lint 0 errors, build, check:bundle 80.8 kB, lint:content all green.
+  Squash-merged to `main` per the auto-ship rule with the plan + status doc updates.
+- **Artifacts (Prompt 5):** `src/types/index.ts` · `src/engine/quiz.ts` · `src/engine/session.ts` ·
+  `src/features/quiz/QuestionViews.tsx` · `tests/scopedSession.test.ts` ·
+  `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

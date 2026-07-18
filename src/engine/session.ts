@@ -15,7 +15,7 @@ import { collocations } from "@/data/collocations";
 import { grammar } from "@/data/grammar";
 import { texts } from "@/data/texts";
 import { isDue, mastery, reviewWeight, dueCount } from "@/engine/srs";
-import { buildThemeQuiz, buildPoolQuiz } from "@/engine/quiz";
+import { buildThemeQuiz, buildPoolQuiz, buildRedemittelQuiz } from "@/engine/quiz";
 import { targetBlocks, weakestBand, buildPreview } from "@/engine/sessionPreview";
 import { sample } from "@/lib/utils";
 
@@ -262,7 +262,7 @@ export function buildScopedSession(
     blocks = capBySource(interleave([cardBlocks, exerciseBlocks], limit * 3), 2).slice(0, limit);
   } else if (type === "redemittel") {
     const pool = redemittel.filter((r) => has(r.id));
-    blocks = sample(pool, Math.min(limit, pool.length)).map((r): SessionBlock => ({
+    const cardBlocks: SessionBlock[] = sample(pool, pool.length).map((r) => ({
       kind: "flashcard",
       key: `fc_rede_${r.id}`,
       source: "redemittel",
@@ -271,6 +271,11 @@ export function buildScopedSession(
       en: r.en,
       example: r.example.de,
     }));
+    // A lighter exercise ratio than vocab: a Redemittel is best recalled whole,
+    // so the cloze is a spice, not the main dish.
+    const exercises = buildRedemittelQuiz(pool, difficulty, Math.ceil(limit * 0.35));
+    const exerciseBlocks: SessionBlock[] = exercises.map((q) => ({ kind: "quiz", key: `qz_${q.id}`, question: q }));
+    blocks = capBySource(interleave([cardBlocks, exerciseBlocks], limit * 3), 2).slice(0, limit);
   } else {
     const topics = grammar.filter((g) => has(g.id));
     const drillBlocks: SessionBlock[] = topics.flatMap((t) =>

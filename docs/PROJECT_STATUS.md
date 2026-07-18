@@ -1,12 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 131). **Üben exercise-variety PR 1 shipped** (Phase 0 + Phase 1
-of `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Bibliothek Üben sets (Wörter + Kollokationen)
-now interleave auto-generated exercises with recall cards instead of flip-cards only, zero new
-content data, plus an FSRS-guard fix (quiz answers no longer write SRS under collocation ids).
-Session 130 shipped the data-architecture P0/P1 integrity fixes. Session 127's brand pick is still
-open: Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, founder owes the light-blue pick
-(Himmelblau vs Cyan; handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-18 (session 131). **Üben exercise-variety PR 1 + PR 2 shipped** (Phase 0/1 +
+Phase 2a/2e of `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Bibliothek Üben sets now
+interleave auto-generated exercises with recall cards across all three browse scopes (Wörter,
+Kollokationen with a noun→verb match grid, Redemittel with a cloze), zero new content data, plus an
+FSRS-guard fix. Session 130 shipped the data-architecture P0/P1 integrity fixes. Session 127's brand
+pick is still open: Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, founder owes the
+light-blue pick (Himmelblau vs Cyan; handoff in the W29 archive). Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -94,11 +95,29 @@ per-item templates". **Shipped in PR 1 (Phase 0 + Phase 1):**
   create phantom SRS cards under collocation ids. This also fixes the same latent bug in the composed
   session's Pool 2.
 - **Tests:** new `tests/scopedSession.test.ts` (pool-purity, no-generic-when-disabled, degenerate
-  pools, variety ≥ 3 kinds, 2-appearance cap, tiny-set degrade, Redemittel/Grammatik unchanged).
-- **Gates:** typecheck ✓ · test:unit **209** ✓ · lint 0 errors ✓ · build ✓ · check:bundle **80.8 kB**
-  (main chunk unchanged; all engine code rides the lazy session chunk) · lint:content ✓.
-- **Next: PR 2** (Phase 2a noun↔verb match grid + 2e Redemittel cloze, Sonnet 5), then PRs 3–5 per the
-  plan §6 model map. Restart the branch from `main` first per the merged-PR rule. **PWA caveat:** the
+  pools, variety ≥ 3 kinds, 2-appearance cap, tiny-set degrade).
+
+**PR 2 (same session, Opus 4.8 — plan recommended Sonnet 5, founder had me continue on Opus): Phase 2a
++ 2e.**
+- **2a noun→verb match grid:** `collocationMatchQ` (`engine/quiz.ts`) reuses the `MatchingQuestion`
+  renderer (kind stays `"matching"`), pairs = {noun, verb}. `distinctCols` dedupes on BOTH noun and
+  verb because `MatchingView` keys the left column by `pair.left` and the right buttons by
+  `pair.right` (a repeat either side = ambiguous + duplicate React key). Wired into `buildPoolQuiz`
+  difficulty 1 + 2, so it reaches the Kollokationen scope, composed Pool 2, and `/quiz`. `MatchingView`
+  sub-line now falls back through `q.hint` so the grid reads "Wähle links ein Nomen, dann rechts das
+  passende Verb".
+- **2e Redemittel cloze:** new MCQ kind `redemittelCloze` (added to `QuizKind` + `MCQQuestion.kind` +
+  `kindLabel`). `redemittelClozeQ` blanks the longest content word (≥ 4 chars, small function-word
+  stoplist, umlaut-safe whole-word regex; distractors from the full Redemittel bank).
+  `buildRedemittelQuiz` drives the Redemittel scope, which now interleaves cloze (~0.35) with cards.
+  Carries the `r_*` sourceId only for the appearance cap; the FSRS guard skips it → XP + combo only.
+- **Verified generated German** by dumping samples: clozes blank meaningful words with 4 distinct
+  real-word options ("Eine ___ wäre" → Möglichkeit), grids are clean unambiguous noun→verb pairs that
+  even show the accusative article ("den Aufenthaltstitel → verlängern"). No em dashes.
+- **Gates (after PR 2):** typecheck ✓ · test:unit **211** ✓ · lint 0 errors ✓ · build ✓ ·
+  check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
+- **Next: PR 3** (Phase 2b typed cloze, Opus 4.8), then 2c (listening) / 2d (odd-one-out) + Phase 3 per
+  the plan §6 map. Restart the branch from `main` first per the merged-PR rule. **PWA caveat:** the
   session surface is service-worker-cached; hard-refresh before judging the live result.
 
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
