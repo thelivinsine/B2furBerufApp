@@ -18,6 +18,8 @@ import { domains } from "@/data/domains";
 import { Badge } from "@/components/ui/badge";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
+import { genderOf } from "@/components/artikel/gender";
+import { Wesen } from "@/components/artikel/Wesen";
 import { useIsDark } from "@/lib/useTheme";
 import { cn } from "@/lib/utils";
 import { frequencyBin } from "@/data/frequency";
@@ -1130,6 +1132,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
                 <div className="flex items-center gap-1.5">
+                  {genderOf(selected) && <Wesen gender={genderOf(selected)!} size={22} />}
                   <p className="truncate text-base font-semibold">{selected.de}</p>
                   <SpeakButton text={selected.de} />
                 </div>
