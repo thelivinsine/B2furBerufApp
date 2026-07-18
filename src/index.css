@@ -51,6 +51,18 @@ input:-webkit-autofill {
     --reward: 38 95% 44%;
     --reward-bg: 39 88% 94%;
 
+    /* Gender marks (Artikel-Visuals, s128 plan): der=blue, die=rose, das=green
+       (textbook convention). Deliberately distinct from the six domain graph
+       hues in lib/graphPalette.ts so a mark never reads as a domain. Each has a
+       pale `-bg` tint for fills behind the Wesen / effect. Hex sources:
+       der #2563eb/#7aa5f8, die #db2777/#f27bb8, das #16a34a/#5fc98b. */
+    --der: 221 83% 53%;
+    --der-bg: 221 83% 95%;
+    --die: 333 71% 51%;
+    --die-bg: 333 71% 96%;
+    --das: 142 76% 36%;
+    --das-bg: 142 60% 94%;
+
     --shadow: 240 30% 30%;
     --radius: 0.875rem;
   }
@@ -87,6 +99,15 @@ input:-webkit-autofill {
 
     --reward: 36 79% 57%;
     --reward-bg: 38 45% 13%;
+
+    /* Gender marks, brightened for the dark canvas (same intent as the domain
+       palette's dark tones); `-bg` tints go dark/low-lightness. */
+    --der: 219 90% 73%;
+    --der-bg: 221 40% 18%;
+    --die: 329 82% 72%;
+    --die-bg: 329 38% 18%;
+    --das: 145 50% 58%;
+    --das-bg: 145 35% 15%;
 
     --shadow: 240 60% 2%;
   }
@@ -282,4 +303,91 @@ input:-webkit-autofill {
     -webkit-user-select: none !important;
     user-select: none !important;
   }
+}
+
+/* Artikel-Visuals gender reveal effects (s128 plan, geometry from Preview D in
+   preview/artikel-visuals/gender-doodles-panel.html): der bursts (8 rays fly
+   outward), die blooms (3 staggered expanding rings), das shatters (6 spinning
+   shards). Rendered by ArtikelEffect.tsx, which remounts the elements on each
+   `play` bump so the animation restarts. Compositor-friendly transforms/opacity
+   only, no JS animation loop.
+
+   Every element starts at opacity 0 and animates with a 200ms delay: the card
+   flip needs ~225ms before the back face is visible, so without the delay the
+   effect would be half over before the learner can see it. Reduced-motion users
+   get `.artikel-fx-tint` instead (an opacity-only fade, no transforms). */
+.artikel-fx {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+/* der: rays radiating from the effect origin. Direction comes from the
+   per-element `--a` custom property; the origin sits at the ray's top edge so
+   rotate() fans them around one point. */
+.artikel-fx-ray {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 3px;
+  height: 20px;
+  border-radius: 2px;
+  background: hsl(var(--der));
+  opacity: 0;
+  transform-origin: center 0;
+  animation: artikel-ray 550ms cubic-bezier(0.2, 0.7, 0.2, 1) 200ms forwards;
+}
+@keyframes artikel-ray {
+  0% { opacity: 0; transform: rotate(var(--a)) translateY(5px) scaleY(0.3); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateY(52px) scaleY(1); }
+}
+/* die: concentric rings blooming outward; the stagger (per-ring delay) is set
+   inline by the component. */
+.artikel-fx-ring {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 3px solid hsl(var(--die));
+  border-radius: 999px;
+  opacity: 0;
+  animation: artikel-bloom 650ms ease-out forwards;
+  animation-delay: var(--d, 200ms);
+}
+@keyframes artikel-bloom {
+  0% { opacity: 0.85; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(4.4); }
+}
+/* das: triangular shards flying apart; trajectory + spin come from the
+   per-element `--dx/--dy/--rot` custom properties. */
+.artikel-fx-shard {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  background: hsl(var(--das));
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  opacity: 0;
+  animation: artikel-shard 600ms ease-out 200ms forwards;
+}
+@keyframes artikel-shard {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.5); }
+}
+/* Reduced motion: a brief gender-tinted glow that only fades (opacity, no
+   transforms). The background gradient is set inline per gender. */
+.artikel-fx-tint {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: artikel-tint 900ms ease-out forwards;
+}
+@keyframes artikel-tint {
+  0% { opacity: 0.55; }
+  100% { opacity: 0; }
 }

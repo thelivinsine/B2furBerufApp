@@ -1,7 +1,12 @@
 # Artikel-Visuals Plan: Wesen gender marks, flip effects, fused doodles on the Theorie cards
 
-> Status: **PLANNED, not started** (authored 2026-07-18, session 128, on branch
-> `claude/visual-gender-indicators-gsox24`). The founder reviewed two design-preview artifacts and
+> Status: **Phase 1 SHIPPED** (session 129, 2026-07-18, branch
+> `claude/article-visuals-opus-tasks-rxurot`): tokens + Wesen marks + flip effects + legend live on
+> the Theorie Wörter views, built in the intended two-model split (Opus 4.8 wiring commit, then
+> Fable 5 art commit replacing the placeholder geometry/keyframes; a 200ms effect delay was added
+> so the reveal stays visible after the ~225ms flip). **Phases 2–3 not started.**
+> (Originally authored 2026-07-18, session 128, on branch
+> `claude/visual-gender-indicators-gsox24`.) The founder reviewed two design-preview artifacts and
 > picked **Preview B (Artikel-Wesen mascots), Preview C (fused per-word doodles), and Preview D
 > (gender answer-reveal effects)** for the Theorie (Bibliothek) cards. Preview A (plain badge chips)
 > was NOT picked; the Wesen serve as the gender mark instead. Implementation happens in a follow-up

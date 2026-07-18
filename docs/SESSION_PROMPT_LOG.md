@@ -582,3 +582,45 @@ from 126 to 128.)
   `docs/PROJECT_REFERENCE.md` (backlog #4 research + SCOPED note, cross-reference section) ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   `docs/SESSION_PROMPT_LOG.md` · PR #564.
+
+---
+
+## Session 129 — 2026-07-18 — Artikel-Visuals PR 1: Wesen marks + flip effects (Opus wiring + Fable art)
+
+- **Branch:** `claude/article-visuals-opus-tasks-rxurot`
+- **Prompt 1 (verbatim):**
+  > I want to implement article visuals plan's opus tasks. Which effort should I set it to? read the plan and let me knpw
+- **Response 1:** Read `docs/plans/ARTIKEL_VISUALS_PLAN.md` §6: the only Opus 4.8 task is the PR 1
+  tokens + card wiring at **medium** effort; the Wesen/effect art is assigned Fable 5 high and the
+  registry/reuse work Sonnet 5. Flagged the split and asked whether to keep the art on Fable.
+- **Prompt 2 (verbatim):**
+  > for now, start working on opus tasks, let me know once done, I'll switch to fable and then it can proceed.
+- **Response 2 (Opus 4.8):** Implemented the PR 1 wiring half: `--der/--die/--das` (+`-bg`) tokens in
+  `src/index.css` light + dark, exposed in `tailwind.config.ts`; new `src/components/artikel/`
+  (`gender.ts` pure `genderOf`, `Wesen.tsx`, `ArtikelEffect.tsx`, `ArtikelLegend.tsx`, the latter
+  three with deliberately placeholder art behind locked prop/class interfaces); `FlipCard` `onFlip`
+  callback; marks wired into `VocabList` (card front + back-face effect), `VocabViews`
+  Tabelle/Liste (16px tier), the one-time legend on the Wörter tab
+  (`artikelLegendDismissed` in `useSettingsStore`); `tests/gender.test.ts`. All gates green;
+  committed and pushed with a boxed handoff comment marking exactly what the art pass replaces.
+- **Prompt 3 (verbatim, after switching the session model to Fable 5):**
+  > I implemented part of the articles visuals plan by opus. Review it and make any necessary corrections/improvements and then continue with all fable related tasks in pr1
+- **Response 3 (Fable 5):** Review found the wiring sound plus one real timing bug: the effect
+  fired at flip START but the back face is only visible ~225ms into the 450ms rotation, so half the
+  animation played hidden (fixed with a 200ms animation delay + base opacity 0). Then authored the
+  real art from the founder-picked Preview B/D in
+  `preview/artikel-visuals/gender-doodles-panel.html`: the three Wesen redrawn at the 24-unit
+  viewBox (tinted bodies, dot eyes, one imperfection each: der sprout / die unclosed outline +
+  eyelash / das stray hairs; solid small tier under 24px) and the per-element reveal effects
+  (der 8-ray burst, die 3 staggered bloom rings, das 6 spinning shards; reduced motion = fading
+  tint, opacity only). Verified visually with headless-Chromium screenshots (creatures at
+  56/28/24/16px light + dark; effects freeze-framed at 120/300/450ms via paused negative
+  animation-delay). Gates green (typecheck, lint 0 errors, test:unit 149, build, bundle 79.6 kB);
+  shipped PR 1 into `main` per the auto-ship rule and updated the docs (this entry,
+  `PROJECT_STATUS.md` s129 handoff, plan status header).
+- **Artifacts:** `src/components/artikel/` (new: `gender.ts` · `Wesen.tsx` · `ArtikelEffect.tsx` ·
+  `ArtikelLegend.tsx`) · `src/index.css` · `tailwind.config.ts` · `src/features/shared/FlipCard.tsx` ·
+  `src/features/vocabulary/VocabList.tsx` + `VocabViews.tsx` + `VocabularyTrainer.tsx` ·
+  `src/store/useSettingsStore.ts` · `tests/gender.test.ts` · `docs/plans/ARTIKEL_VISUALS_PLAN.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/SESSION_PROMPT_LOG.md`

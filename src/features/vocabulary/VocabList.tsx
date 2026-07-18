@@ -8,6 +8,9 @@ import { useProgressStore } from "@/store/useProgressStore";
 import { usePagedList } from "@/lib/usePagedList";
 import { FlipCard } from "@/features/shared/FlipCard";
 import { cn } from "@/lib/utils";
+import { genderOf } from "@/components/artikel/gender";
+import { Wesen } from "@/components/artikel/Wesen";
+import { ArtikelEffect } from "@/components/artikel/ArtikelEffect";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
 
 /**
@@ -28,6 +31,9 @@ const VocabCard = memo(function VocabCard({
   const saved = useProgressStore((s) => s.savedWords.includes(v.id));
   const toggleSavedWord = useProgressStore((s) => s.toggleSavedWord);
   const hasRelated = relatedRows(v).length > 0;
+  const gender = genderOf(v);
+  // Replay trigger for the gender reveal effect: bumped on each front→back flip.
+  const [effectPlay, setEffectPlay] = useState(0);
 
   // Front face: the German word + example. English lives on the flip side.
   // NO filter-facet tags on the tile (founder 2026-07-13): Häufigkeit, Branche
@@ -41,6 +47,7 @@ const VocabCard = memo(function VocabCard({
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
+              {gender && <Wesen gender={gender} size={24} />}
               <p className="truncate text-base font-semibold sm:text-lg">{v.de}</p>
               <span onClick={(e) => e.stopPropagation()}>
                 <SpeakButton text={v.de} />
@@ -96,10 +103,12 @@ const VocabCard = memo(function VocabCard({
     </Card>
   );
 
-  // Back face: the English translation + its example gloss.
+  // Back face: the English translation + its example gloss. For nouns a short
+  // gender reveal effect plays behind the content on each flip to the back.
   const back = (
-    <Card className="h-full border-primary/30 bg-primary/[0.03]">
-      <CardContent className="flex h-full flex-col p-4">
+    <Card className="relative h-full overflow-hidden border-primary/30 bg-primary/[0.03]">
+      {gender && <ArtikelEffect gender={gender} play={effectPlay} />}
+      <CardContent className="relative z-10 flex h-full flex-col p-4">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
           Englisch
         </p>
@@ -114,7 +123,14 @@ const VocabCard = memo(function VocabCard({
     </Card>
   );
 
-  return <FlipCard front={front} back={back} label={`Übersetzung von ${v.de}`} />;
+  return (
+    <FlipCard
+      front={front}
+      back={back}
+      label={`Übersetzung von ${v.de}`}
+      onFlip={gender ? (flipped) => flipped && setEffectPlay((n) => n + 1) : undefined}
+    />
+  );
 });
 
 export function VocabList({ items }: { items: VocabItem[] }) {

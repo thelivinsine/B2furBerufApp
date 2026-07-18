@@ -12,6 +12,8 @@ import { usePagedList } from "@/lib/usePagedList";
 import { CEFR_ORDER } from "@/lib/cefr";
 import { SECTOR_LABEL } from "@/lib/facets";
 import { SectorChips } from "@/features/shared/SectorChips";
+import { genderOf } from "@/components/artikel/gender";
+import { Wesen } from "@/components/artikel/Wesen";
 import { cn } from "@/lib/utils";
 
 /**
@@ -74,12 +76,16 @@ const VOCAB_COLUMNS: DataColumn<VocabItem>[] = [
   {
     id: "wort",
     label: "Wort",
-    cell: (v) => (
-      <div className="flex min-w-0 items-center gap-1">
-        <span className="font-semibold">{v.de}</span>
-        <SpeakButton text={v.de} />
-      </div>
-    ),
+    cell: (v) => {
+      const gender = genderOf(v);
+      return (
+        <div className="flex min-w-0 items-center gap-1">
+          {gender && <Wesen gender={gender} size={16} />}
+          <span className="font-semibold">{v.de}</span>
+          <SpeakButton text={v.de} />
+        </div>
+      );
+    },
     sortValue: sortForm,
     className: "min-w-[12rem]",
   },
@@ -145,8 +151,10 @@ export function VocabTable({ items }: { items: VocabItem[] }) {
 
 /** One dense list row: word + gloss on the left, state on the right. */
 const CompactRow = memo(function CompactRow({ v }: { v: VocabItem }) {
+  const gender = genderOf(v);
   return (
     <li className="flex items-center gap-2 px-3 py-2">
+      {gender && <Wesen gender={gender} size={16} className="shrink-0 self-center" />}
       <div className="min-w-0 flex-1 sm:flex sm:items-baseline sm:gap-2">
         <span className="block truncate text-sm font-semibold sm:inline">{v.de}</span>
         <span className="block truncate text-xs text-muted-foreground sm:inline sm:text-sm">

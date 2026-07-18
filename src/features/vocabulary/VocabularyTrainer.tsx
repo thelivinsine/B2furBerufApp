@@ -45,6 +45,7 @@ import { defaultVisibleBands, hiddenBandsLabel } from "@/lib/cefr";
 import { cn } from "@/lib/utils";
 import { Flashcards } from "./Flashcards";
 import { VocabQuiz } from "./VocabQuiz";
+import { ArtikelLegend } from "@/components/artikel/ArtikelLegend";
 import { VocabList } from "./VocabList";
 import { VocabTable, VocabCompactList } from "./VocabViews";
 
@@ -591,6 +592,11 @@ export function VocabularyTrainer() {
         </div>
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
+          {/* One-time Artikel-Wesen legend (dismiss state in the settings
+              store). Teaches the three gender creatures before they appear
+              beside the words below. */}
+          <ArtikelLegend />
+
           {/* Sub-theme drill-down now lives in the filter (the Unterthema
               dropdown), not a separate picker page. When one or more sub-themes
               are active this breadcrumb shows the context and jumps back to the

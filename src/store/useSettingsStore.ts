@@ -64,6 +64,13 @@ interface SettingsState {
   /** Whether the learner dismissed the "save your progress" sign-in nudge. Persists across sessions. */
   signInBannerDismissed: boolean;
 
+  /**
+   * Whether the learner dismissed the one-time Artikel-Wesen legend on the
+   * Wörter tab (Artikel-Visuals, s128 plan). Once true the hint never shows
+   * again; rides cloudSync via the settings jsonb blob.
+   */
+  artikelLegendDismissed: boolean;
+
   /** Fortschritt "Details" section (charts/calendar/mastery grid) expanded state, redesign Phase 3.3. */
   progressDetailsExpanded: boolean;
 
@@ -110,6 +117,7 @@ const defaults = {
   pinnedTabs: DEFAULT_PINNED_TABS,
   moreOrder: [] as string[],
   signInBannerDismissed: false,
+  artikelLegendDismissed: false,
   progressDetailsExpanded: false,
   claimedMilestones: [] as string[],
 };
