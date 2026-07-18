@@ -270,6 +270,21 @@ horizontal positions from card to card.
   (`VocabList.tsx`) has the same `truncate`-without-`flex-1` pattern on its title but was left untouched
   (single vocab words rarely overflow at card width); worth the same fix if it's ever reported.
 
+## Session 124 (2026-07-16) — Kollokationen Karten text-cutoff + speak-button alignment (condensed handoff)
+
+**Branch `claude/card-text-alignment-fixes-cc3k0r` (Sonnet 5), shipped to `main` (PR #545).**
+Founder-reported via screenshot: Kollokationen "Karten" card titles cut off mid-word with an ellipsis
+and the speak icon at inconsistent horizontal positions. **Root cause:** `CollocationCard` in
+`src/features/collocations/CollocationsBrowser.tsx` rendered the title in a `flex items-center` row
+with a hard `truncate` and no `flex-1`, so short titles left the SpeakButton mid-card and long titles
+got ellipsis-truncated. **Fix (one file, 2 lines):** title row to `flex items-start gap-1.5`, title
+`<p>` to `min-w-0 flex-1 ... leading-snug` (dropped `truncate`), mirroring the example-sentence row:
+titles wrap instead of truncating, speak icon flush right. **Verification:** typecheck/lint clean,
+build + check:bundle 79.6 kB, Playwright screenshot of `/library?tab=kollokationen&view=karten`
+confirmed all titles render in full. **Scope note:** the Wörter card (`VocabList.tsx`) has the same
+`truncate`-without-`flex-1` pattern on its title but was not reported broken and was left untouched;
+worth the same fix if ever reported.
+
 ## Session 125 (2026-07-16) — Theorie graph word-selection distribution + focus polish (condensed handoff)
 
 **Handoff after session 125 (2026-07-16). Theorie graph word-selection distribution + focus polish
@@ -316,3 +331,46 @@ graphs):
   after deploy, hard-refresh / reopen the app so the new SW activates. If `beantragen` still looks
   cramped after that, `spreadAngles`' `blend` (0.7) is the one knob to push harder.
 
+## Session 126 (2026-07-17) — Daily-life content scale-up, Phase A + B (full handoff)
+
+**Handoff after session 126 (2026-07-17). Daily-life content scale-up (Phase A + Phase B, COMPLETE), on
+branch `claude/scale-words-domains-qjv9x4`, shipped to `main` across PRs #553–#558.** The founder:
+_"currently the app has mainly berufsleben words. Can you scope a task to scale up words from other
+domains?"_ → _"i chose both phase a and b"_ → _"go ahead with the plan"_ → _"yes go ahead with phase b"_.
+- **Scoped** `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`: Phase A deepens the 5 existing daily-life themes to
+  workplace parity; Phase B adds new everyday-life themes. Committed on the branch.
+- **Executed Phase A (four theme commits, PR #553, squash-merged to `main`):**
+  - `bank`: 43 → **81 vocab**, 38 → **50 colloc** (+38 v / +12 c).
+  - `bildung`: 46 → **80 vocab**, 39 → **50 colloc** (+34 v / +11 c).
+  - `behoerde`: 49 → **80 vocab**, 42 → **50 colloc** (+31 v / +8 c).
+  - `wohnen`: 57 → **80 vocab**, 45 → **50 colloc** (+23 v / +5 c); `arzt`: 74 → **80 vocab** (+6 v).
+  - Every item CEFR-tagged B1–B2, spread across the theme's 4 sub-themes (deliberately lifting the thin
+    ones, e.g. behoerde.bescheid/aufenthalt, bildung.anerkennung/weiterbildung, wohnen.suche/vertrag). One
+    `provenance.ts` row per id (all `review_status: "draft"`, DWDS/Wiktionary references). New bank totals:
+    **1,378 vocabulary / 811 collocations / 2,620 provenance rows.**
+  - Gates per theme: `pnpm lint:content` ✔, `pnpm build:frequency` (regenerated), `pnpm verify:facts`
+    (0 two-oracle-confirmed errors; the 7 review signals are all pre-existing dual-gender headwords, none
+    from this work), `pnpm build` ✔.
+- **Phase B (COMPLETE): five NEW `alltag` themes, one PR each, all squash-merged to `main`:**
+  - `einkaufen` (Einkaufen & Geschäfte, #554), `essen` (Essen & Restaurant, #555), `mobilitaet` (Mobilität
+    & Verkehr, #556), `freizeit` (Freizeit & Soziales, #557), `digitales` (Handy, Internet & Digitales,
+    #558). Each is a full `behoerde`-shape pack: **49 vocab / 40 collocations / 2 dialogues / 2 texts /
+    3 Can-Do / 1 writing prompt / ~97 provenance rows**, spread across 4 sub-themes, CEFR-tagged B1–B2.
+  - Per theme, wired: `types/index.ts` `ThemeId` + `scripts/lint-content.mjs` `THEME_IDS` (kept in sync),
+    a new lucide icon in `src/lib/icons.ts` (ShoppingCart/UtensilsCrossed/Bus/PartyPopper/Smartphone), the
+    `src/data/themes.ts` record, and the required `writingPrompts` entry (the `Record<ThemeId>` type forces
+    it). **Locked success metric held:** no feature/component code changed except the one-line city rollup.
+  - **City buildings:** einkaufen's PR added `domains: ["alltag"]` to the **Wohnhaus** building so all five
+    new (and any future) unclaimed `alltag` themes fold in by domain rollup; bank/behoerde/wohnen stay
+    explicitly claimed first. Updated `tests/city-mastery.test.ts` (`toContain("wohnen")`) for the
+    full-coverage invariant. A dedicated "consumer/town-life" building is a possible future founder call.
+  - Gates each PR: lint:content, build:frequency, verify:facts (0 errors), build, **test:unit 146/146**,
+    check:bundle 79.6 kB, eslint 0 errors.
+- **Recurring gotcha (both phases):** many planned ids collided with existing entries in OTHER themes
+  (shopping ↔ customer, food ↔ customer, transport ↔ travel/logistics, digital ↔ technology). **Pre-check
+  every candidate id with `grep -c 'id: "v_X"'` / `'id: "c_X"'` across the whole bank BEFORE authoring** to
+  avoid rework; pick theme-distinct words rather than duplicating a concept already tagged elsewhere.
+- **Next / follow-ups:** the whole scale-up plan is done. Natural continuations: (1) founder review pass to
+  flip the new `draft` provenance rows to `verified` (use `pnpm review:queue`); (2) exam sets / more
+  dialogues for the new themes if depth is wanted; (3) a dedicated city building for the consumer themes if
+  the Wohnhaus fold feels wrong. Nothing is blocking.

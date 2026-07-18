@@ -495,3 +495,76 @@ as a continuation entry rather than editing the session-125 entry above).
 - **Artifacts (prompts 7-8):** `preview/branding/genauly-identity-vol6.html` (new) ·
   `preview/branding/vol6-screens/*.png` (9 strips, new) · `preview/branding/README.md` · artifact
   `dfcad5f6` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+
+## Session 128 — 2026-07-18 — Gender-visuals research panel + Artikel-Visuals implementation plan
+
+**Branch:** `claude/visual-gender-indicators-gsox24` · **Model:** Opus 4.8 (switched to Fable 5 for
+the final planning turns) · **Attachments:** none. Docs/preview-only session; nothing shipped to the
+app. Two design-preview pages were published as private claude.ai artifacts during the session and
+are committed to the repo under `preview/artikel-visuals/`. (Numbering note: this session started
+before the parallel sessions 126/127 merged; its docs were rebased onto their `main` and renumbered
+from 126 to 128.)
+
+- **Prompt 1 (verbatim):**
+  > how best can we add visuals to words to show the gender of a word and some more context so that the user can also learn visually. generate a few ideas
+- **Response 1:** Surveyed the current rendering (article is plain text on flashcards, part of the
+  bold string in the Bibliothek views, zero gender encoding anywhere) and proposed 7 ideas:
+  ArticleBadge color chips, shape triple-encoding, plural-morphology highlighting, graph gender
+  rings, suffix-rule hints ("-ung ist immer die"), a gender-sort Neuland scene, and sub-theme icon
+  watermarks, with a recommended ship order.
+- **Prompt 2 (verbatim):**
+  > can you show previews of all these ideas in a html?
+- **Response 2:** Built a preview page of all 7 ideas mocked in the app's real design tokens (light +
+  dark) with real bank words; the artifact publish was initially rejected in the tool UI.
+- **Prompt 3 (verbatim):** `> are you done?`
+- **Response 3:** Confirmed done; sent the HTML file directly instead.
+- **Prompt 4 (verbatim):** `> i didn't decline it. I approved ot`
+- **Response 4:** Re-published the page as an artifact (UI hiccup on the first attempt).
+- **Prompt 5 (verbatim):**
+  > I like some of the above ideas but before fina,ising them, I want to explore if it is possible to add minimalistic icons/doodles which should be easy to create but would leave an impact on the learners like male sticky figure with a huge moustache to represent masculine words? It's just an idea. Brainstorm with a panel of experts on what kind of illustrations are the best and would leave a lasting impact on users based on actual evidence, and based on their report generate preview of some of those ideas as a html artifact.
+- **Response 5:** Ran a three-expert research panel as parallel agents (SLA literature, memory
+  science, competitor/illustration practice; key sources: Santos 2015, Arzt & Kost 2016, Desrochers
+  1989/1991, Bertsch 2007, Sundararajan & Adesope 2020, McDaniel & Einstein, Watkins, Boroditsky).
+  Synthesized the verdict (imagery for gender: yes; repeated bizarre human personas: no, false rule
+  on Mädchen/Person/Gast + contrast collapse) and built a second artifact: findings, evidence
+  scoreboard, the moustache tested honestly, and previews A–E (Artikel-Marken, Artikel-Wesen
+  mascots, fused doodles, answer-reveal effects, Eselsbrücke + Artikel-Sprint).
+- **Prompt 6 (verbatim):**
+  > I didn't understand how does the 8th point work in the report, can you clarify it?
+- **Response 6:** Explained Preview E's two halves: the "Meine Eselsbrücke" self-made association
+  slot (generation effect) and the Artikel-Sprint retrieval drill, and why they are grouped.
+- **Prompt 7 (verbatim):**
+  > what do you mean by this?: Optional and off to the side. Most learners skip it; the keen ones who use it get the biggest durable gain in the whole system.
+- **Response 7:** Clarified the reach-vs-effect-per-use distinction: optional by design, low
+  adoption expected, outsized benefit for motivated learners; don't force it or measure by usage %.
+- **Prompt 8 (verbatim):**
+  > the self-made memory hook is a great exercise for quiz. Add it along with all the research findings in the already available variety of exercies for quiz in the docs.
+- **Response 8:** Recorded the full panel findings + the two proposed quiz exercises (Eselsbrücke,
+  Artikel-Sprint) under backlog #4 in `docs/PROJECT_REFERENCE.md` with a cross-reference in
+  "Research findings to reuse"; committed and pushed.
+- **Prompt 9 (verbatim):**
+  > I like preivew B, C and D from the above html report. How best can we implement it to the theorie cards?
+- **Response 9:** Mapped the three picks onto the actual Theorie card code (`VocabCard` FlipCard in
+  `VocabList.tsx`): Wesen as the gender mark on the card front, the gender effect on card flip
+  (the browse-side answer-reveal moment), fused doodles on the card back for registered words only;
+  proposed 3 phased PRs and two defaults (mark beside the full article text; effect on every flip).
+- **Prompt 10 (verbatim, interrupted mid-response and completed by Prompt 11):**
+  > write a robust implementation plan to implement these features along with model recommendations and save it to the repo. Also document the session - Then I'll implement the plan in a new session.
+- **Prompt 11 (verbatim):**
+  > When selecting the first 20 words for fused doodles, take the words which are of high frequency and also highly useful for kapital 1 in the game.
+- **Response 10/11:** Authored **`docs/plans/ARTIKEL_VISUALS_PLAN.md`** (3 phased PRs, per-phase
+  model recommendations, acceptance criteria, guardrails, risks) with the founder's batch-1
+  selection rule encoded: the 10 nouns Kapitel-1 missions directly reference (verified against
+  `src/data/missions.ts`: 6 die / 4 der / 0 das) + 10 top-Zipf nouns from the Kapitel-1 mission
+  themes with a das-balance override (>= 4 das-words), selection snippet included. Committed both
+  preview pages to `preview/artikel-visuals/`, added the SCOPED pointer to backlog #4. First PR
+  attempt (#564) conflicted: `main` had moved (parallel sessions 126/127, PRs #551–#563), so the
+  branch was rebuilt on the new `main`, the session renumbered 126 → 128, and the docs re-applied:
+  session-128 handoff in `docs/PROJECT_STATUS.md` (aging the s126 daily-life handoff into the W29
+  archive, repairing the missing s124 archive entry, refreshing the stale content-bank counts to the
+  post-scale-up totals), and this log entry appended after the parallel sessions' entries.
+- **Artifacts:** `docs/plans/ARTIKEL_VISUALS_PLAN.md` (new) ·
+  `preview/artikel-visuals/gender-visuals-preview.html` + `gender-doodles-panel.html` (new) ·
+  `docs/PROJECT_REFERENCE.md` (backlog #4 research + SCOPED note, cross-reference section) ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/SESSION_PROMPT_LOG.md` · PR #564.

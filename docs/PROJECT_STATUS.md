@@ -1,16 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-17 (session 127). **Brand kit catalogue Vol. IV, on branch
-`claude/epic-ramanujan-p049i8`.** The founder liked none of the session-113 20-direction catalogue and
-asked for a fresh set of 5–10 brand kits honoring the recorded preferences (flat, no gradients on logo
-or buttons, colorful accents, respect the built app). Delivered
-`preview/branding/genauly-identity-vol4.html`: **8 complete kits** (Textmarker, Haken dran,
-Sticker-Klub, Linie B2, Zwei Stimmen, Bauhaus Pause, Neonschild, Der Dachs), each with mark, wordmark,
-app icon, palette, type pairing, and UI probe. Preview + docs only, no `src/` change. Awaiting the
-founder's pick (mixes allowed); then wire tokens + regenerate icons per the `preview/branding/README.md`
-protocol. (Session 126's daily-life scale-up is COMPLETE: Phase A + B shipped via PRs #553-#558, five new
-`alltag` themes; new bank totals **1,623 vocabulary / 1,011 collocations / 20 themes**. See the handoff
-below.) Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-18 (session 128). **Gender-visuals research + Artikel-Visuals implementation
+plan (docs/preview only, nothing shipped to the app), on branch
+`claude/visual-gender-indicators-gsox24`.** A three-expert evidence panel (SLA research, memory
+science, competitor/illustration scan) evaluated how to teach der/die/das visually; findings live
+under **backlog #4 in `docs/PROJECT_REFERENCE.md`** (don't re-research). The founder reviewed two
+design-preview pages (committed under `preview/artikel-visuals/`) and picked Artikel-Wesen mascots +
+fused doodles + gender flip effects for the Theorie cards; the phased build plan with model
+recommendations is **`docs/plans/ARTIKEL_VISUALS_PLAN.md`** (next session implements PR 1). Session
+127's brand-kit catalogue (Vol. IV–VI) is still awaiting the founder's kit pick, see its handoff
+below. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -40,11 +39,12 @@ architectural decisions, and backend/infra setup are documented in `docs/PROJECT
 read that for the "what's built and how." The living detail of every feature area (mobile bar, the
 session engine, Bibliothek views, the game layer, content conventions) is in `../CLAUDE.md`.
 
-**Content banks (as of 2026-07-14, session 120 — re-verify with `pnpm lint:content` before quoting):**
-vocab **1,246** · collocations **797** · Redemittel **149** · grammar **24 topics / 117 drills** ·
-Lese-/Hörtexte **26** (78 checks) · Can-Do **37** · provenance **2,452 rows** · themes **15** ·
-exam sets **15** · dialogues **20**. Taxonomy is **5 top-level domains** (the `beruf`/`arbeitswelt`
-work split was merged into one `beruf` in s121), all populated. **Branche is a scope
+**Content banks (as of 2026-07-18, session 128, after the s126 daily-life scale-up — re-verify with
+`pnpm lint:content` before quoting):** vocab **1,623** · collocations **1,011** · Redemittel **149** ·
+grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **~3,105
+rows** · themes **20** (five new `alltag` themes in s126: einkaufen/essen/mobilitaet/freizeit/
+digitales) · exam sets **15** · dialogues **30**. Taxonomy is **5 top-level domains** (the
+`beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
 Standing governance debt: ~98% of provenance rows are AI-drafted, not yet human-verified (see
 `strategy/DATA_GOVERNANCE.md`).
@@ -64,6 +64,45 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 128 (2026-07-18). Gender-visuals research panel + Artikel-Visuals
+implementation plan (Opus 4.8 → Fable 5), on branch `claude/visual-gender-indicators-gsox24`,
+docs/preview files only, nothing shipped to the app.** The founder asked how to add visuals showing a
+word's gender so learners "also learn visually", then floated a moustache-stick-figure idea and asked
+for an evidence-based expert brainstorm. What happened, in order:
+- **Idea survey + first preview page:** seven visual-gender ideas (ArticleBadge chips, shape encoding,
+  plural-morphology highlighting, graph gender rings, suffix-rule hints, a gender-sort game scene,
+  sub-theme watermarks), mocked in the app's real tokens.
+- **Three-expert evidence panel** (parallel research agents: SLA literature, memory science,
+  competitor/illustration practice). Headline results: images that FUSE meaning+gender have the
+  strongest evidence (Santos 2015, n=283); color alone is weak and voices are harmful; a repeated
+  "bizarre" marker (the moustache) self-defeats (contrast collapse + seductive-details penalty); human
+  personas teach a FALSE rule on `das Mädchen`/`die Person`/`der Gast` and carry stereotype risk, so
+  they were dropped; learner-generated associations (generation effect) and retrieval-moment practice
+  carry the largest durable gains. Full findings + citations live under **backlog #4 in
+  `docs/PROJECT_REFERENCE.md`** (recorded this session; do not re-research), including two proposed
+  quiz exercises the founder flagged: the **"Meine Eselsbrücke" self-made memory hook** and an
+  **Artikel-Sprint** der/die/das drill.
+- **Second preview page** (panel findings + previews A–E). The founder picked **Preview B
+  (Artikel-Wesen: three non-human mascots, spiky-blue der / round-rose die / boxy-green das), Preview C
+  (fused per-word doodles), and Preview D (gender effects at answer-reveal)** for the **Theorie
+  cards**. Both preview pages are committed under **`preview/artikel-visuals/`** (open in a browser;
+  they follow light/dark).
+- **The build plan is `docs/plans/ARTIKEL_VISUALS_PLAN.md`:** three phased PRs (1: tokens + Wesen
+  marks on Karten/Tabelle/Liste + flip effect + one-time legend; 2: lazy doodle registry + batch 1 of
+  20 fused doodles; 3: reuse in session grading, graph card, flashcards), each with model
+  recommendations (Opus 4.8 for the cross-cutting wiring, **Fable 5 high for the Wesen/doodle art**,
+  Sonnet 5 for mechanical reuse), acceptance criteria, and guardrails (gender palette distinct from
+  `graphPalette.ts` domain colors, shape never color-only, reduced-motion, bundle budget, no
+  always-on animation).
+- **Founder selection rule for the 20 batch-1 doodle words (2026-07-18): high frequency AND highly
+  useful for Kapitel 1 of the game.** The plan encodes it: the 10 nouns Kapitel-1 missions directly
+  reference (6 die / 4 der / 0 das, listed in the plan) + 10 top-Zipf nouns from the Kapitel-1 mission
+  themes (`travel`/`technology`/`sustainability`/`wohnen`/`behoerde`) with a das-balance override
+  (>= 4 das-words in the batch), selection snippet included in the plan. (The five NEW s126 `alltag`
+  themes are not Kapitel-1 themes, so they don't enter batch 1.)
+- **Next session: implement the plan, starting with PR 1** (restart the branch from `main` first per
+  the merged-PR rule, since this session's docs PR has merged).
 
 **Handoff after session 127 (2026-07-17). Brand kit catalogue Vol. IV, on branch
 `claude/epic-ramanujan-p049i8`. Preview + docs only; no `src/` touched, no gates run.** The founder
@@ -98,49 +137,7 @@ accents; don't bulldoze the already-designed pages/menus/icons).
   (light + dark), regenerate logo/favicons/PWA icons from the mark, `pnpm build`, ship to `main`.
   Dark-mode previews of a favorite on request. Until then nothing brand-related changes in the app.
 
-**Handoff after session 126 (2026-07-17). Daily-life content scale-up (Phase A + Phase B, COMPLETE), on
-branch `claude/scale-words-domains-qjv9x4`, shipped to `main` across PRs #553–#558.** The founder:
-_"currently the app has mainly berufsleben words. Can you scope a task to scale up words from other
-domains?"_ → _"i chose both phase a and b"_ → _"go ahead with the plan"_ → _"yes go ahead with phase b"_.
-- **Scoped** `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`: Phase A deepens the 5 existing daily-life themes to
-  workplace parity; Phase B adds new everyday-life themes. Committed on the branch.
-- **Executed Phase A (four theme commits, PR #553, squash-merged to `main`):**
-  - `bank`: 43 → **81 vocab**, 38 → **50 colloc** (+38 v / +12 c).
-  - `bildung`: 46 → **80 vocab**, 39 → **50 colloc** (+34 v / +11 c).
-  - `behoerde`: 49 → **80 vocab**, 42 → **50 colloc** (+31 v / +8 c).
-  - `wohnen`: 57 → **80 vocab**, 45 → **50 colloc** (+23 v / +5 c); `arzt`: 74 → **80 vocab** (+6 v).
-  - Every item CEFR-tagged B1–B2, spread across the theme's 4 sub-themes (deliberately lifting the thin
-    ones, e.g. behoerde.bescheid/aufenthalt, bildung.anerkennung/weiterbildung, wohnen.suche/vertrag). One
-    `provenance.ts` row per id (all `review_status: "draft"`, DWDS/Wiktionary references). New bank totals:
-    **1,378 vocabulary / 811 collocations / 2,620 provenance rows.**
-  - Gates per theme: `pnpm lint:content` ✔, `pnpm build:frequency` (regenerated), `pnpm verify:facts`
-    (0 two-oracle-confirmed errors; the 7 review signals are all pre-existing dual-gender headwords, none
-    from this work), `pnpm build` ✔.
-- **Phase B (COMPLETE): five NEW `alltag` themes, one PR each, all squash-merged to `main`:**
-  - `einkaufen` (Einkaufen & Geschäfte, #554), `essen` (Essen & Restaurant, #555), `mobilitaet` (Mobilität
-    & Verkehr, #556), `freizeit` (Freizeit & Soziales, #557), `digitales` (Handy, Internet & Digitales,
-    #558). Each is a full `behoerde`-shape pack: **49 vocab / 40 collocations / 2 dialogues / 2 texts /
-    3 Can-Do / 1 writing prompt / ~97 provenance rows**, spread across 4 sub-themes, CEFR-tagged B1–B2.
-  - Per theme, wired: `types/index.ts` `ThemeId` + `scripts/lint-content.mjs` `THEME_IDS` (kept in sync),
-    a new lucide icon in `src/lib/icons.ts` (ShoppingCart/UtensilsCrossed/Bus/PartyPopper/Smartphone), the
-    `src/data/themes.ts` record, and the required `writingPrompts` entry (the `Record<ThemeId>` type forces
-    it). **Locked success metric held:** no feature/component code changed except the one-line city rollup.
-  - **City buildings:** einkaufen's PR added `domains: ["alltag"]` to the **Wohnhaus** building so all five
-    new (and any future) unclaimed `alltag` themes fold in by domain rollup; bank/behoerde/wohnen stay
-    explicitly claimed first. Updated `tests/city-mastery.test.ts` (`toContain("wohnen")`) for the
-    full-coverage invariant. A dedicated "consumer/town-life" building is a possible future founder call.
-  - Gates each PR: lint:content, build:frequency, verify:facts (0 errors), build, **test:unit 146/146**,
-    check:bundle 79.6 kB, eslint 0 errors.
-- **Recurring gotcha (both phases):** many planned ids collided with existing entries in OTHER themes
-  (shopping ↔ customer, food ↔ customer, transport ↔ travel/logistics, digital ↔ technology). **Pre-check
-  every candidate id with `grep -c 'id: "v_X"'` / `'id: "c_X"'` across the whole bank BEFORE authoring** to
-  avoid rework; pick theme-distinct words rather than duplicating a concept already tagged elsewhere.
-- **Next / follow-ups:** the whole scale-up plan is done. Natural continuations: (1) founder review pass to
-  flip the new `draft` provenance rows to `verified` (use `pnpm review:queue`); (2) exam sets / more
-  dialogues for the new themes if depth is wanted; (3) a dedicated city building for the consumer themes if
-  the Wohnhaus fold feels wrong. Nothing is blocking.
-
-_(Session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
+_(Session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
 + P0/P1 fixes handoff, session 121's
 arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening

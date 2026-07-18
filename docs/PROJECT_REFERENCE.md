@@ -35,6 +35,14 @@ Only use content under these licenses — anything else blocks monetization:
 - **AnkiDroid / AnkiCore ecosystem** — underlying SRS algorithm and app variants are open-source. Could inform future SRS improvements (the current `engine/srs.ts` implements FSRS-6 since s53; SM-2 fields kept warm for rollback).
 - **LARA (Learning and Reading Assistant)** — open-source platform for building interactive reading materials with audio + translation. Relevant if we add a reading-comprehension module later.
 
+### Visual gender cues + gender-mnemonic exercises (evidence panel, 2026-07-18)
+How to teach `der`/`die`/`das` visually, and two proposed quiz exercises (Artikel-Sprint drill +
+learner-made "Eselsbrücke" association), grounded in a three-expert evidence panel. Full findings,
+the four-layer recommendation, and citations live in **Backlog #4** below (don't re-research).
+Headline: fused meaning+gender imagery and learner-generated associations have the strongest
+evidence; human-persona (moustache-man) imagery teaches a false rule on `das Mädchen`/`die Person`/
+`der Gast` and is dropped; a consistent shape+color+letter marker is the always-on category flag.
+
 ### Writing eval infrastructure
 - LanguageTool (LGPL, hosted API w/ free tier) for error categories; RAG is overkill for a single-insight output.
 - Supabase supports anonymous sign-in, pgvector (unused), Edge Functions for secret-safe LLM calls from a static GitHub Pages SPA.
@@ -56,6 +64,77 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
    workplace scenarios with animated characters (beyond today's text-based branching dialogues).
 4. **Visual mnemonics for vocabulary:** icons/illustrations per noun gender — e.g. man, woman,
    baby/neutral or non-living-thing — to aid visual memory of `der`/`die`/`das`.
+   - **RESEARCHED 2026-07-18 (branch `claude/visual-gender-indicators-gsox24`).** Ran a three-expert
+     evidence panel (SLA researcher, memory scientist, product/illustration designer) on how best to
+     add visual gender cues, and produced two design-preview artifacts (an ArticleBadge/graph-ring
+     survey and a doodle-evidence deck with interactive mockups). Findings below are the reusable
+     conclusion; do not re-research.
+   - **SCOPED 2026-07-18 (same session): implementation plan in
+     `docs/plans/ARTIKEL_VISUALS_PLAN.md`.** The founder picked Preview B (Artikel-Wesen mascots as
+     the gender mark), Preview C (fused doodles, batch 1 = 20 nouns chosen for high frequency AND
+     Kapitel-1 game usefulness), and Preview D (gender effects on card flip) for the Theorie cards.
+     Three phased PRs with per-phase model recommendations; implementation starts in a follow-up
+     session from that plan.
+   - **The founder's "gendered person" instinct (man/woman/child per gender) is half right and half a
+     trap.** Imagery for gender IS well-supported: the largest study (Santos 2015, *Language Teaching
+     Research*, n=283) found images that fuse a noun's MEANING and its GENDER into one picture gave
+     >100% better gender+meaning recall than showing the article alone; color-coding alone was NOT
+     significant; gendered voices were the WORST condition. BUT human-persona imagery backfires
+     exactly where German gender is hardest, because grammatical gender is a property of the WORD, not
+     the referent: `das Mädchen` (girl, neuter), `die Person`/`die Fachkraft` (feminine for anyone),
+     `der Gast`/`der Mensch` (masculine for anyone). A moustache-man on `der Gast` or a child mark on
+     `das Mädchen` teaches a false rule (congruency research predicts interference on these items), and
+     stereotyped man/woman iconography is a liability in a workplace app for adult immigrants. No
+     mainstream app (Duolingo, Babbel, Seedlang, Drops, Memrise, popular Anki decks) stamps human
+     personas on nouns; the industry norm is color coding, and even that draws "it gets on my nerves"
+     fatigue complaints.
+   - **Two memory-science guardrails.** (a) A repeated "bizarre/funny" marker self-defeats: the
+     bizarreness effect only works through CONTRAST, so the same huge moustache on ~400 der-words is a
+     "pure list" that fades to wallpaper, and meaning-irrelevant decoration measurably HURTS learning
+     (seductive-details effect, g ≈ −0.33). (b) A shared marker is a legitimate CATEGORY flag (its job
+     is to signal gender), but it can never be a per-word memory hook (cue overload); do not market or
+     measure it as one.
+   - **Recommended four-layer system (persona-free):**
+     1. **Layer 1 (always on): three hand-drawn Artikel-Marken**, one per gender, triple-encoded as
+        shape + color + the article's own last letter (deR triangle / diE circle / daS square).
+        Colors follow the textbook convention (der blue, die rose, das green), kept as soft pastel
+        chips so brand indigo stays the loud accent, and NOT reusing the six domain colors from
+        `lib/graphPalette.ts`. Shape carries the meaning so it survives 16px, dark mode, and
+        color-blindness (color alone must never be the sole channel). This is the ArticleBadge, used
+        on every noun surface (Karten/Tabelle/Liste, flashcards, session blocks, graph selected-node
+        card), taught once via a legend tooltip. A thin gender-colored ring on noun nodes in the
+        Wörter graph is the same idea applied there.
+     2. **Layer 2 (the loud moment, at RETRIEVAL, where memory actually forms): two new quiz/session
+        exercises.** (i) an **Artikel-Sprint** block for the session composer, a rapid-fire der/die/das
+        drill against a streak/timer (the single best-loved gender feature across competitor apps; the
+        content is free since every noun already stores its article), and (ii) a ~500ms gender-specific
+        answer-reveal effect on a correct answer (der bursts, die blooms, das shatters; three CSS
+        animations, zero per-word art, `useReducedMotion`-guarded). The Fluent-Forever "effect per
+        gender" idea is untested folklore but cheap and theory-consistent, so it rides here.
+     3. **Layer 3 (scoped fused art): per-word doodles that fuse meaning + gender** (a non-human
+        "Artikel-Wesen" mascot interacting with the referent) for only the top ~100 hardest/highest-
+        frequency nouns (full bank = 200-600h of illustration, not viable). Three mascots, whose
+        genderedness is purely linguistic labeling, double as Neuland characters that "collect" words
+        of their article.
+     4. **Layer 4 (personal, HIGHEST durable effect): the "Meine Eselsbrücke" self-made memory hook**
+        (the founder-flagged quiz exercise). An OPTIONAL slot on the card back / answer-reveal where
+        the learner types their own association (plus tappable emoji to build a quick mental image),
+        because self-generated associations beat supplied ones (generation effect d ≈ 0.4, rising to
+        ≈ 0.64 after a day; drawing effect larger still) and the advantage GROWS with delay. Low
+        adoption by design (most learners skip it), outsized benefit for those who use it; store it
+        per-word (rides the progress store), never force it, do not measure success by usage %.
+   - **Dropped by the evidence:** human personas with gendered features (false rule on
+     Mädchen/Person/Gast + stereotype exposure), bank-wide bizarre/funny imagery (contrast collapse),
+     color as the ONLY channel (mixed evidence, accessibility fail), gendered voices (worst condition).
+   - **Key sources:** Santos 2015 (images vs colors vs voices for German gender, n=283); Arzt & Kost
+     2016 (*Die Unterrichtspraxis*, color vs gendered-actor figures); Desrochers et al. 1989/1991
+     (keyword method, gender tag must be INSIDE the image + explicit instruction); Bertsch et al. 2007
+     (generation-effect meta-analysis); Sundararajan & Adesope 2020 (seductive-details meta-analysis);
+     McDaniel & Einstein (bizarreness needs mixed lists); Watkins (cue-overload principle); Boroditsky
+     et al. (gender personification, ~78% congruent). Per-condition numbers came from abstracts and
+     secondary summaries (full texts were paywalled/403-blocked); re-verify before quoting in any
+     user-facing/marketing copy. When this item is scoped for build, Layers 1+2 are the cheap
+     high-evidence first PR; Layers 3+4 follow.
 5. **Domain-based filtering for Vocabulary, Collocations, and scenario-based learning:**
    split content into "Bürokratie / bureaucratic work" vs. "office work," and within office
    work, further filter by industry/sector.

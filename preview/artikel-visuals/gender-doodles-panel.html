@@ -1,0 +1,642 @@
+<title>Genauly · Gender Doodles: Panel Findings + Previews</title>
+<style>
+  /* ---------- Tokens mirrored from src/index.css ---------- */
+  :root {
+    --bg: hsl(240 20% 99%);
+    --fg: hsl(240 12% 12%);
+    --surface: hsl(0 0% 100%);
+    --muted: hsl(240 16% 95%);
+    --muted-fg: hsl(240 6% 44%);
+    --border: hsl(240 14% 90%);
+    --primary: hsl(245 70% 60%);
+    --success: hsl(152 56% 42%);
+    --warn: hsl(35 90% 45%);
+    --danger: hsl(0 72% 51%);
+
+    --der: #2563eb;
+    --die: #db2777;
+    --das: #16a34a;
+    --der-bg: #dbeafe;
+    --die-bg: #fce7f3;
+    --das-bg: #dcfce7;
+
+    --canvas: hsl(240 20% 97%);
+    --annot: hsl(240 6% 40%);
+    --ink: hsl(240 10% 25%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: hsl(223 38% 11%);
+      --fg: hsl(220 24% 94%);
+      --surface: hsl(223 34% 15%);
+      --muted: hsl(223 26% 23%);
+      --muted-fg: hsl(220 20% 76%);
+      --border: hsl(223 24% 27%);
+      --primary: hsl(245 84% 74%);
+      --success: hsl(152 52% 50%);
+      --warn: hsl(38 90% 60%);
+      --danger: hsl(0 80% 68%);
+      --der: #7aa5f8;
+      --die: #f27bb8;
+      --das: #5fc98b;
+      --der-bg: rgba(59, 100, 200, 0.28);
+      --die-bg: rgba(190, 60, 130, 0.28);
+      --das-bg: rgba(40, 140, 90, 0.28);
+      --canvas: hsl(223 36% 9%);
+      --annot: hsl(220 16% 70%);
+      --ink: hsl(220 20% 85%);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: hsl(223 38% 11%); --fg: hsl(220 24% 94%); --surface: hsl(223 34% 15%);
+    --muted: hsl(223 26% 23%); --muted-fg: hsl(220 20% 76%); --border: hsl(223 24% 27%);
+    --primary: hsl(245 84% 74%); --success: hsl(152 52% 50%); --warn: hsl(38 90% 60%); --danger: hsl(0 80% 68%);
+    --der: #7aa5f8; --die: #f27bb8; --das: #5fc98b;
+    --der-bg: rgba(59,100,200,0.28); --die-bg: rgba(190,60,130,0.28); --das-bg: rgba(40,140,90,0.28);
+    --canvas: hsl(223 36% 9%); --annot: hsl(220 16% 70%); --ink: hsl(220 20% 85%);
+  }
+  :root[data-theme="light"] {
+    --bg: hsl(240 20% 99%); --fg: hsl(240 12% 12%); --surface: hsl(0 0% 100%);
+    --muted: hsl(240 16% 95%); --muted-fg: hsl(240 6% 44%); --border: hsl(240 14% 90%);
+    --primary: hsl(245 70% 60%); --success: hsl(152 56% 42%); --warn: hsl(35 90% 45%); --danger: hsl(0 72% 51%);
+    --der: #2563eb; --die: #db2777; --das: #16a34a;
+    --der-bg: #dbeafe; --die-bg: #fce7f3; --das-bg: #dcfce7;
+    --canvas: hsl(240 20% 97%); --annot: hsl(240 6% 40%); --ink: hsl(240 10% 25%);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg); color: var(--fg);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55; margin: 0; padding: 0 1.25rem 6rem;
+  }
+  main { max-width: 62rem; margin: 0 auto; }
+
+  header.sheet { padding: 3.5rem 0 1rem; }
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--annot);
+  }
+  header.sheet h1 { font-size: clamp(1.6rem, 4vw, 2.2rem); letter-spacing: -0.02em; margin: 0.4rem 0 0.6rem; text-wrap: balance; }
+  header.sheet p.lede { color: var(--muted-fg); max-width: 47rem; margin: 0; }
+
+  section { margin-top: 3.4rem; }
+  .sec-head { display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap; }
+  .sec-num { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.8rem; color: var(--primary); font-weight: 700; }
+  .sec-head h2 { font-size: 1.25rem; letter-spacing: -0.01em; margin: 0; }
+  .meta-chip {
+    font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.15rem 0.55rem; border-radius: 999px; border: 1px solid var(--border);
+    color: var(--muted-fg); background: var(--surface); white-space: nowrap;
+  }
+  .meta-chip.good { color: var(--success); border-color: color-mix(in srgb, var(--success) 40%, var(--border)); }
+  .meta-chip.warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 40%, var(--border)); }
+  .meta-chip.bad { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, var(--border)); }
+  .meta-chip.hot { color: var(--primary); border-color: color-mix(in srgb, var(--primary) 40%, var(--border)); }
+  section > p.note { color: var(--muted-fg); max-width: 47rem; margin: 0.5rem 0 1.1rem; font-size: 0.925rem; }
+
+  .canvas {
+    background: var(--canvas); border: 1px solid var(--border); border-radius: 1.25rem;
+    padding: 1.5rem; display: flex; flex-direction: column; gap: 1.4rem; overflow-x: auto;
+  }
+  .canvas-label {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--annot);
+    margin: 0 0 -0.5rem;
+  }
+  .row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-start; }
+
+  /* ---------- Expert cards ---------- */
+  .experts { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: 1rem; }
+  .expert { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.1rem 1.2rem; }
+  .expert h3 { margin: 0 0 0.15rem; font-size: 0.95rem; }
+  .expert .role { color: var(--annot); font-size: 0.72rem; font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; text-transform: uppercase; letter-spacing: 0.08em; }
+  .expert ul { margin: 0.7rem 0 0; padding-left: 1.05rem; font-size: 0.85rem; color: var(--muted-fg); }
+  .expert li { margin: 0.35rem 0; }
+  .expert li b { color: var(--fg); font-weight: 650; }
+
+  .consensus {
+    margin-top: 1rem; border-left: 3px solid var(--primary);
+    background: var(--surface); border-radius: 0.75rem; padding: 1rem 1.2rem;
+    font-size: 0.95rem; max-width: 100%;
+  }
+  .consensus b { font-weight: 700; }
+
+  /* ---------- Scoreboard ---------- */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 1rem; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; min-width: 46rem; font-size: 0.85rem; }
+  th, td { text-align: left; padding: 0.6rem 0.9rem; border-top: 1px solid var(--border); vertical-align: top; }
+  thead th { border-top: 0; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--annot); }
+  td.strat { font-weight: 650; white-space: nowrap; }
+  .pill { font-size: 0.68rem; font-weight: 700; padding: 0.14rem 0.5rem; border-radius: 999px; white-space: nowrap; }
+  .pill.strong { background: var(--das-bg); color: var(--das); }
+  .pill.mixed { background: color-mix(in srgb, var(--warn) 18%, transparent); color: var(--warn); }
+  .pill.weak { background: var(--muted); color: var(--muted-fg); }
+  .pill.against { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+  .pill.untested { background: var(--muted); color: var(--muted-fg); }
+  td.note { color: var(--muted-fg); }
+
+  /* ---------- App atoms ---------- */
+  .vcard {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 1rem;
+    padding: 0.9rem 1rem; box-shadow: 0 1px 2px hsl(240 30% 30% / 0.06), 0 4px 12px hsl(240 30% 30% / 0.05);
+    width: 15.5rem; position: relative;
+  }
+  .vcard .w { font-weight: 650; font-size: 1rem; display: flex; align-items: center; gap: 0.45rem; }
+  .vcard .en { color: var(--muted-fg); font-size: 0.82rem; margin-top: 0.15rem; }
+  .vcard .foot { display: flex; gap: 0.4rem; margin-top: 0.65rem; flex-wrap: wrap; }
+  .badge { font-size: 0.66rem; font-weight: 600; padding: 0.12rem 0.5rem; border-radius: 999px; background: var(--muted); color: var(--muted-fg); }
+  .flag { font-size: 0.66rem; font-weight: 700; padding: 0.12rem 0.5rem; border-radius: 999px; }
+  .flag.bad { background: color-mix(in srgb, var(--danger) 14%, transparent); color: var(--danger); }
+  .flag.ok { background: var(--das-bg); color: var(--das); }
+
+  .doodle { display: inline-block; flex: none; }
+  .doodle svg { display: block; }
+
+  .marklegend { display: flex; gap: 1.6rem; flex-wrap: wrap; align-items: center; }
+  .marklegend .item { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: var(--muted-fg); }
+  .marklegend .item b { color: var(--fg); }
+
+  .sizes { display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap; }
+  .sizes .stop { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; font-size: 0.7rem; color: var(--annot); font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+
+  /* ---------- Mascots ---------- */
+  .mascotcard {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 1rem;
+    padding: 1.1rem; width: 13rem; text-align: center;
+  }
+  .mascotcard h4 { margin: 0.6rem 0 0.1rem; font-size: 0.9rem; }
+  .mascotcard .sub { color: var(--muted-fg); font-size: 0.76rem; }
+
+  /* ---------- Effects stage ---------- */
+  .fxrow { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .fxstage {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 1rem;
+    width: 15rem; height: 11.5rem; position: relative; overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.3rem;
+  }
+  .fxstage .word { font-weight: 650; font-size: 1.05rem; z-index: 2; }
+  .fxstage .art-lab { font-size: 0.78rem; font-weight: 700; z-index: 2; }
+  .fxstage button {
+    z-index: 2; margin-top: 0.55rem; font-size: 0.72rem; font-weight: 600;
+    background: var(--muted); color: var(--fg); border: 1px solid var(--border);
+    border-radius: 999px; padding: 0.3rem 0.8rem; cursor: pointer; font-family: inherit;
+  }
+  .fxstage button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+  .fx { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+
+  /* der: burst */
+  .burst-ray { position: absolute; left: 50%; top: 42%; width: 3px; height: 26px; border-radius: 2px; background: var(--der); opacity: 0; transform-origin: center 0; }
+  .fxstage.play-der .burst-ray { animation: ray 0.55s ease-out forwards; }
+  @keyframes ray {
+    0% { opacity: 0; transform: rotate(var(--a)) translateY(6px) scaleY(0.3); }
+    25% { opacity: 1; }
+    100% { opacity: 0; transform: rotate(var(--a)) translateY(58px) scaleY(1); }
+  }
+  /* die: bloom */
+  .bloom-ring { position: absolute; left: 50%; top: 42%; width: 20px; height: 20px; margin: -10px; border: 3px solid var(--die); border-radius: 999px; opacity: 0; }
+  .fxstage.play-die .bloom-ring { animation: bloom 0.7s ease-out forwards; }
+  @keyframes bloom {
+    0% { opacity: 0.9; transform: scale(0.4); }
+    100% { opacity: 0; transform: scale(4.6); }
+  }
+  .fxstage.play-die .bloom-ring:nth-child(2) { animation-delay: 0.12s; }
+  .fxstage.play-die .bloom-ring:nth-child(3) { animation-delay: 0.24s; }
+  /* das: shatter */
+  .shard { position: absolute; left: 50%; top: 42%; width: 11px; height: 11px; background: var(--das); opacity: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+  .fxstage.play-das .shard { animation: shard 0.6s ease-out forwards; }
+  @keyframes shard {
+    0% { opacity: 1; transform: translate(0,0) rotate(0deg) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.5); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .fxstage.play-der .burst-ray, .fxstage.play-die .bloom-ring, .fxstage.play-das .shard { animation: none; opacity: 0.35; }
+    .fxstage.play-der .burst-ray { transform: rotate(var(--a)) translateY(30px); }
+    .fxstage.play-die .bloom-ring { transform: scale(2.4); }
+    .fxstage.play-das .shard { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); }
+  }
+
+  /* ---------- Eselsbrücke + drill ---------- */
+  .esels {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 1rem;
+    padding: 1rem 1.1rem; width: 19rem;
+  }
+  .esels .lab { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--annot); font-weight: 700; }
+  .esels .input {
+    margin-top: 0.5rem; border: 1.5px dashed var(--border); border-radius: 0.7rem;
+    padding: 0.55rem 0.7rem; font-size: 0.85rem; color: var(--muted-fg); background: var(--muted);
+  }
+  .esels .emojis { display: flex; gap: 0.4rem; margin-top: 0.55rem; font-size: 1.05rem; }
+  .esels .emojis span { background: var(--muted); border-radius: 0.5rem; padding: 0.15rem 0.35rem; cursor: default; }
+
+  .drill { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.1rem; width: 19rem; text-align: center; }
+  .drill .q { font-size: 1.25rem; font-weight: 650; margin: 0.4rem 0 0.9rem; }
+  .drill .q .blank { color: var(--muted-fg); }
+  .drill .opts { display: flex; gap: 0.5rem; justify-content: center; }
+  .drill .opts span {
+    flex: 1; max-width: 5rem; padding: 0.5rem 0; border-radius: 0.7rem; font-weight: 700; font-size: 0.9rem;
+    border: 1.5px solid var(--border); background: var(--muted);
+  }
+  .drill .streak { margin-top: 0.8rem; font-size: 0.72rem; color: var(--muted-fg); }
+
+  /* ---------- Verdict ---------- */
+  .verdict { margin-top: 4rem; border-top: 1px solid var(--border); padding-top: 1.6rem; }
+  .verdict h2 { font-size: 1.15rem; margin: 0 0 0.8rem; }
+  .verdict ol { margin: 0; padding-left: 1.2rem; color: var(--muted-fg); max-width: 47rem; }
+  .verdict li { margin: 0.38rem 0; }
+  .verdict li b { color: var(--fg); font-weight: 650; }
+  .sources { margin-top: 1.4rem; font-size: 0.75rem; color: var(--annot); max-width: 47rem; }
+</style>
+
+<main>
+  <header class="sheet">
+    <div class="eyebrow">Genauly · Expert Panel + Design Preview · 2026-07-17</div>
+    <h1>Gender doodles: what the evidence says, and what to build</h1>
+    <p class="lede">Three research passes (second-language acquisition, memory science, competitor/illustration practice) evaluated the "moustache stick figure" idea against published evidence, then shaped what survives into buildable previews. Sections 01 to 03 are the findings; 04 to 08 are the previews.</p>
+  </header>
+
+  <!-- ============ 01 Panel ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>The panel, in brief</h2></div>
+    <div class="experts">
+      <div class="expert">
+        <div class="role">SLA research</div>
+        <h3>What studies on gender + imagery show</h3>
+        <ul>
+          <li>Largest study (Santos 2015, n=283): images that <b>fuse meaning and gender into one picture</b> beat everything; over 106% better gender+meaning recall than article-only. <b>Color alone: no significant effect.</b> Gendered voices: worst condition.</li>
+          <li>Keyword-method work (Desrochers 1989/1991): imagery helps <b>only when the gender tag is inside the image</b> and the learner is told what it means. A cue floating next to the word does little.</li>
+          <li>Gendered actor figures (Arzt &amp; Kost 2016): no immediate advantage, modest delayed-retention win. Weaker than fused imagery.</li>
+          <li>Congruency research predicts person-imagery <b>backfires on mismatch words</b> (das Mädchen, die Person, der Gast).</li>
+        </ul>
+      </div>
+      <div class="expert">
+        <div class="role">Memory science</div>
+        <h3>What makes images stick, and backfire</h3>
+        <ul>
+          <li><b>Bizarreness only works through contrast.</b> One huge moustache repeated across ~400 der-words is a "pure list": the joke becomes wallpaper and the effect vanishes.</li>
+          <li>Decorative, meaning-irrelevant images <b>hurt</b> learning (seductive-details effect, g ≈ −0.33). A doodle must read as a functional label, not a cartoon.</li>
+          <li>A shared marker works as a <b>category flag</b> (this is fine, that is its job), never as a per-word memory hook (cue overload).</li>
+          <li><b>Learner-generated associations are the biggest durable win</b> (generation effect d ≈ 0.4, growing to ≈ 0.64 after a day; drawing effect larger still).</li>
+          <li>Memory forms at <b>retrieval</b>, not exposure: put the loud moment at answer-reveal, keep browsing quiet.</li>
+        </ul>
+      </div>
+      <div class="expert">
+        <div class="role">Product + illustration</div>
+        <h3>What real apps do, what scales</h3>
+        <ul>
+          <li><b>No mainstream app stamps human personas on nouns.</b> Industry practice is color (Seedlang, Anki decks, textbooks), and even that draws "it gets on my nerves" fatigue complaints.</li>
+          <li>The loved feature everywhere is the <b>gender drill</b>, not the decoration.</li>
+          <li>Per-word custom doodles for 1,246 words: 200 to 600 hours, consistency drift near-certain. <b>Three shared marks: trivial.</b></li>
+          <li>Moustache-man imagery in a workplace app for adult immigrants carries <b>stereotype and false-rule risk</b>; route character energy into non-human mascots instead.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="consensus">
+      <b>Panel consensus:</b> the instinct to use imagery for gender is well-supported, and the moustache instinct points at the right mechanism (personification attaches easily to nouns). But the winning form is different: a <b>small, fixed, shape-distinct 3-mark system</b> for every card, <b>non-human mascots</b> if you want character, <b>fused meaning+gender doodles only for a scoped top-100 hardest words</b>, the <b>loud memorable moment at answer-reveal</b>, and an <b>optional learner-made association</b> to capture the largest effect in the literature.
+    </div>
+  </section>
+
+  <!-- ============ 02 Scoreboard ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>Evidence scoreboard</h2></div>
+    <p class="note">Every strategy the panel assessed, ranked by how much published evidence actually backs it.</p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Strategy</th><th>Evidence</th><th>Panel note</th></tr></thead>
+        <tbody>
+          <tr><td class="strat">Fused meaning+gender image (per word)</td><td><span class="pill strong">Strong</span></td><td class="note">Best result in the largest study. Prohibitive at 1,246 words; viable for a scoped top-100.</td></tr>
+          <tr><td class="strat">Consistent 3-mark system (shape+color+letter)</td><td><span class="pill strong">Solid as category flag</span></td><td class="note">Right tool for always-on labeling: schema, low load, accessible. Won't make individual words memorable, and that is fine.</td></tr>
+          <tr><td class="strat">Learner-generated association</td><td><span class="pill strong">Strong</span></td><td class="note">Generation/drawing effects are among the largest, most durable in memory science.</td></tr>
+          <tr><td class="strat">Gender drill at retrieval</td><td><span class="pill strong">Strong</span></td><td class="note">Retrieval practice is the bedrock finding; also the best-loved feature in competitor apps.</td></tr>
+          <tr><td class="strat">Gendered actor / persona figures</td><td><span class="pill mixed">Mixed</span></td><td class="note">One modest delayed win; congruency research predicts interference on mismatch words; stereotype exposure.</td></tr>
+          <tr><td class="strat">Color coding alone</td><td><span class="pill mixed">Mixed</span></td><td class="note">Null in the biggest study, slight delayed win in another. Fine as a redundant secondary channel, never the sole carrier.</td></tr>
+          <tr><td class="strat">Bizarre/funny marker repeated bank-wide</td><td><span class="pill against">Self-defeating</span></td><td class="note">Bizarreness needs contrast; applied to every word it collapses, and risks the seductive-details penalty.</td></tr>
+          <tr><td class="strat">"Gender worlds" effects (explode/bloom/shatter)</td><td><span class="pill untested">Untested folklore</span></td><td class="note">No direct study, but consistent with fused-imagery theory. Cheap (3 animations), so worth shipping at the retrieval moment.</td></tr>
+          <tr><td class="strat">Gendered voices (audio)</td><td><span class="pill against">Against</span></td><td class="note">Worst condition in Santos 2015. Skip.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 03 Moustache tested ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>The moustache, tested honestly</h2><span class="meta-chip warn">Charming, but a trap</span></div>
+    <p class="note">Your idea works on regular words and breaks exactly where German gender is hardest. Grammatical gender is a property of the word, not the person: the figure teaches a false rule on mismatch words, and by word 400 the same moustache is wallpaper (no contrast, no bizarreness effect).</p>
+    <div class="canvas">
+      <p class="canvas-label">Where it works vs where it teaches a false rule</p>
+      <div class="row">
+        <div class="vcard">
+          <div class="w">
+            <span class="doodle"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="var(--der)" stroke-width="2" stroke-linecap="round">
+              <circle cx="17" cy="10" r="5.5"/>
+              <path d="M17 16 V26 M17 19 L11 23 M17 19 L23 23 M17 26 L12 32 M17 26 L22 32"/>
+              <path d="M11.5 11.5 Q14 14.5 17 12.5 Q20 14.5 22.5 11.5" stroke-width="2.6"/>
+            </svg></span>
+            der Vertrag
+          </div>
+          <div class="en">contract</div>
+          <div class="foot"><span class="flag ok">funktioniert</span></div>
+        </div>
+        <div class="vcard">
+          <div class="w">
+            <span class="doodle"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="var(--der)" stroke-width="2" stroke-linecap="round">
+              <circle cx="17" cy="10" r="5.5"/>
+              <path d="M17 16 V26 M17 19 L11 23 M17 19 L23 23 M17 26 L12 32 M17 26 L22 32"/>
+              <path d="M11.5 11.5 Q14 14.5 17 12.5 Q20 14.5 22.5 11.5" stroke-width="2.6"/>
+            </svg></span>
+            der Gast
+          </div>
+          <div class="en">guest (any gender, incl. women)</div>
+          <div class="foot"><span class="flag bad">falsche Regel</span></div>
+        </div>
+        <div class="vcard">
+          <div class="w">
+            <span class="doodle"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="var(--das)" stroke-width="2" stroke-linecap="round">
+              <rect x="9" y="9" width="16" height="16" rx="2"/>
+              <circle cx="14" cy="15" r="1" fill="var(--das)" stroke="none"/><circle cx="20" cy="15" r="1" fill="var(--das)" stroke="none"/>
+            </svg></span>
+            das Mädchen
+          </div>
+          <div class="en">girl, but grammatically neuter</div>
+          <div class="foot"><span class="flag bad">Konflikt</span></div>
+        </div>
+        <div class="vcard">
+          <div class="w">
+            <span class="doodle"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" stroke="var(--die)" stroke-width="2" stroke-linecap="round">
+              <circle cx="17" cy="10" r="5.5"/>
+              <path d="M13 16 L21 16 L23 27 L11 27 Z M14 27 L13 32 M20 27 L21 32"/>
+            </svg></span>
+            die Person
+          </div>
+          <div class="en">person (any gender, incl. men)</div>
+          <div class="foot"><span class="flag bad">Konflikt</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 04 Marks ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>Preview A · Hand-drawn Artikel-Marken</h2><span class="meta-chip hot">Panel pick: always-on layer</span><span class="meta-chip">3 assets total</span></div>
+    <p class="note">Three wobbly hand-drawn marks, one per gender, triple-encoded: distinct shape + color + the article's own last letter (deR, diE, daS). They read as functional labels (no seductive-details penalty), survive 16px and dark mode, and keep the doodle warmth through one deliberate imperfection per mark. Shown once in a legend the learner is explicitly taught (a one-time tooltip), then everywhere.</p>
+    <div class="canvas">
+      <p class="canvas-label">The three marks</p>
+      <div class="marklegend">
+        <div class="item">
+          <span class="doodle"><svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <path d="M28 8 Q29 8 30.5 10.5 L47 42 Q48 44.5 45 44.5 L11.5 45 Q8.5 45 10 42 L25.5 10.5 Q26.8 8 28 8 Z" stroke="var(--der)" stroke-width="3" stroke-linejoin="round" fill="var(--der-bg)"/>
+            <text x="28" y="40" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="800" font-size="17" fill="var(--der)">r</text>
+          </svg></span>
+          <span><b>der</b> · Dreieck</span>
+        </div>
+        <div class="item">
+          <span class="doodle"><svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <path d="M28 9 Q45 8 46.5 26 Q47.8 45 28.5 46.5 Q10 47.5 9.2 28.5 Q8.5 11 26 9.2" stroke="var(--die)" stroke-width="3" stroke-linecap="round" fill="var(--die-bg)"/>
+            <text x="28" y="34.5" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="800" font-size="17" fill="var(--die)">e</text>
+          </svg></span>
+          <span><b>die</b> · Kreis</span>
+        </div>
+        <div class="item">
+          <span class="doodle"><svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <path d="M13 12 L44 10.5 Q46 10.5 46 13 L45 43 Q45 45 42.5 45 L13.5 45.5 Q11 45.5 11 43 L11.5 14 Q11.5 12 13 12 Z" stroke="var(--das)" stroke-width="3" stroke-linejoin="round" fill="var(--das-bg)"/>
+            <text x="28.5" y="34.5" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="800" font-size="17" fill="var(--das)">s</text>
+          </svg></span>
+          <span><b>das</b> · Quadrat</span>
+        </div>
+      </div>
+
+      <p class="canvas-label">Legibility check: 40px card corner · 24px badge · 16px table row</p>
+      <div class="sizes">
+        <div class="stop">
+          <span class="doodle"><svg width="40" height="40" viewBox="0 0 56 56" fill="none"><path d="M28 8 Q29 8 30.5 10.5 L47 42 Q48 44.5 45 44.5 L11.5 45 Q8.5 45 10 42 L25.5 10.5 Q26.8 8 28 8 Z" stroke="var(--der)" stroke-width="3.4" stroke-linejoin="round" fill="var(--der-bg)"/><text x="28" y="40" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-weight="800" font-size="18" fill="var(--der)">r</text></svg></span>
+          <span>40px</span>
+        </div>
+        <div class="stop">
+          <span class="doodle"><svg width="24" height="24" viewBox="0 0 56 56" fill="none"><path d="M28 8 Q29 8 30.5 10.5 L47 42 Q48 44.5 45 44.5 L11.5 45 Q8.5 45 10 42 L25.5 10.5 Q26.8 8 28 8 Z" stroke="var(--der)" stroke-width="4.5" stroke-linejoin="round" fill="var(--der-bg)"/></svg></span>
+          <span>24px (letter dropped)</span>
+        </div>
+        <div class="stop">
+          <span class="doodle"><svg width="16" height="16" viewBox="0 0 56 56" fill="none"><path d="M28 8 L47 44 L10 44 Z" fill="var(--der)"/></svg></span>
+          <span>16px (solid fill)</span>
+        </div>
+      </div>
+
+      <p class="canvas-label">On the Karten view</p>
+      <div class="row">
+        <div class="vcard">
+          <div class="w">
+            <span class="doodle"><svg width="26" height="26" viewBox="0 0 56 56" fill="none"><path d="M28 9 Q45 8 46.5 26 Q47.8 45 28.5 46.5 Q10 47.5 9.2 28.5 Q8.5 11 26 9.2" stroke="var(--die)" stroke-width="4.2" stroke-linecap="round" fill="var(--die-bg)"/></svg></span>
+            die Besprechung
+          </div>
+          <div class="en">meeting, discussion</div>
+          <div class="foot"><span class="badge">B2.1</span><span class="badge">häufig</span></div>
+        </div>
+        <div class="vcard">
+          <div class="w">
+            <span class="doodle"><svg width="26" height="26" viewBox="0 0 56 56" fill="none"><path d="M28 8 Q29 8 30.5 10.5 L47 42 Q48 44.5 45 44.5 L11.5 45 Q8.5 45 10 42 L25.5 10.5 Q26.8 8 28 8 Z" stroke="var(--der)" stroke-width="4.2" stroke-linejoin="round" fill="var(--der-bg)"/></svg></span>
+            der Vertrag
+          </div>
+          <div class="en">contract</div>
+          <div class="foot"><span class="badge">B1.2</span><span class="badge">häufig</span></div>
+        </div>
+        <div class="vcard">
+          <div class="w">
+            <span class="doodle"><svg width="26" height="26" viewBox="0 0 56 56" fill="none"><path d="M13 12 L44 10.5 Q46 10.5 46 13 L45 43 Q45 45 42.5 45 L13.5 45.5 Q11 45.5 11 43 L11.5 14 Q11.5 12 13 12 Z" stroke="var(--das)" stroke-width="4.2" stroke-linejoin="round" fill="var(--das-bg)"/></svg></span>
+            das Protokoll
+          </div>
+          <div class="en">minutes, protocol</div>
+          <div class="foot"><span class="badge">B2.1</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 05 Mascots ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>Preview B · Artikel-Wesen (non-human mascots)</h2><span class="meta-chip">The safe home for character</span></div>
+    <p class="note">If you want personality, the panel's route is three little non-human creatures whose shapes match the marks from Preview A. Their genderedness is purely linguistic labeling, so das Mädchen and der Gast stay uncontroversial. They can live on flashcards, empty states, and as Neuland characters who "collect" words of their article.</p>
+    <div class="canvas">
+      <p class="canvas-label">The three Wesen (same shape language as the marks)</p>
+      <div class="row">
+        <div class="mascotcard">
+          <span class="doodle"><svg width="84" height="84" viewBox="0 0 84 84" fill="none">
+            <path d="M42 14 Q44 14 46 18 L66 56 Q68 61 62 61.5 L21 62 Q15.5 62 18 56.5 L38 18 Q40 14 42 14 Z" stroke="var(--der)" stroke-width="3.4" stroke-linejoin="round" fill="var(--der-bg)"/>
+            <circle cx="36" cy="44" r="2.6" fill="var(--der)"/><circle cx="48" cy="44" r="2.6" fill="var(--der)"/>
+            <path d="M37 52 Q42 55.5 47 52" stroke="var(--der)" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M42 14 L42 7 M42 7 Q46 5 47 8.5" stroke="var(--der)" stroke-width="2.4" stroke-linecap="round"/>
+          </svg></span>
+          <h4>das der-Wesen</h4>
+          <div class="sub">eckig, zackig · sammelt der-Wörter</div>
+        </div>
+        <div class="mascotcard">
+          <span class="doodle"><svg width="84" height="84" viewBox="0 0 84 84" fill="none">
+            <path d="M42 15 Q66 14 67.5 40 Q69 66 42.5 67.5 Q17 68.5 15.8 42 Q15 17.5 39 15.3" stroke="var(--die)" stroke-width="3.4" stroke-linecap="round" fill="var(--die-bg)"/>
+            <circle cx="35" cy="40" r="2.6" fill="var(--die)"/><circle cx="49" cy="40" r="2.6" fill="var(--die)"/>
+            <path d="M35 50 Q42 54.5 49 50" stroke="var(--die)" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M55 18 Q59 12 63 16" stroke="var(--die)" stroke-width="2.4" stroke-linecap="round"/>
+          </svg></span>
+          <h4>das die-Wesen</h4>
+          <div class="sub">rund, schwungvoll · sammelt die-Wörter</div>
+        </div>
+        <div class="mascotcard">
+          <span class="doodle"><svg width="84" height="84" viewBox="0 0 84 84" fill="none">
+            <path d="M22 20 L61 18.5 Q64.5 18.5 64.5 22 L63.5 61 Q63.5 64.5 59.5 64.5 L23 65.5 Q19 65.5 19 61.5 L20 23.5 Q20 20 22 20 Z" stroke="var(--das)" stroke-width="3.4" stroke-linejoin="round" fill="var(--das-bg)"/>
+            <circle cx="35" cy="41" r="2.6" fill="var(--das)"/><circle cx="49" cy="41" r="2.6" fill="var(--das)"/>
+            <path d="M36 51 L48 51" stroke="var(--das)" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M28 20 L26 13 M56 19 L58 12" stroke="var(--das)" stroke-width="2.4" stroke-linecap="round"/>
+          </svg></span>
+          <h4>das das-Wesen</h4>
+          <div class="sub">kantig, ruhig · sammelt das-Wörter</div>
+        </div>
+      </div>
+      <p class="canvas-label">Note: even here, no moustaches or skirts. Shape + color carry the identity, so mismatch words never contradict the mascot.</p>
+    </div>
+  </section>
+
+  <!-- ============ 06 Fused doodles ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Preview C · Fused doodles for the top 100</h2><span class="meta-chip good">Strongest evidence</span><span class="meta-chip">Scoped, not bank-wide</span></div>
+    <p class="note">The gold standard in the literature: one image fusing the word's meaning with its gender. At 1,246 words that is 200+ hours of illustration, so the panel scopes it to the ~100 highest-frequency or most-missed nouns, where the Wesen interacts with the object. Shown at flashcard-hero size (this style is illegible as a badge, so it complements Preview A, never replaces it).</p>
+    <div class="canvas">
+      <p class="canvas-label">Flashcard-size fused doodles (Wesen + referent)</p>
+      <div class="row">
+        <div class="vcard" style="width: 17rem; text-align: center;">
+          <span class="doodle"><svg width="120" height="96" viewBox="0 0 120 96" fill="none">
+            <rect x="44" y="14" width="42" height="56" rx="3" stroke="var(--ink)" stroke-width="2.6" fill="var(--surface)"/>
+            <path d="M51 26 H79 M51 34 H79 M51 42 H72" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <path d="M52 58 Q58 52 64 58 Q68 61 73 56" stroke="var(--der)" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M22 52 Q23.5 52 25 55 L36 76 Q38 80 33.5 80 L11 80.5 Q7 80.5 9 76.5 L19.5 55 Q20.8 52 22 52 Z" stroke="var(--der)" stroke-width="2.8" stroke-linejoin="round" fill="var(--der-bg)"/>
+            <circle cx="18.5" cy="69" r="1.7" fill="var(--der)"/><circle cx="26" cy="69" r="1.7" fill="var(--der)"/>
+            <path d="M28 62 L46 50" stroke="var(--der)" stroke-width="2.4" stroke-linecap="round"/>
+            <path d="M44 47 L50 44 L48 51 Z" fill="var(--der)"/>
+          </svg></span>
+          <div class="w" style="justify-content: center;">der Vertrag</div>
+          <div class="en">the der-Wesen signs the contract</div>
+        </div>
+        <div class="vcard" style="width: 17rem; text-align: center;">
+          <span class="doodle"><svg width="120" height="96" viewBox="0 0 120 96" fill="none">
+            <ellipse cx="60" cy="62" rx="34" ry="9" stroke="var(--ink)" stroke-width="2.6" fill="var(--surface)"/>
+            <path d="M32 62 V78 M88 62 V78" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"/>
+            <path d="M38 46 Q50 40 51.5 51 Q52.5 60 40 59.5 Q30 59 31.5 49.5 Q32.5 44 36 45.5" stroke="var(--die)" stroke-width="2.8" stroke-linecap="round" fill="var(--die-bg)"/>
+            <circle cx="38" cy="51" r="1.7" fill="var(--die)"/><circle cx="45" cy="51" r="1.7" fill="var(--die)"/>
+            <path d="M82 46 Q94 40 95.5 51 Q96.5 60 84 59.5 Q74 59 75.5 49.5 Q76.5 44 80 45.5" stroke="var(--die)" stroke-width="2.8" stroke-linecap="round" fill="var(--die-bg)"/>
+            <circle cx="82" cy="51" r="1.7" fill="var(--die)"/><circle cx="89" cy="51" r="1.7" fill="var(--die)"/>
+            <path d="M55 34 Q60 30 65 34" stroke="var(--die)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M52 28 Q60 22 68 28" stroke="var(--die)" stroke-width="2.2" stroke-linecap="round" opacity="0.5"/>
+          </svg></span>
+          <div class="w" style="justify-content: center;">die Besprechung</div>
+          <div class="en">two die-Wesen talk it over</div>
+        </div>
+        <div class="vcard" style="width: 17rem; text-align: center;">
+          <span class="doodle"><svg width="120" height="96" viewBox="0 0 120 96" fill="none">
+            <rect x="46" y="12" width="36" height="50" rx="3" stroke="var(--ink)" stroke-width="2.6" fill="var(--surface)"/>
+            <rect x="56" y="7" width="16" height="9" rx="2" stroke="var(--ink)" stroke-width="2.4" fill="var(--surface)"/>
+            <path d="M53 26 L57 30 L63 22" stroke="var(--das)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M67 27 H77" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <path d="M53 40 L57 44 L63 36" stroke="var(--das)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M67 41 H77" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" opacity="0.45"/>
+            <path d="M18 52 L40 51 Q42.5 51 42.5 53.5 L42 76 Q42 78.5 39 78.5 L19 79.5 Q16 79.5 16 76.5 L16.5 54.5 Q16.5 52 18 52 Z" stroke="var(--das)" stroke-width="2.8" stroke-linejoin="round" fill="var(--das-bg)"/>
+            <circle cx="25" cy="63" r="1.7" fill="var(--das)"/><circle cx="33" cy="63" r="1.7" fill="var(--das)"/>
+            <path d="M26 70 L33 70" stroke="var(--das)" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M40 58 L48 50" stroke="var(--das)" stroke-width="2.4" stroke-linecap="round"/>
+          </svg></span>
+          <div class="w" style="justify-content: center;">das Protokoll</div>
+          <div class="en">the das-Wesen ticks the minutes</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 07 Effects ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">07</span><h2>Preview D · Answer-reveal effects</h2><span class="meta-chip">The loud moment, at retrieval</span></div>
+    <p class="note">Memory forms at retrieval, so this is where the memorable moment belongs: a ~500ms gender-specific effect when the learner answers correctly in a session. Der bursts, die blooms, das shatters. Three CSS animations total, zero per-word art, reduced-motion safe. Tap each card to play it.</p>
+    <div class="canvas">
+      <p class="canvas-label">Interactive: click "Abspielen"</p>
+      <div class="fxrow">
+        <div class="fxstage" id="fx-der">
+          <div class="fx">
+            <span class="burst-ray" style="--a: 0deg"></span><span class="burst-ray" style="--a: 45deg"></span>
+            <span class="burst-ray" style="--a: 90deg"></span><span class="burst-ray" style="--a: 135deg"></span>
+            <span class="burst-ray" style="--a: 180deg"></span><span class="burst-ray" style="--a: 225deg"></span>
+            <span class="burst-ray" style="--a: 270deg"></span><span class="burst-ray" style="--a: 315deg"></span>
+          </div>
+          <div class="art-lab" style="color: var(--der);">der</div>
+          <div class="word">Vertrag</div>
+          <button type="button" data-fx="play-der">Abspielen</button>
+        </div>
+        <div class="fxstage" id="fx-die">
+          <div class="fx"><span class="bloom-ring"></span><span class="bloom-ring"></span><span class="bloom-ring"></span></div>
+          <div class="art-lab" style="color: var(--die);">die</div>
+          <div class="word">Besprechung</div>
+          <button type="button" data-fx="play-die">Abspielen</button>
+        </div>
+        <div class="fxstage" id="fx-das">
+          <div class="fx">
+            <span class="shard" style="--dx: -46px; --dy: -30px; --rot: -80deg"></span>
+            <span class="shard" style="--dx: 44px; --dy: -34px; --rot: 70deg"></span>
+            <span class="shard" style="--dx: -52px; --dy: 18px; --rot: -140deg"></span>
+            <span class="shard" style="--dx: 50px; --dy: 22px; --rot: 120deg"></span>
+            <span class="shard" style="--dx: -18px; --dy: -50px; --rot: -40deg"></span>
+            <span class="shard" style="--dx: 20px; --dy: 46px; --rot: 160deg"></span>
+          </div>
+          <div class="art-lab" style="color: var(--das);">das</div>
+          <div class="word">Protokoll</div>
+          <button type="button" data-fx="play-das">Abspielen</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 08 Generation + drill ============ -->
+  <section>
+    <div class="sec-head"><span class="sec-num">08</span><h2>Preview E · Learner-made association + gender sprint</h2><span class="meta-chip good">Biggest durable effect</span></div>
+    <p class="note">Two retrieval-side companions. Left: an optional "Meine Eselsbrücke" slot on the card back, because self-generated associations beat supplied ones and the advantage grows over time. Right: a rapid-fire der/die/das sprint block for the session composer, the feature learners love in every competitor app; the marks and effects from Previews A and D live here.</p>
+    <div class="canvas">
+      <p class="canvas-label">Card back + drill block</p>
+      <div class="row">
+        <div class="esels">
+          <div class="lab">Meine Eselsbrücke · optional</div>
+          <div style="font-weight: 650; margin-top: 0.5rem;">die Überweisung</div>
+          <div class="input">z. B. "Oma schickt mir Geld, jede Woche"</div>
+          <div class="emojis"><span>💸</span><span>🏦</span><span>👵</span><span>✉️</span><span>＋</span></div>
+        </div>
+        <div class="drill">
+          <div class="lab" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--annot); font-weight: 700;">Artikel-Sprint</div>
+          <div class="q"><span class="blank">___</span> Rechnung</div>
+          <div class="opts">
+            <span style="color: var(--der);">der</span>
+            <span style="color: var(--die);">die</span>
+            <span style="color: var(--das);">das</span>
+          </div>
+          <div class="streak">Serie: 7 · 0:42</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ Verdict ============ -->
+  <section class="verdict">
+    <h2>Panel recommendation: a four-layer system</h2>
+    <ol>
+      <li><b>Layer 1, always on:</b> the three Artikel-Marken (Preview A) on every noun surface, taught once via a legend tooltip. This is the ArticleBadge from the earlier preview, upgraded with the hand-drawn shape+letter treatment.</li>
+      <li><b>Layer 2, at retrieval:</b> the answer-reveal effects (Preview D) plus an Artikel-Sprint session block (Preview E). This is where memory actually forms.</li>
+      <li><b>Layer 3, scoped art:</b> fused Wesen doodles for a top-100 hardest-words set (Preview C), grown gradually. The mascots (Preview B) double as Neuland characters.</li>
+      <li><b>Layer 4, personal:</b> the optional Eselsbrücke slot (Preview E) for learner-generated associations, the largest durable effect in the literature.</li>
+      <li><b>Dropped by evidence:</b> human personas with gendered features (false rule on Mädchen/Person/Gast, stereotype exposure), bank-wide bizarre imagery (contrast collapse), color as the only channel, gendered voices.</li>
+    </ol>
+    <p class="sources">Key sources behind the scoreboard: Santos 2015 (Language Teaching Research, n=283, images vs colors vs voices for German gender); Arzt &amp; Kost 2016 (Die Unterrichtspraxis, color vs gendered actors); Desrochers et al. 1989/1991 (keyword method with gender tags); Bertsch et al. 2007 (generation effect meta-analysis); Sundararajan &amp; Adesope 2020 (seductive details meta-analysis); McDaniel &amp; Einstein bizarreness work; Watkins cue-overload principle; Boroditsky et al. on gender personification. Per-condition numbers came from abstracts and secondary summaries; re-verify against full texts before quoting in marketing copy.</p>
+  </section>
+</main>
+
+<script>
+  document.querySelectorAll(".fxstage button").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var stage = btn.closest(".fxstage");
+      var cls = btn.getAttribute("data-fx");
+      stage.classList.remove(cls);
+      void stage.offsetWidth;
+      stage.classList.add(cls);
+    });
+  });
+</script>
