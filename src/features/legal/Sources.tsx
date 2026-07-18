@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { ExternalLink } from "lucide-react";
+import {
+  Database,
+  ExternalLink,
+  Layers,
+  ShieldCheck,
+  SpellCheck,
+  UserCheck,
+} from "lucide-react";
 import { provenance } from "@/data/provenance";
 import { verification as verificationMap } from "@/data/verification";
 import type { ProvenanceContentType, ProvenanceEntry, VerificationTier } from "@/types";
@@ -11,16 +18,17 @@ import {
   type ProvenanceReview,
 } from "@/lib/provenanceReviews";
 import { cn } from "@/lib/utils";
+import { AdminWorkbench, type WorkbenchApi } from "./AdminWorkbench";
 import { LegalChrome, Section, type Lang } from "./LegalChrome";
 
 /**
- * /sources — the auto-generated "Sources & Licenses" page (Phase 2 of the data
- * governance roadmap, see docs/strategy/DATA_GOVERNANCE.md). It is built entirely from
- * the provenance register (src/data/provenance.ts), so it stays in sync with the
- * content automatically: every learning item, the public reference it traces to,
- * and its licence. This is the human-readable, public-facing view of the
- * traceability-over-ownership policy, and the surface that carries any required
- * attribution if we later ingest CC-BY content.
+ * /sources — the auto-generated "Sources & Data Quality" page (data governance
+ * Phase 2; redesigned s130). Built entirely from the provenance register
+ * (src/data/provenance.ts) + the generated Layer C verification map, so it
+ * stays in sync with the content automatically. Public visitors get the visual
+ * data-architecture story (pipeline, tier bar, bank numbers, sources,
+ * licenses, full item browse); founders additionally get the AdminWorkbench
+ * data table (search/filter/sort/CSV export + live review marks).
  */
 
 /* Human-readable names for each content type. */
@@ -97,15 +105,18 @@ const LICENSE_LABEL: Record<string, { de: string; en: string }> = {
 
 /* The machine-verification tier badge shown per item (data-strategy Layer C).
    Ordered strongest-first; unverified/structural collapse into "sourced". */
-const TIER_META: Record<VerificationTier, { de: string; en: string; className: string }> = {
-  human: { de: "menschlich geprüft", en: "human-verified", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  jury: { de: "KI-Jury", en: "AI jury", className: "bg-violet-500/10 text-violet-600 dark:text-violet-400" },
-  linguistic: { de: "sprachlich geprüft", en: "grammar-checked", className: "bg-primary/10 text-primary" },
-  facts: { de: "Fakten geprüft", en: "facts-verified", className: "bg-sky-500/10 text-sky-600 dark:text-sky-400" },
-  provenance: { de: "Quelle belegt", en: "sourced", className: "bg-muted text-muted-foreground" },
-  structural: { de: "Quelle belegt", en: "sourced", className: "bg-muted text-muted-foreground" },
-  unverified: { de: "offen", en: "unverified", className: "bg-muted text-muted-foreground" },
+const TIER_META: Record<VerificationTier, { de: string; en: string; className: string; barClassName: string }> = {
+  human: { de: "menschlich geprüft", en: "human-verified", className: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400", barClassName: "bg-emerald-500" },
+  jury: { de: "KI-Jury", en: "AI jury", className: "bg-violet-500/10 text-violet-600 dark:text-violet-400", barClassName: "bg-violet-500" },
+  linguistic: { de: "sprachlich geprüft", en: "grammar-checked", className: "bg-primary/10 text-primary", barClassName: "bg-primary" },
+  facts: { de: "Fakten geprüft", en: "facts-verified", className: "bg-sky-500/10 text-sky-600 dark:text-sky-400", barClassName: "bg-sky-500" },
+  provenance: { de: "Quelle belegt", en: "sourced", className: "bg-muted text-muted-foreground", barClassName: "bg-muted-foreground/40" },
+  structural: { de: "Quelle belegt", en: "sourced", className: "bg-muted text-muted-foreground", barClassName: "bg-muted-foreground/40" },
+  unverified: { de: "offen", en: "unverified", className: "bg-muted text-muted-foreground", barClassName: "bg-muted-foreground/25" },
 };
+
+/* Tiers shown in the public bar/legend, strongest first. */
+const TIER_DISPLAY: VerificationTier[] = ["human", "jury", "linguistic", "facts", "provenance"];
 
 /** The item's effective tier: an inline override on the row wins, else the generated map. */
 function tierOf(r: ProvenanceEntry): VerificationTier | undefined {
@@ -120,52 +131,10 @@ function hostOf(url: string): string {
   }
 }
 
-/** Founder-only review controls threaded down to each item row. Undefined for
- *  everyone else, so the public page renders exactly as before. */
-interface AdminApi {
-  reviews: Map<string, ProvenanceReview>;
-  /** Persist a row's flag + note. Resolves to whether the write landed, so the
-   *  row can show a truthful saved/failed state. */
-  onChange: (
-    contentId: string,
-    patch: Partial<Pick<ProvenanceReview, "verified" | "comment">>,
-  ) => Promise<boolean>;
-}
-
-/* One item row: label + source link for everyone; plus a "verified" toggle, an
-   internal QC note, and an explicit Save button when the founder is signed in
-   (admin). The flag and the note are edited locally and committed together by
-   the Save button, which is disabled until there are unsaved changes. */
-function ItemRow({ r, lang, admin }: { r: ProvenanceEntry; lang: Lang; admin?: AdminApi }) {
-  const review = admin?.reviews.get(r.content_id);
-  const savedVerified = review?.verified ?? r.review_status === "verified";
-  const savedComment = review?.comment ?? "";
-
-  const [verified, setVerified] = useState(savedVerified);
-  const [comment, setComment] = useState(savedComment);
-
-  // Re-sync the editable fields once the saved review loads (or changes) after
-  // first render, e.g. when the founder's marks finish fetching.
-  useEffect(() => {
-    setVerified(savedVerified);
-    setComment(savedComment);
-  }, [savedVerified, savedComment]);
-
-  const [status, setStatus] = useState<"idle" | "saving" | "error">("idle");
-
-  const dirty = verified !== savedVerified || comment.trim() !== savedComment.trim();
-  const hasSaved = review !== undefined || savedVerified || savedComment.length > 0;
-
-  const save = async () => {
-    if (!admin || !dirty || status === "saving") return;
-    setStatus("saving");
-    const ok = await admin.onChange(r.content_id, { verified, comment });
-    setStatus(ok ? "idle" : "error");
-  };
-
+/* One item row: label + tier badge + source link. Public view. */
+function ItemRow({ r, lang }: { r: ProvenanceEntry; lang: Lang }) {
   const tier = tierOf(r);
   const tierMeta = tier ? TIER_META[tier] : undefined;
-
   return (
     <li className="px-4 py-2 text-sm">
       <div className="flex items-center justify-between gap-3">
@@ -193,108 +162,193 @@ function ItemRow({ r, lang, admin }: { r: ProvenanceEntry; lang: Lang; admin?: A
           </span>
         )}
       </div>
-
-      {admin && (
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 text-xs text-foreground">
-            <input
-              type="checkbox"
-              checked={verified}
-              onChange={(e) => setVerified(e.target.checked)}
-              className="h-3.5 w-3.5 accent-primary"
-            />
-            {lang === "de" ? "geprüft" : "verified"}
-          </label>
-          <input
-            type="text"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                save();
-              }
-            }}
-            placeholder={lang === "de" ? "Notiz…" : "Note…"}
-            className="min-w-0 flex-1 rounded-md border border-border bg-surface px-2 py-1 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-          />
-          <button
-            type="button"
-            disabled={!dirty || status === "saving"}
-            onClick={save}
-            className={cn(
-              "shrink-0 rounded-md px-3 py-1 text-xs font-medium transition-colors",
-              dirty && status !== "saving"
-                ? "bg-primary text-primary-foreground hover:bg-primary/90"
-                : "cursor-default bg-muted text-muted-foreground",
-            )}
-          >
-            {status === "saving"
-              ? lang === "de"
-                ? "Speichern…"
-                : "Saving…"
-              : dirty
-                ? lang === "de"
-                  ? "Speichern"
-                  : "Save"
-                : hasSaved
-                  ? lang === "de"
-                    ? "Gespeichert ✓"
-                    : "Saved ✓"
-                  : lang === "de"
-                    ? "Speichern"
-                    : "Save"}
-          </button>
-          {status === "error" && (
-            <span className="shrink-0 text-xs text-destructive">
-              {lang === "de" ? "Nicht gespeichert" : "Not saved"}
-            </span>
-          )}
-        </div>
-      )}
     </li>
   );
 }
 
 /* One collapsible group of items for a single content type. Children render only
    when the group is opened, so the full register stays light until expanded. */
-function TypeGroup({
-  type,
-  rows,
-  lang,
-  admin,
-}: {
-  type: ProvenanceContentType;
-  rows: ProvenanceEntry[];
-  lang: Lang;
-  admin?: AdminApi;
-}) {
+function TypeGroup({ type, rows, lang }: { type: ProvenanceContentType; rows: ProvenanceEntry[]; lang: Lang }) {
   const [open, setOpen] = useState(false);
-  const name = TYPE_LABEL[type][lang];
-  const verifiedCount = admin
-    ? rows.filter((r) => admin.reviews.get(r.content_id)?.verified).length
-    : 0;
   return (
     <details
       className="rounded-lg border border-border bg-surface/50"
       onToggle={(e) => setOpen((e.currentTarget as HTMLDetailsElement).open)}
     >
       <summary className="flex cursor-pointer items-center justify-between px-4 py-3 text-sm font-medium text-foreground">
-        <span>{name}</span>
-        <span className="text-xs text-muted-foreground">
-          {admin ? `${verifiedCount}/${rows.length} ✓` : rows.length}
-        </span>
+        <span>{TYPE_LABEL[type][lang]}</span>
+        <span className="text-xs text-muted-foreground">{rows.length}</span>
       </summary>
       {open && (
         <ul className="divide-y divide-border border-t border-border">
           {rows.map((r) => (
-            <ItemRow key={r.content_id} r={r} lang={lang} admin={admin} />
+            <ItemRow key={r.content_id} r={r} lang={lang} />
           ))}
         </ul>
       )}
     </details>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Public visuals (s130 redesign)                                      */
+/* ------------------------------------------------------------------ */
+
+/** Four headline numbers, as stat tiles. */
+function StatTiles({
+  stats,
+  lang,
+}: {
+  stats: { total: number; machineChecked: number; verified: number; withReference: number };
+  lang: Lang;
+}) {
+  const t = (de: string, en: string) => (lang === "de" ? de : en);
+  const tiles = [
+    { value: stats.total.toLocaleString("de-DE"), label: t("Lerninhalte", "Learning items") },
+    { value: stats.machineChecked.toLocaleString("de-DE"), label: t("maschinell geprüft", "machine-checked") },
+    { value: stats.verified.toLocaleString("de-DE"), label: t("menschlich geprüft", "human-verified") },
+    {
+      value: `${Math.round((stats.withReference / Math.max(stats.total, 1)) * 100)}%`,
+      label: t("mit Quellenbeleg", "with source reference"),
+    },
+  ];
+  return (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      {tiles.map((tile) => (
+        <div key={tile.label} className="rounded-lg border border-border bg-surface/50 px-3 py-2.5 text-center">
+          <div className="text-lg font-bold tracking-tight text-foreground">{tile.value}</div>
+          <div className="text-[11px] leading-tight text-muted-foreground">{tile.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** The five-step content pipeline, as a compact vertical visual. */
+function Pipeline({ lang }: { lang: Lang }) {
+  const steps = [
+    {
+      icon: Database,
+      de: ["Inhalte als Daten", "Jedes Wort, jede Übung liegt als strukturierter Datensatz vor, mit Thema, Niveau und Quellenangabe."],
+      en: ["Content as data", "Every word and exercise is a structured record with its topic, level and source reference."],
+    },
+    {
+      icon: ShieldCheck,
+      de: ["Automatische Strukturprüfung", "Bei jeder Änderung prüft ein Wächter Verweise, Duplikate und Vollständigkeit. Fehler blockieren die Veröffentlichung."],
+      en: ["Automatic structural checks", "Every change is checked for broken references, duplicates and completeness. Errors block publication."],
+    },
+    {
+      icon: SpellCheck,
+      de: ["Fakten- und Sprachprüfung", "Artikel und Plural werden gegen zwei unabhängige Wörterbücher geprüft, jeder deutsche Satz durch eine Grammatikprüfung."],
+      en: ["Fact and language checks", "Gender and plural are checked against two independent dictionaries; every German sentence runs through a grammar check."],
+    },
+    {
+      icon: Layers,
+      de: ["Vertrauensstufen", "Die Ergebnisse ergeben eine Stufe pro Inhalt, vom Quellenbeleg bis zur menschlichen Prüfung, sichtbar als Abzeichen."],
+      en: ["Trust tiers", "The results combine into a per-item tier, from sourced to human-verified, shown as a badge."],
+    },
+    {
+      icon: UserCheck,
+      de: ["Menschliche Prüfung", "Die höchste Stufe vergibt nur ein Mensch. Ein digitaler Fingerabdruck stellt sicher, dass geprüfte Inhalte danach unverändert bleiben."],
+      en: ["Human review", "Only a person grants the top tier. A digital fingerprint guarantees verified content stays unchanged afterwards."],
+    },
+  ];
+  return (
+    <ol className="relative space-y-4 pl-10">
+      <div aria-hidden className="absolute bottom-4 left-[15px] top-4 w-px bg-border" />
+      {steps.map((step, i) => {
+        const Icon = step.icon;
+        const [title, body] = lang === "de" ? step.de : step.en;
+        return (
+          <li key={title} className="relative">
+            <span className="absolute -left-10 flex h-8 w-8 items-center justify-center rounded-full border border-border bg-surface text-primary shadow-soft">
+              <Icon className="h-4 w-4" />
+            </span>
+            <p className="font-semibold text-foreground">
+              {i + 1}. {title}
+            </p>
+            <p className="mt-0.5">{body}</p>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+/** Stacked tier-distribution bar with a count legend. */
+function TierBar({ byTier, total, lang }: { byTier: Map<VerificationTier, number>; total: number; lang: Lang }) {
+  // structural/unverified collapse into "provenance" for the public display.
+  const counts = new Map<VerificationTier, number>();
+  for (const [tier, n] of byTier) {
+    const display = tier === "structural" || tier === "unverified" ? "provenance" : tier;
+    counts.set(display, (counts.get(display) ?? 0) + n);
+  }
+  const tiered = [...counts.values()].reduce((a, b) => a + b, 0);
+  const pending = Math.max(total - tiered, 0);
+  return (
+    <div>
+      <div className="flex h-3 w-full overflow-hidden rounded-full bg-muted">
+        {TIER_DISPLAY.filter((tier) => counts.get(tier)).map((tier) => (
+          <div
+            key={tier}
+            className={TIER_META[tier].barClassName}
+            style={{ width: `${((counts.get(tier) ?? 0) / Math.max(total, 1)) * 100}%` }}
+            title={`${TIER_META[tier][lang]}: ${counts.get(tier)}`}
+          />
+        ))}
+      </div>
+      <ul className="mt-2.5 space-y-1.5">
+        {TIER_DISPLAY.filter((tier) => counts.get(tier)).map((tier) => {
+          const n = counts.get(tier) ?? 0;
+          return (
+            <li key={tier} className="flex items-center justify-between gap-3">
+              <span className="flex items-center gap-2">
+                <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", TIER_META[tier].barClassName)} />
+                <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", TIER_META[tier].className)}>
+                  {TIER_META[tier][lang]}
+                </span>
+              </span>
+              <span className="shrink-0 text-xs text-muted-foreground">
+                {n} · {Math.round((n / Math.max(total, 1)) * 100)}%
+              </span>
+            </li>
+          );
+        })}
+        {pending > 0 && (
+          <li className="flex items-center justify-between gap-3">
+            <span className="flex items-center gap-2">
+              <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-muted" />
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
+                {lang === "de" ? "nächste Prüfwelle" : "next verification sweep"}
+              </span>
+            </span>
+            <span className="shrink-0 text-xs text-muted-foreground">
+              {pending} · {Math.round((pending / Math.max(total, 1)) * 100)}%
+            </span>
+          </li>
+        )}
+      </ul>
+    </div>
+  );
+}
+
+/** Per-bank item counts as a tile grid. */
+function BankTiles({ byType, lang }: { byType: Map<ProvenanceContentType, ProvenanceEntry[]>; lang: Lang }) {
+  return (
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {TYPE_ORDER.filter((type) => byType.has(type)).map((type) => (
+        <div key={type} className="rounded-lg border border-border bg-surface/50 px-3 py-2">
+          <div className="text-base font-bold text-foreground">{byType.get(type)!.length.toLocaleString("de-DE")}</div>
+          <div className="text-[11px] leading-tight text-muted-foreground">{TYPE_LABEL[type][lang]}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Page                                                                */
+/* ------------------------------------------------------------------ */
 
 export function Sources() {
   const [lang, setLang] = useState<Lang>("de");
@@ -319,7 +373,7 @@ export function Sources() {
     };
   }, [admin]);
 
-  const adminApi: AdminApi | undefined = useMemo(() => {
+  const workbenchApi: WorkbenchApi | undefined = useMemo(() => {
     if (!admin) return undefined;
     return {
       reviews,
@@ -361,12 +415,14 @@ export function Sources() {
     const byTier = new Map<VerificationTier, number>();
     let verified = 0;
     let machineChecked = 0; // facts and/or linguistic (or higher)
+    let withReference = 0;
     const attributions: ProvenanceEntry[] = [];
     for (const r of provenance) {
       if (!byType.has(r.content_type)) byType.set(r.content_type, []);
       byType.get(r.content_type)!.push(r);
       const h = hostOf(r.reference);
       if (h) byHost.set(h, (byHost.get(h) ?? 0) + 1);
+      if (r.reference) withReference += 1;
       byLicense.set(r.license, (byLicense.get(r.license) ?? 0) + 1);
       if (r.review_status === "verified") verified += 1;
       if (r.attribution_required) attributions.push(r);
@@ -374,7 +430,7 @@ export function Sources() {
       if (tier) byTier.set(tier, (byTier.get(tier) ?? 0) + 1);
       if (tier === "facts" || tier === "linguistic" || tier === "jury" || tier === "human") machineChecked += 1;
     }
-    return { byType, byHost, byLicense, byTier, verified, machineChecked, total: provenance.length, attributions };
+    return { byType, byHost, byLicense, byTier, verified, machineChecked, withReference, total: provenance.length, attributions };
   }, []);
 
   const t = (de: string, en: string) => (lang === "de" ? de : en);
@@ -383,14 +439,16 @@ export function Sources() {
     <LegalChrome
       lang={lang}
       setLang={setLang}
-      title={t("Quellen & Lizenzen", "Sources & Licenses")}
-      lastUpdated="2026-06-23"
+      title={t("Quellen & Datenqualität", "Sources & Data Quality")}
+      lastUpdated="2026-07-18"
     >
-      {admin && (
-        <div className="mb-6 rounded-xl border border-primary/30 bg-primary/5 p-4">
+      {admin && workbenchApi && (
+        /* Break out of the narrow legal column on large screens so the data
+           table gets real width; the page column stays max-w-3xl for text. */
+        <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 lg:-mx-16 xl:-mx-40">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-semibold text-foreground">
-              {t("Quellenprüfung (nur für dich)", "Source review (you only)")}
+              {t("Daten-Werkbank (nur Admins)", "Data workbench (admins only)")}
             </h2>
             <span className="text-xs text-muted-foreground">
               {saveState === "saving"
@@ -402,12 +460,13 @@ export function Sources() {
                     : ""}
             </span>
           </div>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mb-3 mt-1 text-sm text-muted-foreground">
             {t(
-              `Du bist als Admin angemeldet. Hake unten Einträge als „geprüft“ ab und füge bei Bedarf eine Notiz hinzu. Nur du siehst diese Markierungen. Bisher geprüft: ${liveVerified} von ${stats.total}.`,
-              `You are signed in as admin. Tick items below as “verified” and add a note if needed. Only you can see these marks. Verified so far: ${liveVerified} of ${stats.total}.`,
+              `Der ganze Inhaltsbestand als Tabelle: suchen, filtern, sortieren, als CSV exportieren, live prüfen. Deine Haken und Notizen sieht nur das Admin-Team. Live geprüft: ${liveVerified} von ${stats.total}.`,
+              `The full content register as a table: search, filter, sort, export as CSV, review live. Your checks and notes are visible to the admin team only. Live-checked: ${liveVerified} of ${stats.total}.`,
             )}
           </p>
+          <AdminWorkbench api={workbenchApi} lang={lang} />
         </div>
       )}
 
@@ -420,43 +479,41 @@ export function Sources() {
         </p>
         <p>
           {t(
-            "Diese Seite wird automatisch aus unserem Herkunftsregister erzeugt und bleibt damit immer aktuell. Die vollständige Richtlinie steht in unserer Daten-Governance-Dokumentation.",
-            "This page is generated automatically from our provenance register, so it always stays current. The full policy is in our data-governance documentation.",
+            "Diese Seite wird automatisch aus unserem Herkunftsregister erzeugt und bleibt damit immer aktuell.",
+            "This page is generated automatically from our provenance register, so it always stays current.",
           )}
         </p>
-        <p className="text-foreground">
-          {t(
-            `Aktuell: ${stats.total} Inhalte, ${stats.verified} davon menschlich geprüft. Alle Inhalte sind eigenerstellt und gegen die unten genannten Quellen verifiziert.`,
-            `Currently: ${stats.total} items, ${stats.verified} human-verified. All content is authored in-house and verified against the references below.`,
-          )}
-        </p>
+        <StatTiles stats={stats} lang={lang} />
       </Section>
 
-      <Section title={t("Prüfstufen (maschinell verifiziert)", "Verification tiers (machine-checked)")}>
-        <p>
+      <Section title={t("So entsteht ein Inhalt", "How an item is made")}>
+        <p className="mb-4">
           {t(
-            `Jeder Inhalt durchläuft eine automatische Prüfleiter: Struktur, Quelle, Wortfakten (Artikel/Plural gegen zwei unabhängige Wörterbücher) und Sprache (Grammatik/Rechtschreibung mit LanguageTool, plus eine CEFR-Plausibilitätsprüfung). Die Stufe ist die höchste, die alle zutreffenden Prüfungen bestanden haben. ${stats.machineChecked} von ${stats.total} Inhalten sind maschinell auf Fakten oder Sprache geprüft; ${stats.verified} zusätzlich von einem Menschen.`,
-            `Every item climbs an automatic verification ladder: structure, source, word facts (article/plural against two independent dictionaries), and language (grammar/spelling via LanguageTool, plus a CEFR plausibility check). The tier is the highest rung all relevant checks passed. ${stats.machineChecked} of ${stats.total} items are machine-checked for facts or language; ${stats.verified} additionally by a human.`,
+            "Inhalte durchlaufen dieselbe Pipeline wie unser Programmcode: fünf Stationen, von der Datenerfassung bis zur menschlichen Prüfung. Kaputte oder unbelegte Inhalte erreichen die App nicht.",
+            "Content travels the same pipeline as our program code: five stations, from data entry to human review. Broken or unsourced content cannot reach the app.",
           )}
         </p>
-        <ul className="mt-2 space-y-1.5">
-          {(["human", "jury", "linguistic", "facts", "provenance"] as VerificationTier[])
-            .filter((tier) => stats.byTier.get(tier))
-            .map((tier) => (
-              <li key={tier} className="flex items-center justify-between gap-3">
-                <span className={cn("rounded-full px-2 py-0.5 text-xs font-medium", TIER_META[tier].className)}>
-                  {TIER_META[tier][lang]}
-                </span>
-                <span className="shrink-0 text-xs text-muted-foreground">{stats.byTier.get(tier)}</span>
-              </li>
-            ))}
-        </ul>
-        <p className="mt-2 text-xs text-muted-foreground">
+        <Pipeline lang={lang} />
+      </Section>
+
+      <Section title={t("Prüfstufen", "Verification tiers")}>
+        <p className="mb-3">
+          {t(
+            `Jeder Inhalt trägt die höchste Stufe, deren Prüfungen er alle bestanden hat. ${stats.machineChecked} von ${stats.total} Inhalten sind maschinell auf Fakten oder Sprache geprüft; ${stats.verified} zusätzlich von einem Menschen.`,
+            `Every item carries the highest tier whose checks it passed. ${stats.machineChecked} of ${stats.total} items are machine-checked for facts or language; ${stats.verified} additionally by a human.`,
+          )}
+        </p>
+        <TierBar byTier={stats.byTier} total={stats.total} lang={lang} />
+        <p className="mt-3 text-xs text-muted-foreground">
           {t(
             "Eine bestandene Prüfung belegt Fakten und Grammatik, nicht Stil, Register oder das genaue Niveau. Diese folgen über eine KI-Jury und eine menschliche Stichprobe.",
             "A passed check attests facts and grammar, not style, register, or the exact level. Those come via an AI jury and a human sample.",
           )}
         </p>
+      </Section>
+
+      <Section title={t("Inhalte in Zahlen", "Content in numbers")}>
+        <BankTiles byType={stats.byType} lang={lang} />
       </Section>
 
       <Section title={t("Quellen, auf die wir uns stützen", "Sources we rely on")}>
@@ -514,19 +571,13 @@ export function Sources() {
       <Section title={t("Alle Inhalte und ihre Quellen", "All content and its sources")}>
         <p className="mb-3">
           {t(
-            "Aufgeklappt zeigt jede Gruppe jeden Eintrag mit Link zur Quelle. Ein lebender Link bestätigt, dass die Seite existiert, nicht die inhaltliche Richtigkeit; die fachliche Prüfung erfolgt zusätzlich durch Menschen.",
-            "Expand a group to see every item with a link to its source. A live link confirms the page exists, not that the content is correct; accuracy is additionally checked by humans.",
+            "Aufgeklappt zeigt jede Gruppe jeden Eintrag mit Prüfstufe und Link zur Quelle. Ein lebender Link bestätigt, dass die Seite existiert, nicht die inhaltliche Richtigkeit; die fachliche Prüfung erfolgt zusätzlich durch Menschen.",
+            "Expand a group to see every item with its tier and a link to its source. A live link confirms the page exists, not that the content is correct; accuracy is additionally checked by humans.",
           )}
         </p>
         <div className="space-y-2">
           {TYPE_ORDER.filter((type) => stats.byType.has(type)).map((type) => (
-            <TypeGroup
-              key={type}
-              type={type}
-              rows={stats.byType.get(type)!}
-              lang={lang}
-              admin={adminApi}
-            />
+            <TypeGroup key={type} type={type} rows={stats.byType.get(type)!} lang={lang} />
           ))}
         </div>
       </Section>

@@ -699,6 +699,25 @@ from 126 to 128.)
   `src/store/useProgressStore.ts`, `src/lib/cloudSync.ts`, `package.json`, `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` (edited) ·
   private artifact "Genauly Content Pipeline".
+- **Prompt 5 (verbatim):**
+  > I need you to redesign the sources page so that it's easily understandable for anyone looking to understand the data architechture and the sources used. Keep it visual where needed. Also for the admin inputs, make it as user firendly as possible to work with the data/content table - add all necessary views, export as csv button, and other functionalities that are useful and necessary but I may have forgotten. Needless to say, these additional features should only be available for admin/founder - thesuhaspala@gmail.com and thelivinsine@gmail.com.
+- **Response 5:** Redesigned `/sources` ("Quellen & Datenqualität"): public visitors get the visual
+  data-architecture story (stat tiles, five-step pipeline graphic, stacked tier-distribution bar
+  with legend, per-bank count tiles; sources/licenses/browse kept). Built the founder-only
+  `AdminWorkbench` (`features/legal/AdminWorkbench.tsx`): full register as a sortable DataTable
+  with fuzzy search, Typ/Stufe/Status filters, CSV export of the filtered view (`src/lib/csv.ts`),
+  copy-id chips, per-row verified checkbox + note (immediate Supabase save), progress bar. Admin
+  gate widened to BOTH founder emails (`FOUNDER_EMAILS` in `src/lib/admin.ts`) with matching RLS
+  migration `0007_provenance_reviews_admins.sql` (founder must run it once; step added to
+  `PHASE2_SETUP.md` + an open action item). Verified with headless-Chromium screenshots (public
+  light/dark/mobile + workbench desktop incl. live search). 14 new tests; 198/198, build green,
+  bundle 80.8 kB.
+- **Artifacts (prompt 5):** `src/features/legal/Sources.tsx` (redesigned) ·
+  `src/features/legal/AdminWorkbench.tsx`, `src/lib/csv.ts`,
+  `supabase/migrations/0007_provenance_reviews_admins.sql`, `tests/csv.test.ts`,
+  `tests/admin.test.ts`, `tests/adminWorkbench.test.tsx` (new) · `src/lib/admin.ts`,
+  `docs/plans/PHASE2_SETUP.md`, `docs/PROJECT_STATUS.md` (edited).
+
 ## Session 131 — 2026-07-18 — Üben exercise-variety options + plan
 
 - **Branch:** `claude/ueben-exercise-variety-i59ry0` · **Model:** Fable 5
