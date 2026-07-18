@@ -444,3 +444,53 @@ for an evidence-based expert brainstorm. What happened, in order:
   themes are not Kapitel-1 themes, so they don't enter batch 1.)
 - **Next session: implement the plan, starting with PR 1** (restart the branch from `main` first per
   the merged-PR rule, since this session's docs PR has merged).
+
+**Handoff after session 129 (2026-07-18). Artikel-Visuals plan FULLY shipped (all 3 PRs), on branch
+`claude/article-visuals-opus-tasks-rxurot`.** Implemented every phase of
+`docs/plans/ARTIKEL_VISUALS_PLAN.md`; Phase 1 in the plan's intended two-model split, both halves on
+the same branch:
+- **Opus 4.8 wiring half:** the `--der/--die/--das` (+`-bg`) tokens in `src/index.css` (light +
+  dark) exposed via `tailwind.config.ts`; the new `src/components/artikel/` feature (pure
+  `gender.ts` `genderOf` helper reading ONLY the authored `article` field, `Wesen.tsx`,
+  `ArtikelEffect.tsx`, `ArtikelLegend.tsx`); `FlipCard` gained an optional `onFlip` callback; marks
+  wired into `VocabList` (24px on the card front, effect on the back face), `VocabViews` Tabelle +
+  Liste (16px solid tier), the one-time legend at the top of the Wörter list (dismiss flag
+  `artikelLegendDismissed` in `useSettingsStore`, rides cloudSync); `tests/gender.test.ts`.
+- **Fable 5 art half (this session's second commit):** the placeholder art was replaced with the
+  founder-picked Preview B/D geometry from `preview/artikel-visuals/gender-doodles-panel.html`:
+  wobbly tinted-body creatures with dot eyes and one deliberate imperfection each (der = apex
+  sprout, die = unclosed outline + eyelash, das = two stray hairs), and the real per-element
+  effects (der = 8-ray burst, die = 3 staggered bloom rings, das = 6 spinning shards, CSS classes
+  `.artikel-fx-*` in `index.css`). A **200ms animation delay** syncs the effect with the card flip
+  (the back face is only visible ~225ms into the rotation, a timing bug found reviewing the
+  placeholder). Reduced motion gets an opacity-only fading tint. Verified via headless-Chromium
+  screenshots (three creatures at 56/28/24/16px in light + dark; effects freeze-framed at
+  120/300/450ms with the paused/negative-delay trick).
+- **PR 2 (same session, Fable 5): the fused-doodle registry + batch 1.** The batch was selected by
+  running the plan §4 snippet verbatim (10 mission nouns + programm/hotel/verfahren/geraet via the
+  das override + it_sicherheit/daten/verbindung/version/funktion/anschluss by Zipf; final tally
+  5 der / 11 die / 4 das, per-word list recorded in the plan §4). New
+  `src/features/vocabulary/doodles/`: `index.ts` (eager id list, `hasDoodle`, `loadDoodle` via
+  dynamic import) + `art.tsx` (all 20 scenes: referents in the new `--ink` token, the creature via
+  the now-exported `WesenBody` so geometry has one home; ~120x96 viewBox per Preview C).
+  `VocabCard` loads the art chunk on the FIRST flip of a registered card and renders the doodle
+  above the English; unregistered cards untouched. `tests/doodles.test.ts` (25 tests): registry ↔
+  art ↔ bank integrity, declared gender === bank `article`, and a rendered-markup assertion that
+  every scene contains ONLY its own gender's CSS tokens (the wrong-gender-doodle guard). All 20
+  scenes reviewed via SSR screenshot sheet in light + dark; three composition fixes from that
+  review (Vollmacht's receiving hand, Hotel wall overlap, Beratung bubble tail).
+- **Gates (after both PRs):** typecheck, lint (0 errors), test:unit 174, build, check:bundle
+  79.6 kB unchanged; the art is its own lazy chunk (`art-*.js` ~11.8 kB / 3.4 kB gzip) loaded only
+  on flip.
+- **PR 3 (same session, Opus 4.8): reuse beyond the Theorie cards.** The reveal effect now fires on
+  a CORRECT noun answer in the composed session (`SessionPlayer` flashcard/typing/speaking grade
+  paths; gender looked up via `vocabById(sourceId)`, no-op for non-nouns and Redemittel/collocation
+  cards; the effect overlays the stage but the block content sits `z-10` above it so the burst
+  radiates from behind the opaque card and never crosses the text, a legibility fix found by
+  screenshot). The Wesen mark also joins the Wörter-graph selected-node card (`WordGraph.tsx`) and
+  the legacy `Flashcards.tsx` front (the component the session engine reuses). No new tests needed
+  (marks/effect are the same tested components); gates green.
+- **Next (optional): later doodle batches** (plan §4 growth path: Kapitel-2 content when authored,
+  then top-Zipf nouns bank-wide, data+SVG only). Also parked in backlog #4: the Neuland Wesen
+  tie-in + the Eselsbrücke / Artikel-Sprint session blocks. PWA caveat: the Bibliothek is
+  service-worker-cached, hard-refresh before judging the live result.

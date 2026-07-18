@@ -1,12 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 130). **Data-architecture review: P0/P1 integrity fixes
-shipped** (verification fingerprints + the `pnpm stamp:verified` gate, the permanent-content-ids
-contract with `ID_RENAMES` remapping, global id uniqueness + per-bank prefixes as lint errors,
-the related-terms drop report). Session 129 shipped the Artikel-Visuals plan fully (all 3 phases,
-`docs/plans/ARTIKEL_VISUALS_PLAN.md`). Session 127's brand pick is still open: Kit 1 · Kobalt &
-Butter recolored to the bottom-nav blues, founder owes the light-blue pick (Himmelblau vs Cyan;
-handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-18 (session 131). **Üben exercise-variety plan authored**
+(`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Üben sets get generated exercise variety from
+the existing banks, zero per-set authoring; implementation not started. Session 130 shipped the
+data-architecture P0/P1 integrity fixes (verification fingerprints + `pnpm stamp:verified`,
+`ID_RENAMES`, global id uniqueness as lint errors). Session 127's brand pick is still open: Kit 1 ·
+Kobalt & Butter recolored to the bottom-nav blues, founder owes the light-blue pick (Himmelblau vs
+Cyan; handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -62,6 +62,28 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 131 (2026-07-18). Üben exercise-variety PLAN authored (Fable 5), branch
+`claude/ueben-exercise-variety-i59ry0`, docs-only, shipped to `main`. NOT yet implemented.** The
+founder wants custom Üben sets (the Bibliothek Üben button on a filtered tab) to play as varied
+exercises, not just flip-cards, without authoring content per set combination. Analysis found the
+variety machinery already exists: `engine/quiz.ts` generates 10 exercise types from the banks with
+zero authoring (translation/article/plural/cloze/collocation-fill/matching/word-order + 3 generic
+grammar mini-banks) and `SessionPlayer`'s `QuestionView` already renders all of them in sessions;
+the gap is that the generator is theme-keyed while `buildScopedSession` maps everything to
+flashcards. The plan (`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`) locks the principle "sets are
+filters, exercises are per-item templates" and phases the work: **Phase 0** extract a pool-based
+`buildPoolQuiz` (distractor fallback to the full bank for small sets; generic mini-banks excluded
+from scoped sessions per the content-pure rule); **Phase 1** mix generated exercises ~50/50 with
+recall cards in `buildScopedSession` (vocab + collocation scopes), 2-appearances-per-item cap, plus
+an **FSRS guard**: `captureLoot` currently writes SRS under collocation ids via quiz `sourceId`,
+restrict the write to ids that resolve in the vocab bank; **Phase 2** new template kinds as
+independent rungs (2a noun↔verb match grid reusing `MatchingQuestion`, 2b typed cloze on the typing
+block, 2c TTS listening word, 2e Redemittel cloze, 2d related-cluster odd-one-out); **Phase 3**
+variety guarantees + gates; **Phase 4 deferred** (authored per-theme packs, build-time AI generation
+through the verification pipeline; runtime LLM generation rejected). PR slicing + effort estimates
++ success criteria are in the plan. **Next session: implement PR 1 (Phase 0 + Phase 1 + tests)**;
+restart the branch from `main` first per the merged-PR rule.
+
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
 branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the
 content/data layer is managed (answered in chat + a private pipeline-diagram artifact), then asked for
@@ -91,57 +113,9 @@ an expert architecture review with P0–P3 recommendations, then approved implem
 - Gates: `lint:content` 0 errors · `test:unit` 184/184 (after rebasing onto the s129 Artikel-Visuals PRs) · `pnpm build` green · bundle 80.7 kB.
   Also refreshed the stale collocation count (1,011 → 1,033) in the docs.
 
-**Handoff after session 129 (2026-07-18). Artikel-Visuals plan FULLY shipped (all 3 PRs), on branch
-`claude/article-visuals-opus-tasks-rxurot`.** Implemented every phase of
-`docs/plans/ARTIKEL_VISUALS_PLAN.md`; Phase 1 in the plan's intended two-model split, both halves on
-the same branch:
-- **Opus 4.8 wiring half:** the `--der/--die/--das` (+`-bg`) tokens in `src/index.css` (light +
-  dark) exposed via `tailwind.config.ts`; the new `src/components/artikel/` feature (pure
-  `gender.ts` `genderOf` helper reading ONLY the authored `article` field, `Wesen.tsx`,
-  `ArtikelEffect.tsx`, `ArtikelLegend.tsx`); `FlipCard` gained an optional `onFlip` callback; marks
-  wired into `VocabList` (24px on the card front, effect on the back face), `VocabViews` Tabelle +
-  Liste (16px solid tier), the one-time legend at the top of the Wörter list (dismiss flag
-  `artikelLegendDismissed` in `useSettingsStore`, rides cloudSync); `tests/gender.test.ts`.
-- **Fable 5 art half (this session's second commit):** the placeholder art was replaced with the
-  founder-picked Preview B/D geometry from `preview/artikel-visuals/gender-doodles-panel.html`:
-  wobbly tinted-body creatures with dot eyes and one deliberate imperfection each (der = apex
-  sprout, die = unclosed outline + eyelash, das = two stray hairs), and the real per-element
-  effects (der = 8-ray burst, die = 3 staggered bloom rings, das = 6 spinning shards, CSS classes
-  `.artikel-fx-*` in `index.css`). A **200ms animation delay** syncs the effect with the card flip
-  (the back face is only visible ~225ms into the rotation, a timing bug found reviewing the
-  placeholder). Reduced motion gets an opacity-only fading tint. Verified via headless-Chromium
-  screenshots (three creatures at 56/28/24/16px in light + dark; effects freeze-framed at
-  120/300/450ms with the paused/negative-delay trick).
-- **PR 2 (same session, Fable 5): the fused-doodle registry + batch 1.** The batch was selected by
-  running the plan §4 snippet verbatim (10 mission nouns + programm/hotel/verfahren/geraet via the
-  das override + it_sicherheit/daten/verbindung/version/funktion/anschluss by Zipf; final tally
-  5 der / 11 die / 4 das, per-word list recorded in the plan §4). New
-  `src/features/vocabulary/doodles/`: `index.ts` (eager id list, `hasDoodle`, `loadDoodle` via
-  dynamic import) + `art.tsx` (all 20 scenes: referents in the new `--ink` token, the creature via
-  the now-exported `WesenBody` so geometry has one home; ~120x96 viewBox per Preview C).
-  `VocabCard` loads the art chunk on the FIRST flip of a registered card and renders the doodle
-  above the English; unregistered cards untouched. `tests/doodles.test.ts` (25 tests): registry ↔
-  art ↔ bank integrity, declared gender === bank `article`, and a rendered-markup assertion that
-  every scene contains ONLY its own gender's CSS tokens (the wrong-gender-doodle guard). All 20
-  scenes reviewed via SSR screenshot sheet in light + dark; three composition fixes from that
-  review (Vollmacht's receiving hand, Hotel wall overlap, Beratung bubble tail).
-- **Gates (after both PRs):** typecheck, lint (0 errors), test:unit 174, build, check:bundle
-  79.6 kB unchanged; the art is its own lazy chunk (`art-*.js` ~11.8 kB / 3.4 kB gzip) loaded only
-  on flip.
-- **PR 3 (same session, Opus 4.8): reuse beyond the Theorie cards.** The reveal effect now fires on
-  a CORRECT noun answer in the composed session (`SessionPlayer` flashcard/typing/speaking grade
-  paths; gender looked up via `vocabById(sourceId)`, no-op for non-nouns and Redemittel/collocation
-  cards; the effect overlays the stage but the block content sits `z-10` above it so the burst
-  radiates from behind the opaque card and never crosses the text, a legibility fix found by
-  screenshot). The Wesen mark also joins the Wörter-graph selected-node card (`WordGraph.tsx`) and
-  the legacy `Flashcards.tsx` front (the component the session engine reuses). No new tests needed
-  (marks/effect are the same tested components); gates green.
-- **Next (optional): later doodle batches** (plan §4 growth path: Kapitel-2 content when authored,
-  then top-Zipf nouns bank-wide, data+SVG only). Also parked in backlog #4: the Neuland Wesen
-  tie-in + the Eselsbrücke / Artikel-Sprint session blocks. PWA caveat: the Bibliothek is
-  service-worker-cached, hard-refresh before judging the live result.
-
-_(Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder picked Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, awaiting the light-blue pick between Himmelblau `#38BDF8` and Cyan `#22D3EE`, see the W29 archive for the wiring steps), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
+_(Session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
+fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder picked Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, awaiting the light-blue pick between Himmelblau `#38BDF8` and Cyan `#22D3EE`, see the W29 archive for the wiring steps), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
 + P0/P1 fixes handoff, session 121's
 arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
