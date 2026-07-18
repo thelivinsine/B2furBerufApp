@@ -84,9 +84,10 @@ restrict the write to ids that resolve in the vocab bank; **Phase 2** new templa
 independent rungs (2a noun↔verb match grid reusing `MatchingQuestion`, 2b typed cloze on the typing
 block, 2c TTS listening word, 2e Redemittel cloze, 2d related-cluster odd-one-out); **Phase 3**
 variety guarantees + gates; **Phase 4 deferred** (authored per-theme packs, build-time AI generation
-through the verification pipeline; runtime LLM generation rejected). PR slicing + effort estimates
-+ success criteria are in the plan. **Next session: implement PR 1 (Phase 0 + Phase 1 + tests)**;
-restart the branch from `main` first per the merged-PR rule.
+through the verification pipeline; runtime LLM generation rejected). PR slicing + effort estimates +
+**per-PR model recommendations** (plan §6: PR 1/3/4 Opus 4.8, PR 2/5 Sonnet 5, Phase 4 content
+drafting Fable 5, no Haiku) + success criteria are in the plan. **Next session: implement PR 1
+(Phase 0 + Phase 1 + tests, Opus 4.8)**; restart the branch from `main` first per the merged-PR rule.
 
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
 branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the

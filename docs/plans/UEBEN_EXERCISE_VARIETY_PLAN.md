@@ -172,15 +172,41 @@ still fills its exercise half via translation/cloze/matching.
   distractor strings may come from the full bank. Pinned by test.
 - **Bundle:** engine-only changes in the lazy session chunk; `check:bundle` is the gate.
 
-## 6. PR slicing & effort
+## 6. PR slicing, effort & model recommendations
 
-| PR | Content | Effort |
-| -- | ------- | ------ |
-| 1  | Phase 0 + Phase 1 (+ FSRS guard) + tests | ~1 session |
-| 2  | 2a match grid + 2e Redemittel cloze | ~0.5 session |
-| 3  | 2b typed cloze | ~0.5 session |
-| 4  | 2c listening word | ~0.5 session |
-| 5  | 2d odd-one-out + Phase 3 assertions | ~0.5 session |
+| PR | Content | Effort | Recommended model |
+| -- | ------- | ------ | ----------------- |
+| 1  | Phase 0 + Phase 1 (+ FSRS guard) + tests | ~1 session | **Opus 4.8** |
+| 2  | 2a match grid + 2e Redemittel cloze | ~0.5 session | **Sonnet 5** |
+| 3  | 2b typed cloze | ~0.5 session | **Opus 4.8** |
+| 4  | 2c listening word | ~0.5 session | **Opus 4.8** |
+| 5  | 2d odd-one-out + Phase 3 assertions | ~0.5 session | **Sonnet 5** |
+
+Why (same routing logic as the Artikel-Visuals and Game G2 plans: match the model to the risk in
+the task, spend the big model only where judgment is the bottleneck):
+
+- **PR 1 = Opus 4.8.** Cross-cutting engine surgery with correctness stakes (the pool refactor must
+  not shift `/quiz` or composed-session behavior; the FSRS guard touches how learning history is
+  written; the content-pure and 2-appearance invariants need well-designed tests). This is the one
+  PR where a subtle mistake corrupts learner state, so it gets the strong model. Fable 5 is a fine
+  upgrade here if the session budget allows, but the spec in this plan is deliberately detailed
+  enough that Opus 4.8 can execute it.
+- **PR 2 = Sonnet 5.** Mechanical: two pure builders that reuse existing question types and
+  renderers (`MatchingQuestion` as-is; the Redemittel cloze mirrors the existing `clozeQ` pattern).
+  Well-bounded, fully specced, cheap to verify with tests.
+- **PR 3 = Opus 4.8.** Extends the typing block's UI and its tolerant-matcher grading path (edge
+  cases: umlauts, article prefixes, the give-up flow) and must respect the graduation gate. More
+  judgment than plumbing.
+- **PR 4 = Opus 4.8.** New interaction affordance (audio prompt + play button) with capability
+  gating (`ttsSupported()`), focus-mode and reduced-motion behavior to preserve; UI taste matters.
+- **PR 5 = Sonnet 5.** The odd-one-out builder is data-plumbing against the already-solved related
+  resolution approach (word graph), and the Phase 3 work is assertions + labels. If the related
+  clusters prove messier than expected mid-PR, escalate that PR to Opus 4.8.
+- **Phase 4 (when unfrozen): Fable 5** for anything that generates or drafts German learning
+  content (authored micro-exercise packs, the build-time generation batch): content quality is the
+  whole point there, and every generated item still passes the verification pipeline + founder
+  review. **Haiku 4.5 is not recommended for any rung** (even the small PRs edit a live learning
+  engine, not boilerplate).
 
 Each PR ships gates-green and merges to `main` per the auto-ship rule; docs (this plan's status
 line, `PROJECT_STATUS.md`, prompt log) update with each.
