@@ -374,3 +374,34 @@ domains?"_ → _"i chose both phase a and b"_ → _"go ahead with the plan"_ →
   flip the new `draft` provenance rows to `verified` (use `pnpm review:queue`); (2) exam sets / more
   dialogues for the new themes if depth is wanted; (3) a dedicated city building for the consumer themes if
   the Wohnhaus fold feels wrong. Nothing is blocking.
+
+## Session 127 (2026-07-17) — Brand kit catalogue Vol. IV–VII (condensed handoff)
+
+On branch `claude/epic-ramanujan-p049i8`; preview + docs only, no `src/` touched, no gates run. The
+founder rejected all 20 of session 113's brand directions and asked for fresh kits built on the
+recorded preferences (s116 verbatim: no gradients on logo or buttons; a variety of colorful accents;
+don't bulldoze the already-designed pages/menus/icons).
+- **Vol. IV** `preview/branding/genauly-identity-vol4.html` (artifact `b4bd024b`): 8 complete kits,
+  each a live SVG mark + wordmark + 64/40/20 px app icon + hex palette + free Google-Fonts pairing +
+  flat UI probe + a "Passt zum Bestand" line. The set: Textmarker (Cobalt & Butter), Haken dran
+  (keeps existing indigo, cheapest to ship), Sticker-Klub (`GAME_OUT #463C44`), Linie B2 (five line
+  colors = five domains), Zwei Stimmen (teal + tangerine), Bauhaus Pause (geometric primitives),
+  Neonschild (marketing face only), Der Dachs (mascot, brand surfaces only).
+- **Vol. V:** real-app previews of Kits 1 + 6 plus four new kits in Kit 6's geometric philosophy
+  (6A Bauklötze / 6B Ulm / 6C Plakat / 6D Neubau); seven preview strips in
+  `preview/branding/vol5-screens/`, produced with the s116-proven token-swap method (documented in
+  `preview/branding/README.md`).
+- **Vol. VI (model switched to Opus 4.8):** eight premium variations of the two favorites (Kit 1:
+  Kobalt & Butter / Tinte & Messing / Aubergine & Aprikose / Marine & Koralle; Kit 6: Bauhaus /
+  Graphit & Messing / Bordeaux & Marine / Mitternacht dark-mode) with the core marks intact, 9 strips
+  in `preview/branding/vol6-screens/` (the harness now also drives the app's real `.dark` mode).
+  Artifact `dfcad5f6`.
+- **Vol. VII:** the founder picked Kit 1 · Kobalt & Butter and asked to recolor it to the
+  bottom-nav blues (dark blue `#2563EB` as primary; the nav's light blue in the logo swipe instead
+  of butter). Delivered `preview/branding/genauly-identity-vol7.html` + 3 strips (`vol7-screens/`):
+  **Himmelblau `#38BDF8`** (recommended) and **Cyan `#22D3EE`** (alternate) on the real app, plus
+  the original for reference. Artifact `a4b80dcf`.
+- **Next:** the founder picks the light blue; that is the likely next real `src/` change (wire the
+  chosen two-blue palette into `src/index.css` + `tailwind.config.ts` light + dark, regenerate
+  logo/favicons/PWA icons from the mark, `pnpm build`, ship to `main`). Until then nothing
+  brand-related changes in the app.

@@ -1,15 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 128). **Gender-visuals research + Artikel-Visuals implementation
-plan (docs/preview only, nothing shipped to the app), on branch
-`claude/visual-gender-indicators-gsox24`.** A three-expert evidence panel (SLA research, memory
-science, competitor/illustration scan) evaluated how to teach der/die/das visually; findings live
-under **backlog #4 in `docs/PROJECT_REFERENCE.md`** (don't re-research). The founder reviewed two
-design-preview pages (committed under `preview/artikel-visuals/`) and picked Artikel-Wesen mascots +
-fused doodles + gender flip effects for the Theorie cards; the phased build plan with model
-recommendations is **`docs/plans/ARTIKEL_VISUALS_PLAN.md`** (next session implements PR 1). Session
-127's brand-kit catalogue (Vol. IV–VI) is still awaiting the founder's kit pick, see its handoff
-below. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-18 (session 129). **Artikel-Visuals PR 1 SHIPPED** (plan:
+`docs/plans/ARTIKEL_VISUALS_PLAN.md`): gender tokens + the three Artikel-Wesen creature marks on the
+Theorie Wörter views + the der-burst/die-bloom/das-shatter flip effects + the one-time legend, built
+in the plan's two-model split (Opus 4.8 wiring, then Fable 5 art on the same branch
+`claude/article-visuals-opus-tasks-rxurot`). Phases 2 (fused-doodle batch) and 3 (session/graph
+reuse) are next. Session 127's brand-kit work (Vol. IV–VII): the founder picked Kit 1 · Kobalt &
+Butter recolored to the bottom-nav blues and still owes the light-blue pick (Himmelblau vs Cyan;
+handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -65,6 +63,34 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 129 (2026-07-18). Artikel-Visuals PR 1 shipped (Wesen marks + flip effects
+on the Theorie cards), on branch `claude/article-visuals-opus-tasks-rxurot`.** Implemented Phase 1
+of `docs/plans/ARTIKEL_VISUALS_PLAN.md` in the plan's intended two-model split, both halves on the
+same branch:
+- **Opus 4.8 wiring half:** the `--der/--die/--das` (+`-bg`) tokens in `src/index.css` (light +
+  dark) exposed via `tailwind.config.ts`; the new `src/components/artikel/` feature (pure
+  `gender.ts` `genderOf` helper reading ONLY the authored `article` field, `Wesen.tsx`,
+  `ArtikelEffect.tsx`, `ArtikelLegend.tsx`); `FlipCard` gained an optional `onFlip` callback; marks
+  wired into `VocabList` (24px on the card front, effect on the back face), `VocabViews` Tabelle +
+  Liste (16px solid tier), the one-time legend at the top of the Wörter list (dismiss flag
+  `artikelLegendDismissed` in `useSettingsStore`, rides cloudSync); `tests/gender.test.ts`.
+- **Fable 5 art half (this session's second commit):** the placeholder art was replaced with the
+  founder-picked Preview B/D geometry from `preview/artikel-visuals/gender-doodles-panel.html`:
+  wobbly tinted-body creatures with dot eyes and one deliberate imperfection each (der = apex
+  sprout, die = unclosed outline + eyelash, das = two stray hairs), and the real per-element
+  effects (der = 8-ray burst, die = 3 staggered bloom rings, das = 6 spinning shards, CSS classes
+  `.artikel-fx-*` in `index.css`). A **200ms animation delay** syncs the effect with the card flip
+  (the back face is only visible ~225ms into the rotation, a timing bug found reviewing the
+  placeholder). Reduced motion gets an opacity-only fading tint. Verified via headless-Chromium
+  screenshots (three creatures at 56/28/24/16px in light + dark; effects freeze-framed at
+  120/300/450ms with the paused/negative-delay trick).
+- **Gates:** typecheck, lint (0 errors), test:unit 149, build, check:bundle 79.6 kB (all art rides
+  the lazy vocabulary chunk).
+- **Next: plan Phase 2** (fused-doodle registry + the founder-ruled batch of 20 words, Fable 5 high
+  per the plan §6; the selection snippet and the 10 fixed mission nouns are in the plan §4), then
+  Phase 3 (session-grading effect + graph-card mark + Flashcards mark, Sonnet 5). PWA caveat: the
+  Bibliothek is service-worker-cached, hard-refresh before judging the live result.
+
 **Handoff after session 128 (2026-07-18). Gender-visuals research panel + Artikel-Visuals
 implementation plan (Opus 4.8 → Fable 5), on branch `claude/visual-gender-indicators-gsox24`,
 docs/preview files only, nothing shipped to the app.** The founder asked how to add visuals showing a
@@ -104,48 +130,7 @@ for an evidence-based expert brainstorm. What happened, in order:
 - **Next session: implement the plan, starting with PR 1** (restart the branch from `main` first per
   the merged-PR rule, since this session's docs PR has merged).
 
-**Handoff after session 127 (2026-07-17). Brand kit catalogue Vol. IV, on branch
-`claude/epic-ramanujan-p049i8`. Preview + docs only; no `src/` touched, no gates run.** The founder
-rejected all 20 of session 113's brand directions and asked Fable for 5–10 fresh brand kits built on
-the recorded preferences (s116 verbatim: no gradients on logo or buttons; a variety of colorful
-accents; don't bulldoze the already-designed pages/menus/icons).
-- **Delivered `preview/branding/genauly-identity-vol4.html`** (indexed in that folder's `README.md`,
-  also published as private Claude artifact `b4bd024b`): 8 complete kits, each a live SVG mark +
-  wordmark + 64/40/20 px app icon + hex palette + free Google-Fonts type pairing + flat UI probe +
-  a "Passt zum Bestand" line mapping it onto the existing app. The set: **Textmarker** (highlighter
-  over the *genau* in "genauly", Cobalt & Butter), **Haken dran** (keeps existing indigo, lime check
-  through the open G, cheapest to ship), **Sticker-Klub** (die-cut sticker G in the game's
-  `GAME_OUT #463C44`), **Linie B2** (transit-line G, five line colors = five domains), **Zwei
-  Stimmen** (two speech bubbles, teal + tangerine like the Heute tabs), **Bauhaus Pause** (G from
-  circle/bar/dot primitives), **Neonschild** (neon-tube G on night ink, marketing face only),
-  **Der Dachs** (geometric badger mascot, brand surfaces only).
-- **Vol. V follow-up (same session):** the founder asked for real-app previews of Kits 1 + 6 and more
-  kits in Kit 6's geometric philosophy. Delivered `preview/branding/genauly-identity-vol5.html` + seven
-  preview strips in `preview/branding/vol5-screens/` (Kit 1, Kit 6, new kits **6A Bauklötze / 6B Ulm /
-  6C Plakat / 6D Neubau**, plus an "Aktuell" reference), produced with the s116-proven token-swap method
-  (real app headless, only CSS tokens + header logo swapped, gradients flattened; method documented in
-  `preview/branding/README.md` for reuse). Still no `src/` change.
-- **Vol. VI follow-up (same session, model switched to Opus 4.8):** the founder asked to lean into the
-  two favorites (Kit 1, Kit 6) with more color variations, aiming for a stunning/premium/trust feel.
-  Delivered `preview/branding/genauly-identity-vol6.html` + 9 strips in `preview/branding/vol6-screens/`:
-  eight premium variations (Kit 1: Kobalt & Butter / Tinte & Messing / Aubergine & Aprikose / Marine &
-  Koralle; Kit 6: Bauhaus / Graphit & Messing / Bordeaux & Marine / **Mitternacht** dark-mode) with the
-  core marks intact, deep considered palettes, previewed on the real app (the harness now also drives the
-  app's real `.dark` mode). Artifact `dfcad5f6`. Still no `src/` change.
-- **Vol. VII follow-up (same session):** the founder picked Kit 1 · Kobalt & Butter and asked to recolor
-  it to the bottom-nav blues (dark blue `#2563EB` as primary; the nav's light blue added to the palette
-  and used in the logo swipe instead of butter). Delivered `preview/branding/genauly-identity-vol7.html`
-  + 3 strips (`vol7-screens/`): two light-blue readings on the real app, **Himmelblau `#38BDF8`**
-  (recommended) and **Cyan `#22D3EE`** (alternate), plus the original for reference. Artifact `a4b80dcf`.
-  Awaiting the founder's pick of light blue; **that is the likely next real `src/` change** (wire the
-  chosen two-blue palette into `index.css` light+dark, regenerate logo/favicons/PWA icons, and note the
-  nav-mark colors already match since the palette is drawn from them). Still no `src/` change yet.
-- **Next:** the founder picks a kit or a mix (e.g. "6A but with the Kit-6 mark", or "6C with red only
-  in the logo"); then lock the spec, wire the palette into `src/index.css` + `tailwind.config.ts`
-  (light + dark), regenerate logo/favicons/PWA icons from the mark, `pnpm build`, ship to `main`.
-  Dark-mode previews of a favorite on request. Until then nothing brand-related changes in the app.
-
-_(Session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
+_(Session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder picked Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, awaiting the light-blue pick between Himmelblau `#38BDF8` and Cyan `#22D3EE`, see the W29 archive for the wiring steps), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
 + P0/P1 fixes handoff, session 121's
 arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
