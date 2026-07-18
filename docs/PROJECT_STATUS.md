@@ -132,6 +132,14 @@ accents; don't bulldoze the already-designed pages/menus/icons).
   Koralle; Kit 6: Bauhaus / Graphit & Messing / Bordeaux & Marine / **Mitternacht** dark-mode) with the
   core marks intact, deep considered palettes, previewed on the real app (the harness now also drives the
   app's real `.dark` mode). Artifact `dfcad5f6`. Still no `src/` change.
+- **Vol. VII follow-up (same session):** the founder picked Kit 1 · Kobalt & Butter and asked to recolor
+  it to the bottom-nav blues (dark blue `#2563EB` as primary; the nav's light blue added to the palette
+  and used in the logo swipe instead of butter). Delivered `preview/branding/genauly-identity-vol7.html`
+  + 3 strips (`vol7-screens/`): two light-blue readings on the real app, **Himmelblau `#38BDF8`**
+  (recommended) and **Cyan `#22D3EE`** (alternate), plus the original for reference. Artifact `a4b80dcf`.
+  Awaiting the founder's pick of light blue; **that is the likely next real `src/` change** (wire the
+  chosen two-blue palette into `index.css` light+dark, regenerate logo/favicons/PWA icons, and note the
+  nav-mark colors already match since the palette is drawn from them). Still no `src/` change yet.
 - **Next:** the founder picks a kit or a mix (e.g. "6A but with the Kit-6 mark", or "6C with red only
   in the logo"); then lock the spec, wire the palette into `src/index.css` + `tailwind.config.ts`
   (light + dark), regenerate logo/favicons/PWA icons from the mark, `pnpm build`, ship to `main`.

@@ -495,6 +495,20 @@ as a continuation entry rather than editing the session-125 entry above).
 - **Artifacts (prompts 7-8):** `preview/branding/genauly-identity-vol6.html` (new) ·
   `preview/branding/vol6-screens/*.png` (9 strips, new) · `preview/branding/README.md` · artifact
   `dfcad5f6` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+- **Prompt 9 (verbatim):**
+  > For the 1 - Kobalt & Butter, can you replace Kobalt with the dark blue color in the bottom navigation icons? Also, add another color to the palette - the light blue in the bottom navigation panel and replace the butter yellow in the logo with this light blue. Now provide a preview
+- **Response:** Pulled the exact nav colors from source (`route-icons.tsx` / `nav-items.ts`): dark blue
+  `#2563EB` (Praktisch/Theorie base), and two candidate light blues (sky `#38BDF8` = gear-center dot;
+  cyan `#22D3EE` = compass needle + chart). Built **Vol. VII**: Kit 1 with `#2563EB` as primary, the
+  light blue added to the palette AND used as the logo highlighter swipe (replacing butter) AND mapped
+  to `--accent` so app chips/badges show it. Rendered two readings on the real app (Himmelblau
+  recommended, Cyan alternate) + the original for reference. Authored
+  `preview/branding/genauly-identity-vol7.html`, 3 strips in `preview/branding/vol7-screens/`, sent the
+  two option strips, published artifact `a4b80dcf`. Asked the founder to confirm which light blue. No
+  `src/` change.
+- **Artifacts (prompt 9):** `preview/branding/genauly-identity-vol7.html` (new) ·
+  `preview/branding/vol7-screens/*.png` (3 strips, new) · `preview/branding/README.md` · artifact
+  `a4b80dcf` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
 
 ## Session 128 — 2026-07-18 — Gender-visuals research panel + Artikel-Visuals implementation plan
 

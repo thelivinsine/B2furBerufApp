@@ -1,5 +1,17 @@
 # Brand identity exploration
 
+## Vol. VII (session 127 cont., 2026-07-17) — Kit 1 recolored to the nav blues
+
+Founder tweak on the Kit 1 · Kobalt & Butter favorite: swap Kobalt for the **dark blue of the bottom
+nav** (`#2563EB`, the Praktisch/Theorie base color in `route-icons.tsx` / `nav-items.ts`), add the
+nav's **light blue** to the palette, and use it in the logo highlighter swipe instead of butter yellow.
+Because the nav carries two light-blue tones, `genauly-identity-vol7.html` shows both readings on the
+real app: **Himmelblau** `#38BDF8` (sky-400, the gear-center dot; the recommendation, reads cleanly as
+"light blue" and makes a dark/light two-blue system) and **Cyan** `#22D3EE` (cyan-400, the compass
+needle + chart bar; the alternate). Both keep the g-on-highlighter mark; the light blue also becomes the
+app `--accent` so chips/badges pick it up. Strips in `vol7-screens/`. Same token-swap method as Vol. V/VI.
+No `src/` change.
+
 ## Vol. VI (session 127 cont., 2026-07-17) — premium color variations of Kit 1 + Kit 6
 
 Founder direction: lean into the two favorites (Kit 1 Textmarker, Kit 6 Bauhaus), play with color while
