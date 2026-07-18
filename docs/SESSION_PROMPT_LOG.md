@@ -699,3 +699,32 @@ from 126 to 128.)
   `src/store/useProgressStore.ts`, `src/lib/cloudSync.ts`, `package.json`, `CLAUDE.md`,
   `docs/PROJECT_STATUS.md`, `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` (edited) ·
   private artifact "Genauly Content Pipeline".
+## Session 131 — 2026-07-18 — Üben exercise-variety options + plan
+
+- **Branch:** `claude/ueben-exercise-variety-i59ry0` · **Model:** Fable 5
+- **Prompt 1 (verbatim):**
+  > I'd like to make the ueben not just a bunch of anki cards where the learner just keeps flipping them but also add a variety of exercises for each custom ueben set. But I also understand it would be an immense amount of data to create custom ueben exercieses for each set combination. So, I'd like you to provide which options do we have to make this happen?
+- **Response 1:** Analysis of the current engine showed the "immense data" problem mostly does not
+  exist: `engine/quiz.ts` already auto-generates 10 exercise types from the existing banks (zero
+  authoring) and `SessionPlayer` renders all of them, but the generator is theme-keyed while
+  `buildScopedSession` (the Bibliothek Üben path) maps vocab/collocations/Redemittel to flashcards
+  only. Laid out five options: (A) wire the existing generator into custom sets via an item-pool
+  refactor, recommended; (B) more template exercise kinds from existing fields (article sorting,
+  noun-verb match grid, typed cloze, TTS listening, odd-one-out), zero authoring; (C) bounded
+  authored micro-exercises keyed per theme, never per set; (D) build-time AI-generated items pushed
+  through the existing verification pipeline; (E) runtime LLM generation, advised against (cost,
+  latency, unverifiable German, breaks offline). Core principle: sets are filters, exercises are
+  per-item templates, so authoring scales with exercise kinds, not set combinations.
+- **Prompt 2 (verbatim):**
+  > alright, create a robust plan for this
+- **Response 2:** Authored `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`: Phase 0 (pool-based
+  `buildPoolQuiz` refactor, distractor fallback for small sets, generic mini-banks kept out of
+  scoped sessions per the content-pure rule), Phase 1 (a ~50/50 card/exercise mix in
+  `buildScopedSession`, 2-appearances cap, difficulty plumbing, and an FSRS guard because quiz
+  `sourceId`s currently write SRS under collocation ids), Phase 2 (five independent new template
+  kinds: match grid, typed cloze, listening word, Redemittel cloze, odd-one-out), Phase 3
+  (variety guarantees + gates), Phase 4 deferred (authored per-theme packs, build-time AI bank;
+  runtime generation rejected), plus the eligibility matrix, risk register, PR slicing, and
+  success criteria. Docs-only session: plan + status handoff + this log; no engine code touched.
+- **Artifacts:** `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` (new) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · `docs/SESSION_PROMPT_LOG.md`
