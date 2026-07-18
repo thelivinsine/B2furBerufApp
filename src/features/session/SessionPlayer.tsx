@@ -31,6 +31,9 @@ import { useCountdown } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { QuestionView, kindLabel } from "@/features/quiz/QuestionViews";
 import { GrammarDrillCard } from "@/features/grammar/GrammarDrillCard";
+import { vocabById } from "@/data/vocabulary";
+import { genderOf, type Gender } from "@/components/artikel/gender";
+import { ArtikelEffect } from "@/components/artikel/ArtikelEffect";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -150,6 +153,12 @@ function SessionRun({
   const [loot, setLoot] = useState<LootItem[]>([]);
   const [done, setDone] = useState(false);
   const [exitConfirm, setExitConfirm] = useState(false);
+  // Gender reveal effect (Artikel-Visuals Phase 3): plays over the stage on a
+  // CORRECT noun answer. Retrieval is where the evidence says the moment lands.
+  const [genderFx, setGenderFx] = useState<{ gender: Gender; play: number }>({
+    gender: "die",
+    play: 0,
+  });
 
   const total = plan.blocks.length;
   const block = plan.blocks[index];
@@ -171,6 +180,15 @@ function SessionRun({
   const registerResult = (correct: boolean) => {
     if (correct) setCorrectCount((c) => c + 1);
     setCombo((c) => (correct ? c + 1 : 0));
+  };
+
+  // Fire the gender reveal effect for a correct answer, but only when the SRS
+  // source is a noun with an article (looked up in the bank). Non-nouns and
+  // Redemittel/collocation cards have no gender, so nothing plays. Never blocks
+  // the Weiter flow: it is a fire-and-forget overlay.
+  const fireGenderEffect = (sourceId: string) => {
+    const gender = genderOf(vocabById(sourceId) ?? {});
+    if (gender) setGenderFx((f) => ({ gender, play: f.play + 1 }));
   };
 
   // Collect a practiced word as loot (Phase 2.4/2.5): read the card level before
@@ -231,7 +249,10 @@ function SessionRun({
     const b = block as Extract<SessionBlock, { kind: "speaking" }>;
     registerResult(correct);
     captureLoot(b.sourceId, b.de, b.en, correct ? 4 : 0, latencyMs);
-    if (correct) award(XP.speakingDrill);
+    if (correct) {
+      fireGenderEffect(b.sourceId);
+      award(XP.speakingDrill);
+    }
   };
 
   // Typed forward recall (4.2): the three-tier verdict maps onto the SRS Grade
@@ -245,7 +266,10 @@ function SessionRun({
       grade.verdict === "correct" ? 4 : grade.verdict === "almost" ? 3 : 0;
     registerResult(grade.verdict === "correct");
     captureLoot(b.sourceId, b.de, b.en, srsGrade, latencyMs);
-    if (grade.verdict === "correct") award(XP.flashcard);
+    if (grade.verdict === "correct") {
+      fireGenderEffect(b.sourceId);
+      award(XP.flashcard);
+    }
   };
 
   const onSttError = () => {
@@ -272,7 +296,11 @@ function SessionRun({
     // (Bibliothek Üben) and write no progress state, just XP.
     if (b.source === "vocab") captureLoot(b.sourceId, b.de, b.en, correct ? 4 : 0, latencyMs);
     else if (b.source === "redemittel") practiceRedemittel(b.sourceId);
-    if (correct) award(XP.flashcard);
+    if (correct) {
+      // Only vocab cards carry an article; the helper no-ops for the rest.
+      if (b.source === "vocab") fireGenderEffect(b.sourceId);
+      award(XP.flashcard);
+    }
     advance();
   };
 
@@ -374,8 +402,11 @@ function SessionRun({
         )}
       </div>
 
-      {/* Center stage: one block per screen, slide transitions. */}
-      <div className="flex flex-1 flex-col justify-center py-4">
+      {/* Center stage: one block per screen, slide transitions. The gender
+          reveal effect overlays this stage on a correct noun answer (Artikel-
+          Visuals Phase 3); pointer-events-none, so it never blocks the block. */}
+      <div className="relative flex flex-1 flex-col justify-center py-4">
+        <ArtikelEffect gender={genderFx.gender} play={genderFx.play} />
         <AnimatePresence mode="wait">
           {/* key={block.key} is load-bearing: it remounts the block per step, which
               resets FlashcardBlock's mount-time timer and MCQView's per-prompt timer
@@ -386,6 +417,9 @@ function SessionRun({
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -24 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            // Above the reveal effect, so the burst/bloom/shatter radiates from
+            // BEHIND the opaque block card instead of crossing its text.
+            className="relative z-10"
           >
             {block.kind === "flashcard" && (
               <FlashcardBlock block={block} onGrade={onFlashcardGrade} />

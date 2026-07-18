@@ -1,11 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 129). **Artikel-Visuals PR 1 + PR 2 SHIPPED** (plan:
-`docs/plans/ARTIKEL_VISUALS_PLAN.md`): gender tokens + the three Artikel-Wesen creature marks on the
-Theorie Wörter views + the der-burst/die-bloom/das-shatter flip effects + the one-time legend (PR 1,
-two-model split: Opus 4.8 wiring then Fable 5 art), and the lazy fused-doodle registry with all 20
-batch-1 scenes on the card backs (PR 2, branch `claude/article-visuals-opus-tasks-rxurot`). Phase 3
-(session/graph reuse) is next. Session 127's brand-kit work (Vol. IV–VII): the founder picked Kit 1 · Kobalt &
+_Last updated: 2026-07-18 (session 129). **Artikel-Visuals plan FULLY SHIPPED, all 3 phases** (plan:
+`docs/plans/ARTIKEL_VISUALS_PLAN.md`, branch `claude/article-visuals-opus-tasks-rxurot`): gender
+tokens + the three Artikel-Wesen creature marks on the Theorie Wörter views + the
+der-burst/die-bloom/das-shatter flip effects + one-time legend (PR 1, Opus wiring then Fable art);
+the lazy fused-doodle registry + all 20 batch-1 scenes on the card backs (PR 2); and the reveal
+effect on correct noun answers in the session + the Wesen mark on the graph selected-node card and
+legacy Flashcards (PR 3). Session 127's brand-kit work (Vol. IV–VII): the founder picked Kit 1 · Kobalt &
 Butter recolored to the bottom-nav blues and still owes the light-blue pick (Himmelblau vs Cyan;
 handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
 
@@ -63,10 +64,10 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 129 (2026-07-18). Artikel-Visuals PR 1 + PR 2 shipped (Wesen marks + flip
-effects, then the 20-word fused-doodle batch), on branch `claude/article-visuals-opus-tasks-rxurot`.**
-Implemented Phases 1 + 2 of `docs/plans/ARTIKEL_VISUALS_PLAN.md`; Phase 1 in the plan's intended
-two-model split, both halves on the same branch:
+**Handoff after session 129 (2026-07-18). Artikel-Visuals plan FULLY shipped (all 3 PRs), on branch
+`claude/article-visuals-opus-tasks-rxurot`.** Implemented every phase of
+`docs/plans/ARTIKEL_VISUALS_PLAN.md`; Phase 1 in the plan's intended two-model split, both halves on
+the same branch:
 - **Opus 4.8 wiring half:** the `--der/--die/--das` (+`-bg`) tokens in `src/index.css` (light +
   dark) exposed via `tailwind.config.ts`; the new `src/components/artikel/` feature (pure
   `gender.ts` `genderOf` helper reading ONLY the authored `article` field, `Wesen.tsx`,
@@ -100,10 +101,18 @@ two-model split, both halves on the same branch:
 - **Gates (after both PRs):** typecheck, lint (0 errors), test:unit 174, build, check:bundle
   79.6 kB unchanged; the art is its own lazy chunk (`art-*.js` ~11.8 kB / 3.4 kB gzip) loaded only
   on flip.
-- **Next: Phase 3** (session-grading effect + graph-card mark + Flashcards mark, Sonnet 5 medium
-  per plan §6), then later doodle batches (Kapitel-2 content when authored, then top-Zipf
-  bank-wide). PWA caveat: the Bibliothek is service-worker-cached, hard-refresh before judging the
-  live result.
+- **PR 3 (same session, Opus 4.8): reuse beyond the Theorie cards.** The reveal effect now fires on
+  a CORRECT noun answer in the composed session (`SessionPlayer` flashcard/typing/speaking grade
+  paths; gender looked up via `vocabById(sourceId)`, no-op for non-nouns and Redemittel/collocation
+  cards; the effect overlays the stage but the block content sits `z-10` above it so the burst
+  radiates from behind the opaque card and never crosses the text, a legibility fix found by
+  screenshot). The Wesen mark also joins the Wörter-graph selected-node card (`WordGraph.tsx`) and
+  the legacy `Flashcards.tsx` front (the component the session engine reuses). No new tests needed
+  (marks/effect are the same tested components); gates green.
+- **Next (optional): later doodle batches** (plan §4 growth path: Kapitel-2 content when authored,
+  then top-Zipf nouns bank-wide, data+SVG only). Also parked in backlog #4: the Neuland Wesen
+  tie-in + the Eselsbrücke / Artikel-Sprint session blocks. PWA caveat: the Bibliothek is
+  service-worker-cached, hard-refresh before judging the live result.
 
 **Handoff after session 128 (2026-07-18). Gender-visuals research panel + Artikel-Visuals
 implementation plan (Opus 4.8 → Fable 5), on branch `claude/visual-gender-indicators-gsox24`,

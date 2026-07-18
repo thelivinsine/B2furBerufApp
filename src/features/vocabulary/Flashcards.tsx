@@ -13,6 +13,8 @@ import { useSessionStore } from "@/store/useSessionStore";
 import { isDue, masteryLabel, mastery } from "@/engine/srs";
 import { XP } from "@/engine/scoring";
 import { shuffle } from "@/lib/utils";
+import { genderOf } from "@/components/artikel/gender";
+import { Wesen } from "@/components/artikel/Wesen";
 
 const grades: { grade: Grade; label: string; variant: "danger" | "warning" | "info" | "success" }[] = [
   { grade: 0, label: "Nochmal", variant: "danger" },
@@ -146,6 +148,7 @@ export function Flashcards({ items }: { items: VocabItem[] }) {
                   {m === "new" ? "neu" : m === "learning" ? "lernen" : m === "review" ? "wiederholen" : "gemeistert"}
                 </Badge>
                 <div className="flex items-center gap-2">
+                  {genderOf(card) && <Wesen gender={genderOf(card)!} size={30} />}
                   <p className="text-center text-3xl font-semibold tracking-tight">
                     {card.article && <span className="text-muted-foreground">{card.article} </span>}
                     {card.de.replace(/^(der|die|das)\s/, "")}

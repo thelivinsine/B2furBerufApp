@@ -1,13 +1,18 @@
 # Artikel-Visuals Plan: Wesen gender marks, flip effects, fused doodles on the Theorie cards
 
-> Status: **Phases 1 + 2 SHIPPED** (session 129, 2026-07-18, branch
+> Status: **ALL 3 PHASES SHIPPED** (session 129, 2026-07-18, branch
 > `claude/article-visuals-opus-tasks-rxurot`). Phase 1: tokens + Wesen marks + flip effects +
 > legend live on the Theorie Wörter views, built in the intended two-model split (Opus 4.8 wiring
 > commit, then Fable 5 art commit replacing the placeholder geometry/keyframes; a 200ms effect
 > delay was added so the reveal stays visible after the ~225ms flip). Phase 2: the lazy doodle
 > registry (`src/features/vocabulary/doodles/`) + all 20 batch-1 fused scenes (final list recorded
 > in §4), guarded by `tests/doodles.test.ts` (registry↔bank integrity AND a rendered-markup check
-> that every scene uses only its own gender's tokens). **Phase 3 not started.**
+> that every scene uses only its own gender's tokens). Phase 3: the reveal effect fires on correct
+> NOUN answers in the session (`SessionPlayer` flashcard/typing/speaking grade paths, gender looked
+> up via `vocabById`; the block content sits `z-10` above the effect so the burst radiates from
+> behind the card and never crosses the text), plus the Wesen mark on the Wörter-graph selected-node
+> card and the legacy `Flashcards` front. **The plan is fully implemented; growth path (later doodle
+> batches) is the only open thread.**
 > (Originally authored 2026-07-18, session 128, on branch
 > `claude/visual-gender-indicators-gsox24`.) The founder reviewed two design-preview artifacts and
 > picked **Preview B (Artikel-Wesen mascots), Preview C (fused per-word doodles), and Preview D

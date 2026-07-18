@@ -639,4 +639,18 @@ from 126 to 128.)
   `src/store/useSettingsStore.ts` · `tests/gender.test.ts` · `tests/doodles.test.ts` ·
   `docs/plans/ARTIKEL_VISUALS_PLAN.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · `docs/SESSION_PROMPT_LOG.md` ·
-  PR #566 (Phase 1)
+  PR #566 (Phase 1) · PR #567 (Phase 2)
+- **Prompt 5 (verbatim, after switching the session model back to Opus 4.8):**
+  > alright, finish the plan
+- **Response 5 (Opus 4.8):** Shipped plan Phase 3 (PR 3), the reuse pass. In `SessionPlayer` the
+  gender reveal effect now fires on a CORRECT noun answer in the flashcard/typing/speaking grade
+  paths (`fireGenderEffect` looks the article up via `vocabById(sourceId)`, no-ops for non-nouns +
+  Redemittel/collocation cards, never blocks Weiter); the effect overlays the stage with the block
+  content pinned `z-10` above it (a screenshot review showed a bloom ring crossing the card text, so
+  the content sits above and the burst radiates from behind the opaque card). Added the Wesen mark to
+  the Wörter-graph selected-node card (`WordGraph.tsx`) and the legacy `Flashcards.tsx` front. Gates
+  green (test:unit 174, bundle 79.6 kB); squash-merged into `main` per the auto-ship rule with the
+  doc updates (plan status -> all 3 phases shipped, status handoff, CLAUDE.md).
+- **Artifacts (PR 3):** `src/features/session/SessionPlayer.tsx` · `src/features/vocabulary/WordGraph.tsx` ·
+  `src/features/vocabulary/Flashcards.tsx` · `docs/plans/ARTIKEL_VISUALS_PLAN.md` ·
+  `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/SESSION_PROMPT_LOG.md` · PR #56?
