@@ -618,9 +618,25 @@ from 126 to 128.)
   animation-delay). Gates green (typecheck, lint 0 errors, test:unit 149, build, bundle 79.6 kB);
   shipped PR 1 into `main` per the auto-ship rule and updated the docs (this entry,
   `PROJECT_STATUS.md` s129 handoff, plan status header).
+- **Prompt 4 (verbatim):**
+  > okay, proceed with phase 2
+- **Response 4 (Fable 5):** Shipped plan Phase 2 (PR 2). Ran the plan §4 selection snippet verbatim
+  against the real banks (10 fixed mission nouns + das-override picks programm/hotel/verfahren/
+  geraet + top-Zipf it_sicherheit/daten/verbindung/version/funktion/anschluss; tally 5 der / 11 die
+  / 4 das, recorded in the plan). Built `src/features/vocabulary/doodles/` (eager `index.ts`
+  registry + lazy `art.tsx` with all 20 fused scenes; referents in the new `--ink` token, creature
+  via the newly exported `WesenBody`), wired `VocabCard` to load the art chunk on a registered
+  card's first flip and show the doodle above the English, and added `tests/doodles.test.ts`
+  (registry/bank/gender integrity + a rendered-markup check that each scene uses only its own
+  gender tokens). Reviewed all 20 scenes via SSR screenshot sheets in light + dark and fixed three
+  compositions (Vollmacht hand, Hotel overlap, Beratung bubble tail). Gates green (test:unit 174,
+  bundle 79.6 kB unchanged, art chunk ~11.8 kB lazy); squash-merged into `main` per the auto-ship
+  rule with the doc updates.
 - **Artifacts:** `src/components/artikel/` (new: `gender.ts` · `Wesen.tsx` · `ArtikelEffect.tsx` ·
-  `ArtikelLegend.tsx`) · `src/index.css` · `tailwind.config.ts` · `src/features/shared/FlipCard.tsx` ·
+  `ArtikelLegend.tsx`) · `src/features/vocabulary/doodles/` (new: `index.ts` · `art.tsx`) ·
+  `src/index.css` · `tailwind.config.ts` · `src/features/shared/FlipCard.tsx` ·
   `src/features/vocabulary/VocabList.tsx` + `VocabViews.tsx` + `VocabularyTrainer.tsx` ·
-  `src/store/useSettingsStore.ts` · `tests/gender.test.ts` · `docs/plans/ARTIKEL_VISUALS_PLAN.md` ·
-  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
-  `docs/SESSION_PROMPT_LOG.md`
+  `src/store/useSettingsStore.ts` · `tests/gender.test.ts` · `tests/doodles.test.ts` ·
+  `docs/plans/ARTIKEL_VISUALS_PLAN.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  PR #566 (Phase 1)

@@ -62,6 +62,10 @@ input:-webkit-autofill {
     --die-bg: 333 71% 96%;
     --das: 142 76% 36%;
     --das-bg: 142 60% 94%;
+    /* Neutral "pencil" stroke for the fused-doodle referent objects (Artikel-
+       Visuals Phase 2): softer than --foreground so the gender color stays the
+       loudest thing in a doodle. */
+    --ink: 240 10% 25%;
 
     --shadow: 240 30% 30%;
     --radius: 0.875rem;
@@ -108,6 +112,7 @@ input:-webkit-autofill {
     --die-bg: 329 38% 18%;
     --das: 145 50% 58%;
     --das-bg: 145 35% 15%;
+    --ink: 220 20% 85%;
 
     --shadow: 240 60% 2%;
   }

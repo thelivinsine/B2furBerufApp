@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useState, type ComponentType } from "react";
 import { ChevronDown, Bookmark } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { genderOf } from "@/components/artikel/gender";
 import { Wesen } from "@/components/artikel/Wesen";
 import { ArtikelEffect } from "@/components/artikel/ArtikelEffect";
+import { hasDoodle, loadDoodle } from "./doodles";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
 
 /**
@@ -34,6 +35,21 @@ const VocabCard = memo(function VocabCard({
   const gender = genderOf(v);
   // Replay trigger for the gender reveal effect: bumped on each front→back flip.
   const [effectPlay, setEffectPlay] = useState(0);
+  // Fused doodle (Phase 2): the art chunk loads lazily on the FIRST flip of a
+  // card that has one; cards without registered art render exactly as before.
+  const withDoodle = hasDoodle(v.id);
+  const [Doodle, setDoodle] = useState<ComponentType | null>(null);
+  const onFlip =
+    gender || withDoodle
+      ? (flipped: boolean) => {
+          if (!flipped) return;
+          if (gender) setEffectPlay((n) => n + 1);
+          if (withDoodle) {
+            // Idempotent: repeat loads reuse the cached chunk/module.
+            void loadDoodle(v.id).then((C) => C && setDoodle(() => C));
+          }
+        }
+      : undefined;
 
   // Front face: the German word + example. English lives on the flip side.
   // NO filter-facet tags on the tile (founder 2026-07-13): Häufigkeit, Branche
@@ -112,6 +128,11 @@ const VocabCard = memo(function VocabCard({
         <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
           Englisch
         </p>
+        {Doodle && (
+          <div className="flex justify-center py-1">
+            <Doodle />
+          </div>
+        )}
         <p className="mt-1 text-base font-semibold sm:text-lg">{v.en}</p>
         {v.plural && <p className="mt-1 text-xs text-muted-foreground">Plural: {v.plural}</p>}
         {v.examples[0].en && (
@@ -123,14 +144,7 @@ const VocabCard = memo(function VocabCard({
     </Card>
   );
 
-  return (
-    <FlipCard
-      front={front}
-      back={back}
-      label={`Übersetzung von ${v.de}`}
-      onFlip={gender ? (flipped) => flipped && setEffectPlay((n) => n + 1) : undefined}
-    />
-  );
+  return <FlipCard front={front} back={back} label={`Übersetzung von ${v.de}`} onFlip={onFlip} />;
 });
 
 export function VocabList({ items }: { items: VocabItem[] }) {
