@@ -49,13 +49,18 @@ export function Wesen({
       aria-label={decorative ? undefined : title}
     >
       {title ? <title>{title}</title> : null}
-      {full ? <FullWesen gender={gender} /> : <SmallMark gender={gender} />}
+      {full ? <WesenBody gender={gender} /> : <SmallMark gender={gender} />}
     </svg>
   );
 }
 
-/** Full-creature tier (>= 24px): tinted body, eyes, mouth, one imperfection. */
-function FullWesen({ gender }: { gender: Gender }) {
+/**
+ * Full-creature tier (>= 24px): tinted body, eyes, mouth, one imperfection.
+ * Exported as a bare group (drawn in the 0..24 box) so the fused doodles in
+ * `features/vocabulary/doodles/` can place THE SAME creature into scenes via a
+ * transform; geometry has exactly one home.
+ */
+export function WesenBody({ gender }: { gender: Gender }) {
   const c = `hsl(var(--${gender}))`;
   const bg = `hsl(var(--${gender}-bg))`;
   const stroke = {

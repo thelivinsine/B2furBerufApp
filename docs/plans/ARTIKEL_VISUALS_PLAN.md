@@ -1,10 +1,13 @@
 # Artikel-Visuals Plan: Wesen gender marks, flip effects, fused doodles on the Theorie cards
 
-> Status: **Phase 1 SHIPPED** (session 129, 2026-07-18, branch
-> `claude/article-visuals-opus-tasks-rxurot`): tokens + Wesen marks + flip effects + legend live on
-> the Theorie Wörter views, built in the intended two-model split (Opus 4.8 wiring commit, then
-> Fable 5 art commit replacing the placeholder geometry/keyframes; a 200ms effect delay was added
-> so the reveal stays visible after the ~225ms flip). **Phases 2–3 not started.**
+> Status: **Phases 1 + 2 SHIPPED** (session 129, 2026-07-18, branch
+> `claude/article-visuals-opus-tasks-rxurot`). Phase 1: tokens + Wesen marks + flip effects +
+> legend live on the Theorie Wörter views, built in the intended two-model split (Opus 4.8 wiring
+> commit, then Fable 5 art commit replacing the placeholder geometry/keyframes; a 200ms effect
+> delay was added so the reveal stays visible after the ~225ms flip). Phase 2: the lazy doodle
+> registry (`src/features/vocabulary/doodles/`) + all 20 batch-1 fused scenes (final list recorded
+> in §4), guarded by `tests/doodles.test.ts` (registry↔bank integrity AND a rendered-markup check
+> that every scene uses only its own gender's tokens). **Phase 3 not started.**
 > (Originally authored 2026-07-18, session 128, on branch
 > `claude/visual-gender-indicators-gsox24`.) The founder reviewed two design-preview artifacts and
 > picked **Preview B (Artikel-Wesen mascots), Preview C (fused per-word doodles), and Preview D
@@ -137,6 +140,16 @@ Kapitel 1 of the Neuland game.** Concretely:
    ```
 
    Record the final 20 ids + articles in this file when the batch ships.
+
+   **SHIPPED batch 1 (session 129, 2026-07-18), selected by running exactly the snippet above
+   (tally 5 der / 11 die / 4 das; the das override bound, pulling all four das-nouns in first):**
+   1. Mission nouns: `v_beratung` (die), `v_bescheid` (der), `v_fahrkarte` (die), `v_gebuehr`
+      (die), `v_kunde` (der), `v_mietvertrag` (der), `v_personalausweis` (der), `v_rechnung`
+      (die), `v_vollmacht` (die), `v_wohnungsgeberbestaetigung` (die).
+   2. Frequency picks: `v_programm` (das, 4.98), `v_hotel` (das, 4.91), `v_verfahren` (das,
+      4.88), `v_geraet` (das, 4.6), `v_it_sicherheit` (die, 5.06), `v_daten` (die, 5.02),
+      `v_verbindung` (die, 4.98), `v_version` (die, 4.81), `v_funktion` (die, 4.79),
+      `v_anschluss` (der, 4.74).
 
 **Acceptance:** 20 doodles render on their card backs at Karten size, light+dark; every doodle
 uses the correct Wesen for its article (cross-check against `article`, this is the one place a

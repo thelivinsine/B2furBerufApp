@@ -1,11 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 129). **Artikel-Visuals PR 1 SHIPPED** (plan:
+_Last updated: 2026-07-18 (session 129). **Artikel-Visuals PR 1 + PR 2 SHIPPED** (plan:
 `docs/plans/ARTIKEL_VISUALS_PLAN.md`): gender tokens + the three Artikel-Wesen creature marks on the
-Theorie Wörter views + the der-burst/die-bloom/das-shatter flip effects + the one-time legend, built
-in the plan's two-model split (Opus 4.8 wiring, then Fable 5 art on the same branch
-`claude/article-visuals-opus-tasks-rxurot`). Phases 2 (fused-doodle batch) and 3 (session/graph
-reuse) are next. Session 127's brand-kit work (Vol. IV–VII): the founder picked Kit 1 · Kobalt &
+Theorie Wörter views + the der-burst/die-bloom/das-shatter flip effects + the one-time legend (PR 1,
+two-model split: Opus 4.8 wiring then Fable 5 art), and the lazy fused-doodle registry with all 20
+batch-1 scenes on the card backs (PR 2, branch `claude/article-visuals-opus-tasks-rxurot`). Phase 3
+(session/graph reuse) is next. Session 127's brand-kit work (Vol. IV–VII): the founder picked Kit 1 · Kobalt &
 Butter recolored to the bottom-nav blues and still owes the light-blue pick (Himmelblau vs Cyan;
 handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
 
@@ -63,10 +63,10 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 129 (2026-07-18). Artikel-Visuals PR 1 shipped (Wesen marks + flip effects
-on the Theorie cards), on branch `claude/article-visuals-opus-tasks-rxurot`.** Implemented Phase 1
-of `docs/plans/ARTIKEL_VISUALS_PLAN.md` in the plan's intended two-model split, both halves on the
-same branch:
+**Handoff after session 129 (2026-07-18). Artikel-Visuals PR 1 + PR 2 shipped (Wesen marks + flip
+effects, then the 20-word fused-doodle batch), on branch `claude/article-visuals-opus-tasks-rxurot`.**
+Implemented Phases 1 + 2 of `docs/plans/ARTIKEL_VISUALS_PLAN.md`; Phase 1 in the plan's intended
+two-model split, both halves on the same branch:
 - **Opus 4.8 wiring half:** the `--der/--die/--das` (+`-bg`) tokens in `src/index.css` (light +
   dark) exposed via `tailwind.config.ts`; the new `src/components/artikel/` feature (pure
   `gender.ts` `genderOf` helper reading ONLY the authored `article` field, `Wesen.tsx`,
@@ -84,12 +84,26 @@ same branch:
   placeholder). Reduced motion gets an opacity-only fading tint. Verified via headless-Chromium
   screenshots (three creatures at 56/28/24/16px in light + dark; effects freeze-framed at
   120/300/450ms with the paused/negative-delay trick).
-- **Gates:** typecheck, lint (0 errors), test:unit 149, build, check:bundle 79.6 kB (all art rides
-  the lazy vocabulary chunk).
-- **Next: plan Phase 2** (fused-doodle registry + the founder-ruled batch of 20 words, Fable 5 high
-  per the plan §6; the selection snippet and the 10 fixed mission nouns are in the plan §4), then
-  Phase 3 (session-grading effect + graph-card mark + Flashcards mark, Sonnet 5). PWA caveat: the
-  Bibliothek is service-worker-cached, hard-refresh before judging the live result.
+- **PR 2 (same session, Fable 5): the fused-doodle registry + batch 1.** The batch was selected by
+  running the plan §4 snippet verbatim (10 mission nouns + programm/hotel/verfahren/geraet via the
+  das override + it_sicherheit/daten/verbindung/version/funktion/anschluss by Zipf; final tally
+  5 der / 11 die / 4 das, per-word list recorded in the plan §4). New
+  `src/features/vocabulary/doodles/`: `index.ts` (eager id list, `hasDoodle`, `loadDoodle` via
+  dynamic import) + `art.tsx` (all 20 scenes: referents in the new `--ink` token, the creature via
+  the now-exported `WesenBody` so geometry has one home; ~120x96 viewBox per Preview C).
+  `VocabCard` loads the art chunk on the FIRST flip of a registered card and renders the doodle
+  above the English; unregistered cards untouched. `tests/doodles.test.ts` (25 tests): registry ↔
+  art ↔ bank integrity, declared gender === bank `article`, and a rendered-markup assertion that
+  every scene contains ONLY its own gender's CSS tokens (the wrong-gender-doodle guard). All 20
+  scenes reviewed via SSR screenshot sheet in light + dark; three composition fixes from that
+  review (Vollmacht's receiving hand, Hotel wall overlap, Beratung bubble tail).
+- **Gates (after both PRs):** typecheck, lint (0 errors), test:unit 174, build, check:bundle
+  79.6 kB unchanged; the art is its own lazy chunk (`art-*.js` ~11.8 kB / 3.4 kB gzip) loaded only
+  on flip.
+- **Next: Phase 3** (session-grading effect + graph-card mark + Flashcards mark, Sonnet 5 medium
+  per plan §6), then later doodle batches (Kapitel-2 content when authored, then top-Zipf
+  bank-wide). PWA caveat: the Bibliothek is service-worker-cached, hard-refresh before judging the
+  live result.
 
 **Handoff after session 128 (2026-07-18). Gender-visuals research panel + Artikel-Visuals
 implementation plan (Opus 4.8 → Fable 5), on branch `claude/visual-gender-indicators-gsox24`,
