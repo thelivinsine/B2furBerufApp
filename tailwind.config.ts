@@ -47,6 +47,21 @@ const config: Config = {
           DEFAULT: "hsl(var(--reward))",
           bg: "hsl(var(--reward-bg))",
         },
+        // Gender marks (Artikel-Visuals, s128 plan): der / die / das + pale
+        // `-bg` tints. Used only by the Artikel-Wesen marks + reveal effects,
+        // never as domain/graph colors.
+        der: {
+          DEFAULT: "hsl(var(--der))",
+          bg: "hsl(var(--der-bg))",
+        },
+        die: {
+          DEFAULT: "hsl(var(--die))",
+          bg: "hsl(var(--die-bg))",
+        },
+        das: {
+          DEFAULT: "hsl(var(--das))",
+          bg: "hsl(var(--das-bg))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

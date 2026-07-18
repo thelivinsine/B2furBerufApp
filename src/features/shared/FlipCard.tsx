@@ -18,15 +18,24 @@ export function FlipCard({
   back,
   className,
   label = "Übersetzung zeigen",
+  onFlip,
 }: {
   front: React.ReactNode;
   back: React.ReactNode;
   className?: string;
   label?: string;
+  /** Fires after each flip with the new state, so a caller can play a reveal
+   *  effect on front→back (Artikel-Visuals). Optional; no-op when omitted. */
+  onFlip?: (flipped: boolean) => void;
 }) {
   const [flipped, setFlipped] = useState(false);
   const reduce = useReducedMotion();
-  const toggle = () => setFlipped((f) => !f);
+  const toggle = () =>
+    setFlipped((f) => {
+      const next = !f;
+      onFlip?.(next);
+      return next;
+    });
 
   return (
     <div

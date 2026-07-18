@@ -51,6 +51,18 @@ input:-webkit-autofill {
     --reward: 38 95% 44%;
     --reward-bg: 39 88% 94%;
 
+    /* Gender marks (Artikel-Visuals, s128 plan): der=blue, die=rose, das=green
+       (textbook convention). Deliberately distinct from the six domain graph
+       hues in lib/graphPalette.ts so a mark never reads as a domain. Each has a
+       pale `-bg` tint for fills behind the Wesen / effect. Hex sources:
+       der #2563eb/#7aa5f8, die #db2777/#f27bb8, das #16a34a/#5fc98b. */
+    --der: 221 83% 53%;
+    --der-bg: 221 83% 95%;
+    --die: 333 71% 51%;
+    --die-bg: 333 71% 96%;
+    --das: 142 76% 36%;
+    --das-bg: 142 60% 94%;
+
     --shadow: 240 30% 30%;
     --radius: 0.875rem;
   }
@@ -87,6 +99,15 @@ input:-webkit-autofill {
 
     --reward: 36 79% 57%;
     --reward-bg: 38 45% 13%;
+
+    /* Gender marks, brightened for the dark canvas (same intent as the domain
+       palette's dark tones); `-bg` tints go dark/low-lightness. */
+    --der: 219 90% 73%;
+    --der-bg: 221 40% 18%;
+    --die: 329 82% 72%;
+    --die-bg: 329 38% 18%;
+    --das: 145 50% 58%;
+    --das-bg: 145 35% 15%;
 
     --shadow: 240 60% 2%;
   }
@@ -282,4 +303,39 @@ input:-webkit-autofill {
     -webkit-user-select: none !important;
     user-select: none !important;
   }
+}
+
+/* Artikel-Visuals gender reveal effects (s128 plan). PLACEHOLDER keyframes with
+   a LOCKED consumer: ArtikelEffect.tsx applies `.artikel-effect` + a per-gender
+   modifier and remounts on replay. A follow-up authoring pass (Fable 5, plan
+   §6) replaces these three keyframe bodies with the real burst / bloom / shatter
+   without renaming the classes. Compositor-friendly transforms/opacity only; no
+   JS animation loop. Reduced motion is handled in the component (static tint). */
+@keyframes artikel-der-burst {
+  0% { transform: scale(0.4); opacity: 0; }
+  35% { transform: scale(1.15); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+@keyframes artikel-die-bloom {
+  0% { transform: scale(0.5) rotate(-8deg); opacity: 0; }
+  40% { transform: scale(1.1) rotate(4deg); opacity: 0.85; }
+  100% { transform: scale(1.35) rotate(0deg); opacity: 0; }
+}
+@keyframes artikel-das-shatter {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+.artikel-effect {
+  animation-duration: 500ms;
+  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  animation-fill-mode: forwards;
+}
+.artikel-effect--der {
+  animation-name: artikel-der-burst;
+}
+.artikel-effect--die {
+  animation-name: artikel-die-bloom;
+}
+.artikel-effect--das {
+  animation-name: artikel-das-shatter;
 }
