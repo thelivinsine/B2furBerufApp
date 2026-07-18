@@ -653,4 +653,11 @@ from 126 to 128.)
   doc updates (plan status -> all 3 phases shipped, status handoff, CLAUDE.md).
 - **Artifacts (PR 3):** `src/features/session/SessionPlayer.tsx` · `src/features/vocabulary/WordGraph.tsx` ·
   `src/features/vocabulary/Flashcards.tsx` · `docs/plans/ARTIKEL_VISUALS_PLAN.md` ·
-  `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/SESSION_PROMPT_LOG.md` · PR #56?
+  `docs/PROJECT_STATUS.md` · `CLAUDE.md` · `docs/SESSION_PROMPT_LOG.md` · PR #568
+- **Prompt 6 (verbatim):**
+  > is everything merged to main? if not do it, and also document the session
+- **Response 6 (Opus 4.8):** Verified all three Artikel-Visuals PRs (#566/#567/#568) are squash-merged
+  into `main` (HEAD == origin/main, every new file present); nothing was left unmerged, so no extra
+  merge was needed. Appended this prompt to close out the session's paper trail and pushed the
+  docs-only update to `main`.
+- **Artifacts (Prompt 6):** `docs/SESSION_PROMPT_LOG.md` (+ this entry)
