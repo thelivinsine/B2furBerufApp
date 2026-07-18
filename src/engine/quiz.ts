@@ -5,12 +5,14 @@ import type {
   MCQQuestion,
   WordOrderQuestion,
   MatchingQuestion,
+  RedemittelPhrase,
   ThemeId,
   VocabItem,
   Collocation,
 } from "@/types";
 import { vocabByTheme, vocabulary } from "@/data/vocabulary";
 import { collocationsByTheme, collocations } from "@/data/collocations";
+import { redemittel } from "@/data/redemittel";
 import { sample, shuffle } from "@/lib/utils";
 import { XP } from "@/engine/scoring";
 
@@ -309,7 +311,128 @@ function wordOrderQ(c: Collocation, difficulty: Difficulty): WordOrderQuestion {
   };
 }
 
+/** Collocations deduped so no noun (grid left) or verb (grid right) repeats:
+ *  MatchingView keys the left column by `pair.left` and renders the right column
+ *  buttons with `key={right}`, so a duplicate on either side makes the match
+ *  ambiguous (and duplicates the React key). Order is preserved. */
+function distinctCols(cs: Collocation[]): Collocation[] {
+  const seenN = new Set<string>();
+  const seenV = new Set<string>();
+  const out: Collocation[] = [];
+  for (const c of cs) {
+    const n = c.noun.toLowerCase();
+    const v = c.verb.toLowerCase();
+    if (seenN.has(n) || seenV.has(v)) continue;
+    seenN.add(n);
+    seenV.add(v);
+    out.push(c);
+  }
+  return out;
+}
+
+/** Noun -> verb match grid (2a): reuses the generic MatchingView, so `pairs`
+ *  carry the noun on the left and its verb on the right. `cols` MUST already be
+ *  noun/verb-distinct (see distinctCols) and hold >= 4 items. `hint` overrides
+ *  the renderer's default "pick the translation" sub-line for the noun-verb case. */
+function collocationMatchQ(cols: Collocation[], difficulty: Difficulty): MatchingQuestion {
+  const picked = sample(cols, 4);
+  return {
+    id: qid("collocationMatch"),
+    kind: "matching",
+    difficulty,
+    themeId: (picked[0].themeId ?? "general") as ThemeId | "general",
+    prompt: "Ordne die Nomen den passenden Verben zu.",
+    hint: "Wähle links ein Nomen, dann rechts das passende Verb.",
+    pairs: picked.map((c) => ({ left: c.noun, right: c.verb })),
+  };
+}
+
+/** German function words never worth blanking in a Redemittel cloze (2e). Kept
+ *  small on purpose: modal / Konjunktiv-II verbs (würde, wäre, könnten) ARE good
+ *  targets for polite Redemittel, so they are deliberately NOT excluded. */
+const FUNCTION_WORDS = new Set<string>([
+  "dass", "wenn", "weil", "damit", "aber", "oder", "denn", "dann", "doch", "auch",
+  "noch", "nur", "schon", "eine", "einen", "einem", "einer", "eines", "der", "die",
+  "das", "den", "dem", "des", "mit", "für", "von", "aus", "bei", "nach", "über",
+  "unter", "dieser", "diese", "dieses", "nicht", "sich", "man", "wir", "ich", "sie",
+]);
+
+/** The best word to blank in a Redemittel phrase: the longest alphabetic token
+ *  (>= 4 chars) that is not a function word or the "…" placeholder. Null when the
+ *  phrase has no such content word. */
+function redemittelKeyword(de: string): string | null {
+  const tokens = de
+    .split(/\s+/)
+    .map((t) => t.replace(/[.,;:!?»«"'()…]/g, ""))
+    .filter((t) => /^[A-Za-zÄÖÜäöüß-]{4,}$/.test(t) && !FUNCTION_WORDS.has(t.toLowerCase()));
+  if (!tokens.length) return null;
+  return tokens.sort((a, b) => b.length - a.length)[0];
+}
+
+/** Blank a content word in a Redemittel phrase (2e); distractors are content
+ *  words drawn from `distractorPool` (the full bank is fine, they are not
+ *  practiced content). Null when no clean blank or too few distractors. */
+function redemittelClozeQ(
+  r: RedemittelPhrase,
+  distractorPool: RedemittelPhrase[],
+  difficulty: Difficulty,
+): MCQQuestion | null {
+  const word = redemittelKeyword(r.de);
+  if (!word) return null;
+  // Replace a WHOLE-word occurrence only (umlaut-safe, JS \b is ASCII-only).
+  const re = new RegExp(`(^|[^A-Za-zÄÖÜäöüß])(${escapeReg(word)})([^A-Za-zÄÖÜäöüß]|$)`);
+  const blanked = r.de.replace(re, (_m, a, _w, c) => `${a}___${c}`);
+  if (!blanked.includes("___")) return null;
+  const pool = Array.from(
+    new Set(
+      distractorPool
+        .filter((x) => x.id !== r.id)
+        .map((x) => redemittelKeyword(x.de))
+        .filter((w): w is string => !!w && w.toLowerCase() !== word.toLowerCase()),
+    ),
+  );
+  const distractors = sample(pool, 3);
+  if (distractors.length < 3) return null;
+  return {
+    id: qid("redemittelCloze"),
+    kind: "redemittelCloze",
+    difficulty,
+    themeId: (r.themeId ?? "general") as ThemeId | "general",
+    prompt: blanked,
+    answer: word,
+    options: shuffle([word, ...distractors]),
+    sourceId: r.id,
+    hint: r.en,
+    explain: `${r.de} – ${r.en}`,
+  };
+}
+
 /* ---------------- Public API ---------------- */
+
+/**
+ * Redemittel cloze set (2e) for a Bibliothek Redemittel Üben: blanks a content
+ * word in each phrase drawn from `pool` (the tab's set); distractors come from
+ * the full Redemittel bank so even a small set builds 4-option questions. Phrases
+ * with no clean blank are skipped.
+ */
+export function buildRedemittelQuiz(
+  pool: RedemittelPhrase[],
+  difficulty: Difficulty,
+  count: number,
+): QuizQuestion[] {
+  const out: QuizQuestion[] = [];
+  const seen = new Set<string>();
+  let guard = 0;
+  while (out.length < count && guard++ < count * 6 && pool.length > 0) {
+    const r = sample(pool, 1)[0];
+    if (seen.has(r.id)) continue;
+    seen.add(r.id);
+    const q = redemittelClozeQ(r, redemittel, difficulty);
+    if (q) out.push(q);
+    if (seen.size >= pool.length) break; // every phrase tried
+  }
+  return out;
+}
 
 /** The practiced pool a quiz set draws its ANSWERS from. */
 export interface PoolQuizInput {
@@ -363,6 +486,7 @@ export function buildPoolQuiz(
   const themeId: ThemeId | "general" = opts.themeId ?? vocab[0]?.themeId ?? "general";
   const nouns = vocab.filter((v) => v.pos === "noun" && v.article);
   const withPlural = vocab.filter((v) => v.plural && !/nur Plural/i.test(v.plural));
+  const uniqueCols = distinctCols(cols); // noun/verb-distinct pool for the match grid
 
   const out: QuizQuestion[] = [];
   const guardN = count * 6;
@@ -395,10 +519,14 @@ export function buildPoolQuiz(
     if (difficulty === 1) {
       // recognition: translation, article, matching
       const roll = Math.random();
-      if (roll < 0.5 && vocab.length >= 4) {
+      if (roll < 0.45 && vocab.length >= 4) {
         pushUnique(translationQ(sample(vocab, 1)[0], vocabDistr, difficulty));
-      } else if (roll < 0.8 && nouns.length > 0) {
+      } else if (roll < 0.68 && nouns.length > 0) {
         pushUnique(articleQ(sample(nouns, 1)[0], difficulty));
+      } else if (roll < 0.85 && vocab.length >= 4) {
+        pushUnique(matchingQ(vocab, difficulty, themeId));
+      } else if (uniqueCols.length >= 4) {
+        pushUnique(collocationMatchQ(uniqueCols, difficulty));
       } else if (vocab.length >= 4) {
         pushUnique(matchingQ(vocab, difficulty, themeId));
       } else if (vocab.length > 0) {
@@ -415,10 +543,12 @@ export function buildPoolQuiz(
       const roll = Math.random();
       if (roll < 0.3 && withPlural.length >= 4) {
         pushUnique(pluralQ(sample(withPlural, 1)[0], vocabDistr, difficulty));
-      } else if (roll < 0.55 && vocab.length >= 4) {
+      } else if (roll < 0.52 && vocab.length >= 4) {
         pushUnique(clozeQ(sample(vocab, 1)[0], vocabDistr, difficulty));
-      } else if (roll < 0.8 && cols.length >= 4) {
+      } else if (roll < 0.72 && cols.length >= 4) {
         pushUnique(collocationFillQ(sample(cols, 1)[0], colDistr, difficulty));
+      } else if (roll < 0.86 && uniqueCols.length >= 4) {
+        pushUnique(collocationMatchQ(uniqueCols, difficulty));
       } else {
         pushUnique(includeGeneric ? connectorChoiceQ(difficulty) : anyContent());
       }

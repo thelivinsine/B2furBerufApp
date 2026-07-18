@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { buildScopedSession } from "@/engine/session";
-import { buildPoolQuiz } from "@/engine/quiz";
+import { buildPoolQuiz, buildRedemittelQuiz } from "@/engine/quiz";
 import { vocabulary, vocabById } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
 import { grammar } from "@/data/grammar";
-import type { QuizQuestion, SessionBlock } from "@/types";
+import type { MatchingQuestion, MCQQuestion, QuizQuestion, SessionBlock } from "@/types";
 
 const headword = (s: string) => s.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0].toLowerCase();
 
@@ -141,14 +141,60 @@ describe("buildScopedSession (s131 exercise variety)", () => {
     if (colSet.length >= 4) expect(plan.blocks.some((b) => b.kind === "quiz")).toBe(true);
   });
 
-  it("leaves Redemittel + Grammatik scopes single-kind", () => {
-    const redeSet = redemittel.slice(0, 8).map((r) => r.id);
-    const redePlan = buildScopedSession("redemittel", redeSet, { srs: {}, minutes: 8 });
-    expect(redePlan.blocks.every((b) => b.kind === "flashcard")).toBe(true);
+  it("mixes cloze exercises into a Redemittel set, Grammatik stays drills-only", () => {
+    const redeSet = redemittel.slice(0, 24).map((r) => r.id);
+    const redePlan = buildScopedSession("redemittel", redeSet, { srs: {}, minutes: 10, difficulty: 2 });
+    expect(redePlan.blocks.some((b) => b.kind === "flashcard")).toBe(true);
+    expect(redePlan.blocks.some((b) => b.kind === "quiz")).toBe(true);
+    // Any Redemittel quiz is a cloze whose source is a phrase from the set.
+    const setIds = new Set(redeSet);
+    for (const b of redePlan.blocks) {
+      if (b.kind === "quiz") {
+        expect(b.question.kind).toBe("redemittelCloze");
+        const q = b.question as MCQQuestion;
+        expect(setIds.has(q.sourceId!)).toBe(true);
+        expect(q.prompt).toContain("___");
+        expect(q.options).toContain(q.answer);
+      }
+    }
 
     const grpSet = grammar.slice(0, 1).map((g) => g.id);
     const grPlan = buildScopedSession("grammar", grpSet, { srs: {}, minutes: 8 });
     expect(grPlan.blocks.every((b) => b.kind === "grammar")).toBe(true);
+  });
+
+  it("builds a valid noun-verb match grid (2a) with distinct sides", () => {
+    // A collocation-only pool: any matching question must be a noun->verb grid
+    // (no vocab to build a translation grid from), so we can assert its shape.
+    const cols = collocations.filter((c) => c.themeId === "behoerde");
+    if (cols.length < 6) return;
+    let sawGrid = false;
+    for (let i = 0; i < 12; i++) {
+      for (const q of buildPoolQuiz({ vocab: [], collocations: cols }, 2, 12, { includeGeneric: false })) {
+        if (q.kind !== "matching") continue;
+        sawGrid = true;
+        const m = q as MatchingQuestion;
+        expect(m.pairs.length).toBe(4);
+        const lefts = m.pairs.map((p) => p.left.toLowerCase());
+        const rights = m.pairs.map((p) => p.right.toLowerCase());
+        expect(new Set(lefts).size).toBe(lefts.length); // no ambiguous noun
+        expect(new Set(rights).size).toBe(rights.length); // no ambiguous verb (also no dup React key)
+      }
+    }
+    expect(sawGrid).toBe(true);
+  });
+
+  it("builds Redemittel clozes directly (2e): whole-word blank + real distractors", () => {
+    const set = redemittel.filter((r) => r.category === "suggestions");
+    const qs = buildRedemittelQuiz(set, 2, 6) as MCQQuestion[];
+    expect(qs.length).toBeGreaterThan(0);
+    for (const q of qs) {
+      expect(q.kind).toBe("redemittelCloze");
+      expect(q.prompt).toContain("___");
+      expect(q.options).toContain(q.answer);
+      expect(new Set(q.options).size).toBe(q.options.length); // 4 distinct options
+      expect(q.answer.length).toBeGreaterThanOrEqual(4);
+    }
   });
 
   it("degrades a tiny set to cards without throwing", () => {

@@ -1,7 +1,8 @@
 # Üben Exercise Variety Plan
 
-_Created session 131 (2026-07-18). Status: **Phase 0 + Phase 1 SHIPPED** (PR 1, s131). Phases 2–4
-not started._
+_Created session 131 (2026-07-18). Status: **Phase 0 + Phase 1 SHIPPED** (PR 1, s131) · **Phase 2a +
+2e SHIPPED** (PR 2, s131). Remaining: Phase 2 rungs 2b (typed cloze) / 2c (listening) / 2d
+(odd-one-out) + Phase 3; Phase 4 deferred._
 _Founder ask: custom Üben sets (the Bibliothek "Üben" button on a filtered tab) should play as a
 varied exercise session, not a stack of flip-cards. Constraint: no per-set content authoring, the
 number of filter combinations is unbounded._
@@ -101,9 +102,14 @@ plays ≥ 3 distinct exercise kinds, zero new content data.
 Each rung is a pure builder in `engine/quiz.ts` + (where noted) a renderer, its own PR, in this
 order (fun-per-effort, founder may reorder):
 
-- **2a. Collocation match grid (S):** `MatchingQuestion` with `pairs: {left: noun, right: verb}`
-  from 4 set collocations. Reuses the existing matching renderer as-is. Wire into collocation scope
-  + composed Pool 2.
+- **2a. Collocation match grid (S) — ✅ SHIPPED (PR 2, s131):** `MatchingQuestion` with
+  `pairs: {left: noun, right: verb}` from 4 set collocations, reusing the existing matching renderer.
+  `collocationMatchQ` in `engine/quiz.ts` (kind stays `"matching"`, so no new renderer); a
+  `distinctCols` dedupe on both noun AND verb is required because `MatchingView` keys the left column
+  by `pair.left` and the right buttons by `pair.right` (a repeat on either side is ambiguous + a
+  duplicate React key). Wired into `buildPoolQuiz` difficulty 1 + 2, so it reaches the collocation
+  scope, composed Pool 2, AND `/quiz`. The renderer's sub-line now falls back through `q.hint`, so the
+  grid reads "Wähle links ein Nomen, dann rechts das passende Verb" instead of "…die Übersetzung".
 - **2b. Typed cloze (M):** production upgrade of the MCQ cloze: the blanked example sentence is the
   prompt, the learner TYPES the headword. Implement as a variant of the existing `typing` block
   (optional `clozePrompt` field) so the tolerant matcher (`engine/pronounce.ts`) + typing UI are
@@ -113,9 +119,14 @@ order (fun-per-effort, founder may reorder):
   picks the missing/heard word from 4 options. MCQ with an `audioPrompt` flag + a play button in
   `QuestionViews`; composer emits it only when the caller reports `ttsSupported()` (same pattern as
   the reading voicemail). Turns any set into listening practice for free.
-- **2e. Redemittel cloze (S/M):** blank one content word (≥ 4 chars, not a function word) of a
-  Redemittel phrase, distractors sampled from other Redemittel. Brings variety to the Redemittel
-  scope, which Phase 1 leaves card-only.
+- **2e. Redemittel cloze (S/M) — ✅ SHIPPED (PR 2, s131):** new MCQ kind `redemittelCloze` (added to
+  `QuizKind` + `MCQQuestion.kind` + `kindLabel` → "Redemittel-Lücke"). `redemittelClozeQ` blanks the
+  longest content word (≥ 4 chars, not a small function-word set; modal/Konjunktiv-II verbs are
+  deliberately kept as good targets) via an umlaut-safe whole-word regex; distractors come from the
+  full Redemittel bank (so a small set still builds 4 options). `buildRedemittelQuiz` drives the
+  Redemittel scope, which now interleaves cloze exercises (~0.35 ratio) with recall cards. The cloze
+  carries the `r_*` sourceId only for the 2-appearance cap; the FSRS guard already skips it (no vocab
+  match), so it awards XP + combo only, never SRS.
 - **2d. Odd-one-out (M, last):** 3 words from one resolvable `related` cluster + 1 outsider,
   "Welches Wort passt nicht dazu?". Reuse the word-graph resolution approach; only use clusters that
   fully resolve (495/3,268 `related` terms don't, see `docs/reports/related-terms-report.md`).
@@ -178,7 +189,7 @@ still fills its exercise half via translation/cloze/matching.
 | PR | Content | Effort | Recommended model |
 | -- | ------- | ------ | ----------------- |
 | 1  | Phase 0 + Phase 1 (+ FSRS guard) + tests — ✅ SHIPPED (s131, Opus 4.8) | ~1 session | **Opus 4.8** |
-| 2  | 2a match grid + 2e Redemittel cloze | ~0.5 session | **Sonnet 5** |
+| 2  | 2a match grid + 2e Redemittel cloze — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Sonnet 5** |
 | 3  | 2b typed cloze | ~0.5 session | **Opus 4.8** |
 | 4  | 2c listening word | ~0.5 session | **Opus 4.8** |
 | 5  | 2d odd-one-out + Phase 3 assertions | ~0.5 session | **Sonnet 5** |
