@@ -759,3 +759,24 @@ from 126 to 128.)
   branch.
 - **Artifacts (Prompt 3):** `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` §6 · `docs/PROJECT_STATUS.md`
   · `docs/SESSION_PROMPT_LOG.md` (+ this entry)
+- **Prompt 4 (verbatim, after switching the session model to Opus 4.8):**
+  > make sure to also capture the ueben analysis done in the session earlier and the recommendations. Then proceed with implementation of the plan with opus tasks of phase 1
+- **Response 4 (Opus 4.8):** (1) Captured the earlier five-option analysis + recommendation durably
+  in the plan as Appendix A (it had only lived in this log). (2) Implemented PR 1 = Phase 0 + Phase 1.
+  Phase 0: generalized `engine/quiz.ts`'s `buildThemeQuiz` into a pool-based `buildPoolQuiz(pool,
+  difficulty, count, opts)` with `buildThemeQuiz` as a behavior-identical wrapper; new opts
+  `includeGeneric` (theme-agnostic banks off for scoped sessions), `vocabDistractors`/
+  `collocationDistractors` (pool if ≥ 4 else full bank), `themeId`, + a shared `anyContent()`
+  fallback. Phase 1: `buildScopedSession` (`engine/session.ts`) now interleaves recall cards with
+  generated exercises for the Wörter + Kollokationen scopes, capped at 2 appearances/item
+  (`capBySource`), with vocab sets also pulling collocation fill/word-order via `headword`
+  resolution; `difficulty` flows from the learner's level. FSRS guard: `SessionPlayer.onQuizResult`
+  only grades FSRS/loot when the question sourceId resolves in the vocab bank, so collocation
+  questions (`c_*`) award XP + combo only (also fixes the latent Pool 2 bug). Added
+  `tests/scopedSession.test.ts`. Gates: typecheck, test:unit 209, lint 0 errors, build,
+  check:bundle 80.8 kB, lint:content all green. Squash-merged to `main` per the auto-ship rule with
+  the plan status + PROJECT_STATUS handoff updates.
+- **Artifacts (Prompt 4):** `src/engine/quiz.ts` · `src/engine/session.ts` ·
+  `src/features/session/SessionPlayer.tsx` · `tests/scopedSession.test.ts` (new) ·
+  `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` (Appendix A + Phase 0/1 shipped markers) ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

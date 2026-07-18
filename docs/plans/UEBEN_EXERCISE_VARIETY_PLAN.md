@@ -1,6 +1,7 @@
 # Üben Exercise Variety Plan
 
-_Created session 131 (2026-07-18). Status: **approved plan, not yet built**._
+_Created session 131 (2026-07-18). Status: **Phase 0 + Phase 1 SHIPPED** (PR 1, s131). Phases 2–4
+not started._
 _Founder ask: custom Üben sets (the Bibliothek "Üben" button on a filtered tab) should play as a
 varied exercise session, not a stack of flip-cards. Constraint: no per-set content authoring, the
 number of filter combinations is unbounded._
@@ -33,7 +34,7 @@ until Phase 4, which is explicitly deferred.
 
 ## 3. Phases
 
-### Phase 0: pool-based generator refactor (no behavior change)
+### Phase 0: pool-based generator refactor (no behavior change) — ✅ SHIPPED (PR 1, s131)
 
 Extract the body of `buildThemeQuiz` into a pure
 
@@ -59,7 +60,7 @@ buildPoolQuiz(
   from the pool; distractor fallback kicks in for tiny pools; degenerate pools (1 item, no nouns, no
   plurals) never loop or throw (the existing guard counter covers this, assert it).
 
-### Phase 1: wire variety into scoped sessions (the core ask)
+### Phase 1: wire variety into scoped sessions (the core ask) — ✅ SHIPPED (PR 1, s131)
 
 `buildScopedSession` changes per scope:
 
@@ -176,7 +177,7 @@ still fills its exercise half via translation/cloze/matching.
 
 | PR | Content | Effort | Recommended model |
 | -- | ------- | ------ | ----------------- |
-| 1  | Phase 0 + Phase 1 (+ FSRS guard) + tests | ~1 session | **Opus 4.8** |
+| 1  | Phase 0 + Phase 1 (+ FSRS guard) + tests — ✅ SHIPPED (s131, Opus 4.8) | ~1 session | **Opus 4.8** |
 | 2  | 2a match grid + 2e Redemittel cloze | ~0.5 session | **Sonnet 5** |
 | 3  | 2b typed cloze | ~0.5 session | **Opus 4.8** |
 | 4  | 2c listening word | ~0.5 session | **Opus 4.8** |
@@ -217,3 +218,39 @@ line, `PROJECT_STATUS.md`, prompt log) update with each.
 2. Zero new rows in any `src/data/*` bank for Phases 0–3.
 3. All existing gates green; no main-chunk growth; no FSRS writes under non-vocab ids.
 4. The founder can no longer reproduce "just flipping cards" on a custom set.
+
+## Appendix A: Options analysis (session 131, the founder ask)
+
+The founder's question was: "make Üben not just Anki cards; add exercise variety per custom set,
+but without authoring an immense amount of per-set data." The session's analysis of the engine
+found the key fact: **the variety machinery already exists and is simply not wired to custom sets.**
+`engine/quiz.ts` already generates ~10 exercise types from the existing banks with zero authoring,
+and `SessionPlayer` already renders every one inside a session; the generator is just theme-keyed
+while `buildScopedSession` maps custom-set items to flashcards. Five options were laid out, cheapest
+first:
+
+- **Option A — wire the existing generator into custom sets (RECOMMENDED first step, zero new
+  content).** Refactor the theme-keyed generator to accept an arbitrary item pool, then have the
+  scoped-session builder interleave recall cards with generated quiz questions drawn from the set's
+  exact items. This is Phase 0 + Phase 1 of this plan. Effort: one session. New data: none.
+- **Option B — add more template exercise kinds from fields already in the banks (still zero
+  authoring).** Article bucket-sort, noun↔verb match grid, typed cloze, TTS listening, odd-one-out.
+  Each is a pure function over existing data. This is Phase 2. Effort: ~half a day per kind.
+- **Option C — bounded authored micro-exercises keyed by theme/sub-theme, never by set.** Richer
+  hand-crafted items (mini-dialogues with gaps, transformations) authored per theme (20), pulled
+  into any set whose items match. Authoring scales linearly with themes, never with combinations.
+  This is half of Phase 4 (deferred).
+- **Option D — build-time AI-generated exercises, verified by the existing pipeline.** Generate a
+  second cloze / a transformation per item offline, run it through LanguageTool + the AI-jury
+  sidecar, commit as a generated data file (like `frequency.ts`). One-time batch cost per item, not
+  per set; stays offline/PWA-safe. The other half of Phase 4 (deferred).
+- **Option E — runtime AI generation (LLM call per session). ADVISED AGAINST.** Per-session API
+  cost, latency in the learning loop, no way to verify German correctness before the learner sees
+  it, and it breaks offline use. Only revisit for premium generative features (writing-coach
+  territory).
+
+**Recommendation:** do A now, add B kinds incrementally (the match grid and article sort are the
+highest fun-per-effort), defer C/D until template variety is exhausted, and do not do E. A+B turn
+every custom Üben set into a varied session with zero new content data, because all the raw
+material (articles, plurals, example sentences, collocation pairs, related terms) already sits in
+the banks. This plan is that recommendation, phased.

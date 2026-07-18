@@ -311,15 +311,56 @@ function wordOrderQ(c: Collocation, difficulty: Difficulty): WordOrderQuestion {
 
 /* ---------------- Public API ---------------- */
 
-export function buildThemeQuiz(
-  themeId: ThemeId,
+/** The practiced pool a quiz set draws its ANSWERS from. */
+export interface PoolQuizInput {
+  vocab: VocabItem[];
+  collocations: Collocation[];
+}
+
+export interface PoolQuizOpts {
+  /**
+   * Include the theme-agnostic connector / relative-pronoun / da-word mini-banks
+   * (grammar filler). True for a theme quiz (`/quiz`, composed-session Pool 2);
+   * false for a Bibliothek scoped session, which must practise ONLY what the page
+   * shows (the content-pure rule, 2026-07-13). Distractor *strings* may still come
+   * from the full bank either way — they are not practiced content.
+   */
+  includeGeneric?: boolean;
+  /**
+   * Distractor pool for the vocab MCQs (translation / plural / cloze). Defaults to
+   * the pool's own vocab when it holds >= 4, else the full bank, so a small custom
+   * set can still build 4-option questions.
+   */
+  vocabDistractors?: VocabItem[];
+  /** Distractor pool for collocation fill. Same >= 4 fallback rule. */
+  collocationDistractors?: Collocation[];
+  /**
+   * themeId stamped on the pool-agnostic question (matching). Defaults to the
+   * first vocab item's theme, else "general".
+   */
+  themeId?: ThemeId | "general";
+}
+
+/**
+ * Generate a mixed, leveled quiz set from an ARBITRARY item pool (the s131 Üben
+ * exercise-variety refactor). This is the generalization of `buildThemeQuiz`:
+ * every answer + sourceId comes from `pool`, so a custom Bibliothek set gets the
+ * same auto-generated variety a theme does with zero authoring. `buildThemeQuiz`
+ * is now a thin wrapper that passes a theme's pools with `includeGeneric: true`
+ * and full-bank distractors, preserving its exact prior behavior.
+ */
+export function buildPoolQuiz(
+  pool: PoolQuizInput,
   difficulty: Difficulty,
-  count = 10,
+  count: number,
+  opts: PoolQuizOpts = {},
 ): QuizQuestion[] {
-  const vocab = vocabByTheme(themeId);
-  const vocabAll = vocabulary;
-  const cols = collocationsByTheme(themeId);
-  const colsAll = collocations;
+  const vocab = pool.vocab;
+  const cols = pool.collocations;
+  const includeGeneric = opts.includeGeneric ?? false;
+  const vocabDistr = opts.vocabDistractors ?? (vocab.length >= 4 ? vocab : vocabulary);
+  const colDistr = opts.collocationDistractors ?? (cols.length >= 4 ? cols : collocations);
+  const themeId: ThemeId | "general" = opts.themeId ?? vocab[0]?.themeId ?? "general";
   const nouns = vocab.filter((v) => v.pos === "noun" && v.article);
   const withPlural = vocab.filter((v) => v.plural && !/nur Plural/i.test(v.plural));
 
@@ -331,32 +372,55 @@ export function buildThemeQuiz(
     if (q) out.push(q);
   };
 
+  // Content-only question from whatever the pool actually supports, preferring
+  // production-lite kinds. Used both as the generic-disabled substitute (scoped
+  // sessions) and as the final top-up for sparse/collocation-only pools.
+  const anyContent = (): QuizQuestion | null => {
+    const roll = Math.random();
+    if (cols.length >= 1 && (roll < 0.5 || vocab.length < 4)) {
+      return collocationFillQ(sample(cols, 1)[0], colDistr, difficulty);
+    }
+    if (vocab.length >= 4) {
+      return (
+        clozeQ(sample(vocab, 1)[0], vocabDistr, difficulty) ??
+        translationQ(sample(vocab, 1)[0], vocabDistr, difficulty)
+      );
+    }
+    if (vocab.length >= 1) return translationQ(sample(vocab, 1)[0], vocabDistr, difficulty);
+    if (cols.length >= 1) return collocationFillQ(sample(cols, 1)[0], colDistr, difficulty);
+    return null;
+  };
+
   while (out.length < count && guard++ < guardN) {
     if (difficulty === 1) {
       // recognition: translation, article, matching
       const roll = Math.random();
       if (roll < 0.5 && vocab.length >= 4) {
-        pushUnique(translationQ(sample(vocab, 1)[0], vocabAll, difficulty));
+        pushUnique(translationQ(sample(vocab, 1)[0], vocabDistr, difficulty));
       } else if (roll < 0.8 && nouns.length > 0) {
         pushUnique(articleQ(sample(nouns, 1)[0], difficulty));
       } else if (vocab.length >= 4) {
         pushUnique(matchingQ(vocab, difficulty, themeId));
       } else if (vocab.length > 0) {
         // Fallback for tiny pools (was dead code behind a duplicated >= 4
-        // condition): distractors come from vocabAll, so one word suffices.
-        pushUnique(translationQ(sample(vocab, 1)[0], vocabAll, difficulty));
+        // condition): distractors come from the bank, so one word suffices.
+        pushUnique(translationQ(sample(vocab, 1)[0], vocabDistr, difficulty));
+      } else {
+        // Vocab-empty pool (e.g. a collocation-only scoped set): fall back to
+        // whatever the pool supports so difficulty 1 still yields exercises.
+        pushUnique(anyContent());
       }
     } else if (difficulty === 2) {
       // production-lite: plural, cloze, collocationFill, connectorChoice
       const roll = Math.random();
       if (roll < 0.3 && withPlural.length >= 4) {
-        pushUnique(pluralQ(sample(withPlural, 1)[0], vocabAll, difficulty));
+        pushUnique(pluralQ(sample(withPlural, 1)[0], vocabDistr, difficulty));
       } else if (roll < 0.55 && vocab.length >= 4) {
-        pushUnique(clozeQ(sample(vocab, 1)[0], vocabAll, difficulty));
+        pushUnique(clozeQ(sample(vocab, 1)[0], vocabDistr, difficulty));
       } else if (roll < 0.8 && cols.length >= 4) {
-        pushUnique(collocationFillQ(sample(cols, 1)[0], colsAll, difficulty));
+        pushUnique(collocationFillQ(sample(cols, 1)[0], colDistr, difficulty));
       } else {
-        pushUnique(connectorChoiceQ(difficulty));
+        pushUnique(includeGeneric ? connectorChoiceQ(difficulty) : anyContent());
       }
     } else {
       // application: wordOrder, relativePronoun, daWord
@@ -364,19 +428,45 @@ export function buildThemeQuiz(
       if (roll < 0.4 && cols.length > 0) {
         pushUnique(wordOrderQ(sample(cols, 1)[0], difficulty));
       } else if (roll < 0.7) {
-        pushUnique(relativePronounQ(difficulty));
+        pushUnique(includeGeneric ? relativePronounQ(difficulty) : anyContent());
       } else {
-        pushUnique(daWordQ(difficulty));
+        pushUnique(includeGeneric ? daWordQ(difficulty) : anyContent());
       }
     }
   }
 
-  // Fallback: if a sparse theme couldn't fill the set, top up with translations.
-  while (out.length < Math.min(count, 4) && vocab.length >= 4) {
-    out.push(translationQ(sample(vocab, 1)[0], vocabAll, difficulty));
+  // Fallback: if a sparse pool couldn't fill the set, top up. A theme quiz keeps
+  // its original translation-only top-up (vocab is always >= 4 there); a small or
+  // collocation-only custom set uses whatever the pool supports.
+  let guard2 = 0;
+  while (out.length < Math.min(count, 4) && guard2++ < count * 4) {
+    const q =
+      vocab.length >= 4
+        ? translationQ(sample(vocab, 1)[0], vocabDistr, difficulty)
+        : anyContent();
+    if (!q) break;
+    out.push(q);
   }
 
   return out.slice(0, count);
+}
+
+export function buildThemeQuiz(
+  themeId: ThemeId,
+  difficulty: Difficulty,
+  count = 10,
+): QuizQuestion[] {
+  return buildPoolQuiz(
+    { vocab: vocabByTheme(themeId), collocations: collocationsByTheme(themeId) },
+    difficulty,
+    count,
+    {
+      includeGeneric: true,
+      vocabDistractors: vocabulary,
+      collocationDistractors: collocations,
+      themeId,
+    },
+  );
 }
 
 function escapeReg(s: string): string {
