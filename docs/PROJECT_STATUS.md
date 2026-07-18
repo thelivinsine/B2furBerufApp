@@ -1,12 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 131). **Üben exercise-variety plan authored**
-(`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Üben sets get generated exercise variety from
-the existing banks, zero per-set authoring; implementation not started. Session 130 shipped the
-data-architecture P0/P1 integrity fixes (verification fingerprints + `pnpm stamp:verified`,
-`ID_RENAMES`, global id uniqueness as lint errors). Session 127's brand pick is still open: Kit 1 ·
-Kobalt & Butter recolored to the bottom-nav blues, founder owes the light-blue pick (Himmelblau vs
-Cyan; handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-18 (session 131). **Üben exercise-variety PR 1 shipped** (Phase 0 + Phase 1
+of `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Bibliothek Üben sets (Wörter + Kollokationen)
+now interleave auto-generated exercises with recall cards instead of flip-cards only, zero new
+content data, plus an FSRS-guard fix (quiz answers no longer write SRS under collocation ids).
+Session 130 shipped the data-architecture P0/P1 integrity fixes. Session 127's brand pick is still
+open: Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, founder owes the light-blue pick
+(Himmelblau vs Cyan; handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -66,28 +66,40 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 131 (2026-07-18). Üben exercise-variety PLAN authored (Fable 5), branch
-`claude/ueben-exercise-variety-i59ry0`, docs-only, shipped to `main`. NOT yet implemented.** The
-founder wants custom Üben sets (the Bibliothek Üben button on a filtered tab) to play as varied
-exercises, not just flip-cards, without authoring content per set combination. Analysis found the
-variety machinery already exists: `engine/quiz.ts` generates 10 exercise types from the banks with
-zero authoring (translation/article/plural/cloze/collocation-fill/matching/word-order + 3 generic
-grammar mini-banks) and `SessionPlayer`'s `QuestionView` already renders all of them in sessions;
-the gap is that the generator is theme-keyed while `buildScopedSession` maps everything to
-flashcards. The plan (`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`) locks the principle "sets are
-filters, exercises are per-item templates" and phases the work: **Phase 0** extract a pool-based
-`buildPoolQuiz` (distractor fallback to the full bank for small sets; generic mini-banks excluded
-from scoped sessions per the content-pure rule); **Phase 1** mix generated exercises ~50/50 with
-recall cards in `buildScopedSession` (vocab + collocation scopes), 2-appearances-per-item cap, plus
-an **FSRS guard**: `captureLoot` currently writes SRS under collocation ids via quiz `sourceId`,
-restrict the write to ids that resolve in the vocab bank; **Phase 2** new template kinds as
-independent rungs (2a noun↔verb match grid reusing `MatchingQuestion`, 2b typed cloze on the typing
-block, 2c TTS listening word, 2e Redemittel cloze, 2d related-cluster odd-one-out); **Phase 3**
-variety guarantees + gates; **Phase 4 deferred** (authored per-theme packs, build-time AI generation
-through the verification pipeline; runtime LLM generation rejected). PR slicing + effort estimates +
-**per-PR model recommendations** (plan §6: PR 1/3/4 Opus 4.8, PR 2/5 Sonnet 5, Phase 4 content
-drafting Fable 5, no Haiku) + success criteria are in the plan. **Next session: implement PR 1
-(Phase 0 + Phase 1 + tests, Opus 4.8)**; restart the branch from `main` first per the merged-PR rule.
+**Handoff after session 131 (2026-07-18). Üben exercise-variety: plan authored (Fable 5) THEN PR 1
+implemented (Opus 4.8), branch `claude/ueben-exercise-variety-i59ry0`, shipped to `main`.** The
+founder wanted custom Üben sets (the Bibliothek Üben button on a filtered tab) to play as varied
+exercises, not flip-cards, without authoring content per set combination. Analysis found the variety
+machinery already existed (`engine/quiz.ts` auto-generates ~10 exercise types from the banks;
+`SessionPlayer` renders all of them) but was theme-keyed while `buildScopedSession` mapped custom-set
+items to flashcards. The plan (`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`, incl. the full 5-option
+analysis in Appendix A + per-PR model map in §6) locks the principle "sets are filters, exercises are
+per-item templates". **Shipped in PR 1 (Phase 0 + Phase 1):**
+- **Phase 0 — `buildPoolQuiz`:** `engine/quiz.ts`'s theme-keyed generator was generalized to take an
+  arbitrary `{ vocab, collocations }` pool. `buildThemeQuiz` is now a thin wrapper (full-bank
+  distractors + `includeGeneric: true`), so `/quiz` and composed-session Pool 2 are behavior-identical.
+  New opts: `includeGeneric` (theme-agnostic connector/relative/daWord banks, OFF for scoped sessions
+  per the content-pure rule), `vocabDistractors`/`collocationDistractors` (default: the pool if ≥ 4
+  else the full bank, so small sets still build 4-option MCQs), `themeId`. A shared `anyContent()`
+  fallback makes sparse/collocation-only pools still yield exercises at any difficulty.
+- **Phase 1 — varied `buildScopedSession`:** the Wörter + Kollokationen scopes now `interleave` recall
+  cards with `buildPoolQuiz` exercises (~50/50), capped at **2 appearances per item** (`capBySource`);
+  a vocab set also pulls collocation fill/word-order from collocations whose noun is a set word
+  (`headword` resolution). Redemittel + Grammatik scopes unchanged. `difficulty` now flows from the
+  learner's level (`SessionPlayer` passes `difficultyForLevel(level)`). Preview line shows the mix
+  ("n Karten · m Übungen").
+- **FSRS guard (correctness fix):** `SessionPlayer.onQuizResult` now only calls `captureLoot`
+  (→ `reviewVocab`) when the question's `sourceId` resolves in the vocab bank (`vocabById`).
+  Collocation-sourced questions (fill/word-order, `c_*` ids) award XP + combo only, so they no longer
+  create phantom SRS cards under collocation ids. This also fixes the same latent bug in the composed
+  session's Pool 2.
+- **Tests:** new `tests/scopedSession.test.ts` (pool-purity, no-generic-when-disabled, degenerate
+  pools, variety ≥ 3 kinds, 2-appearance cap, tiny-set degrade, Redemittel/Grammatik unchanged).
+- **Gates:** typecheck ✓ · test:unit **209** ✓ · lint 0 errors ✓ · build ✓ · check:bundle **80.8 kB**
+  (main chunk unchanged; all engine code rides the lazy session chunk) · lint:content ✓.
+- **Next: PR 2** (Phase 2a noun↔verb match grid + 2e Redemittel cloze, Sonnet 5), then PRs 3–5 per the
+  plan §6 model map. Restart the branch from `main` first per the merged-PR rule. **PWA caveat:** the
+  session surface is service-worker-cached; hard-refresh before judging the live result.
 
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
 branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the

@@ -126,7 +126,11 @@ function SessionRun({
   // reshuffle the deck under the learner.
   const [plan] = useState(() =>
     contentScope
-      ? buildScopedSession(contentScope, libraryIds ?? [], { srs, minutes })
+      ? buildScopedSession(contentScope, libraryIds ?? [], {
+          srs,
+          minutes,
+          difficulty: difficultyForLevel(level),
+        })
       : buildSession({
           srs,
           savedWords,
@@ -232,7 +236,14 @@ function SessionRun({
     setAnswered(true);
     const q = (block as Extract<SessionBlock, { kind: "quiz" }>).question;
     registerResult(correct);
-    if (q.sourceId && q.kind !== "matching") captureLoot(q.sourceId, q.prompt, q.answer, correct ? 4 : 0, latencyMs);
+    // Only grade FSRS / capture loot when the answer is a real vocab card. Some
+    // generated questions (collocation fill, word order) carry a collocation
+    // (`c_*`) sourceId; writing an SRS card under that id would create spaced-
+    // repetition state the Sammlung/collection code never expects. Those award
+    // XP + combo only, like a collocation recognition card.
+    if (q.sourceId && q.kind !== "matching" && vocabById(q.sourceId)) {
+      captureLoot(q.sourceId, q.prompt, q.answer, correct ? 4 : 0, latencyMs);
+    }
     if (correct) award(quizXp(q.difficulty));
   };
 

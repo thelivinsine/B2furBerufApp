@@ -1,10 +1,12 @@
 import type {
+  Collocation,
   Difficulty,
   LearningMode,
   SessionBlock,
   SessionPlan,
   SrsCard,
   ThemeId,
+  VocabItem,
 } from "@/types";
 import { vocabulary, vocabByTheme } from "@/data/vocabulary";
 import { themes, themeById } from "@/data/themes";
@@ -13,7 +15,7 @@ import { collocations } from "@/data/collocations";
 import { grammar } from "@/data/grammar";
 import { texts } from "@/data/texts";
 import { isDue, mastery, reviewWeight, dueCount } from "@/engine/srs";
-import { buildThemeQuiz } from "@/engine/quiz";
+import { buildThemeQuiz, buildPoolQuiz } from "@/engine/quiz";
 import { targetBlocks, weakestBand, buildPreview } from "@/engine/sessionPreview";
 import { sample } from "@/lib/utils";
 
@@ -150,19 +152,89 @@ const CONTENT_SCOPE_LABEL: Record<ContentScope, string> = {
   grammar: "Grammatik",
 };
 
+/** The headword of a display form (strip article/`sich`, take the first token),
+ *  used to resolve collocations whose noun is a word in a vocab set. Mirrors the
+ *  cloze blanking rule in `engine/quiz.ts`. */
+const headword = (s: string) =>
+  s.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0].toLowerCase();
+
+/** A recall card for a vocab word: typed forward recall once graduated, else a
+ *  recognition flashcard (the same mapping the composed session uses). */
+function vocabCardBlock(v: VocabItem, srs: Record<string, SrsCard>): SessionBlock {
+  return graduatedToTyping(srs[v.id])
+    ? { kind: "typing", key: `ty_${v.id}`, sourceId: v.id, de: v.de, en: v.en, example: v.examples[0]?.de }
+    : {
+        kind: "flashcard",
+        key: `fc_${v.id}`,
+        source: "vocab",
+        sourceId: v.id,
+        de: v.de,
+        en: v.en,
+        example: v.examples[0]?.de,
+      };
+}
+
+/** A recognition card for a collocation (XP-only, no SRS; see SessionBlock). */
+function collocationCardBlock(c: Collocation): SessionBlock {
+  return {
+    kind: "flashcard",
+    key: `fc_col_${c.id}`,
+    source: "collocation",
+    sourceId: c.id,
+    de: c.full,
+    en: c.en,
+    example: c.example.de,
+  };
+}
+
+/** The SRS/practice source id a block attributes to, for the per-item appearance
+ *  cap. Matching questions, grammar and reading carry none. */
+function blockSource(b: SessionBlock): string | undefined {
+  if (b.kind === "flashcard" || b.kind === "typing" || b.kind === "speaking") return b.sourceId;
+  if (b.kind === "quiz") return b.question.kind === "matching" ? undefined : b.question.sourceId;
+  return undefined;
+}
+
+/** Keep block order but drop any block that would make its source item appear
+ *  more than `max` times in the session: a recognition card plus one exercise is
+ *  good interleaving, three of the same word is spam. Sourceless blocks (matching,
+ *  grammar, reading) are never capped. */
+function capBySource(blocks: SessionBlock[], max: number): SessionBlock[] {
+  const counts = new Map<string, number>();
+  const out: SessionBlock[] = [];
+  for (const b of blocks) {
+    const s = blockSource(b);
+    if (s) {
+      const n = counts.get(s) ?? 0;
+      if (n >= max) continue;
+      counts.set(s, n + 1);
+    }
+    out.push(b);
+  }
+  return out;
+}
+
 /**
- * Build a content-PURE session for a Bibliothek tab's Üben button: only blocks
- * of the given type, drawn from `ids` (the tab's exact filtered items; empty
- * falls back to the whole bank of that type). Sampled + capped to the target
- * length. No interleaving with other content types, so the learner practises
- * exactly what the page shows.
+ * Build a content-scoped session for a Bibliothek tab's Üben button, drawn from
+ * `ids` (the tab's exact filtered items; empty falls back to the whole bank of
+ * that type). The set is content-PURE: every answer + sourceId comes from the
+ * set, so the learner practises exactly what the page shows.
+ *
+ * Since the s131 exercise-variety refactor the Wörter + Kollokationen scopes
+ * INTERLEAVE recall cards with auto-generated exercises from the same set
+ * (translation / article / plural / cloze / matching, plus collocation fill +
+ * word order), instead of a stack of flip-cards. Redemittel + Grammatik keep
+ * their prior single-kind shape (Grammatik is already varied via its drills;
+ * Redemittel gains a cloze in a later plan phase). Distractor *strings* may come
+ * from the full bank when the set is small (they are not practiced content).
  */
 export function buildScopedSession(
   type: ContentScope,
   ids: string[],
-  opts: { srs: Record<string, SrsCard>; minutes: number },
+  opts: { srs: Record<string, SrsCard>; minutes: number; difficulty?: Difficulty },
 ): SessionPlan {
   const limit = targetBlocks(opts.minutes);
+  const difficulty = opts.difficulty ?? 2;
   const idSet = new Set(ids);
   const has = (id: string) => idSet.size === 0 || idSet.has(id);
   let blocks: SessionBlock[];
@@ -170,30 +242,24 @@ export function buildScopedSession(
 
   if (type === "vocab") {
     const pool = vocabulary.filter((v) => has(v.id));
-    blocks = sample(pool, Math.min(limit, pool.length)).map((v): SessionBlock =>
-      graduatedToTyping(opts.srs[v.id])
-        ? { kind: "typing", key: `ty_${v.id}`, sourceId: v.id, de: v.de, en: v.en, example: v.examples[0]?.de }
-        : {
-            kind: "flashcard",
-            key: `fc_${v.id}`,
-            source: "vocab",
-            sourceId: v.id,
-            de: v.de,
-            en: v.en,
-            example: v.examples[0]?.de,
-          },
-    );
+    const cardBlocks = sample(pool, pool.length).map((v) => vocabCardBlock(v, opts.srs));
+    // Vocab-based exercises + collocation fill/word order for collocations whose
+    // noun is a word in this set (deepens the set's nouns in real usage).
+    const heads = new Set(pool.map((v) => headword(v.de)));
+    const setCols = collocations.filter((c) => heads.has(headword(c.noun)));
+    const exercises = buildPoolQuiz({ vocab: pool, collocations: setCols }, difficulty, Math.ceil(limit * 0.5), {
+      includeGeneric: false,
+    });
+    const exerciseBlocks: SessionBlock[] = exercises.map((q) => ({ kind: "quiz", key: `qz_${q.id}`, question: q }));
+    blocks = capBySource(interleave([cardBlocks, exerciseBlocks], limit * 3), 2).slice(0, limit);
   } else if (type === "collocation") {
     const pool = collocations.filter((c) => has(c.id));
-    blocks = sample(pool, Math.min(limit, pool.length)).map((c): SessionBlock => ({
-      kind: "flashcard",
-      key: `fc_col_${c.id}`,
-      source: "collocation",
-      sourceId: c.id,
-      de: c.full,
-      en: c.en,
-      example: c.example.de,
-    }));
+    const cardBlocks = sample(pool, pool.length).map((c) => collocationCardBlock(c));
+    const exercises = buildPoolQuiz({ vocab: [], collocations: pool }, difficulty, Math.ceil(limit * 0.5), {
+      includeGeneric: false,
+    });
+    const exerciseBlocks: SessionBlock[] = exercises.map((q) => ({ kind: "quiz", key: `qz_${q.id}`, question: q }));
+    blocks = capBySource(interleave([cardBlocks, exerciseBlocks], limit * 3), 2).slice(0, limit);
   } else if (type === "redemittel") {
     const pool = redemittel.filter((r) => has(r.id));
     blocks = sample(pool, Math.min(limit, pool.length)).map((r): SessionBlock => ({
@@ -219,10 +285,17 @@ export function buildScopedSession(
     if (topics.length === 1) label = topics[0].titleDe;
   }
 
+  const cardCount = blocks.filter((b) => b.kind === "flashcard" || b.kind === "typing").length;
+  const exCount = blocks.filter((b) => b.kind === "quiz").length;
+  const preview =
+    exCount > 0
+      ? `${cardCount} ${cardCount === 1 ? "Karte" : "Karten"} · ${exCount} ${exCount === 1 ? "Übung" : "Übungen"}`
+      : `${blocks.length} ${label} zum Üben`;
+
   return {
     blocks,
     minutes: opts.minutes,
-    preview: `${blocks.length} ${label} zum Üben`,
+    preview,
     focus: label,
   };
 }
