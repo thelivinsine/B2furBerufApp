@@ -305,37 +305,89 @@ input:-webkit-autofill {
   }
 }
 
-/* Artikel-Visuals gender reveal effects (s128 plan). PLACEHOLDER keyframes with
-   a LOCKED consumer: ArtikelEffect.tsx applies `.artikel-effect` + a per-gender
-   modifier and remounts on replay. A follow-up authoring pass (Fable 5, plan
-   §6) replaces these three keyframe bodies with the real burst / bloom / shatter
-   without renaming the classes. Compositor-friendly transforms/opacity only; no
-   JS animation loop. Reduced motion is handled in the component (static tint). */
-@keyframes artikel-der-burst {
-  0% { transform: scale(0.4); opacity: 0; }
-  35% { transform: scale(1.15); opacity: 0.9; }
-  100% { transform: scale(1.6); opacity: 0; }
+/* Artikel-Visuals gender reveal effects (s128 plan, geometry from Preview D in
+   preview/artikel-visuals/gender-doodles-panel.html): der bursts (8 rays fly
+   outward), die blooms (3 staggered expanding rings), das shatters (6 spinning
+   shards). Rendered by ArtikelEffect.tsx, which remounts the elements on each
+   `play` bump so the animation restarts. Compositor-friendly transforms/opacity
+   only, no JS animation loop.
+
+   Every element starts at opacity 0 and animates with a 200ms delay: the card
+   flip needs ~225ms before the back face is visible, so without the delay the
+   effect would be half over before the learner can see it. Reduced-motion users
+   get `.artikel-fx-tint` instead (an opacity-only fade, no transforms). */
+.artikel-fx {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
-@keyframes artikel-die-bloom {
-  0% { transform: scale(0.5) rotate(-8deg); opacity: 0; }
-  40% { transform: scale(1.1) rotate(4deg); opacity: 0.85; }
-  100% { transform: scale(1.35) rotate(0deg); opacity: 0; }
+/* der: rays radiating from the effect origin. Direction comes from the
+   per-element `--a` custom property; the origin sits at the ray's top edge so
+   rotate() fans them around one point. */
+.artikel-fx-ray {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 3px;
+  height: 20px;
+  border-radius: 2px;
+  background: hsl(var(--der));
+  opacity: 0;
+  transform-origin: center 0;
+  animation: artikel-ray 550ms cubic-bezier(0.2, 0.7, 0.2, 1) 200ms forwards;
 }
-@keyframes artikel-das-shatter {
-  0% { transform: scale(1); opacity: 0.9; }
-  100% { transform: scale(1.5); opacity: 0; }
+@keyframes artikel-ray {
+  0% { opacity: 0; transform: rotate(var(--a)) translateY(5px) scaleY(0.3); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateY(52px) scaleY(1); }
 }
-.artikel-effect {
-  animation-duration: 500ms;
-  animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
-  animation-fill-mode: forwards;
+/* die: concentric rings blooming outward; the stagger (per-ring delay) is set
+   inline by the component. */
+.artikel-fx-ring {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 3px solid hsl(var(--die));
+  border-radius: 999px;
+  opacity: 0;
+  animation: artikel-bloom 650ms ease-out forwards;
+  animation-delay: var(--d, 200ms);
 }
-.artikel-effect--der {
-  animation-name: artikel-der-burst;
+@keyframes artikel-bloom {
+  0% { opacity: 0.85; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(4.4); }
 }
-.artikel-effect--die {
-  animation-name: artikel-die-bloom;
+/* das: triangular shards flying apart; trajectory + spin come from the
+   per-element `--dx/--dy/--rot` custom properties. */
+.artikel-fx-shard {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  background: hsl(var(--das));
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  opacity: 0;
+  animation: artikel-shard 600ms ease-out 200ms forwards;
 }
-.artikel-effect--das {
-  animation-name: artikel-das-shatter;
+@keyframes artikel-shard {
+  0% { opacity: 1; transform: translate(0, 0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.5); }
+}
+/* Reduced motion: a brief gender-tinted glow that only fades (opacity, no
+   transforms). The background gradient is set inline per gender. */
+.artikel-fx-tint {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: artikel-tint 900ms ease-out forwards;
+}
+@keyframes artikel-tint {
+  0% { opacity: 0.55; }
+  100% { opacity: 0; }
 }
