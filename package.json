@@ -29,6 +29,7 @@
     "verify:cefr": "node scripts/verify-cefr.mjs",
     "verify:sentences": "node scripts/verify-grammar.mjs && node scripts/verify-cefr.mjs",
     "build:verification": "node scripts/build-verification.mjs",
+    "stamp:verified": "node scripts/stamp-verified-hashes.mjs",
     "build:frequency": "node scripts/build-frequency.mjs",
     "review:queue": "node scripts/review-queue.mjs"
   },

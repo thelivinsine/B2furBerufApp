@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Grade, SrsCard } from "@/types";
 import { freshCard, review } from "@/engine/srs";
+import { remapProgressIds } from "@/lib/idRenames";
 import { daysBetween, todayKey } from "@/lib/utils";
 import { useSettingsStore } from "@/store/useSettingsStore";
 
@@ -148,11 +149,11 @@ export const useProgressStore = create<ProgressState>()(
     }),
     {
       name: "b2beruf.progress.v1",
-      // Explicit persist version so the NEXT SrsCard/state shape change has a
-      // migration hook ready (audit D6). 0 matches what zustand has been
-      // writing implicitly, so existing learners rehydrate unchanged.
-      version: 0,
-      migrate: (persisted) => persisted as ProgressState,
+      // v1 (s130): apply the content-id rename table on rehydrate, so a
+      // renamed id carries its FSRS history instead of orphaning it. With an
+      // empty ID_RENAMES table this is a no-op passthrough.
+      version: 1,
+      migrate: (persisted) => remapProgressIds(persisted as ProgressState),
     },
   ),
 );

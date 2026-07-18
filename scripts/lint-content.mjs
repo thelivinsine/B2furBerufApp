@@ -13,8 +13,10 @@
  * Errors fail the process (CI gate). Warnings are advisory and never fail.
  */
 import path from "node:path";
+import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
+import { HASH_SIDECAR, buildContentIndex, contentHash } from "./content-hash.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -251,7 +253,6 @@ function lintCollocations(collocations, subThemeIndex) {
       error(ds, w, `invalid register "${c.register}"`);
     if (c.themeId !== undefined && !THEME_IDS.includes(c.themeId))
       error(ds, w, `invalid themeId "${c.themeId}"`);
-    if (isStr(c.id) && !c.id.startsWith("c_")) warn(ds, w, "id should use the c_ prefix");
     if (c.cefr !== undefined && !CEFR_LEVELS.includes(c.cefr))
       error(ds, w, `invalid cefr "${c.cefr}"`);
     if (c.frequency !== undefined && !FREQUENCIES.includes(c.frequency))
@@ -454,7 +455,6 @@ function lintTexts(texts, subThemeIndex) {
   const allChecks = [];
   for (const t of texts) {
     const w = t.id ?? "?";
-    if (isStr(t.id) && !t.id.startsWith("tx_")) warn(ds, w, "id should use the tx_ prefix");
     if (!TEXT_KINDS.includes(t.kind)) error(ds, w, `invalid kind "${t.kind}"`);
     if (!THEME_IDS.includes(t.themeId)) error(ds, w, `invalid themeId "${t.themeId}"`);
     if (!CEFR_LEVELS.includes(t.cefr)) error(ds, w, `invalid cefr "${t.cefr}"`);
@@ -538,7 +538,6 @@ function lintMissions(missions, refs) {
 
   for (const m of missions) {
     const w = m.id ?? "?";
-    if (isStr(m.id) && !m.id.startsWith("m_")) warn(ds, w, "mission id should use the m_ prefix");
     if (!CHAPTER_IDS.includes(m.chapter)) error(ds, w, `invalid chapter "${m.chapter}"`);
     if (!isNum(m.index) || m.index <= 0) error(ds, w, "index must be a positive number");
     if (!THEME_IDS.includes(m.themeId)) error(ds, w, `invalid themeId "${m.themeId}"`);
@@ -976,6 +975,165 @@ function lintVerification(verification, allContentIds) {
 }
 
 /* ------------------------------------------------------------------ */
+/* cross-bank integrity: global ids, prefixes, fingerprints, renames   */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Global id contract (data-architecture review, s130): provenance and the
+ * verification map are keyed by content_id across ALL banks, so ids must be
+ * globally unique — and each bank's id prefix is what makes a cross-bank
+ * collision structurally impossible. Both are therefore ERRORS, not warnings.
+ * `sources` is a list of [bankName, requiredPrefix, ids].
+ */
+function lintGlobalIds(sources) {
+  const owner = new Map();
+  for (const [bank, prefix, ids] of sources) {
+    for (const id of ids) {
+      if (!isStr(id)) continue;
+      if (!id.startsWith(prefix))
+        error(bank, id, `id must use the ${bank} prefix "${prefix}" (global-uniqueness contract)`);
+      const prev = owner.get(id);
+      if (prev && prev !== bank) error("global-ids", id, `content id used in both "${prev}" and "${bank}"`);
+      else owner.set(id, bank);
+    }
+  }
+}
+
+/**
+ * Human-verification fingerprint gate (P0 of the s130 data-architecture
+ * review): a `review_status: "verified"` stamp must stay tied to the exact
+ * content the human reviewed. `pnpm stamp:verified` writes a canonical-JSON
+ * hash per verified item to docs/reports/verified-hashes.json; here every
+ * verified row is checked against its stamp. Content edited after verification
+ * FAILS the lint until it is re-reviewed and re-stamped (or flipped back to
+ * "draft"), so the "human verified" headline number can never silently rot.
+ */
+function lintVerifiedFingerprints(provenance, contentIndex) {
+  const ds = "verified-hashes";
+  const verified = provenance.filter((r) => r?.review_status === "verified");
+  let sidecar;
+  try {
+    sidecar = JSON.parse(readFileSync(HASH_SIDECAR, "utf8"));
+  } catch {
+    if (verified.length)
+      warn(ds, "sidecar", `docs/reports/verified-hashes.json missing — run pnpm stamp:verified to fingerprint the ${verified.length} verified item(s)`);
+    return;
+  }
+  const stamped = sidecar.hashes ?? {};
+  const verifiedIds = new Set(verified.map((r) => r.content_id));
+  for (const row of verified) {
+    const id = row.content_id;
+    const item = contentIndex.get(id);
+    if (!item) continue; // dangling row already errors in lintProvenance
+    const stamp = stamped[id];
+    if (!stamp)
+      error(ds, id, `verified item has no content fingerprint — run pnpm stamp:verified after the review`);
+    else if (stamp !== contentHash(item))
+      error(ds, id, `content changed AFTER human verification — re-review + pnpm stamp:verified, or flip review_status back to "draft"`);
+  }
+  for (const id of Object.keys(stamped))
+    if (!verifiedIds.has(id))
+      warn(ds, id, `stale fingerprint (no longer review_status:verified) — re-run pnpm stamp:verified`);
+}
+
+/* Mirror of normalizeForm in src/features/vocabulary/wordGraph.ts — keep the
+ * two in sync so the linter reports exactly the edges the graph would drop. */
+const RELATED_ARTICLE_RE = /^(der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines)\s+/i;
+function normalizeForm(s) {
+  return s
+    .toLowerCase()
+    .replace(/\(.*?\)/g, " ")
+    .replace(RELATED_ARTICLE_RE, "")
+    .replace(/^sich\s+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Related-term resolution audit: `related` terms that resolve to a bank entry
+ * become word-graph edges; unresolvable ones are silently dropped by design
+ * (founder-confirmed 2026-07-11) — but "silently" meant invisibly, so a typo
+ * in a related term rotted a connection with no report anywhere. This writes
+ * the drop list to docs/reports/related-terms-report.md and surfaces one
+ * summary warning, keeping the rot visible without flooding CI output.
+ */
+function auditRelatedTerms(vocab) {
+  const byForm = new Set();
+  for (const v of vocab) {
+    if (isStr(v.de)) byForm.add(normalizeForm(v.de));
+    if (isStr(v.plural)) byForm.add(normalizeForm(v.plural));
+  }
+  let total = 0;
+  const unresolved = [];
+  for (const v of vocab) {
+    for (const rel of v.related ?? []) {
+      if (!isStr(rel)) continue;
+      total += 1;
+      if (!byForm.has(normalizeForm(rel))) unresolved.push({ id: v.id, themeId: v.themeId, term: rel });
+    }
+  }
+
+  const reportPath = path.join(root, "docs", "reports", "related-terms-report.md");
+  const byTheme = new Map();
+  for (const u of unresolved) {
+    if (!byTheme.has(u.themeId)) byTheme.set(u.themeId, []);
+    byTheme.get(u.themeId).push(u);
+  }
+  const lines = [
+    "# Related-terms resolution report",
+    "",
+    "Generated by `pnpm lint:content`. Do not hand-edit.",
+    "",
+    `\`related\` terms that do NOT resolve to a vocabulary-bank entry (so the`,
+    `word graph drops the edge, by design). Fix a typo to restore a lost`,
+    `connection, add the word to the bank, or leave it (a plain association`,
+    `that is not a bank entry is fine).`,
+    "",
+    `- Related terms total: ${total}`,
+    `- Resolve to a bank entry: ${total - unresolved.length}`,
+    `- Unresolved (edge dropped): ${unresolved.length}`,
+    "",
+  ];
+  for (const [themeId, rows] of [...byTheme.entries()].sort(([a], [b]) => a.localeCompare(b))) {
+    lines.push(`## ${themeId} (${rows.length})`, "");
+    for (const r of rows.sort((a, b) => a.id.localeCompare(b.id)))
+      lines.push(`- \`${r.id}\`: "${r.term}"`);
+    lines.push("");
+  }
+  writeFileSync(reportPath, `${lines.join("\n")}\n`, "utf8");
+
+  return { total, unresolved: unresolved.length };
+}
+
+/**
+ * ID-rename registry integrity (src/lib/idRenames.ts): a rename's source id
+ * must be gone from the banks (otherwise it is not a rename) and its target
+ * must resolve — possibly through a chain — to a live content id. This is the
+ * repo half of the "shipped ids are permanent" contract; the store half remaps
+ * learner progress on rehydrate/merge.
+ */
+function lintIdRenames(renames, allContentIds) {
+  const ds = "id-renames";
+  for (const [from, to] of Object.entries(renames)) {
+    if (allContentIds.has(from))
+      error(ds, from, `rename source still exists in the banks — a renamed id must be gone`);
+    let cur = to;
+    const seen = new Set([from]);
+    while (Object.prototype.hasOwnProperty.call(renames, cur)) {
+      if (seen.has(cur)) {
+        error(ds, from, `rename chain has a cycle at "${cur}"`);
+        cur = null;
+        break;
+      }
+      seen.add(cur);
+      cur = renames[cur];
+    }
+    if (cur !== null && !allContentIds.has(cur))
+      error(ds, from, `rename target "${cur}" does not exist in any bank`);
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* run                                                                 */
 /* ------------------------------------------------------------------ */
 
@@ -1015,6 +1173,8 @@ async function main() {
     const verif = await load("/src/data/verification.ts").catch(() => ({ verification: {} }));
     // Generated frequency map (pnpm build:frequency) — optional as well.
     const freq = await load("/src/data/frequency.ts").catch(() => ({ frequency: {} }));
+    // ID-rename registry (shipped-ids-are-permanent contract) — optional.
+    const renames = await load("/src/lib/idRenames.ts").catch(() => ({ ID_RENAMES: {} }));
     data = {
       vocabulary: vocab.vocabulary,
       collocations: colloc.collocations,
@@ -1035,6 +1195,7 @@ async function main() {
       chapters: miss.chapters,
       verification: verif.verification ?? {},
       frequency: freq.frequency ?? {},
+      idRenames: renames.ID_RENAMES ?? {},
     };
   } finally {
     await server.close();
@@ -1061,25 +1222,37 @@ async function main() {
     keyItemIds: new Set(data.keyItems.map((k) => k.id)),
   });
 
-  // Build the full set of trackable content ids from all banks, then check
-  // that the provenance register has exactly one row per id.
-  const allContentIds = new Set([
-    ...data.vocabulary.map((v) => v.id),
-    ...data.collocations.map((c) => c.id),
-    ...data.grammar.map((t) => t.id),
-    ...data.grammar.flatMap((t) => t.drills?.map((d) => d.id) ?? []),
-    ...data.scenarios.map((s) => s.id),
-    ...data.examSets.map((e) => e.id),
-    ...data.redemittel.map((r) => r.id),
-    ...data.canDoStatements.map((c) => c.id),
+  // Every bank that feeds the provenance register, with its owned id prefix.
+  // The prefixes make cross-bank id collisions structurally impossible, so
+  // both prefix and global uniqueness are enforced as errors (lintGlobalIds).
+  const idSources = [
+    ["vocabulary", "v_", data.vocabulary.map((v) => v.id)],
+    ["collocations", "c_", data.collocations.map((c) => c.id)],
+    ["grammar", "g_", data.grammar.map((t) => t.id)],
+    ["grammar", "g_", data.grammar.flatMap((t) => t.drills?.map((d) => d.id) ?? [])],
+    ["dialogues", "sc_", data.scenarios.map((s) => s.id)],
+    ["examSets", "ex_", data.examSets.map((e) => e.id)],
+    ["redemittel", "r_", data.redemittel.map((r) => r.id)],
+    ["canDo", "cd_", data.canDoStatements.map((c) => c.id)],
     // One provenance row per text; embedded checks ride on the text's row.
-    ...data.texts.map((t) => t.id),
+    ["texts", "tx_", data.texts.map((t) => t.id)],
     // One provenance row per mission; scenes/moves/checks ride on it.
-    ...data.missions.map((m) => m.id),
+    ["missions", "m_", data.missions.map((m) => m.id)],
     // Writing prompts are keyed by themeId, not individual ids.
-    ...THEME_IDS.filter((id) => data.writingPrompts[id]).map((id) => `wp_${id}`),
-  ]);
+    ["writingPrompts", "wp_", THEME_IDS.filter((id) => data.writingPrompts[id]).map((id) => `wp_${id}`)],
+  ];
+  lintGlobalIds(idSources);
+
+  // Full set of trackable content ids: the provenance register must have
+  // exactly one row per id.
+  const allContentIds = new Set(idSources.flatMap(([, , ids]) => ids));
   lintProvenance(data.provenance, allContentIds);
+
+  // Human-verification fingerprints + the id-rename registry + the
+  // related-terms drop audit (s130 data-architecture review).
+  lintVerifiedFingerprints(data.provenance, buildContentIndex(data));
+  lintIdRenames(data.idRenames, allContentIds);
+  const related = auditRelatedTerms(data.vocabulary);
   const tierHist = lintVerification(data.verification, allContentIds);
 
   // Generated frequency map integrity: every key must be a live content_id
@@ -1130,6 +1303,14 @@ async function main() {
     for (const t of ["human", "jury", "linguistic", "facts", "provenance", "structural", "unverified"])
       if (tierHist[t]) console.log(`  ${String(tierHist[t]).padStart(4)} ${t}`);
   }
+
+  const resolved = related.total - related.unresolved;
+  console.log(
+    `Related terms: ${resolved}/${related.total} resolve to bank entries` +
+      (related.unresolved
+        ? ` (${related.unresolved} dropped from the graph — see docs/reports/related-terms-report.md)`
+        : ""),
+  );
 
   if (warnings.length) {
     console.log(`\n⚠ ${warnings.length} warning(s):`);

@@ -405,3 +405,42 @@ don't bulldoze the already-designed pages/menus/icons).
   chosen two-blue palette into `src/index.css` + `tailwind.config.ts` light + dark, regenerate
   logo/favicons/PWA icons from the mark, `pnpm build`, ship to `main`). Until then nothing
   brand-related changes in the app.
+
+**Handoff after session 128 (2026-07-18). Gender-visuals research panel + Artikel-Visuals
+implementation plan (Opus 4.8 → Fable 5), on branch `claude/visual-gender-indicators-gsox24`,
+docs/preview files only, nothing shipped to the app.** The founder asked how to add visuals showing a
+word's gender so learners "also learn visually", then floated a moustache-stick-figure idea and asked
+for an evidence-based expert brainstorm. What happened, in order:
+- **Idea survey + first preview page:** seven visual-gender ideas (ArticleBadge chips, shape encoding,
+  plural-morphology highlighting, graph gender rings, suffix-rule hints, a gender-sort game scene,
+  sub-theme watermarks), mocked in the app's real tokens.
+- **Three-expert evidence panel** (parallel research agents: SLA literature, memory science,
+  competitor/illustration practice). Headline results: images that FUSE meaning+gender have the
+  strongest evidence (Santos 2015, n=283); color alone is weak and voices are harmful; a repeated
+  "bizarre" marker (the moustache) self-defeats (contrast collapse + seductive-details penalty); human
+  personas teach a FALSE rule on `das Mädchen`/`die Person`/`der Gast` and carry stereotype risk, so
+  they were dropped; learner-generated associations (generation effect) and retrieval-moment practice
+  carry the largest durable gains. Full findings + citations live under **backlog #4 in
+  `docs/PROJECT_REFERENCE.md`** (recorded this session; do not re-research), including two proposed
+  quiz exercises the founder flagged: the **"Meine Eselsbrücke" self-made memory hook** and an
+  **Artikel-Sprint** der/die/das drill.
+- **Second preview page** (panel findings + previews A–E). The founder picked **Preview B
+  (Artikel-Wesen: three non-human mascots, spiky-blue der / round-rose die / boxy-green das), Preview C
+  (fused per-word doodles), and Preview D (gender effects at answer-reveal)** for the **Theorie
+  cards**. Both preview pages are committed under **`preview/artikel-visuals/`** (open in a browser;
+  they follow light/dark).
+- **The build plan is `docs/plans/ARTIKEL_VISUALS_PLAN.md`:** three phased PRs (1: tokens + Wesen
+  marks on Karten/Tabelle/Liste + flip effect + one-time legend; 2: lazy doodle registry + batch 1 of
+  20 fused doodles; 3: reuse in session grading, graph card, flashcards), each with model
+  recommendations (Opus 4.8 for the cross-cutting wiring, **Fable 5 high for the Wesen/doodle art**,
+  Sonnet 5 for mechanical reuse), acceptance criteria, and guardrails (gender palette distinct from
+  `graphPalette.ts` domain colors, shape never color-only, reduced-motion, bundle budget, no
+  always-on animation).
+- **Founder selection rule for the 20 batch-1 doodle words (2026-07-18): high frequency AND highly
+  useful for Kapitel 1 of the game.** The plan encodes it: the 10 nouns Kapitel-1 missions directly
+  reference (6 die / 4 der / 0 das, listed in the plan) + 10 top-Zipf nouns from the Kapitel-1 mission
+  themes (`travel`/`technology`/`sustainability`/`wohnen`/`behoerde`) with a das-balance override
+  (>= 4 das-words in the batch), selection snippet included in the plan. (The five NEW s126 `alltag`
+  themes are not Kapitel-1 themes, so they don't enter batch 1.)
+- **Next session: implement the plan, starting with PR 1** (restart the branch from `main` first per
+  the merged-PR rule, since this session's docs PR has merged).

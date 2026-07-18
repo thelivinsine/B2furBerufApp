@@ -661,3 +661,41 @@ from 126 to 128.)
   merge was needed. Appended this prompt to close out the session's paper trail and pushed the
   docs-only update to `main`.
 - **Artifacts (Prompt 6):** `docs/SESSION_PROMPT_LOG.md` (+ this entry)
+## Session 130 — 2026-07-18 — Data-architecture review + P0/P1 integrity fixes
+
+- **Branch:** `claude/app-data-management-guide-tcmz3j` · **Model:** Fable 5
+- **Prompt 1 (verbatim):**
+  > I had been trying to understand how the data/content of the app is managed but I still am not fully sure how it works. If I don't understand how can I present it to a crowd or audience? I want you to explain it me clearly, and I want to access the data in the repository direclty - so tell me which files to look at and where they are located at. I'm a non tech founder so be as clear as possible but don't dumb it down too much - I understand a few things about tech as I worked as a consultant and analyst, but not as much as a softweare engineer.
+- **Response 1:** Explained the content-as-code architecture end to end: the `src/data/` banks (with
+  live line/size numbers and a real `vocabulary.ts` entry), the domain→theme→sub-theme hierarchy,
+  the five-layer quality pipeline (structural linter, two-oracle fact check, grammar/CEFR checks,
+  trust tiers, human review loop), the ship path, how to browse the files on GitHub, and a
+  three-sentence version for presenting to an audience.
+- **Prompt 2 (verbatim):** `> Yes, create the visual diagram of the content pipeline`
+- **Response 2:** Published a private Claude artifact "Genauly Content Pipeline": a one-page
+  five-stage diagram (content banks → structural gate → linguistic verification → trust tiers →
+  ship) in brand indigo with a stats strip, light + dark themed.
+- **Prompt 3 (verbatim):**
+  > what's your expert opinion on the data architecture? should there be any improvements/corrections? are there any loop-holes or missed opportunities to improve it? Do a detailed analysis and provide p0-p3 recommendations
+- **Response 3:** Inspected the linter, types, sync layer, and generated-file wiring, then delivered
+  a prioritized review. P0: verified items are not fingerprinted, so a post-review edit silently
+  keeps "verified" status. P1: id renames orphan learner FSRS history; global id uniqueness across
+  banks unenforced (prefixes only warnings); unresolvable `related` terms rot invisibly. P2:
+  authoring-workflow scaling (TS2590 splits), the ~2 MB `/sources` chunk, hand-rolled linter vs
+  schema library, game-state sync. P3: oracle-coverage warning for new nouns, learner-performance
+  feedback loop, unused review-status rungs.
+- **Prompt 4 (verbatim):** `> go ahead with the fixes/improvements`
+- **Response 4:** Implemented P0 + P1: (1) `pnpm stamp:verified` + `scripts/content-hash.mjs` +
+  the `docs/reports/verified-hashes.json` sidecar (25 Can-Do rows stamped) with a lint gate that
+  fails on post-verification edits (tamper-tested); (2) `src/lib/idRenames.ts` (`ID_RENAMES` +
+  remap helpers) applied in the progress store's persist v1 migrate and on cloudSync remote rows,
+  pinned by `tests/idRenames.test.ts`; (3) global id uniqueness + per-bank prefixes as lint errors;
+  (4) the related-terms drop audit (`docs/reports/related-terms-report.md`, 495/3,268 unresolved).
+  Gates: lint:content 0 errors, test:unit 184/184 after rebasing onto the parallel s129 Artikel-Visuals PRs, build green, bundle 80.7 kB. Docs updated
+  (CLAUDE.md commands + conventions, PROJECT_STATUS.md s130 handoff, collocation count 1,011→1,033).
+- **Artifacts:** `scripts/content-hash.mjs`, `scripts/stamp-verified-hashes.mjs`,
+  `src/lib/idRenames.ts`, `tests/idRenames.test.ts`, `docs/reports/verified-hashes.json`,
+  `docs/reports/related-terms-report.md` (all new) · `scripts/lint-content.mjs`,
+  `src/store/useProgressStore.ts`, `src/lib/cloudSync.ts`, `package.json`, `CLAUDE.md`,
+  `docs/PROJECT_STATUS.md`, `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` (edited) ·
+  private artifact "Genauly Content Pipeline".
