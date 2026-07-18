@@ -700,6 +700,15 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
 - **No cookie-consent banner**: storage is functional-only (auth session + `b2beruf.*` settings/
   progress + PWA cache), which is consent-exempt under GDPR/§25(2) TTDSG. Only revisit if
   analytics/marketing storage is ever added.
+- **`/sources` = "Quellen & Datenqualität" (redesigned s130):** the public page tells the
+  data-architecture story visually (stat tiles, five-step pipeline graphic, stacked tier bar,
+  per-bank counts, sources/licenses, full item browse), generated from the provenance register +
+  verification map. Founders additionally get the **Daten-Werkbank**
+  (`features/legal/AdminWorkbench.tsx`): the full register as a sortable table with fuzzy search,
+  Typ/Stufe/Status filters, CSV export of the filtered view (`src/lib/csv.ts`), copy-id chips and
+  per-row verified-checkbox + note (Supabase `provenance_reviews`). **Admin gate = the two
+  `FOUNDER_EMAILS` in `src/lib/admin.ts`** (client) + the RLS policy from migrations 0004/0007
+  (server); keep both in lockstep, `tests/admin.test.ts` pins the email list.
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — the only other workflow in `.github/workflows/` is `validate.yml` (the content-lint + SRS test gate), which never deploys. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)

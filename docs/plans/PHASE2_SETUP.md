@@ -287,20 +287,29 @@ real fix), but both are one-click hardening if you want them:
 
 ## Admin source review (provenance QC): founder setup step
 
-The `/sources` page has a founder-only overlay for marking each content item as
-human-verified and attaching an internal note. It is gated to your account both
-in the UI and server-side. To turn it on, run the migration once:
+The `/sources` page has a founder-only **data workbench** (redesigned s130): the
+full content register as a searchable, filterable, sortable table with CSV
+export, plus a live "geprüft" checkbox and note per item. It is gated to the two
+admin accounts both in the UI and server-side. To turn it on, run the
+migrations once:
 
 1. **Create the review table.** Run `supabase/migrations/0004_provenance_reviews.sql`
    in the Supabase SQL editor. It creates `public.provenance_reviews` with an RLS
-   policy that only allows a session whose login email is `thelivinsine@gmail.com`
-   to read or write. No other user (and no anonymous visitor) can see the marks or
-   notes. Verify: the policy `provenance_reviews_founder_all` appears under
-   Authentication → Policies for `provenance_reviews`.
-2. **Use it.** Sign in with that account, open `/sources`, and a "Quellenprüfung"
-   box appears at the top. Each item in "Alle Inhalte und ihre Quellen" gets a
-   "geprüft" checkbox and a "Notiz" field; changes save automatically. If you skip
-   the migration the page still works for everyone, the saves just silently no-op
-   for you (best-effort, offline-first).
-   - If the gating email ever changes, update it in BOTH the migration's policy and
-     `FOUNDER_EMAIL` in `src/lib/admin.ts`.
+   policy that only allows the founder login email to read or write. No other
+   user (and no anonymous visitor) can see the marks or notes. Verify: the policy
+   `provenance_reviews_founder_all` appears under Authentication → Policies for
+   `provenance_reviews`.
+2. **Extend the gate to both admin accounts (s130).** Run
+   `supabase/migrations/0007_provenance_reviews_admins.sql` in the SQL editor. It
+   replaces the policy so BOTH `thelivinsine@gmail.com` and
+   `thesuhaspala@gmail.com` can read/write review marks. Without it the second
+   account sees the workbench but its saves silently fail server-side.
+3. **Use it.** Sign in with either account and open `/sources`: the
+   "Daten-Werkbank" appears at the top with search, type/tier/status filters, a
+   CSV export of the filtered view, and per-row checkbox + note (saved
+   immediately, shared between the two admin accounts). If you skip the
+   migrations the page still works for everyone, the saves just silently no-op
+   (best-effort, offline-first).
+   - If the gating emails ever change, update them in BOTH the RLS policy (a new
+     migration) and `FOUNDER_EMAILS` in `src/lib/admin.ts` (the
+     `tests/admin.test.ts` expectation pins the list).

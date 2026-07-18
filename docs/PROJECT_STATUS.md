@@ -48,6 +48,10 @@ Standing governance debt: ~98% of provenance rows are AI-drafted, not yet human-
 
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
+- [ ] **Run migration 0007 (s130):** `supabase/migrations/0007_provenance_reviews_admins.sql` in the
+      Supabase SQL editor, so the second admin account (`thesuhaspala@gmail.com`) can save review
+      marks in the new /sources Daten-Werkbank. Steps in `docs/plans/PHASE2_SETUP.md` ("Admin source
+      review"). Until then that account sees the workbench but its saves silently no-op.
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
@@ -112,6 +116,20 @@ an expert architecture review with P0–P3 recommendations, then approved implem
   nouns, and a learner-performance → review-queue feedback loop (post-launch, needs telemetry).
 - Gates: `lint:content` 0 errors · `test:unit` 184/184 (after rebasing onto the s129 Artikel-Visuals PRs) · `pnpm build` green · bundle 80.7 kB.
   Also refreshed the stale collocation count (1,011 → 1,033) in the docs.
+- **Second task (same session): /sources redesign + admin Daten-Werkbank.** The public page now
+  tells the data-architecture story visually (four stat tiles, the five-step pipeline graphic, a
+  stacked tier-distribution bar with legend incl. a "nächste Prüfwelle" remainder row, per-bank
+  count tiles; sources/licenses/item browse kept, title now "Quellen & Datenqualität"). Founders
+  additionally get **`features/legal/AdminWorkbench.tsx`**: the full register joined with tier +
+  live review marks as a sortable `DataTable` with fuzzy search, Typ/Stufe/Status filters (incl.
+  Zu prüfen / Mit Notiz / Ohne Quelle / Namensnennung), **CSV export of the filtered view**
+  (`src/lib/csv.ts`, BOM for Excel), copy-id chips, per-row "geprüft" checkbox + note saving
+  immediately to Supabase, and a progress bar. **Admin gate is now TWO accounts**
+  (`FOUNDER_EMAILS` in `src/lib/admin.ts`: thelivinsine + thesuhaspala, pinned by
+  `tests/admin.test.ts`); the matching RLS update is **migration 0007** (founder action item
+  above). Verified via headless-Chromium screenshots (public light/dark/mobile + workbench
+  desktop with live search). New tests: csv (6), admin gate (4), workbench smoke (4);
+  `test:unit` 198/198, build green, bundle 80.8 kB.
 
 _(Session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
