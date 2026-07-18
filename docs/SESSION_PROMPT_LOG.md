@@ -728,3 +728,15 @@ from 126 to 128.)
   success criteria. Docs-only session: plan + status handoff + this log; no engine code touched.
 - **Artifacts:** `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` (new) · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 3 (verbatim):**
+  > did you specify the claude model recommendations for the tasks in the plan? if not, do it and document the session and merge everything to main
+- **Response 3:** The plan had no model map, so §6 became "PR slicing, effort & model
+  recommendations": PR 1 (engine surgery + FSRS guard) = Opus 4.8, PR 2 (match grid + Redemittel
+  cloze, mechanical builders) = Sonnet 5, PR 3 (typed cloze, grading edge cases) = Opus 4.8, PR 4
+  (listening word, new interaction + gating) = Opus 4.8, PR 5 (odd-one-out + assertions) = Sonnet 5
+  with an escalate-to-Opus note, Phase 4 content drafting = Fable 5, Haiku not recommended for any
+  rung. Same risk-based routing logic as the Artikel-Visuals / Game G2 plans, with a per-PR
+  rationale. Updated the s131 status handoff to point at the map, merged to `main`, realigned the
+  branch.
+- **Artifacts (Prompt 3):** `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` §6 · `docs/PROJECT_STATUS.md`
+  · `docs/SESSION_PROMPT_LOG.md` (+ this entry)
