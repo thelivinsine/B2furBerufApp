@@ -1,13 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 129). **Artikel-Visuals plan FULLY SHIPPED, all 3 phases** (plan:
-`docs/plans/ARTIKEL_VISUALS_PLAN.md`, branch `claude/article-visuals-opus-tasks-rxurot`): gender
-tokens + the three Artikel-Wesen creature marks on the Theorie Wörter views + the
-der-burst/die-bloom/das-shatter flip effects + one-time legend (PR 1, Opus wiring then Fable art);
-the lazy fused-doodle registry + all 20 batch-1 scenes on the card backs (PR 2); and the reveal
-effect on correct noun answers in the session + the Wesen mark on the graph selected-node card and
-legacy Flashcards (PR 3). Session 127's brand-kit work (Vol. IV–VII): the founder picked Kit 1 · Kobalt &
-Butter recolored to the bottom-nav blues and still owes the light-blue pick (Himmelblau vs Cyan;
+_Last updated: 2026-07-18 (session 130). **Data-architecture review: P0/P1 integrity fixes
+shipped** (verification fingerprints + the `pnpm stamp:verified` gate, the permanent-content-ids
+contract with `ID_RENAMES` remapping, global id uniqueness + per-bank prefixes as lint errors,
+the related-terms drop report). Session 129 shipped the Artikel-Visuals plan fully (all 3 phases,
+`docs/plans/ARTIKEL_VISUALS_PLAN.md`). Session 127's brand pick is still open: Kit 1 · Kobalt &
+Butter recolored to the bottom-nav blues, founder owes the light-blue pick (Himmelblau vs Cyan;
 handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -38,8 +36,8 @@ architectural decisions, and backend/infra setup are documented in `docs/PROJECT
 read that for the "what's built and how." The living detail of every feature area (mobile bar, the
 session engine, Bibliothek views, the game layer, content conventions) is in `../CLAUDE.md`.
 
-**Content banks (as of 2026-07-18, session 128, after the s126 daily-life scale-up — re-verify with
-`pnpm lint:content` before quoting):** vocab **1,623** · collocations **1,011** · Redemittel **149** ·
+**Content banks (as of 2026-07-18, session 130, verified against `pnpm lint:content` — re-verify
+before quoting):** vocab **1,623** · collocations **1,033** · Redemittel **149** ·
 grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **~3,105
 rows** · themes **20** (five new `alltag` themes in s126: einkaufen/essen/mobilitaet/freizeit/
 digitales) · exam sets **15** · dialogues **30**. Taxonomy is **5 top-level domains** (the
@@ -63,6 +61,35 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
+branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the
+content/data layer is managed (answered in chat + a private pipeline-diagram artifact), then asked for
+an expert architecture review with P0–P3 recommendations, then approved implementing the P0 + P1 set:
+- **P0, verification fingerprints:** a `review_status: "verified"` stamp is now tied to the exact
+  content the human reviewed. New `pnpm stamp:verified` (`scripts/stamp-verified-hashes.mjs` + shared
+  `scripts/content-hash.mjs`) writes a canonical-JSON sha256 per verified provenance row to
+  `docs/reports/verified-hashes.json`; `pnpm lint:content` FAILS when a verified item's current
+  content no longer matches its stamp (tamper-tested end to end). The 25 verified Can-Do rows are
+  stamped. **New reviewer workflow: flip rows to `verified` → `pnpm stamp:verified` → commit both.**
+- **P1, shipped-ids-are-permanent contract:** new `src/lib/idRenames.ts` (`ID_RENAMES` table, empty
+  for now, + pure remap helpers). Applied in `useProgressStore` persist migrate (version 0 → 1) and on
+  incoming cloudSync remote rows, so a future id rename carries FSRS/progress history instead of
+  silently orphaning it. The linter validates the table (source gone, target resolves, no cycles).
+  Pinned by `tests/idRenames.test.ts`.
+- **P1, global id integrity:** cross-bank content-id uniqueness AND the per-bank id prefixes
+  (v_/c_/g_/sc_/ex_/r_/cd_/tx_/m_/wp_) are now lint ERRORS (`lintGlobalIds`; the scattered per-bank
+  prefix warnings were removed). All banks were already compliant, so nothing needed retagging.
+- **P1, related-terms audit:** `lint:content` now writes `docs/reports/related-terms-report.md`
+  (495 of 3,268 `related` terms don't resolve to a bank entry, i.e. word-graph edges dropped by
+  design but previously invisible) plus a one-line summary in the lint output. Not a gate.
+- **P2/P3 recommendations delivered but NOT implemented** (each has a natural trigger): an
+  `add-content` scaffolding script + JSON banks (next big content wave), a build-time summary for the
+  ~2 MB `/sources` chunk (content growth), zod-style single-source schemas (next linter surgery),
+  game-state cloud sync (G2, already planned), an oracle-coverage warning for fact-unchecked new
+  nouns, and a learner-performance → review-queue feedback loop (post-launch, needs telemetry).
+- Gates: `lint:content` 0 errors · `test:unit` 184/184 (after rebasing onto the s129 Artikel-Visuals PRs) · `pnpm build` green · bundle 80.7 kB.
+  Also refreshed the stale collocation count (1,011 → 1,033) in the docs.
 
 **Handoff after session 129 (2026-07-18). Artikel-Visuals plan FULLY shipped (all 3 PRs), on branch
 `claude/article-visuals-opus-tasks-rxurot`.** Implemented every phase of
@@ -114,46 +141,7 @@ the same branch:
   tie-in + the Eselsbrücke / Artikel-Sprint session blocks. PWA caveat: the Bibliothek is
   service-worker-cached, hard-refresh before judging the live result.
 
-**Handoff after session 128 (2026-07-18). Gender-visuals research panel + Artikel-Visuals
-implementation plan (Opus 4.8 → Fable 5), on branch `claude/visual-gender-indicators-gsox24`,
-docs/preview files only, nothing shipped to the app.** The founder asked how to add visuals showing a
-word's gender so learners "also learn visually", then floated a moustache-stick-figure idea and asked
-for an evidence-based expert brainstorm. What happened, in order:
-- **Idea survey + first preview page:** seven visual-gender ideas (ArticleBadge chips, shape encoding,
-  plural-morphology highlighting, graph gender rings, suffix-rule hints, a gender-sort game scene,
-  sub-theme watermarks), mocked in the app's real tokens.
-- **Three-expert evidence panel** (parallel research agents: SLA literature, memory science,
-  competitor/illustration practice). Headline results: images that FUSE meaning+gender have the
-  strongest evidence (Santos 2015, n=283); color alone is weak and voices are harmful; a repeated
-  "bizarre" marker (the moustache) self-defeats (contrast collapse + seductive-details penalty); human
-  personas teach a FALSE rule on `das Mädchen`/`die Person`/`der Gast` and carry stereotype risk, so
-  they were dropped; learner-generated associations (generation effect) and retrieval-moment practice
-  carry the largest durable gains. Full findings + citations live under **backlog #4 in
-  `docs/PROJECT_REFERENCE.md`** (recorded this session; do not re-research), including two proposed
-  quiz exercises the founder flagged: the **"Meine Eselsbrücke" self-made memory hook** and an
-  **Artikel-Sprint** der/die/das drill.
-- **Second preview page** (panel findings + previews A–E). The founder picked **Preview B
-  (Artikel-Wesen: three non-human mascots, spiky-blue der / round-rose die / boxy-green das), Preview C
-  (fused per-word doodles), and Preview D (gender effects at answer-reveal)** for the **Theorie
-  cards**. Both preview pages are committed under **`preview/artikel-visuals/`** (open in a browser;
-  they follow light/dark).
-- **The build plan is `docs/plans/ARTIKEL_VISUALS_PLAN.md`:** three phased PRs (1: tokens + Wesen
-  marks on Karten/Tabelle/Liste + flip effect + one-time legend; 2: lazy doodle registry + batch 1 of
-  20 fused doodles; 3: reuse in session grading, graph card, flashcards), each with model
-  recommendations (Opus 4.8 for the cross-cutting wiring, **Fable 5 high for the Wesen/doodle art**,
-  Sonnet 5 for mechanical reuse), acceptance criteria, and guardrails (gender palette distinct from
-  `graphPalette.ts` domain colors, shape never color-only, reduced-motion, bundle budget, no
-  always-on animation).
-- **Founder selection rule for the 20 batch-1 doodle words (2026-07-18): high frequency AND highly
-  useful for Kapitel 1 of the game.** The plan encodes it: the 10 nouns Kapitel-1 missions directly
-  reference (6 die / 4 der / 0 das, listed in the plan) + 10 top-Zipf nouns from the Kapitel-1 mission
-  themes (`travel`/`technology`/`sustainability`/`wohnen`/`behoerde`) with a das-balance override
-  (>= 4 das-words in the batch), selection snippet included in the plan. (The five NEW s126 `alltag`
-  themes are not Kapitel-1 themes, so they don't enter batch 1.)
-- **Next session: implement the plan, starting with PR 1** (restart the branch from `main` first per
-  the merged-PR rule, since this session's docs PR has merged).
-
-_(Session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder picked Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, awaiting the light-blue pick between Himmelblau `#38BDF8` and Cyan `#22D3EE`, see the W29 archive for the wiring steps), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
+_(Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder picked Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, awaiting the light-blue pick between Himmelblau `#38BDF8` and Cyan `#22D3EE`, see the W29 archive for the wiring steps), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
 + P0/P1 fixes handoff, session 121's
 arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening

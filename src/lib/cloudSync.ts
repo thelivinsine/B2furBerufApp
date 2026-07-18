@@ -1,3 +1,4 @@
+import { remapProgressIds } from "@/lib/idRenames";
 import { supabase } from "@/lib/supabase";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
@@ -112,6 +113,14 @@ function unionStrings(a: string[], b: string[]): string[] {
 function mergeRemoteProgress(remote: Record<string, unknown> | null) {
   if (!remote) return;
   const s = useProgressStore.getState();
+  // A remote row written by an older client may still carry pre-rename content
+  // ids; remap BEFORE merging so old and new keys collapse instead of forking.
+  const r = remapProgressIds({
+    srs: (remote.srs as Record<string, SrsCard>) ?? {},
+    redemittelSeen: (remote.redemittel_seen as Record<string, number>) ?? {},
+    savedWords: (remote.saved_words as string[]) ?? [],
+    scenariosDone: (remote.scenarios_done as string[]) ?? [],
+  });
   const examsLocal = s.examsDone;
   const examsRemote = (remote.exams_done as typeof examsLocal) ?? [];
   const examKey = (e: { id: string; date: string; score: number }) =>
@@ -131,15 +140,12 @@ function mergeRemoteProgress(remote: Record<string, unknown> | null) {
         .sort()
         .pop() ?? null,
     activeDays: unionStrings(s.activeDays, (remote.active_days as string[]) ?? []),
-    srs: mergeSrs(s.srs, (remote.srs as Record<string, SrsCard>) ?? {}),
-    redemittelSeen: mergeNumberMax(
-      s.redemittelSeen,
-      (remote.redemittel_seen as Record<string, number>) ?? {},
-    ),
-    scenariosDone: unionStrings(s.scenariosDone, (remote.scenarios_done as string[]) ?? []),
+    srs: mergeSrs(s.srs, r.srs ?? {}),
+    redemittelSeen: mergeNumberMax(s.redemittelSeen, r.redemittelSeen ?? {}),
+    scenariosDone: unionStrings(s.scenariosDone, r.scenariosDone ?? []),
     examsDone: Array.from(examsMap.values()),
     totalSessions: Math.max(s.totalSessions, (remote.total_sessions as number) ?? 0),
-    savedWords: unionStrings(s.savedWords, (remote.saved_words as string[]) ?? []),
+    savedWords: unionStrings(s.savedWords, r.savedWords ?? []),
   });
   applyingRemote = false;
 }

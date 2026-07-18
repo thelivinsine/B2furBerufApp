@@ -1,0 +1,32 @@
+{
+  "algorithm": "sha256/canonical-json/16",
+  "generated": "2026-07-18",
+  "note": "Content fingerprints of every review_status:verified provenance row. Written by pnpm stamp:verified; checked by pnpm lint:content. Do not hand-edit: re-stamp after a re-review instead.",
+  "hashes": {
+    "cd_behoerde_1": "b6b8a4b421b79b51",
+    "cd_behoerde_2": "4ab4d9cfaeffa3a0",
+    "cd_behoerde_3": "d807cd4cf807edcf",
+    "cd_conflict_1": "3d58660ae50ee480",
+    "cd_conflict_2": "020033debdc12eb6",
+    "cd_customer_1": "720ebb213b780d09",
+    "cd_customer_2": "40d126894f6bda46",
+    "cd_customer_3": "87a63ba38be48629",
+    "cd_logistics_1": "b2b27bf7936f3b40",
+    "cd_logistics_2": "3bbd6f896bfe25c7",
+    "cd_meetings_1": "657fc0a9d620e034",
+    "cd_meetings_2": "06a13c2055a117a2",
+    "cd_meetings_3": "4263971476d0cadb",
+    "cd_project_1": "d4b8289aea8c35e7",
+    "cd_project_2": "d3ea0b8408e082fc",
+    "cd_safety_1": "a5f65bf35269a9e2",
+    "cd_safety_2": "49243ff99add6300",
+    "cd_scheduling_1": "b569df320ae544b2",
+    "cd_scheduling_2": "72baef9cd334b372",
+    "cd_sustainability_1": "cea76f6d15b8eeac",
+    "cd_sustainability_2": "3fbabee1a31e21b3",
+    "cd_technology_1": "159a2348bab55cdb",
+    "cd_technology_2": "207c367627cb2390",
+    "cd_travel_1": "6ba839d0135c52eb",
+    "cd_travel_2": "85d75e6d3111e2e8"
+  }
+}
