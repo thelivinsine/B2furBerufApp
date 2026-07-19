@@ -1079,3 +1079,27 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   the 250-line cap; nothing to archive. Shipped to `main`.
 - **Artifacts (Prompts 16–17):** `src/features/shared/FilterRail.tsx` · `src/features/shared/browseScroll.tsx` ·
   `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · PR #589
+
+## Session 133 — 2026-07-19 — Brand-kit modernization plan
+
+- **Branch:** `claude/brand-kit-modernization-igqlnm`
+- **Prompt 1 (verbatim):** `> check the brand spec document, scope the work with a robust plan with clear model recommendations for each chunk of work. Except for the logo, feel free to deviate subtly wherever needed to make the brand kit of app look modern and top billion dollar successful edutech app. Aim for the highest quality and excellent output. Save the plan to repo.`
+- **Response 1 (Fable 5):** Read `docs/branding/BRAND_SPEC.md` and surveyed every brand touchpoint in
+  the code (tokens in `src/index.css`/`tailwind.config.ts`, hardcoded hexes in `nav-items.ts`,
+  `route-icons.tsx`, `graphPalette.ts`, `UebenPath.tsx`, the four `features/welt` chrome files,
+  `domain-buildings.tsx`, `index.html`, `vite.config.ts` manifest, `prerender-help.mjs`, the
+  `public/` icon set, and the landing page). Authored
+  **`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`**: a four-PR implementation sequence (A atomic
+  token flip + accent-role audit + chrome/meta, Fable 5 · B logo outline + full icon/og pipeline
+  with zero deviation, Opus 4.8 · C deep surface sweep of game/map/buildings/landing, Opus 4.8 or
+  Sonnet 5 · D dark-mode design pass + typography/motion/reward polish, Fable 5), a
+  sanctioned-deviations register (logo locked; primary darkening for AA, `--accent-ink`,
+  ink-on-Koralle, gradient demotion, der-token nudge, dual theme-color metas, typography
+  micro-polish), computationally verified WCAG contrast findings (white on Nachtblau 4.27:1,
+  Nachtblau on Papier 3.96:1, Himmelblau on white 1.94:1, white on Koralle 3.26:1), a proposed
+  permanent `check:contrast` gate, and a risk register (accent-foreground white→ink semantic flip,
+  PWA stale cache, locked palettes re-hued only, OAuth consent-logo re-upload). Docs-only session:
+  no `src/` change. Also aged the s131 handoff into the W29 archive per the doc-hygiene rule.
+- **Artifacts (Prompt 1):** `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · PR (see merge commit on `main`)

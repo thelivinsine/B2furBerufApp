@@ -1,0 +1,242 @@
+# Brand Kit Modernization Plan — Nachtblau & Himmelblau + Koralle
+
+_Authored session 133 (2026-07-19, Fable 5). Status: **PLAN APPROVED FOR SCOPING, implementation
+starts when the founder says go.** Source of truth for the design itself:
+`docs/branding/BRAND_SPEC.md` (Kit 1, finalized s127). This document scopes HOW to ship it at the
+quality bar of a top-tier edutech product, in what order, with which model per chunk of work._
+
+**Mandate from the founder (s133):** implement the finalized brand kit; the **logo is locked exactly
+as specced** (no deviation), but everywhere else subtle, tasteful deviations are allowed where they
+make the app read as a modern, premium, "billion-dollar edutech" product. Aim for the highest
+quality output.
+
+---
+
+## 1. The quality bar (what "premium edutech" means here)
+
+The reference class is Duolingo / Headspace / Linear-grade polish: a warm, confident, FLAT color
+system (the founder prefers flat over gradient-heavy), one loud brand hue used with discipline, warm
+paper ground with crisp white cards, soft tinted shadows (never gray-black), perfect dark mode, and
+zero accessibility misses. Concretely for Genauly:
+
+1. **One system, no leaks.** After the flip, NO surface may still show the old indigo `#5b5be6` /
+   `#6366f1` family. A single stale hue is what makes a rebrand look cheap.
+2. **Color discipline.** Nachtblau = the action/identity color. Himmelblau = tints, fills, chips,
+   the logo swipe, decorative marks. Koralle = reward/streak/celebration ONLY (it inherits the old
+   reward-gold discipline: loot and combo moments, never decoration). Butter = warning only.
+3. **Contrast is a gate, not a vibe.** Every token pair ships with a computed WCAG ratio (see §5).
+4. **Warmth everywhere.** The Papier ground `#FAF6EC` + warm muted/border tones are the single
+   biggest "premium" move; cards must sit on it with warm-tinted shadows (`--shadow #22304F`), not
+   the current cool slate.
+5. **Dark mode is designed, not derived.** The spec explicitly leaves dark mode open; it gets its
+   own design pass (Phase D), not a mechanical lightness flip.
+
+## 2. Current-state inventory (verified s133)
+
+Tokens flow through `tailwind.config.ts` automatically, so `src/index.css` is the master switch.
+Everything else below is hardcoded and must be swept by hand:
+
+| Surface | File | What is hardcoded |
+|---|---|---|
+| Token system | `src/index.css` | All `:root` + `.dark` values (light indigo primary `245 70% 60%`, cyan accent, gold reward) |
+| Tailwind bridge | `tailwind.config.ts` | `accent-gradient`, `mesh`, `dialog-overlay`, shadow recipes (all token-driven, but stops/opacities need retune on warm ground) |
+| Nav colors | `src/components/layout/nav-items.ts` | `#2563eb` (Praktisch/Theorie), `#0ea5e9` (Fortschritt), `#64748b` (Einstellungen) + rgba `bg` tints |
+| Route marks | `src/components/layout/route-icons.tsx` | `BRAND = "#5b5be6"` + per-mark neon second tones (`#22d3ee`, `#10b7cf`, `#fbbf24`, …) |
+| Graph palette | `src/lib/graphPalette.ts` | `beruf`/`professional` = `#5b5be6`/`#8a8af2`; five domain hues; life-area teal |
+| Üben city map | `src/features/dashboard/UebenPath.tsx` | `MAP_LIGHT`/`MAP_DARK` palettes (founder-locked s104), route/pin indigo |
+| Game chrome | `src/features/welt/stage.tsx`, `BattleView.tsx`, `MissionPlayer.tsx`, `scenes.tsx` | "brand indigo" pixel buttons/accents, `GAME_OUT` outline |
+| Domain buildings | `src/components/city/domain-buildings.tsx` | Two-tone + neon marks in the route-icons language |
+| HTML shell | `index.html` | `theme-color #0f1729`, no-JS pre-render inline colors (`#0f1729`, `#a5b4fc`, `#cbd5e1`) |
+| PWA manifest | `vite.config.ts` | `theme_color #6366f1`, `background_color #0f1729` |
+| Help prerender | `scripts/prerender-help.mjs` | Fallback shell `#0f1729` |
+| Logo + icons | `public/` | `genauly-default-logo-transparent-corners.png`, `favicon-16/32/48.png`, `apple-touch-icon.png`, `pwa-192/512/maskable-512.png`, `og-image.png` |
+| Landing | `src/features/landing/LandingPage.tsx` | Gradient CTAs, gradient headline span, gradient avatar/CTA band (token-driven but needs a flat-brand art pass) |
+| Docs language | `CLAUDE.md`, `docs/DECISIONS.md` | "brand indigo", "reward-gold" terminology throughout |
+
+Non-issues by construction: `ArtikelEffect`/Wesen marks, dialog overlay, focus rings, selection
+color, shadows: all ride tokens and update automatically (but get visual QA in Phase D).
+
+## 3. Work breakdown: four PRs, strict order
+
+The flip must never be half-shipped: a deploy where the token system is Nachtblau but the nav marks
+are still old-indigo (or vice versa) looks broken. PR A is therefore atomic and contains everything
+needed for a coherent first impression; B/C/D layer quality on top.
+
+### PR A — Token flip + accent-role audit + chrome alignment (the big switch)
+
+**Model: Fable 5** (highest-risk visual change; needs system-wide judgment, not just find-replace).
+Estimated: one focused session.
+
+1. `src/index.css` `:root` per spec §1, exactly. Derived values the spec leaves implicit:
+   - `--elevated` = white (match `--surface`), `--input` = Lines `42 38% 85%`,
+     `--success-foreground`/`--danger-foreground` = white, `--warning-foreground` = `#3A2E12`
+     (≈ `42 53% 15%`), `--ink` warmed to sit near Tinte (≈ `252 12% 22%`).
+   - `--reward` Koralle + `--reward-bg` per spec. Add the missing **reward foreground rule**: dark
+     ink on Koralle (white on `#F0603F` is ≈3.3:1, fails). Audit every `text-white`-on-reward and
+     `text-reward-*` call site.
+2. **Accent-role audit (the one breaking semantic change).** Today `--accent-foreground` is white;
+   the spec makes it dark ink `#0A2A3A` because Himmelblau is light. Grep every
+   `accent-foreground`, `text-accent`, `bg-accent` call site and apply two rules:
+   - **Himmelblau is never body/label text on light ground** (≈1.9:1 on white). Call sites using
+     `text-accent` as text (e.g. the Üben toggle tint) move to Nachtblau or a new `--accent-ink`
+     (a darkened Himmelblau, ≈ `198 80% 34%`) — a sanctioned subtle deviation.
+   - Fills using accent must pair with `accent-foreground` (now ink), never hardcoded white.
+3. **Gradient discipline (founder prefers flat).** `accent-gradient` becomes
+   Nachtblau → Himmelblau but is *demoted*: keep it only on the primary hero CTA and the
+   `text-gradient` headline moment; verify white text still passes on the light end (cap the
+   Himmelblau stop or end at ~`#4AA8F0`). `bg-mesh` is dialed down to a whisper of the two blues
+   (or removed where it fights the Papier ground). `shadow-glow` re-tints to Nachtblau
+   automatically; retune opacity on the warm ground.
+4. **Contrast nudge decision (sanctioned deviation, decide with the script from §5):** white on
+   Nachtblau `#3D74ED` measures 4.27:1, *just under* the 4.5:1 small-text floor (fine for
+   large/bold, borderline for small button labels), and Nachtblau as text on Papier is 3.96:1
+   (also under AA for small text, e.g. `text-primary` eyebrows/labels). Option: darken
+   `--primary` for light mode to ≈ `221 83% 55%` (≈`#2E6BEB`, 4.75:1 vs white) while keeping pure
+   `#3D74ED` for icons/marks. Ship whichever the script passes; document the choice in BRAND_SPEC.
+   (All ratios in this plan were computed with the WCAG formula in s133; the §5 script re-derives
+   them as a permanent gate.)
+5. Chrome alignment in the same PR: `nav-items.ts` (Praktisch/Theorie → `#3D74ED`, Fortschritt →
+   Himmelblau family — use `#0FA5E9`-adjacent only if `#52C6F9` is too pale at 29px, judged on
+   screenshot), `route-icons.tsx` `BRAND` → `#3D74ED` with a per-mark neon check (the existing
+   cyan neons `#22d3ee`/`#10b7cf` already harmonize with Himmelblau; retune only clashes),
+   `graphPalette.ts` `beruf`/`professional` → Nachtblau light/dark pair.
+6. Meta/shell in the same PR: `index.html` theme-color (switch to **dual
+   `<meta name="theme-color" media="(prefers-color-scheme: …)">`**, light = Papier `#FAF6EC`,
+   dark = the new dark ground), no-JS pre-render inline colors re-tinted; `vite.config.ts` manifest
+   `theme_color #3D74ED`, `background_color` = the dark ground; `scripts/prerender-help.mjs`
+   fallback shell colors.
+7. Dark mode ships in PR A as the spec §2 *starting point* (mechanically correct, contrast-passing)
+   so the app is never broken in dark; the design pass is Phase D.
+8. **Gates:** `pnpm typecheck` + `build` + `test:unit` + `check:bundle` + the §5 contrast script;
+   Playwright screenshots light+dark × mobile(390)+desktop(1280) of Praktisch (Üben + Spielen),
+   all four Theorie tabs (incl. both graphs), Fortschritt, a running Session, AuthDialog, Landing.
+   Founder reviews the screenshot set before merge.
+
+### PR B — Logo + full icon pipeline (NO deviation allowed)
+
+**Model: Opus 4.8** (precision scripting; the design is locked, so no design judgment is needed
+beyond the g-font pick, which the founder makes from a preview panel). Estimated: one session.
+
+1. **Outline the g.** The reference SVG uses a system-ui `<text>`; per spec it must become a
+   `<path>`. Build a small one-page preview rendering the locked swipe with 3–4 candidate heavy
+   sans "g"s (Inter Black, Manrope ExtraBold, Nunito ExtraBold, Figtree Black — all OFL, safe),
+   founder picks one, then outline via opentype.js/fontkit into the final
+   `preview/branding/genauly-logo-final.svg` (swipe path, rotation, colors byte-identical to spec).
+2. **Regenerate every raster asset** from the final mark with a committed script (sharp or
+   resvg-js, run locally, NOT a dependency of the app build):
+   `genauly-default-logo-transparent-corners.png` (rounded-transparent, in-app),
+   `favicon-16/32/48.png` (rounded-transparent), `apple-touch-icon.png` + `pwa-192/512.png`
+   (FULL-BLEED OPAQUE on Papier — the locked iOS rule in CLAUDE.md), `pwa-maskable-512.png`
+   (mark within the inner 80% safe zone).
+3. **New `og-image.png`**: mark + "Genauly" wordmark + one-line tagline on Papier with the swipe
+   motif; 1200×630. This is a design moment: match the vol8 artifact's typography.
+4. Swap every in-app `<img>` reference check (they all point at the canonical file already, so the
+   file replacement carries them), verify the sign-in dialog, header, Sidebar, landing, onboarding,
+   `/privacy` render the new mark with existing rounding/glow styling.
+5. Update `CLAUDE.md` Brand logo section + `BRAND_SPEC.md` status header to "implemented".
+
+### PR C — Deep surface sweep (game, map, buildings, landing)
+
+**Model: Sonnet 5 for the mechanical recolor, Opus 4.8 for the optical retune.** In practice: run
+it as one Opus 4.8 session (the sweep is small enough), or Sonnet 5 with founder screenshots for
+the judgment calls. Estimated: one session.
+
+1. **Neuland game chrome** (`stage.tsx`, `BattleView.tsx`, `MissionPlayer.tsx`, `scenes.tsx`):
+   "brand indigo the single loud accent" becomes "Nachtblau the single loud accent". `GAME_OUT`
+   `#463c44` stays (it is an outline neutral, not brand). Victory loot screen: reward-gold moments
+   become Koralle; check the pixel-art placeholder backdrops still harmonize (they are neutral
+   scene art; only UI chrome changes).
+2. **Üben city map** (`UebenPath.tsx`): the `MAP_LIGHT`/`MAP_DARK` palettes are founder-locked
+   (s104), so do NOT redesign them; only swap the indigo-tinted values (`P.route`, pin, the
+   indigo-tinted ground of "Stimmung 3") to their Nachtblau-tinted equivalents at identical
+   lightness, and screenshot both themes for founder sign-off.
+3. **Domain buildings** (`domain-buildings.tsx`): re-tint the two-tone + neon marks where they use
+   the old indigo family; keep the locked rules (white lit windows, no gold → and now: no coral).
+4. **Landing page**: flatten the gradient band + avatar chips per the PR A gradient discipline;
+   hero re-shot on Papier ground; the `#0f1729`-era no-JS block was already re-tinted in PR A.
+5. **Der/die/das check**: the der blue (`221 83% 53%`) is nearly identical in hue to Nachtblau.
+   On the Karten/Tabelle views judge whether der marks now read as "brand/CTA"; if so, nudge der
+   toward a deeper cobalt (e.g. `226 71% 46%`) — sanctioned deviation, keep the textbook
+   blue/rose/green convention intact.
+6. **Grammar emerald + life-area teal**: optional harmony pass — align the Grammatik emerald with
+   Blatt `#2E9E6B` and re-judge the graph teal against the new blues. Only if they visibly clash;
+   these are semantic, not brand, colors.
+
+### PR D — Dark mode design pass + premium polish (the deviation phase)
+
+**Model: Fable 5** (this is open design work, the spec explicitly defers it). Estimated: one
+session, driven by screenshots.
+
+1. **Dark mode designed properly:** start from spec §2, then tune like a product team would:
+   ground ≈ `250 24% 10%`, surfaces two steps up, Nachtblau lifted to ≈ `221 90% 70%` for
+   text/icons but kept saturated for fills, Himmelblau ≈ `198 90% 70%`, Koralle ≈ `11 88% 66%`,
+   warm-neutral (not blue-gray) muted text. Every pair through the contrast script. The dark
+   theme-color meta + manifest values follow.
+2. **Typography micro-polish (subtle, keep Inter Variable):** tighter tracking on display sizes
+   (`tracking-tight` on text-2xl+), `tabular-nums` on all stat/count surfaces (Fortschritt tiles,
+   session tally, streak), consistent font-weight rhythm (600 UI / 700 headings / 800 display).
+3. **Motion/state consistency:** one hover/active recipe on cards (existing `card-hover` retuned
+   for warm shadows), pressed states on primary buttons, focus-visible ring audit on the new hues.
+4. **Streak + celebration audit:** the streak pill, combo flashes and loot moments all move to
+   Koralle with the ink-on-coral pairing; verify the reward discipline reads clearly against the
+   two blues.
+5. Final full-app screenshot matrix (same set as PR A) in both themes, plus `/hilfe` prerendered
+   pages and the PWA install surfaces.
+
+## 4. Sanctioned subtle deviations (register)
+
+Everything here is pre-approved by the s133 mandate; anything beyond it goes back to the founder.
+The logo (mark geometry, swipe path, colors) is explicitly NOT deviatable.
+
+| # | Deviation | Why |
+|---|---|---|
+| 1 | `--primary` may darken to ≈`221 83% 55%` in light mode | White-on-Nachtblau is ≈4.3:1, under the AA small-text floor |
+| 2 | New `--accent-ink` (darkened Himmelblau) for text-accent call sites | Himmelblau fails as text on light ground |
+| 3 | Reward foreground = ink on Koralle, never white | White-on-Koralle ≈3.3:1 |
+| 4 | Gradients demoted to hero-CTA + headline only; mesh to a whisper | Founder prefers flat; premium = restraint |
+| 5 | der token may deepen to stay distinct from Nachtblau | Both are ≈hue 221 blue; marks must never read as CTAs |
+| 6 | Optional: Grammatik emerald aligned to Blatt; graph teal re-judged | Color-system coherence |
+| 7 | Dual light/dark `theme-color` metas | Modern PWA polish (status bar matches theme) |
+| 8 | Typography micro-polish (tracking, tabular-nums, weight rhythm) | Premium feel without a font change |
+| 9 | Dark-mode values tuned freely within the two-blue + coral identity | Spec §2 is explicitly a starting point |
+
+## 5. Contrast gate (new, small, permanent)
+
+Add `scripts/check-contrast.mjs` (zero-dep, ~60 lines): parses the HSL custom properties out of
+`src/index.css` for both themes and asserts the named pairs (fg/bg, primary-fg/primary,
+accent-fg/accent, warning-fg/warning, muted-fg/background, ink/reward-bg, …) against WCAG AA
+(4.5:1 text, 3:1 large/UI). Wire as `pnpm check:contrast`, run in `validate.yml` beside
+`lint:content`. This is what makes "contrast is a gate" true forever, and it costs nothing.
+
+## 6. Risks and gotchas
+
+- **PWA stale cache:** the whole app is service-worker cached; after each deploy the founder MUST
+  hard-refresh before judging. State this in every PR handoff (it has bitten before, s132).
+- **`accent-foreground` white→ink is a breaking semantic flip:** any component that hardcodes
+  `text-white` on an accent fill will silently keep white and fail contrast. The PR A grep audit
+  is mandatory, not optional.
+- **Founder-locked palettes:** `MAP_LIGHT`/`MAP_DARK` (s104), the pixel-game chrome rules (s74),
+  the domain-building "no gold windows" rule, and the bottom-bar mechanics are all locked; PR C
+  only swaps hue families inside them, never redesigns.
+- **In-game scenes are light-only** (dark deferred, backlog #31): the game sweep is judged in
+  light mode only.
+- **Docs drift:** after PR D, sweep `CLAUDE.md` + `DECISIONS.md` language ("brand indigo" →
+  Nachtblau, "reward-gold" → Koralle/reward, logo section) and flip `BRAND_SPEC.md` status. Stale
+  "indigo" instructions would steer future sessions into repainting the old brand.
+- **Icon regeneration is easy to get subtly wrong:** keep the full-bleed-opaque rule for OS-masked
+  icons and rounded-transparent for in-app; the CLAUDE.md Brand logo section is the checklist.
+- **Google OAuth consent logo** (full-bleed variant, not in repo) needs a founder-side re-upload
+  after PR B; list it in the PR handoff as a founder action item.
+
+## 7. Sequencing summary
+
+| PR | Scope | Model | Size |
+|----|-------|-------|------|
+| A | Token flip + accent audit + nav/route/graph chrome + meta/manifest + contrast script | **Fable 5** | 1 session |
+| B | Logo outline + all favicons/PWA icons/og-image + logo docs | **Opus 4.8** | 1 session |
+| C | Game chrome, Üben map, domain buildings, landing flatten, der-distinctness | **Opus 4.8** (or Sonnet 5 + founder screenshots) | 1 session |
+| D | Dark-mode design pass + typography/motion/reward polish + docs sweep | **Fable 5** | 1 session |
+
+Each PR: build green, screenshot matrix attached, squash-merge to `main` per the auto-ship
+preference, post-merge branch realignment, founder verifies live (hard-refresh). A follows B/C/D
+strictly; B and C are independent of each other after A lands.

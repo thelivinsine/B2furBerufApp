@@ -551,3 +551,41 @@ an expert architecture review with P0–P3 recommendations, then approved implem
 - **Closed out 2026-07-19:** the founder ran migration 0007 in the Supabase SQL editor
   ("Success"), so both admin accounts save review marks live; the action item moved to
   `PROJECT_FOUNDATION.md` completed founder items (PR #586).
+
+## Session 131 (2026-07-18) — Üben exercise-variety plan + full build (aged out of PROJECT_STATUS.md in s133)
+
+**Handoff after session 131 (2026-07-18). Üben exercise-variety plan authored (Fable 5) + fully built
+in 5 PRs (mostly Opus 4.8), branch `claude/ueben-exercise-variety-i59ry0`, all shipped to `main`.**
+The founder wanted custom Üben sets (the Bibliothek Üben button on a filtered tab) to play as varied
+exercises, not flip-cards, **without authoring content per set combination**. The variety machinery
+already existed (`engine/quiz.ts` auto-generates exercise types from the banks; `SessionPlayer` renders
+them) but was theme-keyed while `buildScopedSession` mapped custom-set items to flashcards. The plan
+`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` (5-option analysis in Appendix A, per-PR model map in §6,
+per-phase blow-by-blow) locks "sets are filters, exercises are per-item templates" and **Phases 0–3 are
+now COMPLETE** (only the deferred Phase 4 remains). Full per-PR detail is in the plan + the s131 prompt
+log; the shipped result, and the anchors not to regress:
+- **PR 1 (Phase 0/1):** generalized `buildThemeQuiz` → pool-based `buildPoolQuiz` (`/quiz` + composed
+  Pool 2 behavior-identical); `buildScopedSession` now interleaves recall cards with generated exercises
+  (Wörter + Kollokationen), capped at 2 appearances/item (`capBySource`); **FSRS guard** in
+  `SessionPlayer.onQuizResult` writes SRS only for ids that resolve in the vocab bank (also fixed the
+  latent Pool 2 bug where collocation questions wrote SRS under `c_*`).
+- **PR 2 (2a + 2e):** noun↔verb match grid (`collocationMatchQ`, reuses kind `"matching"`, `distinctCols`
+  dedupe) + Redemittel cloze (`redemittelCloze` kind, `buildRedemittelQuiz`).
+- **PR 3 (2b):** typed-cloze `typing` variant (`cloze` field, graduated words only) + `gradeTypedAny`
+  (accepts the surface form OR the base head).
+- **PR 4 (2c):** TTS listening pick (`listeningCloze` + `audioPrompt`), gated on
+  `ttsSupported() && speechEnabled`; `MCQView` audio branch.
+- **PR 5 (2d + Phase 3):** odd-one-out (`oddOneOut`, no sourceId → XP only) + `avoidRuns` (no 3-in-a-row
+  same kind). Every quiz kind labeled in `kindLabel`.
+- **Coverage gauge:** `pnpm report:exercise-coverage` (`scripts/report-exercise-coverage.mjs`) runs the
+  REAL builder across every theme (all levels × new/mature decks, seeded → deterministic) → visual
+  `docs/reports/exercise-coverage-report.md`. **Finding: theme-level variety is already exhausted
+  (20/20 🟢)**; the residual is cheap word-level polish (85 words with no self-example → no
+  cloze/typing/listening; 74 with no resolvable `related` → no odd-one-out). The plan's "Deciding when
+  to start Phase 4" section holds the rule: start Phase 4 only when that residual is closed AND a
+  learner-repetition/plateau signal appears (needs telemetry the report deliberately lacks).
+- **Gates (final):** typecheck ✓ · test:unit **219** ✓ · lint 0 errors ✓ · build ✓ · check:bundle
+  **80.8 kB** (main chunk unchanged across all 5 PRs) · lint:content ✓. Zero new content-bank rows.
+- **Next:** close the word-level residual (content edits, cheap) before considering Phase 4. **PWA
+  caveat:** the session surface is service-worker-cached; hard-refresh before judging the live result.
+
