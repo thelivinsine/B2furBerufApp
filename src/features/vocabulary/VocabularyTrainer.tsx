@@ -496,7 +496,7 @@ export function VocabularyTrainer() {
           the SAME filter tile inline (collapsed by default) instead of a
           toolbar + sheet; only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden && !filtersOpen, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+        <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile:
               Filter + view on the left, bookmark/search pushed right; Üben fills
               its row with the count at the far right. Desktop keeps Üben/count
@@ -561,28 +561,6 @@ export function VocabularyTrainer() {
 
           </div>
 
-          {/* Mobile filter panel: slides open below the count, closed by default.
-              Body-only grey tile (Thema + facets); the toggle/Üben/count live in
-              the toolbar above. Desktop uses the persistent rail in col 2. */}
-          <AnimatePresence initial={false}>
-            {filtersOpen && (
-              <motion.div
-                key="filter-panel"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
-                className="overflow-hidden lg:hidden"
-              >
-                <FilterRail
-                  {...filterRailProps}
-                  layout="panel"
-                  onClose={() => setFiltersOpen(false)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* The theme ScopeChip was dropped (audit 2026-07-09): the primary
               dropdown already shows the active theme, so the chip was redundant.
               The silent level-band cut now shows as an explicit removable chip. */}
@@ -595,6 +573,29 @@ export function VocabularyTrainer() {
             </div>
           )}
         </div>
+
+        {/* Mobile filter panel: normal-flow content, deliberately OUTSIDE the
+            sticky header so it scrolls away with the page instead of staying
+            pinned on screen (the sticky toolbar above keeps the toggle). Body-
+            only grey tile; desktop uses the persistent rail in col 2. */}
+        <AnimatePresence initial={false}>
+          {filtersOpen && (
+            <motion.div
+              key="filter-panel"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+              className="overflow-hidden lg:hidden"
+            >
+              <FilterRail
+                {...filterRailProps}
+                layout="panel"
+                onClose={() => setFiltersOpen(false)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {/* One-time Artikel-Wesen legend (dismiss state in the settings
