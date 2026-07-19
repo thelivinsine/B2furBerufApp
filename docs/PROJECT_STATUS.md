@@ -1,13 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 131). **Üben exercise-variety PRs 1–4 shipped** (Phase 0/1 + 2a/2e
-+ 2b + 2c of `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Bibliothek Üben sets now interleave
-auto-generated exercises with recall cards across all three browse scopes (Wörter with a typed cloze
-for graduated words + a TTS listening pick, Kollokationen with a noun→verb match grid, Redemittel with
-a cloze), zero new content data, plus an FSRS-guard fix. Only 2d (odd-one-out) + Phase 3 remain.
-Session 130 shipped the data-architecture P0/P1 integrity fixes. Session 127's brand pick is still
-open: Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, founder owes the light-blue pick
-(Himmelblau vs Cyan; handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-18 (session 131). **Üben exercise-variety Phases 0–3 COMPLETE** (PRs 1–5 of
+`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`, Phase 4 deferred): custom Bibliothek Üben sets now
+interleave auto-generated exercises with recall cards across all three browse scopes (Wörter with a
+typed cloze for graduated words + a TTS listening pick + an odd-one-out, Kollokationen with a noun→verb
+match grid, Redemittel with a cloze), a no-3-in-a-row variety guarantee, zero new content data, plus an
+FSRS-guard fix. Session 130 shipped the data-architecture P0/P1 integrity fixes. Session 127's brand
+pick is still open: Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, founder owes the
+light-blue pick (Himmelblau vs Cyan; handoff in the W29 archive). Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -151,9 +152,30 @@ per-item templates". **Shipped in PR 1 (Phase 0 + Phase 1):**
 - **Tests:** `buildListeningQuiz` shape + no-gloss + the TTS gate (`tests/scopedSession.test.ts`).
 - **Gates (after PR 4):** typecheck ✓ · test:unit **217** ✓ · lint 0 errors ✓ · build ✓ ·
   check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
-- **Next: PR 5** (Phase 2d odd-one-out + Phase 3 variety assertions, Sonnet 5) — the last rung. Restart
-  the branch from `main` first per the merged-PR rule. **PWA caveat:** the session surface is
-  service-worker-cached; hard-refresh before judging the live result.
+
+**PR 5 (same session, Opus 4.8 — plan recommended Sonnet 5, founder had me continue on Opus): Phase 2d
+odd-one-out + Phase 3 variety guarantee. Completes Phases 0–3.**
+- **Odd-one-out:** new MCQ kind `oddOneOut` ("Ausreißer"). `oddOneOutQ` (`engine/quiz.ts`) anchors on
+  a set word, resolves 2 of its authored `related` terms to bank entries (the word-graph
+  `normalizeForm` is replicated in engine/ so it does not import features/; a `vocabResolver` built
+  once), and adds an outsider from a DIFFERENT theme as the answer. NO sourceId → XP + combo only,
+  never FSRS (it is category discrimination, not recall of one card). Null when < 2 related resolve.
+  `buildOddOneOutQuiz` drives it in the Wörter scope (~0.2 ratio).
+- **Phase 3 variety guarantee:** `avoidRuns` (`engine/session.ts`) greedily reorders the final block
+  list so no block kind runs 3-in-a-row when avoidable (kills the wall-of-flip-cards feel); preserves
+  the multiset, no-ops for single-kind (grammar) sessions. Applied to every scope before the preview.
+- **Verified generated data:** clean clusters with clear outsiders ({der Wohnsitz · der Nebenwohnsitz ·
+  **der Projektleiter** · der Hauptwohnsitz}; {die Baugenehmigung · **der Ausschlag** · das Bauamt · der
+  Antrag}).
+- **Tests:** odd-one-out shape + no-sourceId, and the no-3-in-a-row assertion (`tests/scopedSession.test.ts`).
+- **Gates (after PR 5):** typecheck ✓ · test:unit **219** ✓ · lint 0 errors ✓ · build ✓ ·
+  check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
+- **Plan status: Phases 0–3 COMPLETE.** The Wörter scope now offers recall cards, typed forward recall,
+  MCQ variety (translation/article/plural/cloze/matching), collocation fill/word-order, a typed cloze
+  for graduated words, a TTS listening pick, and an odd-one-out; Kollokationen has the match grid;
+  Redemittel has its cloze. **Only Phase 4 remains** (authored per-theme packs + build-time AI
+  generation through the verification pipeline; deferred until template variety feels exhausted). **PWA
+  caveat:** the session surface is service-worker-cached; hard-refresh before judging the live result.
 
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
 branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the

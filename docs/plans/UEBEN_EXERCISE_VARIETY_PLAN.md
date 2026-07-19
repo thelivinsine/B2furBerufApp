@@ -1,8 +1,8 @@
 # Üben Exercise Variety Plan
 
-_Created session 131 (2026-07-18). Status: **Phase 0/1 SHIPPED** (PR 1) · **2a + 2e SHIPPED** (PR 2)
-· **2b SHIPPED** (PR 3) · **2c SHIPPED** (PR 4), all s131. Remaining: Phase 2 rung 2d (odd-one-out) +
-Phase 3; Phase 4 deferred._
+_Created session 131 (2026-07-18). Status: **Phases 0–3 COMPLETE** (PRs 1–5, all s131): 0/1 (PR 1),
+2a+2e (PR 2), 2b (PR 3), 2c (PR 4), 2d + Phase 3 variety guarantee (PR 5). **Phase 4 deferred** (the
+only remaining work; do not start until template variety feels exhausted)._
 _Founder ask: custom Üben sets (the Bibliothek "Üben" button on a filtered tab) should play as a
 varied exercise session, not a stack of flip-cards. Constraint: no per-set content authoring, the
 number of filter combinations is unbounded._
@@ -143,21 +143,29 @@ order (fun-per-effort, founder may reorder):
   Redemittel scope, which now interleaves cloze exercises (~0.35 ratio) with recall cards. The cloze
   carries the `r_*` sourceId only for the 2-appearance cap; the FSRS guard already skips it (no vocab
   match), so it awards XP + combo only, never SRS.
-- **2d. Odd-one-out (M, last):** 3 words from one resolvable `related` cluster + 1 outsider,
-  "Welches Wort passt nicht dazu?". Reuse the word-graph resolution approach; only use clusters that
-  fully resolve (495/3,268 `related` terms don't, see `docs/reports/related-terms-report.md`).
+- **2d. Odd-one-out (M, last) — ✅ SHIPPED (PR 5, s131):** new MCQ kind `oddOneOut` ("Ausreißer"
+  badge). `oddOneOutQ` anchors on a set word, resolves 2 of its authored `related` terms to bank
+  entries (the word-graph `normalizeForm` logic is replicated in `engine/quiz.ts` so engine/ does not
+  import features/; a `vocabResolver` map built once), and adds an outsider from a DIFFERENT theme; the
+  answer is the outsider. NO sourceId (category discrimination, not recall of one card), so it awards
+  XP + combo only, never FSRS. Returns null when < 2 related terms resolve or the 4 labels are not
+  distinct. `buildOddOneOutQuiz` drives it in the Wörter scope (~0.2 ratio). Tested in
+  `tests/scopedSession.test.ts` (4 distinct labels, answer in options, no sourceId).
 - (Considered and parked: article bucket-sorting with the Artikel-Wesen creatures. The article MCQ
   already ships in Phase 1 and fires the existing gender reveal effect; a drag-sort UI is new
   interaction surface for little pedagogical delta. Revisit if the founder wants the spectacle.)
 
-### Phase 3: polish + guarantees
+### Phase 3: polish + guarantees — ✅ SHIPPED (PR 5, s131)
 
-- Variety guarantee: no 3 consecutive blocks of the same kind for sets ≥ 6 items (interleave order
-  assertion in tests).
-- Kind badge labels (`kindLabel`) cover every new kind; end screen unchanged.
-- Gates: `pnpm test:unit`, `pnpm lint`, `pnpm build`, `pnpm check:bundle` (all engine code rides the
-  lazy session chunk; main-chunk budget must not move).
-- Reduced-motion + focus-mode behavior inherited from existing blocks, verify nothing regressed.
+- Variety guarantee: `avoidRuns` (`engine/session.ts`) greedily reorders the final block list so no
+  block KIND runs 3-in-a-row when avoidable (a wall of flip-cards is the exact monotony this plan
+  removes); preserves the block multiset, falls back for single-kind sessions (grammar). Pinned by a
+  no-3-in-a-row test in `tests/scopedSession.test.ts`.
+- Kind badge labels (`kindLabel`) cover every new kind (Redemittel-Lücke, Hören, Ausreißer); end
+  screen unchanged.
+- Gates: test:unit 219 · lint 0 errors · build · check:bundle 80.8 kB (main chunk unchanged, all
+  engine code rides the lazy session chunk) · lint:content — all green.
+- Reduced-motion + focus-mode behavior inherited from the existing block renderers, unchanged.
 
 ### Phase 4 (DEFERRED, do not start until template variety is exhausted)
 
@@ -208,7 +216,7 @@ still fills its exercise half via translation/cloze/matching.
 | 2  | 2a match grid + 2e Redemittel cloze — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Sonnet 5** |
 | 3  | 2b typed cloze — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Opus 4.8** |
 | 4  | 2c listening word — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Opus 4.8** |
-| 5  | 2d odd-one-out + Phase 3 assertions | ~0.5 session | **Sonnet 5** |
+| 5  | 2d odd-one-out + Phase 3 assertions — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Sonnet 5** |
 
 Why (same routing logic as the Artikel-Visuals and Game G2 plans: match the model to the risk in
 the task, spend the big model only where judgment is the bottleneck):

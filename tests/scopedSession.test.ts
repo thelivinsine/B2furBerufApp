@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildScopedSession } from "@/engine/session";
-import { buildPoolQuiz, buildRedemittelQuiz, buildListeningQuiz } from "@/engine/quiz";
+import { buildPoolQuiz, buildRedemittelQuiz, buildListeningQuiz, buildOddOneOutQuiz } from "@/engine/quiz";
 import { vocabulary, vocabById } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
@@ -259,6 +259,31 @@ describe("buildScopedSession (s131 exercise variety)", () => {
       );
     }
     expect(sawListening || hasListening(withTts)).toBe(true);
+  });
+
+  it("builds odd-one-out (2d): 4 distinct labels, a resolvable cluster, no FSRS write", () => {
+    const qs = buildOddOneOutQuiz(vocabulary, 2, 8) as MCQQuestion[];
+    expect(qs.length).toBeGreaterThan(0);
+    for (const q of qs) {
+      expect(q.kind).toBe("oddOneOut");
+      expect(q.options.length).toBe(4);
+      expect(new Set(q.options).size).toBe(4); // distinct labels (React keys)
+      expect(q.options).toContain(q.answer);
+      expect(q.sourceId).toBeUndefined(); // category discrimination, XP only
+    }
+  });
+
+  it("breaks up same-kind runs (Phase 3 variety guarantee)", () => {
+    // No block KIND should appear 3 times in a row for a real-sized set.
+    for (let i = 0; i < 4; i++) {
+      const plan = buildScopedSession("vocab", behoerdeIds, { srs: {}, minutes: 12, difficulty: 2 });
+      for (let j = 2; j < plan.blocks.length; j++) {
+        const run3 =
+          plan.blocks[j].kind === plan.blocks[j - 1].kind &&
+          plan.blocks[j].kind === plan.blocks[j - 2].kind;
+        expect(run3).toBe(false);
+      }
+    }
   });
 
   it("degrades a tiny set to cards without throwing", () => {

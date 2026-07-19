@@ -15,7 +15,13 @@ import { collocations } from "@/data/collocations";
 import { grammar } from "@/data/grammar";
 import { texts } from "@/data/texts";
 import { isDue, mastery, reviewWeight, dueCount } from "@/engine/srs";
-import { buildThemeQuiz, buildPoolQuiz, buildRedemittelQuiz, buildListeningQuiz } from "@/engine/quiz";
+import {
+  buildThemeQuiz,
+  buildPoolQuiz,
+  buildRedemittelQuiz,
+  buildListeningQuiz,
+  buildOddOneOutQuiz,
+} from "@/engine/quiz";
 import { targetBlocks, weakestBand, buildPreview } from "@/engine/sessionPreview";
 import { sample } from "@/lib/utils";
 
@@ -254,6 +260,24 @@ function capBySource(blocks: SessionBlock[], max: number): SessionBlock[] {
   return out;
 }
 
+/** Variety guarantee (Phase 3): greedily reorder so no block KIND runs three in
+ *  a row when it can be avoided (a wall of flip-cards is the exact monotony this
+ *  plan removes). Preserves the multiset of blocks; falls back to the next block
+ *  when a break is impossible (e.g. a single-kind grammar session). */
+function avoidRuns(blocks: SessionBlock[]): SessionBlock[] {
+  const remaining = [...blocks];
+  const out: SessionBlock[] = [];
+  while (remaining.length) {
+    const n = out.length;
+    const runs2 = n >= 2 && out[n - 1].kind === out[n - 2].kind;
+    let idx = runs2 ? remaining.findIndex((b) => b.kind !== out[n - 1].kind) : 0;
+    if (idx === -1) idx = 0; // unavoidable: take the next
+    out.push(remaining[idx]);
+    remaining.splice(idx, 1);
+  }
+  return out;
+}
+
 /**
  * Build a content-scoped session for a Bibliothek tab's Üben button, drawn from
  * `ids` (the tab's exact filtered items; empty falls back to the whole bank of
@@ -309,8 +333,12 @@ export function buildScopedSession(
           question: q,
         }))
       : [];
+    // Odd-one-out (2d): a semantic-cluster pick over the set's own related terms.
+    const oddBlocks: SessionBlock[] = buildOddOneOutQuiz(pool, difficulty, Math.ceil(limit * 0.2)).map(
+      (q) => ({ kind: "quiz", key: `qz_${q.id}`, question: q }),
+    );
     blocks = capBySource(
-      interleave([cardBlocks, exerciseBlocks, listeningBlocks], limit * 3),
+      interleave([cardBlocks, exerciseBlocks, listeningBlocks, oddBlocks], limit * 3),
       2,
     ).slice(0, limit);
   } else if (type === "collocation") {
@@ -350,6 +378,10 @@ export function buildScopedSession(
     blocks = sample(drillBlocks, Math.min(limit, drillBlocks.length));
     if (topics.length === 1) label = topics[0].titleDe;
   }
+
+  // Variety guarantee (Phase 3): break up any run of 3+ same-kind blocks so a
+  // session never reads as a wall of flip-cards.
+  blocks = avoidRuns(blocks);
 
   const cardCount = blocks.filter((b) => b.kind === "flashcard" || b.kind === "typing").length;
   const exCount = blocks.filter((b) => b.kind === "quiz").length;

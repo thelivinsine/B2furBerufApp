@@ -845,3 +845,21 @@ from 126 to 128.)
   `src/features/session/SessionPlayer.tsx` · `src/features/quiz/QuestionViews.tsx` ·
   `tests/scopedSession.test.ts` · `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md`
   · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 9 (verbatim):**
+  > continue with opus now for pr5
+- **Response 9 (Opus 4.8; plan recommended Sonnet 5, founder chose to continue on Opus):** Shipped
+  PR 5 = Phase 2d odd-one-out + Phase 3 variety guarantee, completing Phases 0–3. **2d:** new MCQ
+  kind `oddOneOut` ("Ausreißer" badge); `oddOneOutQ` (`engine/quiz.ts`) anchors on a set word,
+  resolves 2 of its authored `related` terms to bank entries via a replicated `normalizeForm` +
+  once-built `vocabResolver` (so engine/ does not import features/), and adds an outsider from a
+  DIFFERENT theme as the answer; NO sourceId, so XP + combo only, never FSRS. `buildOddOneOutQuiz`
+  drives it in the Wörter scope (~0.2 ratio). **Phase 3:** `avoidRuns` (`engine/session.ts`) greedily
+  reorders the final block list so no block kind runs 3-in-a-row when avoidable (kills the
+  wall-of-flip-cards feel), applied to every scope; `kindLabel` now covers every new kind. Extended
+  `tests/scopedSession.test.ts` (odd-one-out shape + no-sourceId, the no-3-in-a-row assertion).
+  Spot-checked the generated clusters before shipping. Gates: typecheck, test:unit 219, lint 0 errors,
+  build, check:bundle 80.8 kB, lint:content all green. Squash-merged to `main` per the auto-ship rule
+  with the plan + status updates. Plan Phases 0–3 now COMPLETE; only Phase 4 (deferred) remains.
+- **Artifacts (Prompt 9):** `src/types/index.ts` · `src/engine/quiz.ts` · `src/engine/session.ts` ·
+  `src/features/quiz/QuestionViews.tsx` · `tests/scopedSession.test.ts` ·
+  `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

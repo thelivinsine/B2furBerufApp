@@ -437,7 +437,101 @@ function listeningClozeQ(item: VocabItem, pool: VocabItem[], difficulty: Difficu
   };
 }
 
+/* --- Odd-one-out (2d): resolve authored `related` clusters, add an outsider --- */
+
+// Same normalization the word graph uses to resolve a `related` term to a bank
+// entry (replicated here so engine/ does not import features/). Strip article /
+// reflexive / bracketed hints, lowercase, collapse whitespace.
+const ODD_ARTICLE_RE = /^(der|die|das|den|dem|des|ein|eine|einen|einem|einer|eines)\s+/i;
+function normForm(s: string): string {
+  return s
+    .toLowerCase()
+    .replace(/\(.*?\)/g, " ")
+    .replace(ODD_ARTICLE_RE, "")
+    .replace(/^sich\s+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+let RESOLVER: Map<string, VocabItem> | null = null;
+/** Bank-wide display-form -> entry map (first form wins; plural aliased), built
+ *  once, mirroring the word graph's `byForm`. */
+function vocabResolver(): Map<string, VocabItem> {
+  if (RESOLVER) return RESOLVER;
+  const m = new Map<string, VocabItem>();
+  for (const v of vocabulary) {
+    const k = normForm(v.de);
+    if (k && !m.has(k)) m.set(k, v);
+  }
+  for (const v of vocabulary) {
+    if (!v.plural) continue;
+    const k = normForm(v.plural);
+    if (k && !m.has(k)) m.set(k, v);
+  }
+  RESOLVER = m;
+  return m;
+}
+
+/** Odd-one-out (2d): the anchor + 2 of its resolvable `related` terms form a
+ *  semantic group; the answer is an outsider from a DIFFERENT theme. No sourceId
+ *  (category discrimination, not recall of one card), so it awards XP only. Null
+ *  when fewer than 2 related terms resolve or the 4 labels are not distinct. */
+function oddOneOutQ(anchor: VocabItem, difficulty: Difficulty): MCQQuestion | null {
+  const resolve = vocabResolver();
+  const related: VocabItem[] = [];
+  const seen = new Set<string>([anchor.id]);
+  for (const rel of anchor.related) {
+    const hit = resolve.get(normForm(rel));
+    if (hit && !seen.has(hit.id)) {
+      seen.add(hit.id);
+      related.push(hit);
+    }
+  }
+  if (related.length < 2) return null;
+  const cluster = [anchor, ...sample(related, 2)];
+  const clusterIds = new Set(cluster.map((v) => v.id));
+  const relatedIds = new Set(related.map((v) => v.id));
+  const outsider = sample(
+    vocabulary.filter(
+      (v) => v.themeId !== anchor.themeId && !clusterIds.has(v.id) && !relatedIds.has(v.id),
+    ),
+    1,
+  )[0];
+  if (!outsider) return null;
+  const options = shuffle([...cluster.map((v) => v.de), outsider.de]);
+  if (new Set(options).size !== options.length) return null; // distinct labels (React keys)
+  return {
+    id: qid("oddOneOut"),
+    kind: "oddOneOut",
+    difficulty,
+    themeId: anchor.themeId,
+    prompt: "Welches Wort passt nicht dazu?",
+    options,
+    answer: outsider.de,
+    explain: `„${outsider.de}" passt nicht zu ${cluster.map((v) => v.de).join(", ")}.`,
+  };
+}
+
 /* ---------------- Public API ---------------- */
+
+/**
+ * Odd-one-out set (2d) for a Bibliothek Wörter Üben: anchors on set words whose
+ * authored `related` cluster resolves (2+ terms), so the group is real, not
+ * inferred. Skips words with too few resolvable related terms.
+ */
+export function buildOddOneOutQuiz(
+  pool: VocabItem[],
+  difficulty: Difficulty,
+  count: number,
+): QuizQuestion[] {
+  const out: QuizQuestion[] = [];
+  for (const v of shuffle(pool.filter((v) => v.related.length >= 2))) {
+    if (out.length >= count) break;
+    const q = oddOneOutQ(v, difficulty);
+    if (q) out.push(q);
+  }
+  return out;
+}
 
 /**
  * Listening set (2c) for a Bibliothek Wörter Üben when TTS is available: each
