@@ -1019,3 +1019,12 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
 - **Response 7:** Confirmed the migration applied; both admin accounts can now save review marks in
   the /sources Daten-Werkbank. Moved the action item from `PROJECT_STATUS.md` open items to
   `PROJECT_FOUNDATION.md` completed founder items and shipped the doc update.
+- **Prompt 8 (verbatim):** `> document the session `
+- **Response 8:** Final documentation sweep. The session was documented incrementally throughout
+  (s130 handoff with both tasks in `PROJECT_STATUS.md`, CLAUDE.md command/convention updates,
+  `PHASE2_SETUP.md` migration steps, prompt-log entries 1-7), so the close-out applied the
+  doc-hygiene rule: aged the session-130 handoff (with a migration-0007 closure note) out of
+  `PROJECT_STATUS.md` into the W29 archive, restoring the two-most-recent-handoffs shape
+  (s132 + s131 remain), and appended this entry. Session totals: PRs #570 (P0/P1 data-integrity
+  fixes), #572 (/sources redesign + Daten-Werkbank), #586 (migration-0007 close-out), all
+  squash-merged to `main`; three rebases over the parallel sessions 129/131/132.
