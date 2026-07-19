@@ -469,7 +469,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         const bothOn = sActive && tActive;
         let alpha: number;
         if (!bothOn) alpha = dark ? 0.04 : 0.05;
-        else if (focusSet === null) alpha = dark ? 0.16 : 0.14;
+        else if (focusSet === null) alpha = dark ? 0.13 : 0.1;
         else if (lit) alpha = dark ? 0.9 : 0.7;
         else alpha = dark ? 0.03 : 0.04;
 
@@ -491,7 +491,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         ctx.strokeStyle = lit
           ? hexToRgba(domainColor(s.domain, dark), alpha)
           : `rgba(${color},${alpha})`;
-        ctx.lineWidth = (lit ? 1.8 : 1) / k;
+        ctx.lineWidth = (lit ? 1.6 : 0.55) / k;
         ctx.beginPath();
         ctx.moveTo(sx, sy);
         ctx.quadraticCurveTo(cx, cy, tx2, ty2);

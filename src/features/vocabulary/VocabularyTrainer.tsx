@@ -343,7 +343,12 @@ export function VocabularyTrainer() {
 
   // Mobile filter toggle: sits at the LEFT of the view switcher (founder s92).
   // Desktop uses the persistent rail instead, so this is mobile-only.
-  const facetCount = activeFacetCount(selection);
+  // The badge counts BOTH the facet pills AND the scope dropdowns
+  // (Branche/Thema/Unterthema), matching the FilterRail's own header badge, so
+  // picking a dropdown value updates the button count too (founder bug report).
+  const scopeActiveCount =
+    sectors.length + themes.length + (hasSubThemes ? subs.length : 0);
+  const facetCount = activeFacetCount(selection) + scopeActiveCount;
   const filterButton = (
     <Button
       size="icon"
@@ -491,7 +496,7 @@ export function VocabularyTrainer() {
           the SAME filter tile inline (collapsed by default) instead of a
           toolbar + sheet; only one FilterRail is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+        <div className={`${browseHeaderClass(headerHidden && !filtersOpen, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile:
               Filter + view on the left, bookmark/search pushed right; Üben fills
               its row with the count at the far right. Desktop keeps Üben/count

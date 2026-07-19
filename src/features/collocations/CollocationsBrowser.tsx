@@ -257,6 +257,14 @@ export function CollocationsBrowser() {
   // Incremental rendering: 60 cards now, the rest as you scroll.
   const { visible, hasMore, remaining, sentinelRef, showMore } = usePagedList(filtered);
 
+  // Mobile filter-button badge: count BOTH the facet pills AND the scope
+  // dropdowns (Branche/Thema/Unterthema), matching the FilterRail's own header
+  // badge, so selecting a dropdown value updates the button count too (founder
+  // bug report).
+  const scopeActiveCount =
+    sectors.length + themes.length + (hasSubThemes ? subs.length : 0);
+  const filterCount = activeFacetCount(selection) + scopeActiveCount;
+
   const primaryGroups = useMemo(
     () => themeGroupsForMode(learningMode, themes, (id) => collocationsByTheme(id).length),
     [learningMode, themes],
@@ -378,7 +386,7 @@ export function CollocationsBrowser() {
           SAME filter tile inline (collapsed by default); only one FilterRail
           is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+        <div className={`${browseHeaderClass(headerHidden && !filtersOpen, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">
@@ -402,9 +410,9 @@ export function CollocationsBrowser() {
                   onClick={() => setFiltersOpen((o) => !o)}
                 >
                   <SlidersHorizontal className="h-4 w-4" />
-                  {activeFacetCount(selection) > 0 && (
+                  {filterCount > 0 && (
                     <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-semibold leading-none text-primary-foreground">
-                      {activeFacetCount(selection)}
+                      {filterCount}
                     </span>
                   )}
                 </Button>
