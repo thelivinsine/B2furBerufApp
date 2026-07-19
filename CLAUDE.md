@@ -364,8 +364,10 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   the single-pill pattern; do NOT reintroduce the per-segment `layoutId` crossfade.
   **Mobile toolbar is a full-width `justify-between` row** `[Filter icon · ViewSwitcher · bookmark/search]`;
   the Filter icon is a page-owned toggle and the filter tile is a body-only **`FilterRail` `layout="panel"`**
-  that slides open/closed via **AnimatePresence** (height/opacity). The desktop persistent rail (`layout`
-  default `"rail"`) is unchanged. (4) **Sub-themes are a filter dropdown, not a page:** the full-page
+  that slides open/closed via **AnimatePresence** (height/opacity). Since s132 the panel is moved OUT of the
+  sticky browse header into normal flow (so it scrolls away, not sticks) and is **capped at `max-h-[55dvh]`
+  as a flex column** (fixed header + one internal `overflow-y-auto` scroll region) so it never swallows the
+  screen. The desktop persistent rail (`layout` default `"rail"`) is unchanged. (4) **Sub-themes are a filter dropdown, not a page:** the full-page
   `SubThemePicker` interstitial is gone; `FilterRail` gained an optional **`secondary`** scope ("Unterthema",
   per-sub-theme counts + "Gesamtes Thema") under Thema when the theme has sub-themes (Wörter + Kollokationen).
   `SubThemePicker` is now unused (kept in repo). (5) **Filter tile controls are icons:** a reset (RotateCcw,

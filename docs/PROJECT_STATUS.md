@@ -1,9 +1,10 @@
 # Project Status
 
 _Last updated: 2026-07-19 (session 132). **Bibliothek mobile-filter fixes + graph two-area color &
-layout** (PRs #581/#582/#583/#584, all squash-merged to `main`): fixed the mobile filter's empty-scroll
-gap, made the mobile Filter badge count scope-dropdown selections (not just facet pills), and made the
-open filter panel scroll away instead of sticking (moved it out of the sticky header). Both Bibliothek
+layout** (PRs #581/#582/#583/#584/#585/#589, all squash-merged to `main`): fixed the mobile filter's
+empty-scroll gap, made the mobile Filter badge count scope-dropdown selections (not just facet pills),
+made the open filter panel scroll away instead of sticking (out of the sticky header), capped that panel
+at 55dvh with internal scroll, and centered the go-to-top button. Both Bibliothek
 graphs now **color-code by TWO life areas** (Berufsleben/professional vs Privatleben/personal) instead
 of the five domains, and the Kollokationen graph uses the founder-picked **"by topic + tighter"** force
 layout (firmer per-topic pull, looser links) so topics read as distinct islands. Session 131 shipped
@@ -67,8 +68,8 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 **Handoff after session 132 (2026-07-19). Bibliothek mobile-filter bug-fixes + graph two-area color &
 "by topic + tighter" layout. Branch `claude/filter-scroll-badge-bugs-y75thb`, all shipped to `main`
-via PRs #581 / #582 / #583.** Four founder screenshots drove a run of mobile-filter fixes on the
-Theorie browse tabs plus a graph redesign:
+via PRs #581 / #582 / #583 / #584 / #585 / #589.** Multiple founder screenshots drove a run of
+mobile-filter fixes on the Theorie browse tabs plus a graph redesign:
 - **Mobile filter, three fixes (`FilterRail.tsx` was already fine; the fixes were in the four browse
   trainers `VocabularyTrainer`/`CollocationsBrowser`/`RedemittelTrainer`/`GrammarHub` + `browseScroll`):**
   (1) empty-gap-on-scroll — the open filter panel lived inside the sticky/collapsing browse header, so
@@ -78,6 +79,12 @@ Theorie browse tabs plus a graph redesign:
   content moved OUTSIDE the sticky header** (only the compact toolbar stays sticky and collapses), the
   badge adds `scopeActiveCount` (sectors + themes + subs) on Wörter/Kollokationen, and the header-collapse
   guard was reverted. All four tabs.
+- **Mobile filter panel cap + go-to-top centering (PR #589, `FilterRail.tsx` panel branch +
+  `browseScroll.tsx`):** the expanded panel is capped at `max-h-[55dvh]` as a flex column (fixed header +
+  one internal `overflow-y-auto` scroll region), so it never swallows the screen. The `ScrollTopButton`
+  was off-center because it is a `motion.button` whose framer inline `transform` (the `y` slide) overrode
+  the Tailwind `-translate-x-1/2` class; fixed by animating `x: "-50%"` on every keyframe and dropping the
+  class.
 - **Graphs recolored to TWO life areas (`lib/graphPalette.ts` + `WordGraph.tsx` + `CollocationGraph.tsx`):**
   new `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS`/`LIFE_AREA_COLORS` helpers bucket the five content
   domains into **Berufsleben (professional = `beruf`, brand indigo)** vs **Privatleben (personal =
