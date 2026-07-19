@@ -219,6 +219,19 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   `engine/session.ts` Pool 6 emits ~1 per session, `features/session/ReadingBlock.tsx` renders a text +
   its comprehension MCQs, a voicemail plays via TTS when `ttsSupported()`; feeds XP + the session tally,
   **never vocab FSRS**).
+  **Bibliothek Üben sets are auto-varied (s131, `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`, Phases
+  0–3 shipped):** `buildScopedSession` (the Bibliothek tab's Üben) no longer stacks flip-cards. It
+  interleaves recall cards with exercises **generated from the set's own items, zero new content
+  data**: the pool-based `buildPoolQuiz` (the generalized `buildThemeQuiz`, now behavior-identical for
+  `/quiz` + composed Pool 2) plus `buildRedemittelQuiz`/`buildListeningQuiz`/`buildOddOneOutQuiz`. New
+  quiz kinds: `redemittelCloze`, `listeningCloze` (TTS, gated on `ttsSupported() && speechEnabled`),
+  `oddOneOut` (Ausreißer, no sourceId → XP only), plus the noun↔verb match grid (reuses kind
+  `"matching"`) and a **typed-cloze** `typing` variant (`cloze` field, graduated words only). Rules to
+  keep: answers/sourceIds derive only from set items (distractor *strings* may come from the full
+  bank); the FSRS write is guarded to ids that resolve in the vocab bank (collocation/redemittel
+  questions award XP + combo only, never SRS under `c_*`/`r_*`); each item caps at 2 appearances
+  (`capBySource`); `avoidRuns` breaks any 3-in-a-row same-kind. Gauge whether variety is exhausted with
+  `pnpm report:exercise-coverage` (theme-level already 20/20 🟢; residual is word-level content polish).
   **Üben is scoped to where the learner is (s101, Üben-refinements plan item 1):** `Session.tsx` parses
   `?grammar=` (Grammatik lesson pins its topic via the `grammarTopicId` opt, Pool 3 uses 4 drills of
   that topic), `?cat=` (Redemittel category), and the Bibliothek facets `?sub=`/`?cefr=`/`?sector=`
