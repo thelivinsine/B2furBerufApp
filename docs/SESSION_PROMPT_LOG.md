@@ -1008,3 +1008,14 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   shipped the doc update to `main`.
 - **Artifacts (Prompts 12–15):** `src/features/collocations/CollocationGraph.tsx` · `CLAUDE.md` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · PR #584 · manual Pages deploy run #590
+
+## Session 130 (cont.) — 2026-07-19 — Migration 0007 confirmed
+
+- **Prompt 6 (verbatim):** `> give me clear instructions on what's my action point`
+- **Response 6:** Step-by-step Supabase instructions for running migration 0007 (SQL editor, the
+  exact SQL pasted inline, expected "Success. No rows returned", in-app verification steps, and the
+  fallback if migration 0004 were missing).
+- **Prompt 7 (verbatim):** `> it says success`
+- **Response 7:** Confirmed the migration applied; both admin accounts can now save review marks in
+  the /sources Daten-Werkbank. Moved the action item from `PROJECT_STATUS.md` open items to
+  `PROJECT_FOUNDATION.md` completed founder items and shipped the doc update.
