@@ -400,17 +400,18 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         forceLink<SimNode, SimLink>(links)
           .id((d) => d.id)
           .distance((l) => 22 + (l.source as SimNode).r + (l.target as SimNode).r)
-          // Looser link pull (founder "by topic + tighter", 2026-07-19) so hub
-          // verbs drag their neighbours toward the centre less, keeping islands
-          // apart.
-          .strength(0.11),
+          // Higher link tension (founder, 2026-07-19: tighten the clusters) so
+          // connected noun/verb pairs pull firmly together.
+          .strength(0.22),
       )
       .force("charge", forceManyBody<SimNode>().strength(-55).distanceMax(240))
-      .force("collide", forceCollide<SimNode>((d) => d.r + 5))
-      // Theme-centroid pull: this is what forms the islands. Firmer (0.28) so
-      // each topic contracts into a distinct island (founder, 2026-07-19).
-      .force("x", forceX<SimNode>((d) => centroidOf(d).x).strength(0.28))
-      .force("y", forceY<SimNode>((d) => centroidOf(d).y).strength(0.28))
+      // Tighter node packing (smaller collision padding) so a cluster's members
+      // sit closer together.
+      .force("collide", forceCollide<SimNode>((d) => d.r + 3))
+      // Theme-centroid pull: this is what forms the islands. Firm (0.38) so each
+      // topic contracts into a compact island (founder "tighter", 2026-07-19).
+      .force("x", forceX<SimNode>((d) => centroidOf(d).x).strength(0.38))
+      .force("y", forceY<SimNode>((d) => centroidOf(d).y).strength(0.38))
       .stop();
     simRef.current = { sim, nodes, links };
 
