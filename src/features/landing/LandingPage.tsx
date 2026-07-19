@@ -255,7 +255,7 @@ export function LandingPage() {
               transition={{ duration: 0.4, delay: 0.05 * i }}
               className="rounded-2xl border border-border bg-surface/70 p-5 shadow-soft backdrop-blur"
             >
-              <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-accent-gradient text-sm font-bold text-white">
+              <div className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
                 {s.step}
               </div>
               <h3 className="mt-3 font-semibold">{s.title}</h3>
@@ -288,7 +288,7 @@ export function LandingPage() {
 
       {/* Closing CTA */}
       <section className="relative z-10 mx-auto max-w-3xl px-4 pb-20 sm:px-6">
-        <div className="overflow-hidden rounded-3xl border border-border bg-accent-gradient p-8 text-center text-white shadow-elevated sm:p-12">
+        <div className="overflow-hidden rounded-3xl border border-primary/20 bg-primary p-8 text-center text-white shadow-elevated sm:p-12">
           <BrainCircuit className="mx-auto h-9 w-9 opacity-90" />
           <h2 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
             {onboarded ? "Weiter geht's, keep the Schwung!" : "Bereit? Let's break through that plateau."}

@@ -20,7 +20,7 @@ import {
   NPC_SPRITES,
   PLAYER_SPRITE,
   GAME_AMBER,
-  GAME_INDIGO,
+  GAME_BLUE,
 } from "@/features/welt/stage";
 
 const EFFECT_LABEL: Record<string, string> = {
@@ -116,7 +116,7 @@ export function BattleView({
             <span className="text-sm font-bold">Du</span>
             <DeltaFloat turns={battle.turns} value={last?.mut ?? 0} />
           </div>
-          <Meter label="Mut" value={battle.mut} max={battle.mutMax} color={GAME_INDIGO} />
+          <Meter label="Mut" value={battle.mut} max={battle.mutMax} color={GAME_BLUE} />
         </GameCard>
 
         {/* crit flash */}
@@ -187,7 +187,7 @@ export function BattleView({
               <button
                 type="button"
                 onClick={onOpenBag}
-                className="flex w-full items-center justify-center gap-3 rounded-md border-2 border-[#463c44] bg-[#5b5be6] px-3 py-3 text-sm font-bold text-white shadow-[0_3px_0_rgba(70,60,68,0.30)] transition-all active:translate-y-[2px] active:shadow-none"
+                className="flex w-full items-center justify-center gap-3 rounded-md border-2 border-[#463c44] bg-[#3D74ED] px-3 py-3 text-sm font-bold text-white shadow-[0_3px_0_rgba(70,60,68,0.30)] transition-all active:translate-y-[2px] active:shadow-none"
               >
                 <motion.img
                   src={BAG_SPRITE}
@@ -209,7 +209,7 @@ export function BattleView({
                   /* typed challenge: complete the gap to land the move */
                   <form
                     key={m.id}
-                    className="space-y-2 rounded-md border-2 border-[#5b5be6] bg-white px-3 py-2.5"
+                    className="space-y-2 rounded-md border-2 border-[#3D74ED] bg-white px-3 py-2.5"
                     onSubmit={(e) => {
                       e.preventDefault();
                       submitTyped(m);
@@ -227,7 +227,7 @@ export function BattleView({
                         autoCorrect="off"
                         spellCheck={false}
                         placeholder="Fehlendes Wort"
-                        className="min-w-0 flex-1 rounded-md border-2 border-[#463c44]/60 bg-white px-3 py-1.5 text-sm text-slate-800 outline-none focus:border-[#5b5be6]"
+                        className="min-w-0 flex-1 rounded-md border-2 border-[#463c44]/60 bg-white px-3 py-1.5 text-sm text-slate-800 outline-none focus:border-[#3D74ED]"
                       />
                       <Pill primary disabled={!typedInput.trim()} onClick={() => submitTyped(m)}>
                         Sagen
@@ -246,7 +246,7 @@ export function BattleView({
                         act((r) => playMove(r, m.id));
                       }
                     }}
-                    className="w-full rounded-md border-2 border-[#463c44]/50 bg-white px-3 py-2.5 text-left transition-all hover:border-[#5b5be6] active:translate-y-[1px]"
+                    className="w-full rounded-md border-2 border-[#463c44]/50 bg-white px-3 py-2.5 text-left transition-all hover:border-[#3D74ED] active:translate-y-[1px]"
                   >
                     {m.tag && (
                       <span className="flex items-center gap-2">

@@ -67,11 +67,13 @@ input:-webkit-autofill {
 
     /* Gender marks (Artikel-Visuals, s128 plan): der=blue, die=rose, das=green
        (textbook convention). Deliberately distinct from the six domain graph
-       hues in lib/graphPalette.ts so a mark never reads as a domain. Each has a
-       pale `-bg` tint for fills behind the Wesen / effect. Hex sources:
-       der #2563eb/#7aa5f8, die #db2777/#f27bb8, das #16a34a/#5fc98b. */
-    --der: 221 83% 53%;
-    --der-bg: 221 83% 95%;
+       hues in lib/graphPalette.ts so a mark never reads as a domain, AND
+       (brand plan PR C, deviation #5) deepened to a cooler cobalt (hue 226 vs
+       Nachtblau's 221, lower lightness) so a der Wesen never reads as the brand
+       action color. Each has a pale `-bg` tint for fills behind the Wesen /
+       effect. der #1f4fd6/#8aa8f7, die #db2777/#f27bb8, das #16a34a/#5fc98b. */
+    --der: 226 74% 48%;
+    --der-bg: 224 74% 95%;
     --die: 333 71% 51%;
     --die-bg: 333 71% 96%;
     --das: 142 76% 36%;
@@ -123,9 +125,11 @@ input:-webkit-autofill {
     --reward-bg: 11 45% 15%;
 
     /* Gender marks, brightened for the dark canvas (same intent as the domain
-       palette's dark tones); `-bg` tints go dark/low-lightness. */
-    --der: 219 90% 73%;
-    --der-bg: 221 40% 18%;
+       palette's dark tones); `-bg` tints go dark/low-lightness. der shifted to
+       hue 226 (brand plan PR C, deviation #5) to stay distinct from the dark
+       Nachtblau primary (221 90% 70%). */
+    --der: 226 88% 76%;
+    --der-bg: 224 40% 18%;
     --die: 329 82% 72%;
     --die-bg: 329 38% 18%;
     --das: 145 50% 58%;

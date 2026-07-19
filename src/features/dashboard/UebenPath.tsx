@@ -49,7 +49,7 @@ type StopState = "done" | "current" | "locked";
 // stop is current (the founder's live screenshot showed the pin slicing
 // through "Bahnhof" and the chip covering the tile).
 const STOPS = [
-  { key: "bahnhof", label: "Bahnhof", missions: ["m_kap1_willkommen", "m_kap1_automat"], stop: [44, 88], tile: [44, 48], color: "#5b5be6", labelPos: "above", chipPos: "right" },
+  { key: "bahnhof", label: "Bahnhof", missions: ["m_kap1_willkommen", "m_kap1_automat"], stop: [44, 88], tile: [44, 48], color: "#3D74ED", labelPos: "above", chipPos: "right" },
   { key: "laden", label: "Laden", missions: ["m_kap1_sim", "m_kap1_einkauf"], stop: [120, 88], tile: [120, 48], color: "#f0705f", labelPos: "above", chipPos: "right" },
   { key: "zuhause", label: "Zuhause", missions: ["m_kap1_dach"], stop: [276, 128], tile: [310, 128], color: "#f2a03d", labelPos: "below", chipPos: "above" },
   { key: "amt", label: "Amt", missions: ["m_kap1_anmeldung"], stop: [216, 170], tile: [216, 205], color: "#2fa8a0", labelPos: "right", chipPos: "above" },
@@ -72,24 +72,24 @@ const SEG_RUNS: [number, number, number, number][][] = [
 ];
 
 // Map scenery palette (theme-aware: the map is an app surface on Heute).
-// s104 founder pick: light = "Brand-Ton" (indigo-tinted ground and blocks,
+// s104 founder pick: light = "Brand-Ton" (Nachtblau-tinted ground and blocks,
 // green parks), dark = "Klarer Abend" (the brightest of the dark candidates;
 // blue-grey ground, near-white labels, dusk rather than deep night). `route`
-// rides the palette because the dark map needs a brighter indigo than the
+// rides the palette because the dark map needs a brighter Nachtblau than the
 // --primary token to keep contrast on the lifted ground.
 const MAP_LIGHT = {
-  ground: "#eef0f7", park: "#d6e6cf", parkDeep: "#bfd9b4",
-  lotA: "#e5e4f1", lotB: "#dbd9ea",
-  casing: "#dee0ee", street: "#ffffff", dash: "#d3d5e7",
-  label: "#5a5e78", dotFill: "#ffffff", pinRing: "#ffffff",
-  route: "#5b5be6", pulseRing: "#4b5563",
+  ground: "#eef1f7", park: "#d6e6cf", parkDeep: "#bfd9b4",
+  lotA: "#e4e8f1", lotB: "#d9deea",
+  casing: "#dee3ee", street: "#ffffff", dash: "#d3d9e7",
+  label: "#5a6378", dotFill: "#ffffff", pinRing: "#ffffff",
+  route: "#3D74ED", pulseRing: "#4b5563",
 };
 const MAP_DARK = {
   ground: "#2e3450", park: "#3a5545", parkDeep: "#4b7058",
   lotA: "#42486e", lotB: "#393f60",
   casing: "#232841", street: "#5a6187", dash: "#8f97bd",
   label: "#dde1f2", dotFill: "#f4f5fc", pinRing: "#f4f5fc",
-  route: "#a6a6fd", pulseRing: "#c7cce0",
+  route: "#8AB0F9", pulseRing: "#c7cce0",
 };
 
 // The "you are here" pin is a dedicated red (distinct from the indigo route

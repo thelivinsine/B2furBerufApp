@@ -134,7 +134,7 @@ export function MissionPlayer({ mission, onExit }: { mission: Mission; onExit: (
           {mission.title}
         </p>
         <span
-          className="inline-flex h-9 items-center gap-1 rounded-md border-2 bg-[#fdfcf8] px-2 text-xs font-bold text-[#5b5be6]"
+          className="inline-flex h-9 items-center gap-1 rounded-md border-2 bg-[#fdfcf8] px-2 text-xs font-bold text-[#3D74ED]"
           style={{ borderColor: GAME_OUT }}
         >
           <Zap className="h-3.5 w-3.5" /> {run.xp}
@@ -155,7 +155,7 @@ export function MissionPlayer({ mission, onExit }: { mission: Mission; onExit: (
             animate={ask ? { y: [0, -2, 0] } : { y: 0 }}
             transition={ask ? { repeat: Infinity, duration: 0.9 } : undefined}
           />
-          <span className="absolute -right-1.5 -top-1.5 rounded-full bg-[#5b5be6] px-1.5 text-[10px] font-bold text-white">
+          <span className="absolute -right-1.5 -top-1.5 rounded-full bg-[#3D74ED] px-1.5 text-[10px] font-bold text-white">
             {run.bag.length}
           </span>
           {ask && (
@@ -325,7 +325,7 @@ function BagSheet({
                   onClick={() => (asking ? onHand(item.id) : setInspect(inspect === item.id ? null : item.id))}
                   className={cn(
                     "flex flex-col items-center gap-1.5 rounded-md border-2 bg-white px-2 py-2.5 text-center transition-all active:translate-y-[2px]",
-                    inspect === item.id && !asking && "ring-2 ring-[#5b5be6]",
+                    inspect === item.id && !asking && "ring-2 ring-[#3D74ED]",
                   )}
                   style={{ borderColor: GAME_OUT }}
                 >
@@ -450,7 +450,7 @@ function VictoryScreen({ run, onExit }: { run: MissionRun; onExit: () => void })
           className="flex flex-col items-center gap-3"
         >
           <span
-            className="inline-flex items-center gap-1.5 rounded-md border-2 bg-white px-4 py-1.5 text-sm font-bold text-[#5b5be6]"
+            className="inline-flex items-center gap-1.5 rounded-md border-2 bg-white px-4 py-1.5 text-sm font-bold text-[#3D74ED]"
             style={{ borderColor: GAME_OUT }}
           >
             <Zap className="h-4 w-4" /> +{run.xp} XP

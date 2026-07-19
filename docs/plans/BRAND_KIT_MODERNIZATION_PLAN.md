@@ -146,11 +146,19 @@ iOS/circle mask sims.
    `/privacy` render the new mark with existing rounding/glow styling.
 5. Update `CLAUDE.md` Brand logo section + `BRAND_SPEC.md` status header to "implemented".
 
-### PR C — Deep surface sweep (game, map, buildings, landing)
+### PR C — Deep surface sweep (game, map, buildings, landing) — ✅ SHIPPED (s133)
 
-**Model: Sonnet 5 for the mechanical recolor, Opus 4.8 for the optical retune.** In practice: run
-it as one Opus 4.8 session (the sweep is small enough), or Sonnet 5 with founder screenshots for
-the judgment calls. Estimated: one session.
+**Model: Opus 4.8** (ran as one session). Estimated: one session. **Shipped s133:** Neuland game
+chrome `#5b5be6`→Nachtblau `#3D74ED` across all four welt files (constant renamed
+`GAME_INDIGO`→`GAME_BLUE`; the leather-backpack amber/brown art + `GAME_OUT` outline kept, since
+those are game props not brand chrome, and the victory loot screen already rides the Koralle
+`--reward` token from PR A). Üben map: `route`/Bahnhof-stop → Nachtblau, MAP_LIGHT scenery tints
+hue-shifted 245→221 at identical lightness (founder-locked lightness/mood untouched), MAP_DARK route
+→ a brighter Nachtblau `#8AB0F9`. Büro domain building → Nachtblau. Landing: step-number chips + the
+closing CTA band flattened from `bg-accent-gradient` to flat `bg-primary` (hero CTAs + the "plateau."
+headline keep the gradient, per the discipline). der token deepened to a cooler cobalt (hue 226,
+light `226 74% 48%` / dark `226 88% 76%`) so a der Wesen never reads as the Nachtblau brand color.
+Verified: in-mission battle chrome, Spielen hub, Theorie der/die/das marks, flattened landing CTA.
 
 1. **Neuland game chrome** (`stage.tsx`, `BattleView.tsx`, `MissionPlayer.tsx`, `scenes.tsx`):
    "brand indigo the single loud accent" becomes "Nachtblau the single loud accent". `GAME_OUT`
