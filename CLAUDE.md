@@ -124,7 +124,7 @@ protection); the build does NOT need any allowlisted scripts — keep it that wa
   Article/BreadcrumbList/FAQPage JSON-LD + full text in `#root`) for SEO. When adding/renaming articles,
   update `content.ts` only, then `pnpm build` (regenerates the pages + sitemap). No em dashes.
 - `features/collection/Sammlung.tsx` — "Meine Sammlung" bag view (redesign Phase 3.4): every bookmarked word plus every word with a `cardLevel >= 1` (`engine/collection.ts`) as a browsable, level-filterable card grid. Off the nav, reached only via the "Meine Sammlung" entry card on Fortschritt (`/analytics`) and the `/sammlung` deep link, the same pattern as the retired `/quiz`. Lazy route (walks the vocabulary bank).
-- `components/city/domain-buildings.tsx` — the six flat SVG domain buildings (redesign Phase 3.1): two-tone + neon marks in the `route-icons.tsx` language, soft corners only (rx on every rect, round-join strokes on pointed shapes), ground-aligned optical sizing, plus the `DOMAIN_BUILDINGS` mastery registry that 3.2's city strip consumes. Lit = bright white windows, unlit = dark shaded openings; the founder rejected gold windows, so **no reward-gold in these marks**. Review sheet: `preview/domain-buildings-preview.svg` (the TSX is the geometry source of truth).
+- `components/city/domain-buildings.tsx` — the six flat SVG domain buildings (redesign Phase 3.1): two-tone + neon marks in the `route-icons.tsx` language, soft corners only (rx on every rect, round-join strokes on pointed shapes), ground-aligned optical sizing, plus the `DOMAIN_BUILDINGS` mastery registry that 3.2's city strip consumes. Lit = bright white windows, unlit = dark shaded openings; the founder rejected gold windows, so **no reward color (Koralle since s133, gold before) in these marks**. Review sheet: `preview/domain-buildings-preview.svg` (the TSX is the geometry source of truth).
 - `components/artikel/` — the Artikel-Visuals gender system (s129, plan: `docs/plans/ARTIKEL_VISUALS_PLAN.md`, Phase 1 shipped): `gender.ts` (pure `genderOf`, reads ONLY the authored `article` field, null = no mark), `Wesen.tsx` (the three creature marks: spiky blue der / round rose die / boxy green das; full creature ≥ 24px, solid shape below; geometry from the founder-picked Preview B in `preview/artikel-visuals/gender-doodles-panel.html`), `ArtikelEffect.tsx` (flip/answer reveal: der bursts, die blooms, das shatters; CSS `.artikel-fx-*` in `index.css`, 200ms delay so the effect stays visible after the FlipCard rotation, reduced-motion = fading tint), `ArtikelLegend.tsx` (one-time hint, `artikelLegendDismissed` in `useSettingsStore`). Colors ride the `--der/--die/--das` (+`-bg`) tokens (light + dark, distinct from the `graphPalette.ts` domain hues; never domain/graph colors). Wired into the Theorie Wörter Karten/Tabelle/Liste. **Phase 2 (s129): fused doodles** live in `features/vocabulary/doodles/` (`index.ts` = eager id registry + `hasDoodle`/`loadDoodle`; `art.tsx` = the 20 batch-1 scenes, referents in `--ink`, creature via the exported `WesenBody`, own-gender tokens ONLY, enforced by `tests/doodles.test.ts` incl. a rendered-markup check); the art is a lazy chunk loaded on a registered card's first flip, and the card back shows the doodle above the English. Growing the bank = add the scene in `art.tsx` + the id in `index.ts` + record it in the plan §4. **Phase 3 (s129): reuse** — the reveal effect fires on correct NOUN answers in the composed session (`SessionPlayer` flashcard/typing/speaking grade paths, gender via `vocabById(sourceId)`; the stage block content is `z-10` above the effect so the burst radiates from behind the opaque card, never over the text), and the Wesen mark also appears on the Wörter-graph selected-node card + the legacy `Flashcards` front. Plan fully shipped.
 - `types/index.ts` — shared types; `types/game.ts` — the Neuland Mission/Scene schema (game G1, s73)
 - `router.tsx`, `App.tsx`, `main.tsx`
@@ -161,8 +161,8 @@ list. Full rationale + per-task model map in the plan's G2 status block.
 - **Art/UI: scene-7 palette, PIXEL-GAME chrome, full-screen (s72 blessing as amended s74;
   `docs/DECISIONS.md` "Game art direction" + "Game interaction & pixel-UI rules"):** the in-mission
   game scenes (the full-screen `MissionPlayer`) are light-theme-only (dark deferred, backlog #31),
-  brand indigo the single loud accent,
-  reward-gold only on the victory loot screen. Since s74 the mission player is a FIXED
+  brand Nachtblau (`#3D74ED`, the s133 rebrand; was indigo) the single loud accent,
+  the Koralle reward tokens only on the victory loot screen. Since s74 the mission player is a FIXED
   full-screen layer (dark surround, edge-to-edge stage) and every in-game surface is
   pixel-styled (2px outlines in `GAME_OUT` #463c44, hard offset shadows, near-square corners,
   RPG name plates); do not reintroduce app-chrome cards inside missions. **The Neuland HUB
@@ -244,9 +244,11 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   **Focus mode (redesign Phase 2.1):** `SessionPlayer` sets `useSessionStore.focusMode` while a block
   is on screen, and `AppShell` hides all chrome (header, bottom bar, sidebar) on `/session` + `/revision`
   so the session plays as a full-screen stage; chrome returns on the end screen. The locked bottom-bar
-  internals are untouched (just not mounted in focus mode). Reward-gold tokens (`--reward`/`--reward-bg`,
-  Tailwind `reward`/`reward-bg`) are reserved for loot / combo moments only (the domain-building marks
-  tried gold windows and the founder rejected them; buildings light up white instead).
+  internals are untouched (just not mounted in focus mode). Reward tokens (`--reward`/`--reward-bg`,
+  Tailwind `reward`/`reward-bg`; **Koralle since the s133 rebrand**, gold before) are reserved for
+  loot / combo / streak moments only (the domain-building marks tried gold windows and the founder
+  rejected them; buildings light up white instead). Since s133 the header streak pill + the
+  Fortschritt "Aktuelle Serie" StatCard ride them too (streak = celebration, not warning).
 - **Global search:** `lib/search.ts` `searchAll` + `GlobalSearch` (header icon / Sidebar / ⌘K).
 - **Bibliothek hub:** single `/library?tab=woerter|kollokationen|redemittel|grammatik`; old routes
   (`/vocabulary`, `/collocations`, `/redemittel`, `/grammar`) redirect in (query params preserved).
@@ -262,7 +264,7 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   Obsidian-style force-directed canvas of the CURRENTLY FILTERED list (`vocabulary/WordGraph.tsx` +
   pure builder `vocabulary/wordGraph.ts`, pinned by `tests/wordgraph.test.ts`): node radius = wordfreq
   Zipf (no corpus evidence = min radius, never a fake claim), **color = TWO life areas** (founder
-  2026-07-19: Berufsleben/professional = the `beruf` domain, brand indigo; Privatleben/personal =
+  2026-07-19: Berufsleben/professional = the `beruf` domain, brand Nachtblau; Privatleben/personal =
   every other domain, teal; helpers `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS` in `lib/graphPalette.ts`;
   the legend + its filter collapse to these two), edges ONLY from
   authored sources (`related` terms resolved to bank entries; collocations whose noun AND verb both
@@ -399,7 +401,7 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   so a time-poor learner is always handed the next-biggest B2 lever. **Üben is on the lesson too**
   (inline gradient button on desktop, sticky bottom action bar above the nav on mobile), replacing the
   old "Wissen im Quiz testen" `/quiz` CTA (the retired `/quiz` route stays reachable via practiceAreas,
-  see below). Emerald stays the quiet Grammatik accent (icon tiles/Muster only); brand indigo stays the
+  see below). Emerald stays the quiet Grammatik accent (icon tiles/Muster only); brand Nachtblau stays the
   action color. **Desktop the Muster panel and the explanation sit side by side** (s103,
   `CardContent` gains `lg:grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]`; mobile keeps the s93 stacked
   order untouched).
@@ -605,7 +607,7 @@ Deeper mechanism/mockup references and the s25–29 evolution are in **`docs/DEC
   `route-icons.tsx`): each mark's bounding box is scaled to a centred 16-unit target with a
   per-mark weight, so a filled disc doesn't read larger than an airy glyph. Re-tune via that map.
 - Dashboard = a house glyph; the **Mehr** menu = the 2×2 grid (the apps/more glyph), `MoreIcon`.
-  Both keep the brand indigo `#5b5be6`. Reference sheet: `preview/route-icons-preview.svg`.
+  Both keep the brand Nachtblau `#3D74ED` (s133 rebrand; was indigo `#5b5be6`). Reference sheet: `preview/route-icons-preview.svg`.
 
 ### Edit mode (iOS home-screen style)
 - Triggered by **long-pressing anywhere** on the tab bar OR anywhere on the More sheet (600ms, with

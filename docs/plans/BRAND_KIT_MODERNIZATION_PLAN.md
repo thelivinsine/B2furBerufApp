@@ -1,7 +1,7 @@
 # Brand Kit Modernization Plan — Nachtblau & Himmelblau + Koralle
 
-_Authored session 133 (2026-07-19, Fable 5). Status: **PLAN APPROVED FOR SCOPING, implementation
-starts when the founder says go.** Source of truth for the design itself:
+_Authored session 133 (2026-07-19, Fable 5). Status: **✅ COMPLETE — all four PRs shipped s133**
+(A #593 Fable 5 · B #594 Opus 4.8 · C #595 Opus 4.8 · D #596 Fable 5, matching the §7 model map). Source of truth for the design itself:
 `docs/branding/BRAND_SPEC.md` (Kit 1, finalized s127). This document scopes HOW to ship it at the
 quality bar of a top-tier edutech product, in what order, with which model per chunk of work._
 
@@ -181,10 +181,19 @@ Verified: in-mission battle chrome, Spielen hub, Theorie der/die/das marks, flat
    Blatt `#2E9E6B` and re-judge the graph teal against the new blues. Only if they visibly clash;
    these are semantic, not brand, colors.
 
-### PR D — Dark mode design pass + premium polish (the deviation phase)
+### PR D — Dark mode design pass + premium polish (the deviation phase) — ✅ SHIPPED (s133)
 
 **Model: Fable 5** (this is open design work, the spec explicitly defers it). Estimated: one
-session, driven by screenshots.
+session, driven by screenshots. **Shipped s133:** the PR A dark theme survived the design review
+almost intact (it was designed, not derived, from the start); the judged changes were dark
+`--muted-foreground` 76%→72% -2% sat (secondary text now actually reads secondary, still ~8:1),
+streak surfaces → Koralle (header pill + the Fortschritt "Aktuelle Serie" StatCard via a new
+`reward` accent; warning stays semantic), `tabular-nums` on the StatCard value (the one numeric
+surface missing it — the codebase already had it everywhere else), and the CLAUDE.md color-language
+sweep (brand indigo→Nachtblau, reward-gold→Koralle, 0 stale references). Buttons already carried
+`active:scale-[0.98]` pressed states and display sizes already `tracking-tight`, so items 2/3
+needed no further change. **`docs/DECISIONS.md` was deliberately NOT swept:** it is the historical
+record of decisions made under the old palette; the binding color rules live in CLAUDE.md.
 
 1. **Dark mode designed properly:** start from spec §2, then tune like a product team would:
    ground ≈ `250 24% 10%`, surfaces two steps up, Nachtblau lifted to ≈ `221 90% 70%` for
