@@ -863,3 +863,34 @@ from 126 to 128.)
 - **Artifacts (Prompt 9):** `src/types/index.ts` · `src/engine/quiz.ts` · `src/engine/session.ts` ·
   `src/features/quiz/QuestionViews.tsx` · `tests/scopedSession.test.ts` ·
   `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 10 (verbatim):**
+  > how do we identify the current variety is exhausted?
+- **Response 10 (Opus 4.8):** Explained (no code) that "exhausted" is per-axis, not global, and laid
+  out the signals: coverage/eligibility gaps (measurable from the banks today), repetition/determinism
+  (the real template ceiling), skill gaps (not templatable → Phase 4), and learner signal (needs
+  telemetry). Gave a two-part decision rule and proposed a cheap offline "exercise-coverage report" as
+  the concrete instrument.
+- **Prompt 11 (verbatim):**
+  > where will that report live and who should read it and how is it useful? explain it briefly in plain language
+- **Response 11 (Opus 4.8):** Plain-language answer: lives at `docs/reports/exercise-coverage-report.md`,
+  generated on demand by a `pnpm` command (a repo document, not an in-app dashboard); read by the
+  founder (where to spend content effort) and whoever builds next; useful because it turns "does this
+  feel samey?" into a named list of topics with a cheap-or-expensive tag.
+- **Prompt 12 (verbatim):**
+  > yes build it, but it should be easily understandable without too much jargon and should be visual with clear explanations wherever needed
+- **Response 12 (Opus 4.8):** Built `scripts/report-exercise-coverage.mjs` + `pnpm
+  report:exercise-coverage`. It runs the REAL session builder (no drift) across every theme, unioned
+  over all CEFR levels (difficulty 1/2/3) and new+mature decks, with a seeded RNG so output is
+  deterministic (verified identical across runs). Writes a visual German report to
+  `docs/reports/exercise-coverage-report.md`: a plain "what is this" intro, a 🟢/🟡/🔴 legend, a
+  per-type glossary, a per-theme variety bar chart, a folded full topic×type matrix, a Kollokationen/
+  Redemittel/Grammatik section, and a "when is variety exhausted?" footer. Caught + fixed two
+  methodology flaws during review (all-graduated deck hid the flip-card → union fresh+mature;
+  collocationMatch mislabeled as vocab-matching → distinguish by prompt) and reframed the residual as
+  word-level once theme-level came out fully 🟢 (20/20). Result: theme-level variety is exhausted; the
+  report ranks the cheap word-level residual (85 words without a self-example, 74 without resolvable
+  related). Wired the command into CLAUDE.md commands + the plan's new "Deciding when to start Phase 4"
+  section. Squash-merged to `main` with the doc updates.
+- **Artifacts (Prompts 10–12):** `scripts/report-exercise-coverage.mjs` (new) ·
+  `docs/reports/exercise-coverage-report.md` (new, generated) · `package.json` · `CLAUDE.md` ·
+  `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

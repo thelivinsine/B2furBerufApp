@@ -64,6 +64,15 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   This is an honest **machine** tier and does NOT touch `review_status`; only a human flips that (see
   the two-loop model in `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN.md` §7). Append ids to the sidecar as
   later waves are reviewed, then regenerate. Sidecar absent → no item is jury (non-breaking).
+- `pnpm report:exercise-coverage` — the Üben exercise-variety gauge (s131 exercise-variety plan).
+  Runs the REAL session builder across every theme (all CEFR levels × new/mature decks) and writes a
+  visual, plain-language `docs/reports/exercise-coverage-report.md`: how many distinct exercise types
+  each topic's custom Üben set can produce, plus the word-level residual (words with no self-example →
+  no cloze/typing/listening; words with no resolvable `related` → no odd-one-out). Deterministic
+  (seeded RNG), no gate. This is the "is template variety exhausted?" answer: theme-level is exhausted
+  when every theme is 🟢; the report's word-level gaps are the remaining CHEAP content polish; the
+  expensive Phase 4 only starts once those are closed AND learner-repetition/plateau signals appear
+  (which need telemetry this report deliberately does not have). Re-run after content edits.
 - `pnpm review:queue` — read-only dump of `draft` provenance rows grouped by bank, then by sector
   (vocab/collocation/text) / category (Redemittel) / group (grammar) / theme / chapter, written to
   `docs/reports/review-queue.md`, for offline founder/reviewer passes (scale-up plan §7.6, s97).

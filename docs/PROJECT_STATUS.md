@@ -177,6 +177,17 @@ odd-one-out + Phase 3 variety guarantee. Completes Phases 0–3.**
   generation through the verification pipeline; deferred until template variety feels exhausted). **PWA
   caveat:** the session surface is service-worker-cached; hard-refresh before judging the live result.
 
+**Post-PR-5 (same session): exercise-coverage gauge.** Added `pnpm report:exercise-coverage`
+(`scripts/report-exercise-coverage.mjs`) to answer "how do we know variety is exhausted?" objectively.
+It runs the REAL session builder across every theme (all CEFR levels × new/mature decks, seeded →
+deterministic) and writes a visual, plain-language `docs/reports/exercise-coverage-report.md`: a
+per-topic variety count + status (🟢/🟡/🔴), a full topic×type matrix, and the **word-level residual**
+(85 words with no self-referencing example → no cloze/typing/listening; 74 with no resolvable
+`related` → no odd-one-out). Finding: **theme-level variety is already exhausted (20/20 🟢)**; the
+residual is cheap content polish. Decision rule (in the plan's new "Deciding when to start Phase 4"
+section): start Phase 4 only when the word-level residual is closed AND a learner-repetition/plateau
+signal appears (needs telemetry the report deliberately lacks). No gate; re-run after content edits.
+
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
 branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the
 content/data layer is managed (answered in chat + a private pipeline-diagram artifact), then asked for

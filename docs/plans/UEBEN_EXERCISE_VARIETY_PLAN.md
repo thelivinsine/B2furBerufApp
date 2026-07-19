@@ -167,6 +167,25 @@ order (fun-per-effort, founder may reorder):
   engine code rides the lazy session chunk) · lint:content — all green.
 - Reduced-motion + focus-mode behavior inherited from the existing block renderers, unchanged.
 
+### Deciding when to start Phase 4 — the coverage gauge (s131)
+
+`pnpm report:exercise-coverage` (`scripts/report-exercise-coverage.mjs`) is the objective "is
+template variety exhausted?" instrument, written to `docs/reports/exercise-coverage-report.md`. It
+runs the REAL session builder across every theme (all CEFR levels × new/mature decks, seeded so it is
+deterministic) and reports, per topic, how many distinct exercise types a custom Üben set produces,
+plus the word-level residual. Two-part decision rule:
+
+1. **Theme-level exhausted** = every theme 🟢 (offers the full type menu). As of s131 this is already
+   true (20/20 🟢), so the cheap remaining work is the report's **word-level residual**: ~85 words
+   with no self-referencing example (blocks cloze/typed-cloze/listening for those words) and ~74 with
+   no resolvable `related` (blocks odd-one-out). Those are content edits, not code.
+2. **Unmet-need signal** = learners still hit repetition (re-seeing identical prompts) or a skill
+   plateau. This needs telemetry the report deliberately does NOT have (the P3 learner-performance
+   loop from the data-architecture review).
+
+Start Phase 4 only when **both** hold: the word-level residual is closed AND a real unmet-need signal
+appears. Until then, closing the residual is the higher-ROI move.
+
 ### Phase 4 (DEFERRED, do not start until template variety is exhausted)
 
 - **Authored micro-exercise packs** keyed by theme/sub-theme (never by set): mini-dialogues with
