@@ -22,7 +22,10 @@ import type { Gender } from "./gender";
  */
 const RAY_ANGLES = [0, 45, 90, 135, 180, 225, 270, 315];
 
-const RING_DELAYS = ["200ms", "310ms", "420ms"];
+// die BLOOM stagger. Tightened (was 200/310/420) so the three rings pop in
+// quick succession and the effect finishes as snappily as der/das instead of
+// rippling out slowly.
+const RING_DELAYS = ["200ms", "280ms", "360ms"];
 
 /** Shard trajectories: spread on all sides, varied spin, no two symmetric. */
 const SHARDS: { dx: number; dy: number; rot: number }[] = [
@@ -37,11 +40,19 @@ const SHARDS: { dx: number; dy: number; rot: number }[] = [
 export function ArtikelEffect({
   gender,
   play,
+  align = "center",
   className,
 }: {
   gender: Gender;
   /** Increment to (re)play. `0`/unchanged = idle. */
   play: number;
+  /**
+   * Horizontal origin of the burst. `"center"` (default) keeps it behind the
+   * content; `"right"` shifts it into the empty right side of a card (the
+   * vocab list back face, where the English text sits left). Drives `--fx-x`,
+   * which the `.artikel-fx-*` origins read.
+   */
+  align?: "center" | "right";
   className?: string;
 }) {
   const reduce = useReducedMotion();
@@ -49,13 +60,20 @@ export function ArtikelEffect({
   // Idle before the first play, so an un-flipped card renders nothing.
   if (!play) return null;
 
+  const originX = align === "right" ? "78%" : "50%";
+
   return (
-    <span key={play} aria-hidden className={cn("artikel-fx", className)}>
+    <span
+      key={play}
+      aria-hidden
+      className={cn("artikel-fx", className)}
+      style={{ "--fx-x": originX } as CSSProperties}
+    >
       {reduce ? (
         <span
           className="artikel-fx-tint"
           style={{
-            background: `radial-gradient(circle at 50% 42%, hsl(var(--${gender}-bg)), transparent 70%)`,
+            background: `radial-gradient(circle at ${originX} 42%, hsl(var(--${gender}-bg)), transparent 70%)`,
           }}
         />
       ) : gender === "der" ? (
