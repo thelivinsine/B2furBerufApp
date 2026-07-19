@@ -905,3 +905,79 @@ from 126 to 128.)
   the s131 status handoff (it had grown to the 250-line ceiling from live per-PR appends) into a tight
   summary pointing at the plan + this log for detail, bringing the file to 165 lines. No code touched.
 - **Artifacts (Prompt 13):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+
+## Session 132 — 2026-07-19 — Bibliothek mobile-filter fixes + graph two-area color & layout
+
+Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main` (PRs #581, #582, #583).
+
+- **Prompt 1 (verbatim, + 1 screenshot of the Wörter tab with a large empty gap above the cards):**
+  > when filter is opened and being scrolled, there seems to be a bug - see the screenshot. Also, when things from dropdowns in the filter are selected, the filter badges doesn't appear with filter count - which is wrong, the filter count with badges should apply to dropdown items as well. fix these two issues
+- **Response 1 (Opus 4.8):** Two fixes. (1) Empty-gap: the sticky/collapsing browse header contained the
+  open filter panel; collapsing the tall block on scroll left its reserved flow space as a blank gap.
+  Interim fix: stop the header collapsing while `filtersOpen` (`headerHidden && !filtersOpen`) in all
+  four browse tabs. (2) Badge: the mobile Filter-button badge counted only `activeFacetCount(selection)`;
+  added `scopeActiveCount` (sectors + themes + subs) on Wörter + Kollokationen (Redemittel/Grammatik use
+  facets only). typecheck + build green; committed + pushed.
+- **Prompt 2 (verbatim, + 1 screenshot of the Kollokationen graph, dense grey tangle):**
+  > the lines are too noisy here. can you make them thinner so that the graph looks better?
+- **Response 2 (Opus 4.8):** Thinned the Kollokationen graph edges: non-lit stroke width `1 → 0.55`,
+  lit `1.8 → 1.6`, resting opacity `0.14 → 0.10` (light) / `0.16 → 0.13` (dark). Built, committed, pushed.
+- **Prompt 3 (verbatim):**
+  > yes merge to main
+- **Response 3 (Opus 4.8):** Opened PR #581 (empty-gap + badge + thin edges), squash-merged to `main`,
+  ran the post-merge realign (reset dev branch to `origin/main`, force-with-lease).
+- **Prompt 4 (verbatim):**
+  > what's the purpose of splitting the non-arbeitswelt categories as three in the graphs? also, the island clusters are not very clearly visible in kollokations graph.
+- **Response 4 (Opus 4.8):** Explained (no code) that the graph colors by the app's 5-domain taxonomy, so
+  the non-work content shows as three real domains (Alltag/Gesundheit/Bildung); the imbalance is because
+  s121 merged the two work domains into one `beruf`. Root-caused the blurry islands: clustering is
+  per-theme (20) but color is per-domain (4), so 10 blue work-islands fuse; plus weak centroid pull and
+  hub-verb bridges. Ranked betterments (cluster by domain, tighter pull, tame hubs, two-level layout).
+- **Prompt 5 (verbatim, two quick messages):**
+  > suggest betterments and reasoning
+  > don't make any changes yet
+- **Response 5 (Opus 4.8):** Gave the ranked recommendations with reasoning, grounded in the real force
+  params (`forceX/Y 0.13`, ring `140+N*30`, charge `-42`, link `0.18`). Recommended domain-clustering +
+  firmer pull; asked the founder to pick clustering by domain vs theme before implementing.
+- **Prompt 6 (verbatim):**
+  > can you generate some previews with various degrees of the above recommendations applied?
+- **Response 6 (Opus 4.8):** Built a self-contained interactive comparison artifact on the REAL graph
+  (extracted 1,243 nodes / 1,014 links via the actual builder; inlined d3-force + its 3 UMD deps,
+  verified the bundle exposes the force API in a browser-like vm). Five animated force presets
+  (Current, By life area, By life area + tighter [recommended], Two levels, By topic + tighter) with a
+  live parameter panel. Published as a claude.ai artifact. Confirmed the data: beruf 733 vs alltag 389 /
+  gesundheit 62 / bildung 59.
+- **Prompt 7 (verbatim, + 3 screenshots of the open filter panel filling the screen):**
+  > here's the filter.. when opened it stays open even after scrolling.. it's stuck! fix the bug
+- **Response 7 (Opus 4.8):** Diagnosed this as a side effect of the Prompt-1 interim guard: freezing the
+  header kept the tall panel pinned. Proper fix: moved the mobile filter panel into normal document flow
+  OUTSIDE the sticky header (only the compact toolbar stays sticky and collapses), and reverted the
+  `&& !filtersOpen` guard, across all four tabs. typecheck + build + PR #582 → merged → realigned.
+- **Prompt 8 (verbatim, mid-turn during Response 7):**
+  > can you translate the stuff in the html artifact for the previw in English?
+- **Response 8 (Opus 4.8):** Regenerated the comparison artifact fully in English (also swapped in the
+  real German word labels, dropping the earlier id-guessing), republished to the same URL.
+- **Prompt 9 (verbatim):**
+  > for the artifact, include enough non tech summary so that I understand what is what
+- **Response 9 (Opus 4.8):** Added a plain-language "How to read this graph" explainer (dot = noun, ring
+  = verb, line = collocation, color = life area, islands = clumps) and de-jargoned the settings panel
+  (e.g. "Pull to center: firm" with the raw number secondary). Republished to the same URL.
+- **Prompt 10 (verbatim):**
+  > keep the color coding to only two main areas - professional and personal life - if needed reword the Arbeitswelt to something like Professional or suitable german word. and the graph I like it by topic + tighter.
+- **Response 10 (Opus 4.8):** Implemented both. Added `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS`/
+  `LIFE_AREA_COLORS` to `graphPalette.ts` (professional = `beruf` = brand indigo; personal = every other
+  domain = teal; labels Berufsleben / Privatleben). Switched BOTH graphs' node color, glow, lit edges,
+  legend chips and the legend domain-filter to the two areas (clustering unchanged). Applied the
+  founder-picked "by topic + tighter" force recipe to the Kollokationen graph: forceX/Y `0.13→0.28`,
+  link `0.18→0.11`, collide `r+3→r+5`, ring `N*30→N*35`. Removed now-unused imports. Gates: typecheck,
+  test:unit 219, lint 0 errors, build all green.
+- **Prompt 11 (verbatim, mid-turn during Response 10):**
+  > once done, document the session and push everything to main
+- **Response 11 (Opus 4.8):** This documentation pass (PROJECT_STATUS.md handoff + _Last updated_,
+  this log, and the CLAUDE.md graph-color/layout facts), then PR #583 → squash-merge to `main` → realign.
+- **Artifacts (session 132):** `src/features/vocabulary/VocabularyTrainer.tsx` ·
+  `src/features/collocations/CollocationsBrowser.tsx` · `src/features/redemittel/RedemittelTrainer.tsx` ·
+  `src/features/grammar/GrammarHub.tsx` · `src/lib/graphPalette.ts` ·
+  `src/features/collocations/CollocationGraph.tsx` · `src/features/vocabulary/WordGraph.tsx` ·
+  `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · PRs #581 / #582 / #583 ·
+  comparison-preview artifact (scratchpad HTML, not committed)

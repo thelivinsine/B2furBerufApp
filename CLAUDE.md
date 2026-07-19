@@ -261,17 +261,24 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   `collocations/CollocationViews.tsx` / `redemittel/RedemittelViews.tsx`. **Wörter Graph** =
   Obsidian-style force-directed canvas of the CURRENTLY FILTERED list (`vocabulary/WordGraph.tsx` +
   pure builder `vocabulary/wordGraph.ts`, pinned by `tests/wordgraph.test.ts`): node radius = wordfreq
-  Zipf (no corpus evidence = min radius, never a fake claim), color = the 6 domains, edges ONLY from
+  Zipf (no corpus evidence = min radius, never a fake claim), **color = TWO life areas** (founder
+  2026-07-19: Berufsleben/professional = the `beruf` domain, brand indigo; Privatleben/personal =
+  every other domain, teal; helpers `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS` in `lib/graphPalette.ts`;
+  the legend + its filter collapse to these two), edges ONLY from
   authored sources (`related` terms resolved to bank entries; collocations whose noun AND verb both
   resolve; unresolvable related terms are dropped, founder-confirmed 2026-07-11). **Kollokationen Graph
   (s118)** = a **bipartite noun ↔ verb** canvas of the filtered collocation list
   (`collocations/CollocationGraph.tsx` + pure builder `collocations/collocationGraph.ts`, pinned by
   `tests/collocationGraph.test.ts`): every distinct noun/verb is a node, every collocation an edge, so
   hub verbs (machen/treffen) surface naturally. Node size = **degree** (frequency is keyed by content_id,
-  not surface form), color = domain of the node's majority theme; nodes are pulled to per-theme centroids
-  to form glowing **theme islands**, tuned to look striking fully zoomed out (fit-to-all on open, cached
+  not surface form), **color = the TWO life areas** (professional vs personal, `lifeAreaColor`, same as
+  the Wörter graph, founder 2026-07-19); nodes are pulled to per-**topic** centroids
+  to form glowing **islands**, tuned to look striking fully zoomed out (fit-to-all on open, cached
   radial glow sprites, curved gradient-tinted edges, vignette background, nouns = solid discs / verbs =
-  rings). The domain palette is shared via `lib/graphPalette.ts`; the selected-node card is bipartite
+  rings). **Layout is the founder-picked "by topic + tighter" recipe (s132, 2026-07-19):** per-topic
+  centroids on a wide ring (`140 + N*35`), firm centroid pull (forceX/Y `0.28`), loose links
+  (`0.11`), roomy collision (`r+5`), so each topic settles into a distinct island rather than one
+  central tangle. The palette is shared via `lib/graphPalette.ts`; the selected-node card is bipartite
   (tap a noun → its verbs, tap a verb → its nouns) and has a **shape toggle beside its close button**
   (s118): the card is either a full-width bar along the bottom (`horizontal`, default) or a full-height
   panel down the right (`vertical`); toggling re-fits the constellation into the area the card leaves

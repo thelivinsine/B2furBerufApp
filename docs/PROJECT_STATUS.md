@@ -1,14 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 131). **Üben exercise-variety Phases 0–3 COMPLETE** (PRs 1–5 of
-`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`, Phase 4 deferred): custom Bibliothek Üben sets now
-interleave auto-generated exercises with recall cards across all three browse scopes (Wörter with a
-typed cloze for graduated words + a TTS listening pick + an odd-one-out, Kollokationen with a noun→verb
-match grid, Redemittel with a cloze), a no-3-in-a-row variety guarantee, zero new content data, plus an
-FSRS-guard fix. Session 130 shipped the data-architecture P0/P1 integrity fixes. Session 127's brand
-pick is still open: Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, founder owes the
-light-blue pick (Himmelblau vs Cyan; handoff in the W29 archive). Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-19 (session 132). **Bibliothek mobile-filter fixes + graph two-area color &
+layout** (PRs #581/#582/#583, all squash-merged to `main`): fixed the mobile filter's empty-scroll
+gap, made the mobile Filter badge count scope-dropdown selections (not just facet pills), and made the
+open filter panel scroll away instead of sticking (moved it out of the sticky header). Both Bibliothek
+graphs now **color-code by TWO life areas** (Berufsleben/professional vs Privatleben/personal) instead
+of the five domains, and the Kollokationen graph uses the founder-picked **"by topic + tighter"** force
+layout (firmer per-topic pull, looser links) so topics read as distinct islands. Session 131 shipped
+Üben exercise-variety Phases 0–3. Session 127's brand pick is still open: Kit 1 · Kobalt & Butter
+recolored to the bottom-nav blues, founder owes the light-blue pick (Himmelblau vs Cyan; handoff in the
+W29 archive). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -67,6 +68,35 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 132 (2026-07-19). Bibliothek mobile-filter bug-fixes + graph two-area color &
+"by topic + tighter" layout. Branch `claude/filter-scroll-badge-bugs-y75thb`, all shipped to `main`
+via PRs #581 / #582 / #583.** Four founder screenshots drove a run of mobile-filter fixes on the
+Theorie browse tabs plus a graph redesign:
+- **Mobile filter, three fixes (`FilterRail.tsx` was already fine; the fixes were in the four browse
+  trainers `VocabularyTrainer`/`CollocationsBrowser`/`RedemittelTrainer`/`GrammarHub` + `browseScroll`):**
+  (1) empty-gap-on-scroll — the open filter panel lived inside the sticky/collapsing browse header, so
+  collapsing it left its reserved flow space as a blank gap; (2) the mobile Filter-button badge counted
+  only facet pills, not the Branche/Thema/Unterthema scope dropdowns; (3) after an interim guard the
+  panel got *stuck* pinned open while scrolling. Final resolution: the filter panel is now **normal-flow
+  content moved OUTSIDE the sticky header** (only the compact toolbar stays sticky and collapses), the
+  badge adds `scopeActiveCount` (sectors + themes + subs) on Wörter/Kollokationen, and the header-collapse
+  guard was reverted. All four tabs.
+- **Graphs recolored to TWO life areas (`lib/graphPalette.ts` + `WordGraph.tsx` + `CollocationGraph.tsx`):**
+  new `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS`/`LIFE_AREA_COLORS` helpers bucket the five content
+  domains into **Berufsleben (professional = `beruf`, brand indigo)** vs **Privatleben (personal =
+  everything else, teal)**. Node color, glow, lit edges, legend chips and the legend domain-filter all
+  collapse to these two on BOTH graphs; clustering still uses the finer theme grain.
+- **Kollokationen graph layout = founder-picked "by topic + tighter"** (from a published comparison
+  artifact of 5 force recipes on the real 1,243-node data): per-topic centroids kept, but firmer pull
+  (forceX/Y `0.13→0.28`), looser links (`0.18→0.11`), roomier collision (`r+3→r+5`), wider ring
+  (`N*30→N*35`). Also thinned the default edge stroke (`1→0.55`) + lowered edge opacity earlier in the
+  session for less visual noise.
+- **Gates:** typecheck, `test:unit` 219, lint 0 errors, build all green. Comparison artifact (English,
+  with a plain-language "how to read this" explainer) is a scratchpad HTML, not in the repo.
+- **Not done / open:** the two-level (domains-as-regions, topics-as-sub-islands) layout was previewed
+  but the founder chose topic+tighter instead. The preview artifact's variants still describe the
+  earlier "by life area" options; it was a decision aid, not kept in sync post-decision.
 
 **Handoff after session 131 (2026-07-18). Üben exercise-variety plan authored (Fable 5) + fully built
 in 5 PRs (mostly Opus 4.8), branch `claude/ueben-exercise-variety-i59ry0`, all shipped to `main`.**
