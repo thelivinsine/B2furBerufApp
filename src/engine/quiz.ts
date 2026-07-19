@@ -407,7 +407,66 @@ function redemittelClozeQ(
   };
 }
 
+/** Listening cloze (2c): TTS speaks the FULL example sentence (`audioPrompt`),
+ *  the learner picks the word that fills the blank. Reuses the MCQ cloze blank +
+ *  distractors; no `hint` (the English gloss would reveal the answer by ear).
+ *  Null when no example contains the headword. */
+function listeningClozeQ(item: VocabItem, pool: VocabItem[], difficulty: Difficulty): MCQQuestion | null {
+  const head = item.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0];
+  if (head.length < 3) return null;
+  const ex = item.examples.find((e) => new RegExp(`\\b${escapeReg(head)}`, "i").test(e.de));
+  if (!ex) return null;
+  const blanked = ex.de.replace(new RegExp(`\\b${escapeReg(head)}\\w*`, "i"), "___");
+  if (!blanked.includes("___")) return null;
+  const distractors = sample(
+    pool.filter((v) => v.id !== item.id),
+    3,
+  ).map((v) => v.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0]);
+  if (distractors.length < 3) return null;
+  return {
+    id: qid("listeningCloze"),
+    kind: "listeningCloze",
+    difficulty,
+    themeId: item.themeId,
+    prompt: blanked,
+    audioPrompt: ex.de,
+    answer: head,
+    options: shuffle([head, ...distractors]),
+    sourceId: item.id,
+    explain: `${ex.de} – ${ex.en}`,
+  };
+}
+
 /* ---------------- Public API ---------------- */
+
+/**
+ * Listening set (2c) for a Bibliothek Wörter Üben when TTS is available: each
+ * item's example sentence is spoken and the learner picks the blanked word.
+ * Distractors fall back to the full bank so a small set still builds 4 options.
+ * Items whose example has no blankable headword are skipped.
+ */
+export function buildListeningQuiz(
+  pool: VocabItem[],
+  difficulty: Difficulty,
+  count: number,
+): QuizQuestion[] {
+  const distr = pool.length >= 4 ? pool : vocabulary;
+  const out: QuizQuestion[] = [];
+  const seen = new Set<string>();
+  let guard = 0;
+  while (out.length < count && guard++ < count * 6 && pool.length > 0) {
+    const v = sample(pool, 1)[0];
+    if (seen.has(v.id)) {
+      if (seen.size >= pool.length) break;
+      continue;
+    }
+    seen.add(v.id);
+    const q = listeningClozeQ(v, distr, difficulty);
+    if (q) out.push(q);
+    if (seen.size >= pool.length) break;
+  }
+  return out;
+}
 
 /**
  * Redemittel cloze set (2e) for a Bibliothek Redemittel Üben: blanks a content

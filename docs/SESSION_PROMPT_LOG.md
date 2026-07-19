@@ -825,3 +825,23 @@ from 126 to 128.)
 - **Artifacts (Prompts 6–7):** `src/types/index.ts` · `src/engine/typing.ts` · `src/engine/session.ts`
   · `src/features/session/SessionPlayer.tsx` · `tests/typing.test.ts` · `tests/scopedSession.test.ts`
   · `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 8 (verbatim):**
+  > go ahead with pr4
+- **Response 8 (Opus 4.8):** Shipped PR 4 = Phase 2c listening word. New MCQ kind `listeningCloze` +
+  an `audioPrompt` field on `QuizQuestionBase` (added to `QuizKind`/`MCQQuestion.kind`/`kindLabel` →
+  "Hören"). `listeningClozeQ` (`engine/quiz.ts`) reuses the cloze blank + distractors, carries NO
+  hint (an EN gloss would reveal the heard word), and stores the full sentence in `audioPrompt`;
+  `buildListeningQuiz` drives it. The Wörter scope emits listening blocks (~0.25 ratio) only when
+  `buildScopedSession` receives `listening: true`, which `SessionPlayer` sets to
+  `ttsSupported() && speechEnabled`. `MCQView` gained an audio branch: an "Anhören" play button that
+  autoplays once per question (useEffect on q.id; the session is opened by a tap, so the gesture
+  requirement is satisfied) plus the gapped frame as supporting text. Grades FSRS via the vocab
+  sourceId. NOT wired into `/quiz` or the composed session (that keeps its own reading-voicemail
+  listening). Extended `tests/scopedSession.test.ts` (shape, no-gloss, the TTS gate). Spot-checked the
+  generated data before shipping. Gates: typecheck, test:unit 217, lint 0 errors, build,
+  check:bundle 80.8 kB, lint:content all green. Squash-merged to `main` per the auto-ship rule with the
+  plan + status updates.
+- **Artifacts (Prompt 8):** `src/types/index.ts` · `src/engine/quiz.ts` · `src/engine/session.ts` ·
+  `src/features/session/SessionPlayer.tsx` · `src/features/quiz/QuestionViews.tsx` ·
+  `tests/scopedSession.test.ts` · `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md`
+  · `docs/SESSION_PROMPT_LOG.md`

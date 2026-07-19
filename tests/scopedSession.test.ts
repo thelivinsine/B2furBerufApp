@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildScopedSession } from "@/engine/session";
-import { buildPoolQuiz, buildRedemittelQuiz } from "@/engine/quiz";
+import { buildPoolQuiz, buildRedemittelQuiz, buildListeningQuiz } from "@/engine/quiz";
 import { vocabulary, vocabById } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
@@ -227,6 +227,38 @@ describe("buildScopedSession (s131 exercise variety)", () => {
       expect(new Set(q.options).size).toBe(q.options.length); // 4 distinct options
       expect(q.answer.length).toBeGreaterThanOrEqual(4);
     }
+  });
+
+  it("builds listening clozes (2c): spoken full sentence, blanked frame, no gloss", () => {
+    const qs = buildListeningQuiz(behoerde, 2, 8) as MCQQuestion[];
+    expect(qs.length).toBeGreaterThan(0);
+    const ids = new Set(behoerdeIds);
+    for (const q of qs) {
+      expect(q.kind).toBe("listeningCloze");
+      expect(q.audioPrompt).toBeTruthy();
+      expect(q.audioPrompt).not.toContain("___"); // the FULL sentence is spoken
+      expect(q.prompt).toContain("___"); // the written frame is gapped
+      expect(q.options).toContain(q.answer);
+      expect(q.hint).toBeUndefined(); // an EN gloss would reveal the heard word
+      expect(ids.has(q.sourceId!)).toBe(true);
+    }
+  });
+
+  it("emits listening blocks only when the caller reports TTS available", () => {
+    const set = behoerdeIds.slice(0, 14);
+    const withTts = buildScopedSession("vocab", set, { srs: {}, minutes: 12, difficulty: 2, listening: true });
+    const without = buildScopedSession("vocab", set, { srs: {}, minutes: 12, difficulty: 2, listening: false });
+    const hasListening = (p: typeof withTts) =>
+      p.blocks.some((b) => b.kind === "quiz" && b.question.kind === "listeningCloze");
+    expect(hasListening(without)).toBe(false);
+    // Union over a few builds (sampling): listening surfaces when enabled.
+    let sawListening = false;
+    for (let i = 0; i < 5 && !sawListening; i++) {
+      sawListening = hasListening(
+        buildScopedSession("vocab", set, { srs: {}, minutes: 12, difficulty: 2, listening: true }),
+      );
+    }
+    expect(sawListening || hasListening(withTts)).toBe(true);
   });
 
   it("degrades a tiny set to cards without throwing", () => {

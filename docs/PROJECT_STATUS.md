@@ -1,13 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 131). **Üben exercise-variety PRs 1–3 shipped** (Phase 0/1 + 2a/2e
-+ 2b of `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Bibliothek Üben sets now interleave
+_Last updated: 2026-07-18 (session 131). **Üben exercise-variety PRs 1–4 shipped** (Phase 0/1 + 2a/2e
++ 2b + 2c of `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Bibliothek Üben sets now interleave
 auto-generated exercises with recall cards across all three browse scopes (Wörter with a typed cloze
-for graduated words, Kollokationen with a noun→verb match grid, Redemittel with a cloze), zero new
-content data, plus an FSRS-guard fix. Session 130 shipped the data-architecture P0/P1 integrity
-fixes. Session 127's brand pick is still open: Kit 1 · Kobalt & Butter recolored to the bottom-nav
-blues, founder owes the light-blue pick (Himmelblau vs Cyan; handoff in the W29 archive). Product
-name: **Genauly** (`genauly.de`)._
+for graduated words + a TTS listening pick, Kollokationen with a noun→verb match grid, Redemittel with
+a cloze), zero new content data, plus an FSRS-guard fix. Only 2d (odd-one-out) + Phase 3 remain.
+Session 130 shipped the data-architecture P0/P1 integrity fixes. Session 127's brand pick is still
+open: Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, founder owes the light-blue pick
+(Himmelblau vs Cyan; handoff in the W29 archive). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -135,9 +135,25 @@ per-item templates". **Shipped in PR 1 (Phase 0 + Phase 1):**
   (`tests/scopedSession.test.ts`).
 - **Gates (after PR 3):** typecheck ✓ · test:unit **215** ✓ · lint 0 errors ✓ · build ✓ ·
   check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
-- **Next: PR 4** (Phase 2c listening word, Opus 4.8), then 2d (odd-one-out, Sonnet 5) + Phase 3 per the
-  plan §6 map. Restart the branch from `main` first per the merged-PR rule. **PWA caveat:** the session
-  surface is service-worker-cached; hard-refresh before judging the live result.
+
+**PR 4 (same session, Opus 4.8): Phase 2c listening word.**
+- **Listening cloze:** new MCQ kind `listeningCloze` + an `audioPrompt` field on `QuizQuestionBase`.
+  `listeningClozeQ` (`engine/quiz.ts`) reuses the cloze blank + distractors but carries NO hint (an EN
+  gloss would reveal the heard word) and stores the full sentence in `audioPrompt`. `buildListeningQuiz`
+  drives it. The Wörter scope emits it (~0.25 ratio) only when `buildScopedSession` gets
+  `listening: true`, which `SessionPlayer` sets to `ttsSupported() && speechEnabled`.
+- **Renderer:** `MCQView` gained an audio branch — an "Anhören" play button (autoplays once per
+  question via `useEffect` on `q.id`; the session is opened by a tap so the gesture requirement is met)
+  + the gapped frame as supporting text. Grades FSRS via the vocab sourceId. NOT wired into `/quiz` or
+  the composed session (that keeps its own reading-voicemail listening).
+- **Verified generated data:** "Den ___ stellt man beim Bundesamt" (spoken full) → Asylantrag;
+  "Die ___ endet am 31. Dezember" → Antragsfrist. Frame gapped, full sentence in audio, 4 options.
+- **Tests:** `buildListeningQuiz` shape + no-gloss + the TTS gate (`tests/scopedSession.test.ts`).
+- **Gates (after PR 4):** typecheck ✓ · test:unit **217** ✓ · lint 0 errors ✓ · build ✓ ·
+  check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
+- **Next: PR 5** (Phase 2d odd-one-out + Phase 3 variety assertions, Sonnet 5) — the last rung. Restart
+  the branch from `main` first per the merged-PR rule. **PWA caveat:** the session surface is
+  service-worker-cached; hard-refresh before judging the live result.
 
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
 branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the

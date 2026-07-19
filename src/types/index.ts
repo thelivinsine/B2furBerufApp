@@ -356,6 +356,7 @@ export type QuizKind =
   | "plural"
   | "cloze"
   | "redemittelCloze"
+  | "listeningCloze"
   | "wordOrder"
   | "matching"
   | "collocationFill"
@@ -376,6 +377,12 @@ interface QuizQuestionBase {
   hint?: string;
   /** Explanation revealed after answering. */
   explain?: string;
+  /**
+   * German text to speak via TTS as the prompt (listening variant, 2c). When
+   * set, the renderer plays this instead of relying on the written prompt. Only
+   * emitted when the caller reports TTS support (+ the speech setting on).
+   */
+  audioPrompt?: string;
 }
 
 /** Single-answer multiple-choice question (the most common kind). */
@@ -386,6 +393,7 @@ export interface MCQQuestion extends QuizQuestionBase {
     | "plural"
     | "cloze"
     | "redemittelCloze"
+    | "listeningCloze"
     | "collocationFill"
     | "connectorChoice"
     | "relativePronoun"
