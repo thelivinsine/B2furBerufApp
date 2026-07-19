@@ -1,13 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-18 (session 131). **Üben exercise-variety PR 1 + PR 2 shipped** (Phase 0/1 +
-Phase 2a/2e of `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Bibliothek Üben sets now
-interleave auto-generated exercises with recall cards across all three browse scopes (Wörter,
-Kollokationen with a noun→verb match grid, Redemittel with a cloze), zero new content data, plus an
-FSRS-guard fix. Session 130 shipped the data-architecture P0/P1 integrity fixes. Session 127's brand
-pick is still open: Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, founder owes the
-light-blue pick (Himmelblau vs Cyan; handoff in the W29 archive). Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-18 (session 131). **Üben exercise-variety PRs 1–3 shipped** (Phase 0/1 + 2a/2e
++ 2b of `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`): custom Bibliothek Üben sets now interleave
+auto-generated exercises with recall cards across all three browse scopes (Wörter with a typed cloze
+for graduated words, Kollokationen with a noun→verb match grid, Redemittel with a cloze), zero new
+content data, plus an FSRS-guard fix. Session 130 shipped the data-architecture P0/P1 integrity
+fixes. Session 127's brand pick is still open: Kit 1 · Kobalt & Butter recolored to the bottom-nav
+blues, founder owes the light-blue pick (Himmelblau vs Cyan; handoff in the W29 archive). Product
+name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -116,9 +116,28 @@ per-item templates". **Shipped in PR 1 (Phase 0 + Phase 1):**
   even show the accusative article ("den Aufenthaltstitel → verlängern"). No em dashes.
 - **Gates (after PR 2):** typecheck ✓ · test:unit **211** ✓ · lint 0 errors ✓ · build ✓ ·
   check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
-- **Next: PR 3** (Phase 2b typed cloze, Opus 4.8), then 2c (listening) / 2d (odd-one-out) + Phase 3 per
-  the plan §6 map. Restart the branch from `main` first per the merged-PR rule. **PWA caveat:** the
-  session surface is service-worker-cached; hard-refresh before judging the live result.
+
+**PR 3 (same session, Opus 4.8): Phase 2b typed cloze.**
+- **Typed cloze:** the `typing` SessionBlock gained an optional `cloze: { prompt; answers }`. When set,
+  `TypingBlock` shows a blanked example sentence ("Ergänze das fehlende Wort", "Lücke" badge) and the
+  learner types the missing word. `engine/typing.ts` gained `gradeTypedAny` (best verdict across
+  targets) so the blank accepts BOTH the exact surface form in the sentence AND the base headword when
+  they differ (a sentence with "Anträge" accepts "Anträge" or "Antrag").
+  `typedClozeData`/`clozeTypingBlock` (`engine/session.ts`) find an example containing the headword,
+  blank the exact token, and keep the full sentence for the reveal.
+- **Gate to graduated words:** only a `graduatedToTyping` word can become a cloze; in the Wörter scope
+  a graduated word has ~50% chance of the cloze variant instead of plain forward recall (never both),
+  so a new word is never asked to be produced cold. Grades FSRS via the vocab sourceId like any typing
+  block (fires the gender reveal on correct nouns).
+- **Verified generated German:** real B2 sentences blank cleanly ("Vor dem Umzug ins Ausland müssen Sie
+  sich ___" → abmelden; "Den ___ erhalten Sie innerhalb von vier Wochen" → Bescheid).
+- **Tests:** `gradeTypedAny` (`tests/typing.test.ts`); graduated-only gate + cloze shape
+  (`tests/scopedSession.test.ts`).
+- **Gates (after PR 3):** typecheck ✓ · test:unit **215** ✓ · lint 0 errors ✓ · build ✓ ·
+  check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
+- **Next: PR 4** (Phase 2c listening word, Opus 4.8), then 2d (odd-one-out, Sonnet 5) + Phase 3 per the
+  plan §6 map. Restart the branch from `main` first per the merged-PR rule. **PWA caveat:** the session
+  surface is service-worker-cached; hard-refresh before judging the live result.
 
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
 branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the

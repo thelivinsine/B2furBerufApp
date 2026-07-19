@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { gradeTyped, normalizeTyped, typedTolerance } from "@/engine/typing";
+import { gradeTyped, gradeTypedAny, normalizeTyped, typedTolerance } from "@/engine/typing";
 import { matchesSpoken } from "@/engine/pronounce";
 
 describe("normalizeTyped", () => {
@@ -119,5 +119,26 @@ describe("gradeTyped — wrong tier and guards", () => {
   it("sets reason only on the almost tier", () => {
     expect(gradeTyped("die Besprechung", "die Besprechung").reason).toBeUndefined();
     expect(gradeTyped("der Termin", "die Besprechung").reason).toBeUndefined();
+  });
+});
+
+describe("gradeTypedAny — typed-cloze multi-target (2b)", () => {
+  it("accepts either the blanked surface form or the base head", () => {
+    // A sentence blanked at 'Anträge' accepts both inflections.
+    expect(gradeTypedAny("Anträge", ["Anträge", "Antrag"]).verdict).toBe("correct");
+    expect(gradeTypedAny("Antrag", ["Anträge", "Antrag"]).verdict).toBe("correct");
+  });
+
+  it("takes the BEST verdict across targets", () => {
+    // Exact on one target wins over an 'almost' on another.
+    expect(gradeTypedAny("Termin", ["Termine", "Termin"]).verdict).toBe("correct");
+    // A small slip against the nearest target is 'almost', not 'wrong'.
+    expect(gradeTypedAny("Anträg", ["Anträge", "Antrag"]).verdict).toBe("almost");
+  });
+
+  it("is 'wrong' only when no target matches, and mirrors gradeTyped for one target", () => {
+    expect(gradeTypedAny("Bericht", ["Anträge", "Antrag"]).verdict).toBe("wrong");
+    expect(gradeTypedAny("die Besprechung", ["die Besprechung"]).verdict).toBe("correct");
+    expect(gradeTypedAny("", ["Antrag"]).verdict).toBe("wrong");
   });
 });

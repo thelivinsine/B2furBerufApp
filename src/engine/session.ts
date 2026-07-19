@@ -174,6 +174,46 @@ function vocabCardBlock(v: VocabItem, srs: Record<string, SrsCard>): SessionBloc
       };
 }
 
+const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/**
+ * Typed-cloze data (2b) for a graduated vocab word: find an example sentence
+ * containing the headword, blank the exact surface token, and accept both that
+ * surface form and the base head when they differ. Null when no example contains
+ * a blankable headword. Mirrors the MCQ cloze blanking in `engine/quiz.ts`.
+ */
+function typedClozeData(v: VocabItem): { prompt: string; full: string; answers: string[] } | null {
+  const head = v.de.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0];
+  if (head.length < 3) return null;
+  for (const ex of v.examples) {
+    const m = ex.de.match(new RegExp(`\\b${escapeRe(head)}\\w*`, "i"));
+    if (!m) continue;
+    const surface = m[0];
+    const prompt = ex.de.replace(surface, "___");
+    if (!prompt.includes("___")) continue;
+    const answers =
+      surface.toLowerCase() === head.toLowerCase() ? [surface] : [surface, head];
+    return { prompt, full: ex.de, answers };
+  }
+  return null;
+}
+
+/** A typed-cloze block for a graduated word, or null when no cloze can be built
+ *  (caller falls back to the plain recall card). */
+function clozeTypingBlock(v: VocabItem): SessionBlock | null {
+  const data = typedClozeData(v);
+  if (!data) return null;
+  return {
+    kind: "typing",
+    key: `tc_${v.id}`,
+    sourceId: v.id,
+    de: v.de,
+    en: v.en,
+    example: data.full,
+    cloze: { prompt: data.prompt, answers: data.answers },
+  };
+}
+
 /** A recognition card for a collocation (XP-only, no SRS; see SessionBlock). */
 function collocationCardBlock(c: Collocation): SessionBlock {
   return {
@@ -242,7 +282,16 @@ export function buildScopedSession(
 
   if (type === "vocab") {
     const pool = vocabulary.filter((v) => has(v.id));
-    const cardBlocks = sample(pool, pool.length).map((v) => vocabCardBlock(v, opts.srs));
+    // Recall step per word. A GRADUATED word (already typed-recall eligible) has a
+    // ~50% chance of the typed-cloze variant (2b) instead of plain forward recall,
+    // so production stays fresh; a new word is never asked to be typed cold.
+    const cardBlocks = sample(pool, pool.length).map((v) => {
+      if (graduatedToTyping(opts.srs[v.id]) && Math.random() < 0.5) {
+        const c = clozeTypingBlock(v);
+        if (c) return c;
+      }
+      return vocabCardBlock(v, opts.srs);
+    });
     // Vocab-based exercises + collocation fill/word order for collocations whose
     // noun is a word in this set (deepens the set's nouns in real usage).
     const heads = new Set(pool.map((v) => headword(v.de)));

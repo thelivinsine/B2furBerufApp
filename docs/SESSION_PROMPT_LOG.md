@@ -801,3 +801,27 @@ from 126 to 128.)
 - **Artifacts (Prompt 5):** `src/types/index.ts` · `src/engine/quiz.ts` · `src/engine/session.ts` ·
   `src/features/quiz/QuestionViews.tsx` · `tests/scopedSession.test.ts` ·
   `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 6 (verbatim):**
+  > what is the model recommendations for pr3?
+- **Response 6 (Opus 4.8):** Answered from the plan §6 map: PR 3 (Phase 2b typed cloze) is
+  recommended on **Opus 4.8**, because it extends the typing block UI + the tolerant-matcher grading
+  path (umlauts, article prefixes, give-up) and must respect the graduation gate, more judgment than
+  the mechanical Sonnet-5 rungs.
+- **Prompt 7 (verbatim):**
+  > yes
+- **Response 7 (Opus 4.8):** Shipped PR 3 = Phase 2b typed cloze. The `typing` SessionBlock gained an
+  optional `cloze: { prompt; answers }`; `TypingBlock` renders the blanked example sentence
+  ("Ergänze das fehlende Wort", "Lücke" badge) and grades the typed answer via the new
+  `gradeTypedAny` (`engine/typing.ts`, best verdict across targets so the blank accepts the exact
+  surface form OR the base headword). `typedClozeData`/`clozeTypingBlock` (`engine/session.ts`) build
+  the cloze from an example containing the headword; it is gated to `graduatedToTyping` words (in the
+  Wörter scope a graduated word has ~50% chance of the cloze variant vs plain forward recall, never
+  both), so a new word is never typed cold. Grades FSRS via the vocab sourceId (fires the gender
+  reveal on correct nouns). Extended `tests/typing.test.ts` (gradeTypedAny) +
+  `tests/scopedSession.test.ts` (graduated-only gate, cloze shape). Spot-checked the generated German
+  before shipping. Gates: typecheck, test:unit 215, lint 0 errors, build, check:bundle 80.8 kB,
+  lint:content all green. Squash-merged to `main` per the auto-ship rule with the plan + status
+  updates.
+- **Artifacts (Prompts 6–7):** `src/types/index.ts` · `src/engine/typing.ts` · `src/engine/session.ts`
+  · `src/features/session/SessionPlayer.tsx` · `tests/typing.test.ts` · `tests/scopedSession.test.ts`
+  · `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

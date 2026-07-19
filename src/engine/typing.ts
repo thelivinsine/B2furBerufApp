@@ -110,3 +110,22 @@ export function gradeTyped(typed: string, expected: string): TypedGrade {
 
   return { verdict: "wrong" };
 }
+
+const VERDICT_RANK: Record<TypedVerdict, number> = { wrong: 0, almost: 1, correct: 2 };
+
+/**
+ * Grade a typed answer against several acceptable targets, returning the BEST
+ * verdict. Used by the typed-cloze block (2b): the blank can be filled by the
+ * exact surface form in the sentence OR the base headword when they differ
+ * (e.g. a sentence with "Anträge" accepts both "Anträge" and "Antrag"), so
+ * neither inflection is marked wrong. A single target behaves like gradeTyped.
+ */
+export function gradeTypedAny(typed: string, expected: string[]): TypedGrade {
+  let best: TypedGrade = { verdict: "wrong" };
+  for (const target of expected) {
+    const g = gradeTyped(typed, target);
+    if (VERDICT_RANK[g.verdict] > VERDICT_RANK[best.verdict]) best = g;
+    if (best.verdict === "correct") break;
+  }
+  return best;
+}
