@@ -981,3 +981,30 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   `src/features/collocations/CollocationGraph.tsx` · `src/features/vocabulary/WordGraph.tsx` ·
   `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · PRs #581 / #582 / #583 ·
   comparison-preview artifact (scratchpad HTML, not committed)
+- **Prompt 12 (verbatim):**
+  > is everything live?
+- **Response 12 (Opus 4.8):** Checked the actual GitHub Pages deploy runs (not just the merges). PRs
+  #581/#582 confirmed live (green); #583 had merged but its Pages run hadn't appeared yet, reported it as
+  still deploying.
+- **Prompt 13 (verbatim, + 1 screenshot of the GitHub mobile commits list showing no check on the latest
+  commit):**
+  > the latest commit isn't live
+- **Response 13 (Opus 4.8):** Diagnosed the real cause: GitHub never fired the `push` event for the #583
+  squash-merge (`32dcb50`), so NEITHER the deploy nor the validate workflow ran (a one-off GitHub webhook
+  miss; the earlier merges fired fine). Manually dispatched `pages.yml` against `main` (it has
+  `workflow_dispatch`), watched run #590 build `32dcb50` and finish `success`, confirming the graph change
+  is live. Noted the validate gate also didn't run but its checks already passed pre-merge on the branch.
+- **Prompt 14 (verbatim, + 1 screenshot of the live two-color Kollokationen graph):**
+  > can you increase the tension of the lines so that the clusters are more tighter together?
+- **Response 14 (Opus 4.8):** Tightened the Kollokationen force layout: link tension `0.11 → 0.22` (the
+  lever the founder named), centroid pull `forceX/Y 0.28 → 0.38`, collision `r+5 → r+3`. typecheck +
+  build green; PR #584 → squash-merge → realign. This time the push webhook fired on its own (verified the
+  `7c9182f` Pages run went `success`); the late #583 webhook also finally fired but was harmless (already
+  deployed via the manual run). Updated the CLAUDE.md graph-layout values to match.
+- **Prompt 15 (verbatim):**
+  > document the session and merge everything to main
+- **Response 15 (Opus 4.8):** This documentation pass (appended prompts 12–15 here, refreshed the
+  PROJECT_STATUS.md s132 handoff with the cluster-tightening + the deploy-webhook-miss learning), then
+  shipped the doc update to `main`.
+- **Artifacts (Prompts 12–15):** `src/features/collocations/CollocationGraph.tsx` · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · PR #584 · manual Pages deploy run #590
