@@ -5,8 +5,9 @@ PRs A+B+C+D, all merged to `main`):** the token system (§1 light + §2 dark), n
 shell meta (PR A), the logo + all favicon/PWA/og assets (PR B), the deep surface sweep (game chrome,
 Üben map, domain buildings, landing flatten, der-distinctness) (PR C), and the polish pass (streak +
 "Aktuelle Serie" → Koralle, dark muted-text hierarchy, StatCard tabular-nums, CLAUDE.md language
-sweep) (PR D). `pnpm check:contrast` guards every token pairing in CI. Implementation record:
-`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`. The g was outlined from
+sweep) (PR D). `pnpm check:contrast` guards every token pairing in CI. The **in-app logo is tile-less** (transparent, no tile; the g is Tinte ink on light, Papier on
+dark, swapped by `src/components/shared/Logo.tsx`); only the browser/OS app icons keep the Papier
+tile. Implementation record: `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`. The g was outlined from
 **Inter 800** (the app's own UI typeface) via `scripts/branding/build-logo-assets.mjs`, which
 regenerates every asset from the one canonical mark. Shipped token values that deviate from the §1 swatches
 (all WCAG-driven, plan §4, enforced by `pnpm check:contrast`): `--primary` 221 83% 54% (Nachtblau

@@ -15,6 +15,7 @@ import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { AccountMenu } from "@/features/auth/AccountMenu";
 import { loadWritingDraft } from "@/features/writing/resumeDraft";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/shared/Logo";
 
 export function AppShell() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -127,7 +128,7 @@ export function AppShell() {
                 className="flex items-center gap-2 lg:hidden"
                 aria-label="Zur Startseite"
               >
-                <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-8 w-8 rounded-lg shadow-glow" />
+                <Logo className="h-8 w-8" />
               </Link>
               <div className="hidden leading-tight lg:block">
                 <p className="text-sm font-semibold">

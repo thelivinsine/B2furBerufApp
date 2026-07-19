@@ -16,26 +16,34 @@ coral reserved for celebration. Full design reference: [`../docs/branding/BRAND_
 The mark is a lowercase **g** sitting on a Himmelblau **highlighter swipe** (Textmarker) — *genau*
 lives inside *genauly*. The `g` is outlined from **Inter 800** (the app's own UI typeface, so the
 mark and the wordmark are the same letterforms) into a real vector `<path>`, so it renders
-identically everywhere from the favicon to print.
+identically everywhere. **The logo is tile-less: transparent background, no tile.** The only thing
+that adapts is the `g` — **Tinte ink on light** grounds, **Papier on dark** grounds — so the mark
+stays legible on any surface (its bowl sits on the light swipe, so it can't stay dark on a dark
+ground).
 
 | File | Use |
 |------|-----|
-| `logo/mark.svg` | The icon mark (g on swipe, Papier tile). Primary app icon. |
+| `logo/mark.svg` · `mark-dark.svg` | The logo, tile-less + transparent. `mark` = ink g (light grounds), `mark-dark` = Papier g (dark grounds). |
 | `logo/wordmark.svg` · `wordmark-white.svg` | "Genauly" set in Inter 800 (ink / white for dark). |
-| `logo/lockup-horizontal.svg` · `-white.svg` | Mark + wordmark, side by side. Default lockup. |
+| `logo/lockup-horizontal.svg` · `-white.svg` | Mark + wordmark, side by side. Default lockup (`-white` for dark). |
 | `logo/lockup-stacked.svg` | Mark above wordmark. For square/narrow spaces. |
 | `logo/mark-mono-ink.svg` · `-white.svg` | Single-color mark (g knocked out of the swipe) for 1-color print / stamps. |
+| `logo/app-icon-tile.svg` | The Papier-tiled version — **only** for the browser/OS app icons (favicon, PWA, apple-touch), never the in-app logo. |
 | `logo/clearspace.svg` | Clear-space + min-size guide. |
-| `previews/logo-overview.png` | Visual contact sheet of all of the above. |
+| `previews/logo-overview.png` · `logo-preview.html` | Contact sheet + an interactive preview of the tile-less mark on light/dark grounds. |
 
 **Rules**
+- **The logo background is always transparent.** Never put the logo in a tile or box. The one
+  exception is the app icons (`icons/`), which need a filled Papier tile because a browser tab or an
+  OS home-screen mask turns transparency into black.
+- **The g adapts to the ground:** ink on light, Papier on dark. In code this is one `<Logo>`
+  component that swaps `mark` ↔ `mark-dark` on the `.dark` class.
 - **Clear space:** keep a margin of at least **¼ of the mark's height** clear on all sides.
 - **Minimum size:** the mark reads down to **16 px** (the favicon); do not use the wordmark or
   lockups below ~20 px cap-height.
-- **On light** use the ink wordmark; **on dark** use the white wordmark. The tile itself is Papier
-  in every context (its swipe + g carry the identity, not the tile).
-- **Don't:** recolor the swipe or the g, add effects/shadows, stretch, rotate, or box the mark in a
-  new container, or set the wordmark in another typeface.
+- **On light** use the ink wordmark; **on dark** use the white wordmark.
+- **Don't:** recolor the swipe, add effects/shadows, stretch, rotate, box the mark in a container, or
+  set the wordmark in another typeface.
 
 ## Color
 
@@ -78,10 +86,12 @@ only. The warm Papier ground + warm-navy shadows are the biggest "premium" move;
 
 ## App icons
 
-`icons/` holds the shipped raster set, regenerated from the one mark:
+`icons/` holds the shipped raster set, regenerated from the one mark. These keep the Papier **tile**
+(unlike the tile-less in-app logo above): a browser tab or an OS mask needs a filled background.
 
-- `favicon-16/32/48.png`, `genauly-default-logo-transparent-corners.png` — **rounded, transparent
-  corners** (browser tab + in-app).
+- `genauly-logo.png` · `genauly-logo-dark.png` — the **tile-less in-app logo** (transparent), ink g
+  and Papier g. Swapped by theme in the app.
+- `favicon-16/32/48.png` — **rounded, transparent-corner tile** (browser tab).
 - `apple-touch-icon.png`, `pwa-192x192.png`, `pwa-512x512.png` — **full-bleed opaque** (iOS/Android
   fill transparency with black; these must stay full-bleed).
 - `pwa-maskable-512x512.png` — mark inside the inner 80% safe zone.

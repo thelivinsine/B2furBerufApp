@@ -3,6 +3,7 @@ import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { HelpBlock, Lang } from "./content";
+import { Logo } from "@/components/shared/Logo";
 
 /**
  * Shared shell for the public help routes (/hilfe and /hilfe/:slug). Mirrors the
@@ -38,11 +39,7 @@ export function HelpChrome({
 
       <header className="relative z-10 mx-auto flex max-w-3xl items-center justify-between px-4 py-5 sm:px-6">
         <button onClick={() => navigate("/welcome")} className="flex items-center gap-2.5 text-left">
-          <img
-            src="/genauly-default-logo-transparent-corners.png"
-            alt=""
-            className="h-9 w-9 rounded-lg shadow-glow"
-          />
+          <Logo className="h-9 w-9" />
           <span className="text-lg font-semibold tracking-tight">Genauly</span>
         </button>
         <Button variant="ghost" onClick={() => navigate("/hilfe")} className="gap-1.5">

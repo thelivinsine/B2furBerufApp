@@ -13,6 +13,7 @@ import { TurnstileWidget } from "@/components/shared/TurnstileWidget";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { recordConsent } from "@/lib/consent";
+import { Logo } from "@/components/shared/Logo";
 
 const TURNSTILE_ENABLED = !!import.meta.env.VITE_TURNSTILE_SITE_KEY;
 
@@ -116,7 +117,7 @@ export function AuthDialog({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <img src="/genauly-default-logo-transparent-corners.png" alt="" className="mb-1 h-10 w-10 rounded-xl shadow-glow" />
+          <Logo className="mb-1 h-10 w-10" />
           <DialogTitle>{isSignup ? "Konto erstellen" : "Anmelden"}</DialogTitle>
           <DialogDescription>
             {isSignup

@@ -9,8 +9,7 @@ cards rearranged to "Option B" (quiet headline = gender creature + word / bookma
 room; foot row = plural pill left + speak button right); (4) the noun gender-reveal effect
 (`ArtikelEffect`) now fires from the empty right side of the card back (`align="right"` → `--fx-x`),
 and the "die" bloom is snappier (`470ms` fast-out + tighter stagger). The s133 **brand rebrand is
-COMPLETE** (Kit 1 · Nachtblau & Himmelblau + Koralle, `docs/branding/BRAND_SPEC.md`). Product name:
-**Genauly** (`genauly.de`)._
+COMPLETE** (Kit 1 · Nachtblau & Himmelblau + Koralle, `docs/branding/BRAND_SPEC.md`).  **A s133 follow-up then shipped the in-app logo TILE-LESS** (transparent, no tile; the g adapts Tinte-on-light / Papier-on-dark via `src/components/shared/Logo.tsx`; app icons keep their tile), plus the consolidated **`brand-kit/`** folder generated from the app's own source. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -169,6 +168,18 @@ hardcoded-hex inventory; each PR section marked SHIPPED with its final values):
   800 glyph-by-glyph, kerned → `scripts/branding/wordmark-data.mjs`), all lockups, the mono knockout
   mark, the palette/type sheets, and the square social avatar. Kit is ~592 kB, 27 files, generated (do
   not hand-edit). CLAUDE.md Brand-logo section points at it.
+- **Logo reworked TILE-LESS** (founder: the logo should be just the letter + swipe, background always
+  transparent, no tile). The in-app logo is now `public/genauly-logo.png` (ink g) +
+  `genauly-logo-dark.png` (Papier g), transparent, swapped by theme via the new shared
+  `src/components/shared/Logo.tsx` (`.dark` class, no JS). All 7 in-app spots (`AppShell`/`Sidebar`/
+  `AuthDialog`/`LandingPage`/`Onboarding`/`LegalChrome`/`HelpChrome`) use `<Logo>` with no
+  tile/`rounded`/`shadow-glow`; the dark no-JS shells (`index.html`, `prerender-help.mjs`) hard-code
+  the dark logo. **App icons (favicon/PWA/apple-touch/maskable) keep their Papier tile** (browser/OS
+  masks turn transparency black). g shade on dark = Papier `#FAF6EC` (light/dark inversion of
+  ink-on-Papier). The old `genauly-default-logo-transparent-corners.png` was removed. Brand kit +
+  generators (`build-logo-assets.mjs`, `build-brand-kit.mjs`) + README updated to tile-less; an
+  interactive `brand-kit/previews/logo-preview.html` artifact was published. Verified the swap in the
+  header/landing/sign-in light+dark.
 - **Open founder items:** re-upload the Google OAuth consent-screen logo (full-bleed variant, not in
   repo) from the new mark; verify the live site after deploy (hard-refresh first, the service worker
   serves the old build until then).

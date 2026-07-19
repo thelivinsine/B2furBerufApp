@@ -66,7 +66,7 @@ function staticShell({ title, updated, breadcrumbHtml, bodyHtml }) {
   return `<main style="min-height:100vh;background:#151320;color:#e8e6f0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:44rem;margin:0 auto;padding:2rem 1.25rem 4rem;">
     <a href="${ORIGIN}/" style="display:inline-flex;align-items:center;gap:.6rem;color:#e8e6f0;text-decoration:none;margin-bottom:1.5rem;">
-      <img src="/genauly-default-logo-transparent-corners.png" alt="Genauly" width="36" height="36" style="border-radius:10px;" />
+      <img src="/genauly-logo-dark.png" alt="Genauly" width="36" height="36" style="border-radius:10px;" />
       <span style="font-weight:600;font-size:1.05rem;">Genauly</span>
     </a>
     ${breadcrumbHtml}

@@ -19,6 +19,7 @@ import {
 } from "@/store/useSettingsStore";
 import type { LearningMode } from "@/types";
 import { recordConsent, hasConsented } from "@/lib/consent";
+import { Logo } from "@/components/shared/Logo";
 
 /**
  * One-screen setup (redesign Phase 1.3). A single "Wofür lernst du Deutsch?"
@@ -74,7 +75,7 @@ export function Onboarding() {
         className="relative w-full max-w-lg"
       >
         <div className="mb-6 flex items-center justify-center gap-2.5">
-          <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-10 w-10 rounded-xl shadow-glow" />
+          <Logo className="h-10 w-10" />
           <span className="text-lg font-semibold tracking-tight">Genauly</span>
         </div>
 

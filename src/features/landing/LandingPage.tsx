@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { AuthDialog, type AuthIntent } from "@/features/auth/AuthDialog";
+import { Logo } from "@/components/shared/Logo";
 
 const features = [
   {
@@ -115,7 +116,7 @@ export function LandingPage() {
       {/* Top nav */}
       <header className="relative z-10 mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
         <div className="flex items-center gap-2.5">
-          <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-9 w-9 rounded-lg shadow-glow" />
+          <Logo className="h-9 w-9" />
           <div className="leading-tight">
             <p className="text-lg font-semibold tracking-tight">Genauly</p>
             <p className="text-xs text-muted-foreground">German for real life · B1–B2</p>
