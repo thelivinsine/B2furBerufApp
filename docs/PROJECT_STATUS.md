@@ -134,50 +134,7 @@ log; the shipped result, and the anchors not to regress:
 - **Next:** close the word-level residual (content edits, cheap) before considering Phase 4. **PWA
   caveat:** the session surface is service-worker-cached; hard-refresh before judging the live result.
 
-**Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
-branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the
-content/data layer is managed (answered in chat + a private pipeline-diagram artifact), then asked for
-an expert architecture review with P0–P3 recommendations, then approved implementing the P0 + P1 set:
-- **P0, verification fingerprints:** a `review_status: "verified"` stamp is now tied to the exact
-  content the human reviewed. New `pnpm stamp:verified` (`scripts/stamp-verified-hashes.mjs` + shared
-  `scripts/content-hash.mjs`) writes a canonical-JSON sha256 per verified provenance row to
-  `docs/reports/verified-hashes.json`; `pnpm lint:content` FAILS when a verified item's current
-  content no longer matches its stamp (tamper-tested end to end). The 25 verified Can-Do rows are
-  stamped. **New reviewer workflow: flip rows to `verified` → `pnpm stamp:verified` → commit both.**
-- **P1, shipped-ids-are-permanent contract:** new `src/lib/idRenames.ts` (`ID_RENAMES` table, empty
-  for now, + pure remap helpers). Applied in `useProgressStore` persist migrate (version 0 → 1) and on
-  incoming cloudSync remote rows, so a future id rename carries FSRS/progress history instead of
-  silently orphaning it. The linter validates the table (source gone, target resolves, no cycles).
-  Pinned by `tests/idRenames.test.ts`.
-- **P1, global id integrity:** cross-bank content-id uniqueness AND the per-bank id prefixes
-  (v_/c_/g_/sc_/ex_/r_/cd_/tx_/m_/wp_) are now lint ERRORS (`lintGlobalIds`; the scattered per-bank
-  prefix warnings were removed). All banks were already compliant, so nothing needed retagging.
-- **P1, related-terms audit:** `lint:content` now writes `docs/reports/related-terms-report.md`
-  (495 of 3,268 `related` terms don't resolve to a bank entry, i.e. word-graph edges dropped by
-  design but previously invisible) plus a one-line summary in the lint output. Not a gate.
-- **P2/P3 recommendations delivered but NOT implemented** (each has a natural trigger): an
-  `add-content` scaffolding script + JSON banks (next big content wave), a build-time summary for the
-  ~2 MB `/sources` chunk (content growth), zod-style single-source schemas (next linter surgery),
-  game-state cloud sync (G2, already planned), an oracle-coverage warning for fact-unchecked new
-  nouns, and a learner-performance → review-queue feedback loop (post-launch, needs telemetry).
-- Gates: `lint:content` 0 errors · `test:unit` 184/184 (after rebasing onto the s129 Artikel-Visuals PRs) · `pnpm build` green · bundle 80.7 kB.
-  Also refreshed the stale collocation count (1,011 → 1,033) in the docs.
-- **Second task (same session): /sources redesign + admin Daten-Werkbank.** The public page now
-  tells the data-architecture story visually (four stat tiles, the five-step pipeline graphic, a
-  stacked tier-distribution bar with legend incl. a "nächste Prüfwelle" remainder row, per-bank
-  count tiles; sources/licenses/item browse kept, title now "Quellen & Datenqualität"). Founders
-  additionally get **`features/legal/AdminWorkbench.tsx`**: the full register joined with tier +
-  live review marks as a sortable `DataTable` with fuzzy search, Typ/Stufe/Status filters (incl.
-  Zu prüfen / Mit Notiz / Ohne Quelle / Namensnennung), **CSV export of the filtered view**
-  (`src/lib/csv.ts`, BOM for Excel), copy-id chips, per-row "geprüft" checkbox + note saving
-  immediately to Supabase, and a progress bar. **Admin gate is now TWO accounts**
-  (`FOUNDER_EMAILS` in `src/lib/admin.ts`: thelivinsine + thesuhaspala, pinned by
-  `tests/admin.test.ts`); the matching RLS update is **migration 0007** (founder action item
-  above). Verified via headless-Chromium screenshots (public light/dark/mobile + workbench
-  desktop with live search). New tests: csv (6), admin gate (4), workbench smoke (4);
-  `test:unit` 198/198, build green, bundle 80.8 kB.
-
-_(Session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
+_(Session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder picked Kit 1 · Kobalt & Butter recolored to the bottom-nav blues, awaiting the light-blue pick between Himmelblau `#38BDF8` and Cyan `#22D3EE`, see the W29 archive for the wiring steps), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
