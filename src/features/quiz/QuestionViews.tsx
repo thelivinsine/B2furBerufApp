@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, X } from "lucide-react";
+import { Check, Volume2, X } from "lucide-react";
 import type {
   QuizQuestion,
   MCQQuestion,
@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useAnswerTimer } from "@/lib/hooks";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { speak } from "@/engine/speech";
 import { cn, shuffle } from "@/lib/utils";
 
 /**
@@ -33,7 +34,20 @@ export function MCQView({
   onResult: (correct: boolean, latencyMs?: number) => void;
 }) {
   const guessFirst = useSettingsStore((s) => s.guessFirst);
+  const speechRate = useSettingsStore((s) => s.speechRate);
+  const voiceURI = useSettingsStore((s) => s.voiceURI);
+  const voiceVariety = useSettingsStore((s) => s.voiceVariety);
   const [picked, setPicked] = useState<string | null>(null);
+  // Listening variant (2c): TTS speaks the full sentence; the written prompt is
+  // the gapped frame. Auto-play once per question (a session is opened by a tap,
+  // so the gesture requirement is satisfied); a replay button covers the rest.
+  const isAudio = !!q.audioPrompt;
+  const playAudio = () =>
+    q.audioPrompt && speak(q.audioPrompt, { rate: speechRate, voiceURI: voiceURI ?? undefined, variety: voiceVariety });
+  useEffect(() => {
+    if (isAudio) playAudio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q.id]);
   // Correct-by-mount thanks to the per-question remount key (q.id) the parent
   // uses, so a new question always starts un-revealed when the setting is on.
   const [revealed, setRevealed] = useState(!guessFirst);
@@ -52,13 +66,27 @@ export function MCQView({
     <div className="space-y-4">
       <Card>
         <CardContent className="p-6">
-          {q.hint && (
-            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{q.hint}</p>
+          {isAudio ? (
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Hör zu und wähle das fehlende Wort:
+              </p>
+              <Button variant="outline" size="lg" className="gap-2" onClick={playAudio}>
+                <Volume2 className="h-5 w-5" /> Anhören
+              </Button>
+              <p className="text-center text-lg font-medium leading-relaxed text-muted-foreground">{q.prompt}</p>
+            </div>
+          ) : (
+            <>
+              {q.hint && (
+                <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{q.hint}</p>
+              )}
+              <div className="flex items-center gap-2">
+                <p className="text-xl font-semibold tracking-tight">{q.prompt}</p>
+                <SpeakButton text={q.prompt.replace(/_+/g, " … ")} />
+              </div>
+            </>
           )}
-          <div className="flex items-center gap-2">
-            <p className="text-xl font-semibold tracking-tight">{q.prompt}</p>
-            <SpeakButton text={q.prompt.replace(/_+/g, " … ")} />
-          </div>
         </CardContent>
       </Card>
 
@@ -319,6 +347,7 @@ export function kindLabel(kind: QuizQuestion["kind"]): string {
     plural: "Plural",
     cloze: "Lückentext",
     redemittelCloze: "Redemittel-Lücke",
+    listeningCloze: "Hören",
     wordOrder: "Satzbau",
     matching: "Zuordnung",
     collocationFill: "Nomen-Verb",

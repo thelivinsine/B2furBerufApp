@@ -15,7 +15,7 @@ import { collocations } from "@/data/collocations";
 import { grammar } from "@/data/grammar";
 import { texts } from "@/data/texts";
 import { isDue, mastery, reviewWeight, dueCount } from "@/engine/srs";
-import { buildThemeQuiz, buildPoolQuiz, buildRedemittelQuiz } from "@/engine/quiz";
+import { buildThemeQuiz, buildPoolQuiz, buildRedemittelQuiz, buildListeningQuiz } from "@/engine/quiz";
 import { targetBlocks, weakestBand, buildPreview } from "@/engine/sessionPreview";
 import { sample } from "@/lib/utils";
 
@@ -271,7 +271,7 @@ function capBySource(blocks: SessionBlock[], max: number): SessionBlock[] {
 export function buildScopedSession(
   type: ContentScope,
   ids: string[],
-  opts: { srs: Record<string, SrsCard>; minutes: number; difficulty?: Difficulty },
+  opts: { srs: Record<string, SrsCard>; minutes: number; difficulty?: Difficulty; listening?: boolean },
 ): SessionPlan {
   const limit = targetBlocks(opts.minutes);
   const difficulty = opts.difficulty ?? 2;
@@ -300,7 +300,19 @@ export function buildScopedSession(
       includeGeneric: false,
     });
     const exerciseBlocks: SessionBlock[] = exercises.map((q) => ({ kind: "quiz", key: `qz_${q.id}`, question: q }));
-    blocks = capBySource(interleave([cardBlocks, exerciseBlocks], limit * 3), 2).slice(0, limit);
+    // Listening (2c): a spoken-sentence pick, only when the caller reports TTS is
+    // available + enabled. Turns any Wörter set into listening practice for free.
+    const listeningBlocks: SessionBlock[] = opts.listening
+      ? buildListeningQuiz(pool, difficulty, Math.ceil(limit * 0.25)).map((q) => ({
+          kind: "quiz",
+          key: `qz_${q.id}`,
+          question: q,
+        }))
+      : [];
+    blocks = capBySource(
+      interleave([cardBlocks, exerciseBlocks, listeningBlocks], limit * 3),
+      2,
+    ).slice(0, limit);
   } else if (type === "collocation") {
     const pool = collocations.filter((c) => has(c.id));
     const cardBlocks = sample(pool, pool.length).map((c) => collocationCardBlock(c));

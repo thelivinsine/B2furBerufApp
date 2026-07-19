@@ -114,6 +114,7 @@ function SessionRun({
   const level = useSettingsStore((s) => s.level);
   const goal = useSettingsStore((s) => s.dailyGoalXp);
   const recognitionEnabled = useSettingsStore((s) => s.recognitionEnabled);
+  const speechEnabled = useSettingsStore((s) => s.speechEnabled);
   const addXp = useProgressStore((s) => s.addXp);
   const todayXp = useTodayXp();
   const reviewVocab = useProgressStore((s) => s.reviewVocab);
@@ -130,6 +131,7 @@ function SessionRun({
           srs,
           minutes,
           difficulty: difficultyForLevel(level),
+          listening: ttsSupported() && speechEnabled,
         })
       : buildSession({
           srs,

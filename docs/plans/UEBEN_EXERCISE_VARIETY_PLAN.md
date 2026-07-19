@@ -1,8 +1,8 @@
 # Üben Exercise Variety Plan
 
-_Created session 131 (2026-07-18). Status: **Phase 0 + Phase 1 SHIPPED** (PR 1) · **Phase 2a + 2e
-SHIPPED** (PR 2) · **Phase 2b SHIPPED** (PR 3), all s131. Remaining: Phase 2 rungs 2c (listening) /
-2d (odd-one-out) + Phase 3; Phase 4 deferred._
+_Created session 131 (2026-07-18). Status: **Phase 0/1 SHIPPED** (PR 1) · **2a + 2e SHIPPED** (PR 2)
+· **2b SHIPPED** (PR 3) · **2c SHIPPED** (PR 4), all s131. Remaining: Phase 2 rung 2d (odd-one-out) +
+Phase 3; Phase 4 deferred._
 _Founder ask: custom Üben sets (the Bibliothek "Üben" button on a filtered tab) should play as a
 varied exercise session, not a stack of flip-cards. Constraint: no per-set content authoring, the
 number of filter combinations is unbounded._
@@ -124,10 +124,17 @@ order (fun-per-effort, founder may reorder):
   `TypingBlock` shows the blanked sentence + "Ergänze das fehlende Wort" / "Lücke" badge; the Anzeigen
   give-up is unchanged. Tests: `gradeTypedAny` in `tests/typing.test.ts`, the graduated-only gate +
   cloze shape in `tests/scopedSession.test.ts`.
-- **2c. Listening word (M):** TTS speaks the example sentence (`engine/speech.ts`), the learner
-  picks the missing/heard word from 4 options. MCQ with an `audioPrompt` flag + a play button in
-  `QuestionViews`; composer emits it only when the caller reports `ttsSupported()` (same pattern as
-  the reading voicemail). Turns any set into listening practice for free.
+- **2c. Listening word (M) — ✅ SHIPPED (PR 4, s131):** TTS speaks the full example sentence, the
+  learner picks the blanked word from 4 options. New MCQ kind `listeningCloze` + an `audioPrompt` field
+  on `QuizQuestionBase` (added to `QuizKind`/`MCQQuestion.kind`/`kindLabel` → "Hören");
+  `listeningClozeQ` reuses the cloze blank + distractors but carries NO `hint` (an EN gloss would
+  reveal the word by ear) and stores the full sentence in `audioPrompt`. `buildListeningQuiz` drives
+  it; the Wörter scope emits it (~0.25 ratio) only when `buildScopedSession` gets `listening: true`,
+  which `SessionPlayer` sets to `ttsSupported() && speechEnabled`. `MCQView` renders an "Anhören"
+  play button (autoplay once per question, replay on tap; the session is opened by a tap, so the
+  gesture requirement is met) + the gapped frame as supporting text. Grades FSRS via the vocab
+  sourceId. NOT wired into `/quiz` or the composed session (that keeps its own reading-voicemail
+  listening). Tested in `tests/scopedSession.test.ts` (shape, no-gloss, the TTS gate).
 - **2e. Redemittel cloze (S/M) — ✅ SHIPPED (PR 2, s131):** new MCQ kind `redemittelCloze` (added to
   `QuizKind` + `MCQQuestion.kind` + `kindLabel` → "Redemittel-Lücke"). `redemittelClozeQ` blanks the
   longest content word (≥ 4 chars, not a small function-word set; modal/Konjunktiv-II verbs are
@@ -200,7 +207,7 @@ still fills its exercise half via translation/cloze/matching.
 | 1  | Phase 0 + Phase 1 (+ FSRS guard) + tests — ✅ SHIPPED (s131, Opus 4.8) | ~1 session | **Opus 4.8** |
 | 2  | 2a match grid + 2e Redemittel cloze — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Sonnet 5** |
 | 3  | 2b typed cloze — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Opus 4.8** |
-| 4  | 2c listening word | ~0.5 session | **Opus 4.8** |
+| 4  | 2c listening word — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Opus 4.8** |
 | 5  | 2d odd-one-out + Phase 3 assertions | ~0.5 session | **Sonnet 5** |
 
 Why (same routing logic as the Artikel-Visuals and Game G2 plans: match the model to the risk in
