@@ -70,18 +70,13 @@ const VocabCard = memo(function VocabCard({
   const front = (
     <Card className="card-hover h-full">
       <CardContent className="flex h-full flex-col p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <div className="flex items-center gap-1.5">
-              {gender && <Wesen gender={gender} size={24} />}
-              <p className="truncate text-base font-semibold sm:text-lg">{v.de}</p>
-              <span onClick={(e) => e.stopPropagation()}>
-                <SpeakButton text={v.de} />
-              </span>
-            </div>
-            {v.plural && (
-              <p className="text-xs text-muted-foreground">Pl.: {v.plural}</p>
-            )}
+        {/* Headline (Option B card rework): creature + word on the left,
+            bookmark on the right. Speak + plural moved to the card foot so the
+            headline stays quiet. */}
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1.5">
+            {gender && <Wesen gender={gender} size={24} />}
+            <p className="truncate text-base font-semibold sm:text-lg">{v.de}</p>
           </div>
           <Button
             type="button"
@@ -99,14 +94,15 @@ const VocabCard = memo(function VocabCard({
             <Bookmark className={cn("h-4 w-4", saved && "fill-current")} />
           </Button>
         </div>
-        <p className="mt-2 border-t border-border pt-2 text-sm italic text-muted-foreground">
+        <p className="mt-2.5 text-sm italic text-muted-foreground">
           „{v.examples[0].de}"
         </p>
 
-        {/* Bottom-right corner: the "Verbunden" toggle. Stops propagation so it
-            does not flip the tile. */}
+        {/* Parked: the cross-module "Verbunden" panel (SHOW_RELATED=false, see
+            top of file). Never renders while parked; kept in place so
+            re-enabling it is a one-line flip. */}
         {hasRelated && (
-          <div className="mt-auto flex items-center justify-end pt-2">
+          <div className="flex items-center justify-end pt-2">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -125,6 +121,20 @@ const VocabCard = memo(function VocabCard({
             <RelatedPanel item={v} />
           </div>
         )}
+
+        {/* Card foot: plural pill on the left, speak on the right (fills where
+            the Verbunden toggle sat). mt-auto pins it to the base so every card
+            in a row shares one foot line. */}
+        <div className={cn("mt-auto flex items-center pt-3", v.plural ? "justify-between" : "justify-end")}>
+          {v.plural && (
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground">
+              Pl.: {v.plural}
+            </span>
+          )}
+          <span onClick={(e) => e.stopPropagation()}>
+            <SpeakButton text={v.de} />
+          </span>
+        </div>
       </CardContent>
     </Card>
   );
@@ -133,7 +143,7 @@ const VocabCard = memo(function VocabCard({
   // gender reveal effect plays behind the content on each flip to the back.
   const back = (
     <Card className="relative h-full overflow-hidden border-primary/30 bg-primary/[0.03]">
-      {gender && <ArtikelEffect gender={gender} play={effectPlay} />}
+      {gender && <ArtikelEffect gender={gender} play={effectPlay} align="right" />}
       <CardContent className="relative z-10 flex h-full flex-col p-4">
         <p className="text-[11px] font-semibold uppercase tracking-wider text-primary/70">
           Englisch
