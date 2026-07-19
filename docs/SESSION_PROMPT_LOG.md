@@ -1194,3 +1194,49 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
 - **Artifacts (Prompts 5–7):** `brand-kit/` (27 files) · `scripts/branding/build-brand-kit.mjs` ·
   `scripts/branding/wordmark-data.mjs` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
   `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · `docs/SESSION_PROMPT_LOG.md`
+
+## Session 134 — 2026-07-19 — Mobile filter rail height, park Verbunden, Option B word cards
+
+- **Branch:** `claude/filter-rail-mobile-height-n8ktd6`
+- **Model:** Opus 4.8 (founder switched to it via `/model` mid-way through prompt 1).
+- **Prompt 1 (verbatim):** `> the filter rail occupies a bit too much space on mobile view when opened. reduce its height by 3-4 lines worth of space for mobile. `
+- **Response 1 (Opus 4.8):** Reduced the `FilterRail` mobile `panel` cap from `max-h-[55dvh]` to
+  `max-h-[45dvh]` (`src/features/shared/FilterRail.tsx`), ~10 dvh / roughly 3-4 text lines on a phone,
+  leaving more of the card list visible; the fixed header + internal scroll region keep the filters
+  reachable. Typecheck green. Committed + pushed; not yet shipped at this point.
+- **Prompt 2 (verbatim):** `> the verbunden drop-down and links to other parts of the app can be parked for now as I need to brainstorm on it and think how it's useful and what are the dependencies for it. for now keep it hidden. Then provide a few previews of rearranging items on the cards for best looks. `
+- **Response 2 (Opus 4.8):** Traced "Verbunden" to the vocab-card cross-module panel (`RelatedPanel`
+  → Kollokation/Schreibtraining/Dialog, toggled in `VocabList.tsx`). Parked it behind a reversible
+  `const SHOW_RELATED = false` (gates `hasRelated`); `RelatedPanel.tsx` + `relatedRows` kept untouched
+  so re-enabling is one line. Built `preview/vocab-card-layouts.html` (real design tokens, light/dark
+  toggle, 2-up grid) with four card-rearrangement options — A baseline · B actions-to-the-foot ·
+  C example bottom-anchored + plural pill · D genus color rail — and sent it via SendUserFile.
+- **Prompt 3 (verbatim):** `> provide the artifact here again `
+- **Response 3 (Opus 4.8):** Re-sent the same `preview/vocab-card-layouts.html` render.
+- **Prompt 4 (verbatim):** `> i like option b. ` _(mid-turn follow-up: `> for the animation on the backside of the card, move it to the right of the card as for most of the cards the right side is empty. Also, the female animation seems too slow and not as snappy as for the others, so fix it.`)_
+- **Response 4 (Opus 4.8):** Implemented Option B in `VocabList.tsx` (quiet headline = creature + word
+  left / bookmark right; example gets room; foot row pins plural pill left + speak button right via
+  `mt-auto`). For the mid-turn asks: gave `ArtikelEffect` a new `align` prop and passed `align="right"`
+  from the card back (origin → `--fx-x: 78%`, the empty right side; `SessionPlayer` stays centered),
+  and made the "die" bloom snappier — `470ms` fast-out cubic-bezier (was `650ms` ease-out) with a
+  tighter `200/280/360ms` ring stagger (was `200/310/420`). The three `.artikel-fx-*` origins now read
+  `var(--fx-x, 50%)`. Gates: typecheck clean, lint 0 errors, build green, `test:unit` 219/219.
+- **Prompt 5 (verbatim):** `> give me a png preview here ` _(also `> provide the artifact here again` earlier; and a bare `> continue`)_
+- **Response 5 (Opus 4.8):** Rendered a PNG of Option B (three front cards die/der/das + one back face
+  showing the right-shifted reveal), light + dark side by side, by driving the pre-installed headless
+  Chromium (`/opt/pw-browsers/chromium-1194`) against a scratchpad HTML built from the real tokens
+  (no Playwright package available). Sent it via SendUserFile.
+- **Prompt 6 (verbatim):** `> yes ` _(to opening + merging a PR for the batch)_
+- **Response 6 (Opus 4.8):** Opened **PR #598** into `main` (no PR template in repo) and squash-merged
+  it (`796fb01`): filter-rail height, parked Verbunden + preview, Option B cards, reveal-effect move +
+  die timing. Ran the required post-merge realignment (`fetch origin main` → `reset --hard` →
+  `push --force-with-lease`) so the dev branch is level with `main`.
+- **Prompt 7 (verbatim):** `> document the session `
+- **Response 7 (Opus 4.8):** This close-out. Added the s134 handoff to `PROJECT_STATUS.md`, aged the
+  s132 handoff into the W29 archive per the two-handoff hygiene rule, refreshed the `_Last updated_`
+  header to s134, and logged prompts 1-7 here.
+- **Artifacts:** `src/features/shared/FilterRail.tsx` · `src/features/vocabulary/VocabList.tsx` ·
+  `src/components/artikel/ArtikelEffect.tsx` · `src/index.css` · `preview/vocab-card-layouts.html` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · commits `2f1c7d4` / `1c48a33` /
+  `df0c9bd` · PR #598 (squash `796fb01`)

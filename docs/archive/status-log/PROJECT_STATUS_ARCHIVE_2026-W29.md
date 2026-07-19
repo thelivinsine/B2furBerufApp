@@ -589,3 +589,45 @@ log; the shipped result, and the anchors not to regress:
 - **Next:** close the word-level residual (content edits, cheap) before considering Phase 4. **PWA
   caveat:** the session surface is service-worker-cached; hard-refresh before judging the live result.
 
+
+## Session 132 (2026-07-19) — Bibliothek mobile-filter fixes + graph two-area color & layout (aged out of PROJECT_STATUS.md in s134)
+
+**Handoff after session 132 (2026-07-19). Bibliothek mobile-filter bug-fixes + graph two-area color &
+"by topic + tighter" layout. Branch `claude/filter-scroll-badge-bugs-y75thb`, all shipped to `main`
+via PRs #581 / #582 / #583 / #584 / #585 / #589.** Multiple founder screenshots drove a run of
+mobile-filter fixes on the Theorie browse tabs plus a graph redesign:
+- **Mobile filter, three fixes (`FilterRail.tsx` was already fine; the fixes were in the four browse
+  trainers `VocabularyTrainer`/`CollocationsBrowser`/`RedemittelTrainer`/`GrammarHub` + `browseScroll`):**
+  (1) empty-gap-on-scroll — the open filter panel lived inside the sticky/collapsing browse header, so
+  collapsing it left its reserved flow space as a blank gap; (2) the mobile Filter-button badge counted
+  only facet pills, not the Branche/Thema/Unterthema scope dropdowns; (3) after an interim guard the
+  panel got *stuck* pinned open while scrolling. Final resolution: the filter panel is now **normal-flow
+  content moved OUTSIDE the sticky header** (only the compact toolbar stays sticky and collapses), the
+  badge adds `scopeActiveCount` (sectors + themes + subs) on Wörter/Kollokationen, and the header-collapse
+  guard was reverted. All four tabs.
+- **Mobile filter panel cap + go-to-top centering (PR #589, `FilterRail.tsx` panel branch +
+  `browseScroll.tsx`):** the expanded panel is capped at `max-h-[55dvh]` as a flex column (fixed header +
+  one internal `overflow-y-auto` scroll region), so it never swallows the screen. The `ScrollTopButton`
+  was off-center because it is a `motion.button` whose framer inline `transform` (the `y` slide) overrode
+  the Tailwind `-translate-x-1/2` class; fixed by animating `x: "-50%"` on every keyframe and dropping the
+  class.
+- **Graphs recolored to TWO life areas (`lib/graphPalette.ts` + `WordGraph.tsx` + `CollocationGraph.tsx`):**
+  new `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS`/`LIFE_AREA_COLORS` helpers bucket the five content
+  domains into **Berufsleben (professional = `beruf`, brand indigo)** vs **Privatleben (personal =
+  everything else, teal)**. Node color, glow, lit edges, legend chips and the legend domain-filter all
+  collapse to these two on BOTH graphs; clustering still uses the finer theme grain.
+- **Kollokationen graph layout = founder-picked "by topic + tighter"** (from a published comparison
+  artifact of 5 force recipes on the real 1,243-node data): per-topic centroids kept, but firmer pull
+  and tighter packing. **Final values after the s132 "tighter clusters" follow-up (PR #584):** forceX/Y
+  `0.38`, link tension `0.22`, collision `r+3`, wider ring (`N*35`); charge `-55/240`. (The intermediate
+  first pass was `0.28`/`0.11`/`r+5`.) Also thinned the default edge stroke (`1→0.55`) + lowered edge
+  opacity earlier in the session for less visual noise.
+- **Gates:** typecheck, `test:unit` 219, lint 0 errors, build all green. Comparison artifact (English,
+  with a plain-language "how to read this" explainer) is a scratchpad HTML, not in the repo.
+- **Deploy gotcha (learned this session):** the #583 squash-merge did NOT fire the GitHub `push` event,
+  so neither `pages.yml` nor `validate.yml` ran and the commit showed no check. `pages.yml` has
+  `workflow_dispatch`, so a manual dispatch against `main` re-deploys the current HEAD; that recovered it.
+  If a merged commit shows no Actions run, dispatch `pages.yml` rather than assuming a build failure.
+- **Not done / open:** the two-level (domains-as-regions, topics-as-sub-islands) layout was previewed
+  but the founder chose topic+tighter instead. The preview artifact's variants still describe the
+  earlier "by life area" options; it was a decision aid, not kept in sync post-decision.
