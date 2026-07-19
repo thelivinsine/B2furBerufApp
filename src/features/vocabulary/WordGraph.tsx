@@ -14,7 +14,6 @@ import { Maximize, Minus, Plus, Waypoints, X } from "lucide-react";
 import type { VocabItem } from "@/types";
 import { collocations } from "@/data/collocations";
 import { themeById } from "@/data/themes";
-import { domains } from "@/data/domains";
 import { Badge } from "@/components/ui/badge";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
@@ -23,7 +22,7 @@ import { Wesen } from "@/components/artikel/Wesen";
 import { useIsDark } from "@/lib/useTheme";
 import { cn } from "@/lib/utils";
 import { frequencyBin } from "@/data/frequency";
-import { DOMAIN_COLORS, FALLBACK_COLOR } from "@/lib/graphPalette";
+import { lifeAreaColor, lifeAreaOf, LIFE_AREAS, LIFE_AREA_COLORS } from "@/lib/graphPalette";
 import { buildWordGraph, type GraphNode } from "./wordGraph";
 import { SaveButton } from "./VocabViews";
 
@@ -55,11 +54,9 @@ const FREQ_LABEL: Record<string, string> = {
 };
 
 const domainOf = (themeId: string) => themeById(themeId)?.domain;
-const nodeColor = (n: GraphNode, dark: boolean) => {
-  const d = domainOf(n.themeId);
-  const c = (d && DOMAIN_COLORS[d]) || FALLBACK_COLOR;
-  return dark ? c.dark : c.light;
-};
+// Color-code by the two life areas (professional vs personal), shared with the
+// Kollokationen graph via graphPalette.ts (founder, 2026-07-19).
+const nodeColor = (n: GraphNode, dark: boolean) => lifeAreaColor(domainOf(n.themeId), dark);
 
 const MIN_K = 0.15;
 const MAX_K = 6;
@@ -142,9 +139,9 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     if (domainFilter.size === 0) return graph.links.length;
     let count = 0;
     for (const l of graph.links) {
-      const sd = domainOf(nodeThemeById.get(l.source) ?? "");
-      const td = domainOf(nodeThemeById.get(l.target) ?? "");
-      if (sd && td && domainFilter.has(sd) && domainFilter.has(td)) count++;
+      const sa = lifeAreaOf(domainOf(nodeThemeById.get(l.source) ?? ""));
+      const ta = lifeAreaOf(domainOf(nodeThemeById.get(l.target) ?? ""));
+      if (domainFilter.has(sa) && domainFilter.has(ta)) count++;
     }
     return count;
   }, [graph, domainFilter, nodeThemeById]);
@@ -159,10 +156,10 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     return m;
   }, [graph]);
 
-  // Domains actually on screen, for the legend.
+  // Life areas actually on screen, for the legend (professional vs personal).
   const presentDomains = useMemo(() => {
-    const present = new Set(graph.nodes.map((n) => domainOf(n.themeId)).filter(Boolean));
-    return domains.filter((d) => present.has(d.id));
+    const present = new Set(graph.nodes.map((n) => lifeAreaOf(domainOf(n.themeId))));
+    return LIFE_AREAS.filter((a) => present.has(a.id));
   }, [graph]);
 
   // Mutable rendering state, read by draw() via refs so pan/zoom/hover never
@@ -321,7 +318,8 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
       // Domain legend filter: when non-empty, nodes/links outside the selected
       // domains dim out (like the focus dimming).
       const domFilter = domainFilterRef.current;
-      const domActive = (n: SimNode) => domFilter.size === 0 || domFilter.has(domainOf(n.themeId) ?? "");
+      const domActive = (n: SimNode) =>
+        domFilter.size === 0 || domFilter.has(lifeAreaOf(domainOf(n.themeId)));
 
       // Viewport in world coordinates, for culling.
       const worldLeft = -tx / k;
@@ -1042,7 +1040,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
     const pool =
       domainFilter.size === 0
         ? live.nodes
-        : live.nodes.filter((n) => domainFilter.has(domainOf(n.themeId) ?? ""));
+        : live.nodes.filter((n) => domainFilter.has(lifeAreaOf(domainOf(n.themeId))));
     const base = pool.length > 0 ? pool : live.nodes;
     const fresh = base.filter((n) => n.id !== selectedRef.current);
     const nodes = fresh.length > 0 ? fresh : base;
@@ -1174,7 +1172,7 @@ export default function WordGraph({ items }: { items: VocabItem[] }) {
           in full (flex-wrap), so no scroll is needed to see every domain. */}
       <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
         {presentDomains.map((d) => {
-          const color = (DOMAIN_COLORS[d.id] ?? FALLBACK_COLOR)[isDark ? "dark" : "light"];
+          const color = LIFE_AREA_COLORS[d.id][isDark ? "dark" : "light"];
           const selectedDom = domainFilter.has(d.id);
           const dimmed = domainFilter.size > 0 && !selectedDom;
           return (

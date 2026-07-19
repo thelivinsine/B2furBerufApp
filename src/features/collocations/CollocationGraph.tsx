@@ -12,12 +12,11 @@ import {
 } from "d3-force";
 import { Maximize, Minus, PanelBottom, PanelRight, Plus, Waypoints, X } from "lucide-react";
 import type { Collocation } from "@/types";
-import { domains } from "@/data/domains";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EmptyState } from "@/components/shared/misc";
 import { useIsDark } from "@/lib/useTheme";
 import { cn } from "@/lib/utils";
-import { domainColor } from "@/lib/graphPalette";
+import { lifeAreaColor, lifeAreaOf, LIFE_AREAS, LIFE_AREA_COLORS } from "@/lib/graphPalette";
 import { buildCollocationGraph, type CollocationNode } from "./collocationGraph";
 
 /**
@@ -139,7 +138,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   const visibleLinkCount = useMemo(() => {
     if (domainFilter.size === 0 && kindFilter.size === 0) return graph.links.length;
     const passes = (n: CollocationNode) =>
-      (domainFilter.size === 0 || domainFilter.has(n.domain ?? "")) &&
+      (domainFilter.size === 0 || domainFilter.has(lifeAreaOf(n.domain))) &&
       (kindFilter.size === 0 || kindFilter.has(n.kind));
     let count = 0;
     for (const l of graph.links) {
@@ -189,7 +188,10 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     const present = Array.from(seen).sort();
 
     const N = Math.max(present.length, 1);
-    const R = 140 + N * 30;
+    // Wider ring (founder "by topic + tighter", 2026-07-19): topic centroids sit
+    // further apart so the firmer pull below settles them into clearly separated
+    // islands instead of one central mass.
+    const R = 140 + N * 35;
     const map = new Map<string, { x: number; y: number }>();
     present.forEach((id, i) => {
       const a = (2 * Math.PI * i) / N - Math.PI / 2;
@@ -242,10 +244,10 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
   domainFilterRef.current = domainFilter;
   kindFilterRef.current = kindFilter;
 
-  // Domains actually on screen, for the legend.
+  // Life areas actually on screen, for the legend (professional vs personal).
   const presentDomains = useMemo(() => {
-    const present = new Set(graph.nodes.map((n) => n.domain).filter(Boolean));
-    return domains.filter((d) => present.has(d.id));
+    const present = new Set(graph.nodes.map((n) => lifeAreaOf(n.domain)));
+    return LIFE_AREAS.filter((a) => present.has(a.id));
   }, [graph]);
 
   const scheduleDraw = () => {
@@ -398,13 +400,17 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         forceLink<SimNode, SimLink>(links)
           .id((d) => d.id)
           .distance((l) => 22 + (l.source as SimNode).r + (l.target as SimNode).r)
-          .strength(0.18),
+          // Looser link pull (founder "by topic + tighter", 2026-07-19) so hub
+          // verbs drag their neighbours toward the centre less, keeping islands
+          // apart.
+          .strength(0.11),
       )
-      .force("charge", forceManyBody<SimNode>().strength(-42).distanceMax(260))
-      .force("collide", forceCollide<SimNode>((d) => d.r + 3))
-      // Theme-centroid pull: this is what forms the islands.
-      .force("x", forceX<SimNode>((d) => centroidOf(d).x).strength(0.13))
-      .force("y", forceY<SimNode>((d) => centroidOf(d).y).strength(0.13))
+      .force("charge", forceManyBody<SimNode>().strength(-55).distanceMax(240))
+      .force("collide", forceCollide<SimNode>((d) => d.r + 5))
+      // Theme-centroid pull: this is what forms the islands. Firmer (0.28) so
+      // each topic contracts into a distinct island (founder, 2026-07-19).
+      .force("x", forceX<SimNode>((d) => centroidOf(d).x).strength(0.28))
+      .force("y", forceY<SimNode>((d) => centroidOf(d).y).strength(0.28))
       .stop();
     simRef.current = { sim, nodes, links };
 
@@ -448,7 +454,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
       const domFilter = domainFilterRef.current;
       const kindF = kindFilterRef.current;
       const isActive = (n: SimNode) =>
-        (domFilter.size === 0 || domFilter.has(n.domain ?? "")) &&
+        (domFilter.size === 0 || domFilter.has(lifeAreaOf(n.domain))) &&
         (kindF.size === 0 || kindF.has(n.kind));
 
       // World transform for the graph itself.
@@ -487,9 +493,9 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         const cx = mx + (-dy / len) * bow;
         const cy = my + (dx / len) * bow;
 
-        const color = lit ? domainColor(s.domain, dark) : dark ? "148,163,184" : "100,116,139";
+        const color = lit ? lifeAreaColor(s.domain, dark) : dark ? "148,163,184" : "100,116,139";
         ctx.strokeStyle = lit
-          ? hexToRgba(domainColor(s.domain, dark), alpha)
+          ? hexToRgba(lifeAreaColor(s.domain, dark), alpha)
           : `rgba(${color},${alpha})`;
         ctx.lineWidth = (lit ? 1.6 : 0.55) / k;
         ctx.beginPath();
@@ -508,7 +514,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         const active = isActive(n);
         const inFocus = focusSet === null || focusSet.has(n.id);
         if (!active || !inFocus) continue;
-        const color = domainColor(n.domain, dark);
+        const color = lifeAreaColor(n.domain, dark);
         const glowR = n.r * (dark ? 3.4 : 2.6);
         const sprite = glowSprite(color);
         ctx.globalAlpha = dark ? 0.75 : 0.4;
@@ -525,7 +531,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         if (x + n.r < worldLeft || x - n.r > worldRight || y + n.r < worldTop || y - n.r > worldBottom)
           continue;
         const dimmed = (focusSet !== null && !focusSet.has(n.id)) || !isActive(n);
-        const color = domainColor(n.domain, dark);
+        const color = lifeAreaColor(n.domain, dark);
         ctx.globalAlpha = dimmed ? 0.12 : 1;
 
         if (n.kind === "verb") {
@@ -1222,7 +1228,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     if (!live || live.nodes.length === 0) return;
     const pool = live.nodes.filter(
       (n) =>
-        (domainFilter.size === 0 || domainFilter.has(n.domain ?? "")) &&
+        (domainFilter.size === 0 || domainFilter.has(lifeAreaOf(n.domain))) &&
         (kindFilter.size === 0 || kindFilter.has(n.kind)),
     );
     const base = pool.length > 0 ? pool : live.nodes;
@@ -1466,7 +1472,7 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         })}
         <span className="text-border">·</span>
         {presentDomains.map((d) => {
-          const color = domainColor(d.id, isDark);
+          const color = LIFE_AREA_COLORS[d.id][isDark ? "dark" : "light"];
           const on = domainFilter.has(d.id);
           const dimmed = domainFilter.size > 0 && !on;
           return (
