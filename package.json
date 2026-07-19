@@ -16,6 +16,7 @@
     "report:exercise-coverage": "node scripts/report-exercise-coverage.mjs",
     "test:unit": "vitest run",
     "check:bundle": "node scripts/check-bundle-size.mjs",
+    "check:contrast": "node scripts/check-contrast.mjs",
     "test:srs": "node scripts/test-srs.mjs",
     "test:pronounce": "node scripts/test-pronounce.mjs",
     "generate:provenance": "node scripts/generate-provenance-stubs.mjs",

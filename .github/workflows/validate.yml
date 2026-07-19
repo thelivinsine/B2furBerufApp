@@ -37,6 +37,11 @@ jobs:
       - name: Lint content
         run: pnpm lint:content
 
+      # Brand-token WCAG gate (brand plan PR A, s133): every designed token
+      # pairing in src/index.css must hold its contrast ratio in both themes.
+      - name: Check token contrast
+        run: pnpm check:contrast
+
       # Layer 2 fact gate (data-strategy verification ladder): fail if BOTH
       # independent morphology oracles agree a noun's der/die/das or plural is
       # wrong. Runs fully offline against the committed vendored subsets

@@ -63,19 +63,19 @@ function blockToHtml(b, lang) {
 /** Minimal inline-styled, dark-theme static snapshot shown to no-JS clients
  *  (crawlers, social previews). Real users never see it: React clears #root. */
 function staticShell({ title, updated, breadcrumbHtml, bodyHtml }) {
-  return `<main style="min-height:100vh;background:#0f1729;color:#e2e8f0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;">
+  return `<main style="min-height:100vh;background:#151320;color:#e8e6f0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;">
   <div style="max-width:44rem;margin:0 auto;padding:2rem 1.25rem 4rem;">
-    <a href="${ORIGIN}/" style="display:inline-flex;align-items:center;gap:.6rem;color:#e2e8f0;text-decoration:none;margin-bottom:1.5rem;">
+    <a href="${ORIGIN}/" style="display:inline-flex;align-items:center;gap:.6rem;color:#e8e6f0;text-decoration:none;margin-bottom:1.5rem;">
       <img src="/genauly-default-logo-transparent-corners.png" alt="Genauly" width="36" height="36" style="border-radius:10px;" />
       <span style="font-weight:600;font-size:1.05rem;">Genauly</span>
     </a>
     ${breadcrumbHtml}
     <h1 style="font-size:1.9rem;font-weight:700;line-height:1.2;margin:.25rem 0 .5rem;">${esc(title)}</h1>
-    ${updated ? `<p style="color:#94a3b8;font-size:.85rem;margin:0 0 1.5rem;">Zuletzt aktualisiert: ${esc(updated)}</p>` : ""}
-    <div class="help-body" style="font-size:1rem;line-height:1.7;color:#cbd5e1;">
+    ${updated ? `<p style="color:#a5a2b5;font-size:.85rem;margin:0 0 1.5rem;">Zuletzt aktualisiert: ${esc(updated)}</p>` : ""}
+    <div class="help-body" style="font-size:1rem;line-height:1.7;color:#c6c3d4;">
       ${bodyHtml}
     </div>
-    <p style="margin-top:2.5rem;font-size:.9rem;color:#94a3b8;">
+    <p style="margin-top:2.5rem;font-size:.9rem;color:#a5a2b5;">
       <a href="${ORIGIN}/hilfe" style="color:#a5b4fc;">Alle Hilfe-Themen</a> ·
       <a href="${ORIGIN}/" style="color:#a5b4fc;">Zur App</a> ·
       <a href="${ORIGIN}/about" style="color:#a5b4fc;">Über Genauly</a>
@@ -160,7 +160,7 @@ function breadcrumbHtml(items) {
   // items: [{ name, url }]
   const parts = items.map((it, i) =>
     i === items.length - 1
-      ? `<span style="color:#cbd5e1;">${esc(it.name)}</span>`
+      ? `<span style="color:#c6c3d4;">${esc(it.name)}</span>`
       : `<a href="${esc(it.url)}" style="color:#a5b4fc;text-decoration:none;">${esc(it.name)}</a>`,
   );
   return `<nav style="font-size:.8rem;color:#64748b;margin-bottom:.5rem;">${parts.join(
@@ -214,7 +214,7 @@ async function main() {
             (a) =>
               `<li><a href="${ORIGIN}/hilfe/${a.slug}" style="color:#a5b4fc;text-decoration:none;font-weight:600;">${esc(
                 a.title[LANG],
-              )}</a><br /><span style="color:#94a3b8;font-size:.9rem;">${esc(a.description[LANG])}</span></li>`,
+              )}</a><br /><span style="color:#a5a2b5;font-size:.9rem;">${esc(a.description[LANG])}</span></li>`,
           )
           .join("");
         return `<h2>${esc(helpCategories[cat][LANG])}</h2><ul>${links}</ul>`;

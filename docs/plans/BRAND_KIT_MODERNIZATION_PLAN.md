@@ -62,10 +62,14 @@ The flip must never be half-shipped: a deploy where the token system is Nachtbla
 are still old-indigo (or vice versa) looks broken. PR A is therefore atomic and contains everything
 needed for a coherent first impression; B/C/D layer quality on top.
 
-### PR A — Token flip + accent-role audit + chrome alignment (the big switch)
+### PR A — Token flip + accent-role audit + chrome alignment (the big switch) — ✅ SHIPPED (s133)
 
 **Model: Fable 5** (highest-risk visual change; needs system-wide judgment, not just find-replace).
-Estimated: one focused session.
+Estimated: one focused session. **Shipped s133:** all items below landed; final token values in the
+BRAND_SPEC status header (primary 54%, warning 38 92% 46%, reward 11 82% 54%, `--accent-ink` added;
+42/42 contrast pairings pass via the new `pnpm check:contrast` gate, wired into `validate.yml`).
+The boot-error shell in `src/main.tsx` was also retinted (found during the sweep). Screenshots
+light+dark × mobile+desktop verified Praktisch, Theorie (Karten + Graph), Fortschritt, Landing.
 
 1. `src/index.css` `:root` per spec §1, exactly. Derived values the spec leaves implicit:
    - `--elevated` = white (match `--surface`), `--input` = Lines `42 38% 85%`,

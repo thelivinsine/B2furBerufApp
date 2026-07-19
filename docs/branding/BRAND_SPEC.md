@@ -1,7 +1,13 @@
 # Genauly Brand Spec — FINALIZED, not yet implemented
 
-**Status:** ✅ Design finalized (session 127, 2026-07-19). ⛔ **NOT wired into the app yet** — no
-`src/` change has been made. This file is the locked reference for the implementation session.
+**Status:** ✅ Design finalized (session 127, 2026-07-19). 🔵 **PARTIALLY IMPLEMENTED (s133, brand
+plan PR A):** the token system (§1 light + §2 dark), nav/route/graph chrome and shell meta are LIVE;
+the logo + icon assets (§3) and the deep game/map/landing sweep are still pending (plan PRs B/C/D, see
+`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`). Shipped token values that deviate from the §1 swatches
+(all WCAG-driven, plan §4, enforced by `pnpm check:contrast`): `--primary` 221 83% 54% (Nachtblau
+darkened 58%→54% for AA), `--warning` 38 92% 46% (Butter deepened for text legibility), `--reward`
+11 82% 54% (Koralle deepened so coral text clears 3:1 on its blush), plus a new `--accent-ink`
+(198 90% 32% light / 198 85% 72% dark) for text call sites, since Himmelblau itself is never text.
 
 **Chosen direction:** Kit 1 · **Nachtblau & Himmelblau + Koralle** (brand catalogue Vol. VIII).
 The core mark is the Textmarker: a lowercase **g** sitting on a highlighter swipe, with *genau* living

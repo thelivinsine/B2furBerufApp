@@ -56,10 +56,10 @@ function paintFatal(_label: string, detail: unknown): void {
   badge.setAttribute(
     "style",
     "width:3rem;height:3rem;margin:0 auto 1.25rem;border-radius:0.875rem;" +
-      "background:linear-gradient(135deg,#6366f1,#8b5cf6);" +
+      "background:linear-gradient(135deg,#2866eb,#0c8ac0);" +
       "display:flex;align-items:center;justify-content:center;" +
       "font-size:1.5rem;font-weight:700;color:#fff;" +
-      "box-shadow:0 8px 24px -8px rgba(99,102,241,0.6);",
+      "box-shadow:0 8px 24px -8px rgba(40,102,235,0.5);",
   );
   badge.textContent = "G";
 
@@ -82,9 +82,9 @@ function paintFatal(_label: string, detail: unknown): void {
   btn.setAttribute(
     "style",
     "width:100%;padding:0.75rem 1.5rem;border:none;border-radius:0.75rem;" +
-      "background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;" +
+      "background:linear-gradient(135deg,#2866eb,#0c8ac0);color:#fff;" +
       "font-size:1rem;font-weight:600;cursor:pointer;" +
-      "box-shadow:0 8px 24px -8px rgba(99,102,241,0.6);" +
+      "box-shadow:0 8px 24px -8px rgba(40,102,235,0.5);" +
       "font-family:inherit;",
   );
   btn.textContent = "Neu laden";

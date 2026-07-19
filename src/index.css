@@ -22,34 +22,48 @@ input:-webkit-autofill {
 
 @layer base {
   :root {
-    --background: 240 20% 99%;
-    --foreground: 240 12% 12%;
+    /* Brand tokens (Kit 1 · Nachtblau & Himmelblau + Koralle, BRAND_SPEC.md,
+       shipped via BRAND_KIT_MODERNIZATION_PLAN.md PR A). Warm Papier ground,
+       white cards, Nachtblau primary, Himmelblau accent, Koralle reward.
+       Values that deviate from the spec swatches do so for WCAG AA (the
+       sanctioned-deviations register, plan §4); `pnpm check:contrast` is the
+       gate that keeps every pairing honest. */
+    --background: 43 58% 95%;
+    --foreground: 252 16% 12%;
     --surface: 0 0% 100%;
-    --elevated: 240 24% 100%;
+    --elevated: 0 0% 100%;
 
-    --muted: 240 16% 95%;
-    --muted-foreground: 240 6% 44%;
+    --muted: 42 44% 89%;
+    --muted-foreground: 43 11% 37%;
 
-    --border: 240 14% 90%;
-    --input: 240 14% 90%;
-    --ring: 245 70% 60%;
+    --border: 42 38% 85%;
+    --input: 42 38% 85%;
+    --ring: 221 83% 54%;
 
-    --primary: 245 70% 60%;
+    /* Nachtblau, darkened 58%→54% (plan deviation #1) so white-on-primary
+       (5.0:1) and primary-as-text on Papier (4.6:1) both clear AA. */
+    --primary: 221 83% 54%;
     --primary-foreground: 0 0% 100%;
-    --accent: 188 86% 43%;
-    --accent-foreground: 0 0% 100%;
+    /* Himmelblau. Light, so it pairs with INK, never white; and it is never
+       used as text on light ground: text call sites use --accent-ink. */
+    --accent: 198 93% 65%;
+    --accent-foreground: 202 71% 13%;
+    --accent-ink: 198 90% 32%;
 
-    --success: 152 56% 42%;
+    --success: 153 55% 40%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 30 40% 12%;
-    --danger: 0 72% 56%;
+    /* Butter, deepened for legibility: the pure #F3C24B swatch is a fill
+       tone; as a text/icon token it needs this darker amber. */
+    --warning: 38 92% 46%;
+    --warning-foreground: 42 53% 15%;
+    --danger: 4 73% 56%;
     --danger-foreground: 0 0% 100%;
 
-    /* Reward-gold (redesign Phase 2.3): reserved for loot / combo moments
-       only. `reward` is the gold mark, `reward-bg` its pale tint. */
-    --reward: 38 95% 44%;
-    --reward-bg: 39 88% 94%;
+    /* Reward = Koralle (was gold): reserved for loot / combo / streak moments
+       only. Deepened 59%→54% (plan deviation #3) so coral text on the
+       `reward-bg` blush clears the 3:1 UI floor; pairs with ink, not white. */
+    --reward: 11 82% 54%;
+    --reward-bg: 16 77% 93%;
 
     /* Gender marks (Artikel-Visuals, s128 plan): der=blue, die=rose, das=green
        (textbook convention). Deliberately distinct from the six domain graph
@@ -65,44 +79,48 @@ input:-webkit-autofill {
     /* Neutral "pencil" stroke for the fused-doodle referent objects (Artikel-
        Visuals Phase 2): softer than --foreground so the gender color stays the
        loudest thing in a doodle. */
-    --ink: 240 10% 25%;
+    --ink: 252 12% 22%;
 
-    --shadow: 240 30% 30%;
+    /* Warm-navy Schatten (#22304F): every shadow recipe reads it, so cards
+       cast a brand-tinted shadow on the Papier ground, never gray-black. */
+    --shadow: 221 40% 22%;
     --radius: 0.875rem;
   }
 
   .dark {
-    --background: 223 38% 11%;
-    --foreground: 220 24% 94%;
-    --surface: 223 34% 15%;
-    --elevated: 223 32% 19%;
+    /* Dark theme, two-blue + coral identity kept (BRAND_SPEC §2 starting
+       point; the full design pass is plan PR D). Every pairing below clears
+       AA with room (see check-contrast.mjs). */
+    --background: 250 24% 10%;
+    --foreground: 250 20% 92%;
+    --surface: 250 20% 14%;
+    --elevated: 250 18% 18%;
 
-    --muted: 223 26% 23%;
-    --muted-foreground: 220 20% 76%;
+    --muted: 250 16% 22%;
+    --muted-foreground: 250 12% 76%;
 
-    --border: 223 24% 27%;
-    --input: 223 24% 29%;
-    /* Lightened from 68% so purple text (eyebrows, active tab labels, the
-       `text-primary` section headers) clears WCAG AA contrast on the dark
-       background; at 68% it measured ~4.3:1, just under the 4.5:1 floor for the
-       small bold uppercase labels. Primary-as-button-fill is unaffected (its
-       dark `primary-foreground` text only gains contrast). */
-    --ring: 245 84% 74%;
+    --border: 250 14% 26%;
+    --input: 250 14% 28%;
+    /* Nachtblau lifted for the dark ground: 70% lightness measures 6.6:1 as
+       text on the background, so eyebrows / active-tab labels clear AA with
+       margin (the old purple needed 74% for the same reason). */
+    --ring: 221 90% 70%;
 
-    --primary: 245 84% 74%;
-    --primary-foreground: 240 30% 8%;
-    --accent: 188 80% 52%;
-    --accent-foreground: 240 30% 8%;
+    --primary: 221 90% 70%;
+    --primary-foreground: 250 30% 8%;
+    --accent: 198 90% 70%;
+    --accent-foreground: 202 71% 10%;
+    --accent-ink: 198 85% 72%;
 
-    --success: 152 52% 50%;
-    --success-foreground: 240 30% 8%;
-    --warning: 38 92% 56%;
-    --warning-foreground: 30 40% 10%;
-    --danger: 0 72% 62%;
-    --danger-foreground: 240 30% 8%;
+    --success: 153 50% 52%;
+    --success-foreground: 250 30% 8%;
+    --warning: 43 90% 62%;
+    --warning-foreground: 42 50% 10%;
+    --danger: 4 75% 64%;
+    --danger-foreground: 250 30% 8%;
 
-    --reward: 36 79% 57%;
-    --reward-bg: 38 45% 13%;
+    --reward: 11 88% 66%;
+    --reward-bg: 11 45% 15%;
 
     /* Gender marks, brightened for the dark canvas (same intent as the domain
        palette's dark tones); `-bg` tints go dark/low-lightness. */
@@ -112,9 +130,9 @@ input:-webkit-autofill {
     --die-bg: 329 38% 18%;
     --das: 145 50% 58%;
     --das-bg: 145 35% 15%;
-    --ink: 220 20% 85%;
+    --ink: 250 12% 85%;
 
-    --shadow: 240 60% 2%;
+    --shadow: 221 60% 3%;
   }
 
   * {

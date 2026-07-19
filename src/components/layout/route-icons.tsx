@@ -11,7 +11,7 @@ import { navItems } from "./nav-items";
 // the root opacity.
 // ─────────────────────────────────────────────────────────────────────────
 
-const BRAND = "#5b5be6";
+const BRAND = "#3D74ED";
 
 type Render = (c: string) => React.ReactNode;
 
@@ -33,7 +33,7 @@ const RENDERERS: Record<string, Render> = {
   // ignores the route accent `c`.
   "/vocabulary": () => (
     <>
-      <path d="M10 3.4C7.7 2.4 4.8 2.4 2.4 3.4V16.6c2.4-1 5.3-1 7.6 0V3.4Z" fill="#5b5be6" />
+      <path d="M10 3.4C7.7 2.4 4.8 2.4 2.4 3.4V16.6c2.4-1 5.3-1 7.6 0V3.4Z" fill="#3D74ED" />
       <path d="M10 3.4c2.3-1 5.2-1 7.6 0V16.6c-2.4-1-5.3-1-7.6 0V3.4Z" fill="#10b7cf" />
       <line x1="4.4"  y1="7"   x2="8.2"  y2="7"   stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".7" />
       <line x1="4.4"  y1="9.6" x2="8.2"  y2="9.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".5" />

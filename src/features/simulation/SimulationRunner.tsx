@@ -281,7 +281,7 @@ export function SimulationRunner({
                 <div className="flex items-start gap-2.5">
                   <div className={cn(
                     "mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-                    node.speaker === "examiner" ? "bg-accent/10 text-accent" : "bg-primary/10 text-primary"
+                    node.speaker === "examiner" ? "bg-accent/10 text-accent-ink" : "bg-primary/10 text-primary"
                   )}>
                     {node.speaker === "examiner" ? <Users className="h-4 w-4" /> : <User className="h-4 w-4" />}
                   </div>
@@ -304,7 +304,7 @@ export function SimulationRunner({
             <Card className="border-accent/40 bg-accent/5">
               <CardContent className="space-y-3 p-5">
                 <div className="flex items-start gap-2.5">
-                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent">
+                  <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10 text-accent-ink">
                     <Users className="h-4 w-4" />
                   </div>
                   <div>

@@ -43,7 +43,7 @@ export function ExamHub() {
               <Card className="card-hover h-full cursor-pointer" onClick={() => setActive(ex)}>
                 <CardContent className="flex h-full flex-col gap-3 p-5">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent-ink">
                       <GraduationCap className="h-5 w-5" />
                     </div>
                     {lastAttempt && (
