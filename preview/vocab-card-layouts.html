@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wörter-Karten · Layout-Optionen</title>
+<style>
+  :root {
+    --background: 43 58% 95%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%;
+    --muted: 42 44% 89%;
+    --muted-foreground: 43 11% 37%;
+    --border: 42 38% 85%;
+    --primary: 221 83% 54%;
+    --accent: 198 93% 65%;
+    --reward: 11 82% 54%;
+    --der: 226 74% 48%;
+    --die: 333 71% 51%;
+    --das: 142 76% 36%;
+    --shadow: 221 40% 22%;
+  }
+  :root[data-theme="dark"] {
+    --background: 250 24% 10%;
+    --foreground: 250 20% 92%;
+    --surface: 250 20% 14%;
+    --muted: 250 16% 22%;
+    --muted-foreground: 250 10% 72%;
+    --border: 250 14% 26%;
+    --primary: 221 90% 70%;
+    --accent: 198 90% 70%;
+    --reward: 11 88% 66%;
+    --der: 226 88% 76%;
+    --die: 329 82% 72%;
+    --das: 145 50% 58%;
+    --shadow: 221 60% 3%;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    line-height: 1.4;
+    padding: 32px 20px 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+
+  header.page h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  header.page p { color: hsl(var(--muted-foreground)); font-size: 14px; margin-top: 6px; }
+  code { font-size: 0.92em; background: hsl(var(--muted)); padding: 1px 5px; border-radius: 4px; }
+
+  .toolbar { display: flex; gap: 8px; align-items: center; margin: 20px 0 28px; }
+  .toggle {
+    font: inherit; font-size: 13px; font-weight: 600;
+    padding: 7px 14px; border-radius: 999px; cursor: pointer;
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--surface)); color: hsl(var(--foreground));
+  }
+  .toggle:hover { border-color: hsl(var(--primary) / 0.5); }
+
+  section.variant { margin-bottom: 40px; }
+  .vhead { margin-bottom: 12px; }
+  .vhead .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+    text-transform: uppercase; color: hsl(var(--primary));
+    background: hsl(var(--primary) / 0.1); padding: 3px 9px; border-radius: 6px;
+    margin-bottom: 8px;
+  }
+  .vhead h2 { font-size: 17px; font-weight: 700; }
+  .vhead p { font-size: 13.5px; color: hsl(var(--muted-foreground)); margin-top: 4px; max-width: 64ch; }
+
+  /* Real grid: 1 col on narrow, 2 col wider — same as the app (sm:grid-cols-2). */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ---- Card chrome (mirrors the app Card: rounded-xl, soft shadow) ---- */
+  .card {
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    border-radius: 14px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 1px 3px hsl(var(--shadow) / 0.08);
+    padding: 16px;
+    display: flex; flex-direction: column;
+    min-height: 150px;
+  }
+
+  .word { font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+  .plural { font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .plural-pill {
+    display: inline-block; font-size: 11px; color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted)); padding: 1px 7px; border-radius: 999px;
+  }
+  .example { font-size: 13.5px; font-style: italic; color: hsl(var(--muted-foreground)); }
+  .divider { border-top: 1px solid hsl(var(--border)); }
+
+  .ico {
+    width: 30px; height: 30px; flex: none; border-radius: 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: hsl(var(--muted-foreground)); cursor: pointer;
+    border: none; background: transparent;
+  }
+  .ico:hover { background: hsl(var(--muted)); }
+  .ico.saved { color: hsl(var(--primary)); }
+  .ico.sm { width: 26px; height: 26px; }
+  .ico svg { width: 17px; height: 17px; }
+
+  /* ---- Gender creatures (approximating Wesen): spiky der / round die / boxy das ---- */
+  .wesen { width: 22px; height: 22px; flex: none; }
+  .wesen.der { background: hsl(var(--der)); clip-path: polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%); }
+  .wesen.die { background: hsl(var(--die)); border-radius: 50%; }
+  .wesen.das { background: hsl(var(--das)); border-radius: 6px; }
+  .wesen.lg { width: 30px; height: 30px; }
+
+  .row { display: flex; align-items: center; }
+  .between { justify-content: space-between; }
+  .top { align-items: flex-start; }
+  .gap6 { gap: 6px; } .gap8 { gap: 8px; }
+  .minw { min-width: 0; }
+  .wrap6 { flex-wrap: wrap; }
+  .mt-auto { margin-top: auto; }
+  .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  .note {
+    font-size: 12px; color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted) / 0.6); border: 1px dashed hsl(var(--border));
+    border-radius: 8px; padding: 8px 12px; margin-top: 10px;
+  }
+  .rec {
+    display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; color: hsl(var(--das)); background: hsl(var(--das) / 0.12);
+    padding: 2px 7px; border-radius: 5px; margin-left: 8px; vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <h1>Wörter-Karten · Layout-Optionen</h1>
+    <p>Vier Anordnungen der Kartenelemente, nachdem der „Verbunden“-Umschalter geparkt wurde. Jede Option zeigt zwei echte Wörter (rundes rosa <em>die</em>, spitzes blaues <em>der</em>, eckiges grünes <em>das</em>). Wähle eine aus, dann setze ich sie in <code>VocabList.tsx</code> um.</p>
+  </header>
+
+  <div class="toolbar">
+    <button class="toggle" id="themeBtn">◐ Dunkel testen</button>
+  </div>
+
+  <!-- ============ A. Baseline ============ -->
+  <section class="variant">
+    <div class="vhead">
+      <span class="tag">Option A</span>
+      <h2>Aktueller Stand (ohne „Verbunden“)</h2>
+      <p>Genau wie heute, nur ohne den unteren Umschalter. Das Beispiel folgt direkt auf den Plural, unten bleibt Leerraum. Referenz zum Vergleichen.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="row between top">
+          <div class="minw">
+            <div class="row gap6">
+              <span class="wesen die"></span>
+              <span class="word truncate">die Verbindung</span>
+              <button class="ico" data-icon="speak" title="Vorlesen"></button>
+            </div>
+            <p class="plural" style="margin-top:2px;">Pl.: die Verbindungen</p>
+          </div>
+          <button class="ico saved" data-icon="book-fill" title="Gespeichert"></button>
+        </div>
+        <p class="example divider" style="margin-top:8px; padding-top:8px;">„Es gibt eine direkte Verbindung nach Hamburg.“</p>
+      </div>
+      <div class="card">
+        <div class="row between top">
+          <div class="minw">
+            <div class="row gap6">
+              <span class="wesen der"></span>
+              <span class="word truncate">der Anschluss</span>
+              <button class="ico" data-icon="speak" title="Vorlesen"></button>
+            </div>
+            <p class="plural" style="margin-top:2px;">Pl.: die Anschlüsse</p>
+          </div>
+          <button class="ico" data-icon="book" title="Speichern"></button>
+        </div>
+        <p class="example divider" style="margin-top:8px; padding-top:8px;">„Ich habe den Anschluss verpasst.“</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ B. Actions to the base ============ -->
+  <section class="variant">
+    <div class="vhead">
+      <span class="tag">Option B</span>
+      <h2>Aktionen an den Fuß <span class="rec">Empfehlung</span></h2>
+      <p>Die Kopfzeile wird ruhig: nur Kreatur + Wort links, Lesezeichen rechts. Das Beispiel bekommt Luft und der Vorlese-Knopf sitzt unten rechts (genau dort, wo „Verbunden“ war), der Plural als kleine Pille unten links. Alle Karten teilen denselben Fußanker.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="row between gap8">
+          <div class="row gap6 minw">
+            <span class="wesen das"></span>
+            <span class="word truncate">das Netzwerk</span>
+          </div>
+          <button class="ico saved" data-icon="book-fill" title="Gespeichert"></button>
+        </div>
+        <p class="example" style="margin-top:10px;">„Das Netzwerk ist heute sehr langsam.“</p>
+        <div class="row between mt-auto" style="padding-top:12px;">
+          <span class="plural-pill">Pl.: die Netzwerke</span>
+          <button class="ico" data-icon="speak" title="Vorlesen"></button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row between gap8">
+          <div class="row gap6 minw">
+            <span class="wesen die"></span>
+            <span class="word truncate">die Verbindung</span>
+          </div>
+          <button class="ico" data-icon="book" title="Speichern"></button>
+        </div>
+        <p class="example" style="margin-top:10px;">„Es gibt eine direkte Verbindung nach Hamburg.“</p>
+        <div class="row between mt-auto" style="padding-top:12px;">
+          <span class="plural-pill">Pl.: die Verbindungen</span>
+          <button class="ico" data-icon="speak" title="Vorlesen"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ C. Example bottom-anchored, plural inline pill ============ -->
+  <section class="variant">
+    <div class="vhead">
+      <span class="tag">Option C</span>
+      <h2>Beispiel unten verankert, Plural als Pille</h2>
+      <p>Kopfzeile wie heute (Kreatur + Wort + Vorlesen, Lesezeichen rechts), aber der Plural wird zur Inline-Pille neben dem Wort (spart eine Zeile) und das Beispiel wird mit <code>mt-auto</code> an den Kartenfuß gedrückt, so dass die Beispiele über die ganze Reihe hinweg auf einer Linie liegen.</p>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="row between gap8 top">
+          <div class="row gap6 minw wrap6">
+            <span class="wesen der"></span>
+            <span class="word">der Anschluss</span>
+            <button class="ico sm" data-icon="speak" title="Vorlesen"></button>
+            <span class="plural-pill">Pl.: die Anschlüsse</span>
+          </div>
+          <button class="ico saved" data-icon="book-fill" title="Gespeichert"></button>
+        </div>
+        <p class="example divider mt-auto" style="margin-top:12px; padding-top:10px;">„Ich habe den Anschluss verpasst.“</p>
+      </div>
+      <div class="card">
+        <div class="row between gap8 top">
+          <div class="row gap6 minw wrap6">
+            <span class="wesen das"></span>
+            <span class="word">das Netzwerk</span>
+            <button class="ico sm" data-icon="speak" title="Vorlesen"></button>
+            <span class="plural-pill">Pl.: die Netzwerke</span>
+          </div>
+          <button class="ico" data-icon="book" title="Speichern"></button>
+        </div>
+        <p class="example divider mt-auto" style="margin-top:12px; padding-top:10px;">„Verbinden Sie sich bitte mit dem Netzwerk im Büro.“</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ D. Gender left-rail ============ -->
+  <section class="variant">
+    <div class="vhead">
+      <span class="tag">Option D</span>
+      <h2>Genus als Farbkante links</h2>
+      <p>Die Genus-Farbe wird strukturell: eine farbige Kante links trägt die Kreatur, Wort und Plural stehen gestapelt, Vorlesen und Lesezeichen oben rechts gruppiert, Beispiel am Fuß. Stärkstes Genus-Signal, aber der größte Umbau.</p>
+    </div>
+    <div class="grid">
+      <div class="card" style="padding:0; overflow:hidden; flex-direction:row;">
+        <span style="width:6px; flex:none; background:hsl(var(--die));"></span>
+        <div style="padding:14px; flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div class="row between gap8 top">
+            <div class="row gap8 minw">
+              <span class="wesen die lg"></span>
+              <div class="minw">
+                <div class="word truncate">die Verbindung</div>
+                <div class="plural">Pl.: die Verbindungen</div>
+              </div>
+            </div>
+            <div class="row gap6" style="flex:none;">
+              <button class="ico" data-icon="speak" title="Vorlesen"></button>
+              <button class="ico saved" data-icon="book-fill" title="Gespeichert"></button>
+            </div>
+          </div>
+          <p class="example divider mt-auto" style="margin-top:12px; padding-top:10px;">„Es gibt eine direkte Verbindung nach Hamburg.“</p>
+        </div>
+      </div>
+      <div class="card" style="padding:0; overflow:hidden; flex-direction:row;">
+        <span style="width:6px; flex:none; background:hsl(var(--der));"></span>
+        <div style="padding:14px; flex:1; display:flex; flex-direction:column; min-width:0;">
+          <div class="row between gap8 top">
+            <div class="row gap8 minw">
+              <span class="wesen der lg"></span>
+              <div class="minw">
+                <div class="word truncate">der Anschluss</div>
+                <div class="plural">Pl.: die Anschlüsse</div>
+              </div>
+            </div>
+            <div class="row gap6" style="flex:none;">
+              <button class="ico" data-icon="speak" title="Vorlesen"></button>
+              <button class="ico" data-icon="book" title="Speichern"></button>
+            </div>
+          </div>
+          <p class="example divider mt-auto" style="margin-top:12px; padding-top:10px;">„Ich habe den Anschluss verpasst.“</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="note">
+    Die Kreaturen hier sind vereinfachte Platzhalter (Kreis / Stern / Quadrat); in der App rendert die echte <code>Wesen</code>-Grafik. Farben, Abstände und Kartenchrom stammen aus den echten Design-Tokens (hell + dunkel).
+  </div>
+</div>
+
+<script>
+  const ICONS = {
+    speak: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>',
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+    'book-fill': '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>',
+  };
+  document.querySelectorAll('[data-icon]').forEach((el) => {
+    el.innerHTML = ICONS[el.getAttribute('data-icon')] || '';
+  });
+
+  const btn = document.getElementById('themeBtn');
+  btn.addEventListener('click', () => {
+    const root = document.documentElement;
+    const dark = root.getAttribute('data-theme') === 'dark';
+    root.setAttribute('data-theme', dark ? 'light' : 'dark');
+    btn.textContent = dark ? '◐ Dunkel testen' : '◑ Hell testen';
+  });
+</script>
+</body>
+</html>

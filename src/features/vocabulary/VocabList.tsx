@@ -15,6 +15,16 @@ import { hasDoodle, loadDoodle } from "./doodles";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
 
 /**
+ * The cross-module "Verbunden" dropdown (RelatedPanel: links from a word to a
+ * Kollokation / Schreibtraining / Dialog for the same theme) is PARKED for now
+ * (founder, 2026-07-19): the feature needs a rethink on how it is useful and
+ * what it should depend on. Flip this to `true` to bring the toggle + panel
+ * back; RelatedPanel.tsx and relatedRows stay in the repo untouched. Do NOT
+ * delete this flag or the panel while it is parked.
+ */
+const SHOW_RELATED = false;
+
+/**
  * One word card, memoized and subscribed to its OWN slice of the progress
  * store. Before this, the whole list (up to 528 cards) subscribed to `srs` +
  * `savedWords` at the top, so toggling one bookmark re-rendered every card.
@@ -31,7 +41,7 @@ const VocabCard = memo(function VocabCard({
 }) {
   const saved = useProgressStore((s) => s.savedWords.includes(v.id));
   const toggleSavedWord = useProgressStore((s) => s.toggleSavedWord);
-  const hasRelated = relatedRows(v).length > 0;
+  const hasRelated = SHOW_RELATED && relatedRows(v).length > 0;
   const gender = genderOf(v);
   // Replay trigger for the gender reveal effect: bumped on each front→back flip.
   const [effectPlay, setEffectPlay] = useState(0);
