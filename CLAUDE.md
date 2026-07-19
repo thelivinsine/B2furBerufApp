@@ -687,6 +687,13 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   popups too, adjusting only the radial center/stops if a different focal point is needed.
 
 ## Brand logo (rebrand shipped s133; mark locked 2026-06-08 → 2026-07-19)
+- **Brand kit (s133): the full, browsable kit lives in `brand-kit/`** (logo mark/wordmark/lockups/
+  mono, `color/` palette + `tokens.css`/`tokens.json`, `type/` specimen, `icons/`, `social/`,
+  `previews/`, and a `README.md` with usage rules). It is **generated from the app's own source** by
+  `scripts/branding/build-brand-kit.mjs` (colors read live from `src/index.css`; the outlined wordmark
+  is `scripts/branding/wordmark-data.mjs`), so it cannot drift from what ships. Rerun that script (plus
+  `build-logo-assets.mjs` for the `public/` icons) after any mark or token change. Do not hand-edit the
+  generated files.
 - **Current mark (s133, brand plan PR B): the lowercase g on a Himmelblau highlighter swipe**, on a
   Papier `#FAF6EC` rounded tile (Kit 1 · Nachtblau & Himmelblau + Koralle). The **g is OUTLINED to a
   `<path>`** (Inter 800, the app's own UI typeface, so mark + wordmark cohere) so it renders identically

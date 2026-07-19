@@ -1167,3 +1167,30 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
 - **Artifacts (Prompt 4):** `src/components/layout/AppShell.tsx` · `src/components/shared/StatCard.tsx` ·
   `src/features/analytics/Analytics.tsx` · `src/index.css` · `CLAUDE.md` · `docs/branding/BRAND_SPEC.md` ·
   `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · `docs/PROJECT_STATUS.md` · PR #596
+- **Prompt 5 (verbatim):** `> document the session. ` _(switched session model to Opus 4.8)_
+- **Response 5 (Opus 4.8):** Started the documentation close-out (the session had been documented
+  incrementally after each PR, so this was the hygiene sweep: refreshed the s133 handoff header in
+  `PROJECT_STATUS.md` from "PLAN authored" to "plan authored AND fully shipped"). Interrupted by
+  prompt 6 before finishing; folded the remaining doc work into the prompt-7 pass below.
+- **Prompt 6 (verbatim):** `> store all the brand kit items in a dedicated repo. generate proper brand kit if any of them isn't available. `
+- **Response 6 (Opus 4.8):** Asked (AskUserQuestion) whether the kit should be a standalone GitHub
+  repo or a folder in this repo; founder chose **folder in this repo** (recommended: one source of
+  truth, no drift). Built **`brand-kit/`** + the generator **`scripts/branding/build-brand-kit.mjs`**,
+  which reads the mark constants + the live tokens from `src/index.css` so the kit cannot drift from
+  what ships. **Generated the missing pieces** a proper kit needs: the "Genauly" **wordmark** (outlined
+  from Inter 800 glyph-by-glyph with kerning, bypassing an unsupported opentype GSUB feature →
+  `scripts/branding/wordmark-data.mjs`), horizontal + stacked **lockups** (ink + white), a **mono
+  knockout** mark (swipe filled, g cut out as negative space, verified legible on white/Papier/blue/
+  ink grounds), a **clear-space** guide, the **palette.svg** swatch sheet + `tokens.css`/`tokens.json`,
+  an **Inter type specimen**, copied **app icons**, a **square social avatar** + og-image, PNG
+  **preview** contact sheets, and a **README** with full usage rules. ~592 kB, 27 files. Verified the
+  logo-overview, palette, typography, and mono sheets by screenshot.
+- **Prompt 7 (verbatim):** `> then document the session once done with the current task`
+- **Response 7 (Opus 4.8):** This close-out. Folded the brand-kit deliverable into the s133
+  `PROJECT_STATUS.md` handoff, noted it in the plan doc + a new CLAUDE.md Brand-logo bullet (where the
+  kit lives + how to regenerate), refreshed the handoff header, and logged prompts 5–7 here. Doc
+  hygiene checked: `PROJECT_STATUS.md` holds the two most recent handoffs (s133 + s132), under the
+  250-line cap. Shipped with the brand-kit PR.
+- **Artifacts (Prompts 5–7):** `brand-kit/` (27 files) · `scripts/branding/build-brand-kit.mjs` ·
+  `scripts/branding/wordmark-data.mjs` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · `docs/SESSION_PROMPT_LOG.md`

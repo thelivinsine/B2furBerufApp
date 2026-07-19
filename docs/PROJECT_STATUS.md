@@ -71,12 +71,14 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 133 (2026-07-19). Brand-kit modernization PLAN authored (Fable 5), branch
-`claude/brand-kit-modernization-igqlnm`, docs-only, shipped to `main`.** The founder asked for the
-brand-spec implementation to be scoped with a robust plan and clear model recommendations per chunk,
-allowing subtle deviations everywhere EXCEPT the logo to reach a premium "top edutech" finish.
-Result: **`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`**, grounded in a fresh code survey (the full
-hardcoded-hex inventory is §2 of the plan):
+**Handoff after session 133 (2026-07-19). Brand-kit modernization: plan authored AND fully shipped
+(all 4 PRs), branch `claude/brand-kit-modernization-igqlnm`, everything merged to `main`.** The
+founder asked to scope the brand-spec implementation with a robust plan + per-chunk model
+recommendations (logo locked, subtle deviations allowed elsewhere for a premium "top edutech"
+finish), then gave the go for each phase in turn ("go ahead with a" → "b and c" → "go ahead"). The
+finalized Kit 1 brand (Nachtblau & Himmelblau + Koralle, `docs/branding/BRAND_SPEC.md`) is now LIVE.
+Plan + implementation record: **`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`** (§2 = the full
+hardcoded-hex inventory; each PR section marked SHIPPED with its final values):
 - **Four-PR sequence (A → {B, C} → D):** **A** = atomic token flip (`src/index.css` per spec §1) +
   the accent-role audit (`--accent-foreground` flips white→ink; Himmelblau banned as text on light
   ground) + nav/route/graph chrome + theme-color/manifest/prerender meta (**Fable 5**); **B** = logo
@@ -134,6 +136,17 @@ hardcoded-hex inventory is §2 of the plan):
   color-language sweep (0 stale "brand indigo"/"reward-gold" references; DECISIONS.md deliberately
   left as the historical record). Buttons already had pressed states + display tracking, no change
   needed. **The brand plan is COMPLETE (all 4 PRs).**
+- **Brand kit consolidated** (post-plan, founder ask "store all the brand kit items in a dedicated
+  repo… generate proper brand kit if any of them isn't available"; founder chose a folder in THIS
+  repo over a standalone repo, to keep one source of truth). New **`brand-kit/`** folder + generator
+  **`scripts/branding/build-brand-kit.mjs`**: logo mark/wordmark/lockups(H+stacked)/mono-knockout +
+  clear-space guide, `color/` palette.svg + `tokens.css`/`tokens.json` (parsed live from
+  `src/index.css`), `type/` Inter specimen, `icons/` (shipped raster set), `social/` og + square
+  avatar, `previews/` PNG contact sheets, and a `README.md` with usage rules. **Generated the missing
+  pieces** that a proper kit needs and we didn't have: the "Genauly" **wordmark** (outlined from Inter
+  800 glyph-by-glyph, kerned → `scripts/branding/wordmark-data.mjs`), all lockups, the mono knockout
+  mark, the palette/type sheets, and the square social avatar. Kit is ~592 kB, 27 files, generated (do
+  not hand-edit). CLAUDE.md Brand-logo section points at it.
 - **Open founder items:** re-upload the Google OAuth consent-screen logo (full-bleed variant, not in
   repo) from the new mark; verify the live site after deploy (hard-refresh first, the service worker
   serves the old build until then).

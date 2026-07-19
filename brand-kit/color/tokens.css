@@ -1,0 +1,68 @@
+/* Genauly design tokens (Kit 1 · Nachtblau & Himmelblau + Koralle).
+   Generated from src/index.css. HSL is space-separated, ready for
+   hsl(var(--token)). Regenerate with scripts/branding/build-brand-kit.mjs. */
+:root {
+  --background: 43 58% 95%; /* #FAF5EB */
+  --foreground: 252 16% 12%; /* #1C1A23 */
+  --surface: 0 0% 100%; /* #FFFFFF */
+  --elevated: 0 0% 100%; /* #FFFFFF */
+  --muted: 42 44% 89%; /* #EFE8D7 */
+  --muted-foreground: 43 11% 37%; /* #696354 */
+  --border: 42 38% 85%; /* #E7DFCA */
+  --input: 42 38% 85%; /* #E7DFCA */
+  --ring: 221 83% 54%; /* #2866EB */
+  --primary: 221 83% 54%; /* #2866EB */
+  --primary-foreground: 0 0% 100%; /* #FFFFFF */
+  --accent: 198 93% 65%; /* #53C7F9 */
+  --accent-foreground: 202 71% 13%; /* #0A2739 */
+  --accent-ink: 198 90% 32%; /* #086F9B */
+  --success: 153 55% 40%; /* #2E9E6C */
+  --success-foreground: 0 0% 100%; /* #FFFFFF */
+  --warning: 38 92% 46%; /* #E19209 */
+  --warning-foreground: 42 53% 15%; /* #3B2E12 */
+  --danger: 4 73% 56%; /* #E1483D */
+  --danger-foreground: 0 0% 100%; /* #FFFFFF */
+  --reward: 11 82% 54%; /* #EA4D2A */
+  --reward-bg: 16 77% 93%; /* #FBE7DF */
+  --der: 226 74% 48%; /* #204AD5 */
+  --der-bg: 224 74% 95%; /* #E9EEFC */
+  --die: 333 71% 51%; /* #DB2979 */
+  --die-bg: 333 71% 96%; /* #FCEEF4 */
+  --das: 142 76% 36%; /* #16A249 */
+  --das-bg: 142 60% 94%; /* #E7F9ED */
+  --ink: 252 12% 22%; /* #34313F */
+  --shadow: 221 40% 22%; /* #22304F */
+}
+
+.dark {
+  --background: 250 24% 10%; /* #151320 */
+  --foreground: 250 20% 92%; /* #E8E7EF */
+  --surface: 250 20% 14%; /* #1F1D2B */
+  --elevated: 250 18% 18%; /* #282636 */
+  --muted: 250 16% 22%; /* #322F41 */
+  --muted-foreground: 250 10% 72%; /* #B3B0BF */
+  --border: 250 14% 26%; /* #3C394C */
+  --input: 250 14% 28%; /* #413D51 */
+  --ring: 221 90% 70%; /* #6E99F7 */
+  --primary: 221 90% 70%; /* #6E99F7 */
+  --primary-foreground: 250 30% 8%; /* #100E1B */
+  --accent: 198 90% 70%; /* #6ECEF7 */
+  --accent-foreground: 202 71% 10%; /* #071E2C */
+  --accent-ink: 198 85% 72%; /* #7BD0F4 */
+  --success: 153 50% 52%; /* #47C28B */
+  --success-foreground: 250 30% 8%; /* #100E1B */
+  --warning: 43 90% 62%; /* #F5C447 */
+  --warning-foreground: 42 50% 10%; /* #261F0D */
+  --danger: 4 75% 64%; /* #E8685E */
+  --danger-foreground: 250 30% 8%; /* #100E1B */
+  --reward: 11 88% 66%; /* #F5785C */
+  --reward-bg: 11 45% 15%; /* #371B15 */
+  --der: 226 88% 76%; /* #8CA5F8 */
+  --der-bg: 224 40% 18%; /* #1C2540 */
+  --die: 329 82% 72%; /* #F27DBA */
+  --die-bg: 329 38% 18%; /* #3F1C2E */
+  --das: 145 50% 58%; /* #5EC98B */
+  --das-bg: 145 35% 15%; /* #193424 */
+  --ink: 250 12% 85%; /* #D6D4DD */
+  --shadow: 221 60% 3%; /* #03060C */
+}
