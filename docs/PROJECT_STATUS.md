@@ -7,13 +7,15 @@ Koralle, locked spec at `docs/branding/BRAND_SPEC.md`) is now scoped in
 audit + chrome/meta · B logo + icon pipeline · C deep surface sweep · D dark-mode design + premium
 polish) with a model recommendation per PR, a sanctioned-deviations register (the logo is locked,
 everything else may deviate subtly toward a premium finish), computed WCAG contrast findings, and a
-proposed permanent `check:contrast` gate. **Plan PRs A+B+C then SHIPPED the same session** (founder
-"go ahead with a", then "go ahead with b and c"): A = full token flip + designed dark theme +
-chrome/meta + the live `pnpm check:contrast` gate (42/42); B = the new logo mark (lowercase g on the
+proposed permanent `check:contrast` gate. **The ENTIRE plan then SHIPPED the same session** (PRs
+#593/#594/#595/#596, all squash-merged to `main`): A = full token flip + designed dark theme +
+chrome/meta + the live `pnpm check:contrast` CI gate; B = the new logo mark (lowercase g on the
 Himmelblau swipe, g outlined from Inter 800) + regenerated favicon/PWA/og assets via
 `scripts/branding/build-logo-assets.mjs`; C = deep surface sweep (Neuland game chrome, Üben map,
-domain buildings, landing flatten, der-distinctness). Only plan PR D (dark-mode design polish + docs
-language sweep) remains. Product name: **Genauly** (`genauly.de`)._
+domain buildings, landing flatten, der-distinctness); D = polish (streak surfaces → Koralle, dark
+muted-text hierarchy, StatCard tabular-nums, CLAUDE.md color-language sweep). **The rebrand is
+COMPLETE**; `BRAND_SPEC.md` records the final shipped values. Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -125,9 +127,16 @@ hardcoded-hex inventory is §2 of the plan):
   Nachtblau brand. Verified in-mission battle chrome, Spielen hub, der/die/das marks, flattened CTA.
 - **Gates (B+C):** typecheck ✓ · lint 0 errors ✓ · test:unit 219 ✓ · build ✓ · check:bundle 80.8 kB ✓
   · check:contrast 42/42 ✓.
-- **Next:** plan PR D (dark-mode design pass + typography/motion/reward polish + CLAUDE.md/DECISIONS.md
-  language sweep) on founder go. **PWA caveat:** hard-refresh before judging the live result; the
-  service worker serves the old build until then.
+- **PR D (polish + docs sweep) then shipped** (PR #596): streak surfaces → Koralle (the header
+  streak pill off `warning` onto `bg-reward-bg`/`text-reward`, + the Fortschritt "Aktuelle Serie"
+  StatCard via a new `reward` accent in the accentMap); dark `--muted-foreground` 76%→72% (secondary
+  text reads secondary, still ~8:1); `tabular-nums` added to the StatCard value; CLAUDE.md
+  color-language sweep (0 stale "brand indigo"/"reward-gold" references; DECISIONS.md deliberately
+  left as the historical record). Buttons already had pressed states + display tracking, no change
+  needed. **The brand plan is COMPLETE (all 4 PRs).**
+- **Open founder items:** re-upload the Google OAuth consent-screen logo (full-bleed variant, not in
+  repo) from the new mark; verify the live site after deploy (hard-refresh first, the service worker
+  serves the old build until then).
 
 **Handoff after session 132 (2026-07-19). Bibliothek mobile-filter bug-fixes + graph two-area color &
 "by topic + tighter" layout. Branch `claude/filter-scroll-badge-bugs-y75thb`, all shipped to `main`

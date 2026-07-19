@@ -8,7 +8,7 @@ interface StatCardProps {
   label: string;
   value: React.ReactNode;
   hint?: string;
-  accent?: "primary" | "accent" | "success" | "warning";
+  accent?: "primary" | "accent" | "success" | "warning" | "reward";
   className?: string;
 }
 
@@ -17,6 +17,8 @@ const accentMap = {
   accent: "bg-accent/10 text-accent-ink",
   success: "bg-success/15 text-success",
   warning: "bg-warning/15 text-warning",
+  // Koralle: streak / celebration stats (s133 rebrand).
+  reward: "bg-reward-bg text-reward",
 };
 
 export function StatCard({
@@ -38,7 +40,7 @@ export function StatCard({
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-sm font-medium text-muted-foreground">{label}</p>
-            <p className="mt-1 text-2xl font-semibold tracking-tight">{value}</p>
+            <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">{value}</p>
             {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
           </div>
           <div className={cn("rounded-lg p-2 sm:p-2.5", accentMap[accent])}>

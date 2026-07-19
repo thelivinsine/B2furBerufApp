@@ -1150,3 +1150,20 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   `src/features/dashboard/UebenPath.tsx` · `src/components/city/domain-buildings.tsx` ·
   `src/features/landing/LandingPage.tsx` · `src/index.css` · `CLAUDE.md` ·
   `docs/branding/BRAND_SPEC.md` · `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · PRs #594, #595
+- **Prompt 4 (verbatim):** `> go ahead `
+- **Response 4 (Fable 5):** Shipped brand plan PR D (#596), completing the rebrand. The PR A dark
+  theme survived its design review nearly intact; judged changes: dark `--muted-foreground` 76%→72%
+  (hierarchy: secondary text now reads secondary, still ~8:1 on the ground), streak surfaces moved
+  from warning/Butter to **Koralle** (header streak pill `bg-reward-bg`/`text-reward`/`fill-reward`,
+  Fortschritt "Aktuelle Serie" StatCard via a new `reward` accent), `tabular-nums` on the StatCard
+  value (the one numeric surface missing it), and the CLAUDE.md color-language sweep (brand
+  indigo→Nachtblau, reward-gold→Koralle; DECISIONS.md deliberately kept as history). Found already
+  done and left alone: button pressed states (`active:scale-[0.98]`), display `tracking-tight`,
+  Analytics/session tabular-nums. Gates green (typecheck, lint 0 errors, test:unit 219, build,
+  bundle 80.8 kB, contrast 42/42 incl. the retuned dark muted pairs). Verified the Koralle streak
+  pill light+dark and the dark Fortschritt hierarchy by screenshot. BRAND_SPEC flipped to FULLY
+  IMPLEMENTED; the plan doc records all four PRs (#593 Fable 5 · #594/#595 Opus 4.8 · #596 Fable 5).
+  Squash-merged to `main`.
+- **Artifacts (Prompt 4):** `src/components/layout/AppShell.tsx` · `src/components/shared/StatCard.tsx` ·
+  `src/features/analytics/Analytics.tsx` · `src/index.css` · `CLAUDE.md` · `docs/branding/BRAND_SPEC.md` ·
+  `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · `docs/PROJECT_STATUS.md` · PR #596

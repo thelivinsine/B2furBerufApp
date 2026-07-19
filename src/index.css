@@ -99,7 +99,10 @@ input:-webkit-autofill {
     --elevated: 250 18% 18%;
 
     --muted: 250 16% 22%;
-    --muted-foreground: 250 12% 76%;
+    /* Dimmed + slightly desaturated (76%→72%, PR D design pass) so secondary
+       text actually reads secondary against the 92%-lightness foreground;
+       still ~8:1 on the background, far above AA. */
+    --muted-foreground: 250 10% 72%;
 
     --border: 250 14% 26%;
     --input: 250 14% 28%;

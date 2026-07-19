@@ -365,7 +365,7 @@ export function Analytics() {
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             <StatCard icon={Zap} label="Gesamt-XP" value={xp.toLocaleString()} hint={`${totalSessions} Sitzungen`} />
-            <StatCard icon={Flame} label="Aktuelle Serie" value={`${streak} Tage`} hint={`Rekord: ${longestStreak}`} accent="warning" />
+            <StatCard icon={Flame} label="Aktuelle Serie" value={`${streak} Tage`} hint={`Rekord: ${longestStreak}`} accent="reward" />
             <StatCard icon={BookOpen} label="Vokabeln" value={`${masteryGroups.mastered}/${vocabulary.length}`} hint={`${pct(masteryGroups.mastered, vocabulary.length)}% gemeistert`} accent="success" />
             <StatCard icon={Trophy} label="Szenarien" value={`${scenariosDone.length}/${scenarios.length}`} hint={`${examsDone.length} Prüfungen`} accent="accent" />
           </div>

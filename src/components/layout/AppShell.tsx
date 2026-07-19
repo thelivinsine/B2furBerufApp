@@ -140,14 +140,16 @@ export function AppShell() {
             <div className="flex items-center gap-1.5 sm:gap-2">
               {/* Streak chip: flame + day count. The daily-goal figure lives on
                   the dashboard ring now, so the header carries the streak alone
-                  (no duplicated goal gauge). */}
+                  (no duplicated goal gauge). Koralle since the s133 rebrand:
+                  streak/celebration rides the reward tokens, warning stays a
+                  semantic state color. */}
               <div
-                className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-warning/10 px-3"
+                className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-reward-bg px-3"
                 role="img"
                 aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
               >
-                <Flame className={cn("h-4 w-4 text-warning", streak > 0 && "fill-warning/30")} />
-                <span className="text-sm font-bold tabular-nums text-warning">{streak}</span>
+                <Flame className={cn("h-4 w-4 text-reward", streak > 0 && "fill-reward/30")} />
+                <span className="text-sm font-bold tabular-nums text-reward">{streak}</span>
                 <span className="text-xs font-medium text-muted-foreground">
                   {streak === 1 ? "Tag" : "Tage"}
                 </span>
