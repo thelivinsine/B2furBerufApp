@@ -7,11 +7,13 @@ Koralle, locked spec at `docs/branding/BRAND_SPEC.md`) is now scoped in
 audit + chrome/meta · B logo + icon pipeline · C deep surface sweep · D dark-mode design + premium
 polish) with a model recommendation per PR, a sanctioned-deviations register (the logo is locked,
 everything else may deviate subtly toward a premium finish), computed WCAG contrast findings, and a
-proposed permanent `check:contrast` gate. **Plan PR A then SHIPPED the same session** (founder "go
-ahead with a"): the full token flip (warm Papier ground, Nachtblau primary, Himmelblau accent +
-`--accent-ink`, Koralle reward), the designed dark theme, nav/route/graph chrome, shell/manifest/
-prerender meta, and the live `pnpm check:contrast` CI gate (42/42 pairings pass). Logo + icons are
-UNCHANGED until plan PR B. Product name: **Genauly** (`genauly.de`)._
+proposed permanent `check:contrast` gate. **Plan PRs A+B+C then SHIPPED the same session** (founder
+"go ahead with a", then "go ahead with b and c"): A = full token flip + designed dark theme +
+chrome/meta + the live `pnpm check:contrast` gate (42/42); B = the new logo mark (lowercase g on the
+Himmelblau swipe, g outlined from Inter 800) + regenerated favicon/PWA/og assets via
+`scripts/branding/build-logo-assets.mjs`; C = deep surface sweep (Neuland game chrome, Üben map,
+domain buildings, landing flatten, der-distinctness). Only plan PR D (dark-mode design polish + docs
+language sweep) remains. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -105,9 +107,27 @@ hardcoded-hex inventory is §2 of the plan):
 - **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219 ✓ · build ✓ · check:bundle 80.8 kB ✓ ·
   check:contrast 42/42 ✓. Screenshots (light+dark × 390/1280) verified Praktisch, Theorie Karten +
   Graph, Fortschritt, Landing: warm ground + white cards + Nachtblau reads clean everywhere.
-- **Next:** plan PR B (logo + icon pipeline) on founder go; then PR C (game/map/buildings/landing
-  sweep) and PR D (dark-mode polish + docs language sweep). **PWA caveat:** hard-refresh before
-  judging the live result; the service worker serves the old build until then.
+- **PR B (logo + icon pipeline) then shipped** (PR #594): new mark = lowercase **g** on the
+  Himmelblau highlighter swipe on a Papier tile; the g is OUTLINED from **Inter 800** (the app's own
+  UI typeface, picked from a 5-candidate panel) into a real `<path>` via opentype.js.
+  **`scripts/branding/build-logo-assets.mjs`** is the one source of truth: rasterizes every asset
+  from the mark with Playwright Chromium (no `sharp` dep) — default logo + favicon-16/32/48
+  (transparent corners), apple-touch/pwa-192/512 (full-bleed opaque), maskable (inner 80%), and a new
+  Papier og-image (mark + Inter-800 wordmark + tagline). Founder action item: re-upload the OAuth
+  consent full-bleed logo variant (not in repo).
+- **PR C (deep surface sweep) then shipped** (PR #595): Neuland game chrome `#5b5be6`→Nachtblau across
+  all four welt files (`GAME_INDIGO`→`GAME_BLUE`; leather-backpack art + `GAME_OUT` kept; victory loot
+  already Koralle via the PR A token); Üben map route/Bahnhof→Nachtblau + MAP_LIGHT scenery tints
+  hue-shifted 245→221 at identical (founder-locked) lightness + MAP_DARK route→`#8AB0F9`; Büro
+  building→Nachtblau; landing step-chips + closing CTA band flattened `bg-accent-gradient`→flat
+  `bg-primary` (hero CTAs + "plateau." headline keep the gradient); **der token deepened to a cooler
+  cobalt** (hue 226, light `226 74% 48%` / dark `226 88% 76%`) so a der Wesen never reads as the
+  Nachtblau brand. Verified in-mission battle chrome, Spielen hub, der/die/das marks, flattened CTA.
+- **Gates (B+C):** typecheck ✓ · lint 0 errors ✓ · test:unit 219 ✓ · build ✓ · check:bundle 80.8 kB ✓
+  · check:contrast 42/42 ✓.
+- **Next:** plan PR D (dark-mode design pass + typography/motion/reward polish + CLAUDE.md/DECISIONS.md
+  language sweep) on founder go. **PWA caveat:** hard-refresh before judging the live result; the
+  service worker serves the old build until then.
 
 **Handoff after session 132 (2026-07-19). Bibliothek mobile-filter bug-fixes + graph two-area color &
 "by topic + tighter" layout. Branch `claude/filter-scroll-badge-bugs-y75thb`, all shipped to `main`

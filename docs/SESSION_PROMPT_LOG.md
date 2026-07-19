@@ -1123,3 +1123,30 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   `vite.config.ts` · `scripts/prerender-help.mjs` · `src/main.tsx` · 7 `text-accent` call-site
   files · `docs/branding/BRAND_SPEC.md` · `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · PR (see
   merge commit on `main`)
+- **Prompt 3 (verbatim):** `> go ahead with b and c`
+- **Response 3 (Opus 4.8):** Shipped brand plan PRs B and C as two PRs.
+  **PR B (#594) — logo + icon pipeline:** outlined the lowercase g from **Inter 800** (chosen from a
+  5-candidate panel rendered on the locked swipe — Inter 800/900, Manrope 800, Figtree 900, Nunito
+  900 — for wordmark cohesion with the app's Inter UI type + favicon-scale legibility) into a real
+  `<path>` via opentype.js. Wrote `scripts/branding/build-logo-assets.mjs` (dev tooling, not in the
+  app build): one source of truth for the swipe + outlined-g, rasterizing every `public/` asset with
+  Playwright Chromium (no sharp) — default logo + favicon-16/32/48 (transparent corners),
+  apple-touch/pwa-192/512 (full-bleed opaque), maskable (inner 80%), a new Papier og-image (mark +
+  Inter-800 wordmark + tagline + genauly.de plate), and the canonical
+  `preview/branding/genauly-logo-final.svg`. Verified on white/dark + iOS/circle mask sims and in the
+  app header/landing/sidebar.
+  **PR C (#595) — deep surface sweep:** Neuland game chrome `#5b5be6`→Nachtblau `#3D74ED` across all
+  four welt files (`GAME_INDIGO`→`GAME_BLUE`; leather-backpack amber art + `GAME_OUT` outline kept as
+  game props; victory loot already Koralle via PR A); Üben map route/Bahnhof→Nachtblau, MAP_LIGHT
+  scenery tints hue-shifted 245→221 at identical (founder-locked) lightness, MAP_DARK route→`#8AB0F9`;
+  Büro building→Nachtblau; landing step-chips + closing CTA band flattened to flat `bg-primary` (hero
+  CTAs + "plateau." headline keep the gradient per the discipline); der token deepened to a cooler
+  cobalt (light `226 74% 48%` / dark `226 88% 76%`) so a der Wesen never reads as the brand.
+  Gates green (typecheck, lint 0 errors, test:unit 219, build, bundle 80.8 kB, contrast 42/42).
+  Verified in-mission battle chrome, Spielen hub, Theorie der/die/das marks, flattened landing CTA.
+  Both squash-merged to `main`; docs (BRAND_SPEC, plan, PROJECT_STATUS, this log) updated.
+- **Artifacts (Prompt 3):** `scripts/branding/build-logo-assets.mjs` · `preview/branding/genauly-logo-final.svg` ·
+  `public/` (9 icon/og assets) · `src/features/welt/{stage,BattleView,MissionPlayer,scenes}.tsx` ·
+  `src/features/dashboard/UebenPath.tsx` · `src/components/city/domain-buildings.tsx` ·
+  `src/features/landing/LandingPage.tsx` · `src/index.css` · `CLAUDE.md` ·
+  `docs/branding/BRAND_SPEC.md` · `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · PRs #594, #595

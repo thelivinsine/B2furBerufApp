@@ -66,7 +66,7 @@ export const DOC_ICONS: Record<string, string> = {
 export const DOC_ICON_FALLBACK = docVertragUrl;
 
 /** Brand accents, mirroring the scene-7 mockup palette. */
-export const GAME_INDIGO = "#5b5be6";
+export const GAME_BLUE = "#3D74ED"; // Nachtblau (brand primary)
 export const GAME_AMBER = "#f3a64a";
 /** The sprite outline color: every pixel panel borders in it. */
 export const GAME_OUT = "#463c44";
@@ -195,7 +195,7 @@ export function SheetCard({
     <div className="relative">
       {name && (
         <span
-          className="absolute -top-3 left-3 z-10 border-2 bg-[#5b5be6] px-2 py-0.5 text-xs font-bold text-white"
+          className="absolute -top-3 left-3 z-10 border-2 bg-[#3D74ED] px-2 py-0.5 text-xs font-bold text-white"
           style={{ borderColor: GAME_OUT, borderRadius: 4 }}
         >
           {name}
@@ -206,7 +206,7 @@ export function SheetCard({
   );
 }
 
-/** Pixel button; primary = filled brand indigo (one loud accent per screen). */
+/** Pixel button; primary = filled Nachtblau (one loud accent per screen). */
 export function Pill({
   children,
   onClick,
@@ -229,7 +229,7 @@ export function Pill({
         "rounded-md border-2 px-4 py-2 text-sm font-semibold transition-all",
         HARD_SHADOW,
         "active:translate-y-[2px] active:shadow-none disabled:pointer-events-none disabled:opacity-50",
-        primary ? "bg-[#5b5be6] text-white" : "bg-[#fdfcf8] text-slate-700",
+        primary ? "bg-[#3D74ED] text-white" : "bg-[#fdfcf8] text-slate-700",
         className,
       )}
       style={{ borderColor: GAME_OUT }}

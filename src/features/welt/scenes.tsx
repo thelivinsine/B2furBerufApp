@@ -312,7 +312,7 @@ export function LoadoutView({
                 transition={{ repeat: Infinity, duration: 1.6, delay: i * 0.3 }}
                 className={cn(
                   "flex h-10 w-10 items-center justify-center rounded-md border-2 bg-white/95",
-                  asking?.id === s.id ? "border-[#5b5be6]" : "border-[#463c44]/60",
+                  asking?.id === s.id ? "border-[#3D74ED]" : "border-[#463c44]/60",
                 )}
               >
                 <img
@@ -342,7 +342,7 @@ export function LoadoutView({
             className="w-16 select-none"
             style={{ imageRendering: "pixelated" }}
           />
-          <span className="absolute -right-2 -top-2 rounded-full bg-[#5b5be6] px-1.5 py-0.5 text-[10px] font-bold text-white">
+          <span className="absolute -right-2 -top-2 rounded-full bg-[#3D74ED] px-1.5 py-0.5 text-[10px] font-bold text-white">
             {packedCount}/{scene.slots.length}
           </span>
         </button>
@@ -449,7 +449,7 @@ export function ListeningView({ scene, act, translate }: SceneViewProps & { scen
             <span className="text-xs font-bold text-slate-500">{scene.ticker.label}</span>
             <span className="font-mono text-lg font-bold text-amber-500">{scene.ticker.current}</span>
             <span className="text-xs text-slate-400">
-              Du: <span className="font-mono font-semibold text-[#5b5be6]">{scene.ticker.yours}</span>
+              Du: <span className="font-mono font-semibold text-[#3D74ED]">{scene.ticker.yours}</span>
             </span>
           </GameCard>
         )}
@@ -482,7 +482,7 @@ export function ListeningView({ scene, act, translate }: SceneViewProps & { scen
             <button
               type="button"
               onClick={() => setRevealed(true)}
-              className="text-xs font-medium text-[#5b5be6] hover:underline"
+              className="text-xs font-medium text-[#3D74ED] hover:underline"
             >
               Text anzeigen
             </button>
@@ -712,7 +712,7 @@ export function AutomatView({
         <GameCard className="space-y-3 p-4">
           <div className="flex items-center justify-between">
             <span
-              className="inline-flex items-center gap-1.5 border-2 bg-[#5b5be6] px-2 py-0.5 text-xs font-bold text-white"
+              className="inline-flex items-center gap-1.5 border-2 bg-[#3D74ED] px-2 py-0.5 text-xs font-bold text-white"
               style={{ borderColor: GAME_OUT, borderRadius: 4 }}
             >
               <Cpu className="h-3.5 w-3.5" />
@@ -877,7 +877,7 @@ export function FormView({ scene, act, translate }: SceneViewProps & { scene: Fo
                           autoCapitalize="none"
                           autoCorrect="off"
                           spellCheck={false}
-                          className="min-w-0 flex-1 rounded-md border-2 border-[#463c44] bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-[#5b5be6]"
+                          className="min-w-0 flex-1 rounded-md border-2 border-[#463c44] bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-[#3D74ED]"
                           placeholder="Antwort eintragen"
                         />
                         <Pill primary disabled={!input.trim()} onClick={trySubmit}>

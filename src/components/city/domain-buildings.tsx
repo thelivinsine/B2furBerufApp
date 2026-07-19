@@ -59,7 +59,7 @@ export interface DomainBuilding {
 }
 
 export const DOMAIN_BUILDINGS: DomainBuilding[] = [
-  { id: "buero", label: "Büro", color: "#5b5be6", domains: ["beruf"], themeIds: [] },
+  { id: "buero", label: "Büro", color: "#3D74ED", domains: ["beruf"], themeIds: [] },
   { id: "buergeramt", label: "Bürgeramt", color: "#64748b", domains: [], themeIds: ["behoerde"] },
   { id: "bank", label: "Bank", color: "#0ea5e9", domains: [], themeIds: ["bank"] },
   { id: "arztpraxis", label: "Arztpraxis", color: "#e11d48", domains: ["gesundheit"], themeIds: [] },
@@ -81,7 +81,7 @@ const glow = (lit: boolean, litOpacity: number) =>
 type Render = (c: string, lit: boolean) => ReactNode;
 
 const RENDERERS: Record<DomainBuildingId, Render> = {
-  // Büro — indigo office tower with a neon-cyan annex; a window grid glows.
+  // Büro — Nachtblau office tower with a neon-cyan annex; a window grid glows.
   buero: (c, lit) => (
     <>
       <rect x="3.4" y="2.6" width="9.2" height="14.6" rx="1.2" fill={c} />
