@@ -1,5 +1,19 @@
 # Brand identity exploration
 
+## Vol. VIII (session 127 cont., 2026-07-17) — Kit 1 final feinschliff
+
+Founder feedback on the Vol. VII Himmelblau pick, three tweaks in `genauly-identity-vol8.html`:
+- Both blues **~10–15% lighter**: Nachtblau `#2563EB → #3D74ED`, Himmelblau `#38BDF8 → #52C6F9`.
+- **Coral `#F0603F` added** to the palette; mapped to the `--reward` token so it shows in-app (streak /
+  reward), giving the cool two-blue system a warm counterpoint. Butter stays as a secondary warm swatch.
+- **Logo swipe extended** at the bottom (`L 54 40 L 13 44` → `L 54 45 L 13 49`, with the left round-cap
+  Q adjusted) so the highlighter fully covers the g's closed bowl; the descender still pokes out naturally.
+  Verified at 200px and 44px. The spec sheet shows a before/after of the mark.
+
+Single refined kit, previewed on the real app (`vol8-screens/k1-final.png`) + a component demo showing
+coral. Same token-swap method. Artifact published. **This is the likely spec to wire for real next.** No
+`src/` change yet.
+
 ## Vol. VII (session 127 cont., 2026-07-17) — Kit 1 recolored to the nav blues
 
 Founder tweak on the Kit 1 · Kobalt & Butter favorite: swap Kobalt for the **dark blue of the bottom
