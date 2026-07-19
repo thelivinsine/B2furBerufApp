@@ -1102,4 +1102,24 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   no `src/` change. Also aged the s131 handoff into the W29 archive per the doc-hygiene rule.
 - **Artifacts (Prompt 1):** `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` ·
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · PR (see merge commit on `main`)
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · PR #592
+- **Prompt 2 (verbatim):** `> go ahead with a`
+- **Response 2 (Fable 5):** Built and shipped plan PR A, the atomic brand flip. Token systems for
+  both themes in `src/index.css` (Papier ground, Nachtblau primary at `221 83% 54%`, Himmelblau
+  accent with ink pairing + new `--accent-ink`, Koralle reward at `11 82% 54%`, warm `--shadow`
+  `#22304F`; all deviations WCAG-driven and documented in the BRAND_SPEC status header),
+  `tailwind.config.ts` accent.ink + re-stopped accent-gradient + quieted mesh, the
+  `text-accent`→`text-accent-ink` sweep across 7 files, chrome alignment (`nav-items.ts`,
+  `route-icons.tsx` BRAND, `graphPalette.ts` beruf/professional → Nachtblau), shell/meta
+  (dual theme-color metas + no-JS shell in `index.html`, manifest `#3D74ED`/`#151320`,
+  `prerender-help.mjs`, `src/main.tsx` boot-error gradient), and the permanent
+  `scripts/check-contrast.mjs` gate wired into `validate.yml` (42/42 pairings pass). Gates all
+  green (typecheck, lint 0 errors, test:unit 219, build, bundle 80.8 kB). Playwright screenshots
+  light+dark × mobile+desktop verified Praktisch, Theorie (Karten + Graph), Fortschritt, Landing.
+  Marked PR A shipped in the plan + BRAND_SPEC. Squash-merged to `main`.
+- **Artifacts (Prompt 2):** `src/index.css` · `tailwind.config.ts` · `scripts/check-contrast.mjs` ·
+  `package.json` · `.github/workflows/validate.yml` · `src/components/layout/nav-items.ts` ·
+  `src/components/layout/route-icons.tsx` · `src/lib/graphPalette.ts` · `index.html` ·
+  `vite.config.ts` · `scripts/prerender-help.mjs` · `src/main.tsx` · 7 `text-accent` call-site
+  files · `docs/branding/BRAND_SPEC.md` · `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · PR (see
+  merge commit on `main`)

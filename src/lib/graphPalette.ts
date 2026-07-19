@@ -7,7 +7,7 @@
  * both graphs agree on domain colors (the Kollokationen graph reuses these).
  */
 export const DOMAIN_COLORS: Record<string, { light: string; dark: string }> = {
-  beruf: { light: "#5b5be6", dark: "#8a8af2" },
+  beruf: { light: "#3D74ED", dark: "#7AA5F8" },
   alltag: { light: "#0d9488", dark: "#2dd4bf" },
   gesundheit: { light: "#e11d48", dark: "#fb7185" },
   bildung: { light: "#d97706", dark: "#fbbf24" },
@@ -39,7 +39,7 @@ export const LIFE_AREAS: { id: LifeAreaId; titleDe: string }[] = [
 ];
 
 export const LIFE_AREA_COLORS: Record<LifeAreaId, { light: string; dark: string }> = {
-  professional: { light: "#5b5be6", dark: "#8a8af2" },
+  professional: { light: "#3D74ED", dark: "#7AA5F8" },
   personal: { light: "#0d9488", dark: "#2dd4bf" },
 };
 

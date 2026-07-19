@@ -7,8 +7,11 @@ Koralle, locked spec at `docs/branding/BRAND_SPEC.md`) is now scoped in
 audit + chrome/meta · B logo + icon pipeline · C deep surface sweep · D dark-mode design + premium
 polish) with a model recommendation per PR, a sanctioned-deviations register (the logo is locked,
 everything else may deviate subtly toward a premium finish), computed WCAG contrast findings, and a
-proposed permanent `check:contrast` gate. Implementation starts when the founder says go. Product
-name: **Genauly** (`genauly.de`)._
+proposed permanent `check:contrast` gate. **Plan PR A then SHIPPED the same session** (founder "go
+ahead with a"): the full token flip (warm Papier ground, Nachtblau primary, Himmelblau accent +
+`--accent-ink`, Koralle reward), the designed dark theme, nav/route/graph chrome, shell/manifest/
+prerender meta, and the live `pnpm check:contrast` CI gate (42/42 pairings pass). Logo + icons are
+UNCHANGED until plan PR B. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -89,7 +92,22 @@ hardcoded-hex inventory is §2 of the plan):
   token nudge, dual light/dark theme-color metas, and typography micro-polish. Risks in §6 include
   the accent-foreground semantic flip, PWA stale cache, and the Google OAuth consent-logo re-upload
   (founder action after PR B).
-- **No `src/` change was made.** Next session: run plan PR A on founder go.
+- **PR A was then built and shipped in the same session** (founder: "go ahead with a"). Everything
+  in plan PR A landed: `src/index.css` light+dark token systems (final values in the BRAND_SPEC
+  status header; deviations: primary `221 83% 54%`, warning `38 92% 46%`, reward `11 82% 54%`, new
+  `--accent-ink`), `tailwind.config.ts` (accent.ink, gradient re-stopped primary→`hsl(198 88% 40%)`
+  so white text survives, mesh dialed to a whisper), the `text-accent`→`text-accent-ink` sweep
+  (7 files), `nav-items.ts`/`route-icons.tsx` BRAND→`#3D74ED`, `graphPalette.ts`
+  beruf/professional→Nachtblau, `index.html` dual light/dark theme-color metas + no-JS shell retint,
+  `vite.config.ts` manifest (`#3D74ED`/`#151320`), `prerender-help.mjs` shell, `src/main.tsx`
+  boot-error gradient, and the new **`scripts/check-contrast.mjs`** (`pnpm check:contrast`, wired
+  into `validate.yml`): 42/42 designed token pairings pass AA in both themes.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219 ✓ · build ✓ · check:bundle 80.8 kB ✓ ·
+  check:contrast 42/42 ✓. Screenshots (light+dark × 390/1280) verified Praktisch, Theorie Karten +
+  Graph, Fortschritt, Landing: warm ground + white cards + Nachtblau reads clean everywhere.
+- **Next:** plan PR B (logo + icon pipeline) on founder go; then PR C (game/map/buildings/landing
+  sweep) and PR D (dark-mode polish + docs language sweep). **PWA caveat:** hard-refresh before
+  judging the live result; the service worker serves the old build until then.
 
 **Handoff after session 132 (2026-07-19). Bibliothek mobile-filter bug-fixes + graph two-area color &
 "by topic + tighter" layout. Branch `claude/filter-scroll-badge-bugs-y75thb`, all shipped to `main`

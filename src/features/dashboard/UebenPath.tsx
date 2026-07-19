@@ -424,7 +424,7 @@ export default function UebenPath() {
       >
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-muted-foreground">Kapitel 1 · {chapterTitle}</span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-accent">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/10 px-2.5 py-1 text-[11px] font-bold tabular-nums text-accent-ink">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
             {doneCount} / {kap1.length}
           </span>

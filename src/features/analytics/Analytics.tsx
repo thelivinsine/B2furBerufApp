@@ -519,7 +519,7 @@ export function Analytics() {
       <Card className="card-hover cursor-pointer" onClick={() => navigate("/sammlung")}>
         <CardContent className="flex items-center justify-between gap-4 p-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent-ink">
               <Boxes className="h-5 w-5" />
             </div>
             <div>

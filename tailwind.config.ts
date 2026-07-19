@@ -25,6 +25,9 @@ const config: Config = {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          // Text-safe Himmelblau: the accent itself is too light to read as
+          // text on light ground, so text/icon-on-tint call sites use this.
+          ink: "hsl(var(--accent-ink))",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
@@ -94,10 +97,15 @@ const config: Config = {
         glow: "0 0 0 1px hsl(var(--primary) / 0.12), 0 8px 30px hsl(var(--primary) / 0.18)",
       },
       backgroundImage: {
+        // Nachtblau → deep sky. The end stop is deliberately DARKER than the
+        // Himmelblau accent token: gradient buttons carry white text, and pure
+        // Himmelblau (65% lightness) would fail contrast at the light end.
         "accent-gradient":
-          "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)",
+          "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(198 88% 40%) 100%)",
+        // Dialed down for the flat brand (founder prefers flat): a whisper of
+        // the two blues on the warm Papier ground, not a visible wash.
         "mesh":
-          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.12) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.1) 0px, transparent 50%)",
+          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.07) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.06) 0px, transparent 50%)",
         // Dialog backdrop: a brand-tinted radial that's lighter directly behind
         // the card and deepens toward the screen edges (a subtle spotlight). Uses
         // the cool-slate `--shadow` token instead of flat black, so it adapts to
