@@ -558,11 +558,13 @@ export function FilterRail<T>({
       <div
         role="region"
         aria-label="Filter"
-        // Capped to ~55% of the viewport with the filters scrolling INSIDE
+        // Capped to ~45% of the viewport with the filters scrolling INSIDE
         // (founder, mobile): a flex column with a fixed header and one internal
-        // scroll region, so an open panel never swallows the whole screen.
+        // scroll region, so an open panel never swallows the whole screen. The
+        // cap was trimmed from 55dvh (~3-4 fewer lines on a phone) so the open
+        // panel leaves more of the list visible.
         className={cn(
-          "flex max-h-[55dvh] flex-col rounded-xl border border-border bg-muted shadow-soft",
+          "flex max-h-[45dvh] flex-col rounded-xl border border-border bg-muted shadow-soft",
           className,
         )}
       >
