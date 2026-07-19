@@ -1,17 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-19 (session 132). **Bibliothek mobile-filter fixes + graph two-area color &
-layout** (PRs #581/#582/#583/#584/#585/#589, all squash-merged to `main`): fixed the mobile filter's
-empty-scroll gap, made the mobile Filter badge count scope-dropdown selections (not just facet pills),
-made the open filter panel scroll away instead of sticking (out of the sticky header), capped that panel
-at 55dvh with internal scroll, and centered the go-to-top button. Both Bibliothek
-graphs now **color-code by TWO life areas** (Berufsleben/professional vs Privatleben/personal) instead
-of the five domains, and the Kollokationen graph uses the founder-picked **"by topic + tighter"** force
-layout (firmer per-topic pull, looser links) so topics read as distinct islands. Session 131 shipped
-Üben exercise-variety Phases 0–3. Session 127's brand is now **FINALIZED but not implemented** (Vol. VIII, Kit 1 · Nachtblau & Himmelblau
-+ Koralle): locked spec at **`docs/branding/BRAND_SPEC.md`**, all preview artifacts saved under
-`preview/branding/artifacts/`; wire it into `src/` only when the founder says go. Product name:
-**Genauly** (`genauly.de`)._
+_Last updated: 2026-07-19 (session 133). **Brand-kit modernization plan authored** (docs-only,
+no `src/` change): the implementation of the finalized s127 brand (Kit 1 · Nachtblau & Himmelblau +
+Koralle, locked spec at `docs/branding/BRAND_SPEC.md`) is now scoped in
+**`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`**: a four-PR sequence (A token flip + accent-role
+audit + chrome/meta · B logo + icon pipeline · C deep surface sweep · D dark-mode design + premium
+polish) with a model recommendation per PR, a sanctioned-deviations register (the logo is locked,
+everything else may deviate subtly toward a premium finish), computed WCAG contrast findings, and a
+proposed permanent `check:contrast` gate. Implementation starts when the founder says go. Product
+name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -67,6 +64,33 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 133 (2026-07-19). Brand-kit modernization PLAN authored (Fable 5), branch
+`claude/brand-kit-modernization-igqlnm`, docs-only, shipped to `main`.** The founder asked for the
+brand-spec implementation to be scoped with a robust plan and clear model recommendations per chunk,
+allowing subtle deviations everywhere EXCEPT the logo to reach a premium "top edutech" finish.
+Result: **`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`**, grounded in a fresh code survey (the full
+hardcoded-hex inventory is §2 of the plan):
+- **Four-PR sequence (A → {B, C} → D):** **A** = atomic token flip (`src/index.css` per spec §1) +
+  the accent-role audit (`--accent-foreground` flips white→ink; Himmelblau banned as text on light
+  ground) + nav/route/graph chrome + theme-color/manifest/prerender meta (**Fable 5**); **B** = logo
+  outline (g→`<path>`, founder picks the weight from a candidate panel) + the full favicon/PWA/
+  og-image asset pipeline, zero deviation allowed (**Opus 4.8**); **C** = deep sweep of the Neuland
+  game chrome, Üben city map (locked palettes re-hued only), domain buildings, landing flatten,
+  der-vs-Nachtblau distinctness check (**Opus 4.8**, or Sonnet 5 + founder screenshots); **D** = the
+  real dark-mode design pass + typography/motion/reward polish + CLAUDE.md/DECISIONS.md language
+  sweep (**Fable 5**).
+- **Contrast findings verified by computation (s133):** white on Nachtblau `#3D74ED` = 4.27:1 and
+  Nachtblau on Papier = 3.96:1 (both under the 4.5:1 small-text AA floor → sanctioned darkening
+  option ≈ `#2E6BEB` at 4.75:1); Himmelblau on white = 1.94:1 (never text); white on Koralle =
+  3.26:1 (reward pairs with ink, 5.28:1). A zero-dep `scripts/check-contrast.mjs` gate
+  (`pnpm check:contrast`, wired into `validate.yml`) is specced in plan §5.
+- **Sanctioned-deviations register (plan §4)** pre-approves: primary darkening for AA, a new
+  `--accent-ink`, ink-on-Koralle reward pairing, gradient demotion (founder prefers flat), a der
+  token nudge, dual light/dark theme-color metas, and typography micro-polish. Risks in §6 include
+  the accent-foreground semantic flip, PWA stale cache, and the Google OAuth consent-logo re-upload
+  (founder action after PR B).
+- **No `src/` change was made.** Next session: run plan PR A on founder go.
+
 **Handoff after session 132 (2026-07-19). Bibliothek mobile-filter bug-fixes + graph two-area color &
 "by topic + tighter" layout. Branch `claude/filter-scroll-badge-bugs-y75thb`, all shipped to `main`
 via PRs #581 / #582 / #583 / #584 / #585 / #589.** Multiple founder screenshots drove a run of
@@ -107,42 +131,7 @@ mobile-filter fixes on the Theorie browse tabs plus a graph redesign:
   but the founder chose topic+tighter instead. The preview artifact's variants still describe the
   earlier "by life area" options; it was a decision aid, not kept in sync post-decision.
 
-**Handoff after session 131 (2026-07-18). Üben exercise-variety plan authored (Fable 5) + fully built
-in 5 PRs (mostly Opus 4.8), branch `claude/ueben-exercise-variety-i59ry0`, all shipped to `main`.**
-The founder wanted custom Üben sets (the Bibliothek Üben button on a filtered tab) to play as varied
-exercises, not flip-cards, **without authoring content per set combination**. The variety machinery
-already existed (`engine/quiz.ts` auto-generates exercise types from the banks; `SessionPlayer` renders
-them) but was theme-keyed while `buildScopedSession` mapped custom-set items to flashcards. The plan
-`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` (5-option analysis in Appendix A, per-PR model map in §6,
-per-phase blow-by-blow) locks "sets are filters, exercises are per-item templates" and **Phases 0–3 are
-now COMPLETE** (only the deferred Phase 4 remains). Full per-PR detail is in the plan + the s131 prompt
-log; the shipped result, and the anchors not to regress:
-- **PR 1 (Phase 0/1):** generalized `buildThemeQuiz` → pool-based `buildPoolQuiz` (`/quiz` + composed
-  Pool 2 behavior-identical); `buildScopedSession` now interleaves recall cards with generated exercises
-  (Wörter + Kollokationen), capped at 2 appearances/item (`capBySource`); **FSRS guard** in
-  `SessionPlayer.onQuizResult` writes SRS only for ids that resolve in the vocab bank (also fixed the
-  latent Pool 2 bug where collocation questions wrote SRS under `c_*`).
-- **PR 2 (2a + 2e):** noun↔verb match grid (`collocationMatchQ`, reuses kind `"matching"`, `distinctCols`
-  dedupe) + Redemittel cloze (`redemittelCloze` kind, `buildRedemittelQuiz`).
-- **PR 3 (2b):** typed-cloze `typing` variant (`cloze` field, graduated words only) + `gradeTypedAny`
-  (accepts the surface form OR the base head).
-- **PR 4 (2c):** TTS listening pick (`listeningCloze` + `audioPrompt`), gated on
-  `ttsSupported() && speechEnabled`; `MCQView` audio branch.
-- **PR 5 (2d + Phase 3):** odd-one-out (`oddOneOut`, no sourceId → XP only) + `avoidRuns` (no 3-in-a-row
-  same kind). Every quiz kind labeled in `kindLabel`.
-- **Coverage gauge:** `pnpm report:exercise-coverage` (`scripts/report-exercise-coverage.mjs`) runs the
-  REAL builder across every theme (all levels × new/mature decks, seeded → deterministic) → visual
-  `docs/reports/exercise-coverage-report.md`. **Finding: theme-level variety is already exhausted
-  (20/20 🟢)**; the residual is cheap word-level polish (85 words with no self-example → no
-  cloze/typing/listening; 74 with no resolvable `related` → no odd-one-out). The plan's "Deciding when
-  to start Phase 4" section holds the rule: start Phase 4 only when that residual is closed AND a
-  learner-repetition/plateau signal appears (needs telemetry the report deliberately lacks).
-- **Gates (final):** typecheck ✓ · test:unit **219** ✓ · lint 0 errors ✓ · build ✓ · check:bundle
-  **80.8 kB** (main chunk unchanged across all 5 PRs) · lint:content ✓. Zero new content-bank rows.
-- **Next:** close the word-level residual (content edits, cheap) before considering Phase 4. **PWA
-  caveat:** the session surface is service-worker-cached; hard-refresh before judging the live result.
-
-_(Session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
+_(Session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VIII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
