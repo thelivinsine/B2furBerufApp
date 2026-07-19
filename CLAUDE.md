@@ -276,9 +276,10 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   to form glowing **islands**, tuned to look striking fully zoomed out (fit-to-all on open, cached
   radial glow sprites, curved gradient-tinted edges, vignette background, nouns = solid discs / verbs =
   rings). **Layout is the founder-picked "by topic + tighter" recipe (s132, 2026-07-19):** per-topic
-  centroids on a wide ring (`140 + N*35`), firm centroid pull (forceX/Y `0.28`), loose links
-  (`0.11`), roomy collision (`r+5`), so each topic settles into a distinct island rather than one
-  central tangle. The palette is shared via `lib/graphPalette.ts`; the selected-node card is bipartite
+  centroids on a wide ring (`140 + N*35`), firm centroid pull (forceX/Y `0.38`), high link tension
+  (`0.22`), tight collision (`r+3`), so each topic contracts into a compact island rather than one
+  central tangle (link/pull tightened in a s132 follow-up when the founder asked for tighter clusters).
+  The palette is shared via `lib/graphPalette.ts`; the selected-node card is bipartite
   (tap a noun → its verbs, tap a verb → its nouns) and has a **shape toggle beside its close button**
   (s118): the card is either a full-width bar along the bottom (`horizontal`, default) or a full-height
   panel down the right (`vertical`); toggling re-fits the constellation into the area the card leaves
