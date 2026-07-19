@@ -1,7 +1,7 @@
 # Project Status
 
 _Last updated: 2026-07-19 (session 132). **Bibliothek mobile-filter fixes + graph two-area color &
-layout** (PRs #581/#582/#583, all squash-merged to `main`): fixed the mobile filter's empty-scroll
+layout** (PRs #581/#582/#583/#584, all squash-merged to `main`): fixed the mobile filter's empty-scroll
 gap, made the mobile Filter badge count scope-dropdown selections (not just facet pills), and made the
 open filter panel scroll away instead of sticking (moved it out of the sticky header). Both Bibliothek
 graphs now **color-code by TWO life areas** (Berufsleben/professional vs Privatleben/personal) instead
@@ -89,11 +89,16 @@ Theorie browse tabs plus a graph redesign:
   collapse to these two on BOTH graphs; clustering still uses the finer theme grain.
 - **Kollokationen graph layout = founder-picked "by topic + tighter"** (from a published comparison
   artifact of 5 force recipes on the real 1,243-node data): per-topic centroids kept, but firmer pull
-  (forceX/Y `0.13→0.28`), looser links (`0.18→0.11`), roomier collision (`r+3→r+5`), wider ring
-  (`N*30→N*35`). Also thinned the default edge stroke (`1→0.55`) + lowered edge opacity earlier in the
-  session for less visual noise.
+  and tighter packing. **Final values after the s132 "tighter clusters" follow-up (PR #584):** forceX/Y
+  `0.38`, link tension `0.22`, collision `r+3`, wider ring (`N*35`); charge `-55/240`. (The intermediate
+  first pass was `0.28`/`0.11`/`r+5`.) Also thinned the default edge stroke (`1→0.55`) + lowered edge
+  opacity earlier in the session for less visual noise.
 - **Gates:** typecheck, `test:unit` 219, lint 0 errors, build all green. Comparison artifact (English,
   with a plain-language "how to read this" explainer) is a scratchpad HTML, not in the repo.
+- **Deploy gotcha (learned this session):** the #583 squash-merge did NOT fire the GitHub `push` event,
+  so neither `pages.yml` nor `validate.yml` ran and the commit showed no check. `pages.yml` has
+  `workflow_dispatch`, so a manual dispatch against `main` re-deploys the current HEAD; that recovered it.
+  If a merged commit shows no Actions run, dispatch `pages.yml` rather than assuming a build failure.
 - **Not done / open:** the two-level (domains-as-regions, topics-as-sub-islands) layout was previewed
   but the founder chose topic+tighter instead. The preview artifact's variants still describe the
   earlier "by life area" options; it was a decision aid, not kept in sync post-decision.
