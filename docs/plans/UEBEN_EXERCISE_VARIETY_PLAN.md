@@ -1,8 +1,8 @@
 # Üben Exercise Variety Plan
 
-_Created session 131 (2026-07-18). Status: **Phase 0 + Phase 1 SHIPPED** (PR 1, s131) · **Phase 2a +
-2e SHIPPED** (PR 2, s131). Remaining: Phase 2 rungs 2b (typed cloze) / 2c (listening) / 2d
-(odd-one-out) + Phase 3; Phase 4 deferred._
+_Created session 131 (2026-07-18). Status: **Phase 0 + Phase 1 SHIPPED** (PR 1) · **Phase 2a + 2e
+SHIPPED** (PR 2) · **Phase 2b SHIPPED** (PR 3), all s131. Remaining: Phase 2 rungs 2c (listening) /
+2d (odd-one-out) + Phase 3; Phase 4 deferred._
 _Founder ask: custom Üben sets (the Bibliothek "Üben" button on a filtered tab) should play as a
 varied exercise session, not a stack of flip-cards. Constraint: no per-set content authoring, the
 number of filter combinations is unbounded._
@@ -110,11 +110,20 @@ order (fun-per-effort, founder may reorder):
   duplicate React key). Wired into `buildPoolQuiz` difficulty 1 + 2, so it reaches the collocation
   scope, composed Pool 2, AND `/quiz`. The renderer's sub-line now falls back through `q.hint`, so the
   grid reads "Wähle links ein Nomen, dann rechts das passende Verb" instead of "…die Übersetzung".
-- **2b. Typed cloze (M):** production upgrade of the MCQ cloze: the blanked example sentence is the
-  prompt, the learner TYPES the headword. Implement as a variant of the existing `typing` block
-  (optional `clozePrompt` field) so the tolerant matcher (`engine/pronounce.ts`) + typing UI are
-  reused; grades FSRS like typing does. Gate to graduated cards (same
-  `TYPING_STABILITY_FLOOR` logic) so new words are never asked cold. Extend `tests/typing.test.ts`.
+- **2b. Typed cloze (M) — ✅ SHIPPED (PR 3, s131):** production upgrade of the MCQ cloze: the blanked
+  example sentence is the prompt, the learner TYPES the missing word. Implemented as a variant of the
+  `typing` SessionBlock (new optional `cloze: { prompt; answers }` field) so the typing UI + grader
+  are reused. `engine/typing.ts` gained `gradeTypedAny` (best verdict across targets): the blank
+  accepts BOTH the exact surface form in the sentence AND the base headword when they differ (a
+  sentence with "Anträge" accepts "Anträge" or "Antrag"), so neither inflection is marked wrong.
+  `typedClozeData`/`clozeTypingBlock` (`engine/session.ts`) find an example containing the headword,
+  blank the exact surface token, and store the full sentence for the reveal. Gated to graduated words
+  (`graduatedToTyping`): in the vocab scope a graduated word has ~50% chance of the cloze variant
+  instead of plain forward recall (never both), so a new word is never asked to be produced cold.
+  Grades FSRS via the vocab sourceId like any typing block (fires the gender reveal on correct nouns).
+  `TypingBlock` shows the blanked sentence + "Ergänze das fehlende Wort" / "Lücke" badge; the Anzeigen
+  give-up is unchanged. Tests: `gradeTypedAny` in `tests/typing.test.ts`, the graduated-only gate +
+  cloze shape in `tests/scopedSession.test.ts`.
 - **2c. Listening word (M):** TTS speaks the example sentence (`engine/speech.ts`), the learner
   picks the missing/heard word from 4 options. MCQ with an `audioPrompt` flag + a play button in
   `QuestionViews`; composer emits it only when the caller reports `ttsSupported()` (same pattern as
@@ -190,7 +199,7 @@ still fills its exercise half via translation/cloze/matching.
 | -- | ------- | ------ | ----------------- |
 | 1  | Phase 0 + Phase 1 (+ FSRS guard) + tests — ✅ SHIPPED (s131, Opus 4.8) | ~1 session | **Opus 4.8** |
 | 2  | 2a match grid + 2e Redemittel cloze — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Sonnet 5** |
-| 3  | 2b typed cloze | ~0.5 session | **Opus 4.8** |
+| 3  | 2b typed cloze — ✅ SHIPPED (s131, Opus 4.8) | ~0.5 session | **Opus 4.8** |
 | 4  | 2c listening word | ~0.5 session | **Opus 4.8** |
 | 5  | 2d odd-one-out + Phase 3 assertions | ~0.5 session | **Sonnet 5** |
 

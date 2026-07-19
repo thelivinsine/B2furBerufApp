@@ -25,7 +25,7 @@ import { quizXp } from "@/engine/quiz";
 import { XP } from "@/engine/scoring";
 import { listen, recognitionSupported, ttsSupported, type RecognitionHandle } from "@/engine/speech";
 import { matchesSpoken } from "@/engine/pronounce";
-import { gradeTyped, type TypedGrade } from "@/engine/typing";
+import { gradeTyped, gradeTypedAny, type TypedGrade } from "@/engine/typing";
 import { ReadingBlock } from "@/features/session/ReadingBlock";
 import { useCountdown } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
@@ -858,7 +858,7 @@ function TypingBlock({
 
   const submit = () => {
     if (evaluatedRef.current || !value.trim()) return;
-    grade(gradeTyped(value, block.de));
+    grade(block.cloze ? gradeTypedAny(value, block.cloze.answers) : gradeTyped(value, block.de));
   };
 
   const correct = outcome?.verdict === "correct";
@@ -872,14 +872,20 @@ function TypingBlock({
   return (
     <div className="space-y-5">
       <div className="flex justify-end">
-        <Badge variant="muted">Tippen</Badge>
+        <Badge variant="muted">{block.cloze ? "Lücke" : "Tippen"}</Badge>
       </div>
 
       <div className="flex min-h-[13rem] flex-col items-center justify-center gap-3 rounded-2xl border border-border bg-surface p-6 shadow-soft">
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Schreib es auf Deutsch:
+          {block.cloze ? "Ergänze das fehlende Wort:" : "Schreib es auf Deutsch:"}
         </p>
-        <p className="w-full break-words text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
+        {block.cloze ? (
+          <p className="w-full break-words text-center text-xl font-medium leading-relaxed sm:text-2xl">
+            {block.cloze.prompt}
+          </p>
+        ) : (
+          <p className="w-full break-words text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
+        )}
       </div>
 
       {outcome ? (

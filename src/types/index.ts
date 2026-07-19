@@ -465,6 +465,14 @@ export type SessionBlock =
       en: string;
       /** English example for context (the German sentence would reveal the answer). */
       example?: string;
+      /**
+       * Typed-cloze variant (2b): when set, the block shows `prompt` (an example
+       * sentence with the headword blanked) instead of the English, and the typed
+       * answer is graded against `answers` (the blanked surface form, plus the base
+       * headword when it differs). Only built for graduated cards, so a new word is
+       * never asked to be produced cold. Absent = plain typed forward recall.
+       */
+      cloze?: { prompt: string; answers: string[] };
     }
   | {
       kind: "reading";

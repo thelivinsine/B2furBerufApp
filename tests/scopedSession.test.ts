@@ -5,7 +5,8 @@ import { vocabulary, vocabById } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
 import { grammar } from "@/data/grammar";
-import type { MatchingQuestion, MCQQuestion, QuizQuestion, SessionBlock } from "@/types";
+import { gradeTypedAny } from "@/engine/typing";
+import type { MatchingQuestion, MCQQuestion, QuizQuestion, SessionBlock, SrsCard } from "@/types";
 
 const headword = (s: string) => s.replace(/^(der|die|das|sich)\s+/i, "").split(" ")[0].toLowerCase();
 
@@ -182,6 +183,37 @@ describe("buildScopedSession (s131 exercise variety)", () => {
       }
     }
     expect(sawGrid).toBe(true);
+  });
+
+  it("offers a typed cloze (2b) for graduated words, never for new ones", () => {
+    // A graduated card: reps >= 2 and interval/stability >= the typing floor (8).
+    const graduated: SrsCard = { ease: 2.5, interval: 20, reps: 5, due: "2020-01-01" };
+    const set = behoerdeIds.slice(0, 14);
+    const srs: Record<string, SrsCard> = {};
+    for (const id of set) srs[id] = graduated;
+
+    // Fresh learner (no graduated cards): no typed cloze block ever appears.
+    for (let i = 0; i < 5; i++) {
+      const fresh = buildScopedSession("vocab", set, { srs: {}, minutes: 10, difficulty: 2 });
+      expect(fresh.blocks.some((b) => b.kind === "typing" && "cloze" in b && b.cloze)).toBe(false);
+    }
+
+    // Graduated set: a typed cloze surfaces (probabilistic ~50%/word, so union
+    // over a few builds), and every cloze it produces is well-formed.
+    let sawCloze = false;
+    for (let i = 0; i < 6; i++) {
+      const plan = buildScopedSession("vocab", set, { srs, minutes: 10, difficulty: 2 });
+      for (const b of plan.blocks) {
+        if (b.kind !== "typing" || !("cloze" in b) || !b.cloze) continue;
+        sawCloze = true;
+        expect(b.cloze.prompt).toContain("___");
+        expect(b.cloze.answers.length).toBeGreaterThan(0);
+        expect(set).toContain(b.sourceId); // still a set word, graded to FSRS
+        // The intended answer grades correct against its own target list.
+        expect(gradeTypedAny(b.cloze.answers[0], b.cloze.answers).verdict).toBe("correct");
+      }
+    }
+    expect(sawCloze).toBe(true);
   });
 
   it("builds Redemittel clozes directly (2e): whole-word blank + real distractors", () => {
