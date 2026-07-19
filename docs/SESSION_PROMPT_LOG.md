@@ -509,6 +509,21 @@ as a continuation entry rather than editing the session-125 entry above).
 - **Artifacts (prompt 9):** `preview/branding/genauly-identity-vol7.html` (new) ·
   `preview/branding/vol7-screens/*.png` (3 strips, new) · `preview/branding/README.md` · artifact
   `a4b80dcf` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+- **Prompt 10 (verbatim):**
+  > I like your recommendation but I want both the suggested blues to be a little lighter.. loke 10-15%. Also add an additional color coral to the palette and generate a preview with this setup
+- **Prompt 11 (verbatim, same turn):**
+  > also, for the logo, the highlight seems to be slightly short and doesn't filly cover the closed circle part of the g. maybe extend the blue highlight by 1-2 pixels on the bottom and tht should fix it.
+- **Response:** Built **Vol. VIII**, a single refined Kit 1: both blues lightened ~10–15% (Nachtblau
+  `#2563EB→#3D74ED`, Himmelblau `#38BDF8→#52C6F9`), coral `#F0603F` added to the palette and mapped to
+  the `--reward` token so it shows in-app (streak/reward), and the logo swipe path extended at the bottom
+  (`L 54 40 L 13 44 Q 9 40 10 32` → `L 54 45 L 13 49 Q 9 45 10 34`) so it fully covers the g's closed
+  bowl (tested at 200px + 44px, before/after in the sheet). Authored
+  `preview/branding/genauly-identity-vol8.html` (logo before/after + palette + coral component demo +
+  real-app strip), strip in `preview/branding/vol8-screens/`, sent it, published artifact `0b98120a`.
+  Flagged this as the likely spec to wire for real next.
+- **Artifacts (prompts 10-11):** `preview/branding/genauly-identity-vol8.html` (new) ·
+  `preview/branding/vol8-screens/k1-final.png` (new) · `preview/branding/README.md` · artifact
+  `0b98120a` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
 
 ## Session 128 — 2026-07-18 — Gender-visuals research panel + Artikel-Visuals implementation plan
 

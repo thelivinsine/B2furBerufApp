@@ -401,10 +401,15 @@ don't bulldoze the already-designed pages/menus/icons).
   of butter). Delivered `preview/branding/genauly-identity-vol7.html` + 3 strips (`vol7-screens/`):
   **Himmelblau `#38BDF8`** (recommended) and **Cyan `#22D3EE`** (alternate) on the real app, plus
   the original for reference. Artifact `a4b80dcf`.
-- **Next:** the founder picks the light blue; that is the likely next real `src/` change (wire the
-  chosen two-blue palette into `src/index.css` + `tailwind.config.ts` light + dark, regenerate
-  logo/favicons/PWA icons from the mark, `pnpm build`, ship to `main`). Until then nothing
-  brand-related changes in the app.
+- **Vol. VIII:** the founder picked Himmelblau and asked for three tweaks. Delivered
+  `preview/branding/genauly-identity-vol8.html` + `vol8-screens/k1-final.png`: both blues ~10–15%
+  lighter (Nachtblau `#3D74ED`, Himmelblau `#52C6F9`), **coral `#F0603F` added** to the palette (mapped
+  to `--reward`/streak so it shows in-app), and the **logo swipe extended** to fully cover the g's
+  closed bowl (before/after in the sheet, verified at 200px + 44px). Artifact `0b98120a`.
+- **Next:** the **Vol. VIII palette is the front-runner** and the likely next real `src/` change (wire
+  it into `src/index.css` + `tailwind.config.ts` light + dark, regenerate logo/favicons/PWA icons from
+  the corrected mark, `pnpm build`, ship to `main`; the nav-mark colors already align since the palette
+  is drawn from them). Until then nothing brand-related changes in the app.
 
 **Handoff after session 128 (2026-07-18). Gender-visuals research panel + Artikel-Visuals
 implementation plan (Opus 4.8 → Fable 5), on branch `claude/visual-gender-indicators-gsox24`,
