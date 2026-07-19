@@ -1,5 +1,16 @@
 # Brand identity exploration
 
+> ## ✅ FINALIZED — Vol. VIII (Kit 1 · Nachtblau & Himmelblau + Koralle)
+>
+> The founder finalized this direction on 2026-07-19. **It is NOT implemented yet** (no `src/` change).
+> The locked, implementation-ready spec (exact tokens + HSL + logo + checklist) is
+> **`docs/branding/BRAND_SPEC.md`**. Canonical logo reference: `genauly-logo-final.svg`.
+> Wire it only when the founder says go.
+>
+> **All published artifacts are saved self-contained under `artifacts/`** (`genauly-vol[5-8]-artifact.html`;
+> Vol. IV is already self-contained as `genauly-identity-vol4.html`). The `genauly-identity-vol*.html`
+> files are the editable sources (they reference the `vol*-screens/` strips).
+
 ## Vol. VIII (session 127 cont., 2026-07-17) — Kit 1 final feinschliff
 
 Founder feedback on the Vol. VII Himmelblau pick, three tweaks in `genauly-identity-vol8.html`:

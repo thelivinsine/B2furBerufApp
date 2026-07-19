@@ -685,6 +685,10 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   popups too, adjusting only the radial center/stops if a different focal point is needed.
 
 ## Brand logo (locked 2026-06-08)
+- **Pending rebrand (finalized s127, 2026-07-19, NOT implemented):** the founder finalized a new brand
+  (Kit 1 · Nachtblau & Himmelblau + Koralle, a lowercase-g-on-highlighter mark + a two-blue-plus-coral
+  palette). The locked, implementation-ready spec is **`docs/branding/BRAND_SPEC.md`**; do NOT wire it
+  until the founder says go. Everything below describes the CURRENT (still-live) logo until then.
 - The **default logo is the rounded gradient "G" with transparent corners.** The canonical asset
   is **`public/genauly-default-logo-transparent-corners.png`**; every in-app logo `<img>` points
   at it (sign-in dialog, mobile header `AppShell`, desktop `Sidebar`, landing, onboarding,

@@ -406,10 +406,16 @@ don't bulldoze the already-designed pages/menus/icons).
   lighter (Nachtblau `#3D74ED`, Himmelblau `#52C6F9`), **coral `#F0603F` added** to the palette (mapped
   to `--reward`/streak so it shows in-app), and the **logo swipe extended** to fully cover the g's
   closed bowl (before/after in the sheet, verified at 200px + 44px). Artifact `0b98120a`.
-- **Next:** the **Vol. VIII palette is the front-runner** and the likely next real `src/` change (wire
-  it into `src/index.css` + `tailwind.config.ts` light + dark, regenerate logo/favicons/PWA icons from
-  the corrected mark, `pnpm build`, ship to `main`; the nav-mark colors already align since the palette
-  is drawn from them). Until then nothing brand-related changes in the app.
+- **FINALIZED (2026-07-19), not implemented:** the founder locked Vol. VIII as the brand and asked to
+  finalize + save everything without wiring it. Wrote the implementation-ready spec
+  **`docs/branding/BRAND_SPEC.md`** (exact token→HSL map, dark-mode starting point, logo path + the
+  "outline the g" note, and a step-by-step checklist), saved the canonical
+  `preview/branding/genauly-logo-final.svg`, and saved every published artifact self-contained under
+  `preview/branding/artifacts/genauly-vol[5-8]-artifact.html` (Vol. IV already self-contained).
+- **Next (only on founder go):** execute the `BRAND_SPEC.md` checklist — wire the `:root` tokens
+  (light) + tune `.dark`, regenerate logo/favicons/PWA icons from the corrected+outlined mark,
+  `pnpm build`, screenshot both themes, ship to `main`. The nav-mark colors already align (the palette
+  was drawn from them). Until then nothing brand-related changes in the app.
 
 **Handoff after session 128 (2026-07-18). Gender-visuals research panel + Artikel-Visuals
 implementation plan (Opus 4.8 → Fable 5), on branch `claude/visual-gender-indicators-gsox24`,

@@ -524,6 +524,23 @@ as a continuation entry rather than editing the session-125 entry above).
 - **Artifacts (prompts 10-11):** `preview/branding/genauly-identity-vol8.html` (new) ·
   `preview/branding/vol8-screens/k1-final.png` (new) · `preview/branding/README.md` · artifact
   `0b98120a` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`.
+- **Prompt 12 (verbatim):**
+  > provide the artifact again here in the chat
+- **Response:** Republished the Vol. VIII artifact at the same URL (`0b98120a`) to re-surface it.
+- **Prompt 13 (verbatim):**
+  > finalize this version but don't implement the changes yet. Document the session along with saving all the artifacts to the repo.
+- **Response:** Finalized Vol. VIII as the chosen brand **without any `src/` change**. Wrote the
+  implementation-ready spec `docs/branding/BRAND_SPEC.md` (exact token→HSL map for all 14 tokens,
+  dark-mode starting point, the logo swipe path + "outline the g" production note, and a step-by-step
+  implementation checklist), saved the canonical logo reference `preview/branding/genauly-logo-final.svg`,
+  and saved every published artifact self-contained under `preview/branding/artifacts/`
+  (`genauly-vol[5-8]-artifact.html`; Vol. IV already self-contained). Updated the branding README (a
+  FINALIZED banner), the `PROJECT_STATUS.md` `_Last updated_` block + the aged-out session-127 reference,
+  the W29 archive branding handoff (finalization + Next-on-go), and this log. Shipped the docs to `main`.
+- **Artifacts (prompts 12-13):** `docs/branding/BRAND_SPEC.md` (new) ·
+  `preview/branding/genauly-logo-final.svg` (new) · `preview/branding/artifacts/genauly-vol[5-8]-artifact.html`
+  (new) · `preview/branding/README.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · `docs/SESSION_PROMPT_LOG.md` · `CLAUDE.md`.
 
 ## Session 128 — 2026-07-18 — Gender-visuals research panel + Artikel-Visuals implementation plan
 
