@@ -90,14 +90,18 @@ export function ScrollTopButton({ show }: { show: boolean }) {
         <motion.button
           key="scrolltop"
           type="button"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 8 }}
+          // Keep x at -50% across every keyframe: framer writes an inline
+          // `transform` for the y animation, which would otherwise override the
+          // Tailwind `-translate-x-1/2` centering class and shift the button off
+          // center. Animating x here keeps the horizontal centering intact.
+          initial={{ opacity: 0, x: "-50%", y: 8 }}
+          animate={{ opacity: 1, x: "-50%", y: 0 }}
+          exit={{ opacity: 0, x: "-50%", y: 8 }}
           transition={{ duration: 0.15 }}
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
           aria-label="Nach oben"
           title="Nach oben"
-          className="fixed left-1/2 z-30 -translate-x-1/2 rounded-full border border-border bg-surface/95 p-2 text-muted-foreground shadow-elevated-soft backdrop-blur transition-colors hover:text-foreground lg:hidden bottom-[calc(3.9375rem+env(safe-area-inset-bottom)+3.5rem)]"
+          className="fixed left-1/2 z-30 rounded-full border border-border bg-surface/95 p-2 text-muted-foreground shadow-elevated-soft backdrop-blur transition-colors hover:text-foreground lg:hidden bottom-[calc(3.9375rem+env(safe-area-inset-bottom)+3.5rem)]"
         >
           <ArrowUp className="h-5 w-5" />
         </motion.button>

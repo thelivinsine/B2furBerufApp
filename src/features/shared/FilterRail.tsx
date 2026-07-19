@@ -558,13 +558,16 @@ export function FilterRail<T>({
       <div
         role="region"
         aria-label="Filter"
+        // Capped to ~55% of the viewport with the filters scrolling INSIDE
+        // (founder, mobile): a flex column with a fixed header and one internal
+        // scroll region, so an open panel never swallows the whole screen.
         className={cn(
-          "space-y-4 rounded-xl border border-border bg-muted p-3 shadow-soft",
+          "flex max-h-[55dvh] flex-col rounded-xl border border-border bg-muted shadow-soft",
           className,
         )}
       >
-        {/* Panel header: label on the left, reset + close icons top-right. */}
-        <div className="flex items-center justify-between gap-2">
+        {/* Panel header (fixed): label on the left, reset + close icons top-right. */}
+        <div className="flex shrink-0 items-center justify-between gap-2 p-3 pb-2">
           <span className="text-sm font-semibold text-primary">
             Filter{activeCount > 0 ? ` (${activeCount})` : ""}
           </span>
@@ -573,7 +576,10 @@ export function FilterRail<T>({
             {closeButton}
           </div>
         </div>
-        {filterBody}
+        {/* Scroll region: only this scrolls, so the panel stays capped. */}
+        <div className="slim-scrollbar min-h-0 flex-1 space-y-4 overflow-y-auto px-3 pb-3">
+          {filterBody}
+        </div>
       </div>
     );
   }
