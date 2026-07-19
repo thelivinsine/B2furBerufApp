@@ -8,10 +8,10 @@ at 55dvh with internal scroll, and centered the go-to-top button. Both Bibliothe
 graphs now **color-code by TWO life areas** (Berufsleben/professional vs Privatleben/personal) instead
 of the five domains, and the Kollokationen graph uses the founder-picked **"by topic + tighter"** force
 layout (firmer per-topic pull, looser links) so topics read as distinct islands. Session 131 shipped
-Üben exercise-variety Phases 0–3. Session 127's brand pick has narrowed (Vol. VIII): Kit 1 recolored to
-the bottom-nav blues, founder picked **Himmelblau** and it was refined (both blues ~10–15% lighter,
-coral added, logo swipe fixed) — that Vol. VIII palette is the front-runner to wire for real; handoff in
-the W29 archive. Product name: **Genauly** (`genauly.de`)._
+Üben exercise-variety Phases 0–3. Session 127's brand is now **FINALIZED but not implemented** (Vol. VIII, Kit 1 · Nachtblau & Himmelblau
++ Koralle): locked spec at **`docs/branding/BRAND_SPEC.md`**, all preview artifacts saved under
+`preview/branding/artifacts/`; wire it into `src/` only when the founder says go. Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -144,7 +144,7 @@ log; the shipped result, and the anchors not to regress:
 
 _(Session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VIII; the founder picked Kit 1 · Kobalt & Butter recolored to the bottom-nav blues and chose Himmelblau, refined in Vol. VIII to lighter blues + coral + a fixed logo swipe — the front-runner to wire for real, see the W29 archive for the wiring steps), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VIII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
 + P0/P1 fixes handoff, session 121's
 arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
