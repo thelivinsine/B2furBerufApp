@@ -68,125 +68,40 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 131 (2026-07-18). Üben exercise-variety: plan authored (Fable 5) THEN PR 1
-implemented (Opus 4.8), branch `claude/ueben-exercise-variety-i59ry0`, shipped to `main`.** The
-founder wanted custom Üben sets (the Bibliothek Üben button on a filtered tab) to play as varied
-exercises, not flip-cards, without authoring content per set combination. Analysis found the variety
-machinery already existed (`engine/quiz.ts` auto-generates ~10 exercise types from the banks;
-`SessionPlayer` renders all of them) but was theme-keyed while `buildScopedSession` mapped custom-set
-items to flashcards. The plan (`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md`, incl. the full 5-option
-analysis in Appendix A + per-PR model map in §6) locks the principle "sets are filters, exercises are
-per-item templates". **Shipped in PR 1 (Phase 0 + Phase 1):**
-- **Phase 0 — `buildPoolQuiz`:** `engine/quiz.ts`'s theme-keyed generator was generalized to take an
-  arbitrary `{ vocab, collocations }` pool. `buildThemeQuiz` is now a thin wrapper (full-bank
-  distractors + `includeGeneric: true`), so `/quiz` and composed-session Pool 2 are behavior-identical.
-  New opts: `includeGeneric` (theme-agnostic connector/relative/daWord banks, OFF for scoped sessions
-  per the content-pure rule), `vocabDistractors`/`collocationDistractors` (default: the pool if ≥ 4
-  else the full bank, so small sets still build 4-option MCQs), `themeId`. A shared `anyContent()`
-  fallback makes sparse/collocation-only pools still yield exercises at any difficulty.
-- **Phase 1 — varied `buildScopedSession`:** the Wörter + Kollokationen scopes now `interleave` recall
-  cards with `buildPoolQuiz` exercises (~50/50), capped at **2 appearances per item** (`capBySource`);
-  a vocab set also pulls collocation fill/word-order from collocations whose noun is a set word
-  (`headword` resolution). Redemittel + Grammatik scopes unchanged. `difficulty` now flows from the
-  learner's level (`SessionPlayer` passes `difficultyForLevel(level)`). Preview line shows the mix
-  ("n Karten · m Übungen").
-- **FSRS guard (correctness fix):** `SessionPlayer.onQuizResult` now only calls `captureLoot`
-  (→ `reviewVocab`) when the question's `sourceId` resolves in the vocab bank (`vocabById`).
-  Collocation-sourced questions (fill/word-order, `c_*` ids) award XP + combo only, so they no longer
-  create phantom SRS cards under collocation ids. This also fixes the same latent bug in the composed
-  session's Pool 2.
-- **Tests:** new `tests/scopedSession.test.ts` (pool-purity, no-generic-when-disabled, degenerate
-  pools, variety ≥ 3 kinds, 2-appearance cap, tiny-set degrade).
-
-**PR 2 (same session, Opus 4.8 — plan recommended Sonnet 5, founder had me continue on Opus): Phase 2a
-+ 2e.**
-- **2a noun→verb match grid:** `collocationMatchQ` (`engine/quiz.ts`) reuses the `MatchingQuestion`
-  renderer (kind stays `"matching"`), pairs = {noun, verb}. `distinctCols` dedupes on BOTH noun and
-  verb because `MatchingView` keys the left column by `pair.left` and the right buttons by
-  `pair.right` (a repeat either side = ambiguous + duplicate React key). Wired into `buildPoolQuiz`
-  difficulty 1 + 2, so it reaches the Kollokationen scope, composed Pool 2, and `/quiz`. `MatchingView`
-  sub-line now falls back through `q.hint` so the grid reads "Wähle links ein Nomen, dann rechts das
-  passende Verb".
-- **2e Redemittel cloze:** new MCQ kind `redemittelCloze` (added to `QuizKind` + `MCQQuestion.kind` +
-  `kindLabel`). `redemittelClozeQ` blanks the longest content word (≥ 4 chars, small function-word
-  stoplist, umlaut-safe whole-word regex; distractors from the full Redemittel bank).
-  `buildRedemittelQuiz` drives the Redemittel scope, which now interleaves cloze (~0.35) with cards.
-  Carries the `r_*` sourceId only for the appearance cap; the FSRS guard skips it → XP + combo only.
-- **Verified generated German** by dumping samples: clozes blank meaningful words with 4 distinct
-  real-word options ("Eine ___ wäre" → Möglichkeit), grids are clean unambiguous noun→verb pairs that
-  even show the accusative article ("den Aufenthaltstitel → verlängern"). No em dashes.
-- **Gates (after PR 2):** typecheck ✓ · test:unit **211** ✓ · lint 0 errors ✓ · build ✓ ·
-  check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
-
-**PR 3 (same session, Opus 4.8): Phase 2b typed cloze.**
-- **Typed cloze:** the `typing` SessionBlock gained an optional `cloze: { prompt; answers }`. When set,
-  `TypingBlock` shows a blanked example sentence ("Ergänze das fehlende Wort", "Lücke" badge) and the
-  learner types the missing word. `engine/typing.ts` gained `gradeTypedAny` (best verdict across
-  targets) so the blank accepts BOTH the exact surface form in the sentence AND the base headword when
-  they differ (a sentence with "Anträge" accepts "Anträge" or "Antrag").
-  `typedClozeData`/`clozeTypingBlock` (`engine/session.ts`) find an example containing the headword,
-  blank the exact token, and keep the full sentence for the reveal.
-- **Gate to graduated words:** only a `graduatedToTyping` word can become a cloze; in the Wörter scope
-  a graduated word has ~50% chance of the cloze variant instead of plain forward recall (never both),
-  so a new word is never asked to be produced cold. Grades FSRS via the vocab sourceId like any typing
-  block (fires the gender reveal on correct nouns).
-- **Verified generated German:** real B2 sentences blank cleanly ("Vor dem Umzug ins Ausland müssen Sie
-  sich ___" → abmelden; "Den ___ erhalten Sie innerhalb von vier Wochen" → Bescheid).
-- **Tests:** `gradeTypedAny` (`tests/typing.test.ts`); graduated-only gate + cloze shape
-  (`tests/scopedSession.test.ts`).
-- **Gates (after PR 3):** typecheck ✓ · test:unit **215** ✓ · lint 0 errors ✓ · build ✓ ·
-  check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
-
-**PR 4 (same session, Opus 4.8): Phase 2c listening word.**
-- **Listening cloze:** new MCQ kind `listeningCloze` + an `audioPrompt` field on `QuizQuestionBase`.
-  `listeningClozeQ` (`engine/quiz.ts`) reuses the cloze blank + distractors but carries NO hint (an EN
-  gloss would reveal the heard word) and stores the full sentence in `audioPrompt`. `buildListeningQuiz`
-  drives it. The Wörter scope emits it (~0.25 ratio) only when `buildScopedSession` gets
-  `listening: true`, which `SessionPlayer` sets to `ttsSupported() && speechEnabled`.
-- **Renderer:** `MCQView` gained an audio branch — an "Anhören" play button (autoplays once per
-  question via `useEffect` on `q.id`; the session is opened by a tap so the gesture requirement is met)
-  + the gapped frame as supporting text. Grades FSRS via the vocab sourceId. NOT wired into `/quiz` or
-  the composed session (that keeps its own reading-voicemail listening).
-- **Verified generated data:** "Den ___ stellt man beim Bundesamt" (spoken full) → Asylantrag;
-  "Die ___ endet am 31. Dezember" → Antragsfrist. Frame gapped, full sentence in audio, 4 options.
-- **Tests:** `buildListeningQuiz` shape + no-gloss + the TTS gate (`tests/scopedSession.test.ts`).
-- **Gates (after PR 4):** typecheck ✓ · test:unit **217** ✓ · lint 0 errors ✓ · build ✓ ·
-  check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
-
-**PR 5 (same session, Opus 4.8 — plan recommended Sonnet 5, founder had me continue on Opus): Phase 2d
-odd-one-out + Phase 3 variety guarantee. Completes Phases 0–3.**
-- **Odd-one-out:** new MCQ kind `oddOneOut` ("Ausreißer"). `oddOneOutQ` (`engine/quiz.ts`) anchors on
-  a set word, resolves 2 of its authored `related` terms to bank entries (the word-graph
-  `normalizeForm` is replicated in engine/ so it does not import features/; a `vocabResolver` built
-  once), and adds an outsider from a DIFFERENT theme as the answer. NO sourceId → XP + combo only,
-  never FSRS (it is category discrimination, not recall of one card). Null when < 2 related resolve.
-  `buildOddOneOutQuiz` drives it in the Wörter scope (~0.2 ratio).
-- **Phase 3 variety guarantee:** `avoidRuns` (`engine/session.ts`) greedily reorders the final block
-  list so no block kind runs 3-in-a-row when avoidable (kills the wall-of-flip-cards feel); preserves
-  the multiset, no-ops for single-kind (grammar) sessions. Applied to every scope before the preview.
-- **Verified generated data:** clean clusters with clear outsiders ({der Wohnsitz · der Nebenwohnsitz ·
-  **der Projektleiter** · der Hauptwohnsitz}; {die Baugenehmigung · **der Ausschlag** · das Bauamt · der
-  Antrag}).
-- **Tests:** odd-one-out shape + no-sourceId, and the no-3-in-a-row assertion (`tests/scopedSession.test.ts`).
-- **Gates (after PR 5):** typecheck ✓ · test:unit **219** ✓ · lint 0 errors ✓ · build ✓ ·
-  check:bundle **80.8 kB** (main chunk unchanged) · lint:content ✓.
-- **Plan status: Phases 0–3 COMPLETE.** The Wörter scope now offers recall cards, typed forward recall,
-  MCQ variety (translation/article/plural/cloze/matching), collocation fill/word-order, a typed cloze
-  for graduated words, a TTS listening pick, and an odd-one-out; Kollokationen has the match grid;
-  Redemittel has its cloze. **Only Phase 4 remains** (authored per-theme packs + build-time AI
-  generation through the verification pipeline; deferred until template variety feels exhausted). **PWA
+**Handoff after session 131 (2026-07-18). Üben exercise-variety plan authored (Fable 5) + fully built
+in 5 PRs (mostly Opus 4.8), branch `claude/ueben-exercise-variety-i59ry0`, all shipped to `main`.**
+The founder wanted custom Üben sets (the Bibliothek Üben button on a filtered tab) to play as varied
+exercises, not flip-cards, **without authoring content per set combination**. The variety machinery
+already existed (`engine/quiz.ts` auto-generates exercise types from the banks; `SessionPlayer` renders
+them) but was theme-keyed while `buildScopedSession` mapped custom-set items to flashcards. The plan
+`docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` (5-option analysis in Appendix A, per-PR model map in §6,
+per-phase blow-by-blow) locks "sets are filters, exercises are per-item templates" and **Phases 0–3 are
+now COMPLETE** (only the deferred Phase 4 remains). Full per-PR detail is in the plan + the s131 prompt
+log; the shipped result, and the anchors not to regress:
+- **PR 1 (Phase 0/1):** generalized `buildThemeQuiz` → pool-based `buildPoolQuiz` (`/quiz` + composed
+  Pool 2 behavior-identical); `buildScopedSession` now interleaves recall cards with generated exercises
+  (Wörter + Kollokationen), capped at 2 appearances/item (`capBySource`); **FSRS guard** in
+  `SessionPlayer.onQuizResult` writes SRS only for ids that resolve in the vocab bank (also fixed the
+  latent Pool 2 bug where collocation questions wrote SRS under `c_*`).
+- **PR 2 (2a + 2e):** noun↔verb match grid (`collocationMatchQ`, reuses kind `"matching"`, `distinctCols`
+  dedupe) + Redemittel cloze (`redemittelCloze` kind, `buildRedemittelQuiz`).
+- **PR 3 (2b):** typed-cloze `typing` variant (`cloze` field, graduated words only) + `gradeTypedAny`
+  (accepts the surface form OR the base head).
+- **PR 4 (2c):** TTS listening pick (`listeningCloze` + `audioPrompt`), gated on
+  `ttsSupported() && speechEnabled`; `MCQView` audio branch.
+- **PR 5 (2d + Phase 3):** odd-one-out (`oddOneOut`, no sourceId → XP only) + `avoidRuns` (no 3-in-a-row
+  same kind). Every quiz kind labeled in `kindLabel`.
+- **Coverage gauge:** `pnpm report:exercise-coverage` (`scripts/report-exercise-coverage.mjs`) runs the
+  REAL builder across every theme (all levels × new/mature decks, seeded → deterministic) → visual
+  `docs/reports/exercise-coverage-report.md`. **Finding: theme-level variety is already exhausted
+  (20/20 🟢)**; the residual is cheap word-level polish (85 words with no self-example → no
+  cloze/typing/listening; 74 with no resolvable `related` → no odd-one-out). The plan's "Deciding when
+  to start Phase 4" section holds the rule: start Phase 4 only when that residual is closed AND a
+  learner-repetition/plateau signal appears (needs telemetry the report deliberately lacks).
+- **Gates (final):** typecheck ✓ · test:unit **219** ✓ · lint 0 errors ✓ · build ✓ · check:bundle
+  **80.8 kB** (main chunk unchanged across all 5 PRs) · lint:content ✓. Zero new content-bank rows.
+- **Next:** close the word-level residual (content edits, cheap) before considering Phase 4. **PWA
   caveat:** the session surface is service-worker-cached; hard-refresh before judging the live result.
-
-**Post-PR-5 (same session): exercise-coverage gauge.** Added `pnpm report:exercise-coverage`
-(`scripts/report-exercise-coverage.mjs`) to answer "how do we know variety is exhausted?" objectively.
-It runs the REAL session builder across every theme (all CEFR levels × new/mature decks, seeded →
-deterministic) and writes a visual, plain-language `docs/reports/exercise-coverage-report.md`: a
-per-topic variety count + status (🟢/🟡/🔴), a full topic×type matrix, and the **word-level residual**
-(85 words with no self-referencing example → no cloze/typing/listening; 74 with no resolvable
-`related` → no odd-one-out). Finding: **theme-level variety is already exhausted (20/20 🟢)**; the
-residual is cheap content polish. Decision rule (in the plan's new "Deciding when to start Phase 4"
-section): start Phase 4 only when the word-level residual is closed AND a learner-repetition/plateau
-signal appears (needs telemetry the report deliberately lacks). No gate; re-run after content edits.
 
 **Handoff after session 130 (2026-07-18). Data-architecture review + P0/P1 integrity fixes (Fable 5),
 branch `claude/app-data-management-guide-tcmz3j`, shipped to `main`.** The founder asked how the

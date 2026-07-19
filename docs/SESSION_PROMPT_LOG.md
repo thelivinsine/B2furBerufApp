@@ -894,3 +894,14 @@ from 126 to 128.)
 - **Artifacts (Prompts 10–12):** `scripts/report-exercise-coverage.mjs` (new) ·
   `docs/reports/exercise-coverage-report.md` (new, generated) · `package.json` · `CLAUDE.md` ·
   `docs/plans/UEBEN_EXERCISE_VARIETY_PLAN.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 13 (verbatim):**
+  > document the session
+- **Response 13 (Opus 4.8):** Session-close documentation pass. Verified both `PROJECT_STATUS.md` and
+  this log are complete/consistent (all 12 prior prompts captured with responses + artifacts; two
+  handoffs held per the doc-hygiene rule, s129 already archived to W29). Fixed the one stale spot the
+  variety work left: added a concise "Bibliothek Üben sets are auto-varied (s131)" note to the
+  `CLAUDE.md` session-engine section (the new builders, the FSRS guard, the 2-appearance cap,
+  `avoidRuns`, and the `pnpm report:exercise-coverage` gauge) so future sessions discover it. Condensed
+  the s131 status handoff (it had grown to the 250-line ceiling from live per-PR appends) into a tight
+  summary pointing at the plan + this log for detail, bringing the file to 165 lines. No code touched.
+- **Artifacts (Prompt 13):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
