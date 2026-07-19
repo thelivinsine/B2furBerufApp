@@ -3,6 +3,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/shared/Logo";
 
 export type Lang = "de" | "en";
 
@@ -48,11 +49,7 @@ export function LegalChrome({
           onClick={() => navigate("/welcome")}
           className="flex items-center gap-2.5 text-left"
         >
-          <img
-            src="/genauly-default-logo-transparent-corners.png"
-            alt=""
-            className="h-9 w-9 rounded-lg shadow-glow"
-          />
+          <Logo className="h-9 w-9" />
           <span className="text-lg font-semibold tracking-tight">Genauly</span>
         </button>
         <Button variant="ghost" onClick={handleBack} className="gap-1.5">

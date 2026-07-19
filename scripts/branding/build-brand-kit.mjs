@@ -37,8 +37,6 @@ for (const d of ["logo", "color", "type", "icons", "social", "previews"]) {
 const PAPIER = "#FAF6EC";
 const HIMMELBLAU = "#52C6F9";
 const TINTE = "#1C1A24";
-const NACHTBLAU = "#3D74ED";
-const KORALLE = "#F0603F";
 const SWIPE = "M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z";
 const G_PATH =
   "M31.50 56.06Q28.50 56.06 26.27 55.31Q24.03 54.55 22.65 53.19Q21.26 51.84 20.85 50.06L27.07 48.78Q27.27 49.40 27.83 49.92Q28.38 50.45 29.28 50.76Q30.19 51.08 31.46 51.08Q33.65 51.08 34.83 50.10Q36.01 49.11 36.01 47.06L36.01 43L35.46 43Q35.05 44.03 34.24 44.87Q33.43 45.71 32.18 46.20Q30.94 46.69 29.24 46.69Q26.72 46.69 24.64 45.51Q22.56 44.33 21.31 41.86Q20.05 39.39 20.05 35.54Q20.05 31.52 21.35 28.91Q22.64 26.31 24.72 25.05Q26.80 23.79 29.22 23.79Q31.05 23.79 32.35 24.40Q33.65 25.02 34.50 25.99Q35.35 26.96 35.78 28.01L35.99 28.01L35.99 24.07L43.06 24.07L43.06 46.49Q43.06 49.65 41.60 51.78Q40.13 53.91 37.53 54.99Q34.92 56.06 31.50 56.06M31.68 41.44Q33.06 41.44 34.02 40.75Q34.98 40.05 35.50 38.70Q36.01 37.36 36.01 35.52Q36.01 33.63 35.50 32.25Q34.98 30.88 34.03 30.13Q33.08 29.38 31.68 29.38Q30.31 29.38 29.35 30.15Q28.40 30.92 27.91 32.30Q27.42 33.67 27.42 35.52Q27.42 37.36 27.91 38.69Q28.40 40.03 29.35 40.73Q30.31 41.44 31.68 41.44";
@@ -46,9 +44,13 @@ const G_PATH =
 const svg = (vb, w, h, body) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="${w}" height="${h}">${body}</svg>\n`;
 
-// Mark artwork (swipe + g) in the 64-unit space.
-const MARK = `<path d="${SWIPE}" fill="${HIMMELBLAU}" transform="rotate(-3 32 32)"/><path d="${G_PATH}" fill="${TINTE}"/>`;
-const markTile = () => `<rect width="64" height="64" rx="14" fill="${PAPIER}"/>${MARK}`;
+// Mark artwork (swipe + g) in the 64-unit space. The LOGO is tile-less
+// (transparent, no tile); the g adapts to the ground. `markTiled` (Papier tile)
+// is kept only for the app-icon reference, not the logo.
+const markG = (g) => `<path d="${SWIPE}" fill="${HIMMELBLAU}" transform="rotate(-3 32 32)"/><path d="${G_PATH}" fill="${g}"/>`;
+const MARK = markG(TINTE); // tile-less light (ink g)
+const MARK_DARK = markG(PAPIER); // tile-less dark (Papier g)
+const markTiled = () => `<rect width="64" height="64" rx="14" fill="${PAPIER}"/>${markG(TINTE)}`; // app-icon tile only
 
 // Wordmark normalized so its cap-top sits at y=0, left edge at x=0.
 // After translate(-x1,-y1): width = x2-x1, height = y2-y1, baseline at 100-y1.
@@ -58,8 +60,11 @@ const wordmark = (fill) =>
   `<g transform="translate(${-WORDMARK_BBOX.x1} ${-WORDMARK_BBOX.y1})"><path d="${WORDMARK_PATH}" fill="${fill}"/></g>`;
 
 // ---- LOGO ----
-// mark (icon tile)
-writeFileSync(join(KIT, "logo/mark.svg"), svg("0 0 64 64", 256, 256, markTile()));
+// The logo is tile-less + transparent. mark = light (ink g), mark-dark = dark
+// (Papier g). The Papier-tiled version is only the app-icon reference.
+writeFileSync(join(KIT, "logo/mark.svg"), svg("0 0 64 64", 256, 256, MARK));
+writeFileSync(join(KIT, "logo/mark-dark.svg"), svg("0 0 64 64", 256, 256, MARK_DARK));
+writeFileSync(join(KIT, "logo/app-icon-tile.svg"), svg("0 0 64 64", 256, 256, markTiled()));
 // mono marks (single color, no tile): the swipe is filled and the g is KNOCKED
 // OUT as negative space (a mask), so both elements stay legible in one ink.
 // Reproduces the two-tone figure/ground with a single fill on any background.
@@ -79,7 +84,7 @@ writeFileSync(join(KIT, "logo/wordmark-white.svg"), svg(`0 0 ${WM_W} ${WM_H}`, M
 // to the tile's optical center.
 const capH = 100 - WORDMARK_BBOX.y1; // baseline distance from cap-top ~73.73
 const kH = 40 / capH; // scale so cap-height = 40
-const wmWs = WM_W * kH, wmHs = WM_H * kH;
+const wmWs = WM_W * kH;
 const GAP = 22;
 const wmX = 64 + GAP;
 const wmY = 32 - 20; // cap-top so the cap block centers on tile mid (y=32)
@@ -88,8 +93,8 @@ const lockupH = (wmFill, textFill) => {
   return svg(`0 0 ${totalW} 64`, totalW, 64,
     `${wmFill}<g transform="translate(${wmX} ${wmY}) scale(${kH.toFixed(4)})">${wordmark(textFill)}</g>`);
 };
-writeFileSync(join(KIT, "logo/lockup-horizontal.svg"), lockupH(markTile(), TINTE));
-writeFileSync(join(KIT, "logo/lockup-horizontal-white.svg"), lockupH(markTile(), "#FFFFFF"));
+writeFileSync(join(KIT, "logo/lockup-horizontal.svg"), lockupH(MARK, TINTE));
+writeFileSync(join(KIT, "logo/lockup-horizontal-white.svg"), lockupH(markG("#FFFFFF"), "#FFFFFF"));
 
 // Stacked lockup: tile centered on top, wordmark centered beneath.
 const kS = 30 / capH; // smaller wordmark for the stack
@@ -102,7 +107,7 @@ const wmYs = 64 + stackGap;
 const stackH = Math.ceil(wmYs + wmHss);
 writeFileSync(join(KIT, "logo/lockup-stacked.svg"),
   svg(`0 0 ${stackW} ${stackH}`, stackW, stackH,
-    `<g transform="translate(${tileX.toFixed(2)} 0)">${markTile()}</g><g transform="translate(${wmXs.toFixed(2)} ${wmYs}) scale(${kS.toFixed(4)})">${wordmark(TINTE)}</g>`));
+    `<g transform="translate(${tileX.toFixed(2)} 0)">${MARK}</g><g transform="translate(${wmXs.toFixed(2)} ${wmYs}) scale(${kS.toFixed(4)})">${wordmark(TINTE)}</g>`));
 
 // Clear-space + min-size guide: mark with a padding frame = 0.25 tile all round.
 const pad = 16; // 0.25 * 64
@@ -111,7 +116,7 @@ writeFileSync(join(KIT, "logo/clearspace.svg"),
     `<rect x="${-pad}" y="${-pad}" width="${64 + pad * 2}" height="${64 + pad * 2}" fill="#F0E9D8"/>` +
     `<rect x="0" y="0" width="64" height="64" fill="none" stroke="#3D74ED" stroke-width="0.5" stroke-dasharray="2 2"/>` +
     `<rect x="${-pad}" y="${-pad}" width="${64 + pad * 2}" height="${64 + pad * 2}" fill="none" stroke="#B9B2A0" stroke-width="0.5" stroke-dasharray="3 3"/>` +
-    markTile()));
+    MARK));
 
 // ---- COLOR: parse tokens from src/index.css ----
 const css = readFileSync(join(root, "src/index.css"), "utf8");
@@ -200,7 +205,8 @@ writeFileSync(join(KIT, "type/typography.svg"), svg("0 0 820 440", 820, 440, typ
 
 // ---- ICONS (copy the shipped raster set) ----
 const ICONS = [
-  "genauly-default-logo-transparent-corners.png",
+  "genauly-logo.png",
+  "genauly-logo-dark.png",
   "favicon-16.png", "favicon-32.png", "favicon-48.png",
   "apple-touch-icon.png", "pwa-192x192.png", "pwa-512x512.png",
   "pwa-maskable-512x512.png",
@@ -249,7 +255,7 @@ if (chromium) {
       <div class="card"><span class="lbl">WORDMARK</span><img src="logo/wordmark.svg" width="240"></div>
       <div class="card"><span class="lbl">HORIZONTAL LOCKUP</span><img src="logo/lockup-horizontal.svg" width="300"></div>
       <div class="card"><span class="lbl">STACKED LOCKUP</span><img src="logo/lockup-stacked.svg" width="150"></div>
-      <div class="card dark"><span class="lbl">ON DARK</span><div class="row"><img src="logo/mark.svg" width="64"><img src="logo/wordmark-white.svg" width="220"></div></div>
+      <div class="card dark"><span class="lbl">ON DARK</span><div class="row"><img src="logo/mark-dark.svg" width="64"><img src="logo/wordmark-white.svg" width="220"></div></div>
       <div class="card"><span class="lbl">MONO</span><div class="row"><img src="logo/mark-mono-ink.svg" width="64"><img src="logo/clearspace.svg" width="120"></div></div>
     </div>
   </body></html>`;

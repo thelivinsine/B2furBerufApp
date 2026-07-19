@@ -49,6 +49,13 @@ function fullBleedSvg(k = 0.82) {
   const t = 32 - 32 * k;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="${PAPIER}"/><g transform="translate(${t} ${t}) scale(${k})">${MARK}</g></svg>`;
 }
+/** Tile-less in-app logo (transparent, NO tile): just the swipe + g. The g
+ * adapts to the ground — Tinte on light, Papier on dark — so the mark reads on
+ * any surface. This is the in-app <img> logo (header/sidebar/dialog/landing);
+ * the OS/browser icons above keep their tile. */
+function tilelessSvg(gColor) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path d="${SWIPE}" fill="${HIMMELBLAU}" transform="rotate(-3 32 32)"/><path d="${G_PATH}" fill="${gColor}"/></svg>`;
+}
 /** Canonical committed SVG (256 default render box). */
 function canonicalSvg() {
   return `<!-- Genauly brand mark (Kit 1, BRAND_SPEC.md). The g is OUTLINED
@@ -90,10 +97,16 @@ function ogHtml(interWoffB64) {
 const ROUNDED = roundedSvg();
 const FULLBLEED = fullBleedSvg(0.82);
 const MASKABLE = fullBleedSvg(0.62); // mark within inner ~80% safe zone
+const TILELESS_LIGHT = tilelessSvg(TINTE); // in-app logo on light grounds
+const TILELESS_DARK = tilelessSvg(PAPIER); // in-app logo on dark grounds
 
-// [file, size, svg]
+// [file, size, svg, transparent]
 const ICONS = [
-  ["genauly-default-logo-transparent-corners.png", 512, ROUNDED, true],
+  // In-app logo: tile-less, transparent, g adapts to the theme.
+  ["genauly-logo.png", 512, TILELESS_LIGHT, true],
+  ["genauly-logo-dark.png", 512, TILELESS_DARK, true],
+  // Browser tab + OS icons keep their Papier tile (transparency shows black on
+  // OS masks; a bare mark vanishes on a themed browser tab).
   ["favicon-16.png", 16, ROUNDED, true],
   ["favicon-32.png", 32, ROUNDED, true],
   ["favicon-48.png", 48, ROUNDED, true],

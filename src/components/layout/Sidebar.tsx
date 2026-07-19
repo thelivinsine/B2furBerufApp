@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { navItems } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
+import { Logo } from "@/components/shared/Logo";
 
 export function Sidebar({
   onNavigate,
@@ -21,7 +22,7 @@ export function Sidebar({
         className="mb-4 flex items-center gap-2.5 rounded-xl px-2 py-2 transition-colors hover:bg-muted/60"
         aria-label="Zur Startseite"
       >
-        <img src="/genauly-default-logo-transparent-corners.png" alt="" className="h-9 w-9 rounded-lg shadow-glow" />
+        <Logo className="h-9 w-9" />
         <div className="leading-tight">
           <p className="text-sm font-semibold tracking-tight">Genauly</p>
           <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>

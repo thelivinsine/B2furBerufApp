@@ -1194,6 +1194,40 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
 - **Artifacts (Prompts 5–7):** `brand-kit/` (27 files) · `scripts/branding/build-brand-kit.mjs` ·
   `scripts/branding/wordmark-data.mjs` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
   `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 8 (verbatim):** `> for the dark mode logo, why can't you use the same blue for the highlight but white for the letter g?`
+- **Response 8 (Opus 4.8):** Rendered the option rather than asserting: white-g + Himmelblau swipe on
+  dark actually works (the descender reads on the dark ground; the bowl-on-swipe contrast is modest
+  but legible at logo size). Explained the app was using ONE universal Papier-tile mark, not a
+  theme variant. Offered A (tile-less white g) vs B (dark sticker tile + white g); founder picked B.
+- **Prompt 9 (verbatim):** `> the white g looks too white.m can you look for a lighter shade and provide some previews?`
+- **Response 9 (Opus 4.8):** Rendered 6 g shades on the dark tile (pure white → Papier cream →
+  off-whites → grey-lavender → steel blue) and sent the comparison; asked which to use, recommending
+  Papier `#FAF6EC`. Founder replied "[No preference]", so I took the recommendation.
+- **Prompt 10 (verbatim):** `> also, the logo should just be the letter with the blue highlight.. the background shouldn't be part of the logo and should always be transparent. all the previews you provided look the samem generate an html artifact`
+- **Response 10 (Opus 4.8, artifact-design skill):** Two changes: the logo becomes **tile-less**
+  (transparent always, just swipe + g), and I built a proper interactive **HTML artifact**
+  (`brand-kit/previews/logo-preview.html`, theme-aware, Papier/Tinte + Nachtblau, marks at full size)
+  showing the tile-less mark on transparent/light/dark grounds + the dark-mode g-shade chooser so the
+  differences actually read. Published via the Artifact tool.
+- **Prompt 11 (verbatim):** `> provide the artifact here`
+- **Response 11 (Opus 4.8):** Rendered the artifact inline via SendUserFile (display:render) and
+  re-shared the published URL.
+- **Prompt 12 (verbatim):** `> go ahead with the recommendation` (+ mid-turn: `once done with the current task, check if the branding is applied to the app well and make any improvements or corrections if needed, then document the session and push everything to main`)
+- **Response 12 (Fable 5 → Opus 4.8):** Implemented the tile-less logo end-to-end with Papier g on
+  dark. `build-logo-assets.mjs` now emits `genauly-logo.png` (ink g) + `genauly-logo-dark.png`
+  (Papier g), both transparent/tile-less; favicons/PWA keep their tile. New shared
+  `src/components/shared/Logo.tsx` swaps them on `.dark` (no JS); all 7 in-app logo spots switched to
+  `<Logo>` with no tile/rounded/glow box; the dark no-JS shells (`index.html`, `prerender-help.mjs`)
+  hard-code the dark logo; the old `genauly-default-logo-transparent-corners.png` removed. Brand kit +
+  its generator + README updated to tile-less (mark/mark-dark/app-icon-tile, lockups, overview).
+  Branding QA: verified the logo swap in header/landing/sign-in light+dark; the wider app was already
+  verified across PRs A–D. Gates green (typecheck, lint 0 errors, test:unit, build, bundle 80.8 kB,
+  check:contrast). Docs (PROJECT_STATUS, BRAND_SPEC, CLAUDE.md, this log) updated; pushed to `main`.
+- **Artifacts (Prompts 8–12):** `src/components/shared/Logo.tsx` · `public/genauly-logo.png` ·
+  `public/genauly-logo-dark.png` · `scripts/branding/build-logo-assets.mjs` ·
+  `scripts/branding/build-brand-kit.mjs` · `brand-kit/` (logo/README/previews incl.
+  `logo-preview.html`) · 7 in-app logo components · `index.html` · `scripts/prerender-help.mjs` ·
+  `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/branding/BRAND_SPEC.md` · `docs/SESSION_PROMPT_LOG.md`
 
 ## Session 134 — 2026-07-19 — Mobile filter rail height, park Verbunden, Option B word cards
 
