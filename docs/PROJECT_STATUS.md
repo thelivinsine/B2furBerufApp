@@ -51,10 +51,6 @@ Standing governance debt: ~98% of provenance rows are AI-drafted, not yet human-
 
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
-- [ ] **Run migration 0007 (s130):** `supabase/migrations/0007_provenance_reviews_admins.sql` in the
-      Supabase SQL editor, so the second admin account (`thesuhaspala@gmail.com`) can save review
-      marks in the new /sources Daten-Werkbank. Steps in `docs/plans/PHASE2_SETUP.md` ("Admin source
-      review"). Until then that account sees the workbench but its saves silently no-op.
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
