@@ -348,6 +348,7 @@ export function kindLabel(kind: QuizQuestion["kind"]): string {
     cloze: "Lückentext",
     redemittelCloze: "Redemittel-Lücke",
     listeningCloze: "Hören",
+    oddOneOut: "Ausreißer",
     wordOrder: "Satzbau",
     matching: "Zuordnung",
     collocationFill: "Nomen-Verb",
