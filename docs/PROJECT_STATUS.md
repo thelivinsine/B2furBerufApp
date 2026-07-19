@@ -1,21 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-19 (session 133). **Brand-kit modernization plan authored** (docs-only,
-no `src/` change): the implementation of the finalized s127 brand (Kit 1 · Nachtblau & Himmelblau +
-Koralle, locked spec at `docs/branding/BRAND_SPEC.md`) is now scoped in
-**`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`**: a four-PR sequence (A token flip + accent-role
-audit + chrome/meta · B logo + icon pipeline · C deep surface sweep · D dark-mode design + premium
-polish) with a model recommendation per PR, a sanctioned-deviations register (the logo is locked,
-everything else may deviate subtly toward a premium finish), computed WCAG contrast findings, and a
-proposed permanent `check:contrast` gate. **The ENTIRE plan then SHIPPED the same session** (PRs
-#593/#594/#595/#596, all squash-merged to `main`): A = full token flip + designed dark theme +
-chrome/meta + the live `pnpm check:contrast` CI gate; B = the new logo mark (lowercase g on the
-Himmelblau swipe, g outlined from Inter 800) + regenerated favicon/PWA/og assets via
-`scripts/branding/build-logo-assets.mjs`; C = deep surface sweep (Neuland game chrome, Üben map,
-domain buildings, landing flatten, der-distinctness); D = polish (streak surfaces → Koralle, dark
-muted-text hierarchy, StatCard tabular-nums, CLAUDE.md color-language sweep). **The rebrand is
-COMPLETE**; `BRAND_SPEC.md` records the final shipped values. Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-19 (session 134). **Theorie (Wörter) card + mobile-filter polish, shipped to
+`main` via PR #598.** Four founder-driven changes (details in the s134 handoff below): (1) the
+`FilterRail` mobile panel cap trimmed `max-h-[55dvh]`→`max-h-[45dvh]` (~3-4 fewer lines when open);
+(2) the vocab card's cross-module "Verbunden" dropdown parked behind a reversible
+`SHOW_RELATED = false` flag (`RelatedPanel` kept; founder wants to rethink it); (3) the Wörter Karten
+cards rearranged to "Option B" (quiet headline = gender creature + word / bookmark; example gets
+room; foot row = plural pill left + speak button right); (4) the noun gender-reveal effect
+(`ArtikelEffect`) now fires from the empty right side of the card back (`align="right"` → `--fx-x`),
+and the "die" bloom is snappier (`470ms` fast-out + tighter stagger). The s133 **brand rebrand is
+COMPLETE** (Kit 1 · Nachtblau & Himmelblau + Koralle, `docs/branding/BRAND_SPEC.md`). Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -70,6 +65,33 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 134 (2026-07-19). Theorie (Wörter) card + mobile-filter polish. Branch
+`claude/filter-rail-mobile-height-n8ktd6`, shipped to `main` via PR #598 (squash `796fb01`).** A
+short founder-driven round on the Theorie Wörter tab and the mobile filter (ran on Opus 4.8):
+- **Mobile filter panel shorter (`FilterRail.tsx`, `panel` branch):** cap dropped
+  `max-h-[55dvh]`→`max-h-[45dvh]` (~10 dvh, roughly 3-4 text lines) so an open filter leaves more of
+  the card list visible on phones; the fixed header + internal `overflow-y-auto` scroll region are
+  unchanged, so nothing is clipped.
+- **"Verbunden" cross-module panel PARKED (`VocabList.tsx`):** the vocab card dropdown that linked a
+  word to a Kollokation/Schreibtraining/Dialog (`RelatedPanel` + `relatedRows`) is hidden behind a
+  reversible `const SHOW_RELATED = false` (founder wants to rethink its usefulness + dependencies
+  before it ships). The panel + helper are untouched in the repo; re-enabling is a one-line flip. Do
+  not delete them while parked.
+- **Wörter Karten = "Option B" layout (`VocabList.tsx`):** with the bottom toggle gone the card was
+  rearranged (founder picked B from a 4-option `preview/vocab-card-layouts.html`): quiet headline
+  (gender creature + word left, bookmark right), the example gets room, and a foot row pins the
+  plural (a small `bg-muted` pill) left + the speak button right via `mt-auto`, so every card in a
+  row shares one foot line. Speak + plural moved OUT of the headline.
+- **Gender reveal effect moved right + snappier die (`ArtikelEffect.tsx` + `index.css`):** new
+  `align` prop; the vocab card back face passes `align="right"`, shifting the burst/bloom/shatter
+  origin to `--fx-x: 78%` (into the empty right side where the English text isn't). The session
+  player (`SessionPlayer`) keeps the default centered origin. The "die" bloom is now `470ms` fast-out
+  cubic-bezier (was `650ms` ease-out) with a tighter `200/280/360ms` ring stagger (was
+  `200/310/420`), finishing as crisply as der's rays / das's shards. The `left:50%` origins in
+  `.artikel-fx-ray/ring/shard` now read `var(--fx-x, 50%)`.
+- **Gates:** typecheck clean, lint 0 errors, build green, `test:unit` 219/219. **PWA caveat:** the
+  Wörter cards are a service-worker-cached surface; hard-refresh before judging the live result.
 
 **Handoff after session 133 (2026-07-19). Brand-kit modernization: plan authored AND fully shipped
 (all 4 PRs), branch `claude/brand-kit-modernization-igqlnm`, everything merged to `main`.** The
@@ -151,47 +173,7 @@ hardcoded-hex inventory; each PR section marked SHIPPED with its final values):
   repo) from the new mark; verify the live site after deploy (hard-refresh first, the service worker
   serves the old build until then).
 
-**Handoff after session 132 (2026-07-19). Bibliothek mobile-filter bug-fixes + graph two-area color &
-"by topic + tighter" layout. Branch `claude/filter-scroll-badge-bugs-y75thb`, all shipped to `main`
-via PRs #581 / #582 / #583 / #584 / #585 / #589.** Multiple founder screenshots drove a run of
-mobile-filter fixes on the Theorie browse tabs plus a graph redesign:
-- **Mobile filter, three fixes (`FilterRail.tsx` was already fine; the fixes were in the four browse
-  trainers `VocabularyTrainer`/`CollocationsBrowser`/`RedemittelTrainer`/`GrammarHub` + `browseScroll`):**
-  (1) empty-gap-on-scroll — the open filter panel lived inside the sticky/collapsing browse header, so
-  collapsing it left its reserved flow space as a blank gap; (2) the mobile Filter-button badge counted
-  only facet pills, not the Branche/Thema/Unterthema scope dropdowns; (3) after an interim guard the
-  panel got *stuck* pinned open while scrolling. Final resolution: the filter panel is now **normal-flow
-  content moved OUTSIDE the sticky header** (only the compact toolbar stays sticky and collapses), the
-  badge adds `scopeActiveCount` (sectors + themes + subs) on Wörter/Kollokationen, and the header-collapse
-  guard was reverted. All four tabs.
-- **Mobile filter panel cap + go-to-top centering (PR #589, `FilterRail.tsx` panel branch +
-  `browseScroll.tsx`):** the expanded panel is capped at `max-h-[55dvh]` as a flex column (fixed header +
-  one internal `overflow-y-auto` scroll region), so it never swallows the screen. The `ScrollTopButton`
-  was off-center because it is a `motion.button` whose framer inline `transform` (the `y` slide) overrode
-  the Tailwind `-translate-x-1/2` class; fixed by animating `x: "-50%"` on every keyframe and dropping the
-  class.
-- **Graphs recolored to TWO life areas (`lib/graphPalette.ts` + `WordGraph.tsx` + `CollocationGraph.tsx`):**
-  new `lifeAreaOf`/`lifeAreaColor`/`LIFE_AREAS`/`LIFE_AREA_COLORS` helpers bucket the five content
-  domains into **Berufsleben (professional = `beruf`, brand indigo)** vs **Privatleben (personal =
-  everything else, teal)**. Node color, glow, lit edges, legend chips and the legend domain-filter all
-  collapse to these two on BOTH graphs; clustering still uses the finer theme grain.
-- **Kollokationen graph layout = founder-picked "by topic + tighter"** (from a published comparison
-  artifact of 5 force recipes on the real 1,243-node data): per-topic centroids kept, but firmer pull
-  and tighter packing. **Final values after the s132 "tighter clusters" follow-up (PR #584):** forceX/Y
-  `0.38`, link tension `0.22`, collision `r+3`, wider ring (`N*35`); charge `-55/240`. (The intermediate
-  first pass was `0.28`/`0.11`/`r+5`.) Also thinned the default edge stroke (`1→0.55`) + lowered edge
-  opacity earlier in the session for less visual noise.
-- **Gates:** typecheck, `test:unit` 219, lint 0 errors, build all green. Comparison artifact (English,
-  with a plain-language "how to read this" explainer) is a scratchpad HTML, not in the repo.
-- **Deploy gotcha (learned this session):** the #583 squash-merge did NOT fire the GitHub `push` event,
-  so neither `pages.yml` nor `validate.yml` ran and the commit showed no check. `pages.yml` has
-  `workflow_dispatch`, so a manual dispatch against `main` re-deploys the current HEAD; that recovered it.
-  If a merged commit shows no Actions run, dispatch `pages.yml` rather than assuming a build failure.
-- **Not done / open:** the two-level (domains-as-regions, topics-as-sub-islands) layout was previewed
-  but the founder chose topic+tighter instead. The preview artifact's variants still describe the
-  earlier "by life area" options; it was a decision aid, not kept in sync post-decision.
-
-_(Session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
+_(Session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VIII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
