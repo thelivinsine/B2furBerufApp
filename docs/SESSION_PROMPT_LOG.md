@@ -1043,3 +1043,22 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   (s132 + s131 remain), and appended this entry. Session totals: PRs #570 (P0/P1 data-integrity
   fixes), #572 (/sources redesign + Daten-Werkbank), #586 (migration-0007 close-out), all
   squash-merged to `main`; three rebases over the parallel sessions 129/131/132.
+- **Prompt 16 (verbatim):**
+  > there's one more suggestion to the filter rail when expanded on the mobile view. It should occupy only 40-60% of the screen space and internal sroll should be enabled. in addition to that, the go to top button is not center aligned.. check the screenshots and fix it.
+- **Response 16 (Opus 4.8):** Two mobile fixes (no screenshots actually arrived this turn; diagnosed both
+  from code). (1) Capped the `layout="panel"` FilterRail at `max-h-[55dvh]` as a flex column with a fixed
+  header and one internal `overflow-y-auto` scroll region, so the expanded panel stays ~55% of the screen
+  and the filters scroll inside it. (2) Fixed the off-center `ScrollTopButton`: it is a `motion.button`,
+  and framer-motion's inline `transform` (driving the `y` slide) overrode the Tailwind `-translate-x-1/2`
+  centering class; animated `x: "-50%"` across the keyframes and dropped the class. Both live on all four
+  browse tabs via the shared `FilterRail` + `browseScroll`. typecheck + build green; PR #589 → squash-merge
+  → realign; deploy fired on push.
+- **Prompt 17 (verbatim):**
+  > do the documentation drill and maintenance if needed and merge everything to main
+- **Response 17 (Opus 4.8):** This documentation pass. Folded PR #589 into the session 132 handoff (new
+  bullet + PR list), refreshed the `_Last updated_` block, appended prompts 16–17 here, and added a
+  one-line note to the CLAUDE.md FilterRail mobile-panel description (55dvh cap + internal scroll). Doc
+  hygiene checked: `PROJECT_STATUS.md` holds the two most recent handoffs (s132 + s131) and is well under
+  the 250-line cap; nothing to archive. Shipped to `main`.
+- **Artifacts (Prompts 16–17):** `src/features/shared/FilterRail.tsx` · `src/features/shared/browseScroll.tsx` ·
+  `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · PR #589
