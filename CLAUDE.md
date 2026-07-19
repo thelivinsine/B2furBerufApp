@@ -684,12 +684,16 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   free. Reuse those tokens (don't hand-roll a new overlay style) for sheets, drawers, and other
   popups too, adjusting only the radial center/stops if a different focal point is needed.
 
-## Brand logo (locked 2026-06-08)
-- **Pending rebrand (finalized s127, 2026-07-19, NOT implemented):** the founder finalized a new brand
-  (Kit 1 · Nachtblau & Himmelblau + Koralle, a lowercase-g-on-highlighter mark + a two-blue-plus-coral
-  palette). The locked, implementation-ready spec is **`docs/branding/BRAND_SPEC.md`**; do NOT wire it
-  until the founder says go. Everything below describes the CURRENT (still-live) logo until then.
-- The **default logo is the rounded gradient "G" with transparent corners.** The canonical asset
+## Brand logo (rebrand shipped s133; mark locked 2026-06-08 → 2026-07-19)
+- **Current mark (s133, brand plan PR B): the lowercase g on a Himmelblau highlighter swipe**, on a
+  Papier `#FAF6EC` rounded tile (Kit 1 · Nachtblau & Himmelblau + Koralle). The **g is OUTLINED to a
+  `<path>`** (Inter 800, the app's own UI typeface, so mark + wordmark cohere) so it renders identically
+  everywhere. Design source: `docs/branding/BRAND_SPEC.md` §3. **All assets are generated from ONE
+  source** by `scripts/branding/build-logo-assets.mjs` (the swipe + outlined-g constants live there and
+  in the canonical `preview/branding/genauly-logo-final.svg`). It is dev tooling, NOT part of the app
+  build: it needs a local Playwright Chromium (deterministic SVG→PNG, no `sharp`); rerun it to
+  regenerate every icon after any mark change. The old gradient "G" is retired.
+- The **default logo is the g-on-swipe mark with transparent corners.** The canonical asset
   is **`public/genauly-default-logo-transparent-corners.png`**; every in-app logo `<img>` points
   at it (sign-in dialog, mobile header `AppShell`, desktop `Sidebar`, landing, onboarding,
   `/privacy`). When adding a new logo spot, reuse this file (keep the CSS `rounded-lg`/`rounded-xl`

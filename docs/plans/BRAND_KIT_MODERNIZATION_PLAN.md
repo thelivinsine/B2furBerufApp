@@ -116,10 +116,17 @@ light+dark × mobile+desktop verified Praktisch, Theorie (Karten + Graph), Forts
    all four Theorie tabs (incl. both graphs), Fortschritt, a running Session, AuthDialog, Landing.
    Founder reviews the screenshot set before merge.
 
-### PR B — Logo + full icon pipeline (NO deviation allowed)
+### PR B — Logo + full icon pipeline (NO deviation allowed) — ✅ SHIPPED (s133)
 
 **Model: Opus 4.8** (precision scripting; the design is locked, so no design judgment is needed
-beyond the g-font pick, which the founder makes from a preview panel). Estimated: one session.
+beyond the g-font pick). Estimated: one session. **Shipped s133:** the g was outlined from **Inter
+800** (picked from a 5-candidate panel — Inter 800/900, Manrope 800, Figtree 900, Nunito 900 — for
+wordmark cohesion with the app's own Inter UI type + favicon-scale legibility) via opentype.js into a
+real `<path>`. `scripts/branding/build-logo-assets.mjs` rasterizes ALL assets from that one mark with
+Playwright Chromium (no `sharp` dep): the transparent-corner default logo + favicon-16/32/48, the
+full-bleed-opaque apple-touch/pwa-192/512, the maskable (mark in the inner ~80%), and a new
+Papier og-image (mark + Inter-800 wordmark + tagline + genauly.de plate). Verified on white + dark +
+iOS/circle mask sims.
 
 1. **Outline the g.** The reference SVG uses a system-ui `<text>`; per spec it must become a
    `<path>`. Build a small one-page preview rendering the locked swipe with 3–4 candidate heavy

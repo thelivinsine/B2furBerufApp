@@ -1,9 +1,11 @@
 # Genauly Brand Spec — FINALIZED, not yet implemented
 
 **Status:** ✅ Design finalized (session 127, 2026-07-19). 🔵 **PARTIALLY IMPLEMENTED (s133, brand
-plan PR A):** the token system (§1 light + §2 dark), nav/route/graph chrome and shell meta are LIVE;
-the logo + icon assets (§3) and the deep game/map/landing sweep are still pending (plan PRs B/C/D, see
-`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`). Shipped token values that deviate from the §1 swatches
+plan PRs A+B):** the token system (§1 light + §2 dark), nav/route/graph chrome and shell meta (PR A)
+AND the logo + all favicon/PWA/og assets (PR B) are LIVE; the deep game/map/landing sweep is still
+pending (plan PRs C/D, see `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`). The g was outlined from
+**Inter 800** (the app's own UI typeface) via `scripts/branding/build-logo-assets.mjs`, which
+regenerates every asset from the one canonical mark. Shipped token values that deviate from the §1 swatches
 (all WCAG-driven, plan §4, enforced by `pnpm check:contrast`): `--primary` 221 83% 54% (Nachtblau
 darkened 58%→54% for AA), `--warning` 38 92% 46% (Butter deepened for text legibility), `--reward`
 11 82% 54% (Koralle deepened so coral text clears 3:1 on its blush), plus a new `--accent-ink`
