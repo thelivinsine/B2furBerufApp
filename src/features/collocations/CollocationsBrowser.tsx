@@ -386,7 +386,7 @@ export function CollocationsBrowser() {
           SAME filter tile inline (collapsed by default); only one FilterRail
           is visible per breakpoint. */}
       <div className="space-y-4 lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8 lg:gap-y-4 lg:space-y-0">
-        <div className={`${browseHeaderClass(headerHidden && !filtersOpen, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
+        <div className={`${browseHeaderClass(headerHidden, scrolled)} space-y-4 lg:sticky lg:top-16 lg:z-20 lg:col-start-1 lg:row-start-1 lg:self-start lg:pb-3`}>
           {/* Toolbar + search + Üben/count, grouped and full-width on mobile (see
               Wörter). Desktop keeps Üben/count in the rail. */}
           <div className="flex w-full flex-col gap-2">
@@ -474,25 +474,6 @@ export function CollocationsBrowser() {
 
           </div>
 
-          <AnimatePresence initial={false}>
-            {filtersOpen && (
-              <motion.div
-                key="filter-panel"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
-                className="overflow-hidden lg:hidden"
-              >
-                <FilterRail
-                  {...filterRailProps}
-                  layout="panel"
-                  onClose={() => setFiltersOpen(false)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {hiddenLabel && (
             <div className="flex flex-wrap items-center gap-2">
               <ActiveFilterChip
@@ -502,6 +483,28 @@ export function CollocationsBrowser() {
             </div>
           )}
         </div>
+
+        {/* Mobile filter panel: normal-flow content, deliberately OUTSIDE the
+            sticky header so it scrolls away with the page instead of staying
+            pinned on screen (the sticky toolbar above keeps the toggle). */}
+        <AnimatePresence initial={false}>
+          {filtersOpen && (
+            <motion.div
+              key="filter-panel"
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+              className="overflow-hidden lg:hidden"
+            >
+              <FilterRail
+                {...filterRailProps}
+                layout="panel"
+                onClose={() => setFiltersOpen(false)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="min-w-0 space-y-4 lg:col-start-1 lg:row-start-2">
           {/* Sub-theme drill-down now lives in the filter (the Unterthema
