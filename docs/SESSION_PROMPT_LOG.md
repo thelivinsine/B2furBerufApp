@@ -407,3 +407,15 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `preview/landing-redesign/landing-a-artifact.html`. Verified in the production build (float
   transform sampled moving; closing-button screenshot halo-free). Gates: typecheck ✓, lint 0
   errors, build ✓, test:unit 219/219, bundle 110.8 kB. Squash-merged to main.
+- **Prompt 7 (verbatim):** `> document the session `
+- **Response 7:** This close-out. The session's documentation had been kept current at each merge
+  (s136 status handoff incl. the fix round, W29/W30 archive reconciliation after the parallel game
+  session, prompts 1-6 logged here); this pass added the final prompt entry and shipped it to main.
+  Session 136 total: landing analysis → two previews (A "Der Textmarker" picked, B "Die Nachtstadt"
+  parked) → four founder feedback rounds → full implementation in `LandingPage.tsx` → post-launch
+  device fixes (closing-CTA halo, framer float) → docs. PRs #603, #605, #606 squash-merged.
+- **Artifacts (session total):** `src/features/landing/LandingPage.tsx` · `src/index.css` ·
+  `preview/landing-redesign/` (2 mockups + artifact copy + README) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md` · PRs #603 (`4c32e58`),
+  #605 (`766584b`), #606 (`f065c60`)
