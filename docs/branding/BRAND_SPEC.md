@@ -41,7 +41,7 @@ space-separated format, ready to paste.
 | Lines | — | `#E7DEC9` | `42 38% 85%` | `--border`, `--input` |
 | **Primär** | **Nachtblau** | **`#3D74ED`** | **`221 83% 58%`** | `--primary`, `--ring` |
 | — | on primary | `#FFFFFF` | `0 0% 100%` | `--primary-foreground` |
-| **Akzent** | **Himmelblau** | **`#52C6F9`** | **`198 93% 65%`** | `--accent` |
+| **Akzent** | **Himmel Soft** | **`#8CDBFB`** | **`197 93% 77%`** | `--accent` (s138; was Himmelblau `#52C6F9`) |
 | — | on accent | `#0A2A3A` | `202 71% 13%` | `--accent-foreground` |
 | Erfolg | Blatt | `#2E9E6B` | `153 55% 40%` | `--success` |
 | Warnung | Butter | `#F3C24B` | `43 87% 62%` | `--warning` (fg `#3A2E12`) |
@@ -53,8 +53,9 @@ space-separated format, ready to paste.
 **The three brand moves vs. today:**
 1. **Nachtblau `#3D74ED`** replaces the indigo primary. It is the nav's dark blue `#2563EB`
    (`nav-items.ts`) lightened ~11%.
-2. **Himmelblau `#52C6F9`** is the new accent (chips, active-tab tint, the logo swipe). It is the nav's
-   light blue `#38BDF8` lightened ~13%.
+2. **Himmel Soft `#8CDBFB`** is the accent (chips, active-tab tint, the logo swipe) since s138; the
+   original Himmelblau `#52C6F9` (the nav's light blue `#38BDF8` lightened ~13%) read too harsh
+   against black/white and was retired from both the logo and the token.
 3. **Koralle `#F0603F`** is a warm counterpoint to the two blues, mapped to `--reward` (streak /
    celebration). Butter stays as a secondary warm tone (`--warning`).
 
@@ -66,7 +67,7 @@ identity. Live values (`.dark` in `src/index.css` is the source of truth; same l
 as the proposal, every pairing gated by `pnpm check:contrast`):
 - `--background` `228 24% 10%` (`#131620`), `--surface` `228 20% 14%`, `--foreground` `228 20% 92%`
   (`#e7e8ef`); the no-JS shells + PWA manifest carry the same hexes.
-- `--primary` Nachtblau lifted `221 90% 70%`, `--accent` Himmelblau `198 90% 70%`, `--reward`
+- `--primary` Nachtblau lifted `221 90% 70%`, `--accent` Himmel Soft `197 93% 77%` (s138), `--reward`
   Koralle `11 88% 66%`.
 - Gradient stops are per-theme tokens since s137 (`--gradient-from`/`--gradient-to`): the dark sweep
   stays light end-to-end so the near-black `primary-foreground` text passes AA.
@@ -76,9 +77,9 @@ as the proposal, every pairing gated by `pnpm check:contrast`):
 - Mark: `preview/branding/genauly-logo-final.svg`. Swipe path (in a 64×64 viewBox, rotated `-3° about
   32,32`): `M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z`, fill **Himmel Soft
   `#8CDBFB`** (logo v2 rework 2026-07-20: the founder found the original Himmelblau `#52C6F9` too
-  harsh against black/white; the app's `--accent` token stays `#52C6F9`, only the logo swipe
-  lightened). The swipe bottom was extended (from `…L 54 40 L 13 44 Q 9 40 10 32 Z`) so it fully covers
-  the closed bowl of the **g**; the descender still pokes out naturally.
+  harsh against black/white; in a same-session follow-up Himmel Soft also became the app-wide
+  `--accent`, see §1). The swipe bottom was extended (from `…L 54 40 L 13 44 Q 9 40 10 32 Z`) so it
+  fully covers the closed bowl of the **g**; the descender still pokes out naturally.
 - **Logo v2 rework additions (2026-07-20):** (1) icons center the mark by its TRUE bounding box
   ("Randnah", 5% margin), fixing the empty band above the mark in the old app icon; (2) dark-ground
   marks are TWO-TONE, ink where the artwork sits on the swipe, white where it falls off (only the g's

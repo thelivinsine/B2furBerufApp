@@ -855,10 +855,10 @@ export function LandingPage() {
             {numbers.map(([en, de, label]) => (
               <div key={label}>
                 {/* Gradient-clipped stat numbers (s137, report item 10): the ONE
-                    sanctioned text-gradient moment. Fixed light Himmelblau→sky
+                    sanctioned text-gradient moment. Fixed light Himmel-Soft→sky
                     stops because this band is fixed-dark in both themes (the
                     token gradient would be too dark here in light mode). */}
-                <b className="block bg-gradient-to-r from-[#53C7F9] to-[#8AB0F9] bg-clip-text text-[clamp(1.8rem,3.4vw,2.5rem)] font-extrabold tracking-tight text-transparent">
+                <b className="block bg-gradient-to-r from-[#8CDBFB] to-[#8AB0F9] bg-clip-text text-[clamp(1.8rem,3.4vw,2.5rem)] font-extrabold tracking-tight text-transparent">
                   {lang === "de" ? de : en}
                 </b>
                 <span className="mt-1 block text-sm leading-snug text-[#faf5eb]/65">{label}</span>
@@ -988,7 +988,7 @@ export function LandingPage() {
       {/* ---- Closing CTA ---- */}
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="relative overflow-hidden rounded-[32px] bg-gradient-to-br from-[#2866EB] via-[#1D4FC0] to-[#173F9E] px-6 py-16 text-center text-white shadow-elevated sm:py-20">
-          <svg className="absolute left-[6%] top-[18%] w-[56px] opacity-50" viewBox="0 0 60 60" fill="none" stroke="#53C7F9" strokeWidth="2.6" strokeLinecap="round">
+          <svg className="absolute left-[6%] top-[18%] w-[56px] opacity-50" viewBox="0 0 60 60" fill="none" stroke="#8CDBFB" strokeWidth="2.6" strokeLinecap="round">
             <path d="M30 8 L30 22 M30 38 L30 52 M8 30 L22 30 M38 30 L52 30" />
           </svg>
           <svg className="absolute bottom-[20%] right-[8%] w-[44px] opacity-60" viewBox="0 0 50 50" fill="#F5785C">

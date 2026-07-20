@@ -534,3 +534,17 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `index.html` · `scripts/prerender-help.mjs` · `public/genauly-*.png` + favicons/pwa/apple-touch/og ·
   `preview/branding/genauly-logo-final.svg` · `brand-kit/` (regenerated) ·
   `docs/branding/BRAND_SPEC.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 8 (verbatim):** `> now without changing any of the content, just apply the new blue to wherever the old blue is there in the app.`
+- **Response 8:** Applied Himmel Soft app-wide as the accent: `--accent` → `197 93% 77%` (#8CDBFB)
+  in BOTH themes in `src/index.css` (comments updated), plus the two fixed old-blue hexes in
+  `LandingPage.tsx` (the numbers-band `from-[#53C7F9]` gradient stop and a decorative doodle
+  stroke). Deliberately untouched: `--accent-ink` (the dark text derivative) and the CTA
+  `--gradient-*` stops (different, darker blues, AA-tuned in s137). Brand kit regenerated
+  (tokens.css/json/palette now carry the new accent); BRAND_SPEC §1/§2 Akzent rows + CLAUDE.md
+  + the s138 status handoff corrected (they had recorded the token as deliberately unchanged).
+  Gates: check:contrast all pass · typecheck ✓ · lint 0 errors · test:unit 219/219 · build ✓.
+  Verified the landing swipe/chips render in the new blue via preview screenshot. Squash-merged
+  to `main`.
+- **Artifacts (prompt 8):** `src/index.css` · `src/features/landing/LandingPage.tsx` ·
+  `brand-kit/color/*` (regenerated) · `docs/branding/BRAND_SPEC.md` · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · this log

@@ -44,9 +44,11 @@ input:-webkit-autofill {
        (5.0:1) and primary-as-text on Papier (4.6:1) both clear AA. */
     --primary: 221 83% 54%;
     --primary-foreground: 0 0% 100%;
-    /* Himmelblau. Light, so it pairs with INK, never white; and it is never
-       used as text on light ground: text call sites use --accent-ink. */
-    --accent: 198 93% 65%;
+    /* Himmel Soft #8CDBFB (s138 follow-up: the logo's new softer blue applied
+       app-wide; was Himmelblau 198 93% 65%). Light, so it pairs with INK,
+       never white; and it is never used as text on light ground: text call
+       sites use --accent-ink. */
+    --accent: 197 93% 77%;
     --accent-foreground: 202 71% 13%;
     --accent-ink: 198 90% 32%;
 
@@ -125,7 +127,7 @@ input:-webkit-autofill {
 
     --primary: 221 90% 70%;
     --primary-foreground: 228 30% 8%;
-    --accent: 198 90% 70%;
+    --accent: 197 93% 77%; /* Himmel Soft, same swatch as light (s138) */
     --accent-foreground: 202 71% 10%;
     --accent-ink: 198 85% 72%;
 
@@ -464,7 +466,7 @@ input:-webkit-autofill {
 /* swipe device, scenario marquee, and hero-collage float. Scoped   */
 /* with a `landing-` prefix; used only by features/landing.         */
 /* The swiped word keeps ink-dark text in BOTH themes: the swipe    */
-/* ground is always light Himmelblau, like a real highlighter.      */
+/* ground is always light Himmel Soft, like a real highlighter.     */
 .landing-swipe {
   position: relative;
   display: inline-block;
