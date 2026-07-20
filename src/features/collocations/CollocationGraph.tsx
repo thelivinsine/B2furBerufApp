@@ -188,10 +188,11 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
     const present = Array.from(seen).sort();
 
     const N = Math.max(present.length, 1);
-    // Wider ring (founder "by topic + tighter", 2026-07-19): topic centroids sit
-    // further apart so the firmer pull below settles them into clearly separated
-    // islands instead of one central mass.
-    const R = 140 + N * 35;
+    // Topic centroids on a ring. Tightened to the founder-picked "Am engsten"
+    // recipe (2026-07-20, preview/collocation-graph-tightness.html): a slightly
+    // smaller ring paired with the much firmer pull/link below packs each topic
+    // into a very compact island while keeping the islands clearly separated.
+    const R = 118 + N * 26;
     const map = new Map<string, { x: number; y: number }>();
     present.forEach((id, i) => {
       const a = (2 * Math.PI * i) / N - Math.PI / 2;
@@ -400,18 +401,20 @@ export default function CollocationGraph({ items }: { items: Collocation[] }) {
         forceLink<SimNode, SimLink>(links)
           .id((d) => d.id)
           .distance((l) => 22 + (l.source as SimNode).r + (l.target as SimNode).r)
-          // Higher link tension (founder, 2026-07-19: tighten the clusters) so
-          // connected noun/verb pairs pull firmly together.
-          .strength(0.22),
+          // High link tension (founder "Am engsten", 2026-07-20: tighten the
+          // clusters) so connected noun/verb pairs pull firmly together.
+          .strength(0.38),
       )
-      .force("charge", forceManyBody<SimNode>().strength(-55).distanceMax(240))
-      // Tighter node packing (smaller collision padding) so a cluster's members
-      // sit closer together.
-      .force("collide", forceCollide<SimNode>((d) => d.r + 3))
-      // Theme-centroid pull: this is what forms the islands. Firm (0.38) so each
-      // topic contracts into a compact island (founder "tighter", 2026-07-19).
-      .force("x", forceX<SimNode>((d) => centroidOf(d).x).strength(0.38))
-      .force("y", forceY<SimNode>((d) => centroidOf(d).y).strength(0.38))
+      // Weaker, shorter-range repulsion so a cluster's members can sit close.
+      .force("charge", forceManyBody<SimNode>().strength(-34).distanceMax(200))
+      // Tight node packing (small collision padding) so a cluster's members sit
+      // right next to each other.
+      .force("collide", forceCollide<SimNode>((d) => d.r + 1.5))
+      // Theme-centroid pull: this is what forms the islands. Strong (0.72) so
+      // each topic contracts into a very compact island (founder "Am engsten",
+      // 2026-07-20; preview/collocation-graph-tightness.html).
+      .force("x", forceX<SimNode>((d) => centroidOf(d).x).strength(0.72))
+      .force("y", forceY<SimNode>((d) => centroidOf(d).y).strength(0.72))
       .stop();
     simRef.current = { sim, nodes, links };
 
