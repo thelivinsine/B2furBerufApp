@@ -8,6 +8,10 @@ import strasseUrl from "./assets/strasse.png";
 import terminalUrl from "./assets/terminal.png";
 import ladenUrl from "./assets/laden.png";
 import schmidtUrl from "./assets/schmidt.png";
+import beamterUrl from "./assets/beamter.png";
+import miloUrl from "./assets/milo.png";
+import kassiererinUrl from "./assets/kassiererin.png";
+import brandtUrl from "./assets/brandt.png";
 import playerUrl from "./assets/player.png";
 import bagUrl from "./assets/bag.png";
 import dictUrl from "./assets/dict.png";
@@ -52,6 +56,10 @@ const SETTING_LABEL: Record<SceneSetting, string | null> = {
 /** Character sprites (transparent PNGs) keyed by GameNpc.sprite. */
 export const NPC_SPRITES: Record<string, string> = {
   schmidt: schmidtUrl,
+  beamter: beamterUrl,
+  milo: miloUrl,
+  kassiererin: kassiererinUrl,
+  brandt: brandtUrl,
 };
 export const PLAYER_SPRITE = playerUrl;
 export const BAG_SPRITE = bagUrl;

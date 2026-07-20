@@ -27,7 +27,7 @@ W, H = 240, 160
 OUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "src", "features", "welt", "assets")
 
 # ---- modern palette (scenes3.py, the blessed reference) ----
-INDIGO = (91, 91, 230)
+INDIGO = (61, 116, 237)  # brand Nachtblau #3D74ED (s133 rebrand; was #5b5be6)
 OUT = (70, 60, 68)             # soft warm outline, never pure black
 SKIN = (240, 204, 168)
 WALL = (233, 229, 221)
@@ -135,6 +135,166 @@ SCHMIDT = [
     ".......kbbk.kbbk..........",
     ".......kkkk.kkkk..........",
 ]
+
+# ---- battle-NPC sprites (s135): every dialogue-battle opponent gets a body.
+# Same 26x32 front template + world scale as Schmidt; distinct at 11% stage
+# width via silhouette (cap/apron/lanyard/cardigan) + palette, never via detail.
+
+# Der Grenzbeamte: uniform cap with brim, slate uniform, dark tie
+BEAMTER = [
+    "..........................",
+    ".........kkkkkkk..........",
+    "........kccccccck.........",
+    "........kccgcccck.........",
+    "......kkkkkkkkkkkkk.......",
+    "......khkssssssskhk.......",
+    "......khkssssssskhk.......",
+    "......khkskssksskhk.......",
+    "......khkssssssskhk.......",
+    "......khkssssssskhk.......",
+    "......khkssrrssskhk.......",
+    ".......kksssssskk.........",
+    "........kkssssk...........",
+    ".......kuuuuuuuuk.........",
+    "......kuuuuvvuuuuk........",
+    ".....kuuuuuvvuuuuuk.......",
+    "....kuukuuuvvuuukuuk......",
+    "....kuukuuuvvuuukuuk......",
+    "....kuuksssssssskuuk......",
+    "....kuuuukkkkkkuuuuk......",
+    "....kuuuuuuuuuuuuuk.......",
+    "....kuuuuuuuuuuuuuk.......",
+    ".....kuuuuuuuuuuk.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    "......kpppppppppk.........",
+    "......kppppppppk..........",
+    ".......kssk.kssk..........",
+    ".......kssk.kssk..........",
+    ".......kbbk.kbbk..........",
+    ".......kkkk.kkkk..........",
+]
+BEAMTER_CMAP = {'k': OUT, 'c': (74, 100, 150), 'g': (232, 190, 92), 'h': (74, 56, 44),
+                's': SKIN, 'u': (104, 118, 148), 'v': (44, 48, 62), 'p': (78, 86, 110),
+                'b': (58, 58, 66), 'r': (202, 128, 116)}
+
+# Milo, Verkäufer im Handyladen: curly dark hair, teal polo, gelbes Lanyard
+MILO = [
+    "..........kkkkk...........",
+    ".........khhhhhk..........",
+    "........khhhhhhhk.........",
+    ".......khhhhhhhhhk........",
+    "......khhhkkkkkhhhk.......",
+    "......khkssssssskhk.......",
+    "......khkssssssskhk.......",
+    "......khkskssksskhk.......",
+    "......khkssssssskhk.......",
+    "......khkssssssskhk.......",
+    "......khkssrrssskhk.......",
+    ".......kksssssskk.........",
+    "........kkssssk...........",
+    ".......kttttttttk.........",
+    "......ktttlttlttttk.......",
+    ".....ktttttllttttttk......",
+    "....kttktttllttttkttk.....",
+    "....kttktttllttttkttk.....",
+    "....kttksssssssskttk......",
+    "....kttttkkkkkkttttk......",
+    "....ktttttttttttttk.......",
+    "....ktttttttttttttk.......",
+    ".....kttttttttttk.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    "......kpppppppppk.........",
+    "......kppppppppk..........",
+    ".......kssk.kssk..........",
+    ".......kssk.kssk..........",
+    ".......kbbk.kbbk..........",
+    ".......kkkk.kkkk..........",
+]
+MILO_CMAP = {'k': OUT, 'h': (44, 36, 34), 's': SKIN, 't': (52, 148, 140),
+             'l': (232, 190, 92), 'p': (94, 102, 124), 'b': (58, 58, 66),
+             'r': (202, 128, 116)}
+
+# Die Kassiererin: ponytail, green Supermarkt apron over white shirt
+KASSIERERIN = [
+    "..........kkkkk...........",
+    ".........khhhhhk..........",
+    "........khhhhhhhk.........",
+    ".......khhhhhhhhhkk.......",
+    "......khhkkkkkkkhhhk......",
+    "......khkssssssskhhk......",
+    "......khkssssssskhhk......",
+    "......khkskssksskhk.......",
+    "......khkssssssskhk.......",
+    "......khkssssssskhk.......",
+    "......khkssrrssskhk.......",
+    ".......kksssssskk.........",
+    "........kkssssk...........",
+    ".......kwwaaaawwk.........",
+    "......kwwaaaaaawwk........",
+    ".....kwwaaaaaaaawwk.......",
+    "....kwwkaaaaaaaakwwk......",
+    "....kwwkaaaaaaaakwwk......",
+    "....kwwksssssssskwwk......",
+    "....kwwaakkkkkkaawwk......",
+    "....kwaaaaaaaaaaaawk......",
+    "....kwaaaaaaaaaaaawk......",
+    ".....kaaaaaaaaaak.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    "......kpppppppppk.........",
+    "......kppppppppk..........",
+    ".......kssk.kssk..........",
+    ".......kssk.kssk..........",
+    ".......kbbk.kbbk..........",
+    ".......kkkk.kkkk..........",
+]
+KASSIERERIN_CMAP = {'k': OUT, 'h': (150, 96, 52), 's': SKIN, 'w': (250, 250, 248),
+                    'a': (96, 150, 96), 'p': (100, 106, 128), 'b': (64, 64, 74),
+                    'r': (202, 128, 116)}
+
+# Herr Brandt, Vermieter: graues Haar mit Geheimratsecken, brauner Cardigan
+BRANDT = [
+    "..........................",
+    "..........kkkkk...........",
+    ".........khhhhhk..........",
+    "........khhhhhhhk.........",
+    "......kkksskkkssskk.......",
+    "......khkssssssskhk.......",
+    "......khkssssssskhk.......",
+    "......khkskssksskhk.......",
+    "......khkssssssskhk.......",
+    "......khkshhhhhskhk.......",
+    "......khkssrrssskhk.......",
+    ".......kksssssskk.........",
+    "........kkssssk...........",
+    ".......kccwwwwcck.........",
+    "......kccwwwwwwcck........",
+    ".....kccwwwkkwwwcck.......",
+    "....kcckcwwkkwwckcck......",
+    "....kcckcwwkkwwckcck......",
+    "....kccksssssssskcck......",
+    "....kcccckkkkkkcccck......",
+    "....kcccccccccccccck......",
+    "....kcccccccccccccck......",
+    ".....kcccccccccccck.......",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    "......kpppppppppk.........",
+    "......kppppppppk..........",
+    ".......kssk.kssk..........",
+    ".......kssk.kssk..........",
+    ".......kbbk.kbbk..........",
+    ".......kkkk.kkkk..........",
+]
+BRANDT_CMAP = {'k': OUT, 'h': (176, 176, 182), 's': SKIN, 'c': (140, 104, 78),
+               'w': (238, 234, 224), 'p': (110, 104, 96), 'b': (64, 64, 74),
+               'r': (202, 128, 116)}
 
 # seated NPC, front, 14x20 (world scale: a seated adult is ~2/3 of standing)
 NPC_SEAT = [
@@ -574,6 +734,10 @@ backdrop_terminal().save(os.path.join(OUT_DIR, "terminal.png"))
 backdrop_laden().save(os.path.join(OUT_DIR, "laden.png"))
 sprite_png(SCHMIDT, SCHMIDT_CMAP, "schmidt.png")
 sprite_png(PLAYER_BACK, PLAYER_CMAP, "player.png")
+sprite_png(BEAMTER, BEAMTER_CMAP, "beamter.png")
+sprite_png(MILO, MILO_CMAP, "milo.png")
+sprite_png(KASSIERERIN, KASSIERERIN_CMAP, "kassiererin.png")
+sprite_png(BRANDT, BRANDT_CMAP, "brandt.png")
 sprite_png(BAG, BAG_CMAP, "bag.png")
 sprite_png(DOC_AUSWEIS, DOC_CMAP, "doc-ausweis.png")
 sprite_png(DOC_VERTRAG, DOC_CMAP, "doc-vertrag.png")
