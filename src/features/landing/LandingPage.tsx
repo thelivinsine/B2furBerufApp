@@ -402,21 +402,22 @@ export function LandingPage() {
     { label: t("Sources & licenses", "Quellen & Lizenzen"), to: "/sources" },
   ];
 
-  const primaryCta = onboarded ? (
+  const primaryCta = (
     <button
-      onClick={goApp}
+      onClick={onboarded ? goApp : start}
       className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition-colors hover:bg-primary/90"
     >
-      {goAppLabel} <ArrowRight className="h-4 w-4" />
-    </button>
-  ) : (
-    <button
-      onClick={start}
-      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition-colors hover:bg-primary/90"
-    >
-      {startLabel} <ArrowRight className="h-4 w-4" />
+      {onboarded ? goAppLabel : startLabel} <ArrowRight className="h-4 w-4" />
     </button>
   );
+
+  /* Gentle 7s bob for the hero collage. Driven by framer (not a CSS keyframe)
+     so it renders on iOS Safari configurations where the CSS animation was
+     observed not to run (founder report, s136). */
+  const float = (delay = 0) => ({
+    animate: { y: [0, -9, 0] },
+    transition: { duration: 7, repeat: Infinity, ease: "easeInOut" as const, delay },
+  });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -558,11 +559,11 @@ export function LandingPage() {
             </span>
           </div>
 
-          {/* main flashcard: die Bewerbung. The float animation lives on an inner
-              wrapper: an animation on `transform` would override the centering
-              translate + rotate on this positioned element. */}
+          {/* main flashcard: die Bewerbung. The float lives on an inner wrapper:
+              animating transform on the positioned element itself would override
+              its centering translate + rotate. */}
           <div className="absolute left-1/2 top-[46%] z-[3] w-[290px] -translate-x-1/2 -translate-y-1/2" style={{ rotate: "-2deg" }}>
-            <div className="landing-float rounded-[20px] border border-border bg-surface p-6 shadow-elevated">
+            <motion.div {...float()} className="rounded-[20px] border border-border bg-surface p-6 shadow-elevated">
             <div className="flex items-center justify-between">
               <span className="relative px-2 py-0.5 text-base font-extrabold text-die">
                 die
@@ -584,23 +585,23 @@ export function LandingPage() {
               <br />
               <span className="text-[0.83rem]">Ich habe meine Bewerbung gestern abgeschickt.</span>
             </p>
-            </div>
+            </motion.div>
           </div>
 
           {/* floating pills (same inner-wrapper pattern for the float animation) */}
           <div className="absolute right-[2%] top-[10%] z-[4] rotate-2">
-            <div className="landing-float flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-bold text-reward shadow-elevated" style={{ animationDelay: "0.8s" }}>
+            <motion.div {...float(0.8)} className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-bold text-reward shadow-elevated">
               <Flame className="h-4 w-4 fill-current" />
               <span className="tabular-nums">{t("12-day streak", "12 Tage Serie")}</span>
-            </div>
+            </motion.div>
           </div>
           <div className="absolute bottom-[14%] left-[2%] z-[4] -rotate-3">
-            <div className="landing-float flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-bold text-success shadow-elevated" style={{ animationDelay: "0.3s" }}>
+            <motion.div {...float(0.3)} className="flex items-center gap-2 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-bold text-success shadow-elevated">
               <span className="grid h-[22px] w-[22px] place-items-center rounded-full bg-success/15">
                 <Check className="h-3.5 w-3.5" strokeWidth={3} />
               </span>
               <span className="tabular-nums">+10 XP · Genau!</span>
-            </div>
+            </motion.div>
           </div>
           <div className="absolute bottom-[4%] right-[4%] z-[4] flex rotate-[1.5deg] items-center gap-1.5 rounded-full border border-border bg-surface px-4 py-2.5 text-sm font-bold text-accent-ink shadow-elevated">
             <MapPin className="h-4 w-4" /> Bürgeramt, Schalter 3
@@ -1001,7 +1002,7 @@ export function LandingPage() {
           </p>
           <button
             onClick={onboarded ? goApp : start}
-            className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-white px-9 py-4 text-lg font-bold text-[#2866EB] shadow-elevated transition-colors hover:bg-[#FAF5EB]"
+            className="mt-8 inline-flex items-center gap-1.5 rounded-full bg-white px-9 py-4 text-lg font-bold text-[#2866EB] transition-colors hover:bg-[#FAF5EB]"
           >
             {onboarded ? goAppLabel : startLabel} <ArrowRight className="h-5 w-5" />
           </button>
