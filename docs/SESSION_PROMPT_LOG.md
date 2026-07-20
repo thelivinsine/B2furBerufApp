@@ -496,3 +496,41 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   #609) → items 8-10 + hotfix (PR #610) → docs. PRs #609, #610 squash-merged.
 - **Artifacts (close-out):** `docs/PROJECT_STATUS.md` · `docs/branding/BRAND_SPEC.md` ·
   `docs/SESSION_PROMPT_LOG.md` · PRs #609 (`902ba22`), #610 (`add6529`)
+
+## Session 138 — 2026-07-20 — Logo v2 rework (Himmel Soft swipe, wordmark, Randnah icons)
+
+- **Branch:** `claude/logo-blue-contrast-xsfk19`
+- **Prompt 1 (verbatim):** `> the blue highlight on the logo has a harsh contrast with black and white.. can you provide previews with lighter shades of blue?`
+- **Response 1:** Published a claude.ai artifact preview rendering the actual mark geometry with
+  the current Himmelblau #52C6F9 plus five lighter candidates (#74D2FA → #CFF0FE), each shown on
+  the light Papier and dark navy grounds. No repo changes.
+- **Prompt 2 (summary; attachment: home-screen icon screenshot):** Picked **Himmel Soft #8CDBFB**;
+  asked for a full-word "genauly" logo with the highlight on the "genau" letters, keeping the
+  g-only mark for constrained spots, and flagged the favicon mark as too small in its tile.
+- **Responses 2-6 (preview iteration v2→v8):** Seven more artifact rounds refining the design per
+  founder feedback: gentler swipe angle; dark-ground color rules (several missteps: whole-word
+  two-tone, then a g-only narrow highlight, both rejected); the founder re-anchored on the
+  Version-2 swipe ("exactly like the screenshot", "width or height exactly same from v2") with
+  ONLY the letter g dual-tone on dark; favicon centered by true bbox with "Größer"/"Randnah" size
+  options. Each round was verified by headless-Chromium screenshot before publishing (caught white
+  slivers on e/n/a bottoms and letters-with-holes regressions).
+- **Prompt 7 (verbatim):** `> finalize these logos and radnah favicon. Apply the logos everywhere in the app.` (interrupted, then:) `> remember this session's work is only about logos. So, the implementation should only be for the logos. now go ahead`
+- **Response 7:** Implemented the finalized design, logos only: rewrote
+  `scripts/branding/build-logo-assets.mjs` (Himmel Soft swipe; bbox-measured "Randnah" centering
+  at 5% margin for favicons/apple-touch/pwa, 10% for maskable; two-tone dark marks; NEW lowercase
+  wordmark assets rendered from the app's own Inter variable font with the exact v2 band
+  geometry); regenerated all public/ icons + og-image + canonical SVG; `Logo.tsx` gained
+  `variant="mark" | "wordmark"`; wordmark applied in Sidebar, AuthDialog, Onboarding, HelpChrome,
+  LegalChrome, landing header (sm+)/footer, and the dark no-JS shells (adjacent "Genauly" text
+  spans removed); mobile AppShell header keeps the mark. Brand kit swipe const updated + kit
+  regenerated; BRAND_SPEC §3 + CLAUDE.md brand section rewritten. Fixed in verification: a
+  responsive-utility clash that showed both theme images on the landing (display utilities now
+  wrap `<Logo>` instead of being passed in). Gates: typecheck ✓ · lint 0 errors · test:unit
+  219/219 · build ✓ · bundle 110.5 kB. Verified via `pnpm preview` + headless Chromium
+  (landing light/dark/mobile, /hilfe dark). Squash-merged to `main`.
+- **Artifacts:** `scripts/branding/build-logo-assets.mjs` · `scripts/branding/build-brand-kit.mjs` ·
+  `src/components/shared/Logo.tsx` · `src/components/layout/Sidebar.tsx` ·
+  `src/features/{auth/AuthDialog,onboarding/Onboarding,help/HelpChrome,legal/LegalChrome,landing/LandingPage}.tsx` ·
+  `index.html` · `scripts/prerender-help.mjs` · `public/genauly-*.png` + favicons/pwa/apple-touch/og ·
+  `preview/branding/genauly-logo-final.svg` · `brand-kit/` (regenerated) ·
+  `docs/branding/BRAND_SPEC.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log

@@ -19,14 +19,11 @@ export function Sidebar({
       <Link
         to="/welcome"
         onClick={onNavigate}
-        className="mb-4 flex items-center gap-2.5 rounded-xl px-2 py-2 transition-colors hover:bg-muted/60"
+        className="mb-4 flex flex-col items-start gap-1.5 rounded-xl px-2 py-2 transition-colors hover:bg-muted/60"
         aria-label="Zur Startseite"
       >
-        <Logo className="h-9 w-9" />
-        <div className="leading-tight">
-          <p className="text-sm font-semibold tracking-tight">Genauly</p>
-          <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
-        </div>
+        <Logo variant="wordmark" className="h-7 w-auto" />
+        <p className="text-xs text-muted-foreground">Deutsch im Beruf · B2</p>
       </Link>
 
       {onSearch && (

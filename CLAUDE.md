@@ -722,24 +722,33 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   orange/red = Koralle, rose/pink = the sanctioned extra); never indigo/violet/purple/fuchsia.
   `bg-mesh` sits at 0.10/0.09 (visible whisper, not a band), and the landing numbers band's
   gradient-clipped stat values are the one sanctioned `text-gradient`-style moment.
-- **Current mark (s133, brand plan PR B): the lowercase g on a Himmelblau highlighter swipe** (Kit 1 ·
-  Nachtblau & Himmelblau + Koralle). The **g is OUTLINED to a `<path>`** (Inter 800, the app's own UI
-  typeface, so mark + wordmark cohere) so it renders identically everywhere. Design source:
-  `docs/branding/BRAND_SPEC.md` §3. **All assets are generated from ONE source** by
-  `scripts/branding/build-logo-assets.mjs` (the swipe + outlined-g constants live there and in the
-  canonical `preview/branding/genauly-logo-final.svg`). It is dev tooling, NOT part of the app build:
-  it needs a local Playwright Chromium (deterministic SVG→PNG, no `sharp`); rerun it to regenerate every
-  icon after any mark change. The old gradient "G" is retired.
-- **The in-app logo is TILE-LESS (transparent, no tile; founder s133).** It is just the swipe + g,
-  and the **g adapts to the theme so it stays legible on any surface: Tinte ink in light, Papier
-  `#FAF6EC` in dark** (its bowl sits on the light swipe, so a dark g would vanish on a dark ground).
-  Two assets, `public/genauly-logo.png` (ink) + `public/genauly-logo-dark.png` (Papier), swapped by
-  the shared **`src/components/shared/Logo.tsx`** via the `.dark` class (`block dark:hidden` /
-  `hidden dark:block`; `useTheme` puts `.dark` on `<html>` globally). Every in-app logo spot uses
-  `<Logo className="h-8 w-8" />` (mobile header `AppShell`, desktop `Sidebar`, sign-in `AuthDialog`,
-  landing, onboarding, `LegalChrome` `/privacy`, `HelpChrome` `/hilfe`); **no tile, no
-  `rounded`/`shadow-glow` box** (the tile-less mark floats). The static no-JS shells (`index.html`,
-  `scripts/prerender-help.mjs`) are dark, so they hard-code `genauly-logo-dark.png`. When adding a
+- **Current mark (s133 PR B, reworked s138 2026-07-20): the lowercase g on a Himmel Soft highlighter
+  swipe**. The swipe is **Himmel Soft `#8CDBFB`** (founder-picked s138: the original Himmelblau
+  `#52C6F9` read too harsh against black/white; the `--accent` token is UNCHANGED, only the logo
+  lightened). The **g is OUTLINED to a `<path>`** (Inter 800, the app's own UI typeface) so it renders
+  identically everywhere. **s138 additions:** (1) every icon centers the mark by its TRUE bounding box
+  ("Randnah", 5% margin; the raw path sits low in the 64-box and used to leave an empty band at the top
+  of the app icon — never revert to raw-coordinate centering); (2) **dark-ground marks are TWO-TONE**:
+  ink where the artwork sits on the swipe, white where it falls off (only the g's descender); (3) a
+  **lowercase wordmark** "genauly" with the swipe under "genau" is the primary logo where there is room
+  (`public/genauly-wordmark.png`/`-dark.png`; dark keeps "enau" solid ink + "ly" white so ONLY the g is
+  dual-tone). Design source: `docs/branding/BRAND_SPEC.md` §3. **All assets are generated from ONE
+  source** by `scripts/branding/build-logo-assets.mjs` (swipe + outlined-g + wordmark band constants).
+  It is dev tooling, NOT part of the app build: it needs a local Playwright Chromium (deterministic
+  SVG→PNG, no `sharp`) and the app's installed `@fontsource-variable/inter` (for the wordmark); rerun
+  it after any mark change. The old gradient "G" is retired.
+- **The in-app logo is TILE-LESS (transparent, no tile; founder s133).** Two variants since s138,
+  both served by the shared **`src/components/shared/Logo.tsx`** (`variant="mark" | "wordmark"`,
+  images swapped by the `.dark` class: `block dark:hidden` / `hidden dark:block`; `useTheme` puts
+  `.dark` on `<html>` globally): the compact **g mark** (`genauly-logo.png`/`-dark.png`) for
+  space-constrained spots, and the **wordmark** (`genauly-wordmark.png`/`-dark.png`, size with
+  `h-* w-auto`) as the primary logo where there is room. On dark grounds both are TWO-TONE (ink on
+  the swipe, white off it — only the g splits). Current placement: mobile header `AppShell` = mark
+  (founder dropped the mobile wordmark in s86); desktop `Sidebar`, `AuthDialog`, onboarding,
+  `LegalChrome`, `HelpChrome`, landing footer = wordmark (adjacent "Genauly" text spans were removed,
+  the image IS the name); landing header = mark on phones, wordmark from `sm:`. **No tile, no
+  `rounded`/`shadow-glow` box** (the tile-less logo floats). The static no-JS shells (`index.html`,
+  `scripts/prerender-help.mjs`) are dark and hard-code `genauly-wordmark-dark.png`. When adding a
   logo spot, use `<Logo>`, do not box it.
 - **App icons keep their Papier tile** (browser tab + OS masks need a filled background; transparency
   shows black). The tiled favicons/PWA/apple-touch/maskable are still generated by

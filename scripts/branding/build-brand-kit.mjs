@@ -35,7 +35,9 @@ for (const d of ["logo", "color", "type", "icons", "social", "previews"]) {
 
 // ---- Brand constants (BRAND_SPEC §1/§3) ----
 const PAPIER = "#FAF6EC";
-const HIMMELBLAU = "#52C6F9";
+// Logo swipe: Himmel Soft (logo v2 rework 2026-07-20; softer than the app's
+// Himmelblau --accent token #52C6F9, which is unchanged).
+const HIMMELBLAU = "#8CDBFB";
 const TINTE = "#1C1A24";
 const SWIPE = "M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z";
 const G_PATH =

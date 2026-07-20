@@ -1,19 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-20 (session 137). **Brand premium pass shipped to `main`** (review of the
-s133 rebrand, fixes 1-7 of a ten-point report): the `accent-gradient` is now token-driven
-(`--gradient-from`/`--gradient-to` in `index.css`, deep Nachtblau → primary → vivid sky) so gradient
-CTAs end brighter instead of muddier AND stay legible in dark mode (the old fixed end stop dropped
-dark-mode text to ~2.5:1; both stops are now gated in `check-contrast.mjs`, 46/46 pass). Landing
-hero/nav CTAs and step chip 1 are back on the gradient (flattened in s133/s136), the default Button
-variant carries a subtle top sheen, and two shared text classes landed in `index.css`:
-**`.text-display`** (extrabold, tracking-tight, balanced wrap; applied to every page H1 via
-SectionHeading/HubHero + Lernpfad/Neuland/Grammar lesson/Legal/Help) and **`.text-eyebrow`** (the one
-canonical overline recipe). Pre-rebrand indigo/violet remnants purged (Neuland Boss tag, game Chip
-tone, QuizHub hero, intent cards, stale comments). A second wave shipped items 8-10: brand-family
-theme/hub gradients, the dark theme re-hued to warm navy (228), mesh + one text-gradient moment,
-plus a hotfix for a conflict marker that briefly broke `main`'s build. Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-20 (session 138). **Logo v2 rework shipped to `main`** (logos only, founder
+directive): the swipe is now **Himmel Soft `#8CDBFB`** (the original Himmelblau read too harsh
+against black/white; the `--accent` token is unchanged), every icon centers the mark by its TRUE
+bounding box ("Randnah", 5% margin — the app icon no longer floats small with an empty band on
+top), dark-ground logos are **two-tone** (ink on the swipe, white off it; only the g splits), and a
+new lowercase **wordmark** "genauly" (swipe under "genau") is the primary logo wherever there is
+room (`Logo variant="wordmark"`; the mobile header keeps the compact g). Iterated across 8 preview
+rounds in a claude.ai artifact. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -69,6 +63,41 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 138 (2026-07-20). Logo v2 rework (logos ONLY, founder-scoped), branch
+`claude/logo-blue-contrast-xsfk19`, shipped to `main`.** The founder found the logo's Himmelblau
+swipe too harsh against black/white and iterated through 8 artifact preview rounds (v2→v8) to a
+finalized design, then said "finalize these logos and Randnah favicon, apply everywhere, logos
+only." What shipped:
+- **Swipe color: Himmel Soft `#8CDBFB`** on every logo asset. The app's `--accent` token stays
+  Himmelblau `#52C6F9` (deliberately decoupled; only the logo lightened).
+- **Icons re-centered ("Randnah"):** `build-logo-assets.mjs` now measures the mark's true bbox
+  in-browser and centers it at 5% margin (favicons/apple-touch/pwa; maskable keeps the 80% safe
+  zone at 10%). This fixes the founder-screenshotted "empty band above the g" app icon. Never
+  revert to raw-coordinate centering.
+- **Two-tone dark logos:** on dark grounds, artwork on the swipe is ink, off the swipe is white —
+  in practice only the g splits (ink bowl, white descender). Light grounds stay all ink.
+- **New lowercase wordmark** (`public/genauly-wordmark.png`/`-dark.png`, 548×138): "genauly" in
+  the app's own Inter (variable, wght 800, −0.02em, rendered via embedded `@fontsource-variable/
+  inter` woff2), swipe under "genau" with the exact v2 band geometry (−0.16em/+0.10em overhangs,
+  0.12em/0.10em em-box insets, −2° tilt). Dark wordmark: word white, "enau" solid ink on the
+  swipe, ONLY the g dual-tone (clip = swipe ∪ an e..u rect, avoids white slivers on letter
+  bottoms).
+- **`Logo.tsx` gained `variant="mark" | "wordmark"`**; wordmark placed in Sidebar, AuthDialog,
+  Onboarding, HelpChrome, LegalChrome, landing footer, landing header (`sm:`+; phones keep the
+  mark), and the dark no-JS shells (`index.html`, `prerender-help.mjs` — the adjacent "Genauly"
+  text spans were removed, the image IS the name). Mobile `AppShell` header keeps the compact
+  mark (s86 rule). **Gotcha fixed in review:** responsive display utilities must wrap `<Logo>` in
+  a container, never be passed into it (they override the internal `dark:` image swap — this
+  briefly showed both theme images on the landing).
+- **Brand kit + spec:** `build-brand-kit.mjs` swipe const updated + kit regenerated;
+  `BRAND_SPEC.md` §3 + CLAUDE.md brand section rewritten. NOTE: the kit's lockups still use the
+  outlined capital-G "Genauly" wordmark path (`wordmark-data.mjs`); outlining the new lowercase
+  wordmark for the kit is an open follow-up.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.5 kB ✓.
+  Verified rendered output via `pnpm preview` + headless Chromium (landing light/dark/mobile,
+  /hilfe dark). PWA caveat: hard-refresh the live site; the home-screen icon may need re-adding
+  to show the new Randnah size.
+
 **Handoff after session 137 (2026-07-20). Branding-refresh review + premium pass (fixes 1-7),
 branch `claude/app-branding-refresh-review-bmrly2`, shipped to `main`.** The founder asked for a
 review of the s133 rebrand ("doesn't look as premium as before"), first as a report only, then
@@ -110,44 +139,7 @@ greenlit fixes 1-7 of the ten-point list. What shipped:
   conflict marker); the wave-2 run (`add6529`, PR #610) completed green, so BOTH waves went live
   together.** PWA caveat: hard-refresh the live site.
 
-**Handoff after session 136 (2026-07-20). Landing-page redesign, previews → full implementation,
-branch `claude/landing-page-redesign-iqxlja`, shipped to `main`.** The founder asked for a
-conversion-focused landing analysis + "billion-dollar edutech" previews, picked **Preview A "Der
-Textmarker"** (warm highlighter editorial; Preview B "Die Nachtstadt" remains unbuilt in
-`preview/landing-redesign/` as a future direction), then iterated: logo/wordmark optical alignment,
-real page links in the nav, a filter→custom-Üben section, English-first copy, an EN/DE page toggle,
-"Go to app" for logged-in visitors, and companion (not replacement) positioning.
-- **`src/features/landing/LandingPage.tsx` rebuilt** (full rewrite, token-based so dark mode works):
-  sticky nav (anchors + About/Help/Sources + LangToggle + auth-aware CTA) · hero (swiped "plateau."
-  headline, flashcard collage with `Wesen` creatures + floating streak/XP pills) · scenario marquee ·
-  plateau chart (`PlateauChart`, hand-drawn SVG with "Du bist hier") · bento features (session mock,
-  der/die/das cells, FSRS bars, speaking wave, exam badges) · **filter rail mock + "Filter what you
-  need. Practice exactly that."** · dark numbers band (honest counts + /sources link) · steps
-  ("Your smart companion.") · the OAuth-required "What is Genauly?" purpose card (kept, bilingual) ·
-  FAQ `details` · closing CTA · footer. All copy lives inline as `t(en, de)` pairs on a local `lang`
-  state (default EN); German is reserved for obvious/brand terms per the founder's 10-20% rule.
-- **New `.landing-*` CSS in `src/index.css`:** `landing-swipe` (the highlighter device; swiped text
-  stays ink `#1c1a23` in BOTH themes since the swipe ground is always light Himmelblau; a
-  `landing-swipe-reward` variant tints with `--reward-bg`) and `landing-marquee` (+ reduced-motion
-  opt-out). **The hero collage float is framer-motion, NOT CSS** (the `float()` helper in
-  `LandingPage.tsx`): a CSS-keyframe version shipped first but did not run on the founder's iPhone,
-  and a CSS `transform` animation also overrides Tailwind translate/rotate on the same element, so
-  the float animates an INNER wrapper via framer while the outer element keeps position/rotation.
-  The closing card's white CTA carries **no shadow** (rendered as a heavy halo on device); the other
-  CTAs keep `shadow-glow` (founder-specified). The published preview artifact is stored at
-  `preview/landing-redesign/landing-a-artifact.html`.
-- **Rules recorded:** logged-in CTA label is "Go to app"/"Zur App" (never "Dashboard"); no
-  replacement-for-traditional-learning claims; hero eyebrow is "German for real life" (B1–B2
-  removed at founder request; the footer keeps the full tagline).
-- **Previews:** `preview/landing-redesign/` holds both mockups + README (analysis, revision log,
-  implementation spec). Preview A includes a working JS EN/DE toggle; it was published as a claude.ai
-  artifact for founder review across four feedback rounds.
-- **Gates:** typecheck ✓ · lint 0 errors ✓ · build ✓ · test:unit 219/219 ✓ · check:bundle 111 kB
-  (landing is eagerly routed; +~30 kB static JSX, well under the 400 kB budget) ✓. Verified rendered
-  output via `pnpm preview` + headless Chromium: light/dark, EN/DE, 390/1280, logged-in state.
-  **PWA caveat:** the landing is service-worker-cached; hard-refresh the live site before judging.
-
-_(Session 135's game demo-readiness review + P0/P1 batch handoff is now in
+_(Session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
