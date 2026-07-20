@@ -84,12 +84,12 @@
   </div>
 
   <h2>3 · Favicon / app icon — centered + enlarged</h2>
-  <p class="sub">Left is the old low placement (empty band on top, your screenshot). Middle and right are centered by the mark's real bounds at two sizes.</p>
+  <p class="sub">Left is the old low placement (empty band on top, your screenshot). Middle and right are centered by the mark's real bounds at two sizes. <b>Größer (12% Rand)</b> is the applied version, shipped in every favicon / PWA / apple-touch icon.</p>
   <div class="card"><div class="tiles" id="tiles"></div></div>
   <div class="card" style="margin-top:14px;"><div class="os" id="oshint"></div></div>
 
   <p class="note">
-    Pick a favicon size — <b>Größer</b> or <b>Randnah</b> — and I'll implement the two-tone g, the wordmark, and regenerate every favicon / PWA / apple-touch icon with the corrected centering, then push it.<br><br>
+    <b>Applied: Größer</b> (12% Rand). The two-tone g, the wordmark, and every favicon / PWA / apple-touch icon were regenerated with this centering and pushed (build-logo-assets.mjs, TILE_MARGIN = 0.12).<br><br>
     <span style="opacity:.8">Wordmark here is rendered with a stand-in bold face, so letterforms are approximate. Production uses the outlined <b>Inter 800</b> shapes so the "g" matches the mark exactly. Colour, swipe angle, the swipe-boundary two-tone split, and the tile centering are all exact.</span>
   </p>
 </div>
@@ -164,10 +164,10 @@
   document.getElementById('g-dark').innerHTML  = gMark(64,'dark')+gMark(40,'dark')+gMark(28,'dark');
   document.getElementById('tiles').innerHTML = `
     <div class="tilecol bad">${oldTile(112,1.25)}<div class="name">Vorher · schief</div><div class="meta">Band oben leer</div></div>
-    <div class="tilecol">${tile(112,0.12)}<div class="name">Größer · zentriert</div><div class="meta mono">Rand 12%</div></div>
-    <div class="tilecol pick">${tile(112,0.05)}<div class="name">Randnah · empfohlen</div><div class="meta mono">Rand 5%</div></div>`;
+    <div class="tilecol pick">${tile(112,0.12)}<div class="name">Größer · angewendet</div><div class="meta mono">Rand 12%</div></div>
+    <div class="tilecol">${tile(112,0.05)}<div class="name">Randnah · verworfen</div><div class="meta mono">Rand 5%</div></div>`;
   document.getElementById('oshint').innerHTML =
-    `<span class="oslabel">Home-Screen-Größe (Randnah):</span>`+tile(60,0.05)+tile(44,0.05)+tile(30,0.05);
+    `<span class="oslabel">Home-Screen-Größe (Größer):</span>`+tile(60,0.12)+tile(44,0.12)+tile(30,0.12);
 
   // center g marks + tiles by true bbox
   function centerGroup(svg, margin){
