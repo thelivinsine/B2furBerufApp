@@ -58,14 +58,18 @@ space-separated format, ready to paste.
 3. **Koralle `#F0603F`** is a warm counterpoint to the two blues, mapped to `--reward` (streak /
    celebration). Butter stays as a secondary warm tone (`--warning`).
 
-## 2. Dark mode (to be tuned at implementation)
+## 2. Dark mode (SHIPPED; re-hued s137)
 
-Not finalized. Proposed starting point (keep the two-blue + coral identity, lift lightness for a dark
-ground, mirror the existing `.dark` block in `src/index.css`):
-- `--background` ~ `250 24% 10%`, `--surface` ~ `250 20% 14%`, `--foreground` ~ `250 20% 92%`
-- `--primary` Nachtblau lifted ~ `221 90% 70%`, `--accent` Himmelblau ~ `198 90% 70%`
-- `--reward` Koralle ~ `11 88% 66%`
-Verify contrast (white/ink on primary and accent) and screenshot both themes before shipping.
+Shipped in PR A on the proposal below, then **re-hued 250 → 228 (warm navy) in the s137 premium
+pass**: the violet 250 surfaces were an indigo-era leftover, and warm navy carries the Nachtblau
+identity. Live values (`.dark` in `src/index.css` is the source of truth; same lightness/saturation
+as the proposal, every pairing gated by `pnpm check:contrast`):
+- `--background` `228 24% 10%` (`#131620`), `--surface` `228 20% 14%`, `--foreground` `228 20% 92%`
+  (`#e7e8ef`); the no-JS shells + PWA manifest carry the same hexes.
+- `--primary` Nachtblau lifted `221 90% 70%`, `--accent` Himmelblau `198 90% 70%`, `--reward`
+  Koralle `11 88% 66%`.
+- Gradient stops are per-theme tokens since s137 (`--gradient-from`/`--gradient-to`): the dark sweep
+  stays light end-to-end so the near-black `primary-foreground` text passes AA.
 
 ## 3. Logo
 

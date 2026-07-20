@@ -106,7 +106,9 @@ greenlit fixes 1-7 of the ten-point list. What shipped:
   sub-idea was dropped as churn without visual payoff.
 - **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.9 kB ✓ ·
   check:contrast 46/46 ✓. Verified rendered output via `pnpm preview` + headless Chromium
-  (landing light/dark, Anwenden hub, Fortschritt). PWA caveat: hard-refresh the live site.
+  (landing light/dark, Anwenden hub, Fortschritt). **Deploy: the wave-1 Pages run failed (the #609
+  conflict marker); the wave-2 run (`add6529`, PR #610) completed green, so BOTH waves went live
+  together.** PWA caveat: hard-refresh the live site.
 
 **Handoff after session 136 (2026-07-20). Landing-page redesign, previews → full implementation,
 branch `claude/landing-page-redesign-iqxlja`, shipped to `main`.** The founder asked for a
