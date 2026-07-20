@@ -7,7 +7,9 @@ bounding box ("Randnah", 5% margin — the app icon no longer floats small with 
 top), dark-ground logos are **two-tone** (ink on the swipe, white off it; only the g splits), and a
 new lowercase **wordmark** "genauly" (swipe under "genau") is the primary logo wherever there is
 room (`Logo variant="wordmark"`; the mobile header keeps the compact g). Iterated across 8 preview
-rounds in a claude.ai artifact. Product name: **Genauly** (`genauly.de`)._
+rounds in a claude.ai artifact. A same-session follow-up then applied Himmel Soft **app-wide as the
+`--accent` token** (both themes, `197 93% 77%`; contrast gate green). Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -68,8 +70,12 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 swipe too harsh against black/white and iterated through 8 artifact preview rounds (v2→v8) to a
 finalized design, then said "finalize these logos and Randnah favicon, apply everywhere, logos
 only." What shipped:
-- **Swipe color: Himmel Soft `#8CDBFB`** on every logo asset. The app's `--accent` token stays
-  Himmelblau `#52C6F9` (deliberately decoupled; only the logo lightened).
+- **Swipe color: Himmel Soft `#8CDBFB`** on every logo asset. (Initially the `--accent` token was
+  deliberately left at Himmelblau `#52C6F9`; a same-session follow-up prompt then applied Himmel
+  Soft app-wide: `--accent: 197 93% 77%` in BOTH themes in `index.css`, plus the two fixed
+  `#53C7F9` hexes on the landing (numbers-band gradient stop, decorative doodle stroke). The darker
+  `--accent-ink` text variant and the CTA `--gradient-*` stops are different blues and stayed.
+  `check:contrast` green; brand kit regenerated.)
 - **Icons re-centered ("Randnah"):** `build-logo-assets.mjs` now measures the mark's true bbox
   in-browser and centers it at 5% margin (favicons/apple-touch/pwa; maskable keeps the 80% safe
   zone at 10%). This fixes the founder-screenshotted "empty band above the g" app icon. Never

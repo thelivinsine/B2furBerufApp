@@ -724,8 +724,9 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   gradient-clipped stat values are the one sanctioned `text-gradient`-style moment.
 - **Current mark (s133 PR B, reworked s138 2026-07-20): the lowercase g on a Himmel Soft highlighter
   swipe**. The swipe is **Himmel Soft `#8CDBFB`** (founder-picked s138: the original Himmelblau
-  `#52C6F9` read too harsh against black/white; the `--accent` token is UNCHANGED, only the logo
-  lightened). The **g is OUTLINED to a `<path>`** (Inter 800, the app's own UI typeface) so it renders
+  `#52C6F9` read too harsh against black/white). In a same-session follow-up the founder applied
+  Himmel Soft app-wide: **`--accent` is now `197 93% 77%` in BOTH themes** (index.css; the darker
+  `--accent-ink` text variant and the CTA `--gradient-*` stops are different blues and stayed). The **g is OUTLINED to a `<path>`** (Inter 800, the app's own UI typeface) so it renders
   identically everywhere. **s138 additions:** (1) every icon centers the mark by its TRUE bounding box
   ("Randnah", 5% margin; the raw path sits low in the 64-box and used to leave an empty band at the top
   of the app icon — never revert to raw-coordinate centering); (2) **dark-ground marks are TWO-TONE**:
