@@ -59,6 +59,10 @@ a{color:inherit}
 .btn-primary.big{padding:1.15rem 2.2rem;font-size:1.1rem}
 .btn-ghost{background:transparent;color:var(--tinte);padding:.7rem 1.1rem;font-weight:600}
 .btn-ghost:hover{background:rgba(28,26,35,.05)}
+.lang-toggle{display:inline-flex;align-items:center;border:1.5px solid var(--border);border-radius:var(--r-pill);
+  background:var(--surface);padding:3px;gap:2px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow-soft)}
+.lang-toggle span{font-size:.76rem;font-weight:700;color:var(--mut);padding:.26rem .58rem;border-radius:var(--r-pill);transition:background .15s,color .15s}
+.lang-toggle span.on{background:var(--himmel-soft);color:var(--accent-ink)}
 .arrow{width:1em;height:1em;flex:none}
 
 /* ============ NAV ============ */
@@ -68,8 +72,9 @@ nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(
 .brand{display:flex;align-items:center;gap:.6rem;text-decoration:none}
 .brand svg{width:34px;height:34px}
 .brand b{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
-.nav-links{display:flex;gap:1.6rem;font-size:.92rem;font-weight:600;color:var(--mut)}
-.nav-links a{text-decoration:none}
+.nav-links{display:flex;gap:1.5rem;font-size:.92rem;font-weight:600;color:var(--mut)}
+.nav-links a{text-decoration:none;white-space:nowrap}
+@media(max-width:1120px){.nav-links{gap:1.1rem;font-size:.88rem}}
 .nav-links a:hover{color:var(--tinte)}
 .nav-cta{display:flex;align-items:center;gap:.4rem}
 .nav-cta .btn-primary{padding:.62rem 1.2rem;font-size:.92rem;white-space:nowrap}
@@ -216,6 +221,30 @@ h2{font-size:clamp(1.9rem,3.4vw,2.7rem);letter-spacing:-.03em;font-weight:800;li
 .exam-b{border:1.5px solid var(--border);border-radius:14px;padding:.65rem .95rem;font-size:.82rem;font-weight:700;background:var(--papier)}
 .exam-b small{display:block;font-weight:600;color:var(--mut);font-size:.7rem;margin-top:.1rem}
 
+/* ============ FILTER RAIL MOCK ============ */
+.rail-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  box-shadow:var(--shadow-lift);padding:1.5rem;max-width:23rem;margin:0 auto;transform:rotate(-1.2deg)}
+.rail-head{display:flex;align-items:center;justify-content:space-between}
+.rail-head b{font-size:1rem;font-weight:800;color:var(--nachtblau);display:inline-flex;align-items:center;gap:.45rem}
+.rail-head b svg{width:17px;height:17px}
+.rail-count{font-size:.72rem;font-weight:800;background:var(--nachtblau);color:#fff;border-radius:var(--r-pill);padding:.2rem .55rem}
+.rail-search{margin-top:1rem;display:flex;align-items:center;gap:.5rem;border:1.5px solid var(--border);
+  border-radius:12px;padding:.55rem .8rem;font-size:.88rem;color:var(--mut);background:var(--papier)}
+.rail-search svg{width:15px;height:15px;flex:none}
+.rail-sec{margin-top:1.1rem}
+.rail-lab{font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.rail-select{margin-top:.5rem;display:flex;justify-content:space-between;align-items:center;border:1.5px solid var(--border);
+  border-radius:12px;padding:.55rem .8rem;font-size:.9rem;font-weight:700;background:#fff}
+.rail-select svg{width:15px;height:15px;color:var(--mut)}
+.rail-pills{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+.rail-pill{border:1.5px solid var(--border);background:#fff;border-radius:var(--r-pill);padding:.32rem .7rem;
+  font-size:.8rem;font-weight:600;color:var(--mut)}
+.rail-pill.on{background:var(--himmel-soft);border-color:var(--himmel);color:var(--accent-ink);font-weight:700}
+.rail-cta{margin-top:1.3rem;border-top:1.5px dashed var(--border);padding-top:1.1rem}
+.rail-cta .go{display:block;text-align:center;background:linear-gradient(135deg,var(--nachtblau),#4A85F2);color:#fff;
+  border-radius:12px;padding:.8rem;font-weight:800;font-size:.95rem;text-decoration:none;
+  box-shadow:0 8px 20px -8px rgba(40,102,235,.6)}
+
 /* ============ NUMBERS ============ */
 .numbers{background:var(--tinte);color:var(--papier);border-radius:28px;padding:3.5rem 3rem;position:relative;overflow:hidden}
 .numbers .glow{position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(83,199,249,.25),transparent 65%);
@@ -280,21 +309,26 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
 <nav>
   <div class="nav-inner">
     <a class="brand" href="#">
-      <svg viewBox="0 0 64 64" aria-label="Genauly">
+      <svg viewBox="7 12 52 52" aria-label="Genauly">
         <path d="M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z" fill="#52C6F9" transform="rotate(-3 32 32)"/>
         <path d="M31.50 56.06Q28.50 56.06 26.27 55.31Q24.03 54.55 22.65 53.19Q21.26 51.84 20.85 50.06L27.07 48.78Q27.27 49.40 27.83 49.92Q28.38 50.45 29.28 50.76Q30.19 51.08 31.46 51.08Q33.65 51.08 34.83 50.10Q36.01 49.11 36.01 47.06L36.01 43L35.46 43Q35.05 44.03 34.24 44.87Q33.43 45.71 32.18 46.20Q30.94 46.69 29.24 46.69Q26.72 46.69 24.64 45.51Q22.56 44.33 21.31 41.86Q20.05 39.39 20.05 35.54Q20.05 31.52 21.35 28.91Q22.64 26.31 24.72 25.05Q26.80 23.79 29.22 23.79Q31.05 23.79 32.35 24.40Q33.65 25.02 34.50 25.99Q35.35 26.96 35.78 28.01L35.99 28.01L35.99 24.07L43.06 24.07L43.06 46.49Q43.06 49.65 41.60 51.78Q40.13 53.91 37.53 54.99Q34.92 56.06 31.50 56.06M31.68 41.44Q33.06 41.44 34.02 40.75Q34.98 40.05 35.50 38.70Q36.01 37.36 36.01 35.52Q36.01 33.63 35.50 32.25Q34.98 30.88 34.03 30.13Q33.08 29.38 31.68 29.38Q30.31 29.38 29.35 30.15Q28.40 30.92 27.91 32.30Q27.42 33.67 27.42 35.52Q27.42 37.36 27.91 38.69Q28.40 40.03 29.35 40.73Q30.31 41.44 31.68 41.44" fill="#1C1A24"/>
       </svg>
       <b>Genauly</b>
     </a>
     <div class="nav-links">
-      <a href="#plateau">Warum Genauly</a>
-      <a href="#features">Was du bekommst</a>
-      <a href="#steps">So funktioniert's</a>
+      <a href="#plateau">Why Genauly</a>
+      <a href="#features">Features</a>
       <a href="#faq">FAQ</a>
+      <a href="/about" title="/about">About</a>
+      <a href="/hilfe" title="/hilfe">Help</a>
+      <a href="/sources" title="/sources">Sources</a>
     </div>
     <div class="nav-cta">
+      <button class="lang-toggle" id="langToggle" type="button" aria-label="Switch language / Sprache wechseln">
+        <span class="on">EN</span><span>DE</span>
+      </button>
       <a class="btn btn-ghost" href="#">Log in</a>
-      <a class="btn btn-primary" href="#">Kostenlos starten</a>
+      <a class="btn btn-primary" href="#">Start free</a>
     </div>
   </div>
 </nav>
@@ -316,19 +350,20 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
       <p class="lead">
         You passed B1. You still rehearse sentences before every phone call.
         Genauly turns textbook German into <b>confident, real-world German</b>:
-        im Job, beim Amt, beim Arzt, und in jedem Gespräch, das dich bisher nervös gemacht hat.
+        at work, at the Behörde, at the doctor, and in every conversation that
+        used to make you nervous.
       </p>
       <div class="hero-ctas">
         <a class="btn btn-primary big" href="#">
-          Kostenlos starten
+          <span>Start free</span>
           <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
         </a>
         <a class="link-quiet" href="#">Ich habe schon ein Konto</a>
       </div>
       <div class="checks">
         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg> Free to start</span>
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg> Kein Konto nötig</span>
-        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg> Läuft im Browser</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg> No account needed</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg> Runs in your browser</span>
       </div>
     </div>
 
@@ -473,28 +508,28 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
       </svg>
     </div>
     <div>
-      <p class="kicker">Warum du feststeckst</p>
-      <h2>B1 ist nicht das Ziel.<br>Es ist <span class="swipe">die Hälfte.<i></i></span></h2>
+      <p class="kicker">Why you're stuck</p>
+      <h2>B1 isn't the finish line.<br>It's <span class="swipe">halfway.<i></i></span></h2>
       <div class="pain-list">
         <div class="pain">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8M8 13h5M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z"/></svg></span>
           <div>
-            <h4>Der Kurs hat dir Grammatik gegeben. Nicht Gespräche.</h4>
-            <p>Genauly übt genau die Situationen, in denen du bisher ins Englische wechselst: verzweigte Dialoge zum Durchspielen, so oft du willst.</p>
+            <h4>Your course gave you grammar. Not conversations.</h4>
+            <p>Genauly drills exactly the situations where you still switch to English: branching dialogues you can replay until they feel easy.</p>
           </div>
         </div>
         <div class="pain">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z"/></svg></span>
           <div>
-            <h4>Du lernst Wörter. Und vergisst sie wieder.</h4>
-            <p>Spaced Repetition (FSRS) zeigt dir jedes Wort genau dann, wenn du es fast vergessen hättest. So bleibt es. Dauerhaft.</p>
+            <h4>You learn words. Then you lose them.</h4>
+            <p>Spaced repetition (FSRS) brings each word back right before you would forget it. So it sticks. For good.</p>
           </div>
         </div>
         <div class="pain">
           <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19v3M8 22h8M19 11a7 7 0 0 1-14 0M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4z"/></svg></span>
           <div>
-            <h4>Sprechen übst du nie, weil immer jemand zuhört.</h4>
-            <p>Hier nicht. Sprich mit der Spracherkennung, so lange und so falsch du willst. Feedback ja, Publikum nein.</p>
+            <h4>You never practice speaking, because someone is always listening.</h4>
+            <p>Not here. Talk to the speech recognition as long, and as wrong, as you like. Feedback yes, audience no.</p>
           </div>
         </div>
       </div>
@@ -506,15 +541,15 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
 <section class="sec" id="features" style="padding-top:1rem">
   <div class="wrap">
     <div class="sec-head">
-      <p class="kicker">Was du bekommst</p>
-      <h2>Ein komplettes Trainingssystem.<br>Kein <span class="swipe koralle">Karteikarten-Friedhof.<i></i></span></h2>
+      <p class="kicker">What you get</p>
+      <h2>A complete training system.<br>Not a <span class="swipe koralle">flashcard graveyard.<i></i></span></h2>
     </div>
     <div class="bento">
 
       <div class="b b-session">
-        <span class="badge">Die Session</span>
-        <h3>Lern-Sessions, die sich nach Fortschritt anfühlen</h3>
-        <p>Fünf Minuten oder fünfzig: Genauly mischt Karten, Quiz, Tippen, Hören und Sprechen zu einer Session, die genau zu deinem Stand passt.</p>
+        <span class="badge">The session</span>
+        <h3>Sessions that feel like progress</h3>
+        <p>Five minutes or fifty: Genauly mixes cards, quiz, typing, listening and speaking into one session that matches exactly where you are.</p>
         <div class="mock-session" aria-hidden="true">
           <div class="mock-prog"><i></i></div>
           <p class="mock-q">Ich möchte einen Termin <span class="blank">vereinbaren</span>.</p>
@@ -531,28 +566,28 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
 
       <div class="b b-artikel">
         <span class="badge">der · die · das</span>
-        <h3>Artikel, die du nie wieder vergisst</h3>
-        <p>Jedes Nomen hat sein Wesen: spitz, rund oder eckig. Form + Farbe + Figur, dreifach verankert.</p>
+        <h3>Articles you'll never forget again</h3>
+        <p>Every noun has its creature: spiky, round or boxy. Shape + color + character, anchored three ways.</p>
         <div class="wesen-row" aria-hidden="true">
           <div class="wesen-cell der">
             <svg viewBox="0 0 24 24"><g fill="none" stroke="#2148D5" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.7 Q12.6 4.7 13.2 5.9 L20.2 18.7 Q21 20.2 19.2 20.25 L4.9 20.55 Q3.1 20.55 3.9 18.95 L10.8 5.9 Q11.4 4.7 12 4.7 Z" fill="#fff"/><path d="M12 4.7 L12 2.5 M12 2.5 Q13.4 1.8 13.8 3"/><circle cx="10.1" cy="14.7" r="0.95" fill="#2148D5" stroke="none"/><circle cx="13.9" cy="14.7" r="0.95" fill="#2148D5" stroke="none"/><path d="M10.4 17.2 Q12 18.35 13.6 17.2" stroke-width="1.5"/></g></svg>
-            <b>der</b><small>spitz</small>
+            <b>der</b><small>spiky</small>
           </div>
           <div class="wesen-cell die">
             <svg viewBox="0 0 24 24"><g fill="none" stroke="#DB2C7F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 Q20.4 3.1 20.9 12 Q21.4 20.6 12.2 21 Q3.3 21.4 3.05 12.2 Q2.85 4.5 10.2 3.65" fill="#fff"/><path d="M16.7 4.3 Q18 2.3 19.4 3.7" stroke-width="1.5"/><circle cx="9.6" cy="11.6" r="0.95" fill="#DB2C7F" stroke="none"/><circle cx="14.4" cy="11.6" r="0.95" fill="#DB2C7F" stroke="none"/><path d="M9.4 15 Q12 16.9 14.6 15" stroke-width="1.5"/></g></svg>
-            <b>die</b><small>rund</small>
+            <b>die</b><small>round</small>
           </div>
           <div class="wesen-cell das">
             <svg viewBox="0 0 24 24"><g fill="none" stroke="#16A24E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.1 5.7 L18.4 5.2 Q19.7 5.2 19.7 6.5 L19.3 18.4 Q19.3 19.7 17.9 19.7 L6.6 20.1 Q5.3 20.1 5.3 18.8 L5.6 6.8 Q5.6 5.7 6.1 5.7 Z" fill="#fff"/><path d="M8.7 5.5 L7.3 3.5 M15.3 5.3 L16.7 3.2" stroke-width="1.5"/><circle cx="9.6" cy="12.1" r="0.95" fill="#16A24E" stroke="none"/><circle cx="14.4" cy="12.1" r="0.95" fill="#16A24E" stroke="none"/><path d="M9.9 15.6 L14.1 15.6" stroke-width="1.5"/></g></svg>
-            <b>das</b><small>eckig</small>
+            <b>das</b><small>boxy</small>
           </div>
         </div>
-        <p style="margin-top:1.2rem;font-size:.85rem">Beim richtigen Artikel platzt, blüht oder zerspringt die Karte. Kleine Belohnung, großer Anker.</p>
+        <p style="margin-top:1.2rem;font-size:.85rem">Answer right and the card bursts, blooms or shatters. Small reward, strong memory.</p>
       </div>
 
       <div class="b b-srs">
-        <h3>Vergessen, wissenschaftlich abgeschafft</h3>
-        <p>FSRS-Spaced-Repetition plant jede Wiederholung auf den optimalen Moment.</p>
+        <h3>Forgetting, scientifically cancelled</h3>
+        <p>FSRS spaced repetition schedules every review for the optimal moment.</p>
         <div class="srs-bars" aria-hidden="true">
           <i style="height:30%"></i><i style="height:45%"></i><i class="hot" style="height:70%"></i><i style="height:38%"></i>
           <i style="height:55%"></i><i class="hot" style="height:90%"></i><i style="height:48%"></i><i style="height:26%"></i>
@@ -561,8 +596,8 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
       </div>
 
       <div class="b b-speak">
-        <h3>Sprich, ohne Publikum</h3>
-        <p>Spracherkennung und Vorlesestimme, direkt im Browser. Aussprache üben, judgement-free.</p>
+        <h3>Speak without an audience</h3>
+        <p>Speech recognition and a read-aloud voice, right in your browser. Practice your Aussprache, judgement-free.</p>
         <div class="wave" aria-hidden="true">
           <i style="height:22%"></i><i style="height:48%"></i><i style="height:80%"></i><i style="height:56%"></i><i style="height:92%"></i>
           <i style="height:40%"></i><i style="height:66%"></i><i style="height:30%"></i><i style="height:74%"></i><i style="height:50%"></i>
@@ -571,14 +606,90 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
       </div>
 
       <div class="b b-exam">
-        <h3>Prüfung? Eingeplant.</h3>
-        <p>Wortschatz, Redemittel und Simulationen, ausgerichtet auf die zwei großen B2-Prüfungen.</p>
+        <h3>Exam? Covered.</h3>
+        <p>Vocabulary, Redemittel and simulations aligned with the two big B2 exams.</p>
         <div class="exam-row">
-          <span class="exam-b">telc Deutsch B2 Beruf<small>Sprechen · Schreiben · Wortschatz</small></span>
-          <span class="exam-b">Goethe-Zertifikat B2<small>Alle vier Module</small></span>
+          <span class="exam-b">telc Deutsch B2 Beruf<small>Speaking · Writing · Vocabulary</small></span>
+          <span class="exam-b">Goethe-Zertifikat B2<small>All four modules</small></span>
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- ================= FILTER / CUSTOM ÜBEN ================= -->
+<section class="sec" id="filter" style="padding-top:.5rem">
+  <div class="wrap plateau-grid">
+    <div style="position:relative">
+      <div class="rail-card" aria-hidden="true">
+        <div class="rail-head">
+          <b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg> Filter</b>
+          <span class="rail-count">3</span>
+        </div>
+        <div class="rail-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+          Suchen…
+        </div>
+        <div class="rail-sec">
+          <span class="rail-lab">Thema</span>
+          <div class="rail-select">Arzt &amp; Gesundheit
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="rail-sec">
+          <span class="rail-lab">Stufe</span>
+          <div class="rail-pills">
+            <span class="rail-pill">B1.1</span><span class="rail-pill">B1.2</span>
+            <span class="rail-pill on">B2.1</span><span class="rail-pill">B2.2</span>
+          </div>
+        </div>
+        <div class="rail-sec">
+          <span class="rail-lab">Wortart</span>
+          <div class="rail-pills">
+            <span class="rail-pill on">Nomen</span><span class="rail-pill">Verben</span><span class="rail-pill">Adjektive</span>
+          </div>
+        </div>
+        <div class="rail-sec">
+          <span class="rail-lab">Branche</span>
+          <div class="rail-pills">
+            <span class="rail-pill on">Pflege</span><span class="rail-pill">IT</span><span class="rail-pill">Handwerk</span>
+          </div>
+        </div>
+        <div class="rail-cta">
+          <a class="go num" href="#">Üben · 34 Wörter</a>
+        </div>
+      </div>
+      <svg class="doodle" style="right:2%;bottom:2%;width:74px" viewBox="0 0 80 80" fill="none" stroke="#EA4D2A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M72 8 Q54 18 44 40 Q37 54 22 62"/><path d="M30 68 L18 64 L24 52"/>
+      </svg>
+    </div>
+    <div>
+      <p class="kicker">Your library, your rules</p>
+      <h2>Filter what you need.<br><span class="swipe">Practice exactly that.<i></i></span></h2>
+      <div class="pain-list">
+        <div class="pain">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M7 12h10M10 19h4"/></svg></span>
+          <div>
+            <h4>Slice 1,600+ words any way you like</h4>
+            <p>By topic and sub-topic, CEFR level (B1.1 to B2.2), industry, word type, frequency, or what's due for review. Combine filters freely.</p>
+          </div>
+        </div>
+        <div class="pain">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8L21 10h-7l-1-8z"/></svg></span>
+          <div>
+            <h4>One tap turns your filter into a session</h4>
+            <p>Hit Üben and that exact list becomes a custom practice session: cards, quiz, typing, listening, matching. Built from your words, nothing generic.</p>
+          </div>
+        </div>
+        <div class="pain">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z"/></svg></span>
+          <div>
+            <h4>Made for busy weeks</h4>
+            <p>Doctor's appointment on Friday? Filter Arzt at your level, practice ten minutes a day, walk in prepared.</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -588,17 +699,17 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
   <div class="wrap">
     <div class="numbers">
       <div class="glow"></div>
-      <p class="kicker" style="color:var(--himmel)">Handgebaut, nicht zusammengekratzt</p>
-      <h2>Jedes Wort hat eine Quelle.<br>Jeder Satz einen Zweck.</h2>
+      <p class="kicker" style="color:var(--himmel)">Handmade, not scraped</p>
+      <h2>Every word has a source.<br>Every sentence has a job.</h2>
       <div class="num-grid num">
-        <div class="num-cell"><b>1.623</b><span>Wörter mit Artikel, Plural und zwei echten Beispielsätzen</span></div>
-        <div class="num-cell"><b>1.033</b><span>Nomen-Verb-Kollokationen, wie Deutsche wirklich sprechen</span></div>
-        <div class="num-cell"><b>117</b><span>Grammatik-Übungen entlang der wichtigsten B2-Marker</span></div>
-        <div class="num-cell"><b>20</b><span>Themen aus Beruf und Alltag, vom Meeting bis zur Mietwohnung</span></div>
+        <div class="num-cell"><b>1,623</b><span>words with article, plural and two real example sentences</span></div>
+        <div class="num-cell"><b>1,033</b><span>noun-verb collocations, the way Germans actually speak</span></div>
+        <div class="num-cell"><b>117</b><span>grammar drills along the biggest B2 markers</span></div>
+        <div class="num-cell"><b>20</b><span>topics from work and daily life, from meetings to Mietvertrag</span></div>
       </div>
       <div class="prov-note">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
-        <span>Alle Inhalte werden maschinell und menschlich geprüft, mit offener Herkunft pro Eintrag. <a href="#">Quellen &amp; Datenqualität ansehen</a></span>
+        <span>Every item is machine-checked and human-reviewed, with open provenance per entry. <a href="/sources" title="/sources">See sources &amp; data quality</a></span>
       </div>
     </div>
   </div>
@@ -608,26 +719,26 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
 <section class="sec" id="steps" style="padding-top:1rem">
   <div class="wrap">
     <div class="sec-head">
-      <p class="kicker">So funktioniert's</p>
-      <h2>Drei Schritte. <span class="swipe">Kein Lehrbuch.<i></i></span></h2>
+      <p class="kicker">How it works</p>
+      <h2>Three steps. <span class="swipe">No textbook.<i></i></span></h2>
     </div>
     <div class="steps">
       <div class="step">
         <span class="n">1</span>
-        <h3>Wähle eine echte Situation</h3>
-        <p>Beruf, Behörde, Arzt, Wohnen, Bank oder Prüfung. Jedes Thema spiegelt das Deutsch, das du wirklich brauchst.</p>
+        <h3>Pick a real situation</h3>
+        <p>Work, Behörde, doctor, housing, bank or exam prep. Every topic mirrors the German you actually need.</p>
         <svg class="connect" viewBox="0 0 30 20" fill="none" stroke="#EBE2CE" stroke-width="3" stroke-linecap="round"><path d="M2 10 L22 10 M16 4 L24 10 L16 16"/></svg>
       </div>
       <div class="step">
         <span class="n">2</span>
-        <h3>Übe laut und schriftlich</h3>
-        <p>Verzweigte Dialoge, Wortschatz mit Spaced Repetition, Quiz in drei Stufen, Sprechen mit Spracherkennung.</p>
+        <h3>Practice out loud and in writing</h3>
+        <p>Branching dialogues, vocabulary with spaced repetition, leveled quizzes, and speaking with speech recognition.</p>
         <svg class="connect" viewBox="0 0 30 20" fill="none" stroke="#EBE2CE" stroke-width="3" stroke-linecap="round"><path d="M2 10 L22 10 M16 4 L24 10 L16 16"/></svg>
       </div>
       <div class="step">
         <span class="n">3</span>
-        <h3>Bekomm Feedback, sieh Fortschritt</h3>
-        <p>Ein klarer KI-Tipp zu deiner größten Schwäche, plus Can-Do-Meilensteine und Fortschritt auf allen Geräten.</p>
+        <h3>Get feedback, see progress</h3>
+        <p>One clear AI tip on your biggest weakness, plus Can-Do milestones and progress that follows you across devices.</p>
       </div>
     </div>
   </div>
@@ -637,29 +748,29 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
 <section class="sec" id="faq" style="padding-top:1rem">
   <div class="wrap">
     <div class="sec-head" style="margin:0 auto;text-align:center">
-      <p class="kicker">Häufige Fragen</p>
-      <h2>Noch Fragen? Genau dafür.</h2>
+      <p class="kicker">FAQ</p>
+      <h2>Questions? Genau.</h2>
     </div>
     <div class="faq">
       <details open>
-        <summary>Für wen ist Genauly? <span class="pm">+</span></summary>
-        <p>Für Erwachsene, die schon Deutsch können (etwa B1) und in echten Situationen sicher werden wollen: im Job und im Alltag. Auch ideal zur Vorbereitung auf telc Deutsch B2 Beruf oder das Goethe-Zertifikat B2.</p>
+        <summary>Who is Genauly for? <span class="pm">+</span></summary>
+        <p>Adults who already know basic German (around B1) and want to become confident in real-life situations at work and in daily life. It also suits anyone preparing for the telc Deutsch B2 Beruf or Goethe-Zertifikat B2 exam.</p>
       </details>
       <details>
-        <summary>Ist Genauly kostenlos? <span class="pm">+</span></summary>
-        <p>Ja. Du startest kostenlos und ohne Konto. Anmelden ist optional und speichert deinen Fortschritt auf allen Geräten.</p>
+        <summary>Is Genauly free? <span class="pm">+</span></summary>
+        <p>Yes. You can start for free with no account. Signing in is optional and saves your progress across your devices.</p>
       </details>
       <details>
-        <summary>Welches Niveau brauche ich? <span class="pm">+</span></summary>
-        <p>Das Plateau, ungefähr B1 bis B2. Alle Inhalte sind nach GER-Stufe markiert, du startest wo du dich wohlfühlst und steigerst dich in deinem Tempo.</p>
+        <summary>What level do I need? <span class="pm">+</span></summary>
+        <p>The intermediate plateau, roughly B1 to B2. Content is tagged by CEFR level, so you start where you are comfortable and level up at your own pace.</p>
       </details>
       <details>
-        <summary>Wie funktioniert das KI-Schreibfeedback? <span class="pm">+</span></summary>
-        <p>Du schreibst einen kurzen Text und bekommst einen klaren, priorisierten Tipp zu deiner größten Schwäche. Ein Grammatik-Checker kategorisiert zuerst, ein KI-Modell hilft nur, wenn ein tieferer Blick nötig ist. KI-Feedback ist immer als solches markiert.</p>
+        <summary>How does the AI writing feedback work? <span class="pm">+</span></summary>
+        <p>You write a short text and get one clear, prioritised tip on your biggest weakness. A grammar checker categorises errors first, and an AI model is used only when a deeper read helps. AI feedback is always marked as such.</p>
       </details>
       <details>
-        <summary>Muss ich etwas installieren? <span class="pm">+</span></summary>
-        <p>Nein. Genauly läuft im Browser und lässt sich als App auf den Homescreen legen. Funktioniert auf Handy, Tablet und Laptop.</p>
+        <summary>Do I need to install anything? <span class="pm">+</span></summary>
+        <p>No. Genauly runs in your browser and can be added to your home screen as an app. It works on phone, tablet and laptop.</p>
       </details>
     </div>
   </div>
@@ -671,13 +782,13 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
     <div class="closing">
       <svg style="position:absolute;left:6%;top:18%;width:60px;opacity:.5" viewBox="0 0 60 60" fill="none" stroke="#53C7F9" stroke-width="2.6" stroke-linecap="round"><path d="M30 8 L30 22 M30 38 L30 52 M8 30 L22 30 M38 30 L52 30"/></svg>
       <svg style="position:absolute;right:8%;bottom:20%;width:46px;opacity:.6" viewBox="0 0 50 50" fill="#F5785C"><path d="M25 4 l5 12 12 2-9 8.5 2.5 12L25 32l-10.5 6.5L17 26.5 8 18l12-2z"/></svg>
-      <h2>Bereit? Dein Deutsch wartet.</h2>
-      <p>Starte kostenlos, ohne Konto, direkt im Browser. In zwei Minuten steckst du mitten in deiner ersten Session.</p>
+      <h2>Ready? Dein Deutsch is waiting.</h2>
+      <p>Start free, no account, right in your browser. Two minutes from now you'll be mid-session.</p>
       <a class="btn btn-white" href="#">
-        Kostenlos starten
+        <span>Start free</span>
         <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       </a>
-      <small>Kein Abo. Keine Kreditkarte. Kein Kleingedrucktes.</small>
+      <small>No subscription. No credit card. No fine print.</small>
     </div>
   </div>
 </section>
@@ -687,19 +798,149 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
   <div class="wrap">
     <div class="foot-grid">
       <a class="brand" href="#" style="text-decoration:none">
-        <svg viewBox="0 0 64 64" width="28" height="28">
+        <svg viewBox="7 12 52 52" width="28" height="28">
           <path d="M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z" fill="#52C6F9" transform="rotate(-3 32 32)"/>
           <path d="M31.50 56.06Q28.50 56.06 26.27 55.31Q24.03 54.55 22.65 53.19Q21.26 51.84 20.85 50.06L27.07 48.78Q27.27 49.40 27.83 49.92Q28.38 50.45 29.28 50.76Q30.19 51.08 31.46 51.08Q33.65 51.08 34.83 50.10Q36.01 49.11 36.01 47.06L36.01 43L35.46 43Q35.05 44.03 34.24 44.87Q33.43 45.71 32.18 46.20Q30.94 46.69 29.24 46.69Q26.72 46.69 24.64 45.51Q22.56 44.33 21.31 41.86Q20.05 39.39 20.05 35.54Q20.05 31.52 21.35 28.91Q22.64 26.31 24.72 25.05Q26.80 23.79 29.22 23.79Q31.05 23.79 32.35 24.40Q33.65 25.02 34.50 25.99Q35.35 26.96 35.78 28.01L35.99 28.01L35.99 24.07L43.06 24.07L43.06 46.49Q43.06 49.65 41.60 51.78Q40.13 53.91 37.53 54.99Q34.92 56.06 31.50 56.06M31.68 41.44Q33.06 41.44 34.02 40.75Q34.98 40.05 35.50 38.70Q36.01 37.36 36.01 35.52Q36.01 33.63 35.50 32.25Q34.98 30.88 34.03 30.13Q33.08 29.38 31.68 29.38Q30.31 29.38 29.35 30.15Q28.40 30.92 27.91 32.30Q27.42 33.67 27.42 35.52Q27.42 37.36 27.91 38.69Q28.40 40.03 29.35 40.73Q30.31 41.44 31.68 41.44" fill="#1C1A24"/>
         </svg>
         <b style="font-size:1rem">Genauly</b>
       </a>
       <nav class="foot-links">
-        <a href="#">Über uns</a><a href="#">Hilfe</a><a href="#">Datenschutz</a><a href="#">AGB</a><a href="#">Quellen &amp; Lizenzen</a>
+        <a href="/about" title="/about">About</a><a href="/hilfe" title="/hilfe">Help</a><a href="/privacy" title="/privacy">Privacy</a><a href="/terms" title="/terms">Terms</a><a href="/sources" title="/sources">Sources &amp; licenses</a>
       </nav>
     </div>
     <p class="foot-note">Genauly · German for real life · Deutsch für das echte Leben · B1–B2</p>
   </div>
 </footer>
+
+<script>
+/* EN/DE page language toggle, mirroring the bilingual pattern of /about, /hilfe
+   and the legal pages. English innerHTML is snapshotted on first switch, so the
+   dictionary below only carries the German side. */
+(function () {
+  var T = [
+    /* [selector, german, "t" = swap only the text node (keeps child icons)] */
+    [".nav-links a:nth-child(1)", "Vorteile"],
+    [".nav-links a:nth-child(2)", "Funktionen"],
+    [".nav-links a:nth-child(3)", "FAQ"],
+    [".nav-links a:nth-child(4)", "Über uns"],
+    [".nav-links a:nth-child(5)", "Hilfe"],
+    [".nav-links a:nth-child(6)", "Quellen"],
+    [".nav-cta .btn-ghost", "Anmelden"],
+    [".nav-cta .btn-primary", "Kostenlos starten"],
+    [".eyebrow", " Deutsch fürs echte Leben · B1–B2", "t"],
+    [".hero h1", 'Durchbrich das <span class="swipe">Plateau.<i></i></span> <span class="sub">Deutsch für die Situationen, die wirklich zählen.</span>'],
+    [".hero .lead", 'Du hast B1 geschafft. Und übst trotzdem vor jedem Anruf die Sätze. Genauly macht aus Lehrbuch-Deutsch <b>sicheres Deutsch für das echte Leben</b>: im Job, beim Amt, beim Arzt und in jedem Gespräch, das dich bisher nervös gemacht hat.'],
+    [".hero-ctas .btn-primary.big span", "Kostenlos starten"],
+    [".link-quiet", "Ich habe schon ein Konto"],
+    [".checks span:nth-child(1)", " Kostenlos loslegen", "t"],
+    [".checks span:nth-child(2)", " Kein Konto nötig", "t"],
+    [".checks span:nth-child(3)", " Läuft im Browser", "t"],
+    ["#plateau .kicker", "Warum du feststeckst"],
+    ["#plateau h2", 'B1 ist nicht das Ziel.<br>Es ist <span class="swipe">die Hälfte.<i></i></span>'],
+    ["#plateau .pain:nth-child(1) h4", "Der Kurs hat dir Grammatik gegeben. Nicht Gespräche."],
+    ["#plateau .pain:nth-child(1) p", "Genauly übt genau die Situationen, in denen du bisher ins Englische wechselst: verzweigte Dialoge zum Durchspielen, so oft du willst."],
+    ["#plateau .pain:nth-child(2) h4", "Du lernst Wörter. Und vergisst sie wieder."],
+    ["#plateau .pain:nth-child(2) p", "Spaced Repetition (FSRS) zeigt dir jedes Wort genau dann, wenn du es fast vergessen hättest. So bleibt es. Dauerhaft."],
+    ["#plateau .pain:nth-child(3) h4", "Sprechen übst du nie, weil immer jemand zuhört."],
+    ["#plateau .pain:nth-child(3) p", "Hier nicht. Sprich mit der Spracherkennung, so lange und so falsch du willst. Feedback ja, Publikum nein."],
+    ["#features .kicker", "Was du bekommst"],
+    ["#features .sec-head h2", 'Ein komplettes Trainingssystem.<br>Kein <span class="swipe koralle">Karteikarten-Friedhof.<i></i></span>'],
+    [".b-session .badge", "Die Session"],
+    [".b-session h3", "Lern-Sessions, die sich nach Fortschritt anfühlen"],
+    [".b-session > p", "Fünf Minuten oder fünfzig: Genauly mischt Karten, Quiz, Tippen, Hören und Sprechen zu einer Session, die genau zu deinem Stand passt."],
+    [".b-artikel h3", "Artikel, die du nie wieder vergisst"],
+    [".b-artikel > p:first-of-type", "Jedes Nomen hat sein Wesen: spitz, rund oder eckig. Form + Farbe + Figur, dreifach verankert."],
+    [".wesen-cell.der small", "spitz"],
+    [".wesen-cell.die small", "rund"],
+    [".wesen-cell.das small", "eckig"],
+    [".b-artikel > p:last-of-type", "Beim richtigen Artikel platzt, blüht oder zerspringt die Karte. Kleine Belohnung, großer Anker."],
+    [".b-srs h3", "Vergessen, wissenschaftlich abgeschafft"],
+    [".b-srs > p", "FSRS-Spaced-Repetition plant jede Wiederholung auf den optimalen Moment."],
+    [".b-speak h3", "Sprich, ohne Publikum"],
+    [".b-speak > p", "Spracherkennung und Vorlesestimme, direkt im Browser. Aussprache üben, ganz ohne Bewertung von außen."],
+    [".b-exam h3", "Prüfung? Eingeplant."],
+    [".b-exam > p", "Wortschatz, Redemittel und Simulationen, ausgerichtet auf die zwei großen B2-Prüfungen."],
+    [".exam-row .exam-b:nth-child(1) small", "Sprechen · Schreiben · Wortschatz"],
+    [".exam-row .exam-b:nth-child(2) small", "Alle vier Module"],
+    ["#filter .kicker", "Deine Bibliothek, deine Regeln"],
+    ["#filter h2", 'Filtere, was du brauchst.<br><span class="swipe">Übe genau das.<i></i></span>'],
+    ["#filter .pain:nth-child(1) h4", "1.600+ Wörter, geschnitten wie du willst"],
+    ["#filter .pain:nth-child(1) p", "Nach Thema und Unterthema, GER-Stufe (B1.1 bis B2.2), Branche, Wortart, Häufigkeit oder fälligen Wiederholungen. Frei kombinierbar."],
+    ["#filter .pain:nth-child(2) h4", "Ein Tipp macht aus deinem Filter eine Session"],
+    ["#filter .pain:nth-child(2) p", "Tippe auf Üben und genau diese Liste wird eine eigene Übungs-Session: Karten, Quiz, Tippen, Hören, Zuordnen. Aus deinen Wörtern, nichts von der Stange."],
+    ["#filter .pain:nth-child(3) h4", "Gemacht für volle Wochen"],
+    ["#filter .pain:nth-child(3) p", "Freitag Arzttermin? Filtere Arzt auf deinem Niveau, übe zehn Minuten am Tag, geh vorbereitet hin."],
+    [".numbers .kicker", "Handgebaut, nicht zusammengekratzt"],
+    [".numbers h2", "Jedes Wort hat eine Quelle.<br>Jeder Satz einen Zweck."],
+    [".num-grid .num-cell:nth-child(1) b", "1.623"],
+    [".num-grid .num-cell:nth-child(1) span", "Wörter mit Artikel, Plural und zwei echten Beispielsätzen"],
+    [".num-grid .num-cell:nth-child(2) b", "1.033"],
+    [".num-grid .num-cell:nth-child(2) span", "Nomen-Verb-Kollokationen, wie Deutsche wirklich sprechen"],
+    [".num-grid .num-cell:nth-child(3) span", "Grammatik-Übungen entlang der wichtigsten B2-Marker"],
+    [".num-grid .num-cell:nth-child(4) span", "Themen aus Beruf und Alltag, vom Meeting bis zur Mietwohnung"],
+    [".prov-note > span", 'Alle Inhalte werden maschinell und menschlich geprüft, mit offener Herkunft pro Eintrag. <a href="/sources" title="/sources">Quellen &amp; Datenqualität ansehen</a>'],
+    ["#steps .kicker", "So funktioniert's"],
+    ["#steps .sec-head h2", 'Drei Schritte. <span class="swipe">Kein Lehrbuch.<i></i></span>'],
+    ["#steps .step:nth-child(1) h3", "Wähle eine echte Situation"],
+    ["#steps .step:nth-child(1) p", "Beruf, Behörde, Arzt, Wohnen, Bank oder Prüfung. Jedes Thema spiegelt das Deutsch, das du wirklich brauchst."],
+    ["#steps .step:nth-child(2) h3", "Übe laut und schriftlich"],
+    ["#steps .step:nth-child(2) p", "Verzweigte Dialoge, Wortschatz mit Spaced Repetition, Quiz in drei Stufen, Sprechen mit Spracherkennung."],
+    ["#steps .step:nth-child(3) h3", "Bekomm Feedback, sieh Fortschritt"],
+    ["#steps .step:nth-child(3) p", "Ein klarer KI-Tipp zu deiner größten Schwäche, plus Can-Do-Meilensteine und Fortschritt auf allen Geräten."],
+    ["#faq .kicker", "Häufige Fragen"],
+    ["#faq .sec-head h2", "Noch Fragen? Genau."],
+    ["#faq details:nth-of-type(1) summary", "Für wen ist Genauly? ", "t"],
+    ["#faq details:nth-of-type(1) > p", "Für Erwachsene, die schon Deutsch können (etwa B1) und in echten Situationen sicher werden wollen: im Job und im Alltag. Auch ideal zur Vorbereitung auf telc Deutsch B2 Beruf oder das Goethe-Zertifikat B2."],
+    ["#faq details:nth-of-type(2) summary", "Ist Genauly kostenlos? ", "t"],
+    ["#faq details:nth-of-type(2) > p", "Ja. Du startest kostenlos und ohne Konto. Anmelden ist optional und speichert deinen Fortschritt auf allen Geräten."],
+    ["#faq details:nth-of-type(3) summary", "Welches Niveau brauche ich? ", "t"],
+    ["#faq details:nth-of-type(3) > p", "Das Plateau, ungefähr B1 bis B2. Alle Inhalte sind nach GER-Stufe markiert, du startest wo du dich wohlfühlst und steigerst dich in deinem Tempo."],
+    ["#faq details:nth-of-type(4) summary", "Wie funktioniert das KI-Schreibfeedback? ", "t"],
+    ["#faq details:nth-of-type(4) > p", "Du schreibst einen kurzen Text und bekommst einen klaren, priorisierten Tipp zu deiner größten Schwäche. Ein Grammatik-Checker kategorisiert zuerst, ein KI-Modell hilft nur, wenn ein tieferer Blick nötig ist. KI-Feedback ist immer als solches markiert."],
+    ["#faq details:nth-of-type(5) summary", "Muss ich etwas installieren? ", "t"],
+    ["#faq details:nth-of-type(5) > p", "Nein. Genauly läuft im Browser und lässt sich als App auf den Homescreen legen. Funktioniert auf Handy, Tablet und Laptop."],
+    [".closing h2", "Bereit? Dein Deutsch wartet."],
+    [".closing > p", "Starte kostenlos, ohne Konto, direkt im Browser. In zwei Minuten steckst du mitten in deiner ersten Session."],
+    [".closing .btn-white span", "Kostenlos starten"],
+    [".closing small", "Kein Abo. Keine Kreditkarte. Kein Kleingedrucktes."],
+    [".foot-links a:nth-child(1)", "Über uns"],
+    [".foot-links a:nth-child(2)", "Hilfe"],
+    [".foot-links a:nth-child(3)", "Datenschutz"],
+    [".foot-links a:nth-child(4)", "AGB"],
+    [".foot-links a:nth-child(5)", "Quellen &amp; Lizenzen"]
+  ];
+  var en = {};
+  function apply(lang) {
+    T.forEach(function (row) {
+      var el = document.querySelector(row[0]);
+      if (!el) return;
+      if (row[2] === "t") {
+        var node = null;
+        for (var i = 0; i < el.childNodes.length; i++) {
+          var n = el.childNodes[i];
+          if (n.nodeType === 3 && n.textContent.trim()) { node = n; break; }
+        }
+        if (!node) return;
+        if (!(row[0] in en)) en[row[0]] = node.textContent;
+        node.textContent = lang === "de" ? row[1] : en[row[0]];
+      } else {
+        if (!(row[0] in en)) en[row[0]] = el.innerHTML;
+        el.innerHTML = lang === "de" ? row[1] : en[row[0]];
+      }
+    });
+    document.documentElement.lang = lang;
+  }
+  var btn = document.getElementById("langToggle");
+  var lang = "en";
+  btn.addEventListener("click", function () {
+    lang = lang === "en" ? "de" : "en";
+    var segs = btn.querySelectorAll("span");
+    segs[0].classList.toggle("on", lang === "en");
+    segs[1].classList.toggle("on", lang === "de");
+    apply(lang);
+  });
+})();
+</script>
 
 </body>
 </html>

@@ -1295,3 +1295,19 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
 - **Artifacts:** `preview/landing-redesign/landing-a-textmarker.html` ·
   `preview/landing-redesign/landing-b-nachtstadt.html` · `preview/landing-redesign/README.md` ·
   commit `253534e`
+- **Prompt 2 (verbatim):** `> provide the artifacts now here by publishing them `
+- **Response 2:** Published both previews as claude.ai artifacts (adapted copies: document
+  wrapper stripped, CDN font link removed since the artifact CSP blocks external hosts; the
+  system-font fallback matches the shipped app, which does not self-host Inter).
+- **Prompt 3 (verbatim):** `> I like preview a very much. Just make sure the logo as a whole should be horizontally aligned with the text Genauly beside it. Currently it seems as if the logo is somewhat lower compared to the Genauly text. for the landing page, add some menu items on the top like About, Sources, Help, etc. Make use of existing pages. Additionally, Stress on the landing page somewhere about the fact that the learner can specifically filter the words by various criteria and practice by custom ueben session. Finally, the page should predominantly be in English with German used only for the no-brainer or obvious stuff - the german words should be only 10-20% of the total words. ` _(mid-turn follow-up: `> in addition to the above comments and tasks, also provide an option to switch to German on the homepage just like other pages in the app`)_
+- **Response 3:** Preview A revised: logo viewBox cropped to the artwork bounds (`7 12 52 52`)
+  so the mark centers optically on the wordmark; nav + footer link the real pages (/about,
+  /hilfe, /sources, /privacy, /terms); new "Filter what you need. Practice exactly that."
+  section with a filter-rail mockup (Thema/Stufe/Wortart/Branche + Üben footer) selling the
+  faceted library and custom scoped Üben sessions; all copy rewritten English-first with
+  German only for obvious/brand terms; and a working EN/DE nav toggle (JS dictionary swaps
+  the whole page's copy, mirroring the bilingual public pages). Verified via headless
+  Chromium (EN/DE roundtrip clean, DE nav fits one line), artifact A republished at the
+  same URL.
+- **Artifacts (rev 2):** `preview/landing-redesign/landing-a-textmarker.html` ·
+  `preview/landing-redesign/README.md`

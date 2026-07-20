@@ -45,4 +45,18 @@ a data-quality band. Closing echo: "Die Stadt wird hell, wenn du übst." Feels b
 more premium; more implementation work (hero art + mockups as components).
 
 Copy in both follows the house rules: no em dashes, Denglish brand voice, honest numbers
-only, single primary CTA ("Kostenlos starten") repeated consistently.
+only, single primary CTA repeated consistently.
+
+## Revision 2 (founder feedback, s135): Preview A chosen
+
+Preview A updated per founder direction: (1) logo optically centered against the wordmark
+(viewBox cropped to the artwork bounds, `7 12 52 52`); (2) nav gained real page links
+(About `/about`, Help `/hilfe`, Sources `/sources`, plus footer Privacy/Terms); (3) a new
+dedicated section "Filter what you need. Practice exactly that." with a filter-rail mockup
+(Thema/Stufe/Wortart/Branche + the Üben footer button) selling the faceted library and
+custom scoped Üben sessions; (4) copy rewritten English-first, German kept only for
+obvious/brand terms (der/die/das, Behörde, Üben, exam names, the app-UI mocks and the
+scenario chips, roughly 10-20%); (5) a working EN/DE toggle in the nav (mirrors the
+bilingual pattern of /about, /hilfe and the legal pages): the script at the bottom of the
+file snapshots the English innerHTML and swaps in the full German dictionary, so the
+whole page is previewable in both languages.
