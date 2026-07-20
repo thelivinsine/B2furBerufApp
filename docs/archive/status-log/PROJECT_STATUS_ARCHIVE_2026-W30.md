@@ -80,3 +80,44 @@ real page links in the nav, a filter→custom-Üben section, English-first copy,
   (landing is eagerly routed; +~30 kB static JSX, well under the 400 kB budget) ✓. Verified rendered
   output via `pnpm preview` + headless Chromium: light/dark, EN/DE, 390/1280, logged-in state.
   **PWA caveat:** the landing is service-worker-cached; hard-refresh the live site before judging.
+
+**Handoff after session 137 (2026-07-20). Branding-refresh review + premium pass (fixes 1-7),
+branch `claude/app-branding-refresh-review-bmrly2`, shipped to `main`.** The founder asked for a
+review of the s133 rebrand ("doesn't look as premium as before"), first as a report only, then
+greenlit fixes 1-7 of the ten-point list. What shipped:
+- **Token-driven accent-gradient (fixes 1+2):** `--gradient-from: 226 83% 47%` / `--gradient-to:
+  196 93% 38%` (light) and `226 90% 66%` / `198 90% 58%` (dark) in `index.css`;
+  `tailwind.config.ts` renders `linear-gradient(135deg, from 0%, primary 45%, to 100%)`. Light mode
+  now travels deep Nachtblau → vivid sky (ends brighter/more saturated, the s133 fixed end stop read
+  muddy); dark mode stays light end-to-end so the near-black `primary-foreground` text passes (old:
+  ~2.5:1, a real AA failure `check:contrast` could not see). Both stops are now gated
+  (`primary-foreground` on from=CORE / on to=UI, both themes, 46/46 pass).
+- **Gradient restored on the landing (fix 3):** the four `bg-primary` pill CTAs (nav + hero) and
+  step chip 1 ride `bg-accent-gradient` again; all pills + the three step chips switched
+  `text-white` → `text-primary-foreground` so they stay legible on the light dark-mode gradient.
+- **Button default sheen (fix 4):** `bg-gradient-to-b from-white/12 to-transparent` over
+  `bg-primary` in `button.tsx` (subtle dimensionality, hover behavior unchanged).
+- **`.text-display` + `.text-eyebrow` (fixes 5+6)** in `index.css` `@layer components`; applied to
+  SectionHeading + HubHero (all hub/Fortschritt/Settings headers), Lernpfad + Neuland H1s (parity
+  kept, comments updated), GrammarTopicView, LegalChrome, HelpChrome, QuizHub, WritingHub, and the
+  6 landing eyebrows. Page titles are now extrabold/tracking-tight like the s136 landing.
+- **Indigo/violet purge (fix 7):** Neuland Boss tag → `bg-primary/10 text-primary`, game `Chip`
+  tone `indigo` renamed `blue` (`bg-blue-50 text-blue-700`), QuizHub hero + intent cards
+  `from-violet/indigo/purple-*` → brand families (`from-blue-600 to-sky-500`,
+  `from-amber-500 to-orange-600`), Anwenden Prüfung card `to-purple-500` → `to-pink-500`, stale
+  "brand indigo" comments reworded.
+- **Second wave (items 8-10, greenlit in-session):** themes.ts accents + Sammlung/Anwenden hub
+  tiles re-derived from the brand families (no more indigo/violet/purple/fuchsia); the dark theme
+  re-hued 250 → **228 warm navy** across all surface/text tokens incl. the no-JS shells + manifest
+  (`#131620`/`#e7e8ef`) and the brand-kit tokens/docs (regenerated); `bg-mesh` nudged to 0.10/0.09;
+  the landing numbers band's stat values are gradient-clipped (fixed light Himmelblau stops, the one
+  sanctioned text-gradient moment). **Hotfix ridealong:** PR #609's squash accidentally shipped an
+  unresolved rebase-conflict marker in `LandingPage.tsx` (post-rebase gates were not re-run),
+  breaking `main`'s build; resolved here (single-button `primaryCta` keeping main's simplification +
+  the gradient classes) and all gates re-run. Item 10's "landing pills onto the shared Button"
+  sub-idea was dropped as churn without visual payoff.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.9 kB ✓ ·
+  check:contrast 46/46 ✓. Verified rendered output via `pnpm preview` + headless Chromium
+  (landing light/dark, Anwenden hub, Fortschritt). **Deploy: the wave-1 Pages run failed (the #609
+  conflict marker); the wave-2 run (`add6529`, PR #610) completed green, so BOTH waves went live
+  together.** PWA caveat: hard-refresh the live site.

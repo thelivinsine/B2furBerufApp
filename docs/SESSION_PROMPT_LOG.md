@@ -579,3 +579,53 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   marks, wordmark/lockup PNGs, palette, tokens, previews, README) ·
   `preview/branding/artifacts/genauly-logo-v2-previews.html` · `preview/branding/README.md` ·
   `CLAUDE.md` · `docs/branding/BRAND_SPEC.md` · `docs/PROJECT_STATUS.md` · this log
+
+## Session 139 — 2026-07-20 — Icon-preview fix · mission-exit toggle · Kollokationen graph clustering
+
+- **Branch:** `claude/app-icon-favicon-update-gympjq`
+- **Prompt 1 (verbatim):** `> the app icon and favicon don't look like they're updated. check the previews saved and of them, currently it's still Radenah that's applied but I'd like to have "großer" version applied.`
+- **Response 1:** Investigated. The shipped favicons/apple-touch/pwa icons were **already Größer**
+  (`TILE_MARGIN = 0.12`) since s138's commit bc6c5bb, confirmed by measuring every committed PNG with
+  PIL (mark ≈ 73–75% of the tile = 12% margin; Randnah would be ≈ 90%). The confusion came from the
+  saved preview `preview/branding/artifacts/genauly-logo-v2-previews.html`, which still highlighted
+  **Randnah** as "empfohlen" and rendered the home-screen mockup row at the 5% margin. Fixed the
+  preview to mark Größer as applied and render the OS row at 12%; no shipped asset changed. Explained
+  the likely PWA/browser cache and sent the founder the real apple-touch-icon.png as proof. Pushed to
+  the branch (not yet merged).
+- **Artifacts (prompt 1):** `preview/branding/artifacts/genauly-logo-v2-previews.html` (commit 5762e65)
+- **Prompt 2 (verbatim; attachment: `/welt` screenshot):** `> there's an issue here.. when I exit the game for some reason I don't see the lernen spielen toggle here. fix it` (interrupted, then:) `> continue`
+- **Response 2:** Root-caused: a mission launched from Heute → Spielen deep-links to the standalone
+  `/welt` route to play full-screen, and on exit `Welt.tsx` only stripped the `?mission=` param,
+  leaving the learner on the toggle-less `/welt` hub (the Lernen/Spielen toggle lives only on the
+  Dashboard `/`). Fix (3 coordinated changes): `SpielenHub` tags the deep link `&from=heute`;
+  `Welt.tsx` navigates back to `/?tab=spielen` on exit when it sees that marker; `Dashboard.tsx`
+  reads `?tab=spielen` to open on the Spielen tab (and clears the param on a manual switch). Direct
+  `/welt` visits unchanged. Gates: typecheck ✓ · build ✓ · check:bundle 110.5 kB ✓ · test:unit
+  219/219 ✓.
+- **Artifacts (prompt 2):** `src/features/dashboard/SpielenHub.tsx` · `src/features/welt/Welt.tsx` ·
+  `src/features/dashboard/Dashboard.tsx` (commit b2806fe)
+- **Prompt 3 (verbatim):** `> yes merge`
+- **Response 3:** Opened PR #616 (icon-preview fix + mission-exit fix) into `main` and squash-merged
+  (`50c178a`); ran the required post-merge realignment (branch reset to `origin/main`, force-with-lease
+  push).
+- **Artifacts (prompt 3):** PR #616 → `main` (`50c178a`)
+- **Prompt 4 (verbatim):** `> can you also pull the nodes in collocations graph closer to make the clusters look better? generate a couple of previews first`
+- **Response 4:** Wrote a preview generator (`preview/gen-collocation-graph-tightness.mjs`) that loads
+  the REAL collocation bank + pure builder + palette via Vite SSR and runs the shipped d3-force layout
+  at three tightness settings (current / Enger / Am engsten), rendering each to an SVG in one
+  self-contained HTML; screenshotted it via headless Chromium and sent the founder the comparison
+  (1,033 collocations → 1,243 nodes). Founder picked **"Am engsten"** via the option picker. Applied to
+  `CollocationGraph.tsx`: centroid pull (forceX/Y) 0.72 (was 0.38), link 0.38 (0.22), charge −34/max200
+  (−55/240), collision r+1.5 (r+3), centroid ring 118+N·26 (140+N·35). Regenerated the preview to mark
+  the applied option; refreshed the CLAUDE.md layout-recipe note. Pure builder untouched, so
+  `tests/collocationGraph.test.ts` (11) still passes. Gates: typecheck ✓ · build ✓ · check:bundle
+  110.5 kB ✓. Opened PR #617 and squash-merged (`f064047`); realigned the branch.
+- **Artifacts (prompt 4):** `src/features/collocations/CollocationGraph.tsx` ·
+  `preview/gen-collocation-graph-tightness.mjs` · `preview/collocation-graph-tightness.html` ·
+  `CLAUDE.md` (commit e4a21a3) · PR #617 → `main` (`f064047`)
+- **Prompt 5 (verbatim):** `> yes` (to updating the documentation)
+- **Response 5:** Updated `docs/PROJECT_STATUS.md` (new s139 `_Last updated_` block + Resume-here
+  handoff; moved the s137 handoff into `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`,
+  keeping s139 + s138 as the two most recent) and appended this session-139 prompt-log entry.
+- **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log

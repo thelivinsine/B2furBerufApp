@@ -1,16 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-20 (session 138). **Logo v2 rework shipped to `main`** (logos only, founder
-directive): the swipe is now **Himmel Soft `#8CDBFB`** (the original Himmelblau read too harsh
-against black/white), every icon centers the mark by its TRUE bounding box (**"Größer", 12% margin**
-— `TILE_MARGIN` in `build-logo-assets.mjs`; the app icon no longer floats small with an empty band on
-top), dark-ground logos are **two-tone** (ink on the swipe, white off it; only the g splits), and a
-new lowercase **wordmark** "genauly" (swipe under "genau") is the primary logo wherever there is
-room, **including the mobile landing header** (`Logo variant="wordmark"`; only the mobile in-app
-`AppShell` header keeps the compact g). Iterated across 8 preview rounds in a claude.ai artifact.
-Same-session follow-ups: Himmel Soft applied **app-wide as the `--accent` token** (both themes,
-`197 93% 77%`; contrast gate green), icons switched Randnah→Größer, and the mobile landing header
-switched mark→wordmark. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-20 (session 139). **Three small fixes shipped to `main`** (PRs #616, #617):
+(1) the saved icon-size preview was corrected to show **Größer as the applied favicon/app-icon size**
+(the shipped assets were already Größer since s138; only the misleading preview showed Randnah); (2)
+exiting a Neuland mission launched from **Heute → Spielen** now returns to the Spielen tab (with the
+Lernen/Spielen toggle) instead of stranding the learner on the toggle-less `/welt` hub; (3) the
+**Kollokationen graph clusters were pulled tighter** (founder-picked "Am engsten": centroid pull
+0.72, link 0.38, charge −34, collision r+1.5, ring 118+N·26) so the theme islands read as compact,
+distinct clusters. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -66,6 +63,34 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 139 (2026-07-20). Three small fixes, branch
+`claude/app-icon-favicon-update-gympjq`, all shipped to `main` (PRs #616, #617).** Founder-reported
+issues, handled one prompt at a time:
+- **Icon-size preview correction (#616):** the founder thought the app icon/favicon still showed the
+  old **Randnah** (5% margin) size. The shipped assets were in fact already **Größer** (12% margin)
+  since s138 — verified by measuring every committed PNG (mark ≈ 73–75% of the tile = 12% margin;
+  Randnah would be ≈ 90%). The confusion came from the saved preview
+  `preview/branding/artifacts/genauly-logo-v2-previews.html`, which still highlighted Randnah as
+  "empfohlen" and rendered the home-screen mockup row at the 5% margin. Fixed the preview to mark
+  Größer as applied and render the OS row at 12%. **No shipped asset changed.** If the live
+  tab/home-screen icon still looks old it is PWA/browser cache (hard-refresh; re-add the PWA).
+- **Mission-exit toggle fix (#616):** exiting a mission launched from Heute → Spielen stripped the
+  `?mission=` param and left the learner on the standalone `/welt` hub, which has no Lernen/Spielen
+  toggle. Now `SpielenHub` tags the deep link `&from=heute`, `Welt.tsx` navigates back to
+  `/?tab=spielen` on exit when it sees that marker, and `Dashboard.tsx` opens on the Spielen tab for
+  `?tab=spielen` (clearing the param on a manual switch). Direct `/welt` visits are unchanged.
+- **Kollokationen graph — tighter clusters (#617):** founder asked to pull the nodes closer so the
+  theme islands look better; generated a 3-option preview
+  (`preview/collocation-graph-tightness.html` + generator `preview/gen-collocation-graph-tightness.mjs`,
+  rendering the REAL bank through the shipped d3-force layout) and the founder picked **"Am engsten"**.
+  `CollocationGraph.tsx` force block now: centroid pull (forceX/Y) **0.72** (was 0.38), link **0.38**
+  (0.22), charge **−34/max200** (−55/240), collision **r+1.5** (r+3), centroid ring **118+N·26**
+  (140+N·35). Pure builder unchanged, so `tests/collocationGraph.test.ts` (11) still passes; CLAUDE.md
+  layout-recipe note refreshed.
+- **Gates (each PR):** typecheck ✓ · build ✓ · check:bundle 110.5 kB ✓ · test:unit 219/219 (#616) /
+  collocationGraph 11/11 (#617) ✓. Post-merge branch realigned to `main` both times. PWA caveat: the
+  graph + icons are service-worker-cached; hard-refresh the live site.
+
 **Handoff after session 138 (2026-07-20). Logo v2 rework (logos ONLY, founder-scoped), branch
 `claude/logo-blue-contrast-xsfk19`, shipped to `main`.** The founder found the logo's Himmelblau
 swipe too harsh against black/white and iterated through 8 artifact preview rounds (v2→v8) to a
@@ -109,48 +134,7 @@ only." What shipped:
   /hilfe dark) and the regenerated brand-kit contact sheet. PWA caveat: hard-refresh the live site;
   the home-screen icon may need re-adding to show the new size.
 
-**Handoff after session 137 (2026-07-20). Branding-refresh review + premium pass (fixes 1-7),
-branch `claude/app-branding-refresh-review-bmrly2`, shipped to `main`.** The founder asked for a
-review of the s133 rebrand ("doesn't look as premium as before"), first as a report only, then
-greenlit fixes 1-7 of the ten-point list. What shipped:
-- **Token-driven accent-gradient (fixes 1+2):** `--gradient-from: 226 83% 47%` / `--gradient-to:
-  196 93% 38%` (light) and `226 90% 66%` / `198 90% 58%` (dark) in `index.css`;
-  `tailwind.config.ts` renders `linear-gradient(135deg, from 0%, primary 45%, to 100%)`. Light mode
-  now travels deep Nachtblau → vivid sky (ends brighter/more saturated, the s133 fixed end stop read
-  muddy); dark mode stays light end-to-end so the near-black `primary-foreground` text passes (old:
-  ~2.5:1, a real AA failure `check:contrast` could not see). Both stops are now gated
-  (`primary-foreground` on from=CORE / on to=UI, both themes, 46/46 pass).
-- **Gradient restored on the landing (fix 3):** the four `bg-primary` pill CTAs (nav + hero) and
-  step chip 1 ride `bg-accent-gradient` again; all pills + the three step chips switched
-  `text-white` → `text-primary-foreground` so they stay legible on the light dark-mode gradient.
-- **Button default sheen (fix 4):** `bg-gradient-to-b from-white/12 to-transparent` over
-  `bg-primary` in `button.tsx` (subtle dimensionality, hover behavior unchanged).
-- **`.text-display` + `.text-eyebrow` (fixes 5+6)** in `index.css` `@layer components`; applied to
-  SectionHeading + HubHero (all hub/Fortschritt/Settings headers), Lernpfad + Neuland H1s (parity
-  kept, comments updated), GrammarTopicView, LegalChrome, HelpChrome, QuizHub, WritingHub, and the
-  6 landing eyebrows. Page titles are now extrabold/tracking-tight like the s136 landing.
-- **Indigo/violet purge (fix 7):** Neuland Boss tag → `bg-primary/10 text-primary`, game `Chip`
-  tone `indigo` renamed `blue` (`bg-blue-50 text-blue-700`), QuizHub hero + intent cards
-  `from-violet/indigo/purple-*` → brand families (`from-blue-600 to-sky-500`,
-  `from-amber-500 to-orange-600`), Anwenden Prüfung card `to-purple-500` → `to-pink-500`, stale
-  "brand indigo" comments reworded.
-- **Second wave (items 8-10, greenlit in-session):** themes.ts accents + Sammlung/Anwenden hub
-  tiles re-derived from the brand families (no more indigo/violet/purple/fuchsia); the dark theme
-  re-hued 250 → **228 warm navy** across all surface/text tokens incl. the no-JS shells + manifest
-  (`#131620`/`#e7e8ef`) and the brand-kit tokens/docs (regenerated); `bg-mesh` nudged to 0.10/0.09;
-  the landing numbers band's stat values are gradient-clipped (fixed light Himmelblau stops, the one
-  sanctioned text-gradient moment). **Hotfix ridealong:** PR #609's squash accidentally shipped an
-  unresolved rebase-conflict marker in `LandingPage.tsx` (post-rebase gates were not re-run),
-  breaking `main`'s build; resolved here (single-button `primaryCta` keeping main's simplification +
-  the gradient classes) and all gates re-run. Item 10's "landing pills onto the shared Button"
-  sub-idea was dropped as churn without visual payoff.
-- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.9 kB ✓ ·
-  check:contrast 46/46 ✓. Verified rendered output via `pnpm preview` + headless Chromium
-  (landing light/dark, Anwenden hub, Fortschritt). **Deploy: the wave-1 Pages run failed (the #609
-  conflict marker); the wave-2 run (`add6529`, PR #610) completed green, so BOTH waves went live
-  together.** PWA caveat: hard-refresh the live site.
-
-_(Session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
+_(Session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
