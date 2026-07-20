@@ -60,3 +60,14 @@ scenario chips, roughly 10-20%); (5) a working EN/DE toggle in the nav (mirrors 
 bilingual pattern of /about, /hilfe and the legal pages): the script at the bottom of the
 file snapshots the English innerHTML and swaps in the full German dictionary, so the
 whole page is previewable in both languages.
+
+## Revision 3 (founder feedback, s135)
+
+- The steps headline "Three steps. No textbook." was replaced with "Three steps. Your
+  smart companion." (DE: "Dein smarter Begleiter."): Genauly is a companion to
+  traditional learning, never a claimed replacement. Avoid replacement claims in all
+  future landing copy.
+- **Implementation spec (not visible in the logged-out preview):** when the visitor is
+  already onboarded/logged in, every primary CTA (nav, hero, closing) reads **"Go to
+  app"** (DE: **"Zur App"**) and routes to `/`, replacing the live page's "Zum
+  Dashboard" label.

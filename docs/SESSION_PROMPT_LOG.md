@@ -1311,3 +1311,13 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   same URL.
 - **Artifacts (rev 2):** `preview/landing-redesign/landing-a-textmarker.html` ·
   `preview/landing-redesign/README.md`
+- **Prompt 4 (verbatim):** `> if the user already logged in, the landing page cta should be go to app, not go to dashboard. also, regarding the claim "no textbook" - replace it with something else. This app is never a direct replacement for traditional learning but a smart and modern companion for learning. `
+- **Response 4:** Steps headline replaced: "Three steps. No textbook." became "Three steps.
+  Your smart companion." (DE "Dein smarter Begleiter."); the companion-not-replacement
+  positioning rule is recorded in the preview README for all future landing copy. The
+  logged-in CTA spec ("Go to app" / "Zur App" routing to `/`, replacing the live page's
+  "Zum Dashboard") is recorded there too since the preview shows only the logged-out
+  state. Fixed the two mobile fallouts the longer headline exposed (h2 down to 1.55rem
+  below 480px; nav drops the wordmark below 520px, matching the shipped app header) and
+  verified zero horizontal overflow at 390px in both languages. Artifact republished at
+  the same URL.

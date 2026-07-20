@@ -81,8 +81,9 @@ nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(
 @media(max-width:820px){.nav-links{display:none}}
 @media(max-width:520px){
   .nav-cta .btn-ghost{display:none}
-  .nav-cta .btn-primary{padding:.55rem 1rem;font-size:.86rem}
-  .brand b{font-size:1.1rem}
+  .nav-cta .btn-primary{padding:.55rem .9rem;font-size:.84rem}
+  .brand b{display:none} /* the app header also drops the wordmark on mobile; the g mark stays */
+  .nav-inner{padding:.9rem 16px}
 }
 
 /* ============ HERO ============ */
@@ -155,6 +156,7 @@ section{position:relative}
 .sec-head{max-width:44rem}
 .kicker{font-size:.8rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
 h2{font-size:clamp(1.9rem,3.4vw,2.7rem);letter-spacing:-.03em;font-weight:800;line-height:1.12;margin-top:.7rem}
+@media(max-width:480px){h2{font-size:1.55rem}}
 .sec-head p{margin-top:1rem;font-size:1.05rem;line-height:1.65;color:var(--mut)}
 
 /* plateau chart */
@@ -720,7 +722,7 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
   <div class="wrap">
     <div class="sec-head">
       <p class="kicker">How it works</p>
-      <h2>Three steps. <span class="swipe">No textbook.<i></i></span></h2>
+      <h2>Three steps. <span class="swipe">Your smart companion.<i></i></span></h2>
     </div>
     <div class="steps">
       <div class="step">
@@ -880,7 +882,7 @@ footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
     [".num-grid .num-cell:nth-child(4) span", "Themen aus Beruf und Alltag, vom Meeting bis zur Mietwohnung"],
     [".prov-note > span", 'Alle Inhalte werden maschinell und menschlich geprüft, mit offener Herkunft pro Eintrag. <a href="/sources" title="/sources">Quellen &amp; Datenqualität ansehen</a>'],
     ["#steps .kicker", "So funktioniert's"],
-    ["#steps .sec-head h2", 'Drei Schritte. <span class="swipe">Kein Lehrbuch.<i></i></span>'],
+    ["#steps .sec-head h2", 'Drei Schritte. <span class="swipe">Dein smarter Begleiter.<i></i></span>'],
     ["#steps .step:nth-child(1) h3", "Wähle eine echte Situation"],
     ["#steps .step:nth-child(1) p", "Beruf, Behörde, Arzt, Wohnen, Bank oder Prüfung. Jedes Thema spiegelt das Deutsch, das du wirklich brauchst."],
     ["#steps .step:nth-child(2) h3", "Übe laut und schriftlich"],
