@@ -99,14 +99,15 @@ only." What shipped:
   (block/hidden) must wrap `<Logo>` in a container, never be passed into it (they override the
   internal `dark:` image swap); *height* utilities are safe to pass in (they apply to both theme
   images), which is why the single responsive `h-7 sm:h-8` on the landing header works.
-- **Brand kit + spec:** `build-brand-kit.mjs` swipe const updated + kit regenerated;
-  `BRAND_SPEC.md` §3 + CLAUDE.md brand section rewritten. NOTE: the kit's lockups still use the
-  outlined capital-G "Genauly" wordmark path (`wordmark-data.mjs`); outlining the new lowercase
-  wordmark for the kit is an open follow-up.
+- **Brand kit + spec:** `build-brand-kit.mjs` reworked to the logo v2 (two-tone dark mark, Größer
+  app-icon tile, the lowercase "genauly" wordmark as PNG copied from `public/`, PNG lockups; drops
+  the `wordmark-data.mjs` capital-G dependency) and regenerated; `brand-kit/README.md`,
+  `BRAND_SPEC.md` §3, and the CLAUDE.md brand section rewritten. The 8-round preview artifact is
+  saved at `preview/branding/artifacts/genauly-logo-v2-previews.html`.
 - **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.5 kB ✓.
   Verified rendered output via `pnpm preview` + headless Chromium (landing light/dark/mobile,
-  /hilfe dark). PWA caveat: hard-refresh the live site; the home-screen icon may need re-adding
-  to show the new Randnah size.
+  /hilfe dark) and the regenerated brand-kit contact sheet. PWA caveat: hard-refresh the live site;
+  the home-screen icon may need re-adding to show the new size.
 
 **Handoff after session 137 (2026-07-20). Branding-refresh review + premium pass (fixes 1-7),
 branch `claude/app-branding-refresh-review-bmrly2`, shipped to `main`.** The founder asked for a

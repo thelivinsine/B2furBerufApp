@@ -1,30 +1,31 @@
 #!/usr/bin/env node
 /**
- * Genauly brand-kit generator (s133). Produces the full, self-contained kit
- * under `brand-kit/` from ONE source of truth: the same swipe + outlined-g
- * mark as `build-logo-assets.mjs`, the outlined "Genauly" wordmark
- * (`wordmark-data.mjs`), and the live design tokens parsed straight out of
- * `src/index.css`. Because color + logo are read from the app's own source,
- * the kit cannot drift from what ships.
+ * Genauly brand-kit generator (s133; logo v2 refresh s138). Produces the full,
+ * self-contained kit under `brand-kit/` from ONE source of truth: the same
+ * swipe + outlined-g mark and lowercase "genauly" wordmark as
+ * `build-logo-assets.mjs` (whose `public/genauly-wordmark*.png` this copies),
+ * and the live design tokens parsed straight out of `src/index.css`. Because
+ * color + logo are read from the app's own source, the kit cannot drift.
  *
  * Outputs (all committed):
- *   brand-kit/logo/    mark, wordmark (ink/white), horizontal + stacked
- *                      lockups (ink/white), mono marks, clear-space guide
+ *   brand-kit/logo/    mark (light SVG) + mark-dark (two-tone SVG), wordmark
+ *                      (light/dark PNG), horizontal + stacked lockups (PNG),
+ *                      mono marks, app-icon tile, clear-space guide
  *   brand-kit/color/   palette.svg swatch sheet, tokens.css, tokens.json
  *   brand-kit/type/    typography.svg specimen
  *   brand-kit/icons/   every favicon / PWA / apple-touch / maskable (copied)
  *   brand-kit/social/  og-image + a square avatar
  *   brand-kit/previews/ PNG contact sheets (rendered via Playwright if present)
  *
- * Pure-Node for the SVGs / tokens / copies (no browser needed). The PNG
- * preview sheets + avatar render via Playwright Chromium when available
- * (same dev-tooling contract as build-logo-assets.mjs); they are skipped with
- * a warning otherwise, so the core kit always builds. Not part of the app build.
+ * Pure-Node for the SVG marks / tokens / palette / copies (no browser needed).
+ * The wordmark is raster (live Inter, like the app), so the PNG lockups +
+ * preview sheets + avatar render via Playwright Chromium when available (same
+ * dev-tooling contract as build-logo-assets.mjs); they are skipped with a
+ * warning otherwise, so the core kit always builds. Not part of the app build.
  */
-import { writeFileSync, copyFileSync, mkdirSync, existsSync, readFileSync } from "node:fs";
+import { writeFileSync, copyFileSync, mkdirSync, existsSync, readFileSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { WORDMARK_PATH, WORDMARK_BBOX } from "./wordmark-data.mjs";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const KIT = join(root, "brand-kit");
@@ -46,30 +47,39 @@ const G_PATH =
 const svg = (vb, w, h, body) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" width="${w}" height="${h}">${body}</svg>\n`;
 
-// Mark artwork (swipe + g) in the 64-unit space. The LOGO is tile-less
-// (transparent, no tile); the g adapts to the ground. `markTiled` (Papier tile)
-// is kept only for the app-icon reference, not the logo.
-const markG = (g) => `<path d="${SWIPE}" fill="${HIMMELBLAU}" transform="rotate(-3 32 32)"/><path d="${G_PATH}" fill="${g}"/>`;
-const MARK = markG(TINTE); // tile-less light (ink g)
-const MARK_DARK = markG(PAPIER); // tile-less dark (Papier g)
-const markTiled = () => `<rect width="64" height="64" rx="14" fill="${PAPIER}"/>${markG(TINTE)}`; // app-icon tile only
+// The mark's true bbox (swipe ∪ g), measured in build-logo-assets.mjs; used to
+// center the app-icon tile at the "Größer" margin, matching the shipped icons.
+const MARK_BBOX = { x: 9.2, y: 18.78, w: 47.23, h: 37.28 };
+const TILE_MARGIN = 0.12; // "Größer" (matches build-logo-assets.mjs)
+function centerTransform(bb, margin) {
+  const s = (64 * (1 - 2 * margin)) / Math.max(bb.w, bb.h);
+  const tx = 32 - s * (bb.x + bb.w / 2);
+  const ty = 32 - s * (bb.y + bb.h / 2);
+  const r = (n) => Math.round(n * 1000) / 1000;
+  return `translate(${r(tx)} ${r(ty)}) scale(${r(s)})`;
+}
 
-// Wordmark normalized so its cap-top sits at y=0, left edge at x=0.
-// After translate(-x1,-y1): width = x2-x1, height = y2-y1, baseline at 100-y1.
-const WM_W = +(WORDMARK_BBOX.x2 - WORDMARK_BBOX.x1).toFixed(2); // ~406.25
-const WM_H = +(WORDMARK_BBOX.y2 - WORDMARK_BBOX.y1).toFixed(2); // ~94.53
-const wordmark = (fill) =>
-  `<g transform="translate(${-WORDMARK_BBOX.x1} ${-WORDMARK_BBOX.y1})"><path d="${WORDMARK_PATH}" fill="${fill}"/></g>`;
+// Mark artwork (swipe + g) in the 64-unit space. The LOGO is tile-less
+// (transparent). On light grounds the g is ink; on dark grounds the mark is
+// TWO-TONE (ink where the g sits on the swipe, white where it falls off — only
+// the descender), matching the shipped logo. `markTiled` (Papier tile, Größer-
+// centered) is the app-icon reference only, not the logo.
+const markG = (g) => `<path d="${SWIPE}" fill="${HIMMELBLAU}" transform="rotate(-3 32 32)"/><path d="${G_PATH}" fill="${g}"/>`;
+const markTwoTone = (id = "swd") =>
+  `<defs><clipPath id="${id}"><path d="${SWIPE}" transform="rotate(-3 32 32)"/></clipPath></defs>` +
+  `<path d="${SWIPE}" fill="${HIMMELBLAU}" transform="rotate(-3 32 32)"/>` +
+  `<path d="${G_PATH}" fill="#FFFFFF"/>` +
+  `<path d="${G_PATH}" fill="${TINTE}" clip-path="url(#${id})"/>`;
+const MARK = markG(TINTE); // tile-less light (ink g)
+const MARK_DARK = markTwoTone(); // tile-less dark (two-tone: ink bowl, white descender)
+const markTiled = () => `<rect width="64" height="64" rx="14" fill="${PAPIER}"/><g transform="${centerTransform(MARK_BBOX, TILE_MARGIN)}">${markG(TINTE)}</g>`;
 
 // ---- LOGO ----
-// The logo is tile-less + transparent. mark = light (ink g), mark-dark = dark
-// (Papier g). The Papier-tiled version is only the app-icon reference.
 writeFileSync(join(KIT, "logo/mark.svg"), svg("0 0 64 64", 256, 256, MARK));
 writeFileSync(join(KIT, "logo/mark-dark.svg"), svg("0 0 64 64", 256, 256, MARK_DARK));
 writeFileSync(join(KIT, "logo/app-icon-tile.svg"), svg("0 0 64 64", 256, 256, markTiled()));
 // mono marks (single color, no tile): the swipe is filled and the g is KNOCKED
 // OUT as negative space (a mask), so both elements stay legible in one ink.
-// Reproduces the two-tone figure/ground with a single fill on any background.
 const monoMark = (ink, id) =>
   `<defs><mask id="${id}">` +
   `<path d="${SWIPE}" fill="#fff" transform="rotate(-3 32 32)"/>` +
@@ -78,38 +88,22 @@ const monoMark = (ink, id) =>
   `<path d="${SWIPE}" fill="${ink}" transform="rotate(-3 32 32)" mask="url(#${id})"/>`;
 writeFileSync(join(KIT, "logo/mark-mono-ink.svg"), svg("0 0 64 64", 256, 256, monoMark(TINTE, "ko")));
 writeFileSync(join(KIT, "logo/mark-mono-white.svg"), svg("0 0 64 64", 256, 256, monoMark("#FFFFFF", "ko")));
-// wordmark (ink / white)
-writeFileSync(join(KIT, "logo/wordmark.svg"), svg(`0 0 ${WM_W} ${WM_H}`, Math.round(WM_W), Math.round(WM_H), wordmark(TINTE)));
-writeFileSync(join(KIT, "logo/wordmark-white.svg"), svg(`0 0 ${WM_W} ${WM_H}`, Math.round(WM_W), Math.round(WM_H), wordmark("#FFFFFF")));
 
-// Horizontal lockup: tile (64) + gap + wordmark scaled so cap-height ~40 aligns
-// to the tile's optical center.
-const capH = 100 - WORDMARK_BBOX.y1; // baseline distance from cap-top ~73.73
-const kH = 40 / capH; // scale so cap-height = 40
-const wmWs = WM_W * kH;
-const GAP = 22;
-const wmX = 64 + GAP;
-const wmY = 32 - 20; // cap-top so the cap block centers on tile mid (y=32)
-const lockupH = (wmFill, textFill) => {
-  const totalW = Math.ceil(wmX + wmWs);
-  return svg(`0 0 ${totalW} 64`, totalW, 64,
-    `${wmFill}<g transform="translate(${wmX} ${wmY}) scale(${kH.toFixed(4)})">${wordmark(textFill)}</g>`);
-};
-writeFileSync(join(KIT, "logo/lockup-horizontal.svg"), lockupH(MARK, TINTE));
-writeFileSync(join(KIT, "logo/lockup-horizontal-white.svg"), lockupH(markG("#FFFFFF"), "#FFFFFF"));
-
-// Stacked lockup: tile centered on top, wordmark centered beneath.
-const kS = 30 / capH; // smaller wordmark for the stack
-const wmWss = WM_W * kS, wmHss = WM_H * kS;
-const stackW = Math.ceil(Math.max(64, wmWss));
-const stackGap = 18;
-const tileX = (stackW - 64) / 2;
-const wmXs = (stackW - wmWss) / 2;
-const wmYs = 64 + stackGap;
-const stackH = Math.ceil(wmYs + wmHss);
-writeFileSync(join(KIT, "logo/lockup-stacked.svg"),
-  svg(`0 0 ${stackW} ${stackH}`, stackW, stackH,
-    `<g transform="translate(${tileX.toFixed(2)} 0)">${MARK}</g><g transform="translate(${wmXs.toFixed(2)} ${wmYs}) scale(${kS.toFixed(4)})">${wordmark(TINTE)}</g>`));
+// Wordmark: the lowercase "genauly" with the swipe under "genau". It is set in
+// live Inter (the swipe splits the g into two tones on dark), so, exactly like
+// the app, it ships as PNG — an outlined path would need font-outlining tooling
+// and an SVG <text> would fall back off-platform. Copy the shipped assets.
+for (const [src, dst] of [
+  ["genauly-wordmark.png", "logo/wordmark.png"],
+  ["genauly-wordmark-dark.png", "logo/wordmark-dark.png"],
+]) {
+  if (existsSync(join(pub, src))) copyFileSync(join(pub, src), join(KIT, dst));
+}
+// The lockups (mark + wordmark) are raster composites too; they render in the
+// Playwright block below. Remove the stale capital-G vector wordmark + lockups.
+for (const stale of ["wordmark.svg", "wordmark-white.svg", "lockup-horizontal.svg", "lockup-horizontal-white.svg", "lockup-stacked.svg"]) {
+  rmSync(join(KIT, "logo", stale), { force: true });
+}
 
 // Clear-space + min-size guide: mark with a padding frame = 0.25 tile all round.
 const pad = 16; // 0.25 * 64
@@ -162,7 +156,7 @@ const SWATCHES = [
   ["Papier", "background", "Ground"],
   ["Tinte", "foreground", "Text"],
   ["Nachtblau", "primary", "Primär / Aktion"],
-  ["Himmelblau", "accent", "Akzent / Swipe"],
+  ["Himmel Soft", "accent", "Akzent / Swipe"],
   ["Koralle", "reward", "Belohnung / Serie"],
   ["Blatt", "success", "Erfolg"],
   ["Butter", "warning", "Warnung"],
@@ -218,12 +212,12 @@ for (const f of ICONS) {
 }
 if (existsSync(join(pub, "og-image.png"))) copyFileSync(join(pub, "og-image.png"), join(KIT, "social/og-image.png"));
 
-console.log("✓ SVG logos, lockups, palette, type specimen, tokens.css/json, copied icons");
+console.log("✓ SVG marks + mono, wordmark PNGs, palette, type specimen, tokens.css/json, copied icons");
 
 // ---- PNG preview sheets + square avatar (Playwright, optional) ----
 let chromium;
 try { ({ chromium } = await import("playwright")); }
-catch { console.warn("! Playwright not found; skipping PNG preview sheets + avatar."); }
+catch { console.warn("! Playwright not found; skipping PNG lockups + preview sheets + avatar."); }
 
 if (chromium) {
   const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM || undefined });
@@ -251,16 +245,41 @@ if (chromium) {
     .lbl{font-size:12px;font-weight:700;color:#3D74ED}.card.dark .lbl{color:#8AB0F9}
     img{display:block}.row{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
   </style></head><body>
-    <h1>Genauly · Logo</h1><p>g on the Himmelblau Textmarker swipe. Inter 800 wordmark.</p>
+    <h1>Genauly · Logo</h1><p>Lowercase g on the Himmel Soft Textmarker swipe. Inter 800 wordmark.</p>
     <div class="grid">
       <div class="card"><span class="lbl">MARK</span><div class="row"><img src="logo/mark.svg" width="88"><img src="logo/mark.svg" width="52"><img src="logo/mark.svg" width="32"></div></div>
-      <div class="card"><span class="lbl">WORDMARK</span><img src="logo/wordmark.svg" width="240"></div>
-      <div class="card"><span class="lbl">HORIZONTAL LOCKUP</span><img src="logo/lockup-horizontal.svg" width="300"></div>
-      <div class="card"><span class="lbl">STACKED LOCKUP</span><img src="logo/lockup-stacked.svg" width="150"></div>
-      <div class="card dark"><span class="lbl">ON DARK</span><div class="row"><img src="logo/mark-dark.svg" width="64"><img src="logo/wordmark-white.svg" width="220"></div></div>
+      <div class="card"><span class="lbl">WORDMARK</span><img src="logo/wordmark.png" width="240"></div>
+      <div class="card"><span class="lbl">HORIZONTAL LOCKUP</span><img src="logo/lockup-horizontal.png" width="300"></div>
+      <div class="card"><span class="lbl">STACKED LOCKUP</span><img src="logo/lockup-stacked.png" width="150"></div>
+      <div class="card dark"><span class="lbl">ON DARK</span><div class="row"><img src="logo/mark-dark.svg" width="64"><img src="logo/wordmark-dark.png" width="220"></div></div>
       <div class="card"><span class="lbl">MONO</span><div class="row"><img src="logo/mark-mono-ink.svg" width="64"><img src="logo/clearspace.svg" width="120"></div></div>
     </div>
   </body></html>`;
+
+  // Raster lockups: mark (SVG, data-URI) + wordmark (PNG, data-URI), composited.
+  const asDataUri = (p, mime) => `data:${mime};base64,${readFileSync(join(KIT, p)).toString("base64")}`;
+  const lockup = async (markFile, wmFile, out, dark, stacked) => {
+    const mark = asDataUri(markFile, "image/svg+xml");
+    const wm = asDataUri(wmFile, "image/png");
+    const dir = stacked ? "column" : "row";
+    const gap = stacked ? 18 : 26;
+    const markPx = stacked ? 96 : 76;
+    const wmPx = stacked ? 150 : 168; // wordmark width; height auto (~3.97:1)
+    const pad = 28;
+    const html = `<!doctype html><html><head><style>*{margin:0}
+      body{display:inline-flex;flex-direction:${dir};align-items:center;gap:${gap}px;padding:${pad}px;background:transparent}
+      .m{width:${markPx}px;height:${markPx}px}.w{width:${wmPx}px;height:auto;display:block}
+    </style></head><body><img class="m" src="${mark}"><img class="w" src="${wm}"></body></html>`;
+    const pg = await browser.newPage({ deviceScaleFactor: 3 });
+    await pg.setContent(html, { waitUntil: "networkidle" });
+    const el = await pg.$("body");
+    writeFileSync(join(KIT, out), await el.screenshot({ omitBackground: true }));
+    await pg.close();
+  };
+  await lockup("logo/mark.svg", "logo/wordmark.png", "logo/lockup-horizontal.png", false, false);
+  await lockup("logo/mark-dark.svg", "logo/wordmark-dark.png", "logo/lockup-horizontal-dark.png", true, false);
+  await lockup("logo/mark.svg", "logo/wordmark.png", "logo/lockup-stacked.png", false, true);
+
   const page = await browser.newPage({ deviceScaleFactor: 2 });
   await page.setViewportSize({ width: 1000, height: 900 });
   await page.goto("file://" + KIT + "/");
@@ -269,7 +288,7 @@ if (chromium) {
   writeFileSync(join(KIT, "previews/logo-overview.png"), await page.screenshot({ fullPage: true }));
   await page.close();
   await browser.close();
-  console.log("✓ PNG previews (logo-overview, palette, typography) + social/avatar.png");
+  console.log("✓ PNG lockups (horizontal/-dark/stacked) + previews (logo-overview, palette, typography) + social/avatar.png");
 }
 
 console.log("Brand kit written to brand-kit/");

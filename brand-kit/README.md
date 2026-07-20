@@ -13,22 +13,23 @@ coral reserved for celebration. Full design reference: [`../docs/branding/BRAND_
 
 ## Logo
 
-The mark is a lowercase **g** sitting on a Himmelblau **highlighter swipe** (Textmarker) — *genau*
+The mark is a lowercase **g** sitting on a **Himmel Soft** highlighter swipe (Textmarker) — *genau*
 lives inside *genauly*. The `g` is outlined from **Inter 800** (the app's own UI typeface, so the
 mark and the wordmark are the same letterforms) into a real vector `<path>`, so it renders
-identically everywhere. **The logo is tile-less: transparent background, no tile.** The only thing
-that adapts is the `g` — **Tinte ink on light** grounds, **Papier on dark** grounds — so the mark
-stays legible on any surface (its bowl sits on the light swipe, so it can't stay dark on a dark
-ground).
+identically everywhere. **The logo is tile-less: transparent background, no tile.** On light grounds
+the `g` is **Tinte ink**; on dark grounds the mark is **two-tone** — ink where the `g` sits on the
+swipe, **white** where it falls off (only the descender) — so it reads on any surface. The primary
+logo everywhere there is room is the **wordmark** (the whole word "genauly"); the compact **g mark**
+is for tight spots.
 
 | File | Use |
 |------|-----|
-| `logo/mark.svg` · `mark-dark.svg` | The logo, tile-less + transparent. `mark` = ink g (light grounds), `mark-dark` = Papier g (dark grounds). |
-| `logo/wordmark.svg` · `wordmark-white.svg` | "Genauly" set in Inter 800 (ink / white for dark). |
-| `logo/lockup-horizontal.svg` · `-white.svg` | Mark + wordmark, side by side. Default lockup (`-white` for dark). |
-| `logo/lockup-stacked.svg` | Mark above wordmark. For square/narrow spaces. |
+| `logo/mark.svg` · `mark-dark.svg` | The compact mark, tile-less + transparent. `mark` = ink g (light grounds), `mark-dark` = two-tone (dark grounds). |
+| `logo/wordmark.png` · `wordmark-dark.png` | The primary logo: lowercase "genauly", Inter 800, swipe under "genau". Ships as PNG (live Inter text; the swipe two-tones the g on dark). Use `-dark` on dark grounds. |
+| `logo/lockup-horizontal.png` · `-dark.png` | Compact mark + wordmark, side by side (`-dark` for dark grounds). |
+| `logo/lockup-stacked.png` | Mark above wordmark. For square/narrow spaces. |
 | `logo/mark-mono-ink.svg` · `-white.svg` | Single-color mark (g knocked out of the swipe) for 1-color print / stamps. |
-| `logo/app-icon-tile.svg` | The Papier-tiled version — **only** for the browser/OS app icons (favicon, PWA, apple-touch), never the in-app logo. |
+| `logo/app-icon-tile.svg` | The Papier-tiled version (mark centered "Größer", 12% margin) — **only** for the browser/OS app icons (favicon, PWA, apple-touch), never the in-app logo. |
 | `logo/clearspace.svg` | Clear-space + min-size guide. |
 | `previews/logo-overview.png` · `logo-preview.html` | Contact sheet + an interactive preview of the tile-less mark on light/dark grounds. |
 
@@ -36,12 +37,12 @@ ground).
 - **The logo background is always transparent.** Never put the logo in a tile or box. The one
   exception is the app icons (`icons/`), which need a filled Papier tile because a browser tab or an
   OS home-screen mask turns transparency into black.
-- **The g adapts to the ground:** ink on light, Papier on dark. In code this is one `<Logo>`
-  component that swaps `mark` ↔ `mark-dark` on the `.dark` class.
+- **The mark adapts to the ground:** ink g on light; two-tone (ink on the swipe, white off it) on
+  dark. In code this is one `<Logo>` component that swaps the light ↔ dark image on the `.dark` class.
 - **Clear space:** keep a margin of at least **¼ of the mark's height** clear on all sides.
 - **Minimum size:** the mark reads down to **16 px** (the favicon); do not use the wordmark or
   lockups below ~20 px cap-height.
-- **On light** use the ink wordmark; **on dark** use the white wordmark.
+- **On light** use `wordmark.png`; **on dark** use `wordmark-dark.png`.
 - **Don't:** recolor the swipe, add effects/shadows, stretch, rotate, box the mark in a container, or
   set the wordmark in another typeface.
 
@@ -58,7 +59,7 @@ truth, and `pnpm check:contrast` guards every pairing).
 | Ground | Papier | `#FAF5EB` | `#131620` | `--background` |
 | Text | Tinte | `#1C1A23` | `#EAE7F0`¹ | `--foreground` |
 | Primär / action | **Nachtblau** | `#2866EB` | `#6E99F7` | `--primary` |
-| Akzent / swipe | **Himmelblau** | `#53C7F9` | `#6ECEF7` | `--accent` |
+| Akzent / swipe | **Himmel Soft** | `#8EDCFB` | `#8EDCFB` | `--accent` |
 | Accent-as-text | — | `#086F9B` | — | `--accent-ink` |
 | Belohnung / streak | **Koralle** | `#EA4D2A` | `#F5785C` | `--reward` |
 | Erfolg | Blatt | `#2E9E6C` | — | `--success` |
@@ -67,7 +68,7 @@ truth, and `pnpm check:contrast` guards every pairing).
 
 ¹ approximate; see `tokens.json` for every dark value.
 
-**Discipline (what keeps it premium):** Nachtblau is the single action/identity color. Himmelblau is
+**Discipline (what keeps it premium):** Nachtblau is the single action/identity color. Himmel Soft is
 for tints, chips, and the swipe — **never body text on a light ground** (use `--accent-ink` for
 that). Koralle is for **reward / streak / celebration only**, never decoration. Butter is warning
 only. The warm Papier ground + warm-navy shadows are the biggest "premium" move; keep cards on it.
@@ -106,10 +107,14 @@ only. The warm Papier ground + warm-navy shadows are the biggest "premium" move;
 ## Regenerating
 
 ```bash
-# needs a local Playwright Chromium for the PNG previews (SVGs/tokens build without it)
+# needs a local Playwright Chromium for the PNG previews + lockups + wordmark
+# (the marks/tokens/palette build without it). Run build-logo-assets.mjs first
+# so the wordmark PNGs the kit copies are up to date.
+node scripts/branding/build-logo-assets.mjs
 node scripts/branding/build-brand-kit.mjs
 ```
 
-The mark geometry + outlined-g live in `scripts/branding/build-logo-assets.mjs` (which regenerates
-the `public/` app icons); the outlined wordmark is `scripts/branding/wordmark-data.mjs`; the colors
-are read live from `src/index.css`. Change those sources, rerun both scripts, done.
+The mark geometry + outlined-g + the lowercase wordmark all live in
+`scripts/branding/build-logo-assets.mjs` (which regenerates the `public/` app icons **and** the
+`public/genauly-wordmark*.png` the kit copies); the colors are read live from `src/index.css`.
+Change those sources, rerun both scripts, done.
