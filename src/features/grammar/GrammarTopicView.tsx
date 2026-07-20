@@ -123,7 +123,7 @@ function Lesson({
         <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 sm:h-12 sm:w-12">
           <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
         </span>
-        <h1 className="min-w-0 text-2xl font-bold tracking-tight sm:text-3xl">{topic.titleDe}</h1>
+        <h1 className="text-display min-w-0 text-2xl sm:text-3xl">{topic.titleDe}</h1>
       </div>
 
       {/* Muster first (the fastest-scan artifact), one variant per row, then

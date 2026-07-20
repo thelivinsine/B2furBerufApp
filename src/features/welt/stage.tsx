@@ -252,15 +252,15 @@ export function Pill({
 /** Small outlined chip (level badges, move tags). */
 export function Chip({
   children,
-  tone = "indigo",
+  tone = "blue",
   className,
 }: {
   children: ReactNode;
-  tone?: "indigo" | "slate" | "teal" | "amber";
+  tone?: "blue" | "slate" | "teal" | "amber";
   className?: string;
 }) {
   const tones = {
-    indigo: "bg-indigo-50 text-indigo-700",
+    blue: "bg-blue-50 text-blue-700",
     slate: "bg-slate-100 text-slate-600",
     teal: "bg-teal-50 text-teal-700",
     amber: "bg-amber-50 text-amber-700",

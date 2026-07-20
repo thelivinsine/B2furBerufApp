@@ -326,7 +326,7 @@ export function LandingPage() {
   const steps = [
     {
       n: "1",
-      tone: "bg-primary",
+      tone: "bg-accent-gradient",
       rot: "-rotate-3",
       title: t("Pick a real situation", "Wähle eine echte Situation"),
       text: t(
@@ -404,10 +404,24 @@ export function LandingPage() {
 
   const primaryCta = (
     <button
+<<<<<<< HEAD
       onClick={onboarded ? goApp : start}
       className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition-colors hover:bg-primary/90"
     >
       {onboarded ? goAppLabel : startLabel} <ArrowRight className="h-4 w-4" />
+=======
+      onClick={goApp}
+      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-accent-gradient px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition hover:brightness-105"
+    >
+      {goAppLabel} <ArrowRight className="h-4 w-4" />
+    </button>
+  ) : (
+    <button
+      onClick={start}
+      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-accent-gradient px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition hover:brightness-105"
+    >
+      {startLabel} <ArrowRight className="h-4 w-4" />
+>>>>>>> c559623 (brand: premium pass — token-driven gradient, display/eyebrow text styles, indigo purge (s137))
     </button>
   );
 
@@ -505,7 +519,7 @@ export function LandingPage() {
             {onboarded ? (
               <button
                 onClick={goApp}
-                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-8 py-4 text-lg font-bold text-primary-foreground shadow-glow transition-colors hover:bg-primary/90"
+                className="inline-flex items-center gap-1.5 rounded-full bg-accent-gradient px-8 py-4 text-lg font-bold text-primary-foreground shadow-glow transition hover:brightness-105"
               >
                 {goAppLabel} <ArrowRight className="h-5 w-5" />
               </button>
@@ -513,7 +527,7 @@ export function LandingPage() {
               <>
                 <button
                   onClick={start}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-primary px-8 py-4 text-lg font-bold text-primary-foreground shadow-glow transition-colors hover:bg-primary/90"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-accent-gradient px-8 py-4 text-lg font-bold text-primary-foreground shadow-glow transition hover:brightness-105"
                 >
                   {startLabel} <ArrowRight className="h-5 w-5" />
                 </button>
@@ -632,7 +646,7 @@ export function LandingPage() {
           <PlateauChart lang={lang} />
         </div>
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-accent-ink">
+          <p className="text-eyebrow text-accent-ink">
             {t("Why you're stuck", "Warum du feststeckst")}
           </p>
           <h2 className="mt-3 text-[1.55rem] font-extrabold leading-tight tracking-tight sm:text-[clamp(1.9rem,3.4vw,2.7rem)]">
@@ -653,7 +667,7 @@ export function LandingPage() {
       {/* ---- Bento features ---- */}
       <section id="features" className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="max-w-2xl">
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-accent-ink">
+          <p className="text-eyebrow text-accent-ink">
             {t("What you get", "Was du bekommst")}
           </p>
           <h2 className="mt-3 text-[1.55rem] font-extrabold leading-tight tracking-tight sm:text-[clamp(1.9rem,3.4vw,2.7rem)]">
@@ -812,7 +826,7 @@ export function LandingPage() {
           </svg>
         </div>
         <div>
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-accent-ink">
+          <p className="text-eyebrow text-accent-ink">
             {t("Your library, your rules", "Deine Bibliothek, deine Regeln")}
           </p>
           <h2 className="mt-3 text-[1.55rem] font-extrabold leading-tight tracking-tight sm:text-[clamp(1.9rem,3.4vw,2.7rem)]">
@@ -837,7 +851,7 @@ export function LandingPage() {
             className="pointer-events-none absolute -right-24 -top-40 h-[420px] w-[420px] rounded-full"
             style={{ background: "radial-gradient(circle, rgba(83,199,249,0.25), transparent 65%)" }}
           />
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-accent">
+          <p className="text-eyebrow text-accent">
             {t("Handmade, not scraped", "Handgebaut, nicht zusammengekratzt")}
           </p>
           <h2 className="mt-3 text-[1.55rem] font-extrabold leading-tight tracking-tight text-white sm:text-[clamp(1.9rem,3.4vw,2.7rem)]">
@@ -878,7 +892,7 @@ export function LandingPage() {
       {/* ---- Steps ---- */}
       <section id="steps" className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="max-w-2xl">
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-accent-ink">
+          <p className="text-eyebrow text-accent-ink">
             {t("How it works", "So funktioniert's")}
           </p>
           <h2 className="mt-3 text-[1.55rem] font-extrabold leading-tight tracking-tight sm:text-[clamp(1.9rem,3.4vw,2.7rem)]">
@@ -894,7 +908,7 @@ export function LandingPage() {
             <div key={s.n} className="rounded-[20px] border border-border bg-surface p-7 shadow-soft">
               <span
                 className={cn(
-                  "grid h-11 w-11 place-items-center rounded-[14px] text-lg font-extrabold text-white shadow-soft",
+                  "grid h-11 w-11 place-items-center rounded-[14px] text-lg font-extrabold text-primary-foreground shadow-soft",
                   s.tone,
                   s.rot,
                 )}
@@ -953,7 +967,7 @@ export function LandingPage() {
       {/* ---- FAQ ---- */}
       <section id="faq" className="mx-auto max-w-6xl px-4 pb-20 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-accent-ink">FAQ</p>
+          <p className="text-eyebrow text-accent-ink">FAQ</p>
           <h2 className="mt-3 text-[1.55rem] font-extrabold leading-tight tracking-tight sm:text-[clamp(1.9rem,3.4vw,2.7rem)]">
             {t("Questions? Genau.", "Noch Fragen? Genau.")}
           </h2>

@@ -64,11 +64,11 @@ export function NeulandHub({
   return (
     <div className={cn("mx-auto max-w-lg", compact ? "space-y-4" : "space-y-3")}>
       {/* "Neuland" is centered on the page exactly like Üben's "Lernpfad"
-          (same text-2xl/font-bold). "Beta" is a suffix, NOT part of the
+          (same text-display/text-2xl). "Beta" is a suffix, NOT part of the
           heading, so it's absolutely positioned off the right edge and does
           not shift the word off-center (founder). */}
       <header className="text-center">
-        <h1 className="relative inline-block text-2xl font-bold">
+        <h1 className="text-display relative inline-block text-2xl">
           Neuland
           <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
             Beta
@@ -165,7 +165,7 @@ export function NeulandHub({
                     >
                       {m.title}
                       {m.boss && (
-                        <span className="ml-1.5 inline-flex items-center rounded-md bg-indigo-100 px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wide text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-400">
+                        <span className="ml-1.5 inline-flex items-center rounded-md bg-primary/10 px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase tracking-wide text-primary dark:bg-primary/15">
                           <Swords className="mr-1 h-3 w-3" /> Boss
                         </span>
                       )}

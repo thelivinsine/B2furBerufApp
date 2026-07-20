@@ -1,18 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-20 (session 136). **Landing page fully redesigned ("Der Textmarker"),
-shipped to `main`.** The founder picked Preview A from a two-preview round
-(`preview/landing-redesign/`, analysis in its README) and iterated four rounds; `LandingPage.tsx`
-was rebuilt from scratch: the brand highlighter swipe as the page-wide device (`.landing-*` CSS in
-`index.css`), a hero flashcard collage with the real Artikel-Wesen, a scenario marquee, a "Du bist
-hier" plateau chart, a bento feature grid, a dedicated **filter → custom Üben session** section,
-an honest content-count band, steps ("Your smart companion.", never a replacement-for-courses
-claim), the preserved OAuth "What is Genauly?" purpose block, FAQ, and a Nachtblau closing CTA.
-Copy is **English-first with German seasoning (~10-20%)**, the whole page switches EN/DE via a nav
-LangToggle, and logged-in visitors get **"Go to app" / "Zur App"** CTAs (never "Dashboard").
-Earlier the same day the parallel **session 135 shipped the game demo-readiness review + P0/P1
-batch** (battle-NPC sprites, cutscene cast, Spielen-tile fix, Nachtblau assets; handoff below).
-Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-20 (session 137). **Brand premium pass shipped to `main`** (review of the
+s133 rebrand, fixes 1-7 of a ten-point report): the `accent-gradient` is now token-driven
+(`--gradient-from`/`--gradient-to` in `index.css`, deep Nachtblau → primary → vivid sky) so gradient
+CTAs end brighter instead of muddier AND stay legible in dark mode (the old fixed end stop dropped
+dark-mode text to ~2.5:1; both stops are now gated in `check-contrast.mjs`, 46/46 pass). Landing
+hero/nav CTAs and step chip 1 are back on the gradient (flattened in s133/s136), the default Button
+variant carries a subtle top sheen, and two shared text classes landed in `index.css`:
+**`.text-display`** (extrabold, tracking-tight, balanced wrap; applied to every page H1 via
+SectionHeading/HubHero + Lernpfad/Neuland/Grammar lesson/Legal/Help) and **`.text-eyebrow`** (the one
+canonical overline recipe). Pre-rebrand indigo/violet remnants purged (Neuland Boss tag, game Chip
+tone, QuizHub hero, intent cards, stale comments). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -68,6 +66,38 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 137 (2026-07-20). Branding-refresh review + premium pass (fixes 1-7),
+branch `claude/app-branding-refresh-review-bmrly2`, shipped to `main`.** The founder asked for a
+review of the s133 rebrand ("doesn't look as premium as before"), first as a report only, then
+greenlit fixes 1-7 of the ten-point list. What shipped:
+- **Token-driven accent-gradient (fixes 1+2):** `--gradient-from: 226 83% 47%` / `--gradient-to:
+  196 93% 38%` (light) and `226 90% 66%` / `198 90% 58%` (dark) in `index.css`;
+  `tailwind.config.ts` renders `linear-gradient(135deg, from 0%, primary 45%, to 100%)`. Light mode
+  now travels deep Nachtblau → vivid sky (ends brighter/more saturated, the s133 fixed end stop read
+  muddy); dark mode stays light end-to-end so the near-black `primary-foreground` text passes (old:
+  ~2.5:1, a real AA failure `check:contrast` could not see). Both stops are now gated
+  (`primary-foreground` on from=CORE / on to=UI, both themes, 46/46 pass).
+- **Gradient restored on the landing (fix 3):** the four `bg-primary` pill CTAs (nav + hero) and
+  step chip 1 ride `bg-accent-gradient` again; all pills + the three step chips switched
+  `text-white` → `text-primary-foreground` so they stay legible on the light dark-mode gradient.
+- **Button default sheen (fix 4):** `bg-gradient-to-b from-white/12 to-transparent` over
+  `bg-primary` in `button.tsx` (subtle dimensionality, hover behavior unchanged).
+- **`.text-display` + `.text-eyebrow` (fixes 5+6)** in `index.css` `@layer components`; applied to
+  SectionHeading + HubHero (all hub/Fortschritt/Settings headers), Lernpfad + Neuland H1s (parity
+  kept, comments updated), GrammarTopicView, LegalChrome, HelpChrome, QuizHub, WritingHub, and the
+  6 landing eyebrows. Page titles are now extrabold/tracking-tight like the s136 landing.
+- **Indigo/violet purge (fix 7):** Neuland Boss tag → `bg-primary/10 text-primary`, game `Chip`
+  tone `indigo` renamed `blue` (`bg-blue-50 text-blue-700`), QuizHub hero + intent cards
+  `from-violet/indigo/purple-*` → brand families (`from-blue-600 to-sky-500`,
+  `from-amber-500 to-orange-600`), Anwenden Prüfung card `to-purple-500` → `to-pink-500`, stale
+  "brand indigo" comments reworded.
+- **Deliberately NOT done (report items 8-10, founder has the list):** re-deriving ALL HubHero/
+  themes.ts rainbow gradients from the brand family, re-hueing the violet (hue 250) dark theme
+  toward warm navy, and migrating the landing's hand-rolled pills onto the shared Button.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.9 kB ✓ ·
+  check:contrast 46/46 ✓. Verified rendered output via `pnpm preview` + headless Chromium
+  (landing light/dark, Anwenden hub, Fortschritt). PWA caveat: hard-refresh the live site.
+
 **Handoff after session 136 (2026-07-20). Landing-page redesign, previews → full implementation,
 branch `claude/landing-page-redesign-iqxlja`, shipped to `main`.** The founder asked for a
 conversion-focused landing analysis + "billion-dollar edutech" previews, picked **Preview A "Der
@@ -105,48 +135,8 @@ real page links in the nav, a filter→custom-Üben section, English-first copy,
   output via `pnpm preview` + headless Chromium: light/dark, EN/DE, 390/1280, logged-in state.
   **PWA caveat:** the landing is service-worker-cached; hard-refresh the live site before judging.
 
-**Handoff after session 135 (2026-07-20). Game demo-readiness review + P0 batch + P1 cutscene pass
-SHIPPED (PRs #601, #602 merged to `main`). Branch `claude/game-review-demo-readiness-8fdpid`.** The
-founder asked for a comprehensive review of the current game (Neuland, G1 + G2 Kapitel 1) with
-priority actions so the game can be presented in this week's demo, then greenlit the P0 batch and the
-P1 cutscene pass in-session. Deliverables:
-**`docs/plans/GAME_DEMO_READINESS_REVIEW.md`** (verdict, evidence, prioritized actions, a
-3–4-minute game demo script, and the implementation record) plus the shipped fixes below. Key facts:
-- **Evidence gathered:** `pnpm typecheck` ✓ · `test:unit` 219/219 ✓ · `lint:content` ✓, plus a
-  scripted Playwright playthrough (mobile 390x844, dev build, fresh profile): hub light+dark, mission
-  1.1 scenes + battle + bag ask flow (Reisepass hand-over, Wörterbuch), boss 1.6 reachable ungated,
-  Heute → Spielen embed. **Zero console errors.**
-- **P0.1 SHIPPED — Spielen-tile auto-center fix (`NeulandHub.tsx`):** the compact 3-row mission tile
-  opened scrolled to max (hid the next mission + its play button) because the tile was not
-  positioned, so the auto-center's `r.offsetTop` was document-relative. The tile is now `relative`
-  (it becomes the rows' offsetParent). Verified scripted: fresh profile shows 1.1–1.3 (scrollTop 0),
-  mid-chapter centers 1.4.
-- **P0.2 SHIPPED — battle opponents have bodies (founder-caught; the review's first pass missed
-  it):** `NPC_SPRITES` had only Frau Schmidt, so 4 of 5 dialogue battles ran against an invisible
-  opponent. Four new code-authored 26x32 sprites in `welt_assets.py` (Grenzbeamte peaked cap+badge,
-  Milo lanyard, Kassiererin apron, Herr Brandt balding+mustache+cardigan; blessed style, locked
-  world scale), wired via `stage.tsx` `NPC_SPRITES`, `sprite:` on the 4 battle NPCs in
-  `missions.ts`, and the linter's `GAME_SPRITES` mirror (`lint-content.mjs`, it errors on
-  unregistered sprites). Shared battle anchor composite-checked on all four backdrops.
-- **P1 art SHIPPED — Nachtblau asset regen:** `welt_assets.py` `INDIGO` `(91,91,230)`→`(61,116,237)`
-  (`#3D74ED`), all assets regenerated (player backpack, backdrop accents, doc + Wörterbuch icons).
-- **P1 SHIPPED — cutscene characters (`scenes.tsx` `CutsceneCast`):** all 19 cutscenes rendered as
-  empty rooms (only hotspot placed the player). Now the player stands bottom-left on every
-  backdropped cutscene (the `website` prop scene stays character-free) and the speaking NPC stands
-  right (current line's speaker if sprited, else the scene's primary sprited NPC, so no flicker).
-  Needed a new **Jonas sprite** (the recurring companion, 22 cutscene lines, was spriteless);
-  registered like the others. Composite-checked on all 5 cutscene backdrops; verified in-app the
-  player renders on the 1.1 arrivals cutscene. Listening/automat/form/loadout keep prop/device focus
-  (no person) by design.
-- **Still open before the demo:** founder tasks only — seed missions 1.1–1.3 on the exact demo
-  device (game progress is LOCAL-ONLY) + dress rehearsal of 1.4 and the boss after the merge is live
-  (hard-refresh, PWA autoUpdate).
-- **By-design, don't "fix":** missions light-only (hub theme-aware), Kapitel 2+ locked teaser, dark
-  surround below short scenes, no game cloud sync until the G2 migration.
-- **Gates:** typecheck ✓ · lint 0 errors ✓ · lint:content ✓ · test:unit 219/219 ✓ · build ✓ ·
-  bundle 80.7 kB ✓.
-
-_(Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
+_(Session 135's game demo-readiness review + P0/P1 batch handoff is now in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit

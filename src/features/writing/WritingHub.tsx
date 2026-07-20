@@ -203,7 +203,7 @@ export function WritingHub() {
           <Icon className="h-6 w-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{t.titleDe}</h1>
+          <h1 className="text-display text-2xl">{t.titleDe}</h1>
           <p className="text-sm text-muted-foreground">Schreibtraining mit KI-Feedback.</p>
         </div>
       </div>

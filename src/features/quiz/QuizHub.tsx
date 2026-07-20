@@ -93,7 +93,7 @@ export function QuizHub() {
             <Icon className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">{t.titleDe}</h1>
+            <h1 className="text-display text-2xl">{t.titleDe}</h1>
             <p className="text-sm text-muted-foreground">Wähle deine Schwierigkeitsstufe.</p>
           </div>
         </div>
@@ -129,7 +129,7 @@ export function QuizHub() {
     <div className="space-y-4 sm:space-y-6">
       <HubHero
         icon={ListChecks}
-        gradient="from-violet-500 to-indigo-500"
+        gradient="from-blue-600 to-sky-500"
         eyebrow="Quiz"
         title="Themen-Quiz"
       />

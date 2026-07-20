@@ -212,7 +212,7 @@ export function RouteIcon({
 }
 
 // The "Mehr" overflow button is not a route, so it gets its own branded mark:
-// a 2×2 tile grid (the classic "more / apps" glyph) in the brand indigo.
+// a 2×2 tile grid (the classic "more / apps" glyph) in the brand Nachtblau.
 export const MORE_BRAND = BRAND;
 
 export function MoreIcon({ size = 24 }: { active?: boolean; size?: number }) {

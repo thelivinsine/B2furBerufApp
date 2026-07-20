@@ -207,7 +207,7 @@ export default function UebenPath() {
     // it reads as a deliberate focused column instead of a stranded one.
     <div className="flex min-h-[calc(100dvh-15rem)] flex-col gap-4 lg:min-h-0">
       {/* Centered page title, mirroring the Spielen "Neuland" header row */}
-      <h1 className="text-center text-2xl font-bold">Lernpfad</h1>
+      <h1 className="text-display text-center text-2xl">Lernpfad</h1>
 
       {/* Illustrated city map: the single journey surface (stepper retired s88).
           Native 3:2 (360x240) in a surface mat (the same mat, same dimensions
