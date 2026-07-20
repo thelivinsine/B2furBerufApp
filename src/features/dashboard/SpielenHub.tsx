@@ -12,5 +12,8 @@ import { NeulandHub } from "@/features/welt/NeulandHub";
  */
 export default function SpielenHub() {
   const navigate = useNavigate();
-  return <NeulandHub compact onPlay={(mission) => navigate(`/welt?mission=${mission.id}`)} />;
+  // `from=heute` lets the mission player return here (Heute → Spielen, with the
+  // Lernen/Spielen toggle) on exit instead of stranding the learner on the
+  // toggle-less standalone /welt hub.
+  return <NeulandHub compact onPlay={(mission) => navigate(`/welt?mission=${mission.id}&from=heute`)} />;
 }
