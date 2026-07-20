@@ -1,0 +1,182 @@
+<title>Genauly Logo v2 · final (v8)</title>
+<!-- Genauly logo v2 rework (s138, 2026-07-20). The final of 8 founder-iterated
+     preview rounds: Himmel Soft #8CDBFB swipe, wordmark with the swipe under
+     "genau", only the g two-tone on dark, and the app-icon size options
+     (Größer chosen). Shipped via build-logo-assets.mjs; see BRAND_SPEC §3. -->
+<style>
+  :root {
+    --swipe:#8CDBFB; --papier:#FAF6EC; --tinte:#1C1A24; --navy:#131620;
+    --bg:#F3EFE3; --card:#FFFFFF; --text:#26232E; --muted:#6A6455; --line:#E7DFCA;
+    font-synthesis:none;
+  }
+  @media (prefers-color-scheme: dark){ :root{--bg:#101017;--card:#191A22;--text:#E7E8EF;--muted:#9A94A8;--line:#2A2E3C;} }
+  :root[data-theme="light"]{--bg:#F3EFE3;--card:#FFFFFF;--text:#26232E;--muted:#6A6455;--line:#E7DFCA;}
+  :root[data-theme="dark"]{--bg:#101017;--card:#191A22;--text:#E7E8EF;--muted:#9A94A8;--line:#2A2E3C;}
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:960px;margin:0 auto;padding:48px 24px 72px;}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#2866EB;margin:0 0 10px;}
+  h1{font-size:clamp(26px,4vw,36px);font-weight:800;letter-spacing:-.02em;margin:0 0 12px;text-wrap:balance;}
+  .lede{font-size:16px;color:var(--muted);max-width:64ch;margin:0;}
+  .chip{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:5px 12px;margin-top:16px;}
+  .dot{width:13px;height:13px;border-radius:4px;background:var(--swipe);border:1px solid rgba(0,0,0,.08);}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,monospace;font-variant-numeric:tabular-nums;}
+  h2{font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#2866EB;margin:48px 0 4px;}
+  .sub{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:64ch;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;}
+  .two{display:grid;grid-template-columns:1fr 1fr;}
+  .pane{padding:44px 28px 22px;display:flex;flex-direction:column;align-items:center;gap:18px;min-height:176px;justify-content:center;}
+  .pane.light{background:var(--papier);}
+  .pane.dark{background:var(--navy);}
+  .pane-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;opacity:.55;}
+  .pane.light .pane-label{color:var(--tinte);}
+  .pane.dark .pane-label{color:var(--papier);}
+  .wmsvg{display:block;height:66px;width:auto;}
+  .wmsvg text{font-family:"Inter","Helvetica Neue",Arial,system-ui,sans-serif;font-weight:800;letter-spacing:-2px;}
+  .marks-row{display:flex;align-items:center;gap:26px;flex-wrap:wrap;justify-content:center;}
+  svg.mark{display:block;}
+
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:24px;}
+  .tilecol{display:flex;flex-direction:column;align-items:center;gap:12px;}
+  .tilecol .name{font-size:13px;font-weight:700;}
+  .tilecol .meta{font-size:12px;color:var(--muted);}
+  .tilecol.bad .name{color:#B23B2E;}
+  .tilecol.pick .name{color:#2866EB;}
+  .tilecol.pick svg.tile{outline:2px solid #2866EB;outline-offset:3px;border-radius:22%;}
+  .os{display:flex;align-items:center;gap:14px;padding:22px 24px;}
+  .os .oslabel{font-size:11px;color:var(--muted);}
+
+  .note{margin-top:40px;font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px;}
+  .note b{color:var(--text);}
+  ol.changes{margin:14px 0 0;padding-left:20px;font-size:14px;color:var(--muted);}
+  ol.changes li{margin:4px 0;} ol.changes b{color:var(--text);}
+  @media (max-width:620px){.two{grid-template-columns:1fr;}.tiles{grid-template-columns:1fr;}}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Genauly · Brand mark v8</p>
+  <h1>The exact v2 swipe · only the g splits</h1>
+  <p class="lede">The swipe now uses the exact Version-2 geometry: same width, same height, same overhangs, so the letter bottoms sit just below the blue like a real highlighter. Only the letter <b>g</b> is dual-tone on dark. Swipe stays Himmel Soft <span class="mono">#8CDBFB</span>.</p>
+  <ol class="changes">
+    <li><b>Swipe:</b> width and height identical to Version 2 (0.16em/0.10em overhangs, same band height), −2° tilt.</li>
+    <li><b>Dark ground:</b> "enau" solid black, "ly" solid white, only the <b>g</b> dual-tone (black bowl on the swipe, white descender).</li>
+    <li><b>Light ground:</b> whole word solid ink, exactly like Version 2.</li>
+    <li><b>Compact g + favicon:</b> unchanged (two-tone g on dark; favicon centered, no empty band).</li>
+  </ol>
+  <span class="chip"><span class="dot"></span> Swipe: Himmel Soft <span class="mono">#8CDBFB</span></span>
+
+  <h2>1 · Primary logo — wordmark</h2>
+  <p class="sub">Wide swipe under "genau", the original look. Dark: "enau" black on the swipe, "ly" white, only the g dual-tone.</p>
+  <div class="card two">
+    <div class="pane light"><span id="wm-light"></span><span class="pane-label">Light ground</span></div>
+    <div class="pane dark"><span id="wm-dark"></span><span class="pane-label">Dark ground</span></div>
+  </div>
+
+  <h2>2 · Compact mark — two-tone "g"</h2>
+  <p class="sub">Same rule. On dark, the part of the g on the swipe is black, the descender that falls off it is white.</p>
+  <div class="card two">
+    <div class="pane light"><div class="marks-row" id="g-light"></div><span class="pane-label">Light ground · all ink</span></div>
+    <div class="pane dark"><div class="marks-row" id="g-dark"></div><span class="pane-label">Dark ground · black on swipe, white off</span></div>
+  </div>
+
+  <h2>3 · Favicon / app icon — centered + enlarged</h2>
+  <p class="sub">Left is the old low placement (empty band on top, your screenshot). Middle and right are centered by the mark's real bounds at two sizes.</p>
+  <div class="card"><div class="tiles" id="tiles"></div></div>
+  <div class="card" style="margin-top:14px;"><div class="os" id="oshint"></div></div>
+
+  <p class="note">
+    Pick a favicon size — <b>Größer</b> or <b>Randnah</b> — and I'll implement the two-tone g, the wordmark, and regenerate every favicon / PWA / apple-touch icon with the corrected centering, then push it.<br><br>
+    <span style="opacity:.8">Wordmark here is rendered with a stand-in bold face, so letterforms are approximate. Production uses the outlined <b>Inter 800</b> shapes so the "g" matches the mark exactly. Colour, swipe angle, the swipe-boundary two-tone split, and the tile centering are all exact.</span>
+  </p>
+</div>
+
+<script>
+  const SWIPE='M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z';
+  const G='M31.50 56.06Q28.50 56.06 26.27 55.31Q24.03 54.55 22.65 53.19Q21.26 51.84 20.85 50.06L27.07 48.78Q27.27 49.40 27.83 49.92Q28.38 50.45 29.28 50.76Q30.19 51.08 31.46 51.08Q33.65 51.08 34.83 50.10Q36.01 49.11 36.01 47.06L36.01 43L35.46 43Q35.05 44.03 34.24 44.87Q33.43 45.71 32.18 46.20Q30.94 46.69 29.24 46.69Q26.72 46.69 24.64 45.51Q22.56 44.33 21.31 41.86Q20.05 39.39 20.05 35.54Q20.05 31.52 21.35 28.91Q22.64 26.31 24.72 25.05Q26.80 23.79 29.22 23.79Q31.05 23.79 32.35 24.40Q33.65 25.02 34.50 25.99Q35.35 26.96 35.78 28.01L35.99 28.01L35.99 24.07L43.06 24.07L43.06 46.49Q43.06 49.65 41.60 51.78Q40.13 53.91 37.53 54.99Q34.92 56.06 31.50 56.06M31.68 41.44Q33.06 41.44 34.02 40.75Q34.98 40.05 35.50 38.70Q36.01 37.36 36.01 35.52Q36.01 33.63 35.50 32.25Q34.98 30.88 34.03 30.13Q33.08 29.38 31.68 29.38Q30.31 29.38 29.35 30.15Q28.40 30.92 27.91 32.30Q27.42 33.67 27.42 35.52Q27.42 37.36 27.91 38.69Q28.40 40.03 29.35 40.73Q30.31 41.44 31.68 41.44';
+  const SWIPE_C='#8CDBFB', INK='#1C1A24', PAPIER='#FAF6EC', WHITE='#FFFFFF';
+  const NS='http://www.w3.org/2000/svg';
+  // the original organic highlighter stroke from the v2 wordmark (120x46 design box)
+  const WIDE='M4 12 Q1 24 4 36 Q3 40 10 39 L110 35 Q117 36 116 27 L117 13 Q118 7 110 8 L10 10 Q4 9 4 12 Z';
+  let uid=0;
+
+  // ---- Wordmark: the EXACT v2 swipe geometry. v2 positioned the swipe as an inset
+  // around the "genau" span: left -0.16em, right +0.10em, top +0.12em, bottom -0.10em
+  // of the 1em text box (Inter box top ≈ baseline-0.864em with line-height 1).
+  // Dark mode: white word; "genau" black (solid, so no white slivers on e/n/a/u);
+  // the g alone is dual-tone via the swipe clip (black bowl, white descender).
+  function renderWM(el, mode){
+    const FS=64, PAD=14, BASE=56;
+    el.innerHTML = `<svg class="wmsvg"><text x="${PAD}" y="${BASE}" font-size="${FS}">genauly</text></svg>`;
+    const svg=el.querySelector('svg'), t=el.querySelector('text');
+    const full=t.getComputedTextLength();
+    const gEnd=PAD+t.getSubStringLength(0,1);
+    const genau=t.getSubStringLength(0,5);
+    // exact v2 band: x/y/w/h from the em-box insets above
+    const sx=PAD-0.16*FS, sw=genau+0.26*FS;
+    const sy=BASE-0.744*FS, sh=0.78*FS;
+    const cx=sx+sw/2, cy=sy+sh/2;
+    const TR=`rotate(-2 ${cx} ${cy}) translate(${sx} ${sy}) scale(${sw/120} ${sh/46})`;
+    const W=PAD*2+full, H=92;
+    svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    const id='wm'+(++uid);
+    const swipeEl=`<path d="${WIDE}" transform="${TR}" fill="${SWIPE_C}"/>`;
+    const txt=(fill,clip)=>`<text x="${PAD}" y="${BASE}" font-size="${FS}" fill="${fill}"${clip?` clip-path="url(#${clip})"`:''}>genauly</text>`;
+    if(mode==='dark'){
+      // clip = swipe ∪ a rect over e..u at full letter height, so e/n/a/u are solid
+      // black while the g (outside the rect) is split by the swipe alone.
+      svg.innerHTML =
+        `<defs><clipPath id="${id}"><path d="${WIDE}" transform="${TR}"/>`+
+        `<rect x="${gEnd-1}" y="${BASE-0.9*FS}" width="${PAD+genau-gEnd+2}" height="${0.96*FS}"/></clipPath></defs>`+
+        swipeEl + txt(WHITE) + txt(INK,id);
+    } else {
+      svg.innerHTML = swipeEl + txt(INK);
+    }
+  }
+
+  // ---- Compact g: tile-less. dark = two-tone; light = ink ----
+  function gMark(px, mode){
+    const id='c'+(++uid);
+    const layers = mode==='dark'
+      ? `<path d="${G}" fill="${WHITE}"/><path d="${G}" fill="${INK}" clip-path="url(#${id})"/>`
+      : `<path d="${G}" fill="${INK}"/>`;
+    return `<svg class="mark cx" data-margin="0.05" width="${px}" height="${px}" viewBox="0 0 64 64" aria-label="Genauly">
+      <defs><clipPath id="${id}"><path d="${SWIPE}" transform="rotate(-3 32 32)"/></clipPath></defs>
+      <g class="center"><path d="${SWIPE}" fill="${SWIPE_C}" transform="rotate(-3 32 32)"/>${layers}</g></svg>`;
+  }
+  function tile(px, margin){
+    return `<svg class="tile cxt" data-margin="${margin}" width="${px}" height="${px}" viewBox="0 0 64 64" aria-label="Genauly app icon">
+      <rect width="64" height="64" rx="14" fill="${PAPIER}"/>
+      <g class="center"><path d="${SWIPE}" fill="${SWIPE_C}" transform="rotate(-3 32 32)"/><path d="${G}" fill="${INK}"/></g></svg>`;
+  }
+  function oldTile(px, scale){
+    return `<svg class="tile" width="${px}" height="${px}" viewBox="0 0 64 64">
+      <rect width="64" height="64" rx="14" fill="${PAPIER}"/>
+      <g transform="translate(32 32) scale(${scale}) translate(-32 -32)"><path d="${SWIPE}" fill="${SWIPE_C}" transform="rotate(-3 32 32)"/><path d="${G}" fill="${INK}"/></g></svg>`;
+  }
+
+  renderWM(document.getElementById('wm-light'),'light');
+  renderWM(document.getElementById('wm-dark'),'dark');
+  document.getElementById('g-light').innerHTML = gMark(64,'light')+gMark(40,'light')+gMark(28,'light');
+  document.getElementById('g-dark').innerHTML  = gMark(64,'dark')+gMark(40,'dark')+gMark(28,'dark');
+  document.getElementById('tiles').innerHTML = `
+    <div class="tilecol bad">${oldTile(112,1.25)}<div class="name">Vorher · schief</div><div class="meta">Band oben leer</div></div>
+    <div class="tilecol">${tile(112,0.12)}<div class="name">Größer · zentriert</div><div class="meta mono">Rand 12%</div></div>
+    <div class="tilecol pick">${tile(112,0.05)}<div class="name">Randnah · empfohlen</div><div class="meta mono">Rand 5%</div></div>`;
+  document.getElementById('oshint').innerHTML =
+    `<span class="oslabel">Home-Screen-Größe (Randnah):</span>`+tile(60,0.05)+tile(44,0.05)+tile(30,0.05);
+
+  // center g marks + tiles by true bbox
+  function centerGroup(svg, margin){
+    const g=svg.querySelector('.center'); const bb=g.getBBox();
+    const s=(64*(1-2*margin))/Math.max(bb.width,bb.height);
+    const cx=bb.x+bb.width/2, cy=bb.y+bb.height/2;
+    g.setAttribute('transform',`translate(${32-s*cx} ${32-s*cy}) scale(${s})`);
+  }
+  requestAnimationFrame(()=>{
+    document.querySelectorAll('svg.cx, svg.cxt').forEach(svg=>centerGroup(svg, parseFloat(svg.dataset.margin||'0.05')));
+  });
+</script>

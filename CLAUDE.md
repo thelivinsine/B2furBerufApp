@@ -700,10 +700,12 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
 - **Brand kit (s133): the full, browsable kit lives in `brand-kit/`** (logo mark/wordmark/lockups/
   mono, `color/` palette + `tokens.css`/`tokens.json`, `type/` specimen, `icons/`, `social/`,
   `previews/`, and a `README.md` with usage rules). It is **generated from the app's own source** by
-  `scripts/branding/build-brand-kit.mjs` (colors read live from `src/index.css`; the outlined wordmark
-  is `scripts/branding/wordmark-data.mjs`), so it cannot drift from what ships. Rerun that script (plus
-  `build-logo-assets.mjs` for the `public/` icons) after any mark or token change. Do not hand-edit the
-  generated files.
+  `scripts/branding/build-brand-kit.mjs` (colors read live from `src/index.css`; the marks are SVG,
+  and since the s138 logo v2 the **wordmark + lockups are PNG copied/composited from the
+  `public/genauly-wordmark*.png` that `build-logo-assets.mjs` renders** — the lowercase wordmark is
+  live Inter, so it cannot be a portable vector). It cannot drift from what ships. **Run
+  `build-logo-assets.mjs` first, then `build-brand-kit.mjs`** after any mark or token change (the kit
+  copies the wordmark PNGs the logo script produces). Do not hand-edit the generated files.
 - **Premium pass (s137):** the `accent-gradient` stops are the theme-aware `--gradient-from`/
   `--gradient-to` tokens in `index.css` (light: deep Nachtblau → primary → vivid sky; dark: light
   end-to-end so the dark `primary-foreground` text passes AA — never reintroduce a fixed dark end

@@ -1,15 +1,17 @@
 # Brand identity exploration
 
-> ## ✅ FINALIZED — Vol. VIII (Kit 1 · Nachtblau & Himmelblau + Koralle)
+> ## ✅ FINALIZED + SHIPPED — Vol. VIII (Kit 1 · Nachtblau & Himmelblau + Koralle)
 >
-> The founder finalized this direction on 2026-07-19. **It is NOT implemented yet** (no `src/` change).
-> The locked, implementation-ready spec (exact tokens + HSL + logo + checklist) is
-> **`docs/branding/BRAND_SPEC.md`**. Canonical logo reference: `genauly-logo-final.svg`.
-> Wire it only when the founder says go.
+> The founder finalized this direction on 2026-07-19 and it **shipped in s133** (tokens, nav/route
+> chrome, logo + all icons; see `docs/branding/BRAND_SPEC.md`). **Logo v2 rework in s138 (2026-07-20):**
+> the swipe lightened to **Himmel Soft `#8CDBFB`** (also applied app-wide as `--accent`), the compact
+> mark went **two-tone on dark**, icons re-centered ("Größer"), and a lowercase **"genauly" wordmark**
+> (swipe under "genau") became the primary logo. The 8-round preview artifact for that rework is
+> **`artifacts/genauly-logo-v2-previews.html`**; canonical logo reference: `genauly-logo-final.svg`.
 >
-> **All published artifacts are saved self-contained under `artifacts/`** (`genauly-vol[5-8]-artifact.html`;
-> Vol. IV is already self-contained as `genauly-identity-vol4.html`). The `genauly-identity-vol*.html`
-> files are the editable sources (they reference the `vol*-screens/` strips).
+> **All published artifacts are saved self-contained under `artifacts/`** (`genauly-vol[5-8]-artifact.html`
+> + `genauly-logo-v2-previews.html`; Vol. IV is self-contained as `genauly-identity-vol4.html`). The
+> `genauly-identity-vol*.html` files are the editable sources (they reference the `vol*-screens/` strips).
 
 ## Vol. VIII (session 127 cont., 2026-07-17) — Kit 1 final feinschliff
 

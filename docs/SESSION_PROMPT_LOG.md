@@ -562,3 +562,20 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `src/features/landing/LandingPage.tsx` · `public/` icons (favicons/apple-touch/pwa/canonical
   regenerated) · `preview/branding/genauly-logo-final.svg` · `docs/branding/BRAND_SPEC.md` ·
   `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 10 (verbatim):** `> document the session and save the artifacts. Update the brandkit on the repo.`
+- **Response 10:** Session close-out. (a) **Docs:** PROJECT_STATUS.md + SESSION_PROMPT_LOG.md had
+  been kept current at each merge; this pass finalized the s138 handoff (Größer, mobile-landing
+  wordmark, brand-kit rework, resolved the earlier "open follow-up" note) and logged prompts 9-10.
+  (b) **Artifact saved:** the final 8-round logo preview → `preview/branding/artifacts/
+  genauly-logo-v2-previews.html` (title/header note added; indexed in `preview/branding/README.md`,
+  whose stale "NOT implemented yet" banner was corrected to "finalized + shipped"). (c) **Brand kit
+  updated to logo v2:** reworked `build-brand-kit.mjs` — compact mark-dark is now TWO-TONE (was a
+  flat Papier g), the app-icon tile is Größer-centered, the wordmark + lockups switched from the
+  outlined capital-G "Genauly" (`wordmark-data.mjs` dependency dropped) to the lowercase "genauly"
+  PNGs copied from `public/` + PNG lockup composites, palette/README relabeled Himmelblau→Himmel
+  Soft (#8EDCFB). Regenerated the whole kit; verified the contact sheet renders the new wordmark +
+  two-tone dark. Gates: lint 0 errors (scripts). Squash-merged to `main`.
+- **Artifacts (prompt 10):** `scripts/branding/build-brand-kit.mjs` · `brand-kit/**` (regenerated:
+  marks, wordmark/lockup PNGs, palette, tokens, previews, README) ·
+  `preview/branding/artifacts/genauly-logo-v2-previews.html` · `preview/branding/README.md` ·
+  `CLAUDE.md` · `docs/branding/BRAND_SPEC.md` · `docs/PROJECT_STATUS.md` · this log
