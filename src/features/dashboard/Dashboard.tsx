@@ -1,4 +1,5 @@
 import { lazy, Suspense, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -46,7 +47,12 @@ const fallback = (
 );
 
 export function Dashboard() {
-  const [tab, setTab] = useState<HeuteTab>("ueben");
+  const [params, setParams] = useSearchParams();
+  // Open on Spielen when returned here from the mission player (/?tab=spielen),
+  // so exiting a game lands back on the tab with the Lernen/Spielen toggle.
+  const [tab, setTab] = useState<HeuteTab>(() =>
+    params.get("tab") === "spielen" ? "spielen" : "ueben",
+  );
   // Direction of the last tab change (+1 = moved right to Spielen, -1 = moved
   // left to Üben) so the content slides in the matching direction.
   const [dir, setDir] = useState(0);
@@ -55,6 +61,12 @@ export function Dashboard() {
     if (id === tab) return;
     setDir(TAB_INDEX[id] > TAB_INDEX[tab] ? 1 : -1);
     setTab(id);
+    // Keep the URL in sync so a manual switch away from Spielen doesn't leave a
+    // stale ?tab=spielen behind (the param is only read on mount).
+    if (params.has("tab")) {
+      params.delete("tab");
+      setParams(params, { replace: true });
+    }
   };
   // Horizontal slide: entering panel comes from the side you moved toward, the
   // leaving panel exits the opposite side (right->left when going to Spielen,

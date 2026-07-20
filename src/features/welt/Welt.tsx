@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { Mission } from "@/types/game";
 import { missionUnlocked } from "@/engine/mission";
 import { missions } from "@/data/missions";
@@ -17,6 +17,7 @@ import { NeulandHub } from "@/features/welt/NeulandHub";
  */
 export function Welt() {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // Deep link from Heute → Spielen: /welt?mission=<id> auto-opens that mission
   // when it exists and is unlocked. Read once on mount; absent or invalid param
@@ -32,6 +33,13 @@ export function Welt() {
 
   const exitMission = () => {
     setActive(null);
+    // Launched from Heute → Spielen: return there so the Lernen/Spielen toggle
+    // is back on screen, instead of stranding the learner on the toggle-less
+    // standalone /welt hub. Direct /welt visits just drop the mission param.
+    if (params.get("from") === "heute") {
+      navigate("/?tab=spielen", { replace: true });
+      return;
+    }
     if (params.has("mission")) {
       params.delete("mission");
       setParams(params, { replace: true });
