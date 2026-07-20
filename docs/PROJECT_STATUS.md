@@ -86,10 +86,14 @@ real page links in the nav, a filter→custom-Üben section, English-first copy,
   state (default EN); German is reserved for obvious/brand terms per the founder's 10-20% rule.
 - **New `.landing-*` CSS in `src/index.css`:** `landing-swipe` (the highlighter device; swiped text
   stays ink `#1c1a23` in BOTH themes since the swipe ground is always light Himmelblau; a
-  `landing-swipe-reward` variant tints with `--reward-bg`), `landing-float`, `landing-marquee`
-  (+ reduced-motion opt-outs). **Gotcha fixed during verify:** a CSS `transform` animation overrides
-  Tailwind translate/rotate on the same element, so floated collage elements keep position/rotation
-  on an OUTER element and animate an inner wrapper.
+  `landing-swipe-reward` variant tints with `--reward-bg`) and `landing-marquee` (+ reduced-motion
+  opt-out). **The hero collage float is framer-motion, NOT CSS** (the `float()` helper in
+  `LandingPage.tsx`): a CSS-keyframe version shipped first but did not run on the founder's iPhone,
+  and a CSS `transform` animation also overrides Tailwind translate/rotate on the same element, so
+  the float animates an INNER wrapper via framer while the outer element keeps position/rotation.
+  The closing card's white CTA carries **no shadow** (rendered as a heavy halo on device); the other
+  CTAs keep `shadow-glow` (founder-specified). The published preview artifact is stored at
+  `preview/landing-redesign/landing-a-artifact.html`.
 - **Rules recorded:** logged-in CTA label is "Go to app"/"Zur App" (never "Dashboard"); no
   replacement-for-traditional-learning claims; hero eyebrow is "German for real life" (B1–B2
   removed at founder request; the footer keeps the full tagline).
