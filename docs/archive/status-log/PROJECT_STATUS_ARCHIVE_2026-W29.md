@@ -725,3 +725,32 @@ hardcoded-hex inventory; each PR section marked SHIPPED with its final values):
 - **Open founder items:** re-upload the Google OAuth consent-screen logo (full-bleed variant, not in
   repo) from the new mark; verify the live site after deploy (hard-refresh first, the service worker
   serves the old build until then).
+
+## Session 134 (2026-07-19) — Theorie (Wörter) card + mobile-filter polish (condensed handoff)
+
+**Handoff after session 134 (2026-07-19). Theorie (Wörter) card + mobile-filter polish. Branch
+`claude/filter-rail-mobile-height-n8ktd6`, shipped to `main` via PR #598 (squash `796fb01`).** A
+short founder-driven round on the Theorie Wörter tab and the mobile filter (ran on Opus 4.8):
+- **Mobile filter panel shorter (`FilterRail.tsx`, `panel` branch):** cap dropped
+  `max-h-[55dvh]`→`max-h-[45dvh]` (~10 dvh, roughly 3-4 text lines) so an open filter leaves more of
+  the card list visible on phones; the fixed header + internal `overflow-y-auto` scroll region are
+  unchanged, so nothing is clipped.
+- **"Verbunden" cross-module panel PARKED (`VocabList.tsx`):** the vocab card dropdown that linked a
+  word to a Kollokation/Schreibtraining/Dialog (`RelatedPanel` + `relatedRows`) is hidden behind a
+  reversible `const SHOW_RELATED = false` (founder wants to rethink its usefulness + dependencies
+  before it ships). The panel + helper are untouched in the repo; re-enabling is a one-line flip. Do
+  not delete them while parked.
+- **Wörter Karten = "Option B" layout (`VocabList.tsx`):** with the bottom toggle gone the card was
+  rearranged (founder picked B from a 4-option `preview/vocab-card-layouts.html`): quiet headline
+  (gender creature + word left, bookmark right), the example gets room, and a foot row pins the
+  plural (a small `bg-muted` pill) left + the speak button right via `mt-auto`, so every card in a
+  row shares one foot line. Speak + plural moved OUT of the headline.
+- **Gender reveal effect moved right + snappier die (`ArtikelEffect.tsx` + `index.css`):** new
+  `align` prop; the vocab card back face passes `align="right"`, shifting the burst/bloom/shatter
+  origin to `--fx-x: 78%` (into the empty right side where the English text isn't). The session
+  player (`SessionPlayer`) keeps the default centered origin. The "die" bloom is now `470ms` fast-out
+  cubic-bezier (was `650ms` ease-out) with a tighter `200/280/360ms` ring stagger (was
+  `200/310/420`), finishing as crisply as der's rays / das's shards. The `left:50%` origins in
+  `.artikel-fx-ray/ring/shard` now read `var(--fx-x, 50%)`.
+- **Gates:** typecheck clean, lint 0 errors, build green, `test:unit` 219/219. **PWA caveat:** the
+  Wörter cards are a service-worker-cached surface; hard-refresh before judging the live result.

@@ -1332,3 +1332,68 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   `src/features/welt/assets/jonas.png` (new) · `src/features/welt/stage.tsx` ·
   `src/features/welt/scenes.tsx` (`CutsceneCast`) · `src/data/missions.ts` · `scripts/lint-content.mjs` ·
   `docs/plans/GAME_DEMO_READINESS_REVIEW.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+## Session 136 — 2026-07-20 — Landing-page redesign (analysis → previews → ship)
+
+- **Branch:** `claude/landing-page-redesign-iqxlja`
+- **Prompt 1 (verbatim):** `> do an analysis of the landing page and improve it such that it provides the highest value to the learner and has highest conversion rate. The visuals and quality should resemble a billion dollar edutech app with excellent finesse which also includes creative elements, doodles, artistic elements and visual coherence wherever applicable. Go ahead and provide a couple of previews of the homepage for such highest standards. `
+- **Response 1:** Audited `src/features/landing/LandingPage.tsx` against conversion best practice
+  (biggest gaps: no product visual anywhere, no honest proof/trust signals, flat card grids, competing
+  hero CTAs, the OAuth prose block killing momentum) and built two self-contained on-brand previews in
+  `preview/landing-redesign/`, both reusing the shipped logo geometry and the real Wesen creature paths:
+  **A "Der Textmarker"** (warm Papier editorial; the Himmelblau highlighter swipe as the page-wide
+  device, doodle annotations, flashcard collage hero, scenario marquee, "Du bist hier" plateau chart,
+  bento feature grid, honest content-count band) and **B "Die Nachtstadt"** (cinematic night-city hero
+  with the six lit domain buildings + phone mockup of the Heute screen, trust bar, three product splits
+  incl. Neuland and the word constellation, data-quality tier band, "Die Stadt wird hell, wenn du übst"
+  closer). Verified both at 1280/390 px via headless Chromium, fixed badge overlap / mobile nav wrap /
+  floating-chip collisions, wrote the analysis into `preview/landing-redesign/README.md`, pushed, and
+  sent the founder the two HTMLs plus full-page desktop/mobile screenshots. Nothing shipped to the app
+  yet; awaiting the founder's pick before implementing in `LandingPage.tsx`.
+- **Artifacts:** `preview/landing-redesign/landing-a-textmarker.html` ·
+  `preview/landing-redesign/landing-b-nachtstadt.html` · `preview/landing-redesign/README.md` ·
+  commit `253534e`
+- **Prompt 2 (verbatim):** `> provide the artifacts now here by publishing them `
+- **Response 2:** Published both previews as claude.ai artifacts (adapted copies: document
+  wrapper stripped, CDN font link removed since the artifact CSP blocks external hosts; the
+  system-font fallback matches the shipped app, which does not self-host Inter).
+- **Prompt 3 (verbatim):** `> I like preview a very much. Just make sure the logo as a whole should be horizontally aligned with the text Genauly beside it. Currently it seems as if the logo is somewhat lower compared to the Genauly text. for the landing page, add some menu items on the top like About, Sources, Help, etc. Make use of existing pages. Additionally, Stress on the landing page somewhere about the fact that the learner can specifically filter the words by various criteria and practice by custom ueben session. Finally, the page should predominantly be in English with German used only for the no-brainer or obvious stuff - the german words should be only 10-20% of the total words. ` _(mid-turn follow-up: `> in addition to the above comments and tasks, also provide an option to switch to German on the homepage just like other pages in the app`)_
+- **Response 3:** Preview A revised: logo viewBox cropped to the artwork bounds (`7 12 52 52`)
+  so the mark centers optically on the wordmark; nav + footer link the real pages (/about,
+  /hilfe, /sources, /privacy, /terms); new "Filter what you need. Practice exactly that."
+  section with a filter-rail mockup (Thema/Stufe/Wortart/Branche + Üben footer) selling the
+  faceted library and custom scoped Üben sessions; all copy rewritten English-first with
+  German only for obvious/brand terms; and a working EN/DE nav toggle (JS dictionary swaps
+  the whole page's copy, mirroring the bilingual public pages). Verified via headless
+  Chromium (EN/DE roundtrip clean, DE nav fits one line), artifact A republished at the
+  same URL.
+- **Artifacts (rev 2):** `preview/landing-redesign/landing-a-textmarker.html` ·
+  `preview/landing-redesign/README.md`
+- **Prompt 4 (verbatim):** `> if the user already logged in, the landing page cta should be go to app, not go to dashboard. also, regarding the claim "no textbook" - replace it with something else. This app is never a direct replacement for traditional learning but a smart and modern companion for learning. `
+- **Response 4:** Steps headline replaced: "Three steps. No textbook." became "Three steps.
+  Your smart companion." (DE "Dein smarter Begleiter."); the companion-not-replacement
+  positioning rule is recorded in the preview README for all future landing copy. The
+  logged-in CTA spec ("Go to app" / "Zur App" routing to `/`, replacing the live page's
+  "Zum Dashboard") is recorded there too since the preview shows only the logged-out
+  state. Fixed the two mobile fallouts the longer headline exposed (h2 down to 1.55rem
+  below 480px; nav drops the wordmark below 520px, matching the shipped app header) and
+  verified zero horizontal overflow at 390px in both languages. Artifact republished at
+  the same URL.
+- **Prompt 5 (verbatim):** `> looks good. the caption says "German for real life B1-B2" remove the B1-B2 there. implement the design, document the session and merge everything to main `
+- **Response 5:** Removed "· B1–B2" from the hero eyebrow (both languages; footer tagline kept).
+  Then implemented the approved Preview A as the real landing: `src/features/landing/LandingPage.tsx`
+  rebuilt from scratch (token-based colors so dark mode works; sticky nav with anchors +
+  About/Help/Sources + EN/DE LangToggle + auth-aware CTA; swiped hero + Wesen flashcard collage;
+  scenario marquee; PlateauChart; bento features; filter-rail mock + custom-Üben section; dark
+  numbers band; "Your smart companion." steps; the OAuth "What is Genauly?" purpose card preserved
+  bilingually; FAQ; closing CTA; footer), with all copy as inline `t(en, de)` pairs and logged-in
+  visitors getting "Go to app"/"Zur App". New `.landing-*` CSS (swipe/float/marquee,
+  reduced-motion-safe) in `src/index.css`; fixed a transform-override bug (CSS float animation vs
+  Tailwind translate/rotate) found via rendered-output verification (pnpm preview + headless
+  Chromium: light/dark, EN/DE, 390/1280, logged-in). Gates: typecheck ✓, lint 0 errors, build ✓,
+  test:unit 219/219, bundle 111 kB / 400 kB. Documented (PROJECT_STATUS s136 handoff; s133 handoff
+  aged into the new W30 archive chunk; this log), opened a PR into main and squash-merged, then ran
+  the post-merge realignment.
+- **Artifacts (implementation):** `src/features/landing/LandingPage.tsx` · `src/index.css` ·
+  `preview/landing-redesign/*` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`
