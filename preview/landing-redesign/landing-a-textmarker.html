@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Genauly Landing · Preview A · Der Textmarker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   Preview A · "Der Textmarker" (highlighter editorial)
+   The logo's Himmelblau swipe becomes the page's design language:
+   everything important is hand-highlighted, annotated, doodled,
+   like the notebook of a learner who is finally getting it.
+   Brand tokens from src/index.css / brand-kit (Kit 1).
+   ============================================================ */
+:root{
+  --papier:#FAF5EB; --papier-deep:#F3ECDA; --tinte:#1C1A23;
+  --nachtblau:#2866EB; --nachtblau-deep:#1D4FC0; --himmel:#53C7F9; --himmel-soft:#D8F1FE;
+  --accent-ink:#086F9B; --koralle:#EA4D2A; --koralle-soft:#FDE4DD;
+  --blatt:#2E9E6C; --blatt-soft:#DDF2E7; --butter:#E19209;
+  --surface:#FFFFFF; --muted:#F1EAD9; --border:#EBE2CE;
+  --mut:#6D6879; /* muted foreground */
+  --der:#2148D5; --der-bg:#E9EDFC; --die:#DB2C7F; --die-bg:#FDEDF5; --das:#16A24E; --das-bg:#E4F6EB;
+  --shadow-soft:0 2px 10px -2px rgba(34,52,84,.10),0 1px 3px rgba(34,52,84,.06);
+  --shadow-lift:0 16px 40px -12px rgba(34,52,84,.22),0 4px 12px -4px rgba(34,52,84,.10);
+  --r-card:20px; --r-pill:999px;
+  --w:1120px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+h1,h2,h3,h4{font-stretch:normal}
+body{
+  font-family:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+  background:var(--papier); color:var(--tinte);
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  background-image:radial-gradient(rgba(28,26,35,.045) 1px, transparent 1.4px);
+  background-size:26px 26px;
+}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 24px}
+.num{font-variant-numeric:tabular-nums}
+a{color:inherit}
+
+/* ---- the highlighter swipe, the one brand device ---- */
+.swipe{position:relative;display:inline-block;white-space:nowrap}
+.swipe>i{position:absolute;left:-.14em;right:-.12em;top:.14em;bottom:-.02em;background:var(--himmel);
+  border-radius:.28em .5em .3em .55em;transform:rotate(-1.6deg);z-index:-1;font-style:normal}
+.swipe.koralle>i{background:var(--koralle-soft)}
+.swipe.soft>i{background:var(--himmel-soft)}
+
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;gap:.5rem;border:none;cursor:pointer;text-decoration:none;
+  font-family:inherit;font-weight:700;border-radius:var(--r-pill);transition:transform .15s ease, box-shadow .15s ease}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--nachtblau);color:#fff;padding:.95rem 1.7rem;font-size:1rem;
+  box-shadow:0 6px 20px -6px rgba(40,102,235,.55),inset 0 1px 0 rgba(255,255,255,.2)}
+.btn-primary:hover{background:var(--nachtblau-deep);box-shadow:0 10px 28px -6px rgba(40,102,235,.6)}
+.btn-primary.big{padding:1.15rem 2.2rem;font-size:1.1rem}
+.btn-ghost{background:transparent;color:var(--tinte);padding:.7rem 1.1rem;font-weight:600}
+.btn-ghost:hover{background:rgba(28,26,35,.05)}
+.arrow{width:1em;height:1em;flex:none}
+
+/* ============ NAV ============ */
+nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(250,245,235,.82);
+  border-bottom:1px solid rgba(235,226,206,.7)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:.9rem 24px;max-width:var(--w);margin:0 auto}
+.brand{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+.brand svg{width:34px;height:34px}
+.brand b{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
+.nav-links{display:flex;gap:1.6rem;font-size:.92rem;font-weight:600;color:var(--mut)}
+.nav-links a{text-decoration:none}
+.nav-links a:hover{color:var(--tinte)}
+.nav-cta{display:flex;align-items:center;gap:.4rem}
+.nav-cta .btn-primary{padding:.62rem 1.2rem;font-size:.92rem;white-space:nowrap}
+@media(max-width:820px){.nav-links{display:none}}
+@media(max-width:520px){
+  .nav-cta .btn-ghost{display:none}
+  .nav-cta .btn-primary{padding:.55rem 1rem;font-size:.86rem}
+  .brand b{font-size:1.1rem}
+}
+
+/* ============ HERO ============ */
+.hero{position:relative;padding:4.5rem 0 3.5rem}
+.hero-grid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:3rem;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:.55rem;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-pill);padding:.42rem .95rem .42rem .55rem;font-size:.82rem;font-weight:600;color:var(--mut);
+  box-shadow:var(--shadow-soft)}
+.eyebrow .dot{width:22px;height:22px;border-radius:50%;background:var(--himmel-soft);display:grid;place-items:center}
+h1{font-size:clamp(2.6rem,5.4vw,4.1rem);line-height:1.04;letter-spacing:-.035em;font-weight:800;margin-top:1.3rem}
+h1 .sub{display:block;margin-top:.35rem;font-size:.62em;font-weight:700;color:var(--mut);letter-spacing:-.02em}
+.hero p.lead{margin-top:1.35rem;font-size:1.13rem;line-height:1.65;color:var(--mut);max-width:34rem}
+.hero p.lead b{color:var(--tinte);font-weight:600}
+.hero-ctas{display:flex;align-items:center;gap:1.3rem;margin-top:2rem;flex-wrap:wrap}
+.link-quiet{font-size:.95rem;font-weight:600;color:var(--mut);text-decoration:none;border-bottom:1.5px solid var(--border)}
+.link-quiet:hover{color:var(--tinte);border-color:var(--tinte)}
+.checks{display:flex;gap:1.4rem;margin-top:1.4rem;flex-wrap:wrap;font-size:.85rem;color:var(--mut);font-weight:500}
+.checks span{display:inline-flex;align-items:center;gap:.4rem}
+.checks svg{width:15px;height:15px;color:var(--blatt)}
+
+/* hero card collage */
+.stage{position:relative;height:460px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);box-shadow:var(--shadow-lift)}
+.fcard{position:absolute;width:290px;padding:1.5rem 1.5rem 1.4rem;z-index:3;left:50%;top:48%;
+  transform:translate(-50%,-50%) rotate(-2deg);animation:float 7s ease-in-out infinite}
+.fcard .art-row{display:flex;align-items:center;justify-content:space-between}
+.fcard .artikel{font-size:1rem;font-weight:800;color:var(--die);position:relative;padding:.1rem .45rem}
+.fcard .artikel svg.ring{position:absolute;inset:-6px -8px;width:calc(100% + 16px);height:calc(100% + 12px)}
+.fcard h3{font-size:1.75rem;letter-spacing:-.02em;font-weight:800;margin-top:.5rem}
+.fcard .plural{font-size:.85rem;color:var(--mut);margin-top:.2rem}
+.fcard .en{margin-top:1rem;padding-top:.9rem;border-top:1.5px dashed var(--border);font-size:.95rem;color:var(--mut)}
+.fcard .en b{color:var(--tinte)}
+.speak{width:38px;height:38px;border-radius:12px;background:var(--himmel-soft);display:grid;place-items:center;border:none;cursor:pointer}
+.speak svg{width:19px;height:19px;color:var(--accent-ink)}
+.bcard{position:absolute;width:250px;padding:1.2rem 1.3rem;z-index:2;left:8%;top:6%;transform:rotate(4.5deg);opacity:.95}
+.bcard .artikel{color:var(--der);font-weight:800;font-size:.9rem}
+.bcard h3{font-size:1.3rem;font-weight:800;letter-spacing:-.02em;margin-top:.25rem}
+.bcard .tag{display:inline-block;margin-top:.6rem;font-size:.72rem;font-weight:700;background:var(--der-bg);color:var(--der);
+  border-radius:var(--r-pill);padding:.22rem .6rem}
+.pill-float{position:absolute;display:flex;align-items:center;gap:.5rem;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-pill);padding:.55rem .95rem;font-size:.85rem;font-weight:700;box-shadow:var(--shadow-lift);z-index:4}
+.pill-streak{right:2%;top:12%;color:var(--koralle);transform:rotate(2deg);animation:float 6s .8s ease-in-out infinite}
+.pill-xp{left:4%;bottom:14%;color:var(--blatt);transform:rotate(-3deg);animation:float 8s .3s ease-in-out infinite}
+.pill-xp .zap{width:22px;height:22px;border-radius:50%;background:var(--blatt-soft);display:grid;place-items:center}
+.pill-scene{right:6%;bottom:4%;color:var(--accent-ink);transform:rotate(1.5deg)}
+@keyframes float{0%,100%{margin-top:0}50%{margin-top:-9px}}
+.doodle{position:absolute;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.fcard,.pill-streak,.pill-xp,.marquee-track{animation:none!important}}
+@media(max-width:940px){
+  .hero-grid{grid-template-columns:1fr}
+  .stage{height:430px;max-width:460px;margin:0 auto}
+}
+
+/* ============ MARQUEE ============ */
+.marquee{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface);
+  padding:.95rem 0;overflow:hidden;position:relative}
+.marquee:before,.marquee:after{content:"";position:absolute;top:0;bottom:0;width:120px;z-index:2}
+.marquee:before{left:0;background:linear-gradient(90deg,var(--surface),transparent)}
+.marquee:after{right:0;background:linear-gradient(-90deg,var(--surface),transparent)}
+.marquee-track{display:flex;gap:.9rem;width:max-content;animation:scroll 46s linear infinite}
+.marquee:hover .marquee-track{animation-play-state:paused}
+@keyframes scroll{to{transform:translateX(-50%)}}
+.chip{display:inline-flex;align-items:center;gap:.45rem;border:1.5px solid var(--border);border-radius:var(--r-pill);
+  padding:.45rem 1rem;font-size:.88rem;font-weight:600;color:var(--mut);white-space:nowrap;background:var(--papier)}
+.chip i{width:8px;height:8px;border-radius:50%;flex:none;font-style:normal}
+
+/* ============ SECTIONS ============ */
+section{position:relative}
+.sec{padding:5.5rem 0}
+.sec-head{max-width:44rem}
+.kicker{font-size:.8rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink)}
+h2{font-size:clamp(1.9rem,3.4vw,2.7rem);letter-spacing:-.03em;font-weight:800;line-height:1.12;margin-top:.7rem}
+.sec-head p{margin-top:1rem;font-size:1.05rem;line-height:1.65;color:var(--mut)}
+
+/* plateau chart */
+.plateau-grid{display:grid;grid-template-columns:minmax(0,6fr) minmax(0,6fr);gap:3.5rem;align-items:center}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);
+  padding:2rem;box-shadow:var(--shadow-soft)}
+.pain-list{margin-top:1.8rem;display:grid;gap:1.1rem}
+.pain{display:flex;gap:1rem;align-items:flex-start}
+.pain .ico{width:40px;height:40px;flex:none;border-radius:13px;display:grid;place-items:center;background:var(--himmel-soft)}
+.pain .ico svg{width:20px;height:20px;color:var(--accent-ink)}
+.pain h4{font-size:1rem;font-weight:700}
+.pain p{font-size:.93rem;color:var(--mut);line-height:1.55;margin-top:.2rem}
+@media(max-width:940px){.plateau-grid{grid-template-columns:1fr}}
+
+/* ============ BENTO ============ */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:1.1rem;margin-top:3rem}
+.b{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:1.7rem;
+  box-shadow:var(--shadow-soft);position:relative;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease}
+.b:hover{transform:translateY(-4px);box-shadow:var(--shadow-lift)}
+.b h3{font-size:1.2rem;font-weight:800;letter-spacing:-.02em}
+.b>p{font-size:.93rem;color:var(--mut);line-height:1.6;margin-top:.45rem}
+.b .badge{position:absolute;top:1.2rem;right:1.2rem;font-size:.7rem;font-weight:800;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--accent-ink);background:var(--himmel-soft);border-radius:var(--r-pill);padding:.28rem .7rem}
+.b-session h3,.b-artikel h3{margin-top:1.9rem}
+.b-session{grid-column:span 4;grid-row:span 2}
+.b-artikel{grid-column:span 2;grid-row:span 2}
+.b-srs{grid-column:span 2}
+.b-speak{grid-column:span 2}
+.b-exam{grid-column:span 2}
+@media(max-width:940px){.bento{grid-template-columns:1fr 1fr}.b-session,.b-artikel,.b-srs,.b-speak,.b-exam{grid-column:span 2;grid-row:auto}}
+
+/* session mock inside bento */
+.mock-session{margin-top:1.4rem;background:var(--papier);border:1px solid var(--border);border-radius:16px;padding:1.2rem}
+.mock-prog{height:7px;background:var(--muted);border-radius:99px;overflow:hidden}
+.mock-prog i{display:block;height:100%;width:62%;background:linear-gradient(90deg,var(--nachtblau),var(--himmel));border-radius:99px}
+.mock-q{margin-top:1.1rem;font-weight:700;font-size:1.02rem}
+.mock-q .blank{display:inline-block;min-width:5.5rem;border-bottom:2.5px solid var(--nachtblau);color:var(--nachtblau);
+  text-align:center;font-weight:800}
+.mock-opts{display:flex;gap:.55rem;margin-top:1rem;flex-wrap:wrap}
+.mock-opt{border:1.5px solid var(--border);background:var(--surface);border-radius:12px;padding:.5rem .95rem;
+  font-size:.9rem;font-weight:600;font-family:inherit;cursor:pointer}
+.mock-opt.right{border-color:var(--blatt);background:var(--blatt-soft);color:var(--blatt);font-weight:700}
+.mock-kinds{display:flex;gap:.4rem;margin-top:1.2rem;flex-wrap:wrap}
+.mock-kinds span{font-size:.72rem;font-weight:700;color:var(--mut);background:var(--muted);border-radius:var(--r-pill);padding:.26rem .65rem}
+
+/* artikel bento */
+.wesen-row{display:flex;justify-content:space-between;gap:.6rem;margin-top:1.5rem}
+.wesen-cell{flex:1;text-align:center;border-radius:16px;padding:1rem .5rem .8rem}
+.wesen-cell.der{background:var(--der-bg)} .wesen-cell.die{background:var(--die-bg)} .wesen-cell.das{background:var(--das-bg)}
+.wesen-cell svg{width:52px;height:52px}
+.wesen-cell b{display:block;font-size:.92rem;font-weight:800;margin-top:.3rem}
+.wesen-cell.der b{color:var(--der)} .wesen-cell.die b{color:var(--die)} .wesen-cell.das b{color:var(--das)}
+.wesen-cell small{font-size:.72rem;color:var(--mut)}
+
+/* srs sparkline */
+.srs-bars{display:flex;align-items:flex-end;gap:5px;height:56px;margin-top:1.2rem}
+.srs-bars i{flex:1;background:var(--himmel-soft);border-radius:4px 4px 2px 2px}
+.srs-bars i.hot{background:var(--nachtblau)}
+/* speak waveform */
+.wave{display:flex;align-items:center;gap:4px;height:52px;margin-top:1.2rem}
+.wave i{width:5px;border-radius:99px;background:var(--nachtblau);opacity:.85}
+/* exam badges */
+.exam-row{display:flex;gap:.7rem;margin-top:1.2rem;flex-wrap:wrap}
+.exam-b{border:1.5px solid var(--border);border-radius:14px;padding:.65rem .95rem;font-size:.82rem;font-weight:700;background:var(--papier)}
+.exam-b small{display:block;font-weight:600;color:var(--mut);font-size:.7rem;margin-top:.1rem}
+
+/* ============ NUMBERS ============ */
+.numbers{background:var(--tinte);color:var(--papier);border-radius:28px;padding:3.5rem 3rem;position:relative;overflow:hidden}
+.numbers .glow{position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(83,199,249,.25),transparent 65%);
+  top:-160px;right:-100px;pointer-events:none}
+.numbers h2{color:#fff}
+.num-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2rem;margin-top:2.6rem}
+.num-cell b{font-size:clamp(1.9rem,3.4vw,2.6rem);font-weight:800;letter-spacing:-.03em;display:block}
+.num-cell b em{font-style:normal;color:var(--himmel)}
+.num-cell span{font-size:.9rem;color:rgba(250,245,235,.66);font-weight:500;display:block;margin-top:.3rem;line-height:1.4}
+.prov-note{margin-top:2.4rem;padding-top:1.6rem;border-top:1px solid rgba(250,245,235,.14);display:flex;gap:.8rem;align-items:center;
+  font-size:.92rem;color:rgba(250,245,235,.8)}
+.prov-note svg{width:20px;height:20px;color:var(--himmel);flex:none}
+.prov-note a{color:var(--himmel);font-weight:600;text-decoration:none;border-bottom:1px solid rgba(83,199,249,.4)}
+@media(max-width:820px){.num-grid{grid-template-columns:1fr 1fr}.numbers{padding:2.5rem 1.8rem}}
+
+/* ============ STEPS ============ */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin-top:3rem;counter-reset:step}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-card);padding:1.8rem;box-shadow:var(--shadow-soft);position:relative}
+.step .n{width:44px;height:44px;border-radius:14px;background:var(--nachtblau);color:#fff;display:grid;place-items:center;
+  font-weight:800;font-size:1.15rem;box-shadow:0 6px 16px -6px rgba(40,102,235,.5);transform:rotate(-3deg)}
+.step:nth-child(2) .n{background:var(--accent-ink);transform:rotate(2deg)}
+.step:nth-child(3) .n{background:var(--koralle);transform:rotate(-2deg)}
+.step h3{margin-top:1.1rem;font-size:1.12rem;font-weight:800;letter-spacing:-.01em}
+.step p{margin-top:.45rem;font-size:.93rem;color:var(--mut);line-height:1.6}
+.step .connect{position:absolute;top:2.6rem;right:-1.35rem;width:1.6rem;z-index:1}
+@media(max-width:820px){.steps{grid-template-columns:1fr}.step .connect{display:none}}
+
+/* ============ FAQ ============ */
+.faq{max-width:46rem;margin:3rem auto 0}
+details{background:var(--surface);border:1px solid var(--border);border-radius:18px;margin-bottom:.8rem;
+  box-shadow:var(--shadow-soft);overflow:hidden}
+summary{list-style:none;cursor:pointer;padding:1.25rem 1.5rem;font-weight:700;font-size:1rem;display:flex;
+  justify-content:space-between;align-items:center;gap:1rem}
+summary::-webkit-details-marker{display:none}
+summary .pm{width:26px;height:26px;flex:none;border-radius:50%;background:var(--himmel-soft);display:grid;place-items:center;
+  color:var(--accent-ink);font-weight:800;transition:transform .2s}
+details[open] summary .pm{transform:rotate(45deg)}
+details>p{padding:0 1.5rem 1.4rem;font-size:.95rem;line-height:1.65;color:var(--mut)}
+
+/* ============ CLOSING CTA ============ */
+.closing{background:linear-gradient(135deg,var(--nachtblau) 0%,#1D4FC0 60%,#173F9E 100%);border-radius:32px;
+  padding:4.5rem 2rem;text-align:center;color:#fff;position:relative;overflow:hidden;box-shadow:var(--shadow-lift)}
+.closing h2{color:#fff;font-size:clamp(2rem,4vw,3rem)}
+.closing p{margin:1.1rem auto 0;max-width:30rem;font-size:1.08rem;line-height:1.6;color:rgba(255,255,255,.85)}
+.closing .btn-white{background:#fff;color:var(--nachtblau);padding:1.1rem 2.2rem;font-size:1.08rem;margin-top:2.2rem;
+  box-shadow:0 12px 32px -8px rgba(9,20,60,.5)}
+.closing .btn-white:hover{background:var(--papier)}
+.closing small{display:block;margin-top:1.1rem;font-size:.85rem;color:rgba(255,255,255,.65)}
+
+/* ============ FOOTER ============ */
+footer{padding:3.5rem 0 2.5rem;color:var(--mut);font-size:.88rem}
+.foot-grid{display:flex;justify-content:space-between;align-items:flex-start;gap:2rem;flex-wrap:wrap}
+.foot-links{display:flex;gap:1.6rem;flex-wrap:wrap}
+.foot-links a{text-decoration:none;font-weight:500}
+.foot-links a:hover{color:var(--tinte)}
+.foot-note{margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);font-size:.8rem}
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<nav>
+  <div class="nav-inner">
+    <a class="brand" href="#">
+      <svg viewBox="0 0 64 64" aria-label="Genauly">
+        <path d="M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z" fill="#52C6F9" transform="rotate(-3 32 32)"/>
+        <path d="M31.50 56.06Q28.50 56.06 26.27 55.31Q24.03 54.55 22.65 53.19Q21.26 51.84 20.85 50.06L27.07 48.78Q27.27 49.40 27.83 49.92Q28.38 50.45 29.28 50.76Q30.19 51.08 31.46 51.08Q33.65 51.08 34.83 50.10Q36.01 49.11 36.01 47.06L36.01 43L35.46 43Q35.05 44.03 34.24 44.87Q33.43 45.71 32.18 46.20Q30.94 46.69 29.24 46.69Q26.72 46.69 24.64 45.51Q22.56 44.33 21.31 41.86Q20.05 39.39 20.05 35.54Q20.05 31.52 21.35 28.91Q22.64 26.31 24.72 25.05Q26.80 23.79 29.22 23.79Q31.05 23.79 32.35 24.40Q33.65 25.02 34.50 25.99Q35.35 26.96 35.78 28.01L35.99 28.01L35.99 24.07L43.06 24.07L43.06 46.49Q43.06 49.65 41.60 51.78Q40.13 53.91 37.53 54.99Q34.92 56.06 31.50 56.06M31.68 41.44Q33.06 41.44 34.02 40.75Q34.98 40.05 35.50 38.70Q36.01 37.36 36.01 35.52Q36.01 33.63 35.50 32.25Q34.98 30.88 34.03 30.13Q33.08 29.38 31.68 29.38Q30.31 29.38 29.35 30.15Q28.40 30.92 27.91 32.30Q27.42 33.67 27.42 35.52Q27.42 37.36 27.91 38.69Q28.40 40.03 29.35 40.73Q30.31 41.44 31.68 41.44" fill="#1C1A24"/>
+      </svg>
+      <b>Genauly</b>
+    </a>
+    <div class="nav-links">
+      <a href="#plateau">Warum Genauly</a>
+      <a href="#features">Was du bekommst</a>
+      <a href="#steps">So funktioniert's</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="#">Log in</a>
+      <a class="btn btn-primary" href="#">Kostenlos starten</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">
+        <span class="dot">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#086F9B" stroke-width="2.5" stroke-linecap="round"><path d="M4 16 L20 13 M6 19 L18 17"/></svg>
+        </span>
+        German for real life · B1–B2
+      </span>
+      <h1>
+        Break through the <span class="swipe">plateau.<i></i></span>
+        <span class="sub">German for the situations that actually matter.</span>
+      </h1>
+      <p class="lead">
+        You passed B1. You still rehearse sentences before every phone call.
+        Genauly turns textbook German into <b>confident, real-world German</b>:
+        im Job, beim Amt, beim Arzt, und in jedem Gespräch, das dich bisher nervös gemacht hat.
+      </p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary big" href="#">
+          Kostenlos starten
+          <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="link-quiet" href="#">Ich habe schon ein Konto</a>
+      </div>
+      <div class="checks">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg> Free to start</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg> Kein Konto nötig</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg> Läuft im Browser</span>
+      </div>
+    </div>
+
+    <!-- card collage -->
+    <div class="stage" aria-hidden="true">
+      <!-- doodle arrow pointing at the main card -->
+      <svg class="doodle" style="left:-4%;top:20%;width:90px" viewBox="0 0 90 70" fill="none" stroke="#086F9B" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 8 Q40 4 58 26 Q72 42 70 56"/><path d="M60 48 L70 58 L78 46"/>
+      </svg>
+      <svg class="doodle" style="right:0%;top:44%;width:54px" viewBox="0 0 60 60" fill="none" stroke="#EA4D2A" stroke-width="2.6" stroke-linecap="round">
+        <path d="M30 8 L30 22 M30 38 L30 52 M8 30 L22 30 M38 30 L52 30"/>
+      </svg>
+      <svg class="doodle" style="left:12%;bottom:2%;width:44px" viewBox="0 0 50 50" fill="none" stroke="#53C7F9" stroke-width="2.8" stroke-linecap="round">
+        <path d="M10 40 Q18 12 40 10"/><path d="M32 8 L42 10 L38 20"/>
+      </svg>
+
+      <!-- back card: der Termin -->
+      <div class="card bcard">
+        <span class="artikel">der</span>
+        <div style="display:flex;align-items:center;gap:.55rem">
+          <h3>Termin</h3>
+          <svg width="30" height="30" viewBox="0 0 24 24">
+            <g fill="none" stroke="#2148D5" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4.7 Q12.6 4.7 13.2 5.9 L20.2 18.7 Q21 20.2 19.2 20.25 L4.9 20.55 Q3.1 20.55 3.9 18.95 L10.8 5.9 Q11.4 4.7 12 4.7 Z" fill="#E9EDFC"/>
+              <path d="M12 4.7 L12 2.5 M12 2.5 Q13.4 1.8 13.8 3"/>
+              <circle cx="10.1" cy="14.7" r="0.95" fill="#2148D5" stroke="none"/>
+              <circle cx="13.9" cy="14.7" r="0.95" fill="#2148D5" stroke="none"/>
+              <path d="M10.4 17.2 Q12 18.35 13.6 17.2" stroke-width="1.5"/>
+            </g>
+          </svg>
+        </div>
+        <span class="tag">Beim Amt</span>
+      </div>
+
+      <!-- main flashcard: die Bewerbung -->
+      <div class="card fcard">
+        <div class="art-row">
+          <span class="artikel">die
+            <svg class="ring" viewBox="0 0 60 34" fill="none" stroke="#DB2C7F" stroke-width="2.2" stroke-linecap="round">
+              <path d="M8 17 Q6 5 30 4 Q56 3 54 16 Q53 30 28 30 Q10 30 9 20"/>
+            </svg>
+          </span>
+          <button class="speak" aria-label="Anhören">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+          </button>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:.7rem">
+          <h3>Bewerbung</h3>
+          <svg width="44" height="44" viewBox="0 0 24 24" style="margin-bottom:2px">
+            <g fill="none" stroke="#DB2C7F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3.5 Q20.4 3.1 20.9 12 Q21.4 20.6 12.2 21 Q3.3 21.4 3.05 12.2 Q2.85 4.5 10.2 3.65" fill="#FDEDF5"/>
+              <path d="M16.7 4.3 Q18 2.3 19.4 3.7" stroke-width="1.5"/>
+              <circle cx="9.6" cy="11.6" r="0.95" fill="#DB2C7F" stroke="none"/>
+              <circle cx="14.4" cy="11.6" r="0.95" fill="#DB2C7F" stroke="none"/>
+              <path d="M9.4 15 Q12 16.9 14.6 15" stroke-width="1.5"/>
+            </g>
+          </svg>
+        </div>
+        <p class="plural">die Bewerbungen · Pl.</p>
+        <p class="en">the <b>job application</b><br><span style="font-size:.85rem">Ich habe meine Bewerbung gestern abgeschickt.</span></p>
+      </div>
+
+      <!-- floating pills -->
+      <div class="pill-float pill-streak">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="#EA4D2A"><path d="M12 2c1 4-3 5.5-3 9a3 3 0 0 0 6 .2C15 8 19 8.5 19 13a7 7 0 1 1-14 0c0-5 5-6.5 7-11z"/></svg>
+        <span class="num">12 Tage Serie</span>
+      </div>
+      <div class="pill-float pill-xp">
+        <span class="zap"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2E9E6C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 L9.5 18 L20 6.5"/></svg></span>
+        <span class="num">+10 XP · Genau!</span>
+      </div>
+      <div class="pill-float pill-scene">📍 Bürgeramt, Schalter 3</div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= SCENARIO MARQUEE ================= -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <!-- set 1 -->
+    <span class="chip"><i style="background:#2866EB"></i>Gehaltsgespräch führen</span>
+    <span class="chip"><i style="background:#EA4D2A"></i>Termin beim Bürgeramt</span>
+    <span class="chip"><i style="background:#2E9E6C"></i>Nebenkostenabrechnung verstehen</span>
+    <span class="chip"><i style="background:#086F9B"></i>Arzttermin verschieben</span>
+    <span class="chip"><i style="background:#E19209"></i>Smalltalk in der Kaffeeküche</span>
+    <span class="chip"><i style="background:#DB2C7F"></i>Wohnungsbesichtigung</span>
+    <span class="chip"><i style="background:#2866EB"></i>Vorstellungsgespräch üben</span>
+    <span class="chip"><i style="background:#16A24E"></i>Konto eröffnen</span>
+    <span class="chip"><i style="background:#EA4D2A"></i>Reklamation im Geschäft</span>
+    <span class="chip"><i style="background:#086F9B"></i>Meeting moderieren</span>
+    <span class="chip"><i style="background:#DB2C7F"></i>Krankmeldung schreiben</span>
+    <span class="chip"><i style="background:#E19209"></i>Handyvertrag kündigen</span>
+    <!-- set 2 (duplicate for seamless loop) -->
+    <span class="chip"><i style="background:#2866EB"></i>Gehaltsgespräch führen</span>
+    <span class="chip"><i style="background:#EA4D2A"></i>Termin beim Bürgeramt</span>
+    <span class="chip"><i style="background:#2E9E6C"></i>Nebenkostenabrechnung verstehen</span>
+    <span class="chip"><i style="background:#086F9B"></i>Arzttermin verschieben</span>
+    <span class="chip"><i style="background:#E19209"></i>Smalltalk in der Kaffeeküche</span>
+    <span class="chip"><i style="background:#DB2C7F"></i>Wohnungsbesichtigung</span>
+    <span class="chip"><i style="background:#2866EB"></i>Vorstellungsgespräch üben</span>
+    <span class="chip"><i style="background:#16A24E"></i>Konto eröffnen</span>
+    <span class="chip"><i style="background:#EA4D2A"></i>Reklamation im Geschäft</span>
+    <span class="chip"><i style="background:#086F9B"></i>Meeting moderieren</span>
+    <span class="chip"><i style="background:#DB2C7F"></i>Krankmeldung schreiben</span>
+    <span class="chip"><i style="background:#E19209"></i>Handyvertrag kündigen</span>
+  </div>
+</div>
+
+<!-- ================= THE PLATEAU ================= -->
+<section class="sec" id="plateau">
+  <div class="wrap plateau-grid">
+    <div class="chart-card">
+      <svg viewBox="0 0 440 300" width="100%" role="img" aria-label="The intermediate plateau: fast progress to B1, then a long flat stretch">
+        <!-- axes -->
+        <path d="M40 20 L40 260 L420 260" fill="none" stroke="#EBE2CE" stroke-width="2"/>
+        <text x="14" y="60" font-size="13" font-weight="700" fill="#6D6879">B2</text>
+        <text x="14" y="150" font-size="13" font-weight="700" fill="#6D6879">B1</text>
+        <text x="14" y="240" font-size="13" font-weight="700" fill="#6D6879">A1</text>
+        <text x="390" y="282" font-size="12" fill="#6D6879">Zeit</text>
+        <!-- solid curve: quick rise then plateau (hand-drawn wobble) -->
+        <path d="M42 250 Q80 240 105 200 Q135 152 170 145 Q220 138 268 140 Q300 141 316 139"
+              fill="none" stroke="#1C1A23" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- plateau highlight swipe -->
+        <rect x="168" y="126" width="152" height="26" rx="10" fill="#53C7F9" opacity=".45" transform="rotate(-1 244 139)"/>
+        <text x="196" y="122" font-size="13" font-weight="800" fill="#086F9B">das Plateau</text>
+        <!-- you are here pin -->
+        <circle cx="316" cy="139" r="7" fill="#EA4D2A"/>
+        <circle cx="316" cy="139" r="12" fill="none" stroke="#EA4D2A" stroke-width="2" opacity=".4"/>
+        <g transform="translate(258 165)">
+          <rect x="0" y="0" width="104" height="28" rx="14" fill="#1C1A23"/>
+          <text x="52" y="18.5" font-size="12.5" font-weight="700" fill="#FAF5EB" text-anchor="middle">Du bist hier</text>
+        </g>
+        <!-- dashed breakthrough curve -->
+        <path d="M316 139 Q352 130 372 100 Q392 70 402 52"
+              fill="none" stroke="#2866EB" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="1 9"/>
+        <g transform="translate(360 26)">
+          <rect x="0" y="0" width="76" height="26" rx="13" fill="#2866EB"/>
+          <text x="38" y="17.5" font-size="12" font-weight="800" fill="#fff" text-anchor="middle">mit Genauly</text>
+        </g>
+        <!-- little star doodles -->
+        <path d="M398 40 l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6L389 47l6-1z" fill="#EA4D2A" opacity=".9"/>
+      </svg>
+    </div>
+    <div>
+      <p class="kicker">Warum du feststeckst</p>
+      <h2>B1 ist nicht das Ziel.<br>Es ist <span class="swipe">die Hälfte.<i></i></span></h2>
+      <div class="pain-list">
+        <div class="pain">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9h8M8 13h5M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z"/></svg></span>
+          <div>
+            <h4>Der Kurs hat dir Grammatik gegeben. Nicht Gespräche.</h4>
+            <p>Genauly übt genau die Situationen, in denen du bisher ins Englische wechselst: verzweigte Dialoge zum Durchspielen, so oft du willst.</p>
+          </div>
+        </div>
+        <div class="pain">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 3M21 12a9 9 0 1 1-9-9 9 9 0 0 1 9 9z"/></svg></span>
+          <div>
+            <h4>Du lernst Wörter. Und vergisst sie wieder.</h4>
+            <p>Spaced Repetition (FSRS) zeigt dir jedes Wort genau dann, wenn du es fast vergessen hättest. So bleibt es. Dauerhaft.</p>
+          </div>
+        </div>
+        <div class="pain">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19v3M8 22h8M19 11a7 7 0 0 1-14 0M12 15a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v5a4 4 0 0 0 4 4z"/></svg></span>
+          <div>
+            <h4>Sprechen übst du nie, weil immer jemand zuhört.</h4>
+            <p>Hier nicht. Sprich mit der Spracherkennung, so lange und so falsch du willst. Feedback ja, Publikum nein.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= BENTO FEATURES ================= -->
+<section class="sec" id="features" style="padding-top:1rem">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Was du bekommst</p>
+      <h2>Ein komplettes Trainingssystem.<br>Kein <span class="swipe koralle">Karteikarten-Friedhof.<i></i></span></h2>
+    </div>
+    <div class="bento">
+
+      <div class="b b-session">
+        <span class="badge">Die Session</span>
+        <h3>Lern-Sessions, die sich nach Fortschritt anfühlen</h3>
+        <p>Fünf Minuten oder fünfzig: Genauly mischt Karten, Quiz, Tippen, Hören und Sprechen zu einer Session, die genau zu deinem Stand passt.</p>
+        <div class="mock-session" aria-hidden="true">
+          <div class="mock-prog"><i></i></div>
+          <p class="mock-q">Ich möchte einen Termin <span class="blank">vereinbaren</span>.</p>
+          <div class="mock-opts">
+            <button class="mock-opt">machen</button>
+            <button class="mock-opt right">✓ vereinbaren</button>
+            <button class="mock-opt">bekommen</button>
+          </div>
+          <div class="mock-kinds">
+            <span>Karten</span><span>Quiz</span><span>Tippen</span><span>Hören</span><span>Sprechen</span><span>Lesen</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="b b-artikel">
+        <span class="badge">der · die · das</span>
+        <h3>Artikel, die du nie wieder vergisst</h3>
+        <p>Jedes Nomen hat sein Wesen: spitz, rund oder eckig. Form + Farbe + Figur, dreifach verankert.</p>
+        <div class="wesen-row" aria-hidden="true">
+          <div class="wesen-cell der">
+            <svg viewBox="0 0 24 24"><g fill="none" stroke="#2148D5" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.7 Q12.6 4.7 13.2 5.9 L20.2 18.7 Q21 20.2 19.2 20.25 L4.9 20.55 Q3.1 20.55 3.9 18.95 L10.8 5.9 Q11.4 4.7 12 4.7 Z" fill="#fff"/><path d="M12 4.7 L12 2.5 M12 2.5 Q13.4 1.8 13.8 3"/><circle cx="10.1" cy="14.7" r="0.95" fill="#2148D5" stroke="none"/><circle cx="13.9" cy="14.7" r="0.95" fill="#2148D5" stroke="none"/><path d="M10.4 17.2 Q12 18.35 13.6 17.2" stroke-width="1.5"/></g></svg>
+            <b>der</b><small>spitz</small>
+          </div>
+          <div class="wesen-cell die">
+            <svg viewBox="0 0 24 24"><g fill="none" stroke="#DB2C7F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 Q20.4 3.1 20.9 12 Q21.4 20.6 12.2 21 Q3.3 21.4 3.05 12.2 Q2.85 4.5 10.2 3.65" fill="#fff"/><path d="M16.7 4.3 Q18 2.3 19.4 3.7" stroke-width="1.5"/><circle cx="9.6" cy="11.6" r="0.95" fill="#DB2C7F" stroke="none"/><circle cx="14.4" cy="11.6" r="0.95" fill="#DB2C7F" stroke="none"/><path d="M9.4 15 Q12 16.9 14.6 15" stroke-width="1.5"/></g></svg>
+            <b>die</b><small>rund</small>
+          </div>
+          <div class="wesen-cell das">
+            <svg viewBox="0 0 24 24"><g fill="none" stroke="#16A24E" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6.1 5.7 L18.4 5.2 Q19.7 5.2 19.7 6.5 L19.3 18.4 Q19.3 19.7 17.9 19.7 L6.6 20.1 Q5.3 20.1 5.3 18.8 L5.6 6.8 Q5.6 5.7 6.1 5.7 Z" fill="#fff"/><path d="M8.7 5.5 L7.3 3.5 M15.3 5.3 L16.7 3.2" stroke-width="1.5"/><circle cx="9.6" cy="12.1" r="0.95" fill="#16A24E" stroke="none"/><circle cx="14.4" cy="12.1" r="0.95" fill="#16A24E" stroke="none"/><path d="M9.9 15.6 L14.1 15.6" stroke-width="1.5"/></g></svg>
+            <b>das</b><small>eckig</small>
+          </div>
+        </div>
+        <p style="margin-top:1.2rem;font-size:.85rem">Beim richtigen Artikel platzt, blüht oder zerspringt die Karte. Kleine Belohnung, großer Anker.</p>
+      </div>
+
+      <div class="b b-srs">
+        <h3>Vergessen, wissenschaftlich abgeschafft</h3>
+        <p>FSRS-Spaced-Repetition plant jede Wiederholung auf den optimalen Moment.</p>
+        <div class="srs-bars" aria-hidden="true">
+          <i style="height:30%"></i><i style="height:45%"></i><i class="hot" style="height:70%"></i><i style="height:38%"></i>
+          <i style="height:55%"></i><i class="hot" style="height:90%"></i><i style="height:48%"></i><i style="height:26%"></i>
+          <i class="hot" style="height:64%"></i><i style="height:40%"></i><i style="height:58%"></i><i class="hot" style="height:82%"></i>
+        </div>
+      </div>
+
+      <div class="b b-speak">
+        <h3>Sprich, ohne Publikum</h3>
+        <p>Spracherkennung und Vorlesestimme, direkt im Browser. Aussprache üben, judgement-free.</p>
+        <div class="wave" aria-hidden="true">
+          <i style="height:22%"></i><i style="height:48%"></i><i style="height:80%"></i><i style="height:56%"></i><i style="height:92%"></i>
+          <i style="height:40%"></i><i style="height:66%"></i><i style="height:30%"></i><i style="height:74%"></i><i style="height:50%"></i>
+          <i style="height:88%"></i><i style="height:36%"></i><i style="height:60%"></i><i style="height:24%"></i>
+        </div>
+      </div>
+
+      <div class="b b-exam">
+        <h3>Prüfung? Eingeplant.</h3>
+        <p>Wortschatz, Redemittel und Simulationen, ausgerichtet auf die zwei großen B2-Prüfungen.</p>
+        <div class="exam-row">
+          <span class="exam-b">telc Deutsch B2 Beruf<small>Sprechen · Schreiben · Wortschatz</small></span>
+          <span class="exam-b">Goethe-Zertifikat B2<small>Alle vier Module</small></span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= NUMBERS ================= -->
+<section class="sec" style="padding-top:.5rem">
+  <div class="wrap">
+    <div class="numbers">
+      <div class="glow"></div>
+      <p class="kicker" style="color:var(--himmel)">Handgebaut, nicht zusammengekratzt</p>
+      <h2>Jedes Wort hat eine Quelle.<br>Jeder Satz einen Zweck.</h2>
+      <div class="num-grid num">
+        <div class="num-cell"><b>1.623</b><span>Wörter mit Artikel, Plural und zwei echten Beispielsätzen</span></div>
+        <div class="num-cell"><b>1.033</b><span>Nomen-Verb-Kollokationen, wie Deutsche wirklich sprechen</span></div>
+        <div class="num-cell"><b>117</b><span>Grammatik-Übungen entlang der wichtigsten B2-Marker</span></div>
+        <div class="num-cell"><b>20</b><span>Themen aus Beruf und Alltag, vom Meeting bis zur Mietwohnung</span></div>
+      </div>
+      <div class="prov-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span>Alle Inhalte werden maschinell und menschlich geprüft, mit offener Herkunft pro Eintrag. <a href="#">Quellen &amp; Datenqualität ansehen</a></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= STEPS ================= -->
+<section class="sec" id="steps" style="padding-top:1rem">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">So funktioniert's</p>
+      <h2>Drei Schritte. <span class="swipe">Kein Lehrbuch.<i></i></span></h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="n">1</span>
+        <h3>Wähle eine echte Situation</h3>
+        <p>Beruf, Behörde, Arzt, Wohnen, Bank oder Prüfung. Jedes Thema spiegelt das Deutsch, das du wirklich brauchst.</p>
+        <svg class="connect" viewBox="0 0 30 20" fill="none" stroke="#EBE2CE" stroke-width="3" stroke-linecap="round"><path d="M2 10 L22 10 M16 4 L24 10 L16 16"/></svg>
+      </div>
+      <div class="step">
+        <span class="n">2</span>
+        <h3>Übe laut und schriftlich</h3>
+        <p>Verzweigte Dialoge, Wortschatz mit Spaced Repetition, Quiz in drei Stufen, Sprechen mit Spracherkennung.</p>
+        <svg class="connect" viewBox="0 0 30 20" fill="none" stroke="#EBE2CE" stroke-width="3" stroke-linecap="round"><path d="M2 10 L22 10 M16 4 L24 10 L16 16"/></svg>
+      </div>
+      <div class="step">
+        <span class="n">3</span>
+        <h3>Bekomm Feedback, sieh Fortschritt</h3>
+        <p>Ein klarer KI-Tipp zu deiner größten Schwäche, plus Can-Do-Meilensteine und Fortschritt auf allen Geräten.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="sec" id="faq" style="padding-top:1rem">
+  <div class="wrap">
+    <div class="sec-head" style="margin:0 auto;text-align:center">
+      <p class="kicker">Häufige Fragen</p>
+      <h2>Noch Fragen? Genau dafür.</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>Für wen ist Genauly? <span class="pm">+</span></summary>
+        <p>Für Erwachsene, die schon Deutsch können (etwa B1) und in echten Situationen sicher werden wollen: im Job und im Alltag. Auch ideal zur Vorbereitung auf telc Deutsch B2 Beruf oder das Goethe-Zertifikat B2.</p>
+      </details>
+      <details>
+        <summary>Ist Genauly kostenlos? <span class="pm">+</span></summary>
+        <p>Ja. Du startest kostenlos und ohne Konto. Anmelden ist optional und speichert deinen Fortschritt auf allen Geräten.</p>
+      </details>
+      <details>
+        <summary>Welches Niveau brauche ich? <span class="pm">+</span></summary>
+        <p>Das Plateau, ungefähr B1 bis B2. Alle Inhalte sind nach GER-Stufe markiert, du startest wo du dich wohlfühlst und steigerst dich in deinem Tempo.</p>
+      </details>
+      <details>
+        <summary>Wie funktioniert das KI-Schreibfeedback? <span class="pm">+</span></summary>
+        <p>Du schreibst einen kurzen Text und bekommst einen klaren, priorisierten Tipp zu deiner größten Schwäche. Ein Grammatik-Checker kategorisiert zuerst, ein KI-Modell hilft nur, wenn ein tieferer Blick nötig ist. KI-Feedback ist immer als solches markiert.</p>
+      </details>
+      <details>
+        <summary>Muss ich etwas installieren? <span class="pm">+</span></summary>
+        <p>Nein. Genauly läuft im Browser und lässt sich als App auf den Homescreen legen. Funktioniert auf Handy, Tablet und Laptop.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CLOSING CTA ================= -->
+<section class="sec" style="padding-top:1rem">
+  <div class="wrap">
+    <div class="closing">
+      <svg style="position:absolute;left:6%;top:18%;width:60px;opacity:.5" viewBox="0 0 60 60" fill="none" stroke="#53C7F9" stroke-width="2.6" stroke-linecap="round"><path d="M30 8 L30 22 M30 38 L30 52 M8 30 L22 30 M38 30 L52 30"/></svg>
+      <svg style="position:absolute;right:8%;bottom:20%;width:46px;opacity:.6" viewBox="0 0 50 50" fill="#F5785C"><path d="M25 4 l5 12 12 2-9 8.5 2.5 12L25 32l-10.5 6.5L17 26.5 8 18l12-2z"/></svg>
+      <h2>Bereit? Dein Deutsch wartet.</h2>
+      <p>Starte kostenlos, ohne Konto, direkt im Browser. In zwei Minuten steckst du mitten in deiner ersten Session.</p>
+      <a class="btn btn-white" href="#">
+        Kostenlos starten
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <small>Kein Abo. Keine Kreditkarte. Kein Kleingedrucktes.</small>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <a class="brand" href="#" style="text-decoration:none">
+        <svg viewBox="0 0 64 64" width="28" height="28">
+          <path d="M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z" fill="#52C6F9" transform="rotate(-3 32 32)"/>
+          <path d="M31.50 56.06Q28.50 56.06 26.27 55.31Q24.03 54.55 22.65 53.19Q21.26 51.84 20.85 50.06L27.07 48.78Q27.27 49.40 27.83 49.92Q28.38 50.45 29.28 50.76Q30.19 51.08 31.46 51.08Q33.65 51.08 34.83 50.10Q36.01 49.11 36.01 47.06L36.01 43L35.46 43Q35.05 44.03 34.24 44.87Q33.43 45.71 32.18 46.20Q30.94 46.69 29.24 46.69Q26.72 46.69 24.64 45.51Q22.56 44.33 21.31 41.86Q20.05 39.39 20.05 35.54Q20.05 31.52 21.35 28.91Q22.64 26.31 24.72 25.05Q26.80 23.79 29.22 23.79Q31.05 23.79 32.35 24.40Q33.65 25.02 34.50 25.99Q35.35 26.96 35.78 28.01L35.99 28.01L35.99 24.07L43.06 24.07L43.06 46.49Q43.06 49.65 41.60 51.78Q40.13 53.91 37.53 54.99Q34.92 56.06 31.50 56.06M31.68 41.44Q33.06 41.44 34.02 40.75Q34.98 40.05 35.50 38.70Q36.01 37.36 36.01 35.52Q36.01 33.63 35.50 32.25Q34.98 30.88 34.03 30.13Q33.08 29.38 31.68 29.38Q30.31 29.38 29.35 30.15Q28.40 30.92 27.91 32.30Q27.42 33.67 27.42 35.52Q27.42 37.36 27.91 38.69Q28.40 40.03 29.35 40.73Q30.31 41.44 31.68 41.44" fill="#1C1A24"/>
+        </svg>
+        <b style="font-size:1rem">Genauly</b>
+      </a>
+      <nav class="foot-links">
+        <a href="#">Über uns</a><a href="#">Hilfe</a><a href="#">Datenschutz</a><a href="#">AGB</a><a href="#">Quellen &amp; Lizenzen</a>
+      </nav>
+    </div>
+    <p class="foot-note">Genauly · German for real life · Deutsch für das echte Leben · B1–B2</p>
+  </div>
+</footer>
+
+</body>
+</html>
