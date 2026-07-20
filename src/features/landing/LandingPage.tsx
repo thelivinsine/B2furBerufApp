@@ -425,15 +425,12 @@ export function LandingPage() {
       <nav className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
           <div className="flex items-center">
-            {/* Compact mark on phones, the full wordmark from sm up. The
-                responsive toggle lives on wrappers: display utilities passed
-                INTO <Logo> would fight its internal light/dark image swap. */}
-            <span className="sm:hidden">
-              <Logo className="h-9 w-9" />
-            </span>
-            <span className="hidden sm:block">
-              <Logo variant="wordmark" className="h-8 w-auto" />
-            </span>
+            {/* The full wordmark on every size: the landing is a new learner's
+                first impression, so they should see the app NAME, not just the
+                mark (founder, s138). Height utilities are safe to pass into
+                <Logo> (they apply to both theme images); only display utilities
+                would fight its internal light/dark swap. */}
+            <Logo variant="wordmark" className="h-7 w-auto sm:h-8" />
           </div>
           <div className="hidden items-center gap-5 text-sm font-semibold text-muted-foreground lg:flex">
             {navLinks.map((l) =>

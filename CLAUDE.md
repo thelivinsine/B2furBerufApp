@@ -728,7 +728,8 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   Himmel Soft app-wide: **`--accent` is now `197 93% 77%` in BOTH themes** (index.css; the darker
   `--accent-ink` text variant and the CTA `--gradient-*` stops are different blues and stayed). The **g is OUTLINED to a `<path>`** (Inter 800, the app's own UI typeface) so it renders
   identically everywhere. **s138 additions:** (1) every icon centers the mark by its TRUE bounding box
-  ("Randnah", 5% margin; the raw path sits low in the 64-box and used to leave an empty band at the top
+  ("Größer", 12% margin — the founder picked it over the tighter 5% "Randnah", which read too big
+  live; `TILE_MARGIN` in `build-logo-assets.mjs`; the raw path sits low in the 64-box and used to leave an empty band at the top
   of the app icon — never revert to raw-coordinate centering); (2) **dark-ground marks are TWO-TONE**:
   ink where the artwork sits on the swipe, white where it falls off (only the g's descender); (3) a
   **lowercase wordmark** "genauly" with the swipe under "genau" is the primary logo where there is room

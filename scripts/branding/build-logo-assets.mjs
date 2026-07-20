@@ -19,10 +19,11 @@
  * (@fontsource-variable/inter), so `pnpm install` must have run.
  *
  * Asset rules (locked in CLAUDE.md → Brand logo):
- *  - The mark in every icon is centered by its TRUE bounding box ("Randnah",
- *    5% margin, founder-picked 2026-07-20). The raw path coords sit low in the
- *    64-box (the g descender), which used to leave an empty band at the top of
- *    the app icon; never go back to raw-coordinate centering.
+ *  - The mark in every icon is centered by its TRUE bounding box ("Größer",
+ *    12% margin, founder-picked 2026-07-20; the tighter 5% "Randnah" looked
+ *    too big live). The raw path coords sit low in the 64-box (the g
+ *    descender), which used to leave an empty band at the top of the app
+ *    icon; never go back to raw-coordinate centering.
  *  - In-app + favicons: ROUNDED tile, TRANSPARENT corners (Papier fill).
  *  - OS-masked icons (apple-touch, pwa-192/512): FULL-BLEED OPAQUE (no
  *    transparent corners; iOS fills transparency with black).
@@ -72,8 +73,12 @@ function markLayers(mode, clipId) {
   return SWIPE_EL + `<path d="${G_PATH}" fill="${TINTE}"/>`;
 }
 
+// Icon tile margin. "Größer" = 0.12 (founder-picked over the tighter 0.05
+// "Randnah", which read too big live). One knob for every tiled icon.
+const TILE_MARGIN = 0.12;
+
 /** translate+scale that centers the mark's true bbox in the 64-box at the
- * given margin (Randnah = 0.05). bbox measured in-browser once at startup. */
+ * given margin. bbox measured in-browser once at startup. */
 function centerTransform(bb, margin) {
   const s = (64 * (1 - 2 * margin)) / Math.max(bb.w, bb.h);
   const tx = 32 - s * (bb.x + bb.w / 2);
@@ -82,11 +87,11 @@ function centerTransform(bb, margin) {
   return `translate(${r(tx)} ${r(ty)}) scale(${r(s)})`;
 }
 
-/** Rounded tile with transparent corners (in-app + favicons). Randnah. */
+/** Rounded tile with transparent corners (in-app + favicons). Größer. */
 function roundedSvg(bb) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${PAPIER}"/><g transform="${centerTransform(bb, 0.05)}">${markLayers("light", "cr")}</g></svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="${PAPIER}"/><g transform="${centerTransform(bb, TILE_MARGIN)}">${markLayers("light", "cr")}</g></svg>`;
 }
-/** Full-bleed opaque square (OS-masked icons). Randnah. */
+/** Full-bleed opaque square (OS-masked icons). */
 function fullBleedSvg(bb, margin) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="${PAPIER}"/><g transform="${centerTransform(bb, margin)}">${markLayers("light", "cf")}</g></svg>`;
 }
@@ -102,12 +107,12 @@ function canonicalSvg(bb) {
   return `<!-- Genauly brand mark (Kit 1, BRAND_SPEC.md; logo v2 rework 2026-07-20).
      The g is OUTLINED (Inter 800 -> <path>) so it renders identically across
      platforms and in the favicon / PWA icons. The mark is centered by its true
-     bounding box ("Randnah", 5% margin). Regenerate with
+     bounding box ("Größer", 12% margin). Regenerate with
      scripts/branding/build-logo-assets.mjs.
      Swipe = Himmel Soft ${HIMMEL_SOFT}, ink = ${TINTE}, tile = Papier ${PAPIER}. -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="256" height="256" role="img" aria-label="Genauly">
   <rect width="64" height="64" rx="14" fill="${PAPIER}"/>
-  <g transform="${centerTransform(bb, 0.05)}">
+  <g transform="${centerTransform(bb, TILE_MARGIN)}">
     <path d="${SWIPE}" fill="${HIMMEL_SOFT}" transform="rotate(-3 32 32)"/>
     <path d="${G_PATH}" fill="${TINTE}"/>
   </g>
@@ -226,8 +231,8 @@ const centerCx = (svg) =>
   svg.replace('class="cx"', `transform="${centerTransform(BB, 0.02)}"`);
 
 const ROUNDED = roundedSvg(BB);
-const FULLBLEED = fullBleedSvg(BB, 0.05); // Randnah
-const MASKABLE = fullBleedSvg(BB, 0.1); // mark within inner ~80% safe zone
+const FULLBLEED = fullBleedSvg(BB, TILE_MARGIN); // Größer
+const MASKABLE = fullBleedSvg(BB, 0.14); // mark within inner ~72% safe zone (OS crops)
 const TILELESS_LIGHT = centerCx(tilelessSvg("light"));
 const TILELESS_DARK = centerCx(tilelessSvg("dark"));
 
