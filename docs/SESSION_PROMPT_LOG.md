@@ -548,3 +548,17 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
 - **Artifacts (prompt 8):** `src/index.css` · `src/features/landing/LandingPage.tsx` ·
   `brand-kit/color/*` (regenerated) · `docs/branding/BRAND_SPEC.md` · `CLAUDE.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 9 (verbatim):** `> for the favicon - I like großer better than the radenah from the previews. The radenah when live looks too big. also, in Mobile view, the bigger logo should be applied on the landing page as that's the first thing a new learner would see and they should see the app name there not just short logo.` (clarified: `> for clarification - i meant in mobile view, the logo with all the letters should be applied on the landing page's header.`)
+- **Response 9:** Two changes. (1) Icon tile margin: added `TILE_MARGIN = 0.12` ("Größer") in
+  `build-logo-assets.mjs` and applied it to every tiled icon (favicons/apple-touch/pwa +
+  canonical SVG); maskable bumped to 0.14 (OS crops it); regenerated all icon assets — the mark
+  now reads smaller in the tile with more breathing room. (2) Mobile landing header: replaced the
+  compact-mark-on-phones logic with the full wordmark at every size (`h-7 w-auto sm:h-8`), so a
+  first-time mobile visitor sees the app name. Verified the wordmark fits alongside the EN/DE
+  toggle + Start-free CTA down to 320px (light + dark) via headless Chromium. Docs corrected
+  (BRAND_SPEC, CLAUDE.md, status handoff: Randnah→Größer, mobile-landing wordmark). Gates:
+  typecheck ✓ · lint 0 errors · test:unit 219/219 · build ✓. Squash-merged to `main`.
+- **Artifacts (prompt 9):** `scripts/branding/build-logo-assets.mjs` ·
+  `src/features/landing/LandingPage.tsx` · `public/` icons (favicons/apple-touch/pwa/canonical
+  regenerated) · `preview/branding/genauly-logo-final.svg` · `docs/branding/BRAND_SPEC.md` ·
+  `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log

@@ -81,7 +81,8 @@ as the proposal, every pairing gated by `pnpm check:contrast`):
   `--accent`, see §1). The swipe bottom was extended (from `…L 54 40 L 13 44 Q 9 40 10 32 Z`) so it
   fully covers the closed bowl of the **g**; the descender still pokes out naturally.
 - **Logo v2 rework additions (2026-07-20):** (1) icons center the mark by its TRUE bounding box
-  ("Randnah", 5% margin), fixing the empty band above the mark in the old app icon; (2) dark-ground
+  ("Größer", 12% margin — the founder chose it over the tighter 5% "Randnah", which was too big
+  live), fixing the empty band above the mark in the old app icon; (2) dark-ground
   marks are TWO-TONE, ink where the artwork sits on the swipe, white where it falls off (only the g's
   descender); (3) a lowercase **wordmark** "genauly" (Inter 800, −0.02em) with the swipe under
   "genau" (band: −0.16em/+0.10em overhangs, 0.12em/0.10em em-box insets, −2° tilt) is the primary

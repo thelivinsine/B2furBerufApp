@@ -2,14 +2,15 @@
 
 _Last updated: 2026-07-20 (session 138). **Logo v2 rework shipped to `main`** (logos only, founder
 directive): the swipe is now **Himmel Soft `#8CDBFB`** (the original Himmelblau read too harsh
-against black/white; the `--accent` token is unchanged), every icon centers the mark by its TRUE
-bounding box ("Randnah", 5% margin — the app icon no longer floats small with an empty band on
+against black/white), every icon centers the mark by its TRUE bounding box (**"Größer", 12% margin**
+— `TILE_MARGIN` in `build-logo-assets.mjs`; the app icon no longer floats small with an empty band on
 top), dark-ground logos are **two-tone** (ink on the swipe, white off it; only the g splits), and a
 new lowercase **wordmark** "genauly" (swipe under "genau") is the primary logo wherever there is
-room (`Logo variant="wordmark"`; the mobile header keeps the compact g). Iterated across 8 preview
-rounds in a claude.ai artifact. A same-session follow-up then applied Himmel Soft **app-wide as the
-`--accent` token** (both themes, `197 93% 77%`; contrast gate green). Product name: **Genauly**
-(`genauly.de`)._
+room, **including the mobile landing header** (`Logo variant="wordmark"`; only the mobile in-app
+`AppShell` header keeps the compact g). Iterated across 8 preview rounds in a claude.ai artifact.
+Same-session follow-ups: Himmel Soft applied **app-wide as the `--accent` token** (both themes,
+`197 93% 77%`; contrast gate green), icons switched Randnah→Größer, and the mobile landing header
+switched mark→wordmark. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -76,10 +77,11 @@ only." What shipped:
   `#53C7F9` hexes on the landing (numbers-band gradient stop, decorative doodle stroke). The darker
   `--accent-ink` text variant and the CTA `--gradient-*` stops are different blues and stayed.
   `check:contrast` green; brand kit regenerated.)
-- **Icons re-centered ("Randnah"):** `build-logo-assets.mjs` now measures the mark's true bbox
-  in-browser and centers it at 5% margin (favicons/apple-touch/pwa; maskable keeps the 80% safe
-  zone at 10%). This fixes the founder-screenshotted "empty band above the g" app icon. Never
-  revert to raw-coordinate centering.
+- **Icons re-centered ("Größer", `TILE_MARGIN = 0.12`):** `build-logo-assets.mjs` now measures the
+  mark's true bbox in-browser and centers it at a 12% margin (favicons/apple-touch/pwa; maskable at
+  14% since the OS crops it). This fixes the founder-screenshotted "empty band above the g" app icon.
+  (Started at 5% "Randnah"; the founder found that too big live and picked Größer in a follow-up.)
+  Never revert to raw-coordinate centering.
 - **Two-tone dark logos:** on dark grounds, artwork on the swipe is ink, off the swipe is white —
   in practice only the g splits (ink bowl, white descender). Light grounds stay all ink.
 - **New lowercase wordmark** (`public/genauly-wordmark.png`/`-dark.png`, 548×138): "genauly" in
@@ -89,12 +91,14 @@ only." What shipped:
   swipe, ONLY the g dual-tone (clip = swipe ∪ an e..u rect, avoids white slivers on letter
   bottoms).
 - **`Logo.tsx` gained `variant="mark" | "wordmark"`**; wordmark placed in Sidebar, AuthDialog,
-  Onboarding, HelpChrome, LegalChrome, landing footer, landing header (`sm:`+; phones keep the
-  mark), and the dark no-JS shells (`index.html`, `prerender-help.mjs` — the adjacent "Genauly"
-  text spans were removed, the image IS the name). Mobile `AppShell` header keeps the compact
-  mark (s86 rule). **Gotcha fixed in review:** responsive display utilities must wrap `<Logo>` in
-  a container, never be passed into it (they override the internal `dark:` image swap — this
-  briefly showed both theme images on the landing).
+  Onboarding, HelpChrome, LegalChrome, landing footer, **landing header at ALL sizes** (the
+  founder wants a first-time visitor to see the app NAME, not just the mark; sized `h-7 w-auto
+  sm:h-8`), and the dark no-JS shells (`index.html`, `prerender-help.mjs` — the adjacent "Genauly"
+  text spans were removed, the image IS the name). Only the mobile in-app `AppShell` header keeps
+  the compact mark (s86 rule). **Gotcha fixed in review:** responsive *display* utilities
+  (block/hidden) must wrap `<Logo>` in a container, never be passed into it (they override the
+  internal `dark:` image swap); *height* utilities are safe to pass in (they apply to both theme
+  images), which is why the single responsive `h-7 sm:h-8` on the landing header works.
 - **Brand kit + spec:** `build-brand-kit.mjs` swipe const updated + kit regenerated;
   `BRAND_SPEC.md` §3 + CLAUDE.md brand section rewritten. NOTE: the kit's lockups still use the
   outlined capital-G "Genauly" wordmark path (`wordmark-data.mjs`); outlining the new lowercase
