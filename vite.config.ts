@@ -32,7 +32,7 @@ export default defineConfig({
         description:
           "Practise real-life German for the B1 to B2 plateau: work, Behörde, doctor visits and job interviews, plus telc Deutsch B2 Beruf exam prep.",
         theme_color: "#3D74ED",
-        background_color: "#151320",
+        background_color: "#131620",
         display: "standalone",
         scope: "/",
         start_url: "/",

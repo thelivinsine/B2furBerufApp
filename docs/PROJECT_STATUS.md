@@ -10,7 +10,10 @@ variant carries a subtle top sheen, and two shared text classes landed in `index
 **`.text-display`** (extrabold, tracking-tight, balanced wrap; applied to every page H1 via
 SectionHeading/HubHero + Lernpfad/Neuland/Grammar lesson/Legal/Help) and **`.text-eyebrow`** (the one
 canonical overline recipe). Pre-rebrand indigo/violet remnants purged (Neuland Boss tag, game Chip
-tone, QuizHub hero, intent cards, stale comments). Product name: **Genauly** (`genauly.de`)._
+tone, QuizHub hero, intent cards, stale comments). A second wave shipped items 8-10: brand-family
+theme/hub gradients, the dark theme re-hued to warm navy (228), mesh + one text-gradient moment,
+plus a hotfix for a conflict marker that briefly broke `main`'s build. Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -91,9 +94,16 @@ greenlit fixes 1-7 of the ten-point list. What shipped:
   `from-violet/indigo/purple-*` → brand families (`from-blue-600 to-sky-500`,
   `from-amber-500 to-orange-600`), Anwenden Prüfung card `to-purple-500` → `to-pink-500`, stale
   "brand indigo" comments reworded.
-- **Deliberately NOT done (report items 8-10, founder has the list):** re-deriving ALL HubHero/
-  themes.ts rainbow gradients from the brand family, re-hueing the violet (hue 250) dark theme
-  toward warm navy, and migrating the landing's hand-rolled pills onto the shared Button.
+- **Second wave (items 8-10, greenlit in-session):** themes.ts accents + Sammlung/Anwenden hub
+  tiles re-derived from the brand families (no more indigo/violet/purple/fuchsia); the dark theme
+  re-hued 250 → **228 warm navy** across all surface/text tokens incl. the no-JS shells + manifest
+  (`#131620`/`#e7e8ef`) and the brand-kit tokens/docs (regenerated); `bg-mesh` nudged to 0.10/0.09;
+  the landing numbers band's stat values are gradient-clipped (fixed light Himmelblau stops, the one
+  sanctioned text-gradient moment). **Hotfix ridealong:** PR #609's squash accidentally shipped an
+  unresolved rebase-conflict marker in `LandingPage.tsx` (post-rebase gates were not re-run),
+  breaking `main`'s build; resolved here (single-button `primaryCta` keeping main's simplification +
+  the gradient classes) and all gates re-run. Item 10's "landing pills onto the shared Button"
+  sub-idea was dropped as churn without visual payoff.
 - **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.9 kB ✓ ·
   check:contrast 46/46 ✓. Verified rendered output via `pnpm preview` + headless Chromium
   (landing light/dark, Anwenden hub, Fortschritt). PWA caveat: hard-refresh the live site.

@@ -8,7 +8,7 @@ export const themes: ExamTheme[] = [
     blurb: "Lead and contribute to workplace meetings, coordinate tasks and align a team.",
     blurbDe: "Besprechungen leiten und aktiv mitgestalten, Aufgaben koordinieren und das Team abstimmen.",
     icon: "Users",
-    accent: "from-indigo-500 to-violet-500",
+    accent: "from-blue-600 to-sky-500",
     domain: "beruf",
     context: "work",
     situations: [
@@ -103,7 +103,7 @@ export const themes: ExamTheme[] = [
     blurb: "Plan milestones, assign responsibilities and keep a project on track.",
     blurbDe: "Meilensteine planen, Zuständigkeiten verteilen und ein Projekt auf Kurs halten.",
     icon: "KanbanSquare",
-    accent: "from-violet-500 to-fuchsia-500",
+    accent: "from-teal-500 to-cyan-500",
     domain: "beruf",
     context: "work",
     situations: [
@@ -120,7 +120,7 @@ export const themes: ExamTheme[] = [
     blurb: "Discuss new tools, software rollouts and the move to digital workflows.",
     blurbDe: "Über neue Tools, Software-Einführungen und den Wandel zu digitalen Arbeitsabläufen sprechen.",
     icon: "Laptop",
-    accent: "from-blue-500 to-indigo-500",
+    accent: "from-cyan-500 to-blue-600",
     domain: "beruf",
     context: "both",
     situations: [
@@ -280,7 +280,7 @@ export const themes: ExamTheme[] = [
     blurb: "Navigate learning in Germany: enrol in a language or integration course, get a foreign qualification recognised, sit exams and plan further training for your career.",
     blurbDe: "Sich in der deutschen Bildungswelt zurechtfinden: einen Sprach- oder Integrationskurs belegen, einen ausländischen Abschluss anerkennen lassen, Prüfungen ablegen und die berufliche Weiterbildung planen.",
     icon: "GraduationCap",
-    accent: "from-violet-500 to-purple-500",
+    accent: "from-sky-500 to-blue-600",
     domain: "bildung",
     context: "both",
     situations: [
@@ -372,7 +372,7 @@ export const themes: ExamTheme[] = [
     blurb: "Build a life outside work: pursue hobbies and sport, make plans with people, handle small talk, and go to events and cultural venues.",
     blurbDe: "Ein Leben neben der Arbeit gestalten: Hobbys und Sport nachgehen, sich mit Menschen verabreden, Smalltalk führen und Veranstaltungen und Kultur besuchen.",
     icon: "PartyPopper",
-    accent: "from-fuchsia-500 to-pink-500",
+    accent: "from-pink-500 to-rose-500",
     domain: "alltag",
     context: "personal",
     situations: [
@@ -395,7 +395,7 @@ export const themes: ExamTheme[] = [
     blurb: "Manage digital life in Germany: pick a mobile or internet contract, set up a connection, deal with device problems, and handle online accounts and data safely.",
     blurbDe: "Das digitale Leben in Deutschland regeln: einen Handy- oder Internetvertrag wählen, eine Verbindung einrichten, Geräteprobleme lösen und Online-Konten und Daten sicher verwalten.",
     icon: "Smartphone",
-    accent: "from-blue-500 to-indigo-500",
+    accent: "from-cyan-500 to-blue-600",
     domain: "alltag",
     context: "personal",
     situations: [

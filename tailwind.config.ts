@@ -104,10 +104,11 @@ const config: Config = {
         // text below AA there). Contrast gated in scripts/check-contrast.mjs.
         "accent-gradient":
           "linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%)",
-        // Dialed down for the flat brand (founder prefers flat): a whisper of
-        // the two blues on the warm Papier ground, not a visible wash.
+        // A whisper of the two blues on the warm Papier ground. Nudged back up
+        // 0.07/0.06 → 0.10/0.09 in the s137 premium pass (the s133 values were
+        // effectively invisible); still a wash, never a visible gradient band.
         "mesh":
-          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.07) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.06) 0px, transparent 50%)",
+          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.09) 0px, transparent 50%)",
         // Dialog backdrop: a brand-tinted radial that's lighter directly behind
         // the card and deepens toward the screen edges (a subtle spotlight). Uses
         // the cool-slate `--shadow` token instead of flat black, so it adapts to

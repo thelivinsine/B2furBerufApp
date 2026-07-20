@@ -100,39 +100,41 @@ input:-webkit-autofill {
   }
 
   .dark {
-    /* Dark theme, two-blue + coral identity kept (BRAND_SPEC §2 starting
-       point; the full design pass is plan PR D). Every pairing below clears
-       AA with room (see check-contrast.mjs). */
-    --background: 250 24% 10%;
-    --foreground: 250 20% 92%;
-    --surface: 250 20% 14%;
-    --elevated: 250 18% 18%;
+    /* Dark theme, two-blue + coral identity kept. Re-hued 250→228 in the
+       s137 premium pass (item 9): the spec's §2 "starting point" surfaces sat
+       on a violet hue left over from the indigo era; warm navy carries the
+       Nachtblau identity instead. Same lightness/saturation, so every pairing
+       still clears AA with room (see check-contrast.mjs). */
+    --background: 228 24% 10%;
+    --foreground: 228 20% 92%;
+    --surface: 228 20% 14%;
+    --elevated: 228 18% 18%;
 
-    --muted: 250 16% 22%;
+    --muted: 228 16% 22%;
     /* Dimmed + slightly desaturated (76%→72%, PR D design pass) so secondary
        text actually reads secondary against the 92%-lightness foreground;
        still ~8:1 on the background, far above AA. */
-    --muted-foreground: 250 10% 72%;
+    --muted-foreground: 228 10% 72%;
 
-    --border: 250 14% 26%;
-    --input: 250 14% 28%;
+    --border: 228 14% 26%;
+    --input: 228 14% 28%;
     /* Nachtblau lifted for the dark ground: 70% lightness measures 6.6:1 as
        text on the background, so eyebrows / active-tab labels clear AA with
        margin (the old purple needed 74% for the same reason). */
     --ring: 221 90% 70%;
 
     --primary: 221 90% 70%;
-    --primary-foreground: 250 30% 8%;
+    --primary-foreground: 228 30% 8%;
     --accent: 198 90% 70%;
     --accent-foreground: 202 71% 10%;
     --accent-ink: 198 85% 72%;
 
     --success: 153 50% 52%;
-    --success-foreground: 250 30% 8%;
+    --success-foreground: 228 30% 8%;
     --warning: 43 90% 62%;
     --warning-foreground: 42 50% 10%;
     --danger: 4 75% 64%;
-    --danger-foreground: 250 30% 8%;
+    --danger-foreground: 228 30% 8%;
 
     --reward: 11 88% 66%;
     --reward-bg: 11 45% 15%;
@@ -147,7 +149,7 @@ input:-webkit-autofill {
     --die-bg: 329 38% 18%;
     --das: 145 50% 58%;
     --das-bg: 145 35% 15%;
-    --ink: 250 12% 85%;
+    --ink: 228 12% 85%;
 
     --shadow: 221 60% 3%;
 

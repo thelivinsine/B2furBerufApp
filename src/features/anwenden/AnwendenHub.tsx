@@ -34,7 +34,7 @@ const CARDS: {
   {
     to: "/exam",
     icon: GraduationCap,
-    gradient: "from-fuchsia-500 to-pink-500",
+    gradient: "from-amber-500 to-orange-500",
     title: "Prüfung",
     desc: "Ein kompletter Prüfungsdurchlauf unter realistischen Bedingungen und mit Zeitdruck.",
   },
