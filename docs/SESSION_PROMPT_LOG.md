@@ -1274,3 +1274,24 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · commits `2f1c7d4` / `1c48a33` /
   `df0c9bd` · PR #598 (squash `796fb01`)
+
+## Session 135 — 2026-07-20 — Landing-page redesign analysis + two previews
+
+- **Branch:** `claude/landing-page-redesign-iqxlja`
+- **Prompt 1 (verbatim):** `> do an analysis of the landing page and improve it such that it provides the highest value to the learner and has highest conversion rate. The visuals and quality should resemble a billion dollar edutech app with excellent finesse which also includes creative elements, doodles, artistic elements and visual coherence wherever applicable. Go ahead and provide a couple of previews of the homepage for such highest standards. `
+- **Response 1:** Audited `src/features/landing/LandingPage.tsx` against conversion best practice
+  (biggest gaps: no product visual anywhere, no honest proof/trust signals, flat card grids, competing
+  hero CTAs, the OAuth prose block killing momentum) and built two self-contained on-brand previews in
+  `preview/landing-redesign/`, both reusing the shipped logo geometry and the real Wesen creature paths:
+  **A "Der Textmarker"** (warm Papier editorial; the Himmelblau highlighter swipe as the page-wide
+  device, doodle annotations, flashcard collage hero, scenario marquee, "Du bist hier" plateau chart,
+  bento feature grid, honest content-count band) and **B "Die Nachtstadt"** (cinematic night-city hero
+  with the six lit domain buildings + phone mockup of the Heute screen, trust bar, three product splits
+  incl. Neuland and the word constellation, data-quality tier band, "Die Stadt wird hell, wenn du übst"
+  closer). Verified both at 1280/390 px via headless Chromium, fixed badge overlap / mobile nav wrap /
+  floating-chip collisions, wrote the analysis into `preview/landing-redesign/README.md`, pushed, and
+  sent the founder the two HTMLs plus full-page desktop/mobile screenshots. Nothing shipped to the app
+  yet; awaiting the founder's pick before implementing in `LandingPage.tsx`.
+- **Artifacts:** `preview/landing-redesign/landing-a-textmarker.html` ·
+  `preview/landing-redesign/landing-b-nachtstadt.html` · `preview/landing-redesign/README.md` ·
+  commit `253534e`
