@@ -12,6 +12,7 @@ import beamterUrl from "./assets/beamter.png";
 import miloUrl from "./assets/milo.png";
 import kassiererinUrl from "./assets/kassiererin.png";
 import brandtUrl from "./assets/brandt.png";
+import jonasUrl from "./assets/jonas.png";
 import playerUrl from "./assets/player.png";
 import bagUrl from "./assets/bag.png";
 import dictUrl from "./assets/dict.png";
@@ -60,6 +61,7 @@ export const NPC_SPRITES: Record<string, string> = {
   milo: miloUrl,
   kassiererin: kassiererinUrl,
   brandt: brandtUrl,
+  jonas: jonasUrl,
 };
 export const PLAYER_SPRITE = playerUrl;
 export const BAG_SPRITE = bagUrl;

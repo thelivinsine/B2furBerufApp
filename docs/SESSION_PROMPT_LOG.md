@@ -1314,3 +1314,21 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   recolored) · `src/features/welt/stage.tsx` · `src/data/missions.ts` · `scripts/lint-content.mjs` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   commit `46e22eb` + the P0-batch commit/PR
+- **Prompt 6 (verbatim):** `go ahead with p1 tasks` _(model switched to Opus 4.8 via /model for this turn)_
+- **Response 6 (Opus 4.8):** Shipped the P1 cutscene-character pass. Root gap: all 19 cutscenes
+  rendered empty rooms (only hotspot placed the player), and the dominant cutscene speaker Jonas
+  (22 lines) had no sprite. Authored a **Jonas sprite** in `welt_assets.py` (messy brown hair, rust
+  hoodie, denim; validated 26x32, distinct from the cast), registered in `stage.tsx` `NPC_SPRITES` +
+  `sprite:` on `npc_jonas` in `missions.ts` + the linter `GAME_SPRITES` mirror. Added `CutsceneCast`
+  to `scenes.tsx`: the player stands bottom-left on every backdropped cutscene (the `website` prop
+  scene stays character-free), the speaking NPC stands right (current line's speaker if sprited, else
+  the scene's primary sprited NPC via useMemo, so it doesn't flicker on narrator/player lines).
+  Placement composite-checked on all five cutscene backdrops; verified in-app that the player renders
+  on the 1.1 arrivals cutscene (zero console errors). Listening/automat/form/loadout deliberately keep
+  their prop/device focus (no person). Gates: typecheck ✓, lint 0 errors ✓, lint:content ✓,
+  test:unit 219 ✓, build ✓, bundle 80.7 kB ✓. Updated the review doc (P1 item + implementation
+  record), `PROJECT_STATUS.md`, and this log.
+- **Artifacts (P1):** `preview/game-pixel-mockups/welt_assets.py` (Jonas) ·
+  `src/features/welt/assets/jonas.png` (new) · `src/features/welt/stage.tsx` ·
+  `src/features/welt/scenes.tsx` (`CutsceneCast`) · `src/data/missions.ts` · `scripts/lint-content.mjs` ·
+  `docs/plans/GAME_DEMO_READINESS_REVIEW.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`

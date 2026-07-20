@@ -33,6 +33,7 @@ export const gameNpcs: GameNpc[] = [
     id: "npc_jonas",
     name: "Jonas",
     role: { de: "Dein deutscher Freund", en: "Your local German friend" },
+    sprite: "jonas",
   },
   {
     id: "npc_frau_schmidt",

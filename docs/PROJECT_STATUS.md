@@ -1,10 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-20 (session 135). **Game demo-readiness review + P0 batch shipped:** the
-Neuland game layer was reviewed end-to-end for this week's demo (zero-console-error scripted
-playthrough), then the founder greenlit the P0 batch in-session: the Heute → Spielen tile
-auto-center fix, four new battle-NPC sprites (every dialogue battle now has a visible opponent,
-a founder-caught gap), and the Nachtblau regeneration of all pixel assets. Review + record:
+_Last updated: 2026-07-20 (session 135). **Game demo-readiness review + P0 batch + P1 cutscene pass
+shipped:** the Neuland game layer was reviewed end-to-end for this week's demo (zero-console-error
+scripted playthrough), then the founder greenlit the fixes in-session: the Heute → Spielen tile
+auto-center fix, five new NPC sprites (four battle opponents — every dialogue battle now has a
+visible opponent, a founder-caught gap — plus Jonas the recurring cutscene companion), characters
+placed on all 19 previously-empty cutscene stages, and the Nachtblau regeneration of all pixel
+assets. Review + record:
 **`docs/plans/GAME_DEMO_READINESS_REVIEW.md`** (details in the s135 handoff below). The s133
 **brand rebrand is COMPLETE** (Kit 1 · Nachtblau & Himmelblau + Koralle,
 `docs/branding/BRAND_SPEC.md`), incl. the tile-less in-app logo + the generated `brand-kit/`
@@ -88,10 +90,17 @@ week's demo, then greenlit the whole P0 batch in-session. Deliverables:
   unregistered sprites). Shared battle anchor composite-checked on all four backdrops.
 - **P1 art SHIPPED — Nachtblau asset regen:** `welt_assets.py` `INDIGO` `(91,91,230)`→`(61,116,237)`
   (`#3D74ED`), all assets regenerated (player backpack, backdrop accents, doc + Wörterbuch icons).
-- **Still open before the demo:** founder tasks — seed missions 1.1–1.3 on the exact demo device
-  (game progress is LOCAL-ONLY) + dress rehearsal of 1.4 and the boss after the merge is live
-  (hard-refresh, PWA autoUpdate). Optional P1: place the player/NPC sprites on cutscene stages
-  (19 scenes, founder-reviewed look change; sprites now exist).
+- **P1 SHIPPED — cutscene characters (`scenes.tsx` `CutsceneCast`):** all 19 cutscenes rendered as
+  empty rooms (only hotspot placed the player). Now the player stands bottom-left on every
+  backdropped cutscene (the `website` prop scene stays character-free) and the speaking NPC stands
+  right (current line's speaker if sprited, else the scene's primary sprited NPC, so no flicker).
+  Needed a new **Jonas sprite** (the recurring companion, 22 cutscene lines, was spriteless);
+  registered like the others. Composite-checked on all 5 cutscene backdrops; verified in-app the
+  player renders on the 1.1 arrivals cutscene. Listening/automat/form/loadout keep prop/device focus
+  (no person) by design.
+- **Still open before the demo:** founder tasks only — seed missions 1.1–1.3 on the exact demo
+  device (game progress is LOCAL-ONLY) + dress rehearsal of 1.4 and the boss after the merge is live
+  (hard-refresh, PWA autoUpdate).
 - **By-design, don't "fix":** missions light-only (hub theme-aware), Kapitel 2+ locked teaser, dark
   surround below short scenes, no game cloud sync until the G2 migration.
 - **Gates:** typecheck ✓ · lint 0 errors ✓ · lint:content ✓ · test:unit 219/219 ✓ · build ✓ ·
