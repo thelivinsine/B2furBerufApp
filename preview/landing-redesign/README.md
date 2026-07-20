@@ -1,4 +1,4 @@
-# Landing-page redesign previews (s134)
+# Landing-page redesign previews (s136)
 
 Two self-contained mockups for a conversion-focused landing rework. Open in any browser;
 no build step. Both are pure HTML/CSS, brand tokens copied from `src/index.css` /
@@ -47,7 +47,7 @@ more premium; more implementation work (hero art + mockups as components).
 Copy in both follows the house rules: no em dashes, Denglish brand voice, honest numbers
 only, single primary CTA repeated consistently.
 
-## Revision 2 (founder feedback, s135): Preview A chosen
+## Revision 2 (founder feedback, s136): Preview A chosen
 
 Preview A updated per founder direction: (1) logo optically centered against the wordmark
 (viewBox cropped to the artwork bounds, `7 12 52 52`); (2) nav gained real page links
@@ -61,7 +61,7 @@ bilingual pattern of /about, /hilfe and the legal pages): the script at the bott
 file snapshots the English innerHTML and swaps in the full German dictionary, so the
 whole page is previewable in both languages.
 
-## Revision 3 (founder feedback, s135)
+## Revision 3 (founder feedback, s136)
 
 - The steps headline "Three steps. No textbook." was replaced with "Three steps. Your
   smart companion." (DE: "Dein smarter Begleiter."): Genauly is a companion to

@@ -425,7 +425,7 @@ input:-webkit-autofill {
 }
 
 /* ---------------------------------------------------------------- */
-/* Landing page (s135 redesign, "Der Textmarker"): the highlighter  */
+/* Landing page (s136 redesign, "Der Textmarker"): the highlighter  */
 /* swipe device, scenario marquee, and hero-collage float. Scoped   */
 /* with a `landing-` prefix; used only by features/landing.         */
 /* The swiped word keeps ink-dark text in BOTH themes: the swipe    */

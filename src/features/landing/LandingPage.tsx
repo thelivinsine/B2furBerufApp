@@ -24,7 +24,7 @@ import { Logo } from "@/components/shared/Logo";
 import { Wesen } from "@/components/artikel/Wesen";
 
 /**
- * Landing page, "Der Textmarker" redesign (s135, founder-picked from
+ * Landing page, "Der Textmarker" redesign (s136, founder-picked from
  * preview/landing-redesign/). The logo's Himmelblau highlighter swipe is the
  * page-wide device (`.landing-swipe` in index.css); the hero shows the product
  * as a flashcard collage with the real Artikel-Wesen; a dedicated section sells

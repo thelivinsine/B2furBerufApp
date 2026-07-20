@@ -1,18 +1,18 @@
 # Project Status
 
-_Last updated: 2026-07-20 (session 135). **Landing page fully redesigned ("Der Textmarker"), shipped
-to `main`.** The founder picked Preview A from a two-preview round (`preview/landing-redesign/`,
-analysis in its README) and iterated four rounds; `LandingPage.tsx` was rebuilt from scratch: the
-brand highlighter swipe as the page-wide device (`.landing-*` CSS in `index.css`), a hero flashcard
-collage with the real Artikel-Wesen, a scenario marquee, a "Du bist hier" plateau chart, a bento
-feature grid, a dedicated **filter → custom Üben session** section (faceted-library selling point),
-honest content-count band, steps ("Your smart companion.", never a replacement-for-courses claim),
-the preserved OAuth "What is Genauly?" purpose block, FAQ, and a Nachtblau closing CTA. Copy is
-**English-first with German seasoning (~10-20%)** and the whole page switches EN/DE via a nav
-LangToggle (same bilingual pattern as /about and legal). Logged-in visitors get **"Go to app" / "Zur
-App"** CTAs (never "Dashboard"). The nav links About/Help/Sources; the in-nav logo is optically
-nudged (`-top-[2px]`) because the mark's artwork sits low in its canvas. Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-20 (session 136). **Landing page fully redesigned ("Der Textmarker"),
+shipped to `main`.** The founder picked Preview A from a two-preview round
+(`preview/landing-redesign/`, analysis in its README) and iterated four rounds; `LandingPage.tsx`
+was rebuilt from scratch: the brand highlighter swipe as the page-wide device (`.landing-*` CSS in
+`index.css`), a hero flashcard collage with the real Artikel-Wesen, a scenario marquee, a "Du bist
+hier" plateau chart, a bento feature grid, a dedicated **filter → custom Üben session** section,
+an honest content-count band, steps ("Your smart companion.", never a replacement-for-courses
+claim), the preserved OAuth "What is Genauly?" purpose block, FAQ, and a Nachtblau closing CTA.
+Copy is **English-first with German seasoning (~10-20%)**, the whole page switches EN/DE via a nav
+LangToggle, and logged-in visitors get **"Go to app" / "Zur App"** CTAs (never "Dashboard").
+Earlier the same day the parallel **session 135 shipped the game demo-readiness review + P0/P1
+batch** (battle-NPC sprites, cutscene cast, Spielen-tile fix, Nachtblau assets; handoff below).
+Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -68,7 +68,7 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 135 (2026-07-20). Landing-page redesign, previews → full implementation,
+**Handoff after session 136 (2026-07-20). Landing-page redesign, previews → full implementation,
 branch `claude/landing-page-redesign-iqxlja`, shipped to `main`.** The founder asked for a
 conversion-focused landing analysis + "billion-dollar edutech" previews, picked **Preview A "Der
 Textmarker"** (warm highlighter editorial; Preview B "Die Nachtstadt" remains unbuilt in
@@ -101,35 +101,47 @@ real page links in the nav, a filter→custom-Üben section, English-first copy,
   output via `pnpm preview` + headless Chromium: light/dark, EN/DE, 390/1280, logged-in state.
   **PWA caveat:** the landing is service-worker-cached; hard-refresh the live site before judging.
 
-**Handoff after session 134 (2026-07-19). Theorie (Wörter) card + mobile-filter polish. Branch
-`claude/filter-rail-mobile-height-n8ktd6`, shipped to `main` via PR #598 (squash `796fb01`).** A
-short founder-driven round on the Theorie Wörter tab and the mobile filter (ran on Opus 4.8):
-- **Mobile filter panel shorter (`FilterRail.tsx`, `panel` branch):** cap dropped
-  `max-h-[55dvh]`→`max-h-[45dvh]` (~10 dvh, roughly 3-4 text lines) so an open filter leaves more of
-  the card list visible on phones; the fixed header + internal `overflow-y-auto` scroll region are
-  unchanged, so nothing is clipped.
-- **"Verbunden" cross-module panel PARKED (`VocabList.tsx`):** the vocab card dropdown that linked a
-  word to a Kollokation/Schreibtraining/Dialog (`RelatedPanel` + `relatedRows`) is hidden behind a
-  reversible `const SHOW_RELATED = false` (founder wants to rethink its usefulness + dependencies
-  before it ships). The panel + helper are untouched in the repo; re-enabling is a one-line flip. Do
-  not delete them while parked.
-- **Wörter Karten = "Option B" layout (`VocabList.tsx`):** with the bottom toggle gone the card was
-  rearranged (founder picked B from a 4-option `preview/vocab-card-layouts.html`): quiet headline
-  (gender creature + word left, bookmark right), the example gets room, and a foot row pins the
-  plural (a small `bg-muted` pill) left + the speak button right via `mt-auto`, so every card in a
-  row shares one foot line. Speak + plural moved OUT of the headline.
-- **Gender reveal effect moved right + snappier die (`ArtikelEffect.tsx` + `index.css`):** new
-  `align` prop; the vocab card back face passes `align="right"`, shifting the burst/bloom/shatter
-  origin to `--fx-x: 78%` (into the empty right side where the English text isn't). The session
-  player (`SessionPlayer`) keeps the default centered origin. The "die" bloom is now `470ms` fast-out
-  cubic-bezier (was `650ms` ease-out) with a tighter `200/280/360ms` ring stagger (was
-  `200/310/420`), finishing as crisply as der's rays / das's shards. The `left:50%` origins in
-  `.artikel-fx-ray/ring/shard` now read `var(--fx-x, 50%)`.
-- **Gates:** typecheck clean, lint 0 errors, build green, `test:unit` 219/219. **PWA caveat:** the
-  Wörter cards are a service-worker-cached surface; hard-refresh before judging the live result.
+**Handoff after session 135 (2026-07-20). Game demo-readiness review + the P0 batch SHIPPED. Branch
+`claude/game-review-demo-readiness-8fdpid`.** The founder asked for a comprehensive review of the
+current game (Neuland, G1 + G2 Kapitel 1) with priority actions so the game can be presented in this
+week's demo, then greenlit the whole P0 batch in-session. Deliverables:
+**`docs/plans/GAME_DEMO_READINESS_REVIEW.md`** (verdict, evidence, prioritized actions, a
+3–4-minute game demo script, and the implementation record) plus the shipped fixes below. Key facts:
+- **Evidence gathered:** `pnpm typecheck` ✓ · `test:unit` 219/219 ✓ · `lint:content` ✓, plus a
+  scripted Playwright playthrough (mobile 390x844, dev build, fresh profile): hub light+dark, mission
+  1.1 scenes + battle + bag ask flow (Reisepass hand-over, Wörterbuch), boss 1.6 reachable ungated,
+  Heute → Spielen embed. **Zero console errors.**
+- **P0.1 SHIPPED — Spielen-tile auto-center fix (`NeulandHub.tsx`):** the compact 3-row mission tile
+  opened scrolled to max (hid the next mission + its play button) because the tile was not
+  positioned, so the auto-center's `r.offsetTop` was document-relative. The tile is now `relative`
+  (it becomes the rows' offsetParent). Verified scripted: fresh profile shows 1.1–1.3 (scrollTop 0),
+  mid-chapter centers 1.4.
+- **P0.2 SHIPPED — battle opponents have bodies (founder-caught; the review's first pass missed
+  it):** `NPC_SPRITES` had only Frau Schmidt, so 4 of 5 dialogue battles ran against an invisible
+  opponent. Four new code-authored 26x32 sprites in `welt_assets.py` (Grenzbeamte peaked cap+badge,
+  Milo lanyard, Kassiererin apron, Herr Brandt balding+mustache+cardigan; blessed style, locked
+  world scale), wired via `stage.tsx` `NPC_SPRITES`, `sprite:` on the 4 battle NPCs in
+  `missions.ts`, and the linter's `GAME_SPRITES` mirror (`lint-content.mjs`, it errors on
+  unregistered sprites). Shared battle anchor composite-checked on all four backdrops.
+- **P1 art SHIPPED — Nachtblau asset regen:** `welt_assets.py` `INDIGO` `(91,91,230)`→`(61,116,237)`
+  (`#3D74ED`), all assets regenerated (player backpack, backdrop accents, doc + Wörterbuch icons).
+- **P1 SHIPPED — cutscene characters (`scenes.tsx` `CutsceneCast`):** all 19 cutscenes rendered as
+  empty rooms (only hotspot placed the player). Now the player stands bottom-left on every
+  backdropped cutscene (the `website` prop scene stays character-free) and the speaking NPC stands
+  right (current line's speaker if sprited, else the scene's primary sprited NPC, so no flicker).
+  Needed a new **Jonas sprite** (the recurring companion, 22 cutscene lines, was spriteless);
+  registered like the others. Composite-checked on all 5 cutscene backdrops; verified in-app the
+  player renders on the 1.1 arrivals cutscene. Listening/automat/form/loadout keep prop/device focus
+  (no person) by design.
+- **Still open before the demo:** founder tasks only — seed missions 1.1–1.3 on the exact demo
+  device (game progress is LOCAL-ONLY) + dress rehearsal of 1.4 and the boss after the merge is live
+  (hard-refresh, PWA autoUpdate).
+- **By-design, don't "fix":** missions light-only (hub theme-aware), Kapitel 2+ locked teaser, dark
+  surround below short scenes, no game cloud sync until the G2 migration.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · lint:content ✓ · test:unit 219/219 ✓ · build ✓ ·
+  bundle 80.7 kB ✓.
 
-_(Session 133's brand-kit-modernization full-ship handoff is now in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
+_(Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VIII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit

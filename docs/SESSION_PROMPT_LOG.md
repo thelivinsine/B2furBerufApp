@@ -1275,7 +1275,64 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · commits `2f1c7d4` / `1c48a33` /
   `df0c9bd` · PR #598 (squash `796fb01`)
 
-## Session 135 — 2026-07-20 — Landing-page redesign analysis + two previews
+## Session 135 — 2026-07-20 — Game demo-readiness review + P0 batch (Fable 5)
+
+- **Branch:** `claude/game-review-demo-readiness-8fdpid`
+- **Prompt 1 (verbatim):** `do a comprehensive review and analysis of the current game and provide priority actions and recommendations so that the game can also be presented in the demo this week.`
+- **Response 1:** Reviewed the Neuland layer end-to-end: re-ran gates (typecheck, test:unit 219,
+  lint:content), then a scripted Playwright playthrough (390x844) of the hub (light+dark), mission
+  1.1 incl. the battle + bag ask flow, the boss opening, and the Heute → Spielen embed — zero console
+  errors. Authored `docs/plans/GAME_DEMO_READINESS_REVIEW.md`: verdict "demo-ready with one must-fix
+  bug" (the Spielen compact tile opens scrolled to max, hiding the next mission; offsetParent bug in
+  `NeulandHub.tsx`), a Nachtblau asset-regen P1 (assets still carried pre-rebrand `#5b5be6`), founder
+  prep tasks, and a 3–4-minute game demo script. Started committing doc updates.
+- **Prompt 2 (verbatim):** `why are you editing the documentation.. you haven't yet delivered what I asked for`
+- **Response 2:** Fair correction; delivered the full review in chat (verdict, evidence, prioritized
+  P0/P1/P2, demo script, by-design caveats). Doc edits committed to the session branch only after the
+  stop-hook required it; no merge to `main`.
+- **Prompt 3 (verbatim):** `some of the game screenshots literally doesn't have a character sometimes.. why isn't that captured in the analysis?`
+- **Response 3:** Verified the founder was right and the review had misfiled it as "placeholder art
+  by design": `NPC_SPRITES` contained ONLY Frau Schmidt, so 4 of 5 dialogue battles ran against an
+  invisible opponent, and only the hotspot renderer places the player. Re-ranked the priorities:
+  battle-NPC sprites became P0.2, cutscene character placement P1.
+- **Prompt 4 (verbatim):** `which model you recommend for p0 and p1?`
+- **Response 4:** Sonnet 5 for the scroll fix, Fable 5 for the sprite design (character art in the
+  blessed style), Haiku-grade for the recolor riding along, Sonnet 5 for the cutscene pass; offered
+  to run the whole P0 batch in the current Fable session.
+- **Prompt 5 (verbatim):** `go ahead with the whole P0 batch in this session`
+- **Response 5:** Shipped the batch: (1) `NeulandHub.tsx` compact tile made `relative` (auto-center
+  fixed; verified fresh profile → 1.1–1.3, mid-chapter → 1.4 centered); (2) four new 26x32 battle-NPC
+  sprites authored in `welt_assets.py` (Grenzbeamte cap+badge, Milo lanyard, Kassiererin apron,
+  Herr Brandt balding+mustache), registered in `stage.tsx` `NPC_SPRITES` + `sprite:` fields in
+  `missions.ts` + the linter `GAME_SPRITES` mirror; (3) `INDIGO`→`(61,116,237)` Nachtblau, all assets
+  regenerated. Verified via sprite sheets, per-backdrop anchor composites, and a Playwright run
+  (Beamter renders in the 1.1 battle, zero errors). Gates: typecheck ✓, lint 0 errors ✓,
+  lint:content ✓, test:unit 219 ✓, build ✓, bundle 80.7 kB ✓. Updated the review doc with the
+  implementation record + the founder-caught finding, refreshed `PROJECT_STATUS.md`, logged here.
+- **Artifacts:** `docs/plans/GAME_DEMO_READINESS_REVIEW.md` · `src/features/welt/NeulandHub.tsx` ·
+  `preview/game-pixel-mockups/welt_assets.py` · `src/features/welt/assets/*` (4 new sprites + 6
+  recolored) · `src/features/welt/stage.tsx` · `src/data/missions.ts` · `scripts/lint-content.mjs` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
+  commit `46e22eb` + the P0-batch commit/PR
+- **Prompt 6 (verbatim):** `go ahead with p1 tasks` _(model switched to Opus 4.8 via /model for this turn)_
+- **Response 6 (Opus 4.8):** Shipped the P1 cutscene-character pass. Root gap: all 19 cutscenes
+  rendered empty rooms (only hotspot placed the player), and the dominant cutscene speaker Jonas
+  (22 lines) had no sprite. Authored a **Jonas sprite** in `welt_assets.py` (messy brown hair, rust
+  hoodie, denim; validated 26x32, distinct from the cast), registered in `stage.tsx` `NPC_SPRITES` +
+  `sprite:` on `npc_jonas` in `missions.ts` + the linter `GAME_SPRITES` mirror. Added `CutsceneCast`
+  to `scenes.tsx`: the player stands bottom-left on every backdropped cutscene (the `website` prop
+  scene stays character-free), the speaking NPC stands right (current line's speaker if sprited, else
+  the scene's primary sprited NPC via useMemo, so it doesn't flicker on narrator/player lines).
+  Placement composite-checked on all five cutscene backdrops; verified in-app that the player renders
+  on the 1.1 arrivals cutscene (zero console errors). Listening/automat/form/loadout deliberately keep
+  their prop/device focus (no person). Gates: typecheck ✓, lint 0 errors ✓, lint:content ✓,
+  test:unit 219 ✓, build ✓, bundle 80.7 kB ✓. Updated the review doc (P1 item + implementation
+  record), `PROJECT_STATUS.md`, and this log.
+- **Artifacts (P1):** `preview/game-pixel-mockups/welt_assets.py` (Jonas) ·
+  `src/features/welt/assets/jonas.png` (new) · `src/features/welt/stage.tsx` ·
+  `src/features/welt/scenes.tsx` (`CutsceneCast`) · `src/data/missions.ts` · `scripts/lint-content.mjs` ·
+  `docs/plans/GAME_DEMO_READINESS_REVIEW.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+## Session 136 — 2026-07-20 — Landing-page redesign (analysis → previews → ship)
 
 - **Branch:** `claude/landing-page-redesign-iqxlja`
 - **Prompt 1 (verbatim):** `> do an analysis of the landing page and improve it such that it provides the highest value to the learner and has highest conversion rate. The visuals and quality should resemble a billion dollar edutech app with excellent finesse which also includes creative elements, doodles, artistic elements and visual coherence wherever applicable. Go ahead and provide a couple of previews of the homepage for such highest standards. `
@@ -1333,7 +1390,7 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   reduced-motion-safe) in `src/index.css`; fixed a transform-override bug (CSS float animation vs
   Tailwind translate/rotate) found via rendered-output verification (pnpm preview + headless
   Chromium: light/dark, EN/DE, 390/1280, logged-in). Gates: typecheck ✓, lint 0 errors, build ✓,
-  test:unit 219/219, bundle 111 kB / 400 kB. Documented (PROJECT_STATUS s135 handoff; s133 handoff
+  test:unit 219/219, bundle 111 kB / 400 kB. Documented (PROJECT_STATUS s136 handoff; s133 handoff
   aged into the new W30 archive chunk; this log), opened a PR into main and squash-merged, then ran
   the post-merge realignment.
 - **Artifacts (implementation):** `src/features/landing/LandingPage.tsx` · `src/index.css` ·
