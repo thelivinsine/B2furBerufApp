@@ -423,3 +423,57 @@ input:-webkit-autofill {
   0% { opacity: 0.55; }
   100% { opacity: 0; }
 }
+
+/* ---------------------------------------------------------------- */
+/* Landing page (s135 redesign, "Der Textmarker"): the highlighter  */
+/* swipe device, scenario marquee, and hero-collage float. Scoped   */
+/* with a `landing-` prefix; used only by features/landing.         */
+/* The swiped word keeps ink-dark text in BOTH themes: the swipe    */
+/* ground is always light Himmelblau, like a real highlighter.      */
+.landing-swipe {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
+}
+.landing-swipe > i {
+  position: absolute;
+  left: -0.14em;
+  right: -0.12em;
+  top: 0.14em;
+  bottom: -0.02em;
+  background: hsl(var(--accent));
+  border-radius: 0.28em 0.5em 0.3em 0.55em;
+  transform: rotate(-1.6deg);
+}
+.landing-swipe > span {
+  position: relative;
+  color: #1c1a23;
+}
+.landing-swipe.landing-swipe-reward > i {
+  background: hsl(var(--reward-bg));
+}
+.landing-swipe.landing-swipe-reward > span {
+  color: inherit;
+}
+@keyframes landing-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-9px); }
+}
+.landing-float {
+  animation: landing-float 7s ease-in-out infinite;
+}
+@keyframes landing-scroll {
+  to { transform: translateX(-50%); }
+}
+.landing-marquee-track {
+  animation: landing-scroll 46s linear infinite;
+}
+.landing-marquee:hover .landing-marquee-track {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-float,
+  .landing-marquee-track {
+    animation: none;
+  }
+}

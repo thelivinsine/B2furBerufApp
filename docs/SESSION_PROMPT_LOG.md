@@ -1321,3 +1321,22 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   below 480px; nav drops the wordmark below 520px, matching the shipped app header) and
   verified zero horizontal overflow at 390px in both languages. Artifact republished at
   the same URL.
+- **Prompt 5 (verbatim):** `> looks good. the caption says "German for real life B1-B2" remove the B1-B2 there. implement the design, document the session and merge everything to main `
+- **Response 5:** Removed "· B1–B2" from the hero eyebrow (both languages; footer tagline kept).
+  Then implemented the approved Preview A as the real landing: `src/features/landing/LandingPage.tsx`
+  rebuilt from scratch (token-based colors so dark mode works; sticky nav with anchors +
+  About/Help/Sources + EN/DE LangToggle + auth-aware CTA; swiped hero + Wesen flashcard collage;
+  scenario marquee; PlateauChart; bento features; filter-rail mock + custom-Üben section; dark
+  numbers band; "Your smart companion." steps; the OAuth "What is Genauly?" purpose card preserved
+  bilingually; FAQ; closing CTA; footer), with all copy as inline `t(en, de)` pairs and logged-in
+  visitors getting "Go to app"/"Zur App". New `.landing-*` CSS (swipe/float/marquee,
+  reduced-motion-safe) in `src/index.css`; fixed a transform-override bug (CSS float animation vs
+  Tailwind translate/rotate) found via rendered-output verification (pnpm preview + headless
+  Chromium: light/dark, EN/DE, 390/1280, logged-in). Gates: typecheck ✓, lint 0 errors, build ✓,
+  test:unit 219/219, bundle 111 kB / 400 kB. Documented (PROJECT_STATUS s135 handoff; s133 handoff
+  aged into the new W30 archive chunk; this log), opened a PR into main and squash-merged, then ran
+  the post-merge realignment.
+- **Artifacts (implementation):** `src/features/landing/LandingPage.tsx` · `src/index.css` ·
+  `preview/landing-redesign/*` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`

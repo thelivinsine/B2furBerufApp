@@ -1,15 +1,18 @@
 # Project Status
 
-_Last updated: 2026-07-19 (session 134). **Theorie (Wörter) card + mobile-filter polish, shipped to
-`main` via PR #598.** Four founder-driven changes (details in the s134 handoff below): (1) the
-`FilterRail` mobile panel cap trimmed `max-h-[55dvh]`→`max-h-[45dvh]` (~3-4 fewer lines when open);
-(2) the vocab card's cross-module "Verbunden" dropdown parked behind a reversible
-`SHOW_RELATED = false` flag (`RelatedPanel` kept; founder wants to rethink it); (3) the Wörter Karten
-cards rearranged to "Option B" (quiet headline = gender creature + word / bookmark; example gets
-room; foot row = plural pill left + speak button right); (4) the noun gender-reveal effect
-(`ArtikelEffect`) now fires from the empty right side of the card back (`align="right"` → `--fx-x`),
-and the "die" bloom is snappier (`470ms` fast-out + tighter stagger). The s133 **brand rebrand is
-COMPLETE** (Kit 1 · Nachtblau & Himmelblau + Koralle, `docs/branding/BRAND_SPEC.md`).  **A s133 follow-up then shipped the in-app logo TILE-LESS** (transparent, no tile; the g adapts Tinte-on-light / Papier-on-dark via `src/components/shared/Logo.tsx`; app icons keep their tile), plus the consolidated **`brand-kit/`** folder generated from the app's own source. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-20 (session 135). **Landing page fully redesigned ("Der Textmarker"), shipped
+to `main`.** The founder picked Preview A from a two-preview round (`preview/landing-redesign/`,
+analysis in its README) and iterated four rounds; `LandingPage.tsx` was rebuilt from scratch: the
+brand highlighter swipe as the page-wide device (`.landing-*` CSS in `index.css`), a hero flashcard
+collage with the real Artikel-Wesen, a scenario marquee, a "Du bist hier" plateau chart, a bento
+feature grid, a dedicated **filter → custom Üben session** section (faceted-library selling point),
+honest content-count band, steps ("Your smart companion.", never a replacement-for-courses claim),
+the preserved OAuth "What is Genauly?" purpose block, FAQ, and a Nachtblau closing CTA. Copy is
+**English-first with German seasoning (~10-20%)** and the whole page switches EN/DE via a nav
+LangToggle (same bilingual pattern as /about and legal). Logged-in visitors get **"Go to app" / "Zur
+App"** CTAs (never "Dashboard"). The nav links About/Help/Sources; the in-nav logo is optically
+nudged (`-top-[2px]`) because the mark's artwork sits low in its canvas. Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -65,6 +68,39 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 135 (2026-07-20). Landing-page redesign, previews → full implementation,
+branch `claude/landing-page-redesign-iqxlja`, shipped to `main`.** The founder asked for a
+conversion-focused landing analysis + "billion-dollar edutech" previews, picked **Preview A "Der
+Textmarker"** (warm highlighter editorial; Preview B "Die Nachtstadt" remains unbuilt in
+`preview/landing-redesign/` as a future direction), then iterated: logo/wordmark optical alignment,
+real page links in the nav, a filter→custom-Üben section, English-first copy, an EN/DE page toggle,
+"Go to app" for logged-in visitors, and companion (not replacement) positioning.
+- **`src/features/landing/LandingPage.tsx` rebuilt** (full rewrite, token-based so dark mode works):
+  sticky nav (anchors + About/Help/Sources + LangToggle + auth-aware CTA) · hero (swiped "plateau."
+  headline, flashcard collage with `Wesen` creatures + floating streak/XP pills) · scenario marquee ·
+  plateau chart (`PlateauChart`, hand-drawn SVG with "Du bist hier") · bento features (session mock,
+  der/die/das cells, FSRS bars, speaking wave, exam badges) · **filter rail mock + "Filter what you
+  need. Practice exactly that."** · dark numbers band (honest counts + /sources link) · steps
+  ("Your smart companion.") · the OAuth-required "What is Genauly?" purpose card (kept, bilingual) ·
+  FAQ `details` · closing CTA · footer. All copy lives inline as `t(en, de)` pairs on a local `lang`
+  state (default EN); German is reserved for obvious/brand terms per the founder's 10-20% rule.
+- **New `.landing-*` CSS in `src/index.css`:** `landing-swipe` (the highlighter device; swiped text
+  stays ink `#1c1a23` in BOTH themes since the swipe ground is always light Himmelblau; a
+  `landing-swipe-reward` variant tints with `--reward-bg`), `landing-float`, `landing-marquee`
+  (+ reduced-motion opt-outs). **Gotcha fixed during verify:** a CSS `transform` animation overrides
+  Tailwind translate/rotate on the same element, so floated collage elements keep position/rotation
+  on an OUTER element and animate an inner wrapper.
+- **Rules recorded:** logged-in CTA label is "Go to app"/"Zur App" (never "Dashboard"); no
+  replacement-for-traditional-learning claims; hero eyebrow is "German for real life" (B1–B2
+  removed at founder request; the footer keeps the full tagline).
+- **Previews:** `preview/landing-redesign/` holds both mockups + README (analysis, revision log,
+  implementation spec). Preview A includes a working JS EN/DE toggle; it was published as a claude.ai
+  artifact for founder review across four feedback rounds.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · build ✓ · test:unit 219/219 ✓ · check:bundle 111 kB
+  (landing is eagerly routed; +~30 kB static JSX, well under the 400 kB budget) ✓. Verified rendered
+  output via `pnpm preview` + headless Chromium: light/dark, EN/DE, 390/1280, logged-in state.
+  **PWA caveat:** the landing is service-worker-cached; hard-refresh the live site before judging.
+
 **Handoff after session 134 (2026-07-19). Theorie (Wörter) card + mobile-filter polish. Branch
 `claude/filter-rail-mobile-height-n8ktd6`, shipped to `main` via PR #598 (squash `796fb01`).** A
 short founder-driven round on the Theorie Wörter tab and the mobile filter (ran on Opus 4.8):
@@ -92,99 +128,8 @@ short founder-driven round on the Theorie Wörter tab and the mobile filter (ran
 - **Gates:** typecheck clean, lint 0 errors, build green, `test:unit` 219/219. **PWA caveat:** the
   Wörter cards are a service-worker-cached surface; hard-refresh before judging the live result.
 
-**Handoff after session 133 (2026-07-19). Brand-kit modernization: plan authored AND fully shipped
-(all 4 PRs), branch `claude/brand-kit-modernization-igqlnm`, everything merged to `main`.** The
-founder asked to scope the brand-spec implementation with a robust plan + per-chunk model
-recommendations (logo locked, subtle deviations allowed elsewhere for a premium "top edutech"
-finish), then gave the go for each phase in turn ("go ahead with a" → "b and c" → "go ahead"). The
-finalized Kit 1 brand (Nachtblau & Himmelblau + Koralle, `docs/branding/BRAND_SPEC.md`) is now LIVE.
-Plan + implementation record: **`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`** (§2 = the full
-hardcoded-hex inventory; each PR section marked SHIPPED with its final values):
-- **Four-PR sequence (A → {B, C} → D):** **A** = atomic token flip (`src/index.css` per spec §1) +
-  the accent-role audit (`--accent-foreground` flips white→ink; Himmelblau banned as text on light
-  ground) + nav/route/graph chrome + theme-color/manifest/prerender meta (**Fable 5**); **B** = logo
-  outline (g→`<path>`, founder picks the weight from a candidate panel) + the full favicon/PWA/
-  og-image asset pipeline, zero deviation allowed (**Opus 4.8**); **C** = deep sweep of the Neuland
-  game chrome, Üben city map (locked palettes re-hued only), domain buildings, landing flatten,
-  der-vs-Nachtblau distinctness check (**Opus 4.8**, or Sonnet 5 + founder screenshots); **D** = the
-  real dark-mode design pass + typography/motion/reward polish + CLAUDE.md/DECISIONS.md language
-  sweep (**Fable 5**).
-- **Contrast findings verified by computation (s133):** white on Nachtblau `#3D74ED` = 4.27:1 and
-  Nachtblau on Papier = 3.96:1 (both under the 4.5:1 small-text AA floor → sanctioned darkening
-  option ≈ `#2E6BEB` at 4.75:1); Himmelblau on white = 1.94:1 (never text); white on Koralle =
-  3.26:1 (reward pairs with ink, 5.28:1). A zero-dep `scripts/check-contrast.mjs` gate
-  (`pnpm check:contrast`, wired into `validate.yml`) is specced in plan §5.
-- **Sanctioned-deviations register (plan §4)** pre-approves: primary darkening for AA, a new
-  `--accent-ink`, ink-on-Koralle reward pairing, gradient demotion (founder prefers flat), a der
-  token nudge, dual light/dark theme-color metas, and typography micro-polish. Risks in §6 include
-  the accent-foreground semantic flip, PWA stale cache, and the Google OAuth consent-logo re-upload
-  (founder action after PR B).
-- **PR A was then built and shipped in the same session** (founder: "go ahead with a"). Everything
-  in plan PR A landed: `src/index.css` light+dark token systems (final values in the BRAND_SPEC
-  status header; deviations: primary `221 83% 54%`, warning `38 92% 46%`, reward `11 82% 54%`, new
-  `--accent-ink`), `tailwind.config.ts` (accent.ink, gradient re-stopped primary→`hsl(198 88% 40%)`
-  so white text survives, mesh dialed to a whisper), the `text-accent`→`text-accent-ink` sweep
-  (7 files), `nav-items.ts`/`route-icons.tsx` BRAND→`#3D74ED`, `graphPalette.ts`
-  beruf/professional→Nachtblau, `index.html` dual light/dark theme-color metas + no-JS shell retint,
-  `vite.config.ts` manifest (`#3D74ED`/`#151320`), `prerender-help.mjs` shell, `src/main.tsx`
-  boot-error gradient, and the new **`scripts/check-contrast.mjs`** (`pnpm check:contrast`, wired
-  into `validate.yml`): 42/42 designed token pairings pass AA in both themes.
-- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219 ✓ · build ✓ · check:bundle 80.8 kB ✓ ·
-  check:contrast 42/42 ✓. Screenshots (light+dark × 390/1280) verified Praktisch, Theorie Karten +
-  Graph, Fortschritt, Landing: warm ground + white cards + Nachtblau reads clean everywhere.
-- **PR B (logo + icon pipeline) then shipped** (PR #594): new mark = lowercase **g** on the
-  Himmelblau highlighter swipe on a Papier tile; the g is OUTLINED from **Inter 800** (the app's own
-  UI typeface, picked from a 5-candidate panel) into a real `<path>` via opentype.js.
-  **`scripts/branding/build-logo-assets.mjs`** is the one source of truth: rasterizes every asset
-  from the mark with Playwright Chromium (no `sharp` dep) — default logo + favicon-16/32/48
-  (transparent corners), apple-touch/pwa-192/512 (full-bleed opaque), maskable (inner 80%), and a new
-  Papier og-image (mark + Inter-800 wordmark + tagline). Founder action item: re-upload the OAuth
-  consent full-bleed logo variant (not in repo).
-- **PR C (deep surface sweep) then shipped** (PR #595): Neuland game chrome `#5b5be6`→Nachtblau across
-  all four welt files (`GAME_INDIGO`→`GAME_BLUE`; leather-backpack art + `GAME_OUT` kept; victory loot
-  already Koralle via the PR A token); Üben map route/Bahnhof→Nachtblau + MAP_LIGHT scenery tints
-  hue-shifted 245→221 at identical (founder-locked) lightness + MAP_DARK route→`#8AB0F9`; Büro
-  building→Nachtblau; landing step-chips + closing CTA band flattened `bg-accent-gradient`→flat
-  `bg-primary` (hero CTAs + "plateau." headline keep the gradient); **der token deepened to a cooler
-  cobalt** (hue 226, light `226 74% 48%` / dark `226 88% 76%`) so a der Wesen never reads as the
-  Nachtblau brand. Verified in-mission battle chrome, Spielen hub, der/die/das marks, flattened CTA.
-- **Gates (B+C):** typecheck ✓ · lint 0 errors ✓ · test:unit 219 ✓ · build ✓ · check:bundle 80.8 kB ✓
-  · check:contrast 42/42 ✓.
-- **PR D (polish + docs sweep) then shipped** (PR #596): streak surfaces → Koralle (the header
-  streak pill off `warning` onto `bg-reward-bg`/`text-reward`, + the Fortschritt "Aktuelle Serie"
-  StatCard via a new `reward` accent in the accentMap); dark `--muted-foreground` 76%→72% (secondary
-  text reads secondary, still ~8:1); `tabular-nums` added to the StatCard value; CLAUDE.md
-  color-language sweep (0 stale "brand indigo"/"reward-gold" references; DECISIONS.md deliberately
-  left as the historical record). Buttons already had pressed states + display tracking, no change
-  needed. **The brand plan is COMPLETE (all 4 PRs).**
-- **Brand kit consolidated** (post-plan, founder ask "store all the brand kit items in a dedicated
-  repo… generate proper brand kit if any of them isn't available"; founder chose a folder in THIS
-  repo over a standalone repo, to keep one source of truth). New **`brand-kit/`** folder + generator
-  **`scripts/branding/build-brand-kit.mjs`**: logo mark/wordmark/lockups(H+stacked)/mono-knockout +
-  clear-space guide, `color/` palette.svg + `tokens.css`/`tokens.json` (parsed live from
-  `src/index.css`), `type/` Inter specimen, `icons/` (shipped raster set), `social/` og + square
-  avatar, `previews/` PNG contact sheets, and a `README.md` with usage rules. **Generated the missing
-  pieces** that a proper kit needs and we didn't have: the "Genauly" **wordmark** (outlined from Inter
-  800 glyph-by-glyph, kerned → `scripts/branding/wordmark-data.mjs`), all lockups, the mono knockout
-  mark, the palette/type sheets, and the square social avatar. Kit is ~592 kB, 27 files, generated (do
-  not hand-edit). CLAUDE.md Brand-logo section points at it.
-- **Logo reworked TILE-LESS** (founder: the logo should be just the letter + swipe, background always
-  transparent, no tile). The in-app logo is now `public/genauly-logo.png` (ink g) +
-  `genauly-logo-dark.png` (Papier g), transparent, swapped by theme via the new shared
-  `src/components/shared/Logo.tsx` (`.dark` class, no JS). All 7 in-app spots (`AppShell`/`Sidebar`/
-  `AuthDialog`/`LandingPage`/`Onboarding`/`LegalChrome`/`HelpChrome`) use `<Logo>` with no
-  tile/`rounded`/`shadow-glow`; the dark no-JS shells (`index.html`, `prerender-help.mjs`) hard-code
-  the dark logo. **App icons (favicon/PWA/apple-touch/maskable) keep their Papier tile** (browser/OS
-  masks turn transparency black). g shade on dark = Papier `#FAF6EC` (light/dark inversion of
-  ink-on-Papier). The old `genauly-default-logo-transparent-corners.png` was removed. Brand kit +
-  generators (`build-logo-assets.mjs`, `build-brand-kit.mjs`) + README updated to tile-less; an
-  interactive `brand-kit/previews/logo-preview.html` artifact was published. Verified the swap in the
-  header/landing/sign-in light+dark.
-- **Open founder items:** re-upload the Google OAuth consent-screen logo (full-bleed variant, not in
-  repo) from the new mark; verify the live site after deploy (hard-refresh first, the service worker
-  serves the old build until then).
-
-_(Session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
+_(Session 133's brand-kit-modernization full-ship handoff is now in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VIII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
 session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
