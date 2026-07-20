@@ -117,7 +117,7 @@ export function AuthDialog({
         onOpenAutoFocus={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <Logo className="mb-1 h-10 w-10" />
+          <Logo variant="wordmark" className="mb-1 h-8 w-auto self-start" />
           <DialogTitle>{isSignup ? "Konto erstellen" : "Anmelden"}</DialogTitle>
           <DialogDescription>
             {isSignup

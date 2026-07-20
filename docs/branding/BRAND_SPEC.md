@@ -74,9 +74,18 @@ as the proposal, every pairing gated by `pnpm check:contrast`):
 ## 3. Logo
 
 - Mark: `preview/branding/genauly-logo-final.svg`. Swipe path (in a 64×64 viewBox, rotated `-3° about
-  32,32`): `M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z`, fill Himmelblau `#52C6F9`.
-  The swipe bottom was extended (from `…L 54 40 L 13 44 Q 9 40 10 32 Z`) so it fully covers the closed
-  bowl of the **g**; the descender still pokes out naturally.
+  32,32`): `M 12 24 L 52 20 Q 57 23 55 30 L 54 45 L 13 49 Q 9 45 10 34 Z`, fill **Himmel Soft
+  `#8CDBFB`** (logo v2 rework 2026-07-20: the founder found the original Himmelblau `#52C6F9` too
+  harsh against black/white; the app's `--accent` token stays `#52C6F9`, only the logo swipe
+  lightened). The swipe bottom was extended (from `…L 54 40 L 13 44 Q 9 40 10 32 Z`) so it fully covers
+  the closed bowl of the **g**; the descender still pokes out naturally.
+- **Logo v2 rework additions (2026-07-20):** (1) icons center the mark by its TRUE bounding box
+  ("Randnah", 5% margin), fixing the empty band above the mark in the old app icon; (2) dark-ground
+  marks are TWO-TONE, ink where the artwork sits on the swipe, white where it falls off (only the g's
+  descender); (3) a lowercase **wordmark** "genauly" (Inter 800, −0.02em) with the swipe under
+  "genau" (band: −0.16em/+0.10em overhangs, 0.12em/0.10em em-box insets, −2° tilt) is the primary
+  logo where there is room (`public/genauly-wordmark.png` / `-dark.png`); the dark wordmark keeps
+  "enau" solid ink and "ly" white so ONLY the g is dual-tone.
 - **The g must be outlined to a `<path>` at implementation time** — the reference SVG uses a system-ui
   `<text>` element, which renders differently across platforms and would not be reproducible in the
   favicon / PWA icons. Outline it from a chosen weight (a heavy geometric-humanist sans; the reference

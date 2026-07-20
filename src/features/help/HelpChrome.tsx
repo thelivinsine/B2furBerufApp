@@ -39,8 +39,7 @@ export function HelpChrome({
 
       <header className="relative z-10 mx-auto flex max-w-3xl items-center justify-between px-4 py-5 sm:px-6">
         <button onClick={() => navigate("/welcome")} className="flex items-center gap-2.5 text-left">
-          <Logo className="h-9 w-9" />
-          <span className="text-lg font-semibold tracking-tight">Genauly</span>
+          <Logo variant="wordmark" className="h-8 w-auto" />
         </button>
         <Button variant="ghost" onClick={() => navigate("/hilfe")} className="gap-1.5">
           <ArrowLeft className="h-4 w-4" />

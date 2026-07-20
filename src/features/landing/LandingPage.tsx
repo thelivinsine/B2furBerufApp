@@ -424,12 +424,16 @@ export function LandingPage() {
       {/* ---- Nav ---- */}
       <nav className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 sm:px-6">
-          <div className="flex items-center gap-2.5">
-            {/* The mark's artwork sits low in its square canvas; the nudge centers it optically on the wordmark. */}
-            <span className="relative -top-[2px]">
+          <div className="flex items-center">
+            {/* Compact mark on phones, the full wordmark from sm up. The
+                responsive toggle lives on wrappers: display utilities passed
+                INTO <Logo> would fight its internal light/dark image swap. */}
+            <span className="sm:hidden">
               <Logo className="h-9 w-9" />
             </span>
-            <p className="hidden text-xl font-extrabold tracking-tight sm:block">Genauly</p>
+            <span className="hidden sm:block">
+              <Logo variant="wordmark" className="h-8 w-auto" />
+            </span>
           </div>
           <div className="hidden items-center gap-5 text-sm font-semibold text-muted-foreground lg:flex">
             {navLinks.map((l) =>
@@ -1024,11 +1028,8 @@ export function LandingPage() {
       {/* ---- Footer ---- */}
       <footer className="border-t border-border py-10 text-sm text-muted-foreground">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 px-4 sm:px-6">
-          <div className="flex items-center gap-2">
-            <span className="relative -top-[1px]">
-              <Logo className="h-7 w-7" />
-            </span>
-            <b className="text-base font-extrabold text-foreground">Genauly</b>
+          <div className="flex items-center">
+            <Logo variant="wordmark" className="h-6 w-auto" />
           </div>
           <nav className="flex flex-wrap gap-5">
             {footLinks.map((l) => (

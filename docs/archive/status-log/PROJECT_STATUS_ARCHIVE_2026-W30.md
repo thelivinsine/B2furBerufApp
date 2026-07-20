@@ -43,3 +43,40 @@ P1 cutscene pass in-session. Deliverables:
   surround below short scenes, no game cloud sync until the G2 migration.
 - **Gates:** typecheck ✓ · lint 0 errors ✓ · lint:content ✓ · test:unit 219/219 ✓ · build ✓ ·
   bundle 80.7 kB ✓.
+
+**Handoff after session 136 (2026-07-20). Landing-page redesign, previews → full implementation,
+branch `claude/landing-page-redesign-iqxlja`, shipped to `main`.** The founder asked for a
+conversion-focused landing analysis + "billion-dollar edutech" previews, picked **Preview A "Der
+Textmarker"** (warm highlighter editorial; Preview B "Die Nachtstadt" remains unbuilt in
+`preview/landing-redesign/` as a future direction), then iterated: logo/wordmark optical alignment,
+real page links in the nav, a filter→custom-Üben section, English-first copy, an EN/DE page toggle,
+"Go to app" for logged-in visitors, and companion (not replacement) positioning.
+- **`src/features/landing/LandingPage.tsx` rebuilt** (full rewrite, token-based so dark mode works):
+  sticky nav (anchors + About/Help/Sources + LangToggle + auth-aware CTA) · hero (swiped "plateau."
+  headline, flashcard collage with `Wesen` creatures + floating streak/XP pills) · scenario marquee ·
+  plateau chart (`PlateauChart`, hand-drawn SVG with "Du bist hier") · bento features (session mock,
+  der/die/das cells, FSRS bars, speaking wave, exam badges) · **filter rail mock + "Filter what you
+  need. Practice exactly that."** · dark numbers band (honest counts + /sources link) · steps
+  ("Your smart companion.") · the OAuth-required "What is Genauly?" purpose card (kept, bilingual) ·
+  FAQ `details` · closing CTA · footer. All copy lives inline as `t(en, de)` pairs on a local `lang`
+  state (default EN); German is reserved for obvious/brand terms per the founder's 10-20% rule.
+- **New `.landing-*` CSS in `src/index.css`:** `landing-swipe` (the highlighter device; swiped text
+  stays ink `#1c1a23` in BOTH themes since the swipe ground is always light Himmelblau; a
+  `landing-swipe-reward` variant tints with `--reward-bg`) and `landing-marquee` (+ reduced-motion
+  opt-out). **The hero collage float is framer-motion, NOT CSS** (the `float()` helper in
+  `LandingPage.tsx`): a CSS-keyframe version shipped first but did not run on the founder's iPhone,
+  and a CSS `transform` animation also overrides Tailwind translate/rotate on the same element, so
+  the float animates an INNER wrapper via framer while the outer element keeps position/rotation.
+  The closing card's white CTA carries **no shadow** (rendered as a heavy halo on device); the other
+  CTAs keep `shadow-glow` (founder-specified). The published preview artifact is stored at
+  `preview/landing-redesign/landing-a-artifact.html`.
+- **Rules recorded:** logged-in CTA label is "Go to app"/"Zur App" (never "Dashboard"); no
+  replacement-for-traditional-learning claims; hero eyebrow is "German for real life" (B1–B2
+  removed at founder request; the footer keeps the full tagline).
+- **Previews:** `preview/landing-redesign/` holds both mockups + README (analysis, revision log,
+  implementation spec). Preview A includes a working JS EN/DE toggle; it was published as a claude.ai
+  artifact for founder review across four feedback rounds.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · build ✓ · test:unit 219/219 ✓ · check:bundle 111 kB
+  (landing is eagerly routed; +~30 kB static JSX, well under the 400 kB budget) ✓. Verified rendered
+  output via `pnpm preview` + headless Chromium: light/dark, EN/DE, 390/1280, logged-in state.
+  **PWA caveat:** the landing is service-worker-cached; hard-refresh the live site before judging.

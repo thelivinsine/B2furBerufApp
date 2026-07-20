@@ -74,9 +74,8 @@ export function Onboarding() {
         transition={{ duration: 0.5 }}
         className="relative w-full max-w-lg"
       >
-        <div className="mb-6 flex items-center justify-center gap-2.5">
-          <Logo className="h-10 w-10" />
-          <span className="text-lg font-semibold tracking-tight">Genauly</span>
+        <div className="mb-6 flex items-center justify-center">
+          <Logo variant="wordmark" className="h-9 w-auto" />
         </div>
 
         <Card className="space-y-6 p-6 shadow-elevated">
