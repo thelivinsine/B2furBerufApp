@@ -455,13 +455,6 @@ input:-webkit-autofill {
 .landing-swipe.landing-swipe-reward > span {
   color: inherit;
 }
-@keyframes landing-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-9px); }
-}
-.landing-float {
-  animation: landing-float 7s ease-in-out infinite;
-}
 @keyframes landing-scroll {
   to { transform: translateX(-50%); }
 }
@@ -472,7 +465,6 @@ input:-webkit-autofill {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {
-  .landing-float,
   .landing-marquee-track {
     animation: none;
   }

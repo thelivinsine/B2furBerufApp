@@ -1397,3 +1397,14 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   `preview/landing-redesign/*` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 6 (verbatim):** `> [2 live-site screenshots] this looks different from the artifact. Make the button normal without the glow. Also, for the example card - Bewerbung, the card doesn't float as shown in the preview artifact - fix it. Save the artifact also to the repo. ` _(mid-turn follow-up: `> don't edit all the buttons' glow. Only the blue card's white button has too much glow which needs fixing.`)_
+- **Response 6:** Removed the shadow from ONLY the closing blue card's white CTA (the halo the
+  founder flagged); per the mid-turn correction the nav/hero/Üben-mock buttons keep their original
+  `shadow-glow`. The hero "Bewerbung" collage float was converted from the CSS keyframe (present in
+  the built CSS but not running on the founder's iPhone) to framer-motion (`float()` helper,
+  `y: [0,-9,0]`, 7s loop, staggered delays), the same animation engine the rest of the app
+  demonstrably runs on that device; the dead `.landing-float` CSS was removed. The published
+  artifact's single-file copy was saved to the repo as
+  `preview/landing-redesign/landing-a-artifact.html`. Verified in the production build (float
+  transform sampled moving; closing-button screenshot halo-free). Gates: typecheck ✓, lint 0
+  errors, build ✓, test:unit 219/219, bundle 110.8 kB. Squash-merged to main.
