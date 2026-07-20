@@ -38,13 +38,13 @@ const VARIANTS = [
   },
   {
     name: "Enger",
-    tag: "Empfehlung",
+    tag: "Alternative",
     sub: "Sog .55 · Link .30 · Abstoßung −44 · Kollision r+2 · Ring 128+N·30",
     pull: 0.55, link: 0.3, charge: -44, chargeMax: 220, collide: 2, ringBase: 128, ringPer: 30,
   },
   {
     name: "Am engsten",
-    tag: "sehr kompakt",
+    tag: "angewendet",
     sub: "Sog .72 · Link .38 · Abstoßung −34 · Kollision r+1.5 · Ring 118+N·26",
     pull: 0.72, link: 0.38, charge: -34, chargeMax: 200, collide: 1.5, ringBase: 118, ringPer: 26,
   },
@@ -167,7 +167,7 @@ async function main() {
     const cards = panels
       .map(
         ({ v, svg }) => `
-      <figure class="card${v.tag === "Empfehlung" ? " pick" : ""}">
+      <figure class="card${v.tag === "angewendet" ? " pick" : ""}">
         <figcaption>
           <div class="hd"><b>${v.name}</b><span class="tag">${v.tag}</span></div>
           <div class="sub mono">${v.sub}</div>
@@ -219,7 +219,7 @@ async function main() {
   </div>
   <div class="grid">${cards}</div>
   <p class="note">
-    <b>Empfehlung: „Enger".</b> Deutlich kompaktere Inseln, aber die Themen bleiben klar getrennt und die Brücken-Verben (machen/treffen) sitzen noch sichtbar dazwischen. „Am engsten" packt die Knoten sehr dicht — schön aufgeräumt, aber einzelne Verbindungen sind zoomt man nicht rein schwerer zu erkennen. Sag mir welche, dann setze ich genau diese Werte in <span class="mono">CollocationGraph.tsx</span> ein.
+    <b>Angewendet: „Am engsten".</b> Sehr kompakte, aufgeräumte Themen-Inseln (vom Gründer gewählt, 2026-07-20). Die Werte stehen jetzt im Kraft-Block von <span class="mono">CollocationGraph.tsx</span>. „Enger" bleibt als dokumentierte Alternative erhalten, falls die dichte Anordnung einzelne Verbindungen zu schwer lesbar macht.
   </p>
 </div>
 </body></html>`;

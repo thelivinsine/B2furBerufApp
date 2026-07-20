@@ -287,10 +287,12 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   the Wörter graph, founder 2026-07-19); nodes are pulled to per-**topic** centroids
   to form glowing **islands**, tuned to look striking fully zoomed out (fit-to-all on open, cached
   radial glow sprites, curved gradient-tinted edges, vignette background, nouns = solid discs / verbs =
-  rings). **Layout is the founder-picked "by topic + tighter" recipe (s132, 2026-07-19):** per-topic
-  centroids on a wide ring (`140 + N*35`), firm centroid pull (forceX/Y `0.38`), high link tension
-  (`0.22`), tight collision (`r+3`), so each topic contracts into a compact island rather than one
-  central tangle (link/pull tightened in a s132 follow-up when the founder asked for tighter clusters).
+  rings). **Layout is the founder-picked "Am engsten" recipe (2026-07-20, supersedes the s132 "by
+  topic + tighter" numbers):** per-topic centroids on a ring (`118 + N*26`), strong centroid pull
+  (forceX/Y `0.72`), high link tension (`0.38`), weak short-range repulsion (`-34`, distanceMax `200`),
+  tight collision (`r+1.5`), so each topic contracts into a very compact island rather than one central
+  tangle. Chosen from `preview/collocation-graph-tightness.html` (generator
+  `preview/gen-collocation-graph-tightness.mjs` renders the real bank at three tightness settings).
   The palette is shared via `lib/graphPalette.ts`; the selected-node card is bipartite
   (tap a noun → its verbs, tap a verb → its nouns) and has a **shape toggle beside its close button**
   (s118): the card is either a full-width bar along the bottom (`horizontal`, default) or a full-height
