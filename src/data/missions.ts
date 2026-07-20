@@ -65,6 +65,7 @@ export const gameNpcs: GameNpc[] = [
     id: "npc_beamter",
     name: "Der Grenzbeamte",
     role: { de: "Beamter an der Passkontrolle", en: "Officer at passport control" },
+    sprite: "beamter",
   },
   {
     id: "npc_automat",
@@ -75,16 +76,19 @@ export const gameNpcs: GameNpc[] = [
     id: "npc_milo",
     name: "Milo",
     role: { de: "Verkäufer im Handyladen", en: "Salesman at the phone shop" },
+    sprite: "milo",
   },
   {
     id: "npc_kassiererin",
     name: "Die Kassiererin",
     role: { de: "Kassiererin im Supermarkt", en: "Cashier at the supermarket" },
+    sprite: "kassiererin",
   },
   {
     id: "npc_herr_brandt",
     name: "Herr Brandt",
     role: { de: "Dein erster Vermieter", en: "Your first landlord" },
+    sprite: "brandt",
   },
 ];
 

@@ -104,7 +104,7 @@ const SCENE_SETTINGS = ["website", "wohnung", "strasse", "wartezimmer", "amt", "
 const BATTLE_EFFECTS = ["beamtendeutsch", "missverstaendnis", "smalltalk"];
 // Sprite keys with real art in src/features/welt/stage.tsx NPC_SPRITES; an
 // npc.sprite outside this list silently renders nothing, so keep in sync.
-const GAME_SPRITES = ["schmidt"];
+const GAME_SPRITES = ["schmidt", "beamter", "milo", "kassiererin", "brandt"];
 
 /* ---- diagnostics collection ---- */
 const errors = [];

@@ -1,10 +1,10 @@
 # Project Status
 
-_Last updated: 2026-07-20 (session 135). **Game demo-readiness review authored (no app code
-changed):** the Neuland game layer was reviewed end-to-end for this week's demo — all gates green,
-zero-console-error scripted playthrough, verdict "demo-ready with ONE must-fix bug" (the Heute →
-Spielen compact tile opens scrolled to the wrong rows) plus a Nachtblau asset-regeneration polish
-item and a 3–4-minute game demo script. Full findings + prioritized actions:
+_Last updated: 2026-07-20 (session 135). **Game demo-readiness review + P0 batch shipped:** the
+Neuland game layer was reviewed end-to-end for this week's demo (zero-console-error scripted
+playthrough), then the founder greenlit the P0 batch in-session: the Heute → Spielen tile
+auto-center fix, four new battle-NPC sprites (every dialogue battle now has a visible opponent,
+a founder-caught gap), and the Nachtblau regeneration of all pixel assets. Review + record:
 **`docs/plans/GAME_DEMO_READINESS_REVIEW.md`** (details in the s135 handoff below). The s133
 **brand rebrand is COMPLETE** (Kit 1 · Nachtblau & Himmelblau + Koralle,
 `docs/branding/BRAND_SPEC.md`), incl. the tile-less in-app logo + the generated `brand-kit/`
@@ -64,32 +64,38 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 135 (2026-07-20). Game demo-readiness review for this week's demo. Branch
-`claude/game-review-demo-readiness-8fdpid`, doc-only.** The founder asked for a comprehensive review
-of the current game (Neuland, G1 + G2 Kapitel 1) with priority actions so the game can be presented
-in this week's demo. Deliverable: **`docs/plans/GAME_DEMO_READINESS_REVIEW.md`** (verdict, evidence,
-prioritized P0/P1/P2 actions, and a suggested 3–4-minute game demo script). Key facts for the next
-session:
+**Handoff after session 135 (2026-07-20). Game demo-readiness review + the P0 batch SHIPPED. Branch
+`claude/game-review-demo-readiness-8fdpid`.** The founder asked for a comprehensive review of the
+current game (Neuland, G1 + G2 Kapitel 1) with priority actions so the game can be presented in this
+week's demo, then greenlit the whole P0 batch in-session. Deliverables:
+**`docs/plans/GAME_DEMO_READINESS_REVIEW.md`** (verdict, evidence, prioritized actions, a
+3–4-minute game demo script, and the implementation record) plus the shipped fixes below. Key facts:
 - **Evidence gathered:** `pnpm typecheck` ✓ · `test:unit` 219/219 ✓ · `lint:content` ✓, plus a
   scripted Playwright playthrough (mobile 390x844, dev build, fresh profile): hub light+dark, mission
   1.1 scenes + battle + bag ask flow (Reisepass hand-over, Wörterbuch), boss 1.6 reachable ungated,
   Heute → Spielen embed. **Zero console errors.**
-- **P0 (the one demo blocker):** the Heute → Spielen compact 3-row mission tile opens scrolled to the
-  BOTTOM (shows 1.4–1.6, hides the next mission + its play button). Root cause in
-  `src/features/welt/NeulandHub.tsx`: the auto-center uses `r.offsetTop`, but the compact scroll
-  container is not positioned, so `offsetTop` (measured 615px) is document-relative and the tile
-  slams to max scroll (182/182 measured). Fix: make the container `relative` or compute
-  `r.offsetTop - c.offsetTop`; re-verify fresh + mid-chapter profiles.
-- **P1:** regenerate the pixel assets in Nachtblau — `preview/game-pixel-mockups/welt_assets.py`
-  still has `INDIGO = (91, 91, 230)` (`#5b5be6`); the s133 PR C swept only the TSX chrome, so
-  backdrop signs/awnings, the player sprite, doc icons and the Wörterbuch sprite carry pre-rebrand
-  indigo next to Nachtblau buttons. Change to `(61, 116, 237)`, rerun (needs Python + PIL), assets
-  land in `src/features/welt/assets/`. Plus founder tasks: seed missions 1.1–1.3 on the demo device
-  (game progress is LOCAL-ONLY, seed the exact presenting device) and a dress rehearsal of 1.4 + the
-  boss after merges are live (hard-refresh first, PWA autoUpdate).
+- **P0.1 SHIPPED — Spielen-tile auto-center fix (`NeulandHub.tsx`):** the compact 3-row mission tile
+  opened scrolled to max (hid the next mission + its play button) because the tile was not
+  positioned, so the auto-center's `r.offsetTop` was document-relative. The tile is now `relative`
+  (it becomes the rows' offsetParent). Verified scripted: fresh profile shows 1.1–1.3 (scrollTop 0),
+  mid-chapter centers 1.4.
+- **P0.2 SHIPPED — battle opponents have bodies (founder-caught; the review's first pass missed
+  it):** `NPC_SPRITES` had only Frau Schmidt, so 4 of 5 dialogue battles ran against an invisible
+  opponent. Four new code-authored 26x32 sprites in `welt_assets.py` (Grenzbeamte peaked cap+badge,
+  Milo lanyard, Kassiererin apron, Herr Brandt balding+mustache+cardigan; blessed style, locked
+  world scale), wired via `stage.tsx` `NPC_SPRITES`, `sprite:` on the 4 battle NPCs in
+  `missions.ts`, and the linter's `GAME_SPRITES` mirror (`lint-content.mjs`, it errors on
+  unregistered sprites). Shared battle anchor composite-checked on all four backdrops.
+- **P1 art SHIPPED — Nachtblau asset regen:** `welt_assets.py` `INDIGO` `(91,91,230)`→`(61,116,237)`
+  (`#3D74ED`), all assets regenerated (player backpack, backdrop accents, doc + Wörterbuch icons).
+- **Still open before the demo:** founder tasks — seed missions 1.1–1.3 on the exact demo device
+  (game progress is LOCAL-ONLY) + dress rehearsal of 1.4 and the boss after the merge is live
+  (hard-refresh, PWA autoUpdate). Optional P1: place the player/NPC sprites on cutscene stages
+  (19 scenes, founder-reviewed look change; sprites now exist).
 - **By-design, don't "fix":** missions light-only (hub theme-aware), Kapitel 2+ locked teaser, dark
   surround below short scenes, no game cloud sync until the G2 migration.
-- **No code changed this session** (review only, per the ask). P0 + P1 fit one short session.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · lint:content ✓ · test:unit 219/219 ✓ · build ✓ ·
+  bundle 80.7 kB ✓.
 
 **Handoff after session 134 (2026-07-19). Theorie (Wörter) card + mobile-filter polish. Branch
 `claude/filter-rail-mobile-height-n8ktd6`, shipped to `main` via PR #598 (squash `796fb01`).** A

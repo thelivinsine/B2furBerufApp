@@ -129,7 +129,10 @@ export function NeulandHub({
               ref={compact ? scrollRef : undefined}
               className={cn(
                 "rounded-2xl border border-border bg-surface px-4 shadow-soft",
-                compact && "no-scrollbar overflow-y-auto overscroll-contain",
+                // relative makes this tile the rows' offsetParent, so the
+                // auto-center's row.offsetTop is measured against the tile,
+                // not the page (without it the tile opens at max scroll)
+                compact && "no-scrollbar relative overflow-y-auto overscroll-contain",
               )}
               style={compact ? { height: COMPACT_LIST_H } : undefined}
             >

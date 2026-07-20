@@ -51,34 +51,49 @@ rehearsal). Nothing structural is needed this week.
 
 ## Priority actions
 
-### P0 — must fix before the demo (small, low-risk)
+### P0 — must fix before the demo (small, low-risk) — **BOTH FIXED s135** ✅
 
-1. **Heute → Spielen compact tile opens scrolled to the WRONG rows.** Reproduced and measured:
-   on a fresh profile the 3-row mission checklist opens showing 1.4–1.6 with the next-mission
-   row (1.1) and its play button scrolled out of view (`scrollTop` lands at the max, 182/182).
-   Root cause in `NeulandHub.tsx`: the auto-center math uses `r.offsetTop`, but the scroll tile
-   is not a positioned ancestor, so `offsetTop` (measured 615px, against the page) is relative
-   to the document, not the tile, and the tile always slams to the bottom. Fix is one line:
-   make the compact scroll container `relative` (or compute `r.offsetTop - c.offsetTop`), then
-   re-verify with a fresh profile AND a mid-chapter profile. This is the first game surface the
-   audience sees on the dashboard, so it is the one real demo blocker. _(Model: Sonnet 5.)_
+1. **Heute → Spielen compact tile opens scrolled to the WRONG rows — FIXED s135.** Reproduced
+   and measured: on a fresh profile the 3-row mission checklist opened showing 1.4–1.6 with the
+   next-mission row (1.1) and its play button scrolled out of view (`scrollTop` landed at the
+   max, 182/182). Root cause in `NeulandHub.tsx`: the auto-center math uses `r.offsetTop`, but
+   the scroll tile was not a positioned ancestor, so `offsetTop` (measured 615px, against the
+   page) was document-relative and the tile always slammed to the bottom. Fix: the compact
+   scroll container is now `relative`, making it the rows' offsetParent. Verified scripted:
+   fresh profile shows 1.1–1.3 (`scrollTop` 0), mid-chapter profile centers 1.4.
+2. **Battles fought against invisible opponents — FIXED s135** _(founder-caught: the first
+   review pass misfiled the sparse stages as "placeholder art, by design"; an invisible battle
+   opponent violates the game's own "feels like a game" bar and the s82 precedent that blank
+   stages read as missing art)._ `NPC_SPRITES` contained exactly ONE character (Frau Schmidt),
+   so 4 of the 5 dialogue battles showed a name plate + Geduld bar over an empty backdrop, and
+   only the hotspot scene ever placed the player. Fix: four new code-authored 26x32 front
+   sprites in `welt_assets.py` in the blessed style + world scale (Grenzbeamte with peaked cap
+   + badge, Milo with lanyard, Kassiererin with Supermarkt apron, Herr Brandt balding with
+   mustache + cardigan), registered in `NPC_SPRITES` (`stage.tsx`), `sprite:` set on the four
+   battle NPCs (`missions.ts`), and the linter's `GAME_SPRITES` mirror extended. The shared
+   battle anchor (65.5%/23%) was composite-checked against all four battle backdrops: every
+   NPC lands behind their counter/desk. Every dialogue battle now has a visible opponent.
 
 ### P1 — high value this week, still low-risk
 
-2. **Regenerate the pixel placeholder assets in Nachtblau.** The s133 rebrand (PR #595) swept
-   the game's TSX chrome to `#3D74ED`, but the code-authored PNG assets were never regenerated:
-   `preview/game-pixel-mockups/welt_assets.py` still has `INDIGO = (91, 91, 230)` (`#5b5be6`),
-   so backdrop signs/awnings, the player sprite's backpack, the doc icons and the Wörterbuch
-   sprite carry the OLD indigo next to Nachtblau buttons. Visible in the chapter hero and in
-   every mission. Change the constant to `(61, 116, 237)`, rerun the script (writes
-   `src/features/welt/assets/`), eyeball the hero + one mission. _(Model: Haiku 4.5/Sonnet 5;
-   needs local Python + PIL.)_
-3. **Seed the demo device the evening before.** Play missions 1.1–1.3 by hand on the demo
+2. **Regenerate the pixel placeholder assets in Nachtblau — DONE s135** (rode along with the
+   sprite work). The s133 rebrand (PR #595) swept the game's TSX chrome to `#3D74ED`, but the
+   code-authored PNG assets were never regenerated: `welt_assets.py` still had
+   `INDIGO = (91, 91, 230)` (`#5b5be6`), so backdrop signs/awnings, the player sprite's
+   backpack, the doc icons and the Wörterbuch sprite carried the OLD indigo next to Nachtblau
+   buttons. The constant is now `(61, 116, 237)` and every asset is regenerated.
+3. **Cutscene stages have no characters (STILL OPEN, the remaining art gap).** Only the
+   hotspot renderer places the player; cutscenes/listening/automat/form/loadout stages render
+   uninhabited rooms. With the battle sprites now existing, the cheap next step is placing the
+   player (and the speaking NPC where registered) on cutscene stages via the existing
+   `StageSprite` — but it touches the look of 19 scenes, so it is a founder-reviewed change,
+   not a night-before-the-demo one. _(Model: Sonnet 5, founder eyeballs screenshots.)_
+4. **Seed the demo device the evening before.** Play missions 1.1–1.3 by hand on the demo
    profile so the hub reads lived-in (3/6, checkmarks + replay buttons, streak alive) and the
    live demo can start at 1.4 (hotspot + automat + battle variety) instead of the text-heavy
    1.1 opening. Remember game progress is LOCAL-ONLY: seed on the exact device/profile you
    will present from, and do not switch devices for the game segment. _(Founder task.)_
-4. **Dress rehearsal on the founder's phone, after the P0/P1 merges are live.** Hard-refresh
+5. **Dress rehearsal on the founder's phone, after the P0/P1 merges are live.** Hard-refresh
    first (PWA `autoUpdate` serves the old build for one load). Play 1.4 and the boss 1.6
    end-to-end once, including one deliberate wrong answer (to show the retry scaffolding) and
    one Wörterbuch use. My sweep exercised mechanics but did not complete every mission on a
@@ -110,8 +125,13 @@ rehearsal). Nothing structural is needed this week.
 6. **Say the integration line:** "Everything you answer in the game feeds the same memory model
    as the practice sessions — one progression, two ways to learn."
 
-## What was deliberately not done in this review
+## Implementation record (same session, founder-approved "whole P0 batch")
 
-No code was changed (the ask was review + recommendations). The P0 fix, the asset regeneration,
-and the doc updates that ship them belong to the implementing session; everything above is
-scoped so P0+P1 fit comfortably in one short session before the demo.
+Shipped in s135 after the founder greenlit the batch: the scroll fix (`NeulandHub.tsx`), the
+four battle-NPC sprites + Nachtblau asset regeneration (`welt_assets.py` →
+`src/features/welt/assets/`, wiring in `stage.tsx` + `missions.ts` + `lint-content.mjs`
+`GAME_SPRITES`). Verified: scripted Playwright checks for both scroll cases + the Beamter
+rendering in the 1.1 battle (zero console errors), PIL composites of every battle backdrop ×
+NPC at the shared anchor, and the full gate set (typecheck · lint 0 errors · lint:content ·
+test:unit 219 · build · bundle 80.7 kB). Remaining before the demo: the founder tasks (seed +
+dress rehearsal) and optionally the P1 cutscene-character pass.
