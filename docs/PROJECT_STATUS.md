@@ -101,10 +101,11 @@ real page links in the nav, a filter→custom-Üben section, English-first copy,
   output via `pnpm preview` + headless Chromium: light/dark, EN/DE, 390/1280, logged-in state.
   **PWA caveat:** the landing is service-worker-cached; hard-refresh the live site before judging.
 
-**Handoff after session 135 (2026-07-20). Game demo-readiness review + the P0 batch SHIPPED. Branch
-`claude/game-review-demo-readiness-8fdpid`.** The founder asked for a comprehensive review of the
-current game (Neuland, G1 + G2 Kapitel 1) with priority actions so the game can be presented in this
-week's demo, then greenlit the whole P0 batch in-session. Deliverables:
+**Handoff after session 135 (2026-07-20). Game demo-readiness review + P0 batch + P1 cutscene pass
+SHIPPED (PRs #601, #602 merged to `main`). Branch `claude/game-review-demo-readiness-8fdpid`.** The
+founder asked for a comprehensive review of the current game (Neuland, G1 + G2 Kapitel 1) with
+priority actions so the game can be presented in this week's demo, then greenlit the P0 batch and the
+P1 cutscene pass in-session. Deliverables:
 **`docs/plans/GAME_DEMO_READINESS_REVIEW.md`** (verdict, evidence, prioritized actions, a
 3–4-minute game demo script, and the implementation record) plus the shipped fixes below. Key facts:
 - **Evidence gathered:** `pnpm typecheck` ✓ · `test:unit` 219/219 ✓ · `lint:content` ✓, plus a

@@ -146,7 +146,17 @@ list. Full rationale + per-task model map in the plan's G2 status block.
   live in the `SceneSetting` enum (`website`/`wohnung`/`strasse`/`wartezimmer`/`amt`/`terminal`/
   `laden`); every setting except `website` (which renders its own browser chrome) now has a
   code-authored placeholder backdrop from `preview/game-pixel-mockups/welt_assets.py` (s82 added
-  `terminal`/`laden`), licensed pixel art still the eventual G2 upgrade. **Missions are data,
+  `terminal`/`laden`), licensed pixel art still the eventual G2 upgrade. **Every scene shows people
+  (s135, founder-caught: empty stages read as broken/missing art).** Character sprites are
+  code-authored in `welt_assets.py` (26x32 front NPCs at the locked world scale, the 16-wide player
+  back sprite), written to `src/features/welt/assets/`, keyed in `stage.tsx` `NPC_SPRITES` and
+  mirrored by the linter's `GAME_SPRITES` (it ERRORS on a `GameNpc.sprite` with no registered art).
+  Every dialogue-battle opponent AND the recurring companion Jonas have a `sprite:`; a new NPC must
+  ship one. `BattleView` stages opponent-top/player-bottom, and `scenes.tsx` `CutsceneCast` stands
+  the player bottom-left on every backdropped cutscene (the `website` prop scene stays
+  character-free) plus the speaking NPC (current line's speaker if sprited, else the scene's primary
+  sprited NPC). Listening/automat/form/loadout deliberately keep prop/device focus (no person).
+  **Missions are data,
   not code:** `src/data/missions.ts` (bank + `chapters`/
   `gameNpcs`/`keyItems` registries) is interpreted by the pure runner `src/engine/mission.ts`
   (immutable transitions emit effects; `MissionPlayer` applies them to the real stores, so the

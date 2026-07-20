@@ -1332,6 +1332,18 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
   `src/features/welt/assets/jonas.png` (new) · `src/features/welt/stage.tsx` ·
   `src/features/welt/scenes.tsx` (`CutsceneCast`) · `src/data/missions.ts` · `scripts/lint-content.mjs` ·
   `docs/plans/GAME_DEMO_READINESS_REVIEW.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 7 (verbatim):** `document the session`
+- **Response 7 (Opus 4.8):** Session close-out. Most doc updates already landed inline during the P0
+  and P1 work; this pass verified and completed them: confirmed the s135 `PROJECT_STATUS.md` handoff
+  reflects both the P0 batch and the P1 cutscene pass (P0.1 scroll fix, P0.2 battle-NPC sprites, P1
+  Nachtblau regen, P1 cutscene `CutsceneCast` + Jonas), refreshed the `_Last updated_` header, added
+  a **game-layer sprite/cutscene convention note to `CLAUDE.md`** (every scene shows people;
+  `NPC_SPRITES` is linter-mirrored by `GAME_SPRITES`; new NPCs must ship a sprite; `CutsceneCast`
+  placement rules) so a future session doesn't regress it, and logged prompts 6–7 here. No app code
+  changed in this turn.
+- **Artifacts (doc pass):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  `docs/plans/GAME_DEMO_READINESS_REVIEW.md`
+
 ## Session 136 — 2026-07-20 — Landing-page redesign (analysis → previews → ship)
 
 - **Branch:** `claude/landing-page-redesign-iqxlja`
