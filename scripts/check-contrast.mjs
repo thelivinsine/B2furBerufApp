@@ -77,6 +77,11 @@ const PAIRS = [
   ["reward", "surface", UI], // text-reward chips
   ["reward", "reward-bg", UI], // streak / combo pill
   ["ring", "background", UI], // focus ring visibility
+  // Accent-gradient stops (s137): gradient CTAs carry primary-foreground text.
+  // The deep start stop must clear small-text AA; the vivid end stop clears
+  // the UI floor (bold button labels), the same bar the s133 gradient set.
+  ["primary-foreground", "gradient-from", CORE],
+  ["primary-foreground", "gradient-to", UI],
 ];
 
 let failures = 0;

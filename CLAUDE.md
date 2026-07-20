@@ -180,7 +180,7 @@ list. Full rationale + per-task model map in the plan's G2 status block.
   Heute → Spielen hub (`features/welt/NeulandHub`, also `/welt`) is a **centered header hoisted OUTSIDE
   the chapter loop** (keep it there: inside the loop it duplicates the
   H1 the moment Kapitel 2 is authored). "Neuland" is centered on the page exactly like Üben's "Lernpfad"
-  (same `text-2xl`/`font-bold`); the neutral Beta chip (no amber) is a **suffix**, absolutely positioned
+  (same `text-display`/`text-2xl` since the s137 premium pass); the neutral Beta chip (no amber) is a **suffix**, absolutely positioned
   off the h1's right edge and out of flow, so it does NOT shift the word off-center (s90) + a chapter hero with a scrim overlay (Kapitel eyebrow, district
   title, n/6 count, "Mission spielen" CTA) over ONE dense checklist card (done = green check + quiet
   replay icon button, next = the single gradient play control, locked = Lock, boss tag inline, a locked
@@ -704,6 +704,16 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   is `scripts/branding/wordmark-data.mjs`), so it cannot drift from what ships. Rerun that script (plus
   `build-logo-assets.mjs` for the `public/` icons) after any mark or token change. Do not hand-edit the
   generated files.
+- **Premium pass (s137):** the `accent-gradient` stops are the theme-aware `--gradient-from`/
+  `--gradient-to` tokens in `index.css` (light: deep Nachtblau → primary → vivid sky; dark: light
+  end-to-end so the dark `primary-foreground` text passes AA — never reintroduce a fixed dark end
+  stop, it broke dark-mode contrast once already). Both stops are gated in `check-contrast.mjs`.
+  Shared text classes in `index.css`: **`.text-display`** for page H1s (extrabold, tracking-tight,
+  balanced wrap; SectionHeading + HubHero already use it) and **`.text-eyebrow`** for overline
+  kickers (color stays per surface). Use these instead of hand-rolling heading/eyebrow recipes.
+  The default Button variant carries a subtle white top sheen over `bg-primary`; landing CTAs ride
+  `bg-accent-gradient` with `text-primary-foreground` (NOT `text-white`, which fails on the light
+  dark-mode gradient).
 - **Current mark (s133, brand plan PR B): the lowercase g on a Himmelblau highlighter swipe** (Kit 1 ·
   Nachtblau & Himmelblau + Koralle). The **g is OUTLINED to a `<path>`** (Inter 800, the app's own UI
   typeface, so mark + wordmark cohere) so it renders identically everywhere. Design source:

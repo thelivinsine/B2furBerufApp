@@ -9,7 +9,10 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-soft hover:bg-primary/90 hover:shadow-glow",
+          // The top sheen (white/12 fading out) gives primary buttons a subtle
+          // dimensionality without the full two-hue gradient (s137 premium
+          // pass); the underlying bg-primary still drives the hover shift.
+          "bg-primary bg-gradient-to-b from-white/12 to-transparent text-primary-foreground shadow-soft hover:bg-primary/90 hover:shadow-glow",
         gradient:
           "bg-accent-gradient text-primary-foreground shadow-soft hover:shadow-glow hover:brightness-105",
         secondary:

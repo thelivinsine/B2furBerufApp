@@ -87,6 +87,16 @@ input:-webkit-autofill {
        cast a brand-tinted shadow on the Papier ground, never gray-black. */
     --shadow: 221 40% 22%;
     --radius: 0.875rem;
+
+    /* Accent-gradient stops (s137 premium pass): token-driven so the sweep
+       retunes per theme (the old fixed end stop broke contrast in dark mode).
+       Light travels deep Nachtblau → primary → vivid sky, so gradient CTAs
+       end BRIGHTER and more saturated than they start instead of muddier.
+       White text clears 4.5:1 on from/primary and the 3:1 UI floor on the
+       vivid end stop (same bar the s133 gradient shipped with); both are
+       gated in scripts/check-contrast.mjs. */
+    --gradient-from: 226 83% 47%;
+    --gradient-to: 196 93% 38%;
   }
 
   .dark {
@@ -140,6 +150,13 @@ input:-webkit-autofill {
     --ink: 250 12% 85%;
 
     --shadow: 221 60% 3%;
+
+    /* Dark gradient stops: the dark primary is a LIGHT blue with near-black
+       text, so the sweep must stay light end to end (the s133 fixed end stop
+       hsl(198 88% 40%) dropped dark text to ~2.5:1 in dark mode). Ink on the
+       deepest stop measures ~5.5:1; the sky end is brighter still. */
+    --gradient-from: 226 90% 66%;
+    --gradient-to: 198 90% 58%;
   }
 
   * {
@@ -231,6 +248,22 @@ input:-webkit-autofill {
     /* Only transform + shadow animate (transition-all made every property a
        candidate, which is wasted style-recalc work on card-heavy lists). */
     @apply transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-elevated;
+  }
+
+  /* Display headings (s137 premium pass): ONE shared treatment for page
+     titles so the app carries the landing page's confident voice (extrabold,
+     tight tracking, balanced wrap). Size stays per call site. */
+  .text-display {
+    @apply font-extrabold tracking-tight;
+    text-wrap: balance;
+  }
+
+  /* Eyebrow/kicker (s137 premium pass): the one canonical overline recipe.
+     Three competing versions coexisted (tracking-wider vs 0.12em vs 0.14em,
+     semibold vs extrabold); this is the standard. Color stays per surface
+     (text-primary in-app, text-accent-ink on the landing, etc). */
+  .text-eyebrow {
+    @apply text-xs font-bold uppercase tracking-[0.14em];
   }
 }
 

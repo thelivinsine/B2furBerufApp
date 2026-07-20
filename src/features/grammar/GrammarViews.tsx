@@ -11,7 +11,7 @@ import { groupMeta, topicRank } from "./grammarMeta";
  * Karten + Liste presentations of the Grammatik tab (Bibliothek redesign,
  * session 93). Both are lenses over the same filtered topic list; tapping a
  * topic opens the lesson view (`?topic=`). Emerald is the quiet Grammatik
- * accent (carried over from the pre-redesign hub icons); brand indigo stays
+ * accent (carried over from the pre-redesign hub icons); brand Nachtblau stays
  * the loud action color.
  */
 

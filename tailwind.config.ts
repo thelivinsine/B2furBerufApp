@@ -97,11 +97,13 @@ const config: Config = {
         glow: "0 0 0 1px hsl(var(--primary) / 0.12), 0 8px 30px hsl(var(--primary) / 0.18)",
       },
       backgroundImage: {
-        // Nachtblau → deep sky. The end stop is deliberately DARKER than the
-        // Himmelblau accent token: gradient buttons carry white text, and pure
-        // Himmelblau (65% lightness) would fail contrast at the light end.
+        // Deep Nachtblau → primary → vivid sky (s137 premium pass): the stops
+        // ride the theme-aware --gradient-from/--gradient-to tokens in
+        // index.css, so the sweep ends brighter than it starts in light mode
+        // AND stays legible in dark mode (the old fixed end stop dropped dark
+        // text below AA there). Contrast gated in scripts/check-contrast.mjs.
         "accent-gradient":
-          "linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(198 88% 40%) 100%)",
+          "linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%)",
         // Dialed down for the flat brand (founder prefers flat): a whisper of
         // the two blues on the warm Papier ground, not a visible wash.
         "mesh":

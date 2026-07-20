@@ -419,3 +419,45 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md` · PRs #603 (`4c32e58`),
   #605 (`766584b`), #606 (`f065c60`)
+
+## Session 137 — 2026-07-20 — Branding-refresh review + premium pass (fixes 1-7)
+
+- **Branch:** `claude/app-branding-refresh-review-bmrly2`
+- **Prompt 1 (verbatim):** `> review the branding refresh of the app. Insert some of the elements from previous versions like gradients on the buttons, better text styles as the current one doesn't look as premium as before. do a thorough analysis and report top ten things to refine or update.`
+- **Response 1 (merged with prompt 2's instruction):** Began evidence-gathering: diffed the s133
+  rebrand PRs A-D and the s136 landing against the pre-rebrand design system (old indigo→cyan
+  gradient vs the new muddier Nachtblau sweep, flattened landing CTAs/step chips, near-invisible
+  mesh, unused `.text-gradient`, three competing eyebrow recipes, stale indigo/violet remnants).
+- **Prompt 2 (verbatim):** `> don't implement any changes yet, provide me the report first`
+- **Response 2:** Delivered the analysis-only report: what shipped in s133, which premium cues were
+  lost, and a ranked top-ten refinement list. (1) retune `accent-gradient` to end bright; (2) fix
+  the dark-mode gradient contrast defect (fixed end stop ~2.5:1 under dark text, invisible to
+  `check:contrast`); (3) restore gradients on landing CTAs/step chips/closing band; (4) subtle
+  gradient on the default Button; (5) unify display typography; (6) one canonical eyebrow style;
+  (7) purge pre-rebrand indigo/violet remnants; (8) re-derive HubHero/themes.ts rainbow gradients
+  from the brand family; (9) align dark mode's violet hue (250) with the brand hue (221); (10)
+  restore a whisper of ambient depth (mesh + `.text-gradient` moments). No code changed.
+- **Prompt 3 (verbatim):** `> go ahead with all the fixes until 7`
+- **Response 3:** Implemented fixes 1-7: token-driven `--gradient-from`/`--gradient-to` (light deep
+  Nachtblau → primary → vivid sky; dark light end-to-end), both stops added to the
+  `check-contrast.mjs` gate (46/46 pass); landing nav/hero CTAs + step chip 1 back on
+  `bg-accent-gradient` with theme-aware `text-primary-foreground`; default Button top sheen; new
+  `.text-display` applied to every page H1 (SectionHeading, HubHero, Lernpfad, Neuland,
+  GrammarTopicView, LegalChrome, HelpChrome, QuizHub, WritingHub) and `.text-eyebrow` (headers +
+  6 landing eyebrows); indigo/violet purge (Neuland Boss tag → primary tint, game Chip tone
+  indigo→blue, QuizHub hero + intent cards + Anwenden Prüfung card → brand-family gradients, stale
+  comments reworded). Gates: typecheck ✓, lint 0 errors, test:unit 219/219, build ✓, bundle
+  110.9 kB, check:contrast 46/46. Verified rendered output via pnpm preview + headless Chromium
+  (landing light/dark, Anwenden, Fortschritt). Documented (s137 handoff; s135 aged into the new
+  W30 archive chunk; this log), PR into main squash-merged, post-merge realignment run.
+- **Artifacts:** `src/index.css` · `tailwind.config.ts` · `scripts/check-contrast.mjs` ·
+  `src/components/ui/button.tsx` · `src/components/shared/misc.tsx` ·
+  `src/components/shared/HubHero.tsx` · `src/features/landing/LandingPage.tsx` ·
+  `src/features/dashboard/UebenPath.tsx` · `src/features/welt/NeulandHub.tsx` ·
+  `src/features/welt/stage.tsx` · `src/features/quiz/QuizHub.tsx` ·
+  `src/features/dashboard/intentCards.ts` · `src/features/anwenden/AnwendenHub.tsx` ·
+  `src/features/grammar/GrammarTopicView.tsx` · `src/features/grammar/GrammarViews.tsx` ·
+  `src/features/writing/WritingHub.tsx` · `src/features/legal/LegalChrome.tsx` ·
+  `src/features/help/HelpChrome.tsx` · `src/components/layout/route-icons.tsx` · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`
