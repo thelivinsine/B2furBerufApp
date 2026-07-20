@@ -21,12 +21,14 @@ import { shuffle, sample, cn } from "@/lib/utils";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import {
   PixelStage,
+  StageSprite,
   GameCard,
   SheetCard,
   Pill,
   GameText,
   BAG_SPRITE,
   PLAYER_SPRITE,
+  NPC_SPRITES,
   DOC_ICONS,
   DOC_ICON_FALLBACK,
   GAME_OUT,
@@ -53,6 +55,43 @@ export function speakerName(speaker: string): string {
   if (speaker === "du") return "Du";
   if (speaker === "erzaehler") return "";
   return npcById.get(speaker)?.name ?? speaker;
+}
+
+/** The stage art for a speaker, if that speaker is an NPC with a sprite. */
+function npcSpriteFor(speaker: string): string | undefined {
+  const key = npcById.get(speaker)?.sprite;
+  return key ? NPC_SPRITES[key] : undefined;
+}
+
+/**
+ * Cast on a cutscene stage (s135): the player always stands bottom-left so no
+ * scene reads as an empty room, and the speaking NPC stands to the right. The
+ * NPC is the current line's speaker when they have a sprite, otherwise the
+ * scene's primary sprited NPC (the one with the most lines), so the figure
+ * stays put through narrator/player lines instead of flickering out. Only
+ * drawn on backdropped settings; the `website` prop scene stays character-free.
+ */
+function CutsceneCast({ scene, speaker }: { scene: CutsceneScene; speaker: string }) {
+  const primaryNpc = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const l of scene.lines) {
+      if (npcSpriteFor(l.speaker)) counts.set(l.speaker, (counts.get(l.speaker) ?? 0) + 1);
+    }
+    let best: string | undefined;
+    let max = 0;
+    for (const [id, n] of counts) if (n > max) [best, max] = [id, n];
+    return best;
+  }, [scene.lines]);
+
+  if (scene.setting === "website") return null;
+  const npcSprite = npcSpriteFor(speaker) ?? (primaryNpc ? npcSpriteFor(primaryNpc) : undefined);
+
+  return (
+    <>
+      {npcSprite && <StageSprite src={npcSprite} x={60} y={38} w={14} />}
+      <StageSprite src={PLAYER_SPRITE} x={13} y={52} w={9} />
+    </>
+  );
 }
 
 /** Shared choice flow: an optional feedback beat before the route is taken. */
@@ -109,7 +148,9 @@ export function CutsceneView({ scene, act, translate }: SceneViewProps & { scene
 
   return (
     <div className="space-y-4">
-      <PixelStage setting={scene.setting} label={scene.label} />
+      <PixelStage setting={scene.setting} label={scene.label}>
+        <CutsceneCast scene={scene} speaker={line.speaker} />
+      </PixelStage>
       {flow.pending?.feedback ? (
         <FeedbackCard feedback={flow.pending.feedback} translate={translate} onNext={flow.confirm} />
       ) : (

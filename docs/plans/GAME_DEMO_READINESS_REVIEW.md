@@ -82,12 +82,18 @@ rehearsal). Nothing structural is needed this week.
    `INDIGO = (91, 91, 230)` (`#5b5be6`), so backdrop signs/awnings, the player sprite's
    backpack, the doc icons and the Wörterbuch sprite carried the OLD indigo next to Nachtblau
    buttons. The constant is now `(61, 116, 237)` and every asset is regenerated.
-3. **Cutscene stages have no characters (STILL OPEN, the remaining art gap).** Only the
-   hotspot renderer places the player; cutscenes/listening/automat/form/loadout stages render
-   uninhabited rooms. With the battle sprites now existing, the cheap next step is placing the
-   player (and the speaking NPC where registered) on cutscene stages via the existing
-   `StageSprite` — but it touches the look of 19 scenes, so it is a founder-reviewed change,
-   not a night-before-the-demo one. _(Model: Sonnet 5, founder eyeballs screenshots.)_
+3. **Cutscene stages had no characters — DONE s135 (P1 pass).** Only the hotspot renderer
+   placed the player, so all 19 cutscenes rendered as empty rooms. Fixed: `CutsceneCast` in
+   `scenes.tsx` now stands the player bottom-left on every backdropped cutscene (the `website`
+   prop scene stays character-free) and the speaking NPC to the right — the NPC is the current
+   line's speaker when sprited, otherwise the scene's primary sprited NPC (most lines), so the
+   figure stays put through narrator/player lines instead of flickering. This needed a **Jonas
+   sprite** (the recurring companion, 22 cutscene lines, previously spriteless): a new
+   code-authored sprite (messy brown hair, rust hoodie, denim), registered like the others.
+   Placement was composite-checked across all five cutscene backdrops (terminal/strasse/laden/
+   wohnung/amt); verified in-app that the player stands in the 1.1 arrivals hall. The
+   listening/automat/form/loadout stages still render their prop/device without a person by
+   design (the device or form is the focus); revisit only if they read empty in the rehearsal.
 4. **Seed the demo device the evening before.** Play missions 1.1–1.3 by hand on the demo
    profile so the hub reads lived-in (3/6, checkmarks + replay buttons, streak alive) and the
    live demo can start at 1.4 (hotspot + automat + battle variety) instead of the text-heavy
@@ -127,11 +133,14 @@ rehearsal). Nothing structural is needed this week.
 
 ## Implementation record (same session, founder-approved "whole P0 batch")
 
-Shipped in s135 after the founder greenlit the batch: the scroll fix (`NeulandHub.tsx`), the
-four battle-NPC sprites + Nachtblau asset regeneration (`welt_assets.py` →
-`src/features/welt/assets/`, wiring in `stage.tsx` + `missions.ts` + `lint-content.mjs`
-`GAME_SPRITES`). Verified: scripted Playwright checks for both scroll cases + the Beamter
-rendering in the 1.1 battle (zero console errors), PIL composites of every battle backdrop ×
-NPC at the shared anchor, and the full gate set (typecheck · lint 0 errors · lint:content ·
-test:unit 219 · build · bundle 80.7 kB). Remaining before the demo: the founder tasks (seed +
-dress rehearsal) and optionally the P1 cutscene-character pass.
+Shipped in s135 after the founder greenlit the batch, then the P1 cutscene pass: the scroll fix
+(`NeulandHub.tsx`), the four battle-NPC sprites + the Jonas cutscene sprite + Nachtblau asset
+regeneration (`welt_assets.py` → `src/features/welt/assets/`, wiring in `stage.tsx` +
+`missions.ts` + `lint-content.mjs` `GAME_SPRITES`), and the `CutsceneCast` player/NPC placement
+in `scenes.tsx`. Verified: scripted Playwright checks for both scroll cases + the Beamter
+rendering in the 1.1 battle + the player rendering on the 1.1 cutscene (zero console errors), PIL
+composites of every battle AND cutscene backdrop × character at the shared anchors, and the full
+gate set (typecheck · lint 0 errors · lint:content · test:unit 219 · build · bundle 80.7 kB).
+Remaining before the demo: the founder tasks (seed + dress rehearsal). The five daily-life scene
+kinds that show a prop/device without a person (listening/automat/form/loadout) are left as-is by
+design; revisit only if the rehearsal makes one read empty.

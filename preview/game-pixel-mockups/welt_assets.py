@@ -296,6 +296,47 @@ BRANDT_CMAP = {'k': OUT, 'h': (176, 176, 182), 's': SKIN, 'c': (140, 104, 78),
                'w': (238, 234, 224), 'p': (110, 104, 96), 'b': (64, 64, 74),
                'r': (202, 128, 116)}
 
+# Jonas, dein deutscher Freund: the recurring companion (22 cutscene lines),
+# so he gets a body too (s135 P1). Messy warm-brown hair, rust hoodie with a
+# hood collar + light drawstrings, denim jeans. Younger/casual silhouette.
+JONAS = [
+    ".........hh...hh..........",
+    "........khhhhhhhk.........",
+    ".......khhhhhhhhhk........",
+    "......khhhhhhhhhhhk.......",
+    "......khhkkkkkkkhhk.......",
+    "......khkssssssskhk.......",
+    "......khkssssssskhk.......",
+    "......khkskssksskhk.......",
+    "......khkssssssskhk.......",
+    "......khkssssssskhk.......",
+    "......khkssrrssskhk.......",
+    ".......kksssssskk.........",
+    "........kkssssk...........",
+    ".......kjjttttjjk.........",
+    "......kjjttttttjjk........",
+    ".....kjttdttttdttjk.......",
+    "....kjjtttttttttjjk.......",
+    "....kjjtttttttttjjk.......",
+    "....kjjksssssssskjjk......",
+    "....kjjjkkkkkkkjjjjk......",
+    "....kjjjjjjjjjjjjjk.......",
+    "....kjjjjjjjjjjjjjk.......",
+    ".....kjjjjjjjjjjk.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    ".....kppppppppppk.........",
+    "......kpppppppppk.........",
+    "......kppppppppk..........",
+    ".......kssk.kssk..........",
+    ".......kssk.kssk..........",
+    ".......kbbk.kbbk..........",
+    ".......kkkk.kkkk..........",
+]
+JONAS_CMAP = {'k': OUT, 'h': (128, 88, 54), 's': SKIN, 'j': (200, 106, 66),
+              'd': (238, 216, 190), 't': (216, 122, 82), 'p': (86, 96, 120),
+              'b': (58, 58, 66), 'r': (202, 128, 116)}
+
 # seated NPC, front, 14x20 (world scale: a seated adult is ~2/3 of standing)
 NPC_SEAT = [
     "....kkkkkk....",
@@ -738,6 +779,7 @@ sprite_png(BEAMTER, BEAMTER_CMAP, "beamter.png")
 sprite_png(MILO, MILO_CMAP, "milo.png")
 sprite_png(KASSIERERIN, KASSIERERIN_CMAP, "kassiererin.png")
 sprite_png(BRANDT, BRANDT_CMAP, "brandt.png")
+sprite_png(JONAS, JONAS_CMAP, "jonas.png")
 sprite_png(BAG, BAG_CMAP, "bag.png")
 sprite_png(DOC_AUSWEIS, DOC_CMAP, "doc-ausweis.png")
 sprite_png(DOC_VERTRAG, DOC_CMAP, "doc-vertrag.png")
