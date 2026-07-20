@@ -485,3 +485,14 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `brand-kit/README.md` · `brand-kit/previews/logo-preview.html` ·
   `src/features/landing/LandingPage.tsx` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
   `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 5 (verbatim):** `> document the session `
+- **Response 5:** This close-out. The session's documentation had been kept current at each merge
+  (s137 handoff covering both waves + the hotfix, prompts 1-4 logged here, CLAUDE.md premium-pass
+  conventions, the W30 archive chunk); this pass added the deploy confirmation to the handoff (the
+  wave-1 Pages run failed on the #609 conflict marker, the wave-2 run add6529 went green, so both
+  waves went live together), rewrote `docs/branding/BRAND_SPEC.md` §2 from "dark mode to be tuned"
+  to the shipped, s137-re-hued warm-navy values, and logged this prompt. Session 137 total:
+  branding-refresh review → ten-point report (report-first at founder request) → fixes 1-7 (PR
+  #609) → items 8-10 + hotfix (PR #610) → docs. PRs #609, #610 squash-merged.
+- **Artifacts (close-out):** `docs/PROJECT_STATUS.md` · `docs/branding/BRAND_SPEC.md` ·
+  `docs/SESSION_PROMPT_LOG.md` · PRs #609 (`902ba22`), #610 (`add6529`)
