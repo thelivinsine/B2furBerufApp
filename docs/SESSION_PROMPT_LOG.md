@@ -461,3 +461,27 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `src/features/help/HelpChrome.tsx` · `src/components/layout/route-icons.tsx` · `CLAUDE.md` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 4 (verbatim):** `> go ahead with the rest of the items`
+- **Response 4:** Shipped report items 8-10. (8) themes.ts accents with indigo/violet/purple/
+  fuchsia re-derived from the brand families (meetings blue→sky, project teal→cyan, technology +
+  digitales cyan→blue, bildung sky→blue, freizeit pink→rose), Sammlung hub tile → Koralle
+  orange→red, Anwenden Prüfung card → amber→orange (matches ExamHub). (9) dark theme re-hued
+  250 → 228 warm navy across background/surface/elevated/muted/border/input/foregrounds/ink
+  (same L/S, contrast gate still green), plus the hard-coded shells: index.html dual theme-color
+  + no-JS shell, vite.config.ts manifest background, prerender-help.mjs shell (#151320→#131620,
+  #e8e6f0→#e7e8ef) and the brand kit (tokens regenerated via build-brand-kit.mjs; README +
+  logo-preview hexes updated). (10) bg-mesh 0.07/0.06 → 0.10/0.09 and the landing numbers band's
+  stat values gradient-clipped with fixed light Himmelblau stops (the band is fixed-dark in both
+  themes). ALSO fixed a self-inflicted breakage: PR #609's squash contained an unresolved
+  rebase-conflict marker in LandingPage.tsx (the conflicted file list had been truncated and
+  gates were not re-run post-rebase), which broke main's build; resolved by keeping main's
+  single-button primaryCta with the gradient classes. Gates re-run in full: typecheck ✓, lint 0
+  errors, test:unit 219/219, build ✓, bundle 110.7 kB, check:contrast ✓, lint:content ✓; verified
+  dark Fortschritt/Theorie + the landing numbers band by screenshot. Documented and squash-merged
+  to main.
+- **Artifacts (wave 2):** `src/data/themes.ts` · `src/features/collection/Sammlung.tsx` ·
+  `src/features/anwenden/AnwendenHub.tsx` · `src/index.css` · `tailwind.config.ts` ·
+  `index.html` · `vite.config.ts` · `scripts/prerender-help.mjs` · `brand-kit/color/tokens.*` ·
+  `brand-kit/README.md` · `brand-kit/previews/logo-preview.html` ·
+  `src/features/landing/LandingPage.tsx` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/SESSION_PROMPT_LOG.md`

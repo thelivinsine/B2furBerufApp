@@ -713,7 +713,15 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   kickers (color stays per surface). Use these instead of hand-rolling heading/eyebrow recipes.
   The default Button variant carries a subtle white top sheen over `bg-primary`; landing CTAs ride
   `bg-accent-gradient` with `text-primary-foreground` (NOT `text-white`, which fails on the light
-  dark-mode gradient).
+  dark-mode gradient). **Second wave (same session, report items 8-10):** the dark theme's surfaces
+  are hue **228 warm navy** (re-hued from the violet 250 left over from the indigo era; do not
+  revert), and the no-JS shells/manifest dark hexes are `#131620` bg / `#e7e8ef` fg (index.html,
+  vite.config.ts manifest, prerender-help.mjs, brand-kit docs). Decorative gradient pairs
+  (themes.ts `accent`, HubHero tiles, intent cards) come ONLY from the brand families
+  (blue/sky/cyan = Nachtblau/Himmelblau, emerald/teal/green = Blatt, amber/orange/yellow = Butter,
+  orange/red = Koralle, rose/pink = the sanctioned extra); never indigo/violet/purple/fuchsia.
+  `bg-mesh` sits at 0.10/0.09 (visible whisper, not a band), and the landing numbers band's
+  gradient-clipped stat values are the one sanctioned `text-gradient`-style moment.
 - **Current mark (s133, brand plan PR B): the lowercase g on a Himmelblau highlighter swipe** (Kit 1 ·
   Nachtblau & Himmelblau + Koralle). The **g is OUTLINED to a `<path>`** (Inter 800, the app's own UI
   typeface, so mark + wordmark cohere) so it renders identically everywhere. Design source:

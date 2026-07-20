@@ -55,7 +55,7 @@ truth, and `pnpm check:contrast` guards every pairing).
 
 | Role | Name | Light hex | Dark hex | Token |
 |------|------|-----------|----------|-------|
-| Ground | Papier | `#FAF5EB` | `#151320` | `--background` |
+| Ground | Papier | `#FAF5EB` | `#131620` | `--background` |
 | Text | Tinte | `#1C1A23` | `#EAE7F0`¹ | `--foreground` |
 | Primär / action | **Nachtblau** | `#2866EB` | `#6E99F7` | `--primary` |
 | Akzent / swipe | **Himmelblau** | `#53C7F9` | `#6ECEF7` | `--accent` |

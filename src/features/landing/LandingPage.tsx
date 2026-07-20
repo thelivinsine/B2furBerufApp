@@ -404,24 +404,10 @@ export function LandingPage() {
 
   const primaryCta = (
     <button
-<<<<<<< HEAD
       onClick={onboarded ? goApp : start}
-      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition-colors hover:bg-primary/90"
+      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-accent-gradient px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition hover:brightness-105"
     >
       {onboarded ? goAppLabel : startLabel} <ArrowRight className="h-4 w-4" />
-=======
-      onClick={goApp}
-      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-accent-gradient px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition hover:brightness-105"
-    >
-      {goAppLabel} <ArrowRight className="h-4 w-4" />
-    </button>
-  ) : (
-    <button
-      onClick={start}
-      className="inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-accent-gradient px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-glow transition hover:brightness-105"
-    >
-      {startLabel} <ArrowRight className="h-4 w-4" />
->>>>>>> c559623 (brand: premium pass — token-driven gradient, display/eyebrow text styles, indigo purge (s137))
     </button>
   );
 
@@ -864,7 +850,11 @@ export function LandingPage() {
           <div className="mt-9 grid grid-cols-2 gap-7 tabular-nums lg:grid-cols-4">
             {numbers.map(([en, de, label]) => (
               <div key={label}>
-                <b className="block text-[clamp(1.8rem,3.4vw,2.5rem)] font-extrabold tracking-tight">
+                {/* Gradient-clipped stat numbers (s137, report item 10): the ONE
+                    sanctioned text-gradient moment. Fixed light Himmelblau→sky
+                    stops because this band is fixed-dark in both themes (the
+                    token gradient would be too dark here in light mode). */}
+                <b className="block bg-gradient-to-r from-[#53C7F9] to-[#8AB0F9] bg-clip-text text-[clamp(1.8rem,3.4vw,2.5rem)] font-extrabold tracking-tight text-transparent">
                   {lang === "de" ? de : en}
                 </b>
                 <span className="mt-1 block text-sm leading-snug text-[#faf5eb]/65">{label}</span>

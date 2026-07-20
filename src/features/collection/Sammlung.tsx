@@ -103,7 +103,7 @@ export function Sammlung() {
     <div className="space-y-4 sm:space-y-6">
       <HubHero
         icon={Boxes}
-        gradient="from-fuchsia-500 to-pink-500"
+        gradient="from-orange-500 to-red-500"
         eyebrow="Sammlung"
         title="Meine Sammlung"
       />
