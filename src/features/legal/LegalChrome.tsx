@@ -41,7 +41,7 @@ export function LegalChrome({
   const updatedLabel = lang === "de" ? "Zuletzt aktualisiert" : "Last updated";
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background bg-mesh">
+    <div className="relative min-h-screen overflow-hidden bg-background bg-page">
       <div className="pointer-events-none absolute -top-40 left-1/2 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
 
       <header className="relative z-10 mx-auto flex max-w-3xl items-center justify-between px-4 py-5 sm:px-6">

@@ -82,7 +82,7 @@ export function AppShell() {
 
   if (resuming) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background bg-mesh text-muted-foreground">
+      <div className="flex min-h-screen flex-col items-center justify-center gap-3 bg-background bg-page text-muted-foreground">
         <Loader2 className="h-6 w-6 animate-spin text-primary" />
         <p className="text-sm">Schreibtraining wird fortgesetzt …</p>
       </div>
@@ -90,7 +90,7 @@ export function AppShell() {
   }
 
   return (
-    <div className="min-h-screen bg-background bg-mesh">
+    <div className="min-h-screen bg-background bg-page">
       <Toaster />
 
       {/* Desktop sidebar */}

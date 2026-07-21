@@ -1,11 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-21 (session 140). **Light-theme chrome recolor shipped to `main`:** the warm
-Papier cream tokens read as "butter yellow" to the founder, so the light `--muted`/`--border`/
-`--input` (switcher tracks, tags, tiles, borders) are now a neutral cool grey and the light
-`--background` is a pale Himmelblau (`199 68% 95%`, hex `#EAF5FB` in the `theme-color` meta), which
-the existing `bg-mesh` blue washes turn into a soft Himmelblau gradient. Dark theme untouched;
-`check:contrast` 46/46 green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-21 (session 140). **Light-theme recolor shipped to `main` in two rounds:**
+the warm Papier chrome read as "butter yellow" to the founder. Round 1 (PR #619) moved
+`--muted`/`--border`/`--input` to neutral cool greys and the ground to a flat pale Himmelblau.
+Round 2 (same day, after a 3-round preview picker) replaced the flat ground with the
+founder-picked **"I1" `bg-page` gradient** (very subtle mint → sky 150° diagonal via the new
+`--page-from/mid/to` tokens; dark mode is a no-op) and **lightened the greys** (muted 90%, border
+86%). Dark theme + `--warning` Butter untouched; `check:contrast` green. Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -61,23 +63,31 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 140 (2026-07-21). Light-theme chrome recolor, branch
-`claude/session-f94z5m`, shipped to `main`.** Founder screenshot of `/library` on mobile: the warm
-Papier tint across the tab/view switcher tracks, the plural tags, and the page ground read as
-"butter yellow"; they asked for a good-contrast grey on the toggle and tags and a Himmelblau shade
-for the background gradient. What shipped (light theme only, `src/index.css` + `index.html`):
-- **Neutral grey chrome:** `--muted` `42 44% 89%` → **`220 9% 87%`**, `--muted-foreground`
-  `43 11% 37%` → `220 8% 36%`, `--border`/`--input` `42 38% 85%` → **`220 8% 83%`**. This covers the
-  LibrarySwitcher/ViewSwitcher tracks, the `bg-muted` tag pills (e.g. "Pl.: …"), the bottom-bar
+**Handoff after session 140 (2026-07-21). Light-theme recolor (two rounds + a 3-round preview
+picker), branch `claude/session-f94z5m`, shipped to `main`.** Founder screenshot of `/library` on
+mobile: the warm Papier tint (switcher tracks, tags, page ground) read as "butter yellow". What
+shipped:
+- **Round 1 (PR #619): neutral grey chrome + flat Himmelblau ground.** `--muted`/`--border`/
+  `--input` moved from the warm 42/43-hue tans to neutral 220-hue greys; `--background` to a pale
+  Himmelblau. Covers the LibrarySwitcher/ViewSwitcher tracks, `bg-muted` tag pills, the bottom-bar
   active `bg-border` squircle, and every border, app-wide by token.
-- **Pale Himmelblau ground:** `--background` `43 58% 95%` → **`199 68% 95%`** (`#EAF5FB`); the
-  existing `bg-mesh` primary/accent radial washes now sit on a blue ground, so the page reads as a
-  soft Himmelblau gradient. The light `theme-color` meta in `index.html` follows (`#FAF6EC` →
-  `#EAF5FB`).
-- **Deliberately untouched:** dark theme; the semantic `--warning` butter tokens; the brand-kit /
-  logo scripts' `PAPIER` app-icon tile constant (OS icons keep their filled tile, separate concern).
-- **Gates:** `check:contrast` 46/46 ✓ (all token pairings, both themes) · build ✓. PWA caveat:
-  the shell is service-worker-cached; hard-refresh the live site to see the new colors.
+- **Preview picker (3 rounds, committed to `preview/`):** `background-gradient-variations.html`
+  (8 ground options A–H rendered in the real chrome), `…-r2-himmel-mint.html` (the founder liked
+  Himmel → Mint; 4 intensity steps), `…-r3-invertiert.html` (the founder picked "Sehr dezent" but
+  inverted; 3 mirrored takes). Screenshotted via the preinstalled headless Chromium; founder picked
+  **I1** (very subtle mint → sky, 150° diagonal).
+- **Round 2 (PR #620): the "I1" gradient ground + lighter greys.** New `--page-from/mid/to` tokens
+  (light: mint `144 45% 98%` → `150 50% 98%` → sky `198 83% 98%`; dark: all three = the flat dark
+  ground, so dark mode is a NO-OP) + a **`bg-page`** backgroundImage in `tailwind.config.ts` (the
+  bg-mesh washes layered over the 150° linear). Applied on the five full-page shells (AppShell ×2,
+  Onboarding, LegalChrome, HelpChrome); ExamHub/SimulationHub Cards keep plain `bg-mesh`. Flat
+  `--background` became the near-white fallback `180 45% 98%` (sticky bars, inputs); light
+  `theme-color` meta = the mint top stop `#F7FCF9`. Mid-round the founder also asked for lighter
+  button greys: `--muted` 87% → **`220 10% 90%`**, `--border`/`--input` 83% → **`220 9% 86%`**.
+- **Deliberately untouched:** dark theme; the semantic `--warning` Butter tokens; the brand-kit /
+  logo scripts' `PAPIER` app-icon tile constant. CLAUDE.md brand section documents the new ground.
+- **Gates (both rounds):** `check:contrast` all pairings ✓ · build ✓. PWA caveat: the shell is
+  service-worker-cached; hard-refresh the live site to see the new colors.
 
 **Handoff after session 139 (2026-07-20). Three small fixes, branch
 `claude/app-icon-favicon-update-gympjq`, all shipped to `main` (PRs #616, #617).** Founder-reported

@@ -726,6 +726,16 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   orange/red = Koralle, rose/pink = the sanctioned extra); never indigo/violet/purple/fuchsia.
   `bg-mesh` sits at 0.10/0.09 (visible whisper, not a band), and the landing numbers band's
   gradient-clipped stat values are the one sanctioned `text-gradient`-style moment.
+  **Light-theme ground since s140 (2026-07-21, founder-picked "I1"):** the warm Papier chrome is
+  retired in the light theme. `--muted`/`--border`/`--input` are neutral cool greys (220-hue;
+  founder-lightened to 90%/86% in-session), and the page ground is **`bg-page`** (tailwind config):
+  the bg-mesh washes over a very subtle mint → sky 150° diagonal riding the `--page-from/mid/to`
+  tokens (dark sets all three to the flat dark ground, so dark mode is unchanged). `bg-page` is on
+  the five full-page shells (AppShell ×2, Onboarding, LegalChrome, HelpChrome); Cards keep plain
+  `bg-mesh`. Flat `--background` (`180 45% 98%`) is the fallback + sticky-bar/input fill; the light
+  `theme-color` meta rides the gradient's mint top stop `#F7FCF9`. Preview picker artifacts:
+  `preview/background-gradient-variations*.html`. Semantic `--warning` Butter and the app-icon
+  Papier tile are deliberately untouched.
 - **Current mark (s133 PR B, reworked s138 2026-07-20): the lowercase g on a Himmel Soft highlighter
   swipe**. The swipe is **Himmel Soft `#8CDBFB`** (founder-picked s138: the original Himmelblau
   `#52C6F9` read too harsh against black/white). In a same-session follow-up the founder applied

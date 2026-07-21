@@ -109,6 +109,12 @@ const config: Config = {
         // effectively invisible); still a wash, never a visible gradient band.
         "mesh":
           "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.09) 0px, transparent 50%)",
+        // Page ground (s140, founder-picked "I1"): the same mesh washes over a
+        // very subtle mint → sky diagonal riding the --page-* tokens (dark mode
+        // sets all three stops to the flat dark ground, so it is a no-op there).
+        // Use on full-page shells; cards keep plain bg-mesh.
+        "page":
+          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.09) 0px, transparent 50%), linear-gradient(150deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%)",
         // Dialog backdrop: a brand-tinted radial that's lighter directly behind
         // the card and deepens toward the screen edges (a subtle spotlight). Uses
         // the cool-slate `--shadow` token instead of flat black, so it adapts to

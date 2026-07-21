@@ -645,3 +645,28 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `docs/PROJECT_STATUS.md` (s140 handoff, s138 handoff archived to W30) and this log.
 - **Artifacts (prompt 1):** `src/index.css` · `index.html` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+- **Prompt 2 (verbatim):** `> can you provide me a preview with different variations of the background using different gradients himmelblue and maybe another color rather than the himmelblue`
+- **Response 2:** Built `preview/background-gradient-variations.html`: 8 page-ground options (A
+  current, B/C/D Himmelblau gradient treatments, E Mint, F Himmel→Mint, G Rosé, H neutral grey-blue)
+  each rendered as a phone mockup of `/library` in the new s140 grey chrome; screenshotted via the
+  preinstalled headless Chromium and sent the sheet. Committed the preview to the branch.
+- **Artifacts (prompt 2):** `preview/background-gradient-variations.html` (commit 468c219)
+- **Prompt 3 (verbatim, self-corrected mid-prompt):** `> i like mint but the color intensity should be further reduced and should be very subtle.` … `> i meant himmel mint. Provide a couple of previews with reduced color intensity`
+- **Response 3:** Round 2 sheet `…-r2-himmel-mint.html`: the F blend at four intensity steps
+  (original / ~35% / ~55% / ~75% lighter), screenshot sent; recommended F2.
+- **Artifacts (prompt 3):** `preview/background-gradient-variations-r2-himmel-mint.html` (d0c71ec)
+- **Prompt 4 (verbatim):** `> i like sehr dezent but invert the gradient and provide me with previews`
+- **Response 4:** Round 3 sheet `…-r3-invertiert.html`: F3 reference + three mint-top → sky-bottom
+  inversions (I1 diagonal mirror, I2 vertical, I3 vertical with the blue washes moved to the bottom
+  corners), screenshot sent.
+- **Artifacts (prompt 4):** `preview/background-gradient-variations-r3-invertiert.html` (0a6ffb4)
+- **Prompt 5 (verbatim):** `> i like I1` then mid-turn `> ship it and document the session along with saving the previews to the repo`
+- **Response 5:** Applied I1: new `--page-from/mid/to` tokens (dark = flat dark ground, no-op) + the
+  `bg-page` backgroundImage (mesh washes over the 150° mint→sky linear) on the five full-page shells
+  (AppShell ×2, Onboarding, LegalChrome, HelpChrome); flat `--background` → near-white `180 45% 98%`;
+  light `theme-color` → `#F7FCF9`. Cards keep plain `bg-mesh`.
+- **Prompt 6 (verbatim, mid-turn):** `> the gray for the buttons could also be lighter as it doesn't look very good at the moment. Make a decision and apply the fix`
+- **Response 6:** Decision: lightened the chrome greys, `--muted` `220 9% 87%` → `220 10% 90%`,
+  `--border`/`--input` `220 8% 83%` → `220 9% 86%` (muted-foreground on muted still 5.5:1 AA).
+  Gates: check:contrast all ✓ · build ✓. Shipped rounds as PR #620 (squash-merge), updated
+  CLAUDE.md (brand section), `docs/PROJECT_STATUS.md` (s140 handoff rewritten) and this log.
