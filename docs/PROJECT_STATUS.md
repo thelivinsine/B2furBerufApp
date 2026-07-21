@@ -1,13 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-20 (session 139). **Three small fixes shipped to `main`** (PRs #616, #617):
-(1) the saved icon-size preview was corrected to show **Größer as the applied favicon/app-icon size**
-(the shipped assets were already Größer since s138; only the misleading preview showed Randnah); (2)
-exiting a Neuland mission launched from **Heute → Spielen** now returns to the Spielen tab (with the
-Lernen/Spielen toggle) instead of stranding the learner on the toggle-less `/welt` hub; (3) the
-**Kollokationen graph clusters were pulled tighter** (founder-picked "Am engsten": centroid pull
-0.72, link 0.38, charge −34, collision r+1.5, ring 118+N·26) so the theme islands read as compact,
-distinct clusters. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-21 (session 140). **Light-theme chrome recolor shipped to `main`:** the warm
+Papier cream tokens read as "butter yellow" to the founder, so the light `--muted`/`--border`/
+`--input` (switcher tracks, tags, tiles, borders) are now a neutral cool grey and the light
+`--background` is a pale Himmelblau (`199 68% 95%`, hex `#EAF5FB` in the `theme-color` meta), which
+the existing `bg-mesh` blue washes turn into a soft Himmelblau gradient. Dark theme untouched;
+`check:contrast` 46/46 green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -63,6 +61,24 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 140 (2026-07-21). Light-theme chrome recolor, branch
+`claude/session-f94z5m`, shipped to `main`.** Founder screenshot of `/library` on mobile: the warm
+Papier tint across the tab/view switcher tracks, the plural tags, and the page ground read as
+"butter yellow"; they asked for a good-contrast grey on the toggle and tags and a Himmelblau shade
+for the background gradient. What shipped (light theme only, `src/index.css` + `index.html`):
+- **Neutral grey chrome:** `--muted` `42 44% 89%` → **`220 9% 87%`**, `--muted-foreground`
+  `43 11% 37%` → `220 8% 36%`, `--border`/`--input` `42 38% 85%` → **`220 8% 83%`**. This covers the
+  LibrarySwitcher/ViewSwitcher tracks, the `bg-muted` tag pills (e.g. "Pl.: …"), the bottom-bar
+  active `bg-border` squircle, and every border, app-wide by token.
+- **Pale Himmelblau ground:** `--background` `43 58% 95%` → **`199 68% 95%`** (`#EAF5FB`); the
+  existing `bg-mesh` primary/accent radial washes now sit on a blue ground, so the page reads as a
+  soft Himmelblau gradient. The light `theme-color` meta in `index.html` follows (`#FAF6EC` →
+  `#EAF5FB`).
+- **Deliberately untouched:** dark theme; the semantic `--warning` butter tokens; the brand-kit /
+  logo scripts' `PAPIER` app-icon tile constant (OS icons keep their filled tile, separate concern).
+- **Gates:** `check:contrast` 46/46 ✓ (all token pairings, both themes) · build ✓. PWA caveat:
+  the shell is service-worker-cached; hard-refresh the live site to see the new colors.
+
 **Handoff after session 139 (2026-07-20). Three small fixes, branch
 `claude/app-icon-favicon-update-gympjq`, all shipped to `main` (PRs #616, #617).** Founder-reported
 issues, handled one prompt at a time:
@@ -91,50 +107,7 @@ issues, handled one prompt at a time:
   collocationGraph 11/11 (#617) ✓. Post-merge branch realigned to `main` both times. PWA caveat: the
   graph + icons are service-worker-cached; hard-refresh the live site.
 
-**Handoff after session 138 (2026-07-20). Logo v2 rework (logos ONLY, founder-scoped), branch
-`claude/logo-blue-contrast-xsfk19`, shipped to `main`.** The founder found the logo's Himmelblau
-swipe too harsh against black/white and iterated through 8 artifact preview rounds (v2→v8) to a
-finalized design, then said "finalize these logos and Randnah favicon, apply everywhere, logos
-only." What shipped:
-- **Swipe color: Himmel Soft `#8CDBFB`** on every logo asset. (Initially the `--accent` token was
-  deliberately left at Himmelblau `#52C6F9`; a same-session follow-up prompt then applied Himmel
-  Soft app-wide: `--accent: 197 93% 77%` in BOTH themes in `index.css`, plus the two fixed
-  `#53C7F9` hexes on the landing (numbers-band gradient stop, decorative doodle stroke). The darker
-  `--accent-ink` text variant and the CTA `--gradient-*` stops are different blues and stayed.
-  `check:contrast` green; brand kit regenerated.)
-- **Icons re-centered ("Größer", `TILE_MARGIN = 0.12`):** `build-logo-assets.mjs` now measures the
-  mark's true bbox in-browser and centers it at a 12% margin (favicons/apple-touch/pwa; maskable at
-  14% since the OS crops it). This fixes the founder-screenshotted "empty band above the g" app icon.
-  (Started at 5% "Randnah"; the founder found that too big live and picked Größer in a follow-up.)
-  Never revert to raw-coordinate centering.
-- **Two-tone dark logos:** on dark grounds, artwork on the swipe is ink, off the swipe is white —
-  in practice only the g splits (ink bowl, white descender). Light grounds stay all ink.
-- **New lowercase wordmark** (`public/genauly-wordmark.png`/`-dark.png`, 548×138): "genauly" in
-  the app's own Inter (variable, wght 800, −0.02em, rendered via embedded `@fontsource-variable/
-  inter` woff2), swipe under "genau" with the exact v2 band geometry (−0.16em/+0.10em overhangs,
-  0.12em/0.10em em-box insets, −2° tilt). Dark wordmark: word white, "enau" solid ink on the
-  swipe, ONLY the g dual-tone (clip = swipe ∪ an e..u rect, avoids white slivers on letter
-  bottoms).
-- **`Logo.tsx` gained `variant="mark" | "wordmark"`**; wordmark placed in Sidebar, AuthDialog,
-  Onboarding, HelpChrome, LegalChrome, landing footer, **landing header at ALL sizes** (the
-  founder wants a first-time visitor to see the app NAME, not just the mark; sized `h-7 w-auto
-  sm:h-8`), and the dark no-JS shells (`index.html`, `prerender-help.mjs` — the adjacent "Genauly"
-  text spans were removed, the image IS the name). Only the mobile in-app `AppShell` header keeps
-  the compact mark (s86 rule). **Gotcha fixed in review:** responsive *display* utilities
-  (block/hidden) must wrap `<Logo>` in a container, never be passed into it (they override the
-  internal `dark:` image swap); *height* utilities are safe to pass in (they apply to both theme
-  images), which is why the single responsive `h-7 sm:h-8` on the landing header works.
-- **Brand kit + spec:** `build-brand-kit.mjs` reworked to the logo v2 (two-tone dark mark, Größer
-  app-icon tile, the lowercase "genauly" wordmark as PNG copied from `public/`, PNG lockups; drops
-  the `wordmark-data.mjs` capital-G dependency) and regenerated; `brand-kit/README.md`,
-  `BRAND_SPEC.md` §3, and the CLAUDE.md brand section rewritten. The 8-round preview artifact is
-  saved at `preview/branding/artifacts/genauly-logo-v2-previews.html`.
-- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.5 kB ✓.
-  Verified rendered output via `pnpm preview` + headless Chromium (landing light/dark/mobile,
-  /hilfe dark) and the regenerated brand-kit contact sheet. PWA caveat: hard-refresh the live site;
-  the home-screen icon may need re-adding to show the new size.
-
-_(Session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
+_(Session 138's logo-v2 rework handoff, session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
