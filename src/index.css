@@ -23,24 +23,35 @@ input:-webkit-autofill {
 @layer base {
   :root {
     /* Brand tokens (Kit 1 · Nachtblau & Himmelblau + Koralle, BRAND_SPEC.md,
-       shipped via BRAND_KIT_MODERNIZATION_PLAN.md PR A). Pale Himmelblau ground
-       (founder s140: the warm Papier cream read as butter yellow in the chrome),
-       white cards, Nachtblau primary, Himmelblau accent, Koralle reward.
-       Values that deviate from the spec swatches do so for WCAG AA (the
-       sanctioned-deviations register, plan §4); `pnpm check:contrast` is the
-       gate that keeps every pairing honest. */
-    --background: 199 68% 95%;
+       shipped via BRAND_KIT_MODERNIZATION_PLAN.md PR A). Near-white cool ground
+       (founder s140: the warm Papier cream read as butter yellow; the visible
+       page ground is the bg-page mint → sky whisper below, this flat token is
+       its fallback + the translucent sticky-bar/input fill), white cards,
+       Nachtblau primary, Himmelblau accent, Koralle reward. Values that deviate
+       from the spec swatches do so for WCAG AA (the sanctioned-deviations
+       register, plan §4); `pnpm check:contrast` is the gate that keeps every
+       pairing honest. */
+    --background: 180 45% 98%;
+    /* Page-ground gradient stops (s140, founder-picked "I1" from
+       preview/background-gradient-variations-r3-invertiert.html): a very
+       subtle mint → sky diagonal (150°), rendered by the bg-page utility in
+       tailwind.config.ts with the bg-mesh washes on top. */
+    --page-from: 144 45% 98%;
+    --page-mid: 150 50% 98%;
+    --page-to: 198 83% 98%;
     --foreground: 252 16% 12%;
     --surface: 0 0% 100%;
     --elevated: 0 0% 100%;
 
     /* Neutral cool grey for chrome fills (switcher tracks, tags, tiles); the
-       warm tan muted/border of the Papier era read as butter yellow. */
-    --muted: 220 9% 87%;
+       warm tan muted/border of the Papier era read as butter yellow. Lightened
+       87%/83% → 90%/86% in the same session (founder: the first grey read too
+       heavy on the near-white ground). */
+    --muted: 220 10% 90%;
     --muted-foreground: 220 8% 36%;
 
-    --border: 220 8% 83%;
-    --input: 220 8% 83%;
+    --border: 220 9% 86%;
+    --input: 220 9% 86%;
     --ring: 221 83% 54%;
 
     /* Nachtblau, darkened 58%→54% (plan deviation #1) so white-on-primary
@@ -111,6 +122,11 @@ input:-webkit-autofill {
        Nachtblau identity instead. Same lightness/saturation, so every pairing
        still clears AA with room (see check-contrast.mjs). */
     --background: 228 24% 10%;
+    /* bg-page is a no-op in dark: all three stops sit on the flat dark ground
+       (the mesh washes above them still give the usual subtle glow). */
+    --page-from: 228 24% 10%;
+    --page-mid: 228 24% 10%;
+    --page-to: 228 24% 10%;
     --foreground: 228 20% 92%;
     --surface: 228 20% 14%;
     --elevated: 228 18% 18%;

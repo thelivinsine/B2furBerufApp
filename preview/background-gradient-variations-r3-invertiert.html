@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<title>Genauly · Himmel → Mint · Sehr dezent, umgekehrt</title>
+<style>
+  /* Session 140 preview round 2: the founder picked F (Himmel → Mint) from
+     background-gradient-variations.html but wants it much more subtle. Same
+     simplified /library chrome; four intensity steps of the same blend. */
+  :root {
+    --fg: hsl(252 16% 12%);
+    --muted: hsl(220 9% 87%);
+    --muted-fg: hsl(220 8% 36%);
+    --border: hsl(220 8% 83%);
+    --primary: hsl(221 83% 54%);
+    --cta: linear-gradient(135deg, hsl(226 83% 47%) 0%, hsl(221 83% 54%) 45%, hsl(196 93% 38%) 100%);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #f2f3f5; color: var(--fg); padding: 28px;
+  }
+  h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.02em; }
+  p.sub { color: var(--muted-fg); font-size: 13px; margin-top: 4px; }
+  .grid { display: flex; flex-wrap: wrap; gap: 26px; margin-top: 22px; }
+  .variant { width: 292px; }
+  .label { display: flex; align-items: baseline; gap: 8px; margin: 0 2px 8px; white-space: nowrap; }
+  .label b { font-size: 14px; }
+  .label span { font-size: 11px; color: var(--muted-fg); }
+  .stops { font-size: 10.5px; color: var(--muted-fg); margin: 8px 2px 0; line-height: 1.5; }
+  .phone {
+    width: 292px; height: 560px; border-radius: 28px; border: 1px solid #d8dadf;
+    overflow: hidden; box-shadow: 0 10px 28px rgba(34, 48, 79, 0.14); background: #fff;
+  }
+  .screen { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 12px 12px 10px; }
+  .hdr { display: flex; align-items: center; justify-content: space-between; padding: 2px 2px 10px; }
+  .glogo { font-weight: 800; font-size: 21px; letter-spacing: -0.03em; position: relative; }
+  .glogo i { position: absolute; left: -3px; right: -5px; top: 5px; bottom: 1px; background: #8CDBFB; border-radius: 3px; transform: rotate(-2deg); z-index: 0; }
+  .glogo b { position: relative; z-index: 1; font-style: normal; }
+  .hdr-right { display: flex; align-items: center; gap: 7px; }
+  .streak { background: hsl(16 77% 93%); color: hsl(11 82% 44%); font-size: 10.5px; font-weight: 700; border-radius: 999px; padding: 4px 9px; }
+  .avatar { width: 22px; height: 22px; border-radius: 50%; border: 1.6px solid var(--muted-fg); }
+  .track { background: var(--muted); border-radius: 999px; display: flex; align-items: center; padding: 3px; gap: 2px; }
+  .track .pill { background: #fff; color: var(--primary); font-weight: 700; border-radius: 999px; padding: 6px 12px; font-size: 11.5px; box-shadow: 0 1px 3px rgba(34,48,79,.12); }
+  .track .tab { color: var(--muted-fg); font-size: 11px; font-weight: 600; padding: 6px 7px; white-space: nowrap; }
+  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .icbox { width: 30px; height: 30px; border-radius: 9px; background: #fff; border: 1px solid var(--border); display: grid; place-items: center; color: var(--muted-fg); font-size: 12px; }
+  .vsw { background: var(--muted); border-radius: 11px; display: flex; padding: 3px; gap: 2px; }
+  .vsw .v { width: 26px; height: 24px; border-radius: 8px; display: grid; place-items: center; font-size: 11px; color: var(--muted-fg); }
+  .vsw .v.on { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(34,48,79,.12); }
+  .card { background: #fff; border-radius: 16px; padding: 13px 13px 11px; margin-top: 11px; box-shadow: 0 2px 8px rgba(34,48,79,.07); }
+  .card h3 { font-size: 14.5px; display: flex; align-items: center; gap: 7px; }
+  .card h3 .die { width: 13px; height: 13px; border-radius: 50%; border: 2px solid hsl(333 71% 51%); }
+  .card h3 .bm { margin-left: auto; color: var(--muted-fg); font-size: 12px; font-weight: 400; }
+  .card .ex { font-style: italic; color: var(--muted-fg); font-size: 11px; margin-top: 7px; line-height: 1.45; }
+  .card .meta { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; }
+  .tag { background: var(--muted); color: var(--muted-fg); font-size: 9.5px; font-weight: 600; border-radius: 999px; padding: 4px 8px; }
+  .spk { color: var(--muted-fg); font-size: 12px; }
+  .bottom { margin-top: auto; display: flex; gap: 8px; align-items: center; }
+  .fb { background: #fff; border: 1px solid var(--border); border-radius: 999px; font-size: 10px; font-weight: 600; color: var(--muted-fg); padding: 9px 11px; white-space: nowrap; }
+  .cta { flex: 1; background: var(--cta); color: #fff; font-weight: 700; font-size: 11.5px; border-radius: 999px; padding: 10px 0; text-align: center; box-shadow: 0 4px 14px rgba(61,116,237,.35); }
+</style>
+</head>
+<body>
+  <h1>Himmel → Mint · Sehr dezent, umgekehrt</h1>
+  <p class="sub">Runde 3: F3 (Sehr dezent) mit umgekehrtem Verlauf. Referenz links, daneben drei gespiegelte Richtungen.</p>
+  <div class="grid" id="grid"></div>
+
+  <template id="phone-t">
+    <div class="variant">
+      <div class="label"><b></b><span></span></div>
+      <div class="phone"><div class="screen">
+        <div class="hdr">
+          <div class="glogo"><i></i><b>g</b></div>
+          <div class="hdr-right"><span class="streak">&#128293; 1 Tag</span><span class="avatar"></span></div>
+        </div>
+        <div class="track"><span class="pill">Wörter</span><span class="tab">Kollokationen</span><span class="tab">Redemittel</span><span class="tab">Gram.</span></div>
+        <div class="toolbar">
+          <span class="icbox">&#9776;</span>
+          <div class="vsw"><span class="v">&#9638;</span><span class="v">&#10070;</span><span class="v on">&#9640;</span><span class="v">&#9636;</span></div>
+          <span style="display:flex;gap:6px"><span class="icbox">&#9733;</span><span class="icbox">&#9906;</span></span>
+        </div>
+        <div class="card">
+          <h3><span class="die"></span>die Besprechung<span class="bm">&#9734;</span></h3>
+          <div class="ex">„Die Besprechung beginnt um neun Uhr."</div>
+          <div class="meta"><span class="tag">Pl.: die Besprechungen</span><span class="spk">&#128266;</span></div>
+        </div>
+        <div class="card">
+          <h3><span class="die"></span>die Tagesordnung<span class="bm">&#9734;</span></h3>
+          <div class="ex">„Steht das Thema auf der Tagesordnung?"</div>
+          <div class="meta"><span class="tag">Pl.: die Tagesordnungen</span><span class="spk">&#128266;</span></div>
+        </div>
+        <div class="bottom"><span class="fb">&#10024; Feedback</span><span class="cta">&#9889; Üben mit 1623 Wörtern</span></div>
+      </div></div>
+      <div class="stops"></div>
+    </div>
+  </template>
+
+<script>
+  const MESH = "radial-gradient(at 0% 0%, hsl(221 83% 54% / 0.10) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(197 93% 77% / 0.09) 0px, transparent 50%)";
+  // Same 150° sky→mint blend; each step mixes the stops further toward white
+  // (F1 ≈ +35 %, F2 ≈ +55 %, F3 ≈ +75 %).
+  const VARIANTS = [
+    { id: "F3", name: "Referenz", note: "aus Runde 2 (Himmel oben)",
+      bg: MESH + ", linear-gradient(150deg, #F4FBFE 0%, #F9FDFB 62%, #F7FCF9 100%)",
+      stops: "#F4FBFE \u2192 #F9FDFB \u2192 #F7FCF9 (150\u00b0)" },
+    { id: "I1", name: "Umgekehrt diagonal", note: "Mint oben \u2192 Himmel unten",
+      bg: MESH + ", linear-gradient(150deg, #F7FCF9 0%, #F9FDFB 38%, #F4FBFE 100%)",
+      stops: "#F7FCF9 \u2192 #F9FDFB \u2192 #F4FBFE (150\u00b0)" },
+    { id: "I2", name: "Umgekehrt vertikal", note: "Mint oben \u2192 Himmel unten, gerade",
+      bg: MESH + ", linear-gradient(180deg, #F7FCF9 0%, #F9FDFB 45%, #F3FAFE 100%)",
+      stops: "#F7FCF9 \u2192 #F9FDFB \u2192 #F3FAFE (vertikal)" },
+    { id: "I3", name: "Umgekehrt + Schein unten", note: "Blau-Schleier nach unten verlegt",
+      bg: "radial-gradient(at 0% 100%, hsl(221 83% 54% / 0.08) 0px, transparent 50%), radial-gradient(at 100% 100%, hsl(197 93% 77% / 0.20) 0px, transparent 55%), linear-gradient(180deg, #F7FCF9 0%, #F9FDFB 45%, #F4FBFE 100%)",
+      stops: "wie I2, aber bg-mesh-Schleier unten statt oben" },
+  ];
+  const grid = document.getElementById("grid");
+  const t = document.getElementById("phone-t");
+  for (const v of VARIANTS) {
+    const node = t.content.cloneNode(true);
+    node.querySelector(".label b").textContent = v.id + " · " + v.name;
+    node.querySelector(".label span").textContent = v.note;
+    node.querySelector(".screen").style.background = v.bg;
+    node.querySelector(".stops").textContent = v.stops;
+    grid.appendChild(node);
+  }
+</script>
+</body>
+</html>

@@ -66,7 +66,7 @@ export function Onboarding() {
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background bg-mesh px-4 py-10">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background bg-page px-4 py-10">
       <div className="pointer-events-none absolute -top-32 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/20 blur-3xl" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
