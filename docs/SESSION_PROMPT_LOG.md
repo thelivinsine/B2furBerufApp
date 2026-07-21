@@ -629,3 +629,19 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   keeping s139 + s138 as the two most recent) and appended this session-139 prompt-log entry.
 - **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+
+---
+
+## Session 140 — 2026-07-21 · branch `claude/session-f94z5m`
+
+- **Prompt 1 (verbatim; attachment: mobile screenshot of `genauly.de/library`):** `> instead of butter yellow used here as part of the layout, can you use a a shade of grey with good contrast for the toggle and tags. For the background where butter yellow is used.. use a shade of himmelblue for the gradient.`
+- **Response 1:** The "butter yellow" is the warm Papier light-theme token set. Recolored the light
+  theme in `src/index.css`: `--muted` (switcher tracks + tag pills) `42 44% 89%` → neutral grey
+  `220 9% 87%`, `--muted-foreground` → `220 8% 36%`, `--border`/`--input` → `220 8% 83%`;
+  `--background` `43 58% 95%` (Papier cream) → pale Himmelblau `199 68% 95%` (`#EAF5FB`), so the
+  existing `bg-mesh` blue washes read as a soft Himmelblau gradient. Updated the light `theme-color`
+  meta in `index.html` to `#EAF5FB`. Dark theme, the semantic `--warning` butter tokens, and the
+  app-icon `PAPIER` tile constant untouched. Gates: check:contrast 46/46 ✓ · build ✓. Updated
+  `docs/PROJECT_STATUS.md` (s140 handoff, s138 handoff archived to W30) and this log.
+- **Artifacts (prompt 1):** `src/index.css` · `index.html` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log

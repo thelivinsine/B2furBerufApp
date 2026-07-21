@@ -121,3 +121,46 @@ greenlit fixes 1-7 of the ten-point list. What shipped:
   (landing light/dark, Anwenden hub, Fortschritt). **Deploy: the wave-1 Pages run failed (the #609
   conflict marker); the wave-2 run (`add6529`, PR #610) completed green, so BOTH waves went live
   together.** PWA caveat: hard-refresh the live site.
+
+**Handoff after session 138 (2026-07-20). Logo v2 rework (logos ONLY, founder-scoped), branch
+`claude/logo-blue-contrast-xsfk19`, shipped to `main`.** The founder found the logo's Himmelblau
+swipe too harsh against black/white and iterated through 8 artifact preview rounds (v2→v8) to a
+finalized design, then said "finalize these logos and Randnah favicon, apply everywhere, logos
+only." What shipped:
+- **Swipe color: Himmel Soft `#8CDBFB`** on every logo asset. (Initially the `--accent` token was
+  deliberately left at Himmelblau `#52C6F9`; a same-session follow-up prompt then applied Himmel
+  Soft app-wide: `--accent: 197 93% 77%` in BOTH themes in `index.css`, plus the two fixed
+  `#53C7F9` hexes on the landing (numbers-band gradient stop, decorative doodle stroke). The darker
+  `--accent-ink` text variant and the CTA `--gradient-*` stops are different blues and stayed.
+  `check:contrast` green; brand kit regenerated.)
+- **Icons re-centered ("Größer", `TILE_MARGIN = 0.12`):** `build-logo-assets.mjs` now measures the
+  mark's true bbox in-browser and centers it at a 12% margin (favicons/apple-touch/pwa; maskable at
+  14% since the OS crops it). This fixes the founder-screenshotted "empty band above the g" app icon.
+  (Started at 5% "Randnah"; the founder found that too big live and picked Größer in a follow-up.)
+  Never revert to raw-coordinate centering.
+- **Two-tone dark logos:** on dark grounds, artwork on the swipe is ink, off the swipe is white —
+  in practice only the g splits (ink bowl, white descender). Light grounds stay all ink.
+- **New lowercase wordmark** (`public/genauly-wordmark.png`/`-dark.png`, 548×138): "genauly" in
+  the app's own Inter (variable, wght 800, −0.02em, rendered via embedded `@fontsource-variable/
+  inter` woff2), swipe under "genau" with the exact v2 band geometry (−0.16em/+0.10em overhangs,
+  0.12em/0.10em em-box insets, −2° tilt). Dark wordmark: word white, "enau" solid ink on the
+  swipe, ONLY the g dual-tone (clip = swipe ∪ an e..u rect, avoids white slivers on letter
+  bottoms).
+- **`Logo.tsx` gained `variant="mark" | "wordmark"`**; wordmark placed in Sidebar, AuthDialog,
+  Onboarding, HelpChrome, LegalChrome, landing footer, **landing header at ALL sizes** (the
+  founder wants a first-time visitor to see the app NAME, not just the mark; sized `h-7 w-auto
+  sm:h-8`), and the dark no-JS shells (`index.html`, `prerender-help.mjs` — the adjacent "Genauly"
+  text spans were removed, the image IS the name). Only the mobile in-app `AppShell` header keeps
+  the compact mark (s86 rule). **Gotcha fixed in review:** responsive *display* utilities
+  (block/hidden) must wrap `<Logo>` in a container, never be passed into it (they override the
+  internal `dark:` image swap); *height* utilities are safe to pass in (they apply to both theme
+  images), which is why the single responsive `h-7 sm:h-8` on the landing header works.
+- **Brand kit + spec:** `build-brand-kit.mjs` reworked to the logo v2 (two-tone dark mark, Größer
+  app-icon tile, the lowercase "genauly" wordmark as PNG copied from `public/`, PNG lockups; drops
+  the `wordmark-data.mjs` capital-G dependency) and regenerated; `brand-kit/README.md`,
+  `BRAND_SPEC.md` §3, and the CLAUDE.md brand section rewritten. The 8-round preview artifact is
+  saved at `preview/branding/artifacts/genauly-logo-v2-previews.html`.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit 219/219 ✓ · build ✓ · bundle 110.5 kB ✓.
+  Verified rendered output via `pnpm preview` + headless Chromium (landing light/dark/mobile,
+  /hilfe dark) and the regenerated brand-kit contact sheet. PWA caveat: hard-refresh the live site;
+  the home-screen icon may need re-adding to show the new size.
