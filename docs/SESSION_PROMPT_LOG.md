@@ -759,8 +759,8 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   founder-gated aggregate RPCs), an explicit do-NOT-build list, phasing (MVP ≈ 2 sessions), and
   risks. Built `preview/admin-control-center-mockups.html`: 3 mockup screens on the brand tokens
   (Übersicht cockpit, Prüfmodus review card with keyboard flow, Feedback-Inbox + Systemzustand).
-  Docs-only change; opened a PR into `main` and squash-merged per the auto-ship rule, then updated
+  Docs-only change; opened PR #626 into `main` and squash-merged it (squash `cff04de`) per the auto-ship rule, then updated
   `docs/PROJECT_STATUS.md` (s143 handoff, s141 → W30 archive) and this log.
 - **Artifacts (prompt 1):** `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` ·
   `preview/admin-control-center-mockups.html` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #626 (squash `cff04de`)

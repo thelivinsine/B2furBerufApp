@@ -64,7 +64,7 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 ## Resume here (next session)
 
 **Handoff after session 143 (2026-07-21). Admin Control Center scoping, branch
-`claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (docs + preview only).** Founder
+`claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (PR #626, docs + preview only).** Founder
 asked for a full-blown comprehensive admin control center: an expert-agent panel to research and
 scope it, a detailed report with recommendations, and HTML previews. What shipped (research/design
 only, zero app-code changes):
