@@ -703,3 +703,43 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   (s139 handoff prepended), `CLAUDE.md` (mobile-bar label feature + Theorie→Bibliothek rename), and
   this log.
 - **Artifacts (prompt 4):** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · this log
+
+---
+
+## Session 142 — 2026-07-21 · branch `claude/words-collocations-qc-0pycjq`
+
+- **Prompt 1 (verbatim):** `> [screenshot] there seems to be collocations in words section here. do a quality control of this section and provide priority actions`
+- **Response 1:** QC of the Theorie → Wörter section. Confirmed the Wörter list renders the whole
+  vocab bank with no part-of-speech filter, so multi-word Nomen-Verb collocations leak in. Scanned
+  all 1,623 entries: **8 are noun+verb collocations** (the screenshot's "Aufgaben verteilen" among
+  them), and cross-checking the collocations bank found **6 are literal duplicates** of existing
+  `c_*` entries (`v_aufgabe_verteilen`, `v_zustandig_klaeren`, `v_software_einfuehren`,
+  `v_muell_vermeiden`, `v_energie_sparen`, `v_wortergreifen`). Flagged the ID-permanence constraint
+  (deletion orphans FSRS progress → retire from surface, not delete). Asked the founder two
+  decisions (cleanup scope; guardrail). Founder chose **report only, no data changes** + **add a
+  linter check**. Shipped the guardrail as a warn-only `lintVocabCollocationOverlap` in
+  `scripts/lint-content.mjs` (normalizes lexemes, flags vocab `de` == collocation `full`); it caught
+  all 6 dupes. Pushed to the branch (not merged).
+- **Artifacts (prompt 1):** `scripts/lint-content.mjs` (commit c789778)
+- **Prompt 2 (verbatim):** `> the red and orange ones shouldn't be in worter as a combination of noun and verb - they can live in worter as separate words but together they should be in collocations. For the yellow (borderline), they can stay.`
+- **Response 2:** Implemented retire-from-surface for the 8 combos (individual words stay; only the
+  combination leaves Wörter). Added `RETIRED_VOCAB_IDS` + `browsableVocabulary` to
+  `src/data/vocabulary.ts`; routed every "words" surface through it (Wörter browse via `themeScoped`
+  + the now-browsable `vocabByTheme`/`vocabBySubTheme`, global search, the 3 composed-session word
+  pools in `engine/session.ts`, `Sammlung.tsx`, the "Alle Themen" count). `vocabById`/`vocabulary`
+  stay the full bank for id resolution. Added the 2 combos missing from Kollokationen
+  (`c_planung_revidieren`, `c_vorwuerfe_zurueckweisen`, colloc 1,033 → **1,035**) + provenance rows.
+  Upgraded the guardrail from warn to **ERROR** (retired ids are the sanctioned exception; stale-set
+  entries also flagged). Gates: `lint:content` (no errors) · `typecheck` · `test:unit` 219 · `build`
+  · `check:bundle` 110.5/400 kB all green. Opened PR #624 into `main` and squash-merged it; realigned
+  the dev branch to `origin/main` with `--force-with-lease`.
+- **Artifacts (prompt 2):** `src/data/vocabulary.ts` · `src/data/collocations.ts` ·
+  `src/data/provenance.ts` · `src/engine/session.ts` · `src/lib/search.ts` ·
+  `src/features/vocabulary/VocabularyTrainer.tsx` · `src/features/collection/Sammlung.tsx` ·
+  `scripts/lint-content.mjs` (commit bc580e2) · PR #624 (squash `8c0f891`)
+- **Prompt 3 (verbatim):** `> document the session`
+- **Response 3:** Updated `docs/PROJECT_STATUS.md` (s142 handoff added, `_Last updated_` block,
+  content counts colloc → 1,035, s140 handoff moved to the W30 archive),
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` (s140 handoff prepended), `CLAUDE.md`
+  (collocation count + the RETIRED_VOCAB_IDS/browsableVocabulary convention), and this log.
+- **Artifacts (prompt 3):** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · this log

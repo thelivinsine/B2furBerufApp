@@ -3,6 +3,32 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 140 (2026-07-21). Light-theme recolor (two rounds + a 3-round preview
+picker), branch `claude/session-f94z5m`, shipped to `main`.** Founder screenshot of `/library` on
+mobile: the warm Papier tint (switcher tracks, tags, page ground) read as "butter yellow". What
+shipped:
+- **Round 1 (PR #619): neutral grey chrome + flat Himmelblau ground.** `--muted`/`--border`/
+  `--input` moved from the warm 42/43-hue tans to neutral 220-hue greys; `--background` to a pale
+  Himmelblau. Covers the LibrarySwitcher/ViewSwitcher tracks, `bg-muted` tag pills, the bottom-bar
+  active `bg-border` squircle, and every border, app-wide by token.
+- **Preview picker (3 rounds, committed to `preview/`):** `background-gradient-variations.html`
+  (8 ground options A–H rendered in the real chrome), `…-r2-himmel-mint.html` (the founder liked
+  Himmel → Mint; 4 intensity steps), `…-r3-invertiert.html` (the founder picked "Sehr dezent" but
+  inverted; 3 mirrored takes). Screenshotted via the preinstalled headless Chromium; founder picked
+  **I1** (very subtle mint → sky, 150° diagonal).
+- **Round 2 (PR #620): the "I1" gradient ground + lighter greys.** New `--page-from/mid/to` tokens
+  (light: mint `144 45% 98%` → `150 50% 98%` → sky `198 83% 98%`; dark: all three = the flat dark
+  ground, so dark mode is a NO-OP) + a **`bg-page`** backgroundImage in `tailwind.config.ts` (the
+  bg-mesh washes layered over the 150° linear). Applied on the five full-page shells (AppShell ×2,
+  Onboarding, LegalChrome, HelpChrome); ExamHub/SimulationHub Cards keep plain `bg-mesh`. Flat
+  `--background` became the near-white fallback `180 45% 98%` (sticky bars, inputs); light
+  `theme-color` meta = the mint top stop `#F7FCF9`. Mid-round the founder also asked for lighter
+  button greys: `--muted` 87% → **`220 10% 90%`**, `--border`/`--input` 83% → **`220 9% 86%`**.
+- **Deliberately untouched:** dark theme; the semantic `--warning` Butter tokens; the brand-kit /
+  logo scripts' `PAPIER` app-icon tile constant. CLAUDE.md brand section documents the new ground.
+- **Gates (both rounds):** `check:contrast` all pairings ✓ · build ✓. PWA caveat: the shell is
+  service-worker-cached; hard-refresh the live site to see the new colors.
+
 **Handoff after session 139 (2026-07-20). Three small fixes, branch
 `claude/app-icon-favicon-update-gympjq`, all shipped to `main` (PRs #616, #617).** Founder-reported
 issues, handled one prompt at a time:

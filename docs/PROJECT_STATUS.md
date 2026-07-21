@@ -1,11 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-21 (session 141). **Mobile bottom-nav labels shipped to `main` (PR #622).**
-Each section's name now appears under its icon in the mobile bar, visible only on the selected tab
-(the label slot is reserved on every tab so nothing shifts). Labels are a neutral theme-aware dark
-grey (`slate-600`/`slate-300`), and the `/library` tab was renamed **Theorie → Bibliothek**. Bar
-squircle 44→40px to fit; the old active underline was replaced by the label. `typecheck` + `build`
-green. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-21 (session 142). **Wörter (words) QC shipped to `main` (PR #624).** Eight
+Nomen-Verb collocations were leaking into the single-word Wörter list (article-less, e.g. "Aufgaben
+verteilen"); six were already duplicated in Kollokationen. Fix: a `RETIRED_VOCAB_IDS` set +
+`browsableVocabulary` view in `src/data/vocabulary.ts` excludes them from every "words" surface
+(browse/search/sessions/Sammlung/theme-counts) while keeping the ids (progress is id-keyed, so no
+deletion). Added the 2 combos missing from Kollokationen (now **1,035**); upgraded the
+`lint:content` guardrail to an ERROR so a future overlap fails CI. All gates green. Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -35,8 +37,9 @@ architectural decisions, and backend/infra setup are documented in `docs/PROJECT
 read that for the "what's built and how." The living detail of every feature area (mobile bar, the
 session engine, Bibliothek views, the game layer, content conventions) is in `../CLAUDE.md`.
 
-**Content banks (as of 2026-07-18, session 130, verified against `pnpm lint:content` — re-verify
-before quoting):** vocab **1,623** · collocations **1,033** · Redemittel **149** ·
+**Content banks (as of 2026-07-21, session 142, verified against `pnpm lint:content` — re-verify
+before quoting):** vocab **1,623** (8 mis-filed noun+verb combos retired from the Wörter surface
+in s142, ids kept) · collocations **1,035** · Redemittel **149** ·
 grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **~3,105
 rows** · themes **20** (five new `alltag` themes in s126: einkaufen/essen/mobilitaet/freizeit/
 digitales) · exam sets **15** · dialogues **30**. Taxonomy is **5 top-level domains** (the
@@ -61,6 +64,33 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 142 (2026-07-21). Wörter (words) quality-control, branch
+`claude/words-collocations-qc-0pycjq`, shipped to `main` (PR #624).** Founder screenshot of the
+Theorie → Wörter list: "Aufgaben verteilen" (a Nomen-Verb collocation) sat article-less among real
+nouns. QC found the Wörter list renders the whole vocab bank with no POS filter, so **8 noun+verb
+collocations leaked in**; **6 were literal duplicates** of existing Kollokationen entries. Founder
+direction: the individual words may stay in Wörter, but the *combination* belongs in Kollokationen.
+What shipped:
+- **Retire-from-surface, never delete** (shipped ids are permanent, progress is id-keyed). New
+  `RETIRED_VOCAB_IDS` set + `browsableVocabulary` (= bank − retired) in `src/data/vocabulary.ts`.
+  Every "words" surface reads `browsableVocabulary`: the Wörter browse (list/table/graph/counts,
+  via `themeScoped` + `vocabByTheme`/`vocabBySubTheme` which are now browsable-based), global search
+  (`lib/search.ts`), the composed-session word pools (`engine/session.ts` ×3: libraryFocus, focus,
+  weightedDue), and `Sammlung.tsx`. `vocabById`/`vocabulary` stay the full bank for id resolution.
+- **The 8 retired ids:** `v_aufgabe_verteilen`, `v_zustandig_klaeren`, `v_software_einfuehren`,
+  `v_muell_vermeiden`, `v_energie_sparen`, `v_wortergreifen`, `v_planung_revidieren`,
+  `v_vorwuerfe_zurueckweisen`.
+- **Added the 2 combos missing from Kollokationen** (`c_planung_revidieren`,
+  `c_vorwuerfe_zurueckweisen`) + provenance rows; the other 6 already existed there. Collocations
+  1,033 → **1,035**.
+- **`lint:content` guardrail (new `lintVocabCollocationOverlap`)** upgraded from warn to **ERROR**:
+  a vocab word whose German equals a collocation `full` must be removed or listed in
+  `RETIRED_VOCAB_IDS`, so a future overlap fails CI. Retired ids are the sanctioned exception; a
+  stale set entry is also flagged. Normalizes lexemes (drops leading article, lowercases).
+- **Gates:** `pnpm lint:content` (1,035 colloc, no errors) · `typecheck` · `test:unit` (219) ·
+  `build` · `check:bundle` (110.5/400 kB) all green. Post-merge branch realigned to `main`.
+  PWA caveat: the word list is service-worker-cached; hard-refresh the live site to see it.
+
 **Handoff after session 141 (2026-07-21). Mobile bottom-nav item labels, branch
 `claude/mobile-nav-item-labels-vx29vh`, shipped to `main` (PR #622).** Founder asked to add each
 nav item's name under its icon in the mobile view, visible only when selected, with real-screenshot
@@ -82,34 +112,10 @@ previews. What shipped (all in `src/components/layout/`):
   (seeded `onboarded:true` in `b2beruf.settings.v1` localStorage to skip onboarding). Post-merge
   branch realigned to `main`. PWA caveat: the nav is service-worker-cached; hard-refresh to see it.
 
-**Handoff after session 140 (2026-07-21). Light-theme recolor (two rounds + a 3-round preview
-picker), branch `claude/session-f94z5m`, shipped to `main`.** Founder screenshot of `/library` on
-mobile: the warm Papier tint (switcher tracks, tags, page ground) read as "butter yellow". What
-shipped:
-- **Round 1 (PR #619): neutral grey chrome + flat Himmelblau ground.** `--muted`/`--border`/
-  `--input` moved from the warm 42/43-hue tans to neutral 220-hue greys; `--background` to a pale
-  Himmelblau. Covers the LibrarySwitcher/ViewSwitcher tracks, `bg-muted` tag pills, the bottom-bar
-  active `bg-border` squircle, and every border, app-wide by token.
-- **Preview picker (3 rounds, committed to `preview/`):** `background-gradient-variations.html`
-  (8 ground options A–H rendered in the real chrome), `…-r2-himmel-mint.html` (the founder liked
-  Himmel → Mint; 4 intensity steps), `…-r3-invertiert.html` (the founder picked "Sehr dezent" but
-  inverted; 3 mirrored takes). Screenshotted via the preinstalled headless Chromium; founder picked
-  **I1** (very subtle mint → sky, 150° diagonal).
-- **Round 2 (PR #620): the "I1" gradient ground + lighter greys.** New `--page-from/mid/to` tokens
-  (light: mint `144 45% 98%` → `150 50% 98%` → sky `198 83% 98%`; dark: all three = the flat dark
-  ground, so dark mode is a NO-OP) + a **`bg-page`** backgroundImage in `tailwind.config.ts` (the
-  bg-mesh washes layered over the 150° linear). Applied on the five full-page shells (AppShell ×2,
-  Onboarding, LegalChrome, HelpChrome); ExamHub/SimulationHub Cards keep plain `bg-mesh`. Flat
-  `--background` became the near-white fallback `180 45% 98%` (sticky bars, inputs); light
-  `theme-color` meta = the mint top stop `#F7FCF9`. Mid-round the founder also asked for lighter
-  button greys: `--muted` 87% → **`220 10% 90%`**, `--border`/`--input` 83% → **`220 9% 86%`**.
-- **Deliberately untouched:** dark theme; the semantic `--warning` Butter tokens; the brand-kit /
-  logo scripts' `PAPIER` app-icon tile constant. CLAUDE.md brand section documents the new ground.
-- **Gates (both rounds):** `check:contrast` all pairings ✓ · build ✓. PWA caveat: the shell is
-  service-worker-cached; hard-refresh the live site to see the new colors.
-
-_(Session 139's three-small-fixes handoff (icon-size preview correction, mission-exit toggle fix,
-Kollokationen graph tighter clusters), session 138's logo-v2 rework handoff, session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
+_(Session 140's light-theme recolor handoff (neutral grey chrome + the "I1" mint→sky gradient
+ground, 2 PRs + a 3-round preview picker), session 139's three-small-fixes handoff (icon-size
+preview correction, mission-exit toggle fix, Kollokationen graph tighter clusters), session 138's
+logo-v2 rework handoff, session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
