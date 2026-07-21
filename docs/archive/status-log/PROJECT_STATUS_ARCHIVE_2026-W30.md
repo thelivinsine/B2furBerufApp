@@ -3,6 +3,34 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 139 (2026-07-20). Three small fixes, branch
+`claude/app-icon-favicon-update-gympjq`, all shipped to `main` (PRs #616, #617).** Founder-reported
+issues, handled one prompt at a time:
+- **Icon-size preview correction (#616):** the founder thought the app icon/favicon still showed the
+  old **Randnah** (5% margin) size. The shipped assets were in fact already **Größer** (12% margin)
+  since s138 — verified by measuring every committed PNG (mark ≈ 73–75% of the tile = 12% margin;
+  Randnah would be ≈ 90%). The confusion came from the saved preview
+  `preview/branding/artifacts/genauly-logo-v2-previews.html`, which still highlighted Randnah as
+  "empfohlen" and rendered the home-screen mockup row at the 5% margin. Fixed the preview to mark
+  Größer as applied and render the OS row at 12%. **No shipped asset changed.** If the live
+  tab/home-screen icon still looks old it is PWA/browser cache (hard-refresh; re-add the PWA).
+- **Mission-exit toggle fix (#616):** exiting a mission launched from Heute → Spielen stripped the
+  `?mission=` param and left the learner on the standalone `/welt` hub, which has no Lernen/Spielen
+  toggle. Now `SpielenHub` tags the deep link `&from=heute`, `Welt.tsx` navigates back to
+  `/?tab=spielen` on exit when it sees that marker, and `Dashboard.tsx` opens on the Spielen tab for
+  `?tab=spielen` (clearing the param on a manual switch). Direct `/welt` visits are unchanged.
+- **Kollokationen graph — tighter clusters (#617):** founder asked to pull the nodes closer so the
+  theme islands look better; generated a 3-option preview
+  (`preview/collocation-graph-tightness.html` + generator `preview/gen-collocation-graph-tightness.mjs`,
+  rendering the REAL bank through the shipped d3-force layout) and the founder picked **"Am engsten"**.
+  `CollocationGraph.tsx` force block now: centroid pull (forceX/Y) **0.72** (was 0.38), link **0.38**
+  (0.22), charge **−34/max200** (−55/240), collision **r+1.5** (r+3), centroid ring **118+N·26**
+  (140+N·35). Pure builder unchanged, so `tests/collocationGraph.test.ts` (11) still passes; CLAUDE.md
+  layout-recipe note refreshed.
+- **Gates (each PR):** typecheck ✓ · build ✓ · check:bundle 110.5 kB ✓ · test:unit 219/219 (#616) /
+  collocationGraph 11/11 (#617) ✓. Post-merge branch realigned to `main` both times. PWA caveat: the
+  graph + icons are service-worker-cached; hard-refresh the live site.
+
 **Handoff after session 135 (2026-07-20). Game demo-readiness review + P0 batch + P1 cutscene pass
 SHIPPED (PRs #601, #602 merged to `main`). Branch `claude/game-review-demo-readiness-8fdpid`.** The
 founder asked for a comprehensive review of the current game (Neuland, G1 + G2 Kapitel 1) with
