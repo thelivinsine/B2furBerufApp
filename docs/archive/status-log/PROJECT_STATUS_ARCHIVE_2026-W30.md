@@ -3,6 +3,27 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 141 (2026-07-21). Mobile bottom-nav item labels, branch
+`claude/mobile-nav-item-labels-vx29vh`, shipped to `main` (PR #622).** Founder asked to add each
+nav item's name under its icon in the mobile view, visible only when selected, with real-screenshot
+previews. What shipped (all in `src/components/layout/`):
+- **`BottomTabBar.tsx` — `BarTab` restructured to a vertical column** (icon squircle on top, label
+  below). The label slot is a **reserved fixed-height row on every tab** (`h-3`, `opacity-0` when
+  inactive) so selecting a tab never shifts the icon rail; the name fades in only on the active tab.
+  The old small active underline was removed (label + grey squircle now mark the active tab). The
+  squircle shrank `h-11 w-11` → **`h-10 w-10`** so icon + label fit inside the locked 63px bar
+  height (a deliberate, founder-driven exception to the s28 `h-11` lock; noted in CLAUDE.md).
+- **Label color:** first shipped in the section accent, then the founder called blue "not premium"
+  → switched to a neutral theme-aware **dark grey** (`text-slate-600 dark:text-slate-300`,
+  `font-semibold text-[10px]`). `color` was dropped from the `BarTab` destructure (now unused).
+- **Rename Theorie → Bibliothek** (founder): `nav-items.ts` `/library` label + `LibrarySwitcher.tsx`
+  `aria-label`. (This reverses the s105 Bibliothek→Theorie rename; the s105 change is still in the
+  historical comments.) Edit mode, icon marks/colors, and the iOS fixes are untouched.
+- **Verification:** `pnpm typecheck` ✓ · `pnpm build` ✓ (incl. PWA + help prerender). Captured
+  real 390×844 mobile screenshots of the running dev app via the preinstalled headless Chromium
+  (seeded `onboarded:true` in `b2beruf.settings.v1` localStorage to skip onboarding). Post-merge
+  branch realigned to `main`. PWA caveat: the nav is service-worker-cached; hard-refresh to see it.
+
 **Handoff after session 140 (2026-07-21). Light-theme recolor (two rounds + a 3-round preview
 picker), branch `claude/session-f94z5m`, shipped to `main`.** Founder screenshot of `/library` on
 mobile: the warm Papier tint (switcher tracks, tags, page ground) read as "butter yellow". What

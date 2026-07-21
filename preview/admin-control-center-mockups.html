@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Genauly Kontrollzentrum · Mockups (s143)</title>
+<style>
+  :root{
+    --bg: hsl(180 45% 98%);
+    --page-a: hsl(144 45% 98%);
+    --page-b: hsl(150 50% 98%);
+    --page-c: hsl(198 83% 98%);
+    --fg: hsl(252 16% 12%);
+    --fg-soft: hsl(252 10% 38%);
+    --fg-faint: hsl(252 8% 55%);
+    --surface: #fff;
+    --muted: hsl(220 10% 90%);
+    --muted-soft: hsl(220 10% 95%);
+    --border: hsl(220 9% 86%);
+    --primary: hsl(221 83% 54%);
+    --primary-soft: hsl(221 83% 96%);
+    --accent: hsl(197 93% 77%);
+    --accent-bg: hsl(197 93% 93%);
+    --reward: hsl(11 82% 54%);
+    --reward-bg: hsl(11 82% 95%);
+    --success: hsl(152 60% 38%);
+    --success-bg: hsl(152 55% 93%);
+    --warning: hsl(43 90% 45%);
+    --warning-bg: hsl(46 95% 92%);
+    --danger: hsl(0 72% 48%);
+    --danger-bg: hsl(0 75% 95%);
+    --grad-a: hsl(226 83% 47%);
+    --grad-b: hsl(196 93% 38%);
+    --shadow-soft: 0 1px 2px hsl(230 25% 45% / .06), 0 4px 16px hsl(230 25% 45% / .08);
+    --shadow-lift: 0 2px 6px hsl(230 25% 45% / .08), 0 12px 32px hsl(230 25% 45% / .12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--fg);
+    background:linear-gradient(150deg,var(--page-a),var(--page-b) 45%,var(--page-c));
+    min-height:100vh;
+    padding:48px 20px 80px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  .intro{max-width:760px;margin:0 auto 44px;text-align:center}
+  .intro .eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--primary)}
+  .intro h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin:10px 0 12px}
+  .intro p{font-size:15px;line-height:1.65;color:var(--fg-soft)}
+  .intro .meta{margin-top:14px;font-size:12.5px;color:var(--fg-faint)}
+
+  /* browser frame */
+  .frame{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow-lift);overflow:hidden;margin:0 auto 26px}
+  .frame-bar{display:flex;align-items:center;gap:10px;padding:10px 16px;background:var(--muted-soft);border-bottom:1px solid var(--border)}
+  .dots{display:flex;gap:6px}
+  .dots i{width:11px;height:11px;border-radius:50%;background:var(--muted);display:block}
+  .urlbar{flex:1;max-width:340px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--fg-faint);padding:5px 12px;text-align:center}
+  .screen-label{display:flex;align-items:baseline;gap:12px;margin:52px 0 14px}
+  .screen-label .num{font-size:13px;font-weight:800;color:var(--primary);letter-spacing:.08em}
+  .screen-label h2{font-size:20px;font-weight:800;letter-spacing:-.01em}
+  .screen-label p{font-size:13.5px;color:var(--fg-soft)}
+
+  /* admin shell */
+  .shell{display:grid;grid-template-columns:216px 1fr;min-height:640px}
+  .side{border-right:1px solid var(--border);background:var(--surface);padding:18px 12px;display:flex;flex-direction:column;gap:2px}
+  .brand{display:flex;align-items:center;gap:9px;padding:6px 10px 16px}
+  .gmark{width:30px;height:30px;border-radius:9px;background:var(--accent);display:grid;place-items:center;font-weight:800;font-size:17px;color:var(--fg)}
+  .brand b{font-size:14.5px;font-weight:800;letter-spacing:-.01em}
+  .brand span{display:block;font-size:10.5px;font-weight:600;color:var(--fg-faint);letter-spacing:.08em;text-transform:uppercase}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13.5px;font-weight:600;color:var(--fg-soft)}
+  .nav-item svg{width:16px;height:16px;flex:none}
+  .nav-item.active{background:var(--primary-soft);color:var(--primary);font-weight:700}
+  .nav-item .pill{margin-left:auto;font-size:10.5px;font-weight:700;background:var(--reward-bg);color:var(--reward);border-radius:99px;padding:2px 7px}
+  .nav-item .pill.blue{background:var(--primary-soft);color:var(--primary)}
+  .side .foot{margin-top:auto;padding:10px 12px;font-size:11px;color:var(--fg-faint);line-height:1.5}
+
+  .main{background:linear-gradient(150deg,var(--page-a),var(--page-c));padding:22px 26px 30px}
+  .topline{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .topline h3{font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .topline .sub{font-size:12.5px;color:var(--fg-faint);margin-top:2px}
+  .founder-chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:99px;padding:5px 12px 5px 6px;font-size:12px;font-weight:600;color:var(--fg-soft);box-shadow:var(--shadow-soft)}
+  .founder-chip .av{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--grad-a),var(--grad-b));color:#fff;display:grid;place-items:center;font-size:10px;font-weight:800}
+
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+  .tile{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow-soft)}
+  .tile .k{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-faint)}
+  .tile .v{font-size:26px;font-weight:800;letter-spacing:-.02em;margin-top:6px}
+  .tile .v small{font-size:13px;font-weight:600;color:var(--fg-faint)}
+  .tile .d{font-size:12px;color:var(--fg-soft);margin-top:3px}
+  .tile .d.up{color:var(--success);font-weight:600}
+  .bar{height:6px;border-radius:99px;background:var(--muted);margin-top:10px;overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px}
+  .grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:12px;margin-bottom:12px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow-soft)}
+  .card h4{font-size:13.5px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .card h4 .tag{font-size:10.5px;font-weight:700;color:var(--fg-faint);background:var(--muted-soft);border:1px solid var(--border);border-radius:99px;padding:2px 8px;letter-spacing:.05em}
+
+  /* stacked tier bar */
+  .tierbar{display:flex;height:26px;border-radius:9px;overflow:hidden;border:1px solid var(--border)}
+  .tierbar i{display:block;height:100%}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:12px;color:var(--fg-soft)}
+  .legend b{font-weight:700;color:var(--fg)}
+  .swatch{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+
+  .handoff{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--primary-soft);border:1px solid hsl(221 83% 86%);border-radius:12px;padding:12px 14px;margin-top:12px}
+  .handoff p{font-size:12.5px;line-height:1.5;color:var(--fg-soft)}
+  .handoff p b{color:var(--fg)}
+  .btn{flex:none;border:0;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;border-radius:10px;padding:9px 15px}
+  .btn.grad{background:linear-gradient(135deg,var(--grad-a),var(--grad-b));color:#fff;box-shadow:0 4px 14px hsl(221 83% 54%/.35)}
+  .btn.ghost{background:var(--surface);border:1px solid var(--border);color:var(--fg-soft)}
+
+  .deploy{display:flex;flex-direction:column;gap:10px}
+  .deploy-row{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--fg-soft)}
+  .dot{width:9px;height:9px;border-radius:50%;flex:none}
+  .dot.g{background:var(--success)} .dot.a{background:var(--warning)} .dot.r{background:var(--danger)}
+  .deploy-row b{color:var(--fg);font-weight:700}
+  .mono{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:var(--muted-soft);border:1px solid var(--border);border-radius:6px;padding:1px 6px}
+
+  .check-list{display:flex;flex-direction:column;gap:8px}
+  .check-item{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .check-item .box{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--border);flex:none;display:grid;place-items:center}
+  .check-item.done .box{background:var(--success);border-color:var(--success);color:#fff;font-size:10px}
+  .check-item.done span{color:var(--fg-faint);text-decoration:line-through}
+  .chip{font-size:10px;font-weight:700;border-radius:99px;padding:2px 8px;margin-left:auto}
+  .chip.block{background:var(--danger-bg);color:var(--danger)}
+  .chip.soon{background:var(--warning-bg);color:hsl(35 80% 34%)}
+  .chip.ok{background:var(--success-bg);color:var(--success)}
+
+  /* spark chart */
+  .spark{width:100%;height:84px}
+
+  /* ===== Screen 2: Prüfmodus ===== */
+  .pruef{background:linear-gradient(150deg,var(--page-a),var(--page-c));min-height:620px;display:flex;flex-direction:column}
+  .pruef-head{display:flex;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--surface)}
+  .pruef-head .back{font-size:12.5px;font-weight:600;color:var(--fg-soft)}
+  .pruef-head .prog{flex:1;max-width:420px;margin:0 auto;text-align:center}
+  .pruef-head .prog .t{font-size:12.5px;font-weight:700}
+  .pruef-head .prog .t span{color:var(--fg-faint);font-weight:600}
+  .pruef-head .prog .bar{margin-top:6px}
+  .queue-chip{font-size:11.5px;font-weight:700;background:var(--muted-soft);border:1px solid var(--border);border-radius:99px;padding:4px 11px;color:var(--fg-soft)}
+  .pruef-stage{flex:1;display:grid;place-items:center;padding:30px 24px}
+  .review-card{width:min(660px,100%);background:var(--surface);border:1px solid var(--border);border-radius:20px;box-shadow:var(--shadow-lift);overflow:hidden}
+  .rc-top{padding:22px 26px 18px;border-bottom:1px solid var(--border)}
+  .why{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .why span{font-size:10.5px;font-weight:700;border-radius:99px;padding:3px 9px}
+  .why .w1{background:var(--reward-bg);color:var(--reward)}
+  .why .w2{background:var(--primary-soft);color:var(--primary)}
+  .why .w3{background:var(--muted-soft);border:1px solid var(--border);color:var(--fg-soft)}
+  .word-row{display:flex;align-items:baseline;gap:12px}
+  .artikel{font-size:15px;font-weight:800;color:hsl(226 74% 48%)}
+  .word{font-size:32px;font-weight:800;letter-spacing:-.02em}
+  .plural{font-size:13px;color:var(--fg-faint);font-weight:600}
+  .gloss{font-size:14px;color:var(--fg-soft);margin-top:4px}
+  .examples{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .ex{font-size:13.5px;line-height:1.55;background:var(--muted-soft);border:1px solid var(--border);border-radius:10px;padding:9px 13px}
+  .ex i{display:block;font-style:normal;font-size:11.5px;color:var(--fg-faint);margin-top:2px}
+  .rc-checks{padding:16px 26px;display:grid;grid-template-columns:1fr 1fr;gap:8px 20px;border-bottom:1px solid var(--border)}
+  .mcheck{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--fg-soft)}
+  .mcheck .ic{width:17px;height:17px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff}
+  .mcheck .ic.ok{background:var(--success)} .mcheck .ic.warn{background:var(--warning)} .mcheck .ic.jury{background:var(--primary)}
+  .mcheck b{color:var(--fg)}
+  .rc-src{padding:12px 26px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--fg-soft)}
+  .rc-src a{color:var(--primary);font-weight:600;text-decoration:none}
+  .keybar{display:flex;justify-content:center;gap:12px;padding:18px 24px 26px}
+  .key{display:flex;align-items:center;gap:9px;border-radius:12px;padding:11px 18px;font-size:13px;font-weight:700;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-soft)}
+  .key kbd{font-family:inherit;font-size:11px;font-weight:800;border-radius:6px;padding:2px 7px;border:1px solid}
+  .key.ok{background:var(--success-bg);border-color:hsl(152 45% 78%);color:var(--success)} .key.ok kbd{border-color:hsl(152 45% 65%)}
+  .key.no{background:var(--danger-bg);border-color:hsl(0 60% 85%);color:var(--danger)} .key.no kbd{border-color:hsl(0 60% 75%)}
+  .key.mut{color:var(--fg-soft)} .key.mut kbd{border-color:var(--border)}
+
+  /* ===== Screen 3: Feedback + System ===== */
+  .fb-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}
+  .inbox-row{display:flex;gap:12px;padding:13px 4px;border-bottom:1px solid var(--border);align-items:flex-start}
+  .inbox-row:last-child{border-bottom:0}
+  .st{flex:none;font-size:10px;font-weight:800;border-radius:99px;padding:3px 9px;margin-top:2px}
+  .st.neu{background:var(--primary-soft);color:var(--primary)}
+  .st.erl{background:var(--success-bg);color:var(--success)}
+  .st.verw{background:var(--muted-soft);color:var(--fg-faint);border:1px solid var(--border)}
+  .inbox-row .msg{font-size:13px;line-height:1.5}
+  .inbox-row .meta{font-size:11px;color:var(--fg-faint);margin-top:3px}
+  .inbox-row .meta b{color:var(--fg-soft);font-weight:600}
+  .inbox-row .pr{font-size:10.5px;font-weight:700;color:var(--primary)}
+  .ping{display:flex;align-items:center;gap:10px;font-size:12.5px;padding:8px 0;border-bottom:1px solid var(--muted-soft)}
+  .ping:last-child{border-bottom:0}
+  .ping b{font-weight:700}
+  .ping .lat{margin-left:auto;font-size:11px;color:var(--fg-faint)}
+  .quota{margin-top:4px}
+  .quota .qrow{display:flex;justify-content:space-between;font-size:12px;color:var(--fg-soft);margin:9px 0 5px}
+  .quota .qrow b{color:var(--fg)}
+  .links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+  .links a{display:block;text-align:center;font-size:11.5px;font-weight:700;color:var(--fg-soft);background:var(--muted-soft);border:1px solid var(--border);border-radius:9px;padding:8px;text-decoration:none}
+
+  .note{max-width:760px;margin:40px auto 0;font-size:12.5px;line-height:1.7;color:var(--fg-faint);text-align:center}
+  @media (max-width:900px){
+    .shell{grid-template-columns:1fr}
+    .side{flex-direction:row;flex-wrap:wrap;border-right:0;border-bottom:1px solid var(--border)}
+    .side .foot,.brand span{display:none}
+    .tiles{grid-template-columns:1fr 1fr}
+    .grid2,.fb-grid{grid-template-columns:1fr}
+    .rc-checks{grid-template-columns:1fr}
+    .keybar{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="intro">
+    <div class="eyebrow">Vorschau · Session 143</div>
+    <h1>Genauly Kontrollzentrum</h1>
+    <p>Drei Mockup-Screens für das Admin Control Center: die Übersicht (Cockpit), der Prüfmodus
+    (Tastatur-Review für den Inhalte-Engpass) und die Feedback-Inbox mit Systemzustand.
+    Alle Zahlen sind Beispielwerte. Konzept: <b>docs/plans/ADMIN_CONTROL_CENTER_PLAN.md</b></p>
+    <div class="meta">Route-Vorschlag: /admin · nur für Gründer-Konten sichtbar (isFounder + RLS/RPC) · Lazy Chunk</div>
+  </header>
+
+  <!-- ============ SCREEN 1 ============ -->
+  <div class="screen-label">
+    <span class="num">01</span>
+    <h2>Übersicht · das Cockpit</h2>
+    <p>Ein Blick: Prüf-Fortschritt, wartende Entscheidungen, Budget, Deploy, Launch.</p>
+  </div>
+  <section class="frame">
+    <div class="frame-bar"><div class="dots"><i></i><i></i><i></i></div><div class="urlbar">genauly.de/admin</div></div>
+    <div class="shell">
+      <aside class="side">
+        <div class="brand"><div class="gmark">g</div><div><b>genauly</b><span>Kontrollzentrum</span></div></div>
+        <div class="nav-item active"><svg viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Übersicht</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8.5l3 3 7-7"/></svg>Prüfen <span class="pill">412</span></div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 3h12v8H6l-4 3z" stroke-linejoin="round"/></svg>Feedback <span class="pill blue">5</span></div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 13V7m4 6V3m4 10V9m4 4V5" stroke-linecap="round"/></svg>Inhalte</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="5" r="2.6"/><path d="M2.5 13.5c.8-2.6 2.9-4 5.5-4s4.7 1.4 5.5 4" stroke-linecap="round"/></svg>Nutzer</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke-linecap="round"/></svg>System</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 14V2l5 2.5L13 2v12"/><path d="M3 14h10" stroke-linecap="round"/></svg>Launch <span class="pill">3</span></div>
+        <div class="foot">Angemeldet als Gründer.<br/>Alle Nutzerzahlen sind Aggregate, keine Einzelprofile.</div>
+      </aside>
+      <div class="main">
+        <div class="topline">
+          <div><h3>Guten Morgen 👋</h3><div class="sub">Montag, 21. Juli · Stand 09:41 · Register: 3.105 Inhalte</div></div>
+          <div class="founder-chip"><span class="av">T</span> Gründer-Konto</div>
+        </div>
+
+        <div class="tiles">
+          <div class="tile">
+            <div class="k">Menschlich geprüft</div>
+            <div class="v">63 <small>/ 3.105</small></div>
+            <div class="d up">+38 diese Woche</div>
+            <div class="bar"><i style="width:2%;background:var(--success)"></i></div>
+          </div>
+          <div class="tile">
+            <div class="k">KI-Jury-Abdeckung</div>
+            <div class="v">42<small>%</small></div>
+            <div class="d">Ziel 100% · läuft ohne dich</div>
+            <div class="bar"><i style="width:42%;background:var(--primary)"></i></div>
+          </div>
+          <div class="tile">
+            <div class="k">Wartende Entscheidungen</div>
+            <div class="v" style="color:var(--reward)">38</div>
+            <div class="d">geprüft, noch nicht im Repo</div>
+            <div class="bar"><i style="width:38%;background:var(--reward)"></i></div>
+          </div>
+          <div class="tile">
+            <div class="k">KI-Budget Juli</div>
+            <div class="v">$1,32 <small>/ $5</small></div>
+            <div class="d">61% Cache-Treffer · Limit fern</div>
+            <div class="bar"><i style="width:26%;background:linear-gradient(90deg,var(--grad-a),var(--grad-b))"></i></div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h4>Vertrauensleiter <span class="tag">alle Bänke</span></h4>
+            <div class="tierbar">
+              <i style="width:8%;background:var(--muted)" title="Unverifiziert"></i>
+              <i style="width:28%;background:hsl(220 15% 72%)" title="Provenienz"></i>
+              <i style="width:20%;background:var(--accent)" title="Linguistik"></i>
+              <i style="width:42%;background:var(--primary)" title="KI-Jury"></i>
+              <i style="width:2%;background:var(--success)" title="Menschlich"></i>
+            </div>
+            <div class="legend">
+              <span><i class="swatch" style="background:var(--muted)"></i>Unverifiziert <b>8%</b></span>
+              <span><i class="swatch" style="background:hsl(220 15% 72%)"></i>Provenienz <b>28%</b></span>
+              <span><i class="swatch" style="background:var(--accent)"></i>Linguistik <b>20%</b></span>
+              <span><i class="swatch" style="background:var(--primary)"></i>KI-Jury <b>42%</b></span>
+              <span><i class="swatch" style="background:var(--success)"></i>Menschlich <b>2%</b></span>
+            </div>
+            <div class="handoff">
+              <p><b>38 Freigaben warten auf Übernahme ins Repo.</b> Kopiere den Übergabe-Prompt und
+              gib ihn der nächsten KI-Session: sie führt <span class="mono">pnpm apply:reviews</span> aus,
+              stempelt und merged.</p>
+              <button class="btn grad">Übergabe-Prompt kopieren</button>
+            </div>
+          </div>
+          <div class="card">
+            <h4>Ist meine Änderung live?</h4>
+            <div class="deploy">
+              <div class="deploy-row"><span class="dot g"></span><div><b>Live und aktuell.</b> Build <span class="mono">a3f92c1</span> = neuester Stand von <span class="mono">main</span>.</div></div>
+              <div class="deploy-row"><span class="dot g"></span><div>Inhalts-Gates grün · <b>validate.yml</b> vor 2 Std.</div></div>
+              <div class="deploy-row"><span class="dot a"></span><div>Dein Gerät zeigt evtl. eine <b>gecachte Version</b> (PWA). Einmal hart neu laden.</div></div>
+              <div class="deploy-row"><span class="dot g"></span><div>Supabase erreichbar · 84 ms</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h4>Aktivität <span class="tag">Aggregate · 30 Tage</span></h4>
+            <svg class="spark" viewBox="0 0 520 84" preserveAspectRatio="none">
+              <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="hsl(221 83% 54%)" stop-opacity=".25"/>
+                <stop offset="1" stop-color="hsl(221 83% 54%)" stop-opacity="0"/>
+              </linearGradient></defs>
+              <path d="M0 70 C40 66,60 58,90 60 S150 50,190 46 S260 52,300 40 S380 30,420 24 S490 18,520 12 L520 84 L0 84 Z" fill="url(#sg)"/>
+              <path d="M0 70 C40 66,60 58,90 60 S150 50,190 46 S260 52,300 40 S380 30,420 24 S490 18,520 12" fill="none" stroke="hsl(221 83% 54%)" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+            <div class="legend" style="margin-top:8px">
+              <span>Konten gesamt <b>214</b></span>
+              <span>davon Gäste <b>131</b></span>
+              <span>aktiv 7 Tage <b>36</b></span>
+              <span>Sitzungen <b>1.204</b></span>
+            </div>
+          </div>
+          <div class="card">
+            <h4>Launch-Checkliste <span class="tag">3 offen</span></h4>
+            <div class="check-list">
+              <div class="check-item"><span class="box"></span><span>Impressum ausfüllen + Route aktivieren</span><span class="chip block">Blockiert Launch</span></div>
+              <div class="check-item"><span class="box"></span><span>Turnstile für Gast-Konten einschalten</span><span class="chip soon">Vor Demo-Welle</span></div>
+              <div class="check-item"><span class="box"></span><span>Google-OAuth-Review: NICHT erneut klicken, wartet</span><span class="chip soon">Wartet</span></div>
+              <div class="check-item done"><span class="box">✓</span><span>Consent-Version = Rechtstexte (v3, im Takt)</span><span class="chip ok">OK</span></div>
+              <div class="check-item done"><span class="box">✓</span><span>Feedback-Funktion deployed + E-Mail läuft</span><span class="chip ok">OK</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 2 ============ -->
+  <div class="screen-label">
+    <span class="num">02</span>
+    <h2>Prüfmodus · ein Inhalt, eine Entscheidung</h2>
+    <p>Priorisierte Warteschlange, Tastatursteuerung, Maschinen-Checks im Kontext.</p>
+  </div>
+  <section class="frame">
+    <div class="frame-bar"><div class="dots"><i></i><i></i><i></i></div><div class="urlbar">genauly.de/admin/pruefen</div></div>
+    <div class="pruef">
+      <div class="pruef-head">
+        <span class="back">← Übersicht</span>
+        <div class="prog">
+          <div class="t">31 / 84 in dieser Sitzung <span>· ca. 9 Min übrig</span></div>
+          <div class="bar"><i style="width:37%;background:linear-gradient(90deg,var(--grad-a),var(--grad-b))"></i></div>
+        </div>
+        <span class="queue-chip">Warteschlange: 412</span>
+      </div>
+      <div class="pruef-stage">
+        <div class="review-card">
+          <div class="rc-top">
+            <div class="why">
+              <span class="w1">Priorität: Mission 1.6 (Boss)</span>
+              <span class="w2">Kernwortschatz · B1.1</span>
+              <span class="w3">v_behoerde_anmeldung</span>
+            </div>
+            <div class="word-row"><span class="artikel">die</span><span class="word">Anmeldung</span><span class="plural">Pl. die Anmeldungen</span></div>
+            <div class="gloss">registration (at the residents' office)</div>
+            <div class="examples">
+              <div class="ex">Für die Anmeldung brauchen Sie Ihren Pass und die Wohnungsgeberbestätigung.<i>For the registration you need your passport and the landlord confirmation.</i></div>
+              <div class="ex">Die Anmeldung muss innerhalb von zwei Wochen nach dem Einzug erfolgen.<i>The registration must happen within two weeks of moving in.</i></div>
+            </div>
+          </div>
+          <div class="rc-checks">
+            <div class="mcheck"><span class="ic ok">✓</span><span><b>Fakten:</b> der/die/das + Plural, 2 Orakel einig</span></div>
+            <div class="mcheck"><span class="ic ok">✓</span><span><b>Grammatik:</b> LanguageTool ohne Befund</span></div>
+            <div class="mcheck"><span class="ic warn">!</span><span><b>CEFR:</b> Heuristik meldet eher B1.2 als B1.1</span></div>
+            <div class="mcheck"><span class="ic jury">J</span><span><b>KI-Jury:</b> bestanden (Welle 2, v3-Prompt)</span></div>
+          </div>
+          <div class="rc-src">Quelle: <a href="#">de.wiktionary.org/wiki/Anmeldung</a> · Provenienz: authored · Status im Register: draft</div>
+          <div class="keybar">
+            <span class="key ok"><kbd>V</kbd> Bestätigen</span>
+            <span class="key no"><kbd>X</kbd> Ablehnen</span>
+            <span class="key mut"><kbd>N</kbd> Notiz</span>
+            <span class="key mut"><kbd>→</kbd> Überspringen</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 3 ============ -->
+  <div class="screen-label">
+    <span class="num">03</span>
+    <h2>Feedback-Inbox + Systemzustand</h2>
+    <p>Triage statt E-Mail-Postfach, daneben Dienste, Limits und Direktlinks.</p>
+  </div>
+  <section class="frame">
+    <div class="frame-bar"><div class="dots"><i></i><i></i><i></i></div><div class="urlbar">genauly.de/admin/feedback</div></div>
+    <div class="main" style="min-height:520px">
+      <div class="topline">
+        <div><h3>Feedback</h3><div class="sub">12 Einträge · 5 neu · gespeichert auch wenn die E-Mail scheitert</div></div>
+        <div class="founder-chip"><span class="av">T</span> Gründer-Konto</div>
+      </div>
+      <div class="fb-grid">
+        <div class="card">
+          <h4>Inbox <span class="tag">neueste zuerst</span></h4>
+          <div class="inbox-row">
+            <span class="st neu">Neu</span>
+            <div>
+              <div class="msg">Der Hörtext in der Übung startet auf meinem iPhone nicht, der Rest ist super!</div>
+              <div class="meta"><b>/session</b> · heute 08:12 · angemeldet · iOS Safari</div>
+            </div>
+          </div>
+          <div class="inbox-row">
+            <span class="st neu">Neu</span>
+            <div>
+              <div class="msg">Könnt ihr mehr Übungen für Pflegeberufe machen? Ich arbeite im Krankenhaus.</div>
+              <div class="meta"><b>/library</b> · gestern 21:47 · Gast</div>
+            </div>
+          </div>
+          <div class="inbox-row">
+            <span class="st erl">Erledigt</span>
+            <div>
+              <div class="msg">Im dunklen Modus ist die Schrift im Filter schwer zu lesen.</div>
+              <div class="meta"><b>/library?tab=woerter</b> · 18. Juli · angemeldet · <span class="pr">→ PR #618</span></div>
+            </div>
+          </div>
+          <div class="inbox-row">
+            <span class="st verw">Verworfen</span>
+            <div>
+              <div class="msg">Macht doch eine Version für Spanisch!</div>
+              <div class="meta"><b>/about</b> · 15. Juli · Gast · Notiz: außerhalb des Fokus, freundlich beantwortet</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <h4>Dienste</h4>
+            <div class="ping"><span class="dot g"></span><b>Supabase</b> erreichbar <span class="lat">84 ms</span></div>
+            <div class="ping"><span class="dot g"></span><b>submit-feedback</b> Funktion antwortet <span class="lat">OK</span></div>
+            <div class="ping"><span class="dot g"></span><b>evaluate-writing</b> Funktion antwortet <span class="lat">OK</span></div>
+            <div class="ping"><span class="dot a"></span><b>Projekt-Pause-Risiko:</b> Free-Tier pausiert nach 7 Tagen Inaktivität</div>
+          </div>
+          <div class="card">
+            <h4>Limits heute</h4>
+            <div class="quota">
+              <div class="qrow"><span>Feedback-E-Mails (Resend)</span><b>7 / 100</b></div>
+              <div class="bar"><i style="width:7%;background:var(--primary)"></i></div>
+              <div class="qrow"><span>KI-Reviews (Tages-Cap)</span><b>2 / 5</b></div>
+              <div class="bar"><i style="width:40%;background:var(--primary)"></i></div>
+              <div class="qrow"><span>Gast-Konten diese Woche</span><b>+19</b></div>
+              <div class="bar"><i style="width:19%;background:var(--warning)"></i></div>
+            </div>
+            <div class="links">
+              <a href="#">Supabase ↗</a><a href="#">GitHub Actions ↗</a><a href="#">Resend ↗</a><a href="#">Pages-Deploy ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <p class="note">
+    Gestaltung folgt den Genauly-Tokens: Nachtblau als einzige laute Akzentfarbe, Himmel Soft für die
+    Marke, Koralle nur für den einen "wartet auf dich"-Moment, neutrale graue Chrome-Flächen, heller
+    Seitengrund mit Mint-zu-Himmel-Verlauf. Der echte Build wäre eine Lazy-Route im bestehenden
+    Bundle und würde DataTable, SearchField, Recharts und die FilterRail-Sprache wiederverwenden.
+  </p>
+</div>
+</body>
+</html>
