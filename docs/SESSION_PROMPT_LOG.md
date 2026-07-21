@@ -670,3 +670,36 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `--border`/`--input` `220 8% 83%` → `220 9% 86%` (muted-foreground on muted still 5.5:1 AA).
   Gates: check:contrast all ✓ · build ✓. Shipped rounds as PR #620 (squash-merge), updated
   CLAUDE.md (brand section), `docs/PROJECT_STATUS.md` (s140 handoff rewritten) and this log.
+
+---
+
+## Session 141 — 2026-07-21 · branch `claude/mobile-nav-item-labels-vx29vh`
+
+- **Prompt 1 (verbatim):** `> for the mobile view, can you add the name of the the navigation menu item to the bottom of the icon? the name should only appear when selected. provide a couple of previews with real screenshots of the app.`
+- **Response 1:** Restructured `BarTab` in `src/components/layout/BottomTabBar.tsx` to a vertical
+  column (icon squircle + label under it). The label slot is a reserved fixed-height row on every
+  tab (`h-3`, `opacity-0` when inactive) so selecting a tab never shifts the icon rail; the name
+  fades in only on the active tab. Removed the old active underline; shrank the squircle `h-11 w-11`
+  → `h-10 w-10` so icon + label fit the locked 63px bar. First version colored the label in the
+  section accent. Captured real 390×844 mobile screenshots of the running dev app (preinstalled
+  headless Chromium, seeded `onboarded:true` in localStorage to skip onboarding) for Praktisch,
+  Theorie, Fortschritt. `typecheck` ✓ · `build` ✓. Committed + pushed to the branch.
+- **Artifacts (prompt 1):** `src/components/layout/BottomTabBar.tsx` (commit bb011cc)
+- **Prompt 2 (verbatim):** `> the labels are in blue which doesn't look very premium. Make them a dark gray shade. Rename Theorie to Bibliothek`
+- **Response 2:** Switched the label color from the section accent to a neutral theme-aware dark grey
+  (`text-slate-600 dark:text-slate-300`), dropped the now-unused `color` from the `BarTab`
+  destructure. Renamed the `/library` nav label + `LibrarySwitcher` `aria-label` from **Theorie**
+  back to **Bibliothek** (reverses the s105 rename). Re-captured screenshots; `typecheck` ✓ ·
+  `build` ✓. Committed + pushed.
+- **Artifacts (prompt 2):** `src/components/layout/BottomTabBar.tsx` · `src/components/layout/nav-items.ts` · `src/features/library/LibrarySwitcher.tsx` (commit 3f3e630)
+- **Prompt 3 (verbatim):** `> push`
+- **Response 3:** Opened PR #622 into `main` and squash-merged it (deploys via `pages.yml`).
+  Realigned the dev branch to `origin/main` with `--force-with-lease` per the post-merge housekeeping
+  rule.
+- **Artifacts (prompt 3):** PR #622 (squash `c4a2822`)
+- **Prompt 4 (verbatim):** `> document the session`
+- **Response 4:** Updated `docs/PROJECT_STATUS.md` (s141 handoff added, `_Last updated_` block, s139
+  handoff moved to the W30 archive), `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`
+  (s139 handoff prepended), `CLAUDE.md` (mobile-bar label feature + Theorie→Bibliothek rename), and
+  this log.
+- **Artifacts (prompt 4):** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · this log

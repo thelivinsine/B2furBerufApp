@@ -1,13 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-21 (session 140). **Light-theme recolor shipped to `main` in two rounds:**
-the warm Papier chrome read as "butter yellow" to the founder. Round 1 (PR #619) moved
-`--muted`/`--border`/`--input` to neutral cool greys and the ground to a flat pale Himmelblau.
-Round 2 (same day, after a 3-round preview picker) replaced the flat ground with the
-founder-picked **"I1" `bg-page` gradient** (very subtle mint → sky 150° diagonal via the new
-`--page-from/mid/to` tokens; dark mode is a no-op) and **lightened the greys** (muted 90%, border
-86%). Dark theme + `--warning` Butter untouched; `check:contrast` green. Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-21 (session 141). **Mobile bottom-nav labels shipped to `main` (PR #622).**
+Each section's name now appears under its icon in the mobile bar, visible only on the selected tab
+(the label slot is reserved on every tab so nothing shifts). Labels are a neutral theme-aware dark
+grey (`slate-600`/`slate-300`), and the `/library` tab was renamed **Theorie → Bibliothek**. Bar
+squircle 44→40px to fit; the old active underline was replaced by the label. `typecheck` + `build`
+green. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -63,6 +61,27 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 141 (2026-07-21). Mobile bottom-nav item labels, branch
+`claude/mobile-nav-item-labels-vx29vh`, shipped to `main` (PR #622).** Founder asked to add each
+nav item's name under its icon in the mobile view, visible only when selected, with real-screenshot
+previews. What shipped (all in `src/components/layout/`):
+- **`BottomTabBar.tsx` — `BarTab` restructured to a vertical column** (icon squircle on top, label
+  below). The label slot is a **reserved fixed-height row on every tab** (`h-3`, `opacity-0` when
+  inactive) so selecting a tab never shifts the icon rail; the name fades in only on the active tab.
+  The old small active underline was removed (label + grey squircle now mark the active tab). The
+  squircle shrank `h-11 w-11` → **`h-10 w-10`** so icon + label fit inside the locked 63px bar
+  height (a deliberate, founder-driven exception to the s28 `h-11` lock; noted in CLAUDE.md).
+- **Label color:** first shipped in the section accent, then the founder called blue "not premium"
+  → switched to a neutral theme-aware **dark grey** (`text-slate-600 dark:text-slate-300`,
+  `font-semibold text-[10px]`). `color` was dropped from the `BarTab` destructure (now unused).
+- **Rename Theorie → Bibliothek** (founder): `nav-items.ts` `/library` label + `LibrarySwitcher.tsx`
+  `aria-label`. (This reverses the s105 Bibliothek→Theorie rename; the s105 change is still in the
+  historical comments.) Edit mode, icon marks/colors, and the iOS fixes are untouched.
+- **Verification:** `pnpm typecheck` ✓ · `pnpm build` ✓ (incl. PWA + help prerender). Captured
+  real 390×844 mobile screenshots of the running dev app via the preinstalled headless Chromium
+  (seeded `onboarded:true` in `b2beruf.settings.v1` localStorage to skip onboarding). Post-merge
+  branch realigned to `main`. PWA caveat: the nav is service-worker-cached; hard-refresh to see it.
+
 **Handoff after session 140 (2026-07-21). Light-theme recolor (two rounds + a 3-round preview
 picker), branch `claude/session-f94z5m`, shipped to `main`.** Founder screenshot of `/library` on
 mobile: the warm Papier tint (switcher tracks, tags, page ground) read as "butter yellow". What
@@ -89,35 +108,8 @@ shipped:
 - **Gates (both rounds):** `check:contrast` all pairings ✓ · build ✓. PWA caveat: the shell is
   service-worker-cached; hard-refresh the live site to see the new colors.
 
-**Handoff after session 139 (2026-07-20). Three small fixes, branch
-`claude/app-icon-favicon-update-gympjq`, all shipped to `main` (PRs #616, #617).** Founder-reported
-issues, handled one prompt at a time:
-- **Icon-size preview correction (#616):** the founder thought the app icon/favicon still showed the
-  old **Randnah** (5% margin) size. The shipped assets were in fact already **Größer** (12% margin)
-  since s138 — verified by measuring every committed PNG (mark ≈ 73–75% of the tile = 12% margin;
-  Randnah would be ≈ 90%). The confusion came from the saved preview
-  `preview/branding/artifacts/genauly-logo-v2-previews.html`, which still highlighted Randnah as
-  "empfohlen" and rendered the home-screen mockup row at the 5% margin. Fixed the preview to mark
-  Größer as applied and render the OS row at 12%. **No shipped asset changed.** If the live
-  tab/home-screen icon still looks old it is PWA/browser cache (hard-refresh; re-add the PWA).
-- **Mission-exit toggle fix (#616):** exiting a mission launched from Heute → Spielen stripped the
-  `?mission=` param and left the learner on the standalone `/welt` hub, which has no Lernen/Spielen
-  toggle. Now `SpielenHub` tags the deep link `&from=heute`, `Welt.tsx` navigates back to
-  `/?tab=spielen` on exit when it sees that marker, and `Dashboard.tsx` opens on the Spielen tab for
-  `?tab=spielen` (clearing the param on a manual switch). Direct `/welt` visits are unchanged.
-- **Kollokationen graph — tighter clusters (#617):** founder asked to pull the nodes closer so the
-  theme islands look better; generated a 3-option preview
-  (`preview/collocation-graph-tightness.html` + generator `preview/gen-collocation-graph-tightness.mjs`,
-  rendering the REAL bank through the shipped d3-force layout) and the founder picked **"Am engsten"**.
-  `CollocationGraph.tsx` force block now: centroid pull (forceX/Y) **0.72** (was 0.38), link **0.38**
-  (0.22), charge **−34/max200** (−55/240), collision **r+1.5** (r+3), centroid ring **118+N·26**
-  (140+N·35). Pure builder unchanged, so `tests/collocationGraph.test.ts` (11) still passes; CLAUDE.md
-  layout-recipe note refreshed.
-- **Gates (each PR):** typecheck ✓ · build ✓ · check:bundle 110.5 kB ✓ · test:unit 219/219 (#616) /
-  collocationGraph 11/11 (#617) ✓. Post-merge branch realigned to `main` both times. PWA caveat: the
-  graph + icons are service-worker-cached; hard-refresh the live site.
-
-_(Session 138's logo-v2 rework handoff, session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
+_(Session 139's three-small-fixes handoff (icon-size preview correction, mission-exit toggle fix,
+Kollokationen graph tighter clusters), session 138's logo-v2 rework handoff, session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
 fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
