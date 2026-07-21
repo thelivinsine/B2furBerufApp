@@ -264,6 +264,45 @@ function lintCollocations(collocations, subThemeIndex) {
   }
 }
 
+/* Normalize a German lexical string for cross-bank comparison: lowercase,
+ * drop a leading article/determiner (der/die/das/ein/eine…), strip surrounding
+ * punctuation, collapse whitespace. So "die Aufgaben verteilen" (a collocation
+ * `full`) and "Aufgaben verteilen" (a vocab `de`) compare equal. */
+function normLexeme(s) {
+  return String(s ?? "")
+    .toLowerCase()
+    .replace(/^(der|die|das|den|dem|des|ein|eine|einen|einem|einer)\s+/, "")
+    .replace(/[.,!?;:"„“»«]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* Guardrail (s-current QC): a Nomen-Verb collocation must live in the
+ * Kollokationen bank, not the single-word Wörter bank. When a vocab entry's
+ * German text is identical to a collocation's `full` phrase, the same item is
+ * taught in two places and shows up article-less in the Wörter list. Warn (do
+ * not fail) so the existing overlaps are visible without blocking CI; a NEW
+ * duplicate then surfaces the moment it is added. */
+function lintVocabCollocationOverlap(vocab, collocations) {
+  const ds = "vocabulary";
+  const collByLexeme = new Map();
+  for (const c of collocations) {
+    const key = normLexeme(c.full);
+    if (key && !collByLexeme.has(key)) collByLexeme.set(key, c.id);
+  }
+  for (const v of vocab) {
+    // Only multi-word entries can collide with a collocation `full` phrase.
+    if (!isStr(v.de) || !v.de.trim().includes(" ")) continue;
+    const hit = collByLexeme.get(normLexeme(v.de));
+    if (hit)
+      warn(
+        ds,
+        v.id ?? "?",
+        `"${v.de}" duplicates collocation ${hit} — a Nomen-Verb collocation belongs in the Kollokationen bank, not Wörter (retire from the vocab surface, keep the id)`,
+      );
+  }
+}
+
 function lintGrammar(grammar) {
   const ds = "grammar";
   checkDuplicateIds(grammar, ds);
@@ -1206,6 +1245,7 @@ async function main() {
   lintThemes(data.themes);
   lintVocabulary(data.vocabulary, subThemeIndex);
   lintCollocations(data.collocations, subThemeIndex);
+  lintVocabCollocationOverlap(data.vocabulary, data.collocations);
   lintGrammar(data.grammar);
   lintScenarios(data.scenarios);
   lintExamSets(data.examSets, new Set(data.scenarios.map((s) => s.id)));
