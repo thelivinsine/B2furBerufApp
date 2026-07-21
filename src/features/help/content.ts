@@ -168,7 +168,109 @@ export const helpArticles: HelpArticle[] = [
         },
       },
     ],
-    related: ["ueben", "spielen-neuland"],
+    related: ["app-installieren", "ueben", "spielen-neuland"],
+  },
+
+  {
+    slug: "app-installieren",
+    category: "grundlagen",
+    icon: "Smartphone",
+    updated: "2026-07-21",
+    title: { de: "Genauly als App aufs Handy", en: "Add Genauly to your phone" },
+    description: {
+      de: "So legst du Genauly in wenigen Sekunden als App auf deinen Startbildschirm, auf iPhone und Android. Ohne Download, ohne App Store.",
+      en: "How to add Genauly to your home screen as an app in seconds, on iPhone and Android. No download, no app store.",
+    },
+    body: [
+      {
+        type: "p",
+        de: "Genauly läuft im Browser, du kannst es aber wie eine echte App auf den Startbildschirm legen. Danach öffnest du es mit einem Tipp auf das Symbol, im Vollbild und auch offline für schon geladene Inhalte. Du musst nichts aus einem App Store herunterladen.",
+        en: "Genauly runs in your browser, but you can place it on your home screen like a real app. After that you open it with one tap on the icon, full screen and even offline for content you have already loaded. There is nothing to download from an app store.",
+      },
+      {
+        type: "h2",
+        de: "iPhone und iPad (Safari)",
+        en: "iPhone and iPad (Safari)",
+      },
+      {
+        type: "steps",
+        de: [
+          "Öffne genauly.de in Safari.",
+          "Tippe unten auf das Teilen-Symbol (das Quadrat mit dem Pfeil nach oben).",
+          "Wähle in der Liste Zum Home-Bildschirm.",
+          "Tippe oben rechts auf Hinzufügen. Fertig, das Genauly-Symbol liegt jetzt auf deinem Startbildschirm.",
+        ],
+        en: [
+          "Open genauly.de in Safari.",
+          "Tap the share icon at the bottom (the square with an arrow pointing up).",
+          "Choose Add to Home Screen in the list.",
+          "Tap Add in the top right. Done, the Genauly icon is now on your home screen.",
+        ],
+      },
+      {
+        type: "note",
+        de: "Auf dem iPhone klappt das nur in Safari, nicht in Chrome. Öffne genauly.de also zuerst in Safari.",
+        en: "On iPhone this only works in Safari, not Chrome. So open genauly.de in Safari first.",
+      },
+      {
+        type: "h2",
+        de: "Android (Chrome)",
+        en: "Android (Chrome)",
+      },
+      {
+        type: "steps",
+        de: [
+          "Öffne genauly.de in Chrome.",
+          "Tippe oben rechts auf das Menü (die drei Punkte).",
+          "Wähle App installieren oder Zum Startbildschirm hinzufügen.",
+          "Bestätige mit Installieren oder Hinzufügen. Das Symbol erscheint auf deinem Startbildschirm.",
+        ],
+        en: [
+          "Open genauly.de in Chrome.",
+          "Tap the menu in the top right (the three dots).",
+          "Choose Install app or Add to Home screen.",
+          "Confirm with Install or Add. The icon appears on your home screen.",
+        ],
+      },
+      {
+        type: "h2",
+        de: "Laptop und PC",
+        en: "Laptop and desktop",
+      },
+      {
+        type: "p",
+        de: "Auch am Computer kannst du Genauly installieren. In Chrome oder Edge erscheint rechts in der Adressleiste ein kleines Installieren-Symbol. Ein Klick darauf legt Genauly als eigenes Fenster an.",
+        en: "You can install Genauly on your computer too. In Chrome or Edge a small install icon appears at the right of the address bar. One click on it opens Genauly in its own window.",
+      },
+      {
+        type: "note",
+        de: "Dein Fortschritt bleibt derselbe. Wenn du dich anmeldest, findest du deine Wörter und deinen Fortschritt in der installierten App genauso wieder wie im Browser.",
+        en: "Your progress stays the same. If you sign in, your words and progress appear in the installed app exactly as in the browser.",
+      },
+    ],
+    faq: [
+      {
+        q: {
+          de: "Kostet die App etwas oder brauche ich einen App Store?",
+          en: "Does the app cost anything, or do I need an app store?",
+        },
+        a: {
+          de: "Nein. Es gibt keinen Download und keine Kosten. Du legst nur die Webseite als Symbol auf den Startbildschirm.",
+          en: "No. There is no download and no cost. You only place the website as an icon on your home screen.",
+        },
+      },
+      {
+        q: {
+          de: "Ich sehe die Option nicht. Was tun?",
+          en: "I do not see the option. What should I do?",
+        },
+        a: {
+          de: "Nutze auf dem iPhone Safari und auf Android Chrome. In anderen Browsern fehlt die Funktion manchmal. Lade die Seite einmal neu und öffne das Teilen- oder Menü-Symbol erneut.",
+          en: "Use Safari on iPhone and Chrome on Android. Some other browsers do not offer the option. Reload the page once and open the share or menu icon again.",
+        },
+      },
+    ],
+    related: ["erste-schritte", "ueben", "spielen-neuland"],
   },
 
   {
