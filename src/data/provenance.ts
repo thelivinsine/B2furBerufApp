@@ -37335,6 +37335,30 @@ const provenancePart2: ProvenanceEntry[] = [
     review_status: "draft",
     notes: "themeId=digitales. Daily-life scale-up Phase B (2026-07-17)."
   },
+  {
+    content_id: "c_planung_revidieren",
+    content_type: "collocation",
+    label: "die Planung revidieren",
+    origin: "authored",
+    reference: "https://www.dwds.de/wb/revidieren",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=scheduling. Collocation moved out of the Wörter surface (v_planung_revidieren retired)."
+  },
+  {
+    content_id: "c_vorwuerfe_zurueckweisen",
+    content_type: "collocation",
+    label: "Vorwürfe zurückweisen",
+    origin: "authored",
+    reference: "https://www.dwds.de/wb/zur%C3%BCckweisen",
+    license: "OWNED",
+    attribution_required: false,
+    added_by: "assistant",
+    review_status: "draft",
+    notes: "themeId=conflict. Collocation moved out of the Wörter surface (v_vorwuerfe_zurueckweisen retired)."
+  },
 ];
 
 export const provenance: ProvenanceEntry[] = provenancePart1.concat(provenancePart2);

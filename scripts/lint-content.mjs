@@ -264,6 +264,54 @@ function lintCollocations(collocations, subThemeIndex) {
   }
 }
 
+/* Normalize a German lexical string for cross-bank comparison: lowercase,
+ * drop a leading article/determiner (der/die/das/ein/eine…), strip surrounding
+ * punctuation, collapse whitespace. So "die Aufgaben verteilen" (a collocation
+ * `full`) and "Aufgaben verteilen" (a vocab `de`) compare equal. */
+function normLexeme(s) {
+  return String(s ?? "")
+    .toLowerCase()
+    .replace(/^(der|die|das|den|dem|des|ein|eine|einen|einem|einer)\s+/, "")
+    .replace(/[.,!?;:"„“»«]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/* Guardrail (s-current QC): a Nomen-Verb collocation must live in the
+ * Kollokationen bank, not the single-word Wörter bank. When a vocab entry's
+ * German text is identical to a collocation's `full` phrase, the same item is
+ * taught in two places and shows up article-less in the Wörter list.
+ *
+ * A duplicate is only OK when the vocab id is in RETIRED_VOCAB_IDS: it stays in
+ * the bank (ids are permanent, so progress still resolves) but is excluded from
+ * the Wörter surface via `browsableVocabulary`. A duplicate on a NON-retired id
+ * is an error, so a newly introduced overlap fails CI until it is either
+ * removed or retired. */
+function lintVocabCollocationOverlap(vocab, collocations, retiredIds) {
+  const ds = "vocabulary";
+  const collByLexeme = new Map();
+  for (const c of collocations) {
+    const key = normLexeme(c.full);
+    if (key && !collByLexeme.has(key)) collByLexeme.set(key, c.id);
+  }
+  for (const v of vocab) {
+    // Only multi-word entries can collide with a collocation `full` phrase.
+    if (!isStr(v.de) || !v.de.trim().includes(" ")) continue;
+    const hit = collByLexeme.get(normLexeme(v.de));
+    if (!hit) continue;
+    if (retiredIds.has(v.id)) continue; // handled: excluded from the Wörter surface
+    error(
+      ds,
+      v.id ?? "?",
+      `"${v.de}" duplicates collocation ${hit} — a Nomen-Verb collocation belongs in the Kollokationen bank, not Wörter. Remove it, or add its id to RETIRED_VOCAB_IDS in src/data/vocabulary.ts to keep it off the word surface.`,
+    );
+  }
+  // Stale-set guard: every retired id must still exist in the bank.
+  const ids = new Set(vocab.map((v) => v.id));
+  for (const id of retiredIds)
+    if (!ids.has(id)) error(ds, id, `RETIRED_VOCAB_IDS lists "${id}" but no such vocab entry exists`);
+}
+
 function lintGrammar(grammar) {
   const ds = "grammar";
   checkDuplicateIds(grammar, ds);
@@ -1177,6 +1225,7 @@ async function main() {
     const renames = await load("/src/lib/idRenames.ts").catch(() => ({ ID_RENAMES: {} }));
     data = {
       vocabulary: vocab.vocabulary,
+      retiredVocabIds: vocab.RETIRED_VOCAB_IDS ?? new Set(),
       collocations: colloc.collocations,
       grammar: gram.grammar,
       scenarios: dia.scenarios,
@@ -1206,6 +1255,7 @@ async function main() {
   lintThemes(data.themes);
   lintVocabulary(data.vocabulary, subThemeIndex);
   lintCollocations(data.collocations, subThemeIndex);
+  lintVocabCollocationOverlap(data.vocabulary, data.collocations, data.retiredVocabIds);
   lintGrammar(data.grammar);
   lintScenarios(data.scenarios);
   lintExamSets(data.examSets, new Set(data.scenarios.map((s) => s.id)));

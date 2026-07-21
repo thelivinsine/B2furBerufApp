@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Boxes, Bookmark, Zap } from "lucide-react";
-import { vocabulary } from "@/data/vocabulary";
+import { browsableVocabulary } from "@/data/vocabulary";
 import { useProgressStore } from "@/store/useProgressStore";
 import { cardLevel, MAX_LEVEL } from "@/engine/collection";
 import { HubHero } from "@/components/shared/HubHero";
@@ -82,7 +82,7 @@ export function Sammlung() {
   const [levelFilter, setLevelFilter] = useState<number>(0);
 
   const entries = useMemo<Entry[]>(() => {
-    return vocabulary
+    return browsableVocabulary
       .map((word) => ({
         word,
         level: cardLevel(srs[word.id]),
