@@ -743,3 +743,24 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` (s140 handoff prepended), `CLAUDE.md`
   (collocation count + the RETIRED_VOCAB_IDS/browsableVocabulary convention), and this log.
 - **Artifacts (prompt 3):** `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · this log
+
+---
+
+## Session 143 — 2026-07-21 · branch `claude/genauly-admin-control-center-7ohvnb`
+
+- **Prompt 1 (verbatim):** `> I want you to create a full-blown comprehensive admin control center for genauly. Gather a panel of experts (agents) to research, analyze, brainstorm how to scope this task, what are important functions and features to have and other important criteria I may have missed based on the total project context and documentation and the findings of the panel. Then provide a detailed report, your recommendations and a html with couple of previews of how it would look like.`
+- **Response 1:** Ran a four-agent expert panel in parallel (product strategy + founder ops,
+  infrastructure/codebase audit, content operations, analytics/telemetry/ops) over the full project
+  context. Synthesized the findings into `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md`: a 7-module
+  "Kontrollzentrum" blueprint (Review Cockpit/Prüfmodus flagship, Feedback-Inbox, System/deploy
+  health, Kosten & Missbrauch, Nutzer-Aggregate, Inhalts-Intelligenz, Launch & Compliance), the P0
+  `pnpm apply:reviews` loop-closer (Supabase review decisions → repo flip + stamp in one commit,
+  decision-time content hashes), a migration-0008 sketch (widened `provenance_reviews` +
+  founder-gated aggregate RPCs), an explicit do-NOT-build list, phasing (MVP ≈ 2 sessions), and
+  risks. Built `preview/admin-control-center-mockups.html`: 3 mockup screens on the brand tokens
+  (Übersicht cockpit, Prüfmodus review card with keyboard flow, Feedback-Inbox + Systemzustand).
+  Docs-only change; opened a PR into `main` and squash-merged per the auto-ship rule, then updated
+  `docs/PROJECT_STATUS.md` (s143 handoff, s141 → W30 archive) and this log.
+- **Artifacts (prompt 1):** `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` ·
+  `preview/admin-control-center-mockups.html` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log

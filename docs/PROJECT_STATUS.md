@@ -1,12 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-21 (session 142). **Wörter (words) QC shipped to `main` (PR #624).** Eight
-Nomen-Verb collocations were leaking into the single-word Wörter list (article-less, e.g. "Aufgaben
-verteilen"); six were already duplicated in Kollokationen. Fix: a `RETIRED_VOCAB_IDS` set +
-`browsableVocabulary` view in `src/data/vocabulary.ts` excludes them from every "words" surface
-(browse/search/sessions/Sammlung/theme-counts) while keeping the ids (progress is id-keyed, so no
-deletion). Added the 2 combos missing from Kollokationen (now **1,035**); upgraded the
-`lint:content` guardrail to an ERROR so a future overlap fails CI. All gates green. Product name:
+_Last updated: 2026-07-21 (session 143). **Admin Control Center scoped (research + plan +
+mockups; docs/preview only, nothing built).** A four-agent expert panel (product strategy,
+infrastructure audit, content ops, analytics/ops) scoped a founder "Kontrollzentrum": the full
+report + recommendations live in `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md`, the visual direction in
+`preview/admin-control-center-mockups.html` (3 mockup screens). Flagship = the Prüfmodus review
+cockpit + the `pnpm apply:reviews` loop-closer for the content-review bottleneck. Product name:
 **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -64,6 +63,35 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 143 (2026-07-21). Admin Control Center scoping, branch
+`claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (docs + preview only).** Founder
+asked for a full-blown comprehensive admin control center: an expert-agent panel to research and
+scope it, a detailed report with recommendations, and HTML previews. What shipped (research/design
+only, zero app-code changes):
+- **Four-agent expert panel** ran in parallel: product strategy + founder ops, infrastructure/
+  codebase audit, content operations, analytics/telemetry/ops. Findings synthesized into
+  **`docs/plans/ADMIN_CONTROL_CENTER_PLAN.md`**: a 7-module blueprint (A Review Cockpit "Prüfmodus"
+  as the flagship, B Feedback-Inbox, C Versand & Systemzustand incl. the "Ist meine Änderung live?"
+  widget, D Kosten & Missbrauch, E Nutzer-Aggregate, F Inhalts-Intelligenz incl. a report-staleness
+  panel, G Launch & Compliance), plus the **P0 loop-closer `pnpm apply:reviews`** (Supabase review
+  decisions → `provenance.ts` flip + `stamp:verified` in ONE commit, guarded by decision-time
+  content hashes), a migration-0008 sketch (widen `provenance_reviews` to
+  decision/content_hash/applied_at + founder-gated aggregate RPCs like `admin_overview()`), an
+  explicit do-NOT-build list (no live CMS, no roles, no analytics SDKs/cookie-banner risk, no
+  per-user data browsing), phasing (MVP ≈ 2 sessions, loop-closer first), and risks (hash-gate
+  race, jury vs human tier confusion, review fatigue, stale artifacts).
+- **`preview/admin-control-center-mockups.html`**: 3 mockup screens on the real brand tokens
+  (Übersicht cockpit, Prüfmodus review card with V/X/N/→ keyboard flow, Feedback-Inbox +
+  Systemzustand). Standalone file, open in a browser.
+- **Key audit facts for whoever builds it:** the only existing admin surface is the /sources
+  Daten-Werkbank; learner tables are owner-only RLS (cross-user reads are impossible from the
+  client today); `ai_usage` + `feedback` have zero client policies (service-role only); the
+  founder-email list is duplicated in 3 places that must stay in lockstep (`admin.ts`, RLS 0007,
+  submit-feedback default); `/admin` must be a lazy chunk (400 kB budget).
+- **Open founder decisions** (plan §10): route naming (/admin proposed), MVP order confirmation,
+  feedback triage fields, checklist storage, German-only UI. Next step if approved: build the MVP
+  per plan §8.
+
 **Handoff after session 142 (2026-07-21). Wörter (words) quality-control, branch
 `claude/words-collocations-qc-0pycjq`, shipped to `main` (PR #624).** Founder screenshot of the
 Theorie → Wörter list: "Aufgaben verteilen" (a Nomen-Verb collocation) sat article-less among real
@@ -91,28 +119,8 @@ What shipped:
   `build` · `check:bundle` (110.5/400 kB) all green. Post-merge branch realigned to `main`.
   PWA caveat: the word list is service-worker-cached; hard-refresh the live site to see it.
 
-**Handoff after session 141 (2026-07-21). Mobile bottom-nav item labels, branch
-`claude/mobile-nav-item-labels-vx29vh`, shipped to `main` (PR #622).** Founder asked to add each
-nav item's name under its icon in the mobile view, visible only when selected, with real-screenshot
-previews. What shipped (all in `src/components/layout/`):
-- **`BottomTabBar.tsx` — `BarTab` restructured to a vertical column** (icon squircle on top, label
-  below). The label slot is a **reserved fixed-height row on every tab** (`h-3`, `opacity-0` when
-  inactive) so selecting a tab never shifts the icon rail; the name fades in only on the active tab.
-  The old small active underline was removed (label + grey squircle now mark the active tab). The
-  squircle shrank `h-11 w-11` → **`h-10 w-10`** so icon + label fit inside the locked 63px bar
-  height (a deliberate, founder-driven exception to the s28 `h-11` lock; noted in CLAUDE.md).
-- **Label color:** first shipped in the section accent, then the founder called blue "not premium"
-  → switched to a neutral theme-aware **dark grey** (`text-slate-600 dark:text-slate-300`,
-  `font-semibold text-[10px]`). `color` was dropped from the `BarTab` destructure (now unused).
-- **Rename Theorie → Bibliothek** (founder): `nav-items.ts` `/library` label + `LibrarySwitcher.tsx`
-  `aria-label`. (This reverses the s105 Bibliothek→Theorie rename; the s105 change is still in the
-  historical comments.) Edit mode, icon marks/colors, and the iOS fixes are untouched.
-- **Verification:** `pnpm typecheck` ✓ · `pnpm build` ✓ (incl. PWA + help prerender). Captured
-  real 390×844 mobile screenshots of the running dev app via the preinstalled headless Chromium
-  (seeded `onboarded:true` in `b2beruf.settings.v1` localStorage to skip onboarding). Post-merge
-  branch realigned to `main`. PWA caveat: the nav is service-worker-cached; hard-refresh to see it.
-
-_(Session 140's light-theme recolor handoff (neutral grey chrome + the "I1" mint→sky gradient
+_(Session 141's mobile-nav-item-labels handoff (labels under the active icon + the
+Theorie→Bibliothek revert, PR #622), session 140's light-theme recolor handoff (neutral grey chrome + the "I1" mint→sky gradient
 ground, 2 PRs + a 3-round preview picker), session 139's three-small-fixes handoff (icon-size
 preview correction, mission-exit toggle fix, Kollokationen graph tighter clusters), session 138's
 logo-v2 rework handoff, session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
