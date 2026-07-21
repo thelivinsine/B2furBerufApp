@@ -27,7 +27,7 @@ function TabIcon({ path }: { path: string }) {
 function BarTab({ path, moreHidden }: { path: string; moreHidden?: boolean }) {
   const item = navItems.find(i => i.to === path);
   if (!item) return null;
-  const { to, end, label, color } = item;
+  const { to, end, label } = item;
   return (
     <NavLink
       to={to}
@@ -56,10 +56,11 @@ function BarTab({ path, moreHidden }: { path: string; moreHidden?: boolean }) {
                 "add the name to the bottom of the icon, only when selected"). */}
             <span
               className={cn(
-                "h-3 max-w-full truncate text-[10px] font-semibold leading-none transition-opacity duration-150",
+                // Neutral dark grey (theme-aware) reads more premium than the
+                // section accent under the coloured icon (founder).
+                "h-3 max-w-full truncate text-[10px] font-semibold leading-none text-slate-600 transition-opacity duration-150 dark:text-slate-300",
                 showActive ? "opacity-100" : "opacity-0",
               )}
-              style={{ color }}
               aria-hidden={!showActive}
             >
               {label}
