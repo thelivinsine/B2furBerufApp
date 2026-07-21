@@ -8,7 +8,7 @@ import type {
   ThemeId,
   VocabItem,
 } from "@/types";
-import { vocabulary, vocabByTheme } from "@/data/vocabulary";
+import { vocabulary, browsableVocabulary, vocabByTheme } from "@/data/vocabulary";
 import { themes, themeById } from "@/data/themes";
 import { redemittel } from "@/data/redemittel";
 import { collocations } from "@/data/collocations";
@@ -128,7 +128,7 @@ export function libraryFocus(opts: {
   }
   const narrowed = !!opts.sub || !!opts.cefr?.length || !!opts.sector?.length;
   if (!narrowed) return undefined;
-  const pool = vocabulary.filter(
+  const pool = browsableVocabulary.filter(
     (v) =>
       (!opts.theme || opts.theme === "all" || v.themeId === opts.theme) &&
       (!opts.sub || v.subThemeId === opts.sub) &&
@@ -305,7 +305,7 @@ export function buildScopedSession(
   let label = CONTENT_SCOPE_LABEL[type];
 
   if (type === "vocab") {
-    const pool = vocabulary.filter((v) => has(v.id));
+    const pool = browsableVocabulary.filter((v) => has(v.id));
     // Recall step per word. A GRADUATED word (already typed-recall eligible) has a
     // ~50% chance of the typed-cloze variant (2b) instead of plain forward recall,
     // so production stays fresh; a new word is never asked to be typed cold.
@@ -466,7 +466,7 @@ export function buildSession(opts: BuildSessionOpts): SessionPlan {
   const band = weakestBand(srs);
 
   /* --- Pool 1: due vocab retrieval (flashcards), weighted + scope-biased --- */
-  const weightedDue = vocabulary
+  const weightedDue = browsableVocabulary
     .filter((v) => isDue(srs[v.id]))
     .map((v) => {
       const ctx = themeById(v.themeId)?.context ?? "both";

@@ -11,7 +11,7 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { themeById } from "@/data/themes";
-import { vocabulary, vocabByTheme, vocabBySubTheme } from "@/data/vocabulary";
+import { vocabulary, browsableVocabulary, vocabByTheme, vocabBySubTheme } from "@/data/vocabulary";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useLibraryScope } from "@/store/useLibraryScope";
@@ -182,7 +182,9 @@ export function VocabularyTrainer() {
   // Theme-scoped list BEFORE the Branche cut, so the Branche dropdown can show
   // per-sector dedicated-content counts within the current Thema scope.
   const themeScoped = useMemo(() => {
-    let list = themes.length ? vocabulary.filter((v) => themes.includes(v.themeId)) : vocabulary;
+    let list = themes.length
+      ? browsableVocabulary.filter((v) => themes.includes(v.themeId))
+      : browsableVocabulary;
     if (subFilter) list = list.filter((v) => !!v.subThemeId && subFilter.includes(v.subThemeId));
     return list;
   }, [themes, subFilter]);
@@ -396,7 +398,7 @@ export function VocabularyTrainer() {
         label: "Thema",
         values: themes,
         onChange: setThemes,
-        all: { value: "all", label: "Alle Themen", count: vocabulary.length },
+        all: { value: "all", label: "Alle Themen", count: browsableVocabulary.length },
         groups: primaryGroups,
       },
       // Sub-theme drill-down as a third dropdown (founder s92): replaces the old

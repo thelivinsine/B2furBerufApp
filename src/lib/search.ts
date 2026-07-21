@@ -1,4 +1,4 @@
-import { vocabulary } from "@/data/vocabulary";
+import { browsableVocabulary } from "@/data/vocabulary";
 import { collocations } from "@/data/collocations";
 import { redemittel } from "@/data/redemittel";
 import { grammar } from "@/data/grammar";
@@ -48,7 +48,7 @@ let INDEX: Record<SearchKind, IndexEntry[]> | null = null;
 
 function buildIndex(): NonNullable<typeof INDEX> {
   return {
-    vocab: vocabulary.map((v) =>
+    vocab: browsableVocabulary.map((v) =>
       buildEntry([v.de, v.en, ...v.related], {
         id: v.id,
         title: v.de,

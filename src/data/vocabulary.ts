@@ -2657,11 +2657,48 @@ const vocabularyPart2: VocabItem[] = [
 
 export const vocabulary: VocabItem[] = vocabularyPart1.concat(vocabularyPart2);
 
+/**
+ * Ids retired from the Wörter (single-word) surface. These entries are
+ * Nomen-Verb collocations that were mis-filed as vocabulary, so the noun+verb
+ * combination showed up article-less in the word list. The combination now
+ * lives in the Kollokationen bank (`c_*`); the individual noun/verb may still
+ * appear in Wörter as separate words.
+ *
+ * They are NOT deleted: shipped content ids are permanent (learner FSRS /
+ * saved-word progress is keyed by id), so `vocabById` must still resolve them.
+ * Instead they are excluded from every surface where a learner browses or
+ * drills "words" via `browsableVocabulary`. The `lint:content` guardrail treats
+ * a retired id that duplicates a collocation as expected (see lint-content.mjs).
+ */
+export const RETIRED_VOCAB_IDS: ReadonlySet<string> = new Set([
+  "v_aufgabe_verteilen", // == c_aufgaben_verteilen
+  "v_zustandig_klaeren", // == c_zustaendigkeit_klaeren
+  "v_software_einfuehren", // == c_software_einführen
+  "v_muell_vermeiden", // == c_müll_vermeiden
+  "v_energie_sparen", // == c_energie_sparen
+  "v_wortergreifen", // == c_wort_ergreifen
+  "v_planung_revidieren", // -> c_planung_revidieren (added)
+  "v_vorwuerfe_zurueckweisen", // -> c_vorwuerfe_zurueckweisen (added)
+]);
+
+/**
+ * The vocabulary a learner browses and drills as single words: the full bank
+ * minus `RETIRED_VOCAB_IDS`. Use this for the Wörter browse, global search and
+ * the composed-session word pools. Use `vocabulary` / `vocabById` only for id
+ * resolution (progress rehydration, cross-references), never for a "words" list.
+ */
+export const browsableVocabulary: VocabItem[] = vocabulary.filter(
+  (v) => !RETIRED_VOCAB_IDS.has(v.id),
+);
+
+// A retired combo is not part of its theme's *word* set, so these "words in
+// theme/sub-theme" helpers read from browsableVocabulary. This keeps the Wörter
+// counts, session word pools, quiz and theme-mastery consistent with the list.
 export const vocabByTheme = (themeId: string) =>
-  vocabulary.filter((v) => v.themeId === themeId);
+  browsableVocabulary.filter((v) => v.themeId === themeId);
 
 export const vocabBySubTheme = (subThemeId: string) =>
-  vocabulary.filter((v) => v.subThemeId === subThemeId);
+  browsableVocabulary.filter((v) => v.subThemeId === subThemeId);
 
 export function filterVocab(opts: { theme?: string; sub?: string; cefr?: string }) {
   let items = vocabulary;
