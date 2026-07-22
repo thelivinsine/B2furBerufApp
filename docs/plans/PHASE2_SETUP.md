@@ -407,3 +407,40 @@ saves to the database as before.
 > above is the supported path and needs no key. (A direct-database
 > `pnpm apply:reviews` mode exists for a developer running it in a secure local
 > shell with the key, but you never need it.)
+
+---
+
+## Fokus "Satzlabor" backend (Schreibtraining redesign)
+
+The Fokus mode of `/writing` (write a sentence, get it corrected, transform it
+along a grammar axis) needs two new Edge Functions and one migration. Until these
+are deployed, the Fokus tab shows a graceful "momentan nicht verfügbar" and the
+Kurz/Lang guided tasks keep working (they use the existing `evaluate-writing`).
+
+One-time founder steps (Supabase project):
+
+1. **Run the migration** `supabase/migrations/0009_sentence_studio.sql` (creates
+   `sentence_checks`, the global `sentence_transforms` cache, the `sentence_ai_ops`
+   ledger, the `bump_transform_hit` RPC, and the `sentence_studio` kill-switch row).
+   In the Supabase dashboard: SQL Editor → paste the file → Run. Or `supabase db push`.
+2. **Deploy the functions:**
+   `supabase functions deploy check-sentence`
+   `supabase functions deploy transform-sentence`
+3. **Secrets** (reuse the ones `evaluate-writing` already has; nothing new is
+   strictly required beyond `ANTHROPIC_API_KEY`). Optional dials, all via
+   `supabase secrets set`:
+   - `TRANSFORM_MODEL` (default `claude-haiku-4-5`; set to `claude-sonnet-5` for
+     higher morphological accuracy once you have compared them on real sentences).
+   - `TRANSFORM_DAILY_LIMIT` (40), `TRANSFORM_BURST_LIMIT` (8/min),
+     `DAILY_CHECK_LIMIT` (20), `USER_MONTHLY_LIMIT` (200), `MAX_SENTENCE_LEN` (300),
+     `PROMPT_VERSION` (bump to invalidate the transform cache after a prompt change).
+   - The global `MONTHLY_SPEND_CAP_USD` ($5) is SHARED with the writing coach, so
+     the whole feature cannot raise your maximum monthly spend.
+4. **Kill-switch:** to pause the feature live without a redeploy, set the
+   `app_config` row `sentence_studio` value to `{"enabled": false}` (whole feature)
+   or `{"transforms_disabled": true}` (corrections stay, transforms off). Flip it
+   back with `{"enabled": true, "transforms_disabled": false}`.
+
+**Cost note:** the transform cache is GLOBAL (cross-user), so common sentences are
+free after the first learner. Only paid LLM calls count against the limits and the
+$5 fuse; cache hits are free. Watch spend in the `/admin` Übersicht AI tile.
