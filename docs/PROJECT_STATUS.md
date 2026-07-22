@@ -7,8 +7,10 @@ only, nothing built).** A four-agent expert panel scoped a founder "Kontrollzent
 (dedicated `/admin`, MVP order confirmed, feedback triage = status+note+link+priority, checklist
 in Supabase, bilingual DE/EN) and requested an added **Steuerung remote-config module** (nav
 renames, page hiding, feature flags; justified by a full prompt-log mining pass, plan §4 H).
-Flagship stays the Prüfmodus review cockpit + the `pnpm apply:reviews` loop-closer. Product name:
-**Genauly** (`genauly.de`)._
+Flagship stays the Prüfmodus review cockpit + the `pnpm apply:reviews` loop-closer. The execution
+plan is chunked with per-chunk model recommendations in
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`; next step = chunk 1 (backend foundation) on
+Fable. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
