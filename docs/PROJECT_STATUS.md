@@ -1,19 +1,17 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 147). **Schreibtraining redesign shipped (backlog #6): the Fokus
-"Satzlabor".** From the founder's sketch, ran a five-expert design panel → `docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`
-→ mockups → full build (PR #640, merged). `/writing` is now a **mode router** (Fokus · Kurz · Lang +
-Verlauf): Kurz/Lang are the original guided tasks (extracted verbatim, existing backend); **Fokus** is a
-single-sentence write→correct→transform grammar lab. The learner writes a sentence, the AI corrects it in
-place and detects its grammar (auto-lighting a tri-state `GrammarRail`), and tapping a target pill fills a
-second box with the sentence transformed along that axis (MVP grid: Aktiv/Vorgangspassiv × Präsens/Perfekt/
-Präteritum). Detection/transforms run on the CORRECTED sentence; the engine ABSTAINS rather than
-hallucinate. Backend (migration `0009` + Edge Functions `check-sentence` / `transform-sentence`) uses a
-GLOBAL cross-user transform cache and meters into the shared **$5/month fuse**, so max spend is unchanged.
-**Backlog #2 (gate writing behind sign-in) was already shipped**; the panel confirmed it. **Founder action
-needed to make Fokus live:** deploy migration 0009 + the two functions (steps in `PHASE2_SETUP.md`); until
-then Fokus degrades gracefully and Kurz/Lang keep working. Prior: /sources refresh + human-verification
-reset (s146). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-22 (session 148). **Auth bug fix: fresh-device OAuth login no longer bounces
+existing accounts to the landing page (PR #644, merged).** Uninstalling the PWA wipes `localStorage`,
+so on the fresh install the local `onboarded` flag defaults to `false`. After a Google login the app
+returned to `/`, where the `RequireOnboarding` route guard read that local flag synchronously and
+redirected to `/welcome` **before** cloud sync pulled the account's real `onboarded: true` from its
+profile. Fix: a `syncHydrated` flag on `useAuthStore` (set when the first cloud-sync pull completes or
+fails offline, reset on sign-out / at each sync start); `RequireOnboarding` now waits for auth
+resolution + that first pull before redirecting a signed-in / guest user, so the cloud `onboarded`
+flag is applied first. Prior: Schreibtraining Fokus "Satzlabor" (s147, backlog #6, PR #640). **Founder
+action still open:** deploy the Fokus backend (migration 0009 + `check-sentence`/`transform-sentence`
+Edge Functions, steps in `PHASE2_SETUP.md`) to make the new `/writing` Fokus mode live; until then it
+degrades gracefully and Kurz/Lang keep working. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -75,6 +73,31 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 148 (2026-07-22). Auth bug fix: fresh-device OAuth login threw existing
+accounts out to the landing page. Branch `claude/pwa-auth-uninstall-bug-hrafrw`, PR #644 merged.**
+The founder reported: after uninstalling the PWA and logging into an admin account with Google, the
+app redirects to the landing page right after login and throws them out.
+- **Root cause.** Uninstalling the PWA wipes `localStorage`, so on the fresh install the local
+  `onboarded` flag defaults to `false`. Google OAuth (`signInWithGoogle`) returns to `/`, where the
+  `RequireOnboarding` guard (`router.tsx`) read the **local** `onboarded` flag *synchronously* and
+  immediately `<Navigate to="/welcome">` — before `startCloudSync` (async) pulled the account's real
+  `onboarded: true` from its Supabase profile. Any existing account on a fresh device got bounced.
+  Not admin-specific; admins just hit it because they test on multiple devices. `RequireFounder` was
+  never in the redirect path (OAuth returns to `/`, not `/admin`) and reads `user.email` which is
+  available immediately, so it needed no change.
+- **Fix (3 files, +37 lines).** New `syncHydrated: boolean` on `useAuthStore` (default false).
+  `cloudSync.ts` sets it `false` at the start of each `startCloudSync` and in `stopCloudSync`
+  (sign-out), and `true` in a `finally` **after** the first pull's profile merge (so the cloud
+  `onboarded` is already applied when it flips; also covers the offline-catch path).
+  `RequireOnboarding` now: (1) lets already-onboarded devices straight in; (2) renders `null` while
+  `status === "loading"` (OAuth handshake in flight); (3) for a signed-in / guest user, renders
+  `null` until `syncHydrated`; (4) only a genuinely signed-out visitor (or one whose pull finished
+  still-not-onboarded) goes to `/welcome`. Circular import (`cloudSync` ↔ `useAuthStore`) is safe:
+  both only touch each other inside function bodies, never at module eval.
+- **Gates:** `typecheck` ✓ · `lint` (0 errors; pre-existing warnings only) · `test:unit` **257/257** ·
+  `build` ✓ · `check:bundle` **112.3 kB** (main chunk unchanged). Sandbox can't reach the live
+  `*.github.io` site, so the founder confirms the reinstall-and-login result after the Pages deploy.
+
 **Handoff after session 147 (2026-07-22). Schreibtraining redesign: Fokus "Satzlabor", branch
 `claude/schreibtraining-todo-review-afoegv`, PR #640 merged.** Backlog #6. A five-expert design panel
 (LLM engine, frontend, German B2 pedagogy, backend cost/security, UX) produced
@@ -102,36 +125,9 @@ What shipped:
   Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness the plan specifies. Fokus is
   MVP-scoped: no per-token diff highlight yet, single sentence only.
 
-**Handoff after session 146 (2026-07-22). /sources verification refresh + human-review reset + table
-restructure, branch `claude/sources-unchecked-items-njvmao`.** The founder asked why /sources showed
-"800+ items not yet checked". What shipped:
-- **Stale verification map, regenerated.** `src/data/verification.ts` was generated 2026-07-13, before
-  the s126 daily-life scale-up (2026-07-17) added ~844 items, so those had no tier and fell into the
-  "next verification sweep" bucket (~27%) — a stale build artifact, not a quality hole. Refreshed all
-  inputs against the current banks: `build:oracles` (der/die/das, 1292/1327 lemmas), `build:frequency-subset`
-  (1889 tokens), `build:languagetool` + `verify:grammar` (5236 sentences, **0** grammar/agreement
-  findings), `verify:facts` (**0** two-oracle errors) + `verify:cefr` (0 flags), then `build:verification`
-  → **3,107 records** (was 2,263). The "next sweep" bucket is now 0; previously-untiered items show as
-  grammar-checked (linguistic). Committed inputs: the vendored `scripts/vendor/*.json` subsets, the
-  `docs/reports/verify-grammar.json` sidecar, and the three `verify:*` reports (the 69 MB LanguageTool
-  lib is gitignored).
-- **Human verification reset to zero (founder request).** The 25 founder-approved Can-Do provenance rows
-  were flipped `review_status: "verified"`→`"draft"` (a precise codemod; `verified_by`/`verified_date`
-  dropped), `build:verification` re-run (human tier → 0), `stamp:verified` re-run (`verified-hashes.json`
-  hashes now `{}`). The `human` tier and the "menschlich geprüft" StatTile now read 0 until the review
-  pass restarts. CLAUDE.md provenance + Can-Do bullets updated to match.
-- **/sources table restructure (no more endless scroll).** The founder-only **Daten-Werkbank** table
-  moved off the main /sources page onto its own sub-page **`/sources/werkbank`** (`RequireFounder`-gated
-  route in `router.tsx`, same lazy chunk as Sources; extracted the shared `useWorkbench` hook +
-  `SourcesWorkbench` component in `Sources.tsx`); the main page shows admins a link card to it. The
-  public **"Alle Inhalte und ihre Quellen"** item browse is now behind a **collapse toggle** (`showAll`,
-  collapsed by default).
-- **Gates:** `typecheck` ✓ · `lint` (0 errors; warnings are the pre-existing debt) · `lint:content` ✓
-  (0 verified) · `test:unit` **253/253** · `build` ✓ · `check:bundle` **111.8 kB** (main chunk unchanged;
-  Sources stays a lazy chunk).
-
-_(Session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,
-`RequireFounder` gate, PR merged) is now in
+_(Session 146's /sources verification-refresh + human-review-reset + table-restructure handoff, and
+session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,
+`RequireFounder` gate, PR merged) are now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 144's Admin Control Center chunks 1 + 2 handoff (backend foundation migration 0008 + the
 `apply:reviews` keyless review loop-closer, PRs #631–#633), session 143's Admin Control Center scoping
 handoff (the expert-panel report + build plan + 4 mockup screens, PR #626), session 142's Wörter quality-control handoff (the

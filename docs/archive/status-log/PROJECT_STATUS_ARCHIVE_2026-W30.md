@@ -422,3 +422,31 @@ door to the admin center, cross-cutting wiring against an already-approved desig
 - **Gates:** `typecheck` ✓ · `lint` (0 errors) · `test:unit` **253/253** (new `tests/adminFunnel.test.ts`) ·
   `build` ✓ · `check:bundle` **111.6 kB** (main chunk unchanged; admin rides an 18 kB lazy chunk).
 - **Next:** chunk 4, the Review Cockpit / Prüfmodus (Opus), needs the `build-review-queue.mjs` scorer.
+
+**Handoff after session 146 (2026-07-22). /sources verification refresh + human-review reset + table
+restructure, branch `claude/sources-unchecked-items-njvmao`.** The founder asked why /sources showed
+"800+ items not yet checked". What shipped:
+- **Stale verification map, regenerated.** `src/data/verification.ts` was generated 2026-07-13, before
+  the s126 daily-life scale-up (2026-07-17) added ~844 items, so those had no tier and fell into the
+  "next verification sweep" bucket (~27%) — a stale build artifact, not a quality hole. Refreshed all
+  inputs against the current banks: `build:oracles` (der/die/das, 1292/1327 lemmas), `build:frequency-subset`
+  (1889 tokens), `build:languagetool` + `verify:grammar` (5236 sentences, **0** grammar/agreement
+  findings), `verify:facts` (**0** two-oracle errors) + `verify:cefr` (0 flags), then `build:verification`
+  → **3,107 records** (was 2,263). The "next sweep" bucket is now 0; previously-untiered items show as
+  grammar-checked (linguistic). Committed inputs: the vendored `scripts/vendor/*.json` subsets, the
+  `docs/reports/verify-grammar.json` sidecar, and the three `verify:*` reports (the 69 MB LanguageTool
+  lib is gitignored).
+- **Human verification reset to zero (founder request).** The 25 founder-approved Can-Do provenance rows
+  were flipped `review_status: "verified"`→`"draft"` (a precise codemod; `verified_by`/`verified_date`
+  dropped), `build:verification` re-run (human tier → 0), `stamp:verified` re-run (`verified-hashes.json`
+  hashes now `{}`). The `human` tier and the "menschlich geprüft" StatTile now read 0 until the review
+  pass restarts. CLAUDE.md provenance + Can-Do bullets updated to match.
+- **/sources table restructure (no more endless scroll).** The founder-only **Daten-Werkbank** table
+  moved off the main /sources page onto its own sub-page **`/sources/werkbank`** (`RequireFounder`-gated
+  route in `router.tsx`, same lazy chunk as Sources; extracted the shared `useWorkbench` hook +
+  `SourcesWorkbench` component in `Sources.tsx`); the main page shows admins a link card to it. The
+  public **"Alle Inhalte und ihre Quellen"** item browse is now behind a **collapse toggle** (`showAll`,
+  collapsed by default).
+- **Gates:** `typecheck` ✓ · `lint` (0 errors; warnings are the pre-existing debt) · `lint:content` ✓
+  (0 verified) · `test:unit` **253/253** · `build` ✓ · `check:bundle` **111.8 kB** (main chunk unchanged;
+  Sources stays a lazy chunk).
