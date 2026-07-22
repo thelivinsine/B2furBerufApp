@@ -764,3 +764,25 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
 - **Artifacts (prompt 1):** `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` ·
   `preview/admin-control-center-mockups.html` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #626 (squash `cff04de`)
+- **Prompt 2 (verbatim):** `> I don't fully understand your analysis and recommendations. Also, what are the five open decision points? explain everything in plain language`
+- **Response 2:** Re-explained the whole scoping result in plain, non-technical language: the
+  three problems found (review ticks never reach the code, invisible feedback/spend/deploy info,
+  no user numbers), the seven proposed modules, the do-not-build list, and each of the five open
+  decisions with a recommendation. No file changes.
+- **Artifacts (prompt 2):** none (explanation only)
+- **Prompt 3 (verbatim):** `> 1. I agree to have a dedicated page.` `> 2. yes, it's fine. But I feel some of the features are missing. I need features like toggling names of the menu items, hiding the pages if needed, etc in the control panel, although I agree the content should only be added or edited via claude. Look up my prompt log to identify such items.` `> 3. link and priority are also needed in addition to your suggestion` `> 4. Online in database` `> 5. Both`
+- **Response 3:** Recorded all five decisions as resolved in the plan (§10: dedicated `/admin`,
+  MVP order confirmed, feedback triage = status+note+link+priority, checklist in Supabase,
+  bilingual DE/EN admin UI). Ran a mining agent over the FULL prompt log (live file + the five
+  W25-W29 archives, ~440 entries): found 25+ config-shaped founder asks (nav renames incl. the
+  s105/s141 Theorie↔Bibliothek flip-flop, s105 "hide Anwendung for the demo tomorrow", the
+  SHOW_PRACTICE_TABS/SHOW_RELATED/FlipHint "keep it in code but hide it" flags, 4 feedback-pill
+  rounds, header slimming, demo crunches) and synthesized a 12-switch catalog + guardrails
+  (never unmount routes; locked bar structure stays locked; label overrides do not reach content
+  banks/prerendered help; runtime-fetched config to dodge the PWA cache). Added it to the plan as
+  module **H · Steuerung (remote config)** with Supabase `app_config` (world-readable,
+  founder-writable) as the mechanism; Steuerung core added to the MVP phasing. Added a 4th mockup
+  screen (Steuerung: nav name+visibility rows, feature switches, DE/EN copy pair, Demo-Modus) +
+  the Steuerung sidebar entry to the preview HTML. Shipped via PR into `main`.
+- **Artifacts (prompt 3):** `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` ·
+  `preview/admin-control-center-mockups.html` · `docs/PROJECT_STATUS.md` · this log
