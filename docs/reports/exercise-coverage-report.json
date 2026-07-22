@@ -4,5 +4,379 @@
   "scope": "themes",
   "rich": 20,
   "ok": 0,
-  "thin": 0
+  "thin": 0,
+  "themes": [
+    {
+      "id": "sustainability",
+      "title": "Nachhaltigkeit",
+      "words": 56,
+      "cols": 41,
+      "vocabKinds": 12,
+      "noExampleIds": [
+        "v_oekologisch",
+        "v_fussabdruck",
+        "v_oeko_bilanz",
+        "v_erneuerbare_energie"
+      ],
+      "noRelatedIds": [
+        "v_recyceln",
+        "v_kompensieren"
+      ]
+    },
+    {
+      "id": "safety",
+      "title": "Arbeitssicherheit & Gesundheit",
+      "words": 154,
+      "cols": 85,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_verletzen",
+        "v_ueberlastung",
+        "v_uebermuedet",
+        "v_kalibrieren",
+        "v_abstuetzen",
+        "v_einweisen",
+        "v_aetzend",
+        "v_dosieren"
+      ],
+      "noRelatedIds": [
+        "v_sicherheitscheck",
+        "v_schutzkleidung",
+        "v_qualitaetskontrolle",
+        "v_ladendiebstahl",
+        "v_ladungssicherung"
+      ]
+    },
+    {
+      "id": "arzt",
+      "title": "Arzt & Gesundheit",
+      "words": 80,
+      "cols": 56,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_ueberweisung",
+        "v_uebelkeit",
+        "v_uebung",
+        "v_aufwaermen",
+        "v_ueberweisungsschein"
+      ],
+      "noRelatedIds": [
+        "v_visite",
+        "v_rehabilitation"
+      ]
+    },
+    {
+      "id": "bank",
+      "title": "Bank & Finanzen",
+      "words": 81,
+      "cols": 50,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_ueberweisen"
+      ],
+      "noRelatedIds": [
+        "v_filiale"
+      ]
+    },
+    {
+      "id": "behoerde",
+      "title": "Behörden & Ämter",
+      "words": 80,
+      "cols": 50,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_einreichen",
+        "v_genehmigen",
+        "v_oeffnungszeiten"
+      ],
+      "noRelatedIds": [
+        "v_wartenummer"
+      ]
+    },
+    {
+      "id": "meetings",
+      "title": "Besprechungen & Teamarbeit",
+      "words": 64,
+      "cols": 37,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_moderieren",
+        "v_ausreden_lassen",
+        "v_einbringen",
+        "v_praesentieren",
+        "v_zeitwaechterin"
+      ],
+      "noRelatedIds": [
+        "v_protokoll",
+        "v_teilnehmer",
+        "v_standpunkt",
+        "v_zusammenarbeit",
+        "v_kollege",
+        "v_diskutieren",
+        "v_einbringen",
+        "v_deshalb",
+        "v_praesentieren",
+        "v_ergebnisoffen"
+      ]
+    },
+    {
+      "id": "bildung",
+      "title": "Bildung & Sprache",
+      "words": 80,
+      "cols": 50,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_anlernen",
+        "v_durchfallen",
+        "v_uebersetzung"
+      ],
+      "noRelatedIds": [
+        "v_handwerklich"
+      ]
+    },
+    {
+      "id": "einkaufen",
+      "title": "Einkaufen & Geschäfte",
+      "words": 49,
+      "cols": 40,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_aermel"
+      ],
+      "noRelatedIds": [
+        "v_pfand",
+        "v_waage"
+      ]
+    },
+    {
+      "id": "essen",
+      "title": "Essen & Restaurant",
+      "words": 49,
+      "cols": 40,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_aufrunden",
+        "v_backen"
+      ],
+      "noRelatedIds": []
+    },
+    {
+      "id": "freizeit",
+      "title": "Freizeit & Soziales",
+      "words": 49,
+      "cols": 40,
+      "vocabKinds": 13,
+      "noExampleIds": [],
+      "noRelatedIds": []
+    },
+    {
+      "id": "travel",
+      "title": "Geschäftsreisen",
+      "words": 52,
+      "cols": 39,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_buchen",
+        "v_reservieren",
+        "v_uebernachten",
+        "v_uebernachtung",
+        "v_abrechnen",
+        "v_umleiten"
+      ],
+      "noRelatedIds": [
+        "v_gepaeck",
+        "v_zeitzonendifferenz",
+        "v_interkulturell",
+        "v_fuehrerschein"
+      ]
+    },
+    {
+      "id": "digitales",
+      "title": "Handy, Internet & Digitales",
+      "words": 49,
+      "cols": 40,
+      "vocabKinds": 13,
+      "noExampleIds": [],
+      "noRelatedIds": []
+    },
+    {
+      "id": "conflict",
+      "title": "Konfliktlösung",
+      "words": 56,
+      "cols": 39,
+      "vocabKinds": 13,
+      "noExampleIds": [],
+      "noRelatedIds": [
+        "v_gereizt",
+        "v_verstaendnis",
+        "v_zuhoeren",
+        "v_klarstellen",
+        "v_klaerungsgespraech",
+        "v_transparent",
+        "v_nachvollziehbar",
+        "v_arbeitsklima",
+        "v_vermittlungsgespraech",
+        "v_einfuehlsam",
+        "v_betriebsrat"
+      ]
+    },
+    {
+      "id": "customer",
+      "title": "Kundenkommunikation",
+      "words": 168,
+      "cols": 98,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_zusichern",
+        "v_servieren",
+        "v_anrichten",
+        "v_zubereiten",
+        "v_eindecken",
+        "v_fahrgast",
+        "v_nachschneiden",
+        "v_gang",
+        "v_zapfen",
+        "v_glaetten",
+        "v_auftragen"
+      ],
+      "noRelatedIds": [
+        "v_anliegen",
+        "v_zufrieden",
+        "v_kundendienst",
+        "v_zusichern",
+        "v_weiterhelfen",
+        "v_kundenzufriedenheit",
+        "v_betreuung",
+        "v_angehoeriger",
+        "v_kopfhaut"
+      ]
+    },
+    {
+      "id": "logistics",
+      "title": "Logistik & Transport",
+      "words": 83,
+      "cols": 56,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_auffuellen",
+        "v_ausliefern",
+        "v_einraeumen",
+        "v_etikettieren",
+        "v_auslasten"
+      ],
+      "noRelatedIds": [
+        "v_route",
+        "v_verpackung"
+      ]
+    },
+    {
+      "id": "mobilitaet",
+      "title": "Mobilität & Verkehr",
+      "words": 49,
+      "cols": 40,
+      "vocabKinds": 13,
+      "noExampleIds": [],
+      "noRelatedIds": [
+        "v_mitfahrgelegenheit",
+        "v_fahrrad"
+      ]
+    },
+    {
+      "id": "project",
+      "title": "Projektkoordination",
+      "words": 90,
+      "cols": 63,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_koordinieren",
+        "v_abschliessen",
+        "v_ueberblick",
+        "v_errichten",
+        "v_entwerfen",
+        "v_abreissen",
+        "v_ausmessen",
+        "v_auslegen"
+      ],
+      "noRelatedIds": [
+        "v_fortschritt",
+        "v_delegieren",
+        "v_aufwand",
+        "v_machbar",
+        "v_einerseits",
+        "v_prototyp"
+      ]
+    },
+    {
+      "id": "technology",
+      "title": "Technik & Digitalisierung",
+      "words": 187,
+      "cols": 75,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_umstellen",
+        "v_einrichten",
+        "v_verschluesseln",
+        "v_montieren",
+        "v_warten",
+        "v_implementieren",
+        "v_anschliessen",
+        "v_herunterladen",
+        "v_hochladen",
+        "v_abstuerzen",
+        "v_auslesen",
+        "v_betonieren",
+        "v_justieren",
+        "v_ueberwachungskamera"
+      ],
+      "noRelatedIds": [
+        "v_geraet",
+        "v_schulung",
+        "v_speichern",
+        "v_umstellen",
+        "v_dadurch",
+        "v_verfahren",
+        "v_lack"
+      ]
+    },
+    {
+      "id": "scheduling",
+      "title": "Termine & Planung",
+      "words": 67,
+      "cols": 46,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_freihalten",
+        "v_vorbereiten",
+        "v_blockieren",
+        "v_ueberschneidung",
+        "v_terminvorschlag",
+        "v_uebergabe"
+      ],
+      "noRelatedIds": [
+        "v_passen",
+        "v_vereinbaren",
+        "v_kurzfristig",
+        "v_erinnerung",
+        "v_ueberschneidung",
+        "v_sobald",
+        "v_anlaufphase"
+      ]
+    },
+    {
+      "id": "wohnen",
+      "title": "Wohnen & Zuhause",
+      "words": 80,
+      "cols": 50,
+      "vocabKinds": 13,
+      "noExampleIds": [
+        "v_uebergabeprotokoll",
+        "v_abdichten",
+        "v_tropfen"
+      ],
+      "noRelatedIds": [
+        "v_wg",
+        "v_barrierefrei"
+      ]
+    }
+  ]
 }
