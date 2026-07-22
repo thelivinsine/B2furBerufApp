@@ -885,3 +885,36 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   the ~250 budget; prompt log ~880 lines under the ~1,200 rotation budget); appended this entry.
   No app-code or content changes this prompt.
 - **Artifacts (prompt 6):** `docs/PROJECT_STATUS.md` · this log
+- **Prompt 7 (verbatim):** `> give me detailed step by step instructions on my action regarding the service role key`
+- **Response 7:** Gave step-by-step instructions to copy the Supabase secret/service_role key and
+  add it as `SUPABASE_SERVICE_ROLE_KEY` in the Claude Code environment settings. (Later superseded:
+  see prompts 9-11, the founder correctly rejected storing a secret there.) No file changes.
+- **Prompt 8 (verbatim):** `> I don't understand why the environment tied ot the repository is in claude code. It's in github isn't it?` (+ two follow-ups: `> I don't get why the environment's configuration persists if each new session is a fresh machine. explain it`)
+- **Response 8:** Explained the GitHub-vs-Claude-environment distinction (GitHub stores code; the
+  Claude environment is the disposable cloud machine that clones + runs it) and that env-var config
+  is a saved recipe reapplied to each fresh machine. Conceptual, no file changes.
+- **Prompt 9 (verbatim):** `> [screenshot of the Claude env-vars box: "These are visible to anyone using this environment — don't add secrets or credentials."] why should I put this key in the environment variables? The claude code env. window explicitly recommends to not put any secrets.`
+- **Response 9:** Conceded the founder was right, the service-role key must NOT go in that plaintext
+  box. Proposed a keyless design: the browser (where the founder is signed in) exports decisions to
+  a file, and `apply:reviews --from <file>` reads it with no DB access, no secret in the
+  environment. Offered to build it or defer to chunk 3.
+- **Prompt 10 (verbatim):** `> I don't get it fully. For which task are we doing this? and do I need to download the file and upload to claude everytime? Explain me in concise manner`
+- **Response 10:** Clarified the task (turning review approvals into committed "verified" marks in
+  the code) and that the file export/upload is once-per-batch, not per-item or constant.
+- **Prompt 11 (verbatim):** `> let's do that then. Upload and download seems like a better tradeoff`
+- **Response 11:** Built the keyless review handoff (chunk 2 addendum): `src/lib/reviewExport.ts`
+  (`buildDecisionExport`/`downloadDecisions`/`pendingDecisionCount`) + an "Entscheidungen (N)"
+  export button in the AdminWorkbench toolbar; `scripts/apply-reviews.mjs` gained a `--from <file>`
+  keyless mode (`parseDecisionFile`, no Supabase, no key, DB write-back skipped, applied state
+  reconciles from the deployed bundle) with the missing-key message now steering to the keyless
+  path. Tests: `tests/reviewExport.test.ts` (browser export → script parse round-trip) +
+  `parseDecisionFile` cases in `tests/applyReviews.test.ts` (243/243). Verified end to end with a
+  2-decision fixture (one hash-matching → flipped + stamped + linted green, one stale → re-review
+  report), then reverted. Docs: `PHASE2_SETUP.md` rewritten to the keyless flow (and to warn AGAINST
+  putting the key in the env vars), CLAUDE.md `apply:reviews` bullet, status doc. Gates: typecheck ·
+  lint 0 errors · test:unit 243/243 · build · check:bundle 110.7 kB · lint:content all green.
+  Shipped via PR into `main`.
+- **Artifacts (prompts 7-11):** `src/lib/reviewExport.ts` · `scripts/apply-reviews.mjs` ·
+  `src/features/legal/AdminWorkbench.tsx` · `tests/reviewExport.test.ts` ·
+  `tests/applyReviews.test.ts` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · this log
