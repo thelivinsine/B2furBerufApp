@@ -988,6 +988,13 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   PROJECT_STATUS (header + s146 handoff, s144 rotated to W30 archive), and this log. Gates:
   typecheck · lint 0 errors · lint:content (0 verified) · build · check:bundle 111.8 kB · test:unit
   253/253 green. Shipped via squash-merge to `main`.
+- **Prompt 4 (verbatim):** `> document the session`
+- **Response 4:** Confirmed the session documentation was already written and shipped in PR #638:
+  the `PROJECT_STATUS.md` `_Last updated_` header + s146 handoff (with s144 rotated to the W30
+  archive and the content-count/governance-debt lines refreshed), the CLAUDE.md provenance/Can-Do/
+  `/sources` bullets, and the Session 146 prompt-log entry (prompts 1-3). This prompt adds its own
+  log entry for the authorship paper trail. Doc hygiene verified: two most recent handoffs live
+  (s146 + s145), older rotated. No app-code or content changes this prompt.
 - **Artifacts (session 146):** `src/data/verification.ts` · `src/data/provenance.ts` ·
   `src/features/legal/Sources.tsx` · `src/router.tsx` · `docs/reports/verified-hashes.json` ·
   `docs/reports/verify-grammar.json` · `docs/reports/verify-grammar-report.md` ·
