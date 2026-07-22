@@ -41,6 +41,24 @@ export interface FeedbackConfig {
   hiddenRoutes: string[];
 }
 
+/** A bilingual DE/EN copy override (both sides required to take effect). */
+export interface BiText {
+  de: string;
+  en: string;
+}
+
+export interface HeaderConfig {
+  /** The app-header streak pill (flame + day count). */
+  streakPill: boolean;
+}
+
+export interface LandingConfig {
+  /** Hero eyebrow ("German for real life"). Null keeps the built-in copy. */
+  heroEyebrow: BiText | null;
+  /** Primary start-CTA label ("Start free"). Null keeps the built-in copy. */
+  ctaLabel: BiText | null;
+}
+
 export interface AppConfigData {
   /** Nav label overrides keyed by route path (e.g. "/library" -> "Theorie"). */
   navLabels: Record<string, string>;
@@ -52,6 +70,13 @@ export interface AppConfigData {
   betaChip: boolean;
   /** Which Heute tab opens first. */
   dashboardStartTab: DashboardStartTab;
+  /** H3: show the Impressum route's links (footer/Settings/legal). The route
+   *  itself stays mounted either way (guardrail: visibility never unmounts). */
+  impressumEnabled: boolean;
+  /** H7 header element switches. */
+  header: HeaderConfig;
+  /** H10 landing-page copy overrides. */
+  landing: LandingConfig;
 }
 
 /**
@@ -74,6 +99,9 @@ export const DEFAULT_APP_CONFIG: AppConfigData = {
   },
   betaChip: true,
   dashboardStartTab: "ueben",
+  impressumEnabled: false, // Impressum links stay hidden until the address is filled
+  header: { streakPill: true },
+  landing: { heroEyebrow: null, ctaLabel: null },
 };
 
 // ---- Defensive per-field coercion ------------------------------------------
@@ -98,6 +126,14 @@ function asStringArray(v: unknown): string[] {
 
 function asBool(v: unknown, fallback: boolean): boolean {
   return typeof v === "boolean" ? v : fallback;
+}
+
+/** A bilingual override only applies when BOTH sides are non-empty strings. */
+function asBiText(v: unknown): BiText | null {
+  if (isRecord(v) && typeof v.de === "string" && typeof v.en === "string" && v.de.trim() && v.en.trim()) {
+    return { de: v.de, en: v.en };
+  }
+  return null;
 }
 
 /**
@@ -136,6 +172,16 @@ export function mergeAppConfig(remote: Map<string, unknown> | Record<string, unk
   const dashboardStartTab: DashboardStartTab =
     startTabRaw === "spielen" || startTabRaw === "ueben" ? startTabRaw : d.dashboardStartTab;
 
+  const headerRaw = get("header");
+  const header: HeaderConfig = isRecord(headerRaw)
+    ? { streakPill: asBool(headerRaw.streakPill, d.header.streakPill) }
+    : d.header;
+
+  const landingRaw = get("landing");
+  const landing: LandingConfig = isRecord(landingRaw)
+    ? { heroEyebrow: asBiText(landingRaw.heroEyebrow), ctaLabel: asBiText(landingRaw.ctaLabel) }
+    : d.landing;
+
   return {
     navLabels: { ...d.navLabels, ...asStringMap(get("navLabels")) },
     hiddenTabs: get("hiddenTabs") !== undefined ? asStringArray(get("hiddenTabs")) : d.hiddenTabs,
@@ -143,6 +189,9 @@ export function mergeAppConfig(remote: Map<string, unknown> | Record<string, unk
     feedback,
     betaChip: asBool(get("betaChip"), d.betaChip),
     dashboardStartTab,
+    impressumEnabled: asBool(get("impressumEnabled"), d.impressumEnabled),
+    header,
+    landing,
   };
 }
 

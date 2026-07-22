@@ -66,6 +66,26 @@ describe("mergeAppConfig — real overrides apply", () => {
     expect(mergeAppConfig({ dashboardStartTab: "spielen" }).dashboardStartTab).toBe("spielen");
   });
 
+  it("applies wave-2 fields: impressum, header, landing", () => {
+    const merged = mergeAppConfig({
+      impressumEnabled: true,
+      header: { streakPill: false },
+      landing: {
+        heroEyebrow: { de: "Hallo", en: "Hi" },
+        ctaLabel: { de: "  ", en: "Go" }, // one side empty -> ignored
+      },
+    });
+    expect(merged.impressumEnabled).toBe(true);
+    expect(merged.header.streakPill).toBe(false);
+    expect(merged.landing.heroEyebrow).toEqual({ de: "Hallo", en: "Hi" });
+    expect(merged.landing.ctaLabel).toBeNull(); // needs BOTH sides
+  });
+
+  it("ignores a malformed landing override", () => {
+    const merged = mergeAppConfig({ landing: { heroEyebrow: "nope", ctaLabel: 3 } });
+    expect(merged.landing).toEqual({ heroEyebrow: null, ctaLabel: null });
+  });
+
   it("does not mutate DEFAULT_APP_CONFIG", () => {
     mergeAppConfig({ navLabels: { "/": "X" }, hiddenTabs: ["/library"] });
     expect(DEFAULT_APP_CONFIG.navLabels).toEqual({});
