@@ -1,20 +1,19 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 146). **/sources refresh + human-verification reset.** Root-caused
-the "800+ items in the next verification sweep" the founder saw on /sources: the generated Layer C map
-(`src/data/verification.ts`) was stale (2026-07-13, before the s126 daily-life content drop), so ~844
-newer items had no tier. Refreshed every `verify:*` input against the current banks (oracle + frequency
-subsets, LanguageTool grammar sidecar: 0 grammar/agreement findings, 0 fact-gate errors) and
-regenerated the map → 3,107 records, "next sweep" bucket now 0 (previously-untiered items show as
-grammar-checked). Then, at founder request, **reset human verification to zero**: the 25 founder-approved
-Can-Do rows were flipped `verified`→`draft` (`verified_by`/`verified_date` dropped), `stamp:verified`
-re-run (hashes now empty), `human` tier + the "menschlich geprüft" stat now read 0. **/sources table
-restructure:** the founder-only Daten-Werkbank moved off the main page onto its own sub-page
-`/sources/werkbank` (`RequireFounder`-gated, same lazy chunk, shared `useWorkbench` hook), and the
-public "Alle Inhalte" item browse is now behind a collapse toggle (collapsed by default) so the page no
-longer scrolls endlessly. Prior: Admin Control Center chunk 3 (`/admin` shell + Übersicht cockpit)
-shipped s145. Next = chunk 4 (Review Cockpit / Prüfmodus) on Opus per
-`ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-22 (session 147). **Schreibtraining redesign shipped (backlog #6): the Fokus
+"Satzlabor".** From the founder's sketch, ran a five-expert design panel → `docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`
+→ mockups → full build (PR #640, merged). `/writing` is now a **mode router** (Fokus · Kurz · Lang +
+Verlauf): Kurz/Lang are the original guided tasks (extracted verbatim, existing backend); **Fokus** is a
+single-sentence write→correct→transform grammar lab. The learner writes a sentence, the AI corrects it in
+place and detects its grammar (auto-lighting a tri-state `GrammarRail`), and tapping a target pill fills a
+second box with the sentence transformed along that axis (MVP grid: Aktiv/Vorgangspassiv × Präsens/Perfekt/
+Präteritum). Detection/transforms run on the CORRECTED sentence; the engine ABSTAINS rather than
+hallucinate. Backend (migration `0009` + Edge Functions `check-sentence` / `transform-sentence`) uses a
+GLOBAL cross-user transform cache and meters into the shared **$5/month fuse**, so max spend is unchanged.
+**Backlog #2 (gate writing behind sign-in) was already shipped**; the panel confirmed it. **Founder action
+needed to make Fokus live:** deploy migration 0009 + the two functions (steps in `PHASE2_SETUP.md`); until
+then Fokus degrades gracefully and Kurz/Lang keep working. Prior: /sources refresh + human-verification
+reset (s146). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -58,6 +57,10 @@ see `strategy/DATA_GOVERNANCE.md`).
 
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
+- [ ] **Deploy the Fokus "Satzlabor" backend (s147)** to make the new `/writing` Fokus mode live: run
+      migration `0009_sentence_studio.sql` + `supabase functions deploy check-sentence transform-sentence`.
+      Steps in `docs/plans/PHASE2_SETUP.md`. No new secrets required. Until then Fokus shows "momentan
+      nicht verfügbar" and Kurz/Lang keep working.
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
@@ -71,6 +74,33 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 147 (2026-07-22). Schreibtraining redesign: Fokus "Satzlabor", branch
+`claude/schreibtraining-todo-review-afoegv`, PR #640 merged.** Backlog #6. A five-expert design panel
+(LLM engine, frontend, German B2 pedagogy, backend cost/security, UX) produced
+`docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`; mockups in `preview/schreibtraining-redesign-mockups.html`.
+What shipped:
+- **`/writing` is now a mode router** (`WritingHub` rewritten): **Fokus · Kurz · Lang** via
+  `WritingModeSwitcher` (sliding pill) + a Verlauf toggle. Kurz/Lang extracted verbatim into
+  `GuidedWritingTrainer` (old length toggle folded into the mode; existing `evaluate-writing` backend).
+- **Fokus "Satzlabor"** (`src/features/writing/fokus/`): single-sentence lab. `FokusTrainer` +
+  tri-state `GrammarRail` (aktuell / target / selected; desktop rail + mobile chip row) +
+  `useFokusMachine` (edit invalidates, transforms derive from the corrected base, in-memory cache).
+  `grammarDimensions.ts` = the Aktiv/Vorgangspassiv × Präsens/Perfekt/Präteritum MVP grid (data-driven,
+  Wave 2 extends the arrays). Client `lib/sentenceStudio.ts` degrades gracefully if the backend is
+  undeployed.
+- **Backend:** migration `0009_sentence_studio.sql` (`sentence_checks` owner-only, GLOBAL cross-user
+  `sentence_transforms` cache, `sentence_ai_ops` paid-op ledger, `bump_transform_hit` RPC,
+  `sentence_studio` kill-switch) + Edge Functions `check-sentence` (correct + detect, Haiku, cache-first)
+  and `transform-sentence` (transform, cache-FIRST, abstains rather than hallucinate; burst/daily/monthly
+  limits count only paid ops; `TRANSFORM_MODEL` env-switchable to Sonnet). Metered into the shared **$5
+  fuse** so max spend is unchanged. Deploy steps in `docs/plans/PHASE2_SETUP.md`.
+- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit **257/257** (new `tests/fokusGrammar.test.ts`) ·
+  build ✓ · check:bundle **111.9 kB** (main unchanged; writing stays lazy) · lint:content ✓.
+- **Open follow-ups:** (1) founder deploys 0009 + the two functions to make Fokus live; (2) decide
+  Haiku vs Sonnet 5 for transforms (default Haiku, one env var); (3) Wave 2 axes (Zustandspassiv,
+  Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness the plan specifies. Fokus is
+  MVP-scoped: no per-token diff highlight yet, single sentence only.
 
 **Handoff after session 146 (2026-07-22). /sources verification refresh + human-review reset + table
 restructure, branch `claude/sources-unchecked-items-njvmao`.** The founder asked why /sources showed
@@ -100,44 +130,9 @@ restructure, branch `claude/sources-unchecked-items-njvmao`.** The founder asked
   (0 verified) · `test:unit` **253/253** · `build` ✓ · `check:bundle` **111.8 kB** (main chunk unchanged;
   Sources stays a lazy chunk).
 
-**Handoff after session 145 (2026-07-22). Admin Control Center chunk 3 (`/admin` shell + Übersicht
-cockpit), branch `claude/admin-control-center-chunk-3-7g5829`.** Chunk 3 of
-`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` on the recommended Opus tier: the founder's front
-door to the admin center, cross-cutting wiring against an already-approved design (mockup 1 in
-`preview/admin-control-center-mockups.html`). What shipped:
-- **Route + gate:** `RequireFounder` in `router.tsx` (mirrors `RequireOnboarding`; renders nothing
-  while auth `status === "loading"` to avoid a redirect flash, else `isFounder(user)` or `<Navigate
-  to="/">`). New standalone top-level route `/admin/*` (outside AppShell chrome, like `/sources`),
-  lazy `AdminApp` (one chunk owns the whole `/admin` subtree via descendant `<Routes>`). Client gate
-  is cosmetic; the real boundary stays the 0008 RLS/RPC.
-- **`src/features/admin/` (all new, lazy):** `AdminApp.tsx` (lang provider + descendant routes),
-  `AdminShell.tsx` (full-screen sidebar cockpit: 8-item DE/EN nav, founder chip, DE/EN toggle,
-  "back to app"; fetches `admin_overview` ONCE and shares it via Outlet context so screens don't
-  re-fetch; Feedback nav badge = `feedback.neu`), `AdminOverview.tsx` (the Übersicht), `adminI18n.tsx`
-  (a `t(de, en)` context + localStorage-persisted lang, no i18n framework), `adminFunnel.ts` (pure,
-  unit-tested), `liveWidget.ts` (C1), `AdminPlaceholder.tsx` (the not-yet-built screens
-  Prüfen/Feedback/Inhalte/Nutzer/System/Steuerung/Launch resolve to it so deep links never 404;
-  chunks 4-7 swap them in).
-- **Übersicht tiles (mockup 1):** **A1** verification-funnel — "Menschlich geprüft" (verified count,
-  25 today), "KI-Jury-Abdeckung" % (tier ≥ jury, the machine floor that costs nothing), and the
-  all-banks trust-ladder stacked bar, all computed synchronously from bundled `provenance.ts` +
-  `verification.ts` (zero backend). **A4** sync-gap — "Wartende Entscheidungen" count + a
-  "Übergabe-Prompt kopieren" button producing the ready-to-paste `pnpm apply:reviews` handoff with
-  the exact ids; pending = approved (`provenance_reviews.decision === "approve"`) minus already
-  `verified` in the bundle (keyless-safe, matches how apply:reviews reconciles). **D1** AI-budget
-  tile (`admin_overview` cost vs $5 + cache-hit rate). **C1** "Ist meine Änderung live?" — build
-  stamp (new Vite `define` `__BUILD_SHA__`/`__BUILD_TIME__`, read only in the admin chunk) vs latest
-  `main` from the public GitHub commits API, plain-language verdicts + the recurring PWA-cache hint +
-  a Supabase-reachable line. Honest metrics: no fabricated deltas; "+N diese Woche" shows only when
-  real (from `verified_date`).
-- **AccountMenu:** founder accounts get a "Kontrollzentrum" (`ShieldCheck`) entry to `/admin`.
-- **Gates:** `typecheck` ✓ · `lint` (0 errors; warnings are the pre-existing compiler-era debt) ·
-  `test:unit` **253/253** (new `tests/adminFunnel.test.ts` pins the funnel + sync-gap + handoff) ·
-  `build` ✓ · `check:bundle` **111.6 kB** (main chunk unchanged; admin rides an 18 kB lazy chunk).
-- **Next:** chunk 4, the Review Cockpit / Prüfmodus (Opus), needs the `build-review-queue.mjs`
-  scorer; deep-links from the Übersicht tiles land there.
-
-_(Session 144's Admin Control Center chunks 1 + 2 handoff (backend foundation migration 0008 + the
+_(Session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,
+`RequireFounder` gate, PR merged) is now in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 144's Admin Control Center chunks 1 + 2 handoff (backend foundation migration 0008 + the
 `apply:reviews` keyless review loop-closer, PRs #631–#633), session 143's Admin Control Center scoping
 handoff (the expert-panel report + build plan + 4 mockup screens, PR #626), session 142's Wörter quality-control handoff (the
 `RETIRED_VOCAB_IDS`/`browsableVocabulary` retire-from-surface set + the vocab↔collocation overlap

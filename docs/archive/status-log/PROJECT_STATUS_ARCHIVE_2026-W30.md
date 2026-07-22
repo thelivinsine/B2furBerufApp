@@ -387,3 +387,38 @@ the environment:
   `test:unit` 237/237 · `build` · `check:bundle` (110.7/400 kB) · `lint:content` all green.
 - **Next:** chunk 3, the `/admin` shell + Übersicht cockpit (Opus recommended); chunks 1-2 outputs
   (sync-gap counter + handoff prompt) are its data feed.
+
+**Handoff after session 145 (2026-07-22). Admin Control Center chunk 3 (`/admin` shell + Übersicht
+cockpit), branch `claude/admin-control-center-chunk-3-7g5829`.** Chunk 3 of
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` on the recommended Opus tier: the founder's front
+door to the admin center, cross-cutting wiring against an already-approved design (mockup 1 in
+`preview/admin-control-center-mockups.html`). What shipped:
+- **Route + gate:** `RequireFounder` in `router.tsx` (mirrors `RequireOnboarding`; renders nothing
+  while auth `status === "loading"` to avoid a redirect flash, else `isFounder(user)` or `<Navigate
+  to="/">`). New standalone top-level route `/admin/*` (outside AppShell chrome, like `/sources`),
+  lazy `AdminApp` (one chunk owns the whole `/admin` subtree via descendant `<Routes>`). Client gate
+  is cosmetic; the real boundary stays the 0008 RLS/RPC.
+- **`src/features/admin/` (all new, lazy):** `AdminApp.tsx` (lang provider + descendant routes),
+  `AdminShell.tsx` (full-screen sidebar cockpit: 8-item DE/EN nav, founder chip, DE/EN toggle,
+  "back to app"; fetches `admin_overview` ONCE and shares it via Outlet context so screens don't
+  re-fetch; Feedback nav badge = `feedback.neu`), `AdminOverview.tsx` (the Übersicht), `adminI18n.tsx`
+  (a `t(de, en)` context + localStorage-persisted lang, no i18n framework), `adminFunnel.ts` (pure,
+  unit-tested), `liveWidget.ts` (C1), `AdminPlaceholder.tsx` (the not-yet-built screens
+  Prüfen/Feedback/Inhalte/Nutzer/System/Steuerung/Launch resolve to it so deep links never 404;
+  chunks 4-7 swap them in).
+- **Übersicht tiles (mockup 1):** **A1** verification-funnel — "Menschlich geprüft" (verified count,
+  25 today), "KI-Jury-Abdeckung" % (tier ≥ jury, the machine floor that costs nothing), and the
+  all-banks trust-ladder stacked bar, all computed synchronously from bundled `provenance.ts` +
+  `verification.ts` (zero backend). **A4** sync-gap — "Wartende Entscheidungen" count + a
+  "Übergabe-Prompt kopieren" button producing the ready-to-paste `pnpm apply:reviews` handoff with
+  the exact ids; pending = approved (`provenance_reviews.decision === "approve"`) minus already
+  `verified` in the bundle (keyless-safe, matches how apply:reviews reconciles). **D1** AI-budget
+  tile (`admin_overview` cost vs $5 + cache-hit rate). **C1** "Ist meine Änderung live?" — build
+  stamp (new Vite `define` `__BUILD_SHA__`/`__BUILD_TIME__`, read only in the admin chunk) vs latest
+  `main` from the public GitHub commits API, plain-language verdicts + the recurring PWA-cache hint +
+  a Supabase-reachable line. Honest metrics: no fabricated deltas; "+N diese Woche" shows only when
+  real (from `verified_date`).
+- **AccountMenu:** founder accounts get a "Kontrollzentrum" (`ShieldCheck`) entry to `/admin`.
+- **Gates:** `typecheck` ✓ · `lint` (0 errors) · `test:unit` **253/253** (new `tests/adminFunnel.test.ts`) ·
+  `build` ✓ · `check:bundle` **111.6 kB** (main chunk unchanged; admin rides an 18 kB lazy chunk).
+- **Next:** chunk 4, the Review Cockpit / Prüfmodus (Opus), needs the `build-review-queue.mjs` scorer.
