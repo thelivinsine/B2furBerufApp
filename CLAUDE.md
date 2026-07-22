@@ -87,6 +87,22 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   content no longer matches its stamp, so a "verified" item can never be silently edited afterwards.
   **Run this right after flipping rows to `verified`** (and commit the sidecar with the flip);
   re-stamping is only legitimate after an actual re-review.
+- `pnpm apply:reviews` — the review LOOP-CLOSER (admin center chunk 2, s144): applies the founder's
+  Supabase review decisions back to the repo. Fetches `provenance_reviews` rows with a `decision`
+  and null `applied_at` (needs `SUPABASE_SERVICE_ROLE_KEY` in env; dev tooling ONLY, never SPA
+  code), maps ids through `ID_RENAMES`, recomputes each item's fingerprint and compares it with the
+  hash stored AT DECISION TIME (the workbench writes it via `src/lib/contentHash.ts` +
+  `src/lib/contentIndex.ts`, kept byte-compatible with `scripts/content-hash.mjs` and pinned by
+  `tests/contentHash.test.ts`), codemods matching approvals to `review_status: "verified"` (+
+  `verified_by`/`verified_date`), then runs `stamp:verified` + `lint:content` so flip and stamp
+  land in the SAME commit. Reject/needs_fix rows export to `docs/reports/review-defects.md`/`.json`
+  (the AI repair queue). `applied_at`/`applied_sha` write-back is a RECONCILE pass that only marks
+  rows whose verified flip is committed at a clean HEAD: run
+  `pnpm apply:reviews --mark-applied` after merging (any later full run also self-heals).
+  `--dry-run` classifies + prints, writes nothing. **Integrity rules (do not weaken): a null or
+  mismatched decision hash is re-review, never a flip; already-verified repo rows are only ever
+  marked applied; never re-stamp to silence a mismatch.** `tests/applyReviews.test.ts` pins the
+  classification + codemod.
 - `pnpm test:srs` — assert `engine/srs.ts` against FSRS golden vectors from py-fsrs (CI gate, s53).
   **Run it after any `engine/srs.ts` edit.** Vector provenance is in the `scripts/test-srs.mjs` header.
 - `pnpm test:pronounce` — assert the `engine/pronounce.ts` spoken/typed answer matcher (CI gate, s56).
@@ -834,8 +850,12 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   only, never individual learner rows** (exception: `feedback` rows, operational mail addressed to
   the founder); `profiles`/`progress`/`writing_evaluations` keep owner-only RLS with NO admin SELECT
   policies. Client wrappers: `src/lib/adminApi.ts` (typed, fail-soft, lazy-only consumer surface).
+  **Chunk 2 (same session): the `pnpm apply:reviews` loop-closer** (see the command bullet above):
+  the /sources workbench now stores `decision` + a decision-time `content_hash` +
+  `reviewer_email` on every approve click (`computeDecisionHash` in `src/lib/provenanceReviews.ts`,
+  banks loaded lazily via `src/lib/contentIndex.ts`, ~4 kB glue chunk over the shared bank chunks).
   Plans: `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` (scope) + `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`
-  (chunks; next: chunk 2 `pnpm apply:reviews`).
+  (chunks; next: chunk 3, the `/admin` shell + Übersicht, recommended on Opus).
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — the only other workflow in `.github/workflows/` is `validate.yml` (the content-lint + SRS test gate), which never deploys. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)

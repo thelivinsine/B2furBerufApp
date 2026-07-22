@@ -1,13 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 144). **Admin Control Center chunk 1 SHIPPED (backend
-foundation).** Migration `supabase/migrations/0008_admin_center.sql` (provenance_reviews decisions
-+ safety hash, feedback triage columns, `app_config`, `launch_checklist`, `is_founder()`/
-`assert_founder()` + the aggregate-only founder RPCs), typed fail-soft client stubs in
-`src/lib/adminApi.ts`, lockstep tests pinning the migration's email gate, and founder deploy steps
-in `docs/plans/PHASE2_SETUP.md`. **Founder action: run migration 0008 in the Supabase SQL editor.**
-Next step = chunk 2 (`pnpm apply:reviews` loop-closer) per
-`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-22 (session 144). **Admin Control Center chunks 1 + 2 SHIPPED.** Chunk 1
+(backend foundation): migration 0008 (provenance_reviews decisions + safety hash, feedback triage,
+`app_config`, `launch_checklist`, founder-gated aggregate RPCs) + `src/lib/adminApi.ts`; the
+founder ran the migration and verified the gate + a live `admin_overview()` JSON. Chunk 2 (the
+loop-closer): `pnpm apply:reviews` (decision fetch → ID_RENAMES → decision-time-hash compare →
+provenance codemod → stamp + lint in ONE commit → reconcile write-back), the /sources workbench
+now stores `decision`/`content_hash`/`reviewer_email` at click time, shared browser/script hash
+pinned by `tests/contentHash.test.ts`. **Founder action (one-time): add `SUPABASE_SERVICE_ROLE_KEY`
+to the Claude environment settings** (steps in `PHASE2_SETUP.md`). Next step = chunk 3 (`/admin`
+shell + Übersicht) on Opus per `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -101,8 +104,44 @@ the security boundary). What shipped:
   carry over as approve decisions, nothing re-clicked); CLAUDE.md admin-gate note now covers 0008.
 - **Gates:** `typecheck` · `lint` (0 errors) · `test:unit` 222/222 · `build` · `check:bundle`
   (110.6/400 kB) · `lint:content` all green. Nothing visible in the app changes yet.
-- **Next:** chunk 2, `pnpm apply:reviews` + decision-time hashes in the workbench (Fable
-  recommended); then chunk 3, the `/admin` shell + Übersicht (Opus).
+- **Deployed + verified live (same session):** the founder ran migration 0008 in the Supabase SQL
+  editor (via the dashboard paste path; `PHASE2_SETUP.md` §1 now marks the CLI optional), confirmed
+  the gate rejects an identity-less call ("forbidden: founder account required" is the HEALTHY
+  result in the SQL editor), and got a real `admin_overview()` JSON via the
+  `set_config('request.jwt.claims', ...)` trick: 6 accounts (4 Google / 2 guests), 8,053 XP,
+  532 SRS cards, 60 sessions, 1 feedback (neu), reviews `decided: 1, approvedUnapplied: 1` (a
+  legacy boolean-era tick, no decision hash, so chunk 2 routes it to re-review, never a blind flip).
+
+**Chunk 2 (same session, same branch): the loop-closer `pnpm apply:reviews` + decision-time
+hashes.** The review pipeline "founder clicks on the phone → next Claude session commits it" now
+works end to end:
+- **Shared fingerprint:** new `src/lib/contentHash.ts` (browser SubtleCrypto sha256 over canonical
+  JSON, byte-compatible with `scripts/content-hash.mjs`) + `src/lib/contentIndex.ts` (the same
+  content-id universe as the stamp script; dynamic-import only, a ~4 kB glue chunk over the shared
+  bank chunks, main chunk untouched at 110.7 kB). Parity pinned by `tests/contentHash.test.ts`
+  (canonicalization, hashes, id universe; jsdom gets node webcrypto).
+- **Decision-time capture:** the /sources Daten-Werkbank tick now saves `decision: "approve"` + a
+  `content_hash` of the item as reviewed + `reviewer_email` (untick clears the decision; note-only
+  edits leave it untouched); CSV export gained the decision column.
+- **`scripts/apply-reviews.mjs`** (`pnpm apply:reviews`; needs `SUPABASE_SERVICE_ROLE_KEY`, dev
+  tooling only): fetch pending decisions → `ID_RENAMES` → hash compare → codemod
+  `provenance.ts` (`draft`→`verified` + `verified_by`/`verified_date`, format-exact) →
+  `stamp:verified` + `lint:content` in the SAME commit → defects/re-review export to
+  `docs/reports/review-defects.md` + `.json`. **Write-back is a reconcile pass:** `applied_at`/
+  `applied_sha` are only set for rows whose verified flip is committed at a clean HEAD
+  (`--mark-applied` after merging; every full run also self-heals). `--dry-run` writes nothing.
+  Integrity rules pinned by `tests/applyReviews.test.ts`: null/mismatched decision hash = re-review
+  (never a flip), already-verified rows only ever mark applied.
+- **Verified end to end in-session:** real flip of `v_besprechung` through the codemod →
+  `stamp:verified` (25→26) → `lint:content` green → reverted. Missing-key guard exits 1 with
+  founder-readable guidance.
+- **Founder action (one-time):** add `SUPABASE_SERVICE_ROLE_KEY` to the Claude Code environment
+  settings so sessions can run the script; steps + key-handling warning appended to
+  `PHASE2_SETUP.md`.
+- **Gates:** `typecheck` · `lint` (0 errors; the one new hook-deps warning was fixed properly) ·
+  `test:unit` 237/237 · `build` · `check:bundle` (110.7/400 kB) · `lint:content` all green.
+- **Next:** chunk 3, the `/admin` shell + Übersicht cockpit (Opus recommended); chunks 1-2 outputs
+  (sync-gap counter + handoff prompt) are its data feed.
 
 **Handoff after session 143 (2026-07-21). Admin Control Center scoping, branch
 `claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (PR #626, docs + preview only).** Founder

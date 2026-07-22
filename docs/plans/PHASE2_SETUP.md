@@ -371,3 +371,36 @@ aggregate numbers only (counts and day totals), never individual user data.
 
 Nothing is visible in the app yet after this step; the `/admin` page itself
 ships in a later chunk. This migration is the plumbing it stands on.
+
+## Review loop-closer (`pnpm apply:reviews`): founder setup step
+
+Chunk 2 of the admin center makes your review clicks count: every "geprüft"
+tick in the /sources Daten-Werkbank now saves an **approve decision plus a
+fingerprint of the exact content you looked at**, and the new
+`pnpm apply:reviews` script (run by a Claude session, not by you) turns those
+decisions into committed `verified` flips, with the fingerprint check making
+sure the content did not change between your review and the commit.
+
+Your one-time setup: give Claude sessions the **service-role key** so the
+script can read your decisions (the review table is locked to your accounts,
+so the normal public key cannot see it).
+
+1. In the Supabase dashboard open **Project Settings → API keys** and copy the
+   **service_role** key (the secret one, NOT the publishable key).
+2. In Claude Code on the web, open your **environment settings** for this
+   repository and add an environment variable:
+   - Name: `SUPABASE_SERVICE_ROLE_KEY`
+   - Value: the key you copied.
+3. That's it. From then on, telling a session "run apply:reviews" (or it
+   running as part of admin-center work) fetches your approvals, applies the
+   safe ones, and reports anything that needs a second look.
+
+> 🔐 **This key bypasses all row security.** It belongs ONLY in the Supabase
+> dashboard and in your private Claude environment settings. Never paste it
+> into chat, never commit it, and if it ever leaks, rotate it in the same
+> dashboard page. The app itself never uses it.
+
+What the script prints back (in plain terms): how many approvals were applied,
+which ones were skipped because the content changed since you reviewed them
+(these reappear in the workbench for a fresh look), and a fix list built from
+your reject / needs-fix decisions (`docs/reports/review-defects.md`).

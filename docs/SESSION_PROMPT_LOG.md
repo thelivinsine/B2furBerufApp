@@ -833,3 +833,45 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
 - **Artifacts (prompt 1):** `supabase/migrations/0008_admin_center.sql` · `src/lib/adminApi.ts` ·
   `tests/admin.test.ts` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+- **Prompt 2 (verbatim):** `> the first step doesn't work for me on powershell. (Windows: scoop install supabase) where should I run this command and how?`
+- **Response 2:** Clarified that chunk 1 needs NO CLI at all: the supported path is pasting
+  `0008_admin_center.sql` into the Supabase dashboard SQL editor (same as migrations 0004-0007),
+  and provided the full SQL + click path inline. No file changes.
+- **Artifacts (prompt 2):** none (guidance only)
+- **Prompt 3 (verbatim):** `> then why is the phase 2 setup suggesting me to setup supabase cli?` (followed in the next message by `> Yes, do that. ...` approving the doc fix and reporting `select public.admin_overview();` returned "forbidden: founder account required")
+- **Response 3:** Explained the doc inconsistency (the CLI's `db push` was only handy for the
+  initial two-migration setup; every later migration ships a dashboard paste step). Marked §1 of
+  `PHASE2_SETUP.md` as optional with a callout, and REWROTE the migration-0008 verify step: the
+  "forbidden" error in the SQL editor is the healthy result (no JWT identity), with the
+  `set_config('request.jwt.claims', ...)` trick documented to see the happy path. Shipped via PR
+  #632 into `main`, branch realigned.
+- **Artifacts (prompt 3):** `docs/plans/PHASE2_SETUP.md` · PR #632
+- **Prompt 4 (verbatim):** `> here's what I get after running the sql query:` (+ the full
+  `admin_overview()` JSON: 6 accounts, 8053 XP, 532 SRS cards, 60 sessions, 1 feedback neu,
+  reviews decided 1 / approvedUnapplied 1)
+- **Response 4:** Confirmed the migration is fully deployed and every RPC branch returns real
+  data; flagged `approvedUnapplied: 1` as the legacy boolean-era tick that chunk 2 will route to
+  re-review (no decision hash). No file changes.
+- **Artifacts (prompt 4):** none (verification read-out)
+- **Prompt 5 (verbatim):** `> go ahead with chunk 2 now` (after switching the session model back
+  to the recommended tier for the trust-critical chunk)
+- **Response 5:** Built chunk 2, the loop-closer. New `src/lib/contentHash.ts` (browser
+  SubtleCrypto canonical-JSON sha256, byte-compatible with `scripts/content-hash.mjs`) +
+  `src/lib/contentIndex.ts` (dynamic-import-only bank index, ~4 kB glue chunk);
+  `provenanceReviews.ts` + Sources.tsx now store `decision`/`content_hash`/`reviewer_email` at
+  click time (workbench CSV gained the decision column); new `scripts/apply-reviews.mjs`
+  (`pnpm apply:reviews`, service-role env key): fetch pending decisions, ID_RENAMES, decision-time
+  hash compare, provenance codemod (draft→verified + verified_by/verified_date), stamp + lint in
+  the same commit, defects/re-review export to `docs/reports/review-defects.md`/`.json`,
+  reconcile-style `applied_at`/`applied_sha` write-back (`--mark-applied`, `--dry-run`). Parity +
+  integrity pinned by `tests/contentHash.test.ts` and `tests/applyReviews.test.ts` (237/237
+  total). Verified end to end in-session: real codemod flip of `v_besprechung` → stamp (25→26) →
+  lint green → reverted. Founder one-time step (SUPABASE_SERVICE_ROLE_KEY into the Claude
+  environment settings) documented in `PHASE2_SETUP.md`; CLAUDE.md command bullet added. Gates:
+  typecheck · lint 0 errors · test:unit 237/237 · build · check:bundle 110.7 kB · lint:content all
+  green. Shipped via PR into `main`.
+- **Artifacts (prompt 5):** `scripts/apply-reviews.mjs` · `src/lib/contentHash.ts` ·
+  `src/lib/contentIndex.ts` · `src/lib/provenanceReviews.ts` · `src/features/legal/Sources.tsx` ·
+  `src/features/legal/AdminWorkbench.tsx` · `tests/contentHash.test.ts` ·
+  `tests/applyReviews.test.ts` · `package.json` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · this log
