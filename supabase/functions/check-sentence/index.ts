@@ -108,32 +108,49 @@ function parseCheck(raw: string): { corrected: string; hasErrors: boolean; sente
   }
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function callAnthropic(text: string): Promise<CheckOut | null> {
   const key = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!key) return null;
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: HAIKU_MODEL,
-        max_tokens: 500,
-        temperature: 0,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: `Text:\n"""${text}"""` }],
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const parsed = parseCheck(data.content?.[0]?.text ?? "");
-    if (!parsed) return null;
-    const inTok = data.usage?.input_tokens ?? 0;
-    const outTok = data.usage?.output_tokens ?? 0;
-    const cost = (inTok / 1e6) * 1 + (outTok / 1e6) * 5;
-    return { ...parsed, model: HAIKU_MODEL, cost };
-  } catch {
-    return null;
+  if (!key) { console.error("[check] anthropic: no ANTHROPIC_API_KEY set"); return null; }
+  // Retry once on a transient overload (429/529) before falling through.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: HAIKU_MODEL,
+          max_tokens: 500,
+          temperature: 0,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: "user", content: `Text:\n"""${text}"""` }],
+        }),
+      });
+      if (res.status === 429 || res.status === 529) {
+        console.error(`[check] anthropic overloaded status=${res.status} attempt=${attempt}`);
+        if (attempt === 0) { await sleep(700); continue; }
+        return null;
+      }
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        console.error(`[check] anthropic http=${res.status} body=${body.slice(0, 400)}`);
+        return null;
+      }
+      const data = await res.json();
+      const raw = data.content?.[0]?.text ?? "";
+      const parsed = parseCheck(raw);
+      if (!parsed) { console.error(`[check] anthropic parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
+      const inTok = data.usage?.input_tokens ?? 0;
+      const outTok = data.usage?.output_tokens ?? 0;
+      const cost = (inTok / 1e6) * 1 + (outTok / 1e6) * 5;
+      return { ...parsed, model: HAIKU_MODEL, cost };
+    } catch (e) {
+      console.error(`[check] anthropic threw: ${e}`);
+      return null;
+    }
   }
+  return null;
 }
 
 async function callGemini(text: string): Promise<CheckOut | null> {
@@ -151,12 +168,18 @@ async function callGemini(text: string): Promise<CheckOut | null> {
         }),
       },
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[check] gemini http=${res.status} body=${body.slice(0, 400)}`);
+      return null;
+    }
     const data = await res.json();
-    const parsed = parseCheck(data.candidates?.[0]?.content?.parts?.[0]?.text ?? "");
-    if (!parsed) return null;
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const parsed = parseCheck(raw);
+    if (!parsed) { console.error(`[check] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
     return { ...parsed, model: "gemini-1.5-flash", cost: 0.0005 };
-  } catch {
+  } catch (e) {
+    console.error(`[check] gemini threw: ${e}`);
     return null;
   }
 }
@@ -177,12 +200,17 @@ async function callOpenAI(text: string): Promise<CheckOut | null> {
         ],
       }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[check] openai http=${res.status} body=${body.slice(0, 400)}`);
+      return null;
+    }
     const data = await res.json();
     const parsed = parseCheck(data.choices?.[0]?.message?.content ?? "");
     if (!parsed) return null;
     return { ...parsed, model: "gpt-4o-mini", cost: 0.0008 };
-  } catch {
+  } catch (e) {
+    console.error(`[check] openai threw: ${e}`);
     return null;
   }
 }
@@ -277,8 +305,10 @@ Deno.serve(async (req) => {
   }
 
   // LLM correction + detection.
+  console.log(`[check] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${HAIKU_MODEL}`);
   const out = (await callAnthropic(text)) || (await callGemini(text)) || (await callOpenAI(text));
   if (!out) {
+    console.error("[check] all providers failed for input hash " + inputHash.slice(0, 12));
     return json({ ok: false, message: "Die Prüfung ist momentan nicht verfügbar. Bitte versuche es später erneut." });
   }
 
