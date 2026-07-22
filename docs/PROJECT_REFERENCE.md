@@ -58,8 +58,9 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
    s105 nav relabel) are all live on `main`. See `CLAUDE.md` "Mobile bottom tab bar" section for the
    current locked layout. Treat any further Dashboard work as a new, separately scoped backlog item
    rather than reopening this one.
-2. **Gate Schreibtraining behind sign-in:** show the login/sign-up popup (`AuthDialog`) when a
-   signed-out guest tries to use Schreibtraining, instead of letting them in freely.
+2. **Gate Schreibtraining behind sign-in — DONE.** `WritingHub` stashes the draft and opens
+   `AuthDialog` when a signed-out guest submits (confirmed s147; the s147 Fokus mode reuses the same
+   login wall).
 3. **Animated-character scenario simulations:** visual, contextual practice — simulate real
    workplace scenarios with animated characters (beyond today's text-based branching dialogues).
 4. **Visual mnemonics for vocabulary:** icons/illustrations per noun gender — e.g. man, woman,
@@ -142,7 +143,12 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
      (+ `.pptx`) and planned in `docs/archive/TAXONOMY_IMPLEMENTATION_PLAN.md`: a faceted Domain → Theme →
      Sub-theme model with a Work/Personal/Both **Mode** lens and work-only **sector** facet (the
      industry/sector split the founder asked for). Not built yet; Phase 0–1 is the next build step.
-6. **Redesign the Schreibtraining section.**
+6. **Redesign the Schreibtraining section — SHIPPED MVP (s147, PR #640).** `/writing` is now a
+   Fokus/Kurz/Lang mode router; **Fokus "Satzlabor"** is the new single-sentence write→correct→transform
+   grammar lab (plan: `docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`). MVP = Aktiv/Vorgangspassiv ×
+   Präsens/Perfekt/Präteritum. Remaining: founder deploys the backend (migration 0009 + 2 Edge Functions);
+   Wave 2 axes (Zustandspassiv, Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness + a
+   per-token correction diff are the next iteration.
 7. **Sourcing/audit infrastructure for content data:** build a data structure + pipeline to
    scrape from reliable open-licensed sources (see "Approved open-licensed sources" above), with
    a clear, audit-ready human-verification workflow. Every data point in the app should carry

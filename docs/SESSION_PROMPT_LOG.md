@@ -1002,3 +1002,45 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `scripts/vendor/german-nouns-subset.json` · `scripts/vendor/german-words-subset.json` ·
   `scripts/vendor/german-frequency-subset.json` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+
+## Session 147 — 2026-07-22 · branch `claude/schreibtraining-todo-review-afoegv`
+_Schreibtraining redesign (backlog #6): five-expert design panel → plan + mockups → full Fokus "Satzlabor" implementation, shipped._
+
+- **Prompt 1 (verbatim):** `I'd like to get to the schreibtraining to-do, let's see what we have`
+- **Response 1:** Surveyed the writing feature + backlog. Found two Schreibtraining items: #2 "gate
+  behind sign-in" (already shipped in `WritingHub`) and #6 "redesign the section" (the real open one).
+  Summarized the current theme-picker → textarea → single-tip flow and the `evaluate-writing` backend.
+- **Prompt 2 (verbatim):** `Schreibtraining - Kurz isnt just about more feedback. In the attached drawing, I wanted to show that I'd like similar filter rail to the right of the screen and to the left a field tofor learner to write things and get checked by AI. And there should be another box/field below where a different style of writing the same sentence is done by selecting various grammatic component like activ vs passiv or prasens vs prateritum. When the user first writes something and submits in the top box, the AI not only shows the corrected version within the same box below the user's text but also the current status of the grammar will be selected in the filter rail. When the user clicks on some other pills/toggles, the sentence should be transformed and be shown in the bottom box. I want you to spin a panel of experts (agents) to brainstorm how best this can be implemented and write a robust and comprehensive implementation plan.` (attachment: hand-drawn sketch of the Fokus write→correct→transform layout with a grammar filter rail)
+- **Response 2:** Grounded in the code, then ran a **5-expert parallel agent panel** (LLM engine,
+  frontend architecture, German B2 pedagogy, backend cost/security, UX). Synthesized into
+  `docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`: single-sentence Fokus lab, detection/transforms on
+  the CORRECTED sentence, abstain-not-hallucinate, GLOBAL cross-user transform cache inside the $5
+  fuse, Voice×Tense MVP grid, tri-state grammar rail, phased build order, founder decisions. Committed
+  + pushed the plan.
+- **Prompt 3 (verbatim):** `can you generate a couple of previews of how it might look like based on the plan?` (+ interrupt/continue)
+- **Response 3:** Built `preview/schreibtraining-redesign-mockups.html` (brand-faithful tokens):
+  desktop Fokus (corrected + Passiv transform; a Perfekt transform with a greyed "not possible" pill),
+  mobile Fokus chip row, mobile Kurz. Delivered via SendUserFile + committed.
+- **Prompt 4 (verbatim):** `looks good. Go ahead and implement this`
+- **Response 4:** Implemented the full vertical slice. Frontend: `WritingHub` → mode router
+  (Fokus/Kurz/Lang + Verlauf), `WritingModeSwitcher`, `GuidedWritingTrainer` (extracted Kurz/Lang),
+  and the Fokus set (`FokusTrainer`, tri-state `GrammarRail`, `useFokusMachine`, `grammarDimensions.ts`,
+  `lib/sentenceStudio.ts`, `resumeDraft` extended). Backend: migration `0009_sentence_studio.sql`
+  (sentence_checks / global sentence_transforms cache / sentence_ai_ops ledger / bump_transform_hit /
+  kill-switch) + Edge Functions `check-sentence` and `transform-sentence`. Deploy steps appended to
+  `PHASE2_SETUP.md`. New `tests/fokusGrammar.test.ts`. Gates: typecheck · lint 0 errors · test:unit
+  257/257 · build · check:bundle 111.9 kB (main unchanged) · lint:content, all green. Committed + pushed.
+- **Prompt 5 (verbatim):** `merge`
+- **Response 5:** Opened PR #640 and squash-merged into `main` (`6bf6524`), ran the post-merge
+  branch realignment (reset dev branch to `origin/main`, force-with-lease). Frontend live on next
+  Pages deploy; Fokus is functional once the founder deploys migration 0009 + the two Edge Functions.
+- **Prompt 6 (verbatim):** `document the session`
+- **Response 6:** Updated `docs/PROJECT_STATUS.md` (header + s147 handoff, s145 rotated to the W30
+  archive), `docs/PROJECT_REFERENCE.md` (backlog #2 marked done, #6 marked shipped), and this log.
+- **Artifacts (session 147):** `docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md` ·
+  `preview/schreibtraining-redesign-mockups.html` · `src/features/writing/WritingHub.tsx` ·
+  `src/features/writing/WritingModeSwitcher.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/resumeDraft.ts` · `src/features/writing/fokus/{FokusTrainer,GrammarRail,grammarDimensions,useFokusMachine}.{tsx,ts}` ·
+  `src/lib/sentenceStudio.ts` · `supabase/migrations/0009_sentence_studio.sql` ·
+  `supabase/functions/{check-sentence,transform-sentence}/index.ts` · `tests/fokusGrammar.test.ts` ·
+  `docs/plans/PHASE2_SETUP.md` · PR #640 (`6bf6524`) · this log · `docs/PROJECT_STATUS.md` · `docs/PROJECT_REFERENCE.md`
