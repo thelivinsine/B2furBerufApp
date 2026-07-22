@@ -289,3 +289,101 @@ only." What shipped:
   Verified rendered output via `pnpm preview` + headless Chromium (landing light/dark/mobile,
   /hilfe dark) and the regenerated brand-kit contact sheet. PWA caveat: hard-refresh the live site;
   the home-screen icon may need re-adding to show the new size.
+
+
+---
+
+**Handoff after session 144 (2026-07-22). Admin Control Center chunks 1 + 2 (backend foundation +
+the review loop-closer), branch `claude/admin-control-center-chunk-1-eafquu` (three PRs to `main`:
+#631 chunk 1, #632 setup-doc fixes, #633 chunk 2).** The first two build chunks of
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, both on the recommended Fable tier (they are the
+security + integrity core). Migration 0008 was deployed live by the founder and verified in-session.
+
+### Chunk 1 · backend foundation (this chunk IS the security boundary)
+What shipped:
+- **Migration `supabase/migrations/0008_admin_center.sql`** (idempotent, founder pastes it into
+  the Supabase SQL editor; steps appended to `docs/plans/PHASE2_SETUP.md`):
+  (1) `provenance_reviews` widened from the boolean checkbox to real decisions:
+  `decision approve|reject|needs_fix`, `content_hash` (the decision-time safety hash chunk 2's
+  `apply:reviews` compares before flipping repo rows), `reviewer_email`, `applied_at`,
+  `applied_sha`; `verified=true` rows backfilled to `decision='approve'` (legacy rows keep a null
+  hash, which apply:reviews must treat as "needs re-review", never a free pass), reviewer emails
+  backfilled from `reviewed_by`. The `verified` boolean stays until the chunk-2 workbench update.
+  (2) `feedback` triage columns: `status neu|erledigt|verworfen`, `priority hoch|normal|niedrig`,
+  `note`, `link` (table stays service-role-only; founder access via RPC only).
+  (3) **`app_config`** (Steuerung store): key/value jsonb rows, world-READABLE RLS (the app will
+  consume it at startup in chunk 7), founder-only writes. (4) **`launch_checklist`**: founder-only
+  RLS, state synced across devices (items seeded by the chunk-6 UI).
+  (5) **`is_founder()`** (the SINGLE email source for every 0008 policy/RPC) + **`assert_founder()`**
+  + SECURITY DEFINER RPCs gated in-body per the 0004/0007 pattern: `admin_overview()` (one jsonb:
+  accounts split guests/email/Google + new7d, active today/7d, sessions/XP/SRS-card totals, AI
+  month spend vs cap inputs, feedback counts, review sync-gap counts), `admin_daily_series()`
+  (30-day `{day, signups, actives}`), `admin_feedback_recent(n)`, `admin_feedback_update(...)`
+  (validates enums; empty string clears note/link). All revoked from `public`/`anon`, granted to
+  `authenticated` (guests ride the authenticated role, so the in-body email check is the real
+  boundary). **Privacy line held: aggregates only, no RPC returns learner rows; no admin SELECT
+  policies were added to `profiles`/`progress`/`writing_evaluations`** (the `feedback` table is the
+  sanctioned per-row exception: operational mail addressed to the founder).
+- **`src/lib/adminApi.ts`**: typed fail-soft wrappers (null/empty/false on error, offline-first)
+  for the four RPCs + raw `app_config` and `launch_checklist` helpers. Not imported by any eager
+  code yet (main chunk unchanged); consumers arrive with the `/admin` shell in chunk 3.
+- **`tests/admin.test.ts` extended (lockstep pin):** migration 0007 + 0008 email sets must equal
+  `FOUNDER_EMAILS` exactly, both emails must sit inside `is_founder()`, and every 0008 admin RPC
+  must contain `perform public.assert_founder();` and a `revoke ... from public, anon`.
+- **Docs:** founder deploy/verify steps in `PHASE2_SETUP.md` (run 0008; existing Werkbank ticks
+  carry over as approve decisions, nothing re-clicked); CLAUDE.md admin-gate note now covers 0008.
+- **Gates:** `typecheck` · `lint` (0 errors) · `test:unit` 222/222 · `build` · `check:bundle`
+  (110.6/400 kB) · `lint:content` all green. Nothing visible in the app changes yet.
+- **Deployed + verified live (same session):** the founder ran migration 0008 in the Supabase SQL
+  editor (via the dashboard paste path; `PHASE2_SETUP.md` §1 now marks the CLI optional), confirmed
+  the gate rejects an identity-less call ("forbidden: founder account required" is the HEALTHY
+  result in the SQL editor), and got a real `admin_overview()` JSON via the
+  `set_config('request.jwt.claims', ...)` trick: 6 accounts (4 Google / 2 guests), 8,053 XP,
+  532 SRS cards, 60 sessions, 1 feedback (neu), reviews `decided: 1, approvedUnapplied: 1` (a
+  legacy boolean-era tick, no decision hash, so chunk 2 routes it to re-review, never a blind flip).
+
+### Chunk 2 · the loop-closer `pnpm apply:reviews` + decision-time hashes
+The review pipeline "founder clicks on the phone → next Claude session commits it" now works end
+to end:
+- **Shared fingerprint:** new `src/lib/contentHash.ts` (browser SubtleCrypto sha256 over canonical
+  JSON, byte-compatible with `scripts/content-hash.mjs`) + `src/lib/contentIndex.ts` (the same
+  content-id universe as the stamp script; dynamic-import only, a ~4 kB glue chunk over the shared
+  bank chunks, main chunk untouched at 110.7 kB). Parity pinned by `tests/contentHash.test.ts`
+  (canonicalization, hashes, id universe; jsdom gets node webcrypto).
+- **Decision-time capture:** the /sources Daten-Werkbank tick now saves `decision: "approve"` + a
+  `content_hash` of the item as reviewed + `reviewer_email` (untick clears the decision; note-only
+  edits leave it untouched); CSV export gained the decision column.
+- **`scripts/apply-reviews.mjs`** (`pnpm apply:reviews`): decision source → `ID_RENAMES` → hash
+  compare → codemod `provenance.ts` (`draft`→`verified` + `verified_by`/`verified_date`,
+  format-exact) → `stamp:verified` + `lint:content` in the SAME commit → defects/re-review export
+  to `docs/reports/review-defects.md` + `.json`. `--dry-run` writes nothing. Integrity rules pinned
+  by `tests/applyReviews.test.ts`: null/mismatched decision hash = re-review (never a flip),
+  already-verified rows only ever mark applied.
+- **Verified end to end in-session:** real flip of `v_besprechung` through the codemod →
+  `stamp:verified` (25→26) → `lint:content` green → reverted.
+
+### Chunk 2 addendum · keyless review handoff (founder security review, same session)
+The founder correctly flagged that the Claude environment's **environment-variables box is plaintext
+and explicitly warns against secrets**, so storing `SUPABASE_SERVICE_ROLE_KEY` there (my first
+instruction) was wrong. Replaced the key path with a keyless file handoff, no secret ever touches
+the environment:
+- **Browser export:** `src/lib/reviewExport.ts` (`buildDecisionExport`/`downloadDecisions`) + an
+  **"Entscheidungen (N)"** button in the AdminWorkbench toolbar. The founder is already securely
+  signed in on /sources (RLS grants read), so the browser downloads a `genauly-review-decisions-*.json`
+  file (decisions + decision-time fingerprints, NO credential). CSV export unchanged.
+- **Keyless script mode:** `pnpm apply:reviews --from <file>` (`parseDecisionFile`) reads that file
+  instead of Supabase, does the identical hash-compare + codemod + stamp + lint, and writes NO
+  database (applied state reconciles from the deployed bundle: the item is `verified` in
+  provenance.ts). The direct-DB path stays for a secure local shell with the key, but is no longer
+  the founder's path. Round-trip (browser export → script parse) pinned by `tests/reviewExport.test.ts`.
+- **Verified end to end:** built a realistic 2-decision fixture (one hash-matching `v_besprechung`,
+  one stale `v_tagesordnung`) → `--from` dry-run classified correctly (1 ready, 1 re-review) →
+  real `--from` run flipped `v_besprechung`, stamped, linted green, exported the stale one to the
+  re-review report → reverted.
+- **Founder action: NONE.** No key to set up; the workbench button + file handoff is the whole flow.
+  `PHASE2_SETUP.md` rewritten accordingly (and now says NOT to put the service-role key in the
+  environment variables).
+- **Gates:** `typecheck` · `lint` (0 errors; the one new hook-deps warning was fixed properly) ·
+  `test:unit` 237/237 · `build` · `check:bundle` (110.7/400 kB) · `lint:content` all green.
+- **Next:** chunk 3, the `/admin` shell + Übersicht cockpit (Opus recommended); chunks 1-2 outputs
+  (sync-gap counter + handoff prompt) are its data feed.

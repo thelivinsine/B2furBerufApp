@@ -78,6 +78,10 @@ const Welt = lazyWithReload(() =>
 const Sources = lazyWithReload(() =>
   import("@/features/legal/Sources").then((m) => ({ default: m.Sources })),
 );
+// The founder-only review table on its own sub-page (same lazy chunk as Sources).
+const SourcesWorkbench = lazyWithReload(() =>
+  import("@/features/legal/Sources").then((m) => ({ default: m.SourcesWorkbench })),
+);
 // Lazy: the bilingual legal bodies + About are long text components that are
 // rarely visited from inside the app; no reason to ship them eagerly.
 const PrivacyPolicy = lazyWithReload(() =>
@@ -193,6 +197,18 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={null}>
         <Sources />
+      </Suspense>
+    ),
+  },
+  // Founder-only review table, split off /sources so that page stays short.
+  {
+    path: "/sources/werkbank",
+    errorElement: routeError,
+    element: (
+      <Suspense fallback={null}>
+        <RequireFounder>
+          <SourcesWorkbench />
+        </RequireFounder>
       </Suspense>
     ),
   },

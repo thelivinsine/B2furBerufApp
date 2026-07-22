@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link, Navigate } from "react-router-dom";
 import {
+  ChevronDown,
   Database,
   ExternalLink,
   Layers,
   ShieldCheck,
   SpellCheck,
+  Table2,
   UserCheck,
 } from "lucide-react";
 import { provenance } from "@/data/provenance";
@@ -351,8 +354,13 @@ function BankTiles({ byType, lang }: { byType: Map<ProvenanceContentType, Proven
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
-export function Sources() {
-  const [lang, setLang] = useState<Lang>("de");
+/**
+ * Shared workbench state for the founder review table. Lives in a hook so both
+ * the /sources summary (which only needs `admin` + `liveVerified`) and the
+ * dedicated /sources/werkbank sub-page (which renders the full table) can drive
+ * the same reviews cache + save handler without duplicating the logic.
+ */
+function useWorkbench() {
   const user = useAuthStore((s) => s.user);
   const admin = isFounder(user);
 
@@ -374,7 +382,7 @@ export function Sources() {
     };
   }, [admin]);
 
-  const workbenchApi: WorkbenchApi | undefined = useMemo(() => {
+  const api: WorkbenchApi | undefined = useMemo(() => {
     if (!admin) return undefined;
     return {
       reviews,
@@ -425,6 +433,14 @@ export function Sources() {
     [reviews],
   );
 
+  return { admin, api, saveState, liveVerified };
+}
+
+export function Sources() {
+  const [lang, setLang] = useState<Lang>("de");
+  const { admin, liveVerified } = useWorkbench();
+  const [showAll, setShowAll] = useState(false);
+
   const stats = useMemo(() => {
     const byType = new Map<ProvenanceContentType, ProvenanceEntry[]>();
     const byHost = new Map<string, number>();
@@ -459,32 +475,32 @@ export function Sources() {
       title={t("Quellen & Datenqualität", "Sources & Data Quality")}
       lastUpdated="2026-07-18"
     >
-      {admin && workbenchApi && (
-        /* Break out of the narrow legal column on large screens so the data
-           table gets real width; the page column stays max-w-3xl for text. */
-        <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 lg:-mx-16 xl:-mx-40">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="font-semibold text-foreground">
-              {t("Daten-Werkbank (nur Admins)", "Data workbench (admins only)")}
-            </h2>
-            <span className="text-xs text-muted-foreground">
-              {saveState === "saving"
-                ? t("Speichern…", "Saving…")
-                : saveState === "saved"
-                  ? t("Gespeichert", "Saved")
-                  : saveState === "error"
-                    ? t("Fehler beim Speichern", "Save failed")
-                    : ""}
+      {admin && (
+        /* The full review table moved to its own sub-page (/sources/werkbank)
+           so this page stays short. Admins get a link card instead of the
+           inline table. */
+        <Link
+          to="/sources/werkbank"
+          className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 transition-colors hover:bg-primary/10"
+        >
+          <span className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Table2 className="h-5 w-5" />
             </span>
-          </div>
-          <p className="mb-3 mt-1 text-sm text-muted-foreground">
-            {t(
-              `Der ganze Inhaltsbestand als Tabelle: suchen, filtern, sortieren, als CSV exportieren, live prüfen. Deine Haken und Notizen sieht nur das Admin-Team. Live geprüft: ${liveVerified} von ${stats.total}.`,
-              `The full content register as a table: search, filter, sort, export as CSV, review live. Your checks and notes are visible to the admin team only. Live-checked: ${liveVerified} of ${stats.total}.`,
-            )}
-          </p>
-          <AdminWorkbench api={workbenchApi} lang={lang} />
-        </div>
+            <span>
+              <span className="block font-semibold text-foreground">
+                {t("Daten-Werkbank (nur Admins)", "Data workbench (admins only)")}
+              </span>
+              <span className="block text-sm text-muted-foreground">
+                {t(
+                  `Ganzer Bestand als Tabelle: suchen, filtern, sortieren, CSV-Export, live prüfen. Live geprüft: ${liveVerified} von ${stats.total}.`,
+                  `The full register as a table: search, filter, sort, CSV export, review live. Live-checked: ${liveVerified} of ${stats.total}.`,
+                )}
+              </span>
+            </span>
+          </span>
+          <ChevronDown className="h-5 w-5 shrink-0 -rotate-90 text-muted-foreground" />
+        </Link>
       )}
 
       <Section title={t("Unser Ansatz", "Our approach")}>
@@ -592,12 +608,83 @@ export function Sources() {
             "Expand a group to see every item with its tier and a link to its source. A live link confirms the page exists, not that the content is correct; accuracy is additionally checked by humans.",
           )}
         </p>
-        <div className="space-y-2">
-          {TYPE_ORDER.filter((type) => stats.byType.has(type)).map((type) => (
-            <TypeGroup key={type} type={type} rows={stats.byType.get(type)!} lang={lang} />
-          ))}
-        </div>
+        <button
+          type="button"
+          onClick={() => setShowAll((v) => !v)}
+          aria-expanded={showAll}
+          className="flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-surface/50 px-4 py-3 text-sm font-medium text-foreground transition-colors hover:bg-surface"
+        >
+          <span>
+            {showAll
+              ? t("Liste zuklappen", "Collapse list")
+              : t("Alle Inhalte anzeigen", "Show all content")}
+            <span className="ml-2 text-xs text-muted-foreground">
+              {stats.total.toLocaleString("de-DE")}
+            </span>
+          </span>
+          <ChevronDown className={cn("h-5 w-5 shrink-0 transition-transform", showAll && "rotate-180")} />
+        </button>
+        {showAll && (
+          <div className="mt-2 space-y-2">
+            {TYPE_ORDER.filter((type) => stats.byType.has(type)).map((type) => (
+              <TypeGroup key={type} type={type} rows={stats.byType.get(type)!} lang={lang} />
+            ))}
+          </div>
+        )}
       </Section>
+    </LegalChrome>
+  );
+}
+
+/**
+ * /sources/werkbank — the founder-only review table on its own page, so the
+ * main /sources page stays short. Route-gated by RequireFounder; this extra
+ * client check just redirects a non-admin who somehow reaches the component.
+ */
+export function SourcesWorkbench() {
+  const [lang, setLang] = useState<Lang>("de");
+  const { admin, api, saveState, liveVerified } = useWorkbench();
+
+  const t = (de: string, en: string) => (lang === "de" ? de : en);
+  const total = provenance.length;
+
+  if (!admin || !api) return <Navigate to="/sources" replace />;
+
+  return (
+    <LegalChrome
+      lang={lang}
+      setLang={setLang}
+      title={t("Daten-Werkbank", "Data workbench")}
+      lastUpdated="2026-07-22"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <Link
+          to="/sources"
+          className="text-sm font-medium text-primary underline-offset-2 hover:underline"
+        >
+          {t("← Zurück zu Quellen", "← Back to Sources")}
+        </Link>
+        <span className="text-xs text-muted-foreground">
+          {saveState === "saving"
+            ? t("Speichern…", "Saving…")
+            : saveState === "saved"
+              ? t("Gespeichert", "Saved")
+              : saveState === "error"
+                ? t("Fehler beim Speichern", "Save failed")
+                : ""}
+        </span>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        {t(
+          `Der ganze Inhaltsbestand als Tabelle: suchen, filtern, sortieren, als CSV exportieren, live prüfen. Deine Haken und Notizen sieht nur das Admin-Team. Live geprüft: ${liveVerified} von ${total}.`,
+          `The full content register as a table: search, filter, sort, export as CSV, review live. Your checks and notes are visible to the admin team only. Live-checked: ${liveVerified} of ${total}.`,
+        )}
+      </p>
+      {/* Break out of the narrow legal column on large screens so the table
+          gets real width. */}
+      <div className="lg:-mx-16 xl:-mx-40">
+        <AdminWorkbench api={api} lang={lang} />
+      </div>
     </LegalChrome>
   );
 }
