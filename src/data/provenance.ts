@@ -13126,9 +13126,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=meetings; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13140,9 +13138,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=meetings; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13154,9 +13150,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=meetings; cefr=B2.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13168,9 +13162,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=scheduling; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13182,9 +13174,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=scheduling; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13196,9 +13186,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=logistics; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13210,9 +13198,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=logistics; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13224,9 +13210,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=customer; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13238,9 +13222,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=customer; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13252,9 +13234,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=customer; cefr=B2.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13266,9 +13246,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=conflict; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13280,9 +13258,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=conflict; cefr=B2.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13294,9 +13270,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=project; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13308,9 +13282,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=project; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13322,9 +13294,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=technology; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13336,9 +13306,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=technology; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13350,9 +13318,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=sustainability; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13364,9 +13330,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=sustainability; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13378,9 +13342,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=safety; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13392,9 +13354,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=safety; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13406,9 +13366,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=travel; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13420,9 +13378,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=travel; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13434,9 +13390,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=behoerde; cefr=B1.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13448,9 +13402,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=behoerde; cefr=B2.1. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {
@@ -13462,9 +13414,7 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "verified",
-    verified_by: "founder",
-    verified_date: "2026-07-02",
+    review_status: "draft",
     notes: "themeId=behoerde; cefr=B2.2. Own wording aligned to the CoE CEFR self-assessment descriptors (cited, not reproduced); founder-reviewed and approved 2026-07-02."
   },
   {

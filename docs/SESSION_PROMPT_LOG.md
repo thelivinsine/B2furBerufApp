@@ -958,3 +958,40 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   most recent handoffs live = s145 + s144), prompt log under the ~1,200 rotation budget. No app-code
   or content changes this prompt.
 - **Artifacts (prompt 2):** `docs/SESSION_PROMPT_LOG.md`
+
+## Session 146 — 2026-07-22 · branch `claude/sources-unchecked-items-njvmao`
+
+- **Prompt 1 (verbatim):** `> in the sources page, it says 800+ items aren't checked yet and will be checked in teh next wave. is that true? why are thye not checked yet`
+- **Response 1:** Investigated. The `/sources` "next verification sweep" bucket is computed as
+  total − items-with-a-tier. Found 3,107 provenance rows but only 2,263 tiered in the generated
+  `src/data/verification.ts` → 844 (~27%) untiered. Root cause: the map was generated 2026-07-13,
+  before the s126 daily-life scale-up (2026-07-17) added ~844 items; nobody re-ran
+  `pnpm build:verification`. Confirmed by sampling new `einkaufen` collocation ids (all absent from
+  the map). Explained the nuance: the generator assigns EVERY row a tier (worst case "sourced"), so
+  the 844 are a stale build artifact, not a quality hole; the genuinely thin layer is HUMAN review
+  (25 items). No code changes this prompt.
+- **Prompt 2 (verbatim):** `> go ahead`
+- **Response 2:** Regenerated the verification map against current banks. Installed deps + Python
+  `wordfreq`, ran `build:oracles` (1292/1327 noun lemmas), `build:frequency-subset` (1889 tokens),
+  `build:languagetool` + `verify:grammar` (5236 sentences, 0 grammar/agreement findings),
+  `verify:facts` (0 two-oracle errors), `verify:cefr` (0 flags), then `build:verification` → 3,107
+  records (25 human / 188 jury / 2789 linguistic / 105 provenance). "Next sweep" bucket → 0. Gates:
+  lint:content · build · check:bundle 111.6 kB · test:unit 253/253 green. Committed + pushed.
+- **Prompt 3 (verbatim):** `> reset the human reviewed to zero, and then merge` (interrupted, then) `> also, move the table to a dedicated sub-page within sources and add a collapse button to the table in the source page - I don't want to endlessly scroll to get to the bottom of the page.`
+- **Response 3:** (a) **Reset human verification to zero:** codemod flipped the 25 `verified` Can-Do
+  provenance rows to `draft` (dropped `verified_by`/`verified_date`), re-ran `build:verification`
+  (human tier → 0) + `stamp:verified` (hashes now `{}`). (b) **Table restructure:** extracted the
+  shared `useWorkbench` hook + a new `SourcesWorkbench` component in `Sources.tsx`; moved the
+  founder-only Daten-Werkbank onto a new `RequireFounder`-gated route `/sources/werkbank` (same lazy
+  chunk) with an admin link card on the main page; wrapped the public "Alle Inhalte" item browse in a
+  collapse toggle (collapsed by default). Updated CLAUDE.md (provenance/Can-Do/sources bullets),
+  PROJECT_STATUS (header + s146 handoff, s144 rotated to W30 archive), and this log. Gates:
+  typecheck · lint 0 errors · lint:content (0 verified) · build · check:bundle 111.8 kB · test:unit
+  253/253 green. Shipped via squash-merge to `main`.
+- **Artifacts (session 146):** `src/data/verification.ts` · `src/data/provenance.ts` ·
+  `src/features/legal/Sources.tsx` · `src/router.tsx` · `docs/reports/verified-hashes.json` ·
+  `docs/reports/verify-grammar.json` · `docs/reports/verify-grammar-report.md` ·
+  `docs/reports/verify-facts-report.md` · `docs/reports/verify-cefr-report.md` ·
+  `scripts/vendor/german-nouns-subset.json` · `scripts/vendor/german-words-subset.json` ·
+  `scripts/vendor/german-frequency-subset.json` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log

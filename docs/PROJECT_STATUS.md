@@ -1,17 +1,19 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 145). **Admin Control Center chunk 3 SHIPPED** (`/admin` shell +
-Übersicht cockpit). The founder-only `/admin` route (lazy `features/admin/` chunk, `RequireFounder`
-wrapper mirroring `RequireOnboarding`, standalone full-screen shell like `/sources`) with the
-eight-item bilingual DE/EN sidebar and the Übersicht screen: A1 verification-funnel tiles + trust
-ladder (bundled `provenance.ts` + `verification.ts`, zero backend), A4 sync-gap counter +
-"Übergabe-Prompt kopieren" (approved-but-not-yet-verified ids, keyless-safe), D1 AI-budget tile
-(`admin_overview`), C1 "Ist meine Änderung live?" widget (build stamp via Vite `define` vs latest
-`main` from the public GitHub API + PWA-cache hint). AccountMenu shows a "Kontrollzentrum" entry for
-founder accounts. Unbuilt screens (Prüfen/Feedback/Inhalte/Nutzer/System/Steuerung/Launch) resolve
-to a placeholder so deep links never 404; chunks 4-7 swap them in. Main chunk unchanged (111.6 kB),
-admin rides an 18 kB lazy chunk. Prior: chunks 1+2 (backend foundation + `apply:reviews`
-loop-closer) shipped s144. Next = chunk 4 (Review Cockpit / Prüfmodus) on Opus per
+_Last updated: 2026-07-22 (session 146). **/sources refresh + human-verification reset.** Root-caused
+the "800+ items in the next verification sweep" the founder saw on /sources: the generated Layer C map
+(`src/data/verification.ts`) was stale (2026-07-13, before the s126 daily-life content drop), so ~844
+newer items had no tier. Refreshed every `verify:*` input against the current banks (oracle + frequency
+subsets, LanguageTool grammar sidecar: 0 grammar/agreement findings, 0 fact-gate errors) and
+regenerated the map → 3,107 records, "next sweep" bucket now 0 (previously-untiered items show as
+grammar-checked). Then, at founder request, **reset human verification to zero**: the 25 founder-approved
+Can-Do rows were flipped `verified`→`draft` (`verified_by`/`verified_date` dropped), `stamp:verified`
+re-run (hashes now empty), `human` tier + the "menschlich geprüft" stat now read 0. **/sources table
+restructure:** the founder-only Daten-Werkbank moved off the main page onto its own sub-page
+`/sources/werkbank` (`RequireFounder`-gated, same lazy chunk, shared `useWorkbench` hook), and the
+public "Alle Inhalte" item browse is now behind a collapse toggle (collapsed by default) so the page no
+longer scrolls endlessly. Prior: Admin Control Center chunk 3 (`/admin` shell + Übersicht cockpit)
+shipped s145. Next = chunk 4 (Review Cockpit / Prüfmodus) on Opus per
 `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -45,13 +47,14 @@ session engine, Bibliothek views, the game layer, content conventions) is in `..
 **Content banks (as of 2026-07-21, session 142, verified against `pnpm lint:content` — re-verify
 before quoting):** vocab **1,623** (8 mis-filed noun+verb combos retired from the Wörter surface
 in s142, ids kept) · collocations **1,035** · Redemittel **149** ·
-grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **~3,105
+grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **3,107
 rows** · themes **20** (five new `alltag` themes in s126: einkaufen/essen/mobilitaet/freizeit/
 digitales) · exam sets **15** · dialogues **30**. Taxonomy is **5 top-level domains** (the
 `beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
-Standing governance debt: ~98% of provenance rows are AI-drafted, not yet human-verified (see
-`strategy/DATA_GOVERNANCE.md`).
+Standing governance debt: **all** provenance rows are AI-drafted and `draft`, none human-verified
+(human verification was reset to zero on 2026-07-22 at founder request, to restart the review pass;
+see `strategy/DATA_GOVERNANCE.md`).
 
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
@@ -68,6 +71,34 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 146 (2026-07-22). /sources verification refresh + human-review reset + table
+restructure, branch `claude/sources-unchecked-items-njvmao`.** The founder asked why /sources showed
+"800+ items not yet checked". What shipped:
+- **Stale verification map, regenerated.** `src/data/verification.ts` was generated 2026-07-13, before
+  the s126 daily-life scale-up (2026-07-17) added ~844 items, so those had no tier and fell into the
+  "next verification sweep" bucket (~27%) — a stale build artifact, not a quality hole. Refreshed all
+  inputs against the current banks: `build:oracles` (der/die/das, 1292/1327 lemmas), `build:frequency-subset`
+  (1889 tokens), `build:languagetool` + `verify:grammar` (5236 sentences, **0** grammar/agreement
+  findings), `verify:facts` (**0** two-oracle errors) + `verify:cefr` (0 flags), then `build:verification`
+  → **3,107 records** (was 2,263). The "next sweep" bucket is now 0; previously-untiered items show as
+  grammar-checked (linguistic). Committed inputs: the vendored `scripts/vendor/*.json` subsets, the
+  `docs/reports/verify-grammar.json` sidecar, and the three `verify:*` reports (the 69 MB LanguageTool
+  lib is gitignored).
+- **Human verification reset to zero (founder request).** The 25 founder-approved Can-Do provenance rows
+  were flipped `review_status: "verified"`→`"draft"` (a precise codemod; `verified_by`/`verified_date`
+  dropped), `build:verification` re-run (human tier → 0), `stamp:verified` re-run (`verified-hashes.json`
+  hashes now `{}`). The `human` tier and the "menschlich geprüft" StatTile now read 0 until the review
+  pass restarts. CLAUDE.md provenance + Can-Do bullets updated to match.
+- **/sources table restructure (no more endless scroll).** The founder-only **Daten-Werkbank** table
+  moved off the main /sources page onto its own sub-page **`/sources/werkbank`** (`RequireFounder`-gated
+  route in `router.tsx`, same lazy chunk as Sources; extracted the shared `useWorkbench` hook +
+  `SourcesWorkbench` component in `Sources.tsx`); the main page shows admins a link card to it. The
+  public **"Alle Inhalte und ihre Quellen"** item browse is now behind a **collapse toggle** (`showAll`,
+  collapsed by default).
+- **Gates:** `typecheck` ✓ · `lint` (0 errors; warnings are the pre-existing debt) · `lint:content` ✓
+  (0 verified) · `test:unit` **253/253** · `build` ✓ · `check:bundle` **111.8 kB** (main chunk unchanged;
+  Sources stays a lazy chunk).
 
 **Handoff after session 145 (2026-07-22). Admin Control Center chunk 3 (`/admin` shell + Übersicht
 cockpit), branch `claude/admin-control-center-chunk-3-7g5829`.** Chunk 3 of
@@ -106,103 +137,9 @@ door to the admin center, cross-cutting wiring against an already-approved desig
 - **Next:** chunk 4, the Review Cockpit / Prüfmodus (Opus), needs the `build-review-queue.mjs`
   scorer; deep-links from the Übersicht tiles land there.
 
-**Handoff after session 144 (2026-07-22). Admin Control Center chunks 1 + 2 (backend foundation +
-the review loop-closer), branch `claude/admin-control-center-chunk-1-eafquu` (three PRs to `main`:
-#631 chunk 1, #632 setup-doc fixes, #633 chunk 2).** The first two build chunks of
-`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, both on the recommended Fable tier (they are the
-security + integrity core). Migration 0008 was deployed live by the founder and verified in-session.
-
-### Chunk 1 · backend foundation (this chunk IS the security boundary)
-What shipped:
-- **Migration `supabase/migrations/0008_admin_center.sql`** (idempotent, founder pastes it into
-  the Supabase SQL editor; steps appended to `docs/plans/PHASE2_SETUP.md`):
-  (1) `provenance_reviews` widened from the boolean checkbox to real decisions:
-  `decision approve|reject|needs_fix`, `content_hash` (the decision-time safety hash chunk 2's
-  `apply:reviews` compares before flipping repo rows), `reviewer_email`, `applied_at`,
-  `applied_sha`; `verified=true` rows backfilled to `decision='approve'` (legacy rows keep a null
-  hash, which apply:reviews must treat as "needs re-review", never a free pass), reviewer emails
-  backfilled from `reviewed_by`. The `verified` boolean stays until the chunk-2 workbench update.
-  (2) `feedback` triage columns: `status neu|erledigt|verworfen`, `priority hoch|normal|niedrig`,
-  `note`, `link` (table stays service-role-only; founder access via RPC only).
-  (3) **`app_config`** (Steuerung store): key/value jsonb rows, world-READABLE RLS (the app will
-  consume it at startup in chunk 7), founder-only writes. (4) **`launch_checklist`**: founder-only
-  RLS, state synced across devices (items seeded by the chunk-6 UI).
-  (5) **`is_founder()`** (the SINGLE email source for every 0008 policy/RPC) + **`assert_founder()`**
-  + SECURITY DEFINER RPCs gated in-body per the 0004/0007 pattern: `admin_overview()` (one jsonb:
-  accounts split guests/email/Google + new7d, active today/7d, sessions/XP/SRS-card totals, AI
-  month spend vs cap inputs, feedback counts, review sync-gap counts), `admin_daily_series()`
-  (30-day `{day, signups, actives}`), `admin_feedback_recent(n)`, `admin_feedback_update(...)`
-  (validates enums; empty string clears note/link). All revoked from `public`/`anon`, granted to
-  `authenticated` (guests ride the authenticated role, so the in-body email check is the real
-  boundary). **Privacy line held: aggregates only, no RPC returns learner rows; no admin SELECT
-  policies were added to `profiles`/`progress`/`writing_evaluations`** (the `feedback` table is the
-  sanctioned per-row exception: operational mail addressed to the founder).
-- **`src/lib/adminApi.ts`**: typed fail-soft wrappers (null/empty/false on error, offline-first)
-  for the four RPCs + raw `app_config` and `launch_checklist` helpers. Not imported by any eager
-  code yet (main chunk unchanged); consumers arrive with the `/admin` shell in chunk 3.
-- **`tests/admin.test.ts` extended (lockstep pin):** migration 0007 + 0008 email sets must equal
-  `FOUNDER_EMAILS` exactly, both emails must sit inside `is_founder()`, and every 0008 admin RPC
-  must contain `perform public.assert_founder();` and a `revoke ... from public, anon`.
-- **Docs:** founder deploy/verify steps in `PHASE2_SETUP.md` (run 0008; existing Werkbank ticks
-  carry over as approve decisions, nothing re-clicked); CLAUDE.md admin-gate note now covers 0008.
-- **Gates:** `typecheck` · `lint` (0 errors) · `test:unit` 222/222 · `build` · `check:bundle`
-  (110.6/400 kB) · `lint:content` all green. Nothing visible in the app changes yet.
-- **Deployed + verified live (same session):** the founder ran migration 0008 in the Supabase SQL
-  editor (via the dashboard paste path; `PHASE2_SETUP.md` §1 now marks the CLI optional), confirmed
-  the gate rejects an identity-less call ("forbidden: founder account required" is the HEALTHY
-  result in the SQL editor), and got a real `admin_overview()` JSON via the
-  `set_config('request.jwt.claims', ...)` trick: 6 accounts (4 Google / 2 guests), 8,053 XP,
-  532 SRS cards, 60 sessions, 1 feedback (neu), reviews `decided: 1, approvedUnapplied: 1` (a
-  legacy boolean-era tick, no decision hash, so chunk 2 routes it to re-review, never a blind flip).
-
-### Chunk 2 · the loop-closer `pnpm apply:reviews` + decision-time hashes
-The review pipeline "founder clicks on the phone → next Claude session commits it" now works end
-to end:
-- **Shared fingerprint:** new `src/lib/contentHash.ts` (browser SubtleCrypto sha256 over canonical
-  JSON, byte-compatible with `scripts/content-hash.mjs`) + `src/lib/contentIndex.ts` (the same
-  content-id universe as the stamp script; dynamic-import only, a ~4 kB glue chunk over the shared
-  bank chunks, main chunk untouched at 110.7 kB). Parity pinned by `tests/contentHash.test.ts`
-  (canonicalization, hashes, id universe; jsdom gets node webcrypto).
-- **Decision-time capture:** the /sources Daten-Werkbank tick now saves `decision: "approve"` + a
-  `content_hash` of the item as reviewed + `reviewer_email` (untick clears the decision; note-only
-  edits leave it untouched); CSV export gained the decision column.
-- **`scripts/apply-reviews.mjs`** (`pnpm apply:reviews`): decision source → `ID_RENAMES` → hash
-  compare → codemod `provenance.ts` (`draft`→`verified` + `verified_by`/`verified_date`,
-  format-exact) → `stamp:verified` + `lint:content` in the SAME commit → defects/re-review export
-  to `docs/reports/review-defects.md` + `.json`. `--dry-run` writes nothing. Integrity rules pinned
-  by `tests/applyReviews.test.ts`: null/mismatched decision hash = re-review (never a flip),
-  already-verified rows only ever mark applied.
-- **Verified end to end in-session:** real flip of `v_besprechung` through the codemod →
-  `stamp:verified` (25→26) → `lint:content` green → reverted.
-
-### Chunk 2 addendum · keyless review handoff (founder security review, same session)
-The founder correctly flagged that the Claude environment's **environment-variables box is plaintext
-and explicitly warns against secrets**, so storing `SUPABASE_SERVICE_ROLE_KEY` there (my first
-instruction) was wrong. Replaced the key path with a keyless file handoff, no secret ever touches
-the environment:
-- **Browser export:** `src/lib/reviewExport.ts` (`buildDecisionExport`/`downloadDecisions`) + an
-  **"Entscheidungen (N)"** button in the AdminWorkbench toolbar. The founder is already securely
-  signed in on /sources (RLS grants read), so the browser downloads a `genauly-review-decisions-*.json`
-  file (decisions + decision-time fingerprints, NO credential). CSV export unchanged.
-- **Keyless script mode:** `pnpm apply:reviews --from <file>` (`parseDecisionFile`) reads that file
-  instead of Supabase, does the identical hash-compare + codemod + stamp + lint, and writes NO
-  database (applied state reconciles from the deployed bundle: the item is `verified` in
-  provenance.ts). The direct-DB path stays for a secure local shell with the key, but is no longer
-  the founder's path. Round-trip (browser export → script parse) pinned by `tests/reviewExport.test.ts`.
-- **Verified end to end:** built a realistic 2-decision fixture (one hash-matching `v_besprechung`,
-  one stale `v_tagesordnung`) → `--from` dry-run classified correctly (1 ready, 1 re-review) →
-  real `--from` run flipped `v_besprechung`, stamped, linted green, exported the stale one to the
-  re-review report → reverted.
-- **Founder action: NONE.** No key to set up; the workbench button + file handoff is the whole flow.
-  `PHASE2_SETUP.md` rewritten accordingly (and now says NOT to put the service-role key in the
-  environment variables).
-- **Gates:** `typecheck` · `lint` (0 errors; the one new hook-deps warning was fixed properly) ·
-  `test:unit` 237/237 · `build` · `check:bundle` (110.7/400 kB) · `lint:content` all green.
-- **Next:** chunk 3, the `/admin` shell + Übersicht cockpit (Opus recommended); chunks 1-2 outputs
-  (sync-gap counter + handoff prompt) are its data feed.
-
-_(Session 143's Admin Control Center scoping handoff (the expert-panel report + build plan + 4
-mockup screens, PR #626), session 142's Wörter quality-control handoff (the
+_(Session 144's Admin Control Center chunks 1 + 2 handoff (backend foundation migration 0008 + the
+`apply:reviews` keyless review loop-closer, PRs #631–#633), session 143's Admin Control Center scoping
+handoff (the expert-panel report + build plan + 4 mockup screens, PR #626), session 142's Wörter quality-control handoff (the
 `RETIRED_VOCAB_IDS`/`browsableVocabulary` retire-from-surface set + the vocab↔collocation overlap
 lint gate, PR #624), session 141's
 mobile-nav-item-labels handoff (labels under the active icon + the
