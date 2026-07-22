@@ -1,110 +1,132 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock, History, Info } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { PenLine, History } from "lucide-react";
 import type { ThemeId } from "@/types";
-import { themes, themeById } from "@/data/themes";
-import { writingPrompts } from "@/data/writingPrompts";
-import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
-import { iconByName } from "@/lib/icons";
-import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
+import type { WritingLength } from "@/lib/writing";
 import { WritingHistory } from "./WritingHistory";
-import { loadWritingDraft, saveWritingDraft, clearWritingDraft } from "./resumeDraft";
+import { WritingModeSwitcher } from "./WritingModeSwitcher";
+import { GuidedWritingTrainer } from "./GuidedWritingTrainer";
+import { FokusTrainer } from "./fokus/FokusTrainer";
+import {
+  loadWritingDraft,
+  saveWritingDraft,
+  clearWritingDraft,
+  type WritingMode,
+} from "./resumeDraft";
 import { AuthDialog } from "@/features/auth/AuthDialog";
 import { useAuthStore } from "@/store/useAuthStore";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { HubHero } from "@/components/shared/HubHero";
 import { cn } from "@/lib/utils";
 
 type HubView = "write" | "history";
 
-const lengthMeta: Record<WritingLength, { labelDe: string; words: string; range: [number, number] }> = {
-  short: { labelDe: "Kurz", words: "ca. 40–60 Wörter", range: [40, 60] },
-  long: { labelDe: "Lang", words: "ca. 120–150 Wörter", range: [120, 150] },
-};
-
-function countWords(text: string): number {
-  const t = text.trim();
-  return t ? t.split(/\s+/).length : 0;
+const MODES: WritingMode[] = ["fokus", "kurz", "lang"];
+function isMode(v: string | null): v is WritingMode {
+  return !!v && (MODES as string[]).includes(v);
 }
+const lengthOf = (mode: WritingMode): WritingLength => (mode === "lang" ? "long" : "short");
 
-function isThemeId(v: string | null): v is ThemeId {
-  return !!v && themes.some((t) => t.id === v);
-}
-
+/**
+ * Schreibtraining hub (redesign, plan: docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md).
+ * A mode router over three surfaces:
+ *   - Fokus: the single-sentence write -> correct -> transform grammar lab.
+ *   - Kurz / Lang: the guided B2-Beruf writing tasks (the original flow).
+ *   - Verlauf: the writing-evaluation history (guided modes only).
+ * Owns the login wall (writing needs a real account) + the draft-resume flow that
+ * survives the Google OAuth full-page redirect.
+ */
 export function WritingHub() {
   const [params, setParams] = useSearchParams();
-  const navigate = useNavigate();
-  const themeParam = params.get("theme");
-  const theme = isThemeId(themeParam) ? themeParam : null;
-
+  const rawMode = params.get("mode");
+  const mode: WritingMode = isMode(rawMode) ? rawMode : "fokus";
   const [hubView, setHubView] = useState<HubView>("write");
-  const [length, setLength] = useState<WritingLength>("short");
-  const [text, setText] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [result, setResult] = useState<WritingEvalResult | null>(null);
 
-  const words = useMemo(() => countWords(text), [text]);
-
-  // Writing requires a real (non-guest) account. Guests get a normal-looking
-  // button that opens a sign-in nudge instead of evaluating.
   const status = useAuthStore((s) => s.status);
   const isSignedIn = status === "signedIn";
   const [authOpen, setAuthOpen] = useState(false);
+  const [resumeText, setResumeText] = useState("");
 
-  // Submit the current draft for AI evaluation.
-  const submit = async () => {
-    if (!theme) return;
-    setSubmitting(true);
-    setResult(null);
-    const res = await evaluateWriting({ theme, length, text: text.trim() });
-    setResult(res);
-    setSubmitting(false);
+  const setMode = (m: WritingMode) => {
+    const p = new URLSearchParams(params);
+    if (m === "fokus") p.delete("mode");
+    else p.set("mode", m);
+    // Switching mode drops a stale theme selection from the other guided flow.
+    if (m === "fokus") p.delete("theme");
+    setParams(p);
+    setHubView("write");
   };
 
-  // After sign-in, restore the in-progress draft so the learner's text is
-  // exactly where they left it, then drop the draft. We deliberately do NOT
-  // auto-evaluate: the learner presses Auswerten again themselves, so they get
-  // a second chance to review or edit before spending an evaluation.
+  // Login wall: stash the draft (survives OAuth redirect) and nudge sign-in.
+  const requireAuthFokus = (sentence: string) => {
+    saveWritingDraft({ mode: "fokus", text: sentence, resume: true });
+    setAuthOpen(true);
+  };
+  const requireAuthGuided = (payload: { theme: ThemeId; length: WritingLength; text: string }) => {
+    saveWritingDraft({
+      mode: payload.length === "long" ? "lang" : "kurz",
+      theme: payload.theme,
+      length: payload.length,
+      text: payload.text,
+      resume: true,
+    });
+    setAuthOpen(true);
+  };
+
+  // After sign-in, restore the in-progress draft where the learner left off (the
+  // learner presses the action again themselves, so no surprise auto-evaluation).
   useEffect(() => {
-    if (!theme || !isSignedIn) return;
+    if (!isSignedIn) return;
     const draft = loadWritingDraft();
-    if (!draft || draft.theme !== theme) return;
-    setLength(draft.length);
-    setText((prev) => (prev ? prev : draft.text));
+    if (!draft) return;
+    const p = new URLSearchParams(params);
+    if (draft.mode === "fokus") {
+      p.delete("mode");
+      p.delete("theme");
+    } else {
+      p.set("mode", draft.mode === "lang" ? "lang" : "kurz");
+      if (draft.theme) p.set("theme", draft.theme);
+    }
+    setParams(p, { replace: true });
+    setResumeText(draft.text);
     clearWritingDraft();
-  }, [theme, isSignedIn]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSignedIn]);
 
-  // Theme picker / history toggle
-  if (!theme) {
-    return (
-      <div className="space-y-4 sm:space-y-6">
-        <HubHero
-          icon={PenLine}
-          gradient="from-rose-500 to-pink-500"
-          eyebrow="KI-Schreibcoach"
-          title="Schreibtraining"
-        />
+  const handleAuthOpenChange = (open: boolean) => {
+    setAuthOpen(open);
+    // Dismissed without signing in: drop the pending resume.
+    if (!open && useAuthStore.getState().status !== "signedIn") {
+      clearWritingDraft();
+    }
+  };
 
-        {/* Tab switcher */}
-        <div className="flex gap-1 rounded-xl border border-border bg-muted/30 p-1 w-fit">
+  return (
+    <div className="space-y-4 sm:space-y-6">
+      <div>
+        <p className="text-eyebrow text-primary">
+          {mode === "fokus" ? "Satzlabor" : "KI-Schreibcoach"}
+        </p>
+        <h1 className="text-display text-2xl sm:text-3xl">Schreiben</h1>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <WritingModeSwitcher value={mode} onChange={setMode} />
+        {/* Verlauf toggle (writing history is guided-mode data). */}
+        <div className="flex gap-1 rounded-xl border border-border bg-muted/30 p-1">
           <button
             onClick={() => setHubView("write")}
             className={cn(
-              "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors",
+              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
               hubView === "write"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            <PenLine className="h-3.5 w-3.5" /> Neuer Text
+            <PenLine className="h-3.5 w-3.5" /> Schreiben
           </button>
           <button
             onClick={() => setHubView("history")}
             className={cn(
-              "flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-medium transition-colors",
+              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
               hubView === "history"
                 ? "bg-background text-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground",
@@ -113,248 +135,25 @@ export function WritingHub() {
             <History className="h-3.5 w-3.5" /> Verlauf
           </button>
         </div>
-
-        {hubView === "history" ? (
-          <WritingHistory />
-        ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {themes.map((t, i) => {
-              const Icon = iconByName(t.icon);
-              return (
-                <motion.button
-                  key={t.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  onClick={() => setParams({ theme: t.id })}
-                  className="text-left"
-                >
-                  <Card className="card-hover group h-full overflow-hidden">
-                    <CardContent className="space-y-3 p-5">
-                      <div className="flex items-start justify-between">
-                        <div className={`rounded-xl bg-gradient-to-br ${t.accent} p-2.5 text-white shadow-soft`}>
-                          <Icon className="h-5 w-5" />
-                        </div>
-                        <Badge variant="muted" className="gap-1">
-                          <PenLine className="h-3 w-3" /> Schreiben
-                        </Badge>
-                      </div>
-                      <p className="font-semibold">{t.titleDe}</p>
-                    </CardContent>
-                  </Card>
-                </motion.button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  const t = themeById(theme)!;
-  const Icon = iconByName(t.icon);
-  const prompt = writingPrompts[theme][length];
-  const [min, max] = lengthMeta[length].range;
-  const enough = words >= Math.floor(min * 0.6);
-  // Minimum words before an evaluation is allowed. Below this the button is
-  // locked on purpose; the hint below the editor tells the learner why.
-  const minWords = 5;
-  const remaining = Math.max(0, minWords - words);
-  const tooShort = words < minWords;
-
-  const reset = () => setParams({});
-  const startOver = () => {
-    setResult(null);
-    setText("");
-  };
-
-  // Guests hit a login wall here: stash the draft (survives the Google OAuth
-  // full-page redirect) and nudge sign-in instead of evaluating.
-  const handleEvaluate = () => {
-    if (!isSignedIn) {
-      saveWritingDraft({ theme, length, text, resume: true });
-      setAuthOpen(true);
-      return;
-    }
-    void submit();
-  };
-
-  const handleAuthOpenChange = (open: boolean) => {
-    setAuthOpen(open);
-    // Dismissed without signing in: drop the pending resume so the learner is
-    // not unexpectedly pulled back into an evaluation on a later sign-in.
-    if (!open && useAuthStore.getState().status !== "signedIn") {
-      clearWritingDraft();
-    }
-  };
-
-  const area = result?.practiceArea ? practiceAreaById(result.practiceArea) : undefined;
-
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" onClick={reset}>
-          <ArrowLeft className="h-4 w-4" /> Themen
-        </Button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className={`rounded-xl bg-gradient-to-br ${t.accent} p-3 text-white shadow-soft`}>
-          <Icon className="h-6 w-6" />
-        </div>
-        <div>
-          <h1 className="text-display text-2xl">{t.titleDe}</h1>
-          <p className="text-sm text-muted-foreground">Schreibtraining mit KI-Feedback.</p>
-        </div>
-      </div>
-
-      {/* Length switch */}
-      <div className="flex gap-2">
-        {(Object.keys(lengthMeta) as WritingLength[]).map((l) => (
-          <button
-            key={l}
-            onClick={() => {
-              setLength(l);
-              setResult(null);
-            }}
-            className={cn(
-              "flex-1 rounded-lg border px-4 py-3 text-left transition-colors",
-              length === l ? "border-primary bg-primary/10" : "border-border hover:bg-muted/40",
-            )}
-          >
-            <p className="text-sm font-semibold">{lengthMeta[l].labelDe}</p>
-            <p className="text-xs text-muted-foreground">{lengthMeta[l].words}</p>
-          </button>
-        ))}
-      </div>
-
-      {/* Prompt */}
-      <Card>
-        <CardContent className="space-y-2 p-5">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Target className="h-3.5 w-3.5" /> Aufgabe
-          </p>
-          <p className="text-sm leading-relaxed">{prompt}</p>
-        </CardContent>
-      </Card>
-
-      {/* Editor */}
-      <Card>
-        <CardContent className="space-y-3 p-5">
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            disabled={submitting}
-            rows={length === "long" ? 10 : 6}
-            placeholder="Schreibe hier deinen Text auf Deutsch …"
-            className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
-          />
-          <div className="flex items-center justify-between">
-            <span
-              className={cn(
-                "text-xs tabular-nums",
-                enough ? "text-success" : "text-muted-foreground",
-              )}
-            >
-              {words} Wörter · Ziel {min}–{max}
-            </span>
-            <div className="flex gap-2">
-              {result && (
-                <Button variant="ghost" onClick={startOver} disabled={submitting}>
-                  Neu schreiben
-                </Button>
-              )}
-              <Button
-                onClick={handleEvaluate}
-                disabled={submitting || tooShort}
-                variant="gradient"
-              >
-                {submitting ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Wird geprüft …
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" /> Auswerten
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-          {tooShort && (
-            <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
-              <PenLine className="h-3.5 w-3.5 shrink-0" />
-              Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
-            </p>
-          )}
-          {/* EU AI Act Art. 50 transparency: tell the user, at the point of use, that they
-              are interacting with an AI and that the output is AI-generated. */}
-          <p className="flex items-start gap-1.5 border-t border-border pt-3 text-xs text-muted-foreground">
-            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            <span>
-              Dein Text wird zur Auswertung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung
-              ist KI-generiert und kann Fehler enthalten.{" "}
-              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-                Mehr im Datenschutz
-              </Link>
-              .
-            </span>
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Result */}
-      {result && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-          {result.ok ? (
-            <Card className="overflow-hidden border-primary/30">
-              <div className="h-1.5 w-full bg-accent-gradient" />
-              <CardContent className="space-y-4 p-5">
-                <div className="flex items-center justify-between">
-                  <p className="flex items-center gap-2 font-semibold">
-                    <Lightbulb className="h-5 w-5 text-primary" /> Dein wichtigster Tipp
-                  </p>
-                  <div className="flex gap-1.5">
-                    {result.cached && <Badge variant="muted">aus dem Cache</Badge>}
-                    {area && <Badge className="bg-primary/10 text-primary">{area.labelDe}</Badge>}
-                  </div>
-                </div>
-                <p className="text-sm leading-relaxed">{result.insight}</p>
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Sparkles className="h-3 w-3 shrink-0" />
-                  KI-generierte Rückmeldung
-                </p>
-                {area && (
-                  <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
-                    <p className="text-sm text-muted-foreground">{area.description}</p>
-                    <Button className="ml-auto" onClick={() => navigate(practiceRoute(area, { theme }))}>
-                      <Target className="h-4 w-4" /> {area.labelDe} üben
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="border-warning/30">
-              <CardContent className="flex items-start gap-3 p-5">
-                <Clock className="mt-0.5 h-5 w-5 shrink-0 text-warning" />
-                <div>
-                  <p className="font-semibold">
-                    {result.limitReached ? "Tageslimit erreicht" : "Gerade nicht verfügbar"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {result.message ??
-                      "Du hast deine kostenlosen Auswertungen für heute genutzt. Komm morgen wieder!"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </motion.div>
+      {hubView === "history" ? (
+        <WritingHistory />
+      ) : mode === "fokus" ? (
+        <FokusTrainer
+          isSignedIn={isSignedIn}
+          onRequireAuth={requireAuthFokus}
+          initialText={resumeText}
+        />
+      ) : (
+        <GuidedWritingTrainer
+          length={lengthOf(mode)}
+          isSignedIn={isSignedIn}
+          onRequireAuth={requireAuthGuided}
+          initialText={resumeText}
+        />
       )}
 
-      {/* Login wall: writing requires a real account. The button looks normal;
-          clicking it as a guest opens this nudge and stashes the draft. */}
       <AuthDialog open={authOpen} onOpenChange={handleAuthOpenChange} intent="signup" />
     </div>
   );
