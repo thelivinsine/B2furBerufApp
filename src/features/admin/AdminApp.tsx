@@ -7,6 +7,7 @@ import { Pruefmodus } from "./Pruefmodus";
 import { AdminFeedback } from "./AdminFeedback";
 import { AdminSystem } from "./AdminSystem";
 import { AdminLaunch } from "./AdminLaunch";
+import { AdminSteuerung } from "./AdminSteuerung";
 
 /**
  * The admin control center, mounted at `/admin/*` as a single lazy chunk (every
@@ -29,7 +30,7 @@ export function AdminApp() {
           <Route path="inhalte" element={<AdminPlaceholder titleDe="Inhalte" titleEn="Content" />} />
           <Route path="nutzer" element={<AdminPlaceholder titleDe="Nutzer" titleEn="Audience" />} />
           <Route path="system" element={<AdminSystem />} />
-          <Route path="steuerung" element={<AdminPlaceholder titleDe="Steuerung" titleEn="Controls" />} />
+          <Route path="steuerung" element={<AdminSteuerung />} />
           <Route path="launch" element={<AdminLaunch />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>

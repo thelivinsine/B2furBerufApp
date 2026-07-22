@@ -48,6 +48,7 @@ import { VocabQuiz } from "./VocabQuiz";
 import { ArtikelLegend } from "@/components/artikel/ArtikelLegend";
 import { VocabList } from "./VocabList";
 import { VocabTable, VocabCompactList } from "./VocabViews";
+import { useAppConfigStore } from "@/lib/appConfig";
 
 // The graph view carries d3-force and the canvas renderer; it loads only when
 // someone actually opens it (Bibliothek views, session 91).
@@ -63,9 +64,11 @@ const WOERTER_VIEWS: LibraryView[] = ["tabelle", "graph", "karten", "liste"];
 // the Vokabeltrainer is purely the browse/inspect surface (the word list).
 // Flip this back to `true` to restore the old three-tab layout (the Flashcards /
 // VocabQuiz components are unchanged and still live in the repo).
-const SHOW_PRACTICE_TABS = false;
+// Steuerung H4 (s146): this became a remote feature flag
+// (`features.practiceTabs`, default false); the component reads it below.
 
 export function VocabularyTrainer() {
+  const showPracticeTabs = useAppConfigStore((s) => s.config.features.practiceTabs);
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const level = useSettingsStore((s) => s.level);
@@ -441,7 +444,7 @@ export function VocabularyTrainer() {
     ),
   };
 
-  const listContent = SHOW_PRACTICE_TABS ? (
+  const listContent = showPracticeTabs ? (
     <Tabs value={mode} onValueChange={setMode}>
       <TabsList className="flex-wrap">
         <TabsTrigger value="flashcards">

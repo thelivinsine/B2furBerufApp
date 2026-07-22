@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { submitFeedback } from "@/lib/feedback";
 import { useSessionStore } from "@/store/useSessionStore";
+import { useAppConfig } from "@/lib/appConfig";
 import { cn } from "@/lib/utils";
 
 /**
@@ -126,7 +127,12 @@ export function FeedbackDialog() {
 export function FeedbackPill() {
   const setOpen = useSessionStore((s) => s.setFeedbackOpen);
   const { pathname } = useLocation();
+  // Steuerung H5: the whole feedback affordance can be turned off, relabelled,
+  // or suppressed per route from remote config (default = today's behavior).
+  const feedback = useAppConfig().feedback;
   if (pathname === "/") return null;
+  if (!feedback.enabled) return null;
+  if (feedback.hiddenRoutes.some((r) => r && pathname.startsWith(r))) return null;
   return (
     <button
       type="button"
@@ -135,7 +141,7 @@ export function FeedbackPill() {
       className="fixed bottom-4 right-4 z-40 hidden items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground lg:flex lg:translate-x-1/2 lg:right-[calc(9.5rem_+_max(0px,(100vw_-_88rem)/2))]"
     >
       <MessageSquareText className="h-3.5 w-3.5 text-primary" />
-      <span>Mit KI gebaut · Feedback</span>
+      <span>{feedback.label ?? "Mit KI gebaut · Feedback"}</span>
     </button>
   );
 }

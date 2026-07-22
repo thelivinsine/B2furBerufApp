@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { navItems, DEFAULT_PINNED_TABS } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useNavLabel, useAppConfigStore } from "@/lib/appConfig";
 import { cn } from "@/lib/utils";
 
 // Flat light-grey backdrop for the active pill (no gradient, no section-colour tint).
@@ -26,8 +27,11 @@ function TabIcon({ path }: { path: string }) {
 /** Normal-mode tab: a NavLink with the compact squircle active pill + underline. */
 function BarTab({ path, moreHidden }: { path: string; moreHidden?: boolean }) {
   const item = navItems.find(i => i.to === path);
+  // Steuerung H1: apply a remote label override (falls back to the built-in).
+  // Called unconditionally before the early return to respect the hooks rule.
+  const label = useNavLabel(path, item?.label ?? "");
   if (!item) return null;
-  const { to, end, label } = item;
+  const { to, end } = item;
   return (
     <NavLink
       to={to}
@@ -91,6 +95,12 @@ export function BottomTabBar() {
   // be stranded off the bar.
   const saved  = pinnedTabs.filter(p => CONTENT.includes(p));
   const middle = [...saved, ...CONTENT.filter(p => !saved.includes(p))];
+  // Steuerung H2: hide middle tabs from the RAIL only (routes stay mounted, and
+  // edit-mode reorder keeps operating on the full `middle` so hidden tabs are
+  // never dropped from the persisted pins). Home + Einstellungen are never
+  // hideable (locked bar structure).
+  const hiddenTabs = useAppConfigStore(s => s.config.hiddenTabs);
+  const shownMiddle = middle.filter(p => !hiddenTabs.includes(p));
 
   // Navigating anywhere ends the reorder easter egg (there is no sheet to close).
   useEffect(() => { setEditMode(false); }, [pathname]);
@@ -185,7 +195,7 @@ export function BottomTabBar() {
             /* Normal mode: Home · content sections · Einstellungen */
             <>
               <BarTab path="/" />
-              {middle.map(path => <BarTab key={path} path={path} />)}
+              {shownMiddle.map(path => <BarTab key={path} path={path} />)}
               <BarTab path="/settings" />
             </>
           )}

@@ -13,6 +13,7 @@ import { Wesen } from "@/components/artikel/Wesen";
 import { ArtikelEffect } from "@/components/artikel/ArtikelEffect";
 import { hasDoodle, loadDoodle } from "./doodles";
 import { RelatedPanel, relatedRows } from "./RelatedPanel";
+import { useAppConfigStore } from "@/lib/appConfig";
 
 /**
  * The cross-module "Verbunden" dropdown (RelatedPanel: links from a word to a
@@ -21,8 +22,11 @@ import { RelatedPanel, relatedRows } from "./RelatedPanel";
  * what it should depend on. Flip this to `true` to bring the toggle + panel
  * back; RelatedPanel.tsx and relatedRows stay in the repo untouched. Do NOT
  * delete this flag or the panel while it is parked.
+ *
+ * Steuerung H4 (s146): the compile-time flag became a remote feature flag
+ * (`features.relatedPanel`, default false = parked). VocabCard reads it from
+ * the app-config store below.
  */
-const SHOW_RELATED = false;
 
 /**
  * One word card, memoized and subscribed to its OWN slice of the progress
@@ -41,7 +45,8 @@ const VocabCard = memo(function VocabCard({
 }) {
   const saved = useProgressStore((s) => s.savedWords.includes(v.id));
   const toggleSavedWord = useProgressStore((s) => s.toggleSavedWord);
-  const hasRelated = SHOW_RELATED && relatedRows(v).length > 0;
+  const relatedEnabled = useAppConfigStore((s) => s.config.features.relatedPanel);
+  const hasRelated = relatedEnabled && relatedRows(v).length > 0;
   const gender = genderOf(v);
   // Replay trigger for the gender reveal effect: bumped on each front→back flip.
   const [effectPlay, setEffectPlay] = useState(0);

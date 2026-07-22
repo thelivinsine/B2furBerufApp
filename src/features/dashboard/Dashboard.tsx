@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Play } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppConfigStore } from "@/lib/appConfig";
 
 // Lernen (Praktisch toggle) open-book mark. The two pages are separate shapes
 // with a ~2px gutter down the middle, so when the icon is FILLED the pill
@@ -50,9 +51,14 @@ export function Dashboard() {
   const [params, setParams] = useSearchParams();
   // Open on Spielen when returned here from the mission player (/?tab=spielen),
   // so exiting a game lands back on the tab with the Lernen/Spielen toggle.
-  const [tab, setTab] = useState<HeuteTab>(() =>
-    params.get("tab") === "spielen" ? "spielen" : "ueben",
-  );
+  // The URL param wins; otherwise the Steuerung H8 remote default decides which
+  // tab opens first (default "ueben" = today's behavior).
+  const startTabDefault = useAppConfigStore((s) => s.config.dashboardStartTab);
+  const [tab, setTab] = useState<HeuteTab>(() => {
+    const p = params.get("tab");
+    if (p === "spielen" || p === "ueben") return p;
+    return startTabDefault;
+  });
   // Direction of the last tab change (+1 = moved right to Spielen, -1 = moved
   // left to Üben) so the content slides in the matching direction.
   const [dir, setDir] = useState(0);
