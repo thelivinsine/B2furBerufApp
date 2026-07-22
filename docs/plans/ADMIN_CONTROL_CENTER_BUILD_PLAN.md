@@ -2,7 +2,8 @@
 
 _Session 143 (2026-07-22). The execution companion to `ADMIN_CONTROL_CENTER_PLAN.md` (the approved
 scope; read that first for the "what and why"). This file answers "in what order, in what size
-pieces, and with which Claude model per piece". Status: **ready to execute, chunk 1 first.**_
+pieces, and with which Claude model per piece". Status: **chunks 1-3 SHIPPED (s144-s145); next =
+chunk 4 (Review Cockpit / Prüfmodus, Opus).**_
 
 **How to use this plan:** each chunk is one focused session producing one PR into `main`. Set the
 recommended model with `/model` at the START of the session (the model cannot switch mid-task;

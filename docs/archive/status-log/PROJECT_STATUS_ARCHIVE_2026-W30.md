@@ -3,6 +3,29 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 143 (2026-07-21). Admin Control Center scoping, branch
+`claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (PR #626, docs + preview only).**
+Founder asked for a comprehensive admin control center: an expert-agent panel to scope it, a report
+with recommendations, and HTML previews (research/design only, zero app-code changes).
+- **Four-agent expert panel** (product strategy, infra/codebase audit, content ops, analytics/ops)
+  synthesized into **`docs/plans/ADMIN_CONTROL_CENTER_PLAN.md`**: a 7-module blueprint (A Review
+  Cockpit "Prüfmodus" flagship, B Feedback-Inbox, C Versand & Systemzustand incl. the "Ist meine
+  Änderung live?" widget, D Kosten & Missbrauch, E Nutzer-Aggregate, F Inhalts-Intelligenz, G Launch
+  & Compliance) + the P0 loop-closer `pnpm apply:reviews`, a migration-0008 sketch, a do-NOT-build
+  list (no live CMS, no roles, no analytics SDK/cookie-banner risk, no per-user data browsing),
+  phasing, and risks.
+- **`preview/admin-control-center-mockups.html`**: 4 mockup screens on the real brand tokens
+  (Übersicht cockpit, Prüfmodus review card, Feedback-Inbox + Systemzustand, Steuerung).
+- **Founder decisions (plan §10):** dedicated `/admin` route · feedback triage = status + note +
+  link + priority · launch checklist persisted in Supabase · admin UI bilingual DE/EN · plus a
+  **Steuerung (remote-config) module** (§4 H, justified by a prompt-log mining pass: 25+
+  config-shaped asks → a 12-switch catalog + guardrails; mechanism = Supabase `app_config`,
+  world-readable/founder-writable, runtime-fetched to dodge the PWA cache; visibility toggles never
+  unmount routes; the locked bar structure stays locked).
+- **Build plan `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`:** the scope chunked into 12
+  PR-sized chunks (+4 later) with per-chunk model recs (MVP mix: Fable ×2 security/integrity core,
+  Opus ×3 cross-cutting builds, Sonnet ×3 well-specified UI). No gates (docs only).
+
 **Handoff after session 142 (2026-07-21). Wörter (words) quality-control, branch
 `claude/words-collocations-qc-0pycjq`, shipped to `main` (PR #624).** Founder screenshot of the
 Theorie → Wörter list: "Aufgaben verteilen" (a Nomen-Verb collocation) sat article-less among real
