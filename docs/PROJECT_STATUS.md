@@ -99,8 +99,14 @@ only, zero app-code changes):
   crunches) and produced a 12-switch catalog + guardrails, now plan §4 H (mechanism: Supabase
   `app_config`, world-readable/founder-writable, fetched at runtime to dodge the PWA cache;
   visibility toggles never unmount routes; locked bar structure stays locked). Steuerung core
-  joins the MVP (plan §8). A 4th mockup screen (Steuerung) was added to the preview HTML. Next
-  step: build the MVP per plan §8 (loop-closer first).
+  joins the MVP (plan §8). A 4th mockup screen (Steuerung) was added to the preview HTML.
+- **Build plan authored (2026-07-22): `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`.** The
+  approved scope chunked into 12 numbered PR-sized chunks (+4 later items), each with a
+  plain-language executive summary, scope/verify lists, dependencies, effort, and a per-chunk
+  Claude-model recommendation (MVP mix: Fable ×2 for the security/integrity core = migration 0008
+  + apply:reviews; Opus ×3 for the cross-cutting builds = shell/Übersicht, Prüfmodus, Steuerung
+  core; Sonnet ×3 for feedback inbox, system/launch, report sidecars). Sequencing diagram + model
+  rationale included. **Next step: chunk 1 (backend foundation) on Fable.**
 
 **Handoff after session 142 (2026-07-21). Wörter (words) quality-control, branch
 `claude/words-collocations-qc-0pycjq`, shipped to `main` (PR #624).** Founder screenshot of the

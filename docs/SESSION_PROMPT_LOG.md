@@ -786,3 +786,16 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   the Steuerung sidebar entry to the preview HTML. Shipped via PR into `main`.
 - **Artifacts (prompt 3):** `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` ·
   `preview/admin-control-center-mockups.html` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 4 (verbatim):** `> build a robust plan with model recommendations for each chunk of work and executive summary for each chunk. then save it and merge with main`
+- **Response 4:** Authored `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, the execution
+  companion to the scoping plan: 12 PR-sized chunks (Phase 1 MVP: backend foundation 0008,
+  apply:reviews loop-closer, /admin shell + Übersicht, Prüfmodus + priority queue, Feedback-Inbox,
+  System + launch checklist, Steuerung core, report JSON sidecars; Phase 2: content intelligence,
+  Steuerung wave 2, Turnstile + abuse meters, compliance pack) plus 4 later items. Each chunk
+  carries a plain-language executive summary, scope/needs/verify, effort, and a recommended Claude
+  model with reasoning (Fable for the security/integrity core, Opus for cross-cutting builds
+  touching locked surfaces, Sonnet for well-specified work), aligned with the house model-guidance
+  table in `PROJECT_REFERENCE.md`. Cross-linked from the scoping plan; status doc updated. Merged
+  to `main`.
+- **Artifacts (prompt 4):** `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` ·
+  `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` · `docs/PROJECT_STATUS.md` · this log

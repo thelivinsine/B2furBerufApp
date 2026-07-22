@@ -4,7 +4,9 @@ _Session 143 (2026-07-21, updated 2026-07-22). Produced by a four-expert agent p
 strategy, infrastructure audit, content operations, analytics/ops) plus synthesis, then revised
 after the founder resolved the open decisions (§10) and requested a remote-config module (§4 H,
 justified by a full prompt-log mining pass). Status: **approved scope, not yet built.**
-Visual direction: `preview/admin-control-center-mockups.html` (4 mockup screens)._
+Visual direction: `preview/admin-control-center-mockups.html` (4 mockup screens). Execution:
+**`ADMIN_CONTROL_CENTER_BUILD_PLAN.md`** (the chunked build plan with per-chunk model
+recommendations; start there when building)._
 
 ---
 
