@@ -67,10 +67,14 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 144 (2026-07-22). Admin Control Center chunk 1: backend foundation,
-branch `claude/admin-control-center-chunk-1-eafquu`.** First build chunk of
-`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` (run on the recommended Fable tier: this chunk IS
-the security boundary). What shipped:
+**Handoff after session 144 (2026-07-22). Admin Control Center chunks 1 + 2 (backend foundation +
+the review loop-closer), branch `claude/admin-control-center-chunk-1-eafquu` (three PRs to `main`:
+#631 chunk 1, #632 setup-doc fixes, #633 chunk 2).** The first two build chunks of
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, both on the recommended Fable tier (they are the
+security + integrity core). Migration 0008 was deployed live by the founder and verified in-session.
+
+### Chunk 1 · backend foundation (this chunk IS the security boundary)
+What shipped:
 - **Migration `supabase/migrations/0008_admin_center.sql`** (idempotent, founder pastes it into
   the Supabase SQL editor; steps appended to `docs/plans/PHASE2_SETUP.md`):
   (1) `provenance_reviews` widened from the boolean checkbox to real decisions:
@@ -112,9 +116,9 @@ the security boundary). What shipped:
   532 SRS cards, 60 sessions, 1 feedback (neu), reviews `decided: 1, approvedUnapplied: 1` (a
   legacy boolean-era tick, no decision hash, so chunk 2 routes it to re-review, never a blind flip).
 
-**Chunk 2 (same session, same branch): the loop-closer `pnpm apply:reviews` + decision-time
-hashes.** The review pipeline "founder clicks on the phone → next Claude session commits it" now
-works end to end:
+### Chunk 2 · the loop-closer `pnpm apply:reviews` + decision-time hashes
+The review pipeline "founder clicks on the phone → next Claude session commits it" now works end
+to end:
 - **Shared fingerprint:** new `src/lib/contentHash.ts` (browser SubtleCrypto sha256 over canonical
   JSON, byte-compatible with `scripts/content-hash.mjs`) + `src/lib/contentIndex.ts` (the same
   content-id universe as the stamp script; dynamic-import only, a ~4 kB glue chunk over the shared
