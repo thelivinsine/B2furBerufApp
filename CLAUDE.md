@@ -482,14 +482,16 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (52 milestones) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
-- **Nav zones (labels updated s105, 2026-07-13; `/library` reverted to Bibliothek s141):** the tabs
-  are now **Praktisch** (`/`, was "Heute"), **Bibliothek** (`/library`; renamed to "Theorie" in s105,
-  reverted back to "Bibliothek" by founder in s141), **Fortschritt** (`/analytics`), + **Einstellungen**.
-  **Anwenden is HIDDEN from the nav** (founder, demo): removed from `navItems`, `BottomTabBar` `CONTENT`,
-  and `DEFAULT_PINNED_TABS` (now `["/", "/library", "/analytics"]`), but `/anwenden` stays mounted in
-  `router.tsx` so `/welt` + deep links still resolve — re-add the `navItems` row to restore it. The
-  Praktisch route mark is a **dumbbell** (`route-icons.tsx`), not a house. Settings-store persist
-  migration (`ROUTE_SUCCESSOR` in `nav-items.ts`) still forwards old pins. The s26–28 bottom-bar
+- **Nav zones (labels updated s105, 2026-07-13; `/library` reverted to Bibliothek s141; Schreiben added
+  s147):** the tabs are now **Praktisch** (`/`, was "Heute"), **Bibliothek** (`/library`; renamed to
+  "Theorie" in s105, reverted back to "Bibliothek" by founder in s141), **Schreiben** (`/writing`, added
+  as a dedicated item s147, rose accent, pencil mark), **Fortschritt** (`/analytics`), + **Einstellungen**.
+  **Anwenden is HIDDEN from the nav** (founder, demo): removed from `navItems`, but `/anwenden` stays
+  mounted in `router.tsx` so `/welt` + deep links still resolve — re-add the `navItems` row to restore it.
+  `BottomTabBar` `CONTENT` is now `["/library", "/writing", "/analytics"]` and `DEFAULT_PINNED_TABS` is
+  `["/", "/library", "/writing", "/analytics"]` (Home + 3 middle + fixed Einstellungen = the 5 locked
+  slots). The `/writing` → `/anwenden` `ROUTE_SUCCESSOR` remap was removed (it is a top-level route again).
+  The Praktisch route mark is a **dumbbell** (`route-icons.tsx`), not a house. The s26–28 bottom-bar
   **mechanics stay locked**.
 - **AI-disclaimer feedback button (s105):** `components/layout/FeedbackButton.tsx` renders a subtle fixed
   "Mit KI gebaut · Feedback" pill on every non-focus page (mounted in `AppShell`). It opens a dialog →
@@ -698,7 +700,8 @@ drag now reorders the sheet grid; the + badge is the single, unambiguous add aff
 - More-sheet order stored in `useSettingsStore` as `moreOrder: string[]` (full ordering of every
   route path; empty array = fall back to `nav-items` order). Rides into `profiles.settings` jsonb
   via cloudSync like the other settings.
-- `DEFAULT_PINNED_TABS = ["/", "/library", "/analytics"]` in `nav-items.ts` (Anwenden dropped from the
+- `DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"]` in `nav-items.ts` (Schreiben added
+  s147; Anwenden dropped from the
   nav in s105; was `["/", "/library", "/anwenden", "/analytics"]` in Phase 5, session 49). The store is
   persisted at `version: 1`; its `migrate` remaps any pre-Phase-5 pins/More-order via `ROUTE_SUCCESSOR`
   (also in `nav-items.ts`) so removed routes forward to their successor zone instead of vanishing.
