@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { PenLine, History } from "lucide-react";
 import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 import { WritingHistory } from "./WritingHistory";
 import { WritingModeSwitcher } from "./WritingModeSwitcher";
+import { WritingViewToggle, type WritingHubView } from "./WritingViewToggle";
 import { GuidedWritingTrainer } from "./GuidedWritingTrainer";
 import { FokusTrainer } from "./fokus/FokusTrainer";
 import {
@@ -15,9 +15,8 @@ import {
 } from "./resumeDraft";
 import { AuthDialog } from "@/features/auth/AuthDialog";
 import { useAuthStore } from "@/store/useAuthStore";
-import { cn } from "@/lib/utils";
 
-type HubView = "write" | "history";
+type HubView = WritingHubView;
 
 const MODES: WritingMode[] = ["fokus", "kurz", "lang"];
 function isMode(v: string | null): v is WritingMode {
@@ -101,39 +100,20 @@ export function WritingHub() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div>
-        <p className="text-eyebrow text-primary">
-          {mode === "fokus" ? "Satzlabor" : "KI-Schreibcoach"}
-        </p>
-        <h1 className="text-display text-2xl sm:text-3xl">Schreiben</h1>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <WritingModeSwitcher value={mode} onChange={setMode} />
-        {/* Verlauf toggle (writing history is guided-mode data). */}
-        <div className="flex gap-1 rounded-xl border border-border bg-muted/30 p-1">
-          <button
-            onClick={() => setHubView("write")}
-            className={cn(
-              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-              hubView === "write"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <PenLine className="h-3.5 w-3.5" /> Schreiben
-          </button>
-          <button
-            onClick={() => setHubView("history")}
-            className={cn(
-              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-              hubView === "history"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <History className="h-3.5 w-3.5" /> Verlauf
-          </button>
+      {/* Header, mirroring the Bibliothek hub (founder s148): no separate
+          eyebrow + H1, the mode switcher IS the lifted page header. On desktop
+          the header + toolbar sit at the content-column width (col 1 of the same
+          [1fr, 18rem] grid the trainers use for their content + rail), so they
+          line up with the cards, not the rail. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-x-6">
+        <div className="space-y-3 lg:col-start-1">
+          <WritingModeSwitcher value={mode} onChange={setMode} />
+          {/* Toolbar row: the Schreiben / Verlauf toggle, like the Bibliothek
+              ViewSwitcher meta row (centered on mobile, right-aligned on
+              desktop). Verlauf is guided-mode data regardless of the mode. */}
+          <div className="flex justify-center lg:justify-end">
+            <WritingViewToggle value={hubView} onChange={setHubView} />
+          </div>
         </div>
       </div>
 
