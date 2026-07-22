@@ -1085,3 +1085,20 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
 - **Response 8-11 (backend support):** Diagnosed the "Satzlabor nicht verfügbar" as the graceful fallback shown when the Edge Functions are undeployed / the LLM call fails. Explained the fallback chain (Anthropic → Gemini → OpenAI) is already coded and that Supabase secrets are project-wide (so `GEMINI_API_KEY` auto-applies). Since the functions swallowed errors silently, shipped **diagnostic logging + an Anthropic 429/529 retry** to both functions (PR #643) so the logs reveal the real cause. Gave non-technical, click-by-click browser deploy steps (GitHub "copy raw file" → Supabase Edge Functions editor → Deploy).
 - **Prompt 13 (verbatim):** `okay, meanwhile can you fix the UI - it looks shitty. Take bibliothek as reference and update the entire shreibtraining section to follow the same design language. the userflow of the kurz and lang shouldn't go through the Themas, instead the user should directly see an Aufgabe with writing field. and to the right a filter rail. Harmonize the design and merge`
 - **Response 13:** Harmonized Schreibtraining with the Bibliothek design language. New `WritingRail` (grey `bg-muted` tile, uppercase eyebrow domain sections, single-select theme pills; desktop sticky aside + mobile chip row) mirrors the FilterRail / Fokus GrammarRail look. Rewrote `GuidedWritingTrainer`: Kurz/Lang now land STRAIGHT on an Aufgabe + writing field (no theme-picker page), with the Thema rail on the right to switch topic; task resets on theme/length change (resume-safe). Both guided + Fokus now share the `lg:grid-cols-[minmax(0,1fr)_18rem]` content+rail grid. Gates: typecheck · lint 0 errors · test:unit 257/257 · build · check:bundle 112.1 kB, all green. Shipped via squash-merge.
+- **Prompt 14 (verbatim):** `clearly there are some mistakes in teh sentence here that the ai corrected. Why does it say that the sentence is correct? There's no highlight of the mistakes, no tip. These things should be fixed.` (attachment: dark-mode Fokus correction screenshot showing a corrected sentence with no diff/tip)
+- **Response 14:** Fixed the correction display (PR #646, same branch). Added a pure client-side word
+  diff `src/lib/wordDiff.ts` (LCS over tokens, no AI/network → no redeploy). `FokusTrainer` now strikes
+  the original, highlights the changed words in place, lists each edit as before → after ("Was ich
+  geändert habe"), and the header reads "Korrigiert · N Änderungen" (the green check alone read as
+  "correct"). `tests/wordDiff.test.ts` (260/260). Note left to founder: deeper per-change *why*
+  explanations would need an AI backend field + redeploy. Rebased onto the interleaved s148 auth-fix
+  merge, resolved the prompt-log conflict, squash-merged #646.
+- **Prompt 15 (verbatim):** `document the session`
+- **Response 15:** Updated `docs/PROJECT_STATUS.md` (header rewritten to the Schreibtraining-complete
+  state; the s147 handoff expanded to cover PRs #642/#643/#646; the open-action item changed to
+  "redeploy for logging/retry + confirm GEMINI_API_KEY") and appended prompts 14-15 here.
+- **Artifacts (session 147 continued):** `src/components/layout/nav-items.ts` · `src/components/layout/BottomTabBar.tsx` ·
+  `supabase/functions/check-sentence/index.ts` · `supabase/functions/transform-sentence/index.ts` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/lib/wordDiff.ts` · `tests/wordDiff.test.ts` ·
+  `CLAUDE.md` · PRs #642 · #643 · #646 · `docs/PROJECT_STATUS.md` · this log

@@ -1,17 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 148). **Auth bug fix: fresh-device OAuth login no longer bounces
-existing accounts to the landing page (PR #644, merged).** Uninstalling the PWA wipes `localStorage`,
-so on the fresh install the local `onboarded` flag defaults to `false`. After a Google login the app
-returned to `/`, where the `RequireOnboarding` route guard read that local flag synchronously and
-redirected to `/welcome` **before** cloud sync pulled the account's real `onboarded: true` from its
-profile. Fix: a `syncHydrated` flag on `useAuthStore` (set when the first cloud-sync pull completes or
-fails offline, reset on sign-out / at each sync start); `RequireOnboarding` now waits for auth
-resolution + that first pull before redirecting a signed-in / guest user, so the cloud `onboarded`
-flag is applied first. Prior: Schreibtraining Fokus "Satzlabor" (s147, backlog #6, PR #640). **Founder
-action still open:** deploy the Fokus backend (migration 0009 + `check-sentence`/`transform-sentence`
-Edge Functions, steps in `PHASE2_SETUP.md`) to make the new `/writing` Fokus mode live; until then it
-degrades gracefully and Kurz/Lang keep working. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-22 (session 147, continued). **Schreibtraining redesign complete + a dedicated
+"Schreiben" nav item (backlog #6; PRs #640/#642/#643/#646, all merged).** `/writing` is now a Fokus ·
+Kurz · Lang mode router matching the Bibliothek design language: **Fokus "Satzlabor"** is a
+single-sentence write→correct→transform grammar lab (corrections now highlight the changed words in
+place + list each edit as before→after via a client-side word diff), and **Kurz/Lang land straight on
+an Aufgabe + writing field** with a Thema filter rail (no theme-picker page). Backend = migration 0009 +
+Edge Functions `check-sentence`/`transform-sentence` (global cross-user transform cache, shared $5 fuse,
+Anthropic→Gemini→OpenAI fallback with a 429/529 retry + diagnostic logging). **Founder action open:**
+redeploy the two functions to pick up the logging/retry fix, and confirm `GEMINI_API_KEY` is set as a
+project secret. Interleaved parallel work: s148 auth fix (fresh-device OAuth no longer bounces existing
+accounts to the landing page; PR #644, its handoff below). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -55,10 +54,10 @@ see `strategy/DATA_GOVERNANCE.md`).
 
 ## Open founder action items
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
-- [ ] **Deploy the Fokus "Satzlabor" backend (s147)** to make the new `/writing` Fokus mode live: run
-      migration `0009_sentence_studio.sql` + `supabase functions deploy check-sentence transform-sentence`.
-      Steps in `docs/plans/PHASE2_SETUP.md`. No new secrets required. Until then Fokus shows "momentan
-      nicht verfügbar" and Kurz/Lang keep working.
+- [ ] **Redeploy the Fokus "Satzlabor" functions (s147)** to pick up the diagnostic logging + Anthropic
+      retry fix: `check-sentence` + `transform-sentence` (migration 0009 + the initial deploy are already
+      done). Also confirm `GEMINI_API_KEY` is set as a Supabase project secret so the fallback is active.
+      Steps in `docs/plans/PHASE2_SETUP.md`.
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
@@ -118,12 +117,34 @@ What shipped:
   and `transform-sentence` (transform, cache-FIRST, abstains rather than hallucinate; burst/daily/monthly
   limits count only paid ops; `TRANSFORM_MODEL` env-switchable to Sonnet). Metered into the shared **$5
   fuse** so max spend is unchanged. Deploy steps in `docs/plans/PHASE2_SETUP.md`.
-- **Gates:** typecheck ✓ · lint 0 errors ✓ · test:unit **257/257** (new `tests/fokusGrammar.test.ts`) ·
-  build ✓ · check:bundle **111.9 kB** (main unchanged; writing stays lazy) · lint:content ✓.
-- **Open follow-ups:** (1) founder deploys 0009 + the two functions to make Fokus live; (2) decide
-  Haiku vs Sonnet 5 for transforms (default Haiku, one env var); (3) Wave 2 axes (Zustandspassiv,
-  Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness the plan specifies. Fokus is
-  MVP-scoped: no per-token diff highlight yet, single sentence only.
+- **The session continued past the initial ship (5 more PRs on the same branch):**
+  - **Nav (PR #642):** Schreibtraining promoted to a dedicated top-level nav item **"Schreiben"**
+    (`/writing`, rose accent, the existing pencil mark). `DEFAULT_PINNED_TABS` + `BottomTabBar` `CONTENT`
+    now `["/library", "/writing", "/analytics"]`; the `/writing → /anwenden` `ROUTE_SUCCESSOR` remap was
+    removed. CLAUDE.md nav bullets updated.
+  - **Backend robustness (PR #643):** the two Edge Functions swallowed LLM errors silently, so failures
+    were invisible in the logs. Added diagnostic `console.error` logging (HTTP status + body, parse
+    failures, a providers-configured line) and a one-shot Anthropic 429/529 retry before falling to
+    Gemini → OpenAI. **Founder must redeploy the functions to pick this up.**
+  - **Design harmonization (PR #646):** the whole section now matches the Bibliothek design language.
+    New `WritingRail` (grey `bg-muted` tile, uppercase domain eyebrows, single-select theme pills;
+    desktop sticky aside + mobile chip row). `GuidedWritingTrainer` rewritten: **Kurz/Lang land straight
+    on an Aufgabe + writing field** (no theme-picker page), topic switched from the Thema rail. Both
+    guided + Fokus share the `[minmax(0,1fr)_18rem]` content+rail grid.
+  - **Correction display fix (PR #646):** the Fokus correction showed the corrected sentence with no
+    indication of what changed and a green check that read as "correct". Now a pure client-side word
+    diff (`lib/wordDiff.ts`) strikes the original, **highlights the changed words in place**, lists each
+    edit as before → after ("Was ich geändert habe"), and the header reads "Korrigiert · N Änderungen".
+    No backend needed. `tests/wordDiff.test.ts` pins it.
+- **Gates (final, PR #646):** typecheck ✓ · lint 0 errors ✓ · test:unit **260/260** (added
+  `fokusGrammar` + `wordDiff` tests) · build ✓ · check:bundle **112.3 kB** (main unchanged; writing lazy).
+- **Open follow-ups:** (1) founder **redeploys** `check-sentence`/`transform-sentence` for the logging +
+  retry fix (the functions + migration 0009 are already deployed; Fokus worked but was flaky, likely a
+  provider hiccup, hence the retry/logging); confirm `GEMINI_API_KEY` is set as a project secret so the
+  fallback is active; (2) decide Haiku vs Sonnet 5 for transforms (default Haiku, one env var); (3) Wave
+  2 axes (Zustandspassiv, Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness; (4) optional:
+  AI-authored per-change *explanations* in the correction tip (needs a backend field + redeploy). Fokus
+  is single-sentence by design.
 
 _(Session 146's /sources verification-refresh + human-review-reset + table-restructure handoff, and
 session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,
