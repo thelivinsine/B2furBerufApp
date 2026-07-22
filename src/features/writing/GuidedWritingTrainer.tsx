@@ -1,27 +1,29 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, PenLine, Sparkles, Target, Loader2, Lightbulb, Clock, Info } from "lucide-react";
+import { Sparkles, Target, Loader2, Lightbulb, Clock, Info } from "lucide-react";
 import type { ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { writingPrompts } from "@/data/writingPrompts";
 import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { iconByName } from "@/lib/icons";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
+import { WritingRail } from "./WritingRail";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * Guided writing task (Kurz / Lang) for Schreibtraining: pick a theme, write to a
- * B2-Beruf-style prompt, get the single most important coaching tip + a practice
- * deep-link. This is the app's original writing flow, extracted from WritingHub
- * unchanged (plan: docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md); the mode switcher
- * now supplies `length` (Kurz = short, Lang = long), so the old in-page length
- * toggle is gone. Auth is gated by the parent via `onRequireAuth`.
+ * Guided writing task (Kurz / Lang) for Schreibtraining (redesign, s147). The
+ * learner lands STRAIGHT on an Aufgabe + writing field (no theme-picker page);
+ * the topic is switched from the Thema rail on the right (desktop) or the chip
+ * row (mobile), harmonized with the Bibliothek / Fokus design language. Mode
+ * supplies `length` (Kurz = short, Lang = long); auth is gated by the parent via
+ * `onRequireAuth`.
  */
 
+const DEFAULT_THEME: ThemeId = themes[0].id;
 const rangeByLength: Record<WritingLength, [number, number]> = {
   short: [40, 60],
   long: [120, 150],
@@ -50,7 +52,7 @@ export function GuidedWritingTrainer({
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const themeParam = params.get("theme");
-  const theme = isThemeId(themeParam) ? themeParam : null;
+  const theme: ThemeId = isThemeId(themeParam) ? themeParam : DEFAULT_THEME;
 
   const [text, setText] = useState(initialText);
   const [submitting, setSubmitting] = useState(false);
@@ -58,21 +60,25 @@ export function GuidedWritingTrainer({
 
   const words = useMemo(() => countWords(text), [text]);
 
-  // Restore a resumed draft's text once (do not auto-evaluate).
+  // Reset the draft + result when the task (theme or length) changes, but NOT on
+  // mount (so a resumed draft survives). keyRef is seeded with the initial task.
+  const keyRef = useRef(`${theme}|${length}`);
   useEffect(() => {
-    if (initialText && !text) setText(initialText);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialText]);
+    const key = `${theme}|${length}`;
+    if (keyRef.current !== key) {
+      keyRef.current = key;
+      setText("");
+      setResult(null);
+    }
+  }, [theme, length]);
 
-  const setTheme = (id: ThemeId | null) => {
+  const setTheme = (id: ThemeId) => {
     const p = new URLSearchParams(params);
-    if (id) p.set("theme", id);
-    else p.delete("theme");
+    p.set("theme", id);
     setParams(p);
   };
 
   const submit = async () => {
-    if (!theme) return;
     setSubmitting(true);
     setResult(null);
     const res = await evaluateWriting({ theme, length, text: text.trim() });
@@ -81,48 +87,12 @@ export function GuidedWritingTrainer({
   };
 
   const handleEvaluate = () => {
-    if (!theme) return;
     if (!isSignedIn) {
       onRequireAuth({ theme, length, text });
       return;
     }
     void submit();
   };
-
-  // Theme picker
-  if (!theme) {
-    return (
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {themes.map((t, i) => {
-          const Icon = iconByName(t.icon);
-          return (
-            <motion.button
-              key={t.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04 }}
-              onClick={() => setTheme(t.id)}
-              className="text-left"
-            >
-              <Card className="card-hover group h-full overflow-hidden">
-                <CardContent className="space-y-3 p-5">
-                  <div className="flex items-start justify-between">
-                    <div className={`rounded-xl bg-gradient-to-br ${t.accent} p-2.5 text-white shadow-soft`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <Badge variant="muted" className="gap-1">
-                      <PenLine className="h-3 w-3" /> {length === "long" ? "Lang" : "Kurz"}
-                    </Badge>
-                  </div>
-                  <p className="font-semibold">{t.titleDe}</p>
-                </CardContent>
-              </Card>
-            </motion.button>
-          );
-        })}
-      </div>
-    );
-  }
 
   const t = themeById(theme)!;
   const Icon = iconByName(t.icon);
@@ -133,37 +103,26 @@ export function GuidedWritingTrainer({
   const remaining = Math.max(0, minWords - words);
   const tooShort = words < minWords;
 
-  const startOver = () => {
-    setResult(null);
-    setText("");
-  };
-
   const area = result?.practiceArea ? practiceAreaById(result.practiceArea) : undefined;
 
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" onClick={() => setTheme(null)}>
-          <ArrowLeft className="h-4 w-4" /> Themen
-        </Button>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <div className={`rounded-xl bg-gradient-to-br ${t.accent} p-3 text-white shadow-soft`}>
-          <Icon className="h-6 w-6" />
-        </div>
-        <div>
-          <h2 className="text-display text-2xl">{t.titleDe}</h2>
-          <p className="text-sm text-muted-foreground">Schreibtraining mit KI-Feedback.</p>
-        </div>
-      </div>
-
-      {/* Prompt */}
+  const content = (
+    <div className="space-y-4">
+      {/* Aufgabe */}
       <Card>
-        <CardContent className="space-y-2 p-5">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            <Target className="h-3.5 w-3.5" /> Aufgabe
-          </p>
+        <CardContent className="space-y-3 p-5">
+          <div className="flex items-center gap-3">
+            <div className={`rounded-xl bg-gradient-to-br ${t.accent} p-2.5 text-white shadow-soft`}>
+              <Icon className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                <Target className="h-3.5 w-3.5" /> Aufgabe · {t.titleDe}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {length === "long" ? "Langer Text" : "Kurzer Text"} · Ziel {min}–{max} Wörter
+              </p>
+            </div>
+          </div>
           <p className="text-sm leading-relaxed">{prompt}</p>
         </CardContent>
       </Card>
@@ -185,7 +144,7 @@ export function GuidedWritingTrainer({
             </span>
             <div className="flex gap-2">
               {result && (
-                <Button variant="ghost" onClick={startOver} disabled={submitting}>
+                <Button variant="ghost" onClick={() => { setResult(null); setText(""); }} disabled={submitting}>
                   Neu schreiben
                 </Button>
               )}
@@ -204,7 +163,6 @@ export function GuidedWritingTrainer({
           </div>
           {tooShort && (
             <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
-              <PenLine className="h-3.5 w-3.5 shrink-0" />
               Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
             </p>
           )}
@@ -270,6 +228,21 @@ export function GuidedWritingTrainer({
           )}
         </motion.div>
       )}
+    </div>
+  );
+
+  return (
+    <div>
+      {/* Mobile: Thema chip row above the task. */}
+      <div className="mb-4 lg:hidden">
+        <WritingRail layout="chips" value={theme} onChange={setTheme} />
+      </div>
+
+      {/* Desktop: content + sticky Thema rail. Mobile: content only. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start lg:gap-6">
+        {content}
+        <WritingRail value={theme} onChange={setTheme} className="hidden lg:block" />
+      </div>
     </div>
   );
 }
