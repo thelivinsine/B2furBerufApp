@@ -135,33 +135,48 @@ function userMsg(source: string, target: Tuple): string {
   return `Satz: """${source}"""\nZielform: ${JSON.stringify(target)}`;
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 async function callAnthropic(source: string, target: Tuple): Promise<TransformOut | null> {
   const key = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!key) return null;
-  try {
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: TRANSFORM_MODEL,
-        max_tokens: 400,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content: userMsg(source, target) }],
-      }),
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const parsed = parse(data.content?.[0]?.text ?? "", target);
-    if (!parsed) return null;
-    const inTok = data.usage?.input_tokens ?? 0;
-    const outTok = data.usage?.output_tokens ?? 0;
-    // Haiku ~$1/$5 per MTok; Sonnet ~$3/$15. Use the higher for a conservative estimate on Sonnet.
-    const isSonnet = TRANSFORM_MODEL.includes("sonnet");
-    const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
-    return { ...parsed, model: TRANSFORM_MODEL, cost };
-  } catch {
-    return null;
+  if (!key) { console.error("[transform] anthropic: no ANTHROPIC_API_KEY set"); return null; }
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: TRANSFORM_MODEL,
+          max_tokens: 400,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: "user", content: userMsg(source, target) }],
+        }),
+      });
+      if (res.status === 429 || res.status === 529) {
+        console.error(`[transform] anthropic overloaded status=${res.status} attempt=${attempt}`);
+        if (attempt === 0) { await sleep(700); continue; }
+        return null;
+      }
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        console.error(`[transform] anthropic http=${res.status} body=${body.slice(0, 400)}`);
+        return null;
+      }
+      const data = await res.json();
+      const raw = data.content?.[0]?.text ?? "";
+      const parsed = parse(raw, target);
+      if (!parsed) { console.error(`[transform] anthropic parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
+      const inTok = data.usage?.input_tokens ?? 0;
+      const outTok = data.usage?.output_tokens ?? 0;
+      const isSonnet = TRANSFORM_MODEL.includes("sonnet");
+      const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
+      return { ...parsed, model: TRANSFORM_MODEL, cost };
+    } catch (e) {
+      console.error(`[transform] anthropic threw: ${e}`);
+      return null;
+    }
   }
+  return null;
 }
 
 async function callGemini(source: string, target: Tuple): Promise<TransformOut | null> {
@@ -179,12 +194,18 @@ async function callGemini(source: string, target: Tuple): Promise<TransformOut |
         }),
       },
     );
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[transform] gemini http=${res.status} body=${body.slice(0, 400)}`);
+      return null;
+    }
     const data = await res.json();
-    const parsed = parse(data.candidates?.[0]?.content?.parts?.[0]?.text ?? "", target);
-    if (!parsed) return null;
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const parsed = parse(raw, target);
+    if (!parsed) { console.error(`[transform] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
     return { ...parsed, model: "gemini-1.5-flash", cost: 0.0005 };
-  } catch {
+  } catch (e) {
+    console.error(`[transform] gemini threw: ${e}`);
     return null;
   }
 }
@@ -205,12 +226,17 @@ async function callOpenAI(source: string, target: Tuple): Promise<TransformOut |
         ],
       }),
     });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[transform] openai http=${res.status} body=${body.slice(0, 400)}`);
+      return null;
+    }
     const data = await res.json();
     const parsed = parse(data.choices?.[0]?.message?.content ?? "", target);
     if (!parsed) return null;
     return { ...parsed, model: "gpt-4o-mini", cost: 0.0008 };
-  } catch {
+  } catch (e) {
+    console.error(`[transform] openai threw: ${e}`);
     return null;
   }
 }
@@ -314,8 +340,12 @@ Deno.serve(async (req) => {
     if (!chk) return json({ ok: false, message: "Bitte prüfe den Satz zuerst." }, 400);
   }
 
+  console.log(`[transform] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${TRANSFORM_MODEL}`);
   const out = (await callAnthropic(source, target)) || (await callGemini(source, target)) || (await callOpenAI(source, target));
-  if (!out) return json({ ok: false, message: "Die Umformung ist momentan nicht verfügbar." });
+  if (!out) {
+    console.error(`[transform] all providers failed target=${canonicalTuple(target)}`);
+    return json({ ok: false, message: "Die Umformung ist momentan nicht verfügbar." });
+  }
 
   // Contract validation: an "applicable" transform must be non-empty, differ from
   // the source, and hit the requested tuple; otherwise treat as not applicable.
