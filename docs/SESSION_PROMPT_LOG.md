@@ -875,3 +875,13 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `src/features/legal/AdminWorkbench.tsx` · `tests/contentHash.test.ts` ·
   `tests/applyReviews.test.ts` · `package.json` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 6 (verbatim):** `> document the session`
+- **Response 6:** Session documentation was maintained incrementally across prompts 1-5 (status
+  handoffs + prompt-log entries shipped in PRs #631-#633, CLAUDE.md `apply:reviews`/admin-gate
+  bullets, PHASE2_SETUP.md founder steps). This closing pass: promoted the session-144 handoff
+  header in `PROJECT_STATUS.md` to cover BOTH chunks (chunk 1 + chunk 2 as `###` subsections, was
+  titled "chunk 1" only) and noted the three PRs (#631/#632/#633); verified doc hygiene (two
+  handoffs live: s144 + s143, s142 already rotated to the W30 archive; status doc 212 lines under
+  the ~250 budget; prompt log ~880 lines under the ~1,200 rotation budget); appended this entry.
+  No app-code or content changes this prompt.
+- **Artifacts (prompt 6):** `docs/PROJECT_STATUS.md` · this log
