@@ -1,16 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 143). **Admin Control Center scope APPROVED (docs/preview
-only, nothing built).** A four-agent expert panel scoped a founder "Kontrollzentrum"
-(`docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` + 4 mockup screens in
-`preview/admin-control-center-mockups.html`); the founder then resolved all five open decisions
-(dedicated `/admin`, MVP order confirmed, feedback triage = status+note+link+priority, checklist
-in Supabase, bilingual DE/EN) and requested an added **Steuerung remote-config module** (nav
-renames, page hiding, feature flags; justified by a full prompt-log mining pass, plan §4 H).
-Flagship stays the Prüfmodus review cockpit + the `pnpm apply:reviews` loop-closer. The execution
-plan is chunked with per-chunk model recommendations in
-`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`; next step = chunk 1 (backend foundation) on
-Fable. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-22 (session 144). **Admin Control Center chunk 1 SHIPPED (backend
+foundation).** Migration `supabase/migrations/0008_admin_center.sql` (provenance_reviews decisions
++ safety hash, feedback triage columns, `app_config`, `launch_checklist`, `is_founder()`/
+`assert_founder()` + the aggregate-only founder RPCs), typed fail-soft client stubs in
+`src/lib/adminApi.ts`, lockstep tests pinning the migration's email gate, and founder deploy steps
+in `docs/plans/PHASE2_SETUP.md`. **Founder action: run migration 0008 in the Supabase SQL editor.**
+Next step = chunk 2 (`pnpm apply:reviews` loop-closer) per
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -67,6 +64,46 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 144 (2026-07-22). Admin Control Center chunk 1: backend foundation,
+branch `claude/admin-control-center-chunk-1-eafquu`.** First build chunk of
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` (run on the recommended Fable tier: this chunk IS
+the security boundary). What shipped:
+- **Migration `supabase/migrations/0008_admin_center.sql`** (idempotent, founder pastes it into
+  the Supabase SQL editor; steps appended to `docs/plans/PHASE2_SETUP.md`):
+  (1) `provenance_reviews` widened from the boolean checkbox to real decisions:
+  `decision approve|reject|needs_fix`, `content_hash` (the decision-time safety hash chunk 2's
+  `apply:reviews` compares before flipping repo rows), `reviewer_email`, `applied_at`,
+  `applied_sha`; `verified=true` rows backfilled to `decision='approve'` (legacy rows keep a null
+  hash, which apply:reviews must treat as "needs re-review", never a free pass), reviewer emails
+  backfilled from `reviewed_by`. The `verified` boolean stays until the chunk-2 workbench update.
+  (2) `feedback` triage columns: `status neu|erledigt|verworfen`, `priority hoch|normal|niedrig`,
+  `note`, `link` (table stays service-role-only; founder access via RPC only).
+  (3) **`app_config`** (Steuerung store): key/value jsonb rows, world-READABLE RLS (the app will
+  consume it at startup in chunk 7), founder-only writes. (4) **`launch_checklist`**: founder-only
+  RLS, state synced across devices (items seeded by the chunk-6 UI).
+  (5) **`is_founder()`** (the SINGLE email source for every 0008 policy/RPC) + **`assert_founder()`**
+  + SECURITY DEFINER RPCs gated in-body per the 0004/0007 pattern: `admin_overview()` (one jsonb:
+  accounts split guests/email/Google + new7d, active today/7d, sessions/XP/SRS-card totals, AI
+  month spend vs cap inputs, feedback counts, review sync-gap counts), `admin_daily_series()`
+  (30-day `{day, signups, actives}`), `admin_feedback_recent(n)`, `admin_feedback_update(...)`
+  (validates enums; empty string clears note/link). All revoked from `public`/`anon`, granted to
+  `authenticated` (guests ride the authenticated role, so the in-body email check is the real
+  boundary). **Privacy line held: aggregates only, no RPC returns learner rows; no admin SELECT
+  policies were added to `profiles`/`progress`/`writing_evaluations`** (the `feedback` table is the
+  sanctioned per-row exception: operational mail addressed to the founder).
+- **`src/lib/adminApi.ts`**: typed fail-soft wrappers (null/empty/false on error, offline-first)
+  for the four RPCs + raw `app_config` and `launch_checklist` helpers. Not imported by any eager
+  code yet (main chunk unchanged); consumers arrive with the `/admin` shell in chunk 3.
+- **`tests/admin.test.ts` extended (lockstep pin):** migration 0007 + 0008 email sets must equal
+  `FOUNDER_EMAILS` exactly, both emails must sit inside `is_founder()`, and every 0008 admin RPC
+  must contain `perform public.assert_founder();` and a `revoke ... from public, anon`.
+- **Docs:** founder deploy/verify steps in `PHASE2_SETUP.md` (run 0008; existing Werkbank ticks
+  carry over as approve decisions, nothing re-clicked); CLAUDE.md admin-gate note now covers 0008.
+- **Gates:** `typecheck` · `lint` (0 errors) · `test:unit` 222/222 · `build` · `check:bundle`
+  (110.6/400 kB) · `lint:content` all green. Nothing visible in the app changes yet.
+- **Next:** chunk 2, `pnpm apply:reviews` + decision-time hashes in the workbench (Fable
+  recommended); then chunk 3, the `/admin` shell + Übersicht (Opus).
+
 **Handoff after session 143 (2026-07-21). Admin Control Center scoping, branch
 `claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (PR #626, docs + preview only).** Founder
 asked for a full-blown comprehensive admin control center: an expert-agent panel to research and
@@ -110,34 +147,9 @@ only, zero app-code changes):
   core; Sonnet ×3 for feedback inbox, system/launch, report sidecars). Sequencing diagram + model
   rationale included. **Next step: chunk 1 (backend foundation) on Fable.**
 
-**Handoff after session 142 (2026-07-21). Wörter (words) quality-control, branch
-`claude/words-collocations-qc-0pycjq`, shipped to `main` (PR #624).** Founder screenshot of the
-Theorie → Wörter list: "Aufgaben verteilen" (a Nomen-Verb collocation) sat article-less among real
-nouns. QC found the Wörter list renders the whole vocab bank with no POS filter, so **8 noun+verb
-collocations leaked in**; **6 were literal duplicates** of existing Kollokationen entries. Founder
-direction: the individual words may stay in Wörter, but the *combination* belongs in Kollokationen.
-What shipped:
-- **Retire-from-surface, never delete** (shipped ids are permanent, progress is id-keyed). New
-  `RETIRED_VOCAB_IDS` set + `browsableVocabulary` (= bank − retired) in `src/data/vocabulary.ts`.
-  Every "words" surface reads `browsableVocabulary`: the Wörter browse (list/table/graph/counts,
-  via `themeScoped` + `vocabByTheme`/`vocabBySubTheme` which are now browsable-based), global search
-  (`lib/search.ts`), the composed-session word pools (`engine/session.ts` ×3: libraryFocus, focus,
-  weightedDue), and `Sammlung.tsx`. `vocabById`/`vocabulary` stay the full bank for id resolution.
-- **The 8 retired ids:** `v_aufgabe_verteilen`, `v_zustandig_klaeren`, `v_software_einfuehren`,
-  `v_muell_vermeiden`, `v_energie_sparen`, `v_wortergreifen`, `v_planung_revidieren`,
-  `v_vorwuerfe_zurueckweisen`.
-- **Added the 2 combos missing from Kollokationen** (`c_planung_revidieren`,
-  `c_vorwuerfe_zurueckweisen`) + provenance rows; the other 6 already existed there. Collocations
-  1,033 → **1,035**.
-- **`lint:content` guardrail (new `lintVocabCollocationOverlap`)** upgraded from warn to **ERROR**:
-  a vocab word whose German equals a collocation `full` must be removed or listed in
-  `RETIRED_VOCAB_IDS`, so a future overlap fails CI. Retired ids are the sanctioned exception; a
-  stale set entry is also flagged. Normalizes lexemes (drops leading article, lowercases).
-- **Gates:** `pnpm lint:content` (1,035 colloc, no errors) · `typecheck` · `test:unit` (219) ·
-  `build` · `check:bundle` (110.5/400 kB) all green. Post-merge branch realigned to `main`.
-  PWA caveat: the word list is service-worker-cached; hard-refresh the live site to see it.
-
-_(Session 141's mobile-nav-item-labels handoff (labels under the active icon + the
+_(Session 142's Wörter quality-control handoff (the `RETIRED_VOCAB_IDS`/`browsableVocabulary`
+retire-from-surface set + the vocab↔collocation overlap lint gate, PR #624), session 141's
+mobile-nav-item-labels handoff (labels under the active icon + the
 Theorie→Bibliothek revert, PR #622), session 140's light-theme recolor handoff (neutral grey chrome + the "I1" mint→sky gradient
 ground, 2 PRs + a 3-round preview picker), session 139's three-small-fixes handoff (icon-size
 preview correction, mission-exit toggle fix, Kollokationen graph tighter clusters), session 138's
