@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Schreibtraining Redesign — Satzlabor Mockups</title>
+<style>
+  :root{
+    --background:180 45% 98%; --foreground:252 16% 12%; --surface:0 0% 100%;
+    --muted:220 10% 90%; --muted-foreground:220 8% 36%; --border:220 9% 86%;
+    --primary:221 83% 54%; --primary-foreground:0 0% 100%;
+    --accent:197 93% 77%; --accent-ink:198 90% 32%;
+    --success:153 55% 40%; --warning:38 92% 46%; --reward:11 82% 54%;
+    --gradient-from:226 83% 47%; --gradient-to:196 93% 38%;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 12% -8%, hsl(150 40% 96%), transparent 60%),
+      radial-gradient(1200px 700px at 100% 0%, hsl(200 60% 97%), transparent 55%),
+      hsl(var(--background));
+    color:hsl(var(--foreground));-webkit-font-smoothing:antialiased;
+    padding:32px 20px 80px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  .doc-head{margin-bottom:28px}
+  .doc-head h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+  .doc-head p{margin:0;color:hsl(var(--muted-foreground));font-size:14px;max-width:70ch}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:hsl(var(--muted-foreground))}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:11px;height:11px;border-radius:4px;display:inline-block}
+  .caption{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:hsl(var(--muted-foreground));margin:38px 0 12px}
+  .caption b{color:hsl(var(--primary));font-weight:700}
+
+  /* ---- shared app chrome ---- */
+  .eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:hsl(var(--accent-ink))}
+  .h1{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:2px 0 0}
+  .switch{display:inline-flex;background:hsl(var(--muted));border-radius:12px;padding:4px;gap:2px;margin:16px 0 4px}
+  .switch button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;color:hsl(var(--muted-foreground));
+    padding:7px 20px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:6px}
+  .switch button.on{background:hsl(var(--surface));color:hsl(var(--primary));box-shadow:0 1px 3px rgba(20,30,60,.12)}
+  .card{background:hsl(var(--surface));border:1px solid hsl(var(--border));border-radius:var(--radius);box-shadow:0 1px 2px rgba(20,30,60,.05)}
+  .btn{border:0;border-radius:11px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;padding:11px 18px;display:inline-flex;align-items:center;gap:8px}
+  .btn-grad{color:#fff;background:linear-gradient(135deg,hsl(var(--gradient-from)),hsl(var(--gradient-to)))}
+  .btn-ghost{background:transparent;color:hsl(var(--muted-foreground));border:1px solid transparent}
+  .ki{display:flex;gap:8px;align-items:flex-start;font-size:12px;color:hsl(var(--muted-foreground));border-top:1px solid hsl(var(--border));padding-top:12px;margin-top:12px;line-height:1.5}
+  .ki a{color:hsl(var(--primary));text-decoration:none;font-weight:600}
+  .i{width:15px;height:15px;flex:none;margin-top:1px;color:hsl(var(--muted-foreground))}
+
+  /* ---- fokus layout ---- */
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;align-items:start;margin-top:14px}
+  .col{display:flex;flex-direction:column;gap:16px}
+  .sub{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:hsl(var(--muted-foreground));margin:0 0 8px}
+  .sentbox{padding:18px}
+  .orig{color:hsl(var(--muted-foreground));font-size:15px;line-height:1.6}
+  .corr-lab{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:hsl(var(--success));margin:14px 0 6px}
+  .corr{font-size:16px;line-height:1.65}
+  .ins{background:hsl(var(--success)/.16);border-radius:5px;padding:1px 4px}
+  .fix{background:hsl(var(--warning)/.18);border-radius:5px;padding:1px 4px}
+  mark.mv{background:hsl(var(--primary)/.12);border-radius:5px;padding:1px 4px;color:inherit}
+  .row-cta{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  .speak{width:30px;height:30px;border-radius:8px;border:1px solid hsl(var(--border));background:hsl(var(--surface));display:inline-flex;align-items:center;justify-content:center;color:hsl(var(--primary));cursor:pointer}
+
+  .outbox{background:hsl(var(--muted)/.4);border:1px solid hsl(var(--border));border-radius:var(--radius);padding:18px}
+  .outlab{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .outlab .eb{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:hsl(var(--accent-ink))}
+  .out-sent{font-size:16px;line-height:1.65}
+  .note{display:flex;gap:8px;font-size:13px;color:hsl(var(--muted-foreground));margin-top:12px;line-height:1.55}
+  .note .i{color:hsl(var(--primary))}
+  .en{font-size:10px;font-weight:700;border:1px solid hsl(var(--border));border-radius:6px;padding:1px 5px;color:hsl(var(--muted-foreground));margin-left:6px}
+
+  /* ---- grammar rail ---- */
+  .rail{background:hsl(var(--muted));border:1px solid hsl(var(--border));border-radius:var(--radius);padding:16px;position:sticky;top:14px}
+  .rail-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .rail-title{font-size:13px;font-weight:700}
+  .rail-count{font-size:11px;color:hsl(var(--muted-foreground));font-weight:600}
+  .rst{width:26px;height:26px;border-radius:7px;border:1px solid hsl(var(--border));background:hsl(var(--surface));color:hsl(var(--muted-foreground));display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+  .grp{margin-bottom:16px}
+  .grp h4{font-size:11px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:hsl(var(--muted-foreground));margin:0 0 8px}
+  .pills{display:flex;flex-wrap:wrap;gap:7px}
+  .pill{font-size:13px;font-weight:600;border-radius:9px;padding:6px 12px;cursor:pointer;border:1px solid hsl(var(--border));background:hsl(var(--surface));color:hsl(var(--foreground));display:inline-flex;align-items:center;gap:6px}
+  .pill.current{background:hsl(var(--primary)/.12);border-color:hsl(var(--primary)/.35);color:hsl(var(--primary))}
+  .pill.current .badge{font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:hsl(var(--primary));opacity:.85}
+  .pill.target-sel{border-color:hsl(var(--primary));box-shadow:0 0 0 2px hsl(var(--primary)/.9) inset;color:hsl(var(--primary));font-weight:700}
+  .pill.disabled{opacity:.4;cursor:not-allowed;text-decoration:none}
+  .pill .cdot{width:7px;height:7px;border-radius:50%;background:hsl(var(--primary))}
+  .rail-hint{font-size:12px;color:hsl(var(--muted-foreground));line-height:1.5;margin-top:4px}
+  .rail-hint b{color:hsl(var(--primary))}
+
+  .naitem{font-size:12px;color:hsl(var(--muted-foreground));background:hsl(var(--surface));border:1px dashed hsl(var(--border));border-radius:9px;padding:10px 12px;line-height:1.5}
+
+  /* ---- phones ---- */
+  .phones{display:flex;gap:26px;flex-wrap:wrap;margin-top:14px}
+  .phone{width:330px;background:hsl(var(--surface));border:1px solid hsl(var(--border));border-radius:26px;box-shadow:0 10px 30px rgba(20,30,60,.10);padding:16px 14px 20px}
+  .phone .notch{width:110px;height:5px;border-radius:3px;background:hsl(var(--border));margin:2px auto 14px}
+  .switch.full{display:flex;width:100%;margin:0 0 14px}
+  .switch.full button{flex:1;justify-content:center;padding:8px 0}
+  .chiprow{display:flex;gap:7px;overflow-x:auto;padding:6px 2px;margin:12px 0;position:relative}
+  .chiprow::-webkit-scrollbar{display:none}
+  .chiprow{scrollbar-width:none}
+  .gl{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:hsl(var(--muted-foreground));align-self:center;flex:none;margin-right:2px}
+  .pill.sm{font-size:12px;padding:5px 10px;flex:none}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="doc-head">
+    <h1>Schreibtraining Redesign · „Satzlabor" (Fokus)</h1>
+    <p>Interaktive Mockups zum Plan (<code>docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md</code>). Der Lernende schreibt einen Satz, die KI korrigiert ihn im selben Feld und erkennt die Grammatik. Ein Tipp auf eine andere Form formt den Satz um. Farben und Chrome entsprechen der App (Nachtblau, Himmel, grauer Filter-Rail).</p>
+    <div class="legend">
+      <span><i class="dot" style="background:hsl(var(--primary)/.14);border:1px solid hsl(var(--primary)/.4)"></i> Pille „aktuell" (Füllung = so IST der Satz)</span>
+      <span><i class="dot" style="background:hsl(var(--surface));border:1px solid hsl(var(--border))"></i> Ziel-Pille (tippen zum Umformen)</span>
+      <span><i class="dot" style="background:hsl(var(--surface));border:2px solid hsl(var(--primary))"></i> gewähltes Ziel (Ring = deine Aktion)</span>
+      <span><i class="dot" style="background:hsl(var(--success)/.16)"></i> Einfügung</span>
+      <span><i class="dot" style="background:hsl(var(--warning)/.18)"></i> Korrektur</span>
+    </div>
+  </div>
+
+  <!-- ================= DESKTOP: corrected + transformed ================= -->
+  <div class="caption">Desktop · <b>Fokus</b> · Satz korrigiert, Rail erkennt „Aktiv · Präsens", Ziel „Passiv" getippt</div>
+
+  <div>
+    <div class="eyebrow">Satzlabor</div>
+    <h1 class="h1">Schreiben</h1>
+    <div class="switch">
+      <button class="on">✎ Fokus</button>
+      <button>Kurz</button>
+      <button>Lang</button>
+    </div>
+
+    <div class="grid">
+      <div class="col">
+        <!-- input + correction -->
+        <div class="card sentbox">
+          <p class="sub">Dein Satz</p>
+          <div class="orig">Der Chef schreibt die E-Mail an Kunde.</div>
+          <div class="corr-lab">✓ Korrigiert</div>
+          <div class="corr">Der Chef schreibt die E-Mail an <mark class="fix">den Kunden</mark>.</div>
+          <div class="row-cta">
+            <button class="btn btn-ghost">Neuer Satz</button>
+            <button class="btn btn-grad">✦ Korrigieren</button>
+          </div>
+          <div class="ki"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Dein Satz wird zur Prüfung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung ist KI-generiert und kann Fehler enthalten. <a href="#">Mehr im Datenschutz</a>.</span>
+          </div>
+        </div>
+
+        <!-- transformed output -->
+        <div class="outbox">
+          <div class="outlab">
+            <span class="eb">Passiv</span>
+            <button class="speak" title="Vorlesen">🔊</button>
+          </div>
+          <div class="out-sent">Die E-Mail wird <mark class="mv">vom Chef</mark> an den Kunden <mark class="mv">geschrieben</mark>.</div>
+          <div class="note"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+            <span>Passiv: „werden" + Partizip II. Das Objekt wird zum Subjekt, der Chef wird zu „vom Chef". Klingt sachlich, typisch im Beruf. <span class="en">EN</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- grammar rail -->
+      <aside class="rail">
+        <div class="rail-head">
+          <div>
+            <div class="rail-title">Grammatik</div>
+            <div class="rail-count">2 erkannt</div>
+          </div>
+          <button class="rst" title="Zurücksetzen">↺</button>
+        </div>
+
+        <div class="grp">
+          <h4>Genus Verbi</h4>
+          <div class="pills">
+            <span class="pill current"><span class="cdot"></span>Aktiv <span class="badge">aktuell</span></span>
+            <span class="pill target-sel">Passiv</span>
+          </div>
+        </div>
+
+        <div class="grp">
+          <h4>Zeitform</h4>
+          <div class="pills">
+            <span class="pill current"><span class="cdot"></span>Präsens <span class="badge">aktuell</span></span>
+            <span class="pill">Präteritum</span>
+            <span class="pill">Perfekt</span>
+          </div>
+        </div>
+
+        <div class="rail-hint"><b>Blau = jetzt.</b> Tippe eine andere Form, um den Satz umzuformen.</div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ================= DESKTOP: tense transform + not-possible ================= -->
+  <div class="caption">Desktop · <b>Fokus</b> · Zeitform „Perfekt" gewählt · und ein Beispiel, wenn eine Umformung nicht geht</div>
+
+  <div class="grid">
+    <div class="col">
+      <div class="card sentbox">
+        <p class="sub">Dein Satz</p>
+        <div class="corr" style="margin-top:2px">Ich rufe den Kunden an.</div>
+        <div class="corr-lab" style="margin-top:10px">✓ Alles korrekt</div>
+        <div class="rail-hint" style="margin-top:0">Wähle rechts eine Umformung.</div>
+      </div>
+      <div class="outbox">
+        <div class="outlab"><span class="eb">Perfekt</span><button class="speak">🔊</button></div>
+        <div class="out-sent">Ich <mark class="mv">habe</mark> den Kunden <mark class="mv">angerufen</mark>.</div>
+        <div class="note"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Perfekt: „haben" + Partizip. Das trennbare „an" hängt sich wieder an: an-ge-rufen. Perfekt nutzt man beim Sprechen. <span class="en">EN</span></span>
+        </div>
+      </div>
+    </div>
+    <aside class="rail">
+      <div class="rail-head"><div><div class="rail-title">Grammatik</div><div class="rail-count">2 erkannt</div></div><button class="rst">↺</button></div>
+      <div class="grp"><h4>Genus Verbi</h4><div class="pills">
+        <span class="pill current"><span class="cdot"></span>Aktiv <span class="badge">aktuell</span></span>
+        <span class="pill disabled" title="Kein Passiv möglich">Passiv</span>
+      </div></div>
+      <div class="grp"><h4>Zeitform</h4><div class="pills">
+        <span class="pill current"><span class="cdot"></span>Präsens <span class="badge">aktuell</span></span>
+        <span class="pill">Präteritum</span>
+        <span class="pill target-sel">Perfekt</span>
+      </div></div>
+      <div class="naitem">„Passiv" ist ausgegraut: dieser Satz hat zwar ein Objekt, aber probier auch mal einen Satz ohne Objekt („Er schläft") und sieh, warum es dann nicht geht.</div>
+    </aside>
+  </div>
+
+  <!-- ================= MOBILE ================= -->
+  <div class="caption">Mobil · <b>Fokus</b> (Chip-Reihe statt Rail) &nbsp;·&nbsp; und <b>Kurz</b> (geführte Aufgabe, keine Rail)</div>
+  <div class="phones">
+
+    <!-- mobile fokus -->
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="eyebrow">Satzlabor</div>
+      <div class="h1" style="font-size:20px">Schreiben</div>
+      <div class="switch full"><button class="on">✎ Fokus</button><button>Kurz</button><button>Lang</button></div>
+
+      <div class="card sentbox" style="padding:14px">
+        <p class="sub">Dein Satz</p>
+        <div class="orig" style="font-size:14px">Der Chef schreibt die E-Mail an Kunde.</div>
+        <div class="corr-lab" style="margin:10px 0 4px">✓ Korrigiert</div>
+        <div class="corr" style="font-size:15px">…an <mark class="fix">den Kunden</mark>.</div>
+      </div>
+      <button class="btn btn-grad" style="width:100%;justify-content:center;margin-top:12px">✦ Korrigieren</button>
+
+      <div class="chiprow">
+        <span class="gl">Genus</span>
+        <span class="pill sm current"><span class="cdot"></span>Aktiv</span>
+        <span class="pill sm target-sel">Passiv</span>
+        <span class="gl" style="margin-left:8px">Zeit</span>
+        <span class="pill sm current"><span class="cdot"></span>Präs</span>
+        <span class="pill sm">Prät</span>
+        <span class="pill sm">Perf</span>
+      </div>
+
+      <div class="outbox" style="padding:14px">
+        <div class="outlab"><span class="eb">Passiv</span><button class="speak">🔊</button></div>
+        <div class="out-sent" style="font-size:15px">Die E-Mail wird <mark class="mv">vom Chef</mark> geschrieben.</div>
+        <div class="note" style="font-size:12px"><span>ℹ Passiv: „werden" + Partizip II.</span></div>
+      </div>
+    </div>
+
+    <!-- mobile kurz -->
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="eyebrow">KI-Schreibcoach</div>
+      <div class="h1" style="font-size:20px">Schreiben</div>
+      <div class="switch full"><button>Fokus</button><button class="on">Kurz</button><button>Lang</button></div>
+
+      <div class="card" style="padding:14px;margin-bottom:12px">
+        <p class="sub" style="display:flex;gap:6px;align-items:center">◎ Aufgabe · Beschwerde</p>
+        <div style="font-size:13px;line-height:1.55;color:hsl(var(--foreground))">Schreibe eine kurze Beschwerde an einen Onlineshop: Ein Artikel kam beschädigt an. Bitte um Umtausch.</div>
+      </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:13px;color:hsl(var(--muted-foreground));line-height:1.6">Sehr geehrte Damen und Herren, leider ist mein Paket beschädigt angekommen …</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+          <span style="font-size:11px;color:hsl(var(--success))">52 Wörter · Ziel 40–60</span>
+          <button class="btn btn-grad" style="padding:8px 14px;font-size:13px">✦ Auswerten</button>
+        </div>
+      </div>
+      <div class="card" style="padding:14px;margin-top:12px;border-color:hsl(var(--primary)/.3)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-weight:700;font-size:13px;display:flex;gap:6px;align-items:center">💡 Dein wichtigster Tipp</span>
+          <span style="font-size:11px;font-weight:600;color:hsl(var(--primary));background:hsl(var(--primary)/.1);border-radius:7px;padding:3px 8px">Kasus</span>
+        </div>
+        <div style="font-size:13px;line-height:1.55;margin-top:8px">Achte auf den Dativ nach „mit". Sonst liest sich dein Text schon sehr sicher. Weiter so!</div>
+        <div style="font-size:12px;color:hsl(var(--primary));font-weight:600;margin-top:10px">▸ Korrigierte Fassung anzeigen</div>
+      </div>
+    </div>
+
+  </div>
+
+  <p style="margin-top:44px;font-size:12px;color:hsl(var(--muted-foreground))">Mockup, kein finales Design. Zweck: Layout, Zustände und die Doppelrolle der Grammatik-Pillen (aktuell vs. Ziel) sichtbar machen. MVP-Achsen: Aktiv/Passiv × Präsens/Perfekt/Präteritum.</p>
+</div>
+</body>
+</html>
