@@ -191,6 +191,23 @@
   .links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
   .links a{display:block;text-align:center;font-size:11.5px;font-weight:700;color:var(--fg-soft);background:var(--muted-soft);border:1px solid var(--border);border-radius:9px;padding:8px;text-decoration:none}
 
+  /* ===== Screen 4: Steuerung ===== */
+  .cfg-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--muted-soft)}
+  .cfg-row:last-child{border-bottom:0}
+  .cfg-row .lbl{font-size:12.5px;font-weight:600;min-width:96px;color:var(--fg-soft)}
+  .cfg-row .hint{font-size:11px;color:var(--fg-faint);margin-top:2px}
+  .txt-input{flex:1;font:inherit;font-size:12.5px;font-weight:600;color:var(--fg);background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px 11px;min-width:0}
+  .switch{flex:none;width:36px;height:21px;border-radius:99px;background:var(--muted);position:relative;transition:.15s}
+  .switch::after{content:"";position:absolute;top:2.5px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px hsl(230 25% 45%/.3)}
+  .switch.on{background:var(--success)}
+  .switch.on::after{left:auto;right:3px}
+  .cfg-note{font-size:11.5px;color:var(--fg-faint);line-height:1.55;background:var(--muted-soft);border:1px solid var(--border);border-radius:9px;padding:8px 11px;margin-top:12px}
+  .lang-pair{display:grid;grid-template-columns:26px 1fr;gap:8px;align-items:center;margin-top:6px}
+  .lang-pair b{font-size:10px;font-weight:800;color:var(--fg-faint);letter-spacing:.08em}
+  .demo-card{display:flex;align-items:flex-start;gap:14px;background:linear-gradient(135deg,hsl(226 83% 97%),hsl(197 93% 95%));border:1px solid hsl(221 60% 88%);border-radius:12px;padding:14px 16px}
+  .demo-card .t{font-size:13px;font-weight:800}
+  .demo-card .d{font-size:12px;color:var(--fg-soft);line-height:1.55;margin-top:3px}
+
   .note{max-width:760px;margin:40px auto 0;font-size:12.5px;line-height:1.7;color:var(--fg-faint);text-align:center}
   @media (max-width:900px){
     .shell{grid-template-columns:1fr}
@@ -209,10 +226,11 @@
   <header class="intro">
     <div class="eyebrow">Vorschau · Session 143</div>
     <h1>Genauly Kontrollzentrum</h1>
-    <p>Drei Mockup-Screens für das Admin Control Center: die Übersicht (Cockpit), der Prüfmodus
-    (Tastatur-Review für den Inhalte-Engpass) und die Feedback-Inbox mit Systemzustand.
+    <p>Vier Mockup-Screens für das Admin Control Center: die Übersicht (Cockpit), der Prüfmodus
+    (Tastatur-Review für den Inhalte-Engpass), die Feedback-Inbox mit Systemzustand und die
+    Steuerung (Menü-Namen, Seiten-Sichtbarkeit, Funktions-Schalter, live ohne Deployment).
     Alle Zahlen sind Beispielwerte. Konzept: <b>docs/plans/ADMIN_CONTROL_CENTER_PLAN.md</b></p>
-    <div class="meta">Route-Vorschlag: /admin · nur für Gründer-Konten sichtbar (isFounder + RLS/RPC) · Lazy Chunk</div>
+    <div class="meta">Route: /admin (beschlossen) · nur für Gründer-Konten (isFounder + RLS/RPC) · Lazy Chunk · Oberfläche zweisprachig DE/EN</div>
   </header>
 
   <!-- ============ SCREEN 1 ============ -->
@@ -232,6 +250,7 @@
         <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 13V7m4 6V3m4 10V9m4 4V5" stroke-linecap="round"/></svg>Inhalte</div>
         <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="5" r="2.6"/><path d="M2.5 13.5c.8-2.6 2.9-4 5.5-4s4.7 1.4 5.5 4" stroke-linecap="round"/></svg>Nutzer</div>
         <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="2.2"/><path d="M8 1.5v2M8 12.5v2M1.5 8h2M12.5 8h2M3.4 3.4l1.4 1.4M11.2 11.2l1.4 1.4M12.6 3.4l-1.4 1.4M4.8 11.2l-1.4 1.4" stroke-linecap="round"/></svg>System</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2 5h8M13 5h1M2 11h1M6 11h8"/><circle cx="11" cy="5" r="1.8"/><circle cx="4" cy="11" r="1.8"/></svg>Steuerung</div>
         <div class="nav-item"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M3 14V2l5 2.5L13 2v12"/><path d="M3 14h10" stroke-linecap="round"/></svg>Launch <span class="pill">3</span></div>
         <div class="foot">Angemeldet als Gründer.<br/>Alle Nutzerzahlen sind Aggregate, keine Einzelprofile.</div>
       </aside>
@@ -451,6 +470,60 @@
             </div>
             <div class="links">
               <a href="#">Supabase ↗</a><a href="#">GitHub Actions ↗</a><a href="#">Resend ↗</a><a href="#">Pages-Deploy ↗</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCREEN 4 ============ -->
+  <div class="screen-label">
+    <span class="num">04</span>
+    <h2>Steuerung · die App einstellen, ohne Code</h2>
+    <p>Menü-Namen, Seiten-Sichtbarkeit und Funktions-Schalter, sofort live. Inhalte bleiben bei Claude.</p>
+  </div>
+  <section class="frame">
+    <div class="frame-bar"><div class="dots"><i></i><i></i><i></i></div><div class="urlbar">genauly.de/admin/steuerung</div></div>
+    <div class="main" style="min-height:540px">
+      <div class="topline">
+        <div><h3>Steuerung</h3><div class="sub">Änderungen wirken sofort in der Live-App, kein Deployment nötig · Sprache: DE / EN</div></div>
+        <div class="founder-chip"><span class="av">T</span> Gründer-Konto</div>
+      </div>
+      <div class="fb-grid">
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <h4>Navigation <span class="tag">Name + Sichtbarkeit</span></h4>
+            <div class="cfg-row"><span class="lbl">Tab 1</span><input class="txt-input" value="Praktisch" readonly /><span class="switch on"></span></div>
+            <div class="cfg-row"><span class="lbl">Tab 2</span><input class="txt-input" value="Bibliothek" readonly /><span class="switch on"></span></div>
+            <div class="cfg-row"><span class="lbl">Tab 3</span><input class="txt-input" value="Anwenden" readonly /><span class="switch"></span></div>
+            <div class="cfg-row"><span class="lbl">Tab 4</span><input class="txt-input" value="Fortschritt" readonly /><span class="switch on"></span></div>
+            <div class="cfg-note">Ausblenden entfernt nur den Menüpunkt. Die Seite selbst bleibt erreichbar, damit Direktlinks und das Spiel weiter funktionieren. Start und Einstellungen sind fest.</div>
+          </div>
+          <div class="card">
+            <h4>Texte <span class="tag">Landing · DE/EN-Paar</span></h4>
+            <div class="cfg-row" style="display:block">
+              <span class="lbl">Hero-Zeile</span>
+              <div class="lang-pair"><b>DE</b><input class="txt-input" value="Deutsch für das echte Leben" readonly /></div>
+              <div class="lang-pair"><b>EN</b><input class="txt-input" value="German for real life" readonly /></div>
+              <div class="hint">Wird bei Inhalts-Verweisen gewarnt: statische Hilfe-Seiten aktualisieren sich erst beim nächsten Build.</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:12px">
+            <h4>Funktions-Schalter</h4>
+            <div class="cfg-row"><div style="flex:1"><div style="font-size:12.5px;font-weight:600">Feedback-Button</div><div class="hint">außer in /session und /welt</div></div><span class="switch on"></span></div>
+            <div class="cfg-row"><div style="flex:1"><div style="font-size:12.5px;font-weight:600">Beta-Chip auf Neuland</div></div><span class="switch on"></span></div>
+            <div class="cfg-row"><div style="flex:1"><div style="font-size:12.5px;font-weight:600">"Verbunden"-Panel (Wörter)</div><div class="hint">geparkt seit s134</div></div><span class="switch"></span></div>
+            <div class="cfg-row"><div style="flex:1"><div style="font-size:12.5px;font-weight:600">Karteikarten/Quiz-Tabs im Trainer</div><div class="hint">geparkt seit s49</div></div><span class="switch"></span></div>
+            <div class="cfg-row"><div style="flex:1"><div style="font-size:12.5px;font-weight:600">Impressum-Seite + Links</div><div class="hint">öffnet eine Checkliste vor dem Einschalten</div></div><span class="switch"></span></div>
+          </div>
+          <div class="demo-card">
+            <span class="switch" style="margin-top:3px"></span>
+            <div>
+              <div class="t">Demo-Modus</div>
+              <div class="d">Ein Schalter für Präsentationen: blendet unfertige Bereiche aus und unterdrückt den Feedback-Button. Danach wieder ausschalten, alles kommt zurück.</div>
             </div>
           </div>
         </div>

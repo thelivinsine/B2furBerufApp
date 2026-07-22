@@ -1,8 +1,10 @@
 # Admin Control Center ("Kontrollzentrum") · Scoping Report & Plan
 
-_Session 143 (2026-07-21). Produced by a four-expert agent panel (product strategy, infrastructure
-audit, content operations, analytics/ops) plus synthesis. Status: **proposal, not yet built.**
-Visual direction: `preview/admin-control-center-mockups.html` (3 mockup screens)._
+_Session 143 (2026-07-21, updated 2026-07-22). Produced by a four-expert agent panel (product
+strategy, infrastructure audit, content operations, analytics/ops) plus synthesis, then revised
+after the founder resolved the open decisions (§10) and requested a remote-config module (§4 H,
+justified by a full prompt-log mining pass). Status: **approved scope, not yet built.**
+Visual direction: `preview/admin-control-center-mockups.html` (4 mockup screens)._
 
 ---
 
@@ -19,7 +21,7 @@ git-compiled content model, one non-technical operator, and three real operation
    health, the $5/month AI cap, abuse signals).
 
 The recommendation is one lazy `/admin` route inside the existing SPA, gated by the proven
-`isFounder` + founder-email RLS/RPC pattern, composed of seven modules. The flagship is the
+`isFounder` + founder-email RLS/RPC pattern, composed of eight modules. The flagship is the
 **Review Cockpit (Prüfmodus)**: a keyboard-driven, priority-scored review flow whose decisions are
 applied back to the repo by a new `pnpm apply:reviews` script. Everything reads either the bundle
 (content banks, generated verification/frequency maps, report JSON sidecars), founder-gated
@@ -107,8 +109,10 @@ stamped, CI-gated `verified` flip.
 
 ### B · Feedback-Inbox
 Rows from the `feedback` table via founder-gated RPC: message, page, timestamp, user (if signed in),
-`emailed` flag; status triage (neu / erledigt / verworfen) + free-text note + optional PR link.
-Requires migration work (status columns + RPC); the table already has the right indexes.
+`emailed` flag; triage fields per founder decision (2026-07-22): **status** (neu / erledigt /
+verworfen), **priority** (hoch / normal / niedrig), **free-text note**, and **link** (PR # or URL
+of the change that addressed it). Requires migration work (status/priority/note/link columns +
+RPC); the table already has the right indexes.
 
 ### C · Versand & Systemzustand ("System")
 - **C1 "Ist meine Änderung live?":** deployed build id (stamped via Vite `define`) vs latest `main`
@@ -151,7 +155,8 @@ personal data). Cohorts/funnels are explicitly deferred until sustained triple-d
 ### G · Launch & Compliance
 - **G1 Launch checklist:** the literal open list (Impressum = legally blocking, lawyer pass, Google
   OAuth review with the "do NOT re-click 'I have fixed the issues'" memo, Turnstile, Resend SMTP,
-  consent-version currency), checkable, persisted in Supabase or localStorage.
+  consent-version currency), checkable, **persisted in Supabase** (founder decision 2026-07-22, so
+  ticks follow across devices).
 - **G2 Consent-drift check:** runtime assert `CONSENT_VERSION` == legal `LAST_UPDATED` lockstep.
 - **G3 Auditor export:** one button producing the backlog #34 package (register CSV + tier
   distribution + report links + sampling guide). Converts the provenance discipline into a B2B
@@ -160,6 +165,58 @@ personal data). Cohorts/funnels are explicitly deferred until sustained triple-d
   pg_cron retention job is actually scheduled.
 
 ---
+
+### H · Steuerung (remote config) · added 2026-07-22, founder-requested
+The founder asked for self-service control over app presentation: "toggling names of the menu
+items, hiding the pages if needed", with content still flowing only through Claude sessions. A
+mining pass over the FULL prompt log (~440 entries, s26-s143) found 25+ prompts that were exactly
+this shape, so the module is justified by real usage history, not speculation.
+
+**Mechanism:** one Supabase `app_config` table (single jsonb row or key/value rows). RLS: everyone
+may READ (the app itself consumes it), only founder emails may WRITE (the 0004/0007 pattern). The
+app fetches it at runtime with a short cache and falls back to the compiled defaults when offline
+or unset. Runtime fetch is deliberate: config baked into the bundle would inherit the recurring
+PWA stale-cache problem and defeat the purpose. Admin UI: a switch/text panel with live preview
+and a "Zurücksetzen auf Standard" per entry.
+
+**Switch catalog (evidence = founder prompts it would have covered):**
+1. **Nav label override per route** (Praktisch/Bibliothek/Fortschritt...). Evidence: 4-5 (the s105
+   rename, the s141 revert, s107 "Üben"→"Lernen", s47 relabels). Feeds `nav-items`, BottomTabBar,
+   switcher aria-labels from ONE source (the s112 stale-"(Heute)"-strings sweep showed why).
+2. **Nav visibility per middle tab** (show/hide zones like Anwenden). Evidence: 2 (s105 "hide
+   Anwendung for the demo tomorrow", the s49 /quiz retirement). Writes through the existing
+   pinned-tabs semantics.
+3. **Impressum toggle** (restore route + footer/Settings/legal links together). Gated behind a
+   confirmation checklist (real address filled, legal pages consistent), not a bare switch.
+4. **Feature-flag registry** replacing ad-hoc code constants: `practiceTabs` (SHOW_PRACTICE_TABS),
+   `relatedPanel` (SHOW_RELATED, s134 "keep it hidden"), `flipHint`, plus future parks. Evidence: 3
+   shipped flag-shaped asks, each phrased "keep it in the code but hide it".
+5. **Feedback widget config:** on/off, per-route suppression, label. Evidence: 4 rounds of tweaks
+   (s105 create + skip-pages, mobile rework, s117 relabel).
+6. **Beta chip toggle** (Neuland suffix show/hide; text/position stay fixed, they are
+   founder-locked pixel work). Evidence: 2.
+7. **Header element switches:** streak pill, XP sub-line, mobile search icon. Evidence: 3 prompts
+   covering ~6 elements (s86, s105).
+8. **Dashboard start tab default/order** (Üben vs Spielen first). Evidence: 2 (s85, s107).
+9. **Hub optional-element checklist** (e.g. tiles/shelves like the removed Neuland card,
+   Schlüssel-Dokumente shelf, CityStrip). Evidence: 4 removals.
+10. **Landing copy overrides** (hero eyebrow, steps headline, CTA labels; DE/EN pairs). Evidence:
+    3 same-session asks in s136; marketing copy churns most post-launch.
+11. **Chrome microcopy overrides** (exit-button label, empty-state eyebrow). Evidence: 2.
+12. **Demo-Modus preset:** ONE switch bundling the demo asks that recur before every presentation
+    (hide non-demo zones, suppress the feedback pill). Evidence: 3 separate demo crunches
+    (s94/s102, s105, s111).
+
+**Guardrails (from the mining pass, non-negotiable):**
+- Visibility toggles NEVER unmount routes (deep links + `/welt` must keep resolving; the /quiz
+  no-redirect intent stays honored). "Hidden" means nav/link visibility only.
+- The locked bottom-bar structure stays locked: relabel/show/hide middle tabs only; slot count,
+  fixed Home/Einstellungen, and edit-mode mechanics are out of config's reach.
+- Label overrides do not reach content banks or the prerendered /hilfe pages; the panel shows a
+  "referenced in content" warning when a renamed label appears in committed copy, and notes that
+  prerendered pages update on next build only.
+- Learning-behavior defaults (voiceVariety etc.) apply to NEW users only; changing existing users'
+  persisted settings stays a code decision with a migration.
 
 ## 5. The loop-closer: `pnpm apply:reviews` (P0, build first)
 
@@ -211,16 +268,21 @@ Supporting migration (0008): widen `provenance_reviews` from boolean to
 
 ## 8. Phasing
 
-**MVP (highest leverage, ~2 sessions):**
+**MVP (highest leverage, ~2-3 sessions):**
 1. `pnpm apply:reviews` + migration 0008 + decision-time hashes (the loop-closer).
 2. `/admin` route (RequireFounder, lazy) with: Review Cockpit (A1 funnel, A2 queue, A3 Prüfmodus,
-   A4 sync-gap + handoff prompt), Feedback-Inbox (B), System (C1 live-widget + C2 gates), Launch
-   checklist (G1), AI budget tile (D1 via `admin_overview`).
-3. JSON sidecars + staleness metadata for the report scripts (prerequisite for dashboards).
+   A4 sync-gap + handoff prompt), Feedback-Inbox (B, incl. priority + link fields), System (C1
+   live-widget + C2 gates), Launch checklist (G1, Supabase-persisted), AI budget tile (D1 via
+   `admin_overview`).
+3. Steuerung core (H): the `app_config` table + runtime fetch/fallback plumbing, plus the
+   highest-evidence switches: nav labels (H1), nav visibility (H2), feature-flag registry (H4),
+   feedback widget (H5), Beta chip (H6), dashboard start tab (H8).
+4. JSON sidecars + staleness metadata for the report scripts (prerequisite for dashboards).
 
 **v2 (pre-launch):** D2 abuse meters (pair with enabling Turnstile), F1-F3 content intelligence,
-G2 consent drift, G3 auditor export, A5 sampling protocol, feedback context/PR links, review
-streaks.
+G2 consent drift, G3 auditor export, A5 sampling protocol, review streaks; Steuerung wave 2:
+Impressum toggle (H3), header switches (H7), hub optional elements (H9), landing/microcopy
+overrides (H10/H11), Demo-Modus preset (H12).
 
 **Later (post-launch, gated on real users):** E audience tiles the week the link goes public;
 retention curves at sustained 3-digit WAU; native-reviewer lane (3rd email + RLS update + reviewer
@@ -241,12 +303,12 @@ privacy-policy sentence + CONSENT_VERSION bump).
    the UI.
 6. **Bundle discipline:** everything rides lazy admin chunks; zero eager imports of banks/reports.
 
-## 10. Open decisions for the founder
+## 10. Founder decisions (RESOLVED 2026-07-22)
 
-1. **Route naming/entry:** `/admin` as its own route (recommended) vs growing inside `/sources`.
-   Proposal: `/admin`, linked only from the AccountMenu for founder accounts.
-2. **MVP order:** panel consensus is loop-closer first, then Prüfmodus, then inbox. Confirm.
-3. **Feedback triage fields:** is status + note + optional PR link enough?
-4. **Launch checklist storage:** Supabase (syncs across devices) vs localStorage (zero backend).
-   Proposal: Supabase, it is 10 lines on an existing pattern.
-5. **German-only or bilingual admin UI?** Proposal: German-first like the app, no EN peek needed.
+1. **Route:** dedicated `/admin` page. Approved.
+2. **MVP order:** approved, WITH the addition of the Steuerung remote-config module (§4 H); the
+   founder explicitly wants self-service nav renames / page hiding etc., content stays
+   Claude-session-only. Steuerung core joins the MVP (phasing §8).
+3. **Feedback triage fields:** status + note + **link + priority** (all four).
+4. **Launch checklist storage:** Supabase (online database), synced across devices.
+5. **Language:** **bilingual DE/EN** admin UI (both, not German-only).

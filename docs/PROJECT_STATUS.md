@@ -1,11 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-21 (session 143). **Admin Control Center scoped (research + plan +
-mockups; docs/preview only, nothing built).** A four-agent expert panel (product strategy,
-infrastructure audit, content ops, analytics/ops) scoped a founder "Kontrollzentrum": the full
-report + recommendations live in `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md`, the visual direction in
-`preview/admin-control-center-mockups.html` (3 mockup screens). Flagship = the Prüfmodus review
-cockpit + the `pnpm apply:reviews` loop-closer for the content-review bottleneck. Product name:
+_Last updated: 2026-07-22 (session 143). **Admin Control Center scope APPROVED (docs/preview
+only, nothing built).** A four-agent expert panel scoped a founder "Kontrollzentrum"
+(`docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` + 4 mockup screens in
+`preview/admin-control-center-mockups.html`); the founder then resolved all five open decisions
+(dedicated `/admin`, MVP order confirmed, feedback triage = status+note+link+priority, checklist
+in Supabase, bilingual DE/EN) and requested an added **Steuerung remote-config module** (nav
+renames, page hiding, feature flags; justified by a full prompt-log mining pass, plan §4 H).
+Flagship stays the Prüfmodus review cockpit + the `pnpm apply:reviews` loop-closer. Product name:
 **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -88,9 +90,17 @@ only, zero app-code changes):
   client today); `ai_usage` + `feedback` have zero client policies (service-role only); the
   founder-email list is duplicated in 3 places that must stay in lockstep (`admin.ts`, RLS 0007,
   submit-feedback default); `/admin` must be a lazy chunk (400 kB budget).
-- **Open founder decisions** (plan §10): route naming (/admin proposed), MVP order confirmation,
-  feedback triage fields, checklist storage, German-only UI. Next step if approved: build the MVP
-  per plan §8.
+- **Founder decisions resolved (2026-07-22, plan §10):** dedicated `/admin` route · MVP order
+  confirmed · feedback triage fields = status + note + **link + priority** · launch checklist
+  persisted in **Supabase** · admin UI **bilingual DE/EN**. The founder additionally requested a
+  **Steuerung (remote-config) module**: a prompt-log mining pass over all ~440 entries (s26-s143)
+  found 25+ config-shaped asks (nav renames incl. the Theorie↔Bibliothek flip-flop, s105 "hide
+  Anwendung for the demo", three "keep it in code but hide it" flags, feedback-pill rounds, demo
+  crunches) and produced a 12-switch catalog + guardrails, now plan §4 H (mechanism: Supabase
+  `app_config`, world-readable/founder-writable, fetched at runtime to dodge the PWA cache;
+  visibility toggles never unmount routes; locked bar structure stays locked). Steuerung core
+  joins the MVP (plan §8). A 4th mockup screen (Steuerung) was added to the preview HTML. Next
+  step: build the MVP per plan §8 (loop-closer first).
 
 **Handoff after session 142 (2026-07-21). Wörter (words) quality-control, branch
 `claude/words-collocations-qc-0pycjq`, shipped to `main` (PR #624).** Founder screenshot of the
