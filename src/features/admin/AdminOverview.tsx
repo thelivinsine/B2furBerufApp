@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Copy, RefreshCw, ClipboardCheck, AlertTriangle } from "lucide-react";
+import { Check, Copy, RefreshCw, ClipboardCheck, AlertTriangle, MessageSquare } from "lucide-react";
 import { provenance } from "@/data/provenance";
 import { verification as verificationMap } from "@/data/verification";
 import type { VerificationTier } from "@/types";
@@ -182,14 +182,25 @@ export function AdminOverview() {
             )}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={reload}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-soft hover:text-foreground"
-        >
-          <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
-          {t("Aktualisieren", "Refresh")}
-        </button>
+        <div className="flex items-center gap-2">
+          {overview && overview.feedback.neu > 0 && (
+            <Link
+              to="/admin/feedback"
+              className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary shadow-soft hover:brightness-105"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+              {overview.feedback.neu} {t("neu", "new")}
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={reload}
+            className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-soft hover:text-foreground"
+          >
+            <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
+            {t("Aktualisieren", "Refresh")}
+          </button>
+        </div>
       </div>
 
       {/* A1 + D1 tiles */}
