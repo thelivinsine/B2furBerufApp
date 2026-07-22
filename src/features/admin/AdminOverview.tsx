@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, RefreshCw } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Check, Copy, RefreshCw, ClipboardCheck, AlertTriangle } from "lucide-react";
 import { provenance } from "@/data/provenance";
 import { verification as verificationMap } from "@/data/verification";
 import type { VerificationTier } from "@/types";
@@ -244,6 +245,20 @@ export function AdminOverview() {
             <span className="rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
               {t("alle Bänke", "all banks")}
             </span>
+            <div className="ml-auto flex items-center gap-2">
+              <Link
+                to="/admin/pruefen?defect=1"
+                className="flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-bold text-warning hover:brightness-105"
+              >
+                <AlertTriangle className="h-3 w-3" /> {t("Verdachtsfälle", "Flagged")}
+              </Link>
+              <Link
+                to="/admin/pruefen"
+                className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary hover:brightness-105"
+              >
+                <ClipboardCheck className="h-3 w-3" /> {t("Prüfen", "Review")}
+              </Link>
+            </div>
           </div>
           <TierBar funnel={funnel} lang={lang} />
 

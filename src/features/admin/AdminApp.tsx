@@ -3,6 +3,7 @@ import { AdminLangProvider } from "./adminI18n";
 import { AdminShell } from "./AdminShell";
 import { AdminOverview } from "./AdminOverview";
 import { AdminPlaceholder } from "./AdminPlaceholder";
+import { Pruefmodus } from "./Pruefmodus";
 
 /**
  * The admin control center, mounted at `/admin/*` as a single lazy chunk (every
@@ -20,7 +21,7 @@ export function AdminApp() {
       <Routes>
         <Route element={<AdminShell />}>
           <Route index element={<AdminOverview />} />
-          <Route path="pruefen" element={<AdminPlaceholder titleDe="Prüfen" titleEn="Review" />} />
+          <Route path="pruefen" element={<Pruefmodus />} />
           <Route path="feedback" element={<AdminPlaceholder titleDe="Feedback" titleEn="Feedback" />} />
           <Route path="inhalte" element={<AdminPlaceholder titleDe="Inhalte" titleEn="Content" />} />
           <Route path="nutzer" element={<AdminPlaceholder titleDe="Nutzer" titleEn="Audience" />} />
