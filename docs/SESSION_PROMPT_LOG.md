@@ -1052,3 +1052,28 @@ _Schreibtraining redesign (backlog #6): five-expert design panel → plan + mock
   `/writing → /anwenden` `ROUTE_SUCCESSOR` remap. Sidebar (desktop) picks it up automatically (maps
   `navItems`). Updated the CLAUDE.md nav bullets. Gates: typecheck · lint 0 errors · test:unit 257/257 ·
   build · check:bundle 112.1 kB, all green. Shipped via squash-merge to `main`.
+
+## Session 148 — 2026-07-22 · branch `claude/pwa-auth-uninstall-bug-hrafrw`
+_Auth bug fix: fresh-device Google OAuth login no longer bounces existing accounts to the landing page._
+
+- **Prompt 1 (verbatim):** `there's an authentication bug when I uninstalled the pwa from my computer and trying to login to an admin account. Right after logging in with google it redirects me to landing page and throws me out of the app! Check what's the issue and fix asap`
+- **Response 1:** Traced the flow (`useAuthStore`, `router.tsx` `RequireOnboarding`/`RequireFounder`,
+  `cloudSync.ts`, `useSettingsStore`, onboarding + AuthDialog). Root cause: uninstalling the PWA wipes
+  `localStorage`, so the local `onboarded` flag is `false` on the fresh install; Google OAuth returns
+  to `/`, where `RequireOnboarding` read the local flag synchronously and redirected to `/welcome`
+  before the async `startCloudSync` pulled the account's real `onboarded: true` from its Supabase
+  profile. Any existing account on a fresh device was bounced (not admin-specific; `RequireFounder`
+  was never in the redirect path and reads `user.email`, available immediately). Fix (3 files, +37
+  lines): new `syncHydrated` flag on `useAuthStore`, set `false` at each `startCloudSync` start and in
+  `stopCloudSync`, `true` in a `finally` after the first pull's profile merge; `RequireOnboarding` now
+  waits for auth resolution (`status === "loading"` → null) and, for a signed-in/guest user, for the
+  first cloud pull (`!syncHydrated` → null) before redirecting to `/welcome`. Gates: typecheck · lint
+  0 errors · test:unit 257/257 · build · check:bundle 112.3 kB (main unchanged). Opened PR #644,
+  squash-merged into `main` (`2fb0805`), ran the post-merge branch realignment (reset dev branch to
+  `origin/main`, force-with-lease).
+- **Prompt 2 (verbatim):** `yes` (assent to the offer to update `docs/PROJECT_STATUS.md` + the session prompt log)
+- **Response 2:** Updated `docs/PROJECT_STATUS.md` (header + s148 handoff at the top of "Resume here",
+  s146 rotated into the W30 archive) and appended this log entry.
+- **Artifacts (session 148):** `src/store/useAuthStore.ts` · `src/lib/cloudSync.ts` · `src/router.tsx` ·
+  PR #644 (`2fb0805`) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
