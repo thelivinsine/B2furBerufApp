@@ -4,6 +4,8 @@ import type { RouteObject } from "react-router-dom";
 import { AppShell } from "@/components/layout/AppShell";
 import { RouteError } from "@/components/layout/RouteError";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useAuthStore } from "@/store/useAuthStore";
+import { isFounder } from "@/lib/admin";
 import { LandingPage } from "@/features/landing/LandingPage";
 // Impressum is built but TEMPORARILY HIDDEN until the founder fills the real
 // name/address placeholders (deferred to the lawyer/launch pass). To re-enable:
@@ -96,10 +98,29 @@ const HelpHub = lazyWithReload(() =>
 const HelpArticle = lazyWithReload(() =>
   import("@/features/help/HelpArticle").then((m) => ({ default: m.HelpArticle })),
 );
+// Lazy: the admin control center (founder-only). A single chunk for the whole
+// /admin/* subtree — it statically imports the provenance register + generated
+// verification map for the trust funnel, so it must never touch eager code.
+const AdminApp = lazyWithReload(() =>
+  import("@/features/admin/AdminApp").then((m) => ({ default: m.AdminApp })),
+);
 
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
   if (!onboarded) return <Navigate to="/welcome" replace />;
+  return <>{children}</>;
+}
+
+// Founder gate for /admin. Mirrors RequireOnboarding: while auth is still
+// resolving we render nothing (avoids a redirect flash for a founder whose
+// session has not loaded yet); a resolved non-founder or logged-out visitor is
+// sent home. This is the CLIENT gate only — every privileged read is enforced
+// server-side by the founder-email RLS/RPC, so forcing the UI reveals nothing.
+function RequireFounder({ children }: { children: React.ReactNode }) {
+  const user = useAuthStore((s) => s.user);
+  const status = useAuthStore((s) => s.status);
+  if (status === "loading") return null;
+  if (!isFounder(user)) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
@@ -172,6 +193,20 @@ export const router = createBrowserRouter([
     element: (
       <Suspense fallback={null}>
         <Sources />
+      </Suspense>
+    ),
+  },
+  // Admin control center (founder-only). Standalone like /sources: it renders
+  // its own full-screen shell, outside the AppShell chrome. The /admin/* splat
+  // lets the lazy AdminApp own its descendant routing in a single chunk.
+  {
+    path: "/admin/*",
+    errorElement: routeError,
+    element: (
+      <Suspense fallback={null}>
+        <RequireFounder>
+          <AdminApp />
+        </RequireFounder>
       </Suspense>
     ),
   },

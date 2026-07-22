@@ -1,16 +1,17 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 144). **Admin Control Center chunks 1 + 2 SHIPPED.** Chunk 1
-(backend foundation): migration 0008 (provenance_reviews decisions + safety hash, feedback triage,
-`app_config`, `launch_checklist`, founder-gated aggregate RPCs) + `src/lib/adminApi.ts`; the
-founder ran the migration and verified the gate + a live `admin_overview()` JSON. Chunk 2 (the
-loop-closer): `pnpm apply:reviews` (decision source → ID_RENAMES → decision-time-hash compare →
-provenance codemod → stamp + lint in ONE commit), the /sources workbench stores
-`decision`/`content_hash`/`reviewer_email` at click time. **Keyless handoff (s144 addendum, founder
-security review):** the founder exports decisions from the workbench ("Entscheidungen" button →
-JSON download) and a session runs `apply:reviews --from <file>`, so NO service-role key ever lives
-in the Claude environment (its config is plaintext, warns against secrets). **No founder key setup
-needed.** Next step = chunk 3 (`/admin` shell + Übersicht) on Opus per
+_Last updated: 2026-07-22 (session 145). **Admin Control Center chunk 3 SHIPPED** (`/admin` shell +
+Übersicht cockpit). The founder-only `/admin` route (lazy `features/admin/` chunk, `RequireFounder`
+wrapper mirroring `RequireOnboarding`, standalone full-screen shell like `/sources`) with the
+eight-item bilingual DE/EN sidebar and the Übersicht screen: A1 verification-funnel tiles + trust
+ladder (bundled `provenance.ts` + `verification.ts`, zero backend), A4 sync-gap counter +
+"Übergabe-Prompt kopieren" (approved-but-not-yet-verified ids, keyless-safe), D1 AI-budget tile
+(`admin_overview`), C1 "Ist meine Änderung live?" widget (build stamp via Vite `define` vs latest
+`main` from the public GitHub API + PWA-cache hint). AccountMenu shows a "Kontrollzentrum" entry for
+founder accounts. Unbuilt screens (Prüfen/Feedback/Inhalte/Nutzer/System/Steuerung/Launch) resolve
+to a placeholder so deep links never 404; chunks 4-7 swap them in. Main chunk unchanged (111.6 kB),
+admin rides an 18 kB lazy chunk. Prior: chunks 1+2 (backend foundation + `apply:reviews`
+loop-closer) shipped s144. Next = chunk 4 (Review Cockpit / Prüfmodus) on Opus per
 `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -67,6 +68,43 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 145 (2026-07-22). Admin Control Center chunk 3 (`/admin` shell + Übersicht
+cockpit), branch `claude/admin-control-center-chunk-3-7g5829`.** Chunk 3 of
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` on the recommended Opus tier: the founder's front
+door to the admin center, cross-cutting wiring against an already-approved design (mockup 1 in
+`preview/admin-control-center-mockups.html`). What shipped:
+- **Route + gate:** `RequireFounder` in `router.tsx` (mirrors `RequireOnboarding`; renders nothing
+  while auth `status === "loading"` to avoid a redirect flash, else `isFounder(user)` or `<Navigate
+  to="/">`). New standalone top-level route `/admin/*` (outside AppShell chrome, like `/sources`),
+  lazy `AdminApp` (one chunk owns the whole `/admin` subtree via descendant `<Routes>`). Client gate
+  is cosmetic; the real boundary stays the 0008 RLS/RPC.
+- **`src/features/admin/` (all new, lazy):** `AdminApp.tsx` (lang provider + descendant routes),
+  `AdminShell.tsx` (full-screen sidebar cockpit: 8-item DE/EN nav, founder chip, DE/EN toggle,
+  "back to app"; fetches `admin_overview` ONCE and shares it via Outlet context so screens don't
+  re-fetch; Feedback nav badge = `feedback.neu`), `AdminOverview.tsx` (the Übersicht), `adminI18n.tsx`
+  (a `t(de, en)` context + localStorage-persisted lang, no i18n framework), `adminFunnel.ts` (pure,
+  unit-tested), `liveWidget.ts` (C1), `AdminPlaceholder.tsx` (the not-yet-built screens
+  Prüfen/Feedback/Inhalte/Nutzer/System/Steuerung/Launch resolve to it so deep links never 404;
+  chunks 4-7 swap them in).
+- **Übersicht tiles (mockup 1):** **A1** verification-funnel — "Menschlich geprüft" (verified count,
+  25 today), "KI-Jury-Abdeckung" % (tier ≥ jury, the machine floor that costs nothing), and the
+  all-banks trust-ladder stacked bar, all computed synchronously from bundled `provenance.ts` +
+  `verification.ts` (zero backend). **A4** sync-gap — "Wartende Entscheidungen" count + a
+  "Übergabe-Prompt kopieren" button producing the ready-to-paste `pnpm apply:reviews` handoff with
+  the exact ids; pending = approved (`provenance_reviews.decision === "approve"`) minus already
+  `verified` in the bundle (keyless-safe, matches how apply:reviews reconciles). **D1** AI-budget
+  tile (`admin_overview` cost vs $5 + cache-hit rate). **C1** "Ist meine Änderung live?" — build
+  stamp (new Vite `define` `__BUILD_SHA__`/`__BUILD_TIME__`, read only in the admin chunk) vs latest
+  `main` from the public GitHub commits API, plain-language verdicts + the recurring PWA-cache hint +
+  a Supabase-reachable line. Honest metrics: no fabricated deltas; "+N diese Woche" shows only when
+  real (from `verified_date`).
+- **AccountMenu:** founder accounts get a "Kontrollzentrum" (`ShieldCheck`) entry to `/admin`.
+- **Gates:** `typecheck` ✓ · `lint` (0 errors; warnings are the pre-existing compiler-era debt) ·
+  `test:unit` **253/253** (new `tests/adminFunnel.test.ts` pins the funnel + sync-gap + handoff) ·
+  `build` ✓ · `check:bundle` **111.6 kB** (main chunk unchanged; admin rides an 18 kB lazy chunk).
+- **Next:** chunk 4, the Review Cockpit / Prüfmodus (Opus), needs the `build-review-queue.mjs`
+  scorer; deep-links from the Übersicht tiles land there.
 
 **Handoff after session 144 (2026-07-22). Admin Control Center chunks 1 + 2 (backend foundation +
 the review loop-closer), branch `claude/admin-control-center-chunk-1-eafquu` (three PRs to `main`:
@@ -163,51 +201,10 @@ the environment:
 - **Next:** chunk 3, the `/admin` shell + Übersicht cockpit (Opus recommended); chunks 1-2 outputs
   (sync-gap counter + handoff prompt) are its data feed.
 
-**Handoff after session 143 (2026-07-21). Admin Control Center scoping, branch
-`claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (PR #626, docs + preview only).** Founder
-asked for a full-blown comprehensive admin control center: an expert-agent panel to research and
-scope it, a detailed report with recommendations, and HTML previews. What shipped (research/design
-only, zero app-code changes):
-- **Four-agent expert panel** ran in parallel: product strategy + founder ops, infrastructure/
-  codebase audit, content operations, analytics/telemetry/ops. Findings synthesized into
-  **`docs/plans/ADMIN_CONTROL_CENTER_PLAN.md`**: a 7-module blueprint (A Review Cockpit "Prüfmodus"
-  as the flagship, B Feedback-Inbox, C Versand & Systemzustand incl. the "Ist meine Änderung live?"
-  widget, D Kosten & Missbrauch, E Nutzer-Aggregate, F Inhalts-Intelligenz incl. a report-staleness
-  panel, G Launch & Compliance), plus the **P0 loop-closer `pnpm apply:reviews`** (Supabase review
-  decisions → `provenance.ts` flip + `stamp:verified` in ONE commit, guarded by decision-time
-  content hashes), a migration-0008 sketch (widen `provenance_reviews` to
-  decision/content_hash/applied_at + founder-gated aggregate RPCs like `admin_overview()`), an
-  explicit do-NOT-build list (no live CMS, no roles, no analytics SDKs/cookie-banner risk, no
-  per-user data browsing), phasing (MVP ≈ 2 sessions, loop-closer first), and risks (hash-gate
-  race, jury vs human tier confusion, review fatigue, stale artifacts).
-- **`preview/admin-control-center-mockups.html`**: 3 mockup screens on the real brand tokens
-  (Übersicht cockpit, Prüfmodus review card with V/X/N/→ keyboard flow, Feedback-Inbox +
-  Systemzustand). Standalone file, open in a browser.
-- **Key audit facts for whoever builds it:** the only existing admin surface is the /sources
-  Daten-Werkbank; learner tables are owner-only RLS (cross-user reads are impossible from the
-  client today); `ai_usage` + `feedback` have zero client policies (service-role only); the
-  founder-email list is duplicated in 3 places that must stay in lockstep (`admin.ts`, RLS 0007,
-  submit-feedback default); `/admin` must be a lazy chunk (400 kB budget).
-- **Founder decisions resolved (2026-07-22, plan §10):** dedicated `/admin` route · MVP order
-  confirmed · feedback triage fields = status + note + **link + priority** · launch checklist
-  persisted in **Supabase** · admin UI **bilingual DE/EN**. The founder additionally requested a
-  **Steuerung (remote-config) module**: a prompt-log mining pass over all ~440 entries (s26-s143)
-  found 25+ config-shaped asks (nav renames incl. the Theorie↔Bibliothek flip-flop, s105 "hide
-  Anwendung for the demo", three "keep it in code but hide it" flags, feedback-pill rounds, demo
-  crunches) and produced a 12-switch catalog + guardrails, now plan §4 H (mechanism: Supabase
-  `app_config`, world-readable/founder-writable, fetched at runtime to dodge the PWA cache;
-  visibility toggles never unmount routes; locked bar structure stays locked). Steuerung core
-  joins the MVP (plan §8). A 4th mockup screen (Steuerung) was added to the preview HTML.
-- **Build plan authored (2026-07-22): `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`.** The
-  approved scope chunked into 12 numbered PR-sized chunks (+4 later items), each with a
-  plain-language executive summary, scope/verify lists, dependencies, effort, and a per-chunk
-  Claude-model recommendation (MVP mix: Fable ×2 for the security/integrity core = migration 0008
-  + apply:reviews; Opus ×3 for the cross-cutting builds = shell/Übersicht, Prüfmodus, Steuerung
-  core; Sonnet ×3 for feedback inbox, system/launch, report sidecars). Sequencing diagram + model
-  rationale included. **Next step: chunk 1 (backend foundation) on Fable.**
-
-_(Session 142's Wörter quality-control handoff (the `RETIRED_VOCAB_IDS`/`browsableVocabulary`
-retire-from-surface set + the vocab↔collocation overlap lint gate, PR #624), session 141's
+_(Session 143's Admin Control Center scoping handoff (the expert-panel report + build plan + 4
+mockup screens, PR #626), session 142's Wörter quality-control handoff (the
+`RETIRED_VOCAB_IDS`/`browsableVocabulary` retire-from-surface set + the vocab↔collocation overlap
+lint gate, PR #624), session 141's
 mobile-nav-item-labels handoff (labels under the active icon + the
 Theorie→Bibliothek revert, PR #622), session 140's light-theme recolor handoff (neutral grey chrome + the "I1" mint→sky gradient
 ground, 2 PRs + a 3-round preview picker), session 139's three-small-fixes handoff (icon-size

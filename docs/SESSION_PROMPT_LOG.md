@@ -918,3 +918,34 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `src/features/legal/AdminWorkbench.tsx` · `tests/reviewExport.test.ts` ·
   `tests/applyReviews.test.ts` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` ·
   `docs/PROJECT_STATUS.md` · this log
+
+## Session 145 — 2026-07-22 · branch `claude/admin-control-center-chunk-3-7g5829`
+
+- **Prompt 1 (verbatim):** `> start with chunk 3 of admin control center build plan`
+- **Response 1:** Built chunk 3 of `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` (the `/admin`
+  shell + Übersicht cockpit) per the approved mockup 1. Route + gate: `RequireFounder` wrapper in
+  `router.tsx` (mirrors `RequireOnboarding`; no-flash while auth loads, else `isFounder`/redirect)
+  and a new standalone lazy route `/admin/*` (outside AppShell, like `/sources`) → `AdminApp`, which
+  owns the whole `/admin` subtree in one lazy chunk via descendant `<Routes>`. New `src/features/admin/`:
+  `AdminApp.tsx`, `AdminShell.tsx` (8-item DE/EN sidebar, founder chip, DE/EN toggle, one shared
+  `admin_overview` fetch via Outlet context, Feedback nav badge), `AdminOverview.tsx` (the Übersicht:
+  A1 verification-funnel tiles + all-banks trust-ladder from bundled provenance+verification, A4
+  sync-gap counter + "Übergabe-Prompt kopieren" handoff via `adminFunnel.ts`, D1 AI-budget tile, C1
+  "Ist meine Änderung live?" widget via `liveWidget.ts`), `adminI18n.tsx` (`t(de,en)` context +
+  localStorage lang), `adminFunnel.ts` (pure, unit-tested), `liveWidget.ts`, `AdminPlaceholder.tsx`
+  (unbuilt screens resolve so deep links never 404). Added the `__BUILD_SHA__`/`__BUILD_TIME__` Vite
+  `define` (read only in the admin chunk) + `src/vite-env.d.ts` declarations. AccountMenu shows a
+  founder-only "Kontrollzentrum" entry. Honest metrics kept: no fabricated deltas; jury/human counts
+  are separate. Gates: typecheck · lint 0 errors · test:unit 253/253 (new `tests/adminFunnel.test.ts`)
+  · build · check:bundle 111.6 kB (main chunk unchanged, admin = 18 kB lazy chunk). Docs: status doc
+  (s145 handoff, s143 rotated to the W30 archive), CLAUDE.md admin bullet, build-plan status line,
+  this log. Shipped via PR into `main`.
+- **Artifacts (prompt 1):** `src/router.tsx` · `src/features/admin/AdminApp.tsx` ·
+  `src/features/admin/AdminShell.tsx` · `src/features/admin/AdminOverview.tsx` ·
+  `src/features/admin/adminI18n.tsx` · `src/features/admin/adminFunnel.ts` ·
+  `src/features/admin/liveWidget.ts` · `src/features/admin/AdminPlaceholder.tsx` ·
+  `src/features/auth/AccountMenu.tsx` · `vite.config.ts` · `src/vite-env.d.ts` ·
+  `tests/adminFunnel.test.ts` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
+  `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` ·
+  `CLAUDE.md` · this log

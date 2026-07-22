@@ -862,8 +862,20 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   the /sources workbench now stores `decision` + a decision-time `content_hash` +
   `reviewer_email` on every approve click (`computeDecisionHash` in `src/lib/provenanceReviews.ts`,
   banks loaded lazily via `src/lib/contentIndex.ts`, ~4 kB glue chunk over the shared bank chunks).
+  **Chunk 3 (s145): the `/admin` shell + Übersicht cockpit.** Founder-only lazy route `/admin/*`
+  (`RequireFounder` in `router.tsx` mirrors `RequireOnboarding`; standalone full-screen shell like
+  `/sources`, outside AppShell). The whole subtree is ONE lazy chunk (`src/features/admin/AdminApp.tsx`
+  owns descendant `<Routes>`): `AdminShell` (8-item bilingual DE/EN sidebar, founder chip, lang
+  toggle; fetches `admin_overview` once and shares it via Outlet context), `AdminOverview` (the
+  Übersicht: **A1** funnel tiles + all-banks trust-ladder from bundled `provenance.ts`+`verification.ts`,
+  **A4** sync-gap + "Übergabe-Prompt kopieren" via `adminFunnel.ts` `pendingApprovals`/`buildHandoffPrompt`,
+  **D1** AI-budget tile, **C1** live-deploy widget `liveWidget.ts` = `__BUILD_SHA__` Vite define vs
+  latest `main` GitHub API + PWA-cache hint), and `AdminPlaceholder` for the not-yet-built screens
+  (deep links resolve, never 404; chunks 4-7 swap them in). `t(de,en)` via `adminI18n.tsx` (no i18n
+  framework). Founder-account AccountMenu shows a "Kontrollzentrum" entry. `tests/adminFunnel.test.ts`
+  pins the pure funnel. The `__BUILD_SHA__`/`__BUILD_TIME__` defines are read ONLY in the admin chunk.
   Plans: `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` (scope) + `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`
-  (chunks; next: chunk 3, the `/admin` shell + Übersicht, recommended on Opus).
+  (chunks; next: chunk 4, the Review Cockpit / Prüfmodus, recommended on Opus).
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — the only other workflow in `.github/workflows/` is `validate.yml` (the content-lint + SRS test gate), which never deploys. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)

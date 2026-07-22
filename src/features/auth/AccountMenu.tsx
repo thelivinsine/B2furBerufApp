@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { LogOut, UserCircle2, Cloud, CloudOff, Settings as SettingsIcon, Sun, Moon, Monitor } from "lucide-react";
+import { LogOut, UserCircle2, Cloud, CloudOff, Settings as SettingsIcon, Sun, Moon, Monitor, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
+import { isFounder } from "@/lib/admin";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useSettingsStore, type ThemeMode } from "@/store/useSettingsStore";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ export function AccountMenu() {
 
   const signedIn = status === "signedIn";
   const synced = status === "signedIn" || status === "anonymous";
+  const founder = isFounder(user);
 
   const openAuth = (i: AuthIntent) => {
     setIntent(i);
@@ -155,6 +157,15 @@ export function AccountMenu() {
               Einstellungen
             </Button>
           </Link>
+
+          {founder && (
+            <Link to="/admin" onClick={() => setOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start px-2 text-primary hover:text-primary">
+                <ShieldCheck className="h-4 w-4" />
+                Kontrollzentrum
+              </Button>
+            </Link>
+          )}
 
           {synced && (
             <Button
