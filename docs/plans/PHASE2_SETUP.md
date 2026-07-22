@@ -372,35 +372,38 @@ aggregate numbers only (counts and day totals), never individual user data.
 Nothing is visible in the app yet after this step; the `/admin` page itself
 ships in a later chunk. This migration is the plumbing it stands on.
 
-## Review loop-closer (`pnpm apply:reviews`): founder setup step
+## Review loop-closer (`pnpm apply:reviews`): how it works, no setup needed
 
 Chunk 2 of the admin center makes your review clicks count: every "geprüft"
-tick in the /sources Daten-Werkbank now saves an **approve decision plus a
-fingerprint of the exact content you looked at**, and the new
-`pnpm apply:reviews` script (run by a Claude session, not by you) turns those
-decisions into committed `verified` flips, with the fingerprint check making
-sure the content did not change between your review and the commit.
+tick in the /sources Daten-Werkbank saves an **approve decision plus a
+fingerprint of the exact content you looked at**. A Claude session (not you)
+then turns those approvals into committed `verified` flips, with the
+fingerprint check making sure the content did not change between your review
+and the commit.
 
-Your one-time setup: give Claude sessions the **service-role key** so the
-script can read your decisions (the review table is locked to your accounts,
-so the normal public key cannot see it).
+**There is NO key to set up.** The handoff is a plain file, so no secret ever
+lives in the Claude environment (its config is plaintext and explicitly warns
+against secrets). The flow:
 
-1. In the Supabase dashboard open **Project Settings → API keys** and copy the
-   **service_role** key (the secret one, NOT the publishable key).
-2. In Claude Code on the web, open your **environment settings** for this
-   repository and add an environment variable:
-   - Name: `SUPABASE_SERVICE_ROLE_KEY`
-   - Value: the key you copied.
-3. That's it. From then on, telling a session "run apply:reviews" (or it
-   running as part of admin-center work) fetches your approvals, applies the
-   safe ones, and reports anything that needs a second look.
+1. **You:** in the /sources workbench, review items, then click the
+   **"Entscheidungen (N)"** button. Your browser downloads a small JSON file of
+   your decisions. It contains data only, no password or key, so it is safe to
+   hand over. (You do this in the browser because you are already securely
+   signed in there; the review table is locked to your account.)
+2. **Claude session:** you upload that file and say "apply my reviews". The
+   session runs `pnpm apply:reviews --from <file>`, which flips the approvals
+   whose content still matches, stamps and lints them in one commit, and merges.
+3. **Done.** The approved items are now `verified` in the app. Anything skipped
+   because the content changed since your review (or your reject / needs-fix
+   items) is listed in `docs/reports/review-defects.md` for a follow-up.
 
-> 🔐 **This key bypasses all row security.** It belongs ONLY in the Supabase
-> dashboard and in your private Claude environment settings. Never paste it
-> into chat, never commit it, and if it ever leaks, rotate it in the same
-> dashboard page. The app itself never uses it.
+You only export + hand off a file **when you want to commit a batch of
+approvals**, not for every review and not on a schedule. Reviewing itself just
+saves to the database as before.
 
-What the script prints back (in plain terms): how many approvals were applied,
-which ones were skipped because the content changed since you reviewed them
-(these reappear in the workbench for a fresh look), and a fix list built from
-your reject / needs-fix decisions (`docs/reports/review-defects.md`).
+> 🔐 **Do NOT put the Supabase service-role key in the Claude environment
+> variables.** That box is plaintext and visible to anyone using the
+> environment; it is the wrong place for a credential. The keyless file flow
+> above is the supported path and needs no key. (A direct-database
+> `pnpm apply:reviews` mode exists for a developer running it in a secure local
+> shell with the key, but you never need it.)

@@ -88,21 +88,29 @@ Do NOT use `npm`/`yarn` — there is no `package-lock.json`. Run `pnpm install` 
   **Run this right after flipping rows to `verified`** (and commit the sidecar with the flip);
   re-stamping is only legitimate after an actual re-review.
 - `pnpm apply:reviews` — the review LOOP-CLOSER (admin center chunk 2, s144): applies the founder's
-  Supabase review decisions back to the repo. Fetches `provenance_reviews` rows with a `decision`
-  and null `applied_at` (needs `SUPABASE_SERVICE_ROLE_KEY` in env; dev tooling ONLY, never SPA
-  code), maps ids through `ID_RENAMES`, recomputes each item's fingerprint and compares it with the
+  review decisions back to the repo. **Two input modes.** KEYLESS (the supported path): the founder
+  clicks "Entscheidungen" in the /sources workbench to download a decisions file
+  (`buildDecisionExport`/`downloadDecisions` in `src/lib/reviewExport.ts`), and a session runs
+  `pnpm apply:reviews --from <file>` (`parseDecisionFile` reads it; NO Supabase, NO service-role
+  key, so no secret ever lives in the Claude environment's plaintext config). DIRECT-DB (optional,
+  a secure local shell only): with `SUPABASE_SERVICE_ROLE_KEY` in env it fetches
+  `provenance_reviews` rows with a `decision` and null `applied_at` itself. Either way it maps ids
+  through `ID_RENAMES`, recomputes each item's fingerprint and compares it with the
   hash stored AT DECISION TIME (the workbench writes it via `src/lib/contentHash.ts` +
   `src/lib/contentIndex.ts`, kept byte-compatible with `scripts/content-hash.mjs` and pinned by
   `tests/contentHash.test.ts`), codemods matching approvals to `review_status: "verified"` (+
   `verified_by`/`verified_date`), then runs `stamp:verified` + `lint:content` so flip and stamp
   land in the SAME commit. Reject/needs_fix rows export to `docs/reports/review-defects.md`/`.json`
-  (the AI repair queue). `applied_at`/`applied_sha` write-back is a RECONCILE pass that only marks
-  rows whose verified flip is committed at a clean HEAD: run
-  `pnpm apply:reviews --mark-applied` after merging (any later full run also self-heals).
-  `--dry-run` classifies + prints, writes nothing. **Integrity rules (do not weaken): a null or
+  (the AI repair queue). In KEYLESS mode there is no DB write-back: applied state reconciles from
+  the deployed bundle (the item is `verified` in provenance.ts). In DIRECT-DB mode
+  `applied_at`/`applied_sha` write-back is a RECONCILE pass that only marks rows whose verified flip
+  is committed at a clean HEAD: run `pnpm apply:reviews --mark-applied` after merging (any later
+  full run also self-heals). `--dry-run` classifies + prints, writes nothing. **Integrity rules (do
+  not weaken): a null or
   mismatched decision hash is re-review, never a flip; already-verified repo rows are only ever
   marked applied; never re-stamp to silence a mismatch.** `tests/applyReviews.test.ts` pins the
-  classification + codemod.
+  classification + codemod + `parseDecisionFile`; `tests/reviewExport.test.ts` pins the
+  browser-export → script-parse round-trip.
 - `pnpm test:srs` — assert `engine/srs.ts` against FSRS golden vectors from py-fsrs (CI gate, s53).
   **Run it after any `engine/srs.ts` edit.** Vector provenance is in the `scripts/test-srs.mjs` header.
 - `pnpm test:pronounce` — assert the `engine/pronounce.ts` spoken/typed answer matcher (CI gate, s56).

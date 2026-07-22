@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { classifyApproveRow, flipProvenanceSource } from "../scripts/apply-reviews.mjs";
+import {
+  classifyApproveRow,
+  flipProvenanceSource,
+  parseDecisionFile,
+} from "../scripts/apply-reviews.mjs";
 
 /**
  * Pins the integrity core of `pnpm apply:reviews` (admin center chunk 2):
@@ -131,5 +135,52 @@ describe("flipProvenanceSource", () => {
     });
     expect(error).toBeNull();
     expect(out).toContain(`verified_by: "evil\\" } ] //",`);
+  });
+});
+
+describe("parseDecisionFile (keyless --from input)", () => {
+  const good = JSON.stringify({
+    source: "genauly-review-decisions",
+    version: 1,
+    exportedAt: "2026-07-22T00:00:00.000Z",
+    count: 2,
+    decisions: [
+      { content_id: "v_a", decision: "approve", content_hash: "abc123", reviewer_email: "f@x.de", comment: null },
+      { content_id: "v_b", decision: "reject", content_hash: null, reviewer_email: "f@x.de", comment: "wrong plural" },
+    ],
+  });
+
+  it("parses a valid export into DB-shaped rows", () => {
+    const rows = parseDecisionFile(good);
+    expect(rows).toHaveLength(2);
+    expect(rows[0]).toEqual({
+      content_id: "v_a",
+      decision: "approve",
+      content_hash: "abc123",
+      reviewer_email: "f@x.de",
+      comment: null,
+    });
+    expect(rows[1].decision).toBe("reject");
+  });
+
+  it("rejects non-JSON and the wrong file shape", () => {
+    expect(() => parseDecisionFile("not json")).toThrow(/valid JSON/);
+    expect(() => parseDecisionFile(JSON.stringify({ foo: 1 }))).toThrow(/Genauly review-decisions/);
+    expect(() => parseDecisionFile(JSON.stringify({ source: "genauly-review-decisions" }))).toThrow(
+      /Genauly review-decisions/,
+    );
+  });
+
+  it("rejects rows missing an id or with an invalid decision", () => {
+    const noId = JSON.stringify({
+      source: "genauly-review-decisions",
+      decisions: [{ decision: "approve" }],
+    });
+    const badDecision = JSON.stringify({
+      source: "genauly-review-decisions",
+      decisions: [{ content_id: "v_a", decision: "maybe" }],
+    });
+    expect(() => parseDecisionFile(noId)).toThrow(/content_id/);
+    expect(() => parseDecisionFile(badDecision)).toThrow(/invalid decision/);
   });
 });

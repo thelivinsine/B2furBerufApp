@@ -23,12 +23,24 @@
  *      `pnpm apply:reviews --mark-applied` (or let the next run reconcile).
  *
  * Modes:
- *   pnpm apply:reviews                 full run (reconcile + codemod + reports)
+ *   pnpm apply:reviews --from <file>   KEYLESS: read decisions from a founder
+ *                                      export (the /sources "Entscheidungen"
+ *                                      download); codemod + stamp + lint, NO
+ *                                      database access. The recommended path.
+ *   pnpm apply:reviews                 full run against Supabase directly
+ *                                      (needs the service-role key in env)
  *   pnpm apply:reviews --dry-run       classify + print only, write NOTHING
- *   pnpm apply:reviews --mark-applied  reconcile-only (after committing flips)
+ *   pnpm apply:reviews --mark-applied  reconcile-only (DB mode; after commit)
  *
- * Env: SUPABASE_SERVICE_ROLE_KEY (required), SUPABASE_URL (optional override;
- * defaults to the committed project URL). Never commit the key.
+ * The keyless `--from` flow exists because the service-role key must NOT live
+ * in the Claude environment's plaintext config (it warns against secrets). The
+ * founder exports decisions from the browser (where they are securely signed
+ * in and RLS grants read access); the file carries data, never a credential.
+ * In `--from` mode the DB applied_at write-back is skipped; applied state
+ * reconciles from the deployed bundle (the item is verified in provenance.ts).
+ *
+ * Env (DB mode only): SUPABASE_SERVICE_ROLE_KEY, SUPABASE_URL (optional
+ * override). Never commit the key. `--from` needs no env at all.
  *
  * Integrity rules (do not weaken): a stamp mismatch means re-review, never
  * re-stamp-to-silence; a null decision hash is never a free pass; rows whose
@@ -49,6 +61,40 @@ const DEFECTS_JSON = path.join(root, "docs", "reports", "review-defects.json");
 // ---------------------------------------------------------------------------
 // Pure helpers (exported for tests/applyReviews.test.ts)
 // ---------------------------------------------------------------------------
+
+/**
+ * Parse + validate a founder decision export (the browser download consumed by
+ * `--from`). Returns the decision rows in the same shape the Supabase fetch
+ * yields (content_id / decision / content_hash / reviewer_email / comment), so
+ * the rest of the pipeline is source-agnostic. Throws on a wrong/corrupt file.
+ * Pinned against the browser builder by tests/reviewExport.test.ts.
+ */
+export function parseDecisionFile(text) {
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error("not valid JSON — is this the exported decisions file?");
+  }
+  if (!data || data.source !== "genauly-review-decisions" || !Array.isArray(data.decisions))
+    throw new Error(
+      "not a Genauly review-decisions export (missing source/decisions). " +
+        "Use the /sources workbench \"Entscheidungen\" export button.",
+    );
+  return data.decisions.map((d) => {
+    if (!d || typeof d.content_id !== "string" || !d.content_id)
+      throw new Error("a decision row is missing content_id");
+    if (!["approve", "reject", "needs_fix"].includes(d.decision))
+      throw new Error(`invalid decision "${d.decision}" for ${d.content_id}`);
+    return {
+      content_id: d.content_id,
+      decision: d.decision,
+      content_hash: d.content_hash ?? null,
+      reviewer_email: d.reviewer_email ?? null,
+      comment: d.comment ?? null,
+    };
+  });
+}
 
 /**
  * Classify one approve-decision row against the live repo.
@@ -256,15 +302,32 @@ async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes("--dry-run");
   const markAppliedOnly = args.includes("--mark-applied");
+  const fromIdx = args.indexOf("--from");
+  const fromPath = fromIdx !== -1 ? args[fromIdx + 1] : null;
+  const fileMode = Boolean(fromPath);
+
+  if (fromIdx !== -1 && !fromPath) {
+    console.error("✖ --from needs a file path, e.g. `pnpm apply:reviews --from decisions.json`.");
+    process.exitCode = 1;
+    return;
+  }
+  if (fileMode && markAppliedOnly) {
+    console.error("✖ --mark-applied writes to the database; it cannot be combined with --from.");
+    process.exitCode = 1;
+    return;
+  }
 
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!serviceKey) {
+  if (!fileMode && !serviceKey) {
     console.error(
       "✖ SUPABASE_SERVICE_ROLE_KEY is not set.\n" +
-        "  This script is dev tooling: it needs the service-role key to read the\n" +
-        "  founder's review decisions (the table is founder-RLS-locked).\n" +
-        "  Get it from the Supabase dashboard (Project Settings -> API keys) and\n" +
-        "  export it in the environment. NEVER commit it or ship it to the SPA.",
+        "  Preferred: run the KEYLESS flow instead. In the /sources workbench click\n" +
+        '  "Entscheidungen" to download your decisions, then run\n' +
+        "    pnpm apply:reviews --from <that-file.json>\n" +
+        "  (no key, no secret in this environment).\n" +
+        "  The direct-database mode needs the service-role key from the Supabase\n" +
+        "  dashboard (Project Settings -> API keys) in a SECURE local shell only.\n" +
+        "  NEVER put it in the Claude environment config, the repo, or the SPA.",
     );
     process.exitCode = 1;
     return;
@@ -274,24 +337,46 @@ async function main() {
   const repo = await loadRepo();
   const provenanceById = new Map(repo.provenance.map((r) => [r.content_id, r]));
   const labels = new Map(repo.provenance.map((r) => [r.content_id, r.label]));
-  const supabaseUrl = process.env.SUPABASE_URL || repo.supabaseUrl;
 
-  const { createClient } = await import("@supabase/supabase-js");
-  const db = createClient(supabaseUrl, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-
-  const { data: pending, error } = await db
-    .from("provenance_reviews")
-    .select("*")
-    .not("decision", "is", null)
-    .is("applied_at", null);
-  if (error) {
-    console.error(`✖ Could not fetch provenance_reviews: ${error.message}`);
-    process.exitCode = 1;
-    return;
+  let db = null;
+  let pending;
+  if (fileMode) {
+    const abs = path.resolve(process.cwd(), fromPath);
+    let text;
+    try {
+      text = await readFile(abs, "utf8");
+    } catch {
+      console.error(`✖ Could not read decisions file: ${abs}`);
+      process.exitCode = 1;
+      return;
+    }
+    try {
+      pending = parseDecisionFile(text);
+    } catch (err) {
+      console.error(`✖ ${err.message}`);
+      process.exitCode = 1;
+      return;
+    }
+    console.log(`${pending.length} decision(s) read from ${path.relative(root, abs)} (keyless).`);
+  } else {
+    const supabaseUrl = process.env.SUPABASE_URL || repo.supabaseUrl;
+    const { createClient } = await import("@supabase/supabase-js");
+    db = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data, error } = await db
+      .from("provenance_reviews")
+      .select("*")
+      .not("decision", "is", null)
+      .is("applied_at", null);
+    if (error) {
+      console.error(`✖ Could not fetch provenance_reviews: ${error.message}`);
+      process.exitCode = 1;
+      return;
+    }
+    pending = data;
+    console.log(`${pending.length} pending decision(s) fetched from Supabase.`);
   }
-  console.log(`${pending.length} pending decision(s) fetched.`);
 
   const clean = registerIsClean();
   const sha = headSha();
@@ -348,9 +433,17 @@ async function main() {
 
   // -------------------------------------------------------------------------
   // Reconcile: mark rows applied whose verified state is already committed.
-  // Only against a clean register at HEAD, so applied_sha is honest.
+  // DB mode only (the keyless flow has no write access; applied state
+  // reconciles from the deployed bundle instead). Only against a clean
+  // register at HEAD, so applied_sha is honest.
   // -------------------------------------------------------------------------
-  if (buckets.already_verified.length > 0) {
+  if (fileMode && buckets.already_verified.length > 0) {
+    console.log(
+      `\n${buckets.already_verified.length} decision(s) already verified in the repo. ` +
+        "In the keyless flow their applied state reconciles from the deployed bundle " +
+        "(no database write-back here).",
+    );
+  } else if (buckets.already_verified.length > 0) {
     if (!clean) {
       console.log(
         "\n⚠ Register has uncommitted changes; skipping applied_at write-back " +
@@ -420,9 +513,13 @@ async function main() {
         console.log(`- ${row.targetId} (${labels.get(row.targetId) ?? ""})`);
       console.log("```");
       console.log(
-        "\nNEXT: commit the flip + stamp together, merge, then run\n" +
-          "`pnpm apply:reviews --mark-applied` to write applied_at/applied_sha back\n" +
-          "(the next full run also reconciles automatically).",
+        fileMode
+          ? "\nNEXT: commit the flip + stamp together and merge. Applied state\n" +
+              "reconciles from the deployed bundle (the items are now verified in\n" +
+              "provenance.ts), so there is nothing to write back and no key needed."
+          : "\nNEXT: commit the flip + stamp together, merge, then run\n" +
+              "`pnpm apply:reviews --mark-applied` to write applied_at/applied_sha back\n" +
+              "(the next full run also reconciles automatically).",
       );
     }
   } else if (!markAppliedOnly) {

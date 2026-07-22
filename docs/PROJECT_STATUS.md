@@ -4,13 +4,14 @@ _Last updated: 2026-07-22 (session 144). **Admin Control Center chunks 1 + 2 SHI
 (backend foundation): migration 0008 (provenance_reviews decisions + safety hash, feedback triage,
 `app_config`, `launch_checklist`, founder-gated aggregate RPCs) + `src/lib/adminApi.ts`; the
 founder ran the migration and verified the gate + a live `admin_overview()` JSON. Chunk 2 (the
-loop-closer): `pnpm apply:reviews` (decision fetch → ID_RENAMES → decision-time-hash compare →
-provenance codemod → stamp + lint in ONE commit → reconcile write-back), the /sources workbench
-now stores `decision`/`content_hash`/`reviewer_email` at click time, shared browser/script hash
-pinned by `tests/contentHash.test.ts`. **Founder action (one-time): add `SUPABASE_SERVICE_ROLE_KEY`
-to the Claude environment settings** (steps in `PHASE2_SETUP.md`). Next step = chunk 3 (`/admin`
-shell + Übersicht) on Opus per `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. Product name: **Genauly**
-(`genauly.de`)._
+loop-closer): `pnpm apply:reviews` (decision source → ID_RENAMES → decision-time-hash compare →
+provenance codemod → stamp + lint in ONE commit), the /sources workbench stores
+`decision`/`content_hash`/`reviewer_email` at click time. **Keyless handoff (s144 addendum, founder
+security review):** the founder exports decisions from the workbench ("Entscheidungen" button →
+JSON download) and a session runs `apply:reviews --from <file>`, so NO service-role key ever lives
+in the Claude environment (its config is plaintext, warns against secrets). **No founder key setup
+needed.** Next step = chunk 3 (`/admin` shell + Übersicht) on Opus per
+`ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -127,21 +128,36 @@ to end:
 - **Decision-time capture:** the /sources Daten-Werkbank tick now saves `decision: "approve"` + a
   `content_hash` of the item as reviewed + `reviewer_email` (untick clears the decision; note-only
   edits leave it untouched); CSV export gained the decision column.
-- **`scripts/apply-reviews.mjs`** (`pnpm apply:reviews`; needs `SUPABASE_SERVICE_ROLE_KEY`, dev
-  tooling only): fetch pending decisions → `ID_RENAMES` → hash compare → codemod
-  `provenance.ts` (`draft`→`verified` + `verified_by`/`verified_date`, format-exact) →
-  `stamp:verified` + `lint:content` in the SAME commit → defects/re-review export to
-  `docs/reports/review-defects.md` + `.json`. **Write-back is a reconcile pass:** `applied_at`/
-  `applied_sha` are only set for rows whose verified flip is committed at a clean HEAD
-  (`--mark-applied` after merging; every full run also self-heals). `--dry-run` writes nothing.
-  Integrity rules pinned by `tests/applyReviews.test.ts`: null/mismatched decision hash = re-review
-  (never a flip), already-verified rows only ever mark applied.
+- **`scripts/apply-reviews.mjs`** (`pnpm apply:reviews`): decision source → `ID_RENAMES` → hash
+  compare → codemod `provenance.ts` (`draft`→`verified` + `verified_by`/`verified_date`,
+  format-exact) → `stamp:verified` + `lint:content` in the SAME commit → defects/re-review export
+  to `docs/reports/review-defects.md` + `.json`. `--dry-run` writes nothing. Integrity rules pinned
+  by `tests/applyReviews.test.ts`: null/mismatched decision hash = re-review (never a flip),
+  already-verified rows only ever mark applied.
 - **Verified end to end in-session:** real flip of `v_besprechung` through the codemod →
-  `stamp:verified` (25→26) → `lint:content` green → reverted. Missing-key guard exits 1 with
-  founder-readable guidance.
-- **Founder action (one-time):** add `SUPABASE_SERVICE_ROLE_KEY` to the Claude Code environment
-  settings so sessions can run the script; steps + key-handling warning appended to
-  `PHASE2_SETUP.md`.
+  `stamp:verified` (25→26) → `lint:content` green → reverted.
+
+### Chunk 2 addendum · keyless review handoff (founder security review, same session)
+The founder correctly flagged that the Claude environment's **environment-variables box is plaintext
+and explicitly warns against secrets**, so storing `SUPABASE_SERVICE_ROLE_KEY` there (my first
+instruction) was wrong. Replaced the key path with a keyless file handoff, no secret ever touches
+the environment:
+- **Browser export:** `src/lib/reviewExport.ts` (`buildDecisionExport`/`downloadDecisions`) + an
+  **"Entscheidungen (N)"** button in the AdminWorkbench toolbar. The founder is already securely
+  signed in on /sources (RLS grants read), so the browser downloads a `genauly-review-decisions-*.json`
+  file (decisions + decision-time fingerprints, NO credential). CSV export unchanged.
+- **Keyless script mode:** `pnpm apply:reviews --from <file>` (`parseDecisionFile`) reads that file
+  instead of Supabase, does the identical hash-compare + codemod + stamp + lint, and writes NO
+  database (applied state reconciles from the deployed bundle: the item is `verified` in
+  provenance.ts). The direct-DB path stays for a secure local shell with the key, but is no longer
+  the founder's path. Round-trip (browser export → script parse) pinned by `tests/reviewExport.test.ts`.
+- **Verified end to end:** built a realistic 2-decision fixture (one hash-matching `v_besprechung`,
+  one stale `v_tagesordnung`) → `--from` dry-run classified correctly (1 ready, 1 re-review) →
+  real `--from` run flipped `v_besprechung`, stamped, linted green, exported the stale one to the
+  re-review report → reverted.
+- **Founder action: NONE.** No key to set up; the workbench button + file handoff is the whole flow.
+  `PHASE2_SETUP.md` rewritten accordingly (and now says NOT to put the service-role key in the
+  environment variables).
 - **Gates:** `typecheck` · `lint` (0 errors; the one new hook-deps warning was fixed properly) ·
   `test:unit` 237/237 · `build` · `check:bundle` (110.7/400 kB) · `lint:content` all green.
 - **Next:** chunk 3, the `/admin` shell + Übersicht cockpit (Opus recommended); chunks 1-2 outputs

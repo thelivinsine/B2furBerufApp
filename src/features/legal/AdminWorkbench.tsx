@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Download, ExternalLink, RotateCcw } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, FileJson, RotateCcw } from "lucide-react";
 import { provenance } from "@/data/provenance";
 import { verification as verificationMap } from "@/data/verification";
 import type { ProvenanceContentType, ProvenanceEntry, VerificationTier } from "@/types";
@@ -16,6 +16,7 @@ import { SearchField } from "@/features/shared/SearchField";
 import { buildCsv, downloadCsv, type CsvValue } from "@/lib/csv";
 import { foldText } from "@/lib/fuzzy";
 import type { ProvenanceReview } from "@/lib/provenanceReviews";
+import { downloadDecisions, pendingDecisionCount } from "@/lib/reviewExport";
 import { cn } from "@/lib/utils";
 import type { Lang } from "./LegalChrome";
 
@@ -218,6 +219,13 @@ export function AdminWorkbench({ api, lang }: { api: WorkbenchApi; lang: Lang })
 
   const hasFilter = query !== "" || typeFilter !== "all" || tierFilter !== "all" || statusFilter !== "all";
 
+  // The keyless review handoff: number of decisions ready to hand to a session
+  // (all saved decisions; apply:reviews re-classifies them against the repo).
+  const decisionCount = useMemo(
+    () => pendingDecisionCount(api.reviews.values()),
+    [api.reviews],
+  );
+
   const exportCsv = () => {
     const headers = [
       "content_id", "type", "label", "origin", "source", "reference", "license",
@@ -409,6 +417,20 @@ export function AdminWorkbench({ api, lang }: { api: WorkbenchApi; lang: Lang })
         <Button variant="outline" size="sm" onClick={exportCsv} className="gap-1.5 text-xs">
           <Download className="h-3.5 w-3.5" />
           {t(`CSV exportieren (${rows.length})`, `Export CSV (${rows.length})`)}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => downloadDecisions(api.reviews.values())}
+          disabled={decisionCount === 0}
+          className="gap-1.5 text-xs"
+          title={t(
+            "Entscheidungen als Datei für `pnpm apply:reviews --from` exportieren (kein Schlüssel nötig)",
+            "Export decisions as a file for `pnpm apply:reviews --from` (no key needed)",
+          )}
+        >
+          <FileJson className="h-3.5 w-3.5" />
+          {t(`Entscheidungen (${decisionCount})`, `Decisions (${decisionCount})`)}
         </Button>
       </div>
 
