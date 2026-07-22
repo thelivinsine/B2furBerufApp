@@ -949,3 +949,12 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` ·
   `docs/archive/PROJECT_STATUS_ARCHIVE.md` · `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` ·
   `CLAUDE.md` · this log
+- **Prompt 2 (verbatim):** `> document the session`
+- **Response 2:** Noted that the session documentation was already completed and shipped as part of
+  PR #636 (chunk 3): the `PROJECT_STATUS.md` s145 handoff + `_Last updated_` header, the s143
+  handoff rotation to the W30 archive with the index row updated, the CLAUDE.md admin-center bullet,
+  the build-plan status line, and the prompt-log Session 145 entry. This prompt adds its own log
+  entry for the authorship paper trail. Verified doc hygiene: status doc 229 lines (under ~250, two
+  most recent handoffs live = s145 + s144), prompt log under the ~1,200 rotation budget. No app-code
+  or content changes this prompt.
+- **Artifacts (prompt 2):** `docs/SESSION_PROMPT_LOG.md`
