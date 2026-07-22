@@ -17,13 +17,13 @@ level (higher rungs of the ladder)._
 ## Summary
 
 - Nouns checked: **1330**
-- Covered by ≥1 oracle: **953** (72%)  ·  not covered: **377**
-- ✔ Article verified: **936**  (440 by both oracles, 496 by one)
-- ✔ Plural verified: **600**  (346 by both oracles, 254 by one)
+- Covered by ≥1 oracle: **1300** (98%)  ·  not covered: **30**
+- ✔ Article verified: **1281**  (618 by both oracles, 663 by one)
+- ✔ Plural verified: **843**  (496 by both oracles, 347 by one)
 - ⛔ GATE — two-oracle-confirmed errors (build fails): **0**
-- ⚑ Review signals (one oracle only, or oracles disagree): **7**
-- ◑ Plural-form headwords (gender not comparable): **10**
-- ~ We assert a plural, but no oracle lists one to compare: **95**
+- ⚑ Review signals (one oracle only, or oracles disagree): **8**
+- ◑ Plural-form headwords (gender not comparable): **11**
+- ~ We assert a plural, but no oracle lists one to compare: **159**
 
 ## ⛔ GATE — two independent authorities agree our form is wrong
 
@@ -40,6 +40,7 @@ A single oracle differs, or the two oracles differ from each other (usually a va
 | id | headword | field | ours | oracles say |
 |---|---|---|---|---|
 | `v_ansprechpartner` | der Ansprechpartner / die Ansprechpartnerin | article | der | B:die~head |
+| `v_bekannter` | der Bekannte | article | der | A:das |
 | `v_betriebskosten` | die Betriebskosten | article | die | B:der~head |
 | `v_lkw_fahrer` | der LKW-Fahrer / die LKW-Fahrerin | article | der | B:die~head |
 | `v_onlinebanking` | das Online-Banking | article | das | B:der~head |
@@ -55,6 +56,7 @@ Auto-detected and skipped, not counted as errors.
 | id | headword |
 |---|---|
 | `v_bedenken` | die Bedenken |
+| `v_heizkosten` | die Heizkosten |
 | `v_lagerhaltungskosten` | die Lagerhaltungskosten |
 | `v_lagerkosten` | die Lagerkosten |
 | `v_lieferbedingungen` | die Lieferbedingungen |
@@ -70,387 +72,40 @@ Auto-detected and skipped, not counted as errors.
 Neither lexicon lists the lemma and no known compound head matched. Almost all are rare domain
 compounds or acronyms. Raising coverage further is a follow-up (a third source, or manual review).
 
-<details><summary>377 items</summary>
+<details><summary>30 items</summary>
 
 | id | headword |
 |---|---|
-| `v_abendkurs` | der Abendkurs |
-| `v_abfahrt` | die Abfahrt |
-| `v_ablaufdatum` | das Ablaufdatum |
-| `v_absage` | die Absage |
-| `v_aermel` | der Ärmel |
-| `v_akku` | der Akku |
-| `v_aktualisierung` | die Aktualisierung |
-| `v_ampel` | die Ampel |
-| `v_anbieter` | der Anbieter |
-| `v_anbieterwechsel` | der Anbieterwechsel |
-| `v_anerkennungsverfahren` | das Anerkennungsverfahren |
-| `v_anhoerung` | die Anhörung |
 | `v_anpassungsqualifizierung` | die Anpassungsqualifizierung |
-| `v_anruf` | der Anruf |
-| `v_antragsfrist` | die Antragsfrist |
-| `v_app` | die App |
-| `v_asylantrag` | der Asylantrag |
-| `v_aufenthaltsdauer` | die Aufenthaltsdauer |
-| `v_aufenthaltsgestattung` | die Aufenthaltsgestattung |
-| `v_aufenthaltskarte` | die Aufenthaltskarte |
-| `v_aufenthaltsstatus` | der Aufenthaltsstatus |
-| `v_aufstieg` | der Aufstieg |
-| `v_auftraggeber` | der Auftraggeber |
-| `v_ausflug` | der Ausflug |
 | `v_auslastung` | die Auslastung |
-| `v_ausreise` | die Ausreise |
-| `v_ausschlag` | der Ausschlag |
-| `v_ausstellung` | die Ausstellung |
-| `v_ausverkauf` | der Ausverkauf |
-| `v_auswahl` | die Auswahl |
-| `v_autobahn` | die Autobahn |
-| `v_backofen` | der Backofen |
-| `v_baeckerei` | die Bäckerei |
 | `v_bahncard` | die BahnCard |
-| `v_bahnhof` | der Bahnhof |
-| `v_bahnsteig` | der Bahnsteig |
-| `v_bandbreite` | die Bandbreite |
-| `v_bankingapp` | die Banking-App |
-| `v_bankkarte` | die Bankkarte |
-| `v_barzahlung` | die Barzahlung |
-| `v_baumwolle` | die Baumwolle |
-| `v_beanstandung` | die Beanstandung |
-| `v_bedienungszuschlag` | der Bedienungszuschlag |
-| `v_befristung` | die Befristung |
-| `v_begegnung` | die Begegnung |
-| `v_beilage` | die Beilage |
-| `v_bekannter` | der Bekannte |
-| `v_benutzername` | der Benutzername |
-| `v_benzin` | das Benzin |
-| `v_berufsabschluss` | der Berufsabschluss |
-| `v_berufserfahrung` | die Berufserfahrung |
 | `v_beschwerden` | die Beschwerden |
-| `v_bewertung` | die Bewertung |
-| `v_bewilligung` | die Bewilligung |
-| `v_bewilligungsbescheid` | der Bewilligungsbescheid |
-| `v_bewirtung` | die Bewirtung |
-| `v_bildschirm` | der Bildschirm |
-| `v_bildungspraemie` | die Bildungsprämie |
-| `v_bildungsurlaub` | der Bildungsurlaub |
-| `v_bonitaet` | die Bonität |
-| `v_brettspiel` | das Brettspiel |
-| `v_brot` | das Brot |
-| `v_browser` | der Browser |
-| `v_buehne` | die Bühne |
-| `v_buergschaft` | die Bürgschaft |
-| `v_bussgeld` | das Bußgeld |
-| `v_chor` | der Chor |
-| `v_cookie` | das Cookie |
-| `v_darlehen` | das Darlehen |
 | `v_daten` | die Daten |
 | `v_datenblatt` | das Datenblatt |
-| `v_datenrate` | die Datenrate |
-| `v_datenvolumen` | das Datenvolumen |
-| `v_debitkarte` | die Debitkarte |
-| `v_defekt` | der Defekt |
-| `v_deutschlandticket` | das Deutschlandticket |
-| `v_diesel` | der Diesel |
-| `v_diplom` | das Diplom |
-| `v_discounter` | der Discounter |
-| `v_display` | das Display |
-| `v_drogerie` | die Drogerie |
-| `v_echtzeitueberweisung` | die Echtzeitüberweisung |
-| `v_ecke` | die Ecke |
-| `v_ehrenamt` | das Ehrenamt |
-| `v_eigenanteil` | der Eigenanteil |
-| `v_eigenbedarf` | der Eigenbedarf |
-| `v_einkaufskorb` | der Einkaufskorb |
-| `v_einkaufsliste` | die Einkaufsliste |
-| `v_einladung` | die Einladung |
-| `v_einreise` | die Einreise |
-| `v_einstellung` | die Einstellung |
-| `v_eintritt` | der Eintritt |
-| `v_eintrittskarte` | die Eintrittskarte |
-| `v_einwohnermeldeamt` | das Einwohnermeldeamt |
-| `v_einzelfahrschein` | der Einzelfahrschein |
-| `v_empfehlung` | die Empfehlung |
-| `v_endstation` | die Endstation |
-| `v_entfernung` | die Entfernung |
-| `v_ermaessigung` | die Ermäßigung |
 | `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) |
-| `v_ersatz` | der Ersatz |
-| `v_erstattung` | die Erstattung |
-| `v_expose` | das Exposé |
-| `v_fahrkartenkontrolle` | die Fahrkartenkontrolle |
-| `v_fahrplan` | der Fahrplan |
-| `v_fahrrad` | das Fahrrad |
-| `v_fahrschein` | der Fahrschein |
-| `v_feier` | die Feier |
-| `v_fernstudium` | das Fernstudium |
-| `v_festival` | das Festival |
-| `v_fiktionsbescheinigung` | die Fiktionsbescheinigung |
-| `v_finanzierung` | die Finanzierung |
-| `v_fisch` | der Fisch |
-| `v_flatrate` | die Flatrate |
-| `v_fleisch` | das Fleisch |
-| `v_freischaltung` | die Freischaltung |
-| `v_freistellungsauftrag` | der Freistellungsauftrag |
-| `v_freizeitangebot` | das Freizeitangebot |
-| `v_fuehrungszeugnis` | das Führungszeugnis |
-| `v_fussgaenger` | der Fußgänger |
-| `v_gabel` | die Gabel |
-| `v_gastgeber` | der Gastgeber |
-| `v_geburtsurkunde` | die Geburtsurkunde |
-| `v_gedeck` | das Gedeck |
-| `v_gelegenheit` | die Gelegenheit |
-| `v_gemeinsamkeit` | die Gemeinsamkeit |
-| `v_gemeinschaftskonto` | das Gemeinschaftskonto |
-| `v_gemuese` | das Gemüse |
-| `v_geschwindigkeit` | die Geschwindigkeit |
-| `v_gespraechsthema` | das Gesprächsthema |
-| `v_gesundheitskarte` | die Gesundheitskarte |
-| `v_getraenk` | das Getränk |
-| `v_gewuerz` | das Gewürz |
 | `v_girocard` | die Girocard |
-| `v_glas` | das Glas |
-| `v_glasfaser` | die Glasfaser |
-| `v_gleichwertigkeit` | die Gleichwertigkeit |
-| `v_gleis` | das Gleis |
-| `v_grammatik` | die Grammatik |
-| `v_grillen` | das Grillen |
-| `v_grundgebuehr` | die Grundgebühr |
-| `v_grundsteuer` | die Grundsteuer |
-| `v_haltbarkeitsdatum` | das Haltbarkeitsdatum |
-| `v_haltestelle` | die Haltestelle |
-| `v_handy` | das Handy |
-| `v_hauptwohnsitz` | der Hauptwohnsitz |
-| `v_hausbank` | die Hausbank |
-| `v_heiratsurkunde` | die Heiratsurkunde |
-| `v_heizkosten` | die Heizkosten |
-| `v_herd` | der Herd |
-| `v_hobby` | das Hobby |
-| `v_hobbyraum` | der Hobbyraum |
 | `v_hoerverstehen` | das Hörverstehen |
-| `v_hotspot` | der Hotspot |
 | `v_iban` | die IBAN |
-| `v_imbiss` | der Imbiss |
-| `v_indexmiete` | die Indexmiete |
-| `v_interesse` | das Interesse |
-| `v_internetanschluss` | der Internetanschluss |
-| `v_kartenlesegeraet` | das Kartenlesegerät |
-| `v_kartennummer` | die Kartennummer |
-| `v_kartensperrung` | die Kartensperrung |
-| `v_kartenzahlung` | die Kartenzahlung |
-| `v_kassenzettel` | der Kassenzettel |
-| `v_kassierer` | der Kassierer |
-| `v_kaufbeleg` | der Kaufbeleg |
-| `v_kennwort` | das Kennwort |
-| `v_kennzeichen` | das Kennzeichen |
-| `v_kino` | das Kino |
-| `v_klage` | die Klage |
-| `v_kleiderbuegel` | der Kleiderbügel |
-| `v_kleidergroesse` | die Kleidergröße |
-| `v_kleidungsstueck` | das Kleidungsstück |
-| `v_kleingeld` | das Kleingeld |
-| `v_klingelton` | der Klingelton |
-| `v_knopf` | der Knopf |
-| `v_kompetenz` | die Kompetenz |
-| `v_kompliment` | das Kompliment |
-| `v_kontovollmacht` | die Kontovollmacht |
-| `v_kontowechsel` | der Kontowechsel |
-| `v_konversation` | die Konversation |
-| `v_konzert` | das Konzert |
-| `v_kreuzung` | die Kreuzung |
-| `v_kueche` | die Küche |
-| `v_kuendigungsfrist` | die Kündigungsfrist |
-| `v_kundennummer` | die Kundennummer |
-| `v_ladekabel` | das Ladekabel |
-| `v_laermbelaestigung` | die Lärmbelästigung |
-| `v_laptop` | der Laptop |
-| `v_lebensmittel` | das Lebensmittel |
-| `v_lehrgang` | der Lehrgang |
-| `v_lektion` | die Lektion |
 | `v_leseverstehen` | das Leseverstehen |
-| `v_lesung` | die Lesung |
-| `v_lieferadresse` | die Lieferadresse |
-| `v_lieferdienst` | der Lieferdienst |
-| `v_lieferzeit` | die Lieferzeit |
-| `v_linie` | die Linie |
 | `v_lkw` | der LKW |
-| `v_loeffel` | der Löffel |
-| `v_mahlzeit` | die Mahlzeit |
-| `v_mailbox` | die Mailbox |
-| `v_meldeadresse` | die Meldeadresse |
-| `v_meldepflicht` | die Meldepflicht |
-| `v_menue` | das Menü |
-| `v_messer` | das Messer |
-| `v_mietinteressent` | der Mietinteressent |
-| `v_mietspiegel` | der Mietspiegel |
-| `v_mietwohnung` | die Mietwohnung |
-| `v_mitfahrgelegenheit` | die Mitfahrgelegenheit |
-| `v_mitspieler` | der Mitspieler |
-| `v_mobilfunk` | der Mobilfunk |
-| `v_mobilfunkvertrag` | der Mobilfunkvertrag |
-| `v_modernisierung` | die Modernisierung |
-| `v_monatskarte` | die Monatskarte |
-| `v_muellabfuhr` | die Müllabfuhr |
-| `v_museum` | das Museum |
-| `v_musikinstrument` | das Musikinstrument |
-| `v_musterpruefung` | die Musterprüfung |
-| `v_muttersprachler` | der Muttersprachler |
 | `v_nachbereitung` | die Nachbereitung |
-| `v_nachbesserung` | die Nachbesserung |
-| `v_nachforderung` | die Nachforderung |
-| `v_nachhilfe` | die Nachhilfe |
-| `v_nachmieter` | der Nachmieter |
-| `v_nachsorge` | die Nachsorge |
-| `v_nachtisch` | der Nachtisch |
-| `v_nahverkehr` | der Nahverkehr |
-| `v_nebenwohnsitz` | der Nebenwohnsitz |
-| `v_newsletter` | der Newsletter |
 | `v_oeffnungszeiten` | die Öffnungszeiten |
-| `v_onlineshop` | der Onlineshop |
-| `v_orientierung` | die Orientierung |
-| `v_packstation` | die Packstation |
-| `v_paket` | das Paket |
-| `v_paketbote` | der Paketbote |
-| `v_paketshop` | der Paketshop |
-| `v_parkplatz` | der Parkplatz |
-| `v_passfoto` | das Passfoto |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) |
-| `v_pfand` | das Pfand |
-| `v_pfanne` | die Pfanne |
-| `v_phishing` | das Phishing |
-| `v_physiotherapie` | die Physiotherapie |
-| `v_plauderei` | die Plauderei |
 | `v_prepaid` | das Prepaid |
-| `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probenahme` | die Probenahme |
-| `v_profil` | das Profil |
-| `v_provision` | die Provision |
-| `v_pruefer` | der Prüfer |
-| `v_pruefungsangst` | die Prüfungsangst |
-| `v_publikum` | das Publikum |
-| `v_punktzahl` | die Punktzahl |
-| `v_quittung` | die Quittung |
-| `v_raeumungsklage` | die Räumungsklage |
-| `v_rate` | die Rate |
-| `v_rechtsbehelfsbelehrung` | die Rechtsbehelfsbelehrung |
-| `v_rechtskraft` | die Rechtskraft |
-| `v_reifen` | der Reifen |
-| `v_reissverschluss` | der Reißverschluss |
-| `v_rendite` | die Rendite |
 | `v_ressourcen` | die Ressourcen |
 | `v_rezeptur` | die Rezeptur |
-| `v_richtung` | die Richtung |
-| `v_router` | der Router |
-| `v_ruecklage` | die Rücklage |
-| `v_ruecklastschrift` | die Rücklastschrift |
-| `v_ruecksendung` | die Rücksendung |
 | `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit |
-| `v_rufnummernmitnahme` | die Rufnummernmitnahme |
-| `v_sachmangel` | der Sachmangel |
-| `v_salat` | der Salat |
-| `v_schaffner` | der Schaffner |
-| `v_schoenheitsreparatur` | die Schönheitsreparatur |
-| `v_schuessel` | die Schüssel |
-| `v_schuldnerberatung` | die Schuldnerberatung |
-| `v_schwarzfahren` | das Schwarzfahren |
-| `v_schwimmbad` | das Schwimmbad |
-| `v_schwindel` | der Schwindel |
-| `v_selbstauskunft` | die Selbstauskunft |
-| `v_selbstbedienungskasse` | die Selbstbedienungskasse |
-| `v_seminar` | das Seminar |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte |
 | `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt |
 | `v_sicherheitsschuhe` | die Sicherheitsschuhe |
-| `v_simkarte` | die SIM-Karte |
-| `v_smalltalk` | der Smalltalk |
-| `v_smartphone` | das Smartphone |
-| `v_snack` | der Snack |
-| `v_sosse` | die Soße |
-| `v_spam` | der Spam |
-| `v_sparkasse` | die Sparkasse |
-| `v_sparziel` | das Sparziel |
-| `v_spaziergang` | der Spaziergang |
-| `v_speise` | die Speise |
-| `v_sperrhotline` | die Sperrhotline |
-| `v_spezialitaet` | die Spezialität |
 | `v_spliss` | der Spliss |
-| `v_sportart` | die Sportart |
-| `v_sprachnachweis` | der Sprachnachweis |
-| `v_staffelmiete` | die Staffelmiete |
 | `v_stakeholder` | die Stakeholder (Pl.) |
 | `v_stammdaten` | die Stammdaten |
-| `v_startbildschirm` | der Startbildschirm |
-| `v_stau` | der Stau |
-| `v_steuernummer` | die Steuernummer |
-| `v_stimmung` | die Stimmung |
-| `v_stoff` | der Stoff |
-| `v_strassenbahn` | die Straßenbahn |
-| `v_stromzaehler` | der Stromzähler |
-| `v_suchmaschine` | die Suchmaschine |
-| `v_suppe` | die Suppe |
-| `v_tagesgeldkonto` | das Tagesgeldkonto |
-| `v_tageskarte` | die Tageskarte |
-| `v_tageslimit` | das Tageslimit |
 | `v_tan` | die TAN |
-| `v_tankstelle` | die Tankstelle |
-| `v_tarif` | der Tarif |
-| `v_tasse` | die Tasse |
-| `v_teller` | der Teller |
-| `v_theater` | das Theater |
-| `v_ticketautomat` | der Ticketautomat |
-| `v_tilgung` | die Tilgung |
-| `v_tisch` | der Tisch |
-| `v_topf` | der Topf |
-| `v_training` | das Training |
-| `v_treffen` | das Treffen |
 | `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) |
-| `v_tuete` | die Tüte |
-| `v_ubahn` | die U-Bahn |
-| `v_uebersetzung` | die Übersetzung |
-| `v_umtauschfrist` | die Umtauschfrist |
-| `v_umtauschschein` | der Umtauschschein |
-| `v_untermieter` | der Untermieter |
-| `v_urkunde` | die Urkunde |
-| `v_verabredung` | die Verabredung |
-| `v_veranstaltung` | die Veranstaltung |
-| `v_verein` | der Verein |
-| `v_verfuegungsrahmen` | der Verfügungsrahmen |
-| `v_vertragsabschluss` | der Vertragsabschluss |
-| `v_vertragslaufzeit` | die Vertragslaufzeit |
-| `v_vertragsverlaengerung` | die Vertragsverlängerung |
-| `v_verwaltungsakt` | der Verwaltungsakt |
-| `v_vokabelheft` | das Vokabelheft |
-| `v_vorauszahlung` | die Vorauszahlung |
-| `v_vorkasse` | die Vorkasse |
-| `v_vorstellung` | die Vorstellung |
-| `v_waage` | die Waage |
-| `v_wanderung` | die Wanderung |
-| `v_wegzug` | der Wegzug |
-| `v_werbung` | die Werbung |
-| `v_werdegang` | der Werdegang |
-| `v_wertstellung` | die Wertstellung |
-| `v_wetter` | das Wetter |
-| `v_widerruf` | der Widerruf |
-| `v_widerspruchsbescheid` | der Widerspruchsbescheid |
-| `v_witz` | der Witz |
-| `v_wlan` | das WLAN |
-| `v_wohnberechtigungsschein` | der Wohnberechtigungsschein |
-| `v_wohnflaeche` | die Wohnfläche |
-| `v_workshop` | der Workshop |
-| `v_zahlungsart` | die Zahlungsart |
-| `v_zahlungsausgang` | der Zahlungsausgang |
-| `v_zahlungseingang` | der Zahlungseingang |
-| `v_zahlungsverkehr` | der Zahlungsverkehr |
-| `v_zebrastreifen` | der Zebrastreifen |
-| `v_zeugnisbewertung` | die Zeugnisbewertung |
-| `v_zinssatz` | der Zinssatz |
 | `v_zugangsdaten` | die Zugangsdaten |
 | `v_zugriffsrechte` | die Zugriffsrechte (Pl.) |
-| `v_zulassung` | die Zulassung |
-| `v_zusage` | die Zusage |
-| `v_zuschlag` | der Zuschlag |
-| `v_zuzug` | der Zuzug |
-| `v_zweifaktorauth` | die Zwei-Faktor-Authentifizierung |
-| `v_zwischenzeugnis` | das Zwischenzeugnis |
 
 </details>
 
@@ -459,64 +114,106 @@ compounds or acronyms. Raising coverage further is a follow-up (a third source, 
 Gender is covered; only the plural could not be checked (no oracle lists a plural form for the
 lemma, or coverage came via the gender-only compound head fallback).
 
-<details><summary>95 items</summary>
+<details><summary>159 items</summary>
 
 | id | headword |
 |---|---|
 | `v_abfuellung` | die Abfüllung |
+| `v_ablaufdatum` | das Ablaufdatum |
 | `v_absturzsicherung` | die Absturzsicherung |
 | `v_aktionspunkt` | der Aktionspunkt |
+| `v_anbieterwechsel` | der Anbieterwechsel |
+| `v_anerkennungsverfahren` | das Anerkennungsverfahren |
 | `v_angehoerigengespraech` | das Angehörigengespräch |
+| `v_antragsfrist` | die Antragsfrist |
+| `v_aufenthaltsgestattung` | die Aufenthaltsgestattung |
+| `v_aufenthaltskarte` | die Aufenthaltskarte |
 | `v_aufenthaltszweck` | der Aufenthaltszweck |
 | `v_bankberater` | der Bankberater |
+| `v_bankingapp` | die Banking-App |
 | `v_bauphase` | die Bauphase |
+| `v_bedienungszuschlag` | der Bedienungszuschlag |
 | `v_behoerdentermin` | der Behördentermin |
+| `v_berufsabschluss` | der Berufsabschluss |
 | `v_berufskraftfahrer` | der Berufskraftfahrer |
 | `v_betriebskosten` | die Betriebskosten |
+| `v_bewilligungsbescheid` | der Bewilligungsbescheid |
 | `v_bildungsabschluss` | der Bildungsabschluss |
 | `v_bildungsgutschein` | der Bildungsgutschein |
+| `v_bildungspraemie` | die Bildungsprämie |
 | `v_buergeramt` | das Bürgeramt |
+| `v_datenrate` | die Datenrate |
+| `v_deutschlandticket` | das Deutschlandticket |
 | `v_dienstplan` | der Dienstplan |
 | `v_digital_prozess` | der digitale Prozess |
+| `v_echtzeitueberweisung` | die Echtzeitüberweisung |
+| `v_eigenanteil` | der Eigenanteil |
 | `v_einlasskontrolle` | die Einlasskontrolle |
 | `v_einstufungstest` | der Einstufungstest |
+| `v_einzelfahrschein` | der Einzelfahrschein |
 | `v_endgeraet` | das Endgerät |
 | `v_endkontrolle` | die Endkontrolle |
 | `v_ergebnisprotokoll` | das Ergebnisprotokoll |
 | `v_ernaehrungsberatung` | die Ernährungsberatung |
 | `v_eskalationsstufe` | die Eskalationsstufe |
+| `v_fahrkartenkontrolle` | die Fahrkartenkontrolle |
 | `v_fallbesprechung` | die Fallbesprechung |
 | `v_fehlerbericht` | der Fehlerbericht |
 | `v_fortschrittsbericht` | der Fortschrittsbericht |
+| `v_freistellungsauftrag` | der Freistellungsauftrag |
+| `v_freizeitangebot` | das Freizeitangebot |
+| `v_fuehrungszeugnis` | das Führungszeugnis |
 | `v_garantieanspruch` | der Garantieanspruch |
 | `v_gefahrstoff` | der Gefahrstoff |
 | `v_geschaeftsessen` | das Geschäftsessen |
 | `v_gesichtsbehandlung` | die Gesichtsbehandlung |
+| `v_gesundheitskarte` | die Gesundheitskarte |
+| `v_grundgebuehr` | die Grundgebühr |
 | `v_haarkur` | die Haarkur |
+| `v_hausbank` | die Hausbank |
 | `v_hautanalyse` | die Hautanalyse |
 | `v_hygieneplan` | der Hygieneplan |
 | `v_ich_botschaft` | die Ich-Botschaft |
+| `v_indexmiete` | die Indexmiete |
+| `v_internetanschluss` | der Internetanschluss |
+| `v_kartenlesegeraet` | das Kartenlesegerät |
+| `v_kartennummer` | die Kartennummer |
+| `v_kartensperrung` | die Kartensperrung |
+| `v_kaufbeleg` | der Kaufbeleg |
 | `v_klaerungsgespraech` | das Klärungsgespräch |
 | `v_kontoeroeffnung` | die Kontoeröffnung |
+| `v_kontovollmacht` | die Kontovollmacht |
+| `v_kontowechsel` | der Kontowechsel |
 | `v_kostenvoranschlag` | der Kostenvoranschlag |
+| `v_kundennummer` | die Kundennummer |
 | `v_kursgebuehr` | die Kursgebühr |
 | `v_ladeliste` | die Ladeliste |
 | `v_ladezeit` | die Ladezeit |
 | `v_lagerbestand` | der Lagerbestand |
+| `v_lieferadresse` | die Lieferadresse |
 | `v_liefertermin` | der Liefertermin |
 | `v_losgroesse` | die Losgröße |
 | `v_materialpruefung` | die Materialprüfung |
+| `v_meldeadresse` | die Meldeadresse |
 | `v_meldebescheinigung` | die Meldebescheinigung |
+| `v_mietinteressent` | der Mietinteressent |
 | `v_mikrofasertuch` | das Mikrofasertuch |
+| `v_mobilfunkvertrag` | der Mobilfunkvertrag |
+| `v_musterpruefung` | die Musterprüfung |
+| `v_nachbesserung` | die Nachbesserung |
+| `v_nachforderung` | die Nachforderung |
 | `v_nachhaltigkeitsbericht` | der Nachhaltigkeitsbericht |
 | `v_niederlassungserlaubnis` | die Niederlassungserlaubnis |
 | `v_objektleitung` | die Objektleitung |
 | `v_personaltrainer` | der Personaltrainer |
 | `v_pflegegrad` | der Pflegegrad |
+| `v_prepaidkarte` | die Prepaid-Karte |
 | `v_probestunde` | die Probestunde |
 | `v_produktionslinie` | die Produktionslinie |
 | `v_projektphase` | die Projektphase |
 | `v_pruefprotokoll` | das Prüfprotokoll |
+| `v_punktzahl` | die Punktzahl |
+| `v_rechtsbehelfsbelehrung` | die Rechtsbehelfsbelehrung |
 | `v_reinigungsdienst` | der Reinigungsdienst |
 | `v_reinigungsmaschine` | die Reinigungsmaschine |
 | `v_reinigungsplan` | der Reinigungsplan |
@@ -524,19 +221,30 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_roentgengeraet` | das Röntgengerät |
 | `v_rueckgaberecht` | das Rückgaberecht |
 | `v_ruestzeit` | die Rüstzeit |
+| `v_sachmangel` | der Sachmangel |
 | `v_schichtleitung` | die Schichtleitung |
 | `v_schichtplan` | der Schichtplan |
+| `v_schoenheitsreparatur` | die Schönheitsreparatur |
+| `v_schuldnerberatung` | die Schuldnerberatung |
+| `v_selbstbedienungskasse` | die Selbstbedienungskasse |
 | `v_sicherheitskonzept` | das Sicherheitskonzept |
 | `v_sicherheitsregel` | die Sicherheitsregel |
 | `v_sicherheitsunterweisung` | die Sicherheitsunterweisung |
+| `v_sparziel` | das Sparziel |
+| `v_sperrhotline` | die Sperrhotline |
+| `v_sprachnachweis` | der Sprachnachweis |
 | `v_staplerschein` | der Staplerschein |
+| `v_startbildschirm` | der Startbildschirm |
 | `v_stoerfall` | der Störfall |
 | `v_systemausfall` | der Systemausfall |
 | `v_tagegeld` | das Tagegeld |
+| `v_tagesgeldkonto` | das Tagesgeldkonto |
+| `v_tageslimit` | das Tageslimit |
 | `v_taktzeit` | die Taktzeit |
 | `v_taschenkontrolle` | die Taschenkontrolle |
 | `v_teilnahmebescheinigung` | die Teilnahmebescheinigung |
 | `v_terminvorschlag` | der Terminvorschlag |
+| `v_ticketautomat` | der Ticketautomat |
 | `v_trainingsplan` | der Trainingsplan |
 | `v_transportschaden` | der Transportschaden |
 | `v_uebergabeprotokoll` | das Übergabeprotokoll |
@@ -544,18 +252,29 @@ lemma, or coverage came via the gender-only compound head fallback).
 | `v_umlaufverfahren` | das Umlaufverfahren |
 | `v_ummeldung` | die Ummeldung |
 | `v_umsetzungsplan` | der Umsetzungsplan |
+| `v_umtauschfrist` | die Umtauschfrist |
+| `v_umtauschschein` | der Umtauschschein |
 | `v_unfallmeldung` | die Unfallmeldung |
 | `v_verbandswechsel` | der Verbandswechsel |
+| `v_verfuegungsrahmen` | der Verfügungsrahmen |
 | `v_vermittlungsgespraech` | das Vermittlungsgespräch |
 | `v_verpflichtungserklaerung` | die Verpflichtungserklärung |
 | `v_versichertenkarte` | die Versichertenkarte |
+| `v_vertragsabschluss` | der Vertragsabschluss |
+| `v_vertragslaufzeit` | die Vertragslaufzeit |
 | `v_warenbestand` | der Warenbestand |
 | `v_wartenummer` | die Wartenummer |
 | `v_wartungsfenster` | das Wartungsfenster |
+| `v_wertstellung` | die Wertstellung |
+| `v_widerspruchsbescheid` | der Widerspruchsbescheid |
 | `v_wimpernverlaengerung` | die Wimpernverlängerung |
+| `v_wohnberechtigungsschein` | der Wohnberechtigungsschein |
 | `v_wohnungsanzeige` | die Wohnungsanzeige |
 | `v_wohnungsgeberbestaetigung` | die Wohnungsgeberbestätigung |
+| `v_zahlungsart` | die Zahlungsart |
+| `v_zahlungsausgang` | der Zahlungsausgang |
 | `v_zeitwaechterin` | die Zeitwächterin / der Zeitwächter |
+| `v_zeugnisbewertung` | die Zeugnisbewertung |
 | `v_zutrittskontrolle` | die Zutrittskontrolle |
 | `v_zwischenschritt` | der Zwischenschritt |
 
