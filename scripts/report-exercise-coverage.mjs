@@ -19,6 +19,7 @@ import path from "node:path";
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
+import { writeReportSidecarSync } from "./report-sidecar.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -384,6 +385,7 @@ async function main() {
 
     const out = path.join(root, "docs/reports/exercise-coverage-report.md");
     writeFileSync(out, L.join("\n") + "\n", "utf8");
+    writeReportSidecarSync(out, { registerRows: rows.length, scope: "themes", rich, ok, thin });
     console.log(
       `exercise-coverage: ${rows.length} Themen (🟢 ${rich} · 🟡 ${ok} · 🔴 ${thin}) → docs/reports/exercise-coverage-report.md`,
     );
