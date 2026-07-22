@@ -9,6 +9,7 @@ import { EnPeek } from "@/features/grammar/EnPeek";
 import { GrammarRail } from "./GrammarRail";
 import { useFokusMachine, MIN_WORDS } from "./useFokusMachine";
 import { valueLabel, refusalCopy, type AxisId } from "./grammarDimensions";
+import { diffWords } from "@/lib/wordDiff";
 
 /**
  * Fokus "Satzlabor": write a sentence, get it corrected in place, then transform
@@ -42,6 +43,13 @@ export function FokusTrainer({
 
   const tooShort = m.words < MIN_WORDS;
   const remaining = Math.max(0, MIN_WORDS - m.words);
+
+  // Word-level diff of original vs corrected, so the correction can highlight
+  // exactly what changed and list each edit as a tip (client-side, no AI).
+  const diff = useMemo(
+    () => (m.status === "corrected" && m.hasErrors ? diffWords(m.input, m.corrected) : null),
+    [m.status, m.hasErrors, m.input, m.corrected],
+  );
 
   const onSubmit = () => {
     if (!isSignedIn) {
@@ -83,13 +91,43 @@ export function FokusTrainer({
 
         {m.status === "corrected" ? (
           <div className="space-y-3">
-            <p className="text-sm leading-relaxed text-muted-foreground">{m.input}</p>
-            {m.hasErrors ? (
+            <p className="text-sm leading-relaxed text-muted-foreground line-through decoration-warning/50">
+              {m.input}
+            </p>
+            {m.hasErrors && diff ? (
               <>
-                <p className="flex items-center gap-1.5 text-xs font-bold text-success">
-                  <Check className="h-3.5 w-3.5" /> Korrigiert
+                <p className="flex items-center gap-1.5 text-xs font-bold text-primary">
+                  <Check className="h-3.5 w-3.5" /> Korrigiert · {diff.changes.length}{" "}
+                  {diff.changes.length === 1 ? "Änderung" : "Änderungen"}
                 </p>
-                <p className="text-base leading-relaxed">{m.corrected}</p>
+                {/* Corrected sentence with the changed words highlighted in place. */}
+                <p className="text-base leading-relaxed">
+                  {diff.tokens.map((tk, i) => (
+                    <span key={i}>
+                      {tk.changed ? (
+                        <mark className="rounded bg-warning/25 px-0.5 text-foreground">{tk.text}</mark>
+                      ) : (
+                        tk.text
+                      )}
+                      {i < diff.tokens.length - 1 ? " " : ""}
+                    </span>
+                  ))}
+                </p>
+                {/* The tip: what changed, before -> after. */}
+                {diff.changes.length > 0 && (
+                  <div className="space-y-1.5 rounded-lg border border-border bg-surface p-3">
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+                      Was ich geändert habe
+                    </p>
+                    {diff.changes.map((c, i) => (
+                      <p key={i} className="flex flex-wrap items-center gap-1.5 text-sm">
+                        <span className="text-muted-foreground line-through">{c.from || "∅"}</span>
+                        <span className="text-muted-foreground">→</span>
+                        <span className="font-semibold text-success">{c.to || "(entfernt)"}</span>
+                      </p>
+                    ))}
+                  </div>
+                )}
               </>
             ) : (
               <p className="flex items-center gap-1.5 text-sm font-semibold text-success">
