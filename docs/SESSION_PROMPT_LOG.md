@@ -1044,3 +1044,11 @@ _Schreibtraining redesign (backlog #6): five-expert design panel → plan + mock
   `src/lib/sentenceStudio.ts` · `supabase/migrations/0009_sentence_studio.sql` ·
   `supabase/functions/{check-sentence,transform-sentence}/index.ts` · `tests/fokusGrammar.test.ts` ·
   `docs/plans/PHASE2_SETUP.md` · PR #640 (`6bf6524`) · this log · `docs/PROJECT_STATUS.md` · `docs/PROJECT_REFERENCE.md`
+- **Prompt 7 (verbatim):** `Make schreibtraining a dedicated menu item for now with it's own icon and make it live.`
+- **Response 7:** Promoted Schreibtraining to a top-level nav item. Added a `/writing` `navItem`
+  ("Schreiben", rose `#f43f5e` accent, the pencil mark that already existed in `route-icons.tsx`),
+  added it to `DEFAULT_PINNED_TABS` and `BottomTabBar` `CONTENT` (`["/library", "/writing",
+  "/analytics"]` = Home + 3 middle + fixed Einstellungen, the 5 locked slots), and removed the
+  `/writing → /anwenden` `ROUTE_SUCCESSOR` remap. Sidebar (desktop) picks it up automatically (maps
+  `navItems`). Updated the CLAUDE.md nav bullets. Gates: typecheck · lint 0 errors · test:unit 257/257 ·
+  build · check:bundle 112.1 kB, all green. Shipped via squash-merge to `main`.

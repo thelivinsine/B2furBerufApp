@@ -12,9 +12,10 @@ const IZ = 29; // icon size
 
 // The middle content sections. Home is the fixed first slot and Einstellungen
 // the fixed last slot (they replaced the retired "Mehr" sheet in s-polish), so
-// these are the only reorderable tabs. Anwenden is temporarily hidden from the
-// nav (founder, 2026-07-13, demo), so only Theorie + Fortschritt remain here.
-const CONTENT = ["/library", "/analytics"];
+// these are the only reorderable tabs. Anwenden stays hidden from the nav
+// (founder, 2026-07-13, demo); Schreiben was promoted to its own tab (2026-07-22),
+// so the middle is Bibliothek · Schreiben · Fortschritt.
+const CONTENT = ["/library", "/writing", "/analytics"];
 
 // Every surface (bottom bar, sidebar) draws the SAME custom branded SVG for a
 // route — defined once in route-icons.tsx — so an icon is recognisable
