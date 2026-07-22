@@ -5,6 +5,8 @@ import { AdminOverview } from "./AdminOverview";
 import { AdminPlaceholder } from "./AdminPlaceholder";
 import { Pruefmodus } from "./Pruefmodus";
 import { AdminFeedback } from "./AdminFeedback";
+import { AdminSystem } from "./AdminSystem";
+import { AdminLaunch } from "./AdminLaunch";
 
 /**
  * The admin control center, mounted at `/admin/*` as a single lazy chunk (every
@@ -26,9 +28,9 @@ export function AdminApp() {
           <Route path="feedback" element={<AdminFeedback />} />
           <Route path="inhalte" element={<AdminPlaceholder titleDe="Inhalte" titleEn="Content" />} />
           <Route path="nutzer" element={<AdminPlaceholder titleDe="Nutzer" titleEn="Audience" />} />
-          <Route path="system" element={<AdminPlaceholder titleDe="System" titleEn="System" />} />
+          <Route path="system" element={<AdminSystem />} />
           <Route path="steuerung" element={<AdminPlaceholder titleDe="Steuerung" titleEn="Controls" />} />
-          <Route path="launch" element={<AdminPlaceholder titleDe="Launch" titleEn="Launch" />} />
+          <Route path="launch" element={<AdminLaunch />} />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Route>
       </Routes>
