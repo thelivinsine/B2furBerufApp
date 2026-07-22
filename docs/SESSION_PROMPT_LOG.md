@@ -808,3 +808,28 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `CLAUDE.md` needed no changes (docs/preview-only session, no app code, no content counts
   touched).
 - **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · this log
+
+## Session 144 — 2026-07-22 · branch `claude/admin-control-center-chunk-1-eafquu`
+
+- **Prompt 1 (verbatim):** `> start with chunk 1 of the admin control center build plan`
+- **Response 1:** Built chunk 1 (backend foundation) of
+  `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`. New migration
+  `supabase/migrations/0008_admin_center.sql` (idempotent): widened `provenance_reviews` to real
+  decisions (`decision approve|reject|needs_fix`, `content_hash`, `reviewer_email`, `applied_at`,
+  `applied_sha`; `verified=true` backfilled to `decision='approve'`, reviewer emails backfilled
+  from `reviewed_by`); feedback triage columns (`status`/`priority`/`note`/`link`); the
+  `app_config` Steuerung store (world-readable, founder-writable RLS) and the founder-only
+  `launch_checklist`; `is_founder()` (single email source) + `assert_founder()` + the
+  founder-gated SECURITY DEFINER RPCs `admin_overview()`, `admin_daily_series()`,
+  `admin_feedback_recent(n)`, `admin_feedback_update(...)`, each asserting the founder gate
+  in-body (0004/0007 pattern) and revoked from public/anon. Aggregates only; no admin SELECT
+  policies on learner tables. Typed fail-soft client stubs in `src/lib/adminApi.ts` (not imported
+  by eager code; main chunk unchanged at 110.6 kB). `tests/admin.test.ts` extended to pin the
+  migration email gate against `FOUNDER_EMAILS` (set equality, is_founder body, per-RPC
+  assert+revoke). Founder deploy steps appended to `docs/plans/PHASE2_SETUP.md`; CLAUDE.md admin
+  notes updated. Gates: typecheck · lint (0 errors) · test:unit 222/222 · build · check:bundle ·
+  lint:content all green. Shipped via PR into `main`. Founder action: run migration 0008 in the
+  Supabase SQL editor.
+- **Artifacts (prompt 1):** `supabase/migrations/0008_admin_center.sql` · `src/lib/adminApi.ts` ·
+  `tests/admin.test.ts` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log

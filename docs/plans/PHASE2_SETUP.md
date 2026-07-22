@@ -313,3 +313,37 @@ migrations once:
    - If the gating emails ever change, update them in BOTH the RLS policy (a new
      migration) and `FOUNDER_EMAILS` in `src/lib/admin.ts` (the
      `tests/admin.test.ts` expectation pins the list).
+
+## Admin control center backend (migration 0008): founder setup step
+
+The admin center (`/admin`, build plan chunk 1, session 144) needs one database
+migration. It upgrades the review table to real decisions (approve / reject /
+needs fix, with the safety hash), adds the feedback triage fields (status,
+priority, note, link), creates the `app_config` table for the Steuerung
+switches and the `launch_checklist` storage, and installs the founder-only
+database functions that power the dashboard tiles. The functions return
+aggregate numbers only (counts and day totals), never individual user data.
+
+1. **Run the migration.** Open the Supabase dashboard SQL editor, paste the
+   full contents of `supabase/migrations/0008_admin_center.sql`, and run it.
+   It is safe to re-run if it was already applied.
+2. **Verify it landed.** In the Table Editor you should now see two new tables,
+   `app_config` and `launch_checklist`. Under Database → Functions you should
+   see `admin_overview`, `admin_daily_series`, `admin_feedback_recent`,
+   `admin_feedback_update`, `is_founder`, and `assert_founder`.
+3. **Verify the gate (optional, 1 minute).** In the SQL editor run
+   `select public.admin_overview();` It should return a JSON blob of counts
+   (the dashboard runs with elevated rights, so this only proves the function
+   works). The founder-only gate itself is enforced INSIDE each function: any
+   session whose login email is not one of the two founder accounts gets
+   "forbidden: founder account required". If your dashboard's SQL editor has
+   the "Run as: anon/authenticated" impersonation dropdown, you can see that
+   rejection live by re-running the same select impersonating `anon`. The
+   email list is also pinned in CI (`tests/admin.test.ts`), so it cannot
+   silently drift from the app's own founder list.
+4. **Existing review marks are preserved.** Every item you already ticked in
+   the Daten-Werkbank is carried over as an "approve" decision. Nothing needs
+   re-clicking.
+
+Nothing is visible in the app yet after this step; the `/admin` page itself
+ships in a later chunk. This migration is the plumbing it stands on.

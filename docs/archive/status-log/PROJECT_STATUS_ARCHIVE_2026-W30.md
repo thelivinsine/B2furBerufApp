@@ -3,6 +3,33 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 142 (2026-07-21). Wörter (words) quality-control, branch
+`claude/words-collocations-qc-0pycjq`, shipped to `main` (PR #624).** Founder screenshot of the
+Theorie → Wörter list: "Aufgaben verteilen" (a Nomen-Verb collocation) sat article-less among real
+nouns. QC found the Wörter list renders the whole vocab bank with no POS filter, so **8 noun+verb
+collocations leaked in**; **6 were literal duplicates** of existing Kollokationen entries. Founder
+direction: the individual words may stay in Wörter, but the *combination* belongs in Kollokationen.
+What shipped:
+- **Retire-from-surface, never delete** (shipped ids are permanent, progress is id-keyed). New
+  `RETIRED_VOCAB_IDS` set + `browsableVocabulary` (= bank − retired) in `src/data/vocabulary.ts`.
+  Every "words" surface reads `browsableVocabulary`: the Wörter browse (list/table/graph/counts,
+  via `themeScoped` + `vocabByTheme`/`vocabBySubTheme` which are now browsable-based), global search
+  (`lib/search.ts`), the composed-session word pools (`engine/session.ts` ×3: libraryFocus, focus,
+  weightedDue), and `Sammlung.tsx`. `vocabById`/`vocabulary` stay the full bank for id resolution.
+- **The 8 retired ids:** `v_aufgabe_verteilen`, `v_zustandig_klaeren`, `v_software_einfuehren`,
+  `v_muell_vermeiden`, `v_energie_sparen`, `v_wortergreifen`, `v_planung_revidieren`,
+  `v_vorwuerfe_zurueckweisen`.
+- **Added the 2 combos missing from Kollokationen** (`c_planung_revidieren`,
+  `c_vorwuerfe_zurueckweisen`) + provenance rows; the other 6 already existed there. Collocations
+  1,033 → **1,035**.
+- **`lint:content` guardrail (new `lintVocabCollocationOverlap`)** upgraded from warn to **ERROR**:
+  a vocab word whose German equals a collocation `full` must be removed or listed in
+  `RETIRED_VOCAB_IDS`, so a future overlap fails CI. Retired ids are the sanctioned exception; a
+  stale set entry is also flagged. Normalizes lexemes (drops leading article, lowercases).
+- **Gates:** `pnpm lint:content` (1,035 colloc, no errors) · `typecheck` · `test:unit` (219) ·
+  `build` · `check:bundle` (110.5/400 kB) all green. Post-merge branch realigned to `main`.
+  PWA caveat: the word list is service-worker-cached; hard-refresh the live site to see it.
+
 **Handoff after session 141 (2026-07-21). Mobile bottom-nav item labels, branch
 `claude/mobile-nav-item-labels-vx29vh`, shipped to `main` (PR #622).** Founder asked to add each
 nav item's name under its icon in the mobile view, visible only when selected, with real-screenshot

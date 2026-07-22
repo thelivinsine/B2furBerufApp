@@ -820,8 +820,22 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   (`features/legal/AdminWorkbench.tsx`): the full register as a sortable table with fuzzy search,
   Typ/Stufe/Status filters, CSV export of the filtered view (`src/lib/csv.ts`), copy-id chips and
   per-row verified-checkbox + note (Supabase `provenance_reviews`). **Admin gate = the two
-  `FOUNDER_EMAILS` in `src/lib/admin.ts`** (client) + the RLS policy from migrations 0004/0007
-  (server); keep both in lockstep, `tests/admin.test.ts` pins the email list.
+  `FOUNDER_EMAILS` in `src/lib/admin.ts`** (client) + the RLS policy from migrations 0004/0007 and
+  the `is_founder()`/`assert_founder()` gate in migration 0008 (server); keep all in lockstep,
+  `tests/admin.test.ts` pins the email list against both the client list and the migration SQL.
+- **Admin control center backend (s144, build plan chunk 1):** migration
+  `supabase/migrations/0008_admin_center.sql` widens `provenance_reviews` to real decisions
+  (`decision approve|reject|needs_fix` + `content_hash`/`reviewer_email`/`applied_at`/`applied_sha`;
+  `verified=true` rows backfilled to `decision='approve'`), adds feedback triage columns
+  (`status`/`priority`/`note`/`link`), creates `app_config` (world-readable, founder-writable; the
+  Steuerung remote-config store, consumed in chunk 7) and `launch_checklist` (founder-only), and
+  installs the founder-gated SECURITY DEFINER RPCs `admin_overview()`, `admin_daily_series()`,
+  `admin_feedback_recent(n)`, `admin_feedback_update(...)`. **Privacy line: RPCs return aggregates
+  only, never individual learner rows** (exception: `feedback` rows, operational mail addressed to
+  the founder); `profiles`/`progress`/`writing_evaluations` keep owner-only RLS with NO admin SELECT
+  policies. Client wrappers: `src/lib/adminApi.ts` (typed, fail-soft, lazy-only consumer surface).
+  Plans: `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` (scope) + `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`
+  (chunks; next: chunk 2 `pnpm apply:reviews`).
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — the only other workflow in `.github/workflows/` is `validate.yml` (the content-lint + SRS test gate), which never deploys. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)
