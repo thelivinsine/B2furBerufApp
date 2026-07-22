@@ -1,5 +1,6 @@
 import { remapProgressIds } from "@/lib/idRenames";
 import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/store/useAuthStore";
 import { useProgressStore } from "@/store/useProgressStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import type { SrsCard } from "@/types";
@@ -306,6 +307,12 @@ export async function startCloudSync(uid: string) {
   if (userId === uid) return; // already syncing this user
   stopCloudSync();
 
+  // A route guard may be waiting on this: until the first pull below lands, a
+  // fresh device does not yet know the account's real `onboarded` flag (it
+  // lives in the cloud profile). Mark unhydrated so the guard waits instead of
+  // bouncing the user to the landing page.
+  useAuthStore.setState({ syncHydrated: false });
+
   // Account isolation on a shared device: if the local cache belongs to a
   // DIFFERENT account, wipe it before doing anything else. Otherwise the merge
   // below (Math.max / union / mergeSrs) would fold the previous account's
@@ -332,6 +339,12 @@ export async function startCloudSync(uid: string) {
     mergeRemoteSettings(profile);
   } catch {
     /* offline: keep local */
+  } finally {
+    // Whether the pull succeeded or failed offline, the initial reconcile is
+    // done: `onboarded` now reflects the cloud profile (or the local fallback),
+    // so route guards can safely decide. Set AFTER the merge so an existing
+    // account's `onboarded: true` is already applied when this flips.
+    useAuthStore.setState({ syncHydrated: true });
   }
 
   // 2) Push the merged local state up so both sides converge immediately.
@@ -356,4 +369,6 @@ export function stopCloudSync() {
   progressTimer = null;
   settingsTimer = null;
   userId = null;
+  // No session is syncing anymore; the next sign-in re-hydrates from its cloud.
+  useAuthStore.setState({ syncHydrated: false });
 }

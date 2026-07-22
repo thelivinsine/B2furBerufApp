@@ -111,8 +111,22 @@ const AdminApp = lazyWithReload(() =>
 
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
-  if (!onboarded) return <Navigate to="/welcome" replace />;
-  return <>{children}</>;
+  const status = useAuthStore((s) => s.status);
+  const syncHydrated = useAuthStore((s) => s.syncHydrated);
+  // Already onboarded on this device → straight in.
+  if (onboarded) return <>{children}</>;
+  // Auth is still resolving (e.g. we just returned from a Google OAuth redirect
+  // and Supabase is establishing the session). Don't decide yet, or we would
+  // bounce a valid account out to the landing page.
+  if (status === "loading") return null;
+  // The account may have onboarded on ANOTHER device: the `onboarded` flag
+  // lives in the cloud profile and only arrives via the first cloud-sync pull.
+  // On a fresh device (e.g. right after reinstalling the PWA) the local flag is
+  // still false, so a signed-in / guest user must wait for that pull to land
+  // before we treat them as "not onboarded". Only a truly signed-out visitor,
+  // or one whose cloud pull finished still-not-onboarded, goes to /welcome.
+  if (status !== "signedOut" && !syncHydrated) return null;
+  return <Navigate to="/welcome" replace />;
 }
 
 // Founder gate for /admin. Mirrors RequireOnboarding: while auth is still

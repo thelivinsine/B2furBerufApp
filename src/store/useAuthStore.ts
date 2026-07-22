@@ -16,6 +16,14 @@ interface AuthState {
   status: AuthStatus;
   /** True while a sign-in/up network call is in flight. */
   busy: boolean;
+  /**
+   * True once the FIRST cloud-sync pull for the current session has completed
+   * (or failed offline). Route guards use this to avoid redirecting a signed-in
+   * account out to the landing page before its cloud profile (which carries the
+   * real `onboarded` flag) has loaded on a fresh device. Reset on sign-out and
+   * at the start of each cloud sync; see lib/cloudSync.ts.
+   */
+  syncHydrated: boolean;
   error: string | null;
 
   init: () => void;
@@ -61,6 +69,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   status: "loading",
   busy: false,
+  syncHydrated: false,
   error: null,
 
   init: () => {
