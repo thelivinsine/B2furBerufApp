@@ -221,7 +221,7 @@ export function AdminWorkbench({ api, lang }: { api: WorkbenchApi; lang: Lang })
   const exportCsv = () => {
     const headers = [
       "content_id", "type", "label", "origin", "source", "reference", "license",
-      "review_status", "tier", "confidence", "checked_live", "note",
+      "review_status", "tier", "confidence", "checked_live", "decision", "note",
     ];
     const data: CsvValue[][] = rows.map((r) => {
       const review = api.reviews.get(r.entry.content_id);
@@ -237,6 +237,7 @@ export function AdminWorkbench({ api, lang }: { api: WorkbenchApi; lang: Lang })
         r.tier ?? "",
         r.confidence ?? "",
         review?.verified ? "yes" : "no",
+        review?.decision ?? "",
         review?.comment ?? "",
       ];
     });

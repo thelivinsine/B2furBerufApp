@@ -13,6 +13,7 @@ import type { ProvenanceContentType, ProvenanceEntry, VerificationTier } from "@
 import { useAuthStore } from "@/store/useAuthStore";
 import { isFounder } from "@/lib/admin";
 import {
+  computeDecisionHash,
   fetchProvenanceReviews,
   saveProvenanceReview,
   type ProvenanceReview,
@@ -384,13 +385,29 @@ export function Sources() {
           content_id: contentId,
           verified: false,
           comment: null,
+          decision: null,
+          content_hash: null,
+          reviewer_email: null,
         };
+        // Ticking the box is an APPROVE decision and fingerprints the content
+        // as the reviewer sees it (the apply script compares this hash before
+        // flipping the repo row). Unticking clears the decision; a note-only
+        // edit leaves the decision and its hash untouched.
+        const approving = patch.verified === true;
+        const clearing = patch.verified === false;
         const merged: ProvenanceReview = {
           content_id: contentId,
           verified: patch.verified ?? cur.verified,
           // normalise an empty note to null so the column stays clean
           comment:
             patch.comment !== undefined ? (patch.comment ?? "").trim() || null : cur.comment,
+          decision: approving ? "approve" : clearing ? null : cur.decision,
+          content_hash: approving
+            ? await computeDecisionHash(contentId)
+            : clearing
+              ? null
+              : cur.content_hash,
+          reviewer_email: user?.email?.toLowerCase() ?? cur.reviewer_email,
         };
         setSaveState("saving");
         const ok = await saveProvenanceReview(merged, uid);
@@ -401,7 +418,7 @@ export function Sources() {
         return ok;
       },
     };
-  }, [admin, reviews, user?.id]);
+  }, [admin, reviews, user?.id, user?.email]);
 
   const liveVerified = useMemo(
     () => [...reviews.values()].filter((r) => r.verified).length,
