@@ -2,8 +2,19 @@
 
 _Session 143 (2026-07-22). The execution companion to `ADMIN_CONTROL_CENTER_PLAN.md` (the approved
 scope; read that first for the "what and why"). This file answers "in what order, in what size
-pieces, and with which Claude model per piece". Status: **chunks 1-3 SHIPPED (s144-s145); next =
-chunk 4 (Review Cockpit / Prüfmodus, Opus).**_
+pieces, and with which Claude model per piece". Status: **chunks 1-10 SHIPPED (s144-s146); the whole
+MVP (Phase 1) plus Phase-2 chunks 9-10 are done. Next = chunk 11 (Turnstile + abuse meters), then 12
+(compliance pack), then Phase-3 (13-16) on demand.**_
+
+> **Session 146 (2026-07-22):** chunks 4-10 built and shipped in one session. Chunk 4 Review Cockpit
+> (`scripts/review-score.mjs` + `build-review-queue.mjs` → `reviewQueue.json`, `Pruefmodus.tsx`,
+> `tests/reviewScore.test.ts`). Chunk 5 Feedback-Inbox (`AdminFeedback.tsx`). Chunk 6 System health +
+> Launch checklist (`AdminSystem.tsx`, `AdminLaunch.tsx`, `systemHealth.ts`). Chunk 7 Steuerung core
+> (`src/lib/appConfig.ts` + `AdminSteuerung.tsx`, consumers H1/H2/H4/H5/H6/H8 wired, `tests/appConfig.test.ts`).
+> Chunk 8 report JSON sidecars (`report-sidecar.mjs` + 4 scripts, `reportStaleness.ts`). Chunk 9 content
+> intelligence (`AdminInhalte.tsx`, coverage sidecar enriched with residual ids). Chunk 10 Steuerung
+> wave 2 (H3 Impressum toggle + confirm dialog, H7 streak pill, H10 landing copy overrides, H12 Demo-Modus
+> preset). All chunks: typecheck/lint/test:unit/build/check:bundle green; main chunk stayed ~112-116 kB.
 
 **How to use this plan:** each chunk is one focused session producing one PR into `main`. Set the
 recommended model with `/model` at the START of the session (the model cannot switch mid-task;

@@ -958,3 +958,50 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   most recent handoffs live = s145 + s144), prompt log under the ~1,200 rotation budget. No app-code
   or content changes this prompt.
 - **Artifacts (prompt 2):** `docs/SESSION_PROMPT_LOG.md`
+
+---
+
+## Session 146 — 2026-07-22
+
+**Branch:** `claude/landing-back-button-routing-jyhwot`
+
+- **Prompt 1 (verbatim):** `> I found that the back button routing for the pages on the landing page
+  is wrong or not working. Check all the routings alogn with the back button and fix those.`
+- **Response 1:** Audited every page linked from the landing (`/about`, `/privacy`, `/terms`,
+  `/sources` via `LegalChrome`; `/hilfe` + `/hilfe/:slug` via `HelpChrome`). Found one real bug:
+  `HelpChrome`'s Back button was hardcoded to `navigate("/hilfe")`, so on the Help hub itself (exactly
+  where the landing's "Help/Hilfe" nav + footer links land) Back re-navigated to the same page and did
+  nothing. Fixed it to use the history-aware `handleBack` (`location.key !== "default" ? navigate(-1)
+  : navigate("/welcome")`) that `LegalChrome` already uses; the article breadcrumb still links to the
+  hub explicitly. Verified with typecheck + build. Committed + pushed.
+- **Artifacts (prompt 1):** `src/features/help/HelpChrome.tsx` · commit `13c228d`
+- **Prompt 2 (verbatim):** `> alright if it's fixed, continue with admin control center build plan
+  next chunk and work until chunk 10`
+- **Response 2:** Built and shipped Admin Control Center chunks 4-10 (the whole MVP remainder plus
+  Phase-2 content-intel + Steuerung wave 2) per `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, each
+  as its own commit passing the full gate set (typecheck · lint 0-errors · test:unit · build ·
+  check:bundle · lint:content). Chunk 4 Review Cockpit (`review-score.mjs` + `build-review-queue.mjs`
+  → `reviewQueue.json`, `Pruefmodus.tsx`, `tests/reviewScore.test.ts`). Chunk 5 Feedback-Inbox
+  (`AdminFeedback.tsx`). Chunk 6 System health + Launch checklist (`AdminSystem.tsx`, `AdminLaunch.tsx`,
+  `systemHealth.ts`). Chunk 7 Steuerung core (`src/lib/appConfig.ts` + `AdminSteuerung.tsx`, consumers
+  H1/H2/H4/H5/H6/H8 wired, `tests/appConfig.test.ts` pinning the empty==defaults invariant). Chunk 8
+  report JSON sidecars (`report-sidecar.mjs` + 4 scripts, `reportStaleness.ts` + Übersicht staleness
+  strip). Chunk 9 content intelligence (`AdminInhalte.tsx`; coverage sidecar enriched with residual
+  ids). Chunk 10 Steuerung wave 2 (H3 Impressum toggle + confirm dialog, H7 streak pill, H10 landing
+  copy overrides, H12 Demo-Modus preset). Main chunk stayed ~112-116 kB; test:unit 275/275.
+- **Artifacts (prompt 2):** `scripts/review-score.mjs` · `scripts/build-review-queue.mjs` ·
+  `scripts/report-sidecar.mjs` · `src/features/admin/{Pruefmodus,reviewQueueData,AdminFeedback,AdminSystem,AdminLaunch,AdminSteuerung,AdminInhalte,systemHealth,reportStaleness,AdminApp,AdminOverview}.tsx/.ts`
+  · `src/features/admin/reviewQueue.json` · `src/lib/appConfig.ts` · `src/App.tsx` ·
+  `src/components/layout/{BottomTabBar,Sidebar,FeedbackButton,AppShell,nav-items}.tsx` ·
+  `src/features/vocabulary/{VocabList,VocabularyTrainer}.tsx` · `src/features/welt/NeulandHub.tsx` ·
+  `src/features/dashboard/Dashboard.tsx` · `src/features/landing/LandingPage.tsx` · `src/router.tsx` ·
+  `scripts/{verify-facts,verify-cefr,review-queue,report-exercise-coverage}.mjs` · `package.json` ·
+  `tsconfig.app.json` · `tests/{reviewScore,appConfig}.test.ts` · commits `9b4618a`, `0dd4ae4`,
+  `535cf2b`, `b3ad17d`, `0b753d3`, `35a045b`, plus the chunk-10 + docs commits
+- **Prompt 3 (verbatim):** `> document the session once you're done`
+- **Response 3:** Updated the build-plan status line (chunks 1-10 shipped + a Session-146 summary
+  block), `PROJECT_STATUS.md` (`_Last updated_` s146 header + the full s146 handoff, moved the s144
+  handoff to the W30 archive per the two-most-recent doc-hygiene rule), and this log. Status doc kept
+  under 250 lines.
+- **Artifacts (prompt 3):** `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` · `docs/PROJECT_STATUS.md`
+  · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `docs/SESSION_PROMPT_LOG.md`
