@@ -19,6 +19,17 @@ schema, set the secret API keys, and deploy the Edge Function.
 
 ## 1. Install the Supabase CLI (one time)
 
+> **The CLI is OPTIONAL.** Its only advantage is that `supabase db push`
+> (section 3) applies your entire `supabase/migrations/` folder in one command,
+> which was handy for the initial two-migration Phase 2 setup. Every migration
+> added since (0003, 0004, 0006, 0007, 0008, ...) ships with a
+> **"paste it into the Supabase dashboard SQL editor"** instruction that needs
+> nothing installed, and that is the supported route for a single new
+> migration. If the CLI install is giving you trouble (e.g. `scoop` isn't set
+> up on Windows), **skip this whole section** and use the SQL-editor paste
+> steps in the per-migration sections below. You do NOT need to re-run
+> `supabase db push`; your earlier migrations are already applied.
+
 macOS: `brew install supabase/tap/supabase`
 Windows: `scoop install supabase` (or see <https://supabase.com/docs/guides/cli>)
 
@@ -331,15 +342,28 @@ aggregate numbers only (counts and day totals), never individual user data.
    `app_config` and `launch_checklist`. Under Database → Functions you should
    see `admin_overview`, `admin_daily_series`, `admin_feedback_recent`,
    `admin_feedback_update`, `is_founder`, and `assert_founder`.
-3. **Verify the gate (optional, 1 minute).** In the SQL editor run
-   `select public.admin_overview();` It should return a JSON blob of counts
-   (the dashboard runs with elevated rights, so this only proves the function
-   works). The founder-only gate itself is enforced INSIDE each function: any
-   session whose login email is not one of the two founder accounts gets
-   "forbidden: founder account required". If your dashboard's SQL editor has
-   the "Run as: anon/authenticated" impersonation dropdown, you can see that
-   rejection live by re-running the same select impersonating `anon`. The
-   email list is also pinned in CI (`tests/admin.test.ts`), so it cannot
+3. **Verify it (optional).** Two checks:
+   - **The gate is live (expected result: an error).** In the SQL editor run
+     `select public.admin_overview();`. You will get
+     `ERROR: forbidden: founder account required`. **That is the correct,
+     healthy result**, not a failure: the SQL editor connects to the database
+     with no login identity attached, so the function has no founder email to
+     check and refuses it exactly as it refuses any non-founder. The fact that
+     it got as far as raising that error proves the function was created. (If
+     it had returned data here, THAT would be the bug.)
+   - **See the real numbers (optional).** To watch the happy path in the SQL
+     editor, hand the function a founder identity for one query by running
+     both of these lines together as a single query:
+     ```sql
+     select set_config('request.jwt.claims', '{"email":"thelivinsine@gmail.com"}', true);
+     select public.admin_overview();
+     ```
+     The second line now returns a JSON blob of counts. This manual step is
+     only for dashboard testing; in the real app the identity comes from your
+     login token automatically, so the `/admin` page (built in a later chunk)
+     will just work when you are signed in as a founder account.
+
+   The email list is also pinned in CI (`tests/admin.test.ts`), so it cannot
    silently drift from the app's own founder list.
 4. **Existing review marks are preserved.** Every item you already ticked in
    the Daten-Werkbank is carried over as an "approve" decision. Nothing needs
