@@ -368,3 +368,37 @@ visual fixes.
   its per-category card section headers (they read as page headers) for a flat grid, with Kategorie
   moved into the filter as pill facets; Grammatik hub cards show one clean emerald pattern instead of a
   truncated variant list, and drill options got a fill so they read as tappable.
+
+## Schreiben = Bibliothek extension + founder design preferences (session 149, 2026-07-23) — founder-approved
+
+The whole Schreiben section was rebuilt as a visual EXTENSION of the Bibliothek over five founder
+rounds (2 preview rounds, a 13-point fix list, a full audit with a P0/P1/P2 action list, then
+execution of all of it; PRs #648-#651). The shipped state is specced in CLAUDE.md ("Schreiben hub").
+This entry records the REUSABLE design preferences the founder expressed across those rounds, so a
+future surface starts from them instead of rediscovering them:
+
+1. **New sections extend the existing design system.** Reuse the Bibliothek building blocks
+   (sliding-pill switcher as page header, FilterRail tile language, scope dropdowns, facet pills,
+   sticky mobile action bars) rather than inventing a new style per section. Same categorization
+   hierarchy everywhere: Branche → Thema → Unterthema; in learner-facing daily-life groupings,
+   Gesundheit folds into Alltag.
+2. **Previews before implementation.** For design work, ship founder-reviewable HTML mockups
+   (preview/) built from the real tokens, iterate on the feedback list, and only then implement.
+3. **No redundancy in copy or chrome.** A fact appears once (the Ziel range lives on the Aufgabe
+   card, never repeated at the editor; the mode name never repeats under the toggle). No
+   explanatory filler lines in the UI (the "15-20 Aufgaben" hint was cut). Compact chrome: toggles
+   sized to their content (capped, centered), standard 40px icon buttons.
+4. **Dropdowns over pill walls for scopes.** Long option lists (themes) belong in grouped
+   dropdowns with internal scrolling, not wrapping pill grids; rails must never grow past their
+   tile.
+5. **Every visible control must visibly do something.** A reset that is disabled at the default
+   state reads as broken; prefer always-active controls with a real effect (reset = clear scopes +
+   draw a fresh task). Zero-yield options grey out with honest counts instead of dead-ending.
+6. **Color language:** Himmelblau accent tiles for selection rails (never grey slabs there);
+   content on WHITE cards (never grey washes, e.g. the AI transform card); card-title eyebrows
+   bold brand blue ("Aufgabe:", "Dein Satz"), inner section labels muted; a bold colored word
+   label ("Hinweis:") over a generic i icon; green dot = detected fact (never a blue fill/ring);
+   legal/AI disclaimers as standalone muted lines below cards, never inside them.
+7. **Consistent placement + motion.** Primary actions sit in the same place across sibling modes
+   (sticky bottom bars on mobile everywhere); micro-motion is subtle and shares one timing family
+   (directional tab slides like the Bibliothek, 0.12-0.18s panels/popovers, reduced-motion safe).
