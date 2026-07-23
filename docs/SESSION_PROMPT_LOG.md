@@ -1131,6 +1131,20 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   consumer fixes. Gates: typecheck · lint 0 errors · lint:content · test:unit 260/260 · build ·
   check:bundle 112.3 kB · Playwright screenshots both breakpoints. Docs updated (status + this log +
   CLAUDE.md), PR into `main`, squash-merged.
+- **Prompt 4 (verbatim, with a Fokus screenshot attached):** `It doesn't look like you understood my feedback from earlier. Here are the comments: 1. The aufgabe wahlen rail should have internal scrolling and should not extend too much like in the screenshot. The max lenght can be referenced from the bibliothek section. 2. Why are all the topics provided as pills? Why can't you use other filter designs like drop down? Fix it 3. The categorization hierarchy should be similar to the bibliothek - Branchen, Themen, Unterthemen, etc. Also, Gesundheit should be part of alltag as discussed in one of the earlier sessions - that rule is not respected here. Fix these issues. 4. The Ziel 40-60 Worter is repeated. Remove the bottom one. 5. The line "Dein Text wird zur Auswertung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung ist KI-generiert und kann Fehler enthalten. Mehr im Datenschutz." should be a stand alone element below the writing field card. 6. Highlight the Aufgabe and the topic name like in the preview with a nice color and bolded text. 7. The Fokus, Kurz, ... toggle menu looks too big. Reference the bibliothek section for the right size. 8. "Tippe eine andere Form..." should start in the next line. 9. Add a reset button for the rail 10. The AI generated card should also be in white 11. The "KI-generierte Umformung" line should be centered and to the bottom of the card with enough spacing from the main content. 12. This line "Das Präsens wurde ins Präteritum umgewandelt: 'liebe' → 'liebte' und 'kann' → 'konnte'." should not have an i icon, instead should have a "Hinweis" or "Info" with a colored and bolded text. 13. Add a good himmelblue shade to the aufgabe wahlen rail instead of the gray.`
+- **Response 4 (round 3):** All 13 applied. Thema became a Bibliothek-style grouped DROPDOWN with
+  internal scrolling (rail can no longer overgrow; the popover escapes the tile, so the tile drops
+  overflow clipping and the mobile panel switched to a fade/slide animation); gesundheit folded into
+  Alltag in the grouping (prompts carry only the Thema grain, so no dead Branche/Unterthema
+  controls); the "Aufgabe wählen" tile went Himmelblau (`bg-accent/20`) with a header reset icon;
+  the header switcher was capped `lg:max-w-xl` + centered (measured 816×44 = pixel-identical to
+  Bibliothek before, but four short labels at full column width read oversized); Ziel range only on
+  the Aufgabe card; AI disclaimer standalone below the card (guided + Fokus); brand-colored bold
+  Aufgabe eyebrow; Fokus transform box = white card, "Hinweis:" bold label instead of the i icon,
+  "KI-generierte Umformung" centered at the bottom; Grammatik rail reset icon + two-line hint.
+  Gates: typecheck · eslint 0 errors · test:unit 260/260 · build · bundle 112.3 kB · Playwright
+  screenshots (desktop Kurz/Fokus incl. open dropdown, mobile panel). Shipped via PR into `main`,
+  squash-merged; docs updated.
 - **Artifacts (session 149):** `preview/schreiben-bibliothek-extension.html` ·
   `preview/schreiben-bibliothek-extension-r2.html` · `src/features/writing/WritingModeSwitcher.tsx` ·
   `src/features/writing/WritingHub.tsx` · `src/features/writing/WritingRail.tsx` ·
