@@ -104,6 +104,17 @@ A/B, `-r2.html` = variant A + the founder's 7 changes), then implemented on foun
   transform box is a white card with a bold "Hinweis:" label (no i icon) and a centered
   "KI-generierte Umformung" footer; the Grammatik rail got a reset icon and a two-line hint. The
   mobile Aufgabe panel animates via fade/slide because a height collapse would clip the dropdown.
+- **Harmonization round (same session, founder-approved P0+P1 list):** the Aufgabe-wählen rail
+  now carries the FULL Bibliothek scope hierarchy **Branche → Thema → Unterthema** as grouped
+  dropdowns (live counts, zero-yield greyed). `writingPrompts.ts` moved to task objects
+  `{ text, sub?, sectors? }`: all tasks tagged, ~86 new sub-theme tasks authored (every sub-theme
+  ≥2 short + ≥2 long) plus a 5-Branche starter wave (it/care/construction/transport/hospitality,
+  6 each, untagged = universal so a Branche never empties a pool). Bank: **316 tasks**. P1: Fokus
+  Grammatik rail Himmelblau like the Aufgabe rail (+ dark-mode alphas for both), Verlauf constrained
+  to the content grid + empty-state CTA, unified eyebrow rule (card titles bold primary), 40px
+  spinning dice, duplicate Fokus hint removed, Fokus mobile sticky Korrigieren bar. Remaining from
+  the audit list (P2, not started): reset-also-rerolls, micro-motion pass, pools to 15-20/theme,
+  further Branchen waves.
 - **Gates:** typecheck ✓ · lint 0 errors · lint:content ✓ (pool schema validated) · test:unit
   **260/260** · build ✓ · check:bundle **112.3 kB** (writingPrompts stays a lazy chunk) · Playwright
   screenshots of desktop + mobile, both modes (incl. the open dropdown), verified against the

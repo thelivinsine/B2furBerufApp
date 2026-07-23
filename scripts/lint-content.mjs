@@ -470,16 +470,19 @@ function lintPracticeAreas(practiceAreas) {
   }
 }
 
-function lintWritingPrompts(writingPrompts) {
+function lintWritingPrompts(writingPrompts, subThemeIndex) {
   const ds = "writingPrompts";
-  // Random-Aufgabe pools (s148): every theme needs a non-empty short AND long
-  // pool of non-empty prompt strings (the trainer draws a random index).
+  // Random-Aufgabe pools (s148; task objects since s149): every theme needs a
+  // non-empty short AND long pool of tasks. A task's optional `sub` must be a
+  // sub-theme declared on its theme, and `sectors` must be known Branchen
+  // (untagged = universal, the Bibliothek rule).
   for (const id of THEME_IDS) {
     const p = writingPrompts[id];
     if (!p) {
       error(ds, id, "no writing prompt for theme");
       continue;
     }
+    const declared = subThemeIndex.get(id);
     for (const len of ["short", "long"]) {
       const pool = p[len];
       if (!Array.isArray(pool) || pool.length === 0) {
@@ -487,7 +490,12 @@ function lintWritingPrompts(writingPrompts) {
         continue;
       }
       pool.forEach((t, i) => {
-        if (!isStr(t)) error(ds, `${id}.${len}[${i}]`, "empty prompt");
+        const w = `${id}.${len}[${i}]`;
+        if (!isStr(t?.text)) error(ds, w, "empty prompt text");
+        if (t?.sub != null && !(declared && declared.has(t.sub)))
+          error(ds, w, `sub "${t.sub}" not declared on theme "${id}"`);
+        for (const s of t?.sectors ?? [])
+          if (!WORK_SECTORS.includes(s)) error(ds, w, `unknown sector "${s}"`);
       });
     }
   }
@@ -1278,7 +1286,7 @@ async function main() {
   lintExamSets(data.examSets, new Set(data.scenarios.map((s) => s.id)));
   lintRedemittel(data.redemittel);
   lintPracticeAreas(data.practiceAreas);
-  lintWritingPrompts(data.writingPrompts);
+  lintWritingPrompts(data.writingPrompts, subThemeIndex);
   lintCanDo(data.canDoStatements);
   lintTexts(data.texts, subThemeIndex);
   lintGameRegistries(data);

@@ -1145,6 +1145,31 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   Gates: typecheck · eslint 0 errors · test:unit 260/260 · build · bundle 112.3 kB · Playwright
   screenshots (desktop Kurz/Fokus incl. open dropdown, mobile panel). Shipped via PR into `main`,
   squash-merged; docs updated.
+- **Prompt 5 (verbatim):** `can you make sure all feedback items are addressed?`
+- **Response 5:** Full 13-point audit against the merged build, incl. the Fokus corrected/transform
+  states via a network-mocked backend (Playwright fulfills `check-sentence`/`transform-sentence`);
+  all 13 confirmed with screenshots + a programmatic dump of the dropdown grouping.
+- **Prompt 6 (verbatim, Fokus screenshot attached):** `this is what I see.. do you think all the feedback is applied?`
+- **Response 6:** Confirmed the screenshot IS the new build (capped toggle measured, standalone
+  disclaimer, reset icon); explained the grey Grammatik rail (point 13 named only the Aufgabe rail)
+  and that the dimmed pills are the disabled pre-correction state; offered to blue the Fokus rail.
+- **Prompt 7:** (Kurz-tab screenshot, no text)
+- **Response 7:** Confirmed the Kurz view matches the approved design point by point.
+- **Prompt 8 (verbatim):** `why are no unterthemen and Branchen in the aufgabe wahlen for Kurz? Why isn't blue applied for Fokus? There are several hamonizations needed. Do a full audit and provide a list of priority actions for harmonization and overll polishing of the layout and design in all of the shcreiben section`
+- **Response 8:** Explained both (prompts carried only Thema tags, so Branche/Unterthema would have
+  been dead controls; Fokus grey was the literal reading of point 13). Rendered every tab light+dark
+  for a full audit and delivered a prioritized list: P0 (blue Fokus rail; real Branche→Thema→
+  Unterthema hierarchy with prompt tagging/authoring), P1 (Verlauf grid break, unified eyebrows,
+  dark-mode tile tuning, 40px dice, duplicate hint, Fokus mobile sticky bar), P2 polish.
+- **Prompt 9 (verbatim):** `Go ahead with all p0 and p1 items. Ask me questions if unclear on anything`
+- **Response 9:** Shipped all P0+P1 (PR #650): `writingPrompts.ts` moved to task objects
+  `{text, sub?, sectors?}` with all tasks tagged + ~86 new sub-theme tasks (every sub-theme >=2
+  short + >=2 long) + a 5-Branche starter wave (it/care/construction/transport/hospitality, 6 each,
+  untagged = universal); the rail gained Branche/Thema/Unterthema dropdowns with live counts and
+  greyed zero-yield options (`?sub=`/`?sector=`); Fokus rail Himmelblau + dark-mode alphas; Verlauf
+  in the content grid + empty-state CTA; unified eyebrow rule; spinning 40px dice; duplicate hint
+  removed; Fokus mobile sticky Korrigieren bar. Bank: 316 tasks. Gates: typecheck / lint:content /
+  eslint 0 errors / 260 tests / build / bundle 112.3 kB / Playwright light+dark. Squash-merged.
 - **Artifacts (session 149):** `preview/schreiben-bibliothek-extension.html` ·
   `preview/schreiben-bibliothek-extension-r2.html` · `src/features/writing/WritingModeSwitcher.tsx` ·
   `src/features/writing/WritingHub.tsx` · `src/features/writing/WritingRail.tsx` ·
@@ -1152,4 +1177,4 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/resumeDraft.ts` ·
   `src/data/writingPrompts.ts` · `scripts/lint-content.mjs` ·
   `src/features/writing/WritingHistory.tsx` · `src/features/vocabulary/RelatedPanel.tsx` ·
-  `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · this log
+  `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · this log

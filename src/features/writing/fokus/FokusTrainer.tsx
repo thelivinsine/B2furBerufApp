@@ -7,7 +7,6 @@ import {
   Info,
   Clock,
   Check,
-  Lightbulb,
   SlidersHorizontal,
   ChevronDown,
   RotateCcw,
@@ -101,10 +100,26 @@ export function FokusTrainer({
     if (!railEnabled) setPanelOpen(false);
   }, [railEnabled]);
 
+  const korrigierenButton = (
+    <Button onClick={onSubmit} disabled={m.status === "submitting" || tooShort} variant="gradient">
+      {m.status === "submitting" ? (
+        <>
+          <Loader2 className="h-4 w-4 animate-spin" /> Wird geprüft …
+        </>
+      ) : (
+        <>
+          <Sparkles className="h-4 w-4" /> Korrigieren
+        </>
+      )}
+    </Button>
+  );
+
   const inputCard = (
     <Card>
       <CardContent className="space-y-3 p-5">
-        <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+        {/* Card-title eyebrow = bold primary (unified eyebrow system, s149);
+            inner section labels stay muted. */}
+        <p className="text-xs font-bold uppercase tracking-wide text-primary">
           Dein Satz
         </p>
 
@@ -172,20 +187,12 @@ export function FokusTrainer({
         )}
 
         {/* Neuer Satz moved out of the card: desktop = the rail footer,
-            mobile = the toolbar row (Bibliothek-extension redesign, s148). */}
+            mobile = the toolbar row (Bibliothek-extension redesign, s148).
+            Korrigieren lives here on desktop only; mobile uses the sticky
+            bottom action bar, matching Kurz/Lang (s149 harmonization). */}
         {m.status !== "corrected" && (
-          <div className="flex items-center justify-end gap-2">
-            <Button onClick={onSubmit} disabled={m.status === "submitting" || tooShort} variant="gradient">
-              {m.status === "submitting" ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Wird geprüft …
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4" /> Korrigieren
-                </>
-              )}
-            </Button>
+          <div className="hidden items-center justify-end gap-2 lg:flex">
+            {korrigierenButton}
           </div>
         )}
 
@@ -224,7 +231,7 @@ export function FokusTrainer({
       className="rounded-2xl border border-border bg-surface p-5 shadow-soft"
     >
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-[11px] font-bold uppercase tracking-wide text-accent-ink">
+        <span className="text-xs font-bold uppercase tracking-wide text-primary">
           {transformLabel}
         </span>
         {m.transform.status === "done" && m.transform.applicable && m.transform.transformed && (
@@ -373,12 +380,16 @@ export function FokusTrainer({
         />
       </div>
 
-      {/* Idle helper (both breakpoints) when nothing is written yet. */}
-      {m.status === "idle" && !m.input && (
-        <p className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Lightbulb className="h-3.5 w-3.5" />
-          Schreib einen Satz, prüf ihn, dann erkennt die KI Aktiv/Passiv und die Zeitform.
-        </p>
+      {/* (The old idle helper line was removed in s149: it duplicated the
+          rail's "Prüf zuerst deinen Satz …" hint.) */}
+
+      {/* Mobile action bar: Korrigieren pinned above the nav, matching the
+          Kurz/Lang Auswerten bar (s149 harmonization). Gone once corrected
+          (the toolbar then owns Grammatik + Neuer Satz). */}
+      {m.status !== "corrected" && (
+        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 mt-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden [&>button]:h-11 [&>button]:flex-1 [&>button]:rounded-xl [&>button]:text-base">
+          {korrigierenButton}
+        </div>
       )}
     </div>
   );

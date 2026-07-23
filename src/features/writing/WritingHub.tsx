@@ -45,8 +45,12 @@ export function WritingHub() {
     const p = new URLSearchParams(params);
     if (t === "fokus") p.delete("mode");
     else p.set("mode", t);
-    // Switching surface drops a stale theme selection from the guided flow.
-    if (t === "fokus" || t === "verlauf") p.delete("theme");
+    // Switching surface drops stale guided-flow scopes (theme/sub/Branche).
+    if (t === "fokus" || t === "verlauf") {
+      p.delete("theme");
+      p.delete("sub");
+      p.delete("sector");
+    }
     setParams(p);
   };
 
@@ -115,7 +119,13 @@ export function WritingHub() {
       </div>
 
       {tab === "verlauf" ? (
-        <WritingHistory />
+        // Verlauf keeps the same content column as the other tabs (the grid's
+        // col 1), so the page width never jumps between tabs (s149 audit).
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
+          <div className="min-w-0 lg:col-start-1">
+            <WritingHistory />
+          </div>
+        </div>
       ) : tab === "fokus" ? (
         <FokusTrainer
           isSignedIn={isSignedIn}
