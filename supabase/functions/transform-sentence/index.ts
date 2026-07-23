@@ -57,6 +57,10 @@ const MOODS = ["indikativ", "konjunktiv1", "konjunktiv2", "imperativ"];
 const REASONS = ["ok", "kein_akkusativobjekt", "intransitiv_unpersoenlich", "bereits_zielform", "nicht_idiomatisch", "mehrdeutig", "modalverb_grenze"];
 
 const TRANSFORM_MODEL = Deno.env.get("TRANSFORM_MODEL") ?? "claude-sonnet-5";
+// Fallbacks upgraded to Sonnet-5-tier so an Anthropic outage does not silently
+// degrade German grammar quality back to the cheap tier that caused the bug.
+const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-pro";
+const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
 const TRANSFORM_DAILY_LIMIT = Number(Deno.env.get("TRANSFORM_DAILY_LIMIT") ?? "40");
 const TRANSFORM_BURST_LIMIT = Number(Deno.env.get("TRANSFORM_BURST_LIMIT") ?? "8");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
@@ -198,13 +202,16 @@ async function callGemini(source: string, target: Tuple): Promise<TransformOut |
   if (!key) return null;
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [{ parts: [{ text: userMsg(source, target) }] }],
+          // 2.5 Pro is a thinking model: force pure-JSON output and give a
+          // generous budget so reasoning tokens cannot truncate the answer.
+          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4096 },
         }),
       },
     );
@@ -217,7 +224,7 @@ async function callGemini(source: string, target: Tuple): Promise<TransformOut |
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parse(raw, target);
     if (!parsed) { console.error(`[transform] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
-    return { ...parsed, model: "gemini-1.5-flash", cost: 0.0005 };
+    return { ...parsed, model: GEMINI_MODEL, cost: 0.003 };
   } catch (e) {
     console.error(`[transform] gemini threw: ${e}`);
     return null;
@@ -232,8 +239,13 @@ async function callOpenAI(source: string, target: Tuple): Promise<TransformOut |
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: OPENAI_MODEL,
         response_format: { type: "json_object" },
+        // GPT-5 is a reasoning model: cap with max_completion_tokens (max_tokens is
+        // rejected) and keep reasoning minimal so it stays fast and does not starve
+        // the JSON output. No temperature (also rejected on reasoning models).
+        max_completion_tokens: 2048,
+        reasoning_effort: "minimal",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userMsg(source, target) },
@@ -248,7 +260,7 @@ async function callOpenAI(source: string, target: Tuple): Promise<TransformOut |
     const data = await res.json();
     const parsed = parse(data.choices?.[0]?.message?.content ?? "", target);
     if (!parsed) return null;
-    return { ...parsed, model: "gpt-4o-mini", cost: 0.0008 };
+    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
   } catch (e) {
     console.error(`[transform] openai threw: ${e}`);
     return null;

@@ -6,7 +6,7 @@
 //
 //   1. Auth + kill-switch + per-user daily check limit + global monthly $ fuse.
 //   2. Cache lookup by input hash (GLOBAL: corrections are user-independent).
-//   3. ONE Haiku call (fallback Gemini -> gpt-4o-mini) returning corrected text +
+//   3. ONE Sonnet 5 call (fallback Gemini 2.5 Pro -> GPT-5) returning corrected text +
 //      per-sentence {voice,tense,mood}.
 //   4. Persist a per-user row, bump ai_usage + the paid-ops ledger, return JSON.
 //
@@ -59,6 +59,10 @@ const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");
 // Sonnet 5 for German morphology accuracy (was claude-haiku-4-5, which mislabeled
 // copula "sein + Adjektiv" as passive). Override via CHECK_MODEL if ever needed.
 const CHECK_MODEL = Deno.env.get("CHECK_MODEL") ?? "claude-sonnet-5";
+// Fallbacks upgraded to Sonnet-5-tier so an Anthropic outage does not silently
+// degrade German grammar quality back to the cheap tier that caused the bug.
+const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-pro";
+const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
 // Bump when the prompt or model changes: the global correction cache is keyed by
 // source_hash only, so folding this in re-evaluates sentences that were cached by
 // the old (weaker) model instead of serving their stale grammar detection.
@@ -178,13 +182,16 @@ async function callGemini(text: string): Promise<CheckOut | null> {
   if (!key) return null;
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [{ parts: [{ text: `Text:\n"""${text}"""` }] }],
+          // 2.5 Pro is a thinking model: force pure-JSON output and give a
+          // generous budget so reasoning tokens cannot truncate the answer.
+          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4096 },
         }),
       },
     );
@@ -197,7 +204,7 @@ async function callGemini(text: string): Promise<CheckOut | null> {
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parseCheck(raw);
     if (!parsed) { console.error(`[check] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
-    return { ...parsed, model: "gemini-1.5-flash", cost: 0.0005 };
+    return { ...parsed, model: GEMINI_MODEL, cost: 0.003 };
   } catch (e) {
     console.error(`[check] gemini threw: ${e}`);
     return null;
@@ -212,8 +219,13 @@ async function callOpenAI(text: string): Promise<CheckOut | null> {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: OPENAI_MODEL,
         response_format: { type: "json_object" },
+        // GPT-5 is a reasoning model: cap with max_completion_tokens (max_tokens is
+        // rejected) and keep reasoning minimal so it stays fast and does not starve
+        // the JSON output. No temperature (also rejected on reasoning models).
+        max_completion_tokens: 2048,
+        reasoning_effort: "minimal",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: `Text:\n"""${text}"""` },
@@ -228,7 +240,7 @@ async function callOpenAI(text: string): Promise<CheckOut | null> {
     const data = await res.json();
     const parsed = parseCheck(data.choices?.[0]?.message?.content ?? "");
     if (!parsed) return null;
-    return { ...parsed, model: "gpt-4o-mini", cost: 0.0008 };
+    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
   } catch (e) {
     console.error(`[check] openai threw: ${e}`);
     return null;
