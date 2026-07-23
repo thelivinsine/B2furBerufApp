@@ -94,9 +94,20 @@ A/B, `-r2.html` = variant A + the founder's 7 changes), then implemented on foun
   Satz" only. Mobile pairs the Grammatik panel button with Neuer Satz in one row. `WritingHistory`
   shows only the learner's text now (the exact prompt behind an old entry is not recoverable);
   `RelatedPanel` links `/writing?mode=kurz&theme=…` with `wp.short[0]`.
+- **Round 3 (same session, 13 founder fixes):** the Thema selection is a Bibliothek-style
+  **dropdown** (grouped listbox popover, internal scroll), NOT pills; **gesundheit folds into
+  Alltag** in its grouping (founder rule); the "Aufgabe wählen" tile is a light **Himmelblau**
+  `bg-accent/20` wash with a header reset icon; the header switcher is capped `lg:max-w-xl` +
+  centered (measured pixel-identical to Bibliothek's 816×44 before, but four short labels at full
+  width read oversized); the Ziel range shows only on the Aufgabe card; the AI disclaimer is a
+  standalone line below the editor/sentence card; the Aufgabe eyebrow is brand-colored; the Fokus
+  transform box is a white card with a bold "Hinweis:" label (no i icon) and a centered
+  "KI-generierte Umformung" footer; the Grammatik rail got a reset icon and a two-line hint. The
+  mobile Aufgabe panel animates via fade/slide because a height collapse would clip the dropdown.
 - **Gates:** typecheck ✓ · lint 0 errors · lint:content ✓ (pool schema validated) · test:unit
   **260/260** · build ✓ · check:bundle **112.3 kB** (writingPrompts stays a lazy chunk) · Playwright
-  screenshots of desktop + mobile, both modes, verified against the approved mockups.
+  screenshots of desktop + mobile, both modes (incl. the open dropdown), verified against the
+  approved mockups.
 - **Open:** grow the pools toward 15-20 prompts per theme/length in content waves (append to the
   arrays in `writingPrompts.ts`, no schema work needed); the s147 founder redeploy action below still
   stands.
