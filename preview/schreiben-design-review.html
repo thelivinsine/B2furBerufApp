@@ -108,7 +108,7 @@
     box-shadow: 0 1px 2px hsl(var(--shadow) / .12); transition: transform .2s cubic-bezier(.16,1,.3,1), width .2s cubic-bezier(.16,1,.3,1); }
 
   /* himmel tiles: light kräftig, dark weich */
-  .tiles { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .tiles { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; align-items: stretch; }
   .tile { border-radius: 14px; padding: 10px 14px; min-width: 132px;
     background: hsl(var(--accent) / .30); border: 1px solid hsl(var(--accent) / .70); }
   :root[data-theme="dark"] .tile, .darktokens .tile { background: hsl(var(--accent) / .18); border-color: hsl(var(--accent) / .45); }
@@ -162,18 +162,11 @@
   .count { font-size: 12px; color: hsl(var(--muted-foreground)); white-space: nowrap; margin-right: auto; }
   .btn { border: none; border-radius: 12px; padding: 10px 16px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
     display: inline-flex; align-items: center; gap: 7px; color: hsl(var(--primary-foreground)); background: hsl(var(--primary)); }
-  /* Neuer-Satz ghost button, bottom-right of the corrected card. */
-  .cardfoot { display: flex; justify-content: flex-end; margin-top: 18px; }
   .ghostbtn { border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--foreground)); border-radius: 12px;
     padding: 9px 14px; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: border-color .12s; }
   .ghostbtn:hover { border-color: hsl(var(--accent) / .6); }
-
-  /* Eingabe (borderless): floating field + controls, no card frame. */
-  .inhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-  .inhead .count { margin: 0; }
-  .w-field { border-radius: 14px; }
-  .floatrow { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
-  .floatrow .keys { flex: 1 1 auto; }
+  /* Neuer Satz shares the correction-pills row, right-aligned, wraps only if needed. */
+  .tiles .tilebtn { margin-left: auto; align-self: center; }
 
   .footnote { margin: 15px 0 0; font-size: 12px; color: hsl(var(--muted-foreground)); }
   .foot { font-size: 11.5px; color: hsl(var(--muted-foreground)); margin: 42px 2px 0; line-height: 1.65; border-top: 1px solid hsl(var(--border)); padding-top: 16px; }
@@ -219,17 +212,15 @@
     <div class="slabel"><span class="stag rec">Final</span><span class="sname">Kombiniert · deine Auswahl</span></div>
     <p class="swhy">V4-Kacheln (theme-abhängig: hell kräftig, dunkel weich) · Original/Korrigiert-Toggle mit
       Koralle- bzw. Grün-Markierung · Umlaut-Tasten in der Fußzeile (A), ~30 % kleiner · Korrigieren
-      solid (ohne Verlauf) · Neuer Satz unten rechts.</p>
+      solid (ohne Verlauf) · Neuer Satz in der Kachelzeile rechts.</p>
 
     <p class="steps">1 · Eingabe</p>
-    <div class="inputbare">
-      <div class="inhead">
-        <span class="eyebrow">Dein Satz</span>
-        <span class="count" data-count>5 Wörter</span>
-      </div>
-      <textarea class="w-field" rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.">Kanst du bitte es kurz erklaeren?</textarea>
-      <div class="floatrow">
-        <div class="keys" data-keys></div>
+    <div class="card">
+      <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
+      <textarea rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.">Kanst du bitte es kurz erklaeren?</textarea>
+      <div class="footer" style="flex-wrap:wrap">
+        <div class="keys" data-keys style="flex:1 1 auto"></div>
+        <span class="count" data-count style="margin-left:auto;margin-right:0">5 Wörter</span>
         <button class="btn">✦ Korrigieren</button>
       </div>
     </div>
@@ -250,8 +241,8 @@
       <div class="tiles">
         <div class="tile"><span class="cat">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
         <div class="tile"><span class="cat">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+        <button class="ghostbtn tilebtn">↺ Neuer Satz</button>
       </div>
-      <div class="cardfoot"><button class="ghostbtn">↺ Neuer Satz</button></div>
     </div>
   </section>
 
@@ -443,7 +434,6 @@
 <script>
   (function () {
     var root = document.documentElement;
-
     function currentDark() {
       var t = root.getAttribute('data-theme');
       if (t === 'dark') return true;
