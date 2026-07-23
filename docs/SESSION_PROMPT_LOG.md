@@ -1178,6 +1178,15 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   >=8 long per theme (16 new generic tasks); Branche wave 2 adds the remaining 10 sectors at 4
   tasks each. Bank: 373 tasks, all 15 Branchen, subs still >=2/2. Gates green + live Playwright
   check of the reset. Squash-merged.
+- **Prompt 11 (verbatim):** `document the session along with my design preferences.`
+- **Response 11:** Refreshed the stale `docs/PROJECT_STATUS.md` header to the session's final state
+  (373 tasks, hierarchy dropdowns, all 15 Branchen, always-active reset), distilled the founder's
+  reusable DESIGN PREFERENCES into a new "Founder design preferences (UI)" section in `CLAUDE.md`
+  (extend the design system / previews first / no redundancy / dropdowns over pill walls / controls
+  always visibly act / the color language incl. Himmelblau rails, white cards, bold "Hinweis:"
+  labels, green detected dots / consistent placement + one motion timing family) with the full
+  session-grounded record appended to `docs/DECISIONS.md` (s149 entry), and logged this prompt.
+  Shipped via PR into `main`, squash-merged.
 - **Artifacts (session 149):** `preview/schreiben-bibliothek-extension.html` ·
   `preview/schreiben-bibliothek-extension-r2.html` · `src/features/writing/WritingModeSwitcher.tsx` ·
   `src/features/writing/WritingHub.tsx` · `src/features/writing/WritingRail.tsx` ·
@@ -1185,4 +1194,4 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/resumeDraft.ts` ·
   `src/data/writingPrompts.ts` · `scripts/lint-content.mjs` ·
   `src/features/writing/WritingHistory.tsx` · `src/features/vocabulary/RelatedPanel.tsx` ·
-  `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · #651 · this log
+  `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · #651 · #652 · `docs/DECISIONS.md` (s149 design-preferences entry) · this log

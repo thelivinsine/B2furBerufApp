@@ -1,14 +1,17 @@
 # Project Status
 
-_Last updated: 2026-07-23 (session 149). **Schreiben is now a full Bibliothek extension** (founder
-mockup rounds in `preview/schreiben-bibliothek-extension*.html`, then implemented): the 4-segment
-sliding-pill switcher **Fokus · Kurz · Lang · Verlauf** IS the page header (no H1; Verlauf rides
-`?mode=verlauf`), the Thema/Grammatik rails are FilterRail-language tiles ("Aufgabe wählen" with
-domain-grouped pills; Fokus detected forms = white pills with a green dot), mobile swaps floating
-chips for the Bibliothek toolbar-button + collapsible panel + a sticky bottom Auswerten bar, and
-**writing prompts are now random POOLS** (5 short + 5 long per theme, 200 total; dice re-rolls,
-founder target 15-20 per theme in later waves). Founder action open (from s147): redeploy
-`check-sentence`/`transform-sentence` for the logging/retry fix + confirm `GEMINI_API_KEY`.
+_Last updated: 2026-07-23 (session 149, complete). **Schreiben is a full Bibliothek extension**
+(5 founder rounds, PRs #648-#651, all merged): the 4-segment sliding-pill switcher **Fokus · Kurz ·
+Lang · Verlauf** IS the page header, the "Aufgabe wählen" rail is a Himmelblau tile with the
+Bibliothek scope hierarchy **Branche → Thema → Unterthema** as grouped dropdowns (live counts,
+zero-yield greyed, Gesundheit folds into Alltag), the Fokus Grammatik rail shares the same tile
+(green dot = detected form), and writing tasks are RANDOM POOLS of tagged task objects: **373
+tasks**, every theme ≥8 short + ≥8 long, every sub-theme ≥2+2, **all 15 Branchen** with
+sector-specific tasks (untagged = universal). Reset is always-active (clears scopes + draws a
+fresh task); directional tab slides + one micro-motion timing family. **Founder design
+preferences distilled into CLAUDE.md + DECISIONS.md (s149).** Next content wave: pools toward
+15-20 per theme/length (append-only). Founder action open (from s147): redeploy
+`check-sentence`/`transform-sentence` + confirm `GEMINI_API_KEY`.
 Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.

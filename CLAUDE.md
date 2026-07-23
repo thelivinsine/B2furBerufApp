@@ -545,6 +545,28 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   behind the reversible `SHOW_PRACTICE_TABS = false` flag; `Flashcards`/`VocabQuiz` stay in the repo
   (used by the session engine).
 
+## Founder design preferences (UI; distilled s149, full record in `docs/DECISIONS.md`)
+Apply these to ANY new or restyled surface, before the founder has to ask:
+- **Extend the existing design system, never invent a parallel style:** reuse the Bibliothek
+  building blocks (sliding-pill switcher AS the page header, FilterRail tile language, scope
+  dropdowns, facet pills, sticky mobile action bars) and the one categorization hierarchy
+  (Branche → Thema → Unterthema; learner-facing daily-life groupings fold Gesundheit into Alltag).
+- **Previews first for design work:** founder-reviewable `preview/*.html` mockups from the real
+  tokens, iterate on the feedback list, then implement.
+- **No redundancy:** each fact appears once (no repeated ranges/labels), no explanatory filler
+  lines in the UI; compact chrome (content-sized toggles, 40px icon buttons).
+- **Dropdowns over pill walls** for long scope lists; rails never outgrow their tile (internal
+  scrolling).
+- **Controls always visibly act:** no disabled-at-default buttons that read as broken (reset =
+  clear + fresh draw); zero-yield options grey out with honest counts.
+- **Color language:** Himmelblau accent tiles for selection rails (not grey); content on white
+  cards (no grey washes); card-title eyebrows bold brand blue, inner labels muted; a bold colored
+  word label ("Hinweis:") over an i icon; green dot = detected fact; AI/legal disclaimers as
+  standalone lines below cards.
+- **Consistency + motion:** primary actions in the same place across sibling modes (mobile sticky
+  bars); subtle micro-motion in one timing family (directional tab slides, 0.12-0.18s, reduced-
+  motion safe).
+
 ## Writing style (applies to ALL user-facing copy)
 - **Avoid em dashes (`—`).** The founder dislikes them; they are an overused "AI" tell. Use them
   only when genuinely essential (and that is rare). For everything else, **rewrite or paraphrase**
