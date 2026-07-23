@@ -93,10 +93,11 @@ export function AdminShell() {
 
   return (
     <div className="min-h-dvh bg-page text-foreground">
-      <div className="mx-auto grid min-h-dvh w-full max-w-[1240px] grid-cols-1 md:grid-cols-[224px_1fr]">
-        {/* Sidebar */}
-        <aside className="flex flex-col gap-1 border-b border-border bg-surface/70 p-3 md:border-b-0 md:border-r">
-          <div className="flex items-center gap-2.5 px-2 pb-3 pt-1">
+      <div className="mx-auto grid min-h-dvh w-full max-w-[1240px] grid-cols-1 md:grid-cols-[256px_1fr]">
+        {/* Sidebar — spacing mirrors the app's desktop Sidebar (256px column,
+            p-4, 18px marks, px-3/gap-3 rows) so the two nav panels feel alike. */}
+        <aside className="flex flex-col gap-1 border-b border-border bg-surface/70 p-4 md:border-b-0 md:border-r">
+          <div className="flex items-center gap-2.5 px-2 pb-4 pt-1">
             <Logo className="h-7 w-7" variant="mark" />
             <div className="leading-tight">
               <div className="text-sm font-extrabold tracking-tight">genauly</div>
@@ -116,7 +117,7 @@ export function AdminShell() {
                   end={item.end}
                   className={({ isActive }) =>
                     cn(
-                      "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-colors",
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       "md:justify-start justify-center",
                       isActive
                         ? "bg-primary/10 text-primary"
@@ -124,7 +125,7 @@ export function AdminShell() {
                     )
                   }
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
+                  <item.icon className="h-[18px] w-[18px] shrink-0" />
                   <span className="hidden md:inline">{t(item.de, item.en)}</span>
                   {badge != null && (
                     <span className="ml-auto hidden rounded-full bg-primary/15 px-1.5 py-0.5 text-[10px] font-bold text-primary md:inline">

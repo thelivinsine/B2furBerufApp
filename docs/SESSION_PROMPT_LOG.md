@@ -1196,7 +1196,73 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   `src/features/writing/WritingHistory.tsx` · `src/features/vocabulary/RelatedPanel.tsx` ·
   `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · #651 · #652 · `docs/DECISIONS.md` (s149 design-preferences entry) · this log
 
-## Session 150 — 2026-07-23 — Fokus "Satzlabor" grammar-bug fix + AI provider cascade rework (branch `claude/ai-response-bug-xfsth9`)
+## Session 150 — 2026-07-23 — Fokus correction-card redesign + Umlaut keys (branch `claude/diagonal-gradient-invert-odi99r`)
+
+- **Prompt 1 (verbatim, screenshot of the dark Schreiben/Kurz screen attached):** `Can you invert the gradient diagonally taking axis as top left corner to bottom right corner? Meaning the shade appearing currently to the top right corner should appear in the bottom leff corner and vice versa`
+- **Prompt 1b (verbatim):** `I'm talking about the gradient on the background of the app`
+- **Response 1:** Mirrored the `bg-page`/`bg-mesh` wash across the TL→BR diagonal in `tailwind.config.ts`:
+  the accent radial moved `at 100% 0%` → `at 0% 100%`, the primary radial stayed on-axis at top-left, and
+  the linear ground angle reflected `150deg` → `120deg`. Kept `mesh` (cards) in sync; updated the `index.css`
+  comment. `pnpm build` green. Pushed to the branch.
+- **Prompt 2 (verbatim, screenshot of the Fokus screen attached):** `Is the gradient inverted? It doesn't seem like it`
+- **Response 2:** Explained feature branches don't deploy (only `main` is production) and that the linear
+  sweep is a no-op in dark mode (only the faint corner glow relocates). Opened PR #653 and squash-merged the
+  gradient inversion to `main` so it goes live.
+- **Prompt 3 (verbatim, screenshot of the Fokus "Dein Satz" corrected card attached):** `This card is too noisy and has redundant info. If you're a senior expert designer working at a billion dollar edutech app, can you generate a couple of previews to make it minimalistic, visually pleasing, and highly intuitive for the learner and useful?`
+- **Response 3:** Built `preview/fokus-correction-redesign.html` (3 variants from the real tokens, light/dark
+  toggle): A = result sentence + green-underlined fixes + quiet `old → new` chips; B = single inline diff;
+  C = result + learning category. Diagnosed the redundancy (same 2 edits shown 4×). Recommended A.
+- **Prompt 4 (verbatim):** `generate a few visually pleasing high quality previews with highest standards with A with category tags of C.`
+- **Response 4:** Built `preview/fokus-correction-ac.html`: 4 layouts of A+C (chips-with-category, learn-rows,
+  compact line, card-chips), categories as neutral micro-labels (green reserved for "correct").
+- **Prompt 5 (verbatim):** `I like 4, but the smaller cards within needs more contrast. Use the himmel blue shade.`
+- **Response 5:** Built `preview/fokus-correction-v4-himmel.html`: V4 tiles on the sanctioned Himmelblau
+  accent surface (`bg-accent/… + border-accent/…`), category in Himmel-Ink; two intensities (weich ~18% /
+  kräftig ~30%).
+- **Prompt 6 (verbatim):** `I like 4a for dark mode and 4b for light mode. Also, I want to add a neat little toggle button to the top right corner of the tile to switch between the writer's original sentence and corrected sentence. After clicking on the auswerten button, even if the original sentence view is selected, the mistakes should be underlined with the coral color from the app's color pallette. When corrected is toggled, the underlined can stay green.`
+- **Response 6:** Built `preview/fokus-correction-toggle.html`: an interactive Original/Korrigiert segmented
+  toggle (coral marks / green marks), theme-aware tiles (light 4b, dark 4a).
+- **Prompt 7 (verbatim):** `looks good but I think not all users have english keyboards on their devices, so can you add all german special characters as buttons somewhere which should go well with the design preferences, standards and expectations?`
+- **Response 7:** Built `preview/fokus-umlaut-keys.html`: ä ö ü ß Ä Ö Ü insert-at-cursor keys in two
+  placements (footer A / docked accessory B), neutral at rest, Himmelblau on press.
+- **Prompt 8 (verbatim):** `I like B better but the buttons sizes should be atleast 30% smaller as they're a bit too big right now. Can you provide final preview with all my preferences so far and provide it as an artifact so that I can view it witrhin claude. Include all the previous versions in it so that I can toggle between them and view them all at once.`
+- **Response 8:** Built the consolidated `preview/schreiben-design-review.html` (version switcher + "Alle" +
+  Final + app light/dark toggle), published as a claude.ai artifact.
+- **Prompt 9 (verbatim, mid-turn):** `I said I like dsign B for the umlaut buttons by mistake! Use the preview A with reduced button sizes. Use no gradient for korrigieren button. Update the artifact`
+- **Prompt 9b (verbatim, mid-turn):** `Move the neuer satz button to our current card to the bottom right.`
+- **Response 9:** Switched Final to umlaut placement A (small keys), solid (no-gradient) Korrigieren, added
+  Neuer Satz bottom-right of the corrected card; republished the artifact.
+- **Prompt 10 (verbatim):** `For 1- eingabe, there's no need of an outer line of the card, keep the buttons as floating elements and the word count right beside the dein satz with the formatting intact. Extend the writing field's width horizontally on both ends to match with the current margin's length. Round the corners of the writing field.`
+- **Response 10:** Made the Eingabe borderless (floating field + controls, count beside "Dein Satz",
+  full-width rounded field); republished.
+- **Prompt 11 (verbatim):** `I like the one version previous one for 1- eingabe. Revert it. For the 2 - nach dem korrigieren, the bottom right button is too low and is occupying too much space in the card. Match it horizontally with the correction pills and only move it to next lines only if needed.`
+- **Response 11:** Reverted Eingabe to the carded version; moved Neuer Satz onto the correction-pills row
+  (right-aligned, wraps only if needed); republished.
+- **Prompt 12 (verbatim):** `Keep the neuer satz button bottom aligned with the correction pills but in the same line.`
+- **Response 12:** Bottom-aligned Neuer Satz (`align-self: flex-end`) on the pills row; republished.
+- **Prompt 13 (verbatim, mid-turn):** `looks good. implement this version now.`
+- **Prompt 13b (verbatim, mid-turn):** `and once done, push it to main`
+- **Response 13:** Implemented in the real app: `FokusTrainer.tsx` (view toggle + coral/green underline
+  marks + Himmelblau categorized fix tiles + Neuer Satz on the card, removed from mobile toolbar + desktop
+  rail), new `UmlautKeys.tsx` wired into Fokus + `GuidedWritingTrainer.tsx`, `wordDiff.ts` extended
+  (`originalTokens` + `classifyChange`), `index.css` `.fx-mark-*` classes, tests extended. Gates: build ✓ ·
+  lint 0 errors · test:unit 262/262. Opened PR #654 (rebased onto `main` to drop the already-merged
+  gradient commits) and squash-merged.
+- **Prompt 14 (verbatim):** `ship everything live and document the session along with saving the previews to repo for reference`
+- **Response 14:** Confirmed everything is live (PRs #653 + #654 merged; previews already committed to `main`
+  via #654), realigned the branch to `main`, and documented the session (`docs/PROJECT_STATUS.md` header +
+  s150 handoff, s148 handoff moved to the W30 archive, and this log).
+- **Artifacts (session 150):** `tailwind.config.ts` · `src/index.css` · `src/lib/wordDiff.ts` ·
+  `tests/wordDiff.test.ts` · `src/features/writing/UmlautKeys.tsx` (new) ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `preview/fokus-correction-redesign.html` · `preview/fokus-correction-ac.html` ·
+  `preview/fokus-correction-v4-himmel.html` · `preview/fokus-correction-toggle.html` ·
+  `preview/fokus-umlaut-keys.html` · `preview/schreiben-design-review.html` (+ claude.ai artifact) ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · PRs #653 · #654 · this log
+
+## Session 151 — 2026-07-23 — Fokus "Satzlabor" grammar-bug fix + AI provider cascade rework (branch `claude/ai-response-bug-xfsth9`)
+
+_(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23, this one second.)_
 
 - **Prompt 1 (verbatim, 4 Satzlabor screenshots attached):** `Read the ai's responses in these screenshots, don't you think there's a serious bug here?`
 - **Response 1:** Confirmed a serious bug. For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv
@@ -1205,56 +1271,39 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   already was. Root cause traced to `check-sentence` (Haiku) misreading "sein + Adjektiv" as a
   Zustandspassiv + the client collapsing it onto the Vorgangspassiv pill; proposed prompt + client fixes.
 - **Prompt 2 (verbatim):** `Yes, I want you to fix the bugs and I'm happy to run the fucntions in supabase, but before that tell me which llm models are best suited for our task here irrespective of provider and advanceness of the models`
-- **Response 2:** Loaded the grounded model catalogue (claude-api skill). Recommended a mid-frontier
-  tier for German morphology: Sonnet 5 as the sweet spot (Opus 4.8 for max), Haiku the wrong tier;
-  flagged the temperature/thinking migration caveat. Asked which model to standardize on.
-- **Prompt 3 (answer to the model AskUserQuestion):** chose **Sonnet 5 (Recommended)**.
-- **Response 3:** Shipped the fix on Sonnet 5: hardened `check-sentence` (copula-is-Aktiv rule) +
-  `transform-sentence` (`bereits_zielform` needs voice AND tense) prompts, dropped `temperature`,
-  disabled thinking, Sonnet cost math, cache invalidation (`CHECK_VERSION` salt + `PROMPT_VERSION`
-  bump), and the client `normalizeDetected` guard (Zustandspassiv → null, not the Passiv pill) with
-  the test updated. typecheck / 260 tests / build green. Pushed (commits c449cca, f4a0d29).
-- **Prompt 4 (verbatim):** `what are comparable models for sonnet in gemini and chatgpt models?`
-- **Response 4:** Gemini 2.5 Pro (Flash = Haiku-tier), GPT-5 / GPT-5 mini; flagged the current cheap
-  fallbacks (gemini-1.5-flash, gpt-4o-mini) are the same weak tier that caused the bug.
-- **Prompt 5 (verbatim):** `match the fall back model quality, and also which model has the highest free tier limit?`
-- **Response 5:** Answered free tier = Google Gemini (Flash-tier highest; Pro free but rate-limited;
-  OpenAI/Anthropic have no standing free API tier); flagged the free-tier data-training + disclaimer
-  accuracy points. Upgraded the two Satzlabor fallbacks to Gemini 2.5 Pro + GPT-5 (later superseded).
-- **Prompt 6 (verbatim):** `use Gemini 2.5 or 3 flash model as primary and sonnet as second back up if the free tier is exhausted and gpt 5 model if claude sonnet uses $2.` + mid-turn: `the total token cost limit should be $5 for all three models combined. Make the prompts robust`
-- **Response 6:** Reworked check/transform into a free-first cascade: Gemini 2.5 Flash (free, $0) →
-  Sonnet 5 (until $2 month-to-date Claude spend) → GPT-5; existing global $5 `ai_usage` fuse bounds
-  all three combined; robust prompts (worked examples + strict JSON-only). Flagged the quality risk of
-  a cheap primary. Pushed (commit dca9a79).
-- **Prompt 7 (verbatim, interrupt):** `First answe my question` — re the highest free tier.
-- **Response 7:** Answered directly (Gemini highest free tier; free-tier privacy caveat + disclaimer
-  accuracy) then resumed.
-- **Prompt 8 (verbatim):** `I want Gemini to be primary model for all AI reviews or corrections not just satzlabor.`
-- **Response 8:** Extended the identical cascade to `evaluate-writing` (writing coach); made the $2
-  Claude threshold GLOBAL by summing Claude spend across both `sentence_ai_ops` + `writing_evaluations`
-  in all three functions; upgraded evaluate-writing models + request shapes + prompt. Pushed (90962c3).
-- **Prompt 9 (verbatim):** `yes adapt the Ui disclaimer`
-- **Response 9:** Updated both Art. 50 disclaimers (Satzlabor + writing coach) from "(Anthropic Claude)"
-  to "(Anthropic, Google oder OpenAI)"; noted the privacy policy already lists all three. Pushed (f0d8d8e).
-- **Prompt 10 (verbatim):** `how should I store the gemini api keys in supabase?` — answered
-  (`supabase secrets set GEMINI_API_KEY=...` or Dashboard Secrets; get key from AI Studio; billing-
-  enabled key for GDPR data terms).
-- **Prompt 11 (verbatim):** `how to add chatgpt api?` — answered (`OPENAI_API_KEY` secret; platform.
-  openai.com key + billing; GPT-5 access; keep it a GPT-5-family model for `reasoning_effort`).
-- **Prompt 12 (verbatim):** `I'm done with deploying the edge functions and adding api keys. What next?` —
-  laid out: test the live Satzlabor, merge the client pieces to `main`, docs, optional privacy-policy edit.
-- **Prompt 13 (verbatim):** `provide links to the new codes for all the functions thjat I need to run again` —
-  gave GitHub blob links for the three edge functions + the redeploy command.
+- **Response 2:** Loaded the grounded model catalogue (claude-api skill); recommended Sonnet 5 as the
+  sweet spot for German morphology (Opus 4.8 for max), flagged the temperature/thinking migration
+  caveat, asked which model to standardize on.
+- **Prompt 3 (model AskUserQuestion answer):** chose **Sonnet 5**. → Shipped the fix: hardened
+  check/transform prompts (copula-is-Aktiv; `bereits_zielform` needs voice AND tense), dropped
+  `temperature`, disabled thinking, Sonnet cost math, cache invalidation, and the client
+  `normalizeDetected` guard (Zustandspassiv → null) with the test updated.
+- **Prompt 4 (verbatim):** `what are comparable models for sonnet in gemini and chatgpt models?` →
+  Gemini 2.5 Pro / GPT-5; flagged the cheap fallbacks were the same weak tier.
+- **Prompt 5 (verbatim):** `match the fall back model quality, and also which model has the highest free tier limit?` →
+  Free tier = Google Gemini (Flash-tier highest); upgraded the two fallbacks (later superseded).
+- **Prompt 6 (verbatim):** `use Gemini 2.5 or 3 flash model as primary and sonnet as second back up if the free tier is exhausted and gpt 5 model if claude sonnet uses $2.` + mid-turn `the total token cost limit should be $5 for all three models combined. Make the prompts robust` →
+  Reworked check/transform into the free-first cascade Gemini 2.5 Flash ($0) → Sonnet 5 (until $2
+  Claude spend) → GPT-5, global $5 fuse, robust JSON-only prompts.
+- **Prompt 7 (verbatim, interrupt):** `First answe my question` → answered the free-tier question directly.
+- **Prompt 8 (verbatim):** `I want Gemini to be primary model for all AI reviews or corrections not just satzlabor.` →
+  Extended the cascade to `evaluate-writing`; made the $2 Claude threshold GLOBAL (summed across
+  `sentence_ai_ops` + `writing_evaluations` in all three functions).
+- **Prompt 9 (verbatim):** `yes adapt the Ui disclaimer` → both Art. 50 disclaimers → "(Anthropic, Google oder OpenAI)".
+- **Prompts 10-13 (verbatim):** `how should I store the gemini api keys in supabase?` · `how to add chatgpt api?` ·
+  `I'm done with deploying the edge functions and adding api keys. What next?` ·
+  `provide links to the new codes for all the functions thjat I need to run again` → answered each
+  (Supabase Edge Function secrets `GEMINI_API_KEY`/`OPENAI_API_KEY`, key sources + billing/GDPR notes,
+  next-steps plan, GitHub blob links + redeploy command).
 - **Prompt 14 (verbatim):** `edit the privacy policy, document the session and push everything live to main`
-- **Response 14:** Genericized the privacy-policy AI-provider passage (DE + EN) to routing-neutral
-  ("Je nach Funktion und Auslastung … Google Gemini, Anthropics Claude oder OpenAI"); judged
-  non-material so `CONSENT_VERSION` NOT bumped (no forced re-consent). Documented the session
-  (`PROJECT_STATUS.md` header + s150 handoff, s148 moved to the W30 archive, `SESSION_PROMPT_LOG.md`,
-  `CLAUDE.md` AI-provider facts). Opened a PR into `main` and squash-merged.
-- **Artifacts (session 150):** `supabase/functions/check-sentence/index.ts` ·
+- **Response 14:** Genericized the privacy-policy AI passage (DE + EN) routing-neutrally; judged
+  non-material so `CONSENT_VERSION` NOT bumped. Documented the session (PROJECT_STATUS header + handoff,
+  SESSION_PROMPT_LOG, CLAUDE.md AI-provider facts). On merge to `main` a parallel s150 (Fokus correction
+  redesign, PRs #653/#654) had force-updated `main`; resolved the merge (code auto-merged cleanly:
+  cascade + guard + redesign all intact; renumbered this session 150→151, kept both handoffs), then
+  squash-merged.
+- **Artifacts (session 151):** `supabase/functions/check-sentence/index.ts` ·
   `supabase/functions/transform-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
   `src/features/writing/fokus/grammarDimensions.ts` · `tests/fokusGrammar.test.ts` ·
   `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
-  `src/features/legal/PrivacyPolicy.tsx` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · commits c449cca ·
-  f4a0d29 · dca9a79 · f0d8d8e · 90962c3 · this log
+  `src/features/legal/PrivacyPolicy.tsx` · `docs/PROJECT_STATUS.md` · `CLAUDE.md` · PR #657 · this log

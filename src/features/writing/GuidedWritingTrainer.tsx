@@ -9,6 +9,7 @@ import { SECTOR_OPTIONS } from "@/lib/facets";
 import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
 import { WritingRail } from "./WritingRail";
+import { UmlautKeys } from "./UmlautKeys";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -108,6 +109,7 @@ export function GuidedWritingTrainer({
   const [result, setResult] = useState<WritingEvalResult | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [diceSpin, setDiceSpin] = useState(0);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
 
   const words = useMemo(() => countWords(text), [text]);
 
@@ -255,6 +257,7 @@ export function GuidedWritingTrainer({
       <Card>
         <CardContent className="space-y-3 p-5">
           <textarea
+            ref={editorRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             disabled={submitting}
@@ -262,9 +265,11 @@ export function GuidedWritingTrainer({
             placeholder="Schreibe hier deinen Text auf Deutsch …"
             className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
           />
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* German special-character keys for non-German keyboards (s150). */}
+            <UmlautKeys textareaRef={editorRef} value={text} onChange={setText} />
             {/* The Ziel range lives on the Aufgabe card only (founder s149). */}
-            <span className={cn("text-xs tabular-nums", enough ? "text-success" : "text-muted-foreground")}>
+            <span className={cn("ml-auto text-xs tabular-nums", enough ? "text-success" : "text-muted-foreground")}>
               {words} {words === 1 ? "Wort" : "Wörter"}
             </span>
             {/* Desktop actions; on mobile they live in the sticky bottom bar. */}

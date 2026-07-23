@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
@@ -16,9 +16,11 @@ import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
 import { EnPeek } from "@/features/grammar/EnPeek";
 import { GrammarRail } from "./GrammarRail";
+import { UmlautKeys } from "../UmlautKeys";
 import { useFokusMachine, MIN_WORDS } from "./useFokusMachine";
 import { valueLabel, refusalCopy, type AxisId } from "./grammarDimensions";
 import { diffWords } from "@/lib/wordDiff";
+import { cn } from "@/lib/utils";
 
 /**
  * Fokus "Satzlabor": write a sentence, get it corrected in place, then transform
@@ -43,6 +45,10 @@ export function FokusTrainer({
   const reduce = useReducedMotion();
   const [peek, setPeek] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
+  // Correction result view: the learner's original (coral marks) or the
+  // corrected sentence (green marks). Defaults to the corrected sentence.
+  const [view, setView] = useState<"orig" | "corr">("corr");
+  const taRef = useRef<HTMLTextAreaElement>(null);
 
   // Restore a resumed draft's text once (after sign-in), without auto-submitting:
   // the learner presses Korrigieren themselves, matching the guided-mode choice.
@@ -60,6 +66,11 @@ export function FokusTrainer({
     () => (m.status === "corrected" && m.hasErrors ? diffWords(m.input, m.corrected) : null),
     [m.status, m.hasErrors, m.input, m.corrected],
   );
+
+  // Every fresh correction lands on the corrected view.
+  useEffect(() => {
+    setView("corr");
+  }, [m.corrected]);
 
   const onSubmit = () => {
     if (!isSignedIn) {
@@ -114,86 +125,128 @@ export function FokusTrainer({
     </Button>
   );
 
+  const showResult = m.status === "corrected" && m.hasErrors && diff;
+  const resultTokens = view === "orig" ? diff?.originalTokens : diff?.tokens;
+
   const inputCard = (
     <Card>
       <CardContent className="space-y-3 p-5">
-        {/* Card-title eyebrow = bold primary (unified eyebrow system, s149);
-            inner section labels stay muted. */}
-        <p className="text-xs font-bold uppercase tracking-wide text-primary">
-          Dein Satz
-        </p>
+        {/* Card-title eyebrow = bold primary (unified eyebrow system, s149).
+            After a correction it shares the row with the Original/Korrigiert
+            view toggle (s150). */}
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-bold uppercase tracking-wide text-primary">
+            Dein Satz
+          </p>
+          {showResult && (
+            <div className="inline-flex rounded-full bg-muted p-0.5 text-xs font-bold">
+              {(
+                [
+                  { id: "orig" as const, label: "Original" },
+                  { id: "corr" as const, label: "Korrigiert" },
+                ]
+              ).map((seg) => (
+                <button
+                  key={seg.id}
+                  type="button"
+                  aria-pressed={view === seg.id}
+                  onClick={() => setView(seg.id)}
+                  className={cn(
+                    "rounded-full px-3 py-1 transition-colors",
+                    view === seg.id
+                      ? "bg-surface text-foreground shadow-soft"
+                      : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  {seg.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {m.status === "corrected" ? (
-          <div className="space-y-3">
-            <p className="text-sm leading-relaxed text-muted-foreground line-through decoration-warning/50">
-              {m.input}
-            </p>
-            {m.hasErrors && diff ? (
-              <>
-                <p className="flex items-center gap-1.5 text-xs font-bold text-primary">
-                  <Check className="h-3.5 w-3.5" /> Korrigiert · {diff.changes.length}{" "}
-                  {diff.changes.length === 1 ? "Änderung" : "Änderungen"}
-                </p>
-                {/* Corrected sentence with the changed words highlighted in place. */}
-                <p className="text-base leading-relaxed">
-                  {diff.tokens.map((tk, i) => (
-                    <span key={i}>
-                      {tk.changed ? (
-                        <mark className="rounded bg-warning/25 px-0.5 text-foreground">{tk.text}</mark>
-                      ) : (
-                        tk.text
-                      )}
-                      {i < diff.tokens.length - 1 ? " " : ""}
-                    </span>
-                  ))}
-                </p>
-                {/* The tip: what changed, before -> after. */}
-                {diff.changes.length > 0 && (
-                  <div className="space-y-1.5 rounded-lg border border-border bg-surface p-3">
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                      Was ich geändert habe
-                    </p>
-                    {diff.changes.map((c, i) => (
-                      <p key={i} className="flex flex-wrap items-center gap-1.5 text-sm">
-                        <span className="text-muted-foreground line-through">{c.from || "∅"}</span>
-                        <span className="text-muted-foreground">→</span>
-                        <span className="font-semibold text-success">{c.to || "(entfernt)"}</span>
-                      </p>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <p className="flex items-center gap-1.5 text-sm font-semibold text-success">
-                <Check className="h-4 w-4" /> Alles korrekt. Wähle eine Umformung.
+          showResult && resultTokens ? (
+            <div className="space-y-3">
+              {/* One sentence: original with coral marks, or corrected with
+                  green marks. A calm underline, not a loud fill. */}
+              <p className="text-base leading-relaxed">
+                {resultTokens.map((tk, i) => (
+                  <span key={i}>
+                    {tk.changed ? (
+                      <span
+                        className={cn(
+                          "font-semibold",
+                          view === "orig" ? "fx-mark-coral" : "fx-mark-green",
+                        )}
+                      >
+                        {tk.text}
+                      </span>
+                    ) : (
+                      tk.text
+                    )}
+                    {i < resultTokens.length - 1 ? " " : ""}
+                  </span>
+                ))}
               </p>
-            )}
-          </div>
+              <div className="h-px bg-border" />
+              {/* Himmelblau fix tiles (light kräftig, dark weich): each carries
+                  the learning category + the before → after edit. Neuer Satz
+                  shares the row, right- and bottom-aligned. */}
+              <div className="flex flex-wrap items-stretch gap-2.5">
+                {diff.changes.map((c, i) => (
+                  <div
+                    key={i}
+                    className="min-w-[8rem] rounded-xl border border-accent/70 bg-accent/30 p-2.5 dark:border-accent/[0.45] dark:bg-accent/[0.18]"
+                  >
+                    <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-accent-ink">
+                      {c.category}
+                    </span>
+                    <span className="text-sm">
+                      <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
+                      <span className="text-muted-foreground/80">→</span>{" "}
+                      <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
+                    </span>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  onClick={m.startOver}
+                  className="ml-auto h-9 self-end rounded-xl"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Neuer Satz
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <p className="flex items-center gap-1.5 text-sm font-semibold text-success">
+              <Check className="h-4 w-4" /> Alles korrekt. Wähle eine Umformung.
+            </p>
+          )
         ) : (
-          <textarea
-            value={m.input}
-            onChange={(e) => m.setInput(e.target.value)}
-            disabled={m.status === "submitting"}
-            rows={3}
-            placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
-            className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
-          />
+          <>
+            <textarea
+              ref={taRef}
+              value={m.input}
+              onChange={(e) => m.setInput(e.target.value)}
+              disabled={m.status === "submitting"}
+              rows={3}
+              placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."
+              className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
+            />
+            {/* Umlaut keys share the footer row with Korrigieren (desktop);
+                mobile keeps Korrigieren in the sticky bottom bar (s150). */}
+            <div className="flex flex-wrap items-center gap-2">
+              <UmlautKeys textareaRef={taRef} value={m.input} onChange={m.setInput} className="flex-1" />
+              <div className="hidden lg:block">{korrigierenButton}</div>
+            </div>
+          </>
         )}
 
         {m.words > 25 && m.status !== "corrected" && (
           <p className="text-right text-xs text-muted-foreground">
             Tipp: In Fokus funktioniert ein Satz am besten.
           </p>
-        )}
-
-        {/* Neuer Satz moved out of the card: desktop = the rail footer,
-            mobile = the toolbar row (Bibliothek-extension redesign, s148).
-            Korrigieren lives here on desktop only; mobile uses the sticky
-            bottom action bar, matching Kurz/Lang (s149 harmonization). */}
-        {m.status !== "corrected" && (
-          <div className="hidden items-center justify-end gap-2 lg:flex">
-            {korrigierenButton}
-          </div>
         )}
 
         {tooShort && m.status === "idle" && m.words > 0 && (
@@ -299,8 +352,8 @@ export function FokusTrainer({
 
   return (
     <div>
-      {/* Mobile: the Bibliothek pattern, a toolbar row (Grammatik panel toggle
-          + Neuer Satz) above the content, no floating chips. */}
+      {/* Mobile: the Bibliothek pattern, a toolbar row (Grammatik panel toggle)
+          above the content. Neuer Satz now lives on the correction card (s150). */}
       <div className="space-y-4 lg:hidden">
         <div className="space-y-3">
           <div className="flex justify-center gap-2">
@@ -315,14 +368,6 @@ export function FokusTrainer({
               <SlidersHorizontal className="h-4 w-4" />
               Grammatik
               <ChevronDown className={`h-4 w-4 transition-transform ${panelOpen ? "rotate-180" : ""}`} />
-            </Button>
-            <Button
-              variant="outline"
-              className="h-10 rounded-lg"
-              disabled={!railEnabled}
-              onClick={m.startOver}
-            >
-              <RotateCcw className="h-3.5 w-3.5" /> Neuer Satz
             </Button>
           </div>
           <AnimatePresence initial={false}>
@@ -376,7 +421,6 @@ export function FokusTrainer({
           onSelect={onSelect}
           onReset={m.reset}
           canReset={canReset}
-          onNewSentence={m.startOver}
           className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)]"
         />
       </div>
@@ -386,7 +430,7 @@ export function FokusTrainer({
 
       {/* Mobile action bar: Korrigieren pinned above the nav, matching the
           Kurz/Lang Auswerten bar (s149 harmonization). Gone once corrected
-          (the toolbar then owns Grammatik + Neuer Satz). */}
+          (the toolbar owns Grammatik; the card owns Neuer Satz). */}
       {m.status !== "corrected" && (
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 mt-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden [&>button]:h-11 [&>button]:flex-1 [&>button]:rounded-xl [&>button]:text-base">
           {korrigierenButton}
