@@ -101,9 +101,10 @@ wrong, self-contradictory German feedback.
   purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
 - **Fokus disclaimer consolidation (follow-up, same session).** The Fokus view's two AI notes (the
   send-to-AI line + the "KI-generierte Umformung" footer inside the transform box) were merged into
-  ONE harmonized, centered note ("Dein Satz wird von einer KI … geprüft und umgeformt"), moved to the
-  bottom of the content column (desktop: `min-h` column + `mt-auto` so it lands on the same horizontal
-  line as the fixed "Mit KI gebaut · Feedback" pill). The `12rem` bottom offset is a tunable nudge.
+  ONE harmonized, centered note ("Dein Satz wird von einer KI … geprüft und umgeformt") in normal
+  flow under the content. (A first pass pinned it to the bottom via `min-h` + `mt-auto` to line up
+  with the "Mit KI gebaut · Feedback" pill; the founder found that detached band ugly, so it was
+  reverted to a plain centered note.)
 - **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
 - **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
   `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →

@@ -1316,3 +1316,7 @@ _(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23,
   Gates: typecheck ✓ · test:unit 262/262 · build ✓ (no live screenshot: Playwright not installed +
   `.npmrc` cooldown; `12rem` offset noted as tunable). Merged to `main`.
   Artifact: `src/features/writing/fokus/FokusTrainer.tsx` · `docs/PROJECT_STATUS.md` · `CLAUDE.md` · this log
+- **Prompt 16 (verbatim, screenshot of the bottom-pinned note attached):** `okay, this doesn't look good - can you align them horizonatally centered and not to the bottom?`
+- **Response 16:** Reverted the bottom-pin (`min-h` + `mt-auto`) on the desktop content column; the
+  combined note now sits horizontally centered in normal flow directly under the content. typecheck /
+  build ✓. Merged to `main`.
