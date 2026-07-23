@@ -2,9 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Sparkles, Target, Loader2, Lightbulb, Clock, Info, Dices, ChevronDown } from "lucide-react";
-import type { ThemeId } from "@/types";
+import type { ThemeId, WorkSector } from "@/types";
 import { themes, themeById } from "@/data/themes";
 import { writingPrompts } from "@/data/writingPrompts";
+import { SECTOR_OPTIONS } from "@/lib/facets";
 import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
 import { WritingRail } from "./WritingRail";
@@ -38,11 +39,13 @@ function isThemeId(v: string | null): v is ThemeId {
   return !!v && themes.some((t) => t.id === v);
 }
 
-/** Random pool index, avoiding `exclude` when the pool has an alternative. */
-function randomIndex(poolSize: number, exclude?: number): number {
-  if (poolSize <= 1) return 0;
-  let ix = Math.floor(Math.random() * poolSize);
-  if (ix === exclude) ix = (ix + 1) % poolSize;
+/** Random pick from a list of pool indexes, avoiding `exclude` when the list
+ *  has an alternative. */
+function randomFrom(list: number[], exclude?: number): number {
+  if (list.length === 0) return 0;
+  if (list.length === 1) return list[0];
+  let ix = list[Math.floor(Math.random() * list.length)];
+  if (ix === exclude) ix = list[(list.indexOf(ix) + 1) % list.length];
   return ix;
 }
 
@@ -71,44 +74,85 @@ export function GuidedWritingTrainer({
   const themeParam = params.get("theme");
   const theme: ThemeId = isThemeId(themeParam) ? themeParam : DEFAULT_THEME;
 
+  // Unterthema + Branche scopes (s149 harmonization: the Bibliothek hierarchy
+  // in the Aufgabe rail). Invalid values are ignored, never crash a deep link.
+  const subParam = params.get("sub") ?? "";
+  const sub = themeById(theme)?.subThemes?.some((s) => s.id === subParam) ? subParam : "";
+  const sectorParam = params.get("sector") ?? "";
+  const sector = SECTOR_OPTIONS.some((o) => o.value === sectorParam) ? sectorParam : "";
+
   const pool = writingPrompts[theme][length];
+
+  // Which pool indexes the current scopes allow. Branche follows the
+  // untagged-=-universal rule: tagged tasks win when the Branche has any,
+  // otherwise the universal (untagged) tasks serve it, so the pool is never
+  // empty. Falls back to the whole pool as a last resort.
+  const eligible = useMemo(() => {
+    let ix = pool.map((_, i) => i);
+    if (sub) ix = ix.filter((i) => pool[i].sub === sub);
+    if (sector) {
+      const tagged = ix.filter((i) => pool[i].sectors?.includes(sector as WorkSector));
+      ix = tagged.length ? tagged : ix.filter((i) => !pool[i].sectors?.length);
+    }
+    return ix.length ? ix : pool.map((_, i) => i);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theme, length, sub, sector]);
+
   const [promptIx, setPromptIx] = useState(() =>
     initialPromptIndex != null && initialPromptIndex >= 0 && initialPromptIndex < pool.length
       ? initialPromptIndex
-      : randomIndex(pool.length),
+      : randomFrom(eligible),
   );
   const [text, setText] = useState(initialText);
   const [submitting, setSubmitting] = useState(false);
   const [result, setResult] = useState<WritingEvalResult | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [diceSpin, setDiceSpin] = useState(0);
 
   const words = useMemo(() => countWords(text), [text]);
 
-  // Reset draft + result and draw a fresh random Aufgabe when the task (theme
-  // or length) changes, but NOT on mount (so a resumed draft survives). keyRef
-  // is seeded with the initial task.
-  const keyRef = useRef(`${theme}|${length}`);
+  // Reset draft + result and draw a fresh random Aufgabe when the task scope
+  // (theme, length, Unterthema or Branche) changes, but NOT on mount (so a
+  // resumed draft survives). keyRef is seeded with the initial scope.
+  const keyRef = useRef(`${theme}|${length}|${sub}|${sector}`);
   useEffect(() => {
-    const key = `${theme}|${length}`;
+    const key = `${theme}|${length}|${sub}|${sector}`;
     if (keyRef.current !== key) {
       keyRef.current = key;
       setText("");
       setResult(null);
-      setPromptIx(randomIndex(writingPrompts[theme][length].length));
+      setPromptIx(randomFrom(eligible));
     }
-  }, [theme, length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theme, length, sub, sector]);
 
   const setTheme = (id: ThemeId) => {
     const p = new URLSearchParams(params);
     p.set("theme", id);
+    // A sub-theme belongs to its theme; Branche is a cross-theme context axis
+    // and travels (the Bibliothek rule).
+    p.delete("sub");
+    setParams(p);
+  };
+  const setSub = (s: string) => {
+    const p = new URLSearchParams(params);
+    if (s) p.set("sub", s);
+    else p.delete("sub");
+    setParams(p);
+  };
+  const setSector = (s: string) => {
+    const p = new URLSearchParams(params);
+    if (s) p.set("sector", s);
+    else p.delete("sector");
     setParams(p);
   };
 
-  // The dice: another random Aufgabe from the same theme's pool. Keeps any
+  // The dice: another random Aufgabe within the current scope. Keeps any
   // typed text (a mis-tap must not destroy work) but clears a stale result.
   const reroll = () => {
-    setPromptIx((ix) => randomIndex(pool.length, ix));
+    setPromptIx((ix) => randomFrom(eligible, ix));
     setResult(null);
+    setDiceSpin((d) => d + 180);
   };
 
   const submit = async () => {
@@ -128,7 +172,7 @@ export function GuidedWritingTrainer({
   };
 
   const t = themeById(theme)!;
-  const prompt = pool[promptIx] ?? pool[0];
+  const prompt = (pool[promptIx] ?? pool[0]).text;
   const [min, max] = rangeByLength[length];
   const enough = words >= Math.floor(min * 0.6);
   const minWords = 5;
@@ -166,14 +210,18 @@ export function GuidedWritingTrainer({
                 Ziel {min}–{max} Wörter
               </p>
             </div>
+            {/* Standard 40px icon-button size; the icon half-spins per roll. */}
             <button
               type="button"
               onClick={reroll}
               aria-label="Neue Aufgabe"
               title="Neue Aufgabe"
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
             >
-              <Dices className="h-4 w-4" />
+              <Dices
+                className="h-4 w-4 transition-transform duration-300"
+                style={reduce ? undefined : { transform: `rotate(${diceSpin}deg)` }}
+              />
             </button>
           </div>
           <motion.p
@@ -323,6 +371,11 @@ export function GuidedWritingTrainer({
                   setTheme(id);
                   setPickerOpen(false);
                 }}
+                sub={sub}
+                onSubChange={setSub}
+                sector={sector}
+                onSectorChange={setSector}
+                length={length}
                 onClose={() => setPickerOpen(false)}
               />
             </motion.div>
@@ -336,6 +389,11 @@ export function GuidedWritingTrainer({
         <WritingRail
           value={theme}
           onChange={setTheme}
+          sub={sub}
+          onSubChange={setSub}
+          sector={sector}
+          onSectorChange={setSector}
+          length={length}
           className="hidden lg:block lg:sticky lg:top-24"
         />
       </div>

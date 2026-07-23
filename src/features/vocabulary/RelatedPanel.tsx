@@ -48,7 +48,7 @@ export function relatedRows(item: VocabItem): RelatedRow[] {
   if (wp) {
     rows.push({
       mod: "Schreibtraining",
-      text: wp.short[0],
+      text: wp.short[0].text,
       to: `/writing?mode=kurz&theme=${item.themeId}`,
       cta: "starten",
       icon: PenLine,

@@ -220,6 +220,7 @@ function HistoryEntry({
 }
 
 export function WritingHistory() {
+  const navigate = useNavigate();
   const [entries, setEntries] = useState<WritingHistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -287,6 +288,9 @@ export function WritingHistory() {
           <p className="max-w-xs text-sm text-muted-foreground">
             Reiche deinen ersten Text ein und sieh hier deine Schwachstellen im Verlauf.
           </p>
+          <Button variant="gradient" onClick={() => navigate("/writing?mode=kurz")}>
+            <PenLine className="h-4 w-4" /> Ersten Text schreiben
+          </Button>
         </CardContent>
       </Card>
     );
