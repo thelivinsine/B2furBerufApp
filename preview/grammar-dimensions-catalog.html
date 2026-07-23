@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grammatik-Dimensionen · Roadmap & Entscheidungsmatrix (Preview)</title>
+<style>
+  :root{
+    --background:180 45% 98%; --foreground:252 16% 12%; --surface:0 0% 100%;
+    --muted:220 10% 90%; --muted-foreground:220 8% 36%; --border:220 9% 86%;
+    --primary:221 83% 54%; --primary-foreground:0 0% 100%;
+    --accent:197 93% 77%; --accent-ink:198 90% 32%;
+    --success:153 55% 40%; --warning:38 92% 46%; --danger:4 73% 56%; --reward:11 82% 54%;
+    --shadow:221 40% 22%;
+    --page-from:144 45% 98%; --page-mid:150 50% 98%; --page-to:198 83% 98%;
+    --gradient-from:226 83% 47%; --gradient-to:196 93% 38%;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Inter Variable","Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:hsl(var(--foreground));-webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary)/0.10) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent)/0.09) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    min-height:100vh;padding:40px 20px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  .page-eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:hsl(var(--accent-ink))}
+  .page-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:6px;text-wrap:balance}
+  .page-sub{color:hsl(var(--muted-foreground));font-size:15px;margin-top:8px;max-width:78ch;line-height:1.55}
+
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 8px;align-items:center}
+  .tierchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border-radius:999px;padding:4px 11px;border:1px solid}
+  .tier-A{color:hsl(var(--success));border-color:hsl(var(--success)/.4);background:hsl(var(--success)/.10)}
+  .tier-B{color:hsl(var(--warning));border-color:hsl(var(--warning)/.45);background:hsl(var(--warning)/.12)}
+  .tier-C{color:hsl(var(--primary));border-color:hsl(var(--primary)/.4);background:hsl(var(--primary)/.10)}
+  .legend .note{font-size:12px;color:hsl(var(--muted-foreground));margin-left:4px}
+
+  .wave{margin-top:30px}
+  .wave-head{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+  .wave-badge{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:4px 11px;border-radius:999px;color:hsl(var(--primary-foreground))}
+  .wb-1{background:hsl(var(--success))}
+  .wb-2{background:hsl(var(--primary))}
+  .wb-3{background:hsl(var(--accent-ink))}
+  .wb-link{background:hsl(var(--muted-foreground))}
+  .wb-cut{background:hsl(var(--danger))}
+  .wave-title{font-size:17px;font-weight:800}
+  .wave-sub{font-size:13px;color:hsl(var(--muted-foreground));margin-bottom:14px;margin-top:2px}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .dcard{border:1px solid hsl(var(--border));background:hsl(var(--surface));border-radius:14px;padding:16px;box-shadow:0 1px 2px hsl(var(--shadow)/0.04),0 4px 12px hsl(var(--shadow)/0.06);display:flex;flex-direction:column;gap:10px}
+  .dcard.cut{opacity:.72}
+  .dc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .dc-name{font-size:15px;font-weight:800;line-height:1.25}
+  .dc-en{font-size:12px;color:hsl(var(--muted-foreground));font-weight:600;margin-top:1px}
+  .dc-badges{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex:0 0 auto}
+  .cefr{font-size:10.5px;font-weight:800;letter-spacing:.03em;padding:2px 8px;border-radius:999px;background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+  .rank{font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;background:hsl(var(--reward)/.15);color:hsl(var(--reward));border:1px solid hsl(var(--reward)/.35)}
+  .tierline{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .minitier{font-size:11px;font-weight:800;padding:2px 8px;border-radius:6px}
+  .deeplink{font-size:11px;color:hsl(var(--primary));font-weight:700;display:inline-flex;align-items:center;gap:4px}
+  .ops{font-size:12.5px;color:hsl(var(--muted-foreground));line-height:1.5}
+  .ops b{color:hsl(var(--foreground));font-weight:700}
+  .example{border-top:1px dashed hsl(var(--border));padding-top:9px;font-size:12.5px;line-height:1.5}
+  .example .src{color:hsl(var(--muted-foreground))}
+  .example .tgt{color:hsl(var(--foreground));font-weight:600}
+  .example .ar{color:hsl(var(--primary));font-weight:800;margin:0 5px}
+  .icn{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;vertical-align:-1px}
+
+  .foot{margin-top:34px;border-top:1px solid hsl(var(--border));padding-top:16px;font-size:12.5px;color:hsl(var(--muted-foreground));line-height:1.6}
+  .foot b{color:hsl(var(--foreground))}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-eyebrow">Grammatik-Dimensionen · Roadmap</div>
+  <h1 class="page-title">Dimensionen & Umformungen · Entscheidungsmatrix</h1>
+  <p class="page-sub">Alle Kandidaten-Dimensionen für das Satzlabor, gruppiert nach empfohlener Wave. Jede Karte
+  zeigt die Umformungs-Operationen, das CEFR-Einstiegsniveau, den Automatisierungs-Tier (wie gut sich ein
+  eindeutiges Ziel erzeugen und bewerten lässt), den Rang unter den Top-10-B2-Markern und den Link in die
+  24-Themen-Grammatikbank. Reihenfolge des Menüs nach B2-Wert, nicht nach Grammatikbuch.</p>
+
+  <div class="legend">
+    <span class="tierchip tier-A">Tier A · Regel</span>
+    <span class="tierchip tier-B">Tier B · Hybrid</span>
+    <span class="tierchip tier-C">Tier C · KI + Rubrik</span>
+    <span class="note">Tier A = eindeutig erzeug- und prüfbar · Tier B = mehrere gültige Lösungen · Tier C = offen, nur KI</span>
+    <span class="note">· <span style="color:hsl(var(--reward));font-weight:700">#n</span> = Rang unter Top-10 B2-Markern</span>
+  </div>
+
+  <!-- WAVE 1 -->
+  <div class="wave">
+    <div class="wave-head"><span class="wave-badge wb-1">Wave 1 · live</span><span class="wave-title">Bereits ausgeliefert</span></div>
+    <div class="wave-sub">Das 2×3-Raster Genus Verbi × Zeitform. Vollständig, hochwertig, versendet.</div>
+    <div class="cards">
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Genus Verbi</div><div class="dc-en">Voice</div></div>
+          <div class="dc-badges"><span class="cefr">B1 → B2</span><span class="rank">#1</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-A">A</span><span class="minitier tier-C">C</span>
+          <a class="deeplink">→ passive</a></div>
+        <div class="ops"><b>Aktiv → Vorgangspassiv</b> (werden + Partizip II). Kern regelbasiert; Ersatzformen offen.</div>
+        <div class="example"><span class="src">Der Techniker prüft die Rechnung.</span><span class="ar">→</span><span class="tgt">Die Rechnung wird geprüft.</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Zeitform</div><div class="dc-en">Tense</div></div>
+          <div class="dc-badges"><span class="cefr">A2 – B1</span><span class="rank">#8</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-A">A</span><a class="deeplink">→ verbPosition</a></div>
+        <div class="ops"><b>Präsens ↔ Perfekt ↔ Präteritum.</b> Perfekt/Präteritum ist eine Register-Wahl (gesprochen vs. Bericht).</div>
+        <div class="example"><span class="src">Ich gehe zum Arzt.</span><span class="ar">→</span><span class="tgt">Ich bin zum Arzt gegangen.</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- WAVE 2 -->
+  <div class="wave">
+    <div class="wave-head"><span class="wave-badge wb-2">Wave 2 · empfohlen</span><span class="wave-title">Nächster Ausbau</span></div>
+    <div class="wave-sub">Hoher B2-Wert, Backend-Enums existieren teils schon (K-II, Zustandspassiv). Register und Satzbau sind die anschaulichsten Operationen.</div>
+    <div class="cards">
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Modus: Konjunktiv II</div><div class="dc-en">Mood · politeness / irrealis</div></div>
+          <div class="dc-badges"><span class="cefr">B2</span><span class="rank">#3</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-B">B</span><a class="deeplink">→ konjunktiv2</a></div>
+        <div class="ops"><b>Indikativ → höfliche Bitte / irreal.</b> Synthetisch bevorzugt (wäre/hätte/könnte), nie würde im wenn-Satz.</div>
+        <div class="example"><span class="src">Schicken Sie mir die Unterlagen.</span><span class="ar">→</span><span class="tgt">Könnten Sie mir die Unterlagen schicken?</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Zustandspassiv</div><div class="dc-en">Statal passive · sein + PII</div></div>
+          <div class="dc-badges"><span class="cefr">B2</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-B">B</span><a class="deeplink">→ passive</a></div>
+        <div class="ops"><b>Vorgang vs. Zustand:</b> wird geprüft (Aktion) vs. ist geprüft (Ergebnis). Eigene Pille, nicht ins Vorgangspassiv falten.</div>
+        <div class="example"><span class="src">Man öffnet das Geschäft.</span><span class="ar">→</span><span class="tgt">Das Geschäft ist geöffnet.</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Register / Formalität</div><div class="dc-en">Sie ↔ du · formell</div></div>
+          <div class="dc-badges"><span class="cefr">B2 → C1</span><span class="rank">HM</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-C">C</span><a class="deeplink">→ konjunktiv2 / modals</a></div>
+        <div class="ops"><b>Operation, keine Achse.</b> Muss auf jede abhängige Form durchschlagen (Verbendung, Ihr↔dein, Imperativ).</div>
+        <div class="example"><span class="src">Kannst du mir sagen, warum …</span><span class="ar">→</span><span class="tgt">Könnten Sie mir mitteilen, aus welchem Grund …</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Satzbau / Wortstellung</div><div class="dc-en">Hauptsatz ↔ Nebensatz</div></div>
+          <div class="dc-badges"><span class="cefr">B1 → B2</span><span class="rank">#4</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-B">B</span><a class="deeplink">→ verbPosition / subordinate</a></div>
+        <div class="ops"><b>Verb ans Ende:</b> die Verbklammer wird sichtbar. Die anschaulichste Animation des Tools. Strikt V2 nach Vorfeld.</div>
+        <div class="example"><span class="src">Das Projekt war teuer. Trotzdem …</span><span class="ar">→</span><span class="tgt">Obwohl das Projekt teuer war, …</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- WAVE 3 -->
+  <div class="wave">
+    <div class="wave-head"><span class="wave-badge wb-3">Wave 3</span><span class="wave-title">Kompression & integrative Operationen</span></div>
+    <div class="wave-sub">C1-lastige Verdichtung und die integrativen Umformungen. Braucht reife Tier-B/C-Bewertung und Guardrails. Bidirektional = doppelter Wert (produzieren + entschlüsseln).</div>
+    <div class="cards">
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Stil: Nominal ↔ Verbal</div><div class="dc-en">Nominalisierung ⇄ Verbalstil</div></div>
+          <div class="dc-badges"><span class="cefr">B2 → C1</span><span class="rank">#2</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-C">C</span><span class="minitier tier-B">B</span><a class="deeplink">→ wordFormation</a></div>
+        <div class="ops"><b>Nebensatz ↔ Präposition + Nominalphrase</b> (weil↔wegen …). Größte Stil-Lücke B1→B2. Bidirektional.</div>
+        <div class="example"><span class="src">Weil der Zug verspätet war, …</span><span class="ar">→</span><span class="tgt">Wegen der Verspätung des Zuges …</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Relativsatz ↔ Partizip</div><div class="dc-en">Extended participial attribute</div></div>
+          <div class="dc-badges"><span class="cefr">B2 → C1</span><span class="rank">#5</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-C">C</span><span class="minitier tier-A">A</span><a class="deeplink">→ attributes / relativeClauses</a></div>
+        <div class="ops"><b>Verdichten</b> (Relativsatz → Partizip) und <b>entschlüsseln</b> (zurück). Der Decode-Weg ist regelbasiert und eine gute B2-Leseübung.</div>
+        <div class="example"><span class="src">Die Studie, die veröffentlicht wurde, …</span><span class="ar">→</span><span class="tgt">Die veröffentlichte Studie …</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Infinitivkonstruktionen</div><div class="dc-en">Nebensatz → um … zu</div></div>
+          <div class="dc-badges"><span class="cefr">B1 → B2</span><span class="rank">#7</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-B">B</span><a class="deeplink">→ infinitives</a></div>
+        <div class="ops"><b>dass/damit/weil → um…zu / ohne…zu / anstatt…zu.</b> Nur bei gleichem Subjekt (prüfbare Lizenz), sonst damit.</div>
+        <div class="example"><span class="src">… damit ich einen Termin bekomme.</span><span class="ar">→</span><span class="tgt">… um einen Termin zu bekommen.</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Konditionalität</div><div class="dc-en">wenn → sollten / falls / bei</div></div>
+          <div class="dc-badges"><span class="cefr">B1 → B2</span><span class="rank">#9</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-B">B</span><a class="deeplink">→ subordinate / konjunktiv2</a></div>
+        <div class="ops"><b>wenn ↔ Sollten-V1 ↔ falls/sofern ↔ bei + Nomen.</b> Der „Sollten Sie Fragen haben"-Register der B2-E-Mail.</div>
+        <div class="example"><span class="src">Wenn Sie Fragen haben, …</span><span class="ar">→</span><span class="tgt">Sollten Sie Fragen haben, …</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Passiversatzformen</div><div class="dc-en">man / sich lassen / sein + zu / -bar</div></div>
+          <div class="dc-badges"><span class="cefr">B2 → C1</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-C">C</span><a class="deeplink">→ passive</a></div>
+        <div class="ops"><b>Alternativen zum Passiv</b> für formelle Anweisungen und Amtssprache.</div>
+        <div class="example"><span class="src">Sie müssen den Antrag einreichen.</span><span class="ar">→</span><span class="tgt">Der Antrag ist einzureichen.</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Plusquamperfekt</div><div class="dc-en">nur mit Zeitanker</div></div>
+          <div class="dc-badges"><span class="cefr">B2</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-A">A</span><a class="deeplink">→ verbPosition</a></div>
+        <div class="ops"><b>Vorzeitigkeit</b> mit nachdem/als. Nur anbieten, wenn ein zweites Vergangenheitsereignis existiert, sonst gestrandet.</div>
+        <div class="example"><span class="src">Nachdem er ging, …</span><span class="ar">→</span><span class="tgt">Nachdem er gegangen war, …</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DEEP-LINK ONLY -->
+  <div class="wave">
+    <div class="wave-head"><span class="wave-badge wb-link">nur Deep-Link</span><span class="wave-title">Kein Live-Toggle, in die Lektion verlinken</span></div>
+    <div class="wave-sub">Als freie Umformung Fallen: Formen kollabieren, wirken unnatürlich oder haben eine niedrige Decke. Über die eigene Satz-Entdeckung in die Grammatikbank führen.</div>
+    <div class="cards">
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Indirekte Rede (Konjunktiv I)</div><div class="dc-en">Reported speech</div></div>
+          <div class="dc-badges"><span class="cefr">B2 → C1</span><span class="rank">#6</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-C">C</span><a class="deeplink">→ reportedSpeech</a></div>
+        <div class="ops">Deixis, Pronomen, Zeit und K-I/K-II-Ersatz greifen ineinander; viele gültige Ausgaben, selten produziert. Als Live-Toggle riskant.</div>
+        <div class="example"><span class="src">„Ich habe die Datei hochgeladen."</span><span class="ar">→</span><span class="tgt">Er habe die Datei hochgeladen.</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Futur I (als Vermutung)</div><div class="dc-en">Future · assumption only</div></div>
+          <div class="dc-badges"><span class="cefr">B2</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-B">B</span><a class="deeplink">→ future</a></div>
+        <div class="ops">Nur als Vermutung mit Warnhinweis anbieten; „werden + Inf." dort, wo Präsens idiomatisch ist, trainiert Unnatürliches.</div>
+        <div class="example"><span class="src">Sie ist wohl krank.</span><span class="ar">→</span><span class="tgt">Sie wird wohl krank sein.</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Negation (Affix / Lexik)</div><div class="dc-en">un- / -los / nicht-Stellung</div></div>
+          <div class="dc-badges"><span class="cefr">A2 – B1</span><span class="rank">#10</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-B">B</span><a class="deeplink">→ verbPosition</a></div>
+        <div class="ops">nicht-Stellung überlebt bis B2; Affix-Negation hebt das Register. Besser als gezieltes Feedback als als Umform-Achse.</div>
+        <div class="example"><span class="src">Er ist nicht pünktlich.</span><span class="ar">→</span><span class="tgt">Er ist unpünktlich.</span></div>
+      </div>
+
+      <div class="dcard">
+        <div class="dc-top">
+          <div><div class="dc-name">Steigerung</div><div class="dc-en">Comparison · je … desto</div></div>
+          <div class="dc-badges"><span class="cefr">A2 – B1</span></div>
+        </div>
+        <div class="tierline"><span class="minitier tier-A">A</span></div>
+        <div class="ops">Niedrige Decke; nur je…desto und immer+Komparativ sind B2-wert. Als eigene Achse zu dünn.</div>
+        <div class="example"><span class="src">Das Projekt ist wichtig.</span><span class="ar">→</span><span class="tgt">… immer wichtiger.</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CUT -->
+  <div class="wave">
+    <div class="wave-head"><span class="wave-badge wb-cut">gestrichen</span><span class="wave-title">Rauschen bei B1–B2</span></div>
+    <div class="cards">
+      <div class="dcard cut">
+        <div class="dc-top"><div><div class="dc-name">Futur II</div><div class="dc-en">Future perfect</div></div><div class="dc-badges"><span class="cefr">C1</span></div></div>
+        <div class="ops">Vollständig streichen. Rauschen auf B1–B2, sehr selten produktiv.</div>
+      </div>
+      <div class="dcard cut">
+        <div class="dc-top"><div><div class="dc-name">Numerus (eigenständig)</div><div class="dc-en">Number · Sg ↔ Pl</div></div><div class="dc-badges"><span class="cefr">A1 – A2</span></div></div>
+        <div class="ops">Nur als Unter-Prüfung innerhalb anderer Umformungen, nie als eigene Pille.</div>
+      </div>
+      <div class="dcard cut">
+        <div class="dc-top"><div><div class="dc-name">Kasus (eigenständig)</div><div class="dc-en">Case</div></div><div class="dc-badges"><span class="cefr">A2 – B2</span></div></div>
+        <div class="ops">Fällt aus Passiv, Nominalstil und Umbau heraus. Als Feedback zeigen, nicht als Achse.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>Zwei Eimer.</b> <b>Formachsen</b> (Genus Verbi × Zeitform × Modus) kombinieren zu einem kleinen,
+    vorab berechenbaren Raster. <b>Umformungen</b> (Register, Satzbau, Stil, Relativ↔Partizip, Kondition,
+    Infinitiv) sind gerichtete Einzel-Operationen, je ein Ziel, faul + gecacht. So bleibt das Raster klein und
+    die Kosten im bestehenden 5-$-Deckel. &nbsp;·&nbsp; <b>Guardrails sind das eigentliche IP:</b> blockierte
+    Umformungen werden mit einem deutschen Grund ausgegraut, nie falsch erzwungen. &nbsp;·&nbsp;
+    <b>Engine-Notiz:</b> Modus von Konstante zu Achse befördern, `useFokusMachine` von {voice, tense} auf
+    Achsen-Iteration erweitern, Operations-Contract neben dem Tuple, und `PROMPT_VERSION` erhöhen (Cache-Key).
+  </div>
+
+</div>
+</body>
+</html>
