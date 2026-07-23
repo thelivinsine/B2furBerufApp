@@ -1195,3 +1195,66 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   `src/data/writingPrompts.ts` · `scripts/lint-content.mjs` ·
   `src/features/writing/WritingHistory.tsx` · `src/features/vocabulary/RelatedPanel.tsx` ·
   `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · #651 · #652 · `docs/DECISIONS.md` (s149 design-preferences entry) · this log
+
+## Session 150 — 2026-07-23 — Fokus "Satzlabor" grammar-bug fix + AI provider cascade rework (branch `claude/ai-response-bug-xfsth9`)
+
+- **Prompt 1 (verbatim, 4 Satzlabor screenshots attached):** `Read the ai's responses in these screenshots, don't you think there's a serious bug here?`
+- **Response 1:** Confirmed a serious bug. For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv
+  copula, sein + adjective) the panel marked **Passiv** as the detected form, then refused Perfekt/
+  Präteritum with "Der Satz steht schon in dieser Form" and refused a passive it claimed the sentence
+  already was. Root cause traced to `check-sentence` (Haiku) misreading "sein + Adjektiv" as a
+  Zustandspassiv + the client collapsing it onto the Vorgangspassiv pill; proposed prompt + client fixes.
+- **Prompt 2 (verbatim):** `Yes, I want you to fix the bugs and I'm happy to run the fucntions in supabase, but before that tell me which llm models are best suited for our task here irrespective of provider and advanceness of the models`
+- **Response 2:** Loaded the grounded model catalogue (claude-api skill). Recommended a mid-frontier
+  tier for German morphology: Sonnet 5 as the sweet spot (Opus 4.8 for max), Haiku the wrong tier;
+  flagged the temperature/thinking migration caveat. Asked which model to standardize on.
+- **Prompt 3 (answer to the model AskUserQuestion):** chose **Sonnet 5 (Recommended)**.
+- **Response 3:** Shipped the fix on Sonnet 5: hardened `check-sentence` (copula-is-Aktiv rule) +
+  `transform-sentence` (`bereits_zielform` needs voice AND tense) prompts, dropped `temperature`,
+  disabled thinking, Sonnet cost math, cache invalidation (`CHECK_VERSION` salt + `PROMPT_VERSION`
+  bump), and the client `normalizeDetected` guard (Zustandspassiv → null, not the Passiv pill) with
+  the test updated. typecheck / 260 tests / build green. Pushed (commits c449cca, f4a0d29).
+- **Prompt 4 (verbatim):** `what are comparable models for sonnet in gemini and chatgpt models?`
+- **Response 4:** Gemini 2.5 Pro (Flash = Haiku-tier), GPT-5 / GPT-5 mini; flagged the current cheap
+  fallbacks (gemini-1.5-flash, gpt-4o-mini) are the same weak tier that caused the bug.
+- **Prompt 5 (verbatim):** `match the fall back model quality, and also which model has the highest free tier limit?`
+- **Response 5:** Answered free tier = Google Gemini (Flash-tier highest; Pro free but rate-limited;
+  OpenAI/Anthropic have no standing free API tier); flagged the free-tier data-training + disclaimer
+  accuracy points. Upgraded the two Satzlabor fallbacks to Gemini 2.5 Pro + GPT-5 (later superseded).
+- **Prompt 6 (verbatim):** `use Gemini 2.5 or 3 flash model as primary and sonnet as second back up if the free tier is exhausted and gpt 5 model if claude sonnet uses $2.` + mid-turn: `the total token cost limit should be $5 for all three models combined. Make the prompts robust`
+- **Response 6:** Reworked check/transform into a free-first cascade: Gemini 2.5 Flash (free, $0) →
+  Sonnet 5 (until $2 month-to-date Claude spend) → GPT-5; existing global $5 `ai_usage` fuse bounds
+  all three combined; robust prompts (worked examples + strict JSON-only). Flagged the quality risk of
+  a cheap primary. Pushed (commit dca9a79).
+- **Prompt 7 (verbatim, interrupt):** `First answe my question` — re the highest free tier.
+- **Response 7:** Answered directly (Gemini highest free tier; free-tier privacy caveat + disclaimer
+  accuracy) then resumed.
+- **Prompt 8 (verbatim):** `I want Gemini to be primary model for all AI reviews or corrections not just satzlabor.`
+- **Response 8:** Extended the identical cascade to `evaluate-writing` (writing coach); made the $2
+  Claude threshold GLOBAL by summing Claude spend across both `sentence_ai_ops` + `writing_evaluations`
+  in all three functions; upgraded evaluate-writing models + request shapes + prompt. Pushed (90962c3).
+- **Prompt 9 (verbatim):** `yes adapt the Ui disclaimer`
+- **Response 9:** Updated both Art. 50 disclaimers (Satzlabor + writing coach) from "(Anthropic Claude)"
+  to "(Anthropic, Google oder OpenAI)"; noted the privacy policy already lists all three. Pushed (f0d8d8e).
+- **Prompt 10 (verbatim):** `how should I store the gemini api keys in supabase?` — answered
+  (`supabase secrets set GEMINI_API_KEY=...` or Dashboard Secrets; get key from AI Studio; billing-
+  enabled key for GDPR data terms).
+- **Prompt 11 (verbatim):** `how to add chatgpt api?` — answered (`OPENAI_API_KEY` secret; platform.
+  openai.com key + billing; GPT-5 access; keep it a GPT-5-family model for `reasoning_effort`).
+- **Prompt 12 (verbatim):** `I'm done with deploying the edge functions and adding api keys. What next?` —
+  laid out: test the live Satzlabor, merge the client pieces to `main`, docs, optional privacy-policy edit.
+- **Prompt 13 (verbatim):** `provide links to the new codes for all the functions thjat I need to run again` —
+  gave GitHub blob links for the three edge functions + the redeploy command.
+- **Prompt 14 (verbatim):** `edit the privacy policy, document the session and push everything live to main`
+- **Response 14:** Genericized the privacy-policy AI-provider passage (DE + EN) to routing-neutral
+  ("Je nach Funktion und Auslastung … Google Gemini, Anthropics Claude oder OpenAI"); judged
+  non-material so `CONSENT_VERSION` NOT bumped (no forced re-consent). Documented the session
+  (`PROJECT_STATUS.md` header + s150 handoff, s148 moved to the W30 archive, `SESSION_PROMPT_LOG.md`,
+  `CLAUDE.md` AI-provider facts). Opened a PR into `main` and squash-merged.
+- **Artifacts (session 150):** `supabase/functions/check-sentence/index.ts` ·
+  `supabase/functions/transform-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
+  `src/features/writing/fokus/grammarDimensions.ts` · `tests/fokusGrammar.test.ts` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/legal/PrivacyPolicy.tsx` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · commits c449cca ·
+  f4a0d29 · dca9a79 · f0d8d8e · 90962c3 · this log

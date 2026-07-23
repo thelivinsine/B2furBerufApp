@@ -3,6 +3,31 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 148 (2026-07-22). Auth bug fix: fresh-device OAuth login threw existing
+accounts out to the landing page. Branch `claude/pwa-auth-uninstall-bug-hrafrw`, PR #644 merged.**
+The founder reported: after uninstalling the PWA and logging into an admin account with Google, the
+app redirects to the landing page right after login and throws them out.
+- **Root cause.** Uninstalling the PWA wipes `localStorage`, so on the fresh install the local
+  `onboarded` flag defaults to `false`. Google OAuth (`signInWithGoogle`) returns to `/`, where the
+  `RequireOnboarding` guard (`router.tsx`) read the **local** `onboarded` flag *synchronously* and
+  immediately `<Navigate to="/welcome">` — before `startCloudSync` (async) pulled the account's real
+  `onboarded: true` from its Supabase profile. Any existing account on a fresh device got bounced.
+  Not admin-specific; admins just hit it because they test on multiple devices. `RequireFounder` was
+  never in the redirect path (OAuth returns to `/`, not `/admin`) and reads `user.email` which is
+  available immediately, so it needed no change.
+- **Fix (3 files, +37 lines).** New `syncHydrated: boolean` on `useAuthStore` (default false).
+  `cloudSync.ts` sets it `false` at the start of each `startCloudSync` and in `stopCloudSync`
+  (sign-out), and `true` in a `finally` **after** the first pull's profile merge (so the cloud
+  `onboarded` is already applied when it flips; also covers the offline-catch path).
+  `RequireOnboarding` now: (1) lets already-onboarded devices straight in; (2) renders `null` while
+  `status === "loading"` (OAuth handshake in flight); (3) for a signed-in / guest user, renders
+  `null` until `syncHydrated`; (4) only a genuinely signed-out visitor (or one whose pull finished
+  still-not-onboarded) goes to `/welcome`. Circular import (`cloudSync` ↔ `useAuthStore`) is safe:
+  both only touch each other inside function bodies, never at module eval.
+- **Gates:** `typecheck` ✓ · `lint` (0 errors; pre-existing warnings only) · `test:unit` **257/257** ·
+  `build` ✓ · `check:bundle` **112.3 kB** (main chunk unchanged). Sandbox can't reach the live
+  `*.github.io` site, so the founder confirms the reinstall-and-login result after the Pages deploy.
+
 **Handoff after session 143 (2026-07-21). Admin Control Center scoping, branch
 `claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (PR #626, docs + preview only).**
 Founder asked for a comprehensive admin control center: an expert-agent panel to scope it, a report

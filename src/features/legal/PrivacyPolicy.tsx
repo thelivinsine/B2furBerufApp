@@ -110,11 +110,10 @@ function PrivacyDe() {
             weitere Verarbeitung;
           </li>
           <li>
-            und nur, wenn eine tiefere Analyse sinnvoll ist, den Text an{" "}
-            <strong>Anthropics Claude</strong> (unser primäres KI-Modell) sendet, um die
-            Ergebnisse in einen klaren, priorisierten Tipp zu verwandeln. Nur bei seltenen
-            technischen Ausfällen kann die Anfrage stattdessen auf <strong>Google Gemini</strong>{" "}
-            oder <strong>OpenAI</strong> zurückgreifen.
+            und nur, wenn eine tiefere Analyse sinnvoll ist, den Text an einen KI-Dienst sendet,
+            um die Ergebnisse in einen klaren, priorisierten Tipp zu verwandeln. Je nach Funktion
+            und Auslastung verarbeitet dabei <strong>Google Gemini</strong>,{" "}
+            <strong>Anthropics Claude</strong> oder <strong>OpenAI</strong> den Text.
           </li>
         </ul>
         <p className="mt-2">
@@ -322,10 +321,10 @@ function PrivacyEn() {
             to find concrete error categories, often without needing any further processing;
           </li>
           <li>
-            and, only when a deeper read is useful, sends the text to{" "}
-            <strong>Anthropic's Claude</strong> (our primary AI model) to turn the findings into
-            one clear, prioritised tip. On rare technical failures only, the request may fall back
-            to <strong>Google Gemini</strong> or <strong>OpenAI</strong> instead.
+            and, only when a deeper read is useful, sends the text to an AI service to turn the
+            findings into one clear, prioritised tip. Depending on the feature and load,{" "}
+            <strong>Google Gemini</strong>, <strong>Anthropic's Claude</strong>, or{" "}
+            <strong>OpenAI</strong> processes the text.
           </li>
         </ul>
         <p className="mt-2">

@@ -1,18 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-23 (session 149, complete). **Schreiben is a full Bibliothek extension**
-(5 founder rounds, PRs #648-#651, all merged): the 4-segment sliding-pill switcher **Fokus · Kurz ·
-Lang · Verlauf** IS the page header, the "Aufgabe wählen" rail is a Himmelblau tile with the
-Bibliothek scope hierarchy **Branche → Thema → Unterthema** as grouped dropdowns (live counts,
-zero-yield greyed, Gesundheit folds into Alltag), the Fokus Grammatik rail shares the same tile
-(green dot = detected form), and writing tasks are RANDOM POOLS of tagged task objects: **373
-tasks**, every theme ≥8 short + ≥8 long, every sub-theme ≥2+2, **all 15 Branchen** with
-sector-specific tasks (untagged = universal). Reset is always-active (clears scopes + draws a
-fresh task); directional tab slides + one micro-motion timing family. **Founder design
-preferences distilled into CLAUDE.md + DECISIONS.md (s149).** Next content wave: pools toward
-15-20 per theme/length (append-only). Founder action open (from s147): redeploy
-`check-sentence`/`transform-sentence` + confirm `GEMINI_API_KEY`.
-Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-23 (session 150, complete). **Fokus "Satzlabor" grammar-bug fix + AI provider
+cascade rework.** The Satzlabor was teaching wrong German (copula "Ich bin krank" mislabeled as Passiv;
+tense transforms wrongly refused as "Der Satz steht schon in dieser Form"). Fixes: hardened
+German-grammar prompts (explicit copula-is-Aktiv rule, stricter `bereits_zielform`, worked examples,
+strict JSON-only) and `normalizeDetected` no longer forces a detected Zustandspassiv onto the Passiv
+pill. **All three AI Edge Functions (`check-sentence`, `transform-sentence`, `evaluate-writing`) now
+share ONE provider cascade: Gemini 2.5 Flash (free, $0) → Claude Sonnet 5 → GPT-5**, Sonnet leading the
+paid backup until month-to-date Claude spend across all AI features hits $2 (then GPT-5), all bounded
+by the existing global $5/month fuse; models + budget are env-overridable. The two AI disclaimers +
+the privacy policy (DE/EN) now name all three providers routing-neutrally. Founder has deployed all
+three functions + set `GEMINI_API_KEY`. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -55,11 +53,8 @@ Standing governance debt: **all** provenance rows are AI-drafted and `draft`, no
 see `strategy/DATA_GOVERNANCE.md`).
 
 ## Open founder action items
-Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
-- [ ] **Redeploy the Fokus "Satzlabor" functions (s147)** to pick up the diagnostic logging + Anthropic
-      retry fix: `check-sentence` + `transform-sentence` (migration 0009 + the initial deploy are already
-      done). Also confirm `GEMINI_API_KEY` is set as a Supabase project secret so the fallback is active.
-      Steps in `docs/plans/PHASE2_SETUP.md`.
+Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. The s147 Satzlabor redeploy is
+done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMINI_API_KEY` set). Still open:
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
@@ -73,6 +68,43 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 150 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
+rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
+wrong, self-contradictory German feedback.
+- **Bug.** For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv copula, sein + adjective) the
+  panel marked **Passiv** as the detected form, then refused Perfekt/Präteritum with "Der Satz steht
+  schon in dieser Form" (Präsens treated as already past) and refused a passive it simultaneously
+  claimed the sentence already was. Root cause: the cheap Haiku detector misread "sein + Adjektiv" as
+  a Zustandspassiv, which `normalizeDetected` then collapsed onto the Vorgangspassiv pill.
+- **Fix (server prompts).** `check-sentence`: explicit rule that sein/werden/bleiben + adjective/adverb
+  is always Aktiv, only + Partizip II of a transitive verb is passive; worked examples; strict
+  JSON-only. `transform-sentence`: `bereits_zielform` only when BOTH voice AND tense already match (a
+  tense change is a real transform); same copula rule. `evaluate-writing`: JSON-only hardening.
+- **Fix (client).** `grammarDimensions.ts` `normalizeDetected` no longer maps a detected
+  `passiv_zustand` onto the Passiv pill; it returns null (no marker), so a misdetected copula can never
+  surface a wrong Passiv dot. `tests/fokusGrammar.test.ts` updated to lock this in.
+- **Provider cascade (all 3 AI functions).** Founder wanted Gemini primary everywhere + a combined
+  budget. `check-sentence`/`transform-sentence`/`evaluate-writing` each now run **Gemini 2.5 Flash
+  (free, recorded $0) → Claude Sonnet 5 → GPT-5**: Sonnet leads the paid backup until month-to-date
+  Claude spend across **both** `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD`
+  ($2), then GPT-5 leads. The existing global `MONTHLY_SPEND_CAP_USD` ($5, shared via `ai_usage`)
+  bounds all three combined. Anthropic calls drop `temperature` + disable thinking (Sonnet 5 family);
+  Gemini forces JSON output + a generous token budget; GPT-5 uses `max_completion_tokens` +
+  `reasoning_effort: minimal`. Every model id + the $2 threshold are env-overridable (`GEMINI_MODEL`,
+  `CHECK_MODEL`/`TRANSFORM_MODEL`/`EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`). Caches
+  invalidated so stale wrong answers are not re-served (check-sentence `CHECK_VERSION` salt,
+  transform-sentence `PROMPT_VERSION` bump).
+- **Transparency.** The two EU AI Act Art. 50 disclaimers (Satzlabor + writing coach) and the privacy
+  policy (DE + EN) now name all three providers routing-neutrally. Judged non-material (processors +
+  purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
+- **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
+- **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
+  `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →
+  `{ ok: false }`). Watch the function logs on the first Gemini-primary calls.
+- **Caveat carried forward:** Gemini Flash primary is the same cheap tier that caused the original bug;
+  the hardened prompt carries it and Sonnet backstops, but if wrong grammar reappears, flip the primary
+  back via `GEMINI_MODEL` (one env var, no code change).
 
 **Handoff after session 149 (2026-07-23). Schreiben restyled as a Bibliothek extension, branch
 `claude/schreiben-design-refinement-bw8rhh`.** Founder: "make the schreiben section look like it's an
@@ -131,32 +163,8 @@ A/B, `-r2.html` = variant A + the founder's 7 changes), then implemented on foun
   arrays in `writingPrompts.ts`, no schema work needed); the s147 founder redeploy action below still
   stands.
 
-**Handoff after session 148 (2026-07-22). Auth bug fix: fresh-device OAuth login threw existing
-accounts out to the landing page. Branch `claude/pwa-auth-uninstall-bug-hrafrw`, PR #644 merged.**
-The founder reported: after uninstalling the PWA and logging into an admin account with Google, the
-app redirects to the landing page right after login and throws them out.
-- **Root cause.** Uninstalling the PWA wipes `localStorage`, so on the fresh install the local
-  `onboarded` flag defaults to `false`. Google OAuth (`signInWithGoogle`) returns to `/`, where the
-  `RequireOnboarding` guard (`router.tsx`) read the **local** `onboarded` flag *synchronously* and
-  immediately `<Navigate to="/welcome">` — before `startCloudSync` (async) pulled the account's real
-  `onboarded: true` from its Supabase profile. Any existing account on a fresh device got bounced.
-  Not admin-specific; admins just hit it because they test on multiple devices. `RequireFounder` was
-  never in the redirect path (OAuth returns to `/`, not `/admin`) and reads `user.email` which is
-  available immediately, so it needed no change.
-- **Fix (3 files, +37 lines).** New `syncHydrated: boolean` on `useAuthStore` (default false).
-  `cloudSync.ts` sets it `false` at the start of each `startCloudSync` and in `stopCloudSync`
-  (sign-out), and `true` in a `finally` **after** the first pull's profile merge (so the cloud
-  `onboarded` is already applied when it flips; also covers the offline-catch path).
-  `RequireOnboarding` now: (1) lets already-onboarded devices straight in; (2) renders `null` while
-  `status === "loading"` (OAuth handshake in flight); (3) for a signed-in / guest user, renders
-  `null` until `syncHydrated`; (4) only a genuinely signed-out visitor (or one whose pull finished
-  still-not-onboarded) goes to `/welcome`. Circular import (`cloudSync` ↔ `useAuthStore`) is safe:
-  both only touch each other inside function bodies, never at module eval.
-- **Gates:** `typecheck` ✓ · `lint` (0 errors; pre-existing warnings only) · `test:unit` **257/257** ·
-  `build` ✓ · `check:bundle` **112.3 kB** (main chunk unchanged). Sandbox can't reach the live
-  `*.github.io` site, so the founder confirms the reinstall-and-login result after the Pages deploy.
-
-_(Session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first
+_(Session 148's auth-bug-fix handoff (fresh-device OAuth login bounced existing accounts to the
+landing page via the `syncHydrated` gate, PR #644), session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first
 Bibliothek harmonization, PRs #640/#642/#643/#646), session 146's /sources verification-refresh +
 human-review-reset + table-restructure handoff, and
 session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,

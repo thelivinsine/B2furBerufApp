@@ -498,7 +498,20 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   drafts carry `promptIndex` so the OAuth resume restores the exact task. The Aufgabe card has NO
   theme icon (founder), a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel line (the
   editor word count does NOT repeat the Ziel range), and the AI disclaimer is a **standalone line
-  below the editor/sentence card**, never inside it. **Eyebrow rule (s149): card-title eyebrows =
+  below the editor/sentence card**, never inside it. **AI backend (s150):** the Fokus Satzlabor
+  (`check-sentence`/`transform-sentence`) AND the Kurz/Lang writing coach (`evaluate-writing`) share
+  ONE provider cascade in their Supabase Edge Functions: **Gemini 2.5 Flash (free, recorded $0) →
+  Claude Sonnet 5 → GPT-5**, where Sonnet leads the paid backup until month-to-date Claude spend
+  across BOTH `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD` ($2), then GPT-5
+  leads; the global `MONTHLY_SPEND_CAP_USD` ($5, shared `ai_usage` fuse) bounds all three combined.
+  Anthropic calls send no `temperature` + `thinking: disabled` (Sonnet 5 family), Gemini forces JSON
+  output + a generous token budget, GPT-5 uses `max_completion_tokens` + `reasoning_effort: minimal`.
+  Model ids + the $2 threshold are env-overridable (`GEMINI_MODEL`, `CHECK_MODEL`/`TRANSFORM_MODEL`/
+  `EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`); flip `GEMINI_MODEL` to change the primary. The
+  German-grammar prompts are hardened (copula sein+Adjektiv is Aktiv, never Passiv; `bereits_zielform`
+  needs voice AND tense; strict JSON-only), and `normalizeDetected` never marks a detected
+  Zustandspassiv as the Passiv pill. The two Art. 50 disclaimers + `/privacy` (DE+EN) name all three
+  providers routing-neutrally. **Eyebrow rule (s149): card-title eyebrows =
   bold `text-primary` ("Aufgabe:", "Dein Satz", the transform label); inner section labels stay
   muted.** **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20` +
   `border-accent/50`, dark `bg-accent/10` + `border-accent/25`; NOT grey) with a header reset icon
