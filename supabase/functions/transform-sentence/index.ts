@@ -8,8 +8,8 @@
 //      (burst/min, per-day, per-month) counting ONLY paid ops.
 //   2. Validate the target tuple against a closed enum.
 //   3. GLOBAL cache lookup by hash(source | tuple | prompt_version | model) -> free.
-//   4. Otherwise ONE LLM call (TRANSFORM_MODEL, default Haiku; fallback Gemini ->
-//      gpt-4o-mini). The model ABSTAINS (applicable:false) rather than hallucinate.
+//   4. Otherwise ONE LLM call, cascade Gemini 2.5 Flash (free) -> Sonnet 5 ->
+//      GPT-5. The model ABSTAINS (applicable:false) rather than hallucinate.
 //   5. Contract-validate, cache the result globally, bump ai_usage + ledger.
 //
 // Secrets: ANTHROPIC_API_KEY (required), GEMINI_API_KEY / OPENAI_API_KEY (optional),
@@ -56,11 +56,16 @@ const TENSES = ["praesens", "perfekt", "praeteritum", "plusquamperfekt", "futur1
 const MOODS = ["indikativ", "konjunktiv1", "konjunktiv2", "imperativ"];
 const REASONS = ["ok", "kein_akkusativobjekt", "intransitiv_unpersoenlich", "bereits_zielform", "nicht_idiomatisch", "mehrdeutig", "modalverb_grenze"];
 
+// Provider cascade (per cache-miss): free Gemini Flash first, then paid Claude
+// Sonnet, then GPT-5. Sonnet is the paid backup until month-to-date Claude spend
+// reaches CLAUDE_BUDGET_USD, after which GPT-5 leads. All three combined are
+// bounded by the global MONTHLY_SPEND_CAP_USD fuse (Gemini's free tier is $0).
+const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
 const TRANSFORM_MODEL = Deno.env.get("TRANSFORM_MODEL") ?? "claude-sonnet-5";
-// Fallbacks upgraded to Sonnet-5-tier so an Anthropic outage does not silently
-// degrade German grammar quality back to the cheap tier that caused the bug.
-const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-pro";
 const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
+// Once month-to-date Claude (Sonnet) spend reaches this, GPT-5 leads the paid
+// backup instead of Sonnet. A soft routing threshold, not a hard cap.
+const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
 const TRANSFORM_DAILY_LIMIT = Number(Deno.env.get("TRANSFORM_DAILY_LIMIT") ?? "40");
 const TRANSFORM_BURST_LIMIT = Number(Deno.env.get("TRANSFORM_BURST_LIMIT") ?? "8");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
@@ -109,7 +114,12 @@ const SYSTEM_PROMPT =
   `Eine falsche Form schadet dem Lernenden mehr als ein Hinweis. ` +
   `note: ein kurzer deutscher Hinweis (ein Satz), was sich geaendert hat, bei false warum nicht. ` +
   `note_en: dieselbe Erklaerung auf Englisch. achieved: die tatsaechlich gebildete Form. ` +
-  `Antworte AUSSCHLIESSLICH als JSON: ` +
+  `Beispiele: Quelle "Ich bin krank." (Praesens), Ziel Perfekt -> transformed ` +
+  `"Ich bin krank gewesen", applicable true. Quelle "Der Bericht wird geschrieben." Ziel ` +
+  `aktiv Praesens -> "Man schreibt den Bericht", applicable true. ` +
+  `Nutze fuer voice, tense und mood in achieved NUR die vorgegebenen Werte, exakt geschrieben. ` +
+  `Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zaeune und ohne ` +
+  `weiteren Text, genau in dieser Form: ` +
   `{"applicable": true, "reason": "ok", "transformed": "...", "note": "...", "note_en": "...", ` +
   `"achieved": {"voice": "...", "tense": "...", "mood": "..."}}.`;
 
@@ -224,7 +234,8 @@ async function callGemini(source: string, target: Tuple): Promise<TransformOut |
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parse(raw, target);
     if (!parsed) { console.error(`[transform] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
-    return { ...parsed, model: GEMINI_MODEL, cost: 0.003 };
+    // Free tier: record $0 so free calls never consume the paid spend fuse.
+    return { ...parsed, model: GEMINI_MODEL, cost: 0 };
   } catch (e) {
     console.error(`[transform] gemini threw: ${e}`);
     return null;
@@ -367,7 +378,19 @@ Deno.serve(async (req) => {
   }
 
   console.log(`[transform] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${TRANSFORM_MODEL}`);
-  const out = (await callAnthropic(source, target)) || (await callGemini(source, target)) || (await callOpenAI(source, target));
+  // Free Gemini first. On its failure (any error, incl. free-tier/quota 429,
+  // which returns null) fall to a paid model: Sonnet while Claude spend is under
+  // budget, else GPT-5 leads. Each paid model backstops the other.
+  let out = await callGemini(source, target);
+  if (!out) {
+    const { data: claudeRows } = await admin
+      .from("sentence_ai_ops").select("cost_estimate")
+      .ilike("model", "claude%").gte("created_at", startOfMonth.toISOString());
+    const claudeSpend = (claudeRows ?? []).reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
+    out = claudeSpend < CLAUDE_BUDGET_USD
+      ? (await callAnthropic(source, target)) || (await callOpenAI(source, target))
+      : (await callOpenAI(source, target)) || (await callAnthropic(source, target));
+  }
   if (!out) {
     console.error(`[transform] all providers failed target=${canonicalTuple(target)}`);
     return json({ ok: false, message: "Die Umformung ist momentan nicht verfügbar." });
