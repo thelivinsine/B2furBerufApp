@@ -1320,3 +1320,38 @@ _(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23,
 - **Response 16:** Reverted the bottom-pin (`min-h` + `mt-auto`) on the desktop content column; the
   combined note now sits horizontally centered in normal flow directly under the content. typecheck /
   build ✓. Merged to `main`.
+
+## Session 152 — 2026-07-23 — Admin control-center nav aligned to the app sidebar (branch `claude/admin-page-access-ok8g52`)
+
+- **Prompt 1 (verbatim):** `how do I access the admin page? is there a button in the app for the admins?` →
+  Answered from the code: the account-menu dropdown (header, top-right) shows a **"Kontrollzentrum"**
+  link to `/admin` for founder accounts (`AccountMenu.tsx:162`), gated on the two `FOUNDER_EMAILS` in
+  `src/lib/admin.ts` (client) + Supabase RLS (server). Also `/sources` (admin link card) and the
+  founder-only `/sources/werkbank`. No entry in the bottom nav by design.
+- **Prompt 2 (verbatim, screenshot of the open account menu):** `I don't see it here` →
+  Pointed out the blue "Kontrollzentrum" link (shield icon) was in fact visible in the screenshot,
+  between Einstellungen and Abmelden; noted it's the only entry point (plus the `/admin` URL).
+- **Prompt 3 (verbatim):** `It's working` → recapped the two admin surfaces.
+- **Prompt 4 (verbatim):** `can you compare the nagivation panel in the actual app vs the admin control center? The spacing can be adapted from the actual app as currently it looks cramped` →
+  Compared `AdminShell.tsx` vs the app `Sidebar.tsx` (+ AppShell `w-64`); the admin was cramped on
+  every axis. **PR #656:** column 224→256px, `p-3`→`p-4`, marks 16→18px, rows
+  `px-2.5/gap-2.5`→`px-3/gap-3`. Build ✓, squash-merged, branch realigned.
+- **Prompt 5 (verbatim):** `push changes live to main` → confirmed #656 was already squash-merged in
+  the prior step (`origin/main` at `b216b65`); nothing left to push.
+- **Prompt 6 (verbatim, screenshot of the Übersicht cockpit):** `is this how it's supposed to look after your changes?` →
+  Confirmed yes: the running build `b2ed23f` (#658) is two commits newer than the fix `b216b65` (#656)
+  and contains it. Flagged the "Latest main not reachable" widget line + the "1 approval waiting" as
+  harmless/unrelated.
+- **Prompt 7 (verbatim, screenshot of the app's desktop sidebar):** `It doesn't look same as this` +
+  mid-turn `check the logo size and the space below the logo as well. Also the navigation panel's width` →
+  Identified the remaining mismatches (active-row style + header lockup) and addressed all in **PR #660**,
+  all in `AdminShell.tsx`: active row → grey `bg-border` pill + bold `text-foreground` (was blue tint),
+  inactive → `text-foreground/80`; header rebuilt to the app pattern (wordmark `Logo` `h-7 w-auto` +
+  `text-xs` subtitle below + `mb-4`). Panel width already 256px (= app `w-64`) from #656, unchanged.
+  Build ✓, squash-merged, branch realigned. Noted the one deliberate difference: admin keeps monochrome
+  lucide icons (no branded `RouteIcon` marks for admin sections).
+- **Prompt 8 (verbatim):** `document the session` →
+  Updated `docs/PROJECT_STATUS.md` (header + new s152 handoff; moved the s150 + s149 handoffs into the
+  W30 archive per the two-most-recent rule) and appended this log entry.
+- **Artifacts (session 152):** `src/features/admin/AdminShell.tsx` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PRs #656, #660
