@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fokus · Korrektur-Karte Redesign</title>
+<style>
+  /* Real app tokens (src/index.css), both themes. */
+  :root {
+    --background: 180 45% 98%;
+    --surface: 0 0% 100%;
+    --muted: 220 10% 90%;
+    --muted-foreground: 220 8% 36%;
+    --foreground: 252 16% 12%;
+    --border: 220 9% 86%;
+    --primary: 221 83% 54%;
+    --success: 153 55% 40%;
+    --success-bg: 153 55% 94%;
+    --warning: 38 92% 46%;
+    --warning-bg: 38 92% 92%;
+    --danger: 4 73% 56%;
+    --shadow: 221 40% 22%;
+  }
+  .dark {
+    --background: 228 24% 10%;
+    --surface: 228 20% 14%;
+    --muted: 228 16% 22%;
+    --muted-foreground: 228 10% 72%;
+    --foreground: 228 20% 92%;
+    --border: 228 14% 26%;
+    --primary: 221 90% 70%;
+    --success: 153 50% 58%;
+    --success-bg: 153 40% 18%;
+    --warning: 43 90% 62%;
+    --warning-bg: 40 40% 20%;
+    --danger: 4 75% 64%;
+    --shadow: 221 60% 3%;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    transition: background .2s, color .2s;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .kicker { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--primary)); }
+  h1 { font-size: 26px; font-weight: 800; letter-spacing: -.02em; margin: 4px 0 6px; }
+  .lede { color: hsl(var(--muted-foreground)); font-size: 15px; line-height: 1.6; margin: 0; }
+
+  .themeToggle {
+    border: 1px solid hsl(var(--border));
+    background: hsl(var(--surface));
+    color: hsl(var(--foreground));
+    border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+  }
+
+  .variant { margin-top: 34px; }
+  .vhead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+  .vtag {
+    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+    border: 1px solid hsl(var(--border)); border-radius: 999px; padding: 3px 9px;
+  }
+  .vtag.rec { color: hsl(var(--success)); border-color: hsl(var(--success) / .5); background: hsl(var(--success-bg)); }
+  .vname { font-size: 16px; font-weight: 700; }
+  .why { color: hsl(var(--muted-foreground)); font-size: 13.5px; line-height: 1.55; margin: 0 0 14px; }
+
+  /* ---- Card shell (matches app Card) ---- */
+  .card {
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .05), 0 12px 32px hsl(var(--shadow) / .10);
+  }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: hsl(var(--primary)); margin: 0 0 14px; }
+  .eyebrow.ok { color: hsl(var(--success)); display: flex; align-items: center; gap: 6px; }
+  .check { width: 15px; height: 15px; }
+
+  .sentence { font-size: 19px; line-height: 1.5; margin: 0; }
+  .sentence.big { font-size: 21px; }
+
+  /* Corrected word: calm green underline (correct = green, not alarm-orange). */
+  .fix { color: hsl(var(--foreground)); border-bottom: 2px solid hsl(var(--success)); padding-bottom: 1px; font-weight: 600; }
+
+  /* Chips row */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: hsl(var(--muted) / .55);
+    border: 1px solid hsl(var(--border));
+    border-radius: 999px; padding: 5px 11px; font-size: 13.5px;
+  }
+  .chip .old { color: hsl(var(--muted-foreground)); text-decoration: line-through; text-decoration-color: hsl(var(--muted-foreground) / .6); }
+  .chip .arr { color: hsl(var(--muted-foreground)); }
+  .chip .new { color: hsl(var(--success)); font-weight: 700; }
+
+  hr.div { border: none; border-top: 1px solid hsl(var(--border)); margin: 16px 0 0; }
+
+  /* Inline diff */
+  .inline .del { color: hsl(var(--muted-foreground)); text-decoration: line-through; text-decoration-color: hsl(var(--danger) / .55); margin-right: 5px; font-size: .82em; }
+  .inline .ins { color: hsl(var(--success)); font-weight: 700; }
+  .footnote { margin: 16px 0 0; font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+
+  /* Minimal / tap variant */
+  .tapline { display: flex; align-items: center; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid hsl(var(--border)); }
+  .tapline .lbl { font-size: 12.5px; color: hsl(var(--muted-foreground)); }
+  .catpill {
+    font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+    color: hsl(var(--muted-foreground)); background: hsl(var(--muted) / .6);
+    border-radius: 6px; padding: 3px 7px;
+  }
+
+  /* The "before" (current) card, faithfully redrawn */
+  .old-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: hsl(var(--primary)); margin: 0 0 12px; }
+  .old-strike { color: hsl(var(--muted-foreground)); text-decoration: line-through; text-decoration-color: hsl(var(--warning) / .5); font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+  .old-status { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: hsl(var(--primary)); margin: 0 0 12px; }
+  .old-corr { font-size: 16px; line-height: 1.6; margin: 0 0 12px; }
+  .old-mark { background: hsl(var(--warning) / .25); border-radius: 4px; padding: 0 3px; }
+  .old-box { border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); border-radius: 12px; padding: 12px; }
+  .old-box .lbl { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: hsl(var(--muted-foreground)); margin: 0 0 8px; }
+  .old-box .row { font-size: 14px; margin: 6px 0; }
+  .old-box .row .o { color: hsl(var(--muted-foreground)); text-decoration: line-through; }
+  .old-box .row .n { color: hsl(var(--success)); font-weight: 600; }
+
+  .caption { font-size: 12px; color: hsl(var(--muted-foreground)); margin: 8px 2px 0; }
+</style>
+</head>
+<body class="dark">
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="kicker">Schreiben · Fokus</div>
+        <h1>Korrektur-Karte, aufgeräumt</h1>
+        <p class="lede">Die Karte zeigt jede Änderung dreimal. Ein Lerner braucht zwei Dinge:
+          den richtigen Satz zum Lesen und genau die Korrektur zum Lernen. Drei Varianten.</p>
+      </div>
+      <button class="themeToggle" onclick="document.body.classList.toggle('dark')">Hell / Dunkel</button>
+    </div>
+
+    <!-- BEFORE -->
+    <div class="variant">
+      <div class="vhead"><span class="vtag">Jetzt</span><span class="vname">Aktuell</span></div>
+      <p class="why">Durchgestrichener Originalsatz + hervorgehobener Korrektursatz + Änderungsliste +
+        Label + Zähler. Dieselben zwei Edits, viermal erzählt.</p>
+      <div class="card">
+        <p class="old-eyebrow">Dein Satz</p>
+        <p class="old-strike">Kanst du bitte es kurz erklaeren?</p>
+        <p class="old-status">✓ Korrigiert · 2 Änderungen</p>
+        <p class="old-corr"><span class="old-mark">Kannst</span> du bitte es kurz <span class="old-mark">erklären?</span></p>
+        <div class="old-box">
+          <p class="lbl">Was ich geändert habe</p>
+          <p class="row"><span class="o">Kanst</span> → <span class="n">Kannst</span></p>
+          <p class="row"><span class="o">erklaeren?</span> → <span class="n">erklären?</span></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANT A -->
+    <div class="variant">
+      <div class="vhead"><span class="vtag rec">Empfohlen</span><span class="vname">A · Ergebnis + Korrektur-Chips</span></div>
+      <p class="why">Der richtige Satz steht groß und ruhig oben, korrigierte Wörter mit einer sanften
+        grünen Unterstreichung (grün = jetzt richtig). Darunter genau die Edits als leise Chips.
+        Der durchgestrichene Originalsatz, das Label und der Zähler fallen weg, die Chips SIND die Liste
+        und der Zähler.</p>
+      <div class="card">
+        <p class="eyebrow ok"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+        <p class="sentence big"><span class="fix">Kannst</span> du bitte es kurz <span class="fix">erklären?</span></p>
+        <hr class="div" />
+        <div class="chips">
+          <span class="chip"><span class="old">Kanst</span><span class="arr">→</span><span class="new">Kannst</span></span>
+          <span class="chip"><span class="old">erklaeren?</span><span class="arr">→</span><span class="new">erklären?</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANT B -->
+    <div class="variant">
+      <div class="vhead"><span class="vtag">Option</span><span class="vname">B · Inline-Diff</span></div>
+      <p class="why">Der Satz nur EINMAL. Das falsche Wort klein durchgestrichen, direkt gefolgt von der
+        Korrektur in Grün. Null Extra-Boxen, maximal kompakt. Ideal für einen Satz (genau der Fokus-Modus).</p>
+      <div class="card">
+        <p class="eyebrow ok"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+        <p class="sentence inline"><span class="del">Kanst</span><span class="ins">Kannst</span> du bitte es kurz <span class="del">erklaeren?</span><span class="ins">erklären?</span></p>
+        <p class="footnote">2 Wörter korrigiert · Rechtschreibung</p>
+      </div>
+    </div>
+
+    <!-- VARIANT C -->
+    <div class="variant">
+      <div class="vhead"><span class="vtag">Option</span><span class="vname">C · Ergebnis + Lern-Tag</span></div>
+      <p class="why">Wie A, aber jeder Chip trägt eine winzige Kategorie (Rechtschreibung, Grammatik,
+        Wortstellung). Der Lerner sieht nicht nur WAS, sondern WELCHE ART Fehler, das ist der eigentliche
+        Lernwert. Kategorie ist billig aus dem Diff ableitbar (nur Buchstaben/Umlaut geändert = Rechtschreibung).</p>
+      <div class="card">
+        <p class="eyebrow ok"><svg class="check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+        <p class="sentence big"><span class="fix">Kannst</span> du bitte es kurz <span class="fix">erklären?</span></p>
+        <div class="tapline">
+          <span class="catpill">Rechtschreibung</span>
+          <span class="chip" style="border:none;background:transparent;padding:0"><span class="old">Kanst</span><span class="arr">→</span><span class="new">Kannst</span></span>
+        </div>
+        <div class="tapline" style="border-top:none;padding-top:2px">
+          <span class="catpill">Umlaut</span>
+          <span class="chip" style="border:none;background:transparent;padding:0"><span class="old">erklaeren?</span><span class="arr">→</span><span class="new">erklären?</span></span>
+        </div>
+      </div>
+    </div>
+
+    <p class="caption">Alle Karten nutzen die echten App-Tokens (src/index.css), hell &amp; dunkel. Toggle oben rechts.</p>
+  </div>
+</body>
+</html>
