@@ -356,10 +356,14 @@ Deno.serve(async (req) => {
   // budget, else GPT-5 leads. Each paid model backstops the other.
   let out = await callGemini(text);
   if (!out) {
-    const { data: claudeRows } = await admin
-      .from("sentence_ai_ops").select("cost_estimate")
-      .ilike("model", "claude%").gte("created_at", startOfMonth.toISOString());
-    const claudeSpend = (claudeRows ?? []).reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
+    // Month-to-date Claude spend across ALL AI features (Satzlabor + writing coach).
+    const monthIso = startOfMonth.toISOString();
+    const [opsRows, writRows] = await Promise.all([
+      admin.from("sentence_ai_ops").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+      admin.from("writing_evaluations").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+    ]);
+    const claudeSpend = [...(opsRows.data ?? []), ...(writRows.data ?? [])]
+      .reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
     out = claudeSpend < CLAUDE_BUDGET_USD
       ? (await callAnthropic(text)) || (await callOpenAI(text))
       : (await callOpenAI(text)) || (await callAnthropic(text));

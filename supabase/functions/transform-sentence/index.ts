@@ -12,9 +12,9 @@
 //      GPT-5. The model ABSTAINS (applicable:false) rather than hallucinate.
 //   5. Contract-validate, cache the result globally, bump ai_usage + ledger.
 //
-// Secrets: ANTHROPIC_API_KEY (required), GEMINI_API_KEY / OPENAI_API_KEY (optional),
-// TRANSFORM_MODEL (default claude-haiku-4-5; set to claude-sonnet-5 for higher
-// morphological accuracy once eval'd), TRANSFORM_DAILY_LIMIT (default 40),
+// Secrets: GEMINI_API_KEY (free primary), ANTHROPIC_API_KEY + OPENAI_API_KEY
+// (paid backups), GEMINI_MODEL / TRANSFORM_MODEL / OPENAI_MODEL + CLAUDE_BUDGET_USD
+// overrides, TRANSFORM_DAILY_LIMIT (default 40),
 // TRANSFORM_BURST_LIMIT (default 8), USER_MONTHLY_LIMIT (default 200),
 // MONTHLY_SPEND_CAP_USD (default 5), MAX_SENTENCE_LEN (default 300),
 // PROMPT_VERSION (default "1").
@@ -383,10 +383,14 @@ Deno.serve(async (req) => {
   // budget, else GPT-5 leads. Each paid model backstops the other.
   let out = await callGemini(source, target);
   if (!out) {
-    const { data: claudeRows } = await admin
-      .from("sentence_ai_ops").select("cost_estimate")
-      .ilike("model", "claude%").gte("created_at", startOfMonth.toISOString());
-    const claudeSpend = (claudeRows ?? []).reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
+    // Month-to-date Claude spend across ALL AI features (Satzlabor + writing coach).
+    const monthIso = startOfMonth.toISOString();
+    const [opsRows, writRows] = await Promise.all([
+      admin.from("sentence_ai_ops").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+      admin.from("writing_evaluations").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+    ]);
+    const claudeSpend = [...(opsRows.data ?? []), ...(writRows.data ?? [])]
+      .reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
     out = claudeSpend < CLAUDE_BUDGET_USD
       ? (await callAnthropic(source, target)) || (await callOpenAI(source, target))
       : (await callOpenAI(source, target)) || (await callAnthropic(source, target));

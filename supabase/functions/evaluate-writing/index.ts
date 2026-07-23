@@ -6,8 +6,8 @@
 //   2. Cache lookup by input_hash of the normalized text (free on hit).
 //   3. Hosted LanguageTool pass → cheap error categories.
 //   4. If one error bucket clearly dominates → templated insight (NO LLM).
-//   5. Otherwise ONE Claude Haiku call (fallback Gemini Flash → gpt-4o-mini
-//      only on hard failure) returning the single biggest weakness.
+//   5. Otherwise ONE model call, cascade Gemini 2.5 Flash (free) → Sonnet 5 → GPT-5
+//      returning the single biggest weakness.
 //   6. Persist the row, bump ai_usage, return JSON.
 //
 // Secrets (set via `supabase secrets set …`, never shipped to the browser):
@@ -86,7 +86,14 @@ const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "50");
 // Hard upper bound on submitted text length — bounds token cost per call.
 const MAX_TEXT_LEN = Number(Deno.env.get("MAX_TEXT_LEN") ?? "3000");
-const HAIKU_MODEL = "claude-haiku-4-5";
+// Provider cascade (per cache-miss): free Gemini Flash first, then paid Claude
+// Sonnet, then GPT-5. Sonnet is the paid backup until month-to-date Claude spend
+// (across ALL AI features) reaches CLAUDE_BUDGET_USD, after which GPT-5 leads.
+// All three combined are bounded by the global MONTHLY_SPEND_CAP_USD fuse.
+const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
+const EVAL_MODEL = Deno.env.get("EVAL_MODEL") ?? "claude-sonnet-5";
+const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
+const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
 
 // `json` is defined inside the request handler (see Deno.serve) so every
 // response carries the correct per-request CORS headers.
@@ -163,7 +170,9 @@ const SYSTEM_PROMPT =
   `(die mit dem größten Hebel für eine bessere Note) und gib einen kurzen, konkreten, ` +
   `ermutigenden Tipp auf Deutsch (2–3 Sätze, Du-Form). Antworte AUSSCHLIESSLICH als JSON ` +
   `mit den Feldern {"weakness","insight"}. "weakness" ist genau einer dieser Werte: ` +
-  VALID_WEAKNESS.join(", ") + ".";
+  VALID_WEAKNESS.join(", ") +
+  `. Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zäune und ohne ` +
+  `weiteren Text.`;
 
 function buildUserPrompt(text: string, lt: LtBuckets | null): string {
   let s = `Text:\n"""${text}"""`;
@@ -207,8 +216,12 @@ async function callAnthropic(text: string, lt: LtBuckets | null): Promise<LlmOut
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: HAIKU_MODEL,
+        model: EVAL_MODEL,
         max_tokens: 400,
+        // Thinking disabled: leaving adaptive thinking on (the Sonnet 5 default)
+        // could consume the 400-token budget and truncate the JSON. No
+        // temperature is sent (removed on the Sonnet 5 / Opus 4.8 family).
+        thinking: { type: "disabled" },
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: buildUserPrompt(text, lt) }],
       }),
@@ -218,11 +231,12 @@ async function callAnthropic(text: string, lt: LtBuckets | null): Promise<LlmOut
     const raw = data.content?.[0]?.text ?? "";
     const parsed = parseInsight(raw);
     if (!parsed) return null;
-    // Haiku 4.5 ≈ $1 / MTok in, $5 / MTok out.
+    // Sonnet 5 standard rates ($3/$15 per 1M); Haiku fallback = $1/$5.
     const inTok = data.usage?.input_tokens ?? 0;
     const outTok = data.usage?.output_tokens ?? 0;
-    const cost = (inTok / 1e6) * 1 + (outTok / 1e6) * 5;
-    return { ...parsed, model: HAIKU_MODEL, cost };
+    const isSonnet = EVAL_MODEL.includes("sonnet");
+    const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
+    return { ...parsed, model: EVAL_MODEL, cost };
   } catch {
     return null;
   }
@@ -233,13 +247,16 @@ async function callGemini(text: string, lt: LtBuckets | null): Promise<LlmOut | 
   if (!key) return null;
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [{ parts: [{ text: buildUserPrompt(text, lt) }] }],
+          // 2.5 Flash is a thinking model: force pure-JSON output and give a
+          // generous budget so reasoning tokens cannot truncate the answer.
+          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4096 },
         }),
       },
     );
@@ -248,7 +265,8 @@ async function callGemini(text: string, lt: LtBuckets | null): Promise<LlmOut | 
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parseInsight(raw);
     if (!parsed) return null;
-    return { ...parsed, model: "gemini-1.5-flash", cost: 0.0005 };
+    // Free tier: record $0 so free calls never consume the paid spend fuse.
+    return { ...parsed, model: GEMINI_MODEL, cost: 0 };
   } catch {
     return null;
   }
@@ -262,8 +280,13 @@ async function callOpenAI(text: string, lt: LtBuckets | null): Promise<LlmOut | 
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: OPENAI_MODEL,
         response_format: { type: "json_object" },
+        // GPT-5 is a reasoning model: cap with max_completion_tokens (max_tokens is
+        // rejected) and keep reasoning minimal so it stays fast and does not starve
+        // the JSON output. No temperature (also rejected on reasoning models).
+        max_completion_tokens: 2048,
+        reasoning_effort: "minimal",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: buildUserPrompt(text, lt) },
@@ -275,7 +298,7 @@ async function callOpenAI(text: string, lt: LtBuckets | null): Promise<LlmOut | 
     const raw = data.choices?.[0]?.message?.content ?? "";
     const parsed = parseInsight(raw);
     if (!parsed) return null;
-    return { ...parsed, model: "gpt-4o-mini", cost: 0.0008 };
+    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
   } catch {
     return null;
   }
@@ -409,12 +432,23 @@ Deno.serve(async (req) => {
     }
   }
 
-  // (5) Otherwise one LLM call with graceful fallback chain.
+  // (5) Otherwise one LLM call. Free Gemini first; on its failure (any error,
+  // incl. free-tier/quota 429) fall to a paid model: Sonnet while month-to-date
+  // Claude spend across ALL AI features is under budget, else GPT-5 leads.
   if (!weakness) {
-    const out =
-      (await callAnthropic(text, lt)) ||
-      (await callGemini(text, lt)) ||
-      (await callOpenAI(text, lt));
+    const monthIso = startOfMonth.toISOString();
+    let out = await callGemini(text, lt);
+    if (!out) {
+      const [opsRows, writRows] = await Promise.all([
+        admin.from("sentence_ai_ops").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+        admin.from("writing_evaluations").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+      ]);
+      const claudeSpend = [...(opsRows.data ?? []), ...(writRows.data ?? [])]
+        .reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
+      out = claudeSpend < CLAUDE_BUDGET_USD
+        ? (await callAnthropic(text, lt)) || (await callOpenAI(text, lt))
+        : (await callOpenAI(text, lt)) || (await callAnthropic(text, lt));
+    }
     if (!out) {
       return json({
         ok: false,
