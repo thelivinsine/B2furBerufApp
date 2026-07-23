@@ -1,15 +1,18 @@
 # Project Status
 
-_Last updated: 2026-07-23 (session 152, complete). **Admin control-center nav aligned to the app
-sidebar.** The founder asked how admins reach `/admin` (the "Kontrollzentrum" entry in the account-menu
-dropdown, gated on `FOUNDER_EMAILS`; also `/sources/werkbank`), then flagged the `/admin` sidebar as
-cramped. Two PRs (#656 + #660), all in `src/features/admin/AdminShell.tsx`, spacing/appearance only:
-column 224→256px (= app `w-64`), `p-3`→`p-4`, marks 16→18px, rows `px-2.5/gap-2.5`→`px-3/gap-3`, the
-active row switched from a blue tint to the app's grey `bg-border` pill + bold text (inactive rows
-`text-foreground/80`), and the header rebuilt to the app's wordmark-logo + subtitle-below + `mb-4`
-pattern. Admin nav deliberately keeps monochrome lucide icons (no branded marks for admin sections).
-Prior session (s151): Fokus "Satzlabor" grammar-bug fix + the shared Gemini→Sonnet→GPT-5 AI provider
-cascade. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-23 (session 153). **Admin Control Center chunks 4-10 SHIPPED** (the whole MVP
+remainder + Phase-2 content-intel + Steuerung wave 2), plus a landing Help back-button fix. Chunk 4
+Review Cockpit (priority-scored queue + keyboard Prüfmodus, `scripts/review-score.mjs` +
+`build-review-queue.mjs` → `reviewQueue.json`). Chunk 5 Feedback-Inbox. Chunk 6 System health + Launch
+checklist. Chunk 7 Steuerung core (`src/lib/appConfig.ts` remote config + panel; consumers
+H1/H2/H4/H5/H6/H8 wired; empty-config == today's behavior invariant pinned by `tests/appConfig.test.ts`).
+Chunk 8 report JSON sidecars + Übersicht staleness strip. Chunk 9 content intelligence (depth matrix +
+flag triage + exercise-coverage residual work-orders). Chunk 10 Steuerung wave 2 (H3 Impressum toggle
+behind a confirm dialog, H7 streak pill, H10 landing copy overrides, H12 Demo-Modus preset). All seven
+chunks green (typecheck/lint/test:unit/build/check:bundle); main chunk ~112-116 kB. Merged into `main`
+after main advanced through s147-152 (nav/header/Schreibtraining/admin-nav changes reconciled). Next =
+chunk 11 (Turnstile + abuse meters), then 12 (compliance pack); Phase-3 (13-16) on demand. Prior s152:
+admin-nav alignment to the app sidebar (#656/#660). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -68,6 +71,44 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 153 (2026-07-23). Admin Control Center chunks 4-10 + a landing Help
+back-button fix, branch `claude/landing-back-button-routing-jyhwot` (merged to `main`).** The founder
+asked to "continue with the admin control center build plan next chunk and work until chunk 10", so all
+seven remaining MVP + early-Phase-2 chunks of `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` shipped
+in one sitting, each its own commit passing the full gate set (typecheck · lint 0-errors · test:unit ·
+build · check:bundle · lint:content).
+- **Landing fix (first):** `HelpChrome` (`/hilfe` + `/hilfe/:slug`) had its Back button hardcoded to
+  `navigate("/hilfe")`, so on the hub itself (where the landing's Help link lands) Back looped to the
+  same page. Now uses the history-aware `handleBack` (navigate(-1), fallback `/welcome`) that
+  `LegalChrome` already uses; the article breadcrumb still links to the hub explicitly.
+- **Chunk 4 · Review Cockpit (`/admin/pruefen`):** `scripts/review-score.mjs` (pure A2 scoring
+  defect_signal > traffic_proxy > (1-confidence) > bank_criticality) + `pnpm build:review-queue` →
+  compact `reviewQueue.json`; `Pruefmodus.tsx` (filterable queue + keyboard review V/X/N/→/←, item
+  rendered as the learner sees it, machine-check panel, autosave to `provenance_reviews` with a
+  decision-time hash, 50-approvals rubber-stamp nudge). `tests/reviewScore.test.ts`.
+- **Chunk 5 · Feedback-Inbox:** `AdminFeedback.tsx` (triage status/priority/note/link via
+  `admin_feedback_update`, emailed indicator, optimistic writes).
+- **Chunk 6 · System + Launch:** `AdminSystem.tsx` (CI gate strip, Supabase/Edge pings, AI/Resend/guest
+  meters, idle-pause warning, dashboard deep links) + `AdminLaunch.tsx` (checklist in `launch_checklist`,
+  consent-version row) + `systemHealth.ts`.
+- **Chunk 7 · Steuerung core:** `src/lib/appConfig.ts` (typed remote config + defensive `mergeAppConfig`
+  + zustand store loaded once in `App.tsx`). **Empty/unreachable config == today's behavior byte-for-byte,
+  pinned by `tests/appConfig.test.ts`.** Consumers read `config.X ?? current-default`: H1 nav labels
+  (BottomTabBar/Sidebar), H2 middle-tab hide (routes stay mounted, Home/Einstellungen locked), H4 flags,
+  H5 feedback pill, H6 Beta chip, H8 dashboard start tab. `AdminSteuerung.tsx` panel with live preview.
+- **Chunk 8 · report sidecars:** `scripts/report-sidecar.mjs` into verify-facts/verify-cefr/review-queue/
+  exercise-coverage; `reportStaleness.ts` + Übersicht staleness strip.
+- **Chunk 9 · Inhalte:** `AdminInhalte.tsx` (F1 depth matrix, F2 flag triage → Prüfmodus, F3
+  exercise-coverage residual "Copy ids" work orders; coverage sidecar enriched with residual ids).
+- **Chunk 10 · Steuerung wave 2:** H3 Impressum (route always mounted + lazy, links gated behind a
+  confirm dialog), H7 streak pill, H10 landing copy overrides, H12 Demo-Modus preset.
+- **Merge note:** main had advanced through s147-152 while this branch was in flight; merged main in and
+  reconciled the overlapping locked surfaces (nav-items/BottomTabBar/Sidebar from the Schreibtraining
+  nav promotion #642, AppShell header, AdminShell/Overview from the #656/#660 admin-nav alignment,
+  router.tsx `/sources/werkbank` + `/impressum`). Regenerated the report sidecars against merged main.
+- **Next:** chunk 11 (Turnstile + abuse meters, founder does the Cloudflare/Supabase dashboard half),
+  then chunk 12 (compliance pack). No new founder DB step for chunks 4-10 (migration 0008 already live).
+
 **Handoff after session 152 (2026-07-23). Admin control-center nav aligned to the app sidebar, branch
 `claude/admin-page-access-ok8g52`, PRs #656 + #660 merged.** Founder asked how admins reach `/admin`
 (answer: the "Kontrollzentrum" entry in the account-menu dropdown, gated on `FOUNDER_EMAILS` in
@@ -87,56 +128,8 @@ not matching the app's desktop `Sidebar`.
   a hard refresh is needed after the Pages deploy. The Übersicht "Is my change live?" widget showed
   "Latest main not reachable" (GitHub API offline/rate-limited in that render) — cosmetic, unrelated.
 
-**Handoff after session 151 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
-rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
-wrong, self-contradictory German feedback.
-- **Bug.** For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv copula, sein + adjective) the
-  panel marked **Passiv** as the detected form, then refused Perfekt/Präteritum with "Der Satz steht
-  schon in dieser Form" (Präsens treated as already past) and refused a passive it simultaneously
-  claimed the sentence already was. Root cause: the cheap Haiku detector misread "sein + Adjektiv" as
-  a Zustandspassiv, which `normalizeDetected` then collapsed onto the Vorgangspassiv pill.
-- **Fix (server prompts).** `check-sentence`: explicit rule that sein/werden/bleiben + adjective/adverb
-  is always Aktiv, only + Partizip II of a transitive verb is passive; worked examples; strict
-  JSON-only. `transform-sentence`: `bereits_zielform` only when BOTH voice AND tense already match (a
-  tense change is a real transform); same copula rule. `evaluate-writing`: JSON-only hardening.
-- **Fix (client).** `grammarDimensions.ts` `normalizeDetected` no longer maps a detected
-  `passiv_zustand` onto the Passiv pill; it returns null (no marker), so a misdetected copula can never
-  surface a wrong Passiv dot. `tests/fokusGrammar.test.ts` updated to lock this in.
-- **Provider cascade (all 3 AI functions).** Founder wanted Gemini primary everywhere + a combined
-  budget. `check-sentence`/`transform-sentence`/`evaluate-writing` each now run **Gemini 2.5 Flash
-  (free, recorded $0) → Claude Sonnet 5 → GPT-5**: Sonnet leads the paid backup until month-to-date
-  Claude spend across **both** `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD`
-  ($2), then GPT-5 leads. The existing global `MONTHLY_SPEND_CAP_USD` ($5, shared via `ai_usage`)
-  bounds all three combined. Anthropic calls drop `temperature` + disable thinking (Sonnet 5 family);
-  Gemini forces JSON output + a generous token budget; GPT-5 uses `max_completion_tokens` +
-  `reasoning_effort: minimal`. Every model id + the $2 threshold are env-overridable (`GEMINI_MODEL`,
-  `CHECK_MODEL`/`TRANSFORM_MODEL`/`EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`). Caches
-  invalidated so stale wrong answers are not re-served (check-sentence `CHECK_VERSION` salt,
-  transform-sentence `PROMPT_VERSION` bump).
-- **Transparency.** The two EU AI Act Art. 50 disclaimers (Satzlabor + writing coach) and the privacy
-  policy (DE + EN) now name all three providers routing-neutrally. Judged non-material (processors +
-  purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
-- **Fokus disclaimer consolidation (follow-up, same session).** The Fokus view's two AI notes (the
-  send-to-AI line + the "KI-generierte Umformung" footer inside the transform box) were merged into
-  ONE harmonized, centered note ("Dein Satz wird von einer KI … geprüft und umgeformt") in normal
-  flow under the content. (A first pass pinned it to the bottom via `min-h` + `mt-auto` to line up
-  with the "Mit KI gebaut · Feedback" pill; the founder found that detached band ugly, so it was
-  reverted to a plain centered note.)
-- **Mobile Grammatik button fix (follow-up).** On mobile the Grammatik toggle was `disabled` until a
-  correction existed, so tapping it pre-correction did nothing and it read as broken. Removed the
-  `disabled`: it now always opens the panel, which shows the GrammarRail's "Prüf zuerst deinen Satz …"
-  hint (disabled pills) before a correction, matching the always-visible desktop rail. The session's
-  disclaimer changes were already shared (`aiNote`/`bottomBox` render in both the mobile and desktop
-  blocks), so no separate mobile adaptation was needed. **Founder confirmed the mobile fix works live.**
-- **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
-- **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
-  `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →
-  `{ ok: false }`). Watch the function logs on the first Gemini-primary calls.
-- **Caveat carried forward:** Gemini Flash primary is the same cheap tier that caused the original bug;
-  the hardened prompt carries it and Sonnet backstops, but if wrong grammar reappears, flip the primary
-  back via `GEMINI_MODEL` (one env var, no code change).
-
-_(Session 150's Fokus correction-card redesign + Umlaut-keys handoff (PRs #653/#654), session 149's
+_(Session 151's Fokus "Satzlabor" grammar-bug fix + the Gemini→Sonnet→GPT-5 AI provider cascade
+handoff, session 150's Fokus correction-card redesign + Umlaut-keys handoff (PRs #653/#654), session 149's
 Schreiben-as-Bibliothek-extension handoff, session 148's PWA-auth-uninstall bug-fix handoff (fresh-device
 OAuth `syncHydrated` gate, PR #644),
 session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first

@@ -3,6 +3,55 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 151 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
+rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
+wrong, self-contradictory German feedback.
+- **Bug.** For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv copula, sein + adjective) the
+  panel marked **Passiv** as the detected form, then refused Perfekt/Präteritum with "Der Satz steht
+  schon in dieser Form" (Präsens treated as already past) and refused a passive it simultaneously
+  claimed the sentence already was. Root cause: the cheap Haiku detector misread "sein + Adjektiv" as
+  a Zustandspassiv, which `normalizeDetected` then collapsed onto the Vorgangspassiv pill.
+- **Fix (server prompts).** `check-sentence`: explicit rule that sein/werden/bleiben + adjective/adverb
+  is always Aktiv, only + Partizip II of a transitive verb is passive; worked examples; strict
+  JSON-only. `transform-sentence`: `bereits_zielform` only when BOTH voice AND tense already match (a
+  tense change is a real transform); same copula rule. `evaluate-writing`: JSON-only hardening.
+- **Fix (client).** `grammarDimensions.ts` `normalizeDetected` no longer maps a detected
+  `passiv_zustand` onto the Passiv pill; it returns null (no marker), so a misdetected copula can never
+  surface a wrong Passiv dot. `tests/fokusGrammar.test.ts` updated to lock this in.
+- **Provider cascade (all 3 AI functions).** Founder wanted Gemini primary everywhere + a combined
+  budget. `check-sentence`/`transform-sentence`/`evaluate-writing` each now run **Gemini 2.5 Flash
+  (free, recorded $0) → Claude Sonnet 5 → GPT-5**: Sonnet leads the paid backup until month-to-date
+  Claude spend across **both** `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD`
+  ($2), then GPT-5 leads. The existing global `MONTHLY_SPEND_CAP_USD` ($5, shared via `ai_usage`)
+  bounds all three combined. Anthropic calls drop `temperature` + disable thinking (Sonnet 5 family);
+  Gemini forces JSON output + a generous token budget; GPT-5 uses `max_completion_tokens` +
+  `reasoning_effort: minimal`. Every model id + the $2 threshold are env-overridable (`GEMINI_MODEL`,
+  `CHECK_MODEL`/`TRANSFORM_MODEL`/`EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`). Caches
+  invalidated so stale wrong answers are not re-served (check-sentence `CHECK_VERSION` salt,
+  transform-sentence `PROMPT_VERSION` bump).
+- **Transparency.** The two EU AI Act Art. 50 disclaimers (Satzlabor + writing coach) and the privacy
+  policy (DE + EN) now name all three providers routing-neutrally. Judged non-material (processors +
+  purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
+- **Fokus disclaimer consolidation (follow-up, same session).** The Fokus view's two AI notes (the
+  send-to-AI line + the "KI-generierte Umformung" footer inside the transform box) were merged into
+  ONE harmonized, centered note ("Dein Satz wird von einer KI … geprüft und umgeformt") in normal
+  flow under the content. (A first pass pinned it to the bottom via `min-h` + `mt-auto` to line up
+  with the "Mit KI gebaut · Feedback" pill; the founder found that detached band ugly, so it was
+  reverted to a plain centered note.)
+- **Mobile Grammatik button fix (follow-up).** On mobile the Grammatik toggle was `disabled` until a
+  correction existed, so tapping it pre-correction did nothing and it read as broken. Removed the
+  `disabled`: it now always opens the panel, which shows the GrammarRail's "Prüf zuerst deinen Satz …"
+  hint (disabled pills) before a correction, matching the always-visible desktop rail. The session's
+  disclaimer changes were already shared (`aiNote`/`bottomBox` render in both the mobile and desktop
+  blocks), so no separate mobile adaptation was needed. **Founder confirmed the mobile fix works live.**
+- **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
+- **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
+  `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →
+  `{ ok: false }`). Watch the function logs on the first Gemini-primary calls.
+- **Caveat carried forward:** Gemini Flash primary is the same cheap tier that caused the original bug;
+  the hardened prompt carries it and Sonnet backstops, but if wrong grammar reappears, flip the primary
+  back via `GEMINI_MODEL` (one env var, no code change).
+
 **Handoff after session 150 (2026-07-23). Fokus correction-card redesign + Umlaut keys, branch
 `claude/diagonal-gradient-invert-odi99r`, PRs #653 + #654 merged.** Founder started from "invert the
 background gradient diagonally" (PR #653: `tailwind.config.ts` `mesh`/`page` accent radial moved

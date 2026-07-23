@@ -980,7 +980,28 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   framework). Founder-account AccountMenu shows a "Kontrollzentrum" entry. `tests/adminFunnel.test.ts`
   pins the pure funnel. The `__BUILD_SHA__`/`__BUILD_TIME__` defines are read ONLY in the admin chunk.
   Plans: `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` (scope) + `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`
-  (chunks; next: chunk 4, the Review Cockpit / Prüfmodus, recommended on Opus).
+  (chunks; next: chunk 11, Turnstile + abuse meters).
+  **Chunks 4-10 (s146): the rest of the MVP + early Phase 2, all lazy under `AdminApp`.** Chunk 4
+  **Review Cockpit** (`/admin/pruefen`): `scripts/review-score.mjs` (pure A2 scoring
+  defect_signal > traffic_proxy > (1-confidence) > bank_criticality, pinned by `tests/reviewScore.test.ts`)
+  + `pnpm build:review-queue` (`scripts/build-review-queue.mjs` → compact `src/features/admin/reviewQueue.json`,
+  regenerate after content edits) + `Pruefmodus.tsx` (filterable queue + keyboard review V/X/N/→/←,
+  item rendered via `contentIndex`, machine-check panel, autosave to `provenance_reviews` with a
+  decision-time hash, 50-approvals rubber-stamp nudge). Chunk 5 **Feedback-Inbox** (`AdminFeedback.tsx`,
+  triage via `admin_feedback_update`). Chunk 6 **System + Launch** (`AdminSystem.tsx` gate strip/pings/
+  meters via `systemHealth.ts`; `AdminLaunch.tsx` checklist in `launch_checklist`). Chunk 7 **Steuerung
+  core** (`src/lib/appConfig.ts`: typed remote config, `mergeAppConfig` defensively coerces, zustand
+  store loaded once in `App.tsx`; **empty/unreachable config == today's behavior byte-for-byte, pinned
+  by `tests/appConfig.test.ts` — never break this**; `AdminSteuerung.tsx` panel with live preview,
+  saves only real overrides). Consumers read `config.X ?? current-default`: H1 nav labels
+  (BottomTabBar/Sidebar), H2 middle-tab hide (nav only, routes stay mounted, Home/Einstellungen locked),
+  H4 flags (SHOW_PRACTICE_TABS/SHOW_RELATED → `features.*`), H5 feedback pill, H6 Beta chip, H8
+  dashboard start tab, H3 `impressumEnabled` (route always mounted, links gated + confirm dialog), H7
+  streak pill, H10 landing copy, H12 Demo-Modus preset. Chunk 8 **report sidecars** (`scripts/report-sidecar.mjs`
+  → `{generatedAt, registerRows}` JSON beside verify-facts/verify-cefr/review-queue/exercise-coverage;
+  `reportStaleness.ts` + Übersicht staleness strip). Chunk 9 **Inhalte** (`AdminInhalte.tsx`: depth
+  matrix, flag triage → Prüfmodus, exercise-coverage residual "Copy ids" work orders; coverage sidecar
+  carries per-theme residual ids).
 
 ## Deployment (GitHub Pages)
 - **`main` is production.** Pushing/merging to `main` triggers `.github/workflows/pages.yml` (official Actions Pages deploy → builds `dist/` and publishes). This is the **only** deploy path — the only other workflow in `.github/workflows/` is `validate.yml` (the content-lint + SRS test gate), which never deploys. (The old `deploy.yml`/`gh-pages` fallback no longer exists.)

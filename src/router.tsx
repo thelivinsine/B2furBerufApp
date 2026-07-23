@@ -7,11 +7,12 @@ import { useSettingsStore } from "@/store/useSettingsStore";
 import { useAuthStore } from "@/store/useAuthStore";
 import { isFounder } from "@/lib/admin";
 import { LandingPage } from "@/features/landing/LandingPage";
-// Impressum is built but TEMPORARILY HIDDEN until the founder fills the real
-// name/address placeholders (deferred to the lawyer/launch pass). To re-enable:
-// restore this import, the /impressum route below, and the footer/Settings +
-// privacy/terms links. See docs/PROJECT_STATUS.md.
-// import { Impressum } from "@/features/legal/Impressum";
+// Impressum: the ROUTE is always mounted (Steuerung guardrail: visibility
+// toggles never unmount routes), but every LINK to it stays hidden behind the
+// remote `impressumEnabled` flag until the founder fills the real name/address
+// and enables it from /admin/steuerung (§H3). Deep-linking /impressum directly
+// still resolves; it just shows the placeholder body until enabled. Lazy so it
+// stays off the eager main chunk like the other legal pages.
 import { Dashboard } from "@/features/dashboard/Dashboard";
 import { recoverFromStaleAssets, isChunkLoadError } from "@/lib/recover";
 
@@ -92,6 +93,9 @@ const TermsOfService = lazyWithReload(() =>
 );
 const About = lazyWithReload(() =>
   import("@/features/about/About").then((m) => ({ default: m.About })),
+);
+const Impressum = lazyWithReload(() =>
+  import("@/features/legal/Impressum").then((m) => ({ default: m.Impressum })),
 );
 // Lazy: the public help/blog section (/hilfe). Off the eager path; it carries
 // its own bilingual content bank and is prerendered to static HTML at build
@@ -223,6 +227,18 @@ export const router = createBrowserRouter([
         <RequireFounder>
           <SourcesWorkbench />
         </RequireFounder>
+      </Suspense>
+    ),
+  },
+  {
+    // Always mounted so a deep link resolves; the links to it are gated on the
+    // remote `impressumEnabled` flag (Steuerung §H3). Lazy so it stays off the
+    // eager main chunk like the other legal pages.
+    path: "/impressum",
+    errorElement: routeError,
+    element: (
+      <Suspense fallback={null}>
+        <Impressum />
       </Suspense>
     ),
   },

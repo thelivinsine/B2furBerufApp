@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -29,9 +29,20 @@ export function HelpChrome({
   children: React.ReactNode;
 }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const backLabel = lang === "de" ? "Zurück" : "Back";
   const updatedLabel = lang === "de" ? "Zuletzt aktualisiert" : "Last updated";
   const helpLabel = lang === "de" ? "Hilfe" : "Help";
+
+  // Go back one step in history so "Back" returns wherever the visitor came
+  // from (usually the landing page). Falling back to a fixed "/hilfe" was wrong
+  // on the hub itself, where it re-navigated to the current page and did
+  // nothing; fall back to the public landing when there is no in-app history
+  // (direct load), matching LegalChrome.
+  const handleBack = () => {
+    if (location.key !== "default") navigate(-1);
+    else navigate("/welcome");
+  };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-background bg-page">
@@ -41,7 +52,7 @@ export function HelpChrome({
         <button onClick={() => navigate("/welcome")} className="flex items-center gap-2.5 text-left">
           <Logo variant="wordmark" className="h-8 w-auto" />
         </button>
-        <Button variant="ghost" onClick={() => navigate("/hilfe")} className="gap-1.5">
+        <Button variant="ghost" onClick={handleBack} className="gap-1.5">
           <ArrowLeft className="h-4 w-4" />
           {backLabel}
         </Button>

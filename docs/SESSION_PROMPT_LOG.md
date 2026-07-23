@@ -1369,3 +1369,43 @@ _(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23,
   W30 archive per the two-most-recent rule) and appended this log entry.
 - **Artifacts (session 152):** `src/features/admin/AdminShell.tsx` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PRs #656, #660
+
+---
+
+## Session 153 — 2026-07-23 — Admin Control Center chunks 4-10 + landing back-button fix (branch `claude/landing-back-button-routing-jyhwot`)
+
+- **Prompt 1 (verbatim):** `> I found that the back button routing for the pages on the landing page
+  is wrong or not working. Check all the routings alogn with the back button and fix those.`
+- **Response 1:** Audited every page linked from the landing (`LegalChrome`: /about /privacy /terms
+  /sources; `HelpChrome`: /hilfe + /hilfe/:slug). One real bug: `HelpChrome`'s Back button was hardcoded
+  to `navigate("/hilfe")`, so on the Help hub (where the landing's Help link lands) Back looped to the
+  same page. Fixed to the history-aware `handleBack` (navigate(-1), fallback `/welcome`) `LegalChrome`
+  already uses; the article breadcrumb still links to the hub. Committed + pushed.
+- **Artifacts (prompt 1):** `src/features/help/HelpChrome.tsx`
+- **Prompt 2 (verbatim):** `> alright if it's fixed, continue with admin control center build plan
+  next chunk and work until chunk 10`
+- **Response 2:** Built + shipped Admin Control Center chunks 4-10 per
+  `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, each its own commit passing the full gate set. Chunk 4
+  Review Cockpit (`review-score.mjs` + `build-review-queue.mjs` → `reviewQueue.json`, `Pruefmodus.tsx`,
+  `tests/reviewScore.test.ts`). Chunk 5 Feedback-Inbox (`AdminFeedback.tsx`). Chunk 6 System health +
+  Launch checklist (`AdminSystem.tsx`, `AdminLaunch.tsx`, `systemHealth.ts`). Chunk 7 Steuerung core
+  (`src/lib/appConfig.ts` + `AdminSteuerung.tsx`, consumers H1/H2/H4/H5/H6/H8, `tests/appConfig.test.ts`
+  pinning the empty==defaults invariant). Chunk 8 report sidecars (`report-sidecar.mjs` + 4 scripts,
+  `reportStaleness.ts`). Chunk 9 content intelligence (`AdminInhalte.tsx`; coverage sidecar residual
+  ids). Chunk 10 Steuerung wave 2 (H3 Impressum + confirm dialog, H7 streak pill, H10 landing copy, H12
+  Demo-Modus). test:unit 275/275; main chunk ~112-116 kB.
+- **Prompt 3 (verbatim):** `> merge to main .` (with a mid-turn `> document the session once done`)
+- **Response 3:** Opened PR #664 and squash-merged into `main`. main had advanced through s147-152, so
+  merged main into the branch and reconciled overlapping locked surfaces (nav-items/BottomTabBar/Sidebar
+  from the Schreibtraining nav promotion, AppShell header, AdminShell/Overview from the admin-nav
+  alignment #656/#660, router.tsx `/sources/werkbank` + `/impressum`); regenerated the report sidecars;
+  renumbered this session's docs to 153 to avoid the s146 collision on main. Updated PROJECT_STATUS
+  (s153 header + handoff, s151 rotated to the W30 archive), the build-plan status, the CLAUDE.md admin
+  bullet, and this log.
+- **Artifacts (prompt 2-3):** `scripts/{review-score,build-review-queue,report-sidecar,verify-facts,verify-cefr,review-queue,report-exercise-coverage}.mjs`
+  · `src/features/admin/{Pruefmodus,reviewQueueData,AdminFeedback,AdminSystem,AdminLaunch,AdminSteuerung,AdminInhalte,systemHealth,reportStaleness,AdminApp,AdminOverview}.tsx/.ts`
+  · `src/features/admin/reviewQueue.json` · `src/lib/appConfig.ts` · `src/App.tsx` ·
+  `src/components/layout/{BottomTabBar,Sidebar,FeedbackButton,AppShell}.tsx` ·
+  `src/features/vocabulary/{VocabList,VocabularyTrainer}.tsx` · `src/features/welt/NeulandHub.tsx` ·
+  `src/features/dashboard/Dashboard.tsx` · `src/features/landing/LandingPage.tsx` · `src/router.tsx` ·
+  `package.json` · `tsconfig.app.json` · `tests/{reviewScore,appConfig}.test.ts` · docs · PR #664
