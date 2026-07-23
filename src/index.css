@@ -295,6 +295,20 @@ input:-webkit-autofill {
    The old `.lib-slide-in-*` keyframes were removed with it. */
 
 @layer utilities {
+  /* Fokus correction marks (s150): a calm underline instead of a loud fill.
+     Coral (--reward) = "so hast du es geschrieben" in the Original view; green
+     (--success) = "so ist es richtig" in the Korrigiert view. */
+  .fx-mark-coral {
+    box-shadow: inset 0 -2px 0 hsl(var(--reward) / 0.95);
+    border-radius: 1px;
+    padding-bottom: 1px;
+  }
+  .fx-mark-green {
+    box-shadow: inset 0 -2px 0 hsl(var(--success) / 0.9);
+    border-radius: 1px;
+    padding-bottom: 1px;
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

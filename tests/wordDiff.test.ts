@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { diffWords } from "@/lib/wordDiff";
+import { diffWords, classifyChange } from "@/lib/wordDiff";
 
 describe("diffWords", () => {
   it("flags changed tokens and pairs before/after edits", () => {
@@ -27,10 +27,29 @@ describe("diffWords", () => {
 
   it("handles pure insertions and deletions", () => {
     expect(diffWords("Ich gehe Hause.", "Ich gehe nach Hause.").changes).toEqual([
-      { from: "", to: "nach" },
+      { from: "", to: "nach", category: "Ergänzung" },
     ]);
     expect(diffWords("Ich gehe sehr nach Hause.", "Ich gehe nach Hause.").changes).toEqual([
-      { from: "sehr", to: "" },
+      { from: "sehr", to: "", category: "Streichung" },
     ]);
+  });
+
+  it("flags the original tokens too, so the Original view can mark the errors", () => {
+    const { originalTokens } = diffWords(
+      "Kanst du bitte es kurz erklaeren?",
+      "Kannst du bitte es kurz erklären?",
+    );
+    const wrong = originalTokens.filter((t) => t.changed).map((t) => t.text);
+    expect(wrong).toEqual(["Kanst", "erklaeren?"]);
+    expect(originalTokens.find((t) => t.text === "bitte")?.changed).toBe(false);
+  });
+
+  it("classifies edits into learner-facing buckets", () => {
+    expect(classifyChange("Kanst", "Kannst")).toBe("Rechtschreibung");
+    expect(classifyChange("erklaeren?", "erklären?")).toBe("Umlaut");
+    expect(classifyChange("berlin", "Berlin")).toBe("Groß-/Kleinschreibung");
+    expect(classifyChange("", "nach")).toBe("Ergänzung");
+    expect(classifyChange("sehr", "")).toBe("Streichung");
+    expect(classifyChange("ins Buero", "ins Büro")).toBe("Grammatik");
   });
 });
