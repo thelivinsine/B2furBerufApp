@@ -1320,3 +1320,11 @@ _(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23,
 - **Response 16:** Reverted the bottom-pin (`min-h` + `mt-auto`) on the desktop content column; the
   combined note now sits horizontally centered in normal flow directly under the content. typecheck /
   build ✓. Merged to `main`.
+- **Prompt 17 (verbatim, mobile Fokus screenshot attached):** `the grammatic button isn't working on mobile. Fix it. Also, for all the changes made in this session, adapt them to mobile screen as well`
+- **Response 17:** The mobile Grammatik toggle was `disabled` until a correction existed (dead tap =
+  looked broken). Removed the `disabled` so it always opens the panel, which shows the GrammarRail's
+  "Prüf zuerst deinen Satz …" hint pre-correction, matching the always-visible desktop rail. The
+  session's disclaimer changes were already shared across the mobile + desktop blocks (`aiNote`/
+  `bottomBox`), so they were already on mobile (verified against the screenshot). typecheck / 262
+  tests / build ✓. Merged to `main`.
+  Artifact: `src/features/writing/fokus/FokusTrainer.tsx` · `docs/PROJECT_STATUS.md` · this log
