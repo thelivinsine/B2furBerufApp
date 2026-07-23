@@ -259,19 +259,19 @@ export function FokusTrainer({
     </Card>
   );
 
-  // EU AI Act Art. 50 transparency: a standalone line below the sentence card,
-  // not inside it (founder s149).
+  // EU AI Act Art. 50 transparency: ONE combined, harmonized note (was two: the
+  // send-to-AI line + the "KI-generierte Umformung" footer). Centered under the
+  // Dein-Satz box and placed at the bottom of the column so it reads together with
+  // the "Mit KI gebaut · Feedback" pill on the same bottom line (founder s151).
   const aiNote = (
-    <p className="flex items-start gap-1.5 px-1 text-xs text-muted-foreground">
-      <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-      <span>
-        Dein Satz wird zur Prüfung an eine KI (Anthropic, Google oder OpenAI) gesendet. Die
-        Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
-        <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-          Mehr im Datenschutz
-        </Link>
-        .
-      </span>
+    <p className="px-1 pt-1 text-center text-xs leading-relaxed text-muted-foreground">
+      <Info className="mr-1 inline-block h-3.5 w-3.5 -translate-y-px align-middle" />
+      Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die
+      Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
+      <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+        Mehr im Datenschutz
+      </Link>
+      .
     </p>
   );
 
@@ -323,10 +323,8 @@ export function FokusTrainer({
               )}
             </p>
           )}
-          {/* Centered at the card's bottom, clearly separated (founder s149). */}
-          <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-            <Sparkles className="h-3 w-3 shrink-0" /> KI-generierte Umformung
-          </p>
+          {/* The "KI-generierte Umformung" footer was merged into the single
+              bottom-of-column AI note (founder s151). */}
         </>
       )}
     </motion.div>
@@ -400,18 +398,23 @@ export function FokusTrainer({
           </AnimatePresence>
         </div>
         {inputCard}
-        {aiNote}
         {errorCard}
         {bottomBox}
+        {aiNote}
       </div>
 
       {/* Desktop: content column + sticky grammar rail (Bibliothek 16rem grid). */}
       <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8">
-        <div className="space-y-4">
-          {inputCard}
-          {aiNote}
-          {errorCard}
-          {bottomBox}
+        {/* Content column is at least viewport-tall so the AI note is pushed to
+            the bottom (mt-auto), landing on the same horizontal line as the fixed
+            "Mit KI gebaut · Feedback" pill in the rail column (founder s151). */}
+        <div className="flex flex-col lg:min-h-[calc(100vh-12rem)]">
+          <div className="space-y-4">
+            {inputCard}
+            {errorCard}
+            {bottomBox}
+          </div>
+          <div className="mt-auto pt-4">{aiNote}</div>
         </div>
         <GrammarRail
           detected={m.detected}

@@ -99,6 +99,11 @@ wrong, self-contradictory German feedback.
 - **Transparency.** The two EU AI Act Art. 50 disclaimers (Satzlabor + writing coach) and the privacy
   policy (DE + EN) now name all three providers routing-neutrally. Judged non-material (processors +
   purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
+- **Fokus disclaimer consolidation (follow-up, same session).** The Fokus view's two AI notes (the
+  send-to-AI line + the "KI-generierte Umformung" footer inside the transform box) were merged into
+  ONE harmonized, centered note ("Dein Satz wird von einer KI … geprüft und umgeformt"), moved to the
+  bottom of the content column (desktop: `min-h` column + `mt-auto` so it lands on the same horizontal
+  line as the fixed "Mit KI gebaut · Feedback" pill). The `12rem` bottom offset is a tunable nudge.
 - **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
 - **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
   `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →

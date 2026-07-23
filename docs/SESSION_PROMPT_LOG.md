@@ -1307,3 +1307,12 @@ _(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23,
   `src/features/writing/fokus/grammarDimensions.ts` · `tests/fokusGrammar.test.ts` ·
   `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
   `src/features/legal/PrivacyPolicy.tsx` · `docs/PROJECT_STATUS.md` · `CLAUDE.md` · PR #657 · this log
+- **Prompt 15 (verbatim):** `Keep the "Dein Satz wird zur Prüfung an eine KI (Anthropic, Google oder OpenAI) gesendet. Die Rückmeldung ist KI-generiert und kann Fehler enthalten. Mehr im Datenschutz." und "KI-generierte Umformung" in the bottom line inline with feedback button aligned to the bottom and keep the above disclaimers center aligned with the deinsatz box. Also, combine those two disclainers together and harmonize them.` + clarification `with "inline with feedback button" I meant horizontally`
+- **Response 15:** Combined the Fokus view's two AI notes into ONE harmonized, centered note
+  ("Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt …"), removed
+  the "KI-generierte Umformung" footer from the transform box, and pinned the note to the bottom of
+  the desktop content column (`min-h` column + `mt-auto`) so it sits on the same horizontal line as
+  the fixed "Mit KI gebaut · Feedback" pill; centered under the Dein-Satz box on both breakpoints.
+  Gates: typecheck ✓ · test:unit 262/262 · build ✓ (no live screenshot: Playwright not installed +
+  `.npmrc` cooldown; `12rem` offset noted as tunable). Merged to `main`.
+  Artifact: `src/features/writing/fokus/FokusTrainer.tsx` · `docs/PROJECT_STATUS.md` · `CLAUDE.md` · this log

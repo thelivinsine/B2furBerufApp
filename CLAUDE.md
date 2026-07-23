@@ -511,7 +511,9 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   German-grammar prompts are hardened (copula sein+Adjektiv is Aktiv, never Passiv; `bereits_zielform`
   needs voice AND tense; strict JSON-only), and `normalizeDetected` never marks a detected
   Zustandspassiv as the Passiv pill. The two Art. 50 disclaimers + `/privacy` (DE+EN) name all three
-  providers routing-neutrally. **Eyebrow rule (s149): card-title eyebrows =
+  providers routing-neutrally. **Fokus (s151):** the send-to-AI note + the old "KI-generierte
+  Umformung" footer are ONE combined, centered note pinned to the bottom of the content column
+  (`min-h` + `mt-auto`), horizontally in line with the "Mit KI gebaut · Feedback" pill. **Eyebrow rule (s149): card-title eyebrows =
   bold `text-primary` ("Aufgabe:", "Dein Satz", the transform label); inner section labels stay
   muted.** **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20` +
   `border-accent/50`, dark `bg-accent/10` + `border-accent/25`; NOT grey) with a header reset icon
