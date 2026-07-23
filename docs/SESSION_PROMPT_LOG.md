@@ -1195,3 +1195,67 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   `src/data/writingPrompts.ts` · `scripts/lint-content.mjs` ·
   `src/features/writing/WritingHistory.tsx` · `src/features/vocabulary/RelatedPanel.tsx` ·
   `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · #651 · #652 · `docs/DECISIONS.md` (s149 design-preferences entry) · this log
+
+## Session 150 — 2026-07-23 — Fokus correction-card redesign + Umlaut keys (branch `claude/diagonal-gradient-invert-odi99r`)
+
+- **Prompt 1 (verbatim, screenshot of the dark Schreiben/Kurz screen attached):** `Can you invert the gradient diagonally taking axis as top left corner to bottom right corner? Meaning the shade appearing currently to the top right corner should appear in the bottom leff corner and vice versa`
+- **Prompt 1b (verbatim):** `I'm talking about the gradient on the background of the app`
+- **Response 1:** Mirrored the `bg-page`/`bg-mesh` wash across the TL→BR diagonal in `tailwind.config.ts`:
+  the accent radial moved `at 100% 0%` → `at 0% 100%`, the primary radial stayed on-axis at top-left, and
+  the linear ground angle reflected `150deg` → `120deg`. Kept `mesh` (cards) in sync; updated the `index.css`
+  comment. `pnpm build` green. Pushed to the branch.
+- **Prompt 2 (verbatim, screenshot of the Fokus screen attached):** `Is the gradient inverted? It doesn't seem like it`
+- **Response 2:** Explained feature branches don't deploy (only `main` is production) and that the linear
+  sweep is a no-op in dark mode (only the faint corner glow relocates). Opened PR #653 and squash-merged the
+  gradient inversion to `main` so it goes live.
+- **Prompt 3 (verbatim, screenshot of the Fokus "Dein Satz" corrected card attached):** `This card is too noisy and has redundant info. If you're a senior expert designer working at a billion dollar edutech app, can you generate a couple of previews to make it minimalistic, visually pleasing, and highly intuitive for the learner and useful?`
+- **Response 3:** Built `preview/fokus-correction-redesign.html` (3 variants from the real tokens, light/dark
+  toggle): A = result sentence + green-underlined fixes + quiet `old → new` chips; B = single inline diff;
+  C = result + learning category. Diagnosed the redundancy (same 2 edits shown 4×). Recommended A.
+- **Prompt 4 (verbatim):** `generate a few visually pleasing high quality previews with highest standards with A with category tags of C.`
+- **Response 4:** Built `preview/fokus-correction-ac.html`: 4 layouts of A+C (chips-with-category, learn-rows,
+  compact line, card-chips), categories as neutral micro-labels (green reserved for "correct").
+- **Prompt 5 (verbatim):** `I like 4, but the smaller cards within needs more contrast. Use the himmel blue shade.`
+- **Response 5:** Built `preview/fokus-correction-v4-himmel.html`: V4 tiles on the sanctioned Himmelblau
+  accent surface (`bg-accent/… + border-accent/…`), category in Himmel-Ink; two intensities (weich ~18% /
+  kräftig ~30%).
+- **Prompt 6 (verbatim):** `I like 4a for dark mode and 4b for light mode. Also, I want to add a neat little toggle button to the top right corner of the tile to switch between the writer's original sentence and corrected sentence. After clicking on the auswerten button, even if the original sentence view is selected, the mistakes should be underlined with the coral color from the app's color pallette. When corrected is toggled, the underlined can stay green.`
+- **Response 6:** Built `preview/fokus-correction-toggle.html`: an interactive Original/Korrigiert segmented
+  toggle (coral marks / green marks), theme-aware tiles (light 4b, dark 4a).
+- **Prompt 7 (verbatim):** `looks good but I think not all users have english keyboards on their devices, so can you add all german special characters as buttons somewhere which should go well with the design preferences, standards and expectations?`
+- **Response 7:** Built `preview/fokus-umlaut-keys.html`: ä ö ü ß Ä Ö Ü insert-at-cursor keys in two
+  placements (footer A / docked accessory B), neutral at rest, Himmelblau on press.
+- **Prompt 8 (verbatim):** `I like B better but the buttons sizes should be atleast 30% smaller as they're a bit too big right now. Can you provide final preview with all my preferences so far and provide it as an artifact so that I can view it witrhin claude. Include all the previous versions in it so that I can toggle between them and view them all at once.`
+- **Response 8:** Built the consolidated `preview/schreiben-design-review.html` (version switcher + "Alle" +
+  Final + app light/dark toggle), published as a claude.ai artifact.
+- **Prompt 9 (verbatim, mid-turn):** `I said I like dsign B for the umlaut buttons by mistake! Use the preview A with reduced button sizes. Use no gradient for korrigieren button. Update the artifact`
+- **Prompt 9b (verbatim, mid-turn):** `Move the neuer satz button to our current card to the bottom right.`
+- **Response 9:** Switched Final to umlaut placement A (small keys), solid (no-gradient) Korrigieren, added
+  Neuer Satz bottom-right of the corrected card; republished the artifact.
+- **Prompt 10 (verbatim):** `For 1- eingabe, there's no need of an outer line of the card, keep the buttons as floating elements and the word count right beside the dein satz with the formatting intact. Extend the writing field's width horizontally on both ends to match with the current margin's length. Round the corners of the writing field.`
+- **Response 10:** Made the Eingabe borderless (floating field + controls, count beside "Dein Satz",
+  full-width rounded field); republished.
+- **Prompt 11 (verbatim):** `I like the one version previous one for 1- eingabe. Revert it. For the 2 - nach dem korrigieren, the bottom right button is too low and is occupying too much space in the card. Match it horizontally with the correction pills and only move it to next lines only if needed.`
+- **Response 11:** Reverted Eingabe to the carded version; moved Neuer Satz onto the correction-pills row
+  (right-aligned, wraps only if needed); republished.
+- **Prompt 12 (verbatim):** `Keep the neuer satz button bottom aligned with the correction pills but in the same line.`
+- **Response 12:** Bottom-aligned Neuer Satz (`align-self: flex-end`) on the pills row; republished.
+- **Prompt 13 (verbatim, mid-turn):** `looks good. implement this version now.`
+- **Prompt 13b (verbatim, mid-turn):** `and once done, push it to main`
+- **Response 13:** Implemented in the real app: `FokusTrainer.tsx` (view toggle + coral/green underline
+  marks + Himmelblau categorized fix tiles + Neuer Satz on the card, removed from mobile toolbar + desktop
+  rail), new `UmlautKeys.tsx` wired into Fokus + `GuidedWritingTrainer.tsx`, `wordDiff.ts` extended
+  (`originalTokens` + `classifyChange`), `index.css` `.fx-mark-*` classes, tests extended. Gates: build ✓ ·
+  lint 0 errors · test:unit 262/262. Opened PR #654 (rebased onto `main` to drop the already-merged
+  gradient commits) and squash-merged.
+- **Prompt 14 (verbatim):** `ship everything live and document the session along with saving the previews to repo for reference`
+- **Response 14:** Confirmed everything is live (PRs #653 + #654 merged; previews already committed to `main`
+  via #654), realigned the branch to `main`, and documented the session (`docs/PROJECT_STATUS.md` header +
+  s150 handoff, s148 handoff moved to the W30 archive, and this log).
+- **Artifacts (session 150):** `tailwind.config.ts` · `src/index.css` · `src/lib/wordDiff.ts` ·
+  `tests/wordDiff.test.ts` · `src/features/writing/UmlautKeys.tsx` (new) ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `preview/fokus-correction-redesign.html` · `preview/fokus-correction-ac.html` ·
+  `preview/fokus-correction-v4-himmel.html` · `preview/fokus-correction-toggle.html` ·
+  `preview/fokus-umlaut-keys.html` · `preview/schreiben-design-review.html` (+ claude.ai artifact) ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · PRs #653 · #654 · this log
