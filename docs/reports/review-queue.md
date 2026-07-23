@@ -8,7 +8,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 ## Summary (whole register, ignores any filters below)
 
 - Total provenance rows: **3107**
-- Verified: **25** (0.8%)  ·  Draft: **3082**
+- Verified: **0** (0.0%)  ·  Draft: **3107**
 
 | content type | total | verified | verified % |
 |---|---|---|---|
@@ -16,7 +16,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | collocation | 1035 | 0 | 0% |
 | redemittel | 149 | 0 | 0% |
 | grammar_drill | 117 | 0 | 0% |
-| can_do | 52 | 25 | 48% |
+| can_do | 52 | 0 | 0% |
 | text | 36 | 0 | 0% |
 | dialogue | 30 | 0 | 0% |
 | grammar_topic | 24 | 0 | 0% |
@@ -24,9 +24,9 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | exam_set | 15 | 0 | 0% |
 | mission | 6 | 0 | 0% |
 
-## Queue — status=draft (3082 rows)
+## Queue — status=draft (3107 rows)
 
-### can_do (27)
+### can_do (52)
 
 <details><summary>arzt — 3</summary>
 
@@ -48,6 +48,16 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
+<details><summary>behoerde — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_behoerde_1` | Ich kann mich beim Bürgeramt anmelden und die nötigen Unterlagen nennen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_behoerde_2` | Ich kann einen Antrag stellen und fehlende Unterlagen nachreichen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_behoerde_3` | Ich kann auf einen Bescheid reagieren und bei Bedarf Widerspruch einlegen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
 <details><summary>bildung — 3</summary>
 
 | id | label | origin | reference |
@@ -55,6 +65,25 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `cd_bildung_1` | Ich kann mich nach einem passenden Sprachkurs erkundigen und mich anmelden. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
 | `cd_bildung_2` | Ich kann erklären, welche Unterlagen ich für die Anerkennung meines Abschlusses brauche. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
 | `cd_bildung_3` | Ich kann mich zu einer Weiterbildung beraten lassen, eine Förderung erfragen und meinen Werdegang darstellen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>conflict — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_conflict_1` | Ich kann ein Missverständnis ansprechen und klären, ohne den Ton zu verschärfen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_conflict_2` | Ich kann in einem Konflikt vermitteln und einen tragfähigen Kompromiss aushandeln. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>customer — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_customer_1` | Ich kann eine Kundenanfrage verstehen und höflich beantworten. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_customer_2` | Ich kann eine Reklamation entgegennehmen und eine passende Lösung anbieten. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_customer_3` | Ich kann ein schwieriges Kundengespräch ruhig und professionell führen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
 
 </details>
 
@@ -98,6 +127,25 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
+<details><summary>logistics — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_logistics_1` | Ich kann eine Lieferung organisieren und den Lieferstatus erfragen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_logistics_2` | Ich kann bei Lieferproblemen reklamieren und eine Lösung aushandeln. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>meetings — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_meetings_1` | Ich kann in einer Besprechung meine Meinung äußern und auf Fragen reagieren. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_meetings_2` | Ich kann eine Teambesprechung moderieren und die Ergebnisse zusammenfassen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_meetings_3` | Ich kann in einer Diskussion Vor- und Nachteile abwägen und einen Beschluss herbeiführen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
 <details><summary>mobilitaet — 3</summary>
 
 | id | label | origin | reference |
@@ -105,6 +153,60 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `cd_mobilitaet_1` | Ich kann mit Bus und Bahn fahren und nach der richtigen Haltestelle fragen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `cd_mobilitaet_2` | Ich kann eine Fahrkarte kaufen, den passenden Tarif wählen und nach dem Weg fragen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `cd_mobilitaet_3` | Ich kann eine Verspätung melden, eine Umleitung verstehen und eine Panne beschreiben. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>project — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_project_1` | Ich kann über den Stand eines Projekts berichten und die nächsten Schritte nennen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_project_2` | Ich kann Zuständigkeiten klären und Prioritäten im Team abstimmen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>safety — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_safety_1` | Ich kann einen Unfall oder eine Gefahr am Arbeitsplatz melden. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_safety_2` | Ich kann Sicherheitsregeln erklären und Schutzmaßnahmen begründen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>scheduling — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_scheduling_1` | Ich kann einen Termin vereinbaren, verschieben oder absagen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_scheduling_2` | Ich kann einen Terminkonflikt diplomatisch lösen und Alternativen vorschlagen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>sustainability — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_sustainability_1` | Ich kann einfache Vorschläge machen, wie der Betrieb Energie und Müll sparen kann. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_sustainability_2` | Ich kann Nachhaltigkeitsmaßnahmen vergleichen und ihre Vor- und Nachteile abwägen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>technology — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_technology_1` | Ich kann ein technisches Problem melden und beschreiben, was nicht funktioniert. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_technology_2` | Ich kann die Einführung einer neuen Software erklären und Rückfragen beantworten. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>travel — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_travel_1` | Ich kann eine Dienstreise planen und ein Hotel buchen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_travel_2` | Ich kann bei Reiseproblemen reagieren und eine Umbuchung aushandeln. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
 
 </details>
 

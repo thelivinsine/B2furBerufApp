@@ -959,49 +959,453 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   or content changes this prompt.
 - **Artifacts (prompt 2):** `docs/SESSION_PROMPT_LOG.md`
 
+## Session 146 — 2026-07-22 · branch `claude/sources-unchecked-items-njvmao`
+
+- **Prompt 1 (verbatim):** `> in the sources page, it says 800+ items aren't checked yet and will be checked in teh next wave. is that true? why are thye not checked yet`
+- **Response 1:** Investigated. The `/sources` "next verification sweep" bucket is computed as
+  total − items-with-a-tier. Found 3,107 provenance rows but only 2,263 tiered in the generated
+  `src/data/verification.ts` → 844 (~27%) untiered. Root cause: the map was generated 2026-07-13,
+  before the s126 daily-life scale-up (2026-07-17) added ~844 items; nobody re-ran
+  `pnpm build:verification`. Confirmed by sampling new `einkaufen` collocation ids (all absent from
+  the map). Explained the nuance: the generator assigns EVERY row a tier (worst case "sourced"), so
+  the 844 are a stale build artifact, not a quality hole; the genuinely thin layer is HUMAN review
+  (25 items). No code changes this prompt.
+- **Prompt 2 (verbatim):** `> go ahead`
+- **Response 2:** Regenerated the verification map against current banks. Installed deps + Python
+  `wordfreq`, ran `build:oracles` (1292/1327 noun lemmas), `build:frequency-subset` (1889 tokens),
+  `build:languagetool` + `verify:grammar` (5236 sentences, 0 grammar/agreement findings),
+  `verify:facts` (0 two-oracle errors), `verify:cefr` (0 flags), then `build:verification` → 3,107
+  records (25 human / 188 jury / 2789 linguistic / 105 provenance). "Next sweep" bucket → 0. Gates:
+  lint:content · build · check:bundle 111.6 kB · test:unit 253/253 green. Committed + pushed.
+- **Prompt 3 (verbatim):** `> reset the human reviewed to zero, and then merge` (interrupted, then) `> also, move the table to a dedicated sub-page within sources and add a collapse button to the table in the source page - I don't want to endlessly scroll to get to the bottom of the page.`
+- **Response 3:** (a) **Reset human verification to zero:** codemod flipped the 25 `verified` Can-Do
+  provenance rows to `draft` (dropped `verified_by`/`verified_date`), re-ran `build:verification`
+  (human tier → 0) + `stamp:verified` (hashes now `{}`). (b) **Table restructure:** extracted the
+  shared `useWorkbench` hook + a new `SourcesWorkbench` component in `Sources.tsx`; moved the
+  founder-only Daten-Werkbank onto a new `RequireFounder`-gated route `/sources/werkbank` (same lazy
+  chunk) with an admin link card on the main page; wrapped the public "Alle Inhalte" item browse in a
+  collapse toggle (collapsed by default). Updated CLAUDE.md (provenance/Can-Do/sources bullets),
+  PROJECT_STATUS (header + s146 handoff, s144 rotated to W30 archive), and this log. Gates:
+  typecheck · lint 0 errors · lint:content (0 verified) · build · check:bundle 111.8 kB · test:unit
+  253/253 green. Shipped via squash-merge to `main`.
+- **Prompt 4 (verbatim):** `> document the session`
+- **Response 4:** Confirmed the session documentation was already written and shipped in PR #638:
+  the `PROJECT_STATUS.md` `_Last updated_` header + s146 handoff (with s144 rotated to the W30
+  archive and the content-count/governance-debt lines refreshed), the CLAUDE.md provenance/Can-Do/
+  `/sources` bullets, and the Session 146 prompt-log entry (prompts 1-3). This prompt adds its own
+  log entry for the authorship paper trail. Doc hygiene verified: two most recent handoffs live
+  (s146 + s145), older rotated. No app-code or content changes this prompt.
+- **Artifacts (session 146):** `src/data/verification.ts` · `src/data/provenance.ts` ·
+  `src/features/legal/Sources.tsx` · `src/router.tsx` · `docs/reports/verified-hashes.json` ·
+  `docs/reports/verify-grammar.json` · `docs/reports/verify-grammar-report.md` ·
+  `docs/reports/verify-facts-report.md` · `docs/reports/verify-cefr-report.md` ·
+  `scripts/vendor/german-nouns-subset.json` · `scripts/vendor/german-words-subset.json` ·
+  `scripts/vendor/german-frequency-subset.json` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+
+## Session 147 — 2026-07-22 · branch `claude/schreibtraining-todo-review-afoegv`
+_Schreibtraining redesign (backlog #6): five-expert design panel → plan + mockups → full Fokus "Satzlabor" implementation, shipped._
+
+- **Prompt 1 (verbatim):** `I'd like to get to the schreibtraining to-do, let's see what we have`
+- **Response 1:** Surveyed the writing feature + backlog. Found two Schreibtraining items: #2 "gate
+  behind sign-in" (already shipped in `WritingHub`) and #6 "redesign the section" (the real open one).
+  Summarized the current theme-picker → textarea → single-tip flow and the `evaluate-writing` backend.
+- **Prompt 2 (verbatim):** `Schreibtraining - Kurz isnt just about more feedback. In the attached drawing, I wanted to show that I'd like similar filter rail to the right of the screen and to the left a field tofor learner to write things and get checked by AI. And there should be another box/field below where a different style of writing the same sentence is done by selecting various grammatic component like activ vs passiv or prasens vs prateritum. When the user first writes something and submits in the top box, the AI not only shows the corrected version within the same box below the user's text but also the current status of the grammar will be selected in the filter rail. When the user clicks on some other pills/toggles, the sentence should be transformed and be shown in the bottom box. I want you to spin a panel of experts (agents) to brainstorm how best this can be implemented and write a robust and comprehensive implementation plan.` (attachment: hand-drawn sketch of the Fokus write→correct→transform layout with a grammar filter rail)
+- **Response 2:** Grounded in the code, then ran a **5-expert parallel agent panel** (LLM engine,
+  frontend architecture, German B2 pedagogy, backend cost/security, UX). Synthesized into
+  `docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`: single-sentence Fokus lab, detection/transforms on
+  the CORRECTED sentence, abstain-not-hallucinate, GLOBAL cross-user transform cache inside the $5
+  fuse, Voice×Tense MVP grid, tri-state grammar rail, phased build order, founder decisions. Committed
+  + pushed the plan.
+- **Prompt 3 (verbatim):** `can you generate a couple of previews of how it might look like based on the plan?` (+ interrupt/continue)
+- **Response 3:** Built `preview/schreibtraining-redesign-mockups.html` (brand-faithful tokens):
+  desktop Fokus (corrected + Passiv transform; a Perfekt transform with a greyed "not possible" pill),
+  mobile Fokus chip row, mobile Kurz. Delivered via SendUserFile + committed.
+- **Prompt 4 (verbatim):** `looks good. Go ahead and implement this`
+- **Response 4:** Implemented the full vertical slice. Frontend: `WritingHub` → mode router
+  (Fokus/Kurz/Lang + Verlauf), `WritingModeSwitcher`, `GuidedWritingTrainer` (extracted Kurz/Lang),
+  and the Fokus set (`FokusTrainer`, tri-state `GrammarRail`, `useFokusMachine`, `grammarDimensions.ts`,
+  `lib/sentenceStudio.ts`, `resumeDraft` extended). Backend: migration `0009_sentence_studio.sql`
+  (sentence_checks / global sentence_transforms cache / sentence_ai_ops ledger / bump_transform_hit /
+  kill-switch) + Edge Functions `check-sentence` and `transform-sentence`. Deploy steps appended to
+  `PHASE2_SETUP.md`. New `tests/fokusGrammar.test.ts`. Gates: typecheck · lint 0 errors · test:unit
+  257/257 · build · check:bundle 111.9 kB (main unchanged) · lint:content, all green. Committed + pushed.
+- **Prompt 5 (verbatim):** `merge`
+- **Response 5:** Opened PR #640 and squash-merged into `main` (`6bf6524`), ran the post-merge
+  branch realignment (reset dev branch to `origin/main`, force-with-lease). Frontend live on next
+  Pages deploy; Fokus is functional once the founder deploys migration 0009 + the two Edge Functions.
+- **Prompt 6 (verbatim):** `document the session`
+- **Response 6:** Updated `docs/PROJECT_STATUS.md` (header + s147 handoff, s145 rotated to the W30
+  archive), `docs/PROJECT_REFERENCE.md` (backlog #2 marked done, #6 marked shipped), and this log.
+- **Artifacts (session 147):** `docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md` ·
+  `preview/schreibtraining-redesign-mockups.html` · `src/features/writing/WritingHub.tsx` ·
+  `src/features/writing/WritingModeSwitcher.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/resumeDraft.ts` · `src/features/writing/fokus/{FokusTrainer,GrammarRail,grammarDimensions,useFokusMachine}.{tsx,ts}` ·
+  `src/lib/sentenceStudio.ts` · `supabase/migrations/0009_sentence_studio.sql` ·
+  `supabase/functions/{check-sentence,transform-sentence}/index.ts` · `tests/fokusGrammar.test.ts` ·
+  `docs/plans/PHASE2_SETUP.md` · PR #640 (`6bf6524`) · this log · `docs/PROJECT_STATUS.md` · `docs/PROJECT_REFERENCE.md`
+- **Prompt 7 (verbatim):** `Make schreibtraining a dedicated menu item for now with it's own icon and make it live.`
+- **Response 7:** Promoted Schreibtraining to a top-level nav item. Added a `/writing` `navItem`
+  ("Schreiben", rose `#f43f5e` accent, the pencil mark that already existed in `route-icons.tsx`),
+  added it to `DEFAULT_PINNED_TABS` and `BottomTabBar` `CONTENT` (`["/library", "/writing",
+  "/analytics"]` = Home + 3 middle + fixed Einstellungen, the 5 locked slots), and removed the
+  `/writing → /anwenden` `ROUTE_SUCCESSOR` remap. Sidebar (desktop) picks it up automatically (maps
+  `navItems`). Updated the CLAUDE.md nav bullets. Gates: typecheck · lint 0 errors · test:unit 257/257 ·
+  build · check:bundle 112.1 kB, all green. Shipped via squash-merge to `main`.
+- **Prompts 8-12 (verbatim):** `both done.` · `I wrote it and it worked once but stopped working again. Can I add multiple llm fallback options? We already are using gemini for something isn't it, can we use it here?` · (log screenshot) · `I'll not ask again and again to explain my things in non-technical manner...` · (Satzlabor UI harmonization request below)
+- **Response 8-11 (backend support):** Diagnosed the "Satzlabor nicht verfügbar" as the graceful fallback shown when the Edge Functions are undeployed / the LLM call fails. Explained the fallback chain (Anthropic → Gemini → OpenAI) is already coded and that Supabase secrets are project-wide (so `GEMINI_API_KEY` auto-applies). Since the functions swallowed errors silently, shipped **diagnostic logging + an Anthropic 429/529 retry** to both functions (PR #643) so the logs reveal the real cause. Gave non-technical, click-by-click browser deploy steps (GitHub "copy raw file" → Supabase Edge Functions editor → Deploy).
+- **Prompt 13 (verbatim):** `okay, meanwhile can you fix the UI - it looks shitty. Take bibliothek as reference and update the entire shreibtraining section to follow the same design language. the userflow of the kurz and lang shouldn't go through the Themas, instead the user should directly see an Aufgabe with writing field. and to the right a filter rail. Harmonize the design and merge`
+- **Response 13:** Harmonized Schreibtraining with the Bibliothek design language. New `WritingRail` (grey `bg-muted` tile, uppercase eyebrow domain sections, single-select theme pills; desktop sticky aside + mobile chip row) mirrors the FilterRail / Fokus GrammarRail look. Rewrote `GuidedWritingTrainer`: Kurz/Lang now land STRAIGHT on an Aufgabe + writing field (no theme-picker page), with the Thema rail on the right to switch topic; task resets on theme/length change (resume-safe). Both guided + Fokus now share the `lg:grid-cols-[minmax(0,1fr)_18rem]` content+rail grid. Gates: typecheck · lint 0 errors · test:unit 257/257 · build · check:bundle 112.1 kB, all green. Shipped via squash-merge.
+
+## Session 148 — 2026-07-22 · branch `claude/pwa-auth-uninstall-bug-hrafrw`
+_Auth bug fix: fresh-device Google OAuth login no longer bounces existing accounts to the landing page._
+
+- **Prompt 1 (verbatim):** `there's an authentication bug when I uninstalled the pwa from my computer and trying to login to an admin account. Right after logging in with google it redirects me to landing page and throws me out of the app! Check what's the issue and fix asap`
+- **Response 1:** Traced the flow (`useAuthStore`, `router.tsx` `RequireOnboarding`/`RequireFounder`,
+  `cloudSync.ts`, `useSettingsStore`, onboarding + AuthDialog). Root cause: uninstalling the PWA wipes
+  `localStorage`, so the local `onboarded` flag is `false` on the fresh install; Google OAuth returns
+  to `/`, where `RequireOnboarding` read the local flag synchronously and redirected to `/welcome`
+  before the async `startCloudSync` pulled the account's real `onboarded: true` from its Supabase
+  profile. Any existing account on a fresh device was bounced (not admin-specific; `RequireFounder`
+  was never in the redirect path and reads `user.email`, available immediately). Fix (3 files, +37
+  lines): new `syncHydrated` flag on `useAuthStore`, set `false` at each `startCloudSync` start and in
+  `stopCloudSync`, `true` in a `finally` after the first pull's profile merge; `RequireOnboarding` now
+  waits for auth resolution (`status === "loading"` → null) and, for a signed-in/guest user, for the
+  first cloud pull (`!syncHydrated` → null) before redirecting to `/welcome`. Gates: typecheck · lint
+  0 errors · test:unit 257/257 · build · check:bundle 112.3 kB (main unchanged). Opened PR #644,
+  squash-merged into `main` (`2fb0805`), ran the post-merge branch realignment (reset dev branch to
+  `origin/main`, force-with-lease).
+- **Prompt 2 (verbatim):** `yes` (assent to the offer to update `docs/PROJECT_STATUS.md` + the session prompt log)
+- **Response 2:** Updated `docs/PROJECT_STATUS.md` (header + s148 handoff at the top of "Resume here",
+  s146 rotated into the W30 archive) and appended this log entry.
+- **Artifacts (session 148):** `src/store/useAuthStore.ts` · `src/lib/cloudSync.ts` · `src/router.tsx` ·
+  PR #644 (`2fb0805`) · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+- **Prompts 8-12 (verbatim):** `both done.` · `I wrote it and it worked once but stopped working again. Can I add multiple llm fallback options? We already are using gemini for something isn't it, can we use it here?` · (log screenshot) · `I'll not ask again and again to explain my things in non-technical manner...` · (Satzlabor UI harmonization request below)
+- **Response 8-11 (backend support):** Diagnosed the "Satzlabor nicht verfügbar" as the graceful fallback shown when the Edge Functions are undeployed / the LLM call fails. Explained the fallback chain (Anthropic → Gemini → OpenAI) is already coded and that Supabase secrets are project-wide (so `GEMINI_API_KEY` auto-applies). Since the functions swallowed errors silently, shipped **diagnostic logging + an Anthropic 429/529 retry** to both functions (PR #643) so the logs reveal the real cause. Gave non-technical, click-by-click browser deploy steps (GitHub "copy raw file" → Supabase Edge Functions editor → Deploy).
+- **Prompt 13 (verbatim):** `okay, meanwhile can you fix the UI - it looks shitty. Take bibliothek as reference and update the entire shreibtraining section to follow the same design language. the userflow of the kurz and lang shouldn't go through the Themas, instead the user should directly see an Aufgabe with writing field. and to the right a filter rail. Harmonize the design and merge`
+- **Response 13:** Harmonized Schreibtraining with the Bibliothek design language. New `WritingRail` (grey `bg-muted` tile, uppercase eyebrow domain sections, single-select theme pills; desktop sticky aside + mobile chip row) mirrors the FilterRail / Fokus GrammarRail look. Rewrote `GuidedWritingTrainer`: Kurz/Lang now land STRAIGHT on an Aufgabe + writing field (no theme-picker page), with the Thema rail on the right to switch topic; task resets on theme/length change (resume-safe). Both guided + Fokus now share the `lg:grid-cols-[minmax(0,1fr)_18rem]` content+rail grid. Gates: typecheck · lint 0 errors · test:unit 257/257 · build · check:bundle 112.1 kB, all green. Shipped via squash-merge.
+- **Prompt 14 (verbatim):** `clearly there are some mistakes in teh sentence here that the ai corrected. Why does it say that the sentence is correct? There's no highlight of the mistakes, no tip. These things should be fixed.` (attachment: dark-mode Fokus correction screenshot showing a corrected sentence with no diff/tip)
+- **Response 14:** Fixed the correction display (PR #646, same branch). Added a pure client-side word
+  diff `src/lib/wordDiff.ts` (LCS over tokens, no AI/network → no redeploy). `FokusTrainer` now strikes
+  the original, highlights the changed words in place, lists each edit as before → after ("Was ich
+  geändert habe"), and the header reads "Korrigiert · N Änderungen" (the green check alone read as
+  "correct"). `tests/wordDiff.test.ts` (260/260). Note left to founder: deeper per-change *why*
+  explanations would need an AI backend field + redeploy. Rebased onto the interleaved s148 auth-fix
+  merge, resolved the prompt-log conflict, squash-merged #646.
+- **Prompt 15 (verbatim):** `document the session`
+- **Response 15:** Updated `docs/PROJECT_STATUS.md` (header rewritten to the Schreibtraining-complete
+  state; the s147 handoff expanded to cover PRs #642/#643/#646; the open-action item changed to
+  "redeploy for logging/retry + confirm GEMINI_API_KEY") and appended prompts 14-15 here.
+- **Artifacts (session 147 continued):** `src/components/layout/nav-items.ts` · `src/components/layout/BottomTabBar.tsx` ·
+  `supabase/functions/check-sentence/index.ts` · `supabase/functions/transform-sentence/index.ts` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/lib/wordDiff.ts` · `tests/wordDiff.test.ts` ·
+  `CLAUDE.md` · PRs #642 · #643 · #646 · `docs/PROJECT_STATUS.md` · this log
+
 ---
 
-## Session 146 — 2026-07-22
+## Session 149 — 2026-07-23 — Schreiben als Bibliothek-Erweiterung (branch `claude/schreiben-design-refinement-bw8rhh`)
 
-**Branch:** `claude/landing-back-button-routing-jyhwot`
+- **Prompt 1 (verbatim):** `the schreib training section is added newly to the menu. but the design doesn't look good. take reference of the bibliothek section and make the schreiben section look like it's an extension of bibliothek. Adapt all the design features including toggle buttons, buttons, filter rail, pills, etc. It should look like a billion dollar edutech app with highest standards and quality, visually pleasing and minimal. Provide a couple of previews first.`
+- **Response 1:** Built `preview/schreiben-bibliothek-extension.html`: two variants from the real app
+  tokens. Variant A = one 4-segment page-header bar (Fokus · Kurz · Lang · Verlauf, exact
+  LibrarySwitcher geometry); Variant B = mode bar + a small h-10 Schreiben/Verlauf view toggle (the
+  Bibliothek two-tier hierarchy). Both: FilterRail-styled Thema/Grammatik rails, 16rem grid, facet
+  pills, mobile sticky action bar. Recommended A; sent the rendered previews.
+- **Prompt 2 (verbatim):** `I like variant A but I need following changes: 1. The icon beside Aufgabe isn't required. Instead use it as an icon for filter rail. Also, the second like below Aufgabe header doesn't have to say Kurz again. The user already know that from the toggle button. Lastly, After the word Aufgabe, usea collon or a dash to show that the Aufgabe is of a particular topic shown there. 2. The filter rail should be renamed to something like Selection of Aufgabe or something like that. 3. The filter rail need not have a button at the bottom and no need of word count. 4. Every selection in the selection rail should have at least 15-20 different Aufgaben and everytime a user selects a theme, the Aufgabe should be random. 5. In mobile view, instead of pills floating above the Aufgabe card, they should be neatly organized in a button and a rail when clicked on it similar to Bibliothek. 6. For the identified pills in Fokus section, instead of a a new style, just keep them as white pills and use a green dot instead. That's enough. Again, no need of count in the filter rail. Just neuer Satz button is enough there. 7. For mobile view of Fokus, use the same style as above for Kurz with a button and in the same row, a Neuer satz button. Now create desktop and mobile previews for both Fokus and Kurz sections with the above suggestions into consideration.`
+- **Response 2:** Built `preview/schreiben-bibliothek-extension-r2.html` (variant A with all 7 changes):
+  no Aufgabe icon (Target icon in the rail header), "Aufgabe: Thema" + Ziel line only, rail renamed
+  "Aufgabe wählen" with no footer/count, dice for random tasks, mobile button + collapsible panel,
+  Fokus green-dot pills + Neuer-Satz-only footer, Fokus mobile Grammatik+Neuer-Satz row. Noted the
+  15-20-per-theme pool means a large content expansion, proposed shipping 5/theme/length first.
+- **Prompt 3 (verbatim):** `looks good. The Aufgabe wahlen dropdown should use same categorization as in bibliothek. Branche, Thema, Unterthema, etc. No need of explaining that there are 15-20 different Aufgaben - remove that line from the filter line. Implement it now`
+- **Response 3:** Implemented the full redesign. Prompts are keyed per THEME, so the rail mirrors the
+  Bibliothek Thema dropdown's Domain grouping (Berufsleben / Alltag & Erledigungen / Gesundheit &
+  Soziales / Bildung & Sprache); Branche/Unterthema don't exist on writing prompts, so no dead
+  filters were added. Shipped: `WritingModeSwitcher` as the 4-tab header (Verlauf folded in),
+  `WritingHub` mode routing, `writingPrompts.ts` restructured into random pools (5 short + 5 long per
+  theme, 200 prompts, wave 1 of 15-20), dice re-roll, `promptIndex` draft resume, `WritingRail` +
+  `GrammarRail` as FilterRail tiles (green-dot detected pills, Neuer Satz footer), mobile
+  button+panel + sticky Auswerten bar, linter pool validation, WritingHistory/RelatedPanel/AppShell
+  consumer fixes. Gates: typecheck · lint 0 errors · lint:content · test:unit 260/260 · build ·
+  check:bundle 112.3 kB · Playwright screenshots both breakpoints. Docs updated (status + this log +
+  CLAUDE.md), PR into `main`, squash-merged.
+- **Prompt 4 (verbatim, with a Fokus screenshot attached):** `It doesn't look like you understood my feedback from earlier. Here are the comments: 1. The aufgabe wahlen rail should have internal scrolling and should not extend too much like in the screenshot. The max lenght can be referenced from the bibliothek section. 2. Why are all the topics provided as pills? Why can't you use other filter designs like drop down? Fix it 3. The categorization hierarchy should be similar to the bibliothek - Branchen, Themen, Unterthemen, etc. Also, Gesundheit should be part of alltag as discussed in one of the earlier sessions - that rule is not respected here. Fix these issues. 4. The Ziel 40-60 Worter is repeated. Remove the bottom one. 5. The line "Dein Text wird zur Auswertung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung ist KI-generiert und kann Fehler enthalten. Mehr im Datenschutz." should be a stand alone element below the writing field card. 6. Highlight the Aufgabe and the topic name like in the preview with a nice color and bolded text. 7. The Fokus, Kurz, ... toggle menu looks too big. Reference the bibliothek section for the right size. 8. "Tippe eine andere Form..." should start in the next line. 9. Add a reset button for the rail 10. The AI generated card should also be in white 11. The "KI-generierte Umformung" line should be centered and to the bottom of the card with enough spacing from the main content. 12. This line "Das Präsens wurde ins Präteritum umgewandelt: 'liebe' → 'liebte' und 'kann' → 'konnte'." should not have an i icon, instead should have a "Hinweis" or "Info" with a colored and bolded text. 13. Add a good himmelblue shade to the aufgabe wahlen rail instead of the gray.`
+- **Response 4 (round 3):** All 13 applied. Thema became a Bibliothek-style grouped DROPDOWN with
+  internal scrolling (rail can no longer overgrow; the popover escapes the tile, so the tile drops
+  overflow clipping and the mobile panel switched to a fade/slide animation); gesundheit folded into
+  Alltag in the grouping (prompts carry only the Thema grain, so no dead Branche/Unterthema
+  controls); the "Aufgabe wählen" tile went Himmelblau (`bg-accent/20`) with a header reset icon;
+  the header switcher was capped `lg:max-w-xl` + centered (measured 816×44 = pixel-identical to
+  Bibliothek before, but four short labels at full column width read oversized); Ziel range only on
+  the Aufgabe card; AI disclaimer standalone below the card (guided + Fokus); brand-colored bold
+  Aufgabe eyebrow; Fokus transform box = white card, "Hinweis:" bold label instead of the i icon,
+  "KI-generierte Umformung" centered at the bottom; Grammatik rail reset icon + two-line hint.
+  Gates: typecheck · eslint 0 errors · test:unit 260/260 · build · bundle 112.3 kB · Playwright
+  screenshots (desktop Kurz/Fokus incl. open dropdown, mobile panel). Shipped via PR into `main`,
+  squash-merged; docs updated.
+- **Prompt 5 (verbatim):** `can you make sure all feedback items are addressed?`
+- **Response 5:** Full 13-point audit against the merged build, incl. the Fokus corrected/transform
+  states via a network-mocked backend (Playwright fulfills `check-sentence`/`transform-sentence`);
+  all 13 confirmed with screenshots + a programmatic dump of the dropdown grouping.
+- **Prompt 6 (verbatim, Fokus screenshot attached):** `this is what I see.. do you think all the feedback is applied?`
+- **Response 6:** Confirmed the screenshot IS the new build (capped toggle measured, standalone
+  disclaimer, reset icon); explained the grey Grammatik rail (point 13 named only the Aufgabe rail)
+  and that the dimmed pills are the disabled pre-correction state; offered to blue the Fokus rail.
+- **Prompt 7:** (Kurz-tab screenshot, no text)
+- **Response 7:** Confirmed the Kurz view matches the approved design point by point.
+- **Prompt 8 (verbatim):** `why are no unterthemen and Branchen in the aufgabe wahlen for Kurz? Why isn't blue applied for Fokus? There are several hamonizations needed. Do a full audit and provide a list of priority actions for harmonization and overll polishing of the layout and design in all of the shcreiben section`
+- **Response 8:** Explained both (prompts carried only Thema tags, so Branche/Unterthema would have
+  been dead controls; Fokus grey was the literal reading of point 13). Rendered every tab light+dark
+  for a full audit and delivered a prioritized list: P0 (blue Fokus rail; real Branche→Thema→
+  Unterthema hierarchy with prompt tagging/authoring), P1 (Verlauf grid break, unified eyebrows,
+  dark-mode tile tuning, 40px dice, duplicate hint, Fokus mobile sticky bar), P2 polish.
+- **Prompt 9 (verbatim):** `Go ahead with all p0 and p1 items. Ask me questions if unclear on anything`
+- **Response 9:** Shipped all P0+P1 (PR #650): `writingPrompts.ts` moved to task objects
+  `{text, sub?, sectors?}` with all tasks tagged + ~86 new sub-theme tasks (every sub-theme >=2
+  short + >=2 long) + a 5-Branche starter wave (it/care/construction/transport/hospitality, 6 each,
+  untagged = universal); the rail gained Branche/Thema/Unterthema dropdowns with live counts and
+  greyed zero-yield options (`?sub=`/`?sector=`); Fokus rail Himmelblau + dark-mode alphas; Verlauf
+  in the content grid + empty-state CTA; unified eyebrow rule; spinning 40px dice; duplicate hint
+  removed; Fokus mobile sticky Korrigieren bar. Bank: 316 tasks. Gates: typecheck / lint:content /
+  eslint 0 errors / 260 tests / build / bundle 112.3 kB / Playwright light+dark. Squash-merged.
+- **Prompt 10 (verbatim, dark-mode rail screenshot attached):** `Go ahead with the P2 items as well. Also, the reset button doesn't work here. Fix it`
+- **Response 10 (PR #651):** Reset was disabled at the default scope by design (nothing to clear),
+  which read as broken; it is now always active and does a full reset (clears Branche/Unterthema/
+  Thema AND draws a fresh random Aufgabe, dice-spin feedback). P2 shipped: directional tab slide
+  (LibraryHub popLayout), 0.12s popover fade, unified 0.18s panel timing; pool wave to >=8 short +
+  >=8 long per theme (16 new generic tasks); Branche wave 2 adds the remaining 10 sectors at 4
+  tasks each. Bank: 373 tasks, all 15 Branchen, subs still >=2/2. Gates green + live Playwright
+  check of the reset. Squash-merged.
+- **Prompt 11 (verbatim):** `document the session along with my design preferences.`
+- **Response 11:** Refreshed the stale `docs/PROJECT_STATUS.md` header to the session's final state
+  (373 tasks, hierarchy dropdowns, all 15 Branchen, always-active reset), distilled the founder's
+  reusable DESIGN PREFERENCES into a new "Founder design preferences (UI)" section in `CLAUDE.md`
+  (extend the design system / previews first / no redundancy / dropdowns over pill walls / controls
+  always visibly act / the color language incl. Himmelblau rails, white cards, bold "Hinweis:"
+  labels, green detected dots / consistent placement + one motion timing family) with the full
+  session-grounded record appended to `docs/DECISIONS.md` (s149 entry), and logged this prompt.
+  Shipped via PR into `main`, squash-merged.
+- **Artifacts (session 149):** `preview/schreiben-bibliothek-extension.html` ·
+  `preview/schreiben-bibliothek-extension-r2.html` · `src/features/writing/WritingModeSwitcher.tsx` ·
+  `src/features/writing/WritingHub.tsx` · `src/features/writing/WritingRail.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/GrammarRail.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/resumeDraft.ts` ·
+  `src/data/writingPrompts.ts` · `scripts/lint-content.mjs` ·
+  `src/features/writing/WritingHistory.tsx` · `src/features/vocabulary/RelatedPanel.tsx` ·
+  `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · #651 · #652 · `docs/DECISIONS.md` (s149 design-preferences entry) · this log
+
+## Session 150 — 2026-07-23 — Fokus correction-card redesign + Umlaut keys (branch `claude/diagonal-gradient-invert-odi99r`)
+
+- **Prompt 1 (verbatim, screenshot of the dark Schreiben/Kurz screen attached):** `Can you invert the gradient diagonally taking axis as top left corner to bottom right corner? Meaning the shade appearing currently to the top right corner should appear in the bottom leff corner and vice versa`
+- **Prompt 1b (verbatim):** `I'm talking about the gradient on the background of the app`
+- **Response 1:** Mirrored the `bg-page`/`bg-mesh` wash across the TL→BR diagonal in `tailwind.config.ts`:
+  the accent radial moved `at 100% 0%` → `at 0% 100%`, the primary radial stayed on-axis at top-left, and
+  the linear ground angle reflected `150deg` → `120deg`. Kept `mesh` (cards) in sync; updated the `index.css`
+  comment. `pnpm build` green. Pushed to the branch.
+- **Prompt 2 (verbatim, screenshot of the Fokus screen attached):** `Is the gradient inverted? It doesn't seem like it`
+- **Response 2:** Explained feature branches don't deploy (only `main` is production) and that the linear
+  sweep is a no-op in dark mode (only the faint corner glow relocates). Opened PR #653 and squash-merged the
+  gradient inversion to `main` so it goes live.
+- **Prompt 3 (verbatim, screenshot of the Fokus "Dein Satz" corrected card attached):** `This card is too noisy and has redundant info. If you're a senior expert designer working at a billion dollar edutech app, can you generate a couple of previews to make it minimalistic, visually pleasing, and highly intuitive for the learner and useful?`
+- **Response 3:** Built `preview/fokus-correction-redesign.html` (3 variants from the real tokens, light/dark
+  toggle): A = result sentence + green-underlined fixes + quiet `old → new` chips; B = single inline diff;
+  C = result + learning category. Diagnosed the redundancy (same 2 edits shown 4×). Recommended A.
+- **Prompt 4 (verbatim):** `generate a few visually pleasing high quality previews with highest standards with A with category tags of C.`
+- **Response 4:** Built `preview/fokus-correction-ac.html`: 4 layouts of A+C (chips-with-category, learn-rows,
+  compact line, card-chips), categories as neutral micro-labels (green reserved for "correct").
+- **Prompt 5 (verbatim):** `I like 4, but the smaller cards within needs more contrast. Use the himmel blue shade.`
+- **Response 5:** Built `preview/fokus-correction-v4-himmel.html`: V4 tiles on the sanctioned Himmelblau
+  accent surface (`bg-accent/… + border-accent/…`), category in Himmel-Ink; two intensities (weich ~18% /
+  kräftig ~30%).
+- **Prompt 6 (verbatim):** `I like 4a for dark mode and 4b for light mode. Also, I want to add a neat little toggle button to the top right corner of the tile to switch between the writer's original sentence and corrected sentence. After clicking on the auswerten button, even if the original sentence view is selected, the mistakes should be underlined with the coral color from the app's color pallette. When corrected is toggled, the underlined can stay green.`
+- **Response 6:** Built `preview/fokus-correction-toggle.html`: an interactive Original/Korrigiert segmented
+  toggle (coral marks / green marks), theme-aware tiles (light 4b, dark 4a).
+- **Prompt 7 (verbatim):** `looks good but I think not all users have english keyboards on their devices, so can you add all german special characters as buttons somewhere which should go well with the design preferences, standards and expectations?`
+- **Response 7:** Built `preview/fokus-umlaut-keys.html`: ä ö ü ß Ä Ö Ü insert-at-cursor keys in two
+  placements (footer A / docked accessory B), neutral at rest, Himmelblau on press.
+- **Prompt 8 (verbatim):** `I like B better but the buttons sizes should be atleast 30% smaller as they're a bit too big right now. Can you provide final preview with all my preferences so far and provide it as an artifact so that I can view it witrhin claude. Include all the previous versions in it so that I can toggle between them and view them all at once.`
+- **Response 8:** Built the consolidated `preview/schreiben-design-review.html` (version switcher + "Alle" +
+  Final + app light/dark toggle), published as a claude.ai artifact.
+- **Prompt 9 (verbatim, mid-turn):** `I said I like dsign B for the umlaut buttons by mistake! Use the preview A with reduced button sizes. Use no gradient for korrigieren button. Update the artifact`
+- **Prompt 9b (verbatim, mid-turn):** `Move the neuer satz button to our current card to the bottom right.`
+- **Response 9:** Switched Final to umlaut placement A (small keys), solid (no-gradient) Korrigieren, added
+  Neuer Satz bottom-right of the corrected card; republished the artifact.
+- **Prompt 10 (verbatim):** `For 1- eingabe, there's no need of an outer line of the card, keep the buttons as floating elements and the word count right beside the dein satz with the formatting intact. Extend the writing field's width horizontally on both ends to match with the current margin's length. Round the corners of the writing field.`
+- **Response 10:** Made the Eingabe borderless (floating field + controls, count beside "Dein Satz",
+  full-width rounded field); republished.
+- **Prompt 11 (verbatim):** `I like the one version previous one for 1- eingabe. Revert it. For the 2 - nach dem korrigieren, the bottom right button is too low and is occupying too much space in the card. Match it horizontally with the correction pills and only move it to next lines only if needed.`
+- **Response 11:** Reverted Eingabe to the carded version; moved Neuer Satz onto the correction-pills row
+  (right-aligned, wraps only if needed); republished.
+- **Prompt 12 (verbatim):** `Keep the neuer satz button bottom aligned with the correction pills but in the same line.`
+- **Response 12:** Bottom-aligned Neuer Satz (`align-self: flex-end`) on the pills row; republished.
+- **Prompt 13 (verbatim, mid-turn):** `looks good. implement this version now.`
+- **Prompt 13b (verbatim, mid-turn):** `and once done, push it to main`
+- **Response 13:** Implemented in the real app: `FokusTrainer.tsx` (view toggle + coral/green underline
+  marks + Himmelblau categorized fix tiles + Neuer Satz on the card, removed from mobile toolbar + desktop
+  rail), new `UmlautKeys.tsx` wired into Fokus + `GuidedWritingTrainer.tsx`, `wordDiff.ts` extended
+  (`originalTokens` + `classifyChange`), `index.css` `.fx-mark-*` classes, tests extended. Gates: build ✓ ·
+  lint 0 errors · test:unit 262/262. Opened PR #654 (rebased onto `main` to drop the already-merged
+  gradient commits) and squash-merged.
+- **Prompt 14 (verbatim):** `ship everything live and document the session along with saving the previews to repo for reference`
+- **Response 14:** Confirmed everything is live (PRs #653 + #654 merged; previews already committed to `main`
+  via #654), realigned the branch to `main`, and documented the session (`docs/PROJECT_STATUS.md` header +
+  s150 handoff, s148 handoff moved to the W30 archive, and this log).
+- **Artifacts (session 150):** `tailwind.config.ts` · `src/index.css` · `src/lib/wordDiff.ts` ·
+  `tests/wordDiff.test.ts` · `src/features/writing/UmlautKeys.tsx` (new) ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `preview/fokus-correction-redesign.html` · `preview/fokus-correction-ac.html` ·
+  `preview/fokus-correction-v4-himmel.html` · `preview/fokus-correction-toggle.html` ·
+  `preview/fokus-umlaut-keys.html` · `preview/schreiben-design-review.html` (+ claude.ai artifact) ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · PRs #653 · #654 · this log
+
+## Session 151 — 2026-07-23 — Fokus "Satzlabor" grammar-bug fix + AI provider cascade rework (branch `claude/ai-response-bug-xfsth9`)
+
+_(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23, this one second.)_
+
+- **Prompt 1 (verbatim, 4 Satzlabor screenshots attached):** `Read the ai's responses in these screenshots, don't you think there's a serious bug here?`
+- **Response 1:** Confirmed a serious bug. For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv
+  copula, sein + adjective) the panel marked **Passiv** as the detected form, then refused Perfekt/
+  Präteritum with "Der Satz steht schon in dieser Form" and refused a passive it claimed the sentence
+  already was. Root cause traced to `check-sentence` (Haiku) misreading "sein + Adjektiv" as a
+  Zustandspassiv + the client collapsing it onto the Vorgangspassiv pill; proposed prompt + client fixes.
+- **Prompt 2 (verbatim):** `Yes, I want you to fix the bugs and I'm happy to run the fucntions in supabase, but before that tell me which llm models are best suited for our task here irrespective of provider and advanceness of the models`
+- **Response 2:** Loaded the grounded model catalogue (claude-api skill); recommended Sonnet 5 as the
+  sweet spot for German morphology (Opus 4.8 for max), flagged the temperature/thinking migration
+  caveat, asked which model to standardize on.
+- **Prompt 3 (model AskUserQuestion answer):** chose **Sonnet 5**. → Shipped the fix: hardened
+  check/transform prompts (copula-is-Aktiv; `bereits_zielform` needs voice AND tense), dropped
+  `temperature`, disabled thinking, Sonnet cost math, cache invalidation, and the client
+  `normalizeDetected` guard (Zustandspassiv → null) with the test updated.
+- **Prompt 4 (verbatim):** `what are comparable models for sonnet in gemini and chatgpt models?` →
+  Gemini 2.5 Pro / GPT-5; flagged the cheap fallbacks were the same weak tier.
+- **Prompt 5 (verbatim):** `match the fall back model quality, and also which model has the highest free tier limit?` →
+  Free tier = Google Gemini (Flash-tier highest); upgraded the two fallbacks (later superseded).
+- **Prompt 6 (verbatim):** `use Gemini 2.5 or 3 flash model as primary and sonnet as second back up if the free tier is exhausted and gpt 5 model if claude sonnet uses $2.` + mid-turn `the total token cost limit should be $5 for all three models combined. Make the prompts robust` →
+  Reworked check/transform into the free-first cascade Gemini 2.5 Flash ($0) → Sonnet 5 (until $2
+  Claude spend) → GPT-5, global $5 fuse, robust JSON-only prompts.
+- **Prompt 7 (verbatim, interrupt):** `First answe my question` → answered the free-tier question directly.
+- **Prompt 8 (verbatim):** `I want Gemini to be primary model for all AI reviews or corrections not just satzlabor.` →
+  Extended the cascade to `evaluate-writing`; made the $2 Claude threshold GLOBAL (summed across
+  `sentence_ai_ops` + `writing_evaluations` in all three functions).
+- **Prompt 9 (verbatim):** `yes adapt the Ui disclaimer` → both Art. 50 disclaimers → "(Anthropic, Google oder OpenAI)".
+- **Prompts 10-13 (verbatim):** `how should I store the gemini api keys in supabase?` · `how to add chatgpt api?` ·
+  `I'm done with deploying the edge functions and adding api keys. What next?` ·
+  `provide links to the new codes for all the functions thjat I need to run again` → answered each
+  (Supabase Edge Function secrets `GEMINI_API_KEY`/`OPENAI_API_KEY`, key sources + billing/GDPR notes,
+  next-steps plan, GitHub blob links + redeploy command).
+- **Prompt 14 (verbatim):** `edit the privacy policy, document the session and push everything live to main`
+- **Response 14:** Genericized the privacy-policy AI passage (DE + EN) routing-neutrally; judged
+  non-material so `CONSENT_VERSION` NOT bumped. Documented the session (PROJECT_STATUS header + handoff,
+  SESSION_PROMPT_LOG, CLAUDE.md AI-provider facts). On merge to `main` a parallel s150 (Fokus correction
+  redesign, PRs #653/#654) had force-updated `main`; resolved the merge (code auto-merged cleanly:
+  cascade + guard + redesign all intact; renumbered this session 150→151, kept both handoffs), then
+  squash-merged.
+- **Artifacts (session 151):** `supabase/functions/check-sentence/index.ts` ·
+  `supabase/functions/transform-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
+  `src/features/writing/fokus/grammarDimensions.ts` · `tests/fokusGrammar.test.ts` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/legal/PrivacyPolicy.tsx` · `docs/PROJECT_STATUS.md` · `CLAUDE.md` · PR #657 · this log
+- **Prompt 15 (verbatim):** `Keep the "Dein Satz wird zur Prüfung an eine KI (Anthropic, Google oder OpenAI) gesendet. Die Rückmeldung ist KI-generiert und kann Fehler enthalten. Mehr im Datenschutz." und "KI-generierte Umformung" in the bottom line inline with feedback button aligned to the bottom and keep the above disclaimers center aligned with the deinsatz box. Also, combine those two disclainers together and harmonize them.` + clarification `with "inline with feedback button" I meant horizontally`
+- **Response 15:** Combined the Fokus view's two AI notes into ONE harmonized, centered note
+  ("Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt …"), removed
+  the "KI-generierte Umformung" footer from the transform box, and pinned the note to the bottom of
+  the desktop content column (`min-h` column + `mt-auto`) so it sits on the same horizontal line as
+  the fixed "Mit KI gebaut · Feedback" pill; centered under the Dein-Satz box on both breakpoints.
+  Gates: typecheck ✓ · test:unit 262/262 · build ✓ (no live screenshot: Playwright not installed +
+  `.npmrc` cooldown; `12rem` offset noted as tunable). Merged to `main`.
+  Artifact: `src/features/writing/fokus/FokusTrainer.tsx` · `docs/PROJECT_STATUS.md` · `CLAUDE.md` · this log
+- **Prompt 16 (verbatim, screenshot of the bottom-pinned note attached):** `okay, this doesn't look good - can you align them horizonatally centered and not to the bottom?`
+- **Response 16:** Reverted the bottom-pin (`min-h` + `mt-auto`) on the desktop content column; the
+  combined note now sits horizontally centered in normal flow directly under the content. typecheck /
+  build ✓. Merged to `main`.
+- **Prompt 17 (verbatim, mobile Fokus screenshot attached):** `the grammatic button isn't working on mobile. Fix it. Also, for all the changes made in this session, adapt them to mobile screen as well`
+- **Response 17:** The mobile Grammatik toggle was `disabled` until a correction existed (dead tap =
+  looked broken). Removed the `disabled` so it always opens the panel, which shows the GrammarRail's
+  "Prüf zuerst deinen Satz …" hint pre-correction, matching the always-visible desktop rail. The
+  session's disclaimer changes were already shared across the mobile + desktop blocks (`aiNote`/
+  `bottomBox`), so they were already on mobile (verified against the screenshot). typecheck / 262
+  tests / build ✓. Merged to `main`.
+  Artifact: `src/features/writing/fokus/FokusTrainer.tsx` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 18 (verbatim):** `it's working. document the session`
+- **Response 18:** Founder confirmed the mobile Grammatik button works live. Session 151 was
+  documented incrementally across its eight merged PRs (#657 grammar-bug fix + Gemini→Sonnet→GPT-5
+  cascade; #658/#659 the combined-then-centered Fokus disclaimer; #662 the mobile Grammatik fix) —
+  the s151 `PROJECT_STATUS.md` handoff, this log (prompts 1-18), and the `CLAUDE.md` AI-backend + Fokus
+  notes all reflect the final state. This entry closes the session. (Note: it ran interleaved with the
+  parallel s150 Fokus-correction-redesign and s152 admin-nav sessions, both merged the same day; merges
+  were resolved so all three coexist on `main`.)
+
+- **Prompt 1 (verbatim):** `how do I access the admin page? is there a button in the app for the admins?` →
+  Answered from the code: the account-menu dropdown (header, top-right) shows a **"Kontrollzentrum"**
+  link to `/admin` for founder accounts (`AccountMenu.tsx:162`), gated on the two `FOUNDER_EMAILS` in
+  `src/lib/admin.ts` (client) + Supabase RLS (server). Also `/sources` (admin link card) and the
+  founder-only `/sources/werkbank`. No entry in the bottom nav by design.
+- **Prompt 2 (verbatim, screenshot of the open account menu):** `I don't see it here` →
+  Pointed out the blue "Kontrollzentrum" link (shield icon) was in fact visible in the screenshot,
+  between Einstellungen and Abmelden; noted it's the only entry point (plus the `/admin` URL).
+- **Prompt 3 (verbatim):** `It's working` → recapped the two admin surfaces.
+- **Prompt 4 (verbatim):** `can you compare the nagivation panel in the actual app vs the admin control center? The spacing can be adapted from the actual app as currently it looks cramped` →
+  Compared `AdminShell.tsx` vs the app `Sidebar.tsx` (+ AppShell `w-64`); the admin was cramped on
+  every axis. **PR #656:** column 224→256px, `p-3`→`p-4`, marks 16→18px, rows
+  `px-2.5/gap-2.5`→`px-3/gap-3`. Build ✓, squash-merged, branch realigned.
+- **Prompt 5 (verbatim):** `push changes live to main` → confirmed #656 was already squash-merged in
+  the prior step (`origin/main` at `b216b65`); nothing left to push.
+- **Prompt 6 (verbatim, screenshot of the Übersicht cockpit):** `is this how it's supposed to look after your changes?` →
+  Confirmed yes: the running build `b2ed23f` (#658) is two commits newer than the fix `b216b65` (#656)
+  and contains it. Flagged the "Latest main not reachable" widget line + the "1 approval waiting" as
+  harmless/unrelated.
+- **Prompt 7 (verbatim, screenshot of the app's desktop sidebar):** `It doesn't look same as this` +
+  mid-turn `check the logo size and the space below the logo as well. Also the navigation panel's width` →
+  Identified the remaining mismatches (active-row style + header lockup) and addressed all in **PR #660**,
+  all in `AdminShell.tsx`: active row → grey `bg-border` pill + bold `text-foreground` (was blue tint),
+  inactive → `text-foreground/80`; header rebuilt to the app pattern (wordmark `Logo` `h-7 w-auto` +
+  `text-xs` subtitle below + `mb-4`). Panel width already 256px (= app `w-64`) from #656, unchanged.
+  Build ✓, squash-merged, branch realigned. Noted the one deliberate difference: admin keeps monochrome
+  lucide icons (no branded `RouteIcon` marks for admin sections).
+- **Prompt 8 (verbatim):** `document the session` →
+  Updated `docs/PROJECT_STATUS.md` (header + new s152 handoff; moved the s150 + s149 handoffs into the
+  W30 archive per the two-most-recent rule) and appended this log entry.
+- **Artifacts (session 152):** `src/features/admin/AdminShell.tsx` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PRs #656, #660
+
+---
+
+## Session 153 — 2026-07-23 — Admin Control Center chunks 4-10 + landing back-button fix (branch `claude/landing-back-button-routing-jyhwot`)
 
 - **Prompt 1 (verbatim):** `> I found that the back button routing for the pages on the landing page
   is wrong or not working. Check all the routings alogn with the back button and fix those.`
-- **Response 1:** Audited every page linked from the landing (`/about`, `/privacy`, `/terms`,
-  `/sources` via `LegalChrome`; `/hilfe` + `/hilfe/:slug` via `HelpChrome`). Found one real bug:
-  `HelpChrome`'s Back button was hardcoded to `navigate("/hilfe")`, so on the Help hub itself (exactly
-  where the landing's "Help/Hilfe" nav + footer links land) Back re-navigated to the same page and did
-  nothing. Fixed it to use the history-aware `handleBack` (`location.key !== "default" ? navigate(-1)
-  : navigate("/welcome")`) that `LegalChrome` already uses; the article breadcrumb still links to the
-  hub explicitly. Verified with typecheck + build. Committed + pushed.
-- **Artifacts (prompt 1):** `src/features/help/HelpChrome.tsx` · commit `13c228d`
+- **Response 1:** Audited every page linked from the landing (`LegalChrome`: /about /privacy /terms
+  /sources; `HelpChrome`: /hilfe + /hilfe/:slug). One real bug: `HelpChrome`'s Back button was hardcoded
+  to `navigate("/hilfe")`, so on the Help hub (where the landing's Help link lands) Back looped to the
+  same page. Fixed to the history-aware `handleBack` (navigate(-1), fallback `/welcome`) `LegalChrome`
+  already uses; the article breadcrumb still links to the hub. Committed + pushed.
+- **Artifacts (prompt 1):** `src/features/help/HelpChrome.tsx`
 - **Prompt 2 (verbatim):** `> alright if it's fixed, continue with admin control center build plan
   next chunk and work until chunk 10`
-- **Response 2:** Built and shipped Admin Control Center chunks 4-10 (the whole MVP remainder plus
-  Phase-2 content-intel + Steuerung wave 2) per `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, each
-  as its own commit passing the full gate set (typecheck · lint 0-errors · test:unit · build ·
-  check:bundle · lint:content). Chunk 4 Review Cockpit (`review-score.mjs` + `build-review-queue.mjs`
-  → `reviewQueue.json`, `Pruefmodus.tsx`, `tests/reviewScore.test.ts`). Chunk 5 Feedback-Inbox
-  (`AdminFeedback.tsx`). Chunk 6 System health + Launch checklist (`AdminSystem.tsx`, `AdminLaunch.tsx`,
-  `systemHealth.ts`). Chunk 7 Steuerung core (`src/lib/appConfig.ts` + `AdminSteuerung.tsx`, consumers
-  H1/H2/H4/H5/H6/H8 wired, `tests/appConfig.test.ts` pinning the empty==defaults invariant). Chunk 8
-  report JSON sidecars (`report-sidecar.mjs` + 4 scripts, `reportStaleness.ts` + Übersicht staleness
-  strip). Chunk 9 content intelligence (`AdminInhalte.tsx`; coverage sidecar enriched with residual
-  ids). Chunk 10 Steuerung wave 2 (H3 Impressum toggle + confirm dialog, H7 streak pill, H10 landing
-  copy overrides, H12 Demo-Modus preset). Main chunk stayed ~112-116 kB; test:unit 275/275.
-- **Artifacts (prompt 2):** `scripts/review-score.mjs` · `scripts/build-review-queue.mjs` ·
-  `scripts/report-sidecar.mjs` · `src/features/admin/{Pruefmodus,reviewQueueData,AdminFeedback,AdminSystem,AdminLaunch,AdminSteuerung,AdminInhalte,systemHealth,reportStaleness,AdminApp,AdminOverview}.tsx/.ts`
+- **Response 2:** Built + shipped Admin Control Center chunks 4-10 per
+  `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, each its own commit passing the full gate set. Chunk 4
+  Review Cockpit (`review-score.mjs` + `build-review-queue.mjs` → `reviewQueue.json`, `Pruefmodus.tsx`,
+  `tests/reviewScore.test.ts`). Chunk 5 Feedback-Inbox (`AdminFeedback.tsx`). Chunk 6 System health +
+  Launch checklist (`AdminSystem.tsx`, `AdminLaunch.tsx`, `systemHealth.ts`). Chunk 7 Steuerung core
+  (`src/lib/appConfig.ts` + `AdminSteuerung.tsx`, consumers H1/H2/H4/H5/H6/H8, `tests/appConfig.test.ts`
+  pinning the empty==defaults invariant). Chunk 8 report sidecars (`report-sidecar.mjs` + 4 scripts,
+  `reportStaleness.ts`). Chunk 9 content intelligence (`AdminInhalte.tsx`; coverage sidecar residual
+  ids). Chunk 10 Steuerung wave 2 (H3 Impressum + confirm dialog, H7 streak pill, H10 landing copy, H12
+  Demo-Modus). test:unit 275/275; main chunk ~112-116 kB.
+- **Prompt 3 (verbatim):** `> merge to main .` (with a mid-turn `> document the session once done`)
+- **Response 3:** Opened PR #664 and squash-merged into `main`. main had advanced through s147-152, so
+  merged main into the branch and reconciled overlapping locked surfaces (nav-items/BottomTabBar/Sidebar
+  from the Schreibtraining nav promotion, AppShell header, AdminShell/Overview from the admin-nav
+  alignment #656/#660, router.tsx `/sources/werkbank` + `/impressum`); regenerated the report sidecars;
+  renumbered this session's docs to 153 to avoid the s146 collision on main. Updated PROJECT_STATUS
+  (s153 header + handoff, s151 rotated to the W30 archive), the build-plan status, the CLAUDE.md admin
+  bullet, and this log.
+- **Artifacts (prompt 2-3):** `scripts/{review-score,build-review-queue,report-sidecar,verify-facts,verify-cefr,review-queue,report-exercise-coverage}.mjs`
+  · `src/features/admin/{Pruefmodus,reviewQueueData,AdminFeedback,AdminSystem,AdminLaunch,AdminSteuerung,AdminInhalte,systemHealth,reportStaleness,AdminApp,AdminOverview}.tsx/.ts`
   · `src/features/admin/reviewQueue.json` · `src/lib/appConfig.ts` · `src/App.tsx` ·
-  `src/components/layout/{BottomTabBar,Sidebar,FeedbackButton,AppShell,nav-items}.tsx` ·
+  `src/components/layout/{BottomTabBar,Sidebar,FeedbackButton,AppShell}.tsx` ·
   `src/features/vocabulary/{VocabList,VocabularyTrainer}.tsx` · `src/features/welt/NeulandHub.tsx` ·
   `src/features/dashboard/Dashboard.tsx` · `src/features/landing/LandingPage.tsx` · `src/router.tsx` ·
-  `scripts/{verify-facts,verify-cefr,review-queue,report-exercise-coverage}.mjs` · `package.json` ·
-  `tsconfig.app.json` · `tests/{reviewScore,appConfig}.test.ts` · commits `9b4618a`, `0dd4ae4`,
-  `535cf2b`, `b3ad17d`, `0b753d3`, `35a045b`, plus the chunk-10 + docs commits
-- **Prompt 3 (verbatim):** `> document the session once you're done`
-- **Response 3:** Updated the build-plan status line (chunks 1-10 shipped + a Session-146 summary
-  block), `PROJECT_STATUS.md` (`_Last updated_` s146 header + the full s146 handoff, moved the s144
-  handoff to the W30 archive per the two-most-recent doc-hygiene rule), and this log. Status doc kept
-  under 250 lines.
-- **Artifacts (prompt 3):** `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` · `docs/PROJECT_STATUS.md`
-  · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `docs/SESSION_PROMPT_LOG.md`
+  `package.json` · `tsconfig.app.json` · `tests/{reviewScore,appConfig}.test.ts` · docs · PR #664

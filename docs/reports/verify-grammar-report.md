@@ -9,47 +9,43 @@ its rule so it can be judged without native fluency._
 
 ## Summary
 
-- German sentences checked: **3490**  (vocab 2044, collocation 701, redemittel 298, dialogue 343, text 104)
-- Sentences with at least one finding: **35**  ·  clean: **99.0%**
-- Total findings (after ignore-list): **38**
+- German sentences checked: **5236**  (vocab 3246, collocation 1035, redemittel 298, dialogue 513, text 144)
+- Sentences with at least one finding: **33**  ·  clean: **99.4%**
+- Total findings (after ignore-list): **34**
 
 Findings by bucket:
 
 | bucket | count |
 |---|---|
 | Grammar & agreement | 0 |
-| Spelling | 20 |
-| Punctuation & typography | 4 |
+| Spelling | 21 |
+| Punctuation & typography | 2 |
 | Style & register | 5 |
 | Duplication | 0 |
 | Whitespace | 0 |
-| Other | 9 |
+| Other | 6 |
 
 Most-fired rules (top 15):
 
 | rule | count |
 |---|---|
-| `GERMAN_SPELLER_RULE` | 19 |
+| `GERMAN_SPELLER_RULE` | 20 |
 | `H2O` | 3 |
 | `DASS_STATT_DAS_RELATIVPRONOMEN` | 2 |
 | `UPPERCASE_SENTENCE_START` | 2 |
-| `DEN_DEM` | 2 |
-| `DURCHEINANDER` | 1 |
-| `DE_UNPAIRED_QUOTES` | 1 |
-| `FALSCHES_ANFUEHRUNGSZEICHEN` | 1 |
-| `DE_CASE` | 1 |
-| `DOPPELPUNKT_GROSS` | 1 |
+| `DER_ERSTE` | 1 |
+| `KOMMA_ZWISCHEN_HAUPT_UND_NEBENSATZ` | 1 |
 | `DE_VERBAGREEMENT` | 1 |
+| `DIENSTAG_ABEND` | 1 |
+| `MEIN_INTERNET` | 1 |
 | `DE_MULTITOKEN_SPELLING_TWO` | 1 |
-| `GERMAN_WORD_REPEAT_BEGINNING_RULE` | 1 |
-| `DE_WORD_COHERENCY` | 1 |
 | `MATHE` | 1 |
 
 ## Grammar & agreement (0)
 
 _None._
 
-## Spelling (20)
+## Spelling (21)
 
 _Many spelling hits are domain proper nouns, brand names, or valid compounds absent from
 LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
@@ -74,15 +70,14 @@ LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
 | `tx_project_memo_status#body` | text | Duman | Möglicher Tippfehler gefunden. | Du man \| Dumas \| Human \| Duma \| Dumen |
 | `tx_scheduling_email_verschiebung#body` | text | Tomas | Möglicher Tippfehler gefunden. | Thomas \| Komas \| Themas \| Topas \| Das |
 | `tx_travel_voicemail_flug#body` | text | Markus Lang | Hier liegt möglicherweise ein Tippfehler vor. | Markus Lanz |
+| `v_auftragen#ex2` | vocab | strähnchenweise | Möglicher Tippfehler gefunden. | — |
 | `v_scope_creep#ex1` | vocab | Scope-Creep | Möglicher Tippfehler gefunden. | Scope-Trieb \| Scope-Jeep \| Scope-Krepp \| Scope-Kreuz \| Scope-Creme |
 | `v_scope_creep#ex2` | vocab | Scope-Creep | Möglicher Tippfehler gefunden. | Scope-Trieb \| Scope-Jeep \| Scope-Krepp \| Scope-Kreuz \| Scope-Creme |
 
-## Punctuation & typography (4)
+## Punctuation & typography (2)
 
 | id | kind | flagged | message | suggestions |
 |---|---|---|---|---|
-| `r_cla6#ex` | redemittel | „ | Zeichen ohne sein Gegenstück: '“' scheint zu fehlen | — |
-| `r_cla6#ex` | redemittel | " | Möchten Sie ein schließendes typografisches Anführungszeichen verwenden? | “ |
 | `r_mail2#phrase` | redemittel | vielen | Dieser Satz fängt nicht mit einem großgeschriebenen Wort an. | Vielen |
 | `tx_engineering_memo_wartungsprotokoll#body` | text | gez | Dieser Satz fängt nicht mit einem großgeschriebenen Wort an. | Gez |
 
@@ -90,8 +85,8 @@ LanguageTool's dictionary. Scan for genuine typos; ignore the rest._
 
 | id | kind | flagged | message | suggestions |
 |---|---|---|---|---|
+| `sc_internet_stoerung:i1:i1a#opt` | dialogue | mein Internet | Diese Wendung ist möglicherweise umgangssprachlich. | meine Internetverbindung \| mein Internetzugang |
 | `tx_production_voicemail_schichtaenderung#body` | text | Info | 'Info' ist umgangssprachlich. | Information \| Informationsblatt \| Informatik |
-| `tx_wohnen_email_besichtigung#body` | text | Die | Drei aufeinanderfolgende Sätze beginnen mit dem gleichen Wort. Evtl. können Sie den Satz umformulieren, zum Beispiel, indem Sie ein Synonym nutzen. | — |
 | `v_co2_ausstoss#ex1` | vocab | CO2-Ausstoß | Möchten Sie die typografisch schönere Schreibweise "CO₂" verwenden? | CO₂-Ausstoß |
 | `v_co2_ausstoss#ex2` | vocab | CO2-Ausstoß | Möchten Sie die typografisch schönere Schreibweise "CO₂" verwenden? | CO₂-Ausstoß |
 | `v_treibhausgas#ex2` | vocab | CO2 | Möchten Sie die typografisch schönere Schreibweise <suggestion>CO₂</suggestion>, das als Treibhausgas bekannte <suggestion>Kohlendioxid</suggestion>, verwenden? | CO₂ \| Kohlendioxid |
@@ -104,19 +99,16 @@ _None._
 
 _None._
 
-## Other (9)
+## Other (6)
 
 | id | kind | flagged | message | suggestions |
 |---|---|---|---|---|
 | `r_cla4#phrase` | redemittel | dass | Meinten Sie <suggestion>das</suggestion>? | das |
 | `r_com6#phrase` | redemittel | dass | Meinten Sie <suggestion>das</suggestion>? | das |
-| `r_neg7#phrase` | redemittel | auf einander | Bitte prüfen Sie die Getrenntschreibung: Meinten Sie <suggestion>aufeinander</suggestion>? | aufeinander |
 | `sc_dienstreise:d1:d1c#opt` | dialogue | entscheide du | Möglicherweise fehlende grammatische Übereinstimmung zwischen Subjekt (du) und Prädikat (entscheide) bezüglich Person oder Numerus (Einzahl, Mehrzahl - Beispiel: 'ich sind' statt 'ich bin'). | entscheidest du \| entscheide er \| entscheide es \| entscheide ich \| entscheide sie |
-| `sc_nachhaltigkeit:k3:k3a#opt` | dialogue | Dieses | Folgt dem Doppelpunkt weder ein Substantiv noch eine wörtliche Rede oder ein vollständiger Hauptsatz, schreibt man klein weiter. | dieses |
-| `sc_sicherheit:s4:s4b#opt` | dialogue | du | Folgt nach dem Doppelpunkt ein vollständiger Hauptsatz, schreibt man danach groß weiter. | Du |
-| `tx_arzt_email_termin#body` | text | den | Standardsprachlich wird in diesem Fall empfohlen, <suggestion>dem</suggestion> zu schreiben. | dem |
-| `tx_behoerde_anmeldung_brief#body` | text | den | Standardsprachlich wird in diesem Fall empfohlen, <suggestion>dem</suggestion> zu schreiben. | dem |
-| `tx_wohnen_email_besichtigung#body` | text | gern | 'gern' und 'gerne' sollten nicht gleichzeitig benutzt werden. | gerne |
+| `sc_freunde_verabreden:v3:v3b#opt` | dialogue | Samstag Vormittag | Verbindungen aus Wochentag und Tageszeitangabe schreibt man zusammen, sofern ihnen ein Artikel, ein Adjektiv oder eine Präposition vorausgeht. | Samstagvormittag |
+| `v_monatskarte#ex1` | vocab | fahre ich so oft ich will | Hier sollte ein Komma eingefügt werden, wenn es sich bei dem hinteren Satzteil um einen Nebensatz handelt. | — |
+| `v_versicherungsschutz#ex1` | vocab | ersten | Bitte prüfen Sie, ob <suggestion>Ersten</suggestion> hier als Nomen gebraucht wird und daher großgeschrieben werden muss. | Ersten |
 
 ## Method & caveats
 

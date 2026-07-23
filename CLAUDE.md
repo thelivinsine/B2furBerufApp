@@ -480,16 +480,89 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   " · "-joined fragment, bigger icon tile; drill options (`GrammarDrillCard.tsx`) got a `bg-muted/50` idle
   fill so they read as tappable answers, not disabled fields.
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
-- **Fortschritt + Can-Do:** `canDo.ts` bank (25 milestones, founder-verified) drives the Fortschritt
+- **Schreiben hub (`/writing`; restyled s149 as a Bibliothek EXTENSION, founder-approved previews in
+  `preview/schreiben-bibliothek-extension*.html` + a 13-point founder fix round):** the 4-segment
+  sliding-pill switcher **Fokus · Kurz · Lang · Verlauf** IS the page header (s92 rule: no eyebrow/H1;
+  Verlauf rides `?mode=verlauf`; capped `lg:max-w-xl` + centered on desktop, four short labels at full
+  column width read oversized), over the standard `[minmax(0,1fr)_16rem]` content+rail grid.
+  **Kurz/Lang draw a RANDOM Aufgabe:** `src/data/writingPrompts.ts` holds per-theme POOLS of task
+  OBJECTS `{ text, sub?, sectors? }` (316 tasks since the s149 harmonization round; the whole pool
+  rides the theme's one `wp_<themeId>` provenance row, the mission pattern). `sub` = a declared
+  sub-theme slug (coverage invariant: every sub-theme of the 12 sub-themed themes has ≥2 short + ≥2
+  long tagged tasks); `sectors` = Branche tags with the Bibliothek **untagged-=-universal draw
+  rule** (a selected Branche prefers its tagged tasks, else falls back to untagged, never empty;
+  wave 1 = it/care/construction/transport/hospitality at 6 tasks each, grow by tagging). The linter
+  validates text/sub/sectors per task. The dice on the Aufgabe card (standard 40px icon button,
+  half-spin per roll) re-rolls within the current scope (keeps typed text, clears a stale result);
+  scope changes (`?sub=`/`?sector=`; theme switch clears sub, Branche travels) reset the draft;
+  drafts carry `promptIndex` so the OAuth resume restores the exact task. The Aufgabe card has NO
+  theme icon (founder), a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel line (the
+  editor word count does NOT repeat the Ziel range), and the AI disclaimer is a **standalone line
+  below the editor/sentence card**, never inside it. **AI backend (s151):** the Fokus Satzlabor
+  (`check-sentence`/`transform-sentence`) AND the Kurz/Lang writing coach (`evaluate-writing`) share
+  ONE provider cascade in their Supabase Edge Functions: **Gemini 2.5 Flash (free, recorded $0) →
+  Claude Sonnet 5 → GPT-5**, where Sonnet leads the paid backup until month-to-date Claude spend
+  across BOTH `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD` ($2), then GPT-5
+  leads; the global `MONTHLY_SPEND_CAP_USD` ($5, shared `ai_usage` fuse) bounds all three combined.
+  Anthropic calls send no `temperature` + `thinking: disabled` (Sonnet 5 family), Gemini forces JSON
+  output + a generous token budget, GPT-5 uses `max_completion_tokens` + `reasoning_effort: minimal`.
+  Model ids + the $2 threshold are env-overridable (`GEMINI_MODEL`, `CHECK_MODEL`/`TRANSFORM_MODEL`/
+  `EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`); flip `GEMINI_MODEL` to change the primary. The
+  German-grammar prompts are hardened (copula sein+Adjektiv is Aktiv, never Passiv; `bereits_zielform`
+  needs voice AND tense; strict JSON-only), and `normalizeDetected` never marks a detected
+  Zustandspassiv as the Passiv pill. The two Art. 50 disclaimers + `/privacy` (DE+EN) name all three
+  providers routing-neutrally. **Fokus (s151):** the send-to-AI note + the old "KI-generierte
+  Umformung" footer are ONE combined, centered note in normal flow below the content (a first pass
+  bottom-pinned it to align with the "Mit KI gebaut · Feedback" pill; the founder reverted that). **Eyebrow rule (s149): card-title eyebrows =
+  bold `text-primary` ("Aufgabe:", "Dein Satz", the transform label); inner section labels stay
+  muted.** **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20` +
+  `border-accent/50`, dark `bg-accent/10` + `border-accent/25`; NOT grey) with a header reset icon
+  and the Bibliothek scope hierarchy **Branche → Thema → Unterthema** as single-select **dropdowns**
+  (grouped listbox popovers, internal scroll, live counts, zero-yield options greyed; Unterthema
+  only when the theme has sub-themes; Thema groups = Domain categorization with **gesundheit folded
+  into Alltag**, founder rule). No overflow clipping on that tile (the popovers must escape); the
+  mobile panel animates via fade/slide, not height collapse, for the same reason. Fokus
+  `GrammarRail` is the SAME Himmelblau tile (s149; was grey): detected form = **white pill + green
+  `bg-success` dot** (never a blue fill/ring), target solid primary, pre-correction all idle, header
+  reset icon (back to the detected form), hint breaks after "Grüner Punkt
+  = erkannte Form.". The Fokus transform box is a **white card** (never a grey wash) with a bold
+  colored "Hinweis:" label (no i icon) and "KI-generierte Umformung" centered at the card bottom.
+  **Mobile = the Bibliothek pattern:** a toolbar button toggles the collapsible panel
+  (`layout="panel"`, no floating chip rows), Kurz/Lang get a sticky bottom Auswerten action bar and
+  Fokus a sticky Korrigieren bar (pre-correction). **Verlauf renders inside the same content grid column** as the other tabs (never full
+  width) and its empty state deep-links into Kurz. `WritingHistory` shows only the learner's text
+  (the exact prompt behind an old entry is not recoverable from theme+length since pools).
+  **Fokus correction card (s150 redesign, `FokusTrainer.tsx`, founder-approved via the
+  `preview/schreiben-design-review.html` artifact):** the corrected-state card dropped the noisy
+  struck-through original + "· n Änderungen" counter + in-place `<mark>` highlight + "Was ich geändert
+  habe" list. Now: the "Dein Satz" eyebrow shares its row with an **Original/Korrigiert view toggle**
+  (default Korrigiert; resets to Korrigiert on each new correction), Original marks the wrong words
+  with `.fx-mark-coral` (`--reward`) and Korrigiert marks the fixes with `.fx-mark-green` (`--success`)
+  — calm underlines, not fills (`index.css` `@layer utilities`). Below sits a row of **Himmelblau fix
+  tiles** (light `bg-accent/30 border-accent/70`, `dark:bg-accent/[0.18] dark:border-accent/[0.45]`),
+  each = a heuristic learning-category eyebrow (`text-accent-ink`; Rechtschreibung / Umlaut /
+  Groß-/Kleinschreibung / Grammatik / Ergänzung / Streichung, from `classifyChange` in `wordDiff.ts`)
+  + the `old → new` edit, with **Neuer Satz** as an outline button on that same row (`ml-auto
+  self-end`, wraps only if needed) — so Neuer Satz is NOT on the mobile toolbar or the desktop rail
+  anymore. `wordDiff.diffWords` returns `tokens` + `originalTokens` (both flagged) + `changes`
+  (each with a `category`); `tests/wordDiff.test.ts` pins it.
+- **Umlaut keys (`src/features/writing/UmlautKeys.tsx`, s150):** a reusable insert bar (ä ö ü ß Ä Ö Ü)
+  for learners on non-German keyboards. Inserts at the caret (over a selection too), neutral
+  `bg-surface` at rest, flashes Himmelblau on press, keys ~24px. Wired into the Fokus input footer
+  (shares the desktop row with Korrigieren) and the Kurz/Lang guided editor (`GuidedWritingTrainer.tsx`,
+  in the word-count row). Takes `{ textareaRef, value, onChange }`.
+- **Fortschritt + Can-Do:** `canDo.ts` bank (52 milestones) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
-- **Nav zones (labels updated s105, 2026-07-13; `/library` reverted to Bibliothek s141):** the tabs
-  are now **Praktisch** (`/`, was "Heute"), **Bibliothek** (`/library`; renamed to "Theorie" in s105,
-  reverted back to "Bibliothek" by founder in s141), **Fortschritt** (`/analytics`), + **Einstellungen**.
-  **Anwenden is HIDDEN from the nav** (founder, demo): removed from `navItems`, `BottomTabBar` `CONTENT`,
-  and `DEFAULT_PINNED_TABS` (now `["/", "/library", "/analytics"]`), but `/anwenden` stays mounted in
-  `router.tsx` so `/welt` + deep links still resolve — re-add the `navItems` row to restore it. The
-  Praktisch route mark is a **dumbbell** (`route-icons.tsx`), not a house. Settings-store persist
-  migration (`ROUTE_SUCCESSOR` in `nav-items.ts`) still forwards old pins. The s26–28 bottom-bar
+- **Nav zones (labels updated s105, 2026-07-13; `/library` reverted to Bibliothek s141; Schreiben added
+  s147):** the tabs are now **Praktisch** (`/`, was "Heute"), **Bibliothek** (`/library`; renamed to
+  "Theorie" in s105, reverted back to "Bibliothek" by founder in s141), **Schreiben** (`/writing`, added
+  as a dedicated item s147, rose accent, pencil mark), **Fortschritt** (`/analytics`), + **Einstellungen**.
+  **Anwenden is HIDDEN from the nav** (founder, demo): removed from `navItems`, but `/anwenden` stays
+  mounted in `router.tsx` so `/welt` + deep links still resolve — re-add the `navItems` row to restore it.
+  `BottomTabBar` `CONTENT` is now `["/library", "/writing", "/analytics"]` and `DEFAULT_PINNED_TABS` is
+  `["/", "/library", "/writing", "/analytics"]` (Home + 3 middle + fixed Einstellungen = the 5 locked
+  slots). The `/writing` → `/anwenden` `ROUTE_SUCCESSOR` remap was removed (it is a top-level route again).
+  The Praktisch route mark is a **dumbbell** (`route-icons.tsx`), not a house. The s26–28 bottom-bar
   **mechanics stay locked**.
 - **AI-disclaimer feedback button (s105):** `components/layout/FeedbackButton.tsx` renders a subtle fixed
   "Mit KI gebaut · Feedback" pill on every non-focus page (mounted in `AppShell`). It opens a dialog →
@@ -504,6 +577,28 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   added so that intent keeps working. The Vokabeltrainer's in-page Karteikarten/Quiz tabs are hidden
   behind the reversible `SHOW_PRACTICE_TABS = false` flag; `Flashcards`/`VocabQuiz` stay in the repo
   (used by the session engine).
+
+## Founder design preferences (UI; distilled s149, full record in `docs/DECISIONS.md`)
+Apply these to ANY new or restyled surface, before the founder has to ask:
+- **Extend the existing design system, never invent a parallel style:** reuse the Bibliothek
+  building blocks (sliding-pill switcher AS the page header, FilterRail tile language, scope
+  dropdowns, facet pills, sticky mobile action bars) and the one categorization hierarchy
+  (Branche → Thema → Unterthema; learner-facing daily-life groupings fold Gesundheit into Alltag).
+- **Previews first for design work:** founder-reviewable `preview/*.html` mockups from the real
+  tokens, iterate on the feedback list, then implement.
+- **No redundancy:** each fact appears once (no repeated ranges/labels), no explanatory filler
+  lines in the UI; compact chrome (content-sized toggles, 40px icon buttons).
+- **Dropdowns over pill walls** for long scope lists; rails never outgrow their tile (internal
+  scrolling).
+- **Controls always visibly act:** no disabled-at-default buttons that read as broken (reset =
+  clear + fresh draw); zero-yield options grey out with honest counts.
+- **Color language:** Himmelblau accent tiles for selection rails (not grey); content on white
+  cards (no grey washes); card-title eyebrows bold brand blue, inner labels muted; a bold colored
+  word label ("Hinweis:") over an i icon; green dot = detected fact; AI/legal disclaimers as
+  standalone lines below cards.
+- **Consistency + motion:** primary actions in the same place across sibling modes (mobile sticky
+  bars); subtle micro-motion in one timing family (directional tab slides, 0.12-0.18s, reduced-
+  motion safe).
 
 ## Writing style (applies to ALL user-facing copy)
 - **Avoid em dashes (`—`).** The founder dislikes them; they are an overused "AI" tell. Use them
@@ -529,7 +624,7 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
 - **Vocabulary** (`src/data/vocabulary.ts`): each entry has `id`, article (nouns), plural (countable nouns), pronunciation hint, two example sentences, and related terms. Currently **1,623 words** (~49 per workplace theme, a ~27-word `behoerde` pack, **28-word `arzt`/`wohnen`/`bank`/`bildung` packs** added s75, a 13-word care/Pflege pack added s43, the **11 Branche starter packs** added s94, the **Wave-2 deepening** (s95): engineering/it/construction/production at ~60 words each, the **s102 Branche-overhaul packs**: `chemicals`/`pharma`/`cleaning`/`security` at ~20 words each + a 10-word Transport & Logistik Lager boost, the **coverage-review deepening** (2026-07-14): +76 words for the thin service Branchen (hospitality/retail/beauty/cleaning/security/sports) and +57 for the thin daily-life themes, the **daily-life scale-up Phase A** (s126, 2026-07-17, `docs/plans/DAILY_LIFE_SCALEUP_PLAN.md`): +132 words bringing all five original daily-life themes (bank/bildung/behoerde/wohnen/arzt) to ~80 vocab each so they match workplace depth, plus the **daily-life scale-up Phase B** (s126): five NEW `alltag` themes (`einkaufen`/`essen`/`mobilitaet`/`freizeit`/`digitales`) at 49 vocab each (+245); verified by `pnpm lint:content`), all tagged with a `cefr` facet (AI-drafted, human-verify pending), for the split themes a `subThemeId`, and for sector-specific items a `sectors[]` multi-tag (1-4 typical; general words stay untagged = visible under every Branche). **The bank is two concatenated array literals** (`vocabularyPart1/2`, split in s102 for the TS2590 union-complexity limit, same as provenance); append new packs to part 2. When adding words: match the existing schema, keep ids unique, source from standard Goethe-Zertifikat B2 Beruf / telc Deutsch B2+ Beruf word fields, and verify with `pnpm build` + `pnpm lint:content`. **Wörter-surface retire set (s142):** a Nomen-Verb collocation must live in the Kollokationen bank, not the single-word Wörter list (it renders every entry with no POS filter, so a combo shows up article-less next to real nouns). Eight mis-filed combos are listed in **`RETIRED_VOCAB_IDS`** in `vocabulary.ts`; **`browsableVocabulary`** (= bank − retired) is what every "words" surface reads (Wörter browse via `themeScoped` + the now-browsable `vocabByTheme`/`vocabBySubTheme`, `lib/search.ts`, the `engine/session.ts` word pools, `Sammlung.tsx`). `vocabById`/`vocabulary` stay the FULL bank so ids still resolve (shipped ids are permanent, progress is id-keyed → retire, never delete). `lint:content`'s `lintVocabCollocationOverlap` **errors** if a vocab `de` equals a collocation `full` unless the id is retired, so a future overlap fails CI; add the combo to Kollokationen + the id to `RETIRED_VOCAB_IDS`.
 - **Collocations** (`src/data/collocations.ts`): currently **1,035 Nomen-Verb pairs** (~36 per theme; +36 each for `arzt`/`wohnen`/`bank`/`bildung` in s75; +96 across the 11 Branche packs in s94; +65 in the s95 Wave-2 deepening; +40 in the s102 Branche-overhaul packs, ~9 per new sector + 4 Lager pairs; +56 in the coverage-review deepening (2026-07-14): 48 for the thin service Branchen + 8 for daily-life themes; +36 in the daily-life scale-up Phase A (s126): bank/bildung/behoerde/wohnen each to ~50 pairs; +200 in the daily-life scale-up Phase B (s126): 40 each for the five NEW `alltag` themes einkaufen/essen/mobilitaet/freizeit/digitales; +2 in s142: `c_planung_revidieren`/`c_vorwuerfe_zurueckweisen`, the noun+verb combos moved out of the Wörter surface, see the Wörter retire note below). Schema: `id`, `noun`, `verb`, `full`, `en`, `register` (`neutral`|`formal`, `diplomatic` folded into formal in the audit), `themeId`, `example {de, en}`, plus the optional facets `cefr` (all tagged), `subThemeId` (split themes) and the `sectors[]` multi-tag. Keep ids unique (`c_` prefix + snake_case). (The old "floor watch" rule is obsolete since s102: Branche is a scope, not a facet, so no coverage floor applies.)
 - **Grammar** (`src/data/grammar.ts`): currently **24 topics / 117 drills** (s95 Wave 4 completed the B1–B2 canon: +14 German-first topics across 6 new groups `nouns`/`attributes`/`reportedSpeech`/`wordFormation`/`infinitives`/`future`; `grammarMeta.ts` `groupOrder` places them on the B2-marker spine). Schema: `GrammarTopic` with `id`, `group`, `cefr` (REQUIRED since the audit P2 pass, s84: completeness-checked by the linter, AI-drafted founder-verify pending, shown as a badge on the hub cards + topic view), `title`, `titleDe`, `purpose`, `purposeDe` (German added s47), `explanation`, `explanationDe` (s93: the German-FIRST lesson text; the EN `explanation` shows only via the hold-to-peek EN chip; AI-drafted, founder verify pending), `pattern`, `examples`, `pitfalls`, `pitfallsDe` (s93, parallel to `pitfalls`, same order/length), `drills[]`. Topics are ordered by B2-marker priority in the hub. Drills have `id`, `prompt`, `answer`, `options?` (MCQ) or no options (word-order), `explain`, `gloss` (in the lesson the gloss hides behind the EN peek via `GrammarDrillCard`'s `glossPeek` prop; sessions keep it always visible).
-- **Can-Do milestones** (`src/data/canDo.ts`, added s47 for UX overhaul Phase 4): currently **52 `CanDoStatement`s** (2–3 per theme, all 20 themes covered; the s126 daily-life scale-up Phase B added 3 each for the five new `alltag` themes einkaufen/essen/mobilitaet/freizeit/digitales, all `draft`; 25 are founder-verified, the rest `draft`). Schema: `id` (`cd_` prefix), `themeId`, `cefr` (`ContentCefr`), `statement` (German, must start with "Ich kann"), `en` gloss, `threshold` (0..1 theme-mastery ratio at which the milestone is achieved). **Provenance:** AI-drafted, aligned to the CoE CEFR self-assessment descriptors (cited in `provenance.ts`, never reproduced); all 25 rows **founder-reviewed and approved 2026-07-02** (`review_status: "verified"`). When adding NEW statements: keep ids unique, ascending `cefr`/`threshold` within a theme, add a matching `can_do` provenance row (start it `review_status: "draft"` for the next review pass), run `pnpm lint:content`.
+- **Can-Do milestones** (`src/data/canDo.ts`, added s47 for UX overhaul Phase 4): currently **52 `CanDoStatement`s** (2–3 per theme, all 20 themes covered; the s126 daily-life scale-up Phase B added 3 each for the five new `alltag` themes einkaufen/essen/mobilitaet/freizeit/digitales, all `draft`; **all 52 are now `draft`** since the 2026-07-22 human-verification reset). Schema: `id` (`cd_` prefix), `themeId`, `cefr` (`ContentCefr`), `statement` (German, must start with "Ich kann"), `en` gloss, `threshold` (0..1 theme-mastery ratio at which the milestone is achieved). **Provenance:** AI-drafted, aligned to the CoE CEFR self-assessment descriptors (cited in `provenance.ts`, never reproduced). The 25 Can-Do rows were founder-approved 2026-07-02 but **reset to `draft` on 2026-07-22** (human verification restarted from zero at founder request). When adding NEW statements: keep ids unique, ascending `cefr`/`threshold` within a theme, add a matching `can_do` provenance row (start it `review_status: "draft"` for the next review pass), run `pnpm lint:content`.
 - **Lese-/Hörtexte** (`src/data/texts.ts`, added s69 for redesign Phase 4.3): currently **36 `ReadingText`s / 108 checks** (2 Behörden letters, 2 workplace emails, 2 memos, workplace + daily-life announcements, voicemail scripts, the s75 daily-life texts, an s80 round adding a new sub-theme to each daily-life theme, the **s95 Wave-2 sector texts** (a Wartungsprotokoll memo (engineering), a Sprint-Review email (it), a Baustellenordnung announcement (construction) and a Schichtplan voicemail (production)), plus **2 texts for each of the five new `alltag` themes** in the s126 scale-up Phase B (email + announcement per theme); voicemails double as TTS listening input in the 4.4 block). Schema: `id` (`tx_` prefix), `kind` (`TextKind`, closed enum: letter/email/memo/announcement/voicemail), `themeId`, `cefr`, `title`/`titleEn`, `de` (full text, blank-line paragraphs), `en` gloss, `checks` (2–3 `TextCheck` MCQs: German `question`, `options`, `answer` among options, optional English `explain`; check ids globally unique), optional `subThemeId`, optional `sector` (`WorkSector`, s95 Wave 2; validate-when-present in the linter). All texts are authored authentic-STYLE (fictitious names/numbers), CEFR-calibrated against the CoE level descriptors (cited in provenance, never reproduced), one `text` provenance row each (`review_status: "draft"`, founder review pending). Results feed XP/theme progress, NOT vocab FSRS, so texts carry no SRS fields. When adding texts: match the schema, no em dashes, run `pnpm lint:content`.
 - **Content linter (`pnpm lint:content`, gate added 2026-06-14, provenance checks added 2026-06-15):**
   `scripts/lint-content.mjs` loads every `src/data/*` bank through Vite's `ssrLoadModule` (no extra
@@ -557,9 +652,11 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
 - **Provenance register (`src/data/provenance.ts`, added 2026-06-15):** one `ProvenanceEntry` row per
   content_id, tracking `origin` (authored/sourced/adapted), `reference` (Wiktionary/DWDS/Tatoeba URL),
   `license` (SPDX from the allowlist), `review_status` (draft/verified), and who added/verified it.
-  All 3,105 content items have provenance rows, every one carrying a non-empty `reference` (so the
-  back-fill queue is empty); 3,080 are `review_status: "draft"` and 25 are `"verified"` (the founder-
-  approved Can-Do bank). Since s95 the register is **two concatenated array literals**
+  All 3,107 content items have provenance rows, every one carrying a non-empty `reference` (so the
+  back-fill queue is empty); **all 3,107 are `review_status: "draft"` and 0 are `"verified"`** (human
+  verification was reset to zero at founder request, 2026-07-22: the previously-approved 25 Can-Do rows
+  were flipped back to `draft` to restart the human-review pass from a clean slate; the `human` tier on
+  `/sources` is now 0). Since s95 the register is **two concatenated array literals**
   (`provenancePart1/2`): a single 2,000+ row literal exceeds TypeScript's TS2590 union-complexity
   limit. Append new rows to the second literal (the append-script pattern is unchanged). Game missions get one row per mission id (scenes/moves/checks ride on it,
   like text-bank checks). The back-fill queue (items with empty
@@ -696,7 +793,8 @@ drag now reorders the sheet grid; the + badge is the single, unambiguous add aff
 - More-sheet order stored in `useSettingsStore` as `moreOrder: string[]` (full ordering of every
   route path; empty array = fall back to `nav-items` order). Rides into `profiles.settings` jsonb
   via cloudSync like the other settings.
-- `DEFAULT_PINNED_TABS = ["/", "/library", "/analytics"]` in `nav-items.ts` (Anwenden dropped from the
+- `DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"]` in `nav-items.ts` (Schreiben added
+  s147; Anwenden dropped from the
   nav in s105; was `["/", "/library", "/anwenden", "/analytics"]` in Phase 5, session 49). The store is
   persisted at `version: 1`; its `migrate` remaps any pre-Phase-5 pins/More-order via `ROUTE_SUCCESSOR`
   (also in `nav-items.ts`) so removed routes forward to their successor zone instead of vanishing.
@@ -837,13 +935,20 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
 - **No cookie-consent banner**: storage is functional-only (auth session + `b2beruf.*` settings/
   progress + PWA cache), which is consent-exempt under GDPR/§25(2) TTDSG. Only revisit if
   analytics/marketing storage is ever added.
-- **`/sources` = "Quellen & Datenqualität" (redesigned s130):** the public page tells the
-  data-architecture story visually (stat tiles, five-step pipeline graphic, stacked tier bar,
-  per-bank counts, sources/licenses, full item browse), generated from the provenance register +
-  verification map. Founders additionally get the **Daten-Werkbank**
+- **`/sources` = "Quellen & Datenqualität" (redesigned s130; table restructure 2026-07-22):** the
+  public page tells the data-architecture story visually (stat tiles, five-step pipeline graphic,
+  stacked tier bar, per-bank counts, sources/licenses, full item browse), generated from the
+  provenance register + verification map. **The "Alle Inhalte und ihre Quellen" item browse is now
+  behind a collapse toggle (`showAll`, collapsed by default)** so the page no longer scrolls
+  endlessly. Founders additionally get the **Daten-Werkbank**
   (`features/legal/AdminWorkbench.tsx`): the full register as a sortable table with fuzzy search,
   Typ/Stufe/Status filters, CSV export of the filtered view (`src/lib/csv.ts`), copy-id chips and
-  per-row verified-checkbox + note (Supabase `provenance_reviews`). **Admin gate = the two
+  per-row verified-checkbox + note (Supabase `provenance_reviews`). **The workbench moved OFF the
+  main /sources page onto its own founder-only sub-page `/sources/werkbank`** (2026-07-22, route
+  `RequireFounder`-gated in `router.tsx`, same lazy chunk; `SourcesWorkbench` + the shared
+  `useWorkbench` hook in `Sources.tsx`); the main page shows admins a link card to it. Human
+  verification was reset to zero the same day (see the provenance bullet), so the `human` tier and
+  the "menschlich geprüft" stat tile read 0 until the review pass restarts. **Admin gate = the two
   `FOUNDER_EMAILS` in `src/lib/admin.ts`** (client) + the RLS policy from migrations 0004/0007 and
   the `is_founder()`/`assert_founder()` gate in migration 0008 (server); keep all in lockstep,
   `tests/admin.test.ts` pins the email list against both the client list and the migration SQL.

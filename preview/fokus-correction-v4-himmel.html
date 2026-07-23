@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fokus · V4 · Himmelblau-Kacheln</title>
+<style>
+  :root {
+    --background: 180 45% 98%;
+    --surface: 0 0% 100%;
+    --muted: 220 10% 90%;
+    --muted-foreground: 220 8% 36%;
+    --foreground: 252 16% 12%;
+    --border: 220 9% 86%;
+    --primary: 221 83% 54%;
+    --accent: 197 93% 77%;
+    --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --success-bg: 153 55% 95%;
+    --shadow: 221 40% 22%;
+  }
+  .dark {
+    --background: 228 24% 10%;
+    --surface: 228 20% 14%;
+    --muted: 228 16% 22%;
+    --muted-foreground: 228 10% 72%;
+    --foreground: 228 20% 92%;
+    --border: 228 14% 26%;
+    --primary: 221 90% 70%;
+    --accent: 197 93% 77%;
+    --accent-ink: 198 85% 72%;
+    --success: 153 52% 60%;
+    --success-bg: 153 38% 17%;
+    --shadow: 221 60% 3%;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    transition: background .25s, color .25s;
+  }
+  .wrap { max-width: 680px; margin: 0 auto; padding: 44px 20px 90px; }
+
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: hsl(var(--primary)); }
+  h1 { font-size: 27px; font-weight: 800; letter-spacing: -.022em; margin: 6px 0 8px; }
+  .lede { color: hsl(var(--muted-foreground)); font-size: 14.5px; line-height: 1.62; margin: 0; max-width: 48ch; }
+  .toggle {
+    border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--foreground));
+    border-radius: 10px; padding: 8px 13px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap;
+    font-family: inherit;
+  }
+
+  .variant { margin-top: 40px; }
+  .vhead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .vname { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; }
+  .badge { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    color: hsl(var(--success)); border: 1px solid hsl(var(--success) / .45); background: hsl(var(--success-bg));
+    border-radius: 999px; padding: 3px 8px; }
+  .why { color: hsl(var(--muted-foreground)); font-size: 13px; line-height: 1.55; margin: 0 0 15px; max-width: 56ch; }
+
+  .card {
+    background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border));
+    border-radius: 20px;
+    padding: 22px 22px 20px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .05), 0 14px 34px hsl(var(--shadow) / .09);
+  }
+  .status { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700;
+    letter-spacing: .04em; text-transform: uppercase; color: hsl(var(--success)); margin: 0 0 16px; }
+  .status svg { width: 15px; height: 15px; }
+  .sentence { font-size: 21px; line-height: 1.5; margin: 0; letter-spacing: -.01em; }
+  .fix { font-weight: 650; box-shadow: inset 0 -2px 0 hsl(var(--success) / .85); padding-bottom: 1px; border-radius: 1px; }
+
+  .old { color: hsl(var(--muted-foreground)); text-decoration: line-through; text-decoration-color: hsl(var(--muted-foreground) / .55); text-decoration-thickness: 1.5px; }
+  .arr { color: hsl(var(--muted-foreground)); opacity: .8; }
+  .new { color: hsl(var(--success)); font-weight: 700; }
+
+  .stackchips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 17px; }
+  .schip { border-radius: 14px; padding: 10px 14px; min-width: 132px; }
+  .schip .cat { display: block; margin-bottom: 5px; font-size: 10px; font-weight: 800;
+    letter-spacing: .07em; text-transform: uppercase; }
+  .schip .diff { font-size: 15px; }
+
+  /* Himmelblau tiles: the sanctioned accent-selection look (bg-accent/… +
+     border-accent/…), category in Himmel-Ink for identity + contrast. */
+  .weich .schip {
+    background: hsl(var(--accent) / .18);
+    border: 1px solid hsl(var(--accent) / .45);
+  }
+  .weich .schip .cat { color: hsl(var(--accent-ink)); }
+
+  .kraeftig .schip {
+    background: hsl(var(--accent) / .30);
+    border: 1px solid hsl(var(--accent) / .70);
+  }
+  .kraeftig .schip .cat { color: hsl(var(--accent-ink)); }
+  /* On the stronger tile, muted strike can wash out — nudge it darker. */
+  .kraeftig .schip .old { color: hsl(var(--foreground) / .55); }
+
+  .note { font-size: 12px; color: hsl(var(--muted-foreground)); margin: 40px 2px 0; line-height: 1.6; }
+</style>
+</head>
+<body class="dark">
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="kicker">Schreiben · Fokus</div>
+        <h1>V4 · Karten-Chips in Himmelblau</h1>
+        <p class="lede">Die kleinen Korrektur-Kacheln bekommen jetzt echten Kontrast: die Himmelblau-Akzentfläche
+          (dieselbe Selektions-Optik wie in der Bibliothek), Kategorie in Himmel-Ink. Grün bleibt für die
+          fertige Korrektur reserviert. Zwei Intensitäten zur Wahl.</p>
+      </div>
+      <button class="toggle" onclick="document.body.classList.toggle('dark')">Hell / Dunkel</button>
+    </div>
+
+    <!-- 4a -->
+    <div class="variant weich">
+      <div class="vhead"><span class="vname">4a · Himmel weich</span><span class="badge">Empfohlen</span></div>
+      <p class="why">Himmelblau bei ~18 % Deckkraft mit klarer Akzentkante. Deutlich sichtbar, bleibt aber ruhig.</p>
+      <div class="card">
+        <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+        <p class="sentence"><span class="fix">Kannst</span> du bitte es kurz <span class="fix">erklären?</span></p>
+        <div class="stackchips">
+          <div class="schip"><span class="cat">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
+          <div class="schip"><span class="cat">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4b -->
+    <div class="variant kraeftig">
+      <div class="vhead"><span class="vname">4b · Himmel kräftig</span></div>
+      <p class="why">Himmelblau bei ~30 % mit satterer Kante. Mehr Präsenz, die Kacheln werden zum Blickfang.</p>
+      <div class="card">
+        <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+        <p class="sentence"><span class="fix">Kannst</span> du bitte es kurz <span class="fix">erklären?</span></p>
+        <div class="stackchips">
+          <div class="schip"><span class="cat">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
+          <div class="schip"><span class="cat">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="note">Echte App-Tokens (src/index.css), hell &amp; dunkel · Toggle oben rechts. Himmelblau = die
+      sanktionierte Akzent-/Selektionsfläche (bg-accent/… + border-accent/…). Grün bleibt „richtig", die Marke
+      (Nachtblau) bleibt die Aktionsfarbe.</p>
+  </div>
+</body>
+</html>

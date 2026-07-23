@@ -1,0 +1,396 @@
+// Supabase Edge Function: check-sentence
+// ---------------------------------------------------------------------------
+// Corrects a single German sentence and detects its grammar (voice/tense/mood)
+// for the Fokus "Satzlabor" (Schreibtraining redesign). Cost-guarded exactly like
+// evaluate-writing, but scoped to ONE short sentence.
+//
+//   1. Auth + kill-switch + per-user daily check limit + global monthly $ fuse.
+//   2. Cache lookup by input hash (GLOBAL: corrections are user-independent).
+//   3. ONE model call, cascade Gemini 2.5 Flash (free) -> Sonnet 5 -> GPT-5,
+//      returning corrected text +
+//      per-sentence {voice,tense,mood}.
+//   4. Persist a per-user row, bump ai_usage + the paid-ops ledger, return JSON.
+//
+// Secrets (never shipped to the browser): ANTHROPIC_API_KEY (required),
+// GEMINI_API_KEY / OPENAI_API_KEY (optional fallback), DAILY_CHECK_LIMIT
+// (default 20), USER_MONTHLY_LIMIT (default 200), MONTHLY_SPEND_CAP_USD
+// (default 5), MAX_SENTENCE_LEN (default 300). SUPABASE_URL +
+// SUPABASE_SERVICE_ROLE_KEY + SUPABASE_ANON_KEY are injected automatically.
+// ---------------------------------------------------------------------------
+
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const DEFAULT_ALLOWED_ORIGINS = [
+  "https://genauly.de",
+  "https://www.genauly.de",
+  "http://localhost:5173",
+];
+
+function isAllowedOrigin(origin: string): boolean {
+  if (!origin) return false;
+  const env = Deno.env.get("ALLOWED_ORIGINS");
+  const list = env ? env.split(",").map((s) => s.trim()).filter(Boolean) : DEFAULT_ALLOWED_ORIGINS;
+  if (list.includes(origin)) return true;
+  try {
+    const u = new URL(origin);
+    if (u.protocol === "https:" && u.hostname.endsWith(".github.io")) return true;
+  } catch { /* malformed */ }
+  return false;
+}
+
+function corsHeaders(origin: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  };
+  if (isAllowedOrigin(origin)) headers["Access-Control-Allow-Origin"] = origin;
+  return headers;
+}
+
+const VOICES = ["aktiv", "passiv_vorgang", "passiv_zustand"];
+const TENSES = ["praesens", "perfekt", "praeteritum", "plusquamperfekt", "futur1", "futur2"];
+const MOODS = ["indikativ", "konjunktiv1", "konjunktiv2", "imperativ"];
+
+const DAILY_CHECK_LIMIT = Number(Deno.env.get("DAILY_CHECK_LIMIT") ?? "20");
+const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
+const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
+const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");
+// Sonnet 5 for German morphology accuracy (was claude-haiku-4-5, which mislabeled
+// copula "sein + Adjektiv" as passive). Override via CHECK_MODEL if ever needed.
+// Provider cascade (per cache-miss): free Gemini Flash first, then paid Claude
+// Sonnet, then GPT-5. Sonnet is the paid backup until month-to-date Claude spend
+// reaches CLAUDE_BUDGET_USD, after which GPT-5 leads. All three combined are
+// bounded by the global MONTHLY_SPEND_CAP_USD fuse (Gemini's free tier is $0).
+const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
+const CHECK_MODEL = Deno.env.get("CHECK_MODEL") ?? "claude-sonnet-5";
+const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
+// Once month-to-date Claude (Sonnet) spend reaches this, GPT-5 leads the paid
+// backup instead of Sonnet. A soft routing threshold, not a hard cap; the hard
+// ceiling for all providers is MONTHLY_SPEND_CAP_USD.
+const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
+// Bump when the prompt or model changes: the global correction cache is keyed by
+// source_hash only, so folding this in re-evaluates sentences that were cached by
+// the old (weaker) model instead of serving their stale grammar detection.
+const CHECK_VERSION = "2";
+
+// Case-PRESERVING hash (German capitalization is grammatically meaningful, unlike
+// the weakness-classifier in evaluate-writing which lowercases). Salted with
+// CHECK_VERSION so a model/prompt bump invalidates the old cache.
+async function hashText(text: string): Promise<string> {
+  const norm = `${CHECK_VERSION}\n${text.trim().replace(/\s+/g, " ")}`;
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(norm));
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function monthKey(d = new Date()): string {
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+interface Detected { text: string; voice: string; tense: string; mood: string }
+interface CheckOut { corrected: string; hasErrors: boolean; sentences: Detected[]; model: string; cost: number }
+
+const SYSTEM_PROMPT =
+  `Du bist ein praeziser Korrektor und Grammatik-Analyst fuer Deutsch auf Niveau B1 bis B2. ` +
+  `Aufgabe in zwei Schritten: ` +
+  `1. Korrigiere den Text. Behebe nur echte Fehler (Grammatik, Rechtschreibung, Gross- und ` +
+  `Kleinschreibung, Wortstellung, Zeichensetzung). Aendere korrekten Stil und Inhalt NICHT. ` +
+  `Ist der Text bereits fehlerfrei, gib ihn unveraendert zurueck und setze has_errors auf false. ` +
+  `2. Zerlege den KORRIGIERTEN Text in Saetze und bestimme fuer jeden Satz voice ` +
+  `(aktiv, passiv_vorgang, passiv_zustand), tense (praesens, perfekt, praeteritum, ` +
+  `plusquamperfekt, futur1, futur2) und mood (indikativ, konjunktiv1, konjunktiv2, imperativ) ` +
+  `nach dem finiten Verb des Hauptsatzes. ` +
+  `WICHTIG zur voice: Eine Kopula, also sein/werden/bleiben + Adjektiv oder Adverb ` +
+  `(z. B. "Ich bin krank", "Sie ist muede", "Er wird alt", "Wir sind da"), ist IMMER aktiv ` +
+  `und NIEMALS Passiv. Ein Passiv liegt nur vor, wenn ein Partizip II eines transitiven ` +
+  `Verbs steht: passiv_vorgang = werden + Partizip II ("Der Bericht wird geschrieben"), ` +
+  `passiv_zustand = sein + Partizip II ("Die Tuer ist geschlossen"). Ein Adjektiv nach sein ` +
+  `ist KEIN Partizip und damit kein Zustandspassiv. Im Zweifel voice = aktiv. ` +
+  `Beispiele: "Ich bin krank." -> voice aktiv, tense praesens (Kopula, kein Passiv). ` +
+  `"Der Bericht wird geschrieben." -> voice passiv_vorgang, tense praesens. ` +
+  `"Sie hat den Termin abgesagt." -> voice aktiv, tense perfekt. ` +
+  `Nutze fuer voice, tense und mood NUR die genannten Werte, exakt so geschrieben. ` +
+  `Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zaeune und ohne ` +
+  `weiteren Text, genau in dieser Form: ` +
+  `{"corrected": "...", "has_errors": true, "sentences": [{"text": "...", "voice": "aktiv", "tense": "praesens", "mood": "indikativ"}]}.`;
+
+function parseCheck(raw: string): { corrected: string; hasErrors: boolean; sentences: Detected[] } | null {
+  try {
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) return null;
+    const obj = JSON.parse(match[0]);
+    if (typeof obj.corrected !== "string" || !obj.corrected.trim()) return null;
+    const sentences: Detected[] = Array.isArray(obj.sentences)
+      ? obj.sentences
+          .filter((s: unknown) => s && typeof (s as Detected).text === "string")
+          .map((s: Detected) => ({
+            text: String(s.text),
+            voice: VOICES.includes(s.voice) ? s.voice : "aktiv",
+            tense: TENSES.includes(s.tense) ? s.tense : "praesens",
+            mood: MOODS.includes(s.mood) ? s.mood : "indikativ",
+          }))
+      : [];
+    return { corrected: obj.corrected.trim(), hasErrors: !!obj.has_errors, sentences };
+  } catch {
+    return null;
+  }
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function callAnthropic(text: string): Promise<CheckOut | null> {
+  const key = Deno.env.get("ANTHROPIC_API_KEY");
+  if (!key) { console.error("[check] anthropic: no ANTHROPIC_API_KEY set"); return null; }
+  // Retry once on a transient overload (429/529) before falling through.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: CHECK_MODEL,
+          max_tokens: 500,
+          // No `temperature` (removed on Sonnet 5 / Opus 4.8 family -> 400).
+          // Thinking disabled: a one-sentence grammar call does not need it, and
+          // leaving adaptive thinking on (the Sonnet 5 default) could consume the
+          // 500-token budget and truncate the JSON.
+          thinking: { type: "disabled" },
+          system: SYSTEM_PROMPT,
+          messages: [{ role: "user", content: `Text:\n"""${text}"""` }],
+        }),
+      });
+      if (res.status === 429 || res.status === 529) {
+        console.error(`[check] anthropic overloaded status=${res.status} attempt=${attempt}`);
+        if (attempt === 0) { await sleep(700); continue; }
+        return null;
+      }
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        console.error(`[check] anthropic http=${res.status} body=${body.slice(0, 400)}`);
+        return null;
+      }
+      const data = await res.json();
+      const raw = data.content?.[0]?.text ?? "";
+      const parsed = parseCheck(raw);
+      if (!parsed) { console.error(`[check] anthropic parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
+      const inTok = data.usage?.input_tokens ?? 0;
+      const outTok = data.usage?.output_tokens ?? 0;
+      // Sonnet 5 standard rates ($3/$15 per 1M); over-estimates during the intro
+      // window, which keeps the monthly spend fuse conservative. Haiku fallback = $1/$5.
+      const isSonnet = CHECK_MODEL.includes("sonnet");
+      const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
+      return { ...parsed, model: CHECK_MODEL, cost };
+    } catch (e) {
+      console.error(`[check] anthropic threw: ${e}`);
+      return null;
+    }
+  }
+  return null;
+}
+
+async function callGemini(text: string): Promise<CheckOut | null> {
+  const key = Deno.env.get("GEMINI_API_KEY");
+  if (!key) return null;
+  try {
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents: [{ parts: [{ text: `Text:\n"""${text}"""` }] }],
+          // 2.5 Pro is a thinking model: force pure-JSON output and give a
+          // generous budget so reasoning tokens cannot truncate the answer.
+          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4096 },
+        }),
+      },
+    );
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[check] gemini http=${res.status} body=${body.slice(0, 400)}`);
+      return null;
+    }
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    const parsed = parseCheck(raw);
+    if (!parsed) { console.error(`[check] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
+    // Free tier: record $0 so free calls never consume the paid spend fuse.
+    return { ...parsed, model: GEMINI_MODEL, cost: 0 };
+  } catch (e) {
+    console.error(`[check] gemini threw: ${e}`);
+    return null;
+  }
+}
+
+async function callOpenAI(text: string): Promise<CheckOut | null> {
+  const key = Deno.env.get("OPENAI_API_KEY");
+  if (!key) return null;
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: OPENAI_MODEL,
+        response_format: { type: "json_object" },
+        // GPT-5 is a reasoning model: cap with max_completion_tokens (max_tokens is
+        // rejected) and keep reasoning minimal so it stays fast and does not starve
+        // the JSON output. No temperature (also rejected on reasoning models).
+        max_completion_tokens: 2048,
+        reasoning_effort: "minimal",
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "user", content: `Text:\n"""${text}"""` },
+        ],
+      }),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error(`[check] openai http=${res.status} body=${body.slice(0, 400)}`);
+      return null;
+    }
+    const data = await res.json();
+    const parsed = parseCheck(data.choices?.[0]?.message?.content ?? "");
+    if (!parsed) return null;
+    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
+  } catch (e) {
+    console.error(`[check] openai threw: ${e}`);
+    return null;
+  }
+}
+
+Deno.serve(async (req) => {
+  const origin = req.headers.get("Origin") ?? "";
+  const cors = corsHeaders(origin);
+  const json = (body: unknown, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json" } });
+
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method !== "POST") return json({ ok: false, message: "Method not allowed" }, 405);
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+  const authHeader = req.headers.get("Authorization") ?? "";
+  const authed = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+    global: { headers: { Authorization: authHeader } },
+  });
+  const { data: userData } = await authed.auth.getUser();
+  const user = userData?.user;
+  if (!user) return json({ ok: false, message: "Nicht angemeldet." }, 401);
+
+  const admin = createClient(supabaseUrl, serviceKey);
+
+  // Kill-switch (app_config 'sentence_studio').
+  const { data: cfg } = await admin.from("app_config").select("value").eq("key", "sentence_studio").maybeSingle();
+  if (cfg?.value?.enabled === false) {
+    return json({ ok: false, message: "Das Satzlabor ist gerade deaktiviert." });
+  }
+
+  let body: { text?: string };
+  try {
+    body = await req.json();
+  } catch {
+    return json({ ok: false, message: "Ungültige Anfrage." }, 400);
+  }
+  const text = (body.text ?? "").trim();
+  if (text.length < 3) return json({ ok: false, message: "Text zu kurz." }, 400);
+  if (text.length > MAX_SENTENCE_LEN)
+    return json({ ok: false, message: `Satz zu lang (max. ${MAX_SENTENCE_LEN} Zeichen).` }, 400);
+
+  const month = monthKey();
+
+  // Global monthly $ fuse.
+  const { data: usage } = await admin.from("ai_usage").select("cost_estimate").eq("month", month).maybeSingle();
+  if (usage && Number(usage.cost_estimate) >= MONTHLY_CAP) {
+    return json({ ok: false, limitReached: true, message: "Das KI-Kontingent für diesen Monat ist aufgebraucht. Komm im nächsten Monat wieder!" });
+  }
+
+  // Per-user daily check limit.
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const { count: todayCount } = await admin
+    .from("sentence_checks").select("id", { count: "exact", head: true })
+    .eq("user_id", user.id).gte("created_at", startOfDay.toISOString());
+  if ((todayCount ?? 0) >= DAILY_CHECK_LIMIT) {
+    return json({ ok: false, limitReached: true, message: `Du hast heute schon ${DAILY_CHECK_LIMIT} Sätze geprüft. Komm morgen wieder!` });
+  }
+
+  // Per-user monthly ceiling (paid ops).
+  const startOfMonth = new Date();
+  startOfMonth.setUTCDate(1);
+  startOfMonth.setUTCHours(0, 0, 0, 0);
+  const { count: monthOps } = await admin
+    .from("sentence_ai_ops").select("id", { count: "exact", head: true })
+    .eq("user_id", user.id).gte("created_at", startOfMonth.toISOString());
+  if ((monthOps ?? 0) >= USER_MONTHLY_LIMIT) {
+    return json({ ok: false, limitReached: true, message: "Du hast dein KI-Kontingent für diesen Monat erreicht. Komm nächsten Monat wieder!" });
+  }
+
+  const inputHash = await hashText(text);
+
+  // Global cache: corrections are user-independent, so reuse any user's row.
+  const { data: cachedRow } = await admin
+    .from("sentence_checks").select("corrected, has_errors, grammar, model")
+    .eq("source_hash", inputHash).not("corrected", "is", null)
+    .order("created_at", { ascending: false }).limit(1).maybeSingle();
+  if (cachedRow?.corrected) {
+    // Record a per-user history row (free: no ai_usage bump, no paid-op ledger).
+    await admin.from("sentence_checks").insert({
+      user_id: user.id, source_text: text, source_hash: inputHash,
+      corrected: cachedRow.corrected, has_errors: cachedRow.has_errors,
+      grammar: cachedRow.grammar, model: cachedRow.model, cached: true, cost_estimate: 0,
+    });
+    const g = cachedRow.grammar ?? {};
+    return json({
+      ok: true, cached: true, corrected: cachedRow.corrected, hasErrors: cachedRow.has_errors,
+      sentences: [{ text: cachedRow.corrected, voice: g.voice ?? "aktiv", tense: g.tense ?? "praesens", mood: g.mood ?? "indikativ" }],
+    });
+  }
+
+  // LLM correction + detection.
+  console.log(`[check] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${CHECK_MODEL}`);
+  // Free Gemini first. On its failure (any error, incl. free-tier/quota 429,
+  // which returns null) fall to a paid model: Sonnet while Claude spend is under
+  // budget, else GPT-5 leads. Each paid model backstops the other.
+  let out = await callGemini(text);
+  if (!out) {
+    // Month-to-date Claude spend across ALL AI features (Satzlabor + writing coach).
+    const monthIso = startOfMonth.toISOString();
+    const [opsRows, writRows] = await Promise.all([
+      admin.from("sentence_ai_ops").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+      admin.from("writing_evaluations").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+    ]);
+    const claudeSpend = [...(opsRows.data ?? []), ...(writRows.data ?? [])]
+      .reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
+    out = claudeSpend < CLAUDE_BUDGET_USD
+      ? (await callAnthropic(text)) || (await callOpenAI(text))
+      : (await callOpenAI(text)) || (await callAnthropic(text));
+  }
+  if (!out) {
+    console.error("[check] all providers failed for input hash " + inputHash.slice(0, 12));
+    return json({ ok: false, message: "Die Prüfung ist momentan nicht verfügbar. Bitte versuche es später erneut." });
+  }
+
+  const focal = out.sentences[0] ?? { text: out.corrected, voice: "aktiv", tense: "praesens", mood: "indikativ" };
+  const { data: inserted } = await admin.from("sentence_checks").insert({
+    user_id: user.id, source_text: text, source_hash: inputHash,
+    corrected: out.corrected, has_errors: out.hasErrors,
+    grammar: { voice: focal.voice, tense: focal.tense, mood: focal.mood },
+    model: out.model, cached: false, cost_estimate: out.cost,
+  }).select("id").maybeSingle();
+
+  await admin.from("sentence_ai_ops").insert({ user_id: user.id, kind: "check", model: out.model, cost_estimate: out.cost });
+  await admin.rpc("bump_ai_usage", { p_month: month, p_cost: out.cost }).then(() => {}, async () => {
+    await admin.from("ai_usage").upsert(
+      { month, calls: 1, cost_estimate: out.cost, updated_at: new Date().toISOString() },
+      { onConflict: "month", ignoreDuplicates: false },
+    );
+  });
+
+  return json({
+    ok: true, cached: false, checkId: inserted?.id,
+    corrected: out.corrected, hasErrors: out.hasErrors, sentences: out.sentences,
+  });
+});

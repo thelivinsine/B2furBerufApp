@@ -1,18 +1,18 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 146). **Admin Control Center chunks 4-10 SHIPPED in one session**
-(the whole MVP plus Phase-2 content-intel + Steuerung wave 2), on branch
-`claude/landing-back-button-routing-jyhwot`, plus a landing back-button fix. Chunk 4 Review Cockpit
-(priority-scored queue + keyboard Prüfmodus, `scripts/review-score.mjs` + `build-review-queue.mjs` →
-`reviewQueue.json`). Chunk 5 Feedback-Inbox. Chunk 6 System health + Launch checklist. Chunk 7
-Steuerung core (`src/lib/appConfig.ts` remote config + panel; consumers H1/H2/H4/H5/H6/H8 wired;
-empty-config == today's behavior invariant pinned by tests). Chunk 8 report JSON sidecars + Übersicht
-staleness strip. Chunk 9 content intelligence (depth matrix + flag triage + exercise-coverage
-residual work-orders). Chunk 10 Steuerung wave 2 (H3 Impressum toggle behind a confirm dialog, H7
-streak pill, H10 landing copy overrides, H12 Demo-Modus preset). All seven chunks:
-typecheck/lint/test:unit(275)/build/check:bundle green; main chunk ~112-116 kB. Next = chunk 11
-(Turnstile + abuse meters), then 12 (compliance pack); Phase-3 (13-16) on demand. Product name:
-**Genauly** (`genauly.de`)._
+_Last updated: 2026-07-23 (session 153). **Admin Control Center chunks 4-10 SHIPPED** (the whole MVP
+remainder + Phase-2 content-intel + Steuerung wave 2), plus a landing Help back-button fix. Chunk 4
+Review Cockpit (priority-scored queue + keyboard Prüfmodus, `scripts/review-score.mjs` +
+`build-review-queue.mjs` → `reviewQueue.json`). Chunk 5 Feedback-Inbox. Chunk 6 System health + Launch
+checklist. Chunk 7 Steuerung core (`src/lib/appConfig.ts` remote config + panel; consumers
+H1/H2/H4/H5/H6/H8 wired; empty-config == today's behavior invariant pinned by `tests/appConfig.test.ts`).
+Chunk 8 report JSON sidecars + Übersicht staleness strip. Chunk 9 content intelligence (depth matrix +
+flag triage + exercise-coverage residual work-orders). Chunk 10 Steuerung wave 2 (H3 Impressum toggle
+behind a confirm dialog, H7 streak pill, H10 landing copy overrides, H12 Demo-Modus preset). All seven
+chunks green (typecheck/lint/test:unit/build/check:bundle); main chunk ~112-116 kB. Merged into `main`
+after main advanced through s147-152 (nav/header/Schreibtraining/admin-nav changes reconciled). Next =
+chunk 11 (Turnstile + abuse meters), then 12 (compliance pack); Phase-3 (13-16) on demand. Prior s152:
+admin-nav alignment to the app sidebar (#656/#660). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -45,16 +45,18 @@ session engine, Bibliothek views, the game layer, content conventions) is in `..
 **Content banks (as of 2026-07-21, session 142, verified against `pnpm lint:content` — re-verify
 before quoting):** vocab **1,623** (8 mis-filed noun+verb combos retired from the Wörter surface
 in s142, ids kept) · collocations **1,035** · Redemittel **149** ·
-grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **~3,105
+grammar **24 topics / 117 drills** · Lese-/Hörtexte **36** · Can-Do **52** · provenance **3,107
 rows** · themes **20** (five new `alltag` themes in s126: einkaufen/essen/mobilitaet/freizeit/
 digitales) · exam sets **15** · dialogues **30**. Taxonomy is **5 top-level domains** (the
 `beruf`/`arbeitswelt` work split was merged into one `beruf` in s121), all populated. **Branche is a scope
 since s102** (15 sectors, `sectors[]` multi-tag, untagged = universal) on Wörter + Kollokationen.
-Standing governance debt: ~98% of provenance rows are AI-drafted, not yet human-verified (see
-`strategy/DATA_GOVERNANCE.md`).
+Standing governance debt: **all** provenance rows are AI-drafted and `draft`, none human-verified
+(human verification was reset to zero on 2026-07-22 at founder request, to restart the review pass;
+see `strategy/DATA_GOVERNANCE.md`).
 
 ## Open founder action items
-Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
+Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. The s147 Satzlabor redeploy is
+done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMINI_API_KEY` set). Still open:
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
@@ -69,94 +71,75 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
-**Handoff after session 146 (2026-07-22). Admin Control Center chunks 4-10 + a landing back-button
-fix, branch `claude/landing-back-button-routing-jyhwot` (not yet PR'd to `main` at handoff time; nine
-commits).** The founder asked to "continue with the admin control center build plan next chunk and
-work until chunk 10", so all seven remaining MVP + early-Phase-2 chunks of
-`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` shipped in one sitting. Every chunk passed the full
-gate set (typecheck · lint 0-errors · test:unit · build · check:bundle · lint:content) and was
-committed separately.
+**Handoff after session 153 (2026-07-23). Admin Control Center chunks 4-10 + a landing Help
+back-button fix, branch `claude/landing-back-button-routing-jyhwot` (merged to `main`).** The founder
+asked to "continue with the admin control center build plan next chunk and work until chunk 10", so all
+seven remaining MVP + early-Phase-2 chunks of `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` shipped
+in one sitting, each its own commit passing the full gate set (typecheck · lint 0-errors · test:unit ·
+build · check:bundle · lint:content).
+- **Landing fix (first):** `HelpChrome` (`/hilfe` + `/hilfe/:slug`) had its Back button hardcoded to
+  `navigate("/hilfe")`, so on the hub itself (where the landing's Help link lands) Back looped to the
+  same page. Now uses the history-aware `handleBack` (navigate(-1), fallback `/welcome`) that
+  `LegalChrome` already uses; the article breadcrumb still links to the hub explicitly.
+- **Chunk 4 · Review Cockpit (`/admin/pruefen`):** `scripts/review-score.mjs` (pure A2 scoring
+  defect_signal > traffic_proxy > (1-confidence) > bank_criticality) + `pnpm build:review-queue` →
+  compact `reviewQueue.json`; `Pruefmodus.tsx` (filterable queue + keyboard review V/X/N/→/←, item
+  rendered as the learner sees it, machine-check panel, autosave to `provenance_reviews` with a
+  decision-time hash, 50-approvals rubber-stamp nudge). `tests/reviewScore.test.ts`.
+- **Chunk 5 · Feedback-Inbox:** `AdminFeedback.tsx` (triage status/priority/note/link via
+  `admin_feedback_update`, emailed indicator, optimistic writes).
+- **Chunk 6 · System + Launch:** `AdminSystem.tsx` (CI gate strip, Supabase/Edge pings, AI/Resend/guest
+  meters, idle-pause warning, dashboard deep links) + `AdminLaunch.tsx` (checklist in `launch_checklist`,
+  consent-version row) + `systemHealth.ts`.
+- **Chunk 7 · Steuerung core:** `src/lib/appConfig.ts` (typed remote config + defensive `mergeAppConfig`
+  + zustand store loaded once in `App.tsx`). **Empty/unreachable config == today's behavior byte-for-byte,
+  pinned by `tests/appConfig.test.ts`.** Consumers read `config.X ?? current-default`: H1 nav labels
+  (BottomTabBar/Sidebar), H2 middle-tab hide (routes stay mounted, Home/Einstellungen locked), H4 flags,
+  H5 feedback pill, H6 Beta chip, H8 dashboard start tab. `AdminSteuerung.tsx` panel with live preview.
+- **Chunk 8 · report sidecars:** `scripts/report-sidecar.mjs` into verify-facts/verify-cefr/review-queue/
+  exercise-coverage; `reportStaleness.ts` + Übersicht staleness strip.
+- **Chunk 9 · Inhalte:** `AdminInhalte.tsx` (F1 depth matrix, F2 flag triage → Prüfmodus, F3
+  exercise-coverage residual "Copy ids" work orders; coverage sidecar enriched with residual ids).
+- **Chunk 10 · Steuerung wave 2:** H3 Impressum (route always mounted + lazy, links gated behind a
+  confirm dialog), H7 streak pill, H10 landing copy overrides, H12 Demo-Modus preset.
+- **Merge note:** main had advanced through s147-152 while this branch was in flight; merged main in and
+  reconciled the overlapping locked surfaces (nav-items/BottomTabBar/Sidebar from the Schreibtraining
+  nav promotion #642, AppShell header, AdminShell/Overview from the #656/#660 admin-nav alignment,
+  router.tsx `/sources/werkbank` + `/impressum`). Regenerated the report sidecars against merged main.
+- **Next:** chunk 11 (Turnstile + abuse meters, founder does the Cloudflare/Supabase dashboard half),
+  then chunk 12 (compliance pack). No new founder DB step for chunks 4-10 (migration 0008 already live).
 
-- **Landing fix (first):** `HelpChrome` (public `/hilfe` + `/hilfe/:slug`) had its Back button
-  hardcoded to `navigate("/hilfe")`, so on the hub itself (where the landing's Help link lands) Back
-  looped to the same page. Now uses the history-aware `handleBack` (navigate(-1), fallback `/welcome`)
-  that `LegalChrome` already uses. The article breadcrumb still links to the hub explicitly.
-- **Chunk 4 · Review Cockpit (Prüfen):** `scripts/review-score.mjs` (pure A2 scoring: defect_signal >
-  traffic_proxy > (1-confidence) > bank_criticality, shared by the build script + `tests/reviewScore.test.ts`),
-  `scripts/build-review-queue.mjs` (`pnpm build:review-queue` → compact `src/features/admin/reviewQueue.json`,
-  ~155 kB, tuple rows + `{generatedAt, registerRows}` stamp), `reviewQueueData.ts` (typed parser),
-  `Pruefmodus.tsx` (filterable queue + keyboard review session V/X/N/→/←, item rendered as the learner
-  sees it via `contentIndex`, machine-check panel, source link, autosave to `provenance_reviews` with a
-  decision-time hash, 50-approvals rubber-stamp nudge). Deep links from the Übersicht trust-ladder card.
-- **Chunk 5 · Feedback-Inbox:** `AdminFeedback.tsx` (list + expandable detail, status/priority/note/link
-  triage via `admin_feedback_update`, emailed indicator, status filter, optimistic writes). Übersicht
-  topline gains a "n new" quick-link.
-- **Chunk 6 · System + Launch:** `systemHealth.ts` (fail-soft GitHub Actions gate runs + Supabase +
-  Edge-Function CORS-preflight probes), `AdminSystem.tsx` (gate strip, service pings, AI/Resend/guest
-  meters, 7-day-idle-pause warning, dashboard deep links), `AdminLaunch.tsx` (Impressum-blocker checklist
-  persisted to `launch_checklist`, consent-version lockstep row).
-- **Chunk 7 · Steuerung core:** `src/lib/appConfig.ts` (typed schema + compiled `DEFAULT_APP_CONFIG` =
-  today's behavior + defensive `mergeAppConfig` + zustand store loaded once in `App.tsx`, fail-soft).
-  **THE invariant — empty/unreachable config == unchanged app — is pinned by `tests/appConfig.test.ts`.**
-  Consumers: H1 nav labels (BottomTabBar + Sidebar), H2 middle-tab hide (nav only, routes stay mounted,
-  Home/Einstellungen locked), H4 feature flags (SHOW_PRACTICE_TABS/SHOW_RELATED → `features.*`), H5
-  feedback widget, H6 Beta chip, H8 dashboard start tab. `AdminSteuerung.tsx` panel with live preview +
-  save-only-real-overrides.
-- **Chunk 8 · report sidecars:** `scripts/report-sidecar.mjs` wired into verify-facts/verify-cefr/
-  review-queue/report-exercise-coverage (all emit `{generatedAt, registerRows, …}` JSON), `reportStaleness.ts`
-  + Übersicht "Berichte-Aktualität" strip (import.meta.glob, absence-tolerant).
-- **Chunk 9 · Inhalte:** `AdminInhalte.tsx` — F1 depth matrix (20 themes × 7 banks vs reference floor),
-  F2 machine-flag triage (→ Prüfmodus deep links), F3 exercise-coverage residuals with a "Copy ids" work
-  order (the coverage sidecar now carries per-theme residual ids).
-- **Chunk 10 · Steuerung wave 2:** H3 Impressum (route always mounted + lazy; links gated on
-  `impressumEnabled` behind a confirm dialog), H7 streak pill, H10 landing copy overrides (bilingual),
-  H12 Demo-Modus preset.
-- **Next:** open a PR into `main` and squash-merge (auto-ship). Then chunk 11 (Turnstile + abuse meters,
-  founder does the Cloudflare/Supabase dashboard half) and chunk 12 (compliance pack). The remaining
-  admin backend is already live (migration 0008 deployed s144), so no new founder DB step is needed for
-  chunks 4-10; `app_config`/`launch_checklist`/`provenance_reviews` decisions all use the existing tables.
+**Handoff after session 152 (2026-07-23). Admin control-center nav aligned to the app sidebar, branch
+`claude/admin-page-access-ok8g52`, PRs #656 + #660 merged.** Founder asked how admins reach `/admin`
+(answer: the "Kontrollzentrum" entry in the account-menu dropdown, gated on `FOUNDER_EMAILS` in
+`src/lib/admin.ts`; also `/sources/werkbank`), then flagged the `/admin` sidebar as cramped and
+not matching the app's desktop `Sidebar`.
+- **All changes in `src/features/admin/AdminShell.tsx`, spacing/appearance only (no behaviour):**
+  - **PR #656:** sidebar column 224px→**256px** (= app `w-64`), panel padding `p-3`→`p-4`, nav marks
+    `h-4 w-4`→**18px**, rows `px-2.5`/`gap-2.5`→**`px-3`/`gap-3`**.
+  - **PR #660:** active row now the app's **grey `bg-border` pill + bold `text-foreground`** (was a
+    blue `bg-primary/10 text-primary` tint), inactive rows **`text-foreground/80`** (was faint
+    `text-muted-foreground`); header block rebuilt to the app pattern — **wordmark `Logo` `h-7 w-auto`
+    with a `text-xs` subtitle below + `mb-4`** (was a small square mark beside stacked "genauly /
+    CONTROL CENTER" text).
+- **Deliberate remaining difference:** admin nav keeps monochrome lucide icons (the app's colorful
+  branded `RouteIcon` marks don't map to admin sections); flagged to founder, not changed.
+- **Gates:** `pnpm build` ✓ both times. Sandbox can't reach the live site; `/admin` is PWA-cached, so
+  a hard refresh is needed after the Pages deploy. The Übersicht "Is my change live?" widget showed
+  "Latest main not reachable" (GitHub API offline/rate-limited in that render) — cosmetic, unrelated.
 
-**Handoff after session 145 (2026-07-22). Admin Control Center chunk 3 (`/admin` shell + Übersicht
-cockpit), branch `claude/admin-control-center-chunk-3-7g5829`.** Chunk 3 of
-`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` on the recommended Opus tier: the founder's front
-door to the admin center, cross-cutting wiring against an already-approved design (mockup 1 in
-`preview/admin-control-center-mockups.html`). What shipped:
-- **Route + gate:** `RequireFounder` in `router.tsx` (mirrors `RequireOnboarding`; renders nothing
-  while auth `status === "loading"` to avoid a redirect flash, else `isFounder(user)` or `<Navigate
-  to="/">`). New standalone top-level route `/admin/*` (outside AppShell chrome, like `/sources`),
-  lazy `AdminApp` (one chunk owns the whole `/admin` subtree via descendant `<Routes>`). Client gate
-  is cosmetic; the real boundary stays the 0008 RLS/RPC.
-- **`src/features/admin/` (all new, lazy):** `AdminApp.tsx` (lang provider + descendant routes),
-  `AdminShell.tsx` (full-screen sidebar cockpit: 8-item DE/EN nav, founder chip, DE/EN toggle,
-  "back to app"; fetches `admin_overview` ONCE and shares it via Outlet context so screens don't
-  re-fetch; Feedback nav badge = `feedback.neu`), `AdminOverview.tsx` (the Übersicht), `adminI18n.tsx`
-  (a `t(de, en)` context + localStorage-persisted lang, no i18n framework), `adminFunnel.ts` (pure,
-  unit-tested), `liveWidget.ts` (C1), `AdminPlaceholder.tsx` (the not-yet-built screens
-  Prüfen/Feedback/Inhalte/Nutzer/System/Steuerung/Launch resolve to it so deep links never 404;
-  chunks 4-7 swap them in).
-- **Übersicht tiles (mockup 1):** **A1** verification-funnel — "Menschlich geprüft" (verified count,
-  25 today), "KI-Jury-Abdeckung" % (tier ≥ jury, the machine floor that costs nothing), and the
-  all-banks trust-ladder stacked bar, all computed synchronously from bundled `provenance.ts` +
-  `verification.ts` (zero backend). **A4** sync-gap — "Wartende Entscheidungen" count + a
-  "Übergabe-Prompt kopieren" button producing the ready-to-paste `pnpm apply:reviews` handoff with
-  the exact ids; pending = approved (`provenance_reviews.decision === "approve"`) minus already
-  `verified` in the bundle (keyless-safe, matches how apply:reviews reconciles). **D1** AI-budget
-  tile (`admin_overview` cost vs $5 + cache-hit rate). **C1** "Ist meine Änderung live?" — build
-  stamp (new Vite `define` `__BUILD_SHA__`/`__BUILD_TIME__`, read only in the admin chunk) vs latest
-  `main` from the public GitHub commits API, plain-language verdicts + the recurring PWA-cache hint +
-  a Supabase-reachable line. Honest metrics: no fabricated deltas; "+N diese Woche" shows only when
-  real (from `verified_date`).
-- **AccountMenu:** founder accounts get a "Kontrollzentrum" (`ShieldCheck`) entry to `/admin`.
-- **Gates:** `typecheck` ✓ · `lint` (0 errors; warnings are the pre-existing compiler-era debt) ·
-  `test:unit` **253/253** (new `tests/adminFunnel.test.ts` pins the funnel + sync-gap + handoff) ·
-  `build` ✓ · `check:bundle` **111.6 kB** (main chunk unchanged; admin rides an 18 kB lazy chunk).
-- **Next:** chunk 4, the Review Cockpit / Prüfmodus (Opus), needs the `build-review-queue.mjs`
-  scorer; deep-links from the Übersicht tiles land there.
-
-_(Session 144's Admin Control Center chunks 1+2 handoff (backend foundation migration 0008 + the
-`apply:reviews` loop-closer, PRs #631-#633), session 143's Admin Control Center scoping handoff (the
-expert-panel report + build plan + 4 mockup screens, PR #626), session 142's Wörter quality-control
-handoff (the
+_(Session 151's Fokus "Satzlabor" grammar-bug fix + the Gemini→Sonnet→GPT-5 AI provider cascade
+handoff, session 150's Fokus correction-card redesign + Umlaut-keys handoff (PRs #653/#654), session 149's
+Schreiben-as-Bibliothek-extension handoff, session 148's PWA-auth-uninstall bug-fix handoff (fresh-device
+OAuth `syncHydrated` gate, PR #644),
+session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first
+Bibliothek harmonization, PRs #640/#642/#643/#646), session 146's /sources verification-refresh +
+human-review-reset + table-restructure handoff, and
+session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,
+`RequireFounder` gate, PR merged) are now in
+`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 144's Admin Control Center chunks 1 + 2 handoff (backend foundation migration 0008 + the
+`apply:reviews` keyless review loop-closer, PRs #631–#633), session 143's Admin Control Center scoping
+handoff (the expert-panel report + build plan + 4 mockup screens, PR #626), session 142's Wörter quality-control handoff (the
 `RETIRED_VOCAB_IDS`/`browsableVocabulary` retire-from-surface set + the vocab↔collocation overlap
 lint gate, PR #624), session 141's
 mobile-nav-item-labels handoff (labels under the active icon + the

@@ -3,101 +3,174 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
-**Handoff after session 144 (2026-07-22). Admin Control Center chunks 1 + 2 (backend foundation +
-the review loop-closer), branch `claude/admin-control-center-chunk-1-eafquu` (three PRs to `main`:
-#631 chunk 1, #632 setup-doc fixes, #633 chunk 2).** The first two build chunks of
-`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, both on the recommended Fable tier (they are the
-security + integrity core). Migration 0008 was deployed live by the founder and verified in-session.
+**Handoff after session 151 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
+rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
+wrong, self-contradictory German feedback.
+- **Bug.** For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv copula, sein + adjective) the
+  panel marked **Passiv** as the detected form, then refused Perfekt/Präteritum with "Der Satz steht
+  schon in dieser Form" (Präsens treated as already past) and refused a passive it simultaneously
+  claimed the sentence already was. Root cause: the cheap Haiku detector misread "sein + Adjektiv" as
+  a Zustandspassiv, which `normalizeDetected` then collapsed onto the Vorgangspassiv pill.
+- **Fix (server prompts).** `check-sentence`: explicit rule that sein/werden/bleiben + adjective/adverb
+  is always Aktiv, only + Partizip II of a transitive verb is passive; worked examples; strict
+  JSON-only. `transform-sentence`: `bereits_zielform` only when BOTH voice AND tense already match (a
+  tense change is a real transform); same copula rule. `evaluate-writing`: JSON-only hardening.
+- **Fix (client).** `grammarDimensions.ts` `normalizeDetected` no longer maps a detected
+  `passiv_zustand` onto the Passiv pill; it returns null (no marker), so a misdetected copula can never
+  surface a wrong Passiv dot. `tests/fokusGrammar.test.ts` updated to lock this in.
+- **Provider cascade (all 3 AI functions).** Founder wanted Gemini primary everywhere + a combined
+  budget. `check-sentence`/`transform-sentence`/`evaluate-writing` each now run **Gemini 2.5 Flash
+  (free, recorded $0) → Claude Sonnet 5 → GPT-5**: Sonnet leads the paid backup until month-to-date
+  Claude spend across **both** `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD`
+  ($2), then GPT-5 leads. The existing global `MONTHLY_SPEND_CAP_USD` ($5, shared via `ai_usage`)
+  bounds all three combined. Anthropic calls drop `temperature` + disable thinking (Sonnet 5 family);
+  Gemini forces JSON output + a generous token budget; GPT-5 uses `max_completion_tokens` +
+  `reasoning_effort: minimal`. Every model id + the $2 threshold are env-overridable (`GEMINI_MODEL`,
+  `CHECK_MODEL`/`TRANSFORM_MODEL`/`EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`). Caches
+  invalidated so stale wrong answers are not re-served (check-sentence `CHECK_VERSION` salt,
+  transform-sentence `PROMPT_VERSION` bump).
+- **Transparency.** The two EU AI Act Art. 50 disclaimers (Satzlabor + writing coach) and the privacy
+  policy (DE + EN) now name all three providers routing-neutrally. Judged non-material (processors +
+  purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
+- **Fokus disclaimer consolidation (follow-up, same session).** The Fokus view's two AI notes (the
+  send-to-AI line + the "KI-generierte Umformung" footer inside the transform box) were merged into
+  ONE harmonized, centered note ("Dein Satz wird von einer KI … geprüft und umgeformt") in normal
+  flow under the content. (A first pass pinned it to the bottom via `min-h` + `mt-auto` to line up
+  with the "Mit KI gebaut · Feedback" pill; the founder found that detached band ugly, so it was
+  reverted to a plain centered note.)
+- **Mobile Grammatik button fix (follow-up).** On mobile the Grammatik toggle was `disabled` until a
+  correction existed, so tapping it pre-correction did nothing and it read as broken. Removed the
+  `disabled`: it now always opens the panel, which shows the GrammarRail's "Prüf zuerst deinen Satz …"
+  hint (disabled pills) before a correction, matching the always-visible desktop rail. The session's
+  disclaimer changes were already shared (`aiNote`/`bottomBox` render in both the mobile and desktop
+  blocks), so no separate mobile adaptation was needed. **Founder confirmed the mobile fix works live.**
+- **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
+- **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
+  `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →
+  `{ ok: false }`). Watch the function logs on the first Gemini-primary calls.
+- **Caveat carried forward:** Gemini Flash primary is the same cheap tier that caused the original bug;
+  the hardened prompt carries it and Sonnet backstops, but if wrong grammar reappears, flip the primary
+  back via `GEMINI_MODEL` (one env var, no code change).
 
-### Chunk 1 · backend foundation (this chunk IS the security boundary)
-What shipped:
-- **Migration `supabase/migrations/0008_admin_center.sql`** (idempotent, founder pastes it into
-  the Supabase SQL editor; steps appended to `docs/plans/PHASE2_SETUP.md`):
-  (1) `provenance_reviews` widened from the boolean checkbox to real decisions:
-  `decision approve|reject|needs_fix`, `content_hash` (the decision-time safety hash chunk 2's
-  `apply:reviews` compares before flipping repo rows), `reviewer_email`, `applied_at`,
-  `applied_sha`; `verified=true` rows backfilled to `decision='approve'` (legacy rows keep a null
-  hash, which apply:reviews must treat as "needs re-review", never a free pass), reviewer emails
-  backfilled from `reviewed_by`. The `verified` boolean stays until the chunk-2 workbench update.
-  (2) `feedback` triage columns: `status neu|erledigt|verworfen`, `priority hoch|normal|niedrig`,
-  `note`, `link` (table stays service-role-only; founder access via RPC only).
-  (3) **`app_config`** (Steuerung store): key/value jsonb rows, world-READABLE RLS (the app will
-  consume it at startup in chunk 7), founder-only writes. (4) **`launch_checklist`**: founder-only
-  RLS, state synced across devices (items seeded by the chunk-6 UI).
-  (5) **`is_founder()`** (the SINGLE email source for every 0008 policy/RPC) + **`assert_founder()`**
-  + SECURITY DEFINER RPCs gated in-body per the 0004/0007 pattern: `admin_overview()` (one jsonb:
-  accounts split guests/email/Google + new7d, active today/7d, sessions/XP/SRS-card totals, AI
-  month spend vs cap inputs, feedback counts, review sync-gap counts), `admin_daily_series()`
-  (30-day `{day, signups, actives}`), `admin_feedback_recent(n)`, `admin_feedback_update(...)`
-  (validates enums; empty string clears note/link). All revoked from `public`/`anon`, granted to
-  `authenticated` (guests ride the authenticated role, so the in-body email check is the real
-  boundary). **Privacy line held: aggregates only, no RPC returns learner rows; no admin SELECT
-  policies were added to `profiles`/`progress`/`writing_evaluations`** (the `feedback` table is the
-  sanctioned per-row exception: operational mail addressed to the founder).
-- **`src/lib/adminApi.ts`**: typed fail-soft wrappers (null/empty/false on error, offline-first)
-  for the four RPCs + raw `app_config` and `launch_checklist` helpers. Not imported by any eager
-  code yet (main chunk unchanged); consumers arrive with the `/admin` shell in chunk 3.
-- **`tests/admin.test.ts` extended (lockstep pin):** migration 0007 + 0008 email sets must equal
-  `FOUNDER_EMAILS` exactly, both emails must sit inside `is_founder()`, and every 0008 admin RPC
-  must contain `perform public.assert_founder();` and a `revoke ... from public, anon`.
-- **Docs:** founder deploy/verify steps in `PHASE2_SETUP.md` (run 0008; existing Werkbank ticks
-  carry over as approve decisions, nothing re-clicked); CLAUDE.md admin-gate note now covers 0008.
-- **Gates:** `typecheck` · `lint` (0 errors) · `test:unit` 222/222 · `build` · `check:bundle`
-  (110.6/400 kB) · `lint:content` all green. Nothing visible in the app changes yet.
-- **Deployed + verified live (same session):** the founder ran migration 0008 in the Supabase SQL
-  editor (via the dashboard paste path; `PHASE2_SETUP.md` §1 now marks the CLI optional), confirmed
-  the gate rejects an identity-less call ("forbidden: founder account required" is the HEALTHY
-  result in the SQL editor), and got a real `admin_overview()` JSON via the
-  `set_config('request.jwt.claims', ...)` trick: 6 accounts (4 Google / 2 guests), 8,053 XP,
-  532 SRS cards, 60 sessions, 1 feedback (neu), reviews `decided: 1, approvedUnapplied: 1` (a
-  legacy boolean-era tick, no decision hash, so chunk 2 routes it to re-review, never a blind flip).
+**Handoff after session 150 (2026-07-23). Fokus correction-card redesign + Umlaut keys, branch
+`claude/diagonal-gradient-invert-odi99r`, PRs #653 + #654 merged.** Founder started from "invert the
+background gradient diagonally" (PR #653: `tailwind.config.ts` `mesh`/`page` accent radial moved
+top-right → bottom-left, linear angle 150°→120°), then pivoted to redesigning the Fokus corrected-state
+card as "too noisy and redundant" and iterated across ~8 preview rounds before approving a combined
+design and asking to implement + ship.
+- **Design-review artifact.** A single consolidated gallery (`preview/schreiben-design-review.html`,
+  published as a claude.ai artifact) with a version switcher (Final + Alle + every prior variant), an
+  app light/dark toggle, and live interactions. All step previews are committed under `preview/`
+  (`fokus-correction-redesign`, `-ac`, `-v4-himmel`, `-toggle`, `fokus-umlaut-keys`, `schreiben-design-review`).
+- **Correction card (`FokusTrainer.tsx`).** Removed the struck-through original, the "· n Änderungen"
+  counter, the in-place `<mark>` highlight, and the "Was ich geändert habe" list. New: eyebrow "Dein
+  Satz" shares its row with an **Original/Korrigiert segmented toggle** (default Korrigiert; resets to
+  Korrigiert on each new correction via a `view` state + effect on `m.corrected`). Original view marks
+  the wrong words with `.fx-mark-coral` (`--reward`), Korrigiert marks the fixes with `.fx-mark-green`
+  (`--success`) — both are calm underlines (`index.css` `@layer utilities`). Below: **Himmelblau fix
+  tiles** (`bg-accent/30 border-accent/70` light, `dark:bg-accent/[0.18] dark:border-accent/[0.45]`),
+  each = category eyebrow (`text-accent-ink`) + `old → new`. **Neuer Satz** is an outline button on the
+  tiles row, `ml-auto self-end` (right + bottom aligned, wraps only if needed); removed from the mobile
+  toolbar and the desktop `GrammarRail` (`onNewSentence` no longer passed) so it appears once.
+- **Umlaut keys (`src/features/writing/UmlautKeys.tsx`).** Reusable bar, keys ä ö ü ß Ä Ö Ü at ~24px
+  (h-6, min-w 1.6rem), neutral `bg-surface` at rest, Himmelblau on press; inserts at the caret
+  (`onMouseDown` preventDefault keeps focus, `requestAnimationFrame` restores selection). Wired into the
+  Fokus input footer (shares the desktop row with Korrigieren; mobile keeps the sticky Korrigieren bar)
+  and the Kurz/Lang guided editor (`GuidedWritingTrainer.tsx`, in the word-count row).
+- **Diff engine (`wordDiff.ts`).** `diffWords` now also returns `originalTokens` (flagged, so the
+  Original view marks errors reliably) and a per-change `category` from the new exported
+  `classifyChange` (umlaut fold + case/punct normalization + multi-word = Grammatik heuristic).
+  Categories are heuristic — tune if a pattern mis-buckets. `tests/wordDiff.test.ts` extended.
+- **Ops note.** The remote git proxy needs a credential helper (`username=local_proxy`, empty password)
+  for `git push`/`fetch`; without it, pushes fall back to unauthenticated api.anthropic.com and fail.
+  Set `git config credential.helper '!f() { echo username=local_proxy; echo password=; }; f'`.
+- **Gates:** `pnpm build` ✓ · `pnpm lint` **0 errors** (pre-existing warnings only) · `pnpm test:unit`
+  **262/262** · `check:bundle` unaffected (writing stays lazy). Sandbox can't reach the live site;
+  founder confirms after the Pages deploy.
+- **Open:** the s147 founder redeploy action below still stands; error categories are heuristic and can
+  be refined once seen live.
 
-### Chunk 2 · the loop-closer `pnpm apply:reviews` + decision-time hashes
-The review pipeline "founder clicks on the phone → next Claude session commits it" now works end
-to end:
-- **Shared fingerprint:** new `src/lib/contentHash.ts` (browser SubtleCrypto sha256 over canonical
-  JSON, byte-compatible with `scripts/content-hash.mjs`) + `src/lib/contentIndex.ts` (the same
-  content-id universe as the stamp script; dynamic-import only, a ~4 kB glue chunk over the shared
-  bank chunks, main chunk untouched at 110.7 kB). Parity pinned by `tests/contentHash.test.ts`
-  (canonicalization, hashes, id universe; jsdom gets node webcrypto).
-- **Decision-time capture:** the /sources Daten-Werkbank tick now saves `decision: "approve"` + a
-  `content_hash` of the item as reviewed + `reviewer_email` (untick clears the decision; note-only
-  edits leave it untouched); CSV export gained the decision column.
-- **`scripts/apply-reviews.mjs`** (`pnpm apply:reviews`): decision source → `ID_RENAMES` → hash
-  compare → codemod `provenance.ts` (`draft`→`verified` + `verified_by`/`verified_date`,
-  format-exact) → `stamp:verified` + `lint:content` in the SAME commit → defects/re-review export
-  to `docs/reports/review-defects.md` + `.json`. `--dry-run` writes nothing. Integrity rules pinned
-  by `tests/applyReviews.test.ts`: null/mismatched decision hash = re-review (never a flip),
-  already-verified rows only ever mark applied.
-- **Verified end to end in-session:** real flip of `v_besprechung` through the codemod →
-  `stamp:verified` (25→26) → `lint:content` green → reverted.
+**Handoff after session 149 (2026-07-23). Schreiben restyled as a Bibliothek extension, branch
+`claude/schreiben-design-refinement-bw8rhh`.** Founder: "make the schreiben section look like it's an
+extension of bibliothek". Two preview rounds (`preview/schreiben-bibliothek-extension.html` = variants
+A/B, `-r2.html` = variant A + the founder's 7 changes), then implemented on founder go-ahead.
+- **Chrome:** `WritingModeSwitcher` is now the full-width LibrarySwitcher-geometry page header with
+  FOUR segments (Fokus · Kurz · Lang · Verlauf); the eyebrow/H1 and the separate Verlauf toggle are
+  gone (`WritingHub` routes `?mode=verlauf`). Header sits at content-column width over the
+  `[minmax(0,1fr)_16rem]` grid (was 18rem).
+- **Guided (Kurz/Lang):** Aufgabe card has no icon tile; eyebrow "Aufgabe: <Thema>", one "Ziel n–m
+  Wörter" line, a dice button that re-rolls a random task. **`writingPrompts.ts` restructured into
+  pools** (`short`/`long` are `string[]`, 5 each × 20 themes = 200 prompts; wave 1 of the founder's
+  15-20 target; the pool rides the theme's single `wp_<themeId>` provenance row, mission-style).
+  Theme pick draws a random prompt; drafts carry `promptIndex` so OAuth resume restores the exact
+  task. `WritingRail` = the "Aufgabe wählen" FilterRail tile (brand header + Target icon, Domain-
+  grouped white pills, selected solid primary; the founder asked for "the same categorization as
+  Bibliothek": prompts are keyed per THEME, so the rail mirrors the Thema dropdown's domain grouping;
+  Branche/Unterthema don't exist on prompts). Mobile: toolbar button + collapsible panel (chips
+  removed) + sticky bottom Auswerten bar; desktop actions stay in the editor card.
+- **Fokus:** `GrammarRail` restyled to the same tile; detected = white pill + green `bg-success`
+  dot, target = solid primary, pre-correction everything idle; no count/reset, footer = "Neuer
+  Satz" only. Mobile pairs the Grammatik panel button with Neuer Satz in one row. `WritingHistory`
+  shows only the learner's text now (the exact prompt behind an old entry is not recoverable);
+  `RelatedPanel` links `/writing?mode=kurz&theme=…` with `wp.short[0]`.
+- **Round 3 (same session, 13 founder fixes):** the Thema selection is a Bibliothek-style
+  **dropdown** (grouped listbox popover, internal scroll), NOT pills; **gesundheit folds into
+  Alltag** in its grouping (founder rule); the "Aufgabe wählen" tile is a light **Himmelblau**
+  `bg-accent/20` wash with a header reset icon; the header switcher is capped `lg:max-w-xl` +
+  centered (measured pixel-identical to Bibliothek's 816×44 before, but four short labels at full
+  width read oversized); the Ziel range shows only on the Aufgabe card; the AI disclaimer is a
+  standalone line below the editor/sentence card; the Aufgabe eyebrow is brand-colored; the Fokus
+  transform box is a white card with a bold "Hinweis:" label (no i icon) and a centered
+  "KI-generierte Umformung" footer; the Grammatik rail got a reset icon and a two-line hint. The
+  mobile Aufgabe panel animates via fade/slide because a height collapse would clip the dropdown.
+- **Harmonization round (same session, founder-approved P0+P1 list):** the Aufgabe-wählen rail
+  now carries the FULL Bibliothek scope hierarchy **Branche → Thema → Unterthema** as grouped
+  dropdowns (live counts, zero-yield greyed). `writingPrompts.ts` moved to task objects
+  `{ text, sub?, sectors? }`: all tasks tagged, ~86 new sub-theme tasks authored (every sub-theme
+  ≥2 short + ≥2 long) plus a 5-Branche starter wave (it/care/construction/transport/hospitality,
+  6 each, untagged = universal so a Branche never empties a pool). Bank: **316 tasks**. P1: Fokus
+  Grammatik rail Himmelblau like the Aufgabe rail (+ dark-mode alphas for both), Verlauf constrained
+  to the content grid + empty-state CTA, unified eyebrow rule (card titles bold primary), 40px
+  spinning dice, duplicate Fokus hint removed, Fokus mobile sticky Korrigieren bar.
+- **P2 round (same session, founder go + reset-bug report):** the Aufgabe-wählen **reset is now
+  always active** and does a full reset (clears every scope AND draws a fresh random task; it used
+  to be disabled at the default state, which read as broken). Micro-motion pass: directional tab
+  slide (LibraryHub popLayout pattern), 0.12s popover fade, shared 0.18s panel timing. Content:
+  every theme now ≥8 short + ≥8 long, and **Branche wave 2 covers all 15 sectors** (4 tasks each
+  for the 10 new ones). Bank: **373 tasks**. Remaining content waves: pools toward the founder's
+  15-20 per theme/length (append-only authoring).
+- **Gates:** typecheck ✓ · lint 0 errors · lint:content ✓ (pool schema validated) · test:unit
+  **260/260** · build ✓ · check:bundle **112.3 kB** (writingPrompts stays a lazy chunk) · Playwright
+  screenshots of desktop + mobile, both modes (incl. the open dropdown), verified against the
+  approved mockups.
+- **Open:** grow the pools toward 15-20 prompts per theme/length in content waves (append to the
+  arrays in `writingPrompts.ts`, no schema work needed); the s147 founder redeploy action below still
+  stands.
 
-### Chunk 2 addendum · keyless review handoff (founder security review, same session)
-The founder correctly flagged that the Claude environment's **environment-variables box is plaintext
-and explicitly warns against secrets**, so storing `SUPABASE_SERVICE_ROLE_KEY` there (my first
-instruction) was wrong. Replaced the key path with a keyless file handoff, no secret ever touches
-the environment:
-- **Browser export:** `src/lib/reviewExport.ts` (`buildDecisionExport`/`downloadDecisions`) + an
-  **"Entscheidungen (N)"** button in the AdminWorkbench toolbar. The founder is already securely
-  signed in on /sources (RLS grants read), so the browser downloads a `genauly-review-decisions-*.json`
-  file (decisions + decision-time fingerprints, NO credential). CSV export unchanged.
-- **Keyless script mode:** `pnpm apply:reviews --from <file>` (`parseDecisionFile`) reads that file
-  instead of Supabase, does the identical hash-compare + codemod + stamp + lint, and writes NO
-  database (applied state reconciles from the deployed bundle: the item is `verified` in
-  provenance.ts). The direct-DB path stays for a secure local shell with the key, but is no longer
-  the founder's path. Round-trip (browser export → script parse) pinned by `tests/reviewExport.test.ts`.
-- **Verified end to end:** built a realistic 2-decision fixture (one hash-matching `v_besprechung`,
-  one stale `v_tagesordnung`) → `--from` dry-run classified correctly (1 ready, 1 re-review) →
-  real `--from` run flipped `v_besprechung`, stamped, linted green, exported the stale one to the
-  re-review report → reverted.
-- **Founder action: NONE.** No key to set up; the workbench button + file handoff is the whole flow.
-  `PHASE2_SETUP.md` rewritten accordingly (and now says NOT to put the service-role key in the
-  environment variables).
-- **Gates:** `typecheck` · `lint` (0 errors; the one new hook-deps warning was fixed properly) ·
-  `test:unit` 237/237 · `build` · `check:bundle` (110.7/400 kB) · `lint:content` all green.
-- **Next:** chunk 3, the `/admin` shell + Übersicht cockpit (Opus recommended); chunks 1-2 outputs
-  (sync-gap counter + handoff prompt) are its data feed.
-
+**Handoff after session 148 (2026-07-22). Auth bug fix: fresh-device OAuth login threw existing
+accounts out to the landing page. Branch `claude/pwa-auth-uninstall-bug-hrafrw`, PR #644 merged.**
+The founder reported: after uninstalling the PWA and logging into an admin account with Google, the
+app redirects to the landing page right after login and throws them out.
+- **Root cause.** Uninstalling the PWA wipes `localStorage`, so on the fresh install the local
+  `onboarded` flag defaults to `false`. Google OAuth (`signInWithGoogle`) returns to `/`, where the
+  `RequireOnboarding` guard (`router.tsx`) read the **local** `onboarded` flag *synchronously* and
+  immediately `<Navigate to="/welcome">` — before `startCloudSync` (async) pulled the account's real
+  `onboarded: true` from its Supabase profile. Any existing account on a fresh device got bounced.
+  Not admin-specific; admins just hit it because they test on multiple devices. `RequireFounder` was
+  never in the redirect path (OAuth returns to `/`, not `/admin`) and reads `user.email` which is
+  available immediately, so it needed no change.
+- **Fix (3 files, +37 lines).** New `syncHydrated: boolean` on `useAuthStore` (default false).
+  `cloudSync.ts` sets it `false` at the start of each `startCloudSync` and in `stopCloudSync`
+  (sign-out), and `true` in a `finally` **after** the first pull's profile merge (so the cloud
+  `onboarded` is already applied when it flips; also covers the offline-catch path).
+  `RequireOnboarding` now: (1) lets already-onboarded devices straight in; (2) renders `null` while
+  `status === "loading"` (OAuth handshake in flight); (3) for a signed-in / guest user, renders
+  `null` until `syncHydrated`; (4) only a genuinely signed-out visitor (or one whose pull finished
+  still-not-onboarded) goes to `/welcome`. Circular import (`cloudSync` ↔ `useAuthStore`) is safe:
+  both only touch each other inside function bodies, never at module eval.
+- **Gates:** `typecheck` ✓ · `lint` (0 errors; pre-existing warnings only) · `test:unit` **257/257** ·
+  `build` ✓ · `check:bundle` **112.3 kB** (main chunk unchanged). Sandbox can't reach the live
+  `*.github.io` site, so the founder confirms the reinstall-and-login result after the Pages deploy.
 
 **Handoff after session 143 (2026-07-21). Admin Control Center scoping, branch
 `claude/genauly-admin-control-center-7ohvnb`, shipped to `main` (PR #626, docs + preview only).**
@@ -385,3 +458,217 @@ only." What shipped:
   Verified rendered output via `pnpm preview` + headless Chromium (landing light/dark/mobile,
   /hilfe dark) and the regenerated brand-kit contact sheet. PWA caveat: hard-refresh the live site;
   the home-screen icon may need re-adding to show the new size.
+
+
+---
+
+**Handoff after session 144 (2026-07-22). Admin Control Center chunks 1 + 2 (backend foundation +
+the review loop-closer), branch `claude/admin-control-center-chunk-1-eafquu` (three PRs to `main`:
+#631 chunk 1, #632 setup-doc fixes, #633 chunk 2).** The first two build chunks of
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md`, both on the recommended Fable tier (they are the
+security + integrity core). Migration 0008 was deployed live by the founder and verified in-session.
+
+### Chunk 1 · backend foundation (this chunk IS the security boundary)
+What shipped:
+- **Migration `supabase/migrations/0008_admin_center.sql`** (idempotent, founder pastes it into
+  the Supabase SQL editor; steps appended to `docs/plans/PHASE2_SETUP.md`):
+  (1) `provenance_reviews` widened from the boolean checkbox to real decisions:
+  `decision approve|reject|needs_fix`, `content_hash` (the decision-time safety hash chunk 2's
+  `apply:reviews` compares before flipping repo rows), `reviewer_email`, `applied_at`,
+  `applied_sha`; `verified=true` rows backfilled to `decision='approve'` (legacy rows keep a null
+  hash, which apply:reviews must treat as "needs re-review", never a free pass), reviewer emails
+  backfilled from `reviewed_by`. The `verified` boolean stays until the chunk-2 workbench update.
+  (2) `feedback` triage columns: `status neu|erledigt|verworfen`, `priority hoch|normal|niedrig`,
+  `note`, `link` (table stays service-role-only; founder access via RPC only).
+  (3) **`app_config`** (Steuerung store): key/value jsonb rows, world-READABLE RLS (the app will
+  consume it at startup in chunk 7), founder-only writes. (4) **`launch_checklist`**: founder-only
+  RLS, state synced across devices (items seeded by the chunk-6 UI).
+  (5) **`is_founder()`** (the SINGLE email source for every 0008 policy/RPC) + **`assert_founder()`**
+  + SECURITY DEFINER RPCs gated in-body per the 0004/0007 pattern: `admin_overview()` (one jsonb:
+  accounts split guests/email/Google + new7d, active today/7d, sessions/XP/SRS-card totals, AI
+  month spend vs cap inputs, feedback counts, review sync-gap counts), `admin_daily_series()`
+  (30-day `{day, signups, actives}`), `admin_feedback_recent(n)`, `admin_feedback_update(...)`
+  (validates enums; empty string clears note/link). All revoked from `public`/`anon`, granted to
+  `authenticated` (guests ride the authenticated role, so the in-body email check is the real
+  boundary). **Privacy line held: aggregates only, no RPC returns learner rows; no admin SELECT
+  policies were added to `profiles`/`progress`/`writing_evaluations`** (the `feedback` table is the
+  sanctioned per-row exception: operational mail addressed to the founder).
+- **`src/lib/adminApi.ts`**: typed fail-soft wrappers (null/empty/false on error, offline-first)
+  for the four RPCs + raw `app_config` and `launch_checklist` helpers. Not imported by any eager
+  code yet (main chunk unchanged); consumers arrive with the `/admin` shell in chunk 3.
+- **`tests/admin.test.ts` extended (lockstep pin):** migration 0007 + 0008 email sets must equal
+  `FOUNDER_EMAILS` exactly, both emails must sit inside `is_founder()`, and every 0008 admin RPC
+  must contain `perform public.assert_founder();` and a `revoke ... from public, anon`.
+- **Docs:** founder deploy/verify steps in `PHASE2_SETUP.md` (run 0008; existing Werkbank ticks
+  carry over as approve decisions, nothing re-clicked); CLAUDE.md admin-gate note now covers 0008.
+- **Gates:** `typecheck` · `lint` (0 errors) · `test:unit` 222/222 · `build` · `check:bundle`
+  (110.6/400 kB) · `lint:content` all green. Nothing visible in the app changes yet.
+- **Deployed + verified live (same session):** the founder ran migration 0008 in the Supabase SQL
+  editor (via the dashboard paste path; `PHASE2_SETUP.md` §1 now marks the CLI optional), confirmed
+  the gate rejects an identity-less call ("forbidden: founder account required" is the HEALTHY
+  result in the SQL editor), and got a real `admin_overview()` JSON via the
+  `set_config('request.jwt.claims', ...)` trick: 6 accounts (4 Google / 2 guests), 8,053 XP,
+  532 SRS cards, 60 sessions, 1 feedback (neu), reviews `decided: 1, approvedUnapplied: 1` (a
+  legacy boolean-era tick, no decision hash, so chunk 2 routes it to re-review, never a blind flip).
+
+### Chunk 2 · the loop-closer `pnpm apply:reviews` + decision-time hashes
+The review pipeline "founder clicks on the phone → next Claude session commits it" now works end
+to end:
+- **Shared fingerprint:** new `src/lib/contentHash.ts` (browser SubtleCrypto sha256 over canonical
+  JSON, byte-compatible with `scripts/content-hash.mjs`) + `src/lib/contentIndex.ts` (the same
+  content-id universe as the stamp script; dynamic-import only, a ~4 kB glue chunk over the shared
+  bank chunks, main chunk untouched at 110.7 kB). Parity pinned by `tests/contentHash.test.ts`
+  (canonicalization, hashes, id universe; jsdom gets node webcrypto).
+- **Decision-time capture:** the /sources Daten-Werkbank tick now saves `decision: "approve"` + a
+  `content_hash` of the item as reviewed + `reviewer_email` (untick clears the decision; note-only
+  edits leave it untouched); CSV export gained the decision column.
+- **`scripts/apply-reviews.mjs`** (`pnpm apply:reviews`): decision source → `ID_RENAMES` → hash
+  compare → codemod `provenance.ts` (`draft`→`verified` + `verified_by`/`verified_date`,
+  format-exact) → `stamp:verified` + `lint:content` in the SAME commit → defects/re-review export
+  to `docs/reports/review-defects.md` + `.json`. `--dry-run` writes nothing. Integrity rules pinned
+  by `tests/applyReviews.test.ts`: null/mismatched decision hash = re-review (never a flip),
+  already-verified rows only ever mark applied.
+- **Verified end to end in-session:** real flip of `v_besprechung` through the codemod →
+  `stamp:verified` (25→26) → `lint:content` green → reverted.
+
+### Chunk 2 addendum · keyless review handoff (founder security review, same session)
+The founder correctly flagged that the Claude environment's **environment-variables box is plaintext
+and explicitly warns against secrets**, so storing `SUPABASE_SERVICE_ROLE_KEY` there (my first
+instruction) was wrong. Replaced the key path with a keyless file handoff, no secret ever touches
+the environment:
+- **Browser export:** `src/lib/reviewExport.ts` (`buildDecisionExport`/`downloadDecisions`) + an
+  **"Entscheidungen (N)"** button in the AdminWorkbench toolbar. The founder is already securely
+  signed in on /sources (RLS grants read), so the browser downloads a `genauly-review-decisions-*.json`
+  file (decisions + decision-time fingerprints, NO credential). CSV export unchanged.
+- **Keyless script mode:** `pnpm apply:reviews --from <file>` (`parseDecisionFile`) reads that file
+  instead of Supabase, does the identical hash-compare + codemod + stamp + lint, and writes NO
+  database (applied state reconciles from the deployed bundle: the item is `verified` in
+  provenance.ts). The direct-DB path stays for a secure local shell with the key, but is no longer
+  the founder's path. Round-trip (browser export → script parse) pinned by `tests/reviewExport.test.ts`.
+- **Verified end to end:** built a realistic 2-decision fixture (one hash-matching `v_besprechung`,
+  one stale `v_tagesordnung`) → `--from` dry-run classified correctly (1 ready, 1 re-review) →
+  real `--from` run flipped `v_besprechung`, stamped, linted green, exported the stale one to the
+  re-review report → reverted.
+- **Founder action: NONE.** No key to set up; the workbench button + file handoff is the whole flow.
+  `PHASE2_SETUP.md` rewritten accordingly (and now says NOT to put the service-role key in the
+  environment variables).
+- **Gates:** `typecheck` · `lint` (0 errors; the one new hook-deps warning was fixed properly) ·
+  `test:unit` 237/237 · `build` · `check:bundle` (110.7/400 kB) · `lint:content` all green.
+- **Next:** chunk 3, the `/admin` shell + Übersicht cockpit (Opus recommended); chunks 1-2 outputs
+  (sync-gap counter + handoff prompt) are its data feed.
+
+**Handoff after session 145 (2026-07-22). Admin Control Center chunk 3 (`/admin` shell + Übersicht
+cockpit), branch `claude/admin-control-center-chunk-3-7g5829`.** Chunk 3 of
+`docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` on the recommended Opus tier: the founder's front
+door to the admin center, cross-cutting wiring against an already-approved design (mockup 1 in
+`preview/admin-control-center-mockups.html`). What shipped:
+- **Route + gate:** `RequireFounder` in `router.tsx` (mirrors `RequireOnboarding`; renders nothing
+  while auth `status === "loading"` to avoid a redirect flash, else `isFounder(user)` or `<Navigate
+  to="/">`). New standalone top-level route `/admin/*` (outside AppShell chrome, like `/sources`),
+  lazy `AdminApp` (one chunk owns the whole `/admin` subtree via descendant `<Routes>`). Client gate
+  is cosmetic; the real boundary stays the 0008 RLS/RPC.
+- **`src/features/admin/` (all new, lazy):** `AdminApp.tsx` (lang provider + descendant routes),
+  `AdminShell.tsx` (full-screen sidebar cockpit: 8-item DE/EN nav, founder chip, DE/EN toggle,
+  "back to app"; fetches `admin_overview` ONCE and shares it via Outlet context so screens don't
+  re-fetch; Feedback nav badge = `feedback.neu`), `AdminOverview.tsx` (the Übersicht), `adminI18n.tsx`
+  (a `t(de, en)` context + localStorage-persisted lang, no i18n framework), `adminFunnel.ts` (pure,
+  unit-tested), `liveWidget.ts` (C1), `AdminPlaceholder.tsx` (the not-yet-built screens
+  Prüfen/Feedback/Inhalte/Nutzer/System/Steuerung/Launch resolve to it so deep links never 404;
+  chunks 4-7 swap them in).
+- **Übersicht tiles (mockup 1):** **A1** verification-funnel — "Menschlich geprüft" (verified count,
+  25 today), "KI-Jury-Abdeckung" % (tier ≥ jury, the machine floor that costs nothing), and the
+  all-banks trust-ladder stacked bar, all computed synchronously from bundled `provenance.ts` +
+  `verification.ts` (zero backend). **A4** sync-gap — "Wartende Entscheidungen" count + a
+  "Übergabe-Prompt kopieren" button producing the ready-to-paste `pnpm apply:reviews` handoff with
+  the exact ids; pending = approved (`provenance_reviews.decision === "approve"`) minus already
+  `verified` in the bundle (keyless-safe, matches how apply:reviews reconciles). **D1** AI-budget
+  tile (`admin_overview` cost vs $5 + cache-hit rate). **C1** "Ist meine Änderung live?" — build
+  stamp (new Vite `define` `__BUILD_SHA__`/`__BUILD_TIME__`, read only in the admin chunk) vs latest
+  `main` from the public GitHub commits API, plain-language verdicts + the recurring PWA-cache hint +
+  a Supabase-reachable line. Honest metrics: no fabricated deltas; "+N diese Woche" shows only when
+  real (from `verified_date`).
+- **AccountMenu:** founder accounts get a "Kontrollzentrum" (`ShieldCheck`) entry to `/admin`.
+- **Gates:** `typecheck` ✓ · `lint` (0 errors) · `test:unit` **253/253** (new `tests/adminFunnel.test.ts`) ·
+  `build` ✓ · `check:bundle` **111.6 kB** (main chunk unchanged; admin rides an 18 kB lazy chunk).
+- **Next:** chunk 4, the Review Cockpit / Prüfmodus (Opus), needs the `build-review-queue.mjs` scorer.
+
+**Handoff after session 146 (2026-07-22). /sources verification refresh + human-review reset + table
+restructure, branch `claude/sources-unchecked-items-njvmao`.** The founder asked why /sources showed
+"800+ items not yet checked". What shipped:
+- **Stale verification map, regenerated.** `src/data/verification.ts` was generated 2026-07-13, before
+  the s126 daily-life scale-up (2026-07-17) added ~844 items, so those had no tier and fell into the
+  "next verification sweep" bucket (~27%) — a stale build artifact, not a quality hole. Refreshed all
+  inputs against the current banks: `build:oracles` (der/die/das, 1292/1327 lemmas), `build:frequency-subset`
+  (1889 tokens), `build:languagetool` + `verify:grammar` (5236 sentences, **0** grammar/agreement
+  findings), `verify:facts` (**0** two-oracle errors) + `verify:cefr` (0 flags), then `build:verification`
+  → **3,107 records** (was 2,263). The "next sweep" bucket is now 0; previously-untiered items show as
+  grammar-checked (linguistic). Committed inputs: the vendored `scripts/vendor/*.json` subsets, the
+  `docs/reports/verify-grammar.json` sidecar, and the three `verify:*` reports (the 69 MB LanguageTool
+  lib is gitignored).
+- **Human verification reset to zero (founder request).** The 25 founder-approved Can-Do provenance rows
+  were flipped `review_status: "verified"`→`"draft"` (a precise codemod; `verified_by`/`verified_date`
+  dropped), `build:verification` re-run (human tier → 0), `stamp:verified` re-run (`verified-hashes.json`
+  hashes now `{}`). The `human` tier and the "menschlich geprüft" StatTile now read 0 until the review
+  pass restarts. CLAUDE.md provenance + Can-Do bullets updated to match.
+- **/sources table restructure (no more endless scroll).** The founder-only **Daten-Werkbank** table
+  moved off the main /sources page onto its own sub-page **`/sources/werkbank`** (`RequireFounder`-gated
+  route in `router.tsx`, same lazy chunk as Sources; extracted the shared `useWorkbench` hook +
+  `SourcesWorkbench` component in `Sources.tsx`); the main page shows admins a link card to it. The
+  public **"Alle Inhalte und ihre Quellen"** item browse is now behind a **collapse toggle** (`showAll`,
+  collapsed by default).
+- **Gates:** `typecheck` ✓ · `lint` (0 errors; warnings are the pre-existing debt) · `lint:content` ✓
+  (0 verified) · `test:unit` **253/253** · `build` ✓ · `check:bundle` **111.8 kB** (main chunk unchanged;
+  Sources stays a lazy chunk).
+
+---
+
+## Session 147 (2026-07-22) — Schreibtraining redesign: Fokus Satzlabor + nav item + harmonization (moved from PROJECT_STATUS.md in s149)
+
+**Handoff after session 147 (2026-07-22). Schreibtraining redesign: Fokus "Satzlabor", branch
+`claude/schreibtraining-todo-review-afoegv`, PR #640 merged.** Backlog #6. A five-expert design panel
+(LLM engine, frontend, German B2 pedagogy, backend cost/security, UX) produced
+`docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`; mockups in `preview/schreibtraining-redesign-mockups.html`.
+What shipped:
+- **`/writing` is now a mode router** (`WritingHub` rewritten): **Fokus · Kurz · Lang** via
+  `WritingModeSwitcher` (sliding pill) + a Verlauf toggle. Kurz/Lang extracted verbatim into
+  `GuidedWritingTrainer` (old length toggle folded into the mode; existing `evaluate-writing` backend).
+- **Fokus "Satzlabor"** (`src/features/writing/fokus/`): single-sentence lab. `FokusTrainer` +
+  tri-state `GrammarRail` (aktuell / target / selected; desktop rail + mobile chip row) +
+  `useFokusMachine` (edit invalidates, transforms derive from the corrected base, in-memory cache).
+  `grammarDimensions.ts` = the Aktiv/Vorgangspassiv × Präsens/Perfekt/Präteritum MVP grid (data-driven,
+  Wave 2 extends the arrays). Client `lib/sentenceStudio.ts` degrades gracefully if the backend is
+  undeployed.
+- **Backend:** migration `0009_sentence_studio.sql` (`sentence_checks` owner-only, GLOBAL cross-user
+  `sentence_transforms` cache, `sentence_ai_ops` paid-op ledger, `bump_transform_hit` RPC,
+  `sentence_studio` kill-switch) + Edge Functions `check-sentence` (correct + detect, Haiku, cache-first)
+  and `transform-sentence` (transform, cache-FIRST, abstains rather than hallucinate; burst/daily/monthly
+  limits count only paid ops; `TRANSFORM_MODEL` env-switchable to Sonnet). Metered into the shared **$5
+  fuse** so max spend is unchanged. Deploy steps in `docs/plans/PHASE2_SETUP.md`.
+- **The session continued past the initial ship (5 more PRs on the same branch):**
+  - **Nav (PR #642):** Schreibtraining promoted to a dedicated top-level nav item **"Schreiben"**
+    (`/writing`, rose accent, the existing pencil mark). `DEFAULT_PINNED_TABS` + `BottomTabBar` `CONTENT`
+    now `["/library", "/writing", "/analytics"]`; the `/writing → /anwenden` `ROUTE_SUCCESSOR` remap was
+    removed. CLAUDE.md nav bullets updated.
+  - **Backend robustness (PR #643):** the two Edge Functions swallowed LLM errors silently, so failures
+    were invisible in the logs. Added diagnostic `console.error` logging (HTTP status + body, parse
+    failures, a providers-configured line) and a one-shot Anthropic 429/529 retry before falling to
+    Gemini → OpenAI. **Founder must redeploy the functions to pick this up.**
+  - **Design harmonization (PR #646):** the whole section now matches the Bibliothek design language.
+    New `WritingRail` (grey `bg-muted` tile, uppercase domain eyebrows, single-select theme pills;
+    desktop sticky aside + mobile chip row). `GuidedWritingTrainer` rewritten: **Kurz/Lang land straight
+    on an Aufgabe + writing field** (no theme-picker page), topic switched from the Thema rail. Both
+    guided + Fokus share the `[minmax(0,1fr)_18rem]` content+rail grid.
+  - **Correction display fix (PR #646):** the Fokus correction showed the corrected sentence with no
+    indication of what changed and a green check that read as "correct". Now a pure client-side word
+    diff (`lib/wordDiff.ts`) strikes the original, **highlights the changed words in place**, lists each
+    edit as before → after ("Was ich geändert habe"), and the header reads "Korrigiert · N Änderungen".
+    No backend needed. `tests/wordDiff.test.ts` pins it.
+- **Gates (final, PR #646):** typecheck ✓ · lint 0 errors ✓ · test:unit **260/260** (added
+  `fokusGrammar` + `wordDiff` tests) · build ✓ · check:bundle **112.3 kB** (main unchanged; writing lazy).
+- **Open follow-ups:** (1) founder **redeploys** `check-sentence`/`transform-sentence` for the logging +
+  retry fix (the functions + migration 0009 are already deployed; Fokus worked but was flaky, likely a
+  provider hiccup, hence the retry/logging); confirm `GEMINI_API_KEY` is set as a project secret so the
+  fallback is active; (2) decide Haiku vs Sonnet 5 for transforms (default Haiku, one env var); (3) Wave
+  2 axes (Zustandspassiv, Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness; (4) optional:
+  AI-authored per-change *explanations* in the correction tip (needs a backend field + redeploy). Fokus
+  is single-sentence by design.

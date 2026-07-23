@@ -79,6 +79,10 @@ const Welt = lazyWithReload(() =>
 const Sources = lazyWithReload(() =>
   import("@/features/legal/Sources").then((m) => ({ default: m.Sources })),
 );
+// The founder-only review table on its own sub-page (same lazy chunk as Sources).
+const SourcesWorkbench = lazyWithReload(() =>
+  import("@/features/legal/Sources").then((m) => ({ default: m.SourcesWorkbench })),
+);
 // Lazy: the bilingual legal bodies + About are long text components that are
 // rarely visited from inside the app; no reason to ship them eagerly.
 const PrivacyPolicy = lazyWithReload(() =>
@@ -111,8 +115,22 @@ const AdminApp = lazyWithReload(() =>
 
 function RequireOnboarding({ children }: { children: React.ReactNode }) {
   const onboarded = useSettingsStore((s) => s.onboarded);
-  if (!onboarded) return <Navigate to="/welcome" replace />;
-  return <>{children}</>;
+  const status = useAuthStore((s) => s.status);
+  const syncHydrated = useAuthStore((s) => s.syncHydrated);
+  // Already onboarded on this device → straight in.
+  if (onboarded) return <>{children}</>;
+  // Auth is still resolving (e.g. we just returned from a Google OAuth redirect
+  // and Supabase is establishing the session). Don't decide yet, or we would
+  // bounce a valid account out to the landing page.
+  if (status === "loading") return null;
+  // The account may have onboarded on ANOTHER device: the `onboarded` flag
+  // lives in the cloud profile and only arrives via the first cloud-sync pull.
+  // On a fresh device (e.g. right after reinstalling the PWA) the local flag is
+  // still false, so a signed-in / guest user must wait for that pull to land
+  // before we treat them as "not onboarded". Only a truly signed-out visitor,
+  // or one whose cloud pull finished still-not-onboarded, goes to /welcome.
+  if (status !== "signedOut" && !syncHydrated) return null;
+  return <Navigate to="/welcome" replace />;
 }
 
 // Founder gate for /admin. Mirrors RequireOnboarding: while auth is still
@@ -200,10 +218,22 @@ export const router = createBrowserRouter([
       </Suspense>
     ),
   },
+  // Founder-only review table, split off /sources so that page stays short.
+  {
+    path: "/sources/werkbank",
+    errorElement: routeError,
+    element: (
+      <Suspense fallback={null}>
+        <RequireFounder>
+          <SourcesWorkbench />
+        </RequireFounder>
+      </Suspense>
+    ),
+  },
   {
     // Always mounted so a deep link resolves; the links to it are gated on the
-    // remote `impressumEnabled` flag (Steuerung §H3). Not lazy: it is a tiny
-    // static page and shares the legal chrome already in the eager path.
+    // remote `impressumEnabled` flag (Steuerung §H3). Lazy so it stays off the
+    // eager main chunk like the other legal pages.
     path: "/impressum",
     errorElement: routeError,
     element: (

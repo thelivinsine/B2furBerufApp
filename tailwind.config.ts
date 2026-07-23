@@ -97,7 +97,7 @@ const config: Config = {
         glow: "0 0 0 1px hsl(var(--primary) / 0.12), 0 8px 30px hsl(var(--primary) / 0.18)",
       },
       backgroundImage: {
-        // Deep Nachtblau → primary → vivid sky (s137 premium pass): the stops
+        // Deep Nachtblau -> primary -> vivid sky (s137 premium pass): the stops
         // ride the theme-aware --gradient-from/--gradient-to tokens in
         // index.css, so the sweep ends brighter than it starts in light mode
         // AND stays legible in dark mode (the old fixed end stop dropped dark
@@ -105,16 +105,19 @@ const config: Config = {
         "accent-gradient":
           "linear-gradient(135deg, hsl(var(--gradient-from)) 0%, hsl(var(--primary)) 45%, hsl(var(--gradient-to)) 100%)",
         // A whisper of the two blues on the warm Papier ground. Nudged back up
-        // 0.07/0.06 → 0.10/0.09 in the s137 premium pass (the s133 values were
+        // 0.07/0.06 -> 0.10/0.09 in the s137 premium pass (the s133 values were
         // effectively invisible); still a wash, never a visible gradient band.
         "mesh":
-          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.09) 0px, transparent 50%)",
+          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%)",
         // Page ground (s140, founder-picked "I1"): the same mesh washes over a
-        // very subtle mint → sky diagonal riding the --page-* tokens (dark mode
+        // very subtle mint -> sky diagonal riding the --page-* tokens (dark mode
         // sets all three stops to the flat dark ground, so it is a no-op there).
+        // The wash is mirrored across the top-left to bottom-right diagonal
+        // (founder): the accent radial sits bottom-left (0% 100%), the primary
+        // radial stays top-left, and the linear angle is 120deg (150deg mirror).
         // Use on full-page shells; cards keep plain bg-mesh.
         "page":
-          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 100% 0%, hsl(var(--accent) / 0.09) 0px, transparent 50%), linear-gradient(150deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%)",
+          "radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%), radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%), linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%)",
         // Dialog backdrop: a brand-tinted radial that's lighter directly behind
         // the card and deepens toward the screen edges (a subtle spotlight). Uses
         // the cool-slate `--shadow` token instead of flat black, so it adapts to
