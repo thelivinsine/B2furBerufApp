@@ -1170,6 +1170,14 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   in the content grid + empty-state CTA; unified eyebrow rule; spinning 40px dice; duplicate hint
   removed; Fokus mobile sticky Korrigieren bar. Bank: 316 tasks. Gates: typecheck / lint:content /
   eslint 0 errors / 260 tests / build / bundle 112.3 kB / Playwright light+dark. Squash-merged.
+- **Prompt 10 (verbatim, dark-mode rail screenshot attached):** `Go ahead with the P2 items as well. Also, the reset button doesn't work here. Fix it`
+- **Response 10 (PR #651):** Reset was disabled at the default scope by design (nothing to clear),
+  which read as broken; it is now always active and does a full reset (clears Branche/Unterthema/
+  Thema AND draws a fresh random Aufgabe, dice-spin feedback). P2 shipped: directional tab slide
+  (LibraryHub popLayout), 0.12s popover fade, unified 0.18s panel timing; pool wave to >=8 short +
+  >=8 long per theme (16 new generic tasks); Branche wave 2 adds the remaining 10 sectors at 4
+  tasks each. Bank: 373 tasks, all 15 Branchen, subs still >=2/2. Gates green + live Playwright
+  check of the reset. Squash-merged.
 - **Artifacts (session 149):** `preview/schreiben-bibliothek-extension.html` ·
   `preview/schreiben-bibliothek-extension-r2.html` · `src/features/writing/WritingModeSwitcher.tsx` ·
   `src/features/writing/WritingHub.tsx` · `src/features/writing/WritingRail.tsx` ·
@@ -1177,4 +1185,4 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/resumeDraft.ts` ·
   `src/data/writingPrompts.ts` · `scripts/lint-content.mjs` ·
   `src/features/writing/WritingHistory.tsx` · `src/features/vocabulary/RelatedPanel.tsx` ·
-  `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · this log
+  `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · PRs #648 · #649 · #650 · #651 · this log
