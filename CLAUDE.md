@@ -485,29 +485,39 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   sliding-pill switcher **Fokus · Kurz · Lang · Verlauf** IS the page header (s92 rule: no eyebrow/H1;
   Verlauf rides `?mode=verlauf`; capped `lg:max-w-xl` + centered on desktop, four short labels at full
   column width read oversized), over the standard `[minmax(0,1fr)_16rem]` content+rail grid.
-  **Kurz/Lang draw a RANDOM Aufgabe:** `src/data/writingPrompts.ts` holds per-theme POOLS
-  (`short`/`long` are `string[]`, 5 each since s149; founder target 15-20, grow by appending, schema
-  is done; the whole pool rides the theme's one `wp_<themeId>` provenance row, the mission pattern).
-  The dice on the Aufgabe card re-rolls within the theme (keeps typed text, clears a stale result);
+  **Kurz/Lang draw a RANDOM Aufgabe:** `src/data/writingPrompts.ts` holds per-theme POOLS of task
+  OBJECTS `{ text, sub?, sectors? }` (316 tasks since the s149 harmonization round; the whole pool
+  rides the theme's one `wp_<themeId>` provenance row, the mission pattern). `sub` = a declared
+  sub-theme slug (coverage invariant: every sub-theme of the 12 sub-themed themes has ≥2 short + ≥2
+  long tagged tasks); `sectors` = Branche tags with the Bibliothek **untagged-=-universal draw
+  rule** (a selected Branche prefers its tagged tasks, else falls back to untagged, never empty;
+  wave 1 = it/care/construction/transport/hospitality at 6 tasks each, grow by tagging). The linter
+  validates text/sub/sectors per task. The dice on the Aufgabe card (standard 40px icon button,
+  half-spin per roll) re-rolls within the current scope (keeps typed text, clears a stale result);
+  scope changes (`?sub=`/`?sector=`; theme switch clears sub, Branche travels) reset the draft;
   drafts carry `promptIndex` so the OAuth resume restores the exact task. The Aufgabe card has NO
   theme icon (founder), a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel line (the
   editor word count does NOT repeat the Ziel range), and the AI disclaimer is a **standalone line
-  below the editor/sentence card**, never inside it. **`WritingRail` = "Aufgabe wählen": a light
-  HIMMELBLAU tile** (`bg-accent/20` + `border-accent/50`, founder s149; NOT grey) with a header reset
-  icon and ONE scope section, eyebrow "Thema" over a Bibliothek-style single-select **dropdown**
-  (grouped listbox popover, internal scroll; NOT pills, founder s149) whose groups are the Domain
-  categorization with **gesundheit folded into Alltag** (founder rule; prompts carry only the Thema
-  grain, so no Branche/Unterthema controls). No overflow clipping on that tile (the popover must
-  escape); the mobile panel animates via fade/slide, not height collapse, for the same reason. Fokus
-  `GrammarRail` stays the grey FilterRail tile: detected form = **white pill + green `bg-success`
-  dot** (never a blue fill/ring), target solid primary, pre-correction all idle, header reset icon
-  (back to the detected form), footer only "Neuer Satz", hint breaks after "Grüner Punkt = erkannte
-  Form.". The Fokus transform box is a **white card** (never a grey wash) with a bold colored
-  "Hinweis:" label (no i icon) and "KI-generierte Umformung" centered at the card bottom. **Mobile =
-  the Bibliothek pattern:** a toolbar button toggles the collapsible panel (`layout="panel"`, no
-  floating chip rows), Kurz/Lang get a sticky bottom Auswerten action bar, Fokus pairs the Grammatik
-  button with Neuer Satz in one row. `WritingHistory` shows only the learner's text (the exact prompt
-  behind an old entry is not recoverable from theme+length since pools).
+  below the editor/sentence card**, never inside it. **Eyebrow rule (s149): card-title eyebrows =
+  bold `text-primary` ("Aufgabe:", "Dein Satz", the transform label); inner section labels stay
+  muted.** **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20` +
+  `border-accent/50`, dark `bg-accent/10` + `border-accent/25`; NOT grey) with a header reset icon
+  and the Bibliothek scope hierarchy **Branche → Thema → Unterthema** as single-select **dropdowns**
+  (grouped listbox popovers, internal scroll, live counts, zero-yield options greyed; Unterthema
+  only when the theme has sub-themes; Thema groups = Domain categorization with **gesundheit folded
+  into Alltag**, founder rule). No overflow clipping on that tile (the popovers must escape); the
+  mobile panel animates via fade/slide, not height collapse, for the same reason. Fokus
+  `GrammarRail` is the SAME Himmelblau tile (s149; was grey): detected form = **white pill + green
+  `bg-success` dot** (never a blue fill/ring), target solid primary, pre-correction all idle, header
+  reset icon (back to the detected form), footer only "Neuer Satz", hint breaks after "Grüner Punkt
+  = erkannte Form.". The Fokus transform box is a **white card** (never a grey wash) with a bold
+  colored "Hinweis:" label (no i icon) and "KI-generierte Umformung" centered at the card bottom.
+  **Mobile = the Bibliothek pattern:** a toolbar button toggles the collapsible panel
+  (`layout="panel"`, no floating chip rows), Kurz/Lang get a sticky bottom Auswerten action bar and
+  Fokus a sticky Korrigieren bar (pre-correction), Fokus pairs the Grammatik button with Neuer Satz
+  in one row. **Verlauf renders inside the same content grid column** as the other tabs (never full
+  width) and its empty state deep-links into Kurz. `WritingHistory` shows only the learner's text
+  (the exact prompt behind an old entry is not recoverable from theme+length since pools).
 - **Fortschritt + Can-Do:** `canDo.ts` bank (52 milestones) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
 - **Nav zones (labels updated s105, 2026-07-13; `/library` reverted to Bibliothek s141; Schreiben added
