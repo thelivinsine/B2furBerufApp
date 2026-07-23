@@ -56,13 +56,16 @@ const TENSES = ["praesens", "perfekt", "praeteritum", "plusquamperfekt", "futur1
 const MOODS = ["indikativ", "konjunktiv1", "konjunktiv2", "imperativ"];
 const REASONS = ["ok", "kein_akkusativobjekt", "intransitiv_unpersoenlich", "bereits_zielform", "nicht_idiomatisch", "mehrdeutig", "modalverb_grenze"];
 
-const TRANSFORM_MODEL = Deno.env.get("TRANSFORM_MODEL") ?? "claude-haiku-4-5";
+const TRANSFORM_MODEL = Deno.env.get("TRANSFORM_MODEL") ?? "claude-sonnet-5";
 const TRANSFORM_DAILY_LIMIT = Number(Deno.env.get("TRANSFORM_DAILY_LIMIT") ?? "40");
 const TRANSFORM_BURST_LIMIT = Number(Deno.env.get("TRANSFORM_BURST_LIMIT") ?? "8");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");
-const PROMPT_VERSION = Deno.env.get("PROMPT_VERSION") ?? "1";
+// Bumped to "2" with the Sonnet 5 migration + prompt fixes (copula-aktiv rule,
+// stricter bereits_zielform). The global transform cache is keyed on this, so the
+// bump prevents serving stale wrong transforms produced by the old model/prompt.
+const PROMPT_VERSION = Deno.env.get("PROMPT_VERSION") ?? "2";
 
 interface Tuple { voice: string; tense: string; mood: string }
 
@@ -87,6 +90,13 @@ const SYSTEM_PROMPT =
   `tense (praesens, perfekt, praeteritum, plusquamperfekt, futur1, futur2) und mood. ` +
   `Regeln fuer Passiv: passiv_vorgang = werden + Partizip II; passiv_zustand = sein + Partizip II; ` +
   `nur Saetze mit Akkusativobjekt lassen sich persoenlich passivieren. Das Perfekt-Passiv nutzt "worden", nicht "geworden". ` +
+  `Eine Kopula (sein/werden/bleiben + Adjektiv oder Adverb, z. B. "Ich bin krank") ist aktiv, ` +
+  `kein Passiv; das Adjektiv ist kein Partizip. ` +
+  `Setze bereits_zielform NUR, wenn der Satz sowohl im Genus Verbi ALS AUCH in der Zeitform ` +
+  `bereits exakt der Zielvorgabe entspricht. Unterscheidet sich die Zeitform, ist der Satz NICHT ` +
+  `in der Zielform, auch wenn das Genus Verbi passt: "Ich bin krank" (Praesens) wird zu Perfekt ` +
+  `"Ich bin krank gewesen" und zu Praeteritum "Ich war krank" umgeformt. Das sind echte ` +
+  `Umformungen und niemals bereits_zielform. ` +
   `Setze applicable auf false mit passendem reason, wenn: kein Akkusativobjekt vorhanden ist ` +
   `(kein_akkusativobjekt), nur ein unpersoenliches Passiv moeglich waere (intransitiv_unpersoenlich), ` +
   `der Satz schon in der Zielform steht (bereits_zielform), die Umformung nicht idiomatisch waere ` +
@@ -148,6 +158,10 @@ async function callAnthropic(source: string, target: Tuple): Promise<TransformOu
         body: JSON.stringify({
           model: TRANSFORM_MODEL,
           max_tokens: 400,
+          // Thinking disabled: leaving adaptive thinking on (the Sonnet 5 default)
+          // could consume the 400-token budget and truncate the JSON. No
+          // `temperature` is sent (removed on the Sonnet 5 / Opus 4.8 family).
+          thinking: { type: "disabled" },
           system: SYSTEM_PROMPT,
           messages: [{ role: "user", content: userMsg(source, target) }],
         }),

@@ -56,12 +56,19 @@ const DAILY_CHECK_LIMIT = Number(Deno.env.get("DAILY_CHECK_LIMIT") ?? "20");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");
-const HAIKU_MODEL = "claude-haiku-4-5";
+// Sonnet 5 for German morphology accuracy (was claude-haiku-4-5, which mislabeled
+// copula "sein + Adjektiv" as passive). Override via CHECK_MODEL if ever needed.
+const CHECK_MODEL = Deno.env.get("CHECK_MODEL") ?? "claude-sonnet-5";
+// Bump when the prompt or model changes: the global correction cache is keyed by
+// source_hash only, so folding this in re-evaluates sentences that were cached by
+// the old (weaker) model instead of serving their stale grammar detection.
+const CHECK_VERSION = "2";
 
 // Case-PRESERVING hash (German capitalization is grammatically meaningful, unlike
-// the weakness-classifier in evaluate-writing which lowercases).
+// the weakness-classifier in evaluate-writing which lowercases). Salted with
+// CHECK_VERSION so a model/prompt bump invalidates the old cache.
 async function hashText(text: string): Promise<string> {
-  const norm = text.trim().replace(/\s+/g, " ");
+  const norm = `${CHECK_VERSION}\n${text.trim().replace(/\s+/g, " ")}`;
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(norm));
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
@@ -83,6 +90,12 @@ const SYSTEM_PROMPT =
   `(aktiv, passiv_vorgang, passiv_zustand), tense (praesens, perfekt, praeteritum, ` +
   `plusquamperfekt, futur1, futur2) und mood (indikativ, konjunktiv1, konjunktiv2, imperativ) ` +
   `nach dem finiten Verb des Hauptsatzes. ` +
+  `WICHTIG zur voice: Eine Kopula, also sein/werden/bleiben + Adjektiv oder Adverb ` +
+  `(z. B. "Ich bin krank", "Sie ist muede", "Er wird alt", "Wir sind da"), ist IMMER aktiv ` +
+  `und NIEMALS Passiv. Ein Passiv liegt nur vor, wenn ein Partizip II eines transitiven ` +
+  `Verbs steht: passiv_vorgang = werden + Partizip II ("Der Bericht wird geschrieben"), ` +
+  `passiv_zustand = sein + Partizip II ("Die Tuer ist geschlossen"). Ein Adjektiv nach sein ` +
+  `ist KEIN Partizip und damit kein Zustandspassiv. Im Zweifel voice = aktiv. ` +
   `Antworte AUSSCHLIESSLICH als JSON: ` +
   `{"corrected": "...", "has_errors": true, "sentences": [{"text": "...", "voice": "aktiv", "tense": "praesens", "mood": "indikativ"}]}.`;
 
@@ -120,9 +133,13 @@ async function callAnthropic(text: string): Promise<CheckOut | null> {
         method: "POST",
         headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: HAIKU_MODEL,
+          model: CHECK_MODEL,
           max_tokens: 500,
-          temperature: 0,
+          // No `temperature` (removed on Sonnet 5 / Opus 4.8 family -> 400).
+          // Thinking disabled: a one-sentence grammar call does not need it, and
+          // leaving adaptive thinking on (the Sonnet 5 default) could consume the
+          // 500-token budget and truncate the JSON.
+          thinking: { type: "disabled" },
           system: SYSTEM_PROMPT,
           messages: [{ role: "user", content: `Text:\n"""${text}"""` }],
         }),
@@ -143,8 +160,11 @@ async function callAnthropic(text: string): Promise<CheckOut | null> {
       if (!parsed) { console.error(`[check] anthropic parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
       const inTok = data.usage?.input_tokens ?? 0;
       const outTok = data.usage?.output_tokens ?? 0;
-      const cost = (inTok / 1e6) * 1 + (outTok / 1e6) * 5;
-      return { ...parsed, model: HAIKU_MODEL, cost };
+      // Sonnet 5 standard rates ($3/$15 per 1M); over-estimates during the intro
+      // window, which keeps the monthly spend fuse conservative. Haiku fallback = $1/$5.
+      const isSonnet = CHECK_MODEL.includes("sonnet");
+      const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
+      return { ...parsed, model: CHECK_MODEL, cost };
     } catch (e) {
       console.error(`[check] anthropic threw: ${e}`);
       return null;
@@ -305,7 +325,7 @@ Deno.serve(async (req) => {
   }
 
   // LLM correction + detection.
-  console.log(`[check] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${HAIKU_MODEL}`);
+  console.log(`[check] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${CHECK_MODEL}`);
   const out = (await callAnthropic(text)) || (await callGemini(text)) || (await callOpenAI(text));
   if (!out) {
     console.error("[check] all providers failed for input hash " + inputHash.slice(0, 12));
