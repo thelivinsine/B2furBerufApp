@@ -122,6 +122,12 @@ wrong, self-contradictory German feedback.
   flow under the content. (A first pass pinned it to the bottom via `min-h` + `mt-auto` to line up
   with the "Mit KI gebaut · Feedback" pill; the founder found that detached band ugly, so it was
   reverted to a plain centered note.)
+- **Mobile Grammatik button fix (follow-up).** On mobile the Grammatik toggle was `disabled` until a
+  correction existed, so tapping it pre-correction did nothing and it read as broken. Removed the
+  `disabled`: it now always opens the panel, which shows the GrammarRail's "Prüf zuerst deinen Satz …"
+  hint (disabled pills) before a correction, matching the always-visible desktop rail. The session's
+  disclaimer changes were already shared (`aiNote`/`bottomBox` render in both the mobile and desktop
+  blocks), so no separate mobile adaptation was needed.
 - **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
 - **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
   `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →

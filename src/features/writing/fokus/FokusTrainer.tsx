@@ -355,12 +355,15 @@ export function FokusTrainer({
       <div className="space-y-4 lg:hidden">
         <div className="space-y-3">
           <div className="flex justify-center gap-2">
+            {/* Always tappable (founder s151): before a correction the panel opens
+                to the GrammarRail's "Prüf zuerst deinen Satz …" hint (matching the
+                always-visible desktop rail), instead of a dead disabled button that
+                reads as broken. */}
             <Button
               variant={panelOpen ? "default" : "outline"}
               aria-expanded={panelOpen}
               aria-pressed={panelOpen}
               className="h-10 rounded-lg"
-              disabled={!railEnabled}
               onClick={() => setPanelOpen((o) => !o)}
             >
               <SlidersHorizontal className="h-4 w-4" />
