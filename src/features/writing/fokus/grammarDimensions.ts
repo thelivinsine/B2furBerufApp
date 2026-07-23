@@ -91,18 +91,22 @@ const KNOWN: Record<AxisId, Set<string>> = {
 
 /**
  * Map the AI's detected tuple onto the MVP pill set. Detection can return values
- * the MVP rail does not show yet (passiv_zustand, futur1, ...); those collapse to
- * the nearest displayable pill so the "aktuell" marker still lands somewhere
- * sensible, or to `null` when there is genuinely no match (then no pill is marked
- * current in that group, which is honest rather than wrong).
+ * the MVP rail does not show yet (passiv_zustand, futur1, ...); those map to `null`
+ * (no pill marked current in that group), which is honest rather than wrong.
+ *
+ * `passiv_zustand` is deliberately NOT collapsed onto the Passiv pill: that pill is
+ * Vorgangspassiv (werden + Partizip), a different construction from a Zustandspassiv
+ * (sein + Partizip). Collapsing them mislabeled real Zustandspassiv AND, worse, turned
+ * any copula the detector misread as "sein + Partizip" (e.g. "Ich bin krank") into a
+ * confident green Passiv marker. Returning `null` keeps that slip from ever surfacing
+ * a wrong voice on the rail even if detection is off.
  */
 export function normalizeDetected(voice?: string, tense?: string): {
   voice: string | null;
   tense: string | null;
 } {
-  const v = voice === "passiv_zustand" ? "passiv_vorgang" : voice ?? null;
   return {
-    voice: v && KNOWN.voice.has(v) ? v : null,
+    voice: voice && KNOWN.voice.has(voice) ? voice : null,
     tense: tense && KNOWN.tense.has(tense) ? tense : null,
   };
 }

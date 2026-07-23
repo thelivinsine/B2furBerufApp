@@ -1,19 +1,17 @@
 # Project Status
 
-_Last updated: 2026-07-23 (session 150, complete). **Fokus correction redesign + Umlaut keys**
-(founder-approved via a consolidated design-review artifact, branch
-`claude/diagonal-gradient-invert-odi99r`, PRs #653 + #654, both merged). The noisy Fokus
-corrected-state card (struck original + counter + highlighted sentence + change list) is replaced
-with: an **Original/Korrigiert view toggle** (Original underlines the mistakes in **Koralle**,
-Korrigiert underlines the fixes in **green** — a calm underline, not a fill), **theme-aware
-Himmelblau fix tiles** (light strong / dark soft) each carrying a heuristic learning category
-(Rechtschreibung / Umlaut / Groß-/Kleinschreibung / Grammatik / Ergänzung / Streichung), and
-**Neuer Satz** moved onto the card (bottom-right of the tiles row). New reusable **`UmlautKeys`**
-bar (ä ö ü ß Ä Ö Ü, insert at cursor) on the Fokus input + the Kurz/Lang editor for non-German
-keyboards. PR #653 also **inverted the page-background gradient** across the top-left→bottom-right
-diagonal. `wordDiff` now returns flagged original tokens + `classifyChange`. Founder action open
-(from s147): redeploy `check-sentence`/`transform-sentence` + confirm `GEMINI_API_KEY`.
-Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-23 (session 151, complete). **Fokus "Satzlabor" grammar-bug fix + AI provider
+cascade rework** (follows the same-day s150 Fokus correction redesign). The Satzlabor was teaching
+wrong German (copula "Ich bin krank" mislabeled as Passiv; tense transforms wrongly refused as "Der Satz
+steht schon in dieser Form"). Fixes: hardened German-grammar prompts (explicit copula-is-Aktiv rule,
+stricter `bereits_zielform`, worked examples, strict JSON-only) and `normalizeDetected` no longer forces
+a detected Zustandspassiv onto the Passiv pill. **All three AI Edge Functions (`check-sentence`,
+`transform-sentence`, `evaluate-writing`) now share ONE provider cascade: Gemini 2.5 Flash (free, $0) →
+Claude Sonnet 5 → GPT-5**, Sonnet leading the paid backup until month-to-date Claude spend across all AI
+features hits $2 (then GPT-5), all bounded by the existing global $5/month fuse; models + budget are
+env-overridable. The two AI disclaimers + the privacy policy (DE/EN) now name all three providers
+routing-neutrally. Founder has deployed all three functions + set `GEMINI_API_KEY`. Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -56,11 +54,8 @@ Standing governance debt: **all** provenance rows are AI-drafted and `draft`, no
 see `strategy/DATA_GOVERNANCE.md`).
 
 ## Open founder action items
-Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
-- [ ] **Redeploy the Fokus "Satzlabor" functions (s147)** to pick up the diagnostic logging + Anthropic
-      retry fix: `check-sentence` + `transform-sentence` (migration 0009 + the initial deploy are already
-      done). Also confirm `GEMINI_API_KEY` is set as a Supabase project secret so the fallback is active.
-      Steps in `docs/plans/PHASE2_SETUP.md`.
+Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. The s147 Satzlabor redeploy is
+done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMINI_API_KEY` set). Still open:
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
 - [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
@@ -74,6 +69,43 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 151 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
+rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
+wrong, self-contradictory German feedback.
+- **Bug.** For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv copula, sein + adjective) the
+  panel marked **Passiv** as the detected form, then refused Perfekt/Präteritum with "Der Satz steht
+  schon in dieser Form" (Präsens treated as already past) and refused a passive it simultaneously
+  claimed the sentence already was. Root cause: the cheap Haiku detector misread "sein + Adjektiv" as
+  a Zustandspassiv, which `normalizeDetected` then collapsed onto the Vorgangspassiv pill.
+- **Fix (server prompts).** `check-sentence`: explicit rule that sein/werden/bleiben + adjective/adverb
+  is always Aktiv, only + Partizip II of a transitive verb is passive; worked examples; strict
+  JSON-only. `transform-sentence`: `bereits_zielform` only when BOTH voice AND tense already match (a
+  tense change is a real transform); same copula rule. `evaluate-writing`: JSON-only hardening.
+- **Fix (client).** `grammarDimensions.ts` `normalizeDetected` no longer maps a detected
+  `passiv_zustand` onto the Passiv pill; it returns null (no marker), so a misdetected copula can never
+  surface a wrong Passiv dot. `tests/fokusGrammar.test.ts` updated to lock this in.
+- **Provider cascade (all 3 AI functions).** Founder wanted Gemini primary everywhere + a combined
+  budget. `check-sentence`/`transform-sentence`/`evaluate-writing` each now run **Gemini 2.5 Flash
+  (free, recorded $0) → Claude Sonnet 5 → GPT-5**: Sonnet leads the paid backup until month-to-date
+  Claude spend across **both** `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD`
+  ($2), then GPT-5 leads. The existing global `MONTHLY_SPEND_CAP_USD` ($5, shared via `ai_usage`)
+  bounds all three combined. Anthropic calls drop `temperature` + disable thinking (Sonnet 5 family);
+  Gemini forces JSON output + a generous token budget; GPT-5 uses `max_completion_tokens` +
+  `reasoning_effort: minimal`. Every model id + the $2 threshold are env-overridable (`GEMINI_MODEL`,
+  `CHECK_MODEL`/`TRANSFORM_MODEL`/`EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`). Caches
+  invalidated so stale wrong answers are not re-served (check-sentence `CHECK_VERSION` salt,
+  transform-sentence `PROMPT_VERSION` bump).
+- **Transparency.** The two EU AI Act Art. 50 disclaimers (Satzlabor + writing coach) and the privacy
+  policy (DE + EN) now name all three providers routing-neutrally. Judged non-material (processors +
+  purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
+- **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
+- **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
+  `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →
+  `{ ok: false }`). Watch the function logs on the first Gemini-primary calls.
+- **Caveat carried forward:** Gemini Flash primary is the same cheap tier that caused the original bug;
+  the hardened prompt carries it and Sonnet backstops, but if wrong grammar reappears, flip the primary
+  back via `GEMINI_MODEL` (one env var, no code change).
 
 **Handoff after session 150 (2026-07-23). Fokus correction-card redesign + Umlaut keys, branch
 `claude/diagonal-gradient-invert-odi99r`, PRs #653 + #654 merged.** Founder started from "invert the

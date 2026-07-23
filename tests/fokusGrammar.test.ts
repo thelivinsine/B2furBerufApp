@@ -17,8 +17,11 @@ describe("grammar dimensions (Fokus Satzlabor)", () => {
 
   it("normalizes detected values onto displayable pills", () => {
     expect(normalizeDetected("aktiv", "praesens")).toEqual({ voice: "aktiv", tense: "praesens" });
-    // Zustandspassiv collapses to the MVP passive pill.
-    expect(normalizeDetected("passiv_zustand", "perfekt").voice).toBe("passiv_vorgang");
+    // Zustandspassiv (sein + Partizip) is NOT the MVP Passiv pill (Vorgangspassiv,
+    // werden + Partizip), so it marks no voice pill current rather than mislabeling.
+    // This also stops a copula the detector misreads as passive from surfacing a
+    // wrong Passiv marker.
+    expect(normalizeDetected("passiv_zustand", "perfekt").voice).toBeNull();
     // Tenses not in the MVP set do not mark any pill current (honest, not wrong).
     expect(normalizeDetected("aktiv", "futur1").tense).toBeNull();
     expect(normalizeDetected(undefined, undefined)).toEqual({ voice: null, tense: null });

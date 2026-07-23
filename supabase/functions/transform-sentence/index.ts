@@ -8,13 +8,13 @@
 //      (burst/min, per-day, per-month) counting ONLY paid ops.
 //   2. Validate the target tuple against a closed enum.
 //   3. GLOBAL cache lookup by hash(source | tuple | prompt_version | model) -> free.
-//   4. Otherwise ONE LLM call (TRANSFORM_MODEL, default Haiku; fallback Gemini ->
-//      gpt-4o-mini). The model ABSTAINS (applicable:false) rather than hallucinate.
+//   4. Otherwise ONE LLM call, cascade Gemini 2.5 Flash (free) -> Sonnet 5 ->
+//      GPT-5. The model ABSTAINS (applicable:false) rather than hallucinate.
 //   5. Contract-validate, cache the result globally, bump ai_usage + ledger.
 //
-// Secrets: ANTHROPIC_API_KEY (required), GEMINI_API_KEY / OPENAI_API_KEY (optional),
-// TRANSFORM_MODEL (default claude-haiku-4-5; set to claude-sonnet-5 for higher
-// morphological accuracy once eval'd), TRANSFORM_DAILY_LIMIT (default 40),
+// Secrets: GEMINI_API_KEY (free primary), ANTHROPIC_API_KEY + OPENAI_API_KEY
+// (paid backups), GEMINI_MODEL / TRANSFORM_MODEL / OPENAI_MODEL + CLAUDE_BUDGET_USD
+// overrides, TRANSFORM_DAILY_LIMIT (default 40),
 // TRANSFORM_BURST_LIMIT (default 8), USER_MONTHLY_LIMIT (default 200),
 // MONTHLY_SPEND_CAP_USD (default 5), MAX_SENTENCE_LEN (default 300),
 // PROMPT_VERSION (default "1").
@@ -56,13 +56,25 @@ const TENSES = ["praesens", "perfekt", "praeteritum", "plusquamperfekt", "futur1
 const MOODS = ["indikativ", "konjunktiv1", "konjunktiv2", "imperativ"];
 const REASONS = ["ok", "kein_akkusativobjekt", "intransitiv_unpersoenlich", "bereits_zielform", "nicht_idiomatisch", "mehrdeutig", "modalverb_grenze"];
 
-const TRANSFORM_MODEL = Deno.env.get("TRANSFORM_MODEL") ?? "claude-haiku-4-5";
+// Provider cascade (per cache-miss): free Gemini Flash first, then paid Claude
+// Sonnet, then GPT-5. Sonnet is the paid backup until month-to-date Claude spend
+// reaches CLAUDE_BUDGET_USD, after which GPT-5 leads. All three combined are
+// bounded by the global MONTHLY_SPEND_CAP_USD fuse (Gemini's free tier is $0).
+const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
+const TRANSFORM_MODEL = Deno.env.get("TRANSFORM_MODEL") ?? "claude-sonnet-5";
+const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
+// Once month-to-date Claude (Sonnet) spend reaches this, GPT-5 leads the paid
+// backup instead of Sonnet. A soft routing threshold, not a hard cap.
+const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
 const TRANSFORM_DAILY_LIMIT = Number(Deno.env.get("TRANSFORM_DAILY_LIMIT") ?? "40");
 const TRANSFORM_BURST_LIMIT = Number(Deno.env.get("TRANSFORM_BURST_LIMIT") ?? "8");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");
-const PROMPT_VERSION = Deno.env.get("PROMPT_VERSION") ?? "1";
+// Bumped to "2" with the Sonnet 5 migration + prompt fixes (copula-aktiv rule,
+// stricter bereits_zielform). The global transform cache is keyed on this, so the
+// bump prevents serving stale wrong transforms produced by the old model/prompt.
+const PROMPT_VERSION = Deno.env.get("PROMPT_VERSION") ?? "2";
 
 interface Tuple { voice: string; tense: string; mood: string }
 
@@ -87,6 +99,13 @@ const SYSTEM_PROMPT =
   `tense (praesens, perfekt, praeteritum, plusquamperfekt, futur1, futur2) und mood. ` +
   `Regeln fuer Passiv: passiv_vorgang = werden + Partizip II; passiv_zustand = sein + Partizip II; ` +
   `nur Saetze mit Akkusativobjekt lassen sich persoenlich passivieren. Das Perfekt-Passiv nutzt "worden", nicht "geworden". ` +
+  `Eine Kopula (sein/werden/bleiben + Adjektiv oder Adverb, z. B. "Ich bin krank") ist aktiv, ` +
+  `kein Passiv; das Adjektiv ist kein Partizip. ` +
+  `Setze bereits_zielform NUR, wenn der Satz sowohl im Genus Verbi ALS AUCH in der Zeitform ` +
+  `bereits exakt der Zielvorgabe entspricht. Unterscheidet sich die Zeitform, ist der Satz NICHT ` +
+  `in der Zielform, auch wenn das Genus Verbi passt: "Ich bin krank" (Praesens) wird zu Perfekt ` +
+  `"Ich bin krank gewesen" und zu Praeteritum "Ich war krank" umgeformt. Das sind echte ` +
+  `Umformungen und niemals bereits_zielform. ` +
   `Setze applicable auf false mit passendem reason, wenn: kein Akkusativobjekt vorhanden ist ` +
   `(kein_akkusativobjekt), nur ein unpersoenliches Passiv moeglich waere (intransitiv_unpersoenlich), ` +
   `der Satz schon in der Zielform steht (bereits_zielform), die Umformung nicht idiomatisch waere ` +
@@ -95,7 +114,12 @@ const SYSTEM_PROMPT =
   `Eine falsche Form schadet dem Lernenden mehr als ein Hinweis. ` +
   `note: ein kurzer deutscher Hinweis (ein Satz), was sich geaendert hat, bei false warum nicht. ` +
   `note_en: dieselbe Erklaerung auf Englisch. achieved: die tatsaechlich gebildete Form. ` +
-  `Antworte AUSSCHLIESSLICH als JSON: ` +
+  `Beispiele: Quelle "Ich bin krank." (Praesens), Ziel Perfekt -> transformed ` +
+  `"Ich bin krank gewesen", applicable true. Quelle "Der Bericht wird geschrieben." Ziel ` +
+  `aktiv Praesens -> "Man schreibt den Bericht", applicable true. ` +
+  `Nutze fuer voice, tense und mood in achieved NUR die vorgegebenen Werte, exakt geschrieben. ` +
+  `Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zaeune und ohne ` +
+  `weiteren Text, genau in dieser Form: ` +
   `{"applicable": true, "reason": "ok", "transformed": "...", "note": "...", "note_en": "...", ` +
   `"achieved": {"voice": "...", "tense": "...", "mood": "..."}}.`;
 
@@ -148,6 +172,10 @@ async function callAnthropic(source: string, target: Tuple): Promise<TransformOu
         body: JSON.stringify({
           model: TRANSFORM_MODEL,
           max_tokens: 400,
+          // Thinking disabled: leaving adaptive thinking on (the Sonnet 5 default)
+          // could consume the 400-token budget and truncate the JSON. No
+          // `temperature` is sent (removed on the Sonnet 5 / Opus 4.8 family).
+          thinking: { type: "disabled" },
           system: SYSTEM_PROMPT,
           messages: [{ role: "user", content: userMsg(source, target) }],
         }),
@@ -184,13 +212,16 @@ async function callGemini(source: string, target: Tuple): Promise<TransformOut |
   if (!key) return null;
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [{ parts: [{ text: userMsg(source, target) }] }],
+          // 2.5 Pro is a thinking model: force pure-JSON output and give a
+          // generous budget so reasoning tokens cannot truncate the answer.
+          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4096 },
         }),
       },
     );
@@ -203,7 +234,8 @@ async function callGemini(source: string, target: Tuple): Promise<TransformOut |
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parse(raw, target);
     if (!parsed) { console.error(`[transform] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
-    return { ...parsed, model: "gemini-1.5-flash", cost: 0.0005 };
+    // Free tier: record $0 so free calls never consume the paid spend fuse.
+    return { ...parsed, model: GEMINI_MODEL, cost: 0 };
   } catch (e) {
     console.error(`[transform] gemini threw: ${e}`);
     return null;
@@ -218,8 +250,13 @@ async function callOpenAI(source: string, target: Tuple): Promise<TransformOut |
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: OPENAI_MODEL,
         response_format: { type: "json_object" },
+        // GPT-5 is a reasoning model: cap with max_completion_tokens (max_tokens is
+        // rejected) and keep reasoning minimal so it stays fast and does not starve
+        // the JSON output. No temperature (also rejected on reasoning models).
+        max_completion_tokens: 2048,
+        reasoning_effort: "minimal",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: userMsg(source, target) },
@@ -234,7 +271,7 @@ async function callOpenAI(source: string, target: Tuple): Promise<TransformOut |
     const data = await res.json();
     const parsed = parse(data.choices?.[0]?.message?.content ?? "", target);
     if (!parsed) return null;
-    return { ...parsed, model: "gpt-4o-mini", cost: 0.0008 };
+    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
   } catch (e) {
     console.error(`[transform] openai threw: ${e}`);
     return null;
@@ -341,7 +378,23 @@ Deno.serve(async (req) => {
   }
 
   console.log(`[transform] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${TRANSFORM_MODEL}`);
-  const out = (await callAnthropic(source, target)) || (await callGemini(source, target)) || (await callOpenAI(source, target));
+  // Free Gemini first. On its failure (any error, incl. free-tier/quota 429,
+  // which returns null) fall to a paid model: Sonnet while Claude spend is under
+  // budget, else GPT-5 leads. Each paid model backstops the other.
+  let out = await callGemini(source, target);
+  if (!out) {
+    // Month-to-date Claude spend across ALL AI features (Satzlabor + writing coach).
+    const monthIso = startOfMonth.toISOString();
+    const [opsRows, writRows] = await Promise.all([
+      admin.from("sentence_ai_ops").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+      admin.from("writing_evaluations").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+    ]);
+    const claudeSpend = [...(opsRows.data ?? []), ...(writRows.data ?? [])]
+      .reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
+    out = claudeSpend < CLAUDE_BUDGET_USD
+      ? (await callAnthropic(source, target)) || (await callOpenAI(source, target))
+      : (await callOpenAI(source, target)) || (await callAnthropic(source, target));
+  }
   if (!out) {
     console.error(`[transform] all providers failed target=${canonicalTuple(target)}`);
     return json({ ok: false, message: "Die Umformung ist momentan nicht verfügbar." });

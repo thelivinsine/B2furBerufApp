@@ -1259,3 +1259,51 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   `preview/fokus-correction-v4-himmel.html` · `preview/fokus-correction-toggle.html` ·
   `preview/fokus-umlaut-keys.html` · `preview/schreiben-design-review.html` (+ claude.ai artifact) ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · PRs #653 · #654 · this log
+
+## Session 151 — 2026-07-23 — Fokus "Satzlabor" grammar-bug fix + AI provider cascade rework (branch `claude/ai-response-bug-xfsth9`)
+
+_(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23, this one second.)_
+
+- **Prompt 1 (verbatim, 4 Satzlabor screenshots attached):** `Read the ai's responses in these screenshots, don't you think there's a serious bug here?`
+- **Response 1:** Confirmed a serious bug. For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv
+  copula, sein + adjective) the panel marked **Passiv** as the detected form, then refused Perfekt/
+  Präteritum with "Der Satz steht schon in dieser Form" and refused a passive it claimed the sentence
+  already was. Root cause traced to `check-sentence` (Haiku) misreading "sein + Adjektiv" as a
+  Zustandspassiv + the client collapsing it onto the Vorgangspassiv pill; proposed prompt + client fixes.
+- **Prompt 2 (verbatim):** `Yes, I want you to fix the bugs and I'm happy to run the fucntions in supabase, but before that tell me which llm models are best suited for our task here irrespective of provider and advanceness of the models`
+- **Response 2:** Loaded the grounded model catalogue (claude-api skill); recommended Sonnet 5 as the
+  sweet spot for German morphology (Opus 4.8 for max), flagged the temperature/thinking migration
+  caveat, asked which model to standardize on.
+- **Prompt 3 (model AskUserQuestion answer):** chose **Sonnet 5**. → Shipped the fix: hardened
+  check/transform prompts (copula-is-Aktiv; `bereits_zielform` needs voice AND tense), dropped
+  `temperature`, disabled thinking, Sonnet cost math, cache invalidation, and the client
+  `normalizeDetected` guard (Zustandspassiv → null) with the test updated.
+- **Prompt 4 (verbatim):** `what are comparable models for sonnet in gemini and chatgpt models?` →
+  Gemini 2.5 Pro / GPT-5; flagged the cheap fallbacks were the same weak tier.
+- **Prompt 5 (verbatim):** `match the fall back model quality, and also which model has the highest free tier limit?` →
+  Free tier = Google Gemini (Flash-tier highest); upgraded the two fallbacks (later superseded).
+- **Prompt 6 (verbatim):** `use Gemini 2.5 or 3 flash model as primary and sonnet as second back up if the free tier is exhausted and gpt 5 model if claude sonnet uses $2.` + mid-turn `the total token cost limit should be $5 for all three models combined. Make the prompts robust` →
+  Reworked check/transform into the free-first cascade Gemini 2.5 Flash ($0) → Sonnet 5 (until $2
+  Claude spend) → GPT-5, global $5 fuse, robust JSON-only prompts.
+- **Prompt 7 (verbatim, interrupt):** `First answe my question` → answered the free-tier question directly.
+- **Prompt 8 (verbatim):** `I want Gemini to be primary model for all AI reviews or corrections not just satzlabor.` →
+  Extended the cascade to `evaluate-writing`; made the $2 Claude threshold GLOBAL (summed across
+  `sentence_ai_ops` + `writing_evaluations` in all three functions).
+- **Prompt 9 (verbatim):** `yes adapt the Ui disclaimer` → both Art. 50 disclaimers → "(Anthropic, Google oder OpenAI)".
+- **Prompts 10-13 (verbatim):** `how should I store the gemini api keys in supabase?` · `how to add chatgpt api?` ·
+  `I'm done with deploying the edge functions and adding api keys. What next?` ·
+  `provide links to the new codes for all the functions thjat I need to run again` → answered each
+  (Supabase Edge Function secrets `GEMINI_API_KEY`/`OPENAI_API_KEY`, key sources + billing/GDPR notes,
+  next-steps plan, GitHub blob links + redeploy command).
+- **Prompt 14 (verbatim):** `edit the privacy policy, document the session and push everything live to main`
+- **Response 14:** Genericized the privacy-policy AI passage (DE + EN) routing-neutrally; judged
+  non-material so `CONSENT_VERSION` NOT bumped. Documented the session (PROJECT_STATUS header + handoff,
+  SESSION_PROMPT_LOG, CLAUDE.md AI-provider facts). On merge to `main` a parallel s150 (Fokus correction
+  redesign, PRs #653/#654) had force-updated `main`; resolved the merge (code auto-merged cleanly:
+  cascade + guard + redesign all intact; renumbered this session 150→151, kept both handoffs), then
+  squash-merged.
+- **Artifacts (session 151):** `supabase/functions/check-sentence/index.ts` ·
+  `supabase/functions/transform-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
+  `src/features/writing/fokus/grammarDimensions.ts` · `tests/fokusGrammar.test.ts` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/legal/PrivacyPolicy.tsx` · `docs/PROJECT_STATUS.md` · `CLAUDE.md` · PR #657 · this log

@@ -6,7 +6,8 @@
 //
 //   1. Auth + kill-switch + per-user daily check limit + global monthly $ fuse.
 //   2. Cache lookup by input hash (GLOBAL: corrections are user-independent).
-//   3. ONE Haiku call (fallback Gemini -> gpt-4o-mini) returning corrected text +
+//   3. ONE model call, cascade Gemini 2.5 Flash (free) -> Sonnet 5 -> GPT-5,
+//      returning corrected text +
 //      per-sentence {voice,tense,mood}.
 //   4. Persist a per-user row, bump ai_usage + the paid-ops ledger, return JSON.
 //
@@ -56,12 +57,29 @@ const DAILY_CHECK_LIMIT = Number(Deno.env.get("DAILY_CHECK_LIMIT") ?? "20");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");
-const HAIKU_MODEL = "claude-haiku-4-5";
+// Sonnet 5 for German morphology accuracy (was claude-haiku-4-5, which mislabeled
+// copula "sein + Adjektiv" as passive). Override via CHECK_MODEL if ever needed.
+// Provider cascade (per cache-miss): free Gemini Flash first, then paid Claude
+// Sonnet, then GPT-5. Sonnet is the paid backup until month-to-date Claude spend
+// reaches CLAUDE_BUDGET_USD, after which GPT-5 leads. All three combined are
+// bounded by the global MONTHLY_SPEND_CAP_USD fuse (Gemini's free tier is $0).
+const GEMINI_MODEL = Deno.env.get("GEMINI_MODEL") ?? "gemini-2.5-flash";
+const CHECK_MODEL = Deno.env.get("CHECK_MODEL") ?? "claude-sonnet-5";
+const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
+// Once month-to-date Claude (Sonnet) spend reaches this, GPT-5 leads the paid
+// backup instead of Sonnet. A soft routing threshold, not a hard cap; the hard
+// ceiling for all providers is MONTHLY_SPEND_CAP_USD.
+const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
+// Bump when the prompt or model changes: the global correction cache is keyed by
+// source_hash only, so folding this in re-evaluates sentences that were cached by
+// the old (weaker) model instead of serving their stale grammar detection.
+const CHECK_VERSION = "2";
 
 // Case-PRESERVING hash (German capitalization is grammatically meaningful, unlike
-// the weakness-classifier in evaluate-writing which lowercases).
+// the weakness-classifier in evaluate-writing which lowercases). Salted with
+// CHECK_VERSION so a model/prompt bump invalidates the old cache.
 async function hashText(text: string): Promise<string> {
-  const norm = text.trim().replace(/\s+/g, " ");
+  const norm = `${CHECK_VERSION}\n${text.trim().replace(/\s+/g, " ")}`;
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(norm));
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
@@ -83,7 +101,18 @@ const SYSTEM_PROMPT =
   `(aktiv, passiv_vorgang, passiv_zustand), tense (praesens, perfekt, praeteritum, ` +
   `plusquamperfekt, futur1, futur2) und mood (indikativ, konjunktiv1, konjunktiv2, imperativ) ` +
   `nach dem finiten Verb des Hauptsatzes. ` +
-  `Antworte AUSSCHLIESSLICH als JSON: ` +
+  `WICHTIG zur voice: Eine Kopula, also sein/werden/bleiben + Adjektiv oder Adverb ` +
+  `(z. B. "Ich bin krank", "Sie ist muede", "Er wird alt", "Wir sind da"), ist IMMER aktiv ` +
+  `und NIEMALS Passiv. Ein Passiv liegt nur vor, wenn ein Partizip II eines transitiven ` +
+  `Verbs steht: passiv_vorgang = werden + Partizip II ("Der Bericht wird geschrieben"), ` +
+  `passiv_zustand = sein + Partizip II ("Die Tuer ist geschlossen"). Ein Adjektiv nach sein ` +
+  `ist KEIN Partizip und damit kein Zustandspassiv. Im Zweifel voice = aktiv. ` +
+  `Beispiele: "Ich bin krank." -> voice aktiv, tense praesens (Kopula, kein Passiv). ` +
+  `"Der Bericht wird geschrieben." -> voice passiv_vorgang, tense praesens. ` +
+  `"Sie hat den Termin abgesagt." -> voice aktiv, tense perfekt. ` +
+  `Nutze fuer voice, tense und mood NUR die genannten Werte, exakt so geschrieben. ` +
+  `Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zaeune und ohne ` +
+  `weiteren Text, genau in dieser Form: ` +
   `{"corrected": "...", "has_errors": true, "sentences": [{"text": "...", "voice": "aktiv", "tense": "praesens", "mood": "indikativ"}]}.`;
 
 function parseCheck(raw: string): { corrected: string; hasErrors: boolean; sentences: Detected[] } | null {
@@ -120,9 +149,13 @@ async function callAnthropic(text: string): Promise<CheckOut | null> {
         method: "POST",
         headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: HAIKU_MODEL,
+          model: CHECK_MODEL,
           max_tokens: 500,
-          temperature: 0,
+          // No `temperature` (removed on Sonnet 5 / Opus 4.8 family -> 400).
+          // Thinking disabled: a one-sentence grammar call does not need it, and
+          // leaving adaptive thinking on (the Sonnet 5 default) could consume the
+          // 500-token budget and truncate the JSON.
+          thinking: { type: "disabled" },
           system: SYSTEM_PROMPT,
           messages: [{ role: "user", content: `Text:\n"""${text}"""` }],
         }),
@@ -143,8 +176,11 @@ async function callAnthropic(text: string): Promise<CheckOut | null> {
       if (!parsed) { console.error(`[check] anthropic parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
       const inTok = data.usage?.input_tokens ?? 0;
       const outTok = data.usage?.output_tokens ?? 0;
-      const cost = (inTok / 1e6) * 1 + (outTok / 1e6) * 5;
-      return { ...parsed, model: HAIKU_MODEL, cost };
+      // Sonnet 5 standard rates ($3/$15 per 1M); over-estimates during the intro
+      // window, which keeps the monthly spend fuse conservative. Haiku fallback = $1/$5.
+      const isSonnet = CHECK_MODEL.includes("sonnet");
+      const cost = (inTok / 1e6) * (isSonnet ? 3 : 1) + (outTok / 1e6) * (isSonnet ? 15 : 5);
+      return { ...parsed, model: CHECK_MODEL, cost };
     } catch (e) {
       console.error(`[check] anthropic threw: ${e}`);
       return null;
@@ -158,13 +194,16 @@ async function callGemini(text: string): Promise<CheckOut | null> {
   if (!key) return null;
   try {
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [{ parts: [{ text: `Text:\n"""${text}"""` }] }],
+          // 2.5 Pro is a thinking model: force pure-JSON output and give a
+          // generous budget so reasoning tokens cannot truncate the answer.
+          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4096 },
         }),
       },
     );
@@ -177,7 +216,8 @@ async function callGemini(text: string): Promise<CheckOut | null> {
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
     const parsed = parseCheck(raw);
     if (!parsed) { console.error(`[check] gemini parse-fail raw=${String(raw).slice(0, 400)}`); return null; }
-    return { ...parsed, model: "gemini-1.5-flash", cost: 0.0005 };
+    // Free tier: record $0 so free calls never consume the paid spend fuse.
+    return { ...parsed, model: GEMINI_MODEL, cost: 0 };
   } catch (e) {
     console.error(`[check] gemini threw: ${e}`);
     return null;
@@ -192,8 +232,13 @@ async function callOpenAI(text: string): Promise<CheckOut | null> {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: OPENAI_MODEL,
         response_format: { type: "json_object" },
+        // GPT-5 is a reasoning model: cap with max_completion_tokens (max_tokens is
+        // rejected) and keep reasoning minimal so it stays fast and does not starve
+        // the JSON output. No temperature (also rejected on reasoning models).
+        max_completion_tokens: 2048,
+        reasoning_effort: "minimal",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content: `Text:\n"""${text}"""` },
@@ -208,7 +253,7 @@ async function callOpenAI(text: string): Promise<CheckOut | null> {
     const data = await res.json();
     const parsed = parseCheck(data.choices?.[0]?.message?.content ?? "");
     if (!parsed) return null;
-    return { ...parsed, model: "gpt-4o-mini", cost: 0.0008 };
+    return { ...parsed, model: OPENAI_MODEL, cost: 0.004 };
   } catch (e) {
     console.error(`[check] openai threw: ${e}`);
     return null;
@@ -305,8 +350,24 @@ Deno.serve(async (req) => {
   }
 
   // LLM correction + detection.
-  console.log(`[check] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${HAIKU_MODEL}`);
-  const out = (await callAnthropic(text)) || (await callGemini(text)) || (await callOpenAI(text));
+  console.log(`[check] providers configured: anthropic=${!!Deno.env.get("ANTHROPIC_API_KEY")} gemini=${!!Deno.env.get("GEMINI_API_KEY")} openai=${!!Deno.env.get("OPENAI_API_KEY")} model=${CHECK_MODEL}`);
+  // Free Gemini first. On its failure (any error, incl. free-tier/quota 429,
+  // which returns null) fall to a paid model: Sonnet while Claude spend is under
+  // budget, else GPT-5 leads. Each paid model backstops the other.
+  let out = await callGemini(text);
+  if (!out) {
+    // Month-to-date Claude spend across ALL AI features (Satzlabor + writing coach).
+    const monthIso = startOfMonth.toISOString();
+    const [opsRows, writRows] = await Promise.all([
+      admin.from("sentence_ai_ops").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+      admin.from("writing_evaluations").select("cost_estimate").ilike("model", "claude%").gte("created_at", monthIso),
+    ]);
+    const claudeSpend = [...(opsRows.data ?? []), ...(writRows.data ?? [])]
+      .reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
+    out = claudeSpend < CLAUDE_BUDGET_USD
+      ? (await callAnthropic(text)) || (await callOpenAI(text))
+      : (await callOpenAI(text)) || (await callAnthropic(text));
+  }
   if (!out) {
     console.error("[check] all providers failed for input hash " + inputHash.slice(0, 12));
     return json({ ok: false, message: "Die Prüfung ist momentan nicht verfügbar. Bitte versuche es später erneut." });
