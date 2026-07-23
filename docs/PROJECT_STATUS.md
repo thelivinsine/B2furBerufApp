@@ -1,17 +1,18 @@
 # Project Status
 
-_Last updated: 2026-07-23 (session 149, complete). **Schreiben is a full Bibliothek extension**
-(5 founder rounds, PRs #648-#651, all merged): the 4-segment sliding-pill switcher **Fokus · Kurz ·
-Lang · Verlauf** IS the page header, the "Aufgabe wählen" rail is a Himmelblau tile with the
-Bibliothek scope hierarchy **Branche → Thema → Unterthema** as grouped dropdowns (live counts,
-zero-yield greyed, Gesundheit folds into Alltag), the Fokus Grammatik rail shares the same tile
-(green dot = detected form), and writing tasks are RANDOM POOLS of tagged task objects: **373
-tasks**, every theme ≥8 short + ≥8 long, every sub-theme ≥2+2, **all 15 Branchen** with
-sector-specific tasks (untagged = universal). Reset is always-active (clears scopes + draws a
-fresh task); directional tab slides + one micro-motion timing family. **Founder design
-preferences distilled into CLAUDE.md + DECISIONS.md (s149).** Next content wave: pools toward
-15-20 per theme/length (append-only). Founder action open (from s147): redeploy
-`check-sentence`/`transform-sentence` + confirm `GEMINI_API_KEY`.
+_Last updated: 2026-07-23 (session 150, complete). **Fokus correction redesign + Umlaut keys**
+(founder-approved via a consolidated design-review artifact, branch
+`claude/diagonal-gradient-invert-odi99r`, PRs #653 + #654, both merged). The noisy Fokus
+corrected-state card (struck original + counter + highlighted sentence + change list) is replaced
+with: an **Original/Korrigiert view toggle** (Original underlines the mistakes in **Koralle**,
+Korrigiert underlines the fixes in **green** — a calm underline, not a fill), **theme-aware
+Himmelblau fix tiles** (light strong / dark soft) each carrying a heuristic learning category
+(Rechtschreibung / Umlaut / Groß-/Kleinschreibung / Grammatik / Ergänzung / Streichung), and
+**Neuer Satz** moved onto the card (bottom-right of the tiles row). New reusable **`UmlautKeys`**
+bar (ä ö ü ß Ä Ö Ü, insert at cursor) on the Fokus input + the Kurz/Lang editor for non-German
+keyboards. PR #653 also **inverted the page-background gradient** across the top-left→bottom-right
+diagonal. `wordDiff` now returns flagged original tokens + `classifyChange`. Founder action open
+(from s147): redeploy `check-sentence`/`transform-sentence` + confirm `GEMINI_API_KEY`.
 Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -74,6 +75,44 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 150 (2026-07-23). Fokus correction-card redesign + Umlaut keys, branch
+`claude/diagonal-gradient-invert-odi99r`, PRs #653 + #654 merged.** Founder started from "invert the
+background gradient diagonally" (PR #653: `tailwind.config.ts` `mesh`/`page` accent radial moved
+top-right → bottom-left, linear angle 150°→120°), then pivoted to redesigning the Fokus corrected-state
+card as "too noisy and redundant" and iterated across ~8 preview rounds before approving a combined
+design and asking to implement + ship.
+- **Design-review artifact.** A single consolidated gallery (`preview/schreiben-design-review.html`,
+  published as a claude.ai artifact) with a version switcher (Final + Alle + every prior variant), an
+  app light/dark toggle, and live interactions. All step previews are committed under `preview/`
+  (`fokus-correction-redesign`, `-ac`, `-v4-himmel`, `-toggle`, `fokus-umlaut-keys`, `schreiben-design-review`).
+- **Correction card (`FokusTrainer.tsx`).** Removed the struck-through original, the "· n Änderungen"
+  counter, the in-place `<mark>` highlight, and the "Was ich geändert habe" list. New: eyebrow "Dein
+  Satz" shares its row with an **Original/Korrigiert segmented toggle** (default Korrigiert; resets to
+  Korrigiert on each new correction via a `view` state + effect on `m.corrected`). Original view marks
+  the wrong words with `.fx-mark-coral` (`--reward`), Korrigiert marks the fixes with `.fx-mark-green`
+  (`--success`) — both are calm underlines (`index.css` `@layer utilities`). Below: **Himmelblau fix
+  tiles** (`bg-accent/30 border-accent/70` light, `dark:bg-accent/[0.18] dark:border-accent/[0.45]`),
+  each = category eyebrow (`text-accent-ink`) + `old → new`. **Neuer Satz** is an outline button on the
+  tiles row, `ml-auto self-end` (right + bottom aligned, wraps only if needed); removed from the mobile
+  toolbar and the desktop `GrammarRail` (`onNewSentence` no longer passed) so it appears once.
+- **Umlaut keys (`src/features/writing/UmlautKeys.tsx`).** Reusable bar, keys ä ö ü ß Ä Ö Ü at ~24px
+  (h-6, min-w 1.6rem), neutral `bg-surface` at rest, Himmelblau on press; inserts at the caret
+  (`onMouseDown` preventDefault keeps focus, `requestAnimationFrame` restores selection). Wired into the
+  Fokus input footer (shares the desktop row with Korrigieren; mobile keeps the sticky Korrigieren bar)
+  and the Kurz/Lang guided editor (`GuidedWritingTrainer.tsx`, in the word-count row).
+- **Diff engine (`wordDiff.ts`).** `diffWords` now also returns `originalTokens` (flagged, so the
+  Original view marks errors reliably) and a per-change `category` from the new exported
+  `classifyChange` (umlaut fold + case/punct normalization + multi-word = Grammatik heuristic).
+  Categories are heuristic — tune if a pattern mis-buckets. `tests/wordDiff.test.ts` extended.
+- **Ops note.** The remote git proxy needs a credential helper (`username=local_proxy`, empty password)
+  for `git push`/`fetch`; without it, pushes fall back to unauthenticated api.anthropic.com and fail.
+  Set `git config credential.helper '!f() { echo username=local_proxy; echo password=; }; f'`.
+- **Gates:** `pnpm build` ✓ · `pnpm lint` **0 errors** (pre-existing warnings only) · `pnpm test:unit`
+  **262/262** · `check:bundle` unaffected (writing stays lazy). Sandbox can't reach the live site;
+  founder confirms after the Pages deploy.
+- **Open:** the s147 founder redeploy action below still stands; error categories are heuristic and can
+  be refined once seen live.
+
 **Handoff after session 149 (2026-07-23). Schreiben restyled as a Bibliothek extension, branch
 `claude/schreiben-design-refinement-bw8rhh`.** Founder: "make the schreiben section look like it's an
 extension of bibliothek". Two preview rounds (`preview/schreiben-bibliothek-extension.html` = variants
@@ -131,32 +170,8 @@ A/B, `-r2.html` = variant A + the founder's 7 changes), then implemented on foun
   arrays in `writingPrompts.ts`, no schema work needed); the s147 founder redeploy action below still
   stands.
 
-**Handoff after session 148 (2026-07-22). Auth bug fix: fresh-device OAuth login threw existing
-accounts out to the landing page. Branch `claude/pwa-auth-uninstall-bug-hrafrw`, PR #644 merged.**
-The founder reported: after uninstalling the PWA and logging into an admin account with Google, the
-app redirects to the landing page right after login and throws them out.
-- **Root cause.** Uninstalling the PWA wipes `localStorage`, so on the fresh install the local
-  `onboarded` flag defaults to `false`. Google OAuth (`signInWithGoogle`) returns to `/`, where the
-  `RequireOnboarding` guard (`router.tsx`) read the **local** `onboarded` flag *synchronously* and
-  immediately `<Navigate to="/welcome">` — before `startCloudSync` (async) pulled the account's real
-  `onboarded: true` from its Supabase profile. Any existing account on a fresh device got bounced.
-  Not admin-specific; admins just hit it because they test on multiple devices. `RequireFounder` was
-  never in the redirect path (OAuth returns to `/`, not `/admin`) and reads `user.email` which is
-  available immediately, so it needed no change.
-- **Fix (3 files, +37 lines).** New `syncHydrated: boolean` on `useAuthStore` (default false).
-  `cloudSync.ts` sets it `false` at the start of each `startCloudSync` and in `stopCloudSync`
-  (sign-out), and `true` in a `finally` **after** the first pull's profile merge (so the cloud
-  `onboarded` is already applied when it flips; also covers the offline-catch path).
-  `RequireOnboarding` now: (1) lets already-onboarded devices straight in; (2) renders `null` while
-  `status === "loading"` (OAuth handshake in flight); (3) for a signed-in / guest user, renders
-  `null` until `syncHydrated`; (4) only a genuinely signed-out visitor (or one whose pull finished
-  still-not-onboarded) goes to `/welcome`. Circular import (`cloudSync` ↔ `useAuthStore`) is safe:
-  both only touch each other inside function bodies, never at module eval.
-- **Gates:** `typecheck` ✓ · `lint` (0 errors; pre-existing warnings only) · `test:unit` **257/257** ·
-  `build` ✓ · `check:bundle` **112.3 kB** (main chunk unchanged). Sandbox can't reach the live
-  `*.github.io` site, so the founder confirms the reinstall-and-login result after the Pages deploy.
-
-_(Session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first
+_(Session 148's PWA-auth-uninstall bug-fix handoff (fresh-device OAuth `syncHydrated` gate, PR #644),
+session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first
 Bibliothek harmonization, PRs #640/#642/#643/#646), session 146's /sources verification-refresh +
 human-review-reset + table-restructure handoff, and
 session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,

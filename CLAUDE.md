@@ -509,15 +509,33 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   mobile panel animates via fade/slide, not height collapse, for the same reason. Fokus
   `GrammarRail` is the SAME Himmelblau tile (s149; was grey): detected form = **white pill + green
   `bg-success` dot** (never a blue fill/ring), target solid primary, pre-correction all idle, header
-  reset icon (back to the detected form), footer only "Neuer Satz", hint breaks after "Grüner Punkt
+  reset icon (back to the detected form), hint breaks after "Grüner Punkt
   = erkannte Form.". The Fokus transform box is a **white card** (never a grey wash) with a bold
   colored "Hinweis:" label (no i icon) and "KI-generierte Umformung" centered at the card bottom.
   **Mobile = the Bibliothek pattern:** a toolbar button toggles the collapsible panel
   (`layout="panel"`, no floating chip rows), Kurz/Lang get a sticky bottom Auswerten action bar and
-  Fokus a sticky Korrigieren bar (pre-correction), Fokus pairs the Grammatik button with Neuer Satz
-  in one row. **Verlauf renders inside the same content grid column** as the other tabs (never full
+  Fokus a sticky Korrigieren bar (pre-correction). **Verlauf renders inside the same content grid column** as the other tabs (never full
   width) and its empty state deep-links into Kurz. `WritingHistory` shows only the learner's text
   (the exact prompt behind an old entry is not recoverable from theme+length since pools).
+  **Fokus correction card (s150 redesign, `FokusTrainer.tsx`, founder-approved via the
+  `preview/schreiben-design-review.html` artifact):** the corrected-state card dropped the noisy
+  struck-through original + "· n Änderungen" counter + in-place `<mark>` highlight + "Was ich geändert
+  habe" list. Now: the "Dein Satz" eyebrow shares its row with an **Original/Korrigiert view toggle**
+  (default Korrigiert; resets to Korrigiert on each new correction), Original marks the wrong words
+  with `.fx-mark-coral` (`--reward`) and Korrigiert marks the fixes with `.fx-mark-green` (`--success`)
+  — calm underlines, not fills (`index.css` `@layer utilities`). Below sits a row of **Himmelblau fix
+  tiles** (light `bg-accent/30 border-accent/70`, `dark:bg-accent/[0.18] dark:border-accent/[0.45]`),
+  each = a heuristic learning-category eyebrow (`text-accent-ink`; Rechtschreibung / Umlaut /
+  Groß-/Kleinschreibung / Grammatik / Ergänzung / Streichung, from `classifyChange` in `wordDiff.ts`)
+  + the `old → new` edit, with **Neuer Satz** as an outline button on that same row (`ml-auto
+  self-end`, wraps only if needed) — so Neuer Satz is NOT on the mobile toolbar or the desktop rail
+  anymore. `wordDiff.diffWords` returns `tokens` + `originalTokens` (both flagged) + `changes`
+  (each with a `category`); `tests/wordDiff.test.ts` pins it.
+- **Umlaut keys (`src/features/writing/UmlautKeys.tsx`, s150):** a reusable insert bar (ä ö ü ß Ä Ö Ü)
+  for learners on non-German keyboards. Inserts at the caret (over a selection too), neutral
+  `bg-surface` at rest, flashes Himmelblau on press, keys ~24px. Wired into the Fokus input footer
+  (shares the desktop row with Korrigieren) and the Kurz/Lang guided editor (`GuidedWritingTrainer.tsx`,
+  in the word-count row). Takes `{ textareaRef, value, onChange }`.
 - **Fortschritt + Can-Do:** `canDo.ts` bank (52 milestones) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
 - **Nav zones (labels updated s105, 2026-07-13; `/library` reverted to Bibliothek s141; Schreiben added
