@@ -8,6 +8,7 @@
     --border: 220 9% 86%;
     --input: 220 9% 86%;
     --primary: 221 83% 54%;
+    --primary-foreground: 0 0% 100%;
     --accent: 197 93% 77%;
     --accent-ink: 198 90% 32%;
     --success: 153 55% 40%;
@@ -20,14 +21,14 @@
   :root[data-theme="light"] {
     --background: 180 45% 98%; --surface: 0 0% 100%; --muted: 220 10% 90%;
     --muted-foreground: 220 8% 36%; --foreground: 252 16% 12%; --border: 220 9% 86%;
-    --input: 220 9% 86%; --primary: 221 83% 54%; --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --input: 220 9% 86%; --primary: 221 83% 54%; --primary-foreground: 0 0% 100%; --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
     --success: 153 55% 40%; --success-bg: 153 55% 95%; --warning: 38 92% 46%; --reward: 11 82% 54%;
     --shadow: 221 40% 22%; --ring: 221 83% 54%;
   }
   .darktokens, :root[data-theme="dark"] {
     --background: 228 24% 10%; --surface: 228 20% 14%; --muted: 228 16% 22%;
     --muted-foreground: 228 10% 72%; --foreground: 228 20% 92%; --border: 228 14% 26%;
-    --input: 228 14% 28%; --primary: 221 90% 70%; --accent: 197 93% 77%; --accent-ink: 198 85% 72%;
+    --input: 228 14% 28%; --primary: 221 90% 70%; --primary-foreground: 228 30% 8%; --accent: 197 93% 77%; --accent-ink: 198 85% 72%;
     --success: 153 52% 60%; --success-bg: 153 38% 17%; --warning: 43 90% 62%; --reward: 11 88% 66%;
     --shadow: 221 60% 3%; --ring: 221 90% 70%;
   }
@@ -35,7 +36,7 @@
     :root:not([data-theme="light"]) {
       --background: 228 24% 10%; --surface: 228 20% 14%; --muted: 228 16% 22%;
       --muted-foreground: 228 10% 72%; --foreground: 228 20% 92%; --border: 228 14% 26%;
-      --input: 228 14% 28%; --primary: 221 90% 70%; --accent: 197 93% 77%; --accent-ink: 198 85% 72%;
+      --input: 228 14% 28%; --primary: 221 90% 70%; --primary-foreground: 228 30% 8%; --accent: 197 93% 77%; --accent-ink: 198 85% 72%;
       --success: 153 52% 60%; --success-bg: 153 38% 17%; --warning: 43 90% 62%; --reward: 11 88% 66%;
       --shadow: 221 60% 3%; --ring: 221 90% 70%;
     }
@@ -159,9 +160,13 @@
     border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; background: hsl(var(--muted) / .35); overflow-x: auto; }
   .footer { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
   .count { font-size: 12px; color: hsl(var(--muted-foreground)); white-space: nowrap; margin-right: auto; }
-  .btn { border: none; border-radius: 12px; padding: 10px 16px; font: inherit; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer;
-    display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, hsl(226 83% 47%), hsl(var(--primary)) 45%, hsl(196 93% 38%)); }
-  :root[data-theme="dark"] .btn, .darktokens .btn { color: hsl(228 30% 8%); }
+  .btn { border: none; border-radius: 12px; padding: 10px 16px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px; color: hsl(var(--primary-foreground)); background: hsl(var(--primary)); }
+  /* Neuer-Satz ghost button, bottom-right of the corrected card. */
+  .cardfoot { display: flex; justify-content: flex-end; margin-top: 18px; }
+  .ghostbtn { border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--foreground)); border-radius: 12px;
+    padding: 9px 14px; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: border-color .12s; }
+  .ghostbtn:hover { border-color: hsl(var(--accent) / .6); }
 
   .footnote { margin: 15px 0 0; font-size: 12px; color: hsl(var(--muted-foreground)); }
   .foot { font-size: 11.5px; color: hsl(var(--muted-foreground)); margin: 42px 2px 0; line-height: 1.65; border-top: 1px solid hsl(var(--border)); padding-top: 16px; }
@@ -206,17 +211,16 @@
   <section class="screen" data-id="final">
     <div class="slabel"><span class="stag rec">Final</span><span class="sname">Kombiniert · deine Auswahl</span></div>
     <p class="swhy">V4-Kacheln (theme-abhängig: hell kräftig, dunkel weich) · Original/Korrigiert-Toggle mit
-      Koralle- bzw. Grün-Markierung · angedockte Umlaut-Leiste (B), Tasten ~30 % kleiner.</p>
+      Koralle- bzw. Grün-Markierung · Umlaut-Tasten in der Fußzeile (A), ~30 % kleiner · Korrigieren
+      solid (ohne Verlauf) · Neuer Satz unten rechts.</p>
 
     <p class="steps">1 · Eingabe</p>
     <div class="card">
       <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
-      <div class="fieldB">
-        <textarea rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.">Kanst du bitte es kurz erklaeren?</textarea>
-        <div class="accessory"><div class="keys" data-keys></div></div>
-      </div>
-      <div class="footer">
-        <span class="count" data-count>5 Wörter</span>
+      <textarea rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.">Kanst du bitte es kurz erklaeren?</textarea>
+      <div class="footer" style="flex-wrap:wrap">
+        <div class="keys" data-keys style="flex:1 1 auto"></div>
+        <span class="count" data-count style="margin-left:auto;margin-right:0">5 Wörter</span>
         <button class="btn">✦ Korrigieren</button>
       </div>
     </div>
@@ -238,6 +242,7 @@
         <div class="tile"><span class="cat">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
         <div class="tile"><span class="cat">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
       </div>
+      <div class="cardfoot"><button class="ghostbtn">↺ Neuer Satz</button></div>
     </div>
   </section>
 
@@ -391,7 +396,7 @@
 
   <!-- ============ UMLAUT A ============ -->
   <section class="screen" data-id="umlautA" hidden>
-    <div class="slabel"><span class="sname">Umlaut-Tasten A · in der Fußzeile</span></div>
+    <div class="slabel"><span class="stag rec">Gewählt</span><span class="sname">Umlaut-Tasten A · in der Fußzeile</span></div>
     <p class="swhy">Tasten teilen sich die Fußzeile mit Zähler und Aktion. Kein Extra-Element.</p>
     <div class="card">
       <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
@@ -406,7 +411,7 @@
 
   <!-- ============ UMLAUT B ============ -->
   <section class="screen" data-id="umlautB" hidden>
-    <div class="slabel"><span class="stag rec">Gewählt</span><span class="sname">Umlaut-Tasten B · angedockt (kleiner)</span></div>
+    <div class="slabel"><span class="stag">Option</span><span class="sname">Umlaut-Tasten B · angedockt (kleiner)</span></div>
     <p class="swhy">Angedockte Leiste am Textfeld, Tasten ~30 % kleiner. Setz den Cursor, dann eine Taste.</p>
     <div class="card">
       <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
