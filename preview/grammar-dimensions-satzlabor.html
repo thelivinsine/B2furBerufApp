@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satzlabor · erweiterte Grammatik-Dimensionen (Preview)</title>
+<style>
+  :root{
+    --background:180 45% 98%; --foreground:252 16% 12%; --surface:0 0% 100%;
+    --muted:220 10% 90%; --muted-foreground:220 8% 36%; --border:220 9% 86%; --input:220 9% 86%;
+    --primary:221 83% 54%; --primary-foreground:0 0% 100%;
+    --accent:197 93% 77%; --accent-ink:198 90% 32%;
+    --success:153 55% 40%; --warning:38 92% 46%; --danger:4 73% 56%; --reward:11 82% 54%;
+    --shadow:221 40% 22%;
+    --page-from:144 45% 98%; --page-mid:150 50% 98%; --page-to:198 83% 98%;
+    --gradient-from:226 83% 47%; --gradient-to:196 93% 38%;
+    --radius:0.875rem;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Inter Variable","Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:hsl(var(--foreground));
+    -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary)/0.10) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent)/0.09) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    min-height:100vh; padding:40px 20px;
+  }
+  .wrap{max-width:1120px;margin:0 auto}
+  .page-eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:hsl(var(--accent-ink))}
+  .page-title{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:6px;text-wrap:balance}
+  .page-sub{color:hsl(var(--muted-foreground));font-size:15px;margin-top:8px;max-width:70ch;line-height:1.55}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:20px 0 26px;font-size:12.5px;color:hsl(var(--muted-foreground))}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .swatch{display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid;padding:3px 10px;font-size:12px;line-height:1;background:hsl(var(--surface))}
+  .dot{width:7px;height:7px;border-radius:999px;display:inline-block}
+
+  .frame-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:hsl(var(--muted-foreground));margin:26px 0 12px}
+
+  /* App shell mimic */
+  .shell{background:
+      radial-gradient(at 0% 0%, hsl(var(--primary)/0.10) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent)/0.09) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    border:1px solid hsl(var(--border));border-radius:18px;padding:26px;box-shadow:0 2px 4px hsl(var(--shadow)/0.05),0 12px 32px hsl(var(--shadow)/0.10)}
+
+  .switcher{display:inline-flex;background:hsl(var(--muted));border-radius:999px;padding:4px;gap:2px;margin-bottom:22px}
+  .seg{font-size:14px;font-weight:600;padding:7px 18px;border-radius:999px;color:hsl(var(--muted-foreground));border:none;background:transparent;cursor:default}
+  .seg.active{background:hsl(var(--surface));color:hsl(var(--foreground));box-shadow:0 1px 2px hsl(var(--shadow)/0.10)}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) 17rem;gap:0 32px;align-items:start}
+
+  .card{border:1px solid hsl(var(--border));background:hsl(var(--surface));border-radius:14px;box-shadow:0 1px 2px hsl(var(--shadow)/0.04),0 4px 12px hsl(var(--shadow)/0.06)}
+  .card-pad{padding:20px}
+  .eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:hsl(var(--primary))}
+  .struck{font-size:14px;color:hsl(var(--muted-foreground));text-decoration:line-through;text-decoration-color:hsl(var(--warning)/.5);margin-top:8px;line-height:1.5}
+  .corr-line{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;color:hsl(var(--primary));margin-top:12px}
+  .corrected{font-size:16px;line-height:1.6;margin-top:6px}
+  mark{border-radius:4px;background:hsl(var(--warning)/.25);padding:0 2px;color:hsl(var(--foreground))}
+  .changebox{margin-top:12px;border:1px solid hsl(var(--border));border-radius:10px;padding:12px;background:hsl(var(--surface))}
+  .changebox .lbl{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:hsl(var(--muted-foreground))}
+  .changerow{font-size:13px;margin-top:6px}
+  .changerow .from{color:hsl(var(--muted-foreground));text-decoration:line-through}
+  .changerow .arr{color:hsl(var(--muted-foreground));margin:0 5px}
+  .changerow .to{font-weight:600;color:hsl(var(--success))}
+
+  .bottombox{border:1px solid hsl(var(--border));background:hsl(var(--surface));border-radius:16px;padding:20px;box-shadow:0 1px 2px hsl(var(--shadow)/0.04),0 4px 12px hsl(var(--shadow)/0.06);margin-top:18px}
+  .bb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .bb-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:hsl(var(--primary))}
+  .bb-speak{width:30px;height:30px;border-radius:8px;border:1px solid hsl(var(--border));display:grid;place-items:center;color:hsl(var(--muted-foreground));font-size:13px}
+  .bb-sentence{font-size:16px;line-height:1.6}
+  .bb-hint{margin-top:12px;font-size:14px;line-height:1.55;color:hsl(var(--muted-foreground))}
+  .bb-hint b{font-weight:800;color:hsl(var(--primary))}
+  .bb-more{margin-top:10px;font-size:13px;font-weight:700;color:hsl(var(--primary));display:inline-flex;align-items:center;gap:5px}
+  .bb-credit{margin-top:20px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:hsl(var(--muted-foreground))}
+
+  .ai-note{display:flex;gap:6px;font-size:12px;color:hsl(var(--muted-foreground));margin-top:12px;padding:0 4px;line-height:1.5}
+
+  /* Grammar rail · soft Himmelblau tile */
+  .rail{border:1px solid hsl(var(--accent)/.5);background:hsl(var(--accent)/.20);border-radius:14px;box-shadow:0 1px 2px hsl(var(--shadow)/0.04),0 4px 12px hsl(var(--shadow)/0.06);overflow:hidden;position:sticky;top:20px}
+  .rail-head{display:flex;align-items:center;gap:8px;padding:12px 14px}
+  .rail-head .brand{flex:1;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:hsl(var(--primary))}
+  .rail-reset{width:30px;height:30px;border-radius:9px;border:none;background:transparent;color:hsl(var(--muted-foreground));display:grid;place-items:center}
+  .rail-body{border-top:1px solid hsl(var(--accent)/.5);padding:14px}
+  .rail-section+.rail-section{margin-top:18px}
+  .section-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:hsl(var(--muted-foreground));margin-bottom:9px}
+  .axis+.axis{margin-top:12px}
+  .axis-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:hsl(var(--muted-foreground));margin-bottom:7px}
+  .pills{display:flex;flex-wrap:wrap;gap:6px}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid;padding:4px 10px;font-size:12.5px;line-height:1;cursor:default;transition:.12s}
+  .pill.idle{border-color:hsl(var(--border));background:hsl(var(--surface));color:hsl(var(--foreground))}
+  .pill.erkannt{border-color:hsl(var(--border));background:hsl(var(--surface));color:hsl(var(--foreground))}
+  .pill.erkannt .gd{width:6px;height:6px;border-radius:999px;background:hsl(var(--success))}
+  .pill.ziel{border-color:hsl(var(--primary));background:hsl(var(--primary));color:hsl(var(--primary-foreground));font-weight:700}
+  .pill.disabled{border-color:hsl(var(--border));background:hsl(var(--surface));color:hsl(var(--muted-foreground));opacity:.5;cursor:not-allowed}
+  .pill.disabled .lock{font-size:10px}
+  .wave-tag{font-size:9px;font-weight:800;letter-spacing:.04em;padding:1px 5px;border-radius:999px;border:1px solid hsl(var(--accent-ink)/.35);color:hsl(var(--accent-ink));background:hsl(var(--surface));margin-left:6px;vertical-align:middle}
+
+  .rail-hint{font-size:12px;line-height:1.5;color:hsl(var(--muted-foreground));margin-top:16px;border-top:1px solid hsl(var(--accent)/.5);padding-top:12px}
+  .rail-hint b{display:block;color:hsl(var(--success));margin-bottom:2px}
+  .rail-foot{border-top:1px solid hsl(var(--accent)/.5);padding:12px 14px}
+  .newbtn{width:100%;height:40px;border-radius:10px;border:1px solid hsl(var(--border));background:hsl(var(--surface));font-size:13px;font-weight:600;color:hsl(var(--foreground));display:inline-flex;align-items:center;justify-content:center;gap:7px}
+
+  /* Guardrail callout */
+  .guard{margin-top:26px;border:1px dashed hsl(var(--border));border-radius:14px;padding:18px;background:hsl(var(--surface)/.6)}
+  .guard h3{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:hsl(var(--foreground))}
+  .guard p{font-size:13.5px;color:hsl(var(--muted-foreground));margin-top:6px;line-height:1.55}
+  .guard-demo{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;font-size:14px}
+  .guard-demo .snt{font-style:italic;color:hsl(var(--foreground))}
+  .reason{font-size:12px;color:hsl(var(--danger));font-weight:600}
+
+  /* Mobile chip row variant */
+  .phone{max-width:390px;border:1px solid hsl(var(--border));border-radius:26px;padding:16px;background:hsl(var(--surface));box-shadow:0 2px 4px hsl(var(--shadow)/0.05),0 12px 32px hsl(var(--shadow)/0.12)}
+  .chiprow{display:flex;gap:7px;overflow-x:auto;padding:4px 2px 8px;-webkit-overflow-scrolling:touch}
+  .chiprow::-webkit-scrollbar{height:0}
+  .chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid;padding:6px 12px;font-size:13px;white-space:nowrap}
+  .chip.erkannt{border-color:hsl(var(--border));background:hsl(var(--surface))}
+  .chip.erkannt .gd{width:6px;height:6px;border-radius:999px;background:hsl(var(--success))}
+  .chip.ziel{border-color:hsl(var(--primary));background:hsl(var(--primary));color:hsl(var(--primary-foreground));font-weight:700}
+  .chip.idle{border-color:hsl(var(--border));background:hsl(var(--surface))}
+  .mob-note{font-size:11.5px;color:hsl(var(--muted-foreground));margin:4px 2px 12px}
+  .icn{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
+  @media(max-width:880px){.grid{grid-template-columns:1fr}.rail{position:static;margin-top:20px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-eyebrow">Satzlabor · Vorschau</div>
+  <h1 class="page-title">Erweiterte Grammatik-Dimensionen</h1>
+  <p class="page-sub">Empfehlung visualisiert: der Fokus-Trainer mit zwei Rail-Bereichen. <b>Formen</b> sind
+  kombinierbare Achsen (Genus Verbi × Zeitform × Modus), <b>Umformungen</b> sind gerichtete Einzel-Operationen
+  (Register, Satzbau, Stil …). Echte App-Tokens und Pill-Styling. Der Lernende schreibt einen Satz, die KI
+  korrigiert und erkennt die Form (grüner Punkt), ein Tipp auf eine Zielform füllt die untere Box.</p>
+
+  <div class="legend">
+    <span class="swatch" style="border-color:hsl(var(--border))"><span class="dot" style="background:hsl(var(--success))"></span>erkannt (aktuelle Form)</span>
+    <span class="swatch" style="border-color:hsl(var(--primary));background:hsl(var(--primary));color:hsl(var(--primary-foreground))">Ziel (ausgewählt)</span>
+    <span class="swatch" style="border-color:hsl(var(--border))">tippbar</span>
+    <span class="swatch" style="border-color:hsl(var(--border));opacity:.5">geht hier nicht · mit Grund</span>
+    <span><span class="wave-tag">W2</span>&nbsp;Wave 2 &nbsp; <span class="wave-tag">W3</span>&nbsp;Wave 3</span>
+  </div>
+
+  <div class="frame-label">Desktop · Fokus-Modus</div>
+  <div class="shell">
+    <div class="switcher">
+      <button class="seg active">Fokus</button>
+      <button class="seg">Kurz</button>
+      <button class="seg">Lang</button>
+      <button class="seg">Verlauf</button>
+    </div>
+
+    <div class="grid">
+      <!-- left column -->
+      <div>
+        <div class="card"><div class="card-pad">
+          <div class="eyebrow">Dein Satz</div>
+          <div class="struck">Der Techniker prüfen die Rechnung noch heute.</div>
+          <div class="corr-line">
+            <svg class="icn" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+            Korrigiert · 1 Änderung
+          </div>
+          <div class="corrected">Der Techniker <mark>prüft</mark> die Rechnung noch heute.</div>
+          <div class="changebox">
+            <div class="lbl">Was ich geändert habe</div>
+            <div class="changerow"><span class="from">prüfen</span><span class="arr">→</span><span class="to">prüft</span> · Verb passt sich dem Subjekt an (3. Person Singular)</div>
+          </div>
+        </div></div>
+
+        <div class="bottombox">
+          <div class="bb-head">
+            <div class="bb-label">Passiv · Präsens</div>
+            <div class="bb-speak">
+              <svg class="icn" viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></svg>
+            </div>
+          </div>
+          <div class="bb-sentence">Die Rechnung wird noch heute (vom Techniker) geprüft.</div>
+          <div class="bb-hint"><b>Hinweis:</b> Aus dem Akkusativobjekt „die Rechnung" wird das Subjekt. Das
+          Vorgangspassiv bildet man mit „werden" + Partizip II. Der Handelnde (von …) darf wegfallen, das ist
+          die typischere B2-Form.</div>
+          <a class="bb-more">mehr dazu: Passiv
+            <svg class="icn" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <div class="bb-credit">
+            <svg class="icn" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="m12 3 1.9 4.8L18 9.5l-4.1 1.7L12 16l-1.9-4.8L6 9.5l4.1-1.7z"/></svg>
+            KI-generierte Umformung
+          </div>
+        </div>
+
+        <div class="ai-note">
+          <svg class="icn" viewBox="0 0 24 24" style="flex:0 0 auto;width:14px;height:14px"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <span>Korrektur und Umformung sind KI-generiert und können Fehler enthalten. Nutze sie als Anregung, nicht als letzte Instanz.</span>
+        </div>
+      </div>
+
+      <!-- grammar rail -->
+      <aside class="rail">
+        <div class="rail-head">
+          <div class="brand">
+            <svg class="icn" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><circle cx="9" cy="6" r="2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="2" fill="currentColor" stroke="none"/><circle cx="8" cy="18" r="2" fill="currentColor" stroke="none"/></svg>
+            Grammatik
+          </div>
+          <button class="rail-reset"><svg class="icn" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></button>
+        </div>
+        <div class="rail-body">
+
+          <div class="rail-section">
+            <div class="section-title">
+              <svg class="icn" viewBox="0 0 24 24" style="width:13px;height:13px"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+              Formen · kombinierbar
+            </div>
+
+            <div class="axis">
+              <div class="axis-lbl">Genus Verbi</div>
+              <div class="pills">
+                <span class="pill idle">Aktiv</span>
+                <span class="pill ziel">Passiv</span>
+                <span class="pill idle">Zustandspassiv <span class="wave-tag">W2</span></span>
+              </div>
+            </div>
+
+            <div class="axis">
+              <div class="axis-lbl">Zeitform</div>
+              <div class="pills">
+                <span class="pill erkannt"><span class="gd"></span>Präsens</span>
+                <span class="pill idle">Perfekt</span>
+                <span class="pill idle">Präteritum</span>
+                <span class="pill disabled" title="Braucht ein zweites Ereignis in der Vergangenheit">Plusquamperfekt <span class="wave-tag">W3</span></span>
+              </div>
+            </div>
+
+            <div class="axis">
+              <div class="axis-lbl">Modus <span class="wave-tag">W2</span></div>
+              <div class="pills">
+                <span class="pill erkannt"><span class="gd"></span>Indikativ</span>
+                <span class="pill idle">Konjunktiv II</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rail-section">
+            <div class="section-title">
+              <svg class="icn" viewBox="0 0 24 24" style="width:13px;height:13px"><path d="M4 7h11M4 12h16M4 17h9"/><path d="m17 15 3 2-3 2"/></svg>
+              Umformungen · einzeln
+            </div>
+
+            <div class="axis">
+              <div class="axis-lbl">Register <span class="wave-tag">W2</span></div>
+              <div class="pills">
+                <span class="pill erkannt"><span class="gd"></span>Formell (Sie)</span>
+                <span class="pill idle">Informell (du)</span>
+              </div>
+            </div>
+
+            <div class="axis">
+              <div class="axis-lbl">Satzbau <span class="wave-tag">W2</span></div>
+              <div class="pills">
+                <span class="pill erkannt"><span class="gd"></span>Hauptsatz</span>
+                <span class="pill idle">Nebensatz (weil / dass)</span>
+              </div>
+            </div>
+
+            <div class="axis">
+              <div class="axis-lbl">Stil <span class="wave-tag">W3</span></div>
+              <div class="pills">
+                <span class="pill erkannt"><span class="gd"></span>Verbal</span>
+                <span class="pill idle">Nominal</span>
+              </div>
+            </div>
+
+            <div class="axis">
+              <div class="axis-lbl">Weitere <span class="wave-tag">W3</span></div>
+              <div class="pills">
+                <span class="pill idle">Relativsatz → Partizip</span>
+                <span class="pill idle">Nebensatz → um … zu</span>
+                <span class="pill idle">wenn → Sollten Sie …</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="rail-hint">
+            <b>Grüner Punkt = erkannte Form.</b>
+            Tippe eine andere Form oder Umformung, um deinen Satz umzuwandeln.
+          </div>
+        </div>
+        <div class="rail-foot">
+          <button class="newbtn"><svg class="icn" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Neuer Satz</button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Guardrail callout -->
+    <div class="guard">
+      <h3>Sicherheitsnetz: lieber verweigern als falsch umformen</h3>
+      <p>Wenn eine Umformung nicht möglich ist, wird die Pille ausgegraut und nennt den Grund. Das ist genauso
+      lehrreich wie eine gelungene Umformung, und es schützt das Vertrauen: ein falscher Satz schadet mehr als ein Hinweis.</p>
+      <div class="guard-demo">
+        <span class="snt">„Ich schlafe gut."</span>
+        <span style="color:hsl(var(--muted-foreground))">→</span>
+        <span class="pill disabled">Passiv <span class="lock">🔒</span></span>
+        <span class="reason">geht hier nicht: kein Akkusativobjekt (intransitives Verb)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile -->
+  <div class="frame-label">Mobil · Grammatik als Chip-Reihe zwischen korrigiertem Satz und Ergebnis</div>
+  <div class="phone">
+    <div class="card" style="box-shadow:none;border-color:hsl(var(--border))"><div class="card-pad" style="padding:16px">
+      <div class="eyebrow">Dein Satz</div>
+      <div class="corrected" style="font-size:15px;margin-top:8px">Der Techniker <mark>prüft</mark> die Rechnung noch heute.</div>
+    </div></div>
+
+    <div class="mob-note">Erkannte Formen zuerst, dann tippbare Formen und Umformungen.</div>
+    <div class="chiprow">
+      <span class="chip erkannt"><span class="gd"></span>Präsens</span>
+      <span class="chip erkannt"><span class="gd"></span>Aktiv</span>
+      <span class="chip ziel">Passiv</span>
+      <span class="chip idle">Perfekt</span>
+      <span class="chip idle">Konjunktiv II</span>
+      <span class="chip idle">Nebensatz</span>
+      <span class="chip idle">Nominal</span>
+      <span class="chip idle">Informell (du)</span>
+    </div>
+
+    <div class="bottombox" style="margin-top:8px;border-radius:14px;padding:16px">
+      <div class="bb-head"><div class="bb-label">Passiv · Präsens</div></div>
+      <div class="bb-sentence" style="font-size:15px">Die Rechnung wird noch heute (vom Techniker) geprüft.</div>
+      <div class="bb-hint" style="font-size:13px"><b>Hinweis:</b> Das Akkusativobjekt wird zum Subjekt; „werden" + Partizip II.</div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
