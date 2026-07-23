@@ -450,3 +450,56 @@ restructure, branch `claude/sources-unchecked-items-njvmao`.** The founder asked
 - **Gates:** `typecheck` ✓ · `lint` (0 errors; warnings are the pre-existing debt) · `lint:content` ✓
   (0 verified) · `test:unit` **253/253** · `build` ✓ · `check:bundle` **111.8 kB** (main chunk unchanged;
   Sources stays a lazy chunk).
+
+---
+
+## Session 147 (2026-07-22) — Schreibtraining redesign: Fokus Satzlabor + nav item + harmonization (moved from PROJECT_STATUS.md in s149)
+
+**Handoff after session 147 (2026-07-22). Schreibtraining redesign: Fokus "Satzlabor", branch
+`claude/schreibtraining-todo-review-afoegv`, PR #640 merged.** Backlog #6. A five-expert design panel
+(LLM engine, frontend, German B2 pedagogy, backend cost/security, UX) produced
+`docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`; mockups in `preview/schreibtraining-redesign-mockups.html`.
+What shipped:
+- **`/writing` is now a mode router** (`WritingHub` rewritten): **Fokus · Kurz · Lang** via
+  `WritingModeSwitcher` (sliding pill) + a Verlauf toggle. Kurz/Lang extracted verbatim into
+  `GuidedWritingTrainer` (old length toggle folded into the mode; existing `evaluate-writing` backend).
+- **Fokus "Satzlabor"** (`src/features/writing/fokus/`): single-sentence lab. `FokusTrainer` +
+  tri-state `GrammarRail` (aktuell / target / selected; desktop rail + mobile chip row) +
+  `useFokusMachine` (edit invalidates, transforms derive from the corrected base, in-memory cache).
+  `grammarDimensions.ts` = the Aktiv/Vorgangspassiv × Präsens/Perfekt/Präteritum MVP grid (data-driven,
+  Wave 2 extends the arrays). Client `lib/sentenceStudio.ts` degrades gracefully if the backend is
+  undeployed.
+- **Backend:** migration `0009_sentence_studio.sql` (`sentence_checks` owner-only, GLOBAL cross-user
+  `sentence_transforms` cache, `sentence_ai_ops` paid-op ledger, `bump_transform_hit` RPC,
+  `sentence_studio` kill-switch) + Edge Functions `check-sentence` (correct + detect, Haiku, cache-first)
+  and `transform-sentence` (transform, cache-FIRST, abstains rather than hallucinate; burst/daily/monthly
+  limits count only paid ops; `TRANSFORM_MODEL` env-switchable to Sonnet). Metered into the shared **$5
+  fuse** so max spend is unchanged. Deploy steps in `docs/plans/PHASE2_SETUP.md`.
+- **The session continued past the initial ship (5 more PRs on the same branch):**
+  - **Nav (PR #642):** Schreibtraining promoted to a dedicated top-level nav item **"Schreiben"**
+    (`/writing`, rose accent, the existing pencil mark). `DEFAULT_PINNED_TABS` + `BottomTabBar` `CONTENT`
+    now `["/library", "/writing", "/analytics"]`; the `/writing → /anwenden` `ROUTE_SUCCESSOR` remap was
+    removed. CLAUDE.md nav bullets updated.
+  - **Backend robustness (PR #643):** the two Edge Functions swallowed LLM errors silently, so failures
+    were invisible in the logs. Added diagnostic `console.error` logging (HTTP status + body, parse
+    failures, a providers-configured line) and a one-shot Anthropic 429/529 retry before falling to
+    Gemini → OpenAI. **Founder must redeploy the functions to pick this up.**
+  - **Design harmonization (PR #646):** the whole section now matches the Bibliothek design language.
+    New `WritingRail` (grey `bg-muted` tile, uppercase domain eyebrows, single-select theme pills;
+    desktop sticky aside + mobile chip row). `GuidedWritingTrainer` rewritten: **Kurz/Lang land straight
+    on an Aufgabe + writing field** (no theme-picker page), topic switched from the Thema rail. Both
+    guided + Fokus share the `[minmax(0,1fr)_18rem]` content+rail grid.
+  - **Correction display fix (PR #646):** the Fokus correction showed the corrected sentence with no
+    indication of what changed and a green check that read as "correct". Now a pure client-side word
+    diff (`lib/wordDiff.ts`) strikes the original, **highlights the changed words in place**, lists each
+    edit as before → after ("Was ich geändert habe"), and the header reads "Korrigiert · N Änderungen".
+    No backend needed. `tests/wordDiff.test.ts` pins it.
+- **Gates (final, PR #646):** typecheck ✓ · lint 0 errors ✓ · test:unit **260/260** (added
+  `fokusGrammar` + `wordDiff` tests) · build ✓ · check:bundle **112.3 kB** (main unchanged; writing lazy).
+- **Open follow-ups:** (1) founder **redeploys** `check-sentence`/`transform-sentence` for the logging +
+  retry fix (the functions + migration 0009 are already deployed; Fokus worked but was flaky, likely a
+  provider hiccup, hence the retry/logging); confirm `GEMINI_API_KEY` is set as a project secret so the
+  fallback is active; (2) decide Haiku vs Sonnet 5 for transforms (default Haiku, one env var); (3) Wave
+  2 axes (Zustandspassiv, Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness; (4) optional:
+  AI-authored per-change *explanations* in the correction tip (needs a backend field + redeploy). Fokus
+  is single-sentence by design.
