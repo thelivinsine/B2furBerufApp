@@ -158,7 +158,8 @@ export function GuidedWritingTrainer({
         <CardContent className="space-y-3 p-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
+              {/* Highlighted task eyebrow (founder s149): brand color + bold. */}
+              <p className="text-xs font-bold uppercase tracking-wide text-primary">
                 Aufgabe: {t.titleDe}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -199,8 +200,9 @@ export function GuidedWritingTrainer({
             className="w-full resize-y rounded-lg border border-input bg-surface p-3 text-sm leading-relaxed outline-none focus:ring-2 focus:ring-ring"
           />
           <div className="flex items-center justify-between">
+            {/* The Ziel range lives on the Aufgabe card only (founder s149). */}
             <span className={cn("text-xs tabular-nums", enough ? "text-success" : "text-muted-foreground")}>
-              {words} Wörter · Ziel {min}–{max}
+              {words} {words === 1 ? "Wort" : "Wörter"}
             </span>
             {/* Desktop actions; on mobile they live in the sticky bottom bar. */}
             <div className="hidden gap-2 lg:flex">
@@ -217,19 +219,22 @@ export function GuidedWritingTrainer({
               Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
             </p>
           )}
-          <p className="flex items-start gap-1.5 border-t border-border pt-3 text-xs text-muted-foreground">
-            <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-            <span>
-              Dein Text wird zur Auswertung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung
-              ist KI-generiert und kann Fehler enthalten.{" "}
-              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-                Mehr im Datenschutz
-              </Link>
-              .
-            </span>
-          </p>
         </CardContent>
       </Card>
+
+      {/* EU AI Act Art. 50 transparency: a standalone line below the editor
+          card, not inside it (founder s149). */}
+      <p className="flex items-start gap-1.5 px-1 text-xs text-muted-foreground">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+        <span>
+          Dein Text wird zur Auswertung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung
+          ist KI-generiert und kann Fehler enthalten.{" "}
+          <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+            Mehr im Datenschutz
+          </Link>
+          .
+        </span>
+      </p>
 
       {/* Result */}
       {result && (
@@ -304,11 +309,12 @@ export function GuidedWritingTrainer({
           {pickerOpen && (
             <motion.div
               key="aufgabe-panel"
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
-              className="overflow-hidden"
+              // Fade/slide, NOT a height collapse: a height animation needs
+              // overflow-hidden, which would clip the Thema dropdown's popover.
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={reduce ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
             >
               <WritingRail
                 layout="panel"
@@ -330,7 +336,7 @@ export function GuidedWritingTrainer({
         <WritingRail
           value={theme}
           onChange={setTheme}
-          className="hidden lg:flex lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)]"
+          className="hidden lg:block lg:sticky lg:top-24"
         />
       </div>
 

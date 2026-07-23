@@ -34,6 +34,10 @@ interface GrammarRailProps {
   /** The pill mid-transform (for the inline spinner). */
   loadingValue?: string | null;
   onSelect: (axis: AxisId, value: string) => void;
+  /** Reset the transform target back to the detected form (header icon). */
+  onReset?: () => void;
+  /** Whether the selection differs from the detected base (enables reset). */
+  canReset?: boolean;
   /** Start over with a fresh sentence (rail layout's footer button). */
   onNewSentence?: () => void;
   /** Close handler for the panel's X icon (mobile). */
@@ -109,6 +113,8 @@ export function GrammarRail({
   enabled,
   loadingValue,
   onSelect,
+  onReset,
+  canReset = false,
   onNewSentence,
   onClose,
   layout = "rail",
@@ -146,8 +152,9 @@ export function GrammarRail({
       <p className="text-xs leading-relaxed text-muted-foreground">
         {enabled ? (
           <>
-            <b className="text-success">Grüner Punkt = erkannte Form.</b> Tippe eine andere Form,
-            um den Satz umzuformen.
+            {/* Two lines (founder s149): the legend, then the instruction. */}
+            <b className="block text-success">Grüner Punkt = erkannte Form.</b>
+            Tippe eine andere Form, um den Satz umzuformen.
           </>
         ) : (
           <>Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv und die Zeitform.</>
@@ -166,12 +173,29 @@ export function GrammarRail({
         className,
       )}
     >
-      {/* Header row: brand label + (panel only) close icon. */}
-      <div className="flex shrink-0 items-center gap-2 px-3 py-2.5">
+      {/* Header row: brand label + reset icon (+ panel close). */}
+      <div className="flex shrink-0 items-center gap-1 px-3 py-2.5">
         <span className="flex flex-1 items-center gap-2 text-sm font-semibold text-primary">
           <SlidersHorizontal className="h-4 w-4" />
           Grammatik
         </span>
+        {onReset && (
+          <button
+            type="button"
+            onClick={onReset}
+            disabled={!canReset}
+            aria-label="Auf die erkannte Form zurücksetzen"
+            title="Zurücksetzen"
+            className={cn(
+              "inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
+              canReset
+                ? "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
+                : "cursor-not-allowed text-muted-foreground/30",
+            )}
+          >
+            <RotateCcw className="h-4 w-4" />
+          </button>
+        )}
         {panel && onClose && (
           <button
             type="button"

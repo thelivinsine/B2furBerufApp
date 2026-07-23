@@ -108,7 +108,9 @@ export function WritingHub() {
           Content-column width on desktop, level with the trainer grids below. */}
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
         <div className="lg:col-start-1">
-          <WritingModeSwitcher value={tab} onChange={setTab} />
+          {/* Capped + centered on desktop (founder s149: full column width with
+              four short labels read oversized); mobile stays full width. */}
+          <WritingModeSwitcher value={tab} onChange={setTab} className="lg:mx-auto lg:max-w-xl" />
         </div>
       </div>
 

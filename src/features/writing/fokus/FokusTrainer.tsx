@@ -92,6 +92,9 @@ export function FokusTrainer({
   const showBottom =
     m.status === "corrected" && m.transform.status !== "idle";
   const railEnabled = m.status === "corrected";
+  const canReset =
+    railEnabled &&
+    (m.selection.voice !== m.detected.voice || m.selection.tense !== m.detected.tense);
 
   // A fresh sentence disables the grammar controls again; close a stale panel.
   useEffect(() => {
@@ -192,20 +195,24 @@ export function FokusTrainer({
           </p>
         )}
 
-        {/* EU AI Act Art. 50 transparency, at the point of use. */}
-        <p className="flex items-start gap-1.5 border-t border-border pt-3 text-xs text-muted-foreground">
-          <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          <span>
-            Dein Satz wird zur Prüfung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung ist
-            KI-generiert und kann Fehler enthalten.{" "}
-            <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-              Mehr im Datenschutz
-            </Link>
-            .
-          </span>
-        </p>
       </CardContent>
     </Card>
+  );
+
+  // EU AI Act Art. 50 transparency: a standalone line below the sentence card,
+  // not inside it (founder s149).
+  const aiNote = (
+    <p className="flex items-start gap-1.5 px-1 text-xs text-muted-foreground">
+      <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+      <span>
+        Dein Satz wird zur Prüfung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung ist
+        KI-generiert und kann Fehler enthalten.{" "}
+        <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+          Mehr im Datenschutz
+        </Link>
+        .
+      </span>
+    </p>
   );
 
   const bottomBox = showBottom && (
@@ -213,7 +220,8 @@ export function FokusTrainer({
       initial={reduce ? false : { opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: reduce ? 0 : 0.18, ease: "easeOut" }}
-      className="rounded-xl border border-border bg-muted/40 p-5"
+      // White card like every other content card (founder s149; was a grey wash).
+      className="rounded-2xl border border-border bg-surface p-5 shadow-soft"
     >
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[11px] font-bold uppercase tracking-wide text-accent-ink">
@@ -246,17 +254,17 @@ export function FokusTrainer({
         <>
           <p className="text-base leading-relaxed">{m.transform.transformed}</p>
           {m.transform.note && (
-            <p className="mt-3 flex items-start gap-1.5 text-sm leading-relaxed text-muted-foreground">
-              <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <span>
-                {peek && m.transform.noteEn ? m.transform.noteEn : m.transform.note}
-                {m.transform.noteEn && (
-                  <EnPeek active={peek} onChange={setPeek} className="ml-1.5 align-middle" />
-                )}
-              </span>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              {/* "Hinweis" label instead of an icon (founder s149). */}
+              <b className="font-bold text-primary">Hinweis:</b>{" "}
+              {peek && m.transform.noteEn ? m.transform.noteEn : m.transform.note}
+              {m.transform.noteEn && (
+                <EnPeek active={peek} onChange={setPeek} className="ml-1.5 align-middle" />
+              )}
             </p>
           )}
-          <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
+          {/* Centered at the card's bottom, clearly separated (founder s149). */}
+          <p className="mt-6 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
             <Sparkles className="h-3 w-3 shrink-0" /> KI-generierte Umformung
           </p>
         </>
@@ -330,6 +338,8 @@ export function FokusTrainer({
                     onSelect(axis, value);
                     setPanelOpen(false);
                   }}
+                  onReset={m.reset}
+                  canReset={canReset}
                   onClose={() => setPanelOpen(false)}
                 />
               </motion.div>
@@ -337,6 +347,7 @@ export function FokusTrainer({
           </AnimatePresence>
         </div>
         {inputCard}
+        {aiNote}
         {errorCard}
         {bottomBox}
       </div>
@@ -345,6 +356,7 @@ export function FokusTrainer({
       <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8">
         <div className="space-y-4">
           {inputCard}
+          {aiNote}
           {errorCard}
           {bottomBox}
         </div>
@@ -354,6 +366,8 @@ export function FokusTrainer({
           enabled={railEnabled}
           loadingValue={loadingValue}
           onSelect={onSelect}
+          onReset={m.reset}
+          canReset={canReset}
           onNewSentence={m.startOver}
           className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)]"
         />
