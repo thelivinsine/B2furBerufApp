@@ -290,8 +290,8 @@ export function GuidedWritingTrainer({
       <p className="flex items-start gap-1.5 px-1 text-xs text-muted-foreground">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
         <span>
-          Dein Text wird zur Auswertung an eine KI (Anthropic Claude) gesendet. Die Rückmeldung
-          ist KI-generiert und kann Fehler enthalten.{" "}
+          Dein Text wird zur Auswertung an eine KI (Anthropic, Google oder OpenAI) gesendet. Die
+          Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
           <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
             Mehr im Datenschutz
           </Link>
