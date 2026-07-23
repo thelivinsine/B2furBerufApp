@@ -1,0 +1,502 @@
+<style>
+  :root {
+    --background: 180 45% 98%;
+    --surface: 0 0% 100%;
+    --muted: 220 10% 90%;
+    --muted-foreground: 220 8% 36%;
+    --foreground: 252 16% 12%;
+    --border: 220 9% 86%;
+    --input: 220 9% 86%;
+    --primary: 221 83% 54%;
+    --accent: 197 93% 77%;
+    --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --success-bg: 153 55% 95%;
+    --warning: 38 92% 46%;
+    --reward: 11 82% 54%;
+    --shadow: 221 40% 22%;
+    --ring: 221 83% 54%;
+  }
+  :root[data-theme="light"] {
+    --background: 180 45% 98%; --surface: 0 0% 100%; --muted: 220 10% 90%;
+    --muted-foreground: 220 8% 36%; --foreground: 252 16% 12%; --border: 220 9% 86%;
+    --input: 220 9% 86%; --primary: 221 83% 54%; --accent: 197 93% 77%; --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%; --success-bg: 153 55% 95%; --warning: 38 92% 46%; --reward: 11 82% 54%;
+    --shadow: 221 40% 22%; --ring: 221 83% 54%;
+  }
+  .darktokens, :root[data-theme="dark"] {
+    --background: 228 24% 10%; --surface: 228 20% 14%; --muted: 228 16% 22%;
+    --muted-foreground: 228 10% 72%; --foreground: 228 20% 92%; --border: 228 14% 26%;
+    --input: 228 14% 28%; --primary: 221 90% 70%; --accent: 197 93% 77%; --accent-ink: 198 85% 72%;
+    --success: 153 52% 60%; --success-bg: 153 38% 17%; --warning: 43 90% 62%; --reward: 11 88% 66%;
+    --shadow: 221 60% 3%; --ring: 221 90% 70%;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --background: 228 24% 10%; --surface: 228 20% 14%; --muted: 228 16% 22%;
+      --muted-foreground: 228 10% 72%; --foreground: 228 20% 92%; --border: 228 14% 26%;
+      --input: 228 14% 28%; --primary: 221 90% 70%; --accent: 197 93% 77%; --accent-ink: 198 85% 72%;
+      --success: 153 52% 60%; --success-bg: 153 38% 17%; --warning: 43 90% 62%; --reward: 11 88% 66%;
+      --shadow: 221 60% 3%; --ring: 221 90% 70%;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    transition: background .25s, color .25s;
+  }
+  .page { max-width: 720px; margin: 0 auto; padding: 28px 20px 100px; }
+
+  /* ---- header ---- */
+  .head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .kick { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: hsl(var(--primary)); }
+  h1 { font-size: 25px; font-weight: 800; letter-spacing: -.022em; margin: 6px 0 6px; text-wrap: balance; }
+  .sub { color: hsl(var(--muted-foreground)); font-size: 13.5px; line-height: 1.55; margin: 0; max-width: 52ch; }
+  .themebtn { border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--foreground));
+    border-radius: 10px; padding: 8px 12px; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+
+  /* ---- version nav ---- */
+  .nav { display: flex; flex-wrap: wrap; gap: 7px; margin: 22px 0 6px; position: sticky; top: 0;
+    background: hsl(var(--background)); padding: 10px 0; z-index: 5; border-bottom: 1px solid hsl(var(--border)); }
+  .nav button { border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--muted-foreground));
+    border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .12s; }
+  .nav button:hover { border-color: hsl(var(--accent) / .6); color: hsl(var(--foreground)); }
+  .nav button[aria-current="true"] { background: hsl(var(--primary)); border-color: hsl(var(--primary)); color: hsl(var(--surface)); }
+  :root[data-theme="dark"] .nav button[aria-current="true"], .darktokens .nav button[aria-current="true"] { color: hsl(var(--background)); }
+  .nav .sep { width: 1px; align-self: stretch; background: hsl(var(--border)); margin: 2px 3px; }
+
+  .screen { margin-top: 26px; }
+  .screen[hidden] { display: none; }
+  .slabel { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+  .stag { font-size: 10px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: hsl(var(--muted-foreground));
+    border: 1px solid hsl(var(--border)); border-radius: 999px; padding: 3px 8px; }
+  .stag.rec { color: hsl(var(--success)); border-color: hsl(var(--success) / .5); background: hsl(var(--success-bg)); }
+  .sname { font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+  .swhy { color: hsl(var(--muted-foreground)); font-size: 12.5px; line-height: 1.5; margin: 0 0 13px; max-width: 60ch; }
+  .steps { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: hsl(var(--muted-foreground)); margin: 22px 0 8px; }
+
+  /* ---- card ---- */
+  .card { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 20px; padding: 20px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .05), 0 14px 34px hsl(var(--shadow) / .09); }
+  .card + .card { margin-top: 14px; }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: hsl(var(--primary)); }
+  .cardhead { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .status { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+    text-transform: uppercase; color: hsl(var(--success)); }
+  .status svg { width: 15px; height: 15px; }
+
+  .sentence { font-size: 21px; line-height: 1.55; margin: 0; letter-spacing: -.01em; }
+  .sentence.mid { font-size: 16px; }
+  .mk-green { font-weight: 650; box-shadow: inset 0 -2px 0 hsl(var(--success) / .9); padding-bottom: 1px; border-radius: 1px; }
+  .mk-coral { font-weight: 650; box-shadow: inset 0 -2px 0 hsl(var(--reward) / .95); padding-bottom: 1px; border-radius: 1px; }
+  .mk-warn { background: hsl(var(--warning) / .25); border-radius: 4px; padding: 0 3px; }
+
+  .divline { height: 1px; background: hsl(var(--border)); margin: 18px 0 0; }
+
+  /* seg toggle */
+  .seg { position: relative; display: inline-flex; background: hsl(var(--muted) / .7); border-radius: 999px; padding: 3px; }
+  .seg button { position: relative; z-index: 1; border: none; background: transparent; cursor: pointer; font: inherit;
+    font-size: 12px; font-weight: 700; color: hsl(var(--muted-foreground)); padding: 5px 12px; border-radius: 999px; transition: color .18s; }
+  .seg button.on { color: hsl(var(--foreground)); }
+  .seg .pill { position: absolute; top: 3px; bottom: 3px; border-radius: 999px; background: hsl(var(--surface));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .12); transition: transform .2s cubic-bezier(.16,1,.3,1), width .2s cubic-bezier(.16,1,.3,1); }
+
+  /* himmel tiles: light kräftig, dark weich */
+  .tiles { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+  .tile { border-radius: 14px; padding: 10px 14px; min-width: 132px;
+    background: hsl(var(--accent) / .30); border: 1px solid hsl(var(--accent) / .70); }
+  :root[data-theme="dark"] .tile, .darktokens .tile { background: hsl(var(--accent) / .18); border-color: hsl(var(--accent) / .45); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .tile { background: hsl(var(--accent) / .18); border-color: hsl(var(--accent) / .45); } }
+  .tile .cat { display: block; margin-bottom: 5px; font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: hsl(var(--accent-ink)); }
+  .tile .diff { font-size: 15px; }
+  .old { color: hsl(var(--muted-foreground)); text-decoration: line-through; text-decoration-color: hsl(var(--muted-foreground) / .55); text-decoration-thickness: 1.5px; }
+  .arr { color: hsl(var(--muted-foreground)); opacity: .85; }
+  .new { color: hsl(var(--success)); font-weight: 700; }
+
+  /* chips (variant A / AC1) */
+  .chips { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+  .chip { display: inline-flex; align-items: center; gap: 9px; background: hsl(var(--muted) / .45); border: 1px solid hsl(var(--border));
+    border-radius: 999px; padding: 6px 12px 6px 8px; font-size: 14px; }
+  .chip .catt { font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: hsl(var(--muted-foreground));
+    border-right: 1px solid hsl(var(--border)); padding-right: 8px; }
+
+  /* rows (AC2) */
+  .rows { margin-top: 16px; display: grid; gap: 2px; }
+  .lrow { display: grid; grid-template-columns: 120px 1fr; align-items: center; gap: 14px; padding: 10px 4px; border-top: 1px solid hsl(var(--border)); }
+  .lrow:first-child { border-top: none; }
+  .catfill { font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted) / .7); border-radius: 6px; padding: 3px 7px; justify-self: start; }
+
+  /* oneline (AC3) */
+  .oneline { margin-top: 15px; padding-top: 14px; border-top: 1px solid hsl(var(--border)); font-size: 13px;
+    color: hsl(var(--muted-foreground)); display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; }
+  .oneline .cat3 { font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .dot { width: 3px; height: 3px; border-radius: 50%; background: hsl(var(--muted-foreground) / .5); }
+
+  /* current-design bits */
+  .old-strike { color: hsl(var(--muted-foreground)); text-decoration: line-through; text-decoration-color: hsl(var(--warning) / .5); font-size: 14px; line-height: 1.6; margin: 0 0 12px; }
+  .old-box { border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); border-radius: 12px; padding: 12px; margin-top: 12px; }
+  .old-box .lbl { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: hsl(var(--muted-foreground)); margin: 0 0 8px; }
+  .old-box .row { font-size: 14px; margin: 6px 0; }
+
+  /* input + umlaut keys */
+  textarea { width: 100%; resize: vertical; border: 1px solid hsl(var(--input)); background: hsl(var(--surface)); color: hsl(var(--foreground));
+    padding: 12px; font: inherit; font-size: 15px; line-height: 1.55; outline: none; }
+  textarea:focus { box-shadow: 0 0 0 2px hsl(var(--ring)); border-color: transparent; }
+  .keys { display: flex; gap: 5px; }
+  .key { min-width: 26px; height: 24px; padding: 0 5px; border-radius: 7px; border: 1px solid hsl(var(--border)); background: hsl(var(--surface));
+    color: hsl(var(--foreground)); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-grid; place-items: center;
+    transition: background .12s, border-color .12s, transform .06s; }
+  .key:hover { background: hsl(var(--accent) / .22); border-color: hsl(var(--accent) / .6); color: hsl(var(--accent-ink)); }
+  .key:active { transform: translateY(1px) scale(.95); background: hsl(var(--accent) / .34); }
+  .fieldB textarea { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none; }
+  .accessory { display: flex; align-items: center; gap: 5px; padding: 6px 8px; border: 1px solid hsl(var(--input)); border-top: 1px solid hsl(var(--border));
+    border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; background: hsl(var(--muted) / .35); overflow-x: auto; }
+  .footer { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+  .count { font-size: 12px; color: hsl(var(--muted-foreground)); white-space: nowrap; margin-right: auto; }
+  .btn { border: none; border-radius: 12px; padding: 10px 16px; font: inherit; font-size: 14px; font-weight: 700; color: #fff; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px; background: linear-gradient(135deg, hsl(226 83% 47%), hsl(var(--primary)) 45%, hsl(196 93% 38%)); }
+  :root[data-theme="dark"] .btn, .darktokens .btn { color: hsl(228 30% 8%); }
+
+  .footnote { margin: 15px 0 0; font-size: 12px; color: hsl(var(--muted-foreground)); }
+  .foot { font-size: 11.5px; color: hsl(var(--muted-foreground)); margin: 42px 2px 0; line-height: 1.65; border-top: 1px solid hsl(var(--border)); padding-top: 16px; }
+  code { font-size: .92em; }
+
+  :focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; border-radius: 4px; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="page">
+  <div class="head">
+    <div>
+      <div class="kick">Genauly · Schreiben</div>
+      <h1>Korrektur-Karte &amp; Eingabe — Design-Review</h1>
+      <p class="sub">Alle Versionen aus dieser Session an einem Ort. Oben umschalten oder „Alle" für die
+        Gesamtansicht. Das App-Theme (hell/dunkel) getrennt schaltbar. „Final" bündelt deine Entscheidungen.</p>
+    </div>
+    <button class="themebtn" id="themebtn">Hell / Dunkel</button>
+  </div>
+
+  <nav class="nav" id="nav">
+    <button data-go="final" aria-current="true">★ Final</button>
+    <button data-go="alle">Alle</button>
+    <span class="sep"></span>
+    <button data-go="aktuell">Korrektur: Aktuell</button>
+    <button data-go="a">A · Chips</button>
+    <button data-go="b">B · Inline-Diff</button>
+    <span class="sep"></span>
+    <button data-go="ac1">A+C 1 · Chips+Kat.</button>
+    <button data-go="ac2">A+C 2 · Lernzeilen</button>
+    <button data-go="ac3">A+C 3 · Kompakt</button>
+    <button data-go="ac4">A+C 4 · Kacheln</button>
+    <span class="sep"></span>
+    <button data-go="himmel">Himmel 4a/4b</button>
+    <button data-go="toggle">Original/Korrigiert</button>
+    <span class="sep"></span>
+    <button data-go="umlautA">Umlaut A</button>
+    <button data-go="umlautB">Umlaut B</button>
+  </nav>
+
+  <!-- ============ FINAL ============ -->
+  <section class="screen" data-id="final">
+    <div class="slabel"><span class="stag rec">Final</span><span class="sname">Kombiniert · deine Auswahl</span></div>
+    <p class="swhy">V4-Kacheln (theme-abhängig: hell kräftig, dunkel weich) · Original/Korrigiert-Toggle mit
+      Koralle- bzw. Grün-Markierung · angedockte Umlaut-Leiste (B), Tasten ~30 % kleiner.</p>
+
+    <p class="steps">1 · Eingabe</p>
+    <div class="card">
+      <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
+      <div class="fieldB">
+        <textarea rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.">Kanst du bitte es kurz erklaeren?</textarea>
+        <div class="accessory"><div class="keys" data-keys></div></div>
+      </div>
+      <div class="footer">
+        <span class="count" data-count>5 Wörter</span>
+        <button class="btn">✦ Korrigieren</button>
+      </div>
+    </div>
+
+    <p class="steps">2 · Nach dem Korrigieren</p>
+    <div class="card">
+      <div class="cardhead">
+        <span class="eyebrow">Dein Satz</span>
+        <div class="seg" data-seg>
+          <span class="pill"></span>
+          <button data-v="orig">Original</button>
+          <button data-v="corr" class="on">Korrigiert</button>
+        </div>
+      </div>
+      <p class="sentence" data-view="orig" hidden><span class="mk-coral">Kanst</span> du bitte es kurz <span class="mk-coral">erklaeren?</span></p>
+      <p class="sentence" data-view="corr"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="divline"></div>
+      <div class="tiles">
+        <div class="tile"><span class="cat">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
+        <div class="tile"><span class="cat">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AKTUELL ============ -->
+  <section class="screen" data-id="aktuell" hidden>
+    <div class="slabel"><span class="stag">Jetzt</span><span class="sname">Aktuell (Referenz)</span></div>
+    <p class="swhy">Dieselben zwei Edits viermal: durchgestrichenes Original, Zähler, Hervorhebung, Liste.</p>
+    <div class="card">
+      <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
+      <p class="old-strike">Kanst du bitte es kurz erklaeren?</p>
+      <p class="status" style="color:hsl(var(--primary))">✓ Korrigiert · 2 Änderungen</p>
+      <p class="sentence mid" style="margin-top:12px"><span class="mk-warn">Kannst</span> du bitte es kurz <span class="mk-warn">erklären?</span></p>
+      <div class="old-box">
+        <p class="lbl">Was ich geändert habe</p>
+        <p class="row"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></p>
+        <p class="row"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ A ============ -->
+  <section class="screen" data-id="a" hidden>
+    <div class="slabel"><span class="sname">A · Ergebnis + Korrektur-Chips</span></div>
+    <p class="swhy">Richtiger Satz oben, grüne Unterstreichung, darunter die Edits als leise Chips. Kein Original-Strich, kein Zähler.</p>
+    <div class="card">
+      <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+      <p class="sentence" style="margin-top:14px"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="divline"></div>
+      <div class="chips">
+        <span class="chip"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span>
+        <span class="chip"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ B ============ -->
+  <section class="screen" data-id="b" hidden>
+    <div class="slabel"><span class="sname">B · Inline-Diff</span></div>
+    <p class="swhy">Der Satz nur einmal: falsches Wort klein durchgestrichen, Korrektur direkt dahinter in Grün.</p>
+    <div class="card">
+      <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+      <p class="sentence" style="margin-top:14px"><span class="old" style="font-size:.82em;margin-right:5px">Kanst</span><span class="new">Kannst</span> du bitte es kurz <span class="old" style="font-size:.82em;margin-right:5px">erklaeren?</span><span class="new">erklären?</span></p>
+      <p class="footnote">2 Wörter korrigiert · Rechtschreibung</p>
+    </div>
+  </section>
+
+  <!-- ============ AC1 ============ -->
+  <section class="screen" data-id="ac1" hidden>
+    <div class="slabel"><span class="sname">A+C 1 · Chips mit Kategorie</span></div>
+    <p class="swhy">Wie A, aber jeder Chip trägt die Fehler-Kategorie.</p>
+    <div class="card">
+      <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+      <p class="sentence" style="margin-top:14px"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="divline"></div>
+      <div class="chips">
+        <span class="chip"><span class="catt">Rechtschreibung</span><span><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></span>
+        <span class="chip"><span class="catt">Umlaut</span><span><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AC2 ============ -->
+  <section class="screen" data-id="ac2" hidden>
+    <div class="slabel"><span class="sname">A+C 2 · Lernzeilen</span></div>
+    <p class="swhy">Jede Korrektur eine scanbare Zeile: Kategorie links, Korrektur rechts.</p>
+    <div class="card">
+      <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+      <p class="sentence" style="margin-top:14px"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="rows">
+        <div class="lrow"><span class="catfill">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
+        <div class="lrow"><span class="catfill">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AC3 ============ -->
+  <section class="screen" data-id="ac3" hidden>
+    <div class="slabel"><span class="sname">A+C 3 · Kompaktzeile</span></div>
+    <p class="swhy">Minimalste Stufe: Satz plus eine zusammenfassende Zeile.</p>
+    <div class="card">
+      <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+      <p class="sentence" style="margin-top:14px"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="oneline">
+        <span><span class="cat3">Rechtschreibung</span> <span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span>
+        <span class="dot"></span>
+        <span><span class="cat3">Umlaut</span> <span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AC4 ============ -->
+  <section class="screen" data-id="ac4" hidden>
+    <div class="slabel"><span class="sname">A+C 4 · Karten-Chips (Basis fürs Finale)</span></div>
+    <p class="swhy">Kategorie als Eyebrow über jeder Korrektur-Kachel. Wird im Finale zu Himmelblau.</p>
+    <div class="card">
+      <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+      <p class="sentence" style="margin-top:14px"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="tiles">
+        <div class="tile" style="background:hsl(var(--surface));border-color:hsl(var(--border))"><span class="cat" style="color:hsl(var(--muted-foreground))">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
+        <div class="tile" style="background:hsl(var(--surface));border-color:hsl(var(--border))"><span class="cat" style="color:hsl(var(--muted-foreground))">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HIMMEL ============ -->
+  <section class="screen" data-id="himmel" hidden>
+    <div class="slabel"><span class="sname">Himmelblau-Kacheln · 4a weich / 4b kräftig</span></div>
+    <p class="swhy">Deine Wahl: hell = kräftig, dunkel = weich. Genau das steckt im Finale (theme-abhängig).</p>
+    <p class="steps">4a · weich (~18 %)</p>
+    <div class="card">
+      <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+      <p class="sentence" style="margin-top:14px"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="tiles">
+        <div class="tile" style="background:hsl(var(--accent) / .18);border-color:hsl(var(--accent) / .45)"><span class="cat">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
+        <div class="tile" style="background:hsl(var(--accent) / .18);border-color:hsl(var(--accent) / .45)"><span class="cat">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+      </div>
+    </div>
+    <p class="steps">4b · kräftig (~30 %)</p>
+    <div class="card">
+      <p class="status"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Korrigiert</p>
+      <p class="sentence" style="margin-top:14px"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="tiles">
+        <div class="tile" style="background:hsl(var(--accent) / .30);border-color:hsl(var(--accent) / .70)"><span class="cat">Rechtschreibung</span><span class="diff"><span class="old" style="color:hsl(var(--foreground) / .55)">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
+        <div class="tile" style="background:hsl(var(--accent) / .30);border-color:hsl(var(--accent) / .70)"><span class="cat">Umlaut</span><span class="diff"><span class="old" style="color:hsl(var(--foreground) / .55)">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TOGGLE ============ -->
+  <section class="screen" data-id="toggle" hidden>
+    <div class="slabel"><span class="sname">Original / Korrigiert-Toggle</span></div>
+    <p class="swhy">Original = Koralle-Markierung (dein Fehler), Korrigiert = Grün (richtig). Tippe den Toggle.</p>
+    <div class="card">
+      <div class="cardhead">
+        <span class="eyebrow">Dein Satz</span>
+        <div class="seg" data-seg>
+          <span class="pill"></span>
+          <button data-v="orig">Original</button>
+          <button data-v="corr" class="on">Korrigiert</button>
+        </div>
+      </div>
+      <p class="sentence" data-view="orig" hidden><span class="mk-coral">Kanst</span> du bitte es kurz <span class="mk-coral">erklaeren?</span></p>
+      <p class="sentence" data-view="corr"><span class="mk-green">Kannst</span> du bitte es kurz <span class="mk-green">erklären?</span></p>
+      <div class="divline"></div>
+      <div class="tiles">
+        <div class="tile"><span class="cat">Rechtschreibung</span><span class="diff"><span class="old">Kanst</span> <span class="arr">→</span> <span class="new">Kannst</span></span></div>
+        <div class="tile"><span class="cat">Umlaut</span><span class="diff"><span class="old">erklaeren?</span> <span class="arr">→</span> <span class="new">erklären?</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ UMLAUT A ============ -->
+  <section class="screen" data-id="umlautA" hidden>
+    <div class="slabel"><span class="sname">Umlaut-Tasten A · in der Fußzeile</span></div>
+    <p class="swhy">Tasten teilen sich die Fußzeile mit Zähler und Aktion. Kein Extra-Element.</p>
+    <div class="card">
+      <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
+      <textarea rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch …"></textarea>
+      <div class="footer" style="flex-wrap:wrap">
+        <div class="keys" data-keys style="flex:1 1 auto"></div>
+        <span class="count" data-count style="margin-left:auto;margin-right:0">0 Wörter</span>
+        <button class="btn">✦ Korrigieren</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ UMLAUT B ============ -->
+  <section class="screen" data-id="umlautB" hidden>
+    <div class="slabel"><span class="stag rec">Gewählt</span><span class="sname">Umlaut-Tasten B · angedockt (kleiner)</span></div>
+    <p class="swhy">Angedockte Leiste am Textfeld, Tasten ~30 % kleiner. Setz den Cursor, dann eine Taste.</p>
+    <div class="card">
+      <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
+      <div class="fieldB">
+        <textarea rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch …"></textarea>
+        <div class="accessory"><div class="keys" data-keys></div></div>
+      </div>
+      <div class="footer">
+        <span class="count" data-count>0 Wörter</span>
+        <button class="btn">✦ Korrigieren</button>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot">Echte App-Tokens aus <code>src/index.css</code>, hell &amp; dunkel. Farbsprache: Grün = „richtig",
+    Koralle (<code>--reward</code>) = „so geschrieben / Fehler", Himmelblau (Akzent) = Lern-Kategorie, Nachtblau = Aktion.
+    Umlaute werden an der Cursor-Position eingefügt. Gilt für Fokus, Kurz und Lang.</p>
+</div>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+
+    // App theme toggle (works with the viewer's own toggle via data-theme).
+    function currentDark() {
+      var t = root.getAttribute('data-theme');
+      if (t === 'dark') return true;
+      if (t === 'light') return false;
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    }
+    document.getElementById('themebtn').addEventListener('click', function () {
+      root.setAttribute('data-theme', currentDark() ? 'light' : 'dark');
+      allSegs.forEach(placePill);
+    });
+
+    // Version switcher.
+    var nav = document.getElementById('nav');
+    var btns = [].slice.call(nav.querySelectorAll('button'));
+    var screens = [].slice.call(document.querySelectorAll('.screen'));
+    function show(id) {
+      screens.forEach(function (s) { s.hidden = !(id === 'alle' || s.dataset.id === id); });
+      btns.forEach(function (b) { b.setAttribute('aria-current', b.dataset.go === id ? 'true' : 'false'); });
+      allSegs.forEach(placePill);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.go); }); });
+
+    // Original/Korrigiert segmented toggles.
+    var allSegs = [].slice.call(document.querySelectorAll('[data-seg]'));
+    function placePill(seg) {
+      var on = seg.querySelector('button.on'); var pill = seg.querySelector('.pill');
+      if (!on || !pill) return;
+      pill.style.width = on.offsetWidth + 'px';
+      pill.style.transform = 'translateX(' + (on.offsetLeft - 3) + 'px)';
+    }
+    allSegs.forEach(function (seg) {
+      var card = seg.closest('.card');
+      seg.querySelectorAll('button').forEach(function (b) {
+        b.addEventListener('click', function () {
+          seg.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+          card.querySelectorAll('[data-view]').forEach(function (v) { v.hidden = v.dataset.view !== b.dataset.v; });
+          placePill(seg);
+        });
+      });
+    });
+
+    // Umlaut keys.
+    var CHARS = ["ä","ö","ü","ß","Ä","Ö","Ü"];
+    function words(s) { var t = s.trim(); return t ? t.split(/\s+/).length : 0; }
+    document.querySelectorAll('[data-keys]').forEach(function (host) {
+      var card = host.closest('.card');
+      var ta = card.querySelector('[data-ta]');
+      var count = card.querySelector('[data-count]');
+      CHARS.forEach(function (ch) {
+        var b = document.createElement('button');
+        b.className = 'key'; b.type = 'button'; b.textContent = ch;
+        b.addEventListener('mousedown', function (e) { e.preventDefault(); });
+        b.addEventListener('click', function () {
+          var s = ta.selectionStart == null ? ta.value.length : ta.selectionStart;
+          var e = ta.selectionEnd == null ? ta.value.length : ta.selectionEnd;
+          ta.value = ta.value.slice(0, s) + ch + ta.value.slice(e);
+          var pos = s + ch.length; ta.focus(); ta.setSelectionRange(pos, pos);
+          if (count) count.textContent = words(ta.value) + ' Wörter';
+        });
+        host.appendChild(b);
+      });
+      if (ta && count) ta.addEventListener('input', function () { count.textContent = words(ta.value) + ' Wörter'; });
+    });
+
+    requestAnimationFrame(function () { allSegs.forEach(placePill); });
+    window.addEventListener('resize', function () { allSegs.forEach(placePill); });
+  })();
+</script>
