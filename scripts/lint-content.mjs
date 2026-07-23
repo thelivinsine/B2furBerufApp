@@ -472,8 +472,25 @@ function lintPracticeAreas(practiceAreas) {
 
 function lintWritingPrompts(writingPrompts) {
   const ds = "writingPrompts";
-  for (const id of THEME_IDS)
-    if (!writingPrompts[id]) error(ds, id, "no writing prompt for theme");
+  // Random-Aufgabe pools (s148): every theme needs a non-empty short AND long
+  // pool of non-empty prompt strings (the trainer draws a random index).
+  for (const id of THEME_IDS) {
+    const p = writingPrompts[id];
+    if (!p) {
+      error(ds, id, "no writing prompt for theme");
+      continue;
+    }
+    for (const len of ["short", "long"]) {
+      const pool = p[len];
+      if (!Array.isArray(pool) || pool.length === 0) {
+        error(ds, id, `${len} prompt pool missing or empty`);
+        continue;
+      }
+      pool.forEach((t, i) => {
+        if (!isStr(t)) error(ds, `${id}.${len}[${i}]`, "empty prompt");
+      });
+    }
+  }
 }
 
 function lintCanDo(canDoStatements) {

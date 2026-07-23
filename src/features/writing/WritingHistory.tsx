@@ -5,7 +5,6 @@ import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2, ChevronDown,
 import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
-import { writingPrompts } from "@/data/writingPrompts";
 import { getWritingHistory, deleteWritingEvaluation, type WritingHistoryEntry } from "@/lib/writing";
 import { useSessionStore } from "@/store/useSessionStore";
 import { Card, CardContent } from "@/components/ui/card";
@@ -101,7 +100,6 @@ function HistoryEntry({
   const navigate = useNavigate();
   const theme = themeById(entry.theme);
   const area = practiceAreaById(entry.weakness);
-  const task = writingPrompts[entry.theme]?.[entry.length];
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -182,26 +180,20 @@ function HistoryEntry({
             </p>
           </div>
 
-          {/* Disclosure for the original task + the learner's own text */}
+          {/* Disclosure for the learner's own text. (The Aufgabe itself is no
+              longer shown: since the s148 random pools the exact prompt behind
+              an old entry is not recoverable from theme + length alone.) */}
           <button
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground"
           >
             <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", expanded && "rotate-180")} />
-            {expanded ? "Aufgabe & deinen Text ausblenden" : "Aufgabe & deinen Text anzeigen"}
+            {expanded ? "Deinen Text ausblenden" : "Deinen Text anzeigen"}
           </button>
 
           {expanded && (
             <div className="space-y-3">
-              {task && (
-                <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
-                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    <Target className="h-3.5 w-3.5" /> Aufgabe
-                  </p>
-                  <p className="text-sm leading-relaxed text-foreground/80">{task}</p>
-                </div>
-              )}
               <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
                 <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <PenLine className="h-3.5 w-3.5" /> Dein Text

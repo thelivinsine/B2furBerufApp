@@ -1,122 +1,107 @@
-import { iconByName } from "@/lib/icons";
+import { Target, X } from "lucide-react";
 import { themes } from "@/data/themes";
 import { domains } from "@/data/domains";
 import type { ThemeId } from "@/types";
 import { cn } from "@/lib/utils";
 
 /**
- * Thema picker rail for the guided Kurz/Lang writing tasks (Schreibtraining
- * redesign, s147). Same visual language as the Bibliothek FilterRail and the
- * Fokus GrammarRail (grey bg-muted tile, uppercase eyebrow section labels,
- * pill selection): the learner lands straight on an Aufgabe and switches the
- * topic here instead of going through a separate theme-picker page.
+ * "Aufgabe wählen" rail for the guided Kurz/Lang writing tasks (Bibliothek-
+ * extension redesign, s148). The exact FilterRail visual language: grey
+ * bg-muted tile with a brand header row, uppercase eyebrow section labels and
+ * white rounded facet pills (selected = solid primary). Themes are grouped by
+ * the SAME Domain categorization the Bibliothek Thema dropdown uses
+ * (Berufsleben / Alltag / Gesundheit / Bildung, from the domains registry).
+ * Picking a theme draws a random Aufgabe from that theme's prompt pool.
  *
- * Desktop = a sticky right aside with themes grouped by domain. Mobile = a
- * horizontal scrollable chip row (selected first), matching the Fokus chip row.
+ * Desktop = a sticky right aside (`layout="rail"`, 16rem column). Mobile = the
+ * same tile as a collapsible panel (`layout="panel"`) behind a toolbar button,
+ * mirroring the Bibliothek mobile filter panel.
  */
 
 interface WritingRailProps {
   value: ThemeId;
   onChange: (id: ThemeId) => void;
-  layout?: "rail" | "chips";
+  layout?: "rail" | "panel";
+  /** Close handler for the panel's X icon (mobile). */
+  onClose?: () => void;
   className?: string;
 }
 
-// Domains that actually carry writing themes, in registry order.
+// Domains that actually carry writing themes, in registry order (the same
+// grouping `themeGroupsForMode` gives the Bibliothek Thema dropdown).
 const GROUPS = domains
   .map((d) => ({ domain: d, list: themes.filter((t) => t.domain === d.id) }))
   .filter((g) => g.list.length > 0);
 
-function ThemePill({
-  id,
-  label,
-  icon,
-  selected,
-  onChange,
-  compact,
-}: {
-  id: ThemeId;
-  label: string;
-  icon: string;
-  selected: boolean;
-  onChange: (id: ThemeId) => void;
-  compact?: boolean;
-}) {
-  const Icon = iconByName(icon);
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={() => onChange(id)}
-      className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-lg border font-semibold transition-colors",
-        compact ? "px-2.5 py-1 text-xs" : "w-full px-3 py-1.5 text-left text-sm",
-        selected
-          ? "border-primary/35 bg-primary/12 text-primary"
-          : "border-border bg-surface text-foreground hover:bg-muted/60",
-      )}
-    >
-      <Icon className="h-3.5 w-3.5 shrink-0" />
-      <span className={cn(!compact && "truncate")}>{label}</span>
-    </button>
-  );
-}
+export function WritingRail({ value, onChange, layout = "rail", onClose, className }: WritingRailProps) {
+  const panel = layout === "panel";
 
-export function WritingRail({ value, onChange, layout = "rail", className }: WritingRailProps) {
-  if (layout === "chips") {
-    // Selected theme first so it is visible without scrolling.
-    const ordered = [...themes].sort((a, b) =>
-      a.id === value ? -1 : b.id === value ? 1 : 0,
-    );
-    return (
-      <div
-        className={cn("no-scrollbar flex items-center gap-2 overflow-x-auto py-1", className)}
-        role="group"
-        aria-label="Thema"
-      >
-        {ordered.map((t) => (
-          <ThemePill
-            key={t.id}
-            id={t.id}
-            label={t.titleDe}
-            icon={t.icon}
-            selected={t.id === value}
-            onChange={onChange}
-            compact
-          />
-        ))}
-      </div>
-    );
-  }
+  const body = (
+    <div className="space-y-5">
+      {GROUPS.map((g) => (
+        <section key={g.domain.id}>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            {g.domain.titleDe}
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {g.list.map((t) => {
+              const selected = t.id === value;
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => onChange(t.id)}
+                  className={cn(
+                    // The FilterRail facet-pill recipe: roomier tap size on
+                    // mobile (the panel), compact in the lg desktop rail.
+                    "inline-flex items-center rounded-full border px-2.5 py-1 text-sm transition-colors lg:px-2 lg:py-0.5 lg:text-xs",
+                    selected
+                      ? "border-primary bg-primary font-semibold text-primary-foreground"
+                      : "border-border bg-surface text-foreground hover:border-primary/40 hover:bg-surface/70",
+                  )}
+                >
+                  {t.titleDe}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
 
   return (
     <aside
+      role={panel ? "region" : undefined}
+      aria-label="Aufgabe wählen"
       className={cn(
-        "rounded-xl border border-border bg-muted p-4 shadow-soft lg:sticky lg:top-20 lg:max-h-[calc(100vh-9rem)] lg:overflow-y-auto slim-scrollbar",
+        "flex flex-col overflow-hidden rounded-xl border border-border bg-muted shadow-soft",
+        panel && "max-h-[45dvh]",
         className,
       )}
     >
-      <p className="mb-4 text-sm font-bold">Thema</p>
-      <div className="space-y-4">
-        {GROUPS.map((g) => (
-          <div key={g.domain.id}>
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-              {g.domain.titleDe}
-            </p>
-            <div className="space-y-1.5">
-              {g.list.map((t) => (
-                <ThemePill
-                  key={t.id}
-                  id={t.id}
-                  label={t.titleDe}
-                  icon={t.icon}
-                  selected={t.id === value}
-                  onChange={onChange}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+      {/* Header row: brand label + (panel only) close icon. */}
+      <div className="flex shrink-0 items-center gap-2 px-3 py-2.5">
+        <span className="flex flex-1 items-center gap-2 text-sm font-semibold text-primary">
+          <Target className="h-4 w-4" />
+          Aufgabe wählen
+        </span>
+        {panel && onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Schließen"
+            title="Schließen"
+            className="-mr-1 inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+      {/* Scroll region: only this scrolls, so the tile stays capped. */}
+      <div className="slim-scrollbar min-h-0 flex-1 overflow-y-auto border-t border-border p-3">
+        {body}
       </div>
     </aside>
   );
