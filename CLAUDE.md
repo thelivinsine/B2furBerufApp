@@ -480,6 +480,24 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   " · "-joined fragment, bigger icon tile; drill options (`GrammarDrillCard.tsx`) got a `bg-muted/50` idle
   fill so they read as tappable answers, not disabled fields.
 - **Anwenden hub:** `/anwenden`, 3 cards → Sprechen/Schreiben/Prüfung.
+- **Schreiben hub (`/writing`; restyled s149 as a Bibliothek EXTENSION, founder-approved previews in
+  `preview/schreiben-bibliothek-extension*.html`):** the 4-segment sliding-pill switcher **Fokus ·
+  Kurz · Lang · Verlauf** IS the page header (s92 rule: no eyebrow/H1; Verlauf rides `?mode=verlauf`),
+  over the standard `[minmax(0,1fr)_16rem]` content+rail grid. **Kurz/Lang draw a RANDOM Aufgabe:**
+  `src/data/writingPrompts.ts` holds per-theme POOLS (`short`/`long` are `string[]`, 5 each since
+  s149; founder target 15-20, grow by appending, schema is done; the whole pool rides the theme's one
+  `wp_<themeId>` provenance row, the mission pattern). The dice on the Aufgabe card re-rolls within
+  the theme (keeps typed text, clears a stale result); drafts carry `promptIndex` so the OAuth resume
+  restores the exact task. The Aufgabe card has NO theme icon (founder), eyebrow "Aufgabe: <Thema>" +
+  one Ziel line. **Rails are FilterRail-language tiles** (grey `bg-muted`, brand header row, eyebrow
+  sections, white rounded pills, selected = solid primary): `WritingRail` = "Aufgabe wählen" (Target
+  icon; themes grouped by the SAME Domain categorization as the Bibliothek Thema dropdown; no footer,
+  no counts), Fokus `GrammarRail` = detected form as **white pill + green `bg-success` dot** (never a
+  blue fill/ring), target solid primary, pre-correction all idle, footer only "Neuer Satz". **Mobile
+  = the Bibliothek pattern:** a toolbar button toggles the collapsible panel (`layout="panel"`, no
+  floating chip rows), Kurz/Lang get a sticky bottom Auswerten action bar, Fokus pairs the Grammatik
+  button with Neuer Satz in one row. `WritingHistory` shows only the learner's text (the exact prompt
+  behind an old entry is not recoverable from theme+length since pools).
 - **Fortschritt + Can-Do:** `canDo.ts` bank (52 milestones) drives the Fortschritt
   lead section, a weakest-band diagnose card, and the relocated theme-mastery grid.
 - **Nav zones (labels updated s105, 2026-07-13; `/library` reverted to Bibliothek s141; Schreiben added

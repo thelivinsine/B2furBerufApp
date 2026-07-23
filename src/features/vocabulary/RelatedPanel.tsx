@@ -42,13 +42,14 @@ export function relatedRows(item: VocabItem): RelatedRow[] {
     });
   }
 
-  // Writing prompt for the theme (always present for the 11 themes).
+  // Writing prompt for the theme (first of the s148 random pool; the trainer
+  // itself draws a random one when the learner lands).
   const wp = writingPrompts[item.themeId];
   if (wp) {
     rows.push({
       mod: "Schreibtraining",
-      text: wp.short,
-      to: `/writing?theme=${item.themeId}`,
+      text: wp.short[0],
+      to: `/writing?mode=kurz&theme=${item.themeId}`,
       cta: "starten",
       icon: PenLine,
       fg: "text-cyan-700 dark:text-cyan-400",

@@ -1102,3 +1102,40 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   `src/features/writing/WritingRail.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
   `src/features/writing/fokus/FokusTrainer.tsx` · `src/lib/wordDiff.ts` · `tests/wordDiff.test.ts` ·
   `CLAUDE.md` · PRs #642 · #643 · #646 · `docs/PROJECT_STATUS.md` · this log
+
+---
+
+## Session 149 — 2026-07-23 — Schreiben als Bibliothek-Erweiterung (branch `claude/schreiben-design-refinement-bw8rhh`)
+
+- **Prompt 1 (verbatim):** `the schreib training section is added newly to the menu. but the design doesn't look good. take reference of the bibliothek section and make the schreiben section look like it's an extension of bibliothek. Adapt all the design features including toggle buttons, buttons, filter rail, pills, etc. It should look like a billion dollar edutech app with highest standards and quality, visually pleasing and minimal. Provide a couple of previews first.`
+- **Response 1:** Built `preview/schreiben-bibliothek-extension.html`: two variants from the real app
+  tokens. Variant A = one 4-segment page-header bar (Fokus · Kurz · Lang · Verlauf, exact
+  LibrarySwitcher geometry); Variant B = mode bar + a small h-10 Schreiben/Verlauf view toggle (the
+  Bibliothek two-tier hierarchy). Both: FilterRail-styled Thema/Grammatik rails, 16rem grid, facet
+  pills, mobile sticky action bar. Recommended A; sent the rendered previews.
+- **Prompt 2 (verbatim):** `I like variant A but I need following changes: 1. The icon beside Aufgabe isn't required. Instead use it as an icon for filter rail. Also, the second like below Aufgabe header doesn't have to say Kurz again. The user already know that from the toggle button. Lastly, After the word Aufgabe, usea collon or a dash to show that the Aufgabe is of a particular topic shown there. 2. The filter rail should be renamed to something like Selection of Aufgabe or something like that. 3. The filter rail need not have a button at the bottom and no need of word count. 4. Every selection in the selection rail should have at least 15-20 different Aufgaben and everytime a user selects a theme, the Aufgabe should be random. 5. In mobile view, instead of pills floating above the Aufgabe card, they should be neatly organized in a button and a rail when clicked on it similar to Bibliothek. 6. For the identified pills in Fokus section, instead of a a new style, just keep them as white pills and use a green dot instead. That's enough. Again, no need of count in the filter rail. Just neuer Satz button is enough there. 7. For mobile view of Fokus, use the same style as above for Kurz with a button and in the same row, a Neuer satz button. Now create desktop and mobile previews for both Fokus and Kurz sections with the above suggestions into consideration.`
+- **Response 2:** Built `preview/schreiben-bibliothek-extension-r2.html` (variant A with all 7 changes):
+  no Aufgabe icon (Target icon in the rail header), "Aufgabe: Thema" + Ziel line only, rail renamed
+  "Aufgabe wählen" with no footer/count, dice for random tasks, mobile button + collapsible panel,
+  Fokus green-dot pills + Neuer-Satz-only footer, Fokus mobile Grammatik+Neuer-Satz row. Noted the
+  15-20-per-theme pool means a large content expansion, proposed shipping 5/theme/length first.
+- **Prompt 3 (verbatim):** `looks good. The Aufgabe wahlen dropdown should use same categorization as in bibliothek. Branche, Thema, Unterthema, etc. No need of explaining that there are 15-20 different Aufgaben - remove that line from the filter line. Implement it now`
+- **Response 3:** Implemented the full redesign. Prompts are keyed per THEME, so the rail mirrors the
+  Bibliothek Thema dropdown's Domain grouping (Berufsleben / Alltag & Erledigungen / Gesundheit &
+  Soziales / Bildung & Sprache); Branche/Unterthema don't exist on writing prompts, so no dead
+  filters were added. Shipped: `WritingModeSwitcher` as the 4-tab header (Verlauf folded in),
+  `WritingHub` mode routing, `writingPrompts.ts` restructured into random pools (5 short + 5 long per
+  theme, 200 prompts, wave 1 of 15-20), dice re-roll, `promptIndex` draft resume, `WritingRail` +
+  `GrammarRail` as FilterRail tiles (green-dot detected pills, Neuer Satz footer), mobile
+  button+panel + sticky Auswerten bar, linter pool validation, WritingHistory/RelatedPanel/AppShell
+  consumer fixes. Gates: typecheck · lint 0 errors · lint:content · test:unit 260/260 · build ·
+  check:bundle 112.3 kB · Playwright screenshots both breakpoints. Docs updated (status + this log +
+  CLAUDE.md), PR into `main`, squash-merged.
+- **Artifacts (session 149):** `preview/schreiben-bibliothek-extension.html` ·
+  `preview/schreiben-bibliothek-extension-r2.html` · `src/features/writing/WritingModeSwitcher.tsx` ·
+  `src/features/writing/WritingHub.tsx` · `src/features/writing/WritingRail.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/GrammarRail.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/resumeDraft.ts` ·
+  `src/data/writingPrompts.ts` · `scripts/lint-content.mjs` ·
+  `src/features/writing/WritingHistory.tsx` · `src/features/vocabulary/RelatedPanel.tsx` ·
+  `src/components/layout/AppShell.tsx` · `docs/PROJECT_STATUS.md` · this log

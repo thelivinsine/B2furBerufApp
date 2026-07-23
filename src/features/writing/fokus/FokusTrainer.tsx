@@ -1,7 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
-import { Sparkles, Loader2, Info, Clock, Check, Lightbulb } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import {
+  Sparkles,
+  Loader2,
+  Info,
+  Clock,
+  Check,
+  Lightbulb,
+  SlidersHorizontal,
+  ChevronDown,
+  RotateCcw,
+} from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
@@ -33,6 +43,7 @@ export function FokusTrainer({
   const m = useFokusMachine(initialText);
   const reduce = useReducedMotion();
   const [peek, setPeek] = useState(false);
+  const [panelOpen, setPanelOpen] = useState(false);
 
   // Restore a resumed draft's text once (after sign-in), without auto-submitting:
   // the learner presses Korrigieren themselves, matching the guided-mode choice.
@@ -81,6 +92,11 @@ export function FokusTrainer({
   const showBottom =
     m.status === "corrected" && m.transform.status !== "idle";
   const railEnabled = m.status === "corrected";
+
+  // A fresh sentence disables the grammar controls again; close a stale panel.
+  useEffect(() => {
+    if (!railEnabled) setPanelOpen(false);
+  }, [railEnabled]);
 
   const inputCard = (
     <Card>
@@ -152,15 +168,10 @@ export function FokusTrainer({
           </p>
         )}
 
-        <div className="flex items-center justify-between gap-2">
-          {m.status === "corrected" ? (
-            <Button variant="ghost" onClick={m.startOver}>
-              Neuer Satz
-            </Button>
-          ) : (
-            <span />
-          )}
-          {m.status !== "corrected" && (
+        {/* Neuer Satz moved out of the card: desktop = the rail footer,
+            mobile = the toolbar row (Bibliothek-extension redesign, s148). */}
+        {m.status !== "corrected" && (
+          <div className="flex items-center justify-end gap-2">
             <Button onClick={onSubmit} disabled={m.status === "submitting" || tooShort} variant="gradient">
               {m.status === "submitting" ? (
                 <>
@@ -172,8 +183,8 @@ export function FokusTrainer({
                 </>
               )}
             </Button>
-          )}
-        </div>
+          </div>
+        )}
 
         {tooShort && m.status === "idle" && m.words > 0 && (
           <p className="text-xs font-medium text-warning">
@@ -273,26 +284,65 @@ export function FokusTrainer({
 
   return (
     <div>
-      {/* Mobile: single column, grammar as a chip row between the boxes. */}
+      {/* Mobile: the Bibliothek pattern, a toolbar row (Grammatik panel toggle
+          + Neuer Satz) above the content, no floating chips. */}
       <div className="space-y-4 lg:hidden">
+        <div className="space-y-3">
+          <div className="flex justify-center gap-2">
+            <Button
+              variant={panelOpen ? "default" : "outline"}
+              aria-expanded={panelOpen}
+              aria-pressed={panelOpen}
+              className="h-10 rounded-lg"
+              disabled={!railEnabled}
+              onClick={() => setPanelOpen((o) => !o)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Grammatik
+              <ChevronDown className={`h-4 w-4 transition-transform ${panelOpen ? "rotate-180" : ""}`} />
+            </Button>
+            <Button
+              variant="outline"
+              className="h-10 rounded-lg"
+              disabled={!railEnabled}
+              onClick={m.startOver}
+            >
+              <RotateCcw className="h-3.5 w-3.5" /> Neuer Satz
+            </Button>
+          </div>
+          <AnimatePresence initial={false}>
+            {panelOpen && (
+              <motion.div
+                key="grammar-panel"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+                className="overflow-hidden"
+              >
+                <GrammarRail
+                  layout="panel"
+                  detected={m.detected}
+                  selection={m.selection}
+                  enabled={railEnabled}
+                  loadingValue={loadingValue}
+                  onSelect={(axis, value) => {
+                    onSelect(axis, value);
+                    setPanelOpen(false);
+                  }}
+                  onClose={() => setPanelOpen(false)}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
         {inputCard}
         {errorCard}
-        {railEnabled && (
-          <GrammarRail
-            layout="chips"
-            detected={m.detected}
-            selection={m.selection}
-            enabled={railEnabled}
-            loadingValue={loadingValue}
-            onSelect={onSelect}
-            onReset={m.reset}
-          />
-        )}
         {bottomBox}
       </div>
 
-      {/* Desktop: content column + sticky grammar rail. */}
-      <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start lg:gap-6">
+      {/* Desktop: content column + sticky grammar rail (Bibliothek 16rem grid). */}
+      <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8">
         <div className="space-y-4">
           {inputCard}
           {errorCard}
@@ -304,7 +354,8 @@ export function FokusTrainer({
           enabled={railEnabled}
           loadingValue={loadingValue}
           onSelect={onSelect}
-          onReset={m.reset}
+          onNewSentence={m.startOver}
+          className="lg:sticky lg:top-24 lg:max-h-[calc(100vh-8rem)]"
         />
       </div>
 

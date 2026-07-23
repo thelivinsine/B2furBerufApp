@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { PenLine, History } from "lucide-react";
 import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 import { WritingHistory } from "./WritingHistory";
-import { WritingModeSwitcher } from "./WritingModeSwitcher";
+import { WritingModeSwitcher, type WritingTab } from "./WritingModeSwitcher";
 import { GuidedWritingTrainer } from "./GuidedWritingTrainer";
 import { FokusTrainer } from "./fokus/FokusTrainer";
 import {
@@ -15,44 +14,40 @@ import {
 } from "./resumeDraft";
 import { AuthDialog } from "@/features/auth/AuthDialog";
 import { useAuthStore } from "@/store/useAuthStore";
-import { cn } from "@/lib/utils";
 
-type HubView = "write" | "history";
-
-const MODES: WritingMode[] = ["fokus", "kurz", "lang"];
-function isMode(v: string | null): v is WritingMode {
-  return !!v && (MODES as string[]).includes(v);
+const TABS: WritingTab[] = ["fokus", "kurz", "lang", "verlauf"];
+function isTab(v: string | null): v is WritingTab {
+  return !!v && (TABS as string[]).includes(v);
 }
 const lengthOf = (mode: WritingMode): WritingLength => (mode === "lang" ? "long" : "short");
 
 /**
- * Schreibtraining hub (redesign, plan: docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md).
- * A mode router over three surfaces:
+ * Schreiben hub (Bibliothek-extension redesign, s148; original plan:
+ * docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md). The 4-segment switcher IS the
+ * page header (the s92 Bibliothek rule, no eyebrow/H1), routing between:
  *   - Fokus: the single-sentence write -> correct -> transform grammar lab.
- *   - Kurz / Lang: the guided B2-Beruf writing tasks (the original flow).
+ *   - Kurz / Lang: the guided B2-Beruf writing tasks (random Aufgabe pools).
  *   - Verlauf: the writing-evaluation history (guided modes only).
- * Owns the login wall (writing needs a real account) + the draft-resume flow that
- * survives the Google OAuth full-page redirect.
+ * Owns the login wall (writing needs a real account) + the draft-resume flow
+ * that survives the Google OAuth full-page redirect.
  */
 export function WritingHub() {
   const [params, setParams] = useSearchParams();
   const rawMode = params.get("mode");
-  const mode: WritingMode = isMode(rawMode) ? rawMode : "fokus";
-  const [hubView, setHubView] = useState<HubView>("write");
+  const tab: WritingTab = isTab(rawMode) ? rawMode : "fokus";
 
   const status = useAuthStore((s) => s.status);
   const isSignedIn = status === "signedIn";
   const [authOpen, setAuthOpen] = useState(false);
   const [resumeText, setResumeText] = useState("");
 
-  const setMode = (m: WritingMode) => {
+  const setTab = (t: WritingTab) => {
     const p = new URLSearchParams(params);
-    if (m === "fokus") p.delete("mode");
-    else p.set("mode", m);
-    // Switching mode drops a stale theme selection from the other guided flow.
-    if (m === "fokus") p.delete("theme");
+    if (t === "fokus") p.delete("mode");
+    else p.set("mode", t);
+    // Switching surface drops a stale theme selection from the guided flow.
+    if (t === "fokus" || t === "verlauf") p.delete("theme");
     setParams(p);
-    setHubView("write");
   };
 
   // Login wall: stash the draft (survives OAuth redirect) and nudge sign-in.
@@ -60,12 +55,18 @@ export function WritingHub() {
     saveWritingDraft({ mode: "fokus", text: sentence, resume: true });
     setAuthOpen(true);
   };
-  const requireAuthGuided = (payload: { theme: ThemeId; length: WritingLength; text: string }) => {
+  const requireAuthGuided = (payload: {
+    theme: ThemeId;
+    length: WritingLength;
+    text: string;
+    promptIndex?: number;
+  }) => {
     saveWritingDraft({
       mode: payload.length === "long" ? "lang" : "kurz",
       theme: payload.theme,
       length: payload.length,
       text: payload.text,
+      promptIndex: payload.promptIndex,
       resume: true,
     });
     setAuthOpen(true);
@@ -73,6 +74,7 @@ export function WritingHub() {
 
   // After sign-in, restore the in-progress draft where the learner left off (the
   // learner presses the action again themselves, so no surprise auto-evaluation).
+  const [resumePromptIndex, setResumePromptIndex] = useState<number | undefined>(undefined);
   useEffect(() => {
     if (!isSignedIn) return;
     const draft = loadWritingDraft();
@@ -87,6 +89,7 @@ export function WritingHub() {
     }
     setParams(p, { replace: true });
     setResumeText(draft.text);
+    setResumePromptIndex(draft.promptIndex);
     clearWritingDraft();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSignedIn]);
@@ -101,45 +104,17 @@ export function WritingHub() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div>
-        <p className="text-eyebrow text-primary">
-          {mode === "fokus" ? "Satzlabor" : "KI-Schreibcoach"}
-        </p>
-        <h1 className="text-display text-2xl sm:text-3xl">Schreiben</h1>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <WritingModeSwitcher value={mode} onChange={setMode} />
-        {/* Verlauf toggle (writing history is guided-mode data). */}
-        <div className="flex gap-1 rounded-xl border border-border bg-muted/30 p-1">
-          <button
-            onClick={() => setHubView("write")}
-            className={cn(
-              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-              hubView === "write"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <PenLine className="h-3.5 w-3.5" /> Schreiben
-          </button>
-          <button
-            onClick={() => setHubView("history")}
-            className={cn(
-              "flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors",
-              hubView === "history"
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <History className="h-3.5 w-3.5" /> Verlauf
-          </button>
+      {/* No page header: the switcher names the section (Bibliothek rule, s92).
+          Content-column width on desktop, level with the trainer grids below. */}
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
+        <div className="lg:col-start-1">
+          <WritingModeSwitcher value={tab} onChange={setTab} />
         </div>
       </div>
 
-      {hubView === "history" ? (
+      {tab === "verlauf" ? (
         <WritingHistory />
-      ) : mode === "fokus" ? (
+      ) : tab === "fokus" ? (
         <FokusTrainer
           isSignedIn={isSignedIn}
           onRequireAuth={requireAuthFokus}
@@ -147,10 +122,11 @@ export function WritingHub() {
         />
       ) : (
         <GuidedWritingTrainer
-          length={lengthOf(mode)}
+          length={lengthOf(tab)}
           isSignedIn={isSignedIn}
           onRequireAuth={requireAuthGuided}
           initialText={resumeText}
+          initialPromptIndex={resumePromptIndex}
         />
       )}
 

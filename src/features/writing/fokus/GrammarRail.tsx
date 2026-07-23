@@ -1,22 +1,27 @@
-import { Loader2, RotateCcw } from "lucide-react";
+import { Loader2, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { GRAMMAR_AXES, type AxisId } from "./grammarDimensions";
 import type { FokusSelection } from "./useFokusMachine";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
- * The grammar-dimension rail for the Fokus Satzlabor (plan:
- * docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md). Borrows the Bibliothek FilterRail
- * VISUAL language (grey bg-muted tile, uppercase eyebrow section labels, pill
- * sizing) but is a distinct component: FilterRail narrows a list by counted
- * facets, this one shows DETECTED state and accepts a TARGET.
+ * The grammar-dimension rail for the Fokus Satzlabor, in the exact Bibliothek
+ * FilterRail language (Bibliothek-extension redesign, s148): grey bg-muted
+ * tile, brand header row, uppercase eyebrow section labels, white rounded
+ * facet pills. It is still a distinct component: FilterRail narrows a list by
+ * counted facets, this one shows DETECTED state and accepts a TARGET.
  *
- * Tri-state pills, and detected != selected:
- *   - aktuell  (detected): soft fill + dot. Reads as a STATUS chip. Fill = fact.
- *   - target   (tappable): outlined. The "do something" affordance.
- *   - selected (ring): the transform currently shown below. Ring = your action.
- * A pill can be both current and selected (they coincide) -> shows the aktuell
- * fill (no ring). When they differ, both are visible at once (the "from" fill and
- * the "to" ring), which is the whole write->correct->transform story made legible.
+ * Pill states (founder-simplified, s148):
+ *   - erkannt  (detected): white pill with a GREEN dot. Fact, quiet.
+ *   - Ziel     (selected): solid primary pill. Your action, loud.
+ *   - idle     (tappable): plain white pill.
+ * A pill can be both detected and selected (they coincide) -> it shows as the
+ * detected green-dot pill (nothing to transform).
+ *
+ * Desktop = the sticky right aside (`layout="rail"`) with a "Neuer Satz"
+ * footer. Mobile = the same tile as a collapsible panel (`layout="panel"`)
+ * behind a toolbar button; Neuer Satz lives beside that button, so the panel
+ * has no footer.
  */
 
 interface GrammarRailProps {
@@ -29,9 +34,12 @@ interface GrammarRailProps {
   /** The pill mid-transform (for the inline spinner). */
   loadingValue?: string | null;
   onSelect: (axis: AxisId, value: string) => void;
-  onReset: () => void;
-  /** "rail" = desktop right aside; "chips" = mobile horizontal row. */
-  layout?: "rail" | "chips";
+  /** Start over with a fresh sentence (rail layout's footer button). */
+  onNewSentence?: () => void;
+  /** Close handler for the panel's X icon (mobile). */
+  onClose?: () => void;
+  /** "rail" = desktop right aside; "panel" = mobile collapsible tile. */
+  layout?: "rail" | "panel";
   className?: string;
 }
 
@@ -39,11 +47,13 @@ function pillState(
   value: string,
   detectedValue: string | null,
   selectedValue: string,
+  enabled: boolean,
 ): "current" | "selected" | "idle" {
-  const isCurrent = value === detectedValue;
-  const isSelected = value === selectedValue && selectedValue !== detectedValue;
-  if (isCurrent) return "current";
-  if (isSelected) return "selected";
+  // Before a correction exists nothing is detected or chosen: everything reads
+  // idle instead of showing the default selection as a blue "target".
+  if (!enabled) return "idle";
+  if (value === detectedValue) return "current";
+  if (value === selectedValue && selectedValue !== detectedValue) return "selected";
   return "idle";
 }
 
@@ -55,7 +65,6 @@ function Pill({
   enabled,
   loading,
   onSelect,
-  compact,
 }: {
   axis: AxisId;
   value: string;
@@ -64,7 +73,6 @@ function Pill({
   enabled: boolean;
   loading: boolean;
   onSelect: (axis: AxisId, value: string) => void;
-  compact?: boolean;
 }) {
   const isCurrent = state === "current";
   return (
@@ -72,34 +80,25 @@ function Pill({
       type="button"
       role="radio"
       aria-checked={state !== "idle"}
-      aria-label={
-        isCurrent ? `${label}, aktuelle Form` : `Satz in ${label} umformen`
-      }
+      aria-label={isCurrent ? `${label}, erkannte Form` : `Satz in ${label} umformen`}
       disabled={!enabled}
       onClick={() => onSelect(axis, value)}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 rounded-lg border font-semibold transition-colors",
-        compact ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-sm",
+        // The FilterRail facet-pill recipe: roomier tap size on mobile (the
+        // panel), compact in the lg desktop rail.
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm transition-colors lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs",
         !enabled && "cursor-not-allowed opacity-40",
-        state === "current" &&
-          "border-primary/35 bg-primary/12 text-primary",
-        state === "selected" &&
-          "border-primary bg-surface text-primary ring-2 ring-primary",
-        state === "idle" &&
-          "border-border bg-surface text-foreground hover:bg-muted/60",
+        state === "selected"
+          ? "border-primary bg-primary font-semibold text-primary-foreground"
+          : "border-border bg-surface text-foreground hover:border-primary/40 hover:bg-surface/70",
       )}
     >
       {loading ? (
         <Loader2 className="h-3 w-3 animate-spin" />
       ) : isCurrent ? (
-        <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden />
+        <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden />
       ) : null}
       {label}
-      {isCurrent && !compact && (
-        <span className="text-[9px] font-extrabold uppercase tracking-wide text-primary/80">
-          aktuell
-        </span>
-      )}
     </button>
   );
 }
@@ -110,112 +109,98 @@ export function GrammarRail({
   enabled,
   loadingValue,
   onSelect,
-  onReset,
+  onNewSentence,
+  onClose,
   layout = "rail",
   className,
 }: GrammarRailProps) {
-  const detectedCount = (detected.voice ? 1 : 0) + (detected.tense ? 1 : 0);
-  const canReset = selection.voice !== detected.voice || selection.tense !== detected.tense;
+  const panel = layout === "panel";
 
-  if (layout === "chips") {
-    // Mobile: a single horizontal, scrollable chip row with tiny group labels.
-    return (
-      <div
-        className={cn("no-scrollbar flex items-center gap-2 overflow-x-auto py-1", className)}
-        role="group"
-        aria-label="Grammatik"
-      >
-        {GRAMMAR_AXES.map((axis) => {
-          const selectedValue = selection[axis.id];
-          const detectedValue = detected[axis.id];
-          return (
-            <div key={axis.id} className="flex shrink-0 items-center gap-2" role="radiogroup" aria-label={axis.label}>
-              <span className="shrink-0 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                {axis.short}
-              </span>
+  const body = (
+    <div className="space-y-5">
+      {GRAMMAR_AXES.map((axis) => {
+        const selectedValue = selection[axis.id];
+        const detectedValue = detected[axis.id];
+        return (
+          <section key={axis.id} role="radiogroup" aria-label={axis.label}>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              {axis.label}
+            </p>
+            <div className="flex flex-wrap gap-1.5">
               {axis.values.map((v) => (
                 <Pill
                   key={v.id}
                   axis={axis.id}
                   value={v.id}
-                  label={v.short ?? v.label}
-                  state={pillState(v.id, detectedValue, selectedValue)}
+                  label={v.label}
+                  state={pillState(v.id, detectedValue, selectedValue, enabled)}
                   enabled={enabled}
                   loading={loadingValue === v.id}
                   onSelect={onSelect}
-                  compact
                 />
               ))}
             </div>
-          );
-        })}
-      </div>
-    );
-  }
+          </section>
+        );
+      })}
+      <p className="text-xs leading-relaxed text-muted-foreground">
+        {enabled ? (
+          <>
+            <b className="text-success">Grüner Punkt = erkannte Form.</b> Tippe eine andere Form,
+            um den Satz umzuformen.
+          </>
+        ) : (
+          <>Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv und die Zeitform.</>
+        )}
+      </p>
+    </div>
+  );
 
-  // Desktop: the grey rail aside.
   return (
     <aside
+      role={panel ? "region" : undefined}
+      aria-label="Grammatik"
       className={cn(
-        "rounded-xl border border-border bg-muted p-4 shadow-soft lg:sticky lg:top-20",
+        "flex flex-col overflow-hidden rounded-xl border border-border bg-muted shadow-soft",
+        panel && "max-h-[45dvh]",
         className,
       )}
     >
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <p className="text-sm font-bold">Grammatik</p>
-          <p className="text-xs font-semibold text-muted-foreground">
-            {enabled ? `${detectedCount} erkannt` : "Satz prüfen"}
-          </p>
+      {/* Header row: brand label + (panel only) close icon. */}
+      <div className="flex shrink-0 items-center gap-2 px-3 py-2.5">
+        <span className="flex flex-1 items-center gap-2 text-sm font-semibold text-primary">
+          <SlidersHorizontal className="h-4 w-4" />
+          Grammatik
+        </span>
+        {panel && onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Schließen"
+            title="Schließen"
+            className="-mr-1 inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
+      <div className="slim-scrollbar min-h-0 flex-1 overflow-y-auto border-t border-border p-3">
+        {body}
+      </div>
+
+      {/* Footer (desktop rail only): start over with a fresh sentence. */}
+      {!panel && onNewSentence && (
+        <div className="shrink-0 border-t border-border p-3">
+          <Button
+            variant="outline"
+            className="h-10 w-full"
+            onClick={onNewSentence}
+            disabled={!enabled}
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> Neuer Satz
+          </Button>
         </div>
-        <button
-          type="button"
-          onClick={onReset}
-          disabled={!canReset}
-          aria-label="Auf den korrigierten Satz zurücksetzen"
-          title="Zurücksetzen"
-          className={cn(
-            "inline-flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-surface text-muted-foreground transition-colors",
-            canReset ? "hover:text-foreground" : "cursor-not-allowed opacity-40",
-          )}
-        >
-          <RotateCcw className="h-3.5 w-3.5" />
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        {GRAMMAR_AXES.map((axis) => {
-          const selectedValue = selection[axis.id];
-          const detectedValue = detected[axis.id];
-          return (
-            <div key={axis.id} role="radiogroup" aria-label={axis.label}>
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-muted-foreground">
-                {axis.label}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {axis.values.map((v) => (
-                  <Pill
-                    key={v.id}
-                    axis={axis.id}
-                    value={v.id}
-                    label={v.label}
-                    state={pillState(v.id, detectedValue, selectedValue)}
-                    enabled={enabled}
-                    loading={loadingValue === v.id}
-                    onSelect={onSelect}
-                  />
-                ))}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {enabled && (
-        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-          <b className="text-primary">Blau = jetzt.</b> Tippe eine andere Form, um den Satz
-          umzuformen.
-        </p>
       )}
     </aside>
   );

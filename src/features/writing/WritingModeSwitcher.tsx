@@ -1,21 +1,23 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { PenLine } from "lucide-react";
 import { useSlidingPill } from "@/features/shared/useSlidingPill";
 import type { WritingMode } from "./resumeDraft";
 import { cn } from "@/lib/utils";
 
 /**
- * Fokus / Kurz / Lang mode switcher for Schreibtraining (plan:
- * docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md). Same lifted-white sliding-pill
- * language as the Bibliothek ViewSwitcher, but text segments instead of icons.
- * Fokus = the single-sentence grammar lab; Kurz/Lang = the guided writing tasks
- * (they map to the old length short/long).
+ * The Schreiben page-header switcher (Bibliothek-extension redesign, s148).
+ * Exactly the LibrarySwitcher language: a full-width recessed grey track with
+ * a single sliding white pill, the active segment bold + brand. It doubles as
+ * the page header (no separate H1, the s92 Bibliothek rule), so Verlauf is the
+ * fourth segment instead of a separate toggle: Fokus · Kurz · Lang · Verlauf.
  */
 
-const MODES: { id: WritingMode; label: string }[] = [
+export type WritingTab = WritingMode | "verlauf";
+
+const TABS: { id: WritingTab; label: string }[] = [
   { id: "fokus", label: "Fokus" },
   { id: "kurz", label: "Kurz" },
   { id: "lang", label: "Lang" },
+  { id: "verlauf", label: "Verlauf" },
 ];
 
 export function WritingModeSwitcher({
@@ -23,8 +25,8 @@ export function WritingModeSwitcher({
   onChange,
   className,
 }: {
-  value: WritingMode;
-  onChange: (mode: WritingMode) => void;
+  value: WritingTab;
+  onChange: (tab: WritingTab) => void;
   className?: string;
 }) {
   const reduce = useReducedMotion();
@@ -32,37 +34,41 @@ export function WritingModeSwitcher({
   return (
     <div
       ref={trackRef as React.RefObject<HTMLDivElement>}
-      role="group"
-      aria-label="Schreibmodus"
+      role="tablist"
+      aria-label="Schreiben"
       className={cn(
-        "relative inline-flex h-10 items-center gap-0.5 rounded-lg border border-border bg-muted p-0.5",
+        "relative flex w-full items-stretch gap-0.5 rounded-full border border-border bg-muted p-1 shadow-soft sm:gap-1",
         className,
       )}
     >
       {rect && (
         <motion.span
           aria-hidden
-          className="absolute top-0.5 bottom-0.5 left-0 rounded-md bg-surface shadow-soft"
+          className="absolute top-1 bottom-1 left-0 rounded-full bg-surface shadow-soft"
           initial={false}
           animate={{ x: rect.left, width: rect.width }}
-          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }}
+          transition={
+            reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }
+          }
         />
       )}
-      {MODES.map((mode) => {
-        const active = mode.id === value;
+      {TABS.map((tab) => {
+        const active = tab.id === value;
         return (
           <button
-            key={mode.id}
-            ref={registerItem(mode.id)}
-            onClick={() => onChange(mode.id)}
-            aria-pressed={active}
+            key={tab.id}
+            ref={registerItem(tab.id)}
+            onClick={() => onChange(tab.id)}
+            role="tab"
+            aria-selected={active}
             className={cn(
-              "relative z-10 inline-flex h-9 items-center gap-1.5 rounded-md px-4 text-sm font-semibold transition-colors",
-              active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+              "relative z-10 flex-1 whitespace-nowrap rounded-full px-1.5 py-2.5 text-center text-sm leading-none transition-colors sm:px-3",
+              active
+                ? "font-bold text-primary"
+                : "font-medium text-muted-foreground hover:text-foreground",
             )}
           >
-            {mode.id === "fokus" && <PenLine className="h-3.5 w-3.5" />}
-            {mode.label}
+            {tab.label}
           </button>
         );
       })}

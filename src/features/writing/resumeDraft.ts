@@ -21,6 +21,9 @@ export interface WritingDraft {
   /** Guided modes only (Fokus has no theme). */
   theme?: ThemeId;
   length?: WritingLength;
+  /** Which prompt of the theme's random pool the draft was written against, so
+   *  the resumed task matches the text (guided modes only). */
+  promptIndex?: number;
   text: string;
   /** True when the learner hit the login wall mid-action and it should resume. */
   resume: boolean;

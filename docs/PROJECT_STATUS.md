@@ -1,16 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-22 (session 147, continued). **Schreibtraining redesign complete + a dedicated
-"Schreiben" nav item (backlog #6; PRs #640/#642/#643/#646, all merged).** `/writing` is now a Fokus ·
-Kurz · Lang mode router matching the Bibliothek design language: **Fokus "Satzlabor"** is a
-single-sentence write→correct→transform grammar lab (corrections now highlight the changed words in
-place + list each edit as before→after via a client-side word diff), and **Kurz/Lang land straight on
-an Aufgabe + writing field** with a Thema filter rail (no theme-picker page). Backend = migration 0009 +
-Edge Functions `check-sentence`/`transform-sentence` (global cross-user transform cache, shared $5 fuse,
-Anthropic→Gemini→OpenAI fallback with a 429/529 retry + diagnostic logging). **Founder action open:**
-redeploy the two functions to pick up the logging/retry fix, and confirm `GEMINI_API_KEY` is set as a
-project secret. Interleaved parallel work: s148 auth fix (fresh-device OAuth no longer bounces existing
-accounts to the landing page; PR #644, its handoff below). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-23 (session 149). **Schreiben is now a full Bibliothek extension** (founder
+mockup rounds in `preview/schreiben-bibliothek-extension*.html`, then implemented): the 4-segment
+sliding-pill switcher **Fokus · Kurz · Lang · Verlauf** IS the page header (no H1; Verlauf rides
+`?mode=verlauf`), the Thema/Grammatik rails are FilterRail-language tiles ("Aufgabe wählen" with
+domain-grouped pills; Fokus detected forms = white pills with a green dot), mobile swaps floating
+chips for the Bibliothek toolbar-button + collapsible panel + a sticky bottom Auswerten bar, and
+**writing prompts are now random POOLS** (5 short + 5 long per theme, 200 total; dice re-rolls,
+founder target 15-20 per theme in later waves). Founder action open (from s147): redeploy
+`check-sentence`/`transform-sentence` for the logging/retry fix + confirm `GEMINI_API_KEY`.
+Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -72,6 +71,36 @@ Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. Still open:
 
 ## Resume here (next session)
 
+**Handoff after session 149 (2026-07-23). Schreiben restyled as a Bibliothek extension, branch
+`claude/schreiben-design-refinement-bw8rhh`.** Founder: "make the schreiben section look like it's an
+extension of bibliothek". Two preview rounds (`preview/schreiben-bibliothek-extension.html` = variants
+A/B, `-r2.html` = variant A + the founder's 7 changes), then implemented on founder go-ahead.
+- **Chrome:** `WritingModeSwitcher` is now the full-width LibrarySwitcher-geometry page header with
+  FOUR segments (Fokus · Kurz · Lang · Verlauf); the eyebrow/H1 and the separate Verlauf toggle are
+  gone (`WritingHub` routes `?mode=verlauf`). Header sits at content-column width over the
+  `[minmax(0,1fr)_16rem]` grid (was 18rem).
+- **Guided (Kurz/Lang):** Aufgabe card has no icon tile; eyebrow "Aufgabe: <Thema>", one "Ziel n–m
+  Wörter" line, a dice button that re-rolls a random task. **`writingPrompts.ts` restructured into
+  pools** (`short`/`long` are `string[]`, 5 each × 20 themes = 200 prompts; wave 1 of the founder's
+  15-20 target; the pool rides the theme's single `wp_<themeId>` provenance row, mission-style).
+  Theme pick draws a random prompt; drafts carry `promptIndex` so OAuth resume restores the exact
+  task. `WritingRail` = the "Aufgabe wählen" FilterRail tile (brand header + Target icon, Domain-
+  grouped white pills, selected solid primary; the founder asked for "the same categorization as
+  Bibliothek": prompts are keyed per THEME, so the rail mirrors the Thema dropdown's domain grouping;
+  Branche/Unterthema don't exist on prompts). Mobile: toolbar button + collapsible panel (chips
+  removed) + sticky bottom Auswerten bar; desktop actions stay in the editor card.
+- **Fokus:** `GrammarRail` restyled to the same tile; detected = white pill + green `bg-success`
+  dot, target = solid primary, pre-correction everything idle; no count/reset, footer = "Neuer
+  Satz" only. Mobile pairs the Grammatik panel button with Neuer Satz in one row. `WritingHistory`
+  shows only the learner's text now (the exact prompt behind an old entry is not recoverable);
+  `RelatedPanel` links `/writing?mode=kurz&theme=…` with `wp.short[0]`.
+- **Gates:** typecheck ✓ · lint 0 errors · lint:content ✓ (pool schema validated) · test:unit
+  **260/260** · build ✓ · check:bundle **112.3 kB** (writingPrompts stays a lazy chunk) · Playwright
+  screenshots of desktop + mobile, both modes, verified against the approved mockups.
+- **Open:** grow the pools toward 15-20 prompts per theme/length in content waves (append to the
+  arrays in `writingPrompts.ts`, no schema work needed); the s147 founder redeploy action below still
+  stands.
+
 **Handoff after session 148 (2026-07-22). Auth bug fix: fresh-device OAuth login threw existing
 accounts out to the landing page. Branch `claude/pwa-auth-uninstall-bug-hrafrw`, PR #644 merged.**
 The founder reported: after uninstalling the PWA and logging into an admin account with Google, the
@@ -97,56 +126,9 @@ app redirects to the landing page right after login and throws them out.
   `build` ✓ · `check:bundle` **112.3 kB** (main chunk unchanged). Sandbox can't reach the live
   `*.github.io` site, so the founder confirms the reinstall-and-login result after the Pages deploy.
 
-**Handoff after session 147 (2026-07-22). Schreibtraining redesign: Fokus "Satzlabor", branch
-`claude/schreibtraining-todo-review-afoegv`, PR #640 merged.** Backlog #6. A five-expert design panel
-(LLM engine, frontend, German B2 pedagogy, backend cost/security, UX) produced
-`docs/plans/SCHREIBTRAINING_REDESIGN_PLAN.md`; mockups in `preview/schreibtraining-redesign-mockups.html`.
-What shipped:
-- **`/writing` is now a mode router** (`WritingHub` rewritten): **Fokus · Kurz · Lang** via
-  `WritingModeSwitcher` (sliding pill) + a Verlauf toggle. Kurz/Lang extracted verbatim into
-  `GuidedWritingTrainer` (old length toggle folded into the mode; existing `evaluate-writing` backend).
-- **Fokus "Satzlabor"** (`src/features/writing/fokus/`): single-sentence lab. `FokusTrainer` +
-  tri-state `GrammarRail` (aktuell / target / selected; desktop rail + mobile chip row) +
-  `useFokusMachine` (edit invalidates, transforms derive from the corrected base, in-memory cache).
-  `grammarDimensions.ts` = the Aktiv/Vorgangspassiv × Präsens/Perfekt/Präteritum MVP grid (data-driven,
-  Wave 2 extends the arrays). Client `lib/sentenceStudio.ts` degrades gracefully if the backend is
-  undeployed.
-- **Backend:** migration `0009_sentence_studio.sql` (`sentence_checks` owner-only, GLOBAL cross-user
-  `sentence_transforms` cache, `sentence_ai_ops` paid-op ledger, `bump_transform_hit` RPC,
-  `sentence_studio` kill-switch) + Edge Functions `check-sentence` (correct + detect, Haiku, cache-first)
-  and `transform-sentence` (transform, cache-FIRST, abstains rather than hallucinate; burst/daily/monthly
-  limits count only paid ops; `TRANSFORM_MODEL` env-switchable to Sonnet). Metered into the shared **$5
-  fuse** so max spend is unchanged. Deploy steps in `docs/plans/PHASE2_SETUP.md`.
-- **The session continued past the initial ship (5 more PRs on the same branch):**
-  - **Nav (PR #642):** Schreibtraining promoted to a dedicated top-level nav item **"Schreiben"**
-    (`/writing`, rose accent, the existing pencil mark). `DEFAULT_PINNED_TABS` + `BottomTabBar` `CONTENT`
-    now `["/library", "/writing", "/analytics"]`; the `/writing → /anwenden` `ROUTE_SUCCESSOR` remap was
-    removed. CLAUDE.md nav bullets updated.
-  - **Backend robustness (PR #643):** the two Edge Functions swallowed LLM errors silently, so failures
-    were invisible in the logs. Added diagnostic `console.error` logging (HTTP status + body, parse
-    failures, a providers-configured line) and a one-shot Anthropic 429/529 retry before falling to
-    Gemini → OpenAI. **Founder must redeploy the functions to pick this up.**
-  - **Design harmonization (PR #646):** the whole section now matches the Bibliothek design language.
-    New `WritingRail` (grey `bg-muted` tile, uppercase domain eyebrows, single-select theme pills;
-    desktop sticky aside + mobile chip row). `GuidedWritingTrainer` rewritten: **Kurz/Lang land straight
-    on an Aufgabe + writing field** (no theme-picker page), topic switched from the Thema rail. Both
-    guided + Fokus share the `[minmax(0,1fr)_18rem]` content+rail grid.
-  - **Correction display fix (PR #646):** the Fokus correction showed the corrected sentence with no
-    indication of what changed and a green check that read as "correct". Now a pure client-side word
-    diff (`lib/wordDiff.ts`) strikes the original, **highlights the changed words in place**, lists each
-    edit as before → after ("Was ich geändert habe"), and the header reads "Korrigiert · N Änderungen".
-    No backend needed. `tests/wordDiff.test.ts` pins it.
-- **Gates (final, PR #646):** typecheck ✓ · lint 0 errors ✓ · test:unit **260/260** (added
-  `fokusGrammar` + `wordDiff` tests) · build ✓ · check:bundle **112.3 kB** (main unchanged; writing lazy).
-- **Open follow-ups:** (1) founder **redeploys** `check-sentence`/`transform-sentence` for the logging +
-  retry fix (the functions + migration 0009 are already deployed; Fokus worked but was flaky, likely a
-  provider hiccup, hence the retry/logging); confirm `GEMINI_API_KEY` is set as a project secret so the
-  fallback is active; (2) decide Haiku vs Sonnet 5 for transforms (default Haiku, one env var); (3) Wave
-  2 axes (Zustandspassiv, Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness; (4) optional:
-  AI-authored per-change *explanations* in the correction tip (needs a backend field + redeploy). Fokus
-  is single-sentence by design.
-
-_(Session 146's /sources verification-refresh + human-review-reset + table-restructure handoff, and
+_(Session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first
+Bibliothek harmonization, PRs #640/#642/#643/#646), session 146's /sources verification-refresh +
+human-review-reset + table-restructure handoff, and
 session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,
 `RequireFounder` gate, PR merged) are now in
 `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 144's Admin Control Center chunks 1 + 2 handoff (backend foundation migration 0008 + the

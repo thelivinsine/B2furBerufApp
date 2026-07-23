@@ -69,7 +69,9 @@ export function AppShell() {
     if (location.pathname.startsWith("/writing")) return;
     const draft = loadWritingDraft();
     if (draft?.resume) {
-      navigate(`/writing?theme=${draft.theme}`, { replace: true });
+      // WritingHub's resume effect restores mode + theme + text from the draft
+      // itself, so a bare /writing is enough (a Fokus draft has no theme).
+      navigate("/writing", { replace: true });
     }
   }, [authStatus, location.pathname, navigate]);
 
