@@ -34,7 +34,7 @@ input:-webkit-autofill {
     --background: 180 45% 98%;
     /* Page-ground gradient stops (s140, founder-picked "I1" from
        preview/background-gradient-variations-r3-invertiert.html): a very
-       subtle mint → sky diagonal (150°), rendered by the bg-page utility in
+       subtle mint → sky diagonal (120°), rendered by the bg-page utility in
        tailwind.config.ts with the bg-mesh washes on top. */
     --page-from: 144 45% 98%;
     --page-mid: 150 50% 98%;
