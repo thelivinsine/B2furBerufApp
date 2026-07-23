@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 import { WritingHistory } from "./WritingHistory";
@@ -106,6 +107,24 @@ export function WritingHub() {
     }
   };
 
+  // Directional tab slide, the LibraryHub pattern (micro-motion pass, s149
+  // P2): the entering panel comes from the side you moved toward; popLayout
+  // pops the leaving one out of flow so there is no empty beat. The previous
+  // index is read during render and advanced in an effect.
+  const reduce = useReducedMotion();
+  const index = TABS.indexOf(tab);
+  const prevIndex = useRef(index);
+  const dir = index >= prevIndex.current ? 1 : -1;
+  useEffect(() => {
+    prevIndex.current = index;
+  }, [index]);
+  const shift = reduce ? 0 : 32;
+  const slide = {
+    enter: (d: number) => ({ opacity: 0, x: d >= 0 ? shift : -shift }),
+    center: { opacity: 1, x: 0 },
+    exit: (d: number) => ({ opacity: 0, x: d >= 0 ? -shift : shift }),
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* No page header: the switcher names the section (Bibliothek rule, s92).
@@ -118,29 +137,45 @@ export function WritingHub() {
         </div>
       </div>
 
-      {tab === "verlauf" ? (
-        // Verlauf keeps the same content column as the other tabs (the grid's
-        // col 1), so the page width never jumps between tabs (s149 audit).
-        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
-          <div className="min-w-0 lg:col-start-1">
-            <WritingHistory />
-          </div>
-        </div>
-      ) : tab === "fokus" ? (
-        <FokusTrainer
-          isSignedIn={isSignedIn}
-          onRequireAuth={requireAuthFokus}
-          initialText={resumeText}
-        />
-      ) : (
-        <GuidedWritingTrainer
-          length={lengthOf(tab)}
-          isSignedIn={isSignedIn}
-          onRequireAuth={requireAuthGuided}
-          initialText={resumeText}
-          initialPromptIndex={resumePromptIndex}
-        />
-      )}
+      {/* popLayout absolutely-positions the exiting panel, so the wrapper is
+          `relative` to contain it; panels settle to x:0 so sticky bars work. */}
+      <div className="relative">
+        <AnimatePresence mode="popLayout" custom={dir} initial={false}>
+          <motion.div
+            key={tab}
+            custom={dir}
+            variants={slide}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {tab === "verlauf" ? (
+              // Verlauf keeps the same content column as the other tabs (the
+              // grid's col 1), so the page width never jumps between tabs.
+              <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:gap-x-8">
+                <div className="min-w-0 lg:col-start-1">
+                  <WritingHistory />
+                </div>
+              </div>
+            ) : tab === "fokus" ? (
+              <FokusTrainer
+                isSignedIn={isSignedIn}
+                onRequireAuth={requireAuthFokus}
+                initialText={resumeText}
+              />
+            ) : (
+              <GuidedWritingTrainer
+                length={lengthOf(tab)}
+                isSignedIn={isSignedIn}
+                onRequireAuth={requireAuthGuided}
+                initialText={resumeText}
+                initialPromptIndex={resumePromptIndex}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </div>
 
       <AuthDialog open={authOpen} onOpenChange={handleAuthOpenChange} intent="signup" />
     </div>

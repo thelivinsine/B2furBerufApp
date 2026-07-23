@@ -332,7 +332,8 @@ export function FokusTrainer({
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
-                transition={reduce ? { duration: 0 } : { duration: 0.22, ease: "easeOut" }}
+                // 0.18s: the shared panel timing (micro-motion pass, s149 P2).
+                transition={reduce ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
                 className="overflow-hidden"
               >
                 <GrammarRail

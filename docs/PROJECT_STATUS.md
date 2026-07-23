@@ -112,9 +112,14 @@ A/B, `-r2.html` = variant A + the founder's 7 changes), then implemented on foun
   6 each, untagged = universal so a Branche never empties a pool). Bank: **316 tasks**. P1: Fokus
   Grammatik rail Himmelblau like the Aufgabe rail (+ dark-mode alphas for both), Verlauf constrained
   to the content grid + empty-state CTA, unified eyebrow rule (card titles bold primary), 40px
-  spinning dice, duplicate Fokus hint removed, Fokus mobile sticky Korrigieren bar. Remaining from
-  the audit list (P2, not started): reset-also-rerolls, micro-motion pass, pools to 15-20/theme,
-  further Branchen waves.
+  spinning dice, duplicate Fokus hint removed, Fokus mobile sticky Korrigieren bar.
+- **P2 round (same session, founder go + reset-bug report):** the Aufgabe-wählen **reset is now
+  always active** and does a full reset (clears every scope AND draws a fresh random task; it used
+  to be disabled at the default state, which read as broken). Micro-motion pass: directional tab
+  slide (LibraryHub popLayout pattern), 0.12s popover fade, shared 0.18s panel timing. Content:
+  every theme now ≥8 short + ≥8 long, and **Branche wave 2 covers all 15 sectors** (4 tasks each
+  for the 10 new ones). Bank: **373 tasks**. Remaining content waves: pools toward the founder's
+  15-20 per theme/length (append-only authoring).
 - **Gates:** typecheck ✓ · lint 0 errors · lint:content ✓ (pool schema validated) · test:unit
   **260/260** · build ✓ · check:bundle **112.3 kB** (writingPrompts stays a lazy chunk) · Playwright
   screenshots of desktop + mobile, both modes (incl. the open dropdown), verified against the

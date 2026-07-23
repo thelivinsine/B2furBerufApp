@@ -60,6 +60,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Verfasse eine E-Mail an dein Team nach einer strittigen Abstimmung: Fasse das Ergebnis zusammen, erkläre, wie es zustande kam, und beschreibe, was jetzt umgesetzt wird.", sub: "meetings.entscheidung" },
       { text: "Schreibe eine E-Mail an die Entwicklerrunde: Schlage ein neues Vorgehen für Code-Reviews vor, begründe es mit zwei aktuellen Beispielen und bitte um Feedback bis zum nächsten Sprint.", sectors: ["it"] },
       { text: "Schreibe eine Mitteilung an das Küchen- und Serviceteam: Die Karte wechselt zur neuen Saison. Nenne die wichtigsten neuen Gerichte, die Allergene und was das Team den Gästen erzählen soll.", sectors: ["hospitality"] },
+      { text: "Schreibe eine E-Mail an den Auftraggeber nach einem Projekttreffen: Fasse die technischen Entscheidungen zusammen und liste die offenen Prüfpunkte mit Terminen auf.", sectors: ["engineering"] },
     ],
   },
   scheduling: {
@@ -73,6 +74,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze Nachricht an die Stationsleitung: Bitte um einen Diensttausch am Samstag und nenne, wer für dich einspringen würde.", sectors: ["care"] },
       { text: "Schreibe eine kurze Meldung an den Polier: Wegen Regen konnte heute nicht betoniert werden. Nenne den neuen Plan für morgen.", sectors: ["construction"] },
       { text: "Schreibe eine kurze Nachricht an dein Schichtteam: Für Samstagabend fehlt eine Servicekraft. Frage, wer die Schicht übernehmen kann.", sectors: ["hospitality"] },
+      { text: "Schreibe eine kurze Nachricht an einen Kunden: Du schaffst den Termin heute nicht mehr. Entschuldige dich und schlage morgen früh vor.", sectors: ["trades"] },
+      { text: "Schreibe eine kurze Nachricht an dein Team: Wegen Inventur öffnet der Laden am Freitag später. Nenne die neue Öffnungszeit.", sectors: ["retail"] },
+      { text: "Schreibe eine kurze Nachricht an die Frühschicht: Die Wartung der Anlage verschiebt sich auf Mittwoch. Nenne, was das für den Plan bedeutet.", sectors: ["production"] },
+      { text: "Schreibe eine kurze Nachricht an deine Kolleginnen: Der Samstag ist voll ausgebucht. Frage, wer eine Stunde länger bleiben kann.", sectors: ["beauty"] },
+      { text: "Schreibe eine kurze Nachricht an die Einsatzleitung: Du bist krank und kannst die Frühschicht nicht übernehmen. Bitte um Vertretung.", sectors: ["cleaning"] },
+      { text: "Schreibe eine kurze Nachricht an deinen Objektleiter: Tausche deine Nachtschicht am Samstag mit einem Kollegen und bitte um Freigabe.", sectors: ["security"] },
+      { text: "Schreibe eine kurze Nachricht an die Trainer: Der Kursplan für August ändert sich. Nenne die wichtigste Änderung und bis wann Rückmeldungen möglich sind.", sectors: ["sports"] },
     ],
     long: [
       { text: "Schreibe eine E-Mail, in der du einen Projektzeitplan erläuterst. Begründe, warum sich eine Frist verschiebt, beschreibe die Auswirkungen und schlage einen angepassten Plan vor." },
@@ -82,6 +90,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Verfasse eine E-Mail an mehrere Beteiligte, um einen gemeinsamen Workshop-Termin zu finden. Schlage drei Optionen vor, erkläre den Zweck des Workshops und bitte um Antwort bis zu einer Frist." },
       { text: "Schreibe eine E-Mail an die Pflegedienstleitung: Der Dienstplan für die Feiertage ist zu knapp besetzt. Beschreibe die Engpässe und schlage eine fairere Verteilung vor.", sectors: ["care"] },
       { text: "Verfasse eine E-Mail an dein Team zur Urlaubsplanung im Sommer: Erkläre, wie viele pro Woche fehlen dürfen, bis wann Wünsche abgegeben werden und wie ihr Konflikte löst.", sectors: ["hospitality"] },
+      { text: "Verfasse eine E-Mail an einen externen Dienstleister: Vereinbare einen festen monatlichen Wartungstermin. Schlage einen Rhythmus vor, kläre Ausweichregeln für Feiertage und bitte um Bestätigung." },
     ],
   },
   logistics: {
@@ -95,6 +104,10 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze Nachricht an den Baustoffhändler: Der Kies wurde nicht geliefert. Frage nach dem neuen Liefertermin.", sectors: ["construction"] },
       { text: "Schreibe eine kurze Meldung an die Disposition: Du stehst im Stau auf der A3. Nenne deine voraussichtliche Ankunft beim Kunden.", sectors: ["transport"] },
       { text: "Schreibe eine kurze Bestellung an den Getränkehändler: Bestelle für das Wochenende nach und bitte um Lieferung bis Freitagmittag.", sectors: ["hospitality"] },
+      { text: "Schreibe eine kurze Meldung an die Zentrale: Ein Aktionsartikel ist ausverkauft. Frage nach Nachschub und dem Liefertermin.", sectors: ["retail"] },
+      { text: "Schreibe eine kurze Nachricht an den Einkauf: Das Lösungsmittel wird knapp. Bitte um eine Eilbestellung.", sectors: ["chemicals"] },
+      { text: "Schreibe eine kurze Nachricht an den Versand: Eine Kühlketten-Lieferung muss heute noch raus. Bitte um Priorität.", sectors: ["pharma"] },
+      { text: "Schreibe eine kurze Meldung ans Büro: Im Objekt fehlen Reinigungsmittel und Müllbeutel. Bitte um Nachlieferung.", sectors: ["cleaning"] },
     ],
     long: [
       { text: "Verfasse eine Stellungnahme zu einem Lieferengpass. Beschreibe das Problem, nenne mögliche Ursachen und schlage Maßnahmen vor, um die Versorgung sicherzustellen." },
@@ -103,6 +116,8 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine E-Mail an eine Spedition: Hole ein Angebot für regelmäßige Transporte ein. Beschreibe Strecke, Häufigkeit und Ware und frage nach Preisen und Konditionen." },
       { text: "Verfasse eine Stellungnahme zur Einführung eines neuen Systems für die Lagerverwaltung. Nenne die Probleme mit dem alten Ablauf und begründe, welche Vorteile das neue System bringt." },
       { text: "Verfasse einen Bericht über eine Tour: Beschreibe die Route, die Zahl der Stopps, wo es Wartezeiten gab und was die Planung morgen besser machen könnte.", sectors: ["transport"] },
+      { text: "Verfasse einen kurzen Schichtbericht: Beschreibe die produzierte Menge, einen Maschinenstillstand mit Ursache und was die nächste Schicht wissen muss.", sectors: ["production"] },
+      { text: "Schreibe eine E-Mail an einen Paketdienst: Eine wichtige Sendung an einen Kunden ist seit Tagen unterwegs. Nenne die Sendungsnummer, beschreibe die Dringlichkeit und bitte um Nachforschung." },
     ],
   },
   customer: {
@@ -118,6 +133,8 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze Antwort an eine Nutzerin: Ihr gemeldeter Fehler ist behoben. Bitte sie, die neue Version zu testen.", sectors: ["it"] },
       { text: "Schreibe eine kurze Nachricht an einen Empfänger: Du erreichst ihn nicht an der Lieferadresse. Frage, wo du das Paket abstellen darfst.", sectors: ["transport"] },
       { text: "Schreibe eine kurze Antwort an einen Gast: Bedanke dich für die Reservierungsanfrage und bestätige den Tisch für acht Personen auf der Terrasse.", sectors: ["hospitality"] },
+      { text: "Schreibe eine kurze Erinnerung an eine Kundin: Ihr Termin ist morgen um 14 Uhr. Bitte um eine kurze Bestätigung.", sectors: ["beauty"] },
+      { text: "Schreibe eine kurze Antwort an ein Mitglied: Der Kurs am Montag fällt aus. Nenne den Grund und eine Alternative.", sectors: ["sports"] },
     ],
     long: [
       { text: "Schreibe eine E-Mail an einen unzufriedenen Kunden. Entschuldige dich angemessen, erkläre, wie es zum Problem kam, und biete eine konkrete Lösung sowie eine Wiedergutmachung an.", sub: "customer.reklamation" },
@@ -132,6 +149,13 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Verfasse eine E-Mail an die Bauherrin: Erkläre, warum sich der Innenausbau um zwei Wochen verzögert, welche Gewerke betroffen sind und wie ihr die Zeit teilweise aufholen wollt.", sectors: ["construction"] },
       { text: "Verfasse eine E-Mail an einen Stammkunden: Wegen einer Baustelle ändert sich euer Lieferfenster für vier Wochen. Erkläre die Änderung und biete zwei Alternativen an.", sectors: ["transport"] },
       { text: "Verfasse eine Antwort auf die Beschwerde eines Gastes über einen verpatzten Abend: Entschuldige dich konkret, erkläre, was schiefging, und lade ihn mit einem Gutschein zu einem zweiten Besuch ein.", sectors: ["hospitality"] },
+      { text: "Verfasse ein kurzes Angebot für eine Badsanierung: Beschreibe die Arbeiten, nenne Preis und Dauer und erkläre, warum sich die Qualität lohnt.", sectors: ["trades"] },
+      { text: "Verfasse eine Antwort an eine Kundin, die sich über eine lange Wartezeit an der Kasse beschwert hat: Entschuldige dich, erkläre die Ursache und beschreibe, was ihr ändert.", sectors: ["retail"] },
+      { text: "Verfasse eine E-Mail an eine Stammkundin: Stelle die neue Behandlung vor, erkläre, für wen sie geeignet ist, und biete ihr einen Kennenlernpreis an.", sectors: ["beauty"] },
+      { text: "Verfasse eine E-Mail an ein Mitglied, das kündigen möchte: Zeige Verständnis, frage nach den Gründen und mache ein passendes Angebot, zum Beispiel eine Pause der Mitgliedschaft.", sectors: ["sports"] },
+      { text: "Verfasse eine Antwort an einen Kunden, der die Reinigung reklamiert hat: Entschuldige dich, erkläre, was passiert ist, und beschreibe, wie ihr die Qualität ab sofort sichert.", sectors: ["cleaning"] },
+      { text: "Schreibe eine E-Mail an eine Klinik: Erkläre die verspätete Lieferung eines Medizinprodukts, nenne den neuen Termin und beschreibe, wie ihr Engpässe künftig vermeidet.", sectors: ["pharma"] },
+      { text: "Schreibe eine E-Mail an einen Auftraggeber: Empfiehl nach mehreren Vorfällen eine zusätzliche Kontrollrunde am Wochenende. Begründe mit Beispielen und nenne die Kosten.", sectors: ["security"] },
     ],
   },
   conflict: {
@@ -142,6 +166,9 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze Nachricht an deinen Chef: Bitte um ein Gespräch über ein Problem im Team, ohne Namen zu nennen." },
       { text: "Schreibe eine kurze, sachliche Antwort auf eine verärgerte E-Mail eines Kollegen. Zeige Verständnis und schlage ein kurzes Gespräch vor." },
       { text: "Schreibe eine kurze Nachricht an zwei Kollegen, die sich gestritten haben: Lade beide zu einem klärenden Gespräch ein und bleibe neutral." },
+      { text: "Schreibe eine kurze Nachricht an eine Kollegin: Ihr habt euch bei der Aufgabenverteilung missverstanden. Kläre kurz, wer was übernimmt." },
+      { text: "Schreibe eine kurze, ruhige Antwort an einen Kunden, der am Telefon laut geworden ist: Fasse sein Anliegen zusammen und nenne den nächsten Schritt." },
+      { text: "Schreibe eine kurze Nachricht an deinen Teamleiter: Du fühlst dich bei einer Entscheidung übergangen. Bitte sachlich um ein kurzes Gespräch." },
     ],
     long: [
       { text: "Verfasse eine Stellungnahme zu einem Konflikt im Team. Schildere die Situation sachlich, zeige Verständnis für beide Seiten und schlage einen Kompromiss vor." },
@@ -150,6 +177,8 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine Antwort auf eine unberechtigte Kritik an deiner Arbeit. Weise die Vorwürfe höflich, aber bestimmt zurück, belege deine Sicht mit Fakten und schlage vor, wie ihr künftig Missverständnisse vermeidet." },
       { text: "Verfasse eine Stellungnahme zu einem Streit über die Urlaubsplanung im Team. Beschreibe das Problem, zeige Verständnis für beide Seiten und schlage eine klare Regel für die Zukunft vor." },
       { text: "Schreibe eine sachliche E-Mail an die Disposition: Deine Touren sind regelmäßig zu eng getaktet. Beschreibe zwei konkrete Tage, erkläre die Folgen und schlage realistische Zeitfenster vor.", sectors: ["transport"] },
+      { text: "Verfasse eine E-Mail an eine Kollegin nach einem Streit in der Besprechung: Entschuldige dich für den Ton, erkläre deine Sicht in der Sache und schlage vor, wie ihr das Thema gemeinsam löst." },
+      { text: "Schreibe eine Stellungnahme an die Teamleitung zu wiederholten Konflikten über Zuständigkeiten: Beschreibe zwei konkrete Situationen, benenne die Ursache und schlage klare Regeln vor." },
     ],
   },
   project: {
@@ -161,6 +190,8 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze Bitte an eine Kollegin aus einer anderen Abteilung: Du brauchst ihre Zuarbeit für dein Projekt bis Ende der Woche." },
       { text: "Schreibe eine kurze Zusammenfassung für das Projektboard: Was wurde diese Woche erledigt, was steht als Nächstes an?" },
       { text: "Schreibe eine kurze Nachricht an den Product Owner: Ein Ticket dauert länger als geschätzt. Nenne den Grund und die neue Schätzung.", sectors: ["it"] },
+      { text: "Schreibe eine kurze Meldung an deinen Meister: Beim Kunden fehlt Material. Nenne, was du brauchst, um weiterzuarbeiten.", sectors: ["trades"] },
+      { text: "Schreibe eine kurze Statusmeldung an die Projektleitung: Die Berechnung ist fertig, die Prüfung läuft. Nenne den nächsten Meilenstein.", sectors: ["engineering"] },
     ],
     long: [
       { text: "Schreibe einen Projektbericht. Beschreibe den aktuellen Stand, nenne Risiken und Verzögerungen und empfiehl, wie das Projekt wieder in den Zeitplan kommt." },
@@ -169,6 +200,8 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Verfasse einen Projektvorschlag für deine Führungskraft: Beschreibe die Idee, den Nutzen für das Unternehmen, den groben Zeitplan und welche Unterstützung du brauchst." },
       { text: "Schreibe eine E-Mail an dein Projektteam zum Projektstart: Stelle das Ziel vor, erkläre die Rollen und Verantwortlichkeiten und nenne die ersten Aufgaben mit Fristen." },
       { text: "Verfasse einen kurzen Bautagebuch-Eintrag: Beschreibe die heutigen Arbeiten, das Wetter, die Zahl der Arbeiter und besondere Vorkommnisse auf der Baustelle.", sectors: ["construction"] },
+      { text: "Schreibe einen kurzen Vorschlag an die Filialleitung: Die Umkleiden sollen umgebaut werden. Beschreibe das Problem, die Idee und den Nutzen für den Verkauf.", sectors: ["retail"] },
+      { text: "Verfasse einen kurzen Bericht für die Qualitätssicherung: Beschreibe eine Abweichung im Prozess, die Sofortmaßnahme und deinen Vorschlag zur dauerhaften Korrektur.", sectors: ["pharma"] },
     ],
   },
   technology: {
@@ -180,6 +213,8 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze Bitte an die IT: Du brauchst Zugriff auf einen gemeinsamen Ordner. Begründe kurz, wofür." },
       { text: "Schreibe eine kurze Störungsmeldung: Der Drucker im zweiten Stock funktioniert nicht. Beschreibe das Problem und seit wann es besteht." },
       { text: "Schreibe eine kurze Statusmeldung an dein Team: Das Update ist eingespielt. Nenne die wichtigste Änderung und wo man Probleme melden kann.", sectors: ["it"] },
+      { text: "Schreibe eine kurze Nachricht an das Konstruktionsteam: In der Zeichnung fehlt ein Maß. Nenne die Stelle und bitte um eine korrigierte Version.", sectors: ["engineering"] },
+      { text: "Schreibe eine kurze Meldung an die Qualitätssicherung: Ein Prüfgerät zeigt unplausible Werte. Nenne Gerät und Charge und bitte um Prüfung.", sectors: ["pharma"] },
     ],
     long: [
       { text: "Verfasse eine Stellungnahme zur Einführung einer neuen Software im Unternehmen. Nenne Vor- und Nachteile und gib eine begründete Empfehlung." },
@@ -188,6 +223,8 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Verfasse eine Stellungnahme zum Thema Homeoffice und Technik: Beschreibe, welche technischen Voraussetzungen fehlen, welche Risiken das hat und was das Unternehmen verbessern sollte." },
       { text: "Schreibe einen kurzen Bericht über eine IT-Störung: Beschreibe, was ausgefallen ist, wie lange die Störung dauerte, welche Folgen sie hatte und wie sich so ein Ausfall vermeiden lässt." },
       { text: "Verfasse eine Incident-Zusammenfassung für dein Team: Beschreibe, welcher Dienst ausgefallen ist, was die Ursache war, wie ihr sie behoben habt und was ihr gegen eine Wiederholung tut.", sectors: ["it"] },
+      { text: "Verfasse eine Stellungnahme zu einem Konstruktionsproblem: Beschreibe den Fehler, seine möglichen Folgen und schlage zwei Lösungen mit Vor- und Nachteilen vor.", sectors: ["engineering"] },
+      { text: "Schreibe einen kurzen Bericht an die Produktionsleitung: Eine Charge weicht von der Spezifikation ab. Beschreibe die Messwerte, die mögliche Ursache und dein weiteres Vorgehen.", sectors: ["chemicals"] },
     ],
   },
   sustainability: {
@@ -198,6 +235,9 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze E-Mail an die Verwaltung: Schlage vor, auf Ökostrom umzustellen, und begründe kurz." },
       { text: "Schreibe eine kurze Einladung zu einer Aktion: Dein Team räumt am Freitag den Park neben dem Büro auf. Nenne Zeit und Treffpunkt." },
       { text: "Schreibe eine kurze Notiz für das schwarze Brett: Erinnere daran, Licht und Geräte am Feierabend auszuschalten, und nenne einen Grund." },
+      { text: "Schreibe eine kurze Nachricht an dein Team: Schlage vor, für kurze Wege das Fahrrad statt des Firmenwagens zu nutzen, und nenne einen Vorteil." },
+      { text: "Schreibe eine kurze E-Mail an die Kantine: Frage nach einem festen vegetarischen Tag und begründe kurz." },
+      { text: "Schreibe eine kurze Notiz an die Verwaltung: Schlage vor, Restpapier als Notizzettel zu nutzen, und erkläre, wie das organisiert wird." },
     ],
     long: [
       { text: "Schreibe eine Stellungnahme zum Thema Nachhaltigkeit am Arbeitsplatz. Begründe, warum das Thema wichtig ist, und schlage drei konkrete Maßnahmen mit erwartetem Nutzen vor." },
@@ -205,6 +245,9 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe einen kurzen Bericht über die Umweltmaßnahmen in deiner Abteilung: Was wurde umgesetzt, was hat es gebracht und wo gibt es noch Verbesserungsbedarf?" },
       { text: "Verfasse eine Stellungnahme zur Frage, ob euer Betrieb auf Papier verzichten kann. Beschreibe den aktuellen Verbrauch, nenne digitale Alternativen und mögliche Schwierigkeiten bei der Umstellung." },
       { text: "Schreibe eine E-Mail an alle Mitarbeitenden: Stelle ein neues Jobrad- oder Jobticket-Angebot vor, erkläre die Bedingungen und begründe, warum sich die Teilnahme lohnt." },
+      { text: "Schreibe einen Vorschlag an die Werksleitung: Beschreibe, wo in der Produktion Energie verschwendet wird, und schlage zwei Maßnahmen mit geschätzter Einsparung vor.", sectors: ["production"] },
+      { text: "Schreibe eine Mitteilung an dein Team: Der Salon stellt auf nachfüllbare Produkte um. Erkläre die Gründe und was sich im Arbeitsalltag ändert.", sectors: ["beauty"] },
+      { text: "Verfasse eine Stellungnahme zur Anschaffung von Mehrweggeschirr für die Firmenküche: Vergleiche die Kosten mit dem Einwegverbrauch, nenne die Umweltwirkung und gib eine Empfehlung." },
     ],
   },
   safety: {
@@ -218,6 +261,9 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze Meldung an die Hygienebeauftragte: Das Desinfektionsmittel auf Station 3 ist fast leer. Bitte um Nachschub.", sectors: ["care"] },
       { text: "Schreibe eine kurze Notiz an die Kolonne: Ab morgen gilt auf der Baustelle eine neue Anfahrt für Lieferungen. Beschreibe sie kurz.", sectors: ["construction"] },
       { text: "Schreibe eine kurze Nachricht an den Fuhrparkleiter: Am LKW leuchtet die Bremswarnleuchte. Frage, ob du die Tour fortsetzen sollst.", sectors: ["transport"] },
+      { text: "Schreibe eine kurze Meldung an den Schichtleiter: An der Anlage 2 ist die Schutzabdeckung locker. Bitte um Reparatur vor der Nachtschicht.", sectors: ["production"] },
+      { text: "Schreibe eine kurze Meldung an die Sicherheitsfachkraft: Ein Gebinde im Lager ist undicht. Beschreibe, wo es steht und was du gesichert hast.", sectors: ["chemicals"] },
+      { text: "Schreibe eine kurze Meldung an die Leitstelle: Am Nebeneingang ist ein Türschloss defekt. Beschreibe das Risiko und bitte um Reparatur.", sectors: ["security"] },
     ],
     long: [
       { text: "Verfasse eine Stellungnahme zu einem Sicherheitsvorfall. Beschreibe, was passiert ist, welche Maßnahmen nötig sind und wie sich ein solcher Vorfall künftig vermeiden lässt." },
@@ -227,6 +273,11 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine Mitteilung an alle Mitarbeitenden über einen neuen Fluchtwegeplan: Erkläre, was sich geändert hat, wo die Sammelpunkte sind und was bei einem Alarm zu tun ist." },
       { text: "Verfasse einen kurzen Bericht über einen Sturz: Beschreibe, wann und wo der Bewohner gestürzt ist, wie ihr reagiert habt und welche Maßnahmen künftig helfen.", sectors: ["care"] },
       { text: "Schreibe eine E-Mail an den Bauleiter: Auf dem Gerüst fehlen Absturzsicherungen. Beschreibe die Stelle, das Risiko und fordere die Nachrüstung, bevor weitergearbeitet wird.", sectors: ["construction"] },
+      { text: "Schreibe eine Unterweisung für einen neuen Azubi: Erkläre die drei wichtigsten Sicherheitsregeln in der Werkstatt und warum sie gelten.", sectors: ["trades"] },
+      { text: "Schreibe eine Mitteilung an alle Mitglieder: Erkläre die neuen Regeln im Kraftraum (Einweisung, Ablegen der Gewichte, Reinigung der Geräte) und begründe sie kurz.", sectors: ["sports"] },
+      { text: "Schreibe eine kurze Unterweisung für dein Team: Erkläre den sicheren Umgang mit Reinigungschemie und warum Produkte nie gemischt werden dürfen.", sectors: ["cleaning"] },
+      { text: "Verfasse einen kurzen Bericht über einen Vorfall im Objekt: Beschreibe, was du beobachtet hast, wie du reagiert hast und wen du informiert hast.", sectors: ["security"] },
+      { text: "Verfasse eine kurze Unterweisung für neue Mitarbeitende: Erkläre den Umgang mit Gefahrstoffen (Kennzeichnung, Schutzausrüstung, Verhalten bei einem Unfall).", sectors: ["chemicals"] },
     ],
   },
   travel: {
@@ -237,6 +288,9 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine kurze Nachricht an deine Chefin: Dein Zug fällt aus, du erreichst den Termin später. Nenne deine neue Ankunftszeit." },
       { text: "Schreibe eine kurze Bitte an das Sekretariat: Buche dir einen Flug für eine Dienstreise. Nenne Ziel, Datum und gewünschte Zeit." },
       { text: "Schreibe eine kurze Abwesenheitsnotiz für deine E-Mails: Nenne den Zeitraum deiner Dienstreise und wer dich vertritt." },
+      { text: "Schreibe eine kurze E-Mail an das Hotel: Du reist einen Tag später an. Bitte darum, die Reservierung anzupassen." },
+      { text: "Schreibe eine kurze Nachricht an deinen Kollegen vor der gemeinsamen Dienstreise: Schlage einen Treffpunkt am Bahnhof vor und nenne die Abfahrtszeit." },
+      { text: "Schreibe eine kurze Anfrage an den Empfang des Kunden: Melde deinen Besuch für Dienstag an und frage nach einem Besucherparkplatz." },
     ],
     long: [
       { text: "Schreibe einen Bericht über eine Dienstreise. Fasse die wichtigsten Ergebnisse zusammen, bewerte den Nutzen der Reise und gib eine Empfehlung für künftige Reisen." },
@@ -244,6 +298,9 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
       { text: "Schreibe eine E-Mail an einen Geschäftspartner im Ausland: Kündige deinen Besuch an, schlage ein Programm für die zwei Tage vor und frage nach einem Termin für ein gemeinsames Abendessen." },
       { text: "Verfasse eine Stellungnahme zur Reiserichtlinie deines Unternehmens: Beschreibe, was aus deiner Sicht unpraktisch ist, und schlage konkrete Verbesserungen vor, zum Beispiel bei Buchung oder Abrechnung." },
       { text: "Schreibe eine Beschwerde an eine Fluggesellschaft: Dein Flug hatte große Verspätung und dein Gepäck kam beschädigt an. Beschreibe den Ablauf, nenne die Folgen und fordere eine Entschädigung." },
+      { text: "Verfasse eine E-Mail an die Assistenz: Plane deine zweitägige Dienstreise nach München. Nenne Termine, gewünschte Zugzeiten und Hotelwünsche und bitte um die Buchung." },
+      { text: "Schreibe eine E-Mail an den Veranstalter einer Messe: Melde dein Unternehmen als Besucher an und frage nach Tagestickets, Workshops und Hotelempfehlungen in der Nähe." },
+      { text: "Verfasse einen kurzen Leitfaden für die Geschäftsreise deines Teams ins Ausland: Beschreibe Begrüßung, Pünktlichkeit und Kleidung und gib zwei praktische Tipps." },
     ],
   },
   behoerde: {

@@ -155,6 +155,21 @@ export function GuidedWritingTrainer({
     setDiceSpin((d) => d + 180);
   };
 
+  // Rail reset (always active, founder s149 P2): clears every scope AND draws
+  // a fresh random task. When the scopes are already default the URL doesn't
+  // change, so the scope-change effect won't fire; roll explicitly here.
+  const resetScope = () => {
+    const p = new URLSearchParams(params);
+    p.delete("theme");
+    p.delete("sub");
+    p.delete("sector");
+    setParams(p);
+    const fullPool = writingPrompts[DEFAULT_THEME][length].map((_, i) => i);
+    setPromptIx((ix) => randomFrom(fullPool, ix));
+    setResult(null);
+    setDiceSpin((d) => d + 180);
+  };
+
   const submit = async () => {
     setSubmitting(true);
     setResult(null);
@@ -376,6 +391,7 @@ export function GuidedWritingTrainer({
                 sector={sector}
                 onSectorChange={setSector}
                 length={length}
+                onReset={resetScope}
                 onClose={() => setPickerOpen(false)}
               />
             </motion.div>
@@ -394,6 +410,7 @@ export function GuidedWritingTrainer({
           sector={sector}
           onSectorChange={setSector}
           length={length}
+          onReset={resetScope}
           className="hidden lg:block lg:sticky lg:top-24"
         />
       </div>
