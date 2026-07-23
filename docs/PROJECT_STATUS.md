@@ -127,7 +127,7 @@ wrong, self-contradictory German feedback.
   `disabled`: it now always opens the panel, which shows the GrammarRail's "Prüf zuerst deinen Satz …"
   hint (disabled pills) before a correction, matching the always-visible desktop rail. The session's
   disclaimer changes were already shared (`aiNote`/`bottomBox` render in both the mobile and desktop
-  blocks), so no separate mobile adaptation was needed.
+  blocks), so no separate mobile adaptation was needed. **Founder confirmed the mobile fix works live.**
 - **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
 - **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
   `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →
