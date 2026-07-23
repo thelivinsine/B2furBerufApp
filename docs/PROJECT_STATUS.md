@@ -1,17 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-23 (session 151, complete). **Fokus "Satzlabor" grammar-bug fix + AI provider
-cascade rework** (follows the same-day s150 Fokus correction redesign). The Satzlabor was teaching
-wrong German (copula "Ich bin krank" mislabeled as Passiv; tense transforms wrongly refused as "Der Satz
-steht schon in dieser Form"). Fixes: hardened German-grammar prompts (explicit copula-is-Aktiv rule,
-stricter `bereits_zielform`, worked examples, strict JSON-only) and `normalizeDetected` no longer forces
-a detected Zustandspassiv onto the Passiv pill. **All three AI Edge Functions (`check-sentence`,
-`transform-sentence`, `evaluate-writing`) now share ONE provider cascade: Gemini 2.5 Flash (free, $0) →
-Claude Sonnet 5 → GPT-5**, Sonnet leading the paid backup until month-to-date Claude spend across all AI
-features hits $2 (then GPT-5), all bounded by the existing global $5/month fuse; models + budget are
-env-overridable. The two AI disclaimers + the privacy policy (DE/EN) now name all three providers
-routing-neutrally. Founder has deployed all three functions + set `GEMINI_API_KEY`. Product name:
-**Genauly** (`genauly.de`)._
+_Last updated: 2026-07-23 (session 152, complete). **Admin control-center nav aligned to the app
+sidebar.** The founder asked how admins reach `/admin` (the "Kontrollzentrum" entry in the account-menu
+dropdown, gated on `FOUNDER_EMAILS`; also `/sources/werkbank`), then flagged the `/admin` sidebar as
+cramped. Two PRs (#656 + #660), all in `src/features/admin/AdminShell.tsx`, spacing/appearance only:
+column 224→256px (= app `w-64`), `p-3`→`p-4`, marks 16→18px, rows `px-2.5/gap-2.5`→`px-3/gap-3`, the
+active row switched from a blue tint to the app's grey `bg-border` pill + bold text (inactive rows
+`text-foreground/80`), and the header rebuilt to the app's wordmark-logo + subtitle-below + `mb-4`
+pattern. Admin nav deliberately keeps monochrome lucide icons (no branded marks for admin sections).
+Prior session (s151): Fokus "Satzlabor" grammar-bug fix + the shared Gemini→Sonnet→GPT-5 AI provider
+cascade. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -70,6 +68,25 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 152 (2026-07-23). Admin control-center nav aligned to the app sidebar, branch
+`claude/admin-page-access-ok8g52`, PRs #656 + #660 merged.** Founder asked how admins reach `/admin`
+(answer: the "Kontrollzentrum" entry in the account-menu dropdown, gated on `FOUNDER_EMAILS` in
+`src/lib/admin.ts`; also `/sources/werkbank`), then flagged the `/admin` sidebar as cramped and
+not matching the app's desktop `Sidebar`.
+- **All changes in `src/features/admin/AdminShell.tsx`, spacing/appearance only (no behaviour):**
+  - **PR #656:** sidebar column 224px→**256px** (= app `w-64`), panel padding `p-3`→`p-4`, nav marks
+    `h-4 w-4`→**18px**, rows `px-2.5`/`gap-2.5`→**`px-3`/`gap-3`**.
+  - **PR #660:** active row now the app's **grey `bg-border` pill + bold `text-foreground`** (was a
+    blue `bg-primary/10 text-primary` tint), inactive rows **`text-foreground/80`** (was faint
+    `text-muted-foreground`); header block rebuilt to the app pattern — **wordmark `Logo` `h-7 w-auto`
+    with a `text-xs` subtitle below + `mb-4`** (was a small square mark beside stacked "genauly /
+    CONTROL CENTER" text).
+- **Deliberate remaining difference:** admin nav keeps monochrome lucide icons (the app's colorful
+  branded `RouteIcon` marks don't map to admin sections); flagged to founder, not changed.
+- **Gates:** `pnpm build` ✓ both times. Sandbox can't reach the live site; `/admin` is PWA-cached, so
+  a hard refresh is needed after the Pages deploy. The Übersicht "Is my change live?" widget showed
+  "Latest main not reachable" (GitHub API offline/rate-limited in that render) — cosmetic, unrelated.
+
 **Handoff after session 151 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
 rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
 wrong, self-contradictory German feedback.
@@ -119,102 +136,9 @@ wrong, self-contradictory German feedback.
   the hardened prompt carries it and Sonnet backstops, but if wrong grammar reappears, flip the primary
   back via `GEMINI_MODEL` (one env var, no code change).
 
-**Handoff after session 150 (2026-07-23). Fokus correction-card redesign + Umlaut keys, branch
-`claude/diagonal-gradient-invert-odi99r`, PRs #653 + #654 merged.** Founder started from "invert the
-background gradient diagonally" (PR #653: `tailwind.config.ts` `mesh`/`page` accent radial moved
-top-right → bottom-left, linear angle 150°→120°), then pivoted to redesigning the Fokus corrected-state
-card as "too noisy and redundant" and iterated across ~8 preview rounds before approving a combined
-design and asking to implement + ship.
-- **Design-review artifact.** A single consolidated gallery (`preview/schreiben-design-review.html`,
-  published as a claude.ai artifact) with a version switcher (Final + Alle + every prior variant), an
-  app light/dark toggle, and live interactions. All step previews are committed under `preview/`
-  (`fokus-correction-redesign`, `-ac`, `-v4-himmel`, `-toggle`, `fokus-umlaut-keys`, `schreiben-design-review`).
-- **Correction card (`FokusTrainer.tsx`).** Removed the struck-through original, the "· n Änderungen"
-  counter, the in-place `<mark>` highlight, and the "Was ich geändert habe" list. New: eyebrow "Dein
-  Satz" shares its row with an **Original/Korrigiert segmented toggle** (default Korrigiert; resets to
-  Korrigiert on each new correction via a `view` state + effect on `m.corrected`). Original view marks
-  the wrong words with `.fx-mark-coral` (`--reward`), Korrigiert marks the fixes with `.fx-mark-green`
-  (`--success`) — both are calm underlines (`index.css` `@layer utilities`). Below: **Himmelblau fix
-  tiles** (`bg-accent/30 border-accent/70` light, `dark:bg-accent/[0.18] dark:border-accent/[0.45]`),
-  each = category eyebrow (`text-accent-ink`) + `old → new`. **Neuer Satz** is an outline button on the
-  tiles row, `ml-auto self-end` (right + bottom aligned, wraps only if needed); removed from the mobile
-  toolbar and the desktop `GrammarRail` (`onNewSentence` no longer passed) so it appears once.
-- **Umlaut keys (`src/features/writing/UmlautKeys.tsx`).** Reusable bar, keys ä ö ü ß Ä Ö Ü at ~24px
-  (h-6, min-w 1.6rem), neutral `bg-surface` at rest, Himmelblau on press; inserts at the caret
-  (`onMouseDown` preventDefault keeps focus, `requestAnimationFrame` restores selection). Wired into the
-  Fokus input footer (shares the desktop row with Korrigieren; mobile keeps the sticky Korrigieren bar)
-  and the Kurz/Lang guided editor (`GuidedWritingTrainer.tsx`, in the word-count row).
-- **Diff engine (`wordDiff.ts`).** `diffWords` now also returns `originalTokens` (flagged, so the
-  Original view marks errors reliably) and a per-change `category` from the new exported
-  `classifyChange` (umlaut fold + case/punct normalization + multi-word = Grammatik heuristic).
-  Categories are heuristic — tune if a pattern mis-buckets. `tests/wordDiff.test.ts` extended.
-- **Ops note.** The remote git proxy needs a credential helper (`username=local_proxy`, empty password)
-  for `git push`/`fetch`; without it, pushes fall back to unauthenticated api.anthropic.com and fail.
-  Set `git config credential.helper '!f() { echo username=local_proxy; echo password=; }; f'`.
-- **Gates:** `pnpm build` ✓ · `pnpm lint` **0 errors** (pre-existing warnings only) · `pnpm test:unit`
-  **262/262** · `check:bundle` unaffected (writing stays lazy). Sandbox can't reach the live site;
-  founder confirms after the Pages deploy.
-- **Open:** the s147 founder redeploy action below still stands; error categories are heuristic and can
-  be refined once seen live.
-
-**Handoff after session 149 (2026-07-23). Schreiben restyled as a Bibliothek extension, branch
-`claude/schreiben-design-refinement-bw8rhh`.** Founder: "make the schreiben section look like it's an
-extension of bibliothek". Two preview rounds (`preview/schreiben-bibliothek-extension.html` = variants
-A/B, `-r2.html` = variant A + the founder's 7 changes), then implemented on founder go-ahead.
-- **Chrome:** `WritingModeSwitcher` is now the full-width LibrarySwitcher-geometry page header with
-  FOUR segments (Fokus · Kurz · Lang · Verlauf); the eyebrow/H1 and the separate Verlauf toggle are
-  gone (`WritingHub` routes `?mode=verlauf`). Header sits at content-column width over the
-  `[minmax(0,1fr)_16rem]` grid (was 18rem).
-- **Guided (Kurz/Lang):** Aufgabe card has no icon tile; eyebrow "Aufgabe: <Thema>", one "Ziel n–m
-  Wörter" line, a dice button that re-rolls a random task. **`writingPrompts.ts` restructured into
-  pools** (`short`/`long` are `string[]`, 5 each × 20 themes = 200 prompts; wave 1 of the founder's
-  15-20 target; the pool rides the theme's single `wp_<themeId>` provenance row, mission-style).
-  Theme pick draws a random prompt; drafts carry `promptIndex` so OAuth resume restores the exact
-  task. `WritingRail` = the "Aufgabe wählen" FilterRail tile (brand header + Target icon, Domain-
-  grouped white pills, selected solid primary; the founder asked for "the same categorization as
-  Bibliothek": prompts are keyed per THEME, so the rail mirrors the Thema dropdown's domain grouping;
-  Branche/Unterthema don't exist on prompts). Mobile: toolbar button + collapsible panel (chips
-  removed) + sticky bottom Auswerten bar; desktop actions stay in the editor card.
-- **Fokus:** `GrammarRail` restyled to the same tile; detected = white pill + green `bg-success`
-  dot, target = solid primary, pre-correction everything idle; no count/reset, footer = "Neuer
-  Satz" only. Mobile pairs the Grammatik panel button with Neuer Satz in one row. `WritingHistory`
-  shows only the learner's text now (the exact prompt behind an old entry is not recoverable);
-  `RelatedPanel` links `/writing?mode=kurz&theme=…` with `wp.short[0]`.
-- **Round 3 (same session, 13 founder fixes):** the Thema selection is a Bibliothek-style
-  **dropdown** (grouped listbox popover, internal scroll), NOT pills; **gesundheit folds into
-  Alltag** in its grouping (founder rule); the "Aufgabe wählen" tile is a light **Himmelblau**
-  `bg-accent/20` wash with a header reset icon; the header switcher is capped `lg:max-w-xl` +
-  centered (measured pixel-identical to Bibliothek's 816×44 before, but four short labels at full
-  width read oversized); the Ziel range shows only on the Aufgabe card; the AI disclaimer is a
-  standalone line below the editor/sentence card; the Aufgabe eyebrow is brand-colored; the Fokus
-  transform box is a white card with a bold "Hinweis:" label (no i icon) and a centered
-  "KI-generierte Umformung" footer; the Grammatik rail got a reset icon and a two-line hint. The
-  mobile Aufgabe panel animates via fade/slide because a height collapse would clip the dropdown.
-- **Harmonization round (same session, founder-approved P0+P1 list):** the Aufgabe-wählen rail
-  now carries the FULL Bibliothek scope hierarchy **Branche → Thema → Unterthema** as grouped
-  dropdowns (live counts, zero-yield greyed). `writingPrompts.ts` moved to task objects
-  `{ text, sub?, sectors? }`: all tasks tagged, ~86 new sub-theme tasks authored (every sub-theme
-  ≥2 short + ≥2 long) plus a 5-Branche starter wave (it/care/construction/transport/hospitality,
-  6 each, untagged = universal so a Branche never empties a pool). Bank: **316 tasks**. P1: Fokus
-  Grammatik rail Himmelblau like the Aufgabe rail (+ dark-mode alphas for both), Verlauf constrained
-  to the content grid + empty-state CTA, unified eyebrow rule (card titles bold primary), 40px
-  spinning dice, duplicate Fokus hint removed, Fokus mobile sticky Korrigieren bar.
-- **P2 round (same session, founder go + reset-bug report):** the Aufgabe-wählen **reset is now
-  always active** and does a full reset (clears every scope AND draws a fresh random task; it used
-  to be disabled at the default state, which read as broken). Micro-motion pass: directional tab
-  slide (LibraryHub popLayout pattern), 0.12s popover fade, shared 0.18s panel timing. Content:
-  every theme now ≥8 short + ≥8 long, and **Branche wave 2 covers all 15 sectors** (4 tasks each
-  for the 10 new ones). Bank: **373 tasks**. Remaining content waves: pools toward the founder's
-  15-20 per theme/length (append-only authoring).
-- **Gates:** typecheck ✓ · lint 0 errors · lint:content ✓ (pool schema validated) · test:unit
-  **260/260** · build ✓ · check:bundle **112.3 kB** (writingPrompts stays a lazy chunk) · Playwright
-  screenshots of desktop + mobile, both modes (incl. the open dropdown), verified against the
-  approved mockups.
-- **Open:** grow the pools toward 15-20 prompts per theme/length in content waves (append to the
-  arrays in `writingPrompts.ts`, no schema work needed); the s147 founder redeploy action below still
-  stands.
-
-_(Session 148's PWA-auth-uninstall bug-fix handoff (fresh-device OAuth `syncHydrated` gate, PR #644),
+_(Session 150's Fokus correction-card redesign + Umlaut-keys handoff (PRs #653/#654), session 149's
+Schreiben-as-Bibliothek-extension handoff, session 148's PWA-auth-uninstall bug-fix handoff (fresh-device
+OAuth `syncHydrated` gate, PR #644),
 session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first
 Bibliothek harmonization, PRs #640/#642/#643/#646), session 146's /sources verification-refresh +
 human-review-reset + table-restructure handoff, and
