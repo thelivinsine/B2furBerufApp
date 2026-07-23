@@ -168,6 +168,13 @@
     padding: 9px 14px; font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: border-color .12s; }
   .ghostbtn:hover { border-color: hsl(var(--accent) / .6); }
 
+  /* Eingabe (borderless): floating field + controls, no card frame. */
+  .inhead { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .inhead .count { margin: 0; }
+  .w-field { border-radius: 14px; }
+  .floatrow { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+  .floatrow .keys { flex: 1 1 auto; }
+
   .footnote { margin: 15px 0 0; font-size: 12px; color: hsl(var(--muted-foreground)); }
   .foot { font-size: 11.5px; color: hsl(var(--muted-foreground)); margin: 42px 2px 0; line-height: 1.65; border-top: 1px solid hsl(var(--border)); padding-top: 16px; }
   code { font-size: .92em; }
@@ -215,12 +222,14 @@
       solid (ohne Verlauf) · Neuer Satz unten rechts.</p>
 
     <p class="steps">1 · Eingabe</p>
-    <div class="card">
-      <p class="eyebrow" style="margin:0 0 12px">Dein Satz</p>
-      <textarea rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.">Kanst du bitte es kurz erklaeren?</textarea>
-      <div class="footer" style="flex-wrap:wrap">
-        <div class="keys" data-keys style="flex:1 1 auto"></div>
-        <span class="count" data-count style="margin-left:auto;margin-right:0">5 Wörter</span>
+    <div class="inputbare">
+      <div class="inhead">
+        <span class="eyebrow">Dein Satz</span>
+        <span class="count" data-count>5 Wörter</span>
+      </div>
+      <textarea class="w-field" rows="2" data-ta placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail.">Kanst du bitte es kurz erklaeren?</textarea>
+      <div class="floatrow">
+        <div class="keys" data-keys></div>
         <button class="btn">✦ Korrigieren</button>
       </div>
     </div>
@@ -435,7 +444,6 @@
   (function () {
     var root = document.documentElement;
 
-    // App theme toggle (works with the viewer's own toggle via data-theme).
     function currentDark() {
       var t = root.getAttribute('data-theme');
       if (t === 'dark') return true;
@@ -447,7 +455,6 @@
       allSegs.forEach(placePill);
     });
 
-    // Version switcher.
     var nav = document.getElementById('nav');
     var btns = [].slice.call(nav.querySelectorAll('button'));
     var screens = [].slice.call(document.querySelectorAll('.screen'));
@@ -459,7 +466,6 @@
     }
     btns.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.go); }); });
 
-    // Original/Korrigiert segmented toggles.
     var allSegs = [].slice.call(document.querySelectorAll('[data-seg]'));
     function placePill(seg) {
       var on = seg.querySelector('button.on'); var pill = seg.querySelector('.pill');
@@ -478,11 +484,10 @@
       });
     });
 
-    // Umlaut keys.
     var CHARS = ["ä","ö","ü","ß","Ä","Ö","Ü"];
     function words(s) { var t = s.trim(); return t ? t.split(/\s+/).length : 0; }
     document.querySelectorAll('[data-keys]').forEach(function (host) {
-      var card = host.closest('.card');
+      var card = host.closest('.card') || host.closest('.inputbare');
       var ta = card.querySelector('[data-ta]');
       var count = card.querySelector('[data-count]');
       CHARS.forEach(function (ch) {
