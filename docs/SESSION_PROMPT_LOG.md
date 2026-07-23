@@ -1328,8 +1328,14 @@ _(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23,
   `bottomBox`), so they were already on mobile (verified against the screenshot). typecheck / 262
   tests / build ✓. Merged to `main`.
   Artifact: `src/features/writing/fokus/FokusTrainer.tsx` · `docs/PROJECT_STATUS.md` · this log
-
-## Session 152 — 2026-07-23 — Admin control-center nav aligned to the app sidebar (branch `claude/admin-page-access-ok8g52`)
+- **Prompt 18 (verbatim):** `it's working. document the session`
+- **Response 18:** Founder confirmed the mobile Grammatik button works live. Session 151 was
+  documented incrementally across its eight merged PRs (#657 grammar-bug fix + Gemini→Sonnet→GPT-5
+  cascade; #658/#659 the combined-then-centered Fokus disclaimer; #662 the mobile Grammatik fix) —
+  the s151 `PROJECT_STATUS.md` handoff, this log (prompts 1-18), and the `CLAUDE.md` AI-backend + Fokus
+  notes all reflect the final state. This entry closes the session. (Note: it ran interleaved with the
+  parallel s150 Fokus-correction-redesign and s152 admin-nav sessions, both merged the same day; merges
+  were resolved so all three coexist on `main`.)
 
 - **Prompt 1 (verbatim):** `how do I access the admin page? is there a button in the app for the admins?` →
   Answered from the code: the account-menu dropdown (header, top-right) shows a **"Kontrollzentrum"**
