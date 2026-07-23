@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, RotateCcw, Target, X } from "lucide-react";
 import { themes, themeById } from "@/data/themes";
 import { domains } from "@/data/domains";
@@ -32,6 +33,8 @@ interface WritingRailProps {
   onSectorChange: (sector: string) => void;
   /** Current mode's length, for live option counts. */
   length: WritingLength;
+  /** Full reset (always active): clears every scope AND draws a fresh task. */
+  onReset: () => void;
   layout?: "rail" | "panel";
   /** Close handler for the panel's X icon (mobile). */
   onClose?: () => void;
@@ -75,6 +78,7 @@ function ScopeSelect({
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     if (!open) return;
@@ -147,24 +151,32 @@ function ScopeSelect({
           )}
         />
       </button>
-      {open && (
-        <div
-          role="listbox"
-          aria-label={ariaLabel}
-          className="slim-scrollbar absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft"
-        >
-          {groups.map((g, gi) => (
-            <div key={g.label || gi}>
-              {g.label && (
-                <p className="mt-1.5 px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
-                  {g.label}
-                </p>
-              )}
-              {g.options.map(row)}
-            </div>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            role="listbox"
+            aria-label={ariaLabel}
+            // Micro-motion pass (s149 P2): one quick fade/slide for every
+            // popover, matching the panel timing family.
+            initial={reduce ? false : { opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
+            transition={{ duration: reduce ? 0 : 0.12, ease: "easeOut" }}
+            className="slim-scrollbar absolute left-0 right-0 top-full z-20 mt-1 max-h-72 overflow-y-auto rounded-lg border border-border bg-surface p-1.5 shadow-elevated-soft"
+          >
+            {groups.map((g, gi) => (
+              <div key={g.label || gi}>
+                {g.label && (
+                  <p className="mt-1.5 px-2.5 pb-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                    {g.label}
+                  </p>
+                )}
+                {g.options.map(row)}
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -183,6 +195,7 @@ export function WritingRail({
   sector,
   onSectorChange,
   length,
+  onReset,
   layout = "rail",
   onClose,
   className,
@@ -190,7 +203,6 @@ export function WritingRail({
   const panel = layout === "panel";
   const theme = themeById(value);
   const subThemes = theme?.subThemes ?? [];
-  const canReset = value !== DEFAULT_WRITING_THEME || !!sub || !!sector;
 
   // Branche counts respect the current Thema/Unterthema scope; zero-yield
   // Branchen grey out (their tag exists nowhere in this pool, so choosing
@@ -290,22 +302,14 @@ export function WritingRail({
           <Target className="h-4 w-4" />
           Aufgabe wählen
         </span>
+        {/* Always active (founder s149 P2): clears every scope AND draws a
+            fresh random Aufgabe, so the button always visibly does something. */}
         <button
           type="button"
-          onClick={() => {
-            onSectorChange("");
-            onSubChange("");
-            onChange(DEFAULT_WRITING_THEME);
-          }}
-          disabled={!canReset}
-          aria-label="Auswahl zurücksetzen"
-          title="Auswahl zurücksetzen"
-          className={cn(
-            "inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors",
-            canReset
-              ? "text-muted-foreground hover:bg-foreground/5 hover:text-foreground"
-              : "cursor-not-allowed text-muted-foreground/30",
-          )}
+          onClick={onReset}
+          aria-label="Zurücksetzen und neue Aufgabe ziehen"
+          title="Zurücksetzen und neue Aufgabe"
+          className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
         >
           <RotateCcw className="h-4 w-4" />
         </button>
