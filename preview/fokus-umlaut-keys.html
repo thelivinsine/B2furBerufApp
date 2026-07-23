@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Schreiben · Umlaut-Tasten</title>
+<style>
+  :root {
+    --background: 180 45% 98%;
+    --surface: 0 0% 100%;
+    --muted: 220 10% 90%;
+    --muted-foreground: 220 8% 36%;
+    --foreground: 252 16% 12%;
+    --border: 220 9% 86%;
+    --input: 220 9% 86%;
+    --primary: 221 83% 54%;
+    --accent: 197 93% 77%;
+    --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --shadow: 221 40% 22%;
+    --ring: 221 83% 54%;
+  }
+  .dark {
+    --background: 228 24% 10%;
+    --surface: 228 20% 14%;
+    --muted: 228 16% 22%;
+    --muted-foreground: 228 10% 72%;
+    --foreground: 228 20% 92%;
+    --border: 228 14% 26%;
+    --input: 228 14% 28%;
+    --primary: 221 90% 70%;
+    --accent: 197 93% 77%;
+    --accent-ink: 198 85% 72%;
+    --success: 153 52% 60%;
+    --shadow: 221 60% 3%;
+    --ring: 221 90% 70%;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: hsl(var(--background));
+    color: hsl(var(--foreground));
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+    transition: background .25s, color .25s;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 44px 20px 90px; }
+
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 8px; }
+  .kicker { font-size: 11px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: hsl(var(--primary)); }
+  h1 { font-size: 25px; font-weight: 800; letter-spacing: -.022em; margin: 6px 0 8px; }
+  .lede { color: hsl(var(--muted-foreground)); font-size: 14px; line-height: 1.6; margin: 0; max-width: 48ch; }
+  .toggleTheme { border: 1px solid hsl(var(--border)); background: hsl(var(--surface)); color: hsl(var(--foreground));
+    border-radius: 10px; padding: 8px 13px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; font-family: inherit; }
+
+  .variant { margin-top: 36px; }
+  .vhead { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .vnum { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 7px;
+    background: hsl(var(--primary)); color: hsl(var(--surface)); font-size: 12px; font-weight: 800; }
+  .dark .vnum { color: hsl(var(--background)); }
+  .vname { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; }
+  .badge { font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: hsl(var(--success));
+    border: 1px solid hsl(var(--success) / .45); border-radius: 999px; padding: 3px 8px; }
+  .why { color: hsl(var(--muted-foreground)); font-size: 13px; line-height: 1.55; margin: 0 0 14px; max-width: 56ch; }
+
+  .card { background: hsl(var(--surface)); border: 1px solid hsl(var(--border)); border-radius: 20px; padding: 20px;
+    box-shadow: 0 1px 2px hsl(var(--shadow) / .05), 0 14px 34px hsl(var(--shadow) / .09); }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: hsl(var(--primary)); margin: 0 0 12px; }
+
+  textarea { width: 100%; resize: vertical; border: 1px solid hsl(var(--input)); background: hsl(var(--surface));
+    color: hsl(var(--foreground)); padding: 12px; font-size: 15px; line-height: 1.55; font-family: inherit; outline: none; }
+  textarea:focus { box-shadow: 0 0 0 2px hsl(var(--ring)); border-color: transparent; }
+
+  /* Umlaut key */
+  .keys { display: flex; flex-wrap: wrap; gap: 6px; }
+  .key { min-width: 40px; height: 40px; padding: 0 6px; border-radius: 11px; border: 1px solid hsl(var(--border));
+    background: hsl(var(--muted) / .5); color: hsl(var(--foreground)); font-size: 17px; font-weight: 600;
+    font-family: inherit; cursor: pointer; display: inline-grid; place-items: center;
+    transition: background .12s, border-color .12s, transform .06s; }
+  .key:hover { background: hsl(var(--accent) / .22); border-color: hsl(var(--accent) / .6); color: hsl(var(--accent-ink)); }
+  .key:active { transform: translateY(1px) scale(.96); background: hsl(var(--accent) / .34); }
+
+  .count { font-size: 12px; color: hsl(var(--muted-foreground)); white-space: nowrap; }
+  .btn { border: none; border-radius: 12px; padding: 10px 16px; font-size: 14px; font-weight: 700; font-family: inherit;
+    color: #fff; background: linear-gradient(135deg, hsl(226 83% 47%), hsl(var(--primary)) 45%, hsl(196 93% 38%));
+    cursor: pointer; display: inline-flex; align-items: center; gap: 7px; }
+  .dark .btn { color: hsl(228 30% 8%); }
+
+  /* Option A: keys share the footer row with count + action */
+  .footerA { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .footerA .keys { flex: 1 1 auto; }
+  .footerA .count { margin-left: auto; }
+
+  /* Option B: keys as an attached accessory strip under the textarea */
+  .fieldB textarea { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-bottom: none; }
+  .accessory { display: flex; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid hsl(var(--input));
+    border-top: 1px solid hsl(var(--border)); border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;
+    background: hsl(var(--muted) / .35); overflow-x: auto; }
+  .accessory .keys { flex-wrap: nowrap; }
+  .accessory .key { height: 34px; min-width: 34px; border-radius: 9px; font-size: 16px; background: hsl(var(--surface)); }
+  .footerB { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
+  .footerB .count { margin-right: auto; }
+
+  .note { font-size: 12px; color: hsl(var(--muted-foreground)); margin: 36px 2px 0; line-height: 1.65; }
+  code { font-size: .92em; }
+</style>
+</head>
+<body class="dark">
+  <div class="wrap">
+    <div class="topbar">
+      <div>
+        <div class="kicker">Schreiben · Eingabe</div>
+        <h1>Umlaut-Tasten</h1>
+        <p class="lede">Für Nutzer ohne deutsche Tastatur: ä ö ü ß Ä Ö Ü direkt einfügbar (an der
+          Cursor-Position). Klick in ein Textfeld, setz den Cursor, dann eine Taste. Zwei Platzierungen.</p>
+      </div>
+      <button class="toggleTheme" onclick="document.body.classList.toggle('dark')">Hell / Dunkel</button>
+    </div>
+
+    <!-- Option A -->
+    <div class="variant">
+      <div class="vhead"><span class="vnum">A</span><span class="vname">In der Fußzeile</span><span class="badge">Empfohlen</span></div>
+      <p class="why">Die Tasten teilen sich die bestehende Fußzeile mit Wortzähler und Aktion. Kein Extra-Element,
+        keine neue Zeile im Ruhezustand. Passt zur kompakten Chrome-Regel.</p>
+      <div class="card">
+        <p class="eyebrow">Dein Satz</p>
+        <textarea rows="3" data-ta placeholder="Schreib einen Satz auf Deutsch, zum Beispiel: Der Chef schreibt die E-Mail."></textarea>
+        <div class="footerA">
+          <div class="keys" data-keys></div>
+          <span class="count" data-count>0 Wörter</span>
+          <button class="btn">✦ Korrigieren</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Option B -->
+    <div class="variant">
+      <div class="vhead"><span class="vnum">B</span><span class="vname">Angedockte Leiste</span></div>
+      <p class="why">Die Tasten sitzen als eigene Leiste direkt am unteren Rand des Textfelds, wie eine
+        Tastatur-Zubehörleiste. Sehr auffindbar, scrollt bei Bedarf horizontal (mobil).</p>
+      <div class="card">
+        <p class="eyebrow">Dein Satz</p>
+        <div class="fieldB">
+          <textarea rows="3" data-ta placeholder="Schreib einen Satz auf Deutsch …"></textarea>
+          <div class="accessory"><div class="keys" data-keys></div></div>
+        </div>
+        <div class="footerB">
+          <span class="count" data-count>0 Wörter</span>
+          <button class="btn">✦ Korrigieren</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="note">Echte App-Tokens (src/index.css), hell &amp; dunkel. Tasten sind neutral im Ruhezustand
+      (<code>bg-muted</code>), färben beim Antippen ins Himmelblau (Akzent), damit sie sich einreihen ohne zu
+      schreien. Eingefügt wird an der Cursor-Position (auch bei markiertem Text). Gilt für Fokus, Kurz und Lang.</p>
+  </div>
+
+  <script>
+    const CHARS = ["ä","ö","ü","ß","Ä","Ö","Ü"];
+    function countWords(s){ const t=s.trim(); return t?t.split(/\s+/).length:0; }
+    document.querySelectorAll('.card').forEach(card => {
+      const ta = card.querySelector('[data-ta]');
+      const keys = card.querySelector('[data-keys]');
+      const count = card.querySelector('[data-count]');
+      CHARS.forEach(ch => {
+        const b = document.createElement('button');
+        b.className = 'key'; b.type = 'button'; b.textContent = ch;
+        b.addEventListener('mousedown', e => e.preventDefault());
+        b.addEventListener('click', () => {
+          const s = ta.selectionStart ?? ta.value.length;
+          const e = ta.selectionEnd ?? ta.value.length;
+          ta.value = ta.value.slice(0, s) + ch + ta.value.slice(e);
+          const pos = s + ch.length;
+          ta.focus(); ta.setSelectionRange(pos, pos);
+          count.textContent = countWords(ta.value) + ' Wörter';
+        });
+        keys.appendChild(b);
+      });
+      ta.addEventListener('input', () => count.textContent = countWords(ta.value) + ' Wörter');
+    });
+  </script>
+</body>
+</html>
