@@ -228,3 +228,34 @@ export async function saveLaunchChecklistItem(
     return false;
   }
 }
+
+// ---------------------------------------------------------------------------
+// GDPR ops evidence (§G4, chunk 12): aggregate counters, never rows about a
+// person. Fails soft to null when migration 0010 has not been run yet.
+// ---------------------------------------------------------------------------
+
+export interface GdprEvidence {
+  deletions: number;
+  exports: number;
+  lastDeletionAt: string | null;
+  lastExportAt: string | null;
+  /** Whether a pg_cron retention job is actually scheduled. */
+  retentionScheduled: boolean;
+}
+
+export async function fetchGdprEvidence(): Promise<GdprEvidence | null> {
+  try {
+    const { data, error } = await supabase.rpc("admin_gdpr_evidence");
+    if (error || !data) return null;
+    const d = data as Record<string, unknown>;
+    return {
+      deletions: Number(d.deletions ?? 0),
+      exports: Number(d.exports ?? 0),
+      lastDeletionAt: (d.last_deletion_at as string | null) ?? null,
+      lastExportAt: (d.last_export_at as string | null) ?? null,
+      retentionScheduled: Boolean(d.retention_scheduled),
+    };
+  } catch {
+    return null;
+  }
+}
