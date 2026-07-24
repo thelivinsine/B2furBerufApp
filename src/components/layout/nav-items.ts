@@ -44,8 +44,9 @@ export const navItems: NavItem[] = [
   { to: "/library",   label: "Bibliothek",   icon: Library,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Wörter, Kollokationen, Redemittel, Grammatik" },
   // Schreibtraining promoted to a dedicated nav item (founder, 2026-07-22): the
   // Fokus "Satzlabor" now has its own entry instead of only living under the
-  // hidden Anwenden hub. Pencil mark already in route-icons.tsx; rose accent.
-  { to: "/writing",   label: "Schreiben",    icon: PenLine,                    color: "#f43f5e", bg: "rgba(244,63,94,.08)",   desc: "Sätze schreiben und mit KI umformen" },
+  // hidden Anwenden hub. Nib mark (Federspitze) in route-icons.tsx; the accent
+  // moved from rose to brand blue with the s158 icon family harmonization.
+  { to: "/writing",   label: "Schreiben",    icon: PenLine,                    color: "#3D74ED", bg: "rgba(61,116,237,.08)",  desc: "Sätze schreiben und mit KI umformen" },
   { to: "/analytics", label: "Fortschritt",  icon: LineChart,                  color: "#0ea5e9", bg: "rgba(14,165,233,.08)", desc: "Meilensteine und Statistiken" },
   { to: "/settings",  label: "Einstellungen",icon: Settings,                   color: "#64748b", bg: "rgba(100,116,139,.08)",desc: "App und Konto verwalten" },
 ];

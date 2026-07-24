@@ -16,15 +16,15 @@ const BRAND = "#3D74ED";
 type Render = (c: string) => React.ReactNode;
 
 const RENDERERS: Record<string, Render> = {
-  // Praktisch (using German in real life) — a compass: finding your way in real
-  // situations. Blue ring (matching the nav-bar blue family) + two-tone needle
-  // (neon-cyan north, blue south). Ring thickened to sit with the other marks.
-  // Founder tweak, 2026-07-13.
+  // Praktisch (using German in real life) — a signpost (Wegweiser): two
+  // direction boards on a post, blue + neon cyan. Keeps the old compass's
+  // "finding your way in real situations" motif as a solid upright mark.
+  // Founder pick I, session 158 (replaced the compass).
   "/": c => (
     <>
-      <circle cx="10" cy="10" r="8" stroke={c} strokeWidth="2.7" fill="none" />
-      <polygon points="13.6,6.4 11.4,11.4 8.6,8.6" fill="#22d3ee" />
-      <polygon points="6.4,13.6 11.4,11.4 8.6,8.6" fill={c} />
+      <path d="M4.6 3.6h9l3.2 1.85-3.2 1.85h-9Z" fill={c} />
+      <path d="M15.4 8.9h-9l-3.2 1.85 3.2 1.85h9Z" fill="#22d3ee" />
+      <rect x="9.05" y="12.6" width="1.9" height="4.8" rx="0.95" fill={c} />
     </>
   ),
   // Wortschatz — two-tone open book (indigo spine + cyan right page), matching
@@ -41,12 +41,14 @@ const RENDERERS: Record<string, Render> = {
       <line x1="11.8" y1="9.6" x2="15.6" y2="9.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".35" />
     </>
   ),
-  // Bibliothek — a stack of three books (blue spine + neon-cyan middle)
+  // Bibliothek — a closed book with a neon-cyan bookmark ribbon and faint
+  // title lines. Founder pick P, session 158 (replaced the lying stack).
   "/library": c => (
     <>
-      <rect x="2.8" y="4"    width="14.4" height="3.4" rx="1.1" fill={c} />
-      <rect x="3.6" y="8.3"  width="14.4" height="3.4" rx="1.1" fill="#22d3ee" />
-      <rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill={c} opacity=".82" />
+      <rect x="4.4" y="2.8" width="11.2" height="14.4" rx="1.4" fill={c} />
+      <polygon points="11.6,2.8 14.6,2.8 14.6,9 13.1,7.4 11.6,9" fill="#22d3ee" />
+      <line x1="6.6" y1="12.6" x2="10.4" y2="12.6" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".55" />
+      <line x1="6.6" y1="14.4" x2="9.2" y2="14.4" stroke="#fff" strokeWidth="1" strokeLinecap="round" opacity=".4" />
     </>
   ),
   // Anwenden — a target / bullseye (aim, then apply) in orange + neon-amber
@@ -86,11 +88,14 @@ const RENDERERS: Record<string, Render> = {
       <polyline points="6,10.5 8.7,13 14,7" stroke="#fde047" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" fill="none" />
     </>
   ),
-  // Schreibtraining — pencil (red body + neon-pink tip)
+  // Schreibtraining — a fountain-pen nib (Federspitze): blue body, neon-cyan
+  // breather hole + slit. Founder pick E, session 158 (replaced the rose
+  // pencil; the route accent moved from rose to brand blue with it).
   "/writing": c => (
     <>
-      <path d="M14.7 2.9a1.7 1.7 0 0 1 2.4 2.4L7.5 14.9l-3.4.9.9-3.4 9.7-9.5Z" fill={c} />
-      <path d="M4.1 15.8l.9-3.4 2.5 2.5-3.4.9Z" fill="#fb7185" />
+      <path d="M5.9 2.6h8.2c.66 0 1.2.54 1.2 1.2V5c0 2.8-2 7-5.3 12.6C6.7 12 4.7 7.8 4.7 5V3.8c0-.66.54-1.2 1.2-1.2Z" fill={c} />
+      <line x1="10" y1="9" x2="10" y2="13.6" stroke="#22d3ee" strokeWidth="1.2" strokeLinecap="round" />
+      <circle cx="10" cy="7.2" r="1.5" fill="#22d3ee" />
     </>
   ),
   // Sprechsimulation — microphone (cyan capsule + neon-teal stand)
@@ -117,12 +122,13 @@ const RENDERERS: Record<string, Render> = {
       <polygon points="9.2,11 8,18 15.2,8.6 10.8,8.6" fill="#fde047" />
     </>
   ),
-  // Fortschritt — bar chart (sky base rising into neon cyan)
+  // Fortschritt — a progress ring: faint sky track, near-closed sky arc, neon
+  // endpoint dot. Founder pick S, session 158 (replaced the bar chart).
   "/analytics": c => (
     <>
-      <rect x="2.5"  y="11"  width="3.5" height="6.5"  rx="1.2" fill={c} />
-      <rect x="8.25" y="7"   width="3.5" height="10.5" rx="1.2" fill="#22d3ee" />
-      <rect x="14"   y="3"   width="3.5" height="14.5" rx="1.2" fill="#67e8f9" />
+      <circle cx="10" cy="10" r="7" stroke={c} strokeWidth="2.6" fill="none" opacity=".22" />
+      <path d="M10 3 A7 7 0 1 1 3 10" stroke={c} strokeWidth="2.6" strokeLinecap="round" fill="none" />
+      <circle cx="3" cy="10" r="1.9" fill="#22d3ee" />
     </>
   ),
   // Einstellungen — gear (slate ring + neon-blue centre)
@@ -150,19 +156,19 @@ const TARGET = 16; // content fits a centred 16×16 area of the 20-unit grid
 
 // [x, y, w, h] bounding box of each mark's inked area, plus an optical weight.
 const NORM: Record<string, { box: [number, number, number, number]; weight: number }> = {
-  "/":             { box: [0.65, 0.65, 18.7, 18.7], weight: 1.05 },
-  "/library":      { box: [2.8, 4, 15.2, 12],       weight: 1.05 },
+  "/":             { box: [3.2, 3.6, 13.6, 13.8],   weight: 1.05 },
+  "/library":      { box: [4.4, 2.8, 11.2, 14.4],   weight: 1.04 },
   "/anwenden":     { box: [1.3, 1.3, 17.4, 17.4],   weight: 0.94 },
   "/vocabulary":   { box: [2.4, 2.4, 15.2, 15.2],   weight: 1.05 },
   "/redemittel":   { box: [3, 2.5, 14, 13],         weight: 1.05 },
   "/grammar":      { box: [4.5, 2.5, 11, 14.7],     weight: 1.08 },
   "/collocations": { box: [2.05, 4.45, 15.9, 11.1], weight: 1.05 },
   "/quiz":         { box: [1.4, 1.4, 17.2, 17.2],   weight: 0.92 },
-  "/writing":      { box: [3.5, 2.9, 13.6, 12.9],   weight: 1.04 },
+  "/writing":      { box: [4.7, 2.6, 10.6, 15],     weight: 1.02 },
   "/simulation":   { box: [4.2, 1.6, 11.6, 16.2],   weight: 1.05 },
   "/exam":         { box: [1.8, 2.8, 16.4, 11.9],   weight: 1.08 },
   "/revision":     { box: [4.8, 2, 10.4, 16],       weight: 1.0 },
-  "/analytics":    { box: [2.5, 3, 15, 14.5],       weight: 1.08 },
+  "/analytics":    { box: [1.7, 1.7, 16.6, 16.6],   weight: 0.98 },
   "/settings":     { box: [2.31, 2.31, 15.38, 15.38], weight: 1.01 },
 };
 

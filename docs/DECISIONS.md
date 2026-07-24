@@ -402,3 +402,35 @@ future surface starts from them instead of rediscovering them:
 7. **Consistent placement + motion.** Primary actions sit in the same place across sibling modes
    (sticky bottom bars on mobile everywhere); micro-motion is subtle and shares one timing family
    (directional tab slides like the Bibliothek, 0.12-0.18s panels/popovers, reduced-motion safe).
+
+## Nav-icon family harmonization + pinned Fortschritt (session 158, 2026-07-24) — founder-picked
+
+The founder flagged the Schreiben pencil as "not harmonious" with the other bottom-bar marks. Root
+causes identified and accepted: it was the only thin diagonal mark in a row of chunky upright
+shapes, and its second tone (#fb7185) was nearly its body rose (#f43f5e), so it lacked the bright
+two-tone pop every sibling had. Four preview rounds followed (one per tab, each variant rendered
+inside the real 63px bar in both themes, picks by letter). Decisions, all founder-picked and now
+shipped (PRs #679-#683):
+
+1. **Schreiben = Federspitze (pick E).** A fountain-pen nib in brand blue with neon-cyan breather
+   hole + slit. The route accent moved rose → brand blue `#3D74ED` WITH the mark: the founder
+   explicitly wanted "similar colors as other icons, not red". Feather/quill and upright-pen
+   alternates were rejected in favor of the nib.
+2. **Praktisch = Wegweiser (pick I).** Two direction boards on a post (blue + cyan), replacing the
+   compass but keeping its "finding your way in real life" motif as a solid upright silhouette.
+   Stadt, Zuhause and Route alternates rejected.
+3. **Bibliothek = Buch mit Lesezeichen (pick P).** A closed book with a cyan bookmark ribbon,
+   replacing the lying three-book stack. Open book, shelf and library-building alternates rejected.
+4. **Fortschritt = Fortschrittsring (pick S).** A near-closed progress ring with neon endpoint,
+   replacing the bar chart. Kurve, Gipfel and Pokal alternates rejected.
+5. **Trainieren toggle.** The Praktisch dashboard toggle "Lernen" renamed to "Trainieren" with the
+   lucide Dumbbell restored (the toggle's pre-s147 icon), per explicit founder request.
+6. **Fortschritt is pinned left of Einstellungen for every user.** The bar's reorder easter egg now
+   covers only Bibliothek + Schreiben; Fortschritt joined Home and Einstellungen as a fixed slot,
+   and older persisted orders normalise at read time. This amends the locked bar structure on an
+   explicit founder request.
+
+Method notes that worked (keep for future icon rounds): show every variant inside the real tab bar
+next to the already-picked marks (the founder judges the future bar, not a lone glyph), continue
+variant letters across rounds (A-T) so picks stay unambiguous, and keep all marks two-tone with a
+neon-cyan companion on the 20x20 grid with `NORM` optical normalisation.

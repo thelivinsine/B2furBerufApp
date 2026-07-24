@@ -352,6 +352,14 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   own artifact); bars already show Wegweiser + Feder E; current stack as reference + **M**
   Aufgeschlagenes Buch · **N** Bücherregal · **O** Bibliotheksgebäude · **P** Buch mit Lesezeichen,
   all Nachtblau/Neon-Cyan. Awaiting pick (M-P, or keep the stack).
+- **Prompt 5 (verbatim, 2026-07-24 ~12:35 UTC):** `I like P. Now previews for the fortschritt` →
+  **Bibliothek decision recorded: variant P (Buch mit Lesezeichen)**, implementation still held with
+  the other picks. Fortschritt preview round built: `preview/fortschritt-icon-vorschlaege.html`
+  (screenshot-verified; delivered as a rendered file after the founder declined the artifact
+  publish). Bars already show all picks (Wegweiser I, Buch P, Feder E); current bar chart kept as
+  reference + 4 proposals in Himmelblau/Neon-Cyan: **Q** Kurve (rising trend line + neon endpoint) ·
+  **R** Gipfel (mountain + cyan summit flag) · **S** Ring (progress ring + neon endpoint) ·
+  **T** Pokal (trophy + cyan base). Awaiting pick (Q-T, or keep the bars).
 
 ## Session 159 — 2026-07-24 — Grammar-dimensions brainstorm + Fokus Satzlabor Wave 2 (Konjunktiv II + Zustandspassiv) (branch `claude/grammar-dimensions-transformations-l3ib3m`)
 
@@ -370,3 +378,32 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
 - **Prompt 11 (verbatim):** `the project folder is in github though` → founder has no local clone. `transform-sentence` is a single self-contained file (only a remote esm.sh import), so gave the no-terminal path: copy the raw file from GitHub → paste into the Supabase dashboard Edge Functions code editor → Deploy. Also offered the GitHub↔Supabase auto-deploy integration as a permanent fix.
 - **Prompt 12 (verbatim):** `done. document the session. we're done here` → founder confirmed the dashboard redeploy is live; marked the `transform-sentence` redeploy DONE in the status header + handoff and logged these follow-ups.
 - **Artifacts (session 159):** `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md` · `preview/grammar-dimensions-satzlabor.html` · `preview/grammar-dimensions-catalog.html` · `src/features/writing/fokus/grammarDimensions.ts` · `useFokusMachine.ts` · `GrammarRail.tsx` · `FokusTrainer.tsx` · `supabase/functions/transform-sentence/index.ts` · `tests/fokusGrammar.test.ts` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log · PR #678 · artifact daa4dbb6
+- **Prompt 6 (verbatim, 2026-07-24 ~12:50 UTC):** `publish it now` →
+  Published the Fortschritt preview as artifact c4cbc515 (same content as the delivered file).
+- **Prompt 7 (verbatim, 2026-07-24 ~12:55 UTC):** `I like option S with the ring.` →
+  **Fortschritt decision recorded: variant S (Fortschrittsring).** That completed all four picks, so
+  the announced one-pass implementation started: `route-icons.tsx` renderers + `NORM` boxes swapped
+  to Wegweiser (/), Buch mit Lesezeichen (/library), Federspitze (/writing) and Ring (/analytics);
+  `nav-items.ts` Schreiben accent rose #f43f5e → brand blue #3D74ED; `docs/areas/PRAKTISCH-NAV.md`
+  updated. Gates: build · check:bundle 116.9 kB · test:unit green. Live-verified via vite preview +
+  Playwright at 393px: all five tabs render the picked marks, matching the approved previews.
+- **Prompt 8 (verbatim, 2026-07-24 ~13:00 UTC, mid-verification):** `also in addition, make sure the fortschritt button is always to the left of settings button for all the users by default` →
+  `BottomTabBar.tsx`: Fortschritt pinned as `FIXED_LAST_CONTENT` directly left of Einstellungen for
+  every user; only Bibliothek + Schreiben stay reorderable (`REORDERABLE`); older persisted orders
+  normalise at read time; edit mode shows Fortschritt as a fixed tile; `handleReorder` persists the
+  normalised order. `docs/areas/PRAKTISCH-NAV.md` bottom-bar section updated (locked-structure change
+  on explicit founder request). Session documented: PROJECT_STATUS s158 handoff added (s157 handoff
+  rotated to the W30 archive), header refreshed.
+- **Artifacts (session 158):** `src/components/layout/{route-icons.tsx,nav-items.ts,BottomTabBar.tsx}` ·
+  `src/features/dashboard/{Dashboard.tsx,SpielenHub.tsx}` · `src/features/{admin/AdminSteuerung.tsx,help/HelpHub.tsx,welt/Welt.tsx}` ·
+  `preview/schreiben-icon-harmony{,-r2}.html` · `preview/{praktisch,bibliothek,fortschritt}-icon-vorschlaege.html` ·
+  `docs/areas/PRAKTISCH-NAV.md` · `docs/PROJECT_STATUS.md` · this log · PRs #679, #680, #681, #682 + the final implementation PR
+- **Prompt 9 (verbatim, 2026-07-24 ~13:20 UTC):** `document the session` →
+  Most session-158 documentation had shipped with PR #683 (PROJECT_STATUS header + s158 handoff with
+  the s157 handoff rotated to the W30 archive, prompt-log entries 1-8, `docs/areas/PRAKTISCH-NAV.md`).
+  This pass closed the loop: appended the s158 decision record to `docs/DECISIONS.md` (all four icon
+  picks with rejected alternates, the rose→blue Schreiben accent move, the Trainieren/Dumbbell
+  toggle, the pinned-Fortschritt amendment to the locked bar structure, and the preview-method notes
+  for future icon rounds), swept for stale references (none found: BRAND.md doesn't spec route marks;
+  no compass/stack/pencil mentions left outside the updated PRAKTISCH-NAV.md), and logged this prompt.
+- **Artifacts (prompt 9):** `docs/DECISIONS.md` · this log · PR (this one)
