@@ -497,3 +497,16 @@ Founder reviewed individual session cards from screenshots; each turn diagnosed 
 - **Prompt 9 (verbatim):** `for reducing the abmiguity, referring to the points on how to reduce ambiguity, implement 1 but also mix them up by keep questions which are of a mix like now with different parts of speech but as mentioned in point 2.` → `oddOneOutQ`: added a POS-matched flavour mixed ~50/50 with mixed-POS, and an "genuinely unrelated" outsider guard (different theme + no shared `related` link either direction). Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
 - **Prompt 10 (verbatim):** `yes` → documented the session (this entry, PROJECT_STATUS s161 handoff with s159 rotated to the W30 archive, header refreshed) and opened + squash-merged PR #691 (engine/loot) into `main`.
 - **Artifacts (session 161):** `src/data/vocabulary.ts` · `src/features/session/SessionPlayer.tsx` · `src/engine/quiz.ts` · `src/features/quiz/QuestionViews.tsx` · `src/types/index.ts` · `preview/{cloze-hint,plural-variants,loot-shade}-preview.html` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #687 (content) + PR #691 (engine/loot)
+
+## Session 162 — 2026-07-24 — GitHub "protect main" banner question (branch `claude/popup-main-branch-safety-d46p9o`)
+
+- **Prompt 1 (verbatim, + screenshot of the GitHub repo banner):** `why is this pop up coming up. is my main branch unsafe?` →
+  Explained the banner is GitHub's standard nudge shown on every repo whose default branch has no
+  branch-protection rule; it is a suggestion, not an alert that something happened. main is not
+  unsafe: "Public" only grants read access, write access stays with the founder account (and the
+  sessions it authorizes), and the shipping workflow only touches main via squash-merged PRs
+  (force pushes only ever hit session branches, never main). Recommended either dismissing the
+  banner or adding a minimal ruleset (block force pushes + restrict deletions on main, with NO
+  required PR approvals so the founder-approved auto-ship squash-merge keeps working). Docs-only
+  turn, no code changes.
+- **Artifacts (prompt 1):** this log
