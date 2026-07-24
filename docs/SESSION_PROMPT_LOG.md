@@ -628,7 +628,7 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   handoff; moved the s137 handoff into `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`,
   keeping s139 + s138 as the two most recent) and appended this session-139 prompt-log entry.
 - **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #668
 
 ---
 
@@ -644,7 +644,7 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   app-icon `PAPIER` tile constant untouched. Gates: check:contrast 46/46 ✓ · build ✓. Updated
   `docs/PROJECT_STATUS.md` (s140 handoff, s138 handoff archived to W30) and this log.
 - **Artifacts (prompt 1):** `src/index.css` · `index.html` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #668
 - **Prompt 2 (verbatim):** `> can you provide me a preview with different variations of the background using different gradients himmelblue and maybe another color rather than the himmelblue`
 - **Response 2:** Built `preview/background-gradient-variations.html`: 8 page-ground options (A
   current, B/C/D Himmelblau gradient treatments, E Mint, F Himmel→Mint, G Rosé, H neutral grey-blue)
@@ -832,7 +832,7 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   Supabase SQL editor.
 - **Artifacts (prompt 1):** `supabase/migrations/0008_admin_center.sql` · `src/lib/adminApi.ts` ·
   `tests/admin.test.ts` · `docs/plans/PHASE2_SETUP.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #668
 - **Prompt 2 (verbatim):** `> the first step doesn't work for me on powershell. (Windows: scoop install supabase) where should I run this command and how?`
 - **Response 2:** Clarified that chunk 1 needs NO CLI at all: the supported path is pasting
   `0008_admin_center.sql` into the Supabase dashboard SQL editor (same as migrations 0004-0007),
@@ -1001,7 +1001,7 @@ W29 chunk on 2026-07-20). Keep appending here, newest at the bottom, and rotate 
   `docs/reports/verify-facts-report.md` · `docs/reports/verify-cefr-report.md` ·
   `scripts/vendor/german-nouns-subset.json` · `scripts/vendor/german-words-subset.json` ·
   `scripts/vendor/german-frequency-subset.json` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #668
 
 ## Session 147 — 2026-07-22 · branch `claude/schreibtraining-todo-review-afoegv`
 _Schreibtraining redesign (backlog #6): five-expert design panel → plan + mockups → full Fokus "Satzlabor" implementation, shipped._
@@ -1080,7 +1080,7 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
   s146 rotated into the W30 archive) and appended this log entry.
 - **Artifacts (session 148):** `src/store/useAuthStore.ts` · `src/lib/cloudSync.ts` · `src/router.tsx` ·
   PR #644 (`2fb0805`) · `docs/PROJECT_STATUS.md` ·
-  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #668
 - **Prompts 8-12 (verbatim):** `both done.` · `I wrote it and it worked once but stopped working again. Can I add multiple llm fallback options? We already are using gemini for something isn't it, can we use it here?` · (log screenshot) · `I'll not ask again and again to explain my things in non-technical manner...` · (Satzlabor UI harmonization request below)
 - **Response 8-11 (backend support):** Diagnosed the "Satzlabor nicht verfügbar" as the graceful fallback shown when the Edge Functions are undeployed / the LLM call fails. Explained the fallback chain (Anthropic → Gemini → OpenAI) is already coded and that Supabase secrets are project-wide (so `GEMINI_API_KEY` auto-applies). Since the functions swallowed errors silently, shipped **diagnostic logging + an Anthropic 429/529 retry** to both functions (PR #643) so the logs reveal the real cause. Gave non-technical, click-by-click browser deploy steps (GitHub "copy raw file" → Supabase Edge Functions editor → Deploy).
 - **Prompt 13 (verbatim):** `okay, meanwhile can you fix the UI - it looks shitty. Take bibliothek as reference and update the entire shreibtraining section to follow the same design language. the userflow of the kurz and lang shouldn't go through the Themas, instead the user should directly see an Aufgabe with writing field. and to the right a filter rail. Harmonize the design and merge`
@@ -1483,3 +1483,20 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `src/features/writing/fokus/{FokusTrainer,GrammarRail}.tsx` · `src/features/shared/FilterRail.tsx` ·
   `preview/contrast-squircle-review.html` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · this log · PR #665
+
+## Session 155 — 2026-07-24 — Design-preferences distillation → the `design` skill (branch `claude/design-prefs-documentation-e1xmlc`)
+
+- **Prompt 1 (verbatim):** `You're a highly talented and skilled senior expert with decades of design and software engineering expertise who worked in billion and trillion dollar tech companies. can you read (by using subagents maybe) all the prompts in the logs regarding all the design, layout,  related changes, reworks, my preferences, expectations especially in Bibliothek section, Schreiben section (except the verlauf - I want to rework it), and Praktisch pages, and suggest me if writing a skill or saving preferences in claude.md is better? because everytime I ask Opus or Fable to create a new page or section, I get a very bad output and needs too much rework. How can I make this better?` →
+  Two research subagents mined `SESSION_PROMPT_LOG.md` (s133-154), `DECISIONS.md`, `PROJECT_REFERENCE.md`
+  and the `preview/` inventory for every design/layout preference, rework pattern, rejection, and
+  process preference (Bibliothek, Schreiben minus Verlauf, Praktisch, global). Recommendation: a
+  **hybrid**, detailed playbook as a project skill + a short mandatory pointer in CLAUDE.md (CLAUDE.md
+  alone is always-loaded and already ~1,070 lines, so detail there costs tokens every session and gets
+  diluted; a skill alone triggers probabilistically). Built `.claude/skills/design/SKILL.md`
+  (`/design`): rule zero (extend the system; Bibliothek is the reference), the 8-step preview-first
+  process, a pre-flight checklist ranked by actual past rework frequency (redundancy > color > size >
+  dead controls > corners > placement > motion), the locked color language, reusable building blocks,
+  per-section anchors, and the shipped-then-reverted landmine list. Added the mandatory load-the-skill
+  anchor to CLAUDE.md's "Founder design preferences" section.
+- **Artifacts (session 155):** `.claude/skills/design/SKILL.md` · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #668

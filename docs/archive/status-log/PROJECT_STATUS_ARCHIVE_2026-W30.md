@@ -691,3 +691,43 @@ What shipped:
   2 axes (Zustandspassiv, Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness; (4) optional:
   AI-authored per-change *explanations* in the correction tip (needs a backend field + redeploy). Fokus
   is single-sentence by design.
+
+## Session 153 (2026-07-23) — Admin Control Center chunks 4-10 + landing Help back-button fix (moved from PROJECT_STATUS.md in s155)
+
+**Handoff after session 153 (2026-07-23). Admin Control Center chunks 4-10 + a landing Help
+back-button fix, branch `claude/landing-back-button-routing-jyhwot` (merged to `main`).** The founder
+asked to "continue with the admin control center build plan next chunk and work until chunk 10", so all
+seven remaining MVP + early-Phase-2 chunks of `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` shipped
+in one sitting, each its own commit passing the full gate set (typecheck · lint 0-errors · test:unit ·
+build · check:bundle · lint:content).
+- **Landing fix (first):** `HelpChrome` (`/hilfe` + `/hilfe/:slug`) had its Back button hardcoded to
+  `navigate("/hilfe")`, so on the hub itself (where the landing's Help link lands) Back looped to the
+  same page. Now uses the history-aware `handleBack` (navigate(-1), fallback `/welcome`) that
+  `LegalChrome` already uses; the article breadcrumb still links to the hub explicitly.
+- **Chunk 4 · Review Cockpit (`/admin/pruefen`):** `scripts/review-score.mjs` (pure A2 scoring
+  defect_signal > traffic_proxy > (1-confidence) > bank_criticality) + `pnpm build:review-queue` →
+  compact `reviewQueue.json`; `Pruefmodus.tsx` (filterable queue + keyboard review V/X/N/→/←, item
+  rendered as the learner sees it, machine-check panel, autosave to `provenance_reviews` with a
+  decision-time hash, 50-approvals rubber-stamp nudge). `tests/reviewScore.test.ts`.
+- **Chunk 5 · Feedback-Inbox:** `AdminFeedback.tsx` (triage status/priority/note/link via
+  `admin_feedback_update`, emailed indicator, optimistic writes).
+- **Chunk 6 · System + Launch:** `AdminSystem.tsx` (CI gate strip, Supabase/Edge pings, AI/Resend/guest
+  meters, idle-pause warning, dashboard deep links) + `AdminLaunch.tsx` (checklist in `launch_checklist`,
+  consent-version row) + `systemHealth.ts`.
+- **Chunk 7 · Steuerung core:** `src/lib/appConfig.ts` (typed remote config + defensive `mergeAppConfig`
+  + zustand store loaded once in `App.tsx`). **Empty/unreachable config == today's behavior byte-for-byte,
+  pinned by `tests/appConfig.test.ts`.** Consumers read `config.X ?? current-default`: H1 nav labels
+  (BottomTabBar/Sidebar), H2 middle-tab hide (routes stay mounted, Home/Einstellungen locked), H4 flags,
+  H5 feedback pill, H6 Beta chip, H8 dashboard start tab. `AdminSteuerung.tsx` panel with live preview.
+- **Chunk 8 · report sidecars:** `scripts/report-sidecar.mjs` into verify-facts/verify-cefr/review-queue/
+  exercise-coverage; `reportStaleness.ts` + Übersicht staleness strip.
+- **Chunk 9 · Inhalte:** `AdminInhalte.tsx` (F1 depth matrix, F2 flag triage → Prüfmodus, F3
+  exercise-coverage residual "Copy ids" work orders; coverage sidecar enriched with residual ids).
+- **Chunk 10 · Steuerung wave 2:** H3 Impressum (route always mounted + lazy, links gated behind a
+  confirm dialog), H7 streak pill, H10 landing copy overrides, H12 Demo-Modus preset.
+- **Merge note:** main had advanced through s147-152 while this branch was in flight; merged main in and
+  reconciled the overlapping locked surfaces (nav-items/BottomTabBar/Sidebar from the Schreibtraining
+  nav promotion #642, AppShell header, AdminShell/Overview from the #656/#660 admin-nav alignment,
+  router.tsx `/sources/werkbank` + `/impressum`). Regenerated the report sidecars against merged main.
+- **Next:** chunk 11 (Turnstile + abuse meters, founder does the Cloudflare/Supabase dashboard half),
+  then chunk 12 (compliance pack). No new founder DB step for chunks 4-10 (migration 0008 already live).
