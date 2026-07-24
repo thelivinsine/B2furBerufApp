@@ -509,9 +509,18 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   Model ids + the $2 threshold are env-overridable (`GEMINI_MODEL`, `CHECK_MODEL`/`TRANSFORM_MODEL`/
   `EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`); flip `GEMINI_MODEL` to change the primary. The
   German-grammar prompts are hardened (copula sein+Adjektiv is Aktiv, never Passiv; `bereits_zielform`
-  needs voice AND tense; strict JSON-only), and `normalizeDetected` never marks a detected
-  Zustandspassiv as the Passiv pill. The two Art. 50 disclaimers + `/privacy` (DE+EN) name all three
-  providers routing-neutrally. **Fokus (s151):** the send-to-AI note + the old "KI-generierte
+  needs voice AND tense; strict JSON-only), and `normalizeDetected` never mislabels a form onto the
+  wrong pill. **Grammar rail (s152, Wave 2):** the Fokus rail has three combinable axes now,
+  **Genus Verbi** (Aktiv · Passiv · Zustandspassiv), **Zeitform** (Präsens · Perfekt · Präteritum)
+  and **Modus** (Indikativ · Konjunktiv II). `mood` was promoted from the pinned `DEFAULT_MOOD` to a
+  real axis, and Zustandspassiv is its own Genus-Verbi pill (a detected `passiv_zustand` maps
+  straight to it now that the pill exists; the copula-is-Aktiv safeguard lives in the check-sentence
+  prompt). `transform-sentence` `PROMPT_VERSION` is at **4** (added K-II synthetic-vs-würde +
+  Vorgang-vs-Zustand rules). Register/Satzbau (operation-style transforms that do NOT fit the
+  voice/tense/mood tuple) remain a later wave. Rail taxonomy is data-driven from
+  `src/features/writing/fokus/grammarDimensions.ts`; roadmap in
+  `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`. The two Art. 50 disclaimers + `/privacy` (DE+EN)
+  name all three providers routing-neutrally. **Fokus (s151):** the send-to-AI note + the old "KI-generierte
   Umformung" footer are ONE combined, centered note pinned to the bottom of the content column
   (`min-h` + `mt-auto`), horizontally in line with the "Mit KI gebaut · Feedback" pill. **Eyebrow rule (s149): card-title eyebrows =
   bold `text-primary` ("Aufgabe:", "Dein Satz", the transform label); inner section labels stay

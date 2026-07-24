@@ -188,7 +188,8 @@ also the trust anchor: a wrong transform destroys the tool; a principled refusal
 | Wave | Add | Why here |
 |---|---|---|
 | **1 (shipped)** | Genus Verbi {Aktiv, Vorgangspassiv} × Zeitform {Präsens, Perfekt, Präteritum} | complete, high-value, shippable; backend already supports it |
-| **2 (recommend next)** | **Modus {Indikativ, Konjunktiv II}** (promote from pinned constant); **Zustandspassiv** pill; **Register** operation (Sie↔du); **Satzbau** operation (HS↔NS) | all high B2-value, backend enums already exist for K-II/Zustandspassiv; Register + Satzbau are the two most _demonstrable_ operations (the Verbklammer animation especially) |
+| **2a (SHIPPED s152)** | **Modus {Indikativ, Konjunktiv II}** (promoted from pinned constant to a real axis); **Zustandspassiv** as a third Genus-Verbi pill | shipped in PR #678: `mood` threaded through the machine, Zustandspassiv maps to its own pill, `transform-sentence` prompt gained K-II + Vorgang/Zustand rules (`PROMPT_VERSION` 4) |
+| **2b (recommend next)** | **Register** operation (Sie↔du); **Satzbau** operation (HS↔NS) | the two most _demonstrable_ operations (the Verbklammer animation especially); these are operation-style transforms that need the new edge-function operation contract, not the tuple |
 | **3** | **Stil** (verbal↔nominal, bidirectional); **Relativ↔Partizip** (bidirectional); **Infinitiv** (NS→um…zu); **Kondition** (wenn→sollten/falls/bei); **Plusquamperfekt** (only with a temporal anchor); **Passiversatzformen** (man / sich lassen / sein+zu) | the C1-leaning compression + the integrative operations; needs the Tier-B/C grading + guardrails mature |
 | **Deep-link only** | Indirekte Rede (K-I), Futur I (as _Vermutung_ with a warning), affix-Negation, Steigerung | live toggles are traps (forms collapse, unnatural, low ceiling) — send the learner into the lesson bank instead |
 | **Cut** | Futur II, standalone Numerus | noise at B1–B2 |

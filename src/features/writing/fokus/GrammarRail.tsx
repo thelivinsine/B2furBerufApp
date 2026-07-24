@@ -153,8 +153,8 @@ export function GrammarRail({
         {enabled ? (
           <>
             {/* Two lines (founder s149): the legend, then the instruction. */}
-            <b className="block text-success">Grüner Punkt = erkannte Form.</b>
-            Tippe eine andere Form, um den Satz umzuformen.
+            <b className="block text-success">Grüner Punkt = dein Satz.</b>
+            Tippe eine andere Form, um ihn umzuwandeln.
           </>
         ) : (
           <>Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv, Zeitform und Modus.</>
