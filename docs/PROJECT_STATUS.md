@@ -10,9 +10,9 @@ prompt). The rail is data-driven, so both were data/wiring adds; the `transform-
 Konjunktiv-II (synthetic-vs-würde, no würde in the wenn-clause) + Vorgang-vs-Zustand rules,
 **`PROMPT_VERSION` 2 → 4** (cache invalidation). Green-dot legend simplified to "Grüner Punkt = dein
 Satz." Operation-style transforms (Register Sie↔du, Satzbau HS↔NS) stay a later wave (they need a new
-edge-function operation contract, not the tuple). **Founder action: redeploy `transform-sentence`**
-(now `PROMPT_VERSION=4`) so the improved K-II / Zustandspassiv output takes effect; the pills already
-work against the live function without it. Prior s157 doc-maintenance pass + the s156 admin control
+edge-function operation contract, not the tuple). **`transform-sentence` redeployed (`PROMPT_VERSION=4`)
+by the founder via the Supabase dashboard code editor** (2026-07-24), so the improved K-II /
+Zustandspassiv output is live. Prior s157 doc-maintenance pass + the s156 admin control
 center (chunks 1-12 complete; Phase 3 13-16 on demand) still stand; s156 founder action still open: run
 migration 0010 + redeploy `delete-account` (`PHASE2_SETUP.md` §5). Product name: **Genauly**
 (`genauly.de`)._
@@ -93,9 +93,9 @@ artifact (daa4dbb6). Then built the "easy half":
   real Zustandspassiv sentence. The copula safeguard (misread "Ich bin krank" -> aktiv) stays in the
   check-sentence prompt.
 - **Edge function:** `transform-sentence` prompt gained K-II (synthetic-vs-wuerde) + Vorgang-vs-Zustand
-  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder must redeploy `transform-sentence`** for the
-  better output; the pills already work against the live function (its enums already accept
-  konjunktiv2 / passiv_zustand as targets).
+  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder redeployed `transform-sentence`** on 2026-07-24
+  via the Supabase dashboard code editor (the function is a single self-contained file; no local
+  clone / CLI needed), so the improved output is live.
 - **Copy:** rail legend simplified to "Gruener Punkt = dein Satz." / "Tippe eine andere Form, um ihn
   umzuwandeln."
 - **Held (operation-style, need a NEW edge-function contract, not the tuple):** Register (Sie<->du),
