@@ -5,6 +5,7 @@ import { missionUnlocked } from "@/engine/mission";
 import { missions, chapters } from "@/data/missions";
 import { useProgressStore } from "@/store/useProgressStore";
 import { PixelStage } from "@/features/welt/stage";
+import { useAppConfigStore } from "@/lib/appConfig";
 import { cn } from "@/lib/utils";
 
 // Compact (Heute) mission-list crop: exactly three uniform rows tall.
@@ -42,6 +43,7 @@ export function NeulandHub({
 }) {
   const missionsDone = useProgressStore((s) => s.missionsDone);
   const ownedItems = useProgressStore((s) => s.keyItems);
+  const betaChip = useAppConfigStore((s) => s.config.betaChip);
 
   // Only chapters that already have authored missions render as sections.
   const authoredChapters = chapters.filter((c) => missions.some((m) => m.chapter === c.id));
@@ -70,9 +72,13 @@ export function NeulandHub({
       <header className="text-center">
         <h1 className="text-display relative inline-block text-2xl">
           Neuland
-          <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
-            Beta
-          </span>
+          {/* Steuerung H6: the Beta suffix chip can be hidden from remote config
+              (default on). Text/position stay founder-locked pixel work. */}
+          {betaChip && (
+            <span className="absolute left-full top-1/2 ml-2 -translate-y-1/2 whitespace-nowrap rounded-full border border-border bg-surface px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
+              Beta
+            </span>
+          )}
         </h1>
       </header>
 

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, Copy, RefreshCw } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Check, Copy, RefreshCw, ClipboardCheck, AlertTriangle, MessageSquare } from "lucide-react";
 import { provenance } from "@/data/provenance";
 import { verification as verificationMap } from "@/data/verification";
 import type { VerificationTier } from "@/types";
@@ -14,6 +15,7 @@ import {
   type FunnelResult,
 } from "./adminFunnel";
 import { fetchDeployStatus, type DeployStatus } from "./liveWidget";
+import { reportStatuses } from "./reportStaleness";
 
 /* Tier display meta for the trust-ladder bar (strongest first), mirroring the
    colours the public /sources page uses. */
@@ -181,14 +183,25 @@ export function AdminOverview() {
             )}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={reload}
-          className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-soft hover:text-foreground"
-        >
-          <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
-          {t("Aktualisieren", "Refresh")}
-        </button>
+        <div className="flex items-center gap-2">
+          {overview && overview.feedback.neu > 0 && (
+            <Link
+              to="/admin/feedback"
+              className="flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary shadow-soft hover:brightness-105"
+            >
+              <MessageSquare className="h-3.5 w-3.5" />
+              {overview.feedback.neu} {t("neu", "new")}
+            </Link>
+          )}
+          <button
+            type="button"
+            onClick={reload}
+            className="flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-muted-foreground shadow-soft hover:text-foreground"
+          >
+            <RefreshCw className={cn("h-3.5 w-3.5", loading && "animate-spin")} />
+            {t("Aktualisieren", "Refresh")}
+          </button>
+        </div>
       </div>
 
       {/* A1 + D1 tiles */}
@@ -244,6 +257,20 @@ export function AdminOverview() {
             <span className="rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
               {t("alle Bänke", "all banks")}
             </span>
+            <div className="ml-auto flex items-center gap-2">
+              <Link
+                to="/admin/pruefen?defect=1"
+                className="flex items-center gap-1 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-bold text-warning hover:brightness-105"
+              >
+                <AlertTriangle className="h-3 w-3" /> {t("Verdachtsfälle", "Flagged")}
+              </Link>
+              <Link
+                to="/admin/pruefen"
+                className="flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary hover:brightness-105"
+              >
+                <ClipboardCheck className="h-3 w-3" /> {t("Prüfen", "Review")}
+              </Link>
+            </div>
           </div>
           <TierBar funnel={funnel} lang={lang} />
 
@@ -300,6 +327,45 @@ export function AdminOverview() {
           <h2 className="mb-3 text-sm font-extrabold">{t("Ist meine Änderung live?", "Is my change live?")}</h2>
           <LiveWidget deploy={deploy} supabaseOk={supabaseOk} loading={loading} />
         </div>
+      </div>
+
+      {/* Report staleness strip (chunk 8) */}
+      <StalenessStrip lang={lang} t={t} />
+    </div>
+  );
+}
+
+/* The offline-report freshness strip: keeps dashboards honest about age. */
+function StalenessStrip({ lang, t }: { lang: "de" | "en"; t: (de: string, en: string) => string }) {
+  const reports = useMemo(() => reportStatuses(), []);
+  if (reports.length === 0) return null;
+  return (
+    <div className="rounded-xl border border-border bg-surface p-4 shadow-soft">
+      <h2 className="mb-3 text-sm font-extrabold">{t("Berichte-Aktualität", "Report freshness")}</h2>
+      <div className="flex flex-wrap gap-2">
+        {reports.map((r) => (
+          <div
+            key={r.de}
+            className={cn(
+              "flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs",
+              r.stale ? "border-warning/40 bg-warning/10" : "border-border bg-muted/40",
+            )}
+          >
+            <span className={cn("h-1.5 w-1.5 rounded-full", r.stale ? "bg-warning" : "bg-success")} />
+            <span className="font-semibold">{lang === "de" ? r.de : r.en}</span>
+            <span className="text-muted-foreground">
+              {r.generatedAt}
+              {r.registerRows != null && (
+                <>
+                  {" · "}
+                  {r.liveRegisterRows != null
+                    ? `${r.registerRows.toLocaleString(lang === "de" ? "de-DE" : "en-US")}/${r.liveRegisterRows.toLocaleString(lang === "de" ? "de-DE" : "en-US")}`
+                    : `${r.registerRows.toLocaleString(lang === "de" ? "de-DE" : "en-US")} ${r.scope ?? ""}`.trim()}
+                </>
+              )}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

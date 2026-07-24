@@ -314,8 +314,8 @@ office-only library cannot be. Full plan: `docs/strategy/BIBLIOTHEK_SCALEUP_PLAN
 ## FilterRail visual redesign + count-beside-Üben (session 103, 2026-07-12) — founder-approved
 
 The s91/s92 rounds settled on a flat, solid-grey `bg-border` tile for the Bibliothek filter rail
-("every section shares the top row's shade" — see the CLAUDE.md Bibliothek section for the full
-s91/s92 history). In the s100 UI-refinements review the founder called that slab ugly against every
+("every section shares the top row's shade" — see `docs/areas/BIBLIOTHEK.md` for the current
+FilterRail rules; s91/s92 history below). In the s100 UI-refinements review the founder called that slab ugly against every
 other white content card on the page, and separately asked why the result count jumps to the top of
 the panel when it expands instead of staying beside the Üben button.
 
@@ -373,7 +373,7 @@ visual fixes.
 
 The whole Schreiben section was rebuilt as a visual EXTENSION of the Bibliothek over five founder
 rounds (2 preview rounds, a 13-point fix list, a full audit with a P0/P1/P2 action list, then
-execution of all of it; PRs #648-#651). The shipped state is specced in CLAUDE.md ("Schreiben hub").
+execution of all of it; PRs #648-#651). The shipped state is specced in `docs/areas/SCHREIBEN.md`.
 This entry records the REUSABLE design preferences the founder expressed across those rounds, so a
 future surface starts from them instead of rediscovering them:
 

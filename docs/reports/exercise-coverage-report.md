@@ -47,6 +47,7 @@ Gezählt wird das **volle Menü, das ein Thema über alle Stufen (A2–C1) und m
 
 | Thema | Vielfalt | Typen | Status |
 | --- | --- | ---: | --- |
+| Nachhaltigkeit | `████████████` | 12 | 🟢 reich |
 | Arbeitssicherheit & Gesundheit | `████████████` | 13 | 🟢 reich |
 | Arzt & Gesundheit | `████████████` | 13 | 🟢 reich |
 | Bank & Finanzen | `████████████` | 13 | 🟢 reich |
@@ -62,7 +63,6 @@ Gezählt wird das **volle Menü, das ein Thema über alle Stufen (A2–C1) und m
 | Kundenkommunikation | `████████████` | 13 | 🟢 reich |
 | Logistik & Transport | `████████████` | 13 | 🟢 reich |
 | Mobilität & Verkehr | `████████████` | 13 | 🟢 reich |
-| Nachhaltigkeit | `████████████` | 13 | 🟢 reich |
 | Projektkoordination | `████████████` | 13 | 🟢 reich |
 | Technik & Digitalisierung | `████████████` | 13 | 🟢 reich |
 | Termine & Planung | `████████████` | 13 | 🟢 reich |
@@ -103,6 +103,7 @@ Lernender auf einer Stufe sieht davon eine Teilmenge. ✓ = möglich · · = (no
 
 | Thema | Karte | Tippen | Übers. | Artikel | Plural | Lücke | Tipp-Lücke | Hören | Zuordn. | N+V | N-V-Paare | Satzbau | Ausreißer |
 | --- | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: | :-: |
+| Nachhaltigkeit | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | · | ✓ | ✓ |
 | Arbeitssicherheit & Gesundheit | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Arzt & Gesundheit | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Bank & Finanzen | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -118,7 +119,6 @@ Lernender auf einer Stufe sieht davon eine Teilmenge. ✓ = möglich · · = (no
 | Kundenkommunikation | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Logistik & Transport | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Mobilität & Verkehr | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Nachhaltigkeit | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Projektkoordination | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Technik & Digitalisierung | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Termine & Planung | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |

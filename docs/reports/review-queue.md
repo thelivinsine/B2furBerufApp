@@ -7,42 +7,26 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 ## Summary (whole register, ignores any filters below)
 
-- Total provenance rows: **2132**
-- Verified: **25** (1.2%)  ·  Draft: **2107**
+- Total provenance rows: **3107**
+- Verified: **0** (0.0%)  ·  Draft: **3107**
 
 | content type | total | verified | verified % |
 |---|---|---|---|
-| vocabulary | 1022 | 0 | 0% |
-| collocation | 701 | 0 | 0% |
+| vocabulary | 1623 | 0 | 0% |
+| collocation | 1035 | 0 | 0% |
 | redemittel | 149 | 0 | 0% |
 | grammar_drill | 117 | 0 | 0% |
-| can_do | 37 | 25 | 68% |
-| text | 26 | 0 | 0% |
+| can_do | 52 | 0 | 0% |
+| text | 36 | 0 | 0% |
+| dialogue | 30 | 0 | 0% |
 | grammar_topic | 24 | 0 | 0% |
-| dialogue | 20 | 0 | 0% |
+| writing_prompt | 20 | 0 | 0% |
 | exam_set | 15 | 0 | 0% |
-| writing_prompt | 15 | 0 | 0% |
 | mission | 6 | 0 | 0% |
 
-## Branche (sector) rollup — whole register, status=draft
+## Queue — status=draft (3107 rows)
 
-| sector | rows |
-|---|---|
-| production | 87 |
-| engineering | 87 |
-| construction | 87 |
-| it | 85 |
-| care | 42 |
-| retail | 29 |
-| trades | 29 |
-| hospitality | 29 |
-| transport | 29 |
-| beauty | 29 |
-| sports | 29 |
-
-## Queue — status=draft (2107 rows)
-
-### can_do (12)
+### can_do (52)
 
 <details><summary>arzt — 3</summary>
 
@@ -64,6 +48,16 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
+<details><summary>behoerde — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_behoerde_1` | Ich kann mich beim Bürgeramt anmelden und die nötigen Unterlagen nennen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_behoerde_2` | Ich kann einen Antrag stellen und fehlende Unterlagen nachreichen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_behoerde_3` | Ich kann auf einen Bescheid reagieren und bei Bedarf Widerspruch einlegen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
 <details><summary>bildung — 3</summary>
 
 | id | label | origin | reference |
@@ -71,6 +65,148 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `cd_bildung_1` | Ich kann mich nach einem passenden Sprachkurs erkundigen und mich anmelden. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
 | `cd_bildung_2` | Ich kann erklären, welche Unterlagen ich für die Anerkennung meines Abschlusses brauche. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
 | `cd_bildung_3` | Ich kann mich zu einer Weiterbildung beraten lassen, eine Förderung erfragen und meinen Werdegang darstellen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>conflict — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_conflict_1` | Ich kann ein Missverständnis ansprechen und klären, ohne den Ton zu verschärfen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_conflict_2` | Ich kann in einem Konflikt vermitteln und einen tragfähigen Kompromiss aushandeln. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>customer — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_customer_1` | Ich kann eine Kundenanfrage verstehen und höflich beantworten. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_customer_2` | Ich kann eine Reklamation entgegennehmen und eine passende Lösung anbieten. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_customer_3` | Ich kann ein schwieriges Kundengespräch ruhig und professionell führen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>digitales — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_digitales_1` | Ich kann mein Handy einrichten und eine App installieren. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_digitales_2` | Ich kann einen Handy- oder Internetvertrag vergleichen und eine Störung melden. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_digitales_3` | Ich kann einen Vertrag kündigen, ein Online-Konto verwalten und meine Daten schützen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>einkaufen — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_einkaufen_1` | Ich kann im Supermarkt nach Produkten fragen und an der Kasse bezahlen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_einkaufen_2` | Ich kann Kleidung anprobieren, nach einer anderen Größe fragen und mich beraten lassen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_einkaufen_3` | Ich kann eine Ware reklamieren, den Umtausch verlangen und mein Rückgaberecht erklären. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>essen — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_essen_1` | Ich kann im Restaurant einen Tisch reservieren und ein Getränk bestellen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_essen_2` | Ich kann von der Speisekarte bestellen, nach Zutaten fragen und die Rechnung bezahlen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_essen_3` | Ich kann ein Rezept erklären, ein Gericht empfehlen und über gesunde Ernährung sprechen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>freizeit — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_freizeit_1` | Ich kann über meine Hobbys sprechen und mich mit jemandem verabreden. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_freizeit_2` | Ich kann eine Einladung annehmen oder absagen und einen Vorschlag für ein Treffen machen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_freizeit_3` | Ich kann Smalltalk führen, ins Gespräch kommen und über Veranstaltungen sprechen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>logistics — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_logistics_1` | Ich kann eine Lieferung organisieren und den Lieferstatus erfragen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_logistics_2` | Ich kann bei Lieferproblemen reklamieren und eine Lösung aushandeln. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>meetings — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_meetings_1` | Ich kann in einer Besprechung meine Meinung äußern und auf Fragen reagieren. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_meetings_2` | Ich kann eine Teambesprechung moderieren und die Ergebnisse zusammenfassen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_meetings_3` | Ich kann in einer Diskussion Vor- und Nachteile abwägen und einen Beschluss herbeiführen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>mobilitaet — 3</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_mobilitaet_1` | Ich kann mit Bus und Bahn fahren und nach der richtigen Haltestelle fragen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_mobilitaet_2` | Ich kann eine Fahrkarte kaufen, den passenden Tarif wählen und nach dem Weg fragen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `cd_mobilitaet_3` | Ich kann eine Verspätung melden, eine Umleitung verstehen und eine Panne beschreiben. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>project — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_project_1` | Ich kann über den Stand eines Projekts berichten und die nächsten Schritte nennen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_project_2` | Ich kann Zuständigkeiten klären und Prioritäten im Team abstimmen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>safety — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_safety_1` | Ich kann einen Unfall oder eine Gefahr am Arbeitsplatz melden. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_safety_2` | Ich kann Sicherheitsregeln erklären und Schutzmaßnahmen begründen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>scheduling — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_scheduling_1` | Ich kann einen Termin vereinbaren, verschieben oder absagen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_scheduling_2` | Ich kann einen Terminkonflikt diplomatisch lösen und Alternativen vorschlagen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>sustainability — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_sustainability_1` | Ich kann einfache Vorschläge machen, wie der Betrieb Energie und Müll sparen kann. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_sustainability_2` | Ich kann Nachhaltigkeitsmaßnahmen vergleichen und ihre Vor- und Nachteile abwägen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>technology — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_technology_1` | Ich kann ein technisches Problem melden und beschreiben, was nicht funktioniert. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_technology_2` | Ich kann die Einführung einer neuen Software erklären und Rückfragen beantworten. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+
+</details>
+
+<details><summary>travel — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `cd_travel_1` | Ich kann eine Dienstreise planen und ein Hotel buchen. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
+| `cd_travel_2` | Ich kann bei Reiseproblemen reagieren und eine Umbuchung aushandeln. | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/table-2-cefr-3.3-common-reference-levels-self-assessment-grid) |
 
 </details>
 
@@ -84,9 +220,9 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-### collocation (701)
+### collocation (1035)
 
-<details><summary>arzt — 36</summary>
+<details><summary>arzt — 56</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -95,48 +231,73 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_arzttermin_vereinbaren` | einen Arzttermin vereinbaren | authored | [link](https://de.wiktionary.org/wiki/vereinbaren) |
 | `c_arzttermin_verschieben` | den Arzttermin verschieben | authored | [link](https://de.wiktionary.org/wiki/verschieben) |
 | `c_arzttermin_wahrnehmen` | den Arzttermin wahrnehmen | authored | [link](https://de.wiktionary.org/wiki/wahrnehmen) |
+| `c_ausdauer_verbessern` | die Ausdauer verbessern | authored | [link](https://www.dwds.de/r?q=die%20Ausdauer%20verbessern) |
 | `c_behandlung_beginnen` | die Behandlung beginnen | authored | [link](https://de.wiktionary.org/wiki/beginnen) |
 | `c_beipackzettel_lesen` | den Beipackzettel lesen | authored | [link](https://de.wiktionary.org/wiki/lesen) |
 | `c_bescheinigung_vorlegen` | eine ärztliche Bescheinigung vorlegen | authored | [link](https://de.wiktionary.org/wiki/vorlegen) |
 | `c_beschwerden_haben` | Beschwerden haben | authored | [link](https://de.wiktionary.org/wiki/haben) |
 | `c_beschwerden_schildern` | die Beschwerden schildern | authored | [link](https://de.wiktionary.org/wiki/schildern) |
+| `c_blutdruck_messen` | den Blutdruck messen | authored | [link](https://www.dwds.de/r?q=den%20Blutdruck%20messen) |
 | `c_diagnose_stellen` | eine Diagnose stellen | authored | [link](https://de.wiktionary.org/wiki/stellen) |
 | `c_dosis_einhalten` | die Dosis einhalten | authored | [link](https://de.wiktionary.org/wiki/einhalten) |
 | `c_erkaeltung_haben` | eine Erkältung haben | authored | [link](https://de.wiktionary.org/wiki/haben) |
 | `c_fieber_haben` | Fieber haben | authored | [link](https://de.wiktionary.org/wiki/haben) |
 | `c_fieber_messen` | Fieber messen | authored | [link](https://de.wiktionary.org/wiki/messen) |
+| `c_gewicht_stemmen` | Gewichte stemmen | authored | [link](https://www.dwds.de/wb/Gewichte) |
+| `c_gleichgewicht_halten` | das Gleichgewicht halten | authored | [link](https://www.dwds.de/r?q=das%20Gleichgewicht%20halten) |
 | `c_impfung_auffrischen` | eine Impfung auffrischen | authored | [link](https://de.wiktionary.org/wiki/auffrischen) |
+| `c_infusion_anlegen` | eine Infusion anlegen | authored | [link](https://www.dwds.de/r?q=eine%20Infusion%20anlegen) |
+| `c_koerper_aufwaermen` | den Körper aufwärmen | authored | [link](https://www.dwds.de/wb/K%C3%B6rper) |
+| `c_kondition_verbessern` | die Kondition verbessern | authored | [link](https://www.dwds.de/wb/Kondition) |
 | `c_kosten_uebernehmen` | die Kosten übernehmen | authored | [link](https://de.wiktionary.org/wiki/übernehmen) |
 | `c_krankenkasse_wechseln` | die Krankenkasse wechseln | authored | [link](https://de.wiktionary.org/wiki/wechseln) |
 | `c_krankschreibung_ausstellen` | eine Krankschreibung ausstellen | authored | [link](https://de.wiktionary.org/wiki/ausstellen) |
 | `c_medikament_abholen` | ein Medikament abholen | authored | [link](https://de.wiktionary.org/wiki/abholen) |
+| `c_medikament_dosieren` | ein Medikament dosieren | authored | [link](https://www.dwds.de/wb/Medikament) |
 | `c_medikament_einnehmen` | ein Medikament einnehmen | authored | [link](https://de.wiktionary.org/wiki/einnehmen) |
 | `c_medikament_verschreiben` | ein Medikament verschreiben | authored | [link](https://de.wiktionary.org/wiki/verschreiben) |
+| `c_medikamente_verabreichen` | Medikamente verabreichen | authored | [link](https://www.dwds.de/r?q=Medikamente%20verabreichen) |
+| `c_muskeln_aufbauen` | Muskeln aufbauen | authored | [link](https://www.dwds.de/wb/Muskeln) |
+| `c_muskeln_dehnen` | die Muskeln dehnen | authored | [link](https://www.dwds.de/r?q=die%20Muskeln%20dehnen) |
+| `c_nebenwirkungen_dokumentieren` | Nebenwirkungen dokumentieren | authored | [link](https://www.dwds.de/wb/Nebenwirkungen) |
 | `c_notaufnahme_aufsuchen` | die Notaufnahme aufsuchen | authored | [link](https://de.wiktionary.org/wiki/aufsuchen) |
 | `c_notruf_waehlen` | den Notruf wählen | authored | [link](https://de.wiktionary.org/wiki/wählen) |
+| `c_patienten_mobilisieren` | den Patienten mobilisieren | authored | [link](https://www.dwds.de/r?q=den%20Patienten%20mobilisieren) |
 | `c_praxis_anrufen` | die Praxis anrufen | authored | [link](https://de.wiktionary.org/wiki/anrufen) |
+| `c_probanden_rekrutieren` | Probanden rekrutieren | authored | [link](https://www.dwds.de/wb/Probanden) |
+| `c_puls_messen` | den Puls messen | authored | [link](https://www.dwds.de/wb/Puls) |
 | `c_rechnung_einreichen` | eine Rechnung einreichen | authored | [link](https://de.wiktionary.org/wiki/einreichen) |
 | `c_rezept_ausstellen` | ein Rezept ausstellen | authored | [link](https://de.wiktionary.org/wiki/ausstellen) |
 | `c_rezept_einloesen` | das Rezept einlösen | authored | [link](https://de.wiktionary.org/wiki/einlösen) |
 | `c_schmerzen_haben` | Schmerzen haben | authored | [link](https://de.wiktionary.org/wiki/haben) |
 | `c_schmerzen_lindern` | die Schmerzen lindern | authored | [link](https://de.wiktionary.org/wiki/lindern) |
+| `c_studie_durchfuehren` | eine Studie durchführen | authored | [link](https://www.dwds.de/wb/Studie) |
 | `c_symptome_beschreiben` | die Symptome beschreiben | authored | [link](https://de.wiktionary.org/wiki/beschreiben) |
 | `c_ueberweisung_ausstellen` | eine Überweisung ausstellen | authored | [link](https://de.wiktionary.org/wiki/ausstellen) |
 | `c_ueberweisung_bekommen` | eine Überweisung bekommen | authored | [link](https://de.wiktionary.org/wiki/bekommen) |
+| `c_uebung_ausfuehren` | eine Übung ausführen | authored | [link](https://www.dwds.de/wb/%C3%9Cbung) |
 | `c_untersuchung_durchfuehren` | eine Untersuchung durchführen | authored | [link](https://de.wiktionary.org/wiki/durchführen) |
+| `c_verband_wechseln` | den Verband wechseln | authored | [link](https://www.dwds.de/r?q=den%20Verband%20wechseln) |
+| `c_verletzung_auskurieren` | eine Verletzung auskurieren | authored | [link](https://www.dwds.de/r?q=eine%20Verletzung%20auskurieren) |
 | `c_versichertenkarte_vorlegen` | die Versichertenkarte vorlegen | authored | [link](https://de.wiktionary.org/wiki/vorlegen) |
 | `c_wartezimmer_warten` | im Wartezimmer warten | authored | [link](https://de.wiktionary.org/wiki/warten) |
+| `c_zuzahlung_leisten` | eine Zuzahlung leisten | authored | [link](https://www.dwds.de/wb/Zuzahlung) |
 
 </details>
 
-<details><summary>bank — 36</summary>
+<details><summary>bank — 50</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_ausweis_vorlegen` | den Ausweis vorlegen | authored | [link](https://de.wiktionary.org/wiki/vorlegen) |
+| `c_authentifizierung_aktivieren` | die Zwei-Faktor-Authentifizierung aktivieren | authored | [link](https://de.wiktionary.org/wiki/aktivieren) |
+| `c_beleg_aufbewahren` | den Beleg aufbewahren | authored | [link](https://de.wiktionary.org/wiki/aufbewahren) |
 | `c_beratungstermin_vereinbaren` | einen Beratungstermin vereinbaren | authored | [link](https://de.wiktionary.org/wiki/vereinbaren) |
 | `c_betrag_ueberweisen` | einen Betrag überweisen | authored | [link](https://de.wiktionary.org/wiki/überweisen) |
+| `c_bonitaet_pruefen` | die Bonität prüfen | authored | [link](https://de.wiktionary.org/wiki/pr%C3%BCfen) |
+| `c_darlehen_aufnehmen` | ein Darlehen aufnehmen | authored | [link](https://de.wiktionary.org/wiki/aufnehmen) |
 | `c_dauerauftrag_einrichten` | einen Dauerauftrag einrichten | authored | [link](https://de.wiktionary.org/wiki/einrichten) |
+| `c_freistellungsauftrag_stellen` | einen Freistellungsauftrag stellen | authored | [link](https://de.wiktionary.org/wiki/stellen) |
 | `c_gebuehren_sparen` | Gebühren sparen | authored | [link](https://de.wiktionary.org/wiki/sparen) |
 | `c_gehalt_ueberweisen` | das Gehalt überweisen | authored | [link](https://de.wiktionary.org/wiki/überweisen) |
 | `c_geld_abheben` | Geld abheben | authored | [link](https://de.wiktionary.org/wiki/abheben) |
@@ -146,71 +307,76 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_geld_ueberweisen` | Geld überweisen | authored | [link](https://de.wiktionary.org/wiki/überweisen) |
 | `c_iban_angeben` | die IBAN angeben | authored | [link](https://de.wiktionary.org/wiki/angeben) |
 | `c_karte_beantragen` | eine Karte beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
+| `c_karte_entsperren` | die Karte entsperren | authored | [link](https://de.wiktionary.org/wiki/entsperren) |
 | `c_karte_sperren` | die Karte sperren | authored | [link](https://de.wiktionary.org/wiki/sperren) |
 | `c_konto_aufloesen` | ein Konto auflösen | authored | [link](https://de.wiktionary.org/wiki/auflösen) |
 | `c_konto_eroeffnen` | ein Konto eröffnen | authored | [link](https://de.wiktionary.org/wiki/eröffnen) |
 | `c_konto_freischalten` | das Konto freischalten | authored | [link](https://de.wiktionary.org/wiki/freischalten) |
 | `c_konto_fuehren` | ein Konto führen | authored | [link](https://de.wiktionary.org/wiki/führen) |
 | `c_konto_ueberziehen` | das Konto überziehen | authored | [link](https://de.wiktionary.org/wiki/überziehen) |
+| `c_konto_wechseln` | das Konto wechseln | authored | [link](https://de.wiktionary.org/wiki/wechseln) |
 | `c_kontoauszug_ausdrucken` | den Kontoauszug ausdrucken | authored | [link](https://de.wiktionary.org/wiki/ausdrucken) |
 | `c_kontostand_pruefen` | den Kontostand prüfen | authored | [link](https://de.wiktionary.org/wiki/prüfen) |
+| `c_kontovollmacht_erteilen` | eine Kontovollmacht erteilen | authored | [link](https://de.wiktionary.org/wiki/erteilen) |
 | `c_kredit_aufnehmen` | einen Kredit aufnehmen | authored | [link](https://de.wiktionary.org/wiki/aufnehmen) |
 | `c_kredit_beantragen` | einen Kredit beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
 | `c_lastschrift_einrichten` | eine Lastschrift einrichten | authored | [link](https://de.wiktionary.org/wiki/einrichten) |
 | `c_lastschrift_zurueckbuchen` | eine Lastschrift zurückbuchen | authored | [link](https://de.wiktionary.org/wiki/zurückbuchen) |
 | `c_mit_karte_zahlen` | mit Karte zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_mitgliedschaft_kuendigen` | die Mitgliedschaft kündigen | authored | [link](https://www.dwds.de/r?q=die%20Mitgliedschaft%20k%C3%BCndigen) |
 | `c_passwort_aendern` | das Passwort ändern | authored | [link](https://de.wiktionary.org/wiki/ändern) |
 | `c_pin_eingeben` | die PIN eingeben | authored | [link](https://de.wiktionary.org/wiki/eingeben) |
 | `c_raten_zahlen` | in Raten zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_rechnung_begleichen` | eine Rechnung begleichen | authored | [link](https://www.dwds.de/wb/Rechnung) |
 | `c_rechnung_bezahlen` | eine Rechnung bezahlen | authored | [link](https://de.wiktionary.org/wiki/bezahlen) |
+| `c_ruecklage_bilden` | eine Rücklage bilden | authored | [link](https://de.wiktionary.org/wiki/bilden) |
 | `c_schulden_abbauen` | Schulden abbauen | authored | [link](https://de.wiktionary.org/wiki/abbauen) |
+| `c_tageslimit_erhoehen` | das Tageslimit erhöhen | authored | [link](https://de.wiktionary.org/wiki/erh%C3%B6hen) |
 | `c_tan_eingeben` | eine TAN eingeben | authored | [link](https://de.wiktionary.org/wiki/eingeben) |
 | `c_ueberweisung_taetigen` | eine Überweisung tätigen | authored | [link](https://de.wiktionary.org/wiki/tätigen) |
 | `c_umsatz_einsehen` | die Umsätze einsehen | authored | [link](https://de.wiktionary.org/wiki/einsehen) |
 | `c_zahlung_anweisen` | eine Zahlung anweisen | authored | [link](https://de.wiktionary.org/wiki/anweisen) |
+| `c_zahlungseingang_pruefen` | den Zahlungseingang prüfen | authored | [link](https://de.wiktionary.org/wiki/pr%C3%BCfen) |
 | `c_zinsen_zahlen` | Zinsen zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_zinssatz_vergleichen` | den Zinssatz vergleichen | authored | [link](https://de.wiktionary.org/wiki/vergleichen) |
 
 </details>
 
-<details><summary>beauty — 9</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `c_gesichtsbehandlung_buchen` | eine Gesichtsbehandlung buchen | authored | [link](https://www.dwds.de/r?q=eine%20Gesichtsbehandlung%20buchen) |
-| `c_haare_faerben` | die Haare färben | authored | [link](https://www.dwds.de/r?q=die%20Haare%20f%C3%A4rben) |
-| `c_haare_foehnen` | die Haare föhnen | authored | [link](https://www.dwds.de/r?q=die%20Haare%20f%C3%B6hnen) |
-| `c_haut_reinigen` | die Haut reinigen | authored | [link](https://www.dwds.de/r?q=die%20Haut%20reinigen) |
-| `c_kopfhaut_massieren` | die Kopfhaut massieren | authored | [link](https://www.dwds.de/r?q=die%20Kopfhaut%20massieren) |
-| `c_nagellack_auftragen` | Nagellack auftragen | authored | [link](https://www.dwds.de/r?q=Nagellack%20auftragen) |
-| `c_peeling_durchfuehren` | ein Peeling durchführen | authored | [link](https://www.dwds.de/r?q=ein%20Peeling%20durchf%C3%BChren) |
-| `c_spitzen_nachschneiden` | die Spitzen nachschneiden | authored | [link](https://www.dwds.de/r?q=die%20Spitzen%20nachschneiden) |
-| `c_wimpern_faerben` | die Wimpern färben | authored | [link](https://www.dwds.de/r?q=die%20Wimpern%20f%C3%A4rben) |
-
-</details>
-
-<details><summary>behoerde — 36</summary>
+<details><summary>behoerde — 50</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_abmeldung_durchfuehren` | die Abmeldung durchführen | authored | [link](https://www.dwds.de/wb/Abmeldung) |
 | `c_anmeldung_vornehmen` | die Anmeldung vornehmen | authored | [link](https://de.wiktionary.org/wiki/vornehmen) |
 | `c_antrag_stellen` | einen Antrag stellen | authored | [link](https://de.wiktionary.org/wiki/stellen) |
+| `c_asylantrag_stellen` | einen Asylantrag stellen | authored | [link](https://de.wiktionary.org/wiki/stellen) |
 | `c_aufenthaltsgenehmigung_beantragen` | eine Aufenthaltsgenehmigung beantragen | authored | [link](https://www.dwds.de/wb/Aufenthaltsgenehmigung) |
+| `c_aufenthaltskarte_beantragen` | eine Aufenthaltskarte beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
+| `c_aufenthaltsstatus_klaeren` | den Aufenthaltsstatus klären | authored | [link](https://de.wiktionary.org/wiki/kl%C3%A4ren) |
 | `c_aufenthaltstitel_verlaengern` | den Aufenthaltstitel verlängern | authored | [link](https://de.wiktionary.org/wiki/verlängern) |
 | `c_ausweis_verlaengern` | den Ausweis verlängern | authored | [link](https://www.dwds.de/wb/Ausweis) |
+| `c_bauantrag_stellen` | einen Bauantrag stellen | authored | [link](https://www.dwds.de/r?q=einen%20Bauantrag%20stellen) |
+| `c_bauplan_einreichen` | den Bauplan einreichen | authored | [link](https://www.dwds.de/r?q=den%20Bauplan%20einreichen) |
 | `c_bearbeitungszeit_abwarten` | die Bearbeitungszeit abwarten | authored | [link](https://www.dwds.de/wb/Bearbeitungszeit) |
 | `c_behoerde_frist_einhalten` | die Frist einhalten | authored | [link](https://de.wiktionary.org/wiki/einhalten) |
 | `c_behoerdentermin_absagen` | einen Termin absagen | authored | [link](https://de.wiktionary.org/wiki/absagen) |
 | `c_behoerdentermin_vereinbaren` | einen Termin vereinbaren | authored | [link](https://de.wiktionary.org/wiki/vereinbaren) |
 | `c_bescheid_erhalten` | einen Bescheid erhalten | authored | [link](https://de.wiktionary.org/wiki/erhalten) |
+| `c_bescheid_zustellen` | den Bescheid zustellen | authored | [link](https://de.wiktionary.org/wiki/zustellen) |
 | `c_bescheinigung_beantragen` | eine Bescheinigung beantragen | authored | [link](https://www.dwds.de/wb/Bescheinigung) |
 | `c_buergerservice_nutzen` | den Bürgerservice nutzen | authored | [link](https://www.dwds.de/wb/B%C3%BCrgerservice) |
 | `c_dokument_uebersetzen` | ein Dokument übersetzen | authored | [link](https://www.dwds.de/wb/Dokument) |
+| `c_einbuergerung_beantragen` | die Einbürgerung beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
 | `c_einspruch_erheben` | Einspruch erheben | authored | [link](https://www.dwds.de/wb/Einspruch) |
+| `c_fiktionsbescheinigung_verlaengern` | die Fiktionsbescheinigung verlängern | authored | [link](https://de.wiktionary.org/wiki/verl%C3%A4ngern) |
 | `c_formular_ausfuellen` | ein Formular ausfüllen | authored | [link](https://de.wiktionary.org/wiki/ausfüllen) |
+| `c_frist_wahren` | die Frist wahren | authored | [link](https://de.wiktionary.org/wiki/wahren) |
+| `c_fuehrerschein_verlaengern` | den Führerschein verlängern | authored | [link](https://www.dwds.de/r?q=den%20F%C3%BChrerschein%20verl%C3%A4ngern) |
 | `c_fuehrungszeugnis_beantragen` | ein Führungszeugnis beantragen | authored | [link](https://www.dwds.de/wb/F%C3%BChrungszeugnis) |
+| `c_gebuehr_bezahlen` | die Gebühr bezahlen | authored | [link](https://www.dwds.de/wb/Geb%C3%BChr) |
 | `c_gebuehr_zahlen` | eine Gebühr zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
 | `c_genehmigung_einholen` | eine Genehmigung einholen | authored | [link](https://www.dwds.de/wb/Genehmigung) |
+| `c_grundstueck_erschliessen` | ein Grundstück erschließen | authored | [link](https://www.dwds.de/r?q=ein%20Grundst%C3%BCck%20erschlie%C3%9Fen) |
 | `c_kindergeld_beantragen` | Kindergeld beantragen | authored | [link](https://www.dwds.de/wb/Kindergeld) |
 | `c_kopie_anfertigen` | eine Kopie anfertigen | authored | [link](https://www.dwds.de/wb/Kopie) |
 | `c_meldebestaetigung_abholen` | die Meldebestätigung abholen | authored | [link](https://www.dwds.de/wb/Meldebest%C3%A4tigung) |
@@ -226,12 +392,14 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_urkunde_beglaubigen` | eine Urkunde beglaubigen | authored | [link](https://www.dwds.de/wb/Urkunde) |
 | `c_vollmacht_erteilen` | eine Vollmacht erteilen | authored | [link](https://www.dwds.de/wb/Vollmacht) |
 | `c_wartenummer_ziehen` | eine Wartenummer ziehen | authored | [link](https://www.dwds.de/wb/Wartenummer) |
+| `c_widerspruch_begruenden` | den Widerspruch begründen | authored | [link](https://de.wiktionary.org/wiki/begr%C3%BCnden) |
 | `c_widerspruch_einlegen` | Widerspruch einlegen | authored | [link](https://de.wiktionary.org/wiki/einlegen) |
+| `c_wohnsitz_anmelden` | den Wohnsitz anmelden | authored | [link](https://www.dwds.de/wb/Wohnsitz) |
 | `c_zustaendigkeit_klaeren` | die Zuständigkeit klären | authored | [link](https://www.dwds.de/wb/Zust%C3%A4ndigkeit) |
 
 </details>
 
-<details><summary>bildung — 36</summary>
+<details><summary>bildung — 50</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -245,11 +413,16 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_bewerbung_abschicken` | die Bewerbung abschicken | authored | [link](https://de.wiktionary.org/wiki/abschicken) |
 | `c_bewerbung_schreiben` | eine Bewerbung schreiben | authored | [link](https://de.wiktionary.org/wiki/schreiben) |
 | `c_bildung_unterlagen_einreichen` | die Unterlagen einreichen | authored | [link](https://de.wiktionary.org/wiki/einreichen) |
+| `c_bildungsgutschein_beantragen` | einen Bildungsgutschein beantragen | authored | [link](https://www.dwds.de/wb/Bildungsgutschein) |
+| `c_bildungsurlaub_beantragen` | Bildungsurlaub beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
 | `c_deutsch_lernen` | Deutsch lernen | authored | [link](https://de.wiktionary.org/wiki/lernen) |
 | `c_einstufungstest_machen` | einen Einstufungstest machen | authored | [link](https://de.wiktionary.org/wiki/machen) |
 | `c_ergebnis_erhalten` | das Ergebnis erhalten | authored | [link](https://de.wiktionary.org/wiki/erhalten) |
 | `c_foerderung_beantragen` | eine Förderung beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
 | `c_fortbildung_besuchen` | eine Fortbildung besuchen | authored | [link](https://de.wiktionary.org/wiki/besuchen) |
+| `c_gleichwertigkeit_feststellen` | die Gleichwertigkeit feststellen | authored | [link](https://de.wiktionary.org/wiki/feststellen) |
+| `c_grammatik_ueben` | die Grammatik üben | authored | [link](https://de.wiktionary.org/wiki/%C3%BCben) |
+| `c_hoerverstehen_trainieren` | das Hörverstehen trainieren | authored | [link](https://de.wiktionary.org/wiki/trainieren) |
 | `c_integrationskurs_absolvieren` | einen Integrationskurs absolvieren | authored | [link](https://de.wiktionary.org/wiki/absolvieren) |
 | `c_kenntnisse_erweitern` | die Kenntnisse erweitern | authored | [link](https://de.wiktionary.org/wiki/erweitern) |
 | `c_kopie_beglaubigen` | eine Kopie beglaubigen lassen | authored | [link](https://de.wiktionary.org/wiki/beglaubigen) |
@@ -257,6 +430,8 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_kurs_buchen` | einen Kurs buchen | authored | [link](https://de.wiktionary.org/wiki/buchen) |
 | `c_kursgebuehr_zahlen` | die Kursgebühr zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
 | `c_lebenslauf_schreiben` | einen Lebenslauf schreiben | authored | [link](https://de.wiktionary.org/wiki/schreiben) |
+| `c_mitarbeiter_anlernen` | Mitarbeiter anlernen | authored | [link](https://www.dwds.de/r?q=Mitarbeiter%20anlernen) |
+| `c_nachhilfe_nehmen` | Nachhilfe nehmen | authored | [link](https://de.wiktionary.org/wiki/nehmen) |
 | `c_note_bekommen` | eine Note bekommen | authored | [link](https://de.wiktionary.org/wiki/bekommen) |
 | `c_pruefung_ablegen` | eine Prüfung ablegen | authored | [link](https://de.wiktionary.org/wiki/ablegen) |
 | `c_pruefung_anmelden` | sich zur Prüfung anmelden | authored | [link](https://de.wiktionary.org/wiki/anmelden) |
@@ -264,38 +439,30 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_pruefung_wiederholen` | die Prüfung wiederholen | authored | [link](https://de.wiktionary.org/wiki/wiederholen) |
 | `c_pruefungsgebuehr_zahlen` | die Prüfungsgebühr zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
 | `c_qualifikation_nachweisen` | die Qualifikation nachweisen | authored | [link](https://de.wiktionary.org/wiki/nachweisen) |
+| `c_seminar_teilnehmen` | an einem Seminar teilnehmen | authored | [link](https://de.wiktionary.org/wiki/teilnehmen) |
+| `c_sich_weiterentwickeln` | sich beruflich weiterentwickeln | authored | [link](https://de.wiktionary.org/wiki/weiterentwickeln) |
 | `c_sprachkurs_besuchen` | einen Sprachkurs besuchen | authored | [link](https://de.wiktionary.org/wiki/besuchen) |
+| `c_sprachnachweis_erbringen` | einen Sprachnachweis erbringen | authored | [link](https://de.wiktionary.org/wiki/erbringen) |
 | `c_sprachniveau_erreichen` | das Sprachniveau erreichen | authored | [link](https://de.wiktionary.org/wiki/erreichen) |
 | `c_studium_abschliessen` | das Studium abschließen | authored | [link](https://de.wiktionary.org/wiki/abschließen) |
 | `c_umschulung_beginnen` | eine Umschulung beginnen | authored | [link](https://de.wiktionary.org/wiki/beginnen) |
+| `c_urkunde_vorlegen` | die Urkunde vorlegen | authored | [link](https://de.wiktionary.org/wiki/vorlegen) |
 | `c_weiterbildung_machen` | eine Weiterbildung machen | authored | [link](https://de.wiktionary.org/wiki/machen) |
+| `c_wortschatz_erweitern` | den Wortschatz erweitern | authored | [link](https://www.dwds.de/wb/Wortschatz) |
 | `c_zertifikat_erwerben` | ein Zertifikat erwerben | authored | [link](https://de.wiktionary.org/wiki/erwerben) |
 | `c_zeugnis_uebersetzen` | das Zeugnis übersetzen lassen | authored | [link](https://de.wiktionary.org/wiki/übersetzen) |
+| `c_zeugnisbewertung_beantragen` | eine Zeugnisbewertung beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
+| `c_zulassung_erhalten` | die Zulassung erhalten | authored | [link](https://de.wiktionary.org/wiki/erhalten) |
 
 </details>
 
-<details><summary>care — 9</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `c_angehoerige_informieren` | die Angehörigen informieren | authored | [link](https://www.dwds.de/r?q=die%20Angeh%C3%B6rigen%20informieren) |
-| `c_blutdruck_messen` | den Blutdruck messen | authored | [link](https://www.dwds.de/r?q=den%20Blutdruck%20messen) |
-| `c_dienstplan_abstimmen` | den Dienstplan abstimmen | authored | [link](https://www.dwds.de/r?q=den%20Dienstplan%20abstimmen) |
-| `c_infusion_anlegen` | eine Infusion anlegen | authored | [link](https://www.dwds.de/r?q=eine%20Infusion%20anlegen) |
-| `c_medikamente_verabreichen` | Medikamente verabreichen | authored | [link](https://www.dwds.de/r?q=Medikamente%20verabreichen) |
-| `c_patienten_mobilisieren` | den Patienten mobilisieren | authored | [link](https://www.dwds.de/r?q=den%20Patienten%20mobilisieren) |
-| `c_pflege_dokumentieren` | die Pflege dokumentieren | authored | [link](https://www.dwds.de/r?q=die%20Pflege%20dokumentieren) |
-| `c_schweigepflicht_wahren` | die Schweigepflicht wahren | authored | [link](https://www.dwds.de/r?q=die%20Schweigepflicht%20wahren) |
-| `c_verband_wechseln` | den Verband wechseln | authored | [link](https://www.dwds.de/r?q=den%20Verband%20wechseln) |
-
-</details>
-
-<details><summary>conflict — 36</summary>
+<details><summary>conflict — 39</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_aussprache_suchen` | eine Aussprache suchen | authored | [link](https://www.dwds.de/wb/Aussprache) |
 | `c_bereitschaft_signalisieren` | Bereitschaft signalisieren | authored | [link](https://www.dwds.de/wb/Bereitschaft) |
+| `c_betriebsrat_einschalten` | den Betriebsrat einschalten | authored | [link](https://www.dwds.de/r?q=den%20Betriebsrat%20einschalten) |
 | `c_entschuldigung_annehmen` | eine Entschuldigung annehmen | authored | [link](https://www.dwds.de/wb/Entschuldigung) |
 | `c_eskalation_vermeiden` | eine Eskalation vermeiden | authored | [link](https://www.dwds.de/wb/Eskalation) |
 | `c_feedback_annehmen` | Feedback annehmen | authored | [link](https://www.dwds.de/wb/Feedback) |
@@ -319,6 +486,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_respekt_zeigen` | Respekt zeigen | authored | [link](https://www.dwds.de/wb/Respekt) |
 | `c_sachlich_bleiben` | sachlich bleiben | authored | [link](https://www.dwds.de/wb/sachlich) |
 | `c_schuld_zuweisen` | die Schuld zuweisen | authored | [link](https://www.dwds.de/wb/Schuld) |
+| `c_situation_deeskalieren` | die Situation deeskalieren | authored | [link](https://www.dwds.de/wb/Situation) |
 | `c_spannung_abbauen` | die Spannung abbauen | authored | [link](https://www.dwds.de/wb/Spannung) |
 | `c_standpunkt_vertreten` | einen Standpunkt vertreten | authored | [link](https://www.dwds.de/wb/Standpunkt) |
 | `c_streit_beilegen` | den Streit beilegen | authored | [link](https://www.dwds.de/wb/Streit) |
@@ -329,177 +497,325 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_verständnis_zeigen` | Verständnis zeigen | authored | [link](https://www.dwds.de/wb/Verst%C3%A4ndnis) |
 | `c_vertrauensbasis_schaffen` | eine Vertrauensbasis schaffen | authored | [link](https://www.dwds.de/wb/Vertrauensbasis) |
 | `c_vorfall_melden` | einen Vorfall melden | authored | [link](https://www.dwds.de/wb/Vorfall) |
+| `c_vorwuerfe_zurueckweisen` | Vorwürfe zurückweisen | authored | [link](https://www.dwds.de/wb/zur%C3%BCckweisen) |
 | `c_vorwurf_entkraeften` | einen Vorwurf entkräften | authored | [link](https://www.dwds.de/wb/Vorwurf) |
 
 </details>
 
-<details><summary>construction — 26</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `c_anwohner_informieren` | die Anwohner informieren | authored | [link](https://www.dwds.de/r?q=die%20Anwohner%20informieren) |
-| `c_aufmass_nehmen` | das Aufmaß nehmen | authored | [link](https://www.dwds.de/r?q=das%20Aufma%C3%9F%20nehmen) |
-| `c_auftrag_kalkulieren` | einen Auftrag kalkulieren | authored | [link](https://www.dwds.de/r?q=einen%20Auftrag%20kalkulieren) |
-| `c_ausschreibung_gewinnen` | eine Ausschreibung gewinnen | authored | [link](https://www.dwds.de/r?q=eine%20Ausschreibung%20gewinnen) |
-| `c_bauabnahme_durchfuehren` | die Bauabnahme durchführen | authored | [link](https://www.dwds.de/r?q=die%20Bauabnahme%20durchf%C3%BChren) |
-| `c_bauantrag_stellen` | einen Bauantrag stellen | authored | [link](https://www.dwds.de/r?q=einen%20Bauantrag%20stellen) |
-| `c_baugrube_ausheben` | die Baugrube ausheben | authored | [link](https://www.dwds.de/r?q=die%20Baugrube%20ausheben) |
-| `c_bauplan_einreichen` | den Bauplan einreichen | authored | [link](https://www.dwds.de/r?q=den%20Bauplan%20einreichen) |
-| `c_baustelle_absichern` | die Baustelle absichern | authored | [link](https://www.dwds.de/r?q=die%20Baustelle%20absichern) |
-| `c_baustelle_einrichten` | die Baustelle einrichten | authored | [link](https://www.dwds.de/r?q=die%20Baustelle%20einrichten) |
-| `c_bauzeit_verkuerzen` | die Bauzeit verkürzen | authored | [link](https://www.dwds.de/r?q=die%20Bauzeit%20verk%C3%BCrzen) |
-| `c_bewehrung_verlegen` | die Bewehrung verlegen | authored | [link](https://www.dwds.de/r?q=die%20Bewehrung%20verlegen) |
-| `c_dach_decken` | das Dach decken | authored | [link](https://www.dwds.de/r?q=das%20Dach%20decken) |
-| `c_estrich_verlegen` | den Estrich verlegen | authored | [link](https://www.dwds.de/r?q=den%20Estrich%20verlegen) |
-| `c_fassade_daemmen` | die Fassade dämmen | authored | [link](https://www.dwds.de/r?q=die%20Fassade%20d%C3%A4mmen) |
-| `c_fundament_giessen` | das Fundament gießen | authored | [link](https://www.dwds.de/r?q=das%20Fundament%20gie%C3%9Fen) |
-| `c_gebaeude_errichten` | ein Gebäude errichten | authored | [link](https://www.dwds.de/r?q=ein%20Geb%C3%A4ude%20errichten) |
-| `c_geruest_abbauen` | das Gerüst abbauen | authored | [link](https://www.dwds.de/r?q=das%20Ger%C3%BCst%20abbauen) |
-| `c_geruest_aufbauen` | ein Gerüst aufbauen | authored | [link](https://www.dwds.de/r?q=ein%20Ger%C3%BCst%20aufbauen) |
-| `c_gewerk_vergeben` | ein Gewerk vergeben | authored | [link](https://www.dwds.de/r?q=ein%20Gewerk%20vergeben) |
-| `c_grundriss_aendern` | den Grundriss ändern | authored | [link](https://www.dwds.de/r?q=den%20Grundriss%20%C3%A4ndern) |
-| `c_grundstueck_erschliessen` | ein Grundstück erschließen | authored | [link](https://www.dwds.de/r?q=ein%20Grundst%C3%BCck%20erschlie%C3%9Fen) |
-| `c_maengel_beseitigen` | Mängel beseitigen | authored | [link](https://www.dwds.de/r?q=M%C3%A4ngel%20beseitigen) |
-| `c_maengelliste_erstellen` | eine Mängelliste erstellen | authored | [link](https://www.dwds.de/r?q=eine%20M%C3%A4ngelliste%20erstellen) |
-| `c_rohbau_fertigstellen` | den Rohbau fertigstellen | authored | [link](https://www.dwds.de/r?q=den%20Rohbau%20fertigstellen) |
-| `c_wand_hochziehen` | eine Wand hochziehen | authored | [link](https://www.dwds.de/r?q=eine%20Wand%20hochziehen) |
-
-</details>
-
-<details><summary>customer — 36</summary>
+<details><summary>customer — 98</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_anfrage_beantworten` | eine Anfrage beantworten | authored | [link](https://www.dwds.de/wb/Anfrage) |
 | `c_angebot_unterbreiten` | ein Angebot unterbreiten | authored | [link](https://www.dwds.de/wb/Angebot) |
+| `c_angehoerige_informieren` | die Angehörigen informieren | authored | [link](https://www.dwds.de/r?q=die%20Angeh%C3%B6rigen%20informieren) |
+| `c_anwohner_informieren` | die Anwohner informieren | authored | [link](https://www.dwds.de/r?q=die%20Anwohner%20informieren) |
+| `c_auftrag_ausfuehren` | einen Auftrag ausführen | authored | [link](https://www.dwds.de/r?q=einen%20Auftrag%20ausf%C3%BChren) |
+| `c_auftrag_kalkulieren` | einen Auftrag kalkulieren | authored | [link](https://www.dwds.de/r?q=einen%20Auftrag%20kalkulieren) |
+| `c_augenbrauen_zupfen` | die Augenbrauen zupfen | authored | [link](https://www.dwds.de/wb/Augenbrauen) |
 | `c_bedarf_ermitteln` | den Bedarf ermitteln | authored | [link](https://www.dwds.de/wb/Bedarf) |
 | `c_beschwerde_bearbeiten` | eine Beschwerde bearbeiten | authored | [link](https://www.dwds.de/wb/Beschwerde) |
 | `c_beschwerde_bearbeiten_2` | eine Beschwerde bearbeiten | authored | [link](https://www.dwds.de/wb/Beschwerde) |
+| `c_bestellung_aufnehmen` | die Bestellung aufnehmen | authored | [link](https://www.dwds.de/r?q=die%20Bestellung%20aufnehmen) |
 | `c_bestellung_stornieren` | eine Bestellung stornieren | authored | [link](https://www.dwds.de/wb/Bestellung) |
+| `c_besucher_anmelden` | Besucher anmelden | authored | [link](https://www.dwds.de/wb/Besucher) |
 | `c_beziehung_pflegen` | die Beziehung pflegen | authored | [link](https://www.dwds.de/wb/Beziehung) |
+| `c_boden_wischen` | den Boden wischen | authored | [link](https://www.dwds.de/wb/Boden) |
+| `c_creme_auftragen` | die Creme auftragen | authored | [link](https://www.dwds.de/wb/Creme) |
 | `c_empfehlung_aussprechen` | eine Empfehlung aussprechen | authored | [link](https://www.dwds.de/wb/Empfehlung) |
 | `c_entgegenkommen_zeigen` | Entgegenkommen zeigen | authored | [link](https://www.dwds.de/wb/Entgegenkommen) |
 | `c_erwartungen_erfuellen` | Erwartungen erfüllen | authored | [link](https://www.dwds.de/wb/Erwartungen) |
+| `c_essen_servieren` | das Essen servieren | authored | [link](https://www.dwds.de/wb/Essen) |
 | `c_feedback_einholen` | Feedback einholen | authored | [link](https://www.dwds.de/wb/Feedback) |
+| `c_gaeste_bewirten` | Gäste bewirten | authored | [link](https://www.dwds.de/r?q=G%C3%A4ste%20bewirten) |
 | `c_garantie_gewaehren` | eine Garantie gewähren | authored | [link](https://www.dwds.de/wb/Garantie) |
+| `c_gast_bedienen` | einen Gast bedienen | authored | [link](https://www.dwds.de/wb/Gast) |
+| `c_gericht_empfehlen` | ein Gericht empfehlen | authored | [link](https://www.dwds.de/r?q=ein%20Gericht%20empfehlen) |
+| `c_gesichtsbehandlung_buchen` | eine Gesichtsbehandlung buchen | authored | [link](https://www.dwds.de/r?q=eine%20Gesichtsbehandlung%20buchen) |
+| `c_getraenk_empfehlen` | ein Getränk empfehlen | authored | [link](https://www.dwds.de/wb/Getr%C3%A4nk) |
+| `c_gutschein_einloesen` | einen Gutschein einlösen | authored | [link](https://www.dwds.de/wb/Gutschein) |
+| `c_haare_faerben` | die Haare färben | authored | [link](https://www.dwds.de/r?q=die%20Haare%20f%C3%A4rben) |
+| `c_haare_foehnen` | die Haare föhnen | authored | [link](https://www.dwds.de/r?q=die%20Haare%20f%C3%B6hnen) |
+| `c_haare_schneiden` | die Haare schneiden | authored | [link](https://www.dwds.de/wb/Haare) |
+| `c_haare_toenen` | die Haare tönen | authored | [link](https://www.dwds.de/wb/Haare) |
+| `c_haare_waschen` | die Haare waschen | authored | [link](https://www.dwds.de/wb/Haare) |
+| `c_haut_pflegen` | die Haut pflegen | authored | [link](https://www.dwds.de/wb/Haut) |
+| `c_haut_reinigen` | die Haut reinigen | authored | [link](https://www.dwds.de/r?q=die%20Haut%20reinigen) |
+| `c_kasse_abrechnen` | die Kasse abrechnen | authored | [link](https://www.dwds.de/r?q=die%20Kasse%20abrechnen) |
+| `c_kassenbon_ausdrucken` | den Kassenbon ausdrucken | authored | [link](https://www.dwds.de/wb/Kassenbon) |
+| `c_kopfhaut_massieren` | die Kopfhaut massieren | authored | [link](https://www.dwds.de/r?q=die%20Kopfhaut%20massieren) |
+| `c_kostenvoranschlag_erstellen` | einen Kostenvoranschlag erstellen | authored | [link](https://www.dwds.de/r?q=einen%20Kostenvoranschlag%20erstellen) |
 | `c_kulanz_zeigen` | Kulanz zeigen | authored | [link](https://www.dwds.de/wb/Kulanz) |
 | `c_kunden_beraten` | einen Kunden beraten | authored | [link](https://www.dwds.de/wb/Kunden) |
 | `c_kundenanfrage_weiterleiten` | eine Kundenanfrage weiterleiten | authored | [link](https://www.dwds.de/wb/Kundenanfrage) |
 | `c_kundendaten_aktualisieren` | die Kundendaten aktualisieren | authored | [link](https://www.dwds.de/wb/Kundendaten) |
 | `c_kundentermin_vorbereiten` | einen Kundentermin vorbereiten | authored | [link](https://www.dwds.de/wb/Kundentermin) |
 | `c_kundenzufriedenheit_messen` | die Kundenzufriedenheit messen | authored | [link](https://www.dwds.de/wb/Kundenzufriedenheit) |
+| `c_kundschaft_beraten` | die Kundschaft beraten | authored | [link](https://www.dwds.de/r?q=die%20Kundschaft%20beraten) |
+| `c_kurs_besuchen` | einen Kurs besuchen | authored | [link](https://www.dwds.de/wb/Kurs) |
+| `c_ladezeit_optimieren` | die Ladezeit optimieren | authored | [link](https://www.dwds.de/r?q=die%20Ladezeit%20optimieren) |
 | `c_lieferzeit_verkuerzen` | die Lieferzeit verkürzen | authored | [link](https://www.dwds.de/wb/Lieferzeit) |
 | `c_lösung_anbieten` | eine Lösung anbieten | authored | [link](https://www.dwds.de/wb/L%C3%B6sung) |
+| `c_mass_nehmen` | Maß nehmen | authored | [link](https://www.dwds.de/r?q=Ma%C3%9F%20nehmen) |
+| `c_mitgliedschaft_abschliessen` | eine Mitgliedschaft abschließen | authored | [link](https://www.dwds.de/wb/Mitgliedschaft) |
 | `c_nachfrage_bedienen` | die Nachfrage bedienen | authored | [link](https://www.dwds.de/wb/Nachfrage) |
+| `c_naegel_feilen` | die Nägel feilen | authored | [link](https://www.dwds.de/wb/N%C3%A4gel) |
+| `c_naegel_lackieren` | die Nägel lackieren | authored | [link](https://www.dwds.de/wb/N%C3%A4gel) |
+| `c_nagellack_auftragen` | Nagellack auftragen | authored | [link](https://www.dwds.de/r?q=Nagellack%20auftragen) |
 | `c_newsletter_versenden` | einen Newsletter versenden | authored | [link](https://www.dwds.de/wb/Newsletter) |
+| `c_objekt_betreuen` | ein Objekt betreuen | authored | [link](https://www.dwds.de/wb/Objekt) |
+| `c_peeling_durchfuehren` | ein Peeling durchführen | authored | [link](https://www.dwds.de/r?q=ein%20Peeling%20durchf%C3%BChren) |
 | `c_preisliste_erstellen` | eine Preisliste erstellen | authored | [link](https://www.dwds.de/wb/Preisliste) |
+| `c_probestunde_vereinbaren` | eine Probestunde vereinbaren | authored | [link](https://www.dwds.de/r?q=eine%20Probestunde%20vereinbaren) |
 | `c_rabatt_anbieten` | einen Rabatt anbieten | authored | [link](https://www.dwds.de/wb/Rabatt) |
+| `c_rechnung_bringen` | die Rechnung bringen | authored | [link](https://www.dwds.de/wb/Rechnung) |
 | `c_reklamation_bearbeiten` | eine Reklamation bearbeiten | authored | [link](https://www.dwds.de/wb/Reklamation) |
+| `c_reservierung_bestaetigen` | eine Reservierung bestätigen | authored | [link](https://www.dwds.de/r?q=eine%20Reservierung%20best%C3%A4tigen) |
+| `c_retoure_abwickeln` | eine Retoure abwickeln | authored | [link](https://www.dwds.de/r?q=eine%20Retoure%20abwickeln) |
 | `c_rücksicht_nehmen` | auf jemanden Rücksicht nehmen | authored | [link](https://www.dwds.de/wb/R%C3%BCcksicht) |
 | `c_rueckerstattung_veranlassen` | eine Rückerstattung veranlassen | authored | [link](https://www.dwds.de/wb/R%C3%BCckerstattung) |
 | `c_rueckruf_durchfuehren` | einen Rückruf durchführen | authored | [link](https://www.dwds.de/wb/R%C3%BCckruf) |
+| `c_schaden_begutachten` | den Schaden begutachten | authored | [link](https://www.dwds.de/r?q=den%20Schaden%20begutachten) |
+| `c_schaufenster_gestalten` | das Schaufenster gestalten | authored | [link](https://www.dwds.de/r?q=das%20Schaufenster%20gestalten) |
 | `c_service_verbessern` | den Service verbessern | authored | [link](https://www.dwds.de/wb/Service) |
+| `c_sonderangebot_bewerben` | ein Sonderangebot bewerben | authored | [link](https://www.dwds.de/r?q=ein%20Sonderangebot%20bewerben) |
+| `c_sortiment_erweitern` | das Sortiment erweitern | authored | [link](https://www.dwds.de/r?q=das%20Sortiment%20erweitern) |
+| `c_speisekarte_bringen` | die Speisekarte bringen | authored | [link](https://www.dwds.de/wb/Speisekarte) |
+| `c_speisekarte_wechseln` | die Speisekarte wechseln | authored | [link](https://www.dwds.de/r?q=die%20Speisekarte%20wechseln) |
+| `c_spitzen_nachschneiden` | die Spitzen nachschneiden | authored | [link](https://www.dwds.de/r?q=die%20Spitzen%20nachschneiden) |
+| `c_support_kontaktieren` | den Support kontaktieren | authored | [link](https://www.dwds.de/r?q=den%20Support%20kontaktieren) |
+| `c_tagesgericht_anbieten` | ein Tagesgericht anbieten | authored | [link](https://www.dwds.de/r?q=ein%20Tagesgericht%20anbieten) |
+| `c_teppich_reinigen` | den Teppich reinigen | authored | [link](https://www.dwds.de/wb/Teppich) |
+| `c_ticket_eroeffnen` | ein Ticket eröffnen | authored | [link](https://www.dwds.de/r?q=ein%20Ticket%20er%C3%B6ffnen) |
+| `c_tisch_abraeumen` | den Tisch abräumen | authored | [link](https://www.dwds.de/wb/Tisch) |
+| `c_tisch_eindecken` | den Tisch eindecken | authored | [link](https://www.dwds.de/r?q=den%20Tisch%20eindecken) |
+| `c_tisch_reservieren` | einen Tisch reservieren | authored | [link](https://www.dwds.de/wb/Tisch) |
 | `c_treueprogramm_einfuehren` | ein Treueprogramm einführen | authored | [link](https://www.dwds.de/wb/Treueprogramm) |
+| `c_trinkgeld_geben` | Trinkgeld geben | authored | [link](https://www.dwds.de/wb/Trinkgeld) |
 | `c_umtausch_anbieten` | einen Umtausch anbieten | authored | [link](https://www.dwds.de/wb/Umtausch) |
+| `c_umtausch_pruefen` | den Umtausch prüfen | authored | [link](https://www.dwds.de/wb/Umtausch) |
+| `c_verschmutzung_beseitigen` | eine Verschmutzung beseitigen | authored | [link](https://www.dwds.de/wb/Verschmutzung) |
 | `c_vertrag_abschliessen` | einen Vertrag abschließen | authored | [link](https://www.dwds.de/wb/Vertrag) |
 | `c_vertrauen_aufbauen` | Vertrauen aufbauen | authored | [link](https://www.dwds.de/wb/Vertrauen) |
 | `c_vertrauen_gewinnen` | Vertrauen gewinnen | authored | [link](https://www.dwds.de/wb/Vertrauen) |
+| `c_ware_scannen` | die Ware scannen | authored | [link](https://www.dwds.de/wb/Ware) |
+| `c_ware_umtauschen` | die Ware umtauschen | authored | [link](https://www.dwds.de/wb/Ware) |
 | `c_werbung_schalten` | Werbung schalten | authored | [link](https://www.dwds.de/wb/Werbung) |
+| `c_wimpern_faerben` | die Wimpern färben | authored | [link](https://www.dwds.de/r?q=die%20Wimpern%20f%C3%A4rben) |
 | `c_zufriedenheit_sicherstellen` | die Zufriedenheit sicherstellen | authored | [link](https://www.dwds.de/wb/Zufriedenheit) |
-
-</details>
-
-<details><summary>engineering — 26</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `c_abweichung_feststellen` | eine Abweichung feststellen | authored | [link](https://www.dwds.de/r?q=eine%20Abweichung%20feststellen) |
-| `c_anlage_in_betrieb_nehmen` | eine Anlage in Betrieb nehmen | authored | [link](https://www.dwds.de/r?q=eine%20Anlage%20in%20Betrieb%20nehmen) |
-| `c_anlage_stilllegen` | eine Anlage stilllegen | authored | [link](https://www.dwds.de/r?q=eine%20Anlage%20stilllegen) |
-| `c_bauteil_auslegen` | ein Bauteil auslegen | authored | [link](https://www.dwds.de/r?q=ein%20Bauteil%20auslegen) |
-| `c_bauteil_fertigen` | ein Bauteil fertigen | authored | [link](https://www.dwds.de/r?q=ein%20Bauteil%20fertigen) |
-| `c_belastung_berechnen` | die Belastung berechnen | authored | [link](https://www.dwds.de/r?q=die%20Belastung%20berechnen) |
-| `c_datenblatt_anfordern` | das Datenblatt anfordern | authored | [link](https://www.dwds.de/r?q=das%20Datenblatt%20anfordern) |
-| `c_druck_regeln` | den Druck regeln | authored | [link](https://www.dwds.de/r?q=den%20Druck%20regeln) |
-| `c_ergebnisse_auswerten` | die Ergebnisse auswerten | authored | [link](https://www.dwds.de/r?q=die%20Ergebnisse%20auswerten) |
-| `c_fehler_eingrenzen` | einen Fehler eingrenzen | authored | [link](https://www.dwds.de/r?q=einen%20Fehler%20eingrenzen) |
-| `c_festigkeit_pruefen` | die Festigkeit prüfen | authored | [link](https://www.dwds.de/r?q=die%20Festigkeit%20pr%C3%BCfen) |
-| `c_getriebe_austauschen` | das Getriebe austauschen | authored | [link](https://www.dwds.de/r?q=das%20Getriebe%20austauschen) |
-| `c_konstruktion_freigeben` | die Konstruktion freigeben | authored | [link](https://www.dwds.de/r?q=die%20Konstruktion%20freigeben) |
-| `c_lebensdauer_verlaengern` | die Lebensdauer verlängern | authored | [link](https://www.dwds.de/r?q=die%20Lebensdauer%20verl%C3%A4ngern) |
-| `c_messgeraet_kalibrieren` | ein Messgerät kalibrieren | authored | [link](https://www.dwds.de/r?q=ein%20Messger%C3%A4t%20kalibrieren) |
-| `c_motor_ueberholen` | den Motor überholen | authored | [link](https://www.dwds.de/r?q=den%20Motor%20%C3%BCberholen) |
-| `c_norm_erfuellen` | eine Norm erfüllen | authored | [link](https://www.dwds.de/r?q=eine%20Norm%20erf%C3%BCllen) |
-| `c_probe_entnehmen` | eine Probe entnehmen | authored | [link](https://www.dwds.de/r?q=eine%20Probe%20entnehmen) |
-| `c_schweissnaht_pruefen` | eine Schweißnaht prüfen | authored | [link](https://www.dwds.de/r?q=eine%20Schwei%C3%9Fnaht%20pr%C3%BCfen) |
-| `c_simulation_durchfuehren` | eine Simulation durchführen | authored | [link](https://www.dwds.de/r?q=eine%20Simulation%20durchf%C3%BChren) |
-| `c_toleranzen_einhalten` | die Toleranzen einhalten | authored | [link](https://www.dwds.de/r?q=die%20Toleranzen%20einhalten) |
-| `c_verfahren_anwenden` | ein Verfahren anwenden | authored | [link](https://www.dwds.de/r?q=ein%20Verfahren%20anwenden) |
-| `c_verschleiss_reduzieren` | den Verschleiß reduzieren | authored | [link](https://www.dwds.de/r?q=den%20Verschlei%C3%9F%20reduzieren) |
-| `c_werkstoff_auswaehlen` | einen Werkstoff auswählen | authored | [link](https://www.dwds.de/r?q=einen%20Werkstoff%20ausw%C3%A4hlen) |
-| `c_wirkungsgrad_verbessern` | den Wirkungsgrad verbessern | authored | [link](https://www.dwds.de/r?q=den%20Wirkungsgrad%20verbessern) |
-| `c_zeichnung_anfertigen` | eine Zeichnung anfertigen | authored | [link](https://www.dwds.de/r?q=eine%20Zeichnung%20anfertigen) |
-
-</details>
-
-<details><summary>hospitality — 9</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `c_bestellung_aufnehmen` | die Bestellung aufnehmen | authored | [link](https://www.dwds.de/r?q=die%20Bestellung%20aufnehmen) |
-| `c_buffet_aufbauen` | das Buffet aufbauen | authored | [link](https://www.dwds.de/r?q=das%20Buffet%20aufbauen) |
-| `c_gaeste_bewirten` | Gäste bewirten | authored | [link](https://www.dwds.de/r?q=G%C3%A4ste%20bewirten) |
-| `c_gericht_empfehlen` | ein Gericht empfehlen | authored | [link](https://www.dwds.de/r?q=ein%20Gericht%20empfehlen) |
-| `c_reservierung_bestaetigen` | eine Reservierung bestätigen | authored | [link](https://www.dwds.de/r?q=eine%20Reservierung%20best%C3%A4tigen) |
-| `c_speisekarte_wechseln` | die Speisekarte wechseln | authored | [link](https://www.dwds.de/r?q=die%20Speisekarte%20wechseln) |
-| `c_tagesgericht_anbieten` | ein Tagesgericht anbieten | authored | [link](https://www.dwds.de/r?q=ein%20Tagesgericht%20anbieten) |
-| `c_tisch_eindecken` | den Tisch eindecken | authored | [link](https://www.dwds.de/r?q=den%20Tisch%20eindecken) |
 | `c_zutaten_verarbeiten` | Zutaten verarbeiten | authored | [link](https://www.dwds.de/r?q=Zutaten%20verarbeiten) |
 
 </details>
 
-<details><summary>it — 24</summary>
+<details><summary>digitales — 40</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `c_anforderungen_abstimmen` | die Anforderungen abstimmen | authored | [link](https://www.dwds.de/r?q=die%20Anforderungen%20abstimmen) |
-| `c_anforderungen_dokumentieren` | die Anforderungen dokumentieren | authored | [link](https://www.dwds.de/r?q=die%20Anforderungen%20dokumentieren) |
-| `c_anwendung_entwickeln` | eine Anwendung entwickeln | authored | [link](https://www.dwds.de/r?q=eine%20Anwendung%20entwickeln) |
-| `c_backup_erstellen` | ein Backup erstellen | authored | [link](https://www.dwds.de/wb/Backup) |
-| `c_benutzerkonto_anlegen` | ein Benutzerkonto anlegen | authored | [link](https://www.dwds.de/r?q=ein%20Benutzerkonto%20anlegen) |
-| `c_berechtigungen_vergeben` | Berechtigungen vergeben | authored | [link](https://www.dwds.de/r?q=Berechtigungen%20vergeben) |
-| `c_code_testen` | den Code testen | authored | [link](https://www.dwds.de/r?q=den%20Code%20testen) |
-| `c_daten_migrieren` | Daten migrieren | authored | [link](https://www.dwds.de/r?q=Daten%20migrieren) |
-| `c_daten_verschluesseln` | Daten verschlüsseln | authored | [link](https://www.dwds.de/r?q=Daten%20verschl%C3%BCsseln) |
-| `c_datenbank_abfragen` | eine Datenbank abfragen | authored | [link](https://www.dwds.de/r?q=eine%20Datenbank%20abfragen) |
-| `c_dokumentation_pflegen` | die Dokumentation pflegen | authored | [link](https://www.dwds.de/r?q=die%20Dokumentation%20pflegen) |
-| `c_fehler_reproduzieren` | einen Fehler reproduzieren | authored | [link](https://www.dwds.de/r?q=einen%20Fehler%20reproduzieren) |
-| `c_ladezeit_optimieren` | die Ladezeit optimieren | authored | [link](https://www.dwds.de/r?q=die%20Ladezeit%20optimieren) |
-| `c_quellcode_ueberarbeiten` | den Quellcode überarbeiten | authored | [link](https://www.dwds.de/r?q=den%20Quellcode%20%C3%BCberarbeiten) |
-| `c_schnittstelle_definieren` | eine Schnittstelle definieren | authored | [link](https://www.dwds.de/r?q=eine%20Schnittstelle%20definieren) |
-| `c_server_konfigurieren` | einen Server konfigurieren | authored | [link](https://www.dwds.de/r?q=einen%20Server%20konfigurieren) |
-| `c_server_neu_starten` | den Server neu starten | authored | [link](https://www.dwds.de/r?q=den%20Server%20neu%20starten) |
-| `c_sicherheitsluecke_schliessen` | eine Sicherheitslücke schließen | authored | [link](https://www.dwds.de/wb/Sicherheitsl%C3%BCcke) |
-| `c_support_kontaktieren` | den Support kontaktieren | authored | [link](https://www.dwds.de/r?q=den%20Support%20kontaktieren) |
-| `c_system_ueberwachen` | das System überwachen | authored | [link](https://www.dwds.de/r?q=das%20System%20%C3%BCberwachen) |
-| `c_ticket_eroeffnen` | ein Ticket eröffnen | authored | [link](https://www.dwds.de/r?q=ein%20Ticket%20er%C3%B6ffnen) |
-| `c_update_ausrollen` | ein Update ausrollen | authored | [link](https://www.dwds.de/r?q=ein%20Update%20ausrollen) |
-| `c_version_veroeffentlichen` | eine Version veröffentlichen | authored | [link](https://www.dwds.de/r?q=eine%20Version%20ver%C3%B6ffentlichen) |
-| `c_zugriff_sperren` | den Zugriff sperren | authored | [link](https://www.dwds.de/r?q=den%20Zugriff%20sperren) |
+| `c_das_datenvolumen_aufbrauchen` | das Datenvolumen aufbrauchen | authored | [link](https://de.wiktionary.org/wiki/aufbrauchen) |
+| `c_das_geraet_neu_starten` | das Gerät neu starten | authored | [link](https://de.wiktionary.org/wiki/starten) |
+| `c_das_handy_aufladen` | das Handy aufladen | authored | [link](https://de.wiktionary.org/wiki/aufladen) |
+| `c_das_konto_loeschen` | das Konto löschen | authored | [link](https://de.wiktionary.org/wiki/l%C3%B6schen) |
+| `c_das_netz_einrichten` | das Netz einrichten | authored | [link](https://de.wiktionary.org/wiki/einrichten) |
+| `c_das_passwort_zuruecksetzen` | das Passwort zurücksetzen | authored | [link](https://de.wiktionary.org/wiki/zur%C3%BCcksetzen) |
+| `c_das_smartphone_einrichten` | das Smartphone einrichten | authored | [link](https://de.wiktionary.org/wiki/einrichten) |
+| `c_den_akku_laden` | den Akku laden | authored | [link](https://de.wiktionary.org/wiki/laden) |
+| `c_den_anbieter_wechseln` | den Anbieter wechseln | authored | [link](https://de.wiktionary.org/wiki/wechseln) |
+| `c_den_bildschirm_sperren` | den Bildschirm sperren | authored | [link](https://de.wiktionary.org/wiki/sperren) |
+| `c_den_empfang_pruefen` | den Empfang prüfen | authored | [link](https://de.wiktionary.org/wiki/pr%C3%BCfen) |
+| `c_den_newsletter_abbestellen` | den Newsletter abbestellen | authored | [link](https://de.wiktionary.org/wiki/abbestellen) |
+| `c_den_router_neu_starten` | den Router neu starten | authored | [link](https://de.wiktionary.org/wiki/starten) |
+| `c_den_tarif_wechseln` | den Tarif wechseln | authored | [link](https://de.wiktionary.org/wiki/wechseln) |
+| `c_den_vertrag_kuendigen` | den Vertrag kündigen | authored | [link](https://de.wiktionary.org/wiki/k%C3%BCndigen) |
+| `c_den_zugang_sperren` | den Zugang sperren | authored | [link](https://de.wiktionary.org/wiki/sperren) |
+| `c_die_app_installieren` | die App installieren | authored | [link](https://de.wiktionary.org/wiki/installieren) |
+| `c_die_daten_schuetzen` | die Daten schützen | authored | [link](https://de.wiktionary.org/wiki/sch%C3%BCtzen) |
+| `c_die_einstellung_aendern` | die Einstellung ändern | authored | [link](https://de.wiktionary.org/wiki/%C3%A4ndern) |
+| `c_die_flatrate_nutzen` | die Flatrate nutzen | authored | [link](https://de.wiktionary.org/wiki/nutzen) |
+| `c_die_grundgebuehr_zahlen` | die Grundgebühr zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_die_laufzeit_verlaengern` | die Laufzeit verlängern | authored | [link](https://de.wiktionary.org/wiki/verl%C3%A4ngern) |
+| `c_die_mailbox_abhoeren` | die Mailbox abhören | authored | [link](https://de.wiktionary.org/wiki/abh%C3%B6ren) |
+| `c_die_nummer_speichern` | die Nummer speichern | authored | [link](https://de.wiktionary.org/wiki/speichern) |
+| `c_die_rufnummer_mitnehmen` | die Rufnummer mitnehmen | authored | [link](https://de.wiktionary.org/wiki/mitnehmen) |
+| `c_die_seite_aufrufen` | die Seite aufrufen | authored | [link](https://de.wiktionary.org/wiki/aufrufen) |
+| `c_die_simkarte_einlegen` | die SIM-Karte einlegen | authored | [link](https://de.wiktionary.org/wiki/einlegen) |
+| `c_die_verbindung_herstellen` | die Verbindung herstellen | authored | [link](https://de.wiktionary.org/wiki/herstellen) |
+| `c_die_verbindung_trennen` | die Verbindung trennen | authored | [link](https://de.wiktionary.org/wiki/trennen) |
+| `c_ein_konto_anlegen` | ein Konto anlegen | authored | [link](https://de.wiktionary.org/wiki/anlegen) |
+| `c_ein_update_machen` | ein Update machen | authored | [link](https://de.wiktionary.org/wiki/machen) |
+| `c_eine_nachricht_verschicken` | eine Nachricht verschicken | authored | [link](https://de.wiktionary.org/wiki/verschicken) |
+| `c_eine_stoerung_melden` | eine Störung melden | authored | [link](https://de.wiktionary.org/wiki/melden) |
+| `c_einen_anruf_taetigen` | einen Anruf tätigen | authored | [link](https://de.wiktionary.org/wiki/t%C3%A4tigen) |
+| `c_einen_tarif_buchen` | einen Tarif buchen | authored | [link](https://de.wiktionary.org/wiki/buchen) |
+| `c_einen_vertrag_abschliessen` | einen Vertrag abschließen | authored | [link](https://de.wiktionary.org/wiki/abschlie%C3%9Fen) |
+| `c_im_internet_surfen` | im Internet surfen | authored | [link](https://de.wiktionary.org/wiki/surfen) |
+| `c_sich_anmelden` | sich anmelden | authored | [link](https://de.wiktionary.org/wiki/anmelden) |
+| `c_sich_ins_wlan_einloggen` | sich ins WLAN einloggen | authored | [link](https://de.wiktionary.org/wiki/einloggen) |
+| `c_werbung_blockieren` | Werbung blockieren | authored | [link](https://de.wiktionary.org/wiki/blockieren) |
 
 </details>
 
-<details><summary>logistics — 35</summary>
+<details><summary>einkaufen — 40</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `c_an_der_kasse_bezahlen` | an der Kasse bezahlen | authored | [link](https://de.wiktionary.org/wiki/bezahlen) |
+| `c_artikel_umtauschen` | einen Artikel umtauschen | authored | [link](https://de.wiktionary.org/wiki/umtauschen) |
+| `c_auswahl_vergleichen` | die Auswahl vergleichen | authored | [link](https://de.wiktionary.org/wiki/vergleichen) |
+| `c_bar_bezahlen` | bar bezahlen | authored | [link](https://de.wiktionary.org/wiki/bezahlen) |
+| `c_beanstandung_einreichen` | eine Beanstandung einreichen | authored | [link](https://de.wiktionary.org/wiki/einreichen) |
+| `c_beraten_lassen` | sich beraten lassen | authored | [link](https://de.wiktionary.org/wiki/beraten) |
+| `c_bewertung_schreiben` | eine Bewertung schreiben | authored | [link](https://de.wiktionary.org/wiki/schreiben) |
+| `c_defekt_melden` | einen Defekt melden | authored | [link](https://de.wiktionary.org/wiki/melden) |
+| `c_einkaufsliste_schreiben` | eine Einkaufsliste schreiben | authored | [link](https://de.wiktionary.org/wiki/schreiben) |
+| `c_ersatz_verlangen` | Ersatz verlangen | authored | [link](https://de.wiktionary.org/wiki/verlangen) |
+| `c_erstattung_beantragen` | eine Erstattung beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
+| `c_etikett_entfernen` | das Etikett entfernen | authored | [link](https://de.wiktionary.org/wiki/entfernen) |
+| `c_farbe_waehlen` | die Farbe wählen | authored | [link](https://de.wiktionary.org/wiki/w%C3%A4hlen) |
+| `c_garantie_in_anspruch_nehmen` | die Garantie in Anspruch nehmen | authored | [link](https://de.wiktionary.org/wiki/nehmen) |
+| `c_geld_zurueckbekommen` | Geld zurückbekommen | authored | [link](https://de.wiktionary.org/wiki/zur%C3%BCckbekommen) |
+| `c_haltbarkeitsdatum_pruefen` | das Haltbarkeitsdatum prüfen | authored | [link](https://de.wiktionary.org/wiki/pr%C3%BCfen) |
+| `c_im_angebot_sein` | im Angebot sein | authored | [link](https://de.wiktionary.org/wiki/sein) |
+| `c_im_ausverkauf_kaufen` | im Ausverkauf kaufen | authored | [link](https://de.wiktionary.org/wiki/kaufen) |
+| `c_in_den_warenkorb_legen` | in den Warenkorb legen | authored | [link](https://de.wiktionary.org/wiki/legen) |
+| `c_kassenzettel_aufbewahren` | den Kassenzettel aufbewahren | authored | [link](https://de.wiktionary.org/wiki/aufbewahren) |
+| `c_kaufbeleg_vorlegen` | den Kaufbeleg vorlegen | authored | [link](https://de.wiktionary.org/wiki/vorlegen) |
+| `c_kleidergroesse_finden` | die Kleidergröße finden | authored | [link](https://de.wiktionary.org/wiki/finden) |
+| `c_kleidung_anprobieren` | Kleidung anprobieren | authored | [link](https://de.wiktionary.org/wiki/anprobieren) |
+| `c_lebensmittel_einkaufen` | Lebensmittel einkaufen | authored | [link](https://de.wiktionary.org/wiki/einkaufen) |
+| `c_lieferung_verfolgen` | die Lieferung verfolgen | authored | [link](https://de.wiktionary.org/wiki/verfolgen) |
+| `c_lieferzeit_angeben` | die Lieferzeit angeben | authored | [link](https://de.wiktionary.org/wiki/angeben) |
+| `c_nummer_groesser_brauchen` | eine Nummer größer brauchen | authored | [link](https://de.wiktionary.org/wiki/brauchen) |
+| `c_online_bestellen` | etwas online bestellen | authored | [link](https://de.wiktionary.org/wiki/bestellen) |
+| `c_paket_abholen` | das Paket abholen | authored | [link](https://de.wiktionary.org/wiki/abholen) |
+| `c_per_rechnung_zahlen` | per Rechnung zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_pfand_zurueckgeben` | das Pfand zurückgeben | authored | [link](https://de.wiktionary.org/wiki/zur%C3%BCckgeben) |
+| `c_rueckgaberecht_nutzen` | das Rückgaberecht nutzen | authored | [link](https://de.wiktionary.org/wiki/nutzen) |
+| `c_sonderangebot_nutzen` | ein Sonderangebot nutzen | authored | [link](https://de.wiktionary.org/wiki/nutzen) |
+| `c_tuete_packen` | die Tüte packen | authored | [link](https://de.wiktionary.org/wiki/packen) |
+| `c_umkleidekabine_gehen` | in die Umkleidekabine gehen | authored | [link](https://de.wiktionary.org/wiki/gehen) |
+| `c_versandkosten_sparen` | die Versandkosten sparen | authored | [link](https://de.wiktionary.org/wiki/sparen) |
+| `c_vom_kauf_zuruecktreten` | vom Kauf zurücktreten | authored | [link](https://de.wiktionary.org/wiki/zur%C3%BCcktreten) |
+| `c_ware_zurueckgeben` | die Ware zurückgeben | authored | [link](https://de.wiktionary.org/wiki/zur%C3%BCckgeben) |
+| `c_ware_zuruecksenden` | die Ware zurücksenden | authored | [link](https://de.wiktionary.org/wiki/zur%C3%BCcksenden) |
+| `c_zuruecklegen_lassen` | etwas zurücklegen lassen | authored | [link](https://de.wiktionary.org/wiki/zur%C3%BCcklegen) |
+
+</details>
+
+<details><summary>essen — 40</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `c_bedienungszuschlag_zahlen` | den Bedienungszuschlag zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_beilage_aussuchen` | eine Beilage aussuchen | authored | [link](https://de.wiktionary.org/wiki/aussuchen) |
+| `c_betrag_aufrunden` | den Betrag aufrunden | authored | [link](https://de.wiktionary.org/wiki/aufrunden) |
+| `c_brot_backen` | Brot backen | authored | [link](https://de.wiktionary.org/wiki/backen) |
+| `c_empfehlung_geben` | eine Empfehlung geben | authored | [link](https://de.wiktionary.org/wiki/geben) |
+| `c_essen_bestellen` | Essen bestellen | authored | [link](https://de.wiktionary.org/wiki/bestellen) |
+| `c_essen_kochen` | Essen kochen | authored | [link](https://de.wiktionary.org/wiki/kochen) |
+| `c_essen_wuerzen` | das Essen würzen | authored | [link](https://de.wiktionary.org/wiki/w%C3%BCrzen) |
+| `c_fleisch_braten` | Fleisch braten | authored | [link](https://de.wiktionary.org/wiki/braten) |
+| `c_gaeste_platzieren` | die Gäste platzieren | authored | [link](https://de.wiktionary.org/wiki/platzieren) |
+| `c_gemuese_schneiden` | Gemüse schneiden | authored | [link](https://de.wiktionary.org/wiki/schneiden) |
+| `c_getraenk_bestellen` | ein Getränk bestellen | authored | [link](https://de.wiktionary.org/wiki/bestellen) |
+| `c_getrennt_zahlen` | getrennt zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_glas_einschenken` | das Glas einschenken | authored | [link](https://de.wiktionary.org/wiki/einschenken) |
+| `c_kartenzahlung_anbieten` | Kartenzahlung anbieten | authored | [link](https://de.wiktionary.org/wiki/anbieten) |
+| `c_kellner_rufen` | den Kellner rufen | authored | [link](https://de.wiktionary.org/wiki/rufen) |
+| `c_kuchen_backen` | einen Kuchen backen | authored | [link](https://de.wiktionary.org/wiki/backen) |
+| `c_mahlzeit_zubereiten` | eine Mahlzeit zubereiten | authored | [link](https://de.wiktionary.org/wiki/zubereiten) |
+| `c_menue_waehlen` | das Menü wählen | authored | [link](https://de.wiktionary.org/wiki/w%C3%A4hlen) |
+| `c_nach_der_karte_fragen` | nach der Karte fragen | authored | [link](https://de.wiktionary.org/wiki/fragen) |
+| `c_nachschlag_holen` | sich einen Nachschlag holen | authored | [link](https://de.wiktionary.org/wiki/holen) |
+| `c_nachtisch_bestellen` | einen Nachtisch bestellen | authored | [link](https://de.wiktionary.org/wiki/bestellen) |
+| `c_pfanne_erhitzen` | die Pfanne erhitzen | authored | [link](https://de.wiktionary.org/wiki/erhitzen) |
+| `c_platz_nehmen` | Platz nehmen | authored | [link](https://de.wiktionary.org/wiki/nehmen) |
+| `c_rechnung_teilen` | die Rechnung teilen | authored | [link](https://de.wiktionary.org/wiki/teilen) |
+| `c_rechnung_uebernehmen` | die Rechnung übernehmen | authored | [link](https://de.wiktionary.org/wiki/%C3%BCbernehmen) |
+| `c_rechnung_verlangen` | die Rechnung verlangen | authored | [link](https://de.wiktionary.org/wiki/verlangen) |
+| `c_reservierung_vornehmen` | eine Reservierung vornehmen | authored | [link](https://de.wiktionary.org/wiki/vornehmen) |
+| `c_rezept_folgen` | einem Rezept folgen | authored | [link](https://de.wiktionary.org/wiki/folgen) |
+| `c_salat_bestellen` | einen Salat bestellen | authored | [link](https://de.wiktionary.org/wiki/bestellen) |
+| `c_speise_empfehlen` | eine Speise empfehlen | authored | [link](https://de.wiktionary.org/wiki/empfehlen) |
+| `c_speisekarte_lesen` | die Speisekarte lesen | authored | [link](https://de.wiktionary.org/wiki/lesen) |
+| `c_spezialitaet_probieren` | eine Spezialität probieren | authored | [link](https://de.wiktionary.org/wiki/probieren) |
+| `c_suppe_kochen` | eine Suppe kochen | authored | [link](https://de.wiktionary.org/wiki/kochen) |
+| `c_teller_abraeumen` | den Teller abräumen | authored | [link](https://de.wiktionary.org/wiki/abr%C3%A4umen) |
+| `c_teller_abwaschen` | den Teller abwaschen | authored | [link](https://de.wiktionary.org/wiki/abwaschen) |
+| `c_tisch_decken` | den Tisch decken | authored | [link](https://de.wiktionary.org/wiki/decken) |
+| `c_vorspeise_bestellen` | eine Vorspeise bestellen | authored | [link](https://de.wiktionary.org/wiki/bestellen) |
+| `c_zusammen_zahlen` | zusammen zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_zutaten_besorgen` | die Zutaten besorgen | authored | [link](https://de.wiktionary.org/wiki/besorgen) |
+
+</details>
+
+<details><summary>freizeit — 40</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `c_am_training_teilnehmen` | am Training teilnehmen | authored | [link](https://de.wiktionary.org/wiki/teilnehmen) |
+| `c_an_einer_veranstaltung_teilnehmen` | an einer Veranstaltung teilnehmen | authored | [link](https://de.wiktionary.org/wiki/teilnehmen) |
+| `c_das_gespraech_beginnen` | das Gespräch beginnen | authored | [link](https://de.wiktionary.org/wiki/beginnen) |
+| `c_das_publikum_begeistern` | das Publikum begeistern | authored | [link](https://de.wiktionary.org/wiki/begeistern) |
+| `c_ehrenamtlich_arbeiten` | ehrenamtlich arbeiten | authored | [link](https://de.wiktionary.org/wiki/arbeiten) |
+| `c_ein_brettspiel_spielen` | ein Brettspiel spielen | authored | [link](https://de.wiktionary.org/wiki/spielen) |
+| `c_ein_hobby_haben` | ein Hobby haben | authored | [link](https://de.wiktionary.org/wiki/haben) |
+| `c_ein_kompliment_machen` | ein Kompliment machen | authored | [link](https://de.wiktionary.org/wiki/machen) |
+| `c_ein_konzert_besuchen` | ein Konzert besuchen | authored | [link](https://de.wiktionary.org/wiki/besuchen) |
+| `c_eine_ausstellung_ansehen` | eine Ausstellung ansehen | authored | [link](https://de.wiktionary.org/wiki/ansehen) |
+| `c_eine_einladung_annehmen` | eine Einladung annehmen | authored | [link](https://de.wiktionary.org/wiki/annehmen) |
+| `c_eine_feier_organisieren` | eine Feier organisieren | authored | [link](https://de.wiktionary.org/wiki/organisieren) |
+| `c_eine_wanderung_unternehmen` | eine Wanderung unternehmen | authored | [link](https://de.wiktionary.org/wiki/unternehmen) |
+| `c_eine_zusage_geben` | eine Zusage geben | authored | [link](https://de.wiktionary.org/wiki/geben) |
+| `c_einem_verein_beitreten` | einem Verein beitreten | authored | [link](https://de.wiktionary.org/wiki/beitreten) |
+| `c_einen_ausflug_machen` | einen Ausflug machen | authored | [link](https://de.wiktionary.org/wiki/machen) |
+| `c_einen_geburtstag_feiern` | einen Geburtstag feiern | authored | [link](https://de.wiktionary.org/wiki/feiern) |
+| `c_einen_spaziergang_machen` | einen Spaziergang machen | authored | [link](https://de.wiktionary.org/wiki/machen) |
+| `c_einen_termin_absagen` | einen Termin absagen | authored | [link](https://de.wiktionary.org/wiki/absagen) |
+| `c_einen_witz_erzaehlen` | einen Witz erzählen | authored | [link](https://de.wiktionary.org/wiki/erz%C3%A4hlen) |
+| `c_eintritt_zahlen` | Eintritt zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_gaeste_einladen` | Gäste einladen | authored | [link](https://de.wiktionary.org/wiki/einladen) |
+| `c_gemeinsam_kochen` | gemeinsam kochen | authored | [link](https://de.wiktionary.org/wiki/kochen) |
+| `c_gemeinsamkeiten_finden` | Gemeinsamkeiten finden | authored | [link](https://de.wiktionary.org/wiki/finden) |
+| `c_gute_laune_haben` | gute Laune haben | authored | [link](https://de.wiktionary.org/wiki/haben) |
+| `c_ins_gespraech_kommen` | ins Gespräch kommen | authored | [link](https://de.wiktionary.org/wiki/kommen) |
+| `c_ins_kino_gehen` | ins Kino gehen | authored | [link](https://de.wiktionary.org/wiki/gehen) |
+| `c_ins_schwimmbad_gehen` | ins Schwimmbad gehen | authored | [link](https://de.wiktionary.org/wiki/gehen) |
+| `c_ins_theater_gehen` | ins Theater gehen | authored | [link](https://de.wiktionary.org/wiki/gehen) |
+| `c_interesse_zeigen` | Interesse zeigen | authored | [link](https://de.wiktionary.org/wiki/zeigen) |
+| `c_karten_reservieren` | Karten reservieren | authored | [link](https://de.wiktionary.org/wiki/reservieren) |
+| `c_kontakte_knuepfen` | Kontakte knüpfen | authored | [link](https://de.wiktionary.org/wiki/kn%C3%BCpfen) |
+| `c_musik_machen` | Musik machen | authored | [link](https://de.wiktionary.org/wiki/machen) |
+| `c_sich_treffen` | sich treffen | authored | [link](https://de.wiktionary.org/wiki/treffen) |
+| `c_sich_verabreden` | sich verabreden | authored | [link](https://de.wiktionary.org/wiki/verabreden) |
+| `c_sich_verspaeten` | sich verspäten | authored | [link](https://de.wiktionary.org/wiki/versp%C3%A4ten) |
+| `c_smalltalk_machen` | Smalltalk machen | authored | [link](https://de.wiktionary.org/wiki/machen) |
+| `c_sport_treiben` | Sport treiben | authored | [link](https://de.wiktionary.org/wiki/treiben) |
+| `c_ueber_das_wetter_reden` | über das Wetter reden | authored | [link](https://de.wiktionary.org/wiki/reden) |
+| `c_zeit_verbringen` | Zeit verbringen | authored | [link](https://de.wiktionary.org/wiki/verbringen) |
+
+</details>
+
+<details><summary>logistics — 56</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_angebot_einholen` | ein Angebot einholen | authored | [link](https://www.dwds.de/wb/Angebot) |
+| `c_anhaenger_ankuppeln` | den Anhänger ankuppeln | authored | [link](https://www.dwds.de/r?q=den%20Anh%C3%A4nger%20ankuppeln) |
+| `c_anlage_auslasten` | die Anlage auslasten | authored | [link](https://www.dwds.de/r?q=die%20Anlage%20auslasten) |
 | `c_anlieferung_koordinieren` | die Anlieferung koordinieren | authored | [link](https://www.dwds.de/wb/Anlieferung) |
+| `c_bestand_pruefen` | den Bestand prüfen | authored | [link](https://www.dwds.de/wb/Bestand) |
 | `c_bestellung_aufgeben` | eine Bestellung aufgeben | authored | [link](https://www.dwds.de/wb/Bestellung) |
+| `c_charge_pruefen` | eine Charge prüfen | authored | [link](https://www.dwds.de/r?q=eine%20Charge%20pr%C3%BCfen) |
 | `c_engpass_beheben` | einen Engpass beheben | authored | [link](https://www.dwds.de/wb/Engpass) |
+| `c_ersatzteile_bestellen` | Ersatzteile bestellen | authored | [link](https://www.dwds.de/r?q=Ersatzteile%20bestellen) |
 | `c_fracht_versichern` | die Fracht versichern | authored | [link](https://www.dwds.de/wb/Fracht) |
+| `c_fracht_zustellen` | die Fracht zustellen | authored | [link](https://www.dwds.de/r?q=die%20Fracht%20zustellen) |
+| `c_gabelstapler_fahren` | den Gabelstapler fahren | authored | [link](https://www.dwds.de/wb/Gabelstapler) |
+| `c_impfstoff_lagern` | den Impfstoff lagern | authored | [link](https://www.dwds.de/wb/Impfstoff) |
 | `c_inventur_durchfuehren` | eine Inventur durchführen | authored | [link](https://www.dwds.de/wb/Inventur) |
+| `c_kapazitaet_erhoehen` | die Kapazität erhöhen | authored | [link](https://www.dwds.de/r?q=die%20Kapazit%C3%A4t%20erh%C3%B6hen) |
 | `c_kosten_senken` | die Kosten senken | authored | [link](https://www.dwds.de/wb/Kosten) |
+| `c_lager_auffuellen` | das Lager auffüllen | authored | [link](https://www.dwds.de/r?q=das%20Lager%20auff%C3%BCllen) |
 | `c_lager_auffüllen` | das Lager auffüllen | authored | [link](https://www.dwds.de/wb/Lager) |
 | `c_lagerbestand_kontrollieren` | den Lagerbestand kontrollieren | authored | [link](https://www.dwds.de/wb/Lagerbestand) |
 | `c_lieferant_beauftragen` | einen Lieferanten beauftragen | authored | [link](https://www.dwds.de/wb/Lieferanten) |
@@ -509,29 +825,40 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_lieferung_aufgeben` | eine Bestellung aufgeben | authored | [link](https://www.dwds.de/wb/Bestellung) |
 | `c_lieferung_bestaetigen` | eine Lieferung bestätigen | authored | [link](https://www.dwds.de/wb/Lieferung) |
 | `c_lieferung_verzögern` | sich die Lieferung verzögern | authored | [link](https://www.dwds.de/wb/Lieferung) |
+| `c_lkw_beladen` | den Lkw beladen | authored | [link](https://www.dwds.de/r?q=den%20Lkw%20beladen) |
+| `c_maut_bezahlen` | die Maut bezahlen | authored | [link](https://www.dwds.de/r?q=die%20Maut%20bezahlen) |
 | `c_mindestbestand_festlegen` | den Mindestbestand festlegen | authored | [link](https://www.dwds.de/wb/Mindestbestand) |
 | `c_nachbestellung_ausloesen` | eine Nachbestellung auslösen | authored | [link](https://www.dwds.de/wb/Nachbestellung) |
 | `c_palette_stapeln` | die Paletten stapeln | authored | [link](https://www.dwds.de/wb/Paletten) |
+| `c_preis_auszeichnen` | den Preis auszeichnen | authored | [link](https://www.dwds.de/wb/Preis) |
+| `c_produktion_drosseln` | die Produktion drosseln | authored | [link](https://www.dwds.de/r?q=die%20Produktion%20drosseln) |
 | `c_rabatt_gewaehren` | einen Rabatt gewähren | authored | [link](https://www.dwds.de/wb/Rabatt) |
 | `c_rechnung_ausstellen` | eine Rechnung ausstellen | authored | [link](https://www.dwds.de/wb/Rechnung) |
+| `c_regal_auffuellen` | das Regal auffüllen | authored | [link](https://www.dwds.de/wb/Regal) |
+| `c_regale_einraeumen` | die Regale einräumen | authored | [link](https://www.dwds.de/r?q=die%20Regale%20einr%C3%A4umen) |
 | `c_reklamation_einreichen` | eine Reklamation einreichen | authored | [link](https://www.dwds.de/wb/Reklamation) |
 | `c_route_optimieren` | die Route optimieren | authored | [link](https://www.dwds.de/wb/Route) |
 | `c_route_planen` | die Route planen | authored | [link](https://www.dwds.de/wb/Route) |
 | `c_ruecksendung_bearbeiten` | eine Rücksendung bearbeiten | authored | [link](https://www.dwds.de/wb/R%C3%BCcksendung) |
 | `c_schadensmeldung_aufnehmen` | eine Schadensmeldung aufnehmen | authored | [link](https://www.dwds.de/wb/Schadensmeldung) |
 | `c_sendung_verfolgen` | die Sendung verfolgen | authored | [link](https://www.dwds.de/wb/Sendung) |
+| `c_tour_planen` | die Tour planen | authored | [link](https://www.dwds.de/wb/Tour) |
 | `c_transportweg_verkuerzen` | den Transportweg verkürzen | authored | [link](https://www.dwds.de/wb/Transportweg) |
 | `c_verpackung_optimieren` | die Verpackung optimieren | authored | [link](https://www.dwds.de/wb/Verpackung) |
 | `c_versand_vorbereiten` | den Versand vorbereiten | authored | [link](https://www.dwds.de/wb/Versand) |
 | `c_vertrag_kuendigen` | den Vertrag kündigen | authored | [link](https://www.dwds.de/wb/Vertrag) |
+| `c_ware_auszeichnen` | die Ware auszeichnen | authored | [link](https://www.dwds.de/r?q=die%20Ware%20auszeichnen) |
+| `c_ware_einraeumen` | die Ware einräumen | authored | [link](https://www.dwds.de/wb/Ware) |
+| `c_ware_kommissionieren` | die Ware kommissionieren | authored | [link](https://www.dwds.de/wb/Ware) |
 | `c_ware_liefern` | die Ware liefern | authored | [link](https://www.dwds.de/wb/Ware) |
 | `c_ware_pruefen` | die Ware prüfen | authored | [link](https://www.dwds.de/wb/Ware) |
+| `c_ware_verladen` | die Ware verladen | authored | [link](https://www.dwds.de/wb/Ware) |
 | `c_wareneingang_pruefen` | den Wareneingang prüfen | authored | [link](https://www.dwds.de/wb/Wareneingang) |
 | `c_zoll_abwickeln` | den Zoll abwickeln | authored | [link](https://www.dwds.de/wb/Zoll) |
 
 </details>
 
-<details><summary>meetings — 36</summary>
+<details><summary>meetings — 37</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -565,6 +892,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_tagesordnung_festlegen` | die Tagesordnung festlegen | authored | [link](https://www.dwds.de/wb/Tagesordnung) |
 | `c_tagesordnungspunkt_aufnehmen` | einen Tagesordnungspunkt aufnehmen | authored | [link](https://www.dwds.de/wb/Tagesordnungspunkt) |
 | `c_thema_ansprechen` | ein Thema ansprechen | authored | [link](https://www.dwds.de/wb/Thema) |
+| `c_training_leiten` | das Training leiten | authored | [link](https://www.dwds.de/r?q=das%20Training%20leiten) |
 | `c_verantwortung_zuweisen` | die Verantwortung zuweisen | authored | [link](https://www.dwds.de/wb/Verantwortung) |
 | `c_vorschlag_machen` | einen Vorschlag machen | authored | [link](https://www.dwds.de/wb/Vorschlag) |
 | `c_wort_ergreifen` | das Wort ergreifen | authored | [link](https://www.dwds.de/wb/Wort) |
@@ -574,62 +902,97 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>production — 26</summary>
+<details><summary>mobilitaet — 40</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `c_anlage_auslasten` | die Anlage auslasten | authored | [link](https://www.dwds.de/r?q=die%20Anlage%20auslasten) |
-| `c_anlage_umruesten` | die Anlage umrüsten | authored | [link](https://www.dwds.de/r?q=die%20Anlage%20umr%C3%BCsten) |
-| `c_ausschuss_reduzieren` | den Ausschuss reduzieren | authored | [link](https://www.dwds.de/r?q=den%20Ausschuss%20reduzieren) |
-| `c_band_anhalten` | das Band anhalten | authored | [link](https://www.dwds.de/r?q=das%20Band%20anhalten) |
-| `c_betriebsrat_einschalten` | den Betriebsrat einschalten | authored | [link](https://www.dwds.de/r?q=den%20Betriebsrat%20einschalten) |
-| `c_charge_pruefen` | eine Charge prüfen | authored | [link](https://www.dwds.de/r?q=eine%20Charge%20pr%C3%BCfen) |
-| `c_ersatzteile_bestellen` | Ersatzteile bestellen | authored | [link](https://www.dwds.de/r?q=Ersatzteile%20bestellen) |
-| `c_fehlerquote_senken` | die Fehlerquote senken | authored | [link](https://www.dwds.de/r?q=die%20Fehlerquote%20senken) |
-| `c_fliessband_stoppen` | das Fließband stoppen | authored | [link](https://www.dwds.de/r?q=das%20Flie%C3%9Fband%20stoppen) |
-| `c_kapazitaet_erhoehen` | die Kapazität erhöhen | authored | [link](https://www.dwds.de/r?q=die%20Kapazit%C3%A4t%20erh%C3%B6hen) |
-| `c_lager_auffuellen` | das Lager auffüllen | authored | [link](https://www.dwds.de/r?q=das%20Lager%20auff%C3%BCllen) |
-| `c_maschine_anfahren` | die Maschine anfahren | authored | [link](https://www.dwds.de/r?q=die%20Maschine%20anfahren) |
-| `c_maschine_bedienen` | eine Maschine bedienen | authored | [link](https://www.dwds.de/r?q=eine%20Maschine%20bedienen) |
-| `c_mitarbeiter_anlernen` | Mitarbeiter anlernen | authored | [link](https://www.dwds.de/r?q=Mitarbeiter%20anlernen) |
-| `c_probelauf_starten` | den Probelauf starten | authored | [link](https://www.dwds.de/r?q=den%20Probelauf%20starten) |
-| `c_produktion_drosseln` | die Produktion drosseln | authored | [link](https://www.dwds.de/r?q=die%20Produktion%20drosseln) |
-| `c_produktion_hochfahren` | die Produktion hochfahren | authored | [link](https://www.dwds.de/r?q=die%20Produktion%20hochfahren) |
-| `c_pruefprotokoll_unterschreiben` | das Prüfprotokoll unterschreiben | authored | [link](https://www.dwds.de/r?q=das%20Pr%C3%BCfprotokoll%20unterschreiben) |
-| `c_schicht_tauschen` | die Schicht tauschen | authored | [link](https://www.dwds.de/r?q=die%20Schicht%20tauschen) |
-| `c_schichtplan_erstellen` | den Schichtplan erstellen | authored | [link](https://www.dwds.de/r?q=den%20Schichtplan%20erstellen) |
-| `c_stichprobe_ziehen` | eine Stichprobe ziehen | authored | [link](https://www.dwds.de/r?q=eine%20Stichprobe%20ziehen) |
-| `c_stoerung_beheben` | eine Störung beheben | authored | [link](https://www.dwds.de/r?q=eine%20St%C3%B6rung%20beheben) |
-| `c_taktzeit_verkuerzen` | die Taktzeit verkürzen | authored | [link](https://www.dwds.de/r?q=die%20Taktzeit%20verk%C3%BCrzen) |
-| `c_unfall_melden` | einen Unfall melden | authored | [link](https://www.dwds.de/wb/Unfall) |
-| `c_unterweisung_teilnehmen` | an der Unterweisung teilnehmen | authored | [link](https://www.dwds.de/r?q=an%20der%20Unterweisung%20teilnehmen) |
-| `c_werkstueck_einspannen` | das Werkstück einspannen | authored | [link](https://www.dwds.de/r?q=das%20Werkst%C3%BCck%20einspannen) |
+| `c_am_bahnsteig_warten` | am Bahnsteig warten | authored | [link](https://de.wiktionary.org/wiki/warten) |
+| `c_an_der_ecke_warten` | an der Ecke warten | authored | [link](https://de.wiktionary.org/wiki/warten) |
+| `c_an_der_haltestelle_aussteigen` | an der Haltestelle aussteigen | authored | [link](https://de.wiktionary.org/wiki/aussteigen) |
+| `c_auf_die_autobahn_fahren` | auf die Autobahn fahren | authored | [link](https://de.wiktionary.org/wiki/fahren) |
+| `c_das_auto_parken` | das Auto parken | authored | [link](https://de.wiktionary.org/wiki/parken) |
+| `c_den_anschluss_verpassen` | den Anschluss verpassen | authored | [link](https://de.wiktionary.org/wiki/verpassen) |
+| `c_den_fahrplan_lesen` | den Fahrplan lesen | authored | [link](https://de.wiktionary.org/wiki/lesen) |
+| `c_den_fahrschein_entwerten` | den Fahrschein entwerten | authored | [link](https://de.wiktionary.org/wiki/entwerten) |
+| `c_den_motor_starten` | den Motor starten | authored | [link](https://de.wiktionary.org/wiki/starten) |
+| `c_den_tarif_waehlen` | den Tarif wählen | authored | [link](https://de.wiktionary.org/wiki/w%C3%A4hlen) |
+| `c_den_zuschlag_zahlen` | den Zuschlag zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_der_beschilderung_folgen` | der Beschilderung folgen | authored | [link](https://de.wiktionary.org/wiki/folgen) |
+| `c_die_ampel_beachten` | die Ampel beachten | authored | [link](https://de.wiktionary.org/wiki/beachten) |
+| `c_die_bahn_nehmen` | die Bahn nehmen | authored | [link](https://de.wiktionary.org/wiki/nehmen) |
+| `c_die_entfernung_schaetzen` | die Entfernung schätzen | authored | [link](https://de.wiktionary.org/wiki/sch%C3%A4tzen) |
+| `c_die_fahrkarte_vorzeigen` | die Fahrkarte vorzeigen | authored | [link](https://de.wiktionary.org/wiki/vorzeigen) |
+| `c_die_geschwindigkeit_einhalten` | die Geschwindigkeit einhalten | authored | [link](https://de.wiktionary.org/wiki/einhalten) |
+| `c_die_haltestelle_finden` | die Haltestelle finden | authored | [link](https://de.wiktionary.org/wiki/finden) |
+| `c_die_linie_nehmen` | die Linie nehmen | authored | [link](https://de.wiktionary.org/wiki/nehmen) |
+| `c_die_monatskarte_verlaengern` | die Monatskarte verlängern | authored | [link](https://de.wiktionary.org/wiki/verl%C3%A4ngern) |
+| `c_die_reifen_wechseln` | die Reifen wechseln | authored | [link](https://de.wiktionary.org/wiki/wechseln) |
+| `c_die_richtung_wechseln` | die Richtung wechseln | authored | [link](https://de.wiktionary.org/wiki/wechseln) |
+| `c_die_strasse_ueberqueren` | die Straße überqueren | authored | [link](https://de.wiktionary.org/wiki/%C3%BCberqueren) |
+| `c_die_verbindung_suchen` | die Verbindung suchen | authored | [link](https://de.wiktionary.org/wiki/suchen) |
+| `c_ein_bussgeld_zahlen` | ein Bußgeld zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
+| `c_eine_ermaessigung_bekommen` | eine Ermäßigung bekommen | authored | [link](https://de.wiktionary.org/wiki/bekommen) |
+| `c_eine_fahrkarte_kaufen` | eine Fahrkarte kaufen | authored | [link](https://de.wiktionary.org/wiki/kaufen) |
+| `c_einen_parkplatz_suchen` | einen Parkplatz suchen | authored | [link](https://de.wiktionary.org/wiki/suchen) |
+| `c_geradeaus_gehen` | geradeaus gehen | authored | [link](https://de.wiktionary.org/wiki/gehen) |
+| `c_im_stau_stehen` | im Stau stehen | authored | [link](https://de.wiktionary.org/wiki/stehen) |
+| `c_in_die_ubahn_steigen` | in die U-Bahn steigen | authored | [link](https://de.wiktionary.org/wiki/steigen) |
+| `c_links_abbiegen` | links abbiegen | authored | [link](https://de.wiktionary.org/wiki/abbiegen) |
+| `c_mit_dem_bus_fahren` | mit dem Bus fahren | authored | [link](https://de.wiktionary.org/wiki/fahren) |
+| `c_nach_dem_weg_fragen` | nach dem Weg fragen | authored | [link](https://de.wiktionary.org/wiki/fragen) |
+| `c_ohne_ticket_fahren` | ohne Ticket fahren | authored | [link](https://de.wiktionary.org/wiki/fahren) |
+| `c_sich_orientieren` | sich orientieren | authored | [link](https://de.wiktionary.org/wiki/orientieren) |
+| `c_ticket_ziehen` | ein Ticket ziehen | authored | [link](https://de.wiktionary.org/wiki/ziehen) |
+| `c_voll_tanken` | voll tanken | authored | [link](https://de.wiktionary.org/wiki/tanken) |
+| `c_zu_fuss_gehen` | zu Fuß gehen | authored | [link](https://de.wiktionary.org/wiki/gehen) |
+| `c_zum_bahnhof_gehen` | zum Bahnhof gehen | authored | [link](https://de.wiktionary.org/wiki/gehen) |
 
 </details>
 
-<details><summary>project — 36</summary>
+<details><summary>project — 63</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_abnahme_durchfuehren` | die Abnahme durchführen | authored | [link](https://www.dwds.de/wb/Abnahme) |
 | `c_anforderung_definieren` | die Anforderungen definieren | authored | [link](https://www.dwds.de/wb/Anforderungen) |
+| `c_anforderungen_abstimmen` | die Anforderungen abstimmen | authored | [link](https://www.dwds.de/r?q=die%20Anforderungen%20abstimmen) |
+| `c_anforderungen_dokumentieren` | die Anforderungen dokumentieren | authored | [link](https://www.dwds.de/r?q=die%20Anforderungen%20dokumentieren) |
 | `c_arbeitspaket_schnueren` | ein Arbeitspaket schnüren | authored | [link](https://www.dwds.de/wb/Arbeitspaket) |
 | `c_aufgaben_delegieren` | Aufgaben delegieren | authored | [link](https://www.dwds.de/wb/Aufgaben) |
+| `c_aufmass_nehmen` | das Aufmaß nehmen | authored | [link](https://www.dwds.de/r?q=das%20Aufma%C3%9F%20nehmen) |
 | `c_auftrag_erteilen` | einen Auftrag erteilen | authored | [link](https://www.dwds.de/wb/Auftrag) |
 | `c_aufwand_schaetzen` | den Aufwand schätzen | authored | [link](https://www.dwds.de/wb/Aufwand) |
+| `c_ausschreibung_gewinnen` | eine Ausschreibung gewinnen | authored | [link](https://www.dwds.de/r?q=eine%20Ausschreibung%20gewinnen) |
+| `c_bauabnahme_durchfuehren` | die Bauabnahme durchführen | authored | [link](https://www.dwds.de/r?q=die%20Bauabnahme%20durchf%C3%BChren) |
+| `c_baugrube_ausheben` | die Baugrube ausheben | authored | [link](https://www.dwds.de/r?q=die%20Baugrube%20ausheben) |
+| `c_baustelle_einrichten` | die Baustelle einrichten | authored | [link](https://www.dwds.de/r?q=die%20Baustelle%20einrichten) |
+| `c_bauteil_auslegen` | ein Bauteil auslegen | authored | [link](https://www.dwds.de/r?q=ein%20Bauteil%20auslegen) |
+| `c_belastung_berechnen` | die Belastung berechnen | authored | [link](https://www.dwds.de/r?q=die%20Belastung%20berechnen) |
 | `c_bericht_erstatten` | Bericht erstatten | authored | [link](https://www.dwds.de/wb/Bericht) |
 | `c_budget_beantragen` | ein Budget beantragen | authored | [link](https://www.dwds.de/wb/Budget) |
 | `c_budget_einhalten` | das Budget einhalten | authored | [link](https://www.dwds.de/wb/Budget) |
+| `c_charge_freigeben` | eine Charge freigeben | authored | [link](https://www.dwds.de/wb/Charge) |
+| `c_dach_decken` | das Dach decken | authored | [link](https://www.dwds.de/r?q=das%20Dach%20decken) |
+| `c_datenblatt_anfordern` | das Datenblatt anfordern | authored | [link](https://www.dwds.de/r?q=das%20Datenblatt%20anfordern) |
 | `c_dokumentation_erstellen` | die Dokumentation erstellen | authored | [link](https://www.dwds.de/wb/Dokumentation) |
+| `c_dokumentation_pflegen` | die Dokumentation pflegen | authored | [link](https://www.dwds.de/r?q=die%20Dokumentation%20pflegen) |
 | `c_erfahrung_einbringen` | Erfahrung einbringen | authored | [link](https://www.dwds.de/wb/Erfahrung) |
 | `c_ergebnis_praesentieren` | das Ergebnis präsentieren | authored | [link](https://www.dwds.de/wb/Ergebnis) |
+| `c_ergebnisse_auswerten` | die Ergebnisse auswerten | authored | [link](https://www.dwds.de/r?q=die%20Ergebnisse%20auswerten) |
 | `c_fahrplan_aufstellen` | einen Fahrplan aufstellen | authored | [link](https://www.dwds.de/wb/Fahrplan) |
 | `c_feedback_umsetzen` | Feedback umsetzen | authored | [link](https://www.dwds.de/wb/Feedback) |
 | `c_fortschritt_machen` | Fortschritte machen | authored | [link](https://www.dwds.de/wb/Fortschritte) |
+| `c_fundament_giessen` | das Fundament gießen | authored | [link](https://www.dwds.de/r?q=das%20Fundament%20gie%C3%9Fen) |
+| `c_gebaeude_errichten` | ein Gebäude errichten | authored | [link](https://www.dwds.de/r?q=ein%20Geb%C3%A4ude%20errichten) |
+| `c_gewerk_vergeben` | ein Gewerk vergeben | authored | [link](https://www.dwds.de/r?q=ein%20Gewerk%20vergeben) |
+| `c_grundriss_aendern` | den Grundriss ändern | authored | [link](https://www.dwds.de/r?q=den%20Grundriss%20%C3%A4ndern) |
 | `c_kapazitaet_aufstocken` | die Kapazität aufstocken | authored | [link](https://www.dwds.de/wb/Kapazit%C3%A4t) |
+| `c_konstruktion_freigeben` | die Konstruktion freigeben | authored | [link](https://www.dwds.de/r?q=die%20Konstruktion%20freigeben) |
 | `c_konzept_entwickeln` | ein Konzept entwickeln | authored | [link](https://www.dwds.de/wb/Konzept) |
 | `c_kooperation_eingehen` | eine Kooperation eingehen | authored | [link](https://www.dwds.de/wb/Kooperation) |
 | `c_lessons_learned_auswerten` | Lessons Learned auswerten | authored | [link](https://www.dwds.de/wb/Lessons) |
+| `c_maengel_beseitigen` | Mängel beseitigen | authored | [link](https://www.dwds.de/r?q=M%C3%A4ngel%20beseitigen) |
+| `c_maengelliste_erstellen` | eine Mängelliste erstellen | authored | [link](https://www.dwds.de/r?q=eine%20M%C3%A4ngelliste%20erstellen) |
 | `c_maßnahme_ergreifen` | eine Maßnahme ergreifen | authored | [link](https://www.dwds.de/wb/Ma%C3%9Fnahme) |
 | `c_meilenstein_erreichen` | einen Meilenstein erreichen | authored | [link](https://www.dwds.de/wb/Meilenstein) |
 | `c_pflichtenheft_erstellen` | ein Pflichtenheft erstellen | authored | [link](https://www.dwds.de/wb/Pflichtenheft) |
@@ -637,78 +1000,118 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_projekt_abschliessen` | ein Projekt abschließen | authored | [link](https://www.dwds.de/wb/Projekt) |
 | `c_projekt_leiten` | ein Projekt leiten | authored | [link](https://www.dwds.de/wb/Projekt) |
 | `c_projektplan_anpassen` | den Projektplan anpassen | authored | [link](https://www.dwds.de/wb/Projektplan) |
+| `c_pruefprotokoll_unterschreiben` | das Prüfprotokoll unterschreiben | authored | [link](https://www.dwds.de/r?q=das%20Pr%C3%BCfprotokoll%20unterschreiben) |
 | `c_qualitaet_sichern` | die Qualität sichern | authored | [link](https://www.dwds.de/wb/Qualit%C3%A4t) |
 | `c_ressourcen_einplanen` | Ressourcen einplanen | authored | [link](https://www.dwds.de/wb/Ressourcen) |
 | `c_risiko_abschaetzen` | das Risiko abschätzen | authored | [link](https://www.dwds.de/wb/Risiko) |
 | `c_risiko_minimieren` | das Risiko minimieren | authored | [link](https://www.dwds.de/wb/Risiko) |
+| `c_rohbau_fertigstellen` | den Rohbau fertigstellen | authored | [link](https://www.dwds.de/r?q=den%20Rohbau%20fertigstellen) |
 | `c_stakeholder_einbinden` | die Stakeholder einbinden | authored | [link](https://www.dwds.de/wb/Stakeholder) |
 | `c_strategie_ausarbeiten` | eine Strategie ausarbeiten | authored | [link](https://www.dwds.de/wb/Strategie) |
 | `c_verantwortung_übernehmen` | die Verantwortung übernehmen | authored | [link](https://www.dwds.de/wb/Verantwortung) |
+| `c_version_veroeffentlichen` | eine Version veröffentlichen | authored | [link](https://www.dwds.de/r?q=eine%20Version%20ver%C3%B6ffentlichen) |
+| `c_wand_hochziehen` | eine Wand hochziehen | authored | [link](https://www.dwds.de/r?q=eine%20Wand%20hochziehen) |
+| `c_wettkampf_austragen` | einen Wettkampf austragen | authored | [link](https://www.dwds.de/r?q=einen%20Wettkampf%20austragen) |
+| `c_zeichnung_anfertigen` | eine Zeichnung anfertigen | authored | [link](https://www.dwds.de/r?q=eine%20Zeichnung%20anfertigen) |
 | `c_zeitrahmen_abstecken` | den Zeitrahmen abstecken | authored | [link](https://www.dwds.de/wb/Zeitrahmen) |
 | `c_ziel_setzen` | sich ein Ziel setzen | authored | [link](https://www.dwds.de/wb/Ziel) |
 | `c_zwischenstand_berichten` | den Zwischenstand berichten | authored | [link](https://www.dwds.de/wb/Zwischenstand) |
 
 </details>
 
-<details><summary>retail — 9</summary>
+<details><summary>safety — 85</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `c_bestand_pruefen` | den Bestand prüfen | authored | [link](https://www.dwds.de/wb/Bestand) |
-| `c_kasse_abrechnen` | die Kasse abrechnen | authored | [link](https://www.dwds.de/r?q=die%20Kasse%20abrechnen) |
-| `c_kundschaft_beraten` | die Kundschaft beraten | authored | [link](https://www.dwds.de/r?q=die%20Kundschaft%20beraten) |
-| `c_regale_einraeumen` | die Regale einräumen | authored | [link](https://www.dwds.de/r?q=die%20Regale%20einr%C3%A4umen) |
-| `c_retoure_abwickeln` | eine Retoure abwickeln | authored | [link](https://www.dwds.de/r?q=eine%20Retoure%20abwickeln) |
-| `c_schaufenster_gestalten` | das Schaufenster gestalten | authored | [link](https://www.dwds.de/r?q=das%20Schaufenster%20gestalten) |
-| `c_sonderangebot_bewerben` | ein Sonderangebot bewerben | authored | [link](https://www.dwds.de/r?q=ein%20Sonderangebot%20bewerben) |
-| `c_sortiment_erweitern` | das Sortiment erweitern | authored | [link](https://www.dwds.de/r?q=das%20Sortiment%20erweitern) |
-| `c_ware_auszeichnen` | die Ware auszeichnen | authored | [link](https://www.dwds.de/r?q=die%20Ware%20auszeichnen) |
-
-</details>
-
-<details><summary>safety — 35</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
+| `c_abweichung_feststellen` | eine Abweichung feststellen | authored | [link](https://www.dwds.de/r?q=eine%20Abweichung%20feststellen) |
 | `c_alarm_ausloesen` | einen Alarm auslösen | authored | [link](https://www.dwds.de/wb/Alarm) |
+| `c_anlage_stilllegen` | eine Anlage stilllegen | authored | [link](https://www.dwds.de/r?q=eine%20Anlage%20stilllegen) |
 | `c_arbeitsschutz_beachten` | den Arbeitsschutz beachten | authored | [link](https://www.dwds.de/wb/Arbeitsschutz) |
+| `c_ausweis_kontrollieren` | den Ausweis kontrollieren | authored | [link](https://www.dwds.de/wb/Ausweis) |
+| `c_ausweis_pruefen` | den Ausweis prüfen | authored | [link](https://www.dwds.de/wb/Ausweis) |
+| `c_band_anhalten` | das Band anhalten | authored | [link](https://www.dwds.de/r?q=das%20Band%20anhalten) |
+| `c_baustelle_absichern` | die Baustelle absichern | authored | [link](https://www.dwds.de/r?q=die%20Baustelle%20absichern) |
 | `c_belastung_reduzieren` | die Belastung reduzieren | authored | [link](https://www.dwds.de/wb/Belastung) |
+| `c_berechtigungen_vergeben` | Berechtigungen vergeben | authored | [link](https://www.dwds.de/r?q=Berechtigungen%20vergeben) |
 | `c_betriebsanleitung_lesen` | die Betriebsanleitung lesen | authored | [link](https://www.dwds.de/wb/Betriebsanleitung) |
 | `c_brandschutz_einhalten` | den Brandschutz einhalten | authored | [link](https://www.dwds.de/wb/Brandschutz) |
+| `c_daempfe_absaugen` | die Dämpfe absaugen | authored | [link](https://www.dwds.de/wb/D%C3%A4mpfe) |
+| `c_daten_verschluesseln` | Daten verschlüsseln | authored | [link](https://www.dwds.de/r?q=Daten%20verschl%C3%BCsseln) |
 | `c_erste_hilfe_leisten` | Erste Hilfe leisten | authored | [link](https://www.dwds.de/wb/Erste%20Hilfe) |
+| `c_evakuierung_durchfuehren` | eine Evakuierung durchführen | authored | [link](https://www.dwds.de/wb/Evakuierung) |
 | `c_evakuierung_einleiten` | eine Evakuierung einleiten | authored | [link](https://www.dwds.de/wb/Evakuierung) |
+| `c_fehlerquote_senken` | die Fehlerquote senken | authored | [link](https://www.dwds.de/r?q=die%20Fehlerquote%20senken) |
+| `c_fenster_putzen` | die Fenster putzen | authored | [link](https://www.dwds.de/wb/Fenster) |
 | `c_feuerloescher_warten` | den Feuerlöscher warten | authored | [link](https://www.dwds.de/wb/Feuerl%C3%B6scher) |
+| `c_flaeche_reinigen` | die Fläche reinigen | authored | [link](https://www.dwds.de/wb/Fl%C3%A4che) |
+| `c_flaechen_desinfizieren` | die Flächen desinfizieren | authored | [link](https://www.dwds.de/wb/Fl%C3%A4chen) |
+| `c_flecken_entfernen` | Flecken entfernen | authored | [link](https://www.dwds.de/wb/Flecken) |
+| `c_fliessband_stoppen` | das Fließband stoppen | authored | [link](https://www.dwds.de/r?q=das%20Flie%C3%9Fband%20stoppen) |
 | `c_fluchtweg_freihalten` | den Fluchtweg freihalten | authored | [link](https://www.dwds.de/wb/Fluchtweg) |
+| `c_gebaeude_raeumen` | das Gebäude räumen | authored | [link](https://www.dwds.de/wb/Geb%C3%A4ude) |
 | `c_gefaehrdung_beurteilen` | eine Gefährdung beurteilen | authored | [link](https://www.dwds.de/wb/Gef%C3%A4hrdung) |
 | `c_gefahr_hinweisen` | auf eine Gefahr hinweisen | authored | [link](https://www.dwds.de/r?q=auf%20eine%20Gefahr%20hinweisen) |
 | `c_gefahrstoff_lagern` | Gefahrstoffe lagern | authored | [link](https://www.dwds.de/wb/Gefahrstoffe) |
+| `c_gefahrstoffe_kennzeichnen` | Gefahrstoffe kennzeichnen | authored | [link](https://www.dwds.de/wb/Gefahrstoffe) |
+| `c_gelaende_bewachen` | das Gelände bewachen | authored | [link](https://www.dwds.de/wb/Gel%C3%A4nde) |
+| `c_gelaende_ueberwachen` | das Gelände überwachen | authored | [link](https://www.dwds.de/wb/Gel%C3%A4nde) |
+| `c_geraet_sterilisieren` | ein Gerät sterilisieren | authored | [link](https://www.dwds.de/wb/Ger%C3%A4t) |
+| `c_geruest_abbauen` | das Gerüst abbauen | authored | [link](https://www.dwds.de/r?q=das%20Ger%C3%BCst%20abbauen) |
+| `c_geruest_aufbauen` | ein Gerüst aufbauen | authored | [link](https://www.dwds.de/r?q=ein%20Ger%C3%BCst%20aufbauen) |
 | `c_gesundheit_fördern` | die Gesundheit fördern | authored | [link](https://www.dwds.de/wb/Gesundheit) |
 | `c_hygieneregeln_einhalten` | die Hygieneregeln einhalten | authored | [link](https://www.dwds.de/wb/Hygieneregeln) |
+| `c_hygienevorschriften_einhalten` | die Hygienevorschriften einhalten | authored | [link](https://www.dwds.de/wb/Hygienevorschriften) |
 | `c_kontrollgang_machen` | einen Kontrollgang machen | authored | [link](https://www.dwds.de/wb/Kontrollgang) |
+| `c_ladung_sichern` | die Ladung sichern | authored | [link](https://www.dwds.de/r?q=die%20Ladung%20sichern) |
+| `c_lenkzeiten_einhalten` | die Lenkzeiten einhalten | authored | [link](https://www.dwds.de/r?q=die%20Lenkzeiten%20einhalten) |
 | `c_massnahme_anordnen` | eine Maßnahme anordnen | authored | [link](https://www.dwds.de/wb/Ma%C3%9Fnahme) |
 | `c_maßnahmen_treffen` | Vorkehrungen treffen | authored | [link](https://www.dwds.de/wb/Vorkehrungen) |
+| `c_messgeraet_kalibrieren` | ein Messgerät kalibrieren | authored | [link](https://www.dwds.de/r?q=ein%20Messger%C3%A4t%20kalibrieren) |
+| `c_mittel_dosieren` | das Mittel dosieren | authored | [link](https://www.dwds.de/wb/Mittel) |
+| `c_muell_entsorgen` | den Müll entsorgen | authored | [link](https://www.dwds.de/wb/M%C3%BCll) |
+| `c_muelleimer_leeren` | den Mülleimer leeren | authored | [link](https://www.dwds.de/wb/M%C3%BClleimer) |
+| `c_norm_erfuellen` | eine Norm erfüllen | authored | [link](https://www.dwds.de/r?q=eine%20Norm%20erf%C3%BCllen) |
 | `c_notausgang_kennzeichnen` | den Notausgang kennzeichnen | authored | [link](https://www.dwds.de/wb/Notausgang) |
 | `c_notfallplan_erstellen` | einen Notfallplan erstellen | authored | [link](https://www.dwds.de/wb/Notfallplan) |
+| `c_notruf_absetzen` | einen Notruf absetzen | authored | [link](https://www.dwds.de/wb/Notruf) |
+| `c_probe_entnehmen` | eine Probe entnehmen | authored | [link](https://www.dwds.de/r?q=eine%20Probe%20entnehmen) |
+| `c_raum_desinfizieren` | den Raum desinfizieren | authored | [link](https://www.dwds.de/wb/Raum) |
+| `c_reinigungsmittel_dosieren` | das Reinigungsmittel dosieren | authored | [link](https://www.dwds.de/wb/Reinigungsmittel) |
 | `c_risiko_vermeiden` | ein Risiko vermeiden | authored | [link](https://www.dwds.de/wb/Risiko) |
+| `c_schluessel_verwalten` | die Schlüssel verwalten | authored | [link](https://www.dwds.de/wb/Schl%C3%BCssel) |
 | `c_schutzausruestung_tragen` | Schutzausrüstung tragen | authored | [link](https://www.dwds.de/wb/Schutzausr%C3%BCstung) |
 | `c_schutzbrille_tragen` | eine Schutzbrille tragen | authored | [link](https://www.dwds.de/wb/Schutzbrille) |
 | `c_schutzkleidung_bereitstellen` | Schutzkleidung bereitstellen | authored | [link](https://www.dwds.de/wb/Schutzkleidung) |
+| `c_schweigepflicht_wahren` | die Schweigepflicht wahren | authored | [link](https://www.dwds.de/r?q=die%20Schweigepflicht%20wahren) |
+| `c_schweissnaht_pruefen` | eine Schweißnaht prüfen | authored | [link](https://www.dwds.de/r?q=eine%20Schwei%C3%9Fnaht%20pr%C3%BCfen) |
 | `c_sicherheit_gewaehrleisten` | die Sicherheit gewährleisten | authored | [link](https://www.dwds.de/wb/Sicherheit) |
 | `c_sicherheitsbeauftragter_ernennen` | einen Sicherheitsbeauftragten ernennen | authored | [link](https://www.dwds.de/wb/Sicherheitsbeauftragten) |
 | `c_sicherheitsbegehung_durchfuehren` | eine Sicherheitsbegehung durchführen | authored | [link](https://www.dwds.de/wb/Sicherheitsbegehung) |
+| `c_sicherheitsdatenblatt_lesen` | das Sicherheitsdatenblatt lesen | authored | [link](https://www.dwds.de/wb/Sicherheitsdatenblatt) |
 | `c_sicherheitskonzept_erarbeiten` | ein Sicherheitskonzept erarbeiten | authored | [link](https://www.dwds.de/wb/Sicherheitskonzept) |
+| `c_staub_wischen` | Staub wischen | authored | [link](https://www.dwds.de/wb/Staub) |
+| `c_stichprobe_ziehen` | eine Stichprobe ziehen | authored | [link](https://www.dwds.de/r?q=eine%20Stichprobe%20ziehen) |
+| `c_system_ueberwachen` | das System überwachen | authored | [link](https://www.dwds.de/r?q=das%20System%20%C3%BCberwachen) |
+| `c_taschen_kontrollieren` | die Taschen kontrollieren | authored | [link](https://www.dwds.de/wb/Taschen) |
 | `c_uebung_abhalten` | eine Übung abhalten | authored | [link](https://www.dwds.de/wb/%C3%9Cbung) |
+| `c_unfall_melden` | einen Unfall melden | authored | [link](https://www.dwds.de/wb/Unfall) |
 | `c_unfall_verhindern` | einen Unfall verhindern | authored | [link](https://www.dwds.de/wb/Unfall) |
 | `c_untersuchung_veranlassen` | eine Untersuchung veranlassen | authored | [link](https://www.dwds.de/wb/Untersuchung) |
 | `c_unterweisung_durchfuehren` | eine Unterweisung durchführen | authored | [link](https://www.dwds.de/wb/Unterweisung) |
+| `c_unterweisung_teilnehmen` | an der Unterweisung teilnehmen | authored | [link](https://www.dwds.de/r?q=an%20der%20Unterweisung%20teilnehmen) |
 | `c_verbandskasten_pruefen` | den Verbandskasten prüfen | authored | [link](https://www.dwds.de/wb/Verbandskasten) |
 | `c_verbesserung_vorschlagen` | eine Verbesserung vorschlagen | authored | [link](https://www.dwds.de/wb/Verbesserung) |
 | `c_vorschriften_beachten` | die Vorschriften beachten | authored | [link](https://www.dwds.de/wb/Vorschriften) |
+| `c_wache_halten` | Wache halten | authored | [link](https://www.dwds.de/wb/Wache) |
 | `c_wartung_planen` | die Wartung planen | authored | [link](https://www.dwds.de/wb/Wartung) |
+| `c_zugriff_sperren` | den Zugriff sperren | authored | [link](https://www.dwds.de/r?q=den%20Zugriff%20sperren) |
+| `c_zutritt_kontrollieren` | den Zutritt kontrollieren | authored | [link](https://www.dwds.de/wb/Zutritt) |
+| `c_zutritt_verweigern` | den Zutritt verweigern | authored | [link](https://www.dwds.de/wb/Zutritt) |
+| `c_zwischenfall_melden` | einen Zwischenfall melden | authored | [link](https://www.dwds.de/wb/Zwischenfall) |
 
 </details>
 
-<details><summary>scheduling — 36</summary>
+<details><summary>scheduling — 46</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -716,8 +1119,10 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_abstimmung_vornehmen` | eine Abstimmung vornehmen | authored | [link](https://www.dwds.de/wb/Abstimmung) |
 | `c_arbeitszeit_erfassen` | die Arbeitszeit erfassen | authored | [link](https://www.dwds.de/wb/Arbeitszeit) |
 | `c_aufschub_beantragen` | einen Aufschub beantragen | authored | [link](https://www.dwds.de/wb/Aufschub) |
+| `c_bauzeit_verkuerzen` | die Bauzeit verkürzen | authored | [link](https://www.dwds.de/r?q=die%20Bauzeit%20verk%C3%BCrzen) |
 | `c_besprechungstermin_absagen` | den Besprechungstermin absagen | authored | [link](https://www.dwds.de/wb/Besprechungstermin) |
 | `c_deadline_versaeumen` | die Deadline versäumen | authored | [link](https://www.dwds.de/wb/Deadline) |
+| `c_dienstplan_abstimmen` | den Dienstplan abstimmen | authored | [link](https://www.dwds.de/r?q=den%20Dienstplan%20abstimmen) |
 | `c_engpass_ueberbruecken` | einen Engpass überbrücken | authored | [link](https://www.dwds.de/wb/Engpass) |
 | `c_frist_einhalten` | eine Frist einhalten | authored | [link](https://www.dwds.de/wb/Frist) |
 | `c_frist_setzen` | eine Frist setzen | authored | [link](https://www.dwds.de/wb/Frist) |
@@ -727,11 +1132,18 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_pensum_schaffen` | das Pensum schaffen | authored | [link](https://www.dwds.de/wb/Pensum) |
 | `c_plan_erstellen` | einen Plan erstellen | authored | [link](https://www.dwds.de/wb/Plan) |
 | `c_planung_anpassen` | die Planung anpassen | authored | [link](https://www.dwds.de/wb/Planung) |
+| `c_planung_revidieren` | die Planung revidieren | authored | [link](https://www.dwds.de/wb/revidieren) |
 | `c_prioritaet_einraeumen` | einer Sache Priorität einräumen | authored | [link](https://www.dwds.de/wb/Priorit%C3%A4t) |
 | `c_puffer_einplanen` | einen Puffer einplanen | authored | [link](https://www.dwds.de/wb/Puffer) |
 | `c_reihenfolge_festlegen` | die Reihenfolge festlegen | authored | [link](https://www.dwds.de/wb/Reihenfolge) |
+| `c_reinigungsplan_abarbeiten` | den Reinigungsplan abarbeiten | authored | [link](https://www.dwds.de/wb/Reinigungsplan) |
 | `c_rueckstand_aufholen` | den Rückstand aufholen | authored | [link](https://www.dwds.de/wb/R%C3%BCckstand) |
+| `c_rundgang_machen` | einen Rundgang machen | authored | [link](https://www.dwds.de/wb/Rundgang) |
+| `c_schicht_tauschen` | die Schicht tauschen | authored | [link](https://www.dwds.de/r?q=die%20Schicht%20tauschen) |
 | `c_schicht_uebernehmen` | eine Schicht übernehmen | authored | [link](https://www.dwds.de/wb/Schicht) |
+| `c_schichtplan_erstellen` | den Schichtplan erstellen | authored | [link](https://www.dwds.de/r?q=den%20Schichtplan%20erstellen) |
+| `c_streife_gehen` | Streife gehen | authored | [link](https://www.dwds.de/wb/Streife) |
+| `c_taktzeit_verkuerzen` | die Taktzeit verkürzen | authored | [link](https://www.dwds.de/r?q=die%20Taktzeit%20verk%C3%BCrzen) |
 | `c_termin_absagen` | einen Termin absagen | authored | [link](https://www.dwds.de/wb/Termin) |
 | `c_termin_bestaetigen` | einen Termin bestätigen | authored | [link](https://www.dwds.de/wb/Termin) |
 | `c_termin_einhalten` | einen Termin einhalten | authored | [link](https://www.dwds.de/wb/Termin) |
@@ -739,6 +1151,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_termin_koordinieren` | die Termine koordinieren | authored | [link](https://www.dwds.de/wb/Termine) |
 | `c_termin_vereinbaren` | einen Termin vereinbaren | authored | [link](https://www.dwds.de/wb/Termin) |
 | `c_termin_verschieben` | einen Termin verschieben | authored | [link](https://www.dwds.de/wb/Termin) |
+| `c_trainingsplan_erstellen` | einen Trainingsplan erstellen | authored | [link](https://www.dwds.de/r?q=einen%20Trainingsplan%20erstellen) |
 | `c_überblick_verschaffen` | sich einen Überblick verschaffen | authored | [link](https://www.dwds.de/wb/%C3%9Cberblick) |
 | `c_ueberstunden_leisten` | Überstunden leisten | authored | [link](https://www.dwds.de/wb/%C3%9Cberstunden) |
 | `c_urlaub_beantragen` | Urlaub beantragen | authored | [link](https://www.dwds.de/wb/Urlaub) |
@@ -751,27 +1164,12 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>sports — 9</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `c_ausdauer_verbessern` | die Ausdauer verbessern | authored | [link](https://www.dwds.de/r?q=die%20Ausdauer%20verbessern) |
-| `c_gleichgewicht_halten` | das Gleichgewicht halten | authored | [link](https://www.dwds.de/r?q=das%20Gleichgewicht%20halten) |
-| `c_mitgliedschaft_kuendigen` | die Mitgliedschaft kündigen | authored | [link](https://www.dwds.de/r?q=die%20Mitgliedschaft%20k%C3%BCndigen) |
-| `c_muskeln_dehnen` | die Muskeln dehnen | authored | [link](https://www.dwds.de/r?q=die%20Muskeln%20dehnen) |
-| `c_probestunde_vereinbaren` | eine Probestunde vereinbaren | authored | [link](https://www.dwds.de/r?q=eine%20Probestunde%20vereinbaren) |
-| `c_training_leiten` | das Training leiten | authored | [link](https://www.dwds.de/r?q=das%20Training%20leiten) |
-| `c_trainingsplan_erstellen` | einen Trainingsplan erstellen | authored | [link](https://www.dwds.de/r?q=einen%20Trainingsplan%20erstellen) |
-| `c_verletzung_auskurieren` | eine Verletzung auskurieren | authored | [link](https://www.dwds.de/r?q=eine%20Verletzung%20auskurieren) |
-| `c_wettkampf_austragen` | einen Wettkampf austragen | authored | [link](https://www.dwds.de/r?q=einen%20Wettkampf%20austragen) |
-
-</details>
-
-<details><summary>sustainability — 36</summary>
+<details><summary>sustainability — 41</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_abfall_trennen` | Abfall trennen | authored | [link](https://www.dwds.de/wb/Abfall) |
+| `c_ausschuss_reduzieren` | den Ausschuss reduzieren | authored | [link](https://www.dwds.de/r?q=den%20Ausschuss%20reduzieren) |
 | `c_beitrag_leisten` | einen Beitrag leisten | authored | [link](https://www.dwds.de/wb/Beitrag) |
 | `c_bewusstsein_schaffen` | Bewusstsein schaffen | authored | [link](https://www.dwds.de/wb/Bewusstsein) |
 | `c_biodiversitaet_schuetzen` | die Biodiversität schützen | authored | [link](https://www.dwds.de/wb/Biodiversit%C3%A4t) |
@@ -781,11 +1179,13 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_energieverbrauch_senken` | den Energieverbrauch senken | authored | [link](https://www.dwds.de/wb/Energieverbrauch) |
 | `c_erneuerbare_energie_beziehen` | erneuerbare Energie beziehen | authored | [link](https://www.dwds.de/wb/erneuerbare) |
 | `c_fahrrad_foerdern` | das Fahrradfahren fördern | authored | [link](https://www.dwds.de/wb/Fahrradfahren) |
+| `c_fassade_daemmen` | die Fassade dämmen | authored | [link](https://www.dwds.de/r?q=die%20Fassade%20d%C3%A4mmen) |
 | `c_gruenstrom_beziehen` | Grünstrom beziehen | authored | [link](https://www.dwds.de/wb/Gr%C3%BCnstrom) |
 | `c_initiative_starten` | eine Initiative starten | authored | [link](https://www.dwds.de/wb/Initiative) |
 | `c_klimaziel_verfolgen` | ein Klimaziel verfolgen | authored | [link](https://www.dwds.de/wb/Klimaziel) |
 | `c_kompensation_anbieten` | eine Kompensation anbieten | authored | [link](https://www.dwds.de/wb/Kompensation) |
 | `c_kreislaufwirtschaft_foerdern` | die Kreislaufwirtschaft fördern | authored | [link](https://www.dwds.de/wb/Kreislaufwirtschaft) |
+| `c_lebensdauer_verlaengern` | die Lebensdauer verlängern | authored | [link](https://www.dwds.de/r?q=die%20Lebensdauer%20verl%C3%A4ngern) |
 | `c_lieferkette_ueberwachen` | die Lieferkette überwachen | authored | [link](https://www.dwds.de/wb/Lieferkette) |
 | `c_maßnahmen_umsetzen` | Maßnahmen umsetzen | authored | [link](https://www.dwds.de/wb/Ma%C3%9Fnahmen) |
 | `c_mobilitaetskonzept_entwickeln` | ein Mobilitätskonzept entwickeln | authored | [link](https://www.dwds.de/wb/Mobilit%C3%A4tskonzept) |
@@ -798,6 +1198,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_ressourcen_schonen` | Ressourcen schonen | authored | [link](https://www.dwds.de/wb/Ressourcen) |
 | `c_rohstoff_sparen` | Rohstoffe sparen | authored | [link](https://www.dwds.de/wb/Rohstoffe) |
 | `c_solarzellen_installieren` | Solarzellen installieren | authored | [link](https://www.dwds.de/wb/Solarzellen) |
+| `c_sondermuell_entsorgen` | Sondermüll entsorgen | authored | [link](https://www.dwds.de/wb/Sonderm%C3%BCll) |
 | `c_standard_erfuellen` | einen Standard erfüllen | authored | [link](https://www.dwds.de/wb/Standard) |
 | `c_umweltaudit_bestehen` | ein Umweltaudit bestehen | authored | [link](https://www.dwds.de/wb/Umweltaudit) |
 | `c_umweltbewusstsein_foerdern` | das Umweltbewusstsein fördern | authored | [link](https://www.dwds.de/wb/Umweltbewusstsein) |
@@ -805,85 +1206,95 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_verbrauch_messen` | den Verbrauch messen | authored | [link](https://www.dwds.de/wb/Verbrauch) |
 | `c_vorbild_sein` | ein Vorbild sein | authored | [link](https://www.dwds.de/wb/Vorbild) |
 | `c_wasserverbrauch_reduzieren` | den Wasserverbrauch reduzieren | authored | [link](https://www.dwds.de/wb/Wasserverbrauch) |
+| `c_wirkungsgrad_verbessern` | den Wirkungsgrad verbessern | authored | [link](https://www.dwds.de/r?q=den%20Wirkungsgrad%20verbessern) |
 | `c_zertifizierung_anstreben` | eine Zertifizierung anstreben | authored | [link](https://www.dwds.de/wb/Zertifizierung) |
 | `c_ziel_verfehlen` | ein Ziel verfehlen | authored | [link](https://www.dwds.de/wb/Ziel) |
 
 </details>
 
-<details><summary>technology — 34</summary>
+<details><summary>technology — 75</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_anforderung_spezifizieren` | die Anforderung spezifizieren | authored | [link](https://www.dwds.de/wb/Anforderung) |
+| `c_anlage_in_betrieb_nehmen` | eine Anlage in Betrieb nehmen | authored | [link](https://www.dwds.de/r?q=eine%20Anlage%20in%20Betrieb%20nehmen) |
+| `c_anlage_spuelen` | die Anlage spülen | authored | [link](https://www.dwds.de/wb/Anlage) |
+| `c_anlage_umruesten` | die Anlage umrüsten | authored | [link](https://www.dwds.de/r?q=die%20Anlage%20umr%C3%BCsten) |
+| `c_anwendung_entwickeln` | eine Anwendung entwickeln | authored | [link](https://www.dwds.de/r?q=eine%20Anwendung%20entwickeln) |
 | `c_automatisierung_einfuehren` | eine Automatisierung einführen | authored | [link](https://www.dwds.de/wb/Automatisierung) |
+| `c_backup_erstellen` | ein Backup erstellen | authored | [link](https://www.dwds.de/wb/Backup) |
+| `c_bauteil_fertigen` | ein Bauteil fertigen | authored | [link](https://www.dwds.de/r?q=ein%20Bauteil%20fertigen) |
 | `c_benutzerhandbuch_verfassen` | ein Benutzerhandbuch verfassen | authored | [link](https://www.dwds.de/wb/Benutzerhandbuch) |
+| `c_benutzerkonto_anlegen` | ein Benutzerkonto anlegen | authored | [link](https://www.dwds.de/r?q=ein%20Benutzerkonto%20anlegen) |
+| `c_bewehrung_verlegen` | die Bewehrung verlegen | authored | [link](https://www.dwds.de/r?q=die%20Bewehrung%20verlegen) |
 | `c_cloud_nutzen` | die Cloud nutzen | authored | [link](https://www.dwds.de/wb/Cloud) |
+| `c_code_testen` | den Code testen | authored | [link](https://www.dwds.de/r?q=den%20Code%20testen) |
+| `c_daten_migrieren` | Daten migrieren | authored | [link](https://www.dwds.de/r?q=Daten%20migrieren) |
 | `c_daten_sichern` | die Daten sichern | authored | [link](https://www.dwds.de/wb/Daten) |
 | `c_daten_sichern_2` | Daten sichern | authored | [link](https://www.dwds.de/wb/Daten) |
+| `c_datenbank_abfragen` | eine Datenbank abfragen | authored | [link](https://www.dwds.de/r?q=eine%20Datenbank%20abfragen) |
 | `c_datenbank_pflegen` | die Datenbank pflegen | authored | [link](https://www.dwds.de/wb/Datenbank) |
 | `c_datenschutz_einhalten` | den Datenschutz einhalten | authored | [link](https://www.dwds.de/wb/Datenschutz) |
 | `c_downtime_minimieren` | die Downtime minimieren | authored | [link](https://www.dwds.de/wb/Downtime) |
+| `c_druck_regeln` | den Druck regeln | authored | [link](https://www.dwds.de/r?q=den%20Druck%20regeln) |
 | `c_fehler_beheben` | einen Fehler beheben | authored | [link](https://www.dwds.de/wb/Fehler) |
+| `c_fehler_eingrenzen` | einen Fehler eingrenzen | authored | [link](https://www.dwds.de/r?q=einen%20Fehler%20eingrenzen) |
+| `c_fehler_reproduzieren` | einen Fehler reproduzieren | authored | [link](https://www.dwds.de/r?q=einen%20Fehler%20reproduzieren) |
+| `c_festigkeit_pruefen` | die Festigkeit prüfen | authored | [link](https://www.dwds.de/r?q=die%20Festigkeit%20pr%C3%BCfen) |
 | `c_firewall_konfigurieren` | die Firewall konfigurieren | authored | [link](https://www.dwds.de/wb/Firewall) |
+| `c_getriebe_austauschen` | das Getriebe austauschen | authored | [link](https://www.dwds.de/r?q=das%20Getriebe%20austauschen) |
+| `c_kunststoff_verarbeiten` | Kunststoff verarbeiten | authored | [link](https://www.dwds.de/wb/Kunststoff) |
 | `c_lizenz_erwerben` | eine Lizenz erwerben | authored | [link](https://www.dwds.de/wb/Lizenz) |
+| `c_loesung_ansetzen` | eine Lösung ansetzen | authored | [link](https://www.dwds.de/wb/L%C3%B6sung) |
+| `c_maschine_anfahren` | die Maschine anfahren | authored | [link](https://www.dwds.de/r?q=die%20Maschine%20anfahren) |
+| `c_maschine_bedienen` | eine Maschine bedienen | authored | [link](https://www.dwds.de/r?q=eine%20Maschine%20bedienen) |
 | `c_migration_planen` | die Migration planen | authored | [link](https://www.dwds.de/wb/Migration) |
+| `c_motor_ueberholen` | den Motor überholen | authored | [link](https://www.dwds.de/r?q=den%20Motor%20%C3%BCberholen) |
 | `c_netzwerk_einrichten` | das Netzwerk einrichten | authored | [link](https://www.dwds.de/wb/Netzwerk) |
 | `c_passwort_zuruecksetzen` | das Passwort zurücksetzen | authored | [link](https://www.dwds.de/wb/Passwort) |
+| `c_pflege_dokumentieren` | die Pflege dokumentieren | authored | [link](https://www.dwds.de/r?q=die%20Pflege%20dokumentieren) |
+| `c_probe_analysieren` | eine Probe analysieren | authored | [link](https://www.dwds.de/wb/Probe) |
+| `c_probelauf_starten` | den Probelauf starten | authored | [link](https://www.dwds.de/r?q=den%20Probelauf%20starten) |
 | `c_problem_beheben` | ein Problem beheben | authored | [link](https://www.dwds.de/wb/Problem) |
+| `c_produktion_hochfahren` | die Produktion hochfahren | authored | [link](https://www.dwds.de/r?q=die%20Produktion%20hochfahren) |
 | `c_programmierung_auslagern` | die Programmierung auslagern | authored | [link](https://www.dwds.de/wb/Programmierung) |
 | `c_prototyp_testen` | den Prototyp testen | authored | [link](https://www.dwds.de/wb/Prototyp) |
 | `c_prozess_optimieren` | einen Prozess optimieren | authored | [link](https://www.dwds.de/wb/Prozess) |
+| `c_quellcode_ueberarbeiten` | den Quellcode überarbeiten | authored | [link](https://www.dwds.de/r?q=den%20Quellcode%20%C3%BCberarbeiten) |
 | `c_rollout_koordinieren` | den Rollout koordinieren | authored | [link](https://www.dwds.de/wb/Rollout) |
 | `c_schnittstelle_bereitstellen` | eine Schnittstelle bereitstellen | authored | [link](https://www.dwds.de/wb/Schnittstelle) |
+| `c_schnittstelle_definieren` | eine Schnittstelle definieren | authored | [link](https://www.dwds.de/r?q=eine%20Schnittstelle%20definieren) |
 | `c_schulung_durchfuehren` | eine Schulung durchführen | authored | [link](https://www.dwds.de/wb/Schulung) |
 | `c_schulung_durchführen` | eine Schulung durchführen | authored | [link](https://www.dwds.de/wb/Schulung) |
+| `c_server_konfigurieren` | einen Server konfigurieren | authored | [link](https://www.dwds.de/r?q=einen%20Server%20konfigurieren) |
+| `c_server_neu_starten` | den Server neu starten | authored | [link](https://www.dwds.de/r?q=den%20Server%20neu%20starten) |
 | `c_server_warten` | den Server warten | authored | [link](https://www.dwds.de/wb/Server) |
+| `c_sicherheitsluecke_schliessen` | eine Sicherheitslücke schließen | authored | [link](https://www.dwds.de/wb/Sicherheitsl%C3%BCcke) |
+| `c_simulation_durchfuehren` | eine Simulation durchführen | authored | [link](https://www.dwds.de/r?q=eine%20Simulation%20durchf%C3%BChren) |
 | `c_software_einführen` | eine Software einführen | authored | [link](https://www.dwds.de/wb/Software) |
+| `c_stoerung_beheben` | eine Störung beheben | authored | [link](https://www.dwds.de/r?q=eine%20St%C3%B6rung%20beheben) |
 | `c_störung_melden` | eine Störung melden | authored | [link](https://www.dwds.de/wb/St%C3%B6rung) |
 | `c_support_anfragen` | den Support anfragen | authored | [link](https://www.dwds.de/wb/Support) |
 | `c_system_einfuehren` | ein System einführen | authored | [link](https://www.dwds.de/wb/System) |
+| `c_temperatur_ueberwachen` | die Temperatur überwachen | authored | [link](https://www.dwds.de/wb/Temperatur) |
 | `c_testlauf_starten` | einen Testlauf starten | authored | [link](https://www.dwds.de/wb/Testlauf) |
 | `c_ticket_erstellen` | ein Ticket erstellen | authored | [link](https://www.dwds.de/wb/Ticket) |
+| `c_toleranzen_einhalten` | die Toleranzen einhalten | authored | [link](https://www.dwds.de/r?q=die%20Toleranzen%20einhalten) |
+| `c_update_ausrollen` | ein Update ausrollen | authored | [link](https://www.dwds.de/r?q=ein%20Update%20ausrollen) |
 | `c_update_einspielen` | ein Update einspielen | authored | [link](https://www.dwds.de/wb/Update) |
+| `c_verfahren_anwenden` | ein Verfahren anwenden | authored | [link](https://www.dwds.de/r?q=ein%20Verfahren%20anwenden) |
+| `c_verschleiss_reduzieren` | den Verschleiß reduzieren | authored | [link](https://www.dwds.de/r?q=den%20Verschlei%C3%9F%20reduzieren) |
+| `c_versuch_durchfuehren` | einen Versuch durchführen | authored | [link](https://www.dwds.de/wb/Versuch) |
 | `c_wartungsfenster_ankuendigen` | ein Wartungsfenster ankündigen | authored | [link](https://www.dwds.de/wb/Wartungsfenster) |
+| `c_werkstoff_auswaehlen` | einen Werkstoff auswählen | authored | [link](https://www.dwds.de/r?q=einen%20Werkstoff%20ausw%C3%A4hlen) |
+| `c_werkstueck_einspannen` | das Werkstück einspannen | authored | [link](https://www.dwds.de/r?q=das%20Werkst%C3%BCck%20einspannen) |
+| `c_wirkstoff_entwickeln` | einen Wirkstoff entwickeln | authored | [link](https://www.dwds.de/wb/Wirkstoff) |
 | `c_zugang_einrichten` | einen Zugang einrichten | authored | [link](https://www.dwds.de/wb/Zugang) |
 | `c_zugriffsrechte_vergeben` | Zugriffsrechte vergeben | authored | [link](https://www.dwds.de/wb/Zugriffsrechte) |
 
 </details>
 
-<details><summary>trades — 9</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `c_auftrag_ausfuehren` | einen Auftrag ausführen | authored | [link](https://www.dwds.de/r?q=einen%20Auftrag%20ausf%C3%BChren) |
-| `c_fliesen_verfugen` | die Fliesen verfugen | authored | [link](https://www.dwds.de/r?q=die%20Fliesen%20verfugen) |
-| `c_heizung_entlueften` | die Heizung entlüften | authored | [link](https://www.dwds.de/r?q=die%20Heizung%20entl%C3%BCften) |
-| `c_kostenvoranschlag_erstellen` | einen Kostenvoranschlag erstellen | authored | [link](https://www.dwds.de/r?q=einen%20Kostenvoranschlag%20erstellen) |
-| `c_mass_nehmen` | Maß nehmen | authored | [link](https://www.dwds.de/r?q=Ma%C3%9F%20nehmen) |
-| `c_schaden_begutachten` | den Schaden begutachten | authored | [link](https://www.dwds.de/r?q=den%20Schaden%20begutachten) |
-| `c_steckdose_anschliessen` | eine Steckdose anschließen | authored | [link](https://www.dwds.de/r?q=eine%20Steckdose%20anschlie%C3%9Fen) |
-| `c_wasserhahn_austauschen` | den Wasserhahn austauschen | authored | [link](https://www.dwds.de/r?q=den%20Wasserhahn%20austauschen) |
-| `c_wasserleitung_verlegen` | eine Wasserleitung verlegen | authored | [link](https://www.dwds.de/r?q=eine%20Wasserleitung%20verlegen) |
-
-</details>
-
-<details><summary>transport — 9</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `c_anhaenger_ankuppeln` | den Anhänger ankuppeln | authored | [link](https://www.dwds.de/r?q=den%20Anh%C3%A4nger%20ankuppeln) |
-| `c_fracht_zustellen` | die Fracht zustellen | authored | [link](https://www.dwds.de/r?q=die%20Fracht%20zustellen) |
-| `c_fuehrerschein_verlaengern` | den Führerschein verlängern | authored | [link](https://www.dwds.de/r?q=den%20F%C3%BChrerschein%20verl%C3%A4ngern) |
-| `c_ladung_sichern` | die Ladung sichern | authored | [link](https://www.dwds.de/r?q=die%20Ladung%20sichern) |
-| `c_lenkzeiten_einhalten` | die Lenkzeiten einhalten | authored | [link](https://www.dwds.de/r?q=die%20Lenkzeiten%20einhalten) |
-| `c_lkw_beladen` | den Lkw beladen | authored | [link](https://www.dwds.de/r?q=den%20Lkw%20beladen) |
-| `c_maut_bezahlen` | die Maut bezahlen | authored | [link](https://www.dwds.de/r?q=die%20Maut%20bezahlen) |
-| `c_panne_melden` | eine Panne melden | authored | [link](https://www.dwds.de/r?q=eine%20Panne%20melden) |
-| `c_umleitung_fahren` | eine Umleitung fahren | authored | [link](https://www.dwds.de/r?q=eine%20Umleitung%20fahren) |
-
-</details>
-
-<details><summary>travel — 36</summary>
+<details><summary>travel — 39</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -895,6 +1306,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_besuch_planen` | einen Besuch planen | authored | [link](https://www.dwds.de/wb/Besuch) |
 | `c_bordkarte_ausdrucken` | die Bordkarte ausdrucken | authored | [link](https://www.dwds.de/wb/Bordkarte) |
 | `c_buchung_stornieren` | die Buchung stornieren | authored | [link](https://www.dwds.de/wb/Buchung) |
+| `c_buffet_aufbauen` | das Buffet aufbauen | authored | [link](https://www.dwds.de/r?q=das%20Buffet%20aufbauen) |
 | `c_dienstreiseantrag_stellen` | einen Dienstreiseantrag stellen | authored | [link](https://www.dwds.de/wb/Dienstreiseantrag) |
 | `c_einladung_aussprechen` | eine Einladung aussprechen | authored | [link](https://www.dwds.de/wb/Einladung) |
 | `c_fahrkarte_loesen` | eine Fahrkarte lösen | authored | [link](https://www.dwds.de/wb/Fahrkarte) |
@@ -904,6 +1316,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_kontakt_knuepfen` | Kontakte knüpfen | authored | [link](https://www.dwds.de/wb/Kontakte) |
 | `c_kosten_erstatten` | Kosten erstatten | authored | [link](https://www.dwds.de/wb/Kosten) |
 | `c_mietwagen_buchen` | einen Mietwagen buchen | authored | [link](https://www.dwds.de/wb/Mietwagen) |
+| `c_panne_melden` | eine Panne melden | authored | [link](https://www.dwds.de/r?q=eine%20Panne%20melden) |
 | `c_programm_zusammenstellen` | das Programm zusammenstellen | authored | [link](https://www.dwds.de/wb/Programm) |
 | `c_reise_buchen` | eine Reise buchen | authored | [link](https://www.dwds.de/wb/Reise) |
 | `c_reise_genehmigen` | eine Reise genehmigen | authored | [link](https://www.dwds.de/wb/Reise) |
@@ -917,6 +1330,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_taxiquittung_aufbewahren` | die Taxiquittung aufbewahren | authored | [link](https://www.dwds.de/wb/Taxiquittung) |
 | `c_termin_wahrnehmen` | einen Termin wahrnehmen | authored | [link](https://www.dwds.de/wb/Termin) |
 | `c_transfer_organisieren` | den Transfer organisieren | authored | [link](https://www.dwds.de/wb/Transfer) |
+| `c_umleitung_fahren` | eine Umleitung fahren | authored | [link](https://www.dwds.de/r?q=eine%20Umleitung%20fahren) |
 | `c_unterkunft_suchen` | eine Unterkunft suchen | authored | [link](https://www.dwds.de/wb/Unterkunft) |
 | `c_verbindung_suchen` | eine Verbindung suchen | authored | [link](https://www.dwds.de/wb/Verbindung) |
 | `c_verpflegung_organisieren` | die Verpflegung organisieren | authored | [link](https://www.dwds.de/wb/Verpflegung) |
@@ -926,14 +1340,18 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>wohnen — 36</summary>
+<details><summary>wohnen — 50</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `c_abrechnung_pruefen` | die Abrechnung prüfen | authored | [link](https://de.wiktionary.org/wiki/prüfen) |
 | `c_besichtigungstermin_vereinbaren` | einen Besichtigungstermin vereinbaren | authored | [link](https://de.wiktionary.org/wiki/vereinbaren) |
+| `c_eigenbedarf_anmelden` | Eigenbedarf anmelden | authored | [link](https://de.wiktionary.org/wiki/anmelden) |
+| `c_estrich_verlegen` | den Estrich verlegen | authored | [link](https://www.dwds.de/r?q=den%20Estrich%20verlegen) |
+| `c_fliesen_verfugen` | die Fliesen verfugen | authored | [link](https://www.dwds.de/r?q=die%20Fliesen%20verfugen) |
 | `c_handwerker_beauftragen` | einen Handwerker beauftragen | authored | [link](https://de.wiktionary.org/wiki/beauftragen) |
 | `c_hausordnung_beachten` | die Hausordnung beachten | authored | [link](https://de.wiktionary.org/wiki/beachten) |
+| `c_heizung_entlueften` | die Heizung entlüften | authored | [link](https://www.dwds.de/r?q=die%20Heizung%20entl%C3%BCften) |
 | `c_kaltmiete_angeben` | die Kaltmiete angeben | authored | [link](https://de.wiktionary.org/wiki/angeben) |
 | `c_kaution_hinterlegen` | die Kaution hinterlegen | authored | [link](https://de.wiktionary.org/wiki/hinterlegen) |
 | `c_kaution_zurueckzahlen` | die Kaution zurückzahlen | authored | [link](https://de.wiktionary.org/wiki/zurückzahlen) |
@@ -942,6 +1360,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_makler_beauftragen` | einen Makler beauftragen | authored | [link](https://de.wiktionary.org/wiki/beauftragen) |
 | `c_mangel_melden` | einen Mangel melden | authored | [link](https://de.wiktionary.org/wiki/melden) |
 | `c_miete_mindern` | die Miete mindern | authored | [link](https://de.wiktionary.org/wiki/mindern) |
+| `c_miete_ueberweisen` | die Miete überweisen | authored | [link](https://www.dwds.de/wb/Miete) |
 | `c_miete_zahlen` | die Miete zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
 | `c_mietvertrag_abschliessen` | einen Mietvertrag abschließen | authored | [link](https://de.wiktionary.org/wiki/abschließen) |
 | `c_mietvertrag_kuendigen` | den Mietvertrag kündigen | authored | [link](https://de.wiktionary.org/wiki/kündigen) |
@@ -949,14 +1368,23 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `c_nachbarn_informieren` | die Nachbarn informieren | authored | [link](https://de.wiktionary.org/wiki/informieren) |
 | `c_nebenkosten_abrechnen` | die Nebenkosten abrechnen | authored | [link](https://de.wiktionary.org/wiki/abrechnen) |
 | `c_nebenkosten_nachzahlen` | die Nebenkosten nachzahlen | authored | [link](https://de.wiktionary.org/wiki/nachzahlen) |
+| `c_provision_zahlen` | eine Provision zahlen | authored | [link](https://de.wiktionary.org/wiki/zahlen) |
 | `c_reparatur_veranlassen` | eine Reparatur veranlassen | authored | [link](https://de.wiktionary.org/wiki/veranlassen) |
 | `c_reparaturfrist_setzen` | eine Frist zur Reparatur setzen | authored | [link](https://de.wiktionary.org/wiki/setzen) |
 | `c_ruhezeit_einhalten` | die Ruhezeit einhalten | authored | [link](https://de.wiktionary.org/wiki/einhalten) |
 | `c_schaden_beheben` | einen Schaden beheben | authored | [link](https://de.wiktionary.org/wiki/beheben) |
+| `c_schaden_melden` | einen Schaden melden | authored | [link](https://www.dwds.de/wb/Schaden) |
 | `c_schimmel_entfernen` | den Schimmel entfernen | authored | [link](https://de.wiktionary.org/wiki/entfernen) |
+| `c_selbstauskunft_ausfuellen` | eine Selbstauskunft ausfüllen | authored | [link](https://de.wiktionary.org/wiki/ausf%C3%BCllen) |
+| `c_steckdose_anschliessen` | eine Steckdose anschließen | authored | [link](https://www.dwds.de/r?q=eine%20Steckdose%20anschlie%C3%9Fen) |
 | `c_strom_anmelden` | den Strom anmelden | authored | [link](https://de.wiktionary.org/wiki/anmelden) |
+| `c_stromzaehler_ablesen` | den Stromzähler ablesen | authored | [link](https://de.wiktionary.org/wiki/ablesen) |
+| `c_treppenhaus_reinigen` | das Treppenhaus reinigen | authored | [link](https://www.dwds.de/wb/Treppenhaus) |
 | `c_uebergabeprotokoll_unterschreiben` | das Übergabeprotokoll unterschreiben | authored | [link](https://de.wiktionary.org/wiki/unterschreiben) |
+| `c_untervermietung_genehmigen` | die Untervermietung genehmigen | authored | [link](https://de.wiktionary.org/wiki/genehmigen) |
 | `c_vorauszahlung_leisten` | eine Vorauszahlung leisten | authored | [link](https://de.wiktionary.org/wiki/leisten) |
+| `c_wasserhahn_austauschen` | den Wasserhahn austauschen | authored | [link](https://www.dwds.de/r?q=den%20Wasserhahn%20austauschen) |
+| `c_wasserleitung_verlegen` | eine Wasserleitung verlegen | authored | [link](https://www.dwds.de/r?q=eine%20Wasserleitung%20verlegen) |
 | `c_wohn_beschwerde_einreichen` | eine Beschwerde einreichen | authored | [link](https://de.wiktionary.org/wiki/einreichen) |
 | `c_wohnung_besichtigen` | eine Wohnung besichtigen | authored | [link](https://de.wiktionary.org/wiki/besichtigen) |
 | `c_wohnung_finden` | eine Wohnung finden | authored | [link](https://de.wiktionary.org/wiki/finden) |
@@ -969,7 +1397,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-### dialogue (20)
+### dialogue (30)
 
 <details><summary>arzt — 2</summary>
 
@@ -1023,6 +1451,42 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
+<details><summary>digitales — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `sc_handyvertrag_abschliessen` | Szenario: Einen Handyvertrag abschließen | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `sc_internet_stoerung` | Szenario: Eine Internetstörung melden | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>einkaufen — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `sc_supermarkt_einkauf` | Szenario: Einkauf im Supermarkt | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `sc_umtausch_reklamation` | Szenario: Umtausch im Geschäft | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>essen — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `sc_restaurant_bestellen` | Szenario: Im Restaurant bestellen | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `sc_tisch_reservieren` | Szenario: Einen Tisch reservieren | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>freizeit — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `sc_freunde_verabreden` | Szenario: Sich mit Freunden verabreden | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `sc_smalltalk_party` | Szenario: Smalltalk auf einer Feier | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
 <details><summary>logistics — 1</summary>
 
 | id | label | origin | reference |
@@ -1036,6 +1500,15 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | id | label | origin | reference |
 |---|---|---|---|
 | `sc_teambesprechung` | Teambesprechung vorbereiten | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>mobilitaet — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `sc_fahrkarte_kaufen` | Szenario: Eine Fahrkarte kaufen | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `sc_nach_dem_weg_fragen` | Szenario: Nach dem Weg fragen | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 
 </details>
 
@@ -1858,7 +2331,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-### text (26)
+### text (36)
 
 <details><summary>arzt — 3</summary>
 
@@ -1899,14 +2372,6 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>construction — 1</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `tx_construction_aushang_baustellenordnung` | Baustellenordnung: Neubau Schulzentrum | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
-
-</details>
-
 <details><summary>customer — 1</summary>
 
 | id | label | origin | reference |
@@ -1915,19 +2380,39 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>engineering — 1</summary>
+<details><summary>digitales — 2</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `tx_engineering_memo_wartungsprotokoll` | Wartungsprotokoll: Hydraulikpresse P-04 | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `tx_digitales_datenschutz_aushang` | Sicher im Internet: Tipps für Ihr Konto | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `tx_digitales_vertrag_email` | Bestätigung Ihres neuen Mobilfunkvertrags | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 
 </details>
 
-<details><summary>it — 1</summary>
+<details><summary>einkaufen — 2</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `tx_it_email_sprint_review` | Einladung: Sprint-Review am Donnerstag | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `tx_einkaufen_lieferung_email` | Ihre Bestellung ist unterwegs | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `tx_einkaufen_umtausch_aushang` | Umtausch und Rückgabe | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>essen — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `tx_essen_kantine_aushang` | Speiseplan der Woche | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `tx_essen_reservierung_email` | Bestätigung Ihrer Tischreservierung | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+
+</details>
+
+<details><summary>freizeit — 2</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `tx_freizeit_einladung_nachricht` | Einladung zum Grillfest | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `tx_freizeit_kursangebot_aushang` | Neue Kurse im Nachbarschaftstreff | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 
 </details>
 
@@ -1947,42 +2432,47 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>production — 1</summary>
+<details><summary>mobilitaet — 2</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `tx_production_voicemail_schichtaenderung` | Ansage der Schichtleitung: Änderung im Schichtplan | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `tx_mobilitaet_carsharing_email` | Ihre Mitfahrgelegenheit nach München | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `tx_mobilitaet_stoerung_aushang` | Störung auf der Linie U2 | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 
 </details>
 
-<details><summary>project — 1</summary>
+<details><summary>project — 2</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
+| `tx_it_email_sprint_review` | Einladung: Sprint-Review am Donnerstag | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `tx_project_memo_status` | Statusbericht: Projekt Kundenportal, Stand 30. Juni | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 
 </details>
 
-<details><summary>safety — 1</summary>
+<details><summary>safety — 2</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
+| `tx_construction_aushang_baustellenordnung` | Baustellenordnung: Neubau Schulzentrum | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `tx_safety_aushang_unterweisung` | Jährliche Sicherheitsunterweisung im Lager | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 
 </details>
 
-<details><summary>scheduling — 1</summary>
+<details><summary>scheduling — 2</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
+| `tx_production_voicemail_schichtaenderung` | Ansage der Schichtleitung: Änderung im Schichtplan | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `tx_scheduling_email_verschiebung` | Verschiebung unseres Termins am Donnerstag | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 
 </details>
 
-<details><summary>technology — 1</summary>
+<details><summary>technology — 2</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
+| `tx_engineering_memo_wartungsprotokoll` | Wartungsprotokoll: Hydraulikpresse P-04 | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `tx_technology_ankuendigung_wartung` | Wartung der IT-Systeme am Samstag | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 
 </details>
@@ -2005,224 +2495,373 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-### vocabulary (1022)
+### vocabulary (1623)
 
-<details><summary>arzt — 28</summary>
+<details><summary>arzt — 80</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `v_allergie` | die Allergie | authored | [link](https://de.wiktionary.org/wiki/Allergie) |
+| `v_ampulle` | die Ampulle | authored | [link](https://www.dwds.de/wb/Ampulle) |
+| `v_ansteckend` | ansteckend | authored | [link](https://www.dwds.de/r?q=ansteckend) |
 | `v_apotheke` | die Apotheke | authored | [link](https://de.wiktionary.org/wiki/Apotheke) |
+| `v_arzneimittel` | das Arzneimittel | authored | [link](https://www.dwds.de/wb/Arzneimittel) |
 | `v_arzttermin` | der Arzttermin | authored | [link](https://de.wiktionary.org/wiki/Arzttermin) |
+| `v_attest` | das Attest | authored | [link](https://www.dwds.de/wb/Attest) |
+| `v_aufwaermen` | aufwärmen | authored | [link](https://www.dwds.de/wb/aufw%C3%A4rmen) |
+| `v_ausdauer` | die Ausdauer | authored | [link](https://www.dwds.de/r?q=Ausdauer) |
+| `v_ausschlag` | der Ausschlag | authored | [link](https://www.dwds.de/wb/Ausschlag) |
 | `v_behandlung` | die Behandlung | authored | [link](https://de.wiktionary.org/wiki/Behandlung) |
 | `v_beschwerden` | die Beschwerden | authored | [link](https://de.wiktionary.org/wiki/Beschwerde) |
+| `v_bettlaegerig` | bettlägerig | authored | [link](https://www.dwds.de/r?q=bettl%C3%A4gerig) |
+| `v_beweglichkeit` | die Beweglichkeit | authored | [link](https://www.dwds.de/r?q=Beweglichkeit) |
+| `v_blutdruckmessung` | die Blutdruckmessung | authored | [link](https://www.dwds.de/r?q=Blutdruckmessung) |
+| `v_dehnen` | dehnen | authored | [link](https://www.dwds.de/r?q=dehnen) |
+| `v_demenz` | die Demenz | authored | [link](https://www.dwds.de/r?q=Demenz) |
 | `v_diagnose` | die Diagnose | authored | [link](https://de.wiktionary.org/wiki/Diagnose) |
+| `v_dosierung` | die Dosierung | authored | [link](https://www.dwds.de/wb/Dosierung) |
+| `v_eigenanteil` | der Eigenanteil | authored | [link](https://www.dwds.de/wb/Eigenanteil) |
 | `v_erkaeltung` | die Erkältung | authored | [link](https://de.wiktionary.org/wiki/Erkältung) |
+| `v_ernaehrungsberatung` | die Ernährungsberatung | authored | [link](https://www.dwds.de/r?q=Ern%C3%A4hrungsberatung) |
 | `v_facharzt` | der Facharzt | authored | [link](https://de.wiktionary.org/wiki/Facharzt) |
 | `v_fieber` | das Fieber | authored | [link](https://de.wiktionary.org/wiki/Fieber) |
+| `v_fitnessgeraet` | das Fitnessgerät | authored | [link](https://www.dwds.de/wb/Fitnessger%C3%A4t) |
+| `v_gesundheitskarte` | die Gesundheitskarte | authored | [link](https://www.dwds.de/wb/Gesundheitskarte) |
+| `v_gewicht` | das Gewicht | authored | [link](https://www.dwds.de/wb/Gewicht) |
+| `v_gleichgewicht` | das Gleichgewicht | authored | [link](https://www.dwds.de/r?q=Gleichgewicht) |
+| `v_haltung` | die Haltung | authored | [link](https://www.dwds.de/r?q=Haltung) |
+| `v_hantel` | die Hantel | authored | [link](https://www.dwds.de/wb/Hantel) |
 | `v_hausarzt` | der Hausarzt | authored | [link](https://de.wiktionary.org/wiki/Hausarzt) |
 | `v_husten` | der Husten | authored | [link](https://de.wiktionary.org/wiki/Husten) |
+| `v_impfstoff` | der Impfstoff | authored | [link](https://www.dwds.de/wb/Impfstoff) |
 | `v_impfung` | die Impfung | authored | [link](https://de.wiktionary.org/wiki/Impfung) |
+| `v_implantat` | das Implantat | authored | [link](https://www.dwds.de/wb/Implantat) |
+| `v_infusion` | die Infusion | authored | [link](https://www.dwds.de/r?q=Infusion) |
+| `v_kanuele` | die Kanüle | authored | [link](https://www.dwds.de/wb/Kan%C3%BCle) |
+| `v_kondition` | die Kondition | authored | [link](https://www.dwds.de/wb/Kondition) |
+| `v_krafttraining` | das Krafttraining | authored | [link](https://www.dwds.de/wb/Krafttraining) |
 | `v_krankenkasse` | die Krankenkasse | authored | [link](https://de.wiktionary.org/wiki/Krankenkasse) |
 | `v_krankenversicherung` | die Krankenversicherung | authored | [link](https://de.wiktionary.org/wiki/Krankenversicherung) |
 | `v_krankschreibung` | die Krankschreibung | authored | [link](https://de.wiktionary.org/wiki/Krankschreibung) |
+| `v_laufband` | das Laufband | authored | [link](https://www.dwds.de/wb/Laufband) |
 | `v_medikament` | das Medikament | authored | [link](https://de.wiktionary.org/wiki/Medikament) |
+| `v_mobilisieren` | mobilisieren | authored | [link](https://www.dwds.de/r?q=mobilisieren) |
+| `v_muskel` | der Muskel | authored | [link](https://www.dwds.de/r?q=Muskel) |
+| `v_muskelkater` | der Muskelkater | authored | [link](https://www.dwds.de/wb/Muskelkater) |
+| `v_nachsorge` | die Nachsorge | authored | [link](https://www.dwds.de/wb/Nachsorge) |
 | `v_notaufnahme` | die Notaufnahme | authored | [link](https://de.wiktionary.org/wiki/Notaufnahme) |
+| `v_physiotherapie` | die Physiotherapie | authored | [link](https://www.dwds.de/wb/Physiotherapie) |
 | `v_praxis` | die Praxis | authored | [link](https://de.wiktionary.org/wiki/Praxis) |
+| `v_proband` | der Proband | authored | [link](https://www.dwds.de/wb/Proband) |
+| `v_puls` | der Puls | authored | [link](https://www.dwds.de/wb/Puls) |
+| `v_regeneration` | die Regeneration | authored | [link](https://www.dwds.de/r?q=Regeneration) |
+| `v_rehabilitation` | die Rehabilitation | authored | [link](https://www.dwds.de/r?q=Rehabilitation) |
 | `v_rezept` | das Rezept | authored | [link](https://de.wiktionary.org/wiki/Rezept) |
+| `v_rollstuhl` | der Rollstuhl | authored | [link](https://www.dwds.de/r?q=Rollstuhl) |
 | `v_schmerzen` | die Schmerzen | authored | [link](https://de.wiktionary.org/wiki/Schmerz) |
+| `v_schwindel` | der Schwindel | authored | [link](https://www.dwds.de/wb/Schwindel) |
 | `v_sprechstunde` | die Sprechstunde | authored | [link](https://de.wiktionary.org/wiki/Sprechstunde) |
+| `v_spritze` | die Spritze | authored | [link](https://www.dwds.de/wb/Spritze) |
 | `v_symptom` | das Symptom | authored | [link](https://de.wiktionary.org/wiki/Symptom) |
 | `v_uebelkeit` | die Übelkeit | authored | [link](https://de.wiktionary.org/wiki/Übelkeit) |
 | `v_ueberweisung` | die Überweisung | authored | [link](https://de.wiktionary.org/wiki/Überweisung) |
+| `v_ueberweisungsschein` | der Überweisungsschein | authored | [link](https://www.dwds.de/wb/%C3%9Cberweisungsschein) |
+| `v_uebung` | die Übung | authored | [link](https://www.dwds.de/wb/%C3%9Cbung) |
 | `v_untersuchung` | die Untersuchung | authored | [link](https://de.wiktionary.org/wiki/Untersuchung) |
+| `v_verabreichen` | verabreichen | authored | [link](https://www.dwds.de/r?q=verabreichen) |
+| `v_verbandswechsel` | der Verbandswechsel | authored | [link](https://www.dwds.de/r?q=Verbandswechsel) |
 | `v_verschreiben` | verschreiben | authored | [link](https://de.wiktionary.org/wiki/verschreiben) |
 | `v_versichertenkarte` | die Versichertenkarte | authored | [link](https://de.wiktionary.org/wiki/Versichertenkarte) |
+| `v_versicherungsschutz` | der Versicherungsschutz | authored | [link](https://www.dwds.de/wb/Versicherungsschutz) |
+| `v_visite` | die Visite | authored | [link](https://www.dwds.de/r?q=Visite) |
 | `v_wartezimmer` | das Wartezimmer | authored | [link](https://de.wiktionary.org/wiki/Wartezimmer) |
+| `v_wiederholung` | die Wiederholung | authored | [link](https://www.dwds.de/wb/Wiederholung) |
+| `v_wirksamkeit` | die Wirksamkeit | authored | [link](https://www.dwds.de/wb/Wirksamkeit) |
+| `v_wirkstoff` | der Wirkstoff | authored | [link](https://www.dwds.de/wb/Wirkstoff) |
+| `v_wundversorgung` | die Wundversorgung | authored | [link](https://www.dwds.de/r?q=Wundversorgung) |
+| `v_zusatzversicherung` | die Zusatzversicherung | authored | [link](https://www.dwds.de/wb/Zusatzversicherung) |
+| `v_zuzahlung` | die Zuzahlung | authored | [link](https://www.dwds.de/wb/Zuzahlung) |
 
 </details>
 
-<details><summary>bank — 28</summary>
+<details><summary>bank — 81</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `v_abheben` | abheben | authored | [link](https://de.wiktionary.org/wiki/abheben) |
+| `v_ablaufdatum` | das Ablaufdatum | authored | [link](https://www.dwds.de/wb/Ablaufdatum) |
+| `v_auftraggeber` | der Auftraggeber | authored | [link](https://www.dwds.de/wb/Auftraggeber) |
+| `v_auszahlung` | die Auszahlung | authored | [link](https://www.dwds.de/wb/Auszahlung) |
 | `v_bankberater` | der Bankberater | authored | [link](https://de.wiktionary.org/wiki/Bankberater) |
+| `v_bankingapp` | die Banking-App | authored | [link](https://www.dwds.de/wb/Banking-App) |
+| `v_bankkarte` | die Bankkarte | authored | [link](https://www.dwds.de/wb/Bankkarte) |
+| `v_bankverbindung` | die Bankverbindung | authored | [link](https://www.dwds.de/wb/Bankverbindung) |
 | `v_bargeld` | das Bargeld | authored | [link](https://de.wiktionary.org/wiki/Bargeld) |
+| `v_bonitaet` | die Bonität | authored | [link](https://www.dwds.de/wb/Bonit%C3%A4t) |
+| `v_buchung` | die Buchung | authored | [link](https://www.dwds.de/wb/Buchung) |
+| `v_buergschaft` | die Bürgschaft | authored | [link](https://www.dwds.de/wb/B%C3%BCrgschaft) |
+| `v_darlehen` | das Darlehen | authored | [link](https://www.dwds.de/wb/Darlehen) |
 | `v_dauerauftrag` | der Dauerauftrag | authored | [link](https://de.wiktionary.org/wiki/Dauerauftrag) |
+| `v_debitkarte` | die Debitkarte | authored | [link](https://www.dwds.de/wb/Debitkarte) |
 | `v_dispokredit` | der Dispokredit | authored | [link](https://de.wiktionary.org/wiki/Dispositionskredit) |
+| `v_echtzeitueberweisung` | die Echtzeitüberweisung | authored | [link](https://www.dwds.de/wb/Echtzeit%C3%BCberweisung) |
+| `v_einzahlen` | einzahlen | authored | [link](https://www.dwds.de/wb/einzahlen) |
+| `v_einzahlung` | die Einzahlung | authored | [link](https://www.dwds.de/wb/Einzahlung) |
 | `v_filiale` | die Filiale | authored | [link](https://de.wiktionary.org/wiki/Filiale) |
+| `v_finanzierung` | die Finanzierung | authored | [link](https://www.dwds.de/wb/Finanzierung) |
+| `v_freistellungsauftrag` | der Freistellungsauftrag | authored | [link](https://www.dwds.de/wb/Freistellungsauftrag) |
 | `v_geldanlage` | die Geldanlage | authored | [link](https://de.wiktionary.org/wiki/Geldanlage) |
 | `v_geldautomat` | der Geldautomat | authored | [link](https://de.wiktionary.org/wiki/Geldautomat) |
+| `v_gemeinschaftskonto` | das Gemeinschaftskonto | authored | [link](https://www.dwds.de/wb/Gemeinschaftskonto) |
 | `v_girocard` | die Girocard | authored | [link](https://de.wiktionary.org/wiki/Girocard) |
 | `v_girokonto` | das Girokonto | authored | [link](https://de.wiktionary.org/wiki/Girokonto) |
+| `v_guthaben` | das Guthaben | authored | [link](https://www.dwds.de/wb/Guthaben) |
 | `v_gutschrift` | die Gutschrift | authored | [link](https://de.wiktionary.org/wiki/Gutschrift) |
+| `v_hausbank` | die Hausbank | authored | [link](https://www.dwds.de/wb/Hausbank) |
 | `v_iban` | die IBAN | authored | [link](https://de.wiktionary.org/wiki/IBAN) |
+| `v_kartenlesegeraet` | das Kartenlesegerät | authored | [link](https://www.dwds.de/wb/Kartenleseger%C3%A4t) |
+| `v_kartennummer` | die Kartennummer | authored | [link](https://www.dwds.de/wb/Kartennummer) |
+| `v_kartensperrung` | die Kartensperrung | authored | [link](https://www.dwds.de/wb/Kartensperrung) |
+| `v_kontaktlos` | kontaktlos | authored | [link](https://www.dwds.de/wb/kontaktlos) |
+| `v_konto` | das Konto | authored | [link](https://www.dwds.de/wb/Konto) |
 | `v_kontoauszug` | der Kontoauszug | authored | [link](https://de.wiktionary.org/wiki/Kontoauszug) |
 | `v_kontoeroeffnung` | die Kontoeröffnung | authored | [link](https://de.wiktionary.org/wiki/Kontoeröffnung) |
 | `v_kontofuehrungsgebuehr` | die Kontoführungsgebühr | authored | [link](https://de.wiktionary.org/wiki/Kontoführungsgebühr) |
+| `v_kontoinhaber` | der Kontoinhaber | authored | [link](https://www.dwds.de/wb/Kontoinhaber) |
+| `v_kontonummer` | die Kontonummer | authored | [link](https://www.dwds.de/wb/Kontonummer) |
 | `v_kontostand` | der Kontostand | authored | [link](https://de.wiktionary.org/wiki/Kontostand) |
+| `v_kontovollmacht` | die Kontovollmacht | authored | [link](https://www.dwds.de/wb/Kontovollmacht) |
+| `v_kontowechsel` | der Kontowechsel | authored | [link](https://www.dwds.de/wb/Kontowechsel) |
 | `v_kredit` | der Kredit | authored | [link](https://de.wiktionary.org/wiki/Kredit) |
 | `v_kreditkarte` | die Kreditkarte | authored | [link](https://de.wiktionary.org/wiki/Kreditkarte) |
 | `v_lastschrift` | die Lastschrift | authored | [link](https://de.wiktionary.org/wiki/Lastschrift) |
+| `v_mahnung` | die Mahnung | authored | [link](https://www.dwds.de/wb/Mahnung) |
+| `v_mitgliedsbeitrag` | der Mitgliedsbeitrag | authored | [link](https://www.dwds.de/r?q=Mitgliedsbeitrag) |
 | `v_onlinebanking` | das Online-Banking | authored | [link](https://de.wiktionary.org/wiki/Online-Banking) |
 | `v_pin` | die PIN | authored | [link](https://de.wiktionary.org/wiki/PIN) |
+| `v_prepaidkarte` | die Prepaid-Karte | authored | [link](https://www.dwds.de/wb/Prepaidkarte) |
+| `v_quittung` | die Quittung | authored | [link](https://www.dwds.de/wb/Quittung) |
+| `v_rate` | die Rate | authored | [link](https://www.dwds.de/wb/Rate) |
 | `v_ratenzahlung` | die Ratenzahlung | authored | [link](https://de.wiktionary.org/wiki/Ratenzahlung) |
+| `v_rendite` | die Rendite | authored | [link](https://www.dwds.de/wb/Rendite) |
+| `v_ruecklage` | die Rücklage | authored | [link](https://www.dwds.de/wb/R%C3%BCcklage) |
+| `v_ruecklastschrift` | die Rücklastschrift | authored | [link](https://www.dwds.de/wb/R%C3%BCcklastschrift) |
 | `v_schulden` | die Schulden | authored | [link](https://de.wiktionary.org/wiki/Schulden) |
+| `v_schuldnerberatung` | die Schuldnerberatung | authored | [link](https://www.dwds.de/wb/Schuldnerberatung) |
+| `v_sparkasse` | die Sparkasse | authored | [link](https://www.dwds.de/wb/Sparkasse) |
 | `v_sparkonto` | das Sparkonto | authored | [link](https://de.wiktionary.org/wiki/Sparkonto) |
+| `v_sparziel` | das Sparziel | authored | [link](https://www.dwds.de/wb/Sparziel) |
+| `v_sperren` | sperren | authored | [link](https://www.dwds.de/wb/sperren) |
+| `v_sperrhotline` | die Sperrhotline | authored | [link](https://www.dwds.de/wb/Sperrhotline) |
+| `v_tagesgeldkonto` | das Tagesgeldkonto | authored | [link](https://www.dwds.de/wb/Tagesgeldkonto) |
+| `v_tageslimit` | das Tageslimit | authored | [link](https://www.dwds.de/wb/Tageslimit) |
 | `v_tan` | die TAN | authored | [link](https://de.wiktionary.org/wiki/TAN) |
+| `v_tilgung` | die Tilgung | authored | [link](https://www.dwds.de/wb/Tilgung) |
+| `v_ueberweisen` | überweisen | authored | [link](https://www.dwds.de/wb/%C3%BCberweisen) |
+| `v_verfuegungsrahmen` | der Verfügungsrahmen | authored | [link](https://www.dwds.de/wb/Verf%C3%BCgungsrahmen) |
 | `v_verwendungszweck` | der Verwendungszweck | authored | [link](https://de.wiktionary.org/wiki/Verwendungszweck) |
+| `v_wertstellung` | die Wertstellung | authored | [link](https://www.dwds.de/wb/Wertstellung) |
+| `v_zahlungsausgang` | der Zahlungsausgang | authored | [link](https://www.dwds.de/wb/Zahlungsausgang) |
+| `v_zahlungseingang` | der Zahlungseingang | authored | [link](https://www.dwds.de/wb/Zahlungseingang) |
 | `v_zahlungsempfaenger` | der Zahlungsempfänger | authored | [link](https://de.wiktionary.org/wiki/Zahlungsempfänger) |
+| `v_zahlungsverkehr` | der Zahlungsverkehr | authored | [link](https://www.dwds.de/wb/Zahlungsverkehr) |
+| `v_zahlungsverzug` | der Zahlungsverzug | authored | [link](https://www.dwds.de/wb/Zahlungsverzug) |
 | `v_zinsen` | die Zinsen | authored | [link](https://de.wiktionary.org/wiki/Zins) |
+| `v_zinssatz` | der Zinssatz | authored | [link](https://www.dwds.de/wb/Zinssatz) |
+| `v_zweifaktorauth` | die Zwei-Faktor-Authentifizierung | authored | [link](https://www.dwds.de/wb/Zwei-Faktor-Authentifizierung) |
 
 </details>
 
-<details><summary>beauty — 20</summary>
+<details><summary>behoerde — 80</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `v_dauerwelle` | die Dauerwelle | authored | [link](https://www.dwds.de/r?q=Dauerwelle) |
-| `v_faerbemittel` | das Färbemittel | authored | [link](https://www.dwds.de/r?q=F%C3%A4rbemittel) |
-| `v_fettig` | fettig | authored | [link](https://www.dwds.de/r?q=fettig) |
-| `v_foehnen` | föhnen | authored | [link](https://www.dwds.de/r?q=f%C3%B6hnen) |
-| `v_gepflegt` | gepflegt | authored | [link](https://www.dwds.de/r?q=gepflegt) |
-| `v_gesichtsbehandlung` | die Gesichtsbehandlung | authored | [link](https://www.dwds.de/r?q=Gesichtsbehandlung) |
-| `v_haarschnitt` | der Haarschnitt | authored | [link](https://www.dwds.de/r?q=Haarschnitt) |
-| `v_hautanalyse` | die Hautanalyse | authored | [link](https://www.dwds.de/r?q=Hautanalyse) |
-| `v_hautpflege` | die Hautpflege | authored | [link](https://www.dwds.de/r?q=Hautpflege) |
-| `v_kopfhaut` | die Kopfhaut | authored | [link](https://www.dwds.de/r?q=Kopfhaut) |
-| `v_kosmetikerin` | die Kosmetikerin | authored | [link](https://www.dwds.de/r?q=Kosmetikerin) |
-| `v_manikuere` | die Maniküre | authored | [link](https://www.dwds.de/r?q=Manik%C3%BCre) |
-| `v_nachschneiden` | nachschneiden | authored | [link](https://www.dwds.de/r?q=nachschneiden) |
-| `v_nagellack` | der Nagellack | authored | [link](https://www.dwds.de/r?q=Nagellack) |
-| `v_peeling` | das Peeling | authored | [link](https://www.dwds.de/r?q=Peeling) |
-| `v_schminken` | schminken | authored | [link](https://www.dwds.de/r?q=schminken) |
-| `v_spliss` | der Spliss | authored | [link](https://www.dwds.de/r?q=Spliss) |
-| `v_straehne` | die Strähne | authored | [link](https://www.dwds.de/r?q=Str%C3%A4hne) |
-| `v_toenen` | tönen | authored | [link](https://www.dwds.de/r?q=t%C3%B6nen) |
-| `v_wimper` | die Wimper | authored | [link](https://www.dwds.de/r?q=Wimper) |
-
-</details>
-
-<details><summary>behoerde — 27</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
+| `v_ablehnen` | ablehnen | authored | [link](https://www.dwds.de/wb/ablehnen) |
+| `v_ablehnung` | die Ablehnung | authored | [link](https://www.dwds.de/wb/Ablehnung) |
+| `v_abmelden` | abmelden | authored | [link](https://www.dwds.de/wb/abmelden) |
+| `v_abmeldung` | die Abmeldung | authored | [link](https://www.dwds.de/wb/Abmeldung) |
+| `v_anhoerung` | die Anhörung | authored | [link](https://www.dwds.de/wb/Anh%C3%B6rung) |
+| `v_anmelden` | anmelden | authored | [link](https://www.dwds.de/wb/anmelden) |
 | `v_anmeldung` | die Anmeldung | authored | [link](https://de.wiktionary.org/wiki/Anmeldung) |
 | `v_antrag` | der Antrag | authored | [link](https://de.wiktionary.org/wiki/Antrag) |
+| `v_antragsfrist` | die Antragsfrist | authored | [link](https://www.dwds.de/wb/Antragsfrist) |
+| `v_antragsteller` | der Antragsteller | authored | [link](https://www.dwds.de/wb/Antragsteller) |
+| `v_asylantrag` | der Asylantrag | authored | [link](https://www.dwds.de/wb/Asylantrag) |
+| `v_aufenthaltsdauer` | die Aufenthaltsdauer | authored | [link](https://www.dwds.de/wb/Aufenthaltsdauer) |
 | `v_aufenthaltserlaubnis` | die Aufenthaltserlaubnis | authored | [link](https://de.wiktionary.org/wiki/Aufenthaltserlaubnis) |
+| `v_aufenthaltsgestattung` | die Aufenthaltsgestattung | authored | [link](https://www.dwds.de/wb/Aufenthaltsgestattung) |
+| `v_aufenthaltskarte` | die Aufenthaltskarte | authored | [link](https://www.dwds.de/wb/Aufenthaltskarte) |
+| `v_aufenthaltsstatus` | der Aufenthaltsstatus | authored | [link](https://www.dwds.de/wb/Aufenthaltsstatus) |
 | `v_aufenthaltstitel` | der Aufenthaltstitel | authored | [link](https://de.wiktionary.org/wiki/Aufenthaltstitel) |
+| `v_aufenthaltszweck` | der Aufenthaltszweck | authored | [link](https://www.dwds.de/wb/Aufenthaltszweck) |
 | `v_ausfuellen` | ausfüllen | authored | [link](https://de.wiktionary.org/wiki/ausfüllen) |
 | `v_auslaenderbehoerde` | die Ausländerbehörde | authored | [link](https://de.wiktionary.org/wiki/Ausländerbehörde) |
+| `v_ausreise` | die Ausreise | authored | [link](https://www.dwds.de/wb/Ausreise) |
+| `v_bauamt` | das Bauamt | authored | [link](https://www.dwds.de/r?q=Bauamt) |
+| `v_baugenehmigung` | die Baugenehmigung | authored | [link](https://www.dwds.de/r?q=Baugenehmigung) |
 | `v_beantragen` | beantragen | authored | [link](https://de.wiktionary.org/wiki/beantragen) |
 | `v_bearbeitungszeit` | die Bearbeitungszeit | authored | [link](https://de.wiktionary.org/wiki/Bearbeitungszeit) |
+| `v_bebauungsplan` | der Bebauungsplan | authored | [link](https://www.dwds.de/r?q=Bebauungsplan) |
+| `v_begruendung` | die Begründung | authored | [link](https://www.dwds.de/wb/Begr%C3%BCndung) |
 | `v_behoerde` | die Behörde | authored | [link](https://de.wiktionary.org/wiki/Behörde) |
 | `v_behoerdentermin` | der Behördentermin | authored | [link](https://de.wiktionary.org/wiki/Termin) |
 | `v_bescheid` | der Bescheid | authored | [link](https://de.wiktionary.org/wiki/Bescheid) |
 | `v_bescheinigung` | die Bescheinigung | authored | [link](https://de.wiktionary.org/wiki/Bescheinigung) |
+| `v_bewilligung` | die Bewilligung | authored | [link](https://www.dwds.de/wb/Bewilligung) |
+| `v_bewilligungsbescheid` | der Bewilligungsbescheid | authored | [link](https://www.dwds.de/wb/Bewilligungsbescheid) |
 | `v_buergeramt` | das Bürgeramt | authored | [link](https://www.dwds.de/r?q=B%C3%BCrgeramt) |
+| `v_duldung` | die Duldung | authored | [link](https://www.dwds.de/wb/Duldung) |
+| `v_einbuergerung` | die Einbürgerung | authored | [link](https://www.dwds.de/wb/Einb%C3%BCrgerung) |
 | `v_einreichen` | einreichen | authored | [link](https://de.wiktionary.org/wiki/einreichen) |
+| `v_einreise` | die Einreise | authored | [link](https://www.dwds.de/wb/Einreise) |
+| `v_einwohnermeldeamt` | das Einwohnermeldeamt | authored | [link](https://www.dwds.de/wb/Einwohnermeldeamt) |
+| `v_fiktionsbescheinigung` | die Fiktionsbescheinigung | authored | [link](https://www.dwds.de/wb/Fiktionsbescheinigung) |
 | `v_formular` | das Formular | authored | [link](https://de.wiktionary.org/wiki/Formular) |
+| `v_fuehrungszeugnis` | das Führungszeugnis | authored | [link](https://www.dwds.de/wb/F%C3%BChrungszeugnis) |
 | `v_gebuehr` | die Gebühr | authored | [link](https://de.wiktionary.org/wiki/Gebühr) |
+| `v_geburtsurkunde` | die Geburtsurkunde | authored | [link](https://www.dwds.de/wb/Geburtsurkunde) |
+| `v_genehmigen` | genehmigen | authored | [link](https://www.dwds.de/r?q=genehmigen) |
+| `v_hauptwohnsitz` | der Hauptwohnsitz | authored | [link](https://www.dwds.de/wb/Hauptwohnsitz) |
+| `v_hausrecht` | das Hausrecht | authored | [link](https://www.dwds.de/wb/Hausrecht) |
+| `v_heiratsurkunde` | die Heiratsurkunde | authored | [link](https://www.dwds.de/wb/Heiratsurkunde) |
+| `v_klage` | die Klage | authored | [link](https://www.dwds.de/wb/Klage) |
+| `v_meldeadresse` | die Meldeadresse | authored | [link](https://www.dwds.de/wb/Meldeadresse) |
 | `v_meldebescheinigung` | die Meldebescheinigung | authored | [link](https://www.dwds.de/r?q=Meldebescheinigung) |
+| `v_meldepflicht` | die Meldepflicht | authored | [link](https://www.dwds.de/wb/Meldepflicht) |
 | `v_mietvertrag` | der Mietvertrag | authored | [link](https://de.wiktionary.org/wiki/Mietvertrag) |
+| `v_nachforderung` | die Nachforderung | authored | [link](https://www.dwds.de/wb/Nachforderung) |
 | `v_nachweis` | der Nachweis | authored | [link](https://de.wiktionary.org/wiki/Nachweis) |
+| `v_nebenwohnsitz` | der Nebenwohnsitz | authored | [link](https://www.dwds.de/wb/Nebenwohnsitz) |
+| `v_niederlassungserlaubnis` | die Niederlassungserlaubnis | authored | [link](https://www.dwds.de/wb/Niederlassungserlaubnis) |
+| `v_oeffnungszeiten` | die Öffnungszeiten | authored | [link](https://www.dwds.de/wb/%C3%96ffnungszeiten) |
+| `v_passfoto` | das Passfoto | authored | [link](https://www.dwds.de/wb/Passfoto) |
 | `v_personalausweis` | der Personalausweis | authored | [link](https://de.wiktionary.org/wiki/Personalausweis) |
+| `v_pflegegrad` | der Pflegegrad | authored | [link](https://www.dwds.de/r?q=Pflegegrad) |
+| `v_rechtsbehelfsbelehrung` | die Rechtsbehelfsbelehrung | authored | [link](https://www.dwds.de/wb/Rechtsbehelfsbelehrung) |
+| `v_rechtskraft` | die Rechtskraft | authored | [link](https://www.dwds.de/wb/Rechtskraft) |
+| `v_rechtsmittel` | das Rechtsmittel | authored | [link](https://www.dwds.de/wb/Rechtsmittel) |
+| `v_reisepass` | der Reisepass | authored | [link](https://www.dwds.de/wb/Reisepass) |
 | `v_sachbearbeiter` | der Sachbearbeiter | authored | [link](https://de.wiktionary.org/wiki/Sachbearbeiter) |
+| `v_steuernummer` | die Steuernummer | authored | [link](https://www.dwds.de/wb/Steuernummer) |
 | `v_ummeldung` | die Ummeldung | authored | [link](https://www.dwds.de/r?q=Ummeldung) |
 | `v_unterlagen` | die Unterlagen | authored | [link](https://de.wiktionary.org/wiki/Unterlage) |
 | `v_verlaengerung` | die Verlängerung | authored | [link](https://de.wiktionary.org/wiki/Verlängerung) |
+| `v_verpflichtungserklaerung` | die Verpflichtungserklärung | authored | [link](https://www.dwds.de/wb/Verpflichtungserkl%C3%A4rung) |
+| `v_verwaltungsakt` | der Verwaltungsakt | authored | [link](https://www.dwds.de/wb/Verwaltungsakt) |
 | `v_vollmacht` | die Vollmacht | authored | [link](https://de.wiktionary.org/wiki/Vollmacht) |
 | `v_wartenummer` | die Wartenummer | authored | [link](https://www.dwds.de/r?q=Wartenummer) |
+| `v_wegzug` | der Wegzug | authored | [link](https://www.dwds.de/wb/Wegzug) |
+| `v_widerspruch` | der Widerspruch | authored | [link](https://www.dwds.de/wb/Widerspruch) |
+| `v_widerspruchsbescheid` | der Widerspruchsbescheid | authored | [link](https://www.dwds.de/wb/Widerspruchsbescheid) |
+| `v_wohnsitz` | der Wohnsitz | authored | [link](https://www.dwds.de/wb/Wohnsitz) |
 | `v_wohnungsgeberbestaetigung` | die Wohnungsgeberbestätigung | authored | [link](https://www.dwds.de/wb/Wohnungsgeberbest%C3%A4tigung) |
+| `v_zuzug` | der Zuzug | authored | [link](https://www.dwds.de/wb/Zuzug) |
 
 </details>
 
-<details><summary>bildung — 28</summary>
+<details><summary>bildung — 80</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
+| `v_abendkurs` | der Abendkurs | authored | [link](https://www.dwds.de/wb/Abendkurs) |
 | `v_anerkennung` | die Anerkennung | authored | [link](https://de.wiktionary.org/wiki/Anerkennung) |
+| `v_anerkennungsverfahren` | das Anerkennungsverfahren | authored | [link](https://www.dwds.de/wb/Anerkennungsverfahren) |
+| `v_anlernen` | anlernen | authored | [link](https://www.dwds.de/r?q=anlernen) |
+| `v_anmeldefrist` | die Anmeldefrist | authored | [link](https://www.dwds.de/wb/Anmeldefrist) |
+| `v_anpassungsqualifizierung` | die Anpassungsqualifizierung | authored | [link](https://www.dwds.de/wb/Anpassungsqualifizierung) |
+| `v_aufstieg` | der Aufstieg | authored | [link](https://www.dwds.de/wb/Aufstieg) |
 | `v_ausbildung` | die Ausbildung | authored | [link](https://de.wiktionary.org/wiki/Ausbildung) |
+| `v_aussprache` | die Aussprache | authored | [link](https://www.dwds.de/wb/Aussprache) |
 | `v_beglaubigung` | die Beglaubigung | authored | [link](https://de.wiktionary.org/wiki/Beglaubigung) |
+| `v_berufsabschluss` | der Berufsabschluss | authored | [link](https://www.dwds.de/wb/Berufsabschluss) |
+| `v_berufsbegleitend` | berufsbegleitend | authored | [link](https://www.dwds.de/wb/berufsbegleitend) |
+| `v_berufserfahrung` | die Berufserfahrung | authored | [link](https://www.dwds.de/wb/Berufserfahrung) |
 | `v_bestehen` | bestehen | authored | [link](https://de.wiktionary.org/wiki/bestehen) |
 | `v_bewerbung` | die Bewerbung | authored | [link](https://de.wiktionary.org/wiki/Bewerbung) |
 | `v_bildungsabschluss` | der Bildungsabschluss | authored | [link](https://de.wiktionary.org/wiki/Bildungsabschluss) |
+| `v_bildungsgutschein` | der Bildungsgutschein | authored | [link](https://www.dwds.de/wb/Bildungsgutschein) |
+| `v_bildungspraemie` | die Bildungsprämie | authored | [link](https://www.dwds.de/wb/Bildungspr%C3%A4mie) |
+| `v_bildungsurlaub` | der Bildungsurlaub | authored | [link](https://www.dwds.de/wb/Bildungsurlaub) |
+| `v_diplom` | das Diplom | authored | [link](https://www.dwds.de/wb/Diplom) |
 | `v_dozent` | der Dozent | authored | [link](https://de.wiktionary.org/wiki/Dozent) |
+| `v_durchfallen` | durchfallen | authored | [link](https://www.dwds.de/wb/durchfallen) |
 | `v_einstufungstest` | der Einstufungstest | authored | [link](https://de.wiktionary.org/wiki/Einstufungstest) |
+| `v_fernstudium` | das Fernstudium | authored | [link](https://www.dwds.de/wb/Fernstudium) |
 | `v_foerderung` | die Förderung | authored | [link](https://de.wiktionary.org/wiki/Förderung) |
 | `v_fortbildung` | die Fortbildung | authored | [link](https://de.wiktionary.org/wiki/Fortbildung) |
+| `v_geselle` | der Geselle | authored | [link](https://www.dwds.de/r?q=Geselle) |
+| `v_gleichwertigkeit` | die Gleichwertigkeit | authored | [link](https://www.dwds.de/wb/Gleichwertigkeit) |
+| `v_grammatik` | die Grammatik | authored | [link](https://www.dwds.de/wb/Grammatik) |
+| `v_handwerklich` | handwerklich | authored | [link](https://www.dwds.de/r?q=handwerklich) |
+| `v_hausaufgabe` | die Hausaufgabe | authored | [link](https://www.dwds.de/wb/Hausaufgabe) |
 | `v_hochschule` | die Hochschule | authored | [link](https://de.wiktionary.org/wiki/Hochschule) |
+| `v_hoerverstehen` | das Hörverstehen | authored | [link](https://www.dwds.de/wb/H%C3%B6rverstehen) |
 | `v_integrationskurs` | der Integrationskurs | authored | [link](https://de.wiktionary.org/wiki/Integrationskurs) |
+| `v_kompetenz` | die Kompetenz | authored | [link](https://www.dwds.de/wb/Kompetenz) |
+| `v_konversation` | die Konversation | authored | [link](https://www.dwds.de/wb/Konversation) |
 | `v_kursgebuehr` | die Kursgebühr | authored | [link](https://de.wiktionary.org/wiki/Kursgebühr) |
 | `v_kursteilnehmer` | der Kursteilnehmer | authored | [link](https://de.wiktionary.org/wiki/Kursteilnehmer) |
 | `v_lebenslauf` | der Lebenslauf | authored | [link](https://de.wiktionary.org/wiki/Lebenslauf) |
+| `v_lehrbuch` | das Lehrbuch | authored | [link](https://www.dwds.de/wb/Lehrbuch) |
+| `v_lehrgang` | der Lehrgang | authored | [link](https://www.dwds.de/wb/Lehrgang) |
+| `v_lehrling` | der Lehrling | authored | [link](https://www.dwds.de/r?q=Lehrling) |
+| `v_lektion` | die Lektion | authored | [link](https://www.dwds.de/wb/Lektion) |
+| `v_leseverstehen` | das Leseverstehen | authored | [link](https://www.dwds.de/wb/Leseverstehen) |
+| `v_meisterbrief` | der Meisterbrief | authored | [link](https://www.dwds.de/r?q=Meisterbrief) |
+| `v_muendlich` | mündlich | authored | [link](https://www.dwds.de/wb/m%C3%BCndlich) |
+| `v_musterpruefung` | die Musterprüfung | authored | [link](https://www.dwds.de/wb/Musterpr%C3%BCfung) |
+| `v_muttersprachler` | der Muttersprachler | authored | [link](https://www.dwds.de/wb/Muttersprachler) |
+| `v_nachhilfe` | die Nachhilfe | authored | [link](https://www.dwds.de/wb/Nachhilfe) |
 | `v_note` | die Note | authored | [link](https://de.wiktionary.org/wiki/Note) |
+| `v_praktikum` | das Praktikum | authored | [link](https://www.dwds.de/wb/Praktikum) |
+| `v_pruefer` | der Prüfer | authored | [link](https://www.dwds.de/wb/Pr%C3%BCfer) |
 | `v_pruefung` | die Prüfung | authored | [link](https://de.wiktionary.org/wiki/Prüfung) |
+| `v_pruefungsangst` | die Prüfungsangst | authored | [link](https://www.dwds.de/wb/Pr%C3%BCfungsangst) |
 | `v_pruefungsergebnis` | das Prüfungsergebnis | authored | [link](https://de.wiktionary.org/wiki/Prüfungsergebnis) |
 | `v_pruefungstermin` | der Prüfungstermin | authored | [link](https://de.wiktionary.org/wiki/Prüfungstermin) |
+| `v_punktzahl` | die Punktzahl | authored | [link](https://www.dwds.de/wb/Punktzahl) |
 | `v_qualifikation` | die Qualifikation | authored | [link](https://de.wiktionary.org/wiki/Qualifikation) |
+| `v_schriftlich` | schriftlich | authored | [link](https://www.dwds.de/wb/schriftlich) |
+| `v_seminar` | das Seminar | authored | [link](https://www.dwds.de/wb/Seminar) |
 | `v_sprachkurs` | der Sprachkurs | authored | [link](https://de.wiktionary.org/wiki/Sprachkurs) |
+| `v_sprachnachweis` | der Sprachnachweis | authored | [link](https://www.dwds.de/wb/Sprachnachweis) |
 | `v_sprachniveau` | das Sprachniveau | authored | [link](https://de.wiktionary.org/wiki/Sprachniveau) |
+| `v_staplerschein` | der Staplerschein | authored | [link](https://www.dwds.de/wb/Staplerschein) |
 | `v_teilnahmebescheinigung` | die Teilnahmebescheinigung | authored | [link](https://de.wiktionary.org/wiki/Teilnahmebescheinigung) |
+| `v_uebersetzung` | die Übersetzung | authored | [link](https://www.dwds.de/wb/%C3%9Cbersetzung) |
 | `v_umschulung` | die Umschulung | authored | [link](https://de.wiktionary.org/wiki/Umschulung) |
+| `v_urkunde` | die Urkunde | authored | [link](https://www.dwds.de/wb/Urkunde) |
+| `v_vokabelheft` | das Vokabelheft | authored | [link](https://www.dwds.de/wb/Vokabelheft) |
 | `v_volkshochschule` | die Volkshochschule | authored | [link](https://de.wiktionary.org/wiki/Volkshochschule) |
 | `v_weiterbildung` | die Weiterbildung | authored | [link](https://de.wiktionary.org/wiki/Weiterbildung) |
+| `v_werdegang` | der Werdegang | authored | [link](https://www.dwds.de/wb/Werdegang) |
+| `v_wiederholen` | wiederholen | authored | [link](https://www.dwds.de/wb/wiederholen) |
+| `v_workshop` | der Workshop | authored | [link](https://www.dwds.de/wb/Workshop) |
+| `v_wortschatz` | der Wortschatz | authored | [link](https://www.dwds.de/wb/Wortschatz) |
 | `v_zertifikat` | das Zertifikat | authored | [link](https://de.wiktionary.org/wiki/Zertifikat) |
 | `v_zeugnis` | das Zeugnis | authored | [link](https://de.wiktionary.org/wiki/Zeugnis) |
+| `v_zeugnisbewertung` | die Zeugnisbewertung | authored | [link](https://www.dwds.de/wb/Zeugnisbewertung) |
+| `v_zulassung` | die Zulassung | authored | [link](https://www.dwds.de/wb/Zulassung) |
+| `v_zwischenzeugnis` | das Zwischenzeugnis | authored | [link](https://www.dwds.de/wb/Zwischenzeugnis) |
 
 </details>
 
-<details><summary>care — 33</summary>
+<details><summary>conflict — 56</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
+| `v_akkord` | der Akkord | authored | [link](https://www.dwds.de/r?q=Akkord) |
 | `v_angehoerigengespraech` | das Angehörigengespräch | authored | [link](https://www.dwds.de/wb/Angehörigengespräch) |
-| `v_angehoeriger` | der Angehörige | authored | [link](https://de.wiktionary.org/wiki/Angehöriger) |
-| `v_ansteckend` | ansteckend | authored | [link](https://www.dwds.de/r?q=ansteckend) |
-| `v_betreuung` | die Betreuung | authored | [link](https://de.wiktionary.org/wiki/Betreuung) |
-| `v_bettlaegerig` | bettlägerig | authored | [link](https://www.dwds.de/r?q=bettl%C3%A4gerig) |
-| `v_blutdruckmessung` | die Blutdruckmessung | authored | [link](https://www.dwds.de/r?q=Blutdruckmessung) |
-| `v_demenz` | die Demenz | authored | [link](https://www.dwds.de/r?q=Demenz) |
-| `v_desinfektion` | die Desinfektion | authored | [link](https://de.wiktionary.org/wiki/Desinfektion) |
-| `v_dienstplan` | der Dienstplan | authored | [link](https://www.dwds.de/r?q=Dienstplan) |
-| `v_dokumentieren` | dokumentieren | authored | [link](https://de.wiktionary.org/wiki/dokumentieren) |
-| `v_einfuehlsam` | einfühlsam | authored | [link](https://de.wiktionary.org/wiki/einfühlsam) |
-| `v_fallbesprechung` | die Fallbesprechung | authored | [link](https://www.dwds.de/wb/Fallbesprechung) |
-| `v_grundpflege` | die Grundpflege | authored | [link](https://www.dwds.de/r?q=Grundpflege) |
-| `v_hygiene` | die Hygiene | authored | [link](https://de.wiktionary.org/wiki/Hygiene) |
-| `v_infusion` | die Infusion | authored | [link](https://www.dwds.de/r?q=Infusion) |
-| `v_mobilisieren` | mobilisieren | authored | [link](https://www.dwds.de/r?q=mobilisieren) |
-| `v_notruf` | der Notruf | authored | [link](https://www.dwds.de/r?q=Notruf) |
-| `v_pflegedokumentation` | die Pflegedokumentation | authored | [link](https://www.dwds.de/wb/Pflegedokumentation) |
-| `v_pflegegrad` | der Pflegegrad | authored | [link](https://www.dwds.de/r?q=Pflegegrad) |
-| `v_pflegeheim` | das Pflegeheim | authored | [link](https://www.dwds.de/r?q=Pflegeheim) |
-| `v_pflegekraft` | die Pflegekraft | authored | [link](https://www.dwds.de/r?q=Pflegekraft) |
-| `v_rehabilitation` | die Rehabilitation | authored | [link](https://www.dwds.de/r?q=Rehabilitation) |
-| `v_rollstuhl` | der Rollstuhl | authored | [link](https://www.dwds.de/r?q=Rollstuhl) |
-| `v_schicht` | die Schicht | authored | [link](https://de.wiktionary.org/wiki/Schicht) |
-| `v_schichtdienst` | der Schichtdienst | authored | [link](https://de.wiktionary.org/wiki/Schichtdienst) |
-| `v_schutzkleidung` | die Schutzkleidung | authored | [link](https://de.wiktionary.org/wiki/Schutzkleidung) |
-| `v_schweigepflicht` | die Schweigepflicht | authored | [link](https://www.dwds.de/r?q=Schweigepflicht) |
-| `v_sturzgefahr` | die Sturzgefahr | authored | [link](https://www.dwds.de/r?q=Sturzgefahr) |
-| `v_uebergabe` | die Übergabe | authored | [link](https://de.wiktionary.org/wiki/Übergabe) |
-| `v_verabreichen` | verabreichen | authored | [link](https://www.dwds.de/r?q=verabreichen) |
-| `v_verbandswechsel` | der Verbandswechsel | authored | [link](https://www.dwds.de/r?q=Verbandswechsel) |
-| `v_visite` | die Visite | authored | [link](https://www.dwds.de/r?q=Visite) |
-| `v_wundversorgung` | die Wundversorgung | authored | [link](https://www.dwds.de/r?q=Wundversorgung) |
-
-</details>
-
-<details><summary>conflict — 47</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
 | `v_ansprechen` | ansprechen | authored | [link](https://de.wiktionary.org/wiki/ansprechen) |
 | `v_arbeitsklima` | das Arbeitsklima | authored | [link](https://de.wiktionary.org/wiki/Arbeitsklima) |
 | `v_bedenken` | die Bedenken | authored | [link](https://de.wiktionary.org/wiki/Bedenken) |
+| `v_belastbar` | belastbar | authored | [link](https://www.dwds.de/r?q=belastbar) |
 | `v_betriebsklima` | das Betriebsklima | authored | [link](https://de.wiktionary.org/wiki/Betriebsklima) |
+| `v_betriebsrat` | der Betriebsrat | authored | [link](https://www.dwds.de/r?q=Betriebsrat) |
+| `v_deeskalation` | die Deeskalation | authored | [link](https://www.dwds.de/wb/Deeskalation) |
 | `v_deeskalationsstrategie` | die Deeskalationsstrategie | authored | [link](https://www.dwds.de/r?q=Deeskalationsstrategie) |
 | `v_deeskalieren` | deeskalieren | authored | [link](https://de.wiktionary.org/wiki/deeskalieren) |
+| `v_einfuehlsam` | einfühlsam | authored | [link](https://de.wiktionary.org/wiki/einfühlsam) |
 | `v_einlenken` | einlenken | authored | [link](https://de.wiktionary.org/wiki/einlenken) |
 | `v_einwand` | der Einwand | authored | [link](https://de.wiktionary.org/wiki/Einwand) |
 | `v_entschuldigen` | sich entschuldigen | authored | [link](https://www.dwds.de/r?q=sich%20entschuldigen) |
@@ -2239,6 +2878,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_konfliktpotenzial` | das Konfliktpotenzial | authored | [link](https://de.wiktionary.org/wiki/Konfliktpotenzial) |
 | `v_konstruktiv` | konstruktiv | authored | [link](https://de.wiktionary.org/wiki/konstruktiv) |
 | `v_kritik` | die Kritik | authored | [link](https://de.wiktionary.org/wiki/Kritik) |
+| `v_leiharbeiter` | der Leiharbeiter | authored | [link](https://www.dwds.de/r?q=Leiharbeiter) |
 | `v_loesungsorientiert` | lösungsorientiert | authored | [link](https://de.wiktionary.org/wiki/l%C3%B6sungsorientiert) |
 | `v_mediationsverfahren` | das Mediationsverfahren | authored | [link](https://www.dwds.de/r?q=Mediationsverfahren) |
 | `v_meinungsverschiedenheit` | die Meinungsverschiedenheit | authored | [link](https://de.wiktionary.org/wiki/Meinungsverschiedenheit) |
@@ -2249,6 +2889,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_ruhig_bleiben` | ruhig bleiben | authored | [link](https://www.dwds.de/r?q=ruhig%20bleiben) |
 | `v_sachebene` | die Sachebene | authored | [link](https://www.dwds.de/r?q=Sachebene) |
 | `v_sachlich` | sachlich | authored | [link](https://de.wiktionary.org/wiki/sachlich) |
+| `v_schiedsrichter` | der Schiedsrichter | authored | [link](https://www.dwds.de/r?q=Schiedsrichter) |
 | `v_schlichten` | schlichten | authored | [link](https://de.wiktionary.org/wiki/schlichten) |
 | `v_schuldzuweisung` | die Schuldzuweisung | authored | [link](https://de.wiktionary.org/wiki/Schuldzuweisung) |
 | `v_streit` | der Streit | authored | [link](https://de.wiktionary.org/wiki/Streit) |
@@ -2262,105 +2903,89 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_vorwerfen` | vorwerfen | authored | [link](https://de.wiktionary.org/wiki/vorwerfen) |
 | `v_vorwuerfe_zurueckweisen` | Vorwürfe zurückweisen | authored | [link](https://www.dwds.de/r?q=Vorw%C3%BCrfe%20zur%C3%BCckweisen) |
 | `v_vorwurf` | der Vorwurf | authored | [link](https://de.wiktionary.org/wiki/Vorwurf) |
+| `v_zeitarbeit` | die Zeitarbeit | authored | [link](https://www.dwds.de/r?q=Zeitarbeit) |
 | `v_zugestaendnis` | das Zugeständnis | authored | [link](https://de.wiktionary.org/wiki/Zugest%C3%A4ndnis) |
 | `v_zuhoeren` | zuhören | authored | [link](https://de.wiktionary.org/wiki/zuh%C3%B6ren) |
 
 </details>
 
-<details><summary>construction — 60</summary>
+<details><summary>customer — 168</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `v_abreissen` | abreißen | authored | [link](https://www.dwds.de/r?q=abrei%C3%9Fen) |
-| `v_absperrung` | die Absperrung | authored | [link](https://www.dwds.de/r?q=Absperrung) |
-| `v_abstuetzen` | abstützen | authored | [link](https://www.dwds.de/r?q=abst%C3%BCtzen) |
-| `v_absturzsicherung` | die Absturzsicherung | authored | [link](https://www.dwds.de/r?q=Absturzsicherung) |
-| `v_architekt` | der Architekt | authored | [link](https://www.dwds.de/r?q=Architekt) |
-| `v_aufmass` | das Aufmaß | authored | [link](https://www.dwds.de/r?q=Aufma%C3%9F) |
-| `v_aushub` | der Aushub | authored | [link](https://www.dwds.de/r?q=Aushub) |
-| `v_ausschreibung` | die Ausschreibung | authored | [link](https://www.dwds.de/r?q=Ausschreibung) |
-| `v_bagger` | der Bagger | authored | [link](https://www.dwds.de/r?q=Bagger) |
-| `v_barrierefrei` | barrierefrei | authored | [link](https://www.dwds.de/r?q=barrierefrei) |
-| `v_bauabnahme` | die Bauabnahme | authored | [link](https://www.dwds.de/r?q=Bauabnahme) |
-| `v_bauabschnitt` | der Bauabschnitt | authored | [link](https://www.dwds.de/r?q=Bauabschnitt) |
-| `v_bauamt` | das Bauamt | authored | [link](https://www.dwds.de/r?q=Bauamt) |
-| `v_baugenehmigung` | die Baugenehmigung | authored | [link](https://www.dwds.de/r?q=Baugenehmigung) |
-| `v_baugrube` | die Baugrube | authored | [link](https://www.dwds.de/r?q=Baugrube) |
-| `v_bauherr` | der Bauherr | authored | [link](https://www.dwds.de/r?q=Bauherr) |
-| `v_bauleitung` | die Bauleitung | authored | [link](https://www.dwds.de/r?q=Bauleitung) |
-| `v_baumaschine` | die Baumaschine | authored | [link](https://www.dwds.de/r?q=Baumaschine) |
-| `v_bauphase` | die Bauphase | authored | [link](https://www.dwds.de/r?q=Bauphase) |
-| `v_bauplan` | der Bauplan | authored | [link](https://www.dwds.de/r?q=Bauplan) |
-| `v_baustelle` | die Baustelle | authored | [link](https://www.dwds.de/r?q=Baustelle) |
-| `v_bauzaun` | der Bauzaun | authored | [link](https://www.dwds.de/r?q=Bauzaun) |
-| `v_bauzeit` | die Bauzeit | authored | [link](https://www.dwds.de/r?q=Bauzeit) |
-| `v_bebauungsplan` | der Bebauungsplan | authored | [link](https://www.dwds.de/r?q=Bebauungsplan) |
-| `v_beton` | der Beton | authored | [link](https://www.dwds.de/r?q=Beton) |
-| `v_betonieren` | betonieren | authored | [link](https://www.dwds.de/r?q=betonieren) |
-| `v_bewehrung` | die Bewehrung | authored | [link](https://www.dwds.de/r?q=Bewehrung) |
-| `v_dach` | das Dach | authored | [link](https://www.dwds.de/r?q=Dach) |
-| `v_dachstuhl` | der Dachstuhl | authored | [link](https://www.dwds.de/r?q=Dachstuhl) |
-| `v_daemmung` | die Dämmung | authored | [link](https://www.dwds.de/r?q=D%C3%A4mmung) |
-| `v_energieausweis` | der Energieausweis | authored | [link](https://www.dwds.de/r?q=Energieausweis) |
-| `v_entwerfen` | entwerfen | authored | [link](https://www.dwds.de/r?q=entwerfen) |
-| `v_errichten` | errichten | authored | [link](https://www.dwds.de/r?q=errichten) |
-| `v_estrich` | der Estrich | authored | [link](https://www.dwds.de/r?q=Estrich) |
-| `v_fassade` | die Fassade | authored | [link](https://www.dwds.de/r?q=Fassade) |
-| `v_fertigstellen` | fertigstellen | authored | [link](https://www.dwds.de/r?q=fertigstellen) |
-| `v_fertigteil` | das Fertigteil | authored | [link](https://www.dwds.de/r?q=Fertigteil) |
-| `v_fundament` | das Fundament | authored | [link](https://www.dwds.de/r?q=Fundament) |
-| `v_genehmigen` | genehmigen | authored | [link](https://www.dwds.de/r?q=genehmigen) |
-| `v_geruest` | das Gerüst | authored | [link](https://www.dwds.de/r?q=Ger%C3%BCst) |
-| `v_gewerk` | das Gewerk | authored | [link](https://www.dwds.de/r?q=Gewerk) |
-| `v_grundriss` | der Grundriss | authored | [link](https://www.dwds.de/r?q=Grundriss) |
-| `v_grundstueck` | das Grundstück | authored | [link](https://www.dwds.de/r?q=Grundst%C3%BCck) |
-| `v_innenausbau` | der Innenausbau | authored | [link](https://www.dwds.de/r?q=Innenausbau) |
-| `v_kran` | der Kran | authored | [link](https://www.dwds.de/r?q=Kran) |
-| `v_mauern` | mauern | authored | [link](https://www.dwds.de/r?q=mauern) |
-| `v_polier` | der Polier | authored | [link](https://www.dwds.de/r?q=Polier) |
-| `v_putz` | der Putz | authored | [link](https://www.dwds.de/r?q=Putz) |
-| `v_rohbau` | der Rohbau | authored | [link](https://www.dwds.de/r?q=Rohbau) |
-| `v_sanieren` | sanieren | authored | [link](https://www.dwds.de/r?q=sanieren) |
-| `v_sanierung` | die Sanierung | authored | [link](https://www.dwds.de/r?q=Sanierung) |
-| `v_schalung` | die Schalung | authored | [link](https://www.dwds.de/r?q=Schalung) |
-| `v_schluesselfertig` | schlüsselfertig | authored | [link](https://www.dwds.de/r?q=schl%C3%BCsselfertig) |
-| `v_schutzhelm` | der Schutzhelm | authored | [link](https://www.dwds.de/r?q=Schutzhelm) |
-| `v_statik` | die Statik | authored | [link](https://www.dwds.de/r?q=Statik) |
-| `v_subunternehmer` | der Subunternehmer | authored | [link](https://www.dwds.de/r?q=Subunternehmer) |
-| `v_tragfaehig` | tragfähig | authored | [link](https://www.dwds.de/r?q=tragf%C3%A4hig) |
-| `v_trockenbau` | der Trockenbau | authored | [link](https://www.dwds.de/r?q=Trockenbau) |
-| `v_vermessung` | die Vermessung | authored | [link](https://www.dwds.de/r?q=Vermessung) |
-| `v_verputzen` | verputzen | authored | [link](https://www.dwds.de/r?q=verputzen) |
-
-</details>
-
-<details><summary>customer — 50</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
+| `v_abraeumen` | abräumen | authored | [link](https://www.dwds.de/wb/abr%C3%A4umen) |
 | `v_anfrage` | die Anfrage | authored | [link](https://de.wiktionary.org/wiki/Anfrage) |
 | `v_angebot` | das Angebot | authored | [link](https://de.wiktionary.org/wiki/Angebot) |
+| `v_angehoeriger` | der Angehörige | authored | [link](https://de.wiktionary.org/wiki/Angehöriger) |
 | `v_anliegen` | das Anliegen | authored | [link](https://de.wiktionary.org/wiki/Anliegen) |
+| `v_anprobe` | die Anprobe | authored | [link](https://www.dwds.de/wb/Anprobe) |
+| `v_anrichten` | anrichten | authored | [link](https://www.dwds.de/r?q=anrichten) |
 | `v_ansprechpartner` | der Ansprechpartner / die Ansprechpartnerin | authored | [link](https://www.dwds.de/r?q=Ansprechpartner) |
+| `v_auftragen` | auftragen | authored | [link](https://www.dwds.de/wb/auftragen) |
 | `v_auftragsbestaetigung` | die Auftragsbestätigung | authored | [link](https://de.wiktionary.org/wiki/Auftragsbest%C3%A4tigung) |
+| `v_augenbraue` | die Augenbraue | authored | [link](https://www.dwds.de/wb/Augenbraue) |
+| `v_auslage` | die Auslage | authored | [link](https://www.dwds.de/wb/Auslage) |
+| `v_barrierefreiheit` | die Barrierefreiheit | authored | [link](https://www.dwds.de/r?q=Barrierefreiheit) |
+| `v_bauherr` | der Bauherr | authored | [link](https://www.dwds.de/r?q=Bauherr) |
 | `v_bedauern` | bedauern | authored | [link](https://de.wiktionary.org/wiki/bedauern) |
+| `v_bedienung` | die Bedienung | authored | [link](https://www.dwds.de/wb/Bedienung) |
 | `v_beraten` | beraten | authored | [link](https://de.wiktionary.org/wiki/beraten) |
 | `v_beratung` | die Beratung | authored | [link](https://de.wiktionary.org/wiki/Beratung) |
 | `v_beschwerde` | die Beschwerde | authored | [link](https://de.wiktionary.org/wiki/Beschwerde) |
+| `v_besteck` | das Besteck | authored | [link](https://www.dwds.de/wb/Besteck) |
+| `v_betreuung` | die Betreuung | authored | [link](https://de.wiktionary.org/wiki/Betreuung) |
+| `v_dauerwelle` | die Dauerwelle | authored | [link](https://www.dwds.de/r?q=Dauerwelle) |
+| `v_eindecken` | eindecken | authored | [link](https://www.dwds.de/r?q=eindecken) |
+| `v_einkaufswagen` | der Einkaufswagen | authored | [link](https://www.dwds.de/wb/Einkaufswagen) |
+| `v_einzelhandel` | der Einzelhandel | authored | [link](https://www.dwds.de/r?q=Einzelhandel) |
 | `v_empfehlen` | empfehlen | authored | [link](https://de.wiktionary.org/wiki/empfehlen) |
 | `v_entgegenkommen` | entgegenkommen | authored | [link](https://de.wiktionary.org/wiki/entgegenkommen) |
 | `v_erstatten` | erstatten | authored | [link](https://de.wiktionary.org/wiki/erstatten) |
 | `v_erwartungsmanagement` | das Erwartungsmanagement | authored | [link](https://www.dwds.de/r?q=Erwartungsmanagement) |
 | `v_eskalationsstufe` | die Eskalationsstufe | authored | [link](https://www.dwds.de/r?q=Eskalationsstufe) |
+| `v_fahrgast` | der Fahrgast | authored | [link](https://www.dwds.de/r?q=Fahrgast) |
 | `v_feedback` | das Feedback | authored | [link](https://de.wiktionary.org/wiki/Feedback) |
+| `v_fehlerbericht` | der Fehlerbericht | authored | [link](https://www.dwds.de/r?q=Fehlerbericht) |
+| `v_fettig` | fettig | authored | [link](https://www.dwds.de/r?q=fettig) |
+| `v_filialleiter` | der Filialleiter | authored | [link](https://www.dwds.de/wb/Filialleiter) |
+| `v_fitnessstudio` | das Fitnessstudio | authored | [link](https://www.dwds.de/r?q=Fitnessstudio) |
+| `v_fleckentfernung` | die Fleckentfernung | authored | [link](https://www.dwds.de/wb/Fleckentfernung) |
+| `v_foehnen` | föhnen | authored | [link](https://www.dwds.de/r?q=f%C3%B6hnen) |
 | `v_freundlich` | freundlich | authored | [link](https://de.wiktionary.org/wiki/freundlich) |
+| `v_frisur` | die Frisur | authored | [link](https://www.dwds.de/wb/Frisur) |
+| `v_gang` | der Gang | authored | [link](https://www.dwds.de/wb/Gang) |
 | `v_garantie` | die Garantie | authored | [link](https://de.wiktionary.org/wiki/Garantie) |
 | `v_garantieanspruch` | der Garantieanspruch | authored | [link](https://www.dwds.de/r?q=Garantieanspruch) |
+| `v_gast` | der Gast | authored | [link](https://www.dwds.de/wb/Gast) |
+| `v_gastfreundschaft` | die Gastfreundschaft | authored | [link](https://www.dwds.de/r?q=Gastfreundschaft) |
+| `v_gastraum` | der Gastraum | authored | [link](https://www.dwds.de/r?q=Gastraum) |
+| `v_gebaeudereinigung` | die Gebäudereinigung | authored | [link](https://www.dwds.de/wb/Geb%C3%A4udereinigung) |
 | `v_geduld` | die Geduld | authored | [link](https://de.wiktionary.org/wiki/Geduld) |
+| `v_gepflegt` | gepflegt | authored | [link](https://www.dwds.de/r?q=gepflegt) |
+| `v_gericht` | das Gericht | authored | [link](https://www.dwds.de/r?q=Gericht) |
+| `v_gesichtsbehandlung` | die Gesichtsbehandlung | authored | [link](https://www.dwds.de/r?q=Gesichtsbehandlung) |
+| `v_getraenkekarte` | die Getränkekarte | authored | [link](https://www.dwds.de/wb/Getr%C3%A4nkekarte) |
 | `v_gewaehrleistung` | die Gewährleistung | authored | [link](https://de.wiktionary.org/wiki/Gew%C3%A4hrleistung) |
+| `v_glaetten` | glätten | authored | [link](https://www.dwds.de/wb/gl%C3%A4tten) |
+| `v_glasreinigung` | die Glasreinigung | authored | [link](https://www.dwds.de/wb/Glasreinigung) |
+| `v_grundpflege` | die Grundpflege | authored | [link](https://www.dwds.de/r?q=Grundpflege) |
 | `v_gutschein` | der Gutschein | authored | [link](https://de.wiktionary.org/wiki/Gutschein) |
+| `v_haarkur` | die Haarkur | authored | [link](https://www.dwds.de/wb/Haarkur) |
+| `v_haarschnitt` | der Haarschnitt | authored | [link](https://www.dwds.de/r?q=Haarschnitt) |
+| `v_hauptgericht` | das Hauptgericht | authored | [link](https://www.dwds.de/wb/Hauptgericht) |
+| `v_hausgemacht` | hausgemacht | authored | [link](https://www.dwds.de/r?q=hausgemacht) |
+| `v_hautanalyse` | die Hautanalyse | authored | [link](https://www.dwds.de/r?q=Hautanalyse) |
+| `v_hautpflege` | die Hautpflege | authored | [link](https://www.dwds.de/r?q=Hautpflege) |
 | `v_hoeflich` | höflich | authored | [link](https://de.wiktionary.org/wiki/h%C3%B6flich) |
 | `v_jedoch` | jedoch | authored | [link](https://de.wiktionary.org/wiki/jedoch) |
+| `v_kamm` | der Kamm | authored | [link](https://www.dwds.de/wb/Kamm) |
+| `v_kasse` | die Kasse | authored | [link](https://www.dwds.de/r?q=Kasse) |
+| `v_kassenbon` | der Kassenbon | authored | [link](https://www.dwds.de/r?q=Kassenbon) |
+| `v_kassieren` | kassieren | authored | [link](https://www.dwds.de/r?q=kassieren) |
+| `v_kellner` | der Kellner | authored | [link](https://www.dwds.de/wb/Kellner) |
+| `v_kopfhaut` | die Kopfhaut | authored | [link](https://www.dwds.de/r?q=Kopfhaut) |
+| `v_kosmetikerin` | die Kosmetikerin | authored | [link](https://www.dwds.de/r?q=Kosmetikerin) |
+| `v_kostenvoranschlag` | der Kostenvoranschlag | authored | [link](https://www.dwds.de/r?q=Kostenvoranschlag) |
 | `v_kulant` | kulant | authored | [link](https://de.wiktionary.org/wiki/kulant) |
 | `v_kulanz` | die Kulanz | authored | [link](https://de.wiktionary.org/wiki/Kulanz) |
 | `v_kulanzloesung` | die Kulanslösung | authored | [link](https://www.dwds.de/r?q=Kulansl%C3%B6sung) |
@@ -2368,234 +2993,396 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_kundenbindung` | die Kundenbindung | authored | [link](https://www.dwds.de/r?q=Kundenbindung) |
 | `v_kundendienst` | der Kundendienst | authored | [link](https://de.wiktionary.org/wiki/Kundendienst) |
 | `v_kundenfeedback` | das Kundenfeedback | authored | [link](https://www.dwds.de/r?q=Kundenfeedback) |
+| `v_kundenkarte` | die Kundenkarte | authored | [link](https://www.dwds.de/r?q=Kundenkarte) |
 | `v_kundenpflege` | die Kundenpflege | authored | [link](https://www.dwds.de/r?q=Kundenpflege) |
 | `v_kundenzufriedenheit` | die Kundenzufriedenheit | authored | [link](https://www.dwds.de/r?q=Kundenzufriedenheit) |
+| `v_kundschaft` | die Kundschaft | authored | [link](https://www.dwds.de/r?q=Kundschaft) |
+| `v_kurs` | der Kurs | authored | [link](https://www.dwds.de/wb/Kurs) |
+| `v_ladenschluss` | der Ladenschluss | authored | [link](https://www.dwds.de/wb/Ladenschluss) |
+| `v_ladezeit` | die Ladezeit | authored | [link](https://www.dwds.de/r?q=Ladezeit) |
 | `v_lieferbedingungen` | die Lieferbedingungen | authored | [link](https://www.dwds.de/r?q=Lieferbedingungen) |
 | `v_loesung` | die Lösung | authored | [link](https://de.wiktionary.org/wiki/L%C3%B6sung) |
+| `v_lokal` | das Lokal | authored | [link](https://www.dwds.de/wb/Lokal) |
 | `v_maengelruege` | die Mängelrüge | authored | [link](https://www.dwds.de/r?q=M%C3%A4ngelr%C3%BCge) |
+| `v_manikuere` | die Maniküre | authored | [link](https://www.dwds.de/r?q=Manik%C3%BCre) |
+| `v_mitgliedschaft` | die Mitgliedschaft | authored | [link](https://www.dwds.de/wb/Mitgliedschaft) |
 | `v_nachbetreuung` | die Nachbetreuung | authored | [link](https://www.dwds.de/r?q=Nachbetreuung) |
 | `v_nachfrage` | die Nachfrage | authored | [link](https://de.wiktionary.org/wiki/Nachfrage) |
+| `v_nachschneiden` | nachschneiden | authored | [link](https://www.dwds.de/r?q=nachschneiden) |
+| `v_nachspeise` | die Nachspeise | authored | [link](https://www.dwds.de/wb/Nachspeise) |
+| `v_nagellack` | der Nagellack | authored | [link](https://www.dwds.de/r?q=Nagellack) |
+| `v_notdienst` | der Notdienst | authored | [link](https://www.dwds.de/r?q=Notdienst) |
+| `v_pedikuere` | die Pediküre | authored | [link](https://www.dwds.de/wb/Pedik%C3%BCre) |
+| `v_peeling` | das Peeling | authored | [link](https://www.dwds.de/r?q=Peeling) |
+| `v_personaltrainer` | der Personaltrainer | authored | [link](https://www.dwds.de/wb/Personaltrainer) |
+| `v_pflegekraft` | die Pflegekraft | authored | [link](https://www.dwds.de/r?q=Pflegekraft) |
+| `v_pfoertner` | der Pförtner | authored | [link](https://www.dwds.de/wb/Pf%C3%B6rtner) |
+| `v_portion` | die Portion | authored | [link](https://www.dwds.de/r?q=Portion) |
+| `v_probestunde` | die Probestunde | authored | [link](https://www.dwds.de/r?q=Probestunde) |
+| `v_rabatt` | der Rabatt | authored | [link](https://www.dwds.de/r?q=Rabatt) |
+| `v_rasur` | die Rasur | authored | [link](https://www.dwds.de/wb/Rasur) |
 | `v_rechnung` | die Rechnung | authored | [link](https://de.wiktionary.org/wiki/Rechnung) |
+| `v_reduziert` | reduziert | authored | [link](https://www.dwds.de/r?q=reduziert) |
+| `v_reinigungsdienst` | der Reinigungsdienst | authored | [link](https://www.dwds.de/wb/Reinigungsdienst) |
+| `v_reinigungskraft` | die Reinigungskraft | authored | [link](https://www.dwds.de/wb/Reinigungskraft) |
 | `v_reklamation` | die Reklamation | authored | [link](https://de.wiktionary.org/wiki/Reklamation) |
 | `v_reklamationsbearbeitung` | die Reklamationsbearbeitung | authored | [link](https://www.dwds.de/r?q=Reklamationsbearbeitung) |
 | `v_rueckerstattung` | die Rückerstattung | authored | [link](https://de.wiktionary.org/wiki/R%C3%BCckerstattung) |
+| `v_rueckgabe` | die Rückgabe | authored | [link](https://www.dwds.de/wb/R%C3%BCckgabe) |
+| `v_rueckgaberecht` | das Rückgaberecht | authored | [link](https://www.dwds.de/wb/R%C3%BCckgaberecht) |
+| `v_rueckrufaktion` | die Rückrufaktion | authored | [link](https://www.dwds.de/wb/R%C3%BCckrufaktion) |
+| `v_salon` | der Salon | authored | [link](https://www.dwds.de/wb/Salon) |
+| `v_schaufenster` | das Schaufenster | authored | [link](https://www.dwds.de/r?q=Schaufenster) |
+| `v_schere` | die Schere | authored | [link](https://www.dwds.de/wb/Schere) |
+| `v_schminken` | schminken | authored | [link](https://www.dwds.de/r?q=schminken) |
 | `v_servicelevel` | das Servicelevel | authored | [link](https://www.dwds.de/r?q=Servicelevel) |
+| `v_servieren` | servieren | authored | [link](https://www.dwds.de/r?q=servieren) |
+| `v_serviette` | die Serviette | authored | [link](https://www.dwds.de/wb/Serviette) |
+| `v_shampoo` | das Shampoo | authored | [link](https://www.dwds.de/wb/Shampoo) |
 | `v_sich_beschweren` | sich beschweren | authored | [link](https://www.dwds.de/r?q=sich%20beschweren) |
+| `v_sonderangebot` | das Sonderangebot | authored | [link](https://www.dwds.de/r?q=Sonderangebot) |
+| `v_sortiment` | das Sortiment | authored | [link](https://www.dwds.de/r?q=Sortiment) |
+| `v_speisekarte` | die Speisekarte | authored | [link](https://www.dwds.de/r?q=Speisekarte) |
+| `v_spliss` | der Spliss | authored | [link](https://www.dwds.de/r?q=Spliss) |
+| `v_sportverein` | der Sportverein | authored | [link](https://www.dwds.de/r?q=Sportverein) |
+| `v_spuelung` | die Spülung | authored | [link](https://www.dwds.de/wb/Sp%C3%BClung) |
 | `v_stammdaten` | die Stammdaten | authored | [link](https://www.dwds.de/r?q=Stammdaten) |
+| `v_stammgast` | der Stammgast | authored | [link](https://www.dwds.de/r?q=Stammgast) |
+| `v_straehne` | die Strähne | authored | [link](https://www.dwds.de/r?q=Str%C3%A4hne) |
+| `v_streifenfrei` | streifenfrei | authored | [link](https://www.dwds.de/wb/streifenfrei) |
+| `v_support` | der Support | authored | [link](https://www.dwds.de/r?q=Support) |
+| `v_tagesgericht` | das Tagesgericht | authored | [link](https://www.dwds.de/r?q=Tagesgericht) |
+| `v_teppichreinigung` | die Teppichreinigung | authored | [link](https://www.dwds.de/wb/Teppichreinigung) |
+| `v_theke` | die Theke | authored | [link](https://www.dwds.de/r?q=Theke) |
+| `v_toenen` | tönen | authored | [link](https://www.dwds.de/r?q=t%C3%B6nen) |
+| `v_toenung` | die Tönung | authored | [link](https://www.dwds.de/wb/T%C3%B6nung) |
+| `v_trainieren` | trainieren | authored | [link](https://www.dwds.de/r?q=trainieren) |
+| `v_trinkgeld` | das Trinkgeld | authored | [link](https://www.dwds.de/r?q=Trinkgeld) |
+| `v_umkleide` | die Umkleide | authored | [link](https://www.dwds.de/wb/Umkleide) |
+| `v_umkleidekabine` | die Umkleidekabine | authored | [link](https://www.dwds.de/wb/Umkleidekabine) |
+| `v_umtausch` | der Umtausch | authored | [link](https://www.dwds.de/wb/Umtausch) |
 | `v_umtauschen` | umtauschen | authored | [link](https://de.wiktionary.org/wiki/umtauschen) |
+| `v_verkaeufer` | der Verkäufer | authored | [link](https://www.dwds.de/wb/Verk%C3%A4ufer) |
+| `v_vorraetig` | vorrätig | authored | [link](https://www.dwds.de/r?q=vorr%C3%A4tig) |
+| `v_vorspeise` | die Vorspeise | authored | [link](https://www.dwds.de/wb/Vorspeise) |
+| `v_warenkorb` | der Warenkorb | authored | [link](https://www.dwds.de/wb/Warenkorb) |
+| `v_warteschlange` | die Warteschlange | authored | [link](https://www.dwds.de/wb/Warteschlange) |
+| `v_wechselgeld` | das Wechselgeld | authored | [link](https://www.dwds.de/wb/Wechselgeld) |
 | `v_weiterhelfen` | weiterhelfen | authored | [link](https://de.wiktionary.org/wiki/weiterhelfen) |
+| `v_wimper` | die Wimper | authored | [link](https://www.dwds.de/r?q=Wimper) |
+| `v_wimpernverlaengerung` | die Wimpernverlängerung | authored | [link](https://www.dwds.de/wb/Wimpernverl%C3%A4ngerung) |
+| `v_wirt` | der Wirt | authored | [link](https://www.dwds.de/wb/Wirt) |
 | `v_zahlung` | die Zahlung | authored | [link](https://de.wiktionary.org/wiki/Zahlung) |
+| `v_zapfen` | zapfen | authored | [link](https://www.dwds.de/wb/zapfen) |
+| `v_zubereiten` | zubereiten | authored | [link](https://www.dwds.de/r?q=zubereiten) |
+| `v_zubereitung` | die Zubereitung | authored | [link](https://www.dwds.de/wb/Zubereitung) |
 | `v_zufrieden` | zufrieden sein | authored | [link](https://www.dwds.de/r?q=zufrieden%20sein) |
+| `v_zupfen` | zupfen | authored | [link](https://www.dwds.de/wb/zupfen) |
 | `v_zusichern` | zusichern | authored | [link](https://de.wiktionary.org/wiki/zusichern) |
+| `v_zutat` | die Zutat | authored | [link](https://www.dwds.de/r?q=Zutat) |
 | `v_zuverlaessig` | zuverlässig | authored | [link](https://de.wiktionary.org/wiki/zuverl%C3%A4ssig) |
 
 </details>
 
-<details><summary>engineering — 60</summary>
+<details><summary>digitales — 49</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `v_abweichung` | die Abweichung | authored | [link](https://www.dwds.de/r?q=Abweichung) |
-| `v_aluminium` | das Aluminium | authored | [link](https://www.dwds.de/r?q=Aluminium) |
-| `v_antrieb` | der Antrieb | authored | [link](https://www.dwds.de/r?q=Antrieb) |
-| `v_auslegen` | auslegen | authored | [link](https://www.dwds.de/r?q=auslegen) |
-| `v_bauteil` | das Bauteil | authored | [link](https://www.dwds.de/r?q=Bauteil) |
-| `v_berechnung` | die Berechnung | authored | [link](https://www.dwds.de/r?q=Berechnung) |
-| `v_blech` | das Blech | authored | [link](https://www.dwds.de/r?q=Blech) |
-| `v_datenblatt` | das Datenblatt | authored | [link](https://www.dwds.de/r?q=Datenblatt) |
-| `v_dichte` | die Dichte | authored | [link](https://www.dwds.de/r?q=Dichte) |
-| `v_dichtung` | die Dichtung | authored | [link](https://www.dwds.de/r?q=Dichtung) |
-| `v_ermuedung` | die Ermüdung | authored | [link](https://www.dwds.de/r?q=Erm%C3%BCdung) |
-| `v_feder` | die Feder | authored | [link](https://www.dwds.de/r?q=Feder) |
-| `v_festigkeit` | die Festigkeit | authored | [link](https://www.dwds.de/r?q=Festigkeit) |
-| `v_fraesen` | fräsen | authored | [link](https://www.dwds.de/r?q=fr%C3%A4sen) |
-| `v_getriebe` | das Getriebe | authored | [link](https://www.dwds.de/r?q=Getriebe) |
-| `v_gussteil` | das Gussteil | authored | [link](https://www.dwds.de/r?q=Gussteil) |
-| `v_haerte` | die Härte | authored | [link](https://www.dwds.de/r?q=H%C3%A4rte) |
-| `v_hitzebestaendig` | hitzebeständig | authored | [link](https://www.dwds.de/r?q=hitzebest%C3%A4ndig) |
-| `v_hydraulik` | die Hydraulik | authored | [link](https://www.dwds.de/r?q=Hydraulik) |
-| `v_kalibrieren` | kalibrieren | authored | [link](https://www.dwds.de/r?q=kalibrieren) |
-| `v_kolben` | der Kolben | authored | [link](https://www.dwds.de/r?q=Kolben) |
-| `v_konstruieren` | konstruieren | authored | [link](https://www.dwds.de/r?q=konstruieren) |
-| `v_konstruktion` | die Konstruktion | authored | [link](https://www.dwds.de/r?q=Konstruktion) |
-| `v_korrosion` | die Korrosion | authored | [link](https://www.dwds.de/r?q=Korrosion) |
-| `v_korrosionsbestaendig` | korrosionsbeständig | authored | [link](https://www.dwds.de/r?q=korrosionsbest%C3%A4ndig) |
-| `v_kugellager` | das Kugellager | authored | [link](https://www.dwds.de/r?q=Kugellager) |
-| `v_kunststoff` | der Kunststoff | authored | [link](https://www.dwds.de/r?q=Kunststoff) |
-| `v_legierung` | die Legierung | authored | [link](https://www.dwds.de/r?q=Legierung) |
-| `v_leitfaehig` | leitfähig | authored | [link](https://www.dwds.de/r?q=leitf%C3%A4hig) |
-| `v_maschinenbau` | der Maschinenbau | authored | [link](https://www.dwds.de/r?q=Maschinenbau) |
-| `v_materialpruefung` | die Materialprüfung | authored | [link](https://www.dwds.de/r?q=Materialpr%C3%BCfung) |
-| `v_messung` | die Messung | authored | [link](https://www.dwds.de/r?q=Messung) |
-| `v_messwert` | der Messwert | authored | [link](https://www.dwds.de/r?q=Messwert) |
-| `v_norm` | die Norm | authored | [link](https://www.dwds.de/r?q=Norm) |
-| `v_praezise` | präzise | authored | [link](https://www.dwds.de/r?q=pr%C3%A4zise) |
-| `v_prototyp` | der Prototyp | authored | [link](https://www.dwds.de/r?q=Prototyp) |
-| `v_pruefstand` | der Prüfstand | authored | [link](https://www.dwds.de/r?q=Pr%C3%BCfstand) |
-| `v_pumpe` | die Pumpe | authored | [link](https://www.dwds.de/r?q=Pumpe) |
-| `v_reibung` | die Reibung | authored | [link](https://www.dwds.de/r?q=Reibung) |
-| `v_rostfrei` | rostfrei | authored | [link](https://www.dwds.de/r?q=rostfrei) |
-| `v_schaltplan` | der Schaltplan | authored | [link](https://www.dwds.de/r?q=Schaltplan) |
-| `v_schraube` | die Schraube | authored | [link](https://www.dwds.de/r?q=Schraube) |
-| `v_schweissen` | schweißen | authored | [link](https://www.dwds.de/r?q=schwei%C3%9Fen) |
-| `v_schweissnaht` | die Schweißnaht | authored | [link](https://www.dwds.de/r?q=Schwei%C3%9Fnaht) |
-| `v_sensor` | der Sensor | authored | [link](https://www.dwds.de/r?q=Sensor) |
-| `v_simulieren` | simulieren | authored | [link](https://www.dwds.de/r?q=simulieren) |
-| `v_spezifikation` | die Spezifikation | authored | [link](https://www.dwds.de/r?q=Spezifikation) |
-| `v_stahl` | der Stahl | authored | [link](https://www.dwds.de/r?q=Stahl) |
-| `v_steuerung` | die Steuerung | authored | [link](https://www.dwds.de/r?q=Steuerung) |
-| `v_toleranz` | die Toleranz | authored | [link](https://www.dwds.de/r?q=Toleranz) |
-| `v_turbine` | die Turbine | authored | [link](https://www.dwds.de/r?q=Turbine) |
-| `v_ventil` | das Ventil | authored | [link](https://www.dwds.de/r?q=Ventil) |
-| `v_verfahren` | das Verfahren | authored | [link](https://www.dwds.de/r?q=Verfahren) |
-| `v_verformbar` | verformbar | authored | [link](https://www.dwds.de/r?q=verformbar) |
-| `v_verschleiss` | der Verschleiß | authored | [link](https://www.dwds.de/r?q=Verschlei%C3%9F) |
-| `v_verschrauben` | verschrauben | authored | [link](https://www.dwds.de/r?q=verschrauben) |
-| `v_welle` | die Welle | authored | [link](https://www.dwds.de/r?q=Welle) |
-| `v_werkstoff` | der Werkstoff | authored | [link](https://www.dwds.de/r?q=Werkstoff) |
-| `v_wirkungsgrad` | der Wirkungsgrad | authored | [link](https://www.dwds.de/r?q=Wirkungsgrad) |
-| `v_zeichnung` | die Zeichnung | authored | [link](https://www.dwds.de/r?q=Zeichnung) |
+| `v_akku` | der Akku | authored | [link](https://www.dwds.de/wb/Akku) |
+| `v_aktualisierung` | die Aktualisierung | authored | [link](https://www.dwds.de/wb/Aktualisierung) |
+| `v_anbieter` | der Anbieter | authored | [link](https://www.dwds.de/wb/Anbieter) |
+| `v_anbieterwechsel` | der Anbieterwechsel | authored | [link](https://www.dwds.de/wb/Anbieterwechsel) |
+| `v_anruf` | der Anruf | authored | [link](https://www.dwds.de/wb/Anruf) |
+| `v_app` | die App | authored | [link](https://www.dwds.de/wb/App) |
+| `v_bandbreite` | die Bandbreite | authored | [link](https://www.dwds.de/wb/Bandbreite) |
+| `v_benutzername` | der Benutzername | authored | [link](https://www.dwds.de/wb/Benutzername) |
+| `v_bildschirm` | der Bildschirm | authored | [link](https://www.dwds.de/wb/Bildschirm) |
+| `v_browser` | der Browser | authored | [link](https://www.dwds.de/wb/Browser) |
+| `v_cookie` | das Cookie | authored | [link](https://www.dwds.de/wb/Cookie) |
+| `v_datenrate` | die Datenrate | authored | [link](https://www.dwds.de/wb/Datenrate) |
+| `v_datenvolumen` | das Datenvolumen | authored | [link](https://www.dwds.de/wb/Datenvolumen) |
+| `v_display` | das Display | authored | [link](https://www.dwds.de/wb/Display) |
+| `v_einstellung` | die Einstellung | authored | [link](https://www.dwds.de/wb/Einstellung) |
+| `v_empfang` | der Empfang | authored | [link](https://www.dwds.de/wb/Empfang) |
+| `v_flatrate` | die Flatrate | authored | [link](https://www.dwds.de/wb/Flatrate) |
+| `v_freischaltung` | die Freischaltung | authored | [link](https://www.dwds.de/wb/Freischaltung) |
+| `v_glasfaser` | die Glasfaser | authored | [link](https://www.dwds.de/wb/Glasfaser) |
+| `v_grundgebuehr` | die Grundgebühr | authored | [link](https://www.dwds.de/wb/Grundgeb%C3%BChr) |
+| `v_handy` | das Handy | authored | [link](https://www.dwds.de/wb/Handy) |
+| `v_hotspot` | der Hotspot | authored | [link](https://www.dwds.de/wb/Hotspot) |
+| `v_internetanschluss` | der Internetanschluss | authored | [link](https://www.dwds.de/wb/Internetanschluss) |
+| `v_kennwort` | das Kennwort | authored | [link](https://www.dwds.de/wb/Kennwort) |
+| `v_klingelton` | der Klingelton | authored | [link](https://www.dwds.de/wb/Klingelton) |
+| `v_kuendigungsfrist` | die Kündigungsfrist | authored | [link](https://www.dwds.de/wb/K%C3%BCndigungsfrist) |
+| `v_kundennummer` | die Kundennummer | authored | [link](https://www.dwds.de/wb/Kundennummer) |
+| `v_ladekabel` | das Ladekabel | authored | [link](https://www.dwds.de/wb/Ladekabel) |
+| `v_laptop` | der Laptop | authored | [link](https://www.dwds.de/wb/Laptop) |
+| `v_mailbox` | die Mailbox | authored | [link](https://www.dwds.de/wb/Mailbox) |
+| `v_mobilfunk` | der Mobilfunk | authored | [link](https://www.dwds.de/wb/Mobilfunk) |
+| `v_mobilfunkvertrag` | der Mobilfunkvertrag | authored | [link](https://www.dwds.de/wb/Mobilfunkvertrag) |
+| `v_newsletter` | der Newsletter | authored | [link](https://www.dwds.de/wb/Newsletter) |
+| `v_phishing` | das Phishing | authored | [link](https://www.dwds.de/wb/Phishing) |
+| `v_prepaid` | das Prepaid | authored | [link](https://www.dwds.de/wb/Prepaid) |
+| `v_profil` | das Profil | authored | [link](https://www.dwds.de/wb/Profil) |
+| `v_router` | der Router | authored | [link](https://www.dwds.de/wb/Router) |
+| `v_rufnummernmitnahme` | die Rufnummernmitnahme | authored | [link](https://www.dwds.de/wb/Rufnummernmitnahme) |
+| `v_simkarte` | die SIM-Karte | authored | [link](https://www.dwds.de/wb/SIM-Karte) |
+| `v_smartphone` | das Smartphone | authored | [link](https://www.dwds.de/wb/Smartphone) |
+| `v_spam` | der Spam | authored | [link](https://www.dwds.de/wb/Spam) |
+| `v_startbildschirm` | der Startbildschirm | authored | [link](https://www.dwds.de/wb/Startbildschirm) |
+| `v_suchmaschine` | die Suchmaschine | authored | [link](https://www.dwds.de/wb/Suchmaschine) |
+| `v_vertragsabschluss` | der Vertragsabschluss | authored | [link](https://www.dwds.de/wb/Vertragsabschluss) |
+| `v_vertragslaufzeit` | die Vertragslaufzeit | authored | [link](https://www.dwds.de/wb/Vertragslaufzeit) |
+| `v_vertragsverlaengerung` | die Vertragsverlängerung | authored | [link](https://www.dwds.de/wb/Vertragsverl%C3%A4ngerung) |
+| `v_werbung` | die Werbung | authored | [link](https://www.dwds.de/wb/Werbung) |
+| `v_wlan` | das WLAN | authored | [link](https://www.dwds.de/wb/WLAN) |
+| `v_zugangsdaten` | die Zugangsdaten | authored | [link](https://www.dwds.de/wb/Zugangsdaten) |
 
 </details>
 
-<details><summary>hospitality — 20</summary>
+<details><summary>einkaufen — 49</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `v_anrichten` | anrichten | authored | [link](https://www.dwds.de/r?q=anrichten) |
-| `v_ausgebucht` | ausgebucht | authored | [link](https://www.dwds.de/r?q=ausgebucht) |
-| `v_buffet` | das Buffet | authored | [link](https://www.dwds.de/r?q=Buffet) |
-| `v_eindecken` | eindecken | authored | [link](https://www.dwds.de/r?q=eindecken) |
-| `v_gastfreundschaft` | die Gastfreundschaft | authored | [link](https://www.dwds.de/r?q=Gastfreundschaft) |
-| `v_gastraum` | der Gastraum | authored | [link](https://www.dwds.de/r?q=Gastraum) |
-| `v_gericht` | das Gericht | authored | [link](https://www.dwds.de/r?q=Gericht) |
-| `v_hausgemacht` | hausgemacht | authored | [link](https://www.dwds.de/r?q=hausgemacht) |
-| `v_kuechenchef` | der Küchenchef | authored | [link](https://www.dwds.de/r?q=K%C3%BCchenchef) |
-| `v_lebensmittelhygiene` | die Lebensmittelhygiene | authored | [link](https://www.dwds.de/r?q=Lebensmittelhygiene) |
-| `v_lieferservice` | der Lieferservice | authored | [link](https://www.dwds.de/r?q=Lieferservice) |
-| `v_portion` | die Portion | authored | [link](https://www.dwds.de/r?q=Portion) |
-| `v_servieren` | servieren | authored | [link](https://www.dwds.de/r?q=servieren) |
-| `v_speisekarte` | die Speisekarte | authored | [link](https://www.dwds.de/r?q=Speisekarte) |
-| `v_stammgast` | der Stammgast | authored | [link](https://www.dwds.de/r?q=Stammgast) |
-| `v_tagesgericht` | das Tagesgericht | authored | [link](https://www.dwds.de/r?q=Tagesgericht) |
-| `v_theke` | die Theke | authored | [link](https://www.dwds.de/r?q=Theke) |
-| `v_trinkgeld` | das Trinkgeld | authored | [link](https://www.dwds.de/r?q=Trinkgeld) |
-| `v_zubereiten` | zubereiten | authored | [link](https://www.dwds.de/r?q=zubereiten) |
-| `v_zutat` | die Zutat | authored | [link](https://www.dwds.de/r?q=Zutat) |
+| `v_aermel` | der Ärmel | authored | [link](https://www.dwds.de/wb/%C3%84rmel) |
+| `v_anprobieren` | anprobieren | authored | [link](https://www.dwds.de/wb/anprobieren) |
+| `v_ausverkauf` | der Ausverkauf | authored | [link](https://www.dwds.de/wb/Ausverkauf) |
+| `v_auswahl` | die Auswahl | authored | [link](https://www.dwds.de/wb/Auswahl) |
+| `v_baeckerei` | die Bäckerei | authored | [link](https://www.dwds.de/wb/B%C3%A4ckerei) |
+| `v_baumwolle` | die Baumwolle | authored | [link](https://www.dwds.de/wb/Baumwolle) |
+| `v_beanstandung` | die Beanstandung | authored | [link](https://www.dwds.de/wb/Beanstandung) |
+| `v_bewertung` | die Bewertung | authored | [link](https://www.dwds.de/wb/Bewertung) |
+| `v_defekt` | der Defekt | authored | [link](https://www.dwds.de/wb/Defekt) |
+| `v_discounter` | der Discounter | authored | [link](https://www.dwds.de/wb/Discounter) |
+| `v_drogerie` | die Drogerie | authored | [link](https://www.dwds.de/wb/Drogerie) |
+| `v_einkaufskorb` | der Einkaufskorb | authored | [link](https://www.dwds.de/wb/Einkaufskorb) |
+| `v_einkaufsliste` | die Einkaufsliste | authored | [link](https://www.dwds.de/wb/Einkaufsliste) |
+| `v_eng` | eng | authored | [link](https://www.dwds.de/wb/eng) |
+| `v_ersatz` | der Ersatz | authored | [link](https://www.dwds.de/wb/Ersatz) |
+| `v_erstattung` | die Erstattung | authored | [link](https://www.dwds.de/wb/Erstattung) |
+| `v_haltbarkeitsdatum` | das Haltbarkeitsdatum | authored | [link](https://www.dwds.de/wb/Haltbarkeitsdatum) |
+| `v_kassenzettel` | der Kassenzettel | authored | [link](https://www.dwds.de/wb/Kassenzettel) |
+| `v_kassierer` | der Kassierer | authored | [link](https://www.dwds.de/wb/Kassierer) |
+| `v_kaufbeleg` | der Kaufbeleg | authored | [link](https://www.dwds.de/wb/Kaufbeleg) |
+| `v_kleiderbuegel` | der Kleiderbügel | authored | [link](https://www.dwds.de/wb/Kleiderb%C3%BCgel) |
+| `v_kleidergroesse` | die Kleidergröße | authored | [link](https://www.dwds.de/wb/Kleidergr%C3%B6%C3%9Fe) |
+| `v_kleidungsstueck` | das Kleidungsstück | authored | [link](https://www.dwds.de/wb/Kleidungsst%C3%BCck) |
+| `v_kleingeld` | das Kleingeld | authored | [link](https://www.dwds.de/wb/Kleingeld) |
+| `v_knopf` | der Knopf | authored | [link](https://www.dwds.de/wb/Knopf) |
+| `v_lebensmittel` | das Lebensmittel | authored | [link](https://www.dwds.de/wb/Lebensmittel) |
+| `v_lieferadresse` | die Lieferadresse | authored | [link](https://www.dwds.de/wb/Lieferadresse) |
+| `v_lieferzeit` | die Lieferzeit | authored | [link](https://www.dwds.de/wb/Lieferzeit) |
+| `v_nachbesserung` | die Nachbesserung | authored | [link](https://www.dwds.de/wb/Nachbesserung) |
+| `v_onlineshop` | der Onlineshop | authored | [link](https://www.dwds.de/wb/Onlineshop) |
+| `v_packstation` | die Packstation | authored | [link](https://www.dwds.de/wb/Packstation) |
+| `v_paket` | das Paket | authored | [link](https://www.dwds.de/wb/Paket) |
+| `v_paketbote` | der Paketbote | authored | [link](https://www.dwds.de/wb/Paketbote) |
+| `v_paketshop` | der Paketshop | authored | [link](https://www.dwds.de/wb/Paketshop) |
+| `v_pfand` | das Pfand | authored | [link](https://www.dwds.de/wb/Pfand) |
+| `v_reissverschluss` | der Reißverschluss | authored | [link](https://www.dwds.de/wb/Rei%C3%9Fverschluss) |
+| `v_reklamieren` | reklamieren | authored | [link](https://www.dwds.de/wb/reklamieren) |
+| `v_ruecksendung` | die Rücksendung | authored | [link](https://www.dwds.de/wb/R%C3%BCcksendung) |
+| `v_sachmangel` | der Sachmangel | authored | [link](https://www.dwds.de/wb/Sachmangel) |
+| `v_selbstbedienungskasse` | die Selbstbedienungskasse | authored | [link](https://www.dwds.de/wb/Selbstbedienungskasse) |
+| `v_stoff` | der Stoff | authored | [link](https://www.dwds.de/wb/Stoff) |
+| `v_tuete` | die Tüte | authored | [link](https://www.dwds.de/wb/T%C3%BCte) |
+| `v_umtauschfrist` | die Umtauschfrist | authored | [link](https://www.dwds.de/wb/Umtauschfrist) |
+| `v_umtauschschein` | der Umtauschschein | authored | [link](https://www.dwds.de/wb/Umtauschschein) |
+| `v_vorkasse` | die Vorkasse | authored | [link](https://www.dwds.de/wb/Vorkasse) |
+| `v_waage` | die Waage | authored | [link](https://www.dwds.de/wb/Waage) |
+| `v_widerruf` | der Widerruf | authored | [link](https://www.dwds.de/wb/Widerruf) |
+| `v_zahlungsart` | die Zahlungsart | authored | [link](https://www.dwds.de/wb/Zahlungsart) |
+| `v_zurueckgeben` | zurückgeben | authored | [link](https://www.dwds.de/wb/zur%C3%BCckgeben) |
 
 </details>
 
-<details><summary>it — 60</summary>
+<details><summary>essen — 49</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `v_abfrage` | die Abfrage | authored | [link](https://www.dwds.de/r?q=Abfrage) |
-| `v_abstuerzen` | abstürzen | authored | [link](https://www.dwds.de/r?q=abst%C3%BCrzen) |
-| `v_absturz` | der Absturz | authored | [link](https://www.dwds.de/r?q=Absturz) |
-| `v_administrator` | der Administrator | authored | [link](https://www.dwds.de/r?q=Administrator) |
-| `v_agil` | agil | authored | [link](https://www.dwds.de/r?q=agil) |
-| `v_algorithmus` | der Algorithmus | authored | [link](https://www.dwds.de/r?q=Algorithmus) |
-| `v_anforderung` | die Anforderung | authored | [link](https://www.dwds.de/r?q=Anforderung) |
-| `v_auslastung` | die Auslastung | authored | [link](https://www.dwds.de/r?q=Auslastung) |
-| `v_auslesen` | auslesen | authored | [link](https://www.dwds.de/r?q=auslesen) |
-| `v_authentifizierung` | die Authentifizierung | authored | [link](https://www.dwds.de/r?q=Authentifizierung) |
-| `v_automatisiert` | automatisiert | authored | [link](https://www.dwds.de/r?q=automatisiert) |
-| `v_barrierefreiheit` | die Barrierefreiheit | authored | [link](https://www.dwds.de/r?q=Barrierefreiheit) |
-| `v_benutzerkonto` | das Benutzerkonto | authored | [link](https://www.dwds.de/r?q=Benutzerkonto) |
-| `v_benutzeroberflaeche` | die Benutzeroberfläche | authored | [link](https://www.dwds.de/r?q=Benutzeroberfl%C3%A4che) |
-| `v_berechtigung` | die Berechtigung | authored | [link](https://www.dwds.de/r?q=Berechtigung) |
-| `v_bereitstellung` | die Bereitstellung | authored | [link](https://www.dwds.de/r?q=Bereitstellung) |
-| `v_betriebssystem` | das Betriebssystem | authored | [link](https://www.dwds.de/r?q=Betriebssystem) |
-| `v_datenbank` | die Datenbank | authored | [link](https://www.dwds.de/r?q=Datenbank) |
-| `v_datensicherung` | die Datensicherung | authored | [link](https://www.dwds.de/r?q=Datensicherung) |
-| `v_datentraeger` | der Datenträger | authored | [link](https://www.dwds.de/r?q=Datentr%C3%A4ger) |
-| `v_datenverlust` | der Datenverlust | authored | [link](https://www.dwds.de/r?q=Datenverlust) |
-| `v_digital` | digital | authored | [link](https://www.dwds.de/r?q=digital) |
-| `v_dokumentation` | die Dokumentation | authored | [link](https://www.dwds.de/r?q=Dokumentation) |
-| `v_endgeraet` | das Endgerät | authored | [link](https://www.dwds.de/r?q=Endger%C3%A4t) |
-| `v_entwickler` | der Entwickler | authored | [link](https://www.dwds.de/r?q=Entwickler) |
-| `v_fehlerbericht` | der Fehlerbericht | authored | [link](https://www.dwds.de/r?q=Fehlerbericht) |
-| `v_fehlerhaft` | fehlerhaft | authored | [link](https://www.dwds.de/r?q=fehlerhaft) |
-| `v_fehlermeldung` | die Fehlermeldung | authored | [link](https://www.dwds.de/r?q=Fehlermeldung) |
-| `v_festplatte` | die Festplatte | authored | [link](https://www.dwds.de/r?q=Festplatte) |
-| `v_firewall` | die Firewall | authored | [link](https://www.dwds.de/r?q=Firewall) |
-| `v_freigabe` | die Freigabe | authored | [link](https://www.dwds.de/r?q=Freigabe) |
-| `v_hardware` | die Hardware | authored | [link](https://www.dwds.de/r?q=Hardware) |
-| `v_herunterladen` | herunterladen | authored | [link](https://www.dwds.de/r?q=herunterladen) |
-| `v_hochladen` | hochladen | authored | [link](https://www.dwds.de/r?q=hochladen) |
-| `v_implementieren` | implementieren | authored | [link](https://www.dwds.de/r?q=implementieren) |
-| `v_intuitiv` | intuitiv | authored | [link](https://www.dwds.de/r?q=intuitiv) |
-| `v_konfigurieren` | konfigurieren | authored | [link](https://www.dwds.de/r?q=konfigurieren) |
-| `v_ladezeit` | die Ladezeit | authored | [link](https://www.dwds.de/r?q=Ladezeit) |
-| `v_migrieren` | migrieren | authored | [link](https://www.dwds.de/r?q=migrieren) |
-| `v_neustart` | der Neustart | authored | [link](https://www.dwds.de/r?q=Neustart) |
-| `v_programmieren` | programmieren | authored | [link](https://www.dwds.de/r?q=programmieren) |
-| `v_programmiersprache` | die Programmiersprache | authored | [link](https://www.dwds.de/r?q=Programmiersprache) |
-| `v_quellcode` | der Quellcode | authored | [link](https://www.dwds.de/r?q=Quellcode) |
-| `v_rechenzentrum` | das Rechenzentrum | authored | [link](https://www.dwds.de/r?q=Rechenzentrum) |
-| `v_schadsoftware` | die Schadsoftware | authored | [link](https://www.dwds.de/r?q=Schadsoftware) |
-| `v_server` | der Server | authored | [link](https://www.dwds.de/r?q=Server) |
-| `v_sicherheitsluecke` | die Sicherheitslücke | authored | [link](https://www.dwds.de/r?q=Sicherheitsl%C3%BCcke) |
-| `v_skalierbar` | skalierbar | authored | [link](https://www.dwds.de/r?q=skalierbar) |
-| `v_speicher` | der Speicher | authored | [link](https://www.dwds.de/r?q=Speicher) |
-| `v_sprint` | der Sprint | authored | [link](https://www.dwds.de/r?q=Sprint) |
-| `v_support` | der Support | authored | [link](https://www.dwds.de/r?q=Support) |
-| `v_systemausfall` | der Systemausfall | authored | [link](https://www.dwds.de/r?q=Systemausfall) |
-| `v_testabdeckung` | die Testabdeckung | authored | [link](https://www.dwds.de/r?q=Testabdeckung) |
-| `v_testfall` | der Testfall | authored | [link](https://www.dwds.de/r?q=Testfall) |
-| `v_ticket` | das Ticket | authored | [link](https://www.dwds.de/r?q=Ticket) |
-| `v_verschluesselung` | die Verschlüsselung | authored | [link](https://www.dwds.de/r?q=Verschl%C3%BCsselung) |
-| `v_version` | die Version | authored | [link](https://www.dwds.de/r?q=Version) |
-| `v_versionsverwaltung` | die Versionsverwaltung | authored | [link](https://www.dwds.de/r?q=Versionsverwaltung) |
-| `v_virus` | der Virus | authored | [link](https://www.dwds.de/r?q=Virus) |
-| `v_wartungsfenster` | das Wartungsfenster | authored | [link](https://www.dwds.de/r?q=Wartungsfenster) |
+| `v_aufrunden` | aufrunden | authored | [link](https://www.dwds.de/wb/aufrunden) |
+| `v_backen` | backen | authored | [link](https://www.dwds.de/wb/backen) |
+| `v_backofen` | der Backofen | authored | [link](https://www.dwds.de/wb/Backofen) |
+| `v_barzahlung` | die Barzahlung | authored | [link](https://www.dwds.de/wb/Barzahlung) |
+| `v_bedienungszuschlag` | der Bedienungszuschlag | authored | [link](https://www.dwds.de/wb/Bedienungszuschlag) |
+| `v_beilage` | die Beilage | authored | [link](https://www.dwds.de/wb/Beilage) |
+| `v_bewirtung` | die Bewirtung | authored | [link](https://www.dwds.de/wb/Bewirtung) |
+| `v_braten` | braten | authored | [link](https://www.dwds.de/wb/braten) |
+| `v_brot` | das Brot | authored | [link](https://www.dwds.de/wb/Brot) |
+| `v_durchgebraten` | durchgebraten | authored | [link](https://www.dwds.de/wb/durchgebraten) |
+| `v_empfehlung` | die Empfehlung | authored | [link](https://www.dwds.de/wb/Empfehlung) |
+| `v_fisch` | der Fisch | authored | [link](https://www.dwds.de/wb/Fisch) |
+| `v_fleisch` | das Fleisch | authored | [link](https://www.dwds.de/wb/Fleisch) |
+| `v_gabel` | die Gabel | authored | [link](https://www.dwds.de/wb/Gabel) |
+| `v_gedeck` | das Gedeck | authored | [link](https://www.dwds.de/wb/Gedeck) |
+| `v_gemuese` | das Gemüse | authored | [link](https://www.dwds.de/wb/Gem%C3%BCse) |
+| `v_getraenk` | das Getränk | authored | [link](https://www.dwds.de/wb/Getr%C3%A4nk) |
+| `v_getrennt` | getrennt | authored | [link](https://www.dwds.de/wb/getrennt) |
+| `v_gewuerz` | das Gewürz | authored | [link](https://www.dwds.de/wb/Gew%C3%BCrz) |
+| `v_glas` | das Glas | authored | [link](https://www.dwds.de/wb/Glas) |
+| `v_herd` | der Herd | authored | [link](https://www.dwds.de/wb/Herd) |
+| `v_imbiss` | der Imbiss | authored | [link](https://www.dwds.de/wb/Imbiss) |
+| `v_kartenzahlung` | die Kartenzahlung | authored | [link](https://www.dwds.de/wb/Kartenzahlung) |
+| `v_kochen` | kochen | authored | [link](https://www.dwds.de/wb/kochen) |
+| `v_kueche` | die Küche | authored | [link](https://www.dwds.de/wb/K%C3%BCche) |
+| `v_lieferdienst` | der Lieferdienst | authored | [link](https://www.dwds.de/wb/Lieferdienst) |
+| `v_loeffel` | der Löffel | authored | [link](https://www.dwds.de/wb/L%C3%B6ffel) |
+| `v_mahlzeit` | die Mahlzeit | authored | [link](https://www.dwds.de/wb/Mahlzeit) |
+| `v_menue` | das Menü | authored | [link](https://www.dwds.de/wb/Men%C3%BC) |
+| `v_messer` | das Messer | authored | [link](https://www.dwds.de/wb/Messer) |
+| `v_nachtisch` | der Nachtisch | authored | [link](https://www.dwds.de/wb/Nachtisch) |
+| `v_pfanne` | die Pfanne | authored | [link](https://www.dwds.de/wb/Pfanne) |
+| `v_salat` | der Salat | authored | [link](https://www.dwds.de/wb/Salat) |
+| `v_scharf` | scharf | authored | [link](https://www.dwds.de/wb/scharf) |
+| `v_schneiden` | schneiden | authored | [link](https://www.dwds.de/wb/schneiden) |
+| `v_schuessel` | die Schüssel | authored | [link](https://www.dwds.de/wb/Sch%C3%BCssel) |
+| `v_snack` | der Snack | authored | [link](https://www.dwds.de/wb/Snack) |
+| `v_sosse` | die Soße | authored | [link](https://www.dwds.de/wb/So%C3%9Fe) |
+| `v_speise` | die Speise | authored | [link](https://www.dwds.de/wb/Speise) |
+| `v_spezialitaet` | die Spezialität | authored | [link](https://www.dwds.de/wb/Spezialit%C3%A4t) |
+| `v_suppe` | die Suppe | authored | [link](https://www.dwds.de/wb/Suppe) |
+| `v_tageskarte` | die Tageskarte | authored | [link](https://www.dwds.de/wb/Tageskarte) |
+| `v_tasse` | die Tasse | authored | [link](https://www.dwds.de/wb/Tasse) |
+| `v_teller` | der Teller | authored | [link](https://www.dwds.de/wb/Teller) |
+| `v_tisch` | der Tisch | authored | [link](https://www.dwds.de/wb/Tisch) |
+| `v_topf` | der Topf | authored | [link](https://www.dwds.de/wb/Topf) |
+| `v_vegan` | vegan | authored | [link](https://www.dwds.de/wb/vegan) |
+| `v_vegetarisch` | vegetarisch | authored | [link](https://www.dwds.de/wb/vegetarisch) |
+| `v_wuerzen` | würzen | authored | [link](https://www.dwds.de/wb/w%C3%BCrzen) |
 
 </details>
 
-<details><summary>logistics — 50</summary>
+<details><summary>freizeit — 49</summary>
+
+| id | label | origin | reference |
+|---|---|---|---|
+| `v_absage` | die Absage | authored | [link](https://www.dwds.de/wb/Absage) |
+| `v_ausflug` | der Ausflug | authored | [link](https://www.dwds.de/wb/Ausflug) |
+| `v_ausstellung` | die Ausstellung | authored | [link](https://www.dwds.de/wb/Ausstellung) |
+| `v_begegnung` | die Begegnung | authored | [link](https://www.dwds.de/wb/Begegnung) |
+| `v_bekannter` | der Bekannte | authored | [link](https://www.dwds.de/wb/Bekannte) |
+| `v_brettspiel` | das Brettspiel | authored | [link](https://www.dwds.de/wb/Brettspiel) |
+| `v_buehne` | die Bühne | authored | [link](https://www.dwds.de/wb/B%C3%BChne) |
+| `v_chor` | der Chor | authored | [link](https://www.dwds.de/wb/Chor) |
+| `v_ehrenamt` | das Ehrenamt | authored | [link](https://www.dwds.de/wb/Ehrenamt) |
+| `v_einladung` | die Einladung | authored | [link](https://www.dwds.de/wb/Einladung) |
+| `v_eintritt` | der Eintritt | authored | [link](https://www.dwds.de/wb/Eintritt) |
+| `v_eintrittskarte` | die Eintrittskarte | authored | [link](https://www.dwds.de/wb/Eintrittskarte) |
+| `v_feier` | die Feier | authored | [link](https://www.dwds.de/wb/Feier) |
+| `v_festival` | das Festival | authored | [link](https://www.dwds.de/wb/Festival) |
+| `v_freizeitangebot` | das Freizeitangebot | authored | [link](https://www.dwds.de/wb/Freizeitangebot) |
+| `v_gastgeber` | der Gastgeber | authored | [link](https://www.dwds.de/wb/Gastgeber) |
+| `v_gelegenheit` | die Gelegenheit | authored | [link](https://www.dwds.de/wb/Gelegenheit) |
+| `v_gemeinsamkeit` | die Gemeinsamkeit | authored | [link](https://www.dwds.de/wb/Gemeinsamkeit) |
+| `v_gespraechsthema` | das Gesprächsthema | authored | [link](https://www.dwds.de/wb/Gespr%C3%A4chsthema) |
+| `v_grillen` | das Grillen | authored | [link](https://www.dwds.de/wb/grillen) |
+| `v_hobby` | das Hobby | authored | [link](https://www.dwds.de/wb/Hobby) |
+| `v_hobbyraum` | der Hobbyraum | authored | [link](https://www.dwds.de/wb/Hobbyraum) |
+| `v_interesse` | das Interesse | authored | [link](https://www.dwds.de/wb/Interesse) |
+| `v_kino` | das Kino | authored | [link](https://www.dwds.de/wb/Kino) |
+| `v_kompliment` | das Kompliment | authored | [link](https://www.dwds.de/wb/Kompliment) |
+| `v_konzert` | das Konzert | authored | [link](https://www.dwds.de/wb/Konzert) |
+| `v_lesung` | die Lesung | authored | [link](https://www.dwds.de/wb/Lesung) |
+| `v_mitspieler` | der Mitspieler | authored | [link](https://www.dwds.de/wb/Mitspieler) |
+| `v_museum` | das Museum | authored | [link](https://www.dwds.de/wb/Museum) |
+| `v_musikinstrument` | das Musikinstrument | authored | [link](https://www.dwds.de/wb/Musikinstrument) |
+| `v_plauderei` | die Plauderei | authored | [link](https://www.dwds.de/wb/Plauderei) |
+| `v_publikum` | das Publikum | authored | [link](https://www.dwds.de/wb/Publikum) |
+| `v_schwimmbad` | das Schwimmbad | authored | [link](https://www.dwds.de/wb/Schwimmbad) |
+| `v_smalltalk` | der Smalltalk | authored | [link](https://www.dwds.de/wb/Smalltalk) |
+| `v_spaziergang` | der Spaziergang | authored | [link](https://www.dwds.de/wb/Spaziergang) |
+| `v_sportart` | die Sportart | authored | [link](https://www.dwds.de/wb/Sportart) |
+| `v_stimmung` | die Stimmung | authored | [link](https://www.dwds.de/wb/Stimmung) |
+| `v_theater` | das Theater | authored | [link](https://www.dwds.de/wb/Theater) |
+| `v_training` | das Training | authored | [link](https://www.dwds.de/wb/Training) |
+| `v_treffen` | das Treffen | authored | [link](https://www.dwds.de/wb/Treffen) |
+| `v_verabreden` | verabreden | authored | [link](https://www.dwds.de/wb/verabreden) |
+| `v_verabredung` | die Verabredung | authored | [link](https://www.dwds.de/wb/Verabredung) |
+| `v_veranstaltung` | die Veranstaltung | authored | [link](https://www.dwds.de/wb/Veranstaltung) |
+| `v_verein` | der Verein | authored | [link](https://www.dwds.de/wb/Verein) |
+| `v_vorstellung` | die Vorstellung | authored | [link](https://www.dwds.de/wb/Vorstellung) |
+| `v_wanderung` | die Wanderung | authored | [link](https://www.dwds.de/wb/Wanderung) |
+| `v_wetter` | das Wetter | authored | [link](https://www.dwds.de/wb/Wetter) |
+| `v_witz` | der Witz | authored | [link](https://www.dwds.de/wb/Witz) |
+| `v_zusage` | die Zusage | authored | [link](https://www.dwds.de/wb/Zusage) |
+
+</details>
+
+<details><summary>logistics — 83</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `v_allerdings` | allerdings | authored | [link](https://de.wiktionary.org/wiki/allerdings) |
+| `v_anhaenger` | der Anhänger | authored | [link](https://www.dwds.de/r?q=Anh%C3%A4nger) |
 | `v_auffuellen` | auffüllen | authored | [link](https://de.wiktionary.org/wiki/auff%C3%BCllen) |
+| `v_auslasten` | auslasten | authored | [link](https://www.dwds.de/r?q=auslasten) |
 | `v_ausliefern` | ausliefern | authored | [link](https://de.wiktionary.org/wiki/ausliefern) |
 | `v_auslieferung` | die Auslieferung | authored | [link](https://de.wiktionary.org/wiki/Auslieferung) |
+| `v_beladen` | beladen | authored | [link](https://www.dwds.de/r?q=beladen) |
+| `v_berufskraftfahrer` | der Berufskraftfahrer | authored | [link](https://www.dwds.de/r?q=Berufskraftfahrer) |
 | `v_beschaedigt` | beschädigt | authored | [link](https://de.wiktionary.org/wiki/besch%C3%A4digt) |
 | `v_beschaedigung` | die Beschädigung | authored | [link](https://de.wiktionary.org/wiki/Besch%C3%A4digung) |
 | `v_bestand` | der Bestand | authored | [link](https://de.wiktionary.org/wiki/Bestand) |
 | `v_bestellen` | bestellen | authored | [link](https://de.wiktionary.org/wiki/bestellen) |
 | `v_bestellung` | die Bestellung | authored | [link](https://de.wiktionary.org/wiki/Bestellung) |
+| `v_charge` | die Charge | authored | [link](https://www.dwds.de/r?q=Charge) |
 | `v_durchlaufzeit` | die Durchlaufzeit | authored | [link](https://www.dwds.de/r?q=Durchlaufzeit) |
+| `v_durchsatz` | der Durchsatz | authored | [link](https://www.dwds.de/r?q=Durchsatz) |
+| `v_einraeumen` | einräumen | authored | [link](https://www.dwds.de/r?q=einr%C3%A4umen) |
 | `v_empfaenger` | der Empfänger | authored | [link](https://de.wiktionary.org/wiki/Empf%C3%A4nger) |
 | `v_engpass` | der Engpass | authored | [link](https://de.wiktionary.org/wiki/Engpass) |
+| `v_entladen` | entladen | authored | [link](https://www.dwds.de/r?q=entladen) |
+| `v_ersatzteil` | das Ersatzteil | authored | [link](https://www.dwds.de/r?q=Ersatzteil) |
+| `v_etikett` | das Etikett | authored | [link](https://www.dwds.de/wb/Etikett) |
+| `v_etikettieren` | etikettieren | authored | [link](https://www.dwds.de/r?q=etikettieren) |
 | `v_fracht` | die Fracht | authored | [link](https://de.wiktionary.org/wiki/Fracht) |
 | `v_frachtbrief` | der Frachtbrief | authored | [link](https://de.wiktionary.org/wiki/Frachtbrief) |
+| `v_gabelstapler` | der Gabelstapler | authored | [link](https://www.dwds.de/wb/Gabelstapler) |
+| `v_grosshandel` | der Großhandel | authored | [link](https://www.dwds.de/r?q=Gro%C3%9Fhandel) |
+| `v_hochregallager` | das Hochregallager | authored | [link](https://www.dwds.de/wb/Hochregallager) |
+| `v_inventur` | die Inventur | authored | [link](https://www.dwds.de/r?q=Inventur) |
 | `v_just_in_time` | Just-in-time-Lieferung | authored | [link](https://www.dwds.de/r?q=Just-in-time-Lieferung) |
 | `v_kapazitaet` | die Kapazität | authored | [link](https://de.wiktionary.org/wiki/Kapazit%C3%A4t) |
 | `v_kommissionieren` | kommissionieren | authored | [link](https://de.wiktionary.org/wiki/kommissionieren) |
+| `v_kommissionierung` | die Kommissionierung | authored | [link](https://www.dwds.de/wb/Kommissionierung) |
+| `v_ladeflaeche` | die Ladefläche | authored | [link](https://www.dwds.de/r?q=Ladefl%C3%A4che) |
 | `v_ladeliste` | die Ladeliste | authored | [link](https://www.dwds.de/r?q=Ladeliste) |
+| `v_laderampe` | die Laderampe | authored | [link](https://www.dwds.de/wb/Laderampe) |
 | `v_lager` | das Lager | authored | [link](https://de.wiktionary.org/wiki/Lager) |
 | `v_lagerbestand` | der Lagerbestand | authored | [link](https://de.wiktionary.org/wiki/Lagerbestand) |
+| `v_lagerhaltung` | die Lagerhaltung | authored | [link](https://www.dwds.de/r?q=Lagerhaltung) |
 | `v_lagerhaltungskosten` | die Lagerhaltungskosten | authored | [link](https://www.dwds.de/r?q=Lagerhaltungskosten) |
 | `v_lagerkosten` | die Lagerkosten | authored | [link](https://www.dwds.de/r?q=Lagerkosten) |
+| `v_leergut` | das Leergut | authored | [link](https://www.dwds.de/wb/Leergut) |
 | `v_lieferant` | der Lieferant | authored | [link](https://de.wiktionary.org/wiki/Lieferant) |
 | `v_lieferkette` | die Lieferkette | authored | [link](https://de.wiktionary.org/wiki/Lieferkette) |
 | `v_liefern` | liefern | authored | [link](https://de.wiktionary.org/wiki/liefern) |
+| `v_lieferschein` | der Lieferschein | authored | [link](https://www.dwds.de/wb/Lieferschein) |
+| `v_lieferservice` | der Lieferservice | authored | [link](https://www.dwds.de/r?q=Lieferservice) |
 | `v_liefertermin` | der Liefertermin | authored | [link](https://www.dwds.de/r?q=Liefertermin) |
 | `v_lieferung` | die Lieferung | authored | [link](https://de.wiktionary.org/wiki/Lieferung) |
 | `v_lkw` | der LKW | authored | [link](https://de.wiktionary.org/wiki/LKW) |
 | `v_lkw_fahrer` | der LKW-Fahrer / die LKW-Fahrerin | authored | [link](https://www.dwds.de/r?q=LKW-Fahrer) |
+| `v_losgroesse` | die Losgröße | authored | [link](https://www.dwds.de/r?q=Losgr%C3%B6%C3%9Fe) |
+| `v_maut` | die Maut | authored | [link](https://www.dwds.de/r?q=Maut) |
 | `v_mindestbestand` | der Mindestbestand | authored | [link](https://www.dwds.de/r?q=Mindestbestand) |
 | `v_nachschub` | der Nachschub | authored | [link](https://de.wiktionary.org/wiki/Nachschub) |
+| `v_nutzfahrzeug` | das Nutzfahrzeug | authored | [link](https://www.dwds.de/r?q=Nutzfahrzeug) |
 | `v_optimieren` | optimieren | authored | [link](https://de.wiktionary.org/wiki/optimieren) |
 | `v_palette` | die Palette | authored | [link](https://de.wiktionary.org/wiki/Palette) |
+| `v_preisschild` | das Preisschild | authored | [link](https://www.dwds.de/wb/Preisschild) |
+| `v_rangieren` | rangieren | authored | [link](https://www.dwds.de/r?q=rangieren) |
+| `v_regal` | das Regal | authored | [link](https://www.dwds.de/r?q=Regal) |
 | `v_retoure` | die Retoure | authored | [link](https://de.wiktionary.org/wiki/Retoure) |
 | `v_retouren_management` | das Retourenmanagement | authored | [link](https://www.dwds.de/r?q=Retourenmanagement) |
 | `v_route` | die Route | authored | [link](https://de.wiktionary.org/wiki/Route) |
 | `v_rueckstandsliste` | die Rückstandsliste | authored | [link](https://www.dwds.de/r?q=R%C3%BCckstandsliste) |
 | `v_sendungsverfolgung` | die Sendungsverfolgung | authored | [link](https://de.wiktionary.org/wiki/Sendungsverfolgung) |
 | `v_spediteur` | der Spediteur | authored | [link](https://de.wiktionary.org/wiki/Spediteur) |
+| `v_spedition` | die Spedition | authored | [link](https://www.dwds.de/wb/Spedition) |
+| `v_stueckzahl` | die Stückzahl | authored | [link](https://www.dwds.de/r?q=St%C3%BCckzahl) |
 | `v_termingerecht` | termingerecht | authored | [link](https://de.wiktionary.org/wiki/termingerecht) |
+| `v_tourenplanung` | die Tourenplanung | authored | [link](https://www.dwds.de/wb/Tourenplanung) |
 | `v_transport` | der Transport | authored | [link](https://de.wiktionary.org/wiki/Transport) |
 | `v_transportschaden` | der Transportschaden | authored | [link](https://www.dwds.de/r?q=Transportschaden) |
 | `v_umladen` | umladen | authored | [link](https://de.wiktionary.org/wiki/umladen) |
@@ -2604,12 +3391,14 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_versenden` | versenden | authored | [link](https://de.wiktionary.org/wiki/versenden) |
 | `v_verspaetung` | die Verspätung | authored | [link](https://de.wiktionary.org/wiki/Versp%C3%A4tung) |
 | `v_ware` | die Ware | authored | [link](https://de.wiktionary.org/wiki/Ware) |
+| `v_warenbestand` | der Warenbestand | authored | [link](https://www.dwds.de/r?q=Warenbestand) |
 | `v_wareneingang` | der Wareneingang | authored | [link](https://www.dwds.de/r?q=Wareneingang) |
 | `v_zoll` | der Zoll | authored | [link](https://de.wiktionary.org/wiki/Zoll) |
+| `v_zustellung` | die Zustellung | authored | [link](https://www.dwds.de/wb/Zustellung) |
 
 </details>
 
-<details><summary>meetings — 54</summary>
+<details><summary>meetings — 64</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -2619,6 +3408,7 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_aktionspunkt` | der Aktionspunkt | authored | [link](https://www.dwds.de/r?q=Aktionspunkt) |
 | `v_aufgabe_verteilen` | Aufgaben verteilen | authored | [link](https://www.dwds.de/r?q=Aufgaben%20verteilen) |
 | `v_ausreden_lassen` | jemanden ausreden lassen | authored | [link](https://www.dwds.de/r?q=jemanden%20ausreden%20lassen) |
+| `v_bauleitung` | die Bauleitung | authored | [link](https://www.dwds.de/r?q=Bauleitung) |
 | `v_beschluss` | der Beschluss | authored | [link](https://de.wiktionary.org/wiki/Beschluss) |
 | `v_besprechung` | die Besprechung | authored | [link](https://de.wiktionary.org/wiki/Besprechung) |
 | `v_deshalb` | deshalb | authored | [link](https://de.wiktionary.org/wiki/deshalb) |
@@ -2631,22 +3421,29 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_ergebnis` | das Ergebnis | authored | [link](https://de.wiktionary.org/wiki/Ergebnis) |
 | `v_ergebnisoffen` | ergebnisoffen | authored | [link](https://de.wiktionary.org/wiki/ergebnisoffen) |
 | `v_ergebnisprotokoll` | das Ergebnisprotokoll | authored | [link](https://www.dwds.de/r?q=Ergebnisprotokoll) |
+| `v_fallbesprechung` | die Fallbesprechung | authored | [link](https://www.dwds.de/wb/Fallbesprechung) |
 | `v_fazit` | das Fazit | authored | [link](https://de.wiktionary.org/wiki/Fazit) |
 | `v_kollege` | der Kollege | authored | [link](https://de.wiktionary.org/wiki/Kollege) |
 | `v_konsens` | der Konsens | authored | [link](https://de.wiktionary.org/wiki/Konsens) |
 | `v_konsensbasiert` | konsensbasiert | authored | [link](https://www.dwds.de/r?q=konsensbasiert) |
+| `v_kuechenchef` | der Küchenchef | authored | [link](https://www.dwds.de/r?q=K%C3%BCchenchef) |
 | `v_leitung` | die Leitung | authored | [link](https://de.wiktionary.org/wiki/Leitung) |
+| `v_mannschaft` | die Mannschaft | authored | [link](https://www.dwds.de/r?q=Mannschaft) |
 | `v_meeting` | das Meeting | authored | [link](https://de.wiktionary.org/wiki/Meeting) |
 | `v_mehrheit` | die Mehrheit | authored | [link](https://de.wiktionary.org/wiki/Mehrheit) |
 | `v_moderation` | die Moderation | authored | [link](https://de.wiktionary.org/wiki/Moderation) |
 | `v_moderieren` | moderieren | authored | [link](https://de.wiktionary.org/wiki/moderieren) |
+| `v_motivieren` | motivieren | authored | [link](https://www.dwds.de/r?q=motivieren) |
 | `v_nachbereitung` | die Nachbereitung | authored | [link](https://www.dwds.de/r?q=Nachbereitung) |
+| `v_objektleitung` | die Objektleitung | authored | [link](https://www.dwds.de/wb/Objektleitung) |
+| `v_polier` | der Polier | authored | [link](https://www.dwds.de/r?q=Polier) |
 | `v_praesentieren` | präsentieren | authored | [link](https://de.wiktionary.org/wiki/pr%C3%A4sentieren) |
 | `v_protokoll` | das Protokoll | authored | [link](https://de.wiktionary.org/wiki/Protokoll) |
 | `v_rederecht` | das Rederecht | authored | [link](https://de.wiktionary.org/wiki/Rederecht) |
 | `v_redezeit` | die Redezeit | authored | [link](https://www.dwds.de/r?q=Redezeit) |
 | `v_rueckmeldung` | die Rückmeldung | authored | [link](https://de.wiktionary.org/wiki/R%C3%BCckmeldung) |
 | `v_satzung` | die Satzung | authored | [link](https://de.wiktionary.org/wiki/Satzung) |
+| `v_schichtleitung` | die Schichtleitung | authored | [link](https://www.dwds.de/r?q=Schichtleitung) |
 | `v_sitzung` | die Sitzung | authored | [link](https://de.wiktionary.org/wiki/Sitzung) |
 | `v_standpunkt` | der Standpunkt | authored | [link](https://de.wiktionary.org/wiki/Standpunkt) |
 | `v_tagesordnung` | die Tagesordnung | authored | [link](https://de.wiktionary.org/wiki/Tagesordnung) |
@@ -2657,9 +3454,11 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_umlaufverfahren` | das Umlaufverfahren | authored | [link](https://www.dwds.de/r?q=Umlaufverfahren) |
 | `v_vertagen` | vertagen | authored | [link](https://de.wiktionary.org/wiki/vertagen) |
 | `v_videokonferenz` | die Videokonferenz | authored | [link](https://de.wiktionary.org/wiki/Videokonferenz) |
+| `v_vorarbeiter` | der Vorarbeiter | authored | [link](https://www.dwds.de/r?q=Vorarbeiter) |
 | `v_vorschlag` | der Vorschlag | authored | [link](https://de.wiktionary.org/wiki/Vorschlag) |
 | `v_vorschlagen` | vorschlagen | authored | [link](https://de.wiktionary.org/wiki/vorschlagen) |
 | `v_vorsitz` | der Vorsitz | authored | [link](https://de.wiktionary.org/wiki/Vorsitz) |
+| `v_werksleitung` | die Werksleitung | authored | [link](https://www.dwds.de/r?q=Werksleitung) |
 | `v_wortergreifen` | das Wort ergreifen | authored | [link](https://www.dwds.de/r?q=Wort%20ergreifen) |
 | `v_wortmeldung` | die Wortmeldung | authored | [link](https://de.wiktionary.org/wiki/Wortmeldung) |
 | `v_zeitwaechterin` | die Zeitwächterin / der Zeitwächter | authored | [link](https://www.dwds.de/r?q=Zeitw%C3%A4chterin) |
@@ -2670,99 +3469,116 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>production — 60</summary>
+<details><summary>mobilitaet — 49</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `v_akkord` | der Akkord | authored | [link](https://www.dwds.de/r?q=Akkord) |
-| `v_anlernen` | anlernen | authored | [link](https://www.dwds.de/r?q=anlernen) |
-| `v_arbeitskleidung` | die Arbeitskleidung | authored | [link](https://www.dwds.de/r?q=Arbeitskleidung) |
-| `v_arbeitsschritt` | der Arbeitsschritt | authored | [link](https://www.dwds.de/r?q=Arbeitsschritt) |
-| `v_auslasten` | auslasten | authored | [link](https://www.dwds.de/r?q=auslasten) |
-| `v_ausschuss` | der Ausschuss | authored | [link](https://www.dwds.de/r?q=Ausschuss) |
-| `v_automatisierung` | die Automatisierung | authored | [link](https://www.dwds.de/r?q=Automatisierung) |
-| `v_betriebsrat` | der Betriebsrat | authored | [link](https://www.dwds.de/r?q=Betriebsrat) |
-| `v_charge` | die Charge | authored | [link](https://www.dwds.de/r?q=Charge) |
-| `v_durchsatz` | der Durchsatz | authored | [link](https://www.dwds.de/r?q=Durchsatz) |
-| `v_einweisen` | einweisen | authored | [link](https://www.dwds.de/r?q=einweisen) |
-| `v_endkontrolle` | die Endkontrolle | authored | [link](https://www.dwds.de/r?q=Endkontrolle) |
-| `v_ersatzteil` | das Ersatzteil | authored | [link](https://www.dwds.de/r?q=Ersatzteil) |
-| `v_fehlerfrei` | fehlerfrei | authored | [link](https://www.dwds.de/r?q=fehlerfrei) |
-| `v_fehlerquote` | die Fehlerquote | authored | [link](https://www.dwds.de/r?q=Fehlerquote) |
-| `v_fertigen` | fertigen | authored | [link](https://www.dwds.de/r?q=fertigen) |
-| `v_fertigung` | die Fertigung | authored | [link](https://www.dwds.de/r?q=Fertigung) |
-| `v_fliessband` | das Fließband | authored | [link](https://www.dwds.de/r?q=Flie%C3%9Fband) |
-| `v_fruehschicht` | die Frühschicht | authored | [link](https://www.dwds.de/r?q=Fr%C3%BChschicht) |
-| `v_gehoerschutz` | der Gehörschutz | authored | [link](https://www.dwds.de/r?q=Geh%C3%B6rschutz) |
-| `v_instandhaltung` | die Instandhaltung | authored | [link](https://www.dwds.de/r?q=Instandhaltung) |
-| `v_justieren` | justieren | authored | [link](https://www.dwds.de/r?q=justieren) |
-| `v_lagerhaltung` | die Lagerhaltung | authored | [link](https://www.dwds.de/r?q=Lagerhaltung) |
-| `v_leiharbeiter` | der Leiharbeiter | authored | [link](https://www.dwds.de/r?q=Leiharbeiter) |
-| `v_losgroesse` | die Losgröße | authored | [link](https://www.dwds.de/r?q=Losgr%C3%B6%C3%9Fe) |
-| `v_manuell` | manuell | authored | [link](https://www.dwds.de/r?q=manuell) |
-| `v_messgeraet` | das Messgerät | authored | [link](https://www.dwds.de/r?q=Messger%C3%A4t) |
-| `v_montage` | die Montage | authored | [link](https://www.dwds.de/r?q=Montage) |
-| `v_montieren` | montieren | authored | [link](https://www.dwds.de/r?q=montieren) |
-| `v_nachtschicht` | die Nachtschicht | authored | [link](https://www.dwds.de/r?q=Nachtschicht) |
-| `v_presse` | die Presse | authored | [link](https://www.dwds.de/r?q=Presse) |
-| `v_probelauf` | der Probelauf | authored | [link](https://www.dwds.de/r?q=Probelauf) |
-| `v_produktionshalle` | die Produktionshalle | authored | [link](https://www.dwds.de/r?q=Produktionshalle) |
-| `v_produktionslinie` | die Produktionslinie | authored | [link](https://www.dwds.de/r?q=Produktionslinie) |
-| `v_pruefprotokoll` | das Prüfprotokoll | authored | [link](https://www.dwds.de/r?q=Pr%C3%BCfprotokoll) |
-| `v_qualitaetskontrolle` | die Qualitätskontrolle | authored | [link](https://www.dwds.de/r?q=Qualit%C3%A4tskontrolle) |
-| `v_qualitaetsmanagement` | das Qualitätsmanagement | authored | [link](https://www.dwds.de/r?q=Qualit%C3%A4tsmanagement) |
-| `v_roboter` | der Roboter | authored | [link](https://www.dwds.de/r?q=Roboter) |
-| `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit | authored | [link](https://www.dwds.de/r?q=R%C3%BCckverfolgbarkeit) |
-| `v_ruestzeit` | die Rüstzeit | authored | [link](https://www.dwds.de/r?q=R%C3%BCstzeit) |
-| `v_schichtleitung` | die Schichtleitung | authored | [link](https://www.dwds.de/r?q=Schichtleitung) |
-| `v_schichtplan` | der Schichtplan | authored | [link](https://www.dwds.de/r?q=Schichtplan) |
-| `v_schutzbrille` | die Schutzbrille | authored | [link](https://www.dwds.de/r?q=Schutzbrille) |
-| `v_serienproduktion` | die Serienproduktion | authored | [link](https://www.dwds.de/r?q=Serienproduktion) |
-| `v_sicherheitsschuhe` | die Sicherheitsschuhe | authored | [link](https://www.dwds.de/r?q=Sicherheitsschuhe) |
-| `v_stichprobe` | die Stichprobe | authored | [link](https://www.dwds.de/r?q=Stichprobe) |
-| `v_stillstand` | der Stillstand | authored | [link](https://www.dwds.de/r?q=Stillstand) |
-| `v_stoeranfaellig` | störanfällig | authored | [link](https://www.dwds.de/r?q=st%C3%B6ranf%C3%A4llig) |
-| `v_stoerfall` | der Störfall | authored | [link](https://www.dwds.de/r?q=St%C3%B6rfall) |
-| `v_stueckzahl` | die Stückzahl | authored | [link](https://www.dwds.de/r?q=St%C3%BCckzahl) |
-| `v_taktzeit` | die Taktzeit | authored | [link](https://www.dwds.de/r?q=Taktzeit) |
-| `v_umruesten` | umrüsten | authored | [link](https://www.dwds.de/r?q=umr%C3%BCsten) |
-| `v_unterweisung` | die Unterweisung | authored | [link](https://www.dwds.de/r?q=Unterweisung) |
-| `v_vorarbeiter` | der Vorarbeiter | authored | [link](https://www.dwds.de/r?q=Vorarbeiter) |
-| `v_warten` | warten | authored | [link](https://www.dwds.de/r?q=warten) |
-| `v_wartung` | die Wartung | authored | [link](https://www.dwds.de/r?q=Wartung) |
-| `v_werksleitung` | die Werksleitung | authored | [link](https://www.dwds.de/r?q=Werksleitung) |
-| `v_werkstueck` | das Werkstück | authored | [link](https://www.dwds.de/r?q=Werkst%C3%BCck) |
-| `v_zeitarbeit` | die Zeitarbeit | authored | [link](https://www.dwds.de/r?q=Zeitarbeit) |
-| `v_zertifizierung` | die Zertifizierung | authored | [link](https://www.dwds.de/r?q=Zertifizierung) |
+| `v_abbiegen` | abbiegen | authored | [link](https://www.dwds.de/wb/abbiegen) |
+| `v_abfahrt` | die Abfahrt | authored | [link](https://www.dwds.de/wb/Abfahrt) |
+| `v_ampel` | die Ampel | authored | [link](https://www.dwds.de/wb/Ampel) |
+| `v_autobahn` | die Autobahn | authored | [link](https://www.dwds.de/wb/Autobahn) |
+| `v_bahncard` | die BahnCard | authored | [link](https://www.dwds.de/wb/BahnCard) |
+| `v_bahnhof` | der Bahnhof | authored | [link](https://www.dwds.de/wb/Bahnhof) |
+| `v_bahnsteig` | der Bahnsteig | authored | [link](https://www.dwds.de/wb/Bahnsteig) |
+| `v_benzin` | das Benzin | authored | [link](https://www.dwds.de/wb/Benzin) |
+| `v_bussgeld` | das Bußgeld | authored | [link](https://www.dwds.de/wb/Bu%C3%9Fgeld) |
+| `v_deutschlandticket` | das Deutschlandticket | authored | [link](https://www.dwds.de/wb/Deutschlandticket) |
+| `v_diesel` | der Diesel | authored | [link](https://www.dwds.de/wb/Diesel) |
+| `v_ecke` | die Ecke | authored | [link](https://www.dwds.de/wb/Ecke) |
+| `v_einzelfahrschein` | der Einzelfahrschein | authored | [link](https://www.dwds.de/wb/Einzelfahrschein) |
+| `v_endstation` | die Endstation | authored | [link](https://www.dwds.de/wb/Endstation) |
+| `v_entfernung` | die Entfernung | authored | [link](https://www.dwds.de/wb/Entfernung) |
+| `v_entwerten` | entwerten | authored | [link](https://www.dwds.de/wb/entwerten) |
+| `v_ermaessigung` | die Ermäßigung | authored | [link](https://www.dwds.de/wb/Erm%C3%A4%C3%9Figung) |
+| `v_fahrkartenkontrolle` | die Fahrkartenkontrolle | authored | [link](https://www.dwds.de/wb/Fahrkartenkontrolle) |
+| `v_fahrplan` | der Fahrplan | authored | [link](https://www.dwds.de/wb/Fahrplan) |
+| `v_fahrrad` | das Fahrrad | authored | [link](https://www.dwds.de/wb/Fahrrad) |
+| `v_fahrschein` | der Fahrschein | authored | [link](https://www.dwds.de/wb/Fahrschein) |
+| `v_fussgaenger` | der Fußgänger | authored | [link](https://www.dwds.de/wb/Fu%C3%9Fg%C3%A4nger) |
+| `v_geradeaus` | geradeaus | authored | [link](https://www.dwds.de/wb/geradeaus) |
+| `v_geschwindigkeit` | die Geschwindigkeit | authored | [link](https://www.dwds.de/wb/Geschwindigkeit) |
+| `v_gleis` | das Gleis | authored | [link](https://www.dwds.de/wb/Gleis) |
+| `v_haltestelle` | die Haltestelle | authored | [link](https://www.dwds.de/wb/Haltestelle) |
+| `v_kennzeichen` | das Kennzeichen | authored | [link](https://www.dwds.de/wb/Kennzeichen) |
+| `v_kreuzung` | die Kreuzung | authored | [link](https://www.dwds.de/wb/Kreuzung) |
+| `v_linie` | die Linie | authored | [link](https://www.dwds.de/wb/Linie) |
+| `v_mitfahrgelegenheit` | die Mitfahrgelegenheit | authored | [link](https://www.dwds.de/wb/Mitfahrgelegenheit) |
+| `v_monatskarte` | die Monatskarte | authored | [link](https://www.dwds.de/wb/Monatskarte) |
+| `v_nahverkehr` | der Nahverkehr | authored | [link](https://www.dwds.de/wb/Nahverkehr) |
+| `v_orientierung` | die Orientierung | authored | [link](https://www.dwds.de/wb/Orientierung) |
+| `v_parken` | parken | authored | [link](https://www.dwds.de/wb/parken) |
+| `v_parkplatz` | der Parkplatz | authored | [link](https://www.dwds.de/wb/Parkplatz) |
+| `v_pendeln` | pendeln | authored | [link](https://www.dwds.de/wb/pendeln) |
+| `v_reifen` | der Reifen | authored | [link](https://www.dwds.de/wb/Reifen) |
+| `v_richtung` | die Richtung | authored | [link](https://www.dwds.de/wb/Richtung) |
+| `v_schaffner` | der Schaffner | authored | [link](https://www.dwds.de/wb/Schaffner) |
+| `v_schwarzfahren` | das Schwarzfahren | authored | [link](https://www.dwds.de/wb/schwarzfahren) |
+| `v_stau` | der Stau | authored | [link](https://www.dwds.de/wb/Stau) |
+| `v_strassenbahn` | die Straßenbahn | authored | [link](https://www.dwds.de/wb/Stra%C3%9Fenbahn) |
+| `v_tanken` | tanken | authored | [link](https://www.dwds.de/wb/tanken) |
+| `v_tankstelle` | die Tankstelle | authored | [link](https://www.dwds.de/wb/Tankstelle) |
+| `v_tarif` | der Tarif | authored | [link](https://www.dwds.de/wb/Tarif) |
+| `v_ticketautomat` | der Ticketautomat | authored | [link](https://www.dwds.de/wb/Ticketautomat) |
+| `v_ubahn` | die U-Bahn | authored | [link](https://www.dwds.de/wb/U-Bahn) |
+| `v_zebrastreifen` | der Zebrastreifen | authored | [link](https://www.dwds.de/wb/Zebrastreifen) |
+| `v_zuschlag` | der Zuschlag | authored | [link](https://www.dwds.de/wb/Zuschlag) |
 
 </details>
 
-<details><summary>project — 49</summary>
+<details><summary>project — 90</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `v_abhaengigkeit` | die Abhängigkeit | authored | [link](https://de.wiktionary.org/wiki/Abh%C3%A4ngigkeit) |
 | `v_abnahme` | die Abnahme | authored | [link](https://de.wiktionary.org/wiki/Abnahme) |
+| `v_abreissen` | abreißen | authored | [link](https://www.dwds.de/r?q=abrei%C3%9Fen) |
 | `v_abschliessen` | abschließen | authored | [link](https://de.wiktionary.org/wiki/abschlie%C3%9Fen) |
 | `v_abschluss` | der Abschluss | authored | [link](https://de.wiktionary.org/wiki/Abschluss) |
+| `v_agil` | agil | authored | [link](https://www.dwds.de/r?q=agil) |
 | `v_ampelstatus` | der Ampelstatus | authored | [link](https://www.dwds.de/r?q=Ampelstatus) |
+| `v_anforderung` | die Anforderung | authored | [link](https://www.dwds.de/r?q=Anforderung) |
+| `v_arbeitsschritt` | der Arbeitsschritt | authored | [link](https://www.dwds.de/r?q=Arbeitsschritt) |
+| `v_architekt` | der Architekt | authored | [link](https://www.dwds.de/r?q=Architekt) |
 | `v_aufgabe` | die Aufgabe | authored | [link](https://de.wiktionary.org/wiki/Aufgabe) |
+| `v_aufmass` | das Aufmaß | authored | [link](https://www.dwds.de/r?q=Aufma%C3%9F) |
 | `v_aufwand` | der Aufwand | authored | [link](https://de.wiktionary.org/wiki/Aufwand) |
+| `v_auslegen` | auslegen | authored | [link](https://www.dwds.de/r?q=auslegen) |
+| `v_ausmessen` | ausmessen | authored | [link](https://www.dwds.de/r?q=ausmessen) |
+| `v_ausschreibung` | die Ausschreibung | authored | [link](https://www.dwds.de/r?q=Ausschreibung) |
 | `v_ausserdem` | außerdem | authored | [link](https://de.wiktionary.org/wiki/au%C3%9Ferdem) |
+| `v_bauabnahme` | die Bauabnahme | authored | [link](https://www.dwds.de/r?q=Bauabnahme) |
+| `v_bauabschnitt` | der Bauabschnitt | authored | [link](https://www.dwds.de/r?q=Bauabschnitt) |
+| `v_bauphase` | die Bauphase | authored | [link](https://www.dwds.de/r?q=Bauphase) |
+| `v_bauplan` | der Bauplan | authored | [link](https://www.dwds.de/r?q=Bauplan) |
+| `v_berechnung` | die Berechnung | authored | [link](https://www.dwds.de/r?q=Berechnung) |
 | `v_bericht` | der Bericht | authored | [link](https://de.wiktionary.org/wiki/Bericht) |
 | `v_berichten` | berichten | authored | [link](https://de.wiktionary.org/wiki/berichten) |
 | `v_budget` | das Budget | authored | [link](https://de.wiktionary.org/wiki/Budget) |
+| `v_datenblatt` | das Datenblatt | authored | [link](https://www.dwds.de/r?q=Datenblatt) |
 | `v_delegieren` | delegieren | authored | [link](https://de.wiktionary.org/wiki/delegieren) |
+| `v_dokumentation` | die Dokumentation | authored | [link](https://www.dwds.de/r?q=Dokumentation) |
 | `v_effizienz` | die Effizienz | authored | [link](https://de.wiktionary.org/wiki/Effizienz) |
 | `v_einerseits` | einerseits … andererseits | authored | [link](https://www.dwds.de/r?q=einerseits%20%E2%80%A6%20andererseits) |
+| `v_entwerfen` | entwerfen | authored | [link](https://www.dwds.de/r?q=entwerfen) |
+| `v_errichten` | errichten | authored | [link](https://www.dwds.de/r?q=errichten) |
+| `v_fassade` | die Fassade | authored | [link](https://www.dwds.de/r?q=Fassade) |
+| `v_fertigstellen` | fertigstellen | authored | [link](https://www.dwds.de/r?q=fertigstellen) |
 | `v_flexibel` | flexibel | authored | [link](https://de.wiktionary.org/wiki/flexibel) |
 | `v_fortschritt` | der Fortschritt | authored | [link](https://de.wiktionary.org/wiki/Fortschritt) |
 | `v_fortschrittsbericht` | der Fortschrittsbericht | authored | [link](https://www.dwds.de/r?q=Fortschrittsbericht) |
+| `v_freigabe` | die Freigabe | authored | [link](https://www.dwds.de/r?q=Freigabe) |
+| `v_fundament` | das Fundament | authored | [link](https://www.dwds.de/r?q=Fundament) |
+| `v_gewerk` | das Gewerk | authored | [link](https://www.dwds.de/r?q=Gewerk) |
+| `v_grundriss` | der Grundriss | authored | [link](https://www.dwds.de/r?q=Grundriss) |
 | `v_kick_off` | das Kick-off-Meeting | authored | [link](https://de.wiktionary.org/wiki/Kick-off-Meeting) |
+| `v_konstruktion` | die Konstruktion | authored | [link](https://www.dwds.de/r?q=Konstruktion) |
 | `v_koordinieren` | koordinieren | authored | [link](https://de.wiktionary.org/wiki/koordinieren) |
 | `v_lastenheft` | das Lastenheft | authored | [link](https://de.wiktionary.org/wiki/Lastenheft) |
+| `v_leistungsverzeichnis` | das Leistungsverzeichnis | authored | [link](https://www.dwds.de/wb/Leistungsverzeichnis) |
 | `v_machbar` | machbar | authored | [link](https://de.wiktionary.org/wiki/machbar) |
 | `v_meilenstein` | der Meilenstein | authored | [link](https://de.wiktionary.org/wiki/Meilenstein) |
+| `v_messung` | die Messung | authored | [link](https://www.dwds.de/r?q=Messung) |
+| `v_messwert` | der Messwert | authored | [link](https://www.dwds.de/r?q=Messwert) |
 | `v_pflichtenheft` | das Pflichtenheft | authored | [link](https://de.wiktionary.org/wiki/Pflichtenheft) |
 | `v_prioritaet` | die Priorität | authored | [link](https://de.wiktionary.org/wiki/Priorit%C3%A4t) |
 | `v_projekt` | das Projekt | authored | [link](https://de.wiktionary.org/wiki/Projekt) |
@@ -2772,19 +3588,32 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_projektphase` | die Projektphase | authored | [link](https://www.dwds.de/r?q=Projektphase) |
 | `v_projektsponsor` | der Projektsponsor | authored | [link](https://www.dwds.de/r?q=Projektsponsor) |
 | `v_projektstand` | der Projektstand | authored | [link](https://www.dwds.de/r?q=Projektstand) |
+| `v_prototyp` | der Prototyp | authored | [link](https://www.dwds.de/r?q=Prototyp) |
+| `v_pruefprotokoll` | das Prüfprotokoll | authored | [link](https://www.dwds.de/r?q=Pr%C3%BCfprotokoll) |
+| `v_qualitaetsmanagement` | das Qualitätsmanagement | authored | [link](https://www.dwds.de/r?q=Qualit%C3%A4tsmanagement) |
 | `v_realisieren` | realisieren | authored | [link](https://de.wiktionary.org/wiki/realisieren) |
 | `v_ressourcen` | die Ressourcen | authored | [link](https://de.wiktionary.org/wiki/Ressourcen) |
 | `v_ressourcenplanung` | die Ressourcenplanung | authored | [link](https://de.wiktionary.org/wiki/Ressourcenplanung) |
 | `v_review_meeting` | das Review-Meeting | authored | [link](https://www.dwds.de/r?q=Review-Meeting) |
+| `v_rohbau` | der Rohbau | authored | [link](https://www.dwds.de/r?q=Rohbau) |
 | `v_scope_creep` | das Scope-Creep / die Aufgabenerweiterung | authored | [link](https://www.dwds.de/r?q=Scope-Creep) |
+| `v_sicherheitskonzept` | das Sicherheitskonzept | authored | [link](https://www.dwds.de/wb/Sicherheitskonzept) |
+| `v_spezifikation` | die Spezifikation | authored | [link](https://www.dwds.de/r?q=Spezifikation) |
+| `v_sprint` | der Sprint | authored | [link](https://www.dwds.de/r?q=Sprint) |
 | `v_stakeholder` | die Stakeholder (Pl.) | authored | [link](https://www.dwds.de/r?q=Stakeholder) |
+| `v_subunternehmer` | der Subunternehmer | authored | [link](https://www.dwds.de/r?q=Subunternehmer) |
+| `v_ticket` | das Ticket | authored | [link](https://www.dwds.de/r?q=Ticket) |
 | `v_ueberblick` | der Überblick | authored | [link](https://de.wiktionary.org/wiki/%C3%9Cberblick) |
 | `v_umsetzen` | umsetzen | authored | [link](https://de.wiktionary.org/wiki/umsetzen) |
 | `v_umsetzungsplan` | der Umsetzungsplan | authored | [link](https://www.dwds.de/r?q=Umsetzungsplan) |
 | `v_verantwortlich` | verantwortlich | authored | [link](https://de.wiktionary.org/wiki/verantwortlich) |
 | `v_verantwortung` | die Verantwortung | authored | [link](https://de.wiktionary.org/wiki/Verantwortung) |
+| `v_vermessung` | die Vermessung | authored | [link](https://www.dwds.de/r?q=Vermessung) |
 | `v_verzug` | der Verzug | authored | [link](https://de.wiktionary.org/wiki/Verzug) |
+| `v_wettkampf` | der Wettkampf | authored | [link](https://www.dwds.de/r?q=Wettkampf) |
+| `v_zeichnung` | die Zeichnung | authored | [link](https://www.dwds.de/r?q=Zeichnung) |
 | `v_zeitrahmen` | der Zeitrahmen | authored | [link](https://www.dwds.de/r?q=Zeitrahmen) |
+| `v_zertifizierung` | die Zertifizierung | authored | [link](https://www.dwds.de/r?q=Zertifizierung) |
 | `v_ziel` | das Ziel | authored | [link](https://de.wiktionary.org/wiki/Ziel) |
 | `v_zielsetzung` | die Zielsetzung | authored | [link](https://de.wiktionary.org/wiki/Zielsetzung) |
 | `v_zustaendigkeit` | die Zuständigkeit | authored | [link](https://de.wiktionary.org/wiki/Zust%C3%A4ndigkeit) |
@@ -2793,88 +3622,168 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>retail — 20</summary>
+<details><summary>safety — 154</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
-| `v_einraeumen` | einräumen | authored | [link](https://www.dwds.de/r?q=einr%C3%A4umen) |
-| `v_einzelhandel` | der Einzelhandel | authored | [link](https://www.dwds.de/r?q=Einzelhandel) |
-| `v_etikettieren` | etikettieren | authored | [link](https://www.dwds.de/r?q=etikettieren) |
-| `v_grosshandel` | der Großhandel | authored | [link](https://www.dwds.de/r?q=Gro%C3%9Fhandel) |
-| `v_inventur` | die Inventur | authored | [link](https://www.dwds.de/r?q=Inventur) |
-| `v_kasse` | die Kasse | authored | [link](https://www.dwds.de/r?q=Kasse) |
-| `v_kassenbon` | der Kassenbon | authored | [link](https://www.dwds.de/r?q=Kassenbon) |
-| `v_kassieren` | kassieren | authored | [link](https://www.dwds.de/r?q=kassieren) |
-| `v_kundenkarte` | die Kundenkarte | authored | [link](https://www.dwds.de/r?q=Kundenkarte) |
-| `v_kundschaft` | die Kundschaft | authored | [link](https://www.dwds.de/r?q=Kundschaft) |
-| `v_ladendiebstahl` | der Ladendiebstahl | authored | [link](https://www.dwds.de/r?q=Ladendiebstahl) |
-| `v_onlinehandel` | der Onlinehandel | authored | [link](https://www.dwds.de/r?q=Onlinehandel) |
-| `v_rabatt` | der Rabatt | authored | [link](https://www.dwds.de/r?q=Rabatt) |
-| `v_reduziert` | reduziert | authored | [link](https://www.dwds.de/r?q=reduziert) |
-| `v_regal` | das Regal | authored | [link](https://www.dwds.de/r?q=Regal) |
-| `v_schaufenster` | das Schaufenster | authored | [link](https://www.dwds.de/r?q=Schaufenster) |
-| `v_sonderangebot` | das Sonderangebot | authored | [link](https://www.dwds.de/r?q=Sonderangebot) |
-| `v_sortiment` | das Sortiment | authored | [link](https://www.dwds.de/r?q=Sortiment) |
-| `v_vorraetig` | vorrätig | authored | [link](https://www.dwds.de/r?q=vorr%C3%A4tig) |
-| `v_warenbestand` | der Warenbestand | authored | [link](https://www.dwds.de/r?q=Warenbestand) |
-
-</details>
-
-<details><summary>safety — 47</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
+| `v_absauganlage` | die Absauganlage | authored | [link](https://www.dwds.de/wb/Absauganlage) |
+| `v_absperrung` | die Absperrung | authored | [link](https://www.dwds.de/r?q=Absperrung) |
+| `v_abstuetzen` | abstützen | authored | [link](https://www.dwds.de/r?q=abst%C3%BCtzen) |
+| `v_absturzsicherung` | die Absturzsicherung | authored | [link](https://www.dwds.de/r?q=Absturzsicherung) |
+| `v_abweichung` | die Abweichung | authored | [link](https://www.dwds.de/r?q=Abweichung) |
+| `v_abzug_labor` | der Abzug | authored | [link](https://www.dwds.de/wb/Abzug) |
+| `v_aetzend` | ätzend | authored | [link](https://www.dwds.de/wb/%C3%A4tzend) |
+| `v_arbeitskleidung` | die Arbeitskleidung | authored | [link](https://www.dwds.de/r?q=Arbeitskleidung) |
 | `v_arbeitsschutz` | der Arbeitsschutz | authored | [link](https://de.wiktionary.org/wiki/Arbeitsschutz) |
 | `v_arbeitsschutzgesetz` | das Arbeitsschutzgesetz | authored | [link](https://www.dwds.de/r?q=Arbeitsschutzgesetz) |
 | `v_arbeitsstoffverzeichnis` | das Gefahrstoffverzeichnis | authored | [link](https://www.dwds.de/r?q=Gefahrstoffverzeichnis) |
 | `v_arbeitsunfall` | der Arbeitsunfall | authored | [link](https://de.wiktionary.org/wiki/Arbeitsunfall) |
+| `v_authentifizierung` | die Authentifizierung | authored | [link](https://www.dwds.de/r?q=Authentifizierung) |
+| `v_baugrube` | die Baugrube | authored | [link](https://www.dwds.de/r?q=Baugrube) |
+| `v_baustelle` | die Baustelle | authored | [link](https://www.dwds.de/r?q=Baustelle) |
+| `v_bauzaun` | der Bauzaun | authored | [link](https://www.dwds.de/r?q=Bauzaun) |
 | `v_beachten` | beachten | authored | [link](https://de.wiktionary.org/wiki/beachten) |
 | `v_belastung` | die Belastung | authored | [link](https://de.wiktionary.org/wiki/Belastung) |
+| `v_berechtigung` | die Berechtigung | authored | [link](https://www.dwds.de/r?q=Berechtigung) |
+| `v_besen` | der Besen | authored | [link](https://www.dwds.de/wb/Besen) |
+| `v_bewachung` | die Bewachung | authored | [link](https://www.dwds.de/wb/Bewachung) |
 | `v_brandschutz` | der Brandschutz | authored | [link](https://de.wiktionary.org/wiki/Brandschutz) |
 | `v_brandschutzordnung` | die Brandschutzordnung | authored | [link](https://de.wiktionary.org/wiki/Brandschutzordnung) |
+| `v_chemikalie` | die Chemikalie | authored | [link](https://www.dwds.de/wb/Chemikalie) |
+| `v_datensicherung` | die Datensicherung | authored | [link](https://www.dwds.de/r?q=Datensicherung) |
+| `v_datentraeger` | der Datenträger | authored | [link](https://www.dwds.de/r?q=Datentr%C3%A4ger) |
+| `v_datenverlust` | der Datenverlust | authored | [link](https://www.dwds.de/r?q=Datenverlust) |
 | `v_dennoch` | dennoch | authored | [link](https://de.wiktionary.org/wiki/dennoch) |
+| `v_desinfektion` | die Desinfektion | authored | [link](https://de.wiktionary.org/wiki/Desinfektion) |
+| `v_desinfektionsmittel` | das Desinfektionsmittel | authored | [link](https://www.dwds.de/wb/Desinfektionsmittel) |
+| `v_diebstahl` | der Diebstahl | authored | [link](https://www.dwds.de/wb/Diebstahl) |
+| `v_dosieren` | dosieren | authored | [link](https://www.dwds.de/wb/dosieren) |
+| `v_eimer` | der Eimer | authored | [link](https://www.dwds.de/wb/Eimer) |
+| `v_eingreifen` | eingreifen | authored | [link](https://www.dwds.de/wb/eingreifen) |
+| `v_einlasskontrolle` | die Einlasskontrolle | authored | [link](https://www.dwds.de/wb/Einlasskontrolle) |
+| `v_einweisen` | einweisen | authored | [link](https://www.dwds.de/r?q=einweisen) |
+| `v_endkontrolle` | die Endkontrolle | authored | [link](https://www.dwds.de/r?q=Endkontrolle) |
+| `v_entzuendlich` | entzündlich | authored | [link](https://www.dwds.de/wb/entz%C3%BCndlich) |
 | `v_ergonomisch` | ergonomisch | authored | [link](https://de.wiktionary.org/wiki/ergonomisch) |
+| `v_ermuedung` | die Ermüdung | authored | [link](https://www.dwds.de/r?q=Erm%C3%BCdung) |
 | `v_erste_hilfe` | die Erste Hilfe | authored | [link](https://de.wiktionary.org/wiki/Erste%20Hilfe) |
 | `v_erste_hilfe_kurs` | der Erste-Hilfe-Kurs | authored | [link](https://de.wiktionary.org/wiki/Erste-Hilfe-Kurs) |
 | `v_evakuierung` | die Evakuierung | authored | [link](https://de.wiktionary.org/wiki/Evakuierung) |
+| `v_explosionsschutz` | der Explosionsschutz | authored | [link](https://www.dwds.de/wb/Explosionsschutz) |
+| `v_faerbemittel` | das Färbemittel | authored | [link](https://www.dwds.de/r?q=F%C3%A4rbemittel) |
+| `v_fehlerquote` | die Fehlerquote | authored | [link](https://www.dwds.de/r?q=Fehlerquote) |
 | `v_feuerloescher` | der Feuerlöscher | authored | [link](https://de.wiktionary.org/wiki/Feuerl%C3%B6scher) |
+| `v_firewall` | die Firewall | authored | [link](https://www.dwds.de/r?q=Firewall) |
+| `v_funkgeraet` | das Funkgerät | authored | [link](https://www.dwds.de/wb/Funkger%C3%A4t) |
 | `v_gefaehrdungsbeurteilung` | die Gefährdungsbeurteilung | authored | [link](https://www.dwds.de/r?q=Gef%C3%A4hrdungsbeurteilung) |
 | `v_gefaehrlich` | gefährlich | authored | [link](https://de.wiktionary.org/wiki/gef%C3%A4hrlich) |
 | `v_gefahr` | die Gefahr | authored | [link](https://de.wiktionary.org/wiki/Gefahr) |
+| `v_gefahrstoff` | der Gefahrstoff | authored | [link](https://www.dwds.de/wb/Gefahrstoff) |
+| `v_gehoerschutz` | der Gehörschutz | authored | [link](https://www.dwds.de/r?q=Geh%C3%B6rschutz) |
+| `v_geruest` | das Gerüst | authored | [link](https://www.dwds.de/r?q=Ger%C3%BCst) |
 | `v_gesundheit` | die Gesundheit | authored | [link](https://de.wiktionary.org/wiki/Gesundheit) |
 | `v_helm` | der Helm | authored | [link](https://de.wiktionary.org/wiki/Helm) |
+| `v_hygiene` | die Hygiene | authored | [link](https://de.wiktionary.org/wiki/Hygiene) |
+| `v_hygieneplan` | der Hygieneplan | authored | [link](https://www.dwds.de/wb/Hygieneplan) |
+| `v_hygienevorschrift` | die Hygienevorschrift | authored | [link](https://www.dwds.de/wb/Hygienevorschrift) |
+| `v_kalibrieren` | kalibrieren | authored | [link](https://www.dwds.de/r?q=kalibrieren) |
+| `v_keimfrei` | keimfrei | authored | [link](https://www.dwds.de/wb/keimfrei) |
+| `v_kennzeichnung` | die Kennzeichnung | authored | [link](https://www.dwds.de/wb/Kennzeichnung) |
+| `v_kran` | der Kran | authored | [link](https://www.dwds.de/r?q=Kran) |
+| `v_ladendiebstahl` | der Ladendiebstahl | authored | [link](https://www.dwds.de/r?q=Ladendiebstahl) |
+| `v_ladungssicherung` | die Ladungssicherung | authored | [link](https://www.dwds.de/r?q=Ladungssicherung) |
+| `v_lappen` | der Lappen | authored | [link](https://www.dwds.de/wb/Lappen) |
+| `v_lauge` | die Lauge | authored | [link](https://www.dwds.de/wb/Lauge) |
+| `v_lebensmittelhygiene` | die Lebensmittelhygiene | authored | [link](https://www.dwds.de/r?q=Lebensmittelhygiene) |
+| `v_lenkzeit` | die Lenkzeit | authored | [link](https://www.dwds.de/r?q=Lenkzeit) |
+| `v_loesungsmittel` | das Lösungsmittel | authored | [link](https://www.dwds.de/wb/L%C3%B6sungsmittel) |
+| `v_materialpruefung` | die Materialprüfung | authored | [link](https://www.dwds.de/r?q=Materialpr%C3%BCfung) |
 | `v_melden` | melden | authored | [link](https://de.wiktionary.org/wiki/melden) |
 | `v_meldung` | die Meldung | authored | [link](https://de.wiktionary.org/wiki/Meldung) |
+| `v_metalldetektor` | der Metalldetektor | authored | [link](https://www.dwds.de/wb/Metalldetektor) |
+| `v_muelleimer` | der Mülleimer | authored | [link](https://www.dwds.de/wb/M%C3%BClleimer) |
+| `v_norm` | die Norm | authored | [link](https://www.dwds.de/r?q=Norm) |
 | `v_notausgang` | der Notausgang | authored | [link](https://de.wiktionary.org/wiki/Notausgang) |
 | `v_notfall` | der Notfall | authored | [link](https://de.wiktionary.org/wiki/Notfall) |
 | `v_notfallplan` | der Notfallplan | authored | [link](https://de.wiktionary.org/wiki/Notfallplan) |
+| `v_notruf` | der Notruf | authored | [link](https://www.dwds.de/r?q=Notruf) |
+| `v_objektschutz` | der Objektschutz | authored | [link](https://www.dwds.de/wb/Objektschutz) |
 | `v_pause` | die Pause | authored | [link](https://de.wiktionary.org/wiki/Pause) |
 | `v_persoenliche_schutzausruestung` | die persönliche Schutzausrüstung (PSA) | authored | [link](https://www.dwds.de/r?q=pers%C3%B6nliche%20Schutzausr%C3%BCstung) |
+| `v_personenschutz` | der Personenschutz | authored | [link](https://www.dwds.de/wb/Personenschutz) |
+| `v_polieren` | polieren | authored | [link](https://www.dwds.de/wb/polieren) |
+| `v_pruefstand` | der Prüfstand | authored | [link](https://www.dwds.de/r?q=Pr%C3%BCfstand) |
+| `v_qualitaetskontrolle` | die Qualitätskontrolle | authored | [link](https://www.dwds.de/r?q=Qualit%C3%A4tskontrolle) |
+| `v_raeumung` | die Räumung | authored | [link](https://www.dwds.de/wb/R%C3%A4umung) |
+| `v_reinigungsmittel` | das Reinigungsmittel | authored | [link](https://www.dwds.de/wb/Reinigungsmittel) |
 | `v_risiko` | das Risiko | authored | [link](https://de.wiktionary.org/wiki/Risiko) |
+| `v_rueckverfolgbarkeit` | die Rückverfolgbarkeit | authored | [link](https://www.dwds.de/r?q=R%C3%BCckverfolgbarkeit) |
+| `v_ruhezeit` | die Ruhezeit | authored | [link](https://www.dwds.de/r?q=Ruhezeit) |
+| `v_saeure` | die Säure | authored | [link](https://www.dwds.de/wb/S%C3%A4ure) |
+| `v_schadsoftware` | die Schadsoftware | authored | [link](https://www.dwds.de/r?q=Schadsoftware) |
 | `v_schutz` | der Schutz | authored | [link](https://de.wiktionary.org/wiki/Schutz) |
 | `v_schutzausruestung` | die Schutzausrüstung | authored | [link](https://de.wiktionary.org/wiki/Schutzausr%C3%BCstung) |
+| `v_schutzbrille` | die Schutzbrille | authored | [link](https://www.dwds.de/r?q=Schutzbrille) |
+| `v_schutzhelm` | der Schutzhelm | authored | [link](https://www.dwds.de/r?q=Schutzhelm) |
+| `v_schutzkleidung` | die Schutzkleidung | authored | [link](https://de.wiktionary.org/wiki/Schutzkleidung) |
 | `v_schutzmassnahme` | die Schutzmaßnahme | authored | [link](https://de.wiktionary.org/wiki/Schutzma%C3%9Fnahme) |
 | `v_schutzmassnahmenkatalog` | der Schutzmaßnahmenkatalog | authored | [link](https://www.dwds.de/r?q=Schutzma%C3%9Fnahmenkatalog) |
+| `v_schweigepflicht` | die Schweigepflicht | authored | [link](https://www.dwds.de/r?q=Schweigepflicht) |
+| `v_schweissnaht` | die Schweißnaht | authored | [link](https://www.dwds.de/r?q=Schwei%C3%9Fnaht) |
 | `v_sicherheit` | die Sicherheit | authored | [link](https://de.wiktionary.org/wiki/Sicherheit) |
 | `v_sicherheitsbeauftragter` | die Sicherheitsbeauftragte / der Sicherheitsbeauftragte | authored | [link](https://www.dwds.de/r?q=Sicherheitsbeauftragte) |
 | `v_sicherheitscheck` | der Sicherheitscheck | authored | [link](https://www.dwds.de/r?q=Sicherheitscheck) |
+| `v_sicherheitsdatenblatt` | das Sicherheitsdatenblatt | authored | [link](https://www.dwds.de/wb/Sicherheitsdatenblatt) |
+| `v_sicherheitsdienst` | der Sicherheitsdienst | authored | [link](https://www.dwds.de/wb/Sicherheitsdienst) |
 | `v_sicherheitseinweisung` | die Sicherheitseinweisung | authored | [link](https://www.dwds.de/r?q=Sicherheitseinweisung) |
+| `v_sicherheitskraft` | die Sicherheitskraft | authored | [link](https://www.dwds.de/wb/Sicherheitskraft) |
+| `v_sicherheitsluecke` | die Sicherheitslücke | authored | [link](https://www.dwds.de/r?q=Sicherheitsl%C3%BCcke) |
 | `v_sicherheitsregel` | die Sicherheitsregel | authored | [link](https://www.dwds.de/r?q=Sicherheitsregel) |
+| `v_sicherheitsschleuse` | die Sicherheitsschleuse | authored | [link](https://www.dwds.de/wb/Sicherheitsschleuse) |
+| `v_sicherheitsschuhe` | die Sicherheitsschuhe | authored | [link](https://www.dwds.de/r?q=Sicherheitsschuhe) |
 | `v_sicherheitsunterweisung` | die Sicherheitsunterweisung | authored | [link](https://www.dwds.de/r?q=Sicherheitsunterweisung) |
+| `v_statik` | die Statik | authored | [link](https://www.dwds.de/r?q=Statik) |
+| `v_staubsaugen` | staubsaugen | authored | [link](https://www.dwds.de/wb/staubsaugen) |
+| `v_staubsauger` | der Staubsauger | authored | [link](https://www.dwds.de/wb/Staubsauger) |
+| `v_steril` | steril | authored | [link](https://www.dwds.de/wb/steril) |
+| `v_sterilisation` | die Sterilisation | authored | [link](https://www.dwds.de/wb/Sterilisation) |
+| `v_stichprobe` | die Stichprobe | authored | [link](https://www.dwds.de/r?q=Stichprobe) |
+| `v_stoerfall` | der Störfall | authored | [link](https://www.dwds.de/r?q=St%C3%B6rfall) |
+| `v_streife` | die Streife | authored | [link](https://www.dwds.de/wb/Streife) |
 | `v_stress` | der Stress | authored | [link](https://de.wiktionary.org/wiki/Stress) |
+| `v_sturzgefahr` | die Sturzgefahr | authored | [link](https://www.dwds.de/r?q=Sturzgefahr) |
+| `v_systemausfall` | der Systemausfall | authored | [link](https://www.dwds.de/r?q=Systemausfall) |
+| `v_taschenkontrolle` | die Taschenkontrolle | authored | [link](https://www.dwds.de/wb/Taschenkontrolle) |
+| `v_testabdeckung` | die Testabdeckung | authored | [link](https://www.dwds.de/r?q=Testabdeckung) |
+| `v_testfall` | der Testfall | authored | [link](https://www.dwds.de/r?q=Testfall) |
+| `v_tragfaehig` | tragfähig | authored | [link](https://www.dwds.de/r?q=tragf%C3%A4hig) |
 | `v_ueberlastung` | die Überlastung | authored | [link](https://de.wiktionary.org/wiki/%C3%9Cberlastung) |
+| `v_uebermuedet` | übermüdet | authored | [link](https://www.dwds.de/r?q=%C3%BCberm%C3%BCdet) |
 | `v_unfall` | der Unfall | authored | [link](https://de.wiktionary.org/wiki/Unfall) |
 | `v_unfallmeldung` | die Unfallmeldung | authored | [link](https://www.dwds.de/r?q=Unfallmeldung) |
 | `v_unfallverhuetung` | die Unfallverhütung | authored | [link](https://www.dwds.de/r?q=Unfallverh%C3%BCtung) |
+| `v_unterweisung` | die Unterweisung | authored | [link](https://www.dwds.de/r?q=Unterweisung) |
+| `v_verdaechtig` | verdächtig | authored | [link](https://www.dwds.de/wb/verd%C3%A4chtig) |
+| `v_verkehrskontrolle` | die Verkehrskontrolle | authored | [link](https://www.dwds.de/r?q=Verkehrskontrolle) |
+| `v_verkehrssicher` | verkehrssicher | authored | [link](https://www.dwds.de/r?q=verkehrssicher) |
 | `v_verletzen` | sich verletzen | authored | [link](https://www.dwds.de/r?q=sich%20verletzen) |
 | `v_verletzung` | die Verletzung | authored | [link](https://de.wiktionary.org/wiki/Verletzung) |
+| `v_verschluesselung` | die Verschlüsselung | authored | [link](https://www.dwds.de/r?q=Verschl%C3%BCsselung) |
+| `v_verunreinigung` | die Verunreinigung | authored | [link](https://www.dwds.de/wb/Verunreinigung) |
+| `v_videoueberwachung` | die Videoüberwachung | authored | [link](https://www.dwds.de/wb/Video%C3%BCberwachung) |
+| `v_virus` | der Virus | authored | [link](https://www.dwds.de/r?q=Virus) |
+| `v_vorfall` | der Vorfall | authored | [link](https://www.dwds.de/wb/Vorfall) |
 | `v_vorschrift` | die Vorschrift | authored | [link](https://de.wiktionary.org/wiki/Vorschrift) |
 | `v_vorsicht` | die Vorsicht | authored | [link](https://de.wiktionary.org/wiki/Vorsicht) |
 | `v_warnschild` | das Warnschild | authored | [link](https://de.wiktionary.org/wiki/Warnschild) |
+| `v_werkschutz` | der Werkschutz | authored | [link](https://www.dwds.de/wb/Werkschutz) |
+| `v_wischen` | wischen | authored | [link](https://www.dwds.de/wb/wischen) |
+| `v_zutritt` | der Zutritt | authored | [link](https://www.dwds.de/wb/Zutritt) |
+| `v_zutrittskontrolle` | die Zutrittskontrolle | authored | [link](https://www.dwds.de/wb/Zutrittskontrolle) |
 
 </details>
 
-<details><summary>scheduling — 50</summary>
+<details><summary>scheduling — 67</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -2883,19 +3792,24 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_abwesenheit` | die Abwesenheit | authored | [link](https://de.wiktionary.org/wiki/Abwesenheit) |
 | `v_anlaufphase` | die Anlaufphase | authored | [link](https://de.wiktionary.org/wiki/Anlaufphase) |
 | `v_aufgabenverteilung` | die Aufgabenverteilung | authored | [link](https://de.wiktionary.org/wiki/Aufgabenverteilung) |
+| `v_bauzeit` | die Bauzeit | authored | [link](https://www.dwds.de/r?q=Bauzeit) |
 | `v_bestaetigen` | bestätigen | authored | [link](https://de.wiktionary.org/wiki/best%C3%A4tigen) |
 | `v_bestaetigung` | die Bestätigung | authored | [link](https://de.wiktionary.org/wiki/Best%C3%A4tigung) |
 | `v_blockieren` | blockieren | authored | [link](https://de.wiktionary.org/wiki/blockieren) |
 | `v_deadline` | die Deadline | authored | [link](https://de.wiktionary.org/wiki/Deadline) |
+| `v_dienstplan` | der Dienstplan | authored | [link](https://www.dwds.de/r?q=Dienstplan) |
 | `v_dringend` | dringend | authored | [link](https://de.wiktionary.org/wiki/dringend) |
 | `v_einhalten` | einhalten | authored | [link](https://de.wiktionary.org/wiki/einhalten) |
 | `v_erinnerung` | die Erinnerung | authored | [link](https://de.wiktionary.org/wiki/Erinnerung) |
 | `v_freihalten` | freihalten | authored | [link](https://de.wiktionary.org/wiki/freihalten) |
 | `v_frist` | die Frist | authored | [link](https://de.wiktionary.org/wiki/Frist) |
+| `v_fruehschicht` | die Frühschicht | authored | [link](https://www.dwds.de/r?q=Fr%C3%BChschicht) |
+| `v_grundreinigung` | die Grundreinigung | authored | [link](https://www.dwds.de/wb/Grundreinigung) |
 | `v_kapazitaetsplanung` | die Kapazitätsplanung | authored | [link](https://www.dwds.de/r?q=Kapazit%C3%A4tsplanung) |
 | `v_koordination` | die Koordination | authored | [link](https://de.wiktionary.org/wiki/Koordination) |
 | `v_kurzfristig` | kurzfristig | authored | [link](https://de.wiktionary.org/wiki/kurzfristig) |
 | `v_langfristig` | langfristig | authored | [link](https://de.wiktionary.org/wiki/langfristig) |
+| `v_nachtschicht` | die Nachtschicht | authored | [link](https://www.dwds.de/r?q=Nachtschicht) |
 | `v_passen` | passen | authored | [link](https://de.wiktionary.org/wiki/passen) |
 | `v_planen` | planen | authored | [link](https://de.wiktionary.org/wiki/planen) |
 | `v_planung` | die Planung | authored | [link](https://de.wiktionary.org/wiki/Planung) |
@@ -2906,15 +3820,26 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_puffer` | der Puffer | authored | [link](https://de.wiktionary.org/wiki/Puffer) |
 | `v_quartalsplanung` | die Quartalsplanung | authored | [link](https://www.dwds.de/r?q=Quartalsplanung) |
 | `v_rechtzeitig` | rechtzeitig | authored | [link](https://de.wiktionary.org/wiki/rechtzeitig) |
+| `v_reinigungsplan` | der Reinigungsplan | authored | [link](https://www.dwds.de/wb/Reinigungsplan) |
+| `v_ruestzeit` | die Rüstzeit | authored | [link](https://www.dwds.de/r?q=R%C3%BCstzeit) |
+| `v_rundgang` | der Rundgang | authored | [link](https://www.dwds.de/wb/Rundgang) |
+| `v_schicht` | die Schicht | authored | [link](https://de.wiktionary.org/wiki/Schicht) |
+| `v_schichtdienst` | der Schichtdienst | authored | [link](https://de.wiktionary.org/wiki/Schichtdienst) |
+| `v_schichtplan` | der Schichtplan | authored | [link](https://www.dwds.de/r?q=Schichtplan) |
 | `v_sobald` | sobald | authored | [link](https://de.wiktionary.org/wiki/sobald) |
 | `v_soll_ist_vergleich` | der Soll-Ist-Vergleich | authored | [link](https://www.dwds.de/r?q=Soll-Ist-Vergleich) |
 | `v_synchronisieren` | synchronisieren | authored | [link](https://de.wiktionary.org/wiki/synchronisieren) |
+| `v_taktzeit` | die Taktzeit | authored | [link](https://www.dwds.de/r?q=Taktzeit) |
 | `v_termin` | der Termin | authored | [link](https://de.wiktionary.org/wiki/Termin) |
 | `v_terminabstimmung` | die Terminabstimmung | authored | [link](https://www.dwds.de/r?q=Terminabstimmung) |
 | `v_terminkalender` | der Terminkalender | authored | [link](https://de.wiktionary.org/wiki/Terminkalender) |
 | `v_terminvorschlag` | der Terminvorschlag | authored | [link](https://www.dwds.de/r?q=Terminvorschlag) |
+| `v_trainingseinheit` | die Trainingseinheit | authored | [link](https://www.dwds.de/r?q=Trainingseinheit) |
+| `v_trainingsplan` | der Trainingsplan | authored | [link](https://www.dwds.de/r?q=Trainingsplan) |
+| `v_uebergabe` | die Übergabe | authored | [link](https://de.wiktionary.org/wiki/Übergabe) |
 | `v_ueberschneidung` | die Überschneidung | authored | [link](https://www.dwds.de/r?q=%C3%9Cberschneidung) |
 | `v_umplanen` | umplanen | authored | [link](https://de.wiktionary.org/wiki/umplanen) |
+| `v_unterhaltsreinigung` | die Unterhaltsreinigung | authored | [link](https://www.dwds.de/wb/Unterhaltsreinigung) |
 | `v_urlaubsplanung` | die Urlaubsplanung | authored | [link](https://www.dwds.de/r?q=Urlaubsplanung) |
 | `v_vereinbaren` | vereinbaren | authored | [link](https://de.wiktionary.org/wiki/vereinbaren) |
 | `v_verfuegbar` | verfügbar | authored | [link](https://de.wiktionary.org/wiki/verf%C3%BCgbar) |
@@ -2925,53 +3850,31 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_vorbereiten` | vorbereiten | authored | [link](https://de.wiktionary.org/wiki/vorbereiten) |
 | `v_vorlauf` | der Vorlauf | authored | [link](https://de.wiktionary.org/wiki/Vorlauf) |
 | `v_vorziehen` | vorziehen | authored | [link](https://de.wiktionary.org/wiki/vorziehen) |
+| `v_wartungsfenster` | das Wartungsfenster | authored | [link](https://www.dwds.de/r?q=Wartungsfenster) |
 | `v_zeitdruck` | der Zeitdruck | authored | [link](https://de.wiktionary.org/wiki/Zeitdruck) |
 | `v_zeitfenster` | das Zeitfenster | authored | [link](https://de.wiktionary.org/wiki/Zeitfenster) |
 | `v_zeitplan` | der Zeitplan | authored | [link](https://de.wiktionary.org/wiki/Zeitplan) |
 
 </details>
 
-<details><summary>sports — 20</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `v_ausdauer` | die Ausdauer | authored | [link](https://www.dwds.de/r?q=Ausdauer) |
-| `v_belastbar` | belastbar | authored | [link](https://www.dwds.de/r?q=belastbar) |
-| `v_beweglichkeit` | die Beweglichkeit | authored | [link](https://www.dwds.de/r?q=Beweglichkeit) |
-| `v_dehnen` | dehnen | authored | [link](https://www.dwds.de/r?q=dehnen) |
-| `v_ernaehrungsberatung` | die Ernährungsberatung | authored | [link](https://www.dwds.de/r?q=Ern%C3%A4hrungsberatung) |
-| `v_fitnessstudio` | das Fitnessstudio | authored | [link](https://www.dwds.de/r?q=Fitnessstudio) |
-| `v_gleichgewicht` | das Gleichgewicht | authored | [link](https://www.dwds.de/r?q=Gleichgewicht) |
-| `v_haltung` | die Haltung | authored | [link](https://www.dwds.de/r?q=Haltung) |
-| `v_mannschaft` | die Mannschaft | authored | [link](https://www.dwds.de/r?q=Mannschaft) |
-| `v_mitgliedsbeitrag` | der Mitgliedsbeitrag | authored | [link](https://www.dwds.de/r?q=Mitgliedsbeitrag) |
-| `v_motivieren` | motivieren | authored | [link](https://www.dwds.de/r?q=motivieren) |
-| `v_muskel` | der Muskel | authored | [link](https://www.dwds.de/r?q=Muskel) |
-| `v_probestunde` | die Probestunde | authored | [link](https://www.dwds.de/r?q=Probestunde) |
-| `v_regeneration` | die Regeneration | authored | [link](https://www.dwds.de/r?q=Regeneration) |
-| `v_schiedsrichter` | der Schiedsrichter | authored | [link](https://www.dwds.de/r?q=Schiedsrichter) |
-| `v_sportverein` | der Sportverein | authored | [link](https://www.dwds.de/r?q=Sportverein) |
-| `v_trainieren` | trainieren | authored | [link](https://www.dwds.de/r?q=trainieren) |
-| `v_trainingseinheit` | die Trainingseinheit | authored | [link](https://www.dwds.de/r?q=Trainingseinheit) |
-| `v_trainingsplan` | der Trainingsplan | authored | [link](https://www.dwds.de/r?q=Trainingsplan) |
-| `v_wettkampf` | der Wettkampf | authored | [link](https://www.dwds.de/r?q=Wettkampf) |
-
-</details>
-
-<details><summary>sustainability — 47</summary>
+<details><summary>sustainability — 56</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
 | `v_abfall` | der Abfall | authored | [link](https://de.wiktionary.org/wiki/Abfall) |
+| `v_aushub` | der Aushub | authored | [link](https://www.dwds.de/r?q=Aushub) |
+| `v_ausschuss` | der Ausschuss | authored | [link](https://www.dwds.de/r?q=Ausschuss) |
 | `v_betriebsoekologie` | die Betriebsökologie | authored | [link](https://www.dwds.de/r?q=Betriebs%C3%B6kologie) |
 | `v_bewusst` | bewusst | authored | [link](https://de.wiktionary.org/wiki/bewusst) |
 | `v_co2_ausstoss` | der CO2-Ausstoß | authored | [link](https://www.dwds.de/r?q=CO2-Aussto%C3%9F) |
 | `v_co2_kompensation` | die CO₂-Kompensation | authored | [link](https://www.dwds.de/r?q=CO%E2%82%82-Kompensation) |
+| `v_daemmung` | die Dämmung | authored | [link](https://www.dwds.de/r?q=D%C3%A4mmung) |
 | `v_einsparen` | einsparen | authored | [link](https://de.wiktionary.org/wiki/einsparen) |
 | `v_einsparung` | die Einsparung | authored | [link](https://de.wiktionary.org/wiki/Einsparung) |
 | `v_emission` | die Emission | authored | [link](https://de.wiktionary.org/wiki/Emission) |
 | `v_energie_sparen` | Energie sparen | authored | [link](https://www.dwds.de/r?q=Energie%20sparen) |
 | `v_energieaudit` | das Energieaudit | authored | [link](https://www.dwds.de/r?q=Energieaudit) |
+| `v_entsorgung` | die Entsorgung | authored | [link](https://www.dwds.de/wb/Entsorgung) |
 | `v_erneuerbar` | erneuerbar | authored | [link](https://de.wiktionary.org/wiki/erneuerbar) |
 | `v_erneuerbare_energie` | die erneuerbaren Energien (Pl.) | authored | [link](https://www.dwds.de/r?q=erneuerbaren%20Energien) |
 | `v_fussabdruck` | der ökologische Fußabdruck | authored | [link](https://de.wiktionary.org/wiki/%C3%B6kologische%20Fu%C3%9Fabdruck) |
@@ -2979,6 +3882,8 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_klimaneutral` | klimaneutral | authored | [link](https://de.wiktionary.org/wiki/klimaneutral) |
 | `v_klimaschutz` | der Klimaschutz | authored | [link](https://de.wiktionary.org/wiki/Klimaschutz) |
 | `v_kompensieren` | kompensieren | authored | [link](https://de.wiktionary.org/wiki/kompensieren) |
+| `v_korrosion` | die Korrosion | authored | [link](https://www.dwds.de/r?q=Korrosion) |
+| `v_korrosionsbestaendig` | korrosionsbeständig | authored | [link](https://www.dwds.de/r?q=korrosionsbest%C3%A4ndig) |
 | `v_kreislauf` | der Kreislauf | authored | [link](https://de.wiktionary.org/wiki/Kreislauf) |
 | `v_kreislaufwirtschaft` | die Kreislaufwirtschaft | authored | [link](https://de.wiktionary.org/wiki/Kreislaufwirtschaft) |
 | `v_lieferantenbewertung` | die Lieferantenbewertung | authored | [link](https://www.dwds.de/r?q=Lieferantenbewertung) |
@@ -2997,10 +3902,12 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_ressourceneffizienz` | die Ressourceneffizienz | authored | [link](https://www.dwds.de/r?q=Ressourceneffizienz) |
 | `v_ressourcenschonung` | die Ressourcenschonung | authored | [link](https://www.dwds.de/r?q=Ressourcenschonung) |
 | `v_rohstoff` | der Rohstoff | authored | [link](https://de.wiktionary.org/wiki/Rohstoff) |
+| `v_schmutzwasser` | das Schmutzwasser | authored | [link](https://www.dwds.de/wb/Schmutzwasser) |
 | `v_solarenergie` | die Solarenergie | authored | [link](https://de.wiktionary.org/wiki/Solarenergie) |
 | `v_stromverbrauch` | der Stromverbrauch | authored | [link](https://de.wiktionary.org/wiki/Stromverbrauch) |
 | `v_treibhausgas` | das Treibhausgas | authored | [link](https://de.wiktionary.org/wiki/Treibhausgas) |
 | `v_treibhausgasemissionen` | die Treibhausgasemissionen (Pl.) | authored | [link](https://www.dwds.de/r?q=Treibhausgasemissionen) |
+| `v_turbine` | die Turbine | authored | [link](https://www.dwds.de/r?q=Turbine) |
 | `v_umwelt` | die Umwelt | authored | [link](https://de.wiktionary.org/wiki/Umwelt) |
 | `v_umweltfreundlich` | umweltfreundlich | authored | [link](https://de.wiktionary.org/wiki/umweltfreundlich) |
 | `v_verbrauch` | der Verbrauch | authored | [link](https://de.wiktionary.org/wiki/Verbrauch) |
@@ -3008,123 +3915,206 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_verpackungsreduktion` | die Verpackungsreduktion | authored | [link](https://www.dwds.de/r?q=Verpackungsreduktion) |
 | `v_verschwendung` | die Verschwendung | authored | [link](https://de.wiktionary.org/wiki/Verschwendung) |
 | `v_wiederverwendbar` | wiederverwendbar | authored | [link](https://de.wiktionary.org/wiki/wiederverwendbar) |
+| `v_wirkungsgrad` | der Wirkungsgrad | authored | [link](https://www.dwds.de/r?q=Wirkungsgrad) |
 | `v_zudem` | zudem | authored | [link](https://de.wiktionary.org/wiki/zudem) |
 
 </details>
 
-<details><summary>technology — 51</summary>
+<details><summary>technology — 187</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
+| `v_abfrage` | die Abfrage | authored | [link](https://www.dwds.de/r?q=Abfrage) |
+| `v_abfuellung` | die Abfüllung | authored | [link](https://www.dwds.de/wb/Abf%C3%BCllung) |
+| `v_abstuerzen` | abstürzen | authored | [link](https://www.dwds.de/r?q=abst%C3%BCrzen) |
+| `v_absturz` | der Absturz | authored | [link](https://www.dwds.de/r?q=Absturz) |
+| `v_administrator` | der Administrator | authored | [link](https://www.dwds.de/r?q=Administrator) |
 | `v_aktualisieren` | aktualisieren | authored | [link](https://de.wiktionary.org/wiki/aktualisieren) |
+| `v_alarmanlage` | die Alarmanlage | authored | [link](https://www.dwds.de/wb/Alarmanlage) |
+| `v_algorithmus` | der Algorithmus | authored | [link](https://www.dwds.de/r?q=Algorithmus) |
+| `v_aluminium` | das Aluminium | authored | [link](https://www.dwds.de/r?q=Aluminium) |
+| `v_anschliessen` | anschließen | authored | [link](https://www.dwds.de/r?q=anschlie%C3%9Fen) |
+| `v_antrieb` | der Antrieb | authored | [link](https://www.dwds.de/r?q=Antrieb) |
 | `v_anwendung` | die Anwendung | authored | [link](https://de.wiktionary.org/wiki/Anwendung) |
 | `v_ausfall` | der Ausfall | authored | [link](https://de.wiktionary.org/wiki/Ausfall) |
 | `v_ausfallsicherheit` | die Ausfallsicherheit | authored | [link](https://www.dwds.de/r?q=Ausfallsicherheit) |
+| `v_auslastung` | die Auslastung | authored | [link](https://www.dwds.de/r?q=Auslastung) |
+| `v_auslesen` | auslesen | authored | [link](https://www.dwds.de/r?q=auslesen) |
 | `v_automatisieren` | automatisieren | authored | [link](https://de.wiktionary.org/wiki/automatisieren) |
+| `v_automatisiert` | automatisiert | authored | [link](https://www.dwds.de/r?q=automatisiert) |
+| `v_automatisierung` | die Automatisierung | authored | [link](https://www.dwds.de/r?q=Automatisierung) |
 | `v_backup` | das Backup | authored | [link](https://de.wiktionary.org/wiki/Backup) |
+| `v_bagger` | der Bagger | authored | [link](https://www.dwds.de/r?q=Bagger) |
+| `v_baumaschine` | die Baumaschine | authored | [link](https://www.dwds.de/r?q=Baumaschine) |
+| `v_bauteil` | das Bauteil | authored | [link](https://www.dwds.de/r?q=Bauteil) |
 | `v_benutzer` | der Benutzer | authored | [link](https://de.wiktionary.org/wiki/Benutzer) |
 | `v_benutzerfreundlich` | benutzerfreundlich | authored | [link](https://de.wiktionary.org/wiki/benutzerfreundlich) |
+| `v_benutzerkonto` | das Benutzerkonto | authored | [link](https://www.dwds.de/r?q=Benutzerkonto) |
+| `v_benutzeroberflaeche` | die Benutzeroberfläche | authored | [link](https://www.dwds.de/r?q=Benutzeroberfl%C3%A4che) |
+| `v_bereitstellung` | die Bereitstellung | authored | [link](https://www.dwds.de/r?q=Bereitstellung) |
+| `v_beton` | der Beton | authored | [link](https://www.dwds.de/r?q=Beton) |
+| `v_betonieren` | betonieren | authored | [link](https://www.dwds.de/r?q=betonieren) |
+| `v_betriebssystem` | das Betriebssystem | authored | [link](https://www.dwds.de/r?q=Betriebssystem) |
+| `v_bewehrung` | die Bewehrung | authored | [link](https://www.dwds.de/r?q=Bewehrung) |
+| `v_blech` | das Blech | authored | [link](https://www.dwds.de/r?q=Blech) |
+| `v_bohrer` | der Bohrer | authored | [link](https://www.dwds.de/r?q=Bohrer) |
 | `v_cloud` | die Cloud | authored | [link](https://de.wiktionary.org/wiki/Cloud) |
 | `v_cloud_speicher` | der Cloud-Speicher | authored | [link](https://www.dwds.de/r?q=Cloud-Speicher) |
+| `v_dachstuhl` | der Dachstuhl | authored | [link](https://www.dwds.de/r?q=Dachstuhl) |
 | `v_dadurch` | dadurch | authored | [link](https://de.wiktionary.org/wiki/dadurch) |
 | `v_daten` | die Daten | authored | [link](https://de.wiktionary.org/wiki/Daten) |
+| `v_datenbank` | die Datenbank | authored | [link](https://www.dwds.de/r?q=Datenbank) |
 | `v_datenmigration` | die Datenmigration | authored | [link](https://www.dwds.de/r?q=Datenmigration) |
 | `v_datenschutz` | der Datenschutz | authored | [link](https://de.wiktionary.org/wiki/Datenschutz) |
+| `v_destillation` | die Destillation | authored | [link](https://www.dwds.de/wb/Destillation) |
+| `v_dichte` | die Dichte | authored | [link](https://www.dwds.de/r?q=Dichte) |
+| `v_dichtung` | die Dichtung | authored | [link](https://www.dwds.de/r?q=Dichtung) |
+| `v_digital` | digital | authored | [link](https://www.dwds.de/r?q=digital) |
 | `v_digital_prozess` | der digitale Prozess | authored | [link](https://www.dwds.de/r?q=digitale%20Prozess) |
 | `v_digitalisierung` | die Digitalisierung | authored | [link](https://de.wiktionary.org/wiki/Digitalisierung) |
+| `v_dokumentieren` | dokumentieren | authored | [link](https://de.wiktionary.org/wiki/dokumentieren) |
 | `v_effizient` | effizient | authored | [link](https://de.wiktionary.org/wiki/effizient) |
 | `v_einrichten` | einrichten | authored | [link](https://de.wiktionary.org/wiki/einrichten) |
+| `v_endgeraet` | das Endgerät | authored | [link](https://www.dwds.de/r?q=Endger%C3%A4t) |
+| `v_entwickler` | der Entwickler | authored | [link](https://www.dwds.de/r?q=Entwickler) |
+| `v_feder` | die Feder | authored | [link](https://www.dwds.de/r?q=Feder) |
+| `v_fehlerfrei` | fehlerfrei | authored | [link](https://www.dwds.de/r?q=fehlerfrei) |
+| `v_fehlerhaft` | fehlerhaft | authored | [link](https://www.dwds.de/r?q=fehlerhaft) |
+| `v_fehlermeldung` | die Fehlermeldung | authored | [link](https://www.dwds.de/r?q=Fehlermeldung) |
 | `v_fernwartung` | die Fernwartung | authored | [link](https://www.dwds.de/r?q=Fernwartung) |
 | `v_fernzugriff` | der Fernzugriff | authored | [link](https://www.dwds.de/r?q=Fernzugriff) |
+| `v_fertigen` | fertigen | authored | [link](https://www.dwds.de/r?q=fertigen) |
+| `v_fertigteil` | das Fertigteil | authored | [link](https://www.dwds.de/r?q=Fertigteil) |
+| `v_fertigung` | die Fertigung | authored | [link](https://www.dwds.de/r?q=Fertigung) |
+| `v_festigkeit` | die Festigkeit | authored | [link](https://www.dwds.de/r?q=Festigkeit) |
+| `v_festplatte` | die Festplatte | authored | [link](https://www.dwds.de/r?q=Festplatte) |
+| `v_fliessband` | das Fließband | authored | [link](https://www.dwds.de/r?q=Flie%C3%9Fband) |
+| `v_fraesen` | fräsen | authored | [link](https://www.dwds.de/r?q=fr%C3%A4sen) |
 | `v_funktion` | die Funktion | authored | [link](https://de.wiktionary.org/wiki/Funktion) |
 | `v_geraet` | das Gerät | authored | [link](https://de.wiktionary.org/wiki/Ger%C3%A4t) |
+| `v_getriebe` | das Getriebe | authored | [link](https://www.dwds.de/r?q=Getriebe) |
+| `v_granulat` | das Granulat | authored | [link](https://www.dwds.de/wb/Granulat) |
+| `v_gussteil` | das Gussteil | authored | [link](https://www.dwds.de/r?q=Gussteil) |
+| `v_haerte` | die Härte | authored | [link](https://www.dwds.de/r?q=H%C3%A4rte) |
+| `v_hardware` | die Hardware | authored | [link](https://www.dwds.de/r?q=Hardware) |
+| `v_herunterladen` | herunterladen | authored | [link](https://www.dwds.de/r?q=herunterladen) |
+| `v_hitzebestaendig` | hitzebeständig | authored | [link](https://www.dwds.de/r?q=hitzebest%C3%A4ndig) |
+| `v_hochladen` | hochladen | authored | [link](https://www.dwds.de/r?q=hochladen) |
 | `v_homeoffice` | das Homeoffice | authored | [link](https://de.wiktionary.org/wiki/Homeoffice) |
+| `v_hydraulik` | die Hydraulik | authored | [link](https://www.dwds.de/r?q=Hydraulik) |
+| `v_implementieren` | implementieren | authored | [link](https://www.dwds.de/r?q=implementieren) |
 | `v_installieren` | installieren | authored | [link](https://de.wiktionary.org/wiki/installieren) |
+| `v_instandhaltung` | die Instandhaltung | authored | [link](https://www.dwds.de/r?q=Instandhaltung) |
+| `v_intuitiv` | intuitiv | authored | [link](https://www.dwds.de/r?q=intuitiv) |
 | `v_it_sicherheit` | die IT-Sicherheit | authored | [link](https://www.dwds.de/r?q=IT-Sicherheit) |
+| `v_justieren` | justieren | authored | [link](https://www.dwds.de/r?q=justieren) |
 | `v_ki` | die künstliche Intelligenz | authored | [link](https://de.wiktionary.org/wiki/k%C3%BCnstliche%20Intelligenz) |
+| `v_kolben` | der Kolben | authored | [link](https://www.dwds.de/r?q=Kolben) |
 | `v_kompatibel` | kompatibel | authored | [link](https://de.wiktionary.org/wiki/kompatibel) |
+| `v_konfigurieren` | konfigurieren | authored | [link](https://www.dwds.de/r?q=konfigurieren) |
+| `v_konstruieren` | konstruieren | authored | [link](https://www.dwds.de/r?q=konstruieren) |
+| `v_kugellager` | das Kugellager | authored | [link](https://www.dwds.de/r?q=Kugellager) |
+| `v_kunststoff` | der Kunststoff | authored | [link](https://www.dwds.de/r?q=Kunststoff) |
+| `v_kunststoffverarbeitung` | die Kunststoffverarbeitung | authored | [link](https://www.dwds.de/wb/Kunststoffverarbeitung) |
+| `v_labor` | das Labor | authored | [link](https://www.dwds.de/wb/Labor) |
+| `v_lack` | der Lack | authored | [link](https://www.dwds.de/r?q=Lack) |
+| `v_legierung` | die Legierung | authored | [link](https://www.dwds.de/r?q=Legierung) |
+| `v_leitfaehig` | leitfähig | authored | [link](https://www.dwds.de/r?q=leitf%C3%A4hig) |
+| `v_leitstelle` | die Leitstelle | authored | [link](https://www.dwds.de/wb/Leitstelle) |
 | `v_lizenzverwaltung` | die Lizenzverwaltung | authored | [link](https://www.dwds.de/r?q=Lizenzverwaltung) |
+| `v_manuell` | manuell | authored | [link](https://www.dwds.de/r?q=manuell) |
+| `v_maschinenbau` | der Maschinenbau | authored | [link](https://www.dwds.de/r?q=Maschinenbau) |
+| `v_massband` | das Maßband | authored | [link](https://www.dwds.de/r?q=Ma%C3%9Fband) |
+| `v_mauern` | mauern | authored | [link](https://www.dwds.de/r?q=mauern) |
+| `v_medizinprodukt` | das Medizinprodukt | authored | [link](https://www.dwds.de/wb/Medizinprodukt) |
+| `v_messgeraet` | das Messgerät | authored | [link](https://www.dwds.de/r?q=Messger%C3%A4t) |
+| `v_migrieren` | migrieren | authored | [link](https://www.dwds.de/r?q=migrieren) |
+| `v_mikrofasertuch` | das Mikrofasertuch | authored | [link](https://www.dwds.de/wb/Mikrofasertuch) |
+| `v_montage` | die Montage | authored | [link](https://www.dwds.de/r?q=Montage) |
+| `v_montieren` | montieren | authored | [link](https://www.dwds.de/r?q=montieren) |
 | `v_netzwerk` | das Netzwerk | authored | [link](https://de.wiktionary.org/wiki/Netzwerk) |
+| `v_neustart` | der Neustart | authored | [link](https://www.dwds.de/r?q=Neustart) |
 | `v_nutzeroberflaeche` | die Nutzeroberfläche | authored | [link](https://www.dwds.de/r?q=Nutzeroberfl%C3%A4che) |
 | `v_nutzerschulung` | die Nutzerschulung | authored | [link](https://www.dwds.de/r?q=Nutzerschulung) |
+| `v_onlinehandel` | der Onlinehandel | authored | [link](https://www.dwds.de/r?q=Onlinehandel) |
 | `v_passwort` | das Passwort | authored | [link](https://de.wiktionary.org/wiki/Passwort) |
+| `v_pflegedokumentation` | die Pflegedokumentation | authored | [link](https://www.dwds.de/wb/Pflegedokumentation) |
 | `v_pilotprojekt` | das Pilotprojekt | authored | [link](https://de.wiktionary.org/wiki/Pilotprojekt) |
+| `v_praezise` | präzise | authored | [link](https://www.dwds.de/r?q=pr%C3%A4zise) |
+| `v_presse` | die Presse | authored | [link](https://www.dwds.de/r?q=Presse) |
+| `v_probelauf` | der Probelauf | authored | [link](https://www.dwds.de/r?q=Probelauf) |
+| `v_probenahme` | die Probenahme | authored | [link](https://www.dwds.de/wb/Probenahme) |
+| `v_produktionshalle` | die Produktionshalle | authored | [link](https://www.dwds.de/r?q=Produktionshalle) |
+| `v_produktionslinie` | die Produktionslinie | authored | [link](https://www.dwds.de/r?q=Produktionslinie) |
 | `v_programm` | das Programm | authored | [link](https://de.wiktionary.org/wiki/Programm) |
+| `v_programmieren` | programmieren | authored | [link](https://www.dwds.de/r?q=programmieren) |
+| `v_programmiersprache` | die Programmiersprache | authored | [link](https://www.dwds.de/r?q=Programmiersprache) |
+| `v_pumpe` | die Pumpe | authored | [link](https://www.dwds.de/r?q=Pumpe) |
+| `v_quellcode` | der Quellcode | authored | [link](https://www.dwds.de/r?q=Quellcode) |
+| `v_reaktor` | der Reaktor | authored | [link](https://www.dwds.de/wb/Reaktor) |
+| `v_rechenzentrum` | das Rechenzentrum | authored | [link](https://www.dwds.de/r?q=Rechenzentrum) |
+| `v_reibung` | die Reibung | authored | [link](https://www.dwds.de/r?q=Reibung) |
+| `v_reinigungsmaschine` | die Reinigungsmaschine | authored | [link](https://www.dwds.de/wb/Reinigungsmaschine) |
+| `v_reinraum` | der Reinraum | authored | [link](https://www.dwds.de/wb/Reinraum) |
 | `v_reparieren` | reparieren | authored | [link](https://de.wiktionary.org/wiki/reparieren) |
+| `v_rezeptur` | die Rezeptur | authored | [link](https://www.dwds.de/wb/Rezeptur) |
+| `v_roboter` | der Roboter | authored | [link](https://www.dwds.de/r?q=Roboter) |
+| `v_roentgengeraet` | das Röntgengerät | authored | [link](https://www.dwds.de/wb/R%C3%B6ntgenger%C3%A4t) |
 | `v_rollout` | der Rollout | authored | [link](https://de.wiktionary.org/wiki/Rollout) |
+| `v_rostfrei` | rostfrei | authored | [link](https://www.dwds.de/r?q=rostfrei) |
+| `v_saege` | die Säge | authored | [link](https://www.dwds.de/r?q=S%C3%A4ge) |
+| `v_schaltplan` | der Schaltplan | authored | [link](https://www.dwds.de/r?q=Schaltplan) |
+| `v_schalung` | die Schalung | authored | [link](https://www.dwds.de/r?q=Schalung) |
 | `v_schnittstelle` | die Schnittstelle | authored | [link](https://de.wiktionary.org/wiki/Schnittstelle) |
 | `v_schnittstellen_integration` | die Schnittstellenintegration | authored | [link](https://www.dwds.de/r?q=Schnittstellenintegration) |
+| `v_schraube` | die Schraube | authored | [link](https://www.dwds.de/r?q=Schraube) |
 | `v_schulung` | die Schulung | authored | [link](https://de.wiktionary.org/wiki/Schulung) |
+| `v_schweissen` | schweißen | authored | [link](https://www.dwds.de/r?q=schwei%C3%9Fen) |
+| `v_sensor` | der Sensor | authored | [link](https://www.dwds.de/r?q=Sensor) |
+| `v_serienproduktion` | die Serienproduktion | authored | [link](https://www.dwds.de/r?q=Serienproduktion) |
+| `v_server` | der Server | authored | [link](https://www.dwds.de/r?q=Server) |
 | `v_serverausfall` | der Serverausfall | authored | [link](https://www.dwds.de/r?q=Serverausfall) |
+| `v_simulieren` | simulieren | authored | [link](https://www.dwds.de/r?q=simulieren) |
+| `v_skalierbar` | skalierbar | authored | [link](https://www.dwds.de/r?q=skalierbar) |
 | `v_software` | die Software | authored | [link](https://de.wiktionary.org/wiki/Software) |
 | `v_software_einfuehren` | eine Software einführen | authored | [link](https://www.dwds.de/r?q=eine%20Software%20einf%C3%BChren) |
 | `v_softwareaktualisierung` | die Softwareaktualisierung | authored | [link](https://www.dwds.de/r?q=Softwareaktualisierung) |
+| `v_speicher` | der Speicher | authored | [link](https://www.dwds.de/r?q=Speicher) |
 | `v_speichern` | speichern | authored | [link](https://de.wiktionary.org/wiki/speichern) |
+| `v_spritzguss` | der Spritzguss | authored | [link](https://www.dwds.de/wb/Spritzguss) |
+| `v_stahl` | der Stahl | authored | [link](https://www.dwds.de/r?q=Stahl) |
+| `v_steuerung` | die Steuerung | authored | [link](https://www.dwds.de/r?q=Steuerung) |
+| `v_stillstand` | der Stillstand | authored | [link](https://www.dwds.de/r?q=Stillstand) |
+| `v_stoeranfaellig` | störanfällig | authored | [link](https://www.dwds.de/r?q=st%C3%B6ranf%C3%A4llig) |
 | `v_stoerung` | die Störung | authored | [link](https://de.wiktionary.org/wiki/St%C3%B6rung) |
 | `v_systemwartung` | die Systemwartung | authored | [link](https://www.dwds.de/r?q=Systemwartung) |
+| `v_toleranz` | die Toleranz | authored | [link](https://www.dwds.de/r?q=Toleranz) |
+| `v_ueberwachungskamera` | die Überwachungskamera | authored | [link](https://www.dwds.de/wb/%C3%9Cberwachungskamera) |
+| `v_ultraschallgeraet` | das Ultraschallgerät | authored | [link](https://www.dwds.de/wb/Ultraschallger%C3%A4t) |
+| `v_umruesten` | umrüsten | authored | [link](https://www.dwds.de/r?q=umr%C3%BCsten) |
 | `v_umstellen` | umstellen | authored | [link](https://de.wiktionary.org/wiki/umstellen) |
 | `v_update` | das Update | authored | [link](https://de.wiktionary.org/wiki/Update) |
+| `v_ventil` | das Ventil | authored | [link](https://www.dwds.de/r?q=Ventil) |
+| `v_verfahren` | das Verfahren | authored | [link](https://www.dwds.de/r?q=Verfahren) |
+| `v_verformbar` | verformbar | authored | [link](https://www.dwds.de/r?q=verformbar) |
+| `v_verschleiss` | der Verschleiß | authored | [link](https://www.dwds.de/r?q=Verschlei%C3%9F) |
 | `v_verschluesseln` | verschlüsseln | authored | [link](https://de.wiktionary.org/wiki/verschl%C3%BCsseln) |
+| `v_verschrauben` | verschrauben | authored | [link](https://www.dwds.de/r?q=verschrauben) |
+| `v_version` | die Version | authored | [link](https://www.dwds.de/r?q=Version) |
+| `v_versionsverwaltung` | die Versionsverwaltung | authored | [link](https://www.dwds.de/r?q=Versionsverwaltung) |
+| `v_warten` | warten | authored | [link](https://www.dwds.de/r?q=warten) |
+| `v_wartung` | die Wartung | authored | [link](https://www.dwds.de/r?q=Wartung) |
+| `v_welle` | die Welle | authored | [link](https://www.dwds.de/r?q=Welle) |
+| `v_werkstatt` | die Werkstatt | authored | [link](https://www.dwds.de/r?q=Werkstatt) |
+| `v_werkstoff` | der Werkstoff | authored | [link](https://www.dwds.de/r?q=Werkstoff) |
+| `v_werkstueck` | das Werkstück | authored | [link](https://www.dwds.de/r?q=Werkst%C3%BCck) |
+| `v_werkzeug` | das Werkzeug | authored | [link](https://www.dwds.de/r?q=Werkzeug) |
 | `v_zugriff` | der Zugriff | authored | [link](https://de.wiktionary.org/wiki/Zugriff) |
 | `v_zugriffsrechte` | die Zugriffsrechte (Pl.) | authored | [link](https://www.dwds.de/r?q=Zugriffsrechte) |
 
 </details>
 
-<details><summary>trades — 20</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `v_abdichten` | abdichten | authored | [link](https://www.dwds.de/r?q=abdichten) |
-| `v_anschliessen` | anschließen | authored | [link](https://www.dwds.de/r?q=anschlie%C3%9Fen) |
-| `v_ausmessen` | ausmessen | authored | [link](https://www.dwds.de/r?q=ausmessen) |
-| `v_bohrer` | der Bohrer | authored | [link](https://www.dwds.de/r?q=Bohrer) |
-| `v_fliese` | die Fliese | authored | [link](https://www.dwds.de/r?q=Fliese) |
-| `v_geselle` | der Geselle | authored | [link](https://www.dwds.de/r?q=Geselle) |
-| `v_handwerklich` | handwerklich | authored | [link](https://www.dwds.de/r?q=handwerklich) |
-| `v_kostenvoranschlag` | der Kostenvoranschlag | authored | [link](https://www.dwds.de/r?q=Kostenvoranschlag) |
-| `v_lack` | der Lack | authored | [link](https://www.dwds.de/r?q=Lack) |
-| `v_lehrling` | der Lehrling | authored | [link](https://www.dwds.de/r?q=Lehrling) |
-| `v_massband` | das Maßband | authored | [link](https://www.dwds.de/r?q=Ma%C3%9Fband) |
-| `v_meisterbrief` | der Meisterbrief | authored | [link](https://www.dwds.de/r?q=Meisterbrief) |
-| `v_notdienst` | der Notdienst | authored | [link](https://www.dwds.de/r?q=Notdienst) |
-| `v_saege` | die Säge | authored | [link](https://www.dwds.de/r?q=S%C3%A4ge) |
-| `v_steckdose` | die Steckdose | authored | [link](https://www.dwds.de/r?q=Steckdose) |
-| `v_verlegen` | verlegen | authored | [link](https://www.dwds.de/r?q=verlegen) |
-| `v_wasserhahn` | der Wasserhahn | authored | [link](https://www.dwds.de/r?q=Wasserhahn) |
-| `v_wasserleitung` | die Wasserleitung | authored | [link](https://www.dwds.de/r?q=Wasserleitung) |
-| `v_werkstatt` | die Werkstatt | authored | [link](https://www.dwds.de/r?q=Werkstatt) |
-| `v_werkzeug` | das Werkzeug | authored | [link](https://www.dwds.de/r?q=Werkzeug) |
-
-</details>
-
-<details><summary>transport — 20</summary>
-
-| id | label | origin | reference |
-|---|---|---|---|
-| `v_anhaenger` | der Anhänger | authored | [link](https://www.dwds.de/r?q=Anh%C3%A4nger) |
-| `v_beladen` | beladen | authored | [link](https://www.dwds.de/r?q=beladen) |
-| `v_berufskraftfahrer` | der Berufskraftfahrer | authored | [link](https://www.dwds.de/r?q=Berufskraftfahrer) |
-| `v_entladen` | entladen | authored | [link](https://www.dwds.de/r?q=entladen) |
-| `v_fahrgast` | der Fahrgast | authored | [link](https://www.dwds.de/r?q=Fahrgast) |
-| `v_fuehrerschein` | der Führerschein | authored | [link](https://www.dwds.de/r?q=F%C3%BChrerschein) |
-| `v_ladeflaeche` | die Ladefläche | authored | [link](https://www.dwds.de/r?q=Ladefl%C3%A4che) |
-| `v_ladungssicherung` | die Ladungssicherung | authored | [link](https://www.dwds.de/r?q=Ladungssicherung) |
-| `v_lenkzeit` | die Lenkzeit | authored | [link](https://www.dwds.de/r?q=Lenkzeit) |
-| `v_maut` | die Maut | authored | [link](https://www.dwds.de/r?q=Maut) |
-| `v_nutzfahrzeug` | das Nutzfahrzeug | authored | [link](https://www.dwds.de/r?q=Nutzfahrzeug) |
-| `v_panne` | die Panne | authored | [link](https://www.dwds.de/r?q=Panne) |
-| `v_rangieren` | rangieren | authored | [link](https://www.dwds.de/r?q=rangieren) |
-| `v_rastplatz` | der Rastplatz | authored | [link](https://www.dwds.de/r?q=Rastplatz) |
-| `v_ruhezeit` | die Ruhezeit | authored | [link](https://www.dwds.de/r?q=Ruhezeit) |
-| `v_uebermuedet` | übermüdet | authored | [link](https://www.dwds.de/r?q=%C3%BCberm%C3%BCdet) |
-| `v_umleiten` | umleiten | authored | [link](https://www.dwds.de/r?q=umleiten) |
-| `v_umleitung` | die Umleitung | authored | [link](https://www.dwds.de/r?q=Umleitung) |
-| `v_verkehrskontrolle` | die Verkehrskontrolle | authored | [link](https://www.dwds.de/r?q=Verkehrskontrolle) |
-| `v_verkehrssicher` | verkehrssicher | authored | [link](https://www.dwds.de/r?q=verkehrssicher) |
-
-</details>
-
-<details><summary>travel — 45</summary>
+<details><summary>travel — 52</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -3134,15 +4124,18 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_ankunft` | die Ankunft | authored | [link](https://de.wiktionary.org/wiki/Ankunft) |
 | `v_anschluss` | der Anschluss | authored | [link](https://de.wiktionary.org/wiki/Anschluss) |
 | `v_aufenthalt` | der Aufenthalt | authored | [link](https://de.wiktionary.org/wiki/Aufenthalt) |
+| `v_ausgebucht` | ausgebucht | authored | [link](https://www.dwds.de/r?q=ausgebucht) |
 | `v_ausweis_pass` | der Reisepass | authored | [link](https://de.wiktionary.org/wiki/Reisepass) |
 | `v_beleg` | der Beleg | authored | [link](https://de.wiktionary.org/wiki/Beleg) |
 | `v_buchen` | buchen | authored | [link](https://de.wiktionary.org/wiki/buchen) |
+| `v_buffet` | das Buffet | authored | [link](https://www.dwds.de/r?q=Buffet) |
 | `v_dienstreise` | die Dienstreise | authored | [link](https://de.wiktionary.org/wiki/Dienstreise) |
 | `v_dienstreisegenehmigung` | die Dienstreisegenehmigung | authored | [link](https://www.dwds.de/r?q=Dienstreisegenehmigung) |
 | `v_dienstreisericht` | die Reiserichtlinie | authored | [link](https://www.dwds.de/r?q=Reiserichtlinie) |
 | `v_empfang_hotel` | der Empfang | authored | [link](https://de.wiktionary.org/wiki/Empfang) |
 | `v_fahrkarte` | die Fahrkarte | authored | [link](https://de.wiktionary.org/wiki/Fahrkarte) |
 | `v_flug` | der Flug | authored | [link](https://de.wiktionary.org/wiki/Flug) |
+| `v_fuehrerschein` | der Führerschein | authored | [link](https://www.dwds.de/r?q=F%C3%BChrerschein) |
 | `v_gepaeck` | das Gepäck | authored | [link](https://de.wiktionary.org/wiki/Gep%C3%A4ck) |
 | `v_geschaeftsessen` | das Geschäftsessen | authored | [link](https://de.wiktionary.org/wiki/Gesch%C3%A4ftsessen) |
 | `v_geschaeftspartner` | der Geschäftspartner | authored | [link](https://de.wiktionary.org/wiki/Gesch%C3%A4ftspartner) |
@@ -3154,6 +4147,8 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_konferenzraum_hotel` | der Konferenzraum | authored | [link](https://de.wiktionary.org/wiki/Konferenzraum) |
 | `v_messe` | die Messe | authored | [link](https://de.wiktionary.org/wiki/Messe) |
 | `v_mietwagen` | der Mietwagen | authored | [link](https://de.wiktionary.org/wiki/Mietwagen) |
+| `v_panne` | die Panne | authored | [link](https://www.dwds.de/r?q=Panne) |
+| `v_rastplatz` | der Rastplatz | authored | [link](https://www.dwds.de/r?q=Rastplatz) |
 | `v_reisebereitschaft` | die Reisebereitschaft | authored | [link](https://www.dwds.de/r?q=Reisebereitschaft) |
 | `v_reisebuchung` | die Reisebuchung | authored | [link](https://www.dwds.de/r?q=Reisebuchung) |
 | `v_reisekostenabrechnung` | die Reisekostenabrechnung | authored | [link](https://de.wiktionary.org/wiki/Reisekostenabrechnung) |
@@ -3166,6 +4161,8 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `v_transferzeit` | die Transferzeit | authored | [link](https://www.dwds.de/r?q=Transferzeit) |
 | `v_uebernachten` | übernachten | authored | [link](https://de.wiktionary.org/wiki/%C3%BCbernachten) |
 | `v_uebernachtung` | die Übernachtung | authored | [link](https://de.wiktionary.org/wiki/%C3%9Cbernachtung) |
+| `v_umleiten` | umleiten | authored | [link](https://www.dwds.de/r?q=umleiten) |
+| `v_umleitung` | die Umleitung | authored | [link](https://www.dwds.de/r?q=Umleitung) |
 | `v_umsteigen` | umsteigen | authored | [link](https://de.wiktionary.org/wiki/umsteigen) |
 | `v_unterkunft` | die Unterkunft | authored | [link](https://de.wiktionary.org/wiki/Unterkunft) |
 | `v_verbindung` | die Verbindung | authored | [link](https://de.wiktionary.org/wiki/Verbindung) |
@@ -3176,44 +4173,96 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 
 </details>
 
-<details><summary>wohnen — 28</summary>
+<details><summary>wohnen — 80</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
+| `v_abdichten` | abdichten | authored | [link](https://www.dwds.de/r?q=abdichten) |
+| `v_abschlag` | der Abschlag | authored | [link](https://www.dwds.de/wb/Abschlag) |
 | `v_auszug` | der Auszug | authored | [link](https://de.wiktionary.org/wiki/Auszug) |
+| `v_barrierefrei` | barrierefrei | authored | [link](https://www.dwds.de/r?q=barrierefrei) |
+| `v_befristung` | die Befristung | authored | [link](https://www.dwds.de/wb/Befristung) |
 | `v_besichtigung` | die Besichtigung | authored | [link](https://de.wiktionary.org/wiki/Besichtigung) |
+| `v_betriebskosten` | die Betriebskosten | authored | [link](https://www.dwds.de/wb/Betriebskosten) |
+| `v_dach` | das Dach | authored | [link](https://www.dwds.de/r?q=Dach) |
+| `v_eigenbedarf` | der Eigenbedarf | authored | [link](https://www.dwds.de/wb/Eigenbedarf) |
 | `v_einzug` | der Einzug | authored | [link](https://de.wiktionary.org/wiki/Einzug) |
+| `v_energieausweis` | der Energieausweis | authored | [link](https://www.dwds.de/r?q=Energieausweis) |
+| `v_estrich` | der Estrich | authored | [link](https://www.dwds.de/r?q=Estrich) |
+| `v_expose` | das Exposé | authored | [link](https://www.dwds.de/wb/Expos%C3%A9) |
+| `v_feuchtigkeit` | die Feuchtigkeit | authored | [link](https://www.dwds.de/wb/Feuchtigkeit) |
+| `v_fliese` | die Fliese | authored | [link](https://www.dwds.de/r?q=Fliese) |
+| `v_grundsteuer` | die Grundsteuer | authored | [link](https://www.dwds.de/wb/Grundsteuer) |
+| `v_grundstueck` | das Grundstück | authored | [link](https://www.dwds.de/r?q=Grundst%C3%BCck) |
 | `v_handwerker` | der Handwerker | authored | [link](https://de.wiktionary.org/wiki/Handwerker) |
+| `v_hausmeister` | der Hausmeister | authored | [link](https://www.dwds.de/wb/Hausmeister) |
 | `v_hausordnung` | die Hausordnung | authored | [link](https://de.wiktionary.org/wiki/Hausordnung) |
 | `v_hausverwaltung` | die Hausverwaltung | authored | [link](https://de.wiktionary.org/wiki/Hausverwaltung) |
+| `v_heizkosten` | die Heizkosten | authored | [link](https://www.dwds.de/wb/Heizkosten) |
 | `v_heizung` | die Heizung | authored | [link](https://de.wiktionary.org/wiki/Heizung) |
+| `v_indexmiete` | die Indexmiete | authored | [link](https://www.dwds.de/wb/Indexmiete) |
+| `v_innenausbau` | der Innenausbau | authored | [link](https://www.dwds.de/r?q=Innenausbau) |
 | `v_kaltmiete` | die Kaltmiete | authored | [link](https://de.wiktionary.org/wiki/Kaltmiete) |
 | `v_kaution` | die Kaution | authored | [link](https://de.wiktionary.org/wiki/Kaution) |
 | `v_kuendigung` | die Kündigung | authored | [link](https://de.wiktionary.org/wiki/Kündigung) |
+| `v_laermbelaestigung` | die Lärmbelästigung | authored | [link](https://www.dwds.de/wb/L%C3%A4rmbel%C3%A4stigung) |
 | `v_makler` | der Makler | authored | [link](https://de.wiktionary.org/wiki/Makler) |
 | `v_mangel` | der Mangel | authored | [link](https://de.wiktionary.org/wiki/Mangel) |
 | `v_mieter` | der Mieter | authored | [link](https://de.wiktionary.org/wiki/Mieter) |
+| `v_mietinteressent` | der Mietinteressent | authored | [link](https://www.dwds.de/wb/Mietinteressent) |
 | `v_mietminderung` | die Mietminderung | authored | [link](https://de.wiktionary.org/wiki/Mietminderung) |
+| `v_mietspiegel` | der Mietspiegel | authored | [link](https://www.dwds.de/wb/Mietspiegel) |
+| `v_mietwohnung` | die Mietwohnung | authored | [link](https://www.dwds.de/wb/Mietwohnung) |
+| `v_modernisierung` | die Modernisierung | authored | [link](https://www.dwds.de/wb/Modernisierung) |
+| `v_muellabfuhr` | die Müllabfuhr | authored | [link](https://www.dwds.de/wb/M%C3%BCllabfuhr) |
 | `v_nachbar` | der Nachbar | authored | [link](https://de.wiktionary.org/wiki/Nachbar) |
+| `v_nachmieter` | der Nachmieter | authored | [link](https://www.dwds.de/wb/Nachmieter) |
+| `v_nachzahlung` | die Nachzahlung | authored | [link](https://www.dwds.de/wb/Nachzahlung) |
 | `v_nebenkosten` | die Nebenkosten | authored | [link](https://de.wiktionary.org/wiki/Nebenkosten) |
 | `v_nebenkostenabrechnung` | die Nebenkostenabrechnung | authored | [link](https://de.wiktionary.org/wiki/Nebenkostenabrechnung) |
+| `v_pflegeheim` | das Pflegeheim | authored | [link](https://www.dwds.de/r?q=Pflegeheim) |
+| `v_provision` | die Provision | authored | [link](https://www.dwds.de/wb/Provision) |
+| `v_putz` | der Putz | authored | [link](https://www.dwds.de/r?q=Putz) |
 | `v_quadratmeter` | der Quadratmeter | authored | [link](https://de.wiktionary.org/wiki/Quadratmeter) |
+| `v_raeumungsklage` | die Räumungsklage | authored | [link](https://www.dwds.de/wb/R%C3%A4umungsklage) |
 | `v_reparatur` | die Reparatur | authored | [link](https://de.wiktionary.org/wiki/Reparatur) |
+| `v_rohrbruch` | der Rohrbruch | authored | [link](https://www.dwds.de/wb/Rohrbruch) |
+| `v_sanieren` | sanieren | authored | [link](https://www.dwds.de/r?q=sanieren) |
+| `v_sanierung` | die Sanierung | authored | [link](https://www.dwds.de/r?q=Sanierung) |
 | `v_schimmel` | der Schimmel | authored | [link](https://de.wiktionary.org/wiki/Schimmel) |
+| `v_schluesselfertig` | schlüsselfertig | authored | [link](https://www.dwds.de/r?q=schl%C3%BCsselfertig) |
+| `v_schoenheitsreparatur` | die Schönheitsreparatur | authored | [link](https://www.dwds.de/wb/Sch%C3%B6nheitsreparatur) |
+| `v_selbstauskunft` | die Selbstauskunft | authored | [link](https://www.dwds.de/wb/Selbstauskunft) |
+| `v_staffelmiete` | die Staffelmiete | authored | [link](https://www.dwds.de/wb/Staffelmiete) |
+| `v_steckdose` | die Steckdose | authored | [link](https://www.dwds.de/r?q=Steckdose) |
 | `v_strom` | der Strom | authored | [link](https://de.wiktionary.org/wiki/Strom) |
+| `v_stromzaehler` | der Stromzähler | authored | [link](https://www.dwds.de/wb/Stromz%C3%A4hler) |
+| `v_trockenbau` | der Trockenbau | authored | [link](https://www.dwds.de/r?q=Trockenbau) |
+| `v_tropfen` | tropfen | authored | [link](https://www.dwds.de/wb/tropfen) |
 | `v_uebergabeprotokoll` | das Übergabeprotokoll | authored | [link](https://de.wiktionary.org/wiki/Übergabeprotokoll) |
 | `v_umzug` | der Umzug | authored | [link](https://de.wiktionary.org/wiki/Umzug) |
+| `v_untermieter` | der Untermieter | authored | [link](https://www.dwds.de/wb/Untermieter) |
+| `v_verlegen` | verlegen | authored | [link](https://www.dwds.de/r?q=verlegen) |
 | `v_vermieter` | der Vermieter | authored | [link](https://de.wiktionary.org/wiki/Vermieter) |
+| `v_verputzen` | verputzen | authored | [link](https://www.dwds.de/r?q=verputzen) |
+| `v_verstopft` | verstopft | authored | [link](https://www.dwds.de/wb/verstopft) |
+| `v_vorauszahlung` | die Vorauszahlung | authored | [link](https://www.dwds.de/wb/Vorauszahlung) |
 | `v_warmmiete` | die Warmmiete | authored | [link](https://de.wiktionary.org/wiki/Warmmiete) |
+| `v_wasserhahn` | der Wasserhahn | authored | [link](https://www.dwds.de/r?q=Wasserhahn) |
+| `v_wasserleitung` | die Wasserleitung | authored | [link](https://www.dwds.de/r?q=Wasserleitung) |
+| `v_wasserschaden` | der Wasserschaden | authored | [link](https://www.dwds.de/wb/Wasserschaden) |
 | `v_wg` | die Wohngemeinschaft | authored | [link](https://de.wiktionary.org/wiki/Wohngemeinschaft) |
+| `v_wohnberechtigungsschein` | der Wohnberechtigungsschein | authored | [link](https://www.dwds.de/wb/Wohnberechtigungsschein) |
+| `v_wohnflaeche` | die Wohnfläche | authored | [link](https://www.dwds.de/wb/Wohnfl%C3%A4che) |
 | `v_wohnungsanzeige` | die Wohnungsanzeige | authored | [link](https://de.wiktionary.org/wiki/Wohnungsanzeige) |
 | `v_wohnungssuche` | die Wohnungssuche | authored | [link](https://de.wiktionary.org/wiki/Wohnungssuche) |
+| `v_zaehlerstand` | der Zählerstand | authored | [link](https://www.dwds.de/wb/Z%C3%A4hlerstand) |
 
 </details>
 
-### writing_prompt (15)
+### writing_prompt (20)
 
-<details><summary>? — 15</summary>
+<details><summary>? — 20</summary>
 
 | id | label | origin | reference |
 |---|---|---|---|
@@ -3223,8 +4272,13 @@ its `reference` (and, for facts, cross-checked with `pnpm verify:facts`). See
 | `wp_bildung` | Writing prompt: bildung | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `wp_conflict` | Writing prompt: conflict | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `wp_customer` | Writing prompt: customer | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `wp_digitales` | Writing prompt: digitales | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `wp_einkaufen` | Writing prompt: einkaufen | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `wp_essen` | Writing prompt: essen | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `wp_freizeit` | Writing prompt: freizeit | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `wp_logistics` | Writing prompt: logistics | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `wp_meetings` | Writing prompt: meetings | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
+| `wp_mobilitaet` | Writing prompt: mobilitaet | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `wp_project` | Writing prompt: project | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `wp_safety` | Writing prompt: safety | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |
 | `wp_scheduling` | Writing prompt: scheduling | authored | [link](https://www.coe.int/en/web/common-european-framework-reference-languages/level-descriptions) |

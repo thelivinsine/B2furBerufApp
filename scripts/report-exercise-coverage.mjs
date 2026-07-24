@@ -19,6 +19,7 @@ import path from "node:path";
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { createServer } from "vite";
+import { writeReportSidecarSync } from "./report-sidecar.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -183,6 +184,8 @@ async function main() {
         colKinds,
         noExample: noExample.length,
         noRelated: noRelated.length,
+        noExampleIds: noExample.map((v) => v.id),
+        noRelatedIds: noRelated.map((v) => v.id),
       });
     }
 
@@ -384,6 +387,26 @@ async function main() {
 
     const out = path.join(root, "docs/reports/exercise-coverage-report.md");
     writeFileSync(out, L.join("\n") + "\n", "utf8");
+    writeReportSidecarSync(out, {
+      registerRows: rows.length,
+      scope: "themes",
+      rich,
+      ok,
+      thin,
+      // Per-theme word-level residuals (F3 work order): words with no self
+      // example (no cloze/typing/listening) and no resolvable related term
+      // (no odd-one-out). The ids are an exact copy-paste work list for an AI
+      // content-polish session.
+      themes: rows.map((r) => ({
+        id: r.id,
+        title: r.title,
+        words: r.words,
+        cols: r.cols,
+        vocabKinds: r.vocabKinds.size,
+        noExampleIds: r.noExampleIds,
+        noRelatedIds: r.noRelatedIds,
+      })),
+    });
     console.log(
       `exercise-coverage: ${rows.length} Themen (🟢 ${rich} · 🟡 ${ok} · 🔴 ${thin}) → docs/reports/exercise-coverage-report.md`,
     );

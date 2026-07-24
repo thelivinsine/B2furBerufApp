@@ -4,16 +4,24 @@ import { MotionConfig } from "framer-motion";
 import { router } from "./router";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useAuthStore } from "@/store/useAuthStore";
+import { useAppConfigStore } from "@/lib/appConfig";
 
 export function App() {
   const themeMode = useSettingsStore((s) => s.themeMode);
   const reducedMotion = useSettingsStore((s) => s.reducedMotion);
   const initAuth = useAuthStore((s) => s.init);
+  const loadAppConfig = useAppConfigStore((s) => s.load);
 
   // Restore the Supabase session and start cloud sync (offline-first).
   useEffect(() => {
     initAuth();
   }, [initAuth]);
+
+  // Fetch the Steuerung remote config once (fail-soft: stays at compiled
+  // defaults offline, so the app is unchanged when nothing is configured).
+  useEffect(() => {
+    void loadAppConfig();
+  }, [loadAppConfig]);
 
   useEffect(() => {
     const root = document.documentElement;

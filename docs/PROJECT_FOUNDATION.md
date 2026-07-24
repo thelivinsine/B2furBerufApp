@@ -44,7 +44,7 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   are **full-bleed opaque** (no transparent corners) so iOS home-screen icons don't show dark corners.
   - **Do NOT make the in-app logo full-bleed.** A full-bleed square variant exists **only** for
     Google's OAuth consent screen and is not committed. (Full-bleed-everywhere was shipped then
-    reverted in PRs #120/#121.) Full detail of the logo rules is in `CLAUDE.md` → "Brand logo".
+    reverted in PRs #120/#121.) Full detail of the logo rules is in `docs/areas/BRAND.md`.
 
 ### Phase 2 — Supabase auth + cloud sync + AI writing eval ✅ (live 2026-05-31, founder-verified)
 - **Supabase project:** `stkfdavpjflpqoxjunnj`. Publishable key committed in
@@ -100,6 +100,11 @@ All of the following are DONE (the open/optional ones live in `PROJECT_STATUS.md
 - [x] **Rotate the Anthropic key** (the one pasted in chat) — new key set in Supabase secrets.
 - [x] **Run migration 0007** (`provenance_reviews` RLS extended to both admin accounts for the
       /sources Daten-Werkbank). (2026-07-19, founder ran it in the SQL editor, "Success")
+- [x] **Turnstile bot protection LIVE end-to-end** (2026-07-24, founder-verified via live guest/email
+      sign-in). Needs BOTH sides: CAPTCHA enabled in Supabase Auth (Turnstile secret key) AND the
+      `VITE_TURNSTILE_SITE_KEY` GitHub Actions secret (site key, baked in at build by `pages.yml`).
+      Only one side = sign-in fails. The client widget + auth integration + feedback burst/hourly
+      email caps predate this; the admin System/Launch reporting was wired to the real flag in PR #669.
 
 ## Deploy / infra guardrails (authoritative copy in `CLAUDE.md`)
 The full deploy + post-merge housekeeping rules live in `CLAUDE.md` (→ "Deployment (GitHub Pages)"

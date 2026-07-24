@@ -147,7 +147,7 @@ export function FokusTrainer({
             Dein Satz
           </p>
           {showResult && (
-            <div className="inline-flex rounded-full bg-muted p-0.5 text-xs font-bold">
+            <div className="inline-flex rounded-lg bg-muted p-0.5 text-xs font-bold">
               {(
                 [
                   { id: "orig" as const, label: "Original" },
@@ -160,7 +160,7 @@ export function FokusTrainer({
                   aria-pressed={view === seg.id}
                   onClick={() => setView(seg.id)}
                   className={cn(
-                    "rounded-full px-3 py-1 transition-colors",
+                    "rounded-md px-3 py-1 transition-colors",
                     view === seg.id
                       ? "bg-surface text-foreground shadow-soft"
                       : "text-muted-foreground hover:text-foreground",
@@ -363,12 +363,15 @@ export function FokusTrainer({
       <div className="space-y-4 lg:hidden">
         <div className="space-y-3">
           <div className="flex justify-center gap-2">
+            {/* Always tappable (founder s151): before a correction the panel opens
+                to the GrammarRail's "Prüf zuerst deinen Satz …" hint (matching the
+                always-visible desktop rail), instead of a dead disabled button that
+                reads as broken. */}
             <Button
               variant={panelOpen ? "default" : "outline"}
               aria-expanded={panelOpen}
               aria-pressed={panelOpen}
               className="h-10 rounded-lg"
-              disabled={!railEnabled}
               onClick={() => setPanelOpen((o) => !o)}
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -413,16 +416,14 @@ export function FokusTrainer({
 
       {/* Desktop: content column + sticky grammar rail (Bibliothek 16rem grid). */}
       <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8">
-        {/* Content column is at least viewport-tall so the AI note is pushed to
-            the bottom (mt-auto), landing on the same horizontal line as the fixed
-            "Mit KI gebaut · Feedback" pill in the rail column (founder s151). */}
-        <div className="flex flex-col lg:min-h-[calc(100vh-12rem)]">
-          <div className="space-y-4">
-            {inputCard}
-            {errorCard}
-            {bottomBox}
-          </div>
-          <div className="mt-auto pt-4">{aiNote}</div>
+        {/* AI note sits centered in normal flow under the content, NOT pinned to
+            the bottom (founder s151 follow-up: the bottom-pinned version read as an
+            awkward detached band). */}
+        <div className="space-y-4">
+          {inputCard}
+          {errorCard}
+          {bottomBox}
+          {aiNote}
         </div>
         <GrammarRail
           detected={m.detected}

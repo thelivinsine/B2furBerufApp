@@ -1,30 +1,9 @@
 import { lazy, Suspense, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Play } from "lucide-react";
+import { Dumbbell, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-// Lernen (Praktisch toggle) open-book mark. The two pages are separate shapes
-// with a ~2px gutter down the middle, so when the icon is FILLED the pill
-// background shows through that gutter as a subtle center line keeping the two
-// open pages distinct (founder 2026-07-13); the gutter is transparent so it
-// adapts to the light/dark pill automatically. Unfilled = a stroked open book.
-function LernenBook({ className, filled }: { className?: string; filled: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className={className}
-      fill={filled ? "currentColor" : "none"}
-      stroke="currentColor"
-      strokeWidth={filled ? 0 : 2}
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M11 6C8.5 4.7 5.6 4.5 3 4.8a.9.9 0 0 0-.9.9v11.6a.9.9 0 0 0 .9.9c2.6-.2 5.5 0 8 1.4Z" />
-      <path d="M13 6c2.5-1.3 5.4-1.5 8-1.2a.9.9 0 0 1 .9.9v11.6a.9.9 0 0 1-.9.9c-2.6-.2-5.5 0-8 1.4Z" />
-    </svg>
-  );
-}
+import { useAppConfigStore } from "@/lib/appConfig";
 
 // Both tabs import the mission bank, so they load lazily to keep the content
 // bank off the Dashboard's eager path (bundle budget, CLAUDE.md). Üben is the
@@ -49,10 +28,15 @@ const fallback = (
 export function Dashboard() {
   const [params, setParams] = useSearchParams();
   // Open on Spielen when returned here from the mission player (/?tab=spielen),
-  // so exiting a game lands back on the tab with the Lernen/Spielen toggle.
-  const [tab, setTab] = useState<HeuteTab>(() =>
-    params.get("tab") === "spielen" ? "spielen" : "ueben",
-  );
+  // so exiting a game lands back on the tab with the Trainieren/Spielen toggle.
+  // The URL param wins; otherwise the Steuerung H8 remote default decides which
+  // tab opens first (default "ueben" = today's behavior).
+  const startTabDefault = useAppConfigStore((s) => s.config.dashboardStartTab);
+  const [tab, setTab] = useState<HeuteTab>(() => {
+    const p = params.get("tab");
+    if (p === "spielen" || p === "ueben") return p;
+    return startTabDefault;
+  });
   // Direction of the last tab change (+1 = moved right to Spielen, -1 = moved
   // left to Üben) so the content slides in the matching direction.
   const [dir, setDir] = useState(0);
@@ -85,9 +69,10 @@ export function Dashboard() {
     // the toggle->content gap is tightened (lg:space-y-3) so the full-size stack
     // still fits without a scrollbar.
     <div className="space-y-4 sm:space-y-6 lg:flex lg:min-h-[calc(100vh-11rem)] lg:flex-col lg:justify-center lg:space-y-3">
-      {/* Lernen / Spielen: the two ways into the day, centred. Lernen opens by
-          default. The greeting + streak live in the top row; the daily-goal ring
-          moved to Fortschritt (s86), so Heute no longer repeats progress. */}
+      {/* Trainieren / Spielen: the two ways into the day, centred. Trainieren
+          opens by default. The greeting + streak live in the top row; the
+          daily-goal ring moved to Fortschritt (s86), so Heute no longer repeats
+          progress. */}
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
@@ -98,7 +83,7 @@ export function Dashboard() {
       >
         {(
           [
-            { id: "ueben", label: "Lernen", tint: "text-blue-600" },
+            { id: "ueben", label: "Trainieren", tint: "text-blue-600" },
             { id: "spielen", label: "Spielen", tint: "text-orange-500" },
           ] as const
         ).map(({ id, label, tint }) => (
@@ -111,21 +96,19 @@ export function Dashboard() {
             className={cn(
               "inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-semibold transition",
               // Active tab lifts on the white pill and picks up its section's
-              // subtle tint (Lernen = blue + book icon, Spielen = orange + play
-              // icon; renamed from "Üben" in s105 to avoid clashing with the
-              // Theorie Üben button). The tile mats keep a neutral gray border
-              // (founder: colored borders read poorly), so the color lives on
-              // the toggle only.
+              // subtle tint (Trainieren = blue + dumbbell icon, Spielen =
+              // orange + play icon; "Üben" → "Lernen" in s105, → "Trainieren"
+              // with the dumbbell restored in s158, both founder requests).
+              // The tile mats keep a neutral gray border (founder: colored
+              // borders read poorly), so the color lives on the toggle only.
               tab === id
                 ? cn("bg-surface shadow-soft", tint)
                 : "text-muted-foreground hover:text-foreground",
             )}
           >
-            {/* Both active icons fill on the lifted white pill: the Play
-                triangle fills solid, and the Lernen book fills with a subtle
-                center gutter separating its two open pages (LernenBook). */}
+            {/* Both active icons fill on the lifted white pill. */}
             {id === "ueben" ? (
-              <LernenBook filled={tab === id} className="h-4 w-4" />
+              <Dumbbell className={cn("h-4 w-4", tab === id && "fill-current")} />
             ) : (
               <Play className={cn("h-4 w-4", tab === id && "fill-current")} />
             )}

@@ -31,3 +31,21 @@ export function downloadCsv(filename: string, csv: string): void {
   a.remove();
   URL.revokeObjectURL(url);
 }
+
+/** Trigger a client-side download of an arbitrary text file (e.g. a Markdown
+ *  audit summary that ships alongside the register CSV). */
+export function downloadText(
+  filename: string,
+  text: string,
+  mime = "text/plain;charset=utf-8",
+): void {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}

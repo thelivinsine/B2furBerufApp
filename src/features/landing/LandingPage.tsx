@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import { useAppConfig } from "@/lib/appConfig";
 import { AuthDialog, type AuthIntent } from "@/features/auth/AuthDialog";
 import { Logo } from "@/components/shared/Logo";
 import { Wesen } from "@/components/artikel/Wesen";
@@ -222,8 +223,13 @@ export function LandingPage() {
   const [authOpen, setAuthOpen] = useState(false);
   const [intent, setIntent] = useState<AuthIntent>("signup");
   const [lang, setLang] = useState<Lang>("en");
+  // Steuerung wave 2: H10 landing-copy overrides + H3 Impressum link gate.
+  const { landing: landingCfg, impressumEnabled } = useAppConfig();
 
   const t = (en: string, de: string) => (lang === "de" ? de : en);
+  /** Copy with an optional remote {de,en} override applied. */
+  const tOv = (override: { de: string; en: string } | null, en: string, de: string) =>
+    override ? override[lang] : t(en, de);
 
   const openAuth = (i: AuthIntent) => {
     setIntent(i);
@@ -233,7 +239,7 @@ export function LandingPage() {
   const goApp = () => navigate("/");
 
   const goAppLabel = t("Go to app", "Zur App");
-  const startLabel = t("Start free", "Kostenlos starten");
+  const startLabel = tOv(landingCfg.ctaLabel, "Start free", "Kostenlos starten");
 
   const navLinks: Array<{ label: string; href?: string; to?: string }> = [
     { label: t("Why Genauly", "Vorteile"), href: "#plateau" },
@@ -400,6 +406,9 @@ export function LandingPage() {
     { label: t("Privacy", "Datenschutz"), to: "/privacy" },
     { label: t("Terms", "AGB"), to: "/terms" },
     { label: t("Sources & licenses", "Quellen & Lizenzen"), to: "/sources" },
+    // H3: the Impressum link only appears once the founder enables it in
+    // /admin/steuerung (real address filled). The route resolves regardless.
+    ...(impressumEnabled ? [{ label: "Impressum", to: "/impressum" }] : []),
   ];
 
   const primaryCta = (
@@ -471,7 +480,7 @@ export function LandingPage() {
             <span className="grid h-[22px] w-[22px] place-items-center rounded-full bg-accent/25">
               <GraduationCap className="h-3.5 w-3.5 text-accent-ink" />
             </span>
-            {t("German for real life", "Deutsch fürs echte Leben")}
+            {tOv(landingCfg.heroEyebrow, "German for real life", "Deutsch fürs echte Leben")}
           </span>
           <h1 className="mt-5 text-[clamp(2.5rem,5.4vw,4rem)] font-extrabold leading-[1.05] tracking-tight">
             {lang === "de" ? (

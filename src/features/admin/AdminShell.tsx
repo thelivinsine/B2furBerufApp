@@ -97,14 +97,13 @@ export function AdminShell() {
         {/* Sidebar — spacing mirrors the app's desktop Sidebar (256px column,
             p-4, 18px marks, px-3/gap-3 rows) so the two nav panels feel alike. */}
         <aside className="flex flex-col gap-1 border-b border-border bg-surface/70 p-4 md:border-b-0 md:border-r">
-          <div className="flex items-center gap-2.5 px-2 pb-4 pt-1">
-            <Logo className="h-7 w-7" variant="mark" />
-            <div className="leading-tight">
-              <div className="text-sm font-extrabold tracking-tight">genauly</div>
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                {t("Kontrollzentrum", "Control center")}
-              </div>
-            </div>
+          {/* Header block mirrors the app Sidebar: wordmark logo with a
+              subtitle below it and mb-4 of space before the nav. */}
+          <div className="mb-4 flex flex-col items-start gap-1.5 px-2 py-2">
+            <Logo variant="wordmark" className="h-7 w-auto" />
+            <p className="text-xs text-muted-foreground">
+              {t("Kontrollzentrum", "Control center")}
+            </p>
           </div>
 
           <nav className="grid grid-cols-4 gap-1 md:grid-cols-1">
@@ -120,8 +119,8 @@ export function AdminShell() {
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                       "md:justify-start justify-center",
                       isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
+                        ? "bg-border font-semibold text-foreground"
+                        : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
                     )
                   }
                 >

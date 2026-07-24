@@ -34,6 +34,7 @@
     "stamp:verified": "node scripts/stamp-verified-hashes.mjs",
     "apply:reviews": "node scripts/apply-reviews.mjs",
     "build:frequency": "node scripts/build-frequency.mjs",
+    "build:review-queue": "node scripts/build-review-queue.mjs",
     "review:queue": "node scripts/review-queue.mjs"
   },
   "dependencies": {

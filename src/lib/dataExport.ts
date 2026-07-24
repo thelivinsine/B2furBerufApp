@@ -78,4 +78,11 @@ export async function exportUserData() {
   const data = await buildExport();
   const date = new Date().toISOString().slice(0, 10);
   downloadJson(data, `genauly-export-${date}.json`);
+  // GDPR ops evidence (admin §G4): record that an export ran (aggregate count
+  // only, no content). Best-effort: a no-op until migration 0010 is live.
+  try {
+    await supabase.rpc("log_gdpr_event", { p_kind: "export" });
+  } catch {
+    /* best-effort */
+  }
 }

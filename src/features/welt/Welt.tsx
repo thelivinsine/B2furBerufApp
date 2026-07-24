@@ -33,7 +33,7 @@ export function Welt() {
 
   const exitMission = () => {
     setActive(null);
-    // Launched from Heute → Spielen: return there so the Lernen/Spielen toggle
+    // Launched from Heute → Spielen: return there so the Trainieren/Spielen toggle
     // is back on screen, instead of stranding the learner on the toggle-less
     // standalone /welt hub. Direct /welt visits just drop the mission param.
     if (params.get("from") === "heute") {

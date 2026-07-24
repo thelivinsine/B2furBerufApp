@@ -1,20 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 152, complete). **Fokus "Satzlabor" Wave 2: Konjunktiv II +
-Zustandspassiv** (from a grammar-dimensions brainstorm, `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`).
-The Fokus grammar rail now has three combinable axes: **Genus Verbi** (Aktiv · Passiv · Zustandspassiv),
-**Zeitform** (Präsens · Perfekt · Präteritum) and **Modus** (Indikativ · Konjunktiv II). `mood` was
-promoted from the pinned `DEFAULT_MOOD` to a real axis; Zustandspassiv is its own Genus-Verbi pill (a
-detected `passiv_zustand` maps straight to it; the copula-is-Aktiv safeguard stays in the check-sentence
-prompt). The rail is data-driven, so both were data/wiring adds across `grammarDimensions.ts` /
-`useFokusMachine.ts` / `GrammarRail.tsx` / `FokusTrainer.tsx`. The `transform-sentence` prompt gained
-Konjunktiv-II rules (synthetic wäre/hätte/könnte vs würde, never würde in the wenn-clause, K-II
-Vergangenheit) and Vorgang-vs-Zustand rules; **`PROMPT_VERSION` bumped 2 → 4** (cache invalidation). The
-green-dot legend was simplified to "Grüner Punkt = dein Satz." Operation-style transforms (Register
-Sie↔du, Satzbau HS↔NS) remain a later wave: they do NOT fit the voice/tense/mood tuple and need a new
-edge-function operation contract. **Founder action: redeploy `transform-sentence`** (now
-`PROMPT_VERSION=4`) so the improved K-II / Zustandspassiv output takes effect; the new pills already
-work against the live function without it. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 157). **Documentation maintenance pass.** Audit of the whole
+docs system (report-only prompt 1, fixes approved prompt 3): rotated the prompt log (s133-151 →
+the W29/W30 chunks under `docs/archive/prompt-log/`, live file back under budget), refreshed
+`docs/README.md` for the s155 `docs/areas/` restructure, fixed five stale CLAUDE.md section
+pointers in live docs, documented `check:contrast` (CI gate) + `check:refs` + the oracle-subset
+scripts in `docs/areas/COMMANDS.md` and the CLAUDE.md index, corrected the W30 status-archive
+index row (135-154), shrank this file's tail archive blob to a two-line pointer, and added a thin
+router `AGENTS.md` (no rules of its own; points other coding agents at CLAUDE.md → docs/areas/ →
+the skills). Prior s156: admin control center completed to plan (chunks 1-12); only Phase 3
+(13-16) remains, on demand. Founder action from s156 still open: run migration 0010 + redeploy
+`delete-account` (`PHASE2_SETUP.md` §5). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -26,7 +22,9 @@ This is the **lean, living** status doc: current state plus the two most recent 
 - **`docs/DECISIONS.md`** — the "why" behind locked UX decisions.
 - **`docs/archive/PROJECT_STATUS_ARCHIVE.md`** — index into the append-only session-log history,
   chunked by ISO week under `docs/archive/status-log/`.
-- **`../CLAUDE.md`** — developer/agent operating instructions, content conventions, and locked designs.
+- **`../CLAUDE.md`** — the lean always-on operating rules (restructured s155, ~180 lines); deep
+  per-area detail lives in **`docs/areas/`** (COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN,
+  PRAKTISCH-NAV, GAME, BRAND, LEGAL-ADMIN, COMPONENTS) + the `/design` and `/content` skills.
 
 **Doc-hygiene rule (keep this file lean):** hold only **current state + the two most recent
 handoffs**. When you append a new handoff to `## Resume here`, move any handoff older than the two
@@ -38,11 +36,12 @@ lines. Stable "what's built" material goes to `PROJECT_FOUNDATION.md`, not here.
 ## Where things stand
 
 The full SPA is live on `main`: onboarding, dashboard, the composed session loop, the four-zone nav
-(Heute · Bibliothek · Anwenden · Fortschritt), the Neuland game layer (`/welt`, Kapitel 1 complete),
-Supabase auth + cloud sync, and the AI writing coach. **The shipped architecture, locked
+(Praktisch · Bibliothek · Schreiben · Fortschritt), the Neuland game layer (`/welt`, Kapitel 1
+complete), Supabase auth + cloud sync, and the AI writing coach. **The shipped architecture, locked
 architectural decisions, and backend/infra setup are documented in `docs/PROJECT_FOUNDATION.md`** —
 read that for the "what's built and how." The living detail of every feature area (mobile bar, the
-session engine, Bibliothek views, the game layer, content conventions) is in `../CLAUDE.md`.
+session engine, Bibliothek views, the game layer, content conventions) is in `docs/areas/` (index
+in `../CLAUDE.md`).
 
 **Content banks (as of 2026-07-21, session 142, verified against `pnpm lint:content` — re-verify
 before quoting):** vocab **1,623** (8 mis-filed noun+verb combos retired from the Wörter surface
@@ -60,7 +59,9 @@ see `strategy/DATA_GOVERNANCE.md`).
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. The s147 Satzlabor redeploy is
 done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMINI_API_KEY` set). Still open:
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
-- [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
+- [x] ~~Enable Turnstile CAPTCHA on guest sign-in.~~ **DONE 2026-07-24** (live sign-in verified; both
+      Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
+      `PROJECT_FOUNDATION.md`.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
@@ -73,109 +74,57 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 152 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
-branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
-grammar-dimensions brainstorm (four research agents) → `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`
-(full dimension catalog, feasibility tiers, B2-marker ranking, guardrails, Now/Next/Later/Skip roadmap)
-+ two previews (`preview/grammar-dimensions-satzlabor.html`, `-catalog.html`) + a combined claude.ai
-artifact (daa4dbb6). Then built the "easy half":
-- **Konjunktiv II** as a new **Modus** rail axis. `mood` promoted from the pinned `DEFAULT_MOOD` to a
-  real, combinable axis: `grammarDimensions.ts` (AxisId + Modus values Indikativ/Konjunktiv II;
-  `normalizeDetected` takes/returns `mood`, konjunktiv1/imperativ → null), `useFokusMachine.ts`
-  (selection/detected/cache-key/target/base all carry mood), `GrammarRail.tsx` + `FokusTrainer.tsx`
-  (detected prop, transform label, loading pill, reset). Rail is data-driven so the Modus section
-  renders itself.
-- **Zustandspassiv** as a third Genus-Verbi pill (data-only value add). Because `KNOWN.voice` derives
-  from the axis, a detected `passiv_zustand` now maps to its own pill instead of `null`; this also
-  fixed a phantom "Aktiv looks selected" quirk on a real Zustandspassiv sentence. The copula safeguard
-  (misread "Ich bin krank" → aktiv) lives in the check-sentence prompt, unchanged.
-- **Edge function.** `transform-sentence` prompt gained K-II formation rules + a Vorgang-vs-Zustand
-  clarifier + two worked examples; `PROMPT_VERSION` 2 → 4 (global-cache invalidation). **The founder
-  must redeploy `transform-sentence`** for the better output; the pills already work against the live
-  function (its enums already accept konjunktiv2 / passiv_zustand as targets).
-- **Copy.** Rail legend simplified to "Grüner Punkt = dein Satz." / "Tippe eine andere Form, um ihn
-  umzuwandeln." (`GrammarRail.tsx`).
-- **Held for later (operation-style, NOT the tuple → needs a new edge-function contract):** Register
-  (Sie↔du), Satzbau (HS↔NS), Nominalstil, Relativ↔Partizip. Plusquamperfekt deferred (needs a
-  temporal-anchor guardrail). See the brainstorm doc §6.1 roadmap.
-- **Gates:** typecheck ✓ · test:unit **262/262** · lint 0 errors · build ✓ · check:bundle **112 kB** ·
-  lint:content ✓. Edge function is Deno (not deployed from the sandbox).
+**Handoff after session 156 (2026-07-24). Admin chunk 11 (Turnstile) completion + chunk 12
+(compliance pack), branch `claude/admin-page-access-ok8g52`.** Continued the admin control center to
+the end of its plan. Two parts:
+- **Chunk 11 · Turnstile (PRs #669/#670).** Most of chunk 11 already existed (the widget +
+  auth-store `captchaToken` integration + the feedback burst/hourly email caps). Diagnosed a
+  half-configured state: CAPTCHA was on in Supabase Auth but the `VITE_TURNSTILE_SITE_KEY` GitHub
+  secret was unset, so the client sent no token and Supabase rejected guest/email sign-in (Google/OAuth
+  is not captcha-gated, which masked it). Founder set the GitHub secret; a fresh deploy made it live;
+  founder verified live sign-in. Code: the `AdminSystem` "Gast-Konten" tile now reads the real
+  `TURNSTILE_ENABLED` flag (was a hardcoded "still off (chunk 11)" label) and the Launch note states
+  both sides are required. Docs: Turnstile marked done in `PROJECT_FOUNDATION.md` completed-setup.
+- **Chunk 12 · Compliance pack (PR #672).** §G2 consent-drift gate: one canonical legal date in
+  `src/lib/legalMeta.ts` (rendered by PrivacyPolicy, compared to `CONSENT_VERSION`); `consentInSync()`
+  + `tests/consent.test.ts` fail CI on drift; the Launch screen shows a red warning instead of the old
+  static note. §G3 auditor export: `src/lib/auditExport.ts` builds the provenance register CSV + a
+  Markdown summary (tiers, review status, licences, verification links, sampling guide) behind one
+  Launch button; reuses `csv.ts` (+ `downloadText`); no new eager weight; pinned by
+  `tests/auditExport.test.ts`. §G4 GDPR ops evidence: **migration 0010** adds a content-free
+  `gdpr_events` table (kind + timestamp, no user id) + `log_gdpr_event()` + founder-only
+  `admin_gdpr_evidence()` RPC (counts + last timestamps + pg_cron retention probe); `delete-account`
+  logs erasures, `exportUserData` logs exports; the Launch panel shows counters, fail-soft to
+  "run migration 0010".
+- **Founder action (chunk 12 §G4 only):** run `supabase/migrations/0010_gdpr_evidence.sql` +
+  `supabase functions deploy delete-account` (`PHASE2_SETUP.md` §5). G2/G3 work without it.
+- **Admin center status:** chunks **1-12 done** (whole MVP + Phase 2). Only Phase 3 (13-16) remains,
+  on demand. Gates for chunk 12: typecheck · build · check:bundle 116.8 kB · lint 0 errors ·
+  test:unit **289/289**.
 
-**Handoff after session 151 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
-rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
-wrong, self-contradictory German feedback.
-- **Bug.** For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv copula, sein + adjective) the
-  panel marked **Passiv** as the detected form, then refused Perfekt/Präteritum with "Der Satz steht
-  schon in dieser Form" (Präsens treated as already past) and refused a passive it simultaneously
-  claimed the sentence already was. Root cause: the cheap Haiku detector misread "sein + Adjektiv" as
-  a Zustandspassiv, which `normalizeDetected` then collapsed onto the Vorgangspassiv pill.
-- **Fix (server prompts).** `check-sentence`: explicit rule that sein/werden/bleiben + adjective/adverb
-  is always Aktiv, only + Partizip II of a transitive verb is passive; worked examples; strict
-  JSON-only. `transform-sentence`: `bereits_zielform` only when BOTH voice AND tense already match (a
-  tense change is a real transform); same copula rule. `evaluate-writing`: JSON-only hardening.
-- **Fix (client).** `grammarDimensions.ts` `normalizeDetected` no longer maps a detected
-  `passiv_zustand` onto the Passiv pill; it returns null (no marker), so a misdetected copula can never
-  surface a wrong Passiv dot. `tests/fokusGrammar.test.ts` updated to lock this in.
-- **Provider cascade (all 3 AI functions).** Founder wanted Gemini primary everywhere + a combined
-  budget. `check-sentence`/`transform-sentence`/`evaluate-writing` each now run **Gemini 2.5 Flash
-  (free, recorded $0) → Claude Sonnet 5 → GPT-5**: Sonnet leads the paid backup until month-to-date
-  Claude spend across **both** `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD`
-  ($2), then GPT-5 leads. The existing global `MONTHLY_SPEND_CAP_USD` ($5, shared via `ai_usage`)
-  bounds all three combined. Anthropic calls drop `temperature` + disable thinking (Sonnet 5 family);
-  Gemini forces JSON output + a generous token budget; GPT-5 uses `max_completion_tokens` +
-  `reasoning_effort: minimal`. Every model id + the $2 threshold are env-overridable (`GEMINI_MODEL`,
-  `CHECK_MODEL`/`TRANSFORM_MODEL`/`EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`). Caches
-  invalidated so stale wrong answers are not re-served (check-sentence `CHECK_VERSION` salt,
-  transform-sentence `PROMPT_VERSION` bump).
-- **Transparency.** The two EU AI Act Art. 50 disclaimers (Satzlabor + writing coach) and the privacy
-  policy (DE + EN) now name all three providers routing-neutrally. Judged non-material (processors +
-  purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
-- **Fokus disclaimer consolidation (follow-up, same session).** The Fokus view's two AI notes (the
-  send-to-AI line + the "KI-generierte Umformung" footer inside the transform box) were merged into
-  ONE harmonized, centered note ("Dein Satz wird von einer KI … geprüft und umgeformt"), moved to the
-  bottom of the content column (desktop: `min-h` column + `mt-auto` so it lands on the same horizontal
-  line as the fixed "Mit KI gebaut · Feedback" pill). The `12rem` bottom offset is a tunable nudge.
-- **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
-- **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
-  `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →
-  `{ ok: false }`). Watch the function logs on the first Gemini-primary calls.
-- **Caveat carried forward:** Gemini Flash primary is the same cheap tier that caused the original bug;
-  the hardened prompt carries it and Sonnet backstops, but if wrong grammar reappears, flip the primary
-  back via `GEMINI_MODEL` (one env var, no code change).
+**Handoff after session 157 (2026-07-24). Documentation maintenance audit + fixes + AGENTS.md,
+branch `claude/docs-maintenance-audit-8pbhx3`.** Read-only audit first (report delivered, verdict:
+healthy, the s155 restructure is holding), then the approved fix pass:
+- **Prompt-log rotation:** s133-134 → the W29 chunk, s135-151 → a new
+  `archive/prompt-log/SESSION_PROMPT_LOG_2026-W30.md`; live log now holds s152+ (~300 lines vs the
+  ~1,200-line budget); index rows updated in `archive/prompt-log/README.md`.
+- **`docs/README.md`:** added the `areas/` folder + 10-row catalog and the `/design`+`/content`
+  skills note (all missing since the s155 restructure), rewrote the CLAUDE.md row, added an
+  AGENTS.md row, refreshed the two archive rows.
+- **Stale pointers fixed (5):** `PROJECT_FOUNDATION.md` + `PROJECT_REFERENCE.md` ×2 +
+  `DECISIONS.md` ×2 now point at `docs/areas/{BRAND,PRAKTISCH-NAV,BIBLIOTHEK,SCHREIBEN}.md` instead
+  of CLAUDE.md sections that moved in s155.
+- **Command docs:** `check:contrast` (a `validate.yml` CI gate) documented in
+  `docs/areas/COMMANDS.md` + added to the CLAUDE.md CI-gates index; `check:refs` and the
+  `build:dict-subset`/`build:nouns-subset` internals of `build:oracles` documented too.
+- **Archive index:** the W30 row in `archive/PROJECT_STATUS_ARCHIVE.md` corrected to sessions
+  135-154 (the chunk was verified complete; only the index row was stale).
+- **New `AGENTS.md` (repo root):** a thin router with no rules of its own (CLAUDE.md →
+  `docs/areas/` → the skills), so any future non-Claude coding tool lands on the same law.
+  Deliberately NOT comprehensive: a second rulebook would drift against CLAUDE.md.
+- **Next:** nothing pending from this session. The standing doc jobs continue as usual: rotate the
+  prompt log past ~1,200 lines, keep two handoffs here, bump `docs/README.md` when the folder
+  shape changes.
 
-_(Session 150's Fokus correction-card redesign + Umlaut-keys handoff (PRs #653/#654), session 149's
-Schreiben-as-Bibliothek-extension handoff (the 4-segment mode switcher + writing-prompt pools, branch
-`claude/schreiben-design-refinement-bw8rhh`), session 148's PWA-auth-uninstall bug-fix handoff
-(fresh-device OAuth `syncHydrated` gate, PR #644),
-session 147's Schreibtraining-redesign handoff (Fokus Satzlabor + the Schreiben nav item + the first
-Bibliothek harmonization, PRs #640/#642/#643/#646), session 146's /sources verification-refresh +
-human-review-reset + table-restructure handoff, and
-session 145's Admin Control Center chunk 3 handoff (the `/admin` shell + Übersicht cockpit,
-`RequireFounder` gate, PR merged) are now in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 144's Admin Control Center chunks 1 + 2 handoff (backend foundation migration 0008 + the
-`apply:reviews` keyless review loop-closer, PRs #631–#633), session 143's Admin Control Center scoping
-handoff (the expert-panel report + build plan + 4 mockup screens, PR #626), session 142's Wörter quality-control handoff (the
-`RETIRED_VOCAB_IDS`/`browsableVocabulary` retire-from-surface set + the vocab↔collocation overlap
-lint gate, PR #624), session 141's
-mobile-nav-item-labels handoff (labels under the active icon + the
-Theorie→Bibliothek revert, PR #622), session 140's light-theme recolor handoff (neutral grey chrome + the "I1" mint→sky gradient
-ground, 2 PRs + a 3-round preview picker), session 139's three-small-fixes handoff (icon-size
-preview correction, mission-exit toggle fix, Kollokationen graph tighter clusters), session 138's
-logo-v2 rework handoff, session 137's branding-refresh review + premium pass (fixes 1-7 + items 8-10) handoff, session 136's landing-page-redesign handoff and session 135's game demo-readiness review + P0/P1 batch handoff are now in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md`. Session 134's Theorie (Wörter) card + mobile-filter polish handoff, session 133's brand-kit-modernization handoff (plan + all 4 PRs + the consolidated brand-kit/ + the tile-less logo), session 132's Bibliothek mobile-filter bug-fixes + graph two-area color/layout handoff, session 131's Üben exercise-variety plan + full-build handoff, session 130's data-architecture-review handoff (P0/P1 integrity fixes + the /sources redesign with the admin Daten-Werkbank) and session 129's Artikel-Visuals full-ship handoff (all 3 PRs: tokens/Wesen marks/effects, the
-fused-doodle registry + batch 1, and the session/graph/flashcard reuse) is now in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 128's gender-visuals research-panel + Artikel-Visuals implementation-plan handoff, session 127's brand-kit-catalogue handoff (Vol. IV–VII; the founder **finalized** Kit 1 · Nachtblau & Himmelblau + Koralle, locked spec at `docs/branding/BRAND_SPEC.md`, artifacts saved under `preview/branding/artifacts/`, NOT implemented — wire only on request; see the W29 archive), session 126's daily-life content scale-up handoff (Phase A + B), session 125's Theorie graph word-selection distribution + focus polish handoff, session 124's Kollokationen Karten card text-cutoff + speak-button alignment fix handoff,
-session 123's Theorie graph-view P2/P3 batch handoff, session 122's Theorie graph-view quality audit
-+ P0/P1 fixes handoff, session 121's
-arbeitswelt→beruf domain-merge handoff, session 120's content-coverage-deepening
-handoff, session 119's account-dropdown z-index-fix handoff, session 118's Kollokationen-nodal-graph
-handoff, session 117's Üben-navigation + Üben-button-copy handoff, session 116's branding-redesign-support
-handoff (Cobalt & Butter previews + the AI mockup guide) and session 115's demo-readiness-sweep handoff
-are now in `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md`. Session 113's brand-identity-exploration
-handoff (the 20-direction catalogue) is also in W29. Session 114's Theorie pill-animation +
-dark-mode contrast handoff, session 113's Theorie tab-transition/compass/feedback-pill polish handoff,
-session 112's Demo-readiness Chunks 2+3 handoff, its P2 content-accuracy handoff, session 111's handoff
-(demo-readiness plan authored + baseline verified) and sessions 85-110's handoffs, plus the s104
-Üben-map round + Bibliothek pre-demo round, are in
-`docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W28.md`. The shipped-architecture, locked-decisions,
-and completed-setup sections that used to live here moved to `docs/PROJECT_FOUNDATION.md` in s95.)_
+_(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
+mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

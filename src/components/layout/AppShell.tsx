@@ -7,6 +7,7 @@ import { BottomTabBar } from "./BottomTabBar";
 import { GlobalSearch } from "./GlobalSearch";
 import { FeedbackDialog, FeedbackPill } from "./FeedbackButton";
 import { useEffectiveStreak } from "@/store/useProgressStore";
+import { useAppConfigStore } from "@/lib/appConfig";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { useSessionStore } from "@/store/useSessionStore";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -41,6 +42,7 @@ export function AppShell() {
   // Effective streak (0 once broken) so the header never disagrees with the
   // dashboard after a missed day.
   const streak = useEffectiveStreak();
+  const streakPillOn = useAppConfigStore((s) => s.config.header.streakPill);
 
   // Greeting only in the desktop top row (the XP line was removed, founder
   // 2026-07-13). Hour-based greeting keeps the header personal.
@@ -146,17 +148,20 @@ export function AppShell() {
                   (no duplicated goal gauge). Koralle since the s133 rebrand:
                   streak/celebration rides the reward tokens, warning stays a
                   semantic state color. */}
-              <div
-                className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-reward-bg px-3"
-                role="img"
-                aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
-              >
-                <Flame className={cn("h-4 w-4 text-reward", streak > 0 && "fill-reward/30")} />
-                <span className="text-sm font-bold tabular-nums text-reward">{streak}</span>
-                <span className="text-xs font-medium text-muted-foreground">
-                  {streak === 1 ? "Tag" : "Tage"}
-                </span>
-              </div>
+              {/* Steuerung H7: the streak pill can be hidden from remote config. */}
+              {streakPillOn && (
+                <div
+                  className="flex h-9 shrink-0 items-center gap-1.5 rounded-full bg-reward-bg px-3"
+                  role="img"
+                  aria-label={`Serie: ${streak} ${streak === 1 ? "Tag" : "Tage"}`}
+                >
+                  <Flame className={cn("h-4 w-4 text-reward", streak > 0 && "fill-reward/30")} />
+                  <span className="text-sm font-bold tabular-nums text-reward">{streak}</span>
+                  <span className="text-xs font-medium text-muted-foreground">
+                    {streak === 1 ? "Tag" : "Tage"}
+                  </span>
+                </div>
+              )}
               <AccountMenu />
             </div>
           </div>

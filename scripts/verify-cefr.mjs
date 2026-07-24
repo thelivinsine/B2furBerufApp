@@ -27,6 +27,7 @@
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
+import { writeReportSidecar } from "./report-sidecar.mjs";
 import { createServer } from "vite";
 import { headToken } from "./build-frequency-subset.mjs";
 
@@ -299,6 +300,13 @@ async function main() {
 
   await mkdir(path.dirname(REPORT), { recursive: true });
   await writeFile(REPORT, L.join("\n"), "utf8");
+  await writeReportSidecar(REPORT, {
+    registerRows: vocab.length,
+    scope: "vocab",
+    scored,
+    flag: flag.length,
+    watch: watch.length,
+  });
 
   console.log("");
   console.log(`Vocabulary scored by frequency: ${scored}/${vocab.length}   unmeasurable: ${unmeasured.length}`);

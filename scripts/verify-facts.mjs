@@ -38,6 +38,7 @@
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
+import { writeReportSidecar } from "./report-sidecar.mjs";
 import { createServer } from "vite";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -294,6 +295,13 @@ async function main() {
 
   await mkdir(path.dirname(REPORT), { recursive: true });
   await writeFile(REPORT, lines.join("\n"), "utf8");
+  await writeReportSidecar(REPORT, {
+    registerRows: nouns.length,
+    scope: "nouns",
+    covered: coveredCount,
+    gate: gate.length,
+    review: review.length,
+  });
 
   // Console summary.
   console.log("");

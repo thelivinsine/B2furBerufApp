@@ -21,6 +21,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { mkdir, writeFile } from "node:fs/promises";
 import { createServer } from "vite";
+import { writeReportSidecar } from "./report-sidecar.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REPORT = path.join(root, "docs", "reports", "review-queue.md");
@@ -214,6 +215,7 @@ async function main() {
 
   await mkdir(path.dirname(REPORT), { recursive: true });
   await writeFile(REPORT, L.join("\n"), "utf8");
+  await writeReportSidecar(REPORT, { registerRows: total, verified, draft });
   console.log(`\nReport written to ${path.relative(root, REPORT)}`);
 }
 

@@ -5,6 +5,7 @@ import { navItems } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { Logo } from "@/components/shared/Logo";
+import { useAppConfig } from "@/lib/appConfig";
 
 export function Sidebar({
   onNavigate,
@@ -14,6 +15,10 @@ export function Sidebar({
   /** Opens the global search dialog (UX overhaul Phase 2, Tier 1). */
   onSearch?: () => void;
 }) {
+  // Steuerung H1/H2: remote nav-label overrides + middle-tab hiding (routes
+  // stay mounted; Home "/" and Einstellungen "/settings" are never hideable).
+  const { navLabels, hiddenTabs } = useAppConfig();
+  const shownNav = navItems.filter((i) => !hiddenTabs.includes(i.to));
   return (
     <div className="flex h-full flex-col gap-1 p-4">
       <Link
@@ -40,7 +45,7 @@ export function Sidebar({
       )}
 
       <nav className="flex flex-col gap-0.5">
-        {navItems.map(({ to, label, end }) => (
+        {shownNav.map(({ to, label, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -61,7 +66,7 @@ export function Sidebar({
                     (full opacity everywhere; the active row is marked by its grey
                     gradient + bold text). */}
                 <RouteIcon path={to} size={18} active={isActive} />
-                {label}
+                {navLabels[to] ?? label}
               </>
             )}
           </NavLink>

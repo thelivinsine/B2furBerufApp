@@ -3,6 +3,101 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 154 (2026-07-24). App-wide contrast + squircle pass, branch
+`claude/admin-page-access-ok8g52`, PR #665 merged.** Founder: the admin center (and the app generally)
+had too little contrast between cards and background AND between buttons and cards, in BOTH themes, and
+the page toggles / filter pills were too round. Worked previews-first: `preview/contrast-squircle-review.html`
+(interactive, published as a claude.ai artifact) offered three contrast options × light/dark × a
+pill-vs-squircle toggle, over faithful Wörter + Satzlabor mockups. Founder picked **light = Option B,
+dark = Option C, squircle yes**.
+- **Dark = Option C (`src/index.css`):** the flat `24%/10%` ground left `--surface` only 4% above the
+  background. Now a deep-blue ground (`--background`/`--page-*` = `226 44% 6%`) carries brighter, bluer
+  cards (`--surface 224 26% 18%`, was `228 20% 14%`) → a **12% surface↔bg gap**, plus an accent-tinted
+  brighter border (`216 28% 36%`), lifted `--muted`/`--muted-foreground`/`--input`, and a brighter
+  primary/ring (`219 96% 76%`). Foreground-on-surface went 10:1 → **12.6:1**.
+- **Light = Option B:** the card lift is carried by a stronger shared `shadow-soft`
+  (`tailwind.config.ts`; `--shadow` is near-black + low-opacity in dark, so it is a light-only effect),
+  plus slightly deeper `--muted`/`--border` (`88%/84%`) for switcher/pill definition. **The s140-locked
+  mint→sky ground and the `--background` contrast-gate anchor were deliberately left unchanged**, so
+  `check-contrast.mjs` stays honest. (If the founder wants white cards to pop more, deepen `--page-*`
+  next — noted, not done.)
+- **Squircle (`rounded-full`→`rounded-lg` track / `rounded-md` pill):** `LibrarySwitcher` +
+  `WritingModeSwitcher` page toggles, the Fokus Original/Korrigiert toggle (`FokusTrainer.tsx`),
+  `FilterRail` facet pills, `GrammarRail` form pills. Because these are shared, every Bibliothek tab +
+  all of Schreiben change at once. Left round on purpose: status dots, meters, count badges, avatars,
+  circular icon buttons, and the marketing landing page.
+- **Gates:** `check:contrast` (all 40+ pairings re-pass) · `build` · `check:bundle` 116.5 kB · `lint`
+  0 errors · `test:unit` **284/284**. No live screenshot (onboarding/auth gate makes headless capture
+  unreliable; sandbox can't reach the deployed site) — founder confirms live (hard-refresh, PWA-cached).
+
+**Handoff after session 152 (2026-07-23). Admin control-center nav aligned to the app sidebar, branch
+`claude/admin-page-access-ok8g52`, PRs #656 + #660 merged.** Founder asked how admins reach `/admin`
+(answer: the "Kontrollzentrum" entry in the account-menu dropdown, gated on `FOUNDER_EMAILS` in
+`src/lib/admin.ts`; also `/sources/werkbank`), then flagged the `/admin` sidebar as cramped and
+not matching the app's desktop `Sidebar`.
+- **All changes in `src/features/admin/AdminShell.tsx`, spacing/appearance only (no behaviour):**
+  - **PR #656:** sidebar column 224px→**256px** (= app `w-64`), panel padding `p-3`→`p-4`, nav marks
+    `h-4 w-4`→**18px**, rows `px-2.5`/`gap-2.5`→**`px-3`/`gap-3`**.
+  - **PR #660:** active row now the app's **grey `bg-border` pill + bold `text-foreground`** (was a
+    blue `bg-primary/10 text-primary` tint), inactive rows **`text-foreground/80`** (was faint
+    `text-muted-foreground`); header block rebuilt to the app pattern — **wordmark `Logo` `h-7 w-auto`
+    with a `text-xs` subtitle below + `mb-4`** (was a small square mark beside stacked "genauly /
+    CONTROL CENTER" text).
+- **Deliberate remaining difference:** admin nav keeps monochrome lucide icons (the app's colorful
+  branded `RouteIcon` marks don't map to admin sections); flagged to founder, not changed.
+- **Gates:** `pnpm build` ✓ both times. Sandbox can't reach the live site; `/admin` is PWA-cached, so
+  a hard refresh is needed after the Pages deploy. The Übersicht "Is my change live?" widget showed
+  "Latest main not reachable" (GitHub API offline/rate-limited in that render) — cosmetic, unrelated.
+
+**Handoff after session 151 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
+rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
+wrong, self-contradictory German feedback.
+- **Bug.** For "Ich bin krank wegen Kälte und Husten" (a plain Aktiv copula, sein + adjective) the
+  panel marked **Passiv** as the detected form, then refused Perfekt/Präteritum with "Der Satz steht
+  schon in dieser Form" (Präsens treated as already past) and refused a passive it simultaneously
+  claimed the sentence already was. Root cause: the cheap Haiku detector misread "sein + Adjektiv" as
+  a Zustandspassiv, which `normalizeDetected` then collapsed onto the Vorgangspassiv pill.
+- **Fix (server prompts).** `check-sentence`: explicit rule that sein/werden/bleiben + adjective/adverb
+  is always Aktiv, only + Partizip II of a transitive verb is passive; worked examples; strict
+  JSON-only. `transform-sentence`: `bereits_zielform` only when BOTH voice AND tense already match (a
+  tense change is a real transform); same copula rule. `evaluate-writing`: JSON-only hardening.
+- **Fix (client).** `grammarDimensions.ts` `normalizeDetected` no longer maps a detected
+  `passiv_zustand` onto the Passiv pill; it returns null (no marker), so a misdetected copula can never
+  surface a wrong Passiv dot. `tests/fokusGrammar.test.ts` updated to lock this in.
+- **Provider cascade (all 3 AI functions).** Founder wanted Gemini primary everywhere + a combined
+  budget. `check-sentence`/`transform-sentence`/`evaluate-writing` each now run **Gemini 2.5 Flash
+  (free, recorded $0) → Claude Sonnet 5 → GPT-5**: Sonnet leads the paid backup until month-to-date
+  Claude spend across **both** `sentence_ai_ops` + `writing_evaluations` reaches `CLAUDE_BUDGET_USD`
+  ($2), then GPT-5 leads. The existing global `MONTHLY_SPEND_CAP_USD` ($5, shared via `ai_usage`)
+  bounds all three combined. Anthropic calls drop `temperature` + disable thinking (Sonnet 5 family);
+  Gemini forces JSON output + a generous token budget; GPT-5 uses `max_completion_tokens` +
+  `reasoning_effort: minimal`. Every model id + the $2 threshold are env-overridable (`GEMINI_MODEL`,
+  `CHECK_MODEL`/`TRANSFORM_MODEL`/`EVAL_MODEL`, `OPENAI_MODEL`, `CLAUDE_BUDGET_USD`). Caches
+  invalidated so stale wrong answers are not re-served (check-sentence `CHECK_VERSION` salt,
+  transform-sentence `PROMPT_VERSION` bump).
+- **Transparency.** The two EU AI Act Art. 50 disclaimers (Satzlabor + writing coach) and the privacy
+  policy (DE + EN) now name all three providers routing-neutrally. Judged non-material (processors +
+  purpose unchanged, all already disclosed): `CONSENT_VERSION` NOT bumped, so no forced re-consent.
+- **Fokus disclaimer consolidation (follow-up, same session).** The Fokus view's two AI notes (the
+  send-to-AI line + the "KI-generierte Umformung" footer inside the transform box) were merged into
+  ONE harmonized, centered note ("Dein Satz wird von einer KI … geprüft und umgeformt") in normal
+  flow under the content. (A first pass pinned it to the bottom via `min-h` + `mt-auto` to line up
+  with the "Mit KI gebaut · Feedback" pill; the founder found that detached band ugly, so it was
+  reverted to a plain centered note.)
+- **Mobile Grammatik button fix (follow-up).** On mobile the Grammatik toggle was `disabled` until a
+  correction existed, so tapping it pre-correction did nothing and it read as broken. Removed the
+  `disabled`: it now always opens the panel, which shows the GrammarRail's "Prüf zuerst deinen Satz …"
+  hint (disabled pills) before a correction, matching the always-visible desktop rail. The session's
+  disclaimer changes were already shared (`aiNote`/`bottomBox` render in both the mobile and desktop
+  blocks), so no separate mobile adaptation was needed. **Founder confirmed the mobile fix works live.**
+- **Founder ops (done):** deployed all three functions, set `GEMINI_API_KEY` (primary) + provider keys.
+- **Gates:** typecheck ✓ · test:unit **260/260** · build ✓. Edge functions are Deno (no local
+  `deno check`/keys in the sandbox); every path is fail-safe (any provider → null → fall through →
+  `{ ok: false }`). Watch the function logs on the first Gemini-primary calls.
+- **Caveat carried forward:** Gemini Flash primary is the same cheap tier that caused the original bug;
+  the hardened prompt carries it and Sonnet backstops, but if wrong grammar reappears, flip the primary
+  back via `GEMINI_MODEL` (one env var, no code change).
+
 **Handoff after session 150 (2026-07-23). Fokus correction-card redesign + Umlaut keys, branch
 `claude/diagonal-gradient-invert-odi99r`, PRs #653 + #654 merged.** Founder started from "invert the
 background gradient diagonally" (PR #653: `tailwind.config.ts` `mesh`/`page` accent radial moved
@@ -623,3 +718,78 @@ What shipped:
   2 axes (Zustandspassiv, Konjunktiv II, Sie↔du, clause order) + the ~50-triple eval harness; (4) optional:
   AI-authored per-change *explanations* in the correction tip (needs a backend field + redeploy). Fokus
   is single-sentence by design.
+
+## Session 153 (2026-07-23) — Admin Control Center chunks 4-10 + landing Help back-button fix (moved from PROJECT_STATUS.md in s155)
+
+**Handoff after session 153 (2026-07-23). Admin Control Center chunks 4-10 + a landing Help
+back-button fix, branch `claude/landing-back-button-routing-jyhwot` (merged to `main`).** The founder
+asked to "continue with the admin control center build plan next chunk and work until chunk 10", so all
+seven remaining MVP + early-Phase-2 chunks of `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` shipped
+in one sitting, each its own commit passing the full gate set (typecheck · lint 0-errors · test:unit ·
+build · check:bundle · lint:content).
+- **Landing fix (first):** `HelpChrome` (`/hilfe` + `/hilfe/:slug`) had its Back button hardcoded to
+  `navigate("/hilfe")`, so on the hub itself (where the landing's Help link lands) Back looped to the
+  same page. Now uses the history-aware `handleBack` (navigate(-1), fallback `/welcome`) that
+  `LegalChrome` already uses; the article breadcrumb still links to the hub explicitly.
+- **Chunk 4 · Review Cockpit (`/admin/pruefen`):** `scripts/review-score.mjs` (pure A2 scoring
+  defect_signal > traffic_proxy > (1-confidence) > bank_criticality) + `pnpm build:review-queue` →
+  compact `reviewQueue.json`; `Pruefmodus.tsx` (filterable queue + keyboard review V/X/N/→/←, item
+  rendered as the learner sees it, machine-check panel, autosave to `provenance_reviews` with a
+  decision-time hash, 50-approvals rubber-stamp nudge). `tests/reviewScore.test.ts`.
+- **Chunk 5 · Feedback-Inbox:** `AdminFeedback.tsx` (triage status/priority/note/link via
+  `admin_feedback_update`, emailed indicator, optimistic writes).
+- **Chunk 6 · System + Launch:** `AdminSystem.tsx` (CI gate strip, Supabase/Edge pings, AI/Resend/guest
+  meters, idle-pause warning, dashboard deep links) + `AdminLaunch.tsx` (checklist in `launch_checklist`,
+  consent-version row) + `systemHealth.ts`.
+- **Chunk 7 · Steuerung core:** `src/lib/appConfig.ts` (typed remote config + defensive `mergeAppConfig`
+  + zustand store loaded once in `App.tsx`). **Empty/unreachable config == today's behavior byte-for-byte,
+  pinned by `tests/appConfig.test.ts`.** Consumers read `config.X ?? current-default`: H1 nav labels
+  (BottomTabBar/Sidebar), H2 middle-tab hide (routes stay mounted, Home/Einstellungen locked), H4 flags,
+  H5 feedback pill, H6 Beta chip, H8 dashboard start tab. `AdminSteuerung.tsx` panel with live preview.
+- **Chunk 8 · report sidecars:** `scripts/report-sidecar.mjs` into verify-facts/verify-cefr/review-queue/
+  exercise-coverage; `reportStaleness.ts` + Übersicht staleness strip.
+- **Chunk 9 · Inhalte:** `AdminInhalte.tsx` (F1 depth matrix, F2 flag triage → Prüfmodus, F3
+  exercise-coverage residual "Copy ids" work orders; coverage sidecar enriched with residual ids).
+- **Chunk 10 · Steuerung wave 2:** H3 Impressum (route always mounted + lazy, links gated behind a
+  confirm dialog), H7 streak pill, H10 landing copy overrides, H12 Demo-Modus preset.
+- **Merge note:** main had advanced through s147-152 while this branch was in flight; merged main in and
+  reconciled the overlapping locked surfaces (nav-items/BottomTabBar/Sidebar from the Schreibtraining
+  nav promotion #642, AppShell header, AdminShell/Overview from the #656/#660 admin-nav alignment,
+  router.tsx `/sources/werkbank` + `/impressum`). Regenerated the report sidecars against merged main.
+- **Next:** chunk 11 (Turnstile + abuse meters, founder does the Cloudflare/Supabase dashboard half),
+  then chunk 12 (compliance pack). No new founder DB step for chunks 4-10 (migration 0008 already live).
+
+**Handoff after session 155 (2026-07-24). Design-preferences distillation → the `design` skill,
+branch `claude/design-prefs-documentation-e1xmlc`.** The founder asked whether the recurring
+bad-first-draft problem on new pages/sections is better fixed by a skill or by CLAUDE.md
+preferences. Answer delivered: **both, in a hybrid** (CLAUDE.md is always-loaded and already ~1,070
+lines, so detail there dilutes attention and costs tokens every session; a skill loads on demand but
+triggers probabilistically, so it needs an always-on anchor).
+- **New: `.claude/skills/design/SKILL.md`** (the `/design` skill), distilled by two research
+  subagents from `SESSION_PROMPT_LOG.md` s133-154 + `DECISIONS.md` + `PROJECT_REFERENCE.md`:
+  Rule zero (extend the system, Bibliothek is the reference language) · the 8-step process
+  (report-first, previews-first with 2-4 named variants on real tokens, screenshot-verify,
+  implement the exact pick, absorb every numbered feedback point, plain-language summaries) ·
+  a pre-flight checklist ranked by actual rework frequency (1 redundancy, 2 wrong colors, 3
+  oversizing, 4 dead controls, 5 corners, 6 placement, 7 motion) · the locked color language ·
+  reusable building blocks · per-section anchors (Bibliothek/Schreiben/Praktisch; Verlauf marked
+  as slated-for-rework, not reference) · the shipped-then-reverted landmine list.
+- **CLAUDE.md anchor:** the "Founder design preferences" section now opens with a mandatory
+  "load the `design` skill before ANY design/UI work" pointer, so sessions that skim CLAUDE.md
+  still reach the full playbook. Founder can also force it deterministically by typing `/design`.
+- **Maintenance rule (in the skill):** CLAUDE.md is newer law on conflict; update the skill in the
+  same PR that changes a design rule.
+- **Part 2 (same session): the CLAUDE.md restructure.** The founder then asked for best practice
+  on the ~1,078-line / ~36k-token CLAUDE.md and approved the proposed split. CLAUDE.md is now
+  **~180 lines of current law only** (identity, one-line command index, layout map, hard
+  invariants, design-prefs summary, writing style, area index, deployment, workflow) with a
+  maintenance rule at the top (replace rules, don't append history; history → DECISIONS.md).
+  The detail moved, de-narrated to current-state-only with every rule and landmine preserved,
+  into **`docs/areas/`**: COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN, PRAKTISCH-NAV,
+  GAME, BRAND, LEGAL-ADMIN, COMPONENTS. A second skill **`/content`**
+  (`.claude/skills/content/SKILL.md`) holds the add-content workflow (iron laws + gate order).
+  `lint:content` gained a warn-only ratchet: it nags when CLAUDE.md exceeds ~350 lines.
+  Saves ~28k tokens of always-on context per session. `pnpm lint:content` green after the change.
+- **Next:** founder wants to rework Schreiben's Verlauf tab (excluded from the distillation on
+  purpose); when that happens, run it through the new skill's preview-first process and then add
+  Verlauf's picked design to the skill's Schreiben anchor + `docs/areas/SCHREIBEN.md`.
