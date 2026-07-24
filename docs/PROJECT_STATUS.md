@@ -1,11 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 158). **Nav-icon family harmonization (founder-picked):**
-Praktisch = Wegweiser, Bibliothek = Buch mit Lesezeichen, Schreiben = Federspitze (accent rose → brand
-blue), Fortschritt = Fortschrittsring; the dashboard toggle is now "Trainieren" with the Dumbbell; and
-Fortschritt is pinned directly left of Einstellungen in the bottom bar for all users. Prior s159:
-Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv; `transform-sentence` redeployed 2026-07-24, live).
-Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 160). **Fokus KI-Hinweis relocated:** the combined Art. 50
+disclaimer on the Schreiben Fokus tab now drops to a fixed line at the bottom of the viewport, level
+with the floating "Mit KI gebaut · Feedback" pill on desktop (no bordered bar); on mobile the Feedback
+button floats beside Korrigieren with a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line
+beneath. Prior s159: Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv; `transform-sentence`
+redeployed 2026-07-24, live). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -69,26 +69,29 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 158 (2026-07-24). Nav-icon family harmonization + Trainieren toggle,
-branch `claude/schreiben-icon-design-cz21ts`, PRs #679-#683.** A preview-first icon session: the
-founder picked every mark by letter from tab-bar mockups (`preview/schreiben-icon-harmony{,-r2}.html`,
-`praktisch-icon-vorschlaege.html`, `bibliothek-icon-vorschlaege.html`,
-`fortschritt-icon-vorschlaege.html`), then everything was implemented in one pass:
-- **New route marks** (`route-icons.tsx` + `NORM` boxes): Praktisch = **Wegweiser** signpost (pick I,
-  replaced the compass), Bibliothek = **Buch mit Lesezeichen** (pick P, replaced the lying stack),
-  Schreiben = **Federspitze** nib (pick E; `nav-items.ts` accent moved rose `#f43f5e` → brand blue
-  `#3D74ED` with it), Fortschritt = **Fortschrittsring** (pick S, replaced the bar chart). All marks
-  stay two-tone with neon-cyan `#22d3ee` companions.
-- **Trainieren toggle:** the Praktisch dashboard toggle "Lernen" renamed to **"Trainieren"** with the
-  lucide Dumbbell restored (`Dashboard.tsx`, `LernenBook` removed; admin H8 label; Help-hub line).
-- **Fortschritt pinned:** `BottomTabBar` now keeps Fortschritt directly LEFT of Einstellungen for
-  every user (`REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT`); older persisted
-  orders normalise at read time; edit-mode reorder covers only Bibliothek + Schreiben.
-- **Verified live** (vite preview + Playwright): all five tabs render the picked marks at equal
-  widths; screenshots match the approved previews. Docs: `docs/areas/PRAKTISCH-NAV.md` updated.
-- **Gates:** build · check:bundle **116.9 kB** · test:unit green.
-- **Next:** nothing pending from this session; the old `preview/route-icons-preview.svg` reference
-  sheet is stale (pre-s158 marks) if anyone wants to regenerate it.
+**Handoff after session 160 (2026-07-24). Fokus KI-Hinweis relocated level with the floating
+Feedback button, branch `claude/disclaimer-text-layout-5zq5g0`.** A small preview-first Schreiben
+tweak. The founder wanted the combined Art. 50 disclaimer off its centered-in-flow spot and onto the
+same line as the floating Feedback affordance. First round put both in a bordered bottom bar; the
+founder corrected: keep the floating pill exactly as-is, just drop the text to its level.
+- **Desktop (`FokusTrainer.tsx` `aiNoteDesktop`):** the `FeedbackPill` (`fixed bottom-4`, AppShell) is
+  untouched; the note is now a `fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64` element that
+  mirrors the pill's `max-w-6xl` + `sm:px-6` container, capped `max-w-[calc(100%-18rem)]` so its right
+  edge clears the pill. Wrapper is `pointer-events-none`, only the `/privacy` link is clickable, so it
+  never blocks the cards it floats over. Full sentence kept (founder pick).
+- **Mobile:** the action bar lost its `border-t`/`bg-background/90`/`backdrop-blur` chrome; the
+  `FeedbackIconButton` (imported from `components/layout/FeedbackButton`) floats beside the flex-1
+  Korrigieren button, with a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line centered below.
+  Both the buttons and the mobile note are pre-correction only (shared `m.status !== "corrected"`
+  guard); the desktop fixed note always shows on the Fokus tab.
+- **Scope note:** the founder quoted the Fokus string specifically, so the Kurz/Lang
+  (`GuidedWritingTrainer.tsx`) disclaimer was left in its current centered-in-flow placement. If the
+  founder wants Schreiben harmonized, that one is the follow-up.
+- **Preview:** `preview/fokus-disclaimer-inline.html` (real tokens, r2), screenshot-verified in
+  headless Chromium. Could NOT live-verify (unauth `/writing` redirects to the landing page); founder
+  verifies live. Docs: `docs/areas/SCHREIBEN.md` updated.
+- **Gates:** typecheck · build · lint (0 errors) · check:bundle **116.9 kB**, all green.
+- **Next:** nothing pending; optional follow-up is harmonizing the Kurz/Lang disclaimer to match.
 
 **Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
 branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a

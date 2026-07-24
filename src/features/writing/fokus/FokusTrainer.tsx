@@ -14,6 +14,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { SpeakButton } from "@/components/shared/SpeakButton";
+import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
 import { EnPeek } from "@/features/grammar/EnPeek";
 import { GrammarRail } from "./GrammarRail";
 import { UmlautKeys } from "../UmlautKeys";
@@ -267,20 +268,29 @@ export function FokusTrainer({
     </Card>
   );
 
-  // EU AI Act Art. 50 transparency: ONE combined, harmonized note (was two: the
-  // send-to-AI line + the "KI-generierte Umformung" footer). Centered under the
-  // Dein-Satz box and placed at the bottom of the column so it reads together with
-  // the "Mit KI gebaut · Feedback" pill on the same bottom line (founder s151).
-  const aiNote = (
-    <p className="px-1 pt-1 text-center text-xs leading-relaxed text-muted-foreground">
-      <Info className="mr-1 inline-block h-3.5 w-3.5 -translate-y-px align-middle" />
-      Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die
-      Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
-      <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-        Mehr im Datenschutz
-      </Link>
-      .
-    </p>
+  // EU AI Act Art. 50 transparency note. Desktop: dropped to the very bottom of the
+  // viewport so it reads level with the floating "Mit KI gebaut · Feedback" pill,
+  // no bordered bar (founder s159). Mirrors the pill's sidebar offset (`lg:pl-64`)
+  // and the AppShell content container (`max-w-6xl` + `sm:px-6`) so the text sits
+  // in the content column, its right edge clear of the pill. Pointer-events pass
+  // through except the link, so it never blocks the cards it floats over.
+  const aiNoteDesktop = (
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <p className="max-w-[calc(100%-18rem)] text-xs leading-relaxed text-muted-foreground">
+          <Info className="mr-1 inline-block h-3.5 w-3.5 -translate-y-px align-middle" />
+          Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die
+          Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
+          <Link
+            to="/privacy"
+            className="pointer-events-auto font-medium text-primary underline-offset-2 hover:underline"
+          >
+            Mehr im Datenschutz
+          </Link>
+          .
+        </p>
+      </div>
+    </div>
   );
 
   const bottomBox = showBottom && (
@@ -411,19 +421,16 @@ export function FokusTrainer({
         {inputCard}
         {errorCard}
         {bottomBox}
-        {aiNote}
       </div>
 
       {/* Desktop: content column + sticky grammar rail (Bibliothek 16rem grid). */}
       <div className="hidden lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8">
-        {/* AI note sits centered in normal flow under the content, NOT pinned to
-            the bottom (founder s151 follow-up: the bottom-pinned version read as an
-            awkward detached band). */}
+        {/* AI note is the fixed bottom-line `aiNoteDesktop` below (founder s160),
+            level with the floating Feedback pill, so it is NOT in this column. */}
         <div className="space-y-4">
           {inputCard}
           {errorCard}
           {bottomBox}
-          {aiNote}
         </div>
         <GrammarRail
           detected={m.detected}
@@ -440,14 +447,27 @@ export function FokusTrainer({
       {/* (The old idle helper line was removed in s149: it duplicated the
           rail's "Prüf zuerst deinen Satz …" hint.) */}
 
-      {/* Mobile action bar: Korrigieren pinned above the nav, matching the
-          Kurz/Lang Auswerten bar (s149 harmonization). Gone once corrected
-          (the toolbar owns Grammatik; the card owns Neuer Satz). */}
+      {/* Mobile: Feedback + Korrigieren float side by side above the nav, no bar
+          chrome (founder s159), with the condensed KI-Hinweis directly beneath.
+          Gone once corrected (the toolbar owns Grammatik; the card owns Neuer Satz). */}
       {m.status !== "corrected" && (
-        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 mt-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden [&>button]:h-11 [&>button]:flex-1 [&>button]:rounded-xl [&>button]:text-base">
-          {korrigierenButton}
+        <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 mt-4 lg:hidden">
+          <div className="flex items-stretch gap-2">
+            <FeedbackIconButton />
+            <div className="flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base">
+              {korrigierenButton}
+            </div>
+          </div>
+          <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
+            KI-geprüft, kann Fehler enthalten.{" "}
+            <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+              Mehr
+            </Link>
+          </p>
         </div>
       )}
+
+      {aiNoteDesktop}
     </div>
   );
 }

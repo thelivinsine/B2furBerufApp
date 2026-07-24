@@ -46,12 +46,16 @@ design as reference.**
   `passiv_zustand` maps straight to it). `GrammarRail` is the same Himmelblau tile:
   detected form = **white pill + green `bg-success` dot** (never a blue fill/ring), target solid
   primary, pre-correction all idle, header reset icon (back to the detected form), hint breaks
-  after "Grüner Punkt = dein Satz.". Mobile gets a sticky Korrigieren bar (pre-correction);
-  the mobile Grammatik button always opens (never `disabled`).
+  after "Grüner Punkt = dein Satz.". Mobile (pre-correction) floats the **Feedback icon button next
+  to Korrigieren** (both squircle, no bordered bar chrome) with the condensed KI-Hinweis centered
+  directly beneath them (s160); the mobile Grammatik button always opens (never `disabled`).
 - The transform box is a **white card** (never a grey wash) with a bold colored "Hinweis:" label
   (no i icon) and "KI-generierte Umformung" centered at the card bottom. The send-to-AI note +
-  that footer are ONE combined, centered note in normal flow below the content (bottom-pinning
-  was tried and reverted).
+  that footer are ONE combined Art. 50 note. **Desktop (s160):** it is dropped to a fixed line at
+  the very bottom of the viewport, level with the floating "Mit KI gebaut · Feedback" pill (full
+  sentence, left; pill, right; no bordered bar), mirroring the pill's `lg:pl-64` + `max-w-6xl`
+  offsets and clearing the pill on the right; pointer-events pass through except the link.
+  **Mobile (s160):** condensed to "KI-geprüft, kann Fehler enthalten. Mehr" under the button row.
 - **Correction card** (`FokusTrainer.tsx`; approved via `preview/schreiben-design-review.html`):
   the "Dein Satz" eyebrow shares its row with an **Original/Korrigiert view toggle** (default
   Korrigiert; resets to Korrigiert on each new correction). Original marks wrong words with
