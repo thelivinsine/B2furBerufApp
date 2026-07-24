@@ -10,6 +10,7 @@ import {
   SlidersHorizontal,
   ChevronDown,
   RotateCcw,
+  RefreshCw,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -312,7 +313,20 @@ export function FokusTrainer({
           {transformLabel}
         </span>
         {m.transform.status === "done" && m.transform.applicable && m.transform.transformed && (
-          <SpeakButton text={m.transform.transformed} />
+          <div className="flex items-center gap-1.5">
+            {/* "Nochmal": ask the AI for another phrasing of the same target form
+                (capped + cached, so cycling is free after the first two). */}
+            <button
+              type="button"
+              onClick={m.regenerate}
+              title="Andere Formulierung von der KI"
+              aria-label="Andere Formulierung von der KI"
+              className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Nochmal
+            </button>
+            <SpeakButton text={m.transform.transformed} />
+          </div>
         )}
       </div>
 

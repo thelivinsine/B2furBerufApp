@@ -171,13 +171,22 @@ function parse(raw: string, target: Tuple): Omit<TransformOut, "model" | "cost">
   }
 }
 
-function userMsg(source: string, target: Tuple): string {
-  return `Satz: """${source}"""\nZielform: ${JSON.stringify(target)}`;
+// variant 0 = the canonical transform (default, unchanged). variant >= 1 asks
+// for an ALTERNATIVE phrasing (the "Nochmal" button); the client caps it at 2.
+function userMsg(source: string, target: Tuple, variant = 0): string {
+  const base = `Satz: """${source}"""\nZielform: ${JSON.stringify(target)}`;
+  if (variant <= 0) return base;
+  return (
+    base +
+    `\nGib eine ALTERNATIVE Umformung (Variante ${variant + 1}): natuerlich, aber deutlich anders ` +
+    `formuliert als die Standardversion, mit gleicher Bedeutung und exakt derselben Zielform ` +
+    `(voice, tense, mood). Wenn keine sinnvolle Alternative existiert, gib die beste Umformung.`
+  );
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-async function callAnthropic(source: string, target: Tuple): Promise<TransformOut | null> {
+async function callAnthropic(source: string, target: Tuple, variant = 0): Promise<TransformOut | null> {
   const key = Deno.env.get("ANTHROPIC_API_KEY");
   if (!key) { console.error("[transform] anthropic: no ANTHROPIC_API_KEY set"); return null; }
   for (let attempt = 0; attempt < 2; attempt++) {
@@ -193,7 +202,7 @@ async function callAnthropic(source: string, target: Tuple): Promise<TransformOu
           // `temperature` is sent (removed on the Sonnet 5 / Opus 4.8 family).
           thinking: { type: "disabled" },
           system: SYSTEM_PROMPT,
-          messages: [{ role: "user", content: userMsg(source, target) }],
+          messages: [{ role: "user", content: userMsg(source, target, variant) }],
         }),
       });
       if (res.status === 429 || res.status === 529) {
@@ -223,7 +232,7 @@ async function callAnthropic(source: string, target: Tuple): Promise<TransformOu
   return null;
 }
 
-async function callGemini(source: string, target: Tuple): Promise<TransformOut | null> {
+async function callGemini(source: string, target: Tuple, variant = 0): Promise<TransformOut | null> {
   const key = Deno.env.get("GEMINI_API_KEY");
   if (!key) return null;
   try {
@@ -234,10 +243,16 @@ async function callGemini(source: string, target: Tuple): Promise<TransformOut |
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: [{ parts: [{ text: userMsg(source, target) }] }],
+          contents: [{ parts: [{ text: userMsg(source, target, variant) }] }],
           // 2.5 Pro is a thinking model: force pure-JSON output and give a
           // generous budget so reasoning tokens cannot truncate the answer.
-          generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4096 },
+          // Alternative variants (Nochmal) get a warmer temperature for variety;
+          // variant 0 stays at the default so its cached output never drifts.
+          generationConfig: {
+            responseMimeType: "application/json",
+            maxOutputTokens: 4096,
+            ...(variant > 0 ? { temperature: 0.9 } : {}),
+          },
         }),
       },
     );
@@ -258,7 +273,7 @@ async function callGemini(source: string, target: Tuple): Promise<TransformOut |
   }
 }
 
-async function callOpenAI(source: string, target: Tuple): Promise<TransformOut | null> {
+async function callOpenAI(source: string, target: Tuple, variant = 0): Promise<TransformOut | null> {
   const key = Deno.env.get("OPENAI_API_KEY");
   if (!key) return null;
   try {
@@ -275,7 +290,7 @@ async function callOpenAI(source: string, target: Tuple): Promise<TransformOut |
         reasoning_effort: "minimal",
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: userMsg(source, target) },
+          { role: "user", content: userMsg(source, target, variant) },
         ],
       }),
     });
@@ -321,12 +336,15 @@ Deno.serve(async (req) => {
     return json({ ok: false, message: "Umformungen sind gerade nicht verfügbar." });
   }
 
-  let body: { source?: string; checkId?: string; target?: Partial<Tuple> };
+  let body: { source?: string; checkId?: string; target?: Partial<Tuple>; variant?: number };
   try {
     body = await req.json();
   } catch {
     return json({ ok: false, message: "Ungültige Anfrage." }, 400);
   }
+  // "Nochmal": 0 = canonical transform, 1..2 = alternative phrasings. Hard-capped
+  // here so a client can never spend more than two extra generations per sentence.
+  const variant = Math.min(2, Math.max(0, Math.floor(Number(body.variant ?? 0)) || 0));
   const source = normalize(body.source ?? "");
   if (source.length < 3) return json({ ok: false, message: "Satz zu kurz." }, 400);
   if (source.length > MAX_SENTENCE_LEN) return json({ ok: false, message: "Satz zu lang." }, 400);
@@ -345,8 +363,11 @@ Deno.serve(async (req) => {
     return json({ ok: false, limitReached: true, message: "Das KI-Kontingent für diesen Monat ist aufgebraucht." });
   }
 
-  // Cache lookup FIRST (free, before any rate-limit spend is consumed).
-  const cacheKey = await hash(`${normalize(source)}\x1f${canonicalTuple(target)}\x1f${PROMPT_VERSION}\x1f${TRANSFORM_MODEL}`);
+  // Cache lookup FIRST (free, before any rate-limit spend is consumed). variant 0
+  // keeps the original key (existing cache entries stay valid); each alternative
+  // gets its own key so the two extra versions cache independently and globally.
+  const baseKey = `${normalize(source)}\x1f${canonicalTuple(target)}\x1f${PROMPT_VERSION}\x1f${TRANSFORM_MODEL}`;
+  const cacheKey = await hash(variant === 0 ? baseKey : `${baseKey}\x1fv${variant}`);
   const { data: hit } = await admin
     .from("sentence_transforms").select("applicable, reason, result, note, note_en")
     .eq("transform_hash", cacheKey).maybeSingle();
@@ -397,7 +418,7 @@ Deno.serve(async (req) => {
   // Free Gemini first. On its failure (any error, incl. free-tier/quota 429,
   // which returns null) fall to a paid model: Sonnet while Claude spend is under
   // budget, else GPT-5 leads. Each paid model backstops the other.
-  let out = await callGemini(source, target);
+  let out = await callGemini(source, target, variant);
   if (!out) {
     // Month-to-date Claude spend across ALL AI features (Satzlabor + writing coach).
     const monthIso = startOfMonth.toISOString();
@@ -408,8 +429,8 @@ Deno.serve(async (req) => {
     const claudeSpend = [...(opsRows.data ?? []), ...(writRows.data ?? [])]
       .reduce((s, r) => s + Number(r.cost_estimate ?? 0), 0);
     out = claudeSpend < CLAUDE_BUDGET_USD
-      ? (await callAnthropic(source, target)) || (await callOpenAI(source, target))
-      : (await callOpenAI(source, target)) || (await callAnthropic(source, target));
+      ? (await callAnthropic(source, target, variant)) || (await callOpenAI(source, target, variant))
+      : (await callOpenAI(source, target, variant)) || (await callAnthropic(source, target, variant));
   }
   if (!out) {
     console.error(`[transform] all providers failed target=${canonicalTuple(target)}`);

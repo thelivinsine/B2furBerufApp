@@ -563,6 +563,19 @@ _(Numbered 163 to avoid colliding with the concurrent branch-protection session 
   regenerate would return the identical cached sentence (button looks broken). A real regenerate
   needs an edge-function change (bypass cache + add variation) + a founder redeploy + accepting a
   small paid AI call per click. Surfaced the tradeoff for a decision (see chat).
+- **Prompt 4 (verbatim):** `merge to main when done` + two `AskUserQuestion` picks (cheaper/capped
+  variant; cap = **2 alternatives**) → Built the capped "Nochmal" regenerate:
+  - **Edge fn `transform-sentence`:** new optional `variant` (server-clamped 0..2); variant 0 keeps
+    the original cache key byte-for-byte, variants 1..2 get their own keys (`…\x1fv{n}`) so each
+    alternative caches independently + globally; `userMsg` gains an "alternative phrasing" instruction
+    for variant ≥ 1; Gemini gets `temperature: 0.9` for variants only (variant-0 output never drifts).
+    **Needs a founder redeploy** (self-contained file, Supabase dashboard) to take effect.
+  - **Client:** `transformSentence` passes `variant`; `useFokusMachine` caches per `tuple|variant`,
+    tracks the current variant per tuple, and `regenerate()` cycles 0→1→2→0 (new variants generate
+    once, then cycling is free); `FokusTrainer` adds a "Nochmal" button (RefreshCw) in the transform
+    box header beside the speaker. Cost cap: ≤ 2 paid generations per sentence+selection, ever.
+  - Gates: typecheck · build · lint (0 errors) · check:bundle 116.9 kB · fokusGrammar green.
 - **Artifacts (session 163):** `src/lib/wordDiff.ts` · `src/features/writing/fokus/FokusTrainer.tsx` ·
-  `tests/wordDiff.test.ts` · `preview/genus-verbi-wrap.html` · `docs/PROJECT_STATUS.md` · this log ·
-  PR #695
+  `src/features/writing/fokus/useFokusMachine.ts` · `src/lib/sentenceStudio.ts` ·
+  `supabase/functions/transform-sentence/index.ts` · `tests/wordDiff.test.ts` ·
+  `preview/genus-verbi-wrap.html` · `docs/PROJECT_STATUS.md` · this log · PRs #695 + (regenerate PR)

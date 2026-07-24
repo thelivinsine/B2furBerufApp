@@ -57,6 +57,9 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
       `PROJECT_FOUNDATION.md`.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
+- [ ] **Redeploy `transform-sentence` (Supabase dashboard) to activate the "Nochmal" regenerate**
+      button (s163). Self-contained file; same steps as the s159 redeploy. Until then the button
+      returns the cached canonical sentence (no visible change).
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
       now contains a full static pre-render inside `#root` that Google's no-JS HTML crawler can read.
@@ -109,11 +112,15 @@ concurrent branch-protection session already took 162). Two founder screenshots 
   `wordDiff.test.ts` cases. Gates green; shipped PR #695.
 - **"why does Zustandspassiv wrap" — left as-is (founder decision).** Genuine width wrap on the
   256px desktop rail (reproduced in `preview/genus-verbi-wrap.html`); not a bug, no change.
-- **OPEN (awaiting founder decision): a "Nochmal"/regenerate button on the transform box.** Blocked
-  on design intent: `transform-sentence` is GLOBALLY cached (source|tuple|prompt_version|model) by
-  cost-first design, so a client-only regenerate returns the identical sentence. A real one needs an
-  edge-function change (cache-bypass + variation) + a founder redeploy + a small paid AI call per
-  click. Surfaced the tradeoff; not yet built.
+- **"Nochmal"/regenerate button — BUILT, needs a founder redeploy to go live.** Founder chose the
+  capped/cheap variant (cap = 2 alternatives). `transform-sentence` gains an optional `variant`
+  (server-clamped 0..2): variant 0 keeps the original cache key byte-for-byte; variants 1..2 get
+  their own global cache keys + an "alternative phrasing" instruction (Gemini temperature 0.9 for
+  variants only). Client (`useFokusMachine.regenerate()` + a RefreshCw "Nochmal" button in the
+  transform box) cycles 0→1→2→0, generating each new variant once (≤ 2 paid calls per sentence+
+  selection, ever) then cycling the cached versions for free. **ACTION: the founder must redeploy
+  `transform-sentence` via the Supabase dashboard** (self-contained file, same as the s159 redeploy);
+  until then the button returns the cached canonical sentence (no visible change).
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
