@@ -351,3 +351,12 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   **H** Füller aufrecht (vertical fountain pen, blue body + cyan nib). Round-1 B (rose) kept at the
   top as reference. Awaiting pick by letter (E-H); implementation would also retint the `/writing`
   accent in `nav-items.ts`.
+- **Prompt 3 (verbatim, 2026-07-24 ~12:05 UTC):** `i like E. don't yet implement it. Can you provide better icon suggestions for praktisch section?` →
+  **Schreiben decision recorded: variant E (Federspitze Nachtblau, #3D74ED + Neon-Cyan), explicitly
+  NOT implemented yet.** New preview round for the Praktisch icon:
+  `preview/praktisch-icon-vorschlaege.html` (screenshot-verified, published as its own artifact).
+  All bars already show Schreiben as E so the future bar is judged. Current compass kept as
+  reference + 4 proposals in Nachtblau/Neon-Cyan: **I** Wegweiser (two direction boards on a post) ·
+  **J** Stadt (two buildings with lit windows, the miniature of the Üben city map) · **K** Zuhause
+  (house with cyan door) · **L** Route (dashed way from cyan start dot to destination ring).
+  Awaiting pick (I-L, or keep the compass). Nothing implemented in the app.
