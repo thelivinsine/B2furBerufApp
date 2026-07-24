@@ -1372,6 +1372,33 @@ _(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23,
 
 ---
 
+## Session 152 — 2026-07-23 — Admin control-center nav aligned to the app sidebar (branch `claude/admin-page-access-ok8g52`)
+
+_(Restored: this entry was dropped when the parallel session-153 branch merged over the append-only log; re-added from the branch history / PRs #656, #660, #661.)_
+
+- **Prompt 1 (verbatim):** `how do I access the admin page? is there a button in the app for the admins?` →
+  Answered from code: the account-menu dropdown shows a **"Kontrollzentrum"** link to `/admin` for
+  founder accounts (`AccountMenu.tsx:162`), gated on the two `FOUNDER_EMAILS` in `src/lib/admin.ts`
+  (client) + Supabase RLS (server). Also `/sources` + the founder-only `/sources/werkbank`.
+- **Prompt 2 (verbatim, screenshot of the open account menu):** `I don't see it here` → pointed out the
+  blue "Kontrollzentrum" link was already visible in the screenshot.
+- **Prompt 3 (verbatim):** `It's working`
+- **Prompt 4 (verbatim):** `can you compare the nagivation panel in the actual app vs the admin control center? The spacing can be adapted from the actual app as currently it looks cramped` →
+  **PR #656:** admin sidebar column 224→256px, `p-3`→`p-4`, marks 16→18px, rows
+  `px-2.5/gap-2.5`→`px-3/gap-3`.
+- **Prompt 5 (verbatim):** `push changes live to main` → confirmed #656 already squash-merged.
+- **Prompt 6 (verbatim, screenshot of the Übersicht cockpit):** `is this how it's supposed to look after your changes?` →
+  Confirmed the running build contained the fix.
+- **Prompt 7 (verbatim, app-sidebar screenshot):** `It doesn't look same as this` + mid-turn
+  `check the logo size and the space below the logo as well. Also the navigation panel's width` →
+  **PR #660:** active row → grey `bg-border` pill + bold text (was blue tint), inactive
+  `text-foreground/80`; header rebuilt to the app pattern (wordmark `Logo` `h-7 w-auto` + subtitle +
+  `mb-4`). Width already 256px.
+- **Prompt 8 (verbatim):** `document the session` → PR #661 (status doc + this log; moved s150/s149 to
+  the W30 archive).
+- **Artifacts (session 152):** `src/features/admin/AdminShell.tsx` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PRs #656, #660, #661
+
 ## Session 153 — 2026-07-23 — Admin Control Center chunks 4-10 + landing back-button fix (branch `claude/landing-back-button-routing-jyhwot`)
 
 - **Prompt 1 (verbatim):** `> I found that the back button routing for the pages on the landing page
@@ -1409,3 +1436,41 @@ _(Ran in parallel with s150's Fokus correction redesign; both merged 2026-07-23,
   `src/features/vocabulary/{VocabList,VocabularyTrainer}.tsx` · `src/features/welt/NeulandHub.tsx` ·
   `src/features/dashboard/Dashboard.tsx` · `src/features/landing/LandingPage.tsx` · `src/router.tsx` ·
   `package.json` · `tsconfig.app.json` · `tests/{reviewScore,appConfig}.test.ts` · docs · PR #664
+
+## Session 154 — 2026-07-24 — App-wide contrast + squircle pass (branch `claude/admin-page-access-ok8g52`)
+
+- **Prompt 1 (verbatim):** `what's the next step in the admin control center build plan? why are many pages in control center empty?` →
+  Explained from the build plan + `AdminApp.tsx`: only chunks 1-3 were live, the other 7 tabs rendered
+  `AdminPlaceholder`; next = chunk 4 (Review Cockpit, Opus).
+- **Prompt 2 (verbatim):** `are you sure that's the case? I think I already asked in one of the sessions to implement until chunk 10` →
+  Verified via git history + prompt log: only chunks 1-3 were on `main` at that point; the s143 request
+  was to WRITE the 12-chunk plan (which covers chunk 10), not implement it.
+- **Prompt 3 (verbatim):** `I found the issue. The branch where the aork was done didn't merge with main. Now it did. Clone the latest main. I have some feedback` →
+  Pulled latest `main` (PR #664, "Admin Control Center chunks 4-10", now merged as s153); the real
+  admin screens are present. Reset the branch to latest main.
+- **Prompt 4 (verbatim):** `there's a problem with the preview. The view buttons are not same as in the app. Also, there's very little differenxe between rhe dark mode options. Fix these two and provide a new version of the preview` (context: prompt 4-of-this-session actually followed a first preview) →
+  (Design context) Founder reported low card/background AND button/card contrast in both themes + the
+  page toggles/filter pills too round; asked for contrast previews using Wörter + Satzlabor as examples,
+  changes app-wide. Built `preview/contrast-squircle-review.html` (3 contrast options × light/dark ×
+  pill-vs-squircle), published as a claude.ai artifact. This prompt then fixed it: the view switcher now
+  matches the app (icon-only 36px squares on a white sliding pill, Table2/Waypoints/LayoutGrid/List),
+  and the dark options A/B/C were pushed clearly apart (A near-black ground, B bright lifted cards, C
+  deep-blue ground + bluer cards + accent edge). Republished (same URL).
+- **Prompt 5 (verbatim):** `go with option B for light mode and option C for dark mode. squircle looks good. Do a robust implementation with highest quality and standards.` →
+  **PR #665.** Contrast in `src/index.css`: dark = Option C (deep-blue ground `226 44% 6%`, brighter
+  bluer cards `224 26% 18%`, 12% surface↔bg gap, accent-tinted brighter border, brighter primary/ring),
+  light = Option B (stronger shared `shadow-soft` in `tailwind.config.ts`, deeper `--muted`/`--border`;
+  s140 ground + `--background` gate anchor untouched). Squircle: `rounded-full`→`rounded-lg`/`rounded-md`
+  on `LibrarySwitcher` + `WritingModeSwitcher` + Fokus O/K toggle (`FokusTrainer.tsx`) + `FilterRail`
+  facet pills + `GrammarRail` form pills. Gates: `check:contrast` (40+ pairings re-pass), build,
+  check:bundle 116.5 kB, lint 0 errors, test:unit 284/284. Squash-merged, branch realigned.
+- **Prompt 6 (verbatim):** `yes go ahead and document the session and save the preview files on repo` →
+  Confirmed `preview/contrast-squircle-review.html` was already on `main` (rode in with #665's squash);
+  documented as session 154 (PROJECT_STATUS header + handoff, moved the s152 handoff to the W30 archive,
+  restored the s152 prompt-log entry that the parallel s153 merge had dropped, appended this entry,
+  updated CLAUDE.md token facts).
+- **Artifacts (session 154):** `src/index.css` · `tailwind.config.ts` ·
+  `src/features/library/LibrarySwitcher.tsx` · `src/features/writing/WritingModeSwitcher.tsx` ·
+  `src/features/writing/fokus/{FokusTrainer,GrammarRail}.tsx` · `src/features/shared/FilterRail.tsx` ·
+  `preview/contrast-squircle-review.html` · `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · this log · PR #665

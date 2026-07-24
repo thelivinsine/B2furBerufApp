@@ -3,6 +3,25 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 152 (2026-07-23). Admin control-center nav aligned to the app sidebar, branch
+`claude/admin-page-access-ok8g52`, PRs #656 + #660 merged.** Founder asked how admins reach `/admin`
+(answer: the "Kontrollzentrum" entry in the account-menu dropdown, gated on `FOUNDER_EMAILS` in
+`src/lib/admin.ts`; also `/sources/werkbank`), then flagged the `/admin` sidebar as cramped and
+not matching the app's desktop `Sidebar`.
+- **All changes in `src/features/admin/AdminShell.tsx`, spacing/appearance only (no behaviour):**
+  - **PR #656:** sidebar column 224px→**256px** (= app `w-64`), panel padding `p-3`→`p-4`, nav marks
+    `h-4 w-4`→**18px**, rows `px-2.5`/`gap-2.5`→**`px-3`/`gap-3`**.
+  - **PR #660:** active row now the app's **grey `bg-border` pill + bold `text-foreground`** (was a
+    blue `bg-primary/10 text-primary` tint), inactive rows **`text-foreground/80`** (was faint
+    `text-muted-foreground`); header block rebuilt to the app pattern — **wordmark `Logo` `h-7 w-auto`
+    with a `text-xs` subtitle below + `mb-4`** (was a small square mark beside stacked "genauly /
+    CONTROL CENTER" text).
+- **Deliberate remaining difference:** admin nav keeps monochrome lucide icons (the app's colorful
+  branded `RouteIcon` marks don't map to admin sections); flagged to founder, not changed.
+- **Gates:** `pnpm build` ✓ both times. Sandbox can't reach the live site; `/admin` is PWA-cached, so
+  a hard refresh is needed after the Pages deploy. The Übersicht "Is my change live?" widget showed
+  "Latest main not reachable" (GitHub API offline/rate-limited in that render) — cosmetic, unrelated.
+
 **Handoff after session 151 (2026-07-23). Fokus "Satzlabor" grammar-bug fix + AI provider cascade
 rework, branch `claude/ai-response-bug-xfsth9`.** Founder flagged (screenshots) that the Satzlabor gave
 wrong, self-contradictory German feedback.
