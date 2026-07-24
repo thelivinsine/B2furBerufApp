@@ -864,3 +864,33 @@ founder picked every mark by letter from tab-bar mockups (`preview/schreiben-ico
 - **Verified live** (vite preview + Playwright): all five tabs render the picked marks at equal
   widths; screenshots match the approved previews. Docs: `docs/areas/PRAKTISCH-NAV.md` updated.
 - **Gates:** build · check:bundle **116.9 kB** · test:unit green.
+
+**Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
+branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
+grammar-dimensions brainstorm (four research agents) -> `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`
+(dimension catalog, feasibility tiers, B2-marker ranking, guardrails, Now/Next/Later/Skip roadmap) +
+two previews (`preview/grammar-dimensions-satzlabor.html`, `-catalog.html`) + a combined claude.ai
+artifact (daa4dbb6). Then built the "easy half":
+- **Konjunktiv II** as a new **Modus** rail axis: `mood` promoted from the pinned `DEFAULT_MOOD` to a
+  real, combinable axis across `grammarDimensions.ts` / `useFokusMachine.ts` / `GrammarRail.tsx` /
+  `FokusTrainer.tsx` (rail is data-driven, so the Modus section renders itself).
+- **Zustandspassiv** as a third Genus-Verbi pill (data-only value add): a detected `passiv_zustand`
+  now maps to its own pill instead of null; also fixed a phantom "Aktiv looks selected" quirk on a
+  real Zustandspassiv sentence. The copula safeguard (misread "Ich bin krank" -> aktiv) stays in the
+  check-sentence prompt.
+- **Edge function:** `transform-sentence` prompt gained K-II (synthetic-vs-wuerde) + Vorgang-vs-Zustand
+  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder redeployed `transform-sentence` on 2026-07-24**
+  via the Supabase dashboard code editor (single self-contained file, no local clone / CLI needed), so
+  the improved output is live. The pills also worked before that against the live function (its enums
+  already accept konjunktiv2 / passiv_zustand as targets).
+- **Copy:** rail legend simplified to "Gruener Punkt = dein Satz." / "Tippe eine andere Form, um ihn
+  umzuwandeln."
+- **Held (operation-style, need a NEW edge-function contract, not the tuple):** Register (Sie<->du),
+  Satzbau (HS<->NS), Nominalstil, Relativ<->Partizip. Plusquamperfekt deferred (needs a temporal
+  anchor). Roadmap: brainstorm-doc section 6.1.
+- **Merge note:** `main` force-advanced 10 commits (CLAUDE.md restructure #671, prompt-log rotation,
+  sessions 155-158) while this branch was open; merged it in - code auto-merged (mood/copy edits +
+  main's cosmetic tweaks both intact), the 4 doc conflicts resolved to main's new structure and the
+  docs re-applied against it (this handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, prompt-log s159).
+- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build / check:bundle **112 kB** /
+  lint:content. Edge function is Deno (not deployed from the sandbox).
