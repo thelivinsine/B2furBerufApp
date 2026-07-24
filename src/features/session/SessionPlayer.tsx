@@ -28,7 +28,6 @@ import { matchesSpoken } from "@/engine/pronounce";
 import { gradeTyped, gradeTypedAny, type TypedGrade } from "@/engine/typing";
 import { ReadingBlock } from "@/features/session/ReadingBlock";
 import { useCountdown } from "@/lib/hooks";
-import { cn } from "@/lib/utils";
 import { QuestionView, kindLabel } from "@/features/quiz/QuestionViews";
 import { GrammarDrillCard } from "@/features/grammar/GrammarDrillCard";
 import { vocabById } from "@/data/vocabulary";
@@ -355,7 +354,7 @@ function SessionRun({
 
         {loot.length > 0 && (
           <div>
-            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-reward">
+            <p className="mb-2 text-center text-xs font-semibold uppercase tracking-wider text-primary">
               Gesammelt
             </p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -558,23 +557,28 @@ function RewardRing({ percent }: { percent: number }) {
   );
 }
 
-/** A practiced word as a collectible card; leveled-up cards glow reward-gold. */
+/** A practiced word as a collectible card. A level-up reads as a Himmelblau
+ *  "Lv ↑" pill (progress), not a coral wash (which read as an error, s-session);
+ *  unchanged words keep a quiet muted level. */
 function LootCard({ item, index }: { item: LootItem; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10, scale: 0.96 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.15 + index * 0.05, type: "spring", stiffness: 400, damping: 22 }}
-      className={cn(
-        "rounded-xl border p-3",
-        item.up ? "border-reward/40 bg-reward-bg" : "border-border bg-surface",
-      )}
+      className="rounded-xl border border-border bg-surface p-3"
     >
       <p className="truncate text-sm font-semibold">{item.de}</p>
       <p className="truncate text-xs text-muted-foreground">{item.en}</p>
-      <div className="mt-1.5 flex items-center gap-1 text-xs font-bold text-reward">
-        Lv {item.level}
-        {item.up && <ArrowUp className="h-3 w-3" />}
+      <div className="mt-1.5">
+        {item.up ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-bold text-accent-ink">
+            Lv {item.level}
+            <ArrowUp className="h-3 w-3" />
+          </span>
+        ) : (
+          <span className="text-xs font-bold text-muted-foreground">Lv {item.level}</span>
+        )}
       </div>
     </motion.div>
   );
