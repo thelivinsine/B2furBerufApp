@@ -1,18 +1,15 @@
 # Project Status
 
-_Last updated: 2026-07-23 (session 153). **Admin Control Center chunks 4-10 SHIPPED** (the whole MVP
-remainder + Phase-2 content-intel + Steuerung wave 2), plus a landing Help back-button fix. Chunk 4
-Review Cockpit (priority-scored queue + keyboard Prüfmodus, `scripts/review-score.mjs` +
-`build-review-queue.mjs` → `reviewQueue.json`). Chunk 5 Feedback-Inbox. Chunk 6 System health + Launch
-checklist. Chunk 7 Steuerung core (`src/lib/appConfig.ts` remote config + panel; consumers
-H1/H2/H4/H5/H6/H8 wired; empty-config == today's behavior invariant pinned by `tests/appConfig.test.ts`).
-Chunk 8 report JSON sidecars + Übersicht staleness strip. Chunk 9 content intelligence (depth matrix +
-flag triage + exercise-coverage residual work-orders). Chunk 10 Steuerung wave 2 (H3 Impressum toggle
-behind a confirm dialog, H7 streak pill, H10 landing copy overrides, H12 Demo-Modus preset). All seven
-chunks green (typecheck/lint/test:unit/build/check:bundle); main chunk ~112-116 kB. Merged into `main`
-after main advanced through s147-152 (nav/header/Schreibtraining/admin-nav changes reconciled). Next =
-chunk 11 (Turnstile + abuse meters), then 12 (compliance pack); Phase-3 (13-16) on demand. Prior s152:
-admin-nav alignment to the app sidebar (#656/#660). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 154). **App-wide contrast + squircle pass** (founder-picked from
+`preview/contrast-squircle-review.html`): **light = Option B** (card lift via a stronger `shadow-soft`,
+s140 ground untouched), **dark = Option C** (deep-blue ground `226 44% 6%` + brighter bluer cards
+`224 26% 18%`, a 12% surface↔background gap, accent-tinted brighter border, brighter primary), and the
+page toggles / filter facet pills / Fokus toggle **squircled** (`rounded-full`→`rounded-lg`/`rounded-md`)
+via the shared switcher + FilterRail components. All in `src/index.css` + `tailwind.config.ts` + 5 shared
+components; `check-contrast` (40+ pairings), build, bundle, lint, test:unit 284/284 all green. Prior:
+s153 shipped Admin Control Center chunks 4-10 (Review Cockpit, Feedback-Inbox, System+Launch, Steuerung
+core + wave 2, report sidecars, content intelligence; next = chunk 11 Turnstile + abuse meters); s152
+aligned the admin nav to the app sidebar (#656/#660). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -71,6 +68,33 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 154 (2026-07-24). App-wide contrast + squircle pass, branch
+`claude/admin-page-access-ok8g52`, PR #665 merged.** Founder: the admin center (and the app generally)
+had too little contrast between cards and background AND between buttons and cards, in BOTH themes, and
+the page toggles / filter pills were too round. Worked previews-first: `preview/contrast-squircle-review.html`
+(interactive, published as a claude.ai artifact) offered three contrast options × light/dark × a
+pill-vs-squircle toggle, over faithful Wörter + Satzlabor mockups. Founder picked **light = Option B,
+dark = Option C, squircle yes**.
+- **Dark = Option C (`src/index.css`):** the flat `24%/10%` ground left `--surface` only 4% above the
+  background. Now a deep-blue ground (`--background`/`--page-*` = `226 44% 6%`) carries brighter, bluer
+  cards (`--surface 224 26% 18%`, was `228 20% 14%`) → a **12% surface↔bg gap**, plus an accent-tinted
+  brighter border (`216 28% 36%`), lifted `--muted`/`--muted-foreground`/`--input`, and a brighter
+  primary/ring (`219 96% 76%`). Foreground-on-surface went 10:1 → **12.6:1**.
+- **Light = Option B:** the card lift is carried by a stronger shared `shadow-soft`
+  (`tailwind.config.ts`; `--shadow` is near-black + low-opacity in dark, so it is a light-only effect),
+  plus slightly deeper `--muted`/`--border` (`88%/84%`) for switcher/pill definition. **The s140-locked
+  mint→sky ground and the `--background` contrast-gate anchor were deliberately left unchanged**, so
+  `check-contrast.mjs` stays honest. (If the founder wants white cards to pop more, deepen `--page-*`
+  next — noted, not done.)
+- **Squircle (`rounded-full`→`rounded-lg` track / `rounded-md` pill):** `LibrarySwitcher` +
+  `WritingModeSwitcher` page toggles, the Fokus Original/Korrigiert toggle (`FokusTrainer.tsx`),
+  `FilterRail` facet pills, `GrammarRail` form pills. Because these are shared, every Bibliothek tab +
+  all of Schreiben change at once. Left round on purpose: status dots, meters, count badges, avatars,
+  circular icon buttons, and the marketing landing page.
+- **Gates:** `check:contrast` (all 40+ pairings re-pass) · `build` · `check:bundle` 116.5 kB · `lint`
+  0 errors · `test:unit` **284/284**. No live screenshot (onboarding/auth gate makes headless capture
+  unreliable; sandbox can't reach the deployed site) — founder confirms live (hard-refresh, PWA-cached).
+
 **Handoff after session 153 (2026-07-23). Admin Control Center chunks 4-10 + a landing Help
 back-button fix, branch `claude/landing-back-button-routing-jyhwot` (merged to `main`).** The founder
 asked to "continue with the admin control center build plan next chunk and work until chunk 10", so all
@@ -109,26 +133,8 @@ build · check:bundle · lint:content).
 - **Next:** chunk 11 (Turnstile + abuse meters, founder does the Cloudflare/Supabase dashboard half),
   then chunk 12 (compliance pack). No new founder DB step for chunks 4-10 (migration 0008 already live).
 
-**Handoff after session 152 (2026-07-23). Admin control-center nav aligned to the app sidebar, branch
-`claude/admin-page-access-ok8g52`, PRs #656 + #660 merged.** Founder asked how admins reach `/admin`
-(answer: the "Kontrollzentrum" entry in the account-menu dropdown, gated on `FOUNDER_EMAILS` in
-`src/lib/admin.ts`; also `/sources/werkbank`), then flagged the `/admin` sidebar as cramped and
-not matching the app's desktop `Sidebar`.
-- **All changes in `src/features/admin/AdminShell.tsx`, spacing/appearance only (no behaviour):**
-  - **PR #656:** sidebar column 224px→**256px** (= app `w-64`), panel padding `p-3`→`p-4`, nav marks
-    `h-4 w-4`→**18px**, rows `px-2.5`/`gap-2.5`→**`px-3`/`gap-3`**.
-  - **PR #660:** active row now the app's **grey `bg-border` pill + bold `text-foreground`** (was a
-    blue `bg-primary/10 text-primary` tint), inactive rows **`text-foreground/80`** (was faint
-    `text-muted-foreground`); header block rebuilt to the app pattern — **wordmark `Logo` `h-7 w-auto`
-    with a `text-xs` subtitle below + `mb-4`** (was a small square mark beside stacked "genauly /
-    CONTROL CENTER" text).
-- **Deliberate remaining difference:** admin nav keeps monochrome lucide icons (the app's colorful
-  branded `RouteIcon` marks don't map to admin sections); flagged to founder, not changed.
-- **Gates:** `pnpm build` ✓ both times. Sandbox can't reach the live site; `/admin` is PWA-cached, so
-  a hard refresh is needed after the Pages deploy. The Übersicht "Is my change live?" widget showed
-  "Latest main not reachable" (GitHub API offline/rate-limited in that render) — cosmetic, unrelated.
-
-_(Session 151's Fokus "Satzlabor" grammar-bug fix + the Gemini→Sonnet→GPT-5 AI provider cascade
+_(Session 152's admin-control-center-nav-alignment handoff (PRs #656/#660), session 151's Fokus
+"Satzlabor" grammar-bug fix + the Gemini→Sonnet→GPT-5 AI provider cascade
 handoff, session 150's Fokus correction-card redesign + Umlaut-keys handoff (PRs #653/#654), session 149's
 Schreiben-as-Bibliothek-extension handoff, session 148's PWA-auth-uninstall bug-fix handoff (fresh-device
 OAuth `syncHydrated` gate, PR #644),

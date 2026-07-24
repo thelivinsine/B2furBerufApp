@@ -860,6 +860,22 @@ all popups/modals/dialogs** going forward (don't reintroduce flat `bg-black/*` o
   `theme-color` meta rides the gradient's mint top stop `#F7FCF9`. Preview picker artifacts:
   `preview/background-gradient-variations*.html`. Semantic `--warning` Butter and the app-icon
   Papier tile are deliberately untouched.
+- **Contrast + squircle pass (s154, 2026-07-24, founder-picked from
+  `preview/contrast-squircle-review.html`; supersedes the dark-surface numbers above):** cards read too
+  flat against the ground in both themes. **Dark = "Option C"** (`index.css` `.dark`): the ground/surface
+  hue moved 228→**226/224** and the flat `10%/14%` split became a **deep-blue ground `226 44% 6%` with
+  brighter, bluer cards `--surface 224 26% 18%`** (a 12% gap, was 4%), an **accent-tinted brighter
+  `--border 216 28% 36%`**, lifted `--muted`/`--muted-foreground 224 13% 77%`/`--input`, and a brighter
+  `--primary`/`--ring 219 96% 76%`. **Light = "Option B"**: the card lift is carried by a **stronger
+  shared `shadow-soft`** (tailwind.config.ts; `--shadow` is near-black + low-opacity in dark, so it is a
+  light-only effect), plus a slightly deeper `--muted`/`--border` (`88%/84%`). **The s140 mint→sky
+  light ground and the `--background` contrast-gate anchor were left unchanged on purpose** (so
+  `check-contrast.mjs` stays honest; deepen `--page-*` if the founder later wants whiter cards to pop
+  more). All pairings still pass the gate. **Squircle:** the page toggles and filter pills dropped from
+  `rounded-full` to `rounded-lg` track / `rounded-md` pill — `LibrarySwitcher`, `WritingModeSwitcher`,
+  the Fokus Original/Korrigiert toggle, `FilterRail` facet pills, `GrammarRail` form pills (shared
+  components, so every Bibliothek tab + all of Schreiben). Dots, meters, count badges, avatars, circular
+  icon buttons, and the landing page stay round.
 - **Current mark (s133 PR B, reworked s138 2026-07-20): the lowercase g on a Himmel Soft highlighter
   swipe**. The swipe is **Himmel Soft `#8CDBFB`** (founder-picked s138: the original Himmelblau
   `#52C6F9` read too harsh against black/white). In a same-session follow-up the founder applied
