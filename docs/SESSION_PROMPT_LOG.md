@@ -710,3 +710,31 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Gates: typecheck · lint (0 errors) · build, green.
 - **Artifacts (session 165):** `src/features/admin/AdminShell.tsx` · `src/features/admin/Pruefmodus.tsx` ·
   `docs/PROJECT_STATUS.md` · this log
+
+## Session 166 — 2026-07-24 — Schreiben mobile action cluster de-collided (branch `claude/button-overlap-fix-s7fl28`)
+
+- **Prompt 1 (verbatim, 2026-07-24):** `[screenshot of /writing Lang on mobile, dark mode] there's a button overlap issue here. Fix it.`
+- **Prompt 2 (verbatim, 2026-07-24):** `make sure the fixes are applied across the app` →
+  Diagnosed from the screenshot + code: the mobile sticky cluster on Schreiben carries **no bar
+  chrome** (founder s159/s160), so it floats straight over the content cards. Two halves produced the
+  overlap: (a) at 0 words the **Auswerten** button is `disabled`, and the Button base sets
+  `disabled:opacity-50`, so the card text behind bled *through* the button (`variant="outline"` is
+  `bg-surface/50` and had the same problem); (b) the **"Noch N Wörter schreiben, dann kannst du
+  auswerten."** hint is the LAST element of the editor card, i.e. exactly where the pinned cluster
+  sits, so the collision was guaranteed whenever the button was inactive. Bottom padding cannot fix
+  this: a bottom-pinned `sticky` element floats over content at every scroll position except the end.
+  Fix, applied to **both** writing trainers via a shared contract: new
+  `src/features/writing/floatingCluster.ts` exporting `floatingSlot` (opaque `bg-background` backing
+  behind each control) and `floatingNote` (`bg-background/90` + `backdrop-blur-sm` caption plate,
+  matching the four other mobile bars); the transient hint moved out of the card tail into the
+  cluster's single caption slot (hint while too short, Art. 50 note once evaluating is possible,
+  never both), the card keeping it on `lg:` only where there is no cluster. Swept the rest of the app
+  for the same pattern: Wörter, Kollokationen, Redemittel and the two Grammatik bars already carry
+  `bg-background/90 backdrop-blur` (opaque) and needed no change; the desktop Feedback pill and the
+  browse scroll button are likewise already backed. Verified in a real mobile viewport (Playwright,
+  360×800 @3x, light + dark, cluster parked pinned over the editor card) across too-short / ready /
+  Fokus states. Gates: typecheck · lint (0 errors) · test:unit 293/293 · build · check:bundle
+  (117.0 kB), all green.
+- **Artifacts (session 166):** `src/features/writing/floatingCluster.ts` (new) ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
