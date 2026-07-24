@@ -224,7 +224,7 @@ export function AdminSteuerung() {
                   : "bg-muted text-muted-foreground hover:text-foreground",
               )}
             >
-              {tab === "ueben" ? t("Lernen", "Learn") : t("Spielen", "Play")}
+              {tab === "ueben" ? t("Trainieren", "Train") : t("Spielen", "Play")}
             </button>
           ))}
         </div>
