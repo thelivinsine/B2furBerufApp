@@ -694,4 +694,19 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Himmelblau accent tile (`border-accent/40 bg-accent/15 text-accent-ink`, dark `/25` `/10`) with an
   ArrowLeft, so it pops against the neutral nav rows; a compact "App" copy sits top-right on the mobile bar.
   Gates: typecheck · build (green).
-- **Artifacts (session 165):** `src/features/admin/AdminShell.tsx` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 5 (verbatim, 2026-07-24):** `where is the save button here?` (screenshot of the Prüfmodus
+  review cockpit's note box) →
+  Answered in chat (report-before-edits): there is no standalone save in the keyboard cockpit by design.
+  The note is written together with the Approve (V) / Reject (X) decision (`decide()` passes `comment`
+  alongside the verdict); the "Notiz/Note" (N) button only opens/focuses the box; the only confirmation
+  is the easy-to-miss "Saving… / Saved" line bottom-right. A standalone note-save already existed only in
+  the "Alle Inhalte" table (s164).
+- **Prompt 6 (verbatim, 2026-07-24):** `both` (add a hint AND a real save button) →
+  Added to `ReviewSession` (`Pruefmodus.tsx`): (1) a **„Notiz speichern" / "Save note"** button under the
+  note box that calls a note-only `api.onChange(id, { comment })` (no `decision`/`verified`), so the note
+  persists while the item stays in the queue undecided, and does NOT advance the cursor; ⌘/Ctrl+Enter saves
+  from inside the textarea. (2) A helper line: „Notiz speichern" hält den Eintrag offen · Freigeben/Ablehnen
+  speichert sie auch. Reused the existing serialised note-only path in `useWorkbench` (no store change).
+  Gates: typecheck · lint (0 errors) · build, green.
+- **Artifacts (session 165):** `src/features/admin/AdminShell.tsx` · `src/features/admin/Pruefmodus.tsx` ·
+  `docs/PROJECT_STATUS.md` · this log
