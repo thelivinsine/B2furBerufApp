@@ -12,6 +12,7 @@ import {
   Filter as FilterIcon,
   ShieldCheck,
   AlertTriangle,
+  Save,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { provenance } from "@/data/provenance";
@@ -503,6 +504,16 @@ function ReviewSession({
     [current, api, advance, nudged],
   );
 
+  // Save the note on its OWN, without a decision: a note-only onChange (no
+  // `decision`/`verified` in the patch) leaves the verdict + fingerprint
+  // untouched, so the item stays in the queue for later. Does not advance.
+  const saveNote = useCallback(async () => {
+    if (!current) return;
+    setSaveState("saving");
+    const ok = await api.onChange(current.id, { comment: noteDraft.trim() || null });
+    setSaveState(ok ? "saved" : "error");
+  }, [current, api, noteDraft]);
+
   // Keyboard: V verify · X reject · N note · → skip · ← back · Esc exit.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -632,16 +643,43 @@ function ReviewSession({
         <>
           <ReviewCard row={current} item={item} ver={ver} t={t} lang={lang} />
 
-          {/* Note editor */}
+          {/* Note editor. The note saves two ways: together with the
+              Approve/Reject decision, OR on its own via "Notiz speichern"
+              (which keeps the item in the queue, undecided). ⌘/Ctrl+Enter
+              saves from inside the box. */}
           {noteOpen && (
-            <textarea
-              ref={noteRef}
-              value={noteDraft}
-              onChange={(e) => setNoteDraft(e.target.value)}
-              placeholder={t("Notiz (bei Ablehnung: was ist falsch?)", "Note (on reject: what is wrong?)")}
-              rows={2}
-              className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-            />
+            <div className="space-y-1.5">
+              <textarea
+                ref={noteRef}
+                value={noteDraft}
+                onChange={(e) => setNoteDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                    e.preventDefault();
+                    void saveNote();
+                  }
+                }}
+                placeholder={t("Notiz (bei Ablehnung: was ist falsch?)", "Note (on reject: what is wrong?)")}
+                rows={2}
+                className="w-full resize-none rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[11px] leading-snug text-muted-foreground">
+                  {t(
+                    "„Notiz speichern“ hält den Eintrag offen · Freigeben/Ablehnen speichert sie auch",
+                    "“Save note” keeps the item open · Approve/Reject also saves it",
+                  )}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void saveNote()}
+                  className="flex shrink-0 items-center gap-1.5 rounded-lg border border-border bg-surface px-3 py-1.5 text-xs font-semibold text-foreground/80 transition-colors hover:border-primary/40 hover:text-foreground"
+                >
+                  <Save className="h-3.5 w-3.5" />
+                  {t("Notiz speichern", "Save note")}
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Actions */}
