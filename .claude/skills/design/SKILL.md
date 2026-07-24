@@ -63,7 +63,10 @@ Ranked by how often the founder had to correct AI output:
    switchers, filter pills (s154). Fully round stays ONLY for dots, meters, count badges, avatars,
    circular icon buttons.
 6. **Placement.** AI/legal disclaimers are standalone muted lines BELOW cards, never inside them,
-   horizontally centered in normal flow (not bottom-pinned). Primary actions sit in the same place
+   horizontally centered in normal flow (not bottom-pinned) — EXCEPT the two Schreiben trainers
+   (Fokus + Kurz/Lang), where the founder moved the Art. 50 note to a fixed bottom line level with
+   the floating Feedback pill on desktop and a condensed line under the floating action buttons on
+   mobile (s160, `docs/DECISIONS.md`; do not re-center these two). Primary actions sit in the same place
    across sibling modes (sticky bottom bars on mobile everywhere).
 7. **Motion.** One timing family: 0.12-0.18s panels/popovers, directional tab slides ~0.16s,
    everything reduced-motion safe. Snappy, never slow. Opacity-only enter/exit on framer `layout`/
