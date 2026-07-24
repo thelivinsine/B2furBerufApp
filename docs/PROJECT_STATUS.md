@@ -1,11 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 160). **Fokus KI-Hinweis relocated:** the combined Art. 50
-disclaimer on the Schreiben Fokus tab now drops to a fixed line at the bottom of the viewport, level
-with the floating "Mit KI gebaut · Feedback" pill on desktop (no bordered bar); on mobile the Feedback
-button floats beside Korrigieren with a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line
-beneath. Prior s159: Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv; `transform-sentence`
-redeployed 2026-07-24, live). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 160). **Schreiben KI-Hinweis relocated + Feedback label
+shortened:** on BOTH Fokus and Kurz/Lang the combined Art. 50 disclaimer now drops to a fixed line
+at the bottom of the viewport, level with the floating Feedback pill on desktop (no bordered bar);
+on mobile the Feedback button floats beside Auswerten/Korrigieren with a condensed "KI-geprüft, kann
+Fehler enthalten. Mehr" line beneath. The floating pill + related buttons are relabelled from "Mit KI
+gebaut · Feedback" to just **"Feedback"** app-wide. Prior s159: Fokus "Satzlabor" Wave 2 (Konjunktiv
+II + Zustandspassiv; `transform-sentence` redeployed 2026-07-24, live). Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -69,11 +71,12 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 160 (2026-07-24). Fokus KI-Hinweis relocated level with the floating
-Feedback button, branch `claude/disclaimer-text-layout-5zq5g0`.** A small preview-first Schreiben
-tweak. The founder wanted the combined Art. 50 disclaimer off its centered-in-flow spot and onto the
-same line as the floating Feedback affordance. First round put both in a bordered bottom bar; the
-founder corrected: keep the floating pill exactly as-is, just drop the text to its level.
+**Handoff after session 160 (2026-07-24). Schreiben KI-Hinweis relocated (Fokus + Kurz/Lang) +
+"Feedback" label shortened app-wide, branch `claude/disclaimer-text-layout-5zq5g0`.** A small
+preview-first Schreiben tweak. The founder wanted the combined Art. 50 disclaimer off its
+centered-in-flow spot and onto the same line as the floating Feedback affordance. First round put
+both in a bordered bottom bar; the founder corrected: keep the floating pill exactly as-is, just
+drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shortened the pill label.
 - **Desktop (`FokusTrainer.tsx` `aiNoteDesktop`):** the `FeedbackPill` (`fixed bottom-4`, AppShell) is
   untouched; the note is now a `fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64` element that
   mirrors the pill's `max-w-6xl` + `sm:px-6` container, capped `max-w-[calc(100%-18rem)]` so its right
@@ -84,14 +87,21 @@ founder corrected: keep the floating pill exactly as-is, just drop the text to i
   Korrigieren button, with a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line centered below.
   Both the buttons and the mobile note are pre-correction only (shared `m.status !== "corrected"`
   guard); the desktop fixed note always shows on the Fokus tab.
-- **Scope note:** the founder quoted the Fokus string specifically, so the Kurz/Lang
-  (`GuidedWritingTrainer.tsx`) disclaimer was left in its current centered-in-flow placement. If the
-  founder wants Schreiben harmonized, that one is the follow-up.
-- **Preview:** `preview/fokus-disclaimer-inline.html` (real tokens, r2), screenshot-verified in
-  headless Chromium. Could NOT live-verify (unauth `/writing` redirects to the landing page); founder
-  verifies live. Docs: `docs/areas/SCHREIBEN.md` updated.
-- **Gates:** typecheck · build · lint (0 errors) · check:bundle **116.9 kB**, all green.
-- **Next:** nothing pending; optional follow-up is harmonizing the Kurz/Lang disclaimer to match.
+- **Kurz/Lang parity (follow-up prompt, same session):** `GuidedWritingTrainer.tsx` got the SAME
+  treatment. Its inline disclaimer `<p>` was removed from `content`; it now has its own copy of the
+  fixed `aiNoteDesktop` (Kurz/Lang wording) and a reworked chrome-less mobile action bar where the
+  `FeedbackIconButton` floats beside Auswerten (and Neu schreiben after a result) with the condensed
+  note beneath. Only one trainer renders per `/writing` tab, so the two fixed notes never coexist.
+- **Feedback label shortened app-wide (same follow-up):** "Mit KI gebaut · Feedback" → **"Feedback"**
+  in `FeedbackButton.tsx` (`FeedbackPill` default label, `FeedbackFullButton` text, `FeedbackIconButton`
+  aria/title) and the `AdminSteuerung` label placeholder. Remote-config `feedback.label` still
+  overrides the pill. `MessageSquareText`/`Sparkles` icons unchanged.
+- **Preview:** `preview/fokus-disclaimer-inline.html` (real tokens, r3 shows the "Feedback" label +
+  the Fokus/Kurz-Lang note), screenshot-verified in headless Chromium. Could NOT live-verify (unauth
+  `/writing` redirects to the landing page); founder verifies live. Docs: `docs/areas/SCHREIBEN.md`
+  + `docs/areas/PRAKTISCH-NAV.md` updated.
+- **Gates:** typecheck · build · lint (0 errors) · check:bundle **116.8 kB**, all green.
+- **Next:** nothing pending.
 
 **Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
 branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a

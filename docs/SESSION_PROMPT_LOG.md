@@ -431,3 +431,19 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
 - **Artifacts (session 160):** `src/features/writing/fokus/FokusTrainer.tsx` ·
   `src/components/layout/FeedbackButton.tsx` (import target, unchanged) ·
   `preview/fokus-disclaimer-inline.html` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-24):** `kurz and lang should also have same design. Also, for the floating button "Mit KI gebaut · Feedback" - make it just "Feedback" with an icon. No need of mit ki gebaut. Do this across the app` →
+  Applied the Fokus disclaimer treatment to Kurz/Lang (`GuidedWritingTrainer.tsx`): removed the
+  inline disclaimer `<p>` from `content`, added its own fixed `aiNoteDesktop` (Kurz/Lang wording),
+  and reworked the mobile action bar (dropped `border-t`/`bg-background/90`/`backdrop-blur`; the
+  `FeedbackIconButton` now floats beside Auswerten, plus Neu schreiben after a result, with the
+  condensed note beneath). Shortened the feedback label app-wide from "Mit KI gebaut · Feedback" to
+  "Feedback": `FeedbackButton.tsx` (`FeedbackPill` default, `FeedbackFullButton` text,
+  `FeedbackIconButton` aria/title) + the `AdminSteuerung` label placeholder; remote-config
+  `feedback.label` still overrides the pill; icons unchanged. Preview refreshed to r3 (label +
+  parity), screenshot-verified. Gates: typecheck · build · lint (0 errors) · check:bundle 116.8 kB,
+  all green. Docs: `docs/areas/SCHREIBEN.md` + `docs/areas/PRAKTISCH-NAV.md` + PROJECT_STATUS s160
+  handoff updated.
+- **Artifacts (prompt 3):** `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` · `src/features/admin/AdminSteuerung.tsx` ·
+  `preview/fokus-disclaimer-inline.html` · `docs/areas/{SCHREIBEN,PRAKTISCH-NAV}.md` ·
+  `docs/PROJECT_STATUS.md` · this log

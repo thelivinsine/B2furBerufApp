@@ -22,8 +22,9 @@ design as reference.**
   the current scope (keeps typed text, clears a stale result). Scope changes (`?sub=`/`?sector=`;
   theme switch clears sub, Branche travels) reset the draft.
 - Aufgabe card: NO theme icon; a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel
-  line (the editor word count does NOT repeat the Ziel range). The AI disclaimer is a standalone
-  line below the editor/sentence card, never inside it.
+  line (the editor word count does NOT repeat the Ziel range). The AI disclaimer is NOT inside the
+  card: on desktop it is a fixed line at the bottom of the viewport level with the floating Feedback
+  pill; on mobile it is condensed under the action buttons (s160, same as Fokus, see below).
 - **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20` +
   `border-accent/50`, dark `bg-accent/10` + `/25`; NOT grey) with a header reset icon and the
   scope hierarchy Branche → Thema → Unterthema as single-select dropdowns (grouped listbox
@@ -52,10 +53,12 @@ design as reference.**
 - The transform box is a **white card** (never a grey wash) with a bold colored "Hinweis:" label
   (no i icon) and "KI-generierte Umformung" centered at the card bottom. The send-to-AI note +
   that footer are ONE combined Art. 50 note. **Desktop (s160):** it is dropped to a fixed line at
-  the very bottom of the viewport, level with the floating "Mit KI gebaut · Feedback" pill (full
-  sentence, left; pill, right; no bordered bar), mirroring the pill's `lg:pl-64` + `max-w-6xl`
-  offsets and clearing the pill on the right; pointer-events pass through except the link.
-  **Mobile (s160):** condensed to "KI-geprüft, kann Fehler enthalten. Mehr" under the button row.
+  the very bottom of the viewport, level with the floating "Feedback" pill (full sentence, left;
+  pill, right; no bordered bar), mirroring the pill's `lg:pl-64` + `max-w-6xl` offsets and clearing
+  the pill on the right; pointer-events pass through except the link. **Mobile (s160):** condensed
+  to "KI-geprüft, kann Fehler enthalten. Mehr" under the button row. **Kurz/Lang uses the exact same
+  treatment** (`GuidedWritingTrainer.tsx`, s160): its own `aiNoteDesktop` fixed note + the Feedback
+  icon button floating beside Auswerten (and Neu schreiben after a result), condensed note beneath.
 - **Correction card** (`FokusTrainer.tsx`; approved via `preview/schreiben-design-review.html`):
   the "Dein Satz" eyebrow shares its row with an **Original/Korrigiert view toggle** (default
   Korrigiert; resets to Korrigiert on each new correction). Original marks wrong words with
