@@ -51,7 +51,13 @@ design as reference.**
   to Korrigieren** (both squircle, no bordered bar chrome) with the condensed KI-Hinweis centered
   directly beneath them (s160); the mobile Grammatik button always opens (never `disabled`).
 - The transform box is a **white card** (never a grey wash) with a bold colored "Hinweis:" label
-  (no i icon) and "KI-generierte Umformung" centered at the card bottom. The send-to-AI note +
+  (no i icon) and "KI-generierte Umformung" centered at the card bottom. Its header row carries a
+  **"Nochmal" button** (RefreshCw, beside the speaker) that asks the AI for an alternative phrasing
+  of the SAME target form (s163): `useFokusMachine.regenerate()` cycles variant 0→1→2→0, generating
+  each new variant once then serving cached ones for free. Cost cap is enforced server-side too
+  (`transform-sentence` clamps `variant` to 0..2; variant 0 keeps the original global cache key,
+  variants 1..2 cache under their own keys). Needs `transform-sentence` deployed with the `variant`
+  param (done s163). The send-to-AI note +
   that footer are ONE combined Art. 50 note. **Desktop (s160):** it is dropped to a fixed line at
   the very bottom of the viewport, level with the floating "Feedback" pill (full sentence, left;
   pill, right; no bordered bar), mirroring the pill's `lg:pl-64` + `max-w-6xl` offsets and clearing
@@ -71,7 +77,10 @@ design as reference.**
   Streichung, from `classifyChange` in `wordDiff.ts`) + the `old → new` edit, with **Neuer Satz**
   as an outline button on that same row (`ml-auto self-end`, wraps only if needed) — NOT on the
   mobile toolbar or the desktop rail. `wordDiff.diffWords` returns `tokens` + `originalTokens`
-  (both flagged) + `changes` (each with a `category`); `tests/wordDiff.test.ts` pins it.
+  (both flagged) + `changes` (each with a `category`); `tests/wordDiff.test.ts` pins it. A word that
+  was only **reordered** is collapsed by `collapseMoves` into ONE `{category:"Wortstellung",
+  moved:true}` change (was a contradictory Streichung + Ergänzung pair, s163); a `moved` tile renders
+  the word ONCE (green, no `old → new` arrow).
 - The Fokus Original/Korrigiert toggle is `rounded-lg`/`rounded-md` squircle.
 
 ## Umlaut keys
