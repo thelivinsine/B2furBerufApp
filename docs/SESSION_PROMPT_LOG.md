@@ -579,3 +579,8 @@ _(Numbered 163 to avoid colliding with the concurrent branch-protection session 
   `src/features/writing/fokus/useFokusMachine.ts` · `src/lib/sentenceStudio.ts` ·
   `supabase/functions/transform-sentence/index.ts` · `tests/wordDiff.test.ts` ·
   `preview/genus-verbi-wrap.html` · `docs/PROJECT_STATUS.md` · this log · PRs #695 + (regenerate PR)
+- **Prompt 5 (verbatim):** `that's deployed` →
+  Founder redeployed `transform-sentence` via the Supabase dashboard, so the capped "Nochmal"
+  regenerate (variant 0..2) is now live. Marked the redeploy action item done + flipped the s163
+  handoff note to LIVE in `PROJECT_STATUS.md`; logged this. Docs-only follow-up.
+- **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · this log
