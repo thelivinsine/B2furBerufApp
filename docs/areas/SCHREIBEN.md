@@ -39,10 +39,14 @@ design as reference.**
   an old entry is not recoverable since pools).
 
 ## Fokus (Satzlabor)
-- Single-sentence write → correct → transform lab. `GrammarRail` is the same Himmelblau tile:
+- Single-sentence write → correct → transform lab. **Grammar rail = three combinable axes,
+  data-driven from `grammarDimensions.ts`: Genus Verbi (Aktiv · Passiv · Zustandspassiv), Zeitform
+  (Präsens · Perfekt · Präteritum), Modus (Indikativ · Konjunktiv II)** (s159, Wave 2). `mood` is a
+  real axis now (was the pinned `DEFAULT_MOOD`); Zustandspassiv is its own pill (a detected
+  `passiv_zustand` maps straight to it). `GrammarRail` is the same Himmelblau tile:
   detected form = **white pill + green `bg-success` dot** (never a blue fill/ring), target solid
   primary, pre-correction all idle, header reset icon (back to the detected form), hint breaks
-  after "Grüner Punkt = erkannte Form.". Mobile gets a sticky Korrigieren bar (pre-correction);
+  after "Grüner Punkt = dein Satz.". Mobile gets a sticky Korrigieren bar (pre-correction);
   the mobile Grammatik button always opens (never `disabled`).
 - The transform box is a **white card** (never a grey wash) with a bold colored "Hinweis:" label
   (no i icon) and "KI-generierte Umformung" centered at the card bottom. The send-to-AI note +
@@ -81,6 +85,8 @@ until month-to-date Claude spend across `sentence_ai_ops` + `writing_evaluations
 env-overridable (`GEMINI_MODEL`, `CHECK_MODEL`/`TRANSFORM_MODEL`/`EVAL_MODEL`, `OPENAI_MODEL`,
 `CLAUDE_BUDGET_USD`); flip `GEMINI_MODEL` to change the primary. The German-grammar prompts are
 hardened (copula sein+Adjektiv is Aktiv, never Passiv; `bereits_zielform` needs voice AND tense;
-strict JSON-only), and `normalizeDetected` never marks a detected Zustandspassiv as the Passiv
-pill. The two Art. 50 disclaimers + `/privacy` (DE+EN) name all three providers
-routing-neutrally.
+Konjunktiv-II synthetic-vs-würde + Vorgang-vs-Zustand rules; strict JSON-only), and
+`normalizeDetected` maps each detected form to its own pill (Zustandspassiv has its own pill now;
+konjunktiv1/imperativ map to null). `transform-sentence` `PROMPT_VERSION` is at **4** — bump it on
+any prompt change (the global cache is keyed on it). The two Art. 50 disclaimers + `/privacy`
+(DE+EN) name all three providers routing-neutrally.
