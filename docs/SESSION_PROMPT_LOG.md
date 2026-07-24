@@ -342,3 +342,12 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `docs/DECISIONS.md` · `docs/areas/COMMANDS.md` ·
   `docs/archive/{PROJECT_STATUS_ARCHIVE,status-log/PROJECT_STATUS_ARCHIVE_2026-W30}.md` · PR (this one)
 >>>>>>> origin/main
+- **Prompt 2 (verbatim, 2026-07-24 ~11:55 UTC):** `I like the option b but I want you to generate more such previews with feather/ink pens and similar colors as other icons not red.` →
+  Round 2 built: `preview/schreiben-icon-harmony-r2.html` (screenshot-verified, republished to the
+  same artifact URL). B's nib direction carried forward without red, in the cool family colors of
+  the neighbor icons: **E** Federspitze Nachtblau (#3D74ED + Neon-Cyan #22d3ee, the compass/library
+  color logic) · **F** Federspitze Teal (#14b8a6 + #5eead4, own hue in the cool family) ·
+  **G** Schreibfeder/Kiel (feather quill split lengthwise blue/cyan + quill stem) ·
+  **H** Füller aufrecht (vertical fountain pen, blue body + cyan nib). Round-1 B (rose) kept at the
+  top as reference. Awaiting pick by letter (E-H); implementation would also retint the `/writing`
+  accent in `nav-items.ts`.
