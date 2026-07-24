@@ -55,7 +55,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
 1. **Redesign the Dashboard** (the home/progress screen) — **DONE**, iterated across many sessions:
    the UX-overhaul Phase 5 rebuild (sessions 47-49, the Heute/Bibliothek/Anwenden/Fortschritt zones)
    and the subsequent Neuland Üben/Spielen rework (s86-s90 map + hub redesign, s104 map re-spacing,
-   s105 nav relabel) are all live on `main`. See `CLAUDE.md` "Mobile bottom tab bar" section for the
+   s105 nav relabel) are all live on `main`. See `docs/areas/PRAKTISCH-NAV.md` for the
    current locked layout. Treat any further Dashboard work as a new, separately scoped backlog item
    rather than reopening this one.
 2. **Gate Schreibtraining behind sign-in — DONE.** `WritingHub` stashes the draft and opens
@@ -272,7 +272,7 @@ phases. None of these are started; treat as candidates for the next `EXPANSION_P
     - Design a new brand mark that is clearly differentiated from Canva (and other rounded-gradient-
       square app icons). Keep it legible at favicon size and recognisable on a home screen.
     - Once approved, regenerate **every** asset that currently uses the mark, matching the existing
-      treatment rules in `CLAUDE.md` → "Brand logo": the canonical in-app file
+      treatment rules in `docs/areas/BRAND.md`: the canonical in-app file
       `public/genauly-default-logo-transparent-corners.png` (rounded transparent corners, used in all
       in-app spots), the favicons (`favicon-32.png`/`favicon-16.png`, rounded transparent corners),
       and the **full-bleed opaque** OS icons (`apple-touch-icon.png`, `pwa-192x192.png`,
