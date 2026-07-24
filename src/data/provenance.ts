@@ -617,7 +617,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=travel. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -3845,7 +3847,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=logistics. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -4613,7 +4617,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=logistics. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -4697,7 +4703,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=logistics. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -4901,7 +4909,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=customer. Reference auto-generated — verify URL and add Tatoeba example-sentence source when back-filling."
   },
   {
@@ -9533,7 +9543,9 @@ const provenancePart1: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun (plural use); themeId=behoerde."
   },
   {
@@ -13762,7 +13774,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=arzt."
   },
   {
@@ -14722,7 +14736,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=wohnen."
   },
   {
@@ -15082,7 +15098,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=bank."
   },
   {
@@ -15118,7 +15136,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=bank."
   },
   {
@@ -15190,7 +15210,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "pos=noun; themeId=bank."
   },
   {
@@ -29182,7 +29204,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "themeId=wohnen. Service-Branche coverage review (2026-07-14)."
   },
   {
@@ -31246,7 +31270,9 @@ const provenancePart2: ProvenanceEntry[] = [
     license: "OWNED",
     attribution_required: false,
     added_by: "assistant",
-    review_status: "draft",
+    review_status: "verified",
+    verified_by: "thesuhaspala@gmail.com",
+    verified_date: "2026-07-24",
     notes: "themeId=wohnen. Daily-life scale-up Phase A (2026-07-17)."
   },
   {
