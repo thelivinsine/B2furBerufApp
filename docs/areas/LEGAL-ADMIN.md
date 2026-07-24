@@ -62,8 +62,11 @@ burst/hourly caps) and went live once BOTH sides were set: Supabase Auth CAPTCHA
   full-screen shell outside AppShell, like `/sources`). The whole subtree is ONE lazy chunk
   (`src/features/admin/AdminApp.tsx` owns descendant `<Routes>`): `AdminShell` (8-item bilingual
   DE/EN sidebar via `adminI18n.tsx` `t(de,en)`, founder chip, lang toggle; fetches
-  `admin_overview` once, shared via Outlet context). Founder AccountMenu shows a
-  "Kontrollzentrum" entry; deep links to unbuilt screens resolve to `AdminPlaceholder`, never 404.
+  `admin_overview` once, shared via Outlet context). Founder entry to `/admin` = a **"Kontrollzentrum"
+  row in the desktop `Sidebar` nav panel** (`src/components/layout/Sidebar.tsx`, `isFounder`-gated,
+  neutral nav styling) + a **mobile-only** copy in the `AccountMenu` (`lg:hidden`, since the sidebar is
+  desktop-only and the bottom bar is locked). Deep links to unbuilt screens resolve to
+  `AdminPlaceholder`, never 404.
 - **Übersicht:** funnel tiles + all-banks trust ladder from bundled provenance/verification,
   sync-gap + "Übergabe-Prompt kopieren" (`adminFunnel.ts` `pendingApprovals`/
   `buildHandoffPrompt`, pinned by `tests/adminFunnel.test.ts`), AI-budget tile, live-deploy

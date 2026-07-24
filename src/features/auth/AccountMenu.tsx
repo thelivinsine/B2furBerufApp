@@ -159,7 +159,9 @@ export function AccountMenu() {
           </Link>
 
           {founder && (
-            <Link to="/admin" onClick={() => setOpen(false)}>
+            // Moved into the desktop nav panel (Sidebar); this stays as the
+            // mobile-only entry since there is no sidebar below lg.
+            <Link to="/admin" onClick={() => setOpen(false)} className="lg:hidden">
               <Button variant="ghost" className="w-full justify-start px-2 text-primary hover:text-primary">
                 <ShieldCheck className="h-4 w-4" />
                 Kontrollzentrum
