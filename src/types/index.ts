@@ -419,7 +419,24 @@ export interface MatchingQuestion extends QuizQuestionBase {
   pairs: { left: string; right: string }[];
 }
 
-export type QuizQuestion = MCQQuestion | WordOrderQuestion | MatchingQuestion;
+/**
+ * Type-the-answer question (production, no options). Currently the typed plural
+ * variant: the learner must produce the plural form rather than recognise it
+ * among distractors. `accept` holds every normalized target that grades correct
+ * (e.g. the bare "Praxen" and the full "die Praxen"); `answer` is the canonical
+ * form shown on reveal.
+ */
+export interface TypedQuestion extends QuizQuestionBase {
+  kind: "pluralType";
+  answer: string;
+  accept: string[];
+}
+
+export type QuizQuestion =
+  | MCQQuestion
+  | WordOrderQuestion
+  | MatchingQuestion
+  | TypedQuestion;
 
 /* ---------------- Composed session (UX overhaul Phase 1) ---------------- */
 
