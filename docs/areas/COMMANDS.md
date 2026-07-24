@@ -104,6 +104,12 @@ npm/yarn. Run `pnpm install` after pulling.
   `tests/reviewScore.test.ts`). Regenerate after content edits.
 - `pnpm generate:provenance` — bootstrap a FRESH provenance register only (it overwrites). Add new
   rows manually for incremental additions.
+- `pnpm check:refs` — on-demand (no gate): checks that every `reference` URL in
+  `src/data/provenance.ts` actually resolves, so "the link is live" claims stay honest
+  (`scripts/check-provenance-refs.mjs`). Needs network; run before audits or verification waves.
+- `pnpm build:dict-subset` / `pnpm build:nouns-subset` — internals of `pnpm build:oracles` (the
+  LanguageTool + Wiktionary morphology subsets under `scripts/vendor/`); run via `build:oracles`,
+  not directly.
 
 ## Code gates (CI)
 - `pnpm test:srs` — asserts `engine/srs.ts` against FSRS golden vectors from py-fsrs. **Run after
@@ -115,6 +121,9 @@ npm/yarn. Run `pnpm install` after pulling.
 - `pnpm test:unit` — Vitest smoke suite in `tests/`: stores, session composer, search, paged-list +
   debounce contracts, and the per-feature pins referenced throughout the area docs. Extend it when
   touching those areas.
+- `pnpm check:contrast` — WCAG contrast gate for the brand token system: parses the `:root` and
+  `.dark` HSL custom properties out of `src/index.css` and fails CI on contrast regressions
+  (`scripts/check-contrast.mjs`). **Run after any change to the theme tokens in `src/index.css`.**
 - `pnpm check:bundle` — main-chunk size budget, 400 kB (run after `pnpm build`). If a feature
   legitimately needs more, raise the budget in `scripts/check-bundle-size.mjs` in the same PR and
   say why. **Keep eager code light:** the Dashboard imports NO content bank (main chunk ~75 kB);

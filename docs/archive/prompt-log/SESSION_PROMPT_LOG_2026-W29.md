@@ -1965,3 +1965,198 @@ Branch `claude/filter-scroll-badge-bugs-y75thb`. All work squash-merged to `main
 - **Artifacts (Prompts 16–17):** `src/features/shared/FilterRail.tsx` · `src/features/shared/browseScroll.tsx` ·
   `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` · PR #589
 
+
+## Session 133 — 2026-07-19 — Brand-kit modernization plan
+
+- **Branch:** `claude/brand-kit-modernization-igqlnm`
+- **Prompt 1 (verbatim):** `> check the brand spec document, scope the work with a robust plan with clear model recommendations for each chunk of work. Except for the logo, feel free to deviate subtly wherever needed to make the brand kit of app look modern and top billion dollar successful edutech app. Aim for the highest quality and excellent output. Save the plan to repo.`
+- **Response 1 (Fable 5):** Read `docs/branding/BRAND_SPEC.md` and surveyed every brand touchpoint in
+  the code (tokens in `src/index.css`/`tailwind.config.ts`, hardcoded hexes in `nav-items.ts`,
+  `route-icons.tsx`, `graphPalette.ts`, `UebenPath.tsx`, the four `features/welt` chrome files,
+  `domain-buildings.tsx`, `index.html`, `vite.config.ts` manifest, `prerender-help.mjs`, the
+  `public/` icon set, and the landing page). Authored
+  **`docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md`**: a four-PR implementation sequence (A atomic
+  token flip + accent-role audit + chrome/meta, Fable 5 · B logo outline + full icon/og pipeline
+  with zero deviation, Opus 4.8 · C deep surface sweep of game/map/buildings/landing, Opus 4.8 or
+  Sonnet 5 · D dark-mode design pass + typography/motion/reward polish, Fable 5), a
+  sanctioned-deviations register (logo locked; primary darkening for AA, `--accent-ink`,
+  ink-on-Koralle, gradient demotion, der-token nudge, dual theme-color metas, typography
+  micro-polish), computationally verified WCAG contrast findings (white on Nachtblau 4.27:1,
+  Nachtblau on Papier 3.96:1, Himmelblau on white 1.94:1, white on Koralle 3.26:1), a proposed
+  permanent `check:contrast` gate, and a risk register (accent-foreground white→ink semantic flip,
+  PWA stale cache, locked palettes re-hued only, OAuth consent-logo re-upload). Docs-only session:
+  no `src/` change. Also aged the s131 handoff into the W29 archive per the doc-hygiene rule.
+- **Artifacts (Prompt 1):** `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · PR #592
+- **Prompt 2 (verbatim):** `> go ahead with a`
+- **Response 2 (Fable 5):** Built and shipped plan PR A, the atomic brand flip. Token systems for
+  both themes in `src/index.css` (Papier ground, Nachtblau primary at `221 83% 54%`, Himmelblau
+  accent with ink pairing + new `--accent-ink`, Koralle reward at `11 82% 54%`, warm `--shadow`
+  `#22304F`; all deviations WCAG-driven and documented in the BRAND_SPEC status header),
+  `tailwind.config.ts` accent.ink + re-stopped accent-gradient + quieted mesh, the
+  `text-accent`→`text-accent-ink` sweep across 7 files, chrome alignment (`nav-items.ts`,
+  `route-icons.tsx` BRAND, `graphPalette.ts` beruf/professional → Nachtblau), shell/meta
+  (dual theme-color metas + no-JS shell in `index.html`, manifest `#3D74ED`/`#151320`,
+  `prerender-help.mjs`, `src/main.tsx` boot-error gradient), and the permanent
+  `scripts/check-contrast.mjs` gate wired into `validate.yml` (42/42 pairings pass). Gates all
+  green (typecheck, lint 0 errors, test:unit 219, build, bundle 80.8 kB). Playwright screenshots
+  light+dark × mobile+desktop verified Praktisch, Theorie (Karten + Graph), Fortschritt, Landing.
+  Marked PR A shipped in the plan + BRAND_SPEC. Squash-merged to `main`.
+- **Artifacts (Prompt 2):** `src/index.css` · `tailwind.config.ts` · `scripts/check-contrast.mjs` ·
+  `package.json` · `.github/workflows/validate.yml` · `src/components/layout/nav-items.ts` ·
+  `src/components/layout/route-icons.tsx` · `src/lib/graphPalette.ts` · `index.html` ·
+  `vite.config.ts` · `scripts/prerender-help.mjs` · `src/main.tsx` · 7 `text-accent` call-site
+  files · `docs/branding/BRAND_SPEC.md` · `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · PR (see
+  merge commit on `main`)
+- **Prompt 3 (verbatim):** `> go ahead with b and c`
+- **Response 3 (Opus 4.8):** Shipped brand plan PRs B and C as two PRs.
+  **PR B (#594) — logo + icon pipeline:** outlined the lowercase g from **Inter 800** (chosen from a
+  5-candidate panel rendered on the locked swipe — Inter 800/900, Manrope 800, Figtree 900, Nunito
+  900 — for wordmark cohesion with the app's Inter UI type + favicon-scale legibility) into a real
+  `<path>` via opentype.js. Wrote `scripts/branding/build-logo-assets.mjs` (dev tooling, not in the
+  app build): one source of truth for the swipe + outlined-g, rasterizing every `public/` asset with
+  Playwright Chromium (no sharp) — default logo + favicon-16/32/48 (transparent corners),
+  apple-touch/pwa-192/512 (full-bleed opaque), maskable (inner 80%), a new Papier og-image (mark +
+  Inter-800 wordmark + tagline + genauly.de plate), and the canonical
+  `preview/branding/genauly-logo-final.svg`. Verified on white/dark + iOS/circle mask sims and in the
+  app header/landing/sidebar.
+  **PR C (#595) — deep surface sweep:** Neuland game chrome `#5b5be6`→Nachtblau `#3D74ED` across all
+  four welt files (`GAME_INDIGO`→`GAME_BLUE`; leather-backpack amber art + `GAME_OUT` outline kept as
+  game props; victory loot already Koralle via PR A); Üben map route/Bahnhof→Nachtblau, MAP_LIGHT
+  scenery tints hue-shifted 245→221 at identical (founder-locked) lightness, MAP_DARK route→`#8AB0F9`;
+  Büro building→Nachtblau; landing step-chips + closing CTA band flattened to flat `bg-primary` (hero
+  CTAs + "plateau." headline keep the gradient per the discipline); der token deepened to a cooler
+  cobalt (light `226 74% 48%` / dark `226 88% 76%`) so a der Wesen never reads as the brand.
+  Gates green (typecheck, lint 0 errors, test:unit 219, build, bundle 80.8 kB, contrast 42/42).
+  Verified in-mission battle chrome, Spielen hub, Theorie der/die/das marks, flattened landing CTA.
+  Both squash-merged to `main`; docs (BRAND_SPEC, plan, PROJECT_STATUS, this log) updated.
+- **Artifacts (Prompt 3):** `scripts/branding/build-logo-assets.mjs` · `preview/branding/genauly-logo-final.svg` ·
+  `public/` (9 icon/og assets) · `src/features/welt/{stage,BattleView,MissionPlayer,scenes}.tsx` ·
+  `src/features/dashboard/UebenPath.tsx` · `src/components/city/domain-buildings.tsx` ·
+  `src/features/landing/LandingPage.tsx` · `src/index.css` · `CLAUDE.md` ·
+  `docs/branding/BRAND_SPEC.md` · `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · PRs #594, #595
+- **Prompt 4 (verbatim):** `> go ahead `
+- **Response 4 (Fable 5):** Shipped brand plan PR D (#596), completing the rebrand. The PR A dark
+  theme survived its design review nearly intact; judged changes: dark `--muted-foreground` 76%→72%
+  (hierarchy: secondary text now reads secondary, still ~8:1 on the ground), streak surfaces moved
+  from warning/Butter to **Koralle** (header streak pill `bg-reward-bg`/`text-reward`/`fill-reward`,
+  Fortschritt "Aktuelle Serie" StatCard via a new `reward` accent), `tabular-nums` on the StatCard
+  value (the one numeric surface missing it), and the CLAUDE.md color-language sweep (brand
+  indigo→Nachtblau, reward-gold→Koralle; DECISIONS.md deliberately kept as history). Found already
+  done and left alone: button pressed states (`active:scale-[0.98]`), display `tracking-tight`,
+  Analytics/session tabular-nums. Gates green (typecheck, lint 0 errors, test:unit 219, build,
+  bundle 80.8 kB, contrast 42/42 incl. the retuned dark muted pairs). Verified the Koralle streak
+  pill light+dark and the dark Fortschritt hierarchy by screenshot. BRAND_SPEC flipped to FULLY
+  IMPLEMENTED; the plan doc records all four PRs (#593 Fable 5 · #594/#595 Opus 4.8 · #596 Fable 5).
+  Squash-merged to `main`.
+- **Artifacts (Prompt 4):** `src/components/layout/AppShell.tsx` · `src/components/shared/StatCard.tsx` ·
+  `src/features/analytics/Analytics.tsx` · `src/index.css` · `CLAUDE.md` · `docs/branding/BRAND_SPEC.md` ·
+  `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · `docs/PROJECT_STATUS.md` · PR #596
+- **Prompt 5 (verbatim):** `> document the session. ` _(switched session model to Opus 4.8)_
+- **Response 5 (Opus 4.8):** Started the documentation close-out (the session had been documented
+  incrementally after each PR, so this was the hygiene sweep: refreshed the s133 handoff header in
+  `PROJECT_STATUS.md` from "PLAN authored" to "plan authored AND fully shipped"). Interrupted by
+  prompt 6 before finishing; folded the remaining doc work into the prompt-7 pass below.
+- **Prompt 6 (verbatim):** `> store all the brand kit items in a dedicated repo. generate proper brand kit if any of them isn't available. `
+- **Response 6 (Opus 4.8):** Asked (AskUserQuestion) whether the kit should be a standalone GitHub
+  repo or a folder in this repo; founder chose **folder in this repo** (recommended: one source of
+  truth, no drift). Built **`brand-kit/`** + the generator **`scripts/branding/build-brand-kit.mjs`**,
+  which reads the mark constants + the live tokens from `src/index.css` so the kit cannot drift from
+  what ships. **Generated the missing pieces** a proper kit needs: the "Genauly" **wordmark** (outlined
+  from Inter 800 glyph-by-glyph with kerning, bypassing an unsupported opentype GSUB feature →
+  `scripts/branding/wordmark-data.mjs`), horizontal + stacked **lockups** (ink + white), a **mono
+  knockout** mark (swipe filled, g cut out as negative space, verified legible on white/Papier/blue/
+  ink grounds), a **clear-space** guide, the **palette.svg** swatch sheet + `tokens.css`/`tokens.json`,
+  an **Inter type specimen**, copied **app icons**, a **square social avatar** + og-image, PNG
+  **preview** contact sheets, and a **README** with full usage rules. ~592 kB, 27 files. Verified the
+  logo-overview, palette, typography, and mono sheets by screenshot.
+- **Prompt 7 (verbatim):** `> then document the session once done with the current task`
+- **Response 7 (Opus 4.8):** This close-out. Folded the brand-kit deliverable into the s133
+  `PROJECT_STATUS.md` handoff, noted it in the plan doc + a new CLAUDE.md Brand-logo bullet (where the
+  kit lives + how to regenerate), refreshed the handoff header, and logged prompts 5–7 here. Doc
+  hygiene checked: `PROJECT_STATUS.md` holds the two most recent handoffs (s133 + s132), under the
+  250-line cap. Shipped with the brand-kit PR.
+- **Artifacts (Prompts 5–7):** `brand-kit/` (27 files) · `scripts/branding/build-brand-kit.mjs` ·
+  `scripts/branding/wordmark-data.mjs` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` ·
+  `docs/plans/BRAND_KIT_MODERNIZATION_PLAN.md` · `docs/SESSION_PROMPT_LOG.md`
+- **Prompt 8 (verbatim):** `> for the dark mode logo, why can't you use the same blue for the highlight but white for the letter g?`
+- **Response 8 (Opus 4.8):** Rendered the option rather than asserting: white-g + Himmelblau swipe on
+  dark actually works (the descender reads on the dark ground; the bowl-on-swipe contrast is modest
+  but legible at logo size). Explained the app was using ONE universal Papier-tile mark, not a
+  theme variant. Offered A (tile-less white g) vs B (dark sticker tile + white g); founder picked B.
+- **Prompt 9 (verbatim):** `> the white g looks too white.m can you look for a lighter shade and provide some previews?`
+- **Response 9 (Opus 4.8):** Rendered 6 g shades on the dark tile (pure white → Papier cream →
+  off-whites → grey-lavender → steel blue) and sent the comparison; asked which to use, recommending
+  Papier `#FAF6EC`. Founder replied "[No preference]", so I took the recommendation.
+- **Prompt 10 (verbatim):** `> also, the logo should just be the letter with the blue highlight.. the background shouldn't be part of the logo and should always be transparent. all the previews you provided look the samem generate an html artifact`
+- **Response 10 (Opus 4.8, artifact-design skill):** Two changes: the logo becomes **tile-less**
+  (transparent always, just swipe + g), and I built a proper interactive **HTML artifact**
+  (`brand-kit/previews/logo-preview.html`, theme-aware, Papier/Tinte + Nachtblau, marks at full size)
+  showing the tile-less mark on transparent/light/dark grounds + the dark-mode g-shade chooser so the
+  differences actually read. Published via the Artifact tool.
+- **Prompt 11 (verbatim):** `> provide the artifact here`
+- **Response 11 (Opus 4.8):** Rendered the artifact inline via SendUserFile (display:render) and
+  re-shared the published URL.
+- **Prompt 12 (verbatim):** `> go ahead with the recommendation` (+ mid-turn: `once done with the current task, check if the branding is applied to the app well and make any improvements or corrections if needed, then document the session and push everything to main`)
+- **Response 12 (Fable 5 → Opus 4.8):** Implemented the tile-less logo end-to-end with Papier g on
+  dark. `build-logo-assets.mjs` now emits `genauly-logo.png` (ink g) + `genauly-logo-dark.png`
+  (Papier g), both transparent/tile-less; favicons/PWA keep their tile. New shared
+  `src/components/shared/Logo.tsx` swaps them on `.dark` (no JS); all 7 in-app logo spots switched to
+  `<Logo>` with no tile/rounded/glow box; the dark no-JS shells (`index.html`, `prerender-help.mjs`)
+  hard-code the dark logo; the old `genauly-default-logo-transparent-corners.png` removed. Brand kit +
+  its generator + README updated to tile-less (mark/mark-dark/app-icon-tile, lockups, overview).
+  Branding QA: verified the logo swap in header/landing/sign-in light+dark; the wider app was already
+  verified across PRs A–D. Gates green (typecheck, lint 0 errors, test:unit, build, bundle 80.8 kB,
+  check:contrast). Docs (PROJECT_STATUS, BRAND_SPEC, CLAUDE.md, this log) updated; pushed to `main`.
+- **Artifacts (Prompts 8–12):** `src/components/shared/Logo.tsx` · `public/genauly-logo.png` ·
+  `public/genauly-logo-dark.png` · `scripts/branding/build-logo-assets.mjs` ·
+  `scripts/branding/build-brand-kit.mjs` · `brand-kit/` (logo/README/previews incl.
+  `logo-preview.html`) · 7 in-app logo components · `index.html` · `scripts/prerender-help.mjs` ·
+  `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/branding/BRAND_SPEC.md` · `docs/SESSION_PROMPT_LOG.md`
+
+## Session 134 — 2026-07-19 — Mobile filter rail height, park Verbunden, Option B word cards
+
+- **Branch:** `claude/filter-rail-mobile-height-n8ktd6`
+- **Model:** Opus 4.8 (founder switched to it via `/model` mid-way through prompt 1).
+- **Prompt 1 (verbatim):** `> the filter rail occupies a bit too much space on mobile view when opened. reduce its height by 3-4 lines worth of space for mobile. `
+- **Response 1 (Opus 4.8):** Reduced the `FilterRail` mobile `panel` cap from `max-h-[55dvh]` to
+  `max-h-[45dvh]` (`src/features/shared/FilterRail.tsx`), ~10 dvh / roughly 3-4 text lines on a phone,
+  leaving more of the card list visible; the fixed header + internal scroll region keep the filters
+  reachable. Typecheck green. Committed + pushed; not yet shipped at this point.
+- **Prompt 2 (verbatim):** `> the verbunden drop-down and links to other parts of the app can be parked for now as I need to brainstorm on it and think how it's useful and what are the dependencies for it. for now keep it hidden. Then provide a few previews of rearranging items on the cards for best looks. `
+- **Response 2 (Opus 4.8):** Traced "Verbunden" to the vocab-card cross-module panel (`RelatedPanel`
+  → Kollokation/Schreibtraining/Dialog, toggled in `VocabList.tsx`). Parked it behind a reversible
+  `const SHOW_RELATED = false` (gates `hasRelated`); `RelatedPanel.tsx` + `relatedRows` kept untouched
+  so re-enabling is one line. Built `preview/vocab-card-layouts.html` (real design tokens, light/dark
+  toggle, 2-up grid) with four card-rearrangement options — A baseline · B actions-to-the-foot ·
+  C example bottom-anchored + plural pill · D genus color rail — and sent it via SendUserFile.
+- **Prompt 3 (verbatim):** `> provide the artifact here again `
+- **Response 3 (Opus 4.8):** Re-sent the same `preview/vocab-card-layouts.html` render.
+- **Prompt 4 (verbatim):** `> i like option b. ` _(mid-turn follow-up: `> for the animation on the backside of the card, move it to the right of the card as for most of the cards the right side is empty. Also, the female animation seems too slow and not as snappy as for the others, so fix it.`)_
+- **Response 4 (Opus 4.8):** Implemented Option B in `VocabList.tsx` (quiet headline = creature + word
+  left / bookmark right; example gets room; foot row pins plural pill left + speak button right via
+  `mt-auto`). For the mid-turn asks: gave `ArtikelEffect` a new `align` prop and passed `align="right"`
+  from the card back (origin → `--fx-x: 78%`, the empty right side; `SessionPlayer` stays centered),
+  and made the "die" bloom snappier — `470ms` fast-out cubic-bezier (was `650ms` ease-out) with a
+  tighter `200/280/360ms` ring stagger (was `200/310/420`). The three `.artikel-fx-*` origins now read
+  `var(--fx-x, 50%)`. Gates: typecheck clean, lint 0 errors, build green, `test:unit` 219/219.
+- **Prompt 5 (verbatim):** `> give me a png preview here ` _(also `> provide the artifact here again` earlier; and a bare `> continue`)_
+- **Response 5 (Opus 4.8):** Rendered a PNG of Option B (three front cards die/der/das + one back face
+  showing the right-shifted reveal), light + dark side by side, by driving the pre-installed headless
+  Chromium (`/opt/pw-browsers/chromium-1194`) against a scratchpad HTML built from the real tokens
+  (no Playwright package available). Sent it via SendUserFile.
+- **Prompt 6 (verbatim):** `> yes ` _(to opening + merging a PR for the batch)_
+- **Response 6 (Opus 4.8):** Opened **PR #598** into `main` (no PR template in repo) and squash-merged
+  it (`796fb01`): filter-rail height, parked Verbunden + preview, Option B cards, reveal-effect move +
+  die timing. Ran the required post-merge realignment (`fetch origin main` → `reset --hard` →
+  `push --force-with-lease`) so the dev branch is level with `main`.
+- **Prompt 7 (verbatim):** `> document the session `
+- **Response 7 (Opus 4.8):** This close-out. Added the s134 handoff to `PROJECT_STATUS.md`, aged the
+  s132 handoff into the W29 archive per the two-handoff hygiene rule, refreshed the `_Last updated_`
+  header to s134, and logged prompts 1-7 here.
+- **Artifacts:** `src/features/shared/FilterRail.tsx` · `src/features/vocabulary/VocabList.tsx` ·
+  `src/components/artikel/ArtikelEffect.tsx` · `src/index.css` · `preview/vocab-card-layouts.html` ·
+  `docs/PROJECT_STATUS.md` · `docs/SESSION_PROMPT_LOG.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W29.md` · commits `2f1c7d4` / `1c48a33` /
+  `df0c9bd` · PR #598 (squash `796fb01`)
