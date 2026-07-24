@@ -510,3 +510,10 @@ Founder reviewed individual session cards from screenshots; each turn diagnosed 
   required PR approvals so the founder-approved auto-ship squash-merge keeps working). Docs-only
   turn, no code changes.
 - **Artifacts (prompt 1):** this log
+- **Prompt 2 (verbatim, + 2 screenshots of the new-ruleset form):** `this is config correct?` →
+  Two blockers spotted: Enforcement status was "Disabled" (ruleset would be ignored) and Target
+  branches was empty (name "main" is only a label). Told the founder to set status to Active, add
+  target "Include default branch", keep "Block force pushes" ticked, verify "Restrict deletions"
+  is ticked, leave "Require a pull request before merging" and all scanning/quality/coverage/
+  Copilot options off, then Create. Docs-only turn, no code changes.
+- **Artifacts (prompt 2):** this log
