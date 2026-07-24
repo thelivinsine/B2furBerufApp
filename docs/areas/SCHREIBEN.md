@@ -34,6 +34,13 @@ design as reference.**
   not height collapse, for the same reason.
 - Mobile = the Bibliothek pattern: a toolbar button toggles the collapsible panel
   (`layout="panel"`, no floating chip rows); Kurz/Lang get the floating Auswerten cluster (below).
+- **The panel toggles wear the rail's own Himmelblau** (s166): "Aufgabe wählen" (Kurz/Lang) and
+  "Grammatik" (Fokus) are `variant="accent"` when closed, `default` (solid primary) when open.
+  `outline`'s `bg-surface/50` made them vanish into the page ground. The `accent` variant borders
+  with **`accent-ink/70` in light** (the 77%-light accent can never clear the 3:1 UI floor on a
+  near-white ground; measured 1.31:1 vs 3.07:1) and keeps `accent/45` in dark (3.34:1). Label
+  contrast 4.72:1 light / 7.71:1 dark. Reuse the variant for any panel toggle, never re-tint
+  `outline` itself.
 - Umlaut keys (`UmlautKeys`, below) sit in the word-count row of `GuidedWritingTrainer.tsx`.
 - Verlauf renders inside the same content grid column (never full width); its empty state
   deep-links into Kurz. `WritingHistory` shows only the learner's text (the exact prompt behind
