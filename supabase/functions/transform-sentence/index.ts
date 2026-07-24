@@ -71,11 +71,11 @@ const TRANSFORM_BURST_LIMIT = Number(Deno.env.get("TRANSFORM_BURST_LIMIT") ?? "8
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");
-// Bumped to "3" with the Modus/Konjunktiv-II rules (synthetic vs wuerde,
-// no wuerde in the wenn-clause, K-II Vergangenheit haette/waere + Partizip II).
-// The global transform cache is keyed on this, so the bump prevents serving
-// stale transforms produced by the old prompt (which had no K-II guidance).
-const PROMPT_VERSION = Deno.env.get("PROMPT_VERSION") ?? "3";
+// Bumped to "4" with the Zustandspassiv (Vorgang vs Zustand) clarifier +
+// example, on top of the "3" Modus/Konjunktiv-II rules. The global transform
+// cache is keyed on this, so the bump prevents serving stale transforms
+// produced by the old prompt.
+const PROMPT_VERSION = Deno.env.get("PROMPT_VERSION") ?? "4";
 
 interface Tuple { voice: string; tense: string; mood: string }
 
@@ -108,7 +108,9 @@ const SYSTEM_PROMPT =
   `haette/waere + Partizip II ("haette gemacht", "waere gekommen"). Aus einem Imperativ oder einer ` +
   `direkten Aufforderung wird im Konjunktiv II eine hoefliche Bitte ("Schicken Sie mir ..." -> ` +
   `"Koennten Sie mir bitte ... schicken?"). ` +
-  `Regeln fuer Passiv: passiv_vorgang = werden + Partizip II; passiv_zustand = sein + Partizip II; ` +
+  `Regeln fuer Passiv: passiv_vorgang = werden + Partizip II (beschreibt den VORGANG/Prozess, ` +
+  `"Die Rechnung wird geprueft"); passiv_zustand = sein + Partizip II (beschreibt das ERGEBNIS/den ` +
+  `Zustand nach dem Vorgang, "Die Rechnung ist geprueft", "Das Geschaeft ist geoeffnet"). ` +
   `nur Saetze mit Akkusativobjekt lassen sich persoenlich passivieren. Das Perfekt-Passiv nutzt "worden", nicht "geworden". ` +
   `Eine Kopula (sein/werden/bleiben + Adjektiv oder Adverb, z. B. "Ich bin krank") ist aktiv, ` +
   `kein Passiv; das Adjektiv ist kein Partizip. ` +
@@ -129,7 +131,8 @@ const SYSTEM_PROMPT =
   `"Ich bin krank gewesen", applicable true. Quelle "Der Bericht wird geschrieben." Ziel ` +
   `aktiv Praesens -> "Man schreibt den Bericht", applicable true. Quelle "Schicken Sie mir die ` +
   `Unterlagen." Ziel mood konjunktiv2 -> "Koennten Sie mir bitte die Unterlagen schicken?", ` +
-  `applicable true. ` +
+  `applicable true. Quelle "Man oeffnet das Geschaeft um acht." Ziel passiv_zustand Praesens -> ` +
+  `"Das Geschaeft ist um acht geoeffnet", applicable true. ` +
   `Nutze fuer voice, tense und mood in achieved NUR die vorgegebenen Werte, exakt geschrieben. ` +
   `Gib AUSSCHLIESSLICH das JSON-Objekt aus, ohne Markdown, ohne Code-Zaeune und ohne ` +
   `weiteren Text, genau in dieser Form: ` +

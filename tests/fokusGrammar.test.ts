@@ -11,7 +11,11 @@ describe("grammar dimensions (Fokus Satzlabor)", () => {
   it("ships the Voice x Tense x Mood grid (Wave 2 added Modus)", () => {
     const ids = GRAMMAR_AXES.map((a) => a.id);
     expect(ids).toEqual(["voice", "tense", "mood"]);
-    expect(GRAMMAR_AXES[0].values.map((v) => v.id)).toEqual(["aktiv", "passiv_vorgang"]);
+    expect(GRAMMAR_AXES[0].values.map((v) => v.id)).toEqual([
+      "aktiv",
+      "passiv_vorgang",
+      "passiv_zustand",
+    ]);
     expect(GRAMMAR_AXES[1].values.map((v) => v.id)).toEqual(["praesens", "perfekt", "praeteritum"]);
     expect(GRAMMAR_AXES[2].values.map((v) => v.id)).toEqual(["indikativ", "konjunktiv2"]);
   });
@@ -22,11 +26,10 @@ describe("grammar dimensions (Fokus Satzlabor)", () => {
       tense: "praesens",
       mood: "indikativ",
     });
-    // Zustandspassiv (sein + Partizip) is NOT the Passiv pill (Vorgangspassiv,
-    // werden + Partizip), so it marks no voice pill current rather than mislabeling.
-    // This also stops a copula the detector misreads as passive from surfacing a
-    // wrong Passiv marker.
-    expect(normalizeDetected("passiv_zustand", "perfekt").voice).toBeNull();
+    // Zustandspassiv (sein + Partizip) now has its own pill, so it maps straight
+    // to that pill rather than being dropped. The copula safeguard lives in the
+    // check-sentence prompt (a misread "Ich bin krank" comes back as aktiv).
+    expect(normalizeDetected("passiv_zustand", "perfekt").voice).toBe("passiv_zustand");
     // Tenses not in the MVP set do not mark any pill current (honest, not wrong).
     expect(normalizeDetected("aktiv", "futur1").tense).toBeNull();
     // Konjunktiv II is on the rail; Konjunktiv I / Imperativ are not, so they

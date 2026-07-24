@@ -10,9 +10,9 @@
  * maps 1:1 onto rail groups with no translation layer.
  *
  * Wave 1 shipped the Voice x Tense grid. Wave 2 adds Modus (Konjunktiv II) as a
- * third combinable axis (the backend enums already carry it). Zustandspassiv,
- * Register and clause order remain later waves; the UI is data-driven so growing
- * the taxonomy needs no component changes.
+ * third combinable axis and Zustandspassiv as a third Genus-Verbi pill (the
+ * backend enums already carry both). Register and clause order remain later
+ * waves; the UI is data-driven so growing the taxonomy needs no component changes.
  */
 
 export type AxisId = "voice" | "tense" | "mood";
@@ -50,9 +50,10 @@ export interface GrammarAxis {
 }
 
 /**
- * The MVP grid: Aktiv / Vorgangspassiv x Praesens / Perfekt / Praeteritum.
  * "Passiv" means Vorgangspassiv (werden + Partizip), the process reading learners
- * mean ~95% of the time and the #1 B2-Beruf marker.
+ * mean ~95% of the time and the #1 B2-Beruf marker. Zustandspassiv (sein +
+ * Partizip) is a distinct third pill: it names the RESULT/state, not the process
+ * (wird geprueft = Vorgang vs ist geprueft = Zustand), a classic B2 discriminator.
  */
 export const GRAMMAR_AXES: GrammarAxis[] = [
   {
@@ -62,6 +63,12 @@ export const GRAMMAR_AXES: GrammarAxis[] = [
     values: [
       { id: "aktiv", label: "Aktiv", en: "active voice" },
       { id: "passiv_vorgang", label: "Passiv", en: "process passive (werden)" },
+      {
+        id: "passiv_zustand",
+        label: "Zustandspassiv",
+        short: "Zust.",
+        en: "statal passive (sein): the result/state",
+      },
     ],
   },
   {
@@ -113,17 +120,19 @@ const KNOWN: Record<AxisId, Set<string>> = {
 };
 
 /**
- * Map the AI's detected tuple onto the MVP pill set. Detection can return values
- * the MVP rail does not show yet (passiv_zustand, futur1, ...); those map to `null`
- * (no pill marked current in that group), which is honest rather than wrong.
+ * Map the AI's detected tuple onto the displayed pill set. Detection can return
+ * values the rail does not show (futur1, konjunktiv1, imperativ, ...); those map
+ * to `null` (no pill marked current in that group), which is honest rather than
+ * wrong.
  *
- * `passiv_zustand` is deliberately NOT collapsed onto the Passiv pill: that pill is
- * Vorgangspassiv (werden + Partizip), a different construction from a Zustandspassiv
- * (sein + Partizip). Collapsing them mislabeled real Zustandspassiv AND, worse, turned
- * any copula the detector misread as "sein + Partizip" (e.g. "Ich bin krank") into a
- * confident green Passiv marker. Returning `null` keeps that slip from ever surfacing
- * a wrong voice on the rail even if detection is off. `mood` is treated the same way:
- * konjunktiv1 / imperativ are not on the rail, so they map to `null` (no pill marked).
+ * `passiv_zustand` now has its OWN pill (Zustandspassiv), so it maps straight to
+ * that pill rather than being dropped. The earlier `null` mapping existed only
+ * because there was no dedicated pill and collapsing it onto the Vorgangspassiv
+ * "Passiv" pill would mislabel it. The copula safeguard (a misread "Ich bin
+ * krank" must not surface as a passive) now lives in the check-sentence prompt
+ * ("Kopula ... im Zweifel voice = aktiv"), so the detector returns aktiv there,
+ * not passiv_zustand. `mood` follows the same rule: konjunktiv1 / imperativ are
+ * not on the rail, so they map to `null`.
  */
 export function normalizeDetected(voice?: string, tense?: string, mood?: string): {
   voice: string | null;
