@@ -1593,3 +1593,11 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   Verified healthy: CLAUDE.md 178/~350 lines, PROJECT_STATUS.md 178/~250 with exactly the two
   most recent handoffs (s156+s155), dated content counts, append-only logs intact through s156.
 - **Artifacts (session 157):** this log (audit report delivered in chat; fixes await founder go-ahead)
+- **Prompt 2 (verbatim, 2026-07-24 ~11:45 UTC):** `I also want your opinion if we need a high-quality comprehensive agent.md file` →
+  Opinion delivered: **no comprehensive AGENTS.md**. It would recreate the always-on-bloat problem
+  s155 just solved and would drift against CLAUDE.md (violates the one-source-per-fact rule), and
+  there is no consumer today: only Claude Code builds this app and it loads CLAUDE.md. Recommended
+  instead: an optional **thin ~10-line router AGENTS.md** (no rules of its own, points other coding
+  agents at CLAUDE.md → docs/areas/ → the two skills) as zero-drift insurance for any future
+  non-Claude tool. Not created yet; awaiting founder go-ahead (can bundle with the six audit fixes
+  from prompt 1).
