@@ -517,3 +517,9 @@ Founder reviewed individual session cards from screenshots; each turn diagnosed 
   is ticked, leave "Require a pull request before merging" and all scanning/quality/coverage/
   Copilot options off, then Create. Docs-only turn, no code changes.
 - **Artifacts (prompt 2):** this log
+- **Prompt 3 (verbatim, + screenshot of the Add target dropdown):** `I'm selecting the default branch then` →
+  Confirmed "Include default branch" is correct (main is the default; the rule follows a future
+  rename automatically) and warned against "Include all branches", which would also lock the
+  session branches where force-with-lease is routine. Reminder: set Enforcement to Active, then
+  Create. Docs-only turn, no code changes.
+- **Artifacts (prompt 3):** this log
