@@ -1520,3 +1520,13 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
 - **Artifacts (session 155, part 2):** `CLAUDE.md` · `docs/areas/*.md` (10 files) ·
   `.claude/skills/content/SKILL.md` · `.claude/skills/design/SKILL.md` ·
   `scripts/lint-content.mjs` · `docs/PROJECT_STATUS.md` · this log · PR #671
+- **Prompt 4 (verbatim):** `document the session ` →
+  Confirmed the session was already documented incrementally (the s155 PROJECT_STATUS header +
+  two-part handoff, the W30 archive move of the s153 handoff, prompt-log entries 1-3 with PR #668
+  and #671); appended this closing entry and merged the documentation to `main`.
+- **Session 155 summary:** two deliverables, both squash-merged. **PR #668**: the `/design` skill
+  (`.claude/skills/design/SKILL.md`), distilled by research subagents from the s133-154 prompt log
+  + DECISIONS.md, with the mandatory pointer in CLAUDE.md. **PR #671**: CLAUDE.md restructured
+  from 1,078 lines (~36k tokens, always loaded) to ~180 lines of current law; detail moved
+  current-state-only into `docs/areas/` (10 files); new `/content` skill; warn-only CLAUDE.md
+  size ratchet in `scripts/lint-content.mjs`. `pnpm lint:content` green throughout.
