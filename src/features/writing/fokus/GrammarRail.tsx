@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 
 interface GrammarRailProps {
   /** Detected base grammar of the corrected sentence. */
-  detected: { voice: string | null; tense: string | null };
+  detected: { voice: string | null; tense: string | null; mood: string | null };
   /** The learner's current target selection. */
   selection: FokusSelection;
   /** Whether the pills are interactive yet (a correction exists). */
@@ -153,11 +153,11 @@ export function GrammarRail({
         {enabled ? (
           <>
             {/* Two lines (founder s149): the legend, then the instruction. */}
-            <b className="block text-success">Grüner Punkt = erkannte Form.</b>
-            Tippe eine andere Form, um den Satz umzuformen.
+            <b className="block text-success">Grüner Punkt = dein Satz.</b>
+            Tippe eine andere Form, um ihn umzuwandeln.
           </>
         ) : (
-          <>Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv und die Zeitform.</>
+          <>Prüf zuerst deinen Satz, dann erkennt die KI Aktiv/Passiv, Zeitform und Modus.</>
         )}
       </p>
     </div>

@@ -89,14 +89,20 @@ export function FokusTrainer({
       parts.push(valueLabel("voice", m.selection.voice));
     if (m.selection.tense !== m.detected.tense)
       parts.push(valueLabel("tense", m.selection.tense));
+    if (m.selection.mood !== m.detected.mood)
+      parts.push(valueLabel("mood", m.selection.mood));
     return parts.join(" · ") || "Umformung";
   }, [m.selection, m.detected]);
 
+  // The just-changed pill carries the inline spinner: whichever axis differs
+  // from the detected base (voice, then tense, then mood).
   const loadingValue =
     m.transform.status === "loading"
       ? m.selection.voice !== m.detected.voice
         ? m.selection.voice
-        : m.selection.tense
+        : m.selection.tense !== m.detected.tense
+          ? m.selection.tense
+          : m.selection.mood
       : null;
 
   const showBottom =
@@ -104,7 +110,9 @@ export function FokusTrainer({
   const railEnabled = m.status === "corrected";
   const canReset =
     railEnabled &&
-    (m.selection.voice !== m.detected.voice || m.selection.tense !== m.detected.tense);
+    (m.selection.voice !== m.detected.voice ||
+      m.selection.tense !== m.detected.tense ||
+      m.selection.mood !== m.detected.mood);
 
   // A fresh sentence disables the grammar controls again; close a stale panel.
   useEffect(() => {

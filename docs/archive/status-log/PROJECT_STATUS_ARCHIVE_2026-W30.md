@@ -3,6 +3,34 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 156 (2026-07-24). Admin chunk 11 (Turnstile) completion + chunk 12
+(compliance pack), branch `claude/admin-page-access-ok8g52`.** Continued the admin control center to
+the end of its plan. Two parts:
+- **Chunk 11 · Turnstile (PRs #669/#670).** Most of chunk 11 already existed (the widget +
+  auth-store `captchaToken` integration + the feedback burst/hourly email caps). Diagnosed a
+  half-configured state: CAPTCHA was on in Supabase Auth but the `VITE_TURNSTILE_SITE_KEY` GitHub
+  secret was unset, so the client sent no token and Supabase rejected guest/email sign-in (Google/OAuth
+  is not captcha-gated, which masked it). Founder set the GitHub secret; a fresh deploy made it live;
+  founder verified live sign-in. Code: the `AdminSystem` "Gast-Konten" tile now reads the real
+  `TURNSTILE_ENABLED` flag (was a hardcoded "still off (chunk 11)" label) and the Launch note states
+  both sides are required. Docs: Turnstile marked done in `PROJECT_FOUNDATION.md` completed-setup.
+- **Chunk 12 · Compliance pack (PR #672).** §G2 consent-drift gate: one canonical legal date in
+  `src/lib/legalMeta.ts` (rendered by PrivacyPolicy, compared to `CONSENT_VERSION`); `consentInSync()`
+  + `tests/consent.test.ts` fail CI on drift; the Launch screen shows a red warning instead of the old
+  static note. §G3 auditor export: `src/lib/auditExport.ts` builds the provenance register CSV + a
+  Markdown summary (tiers, review status, licences, verification links, sampling guide) behind one
+  Launch button; reuses `csv.ts` (+ `downloadText`); no new eager weight; pinned by
+  `tests/auditExport.test.ts`. §G4 GDPR ops evidence: **migration 0010** adds a content-free
+  `gdpr_events` table (kind + timestamp, no user id) + `log_gdpr_event()` + founder-only
+  `admin_gdpr_evidence()` RPC (counts + last timestamps + pg_cron retention probe); `delete-account`
+  logs erasures, `exportUserData` logs exports; the Launch panel shows counters, fail-soft to
+  "run migration 0010".
+- **Founder action (chunk 12 §G4 only):** run `supabase/migrations/0010_gdpr_evidence.sql` +
+  `supabase functions deploy delete-account` (`PHASE2_SETUP.md` §5). G2/G3 work without it.
+- **Admin center status:** chunks **1-12 done** (whole MVP + Phase 2). Only Phase 3 (13-16) remains,
+  on demand. Gates for chunk 12: typecheck · build · check:bundle 116.8 kB · lint 0 errors ·
+  test:unit **289/289**.
+
 **Handoff after session 154 (2026-07-24). App-wide contrast + squircle pass, branch
 `claude/admin-page-access-ok8g52`, PR #665 merged.** Founder: the admin center (and the app generally)
 had too little contrast between cards and background AND between buttons and cards, in BOTH themes, and
