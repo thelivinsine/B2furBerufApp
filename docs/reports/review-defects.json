@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-07-24T16:40:50.622Z",
+  "registerRows": 3107,
+  "defects": [
+    {
+      "content_id": "v_ansprechpartner",
+      "decision": "reject",
+      "note": "the source doesn't work",
+      "reviewer": "thesuhaspala@gmail.com",
+      "decided_at": null
+    },
+    {
+      "content_id": "v_bedenken",
+      "decision": "reject",
+      "note": "It should be das Bedenken as it's neutral.",
+      "reviewer": "thesuhaspala@gmail.com",
+      "decided_at": null
+    },
+    {
+      "content_id": "v_scope_creep",
+      "decision": "reject",
+      "note": "the source doesn't work",
+      "reviewer": "thesuhaspala@gmail.com",
+      "decided_at": null
+    }
+  ],
+  "rereview": [
+    {
+      "content_id": "v_besprechung",
+      "reason": "Kein Prüf-Fingerprint gespeichert (Alt-Entscheidung); bitte erneut freigeben.",
+      "decision": "approve",
+      "note": null,
+      "reviewer": "thelivinsine@gmail.com"
+    }
+  ]
+}

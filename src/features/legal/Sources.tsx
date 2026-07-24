@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   ChevronDown,
   Database,
@@ -13,16 +13,8 @@ import {
 import { provenance } from "@/data/provenance";
 import { verification as verificationMap } from "@/data/verification";
 import type { ProvenanceContentType, ProvenanceEntry, VerificationTier } from "@/types";
-import { useAuthStore } from "@/store/useAuthStore";
-import { isFounder } from "@/lib/admin";
-import {
-  computeDecisionHash,
-  fetchProvenanceReviews,
-  saveProvenanceReview,
-  type ProvenanceReview,
-} from "@/lib/provenanceReviews";
 import { cn } from "@/lib/utils";
-import { AdminWorkbench, type WorkbenchApi } from "./AdminWorkbench";
+import { useWorkbench } from "./useWorkbench";
 import { LegalChrome, Section, type Lang } from "./LegalChrome";
 
 /**
@@ -31,8 +23,8 @@ import { LegalChrome, Section, type Lang } from "./LegalChrome";
  * (src/data/provenance.ts) + the generated Layer C verification map, so it
  * stays in sync with the content automatically. Public visitors get the visual
  * data-architecture story (pipeline, tier bar, bank numbers, sources,
- * licenses, full item browse); founders additionally get the AdminWorkbench
- * data table (search/filter/sort/CSV export + live review marks).
+ * licenses, full item browse); founders additionally get a link card into the
+ * Control Center's Prüfen page, where the review table + queue now live.
  */
 
 /* Human-readable names for each content type. */
@@ -354,88 +346,6 @@ function BankTiles({ byType, lang }: { byType: Map<ProvenanceContentType, Proven
 /* Page                                                                */
 /* ------------------------------------------------------------------ */
 
-/**
- * Shared workbench state for the founder review table. Lives in a hook so both
- * the /sources summary (which only needs `admin` + `liveVerified`) and the
- * dedicated /sources/werkbank sub-page (which renders the full table) can drive
- * the same reviews cache + save handler without duplicating the logic.
- */
-function useWorkbench() {
-  const user = useAuthStore((s) => s.user);
-  const admin = isFounder(user);
-
-  const [reviews, setReviews] = useState<Map<string, ProvenanceReview>>(new Map());
-  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
-
-  // Load the founder's saved review marks once, when signed in as admin.
-  useEffect(() => {
-    if (!admin) {
-      setReviews(new Map());
-      return;
-    }
-    let cancelled = false;
-    fetchProvenanceReviews().then((m) => {
-      if (!cancelled) setReviews(m);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [admin]);
-
-  const api: WorkbenchApi | undefined = useMemo(() => {
-    if (!admin) return undefined;
-    return {
-      reviews,
-      onChange: async (contentId, patch) => {
-        const uid = user?.id;
-        if (!uid) return false;
-        const cur = reviews.get(contentId) ?? {
-          content_id: contentId,
-          verified: false,
-          comment: null,
-          decision: null,
-          content_hash: null,
-          reviewer_email: null,
-        };
-        // Ticking the box is an APPROVE decision and fingerprints the content
-        // as the reviewer sees it (the apply script compares this hash before
-        // flipping the repo row). Unticking clears the decision; a note-only
-        // edit leaves the decision and its hash untouched.
-        const approving = patch.verified === true;
-        const clearing = patch.verified === false;
-        const merged: ProvenanceReview = {
-          content_id: contentId,
-          verified: patch.verified ?? cur.verified,
-          // normalise an empty note to null so the column stays clean
-          comment:
-            patch.comment !== undefined ? (patch.comment ?? "").trim() || null : cur.comment,
-          decision: approving ? "approve" : clearing ? null : cur.decision,
-          content_hash: approving
-            ? await computeDecisionHash(contentId)
-            : clearing
-              ? null
-              : cur.content_hash,
-          reviewer_email: user?.email?.toLowerCase() ?? cur.reviewer_email,
-        };
-        setSaveState("saving");
-        const ok = await saveProvenanceReview(merged, uid);
-        // Only commit to the local cache once the write actually lands, so a
-        // failed save (e.g. table not provisioned) does not look saved.
-        if (ok) setReviews((prev) => new Map(prev).set(contentId, merged));
-        setSaveState(ok ? "saved" : "error");
-        return ok;
-      },
-    };
-  }, [admin, reviews, user?.id, user?.email]);
-
-  const liveVerified = useMemo(
-    () => [...reviews.values()].filter((r) => r.verified).length,
-    [reviews],
-  );
-
-  return { admin, api, saveState, liveVerified };
-}
-
 export function Sources() {
   const [lang, setLang] = useState<Lang>("de");
   const { admin, liveVerified } = useWorkbench();
@@ -476,11 +386,12 @@ export function Sources() {
       lastUpdated="2026-07-18"
     >
       {admin && (
-        /* The full review table moved to its own sub-page (/sources/werkbank)
-           so this page stays short. Admins get a link card instead of the
-           inline table. */
+        /* The founder review table now lives inside the Control Center's Prüfen
+           page (Warteschlange + Alle Inhalte), so this public page stays short.
+           Admins get a link card into the Control Center instead of an inline
+           table. */
         <Link
-          to="/sources/werkbank"
+          to="/admin/pruefen?view=table"
           className="flex items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 transition-colors hover:bg-primary/10"
         >
           <span className="flex items-center gap-3">
@@ -489,12 +400,12 @@ export function Sources() {
             </span>
             <span>
               <span className="block font-semibold text-foreground">
-                {t("Daten-Werkbank (nur Admins)", "Data workbench (admins only)")}
+                {t("Im Kontrollzentrum prüfen", "Review in the Control Center")}
               </span>
               <span className="block text-sm text-muted-foreground">
                 {t(
-                  `Ganzer Bestand als Tabelle: suchen, filtern, sortieren, CSV-Export, live prüfen. Live geprüft: ${liveVerified} von ${stats.total}.`,
-                  `The full register as a table: search, filter, sort, CSV export, review live. Live-checked: ${liveVerified} of ${stats.total}.`,
+                  `Ganzer Bestand als Tabelle plus Warteschlange: suchen, filtern, freigeben oder ablehnen, CSV-Export. Live geprüft: ${liveVerified} von ${stats.total}.`,
+                  `The full register as a table plus the review queue: search, filter, approve or reject, CSV export. Live-checked: ${liveVerified} of ${stats.total}.`,
                 )}
               </span>
             </span>
@@ -632,59 +543,6 @@ export function Sources() {
           </div>
         )}
       </Section>
-    </LegalChrome>
-  );
-}
-
-/**
- * /sources/werkbank — the founder-only review table on its own page, so the
- * main /sources page stays short. Route-gated by RequireFounder; this extra
- * client check just redirects a non-admin who somehow reaches the component.
- */
-export function SourcesWorkbench() {
-  const [lang, setLang] = useState<Lang>("de");
-  const { admin, api, saveState, liveVerified } = useWorkbench();
-
-  const t = (de: string, en: string) => (lang === "de" ? de : en);
-  const total = provenance.length;
-
-  if (!admin || !api) return <Navigate to="/sources" replace />;
-
-  return (
-    <LegalChrome
-      lang={lang}
-      setLang={setLang}
-      title={t("Daten-Werkbank", "Data workbench")}
-      lastUpdated="2026-07-22"
-    >
-      <div className="flex items-center justify-between gap-3">
-        <Link
-          to="/sources"
-          className="text-sm font-medium text-primary underline-offset-2 hover:underline"
-        >
-          {t("← Zurück zu Quellen", "← Back to Sources")}
-        </Link>
-        <span className="text-xs text-muted-foreground">
-          {saveState === "saving"
-            ? t("Speichern…", "Saving…")
-            : saveState === "saved"
-              ? t("Gespeichert", "Saved")
-              : saveState === "error"
-                ? t("Fehler beim Speichern", "Save failed")
-                : ""}
-        </span>
-      </div>
-      <p className="text-sm text-muted-foreground">
-        {t(
-          `Der ganze Inhaltsbestand als Tabelle: suchen, filtern, sortieren, als CSV exportieren, live prüfen. Deine Haken und Notizen sieht nur das Admin-Team. Live geprüft: ${liveVerified} von ${total}.`,
-          `The full content register as a table: search, filter, sort, export as CSV, review live. Your checks and notes are visible to the admin team only. Live-checked: ${liveVerified} of ${total}.`,
-        )}
-      </p>
-      {/* Break out of the narrow legal column on large screens so the table
-          gets real width. */}
-      <div className="lg:-mx-16 xl:-mx-40">
-        <AdminWorkbench api={api} lang={lang} />
-      </div>
     </LegalChrome>
   );
 }
