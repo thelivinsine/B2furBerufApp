@@ -882,9 +882,14 @@ function TypingBlock({
           {block.cloze ? "Ergänze das fehlende Wort:" : "Schreib es auf Deutsch:"}
         </p>
         {block.cloze ? (
-          <p className="w-full break-words text-center text-xl font-medium leading-relaxed sm:text-2xl">
-            {block.cloze.prompt}
-          </p>
+          <>
+            <p className="w-full break-words text-center text-xl font-medium leading-relaxed sm:text-2xl">
+              {block.cloze.prompt}
+            </p>
+            <p className="w-full break-words text-center text-sm text-muted-foreground">
+              <span className="font-semibold text-primary">Hinweis:</span> {block.en}
+            </p>
+          </>
         ) : (
           <p className="w-full break-words text-center text-3xl font-semibold sm:text-4xl">{block.en}</p>
         )}
