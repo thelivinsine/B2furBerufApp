@@ -505,3 +505,37 @@ Founder reviewed individual session cards from screenshots; each turn diagnosed 
 - **Prompt 9 (verbatim):** `for reducing the abmiguity, referring to the points on how to reduce ambiguity, implement 1 but also mix them up by keep questions which are of a mix like now with different parts of speech but as mentioned in point 2.` → `oddOneOutQ`: added a POS-matched flavour mixed ~50/50 with mixed-POS, and an "genuinely unrelated" outsider guard (different theme + no shared `related` link either direction). Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
 - **Prompt 10 (verbatim):** `yes` → documented the session (this entry, PROJECT_STATUS s161 handoff with s159 rotated to the W30 archive, header refreshed) and opened + squash-merged PR #691 (engine/loot) into `main`.
 - **Artifacts (session 161):** `src/data/vocabulary.ts` · `src/features/session/SessionPlayer.tsx` · `src/engine/quiz.ts` · `src/features/quiz/QuestionViews.tsx` · `src/types/index.ts` · `preview/{cloze-hint,plural-variants,loot-shade}-preview.html` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #687 (content) + PR #691 (engine/loot)
+
+## Session 162 — 2026-07-24 — GitHub "protect main" banner question (branch `claude/popup-main-branch-safety-d46p9o`)
+
+- **Prompt 1 (verbatim, + screenshot of the GitHub repo banner):** `why is this pop up coming up. is my main branch unsafe?` →
+  Explained the banner is GitHub's standard nudge shown on every repo whose default branch has no
+  branch-protection rule; it is a suggestion, not an alert that something happened. main is not
+  unsafe: "Public" only grants read access, write access stays with the founder account (and the
+  sessions it authorizes), and the shipping workflow only touches main via squash-merged PRs
+  (force pushes only ever hit session branches, never main). Recommended either dismissing the
+  banner or adding a minimal ruleset (block force pushes + restrict deletions on main, with NO
+  required PR approvals so the founder-approved auto-ship squash-merge keeps working). Docs-only
+  turn, no code changes.
+- **Artifacts (prompt 1):** this log
+- **Prompt 2 (verbatim, + 2 screenshots of the new-ruleset form):** `this is config correct?` →
+  Two blockers spotted: Enforcement status was "Disabled" (ruleset would be ignored) and Target
+  branches was empty (name "main" is only a label). Told the founder to set status to Active, add
+  target "Include default branch", keep "Block force pushes" ticked, verify "Restrict deletions"
+  is ticked, leave "Require a pull request before merging" and all scanning/quality/coverage/
+  Copilot options off, then Create. Docs-only turn, no code changes.
+- **Artifacts (prompt 2):** this log
+- **Prompt 3 (verbatim, + screenshot of the Add target dropdown):** `I'm selecting the default branch then` →
+  Confirmed "Include default branch" is correct (main is the default; the rule follows a future
+  rename automatically) and warned against "Include all branches", which would also lock the
+  session branches where force-with-lease is routine. Reminder: set Enforcement to Active, then
+  Create. Docs-only turn, no code changes.
+- **Artifacts (prompt 3):** this log
+- **Prompt 4 (verbatim):** `okay, it's done now` →
+  Founder confirmed the ruleset is created (Active, default branch targeted, restrict deletions +
+  block force pushes, nothing else). Recorded the new protection as a standing infra fact in
+  `PROJECT_FOUNDATION.md` (Deploy / infra guardrails) and refreshed the `PROJECT_STATUS.md` header
+  to s162 (docs-only session, no product changes, so no new Resume-here handoff was added; s160/
+  s161 handoffs kept). Wrapped the session: docs PR #694 opened + squash-merged into `main`, branch
+  realigned. First merge under the new ruleset doubles as the proof it doesn't block auto-ship.
+- **Artifacts (session 162):** `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_STATUS.md` · this log

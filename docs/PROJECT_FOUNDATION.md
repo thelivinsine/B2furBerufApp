@@ -117,3 +117,8 @@ and "Post-deploy GitHub housekeeping"). The load-bearing facts:
   origin/main` → `git push --force-with-lease`) so it doesn't diverge and conflict on the next PR.
 - The sandbox can't reach the live `*.github.io` site, the Actions tab, or run Docker — live
   verification (Pages deploy, Supabase) is handed to the founder.
+- **`main` is protected by a GitHub branch ruleset (founder-created 2026-07-24, s162):** targets
+  the default branch; restrict deletions + block force pushes; NO required PR approvals and no
+  required status checks, so the approved auto-ship squash-merge flow is unaffected. Session
+  branches are not targeted; force-with-lease pushes to them stay routine. Don't add required
+  approvals without a founder decision (it would block self-merged PRs).
