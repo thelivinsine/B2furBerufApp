@@ -305,3 +305,49 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `docs/PROJECT_STATUS.md` · `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_REFERENCE.md` ·
   `docs/DECISIONS.md` · `docs/areas/COMMANDS.md` ·
   `docs/archive/{PROJECT_STATUS_ARCHIVE,status-log/PROJECT_STATUS_ARCHIVE_2026-W30}.md` · PR (this one)
+
+## Session 158 — 2026-07-24 — Schreiben nav-icon harmony previews (branch `claude/schreiben-icon-design-cz21ts`)
+
+- **Prompt 1 (verbatim, 2026-07-24 ~11:45 UTC):** `/design the schreiben icon isn't harmonious with other icons. Can you generate a couple of previews?` →
+  Diagnosis: the Schreiben pencil (`route-icons.tsx` `/writing`) breaks the icon family three ways:
+  it is the only thin diagonal mark in a row of upright chunky shapes, its second color `#fb7185` is
+  nearly the same as the rose body `#f43f5e` (no two-tone pop like every sibling), and it reads
+  fragile next to the filled geometric marks. Built `preview/schreiben-icon-harmony.html`
+  (screenshot-verified in headless Chromium, published as a Claude artifact): current state as
+  reference + 4 named variants, each rendered in the real bottom tab bar (light + dark, real tokens,
+  29px icons in the 40px squircle pill) plus a magnified 5-icon strip.
+  **A** Stift aufrecht (chunky vertical pencil, bright rose-pink `#fda4af` eraser cap) ·
+  **B** Federspitze (pen nib, bright breather hole + slit) ·
+  **C** Stift mit Schreiblinie (familiar diagonal, thicker, bright tip + written underline) ·
+  **D** Zweifarbiger Stift (bold pencil split lengthwise rose/pink, like the split Grammatik
+  bookmark). No implementation yet; awaiting the founder's pick by letter.
+- **Artifacts (session 158):** `preview/schreiben-icon-harmony.html` · this log
+=======
+- **Prompt 3 (verbatim, 2026-07-24 ~12:00 UTC):** `go ahead with your recommendations with 6 action items from above and a thin agent.md file` →
+  Executed all seven items: (1) rotated this log (s133-134 → the W29 chunk, s135-151 → a new
+  `archive/prompt-log/SESSION_PROMPT_LOG_2026-W30.md`, live file back to ~300 lines, archive README
+  index updated); (2) `docs/README.md` refreshed for the s155 restructure (new `areas/` catalog +
+  skills note + rewritten CLAUDE.md row + archive rows + AGENTS.md row); (3) fixed the five stale
+  CLAUDE.md section pointers in `PROJECT_FOUNDATION.md`, `PROJECT_REFERENCE.md` (x2), `DECISIONS.md`
+  (x2) to their `docs/areas/` homes; (4) documented `check:contrast` (CI gate) in
+  `docs/areas/COMMANDS.md` + the CLAUDE.md CI-gates index, plus `check:refs` and the
+  `build:dict-subset`/`build:nouns-subset` internals of `build:oracles`; (5) corrected the W30 row
+  in `archive/PROJECT_STATUS_ARCHIVE.md` to sessions 135-154; (6) shrank the `PROJECT_STATUS.md`
+  tail archive blob to a two-line pointer; (7) created the thin router `AGENTS.md` at the repo root
+  (no rules of its own: CLAUDE.md → docs/areas/ → the skills). Session documented per the standing
+  rules (s157 status header + handoff; the s155 handoff rotated to the W30 status archive).
+- **Artifacts (session 157):** `AGENTS.md` · `CLAUDE.md` · `docs/README.md` ·
+  `docs/SESSION_PROMPT_LOG.md` + `docs/archive/prompt-log/{README,SESSION_PROMPT_LOG_2026-W29,SESSION_PROMPT_LOG_2026-W30}.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_REFERENCE.md` ·
+  `docs/DECISIONS.md` · `docs/areas/COMMANDS.md` ·
+  `docs/archive/{PROJECT_STATUS_ARCHIVE,status-log/PROJECT_STATUS_ARCHIVE_2026-W30}.md` · PR (this one)
+>>>>>>> origin/main
+- **Prompt 2 (verbatim, 2026-07-24 ~11:55 UTC):** `I like the option b but I want you to generate more such previews with feather/ink pens and similar colors as other icons not red.` →
+  Round 2 built: `preview/schreiben-icon-harmony-r2.html` (screenshot-verified, republished to the
+  same artifact URL). B's nib direction carried forward without red, in the cool family colors of
+  the neighbor icons: **E** Federspitze Nachtblau (#3D74ED + Neon-Cyan #22d3ee, the compass/library
+  color logic) · **F** Federspitze Teal (#14b8a6 + #5eead4, own hue in the cool family) ·
+  **G** Schreibfeder/Kiel (feather quill split lengthwise blue/cyan + quill stem) ·
+  **H** Füller aufrecht (vertical fountain pen, blue body + cyan nib). Round-1 B (rose) kept at the
+  top as reference. Awaiting pick by letter (E-H); implementation would also retint the `/writing`
+  accent in `nav-items.ts`.
