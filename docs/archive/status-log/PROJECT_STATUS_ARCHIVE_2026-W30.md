@@ -940,3 +940,33 @@ drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shor
   `design` skill §2.6 now carries the Schreiben disclaimer-placement exception so a future session
   doesn't re-center it.
 - **Next:** nothing pending. Founder verifies the live result (PWA: hard-refresh past a stale SW).
+
+**Handoff after session 161 (2026-07-24). Quiz-quality pass on the composed session, branch
+`claude/word-verification-nl4m26`, PR #687 (content) + PR #691 (engine/loot).** Started
+from founder screenshots of individual session cards; each turn diagnosed one exercise type and fixed it:
+- **Content (merged, PR #687):** the `v_soll_ist_vergleich` English gloss reworded `target-actual
+  comparison` → `target/planned vs. actual comparison`; and typed-cloze ("Lücke") cards, which showed
+  only the blanked sentence (unanswerable, many words fit), now render the target word's English
+  meaning as a muted "Hinweis:" line under the sentence (`SessionPlayer.tsx` TypingBlock).
+- **Plural questions (`engine/quiz.ts`):** MCQ distractors are now generated from the noun's OWN stem
+  (`sameStemPluralForms`: -e/-en/-n/-er/-s, Nullplural, umlaut variants) so all four options share the
+  stem and only the correct pattern distinguishes them (was: distractors from unrelated nouns, an A1
+  recognition move). Added a **typed** plural variant (new `pluralType` `QuizQuestion` kind +
+  `TypedView` renderer in `QuestionViews.tsx`, graded by the existing typed grader); ~half of plural
+  slots are typed. **Competency gate:** at difficulty 3 (C1) plural questions are limited to tricky
+  plurals (`isTrickyPlural`: umlaut / -er / Nullplural / stem-changing like Praxis→Praxen); predictable
+  -e/-en/-n/-s plurals drop out. Plural now also appears in the d3 branch.
+- **Odd-one-out / Ausreißer (`engine/quiz.ts` `oddOneOutQ`):** added a **part-of-speech-matched**
+  flavour (all four options share the anchor's POS, mixed ~50/50 with the old mixed-POS style) so the
+  topic is the only discriminator; and the odd word must now be **genuinely unrelated** (different
+  theme AND no shared `related` link in either direction), so a half-belonging word (abdichten next to
+  Blech) can't be the answer. Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
+- **Round-summary loot cards (`SessionPlayer.tsx` `LootCard`):** dropped the coral reward wash (read
+  like wrong answers) for plain white cards; a level-up is now a Himmelblau `bg-accent/20` "Lv ↑" pill,
+  unchanged words keep a muted level, the "Gesammelt" eyebrow moves coral → brand blue. Trophy ring
+  stays coral (the sanctioned celebration accent). Founder picked this variant (C) from a 4-shade preview.
+- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build green. Previews:
+  `preview/cloze-hint-preview.html`, `plural-variants-preview.html`, `loot-shade-preview.html`.
+- **Next:** nothing pending. Held ideas from the discussion: odd-one-out option 3 (make it rarer /
+  reserve for cleanly separable clusters) if the type still feels fuzzy; a "type it" plural could gain
+  an "almost" partial-credit tier if strict grading feels harsh.

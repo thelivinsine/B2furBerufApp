@@ -1,10 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 163). **Fokus correction fix:** a word that was only reordered no
-longer shows as a contradictory "remove X" + "add X"; the client-side word-diff now collapses it into
-one "Wortstellung" (word-order) fix (PR #695). Prior s162 (concurrent): `main` branch protection
-ruleset enabled (restrict deletions + block force pushes, no required approvals, so auto-ship is
-unaffected; see `PROJECT_FOUNDATION.md`). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 164). **Review harmonised into the Control Center:** the founder
+review table moved out of the retired `/sources/werkbank` page into the `/admin/pruefen` Prüfen page as
+a Warteschlange / Alle Inhalte sliding-pill switcher, both backed by one shared `useWorkbench` store;
+the table cell gained a Freigeben/Ablehnen control + a note Save button. Also fixed the note/approve
+save race and applied the founder's 13 hash-matched approvals (3 rejects + 1 re-review). Prior s163:
+Fokus word-order correction collapse (PR #695); s162: `main` branch protection ruleset. Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -71,35 +73,31 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 161 (2026-07-24). Quiz-quality pass on the composed session, branch
-`claude/word-verification-nl4m26`, PR #687 (content) + PR #691 (engine/loot).** Started
-from founder screenshots of individual session cards; each turn diagnosed one exercise type and fixed it:
-- **Content (merged, PR #687):** the `v_soll_ist_vergleich` English gloss reworded `target-actual
-  comparison` → `target/planned vs. actual comparison`; and typed-cloze ("Lücke") cards, which showed
-  only the blanked sentence (unanswerable, many words fit), now render the target word's English
-  meaning as a muted "Hinweis:" line under the sentence (`SessionPlayer.tsx` TypingBlock).
-- **Plural questions (`engine/quiz.ts`):** MCQ distractors are now generated from the noun's OWN stem
-  (`sameStemPluralForms`: -e/-en/-n/-er/-s, Nullplural, umlaut variants) so all four options share the
-  stem and only the correct pattern distinguishes them (was: distractors from unrelated nouns, an A1
-  recognition move). Added a **typed** plural variant (new `pluralType` `QuizQuestion` kind +
-  `TypedView` renderer in `QuestionViews.tsx`, graded by the existing typed grader); ~half of plural
-  slots are typed. **Competency gate:** at difficulty 3 (C1) plural questions are limited to tricky
-  plurals (`isTrickyPlural`: umlaut / -er / Nullplural / stem-changing like Praxis→Praxen); predictable
-  -e/-en/-n/-s plurals drop out. Plural now also appears in the d3 branch.
-- **Odd-one-out / Ausreißer (`engine/quiz.ts` `oddOneOutQ`):** added a **part-of-speech-matched**
-  flavour (all four options share the anchor's POS, mixed ~50/50 with the old mixed-POS style) so the
-  topic is the only discriminator; and the odd word must now be **genuinely unrelated** (different
-  theme AND no shared `related` link in either direction), so a half-belonging word (abdichten next to
-  Blech) can't be the answer. Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
-- **Round-summary loot cards (`SessionPlayer.tsx` `LootCard`):** dropped the coral reward wash (read
-  like wrong answers) for plain white cards; a level-up is now a Himmelblau `bg-accent/20` "Lv ↑" pill,
-  unchanged words keep a muted level, the "Gesammelt" eyebrow moves coral → brand blue. Trophy ring
-  stays coral (the sanctioned celebration accent). Founder picked this variant (C) from a 4-shade preview.
-- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build green. Previews:
-  `preview/cloze-hint-preview.html`, `plural-variants-preview.html`, `loot-shade-preview.html`.
-- **Next:** nothing pending. Held ideas from the discussion: odd-one-out option 3 (make it rarer /
-  reserve for cleanly separable clusters) if the type still feels fuzzy; a "type it" plural could gain
-  an "almost" partial-credit tier if strict grading feels harsh.
+**Handoff after session 164 (2026-07-24). Review harmonised into the Control Center + note/approve
+save race fixed + 13 approvals applied, branch `claude/apply-review-decisions-lw5azm`.** (Branched off
+`main` at s160; s161–163 landed from parallel sessions while this was open, so this is logged as 164.)
+Three linked pieces:
+- **Save-race fix (`useWorkbench`).** The founder asked whether a note typed before approving is saved.
+  It was NOT reliable: the note and the checkbox saved separately, but both `onChange` calls read the
+  SAME stale `reviews` snapshot and each `upsert`ed the whole row, so typing a note then approving wrote
+  the row twice off the same base and the approve write (empty comment) clobbered the note. Fix: merge
+  from an always-latest `reviewsRef` + serialise writes per `content_id` (`writeChains`).
+- **13 approvals applied.** `pnpm apply:reviews --from` on the founder's browser export (17 decisions):
+  13 hash-matched approvals flipped draft→verified + stamped + lint green (commit `5188af2`); 3 rejects
+  → `docs/reports/review-defects.md`; 1 (`v_besprechung`, null fingerprint) held for re-review.
+- **Harmonisation (Variant A, founder-picked).** The founder review table moved OUT of the retired
+  `/sources/werkbank` page INTO the Control Center's **Prüfen** page (`/admin/pruefen`) as a two-segment
+  sliding-pill switcher: **Warteschlange** (priority queue + keyboard cockpit) · **Alle Inhalte** (the
+  full `AdminWorkbench` table). One shared `useWorkbench` store now backs BOTH. The table cell gained a
+  segmented **Freigeben/Ablehnen** control (reject was impossible in the table before) + a wider note
+  field with an explicit **Save button** (appears when edited; still saves on blur/Enter). Redundant
+  queue header/status copy removed. `/sources` links admins into `/admin/pruefen?view=table`.
+- **Files:** `src/features/legal/useWorkbench.ts` (new), `AdminWorkbench.tsx`, `Pruefmodus.tsx`,
+  `Sources.tsx`, `router.tsx`, `tests/adminWorkbench.test.tsx`, `preview/control-center-review.html`.
+- **Gates:** typecheck · lint (0 errors) · test:unit **291/291** · build · check:bundle **116.6 kB** ·
+  lint:content, all green. Decisions in `docs/DECISIONS.md`; area guide `docs/areas/LEGAL-ADMIN.md`.
+- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
+  hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.
 
 **Handoff after session 163 (2026-07-24). Fokus correction: collapse a moved word into one
 Wortstellung fix, branch `claude/disclaimer-text-layout-5zq5g0`, PR #695.** Numbered 163 (a

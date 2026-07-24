@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Download, ExternalLink, FileJson, RotateCcw } from "lucide-react";
+import { Check, Copy, Download, ExternalLink, FileJson, RotateCcw, Save, X } from "lucide-react";
 import { provenance } from "@/data/provenance";
 import { verification as verificationMap } from "@/data/verification";
 import type { ProvenanceContentType, ProvenanceEntry, VerificationTier } from "@/types";
@@ -15,7 +15,7 @@ import { DataTable, type DataColumn } from "@/features/shared/DataTable";
 import { SearchField } from "@/features/shared/SearchField";
 import { buildCsv, downloadCsv, type CsvValue } from "@/lib/csv";
 import { foldText } from "@/lib/fuzzy";
-import type { ProvenanceReview } from "@/lib/provenanceReviews";
+import type { ProvenanceReview, ReviewDecision } from "@/lib/provenanceReviews";
 import { downloadDecisions, pendingDecisionCount } from "@/lib/reviewExport";
 import { cn } from "@/lib/utils";
 import type { Lang } from "./LegalChrome";
@@ -30,9 +30,15 @@ import type { Lang } from "./LegalChrome";
 
 export interface WorkbenchApi {
   reviews: Map<string, ProvenanceReview>;
+  /**
+   * Persist one row's review. A patch carries any of: an explicit `decision`
+   * (approve / reject / needs_fix / null-to-clear), the legacy `verified`
+   * checkbox flag, and/or a `comment`. A comment-only patch never touches the
+   * decision or its fingerprint. Resolves to whether the write landed.
+   */
   onChange: (
     contentId: string,
-    patch: Partial<Pick<ProvenanceReview, "verified" | "comment">>,
+    patch: Partial<Pick<ProvenanceReview, "verified" | "comment" | "decision">>,
   ) => Promise<boolean>;
 }
 
@@ -107,12 +113,19 @@ function CopyId({ id }: { id: string }) {
   );
 }
 
-/** Inline editor for one row's live review mark (checkbox saves immediately,
- *  the note saves on Enter or blur). Mirrors the save contract of the old
- *  per-item overlay: nothing looks saved unless the write actually landed. */
+/** Inline editor for one row's live review decision: a segmented Approve/Reject
+ *  control (either toggles off when tapped again), a note field, and an explicit
+ *  Save button that appears once the note differs from what is stored. Nothing
+ *  looks saved unless the write actually landed. */
 function RowReview({ row, api, lang }: { row: Row; api: WorkbenchApi; lang: Lang }) {
   const saved = api.reviews.get(row.entry.content_id);
   const savedComment = saved?.comment ?? "";
+  // Prefer the explicit decision; fall back to a bare `verified` mark (legacy
+  // rows saved before decisions existed) or a row already verified in the
+  // shipped register, so either still reads as an approve.
+  const decision: ReviewDecision | null =
+    saved?.decision ??
+    (saved?.verified || row.entry.review_status === "verified" ? "approve" : null);
   const [note, setNote] = useState(savedComment);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
@@ -122,47 +135,94 @@ function RowReview({ row, api, lang }: { row: Row; api: WorkbenchApi; lang: Lang
     setNote(savedComment);
   }, [savedComment]);
 
-  const commitNote = async () => {
-    if (note.trim() === savedComment.trim()) return;
+  const dirty = note.trim() !== savedComment.trim();
+
+  const setDecision = async (next: ReviewDecision) => {
+    setBusy(true);
+    // Tapping the active decision again clears it back to open.
+    const value = decision === next ? null : next;
+    const ok = await api.onChange(row.entry.content_id, { decision: value });
+    setError(!ok);
+    setBusy(false);
+  };
+
+  const saveNote = async () => {
+    if (!dirty) return;
     setBusy(true);
     const ok = await api.onChange(row.entry.content_id, { comment: note });
     setError(!ok);
     setBusy(false);
   };
 
-  const toggleVerified = async (next: boolean) => {
-    setBusy(true);
-    const ok = await api.onChange(row.entry.content_id, { verified: next });
-    setError(!ok);
-    setBusy(false);
-  };
+  const isApprove = decision === "approve";
+  const isReject = decision === "reject";
 
   return (
     <div className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        aria-label={lang === "de" ? "geprüft" : "verified"}
-        checked={saved?.verified ?? false}
-        disabled={busy}
-        onChange={(e) => toggleVerified(e.target.checked)}
-        className="h-4 w-4 shrink-0 accent-primary"
-      />
+      <div className="inline-flex shrink-0 overflow-hidden rounded-md border border-border">
+        <button
+          type="button"
+          disabled={busy}
+          aria-pressed={isApprove}
+          aria-label={lang === "de" ? "Freigeben" : "Approve"}
+          title={lang === "de" ? "Freigeben" : "Approve"}
+          onClick={() => setDecision("approve")}
+          className={cn(
+            "grid h-8 w-8 place-items-center transition-colors disabled:opacity-50",
+            isApprove
+              ? "bg-emerald-500 text-white"
+              : "bg-surface text-muted-foreground hover:text-emerald-600",
+          )}
+        >
+          <Check className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          disabled={busy}
+          aria-pressed={isReject}
+          aria-label={lang === "de" ? "Ablehnen" : "Reject"}
+          title={lang === "de" ? "Ablehnen" : "Reject"}
+          onClick={() => setDecision("reject")}
+          className={cn(
+            "grid h-8 w-8 place-items-center border-l border-border transition-colors disabled:opacity-50",
+            isReject
+              ? "bg-danger text-white"
+              : "bg-surface text-muted-foreground hover:text-danger",
+          )}
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
       <input
         type="text"
         value={note}
         disabled={busy}
         onChange={(e) => setNote(e.target.value)}
-        onBlur={commitNote}
+        onBlur={saveNote}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
             e.preventDefault();
-            commitNote();
+            saveNote();
           }
         }}
         placeholder={lang === "de" ? "Notiz" : "Note"}
-        className="w-36 rounded-md border border-border bg-surface px-2 py-1 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+        className="h-8 w-52 rounded-md border border-border bg-surface px-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
       />
-      {error && <span className="text-[10px] text-destructive">{lang === "de" ? "Fehler" : "failed"}</span>}
+      {dirty && (
+        <button
+          type="button"
+          onClick={saveNote}
+          disabled={busy}
+          title={lang === "de" ? "Notiz speichern" : "Save note"}
+          className="inline-flex h-8 shrink-0 items-center gap-1 rounded-md border border-primary bg-primary/10 px-2.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/15 disabled:opacity-50"
+        >
+          <Save className="h-3.5 w-3.5" />
+          {lang === "de" ? "Speichern" : "Save"}
+        </button>
+      )}
+      {error && (
+        <span className="text-[10px] text-destructive">{lang === "de" ? "Fehler" : "failed"}</span>
+      )}
     </div>
   );
 }
@@ -307,6 +367,7 @@ export function AdminWorkbench({ api, lang }: { api: WorkbenchApi; lang: Lang })
     {
       id: "review",
       label: t("Meine Prüfung", "My review"),
+      className: "min-w-[22rem]",
       sortValue: (r) => (api.reviews.get(r.entry.content_id)?.verified ? 1 : 0),
       cell: (r) => <RowReview row={r} api={api} lang={lang} />,
     },

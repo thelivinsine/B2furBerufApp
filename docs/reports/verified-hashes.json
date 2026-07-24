@@ -1,6 +1,20 @@
 {
   "algorithm": "sha256/canonical-json/16",
-  "generated": "2026-07-22",
+  "generated": "2026-07-24",
   "note": "Content fingerprints of every review_status:verified provenance row. Written by pnpm stamp:verified; checked by pnpm lint:content. Do not hand-edit: re-stamp after a re-review instead.",
-  "hashes": {}
+  "hashes": {
+    "v_betriebskosten": "59a78daba41c0d47",
+    "v_heizkosten": "ddfef78e23b5fabc",
+    "v_lagerhaltungskosten": "0a6c4778089c26fb",
+    "v_lagerkosten": "edac9f8ee9920243",
+    "v_lieferbedingungen": "bb9c05d6e1f45650",
+    "v_lkw_fahrer": "b1b90425a26eb13d",
+    "v_nebenkosten": "f4bc6757c61b3e6b",
+    "v_onlinebanking": "2c5b0e507548f31f",
+    "v_schmerzen": "4d34668b34780109",
+    "v_schulden": "b5a92412daf3f0b5",
+    "v_spesen": "22e7cf11aec45870",
+    "v_unterlagen": "02936882d4a036fd",
+    "v_zinsen": "49cc1a6657d058b8"
+  }
 }

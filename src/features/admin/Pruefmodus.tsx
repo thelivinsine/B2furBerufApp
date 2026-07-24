@@ -13,25 +13,17 @@ import {
   ShieldCheck,
   AlertTriangle,
 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { provenance } from "@/data/provenance";
 import { verification as verificationMap } from "@/data/verification";
 import type { ProvenanceContentType, ProvenanceEntry, Verification } from "@/types";
-import { useAuthStore } from "@/store/useAuthStore";
-import {
-  fetchProvenanceReviews,
-  saveProvenanceReview,
-  computeDecisionHash,
-  type ProvenanceReview,
-  type ReviewDecision,
-} from "@/lib/provenanceReviews";
+import { type ProvenanceReview, type ReviewDecision } from "@/lib/provenanceReviews";
 import { cn } from "@/lib/utils";
+import { useSlidingPill } from "@/features/shared/useSlidingPill";
+import { useWorkbench } from "@/features/legal/useWorkbench";
+import { AdminWorkbench, type WorkbenchApi } from "@/features/legal/AdminWorkbench";
 import { useAdminLang } from "./adminI18n";
-import {
-  scoredItems,
-  reviewQueueGeneratedAt,
-  reviewQueueDraftRows,
-  type ScoredItem,
-} from "./reviewQueueData";
+import { scoredItems, reviewQueueGeneratedAt, type ScoredItem } from "./reviewQueueData";
 
 /* Bilingual labels for the content-type facet. */
 const TYPE_LABEL: Record<ProvenanceContentType, { de: string; en: string }> = {
@@ -71,28 +63,14 @@ function hydrate(item: ScoredItem): Row {
 
 export function Pruefmodus() {
   const { t, lang } = useAdminLang();
-  const user = useAuthStore((s) => s.user);
   const [params, setParams] = useSearchParams();
+  const { api, reviews, reviewsLoaded } = useWorkbench();
 
-  const [reviews, setReviews] = useState<Map<string, ProvenanceReview>>(new Map());
-  const [reviewsLoaded, setReviewsLoaded] = useState(false);
-
-  useEffect(() => {
-    let alive = true;
-    void fetchProvenanceReviews().then((m) => {
-      if (!alive) return;
-      setReviews(m);
-      setReviewsLoaded(true);
-    });
-    return () => {
-      alive = false;
-    };
-  }, []);
-
-  // --- Filters (URL-persisted) ---
+  // --- Filters + view (URL-persisted) ---
   const bankFilter = params.get("bank") ?? "";
   const defectOnly = params.get("defect") === "1";
   const inPruefmodus = params.get("mode") === "pruefen";
+  const view: "queue" | "table" = params.get("view") === "table" ? "table" : "queue";
 
   const setParam = useCallback(
     (key: string, value: string | null) => {
@@ -138,15 +116,14 @@ export function Pruefmodus() {
     return m;
   }, [rows]);
 
-  if (inPruefmodus) {
+  // The focused keyboard cockpit takes the whole surface (no switcher chrome).
+  if (inPruefmodus && api) {
     return (
       <ReviewSession
         rows={filtered}
+        api={api}
         reviews={reviews}
-        setReviews={setReviews}
         reviewsLoaded={reviewsLoaded}
-        userEmail={user?.email ?? null}
-        userId={user?.id ?? null}
         onExit={() => setParam("mode", null)}
         t={t}
         lang={lang}
@@ -156,18 +133,120 @@ export function Pruefmodus() {
 
   return (
     <div className="space-y-4">
-      <div>
+      <div className="flex flex-col gap-3">
         <h1 className="text-display text-xl font-extrabold tracking-tight sm:text-2xl">
           {t("Prüfen", "Review")}
         </h1>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          {t(
-            `Priorisierte Warteschlange · ${reviewQueueDraftRows.toLocaleString("de-DE")} offene Einträge · Stand ${reviewQueueGeneratedAt}`,
-            `Priority queue · ${reviewQueueDraftRows.toLocaleString("en-US")} draft items · as of ${reviewQueueGeneratedAt}`,
-          )}
-        </p>
+        <PruefenTabs view={view} onSelect={(v) => setParam("view", v === "table" ? "table" : null)} t={t} />
       </div>
 
+      {view === "table" ? (
+        api ? (
+          <AdminWorkbench api={api} lang={lang} />
+        ) : null
+      ) : (
+        <QueueLanding
+          typeCounts={typeCounts}
+          rowsLength={rows.length}
+          bankFilter={bankFilter}
+          defectOnly={defectOnly}
+          openCount={openCount}
+          filtered={filtered}
+          decisionOf={decisionOf}
+          setParam={setParam}
+          t={t}
+          lang={lang}
+        />
+      )}
+    </div>
+  );
+}
+
+/** The two-segment sliding-pill switcher that heads the Prüfen page:
+ *  Warteschlange (priority queue + keyboard cockpit) vs Alle Inhalte (the full
+ *  register table). Same mechanism as the Bibliothek switcher (useSlidingPill,
+ *  one always-mounted pill, no per-segment layoutId crossfade). */
+function PruefenTabs({
+  view,
+  onSelect,
+  t,
+}: {
+  view: "queue" | "table";
+  onSelect: (v: "queue" | "table") => void;
+  t: (de: string, en: string) => string;
+}) {
+  const reduce = useReducedMotion();
+  const { trackRef, registerItem, rect } = useSlidingPill(view);
+  const segs: { key: "queue" | "table"; label: string }[] = [
+    { key: "queue", label: t("Warteschlange", "Queue") },
+    { key: "table", label: t("Alle Inhalte", "All content") },
+  ];
+  return (
+    <div
+      ref={trackRef as React.RefObject<HTMLDivElement>}
+      role="tablist"
+      aria-label={t("Prüfansicht", "Review view")}
+      className="relative flex w-full max-w-xs items-stretch gap-1 rounded-lg border border-border bg-muted p-1 shadow-soft"
+    >
+      {rect && (
+        <motion.span
+          aria-hidden
+          className="absolute top-1 bottom-1 left-0 rounded-md bg-surface shadow-soft"
+          initial={false}
+          animate={{ x: rect.left, width: rect.width }}
+          transition={reduce ? { duration: 0 } : { type: "spring", stiffness: 520, damping: 40 }}
+        />
+      )}
+      {segs.map((seg) => {
+        const active = view === seg.key;
+        return (
+          <button
+            key={seg.key}
+            ref={registerItem(seg.key) as React.Ref<HTMLButtonElement>}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onSelect(seg.key)}
+            className={cn(
+              "relative z-10 flex-1 whitespace-nowrap rounded-md px-3 py-2 text-center text-sm leading-none transition-colors",
+              active ? "font-bold text-primary" : "font-medium text-muted-foreground hover:text-foreground",
+            )}
+          >
+            {seg.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The Warteschlange landing: filter tile, a start-review call to action, and a
+ *  preview of the top of the priority queue. */
+function QueueLanding({
+  typeCounts,
+  rowsLength,
+  bankFilter,
+  defectOnly,
+  openCount,
+  filtered,
+  decisionOf,
+  setParam,
+  t,
+  lang,
+}: {
+  typeCounts: Map<ProvenanceContentType, number>;
+  rowsLength: number;
+  bankFilter: string;
+  defectOnly: boolean;
+  openCount: number;
+  filtered: Row[];
+  decisionOf: (id: string) => ReviewDecision | null;
+  setParam: (key: string, value: string | null) => void;
+  t: (de: string, en: string) => string;
+  lang: "de" | "en";
+}) {
+  return (
+    <div className="space-y-4">
       {/* Filters */}
       <div className="rounded-xl border border-border bg-surface p-3.5 shadow-soft">
         <div className="mb-2 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -178,7 +257,7 @@ export function Pruefmodus() {
             active={bankFilter === ""}
             onClick={() => setParam("bank", null)}
             label={t("Alle Bänke", "All banks")}
-            count={rows.length}
+            count={rowsLength}
           />
           {[...typeCounts.entries()]
             .sort((a, b) => b[1] - a[1])
@@ -301,10 +380,15 @@ function QueuePreview({
 }) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface shadow-soft">
-      <div className="border-b border-border px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-        {t("Nächste im Filter", "Next in filter")}{" "}
-        <span className="text-muted-foreground/60">
-          ({rows.length}/{total.toLocaleString(lang === "de" ? "de-DE" : "en-US")})
+      <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <span>
+          {t("Nächste im Filter", "Next in filter")}{" "}
+          <span className="text-muted-foreground/60">
+            ({rows.length}/{total.toLocaleString(lang === "de" ? "de-DE" : "en-US")})
+          </span>
+        </span>
+        <span className="font-medium normal-case tracking-normal text-muted-foreground/60">
+          {t(`Stand ${reviewQueueGeneratedAt}`, `as of ${reviewQueueGeneratedAt}`)}
         </span>
       </div>
       <ul className="divide-y divide-border">
@@ -335,21 +419,17 @@ function QueuePreview({
 
 function ReviewSession({
   rows,
+  api,
   reviews,
-  setReviews,
   reviewsLoaded,
-  userEmail,
-  userId,
   onExit,
   t,
   lang,
 }: {
   rows: Row[];
+  api: WorkbenchApi;
   reviews: Map<string, ProvenanceReview>;
-  setReviews: React.Dispatch<React.SetStateAction<Map<string, ProvenanceReview>>>;
   reviewsLoaded: boolean;
-  userEmail: string | null;
-  userId: string | null;
   onExit: () => void;
   t: (de: string, en: string) => string;
   lang: "de" | "en";
@@ -403,18 +483,11 @@ function ReviewSession({
       if (!current) return;
       const trimmed = note.trim();
       setSaveState("saving");
-      const hash = decision === "approve" ? await computeDecisionHash(current.id) : null;
-      const review: ProvenanceReview = {
-        content_id: current.id,
-        verified: decision === "approve",
-        comment: trimmed || null,
-        decision,
-        content_hash: hash,
-        reviewer_email: userEmail?.toLowerCase() ?? null,
-      };
-      const ok = await saveProvenanceReview(review, userId ?? "unknown");
+      // One shared review store: the cockpit writes through the same serialised
+      // onChange the table uses, so the decision + fingerprint land once and the
+      // "Alle Inhalte" table reflects it immediately.
+      const ok = await api.onChange(current.id, { decision, comment: trimmed || null });
       if (ok) {
-        setReviews((prev) => new Map(prev).set(current.id, review));
         setReviewedCount((n) => n + 1);
         // Rubber-stamp guard: count consecutive no-note approvals.
         if (decision === "approve" && !trimmed) {
@@ -427,7 +500,7 @@ function ReviewSession({
       setSaveState(ok ? "saved" : "error");
       if (ok) advance();
     },
-    [current, userEmail, userId, setReviews, advance, nudged],
+    [current, api, advance, nudged],
   );
 
   // Keyboard: V verify · X reject · N note · → skip · ← back · Esc exit.

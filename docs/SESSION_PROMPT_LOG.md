@@ -579,3 +579,36 @@ _(Numbered 163 to avoid colliding with the concurrent branch-protection session 
   `src/features/writing/fokus/useFokusMachine.ts` · `src/lib/sentenceStudio.ts` ·
   `supabase/functions/transform-sentence/index.ts` · `tests/wordDiff.test.ts` ·
   `preview/genus-verbi-wrap.html` · `docs/PROJECT_STATUS.md` · this log · PRs #695 + (regenerate PR)
+
+## Session 164 — 2026-07-24 — Review harmonised into the Control Center + note/approve save-race fix + apply:reviews (branch `claude/apply-review-decisions-lw5azm`)
+_(Branched off `main` at s160; s161–163 landed on `main` from parallel sessions while this was open, so this session is logged as 164.)_
+- **Prompt 1 (verbatim, 2026-07-24):** `Wende die anstehenden Review-Entscheidungen auf das Repo an.` (handoff: run `pnpm apply:reviews` keyless with the 14 expected approvals), then before running: `In the control center, if I write a comment and then reject or approve, are the comments being saved? it's unclear` → then `do both` →
+  Answered the diagnostic: the `/sources/werkbank` row had only a verified checkbox (= `approve`) + a
+  Notiz field (no reject control), and `useWorkbench.onChange` read its base row from a stale memo
+  snapshot then `upsert`ed the whole row, so typing a note then approving wrote the row twice off the
+  same base and the approve write (empty comment) clobbered the note. **Fix:** `onChange` merges from an
+  always-latest `reviewsRef` and serialises writes per `content_id` (`writeChains`). `pnpm apply:reviews`
+  could not run yet (no browser export / service key in the env). Commit `85b2586`.
+- **Prompt 2 (verbatim, 2026-07-24, + the founder's decision export `genaulyreviewdecisions20260724.json`):** `Can you merge and harmonize the source list with checkboxes page in sources page by bringing it to control center? Integrate all the features from the source list page to the existing review page in control center. Aim for the highest quality` → then `refer to the design skill` →
+  Ran `pnpm apply:reviews --from` on the export: 13 hash-matched approvals flipped draft→verified +
+  stamped + lint green (commit `5188af2`); 3 rejects → `docs/reports/review-defects.md`; 1
+  (`v_besprechung`, null fingerprint) held for re-review. Then, per the design skill, mapped the two
+  review surfaces, built a real-token preview (`preview/control-center-review.html`, published as an
+  artifact) with two integration variants, screenshot-verified both, and asked the founder to pick.
+- **Prompt 3 (verbatim, 2026-07-24):** `Can you add a save button for the Notes field - increase the notes field width if needed` →
+  Folded into the harmonised table cell: the note field widened + an explicit **Save button** (appears
+  once the note differs from what is stored; still saves on blur/Enter).
+- **Prompt 4 (verbatim, 2026-07-24):** `Make sure there's no redundancy in the review mode/prufmodus/warteschlange page. No need of previews anymore. Implement the design directly and merge to main` (founder picked **Variant A** via the question chip) →
+  Implemented Variant A directly. Extracted+extended `useWorkbench` into
+  `src/features/legal/useWorkbench.ts` (one shared, serialised, decision-centric review store);
+  `/admin/pruefen` heads with a Warteschlange / Alle Inhalte sliding-pill switcher (`useSlidingPill`),
+  cockpit + `AdminWorkbench` table sharing that store; the table cell gained a segmented
+  Freigeben/Ablehnen control (reject was impossible in the table before) + the note Save button;
+  `/sources/werkbank` retired (route + `SourcesWorkbench` removed), `/sources` links into the Control
+  Center. Removed redundant queue header/status copy. Gates: typecheck · lint (0 errors) ·
+  test:unit 291/291 · build · check:bundle 116.6 kB · lint:content. Commit `8d33612`.
+- **Artifacts (session 164):** `src/features/legal/useWorkbench.ts` (new) · `src/features/legal/AdminWorkbench.tsx` ·
+  `src/features/admin/Pruefmodus.tsx` · `src/features/legal/Sources.tsx` · `src/router.tsx` ·
+  `tests/adminWorkbench.test.tsx` · `src/data/provenance.ts` + `docs/reports/verified-hashes.json` +
+  `docs/reports/review-defects.*` · `preview/control-center-review.html` · `docs/DECISIONS.md` ·
+  `docs/areas/LEGAL-ADMIN.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log · commits `85b2586`, `5188af2`, `8d33612`
