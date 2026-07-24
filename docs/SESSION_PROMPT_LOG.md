@@ -407,3 +407,43 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   for future icon rounds), swept for stale references (none found: BRAND.md doesn't spec route marks;
   no compass/stack/pencil mentions left outside the updated PRAKTISCH-NAV.md), and logged this prompt.
 - **Artifacts (prompt 9):** `docs/DECISIONS.md` · this log · PR (this one)
+
+## Session 160 — 2026-07-24 — Fokus KI-Hinweis relocated level with the floating Feedback button (branch `claude/disclaimer-text-layout-5zq5g0`)
+- **Prompt 1 (verbatim, 2026-07-24):** `can you move the line "Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die Rückmeldung ist KI-generiert und kann Fehler enthalten. Mehr im Datenschutz." to be horizontally in-line with feedback button for the computer view. Also, for mobile view, I want this line to be condensed as much as possible and reside below the auswerten button with the link to privacy policy with just "Mehr".` →
+  Loaded the `design` skill, built `preview/fokus-disclaimer-inline.html` (real light-theme tokens),
+  screenshot-verified in headless Chromium, and presented desktop text (full vs shortened) + mobile
+  text (shortest vs provider-named) variants via `AskUserQuestion`. Founder picked full sentence
+  (desktop) + shortest one-line (mobile).
+- **Prompt 2 (verbatim, 2026-07-24):** `I see that in the desktop view the feedback button and the disclaimer are in a separate section but I like the floating button as before and the text should just be moved downwards to the horizontal level of the feedback button. For mobile view, I want you to bring the feedback button next to the auswerten button. Both the buttons should be floating not in a separate section along with the short text below the buttons` →
+  Corrected the approach: NO bordered bottom bar. Desktop keeps the existing `FeedbackPill`
+  (`fixed bottom-4`) untouched; `aiNoteDesktop` is now a `fixed inset-x-0 bottom-4` note mirroring
+  the pill's `lg:pl-64` + `max-w-6xl` + `sm:px-6` offsets, `max-w-[calc(100%-18rem)]` so its right
+  edge clears the pill, `pointer-events-none` wrapper with only the `/privacy` link clickable.
+  Mobile action group lost its `border-t`/`bg-background/90`/`backdrop-blur` bar chrome: the
+  `FeedbackIconButton` now floats beside the flex-1 Korrigieren button with the condensed
+  "KI-geprüft, kann Fehler enthalten. Mehr" line centered beneath. Rebuilt `preview/*-inline.html`
+  (r2) + re-screenshotted to confirm. `FokusTrainer.tsx` imports `FeedbackIconButton`. Note: the
+  mobile note/buttons are pre-correction only (they own the same `m.status !== "corrected"` guard);
+  the desktop fixed note always shows on the Fokus tab. Kurz/Lang disclaimer left as-is (founder
+  quoted the Fokus string specifically). Gates: typecheck · build · lint (0 errors) ·
+  check:bundle 116.9 kB, all green. Could not live-verify (unauth `/writing` redirects to landing);
+  founder verifies live.
+- **Artifacts (session 160):** `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` (import target, unchanged) ·
+  `preview/fokus-disclaimer-inline.html` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-24):** `kurz and lang should also have same design. Also, for the floating button "Mit KI gebaut · Feedback" - make it just "Feedback" with an icon. No need of mit ki gebaut. Do this across the app` →
+  Applied the Fokus disclaimer treatment to Kurz/Lang (`GuidedWritingTrainer.tsx`): removed the
+  inline disclaimer `<p>` from `content`, added its own fixed `aiNoteDesktop` (Kurz/Lang wording),
+  and reworked the mobile action bar (dropped `border-t`/`bg-background/90`/`backdrop-blur`; the
+  `FeedbackIconButton` now floats beside Auswerten, plus Neu schreiben after a result, with the
+  condensed note beneath). Shortened the feedback label app-wide from "Mit KI gebaut · Feedback" to
+  "Feedback": `FeedbackButton.tsx` (`FeedbackPill` default, `FeedbackFullButton` text,
+  `FeedbackIconButton` aria/title) + the `AdminSteuerung` label placeholder; remote-config
+  `feedback.label` still overrides the pill; icons unchanged. Preview refreshed to r3 (label +
+  parity), screenshot-verified. Gates: typecheck · build · lint (0 errors) · check:bundle 116.8 kB,
+  all green. Docs: `docs/areas/SCHREIBEN.md` + `docs/areas/PRAKTISCH-NAV.md` + PROJECT_STATUS s160
+  handoff updated.
+- **Artifacts (prompt 3):** `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` · `src/features/admin/AdminSteuerung.tsx` ·
+  `preview/fokus-disclaimer-inline.html` · `docs/areas/{SCHREIBEN,PRAKTISCH-NAV}.md` ·
+  `docs/PROJECT_STATUS.md` · this log

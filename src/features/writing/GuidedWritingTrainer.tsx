@@ -13,6 +13,7 @@ import { UmlautKeys } from "./UmlautKeys";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
 import { cn } from "@/lib/utils";
 
 /**
@@ -212,6 +213,29 @@ export function GuidedWritingTrainer({
     </Button>
   );
 
+  // EU AI Act Art. 50 transparency note. Desktop: a fixed line at the bottom of the
+  // viewport, level with the floating "Feedback" pill (no bordered bar), mirroring
+  // the pill's `lg:pl-64` + `max-w-6xl` + `sm:px-6` offsets and clearing it on the
+  // right; pointer-events pass through except the link. Mirrors Fokus (founder s160).
+  const aiNoteDesktop = (
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64">
+      <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+        <p className="max-w-[calc(100%-18rem)] text-xs leading-relaxed text-muted-foreground">
+          <Info className="mr-1 inline-block h-3.5 w-3.5 -translate-y-px align-middle" />
+          Dein Text wird zur Auswertung an eine KI (Anthropic, Google oder OpenAI) gesendet. Die
+          Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
+          <Link
+            to="/privacy"
+            className="pointer-events-auto font-medium text-primary underline-offset-2 hover:underline"
+          >
+            Mehr im Datenschutz
+          </Link>
+          .
+        </p>
+      </div>
+    </div>
+  );
+
   const content = (
     <div className="space-y-4">
       {/* Aufgabe: eyebrow names the topic, dice draws another random task. */}
@@ -290,19 +314,9 @@ export function GuidedWritingTrainer({
         </CardContent>
       </Card>
 
-      {/* EU AI Act Art. 50 transparency: a standalone line below the editor
-          card, not inside it (founder s149). */}
-      <p className="flex items-start gap-1.5 px-1 text-xs text-muted-foreground">
-        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        <span>
-          Dein Text wird zur Auswertung an eine KI (Anthropic, Google oder OpenAI) gesendet. Die
-          Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}
-          <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-            Mehr im Datenschutz
-          </Link>
-          .
-        </span>
-      </p>
+      {/* EU AI Act Art. 50 note lives at the page bottom now (desktop: fixed line
+          level with the floating Feedback pill; mobile: condensed under the action
+          buttons), matching Fokus (founder s160). */}
 
       {/* Result */}
       {result && (
@@ -420,16 +434,30 @@ export function GuidedWritingTrainer({
         />
       </div>
 
-      {/* Mobile action bar: Auswerten pinned above the nav, the page scrolls
-          underneath (the Bibliothek Üben-bar pattern). */}
-      <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 -mx-4 mt-4 flex items-center gap-2 border-t border-border bg-background/90 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:hidden [&>button]:h-11 [&>button]:flex-1 [&>button]:rounded-xl [&>button]:text-base">
-        {result && (
-          <Button variant="outline" onClick={() => { setResult(null); setText(""); }} disabled={submitting}>
-            Neu schreiben
-          </Button>
-        )}
-        {evaluateButton}
+      {/* Mobile: Feedback + Auswerten (and Neu schreiben after a result) float
+          side by side above the nav, no bar chrome, with the condensed KI-Hinweis
+          directly beneath (founder s160, matching Fokus). */}
+      <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 mt-4 lg:hidden">
+        <div className="flex items-stretch gap-2 [&>button]:h-11 [&>button]:rounded-xl">
+          <FeedbackIconButton />
+          {result && (
+            <Button variant="outline" onClick={() => { setResult(null); setText(""); }} disabled={submitting}>
+              Neu schreiben
+            </Button>
+          )}
+          <div className="flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base">
+            {evaluateButton}
+          </div>
+        </div>
+        <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
+          KI-geprüft, kann Fehler enthalten.{" "}
+          <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+            Mehr
+          </Link>
+        </p>
       </div>
+
+      {aiNoteDesktop}
     </div>
   );
 }

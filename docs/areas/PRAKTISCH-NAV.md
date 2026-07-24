@@ -123,7 +123,8 @@ the `compact` prop and deep-links `/welt?mission=<id>` to play full-screen. Exit
 deep-linked from here routes back to `/?tab=spielen` so the toggle is present.
 
 ## Feedback pill
-`components/layout/FeedbackButton.tsx`: a subtle fixed "Mit KI gebaut · Feedback" pill on every
+`components/layout/FeedbackButton.tsx`: a subtle fixed "Feedback" pill (label shortened from
+"Mit KI gebaut · Feedback" app-wide, s160; remote-config `feedback.label` still overrides) on every
 non-focus page (mounted in `AppShell`). Opens a dialog → `lib/feedback.ts` `submitFeedback` →
 the `submit-feedback` Edge Function (`verify_jwt=false`, anonymous-OK) which stores a
 `public.feedback` row AND emails the founder via Resend.

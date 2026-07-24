@@ -190,7 +190,7 @@ export function AdminSteuerung() {
             <span className="w-24 shrink-0 text-xs text-muted-foreground">{t("Label", "Label")}</span>
             <input
               value={draft.feedback.label ?? ""}
-              placeholder="Mit KI gebaut · Feedback"
+              placeholder="Feedback"
               onChange={(e) =>
                 patch({ feedback: { ...draft.feedback, label: e.target.value.trim() || null } })
               }
