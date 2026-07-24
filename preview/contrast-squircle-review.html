@@ -52,29 +52,30 @@
     --muted: hsl(228 16% 22%); --muted-border: hsl(228 14% 28%);
     --fg: hsl(228 20% 92%); --fg-muted: hsl(228 10% 72%);
   }
-  /* DARK — A · deeper ground */
+  /* DARK — A · near-black ground, cards stay put (separation from a DARK ground) */
   .app[data-theme="dark"][data-contrast="a"] {
-    --bg: hsl(228 30% 7%); --grad: none;
+    --bg: hsl(228 34% 5%); --grad: none;
     --surface: hsl(228 20% 14%); --surface2: hsl(228 18% 17%);
-    --card-border: hsl(228 16% 30%); --card-shadow: 0 2px 8px rgba(0,0,0,.45);
-    --muted: hsl(228 16% 21%); --muted-border: hsl(228 15% 30%);
+    --card-border: hsl(228 16% 28%); --card-shadow: 0 3px 10px rgba(0,0,0,.5);
+    --muted: hsl(228 16% 20%); --muted-border: hsl(228 15% 29%);
     --fg: hsl(228 20% 92%); --fg-muted: hsl(228 10% 72%);
   }
-  /* DARK — B · lifted surface */
+  /* DARK — B · bright lifted cards on the normal ground (separation from a LIGHT card) */
   .app[data-theme="dark"][data-contrast="b"] {
-    --bg: hsl(228 24% 10%); --grad: none;
-    --surface: hsl(228 18% 18.5%); --surface2: hsl(228 16% 22%);
-    --card-border: hsl(228 15% 33%); --card-shadow: 0 6px 18px -8px rgba(0,0,0,.60);
-    --muted: hsl(228 15% 25%); --muted-border: hsl(228 14% 34%);
-    --fg: hsl(228 22% 93%); --fg-muted: hsl(228 10% 74%);
+    --bg: hsl(228 22% 11%); --grad: none;
+    --surface: hsl(228 16% 22%); --surface2: hsl(228 15% 26%);
+    --card-border: hsl(228 14% 38%); --card-shadow: 0 10px 24px -8px rgba(0,0,0,.65);
+    --muted: hsl(228 14% 29%); --muted-border: hsl(228 13% 40%);
+    --fg: hsl(228 24% 94%); --fg-muted: hsl(228 12% 76%);
   }
-  /* DARK — C · deeper + tinted elevation */
+  /* DARK — C · deep blue ground + bluer bright cards + accent edge (both, on-brand) */
   .app[data-theme="dark"][data-contrast="c"] {
-    --bg: hsl(228 32% 7%); --grad: none;
-    --surface: hsl(226 22% 17%); --surface2: hsl(226 20% 21%);
-    --card-border: hsl(223 22% 35%); --card-shadow: 0 8px 22px -8px rgba(0,0,0,.65);
-    --muted: hsl(226 18% 24%); --muted-border: hsl(224 18% 34%);
-    --fg: hsl(228 22% 94%); --fg-muted: hsl(228 12% 76%);
+    --bg: hsl(226 44% 6%); --grad: none;
+    --surface: hsl(224 26% 19%); --surface2: hsl(224 24% 23%);
+    --card-border: hsl(214 34% 40%); --card-shadow: 0 12px 28px -8px rgba(0,0,0,.7), 0 0 0 1px hsl(210 80% 60% / .08);
+    --muted: hsl(224 22% 26%); --muted-border: hsl(216 24% 40%);
+    --fg: hsl(224 26% 95%); --fg-muted: hsl(224 14% 78%);
+    --primary: hsl(219 96% 76%); --primary-fg: hsl(226 40% 8%);
   }
 
   /* Brand + semantic tokens (shared, per theme) */
@@ -144,11 +145,16 @@
                      border-radius: calc(var(--r-toggle) - 4px); transition: background .15s, color .15s; }
   .switcher button.on { background: var(--surface); color: var(--fg); box-shadow: var(--card-shadow); font-weight: 700; }
 
-  /* Small view switcher (icons) */
-  .viewsw { display: inline-flex; gap: 3px; padding: 3px; background: var(--muted); border: 1px solid var(--muted-border); border-radius: var(--r-toggle); }
-  .viewsw button { font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; border: 0; background: transparent;
-                   color: var(--fg-muted); padding: 6px 10px; border-radius: calc(var(--r-toggle) - 4px); display: inline-flex; align-items: center; gap: 5px; }
-  .viewsw button.on { background: var(--surface); color: var(--fg); box-shadow: var(--card-shadow); }
+  /* Library view switcher — icon-only squares on a white sliding pill (matches the app) */
+  .viewsw { display: inline-flex; height: 40px; gap: 2px; padding: 2px; background: var(--muted); border: 1px solid var(--muted-border); border-radius: var(--r-toggle); }
+  .viewsw button { width: 36px; height: 36px; cursor: pointer; border: 0; background: transparent; color: var(--fg-muted);
+                   border-radius: calc(var(--r-toggle) - 4px); display: inline-grid; place-items: center; transition: background .15s, color .15s; }
+  .viewsw button svg { width: 17px; height: 17px; }
+  .viewsw button.on { background: var(--surface); color: var(--primary); box-shadow: var(--card-shadow); }
+  /* Text segmented toggle (Original/Korrigiert) */
+  .segtext { display: inline-flex; gap: 3px; padding: 3px; background: var(--muted); border: 1px solid var(--muted-border); border-radius: var(--r-toggle); }
+  .segtext button { font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; border: 0; background: transparent; color: var(--fg-muted); padding: 6px 12px; border-radius: calc(var(--r-toggle) - 4px); }
+  .segtext button.on { background: var(--surface); color: var(--fg); box-shadow: var(--card-shadow); }
 
   .toolbar { display: flex; align-items: center; gap: 10px; margin: 16px 0 14px; }
   .spacer { flex: 1; }
@@ -260,7 +266,10 @@
       </div>
       <div class="toolbar">
         <div class="viewsw">
-          <button>▦ Tabelle</button><button>◍ Graph</button><button class="on">▤ Karten</button><button>☰ Liste</button>
+          <button title="Tabelle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg></button>
+          <button title="Graph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2.4"/><circle cx="5" cy="19" r="2.4"/><circle cx="19" cy="19" r="2.4"/><path d="M6.7 17.2 10.6 7M13.4 7l3.9 10.2M7.4 19h9.2"/></svg></button>
+          <button class="on" title="Karten"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg></button>
+          <button title="Liste"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></button>
         </div>
         <div class="spacer"></div>
         <button class="icon-btn" title="Suche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
@@ -368,7 +377,7 @@
             <div style="display:flex;align-items:center;gap:10px">
               <span class="eyebrow">Dein Satz</span>
               <div class="spacer"></div>
-              <div class="viewsw"><button>Original</button><button class="on">Korrigiert</button></div>
+              <div class="segtext"><button>Original</button><button class="on">Korrigiert</button></div>
             </div>
             <div class="satz-box">Ich bin für die Organisation <span class="mark-green">der Besprechung</span> verantwortlich.</div>
             <div class="fixrow">
@@ -423,9 +432,9 @@
 
   const NOTES = {
     current: "<b>Jetzt (Ist-Zustand).</b> Karten (<code>--surface</code>) liegen nur 4% heller als der Hintergrund im Dunkelmodus und fast deckungsgleich mit Weiß im Hellmodus. Umschalt-Leisten und Pillen teilen sich fast denselben Grauton wie die Karte, deshalb der schwache Kontrast.",
-    a: "<b>Option A · Tieferer Grund.</b> Der Seitenhintergrund wird abgedunkelt (dunkel) bzw. deutlich kühl-grau (hell), die Karten bleiben. Karten heben sich klar ab, weil der Grund zurücktritt. Ruhigste Variante, ändert am wenigsten an den Karten selbst.",
-    b: "<b>Option B · Angehobene Fläche + Schatten.</b> Karten werden heller (dunkel) und bekommen einen spürbaren Schatten (hell). Buttons/Leisten liegen als eigener Ton mit Rand darüber. Klarste Trennung zwischen Karte und Grund und zwischen Button und Karte.",
-    c: "<b>Option C · Marken-getönt + Elevation.</b> Wie B, aber Grund und Kartenränder sind leicht ins Nachtblau getönt und Primär-Buttons kräftiger. Wirkt am meisten „on-brand“, mit dem stärksten Tiefeneindruck.",
+    a: "<b>Option A · Dunkler Grund.</b> Der Grund geht fast auf Schwarz (dunkel: 5% Helligkeit) bzw. deutlich kühl-grau (hell); die Karten bleiben wie jetzt. Trennung entsteht durch den zurücktretenden Grund. Ruhigste Variante, die Karten selbst ändern sich kaum.",
+    b: "<b>Option B · Helle, angehobene Karten.</b> Der Grund bleibt normal, aber die Karten werden spürbar heller (dunkel: 22% statt 14%) und schweben auf einem kräftigen Schatten. Buttons/Leisten liegen als noch hellerer Ton mit Rand darüber. Größter Karte↔Grund- und Button↔Karte-Abstand.",
+    c: "<b>Option C · Tiefes Blau + Elevation.</b> Beide Hebel: tiefblauer Grund (6%) UND hellere, bläuliche Karten (19%) mit feiner Akzent-Kante und kräftigerem Primärblau. Wirkt am meisten „on-brand“ und am plastischsten. Die drei Optionen sollten jetzt im Dunkelmodus klar unterscheidbar sein.",
   };
 
   function setAxis(axis, v) {
