@@ -1,15 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 154). **App-wide contrast + squircle pass** (founder-picked from
-`preview/contrast-squircle-review.html`): **light = Option B** (card lift via a stronger `shadow-soft`,
-s140 ground untouched), **dark = Option C** (deep-blue ground `226 44% 6%` + brighter bluer cards
-`224 26% 18%`, a 12% surface↔background gap, accent-tinted brighter border, brighter primary), and the
-page toggles / filter facet pills / Fokus toggle **squircled** (`rounded-full`→`rounded-lg`/`rounded-md`)
-via the shared switcher + FilterRail components. All in `src/index.css` + `tailwind.config.ts` + 5 shared
-components; `check-contrast` (40+ pairings), build, bundle, lint, test:unit 284/284 all green. Prior:
-s153 shipped Admin Control Center chunks 4-10 (Review Cockpit, Feedback-Inbox, System+Launch, Steuerung
-core + wave 2, report sidecars, content intelligence; next = chunk 11 Turnstile + abuse meters); s152
-aligned the admin nav to the app sidebar (#656/#660). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 155). **Design-preferences distillation → the `design` project
+skill.** Two research subagents mined `SESSION_PROMPT_LOG.md` (s133-154) + `DECISIONS.md` +
+`PROJECT_REFERENCE.md` for every founder design/layout preference, rework pattern, and
+rejected-then-reverted decision (Bibliothek, Schreiben minus Verlauf, Praktisch, global). The
+distillate now lives as `.claude/skills/design/SKILL.md` (loads on demand in any session doing UI
+work; also invocable as `/design`): process rules (previews-first, named variants, screenshot-verify),
+a pre-flight checklist ranked by past rework frequency (redundancy > color > size > dead controls >
+corners > placement > motion), the locked color language, reusable building blocks, per-section
+anchors, and the landmine list. CLAUDE.md's "Founder design preferences" section now points at it as
+mandatory pre-work. Prior: s154 app-wide contrast + squircle pass (light Option B / dark Option C,
+`rounded-full`→`rounded-lg`/`rounded-md`, PR #665). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -68,6 +69,30 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 155 (2026-07-24). Design-preferences distillation → the `design` skill,
+branch `claude/design-prefs-documentation-e1xmlc`.** The founder asked whether the recurring
+bad-first-draft problem on new pages/sections is better fixed by a skill or by CLAUDE.md
+preferences. Answer delivered: **both, in a hybrid** (CLAUDE.md is always-loaded and already ~1,070
+lines, so detail there dilutes attention and costs tokens every session; a skill loads on demand but
+triggers probabilistically, so it needs an always-on anchor).
+- **New: `.claude/skills/design/SKILL.md`** (the `/design` skill), distilled by two research
+  subagents from `SESSION_PROMPT_LOG.md` s133-154 + `DECISIONS.md` + `PROJECT_REFERENCE.md`:
+  Rule zero (extend the system, Bibliothek is the reference language) · the 8-step process
+  (report-first, previews-first with 2-4 named variants on real tokens, screenshot-verify,
+  implement the exact pick, absorb every numbered feedback point, plain-language summaries) ·
+  a pre-flight checklist ranked by actual rework frequency (1 redundancy, 2 wrong colors, 3
+  oversizing, 4 dead controls, 5 corners, 6 placement, 7 motion) · the locked color language ·
+  reusable building blocks · per-section anchors (Bibliothek/Schreiben/Praktisch; Verlauf marked
+  as slated-for-rework, not reference) · the shipped-then-reverted landmine list.
+- **CLAUDE.md anchor:** the "Founder design preferences" section now opens with a mandatory
+  "load the `design` skill before ANY design/UI work" pointer, so sessions that skim CLAUDE.md
+  still reach the full playbook. Founder can also force it deterministically by typing `/design`.
+- **Maintenance rule (in the skill):** CLAUDE.md is newer law on conflict; update the skill in the
+  same PR that changes a design rule.
+- **Next:** founder wants to rework Schreiben's Verlauf tab (excluded from the distillation on
+  purpose); when that happens, run it through the new skill's preview-first process and then add
+  Verlauf's picked design to the skill's Schreiben anchor.
+
 **Handoff after session 154 (2026-07-24). App-wide contrast + squircle pass, branch
 `claude/admin-page-access-ok8g52`, PR #665 merged.** Founder: the admin center (and the app generally)
 had too little contrast between cards and background AND between buttons and cards, in BOTH themes, and
@@ -95,45 +120,8 @@ dark = Option C, squircle yes**.
   0 errors · `test:unit` **284/284**. No live screenshot (onboarding/auth gate makes headless capture
   unreliable; sandbox can't reach the deployed site) — founder confirms live (hard-refresh, PWA-cached).
 
-**Handoff after session 153 (2026-07-23). Admin Control Center chunks 4-10 + a landing Help
-back-button fix, branch `claude/landing-back-button-routing-jyhwot` (merged to `main`).** The founder
-asked to "continue with the admin control center build plan next chunk and work until chunk 10", so all
-seven remaining MVP + early-Phase-2 chunks of `docs/plans/ADMIN_CONTROL_CENTER_BUILD_PLAN.md` shipped
-in one sitting, each its own commit passing the full gate set (typecheck · lint 0-errors · test:unit ·
-build · check:bundle · lint:content).
-- **Landing fix (first):** `HelpChrome` (`/hilfe` + `/hilfe/:slug`) had its Back button hardcoded to
-  `navigate("/hilfe")`, so on the hub itself (where the landing's Help link lands) Back looped to the
-  same page. Now uses the history-aware `handleBack` (navigate(-1), fallback `/welcome`) that
-  `LegalChrome` already uses; the article breadcrumb still links to the hub explicitly.
-- **Chunk 4 · Review Cockpit (`/admin/pruefen`):** `scripts/review-score.mjs` (pure A2 scoring
-  defect_signal > traffic_proxy > (1-confidence) > bank_criticality) + `pnpm build:review-queue` →
-  compact `reviewQueue.json`; `Pruefmodus.tsx` (filterable queue + keyboard review V/X/N/→/←, item
-  rendered as the learner sees it, machine-check panel, autosave to `provenance_reviews` with a
-  decision-time hash, 50-approvals rubber-stamp nudge). `tests/reviewScore.test.ts`.
-- **Chunk 5 · Feedback-Inbox:** `AdminFeedback.tsx` (triage status/priority/note/link via
-  `admin_feedback_update`, emailed indicator, optimistic writes).
-- **Chunk 6 · System + Launch:** `AdminSystem.tsx` (CI gate strip, Supabase/Edge pings, AI/Resend/guest
-  meters, idle-pause warning, dashboard deep links) + `AdminLaunch.tsx` (checklist in `launch_checklist`,
-  consent-version row) + `systemHealth.ts`.
-- **Chunk 7 · Steuerung core:** `src/lib/appConfig.ts` (typed remote config + defensive `mergeAppConfig`
-  + zustand store loaded once in `App.tsx`). **Empty/unreachable config == today's behavior byte-for-byte,
-  pinned by `tests/appConfig.test.ts`.** Consumers read `config.X ?? current-default`: H1 nav labels
-  (BottomTabBar/Sidebar), H2 middle-tab hide (routes stay mounted, Home/Einstellungen locked), H4 flags,
-  H5 feedback pill, H6 Beta chip, H8 dashboard start tab. `AdminSteuerung.tsx` panel with live preview.
-- **Chunk 8 · report sidecars:** `scripts/report-sidecar.mjs` into verify-facts/verify-cefr/review-queue/
-  exercise-coverage; `reportStaleness.ts` + Übersicht staleness strip.
-- **Chunk 9 · Inhalte:** `AdminInhalte.tsx` (F1 depth matrix, F2 flag triage → Prüfmodus, F3
-  exercise-coverage residual "Copy ids" work orders; coverage sidecar enriched with residual ids).
-- **Chunk 10 · Steuerung wave 2:** H3 Impressum (route always mounted + lazy, links gated behind a
-  confirm dialog), H7 streak pill, H10 landing copy overrides, H12 Demo-Modus preset.
-- **Merge note:** main had advanced through s147-152 while this branch was in flight; merged main in and
-  reconciled the overlapping locked surfaces (nav-items/BottomTabBar/Sidebar from the Schreibtraining
-  nav promotion #642, AppShell header, AdminShell/Overview from the #656/#660 admin-nav alignment,
-  router.tsx `/sources/werkbank` + `/impressum`). Regenerated the report sidecars against merged main.
-- **Next:** chunk 11 (Turnstile + abuse meters, founder does the Cloudflare/Supabase dashboard half),
-  then chunk 12 (compliance pack). No new founder DB step for chunks 4-10 (migration 0008 already live).
-
-_(Session 152's admin-control-center-nav-alignment handoff (PRs #656/#660), session 151's Fokus
+_(Session 153's Admin-Control-Center-chunks-4-10 + landing-Help-back-button handoff,
+session 152's admin-control-center-nav-alignment handoff (PRs #656/#660), session 151's Fokus
 "Satzlabor" grammar-bug fix + the Gemini→Sonnet→GPT-5 AI provider cascade
 handoff, session 150's Fokus correction-card redesign + Umlaut-keys handoff (PRs #653/#654), session 149's
 Schreiben-as-Bibliothek-extension handoff, session 148's PWA-auth-uninstall bug-fix handoff (fresh-device

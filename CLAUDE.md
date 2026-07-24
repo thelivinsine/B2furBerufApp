@@ -579,6 +579,10 @@ phase-by-phase record is in **`docs/DECISIONS.md`**. Current-state anchors you m
   (used by the session engine).
 
 ## Founder design preferences (UI; distilled s149, full record in `docs/DECISIONS.md`)
+**Before ANY design/UI work (new page, section, component, restyle, mockup), load the `design`
+skill** (`.claude/skills/design/SKILL.md`, also invocable as `/design`): it holds the full design
+system, the preview-first process, the pre-flight checklist ranked by past rework causes, and the
+rejected-then-reverted landmine list (added s155). The bullets below are only the always-on summary.
 Apply these to ANY new or restyled surface, before the founder has to ask:
 - **Extend the existing design system, never invent a parallel style:** reuse the Bibliothek
   building blocks (sliding-pill switcher AS the page header, FilterRail tile language, scope

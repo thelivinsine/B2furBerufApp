@@ -1483,3 +1483,20 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `src/features/writing/fokus/{FokusTrainer,GrammarRail}.tsx` · `src/features/shared/FilterRail.tsx` ·
   `preview/contrast-squircle-review.html` · `docs/PROJECT_STATUS.md` ·
   `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `CLAUDE.md` · this log · PR #665
+
+## Session 155 — 2026-07-24 — Design-preferences distillation → the `design` skill (branch `claude/design-prefs-documentation-e1xmlc`)
+
+- **Prompt 1 (verbatim):** `You're a highly talented and skilled senior expert with decades of design and software engineering expertise who worked in billion and trillion dollar tech companies. can you read (by using subagents maybe) all the prompts in the logs regarding all the design, layout,  related changes, reworks, my preferences, expectations especially in Bibliothek section, Schreiben section (except the verlauf - I want to rework it), and Praktisch pages, and suggest me if writing a skill or saving preferences in claude.md is better? because everytime I ask Opus or Fable to create a new page or section, I get a very bad output and needs too much rework. How can I make this better?` →
+  Two research subagents mined `SESSION_PROMPT_LOG.md` (s133-154), `DECISIONS.md`, `PROJECT_REFERENCE.md`
+  and the `preview/` inventory for every design/layout preference, rework pattern, rejection, and
+  process preference (Bibliothek, Schreiben minus Verlauf, Praktisch, global). Recommendation: a
+  **hybrid**, detailed playbook as a project skill + a short mandatory pointer in CLAUDE.md (CLAUDE.md
+  alone is always-loaded and already ~1,070 lines, so detail there costs tokens every session and gets
+  diluted; a skill alone triggers probabilistically). Built `.claude/skills/design/SKILL.md`
+  (`/design`): rule zero (extend the system; Bibliothek is the reference), the 8-step preview-first
+  process, a pre-flight checklist ranked by actual past rework frequency (redundancy > color > size >
+  dead controls > corners > placement > motion), the locked color language, reusable building blocks,
+  per-section anchors, and the shipped-then-reverted landmine list. Added the mandatory load-the-skill
+  anchor to CLAUDE.md's "Founder design preferences" section.
+- **Artifacts (session 155):** `.claude/skills/design/SKILL.md` · `CLAUDE.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
