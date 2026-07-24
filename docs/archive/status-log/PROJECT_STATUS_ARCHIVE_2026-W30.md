@@ -865,6 +865,11 @@ healthy, the s155 restructure is holding), then the approved fix pass:
   prompt log past ~1,200 lines, keep two handoffs here, bump `docs/README.md` when the folder
   shape changes.
 
+_Addendum (appended later the same session): after this handoff was written, the founder also
+approved and received **`.github/pull_request_template.md`** (minimal 5-heading PR template: What
+changed / Why / Gates run / Founder action needed / Docs updated), and prompts 4-7 were logged in
+the Session 157 prompt-log block. The session's PRs: #675, #676, #677, #704, plus the template PR._
+
 **Handoff after session 158 (2026-07-24). Nav-icon family harmonization + Trainieren toggle,
 branch `claude/schreiben-icon-design-cz21ts`, PRs #679-#683.** A preview-first icon session: the
 founder picked every mark by letter from tab-bar mockups (`preview/schreiben-icon-harmony{,-r2}.html`,

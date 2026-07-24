@@ -287,6 +287,21 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   the recurring message. Recommended a minimal generic 6-heading template (nothing that duplicates
   CLAUDE.md, so it cannot drift); creation awaits founder go-ahead. (Entry re-inserted here after a
   parallel-session merge race; sessions 158-165 landed on main while this session was open.)
+- **Prompt 5 (verbatim, 2026-07-24 ~12:30 UTC):** `is it merged to main?` →
+  Confirmed: all four session-157 PRs are on main (#675, #676, #677 the maintenance pass +
+  AGENTS.md, #704 the re-based prompt-4 entry after the parallel-session merge race). Branch reset
+  clean on main. Still open: founder decision on adding the minimal PR template.
+- **Prompt 6 (verbatim, 2026-07-24 ~12:35 UTC):** `document the session` →
+  Session documented: prompt-log entries 4-7 (this block), the PR template shipped per prompt 7,
+  and an addendum appended to the archived s157 handoff in the W30 status archive (the live
+  `PROJECT_STATUS.md` is owned by the newer parallel sessions s164/s165, so the s157 record lives
+  in the archive; no live-status stomp).
+- **Prompt 7 (verbatim, 2026-07-24 ~12:35 UTC):** `i agree to the template, let's keep the template` →
+  Created **`.github/pull_request_template.md`**: the minimal generic 5-heading template (What
+  changed / Why / Gates run / **Founder action needed**, defaulting to "None" / Docs updated), with
+  HTML-comment hints that stay invisible if left unfilled. Deliberately contains nothing that
+  duplicates CLAUDE.md rules, so it cannot drift. Every future PR body (agent- or human-authored)
+  now starts from the same structure, and the "no template found" narration stops.
 - **Artifacts (session 157):** this log (audit report delivered in chat; fixes await founder go-ahead)
 - **Prompt 2 (verbatim, 2026-07-24 ~11:45 UTC):** `I also want your opinion if we need a high-quality comprehensive agent.md file` →
   Opinion delivered: **no comprehensive AGENTS.md**. It would recreate the always-on-bloat problem
