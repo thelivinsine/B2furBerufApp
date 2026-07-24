@@ -56,7 +56,9 @@ see `strategy/DATA_GOVERNANCE.md`).
 Completed setup items are recorded in `docs/PROJECT_FOUNDATION.md`. The s147 Satzlabor redeploy is
 done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMINI_API_KEY` set). Still open:
 - [ ] (Optional) Add Resend SMTP to fix the email magic-link rate-limit. Auth → SMTP settings.
-- [ ] (Optional) Enable Turnstile CAPTCHA on guest sign-in to deter bot abuse before public launch.
+- [x] ~~Enable Turnstile CAPTCHA on guest sign-in.~~ **DONE 2026-07-24** (live sign-in verified; both
+      Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
+      `PROJECT_FOUNDATION.md`.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
