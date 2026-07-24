@@ -1,13 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 161). **Quiz-quality pass on the composed session
-(branch `claude/word-verification-nl4m26`):** plural questions now test the pattern, not word
-recognition (same-stem distractors + a typed production variant; at the C1 band only the tricky
-plurals are asked); odd-one-out (Ausreißer) questions gained a part-of-speech-matched flavour plus a
-"genuinely unrelated" guard on the odd word; the round-summary loot cards moved off the coral reward
-wash (read like errors) to white cards + a Himmelblau "Lv up" pill; plus two content tweaks
-(Soll-Ist-Vergleich English gloss reworded, English hint added to typed-cloze cards). Prior s160:
-Schreiben KI-Hinweis relocated level with the floating Feedback pill; "Feedback" label shortened app-wide. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 162). **`main` branch protection enabled:** the founder created
+a GitHub ruleset on the default branch (restrict deletions + block force pushes, no required
+approvals or status checks, so the auto-ship squash-merge flow is unaffected; record in
+`PROJECT_FOUNDATION.md` → Deploy / infra guardrails). Docs-only session, no product changes.
+Prior s161: quiz-quality pass on the composed session (same-stem plural questions + typed variant,
+odd-one-out ambiguity guard, loot-card recolor). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:

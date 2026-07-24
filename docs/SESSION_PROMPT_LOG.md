@@ -523,3 +523,11 @@ Founder reviewed individual session cards from screenshots; each turn diagnosed 
   session branches where force-with-lease is routine. Reminder: set Enforcement to Active, then
   Create. Docs-only turn, no code changes.
 - **Artifacts (prompt 3):** this log
+- **Prompt 4 (verbatim):** `okay, it's done now` →
+  Founder confirmed the ruleset is created (Active, default branch targeted, restrict deletions +
+  block force pushes, nothing else). Recorded the new protection as a standing infra fact in
+  `PROJECT_FOUNDATION.md` (Deploy / infra guardrails) and refreshed the `PROJECT_STATUS.md` header
+  to s162 (docs-only session, no product changes, so no new Resume-here handoff was added; s160/
+  s161 handoffs kept). Wrapped the session: docs PR #694 opened + squash-merged into `main`, branch
+  realigned. First merge under the new ruleset doubles as the proof it doesn't block auto-ship.
+- **Artifacts (session 162):** `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_STATUS.md` · this log
