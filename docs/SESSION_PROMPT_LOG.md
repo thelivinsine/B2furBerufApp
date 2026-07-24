@@ -471,6 +471,16 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
 - **Artifacts (prompt 6):** `src/features/redemittel/RedemittelViews.tsx` ·
   `src/features/collocations/CollocationViews.tsx` · `src/features/vocabulary/VocabViews.tsx` ·
   `preview/speaker-align.html` · this log
+- **Prompt 7 (verbatim, 2026-07-24, + screenshot of the desktop KI-Hinweis):** `the text isn't center aligned with the box above like before.. fix it. Keep the hozixontall alignment intact` →
+  When the disclaimer moved to the fixed bottom line (s160) it lost the `text-center` the original
+  in-flow note had, so it read left-aligned. Restored `text-center` on the `aiNoteDesktop` `<p>` in
+  both `FokusTrainer.tsx` and `GuidedWritingTrainer.tsx`. The p already spans the content-column
+  width (`max-w-[calc(100%-18rem)]`, left-anchored, = the box above), so centering the text lines it
+  up under the box while the fixed `bottom-4` position (the horizontal line with the Feedback pill)
+  is untouched. Preview `preview/fokus-disclaimer-inline.html` updated + screenshot-verified. Gates:
+  typecheck · build · lint (0 errors) · check:bundle 116.8 kB, all green.
+- **Artifacts (prompt 7):** `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `preview/fokus-disclaimer-inline.html` · this log
 
 ## Session 161 — 2026-07-24 — Quiz-quality pass on the composed session (branch `claude/word-verification-nl4m26`)
 

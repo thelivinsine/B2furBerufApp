@@ -277,7 +277,7 @@ export function FokusTrainer({
   const aiNoteDesktop = (
     <div className="pointer-events-none fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <p className="max-w-[calc(100%-18rem)] text-xs leading-relaxed text-muted-foreground">
+        <p className="max-w-[calc(100%-18rem)] text-center text-xs leading-relaxed text-muted-foreground">
           <Info className="mr-1 inline-block h-3.5 w-3.5 -translate-y-px align-middle" />
           Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die
           Rückmeldung ist KI-generiert und kann Fehler enthalten.{" "}

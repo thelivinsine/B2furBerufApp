@@ -48,7 +48,9 @@
   /* NO bottom bar / border. Floating pill stays bottom-right as today; disclaimer
      text is just dropped to the same bottom line, plain, no background. */
   .float-pill{position:absolute;bottom:16px;right:16px}
-  .float-disc{position:absolute;bottom:16px;left:24px;max-width:560px}
+  /* spans the content column (left of the 15rem rail + 26px gap) and CENTERS the
+     text so it lines up under the box above, staying on the bottom line. */
+  .float-disc{position:absolute;bottom:16px;left:24px;right:calc(15rem + 26px + 24px);text-align:center}
 
   /* ---- MOBILE FRAME ---- */
   .phone{width:360px;border:1px solid hsl(var(--border));border-radius:28px;background:hsl(180 45% 98%);overflow:hidden;box-shadow:0 8px 30px rgba(20,30,60,.12)}
