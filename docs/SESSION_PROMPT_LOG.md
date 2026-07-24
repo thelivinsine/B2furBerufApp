@@ -481,3 +481,20 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   typecheck · build · lint (0 errors) · check:bundle 116.8 kB, all green.
 - **Artifacts (prompt 7):** `src/features/writing/fokus/FokusTrainer.tsx` ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `preview/fokus-disclaimer-inline.html` · this log
+- **Prompt 8 (verbatim, 2026-07-24):** `Wende die anstehenden Review-Entscheidungen auf das Repo an.` (handoff: run `pnpm apply:reviews` keyless with the 14 expected approvals), then before running: `In the control center, if I write a comment and then reject or approve, are the comments being saved? it's unclear` → then `do both` →
+  Answered the diagnostic first: the `/sources/werkbank` row has only a verified checkbox (= `approve`)
+  + a Notiz field (no reject/needs_fix control in the UI). The note commits on blur/Enter and the
+  checkbox saves separately, but `useWorkbench.onChange` (`src/features/legal/Sources.tsx`) read its
+  base row from the stale memo snapshot and `upsert`ed the whole row, so typing a note then ticking
+  approve wrote the row twice off the same base and the approve write (empty comment) clobbered the
+  note, locally and in Supabase. **Fix:** `onChange` now merges from an always-latest `reviewsRef` and
+  serialises writes per `content_id` (a `writeChains` promise map), so notes + approvals persist
+  together; row call sites unchanged so the pinned test contract holds. `docs/DECISIONS.md` entry added.
+  **`pnpm apply:reviews` could NOT be run:** keyless mode needs the founder's browser "Entscheidungen"
+  export file and DB mode needs `SUPABASE_SERVICE_ROLE_KEY` (must not live in this env); neither is
+  present and the decision-time fingerprints can't be fabricated (that is the integrity check). Handed
+  back the exact one-step action (export the 14 decisions, provide the JSON, then
+  `pnpm apply:reviews --from <file>`). Gates: typecheck · lint (0 errors) · workbench/reviewExport/apply
+  tests 20/20 · build · check:bundle 116.8 kB, all green.
+- **Artifacts (prompt 8):** `src/features/legal/Sources.tsx` · `docs/DECISIONS.md` ·
+  `docs/PROJECT_STATUS.md` (s161 handoff; s159 archived to W30) · this log

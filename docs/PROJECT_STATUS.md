@@ -1,12 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 160). **Schreiben KI-Hinweis relocated + Feedback label
-shortened:** on BOTH Fokus and Kurz/Lang the combined Art. 50 disclaimer now drops to a fixed line
-at the bottom of the viewport, level with the floating Feedback pill on desktop (no bordered bar);
-on mobile the Feedback button floats beside Auswerten/Korrigieren with a condensed "KI-geprüft, kann
-Fehler enthalten. Mehr" line beneath. The floating pill + related buttons are relabelled from "Mit KI
-gebaut · Feedback" to just **"Feedback"** app-wide. Prior s159: Fokus "Satzlabor" Wave 2 (Konjunktiv
-II + Zustandspassiv; `transform-sentence` redeployed 2026-07-24, live). Product name: **Genauly**
+_Last updated: 2026-07-24 (session 161). **Control-center note/approve save race fixed:** in the
+`/sources/werkbank` workbench, typing a Notiz then ticking approve used to clobber the note (two
+whole-row upserts off the same stale snapshot); `useWorkbench` now merges from an always-latest ref
+and serialises per-id writes, so notes and approvals persist together. `pnpm apply:reviews` (the 14
+approvals) is BLOCKED on the founder's browser decision-export (no key / file in this env). Prior
+s160: Schreiben KI-Hinweis relocated + "Feedback" label shortened app-wide. Product name: **Genauly**
 (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -71,6 +70,29 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 161 (2026-07-24). Control-center (`/sources/werkbank`) note/approve save
+race fixed, branch `claude/apply-review-decisions-lw5azm`.** The founder asked whether a comment
+typed before approving/rejecting in the control center is saved. Investigation found it was NOT
+reliable: the workbench row has only a verified **checkbox** (= `approve`) + a **Notiz** field (no
+reject/needs_fix control in the UI at all). The note commits on blur/Enter and the checkbox saves
+separately, but both `onChange` calls in `useWorkbench` (`Sources.tsx`) read the SAME stale `reviews`
+snapshot and each `upsert`s the whole row, so typing a note then ticking approve wrote the row twice
+off the same base and the approve write (carrying the pre-note empty comment) clobbered the note,
+locally and in Supabase.
+- **Fix (`src/features/legal/Sources.tsx`, `useWorkbench`):** `reviewsRef` (always-latest map) feeds
+  the merge base instead of the memo closure, and a per-`content_id` promise chain (`writeChains`)
+  serialises back-to-back edits so the approve write merges on top of the committed note. Call sites
+  in `AdminWorkbench.tsx` unchanged (the `onChange(id, { verified: true })` test contract holds).
+- **Gates:** typecheck · lint (0 errors) · adminWorkbench/reviewExport/applyReviews tests **20/20** ·
+  build · check:bundle **116.8 kB**, all green. Decision recorded in `docs/DECISIONS.md`.
+- **BLOCKED — `pnpm apply:reviews` (the 14 approvals) not run this session.** The keyless flow needs
+  the founder's browser export (`/sources` → "Entscheidungen" download); the direct-DB flow needs
+  `SUPABASE_SERVICE_ROLE_KEY`, which must NOT live in this environment. Neither the export file nor
+  the key is present, and the decision-time content fingerprints cannot be fabricated (that IS the
+  integrity check). **Next:** founder ticks the 14 items, clicks "Entscheidungen", provides the JSON;
+  then `pnpm apply:reviews --from <file>` flips them + stamps + lints in one commit. Fixing the save
+  race first means those approvals (and any notes) now persist correctly before the export.
+
 **Handoff after session 160 (2026-07-24). Schreiben KI-Hinweis relocated (Fokus + Kurz/Lang) +
 "Feedback" label shortened app-wide, branch `claude/disclaimer-text-layout-5zq5g0`.** A small
 preview-first Schreiben tweak. The founder wanted the combined Art. 50 disclaimer off its
@@ -105,36 +127,6 @@ drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shor
   Decision recorded in `docs/DECISIONS.md`; the `design` skill §2.6 now carries the Schreiben
   disclaimer-placement exception so a future session doesn't re-center it.
 - **Next:** nothing pending. Founder verifies the live result (PWA: hard-refresh past a stale SW).
-
-**Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
-branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
-grammar-dimensions brainstorm (four research agents) -> `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`
-(dimension catalog, feasibility tiers, B2-marker ranking, guardrails, Now/Next/Later/Skip roadmap) +
-two previews (`preview/grammar-dimensions-satzlabor.html`, `-catalog.html`) + a combined claude.ai
-artifact (daa4dbb6). Then built the "easy half":
-- **Konjunktiv II** as a new **Modus** rail axis: `mood` promoted from the pinned `DEFAULT_MOOD` to a
-  real, combinable axis across `grammarDimensions.ts` / `useFokusMachine.ts` / `GrammarRail.tsx` /
-  `FokusTrainer.tsx` (rail is data-driven, so the Modus section renders itself).
-- **Zustandspassiv** as a third Genus-Verbi pill (data-only value add): a detected `passiv_zustand`
-  now maps to its own pill instead of null; also fixed a phantom "Aktiv looks selected" quirk on a
-  real Zustandspassiv sentence. The copula safeguard (misread "Ich bin krank" -> aktiv) stays in the
-  check-sentence prompt.
-- **Edge function:** `transform-sentence` prompt gained K-II (synthetic-vs-wuerde) + Vorgang-vs-Zustand
-  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder redeployed `transform-sentence` on 2026-07-24**
-  via the Supabase dashboard code editor (single self-contained file, no local clone / CLI needed), so
-  the improved output is live. The pills also worked before that against the live function (its enums
-  already accept konjunktiv2 / passiv_zustand as targets).
-- **Copy:** rail legend simplified to "Gruener Punkt = dein Satz." / "Tippe eine andere Form, um ihn
-  umzuwandeln."
-- **Held (operation-style, need a NEW edge-function contract, not the tuple):** Register (Sie<->du),
-  Satzbau (HS<->NS), Nominalstil, Relativ<->Partizip. Plusquamperfekt deferred (needs a temporal
-  anchor). Roadmap: brainstorm-doc section 6.1.
-- **Merge note:** `main` force-advanced 10 commits (CLAUDE.md restructure #671, prompt-log rotation,
-  sessions 155-158) while this branch was open; merged it in - code auto-merged (mood/copy edits +
-  main's cosmetic tweaks both intact), the 4 doc conflicts resolved to main's new structure and the
-  docs re-applied against it (this handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, prompt-log s159).
-- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build / check:bundle **112 kB** /
-  lint:content. Edge function is Deno (not deployed from the sandbox).
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

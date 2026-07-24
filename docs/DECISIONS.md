@@ -463,3 +463,29 @@ Decisions:
    unchanged; remote-config `feedback.label` still overrides the pill.
 
 Shipped in PR #688 (squash-merged to `main`, 2026-07-24).
+
+---
+
+## Control-center comment saves reliably next to approve (session 161, 2026-07-24)
+
+**Prompt (verbatim):** "In the control center, if I write a comment and then reject or approve, are
+the comments being saved? it's unclear" → then "do both" (fix + run `pnpm apply:reviews`).
+
+**Finding.** The `/sources/werkbank` workbench row exposes only a verified **checkbox** (= the
+`approve` decision) and a **Notiz** text field. There is **no reject / needs_fix control** in the UI,
+even though the `ReviewDecision` type supports them. The note commits on blur/Enter; the checkbox
+saves separately. Both went through `useWorkbench.onChange` (`src/features/legal/Sources.tsx`), which
+read its base row from the memoized `reviews` snapshot and `upsert`ed the WHOLE row. Typing a note
+and then ticking approve fired two writes off the same stale base, so the approve write (carrying the
+pre-note empty comment) overwrote the note, in local state and in Supabase.
+
+**Decisions.**
+1. **`onChange` merges from an always-latest `reviewsRef`, not the memo closure**, and pushes the ref
+   forward on a successful save, so a sibling write already sees the committed row.
+2. **Writes are serialised per `content_id`** via a `writeChains` promise map: back-to-back edits to
+   one row run strictly in order, so the approve write merges on top of the note write's result
+   (and vice-versa). Neither field can clobber the other regardless of blur/click ordering.
+3. **Row-level call sites stay unchanged** (`AdminWorkbench.tsx` still sends `{ verified }` and
+   `{ comment }` separately) so the pinned `onChange(id, { verified: true })` test contract holds.
+4. **A real reject/needs_fix control was NOT added** in this pass (would be a design change needing a
+   founder-reviewed preview); logged as a follow-up. Today "reject" is not expressible in the UI.

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import {
   ChevronDown,
@@ -367,6 +367,18 @@ function useWorkbench() {
   const [reviews, setReviews] = useState<Map<string, ProvenanceReview>>(new Map());
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
+  // Always-latest view of the marks, so a save reads the freshest row even when
+  // a sibling save (e.g. the checkbox) is still in flight. Reading `reviews`
+  // straight from the memo closure captured a STALE snapshot: typing a note and
+  // then ticking approve fired two whole-row upserts off the same base, so the
+  // second write (approve, carrying the pre-note empty comment) clobbered the
+  // note it never saw. See docs/DECISIONS.md (workbench note/approve race).
+  const reviewsRef = useRef(reviews);
+  reviewsRef.current = reviews;
+  // Per-id write chain: back-to-back edits to the SAME row run strictly one
+  // after another, so each merge is based on the previous write's result.
+  const writeChains = useRef(new Map<string, Promise<unknown>>());
+
   // Load the founder's saved review marks once, when signed in as admin.
   useEffect(() => {
     if (!admin) {
@@ -386,44 +398,63 @@ function useWorkbench() {
     if (!admin) return undefined;
     return {
       reviews,
-      onChange: async (contentId, patch) => {
+      onChange: (contentId, patch) => {
         const uid = user?.id;
-        if (!uid) return false;
-        const cur = reviews.get(contentId) ?? {
-          content_id: contentId,
-          verified: false,
-          comment: null,
-          decision: null,
-          content_hash: null,
-          reviewer_email: null,
+        if (!uid) return Promise.resolve(false);
+        const run = async () => {
+          // Read the base row from the ref, not the memo closure, so a note
+          // save and an approve save cannot each overwrite the other's field.
+          const cur = reviewsRef.current.get(contentId) ?? {
+            content_id: contentId,
+            verified: false,
+            comment: null,
+            decision: null,
+            content_hash: null,
+            reviewer_email: null,
+          };
+          // Ticking the box is an APPROVE decision and fingerprints the content
+          // as the reviewer sees it (the apply script compares this hash before
+          // flipping the repo row). Unticking clears the decision; a note-only
+          // edit leaves the decision and its hash untouched.
+          const approving = patch.verified === true;
+          const clearing = patch.verified === false;
+          const merged: ProvenanceReview = {
+            content_id: contentId,
+            verified: patch.verified ?? cur.verified,
+            // normalise an empty note to null so the column stays clean
+            comment:
+              patch.comment !== undefined ? (patch.comment ?? "").trim() || null : cur.comment,
+            decision: approving ? "approve" : clearing ? null : cur.decision,
+            content_hash: approving
+              ? await computeDecisionHash(contentId)
+              : clearing
+                ? null
+                : cur.content_hash,
+            reviewer_email: user?.email?.toLowerCase() ?? cur.reviewer_email,
+          };
+          setSaveState("saving");
+          const ok = await saveProvenanceReview(merged, uid);
+          // Only commit to the local cache once the write actually lands, so a
+          // failed save (e.g. table not provisioned) does not look saved. Push
+          // the ref ahead of the async render so the next chained write already
+          // sees this row.
+          if (ok) {
+            const next = new Map(reviewsRef.current).set(contentId, merged);
+            reviewsRef.current = next;
+            setReviews(next);
+          }
+          setSaveState(ok ? "saved" : "error");
+          return ok;
         };
-        // Ticking the box is an APPROVE decision and fingerprints the content
-        // as the reviewer sees it (the apply script compares this hash before
-        // flipping the repo row). Unticking clears the decision; a note-only
-        // edit leaves the decision and its hash untouched.
-        const approving = patch.verified === true;
-        const clearing = patch.verified === false;
-        const merged: ProvenanceReview = {
-          content_id: contentId,
-          verified: patch.verified ?? cur.verified,
-          // normalise an empty note to null so the column stays clean
-          comment:
-            patch.comment !== undefined ? (patch.comment ?? "").trim() || null : cur.comment,
-          decision: approving ? "approve" : clearing ? null : cur.decision,
-          content_hash: approving
-            ? await computeDecisionHash(contentId)
-            : clearing
-              ? null
-              : cur.content_hash,
-          reviewer_email: user?.email?.toLowerCase() ?? cur.reviewer_email,
-        };
-        setSaveState("saving");
-        const ok = await saveProvenanceReview(merged, uid);
-        // Only commit to the local cache once the write actually lands, so a
-        // failed save (e.g. table not provisioned) does not look saved.
-        if (ok) setReviews((prev) => new Map(prev).set(contentId, merged));
-        setSaveState(ok ? "saved" : "error");
-        return ok;
+        // Serialise writes per content_id: the approve write runs only after the
+        // note write it was queued behind, and merges on top of its result.
+        const prev = writeChains.current.get(contentId) ?? Promise.resolve();
+        const result = prev.then(run, run);
+        writeChains.current.set(
+          contentId,
+          result.catch(() => {}),
+        );
+        return result;
       },
     };
   }, [admin, reviews, user?.id, user?.email]);
