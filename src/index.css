@@ -45,13 +45,16 @@ input:-webkit-autofill {
 
     /* Neutral cool grey for chrome fills (switcher tracks, tags, tiles); the
        warm tan muted/border of the Papier era read as butter yellow. Lightened
-       87%/83% → 90%/86% in the same session (founder: the first grey read too
-       heavy on the near-white ground). */
-    --muted: 220 10% 90%;
+       87%/83% → 90%/86% (founder: the first grey read too heavy on the
+       near-white ground), then re-deepened slightly in the s153 contrast pass
+       (Option B) to 88%/84% so a switcher track / idle pill separates from a
+       white card. The real card lift in light mode comes from the stronger
+       `shadow-soft` (tailwind.config.ts), not from the ground. */
+    --muted: 220 13% 88%;
     --muted-foreground: 220 8% 36%;
 
-    --border: 220 9% 86%;
-    --input: 220 9% 86%;
+    --border: 218 13% 84%;
+    --input: 218 13% 84%;
     --ring: 221 83% 54%;
 
     /* Nachtblau, darkened 58%→54% (plan deviation #1) so white-on-primary
@@ -121,30 +124,36 @@ input:-webkit-autofill {
        on a violet hue left over from the indigo era; warm navy carries the
        Nachtblau identity instead. Same lightness/saturation, so every pairing
        still clears AA with room (see check-contrast.mjs). */
-    --background: 228 24% 10%;
+    /* s153 contrast pass — dark "Option C": the flat 24%/10% ground let cards
+       (--surface) sit only 4% above the background, so they vanished. Now a
+       DEEP blue ground (6% L, 44% sat) carries BRIGHTER, bluer cards (18% L)
+       with an accent-tinted border and a lifted primary. The surface↔background
+       gap is 12% (was 4%), which does the separation; the brighter border
+       reinforces the card edge. Every check-contrast.mjs pairing re-verified. */
+    --background: 226 44% 6%;
     /* bg-page is a no-op in dark: all three stops sit on the flat dark ground
        (the mesh washes above them still give the usual subtle glow). */
-    --page-from: 228 24% 10%;
-    --page-mid: 228 24% 10%;
-    --page-to: 228 24% 10%;
-    --foreground: 228 20% 92%;
-    --surface: 228 20% 14%;
-    --elevated: 228 18% 18%;
+    --page-from: 226 44% 6%;
+    --page-mid: 226 44% 6%;
+    --page-to: 226 44% 6%;
+    --foreground: 224 24% 94%;
+    --surface: 224 26% 18%;
+    --elevated: 224 24% 22%;
 
-    --muted: 228 16% 22%;
-    /* Dimmed + slightly desaturated (76%→72%, PR D design pass) so secondary
-       text actually reads secondary against the 92%-lightness foreground;
-       still ~8:1 on the background, far above AA. */
-    --muted-foreground: 228 10% 72%;
+    --muted: 224 22% 25%;
+    /* Dimmed secondary text; lifted 72%→77% for the brighter Option-C surfaces
+       so it still reads as secondary while clearing AA on surface AND muted. */
+    --muted-foreground: 224 13% 77%;
 
-    --border: 228 14% 26%;
-    --input: 228 14% 28%;
-    /* Nachtblau lifted for the dark ground: 70% lightness measures 6.6:1 as
-       text on the background, so eyebrows / active-tab labels clear AA with
-       margin (the old purple needed 74% for the same reason). */
-    --ring: 221 90% 70%;
+    /* Accent-tinted, brighter card edge (Option C's "defined edge"): 26%→36% L,
+       hue pulled toward the sky accent so a card outline reads on-brand. */
+    --border: 216 28% 36%;
+    --input: 220 24% 31%;
+    /* Nachtblau lifted for the deep Option-C ground: 76% lightness clears AA as
+       text on the 6%-L background with wide margin. */
+    --ring: 219 96% 76%;
 
-    --primary: 221 90% 70%;
+    --primary: 219 96% 76%;
     --primary-foreground: 228 30% 8%;
     --accent: 197 93% 77%; /* Himmel Soft, same swatch as light (s138) */
     --accent-foreground: 202 71% 10%;

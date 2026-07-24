@@ -139,7 +139,7 @@ export function FokusTrainer({
             Dein Satz
           </p>
           {showResult && (
-            <div className="inline-flex rounded-full bg-muted p-0.5 text-xs font-bold">
+            <div className="inline-flex rounded-lg bg-muted p-0.5 text-xs font-bold">
               {(
                 [
                   { id: "orig" as const, label: "Original" },
@@ -152,7 +152,7 @@ export function FokusTrainer({
                   aria-pressed={view === seg.id}
                   onClick={() => setView(seg.id)}
                   className={cn(
-                    "rounded-full px-3 py-1 transition-colors",
+                    "rounded-md px-3 py-1 transition-colors",
                     view === seg.id
                       ? "bg-surface text-foreground shadow-soft"
                       : "text-muted-foreground hover:text-foreground",

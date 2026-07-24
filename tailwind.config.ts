@@ -86,7 +86,12 @@ const config: Config = {
         ],
       },
       boxShadow: {
-        soft: "0 1px 2px hsl(var(--shadow) / 0.04), 0 4px 12px hsl(var(--shadow) / 0.06)",
+        // Strengthened in the s153 contrast pass ("Option B"): cards in light
+        // mode sit on a near-white ground, so the lift is carried by this
+        // shadow rather than a ground colour. --shadow is near-black at low
+        // opacity in dark mode, so this stays a light-theme effect (dark uses
+        // surface lightness + border for separation, per "Option C").
+        soft: "0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12)",
         elevated:
           "0 2px 4px hsl(var(--shadow) / 0.05), 0 12px 32px hsl(var(--shadow) / 0.12)",
         // Toned-down (~50%) version of `elevated` for the sign-in dialog, so the
