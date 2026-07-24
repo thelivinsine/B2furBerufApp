@@ -1,0 +1,449 @@
+<title>Genauly · Kontrast & Squircle Review</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { color-scheme: light dark; }
+
+  /* ---- Radius axis (the "squircle" change) ---- */
+  [data-round="pill"]     { --r-toggle: 999px; --r-pill: 999px; }
+  [data-round="squircle"] { --r-toggle: 12px;  --r-pill: 9px;  }
+  .app { --r-card: 16px; --r-input: 10px; }
+
+  /* ================= COLOUR TOKENS (from the real app tokens) ================= */
+  /* LIGHT — current */
+  .app[data-theme="light"][data-contrast="current"] {
+    --bg: hsl(180 30% 97.5%); --grad: none;
+    --surface: hsl(0 0% 100%); --surface2: hsl(220 14% 96%);
+    --card-border: hsl(220 9% 86%); --card-shadow: 0 1px 2px rgba(16,24,40,.06);
+    --muted: hsl(220 10% 90%); --muted-border: hsl(220 9% 86%);
+    --fg: hsl(252 16% 12%); --fg-muted: hsl(220 8% 36%);
+  }
+  /* LIGHT — A · cool grey ground */
+  .app[data-theme="light"][data-contrast="a"] {
+    --bg: hsl(220 18% 93%); --grad: none;
+    --surface: hsl(0 0% 100%); --surface2: hsl(220 16% 96%);
+    --card-border: hsl(220 13% 83%); --card-shadow: 0 1px 3px rgba(16,24,40,.10);
+    --muted: hsl(220 15% 88%); --muted-border: hsl(220 12% 80%);
+    --fg: hsl(252 16% 12%); --fg-muted: hsl(220 8% 34%);
+  }
+  /* LIGHT — B · lifted + shadow */
+  .app[data-theme="light"][data-contrast="b"] {
+    --bg: hsl(206 34% 96%); --grad: none;
+    --surface: hsl(0 0% 100%); --surface2: hsl(216 20% 96%);
+    --card-border: hsl(216 14% 84%);
+    --card-shadow: 0 4px 14px -6px rgba(16,24,40,.18), 0 1px 2px rgba(16,24,40,.06);
+    --muted: hsl(216 14% 89%); --muted-border: hsl(216 12% 82%);
+    --fg: hsl(252 16% 12%); --fg-muted: hsl(220 8% 34%);
+  }
+  /* LIGHT — C · branded tint */
+  .app[data-theme="light"][data-contrast="c"] {
+    --bg: hsl(214 44% 95%); --grad: none;
+    --surface: hsl(0 0% 100%); --surface2: hsl(214 30% 96%);
+    --card-border: hsl(221 34% 87%);
+    --card-shadow: 0 2px 8px -3px rgba(37,78,190,.14);
+    --muted: hsl(214 30% 91%); --muted-border: hsl(216 24% 82%);
+    --fg: hsl(252 16% 12%); --fg-muted: hsl(221 12% 34%);
+  }
+
+  /* DARK — current */
+  .app[data-theme="dark"][data-contrast="current"] {
+    --bg: hsl(228 24% 10%); --grad: none;
+    --surface: hsl(228 20% 14%); --surface2: hsl(228 18% 17%);
+    --card-border: hsl(228 14% 26%); --card-shadow: 0 1px 2px rgba(0,0,0,.30);
+    --muted: hsl(228 16% 22%); --muted-border: hsl(228 14% 28%);
+    --fg: hsl(228 20% 92%); --fg-muted: hsl(228 10% 72%);
+  }
+  /* DARK — A · deeper ground */
+  .app[data-theme="dark"][data-contrast="a"] {
+    --bg: hsl(228 30% 7%); --grad: none;
+    --surface: hsl(228 20% 14%); --surface2: hsl(228 18% 17%);
+    --card-border: hsl(228 16% 30%); --card-shadow: 0 2px 8px rgba(0,0,0,.45);
+    --muted: hsl(228 16% 21%); --muted-border: hsl(228 15% 30%);
+    --fg: hsl(228 20% 92%); --fg-muted: hsl(228 10% 72%);
+  }
+  /* DARK — B · lifted surface */
+  .app[data-theme="dark"][data-contrast="b"] {
+    --bg: hsl(228 24% 10%); --grad: none;
+    --surface: hsl(228 18% 18.5%); --surface2: hsl(228 16% 22%);
+    --card-border: hsl(228 15% 33%); --card-shadow: 0 6px 18px -8px rgba(0,0,0,.60);
+    --muted: hsl(228 15% 25%); --muted-border: hsl(228 14% 34%);
+    --fg: hsl(228 22% 93%); --fg-muted: hsl(228 10% 74%);
+  }
+  /* DARK — C · deeper + tinted elevation */
+  .app[data-theme="dark"][data-contrast="c"] {
+    --bg: hsl(228 32% 7%); --grad: none;
+    --surface: hsl(226 22% 17%); --surface2: hsl(226 20% 21%);
+    --card-border: hsl(223 22% 35%); --card-shadow: 0 8px 22px -8px rgba(0,0,0,.65);
+    --muted: hsl(226 18% 24%); --muted-border: hsl(224 18% 34%);
+    --fg: hsl(228 22% 94%); --fg-muted: hsl(228 12% 76%);
+  }
+
+  /* Brand + semantic tokens (shared, per theme) */
+  .app[data-theme="light"] {
+    --primary: hsl(221 83% 54%); --primary-fg: #fff;
+    --accent: hsl(197 93% 77%); --accent-bg: hsl(197 93% 77% / .22); --accent-border: hsl(197 65% 58% / .55); --accent-ink: hsl(198 90% 32%);
+    --success: hsl(153 55% 40%); --reward: hsl(11 82% 54%);
+    --der: hsl(226 74% 48%); --die: hsl(333 71% 51%); --das: hsl(142 76% 36%);
+  }
+  .app[data-theme="dark"] {
+    --primary: hsl(221 92% 72%); --primary-fg: hsl(228 30% 8%);
+    --accent: hsl(197 93% 77%); --accent-bg: hsl(197 55% 42% / .20); --accent-border: hsl(197 55% 58% / .38); --accent-ink: hsl(198 85% 74%);
+    --success: hsl(153 50% 55%); --reward: hsl(11 88% 66%);
+    --der: hsl(226 88% 76%); --die: hsl(329 82% 72%); --das: hsl(145 50% 58%);
+  }
+
+  body { font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+
+  .app { min-height: 100vh; background: var(--bg); color: var(--fg); transition: background .2s; }
+
+  /* ---------- Control bar ---------- */
+  .controls {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center;
+    padding: 12px 18px; background: var(--surface); border-bottom: 1px solid var(--card-border);
+    box-shadow: 0 1px 0 rgba(0,0,0,.04);
+  }
+  .cgroup { display: flex; flex-direction: column; gap: 5px; }
+  .clabel { font-size: 10px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--fg-muted); }
+  .segset { display: inline-flex; gap: 3px; padding: 3px; background: var(--muted); border: 1px solid var(--muted-border); border-radius: var(--r-toggle); }
+  .segset button {
+    font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer;
+    padding: 5px 11px; border: 0; background: transparent; color: var(--fg-muted);
+    border-radius: calc(var(--r-toggle) - 4px); transition: background .15s, color .15s;
+  }
+  .segset button.on { background: var(--surface); color: var(--fg); box-shadow: var(--card-shadow); }
+  .segset button:focus-visible { outline: 2px solid var(--primary); outline-offset: 1px; }
+
+  /* ---------- Canvas ---------- */
+  .canvas { max-width: 1080px; margin: 0 auto; padding: 22px 18px 80px; }
+  .note {
+    font-size: 12.5px; line-height: 1.5; color: var(--fg-muted);
+    background: var(--surface); border: 1px solid var(--card-border); border-radius: var(--r-card);
+    padding: 12px 14px; margin-bottom: 20px; box-shadow: var(--card-shadow);
+  }
+  .note b { color: var(--fg); }
+
+  /* Shared building blocks */
+  .card { background: var(--surface); border: 1px solid var(--card-border); border-radius: var(--r-card); box-shadow: var(--card-shadow); }
+  .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .04em; color: var(--primary); text-transform: none; }
+  .eyebrow.muted { color: var(--fg-muted); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: 10px; }
+
+  .btn { font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; border-radius: var(--r-input);
+         padding: 9px 16px; border: 1px solid transparent; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-primary { background: linear-gradient(180deg, rgba(255,255,255,.16), rgba(255,255,255,0)) , var(--primary); color: var(--primary-fg); box-shadow: 0 2px 6px -1px hsl(221 60% 40% / .35); }
+  .btn-ghost { background: var(--surface); color: var(--fg); border-color: var(--card-border); }
+  .btn-outline { background: transparent; color: var(--fg); border-color: var(--card-border); }
+  .icon-btn { width: 38px; height: 38px; border-radius: var(--r-input); border: 1px solid var(--card-border);
+              background: var(--surface); color: var(--fg-muted); display: inline-grid; place-items: center; cursor: pointer; }
+  .icon-btn svg { width: 17px; height: 17px; }
+
+  /* Segmented page toggle (LibrarySwitcher / WritingModeSwitcher) */
+  .switcher { display: flex; gap: 4px; padding: 4px; background: var(--muted); border: 1px solid var(--muted-border);
+              border-radius: var(--r-toggle); box-shadow: var(--card-shadow); }
+  .switcher button { flex: 1; font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; border: 0;
+                     padding: 10px 6px; color: var(--fg-muted); background: transparent;
+                     border-radius: calc(var(--r-toggle) - 4px); transition: background .15s, color .15s; }
+  .switcher button.on { background: var(--surface); color: var(--fg); box-shadow: var(--card-shadow); font-weight: 700; }
+
+  /* Small view switcher (icons) */
+  .viewsw { display: inline-flex; gap: 3px; padding: 3px; background: var(--muted); border: 1px solid var(--muted-border); border-radius: var(--r-toggle); }
+  .viewsw button { font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; border: 0; background: transparent;
+                   color: var(--fg-muted); padding: 6px 10px; border-radius: calc(var(--r-toggle) - 4px); display: inline-flex; align-items: center; gap: 5px; }
+  .viewsw button.on { background: var(--surface); color: var(--fg); box-shadow: var(--card-shadow); }
+
+  .toolbar { display: flex; align-items: center; gap: 10px; margin: 16px 0 14px; }
+  .spacer { flex: 1; }
+
+  .layout { display: grid; grid-template-columns: minmax(0,1fr) 16rem; gap: 18px; align-items: start; }
+  @media (max-width: 780px) { .layout { grid-template-columns: 1fr; } }
+
+  /* Vocab cards */
+  .vgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px) { .vgrid { grid-template-columns: 1fr; } }
+  .vcard { padding: 14px 15px; display: flex; flex-direction: column; gap: 8px; position: relative; }
+  .vcard .top { display: flex; align-items: center; gap: 9px; }
+  .dot { width: 13px; height: 13px; border-radius: 4px; flex: none; }
+  .dot.der { background: var(--der); } .dot.die { background: var(--die); } .dot.das { background: var(--das); }
+  .word { font-size: 17px; font-weight: 700; }
+  .plural { font-size: 12.5px; color: var(--fg-muted); }
+  .example { font-size: 13px; line-height: 1.45; color: var(--fg-muted); }
+  .badge { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: var(--r-pill);
+           background: var(--muted); color: var(--fg-muted); border: 1px solid var(--muted-border); }
+  .bk { position: absolute; top: 12px; right: 12px; color: var(--fg-muted); cursor: pointer; }
+  .bk svg { width: 16px; height: 16px; }
+
+  /* Filter rail */
+  .rail { padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+  .rail.himmel { background: var(--accent-bg); border-color: var(--accent-border); }
+  .rail-head { display: flex; align-items: center; gap: 8px; }
+  .rail-head .title { font-size: 13px; font-weight: 700; color: var(--primary); }
+  .rail.himmel .rail-head .title { color: var(--accent-ink); }
+  .count-badge { font-size: 11px; font-weight: 700; background: var(--primary); color: var(--primary-fg); border-radius: var(--r-pill); padding: 1px 7px; }
+  .field { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--card-border);
+           border-radius: var(--r-input); padding: 8px 11px; font-size: 13px; color: var(--fg-muted); }
+  .drop { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--surface);
+          border: 1px solid var(--card-border); border-radius: var(--r-input); padding: 8px 11px; font-size: 13px; cursor: pointer; }
+  .drop .n { font-size: 11px; font-weight: 700; color: var(--fg-muted); background: var(--muted); border-radius: var(--r-pill); padding: 1px 7px; }
+  .facet-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-muted); margin-bottom: 6px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .pill { font-size: 12px; font-weight: 600; padding: 5px 11px; border-radius: var(--r-pill); cursor: pointer;
+          background: var(--surface); border: 1px solid var(--card-border); color: var(--fg); display: inline-flex; gap: 6px; align-items: center; }
+  .pill .n { color: var(--fg-muted); font-size: 11px; }
+  .pill.on { background: var(--primary); color: var(--primary-fg); border-color: transparent; }
+  .pill.on .n { color: var(--primary-fg); opacity: .85; }
+  .rail-foot { display: flex; align-items: center; gap: 10px; padding-top: 4px; border-top: 1px solid var(--card-border); margin-top: 2px; padding-top: 12px; }
+  .rail.himmel .rail-foot { border-top-color: var(--accent-border); }
+  .rail-foot .cnt { font-size: 12px; color: var(--fg-muted); }
+  .rail-foot .btn { flex: 1; justify-content: center; }
+
+  /* Fokus / Satzlabor */
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+  .editor { padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+  .satz-box { background: var(--surface2); border: 1px solid var(--card-border); border-radius: var(--r-input); padding: 12px 13px; font-size: 15px; line-height: 1.5; min-height: 64px; }
+  .umlaut { display: flex; gap: 5px; flex-wrap: wrap; }
+  .ukey { min-width: 30px; height: 30px; padding: 0 6px; font-size: 14px; font-weight: 600; cursor: pointer;
+          background: var(--surface); border: 1px solid var(--card-border); border-radius: var(--r-input); color: var(--fg); }
+  .editor-foot { display: flex; align-items: center; gap: 10px; }
+  .mark-green { border-bottom: 2px solid var(--success); }
+  .mark-coral { border-bottom: 2px solid var(--reward); }
+  .fixrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+  .fixtile { background: var(--accent-bg); border: 1px solid var(--accent-border); border-radius: var(--r-input); padding: 7px 10px; }
+  .fixtile .cat { font-size: 10px; font-weight: 800; letter-spacing: .03em; color: var(--accent-ink); }
+  .fixtile .edit { font-size: 13px; font-weight: 600; }
+  .fixtile .edit s { color: var(--fg-muted); text-decoration-color: var(--reward); }
+  .disclaimer { font-size: 11.5px; color: var(--fg-muted); text-align: center; margin-top: 10px; }
+
+  h2.screen-title { font-size: 22px; font-weight: 800; letter-spacing: -.01em; margin-bottom: 2px; }
+  .hidden { display: none !important; }
+</style>
+
+<div class="app" id="app" data-theme="dark" data-contrast="a" data-round="squircle" data-screen="woerter">
+  <div class="controls">
+    <div class="cgroup">
+      <span class="clabel">Theme</span>
+      <div class="segset" data-axis="theme">
+        <button data-v="light">Hell</button>
+        <button data-v="dark" class="on">Dunkel</button>
+      </div>
+    </div>
+    <div class="cgroup">
+      <span class="clabel">Screen</span>
+      <div class="segset" data-axis="screen">
+        <button data-v="woerter" class="on">Wörter</button>
+        <button data-v="satzlabor">Satzlabor</button>
+      </div>
+    </div>
+    <div class="cgroup">
+      <span class="clabel">Kontrast-Option</span>
+      <div class="segset" data-axis="contrast">
+        <button data-v="current">Jetzt</button>
+        <button data-v="a" class="on">A</button>
+        <button data-v="b">B</button>
+        <button data-v="c">C</button>
+      </div>
+    </div>
+    <div class="cgroup">
+      <span class="clabel">Rundung</span>
+      <div class="segset" data-axis="round">
+        <button data-v="pill">Pill (jetzt)</button>
+        <button data-v="squircle" class="on">Squircle</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas">
+    <div class="note" id="optNote"></div>
+
+    <!-- ===================== WÖRTER ===================== -->
+    <div id="screen-woerter">
+      <div class="switcher" style="margin-bottom:16px">
+        <button class="on">Wörter</button><button>Kollokationen</button><button>Redemittel</button><button>Grammatik</button>
+      </div>
+      <div class="toolbar">
+        <div class="viewsw">
+          <button>▦ Tabelle</button><button>◍ Graph</button><button class="on">▤ Karten</button><button>☰ Liste</button>
+        </div>
+        <div class="spacer"></div>
+        <button class="icon-btn" title="Suche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+        <button class="icon-btn" title="Gespeichert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg></button>
+      </div>
+
+      <div class="layout">
+        <div class="vgrid">
+          <div class="card vcard">
+            <span class="bk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+            <div class="top"><span class="dot die"></span><span class="word">die Besprechung</span></div>
+            <div class="plural">Plural: die Besprechungen</div>
+            <div class="example">Die Besprechung beginnt um neun Uhr im großen Konferenzraum.</div>
+            <div><span class="badge">B1.2</span></div>
+          </div>
+          <div class="card vcard">
+            <span class="bk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+            <div class="top"><span class="dot der"></span><span class="word">der Termin</span></div>
+            <div class="plural">Plural: die Termine</div>
+            <div class="example">Ich möchte einen Termin für nächste Woche vereinbaren.</div>
+            <div><span class="badge">B1.1</span></div>
+          </div>
+          <div class="card vcard">
+            <span class="bk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+            <div class="top"><span class="dot das"></span><span class="word">das Protokoll</span></div>
+            <div class="plural">Plural: die Protokolle</div>
+            <div class="example">Wer schreibt heute das Protokoll der Sitzung?</div>
+            <div><span class="badge">B2.1</span></div>
+          </div>
+          <div class="card vcard">
+            <span class="bk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+            <div class="top"><span class="dot die"></span><span class="word">die Zusammenarbeit</span></div>
+            <div class="plural">Plural: —</div>
+            <div class="example">Die Zusammenarbeit mit dem Team funktioniert reibungslos.</div>
+            <div><span class="badge">B2.2</span></div>
+          </div>
+        </div>
+
+        <aside class="card rail">
+          <div class="rail-head">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+            <span class="title">Filter</span>
+            <span class="count-badge">3</span>
+            <div class="spacer"></div>
+            <span class="icon-btn" style="width:30px;height:30px;border:0;background:transparent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span>
+          </div>
+          <div class="field">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            Suche
+          </div>
+          <div>
+            <div class="facet-label">Branche</div>
+            <div class="drop">Alle Branchen <span class="n">15</span></div>
+          </div>
+          <div>
+            <div class="facet-label">Thema</div>
+            <div class="drop">Besprechungen <span class="n">1</span></div>
+          </div>
+          <div>
+            <div class="facet-label">Wortart</div>
+            <div class="pills">
+              <span class="pill on">Nomen <span class="n">32</span></span>
+              <span class="pill">Verb <span class="n">11</span></span>
+              <span class="pill">Adjektiv <span class="n">6</span></span>
+            </div>
+          </div>
+          <div>
+            <div class="facet-label">Stufe</div>
+            <div class="pills">
+              <span class="pill">B1.1 <span class="n">9</span></span>
+              <span class="pill on">B2.1 <span class="n">14</span></span>
+              <span class="pill">B2.2 <span class="n">7</span></span>
+            </div>
+          </div>
+          <div class="rail-foot">
+            <span class="cnt">49 Wörter</span>
+            <button class="btn btn-primary">Üben</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ===================== SATZLABOR ===================== -->
+    <div id="screen-satzlabor" class="hidden">
+      <div class="switcher" style="margin-bottom:16px">
+        <button class="on">Fokus</button><button>Kurz</button><button>Lang</button><button>Verlauf</button>
+      </div>
+
+      <div class="layout">
+        <div class="stack">
+          <div class="card editor">
+            <span class="eyebrow">Dein Satz</span>
+            <div class="satz-box">Ich bin verantwortlich für die Organisation von der Besprechung.</div>
+            <div class="umlaut">
+              <button class="ukey">ä</button><button class="ukey">ö</button><button class="ukey">ü</button><button class="ukey">ß</button>
+              <button class="ukey">Ä</button><button class="ukey">Ö</button><button class="ukey">Ü</button>
+            </div>
+            <div class="editor-foot">
+              <div class="spacer"></div>
+              <button class="btn btn-primary">Korrigieren</button>
+            </div>
+          </div>
+
+          <div class="card editor">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="eyebrow">Dein Satz</span>
+              <div class="spacer"></div>
+              <div class="viewsw"><button>Original</button><button class="on">Korrigiert</button></div>
+            </div>
+            <div class="satz-box">Ich bin für die Organisation <span class="mark-green">der Besprechung</span> verantwortlich.</div>
+            <div class="fixrow">
+              <div class="fixtile"><div class="cat">Grammatik</div><div class="edit"><s>von der</s> → der</div></div>
+              <div class="fixtile"><div class="cat">Wortstellung</div><div class="edit"><s>… Besprechung.</s> → verantwortlich.</div></div>
+              <div class="spacer"></div>
+              <button class="btn btn-outline">Neuer Satz</button>
+            </div>
+          </div>
+          <div class="disclaimer">Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die Rückmeldung kann Fehler enthalten.</div>
+        </div>
+
+        <div class="stack">
+          <aside class="card rail himmel">
+            <div class="rail-head">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="var(--accent-ink)" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>
+              <span class="title">Aufgabe wählen</span>
+              <div class="spacer"></div>
+              <span class="icon-btn" style="width:30px;height:30px;border:0;background:transparent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span>
+            </div>
+            <div><div class="facet-label">Branche</div><div class="drop">Alle Branchen <span class="n">15</span></div></div>
+            <div><div class="facet-label">Thema</div><div class="drop">Besprechungen <span class="n">1</span></div></div>
+            <div><div class="facet-label">Unterthema</div><div class="drop">Gesamtes Thema <span class="n">4</span></div></div>
+          </aside>
+
+          <aside class="card rail himmel">
+            <div class="rail-head"><span class="title">Grammatik</span></div>
+            <div>
+              <div class="facet-label">Erkannte Form</div>
+              <div class="pills">
+                <span class="pill" style="background:var(--surface)"><span class="dot" style="width:8px;height:8px;border-radius:50%;background:var(--success)"></span>Aktiv · Präsens</span>
+              </div>
+            </div>
+            <div>
+              <div class="facet-label">Zielform</div>
+              <div class="pills">
+                <span class="pill on">Perfekt</span>
+                <span class="pill">Präteritum</span>
+                <span class="pill">Passiv</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const app = document.getElementById('app');
+  const noteEl = document.getElementById('optNote');
+
+  const NOTES = {
+    current: "<b>Jetzt (Ist-Zustand).</b> Karten (<code>--surface</code>) liegen nur 4% heller als der Hintergrund im Dunkelmodus und fast deckungsgleich mit Weiß im Hellmodus. Umschalt-Leisten und Pillen teilen sich fast denselben Grauton wie die Karte, deshalb der schwache Kontrast.",
+    a: "<b>Option A · Tieferer Grund.</b> Der Seitenhintergrund wird abgedunkelt (dunkel) bzw. deutlich kühl-grau (hell), die Karten bleiben. Karten heben sich klar ab, weil der Grund zurücktritt. Ruhigste Variante, ändert am wenigsten an den Karten selbst.",
+    b: "<b>Option B · Angehobene Fläche + Schatten.</b> Karten werden heller (dunkel) und bekommen einen spürbaren Schatten (hell). Buttons/Leisten liegen als eigener Ton mit Rand darüber. Klarste Trennung zwischen Karte und Grund und zwischen Button und Karte.",
+    c: "<b>Option C · Marken-getönt + Elevation.</b> Wie B, aber Grund und Kartenränder sind leicht ins Nachtblau getönt und Primär-Buttons kräftiger. Wirkt am meisten „on-brand“, mit dem stärksten Tiefeneindruck.",
+  };
+
+  function setAxis(axis, v) {
+    app.dataset[axis === 'round' ? 'round' : axis] = v;
+    if (axis === 'contrast') noteEl.innerHTML = NOTES[v];
+    if (axis === 'screen') {
+      document.getElementById('screen-woerter').classList.toggle('hidden', v !== 'woerter');
+      document.getElementById('screen-satzlabor').classList.toggle('hidden', v !== 'satzlabor');
+    }
+    document.querySelectorAll(`.segset[data-axis="${axis}"] button`).forEach(b =>
+      b.classList.toggle('on', b.dataset.v === v));
+  }
+
+  document.querySelectorAll('.segset').forEach(set => {
+    const axis = set.dataset.axis;
+    set.querySelectorAll('button').forEach(btn =>
+      btn.addEventListener('click', () => setAxis(axis, btn.dataset.v)));
+  });
+
+  noteEl.innerHTML = NOTES[app.dataset.contrast];
+</script>
