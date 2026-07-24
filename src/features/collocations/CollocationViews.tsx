@@ -27,9 +27,9 @@ const COLLOCATION_COLUMNS: DataColumn<Collocation>[] = [
     id: "kollokation",
     label: "Kollokation",
     cell: (c) => (
-      <div className="flex min-w-0 items-center gap-1">
-        <span className="font-semibold">{c.full}</span>
-        <SpeakButton text={c.full} />
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="min-w-0 font-semibold">{c.full}</span>
+        <SpeakButton text={c.full} className="ml-auto shrink-0" />
       </div>
     ),
     sortValue: (c) => c.noun,
