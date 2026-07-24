@@ -395,3 +395,12 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `src/features/dashboard/{Dashboard.tsx,SpielenHub.tsx}` · `src/features/{admin/AdminSteuerung.tsx,help/HelpHub.tsx,welt/Welt.tsx}` ·
   `preview/schreiben-icon-harmony{,-r2}.html` · `preview/{praktisch,bibliothek,fortschritt}-icon-vorschlaege.html` ·
   `docs/areas/PRAKTISCH-NAV.md` · `docs/PROJECT_STATUS.md` · this log · PRs #679, #680, #681, #682 + the final implementation PR
+- **Prompt 9 (verbatim, 2026-07-24 ~13:20 UTC):** `document the session` →
+  Most session-158 documentation had shipped with PR #683 (PROJECT_STATUS header + s158 handoff with
+  the s157 handoff rotated to the W30 archive, prompt-log entries 1-8, `docs/areas/PRAKTISCH-NAV.md`).
+  This pass closed the loop: appended the s158 decision record to `docs/DECISIONS.md` (all four icon
+  picks with rejected alternates, the rose→blue Schreiben accent move, the Trainieren/Dumbbell
+  toggle, the pinned-Fortschritt amendment to the locked bar structure, and the preview-method notes
+  for future icon rounds), swept for stale references (none found: BRAND.md doesn't spec route marks;
+  no compass/stack/pencil mentions left outside the updated PRAKTISCH-NAV.md), and logged this prompt.
+- **Artifacts (prompt 9):** `docs/DECISIONS.md` · this log · PR (this one)
