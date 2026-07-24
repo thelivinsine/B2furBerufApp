@@ -1,10 +1,7 @@
 import { useState } from "react";
 import { LegalChrome, Section, type Lang } from "./LegalChrome";
+import { PRIVACY_LAST_UPDATED as LAST_UPDATED } from "@/lib/legalMeta";
 
-const LAST_UPDATED: Record<Lang, string> = {
-  de: "8. Juni 2026",
-  en: "8 June 2026",
-};
 const CONTACT_EMAIL = "thelivinsine@gmail.com";
 
 /**

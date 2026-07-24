@@ -2,9 +2,11 @@
 
 _Session 143 (2026-07-22). The execution companion to `ADMIN_CONTROL_CENTER_PLAN.md` (the approved
 scope; read that first for the "what and why"). This file answers "in what order, in what size
-pieces, and with which Claude model per piece". Status: **chunks 1-10 SHIPPED (s144-s146); the whole
-MVP (Phase 1) plus Phase-2 chunks 9-10 are done. Next = chunk 11 (Turnstile + abuse meters), then 12
-(compliance pack), then Phase-3 (13-16) on demand.**_
+pieces, and with which Claude model per piece". Status: **chunks 1-12 SHIPPED; the whole MVP (Phase 1)
+plus Phase-2 chunks 9-12 are done. Chunk 11 (Turnstile) was already substantially built and went live
+once both config sides were set (founder-verified); chunk 12 (compliance pack: G2 consent-drift gate,
+G3 auditor export, G4 GDPR ops evidence) shipped next. Only Phase-3 (13-16) remains, on demand.
+Founder action for chunk 12: run migration 0010 + redeploy `delete-account` (see `PHASE2_SETUP.md`).**_
 
 > **Session 146 (2026-07-22):** chunks 4-10 built and shipped in one session. Chunk 4 Review Cockpit
 > (`scripts/review-score.mjs` + `build-review-queue.mjs` → `reviewQueue.json`, `Pruefmodus.tsx`,

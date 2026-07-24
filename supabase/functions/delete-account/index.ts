@@ -85,5 +85,14 @@ Deno.serve(async (req) => {
     return json({ ok: false, message: "Konto konnte nicht gelöscht werden." }, 500);
   }
 
+  // GDPR ops evidence (admin control center §G4): record that an erasure ran
+  // (aggregate count only, no user data). Best-effort; a missing gdpr_events
+  // table (migration 0010 not yet run) must not fail the deletion.
+  try {
+    await admin.from("gdpr_events").insert({ kind: "delete" });
+  } catch {
+    /* best-effort */
+  }
+
   return json({ ok: true });
 });

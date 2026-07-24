@@ -239,6 +239,20 @@ the Supabase dashboard. Do these once after the GDPR PR is live:
      re-enable: fill the placeholders, then uncomment the import + `/impressum`
      route in `router.tsx` and restore the footer/Settings/privacy/terms links.
 
+5. **GDPR ops evidence (admin control center chunk 12 §G4).** So the
+   Kontrollzentrum → Launch → Compliance panel can show real counters of
+   executed erasures and data exports:
+   - Run `supabase/migrations/0010_gdpr_evidence.sql` in the Supabase SQL editor.
+     It creates a **content-free** `gdpr_events` table (event kind + timestamp
+     only, no user id), a `log_gdpr_event()` helper, and the founder-only
+     `admin_gdpr_evidence()` RPC. Until it is run, the panel shows "run migration
+     0010" and fails soft (nothing breaks).
+   - Redeploy the deletion function so erasures are logged:
+     `supabase functions deploy delete-account`.
+   - The panel's "retention job" indicator reads whether a `pg_cron` job exists,
+     which is exactly the optional retention schedule in item 3 above. Setting up
+     that job flips the indicator green.
+
 ## In-app feedback → your inbox: founder setup steps (session 105, 2026-07-13)
 
 The subtle "Mit KI gebaut · Feedback" button on every page posts to the
