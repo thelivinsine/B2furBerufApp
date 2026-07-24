@@ -37,14 +37,14 @@ export function WritingModeSwitcher({
       role="tablist"
       aria-label="Schreiben"
       className={cn(
-        "relative flex w-full items-stretch gap-0.5 rounded-full border border-border bg-muted p-1 shadow-soft sm:gap-1",
+        "relative flex w-full items-stretch gap-0.5 rounded-lg border border-border bg-muted p-1 shadow-soft sm:gap-1",
         className,
       )}
     >
       {rect && (
         <motion.span
           aria-hidden
-          className="absolute top-1 bottom-1 left-0 rounded-full bg-surface shadow-soft"
+          className="absolute top-1 bottom-1 left-0 rounded-md bg-surface shadow-soft"
           initial={false}
           animate={{ x: rect.left, width: rect.width }}
           transition={
@@ -62,7 +62,7 @@ export function WritingModeSwitcher({
             role="tab"
             aria-selected={active}
             className={cn(
-              "relative z-10 flex-1 whitespace-nowrap rounded-full px-1.5 py-2.5 text-center text-sm leading-none transition-colors sm:px-3",
+              "relative z-10 flex-1 whitespace-nowrap rounded-md px-1.5 py-2.5 text-center text-sm leading-none transition-colors sm:px-3",
               active
                 ? "font-bold text-primary"
                 : "font-medium text-muted-foreground hover:text-foreground",

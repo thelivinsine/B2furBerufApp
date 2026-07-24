@@ -90,7 +90,7 @@ function Pill({
       className={cn(
         // The FilterRail facet-pill recipe: roomier tap size on mobile (the
         // panel), compact in the lg desktop rail.
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm transition-colors lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs",
+        "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm transition-colors lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs",
         !enabled && "cursor-not-allowed opacity-40",
         state === "selected"
           ? "border-primary bg-primary font-semibold text-primary-foreground"

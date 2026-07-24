@@ -494,7 +494,7 @@ export function FilterRail<T>({
                 // Slightly smaller on desktop (founder 2026-07-13: the white
                 // pills read a touch big in the rail). Only lg is the desktop
                 // rail; the mobile panel keeps the roomier tap size.
-                "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-sm transition-colors lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs",
+                "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm transition-colors lg:gap-1 lg:px-2 lg:py-0.5 lg:text-xs",
                 selected
                   ? "border-primary bg-primary text-primary-foreground"
                   : disabled
