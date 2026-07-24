@@ -4,13 +4,17 @@ Structure here is **locked**: do not change bar structure, edit-mode behavior, o
 without an explicit founder request. Mechanism history + mockups: `docs/DECISIONS.md`.
 
 ## Nav zones
-Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Schreiben** (`/writing`, rose accent,
-pencil mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
+Tabs: **Praktisch** (`/`), **Bibliothek** (`/library`), **Schreiben** (`/writing`, brand-blue
+accent, nib mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last slot).
 **Anwenden is HIDDEN from the nav** (founder, demo): removed from `navItems`, but `/anwenden`
 stays mounted in `router.tsx` so `/welt` + deep links resolve — re-add the `navItems` row to
-restore it. `BottomTabBar` `CONTENT = ["/library", "/writing", "/analytics"]`;
+restore it. `BottomTabBar` `REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT =
+"/analytics"` (Fortschritt is pinned directly left of Einstellungen for every user since s158,
+founder request; older persisted orders are normalised at read time);
 `DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"]` (Home + 3 middle + fixed
-Einstellungen = the 5 locked slots). The Praktisch route mark is the compass. The Anwenden hub
+Einstellungen = the 5 locked slots). Route marks since s158 (founder picks): Praktisch =
+Wegweiser signpost, Bibliothek = book with bookmark ribbon, Schreiben = fountain-pen nib
+(accent moved rose → brand blue), Fortschritt = progress ring. The Anwenden hub
 itself (`/anwenden`) is 3 cards → Sprechen/Schreiben/Prüfung. Remote-config overrides (admin
 Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults match the above.
 
@@ -18,9 +22,9 @@ Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults match the ab
 - Fixed bar, single icon rail, **63px tall**, icons 29px. 5 slots: Home (fixed slot 1) + 3
   middle + Einstellungen (fixed last, plain NavLink to `/settings`). The More sheet is retired
   (`MoreSheet.tsx` deleted); no add/remove — the middle sections are always visible and only
-  REORDER via a hidden long-press easter egg (600ms, haptic; jiggle + drag; transparent
-  full-screen layer = "tap anywhere to finish"; navigating also ends it). Home and Einstellungen
-  never move.
+  Bibliothek + Schreiben REORDER via a hidden long-press easter egg (600ms, haptic; jiggle +
+  drag; transparent full-screen layer = "tap anywhere to finish"; navigating also ends it).
+  Home, Fortschritt and Einstellungen never move (Fortschritt pinned s158).
 - **Active-tab labels:** each tab shows its section name under the icon, visible ONLY on the
   selected tab. The label slot is a reserved fixed-height row on every tab (selection never
   shifts the icon rail); the label is neutral theme-aware dark grey
