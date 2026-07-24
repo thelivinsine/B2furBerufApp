@@ -758,3 +758,38 @@ build · check:bundle · lint:content).
   router.tsx `/sources/werkbank` + `/impressum`). Regenerated the report sidecars against merged main.
 - **Next:** chunk 11 (Turnstile + abuse meters, founder does the Cloudflare/Supabase dashboard half),
   then chunk 12 (compliance pack). No new founder DB step for chunks 4-10 (migration 0008 already live).
+
+**Handoff after session 155 (2026-07-24). Design-preferences distillation → the `design` skill,
+branch `claude/design-prefs-documentation-e1xmlc`.** The founder asked whether the recurring
+bad-first-draft problem on new pages/sections is better fixed by a skill or by CLAUDE.md
+preferences. Answer delivered: **both, in a hybrid** (CLAUDE.md is always-loaded and already ~1,070
+lines, so detail there dilutes attention and costs tokens every session; a skill loads on demand but
+triggers probabilistically, so it needs an always-on anchor).
+- **New: `.claude/skills/design/SKILL.md`** (the `/design` skill), distilled by two research
+  subagents from `SESSION_PROMPT_LOG.md` s133-154 + `DECISIONS.md` + `PROJECT_REFERENCE.md`:
+  Rule zero (extend the system, Bibliothek is the reference language) · the 8-step process
+  (report-first, previews-first with 2-4 named variants on real tokens, screenshot-verify,
+  implement the exact pick, absorb every numbered feedback point, plain-language summaries) ·
+  a pre-flight checklist ranked by actual rework frequency (1 redundancy, 2 wrong colors, 3
+  oversizing, 4 dead controls, 5 corners, 6 placement, 7 motion) · the locked color language ·
+  reusable building blocks · per-section anchors (Bibliothek/Schreiben/Praktisch; Verlauf marked
+  as slated-for-rework, not reference) · the shipped-then-reverted landmine list.
+- **CLAUDE.md anchor:** the "Founder design preferences" section now opens with a mandatory
+  "load the `design` skill before ANY design/UI work" pointer, so sessions that skim CLAUDE.md
+  still reach the full playbook. Founder can also force it deterministically by typing `/design`.
+- **Maintenance rule (in the skill):** CLAUDE.md is newer law on conflict; update the skill in the
+  same PR that changes a design rule.
+- **Part 2 (same session): the CLAUDE.md restructure.** The founder then asked for best practice
+  on the ~1,078-line / ~36k-token CLAUDE.md and approved the proposed split. CLAUDE.md is now
+  **~180 lines of current law only** (identity, one-line command index, layout map, hard
+  invariants, design-prefs summary, writing style, area index, deployment, workflow) with a
+  maintenance rule at the top (replace rules, don't append history; history → DECISIONS.md).
+  The detail moved, de-narrated to current-state-only with every rule and landmine preserved,
+  into **`docs/areas/`**: COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN, PRAKTISCH-NAV,
+  GAME, BRAND, LEGAL-ADMIN, COMPONENTS. A second skill **`/content`**
+  (`.claude/skills/content/SKILL.md`) holds the add-content workflow (iron laws + gate order).
+  `lint:content` gained a warn-only ratchet: it nags when CLAUDE.md exceeds ~350 lines.
+  Saves ~28k tokens of always-on context per session. `pnpm lint:content` green after the change.
+- **Next:** founder wants to rework Schreiben's Verlauf tab (excluded from the distillation on
+  purpose); when that happens, run it through the new skill's preview-first process and then add
+  Verlauf's picked design to the skill's Schreiben anchor + `docs/areas/SCHREIBEN.md`.

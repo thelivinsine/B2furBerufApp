@@ -31,6 +31,7 @@ after pulling.
 - CI gates: `pnpm lint:content` (after ANY content edit) · `pnpm lint` · `pnpm test:unit` ·
   `pnpm test:srs` (after `engine/srs.ts` edits) · `pnpm test:pronounce` (after
   `engine/pronounce.ts` edits) · `pnpm check:bundle` (400 kB main-chunk budget, after build) ·
+  `pnpm check:contrast` (WCAG gate, after `src/index.css` token edits) ·
   `pnpm verify:facts` (noun fact gate; `pnpm build:oracles` first after adding nouns)
 - Warn-only checks: `pnpm verify:grammar` · `pnpm verify:cefr` (`pnpm verify:sentences` = both)
 - Generated data: `pnpm build:frequency` (→ `src/data/frequency.ts`) · `pnpm build:verification`

@@ -44,7 +44,7 @@ for backlog / model guidance / research, `docs/PROJECT_REFERENCE.md`._
   are **full-bleed opaque** (no transparent corners) so iOS home-screen icons don't show dark corners.
   - **Do NOT make the in-app logo full-bleed.** A full-bleed square variant exists **only** for
     Google's OAuth consent screen and is not committed. (Full-bleed-everywhere was shipped then
-    reverted in PRs #120/#121.) Full detail of the logo rules is in `CLAUDE.md` → "Brand logo".
+    reverted in PRs #120/#121.) Full detail of the logo rules is in `docs/areas/BRAND.md`.
 
 ### Phase 2 — Supabase auth + cloud sync + AI writing eval ✅ (live 2026-05-31, founder-verified)
 - **Supabase project:** `stkfdavpjflpqoxjunnj`. Publishable key committed in

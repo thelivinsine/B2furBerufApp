@@ -3,7 +3,10 @@
 A map of everything in `docs/`, so a new session (or a new person) knows where to start and which
 documents are live vs. historical. **Start with `PROJECT_STATUS.md` → its `## Resume here` section.**
 
-_Last reviewed: 2026-07-20 (docs-optimization / maintenance pass): rebuilt this index against the
+_Last reviewed: 2026-07-24 (session 157 maintenance audit): added the `areas/` folder + catalog
+(the s155 CLAUDE.md restructure), noted the `/design` + `/content` skills, refreshed the CLAUDE.md
+row, added the W30 prompt-log archive row after rotating s133–151 out of the live log. Prior
+2026-07-20 (docs-optimization / maintenance pass): rebuilt this index against the
 current tree — added the `branding/` and `reports/` folders (both were missing), completed the
 `plans/` catalog (2 → 17 rows) and the `strategy/` catalog (6 → 19 rows, incl. the whole Neuland
 game-design set and `DATA_STRATEGY.md`), added `DEMO_RUNBOOK.md` + `reference/GENAULY_UX_UI_ANALYSIS.md`;
@@ -27,6 +30,7 @@ docs/
   SESSION_PROMPT_LOG.md     append-only authorship trail (rolling window; older weeks in archive/)
   DEMO_RUNBOOK.md           one-page founder demo cheat sheet
 
+  areas/       per-area deep guides behind the lean CLAUDE.md (read the matching file before touching an area)
   strategy/    business, product, governance, security + the Neuland game-design set (advisory)
   plans/       engineering plans, audits, and runbooks (active + shipped design records)
   branding/    the finalized brand spec + AI mockup-generation guide
@@ -51,7 +55,30 @@ the authoritative current location of every file.
 | `SESSION_PROMPT_LOG.md` | Append-only paper trail of every founder prompt + response (authorship record for a possible copyright filing). Live file holds the current rolling window and rotates at ~1,200 lines; older entries archived by ISO week in `archive/prompt-log/`. | 🟢 Live; append every session |
 | `DECISIONS.md` | The "why" behind locked decisions (UX-overhaul phase history, mobile-bar mechanism/mockup detail). Split out of `CLAUDE.md` so that file stays lean; read before undoing a "locked" rule. | 🟢 Live |
 | `DEMO_RUNBOOK.md` | One-page founder demo cheat sheet (authored s115): device prep, the two account states, the exact tour order, and stage fallbacks. Companion to `plans/DEMO_READINESS_PLAN.md`. | 🟢 Live |
-| `../CLAUDE.md` (repo root) | Developer/agent operating instructions, conventions, and locked designs. Authoritative for the mobile bottom bar and content conventions. | 🟢 Live |
+| `../CLAUDE.md` (repo root) | The lean always-on operating rules (~180 lines of current law since the s155 restructure): stack, command index, layout map, hard invariants, writing style, workflow. Deep per-area detail lives in `areas/` and the `/design` + `/content` skills (`.claude/skills/`). | 🟢 Live |
+| `../AGENTS.md` (repo root) | Thin router for non-Claude coding agents: no rules of its own, points at `CLAUDE.md` → `areas/` → the skills. | 🟢 Live |
+
+## `areas/` — per-area deep guides (split out of CLAUDE.md in s155)
+
+Current-state-only reference behind the lean `CLAUDE.md`; read the matching file BEFORE touching an
+area, and update it in the same PR as any rule change (history goes to `DECISIONS.md`, not here).
+
+| File | Covers |
+|---|---|
+| `areas/COMMANDS.md` | Every script's full behavior; CI gates vs warn-only; review-loop integrity rules |
+| `areas/CONTENT.md` | Content banks, schemas, taxonomy, linter checklist, provenance (pair with the `/content` skill) |
+| `areas/BIBLIOTHEK.md` | The `/library` tabs, views, graphs, FilterRail, search, Grammatik lessons |
+| `areas/SESSION.md` | The composed session engine, Üben auto-variety, focus mode, SRS engines |
+| `areas/SCHREIBEN.md` | `/writing` Fokus/Kurz/Lang, rails, correction card, umlaut keys, AI cascade |
+| `areas/PRAKTISCH-NAV.md` | Dashboard Üben/Spielen, the locked bottom tab bar, header, feedback pill |
+| `areas/GAME.md` | The Neuland layer: missions-as-data, scenes/sprites, pixel rules, hub surfaces |
+| `areas/BRAND.md` | Logo/wordmark rules, icons/favicons, theme tokens, dialog overlay convention |
+| `areas/LEGAL-ADMIN.md` | Legal pages, consent, GDPR self-service, `/sources`, the admin center |
+| `areas/COMPONENTS.md` | Help/blog section, Artikel-Visuals gender system, domain buildings |
+
+The two skills (`.claude/skills/design/SKILL.md` = `/design`, `.claude/skills/content/SKILL.md` =
+`/content`) are the on-demand playbooks for design work and content authoring; treat them as docs
+too and keep them current-state-only.
 
 ## `strategy/` — business, product, governance, game design (advisory)
 
@@ -131,8 +158,8 @@ reviewable offline.
 | File | What it is | Status |
 |---|---|---|
 | `archive/PROJECT_STATUS_ARCHIVE.md` | **Index only** (since s70): maps to the weekly chunks in `archive/status-log/`. | 🗄 Archive |
-| `archive/status-log/` | Session logs chunked by **ISO week** (`PROJECT_STATUS_ARCHIVE_YYYY-Www.md`, sessions 1–132 across W23–W29) plus an `ops-notes` file for undated material, so a lookup loads only one week. Split from the flat archive in s70. | 🗄 Archive |
-| `archive/prompt-log/` | Prompt-log entries aged out of the live log, split by **ISO week** (`SESSION_PROMPT_LOG_YYYY-Www.md` + a `README.md` index, W25–W29, through session 132). Append-only history; left as written. | 🗄 Archive |
+| `archive/status-log/` | Session logs chunked by **ISO week** (`PROJECT_STATUS_ARCHIVE_YYYY-Www.md`, sessions 1–154 across W23–W30) plus an `ops-notes` file for undated material, so a lookup loads only one week. Split from the flat archive in s70. | 🗄 Archive |
+| `archive/prompt-log/` | Prompt-log entries aged out of the live log, split by **ISO week** (`SESSION_PROMPT_LOG_YYYY-Www.md` + a `README.md` index, W25–W30, through session 151). Append-only history; left as written. | 🗄 Archive |
 | `archive/UX_OVERHAUL_PLAN.md` | Session-first redesign (s46). All phases 0–5 shipped. | ✅ Complete (archived s55) |
 | `archive/TAXONOMY_REDESIGN.md` | Faceted taxonomy strategy deck, "what/why" (slides in `reference/TAXONOMY_REDESIGN.pptx`). | ✅ Implemented (archived s55) |
 | `archive/TAXONOMY_IMPLEMENTATION_PLAN.md` | The staged "how" for the taxonomy. Phases 0–4 shipped. | ✅ Complete (archived s55) |
