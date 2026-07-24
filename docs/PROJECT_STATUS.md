@@ -1,11 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 158). **Nav-icon family harmonization (founder-picked):**
-Praktisch = Wegweiser, Bibliothek = Buch mit Lesezeichen, Schreiben = Federspitze (accent rose → brand
-blue), Fortschritt = Fortschrittsring; the dashboard toggle is now "Trainieren" with the Dumbbell; and
-Fortschritt is pinned directly left of Einstellungen in the bottom bar for all users. Prior s159:
-Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv; `transform-sentence` redeployed 2026-07-24, live).
-Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 160). **Quiz-quality pass on the composed session
+(branch `claude/word-verification-nl4m26`):** plural questions now test the pattern, not word
+recognition (same-stem distractors + a typed production variant; at the C1 band only the tricky
+plurals are asked); odd-one-out (Ausreißer) questions gained a part-of-speech-matched flavour plus a
+"genuinely unrelated" guard on the odd word; the round-summary loot cards moved off the coral reward
+wash (read like errors) to white cards + a Himmelblau "Lv up" pill; plus two content tweaks
+(Soll-Ist-Vergleich English gloss reworded, English hint added to typed-cloze cards). Prior s159:
+Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -69,27 +71,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 158 (2026-07-24). Nav-icon family harmonization + Trainieren toggle,
-branch `claude/schreiben-icon-design-cz21ts`, PRs #679-#683.** A preview-first icon session: the
-founder picked every mark by letter from tab-bar mockups (`preview/schreiben-icon-harmony{,-r2}.html`,
-`praktisch-icon-vorschlaege.html`, `bibliothek-icon-vorschlaege.html`,
-`fortschritt-icon-vorschlaege.html`), then everything was implemented in one pass:
-- **New route marks** (`route-icons.tsx` + `NORM` boxes): Praktisch = **Wegweiser** signpost (pick I,
-  replaced the compass), Bibliothek = **Buch mit Lesezeichen** (pick P, replaced the lying stack),
-  Schreiben = **Federspitze** nib (pick E; `nav-items.ts` accent moved rose `#f43f5e` → brand blue
-  `#3D74ED` with it), Fortschritt = **Fortschrittsring** (pick S, replaced the bar chart). All marks
-  stay two-tone with neon-cyan `#22d3ee` companions.
-- **Trainieren toggle:** the Praktisch dashboard toggle "Lernen" renamed to **"Trainieren"** with the
-  lucide Dumbbell restored (`Dashboard.tsx`, `LernenBook` removed; admin H8 label; Help-hub line).
-- **Fortschritt pinned:** `BottomTabBar` now keeps Fortschritt directly LEFT of Einstellungen for
-  every user (`REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT`); older persisted
-  orders normalise at read time; edit-mode reorder covers only Bibliothek + Schreiben.
-- **Verified live** (vite preview + Playwright): all five tabs render the picked marks at equal
-  widths; screenshots match the approved previews. Docs: `docs/areas/PRAKTISCH-NAV.md` updated.
-- **Gates:** build · check:bundle **116.9 kB** · test:unit green.
-- **Next:** nothing pending from this session; the old `preview/route-icons-preview.svg` reference
-  sheet is stale (pre-s158 marks) if anyone wants to regenerate it.
-
 **Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
 branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
 grammar-dimensions brainstorm (four research agents) -> `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`
@@ -119,6 +100,36 @@ artifact (daa4dbb6). Then built the "easy half":
   docs re-applied against it (this handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, prompt-log s159).
 - **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build / check:bundle **112 kB** /
   lint:content. Edge function is Deno (not deployed from the sandbox).
+
+**Handoff after session 160 (2026-07-24). Quiz-quality pass on the composed session, branch
+`claude/word-verification-nl4m26`, PR #687 (content, merged) + one PR for the engine work.** Started
+from founder screenshots of individual session cards; each turn diagnosed one exercise type and fixed it:
+- **Content (merged, PR #687):** the `v_soll_ist_vergleich` English gloss reworded `target-actual
+  comparison` → `target/planned vs. actual comparison`; and typed-cloze ("Lücke") cards, which showed
+  only the blanked sentence (unanswerable, many words fit), now render the target word's English
+  meaning as a muted "Hinweis:" line under the sentence (`SessionPlayer.tsx` TypingBlock).
+- **Plural questions (`engine/quiz.ts`):** MCQ distractors are now generated from the noun's OWN stem
+  (`sameStemPluralForms`: -e/-en/-n/-er/-s, Nullplural, umlaut variants) so all four options share the
+  stem and only the correct pattern distinguishes them (was: distractors from unrelated nouns, an A1
+  recognition move). Added a **typed** plural variant (new `pluralType` `QuizQuestion` kind +
+  `TypedView` renderer in `QuestionViews.tsx`, graded by the existing typed grader); ~half of plural
+  slots are typed. **Competency gate:** at difficulty 3 (C1) plural questions are limited to tricky
+  plurals (`isTrickyPlural`: umlaut / -er / Nullplural / stem-changing like Praxis→Praxen); predictable
+  -e/-en/-n/-s plurals drop out. Plural now also appears in the d3 branch.
+- **Odd-one-out / Ausreißer (`engine/quiz.ts` `oddOneOutQ`):** added a **part-of-speech-matched**
+  flavour (all four options share the anchor's POS, mixed ~50/50 with the old mixed-POS style) so the
+  topic is the only discriminator; and the odd word must now be **genuinely unrelated** (different
+  theme AND no shared `related` link in either direction), so a half-belonging word (abdichten next to
+  Blech) can't be the answer. Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
+- **Round-summary loot cards (`SessionPlayer.tsx` `LootCard`):** dropped the coral reward wash (read
+  like wrong answers) for plain white cards; a level-up is now a Himmelblau `bg-accent/20` "Lv ↑" pill,
+  unchanged words keep a muted level, the "Gesammelt" eyebrow moves coral → brand blue. Trophy ring
+  stays coral (the sanctioned celebration accent). Founder picked this variant (C) from a 4-shade preview.
+- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build green. Previews:
+  `preview/cloze-hint-preview.html`, `plural-variants-preview.html`, `loot-shade-preview.html`.
+- **Next:** nothing pending. Held ideas from the discussion: odd-one-out option 3 (make it rarer /
+  reserve for cleanly separable clusters) if the type still feels fuzzy; a "type it" plural could gain
+  an "almost" partial-credit tier if strict grading feels harsh.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
