@@ -1,0 +1,254 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fortschritt Icon: 4 Vorschläge</title>
+<style>
+  :root {
+    --page: hsl(180 45% 98%);
+    --ink: hsl(252 16% 12%);
+    --muted-ink: hsl(220 8% 36%);
+    --card: #ffffff;
+    --line: hsl(218 13% 84%);
+    --brand: #3D74ED;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: hsl(226 44% 8%);
+      --ink: hsl(224 24% 94%);
+      --muted-ink: hsl(224 13% 77%);
+      --card: hsl(224 26% 16%);
+      --line: hsl(216 28% 30%);
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: hsl(226 44% 8%);
+    --ink: hsl(224 24% 94%);
+    --muted-ink: hsl(224 13% 77%);
+    --card: hsl(224 26% 16%);
+    --line: hsl(216 28% 30%);
+  }
+  :root[data-theme="light"] {
+    --page: hsl(180 45% 98%);
+    --ink: hsl(252 16% 12%);
+    --muted-ink: hsl(220 8% 36%);
+    --card: #ffffff;
+    --line: hsl(218 13% 84%);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font: 15px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 72px; }
+  .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--brand); margin: 0 0 6px;
+  }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .lede { color: var(--muted-ink); max-width: 640px; margin: 0; }
+  .lede b { color: var(--ink); }
+
+  section { margin-top: 44px; }
+  .v-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .v-letter {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 8px;
+    background: var(--brand); color: #fff; font-weight: 800; font-size: 14px;
+    transform: translateY(4px);
+  }
+  .v-name { font-size: 19px; font-weight: 700; margin: 0; }
+  .v-note { color: var(--muted-ink); font-size: 13.5px; margin: 0 0 14px; max-width: 640px; }
+
+  .bars { display: flex; flex-wrap: wrap; gap: 14px; }
+  .phone {
+    width: 393px; max-width: 100%;
+    border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+    flex: 0 1 auto;
+  }
+  .phone .screen { height: 34px; }
+  .phone .tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: 8px 12px 0;
+  }
+  .phone.light { background: hsl(180 45% 98%); }
+  .phone.light .tag { color: hsl(220 8% 36%); }
+  .phone.light .bar { background: #ffffff; border-top: 1px solid hsl(218 13% 84%); }
+  .phone.light .pill.on { background: hsl(218 13% 84%); }
+  .phone.light .lbl { color: #475569; }
+  .phone.dark { background: hsl(226 44% 6%); }
+  .phone.dark .tag { color: hsl(224 13% 77%); }
+  .phone.dark .bar { background: hsl(224 26% 18%); border-top: 1px solid hsl(216 28% 36%); }
+  .phone.dark .pill.on { background: hsl(216 28% 36%); }
+  .phone.dark .lbl { color: #cbd5e1; }
+
+  .bar { display: flex; align-items: stretch; height: 63px; }
+  .tab { flex: 1; padding: 4px; display: flex; }
+  .slot { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .pill { width: 40px; height: 40px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+  .lbl { height: 12px; font-size: 10px; font-weight: 600; line-height: 1; opacity: 0; }
+  .lbl.on { opacity: 1; }
+
+  .zoomrow { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .zoomtile {
+    width: 78px; height: 78px; border-radius: 16px;
+    background: var(--card); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .zoomcap { font-size: 11.5px; color: var(--muted-ink); margin-top: 6px; }
+
+  .pick {
+    margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--muted-ink); font-size: 14px;
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Fortschritt · Nav-Icon</p>
+  <h1>Vier Vorschläge für das Fortschritt-Icon</h1>
+  <p class="lede">Alle Leisten zeigen schon deine Wahlen: Praktisch als <b>I (Wegweiser)</b>,
+  Bibliothek als <b>P (Buch mit Lesezeichen)</b>, Schreiben als <b>E (Federspitze)</b>. Heute ist
+  Fortschritt das Balkendiagramm. Die Vorschläge bleiben in Himmelblau (#0ea5e9) + Neon-Cyan.</p>
+
+  <div id="sections"></div>
+
+  <p class="pick">Auswahl per Buchstabe (Q, R, S oder T), oder die Balken bleiben.</p>
+</div>
+
+<script>
+  // ── Real marks from src/components/layout/route-icons.tsx ──────────────
+  const MARKS = {
+    praktischI: { // picked Praktisch mark (Wegweiser)
+      color: "#3D74ED", box: [3.2, 3.6, 13.6, 13.8], w: 1.05,
+      svg: c => `
+        <path d="M4.6 3.6h9l3.2 1.85-3.2 1.85h-9Z" fill="${c}"/>
+        <path d="M15.4 8.9h-9l-3.2 1.85 3.2 1.85h9Z" fill="#22d3ee"/>
+        <rect x="9.05" y="12.6" width="1.9" height="4.8" rx="0.95" fill="${c}"/>`
+    },
+    bibP: { // picked Bibliothek mark (Buch mit Lesezeichen)
+      color: "#3D74ED", box: [4.4, 2.8, 11.2, 14.4], w: 1.04,
+      svg: c => `
+        <rect x="4.4" y="2.8" width="11.2" height="14.4" rx="1.4" fill="${c}"/>
+        <polygon points="11.6,2.8 14.6,2.8 14.6,9 13.1,7.4 11.6,9" fill="#22d3ee"/>
+        <line x1="6.6" y1="12.6" x2="10.4" y2="12.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".55"/>
+        <line x1="6.6" y1="14.4" x2="9.2" y2="14.4" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".4"/>`
+    },
+    writingE: { // picked Schreiben mark (Federspitze Nachtblau)
+      color: "#3D74ED", box: [4.7, 2.6, 10.6, 15], w: 1.02,
+      svg: c => `
+        <path d="M5.9 2.6h8.2c.66 0 1.2.54 1.2 1.2V5c0 2.8-2 7-5.3 12.6C6.7 12 4.7 7.8 4.7 5V3.8c0-.66.54-1.2 1.2-1.2Z" fill="${c}"/>
+        <line x1="10" y1="9" x2="10" y2="13.6" stroke="#22d3ee" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="10" cy="7.2" r="1.5" fill="#22d3ee"/>`
+    },
+    analytics: { // current Fortschritt mark (reference)
+      color: "#0ea5e9", box: [2.5, 3, 15, 14.5], w: 1.08,
+      svg: c => `
+        <rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="${c}"/>
+        <rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/>
+        <rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/>`
+    },
+    settings: {
+      color: "#64748b", box: [2.31, 2.31, 15.38, 15.38], w: 1.01,
+      svg: c => `
+        <g transform="translate(10 10) scale(0.83) translate(-12 -12)">
+          <path fill="${c}" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/>
+        </g>
+        <circle cx="10" cy="10" r="2.6" fill="#38bdf8"/>`
+    },
+    // ── Fortschritt proposals (sky #0ea5e9) ────────────────────────────────
+    fortQ: { // rising trend line with neon endpoint
+      color: "#0ea5e9", box: [2.4, 4.3, 16.2, 12.7], w: 1.1,
+      svg: c => `
+        <path d="M3 15.5 8 10.5 11.5 13 17 6.5" stroke="${c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <circle cx="17" cy="6.5" r="2" fill="#22d3ee"/>`
+    },
+    fortR: { // summit: mountain with neon flag on top
+      color: "#0ea5e9", box: [3, 1.8, 14, 14.8], w: 1.05,
+      svg: c => `
+        <polygon points="3,16.6 10,5.4 17,16.6" fill="${c}"/>
+        <line x1="10" y1="5.4" x2="10" y2="2.2" stroke="#22d3ee" stroke-width="1.3" stroke-linecap="round"/>
+        <polygon points="10,2 13,3.1 10,4.2" fill="#22d3ee"/>`
+    },
+    fortS: { // progress ring: track + arc + neon endpoint dot
+      color: "#0ea5e9", box: [1.7, 1.7, 16.6, 16.6], w: 0.98,
+      svg: c => `
+        <circle cx="10" cy="10" r="7" stroke="${c}" stroke-width="2.6" fill="none" opacity=".22"/>
+        <path d="M10 3 A7 7 0 1 1 3 10" stroke="${c}" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+        <circle cx="3" cy="10" r="1.9" fill="#22d3ee"/>`
+    },
+    fortT: { // trophy: cup + handles + stem + neon base
+      color: "#0ea5e9", box: [3.2, 3, 13.6, 13.4], w: 1.03,
+      svg: c => `
+        <path d="M5.6 4.4 H3.7 c-.2 2.6 1 4.1 2.9 4.5" stroke="${c}" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        <path d="M14.4 4.4 h1.9 c.2 2.6-1 4.1-2.9 4.5" stroke="${c}" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        <path d="M5.8 3h8.4v4a4.2 4.2 0 0 1-8.4 0Z" fill="${c}"/>
+        <rect x="9.1" y="11" width="1.8" height="3" fill="${c}"/>
+        <rect x="6.4" y="14.4" width="7.2" height="2" rx="0.9" fill="#22d3ee"/>`
+    },
+  };
+
+  // Same optical normalisation as route-icons.tsx
+  const TARGET = 16;
+  function normTransform(box, weight) {
+    const [x, y, w, h] = box;
+    const s = (TARGET * weight) / Math.max(w, h);
+    return `translate(10 10) scale(${s.toFixed(4)}) translate(${(-(x + w / 2)).toFixed(4)} ${(-(y + h / 2)).toFixed(4)})`;
+  }
+  function icon(key, size) {
+    const m = MARKS[key];
+    return `<svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <g transform="${normTransform(m.box, m.w)}">${m.svg(m.color)}</g>
+    </svg>`;
+  }
+
+  const TABS = fortKey => ([
+    { key: "praktischI", label: "Praktisch" },
+    { key: "bibP", label: "Bibliothek" },
+    { key: "writingE", label: "Schreiben" },
+    { key: fortKey, label: "Fortschritt", active: true },
+    { key: "settings", label: "Einstellungen" },
+  ]);
+
+  function bar(fortKey, theme) {
+    const tabs = TABS(fortKey).map(t => `
+      <div class="tab"><div class="slot">
+        <div class="pill ${t.active ? "on" : ""}">${icon(t.key, 29)}</div>
+        <div class="lbl ${t.active ? "on" : ""}">${t.label}</div>
+      </div></div>`).join("");
+    return `<div class="phone ${theme}">
+      <div class="tag">${theme === "light" ? "Hell" : "Dunkel"}</div>
+      <div class="screen"></div>
+      <div class="bar">${tabs}</div>
+    </div>`;
+  }
+
+  function zoom(fortKey) {
+    return `<div class="zoomrow">${TABS(fortKey).map(t =>
+      `<div><div class="zoomtile">${icon(t.key, 52)}</div><div class="zoomcap">${t.label}</div></div>`
+    ).join("")}</div>`;
+  }
+
+  const SECTIONS = [
+    { letter: "", key: "analytics", name: "Aktueller Stand: Balken (Referenz)",
+      note: "Das aufsteigende Balkendiagramm von heute, zum Vergleich mit den Vorschlägen darunter." },
+    { letter: "Q", key: "fortQ", name: "Kurve",
+      note: "Eine steigende Linie mit Neon-Endpunkt: Fortschritt als Trend. Die luftigste Form, klar anders als alle gefüllten Nachbarn." },
+    { letter: "R", key: "fortR", name: "Gipfel",
+      note: "Ein Berg mit Cyan-Fahne auf der Spitze: Meilensteine erklimmen. Satt, sofort lesbar, und ein schönes Echo zum Wegweiser." },
+    { letter: "S", key: "fortS", name: "Ring",
+      note: "Ein fast geschlossener Fortschrittsring mit Neon-Endpunkt: dein Tagesziel auf einen Blick. Ruhig und kompakt." },
+    { letter: "T", key: "fortT", name: "Pokal",
+      note: "Ein Pokal mit Cyan-Sockel: Fortschritt als Erfolg und Meilenstein. Die verspielteste der vier Formen." },
+  ];
+
+  document.getElementById("sections").innerHTML = SECTIONS.map(s => `
+    <section>
+      <div class="v-head">
+        ${s.letter ? `<span class="v-letter">${s.letter}</span>` : ""}
+        <h2 class="v-name">${s.name}</h2>
+      </div>
+      <p class="v-note">${s.note}</p>
+      <div class="bars">${bar(s.key, "light")}${bar(s.key, "dark")}</div>
+      ${zoom(s.key)}
+    </section>`).join("");
+</script>
