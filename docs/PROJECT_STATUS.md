@@ -92,10 +92,16 @@ Three linked pieces:
   segmented **Freigeben/Ablehnen** control (reject was impossible in the table before) + a wider note
   field with an explicit **Save button** (appears when edited; still saves on blur/Enter). Redundant
   queue header/status copy removed. `/sources` links admins into `/admin/pruefen?view=table`.
+- **Follow-up (PR #701): admin entry moved into the nav panel.** The founder "Kontrollzentrum" link
+  moved from the account-menu dropdown into the desktop `Sidebar` as a founder-only nav row (neutral
+  styling, not accent-blue); kept as a mobile-only (`lg:hidden`) account-menu entry since the sidebar
+  is desktop-only and the bottom bar is locked.
 - **Files:** `src/features/legal/useWorkbench.ts` (new), `AdminWorkbench.tsx`, `Pruefmodus.tsx`,
-  `Sources.tsx`, `router.tsx`, `tests/adminWorkbench.test.tsx`, `preview/control-center-review.html`.
-- **Gates:** typecheck · lint (0 errors) · test:unit **291/291** · build · check:bundle **116.6 kB** ·
-  lint:content, all green. Decisions in `docs/DECISIONS.md`; area guide `docs/areas/LEGAL-ADMIN.md`.
+  `Sources.tsx`, `router.tsx`, `tests/adminWorkbench.test.tsx`, `preview/control-center-review.html`,
+  `Sidebar.tsx`, `AccountMenu.tsx`.
+- **Gates:** typecheck · lint (0 errors) · test:unit **291/291** · build · check:bundle (116.6 kB core;
+  117.0 kB after the nav move) · lint:content, all green. Decisions in `docs/DECISIONS.md`; area guide
+  `docs/areas/LEGAL-ADMIN.md`. Shipped in PRs #697, #700 (docs), #701 (nav move).
 - **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
   hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.
 
