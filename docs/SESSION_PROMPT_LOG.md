@@ -1252,6 +1252,15 @@ _Auth bug fix: fresh-device Google OAuth login no longer bounces existing accoun
 - **Response 14:** Confirmed everything is live (PRs #653 + #654 merged; previews already committed to `main`
   via #654), realigned the branch to `main`, and documented the session (`docs/PROJECT_STATUS.md` header +
   s150 handoff, s148 handoff moved to the W30 archive, and this log).
+- **Prompt 15 (verbatim, live mobile light-mode Fokus screenshot attached):** `is the gradient inverted for mobile?`
+- **Response 15:** Yes. `bg-page` is one global utility on the app shell with no per-breakpoint override, so
+  PR #653's inversion applies to mobile identically; the visible umlaut keys confirm the screenshot is the
+  post-gradient build. Noted it's deliberately subtle in light mode (low-opacity washes, ~98%-lightness
+  mint↔sky stops) and offered to deepen the stops / raise the wash opacity if a more pronounced diagonal is
+  wanted. No code change.
+- **Prompt 16 (verbatim):** `alright, document the session`
+- **Response 16:** Appended prompts 15-16 to this session-150 log block (no code changes since the earlier
+  documentation pass), shipped via a docs PR to `main`.
 - **Artifacts (session 150):** `tailwind.config.ts` · `src/index.css` · `src/lib/wordDiff.ts` ·
   `tests/wordDiff.test.ts` · `src/features/writing/UmlautKeys.tsx` (new) ·
   `src/features/writing/fokus/FokusTrainer.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
