@@ -28,14 +28,14 @@
 - Public page telling the data-quality story visually (stat tiles, five-step pipeline graphic,
   stacked tier bar, per-bank counts, sources/licenses). The "Alle Inhalte und ihre Quellen" item
   browse is behind a collapse toggle (`showAll`, collapsed by default).
-- Founders additionally get the **Daten-Werkbank** on its own founder-only sub-page
-  `/sources/werkbank` (`RequireFounder`-gated route, same lazy chunk; `SourcesWorkbench` + the
-  shared `useWorkbench` hook in `Sources.tsx`): the full register as a sortable table with fuzzy
-  search, Typ/Stufe/Status filters, CSV export (`src/lib/csv.ts`), copy-id chips, per-row
-  verified-checkbox + note (Supabase `provenance_reviews`). The main page shows admins a link
-  card. Approve clicks store `decision` + a decision-time `content_hash` + `reviewer_email`
-  (`computeDecisionHash` in `src/lib/provenanceReviews.ts`; banks loaded lazily via
-  `src/lib/contentIndex.ts`).
+- The founder review table **moved into the Control Center** (`/admin/pruefen`, "Alle Inhalte"
+  segment; s161). `/sources` shows admins a link card into it instead of the old
+  `/sources/werkbank` sub-page (retired). The full-register table + queue now share ONE review
+  store, the exported `useWorkbench` hook (`src/features/legal/useWorkbench.ts`); `AdminWorkbench`
+  (`src/features/legal/AdminWorkbench.tsx`) renders the table. Decisions store `decision` + a
+  decision-time `content_hash` (approve only) + `reviewer_email` (`computeDecisionHash` in
+  `src/lib/provenanceReviews.ts`; banks lazy via `src/lib/contentIndex.ts`). Writes are serialised
+  per content_id so a note and a decision never clobber each other (`docs/DECISIONS.md`).
 - Human verification is reset to zero (2026-07-22): the `human` tier + "menschlich geprüft" tile
   read 0 until the review pass restarts.
 - **Admin gate = the two `FOUNDER_EMAILS` in `src/lib/admin.ts`** (client) + the RLS policy from
@@ -70,11 +70,15 @@ burst/hourly caps) and went live once BOTH sides were set: Supabase Auth CAPTCHA
   widget (`liveWidget.ts` = `__BUILD_SHA__` Vite define vs latest `main` via GitHub API + a
   PWA-cache hint; the `__BUILD_SHA__`/`__BUILD_TIME__` defines are read ONLY in the admin chunk),
   report-staleness strip (`reportStaleness.ts`; sidecars from `scripts/report-sidecar.mjs`).
-- **Prüfmodus (Review Cockpit, `/admin/pruefen`):** filterable queue from the generated
+- **Prüfen (`/admin/pruefen`):** a two-segment sliding-pill switcher (`useSlidingPill`, s161).
+  **Warteschlange** = the priority queue + keyboard cockpit: filterable queue from the generated
   `reviewQueue.json` (`pnpm build:review-queue`, scoring `scripts/review-score.mjs`
   defect_signal > traffic_proxy > (1-confidence) > bank_criticality), keyboard review V/X/N/→/←,
-  item rendered via `contentIndex`, machine-check panel, autosave to `provenance_reviews` with a
-  decision-time hash, 50-approvals rubber-stamp nudge.
+  item rendered via `contentIndex`, machine-check panel, 50-approvals rubber-stamp nudge.
+  **Alle Inhalte** = the full-register `AdminWorkbench` table (search, Typ/Stufe/Status filters,
+  CSV export, "Entscheidungen" decision export, per-row segmented Freigeben/Ablehnen + note with a
+  Save button). Both segments write through the one shared `useWorkbench` store, so a decision in
+  the cockpit shows in the table and vice versa.
 - **Feedback-Inbox** (`AdminFeedback.tsx`): triage via `admin_feedback_update`, optimistic
   writes. **System + Launch** (`AdminSystem.tsx` gate strip/pings/meters via `systemHealth.ts`;
   `AdminLaunch.tsx` checklist in `launch_checklist`). **Inhalte** (`AdminInhalte.tsx`: depth

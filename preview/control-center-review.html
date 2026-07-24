@@ -1,0 +1,379 @@
+<title>Kontrollzentrum · Prüfen (harmonisiert)</title>
+<style>
+  :root{
+    --background:180 45% 98%; --foreground:252 16% 12%; --surface:0 0% 100%;
+    --muted:220 13% 88%; --muted-foreground:220 8% 36%; --border:218 13% 84%;
+    --primary:221 83% 54%; --accent:197 93% 77%; --accent-ink:198 90% 32%;
+    --success:153 55% 40%; --warning:38 92% 46%; --danger:4 73% 56%;
+    --violet:262 60% 55%; --sky:201 90% 45%;
+    --page-from:144 45% 98%; --page-to:198 83% 98%;
+    --shadow-soft:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+    --shadow-elev:0 10px 30px -12px rgba(16,24,40,.28);
+  }
+  :root[data-theme="dark"], .dark{
+    --background:226 44% 6%; --foreground:224 24% 94%; --surface:224 26% 18%;
+    --muted:224 22% 25%; --muted-foreground:224 13% 77%; --border:216 28% 36%;
+    --primary:219 96% 76%; --accent:197 93% 77%; --accent-ink:198 85% 72%;
+    --success:153 50% 52%; --warning:43 90% 62%; --danger:4 75% 64%;
+    --violet:262 70% 74%; --sky:201 92% 66%;
+    --page-from:226 44% 6%; --page-to:226 44% 6%;
+    --shadow-soft:0 1px 2px rgba(0,0,0,.4); --shadow-elev:0 12px 34px -10px rgba(0,0,0,.6);
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --background:226 44% 6%; --foreground:224 24% 94%; --surface:224 26% 18%;
+      --muted:224 22% 25%; --muted-foreground:224 13% 77%; --border:216 28% 36%;
+      --primary:219 96% 76%; --accent:197 93% 77%; --accent-ink:198 85% 72%;
+      --success:153 50% 52%; --warning:43 90% 62%; --danger:4 75% 64%;
+      --violet:262 70% 74%; --sky:201 92% 66%;
+      --page-from:226 44% 6%; --page-to:226 44% 6%;
+      --shadow-soft:0 1px 2px rgba(0,0,0,.4); --shadow-elev:0 12px 34px -10px rgba(0,0,0,.6);
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:hsl(var(--foreground));background:hsl(var(--background));
+    -webkit-font-smoothing:antialiased;font-size:14px;line-height:1.45}
+  .tnum{font-variant-numeric:tabular-nums}
+  code,kbd,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+  /* shell */
+  .app{display:grid;grid-template-columns:212px 1fr;min-height:100vh}
+  .side{border-right:1px solid hsl(var(--border));background:hsl(var(--surface));padding:16px 12px;display:flex;flex-direction:column;gap:2px}
+  .brand{display:flex;align-items:center;gap:8px;padding:6px 8px 14px}
+  .brand b{font-weight:800;letter-spacing:-.01em}
+  .brand .dot{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--sky)))}
+  .nav{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;color:hsl(var(--muted-foreground));font-weight:600;font-size:13px}
+  .nav svg{width:17px;height:17px;opacity:.85}
+  .nav.active{background:hsl(var(--primary)/.12);color:hsl(var(--primary))}
+  .nav.active svg{opacity:1}
+  .side .sp{flex:1}
+  .main{padding:22px 26px 60px;max-width:1120px}
+
+  /* headings */
+  h1.page{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
+  .sub{color:hsl(var(--muted-foreground));font-size:12px;margin-top:3px}
+  .eyebrow{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:hsl(var(--muted-foreground))}
+
+  /* sliding-pill switcher (LibrarySwitcher geometry) */
+  .switch{display:inline-flex;gap:4px;padding:4px;border:1px solid hsl(var(--border));background:hsl(var(--muted));border-radius:10px;box-shadow:var(--shadow-soft)}
+  .switch button{appearance:none;border:0;background:transparent;cursor:pointer;font:inherit;font-weight:700;font-size:13.5px;
+    color:hsl(var(--muted-foreground));padding:9px 20px;border-radius:7px;transition:color .15s}
+  .switch button.on{background:hsl(var(--surface));color:hsl(var(--foreground));box-shadow:var(--shadow-soft)}
+
+  .card{background:hsl(var(--surface));border:1px solid hsl(var(--border));border-radius:14px;box-shadow:var(--shadow-soft)}
+
+  /* toolbar */
+  .tool{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  .field{display:flex;align-items:center;gap:7px;height:36px;padding:0 11px;border:1px solid hsl(var(--border));border-radius:9px;background:hsl(var(--surface));color:hsl(var(--muted-foreground));font-size:13px;min-width:210px;flex:1}
+  .field svg{width:15px;height:15px}
+  .sel{height:36px;padding:0 11px;border:1px solid hsl(var(--border));border-radius:9px;background:hsl(var(--surface));color:hsl(var(--foreground));font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+  .sel .cnt{color:hsl(var(--muted-foreground));font-weight:600}
+  .btn{height:36px;padding:0 12px;border:1px solid hsl(var(--border));border-radius:9px;background:hsl(var(--surface));color:hsl(var(--foreground));font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+  .btn.ghost{border-color:transparent;background:transparent;color:hsl(var(--muted-foreground))}
+  .btn svg{width:15px;height:15px}
+  .btn.primary{background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--sky)));color:#fff;border-color:transparent;box-shadow:var(--shadow-soft)}
+
+  /* progress */
+  .prog{display:flex;align-items:center;gap:14px;font-size:12px;color:hsl(var(--muted-foreground))}
+  .prog b{color:hsl(var(--foreground))}
+  .bar{height:6px;flex:1;min-width:120px;border-radius:99px;background:hsl(var(--muted));overflow:hidden}
+  .bar i{display:block;height:100%;border-radius:99px;background:hsl(var(--success))}
+  .bar.blue i{background:linear-gradient(90deg,hsl(var(--primary)),hsl(var(--sky)))}
+
+  /* table */
+  .tblwrap{overflow-x:auto;border-radius:14px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{text-align:left;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:hsl(var(--muted-foreground));padding:11px 14px;border-bottom:1px solid hsl(var(--border));white-space:nowrap;background:hsl(var(--surface))}
+  thead th .ar{opacity:.5;margin-left:3px}
+  tbody td{padding:11px 14px;border-bottom:1px solid hsl(var(--border));vertical-align:middle}
+  tbody tr:last-child td{border-bottom:0}
+  tbody tr:hover{background:hsl(var(--muted)/.35)}
+  .item b{font-weight:650}
+  .idchip{display:inline-flex;align-items:center;gap:5px;margin-top:3px;padding:2px 6px;border-radius:6px;background:hsl(var(--muted));color:hsl(var(--muted-foreground));font-size:10.5px}
+  .idchip svg{width:11px;height:11px;opacity:.7}
+  .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:10.5px;font-weight:700;white-space:nowrap}
+  .b-human{background:hsl(var(--success)/.14);color:hsl(var(--success))}
+  .b-jury{background:hsl(var(--violet)/.14);color:hsl(var(--violet))}
+  .b-lang{background:hsl(var(--primary)/.12);color:hsl(var(--primary))}
+  .b-facts{background:hsl(var(--sky)/.14);color:hsl(var(--sky))}
+  .b-src{background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+  .b-verified{background:hsl(var(--success)/.14);color:hsl(var(--success))}
+  .b-draft{background:hsl(var(--muted));color:hsl(var(--muted-foreground))}
+  .b-approve{background:hsl(var(--success)/.15);color:hsl(var(--success))}
+  .b-reject{background:hsl(var(--danger)/.15);color:hsl(var(--danger))}
+  .b-fix{background:hsl(var(--warning)/.2);color:hsl(var(--warning))}
+  .src{display:inline-flex;align-items:center;gap:4px;color:hsl(var(--primary));font-weight:600;font-size:12px;text-decoration:none}
+  .src svg{width:12px;height:12px}
+  .src.none{color:hsl(var(--muted-foreground));font-weight:500}
+
+  /* inline review cell */
+  .rev{display:flex;align-items:center;gap:9px}
+  .chk{width:17px;height:17px;border-radius:5px;border:1.6px solid hsl(var(--border));display:grid;place-items:center;flex:0 0 auto;background:hsl(var(--surface))}
+  .chk.on{background:hsl(var(--primary));border-color:hsl(var(--primary))}
+  .chk.on svg{width:12px;height:12px;color:#fff}
+  .note{height:30px;min-width:120px;flex:1;padding:0 9px;border:1px solid hsl(var(--border));border-radius:7px;background:hsl(var(--surface));font-size:12px;color:hsl(var(--foreground));display:flex;align-items:center}
+  .note.empty{color:hsl(var(--muted-foreground))}
+  .segrev{display:inline-flex;border:1px solid hsl(var(--border));border-radius:8px;overflow:hidden}
+  .segrev button{appearance:none;border:0;background:hsl(var(--surface));cursor:pointer;padding:5px 8px;display:grid;place-items:center}
+  .segrev button svg{width:14px;height:14px;color:hsl(var(--muted-foreground))}
+  .segrev button.ap.on{background:hsl(var(--success));}.segrev button.ap.on svg{color:#fff}
+  .segrev button.rj.on{background:hsl(var(--danger));}.segrev button.rj.on svg{color:#fff}
+  .segrev button+button{border-left:1px solid hsl(var(--border))}
+
+  /* cockpit */
+  .cockpit{max-width:660px}
+  .learner{padding:22px}
+  .learner .de{font-size:24px;font-weight:800;letter-spacing:-.02em}
+  .learner .meta{font-size:12px;font-weight:600;color:hsl(var(--muted-foreground));margin-top:4px}
+  .learner .en{color:hsl(var(--muted-foreground));margin-top:6px}
+  .learner .ex{margin-top:12px;padding-top:12px;border-top:1px dashed hsl(var(--border));font-size:13.5px}
+  .machine{border-top:1px solid hsl(var(--border));background:hsl(var(--muted)/.3);padding:13px 16px;display:flex;flex-direction:column;gap:8px}
+  .checkrow{display:flex;flex-wrap:wrap;gap:6px}
+  .chk-pass{background:hsl(var(--success)/.15);color:hsl(var(--success))}
+  .chk-flag{background:hsl(var(--warning)/.2);color:hsl(var(--warning))}
+  .mchip{padding:2px 7px;border-radius:6px;font-size:10.5px;font-weight:700}
+  .cardhead{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid hsl(var(--border));background:hsl(var(--muted)/.4);font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:hsl(var(--muted-foreground))}
+  .cardhead code{text-transform:none;letter-spacing:0;font-weight:500;opacity:.8}
+  .act{display:flex;align-items:center;gap:8px;margin-top:14px}
+  .act .big{height:44px;padding:0 16px;border-radius:10px;font-weight:800;font-size:14px;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px;color:#fff}
+  .act .approve{background:hsl(var(--success))}
+  .act .reject{background:hsl(var(--danger))}
+  .act .note-b{background:hsl(var(--surface));border:1px solid hsl(var(--border));color:hsl(var(--muted-foreground))}
+  .act kbd{margin-left:2px;background:rgba(0,0,0,.1);border-radius:4px;padding:1px 5px;font-size:10px;font-weight:800}
+  .dark .act kbd{background:rgba(255,255,255,.16)}
+  .act .navs{margin-left:auto;display:flex;gap:6px}
+  .act .navs button{width:38px;height:38px;border-radius:9px;border:1px solid hsl(var(--border));background:hsl(var(--surface));color:hsl(var(--muted-foreground));cursor:pointer;display:grid;place-items:center}
+  .khint{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:hsl(var(--muted-foreground));margin-top:10px}
+  .khint svg{width:13px;height:13px;vertical-align:-2px;margin-right:4px}
+
+  .queuecard{overflow:hidden}
+  .qhead{padding:9px 15px;border-bottom:1px solid hsl(var(--border));font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:hsl(var(--muted-foreground))}
+  .qrow{display:flex;align-items:center;gap:12px;padding:9px 15px;border-bottom:1px solid hsl(var(--border));font-size:13px}
+  .qrow:last-child{border-bottom:0}
+  .qscore{width:34px;text-align:right;font-weight:800;font-size:12px;color:hsl(var(--muted-foreground))}
+  .qlabel{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .qtype{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:hsl(var(--muted-foreground))}
+  .facet{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:99px;border:1px solid hsl(var(--border));background:hsl(var(--muted));color:hsl(var(--muted-foreground));font-size:12px;font-weight:700;cursor:pointer}
+  .facet.on{border-color:hsl(var(--primary));background:hsl(var(--primary)/.14);color:hsl(var(--primary))}
+  .facet .c{opacity:.7}
+  .startcard{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px;border:1px solid hsl(var(--primary)/.25);background:hsl(var(--primary)/.06);border-radius:13px}
+
+  /* control dock */
+  .dock{position:fixed;bottom:16px;right:16px;z-index:50;display:flex;gap:8px;background:hsl(var(--surface));border:1px solid hsl(var(--border));border-radius:12px;padding:7px;box-shadow:var(--shadow-elev)}
+  .dock .grp{display:inline-flex;border:1px solid hsl(var(--border));border-radius:9px;overflow:hidden}
+  .dock .grp button{appearance:none;border:0;background:transparent;padding:7px 12px;font:inherit;font-weight:700;font-size:12px;color:hsl(var(--muted-foreground));cursor:pointer}
+  .dock .grp button.on{background:hsl(var(--primary));color:#fff}
+  .flag{margin:0 0 14px;padding:10px 13px;border-radius:11px;border:1px solid hsl(var(--warning)/.4);background:hsl(var(--warning)/.1);font-size:12.5px;display:flex;gap:9px;align-items:flex-start}
+  .flag svg{width:16px;height:16px;color:hsl(var(--warning));flex:0 0 auto;margin-top:1px}
+  .hidden{display:none!important}
+  .stack{display:flex;flex-direction:column;gap:16px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:820px){.app{grid-template-columns:1fr}.side{display:none}.row2{grid-template-columns:1fr}}
+</style>
+
+<div class="dock">
+  <div class="grp" id="vg">
+    <button data-v="A" class="on">Variante A</button>
+    <button data-v="B">Variante B</button>
+  </div>
+  <div class="grp" id="tg">
+    <button data-t="light">Hell</button>
+    <button data-t="dark" class="on">Dunkel</button>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><span class="dot"></span><b>Genauly</b></div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Übersicht</div>
+    <div class="nav active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Prüfen</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Feedback</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><rect x="7" y="10" width="3" height="8"/><rect x="12" y="6" width="3" height="12"/><rect x="17" y="13" width="3" height="5"/></svg>Inhalte</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="7" r="4"/><path d="M17 11l2 2 4-4M3 21v-2a4 4 0 0 1 4-4h6"/></svg>Nutzer</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>System</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><circle cx="4" cy="12" r="2"/><circle cx="12" cy="10" r="2"/><circle cx="20" cy="14" r="2"/></svg>Steuerung</div>
+    <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09zM12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg>Launch</div>
+    <div class="sp"></div>
+    <div class="nav" style="font-size:12px"><span class="badge b-lang">Founder</span></div>
+  </aside>
+
+  <main class="main">
+    <!-- ============ VARIANT A ============ -->
+    <section id="varA">
+      <div>
+        <h1 class="page">Prüfen</h1>
+        <p class="sub">Ein Ort für die ganze Prüfung · 3.107 Registerzeilen · 13 freigegeben</p>
+      </div>
+      <div class="switch" id="aSwitch" style="margin-top:14px">
+        <button class="on" data-seg="queue">Warteschlange</button>
+        <button data-seg="table">Alle Inhalte</button>
+      </div>
+
+      <!-- ---- QUEUE (cockpit) segment ---- -->
+      <div id="aQueue" style="margin-top:18px" class="stack">
+        <div class="row2">
+          <div class="card" style="padding:14px">
+            <div class="eyebrow" style="margin-bottom:9px">Filter</div>
+            <div style="display:flex;flex-wrap:wrap;gap:7px">
+              <span class="facet on">Alle Bänke <span class="c tnum">3107</span></span>
+              <span class="facet">Wörter <span class="c tnum">1623</span></span>
+              <span class="facet">Kollokationen <span class="c tnum">1035</span></span>
+              <span class="facet">Redemittel <span class="c tnum">149</span></span>
+            </div>
+            <label style="margin-top:12px;display:flex;align-items:center;gap:8px;font-size:12px;color:hsl(var(--muted-foreground));font-weight:600">
+              <span class="chk"></span> Nur Einträge mit Maschinen-Verdacht
+            </label>
+          </div>
+          <div class="startcard">
+            <div style="font-size:13px;color:hsl(var(--muted-foreground))">
+              <b style="color:hsl(var(--foreground));font-size:15px">2.771</b> offene Einträge im Filter.<br>Einzeln mit Tastatur entscheiden.
+            </div>
+            <button class="act" style="margin:0"><span class="big approve" style="background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--sky)))"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Prüfmodus starten</span></button>
+          </div>
+        </div>
+
+        <!-- focused cockpit card -->
+        <div class="card cockpit queuecard">
+          <div class="cardhead"><span>Wort · Priorität 92</span><code>v_besprechung</code></div>
+          <div class="learner">
+            <div class="de">die Besprechung</div>
+            <div class="meta">die · Besprechungen · [bəˈʃprɛçʊŋ]</div>
+            <div class="en">meeting · discussion</div>
+            <div class="ex">Die Besprechung wurde auf morgen verschoben.<span style="display:block;font-size:12px;color:hsl(var(--muted-foreground));margin-top:2px">The meeting was postponed to tomorrow.</span></div>
+          </div>
+          <div class="machine">
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;font-size:11px">
+              <span class="eyebrow" style="letter-spacing:.06em">Maschinen-Checks</span>
+              <span style="color:hsl(var(--muted-foreground))">Stufe <b style="color:hsl(var(--foreground))">linguistic</b> · Konfidenz <b style="color:hsl(var(--foreground))">88%</b></span>
+            </div>
+            <div class="checkrow">
+              <span class="mchip chk-pass">facts: pass</span>
+              <span class="mchip chk-pass">linguistic: pass</span>
+              <span class="mchip chk-flag">source: flag</span>
+            </div>
+            <a class="src" href="#">duden.de <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg></a>
+          </div>
+          <div style="padding:0 16px 16px">
+            <div class="act">
+              <button class="big approve"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>Freigeben<kbd>V</kbd></button>
+              <button class="big reject"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>Ablehnen<kbd>X</kbd></button>
+              <button class="big note-b"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9z"/><path d="M15 3v6h6"/></svg>Notiz<kbd>N</kbd></button>
+              <div class="navs"><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button><button><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button></div>
+            </div>
+            <div class="khint">
+              <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/></svg>V Freigeben · X Ablehnen · N Notiz · → weiter · ← zurück</span>
+              <span style="color:hsl(var(--success))">Gespeichert</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---- TABLE segment ---- -->
+      <div id="aTable" class="hidden" style="margin-top:18px"></div>
+    </section>
+
+    <!-- ============ VARIANT B ============ -->
+    <section id="varB" class="hidden">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+        <div>
+          <h1 class="page">Prüfen</h1>
+          <p class="sub">Das ganze Register · nach Priorität sortiert · als Liste oder Fokus prüfen</p>
+        </div>
+        <button class="btn primary" style="height:38px"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Fokus-Prüfmodus (2.771)</button>
+      </div>
+      <div id="bTable"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // ---- shared table markup (used by both variants) ----
+  const ROWS = [
+    {label:"die Besprechung",id:"v_besprechung",type:"Wort",tier:["b-lang","Sprache"],reg:["b-draft","Entwurf"],dec:"queued",src:"duden.de",note:""},
+    {label:"die Betriebskosten",id:"v_betriebskosten",type:"Wort",tier:["b-lang","Sprache"],reg:["b-verified","geprüft"],dec:"approve",src:"bmwsb.bund.de",note:""},
+    {label:"der Ansprechpartner / die Ansprechpartnerin",id:"v_ansprechpartner",type:"Wort",tier:["b-facts","Fakten"],reg:["b-draft","Entwurf"],dec:"reject",src:null,note:"the source doesn't work"},
+    {label:"die Bedenken",id:"v_bedenken",type:"Wort",tier:["b-lang","Sprache"],reg:["b-draft","Entwurf"],dec:"reject",src:"dwds.de",note:"It should be das Bedenken as it's neutral."},
+    {label:"die Schmerzen",id:"v_schmerzen",type:"Wort",tier:["b-lang","Sprache"],reg:["b-verified","geprüft"],dec:"approve",src:"dwds.de",note:"Fine, this one's a plural. Singular is der Schmerz."},
+    {label:"die Zinsen",id:"v_zinsen",type:"Wort",tier:["b-facts","Fakten"],reg:["b-verified","geprüft"],dec:"approve",src:"bundesbank.de",note:""},
+    {label:"das Online-Banking",id:"v_onlinebanking",type:"Wort",tier:["b-lang","Sprache"],reg:["b-verified","geprüft"],dec:"approve",src:"verbraucherzentrale.de",note:""},
+    {label:"die Nebenkosten",id:"v_nebenkosten",type:"Wort",tier:["b-facts","Fakten"],reg:["b-verified","geprüft"],dec:"approve",src:"mietrecht.de",note:""},
+    {label:"das Scope-Creep / die Aufgabenerweiterung",id:"v_scope_creep",type:"Kollokation",tier:["b-src","Quelle"],reg:["b-draft","Entwurf"],dec:"reject",src:null,note:"the source doesn't work"},
+    {label:"Ich möchte einen Termin vereinbaren.",id:"r_termin_verein",type:"Redemittel",tier:["b-jury","KI-Jury"],reg:["b-draft","Entwurf"],dec:"open",src:"goethe.de",note:""},
+  ];
+  const CHK=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>`;
+  const EXT=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>`;
+  const COPY=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  const decBadge=d=>({approve:'<span class="badge b-approve">Freigegeben</span>',reject:'<span class="badge b-reject">Abgelehnt</span>',queued:'<span class="badge b-fix">In Warteschlange</span>',open:'<span style="color:hsl(var(--muted-foreground));font-size:11px">–</span>'}[d]||'');
+  function revCell(r){
+    const on = r.dec==='approve';
+    const rj = r.dec==='reject';
+    const noteHtml = r.note ? `<span class="note">${r.note}</span>` : `<span class="note empty">Notiz…</span>`;
+    return `<div class="rev">
+      <span class="segrev">
+        <button class="ap ${on?'on':''}" title="Freigeben">${CHK}</button>
+        <button class="rj ${rj?'on':''}" title="Ablehnen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      </span>${noteHtml}</div>`;
+  }
+  function tableHTML(){
+    const body = ROWS.map(r=>`<tr>
+      <td class="item"><b>${r.label}</b><br><span class="idchip mono">${r.id} ${COPY}</span></td>
+      <td><span style="font-size:12px;color:hsl(var(--muted-foreground))">${r.type}</span></td>
+      <td><span class="badge ${r.tier[0]}">${r.tier[1]}</span></td>
+      <td><span class="badge ${r.reg[0]}">${r.reg[1]}</span></td>
+      <td>${revCell(r)}</td>
+      <td>${decBadge(r.dec)}</td>
+      <td>${r.src?`<a class="src" href="#">${r.src} ${EXT}</a>`:'<span class="src none">keine</span>'}</td>
+    </tr>`).join("");
+    return `
+    <div class="stack">
+      <div class="prog">
+        <span>Geprüft (Register oder live): <b>13</b> / 3.107</span>
+        <span class="bar"><i style="width:12%"></i></span>
+      </div>
+      <div class="tool">
+        <span class="field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>Suchen (Wort, ID, Quelle)</span>
+        <span class="sel">Alle Typen <span class="cnt">▾</span></span>
+        <span class="sel">Alle Stufen <span class="cnt">▾</span></span>
+        <span class="sel">Alle Status <span class="cnt">▾</span></span>
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 12h13M8 6h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>CSV (3.107)</button>
+        <button class="btn primary"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Entscheidungen (17)</button>
+      </div>
+      <p style="font-size:12px;color:hsl(var(--muted-foreground));margin:-4px 0 0">10 von 3.107 Einträgen. Haken und Notizen speichern sofort (nur für Admins sichtbar); Entscheidungen fließen über <span class="mono">apply:reviews</span> ins Repo.</p>
+      <div class="card tblwrap">
+        <table>
+          <thead><tr>
+            <th>Inhalt<span class="ar">▾</span></th><th>Typ</th><th>Stufe</th><th>Register</th><th>Meine Prüfung</th><th>Entscheidung</th><th>Quelle</th>
+          </tr></thead>
+          <tbody>${body}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+  document.getElementById('aTable').innerHTML = tableHTML();
+  document.getElementById('bTable').innerHTML = tableHTML();
+
+  // A segment switch
+  const aSwitch=document.getElementById('aSwitch');
+  aSwitch.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    [...aSwitch.children].forEach(x=>x.classList.toggle('on',x===b));
+    const seg=b.dataset.seg;
+    document.getElementById('aQueue').classList.toggle('hidden',seg!=='queue');
+    document.getElementById('aTable').classList.toggle('hidden',seg!=='table');
+  });
+  // variant + theme docks
+  document.getElementById('vg').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));
+    const v=b.dataset.v;
+    document.getElementById('varA').classList.toggle('hidden',v!=='A');
+    document.getElementById('varB').classList.toggle('hidden',v!=='B');
+  });
+  document.getElementById('tg').addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    [...e.currentTarget.children].forEach(x=>x.classList.toggle('on',x===b));
+    document.documentElement.setAttribute('data-theme',b.dataset.t);
+  });
+  document.documentElement.setAttribute('data-theme','dark');
+</script>

@@ -62,7 +62,8 @@ after pulling.
 - `types/index.ts` shared types · `types/game.ts` mission schema · `router.tsx`, `App.tsx`
 - Routes: `/` Praktisch dashboard · `/library` Bibliothek · `/writing` Schreiben · `/analytics`
   Fortschritt · `/settings` · `/session` · `/welt` game · `/anwenden` (mounted, off the nav) ·
-  `/sources` (+ founder `/sources/werkbank`) · `/admin/*` (founder) · `/hilfe`, `/privacy`,
+  `/sources` (founder review table lives in `/admin/pruefen`) · `/admin/*` (founder) · `/hilfe`,
+  `/privacy`,
   `/terms`, `/about`, `/welcome` (public)
 
 ## Hard invariants (cross-cutting; never break without an explicit founder request)

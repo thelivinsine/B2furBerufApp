@@ -481,7 +481,8 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   typecheck · build · lint (0 errors) · check:bundle 116.8 kB, all green.
 - **Artifacts (prompt 7):** `src/features/writing/fokus/FokusTrainer.tsx` ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `preview/fokus-disclaimer-inline.html` · this log
-- **Prompt 8 (verbatim, 2026-07-24):** `Wende die anstehenden Review-Entscheidungen auf das Repo an.` (handoff: run `pnpm apply:reviews` keyless with the 14 expected approvals), then before running: `In the control center, if I write a comment and then reject or approve, are the comments being saved? it's unclear` → then `do both` →
+## Session 161 — 2026-07-24 — Review harmonised into the Control Center + note/approve save-race fix + apply:reviews (branch `claude/apply-review-decisions-lw5azm`)
+- **Prompt 1 (verbatim, 2026-07-24):** `Wende die anstehenden Review-Entscheidungen auf das Repo an.` (handoff: run `pnpm apply:reviews` keyless with the 14 expected approvals), then before running: `In the control center, if I write a comment and then reject or approve, are the comments being saved? it's unclear` → then `do both` →
   Answered the diagnostic first: the `/sources/werkbank` row has only a verified checkbox (= `approve`)
   + a Notiz field (no reject/needs_fix control in the UI). The note commits on blur/Enter and the
   checkbox saves separately, but `useWorkbench.onChange` (`src/features/legal/Sources.tsx`) read its
@@ -496,5 +497,31 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   back the exact one-step action (export the 14 decisions, provide the JSON, then
   `pnpm apply:reviews --from <file>`). Gates: typecheck · lint (0 errors) · workbench/reviewExport/apply
   tests 20/20 · build · check:bundle 116.8 kB, all green.
-- **Artifacts (prompt 8):** `src/features/legal/Sources.tsx` · `docs/DECISIONS.md` ·
+- **Artifacts (prompt 1):** `src/features/legal/Sources.tsx` · `docs/DECISIONS.md` ·
   `docs/PROJECT_STATUS.md` (s161 handoff; s159 archived to W30) · this log
+- **Prompt 2 (verbatim, 2026-07-24, + the founder's decision export `genaulyreviewdecisions20260724.json`):** `Can you merge and harmonize the source list with checkboxes page in sources page by bringing it to control center? Integrate all the features from the source list page to the existing review page in control center. Aim for the highest quality` → then `refer to the design skill` →
+  First ran the now-unblocked `pnpm apply:reviews --from` on the provided export: 13 hash-matched
+  approvals flipped draft→verified + stamped + lint green (commit `5188af2`); 3 rejects exported to
+  `docs/reports/review-defects.md`; 1 (`v_besprechung`, null fingerprint) held for re-review. Then,
+  per the design skill (previews-first), mapped the two review surfaces (Control Center cockpit
+  `/admin/pruefen` + `/sources/werkbank` table), built a real-token preview
+  (`preview/control-center-review.html`, published as an artifact) with two integration variants,
+  screenshot-verified both in headless Chromium, and asked the founder to pick.
+- **Prompt 3 (verbatim, 2026-07-24):** `Can you add a save button for the Notes field - increase the notes field width if needed` →
+  Folded into the harmonised table cell: the note field widened and an explicit **Save button** added
+  (appears when the note differs from what is stored; still saves on blur/Enter), directly resolving
+  the earlier "is my comment saved?" doubt.
+- **Prompt 4 (verbatim, 2026-07-24):** `Make sure there's no redundancy in the review mode/prufmodus/warteschlange page. No need of previews anymore. Implement the design directly and merge to main` (founder picked **Variant A** via the question chip) →
+  Implemented Variant A directly. Extracted+extended `useWorkbench` into
+  `src/features/legal/useWorkbench.ts` (one shared, serialised, decision-centric review store);
+  `/admin/pruefen` now heads with a Warteschlange / Alle Inhalte sliding-pill switcher
+  (`useSlidingPill`), the cockpit and the `AdminWorkbench` table sharing that store; the table cell
+  gained a segmented Freigeben/Ablehnen control (reject was impossible in the table before) + the note
+  Save button; `/sources/werkbank` retired (route + `SourcesWorkbench` removed), `/sources` links into
+  the Control Center. Removed the redundant queue header/status copy (open count + as-of date each
+  appear once). Gates: typecheck · lint (0 errors) · test:unit 291/291 · build · check:bundle 116.6 kB.
+- **Artifacts (prompts 2-4):** `src/features/legal/useWorkbench.ts` (new) · `src/features/legal/AdminWorkbench.tsx` ·
+  `src/features/admin/Pruefmodus.tsx` · `src/features/legal/Sources.tsx` · `src/router.tsx` ·
+  `tests/adminWorkbench.test.tsx` · `src/data/provenance.ts` + `docs/reports/verified-hashes.json` +
+  `docs/reports/review-defects.*` (apply:reviews) · `preview/control-center-review.html` ·
+  `docs/DECISIONS.md` · `docs/areas/LEGAL-ADMIN.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log

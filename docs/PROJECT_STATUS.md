@@ -1,12 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 161). **Control-center note/approve save race fixed:** in the
-`/sources/werkbank` workbench, typing a Notiz then ticking approve used to clobber the note (two
-whole-row upserts off the same stale snapshot); `useWorkbench` now merges from an always-latest ref
-and serialises per-id writes, so notes and approvals persist together. `pnpm apply:reviews` (the 14
-approvals) is BLOCKED on the founder's browser decision-export (no key / file in this env). Prior
-s160: Schreiben KI-Hinweis relocated + "Feedback" label shortened app-wide. Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-24 (session 161). **Review harmonised into the Control Center:** the founder
+review table moved out of the retired `/sources/werkbank` page into the `/admin/pruefen` Prüfen page
+as a Warteschlange / Alle Inhalte sliding-pill switcher, both backed by one shared `useWorkbench`
+store; the table cell gained a Freigeben/Ablehnen control + a note Save button. Also fixed the
+note/approve save race and applied the founder's 13 hash-matched approvals (3 rejects + 1 re-review).
+Prior s160: Schreiben KI-Hinweis relocated + "Feedback" label shortened app-wide. Product name:
+**Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -70,28 +70,35 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 161 (2026-07-24). Control-center (`/sources/werkbank`) note/approve save
-race fixed, branch `claude/apply-review-decisions-lw5azm`.** The founder asked whether a comment
-typed before approving/rejecting in the control center is saved. Investigation found it was NOT
-reliable: the workbench row has only a verified **checkbox** (= `approve`) + a **Notiz** field (no
-reject/needs_fix control in the UI at all). The note commits on blur/Enter and the checkbox saves
-separately, but both `onChange` calls in `useWorkbench` (`Sources.tsx`) read the SAME stale `reviews`
-snapshot and each `upsert`s the whole row, so typing a note then ticking approve wrote the row twice
-off the same base and the approve write (carrying the pre-note empty comment) clobbered the note,
-locally and in Supabase.
-- **Fix (`src/features/legal/Sources.tsx`, `useWorkbench`):** `reviewsRef` (always-latest map) feeds
-  the merge base instead of the memo closure, and a per-`content_id` promise chain (`writeChains`)
-  serialises back-to-back edits so the approve write merges on top of the committed note. Call sites
-  in `AdminWorkbench.tsx` unchanged (the `onChange(id, { verified: true })` test contract holds).
-- **Gates:** typecheck · lint (0 errors) · adminWorkbench/reviewExport/applyReviews tests **20/20** ·
-  build · check:bundle **116.8 kB**, all green. Decision recorded in `docs/DECISIONS.md`.
-- **BLOCKED — `pnpm apply:reviews` (the 14 approvals) not run this session.** The keyless flow needs
-  the founder's browser export (`/sources` → "Entscheidungen" download); the direct-DB flow needs
-  `SUPABASE_SERVICE_ROLE_KEY`, which must NOT live in this environment. Neither the export file nor
-  the key is present, and the decision-time content fingerprints cannot be fabricated (that IS the
-  integrity check). **Next:** founder ticks the 14 items, clicks "Entscheidungen", provides the JSON;
-  then `pnpm apply:reviews --from <file>` flips them + stamps + lints in one commit. Fixing the save
-  race first means those approvals (and any notes) now persist correctly before the export.
+**Handoff after session 161 (2026-07-24). Review harmonised into the Control Center + note/approve
+save race fixed + 13 approvals applied, branch `claude/apply-review-decisions-lw5azm`.** Three linked
+pieces this session:
+- **Save-race fix (`useWorkbench`).** The founder asked whether a note typed before approving is
+  saved. It was NOT reliable: the note and the checkbox saved separately, but both `onChange` calls
+  read the SAME stale `reviews` snapshot and each `upsert`ed the whole row, so typing a note then
+  approving wrote the row twice off the same base and the approve write (empty comment) clobbered the
+  note. Fix: merge from an always-latest `reviewsRef` + serialise writes per `content_id`
+  (`writeChains`), so a note and a decision never overwrite each other.
+- **13 approvals applied.** Ran `pnpm apply:reviews --from` on the founder's browser decision export
+  (17 decisions): 13 hash-matched approvals flipped draft→verified + stamped + lint green
+  (commit `5188af2`); 3 rejects → `docs/reports/review-defects.md`; 1 (`v_besprechung`, null
+  fingerprint) held for re-review by the integrity rules.
+- **Harmonisation (Variant A, founder-picked).** The founder-only review table moved OUT of the
+  retired `/sources/werkbank` page INTO the Control Center's **Prüfen** page as a two-segment
+  sliding-pill switcher: **Warteschlange** (priority queue + keyboard cockpit) · **Alle Inhalte**
+  (the full `AdminWorkbench` table). One shared `useWorkbench` store now backs BOTH, so a cockpit
+  decision shows in the table instantly. The table cell gained a segmented **Freigeben/Ablehnen**
+  control (reject was previously impossible in the table) plus a wider note field with an explicit
+  **Save button** (appears when the note is edited; still saves on blur/Enter). Redundant queue
+  header/status copy removed. `/sources` now shows admins a link card into `/admin/pruefen?view=table`.
+- **Files:** `src/features/legal/useWorkbench.ts` (new, extracted+extended), `AdminWorkbench.tsx`
+  (RowReview + patch type), `src/features/admin/Pruefmodus.tsx` (switcher + shared store + QueueLanding),
+  `Sources.tsx` (hook import, link card, SourcesWorkbench removed), `router.tsx` (werkbank route
+  removed), `tests/adminWorkbench.test.tsx`. Preview `preview/control-center-review.html`.
+- **Gates:** typecheck · lint (0 errors) · test:unit **291/291** · build · check:bundle **116.6 kB**,
+  all green. Decisions recorded in `docs/DECISIONS.md`; area guide `docs/areas/LEGAL-ADMIN.md` updated.
+- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live
+  (PWA: hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.
 
 **Handoff after session 160 (2026-07-24). Schreiben KI-Hinweis relocated (Fokus + Kurz/Lang) +
 "Feedback" label shortened app-wide, branch `claude/disclaimer-text-layout-5zq5g0`.** A small

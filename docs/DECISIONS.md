@@ -489,3 +489,37 @@ pre-note empty comment) overwrote the note, in local state and in Supabase.
    `{ comment }` separately) so the pinned `onChange(id, { verified: true })` test contract holds.
 4. **A real reject/needs_fix control was NOT added** in this pass (would be a design change needing a
    founder-reviewed preview); logged as a follow-up. Today "reject" is not expressible in the UI.
+
+---
+
+## Review harmonised into the Control Center (session 161, 2026-07-24)
+
+**Prompts (verbatim):** "Can you merge and harmonize the source list with checkboxes page in sources
+page by bringing it to control center? Integrate all the features from the source list page to the
+existing review page in control center. Aim for the highest quality." · "Can you add a save button
+for the Notes field - increase the notes field width if needed." · "Make sure there's no redundancy
+in the review mode/prufmodus/warteschlange page. No need of previews anymore. Implement the design
+directly and merge to main."
+
+**Context.** Founder review lived in two places: the Control Center's keyboard cockpit
+(`/admin/pruefen`) and a separate full-register table on `/sources/werkbank`. A preview offered two
+integration layouts; the founder picked **Variant A — two areas**.
+
+**Decisions.**
+1. **One Prüfen page, two segments.** `/admin/pruefen` heads with a two-segment sliding-pill switcher
+   (`useSlidingPill`, the locked mechanism — no per-segment `layoutId`): **Warteschlange** (priority
+   queue + keyboard cockpit) and **Alle Inhalte** (the full `AdminWorkbench` table). `?view=table`
+   deep-links the table. `/sources/werkbank` is **retired**; `/sources` links admins into the
+   Control Center instead.
+2. **One shared review store.** `useWorkbench` was extracted to
+   `src/features/legal/useWorkbench.ts`, exported, and is now the single review state behind BOTH the
+   cockpit and the table — a decision in one shows in the other. `onChange` is decision-centric
+   (`approve` / `reject` / `needs_fix` / null-to-clear) and serialised per content_id.
+3. **Reject in the table + a note Save button.** The table cell replaced the approve-only checkbox
+   with a segmented **Freigeben / Ablehnen** control (reject was previously impossible in the table),
+   widened the note field, and added an explicit **Save button** that appears once the note is edited
+   (still saves on blur/Enter). The button appears only when dirty, so it never sits disabled at rest
+   (the "no dead controls at default" rule).
+4. **No redundancy on the queue page.** Dropped the description sentence under the "Prüfen" header
+   and the duplicated open-count; the as-of date appears once (preview-list caption), the open count
+   once (start card).
