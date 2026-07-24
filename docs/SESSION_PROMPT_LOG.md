@@ -360,3 +360,15 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   **J** Stadt (two buildings with lit windows, the miniature of the Üben city map) · **K** Zuhause
   (house with cyan door) · **L** Route (dashed way from cyan start dot to destination ring).
   Awaiting pick (I-L, or keep the compass). Nothing implemented in the app.
+- **Prompt 4 (verbatim, 2026-07-24 ~12:20 UTC):** `I like wegweiser. within oraktisch section, rename the lernen to trainieren and use dumbbell used previously. Now, for the bibliothek section create a couple of icon previews now.` →
+  Three parts. (1) **Praktisch nav-icon decision recorded: variant I (Wegweiser)**, implementation
+  still held together with Schreiben E. (2) **Implemented the toggle rename** on the Praktisch
+  dashboard: "Lernen" → "Trainieren" with the lucide Dumbbell icon restored (it was the toggle's
+  icon before the s147 book); `Dashboard.tsx` (label, Dumbbell import, `LernenBook` component
+  removed), `AdminSteuerung.tsx` H8 label ("Trainieren"/"Train"), `HelpHub.tsx` closing line,
+  comment updates in `Welt.tsx`/`SpielenHub.tsx`, and `docs/areas/PRAKTISCH-NAV.md` refreshed
+  (toggle spec + stale "route mark is a dumbbell" corrected to compass). `pnpm build` green.
+  (3) **Bibliothek preview round**: `preview/bibliothek-icon-vorschlaege.html` (screenshot-verified,
+  own artifact); bars already show Wegweiser + Feder E; current stack as reference + **M**
+  Aufgeschlagenes Buch · **N** Bücherregal · **O** Bibliotheksgebäude · **P** Buch mit Lesezeichen,
+  all Nachtblau/Neon-Cyan. Awaiting pick (M-P, or keep the stack).

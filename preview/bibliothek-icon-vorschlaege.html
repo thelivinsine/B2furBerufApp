@@ -1,0 +1,261 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bibliothek Icon: 4 Vorschläge</title>
+<style>
+  :root {
+    --page: hsl(180 45% 98%);
+    --ink: hsl(252 16% 12%);
+    --muted-ink: hsl(220 8% 36%);
+    --card: #ffffff;
+    --line: hsl(218 13% 84%);
+    --brand: #3D74ED;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: hsl(226 44% 8%);
+      --ink: hsl(224 24% 94%);
+      --muted-ink: hsl(224 13% 77%);
+      --card: hsl(224 26% 16%);
+      --line: hsl(216 28% 30%);
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: hsl(226 44% 8%);
+    --ink: hsl(224 24% 94%);
+    --muted-ink: hsl(224 13% 77%);
+    --card: hsl(224 26% 16%);
+    --line: hsl(216 28% 30%);
+  }
+  :root[data-theme="light"] {
+    --page: hsl(180 45% 98%);
+    --ink: hsl(252 16% 12%);
+    --muted-ink: hsl(220 8% 36%);
+    --card: #ffffff;
+    --line: hsl(218 13% 84%);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font: 15px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 72px; }
+  .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--brand); margin: 0 0 6px;
+  }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .lede { color: var(--muted-ink); max-width: 640px; margin: 0; }
+  .lede b { color: var(--ink); }
+
+  section { margin-top: 44px; }
+  .v-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .v-letter {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 8px;
+    background: var(--brand); color: #fff; font-weight: 800; font-size: 14px;
+    transform: translateY(4px);
+  }
+  .v-name { font-size: 19px; font-weight: 700; margin: 0; }
+  .v-note { color: var(--muted-ink); font-size: 13.5px; margin: 0 0 14px; max-width: 640px; }
+
+  .bars { display: flex; flex-wrap: wrap; gap: 14px; }
+  .phone {
+    width: 393px; max-width: 100%;
+    border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+    flex: 0 1 auto;
+  }
+  .phone .screen { height: 34px; }
+  .phone .tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: 8px 12px 0;
+  }
+  .phone.light { background: hsl(180 45% 98%); }
+  .phone.light .tag { color: hsl(220 8% 36%); }
+  .phone.light .bar { background: #ffffff; border-top: 1px solid hsl(218 13% 84%); }
+  .phone.light .pill.on { background: hsl(218 13% 84%); }
+  .phone.light .lbl { color: #475569; }
+  .phone.dark { background: hsl(226 44% 6%); }
+  .phone.dark .tag { color: hsl(224 13% 77%); }
+  .phone.dark .bar { background: hsl(224 26% 18%); border-top: 1px solid hsl(216 28% 36%); }
+  .phone.dark .pill.on { background: hsl(216 28% 36%); }
+  .phone.dark .lbl { color: #cbd5e1; }
+
+  .bar { display: flex; align-items: stretch; height: 63px; }
+  .tab { flex: 1; padding: 4px; display: flex; }
+  .slot { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .pill { width: 40px; height: 40px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+  .lbl { height: 12px; font-size: 10px; font-weight: 600; line-height: 1; opacity: 0; }
+  .lbl.on { opacity: 1; }
+
+  .zoomrow { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .zoomtile {
+    width: 78px; height: 78px; border-radius: 16px;
+    background: var(--card); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .zoomcap { font-size: 11.5px; color: var(--muted-ink); margin-top: 6px; }
+
+  .pick {
+    margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--muted-ink); font-size: 14px;
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Bibliothek · Nav-Icon</p>
+  <h1>Vier Vorschläge für das Bibliothek-Icon</h1>
+  <p class="lede">Alle Leisten zeigen schon deine Wahlen: Praktisch als <b>I (Wegweiser)</b> und
+  Schreiben als <b>E (Federspitze)</b>. Heute ist Bibliothek der liegende Bücherstapel. Die
+  Vorschläge bleiben in Nachtblau + Neon-Cyan.</p>
+
+  <div id="sections"></div>
+
+  <p class="pick">Auswahl per Buchstabe (M, N, O oder P), oder der Stapel bleibt.</p>
+</div>
+
+<script>
+  // ── Real marks from src/components/layout/route-icons.tsx ──────────────
+  const MARKS = {
+    praktischI: { // the founder's picked Praktisch mark (Wegweiser)
+      color: "#3D74ED", box: [3.2, 3.6, 13.6, 13.8], w: 1.05,
+      svg: c => `
+        <path d="M4.6 3.6h9l3.2 1.85-3.2 1.85h-9Z" fill="${c}"/>
+        <path d="M15.4 8.9h-9l-3.2 1.85 3.2 1.85h9Z" fill="#22d3ee"/>
+        <rect x="9.05" y="12.6" width="1.9" height="4.8" rx="0.95" fill="${c}"/>`
+    },
+    library: { // current Bibliothek mark (reference)
+      color: "#3D74ED", box: [2.8, 4, 15.2, 12], w: 1.05,
+      svg: c => `
+        <rect x="2.8" y="4" width="14.4" height="3.4" rx="1.1" fill="${c}"/>
+        <rect x="3.6" y="8.3" width="14.4" height="3.4" rx="1.1" fill="#22d3ee"/>
+        <rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill="${c}" opacity=".82"/>`
+    },
+    analytics: {
+      color: "#0ea5e9", box: [2.5, 3, 15, 14.5], w: 1.08,
+      svg: c => `
+        <rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="${c}"/>
+        <rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/>
+        <rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/>`
+    },
+    settings: {
+      color: "#64748b", box: [2.31, 2.31, 15.38, 15.38], w: 1.01,
+      svg: c => `
+        <g transform="translate(10 10) scale(0.83) translate(-12 -12)">
+          <path fill="${c}" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/>
+        </g>
+        <circle cx="10" cy="10" r="2.6" fill="#38bdf8"/>`
+    },
+    writingE: { // the founder's picked Schreiben mark (Federspitze Nachtblau)
+      color: "#3D74ED", box: [4.7, 2.6, 10.6, 15], w: 1.02,
+      svg: c => `
+        <path d="M5.9 2.6h8.2c.66 0 1.2.54 1.2 1.2V5c0 2.8-2 7-5.3 12.6C6.7 12 4.7 7.8 4.7 5V3.8c0-.66.54-1.2 1.2-1.2Z" fill="${c}"/>
+        <line x1="10" y1="9" x2="10" y2="13.6" stroke="#22d3ee" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="10" cy="7.2" r="1.5" fill="#22d3ee"/>`
+    },
+    // ── Bibliothek proposals ───────────────────────────────────────────────
+    bibM: { // open book, blue left page + cyan right page
+      color: "#3D74ED", box: [2.4, 2.4, 15.2, 15.2], w: 1.05,
+      svg: c => `
+        <path d="M10 3.4C7.7 2.4 4.8 2.4 2.4 3.4V16.6c2.4-1 5.3-1 7.6 0V3.4Z" fill="${c}"/>
+        <path d="M10 3.4c2.3-1 5.2-1 7.6 0V16.6c-2.4-1-5.3-1-7.6 0V3.4Z" fill="#22d3ee"/>
+        <line x1="4.4" y1="7" x2="8.2" y2="7" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".7"/>
+        <line x1="4.4" y1="9.6" x2="8.2" y2="9.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+        <line x1="11.8" y1="7" x2="15.6" y2="7" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".5"/>
+        <line x1="11.8" y1="9.6" x2="15.6" y2="9.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".35"/>`
+    },
+    bibN: { // shelf: two upright spines + one leaning book
+      color: "#3D74ED", box: [3, 3.3, 12.6, 13.8], w: 1.05,
+      svg: c => `
+        <rect x="3" y="3.6" width="3" height="13" rx="0.8" fill="${c}"/>
+        <rect x="6.8" y="3.6" width="3" height="13" rx="0.8" fill="#22d3ee"/>
+        <rect x="11" y="3.9" width="3" height="13" rx="0.8" fill="${c}" opacity=".82" transform="rotate(12 12.5 10.4)"/>
+        <line x1="4" y1="5.6" x2="5" y2="5.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".6"/>
+        <line x1="7.8" y1="5.6" x2="8.8" y2="5.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".6"/>`
+    },
+    bibO: { // library building: pediment + columns + cyan base
+      color: "#3D74ED", box: [2.4, 2.6, 15.2, 14.7], w: 1.05,
+      svg: c => `
+        <polygon points="10,2.6 17.6,6.8 2.4,6.8" fill="${c}"/>
+        <rect x="3.8" y="8.2" width="1.8" height="6.4" rx="0.7" fill="${c}" opacity=".85"/>
+        <rect x="7.3" y="8.2" width="1.8" height="6.4" rx="0.7" fill="${c}" opacity=".85"/>
+        <rect x="10.9" y="8.2" width="1.8" height="6.4" rx="0.7" fill="${c}" opacity=".85"/>
+        <rect x="14.4" y="8.2" width="1.8" height="6.4" rx="0.7" fill="${c}" opacity=".85"/>
+        <rect x="2.8" y="15.4" width="14.4" height="1.9" rx="0.9" fill="#22d3ee"/>`
+    },
+    bibP: { // closed book cover with cyan bookmark ribbon
+      color: "#3D74ED", box: [4.4, 2.8, 11.2, 14.4], w: 1.04,
+      svg: c => `
+        <rect x="4.4" y="2.8" width="11.2" height="14.4" rx="1.4" fill="${c}"/>
+        <polygon points="11.6,2.8 14.6,2.8 14.6,9 13.1,7.4 11.6,9" fill="#22d3ee"/>
+        <line x1="6.6" y1="12.6" x2="10.4" y2="12.6" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".55"/>
+        <line x1="6.6" y1="14.4" x2="9.2" y2="14.4" stroke="#fff" stroke-width="1" stroke-linecap="round" opacity=".4"/>`
+    },
+  };
+
+  // Same optical normalisation as route-icons.tsx
+  const TARGET = 16;
+  function normTransform(box, weight) {
+    const [x, y, w, h] = box;
+    const s = (TARGET * weight) / Math.max(w, h);
+    return `translate(10 10) scale(${s.toFixed(4)}) translate(${(-(x + w / 2)).toFixed(4)} ${(-(y + h / 2)).toFixed(4)})`;
+  }
+  function icon(key, size) {
+    const m = MARKS[key];
+    return `<svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <g transform="${normTransform(m.box, m.w)}">${m.svg(m.color)}</g>
+    </svg>`;
+  }
+
+  const TABS = bibKey => ([
+    { key: "praktischI", label: "Praktisch" },
+    { key: bibKey, label: "Bibliothek", active: true },
+    { key: "writingE", label: "Schreiben" },
+    { key: "analytics", label: "Fortschritt" },
+    { key: "settings", label: "Einstellungen" },
+  ]);
+
+  function bar(bibKey, theme) {
+    const tabs = TABS(bibKey).map(t => `
+      <div class="tab"><div class="slot">
+        <div class="pill ${t.active ? "on" : ""}">${icon(t.key, 29)}</div>
+        <div class="lbl ${t.active ? "on" : ""}">${t.label}</div>
+      </div></div>`).join("");
+    return `<div class="phone ${theme}">
+      <div class="tag">${theme === "light" ? "Hell" : "Dunkel"}</div>
+      <div class="screen"></div>
+      <div class="bar">${tabs}</div>
+    </div>`;
+  }
+
+  function zoom(bibKey) {
+    return `<div class="zoomrow">${TABS(bibKey).map(t =>
+      `<div><div class="zoomtile">${icon(t.key, 52)}</div><div class="zoomcap">${t.label}</div></div>`
+    ).join("")}</div>`;
+  }
+
+  const SECTIONS = [
+    { letter: "", key: "library", name: "Aktueller Stand: Bücherstapel (Referenz)",
+      note: "Der liegende Stapel aus drei Bänden, so wie er heute in der Leiste sitzt." },
+    { letter: "M", key: "bibM", name: "Aufgeschlagenes Buch",
+      note: "Ein offenes Buch, linke Seite Blau, rechte Seite Cyan, mit angedeuteten Textzeilen. Das klassische Lese-Zeichen, satt und symmetrisch." },
+    { letter: "N", key: "bibN", name: "Bücherregal",
+      note: "Zwei stehende Buchrücken und ein angelehntes drittes Buch: die Regal-Silhouette einer Bibliothek. Lebendiger als der liegende Stapel." },
+    { letter: "O", key: "bibO", name: "Bibliotheksgebäude",
+      note: "Giebel und Säulen mit Cyan-Sockel: die Institution Bibliothek. Passt zum Stadt-Motiv von Praktisch, bleibt aber klar unterscheidbar." },
+    { letter: "P", key: "bibP", name: "Buch mit Lesezeichen",
+      note: "Ein geschlossener Band mit Cyan-Lesezeichenband. Die ruhigste, kompakteste Form der vier." },
+  ];
+
+  document.getElementById("sections").innerHTML = SECTIONS.map(s => `
+    <section>
+      <div class="v-head">
+        ${s.letter ? `<span class="v-letter">${s.letter}</span>` : ""}
+        <h2 class="v-name">${s.name}</h2>
+      </div>
+      <p class="v-note">${s.note}</p>
+      <div class="bars">${bar(s.key, "light")}${bar(s.key, "dark")}</div>
+      ${zoom(s.key)}
+    </section>`).join("");
+</script>
