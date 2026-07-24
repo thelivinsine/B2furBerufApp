@@ -59,9 +59,9 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
       `PROJECT_FOUNDATION.md`.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
-- [ ] **Redeploy `transform-sentence` (Supabase dashboard) to activate the "Nochmal" regenerate**
-      button (s163). Self-contained file; same steps as the s159 redeploy. Until then the button
-      returns the cached canonical sentence (no visible change).
+- [x] ~~Redeploy `transform-sentence` to activate the "Nochmal" regenerate button (s163).~~
+      **DONE 2026-07-24** (founder redeployed via the Supabase dashboard; the capped variant path is
+      live).
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
       now contains a full static pre-render inside `#root` that Google's no-JS HTML crawler can read.
@@ -110,8 +110,8 @@ concurrent branch-protection session already took 162). Two founder screenshots 
   `wordDiff.test.ts` cases. Gates green; shipped PR #695.
 - **"why does Zustandspassiv wrap" — left as-is (founder decision).** Genuine width wrap on the
   256px desktop rail (reproduced in `preview/genus-verbi-wrap.html`); not a bug, no change.
-- **"Nochmal"/regenerate button — BUILT, needs a founder redeploy to go live.** Founder chose the
-  capped/cheap variant (cap = 2 alternatives). `transform-sentence` gains an optional `variant`
+- **"Nochmal"/regenerate button — BUILT + deployed, LIVE (founder redeployed `transform-sentence`
+  2026-07-24).** Founder chose the capped/cheap variant (cap = 2 alternatives). `transform-sentence` gains an optional `variant`
   (server-clamped 0..2): variant 0 keeps the original cache key byte-for-byte; variants 1..2 get
   their own global cache keys + an "alternative phrasing" instruction (Gemini temperature 0.9 for
   variants only). Client (`useFokusMachine.regenerate()` + a RefreshCw "Nochmal" button in the
