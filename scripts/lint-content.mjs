@@ -1387,6 +1387,21 @@ async function main() {
         : ""),
   );
 
+  // CLAUDE.md size ratchet (s155): the file states current law only and must stay lean —
+  // detail belongs in docs/areas/* and the skills. Warn-only, so it nags without blocking.
+  try {
+    const claudeMdLines = readFileSync(path.join(root, "CLAUDE.md"), "utf8").split("\n").length;
+    if (claudeMdLines > 350) {
+      warn(
+        "docs",
+        "CLAUDE.md",
+        `${claudeMdLines} lines (budget ~350). Move detail to docs/areas/* or a skill; replace rules instead of appending history.`,
+      );
+    }
+  } catch {
+    /* CLAUDE.md missing is not a content error */
+  }
+
   if (warnings.length) {
     console.log(`\n⚠ ${warnings.length} warning(s):`);
     for (const w of warnings) console.log(`  [${w.dataset}] ${w.where}: ${w.msg}`);

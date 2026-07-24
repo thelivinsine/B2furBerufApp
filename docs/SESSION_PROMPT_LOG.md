@@ -1500,3 +1500,23 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   anchor to CLAUDE.md's "Founder design preferences" section.
 - **Artifacts (session 155):** `.claude/skills/design/SKILL.md` · `CLAUDE.md` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #668
+- **Prompt 2 (verbatim):** `can you also check claude.md and suggest best practice as it's quite huge at the moment?` →
+  Report-first: measured CLAUDE.md at 1,078 lines / ~36k tokens loaded in EVERY session; diagnosed
+  it as "a changelog wearing a rulebook's clothes" (supersession narratives instead of current law;
+  the biggest sections: UX overhaul 336 lines, mobile bar 130, commands 117, brand 106). Proposed:
+  shrink CLAUDE.md to ~300 lines of current law + one-line command index + hard invariants + area
+  pointer index; move detail into on-demand `docs/areas/*` files rewritten current-state-only; add
+  a `/content` skill for the authoring workflow; add a maintenance rule + a warn-only linter
+  ratchet so it never regrows. Estimated ~28k tokens saved per session.
+- **Prompt 3 (verbatim):** `yes go ahead` →
+  **PR #671.** Executed the restructure: CLAUDE.md rewritten to ~180 lines (identity + maintenance
+  rule + stack + command index + layout map + hard invariants + design-prefs summary + writing
+  style + area index + deployment + workflow + roadmap pointers). New `docs/areas/` files
+  (COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN, PRAKTISCH-NAV, GAME, BRAND, LEGAL-ADMIN,
+  COMPONENTS), each de-narrated to current state with every rule and landmine preserved. New
+  `.claude/skills/content/SKILL.md` (iron laws + gate order). `scripts/lint-content.mjs` warns
+  when CLAUDE.md exceeds ~350 lines. Cross-references updated (design skill §8, PROJECT_STATUS).
+  `pnpm lint:content` green.
+- **Artifacts (session 155, part 2):** `CLAUDE.md` · `docs/areas/*.md` (10 files) ·
+  `.claude/skills/content/SKILL.md` · `.claude/skills/design/SKILL.md` ·
+  `scripts/lint-content.mjs` · `docs/PROJECT_STATUS.md` · this log · PR #671
