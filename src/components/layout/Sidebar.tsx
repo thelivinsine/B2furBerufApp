@@ -1,11 +1,13 @@
 import { NavLink, Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { navItems } from "./nav-items";
 import { RouteIcon } from "./route-icons";
 import { SaveProgressBanner } from "@/features/auth/SaveProgressBanner";
 import { Logo } from "@/components/shared/Logo";
 import { useAppConfig } from "@/lib/appConfig";
+import { useAuthStore } from "@/store/useAuthStore";
+import { isFounder } from "@/lib/admin";
 
 export function Sidebar({
   onNavigate,
@@ -19,6 +21,7 @@ export function Sidebar({
   // stay mounted; Home "/" and Einstellungen "/settings" are never hideable).
   const { navLabels, hiddenTabs } = useAppConfig();
   const shownNav = navItems.filter((i) => !hiddenTabs.includes(i.to));
+  const founder = isFounder(useAuthStore((s) => s.user));
   return (
     <div className="flex h-full flex-col gap-1 p-4">
       <Link
@@ -71,6 +74,29 @@ export function Sidebar({
             )}
           </NavLink>
         ))}
+
+        {/* Founder tooling: the Control Center lives in the nav panel on desktop
+            (moved out of the account menu, s164-follow-up). Styled like the other
+            nav rows (neutral, not accent-blue); the ShieldCheck mark sets it
+            apart. The account menu keeps a mobile-only copy since there is no
+            sidebar below lg and the bottom bar is locked. */}
+        {founder && (
+          <NavLink
+            to="/admin"
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              cn(
+                "group mt-1 flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                isActive
+                  ? "bg-muted font-semibold text-foreground"
+                  : "text-foreground/80 hover:bg-muted/60 hover:text-foreground",
+              )
+            }
+          >
+            <ShieldCheck className="h-[18px] w-[18px] shrink-0 text-muted-foreground group-hover:text-foreground" />
+            Kontrollzentrum
+          </NavLink>
+        )}
       </nav>
 
       {/* Sign-in nudge, pinned to the bottom-left of the nav panel. */}
