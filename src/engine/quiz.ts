@@ -571,12 +571,36 @@ function oddOneOutQ(anchor: VocabItem, difficulty: Difficulty): MCQQuestion | nu
     }
   }
   if (related.length < 2) return null;
-  const cluster = [anchor, ...sample(related, 2)];
-  const clusterIds = new Set(cluster.map((v) => v.id));
-  const relatedIds = new Set(related.map((v) => v.id));
+
+  // Two flavours, mixed for variety:
+  //  - part-of-speech matched: all four options share the anchor's POS, so the
+  //    only discriminator is the topic (removes the "odd one = the verb"
+  //    shortcut that made a mixed set answerable without knowing the meanings).
+  //  - mixed POS (like before), kept for variety.
+  // Both flavours require the outsider to be genuinely UNRELATED to the cluster
+  // (different theme AND no shared "related" link either way), so a word that
+  // half-belongs (e.g. abdichten near Blech) is never the odd one out.
+  const samePos = related.filter((v) => v.pos === anchor.pos);
+  const posMatch = Math.random() < 0.5 && samePos.length >= 2;
+  const cluster = [anchor, ...sample(posMatch ? samePos : related, 2)];
+
+  // Ids the cluster links to (its members + everything in their `related`), so
+  // the outsider can be excluded when it shares any link with the cluster.
+  const clusterForms = new Set(cluster.map((v) => normForm(v.de)));
+  const linkedIds = new Set<string>(cluster.map((v) => v.id));
+  for (const v of cluster) {
+    for (const rel of v.related) {
+      const hit = resolve.get(normForm(rel));
+      if (hit) linkedIds.add(hit.id);
+    }
+  }
   const outsider = sample(
     vocabulary.filter(
-      (v) => v.themeId !== anchor.themeId && !clusterIds.has(v.id) && !relatedIds.has(v.id),
+      (v) =>
+        v.themeId !== anchor.themeId &&
+        (!posMatch || v.pos === anchor.pos) &&
+        !linkedIds.has(v.id) &&
+        !v.related.some((rel) => clusterForms.has(normForm(rel))),
     ),
     1,
   )[0];
