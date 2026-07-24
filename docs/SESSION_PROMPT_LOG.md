@@ -375,3 +375,23 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
 - **Prompt 9 (verbatim, mid-documentation):** `a small and quick change I'd like to make is redo the explanation of green dot better.. say something like the Green pills mean your sentence. Keep it as simple as possible.` → rail legend simplified to "Grüner Punkt = dein Satz." / "Tippe eine andere Form, um ihn umzuwandeln." (`GrammarRail.tsx` + preview).
 - **Response 8+9:** Documented the session (this entry renumbered 152→159 after `main` had advanced to s158; PROJECT_STATUS handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, brainstorm-doc roadmap). `main` had force-advanced 10 commits (CLAUDE.md restructure #671, prompt-log rotation #677, sessions 155–158); merged it in (code auto-merged: my mood/copy edits + main's cosmetic tweaks both intact; the four doc conflicts resolved to main's new structure, docs re-applied against it), gates green (typecheck · **289** unit tests · lint 0 errors · build · bundle 112 kB · lint:content), squash-merged PR #678.
 - **Artifacts (session 159):** `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md` · `preview/grammar-dimensions-satzlabor.html` · `preview/grammar-dimensions-catalog.html` · `src/features/writing/fokus/grammarDimensions.ts` · `useFokusMachine.ts` · `GrammarRail.tsx` · `FokusTrainer.tsx` · `supabase/functions/transform-sentence/index.ts` · `tests/fokusGrammar.test.ts` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log · PR #678 · artifact daa4dbb6
+- **Prompt 6 (verbatim, 2026-07-24 ~12:50 UTC):** `publish it now` →
+  Published the Fortschritt preview as artifact c4cbc515 (same content as the delivered file).
+- **Prompt 7 (verbatim, 2026-07-24 ~12:55 UTC):** `I like option S with the ring.` →
+  **Fortschritt decision recorded: variant S (Fortschrittsring).** That completed all four picks, so
+  the announced one-pass implementation started: `route-icons.tsx` renderers + `NORM` boxes swapped
+  to Wegweiser (/), Buch mit Lesezeichen (/library), Federspitze (/writing) and Ring (/analytics);
+  `nav-items.ts` Schreiben accent rose #f43f5e → brand blue #3D74ED; `docs/areas/PRAKTISCH-NAV.md`
+  updated. Gates: build · check:bundle 116.9 kB · test:unit green. Live-verified via vite preview +
+  Playwright at 393px: all five tabs render the picked marks, matching the approved previews.
+- **Prompt 8 (verbatim, 2026-07-24 ~13:00 UTC, mid-verification):** `also in addition, make sure the fortschritt button is always to the left of settings button for all the users by default` →
+  `BottomTabBar.tsx`: Fortschritt pinned as `FIXED_LAST_CONTENT` directly left of Einstellungen for
+  every user; only Bibliothek + Schreiben stay reorderable (`REORDERABLE`); older persisted orders
+  normalise at read time; edit mode shows Fortschritt as a fixed tile; `handleReorder` persists the
+  normalised order. `docs/areas/PRAKTISCH-NAV.md` bottom-bar section updated (locked-structure change
+  on explicit founder request). Session documented: PROJECT_STATUS s158 handoff added (s157 handoff
+  rotated to the W30 archive), header refreshed.
+- **Artifacts (session 158):** `src/components/layout/{route-icons.tsx,nav-items.ts,BottomTabBar.tsx}` ·
+  `src/features/dashboard/{Dashboard.tsx,SpielenHub.tsx}` · `src/features/{admin/AdminSteuerung.tsx,help/HelpHub.tsx,welt/Welt.tsx}` ·
+  `preview/schreiben-icon-harmony{,-r2}.html` · `preview/{praktisch,bibliothek,fortschritt}-icon-vorschlaege.html` ·
+  `docs/areas/PRAKTISCH-NAV.md` · `docs/PROJECT_STATUS.md` · this log · PRs #679, #680, #681, #682 + the final implementation PR

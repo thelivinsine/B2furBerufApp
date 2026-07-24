@@ -1,21 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 159). **Fokus "Satzlabor" Wave 2: Konjunktiv II + Zustandspassiv**
-(from a grammar-dimensions brainstorm, `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`; PR #678). The
-Fokus grammar rail now has three combinable axes: **Genus Verbi** (Aktiv · Passiv · Zustandspassiv),
-**Zeitform** (Präsens · Perfekt · Präteritum) and **Modus** (Indikativ · Konjunktiv II). `mood` was
-promoted from the pinned `DEFAULT_MOOD` to a real axis; Zustandspassiv is its own Genus-Verbi pill (a
-detected `passiv_zustand` maps straight to it; the copula-is-Aktiv safeguard stays in the check-sentence
-prompt). The rail is data-driven, so both were data/wiring adds; the `transform-sentence` prompt gained
-Konjunktiv-II (synthetic-vs-würde, no würde in the wenn-clause) + Vorgang-vs-Zustand rules,
-**`PROMPT_VERSION` 2 → 4** (cache invalidation). Green-dot legend simplified to "Grüner Punkt = dein
-Satz." Operation-style transforms (Register Sie↔du, Satzbau HS↔NS) stay a later wave (they need a new
-edge-function operation contract, not the tuple). **Founder action: redeploy `transform-sentence`**
-(now `PROMPT_VERSION=4`) so the improved K-II / Zustandspassiv output takes effect; the pills already
-work against the live function without it. Prior s157 doc-maintenance pass + the s156 admin control
-center (chunks 1-12 complete; Phase 3 13-16 on demand) still stand; s156 founder action still open: run
-migration 0010 + redeploy `delete-account` (`PHASE2_SETUP.md` §5). Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-24 (session 158). **Nav-icon family harmonization (founder-picked):**
+Praktisch = Wegweiser, Bibliothek = Buch mit Lesezeichen, Schreiben = Federspitze (accent rose → brand
+blue), Fortschritt = Fortschrittsring; the dashboard toggle is now "Trainieren" with the Dumbbell; and
+Fortschritt is pinned directly left of Einstellungen in the bottom bar for all users. Prior s159:
+Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv; founder must redeploy `transform-sentence`).
+Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -79,6 +69,27 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 158 (2026-07-24). Nav-icon family harmonization + Trainieren toggle,
+branch `claude/schreiben-icon-design-cz21ts`, PRs #679-#683.** A preview-first icon session: the
+founder picked every mark by letter from tab-bar mockups (`preview/schreiben-icon-harmony{,-r2}.html`,
+`praktisch-icon-vorschlaege.html`, `bibliothek-icon-vorschlaege.html`,
+`fortschritt-icon-vorschlaege.html`), then everything was implemented in one pass:
+- **New route marks** (`route-icons.tsx` + `NORM` boxes): Praktisch = **Wegweiser** signpost (pick I,
+  replaced the compass), Bibliothek = **Buch mit Lesezeichen** (pick P, replaced the lying stack),
+  Schreiben = **Federspitze** nib (pick E; `nav-items.ts` accent moved rose `#f43f5e` → brand blue
+  `#3D74ED` with it), Fortschritt = **Fortschrittsring** (pick S, replaced the bar chart). All marks
+  stay two-tone with neon-cyan `#22d3ee` companions.
+- **Trainieren toggle:** the Praktisch dashboard toggle "Lernen" renamed to **"Trainieren"** with the
+  lucide Dumbbell restored (`Dashboard.tsx`, `LernenBook` removed; admin H8 label; Help-hub line).
+- **Fortschritt pinned:** `BottomTabBar` now keeps Fortschritt directly LEFT of Einstellungen for
+  every user (`REORDERABLE = ["/library", "/writing"]` + `FIXED_LAST_CONTENT`); older persisted
+  orders normalise at read time; edit-mode reorder covers only Bibliothek + Schreiben.
+- **Verified live** (vite preview + Playwright): all five tabs render the picked marks at equal
+  widths; screenshots match the approved previews. Docs: `docs/areas/PRAKTISCH-NAV.md` updated.
+- **Gates:** build · check:bundle **116.9 kB** · test:unit green.
+- **Next:** nothing pending from this session; the old `preview/route-icons-preview.svg` reference
+  sheet is stale (pre-s158 marks) if anyone wants to regenerate it.
+
 **Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
 branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
 grammar-dimensions brainstorm (four research agents) -> `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`
@@ -107,30 +118,6 @@ artifact (daa4dbb6). Then built the "easy half":
   docs re-applied against it (this handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, prompt-log s159).
 - **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build / check:bundle **112 kB** /
   lint:content. Edge function is Deno (not deployed from the sandbox).
-
-**Handoff after session 157 (2026-07-24). Documentation maintenance audit + fixes + AGENTS.md,
-branch `claude/docs-maintenance-audit-8pbhx3`.** Read-only audit first (report delivered, verdict:
-healthy, the s155 restructure is holding), then the approved fix pass:
-- **Prompt-log rotation:** s133-134 → the W29 chunk, s135-151 → a new
-  `archive/prompt-log/SESSION_PROMPT_LOG_2026-W30.md`; live log now holds s152+ (~300 lines vs the
-  ~1,200-line budget); index rows updated in `archive/prompt-log/README.md`.
-- **`docs/README.md`:** added the `areas/` folder + 10-row catalog and the `/design`+`/content`
-  skills note (all missing since the s155 restructure), rewrote the CLAUDE.md row, added an
-  AGENTS.md row, refreshed the two archive rows.
-- **Stale pointers fixed (5):** `PROJECT_FOUNDATION.md` + `PROJECT_REFERENCE.md` ×2 +
-  `DECISIONS.md` ×2 now point at `docs/areas/{BRAND,PRAKTISCH-NAV,BIBLIOTHEK,SCHREIBEN}.md` instead
-  of CLAUDE.md sections that moved in s155.
-- **Command docs:** `check:contrast` (a `validate.yml` CI gate) documented in
-  `docs/areas/COMMANDS.md` + added to the CLAUDE.md CI-gates index; `check:refs` and the
-  `build:dict-subset`/`build:nouns-subset` internals of `build:oracles` documented too.
-- **Archive index:** the W30 row in `archive/PROJECT_STATUS_ARCHIVE.md` corrected to sessions
-  135-154 (the chunk was verified complete; only the index row was stale).
-- **New `AGENTS.md` (repo root):** a thin router with no rules of its own (CLAUDE.md →
-  `docs/areas/` → the skills), so any future non-Claude coding tool lands on the same law.
-  Deliberately NOT comprehensive: a second rulebook would drift against CLAUDE.md.
-- **Next:** nothing pending from this session. The standing doc jobs continue as usual: rotate the
-  prompt log past ~1,200 lines, keep two handoffs here, bump `docs/README.md` when the folder
-  shape changes.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

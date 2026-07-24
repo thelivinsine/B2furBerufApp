@@ -821,3 +821,27 @@ triggers probabilistically, so it needs an always-on anchor).
 - **Next:** founder wants to rework Schreiben's Verlauf tab (excluded from the distillation on
   purpose); when that happens, run it through the new skill's preview-first process and then add
   Verlauf's picked design to the skill's Schreiben anchor + `docs/areas/SCHREIBEN.md`.
+
+**Handoff after session 157 (2026-07-24). Documentation maintenance audit + fixes + AGENTS.md,
+branch `claude/docs-maintenance-audit-8pbhx3`.** Read-only audit first (report delivered, verdict:
+healthy, the s155 restructure is holding), then the approved fix pass:
+- **Prompt-log rotation:** s133-134 → the W29 chunk, s135-151 → a new
+  `archive/prompt-log/SESSION_PROMPT_LOG_2026-W30.md`; live log now holds s152+ (~300 lines vs the
+  ~1,200-line budget); index rows updated in `archive/prompt-log/README.md`.
+- **`docs/README.md`:** added the `areas/` folder + 10-row catalog and the `/design`+`/content`
+  skills note (all missing since the s155 restructure), rewrote the CLAUDE.md row, added an
+  AGENTS.md row, refreshed the two archive rows.
+- **Stale pointers fixed (5):** `PROJECT_FOUNDATION.md` + `PROJECT_REFERENCE.md` ×2 +
+  `DECISIONS.md` ×2 now point at `docs/areas/{BRAND,PRAKTISCH-NAV,BIBLIOTHEK,SCHREIBEN}.md` instead
+  of CLAUDE.md sections that moved in s155.
+- **Command docs:** `check:contrast` (a `validate.yml` CI gate) documented in
+  `docs/areas/COMMANDS.md` + added to the CLAUDE.md CI-gates index; `check:refs` and the
+  `build:dict-subset`/`build:nouns-subset` internals of `build:oracles` documented too.
+- **Archive index:** the W30 row in `archive/PROJECT_STATUS_ARCHIVE.md` corrected to sessions
+  135-154 (the chunk was verified complete; only the index row was stale).
+- **New `AGENTS.md` (repo root):** a thin router with no rules of its own (CLAUDE.md →
+  `docs/areas/` → the skills), so any future non-Claude coding tool lands on the same law.
+  Deliberately NOT comprehensive: a second rulebook would drift against CLAUDE.md.
+- **Next:** nothing pending from this session. The standing doc jobs continue as usual: rotate the
+  prompt log past ~1,200 lines, keep two handoffs here, bump `docs/README.md` when the folder
+  shape changes.

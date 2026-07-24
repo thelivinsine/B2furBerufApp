@@ -12,11 +12,15 @@ const ACTIVE_BOX = "bg-border";
 const IZ = 29; // icon size
 
 // The middle content sections. Home is the fixed first slot and Einstellungen
-// the fixed last slot (they replaced the retired "Mehr" sheet in s-polish), so
-// these are the only reorderable tabs. Anwenden stays hidden from the nav
-// (founder, 2026-07-13, demo); Schreiben was promoted to its own tab (2026-07-22),
-// so the middle is Bibliothek · Schreiben · Fortschritt.
-const CONTENT = ["/library", "/writing", "/analytics"];
+// the fixed last slot (they replaced the retired "Mehr" sheet in s-polish).
+// Anwenden stays hidden from the nav (founder, 2026-07-13, demo); Schreiben was
+// promoted to its own tab (2026-07-22), so the middle is Bibliothek · Schreiben
+// · Fortschritt. Since s158 (founder request) Fortschritt is pinned to the END
+// of the middle, always directly left of Einstellungen for every user: only
+// Bibliothek and Schreiben reorder, and any older persisted order that moved
+// Fortschritt elsewhere is normalised at read time.
+const REORDERABLE = ["/library", "/writing"];
+const FIXED_LAST_CONTENT = "/analytics";
 
 // Every surface (bottom bar, sidebar) draws the SAME custom branded SVG for a
 // route — defined once in route-icons.tsx — so an icon is recognisable
@@ -90,12 +94,13 @@ export function BottomTabBar() {
   const [editMode, setEditMode] = useState(false);
   const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // The three content sections ALWAYS appear, ordered by any saved custom order
-  // (so the reorder easter egg persists) then completed with any missing ones.
-  // Because there is no add/remove any more, this guarantees a section can never
-  // be stranded off the bar.
-  const saved  = pinnedTabs.filter(p => CONTENT.includes(p));
-  const middle = [...saved, ...CONTENT.filter(p => !saved.includes(p))];
+  // The three content sections ALWAYS appear: the two reorderable ones in any
+  // saved custom order (so the reorder easter egg persists) completed with any
+  // missing ones, then Fortschritt pinned last. Because there is no add/remove
+  // any more, this guarantees a section can never be stranded off the bar.
+  const saved       = pinnedTabs.filter(p => REORDERABLE.includes(p));
+  const reorderable = [...saved, ...REORDERABLE.filter(p => !saved.includes(p))];
+  const middle      = [...reorderable, FIXED_LAST_CONTENT];
   // Steuerung H2: hide middle tabs from the RAIL only (routes stay mounted, and
   // edit-mode reorder keeps operating on the full `middle` so hidden tabs are
   // never dropped from the persisted pins). Home + Einstellungen are never
@@ -106,8 +111,8 @@ export function BottomTabBar() {
   // Navigating anywhere ends the reorder easter egg (there is no sheet to close).
   useEffect(() => { setEditMode(false); }, [pathname]);
 
-  function handleReorder(newMiddle: string[]) {
-    setPinnedTabs(["/", ...newMiddle]);
+  function handleReorder(newReorderable: string[]) {
+    setPinnedTabs(["/", ...newReorderable, FIXED_LAST_CONTENT]);
   }
 
   function startLongPress() {
@@ -160,13 +165,13 @@ export function BottomTabBar() {
                   flexGrow = count keeps each slot the same width as the ends. */}
               <Reorder.Group
                 axis="x"
-                values={middle}
+                values={reorderable}
                 onReorder={handleReorder}
                 as="div"
                 className="flex"
-                style={{ flexGrow: middle.length, flexShrink: 1, flexBasis: 0 }}
+                style={{ flexGrow: reorderable.length, flexShrink: 1, flexBasis: 0 }}
               >
-                {middle.map((path, idx) => (
+                {reorderable.map((path, idx) => (
                   <Reorder.Item
                     key={path}
                     value={path}
@@ -184,6 +189,14 @@ export function BottomTabBar() {
                   </Reorder.Item>
                 ))}
               </Reorder.Group>
+
+              {/* Fortschritt — pinned left of Einstellungen, not reorderable
+                  (founder, s158), so it renders as a still tile like the ends. */}
+              <div className="flex flex-1 p-1">
+                <div className="flex flex-1 items-center justify-center rounded-xl">
+                  <TabIcon path={FIXED_LAST_CONTENT} />
+                </div>
+              </div>
 
               {/* Einstellungen — always fixed last */}
               <div className="flex flex-1 p-1">
