@@ -1571,3 +1571,25 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `supabase/migrations/0010_gdpr_evidence.sql` · `tests/{consent,auditExport}.test.ts` ·
   `docs/plans/{PHASE2_SETUP,ADMIN_CONTROL_CENTER_BUILD_PLAN}.md` · `docs/areas/LEGAL-ADMIN.md` ·
   `docs/PROJECT_STATUS.md` · `docs/PROJECT_FOUNDATION.md` · this log · PRs #669, #670, #672
+
+## Session 157 — 2026-07-24 — Documentation maintenance audit (branch `claude/docs-maintenance-audit-8pbhx3`)
+
+- **Prompt 1 (verbatim, 2026-07-24 ~11:30 UTC):** `do a documentation maintenance audit and report any priority actions. You are allowed to also say it's currently very good and no actions needed if that's the case as some of the documents were recently optimized` →
+  Read-only audit of the whole docs system against its own rules (line budgets, rotation policy,
+  two-handoff rule, cross-references, COMMANDS.md vs `package.json`, archive integrity). Overall
+  verdict: healthy; the s155 restructure and prior optimization passes are holding. Report delivered
+  with 4 priority actions + 2 minor ones, no fixes applied (report-only request):
+  P1 rotate `SESSION_PROMPT_LOG.md` (1,573 lines vs the ~1,200 budget; 24 sessions live vs
+  "current + ~5"; needs a new W30 prompt-log archive file + index row). P2 `docs/README.md` missed
+  the s155 restructure (no `docs/areas/` in the folder map or catalog, no `/design`+`/content`
+  skills, outdated CLAUDE.md row description). P3 five stale pointers in live docs to CLAUDE.md
+  sections that moved to `docs/areas/` (PROJECT_FOUNDATION.md "Brand logo", PROJECT_REFERENCE.md
+  "Mobile bottom tab bar" + "Brand logo", DECISIONS.md Bibliothek section + "Schreiben hub").
+  P4 `pnpm check:contrast` is a CI gate in `validate.yml` but absent from the CLAUDE.md command
+  index and `docs/areas/COMMANDS.md`; `check:refs` also undocumented. Minor: the W30 row in
+  `archive/PROJECT_STATUS_ARCHIVE.md` says "135, 138-143" but the chunk actually holds 135-154
+  (verified complete, nothing lost); the archive-pointer paragraph at the end of
+  `PROJECT_STATUS.md` duplicates the archive index and could shrink to a two-line pointer.
+  Verified healthy: CLAUDE.md 178/~350 lines, PROJECT_STATUS.md 178/~250 with exactly the two
+  most recent handoffs (s156+s155), dated content counts, append-only logs intact through s156.
+- **Artifacts (session 157):** this log (audit report delivered in chat; fixes await founder go-ahead)
