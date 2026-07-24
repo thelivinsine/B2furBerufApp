@@ -4,7 +4,7 @@ _Last updated: 2026-07-24 (session 158). **Nav-icon family harmonization (founde
 Praktisch = Wegweiser, Bibliothek = Buch mit Lesezeichen, Schreiben = Federspitze (accent rose → brand
 blue), Fortschritt = Fortschrittsring; the dashboard toggle is now "Trainieren" with the Dumbbell; and
 Fortschritt is pinned directly left of Einstellungen in the bottom bar for all users. Prior s159:
-Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv; founder must redeploy `transform-sentence`).
+Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv; `transform-sentence` redeployed 2026-07-24, live).
 Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -104,9 +104,10 @@ artifact (daa4dbb6). Then built the "easy half":
   real Zustandspassiv sentence. The copula safeguard (misread "Ich bin krank" -> aktiv) stays in the
   check-sentence prompt.
 - **Edge function:** `transform-sentence` prompt gained K-II (synthetic-vs-wuerde) + Vorgang-vs-Zustand
-  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder must redeploy `transform-sentence`** for the
-  better output; the pills already work against the live function (its enums already accept
-  konjunktiv2 / passiv_zustand as targets).
+  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder redeployed `transform-sentence` on 2026-07-24**
+  via the Supabase dashboard code editor (single self-contained file, no local clone / CLI needed), so
+  the improved output is live. The pills also worked before that against the live function (its enums
+  already accept konjunktiv2 / passiv_zustand as targets).
 - **Copy:** rail legend simplified to "Gruener Punkt = dein Satz." / "Tippe eine andere Form, um ihn
   umzuwandeln."
 - **Held (operation-style, need a NEW edge-function contract, not the tuple):** Register (Sie<->du),
