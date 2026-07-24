@@ -1509,7 +1509,7 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   a `/content` skill for the authoring workflow; add a maintenance rule + a warn-only linter
   ratchet so it never regrows. Estimated ~28k tokens saved per session.
 - **Prompt 3 (verbatim):** `yes go ahead` →
-  **PR #669.** Executed the restructure: CLAUDE.md rewritten to ~180 lines (identity + maintenance
+  **PR #671.** Executed the restructure: CLAUDE.md rewritten to ~180 lines (identity + maintenance
   rule + stack + command index + layout map + hard invariants + design-prefs summary + writing
   style + area index + deployment + workflow + roadmap pointers). New `docs/areas/` files
   (COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN, PRAKTISCH-NAV, GAME, BRAND, LEGAL-ADMIN,
@@ -1519,4 +1519,4 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `pnpm lint:content` green.
 - **Artifacts (session 155, part 2):** `CLAUDE.md` · `docs/areas/*.md` (10 files) ·
   `.claude/skills/content/SKILL.md` · `.claude/skills/design/SKILL.md` ·
-  `scripts/lint-content.mjs` · `docs/PROJECT_STATUS.md` · this log · PR #669
+  `scripts/lint-content.mjs` · `docs/PROJECT_STATUS.md` · this log · PR #671
