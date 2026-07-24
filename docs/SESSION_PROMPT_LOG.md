@@ -637,9 +637,15 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   kept as a **mobile-only** (`lg:hidden`) fallback so phone founders don't lose access. Verified the row
   against a real-token sidebar mock (screenshot). Gates: typecheck · lint (0 errors) · build ·
   check:bundle 117.0 kB.
+- **Prompt 8 (verbatim, 2026-07-24):** `document the session` →
+  Prompt 7 (the admin-nav move) was already documented inline (Session-164 log entry +
+  `docs/areas/LEGAL-ADMIN.md` shell note) and shipped in PR #701. This pass logged prompt 8, completed
+  the artifacts list with the follow-up PRs (#700 docs, #701 nav move), and added the nav move to the
+  PROJECT_STATUS s164 handoff. Shipped as a small follow-up PR (branch restarted from latest `main`).
 - **Artifacts (session 164):** `src/features/legal/useWorkbench.ts` (new) · `src/features/legal/AdminWorkbench.tsx` ·
   `src/features/admin/Pruefmodus.tsx` · `src/features/legal/Sources.tsx` · `src/router.tsx` ·
   `tests/adminWorkbench.test.tsx` · `src/data/provenance.ts` + `docs/reports/verified-hashes.json` +
   `docs/reports/review-defects.*` · `preview/control-center-review.html` · `src/components/layout/Sidebar.tsx` ·
   `src/features/auth/AccountMenu.tsx` · `docs/DECISIONS.md` · `docs/areas/LEGAL-ADMIN.md` · `CLAUDE.md` ·
-  `docs/PROJECT_STATUS.md` · this log · commits `85b2586`, `5188af2`, `8d33612` · PR #697 (merged `24aa20b`)
+  `docs/PROJECT_STATUS.md` · this log · commits `85b2586`, `5188af2`, `8d33612` · PRs #697 (merged `24aa20b`),
+  #700 (docs, merged `7792de2`), #701 (nav move, merged `a25c115`)
