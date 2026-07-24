@@ -211,11 +211,17 @@ export function FokusTrainer({
                     <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-accent-ink">
                       {c.category}
                     </span>
-                    <span className="text-sm">
-                      <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
-                      <span className="text-muted-foreground/80">→</span>{" "}
-                      <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
-                    </span>
+                    {c.moved ? (
+                      // A word that only moved: show it once (no struck "before"),
+                      // the eyebrow already says it was a word-order fix.
+                      <span className="text-sm font-bold text-success">{c.to}</span>
+                    ) : (
+                      <span className="text-sm">
+                        <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
+                        <span className="text-muted-foreground/80">→</span>{" "}
+                        <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
+                      </span>
+                    )}
                   </div>
                 ))}
                 <Button

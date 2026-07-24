@@ -539,3 +539,30 @@ Founder reviewed individual session cards from screenshots; each turn diagnosed 
   s161 handoffs kept). Wrapped the session: docs PR #694 opened + squash-merged into `main`, branch
   realigned. First merge under the new ruleset doubles as the proof it doesn't block auto-ship.
 - **Artifacts (session 162):** `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_STATUS.md` · this log
+
+## Session 163 — 2026-07-24 — Fokus correction: collapse moved words; Genus-Verbi wrap explained (branch `claude/disclaimer-text-layout-5zq5g0`)
+_(Numbered 163 to avoid colliding with the concurrent branch-protection session that also used 162.)_
+- **Prompt 1 (verbatim, + screenshot of the Grammatik rail):** `why is zustandpassiv pill in a new line and not next to passiv pill? looks like there's enough space there.` →
+  Reproduced the exact pill markup at real widths (`preview/genus-verbi-wrap.html`, screenshot):
+  the pills are a plain `flex flex-wrap` row (`GrammarRail.tsx`), so it's a genuine width wrap. On
+  the 256px desktop rail the three compact pills are slightly too wide, so "Zustandspassiv" drops to
+  line 2 (the gap after "Passiv" is ~135px; the pill needs ~160px). Fits on one line from ~360px
+  phones up. Founder chose to LEAVE it (honest wrapping, not a bug).
+- **Prompt 2 (verbatim, + screenshot of a correction showing "heute" removed AND added):** `here's a mistake by ai` →
+  Traced it: NOT an AI error. The corrected sentence is right; the fix tiles are computed
+  client-side by `wordDiff.ts` (LCS), which represents a MOVED word ("heute") as a pure deletion in
+  its old slot + a pure insertion in its new slot, reading as a contradictory remove+add. Fixed:
+  `collapseMoves()` pairs a same-word deletion/insertion into ONE `{category:"Wortstellung", moved:true}`
+  change at the earlier slot; `FokusTrainer` renders a `moved` change as the word once (green, no
+  strike/arrow) under the WORTSTELLUNG eyebrow. Added two `wordDiff.test.ts` cases (move collapses;
+  a real del+ins of different words does not). Gates: typecheck · build · lint (0 errors) ·
+  test:unit (wordDiff + fokusGrammar green). Shipped in PR #695.
+- **Prompt 3 (verbatim):** `For the ai generated box, can you include a nochmal/wieder probieren button so that the user can regenerate a response from AI for the same selected grammar elements in the grammar rail?` →
+  Reported back before building: transforms are GLOBALLY cached in the `transform-sentence` edge
+  function (keyed on source|tuple|prompt_version|model) by deliberate cost-first design, so a client
+  regenerate would return the identical cached sentence (button looks broken). A real regenerate
+  needs an edge-function change (bypass cache + add variation) + a founder redeploy + accepting a
+  small paid AI call per click. Surfaced the tradeoff for a decision (see chat).
+- **Artifacts (session 163):** `src/lib/wordDiff.ts` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `tests/wordDiff.test.ts` · `preview/genus-verbi-wrap.html` · `docs/PROJECT_STATUS.md` · this log ·
+  PR #695

@@ -20,6 +20,9 @@ export interface DiffChange {
   to: string;
   /** A coarse, heuristic error category shown as the fix tile's eyebrow. */
   category: string;
+  /** True when this change is a word that was only MOVED, not altered (a word-
+   *  order fix). The UI shows the word once instead of a from → to pair. */
+  moved?: boolean;
 }
 
 function tokenize(s: string): string[] {
@@ -55,6 +58,56 @@ export function classifyChange(from: string, to: string): string {
   if (nf === nt) return "Groß-/Kleinschreibung";
   if (deUmlaut(nf) === deUmlaut(nt)) return "Umlaut";
   return "Rechtschreibung";
+}
+
+/**
+ * A word that is only REORDERED shows up in the LCS diff as a pure deletion in
+ * its old slot AND a pure insertion in its new slot, so the fix list reads as a
+ * contradictory "remove heute" + "add heute". Collapse each same-word
+ * deletion/insertion pair into ONE "Wortstellung" (word-order) change, placed at
+ * the earlier of the two positions, keeping the corrected spelling.
+ */
+function collapseMoves(changes: DiffChange[]): DiffChange[] {
+  const single = (s: string) => {
+    const t = s.trim();
+    return t !== "" && !/\s/.test(t);
+  };
+  const isDel = (c: DiffChange) => c.to.trim() === "" && single(c.from);
+  const isIns = (c: DiffChange) => c.from.trim() === "" && single(c.to);
+
+  // index -> the merged Wortstellung change (at the earlier slot) or null (drop).
+  const resolved = new Map<number, DiffChange | null>();
+  const usedIns = new Set<number>();
+  for (let i = 0; i < changes.length; i++) {
+    if (!isDel(changes[i]) || resolved.has(i)) continue;
+    const word = normWord(changes[i].from);
+    let k = -1;
+    for (let j = 0; j < changes.length; j++) {
+      if (usedIns.has(j) || j === i || !isIns(changes[j])) continue;
+      if (normWord(changes[j].to) === word) {
+        k = j;
+        break;
+      }
+    }
+    if (k < 0) continue;
+    usedIns.add(k);
+    const label = changes[k].to; // the corrected spelling of the moved word
+    const lo = Math.min(i, k);
+    const hi = Math.max(i, k);
+    resolved.set(lo, { from: label, to: label, category: "Wortstellung", moved: true });
+    resolved.set(hi, null);
+  }
+  if (resolved.size === 0) return changes;
+  const out: DiffChange[] = [];
+  for (let i = 0; i < changes.length; i++) {
+    if (resolved.has(i)) {
+      const merged = resolved.get(i);
+      if (merged) out.push(merged);
+    } else {
+      out.push(changes[i]);
+    }
+  }
+  return out;
 }
 
 export function diffWords(
@@ -127,5 +180,5 @@ export function diffWords(
   }
   flush();
 
-  return { tokens, originalTokens, changes };
+  return { tokens, originalTokens, changes: collapseMoves(changes) };
 }

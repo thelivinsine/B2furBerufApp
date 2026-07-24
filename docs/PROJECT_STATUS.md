@@ -1,11 +1,10 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 162). **`main` branch protection enabled:** the founder created
-a GitHub ruleset on the default branch (restrict deletions + block force pushes, no required
-approvals or status checks, so the auto-ship squash-merge flow is unaffected; record in
-`PROJECT_FOUNDATION.md` → Deploy / infra guardrails). Docs-only session, no product changes.
-Prior s161: quiz-quality pass on the composed session (same-stem plural questions + typed variant,
-odd-one-out ambiguity guard, loot-card recolor). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 163). **Fokus correction fix:** a word that was only reordered no
+longer shows as a contradictory "remove X" + "add X"; the client-side word-diff now collapses it into
+one "Wortstellung" (word-order) fix (PR #695). Prior s162 (concurrent): `main` branch protection
+ruleset enabled (restrict deletions + block force pushes, no required approvals, so auto-ship is
+unaffected; see `PROJECT_FOUNDATION.md`). Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -69,51 +68,6 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 160 (2026-07-24). Schreiben KI-Hinweis relocated (Fokus + Kurz/Lang) +
-"Feedback" label shortened app-wide, branch `claude/disclaimer-text-layout-5zq5g0`.** A small
-preview-first Schreiben tweak. The founder wanted the combined Art. 50 disclaimer off its
-centered-in-flow spot and onto the same line as the floating Feedback affordance. First round put
-both in a bordered bottom bar; the founder corrected: keep the floating pill exactly as-is, just
-drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shortened the pill label.
-- **Desktop (`FokusTrainer.tsx` `aiNoteDesktop`):** the `FeedbackPill` (`fixed bottom-4`, AppShell) is
-  untouched; the note is now a `fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64` element that
-  mirrors the pill's `max-w-6xl` + `sm:px-6` container, capped `max-w-[calc(100%-18rem)]` so its right
-  edge clears the pill. Wrapper is `pointer-events-none`, only the `/privacy` link is clickable, so it
-  never blocks the cards it floats over. Full sentence kept (founder pick).
-- **Mobile:** the action bar lost its `border-t`/`bg-background/90`/`backdrop-blur` chrome; the
-  `FeedbackIconButton` (imported from `components/layout/FeedbackButton`) floats beside the flex-1
-  Korrigieren button, with a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line centered below.
-  Both the buttons and the mobile note are pre-correction only (shared `m.status !== "corrected"`
-  guard); the desktop fixed note always shows on the Fokus tab.
-- **Kurz/Lang parity (follow-up prompt, same session):** `GuidedWritingTrainer.tsx` got the SAME
-  treatment. Its inline disclaimer `<p>` was removed from `content`; it now has its own copy of the
-  fixed `aiNoteDesktop` (Kurz/Lang wording) and a reworked chrome-less mobile action bar where the
-  `FeedbackIconButton` floats beside Auswerten (and Neu schreiben after a result) with the condensed
-  note beneath. Only one trainer renders per `/writing` tab, so the two fixed notes never coexist.
-- **Feedback label shortened app-wide (same follow-up):** "Mit KI gebaut · Feedback" → **"Feedback"**
-  in `FeedbackButton.tsx` (`FeedbackPill` default label, `FeedbackFullButton` text, `FeedbackIconButton`
-  aria/title) and the `AdminSteuerung` label placeholder. Remote-config `feedback.label` still
-  overrides the pill. `MessageSquareText`/`Sparkles` icons unchanged.
-- **Preview:** `preview/fokus-disclaimer-inline.html` (real tokens, r3 shows the "Feedback" label +
-  the Fokus/Kurz-Lang note), screenshot-verified in headless Chromium. Could NOT live-verify (unauth
-  `/writing` redirects to the landing page); founder verifies live. Docs: `docs/areas/SCHREIBEN.md`
-  + `docs/areas/PRAKTISCH-NAV.md` updated.
-- **Later follow-ups (same session, separate PRs):**
-  - **Speaker-button alignment (#690, `e30395f`):** the first column of the three Bibliothek
-    `DataTable`s (`RedemittelViews` "Wendung", `CollocationViews` "Kollokation", `VocabViews` "Wort")
-    put the `SpeakButton` right after the German text, so it landed at a different x per row. Fixed:
-    `min-w-0` text span + `ml-auto shrink-0` on the SpeakButton (+ `shrink-0` on the Wörter gender
-    glyph) → all speaker buttons right-align to the column edge. Mockup: `preview/speaker-align.html`.
-  - **Disclaimer re-centered (#692, `894af07`):** the bottom-line `aiNoteDesktop` had lost the
-    original note's `text-center`, so it read left-aligned; restored `text-center` on both trainers'
-    `<p>` (it already spans the content-column width, so it centers under the box while the fixed
-    `bottom-4` line with the Feedback pill is untouched).
-- **Gates (each PR):** typecheck · build · lint (0 errors) · check:bundle **116.8 kB**, all green.
-- **Shipped:** PRs #688 (`4cbf0fe`), #689 (docs), #690 (`e30395f`), #692 (`894af07`) all
-  squash-merged to `main`, Pages deploys triggered. Decision recorded in `docs/DECISIONS.md`; the
-  `design` skill §2.6 now carries the Schreiben disclaimer-placement exception so a future session
-  doesn't re-center it.
-- **Next:** nothing pending. Founder verifies the live result (PWA: hard-refresh past a stale SW).
 **Handoff after session 161 (2026-07-24). Quiz-quality pass on the composed session, branch
 `claude/word-verification-nl4m26`, PR #687 (content) + PR #691 (engine/loot).** Started
 from founder screenshots of individual session cards; each turn diagnosed one exercise type and fixed it:
@@ -143,6 +97,23 @@ from founder screenshots of individual session cards; each turn diagnosed one ex
 - **Next:** nothing pending. Held ideas from the discussion: odd-one-out option 3 (make it rarer /
   reserve for cleanly separable clusters) if the type still feels fuzzy; a "type it" plural could gain
   an "almost" partial-credit tier if strict grading feels harsh.
+
+**Handoff after session 163 (2026-07-24). Fokus correction: collapse a moved word into one
+Wortstellung fix, branch `claude/disclaimer-text-layout-5zq5g0`, PR #695.** Numbered 163 (a
+concurrent branch-protection session already took 162). Two founder screenshots of the Fokus screen:
+- **"here's a mistake by ai" — not an AI error.** The corrected sentence was right; the fix tiles
+  are a client-side LCS word-diff (`wordDiff.ts`) that rendered a *moved* word ("heute") as a pure
+  deletion in its old slot + a pure insertion in its new slot, reading as a contradictory remove+add.
+  `collapseMoves()` now pairs a same-word del/ins into ONE `{category:"Wortstellung", moved:true}`
+  change; `FokusTrainer` renders a moved change as the word once (green, no strike/arrow). Two new
+  `wordDiff.test.ts` cases. Gates green; shipped PR #695.
+- **"why does Zustandspassiv wrap" — left as-is (founder decision).** Genuine width wrap on the
+  256px desktop rail (reproduced in `preview/genus-verbi-wrap.html`); not a bug, no change.
+- **OPEN (awaiting founder decision): a "Nochmal"/regenerate button on the transform box.** Blocked
+  on design intent: `transform-sentence` is GLOBALLY cached (source|tuple|prompt_version|model) by
+  cost-first design, so a client-only regenerate returns the identical sentence. A real one needs an
+  edge-function change (cache-bypass + variation) + a founder redeploy + a small paid AI call per
+  click. Surfaced the tradeoff; not yet built.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
