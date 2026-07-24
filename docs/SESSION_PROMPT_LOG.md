@@ -372,3 +372,11 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   own artifact); bars already show Wegweiser + Feder E; current stack as reference + **M**
   Aufgeschlagenes Buch · **N** Bücherregal · **O** Bibliotheksgebäude · **P** Buch mit Lesezeichen,
   all Nachtblau/Neon-Cyan. Awaiting pick (M-P, or keep the stack).
+- **Prompt 5 (verbatim, 2026-07-24 ~12:35 UTC):** `I like P. Now previews for the fortschritt` →
+  **Bibliothek decision recorded: variant P (Buch mit Lesezeichen)**, implementation still held with
+  the other picks. Fortschritt preview round built: `preview/fortschritt-icon-vorschlaege.html`
+  (screenshot-verified; delivered as a rendered file after the founder declined the artifact
+  publish). Bars already show all picks (Wegweiser I, Buch P, Feder E); current bar chart kept as
+  reference + 4 proposals in Himmelblau/Neon-Cyan: **Q** Kurve (rising trend line + neon endpoint) ·
+  **R** Gipfel (mountain + cyan summit flag) · **S** Ring (progress ring + neon endpoint) ·
+  **T** Pokal (trophy + cyan base). Awaiting pick (Q-T, or keep the bars).
