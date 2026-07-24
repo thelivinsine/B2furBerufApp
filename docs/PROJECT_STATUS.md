@@ -1,16 +1,21 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 157). **Documentation maintenance pass.** Audit of the whole
-docs system (report-only prompt 1, fixes approved prompt 3): rotated the prompt log (s133-151 →
-the W29/W30 chunks under `docs/archive/prompt-log/`, live file back under budget), refreshed
-`docs/README.md` for the s155 `docs/areas/` restructure, fixed five stale CLAUDE.md section
-pointers in live docs, documented `check:contrast` (CI gate) + `check:refs` + the oracle-subset
-scripts in `docs/areas/COMMANDS.md` and the CLAUDE.md index, corrected the W30 status-archive
-index row (135-154), shrank this file's tail archive blob to a two-line pointer, and added a thin
-router `AGENTS.md` (no rules of its own; points other coding agents at CLAUDE.md → docs/areas/ →
-the skills). Prior s156: admin control center completed to plan (chunks 1-12); only Phase 3
-(13-16) remains, on demand. Founder action from s156 still open: run migration 0010 + redeploy
-`delete-account` (`PHASE2_SETUP.md` §5). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 159). **Fokus "Satzlabor" Wave 2: Konjunktiv II + Zustandspassiv**
+(from a grammar-dimensions brainstorm, `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`; PR #678). The
+Fokus grammar rail now has three combinable axes: **Genus Verbi** (Aktiv · Passiv · Zustandspassiv),
+**Zeitform** (Präsens · Perfekt · Präteritum) and **Modus** (Indikativ · Konjunktiv II). `mood` was
+promoted from the pinned `DEFAULT_MOOD` to a real axis; Zustandspassiv is its own Genus-Verbi pill (a
+detected `passiv_zustand` maps straight to it; the copula-is-Aktiv safeguard stays in the check-sentence
+prompt). The rail is data-driven, so both were data/wiring adds; the `transform-sentence` prompt gained
+Konjunktiv-II (synthetic-vs-würde, no würde in the wenn-clause) + Vorgang-vs-Zustand rules,
+**`PROMPT_VERSION` 2 → 4** (cache invalidation). Green-dot legend simplified to "Grüner Punkt = dein
+Satz." Operation-style transforms (Register Sie↔du, Satzbau HS↔NS) stay a later wave (they need a new
+edge-function operation contract, not the tuple). **Founder action: redeploy `transform-sentence`**
+(now `PROMPT_VERSION=4`) so the improved K-II / Zustandspassiv output takes effect; the pills already
+work against the live function without it. Prior s157 doc-maintenance pass + the s156 admin control
+center (chunks 1-12 complete; Phase 3 13-16 on demand) still stand; s156 founder action still open: run
+migration 0010 + redeploy `delete-account` (`PHASE2_SETUP.md` §5). Product name: **Genauly**
+(`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -74,33 +79,34 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 156 (2026-07-24). Admin chunk 11 (Turnstile) completion + chunk 12
-(compliance pack), branch `claude/admin-page-access-ok8g52`.** Continued the admin control center to
-the end of its plan. Two parts:
-- **Chunk 11 · Turnstile (PRs #669/#670).** Most of chunk 11 already existed (the widget +
-  auth-store `captchaToken` integration + the feedback burst/hourly email caps). Diagnosed a
-  half-configured state: CAPTCHA was on in Supabase Auth but the `VITE_TURNSTILE_SITE_KEY` GitHub
-  secret was unset, so the client sent no token and Supabase rejected guest/email sign-in (Google/OAuth
-  is not captcha-gated, which masked it). Founder set the GitHub secret; a fresh deploy made it live;
-  founder verified live sign-in. Code: the `AdminSystem` "Gast-Konten" tile now reads the real
-  `TURNSTILE_ENABLED` flag (was a hardcoded "still off (chunk 11)" label) and the Launch note states
-  both sides are required. Docs: Turnstile marked done in `PROJECT_FOUNDATION.md` completed-setup.
-- **Chunk 12 · Compliance pack (PR #672).** §G2 consent-drift gate: one canonical legal date in
-  `src/lib/legalMeta.ts` (rendered by PrivacyPolicy, compared to `CONSENT_VERSION`); `consentInSync()`
-  + `tests/consent.test.ts` fail CI on drift; the Launch screen shows a red warning instead of the old
-  static note. §G3 auditor export: `src/lib/auditExport.ts` builds the provenance register CSV + a
-  Markdown summary (tiers, review status, licences, verification links, sampling guide) behind one
-  Launch button; reuses `csv.ts` (+ `downloadText`); no new eager weight; pinned by
-  `tests/auditExport.test.ts`. §G4 GDPR ops evidence: **migration 0010** adds a content-free
-  `gdpr_events` table (kind + timestamp, no user id) + `log_gdpr_event()` + founder-only
-  `admin_gdpr_evidence()` RPC (counts + last timestamps + pg_cron retention probe); `delete-account`
-  logs erasures, `exportUserData` logs exports; the Launch panel shows counters, fail-soft to
-  "run migration 0010".
-- **Founder action (chunk 12 §G4 only):** run `supabase/migrations/0010_gdpr_evidence.sql` +
-  `supabase functions deploy delete-account` (`PHASE2_SETUP.md` §5). G2/G3 work without it.
-- **Admin center status:** chunks **1-12 done** (whole MVP + Phase 2). Only Phase 3 (13-16) remains,
-  on demand. Gates for chunk 12: typecheck · build · check:bundle 116.8 kB · lint 0 errors ·
-  test:unit **289/289**.
+**Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
+branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
+grammar-dimensions brainstorm (four research agents) -> `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`
+(dimension catalog, feasibility tiers, B2-marker ranking, guardrails, Now/Next/Later/Skip roadmap) +
+two previews (`preview/grammar-dimensions-satzlabor.html`, `-catalog.html`) + a combined claude.ai
+artifact (daa4dbb6). Then built the "easy half":
+- **Konjunktiv II** as a new **Modus** rail axis: `mood` promoted from the pinned `DEFAULT_MOOD` to a
+  real, combinable axis across `grammarDimensions.ts` / `useFokusMachine.ts` / `GrammarRail.tsx` /
+  `FokusTrainer.tsx` (rail is data-driven, so the Modus section renders itself).
+- **Zustandspassiv** as a third Genus-Verbi pill (data-only value add): a detected `passiv_zustand`
+  now maps to its own pill instead of null; also fixed a phantom "Aktiv looks selected" quirk on a
+  real Zustandspassiv sentence. The copula safeguard (misread "Ich bin krank" -> aktiv) stays in the
+  check-sentence prompt.
+- **Edge function:** `transform-sentence` prompt gained K-II (synthetic-vs-wuerde) + Vorgang-vs-Zustand
+  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder must redeploy `transform-sentence`** for the
+  better output; the pills already work against the live function (its enums already accept
+  konjunktiv2 / passiv_zustand as targets).
+- **Copy:** rail legend simplified to "Gruener Punkt = dein Satz." / "Tippe eine andere Form, um ihn
+  umzuwandeln."
+- **Held (operation-style, need a NEW edge-function contract, not the tuple):** Register (Sie<->du),
+  Satzbau (HS<->NS), Nominalstil, Relativ<->Partizip. Plusquamperfekt deferred (needs a temporal
+  anchor). Roadmap: brainstorm-doc section 6.1.
+- **Merge note:** `main` force-advanced 10 commits (CLAUDE.md restructure #671, prompt-log rotation,
+  sessions 155-158) while this branch was open; merged it in - code auto-merged (mood/copy edits +
+  main's cosmetic tweaks both intact), the 4 doc conflicts resolved to main's new structure and the
+  docs re-applied against it (this handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, prompt-log s159).
+- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build / check:bundle **112 kB** /
+  lint:content. Edge function is Deno (not deployed from the sandbox).
 
 **Handoff after session 157 (2026-07-24). Documentation maintenance audit + fixes + AGENTS.md,
 branch `claude/docs-maintenance-audit-8pbhx3`.** Read-only audit first (report delivered, verdict:

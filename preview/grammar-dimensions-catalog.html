@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satzlabor · Bauplan der Umformungen (Preview)</title>
+<style>
+  :root{
+    --background:180 45% 98%; --foreground:252 16% 12%; --surface:0 0% 100%;
+    --muted:220 10% 90%; --muted-foreground:220 8% 36%; --border:220 9% 86%;
+    --primary:221 83% 54%; --primary-foreground:0 0% 100%;
+    --accent:197 93% 77%; --accent-ink:198 90% 32%;
+    --success:153 55% 40%; --warning:38 92% 46%; --danger:4 73% 56%; --reward:11 82% 54%;
+    --shadow:221 40% 22%;
+    --page-from:144 45% 98%; --page-mid:150 50% 98%; --page-to:198 83% 98%;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Inter Variable","Inter",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:hsl(var(--foreground));-webkit-font-smoothing:antialiased;line-height:1.5;
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary)/0.10) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent)/0.09) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(var(--page-from)) 0%, hsl(var(--page-mid)) 38%, hsl(var(--page-to)) 100%);
+    min-height:100vh;padding:48px 22px;
+  }
+  .wrap{max-width:760px;margin:0 auto}
+
+  header{margin-bottom:8px}
+  .eyebrow{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:hsl(var(--accent-ink))}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.02em;margin-top:8px;text-wrap:balance}
+  .lede{color:hsl(var(--muted-foreground));font-size:15.5px;margin-top:10px;max-width:60ch}
+  .callout{margin-top:16px;display:flex;gap:10px;align-items:flex-start;background:hsl(var(--surface));border:1px solid hsl(var(--border));border-left:3px solid hsl(var(--primary));border-radius:10px;padding:12px 14px;font-size:13.5px;color:hsl(var(--muted-foreground))}
+  .callout b{color:hsl(var(--foreground))}
+
+  section{margin-top:34px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+  .sec-dot{width:11px;height:11px;border-radius:999px;flex:0 0 auto}
+  .sec-title{font-size:19px;font-weight:800;letter-spacing:-.01em}
+  .sec-sub{font-size:13.5px;color:hsl(var(--muted-foreground));margin:2px 0 14px 23px}
+
+  ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  li{background:hsl(var(--surface));border:1px solid hsl(var(--border));border-radius:12px;padding:13px 16px;
+     display:grid;grid-template-columns:1fr auto;gap:4px 14px;align-items:center;
+     box-shadow:0 1px 2px hsl(var(--shadow)/0.04)}
+  .name{font-size:15px;font-weight:700;grid-column:1;line-height:1.3}
+  .tag{grid-column:2;grid-row:1 / span 2;justify-self:end;align-self:center;
+       font-size:11px;font-weight:700;border-radius:999px;padding:4px 11px;white-space:nowrap;border:1px solid}
+  .ex{grid-column:1;font-size:13.5px;color:hsl(var(--muted-foreground))}
+  .ex .a{color:hsl(var(--foreground));font-weight:600}
+  .ex .ar{color:hsl(var(--primary));font-weight:800;margin:0 6px}
+
+  /* effort / status tags in plain language */
+  .t-live{color:hsl(var(--success));border-color:hsl(var(--success)/.4);background:hsl(var(--success)/.10)}
+  .t-built{color:hsl(var(--primary));border-color:hsl(var(--primary)/.45);background:hsl(var(--primary)/.10)}
+  .t-easy{color:hsl(var(--success));border-color:hsl(var(--success)/.4);background:hsl(var(--success)/.08)}
+  .t-work{color:hsl(var(--warning));border-color:hsl(var(--warning)/.5);background:hsl(var(--warning)/.12)}
+  .t-later{color:hsl(var(--muted-foreground));border-color:hsl(var(--border));background:hsl(var(--muted))}
+  .t-skip{color:hsl(var(--muted-foreground));border-color:hsl(var(--border));background:transparent}
+  li.dim{opacity:.72}
+
+  footer{margin-top:36px;padding-top:16px;border-top:1px solid hsl(var(--border));font-size:13px;color:hsl(var(--muted-foreground));line-height:1.6}
+  footer b{color:hsl(var(--foreground))}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Satzlabor · Bauplan</div>
+    <h1>Was das Satzlabor als Nächstes können soll</h1>
+    <p class="lede">Ein Überblick für die Entscheidung, welche Umformungen sich zu bauen lohnen. Das hier ist
+    kein App-Bildschirm, sondern eine Planungsseite für dich.</p>
+    <div class="callout">
+      <span><b>So liest du die Seite:</b> von oben nach unten wird es unwichtiger. „Jetzt live" ist fertig,
+      „Als Nächstes" lohnt sich zuerst, „Später" kommt danach, „Nicht geplant" lassen wir bewusst weg. Die
+      Marke rechts sagt, wie viel Arbeit dahintersteckt.</span>
+    </div>
+  </header>
+
+  <!-- LIVE -->
+  <section>
+    <div class="sec-head"><span class="sec-dot" style="background:hsl(var(--success))"></span><span class="sec-title">Jetzt live</span></div>
+    <p class="sec-sub">Fertig und im Einsatz.</p>
+    <ul>
+      <li>
+        <span class="name">Aktiv ↔ Passiv</span>
+        <span class="ex"><span class="a">Der Techniker prüft die Rechnung.</span><span class="ar">→</span><span class="a">Die Rechnung wird geprüft.</span></span>
+        <span class="tag t-live">live</span>
+      </li>
+      <li>
+        <span class="name">Zeitform (Präsens, Perfekt, Präteritum)</span>
+        <span class="ex"><span class="a">Ich gehe zum Arzt.</span><span class="ar">→</span><span class="a">Ich bin zum Arzt gegangen.</span></span>
+        <span class="tag t-live">live</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- NEXT -->
+  <section>
+    <div class="sec-head"><span class="sec-dot" style="background:hsl(var(--primary))"></span><span class="sec-title">Als Nächstes</span></div>
+    <p class="sec-sub">Größter Nutzen fürs B2-Niveau, überschaubarer Aufwand.</p>
+    <ul>
+      <li>
+        <span class="name">Höfliche Form (Konjunktiv II)</span>
+        <span class="ex"><span class="a">Schicken Sie mir die Unterlagen.</span><span class="ar">→</span><span class="a">Könnten Sie mir die Unterlagen schicken?</span></span>
+        <span class="tag t-built">gerade gebaut</span>
+      </li>
+      <li>
+        <span class="name">Zustandspassiv (Ergebnis statt Vorgang)</span>
+        <span class="ex"><span class="a">Man öffnet das Geschäft.</span><span class="ar">→</span><span class="a">Das Geschäft ist geöffnet.</span></span>
+        <span class="tag t-built">gerade gebaut</span>
+      </li>
+      <li>
+        <span class="name">Register: du ↔ Sie (locker ↔ formell)</span>
+        <span class="ex"><span class="a">Kannst du mir sagen, warum …</span><span class="ar">→</span><span class="a">Könnten Sie mir mitteilen, aus welchem Grund …</span></span>
+        <span class="tag t-work">Backend nötig</span>
+      </li>
+      <li>
+        <span class="name">Satzbau: zwei Sätze ↔ ein Nebensatz</span>
+        <span class="ex"><span class="a">Das Projekt war teuer. Trotzdem …</span><span class="ar">→</span><span class="a">Obwohl das Projekt teuer war, …</span></span>
+        <span class="tag t-work">Backend nötig</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- LATER -->
+  <section>
+    <div class="sec-head"><span class="sec-dot" style="background:hsl(var(--accent-ink))"></span><span class="sec-title">Später</span></div>
+    <p class="sec-sub">Wertvoll, aber anspruchsvoller. Kommt, wenn die Bewertung dafür ausgereift ist.</p>
+    <ul>
+      <li>
+        <span class="name">Nominalstil (Amts- und Berichtssprache)</span>
+        <span class="ex"><span class="a">Weil der Zug verspätet war, …</span><span class="ar">→</span><span class="a">Wegen der Verspätung des Zuges …</span></span>
+        <span class="tag t-later">später</span>
+      </li>
+      <li>
+        <span class="name">Relativsatz ↔ Partizip (verdichten)</span>
+        <span class="ex"><span class="a">Die Studie, die veröffentlicht wurde, …</span><span class="ar">→</span><span class="a">Die veröffentlichte Studie …</span></span>
+        <span class="tag t-later">später</span>
+      </li>
+      <li>
+        <span class="name">Infinitiv: damit ↔ um … zu</span>
+        <span class="ex"><span class="a">… damit ich einen Termin bekomme.</span><span class="ar">→</span><span class="a">… um einen Termin zu bekommen.</span></span>
+        <span class="tag t-later">später</span>
+      </li>
+      <li>
+        <span class="name">Bedingung: wenn ↔ falls / Sollten Sie …</span>
+        <span class="ex"><span class="a">Wenn Sie Fragen haben, …</span><span class="ar">→</span><span class="a">Sollten Sie Fragen haben, …</span></span>
+        <span class="tag t-later">später</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- SKIP -->
+  <section>
+    <div class="sec-head"><span class="sec-dot" style="background:hsl(var(--muted-foreground))"></span><span class="sec-title">Nicht geplant</span></div>
+    <p class="sec-sub">Bewusst weggelassen. Statt eines Knopfes verlinken wir hier lieber in die Grammatiklektion.</p>
+    <ul>
+      <li class="dim">
+        <span class="name">Indirekte Rede</span>
+        <span class="ex">Zu viele richtige Lösungen, als Knopf schnell verwirrend.</span>
+        <span class="tag t-skip">nur Lektion</span>
+      </li>
+      <li class="dim">
+        <span class="name">Zukunft (Futur)</span>
+        <span class="ex">Im Alltag sagt man meist einfach das Präsens.</span>
+        <span class="tag t-skip">selten nötig</span>
+      </li>
+      <li class="dim">
+        <span class="name">Steigerung (größer, am größten)</span>
+        <span class="ex">Zu einfach für eine eigene Umformung.</span>
+        <span class="tag t-skip">zu klein</span>
+      </li>
+    </ul>
+  </section>
+
+  <footer>
+    <b>Kurzfassung:</b> Die höfliche Form (Konjunktiv II) ist gerade gebaut. Zustandspassiv ist der nächste
+    einfache Schritt. Register und Satzbau bringen viel, brauchen aber eine Backend-Änderung. Alles unter
+    „Später" bauen wir, wenn die ersten Umformungen sich bewährt haben.
+  </footer>
+
+</div>
+</body>
+</html>

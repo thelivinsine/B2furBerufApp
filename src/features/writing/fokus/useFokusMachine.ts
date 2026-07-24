@@ -22,9 +22,9 @@ import {
  *   any edit of the top text after a correction --> back to idle (invalidate).
  *
  * Transforms always derive from the CORRECTED sentence with the FULL current
- * selection (voice + tense are orthogonal and combine), never by compounding the
- * previous transform. Repeated toggles are served from an in-memory cache so
- * switching back to a seen cell is instant and free.
+ * selection (voice, tense and mood are orthogonal and combine), never by
+ * compounding the previous transform. Repeated toggles are served from an
+ * in-memory cache so switching back to a seen cell is instant and free.
  */
 
 export type FokusStatus = "idle" | "submitting" | "corrected" | "error";
@@ -33,6 +33,7 @@ export type TransformStatus = "idle" | "loading" | "done" | "error";
 export interface FokusSelection {
   voice: string;
   tense: string;
+  mood: string;
 }
 
 export interface TransformView {
@@ -68,7 +69,7 @@ export interface FokusMachine {
   corrected: string;
   hasErrors: boolean;
   /** Detected base grammar of the corrected sentence (null = not detected). */
-  detected: { voice: string | null; tense: string | null };
+  detected: { voice: string | null; tense: string | null; mood: string | null };
   /** The learner's current target selection (drives the transform). */
   selection: FokusSelection;
   transform: TransformView;
@@ -91,11 +92,16 @@ export function useFokusMachine(initial = ""): FokusMachine {
   const [status, setStatus] = useState<FokusStatus>("idle");
   const [corrected, setCorrected] = useState("");
   const [hasErrors, setHasErrors] = useState(false);
-  const [detected, setDetected] = useState<{ voice: string | null; tense: string | null }>({
-    voice: null,
-    tense: null,
+  const [detected, setDetected] = useState<{
+    voice: string | null;
+    tense: string | null;
+    mood: string | null;
+  }>({ voice: null, tense: null, mood: null });
+  const [selection, setSelection] = useState<FokusSelection>({
+    voice: "aktiv",
+    tense: "praesens",
+    mood: DEFAULT_MOOD,
   });
-  const [selection, setSelection] = useState<FokusSelection>({ voice: "aktiv", tense: "praesens" });
   const [transform, setTransform] = useState<TransformView>(EMPTY_TRANSFORM);
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [limitReached, setLimitReached] = useState(false);
@@ -122,7 +128,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
     setStatus("idle");
     setCorrected("");
     setHasErrors(false);
-    setDetected({ voice: null, tense: null });
+    setDetected({ voice: null, tense: null, mood: null });
     setTransform(EMPTY_TRANSFORM);
     setErrorMessage(undefined);
     setLimitReached(false);
@@ -161,20 +167,24 @@ export function useFokusMachine(initial = ""): FokusMachine {
     }
 
     const focal: DetectedSentence | undefined = res.sentences?.[0];
-    const norm = normalizeDetected(focal?.voice, focal?.tense);
+    const norm = normalizeDetected(focal?.voice, focal?.tense, focal?.mood);
     submittedRef.current = text;
     checkIdRef.current = res.checkId;
     focalRef.current = focal?.text ?? res.corrected;
     setCorrected(res.corrected);
     setHasErrors(!!res.hasErrors);
     setDetected(norm);
-    setSelection({ voice: norm.voice ?? "aktiv", tense: norm.tense ?? "praesens" });
+    setSelection({
+      voice: norm.voice ?? "aktiv",
+      tense: norm.tense ?? "praesens",
+      mood: norm.mood ?? DEFAULT_MOOD,
+    });
     setCachedCorrection(!!res.cached);
     setStatus("corrected");
   }, [input]);
 
   const runTransform = useCallback(async (sel: FokusSelection) => {
-    const key = `${sel.voice}|${sel.tense}`;
+    const key = `${sel.voice}|${sel.tense}|${sel.mood}`;
     const cached = cacheRef.current.get(key);
     if (cached) {
       setTransform(cached);
@@ -186,7 +196,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
     const res = await transformSentence({
       checkId: checkIdRef.current,
       source: focalRef.current,
-      target: { voice: sel.voice, tense: sel.tense, mood: DEFAULT_MOOD },
+      target: { voice: sel.voice, tense: sel.tense, mood: sel.mood },
     });
     if (reqId !== reqRef.current) return; // superseded by a newer selection
 
@@ -226,7 +236,10 @@ export function useFokusMachine(initial = ""): FokusMachine {
       const next: FokusSelection = { ...selection, [axis]: value };
       setSelection(next);
       // Landing back on the detected base = no transform, hide the bottom box.
-      const isBase = next.voice === detected.voice && next.tense === detected.tense;
+      const isBase =
+        next.voice === detected.voice &&
+        next.tense === detected.tense &&
+        next.mood === detected.mood;
       if (isBase) {
         reqRef.current++;
         setTransform(EMPTY_TRANSFORM);
@@ -239,7 +252,11 @@ export function useFokusMachine(initial = ""): FokusMachine {
 
   const reset = useCallback(() => {
     reqRef.current++;
-    setSelection({ voice: detected.voice ?? "aktiv", tense: detected.tense ?? "praesens" });
+    setSelection({
+      voice: detected.voice ?? "aktiv",
+      tense: detected.tense ?? "praesens",
+      mood: detected.mood ?? DEFAULT_MOOD,
+    });
     setTransform(EMPTY_TRANSFORM);
   }, [detected]);
 

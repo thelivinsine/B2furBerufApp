@@ -322,26 +322,6 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   **D** Zweifarbiger Stift (bold pencil split lengthwise rose/pink, like the split Grammatik
   bookmark). No implementation yet; awaiting the founder's pick by letter.
 - **Artifacts (session 158):** `preview/schreiben-icon-harmony.html` · this log
-=======
-- **Prompt 3 (verbatim, 2026-07-24 ~12:00 UTC):** `go ahead with your recommendations with 6 action items from above and a thin agent.md file` →
-  Executed all seven items: (1) rotated this log (s133-134 → the W29 chunk, s135-151 → a new
-  `archive/prompt-log/SESSION_PROMPT_LOG_2026-W30.md`, live file back to ~300 lines, archive README
-  index updated); (2) `docs/README.md` refreshed for the s155 restructure (new `areas/` catalog +
-  skills note + rewritten CLAUDE.md row + archive rows + AGENTS.md row); (3) fixed the five stale
-  CLAUDE.md section pointers in `PROJECT_FOUNDATION.md`, `PROJECT_REFERENCE.md` (x2), `DECISIONS.md`
-  (x2) to their `docs/areas/` homes; (4) documented `check:contrast` (CI gate) in
-  `docs/areas/COMMANDS.md` + the CLAUDE.md CI-gates index, plus `check:refs` and the
-  `build:dict-subset`/`build:nouns-subset` internals of `build:oracles`; (5) corrected the W30 row
-  in `archive/PROJECT_STATUS_ARCHIVE.md` to sessions 135-154; (6) shrank the `PROJECT_STATUS.md`
-  tail archive blob to a two-line pointer; (7) created the thin router `AGENTS.md` at the repo root
-  (no rules of its own: CLAUDE.md → docs/areas/ → the skills). Session documented per the standing
-  rules (s157 status header + handoff; the s155 handoff rotated to the W30 status archive).
-- **Artifacts (session 157):** `AGENTS.md` · `CLAUDE.md` · `docs/README.md` ·
-  `docs/SESSION_PROMPT_LOG.md` + `docs/archive/prompt-log/{README,SESSION_PROMPT_LOG_2026-W29,SESSION_PROMPT_LOG_2026-W30}.md` ·
-  `docs/PROJECT_STATUS.md` · `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_REFERENCE.md` ·
-  `docs/DECISIONS.md` · `docs/areas/COMMANDS.md` ·
-  `docs/archive/{PROJECT_STATUS_ARCHIVE,status-log/PROJECT_STATUS_ARCHIVE_2026-W30}.md` · PR (this one)
->>>>>>> origin/main
 - **Prompt 2 (verbatim, 2026-07-24 ~11:55 UTC):** `I like the option b but I want you to generate more such previews with feather/ink pens and similar colors as other icons not red.` →
   Round 2 built: `preview/schreiben-icon-harmony-r2.html` (screenshot-verified, republished to the
   same artifact URL). B's nib direction carried forward without red, in the cool family colors of
@@ -372,3 +352,18 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   own artifact); bars already show Wegweiser + Feder E; current stack as reference + **M**
   Aufgeschlagenes Buch · **N** Bücherregal · **O** Bibliotheksgebäude · **P** Buch mit Lesezeichen,
   all Nachtblau/Neon-Cyan. Awaiting pick (M-P, or keep the stack).
+
+## Session 159 — 2026-07-24 — Grammar-dimensions brainstorm + Fokus Satzlabor Wave 2 (Konjunktiv II + Zustandspassiv) (branch `claude/grammar-dimensions-transformations-l3ib3m`)
+
+- **Prompt 1 (verbatim):** `brainstorm all the grammar dimensions and transformation options. Spin up expert agents if needed for research and analysis. Generate a thorough report, recommendations and couple of previews with the recommendations`
+- **Response 1:** Ran four parallel agents (existing Fokus-feature map, grammar data model, design tokens, B1–B2 transformation pedagogy) → `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md` (15-dimension catalog, rule/hybrid/AI feasibility tiers, top-10 B2-marker ranking, guardrails, Formachsen-vs-Umformungen split, Now/Next/Later/Skip roadmap, 12 worked examples) + two previews on the real tokens.
+- **Prompt 2 (verbatim):** `provide the previews as a html artifact here` → published a self-contained toggle artifact (daa4dbb6).
+- **Prompt 3 (verbatim):** `do I need to adapt the edge functions in supabase if we apply the satzlabor updates?` → split: enum-exposure (K-II/Zustandspassiv) = prompt tune + `PROMPT_VERSION` bump; operation-style transforms (Register/Satzbau) = real contract change; deep-links = none.
+- **Prompt 4 (verbatim):** `your response is too technical and long for me.` → plain 3-bullet version.
+- **Prompt 5 (verbatim):** `There's a new version on the main live now. Can you review your answer against it?` → rebased, confirmed the answer held.
+- **Prompt 6 (verbatim):** `go ahead with the easy half for schreiben Satzlabor. I also need more clarification on what the other toggle page named Dimension in the preview shows. Where does these go in the app and the whole preview looks chaotic with too much info and less visual heriarhy` → clarified the "Dimension" preview is a founder planning page (not an app screen), rebuilt it as a calm Now/Next/Later/Skip one-pager; built **Konjunktiv II** as the Modus rail axis (promoted `mood`; `PROMPT_VERSION` 2→3); opened PR #678.
+- **Prompt 7 (verbatim):** `go ahead with the Zustandpassiv` → added **Zustandspassiv** as a third Genus-Verbi pill (`normalizeDetected` maps it to its own pill; copula safeguard stays in the check-sentence prompt); `transform-sentence` Vorgang-vs-Zustand clarifier, `PROMPT_VERSION` 3→4.
+- **Prompt 8 (verbatim):** `document the session and merge`
+- **Prompt 9 (verbatim, mid-documentation):** `a small and quick change I'd like to make is redo the explanation of green dot better.. say something like the Green pills mean your sentence. Keep it as simple as possible.` → rail legend simplified to "Grüner Punkt = dein Satz." / "Tippe eine andere Form, um ihn umzuwandeln." (`GrammarRail.tsx` + preview).
+- **Response 8+9:** Documented the session (this entry renumbered 152→159 after `main` had advanced to s158; PROJECT_STATUS handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, brainstorm-doc roadmap). `main` had force-advanced 10 commits (CLAUDE.md restructure #671, prompt-log rotation #677, sessions 155–158); merged it in (code auto-merged: my mood/copy edits + main's cosmetic tweaks both intact; the four doc conflicts resolved to main's new structure, docs re-applied against it), gates green (typecheck · **289** unit tests · lint 0 errors · build · bundle 112 kB · lint:content), squash-merged PR #678.
+- **Artifacts (session 159):** `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md` · `preview/grammar-dimensions-satzlabor.html` · `preview/grammar-dimensions-catalog.html` · `src/features/writing/fokus/grammarDimensions.ts` · `useFokusMachine.ts` · `GrammarRail.tsx` · `FokusTrainer.tsx` · `supabase/functions/transform-sentence/index.ts` · `tests/fokusGrammar.test.ts` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log · PR #678 · artifact daa4dbb6
