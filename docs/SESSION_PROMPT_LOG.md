@@ -278,6 +278,15 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `PROJECT_STATUS.md` duplicates the archive index and could shrink to a two-line pointer.
   Verified healthy: CLAUDE.md 178/~350 lines, PROJECT_STATUS.md 178/~250 with exactly the two
   most recent handoffs (s156+s155), dated content counts, append-only logs intact through s156.
+- **Prompt 4 (verbatim, 2026-07-24 ~12:15 UTC):** `whenever, I ask for merging the working branch to main the message i get is there's no PR template. Is it necessary to have a template? would it help us to have a template?` →
+  Answered: **not necessary, harmless message.** Every session checks for
+  `.github/pull_request_template.md` before opening a PR and narrates "none found"; nothing fails.
+  A template would help mildly: it guarantees every PR body answers the same questions (what
+  changed / why / gates run / **founder action needed** / docs updated), which strengthens the
+  audit/authorship paper trail and puts founder actions in one predictable slot, and it silences
+  the recurring message. Recommended a minimal generic 6-heading template (nothing that duplicates
+  CLAUDE.md, so it cannot drift); creation awaits founder go-ahead. (Entry re-inserted here after a
+  parallel-session merge race; sessions 158-165 landed on main while this session was open.)
 - **Artifacts (session 157):** this log (audit report delivered in chat; fixes await founder go-ahead)
 - **Prompt 2 (verbatim, 2026-07-24 ~11:45 UTC):** `I also want your opinion if we need a high-quality comprehensive agent.md file` →
   Opinion delivered: **no comprehensive AGENTS.md**. It would recreate the always-on-bloat problem
