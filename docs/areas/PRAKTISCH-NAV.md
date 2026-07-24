@@ -10,7 +10,7 @@ pencil mark), **Fortschritt** (`/analytics`), + **Einstellungen** (fixed last sl
 stays mounted in `router.tsx` so `/welt` + deep links resolve — re-add the `navItems` row to
 restore it. `BottomTabBar` `CONTENT = ["/library", "/writing", "/analytics"]`;
 `DEFAULT_PINNED_TABS = ["/", "/library", "/writing", "/analytics"]` (Home + 3 middle + fixed
-Einstellungen = the 5 locked slots). The Praktisch route mark is a dumbbell. The Anwenden hub
+Einstellungen = the 5 locked slots). The Praktisch route mark is the compass. The Anwenden hub
 itself (`/anwenden`) is 3 cards → Sprechen/Schreiben/Prüfung. Remote-config overrides (admin
 Steuerung H1/H2/H8) may relabel/hide nav items at runtime; defaults match the above.
 
@@ -61,10 +61,11 @@ the wordmark drops on mobile (g mark stays); the streak pill has no goal-gauge r
 the Koralle reward tokens (streak = celebration).
 
 ## Praktisch dashboard (`/`)
-One column on ALL sizes (two-column desktop was rejected). Heute → **Üben/Spielen toggle**
-(`Dashboard.tsx`): active tab gets a subtle section tint on the lifted white pill (Üben
-`text-accent` teal + Dumbbell icon; Spielen `text-orange-500` + Play icon; both active icons
-fill via `fillActive`). Tab switch is a directional horizontal slide (right→left to Spielen,
+One column on ALL sizes (two-column desktop was rejected). Heute → **Trainieren/Spielen toggle**
+(`Dashboard.tsx`; "Üben" → "Lernen" s105, → "Trainieren" with the dumbbell restored s158, both
+founder requests): active tab gets a subtle section tint on the lifted white pill (Trainieren
+`text-blue-600` + lucide Dumbbell icon; Spielen `text-orange-500` + Play icon; both active icons
+fill via `fill-current`). Tab switch is a directional horizontal slide (right→left to Spielen,
 ~0.16s easeOut, reduced-motion safe).
 
 ### Üben tab (`features/dashboard/UebenPath.tsx`, lazy — imports the mission bank, Heute stays bank-free)
