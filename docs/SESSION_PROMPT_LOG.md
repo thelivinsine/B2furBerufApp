@@ -584,6 +584,13 @@ _(Numbered 163 to avoid colliding with the concurrent branch-protection session 
   regenerate (variant 0..2) is now live. Marked the redeploy action item done + flipped the s163
   handoff note to LIVE in `PROJECT_STATUS.md`; logged this. Docs-only follow-up.
 - **Artifacts (prompt 5):** `docs/PROJECT_STATUS.md` · this log
+- **Prompt 6 (verbatim):** `document the session` →
+  Session was already logged prompt-by-prompt (this entry) with the s163 PROJECT_STATUS handoff. This
+  pass finalized the area guide: added the "Nochmal" regenerate button + the `variant` cache/cap and
+  the `collapseMoves`/"Wortstellung" collapse to `docs/areas/SCHREIBEN.md` (current-state law), and
+  logged this. Note: session numbered 163; concurrent sessions took 162 (branch protection) and 164
+  (Control Center review harmonisation), resolved via append-merges in this log + PROJECT_STATUS.
+- **Artifacts (prompt 6):** `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
 
 ## Session 164 — 2026-07-24 — Review harmonised into the Control Center + note/approve save-race fix + apply:reviews (branch `claude/apply-review-decisions-lw5azm`)
 _(Branched off `main` at s160; s161–163 landed on `main` from parallel sessions while this was open, so this session is logged as 164.)_
