@@ -83,6 +83,8 @@ export interface FokusMachine {
   setInput: (text: string) => void;
   submit: () => Promise<void>;
   selectPill: (axis: AxisId, value: string) => void;
+  /** Re-run the AI for the current selection to get an alternative phrasing. */
+  regenerate: () => void;
   reset: () => void;
   startOver: () => void;
 }
@@ -113,9 +115,13 @@ export function useFokusMachine(initial = ""): FokusMachine {
   const submittedRef = useRef<string | null>(null);
   const checkIdRef = useRef<string | undefined>(undefined);
   const focalRef = useRef<string>("");
-  // Client-side transform cache for the current sentence (tuple -> result), so
-  // toggling back to a seen cell never hits the network.
+  // Client-side transform cache for the current sentence (tuple|variant -> result),
+  // so toggling back to a seen cell or an already-generated variant is instant/free.
   const cacheRef = useRef<Map<string, TransformView>>(new Map());
+  // Current "Nochmal" variant per tuple (0 = canonical, 1..2 = alternatives). The
+  // regenerate button cycles 0 -> 1 -> 2 -> 0; new variants generate once (server
+  // caps at 2), then cycling is served from cacheRef.
+  const variantRef = useRef<Map<string, number>>(new Map());
   // Monotonic request id so a slow earlier transform can't overwrite a newer one.
   const reqRef = useRef(0);
 
@@ -124,6 +130,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
     checkIdRef.current = undefined;
     focalRef.current = "";
     cacheRef.current.clear();
+    variantRef.current.clear();
     reqRef.current++;
     setStatus("idle");
     setCorrected("");
@@ -157,6 +164,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
     setLimitReached(false);
     setStale(false);
     cacheRef.current.clear();
+    variantRef.current.clear();
 
     const res = await checkSentence(text);
     if (!res.ok || !res.corrected) {
@@ -183,10 +191,12 @@ export function useFokusMachine(initial = ""): FokusMachine {
     setStatus("corrected");
   }, [input]);
 
-  const runTransform = useCallback(async (sel: FokusSelection) => {
-    const key = `${sel.voice}|${sel.tense}|${sel.mood}`;
+  const runTransform = useCallback(async (sel: FokusSelection, variant = 0) => {
+    const tupleKey = `${sel.voice}|${sel.tense}|${sel.mood}`;
+    const key = `${tupleKey}|${variant}`;
     const cached = cacheRef.current.get(key);
     if (cached) {
+      variantRef.current.set(tupleKey, variant);
       setTransform(cached);
       return;
     }
@@ -197,6 +207,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
       checkId: checkIdRef.current,
       source: focalRef.current,
       target: { voice: sel.voice, tense: sel.tense, mood: sel.mood },
+      variant,
     });
     if (reqId !== reqRef.current) return; // superseded by a newer selection
 
@@ -226,7 +237,10 @@ export function useFokusMachine(initial = ""): FokusMachine {
       };
     }
     // Only cache resolved (non-error) states so a transient failure can retry.
-    if (view.status === "done") cacheRef.current.set(key, view);
+    if (view.status === "done") {
+      cacheRef.current.set(key, view);
+      variantRef.current.set(tupleKey, variant);
+    }
     setTransform(view);
   }, []);
 
@@ -245,10 +259,30 @@ export function useFokusMachine(initial = ""): FokusMachine {
         setTransform(EMPTY_TRANSFORM);
         return;
       }
-      void runTransform(next);
+      // A fresh pill selection starts from the canonical version (variant 0);
+      // "Nochmal" advances from there.
+      variantRef.current.set(`${next.voice}|${next.tense}|${next.mood}`, 0);
+      void runTransform(next, 0);
     },
     [status, selection, detected, runTransform],
   );
+
+  // "Nochmal": cycle to the next AI phrasing of the CURRENT selection. New
+  // variants generate once (server caps at 2), then 0 -> 1 -> 2 -> 0 cycles the
+  // cached versions for free. No-op on the detected base (no transform shown).
+  const regenerate = useCallback(() => {
+    if (status !== "corrected") return;
+    const sel = selection;
+    const isBase =
+      sel.voice === detected.voice &&
+      sel.tense === detected.tense &&
+      sel.mood === detected.mood;
+    if (isBase) return;
+    const tupleKey = `${sel.voice}|${sel.tense}|${sel.mood}`;
+    const current = variantRef.current.get(tupleKey) ?? 0;
+    const next = (current + 1) % 3;
+    void runTransform(sel, next);
+  }, [status, selection, detected, runTransform]);
 
   const reset = useCallback(() => {
     reqRef.current++;
@@ -281,6 +315,7 @@ export function useFokusMachine(initial = ""): FokusMachine {
     setInput,
     submit,
     selectPill,
+    regenerate,
     reset,
     startOver,
   };

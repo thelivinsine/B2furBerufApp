@@ -1,11 +1,11 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 161). **Review harmonised into the Control Center:** the founder
-review table moved out of the retired `/sources/werkbank` page into the `/admin/pruefen` Prüfen page
-as a Warteschlange / Alle Inhalte sliding-pill switcher, both backed by one shared `useWorkbench`
-store; the table cell gained a Freigeben/Ablehnen control + a note Save button. Also fixed the
-note/approve save race and applied the founder's 13 hash-matched approvals (3 rejects + 1 re-review).
-Prior s160: Schreiben KI-Hinweis relocated + "Feedback" label shortened app-wide. Product name:
+_Last updated: 2026-07-24 (session 164). **Review harmonised into the Control Center:** the founder
+review table moved out of the retired `/sources/werkbank` page into the `/admin/pruefen` Prüfen page as
+a Warteschlange / Alle Inhalte sliding-pill switcher, both backed by one shared `useWorkbench` store;
+the table cell gained a Freigeben/Ablehnen control + a note Save button. Also fixed the note/approve
+save race and applied the founder's 13 hash-matched approvals (3 rejects + 1 re-review). Prior s163:
+Fokus word-order correction collapse (PR #695); s162: `main` branch protection ruleset. Product name:
 **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -59,6 +59,9 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       Supabase Auth CAPTCHA and the `VITE_TURNSTILE_SITE_KEY` GitHub secret set). Details in
       `PROJECT_FOUNDATION.md`.
 - [ ] (Optional) Get a hosted LanguageTool key (free tier) for better grammar pre-checks.
+- [ ] **Redeploy `transform-sentence` (Supabase dashboard) to activate the "Nochmal" regenerate**
+      button (s163). Self-contained file; same steps as the s159 redeploy. Until then the button
+      returns the cached canonical sentence (no visible change).
 - [ ] **Google sign-in branding verification — awaiting async Google review (re-submitted s22):**
       The blocking technical issue ("home page does not explain purpose") is fixed: `index.html`
       now contains a full static pre-render inside `#root` that Google's no-JS HTML crawler can read.
@@ -70,70 +73,52 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
-**Handoff after session 161 (2026-07-24). Review harmonised into the Control Center + note/approve
-save race fixed + 13 approvals applied, branch `claude/apply-review-decisions-lw5azm`.** Three linked
-pieces this session:
-- **Save-race fix (`useWorkbench`).** The founder asked whether a note typed before approving is
-  saved. It was NOT reliable: the note and the checkbox saved separately, but both `onChange` calls
-  read the SAME stale `reviews` snapshot and each `upsert`ed the whole row, so typing a note then
-  approving wrote the row twice off the same base and the approve write (empty comment) clobbered the
-  note. Fix: merge from an always-latest `reviewsRef` + serialise writes per `content_id`
-  (`writeChains`), so a note and a decision never overwrite each other.
-- **13 approvals applied.** Ran `pnpm apply:reviews --from` on the founder's browser decision export
-  (17 decisions): 13 hash-matched approvals flipped draft→verified + stamped + lint green
-  (commit `5188af2`); 3 rejects → `docs/reports/review-defects.md`; 1 (`v_besprechung`, null
-  fingerprint) held for re-review by the integrity rules.
-- **Harmonisation (Variant A, founder-picked).** The founder-only review table moved OUT of the
-  retired `/sources/werkbank` page INTO the Control Center's **Prüfen** page as a two-segment
-  sliding-pill switcher: **Warteschlange** (priority queue + keyboard cockpit) · **Alle Inhalte**
-  (the full `AdminWorkbench` table). One shared `useWorkbench` store now backs BOTH, so a cockpit
-  decision shows in the table instantly. The table cell gained a segmented **Freigeben/Ablehnen**
-  control (reject was previously impossible in the table) plus a wider note field with an explicit
-  **Save button** (appears when the note is edited; still saves on blur/Enter). Redundant queue
-  header/status copy removed. `/sources` now shows admins a link card into `/admin/pruefen?view=table`.
-- **Files:** `src/features/legal/useWorkbench.ts` (new, extracted+extended), `AdminWorkbench.tsx`
-  (RowReview + patch type), `src/features/admin/Pruefmodus.tsx` (switcher + shared store + QueueLanding),
-  `Sources.tsx` (hook import, link card, SourcesWorkbench removed), `router.tsx` (werkbank route
-  removed), `tests/adminWorkbench.test.tsx`. Preview `preview/control-center-review.html`.
-- **Gates:** typecheck · lint (0 errors) · test:unit **291/291** · build · check:bundle **116.6 kB**,
-  all green. Decisions recorded in `docs/DECISIONS.md`; area guide `docs/areas/LEGAL-ADMIN.md` updated.
-- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live
-  (PWA: hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.
+**Handoff after session 164 (2026-07-24). Review harmonised into the Control Center + note/approve
+save race fixed + 13 approvals applied, branch `claude/apply-review-decisions-lw5azm`.** (Branched off
+`main` at s160; s161–163 landed from parallel sessions while this was open, so this is logged as 164.)
+Three linked pieces:
+- **Save-race fix (`useWorkbench`).** The founder asked whether a note typed before approving is saved.
+  It was NOT reliable: the note and the checkbox saved separately, but both `onChange` calls read the
+  SAME stale `reviews` snapshot and each `upsert`ed the whole row, so typing a note then approving wrote
+  the row twice off the same base and the approve write (empty comment) clobbered the note. Fix: merge
+  from an always-latest `reviewsRef` + serialise writes per `content_id` (`writeChains`).
+- **13 approvals applied.** `pnpm apply:reviews --from` on the founder's browser export (17 decisions):
+  13 hash-matched approvals flipped draft→verified + stamped + lint green (commit `5188af2`); 3 rejects
+  → `docs/reports/review-defects.md`; 1 (`v_besprechung`, null fingerprint) held for re-review.
+- **Harmonisation (Variant A, founder-picked).** The founder review table moved OUT of the retired
+  `/sources/werkbank` page INTO the Control Center's **Prüfen** page (`/admin/pruefen`) as a two-segment
+  sliding-pill switcher: **Warteschlange** (priority queue + keyboard cockpit) · **Alle Inhalte** (the
+  full `AdminWorkbench` table). One shared `useWorkbench` store now backs BOTH. The table cell gained a
+  segmented **Freigeben/Ablehnen** control (reject was impossible in the table before) + a wider note
+  field with an explicit **Save button** (appears when edited; still saves on blur/Enter). Redundant
+  queue header/status copy removed. `/sources` links admins into `/admin/pruefen?view=table`.
+- **Files:** `src/features/legal/useWorkbench.ts` (new), `AdminWorkbench.tsx`, `Pruefmodus.tsx`,
+  `Sources.tsx`, `router.tsx`, `tests/adminWorkbench.test.tsx`, `preview/control-center-review.html`.
+- **Gates:** typecheck · lint (0 errors) · test:unit **291/291** · build · check:bundle **116.6 kB** ·
+  lint:content, all green. Decisions in `docs/DECISIONS.md`; area guide `docs/areas/LEGAL-ADMIN.md`.
+- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
+  hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.
 
-**Handoff after session 160 (2026-07-24). Schreiben KI-Hinweis relocated (Fokus + Kurz/Lang) +
-"Feedback" label shortened app-wide, branch `claude/disclaimer-text-layout-5zq5g0`.** A small
-preview-first Schreiben tweak. The founder wanted the combined Art. 50 disclaimer off its
-centered-in-flow spot and onto the same line as the floating Feedback affordance. First round put
-both in a bordered bottom bar; the founder corrected: keep the floating pill exactly as-is, just
-drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shortened the pill label.
-- **Desktop (`FokusTrainer.tsx` `aiNoteDesktop`):** the `FeedbackPill` (`fixed bottom-4`, AppShell) is
-  untouched; the note is now a `fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64` element that
-  mirrors the pill's `max-w-6xl` + `sm:px-6` container, capped `max-w-[calc(100%-18rem)]` so its right
-  edge clears the pill. Wrapper is `pointer-events-none`, only the `/privacy` link is clickable, so it
-  never blocks the cards it floats over. Full sentence kept (founder pick).
-- **Mobile:** the action bar lost its `border-t`/`bg-background/90`/`backdrop-blur` chrome; the
-  `FeedbackIconButton` (imported from `components/layout/FeedbackButton`) floats beside the flex-1
-  Korrigieren button, with a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line centered below.
-  Both the buttons and the mobile note are pre-correction only (shared `m.status !== "corrected"`
-  guard); the desktop fixed note always shows on the Fokus tab.
-- **Kurz/Lang parity (follow-up prompt, same session):** `GuidedWritingTrainer.tsx` got the SAME
-  treatment. Its inline disclaimer `<p>` was removed from `content`; it now has its own copy of the
-  fixed `aiNoteDesktop` (Kurz/Lang wording) and a reworked chrome-less mobile action bar where the
-  `FeedbackIconButton` floats beside Auswerten (and Neu schreiben after a result) with the condensed
-  note beneath. Only one trainer renders per `/writing` tab, so the two fixed notes never coexist.
-- **Feedback label shortened app-wide (same follow-up):** "Mit KI gebaut · Feedback" → **"Feedback"**
-  in `FeedbackButton.tsx` (`FeedbackPill` default label, `FeedbackFullButton` text, `FeedbackIconButton`
-  aria/title) and the `AdminSteuerung` label placeholder. Remote-config `feedback.label` still
-  overrides the pill. `MessageSquareText`/`Sparkles` icons unchanged.
-- **Preview:** `preview/fokus-disclaimer-inline.html` (real tokens, r3 shows the "Feedback" label +
-  the Fokus/Kurz-Lang note), screenshot-verified in headless Chromium. Could NOT live-verify (unauth
-  `/writing` redirects to the landing page); founder verifies live. Docs: `docs/areas/SCHREIBEN.md`
-  + `docs/areas/PRAKTISCH-NAV.md` updated.
-- **Gates:** typecheck · build · lint (0 errors) · check:bundle **116.8 kB**, all green.
-- **Shipped:** PR #688 squash-merged to `main` (merge commit `4cbf0fe`), Pages deploy triggered.
-  Decision recorded in `docs/DECISIONS.md`; the `design` skill §2.6 now carries the Schreiben
-  disclaimer-placement exception so a future session doesn't re-center it.
-- **Next:** nothing pending. Founder verifies the live result (PWA: hard-refresh past a stale SW).
+**Handoff after session 163 (2026-07-24). Fokus correction: collapse a moved word into one
+Wortstellung fix, branch `claude/disclaimer-text-layout-5zq5g0`, PR #695.** Numbered 163 (a
+concurrent branch-protection session already took 162). Two founder screenshots of the Fokus screen:
+- **"here's a mistake by ai" — not an AI error.** The corrected sentence was right; the fix tiles
+  are a client-side LCS word-diff (`wordDiff.ts`) that rendered a *moved* word ("heute") as a pure
+  deletion in its old slot + a pure insertion in its new slot, reading as a contradictory remove+add.
+  `collapseMoves()` now pairs a same-word del/ins into ONE `{category:"Wortstellung", moved:true}`
+  change; `FokusTrainer` renders a moved change as the word once (green, no strike/arrow). Two new
+  `wordDiff.test.ts` cases. Gates green; shipped PR #695.
+- **"why does Zustandspassiv wrap" — left as-is (founder decision).** Genuine width wrap on the
+  256px desktop rail (reproduced in `preview/genus-verbi-wrap.html`); not a bug, no change.
+- **"Nochmal"/regenerate button — BUILT, needs a founder redeploy to go live.** Founder chose the
+  capped/cheap variant (cap = 2 alternatives). `transform-sentence` gains an optional `variant`
+  (server-clamped 0..2): variant 0 keeps the original cache key byte-for-byte; variants 1..2 get
+  their own global cache keys + an "alternative phrasing" instruction (Gemini temperature 0.9 for
+  variants only). Client (`useFokusMachine.regenerate()` + a RefreshCw "Nochmal" button in the
+  transform box) cycles 0→1→2→0, generating each new variant once (≤ 2 paid calls per sentence+
+  selection, ever) then cycling the cached versions for free. **ACTION: the founder must redeploy
+  `transform-sentence` via the Supabase dashboard** (self-contained file, same as the s159 redeploy);
+  until then the button returns the cached canonical sentence (no visible change).
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

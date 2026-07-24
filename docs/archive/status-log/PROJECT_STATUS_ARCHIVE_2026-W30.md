@@ -894,3 +894,79 @@ artifact (daa4dbb6). Then built the "easy half":
   docs re-applied against it (this handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, prompt-log s159).
 - **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build / check:bundle **112 kB** /
   lint:content. Edge function is Deno (not deployed from the sandbox).
+
+**Handoff after session 160 (2026-07-24). Schreiben KI-Hinweis relocated (Fokus + Kurz/Lang) +
+"Feedback" label shortened app-wide, branch `claude/disclaimer-text-layout-5zq5g0`.** A small
+preview-first Schreiben tweak. The founder wanted the combined Art. 50 disclaimer off its
+centered-in-flow spot and onto the same line as the floating Feedback affordance. First round put
+both in a bordered bottom bar; the founder corrected: keep the floating pill exactly as-is, just
+drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shortened the pill label.
+- **Desktop (`FokusTrainer.tsx` `aiNoteDesktop`):** the `FeedbackPill` (`fixed bottom-4`, AppShell) is
+  untouched; the note is now a `fixed inset-x-0 bottom-4 z-20 hidden lg:block lg:pl-64` element that
+  mirrors the pill's `max-w-6xl` + `sm:px-6` container, capped `max-w-[calc(100%-18rem)]` so its right
+  edge clears the pill. Wrapper is `pointer-events-none`, only the `/privacy` link is clickable, so it
+  never blocks the cards it floats over. Full sentence kept (founder pick).
+- **Mobile:** the action bar lost its `border-t`/`bg-background/90`/`backdrop-blur` chrome; the
+  `FeedbackIconButton` (imported from `components/layout/FeedbackButton`) floats beside the flex-1
+  Korrigieren button, with a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line centered below.
+  Both the buttons and the mobile note are pre-correction only (shared `m.status !== "corrected"`
+  guard); the desktop fixed note always shows on the Fokus tab.
+- **Kurz/Lang parity (follow-up prompt, same session):** `GuidedWritingTrainer.tsx` got the SAME
+  treatment. Its inline disclaimer `<p>` was removed from `content`; it now has its own copy of the
+  fixed `aiNoteDesktop` (Kurz/Lang wording) and a reworked chrome-less mobile action bar where the
+  `FeedbackIconButton` floats beside Auswerten (and Neu schreiben after a result) with the condensed
+  note beneath. Only one trainer renders per `/writing` tab, so the two fixed notes never coexist.
+- **Feedback label shortened app-wide (same follow-up):** "Mit KI gebaut · Feedback" → **"Feedback"**
+  in `FeedbackButton.tsx` (`FeedbackPill` default label, `FeedbackFullButton` text, `FeedbackIconButton`
+  aria/title) and the `AdminSteuerung` label placeholder. Remote-config `feedback.label` still
+  overrides the pill. `MessageSquareText`/`Sparkles` icons unchanged.
+- **Preview:** `preview/fokus-disclaimer-inline.html` (real tokens, r3 shows the "Feedback" label +
+  the Fokus/Kurz-Lang note), screenshot-verified in headless Chromium. Could NOT live-verify (unauth
+  `/writing` redirects to the landing page); founder verifies live. Docs: `docs/areas/SCHREIBEN.md`
+  + `docs/areas/PRAKTISCH-NAV.md` updated.
+- **Later follow-ups (same session, separate PRs):**
+  - **Speaker-button alignment (#690, `e30395f`):** the first column of the three Bibliothek
+    `DataTable`s (`RedemittelViews` "Wendung", `CollocationViews` "Kollokation", `VocabViews` "Wort")
+    put the `SpeakButton` right after the German text, so it landed at a different x per row. Fixed:
+    `min-w-0` text span + `ml-auto shrink-0` on the SpeakButton (+ `shrink-0` on the Wörter gender
+    glyph) → all speaker buttons right-align to the column edge. Mockup: `preview/speaker-align.html`.
+  - **Disclaimer re-centered (#692, `894af07`):** the bottom-line `aiNoteDesktop` had lost the
+    original note's `text-center`, so it read left-aligned; restored `text-center` on both trainers'
+    `<p>` (it already spans the content-column width, so it centers under the box while the fixed
+    `bottom-4` line with the Feedback pill is untouched).
+- **Gates (each PR):** typecheck · build · lint (0 errors) · check:bundle **116.8 kB**, all green.
+- **Shipped:** PRs #688 (`4cbf0fe`), #689 (docs), #690 (`e30395f`), #692 (`894af07`) all
+  squash-merged to `main`, Pages deploys triggered. Decision recorded in `docs/DECISIONS.md`; the
+  `design` skill §2.6 now carries the Schreiben disclaimer-placement exception so a future session
+  doesn't re-center it.
+- **Next:** nothing pending. Founder verifies the live result (PWA: hard-refresh past a stale SW).
+
+**Handoff after session 161 (2026-07-24). Quiz-quality pass on the composed session, branch
+`claude/word-verification-nl4m26`, PR #687 (content) + PR #691 (engine/loot).** Started
+from founder screenshots of individual session cards; each turn diagnosed one exercise type and fixed it:
+- **Content (merged, PR #687):** the `v_soll_ist_vergleich` English gloss reworded `target-actual
+  comparison` → `target/planned vs. actual comparison`; and typed-cloze ("Lücke") cards, which showed
+  only the blanked sentence (unanswerable, many words fit), now render the target word's English
+  meaning as a muted "Hinweis:" line under the sentence (`SessionPlayer.tsx` TypingBlock).
+- **Plural questions (`engine/quiz.ts`):** MCQ distractors are now generated from the noun's OWN stem
+  (`sameStemPluralForms`: -e/-en/-n/-er/-s, Nullplural, umlaut variants) so all four options share the
+  stem and only the correct pattern distinguishes them (was: distractors from unrelated nouns, an A1
+  recognition move). Added a **typed** plural variant (new `pluralType` `QuizQuestion` kind +
+  `TypedView` renderer in `QuestionViews.tsx`, graded by the existing typed grader); ~half of plural
+  slots are typed. **Competency gate:** at difficulty 3 (C1) plural questions are limited to tricky
+  plurals (`isTrickyPlural`: umlaut / -er / Nullplural / stem-changing like Praxis→Praxen); predictable
+  -e/-en/-n/-s plurals drop out. Plural now also appears in the d3 branch.
+- **Odd-one-out / Ausreißer (`engine/quiz.ts` `oddOneOutQ`):** added a **part-of-speech-matched**
+  flavour (all four options share the anchor's POS, mixed ~50/50 with the old mixed-POS style) so the
+  topic is the only discriminator; and the odd word must now be **genuinely unrelated** (different
+  theme AND no shared `related` link in either direction), so a half-belonging word (abdichten next to
+  Blech) can't be the answer. Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
+- **Round-summary loot cards (`SessionPlayer.tsx` `LootCard`):** dropped the coral reward wash (read
+  like wrong answers) for plain white cards; a level-up is now a Himmelblau `bg-accent/20` "Lv ↑" pill,
+  unchanged words keep a muted level, the "Gesammelt" eyebrow moves coral → brand blue. Trophy ring
+  stays coral (the sanctioned celebration accent). Founder picked this variant (C) from a 4-shade preview.
+- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build green. Previews:
+  `preview/cloze-hint-preview.html`, `plural-variants-preview.html`, `loot-shade-preview.html`.
+- **Next:** nothing pending. Held ideas from the discussion: odd-one-out option 3 (make it rarer /
+  reserve for cleanly separable clusters) if the type still feels fuzzy; a "type it" plural could gain
+  an "almost" partial-credit tier if strict grading feels harsh.

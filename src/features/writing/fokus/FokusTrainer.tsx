@@ -10,6 +10,7 @@ import {
   SlidersHorizontal,
   ChevronDown,
   RotateCcw,
+  RefreshCw,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -211,11 +212,17 @@ export function FokusTrainer({
                     <span className="mb-1 block text-[10px] font-extrabold uppercase tracking-wide text-accent-ink">
                       {c.category}
                     </span>
-                    <span className="text-sm">
-                      <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
-                      <span className="text-muted-foreground/80">→</span>{" "}
-                      <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
-                    </span>
+                    {c.moved ? (
+                      // A word that only moved: show it once (no struck "before"),
+                      // the eyebrow already says it was a word-order fix.
+                      <span className="text-sm font-bold text-success">{c.to}</span>
+                    ) : (
+                      <span className="text-sm">
+                        <span className="text-muted-foreground line-through">{c.from || "∅"}</span>{" "}
+                        <span className="text-muted-foreground/80">→</span>{" "}
+                        <span className="font-bold text-success">{c.to || "(entfernt)"}</span>
+                      </span>
+                    )}
                   </div>
                 ))}
                 <Button
@@ -306,7 +313,20 @@ export function FokusTrainer({
           {transformLabel}
         </span>
         {m.transform.status === "done" && m.transform.applicable && m.transform.transformed && (
-          <SpeakButton text={m.transform.transformed} />
+          <div className="flex items-center gap-1.5">
+            {/* "Nochmal": ask the AI for another phrasing of the same target form
+                (capped + cached, so cycling is free after the first two). */}
+            <button
+              type="button"
+              onClick={m.regenerate}
+              title="Andere Formulierung von der KI"
+              aria-label="Andere Formulierung von der KI"
+              className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Nochmal
+            </button>
+            <SpeakButton text={m.transform.transformed} />
+          </div>
         )}
       </div>
 

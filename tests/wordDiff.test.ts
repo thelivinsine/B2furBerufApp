@@ -44,6 +44,25 @@ describe("diffWords", () => {
     expect(originalTokens.find((t) => t.text === "bitte")?.changed).toBe(false);
   });
 
+  it("collapses a moved word into ONE Wortstellung change (not remove + add)", () => {
+    const { changes } = diffWords(
+      "Ich habe heute es gelernt",
+      "Ich habe es gelernt heute",
+    );
+    // "heute" only moved: exactly one change, tagged Wortstellung + moved.
+    const moves = changes.filter((c) => c.moved);
+    expect(moves).toEqual([{ from: "heute", to: "heute", category: "Wortstellung", moved: true }]);
+    // No leftover contradictory "remove heute" / "add heute" pair.
+    expect(changes.some((c) => c.from === "heute" && c.to === "")).toBe(false);
+    expect(changes.some((c) => c.from === "" && c.to === "heute")).toBe(false);
+  });
+
+  it("keeps a real deletion and a real insertion separate (not a move)", () => {
+    // Different words: not a move, so no collapsing.
+    const { changes } = diffWords("Ich gehe sehr Hause.", "Ich gehe nach Hause.");
+    expect(changes.some((c) => c.moved)).toBe(false);
+  });
+
   it("classifies edits into learner-facing buckets", () => {
     expect(classifyChange("Kanst", "Kannst")).toBe("Rechtschreibung");
     expect(classifyChange("erklaeren?", "erklären?")).toBe("Umlaut");

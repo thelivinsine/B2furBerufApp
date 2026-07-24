@@ -92,6 +92,8 @@ export async function transformSentence(input: {
   checkId?: string;
   source: string;
   target: GrammarTuple;
+  /** 0 = canonical (default); 1..2 = an alternative phrasing ("Nochmal"). */
+  variant?: number;
 }): Promise<TransformResult> {
   const session = await ensureSession();
   if (!session.ok) return { ok: false, message: session.message };
@@ -99,7 +101,14 @@ export async function transformSentence(input: {
   try {
     const { data, error } = await supabase.functions.invoke<TransformResult>(
       "transform-sentence",
-      { body: { checkId: input.checkId, source: input.source, target: input.target } },
+      {
+        body: {
+          checkId: input.checkId,
+          source: input.source,
+          target: input.target,
+          variant: input.variant ?? 0,
+        },
+      },
     );
     if (error) return { ok: false, message: UNAVAILABLE };
     return data ?? { ok: false, message: "Keine Antwort erhalten." };

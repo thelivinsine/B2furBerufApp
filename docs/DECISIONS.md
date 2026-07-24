@@ -466,7 +466,7 @@ Shipped in PR #688 (squash-merged to `main`, 2026-07-24).
 
 ---
 
-## Control-center comment saves reliably next to approve (session 161, 2026-07-24)
+## Control-center comment saves reliably next to approve (session 164, 2026-07-24)
 
 **Prompt (verbatim):** "In the control center, if I write a comment and then reject or approve, are
 the comments being saved? it's unclear" → then "do both" (fix + run `pnpm apply:reviews`).
@@ -492,7 +492,7 @@ pre-note empty comment) overwrote the note, in local state and in Supabase.
 
 ---
 
-## Review harmonised into the Control Center (session 161, 2026-07-24)
+## Review harmonised into the Control Center (session 164, 2026-07-24)
 
 **Prompts (verbatim):** "Can you merge and harmonize the source list with checkboxes page in sources
 page by bringing it to control center? Integrate all the features from the source list page to the

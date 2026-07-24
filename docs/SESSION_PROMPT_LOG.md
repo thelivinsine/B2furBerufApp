@@ -481,47 +481,134 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   typecheck · build · lint (0 errors) · check:bundle 116.8 kB, all green.
 - **Artifacts (prompt 7):** `src/features/writing/fokus/FokusTrainer.tsx` ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `preview/fokus-disclaimer-inline.html` · this log
-## Session 161 — 2026-07-24 — Review harmonised into the Control Center + note/approve save-race fix + apply:reviews (branch `claude/apply-review-decisions-lw5azm`)
+- **Prompt 8 (verbatim, 2026-07-24):** `document the session` (second documentation pass, after the
+  speaker-alignment #690 and re-centering #692 follow-ups) →
+  Extended the PROJECT_STATUS s160 handoff with the two later follow-ups (speaker-button right-align
+  in the three Bibliothek tables → #690 `e30395f`; disclaimer re-centered under the box → #692
+  `894af07`) and updated the shipped-PR list. Logged this prompt. No stale docs found from these two
+  micro-fixes (`docs/areas/SCHREIBEN.md` already describes the bottom-anchored note; the table
+  column alignment is an implementation detail not spec'd in BIBLIOTHEK.md).
+- **Artifacts (prompt 8):** `docs/PROJECT_STATUS.md` · this log
+
+## Session 161 — 2026-07-24 — Quiz-quality pass on the composed session (branch `claude/word-verification-nl4m26`)
+
+Founder reviewed individual session cards from screenshots; each turn diagnosed one exercise type and fixed it.
+
+- **Prompt 1 (verbatim):** `is this a real word?` (screenshot: Vokabel card, EN gloss "target-actual comparison" for "der Soll-Ist-Vergleich") → explained it is a real controlling term but a stiff literal rendering; suggested "target vs. actual" / "plan vs. actual".
+- **Prompt 2 (verbatim):** `target/planned vs. actual sounds more natural to me.` → reworded `v_soll_ist_vergleich` EN gloss to "target/planned vs. actual comparison" + the first example gloss; lint:content + build green.
+- **Prompt 3 (verbatim):** `how is the user supposed to answer this? am I missing something?` (screenshot: typed-cloze "Lücke", "Regelmäßige ___ sind wichtig.") → confirmed the card was under-specified (only the blanked sentence, no cue for which word); diagnosed via `SessionPlayer` TypingBlock + `engine/session.ts` typedClozeData.
+- **Prompt 4 (verbatim):** `yes` → added a muted "Hinweis: <EN meaning>" line under the cloze sentence (always-visible, matches the plain Tippen variant). Preview `cloze-hint-preview.html`.
+- **Prompt 5 (verbatim):** `yes merge` → PR #687 (Soll-Ist gloss + cloze hint) squash-merged into `main`; branch reset to main.
+- **Prompt 6 (verbatim):** `don't you think this kind of questions are more like A1 level?` (screenshot: plural MCQ "Plural von die Praxis?", distractors die Pausen/die Lager/die Rechnungen) → analysis: the topic (German plurals) is B1-B2, but the FORMAT was A1 because distractors were unrelated nouns, so the learner picks by stem recognition. Offered 3 fixes (same-stem distractors / typed / irregular-only).
+- **Prompt 7 (verbatim):** `yes build 1 + 2` — mid-turn additions: `once the user has demonstrated enough competency then the third recommendation could be applied to questions type 1 and 2` and (screenshot: Ausreißer "abdichten" vs Presse/Gehörschutz/Blech) `questions like these are tricky because, abdichten means seal ... what's the main idea behind such questions and how can we reduce ambiguity?` → built plural: `sameStemPluralForms` distractors, new `pluralType` typed `QuizQuestion` kind + `TypedView`, `isTrickyPlural` competency gate at difficulty 3 (plural also added to the d3 branch). Answered the Ausreißer question (main idea = topic membership; ambiguity from mixed POS + weak semantic distance) with 3 reduction options. Previews `plural-variants-preview.html`. Gates: typecheck / lint 0 / test:unit 289 / build.
+- **Prompt 8 (verbatim):** `red colored cards here reads like as if these were all mistakes. Chose a different color shade to show progress` (screenshot: round-summary GESAMMELT loot grid, coral wash) → 4-shade preview (`loot-shade-preview.html`); founder picked **Option C** (white cards + Himmelblau "Lv ↑" pill). Implemented in `LootCard`; eyebrow coral → brand blue; trophy ring stays coral.
+- **Prompt 9 (verbatim):** `for reducing the abmiguity, referring to the points on how to reduce ambiguity, implement 1 but also mix them up by keep questions which are of a mix like now with different parts of speech but as mentioned in point 2.` → `oddOneOutQ`: added a POS-matched flavour mixed ~50/50 with mixed-POS, and an "genuinely unrelated" outsider guard (different theme + no shared `related` link either direction). Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
+- **Prompt 10 (verbatim):** `yes` → documented the session (this entry, PROJECT_STATUS s161 handoff with s159 rotated to the W30 archive, header refreshed) and opened + squash-merged PR #691 (engine/loot) into `main`.
+- **Artifacts (session 161):** `src/data/vocabulary.ts` · `src/features/session/SessionPlayer.tsx` · `src/engine/quiz.ts` · `src/features/quiz/QuestionViews.tsx` · `src/types/index.ts` · `preview/{cloze-hint,plural-variants,loot-shade}-preview.html` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #687 (content) + PR #691 (engine/loot)
+
+## Session 162 — 2026-07-24 — GitHub "protect main" banner question (branch `claude/popup-main-branch-safety-d46p9o`)
+
+- **Prompt 1 (verbatim, + screenshot of the GitHub repo banner):** `why is this pop up coming up. is my main branch unsafe?` →
+  Explained the banner is GitHub's standard nudge shown on every repo whose default branch has no
+  branch-protection rule; it is a suggestion, not an alert that something happened. main is not
+  unsafe: "Public" only grants read access, write access stays with the founder account (and the
+  sessions it authorizes), and the shipping workflow only touches main via squash-merged PRs
+  (force pushes only ever hit session branches, never main). Recommended either dismissing the
+  banner or adding a minimal ruleset (block force pushes + restrict deletions on main, with NO
+  required PR approvals so the founder-approved auto-ship squash-merge keeps working). Docs-only
+  turn, no code changes.
+- **Artifacts (prompt 1):** this log
+- **Prompt 2 (verbatim, + 2 screenshots of the new-ruleset form):** `this is config correct?` →
+  Two blockers spotted: Enforcement status was "Disabled" (ruleset would be ignored) and Target
+  branches was empty (name "main" is only a label). Told the founder to set status to Active, add
+  target "Include default branch", keep "Block force pushes" ticked, verify "Restrict deletions"
+  is ticked, leave "Require a pull request before merging" and all scanning/quality/coverage/
+  Copilot options off, then Create. Docs-only turn, no code changes.
+- **Artifacts (prompt 2):** this log
+- **Prompt 3 (verbatim, + screenshot of the Add target dropdown):** `I'm selecting the default branch then` →
+  Confirmed "Include default branch" is correct (main is the default; the rule follows a future
+  rename automatically) and warned against "Include all branches", which would also lock the
+  session branches where force-with-lease is routine. Reminder: set Enforcement to Active, then
+  Create. Docs-only turn, no code changes.
+- **Artifacts (prompt 3):** this log
+- **Prompt 4 (verbatim):** `okay, it's done now` →
+  Founder confirmed the ruleset is created (Active, default branch targeted, restrict deletions +
+  block force pushes, nothing else). Recorded the new protection as a standing infra fact in
+  `PROJECT_FOUNDATION.md` (Deploy / infra guardrails) and refreshed the `PROJECT_STATUS.md` header
+  to s162 (docs-only session, no product changes, so no new Resume-here handoff was added; s160/
+  s161 handoffs kept). Wrapped the session: docs PR #694 opened + squash-merged into `main`, branch
+  realigned. First merge under the new ruleset doubles as the proof it doesn't block auto-ship.
+- **Artifacts (session 162):** `docs/PROJECT_FOUNDATION.md` · `docs/PROJECT_STATUS.md` · this log
+
+## Session 163 — 2026-07-24 — Fokus correction: collapse moved words; Genus-Verbi wrap explained (branch `claude/disclaimer-text-layout-5zq5g0`)
+_(Numbered 163 to avoid colliding with the concurrent branch-protection session that also used 162.)_
+- **Prompt 1 (verbatim, + screenshot of the Grammatik rail):** `why is zustandpassiv pill in a new line and not next to passiv pill? looks like there's enough space there.` →
+  Reproduced the exact pill markup at real widths (`preview/genus-verbi-wrap.html`, screenshot):
+  the pills are a plain `flex flex-wrap` row (`GrammarRail.tsx`), so it's a genuine width wrap. On
+  the 256px desktop rail the three compact pills are slightly too wide, so "Zustandspassiv" drops to
+  line 2 (the gap after "Passiv" is ~135px; the pill needs ~160px). Fits on one line from ~360px
+  phones up. Founder chose to LEAVE it (honest wrapping, not a bug).
+- **Prompt 2 (verbatim, + screenshot of a correction showing "heute" removed AND added):** `here's a mistake by ai` →
+  Traced it: NOT an AI error. The corrected sentence is right; the fix tiles are computed
+  client-side by `wordDiff.ts` (LCS), which represents a MOVED word ("heute") as a pure deletion in
+  its old slot + a pure insertion in its new slot, reading as a contradictory remove+add. Fixed:
+  `collapseMoves()` pairs a same-word deletion/insertion into ONE `{category:"Wortstellung", moved:true}`
+  change at the earlier slot; `FokusTrainer` renders a `moved` change as the word once (green, no
+  strike/arrow) under the WORTSTELLUNG eyebrow. Added two `wordDiff.test.ts` cases (move collapses;
+  a real del+ins of different words does not). Gates: typecheck · build · lint (0 errors) ·
+  test:unit (wordDiff + fokusGrammar green). Shipped in PR #695.
+- **Prompt 3 (verbatim):** `For the ai generated box, can you include a nochmal/wieder probieren button so that the user can regenerate a response from AI for the same selected grammar elements in the grammar rail?` →
+  Reported back before building: transforms are GLOBALLY cached in the `transform-sentence` edge
+  function (keyed on source|tuple|prompt_version|model) by deliberate cost-first design, so a client
+  regenerate would return the identical cached sentence (button looks broken). A real regenerate
+  needs an edge-function change (bypass cache + add variation) + a founder redeploy + accepting a
+  small paid AI call per click. Surfaced the tradeoff for a decision (see chat).
+- **Prompt 4 (verbatim):** `merge to main when done` + two `AskUserQuestion` picks (cheaper/capped
+  variant; cap = **2 alternatives**) → Built the capped "Nochmal" regenerate:
+  - **Edge fn `transform-sentence`:** new optional `variant` (server-clamped 0..2); variant 0 keeps
+    the original cache key byte-for-byte, variants 1..2 get their own keys (`…\x1fv{n}`) so each
+    alternative caches independently + globally; `userMsg` gains an "alternative phrasing" instruction
+    for variant ≥ 1; Gemini gets `temperature: 0.9` for variants only (variant-0 output never drifts).
+    **Needs a founder redeploy** (self-contained file, Supabase dashboard) to take effect.
+  - **Client:** `transformSentence` passes `variant`; `useFokusMachine` caches per `tuple|variant`,
+    tracks the current variant per tuple, and `regenerate()` cycles 0→1→2→0 (new variants generate
+    once, then cycling is free); `FokusTrainer` adds a "Nochmal" button (RefreshCw) in the transform
+    box header beside the speaker. Cost cap: ≤ 2 paid generations per sentence+selection, ever.
+  - Gates: typecheck · build · lint (0 errors) · check:bundle 116.9 kB · fokusGrammar green.
+- **Artifacts (session 163):** `src/lib/wordDiff.ts` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/features/writing/fokus/useFokusMachine.ts` · `src/lib/sentenceStudio.ts` ·
+  `supabase/functions/transform-sentence/index.ts` · `tests/wordDiff.test.ts` ·
+  `preview/genus-verbi-wrap.html` · `docs/PROJECT_STATUS.md` · this log · PRs #695 + (regenerate PR)
+
+## Session 164 — 2026-07-24 — Review harmonised into the Control Center + note/approve save-race fix + apply:reviews (branch `claude/apply-review-decisions-lw5azm`)
+_(Branched off `main` at s160; s161–163 landed on `main` from parallel sessions while this was open, so this session is logged as 164.)_
 - **Prompt 1 (verbatim, 2026-07-24):** `Wende die anstehenden Review-Entscheidungen auf das Repo an.` (handoff: run `pnpm apply:reviews` keyless with the 14 expected approvals), then before running: `In the control center, if I write a comment and then reject or approve, are the comments being saved? it's unclear` → then `do both` →
-  Answered the diagnostic first: the `/sources/werkbank` row has only a verified checkbox (= `approve`)
-  + a Notiz field (no reject/needs_fix control in the UI). The note commits on blur/Enter and the
-  checkbox saves separately, but `useWorkbench.onChange` (`src/features/legal/Sources.tsx`) read its
-  base row from the stale memo snapshot and `upsert`ed the whole row, so typing a note then ticking
-  approve wrote the row twice off the same base and the approve write (empty comment) clobbered the
-  note, locally and in Supabase. **Fix:** `onChange` now merges from an always-latest `reviewsRef` and
-  serialises writes per `content_id` (a `writeChains` promise map), so notes + approvals persist
-  together; row call sites unchanged so the pinned test contract holds. `docs/DECISIONS.md` entry added.
-  **`pnpm apply:reviews` could NOT be run:** keyless mode needs the founder's browser "Entscheidungen"
-  export file and DB mode needs `SUPABASE_SERVICE_ROLE_KEY` (must not live in this env); neither is
-  present and the decision-time fingerprints can't be fabricated (that is the integrity check). Handed
-  back the exact one-step action (export the 14 decisions, provide the JSON, then
-  `pnpm apply:reviews --from <file>`). Gates: typecheck · lint (0 errors) · workbench/reviewExport/apply
-  tests 20/20 · build · check:bundle 116.8 kB, all green.
-- **Artifacts (prompt 1):** `src/features/legal/Sources.tsx` · `docs/DECISIONS.md` ·
-  `docs/PROJECT_STATUS.md` (s161 handoff; s159 archived to W30) · this log
+  Answered the diagnostic: the `/sources/werkbank` row had only a verified checkbox (= `approve`) + a
+  Notiz field (no reject control), and `useWorkbench.onChange` read its base row from a stale memo
+  snapshot then `upsert`ed the whole row, so typing a note then approving wrote the row twice off the
+  same base and the approve write (empty comment) clobbered the note. **Fix:** `onChange` merges from an
+  always-latest `reviewsRef` and serialises writes per `content_id` (`writeChains`). `pnpm apply:reviews`
+  could not run yet (no browser export / service key in the env). Commit `85b2586`.
 - **Prompt 2 (verbatim, 2026-07-24, + the founder's decision export `genaulyreviewdecisions20260724.json`):** `Can you merge and harmonize the source list with checkboxes page in sources page by bringing it to control center? Integrate all the features from the source list page to the existing review page in control center. Aim for the highest quality` → then `refer to the design skill` →
-  First ran the now-unblocked `pnpm apply:reviews --from` on the provided export: 13 hash-matched
-  approvals flipped draft→verified + stamped + lint green (commit `5188af2`); 3 rejects exported to
-  `docs/reports/review-defects.md`; 1 (`v_besprechung`, null fingerprint) held for re-review. Then,
-  per the design skill (previews-first), mapped the two review surfaces (Control Center cockpit
-  `/admin/pruefen` + `/sources/werkbank` table), built a real-token preview
-  (`preview/control-center-review.html`, published as an artifact) with two integration variants,
-  screenshot-verified both in headless Chromium, and asked the founder to pick.
+  Ran `pnpm apply:reviews --from` on the export: 13 hash-matched approvals flipped draft→verified +
+  stamped + lint green (commit `5188af2`); 3 rejects → `docs/reports/review-defects.md`; 1
+  (`v_besprechung`, null fingerprint) held for re-review. Then, per the design skill, mapped the two
+  review surfaces, built a real-token preview (`preview/control-center-review.html`, published as an
+  artifact) with two integration variants, screenshot-verified both, and asked the founder to pick.
 - **Prompt 3 (verbatim, 2026-07-24):** `Can you add a save button for the Notes field - increase the notes field width if needed` →
-  Folded into the harmonised table cell: the note field widened and an explicit **Save button** added
-  (appears when the note differs from what is stored; still saves on blur/Enter), directly resolving
-  the earlier "is my comment saved?" doubt.
+  Folded into the harmonised table cell: the note field widened + an explicit **Save button** (appears
+  once the note differs from what is stored; still saves on blur/Enter).
 - **Prompt 4 (verbatim, 2026-07-24):** `Make sure there's no redundancy in the review mode/prufmodus/warteschlange page. No need of previews anymore. Implement the design directly and merge to main` (founder picked **Variant A** via the question chip) →
   Implemented Variant A directly. Extracted+extended `useWorkbench` into
   `src/features/legal/useWorkbench.ts` (one shared, serialised, decision-centric review store);
-  `/admin/pruefen` now heads with a Warteschlange / Alle Inhalte sliding-pill switcher
-  (`useSlidingPill`), the cockpit and the `AdminWorkbench` table sharing that store; the table cell
-  gained a segmented Freigeben/Ablehnen control (reject was impossible in the table before) + the note
-  Save button; `/sources/werkbank` retired (route + `SourcesWorkbench` removed), `/sources` links into
-  the Control Center. Removed the redundant queue header/status copy (open count + as-of date each
-  appear once). Gates: typecheck · lint (0 errors) · test:unit 291/291 · build · check:bundle 116.6 kB.
-- **Artifacts (prompts 2-4):** `src/features/legal/useWorkbench.ts` (new) · `src/features/legal/AdminWorkbench.tsx` ·
+  `/admin/pruefen` heads with a Warteschlange / Alle Inhalte sliding-pill switcher (`useSlidingPill`),
+  cockpit + `AdminWorkbench` table sharing that store; the table cell gained a segmented
+  Freigeben/Ablehnen control (reject was impossible in the table before) + the note Save button;
+  `/sources/werkbank` retired (route + `SourcesWorkbench` removed), `/sources` links into the Control
+  Center. Removed redundant queue header/status copy. Gates: typecheck · lint (0 errors) ·
+  test:unit 291/291 · build · check:bundle 116.6 kB · lint:content. Commit `8d33612`.
+- **Artifacts (session 164):** `src/features/legal/useWorkbench.ts` (new) · `src/features/legal/AdminWorkbench.tsx` ·
   `src/features/admin/Pruefmodus.tsx` · `src/features/legal/Sources.tsx` · `src/router.tsx` ·
   `tests/adminWorkbench.test.tsx` · `src/data/provenance.ts` + `docs/reports/verified-hashes.json` +
-  `docs/reports/review-defects.*` (apply:reviews) · `preview/control-center-review.html` ·
-  `docs/DECISIONS.md` · `docs/areas/LEGAL-ADMIN.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log
+  `docs/reports/review-defects.*` · `preview/control-center-review.html` · `docs/DECISIONS.md` ·
+  `docs/areas/LEGAL-ADMIN.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log · commits `85b2586`, `5188af2`, `8d33612`

@@ -6,6 +6,7 @@ import type {
   MCQQuestion,
   WordOrderQuestion,
   MatchingQuestion,
+  TypedQuestion,
 } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +14,7 @@ import { SpeakButton } from "@/components/shared/SpeakButton";
 import { useAnswerTimer } from "@/lib/hooks";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { speak } from "@/engine/speech";
+import { gradeTypedAny, type TypedVerdict } from "@/engine/typing";
 import { cn, shuffle } from "@/lib/utils";
 
 /**
@@ -130,6 +132,82 @@ export function MCQView({
 
       {answered && q.explain && (
         <p className="rounded-lg bg-muted/50 px-3 py-2 text-sm text-muted-foreground">{q.explain}</p>
+      )}
+    </div>
+  );
+}
+
+/* ---------------- Typed answer (plural production) ---------------- */
+export function TypedView({
+  q,
+  onResult,
+}: {
+  q: TypedQuestion;
+  answered: boolean;
+  onResult: (correct: boolean, latencyMs?: number) => void;
+}) {
+  const [value, setValue] = useState("");
+  const [verdict, setVerdict] = useState<TypedVerdict | null>(null);
+  const elapsed = useAnswerTimer(q.id);
+
+  const finish = (v: TypedVerdict) => {
+    if (verdict !== null) return;
+    setVerdict(v);
+    // Only an exact/normalized match passes; a near-miss on the plural ending
+    // is the whole point of the question, so "almost" grades as wrong here.
+    onResult(v === "correct", elapsed());
+  };
+  const submit = () => {
+    if (verdict !== null || !value.trim()) return;
+    finish(gradeTypedAny(value, q.accept).verdict);
+  };
+  const correct = verdict === "correct";
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardContent className="p-6">
+          {q.hint && (
+            <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{q.hint}</p>
+          )}
+          <div className="flex items-center gap-2">
+            <p className="text-xl font-semibold tracking-tight">{q.prompt}</p>
+            <SpeakButton text={q.answer} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {verdict !== null ? (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn(
+            "flex items-center gap-2 rounded-xl border px-4 py-3.5 text-sm font-medium",
+            correct ? "border-success bg-success/10 text-success" : "border-danger bg-danger/10 text-danger",
+          )}
+        >
+          {correct ? <Check className="h-4 w-4" /> : <X className="h-4 w-4" />}
+          <span>{correct ? "Richtig!" : `Richtig: ${q.answer}`}</span>
+        </motion.div>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              autoFocus
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && submit()}
+              placeholder="Pluralform tippen …"
+              className="h-11 w-full rounded-lg border border-input bg-surface px-3.5 text-sm outline-none transition-colors focus:ring-2 focus:ring-ring"
+            />
+            <Button variant="gradient" className="h-11" onClick={submit}>
+              Prüfen
+            </Button>
+          </div>
+          <Button variant="ghost" size="sm" className="w-full" onClick={() => finish("wrong")}>
+            Anzeigen
+          </Button>
+        </div>
       )}
     </div>
   );
@@ -337,6 +415,7 @@ export function QuestionView({
 }) {
   if (q.kind === "matching") return <MatchingView q={q} answered={answered} onResult={onResult} />;
   if (q.kind === "wordOrder") return <WordOrderView q={q} answered={answered} onResult={onResult} />;
+  if (q.kind === "pluralType") return <TypedView q={q} answered={answered} onResult={onResult} />;
   return <MCQView q={q} answered={answered} onResult={onResult} />;
 }
 
@@ -345,6 +424,7 @@ export function kindLabel(kind: QuizQuestion["kind"]): string {
     translation: "Übersetzung",
     article: "Artikel",
     plural: "Plural",
+    pluralType: "Plural",
     cloze: "Lückentext",
     redemittelCloze: "Redemittel-Lücke",
     listeningCloze: "Hören",
