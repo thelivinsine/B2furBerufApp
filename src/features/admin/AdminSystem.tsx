@@ -13,6 +13,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { TURNSTILE_ENABLED } from "@/store/useAuthStore";
 import { useAdminLang } from "./adminI18n";
 import { useAdminData } from "./AdminShell";
 import {
@@ -214,8 +215,15 @@ export function AdminSystem() {
           value={`${anon}`}
           max="∞"
           pct={0}
-          tone="ok"
-          hint={t("Turnstile noch aus (Chunk 11).", "Turnstile still off (chunk 11).")}
+          tone={TURNSTILE_ENABLED ? "ok" : "warn"}
+          hint={
+            TURNSTILE_ENABLED
+              ? t("Turnstile-Bot-Schutz aktiv.", "Turnstile bot protection active.")
+              : t(
+                  "Turnstile-Client-Key fehlt: GitHub-Secret VITE_TURNSTILE_SITE_KEY setzen + neu deployen. Ist er in Supabase Auth aktiv, aber hier aus, schlägt die Anmeldung fehl.",
+                  "Turnstile client key missing: set the GitHub secret VITE_TURNSTILE_SITE_KEY and redeploy. If it is enabled in Supabase Auth but off here, sign-in fails.",
+                )
+          }
         />
       </div>
 

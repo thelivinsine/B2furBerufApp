@@ -54,8 +54,8 @@ const ITEMS: ChecklistItem[] = [
     id: "turnstile",
     de: "Turnstile (Bot-Schutz) für Gast-Konten aktiviert",
     en: "Turnstile (bot protection) enabled for guest accounts",
-    noteDe: "Vorbereitet in PHASE2_SETUP.md §4; Umsetzung in Chunk 11.",
-    noteEn: "Prepared in PHASE2_SETUP.md §4; wired in chunk 11.",
+    noteDe: "Braucht BEIDES: CAPTCHA in Supabase Auth (Secret Key) UND das GitHub-Secret VITE_TURNSTILE_SITE_KEY (Site Key) + Deploy. Nur eine Seite = Anmeldung schlägt fehl.",
+    noteEn: "Needs BOTH: CAPTCHA in Supabase Auth (secret key) AND the GitHub secret VITE_TURNSTILE_SITE_KEY (site key) + a deploy. Only one side = sign-in fails.",
   },
   {
     id: "resend",
