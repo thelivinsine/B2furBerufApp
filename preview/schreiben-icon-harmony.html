@@ -1,0 +1,260 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Schreiben Icon: 4 Varianten</title>
+<style>
+  :root {
+    --page: hsl(180 45% 98%);
+    --ink: hsl(252 16% 12%);
+    --muted-ink: hsl(220 8% 36%);
+    --card: #ffffff;
+    --line: hsl(218 13% 84%);
+    --brand: #3D74ED;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: hsl(226 44% 8%);
+      --ink: hsl(224 24% 94%);
+      --muted-ink: hsl(224 13% 77%);
+      --card: hsl(224 26% 16%);
+      --line: hsl(216 28% 30%);
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: hsl(226 44% 8%);
+    --ink: hsl(224 24% 94%);
+    --muted-ink: hsl(224 13% 77%);
+    --card: hsl(224 26% 16%);
+    --line: hsl(216 28% 30%);
+  }
+  :root[data-theme="light"] {
+    --page: hsl(180 45% 98%);
+    --ink: hsl(252 16% 12%);
+    --muted-ink: hsl(220 8% 36%);
+    --card: #ffffff;
+    --line: hsl(218 13% 84%);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--ink);
+    font: 15px/1.55 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 72px; }
+  .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--brand); margin: 0 0 6px;
+  }
+  h1 { font-size: 26px; line-height: 1.2; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .lede { color: var(--muted-ink); max-width: 620px; margin: 0 0 8px; }
+  .lede b { color: var(--ink); }
+  ul.diag { color: var(--muted-ink); max-width: 640px; margin: 8px 0 0; padding-left: 20px; }
+  ul.diag li { margin: 4px 0; }
+  ul.diag b { color: var(--ink); font-weight: 600; }
+
+  section { margin-top: 44px; }
+  .v-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .v-letter {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 8px;
+    background: var(--brand); color: #fff; font-weight: 800; font-size: 14px;
+    transform: translateY(4px);
+  }
+  .v-name { font-size: 19px; font-weight: 700; margin: 0; }
+  .v-note { color: var(--muted-ink); font-size: 13.5px; margin: 0 0 14px; max-width: 640px; }
+
+  .bars { display: flex; flex-wrap: wrap; gap: 14px; }
+  .phone {
+    width: 393px; max-width: 100%;
+    border: 1px solid var(--line); border-radius: 18px; overflow: hidden;
+    flex: 0 1 auto;
+  }
+  .phone .screen { height: 34px; }
+  .phone .tag {
+    font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    padding: 8px 12px 0;
+  }
+  /* light phone */
+  .phone.light { background: hsl(180 45% 98%); }
+  .phone.light .tag { color: hsl(220 8% 36%); }
+  .phone.light .bar { background: #ffffff; border-top: 1px solid hsl(218 13% 84%); }
+  .phone.light .pill.on { background: hsl(218 13% 84%); }
+  .phone.light .lbl { color: #475569; }
+  /* dark phone */
+  .phone.dark { background: hsl(226 44% 6%); }
+  .phone.dark .tag { color: hsl(224 13% 77%); }
+  .phone.dark .bar { background: hsl(224 26% 18%); border-top: 1px solid hsl(216 28% 36%); }
+  .phone.dark .pill.on { background: hsl(216 28% 36%); }
+  .phone.dark .lbl { color: #cbd5e1; }
+
+  .bar { display: flex; align-items: stretch; height: 63px; }
+  .tab { flex: 1; padding: 4px; display: flex; }
+  .slot { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .pill { width: 40px; height: 40px; border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+  .lbl { height: 12px; font-size: 10px; font-weight: 600; line-height: 1; opacity: 0; }
+  .lbl.on { opacity: 1; }
+
+  .zoomrow { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .zoomtile {
+    width: 78px; height: 78px; border-radius: 16px;
+    background: var(--card); border: 1px solid var(--line);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .zoomcap { font-size: 11.5px; color: var(--muted-ink); margin-top: 6px; }
+
+  .pick {
+    margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--muted-ink); font-size: 14px;
+  }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Schreiben · Nav-Icon</p>
+  <h1>Vier Varianten für das Schreiben-Icon</h1>
+  <p class="lede">Der aktuelle Bleistift fällt aus der Icon-Familie, aus drei Gründen:</p>
+  <ul class="diag">
+    <li><b>Einziges diagonales Icon.</b> Alle Nachbarn (Kompass, Bücherstapel, Balken, Zahnrad) sind aufrecht und kompakt gebaut.</li>
+    <li><b>Kein Zwei-Ton-Kontrast.</b> Die Spitze (#fb7185) ist fast dieselbe Farbe wie der Körper (#f43f5e). Alle anderen Icons haben eine deutlich hellere Zweitfarbe.</li>
+    <li><b>Zu dünn und spitz.</b> Die Familie besteht aus satten, gefüllten Formen; der Stift wirkt daneben zerbrechlich.</li>
+  </ul>
+
+  <div id="sections"></div>
+
+  <p class="pick">Auswahl per Buchstabe (A, B, C oder D). Die helle Rosa-Zweitfarbe lässt sich bei jeder Form auch tauschen.</p>
+</div>
+
+<script>
+  // ── Real marks from src/components/layout/route-icons.tsx ──────────────
+  const NEON = "#fda4af"; // bright companion pink (same logic as exam's #f0abfc on fuchsia)
+
+  const MARKS = {
+    compass: {
+      color: "#3D74ED", box: [0.65, 0.65, 18.7, 18.7], w: 1.05,
+      svg: c => `
+        <circle cx="10" cy="10" r="8" stroke="${c}" stroke-width="2.7" fill="none"/>
+        <polygon points="13.6,6.4 11.4,11.4 8.6,8.6" fill="#22d3ee"/>
+        <polygon points="6.4,13.6 11.4,11.4 8.6,8.6" fill="${c}"/>`
+    },
+    library: {
+      color: "#3D74ED", box: [2.8, 4, 15.2, 12], w: 1.05,
+      svg: c => `
+        <rect x="2.8" y="4" width="14.4" height="3.4" rx="1.1" fill="${c}"/>
+        <rect x="3.6" y="8.3" width="14.4" height="3.4" rx="1.1" fill="#22d3ee"/>
+        <rect x="2.8" y="12.6" width="14.4" height="3.4" rx="1.1" fill="${c}" opacity=".82"/>`
+    },
+    analytics: {
+      color: "#0ea5e9", box: [2.5, 3, 15, 14.5], w: 1.08,
+      svg: c => `
+        <rect x="2.5" y="11" width="3.5" height="6.5" rx="1.2" fill="${c}"/>
+        <rect x="8.25" y="7" width="3.5" height="10.5" rx="1.2" fill="#22d3ee"/>
+        <rect x="14" y="3" width="3.5" height="14.5" rx="1.2" fill="#67e8f9"/>`
+    },
+    settings: {
+      color: "#64748b", box: [2.31, 2.31, 15.38, 15.38], w: 1.01,
+      svg: c => `
+        <g transform="translate(10 10) scale(0.83) translate(-12 -12)">
+          <path fill="${c}" fill-rule="evenodd" d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58ZM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6Z"/>
+        </g>
+        <circle cx="10" cy="10" r="2.6" fill="#38bdf8"/>`
+    },
+    // ── Schreiben variants (rose #f43f5e) ─────────────────────────────────
+    writingCurrent: {
+      color: "#f43f5e", box: [3.5, 2.9, 13.6, 12.9], w: 1.04,
+      svg: c => `
+        <path d="M14.7 2.9a1.7 1.7 0 0 1 2.4 2.4L7.5 14.9l-3.4.9.9-3.4 9.7-9.5Z" fill="${c}"/>
+        <path d="M4.1 15.8l.9-3.4 2.5 2.5-3.4.9Z" fill="#fb7185"/>`
+    },
+    writingA: { // upright chunky pencil, bright eraser cap
+      color: "#f43f5e", box: [6.9, 2.2, 6.2, 15.6], w: 1.0,
+      svg: c => `
+        <rect x="6.9" y="2.2" width="6.2" height="2.9" rx="1.2" fill="${NEON}"/>
+        <rect x="6.9" y="5.7" width="6.2" height="7.5" fill="${c}"/>
+        <polygon points="6.9,13.2 13.1,13.2 10,17.8" fill="${c}" opacity=".82"/>`
+    },
+    writingB: { // fountain-pen nib, bright breather hole + slit
+      color: "#f43f5e", box: [4.7, 2.6, 10.6, 15], w: 1.02,
+      svg: c => `
+        <path d="M5.9 2.6h8.2c.66 0 1.2.54 1.2 1.2V5c0 2.8-2 7-5.3 12.6C6.7 12 4.7 7.8 4.7 5V3.8c0-.66.54-1.2 1.2-1.2Z" fill="${c}"/>
+        <line x1="10" y1="9" x2="10" y2="13.6" stroke="${NEON}" stroke-width="1.2" stroke-linecap="round"/>
+        <circle cx="10" cy="7.2" r="1.5" fill="${NEON}"/>`
+    },
+    writingC: { // familiar diagonal, thicker, bright tip + written line
+      color: "#f43f5e", box: [3.6, 2.2, 14.9, 17.7], w: 1.1,
+      svg: c => `
+        <path d="M14.6 2.8a2.05 2.05 0 0 1 2.9 2.9L8.1 15.2l-4.2 1.1 1.1-4.2 9.6-9.3Z" fill="${c}"/>
+        <path d="M3.9 16.3l1.1-4.2 3.1 3.1-4.2 1.1Z" fill="${NEON}"/>
+        <line x1="8" y1="18.9" x2="17" y2="18.9" stroke="${NEON}" stroke-width="2.2" stroke-linecap="round"/>`
+    },
+    writingD: { // bold pencil split lengthwise into two tones
+      color: "#f43f5e", box: [4.54, 3.84, 11.62, 11.62], w: 1.04,
+      svg: c => `
+        <polygon points="13.04,3.84 14.6,5.4 4.54,15.46 5.10,11.78" fill="${c}"/>
+        <polygon points="14.6,5.4 16.16,6.96 8.22,14.90 4.54,15.46" fill="${NEON}"/>`
+    },
+  };
+
+  // Same optical normalisation as route-icons.tsx
+  const TARGET = 16;
+  function normTransform(box, weight) {
+    const [x, y, w, h] = box;
+    const s = (TARGET * weight) / Math.max(w, h);
+    return `translate(10 10) scale(${s.toFixed(4)}) translate(${(-(x + w / 2)).toFixed(4)} ${(-(y + h / 2)).toFixed(4)})`;
+  }
+  function icon(key, size) {
+    const m = MARKS[key];
+    return `<svg width="${size}" height="${size}" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <g transform="${normTransform(m.box, m.w)}">${m.svg(m.color)}</g>
+    </svg>`;
+  }
+
+  const TABS = writingKey => ([
+    { key: "compass", label: "Praktisch" },
+    { key: "library", label: "Bibliothek" },
+    { key: writingKey, label: "Schreiben", active: true },
+    { key: "analytics", label: "Fortschritt" },
+    { key: "settings", label: "Einstellungen" },
+  ]);
+
+  function bar(writingKey, theme) {
+    const tabs = TABS(writingKey).map(t => `
+      <div class="tab"><div class="slot">
+        <div class="pill ${t.active ? "on" : ""}">${icon(t.key, 29)}</div>
+        <div class="lbl ${t.active ? "on" : ""}">${t.label}</div>
+      </div></div>`).join("");
+    return `<div class="phone ${theme}">
+      <div class="tag">${theme === "light" ? "Hell" : "Dunkel"}</div>
+      <div class="screen"></div>
+      <div class="bar">${tabs}</div>
+    </div>`;
+  }
+
+  function zoom(writingKey) {
+    return `<div class="zoomrow">${TABS(writingKey).map(t =>
+      `<div><div class="zoomtile">${icon(t.key, 52)}</div><div class="zoomcap">${t.label}</div></div>`
+    ).join("")}</div>`;
+  }
+
+  const SECTIONS = [
+    { letter: "", key: "writingCurrent", name: "Aktueller Stand (Referenz)",
+      note: "Der dünne diagonale Bleistift mit Ton-in-Ton-Spitze, so wie er heute in der Leiste sitzt." },
+    { letter: "A", key: "writingA", name: "Stift, aufrecht",
+      note: "Ein satter, senkrechter Bleistift mit hellem Radierer als Zweitfarbe. Steht wie Bücherstapel und Balken gerade in der Reihe." },
+    { letter: "B", key: "writingB", name: "Federspitze",
+      note: "Eine Füllerfeder mit hellem Luftloch und Schlitz. Kompakt, symmetrisch, und etwas edler als ein Bleistift." },
+    { letter: "C", key: "writingC", name: "Stift mit Schreiblinie",
+      note: "Die vertraute Form bleibt, wird aber kräftiger: helle Spitze statt Ton-in-Ton, und eine geschriebene Linie erdet die Diagonale." },
+    { letter: "D", key: "writingD", name: "Zweifarbiger Stift",
+      note: "Ein breiter Stift, der Länge nach in zwei Töne geteilt, wie das geteilte Grammatik-Lesezeichen. Die kräftigste Zwei-Ton-Wirkung." },
+  ];
+
+  document.getElementById("sections").innerHTML = SECTIONS.map(s => `
+    <section>
+      <div class="v-head">
+        ${s.letter ? `<span class="v-letter">${s.letter}</span>` : ""}
+        <h2 class="v-name">${s.name}</h2>
+      </div>
+      <p class="v-note">${s.note}</p>
+      <div class="bars">${bar(s.key, "light")}${bar(s.key, "dark")}</div>
+      ${zoom(s.key)}
+    </section>`).join("");
+</script>

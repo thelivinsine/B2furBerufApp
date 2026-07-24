@@ -1601,3 +1601,20 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   agents at CLAUDE.md → docs/areas/ → the two skills) as zero-drift insurance for any future
   non-Claude tool. Not created yet; awaiting founder go-ahead (can bundle with the six audit fixes
   from prompt 1).
+
+## Session 158 — 2026-07-24 — Schreiben nav-icon harmony previews (branch `claude/schreiben-icon-design-cz21ts`)
+
+- **Prompt 1 (verbatim, 2026-07-24 ~11:45 UTC):** `/design the schreiben icon isn't harmonious with other icons. Can you generate a couple of previews?` →
+  Diagnosis: the Schreiben pencil (`route-icons.tsx` `/writing`) breaks the icon family three ways:
+  it is the only thin diagonal mark in a row of upright chunky shapes, its second color `#fb7185` is
+  nearly the same as the rose body `#f43f5e` (no two-tone pop like every sibling), and it reads
+  fragile next to the filled geometric marks. Built `preview/schreiben-icon-harmony.html`
+  (screenshot-verified in headless Chromium, published as a Claude artifact): current state as
+  reference + 4 named variants, each rendered in the real bottom tab bar (light + dark, real tokens,
+  29px icons in the 40px squircle pill) plus a magnified 5-icon strip.
+  **A** Stift aufrecht (chunky vertical pencil, bright rose-pink `#fda4af` eraser cap) ·
+  **B** Federspitze (pen nib, bright breather hole + slit) ·
+  **C** Stift mit Schreiblinie (familiar diagonal, thicker, bright tip + written underline) ·
+  **D** Zweifarbiger Stift (bold pencil split lengthwise rose/pink, like the split Grammatik
+  bookmark). No implementation yet; awaiting the founder's pick by letter.
+- **Artifacts (session 158):** `preview/schreiben-icon-harmony.html` · this log
