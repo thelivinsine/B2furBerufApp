@@ -3,6 +3,25 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 163 (2026-07-24). Fokus correction: collapse a moved word into one
+Wortstellung fix, branch `claude/disclaimer-text-layout-5zq5g0`, PR #695.** Numbered 163 (a
+concurrent branch-protection session already took 162). Two founder screenshots of the Fokus screen:
+- **"here's a mistake by ai" — not an AI error.** The corrected sentence was right; the fix tiles
+  are a client-side LCS word-diff (`wordDiff.ts`) that rendered a *moved* word ("heute") as a pure
+  deletion in its old slot + a pure insertion in its new slot, reading as a contradictory remove+add.
+  `collapseMoves()` now pairs a same-word del/ins into ONE `{category:"Wortstellung", moved:true}`
+  change; `FokusTrainer` renders a moved change as the word once (green, no strike/arrow). Two new
+  `wordDiff.test.ts` cases. Gates green; shipped PR #695.
+- **"why does Zustandspassiv wrap" — left as-is (founder decision).** Genuine width wrap on the
+  256px desktop rail (reproduced in `preview/genus-verbi-wrap.html`); not a bug, no change.
+- **"Nochmal"/regenerate button — BUILT + deployed, LIVE (founder redeployed `transform-sentence`
+  2026-07-24).** Founder chose the capped/cheap variant (cap = 2 alternatives). `transform-sentence` gains an optional `variant`
+  (server-clamped 0..2): variant 0 keeps the original cache key byte-for-byte; variants 1..2 get
+  their own global cache keys + an "alternative phrasing" instruction (Gemini temperature 0.9 for
+  variants only). Client (`useFokusMachine.regenerate()` + a RefreshCw "Nochmal" button in the
+  transform box) cycles 0→1→2→0, generating each new variant once (≤ 2 paid calls per sentence+
+  selection, ever) then cycling the cached versions for free.
+
 **Handoff after session 156 (2026-07-24). Admin chunk 11 (Turnstile) completion + chunk 12
 (compliance pack), branch `claude/admin-page-access-ok8g52`.** Continued the admin control center to
 the end of its plan. Two parts:

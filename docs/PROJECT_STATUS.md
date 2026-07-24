@@ -1,12 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 164). **Review harmonised into the Control Center:** the founder
-review table moved out of the retired `/sources/werkbank` page into the `/admin/pruefen` Prüfen page as
-a Warteschlange / Alle Inhalte sliding-pill switcher, both backed by one shared `useWorkbench` store;
-the table cell gained a Freigeben/Ablehnen control + a note Save button. Also fixed the note/approve
-save race and applied the founder's 13 hash-matched approvals (3 rejects + 1 re-review). Prior s163:
-Fokus word-order correction collapse (PR #695); s162: `main` branch protection ruleset. Product name:
-**Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 165). **Control Center layout aligned to the app:** `AdminShell`
+now mirrors `AppShell` (edge-pinned `fixed w-64` rail + `lg:pl-64` + `mx-auto max-w-6xl` content), so
+switching into `/admin` keeps the same left anchor, content width, and gutters instead of the old
+centered `max-w-[1240px]` slab; the Back-to-app link moved to the TOP of the nav panel as a prominent
+Himmelblau accent tile. Prior s164: review harmonised into the Control Center (`/admin/pruefen`
+Warteschlange / Alle Inhalte switcher on a shared `useWorkbench` store) + note/approve save-race fix +
+13 approvals applied. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -73,6 +73,24 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 165 (2026-07-24). Control Center layout brought inline with the app +
+prominent top back-button, branch `claude/control-center-layout-margins-yn6nvd`.** The founder asked
+why margins/layout jump drastically when moving from the app into the Control Center. Root cause:
+`AdminShell` renders outside `AppShell` and had drifted, wrapping the whole shell in a centered
+`mx-auto max-w-[1240px]` grid (`256px 1fr`) with an uncapped, left-aligned content column and a
+sidebar that was a grid column rather than an edge-pinned rail.
+- **Fix (no preview, founder-waived):** `AdminShell` now mirrors `AppShell` exactly. Desktop sidebar
+  is a `fixed inset-y-0 left-0 z-30 hidden w-64 border-r bg-surface/60 backdrop-blur-xl lg:block` rail;
+  content wrapper is `lg:pl-64`; `<main>` is `mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8` — same
+  width, centering, and gutters as the app. Below `lg` the rail becomes a top nav bar (admin has no
+  bottom tab bar).
+- **Back-to-app moved to the top** of the nav panel (was a small muted bottom link) as a Himmelblau
+  accent tile (`border-accent/40 bg-accent/15 text-accent-ink`, dark `/25` `/10`) + ArrowLeft, so it
+  pops against the neutral nav rows; a compact "App" copy sits top-right on the mobile bar.
+- **Files:** `src/features/admin/AdminShell.tsx`. **Gates:** typecheck · build, green.
+- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
+  hard-refresh past a stale SW).
+
 **Handoff after session 164 (2026-07-24). Review harmonised into the Control Center + note/approve
 save race fixed + 13 approvals applied, branch `claude/apply-review-decisions-lw5azm`.** (Branched off
 `main` at s160; s161–163 landed from parallel sessions while this was open, so this is logged as 164.)
@@ -104,27 +122,6 @@ Three linked pieces:
   `docs/areas/LEGAL-ADMIN.md`. Shipped in PRs #697, #700 (docs), #701 (nav move).
 - **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
   hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.
-
-**Handoff after session 163 (2026-07-24). Fokus correction: collapse a moved word into one
-Wortstellung fix, branch `claude/disclaimer-text-layout-5zq5g0`, PR #695.** Numbered 163 (a
-concurrent branch-protection session already took 162). Two founder screenshots of the Fokus screen:
-- **"here's a mistake by ai" — not an AI error.** The corrected sentence was right; the fix tiles
-  are a client-side LCS word-diff (`wordDiff.ts`) that rendered a *moved* word ("heute") as a pure
-  deletion in its old slot + a pure insertion in its new slot, reading as a contradictory remove+add.
-  `collapseMoves()` now pairs a same-word del/ins into ONE `{category:"Wortstellung", moved:true}`
-  change; `FokusTrainer` renders a moved change as the word once (green, no strike/arrow). Two new
-  `wordDiff.test.ts` cases. Gates green; shipped PR #695.
-- **"why does Zustandspassiv wrap" — left as-is (founder decision).** Genuine width wrap on the
-  256px desktop rail (reproduced in `preview/genus-verbi-wrap.html`); not a bug, no change.
-- **"Nochmal"/regenerate button — BUILT + deployed, LIVE (founder redeployed `transform-sentence`
-  2026-07-24).** Founder chose the capped/cheap variant (cap = 2 alternatives). `transform-sentence` gains an optional `variant`
-  (server-clamped 0..2): variant 0 keeps the original cache key byte-for-byte; variants 1..2 get
-  their own global cache keys + an "alternative phrasing" instruction (Gemini temperature 0.9 for
-  variants only). Client (`useFokusMachine.regenerate()` + a RefreshCw "Nochmal" button in the
-  transform box) cycles 0→1→2→0, generating each new variant once (≤ 2 paid calls per sentence+
-  selection, ever) then cycling the cached versions for free. **ACTION: the founder must redeploy
-  `transform-sentence` via the Supabase dashboard** (self-contained file, same as the s159 redeploy);
-  until then the button returns the cached canonical sentence (no visible change).
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

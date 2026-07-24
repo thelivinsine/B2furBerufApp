@@ -649,3 +649,25 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `src/features/auth/AccountMenu.tsx` · `docs/DECISIONS.md` · `docs/areas/LEGAL-ADMIN.md` · `CLAUDE.md` ·
   `docs/PROJECT_STATUS.md` · this log · commits `85b2586`, `5188af2`, `8d33612` · PRs #697 (merged `24aa20b`),
   #700 (docs, merged `7792de2`), #701 (nav move, merged `a25c115`)
+
+## Session 165 — 2026-07-24 — Control Center layout aligned to the app + prominent top back-button (branch `claude/control-center-layout-margins-yn6nvd`)
+
+- **Prompt 1 (verbatim, 2026-07-24):** `why are the layouts/margins drastically changing when moved to control center? see the attached screenshots` →
+  Diagnosed in chat (report-before-edits). Root cause: the Control Center (`AdminShell`) renders outside
+  the app's `AppShell` and had drifted on three layout choices. (1) The `max-width` cap wrapped the WHOLE
+  shell (`mx-auto max-w-[1240px]` grid of `256px 1fr`) instead of only the content; (2) the content column
+  had no inner `max-w`/`mx-auto`, filling ~984px left-aligned; (3) the sidebar was a centered grid column,
+  not pinned to the viewport edge like the app's `fixed left-0 w-64` rail. Net: wider, differently-anchored
+  content vs the app's `max-w-6xl` centered column beside an edge-pinned rail.
+- **Prompt 2 (verbatim, 2026-07-24):** `also, keep the back to app button somewhere on the top in the navigation panel and make it easy to spot.`
+- **Prompt 3 (verbatim, 2026-07-24):** `Do you want me to bring the Control Center's margins into line with the app? - yes`
+- **Prompt 4 (verbatim, 2026-07-24):** `no need of preview to bring the control center layout inline with the app.` →
+  Implemented directly (founder waived the preview round). `AdminShell` now mirrors `AppShell` exactly:
+  desktop sidebar is a `fixed inset-y-0 left-0 z-30 hidden w-64 ... lg:block` rail, content wrapper is
+  `lg:pl-64`, and `<main>` is `mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8` (same width, centering,
+  and gutters as the app). Below `lg` the rail becomes a top nav bar (no admin bottom tab bar). The
+  **Back-to-app** link moved from a small muted bottom link to the TOP of the nav panel, styled as a
+  Himmelblau accent tile (`border-accent/40 bg-accent/15 text-accent-ink`, dark `/25` `/10`) with an
+  ArrowLeft, so it pops against the neutral nav rows; a compact "App" copy sits top-right on the mobile bar.
+  Gates: typecheck · build (green).
+- **Artifacts (session 165):** `src/features/admin/AdminShell.tsx` · `docs/PROJECT_STATUS.md` · this log
