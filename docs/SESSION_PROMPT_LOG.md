@@ -619,8 +619,18 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `/sources/werkbank` retired (route + `SourcesWorkbench` removed), `/sources` links into the Control
   Center. Removed redundant queue header/status copy. Gates: typecheck · lint (0 errors) ·
   test:unit 291/291 · build · check:bundle 116.6 kB · lint:content. Commit `8d33612`.
+- **Prompt 5 (verbatim, 2026-07-24):** `is everything merged to main?` →
+  Verified two ways: `origin/main` at `24aa20b` = branch HEAD (0 ahead / 0 behind, clean tree), and
+  PR #697 `merged: true`, closed 17:21. Confirmed all four commits (harmonisation + save-race fix +
+  apply:reviews) are on `main`; Pages deploy triggered.
+- **Prompt 6 (verbatim, 2026-07-24):** `document the session` →
+  The session was already documented inline across prompts 1-4 (PROJECT_STATUS s164 handoff +
+  `_Last updated_`, this Session-164 log block, `docs/DECISIONS.md`, `docs/areas/LEGAL-ADMIN.md`,
+  `CLAUDE.md` route list), all shipped in PR #697. This pass logged prompts 5-6 and confirmed the docs
+  are current against `main` (which had advanced to 5bc97da via parallel doc PRs #698/#699). Shipped as
+  a small follow-up PR (the s164 branch restarted from latest `main` since #697 was already merged).
 - **Artifacts (session 164):** `src/features/legal/useWorkbench.ts` (new) · `src/features/legal/AdminWorkbench.tsx` ·
   `src/features/admin/Pruefmodus.tsx` · `src/features/legal/Sources.tsx` · `src/router.tsx` ·
   `tests/adminWorkbench.test.tsx` · `src/data/provenance.ts` + `docs/reports/verified-hashes.json` +
   `docs/reports/review-defects.*` · `preview/control-center-review.html` · `docs/DECISIONS.md` ·
-  `docs/areas/LEGAL-ADMIN.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log · commits `85b2586`, `5188af2`, `8d33612`
+  `docs/areas/LEGAL-ADMIN.md` · `CLAUDE.md` · `docs/PROJECT_STATUS.md` · this log · commits `85b2586`, `5188af2`, `8d33612` · PR #697 (merged `24aa20b`)
