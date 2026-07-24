@@ -481,3 +481,11 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   typecheck · build · lint (0 errors) · check:bundle 116.8 kB, all green.
 - **Artifacts (prompt 7):** `src/features/writing/fokus/FokusTrainer.tsx` ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `preview/fokus-disclaimer-inline.html` · this log
+- **Prompt 8 (verbatim, 2026-07-24):** `document the session` (second documentation pass, after the
+  speaker-alignment #690 and re-centering #692 follow-ups) →
+  Extended the PROJECT_STATUS s160 handoff with the two later follow-ups (speaker-button right-align
+  in the three Bibliothek tables → #690 `e30395f`; disclaimer re-centered under the box → #692
+  `894af07`) and updated the shipped-PR list. Logged this prompt. No stale docs found from these two
+  micro-fixes (`docs/areas/SCHREIBEN.md` already describes the bottom-anchored note; the table
+  column alignment is an implementation detail not spec'd in BIBLIOTHEK.md).
+- **Artifacts (prompt 8):** `docs/PROJECT_STATUS.md` · this log
