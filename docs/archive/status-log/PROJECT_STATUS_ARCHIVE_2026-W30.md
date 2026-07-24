@@ -3,6 +3,33 @@
 Append-only session-handoff history for ISO week 2026-W30 (chunked per the s70 doc-hygiene
 rule; index at `docs/archive/PROJECT_STATUS_ARCHIVE.md`). Newest at the top.
 
+**Handoff after session 154 (2026-07-24). App-wide contrast + squircle pass, branch
+`claude/admin-page-access-ok8g52`, PR #665 merged.** Founder: the admin center (and the app generally)
+had too little contrast between cards and background AND between buttons and cards, in BOTH themes, and
+the page toggles / filter pills were too round. Worked previews-first: `preview/contrast-squircle-review.html`
+(interactive, published as a claude.ai artifact) offered three contrast options × light/dark × a
+pill-vs-squircle toggle, over faithful Wörter + Satzlabor mockups. Founder picked **light = Option B,
+dark = Option C, squircle yes**.
+- **Dark = Option C (`src/index.css`):** the flat `24%/10%` ground left `--surface` only 4% above the
+  background. Now a deep-blue ground (`--background`/`--page-*` = `226 44% 6%`) carries brighter, bluer
+  cards (`--surface 224 26% 18%`, was `228 20% 14%`) → a **12% surface↔bg gap**, plus an accent-tinted
+  brighter border (`216 28% 36%`), lifted `--muted`/`--muted-foreground`/`--input`, and a brighter
+  primary/ring (`219 96% 76%`). Foreground-on-surface went 10:1 → **12.6:1**.
+- **Light = Option B:** the card lift is carried by a stronger shared `shadow-soft`
+  (`tailwind.config.ts`; `--shadow` is near-black + low-opacity in dark, so it is a light-only effect),
+  plus slightly deeper `--muted`/`--border` (`88%/84%`) for switcher/pill definition. **The s140-locked
+  mint→sky ground and the `--background` contrast-gate anchor were deliberately left unchanged**, so
+  `check-contrast.mjs` stays honest. (If the founder wants white cards to pop more, deepen `--page-*`
+  next — noted, not done.)
+- **Squircle (`rounded-full`→`rounded-lg` track / `rounded-md` pill):** `LibrarySwitcher` +
+  `WritingModeSwitcher` page toggles, the Fokus Original/Korrigiert toggle (`FokusTrainer.tsx`),
+  `FilterRail` facet pills, `GrammarRail` form pills. Because these are shared, every Bibliothek tab +
+  all of Schreiben change at once. Left round on purpose: status dots, meters, count badges, avatars,
+  circular icon buttons, and the marketing landing page.
+- **Gates:** `check:contrast` (all 40+ pairings re-pass) · `build` · `check:bundle` 116.5 kB · `lint`
+  0 errors · `test:unit` **284/284**. No live screenshot (onboarding/auth gate makes headless capture
+  unreliable; sandbox can't reach the deployed site) — founder confirms live (hard-refresh, PWA-cached).
+
 **Handoff after session 152 (2026-07-23). Admin control-center nav aligned to the app sidebar, branch
 `claude/admin-page-access-ok8g52`, PRs #656 + #660 merged.** Founder asked how admins reach `/admin`
 (answer: the "Kontrollzentrum" entry in the account-menu dropdown, gated on `FOUNDER_EMAILS` in

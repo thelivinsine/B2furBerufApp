@@ -1,16 +1,16 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 155). **Design-preferences distillation → the `design` project
-skill.** Two research subagents mined `SESSION_PROMPT_LOG.md` (s133-154) + `DECISIONS.md` +
-`PROJECT_REFERENCE.md` for every founder design/layout preference, rework pattern, and
-rejected-then-reverted decision (Bibliothek, Schreiben minus Verlauf, Praktisch, global). The
-distillate now lives as `.claude/skills/design/SKILL.md` (loads on demand in any session doing UI
-work; also invocable as `/design`): process rules (previews-first, named variants, screenshot-verify),
-a pre-flight checklist ranked by past rework frequency (redundancy > color > size > dead controls >
-corners > placement > motion), the locked color language, reusable building blocks, per-section
-anchors, and the landmine list. CLAUDE.md's "Founder design preferences" section now points at it as
-mandatory pre-work. Prior: s154 app-wide contrast + squircle pass (light Option B / dark Option C,
-`rounded-full`→`rounded-lg`/`rounded-md`, PR #665). Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 156). **Admin control center completed to plan (chunks 1-12).**
+Chunk 11 (Turnstile) finished: it was already largely built, and a half-configured state (Supabase
+CAPTCHA on, GitHub `VITE_TURNSTILE_SITE_KEY` unset) was breaking guest/email sign-in; founder set the
+secret, redeployed, and verified live sign-in. Chunk 12 (compliance pack) shipped (PR #672): §G2
+consent-drift gate (`legalMeta.ts` + `consentInSync()` + a CI test + a red Launch warning), §G3 auditor
+export (register CSV + Markdown summary, one Launch button, `auditExport.ts`), §G4 GDPR ops evidence
+(migration 0010 content-free `gdpr_events` + `admin_gdpr_evidence()` RPC; deletions/exports logged; the
+Launch panel shows counters + pg_cron retention status). Founder action for §G4: run migration 0010 +
+redeploy `delete-account` (`PHASE2_SETUP.md` §5); G2/G3 work without it. Only admin Phase 3 (13-16)
+remains, on demand. Prior s155: design-preferences distillation → the `/design` skill + the CLAUDE.md
+restructure into `docs/areas/`. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -74,6 +74,34 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 156 (2026-07-24). Admin chunk 11 (Turnstile) completion + chunk 12
+(compliance pack), branch `claude/admin-page-access-ok8g52`.** Continued the admin control center to
+the end of its plan. Two parts:
+- **Chunk 11 · Turnstile (PRs #669/#670).** Most of chunk 11 already existed (the widget +
+  auth-store `captchaToken` integration + the feedback burst/hourly email caps). Diagnosed a
+  half-configured state: CAPTCHA was on in Supabase Auth but the `VITE_TURNSTILE_SITE_KEY` GitHub
+  secret was unset, so the client sent no token and Supabase rejected guest/email sign-in (Google/OAuth
+  is not captcha-gated, which masked it). Founder set the GitHub secret; a fresh deploy made it live;
+  founder verified live sign-in. Code: the `AdminSystem` "Gast-Konten" tile now reads the real
+  `TURNSTILE_ENABLED` flag (was a hardcoded "still off (chunk 11)" label) and the Launch note states
+  both sides are required. Docs: Turnstile marked done in `PROJECT_FOUNDATION.md` completed-setup.
+- **Chunk 12 · Compliance pack (PR #672).** §G2 consent-drift gate: one canonical legal date in
+  `src/lib/legalMeta.ts` (rendered by PrivacyPolicy, compared to `CONSENT_VERSION`); `consentInSync()`
+  + `tests/consent.test.ts` fail CI on drift; the Launch screen shows a red warning instead of the old
+  static note. §G3 auditor export: `src/lib/auditExport.ts` builds the provenance register CSV + a
+  Markdown summary (tiers, review status, licences, verification links, sampling guide) behind one
+  Launch button; reuses `csv.ts` (+ `downloadText`); no new eager weight; pinned by
+  `tests/auditExport.test.ts`. §G4 GDPR ops evidence: **migration 0010** adds a content-free
+  `gdpr_events` table (kind + timestamp, no user id) + `log_gdpr_event()` + founder-only
+  `admin_gdpr_evidence()` RPC (counts + last timestamps + pg_cron retention probe); `delete-account`
+  logs erasures, `exportUserData` logs exports; the Launch panel shows counters, fail-soft to
+  "run migration 0010".
+- **Founder action (chunk 12 §G4 only):** run `supabase/migrations/0010_gdpr_evidence.sql` +
+  `supabase functions deploy delete-account` (`PHASE2_SETUP.md` §5). G2/G3 work without it.
+- **Admin center status:** chunks **1-12 done** (whole MVP + Phase 2). Only Phase 3 (13-16) remains,
+  on demand. Gates for chunk 12: typecheck · build · check:bundle 116.8 kB · lint 0 errors ·
+  test:unit **289/289**.
+
 **Handoff after session 155 (2026-07-24). Design-preferences distillation → the `design` skill,
 branch `claude/design-prefs-documentation-e1xmlc`.** The founder asked whether the recurring
 bad-first-draft problem on new pages/sections is better fixed by a skill or by CLAUDE.md
@@ -109,34 +137,8 @@ triggers probabilistically, so it needs an always-on anchor).
   purpose); when that happens, run it through the new skill's preview-first process and then add
   Verlauf's picked design to the skill's Schreiben anchor + `docs/areas/SCHREIBEN.md`.
 
-**Handoff after session 154 (2026-07-24). App-wide contrast + squircle pass, branch
-`claude/admin-page-access-ok8g52`, PR #665 merged.** Founder: the admin center (and the app generally)
-had too little contrast between cards and background AND between buttons and cards, in BOTH themes, and
-the page toggles / filter pills were too round. Worked previews-first: `preview/contrast-squircle-review.html`
-(interactive, published as a claude.ai artifact) offered three contrast options × light/dark × a
-pill-vs-squircle toggle, over faithful Wörter + Satzlabor mockups. Founder picked **light = Option B,
-dark = Option C, squircle yes**.
-- **Dark = Option C (`src/index.css`):** the flat `24%/10%` ground left `--surface` only 4% above the
-  background. Now a deep-blue ground (`--background`/`--page-*` = `226 44% 6%`) carries brighter, bluer
-  cards (`--surface 224 26% 18%`, was `228 20% 14%`) → a **12% surface↔bg gap**, plus an accent-tinted
-  brighter border (`216 28% 36%`), lifted `--muted`/`--muted-foreground`/`--input`, and a brighter
-  primary/ring (`219 96% 76%`). Foreground-on-surface went 10:1 → **12.6:1**.
-- **Light = Option B:** the card lift is carried by a stronger shared `shadow-soft`
-  (`tailwind.config.ts`; `--shadow` is near-black + low-opacity in dark, so it is a light-only effect),
-  plus slightly deeper `--muted`/`--border` (`88%/84%`) for switcher/pill definition. **The s140-locked
-  mint→sky ground and the `--background` contrast-gate anchor were deliberately left unchanged**, so
-  `check-contrast.mjs` stays honest. (If the founder wants white cards to pop more, deepen `--page-*`
-  next — noted, not done.)
-- **Squircle (`rounded-full`→`rounded-lg` track / `rounded-md` pill):** `LibrarySwitcher` +
-  `WritingModeSwitcher` page toggles, the Fokus Original/Korrigiert toggle (`FokusTrainer.tsx`),
-  `FilterRail` facet pills, `GrammarRail` form pills. Because these are shared, every Bibliothek tab +
-  all of Schreiben change at once. Left round on purpose: status dots, meters, count badges, avatars,
-  circular icon buttons, and the marketing landing page.
-- **Gates:** `check:contrast` (all 40+ pairings re-pass) · `build` · `check:bundle` 116.5 kB · `lint`
-  0 errors · `test:unit` **284/284**. No live screenshot (onboarding/auth gate makes headless capture
-  unreliable; sandbox can't reach the deployed site) — founder confirms live (hard-refresh, PWA-cached).
-
-_(Session 153's Admin-Control-Center-chunks-4-10 + landing-Help-back-button handoff,
+_(Session 154's app-wide-contrast-+-squircle handoff (PR #665),
+session 153's Admin-Control-Center-chunks-4-10 + landing-Help-back-button handoff,
 session 152's admin-control-center-nav-alignment handoff (PRs #656/#660), session 151's Fokus
 "Satzlabor" grammar-bug fix + the Gemini→Sonnet→GPT-5 AI provider cascade
 handoff, session 150's Fokus correction-card redesign + Umlaut-keys handoff (PRs #653/#654), session 149's
