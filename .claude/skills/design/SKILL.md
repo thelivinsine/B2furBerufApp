@@ -170,6 +170,8 @@ at full opacity. Structure is locked; don't touch without an explicit founder re
 ## 8. Deeper record
 
 Why a rule exists: `docs/DECISIONS.md`. Verbatim founder wording: `docs/SESSION_PROMPT_LOG.md`.
-Surface-by-surface specifics + current facts: `CLAUDE.md`. Approved mockups: `preview/`
-(`-r2`/`-r3` = iteration rounds; generators `gen-*.mjs` sit beside outputs). When this file and
-CLAUDE.md disagree, CLAUDE.md is newer law; update this skill in the same PR.
+Surface-by-surface specifics + current facts: `docs/areas/` (BIBLIOTHEK, SCHREIBEN,
+PRAKTISCH-NAV, GAME, BRAND, COMPONENTS) with the always-on summary in `CLAUDE.md`. Approved
+mockups: `preview/` (`-r2`/`-r3` = iteration rounds; generators `gen-*.mjs` sit beside outputs).
+When this file and CLAUDE.md/`docs/areas/*` disagree, those are newer law; update this skill in
+the same PR.

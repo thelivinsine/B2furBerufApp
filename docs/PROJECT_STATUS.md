@@ -22,7 +22,9 @@ This is the **lean, living** status doc: current state plus the two most recent 
 - **`docs/DECISIONS.md`** — the "why" behind locked UX decisions.
 - **`docs/archive/PROJECT_STATUS_ARCHIVE.md`** — index into the append-only session-log history,
   chunked by ISO week under `docs/archive/status-log/`.
-- **`../CLAUDE.md`** — developer/agent operating instructions, content conventions, and locked designs.
+- **`../CLAUDE.md`** — the lean always-on operating rules (restructured s155, ~180 lines); deep
+  per-area detail lives in **`docs/areas/`** (COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN,
+  PRAKTISCH-NAV, GAME, BRAND, LEGAL-ADMIN, COMPONENTS) + the `/design` and `/content` skills.
 
 **Doc-hygiene rule (keep this file lean):** hold only **current state + the two most recent
 handoffs**. When you append a new handoff to `## Resume here`, move any handoff older than the two
@@ -34,11 +36,12 @@ lines. Stable "what's built" material goes to `PROJECT_FOUNDATION.md`, not here.
 ## Where things stand
 
 The full SPA is live on `main`: onboarding, dashboard, the composed session loop, the four-zone nav
-(Heute · Bibliothek · Anwenden · Fortschritt), the Neuland game layer (`/welt`, Kapitel 1 complete),
-Supabase auth + cloud sync, and the AI writing coach. **The shipped architecture, locked
+(Praktisch · Bibliothek · Schreiben · Fortschritt), the Neuland game layer (`/welt`, Kapitel 1
+complete), Supabase auth + cloud sync, and the AI writing coach. **The shipped architecture, locked
 architectural decisions, and backend/infra setup are documented in `docs/PROJECT_FOUNDATION.md`** —
 read that for the "what's built and how." The living detail of every feature area (mobile bar, the
-session engine, Bibliothek views, the game layer, content conventions) is in `../CLAUDE.md`.
+session engine, Bibliothek views, the game layer, content conventions) is in `docs/areas/` (index
+in `../CLAUDE.md`).
 
 **Content banks (as of 2026-07-21, session 142, verified against `pnpm lint:content` — re-verify
 before quoting):** vocab **1,623** (8 mis-filed noun+verb combos retired from the Wörter surface
@@ -89,9 +92,20 @@ triggers probabilistically, so it needs an always-on anchor).
   still reach the full playbook. Founder can also force it deterministically by typing `/design`.
 - **Maintenance rule (in the skill):** CLAUDE.md is newer law on conflict; update the skill in the
   same PR that changes a design rule.
+- **Part 2 (same session): the CLAUDE.md restructure.** The founder then asked for best practice
+  on the ~1,078-line / ~36k-token CLAUDE.md and approved the proposed split. CLAUDE.md is now
+  **~180 lines of current law only** (identity, one-line command index, layout map, hard
+  invariants, design-prefs summary, writing style, area index, deployment, workflow) with a
+  maintenance rule at the top (replace rules, don't append history; history → DECISIONS.md).
+  The detail moved, de-narrated to current-state-only with every rule and landmine preserved,
+  into **`docs/areas/`**: COMMANDS, CONTENT, BIBLIOTHEK, SESSION, SCHREIBEN, PRAKTISCH-NAV,
+  GAME, BRAND, LEGAL-ADMIN, COMPONENTS. A second skill **`/content`**
+  (`.claude/skills/content/SKILL.md`) holds the add-content workflow (iron laws + gate order).
+  `lint:content` gained a warn-only ratchet: it nags when CLAUDE.md exceeds ~350 lines.
+  Saves ~28k tokens of always-on context per session. `pnpm lint:content` green after the change.
 - **Next:** founder wants to rework Schreiben's Verlauf tab (excluded from the distillation on
   purpose); when that happens, run it through the new skill's preview-first process and then add
-  Verlauf's picked design to the skill's Schreiben anchor.
+  Verlauf's picked design to the skill's Schreiben anchor + `docs/areas/SCHREIBEN.md`.
 
 **Handoff after session 154 (2026-07-24). App-wide contrast + squircle pass, branch
 `claude/admin-page-access-ok8g52`, PR #665 merged.** Founder: the admin center (and the app generally)
