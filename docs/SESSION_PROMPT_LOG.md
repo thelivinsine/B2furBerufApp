@@ -1530,3 +1530,44 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   from 1,078 lines (~36k tokens, always loaded) to ~180 lines of current law; detail moved
   current-state-only into `docs/areas/` (10 files); new `/content` skill; warn-only CLAUDE.md
   size ratchet in `scripts/lint-content.mjs`. `pnpm lint:content` green throughout.
+
+## Session 156 — 2026-07-24 — Admin chunk 11 (Turnstile) completion + chunk 12 (compliance pack) (branch `claude/admin-page-access-ok8g52`)
+
+- **Prompt 1 (verbatim):** `what's next in admin control center?` →
+  Reported chunks 1-10 shipped; described chunk 11 (Turnstile + abuse meters) as next. (This first
+  description was stale, corrected below.)
+- **Prompt 2 (verbatim):** `didn't I already do the backend task which you're describing for chunk 11?` →
+  Checked the code and corrected myself: most of chunk 11 already existed. The Turnstile widget +
+  full `useAuthStore` `captchaToken` integration were built ~s136, and `submit-feedback` already had a
+  per-IP burst limit + a global hourly email cap. The `AdminSystem` "Gast-Konten" tile just showed a
+  hardcoded "still off (chunk 11)" label.
+- **Prompt 3 (verbatim):** `did it only in supabase.` →
+  Flagged the failure mode: `pages.yml` bakes `VITE_TURNSTILE_SITE_KEY` at build from a GitHub secret;
+  with Supabase CAPTCHA on but that secret unset, the client sends no token and Supabase rejects
+  guest/email sign-in (Google/OAuth is not captcha-gated, masking it). Gave the fix (set the GitHub
+  secret + redeploy) or the fallback (disable Supabase CAPTCHA).
+- **Prompt 4 (verbatim):** `i also did it in GitHub` →
+  Noted GitHub secrets bake in at BUILD time, so a fresh deploy is needed. **PR #669:** the AdminSystem
+  tile now reads the real `TURNSTILE_ENABLED` flag (active / warn), and the Launch note states both
+  sides are required; merging triggered a fresh Pages build carrying the secret.
+- **Prompt 5 (verbatim):** `the live signin works already` →
+  Turnstile confirmed live end-to-end. **PR #670:** marked the Turnstile item done in
+  `PROJECT_STATUS.md` + `PROJECT_FOUNDATION.md` (needs both sides; PR #669 wired the reporting).
+- **Prompt 6 (verbatim):** `go ahead with chunk 12` →
+  **PR #672 (compliance pack).** §G2 consent-drift gate (`src/lib/legalMeta.ts` canonical date +
+  `consentInSync()` + `tests/consent.test.ts` + a red Launch warning). §G3 auditor export
+  (`src/lib/auditExport.ts`: register CSV + Markdown summary, one Launch button, `csv.ts` `downloadText`,
+  `tests/auditExport.test.ts`). §G4 GDPR ops evidence (`supabase/migrations/0010_gdpr_evidence.sql`:
+  content-free `gdpr_events` + `log_gdpr_event()` + `admin_gdpr_evidence()` RPC; `delete-account` +
+  `exportUserData` log events; Launch panel counters + pg_cron retention probe; fail-soft). Founder
+  action: run migration 0010 + redeploy `delete-account` (`PHASE2_SETUP.md` §5). Gates: typecheck,
+  build, check:bundle 116.8 kB, lint 0 errors, test:unit 289/289. Admin center chunks 1-12 all done.
+- **Prompt 7 (verbatim):** `document the session` →
+  Updated `PROJECT_STATUS.md` (header + s156 handoff; moved s154 to the W30 archive),
+  `docs/areas/LEGAL-ADMIN.md` (chunks 1-12 live + the compliance-pack detail), and this log.
+- **Artifacts (session 156):** `src/features/admin/{AdminSystem,AdminLaunch}.tsx` ·
+  `src/lib/{legalMeta,consent,csv,auditExport,adminApi,dataExport}.ts` ·
+  `src/features/legal/PrivacyPolicy.tsx` · `supabase/functions/delete-account/index.ts` ·
+  `supabase/migrations/0010_gdpr_evidence.sql` · `tests/{consent,auditExport}.test.ts` ·
+  `docs/plans/{PHASE2_SETUP,ADMIN_CONTROL_CENTER_BUILD_PLAN}.md` · `docs/areas/LEGAL-ADMIN.md` ·
+  `docs/PROJECT_STATUS.md` · `docs/PROJECT_FOUNDATION.md` · this log · PRs #669, #670, #672

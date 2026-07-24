@@ -44,7 +44,10 @@
 
 ## Admin control center (`/admin`)
 Plans: `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` (scope) + `ADMIN_CONTROL_CENTER_BUILD_PLAN.md`
-(chunks; next: chunk 11, Turnstile + abuse meters). Chunks 1-10 are live.
+(chunks). **Chunks 1-12 are live** (whole MVP + Phase 2); only Phase 3 (13-16) remains, on demand.
+Chunk 11 (Turnstile) was already substantially built (widget + auth `captchaToken` + feedback
+burst/hourly caps) and went live once BOTH sides were set: Supabase Auth CAPTCHA (secret key) AND the
+`VITE_TURNSTILE_SITE_KEY` GitHub secret (site key, baked in at build). Only one side = sign-in fails.
 - **Backend (migration `supabase/migrations/0008_admin_center.sql`):** `provenance_reviews`
   widened to real decisions (`decision approve|reject|needs_fix` + `content_hash`/
   `reviewer_email`/`applied_at`/`applied_sha`), feedback triage columns
@@ -84,3 +87,15 @@ Plans: `docs/plans/ADMIN_CONTROL_CENTER_PLAN.md` (scope) + `ADMIN_CONTROL_CENTER
   dialog), H4 flags (`SHOW_PRACTICE_TABS`/`SHOW_RELATED` → `features.*`), H5 feedback pill, H6
   Beta chip, H7 streak pill, H8 dashboard start tab, H10 landing copy, H12 Demo-Modus preset.
   `AdminSteuerung.tsx` saves only real overrides, with live preview.
+- **Compliance pack (chunk 12, on the Launch screen):** §G2 consent-drift check, `consentInSync()`
+  compares `CONSENT_VERSION` (`src/lib/consent.ts`) against the ONE canonical legal date
+  `PRIVACY_LAST_UPDATED_ISO` (`src/lib/legalMeta.ts`, rendered by PrivacyPolicy). `tests/consent.test.ts`
+  fails CI on drift; the Launch panel shows a red warning. **Bump both together on any material legal
+  change.** §G3 auditor export (`src/lib/auditExport.ts`, one button): the provenance register as CSV
+  plus a Markdown summary (tiers, review status, licences, verification links, sampling guide); reuses
+  `csv.ts` `downloadText`; pinned by `tests/auditExport.test.ts`. §G4 GDPR ops evidence (migration
+  `0010_gdpr_evidence.sql`): a **content-free** `gdpr_events` table (kind + timestamp, NO user id),
+  `log_gdpr_event()` helper, and founder-only `admin_gdpr_evidence()` RPC (counts + last timestamps +
+  a defensive `pg_cron` retention probe). `delete-account` logs erasures; `exportUserData` logs exports;
+  both best-effort. `fetchGdprEvidence()` fails soft to null (the panel shows "run migration 0010").
+  Founder action: run migration 0010 + redeploy `delete-account` (`PHASE2_SETUP.md` §5).
