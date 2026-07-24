@@ -100,10 +100,21 @@ drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shor
   the Fokus/Kurz-Lang note), screenshot-verified in headless Chromium. Could NOT live-verify (unauth
   `/writing` redirects to the landing page); founder verifies live. Docs: `docs/areas/SCHREIBEN.md`
   + `docs/areas/PRAKTISCH-NAV.md` updated.
-- **Gates:** typecheck · build · lint (0 errors) · check:bundle **116.8 kB**, all green.
-- **Shipped:** PR #688 squash-merged to `main` (merge commit `4cbf0fe`), Pages deploy triggered.
-  Decision recorded in `docs/DECISIONS.md`; the `design` skill §2.6 now carries the Schreiben
-  disclaimer-placement exception so a future session doesn't re-center it.
+- **Later follow-ups (same session, separate PRs):**
+  - **Speaker-button alignment (#690, `e30395f`):** the first column of the three Bibliothek
+    `DataTable`s (`RedemittelViews` "Wendung", `CollocationViews` "Kollokation", `VocabViews` "Wort")
+    put the `SpeakButton` right after the German text, so it landed at a different x per row. Fixed:
+    `min-w-0` text span + `ml-auto shrink-0` on the SpeakButton (+ `shrink-0` on the Wörter gender
+    glyph) → all speaker buttons right-align to the column edge. Mockup: `preview/speaker-align.html`.
+  - **Disclaimer re-centered (#692, `894af07`):** the bottom-line `aiNoteDesktop` had lost the
+    original note's `text-center`, so it read left-aligned; restored `text-center` on both trainers'
+    `<p>` (it already spans the content-column width, so it centers under the box while the fixed
+    `bottom-4` line with the Feedback pill is untouched).
+- **Gates (each PR):** typecheck · build · lint (0 errors) · check:bundle **116.8 kB**, all green.
+- **Shipped:** PRs #688 (`4cbf0fe`), #689 (docs), #690 (`e30395f`), #692 (`894af07`) all
+  squash-merged to `main`, Pages deploys triggered. Decision recorded in `docs/DECISIONS.md`; the
+  `design` skill §2.6 now carries the Schreiben disclaimer-placement exception so a future session
+  doesn't re-center it.
 - **Next:** nothing pending. Founder verifies the live result (PWA: hard-refresh past a stale SW).
 **Handoff after session 161 (2026-07-24). Quiz-quality pass on the composed session, branch
 `claude/word-verification-nl4m26`, PR #687 (content) + PR #691 (engine/loot).** Started
