@@ -460,3 +460,14 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   Schreiben exception to the `design` skill §2.6 so a future session doesn't re-center it.
 - **Artifacts (prompts 4-5):** PR #688 (merged, `4cbf0fe`) · `docs/DECISIONS.md` ·
   `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 6 (verbatim, 2026-07-24, + screenshot of the Redemittel table):** `the speaker buttons are not aligned. Fix them by aligning all of the buttons to the right` →
+  The first column of the three Bibliothek `DataTable`s put the `SpeakButton` right after the German
+  text (`gap-1`), so it landed at a different x per row. Fixed all three sibling tables
+  (`RedemittelViews.tsx` "Wendung", `CollocationViews.tsx` "Kollokation", `VocabViews.tsx` "Wort"):
+  `min-w-0` on the text span + `ml-auto shrink-0` on the SpeakButton (and `shrink-0` on the Wesen
+  gender glyph), so every speaker button aligns to the right edge of that column. Verified with a
+  before/after mockup (`preview/speaker-align.html`, screenshot). Gates: typecheck · build · lint
+  (0 errors) · check:bundle 116.8 kB, all green.
+- **Artifacts (prompt 6):** `src/features/redemittel/RedemittelViews.tsx` ·
+  `src/features/collocations/CollocationViews.tsx` · `src/features/vocabulary/VocabViews.tsx` ·
+  `preview/speaker-align.html` · this log
