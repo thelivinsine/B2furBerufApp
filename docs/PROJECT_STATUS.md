@@ -1,13 +1,13 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 160). **Schreiben KI-Hinweis relocated + Feedback label
-shortened:** on BOTH Fokus and Kurz/Lang the combined Art. 50 disclaimer now drops to a fixed line
-at the bottom of the viewport, level with the floating Feedback pill on desktop (no bordered bar);
-on mobile the Feedback button floats beside Auswerten/Korrigieren with a condensed "KI-geprüft, kann
-Fehler enthalten. Mehr" line beneath. The floating pill + related buttons are relabelled from "Mit KI
-gebaut · Feedback" to just **"Feedback"** app-wide. Prior s159: Fokus "Satzlabor" Wave 2 (Konjunktiv
-II + Zustandspassiv; `transform-sentence` redeployed 2026-07-24, live). Product name: **Genauly**
-(`genauly.de`)._
+_Last updated: 2026-07-24 (session 161). **Quiz-quality pass on the composed session
+(branch `claude/word-verification-nl4m26`):** plural questions now test the pattern, not word
+recognition (same-stem distractors + a typed production variant; at the C1 band only the tricky
+plurals are asked); odd-one-out (Ausreißer) questions gained a part-of-speech-matched flavour plus a
+"genuinely unrelated" guard on the odd word; the round-summary loot cards moved off the coral reward
+wash (read like errors) to white cards + a Himmelblau "Lv up" pill; plus two content tweaks
+(Soll-Ist-Vergleich English gloss reworded, English hint added to typed-cloze cards). Prior s160:
+Schreiben KI-Hinweis relocated level with the floating Feedback pill; "Feedback" label shortened app-wide. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -116,36 +116,35 @@ drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shor
   `design` skill §2.6 now carries the Schreiben disclaimer-placement exception so a future session
   doesn't re-center it.
 - **Next:** nothing pending. Founder verifies the live result (PWA: hard-refresh past a stale SW).
-
-**Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
-branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
-grammar-dimensions brainstorm (four research agents) -> `docs/plans/GRAMMAR_DIMENSIONS_BRAINSTORM.md`
-(dimension catalog, feasibility tiers, B2-marker ranking, guardrails, Now/Next/Later/Skip roadmap) +
-two previews (`preview/grammar-dimensions-satzlabor.html`, `-catalog.html`) + a combined claude.ai
-artifact (daa4dbb6). Then built the "easy half":
-- **Konjunktiv II** as a new **Modus** rail axis: `mood` promoted from the pinned `DEFAULT_MOOD` to a
-  real, combinable axis across `grammarDimensions.ts` / `useFokusMachine.ts` / `GrammarRail.tsx` /
-  `FokusTrainer.tsx` (rail is data-driven, so the Modus section renders itself).
-- **Zustandspassiv** as a third Genus-Verbi pill (data-only value add): a detected `passiv_zustand`
-  now maps to its own pill instead of null; also fixed a phantom "Aktiv looks selected" quirk on a
-  real Zustandspassiv sentence. The copula safeguard (misread "Ich bin krank" -> aktiv) stays in the
-  check-sentence prompt.
-- **Edge function:** `transform-sentence` prompt gained K-II (synthetic-vs-wuerde) + Vorgang-vs-Zustand
-  rules + examples; `PROMPT_VERSION` 2 -> 4. **Founder redeployed `transform-sentence` on 2026-07-24**
-  via the Supabase dashboard code editor (single self-contained file, no local clone / CLI needed), so
-  the improved output is live. The pills also worked before that against the live function (its enums
-  already accept konjunktiv2 / passiv_zustand as targets).
-- **Copy:** rail legend simplified to "Gruener Punkt = dein Satz." / "Tippe eine andere Form, um ihn
-  umzuwandeln."
-- **Held (operation-style, need a NEW edge-function contract, not the tuple):** Register (Sie<->du),
-  Satzbau (HS<->NS), Nominalstil, Relativ<->Partizip. Plusquamperfekt deferred (needs a temporal
-  anchor). Roadmap: brainstorm-doc section 6.1.
-- **Merge note:** `main` force-advanced 10 commits (CLAUDE.md restructure #671, prompt-log rotation,
-  sessions 155-158) while this branch was open; merged it in - code auto-merged (mood/copy edits +
-  main's cosmetic tweaks both intact), the 4 doc conflicts resolved to main's new structure and the
-  docs re-applied against it (this handoff, `docs/areas/SCHREIBEN.md` Wave-2 axes, prompt-log s159).
-- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build / check:bundle **112 kB** /
-  lint:content. Edge function is Deno (not deployed from the sandbox).
+**Handoff after session 161 (2026-07-24). Quiz-quality pass on the composed session, branch
+`claude/word-verification-nl4m26`, PR #687 (content) + PR #691 (engine/loot).** Started
+from founder screenshots of individual session cards; each turn diagnosed one exercise type and fixed it:
+- **Content (merged, PR #687):** the `v_soll_ist_vergleich` English gloss reworded `target-actual
+  comparison` → `target/planned vs. actual comparison`; and typed-cloze ("Lücke") cards, which showed
+  only the blanked sentence (unanswerable, many words fit), now render the target word's English
+  meaning as a muted "Hinweis:" line under the sentence (`SessionPlayer.tsx` TypingBlock).
+- **Plural questions (`engine/quiz.ts`):** MCQ distractors are now generated from the noun's OWN stem
+  (`sameStemPluralForms`: -e/-en/-n/-er/-s, Nullplural, umlaut variants) so all four options share the
+  stem and only the correct pattern distinguishes them (was: distractors from unrelated nouns, an A1
+  recognition move). Added a **typed** plural variant (new `pluralType` `QuizQuestion` kind +
+  `TypedView` renderer in `QuestionViews.tsx`, graded by the existing typed grader); ~half of plural
+  slots are typed. **Competency gate:** at difficulty 3 (C1) plural questions are limited to tricky
+  plurals (`isTrickyPlural`: umlaut / -er / Nullplural / stem-changing like Praxis→Praxen); predictable
+  -e/-en/-n/-s plurals drop out. Plural now also appears in the d3 branch.
+- **Odd-one-out / Ausreißer (`engine/quiz.ts` `oddOneOutQ`):** added a **part-of-speech-matched**
+  flavour (all four options share the anchor's POS, mixed ~50/50 with the old mixed-POS style) so the
+  topic is the only discriminator; and the odd word must now be **genuinely unrelated** (different
+  theme AND no shared `related` link in either direction), so a half-belonging word (abdichten next to
+  Blech) can't be the answer. Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
+- **Round-summary loot cards (`SessionPlayer.tsx` `LootCard`):** dropped the coral reward wash (read
+  like wrong answers) for plain white cards; a level-up is now a Himmelblau `bg-accent/20` "Lv ↑" pill,
+  unchanged words keep a muted level, the "Gesammelt" eyebrow moves coral → brand blue. Trophy ring
+  stays coral (the sanctioned celebration accent). Founder picked this variant (C) from a 4-shade preview.
+- **Gates:** typecheck / test:unit **289/289** / lint 0 errors / build green. Previews:
+  `preview/cloze-hint-preview.html`, `plural-variants-preview.html`, `loot-shade-preview.html`.
+- **Next:** nothing pending. Held ideas from the discussion: odd-one-out option 3 (make it rarer /
+  reserve for cleanly separable clusters) if the type still feels fuzzy; a "type it" plural could gain
+  an "almost" partial-credit tier if strict grading feels harsh.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
