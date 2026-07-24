@@ -1,12 +1,12 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 165). **Control Center layout aligned to the app:** `AdminShell`
-now mirrors `AppShell` (edge-pinned `fixed w-64` rail + `lg:pl-64` + `mx-auto max-w-6xl` content), so
-switching into `/admin` keeps the same left anchor, content width, and gutters instead of the old
-centered `max-w-[1240px]` slab; the Back-to-app link moved to the TOP of the nav panel as a prominent
-Himmelblau accent tile. Prior s164: review harmonised into the Control Center (`/admin/pruefen`
-Warteschlange / Alle Inhalte switcher on a shared `useWorkbench` store) + note/approve save-race fix +
-13 approvals applied. Product name: **Genauly** (`genauly.de`)._
+_Last updated: 2026-07-24 (session 166). **Schreiben mobile action cluster de-collided:** the
+floating Feedback + Auswerten/Korrigieren cluster carries no bar chrome, so a disabled
+(`opacity-50`) button let the card text behind it bleed through and the card-tail "Noch N
+Wörter" hint sat exactly under the pinned cluster. Controls now get an opaque backing and the
+hint rides the cluster's caption slot (`src/features/writing/floatingCluster.ts`). Prior s165:
+Control Center layout aligned to `AppShell` + prominent top back-button + Prüfmodus note-save.
+Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -73,6 +73,33 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 166 (2026-07-24). Mobile floating action cluster no longer collides with
+the card underneath (Schreiben), branch `claude/button-overlap-fix-s7fl28`.** Founder screenshot of
+`/writing` (Lang, dark, mobile): the "Feedback" pill, the "Auswerten" button and the card's
+"Noch N Wörter schreiben, dann kannst du auswerten." line all rendered on top of each other.
+- **Root cause (two halves).** The mobile cluster is `sticky` with NO bar chrome (founder s159/s160),
+  so it floats straight over the content cards. (a) With 0 words the Auswerten button is `disabled`
+  → the base `disabled:opacity-50` made it half-transparent, so the card text behind bled *through*
+  the button; `variant="outline"` (`bg-surface/50`) has the same problem. (b) The hint line is the
+  LAST element of the editor card, i.e. exactly where the pinned cluster sits, so the collision was
+  guaranteed whenever the button was inactive. Padding cannot fix this: a bottom-pinned sticky
+  element floats over content at every scroll position except the very end.
+- **Fix (both writing trainers, shared contract).** New `src/features/writing/floatingCluster.ts`
+  exports `floatingSlot` (opaque `bg-background` backing behind each control) and `floatingNote`
+  (`bg-background/90` + `backdrop-blur-sm` plate behind the caption, matching the other mobile bars).
+  `--background` equals the page stops, so both are invisible against the page ground and only mask
+  where they float over a card. The transient "Noch N Wörter …" hint moved from the card tail into
+  the cluster's single caption slot (hint while too short, Art. 50 note once evaluating is possible,
+  never both); the card keeps it on `lg:` only, where there is no cluster.
+- **Files:** `src/features/writing/floatingCluster.ts` (new), `GuidedWritingTrainer.tsx`,
+  `fokus/FokusTrainer.tsx`, `docs/areas/SCHREIBEN.md`.
+- **Verified in a real mobile viewport** (Playwright, 360×800 @3x, light + dark, cluster parked
+  pinned over the editor card): buttons opaque, caption legible, nothing overlapping in any state
+  (too short / ready / Fokus). The other four mobile bars (Wörter, Kollokationen, Redemittel,
+  Grammatik) already carry `bg-background/90 backdrop-blur` and needed no change.
+- **Gates:** typecheck · lint (0 errors) · test:unit **293/293** · build · check:bundle (117.0 kB),
+  all green.
+
 **Handoff after session 165 (2026-07-24). Control Center layout brought inline with the app +
 prominent top back-button, branch `claude/control-center-layout-margins-yn6nvd`.** The founder asked
 why margins/layout jump drastically when moving from the app into the Control Center. Root cause:
@@ -96,38 +123,6 @@ sidebar that was a grid column rather than an edge-pinned rail.
   typecheck · lint (0 errors) · build, green.
 - **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
   hard-refresh past a stale SW).
-
-**Handoff after session 164 (2026-07-24). Review harmonised into the Control Center + note/approve
-save race fixed + 13 approvals applied, branch `claude/apply-review-decisions-lw5azm`.** (Branched off
-`main` at s160; s161–163 landed from parallel sessions while this was open, so this is logged as 164.)
-Three linked pieces:
-- **Save-race fix (`useWorkbench`).** The founder asked whether a note typed before approving is saved.
-  It was NOT reliable: the note and the checkbox saved separately, but both `onChange` calls read the
-  SAME stale `reviews` snapshot and each `upsert`ed the whole row, so typing a note then approving wrote
-  the row twice off the same base and the approve write (empty comment) clobbered the note. Fix: merge
-  from an always-latest `reviewsRef` + serialise writes per `content_id` (`writeChains`).
-- **13 approvals applied.** `pnpm apply:reviews --from` on the founder's browser export (17 decisions):
-  13 hash-matched approvals flipped draft→verified + stamped + lint green (commit `5188af2`); 3 rejects
-  → `docs/reports/review-defects.md`; 1 (`v_besprechung`, null fingerprint) held for re-review.
-- **Harmonisation (Variant A, founder-picked).** The founder review table moved OUT of the retired
-  `/sources/werkbank` page INTO the Control Center's **Prüfen** page (`/admin/pruefen`) as a two-segment
-  sliding-pill switcher: **Warteschlange** (priority queue + keyboard cockpit) · **Alle Inhalte** (the
-  full `AdminWorkbench` table). One shared `useWorkbench` store now backs BOTH. The table cell gained a
-  segmented **Freigeben/Ablehnen** control (reject was impossible in the table before) + a wider note
-  field with an explicit **Save button** (appears when edited; still saves on blur/Enter). Redundant
-  queue header/status copy removed. `/sources` links admins into `/admin/pruefen?view=table`.
-- **Follow-up (PR #701): admin entry moved into the nav panel.** The founder "Kontrollzentrum" link
-  moved from the account-menu dropdown into the desktop `Sidebar` as a founder-only nav row (neutral
-  styling, not accent-blue); kept as a mobile-only (`lg:hidden`) account-menu entry since the sidebar
-  is desktop-only and the bottom bar is locked.
-- **Files:** `src/features/legal/useWorkbench.ts` (new), `AdminWorkbench.tsx`, `Pruefmodus.tsx`,
-  `Sources.tsx`, `router.tsx`, `tests/adminWorkbench.test.tsx`, `preview/control-center-review.html`,
-  `Sidebar.tsx`, `AccountMenu.tsx`.
-- **Gates:** typecheck · lint (0 errors) · test:unit **291/291** · build · check:bundle (116.6 kB core;
-  117.0 kB after the nav move) · lint:content, all green. Decisions in `docs/DECISIONS.md`; area guide
-  `docs/areas/LEGAL-ADMIN.md`. Shipped in PRs #697, #700 (docs), #701 (nav move).
-- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
-  hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_
