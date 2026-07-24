@@ -505,3 +505,22 @@ Founder reviewed individual session cards from screenshots; each turn diagnosed 
 - **Prompt 9 (verbatim):** `for reducing the abmiguity, referring to the points on how to reduce ambiguity, implement 1 but also mix them up by keep questions which are of a mix like now with different parts of speech but as mentioned in point 2.` → `oddOneOutQ`: added a POS-matched flavour mixed ~50/50 with mixed-POS, and an "genuinely unrelated" outsider guard (different theme + no shared `related` link either direction). Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
 - **Prompt 10 (verbatim):** `yes` → documented the session (this entry, PROJECT_STATUS s161 handoff with s159 rotated to the W30 archive, header refreshed) and opened + squash-merged PR #691 (engine/loot) into `main`.
 - **Artifacts (session 161):** `src/data/vocabulary.ts` · `src/features/session/SessionPlayer.tsx` · `src/engine/quiz.ts` · `src/features/quiz/QuestionViews.tsx` · `src/types/index.ts` · `preview/{cloze-hint,plural-variants,loot-shade}-preview.html` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #687 (content) + PR #691 (engine/loot)
+
+## Session 162 — 2026-07-24 — Fokus correction: collapse moved words; Genus-Verbi wrap explained (branch `claude/disclaimer-text-layout-5zq5g0`)
+- **Prompt 1 (verbatim, + screenshot of the Grammatik rail):** `why is zustandpassiv pill in a new line and not next to passiv pill? looks like there's enough space there.` →
+  Reproduced the exact pill markup at real widths (`preview/genus-verbi-wrap.html`, screenshot):
+  the pills are a plain `flex flex-wrap` row (`GrammarRail.tsx`), so it's a genuine width wrap. On
+  the 256px desktop rail the three compact pills are slightly too wide, so "Zustandspassiv" drops to
+  line 2 (the gap after "Passiv" is ~135px; the pill needs ~160px). Fits on one line from ~360px
+  phones up. Founder chose to LEAVE it (honest wrapping, not a bug).
+- **Prompt 2 (verbatim, + screenshot of a correction showing "heute" removed AND added):** `here's a mistake by ai` →
+  Traced it: NOT an AI error. The corrected sentence is right; the fix tiles are computed
+  client-side by `wordDiff.ts` (LCS), which represents a MOVED word ("heute") as a pure deletion in
+  its old slot + a pure insertion in its new slot, reading as a contradictory remove+add. Fixed:
+  `collapseMoves()` pairs a same-word deletion/insertion into ONE `{category:"Wortstellung", moved:true}`
+  change at the earlier slot; `FokusTrainer` renders a `moved` change as the word once (green, no
+  strike/arrow) under the WORTSTELLUNG eyebrow. Added two `wordDiff.test.ts` cases (move collapses;
+  a real del+ins of different words does not). Gates: typecheck · build · lint (0 errors) ·
+  test:unit (wordDiff + fokusGrammar green).
+- **Artifacts (prompts 1-2):** `src/lib/wordDiff.ts` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `tests/wordDiff.test.ts` · `preview/genus-verbi-wrap.html` · this log

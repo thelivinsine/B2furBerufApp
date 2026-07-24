@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Genus-Verbi pill wrap check</title>
+<style>
+  :root{--surface:0 0% 100%;--foreground:252 16% 12%;--muted-foreground:220 8% 36%;--border:218 13% 84%;--accent:197 93% 77%;--success:153 55% 40%;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#0b1020;color:#e7ecf5;padding:28px}
+  h2{font-size:13px;color:#8ea2c9;margin:20px 0 8px;font-weight:600}
+  .tile{background:rgba(56,189,248,.10);border:1px solid rgba(56,189,248,.25);border-radius:12px;padding:12px;margin-bottom:8px}
+  .eyebrow{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:#8ea2c9;margin-bottom:8px}
+  /* exact pill recipe: inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm */
+  .row{display:flex;flex-wrap:wrap;gap:6px}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:6px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#e7ecf5;padding:4px 10px;font-size:14px;line-height:20px;white-space:nowrap}
+  .dot{width:6px;height:6px;border-radius:9999px;background:hsl(var(--success))}
+  .w{margin-bottom:6px;font-size:11px;color:#6b7ba0}
+  .frame{border:1px dashed #33406a}
+</style></head>
+<body>
+  <div id="app"></div>
+  <script>
+    const pill=(label,dot)=>`<span class="pill">${dot?'<span class="dot"></span>':''}${label}</span>`;
+    const section=()=>`<div class="tile"><div class="eyebrow">Genus Verbi</div><div class="row">${pill('Aktiv',true)}${pill('Passiv',false)}${pill('Zustandspassiv',false)}</div></div>`;
+    // Real mobile panel content width ≈ deviceWidth - 32 (px-4) - 24 (tile p-3).
+    const devices=[320,360,390,430];
+    let html='';
+    for(const d of devices){
+      const content=d-32-24;
+      html+=`<h2>Handy ${d}px  →  Panel-Inhalt ${content}px</h2><div style="width:${content}px" class="frame">${section()}</div>`;
+    }
+    // Desktop rail: 16rem = 256px, tile p-3 → content 232px, but pills are the COMPACT lg size.
+    html+=`<h2>Desktop-Rail 256px  →  Inhalt 232px (kompakte lg-Pills, text-xs)</h2>`;
+    html+=`<div style="width:232px" class="frame"><div class="tile"><div class="eyebrow" style="font-size:11px">Genus Verbi</div><div class="row" style="gap:6px">`
+      +`<span class="pill" style="font-size:12px;padding:2px 8px;gap:4px"><span class="dot"></span>Aktiv</span>`
+      +`<span class="pill" style="font-size:12px;padding:2px 8px">Passiv</span>`
+      +`<span class="pill" style="font-size:12px;padding:2px 8px">Zustandspassiv</span>`
+      +`</div></div></div>`;
+    document.getElementById('app').innerHTML=html;
+  </script>
+</body></html>
