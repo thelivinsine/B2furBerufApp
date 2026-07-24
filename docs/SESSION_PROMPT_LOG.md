@@ -287,6 +287,10 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   the recurring message. Recommended a minimal generic 6-heading template (nothing that duplicates
   CLAUDE.md, so it cannot drift); creation awaits founder go-ahead. (Entry re-inserted here after a
   parallel-session merge race; sessions 158-165 landed on main while this session was open.)
+- **Prompt 5 (verbatim, 2026-07-24 ~12:30 UTC):** `is it merged to main?` →
+  Confirmed: all four session-157 PRs are on main (#675, #676, #677 the maintenance pass +
+  AGENTS.md, #704 the re-based prompt-4 entry after the parallel-session merge race). Branch reset
+  clean on main. Still open: founder decision on adding the minimal PR template.
 - **Artifacts (session 157):** this log (audit report delivered in chat; fixes await founder go-ahead)
 - **Prompt 2 (verbatim, 2026-07-24 ~11:45 UTC):** `I also want your opinion if we need a high-quality comprehensive agent.md file` →
   Opinion delivered: **no comprehensive AGENTS.md**. It would recreate the always-on-bloat problem
