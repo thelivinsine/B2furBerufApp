@@ -447,3 +447,16 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   `src/components/layout/FeedbackButton.tsx` · `src/features/admin/AdminSteuerung.tsx` ·
   `preview/fokus-disclaimer-inline.html` · `docs/areas/{SCHREIBEN,PRAKTISCH-NAV}.md` ·
   `docs/PROJECT_STATUS.md` · this log
+- **Prompt 4 (verbatim, 2026-07-24):** `yes, open a PR into main` + mid-turn `and merge` →
+  Checked for a PR template (none), opened **PR #688** into `main` and squash-merged it (merge
+  commit `4cbf0fe`), triggering the Pages deploy. Post-merge housekeeping ran: `git fetch origin
+  main` → `git reset --hard origin/main` → `git push --force-with-lease` on the branch; tree clean.
+- **Prompt 5 (verbatim, 2026-07-24):** `document the session` →
+  Most of the session had been documented inline across the prior prompts (PROJECT_STATUS s160
+  handoff, this log, `docs/areas/SCHREIBEN.md` + `PRAKTISCH-NAV.md`). This pass closed the loop:
+  recorded PR #688 + merge SHA in the handoff, appended a `docs/DECISIONS.md` entry (the Schreiben
+  disclaimer now bottom-anchored, explicitly overriding the "centered in normal flow" guideline for
+  the two trainers only; round-1 bordered bar rejected; "Feedback" label shortening), and added the
+  Schreiben exception to the `design` skill §2.6 so a future session doesn't re-center it.
+- **Artifacts (prompts 4-5):** PR #688 (merged, `4cbf0fe`) · `docs/DECISIONS.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` · this log

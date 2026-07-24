@@ -434,3 +434,32 @@ Method notes that worked (keep for future icon rounds): show every variant insid
 next to the already-picked marks (the founder judges the future bar, not a lone glyph), continue
 variant letters across rounds (A-T) so picks stay unambiguous, and keep all marks two-tone with a
 neon-cyan companion on the 20x20 grid with `NORM` optical normalisation.
+
+## Schreiben AI-disclaimer relocated + "Feedback" pill label (session 160, 2026-07-24) — founder-requested
+
+Founder, verbatim across two prompts: move the Fokus KI-Hinweis "to be horizontally in-line with
+feedback button for the computer view ... for mobile view ... condensed as much as possible and
+reside below the auswerten button ... with just 'Mehr'"; then, correcting round 1's bordered bar:
+"I like the floating button as before and the text should just be moved downwards to the horizontal
+level of the feedback button ... For mobile view ... bring the feedback button next to the auswerten
+button. Both the buttons should be floating not in a separate section along with the short text below
+the buttons." Follow-up: "kurz and lang should also have same design. Also, for the floating button
+'Mit KI gebaut · Feedback' - make it just 'Feedback' with an icon ... Do this across the app".
+
+Decisions:
+1. **The Schreiben Art. 50 disclaimer is now bottom-anchored, not centered-in-flow.** On desktop it
+   is a `fixed bottom-4` line level with the floating Feedback pill (no bordered bar); on mobile it
+   is a condensed "KI-geprüft, kann Fehler enthalten. Mehr" line under the floating action buttons.
+   This **explicitly overrides** the general design guideline that disclaimers sit "centered in
+   normal flow (not bottom-pinned)" (`design` skill §2.6) — but ONLY for the Schreiben trainers
+   (Fokus + Kurz/Lang). The earlier "bottom-pinning was tried and reverted" note (s151) is
+   superseded here by direct founder instruction; do NOT re-center these two.
+2. **Round 1 (a bordered bottom bar holding text + pill) was rejected.** Keep the existing floating
+   pill untouched; only the text drops to its level. No separate section/border.
+3. **Mobile action bars in Schreiben lose their bar chrome.** The Feedback icon button floats beside
+   Auswerten/Korrigieren (both squircle), condensed note beneath. Applies to both trainers.
+4. **The feedback affordance label is shortened to "Feedback" app-wide** (was "Mit KI gebaut ·
+   Feedback"): pill default, in-session button, icon-button aria/title, admin placeholder. Icons
+   unchanged; remote-config `feedback.label` still overrides the pill.
+
+Shipped in PR #688 (squash-merged to `main`, 2026-07-24).

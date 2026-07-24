@@ -101,7 +101,10 @@ drop the text to its level. A follow-up prompt extended it to Kurz/Lang and shor
   `/writing` redirects to the landing page); founder verifies live. Docs: `docs/areas/SCHREIBEN.md`
   + `docs/areas/PRAKTISCH-NAV.md` updated.
 - **Gates:** typecheck · build · lint (0 errors) · check:bundle **116.8 kB**, all green.
-- **Next:** nothing pending.
+- **Shipped:** PR #688 squash-merged to `main` (merge commit `4cbf0fe`), Pages deploy triggered.
+  Decision recorded in `docs/DECISIONS.md`; the `design` skill §2.6 now carries the Schreiben
+  disclaimer-placement exception so a future session doesn't re-center it.
+- **Next:** nothing pending. Founder verifies the live result (PWA: hard-refresh past a stale SW).
 
 **Handoff after session 159 (2026-07-24). Fokus "Satzlabor" Wave 2 (Konjunktiv II + Zustandspassiv),
 branch `claude/grammar-dimensions-transformations-l3ib3m`, PR #678 merged.** Started as a
