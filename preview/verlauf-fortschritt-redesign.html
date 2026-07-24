@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verlauf + Fortschritt Redesign · Runde 1</title>
+<style>
+  /* Real tokens from src/index.css (light theme) */
+  :root {
+    --background: 180 45% 98%;
+    --foreground: 252 16% 12%;
+    --surface: 0 0% 100%;
+    --muted: 220 13% 88%;
+    --muted-foreground: 220 8% 36%;
+    --border: 218 13% 84%;
+    --primary: 221 83% 54%;
+    --accent: 197 93% 77%;
+    --accent-ink: 198 90% 32%;
+    --success: 153 55% 40%;
+    --warning: 38 92% 46%;
+    --danger: 4 73% 56%;
+    --reward: 11 82% 54%;
+    --reward-bg: 16 77% 93%;
+    --shadow: 221 40% 22%;
+    --radius: 0.875rem;
+    --gradient-from: 226 83% 47%;
+    --gradient-to: 196 93% 38%;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Inter Variable", "Inter var", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: hsl(var(--foreground));
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(144 45% 98%) 0%, hsl(150 50% 98%) 38%, hsl(198 83% 98%) 100%);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 44px 24px 120px; }
+
+  /* ---------- preview chrome ---------- */
+  .pv-eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+  h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; margin: 6px 0 4px; text-wrap: balance; }
+  .pv-sub { color: hsl(var(--muted-foreground)); font-size: 14px; margin: 0; }
+  .pv-section { margin-top: 64px; }
+  .pv-section > h2 { font-size: 21px; font-weight: 800; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .pv-section > p { margin: 0; font-size: 13.5px; color: hsl(var(--muted-foreground)); }
+  .variant { margin-top: 36px; }
+  .vhead { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .vletter {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 28px; height: 28px; padding: 0 9px; border-radius: 8px;
+    background: hsl(var(--primary)); color: #fff; font-weight: 800; font-size: 14px;
+    align-self: center;
+  }
+  .vname { font-size: 16.5px; font-weight: 800; }
+  .vnote { font-size: 13px; color: hsl(var(--muted-foreground)); }
+  .vphase {
+    font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+    background: hsl(var(--warning) / 0.15); color: hsl(var(--warning));
+    align-self: center;
+  }
+  .mock {
+    margin-top: 12px; border: 1px solid hsl(var(--border)); border-radius: 18px;
+    padding: 28px 24px 32px;
+    background:
+      radial-gradient(at 0% 0%, hsl(var(--primary) / 0.10) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, hsl(var(--accent) / 0.09) 0px, transparent 50%),
+      linear-gradient(120deg, hsl(144 45% 98%) 0%, hsl(150 50% 98%) 38%, hsl(198 83% 98%) 100%);
+    overflow: hidden;
+  }
+  .mock-inner { max-width: 660px; margin: 0 auto; }
+  .mock-inner.wide { max-width: 840px; }
+
+  /* ---------- app primitives (real geometry) ---------- */
+  .card {
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) + 4px);
+    box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+  }
+  .switcher {
+    display: flex; gap: 4px; padding: 4px; border-radius: var(--radius);
+    border: 1px solid hsl(var(--border)); background: hsl(var(--muted));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+    max-width: 36rem; margin: 0 auto;
+  }
+  .seg {
+    flex: 1; text-align: center; padding: 10px 12px; font-size: 14px; line-height: 1;
+    font-weight: 500; color: hsl(var(--muted-foreground)); border-radius: calc(var(--radius) - 4px);
+  }
+  .seg.active {
+    background: hsl(var(--surface)); font-weight: 700; color: hsl(var(--primary));
+    box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px; border-radius: 999px;
+    padding: 2px 10px; font-size: 12px; font-weight: 500; border: 1px solid transparent;
+  }
+  .badge.muted { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+  .badge.accent { background: hsl(var(--accent) / 0.10); color: hsl(var(--accent-ink)); }
+  .badge.primary { background: hsl(var(--primary) / 0.10); color: hsl(var(--primary)); }
+  .badge.success { background: hsl(var(--success) / 0.15); color: hsl(var(--success)); }
+  .badge.outline { border-color: hsl(var(--border)); color: hsl(var(--muted-foreground)); }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    height: 36px; padding: 0 14px; border-radius: calc(var(--radius) - 4px);
+    font-size: 13.5px; font-weight: 500; border: 1px solid transparent; white-space: nowrap;
+  }
+  .btn-outline { border-color: hsl(var(--border)); background: hsl(var(--surface) / 0.5); color: hsl(var(--foreground)); }
+  .btn-secondary { background: hsl(var(--muted)); color: hsl(var(--foreground)); }
+  .btn-primary {
+    background: linear-gradient(to bottom, rgb(255 255 255 / 0.12), transparent), hsl(var(--primary));
+    color: #fff; box-shadow: 0 1px 2px hsl(var(--shadow) / 0.06), 0 6px 16px -3px hsl(var(--shadow) / 0.12);
+  }
+  .btn-sm { height: 30px; padding: 0 11px; font-size: 12.5px; }
+  .eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: hsl(var(--muted-foreground));
+  }
+  .aufgabe-label { font-weight: 800; color: hsl(var(--primary)); }
+  .tile-accent {
+    background: hsl(var(--accent) / 0.20); border: 1px solid hsl(var(--accent) / 0.50);
+    border-radius: calc(var(--radius) - 4px); color: hsl(var(--accent-ink));
+  }
+  .chip {
+    display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
+    font-size: 12.5px; font-weight: 600; border-radius: calc(var(--radius) - 6px);
+  }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* correction marks (Fokus language: coral on Original, green on Korrigiert) */
+  .fix { background: hsl(var(--success) / 0.10); border-bottom: 2px solid hsl(var(--success)); border-radius: 2px 2px 0 0; }
+  .err { background: hsl(var(--reward-bg)); border-bottom: 2px solid hsl(var(--reward)); border-radius: 2px 2px 0 0; }
+
+  .minitoggle { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: hsl(var(--muted)); }
+  .minitoggle span { padding: 4px 12px; font-size: 12px; font-weight: 500; color: hsl(var(--muted-foreground)); border-radius: 7px; line-height: 1; display: inline-flex; align-items: center; }
+  .minitoggle span.on { background: hsl(var(--surface)); color: hsl(var(--primary)); font-weight: 700; box-shadow: 0 1px 2px hsl(var(--shadow) / 0.10); }
+
+  .trend-up { color: hsl(var(--warning)); }
+  .trend-down { color: hsl(var(--success)); }
+  .trend-flat { color: hsl(var(--muted-foreground)); }
+
+  .icon-btn {
+    width: 32px; height: 32px; border-radius: 9px; display: inline-flex; align-items: center;
+    justify-content: center; color: hsl(var(--muted-foreground)); border: 0; background: transparent;
+  }
+  .select {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    background: hsl(var(--surface)); border: 1px solid hsl(var(--border));
+    border-radius: calc(var(--radius) - 4px); padding: 8px 12px; font-size: 13.5px; font-weight: 500;
+  }
+  .select small { color: hsl(var(--muted-foreground)); font-size: 12px; font-weight: 400; }
+  .search {
+    display: flex; align-items: center; gap: 8px; background: hsl(var(--surface));
+    border: 1px solid hsl(var(--border)); border-radius: calc(var(--radius) - 4px);
+    padding: 8px 12px; font-size: 13.5px; color: hsl(var(--muted-foreground));
+  }
+  .bar-track { height: 8px; border-radius: 999px; background: hsl(var(--muted)); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; background: hsl(var(--primary)); }
+  .hr { height: 1px; background: hsl(var(--border)); border: 0; margin: 0; }
+  .dim { opacity: 0.55; position: relative; }
+  .dim-tag {
+    position: absolute; top: 10px; right: 12px; font-size: 10.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.08em; color: hsl(var(--muted-foreground));
+    background: hsl(var(--muted)); padding: 2px 8px; border-radius: 999px;
+  }
+  .stat-mini { flex: 1; border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--surface)); padding: 10px 12px; }
+  .stat-mini .k { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: hsl(var(--muted-foreground)); }
+  .stat-mini .v { font-size: 17px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .ring {
+    width: 52px; height: 52px; border-radius: 50%; flex: none;
+    background: conic-gradient(hsl(var(--primary)) 0 230deg, hsl(var(--muted)) 230deg 360deg);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ring > div {
+    width: 40px; height: 40px; border-radius: 50%; background: hsl(var(--surface));
+    display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 800;
+    font-variant-numeric: tabular-nums;
+  }
+  .row { display: flex; align-items: center; }
+  svg text { font-family: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="pv-eyebrow">Preview · Runde 1</div>
+  <h1>Verlauf + Fortschritt Redesign</h1>
+  <p class="pv-sub">3 Varianten pro Seite. Bitte per Name wählen (A/B/C für Verlauf, 1/2/3 für Fortschritt); Mischungen sind willkommen. Alle Werte sind Beispieldaten.</p>
+
+  <!-- ============================================================ -->
+  <div class="pv-section">
+    <h2>Schreiben · Verlauf</h2>
+    <p>Alle drei Varianten setzen voraus, dass Korrektur + Aufgabe künftig gespeichert werden (Phase 1). Fokus-Sätze erscheinen als kompakte Einträge.</p>
+
+    <!-- ================= VARIANT A ================= -->
+    <div class="variant">
+      <div class="vhead">
+        <span class="vletter">A</span>
+        <span class="vname">Korrekturkarten</span>
+        <span class="vnote">Die Korrektur ist der Star: jede Karte zeigt den verbesserten Text mit Markierungen, plus Wiederholungs-Knopf.</span>
+      </div>
+      <div class="mock"><div class="mock-inner">
+
+        <div class="switcher">
+          <div class="seg">Fokus</div><div class="seg">Kurz</div><div class="seg">Lang</div><div class="seg active">Verlauf</div>
+        </div>
+
+        <!-- trend strip -->
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:20px;">
+          <span class="eyebrow" style="margin-right:2px;">Schwachstellen</span>
+          <span class="chip tile-accent">Kasus <span class="num">8×</span> <span class="trend-down">→ 3× ↓</span></span>
+          <span class="chip tile-accent">Verbstellung <span class="num">4×</span> <span class="trend-flat">→ 4×</span></span>
+          <span class="chip tile-accent">Präpositionen <span class="num">2×</span> <span class="trend-up">→ 3× ↑</span></span>
+          <span style="margin-left:auto; font-size:12.5px; font-weight:600; color:hsl(var(--primary));">Alle Trends im Fortschritt ›</span>
+        </div>
+
+        <!-- filter row -->
+        <div style="display:flex; align-items:center; gap:8px; margin-top:14px;">
+          <div class="minitoggle">
+            <span class="on">Alle</span><span>Fokus</span><span>Kurz</span><span>Lang</span>
+          </div>
+          <div class="select" style="margin-left:auto;">Alle Themen <small>▾</small></div>
+        </div>
+
+        <!-- entry 1: Kurz -->
+        <div class="card" style="margin-top:14px; padding:18px 20px;">
+          <div class="row" style="gap:8px; flex-wrap:wrap;">
+            <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">22. Juli 2026</span>
+            <span class="badge muted">Wohnen</span>
+            <span class="badge outline">Kurz</span>
+            <button class="icon-btn" style="margin-left:auto;" aria-label="Löschen">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6"/></svg>
+            </button>
+          </div>
+          <p style="margin:10px 0 0; font-size:13.5px;"><span class="aufgabe-label">Aufgabe:</span> Ihre Heizung ist seit drei Tagen kaputt. Schreiben Sie der Hausverwaltung: Problem, bisherige Schritte, Frist.</p>
+          <div style="margin-top:12px;">
+            <div class="minitoggle"><span>Original</span><span class="on">Korrigiert</span></div>
+            <p style="margin:10px 0 0; font-size:14.5px; line-height:1.65;">Sehr geehrte Damen und Herren, seit drei Tagen funktioniert die Heizung in <span class="fix">meiner Wohnung</span> nicht. Ich habe bereits zweimal angerufen und bitte Sie, <span class="fix">den Schaden</span> bis Freitag beheben zu lassen.</p>
+          </div>
+          <div class="row" style="gap:8px; margin-top:14px; flex-wrap:wrap;">
+            <span class="chip tile-accent">Kasus</span>
+            <span style="flex:1;"></span>
+            <button class="btn btn-outline btn-sm">Kasus üben</button>
+            <button class="btn btn-secondary btn-sm">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              In die Wiederholung
+            </button>
+          </div>
+        </div>
+
+        <!-- entry 2: Fokus compact -->
+        <div class="card" style="margin-top:10px; padding:14px 20px;">
+          <div class="row" style="gap:8px; flex-wrap:wrap;">
+            <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">21. Juli 2026</span>
+            <span class="badge outline">Fokus</span>
+            <span style="flex:1;"></span>
+            <span class="chip tile-accent">Kasus</span>
+            <span class="chip tile-accent">Verbstellung</span>
+          </div>
+          <p style="margin:8px 0 0; font-size:14.5px; line-height:1.65;">Ich habe <span class="fix">den Termin</span> abgesagt, weil ich <span class="fix">krank war</span>.</p>
+        </div>
+
+        <!-- entry 3: Lang collapsed -->
+        <div class="card" style="margin-top:10px; padding:14px 20px;">
+          <div class="row" style="gap:8px; flex-wrap:wrap;">
+            <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">18. Juli 2026</span>
+            <span class="badge muted">Beruf</span>
+            <span class="badge outline">Lang</span>
+            <span style="flex:1;"></span>
+            <span class="chip tile-accent">Präpositionen</span>
+            <span style="font-size:12.5px; font-weight:600; color:hsl(var(--muted-foreground));">Anzeigen ▾</span>
+          </div>
+          <p style="margin:8px 0 0; font-size:13.5px; color:hsl(var(--muted-foreground));"><span class="aufgabe-label" style="color:hsl(var(--primary));">Aufgabe:</span> Beschwerde an einen Lieferanten wegen verspäteter Lieferung.</p>
+        </div>
+
+      </div></div>
+    </div>
+
+    <!-- ================= VARIANT B ================= -->
+    <div class="variant">
+      <div class="vhead">
+        <span class="vletter">B</span>
+        <span class="vname">Archiv mit Filter-Rail</span>
+        <span class="vnote">Bibliothek-Sprache: Himmelblau-Rail links, Monatsgruppen rechts. Stärke: alte Texte gezielt wiederfinden (Prüfungsvorbereitung).</span>
+      </div>
+      <div class="mock"><div class="mock-inner wide">
+
+        <div class="switcher">
+          <div class="seg">Fokus</div><div class="seg">Kurz</div><div class="seg">Lang</div><div class="seg active">Verlauf</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 220px 1fr; gap:18px; margin-top:20px;">
+          <!-- rail -->
+          <div>
+            <div class="tile-accent" style="padding:14px;">
+              <div class="row" style="justify-content:space-between;">
+                <span class="eyebrow" style="color:hsl(var(--accent-ink));">Filter</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="color:hsl(var(--accent-ink));"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                <div class="select">Modus: Alle <small>▾</small></div>
+                <div class="select">Thema: Alle <small>▾</small></div>
+                <div class="select">Schwachstelle: Alle <small>▾</small></div>
+              </div>
+              <div style="margin-top:12px; font-size:12px; color:hsl(var(--accent-ink)); font-weight:600;">31 Einträge</div>
+            </div>
+          </div>
+
+          <!-- list -->
+          <div>
+            <div class="search">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+              Im Verlauf suchen
+            </div>
+
+            <div class="eyebrow" style="margin-top:16px;">Juli 2026</div>
+
+            <!-- expanded row -->
+            <div class="card" style="margin-top:8px; padding:16px 18px;">
+              <div class="row" style="gap:8px; flex-wrap:wrap;">
+                <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">22. Juli</span>
+                <span class="badge muted">Wohnen</span>
+                <span class="badge outline">Kurz</span>
+                <span style="flex:1;"></span>
+                <span class="chip tile-accent">Kasus</span>
+                <span style="font-size:12.5px; font-weight:600; color:hsl(var(--muted-foreground));">Ausblenden ▴</span>
+              </div>
+              <p style="margin:9px 0 0; font-size:13.5px;"><span class="aufgabe-label">Aufgabe:</span> Heizungsausfall der Hausverwaltung melden, mit Frist.</p>
+              <div style="margin-top:10px;">
+                <div class="minitoggle"><span class="on">Original</span><span>Korrigiert</span></div>
+                <p style="margin:9px 0 0; font-size:14.5px; line-height:1.65;">Sehr geehrte Damen und Herren, seit drei Tagen funktioniert die Heizung in <span class="err">meine Wohnung</span> nicht. Ich habe bereits zweimal angerufen und bitte Sie, <span class="err">der Schaden</span> bis Freitag beheben zu lassen.</p>
+              </div>
+              <div class="row" style="gap:8px; margin-top:12px;">
+                <span style="flex:1;"></span>
+                <button class="btn btn-outline btn-sm">Kasus üben</button>
+                <button class="btn btn-secondary btn-sm">In die Wiederholung</button>
+              </div>
+            </div>
+
+            <!-- compact rows -->
+            <div class="card" style="margin-top:8px; padding:12px 18px;">
+              <div class="row" style="gap:8px; flex-wrap:wrap;">
+                <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">21. Juli</span>
+                <span class="badge outline">Fokus</span>
+                <span style="font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">Ich habe den Termin abgesagt, weil ich krank war.</span>
+                <span class="chip tile-accent">Verbstellung</span>
+              </div>
+            </div>
+            <div class="card" style="margin-top:8px; padding:12px 18px;">
+              <div class="row" style="gap:8px; flex-wrap:wrap;">
+                <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">18. Juli</span>
+                <span class="badge outline">Lang</span>
+                <span style="font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">Beschwerde: verspätete Lieferung</span>
+                <span class="chip tile-accent">Präpositionen</span>
+              </div>
+            </div>
+
+            <div class="eyebrow" style="margin-top:16px;">Juni 2026</div>
+            <div class="card" style="margin-top:8px; padding:12px 18px;">
+              <div class="row" style="gap:8px; flex-wrap:wrap;">
+                <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">29. Juni</span>
+                <span class="badge outline">Kurz</span>
+                <span style="font-size:13.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;">Terminabsage beim Arzt</span>
+                <span class="chip tile-accent">Kasus</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div></div>
+    </div>
+
+    <!-- ================= VARIANT C ================= -->
+    <div class="variant">
+      <div class="vhead">
+        <span class="vletter">C</span>
+        <span class="vname">Entwicklung zuerst</span>
+        <span class="vnote">Oben der Beweis, dass es besser wird (Fehler pro Text über Zeit), darunter die kompakte Liste.</span>
+      </div>
+      <div class="mock"><div class="mock-inner">
+
+        <div class="switcher">
+          <div class="seg">Fokus</div><div class="seg">Kurz</div><div class="seg">Lang</div><div class="seg active">Verlauf</div>
+        </div>
+
+        <div class="card" style="margin-top:20px; padding:18px 20px;">
+          <div class="row" style="justify-content:space-between;">
+            <span class="eyebrow">Deine Entwicklung</span>
+            <span class="badge success">Kasus: 62 % weniger</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:14px;">
+            <!-- mini bar group 1 -->
+            <div>
+              <div style="display:flex; align-items:flex-end; gap:6px; height:64px;">
+                <div style="flex:1; background:hsl(var(--primary)/0.25); border-radius:4px 4px 0 0; height:100%;"></div>
+                <div style="flex:1; background:hsl(var(--primary)/0.45); border-radius:4px 4px 0 0; height:63%;"></div>
+                <div style="flex:1; background:hsl(var(--primary)); border-radius:4px 4px 0 0; height:38%;"></div>
+              </div>
+              <div style="font-size:12.5px; font-weight:700; margin-top:6px;">Kasus <span class="trend-down">↓</span></div>
+              <div style="font-size:11.5px; color:hsl(var(--muted-foreground));" class="num">Mai 8 · Juni 5 · Juli 3</div>
+            </div>
+            <div>
+              <div style="display:flex; align-items:flex-end; gap:6px; height:64px;">
+                <div style="flex:1; background:hsl(var(--primary)/0.25); border-radius:4px 4px 0 0; height:50%;"></div>
+                <div style="flex:1; background:hsl(var(--primary)/0.45); border-radius:4px 4px 0 0; height:50%;"></div>
+                <div style="flex:1; background:hsl(var(--primary)); border-radius:4px 4px 0 0; height:50%;"></div>
+              </div>
+              <div style="font-size:12.5px; font-weight:700; margin-top:6px;">Verbstellung <span class="trend-flat">→</span></div>
+              <div style="font-size:11.5px; color:hsl(var(--muted-foreground));" class="num">Mai 4 · Juni 4 · Juli 4</div>
+            </div>
+            <div>
+              <div style="display:flex; align-items:flex-end; gap:6px; height:64px;">
+                <div style="flex:1; background:hsl(var(--primary)/0.25); border-radius:4px 4px 0 0; height:25%;"></div>
+                <div style="flex:1; background:hsl(var(--primary)/0.45); border-radius:4px 4px 0 0; height:25%;"></div>
+                <div style="flex:1; background:hsl(var(--primary)); border-radius:4px 4px 0 0; height:38%;"></div>
+              </div>
+              <div style="font-size:12.5px; font-weight:700; margin-top:6px;">Präpositionen <span class="trend-up">↑</span></div>
+              <div style="font-size:11.5px; color:hsl(var(--muted-foreground));" class="num">Mai 2 · Juni 2 · Juli 3</div>
+            </div>
+          </div>
+          <hr class="hr" style="margin:14px 0;">
+          <div class="row" style="gap:8px;">
+            <span style="font-size:13px; color:hsl(var(--muted-foreground));">Größte Schwachstelle: <b style="color:hsl(var(--foreground));">Verbstellung</b></span>
+            <span style="flex:1;"></span>
+            <button class="btn btn-primary btn-sm">Jetzt üben</button>
+          </div>
+        </div>
+
+        <div class="row" style="gap:8px; margin-top:18px;">
+          <span class="eyebrow">Letzte Auswertungen</span>
+          <span class="badge muted num">31</span>
+          <div class="minitoggle" style="margin-left:auto;">
+            <span class="on">Alle</span><span>Fokus</span><span>Kurz</span><span>Lang</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:10px; padding:14px 20px;">
+          <div class="row" style="gap:8px; flex-wrap:wrap;">
+            <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">22. Juli 2026</span>
+            <span class="badge muted">Wohnen</span>
+            <span class="badge outline">Kurz</span>
+            <span style="flex:1;"></span>
+            <span class="chip tile-accent">Kasus</span>
+            <span style="font-size:12.5px; font-weight:600; color:hsl(var(--muted-foreground));">Anzeigen ▾</span>
+          </div>
+        </div>
+        <div class="card" style="margin-top:8px; padding:14px 20px;">
+          <div class="row" style="gap:8px; flex-wrap:wrap;">
+            <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">21. Juli 2026</span>
+            <span class="badge outline">Fokus</span>
+            <span style="flex:1;"></span>
+            <span class="chip tile-accent">Kasus</span>
+            <span class="chip tile-accent">Verbstellung</span>
+            <span style="font-size:12.5px; font-weight:600; color:hsl(var(--muted-foreground));">Anzeigen ▾</span>
+          </div>
+        </div>
+
+      </div></div>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <div class="pv-section">
+    <h2>Fortschritt</h2>
+    <p>Der Überblick oben (Tagesziel-Ring, Level, Stat-Karten) bleibt in allen Varianten unverändert und ist hier nur angedeutet. Unterschiede: was direkt darunter kommt.</p>
+
+    <!-- ================= VARIANT 1 ================= -->
+    <div class="variant">
+      <div class="vhead">
+        <span class="vletter">1</span>
+        <span class="vname">Prüfungs-Cockpit</span>
+        <span class="vnote">Der Prüfungsblock wird das Herz der Seite: Countdown, Bereitschaft pro Säule, Simulationstrend mit Bestehensgrenze.</span>
+      </div>
+      <div class="mock"><div class="mock-inner wide">
+
+        <!-- unchanged overview -->
+        <div class="card dim" style="padding:14px 18px;">
+          <span class="dim-tag">unverändert</span>
+          <div class="row" style="gap:14px;">
+            <div class="ring"><div class="num">64&hairsp;%</div></div>
+            <div>
+              <div style="font-size:13px; font-weight:600;">Tagesziel</div>
+              <div style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">32 / 50 XP heute</div>
+            </div>
+            <span class="badge primary">Level 7 · Entdecker</span>
+            <div style="flex:1;"></div>
+            <div class="row" style="gap:8px; margin-right:132px;">
+              <div class="stat-mini"><div class="k">XP</div><div class="v">4.320</div></div>
+              <div class="stat-mini"><div class="k">Serie</div><div class="v">12</div></div>
+              <div class="stat-mini"><div class="k">Vokabeln</div><div class="v">214</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- exam block -->
+        <div class="card" style="margin-top:14px; padding:20px;">
+          <div class="row" style="gap:10px;">
+            <span class="eyebrow">Prüfung</span>
+            <span class="badge accent">telc B2 Beruf</span>
+            <span style="flex:1;"></span>
+            <button class="btn btn-primary btn-sm">Simulation starten</button>
+          </div>
+          <div style="display:grid; grid-template-columns: 190px 1fr 1fr; gap:22px; margin-top:16px; align-items:start;">
+            <!-- countdown -->
+            <div style="text-align:center;">
+              <div class="ring" style="width:96px; height:96px; margin:0 auto; background:conic-gradient(hsl(var(--primary)) 0 245deg, hsl(var(--muted)) 245deg 360deg);">
+                <div style="width:76px; height:76px; font-size:20px;" class="num">43</div>
+              </div>
+              <div style="font-size:12.5px; font-weight:600; margin-top:8px;">Tage bis zur Prüfung</div>
+              <div style="font-size:12px; color:hsl(var(--muted-foreground));" class="num">5. September 2026</div>
+            </div>
+            <!-- readiness bars -->
+            <div>
+              <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:hsl(var(--muted-foreground));">Bereitschaft</div>
+              <div style="display:flex; flex-direction:column; gap:10px; margin-top:10px;">
+                <div>
+                  <div class="row" style="justify-content:space-between; font-size:12.5px;"><span>Wortschatz</span><b class="num">72&hairsp;%</b></div>
+                  <div class="bar-track" style="margin-top:4px;"><div class="bar-fill" style="width:72%;"></div></div>
+                </div>
+                <div>
+                  <div class="row" style="justify-content:space-between; font-size:12.5px;"><span>Schreiben</span><b class="num">58&hairsp;%</b></div>
+                  <div class="bar-track" style="margin-top:4px;"><div class="bar-fill" style="width:58%; background:hsl(var(--warning));"></div></div>
+                </div>
+                <div>
+                  <div class="row" style="justify-content:space-between; font-size:12.5px;"><span>Szenarien</span><b class="num">65&hairsp;%</b></div>
+                  <div class="bar-track" style="margin-top:4px;"><div class="bar-fill" style="width:65%;"></div></div>
+                </div>
+              </div>
+            </div>
+            <!-- sim trend -->
+            <div>
+              <div style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:hsl(var(--muted-foreground));">Simulationen</div>
+              <svg viewBox="0 0 220 110" style="width:100%; margin-top:6px;" role="img" aria-label="Simulationstrend">
+                <line x1="8" y1="44" x2="212" y2="44" stroke="hsl(220 8% 36%)" stroke-width="1" stroke-dasharray="4 4"/>
+                <text x="8" y="38" font-size="10" fill="hsl(220 8% 36%)">Bestehensgrenze 60 %</text>
+                <polyline points="30,86 110,66 190,33" fill="none" stroke="hsl(221 83% 54%)" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="30" cy="86" r="4" fill="hsl(221 83% 54%)"/>
+                <circle cx="110" cy="66" r="4" fill="hsl(221 83% 54%)"/>
+                <circle cx="190" cy="33" r="5" fill="hsl(221 83% 54%)" stroke="#fff" stroke-width="2"/>
+                <text x="30" y="102" font-size="10" fill="hsl(220 8% 36%)" text-anchor="middle">52</text>
+                <text x="110" y="102" font-size="10" fill="hsl(220 8% 36%)" text-anchor="middle">58</text>
+                <text x="190" y="102" font-size="10" fill="hsl(220 8% 36%)" text-anchor="middle">63</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- unified diagnosis -->
+        <div class="card" style="margin-top:14px; padding:20px;">
+          <div class="row" style="gap:10px;">
+            <span class="eyebrow">Diagnose</span>
+            <span class="badge muted num">3</span>
+          </div>
+          <div style="display:flex; flex-direction:column; margin-top:8px;">
+            <div class="row" style="gap:12px; padding:11px 0; border-bottom:1px solid hsl(var(--border));">
+              <span class="chip tile-accent">Schreiben</span>
+              <span style="font-size:14px; font-weight:600;">Kasus</span>
+              <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">3× in den letzten 5 Texten</span>
+              <span style="flex:1;"></span>
+              <button class="btn btn-outline btn-sm">Üben</button>
+            </div>
+            <div class="row" style="gap:12px; padding:11px 0; border-bottom:1px solid hsl(var(--border));">
+              <span class="chip tile-accent">Wortschatz</span>
+              <span style="font-size:14px; font-weight:600;">Bank &amp; Versicherung</span>
+              <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">41 % gemeistert</span>
+              <span style="flex:1;"></span>
+              <button class="btn btn-outline btn-sm">Session starten</button>
+            </div>
+            <div class="row" style="gap:12px; padding:11px 0;">
+              <span class="chip tile-accent">Grammatik</span>
+              <span style="font-size:14px; font-weight:600;">Verbstellung im Nebensatz</span>
+              <span style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">4× diese Woche</span>
+              <span style="flex:1;"></span>
+              <button class="btn btn-outline btn-sm">Fokus starten</button>
+            </div>
+          </div>
+        </div>
+
+      </div></div>
+    </div>
+
+    <!-- ================= VARIANT 2 ================= -->
+    <div class="variant">
+      <div class="vhead">
+        <span class="vletter">2</span>
+        <span class="vname">Diagnose zuerst</span>
+        <span class="vnote">Die vereinte Schwachstellen-Liste wird der Held direkt unter dem Überblick; die Prüfung als schlanke Leiste.</span>
+      </div>
+      <div class="mock"><div class="mock-inner wide">
+
+        <div class="card dim" style="padding:14px 18px;">
+          <span class="dim-tag">unverändert</span>
+          <div class="row" style="gap:14px;">
+            <div class="ring"><div class="num">64&hairsp;%</div></div>
+            <div>
+              <div style="font-size:13px; font-weight:600;">Tagesziel</div>
+              <div style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">32 / 50 XP heute</div>
+            </div>
+            <span class="badge primary">Level 7 · Entdecker</span>
+          </div>
+        </div>
+
+        <!-- diagnosis hero -->
+        <div class="card" style="margin-top:14px; padding:20px;">
+          <div class="row" style="gap:10px;">
+            <span class="eyebrow">Diagnose</span>
+            <span class="badge muted num">3</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px;">
+            <div class="tile-accent" style="padding:14px;">
+              <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Schreiben</div>
+              <div style="font-size:15.5px; font-weight:800; color:hsl(var(--foreground)); margin-top:4px;">Kasus</div>
+              <div style="font-size:12.5px; color:hsl(var(--accent-ink)); margin-top:2px;" class="num">3× in 5 Texten <span class="trend-down">↓</span></div>
+              <button class="btn btn-primary btn-sm" style="margin-top:12px; width:100%;">Üben</button>
+            </div>
+            <div class="tile-accent" style="padding:14px;">
+              <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Wortschatz</div>
+              <div style="font-size:15.5px; font-weight:800; color:hsl(var(--foreground)); margin-top:4px;">Bank &amp; Versicherung</div>
+              <div style="font-size:12.5px; color:hsl(var(--accent-ink)); margin-top:2px;" class="num">41 % gemeistert</div>
+              <button class="btn btn-primary btn-sm" style="margin-top:12px; width:100%;">Session starten</button>
+            </div>
+            <div class="tile-accent" style="padding:14px;">
+              <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em;">Grammatik</div>
+              <div style="font-size:15.5px; font-weight:800; color:hsl(var(--foreground)); margin-top:4px;">Verbstellung</div>
+              <div style="font-size:12.5px; color:hsl(var(--accent-ink)); margin-top:2px;" class="num">4× diese Woche <span class="trend-up">↑</span></div>
+              <button class="btn btn-primary btn-sm" style="margin-top:12px; width:100%;">Fokus starten</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- slim exam strip -->
+        <div class="card" style="margin-top:14px; padding:14px 20px;">
+          <div class="row" style="gap:14px; flex-wrap:wrap;">
+            <div class="ring" style="width:44px; height:44px; background:conic-gradient(hsl(var(--primary)) 0 245deg, hsl(var(--muted)) 245deg 360deg);"><div style="width:34px; height:34px; font-size:11px;" class="num">43</div></div>
+            <div>
+              <div style="font-size:13.5px; font-weight:700;">telc B2 Beruf</div>
+              <div style="font-size:12px; color:hsl(var(--muted-foreground));" class="num">noch 43 Tage · letzte Simulation 63 %</div>
+            </div>
+            <span style="flex:1;"></span>
+            <button class="btn btn-outline btn-sm">Simulation starten</button>
+          </div>
+        </div>
+
+      </div></div>
+    </div>
+
+    <!-- ================= VARIANT 3 ================= -->
+    <div class="variant">
+      <div class="vhead">
+        <span class="vletter">3</span>
+        <span class="vname">Kompetenzkurve</span>
+        <span class="vnote">Eine Zahl, die nur steigt: gemeisterte Wörter über Zeit als Herzstück, statt der XP-Kurve. Prüfung + Top-Schwachstelle kompakt darunter.</span>
+      </div>
+      <div class="mock"><div class="mock-inner wide">
+
+        <div class="card dim" style="padding:14px 18px;">
+          <span class="dim-tag">unverändert</span>
+          <div class="row" style="gap:14px;">
+            <div class="ring"><div class="num">64&hairsp;%</div></div>
+            <div>
+              <div style="font-size:13px; font-weight:600;">Tagesziel</div>
+              <div style="font-size:12.5px; color:hsl(var(--muted-foreground));" class="num">32 / 50 XP heute</div>
+            </div>
+            <span class="badge primary">Level 7 · Entdecker</span>
+          </div>
+        </div>
+
+        <!-- competence chart -->
+        <div class="card" style="margin-top:14px; padding:20px;">
+          <div class="row" style="gap:10px;">
+            <span class="eyebrow">Kompetenz</span>
+            <div class="minitoggle" style="margin-left:auto;"><span class="on">Wörter</span><span>Can-Dos</span></div>
+          </div>
+          <svg viewBox="0 0 640 170" style="width:100%; margin-top:10px;" role="img" aria-label="Gemeisterte Wörter über Zeit">
+            <path d="M20,140 C90,132 140,124 200,114 C260,104 320,92 390,74 C460,58 540,44 620,30 L620,160 L20,160 Z" fill="hsl(221 83% 54% / 0.10)"/>
+            <path d="M20,140 C90,132 140,124 200,114 C260,104 320,92 390,74 C460,58 540,44 620,30" fill="none" stroke="hsl(221 83% 54%)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="200" cy="114" r="5" fill="hsl(153 55% 40%)" stroke="#fff" stroke-width="2"/>
+            <text x="200" y="100" font-size="11" fill="hsl(153 55% 40%)" text-anchor="middle" font-weight="700">Can-Do: Behörde</text>
+            <circle cx="460" cy="58" r="5" fill="hsl(153 55% 40%)" stroke="#fff" stroke-width="2"/>
+            <text x="460" y="44" font-size="11" fill="hsl(153 55% 40%)" text-anchor="middle" font-weight="700">Can-Do: Meetings</text>
+            <circle cx="620" cy="30" r="5.5" fill="hsl(221 83% 54%)" stroke="#fff" stroke-width="2"/>
+            <text x="614" y="20" font-size="12" fill="hsl(252 16% 12%)" text-anchor="end" font-weight="800">214</text>
+            <text x="20" y="158" font-size="10.5" fill="hsl(220 8% 36%)">Juni</text>
+            <text x="620" y="158" font-size="10.5" fill="hsl(220 8% 36%)" text-anchor="end">heute</text>
+          </svg>
+          <div style="font-size:12.5px; color:hsl(var(--muted-foreground)); margin-top:4px;" class="num">214 Wörter gemeistert · +18 diese Woche</div>
+        </div>
+
+        <!-- compact pair -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px;">
+          <div class="card" style="padding:16px 18px;">
+            <span class="eyebrow">Prüfung</span>
+            <div class="row" style="gap:12px; margin-top:10px;">
+              <div class="ring" style="width:44px; height:44px; background:conic-gradient(hsl(var(--primary)) 0 245deg, hsl(var(--muted)) 245deg 360deg);"><div style="width:34px; height:34px; font-size:11px;" class="num">43</div></div>
+              <div>
+                <div style="font-size:13.5px; font-weight:700;">telc B2 Beruf</div>
+                <div style="font-size:12px; color:hsl(var(--muted-foreground));" class="num">letzte Simulation 63 %</div>
+              </div>
+            </div>
+            <button class="btn btn-outline btn-sm" style="margin-top:12px;">Simulation starten</button>
+          </div>
+          <div class="card" style="padding:16px 18px;">
+            <span class="eyebrow">Diagnose</span>
+            <div style="margin-top:10px;">
+              <div style="font-size:13.5px; font-weight:700;">Kasus <span style="font-weight:500; color:hsl(var(--muted-foreground));">(Schreiben)</span></div>
+              <div style="font-size:12px; color:hsl(var(--muted-foreground));" class="num">3× in den letzten 5 Texten</div>
+            </div>
+            <button class="btn btn-outline btn-sm" style="margin-top:12px;">Üben</button>
+          </div>
+        </div>
+
+      </div></div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
