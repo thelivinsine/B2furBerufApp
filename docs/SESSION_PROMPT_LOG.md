@@ -408,7 +408,71 @@ _(Restored: this entry was dropped when the parallel session-153 branch merged o
   no compass/stack/pencil mentions left outside the updated PRAKTISCH-NAV.md), and logged this prompt.
 - **Artifacts (prompt 9):** `docs/DECISIONS.md` · this log · PR (this one)
 
-## Session 160 — 2026-07-24 — Quiz-quality pass on the composed session (branch `claude/word-verification-nl4m26`)
+## Session 160 — 2026-07-24 — Fokus KI-Hinweis relocated level with the floating Feedback button (branch `claude/disclaimer-text-layout-5zq5g0`)
+- **Prompt 1 (verbatim, 2026-07-24):** `can you move the line "Dein Satz wird von einer KI (Anthropic, Google oder OpenAI) geprüft und umgeformt. Die Rückmeldung ist KI-generiert und kann Fehler enthalten. Mehr im Datenschutz." to be horizontally in-line with feedback button for the computer view. Also, for mobile view, I want this line to be condensed as much as possible and reside below the auswerten button with the link to privacy policy with just "Mehr".` →
+  Loaded the `design` skill, built `preview/fokus-disclaimer-inline.html` (real light-theme tokens),
+  screenshot-verified in headless Chromium, and presented desktop text (full vs shortened) + mobile
+  text (shortest vs provider-named) variants via `AskUserQuestion`. Founder picked full sentence
+  (desktop) + shortest one-line (mobile).
+- **Prompt 2 (verbatim, 2026-07-24):** `I see that in the desktop view the feedback button and the disclaimer are in a separate section but I like the floating button as before and the text should just be moved downwards to the horizontal level of the feedback button. For mobile view, I want you to bring the feedback button next to the auswerten button. Both the buttons should be floating not in a separate section along with the short text below the buttons` →
+  Corrected the approach: NO bordered bottom bar. Desktop keeps the existing `FeedbackPill`
+  (`fixed bottom-4`) untouched; `aiNoteDesktop` is now a `fixed inset-x-0 bottom-4` note mirroring
+  the pill's `lg:pl-64` + `max-w-6xl` + `sm:px-6` offsets, `max-w-[calc(100%-18rem)]` so its right
+  edge clears the pill, `pointer-events-none` wrapper with only the `/privacy` link clickable.
+  Mobile action group lost its `border-t`/`bg-background/90`/`backdrop-blur` bar chrome: the
+  `FeedbackIconButton` now floats beside the flex-1 Korrigieren button with the condensed
+  "KI-geprüft, kann Fehler enthalten. Mehr" line centered beneath. Rebuilt `preview/*-inline.html`
+  (r2) + re-screenshotted to confirm. `FokusTrainer.tsx` imports `FeedbackIconButton`. Note: the
+  mobile note/buttons are pre-correction only (they own the same `m.status !== "corrected"` guard);
+  the desktop fixed note always shows on the Fokus tab. Kurz/Lang disclaimer left as-is (founder
+  quoted the Fokus string specifically). Gates: typecheck · build · lint (0 errors) ·
+  check:bundle 116.9 kB, all green. Could not live-verify (unauth `/writing` redirects to landing);
+  founder verifies live.
+- **Artifacts (session 160):** `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` (import target, unchanged) ·
+  `preview/fokus-disclaimer-inline.html` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-24):** `kurz and lang should also have same design. Also, for the floating button "Mit KI gebaut · Feedback" - make it just "Feedback" with an icon. No need of mit ki gebaut. Do this across the app` →
+  Applied the Fokus disclaimer treatment to Kurz/Lang (`GuidedWritingTrainer.tsx`): removed the
+  inline disclaimer `<p>` from `content`, added its own fixed `aiNoteDesktop` (Kurz/Lang wording),
+  and reworked the mobile action bar (dropped `border-t`/`bg-background/90`/`backdrop-blur`; the
+  `FeedbackIconButton` now floats beside Auswerten, plus Neu schreiben after a result, with the
+  condensed note beneath). Shortened the feedback label app-wide from "Mit KI gebaut · Feedback" to
+  "Feedback": `FeedbackButton.tsx` (`FeedbackPill` default, `FeedbackFullButton` text,
+  `FeedbackIconButton` aria/title) + the `AdminSteuerung` label placeholder; remote-config
+  `feedback.label` still overrides the pill; icons unchanged. Preview refreshed to r3 (label +
+  parity), screenshot-verified. Gates: typecheck · build · lint (0 errors) · check:bundle 116.8 kB,
+  all green. Docs: `docs/areas/SCHREIBEN.md` + `docs/areas/PRAKTISCH-NAV.md` + PROJECT_STATUS s160
+  handoff updated.
+- **Artifacts (prompt 3):** `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/components/layout/FeedbackButton.tsx` · `src/features/admin/AdminSteuerung.tsx` ·
+  `preview/fokus-disclaimer-inline.html` · `docs/areas/{SCHREIBEN,PRAKTISCH-NAV}.md` ·
+  `docs/PROJECT_STATUS.md` · this log
+- **Prompt 4 (verbatim, 2026-07-24):** `yes, open a PR into main` + mid-turn `and merge` →
+  Checked for a PR template (none), opened **PR #688** into `main` and squash-merged it (merge
+  commit `4cbf0fe`), triggering the Pages deploy. Post-merge housekeeping ran: `git fetch origin
+  main` → `git reset --hard origin/main` → `git push --force-with-lease` on the branch; tree clean.
+- **Prompt 5 (verbatim, 2026-07-24):** `document the session` →
+  Most of the session had been documented inline across the prior prompts (PROJECT_STATUS s160
+  handoff, this log, `docs/areas/SCHREIBEN.md` + `PRAKTISCH-NAV.md`). This pass closed the loop:
+  recorded PR #688 + merge SHA in the handoff, appended a `docs/DECISIONS.md` entry (the Schreiben
+  disclaimer now bottom-anchored, explicitly overriding the "centered in normal flow" guideline for
+  the two trainers only; round-1 bordered bar rejected; "Feedback" label shortening), and added the
+  Schreiben exception to the `design` skill §2.6 so a future session doesn't re-center it.
+- **Artifacts (prompts 4-5):** PR #688 (merged, `4cbf0fe`) · `docs/DECISIONS.md` ·
+  `.claude/skills/design/SKILL.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 6 (verbatim, 2026-07-24, + screenshot of the Redemittel table):** `the speaker buttons are not aligned. Fix them by aligning all of the buttons to the right` →
+  The first column of the three Bibliothek `DataTable`s put the `SpeakButton` right after the German
+  text (`gap-1`), so it landed at a different x per row. Fixed all three sibling tables
+  (`RedemittelViews.tsx` "Wendung", `CollocationViews.tsx` "Kollokation", `VocabViews.tsx` "Wort"):
+  `min-w-0` on the text span + `ml-auto shrink-0` on the SpeakButton (and `shrink-0` on the Wesen
+  gender glyph), so every speaker button aligns to the right edge of that column. Verified with a
+  before/after mockup (`preview/speaker-align.html`, screenshot). Gates: typecheck · build · lint
+  (0 errors) · check:bundle 116.8 kB, all green.
+- **Artifacts (prompt 6):** `src/features/redemittel/RedemittelViews.tsx` ·
+  `src/features/collocations/CollocationViews.tsx` · `src/features/vocabulary/VocabViews.tsx` ·
+  `preview/speaker-align.html` · this log
+
+## Session 161 — 2026-07-24 — Quiz-quality pass on the composed session (branch `claude/word-verification-nl4m26`)
 
 Founder reviewed individual session cards from screenshots; each turn diagnosed one exercise type and fixed it.
 
@@ -421,5 +485,5 @@ Founder reviewed individual session cards from screenshots; each turn diagnosed 
 - **Prompt 7 (verbatim):** `yes build 1 + 2` — mid-turn additions: `once the user has demonstrated enough competency then the third recommendation could be applied to questions type 1 and 2` and (screenshot: Ausreißer "abdichten" vs Presse/Gehörschutz/Blech) `questions like these are tricky because, abdichten means seal ... what's the main idea behind such questions and how can we reduce ambiguity?` → built plural: `sameStemPluralForms` distractors, new `pluralType` typed `QuizQuestion` kind + `TypedView`, `isTrickyPlural` competency gate at difficulty 3 (plural also added to the d3 branch). Answered the Ausreißer question (main idea = topic membership; ambiguity from mixed POS + weak semantic distance) with 3 reduction options. Previews `plural-variants-preview.html`. Gates: typecheck / lint 0 / test:unit 289 / build.
 - **Prompt 8 (verbatim):** `red colored cards here reads like as if these were all mistakes. Chose a different color shade to show progress` (screenshot: round-summary GESAMMELT loot grid, coral wash) → 4-shade preview (`loot-shade-preview.html`); founder picked **Option C** (white cards + Himmelblau "Lv ↑" pill). Implemented in `LootCard`; eyebrow coral → brand blue; trophy ring stays coral.
 - **Prompt 9 (verbatim):** `for reducing the abmiguity, referring to the points on how to reduce ambiguity, implement 1 but also mix them up by keep questions which are of a mix like now with different parts of speech but as mentioned in point 2.` → `oddOneOutQ`: added a POS-matched flavour mixed ~50/50 with mixed-POS, and an "genuinely unrelated" outsider guard (different theme + no shared `related` link either direction). Probe over 1,200 questions: 64% fully POS-matched, 0 linked outsiders.
-- **Prompt 10 (verbatim):** `yes` → documented the session (this entry, PROJECT_STATUS s160 handoff with s158 rotated to the W30 archive, header refreshed) and opened + squash-merged the engine/loot PR into `main`.
-- **Artifacts (session 160):** `src/data/vocabulary.ts` · `src/features/session/SessionPlayer.tsx` · `src/engine/quiz.ts` · `src/features/quiz/QuestionViews.tsx` · `src/types/index.ts` · `preview/{cloze-hint,plural-variants,loot-shade}-preview.html` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #687 + the engine/loot PR
+- **Prompt 10 (verbatim):** `yes` → documented the session (this entry, PROJECT_STATUS s161 handoff with s159 rotated to the W30 archive, header refreshed) and opened + squash-merged PR #691 (engine/loot) into `main`.
+- **Artifacts (session 161):** `src/data/vocabulary.ts` · `src/features/session/SessionPlayer.tsx` · `src/engine/quiz.ts` · `src/features/quiz/QuestionViews.tsx` · `src/types/index.ts` · `preview/{cloze-hint,plural-variants,loot-shade}-preview.html` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log · PR #687 (content) + PR #691 (engine/loot)

@@ -21,9 +21,9 @@ const REDEMITTEL_COLUMNS: DataColumn<RedemittelPhrase>[] = [
     id: "wendung",
     label: "Wendung",
     cell: (p) => (
-      <div className="flex min-w-0 items-center gap-1">
-        <span className="font-semibold">{p.de}</span>
-        <SpeakButton text={p.de} />
+      <div className="flex min-w-0 items-center gap-2">
+        <span className="min-w-0 font-semibold">{p.de}</span>
+        <SpeakButton text={p.de} className="ml-auto shrink-0" />
       </div>
     ),
     sortValue: (p) => p.de,

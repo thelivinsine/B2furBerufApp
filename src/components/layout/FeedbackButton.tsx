@@ -141,7 +141,7 @@ export function FeedbackPill() {
       className="fixed bottom-4 right-4 z-40 hidden items-center gap-1.5 rounded-full border border-border bg-surface/90 px-3 py-2 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur-md transition-colors hover:border-primary/40 hover:text-foreground lg:flex lg:translate-x-1/2 lg:right-[calc(9.5rem_+_max(0px,(100vw_-_88rem)/2))]"
     >
       <MessageSquareText className="h-3.5 w-3.5 text-primary" />
-      <span>{feedback.label ?? "Mit KI gebaut · Feedback"}</span>
+      <span>{feedback.label ?? "Feedback"}</span>
     </button>
   );
 }
@@ -150,7 +150,7 @@ export function FeedbackPill() {
  * Compact labelled "Feedback" pill for the mobile Üben action bars (left of the
  * Üben button). Deliberately NOT a bare message-bubble icon: a lone chat glyph
  * read as a live-chat / support widget (founder, 2026-07-14). The Sparkles mark
- * ties it to the "Mit KI gebaut" disclaimer and the visible label makes the
+ * ties it to the "built with AI" disclaimer and the visible label makes the
  * purpose unambiguous.
  */
 export function FeedbackIconButton({ className }: { className?: string }) {
@@ -159,8 +159,8 @@ export function FeedbackIconButton({ className }: { className?: string }) {
     <button
       type="button"
       onClick={() => setOpen(true)}
-      aria-label="Mit KI gebaut · Feedback geben"
-      title="Mit KI gebaut · Feedback geben"
+      aria-label="Feedback geben"
+      title="Feedback geben"
       className={cn(
         "flex h-11 shrink-0 items-center gap-1.5 rounded-xl border border-border bg-surface px-3 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground",
         className,
@@ -189,7 +189,7 @@ export function FeedbackFullButton({ className }: { className?: string }) {
       )}
     >
       <MessageSquareText className="h-3.5 w-3.5 text-primary" />
-      Mit KI gebaut · Feedback geben
+      Feedback
     </button>
   );
 }
