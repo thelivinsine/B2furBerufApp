@@ -738,3 +738,20 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (session 166):** `src/features/writing/floatingCluster.ts` (new) ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
   `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-24):** `increase the contrast of the grammatik and aufgabe wahlen buttons in schreiben section.`
+- **Prompt 4 (verbatim, 2026-07-24):** `no need of a new preview. Refer to the previous designs and take my preference into account` →
+  Preview round waived (as in s165), so implemented directly against the established language. Both
+  mobile panel toggles ("Aufgabe wählen" in Kurz/Lang, "Grammatik" in Fokus) used the shared `outline`
+  variant (`bg-surface/50` + `border-border`), which reads as a ghost on the page ground in both
+  themes. They now use a new **`accent` Button variant** — the Himmelblau tile language of the rail
+  each button opens (s149 law: Schreiben rails are Himmelblau, never grey) — when closed, and keep the
+  solid `default` when open so the open/closed distinction survives. Measured rather than eyeballed:
+  the accent is a 77%-light sky, so NO alpha of it clears the 3:1 UI floor on the near-white light
+  ground (1.31:1), hence the light border uses **`accent-ink/70`** (3.07:1); dark keeps `accent/45`
+  (3.34:1). Label contrast 4.72:1 light / 7.71:1 dark. Brand blue was deliberately NOT used, so the
+  toggle does not compete with the Auswerten/Korrigieren CTA in the same viewport. The variant lives
+  in `src/components/ui/button.tsx` and is reusable for the Bibliothek filter toggles if wanted.
+  Verified by screenshot in both themes, closed and open. Gates: typecheck · lint (0 errors) ·
+  test:unit 293/293 · build · check:bundle · check:contrast, all green.
+- **Artifacts (prompts 3-4):** `src/components/ui/button.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log

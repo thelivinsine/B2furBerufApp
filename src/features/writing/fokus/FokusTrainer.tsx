@@ -402,10 +402,12 @@ export function FokusTrainer({
                 always-visible desktop rail), instead of a dead disabled button that
                 reads as broken. */}
             <Button
-              variant={panelOpen ? "default" : "outline"}
+              /* Closed = the Himmelblau tile of the rail it opens (founder s166,
+                 the `outline` fill was too faint against the page ground). */
+              variant={panelOpen ? "default" : "accent"}
               aria-expanded={panelOpen}
               aria-pressed={panelOpen}
-              className="h-10 rounded-lg"
+              className="h-10 rounded-lg font-semibold"
               onClick={() => setPanelOpen((o) => !o)}
             >
               <SlidersHorizontal className="h-4 w-4" />

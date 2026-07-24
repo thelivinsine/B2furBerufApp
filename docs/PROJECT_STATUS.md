@@ -73,6 +73,19 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Follow-up in session 166: the Schreiben panel toggles now carry the rail's Himmelblau.** Founder:
+"increase the contrast of the grammatik and aufgabe wahlen buttons in schreiben section" (preview
+round explicitly waived, so implemented directly against the established language). Both toggles used
+the shared `outline` variant (`bg-surface/50` + `border-border`), which reads as a ghost on the page
+ground in both themes. They now use a new **`accent` Button variant** (Himmelblau tile, the color of
+the rail each one opens) when closed, and keep the solid `default` when open, so the open/closed
+distinction survives. Light mode borders with **`accent-ink/70`, not `accent`**: the accent is a
+77%-light sky, so no alpha of it clears the 3:1 UI floor on the near-white ground (1.31:1 measured);
+accent-ink/70 lands at 3.07:1. Dark keeps `accent/45` (3.34:1). Label contrast 4.72:1 light,
+7.71:1 dark; `pnpm check:contrast` still green. The variant lives in `src/components/ui/button.tsx`,
+so the Bibliothek filter toggles can adopt it later if the founder wants the same treatment there.
+Gates: typecheck · lint (0 errors) · test:unit 293/293 · build · check:bundle · check:contrast.
+
 **Handoff after session 166 (2026-07-24). Mobile floating action cluster no longer collides with
 the card underneath (Schreiben), branch `claude/button-overlap-fix-s7fl28`.** Founder screenshot of
 `/writing` (Lang, dark, mobile): the "Feedback" pill, the "Auswerten" button and the card's

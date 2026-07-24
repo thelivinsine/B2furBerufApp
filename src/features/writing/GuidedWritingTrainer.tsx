@@ -380,10 +380,12 @@ export function GuidedWritingTrainer({
       <div className="mb-4 space-y-3 lg:hidden">
         <div className="flex justify-center">
           <Button
-            variant={pickerOpen ? "default" : "outline"}
+            /* Closed = the Himmelblau tile of the rail it opens (founder s166,
+               the `outline` fill was too faint against the page ground). */
+            variant={pickerOpen ? "default" : "accent"}
             aria-expanded={pickerOpen}
             aria-pressed={pickerOpen}
-            className="h-10 rounded-lg"
+            className="h-10 rounded-lg font-semibold"
             onClick={() => setPickerOpen((o) => !o)}
           >
             <Target className="h-4 w-4" />
