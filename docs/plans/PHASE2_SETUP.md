@@ -96,6 +96,25 @@ supabase secrets set LANGUAGETOOL_API_KEY=...languagetool-key...
 supabase secrets set GEMINI_API_KEY=...
 supabase secrets set OPENAI_API_KEY=...
 
+## No-CLI deploys (s167)
+
+`.github/workflows/supabase.yml` deploys every Edge Function on merge to `main`
+and applies pending migrations first, so the CLI commands in this document are
+a fallback, not the normal path. **One-time setup, all in the browser:**
+
+1. Supabase Dashboard → Account → **Access Tokens** → generate one.
+2. GitHub → repo **Settings → Secrets and variables → Actions → New repository
+   secret**: `SUPABASE_ACCESS_TOKEN` = that token.
+3. Optional, only if CI should also apply migrations: add `SUPABASE_DB_PASSWORD`
+   (the database password). Without it the migration step is skipped and
+   migrations must be pasted into the Dashboard SQL editor instead.
+
+Until `SUPABASE_ACCESS_TOKEN` exists the workflow skips cleanly rather than
+failing, so the file is inert until it is configured. Function ENV values
+(model ids, the daily limits, spend caps) are Supabase **secrets** and are set in
+the Dashboard under Edge Functions → Secrets; changing one needs no redeploy and
+no code change.
+
 # Cost guardrails (these are the defaults; set them explicitly to be sure)
 supabase secrets set MONTHLY_SPEND_CAP_USD=5
 supabase secrets set DAILY_LIMIT_SHORT=4
@@ -108,6 +127,9 @@ supabase secrets set DAILY_LIMIT_LONG=2
 # Migration 0011 (writing_evaluations.task_id) MUST run before this deploy.
 supabase db push
 supabase functions deploy evaluate-writing
+# NOTE: none of this is needed any more if .github/workflows/supabase.yml is
+# configured (see "No-CLI deploys" below). It deploys every function on merge
+# to main and applies migrations first.
 ```
 
 ## 7. Smoke-test
