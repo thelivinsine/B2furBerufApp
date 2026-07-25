@@ -6,7 +6,11 @@ name: Deploy Supabase functions
 #
 # ONE-TIME SETUP (all in the browser, GitHub → Settings → Secrets and variables
 # → Actions → New repository secret):
-#   SUPABASE_ACCESS_TOKEN  - Supabase Dashboard → Account → Access Tokens
+#   SUPABASE_ACCESS_TOKEN  - Supabase Dashboard → Account → Access Tokens.
+#                            NOTE: these can be created with an expiry. When it
+#                            lapses, deploys fail with a clear error telling you
+#                            to regenerate it (see the "Verify access token"
+#                            step); nothing deploys half-way.
 #   SUPABASE_DB_PASSWORD   - the database password (only needed for migrations;
 #                            leave it unset and the migration step is skipped)
 # The project ref is not a secret and is set below.
@@ -72,6 +76,20 @@ jobs:
         uses: supabase/setup-cli@c4474143ea78539ffce3f52d84f2b6ba22ecc73f # v1
         with:
           version: latest
+
+      # A Supabase access token can be created with an expiry. When it lapses
+      # every deploy fails with an opaque 401, so check it ONCE up front and say
+      # plainly what to do, rather than leaving a non-technical operator staring
+      # at a stack trace.
+      - name: Verify access token
+        if: steps.creds.outputs.configured == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if ! supabase projects list > /dev/null 2>&1; then
+            echo "::error::SUPABASE_ACCESS_TOKEN was rejected. It has most likely EXPIRED. Generate a new one at Supabase Dashboard -> Account -> Access Tokens, then update the SUPABASE_ACCESS_TOKEN secret in GitHub -> Settings -> Secrets and variables -> Actions. Nothing was deployed."
+            exit 1
+          fi
 
       # Migrations run BEFORE the functions. evaluate-writing writes
       # writing_evaluations.task_id, which migration 0011 adds; deploying the

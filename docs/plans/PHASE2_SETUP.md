@@ -110,7 +110,19 @@ a fallback, not the normal path. **One-time setup, all in the browser:**
    migrations must be pasted into the Dashboard SQL editor instead.
 
 Until `SUPABASE_ACCESS_TOKEN` exists the workflow skips cleanly rather than
-failing, so the file is inert until it is configured. Function ENV values
+failing, so the file is inert until it is configured. **Access tokens can carry
+an expiry.** When one lapses the workflow stops at the "Verify access token"
+step with an explicit "regenerate it" error and deploys nothing, rather than
+failing half-way; fix it by generating a new token and updating the same GitHub
+secret. Nothing else changes.
+
+**Migrations applied by hand.** Migration 0011 was run directly in the Dashboard
+SQL editor (s167), not through `supabase db push`, so it is NOT recorded in
+`supabase_migrations.schema_migrations`. That is safe: every statement in it is
+idempotent (`add column if not exists`, `create index if not exists`), so if
+`SUPABASE_DB_PASSWORD` is added later and CI re-applies it, the re-run is a
+no-op. Keep new migrations idempotent for the same reason. Without that secret,
+each future migration needs one paste into the SQL editor. Function ENV values
 (model ids, the daily limits, spend caps) are Supabase **secrets** and are set in
 the Dashboard under Edge Functions → Secrets; changing one needs no redeploy and
 no code change.

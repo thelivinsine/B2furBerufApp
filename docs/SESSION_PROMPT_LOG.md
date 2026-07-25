@@ -905,3 +905,21 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   `supabase/functions/evaluate-writing/index.ts` · `supabase/migrations/0011_writing_task_ref.sql` (new) ·
   `scripts/lint-content.mjs` · `tests/writingScope.test.ts` · `docs/areas/SCHREIBEN.md` ·
   `docs/plans/PHASE2_SETUP.md` · this log
+- **Prompt 12 (verbatim, 2026-07-25):** `I don't have cli`
+- **Response summary:** Gave the browser-only path (Dashboard SQL editor + Edge Function editor +
+  Secrets) AND built the durable fix: `.github/workflows/supabase.yml` applies pending migrations then
+  deploys every Edge Function on merge to `main`, so no CLI is ever needed. Skips cleanly (with a
+  notice, not a failure) until `SUPABASE_ACCESS_TOKEN` exists, so merging it is inert on its own.
+  Actions pinned to commit SHAs, matching `pages.yml`.
+- **Prompt 13 (verbatim, 2026-07-25):** `I ran the query in option a but then realised option b is
+  better so I went ahead and added access token in github repo. The access token is set for 30 days
+  expiry for now.`
+- **Response summary:** Migration 0011 is therefore already applied by hand and NOT recorded in
+  `supabase_migrations.schema_migrations`; harmless because every statement in it is idempotent, so a
+  later CI `db push` is a no-op. `SUPABASE_DB_PASSWORD` is not set, so CI skips migrations entirely for
+  now and future migrations need one Dashboard paste each. Hardened the workflow for the 30-day token
+  expiry: a **"Verify access token" step now runs FIRST** and, on rejection, fails with an explicit
+  "it has most likely expired, regenerate it here" error having deployed nothing, instead of an opaque
+  401 part-way through.
+- **Artifacts (prompts 12-13):** `.github/workflows/supabase.yml` (new) · `docs/plans/PHASE2_SETUP.md` ·
+  this log
