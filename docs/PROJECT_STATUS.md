@@ -1,14 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 166). **Schreiben mobile polish, two founder reports.**
-(1) The chrome-less floating action cluster collided with the card under it: a disabled
-(`opacity-50`) button let the card text bleed through and the card-tail "Noch N Wörter" hint sat
-exactly under the pinned row. Controls now get an opaque backing and the hint rides the cluster's
-caption slot (`src/features/writing/floatingCluster.ts`). (2) The "Aufgabe wählen" / "Grammatik"
-panel toggles were the ghost-like `outline` variant; they now use a new `accent` Button variant,
-the Himmelblau of the rail each one opens (light borders with `accent-ink/70`, since no alpha of
-the 77%-light accent clears the 3:1 UI floor on the near-white ground). Prior s165: Control Center
-layout aligned to `AppShell` + prominent top back-button + Prüfmodus note-save.
+_Last updated: 2026-07-25 (session 167). **Schreiben: the Aufgabe picker stopped lying, plus the
+overhaul plan.** Founder report "why are there almost no items in the writing section?" root-caused:
+the pool holds **373 tasks**, but the rail counted only sector-TAGGED tasks and greyed out at zero
+while the trainer drew with a prefer-tagged-else-untagged fallback. Both now share ONE selector
+(`src/lib/writingScope.ts`); Branche never disables, every dropdown count means "tasks this scope
+draws from", and every dropdown carries a generic option including the new **Alle Themen** (now the
+default landing scope). `docs/plans/SCHREIBEN-OVERHAUL.md` holds the founder-approved scope for the
+content rebuild (B1/B2/C1.1 Niveau axis, exam-realistic Aufgaben, Textsorte axis, 800-1200 tasks in
+waves). Prior s166: Schreiben mobile floating-cluster collision + panel-toggle contrast.
 Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -76,6 +76,44 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
 
 ## Resume here (next session)
 
+**Handoff after session 167 (2026-07-25). Schreiben Aufgabe picker: one selection rule, plus the
+overhaul plan, branch `claude/writing-aufgaben-research-faw959`.** Founder (two screenshots of the
+Kurz/Lang Branche dropdown): "why are there almost no items in the writing section?"
+- **Root cause: the rail and the engine disagreed.** `WritingRail.tsx` counted a Branche option as
+  "tasks explicitly TAGGED with this sector" and set `disabled: count === 0`, while
+  `GuidedWritingTrainer.tsx` drew with prefer-tagged-else-untagged and is never empty. The rail
+  marked a Branche unavailable while the engine would have served the full universal pool behind it.
+  The pool was never the problem: **373 tasks** (189 Kurz, 184 Lang) across all 20 Themen. Only
+  70 carry a `sectors` tag, and **11 of 20 Themen carry none**, so every Alltag theme showed a
+  completely dead Branche dropdown.
+- **Fix: `src/lib/writingScope.ts` is now the ONE selection rule.** `eligibleTasks({theme, sub,
+  sector, length})` returns `WritingTaskRef[]` (`{theme, ix}`); the trainer draws from it and every
+  rail dropdown counts with it, so all counts finally mean the same thing. Branche never disables.
+  The sector fallback is applied **per theme**, so a Branche under Alle Themen keeps the broad pool
+  instead of collapsing to the tagged handful.
+- **"Alle Themen" added** (founder: "add a generic or all themes option for all the dropdowns"), and
+  it is now the **default landing scope** (was `themes[0]`, Besprechungen). A drawn task carries its
+  own theme, which drives the "Aufgabe: <Thema>" eyebrow, the `evaluateWriting` call, the practice
+  deep-link and the saved draft. Unterthema hides under Alle Themen (slugs are theme-scoped).
+- **`tests/writingScope.test.ts` (new, 11 cases)** pins the invariants, including the regression:
+  every Branche x every Thema x both lengths must yield > 0 tasks.
+- **Files:** `src/lib/writingScope.ts` (new), `WritingRail.tsx`, `GuidedWritingTrainer.tsx`,
+  `tests/writingScope.test.ts` (new), `docs/areas/SCHREIBEN.md`, `docs/plans/SCHREIBEN-OVERHAUL.md`
+  (new). **Gates:** typecheck · lint (0 errors) · test:unit **304/304** · build · check:bundle
+  (117.2 kB) · lint:content, all green.
+- **The plan doc is the real deliverable of this session.** It carries the founder-approved scope
+  (B1/B2/C1.1 Niveau axis · no fifth tab, exam simulation rides Kurz/Lang via a Prüfungsformat tag ·
+  add Niveau + Textsorte rail axes · 800-1200 tasks in waves) and three findings that change
+  existing assumptions: **Kurz/Lang word targets (40-60 / 120-150) match no real exam** and must
+  become task-SHAPE buckets with per-task word targets; **there is no Goethe-Zertifikat B2 Beruf**
+  (Goethe-Test PRO has no writing module at all, the Beruf writing exam is telc-only, so CLAUDE.md
+  needs correcting); and **`evaluate-writing` never receives the task text**, which makes
+  Aufgabenerfüllung structurally uncheckable and is the biggest quality ceiling in the module.
+- **Research was half-blocked:** WebFetch returned 403 at the proxy for every external host and the
+  session WebSearch budget ran out, so no official Modellsatz PDF was opened and **no verbatim exam
+  prompt was obtained**. Findings are confidence-marked; §12 of the plan lists 7 items that must not
+  be hard-coded until verified from a primary source.
+
 **Follow-up in session 166: the Schreiben panel toggles now carry the rail's Himmelblau.** Founder:
 "increase the contrast of the grammatik and aufgabe wahlen buttons in schreiben section" (preview
 round explicitly waived, so implemented directly against the established language). Both toggles used
@@ -115,30 +153,6 @@ the card underneath (Schreiben), branch `claude/button-overlap-fix-s7fl28`.** Fo
   Grammatik) already carry `bg-background/90 backdrop-blur` and needed no change.
 - **Gates:** typecheck · lint (0 errors) · test:unit **293/293** · build · check:bundle (117.0 kB),
   all green.
-
-**Handoff after session 165 (2026-07-24). Control Center layout brought inline with the app +
-prominent top back-button, branch `claude/control-center-layout-margins-yn6nvd`.** The founder asked
-why margins/layout jump drastically when moving from the app into the Control Center. Root cause:
-`AdminShell` renders outside `AppShell` and had drifted, wrapping the whole shell in a centered
-`mx-auto max-w-[1240px]` grid (`256px 1fr`) with an uncapped, left-aligned content column and a
-sidebar that was a grid column rather than an edge-pinned rail.
-- **Fix (no preview, founder-waived):** `AdminShell` now mirrors `AppShell` exactly. Desktop sidebar
-  is a `fixed inset-y-0 left-0 z-30 hidden w-64 border-r bg-surface/60 backdrop-blur-xl lg:block` rail;
-  content wrapper is `lg:pl-64`; `<main>` is `mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8` — same
-  width, centering, and gutters as the app. Below `lg` the rail becomes a top nav bar (admin has no
-  bottom tab bar).
-- **Back-to-app moved to the top** of the nav panel (was a small muted bottom link) as a Himmelblau
-  accent tile (`border-accent/40 bg-accent/15 text-accent-ink`, dark `/25` `/10`) + ArrowLeft, so it
-  pops against the neutral nav rows; a compact "App" copy sits top-right on the mobile bar.
-- **Follow-up (same session): Prüfmodus note save.** The founder asked "where is the save button?" on
-  the review cockpit's note box. It saves with the Approve/Reject decision only (no standalone save; the
-  N button just opens the box). Added a **„Notiz speichern"** button (note-only `onChange`, keeps the item
-  in the queue undecided, ⌘/Ctrl+Enter shortcut) + a helper line explaining both save paths. Reused the
-  existing note-only path in `useWorkbench`.
-- **Files:** `src/features/admin/AdminShell.tsx`, `src/features/admin/Pruefmodus.tsx`. **Gates:**
-  typecheck · lint (0 errors) · build, green.
-- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
-  hard-refresh past a stale SW).
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

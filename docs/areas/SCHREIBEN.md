@@ -16,8 +16,24 @@ design as reference.**
 
 ## Kurz / Lang (guided writing)
 - Land STRAIGHT on a randomly drawn Aufgabe + editor — never a theme-picker interstitial.
-  `src/data/writingPrompts.ts` holds per-theme task pools (see `docs/areas/CONTENT.md`); a
-  selected Branche prefers its tagged tasks, else falls back to untagged, never empty.
+  `src/data/writingPrompts.ts` holds per-theme task pools (see `docs/areas/CONTENT.md`).
+- **`src/lib/writingScope.ts` is the ONE task-selection rule** (s167): `eligibleTasks({theme, sub,
+  sector, length})` returns `WritingTaskRef[]` (`{theme, ix}`), and BOTH the trainer's draw and every
+  rail dropdown count go through it. Before s167 the rail counted only sector-TAGGED tasks and
+  greyed out at zero while the trainer drew with a prefer-tagged-else-untagged fallback, so most
+  Branchen read as unavailable although the full universal pool sat behind them (only 70 of 373
+  tasks carry a `sectors` tag; 11 of 20 Themen carry none). Never reintroduce a second counting rule.
+  - `theme: ""` = **Alle Themen**, and it is the DEFAULT landing scope (was `themes[0]`). The drawn
+    task carries its own theme, which is what the "Aufgabe: <Thema>" eyebrow, the evaluation call
+    and the saved draft record.
+  - `sub` applies only inside a concrete theme (slugs are theme-scoped) and is ignored under Alle
+    Themen; the Unterthema dropdown hides there.
+  - `sector` follows the untagged-=-universal rule **per theme**, so a Branche under Alle Themen
+    keeps the broad pool instead of collapsing to the handful of tagged tasks.
+  - No scope is ever empty, so **Branche never disables**. Every dropdown count means the same
+    thing: how many tasks this scope draws from. `tests/writingScope.test.ts` pins all of it.
+- **Every dropdown carries a generic first option** (founder s167): "Alle Branchen", "Alle Themen",
+  "Gesamtes Thema".
 - The dice on the Aufgabe card (standard 40px icon button, half-spin per roll) re-rolls within
   the current scope (keeps typed text, clears a stale result). Scope changes (`?sub=`/`?sector=`;
   theme switch clears sub, Branche travels) reset the draft.

@@ -3,9 +3,9 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Check, ChevronDown, RotateCcw, Target, X } from "lucide-react";
 import { themes, themeById } from "@/data/themes";
 import { domains } from "@/data/domains";
-import { writingPrompts, type WritingTask } from "@/data/writingPrompts";
 import { SECTOR_OPTIONS } from "@/lib/facets";
-import type { ThemeId, WorkSector } from "@/types";
+import { countTasks } from "@/lib/writingScope";
+import type { ThemeId } from "@/types";
 import type { WritingLength } from "@/lib/writing";
 import { cn } from "@/lib/utils";
 
@@ -23,8 +23,9 @@ import { cn } from "@/lib/utils";
  */
 
 interface WritingRailProps {
-  value: ThemeId;
-  onChange: (id: ThemeId) => void;
+  /** Selected Thema ("" = all Themen). */
+  value: ThemeId | "";
+  onChange: (id: ThemeId | "") => void;
   /** Selected sub-theme slug ("" = whole theme). */
   sub: string;
   onSubChange: (sub: string) => void;
@@ -40,8 +41,6 @@ interface WritingRailProps {
   onClose?: () => void;
   className?: string;
 }
-
-export const DEFAULT_WRITING_THEME: ThemeId = themes[0].id;
 
 // Domain-grouped themes, with the gesundheit domain folded into Alltag
 // (founder rule): the writing dropdown shows Berufsleben / Alltag / Bildung.
@@ -181,12 +180,6 @@ function ScopeSelect({
   );
 }
 
-/** Tasks of one theme + length matching a sub-theme filter ("" = all). */
-function tasksForSub(theme: ThemeId, length: WritingLength, sub: string): WritingTask[] {
-  const pool = writingPrompts[theme][length];
-  return sub ? pool.filter((t) => t.sub === sub) : pool;
-}
-
 export function WritingRail({
   value,
   onChange,
@@ -204,12 +197,14 @@ export function WritingRail({
   const theme = themeById(value);
   const subThemes = theme?.subThemes ?? [];
 
-  // Branche counts respect the current Thema/Unterthema scope; zero-yield
-  // Branchen grey out (their tag exists nowhere in this pool, so choosing
-  // them would change nothing).
-  const scopedTasks = tasksForSub(value, length, sub);
-  const sectorCount = (s: string) =>
-    scopedTasks.filter((t) => t.sectors?.includes(s as WorkSector)).length;
+  // ONE counting rule for every dropdown (s167): the number next to an option
+  // is how many tasks picking it would actually draw from, computed by the same
+  // `eligibleTasks` selector the trainer draws with. Before this, Branche
+  // counted only sector-TAGGED tasks and greyed out at zero, which contradicted
+  // the untagged-=-universal rule and made most Branchen look unavailable while
+  // the engine would have served the full pool behind them.
+  const countWith = (over: Partial<{ theme: ThemeId | ""; sub: string; sector: string }>) =>
+    countTasks({ theme: value, sub, sector, length, ...over });
 
   const sectionLabel = "text-xs font-semibold uppercase tracking-wide text-muted-foreground";
 
@@ -226,13 +221,16 @@ export function WritingRail({
           value={sector}
           onChange={onSectorChange}
           groups={[
-            { label: "", options: [{ value: "", label: "Alle Branchen" }] },
             {
               label: "",
-              options: SECTOR_OPTIONS.map((o) => {
-                const count = sectorCount(o.value);
-                return { value: o.value, label: o.label, count, disabled: count === 0 };
-              }),
+              options: [
+                { value: "", label: "Alle Branchen", count: countWith({ sector: "" }) },
+                ...SECTOR_OPTIONS.map((o) => ({
+                  value: o.value,
+                  label: o.label,
+                  count: countWith({ sector: o.value }),
+                })),
+              ],
             },
           ]}
         />
@@ -242,13 +240,26 @@ export function WritingRail({
         <p className={cn("mb-2", sectionLabel)}>Thema</p>
         <ScopeSelect
           ariaLabel="Thema"
-          triggerLabel={theme?.titleDe ?? value}
+          triggerLabel={value ? theme?.titleDe ?? value : "Alle Themen"}
           value={value}
-          onChange={(id) => onChange(id as ThemeId)}
-          groups={GROUPS.map((g) => ({
-            label: g.domain.titleDe,
-            options: g.list.map((t) => ({ value: t.id, label: t.titleDe })),
-          }))}
+          onChange={(id) => onChange(id as ThemeId | "")}
+          groups={[
+            // Generic option on every dropdown (founder s167).
+            {
+              label: "",
+              options: [
+                { value: "", label: "Alle Themen", count: countWith({ theme: "", sub: "" }) },
+              ],
+            },
+            ...GROUPS.map((g) => ({
+              label: g.domain.titleDe,
+              options: g.list.map((t) => ({
+                value: t.id,
+                label: t.titleDe,
+                count: countWith({ theme: t.id, sub: "" }),
+              })),
+            })),
+          ]}
         />
       </section>
 
@@ -266,13 +277,9 @@ export function WritingRail({
               {
                 label: "",
                 options: [
-                  {
-                    value: "",
-                    label: "Gesamtes Thema",
-                    count: writingPrompts[value][length].length,
-                  },
+                  { value: "", label: "Gesamtes Thema", count: countWith({ sub: "" }) },
                   ...subThemes.map((s) => {
-                    const count = tasksForSub(value, length, s.id).length;
+                    const count = countWith({ sub: s.id });
                     return { value: s.id, label: s.titleDe, count, disabled: count === 0 };
                   }),
                 ],

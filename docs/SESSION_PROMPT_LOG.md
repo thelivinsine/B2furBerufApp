@@ -810,3 +810,17 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   Kurz/Lang via a Prüfungsformat tag · add both Niveau and Textsorte rail axes · deep content build
   (800-1200 tasks) in waves · generic "Alle …" option on every rail dropdown.
 - **Artifacts (prompts 1-4):** `docs/plans/SCHREIBEN-OVERHAUL.md` (new) · this log
+- **Prompt 5 (verbatim, 2026-07-25):** `continue with your work if it got interrupted earlier`
+- **Response summary:** Implemented P0 of the overhaul plan (the half that does not depend on the
+  blocked exam PDFs). New **`src/lib/writingScope.ts`** is the ONE task-selection rule:
+  `eligibleTasks({theme, sub, sector, length}) -> WritingTaskRef[]`, used by BOTH the trainer's draw
+  and every rail dropdown count, so the rail can no longer contradict the engine. Branche never
+  disables; the sector fallback is applied per theme so a Branche under Alle Themen keeps the broad
+  pool. Added the generic **"Alle Themen"** option (founder prompt 2) and made it the default landing
+  scope; the drawn task now carries its own theme, driving the eyebrow, `evaluateWriting`, the
+  practice deep-link and the saved draft. Removed the dead `DEFAULT_WRITING_THEME` export and the
+  local `randomFrom`/`DEFAULT_THEME` duplication. New `tests/writingScope.test.ts` (11 cases) pins
+  the invariants including the regression (every Branche x Thema x length yields > 0).
+- **Artifacts (prompt 5):** `src/lib/writingScope.ts` (new) · `src/features/writing/WritingRail.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `tests/writingScope.test.ts` (new) ·
+  `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log

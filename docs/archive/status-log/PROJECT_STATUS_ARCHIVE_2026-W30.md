@@ -1026,3 +1026,27 @@ Three linked pieces:
   `docs/areas/LEGAL-ADMIN.md`. Shipped in PRs #697, #700 (docs), #701 (nav move).
 - **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
   hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.
+
+**Handoff after session 165 (2026-07-24). Control Center layout brought inline with the app +
+prominent top back-button, branch `claude/control-center-layout-margins-yn6nvd`.** The founder asked
+why margins/layout jump drastically when moving from the app into the Control Center. Root cause:
+`AdminShell` renders outside `AppShell` and had drifted, wrapping the whole shell in a centered
+`mx-auto max-w-[1240px]` grid (`256px 1fr`) with an uncapped, left-aligned content column and a
+sidebar that was a grid column rather than an edge-pinned rail.
+- **Fix (no preview, founder-waived):** `AdminShell` now mirrors `AppShell` exactly. Desktop sidebar
+  is a `fixed inset-y-0 left-0 z-30 hidden w-64 border-r bg-surface/60 backdrop-blur-xl lg:block` rail;
+  content wrapper is `lg:pl-64`; `<main>` is `mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 sm:pt-8` — same
+  width, centering, and gutters as the app. Below `lg` the rail becomes a top nav bar (admin has no
+  bottom tab bar).
+- **Back-to-app moved to the top** of the nav panel (was a small muted bottom link) as a Himmelblau
+  accent tile (`border-accent/40 bg-accent/15 text-accent-ink`, dark `/25` `/10`) + ArrowLeft, so it
+  pops against the neutral nav rows; a compact "App" copy sits top-right on the mobile bar.
+- **Follow-up (same session): Prüfmodus note save.** The founder asked "where is the save button?" on
+  the review cockpit's note box. It saves with the Approve/Reject decision only (no standalone save; the
+  N button just opens the box). Added a **„Notiz speichern"** button (note-only `onChange`, keeps the item
+  in the queue undecided, ⌘/Ctrl+Enter shortcut) + a helper line explaining both save paths. Reused the
+  existing note-only path in `useWorkbench`.
+- **Files:** `src/features/admin/AdminShell.tsx`, `src/features/admin/Pruefmodus.tsx`. **Gates:**
+  typecheck · lint (0 errors) · build, green.
+- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
+  hard-refresh past a stale SW).
