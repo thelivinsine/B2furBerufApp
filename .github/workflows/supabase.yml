@@ -71,9 +71,15 @@ jobs:
             echo "db=true" >> "$GITHUB_OUTPUT"
           fi
 
+      # NOTE: every other action in this repo is pinned to a commit SHA. This
+      # one is pinned to the v1 TAG because the sandbox that authored the file
+      # has no network access and could not verify a real SHA (the first attempt
+      # used an invented one and the run failed at action resolution). Re-pin to
+      # a verified SHA when someone with network can look it up; the floating
+      # tag is an accepted, documented exception until then.
       - name: Setup Supabase CLI
         if: steps.creds.outputs.configured == 'true'
-        uses: supabase/setup-cli@c4474143ea78539ffce3f52d84f2b6ba22ecc73f # v1
+        uses: supabase/setup-cli@v1
         with:
           version: latest
 

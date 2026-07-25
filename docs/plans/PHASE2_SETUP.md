@@ -109,6 +109,12 @@ a fallback, not the normal path. **One-time setup, all in the browser:**
    (the database password). Without it the migration step is skipped and
    migrations must be pasted into the Dashboard SQL editor instead.
 
+**Known deviation:** `supabase/setup-cli` is pinned to the `v1` TAG, not a
+commit SHA like every other action in this repo. The sandbox that authored the
+workflow has no network access and could not verify a real SHA (the first
+attempt used an invented one and the run failed at action resolution). Re-pin it
+to a verified SHA when convenient.
+
 Until `SUPABASE_ACCESS_TOKEN` exists the workflow skips cleanly rather than
 failing, so the file is inert until it is configured. **Access tokens can carry
 an expiry.** When one lapses the workflow stops at the "Verify access token"
