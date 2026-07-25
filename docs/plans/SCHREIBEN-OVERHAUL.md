@@ -1,6 +1,16 @@
 # Schreiben overhaul: exam-realistic Aufgaben, a Niveau axis, real Branche differentiation
 
-**Status:** plan, founder-approved scope (s167). Supersedes nothing; extends `docs/areas/SCHREIBEN.md`.
+**Status:** P0, P1 and P2 SHIPPED in s167 (PRs #711, #712, live on `main`). P3 content waves 2 to 4
+remain. Founder-approved scope; extends `docs/areas/SCHREIBEN.md`.
+
+**Shipped:** the counting fix + one shared selector · "Alle Themen" and a generic option on every
+dropdown · the Niveau and Textsorte axes · the exam-shaped `WritingTask` schema · permanent task ids
+on all 493 tasks · 120 new Aufgaben (every Thema x Niveau x Länge) · the evaluator now receives the
+Aufgabe and grades content first · `writing_evaluations.task_id` + Verlauf showing the task again ·
+per-module daily limits (Fokus 10 / Kurz 4 / Lang 2) · CI that deploys Supabase without a CLI.
+
+**Not shipped:** content waves 2 to 4 (§11 P3) and the §12 verification items.
+
 **Trigger:** founder report "why are there almost no items in the writing section?" plus the
 requirement that Aufgaben simulate real telc/Goethe exam tasks and that every filter option yield
 tailored tasks rather than a Branche name-drop.
@@ -129,8 +139,11 @@ three rows. Per-band point values are **not verified** and must not be hard-code
 **Corrections to current project assumptions:**
 - **There is no Goethe-Zertifikat B2 Beruf.** Goethe-Test PRO (Beruf) tests only Lesen and Hören, no
   writing at all. The Beruf writing exam is a **telc** product. Goethe's workplace-writing analogue
-  is simply B2 Schreiben Teil 2, which is already de facto a workplace task. CLAUDE.md should be
-  corrected.
+  is simply B2 Schreiben Teil 2, which is already de facto a workplace task. **CLAUDE.md needed no
+  change** (it names "telc Deutsch B2 Beruf" and "Goethe-Zertifikat B2", both of which exist and are
+  correctly named); the wrong framing lived in the `evaluate-writing` system prompt, which called
+  itself `Prüfer:in für Goethe/telc "Deutsch B2 Beruf"` for every text at every level. P2 replaced it
+  with a per-level prompt.
 - **Goethe C1's Umformulierung gap-fill task is retired** (modular C1 from 01.01.2024). Teil 2 is now
   a free-written formal e-mail. Much prep material still teaches the old format. Any "65 min / 15 min"
   split is an old-format tell.
