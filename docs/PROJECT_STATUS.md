@@ -9,6 +9,8 @@ draws from", and every dropdown carries a generic option including the new **All
 default landing scope). `docs/plans/SCHREIBEN-OVERHAUL.md` holds the founder-approved scope for the
 content rebuild (B1/B2/C1.1 Niveau axis, exam-realistic Aufgaben, Textsorte axis, 800-1200 tasks in
 waves). Prior s166: Schreiben mobile floating-cluster collision + panel-toggle contrast.
+Wave 1 then added the exam-shaped task schema, 120 new Aufgaben across B1/B2/C1.1, the Niveau and
+Textsorte rail axes, and founder-set daily allowances (Fokus 10 / Kurz 4 / Lang 2).
 Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
@@ -75,6 +77,34 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Follow-up in session 167: Wave 1 content + per-module daily limits.**
+- **Schema + content.** `WritingTask` gained the exam-shaped fields (`points[]` = the Inhaltspunkte an
+  examiner grades, `addressee`, `register`, `level`, `format`, `exam`, `words`, `source`), all optional
+  so the bank upgrades in waves. New `WritingFormat`/`WritingExam`/`WritingRegister` unions mirrored in
+  `scripts/lint-content.mjs` (points bounded 2..5, words 30..300, register requires an addressee).
+  **120 new Aufgaben**: every Thema x Niveau (B1/B2/C1.1) x Länge, modelled on the Goethe B1/B2/C1 and
+  telc B2 Beruf task SHAPES. Founder was explicit that these are **reference, not mock exams**: no exam
+  wording is copied. Alltag tasks now carry the formal apparatus (Betreff, Aktenzeichen, Bezugsdatum,
+  Frist, Grußformel) as Inhaltspunkte and **assert no statutory deadline or euro amount**.
+- **Rail** gained Niveau + Textsorte; the Aufgabe card renders the Inhaltspunkte and takes its word
+  target from the task (real exam targets run 40 to 200 and share no single number).
+- **Filter-rule correction, caught by screenshotting the real app.** untagged-=-universal is right for
+  Branche but WRONG for Niveau/Textsorte: legacy tasks outnumber tagged ones ~10:1, so
+  "C1.1 + Widerspruch" was serving a B1 address-change mail. Those two axes now prefer their tagged
+  tasks and count with `countExact` (no fallback), greying out at zero, so a Lang-only Textsorte
+  (Forumsbeitrag) reads as unavailable under Kurz instead of quietly serving a Notiz.
+- **Daily allowances set by the founder:** Fokus **10**/day (`DAILY_CHECK_LIMIT`; one round = one
+  Korrektur, the Umformung never consumes a second unit), Kurz **4** (`DAILY_LIMIT_SHORT`), Lang **2**
+  (`DAILY_LIMIT_LONG`), the last two counted separately against `writing_evaluations.length`.
+  `TRANSFORM_DAILY_LIMIT` dropped to 30 as a pure runaway guard. **The three Edge Functions must be
+  redeployed for these to take effect.**
+- **Gates:** typecheck · lint (0 errors) · lint:content · test:unit **313/313** · build ·
+  check:bundle (117.2 kB). Verified in a real viewport, desktop + mobile 390px.
+- **Open:** the P2 backend change (send the task text + Inhaltspunkte to `evaluate-writing`, fold the
+  task id into the cache key, add an Aufgabenerfüllung rubric row) is NOT done. Until it ships, the new
+  schema is filtering metadata only and the evaluator still grades writing without knowing what was
+  asked. Content waves 2 to 4 (Branche variants, Alltag rewrite, breadth) also remain.
 
 **Handoff after session 167 (2026-07-25). Schreiben Aufgabe picker: one selection rule, plus the
 overhaul plan, branch `claude/writing-aufgaben-research-faw959`.** Founder (two screenshots of the
