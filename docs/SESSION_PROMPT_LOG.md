@@ -976,3 +976,22 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   pick closes it), so it covers the Aufgabe card and the change is invisible until the panel is
   closed. Left alone as a design decision for the founder.
 - **Artifacts (prompt 18):** `src/features/writing/GuidedWritingTrainer.tsx` · this log
+- **Prompt 19 (verbatim, 2026-07-25):** `keep the panel open all the time until the user closes it.
+  then proceed with wave 2`
+- **Response summary:** (a) The mobile "Aufgabe wählen" panel no longer closes when a Thema is picked;
+  only the X and the toolbar toggle close it. Picking a Thema was the one scope that auto-dismissed,
+  which was also the one that changed the most.
+  (b) **Wave 2 shipped: 150 new Branche-specific Aufgaben.** The five Beruf Themen that apply to every
+  industry (`meetings`, `scheduling`, `conflict`, `safety`, `customer`) x **all 15 Branchen** x both
+  Längen, at B2. Each variant is written to the four-way-difference test from the plan §8: a different
+  ADDRESSEE (Stationsleitung vs Polier vs Disposition vs Laborleitung), a different GENRE (Übergabe vs
+  Protokoll vs Mängelmeldung vs Stellungnahme), different domain CONTENT POINTS and different
+  FACHLEXIK (Medikation/Übergabe · Sprint/Release · Gewerk/Abnahme · Lenkzeit/Ladung · Charge/
+  Sicherheitsdatenblatt · Streife/Vorfall). None of them survives swapping the Branche noun.
+  **Branche slots filled: 71/600 (11.8%) → 173/600 (28.8%);** the bank grew 493 → **643 tasks**.
+  A new test pins the guarantee: for those five Themen every Branche must have a tagged task AND the
+  draw must serve it rather than fall back past it. The 11 Themen where Branche still changes nothing
+  (`travel` + all 10 Alltag) are wave 3/4.
+- **Artifacts (prompt 19):** `src/data/writingPrompts.ts` (+150) ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `tests/writingScope.test.ts` ·
+  `docs/areas/SCHREIBEN.md` · this log

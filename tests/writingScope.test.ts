@@ -115,7 +115,14 @@ describe("eligibleTasks", () => {
         }
       }
     }
-    expect(seen.size).toBe(493);
+    // Self-maintaining: every task in every pool must have made it into the id
+    // set, so a collision (which would silently drop one) fails here without
+    // anyone having to bump a hardcoded count as the bank grows.
+    const poolTotal = THEME_IDS.reduce(
+      (n, id) => n + writingPrompts[id].short.length + writingPrompts[id].long.length,
+      0,
+    );
+    expect(seen.size).toBe(poolTotal);
   });
 
   it("writingTaskById is safe for unknown and empty ids", () => {
@@ -224,6 +231,27 @@ describe("Niveau and Textsorte axes (s167)", () => {
         expect(
           countTasks({ theme: "", sub: "", sector: "", level, format: "email_formell", length }),
         ).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it("wave 2: the 5 universal Beruf Themen serve EVERY Branche a dedicated task", () => {
+    // The founder report behind wave 2: picking a Branche redrew a task that had
+    // nothing to do with that Branche, because only 11.8% of theme x Länge x
+    // Branche slots carried a tagged task. These five Themen apply to every
+    // industry, so they are now filled for all 15 Branchen in both lengths.
+    for (const id of ["meetings", "scheduling", "conflict", "safety", "customer"] as const) {
+      for (const length of LENGTHS) {
+        for (const sector of SECTOR_OPTIONS) {
+          const tagged = writingPrompts[id][length].filter((t) =>
+            t.sectors?.includes(sector.value as never),
+          );
+          expect(tagged.length, `${id}/${length}/${sector.value}`).toBeGreaterThan(0);
+          // And the draw must actually serve them, not fall back past them.
+          for (const ref of eligibleTasks({ theme: id, sub: "", sector: sector.value, length })) {
+            expect(writingPrompts[ref.theme][length][ref.ix].sectors).toContain(sector.value);
+          }
+        }
       }
     }
   });

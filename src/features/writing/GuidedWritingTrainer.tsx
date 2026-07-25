@@ -470,10 +470,12 @@ export function GuidedWritingTrainer({
                 onLevelChange={setLevel}
                 format={format}
                 onFormatChange={setFormat}
-                onChange={(id) => {
-                  setTheme(id);
-                  setPickerOpen(false);
-                }}
+                // The panel stays open until the learner closes it (founder
+                // s167): picking a Thema used to close it while every other
+                // scope left it open, so the one control that auto-dismissed
+                // was also the one that changed the most. Closing is now only
+                // the X or the toolbar toggle.
+                onChange={setTheme}
                 sub={sub}
                 onSubChange={setSub}
                 sector={sector}
