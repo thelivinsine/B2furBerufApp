@@ -523,3 +523,41 @@ integration layouts; the founder picked **Variant A — two areas**.
 4. **No redundancy on the queue page.** Dropped the description sentence under the "Prüfen" header
    and the duplicated open-count; the as-of date appears once (preview-list caption), the open count
    once (start card).
+
+## s166 — The mobile floating action cluster on Schreiben (opacity is the contract, not a bar)
+
+**Prompts (verbatim):** "[screenshot] there's a button overlap issue here. Fix it." · "make sure the
+fixes are applied across the app" · "increase the contrast of the grammatik and aufgabe wahlen
+buttons in schreiben section." · "no need of a new preview. Refer to the previous designs and take my
+preference into account"
+
+**Context.** The founder's screenshot of `/writing` (Lang, mobile, dark) showed the Feedback pill,
+the Auswerten button and the card's "Noch N Wörter schreiben …" hint all drawn on top of each other.
+The cluster is `sticky` and carries **no bar chrome** by the s159/s160 decision, so it floats
+straight over the content cards — that part is not the bug and was not touched.
+
+**Decisions.**
+1. **The no-bar-chrome rule stands; opacity becomes its contract.** Because there is no bar, nothing
+   in the cluster may be see-through. `src/features/writing/floatingCluster.ts` holds the two class
+   names: `floatingSlot` (opaque `bg-background` behind each control) and `floatingNote`
+   (`bg-background/90` + `backdrop-blur-sm` behind the caption, the same treatment the four other
+   mobile bars use). `--background` equals the page stops, so both are invisible against the page
+   ground and only mask where they float over a card. This is what makes the founder-approved
+   chrome-less look survivable — do not "fix" a future overlap by re-adding a bar.
+2. **Transient hint lines ride the cluster, never the card tail.** The "Noch N Wörter …" line is the
+   honest reason the primary button is inactive, and a card-tail line lands exactly under the pinned
+   cluster. It now shares the cluster's single caption slot with the Art. 50 note: hint while the
+   text is too short, note once prüfen/auswerten is possible, never both. The card keeps the hint on
+   `lg:` only, where there is no cluster. Bottom padding was considered and rejected: a bottom-pinned
+   sticky element floats over content at every scroll position except the very end.
+3. **The panel toggles wear the rail's Himmelblau.** "Aufgabe wählen" and "Grammatik" were the shared
+   `outline` variant, whose `bg-surface/50` fill reads as a ghost on the page ground. Closed, they now
+   use a new **`accent` Button variant** (the tile language of the rail each one opens, per the s149
+   "Schreiben rails are Himmelblau, never grey" rule); open, they keep the solid `default`, so the
+   open/closed distinction survives. Brand blue was rejected: the Auswerten/Korrigieren CTA sits in
+   the same viewport and a second blue control would compete with it.
+4. **A Himmelblau border needs `accent-ink` in light mode.** `--accent` is a 77%-light sky, so NO
+   alpha of it clears the 3:1 UI-component floor against the near-white light ground (measured
+   1.31:1). The light border therefore uses `accent-ink/70` (3.07:1); dark keeps `accent/45`
+   (3.34:1). Label contrast 4.72:1 light / 7.71:1 dark. Any future accent-tinted control on light
+   ground must border with `accent-ink`, not `accent`.

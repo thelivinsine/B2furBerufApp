@@ -1,11 +1,14 @@
 # Project Status
 
-_Last updated: 2026-07-24 (session 166). **Schreiben mobile action cluster de-collided:** the
-floating Feedback + Auswerten/Korrigieren cluster carries no bar chrome, so a disabled
-(`opacity-50`) button let the card text behind it bleed through and the card-tail "Noch N
-Wörter" hint sat exactly under the pinned cluster. Controls now get an opaque backing and the
-hint rides the cluster's caption slot (`src/features/writing/floatingCluster.ts`). Prior s165:
-Control Center layout aligned to `AppShell` + prominent top back-button + Prüfmodus note-save.
+_Last updated: 2026-07-24 (session 166). **Schreiben mobile polish, two founder reports.**
+(1) The chrome-less floating action cluster collided with the card under it: a disabled
+(`opacity-50`) button let the card text bleed through and the card-tail "Noch N Wörter" hint sat
+exactly under the pinned row. Controls now get an opaque backing and the hint rides the cluster's
+caption slot (`src/features/writing/floatingCluster.ts`). (2) The "Aufgabe wählen" / "Grammatik"
+panel toggles were the ghost-like `outline` variant; they now use a new `accent` Button variant,
+the Himmelblau of the rail each one opens (light borders with `accent-ink/70`, since no alpha of
+the 77%-light accent clears the 3:1 UI floor on the near-white ground). Prior s165: Control Center
+layout aligned to `AppShell` + prominent top back-button + Prüfmodus note-save.
 Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.

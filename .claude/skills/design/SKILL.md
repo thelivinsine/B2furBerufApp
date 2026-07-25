@@ -71,6 +71,13 @@ Ranked by how often the founder had to correct AI output:
 7. **Motion.** One timing family: 0.12-0.18s panels/popovers, directional tab slides ~0.16s,
    everything reduced-motion safe. Snappy, never slow. Opacity-only enter/exit on framer `layout`/
    `Reorder` elements (scale fights layout projection, locked s26).
+8. **Nothing see-through inside a chrome-less floating cluster** (s166). The two Schreiben trainers
+   float their mobile action row over the cards with no bar behind it, so every control needs an
+   opaque backing and the caption a `bg-background/90` plate (`features/writing/floatingCluster.ts`):
+   otherwise a `disabled:opacity-50` or `outline` button lets the card text bleed through and reads
+   as two labels stacked (the founder reported exactly this). Transient "you can't submit yet" hints
+   belong in that cluster's caption slot, never at the card tail, which is where the pinned row
+   parks. Never answer a future overlap here by re-adding a bar.
 
 ## 3. Color language (locked)
 
@@ -78,7 +85,12 @@ Ranked by how often the founder had to correct AI output:
   card-title eyebrows.
 - **Himmelblau / Himmel Soft** (`--accent`, `197 93% 77%` both themes): selection rails and accent
   tiles (`bg-accent/20` + `border-accent/50`, dark `bg-accent/10` + `/25`), key-press flashes,
-  fix-tile chips. Schreiben-style rails are Himmelblau tiles, NEVER grey slabs.
+  fix-tile chips. Schreiben-style rails are Himmelblau tiles, NEVER grey slabs. A control that
+  OPENS such a rail wears its color too (`variant="accent"`, s166: the Schreiben "Aufgabe wählen" /
+  "Grammatik" toggles), never brand blue, which would compete with the CTA beside it.
+- **Accent borders on light ground must use `accent-ink`, not `accent`** (s166): the accent is a
+  77%-light sky, so no alpha of it clears the 3:1 UI-component floor against the near-white page
+  (measured 1.31:1); `accent-ink/70` lands at 3.07:1. Dark ground keeps `accent/45` (3.34:1).
 - **White `bg-surface` cards** for content, with `border-border` + `shadow-soft`. AI output cards
   are white, never a grey wash.
 - **Grey `bg-muted`** only as recessed chrome: the Bibliothek FilterRail tile, switcher tracks,

@@ -755,3 +755,15 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   test:unit 293/293 · build · check:bundle · check:contrast, all green.
 - **Artifacts (prompts 3-4):** `src/components/ui/button.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
   `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 5 (verbatim, 2026-07-24):** `document the session` →
+  Both work items were already documented as they shipped (PR #707 and #708 each carried
+  `PROJECT_STATUS.md` + this log + `docs/areas/SCHREIBEN.md`). This pass closed the remaining gaps:
+  the `_Last updated_` block now covers BOTH founder reports (it named only the overlap fix); a new
+  **s166 entry in `docs/DECISIONS.md`** records the "why" behind the four decisions that a future
+  session could otherwise undo (no-bar-chrome stands and opacity is its contract · transient hints
+  ride the cluster, never the card tail · panel toggles wear the rail's Himmelblau, not brand blue ·
+  accent borders on light ground must use `accent-ink`); and the **`/design` skill** gained the two
+  matching rules (pre-flight item 8 on chrome-less floating clusters, and the Himmelblau/accent-ink
+  border rule in §3), since the skill is what the next design session reads first.
+- **Artifacts (prompt 5):** `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/PROJECT_STATUS.md` · this log
