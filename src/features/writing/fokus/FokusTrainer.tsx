@@ -19,6 +19,7 @@ import { FeedbackIconButton } from "@/components/layout/FeedbackButton";
 import { EnPeek } from "@/features/grammar/EnPeek";
 import { GrammarRail } from "./GrammarRail";
 import { UmlautKeys } from "../UmlautKeys";
+import { floatingNote, floatingSlot } from "../floatingCluster";
 import { useFokusMachine, MIN_WORDS } from "./useFokusMachine";
 import { valueLabel, refusalCopy, type AxisId } from "./grammarDimensions";
 import { diffWords } from "@/lib/wordDiff";
@@ -265,8 +266,11 @@ export function FokusTrainer({
           </p>
         )}
 
+        {/* Desktop only: on mobile the floating action cluster pins exactly
+            over the card's last line, so this hint rides in the cluster
+            instead (see below) and never ends up under the buttons. */}
         {tooShort && m.status === "idle" && m.words > 0 && (
-          <p className="text-xs font-medium text-warning">
+          <p className="hidden text-xs font-medium text-warning lg:block">
             Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du prüfen.
           </p>
         )}
@@ -398,10 +402,12 @@ export function FokusTrainer({
                 always-visible desktop rail), instead of a dead disabled button that
                 reads as broken. */}
             <Button
-              variant={panelOpen ? "default" : "outline"}
+              /* Closed = the Himmelblau tile of the rail it opens (founder s166,
+                 the `outline` fill was too faint against the page ground). */
+              variant={panelOpen ? "default" : "accent"}
               aria-expanded={panelOpen}
               aria-pressed={panelOpen}
-              className="h-10 rounded-lg"
+              className="h-10 rounded-lg font-semibold"
               onClick={() => setPanelOpen((o) => !o)}
             >
               <SlidersHorizontal className="h-4 w-4" />
@@ -472,18 +478,33 @@ export function FokusTrainer({
           Gone once corrected (the toolbar owns Grammatik; the card owns Neuer Satz). */}
       {m.status !== "corrected" && (
         <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 mt-4 lg:hidden">
+          {/* Every control sits on its own opaque backing (see `floatingCluster`);
+              FeedbackIconButton is already solid. */}
           <div className="flex items-stretch gap-2">
             <FeedbackIconButton />
-            <div className="flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base">
+            <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
               {korrigierenButton}
             </div>
           </div>
-          <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
-            KI-geprüft, kann Fehler enthalten.{" "}
-            <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-              Mehr
-            </Link>
-          </p>
+          {/* One line slot under the buttons: the "how many words to go" hint
+              (the honest reason the button is inactive) while the sentence is
+              too short, the Art. 50 note whenever prüfen is actually possible. */}
+          {tooShort && m.status === "idle" && m.words > 0 ? (
+            <p className="mt-2 text-center text-[11px] font-medium leading-snug text-warning">
+              <span className={floatingNote}>
+                Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du prüfen.
+              </span>
+            </p>
+          ) : (
+            <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
+              <span className={floatingNote}>
+                KI-geprüft, kann Fehler enthalten.{" "}
+                <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+                  Mehr
+                </Link>
+              </span>
+            </p>
+          )}
         </div>
       )}
 

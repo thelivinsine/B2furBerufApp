@@ -10,6 +10,7 @@ import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
 import { WritingRail } from "./WritingRail";
 import { UmlautKeys } from "./UmlautKeys";
+import { floatingNote, floatingSlot } from "./floatingCluster";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -306,8 +307,11 @@ export function GuidedWritingTrainer({
               {evaluateButton}
             </div>
           </div>
+          {/* Desktop only: on mobile the floating action cluster pins exactly
+              over the card's last line, so this hint rides in the cluster
+              instead (see below) and never ends up under the buttons. */}
           {tooShort && (
-            <p className="flex items-center gap-1.5 text-xs font-medium text-warning">
+            <p className="hidden items-center gap-1.5 text-xs font-medium text-warning lg:flex">
               Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
             </p>
           )}
@@ -376,10 +380,12 @@ export function GuidedWritingTrainer({
       <div className="mb-4 space-y-3 lg:hidden">
         <div className="flex justify-center">
           <Button
-            variant={pickerOpen ? "default" : "outline"}
+            /* Closed = the Himmelblau tile of the rail it opens (founder s166,
+               the `outline` fill was too faint against the page ground). */
+            variant={pickerOpen ? "default" : "accent"}
             aria-expanded={pickerOpen}
             aria-pressed={pickerOpen}
-            className="h-10 rounded-lg"
+            className="h-10 rounded-lg font-semibold"
             onClick={() => setPickerOpen((o) => !o)}
           >
             <Target className="h-4 w-4" />
@@ -438,23 +444,46 @@ export function GuidedWritingTrainer({
           side by side above the nav, no bar chrome, with the condensed KI-Hinweis
           directly beneath (founder s160, matching Fokus). */}
       <div className="sticky bottom-[calc(3.9375rem_+_env(safe-area-inset-bottom))] z-30 mt-4 lg:hidden">
-        <div className="flex items-stretch gap-2 [&>button]:h-11 [&>button]:rounded-xl">
+        {/* Every control sits on its own opaque backing (see `floatingCluster`);
+            FeedbackIconButton is already solid. */}
+        <div className="flex items-stretch gap-2">
           <FeedbackIconButton />
           {result && (
-            <Button variant="outline" onClick={() => { setResult(null); setText(""); }} disabled={submitting}>
-              Neu schreiben
-            </Button>
+            <div className={floatingSlot}>
+              <Button
+                variant="outline"
+                className="h-11 rounded-xl"
+                onClick={() => { setResult(null); setText(""); }}
+                disabled={submitting}
+              >
+                Neu schreiben
+              </Button>
+            </div>
           )}
-          <div className="flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base">
+          <div className={cn(floatingSlot, "flex-1 [&>button]:h-11 [&>button]:w-full [&>button]:rounded-xl [&>button]:text-base")}>
             {evaluateButton}
           </div>
         </div>
-        <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
-          KI-geprüft, kann Fehler enthalten.{" "}
-          <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
-            Mehr
-          </Link>
-        </p>
+        {/* One line slot under the buttons: while the text is too short to
+            evaluate it carries the "how many words to go" hint (the honest
+            reason the button is inactive), otherwise the Art. 50 note. Only
+            one of them is ever true, so this stays a single line of chrome. */}
+        {tooShort ? (
+          <p className="mt-2 text-center text-[11px] font-medium leading-snug text-warning">
+            <span className={floatingNote}>
+              Noch {remaining} {remaining === 1 ? "Wort" : "Wörter"} schreiben, dann kannst du auswerten.
+            </span>
+          </p>
+        ) : (
+          <p className="mt-2 text-center text-[11px] leading-snug text-muted-foreground">
+            <span className={floatingNote}>
+              KI-geprüft, kann Fehler enthalten.{" "}
+              <Link to="/privacy" className="font-medium text-primary underline-offset-2 hover:underline">
+                Mehr
+              </Link>
+            </span>
+          </p>
+        )}
       </div>
 
       {aiNoteDesktop}

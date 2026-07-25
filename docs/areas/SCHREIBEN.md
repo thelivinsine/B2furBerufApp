@@ -24,7 +24,7 @@ design as reference.**
 - Aufgabe card: NO theme icon; a **brand-colored bold** "Aufgabe: <Thema>" eyebrow + one Ziel
   line (the editor word count does NOT repeat the Ziel range). The AI disclaimer is NOT inside the
   card: on desktop it is a fixed line at the bottom of the viewport level with the floating Feedback
-  pill; on mobile it is condensed under the action buttons (s160, same as Fokus, see below).
+  pill; on mobile it rides the floating cluster's caption slot (s160, same as Fokus, see below).
 - **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20` +
   `border-accent/50`, dark `bg-accent/10` + `/25`; NOT grey) with a header reset icon and the
   scope hierarchy Branche → Thema → Unterthema as single-select dropdowns (grouped listbox
@@ -33,7 +33,14 @@ design as reference.**
   overflow clipping on the tile (popovers must escape); the mobile panel animates via fade/slide,
   not height collapse, for the same reason.
 - Mobile = the Bibliothek pattern: a toolbar button toggles the collapsible panel
-  (`layout="panel"`, no floating chip rows); Kurz/Lang get a sticky bottom Auswerten action bar.
+  (`layout="panel"`, no floating chip rows); Kurz/Lang get the floating Auswerten cluster (below).
+- **The panel toggles wear the rail's own Himmelblau** (s166): "Aufgabe wählen" (Kurz/Lang) and
+  "Grammatik" (Fokus) are `variant="accent"` when closed, `default` (solid primary) when open.
+  `outline`'s `bg-surface/50` made them vanish into the page ground. The `accent` variant borders
+  with **`accent-ink/70` in light** (the 77%-light accent can never clear the 3:1 UI floor on a
+  near-white ground; measured 1.31:1 vs 3.07:1) and keeps `accent/45` in dark (3.34:1). Label
+  contrast 4.72:1 light / 7.71:1 dark. Reuse the variant for any panel toggle, never re-tint
+  `outline` itself.
 - Umlaut keys (`UmlautKeys`, below) sit in the word-count row of `GuidedWritingTrainer.tsx`.
 - Verlauf renders inside the same content grid column (never full width); its empty state
   deep-links into Kurz. `WritingHistory` shows only the learner's text (the exact prompt behind
@@ -49,7 +56,8 @@ design as reference.**
   primary, pre-correction all idle, header reset icon (back to the detected form), hint breaks
   after "Grüner Punkt = dein Satz.". Mobile (pre-correction) floats the **Feedback icon button next
   to Korrigieren** (both squircle, no bordered bar chrome) with the condensed KI-Hinweis centered
-  directly beneath them (s160); the mobile Grammatik button always opens (never `disabled`).
+  directly beneath them (s160; opacity rules in §Mobile floating action cluster); the mobile
+  Grammatik button always opens (never `disabled`).
 - The transform box is a **white card** (never a grey wash) with a bold colored "Hinweis:" label
   (no i icon) and "KI-generierte Umformung" centered at the card bottom. Its header row carries a
   **"Nochmal" button** (RefreshCw, beside the speaker) that asks the AI for an alternative phrasing
@@ -82,6 +90,23 @@ design as reference.**
   moved:true}` change (was a contradictory Streichung + Ergänzung pair, s163); a `moved` tile renders
   the word ONCE (green, no `old → new` arrow).
 - The Fokus Original/Korrigiert toggle is `rounded-lg`/`rounded-md` squircle.
+
+## Mobile floating action cluster (Fokus + Kurz/Lang)
+The sticky bottom cluster (Feedback + Korrigieren / Auswerten, and Neu schreiben after a result)
+carries **no bar chrome** (founder s159/s160): no border, no full-width backdrop. It therefore
+floats straight over the content cards, so nothing in it may be see-through (s164 founder report:
+the disabled Auswerten button and the card's hint line read as two labels on top of each other).
+- **Opacity is the contract, not the bar.** `src/features/writing/floatingCluster.ts` holds the two
+  class names: `floatingSlot` (opaque `bg-background` behind a control, because `variant="outline"`
+  is `bg-surface/50` and `disabled:` is `opacity-50`) and `floatingNote` (the caption plate,
+  `bg-background/90` + `backdrop-blur-sm`, matching the other mobile bars). `--background` equals
+  the page stops, so both are invisible against the page ground and only mask over a card.
+- **Transient hint lines belong in the cluster, not at the card tail.** The "Noch N Wörter
+  schreiben …" line is the honest reason the primary button is inactive; a card-tail line lands
+  exactly under the pinned cluster. It rides the cluster's single caption slot instead: the hint
+  while the text is too short, the Art. 50 note whenever prüfen/auswerten is actually possible
+  (never both, so this stays one line of chrome). The card keeps the hint on `lg:` only, where
+  there is no cluster.
 
 ## Umlaut keys
 `src/features/writing/UmlautKeys.tsx`: reusable insert bar (ä ö ü ß Ä Ö Ü) for non-German

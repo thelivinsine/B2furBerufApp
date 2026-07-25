@@ -994,3 +994,35 @@ from founder screenshots of individual session cards; each turn diagnosed one ex
 - **Next:** nothing pending. Held ideas from the discussion: odd-one-out option 3 (make it rarer /
   reserve for cleanly separable clusters) if the type still feels fuzzy; a "type it" plural could gain
   an "almost" partial-credit tier if strict grading feels harsh.
+
+**Handoff after session 164 (2026-07-24). Review harmonised into the Control Center + note/approve
+save race fixed + 13 approvals applied, branch `claude/apply-review-decisions-lw5azm`.** (Branched off
+`main` at s160; s161–163 landed from parallel sessions while this was open, so this is logged as 164.)
+Three linked pieces:
+- **Save-race fix (`useWorkbench`).** The founder asked whether a note typed before approving is saved.
+  It was NOT reliable: the note and the checkbox saved separately, but both `onChange` calls read the
+  SAME stale `reviews` snapshot and each `upsert`ed the whole row, so typing a note then approving wrote
+  the row twice off the same base and the approve write (empty comment) clobbered the note. Fix: merge
+  from an always-latest `reviewsRef` + serialise writes per `content_id` (`writeChains`).
+- **13 approvals applied.** `pnpm apply:reviews --from` on the founder's browser export (17 decisions):
+  13 hash-matched approvals flipped draft→verified + stamped + lint green (commit `5188af2`); 3 rejects
+  → `docs/reports/review-defects.md`; 1 (`v_besprechung`, null fingerprint) held for re-review.
+- **Harmonisation (Variant A, founder-picked).** The founder review table moved OUT of the retired
+  `/sources/werkbank` page INTO the Control Center's **Prüfen** page (`/admin/pruefen`) as a two-segment
+  sliding-pill switcher: **Warteschlange** (priority queue + keyboard cockpit) · **Alle Inhalte** (the
+  full `AdminWorkbench` table). One shared `useWorkbench` store now backs BOTH. The table cell gained a
+  segmented **Freigeben/Ablehnen** control (reject was impossible in the table before) + a wider note
+  field with an explicit **Save button** (appears when edited; still saves on blur/Enter). Redundant
+  queue header/status copy removed. `/sources` links admins into `/admin/pruefen?view=table`.
+- **Follow-up (PR #701): admin entry moved into the nav panel.** The founder "Kontrollzentrum" link
+  moved from the account-menu dropdown into the desktop `Sidebar` as a founder-only nav row (neutral
+  styling, not accent-blue); kept as a mobile-only (`lg:hidden`) account-menu entry since the sidebar
+  is desktop-only and the bottom bar is locked.
+- **Files:** `src/features/legal/useWorkbench.ts` (new), `AdminWorkbench.tsx`, `Pruefmodus.tsx`,
+  `Sources.tsx`, `router.tsx`, `tests/adminWorkbench.test.tsx`, `preview/control-center-review.html`,
+  `Sidebar.tsx`, `AccountMenu.tsx`.
+- **Gates:** typecheck · lint (0 errors) · test:unit **291/291** · build · check:bundle (116.6 kB core;
+  117.0 kB after the nav move) · lint:content, all green. Decisions in `docs/DECISIONS.md`; area guide
+  `docs/areas/LEGAL-ADMIN.md`. Shipped in PRs #697, #700 (docs), #701 (nav move).
+- **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
+  hard-refresh past a stale SW). **Next:** re-approve `v_besprechung`; triage the 3 rejects.

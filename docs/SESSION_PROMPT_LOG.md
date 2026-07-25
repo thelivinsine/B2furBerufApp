@@ -716,3 +716,60 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (session 165):** `src/features/admin/AdminShell.tsx` · `src/features/admin/Pruefmodus.tsx` ·
   `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log ·
   PRs #703 (layout, merged `671659d`), #706 (note save, merged `da63a0e`)
+
+## Session 166 — 2026-07-24 — Schreiben mobile action cluster de-collided (branch `claude/button-overlap-fix-s7fl28`)
+
+- **Prompt 1 (verbatim, 2026-07-24):** `[screenshot of /writing Lang on mobile, dark mode] there's a button overlap issue here. Fix it.`
+- **Prompt 2 (verbatim, 2026-07-24):** `make sure the fixes are applied across the app` →
+  Diagnosed from the screenshot + code: the mobile sticky cluster on Schreiben carries **no bar
+  chrome** (founder s159/s160), so it floats straight over the content cards. Two halves produced the
+  overlap: (a) at 0 words the **Auswerten** button is `disabled`, and the Button base sets
+  `disabled:opacity-50`, so the card text behind bled *through* the button (`variant="outline"` is
+  `bg-surface/50` and had the same problem); (b) the **"Noch N Wörter schreiben, dann kannst du
+  auswerten."** hint is the LAST element of the editor card, i.e. exactly where the pinned cluster
+  sits, so the collision was guaranteed whenever the button was inactive. Bottom padding cannot fix
+  this: a bottom-pinned `sticky` element floats over content at every scroll position except the end.
+  Fix, applied to **both** writing trainers via a shared contract: new
+  `src/features/writing/floatingCluster.ts` exporting `floatingSlot` (opaque `bg-background` backing
+  behind each control) and `floatingNote` (`bg-background/90` + `backdrop-blur-sm` caption plate,
+  matching the four other mobile bars); the transient hint moved out of the card tail into the
+  cluster's single caption slot (hint while too short, Art. 50 note once evaluating is possible,
+  never both), the card keeping it on `lg:` only where there is no cluster. Swept the rest of the app
+  for the same pattern: Wörter, Kollokationen, Redemittel and the two Grammatik bars already carry
+  `bg-background/90 backdrop-blur` (opaque) and needed no change; the desktop Feedback pill and the
+  browse scroll button are likewise already backed. Verified in a real mobile viewport (Playwright,
+  360×800 @3x, light + dark, cluster parked pinned over the editor card) across too-short / ready /
+  Fokus states. Gates: typecheck · lint (0 errors) · test:unit 293/293 · build · check:bundle
+  (117.0 kB), all green.
+- **Artifacts (session 166):** `src/features/writing/floatingCluster.ts` (new) ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/fokus/FokusTrainer.tsx` ·
+  `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 3 (verbatim, 2026-07-24):** `increase the contrast of the grammatik and aufgabe wahlen buttons in schreiben section.`
+- **Prompt 4 (verbatim, 2026-07-24):** `no need of a new preview. Refer to the previous designs and take my preference into account` →
+  Preview round waived (as in s165), so implemented directly against the established language. Both
+  mobile panel toggles ("Aufgabe wählen" in Kurz/Lang, "Grammatik" in Fokus) used the shared `outline`
+  variant (`bg-surface/50` + `border-border`), which reads as a ghost on the page ground in both
+  themes. They now use a new **`accent` Button variant** — the Himmelblau tile language of the rail
+  each button opens (s149 law: Schreiben rails are Himmelblau, never grey) — when closed, and keep the
+  solid `default` when open so the open/closed distinction survives. Measured rather than eyeballed:
+  the accent is a 77%-light sky, so NO alpha of it clears the 3:1 UI floor on the near-white light
+  ground (1.31:1), hence the light border uses **`accent-ink/70`** (3.07:1); dark keeps `accent/45`
+  (3.34:1). Label contrast 4.72:1 light / 7.71:1 dark. Brand blue was deliberately NOT used, so the
+  toggle does not compete with the Auswerten/Korrigieren CTA in the same viewport. The variant lives
+  in `src/components/ui/button.tsx` and is reusable for the Bibliothek filter toggles if wanted.
+  Verified by screenshot in both themes, closed and open. Gates: typecheck · lint (0 errors) ·
+  test:unit 293/293 · build · check:bundle · check:contrast, all green.
+- **Artifacts (prompts 3-4):** `src/components/ui/button.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `src/features/writing/fokus/FokusTrainer.tsx` · `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · this log
+- **Prompt 5 (verbatim, 2026-07-24):** `document the session` →
+  Both work items were already documented as they shipped (PR #707 and #708 each carried
+  `PROJECT_STATUS.md` + this log + `docs/areas/SCHREIBEN.md`). This pass closed the remaining gaps:
+  the `_Last updated_` block now covers BOTH founder reports (it named only the overlap fix); a new
+  **s166 entry in `docs/DECISIONS.md`** records the "why" behind the four decisions that a future
+  session could otherwise undo (no-bar-chrome stands and opacity is its contract · transient hints
+  ride the cluster, never the card tail · panel toggles wear the rail's Himmelblau, not brand blue ·
+  accent borders on light ground must use `accent-ink`); and the **`/design` skill** gained the two
+  matching rules (pre-flight item 8 on chrome-less floating clusters, and the Himmelblau/accent-ink
+  border rule in §3), since the skill is what the next design session reads first.
+- **Artifacts (prompt 5):** `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
+  `docs/PROJECT_STATUS.md` · this log
