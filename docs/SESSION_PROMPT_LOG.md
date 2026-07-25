@@ -824,3 +824,44 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 5):** `src/lib/writingScope.ts` (new) · `src/features/writing/WritingRail.tsx` ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `tests/writingScope.test.ts` (new) ·
   `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+- **Prompt 6 (verbatim, 2026-07-25):** `what is this pdf you're talking about? why do you need them?`
+  → Explained in plain language: the free official Modellsätze (practice exam papers) on goethe.de /
+  telc.net / bamf.de, wanted for exact task wording, real Inhaltspunkte and the examiner point tables;
+  unreachable because the sandbox has no outbound network (403 at the proxy on every host).
+- **Prompt 7 (verbatim, 2026-07-25):** `It doesn't have to be with exact wording or a direct
+  simulation. I asked you to go through those sources for reference. We're not advertising this
+  feature of the app as mock exams, the goal is the user to have a choice of tasks on the platform to
+  practice the tasks. The tasks are the main thing, not the headers and their wordings. exact
+  inhaltspunke are the most important - gather the information from reliable sources and get an
+  overview, then generate the tasks and categorize them as discussed earlier.`
+- **Response summary (prompt 7):** Unblocked the build. Extended `WritingTask` with the exam-shaped
+  fields (`points[]`, `addressee`, `register`, `level`, `format`, `exam`, `words`, `source`), added
+  `WritingFormat`/`WritingExam`/`WritingRegister` unions + linter mirrors (points bounded 2..5, words
+  30..300, register requires an addressee), and authored **120 new structured Aufgaben**: every Thema
+  x Niveau (B1/B2/C1.1) x Länge, modelled on the Goethe B1/B2/C1 and telc B2 Beruf task SHAPES.
+  Alltag tasks now carry the formal apparatus (Betreff, Aktenzeichen, Bezugsdatum, Frist, Grußformel)
+  as Inhaltspunkte and assert no statutory deadline or euro amount. Rail gained Niveau + Textsorte
+  dropdowns; the Aufgabe card renders the Inhaltspunkte + "An: <Adressat> (Sie/du)" and takes its word
+  target from the task. **Caught a bug in my own filter rule by screenshotting the real app:**
+  untagged-=-universal is right for Branche but wrong for Niveau/Textsorte (legacy tasks outnumber
+  tagged ~10:1), so "C1.1 + Widerspruch" was serving a B1 address-change mail. Those two axes now
+  prefer their tagged tasks and count with `countExact` (no fallback), greying out at zero.
+- **Artifacts (prompt 7):** `src/types/index.ts` · `src/data/writingPrompts.ts` (+120 tasks) ·
+  `src/data/provenance.ts` (20 wp_ notes) · `src/lib/writingScope.ts` · `scripts/lint-content.mjs` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `tests/writingScope.test.ts` · `docs/areas/SCHREIBEN.md` · commit bb99861
+- **Prompt 8 (verbatim, 2026-07-25):** `set the daily limit for the modules as follows: fokus - 10 per
+  day (1 correction + 1 umformen counts as 1 here, even if the user doesn't make use of the umformen,
+  the correction alone still counts as 1) kurz - 4 lang - 2`
+- **Response summary (prompt 8):** `DAILY_CHECK_LIMIT` 20 → **10** (Fokus; the counter is the
+  CORRECTION count, so an Umformung never consumes a second unit). `TRANSFORM_DAILY_LIMIT` 40 → **30**,
+  which is now only a runaway guard for the "Nochmal" variant cycle (10 rounds x 3 variants) and must
+  stay >= 3x `DAILY_CHECK_LIMIT`. The single shared `DAILY_LIMIT` (5) in `evaluate-writing` is retired
+  in favour of **per-mode** budgets counted against `writing_evaluations.length`: `DAILY_LIMIT_SHORT`
+  **4** and `DAILY_LIMIT_LONG` **2**, so spending the day on Kurz cannot exhaust Lang. Limit messages
+  name the mode. A cached resubmission of the same text still returns before the row is written, so it
+  is free and does not consume the allowance. **Needs the three Edge Functions redeployed to take
+  effect** (the defaults live in the function code).
+- **Artifacts (prompt 8):** `supabase/functions/check-sentence/index.ts` ·
+  `supabase/functions/transform-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
+  `docs/plans/PHASE2_SETUP.md` · `docs/areas/SCHREIBEN.md` · this log

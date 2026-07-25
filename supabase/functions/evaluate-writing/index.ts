@@ -17,7 +17,8 @@
 //   LANGUAGETOOL_API_URL     (optional, defaults to public api)
 //   LANGUAGETOOL_API_KEY     (optional, for hosted/premium)
 //   LANGUAGETOOL_USERNAME    (optional, for hosted/premium)
-//   DAILY_LIMIT              (optional, default 5)
+//   DAILY_LIMIT_SHORT        (optional, default 4)  Kurz-Auswertungen pro Tag
+//   DAILY_LIMIT_LONG         (optional, default 2)  Lang-Auswertungen pro Tag
 //   MONTHLY_SPEND_CAP_USD    (optional, default 5)
 // SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY are injected automatically.
 // ---------------------------------------------------------------------------
@@ -79,7 +80,12 @@ const VALID_WEAKNESS: Weakness[] = [
   "daWords", "collocations", "register", "spelling",
 ];
 
-const DAILY_LIMIT = Number(Deno.env.get("DAILY_LIMIT") ?? "5");
+// Per-MODE daily allowances (founder s167). Kurz and Lang cost very different
+// amounts of model output, so they get separate budgets instead of one shared
+// counter: a learner who spends the day on Kurz can no longer exhaust their
+// Lang allowance, and vice versa. Counted per length against writing_evaluations.
+const DAILY_LIMIT_SHORT = Number(Deno.env.get("DAILY_LIMIT_SHORT") ?? "4");
+const DAILY_LIMIT_LONG = Number(Deno.env.get("DAILY_LIMIT_LONG") ?? "2");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 // Per-user monthly call ceiling so a single account (or bot-farmed guest)
 // can't drain the shared global $ budget and lock everyone else out.
@@ -362,19 +368,22 @@ Deno.serve(async (req) => {
     });
   }
 
-  // (1b) Per-user daily limit.
+  // (1b) Per-user daily limit, SEPARATE per mode (Kurz 4 / Lang 2, s167).
+  const dailyLimit = length === "long" ? DAILY_LIMIT_LONG : DAILY_LIMIT_SHORT;
+  const modeLabel = length === "long" ? "lange" : "kurze";
   const startOfDay = new Date();
   startOfDay.setUTCHours(0, 0, 0, 0);
   const { count: todayCount } = await admin
     .from("writing_evaluations")
     .select("id", { count: "exact", head: true })
     .eq("user_id", user.id)
+    .eq("length", length)
     .gte("created_at", startOfDay.toISOString());
-  if ((todayCount ?? 0) >= DAILY_LIMIT) {
+  if ((todayCount ?? 0) >= dailyLimit) {
     return json({
       ok: false,
       limitReached: true,
-      message: `Du hast heute schon ${DAILY_LIMIT} Texte ausgewertet. Komm morgen wieder!`,
+      message: `Du hast heute schon ${dailyLimit} ${modeLabel} Texte ausgewertet. Komm morgen wieder!`,
     });
   }
 
