@@ -12,9 +12,10 @@ waves). Prior s166: Schreiben mobile floating-cluster collision + panel-toggle c
 Wave 1 then added the exam-shaped task schema, 120 new Aufgaben across B1/B2/C1.1, the Niveau and
 Textsorte rail axes, and founder-set daily allowances (Fokus 10 / Kurz 4 / Lang 2). P2 followed: the
 evaluator now RECEIVES the Aufgabe and grades content first, every task carries a permanent id, and
-evaluations record it so Verlauf shows the task again. **All of it is merged and live** (PRs #711 +
-#712), and `.github/workflows/supabase.yml` now deploys Edge Functions on merge, so backend changes
-no longer need a CLI. Product name: **Genauly** (`genauly.de`)._
+evaluations record it so Verlauf shows the task again. Then **wave 2**: 150 Branche-specific Aufgaben,
+taking the bank to **643 tasks** and Branche coverage from 11.8% to 28.8%. **All of it is merged and
+live** (PRs #711 to #715), and `.github/workflows/supabase.yml` now deploys Edge Functions on merge,
+so backend changes no longer need a CLI. Product name: **Genauly** (`genauly.de`)._
 
 This is the **lean, living** status doc: current state plus the two most recent session handoffs.
 **Start at the `## Resume here (next session)` section at the end.** Companion files:
@@ -80,6 +81,34 @@ done (s150: all three AI functions deployed on the Gemini-primary cascade, `GEMI
       `view-source:https://genauly.de`).
 
 ## Resume here (next session)
+
+**Handoff after session 167 (2026-07-25), part 3: the Branche answer + wave 2. MERGED AND LIVE**
+(PRs **#714**, **#715**).
+
+- **Founder: "when a thema is selected and then the Branche is changed, the aufgabe doesn't change."**
+  Reproduced in the running app rather than reasoned from the code: the task IS re-drawn every time,
+  on desktop and in the mobile panel. The cause was **coverage**, not the mechanism. Only **71 of 600**
+  theme x Länge x Branche slots carried a task tagged for that Branche (11.8%), and **11 of 20 Themen
+  had none**, so the fallback served the identical pool whichever Branche was picked, and the re-roll
+  landed back on the same task about one time in twelve.
+- **Fix (#714):** the scope-change re-roll now passes the current task as `exclude`, exactly like the
+  dice, so a filter change is always visible (founder rule: controls always visibly act). Verified on
+  `behoerde` (zero coverage, worst case): 14 consecutive Branche switches, 0 repeats.
+- **Mobile panel stays open until closed (#715).** Picking a Thema used to dismiss it while every
+  other scope left it open, so the one control that auto-closed was also the one that changed the
+  most. Only the X and the toolbar toggle close it now.
+- **Wave 2 (#715): 150 Branche-specific Aufgaben.** The five Beruf Themen that apply to EVERY industry
+  (`meetings`, `scheduling`, `conflict`, `safety`, `customer`) x **all 15 Branchen** x both Längen, at
+  B2. Bank: 493 -> **643 tasks**. **Branche slots filled: 71/600 (11.8%) -> 173/600 (28.8%).**
+  Every variant satisfies the four-way-difference test (plan §8): different ADDRESSEE, GENRE, domain
+  CONTENT POINTS and FACHLEXIK. Swapping the Branche noun breaks all of them, which was the point.
+- **A test pins it:** for those five Themen every Branche must have a tagged task AND the draw must
+  serve it rather than fall back past it. The task-count assertion is now self-maintaining (compares
+  against pool totals) so it does not need bumping as the bank grows.
+- **Still generic: 11 Themen** (`travel` + all 10 Alltag). For Alltag this is partly principled, since
+  Branche means where you WORK and a Wohnen or Bank task is personal life. But some genuinely do vary
+  (Krankmeldung in Schichtdienst vs Büro, Urlaubsantrag auf der Baustelle). That judgement call is
+  **wave 3**, together with rewriting the remaining legacy tasks to carry Inhaltspunkte.
 
 **Handoff after session 167 (2026-07-25), part 2: P2 + no-CLI deploys, MERGED AND LIVE.**
 Branch `claude/writing-aufgaben-research-faw959`, PRs **#711** (the overhaul) and **#712** (a CI fix).
@@ -200,33 +229,6 @@ accent-ink/70 lands at 3.07:1. Dark keeps `accent/45` (3.34:1). Label contrast 4
 7.71:1 dark; `pnpm check:contrast` still green. The variant lives in `src/components/ui/button.tsx`,
 so the Bibliothek filter toggles can adopt it later if the founder wants the same treatment there.
 Gates: typecheck · lint (0 errors) · test:unit 293/293 · build · check:bundle · check:contrast.
-
-**Handoff after session 166 (2026-07-24). Mobile floating action cluster no longer collides with
-the card underneath (Schreiben), branch `claude/button-overlap-fix-s7fl28`.** Founder screenshot of
-`/writing` (Lang, dark, mobile): the "Feedback" pill, the "Auswerten" button and the card's
-"Noch N Wörter schreiben, dann kannst du auswerten." line all rendered on top of each other.
-- **Root cause (two halves).** The mobile cluster is `sticky` with NO bar chrome (founder s159/s160),
-  so it floats straight over the content cards. (a) With 0 words the Auswerten button is `disabled`
-  → the base `disabled:opacity-50` made it half-transparent, so the card text behind bled *through*
-  the button; `variant="outline"` (`bg-surface/50`) has the same problem. (b) The hint line is the
-  LAST element of the editor card, i.e. exactly where the pinned cluster sits, so the collision was
-  guaranteed whenever the button was inactive. Padding cannot fix this: a bottom-pinned sticky
-  element floats over content at every scroll position except the very end.
-- **Fix (both writing trainers, shared contract).** New `src/features/writing/floatingCluster.ts`
-  exports `floatingSlot` (opaque `bg-background` backing behind each control) and `floatingNote`
-  (`bg-background/90` + `backdrop-blur-sm` plate behind the caption, matching the other mobile bars).
-  `--background` equals the page stops, so both are invisible against the page ground and only mask
-  where they float over a card. The transient "Noch N Wörter …" hint moved from the card tail into
-  the cluster's single caption slot (hint while too short, Art. 50 note once evaluating is possible,
-  never both); the card keeps it on `lg:` only, where there is no cluster.
-- **Files:** `src/features/writing/floatingCluster.ts` (new), `GuidedWritingTrainer.tsx`,
-  `fokus/FokusTrainer.tsx`, `docs/areas/SCHREIBEN.md`.
-- **Verified in a real mobile viewport** (Playwright, 360×800 @3x, light + dark, cluster parked
-  pinned over the editor card): buttons opaque, caption legible, nothing overlapping in any state
-  (too short / ready / Fokus). The other four mobile bars (Wörter, Kollokationen, Redemittel,
-  Grammatik) already carry `bg-background/90 backdrop-blur` and needed no change.
-- **Gates:** typecheck · lint (0 errors) · test:unit **293/293** · build · check:bundle (117.0 kB),
-  all green.
 
 _(Older session handoffs are archived by ISO week under `docs/archive/status-log/`; the index
 mapping every session to its week file is `docs/archive/PROJECT_STATUS_ARCHIVE.md`.)_

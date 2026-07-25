@@ -995,3 +995,18 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 19):** `src/data/writingPrompts.ts` (+150) ·
   `src/features/writing/GuidedWritingTrainer.tsx` · `tests/writingScope.test.ts` ·
   `docs/areas/SCHREIBEN.md` · this log
+- **Prompt 20 (verbatim, 2026-07-25):** `document the session`
+- **Response summary:** Second documentation pass, covering everything after the first one (prompts 18
+  and 19). `docs/PROJECT_STATUS.md` gained a **part-3 handoff** (the Branche investigation and its
+  coverage answer, the re-roll `exclude` fix, the mobile panel change, wave 2 with its coverage
+  numbers, and what is still generic), the `_Last updated_` block was refreshed to 643 tasks and PRs
+  #711 to #715, and the s166 handoff was archived to `docs/archive/status-log/` so the file keeps only
+  the two most recent sessions (234 lines, under the ~250 cap).
+  `docs/plans/SCHREIBEN-OVERHAUL.md` now records wave 2 as DONE and, importantly, **why its scope
+  changed** from the original plan (5 Themen x all 15 Branchen instead of 9 Themen x 6 Branchen:
+  covering every Branche matters more than every theme, because the founder ask was that each filter
+  OPTION yield tailored tasks). Wave 3 gained the open judgement call about whether Branche is
+  meaningful for Alltag genres at all.
+- **Artifacts (prompt 20):** `docs/PROJECT_STATUS.md` ·
+  `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · `docs/plans/SCHREIBEN-OVERHAUL.md` ·
+  this log

@@ -1,15 +1,19 @@
 # Schreiben overhaul: exam-realistic Aufgaben, a Niveau axis, real Branche differentiation
 
-**Status:** P0, P1 and P2 SHIPPED in s167 (PRs #711, #712, live on `main`). P3 content waves 2 to 4
-remain. Founder-approved scope; extends `docs/areas/SCHREIBEN.md`.
+**Status:** P0, P1, P2 and **content wave 2** SHIPPED in s167 (PRs #711 to #715, live on `main`).
+Waves 3 and 4 remain. Founder-approved scope; extends `docs/areas/SCHREIBEN.md`.
 
 **Shipped:** the counting fix + one shared selector · "Alle Themen" and a generic option on every
 dropdown · the Niveau and Textsorte axes · the exam-shaped `WritingTask` schema · permanent task ids
-on all 493 tasks · 120 new Aufgaben (every Thema x Niveau x Länge) · the evaluator now receives the
-Aufgabe and grades content first · `writing_evaluations.task_id` + Verlauf showing the task again ·
-per-module daily limits (Fokus 10 / Kurz 4 / Lang 2) · CI that deploys Supabase without a CLI.
+on every task · **270 new Aufgaben** (wave 1: 120, every Thema x Niveau x Länge; wave 2: 150, five
+universal Beruf Themen x all 15 Branchen x both Längen) · the evaluator now receives the Aufgabe and
+grades content first · `writing_evaluations.task_id` + Verlauf showing the task again · per-module
+daily limits (Fokus 10 / Kurz 4 / Lang 2) · a scope change never re-rolls onto the same task · the
+mobile panel stays open until closed · CI that deploys Supabase without a CLI.
 
-**Not shipped:** content waves 2 to 4 (§11 P3) and the §12 verification items.
+**Bank: 373 -> 643 tasks. Branche slots filled: 71/600 (11.8%) -> 173/600 (28.8%).**
+
+**Not shipped:** waves 3 and 4 (§11 P3) and the §12 verification items.
 
 **Trigger:** founder report "why are there almost no items in the writing section?" plus the
 requirement that Aufgaben simulate real telc/Goethe exam tasks and that every filter option yield
@@ -412,10 +416,19 @@ gate today; it would if any row were flipped to verified first. Update `docs/are
 **P3 — content waves** (target 800 to 1200 tasks)
 - **Wave 1 — exam core.** Every Goethe task type at every level, Thema-generic: B1 T1/T2/T3,
   B2 T1/T2, C1 T1/T2. Roughly 20 Themen x 2 Längen x 3 Niveaus, exam-tagged.
-- **Wave 2 — Beruf Branche variants.** The 9 workplace Themen x the top 6 Branchen, written to the
-  §8 four-way-difference test, at B2 and C1.1.
-- **Wave 3 — Alltag formal apparatus.** Rewrite the 152 Alltag tasks with Betreff, Aktenzeichen,
-  Frist and Grußformel as Inhaltspunkte. Legal claims verified against primary sources.
+- **Wave 2 — Beruf Branche variants. DONE (s167, PR #715).** Scoped to the FIVE Beruf Themen that
+  apply to every industry (`meetings`, `scheduling`, `conflict`, `safety`, `customer`) x **all 15
+  Branchen** x both Längen at B2, rather than 9 Themen x 6 Branchen: covering every Branche matters
+  more than covering every theme, because the founder ask was that each filter OPTION yield tailored
+  tasks. 150 tasks, each satisfying the §8 four-way-difference test. C1.1 Branche variants and the
+  remaining Beruf Themen (`logistics`, `project`, `technology`, `sustainability`, `travel`) move to
+  wave 4.
+- **Wave 3 — Alltag formal apparatus.** Rewrite the legacy Alltag tasks with Betreff, Aktenzeichen,
+  Frist and Grußformel as Inhaltspunkte (the 30 new wave-1 Alltag tasks already have them). Legal
+  claims verified against primary sources. Decide per genre whether Branche is meaningful at all:
+  Branche means where you WORK, so a Wohnen or Bank task is personal life and a Gastronomie-flavoured
+  Kontokündigung would be artificial, but Krankmeldung (Schichtdienst vs Büro) and Urlaubsantrag
+  (Baustelle) genuinely do vary.
 - **Wave 4 — remaining Branchen and B1 breadth.**
 
 ---
