@@ -960,3 +960,19 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
     `evaluate-writing` system prompt, which P2 replaced.
 - **Artifacts (prompts 16-17):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/PROJECT_FOUNDATION.md` ·
   `docs/plans/SCHREIBEN-OVERHAUL.md` · this log
+- **Prompt 18 (verbatim, 2026-07-25):** `when a thema is selected and then the Branche is changed.. the
+  aufgabe doesn't change. why is that?`
+- **Response summary:** Reproduced in the running app rather than reasoning from the code: the Aufgabe
+  IS re-drawn on every Branche change, on desktop AND in the mobile panel. The real cause is content
+  coverage, not the mechanism. Measured: only **71 of 600** theme x Länge x Branche slots carry a task
+  actually tagged for that Branche (**11.8%**), and **11 of 20 Themen have zero** (travel + every
+  Alltag theme), so under those the untagged-=-universal fallback serves the identical pool for every
+  Branche. The re-roll then had roughly a 1-in-12 chance of landing on the same task, which reads as
+  "the control did nothing". Fixed that half: the scope-change re-roll now passes the CURRENT task as
+  `exclude`, exactly like the dice does, so a filter change is always visible (founder rule: controls
+  always visibly act). Verified on `behoerde` (0 coverage, the worst case): 14 consecutive Branche
+  switches, 0 repeats. The other half is content wave 2 and is NOT fixed.
+- **Also flagged (not changed):** on mobile the panel stays open after picking a Branche (only a Thema
+  pick closes it), so it covers the Aufgabe card and the change is invisible until the panel is
+  closed. Left alone as a design decision for the founder.
+- **Artifacts (prompt 18):** `src/features/writing/GuidedWritingTrainer.tsx` · this log
