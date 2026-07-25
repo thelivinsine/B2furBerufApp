@@ -708,5 +708,11 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   from inside the textarea. (2) A helper line: „Notiz speichern" hält den Eintrag offen · Freigeben/Ablehnen
   speichert sie auch. Reused the existing serialised note-only path in `useWorkbench` (no store change).
   Gates: typecheck · lint (0 errors) · build, green.
+- **Prompt 7 (verbatim, 2026-07-24):** `document the session` →
+  Prompts 1-6 were already documented inline (this Session-165 log block + the PROJECT_STATUS s165 handoff),
+  and shipped in PRs #703 (layout) and #706 (note save). This pass logged prompt 7 and confirmed both docs
+  are current against `main` (advanced to `da63a0e`; parallel doc PRs #704/#705 landed session-157 prompts
+  while this was open). Shipped as a small follow-up doc PR.
 - **Artifacts (session 165):** `src/features/admin/AdminShell.tsx` · `src/features/admin/Pruefmodus.tsx` ·
-  `docs/PROJECT_STATUS.md` · this log
+  `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log ·
+  PRs #703 (layout, merged `671659d`), #706 (note save, merged `da63a0e`)
