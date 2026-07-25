@@ -1050,3 +1050,30 @@ sidebar that was a grid column rather than an edge-pinned rail.
   typecheck · lint (0 errors) · build, green.
 - **Cannot live-verify** (`/admin` is founder-auth-gated in the sandbox); founder verifies live (PWA:
   hard-refresh past a stale SW).
+
+**Handoff after session 166 (2026-07-24). Mobile floating action cluster no longer collides with
+the card underneath (Schreiben), branch `claude/button-overlap-fix-s7fl28`.** Founder screenshot of
+`/writing` (Lang, dark, mobile): the "Feedback" pill, the "Auswerten" button and the card's
+"Noch N Wörter schreiben, dann kannst du auswerten." line all rendered on top of each other.
+- **Root cause (two halves).** The mobile cluster is `sticky` with NO bar chrome (founder s159/s160),
+  so it floats straight over the content cards. (a) With 0 words the Auswerten button is `disabled`
+  → the base `disabled:opacity-50` made it half-transparent, so the card text behind bled *through*
+  the button; `variant="outline"` (`bg-surface/50`) has the same problem. (b) The hint line is the
+  LAST element of the editor card, i.e. exactly where the pinned cluster sits, so the collision was
+  guaranteed whenever the button was inactive. Padding cannot fix this: a bottom-pinned sticky
+  element floats over content at every scroll position except the very end.
+- **Fix (both writing trainers, shared contract).** New `src/features/writing/floatingCluster.ts`
+  exports `floatingSlot` (opaque `bg-background` backing behind each control) and `floatingNote`
+  (`bg-background/90` + `backdrop-blur-sm` plate behind the caption, matching the other mobile bars).
+  `--background` equals the page stops, so both are invisible against the page ground and only mask
+  where they float over a card. The transient "Noch N Wörter …" hint moved from the card tail into
+  the cluster's single caption slot (hint while too short, Art. 50 note once evaluating is possible,
+  never both); the card keeps it on `lg:` only, where there is no cluster.
+- **Files:** `src/features/writing/floatingCluster.ts` (new), `GuidedWritingTrainer.tsx`,
+  `fokus/FokusTrainer.tsx`, `docs/areas/SCHREIBEN.md`.
+- **Verified in a real mobile viewport** (Playwright, 360×800 @3x, light + dark, cluster parked
+  pinned over the editor card): buttons opaque, caption legible, nothing overlapping in any state
+  (too short / ready / Fokus). The other four mobile bars (Wörter, Kollokationen, Redemittel,
+  Grammatik) already carry `bg-background/90 backdrop-blur` and needed no change.
+- **Gates:** typecheck · lint (0 errors) · test:unit **293/293** · build · check:bundle (117.0 kB),
+  all green.
