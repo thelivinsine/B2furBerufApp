@@ -39,12 +39,24 @@ design as reference.**
   - No scope is ever empty, so **Branche never disables**. `tests/writingScope.test.ts` pins all of it.
 - **Every dropdown carries a generic first option** (founder s167): "Alle Niveaus", "Alle Branchen",
   "Alle Themen", "Gesamtes Thema", "Alle Textsorten".
+- **A scope change never re-rolls onto the same Aufgabe** (s167): the re-roll passes the current task
+  as `exclude`, exactly like the dice. Most scope changes still redraw from a pool the filter did not
+  narrow, so without this a filter looked broken roughly one time in twelve.
+- **The mobile panel stays open until the learner closes it** (founder s167). Picking a Thema used to
+  close it while every other scope left it open, so the one control that auto-dismissed was also the
+  one that changed the most. Only the X and the toolbar toggle close it now.
 - **The task schema is exam-shaped** (s167, `WritingTask`): `points[]` (2 to 5 Inhaltspunkte, the
   thing an examiner actually grades), `addressee`, `register` (du/sie), `level`, `format`, `exam`,
   `words`, `source`. All optional so the bank upgrades in waves; the linter validates when present.
   The Aufgabe card renders the Inhaltspunkte plus "An: <Adressat> (Sie/du)", and the **word target
   comes from the task**, not the mode: real exam targets run 40 to 200 and share no single number
   (`rangeByLength` is only the fallback for untagged legacy tasks).
+- **Branche coverage (wave 2, s167):** the five Beruf Themen that apply to EVERY industry
+  (`meetings`, `scheduling`, `conflict`, `safety`, `customer`) now carry a dedicated task for all 15
+  Branchen in both Längen, at B2. Branche slots filled went from 71/600 (11.8%) to 173/600 (28.8%).
+  `tests/writingScope.test.ts` pins it: for those five Themen every Branche must have a tagged task
+  AND the draw must serve it rather than fall back past it. The 11 Themen where Branche still changes
+  nothing (`travel` + all Alltag) are wave 3/4.
 - **Exam formats are REFERENCE, not reproduction** (founder s167): tasks are modelled on the Goethe
   B1 Teil 1-3, B2 Teil 1-2, C1 Teil 1-2 and telc B2 Beruf shapes. No exam wording is copied and the
   module is not advertised as a mock exam. Alltag tasks carry the formal apparatus (Betreff,
