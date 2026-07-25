@@ -773,3 +773,40 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   border rule in §3), since the skill is what the next design session reads first.
 - **Artifacts (prompt 5):** `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
   `docs/PROJECT_STATUS.md` · this log
+
+## Session 167 (2026-07-25) — branch `claude/writing-aufgaben-research-faw959`
+
+- **Prompt 1 (verbatim, 2026-07-25):** `[two screenshots of the Schreiben Kurz/Lang Branche dropdown]
+  why are there almost no items in the writing section? also, the Aufgabes should be simulation of the
+  real world telc or goethe exams. Spin up a panel of expert agents and research which of those qualify
+  as kurz and lang, and what kind of aufgabes should be in these sections such that b1, b2 and c1.1
+  learners can actually benefit from this schreiben module of the app. Each filter option should have a
+  bunch of options and they should be tailored to those specific selections, not just a mention of the
+  branche in the aufgabe that the learner selects. ask me if you if there's unclarity regarding anything.
+  The value the learner should get from this should be immense and the quality of the app for this
+  section should be of highest standards. Come back with your detailed analysis and report with
+  recommendations with priority actions.`
+- **Prompt 2 (verbatim):** `also, add a generic or all themes option for all the dropdowns in the
+  selection rail.`
+- **Prompt 3 (verbatim):** `what was your question?` (x2, after the AskUserQuestion dialog was declined;
+  the four decisions were restated as plain text)
+- **Prompt 4 (verbatim):** `1. c1.1 2. no need of a fifth tab 3. yes, add 4. go deep with waves as you
+  recommend`
+- **Response summary:** Root-caused the "empty" writing section: the pool holds **373 tasks**, but
+  `WritingRail.tsx:211` counts only sector-TAGGED tasks and disables at zero, contradicting the
+  untagged-equals-universal rule in `facets.ts:138` and the trainer's own prefer-tagged-else-untagged
+  draw (`GuidedWritingTrainer.tsx:93-102`). Only 70/373 tasks carry a `sectors` tag; 11 of 20 Themen
+  carry none, so every Alltag theme has a dead Branche dropdown. Ran a 5-agent research panel
+  (telc formats · Goethe formats · DaF Schreibdidaktik · codebase audit · real-world German genres).
+  **Research was half-blocked:** WebFetch returned 403 at the proxy for every external host and the
+  session WebSearch budget was exhausted, so no official PDF could be opened and no verbatim exam
+  prompt was obtained. Agents correctly declined to fabricate German exam text; all findings are
+  confidence-marked. Key findings: Kurz/Lang word targets (40-60 / 120-150) match **no** exam, so they
+  are redefined as task-SHAPE buckets with per-task word targets; there is **no Goethe-Zertifikat B2
+  Beruf** (Goethe-Test PRO has no writing at all, the Beruf writing exam is telc-only); Goethe C1's
+  Umformulierung gap-fill is **retired** since the 2024 modular revision; and `evaluate-writing` never
+  receives the task text, making Aufgabenerfüllung structurally uncheckable.
+- **Founder decisions (locked):** three levels B1/B2/C1.1 · no fifth tab, exam simulation rides
+  Kurz/Lang via a Prüfungsformat tag · add both Niveau and Textsorte rail axes · deep content build
+  (800-1200 tasks) in waves · generic "Alle …" option on every rail dropdown.
+- **Artifacts (prompts 1-4):** `docs/plans/SCHREIBEN-OVERHAUL.md` (new) · this log
