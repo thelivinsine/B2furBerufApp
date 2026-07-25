@@ -16,8 +16,40 @@ design as reference.**
 
 ## Kurz / Lang (guided writing)
 - Land STRAIGHT on a randomly drawn Aufgabe + editor — never a theme-picker interstitial.
-  `src/data/writingPrompts.ts` holds per-theme task pools (see `docs/areas/CONTENT.md`); a
-  selected Branche prefers its tagged tasks, else falls back to untagged, never empty.
+  `src/data/writingPrompts.ts` holds per-theme task pools (see `docs/areas/CONTENT.md`).
+- **`src/lib/writingScope.ts` is the ONE task-selection rule** (s167): `eligibleTasks({theme, sub,
+  sector, level, format, length})` returns `WritingTaskRef[]` (`{theme, ix}`), and BOTH the trainer's
+  draw and every rail dropdown count go through it. Before s167 the rail counted only sector-TAGGED tasks and
+  greyed out at zero while the trainer drew with a prefer-tagged-else-untagged fallback, so most
+  Branchen read as unavailable although the full universal pool sat behind them (only 70 of 373
+  tasks carry a `sectors` tag; 11 of 20 Themen carry none). Never reintroduce a second counting rule.
+  - `theme: ""` = **Alle Themen**, and it is the DEFAULT landing scope (was `themes[0]`). The drawn
+    task carries its own theme, which is what the "Aufgabe: <Thema>" eyebrow, the evaluation call
+    and the saved draft record.
+  - `sub` applies only inside a concrete theme (slugs are theme-scoped) and is ignored under Alle
+    Themen; the Unterthema dropdown hides there.
+  - `sector` follows the untagged-=-universal rule **per theme**, so a Branche under Alle Themen
+    keeps the broad pool instead of collapsing to the handful of tagged tasks.
+  - **Niveau and Textsorte do NOT follow untagged-=-universal**, and this distinction is the whole
+    point: an untagged task is not "every level" and certainly not "every Textsorte". They PREFER
+    their tagged tasks, and their dropdowns count with `countExact` (no fallback) and grey out at
+    zero. Admitting untagged tasks made "C1.1 + Widerspruch" serve a B1 address-change mail, since
+    legacy tasks outnumber tagged ones roughly ten to one. A Lang-only Textsorte (Forumsbeitrag)
+    therefore reads as unavailable under Kurz rather than quietly serving a Notiz.
+  - No scope is ever empty, so **Branche never disables**. `tests/writingScope.test.ts` pins all of it.
+- **Every dropdown carries a generic first option** (founder s167): "Alle Niveaus", "Alle Branchen",
+  "Alle Themen", "Gesamtes Thema", "Alle Textsorten".
+- **The task schema is exam-shaped** (s167, `WritingTask`): `points[]` (2 to 5 Inhaltspunkte, the
+  thing an examiner actually grades), `addressee`, `register` (du/sie), `level`, `format`, `exam`,
+  `words`, `source`. All optional so the bank upgrades in waves; the linter validates when present.
+  The Aufgabe card renders the Inhaltspunkte plus "An: <Adressat> (Sie/du)", and the **word target
+  comes from the task**, not the mode: real exam targets run 40 to 200 and share no single number
+  (`rangeByLength` is only the fallback for untagged legacy tasks).
+- **Exam formats are REFERENCE, not reproduction** (founder s167): tasks are modelled on the Goethe
+  B1 Teil 1-3, B2 Teil 1-2, C1 Teil 1-2 and telc B2 Beruf shapes. No exam wording is copied and the
+  module is not advertised as a mock exam. Alltag tasks carry the formal apparatus (Betreff,
+  Aktenzeichen, Bezugsdatum, Frist, Grußformel) as Inhaltspunkte, and **never assert a statutory
+  deadline or euro amount**: they ask the learner to name the date instead.
 - The dice on the Aufgabe card (standard 40px icon button, half-spin per roll) re-rolls within
   the current scope (keeps typed text, clears a stale result). Scope changes (`?sub=`/`?sector=`;
   theme switch clears sub, Branche travels) reset the draft.
@@ -27,7 +59,9 @@ design as reference.**
   pill; on mobile it rides the floating cluster's caption slot (s160, same as Fokus, see below).
 - **`WritingRail` = "Aufgabe wählen": a light HIMMELBLAU tile** (`bg-accent/20` +
   `border-accent/50`, dark `bg-accent/10` + `/25`; NOT grey) with a header reset icon and the
-  scope hierarchy Branche → Thema → Unterthema as single-select dropdowns (grouped listbox
+  scope hierarchy Niveau → Branche → Thema → Unterthema → Textsorte as single-select dropdowns
+  (Textsorte grouped by family: E-Mail & Nachricht / Meinung & Öffentlichkeit / Bericht /
+  Beschwerde & Antrag) (grouped listbox
   popovers, internal scroll, live counts, zero-yield greyed; Unterthema only when the theme has
   sub-themes; Thema groups = Domain categorization with gesundheit folded into Alltag). No
   overflow clipping on the tile (popovers must escape); the mobile panel animates via fade/slide,
@@ -113,6 +147,56 @@ the disabled Auswerten button and the card's hint line read as two labels on top
 keyboards. Inserts at the caret (over a selection too), neutral `bg-surface` at rest, flashes
 Himmelblau on press, keys ~24px. Wired into the Fokus input footer (shares the desktop row with
 Korrigieren) and the Kurz/Lang editor. Takes `{ textareaRef, value, onChange }`.
+
+## Daily allowances (founder s167)
+Per learner, per day, all env-overridable in the Edge Functions:
+- **Fokus: 10 Runden** (`DAILY_CHECK_LIMIT`, `check-sentence`). One round = one
+  Korrektur. The optional Umformung that follows does **not** consume a second unit, so
+  the counter is the CORRECTION count only. `TRANSFORM_DAILY_LIMIT` (30) exists purely so
+  the "Nochmal" variant cycle cannot run away (10 rounds x 3 variants); it is never the
+  binding constraint and must stay >= 3x `DAILY_CHECK_LIMIT`.
+- **Kurz: 4** (`DAILY_LIMIT_SHORT`) and **Lang: 2** (`DAILY_LIMIT_LONG`), counted
+  SEPARATELY against `writing_evaluations.length`, so spending the day on Kurz cannot
+  exhaust the Lang allowance. The old single `DAILY_LIMIT` (5, shared) is retired.
+- A cached resubmission of the same text returns before the row is written, so it is free
+  and does not consume the day's allowance.
+- The per-user monthly ceilings and the global `MONTHLY_SPEND_CAP_USD` fuse still apply
+  above these.
+
+## The evaluator receives the Aufgabe (s167 P2)
+Before s167 `evaluate-writing` got `{theme, length, text}` and the task text NEVER reached a
+prompt, so Aufgabenerfüllung was structurally uncheckable: the model graded language in a vacuum
+and could not know a content point was missing, the Anredeform wrong, or the text far too short.
+- The client now sends `taskId · task · points[] · level · format · addressee · register · words`
+  (`src/lib/writing.ts`). Every field is OPTIONAL and bounded server-side before it reaches a
+  prompt (task 600 chars, each point 200, max 5 points): it is learner-supplied input on the wire,
+  not trusted content. A legacy task without structure degrades to language-only feedback.
+- `buildSystemPrompt(level, hasTask)` replaced the fixed "Prüfer:in für Deutsch B2 Beruf" string.
+  It grades at the TASK's level (a B1 text is no longer marked to a B2 bar) and, when a task is
+  present, checks **content first**: every Inhaltspunkt covered, Anrede matching the addressee,
+  length roughly met. That mirrors the real rubrics (Goethe zeroes an Aufgabe whose Erfüllung
+  fails; telc counts covered Leitpunkte).
+- **`taskCompletion` (Aufgabenerfüllung) is a new `WeaknessCategory`**, mirrored in
+  `src/data/practiceAreas.ts` (deep-links back into Kurz, since the fix is rewriting the task, not
+  a grammar lesson) and in `scripts/lint-content.mjs`.
+- **The cache key folds in the task id + level + `PROMPT_REV`.** It was text-only, which was
+  harmless while the task did not shape the prompt and would have been a correctness bug the
+  moment it did. Bump `PROMPT_REV` on any rubric/prompt change to invalidate the cache.
+- The Aufgabe travels with EVERY provider call, so a cascade fallback cannot silently downgrade to
+  language-only grading.
+- **The dominant-spelling shortcut still bypasses the task check by design** (>=3 spelling errors,
+  >8% of words, and at least 2x the grammar count): a text that misspelt is served the spelling
+  tip with no LLM call at all, which is both the right feedback and free.
+
+## Task ids and the evaluation reference
+- Every task carries a **permanent** `id` (`wt_<themeId>_<s|l><nn>`), enforced unique + pattern-
+  matched by `lintWritingPrompts`. Same law as every other content id: retire from the surface,
+  never rename, reuse or renumber. An evaluation row references it and the AI cache is keyed on it.
+- `writing_evaluations.task_id` (migration **0011**) records it, so **Verlauf can show the Aufgabe
+  again** (with its Inhaltspunkte), which pooled prompts made impossible after s148.
+- **Deploy order matters: run migration 0011 BEFORE deploying `evaluate-writing`.** The insert is
+  guarded (it retries without `task_id` and logs) so a wrong order degrades to "no task reference"
+  instead of losing the row, which would also have stopped the daily limit counting.
 
 ## AI backend
 The Fokus Satzlabor (`check-sentence`/`transform-sentence`) AND the Kurz/Lang coach

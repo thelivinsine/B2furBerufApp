@@ -2,13 +2,18 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Sparkles, Target, Loader2, Lightbulb, Clock, Info, Dices, ChevronDown } from "lucide-react";
-import type { ThemeId, WorkSector } from "@/types";
+import type { ThemeId } from "@/types";
 import { themes, themeById } from "@/data/themes";
-import { writingPrompts } from "@/data/writingPrompts";
+import {
+  eligibleTasks,
+  randomTask,
+  taskAt,
+  type WritingTaskRef,
+} from "@/lib/writingScope";
 import { SECTOR_OPTIONS } from "@/lib/facets";
 import { practiceAreaById, practiceRoute } from "@/data/practiceAreas";
 import { evaluateWriting, type WritingEvalResult, type WritingLength } from "@/lib/writing";
-import { WritingRail } from "./WritingRail";
+import { WritingRail, WRITING_FORMATS, WRITING_LEVELS, writingFormatLabel } from "./WritingRail";
 import { UmlautKeys } from "./UmlautKeys";
 import { floatingNote, floatingSlot } from "./floatingCluster";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,7 +32,6 @@ import { cn } from "@/lib/utils";
  * short, Lang = long); auth is gated by the parent via `onRequireAuth`.
  */
 
-const DEFAULT_THEME: ThemeId = themes[0].id;
 const rangeByLength: Record<WritingLength, [number, number]> = {
   short: [40, 60],
   long: [120, 150],
@@ -40,16 +44,6 @@ function countWords(text: string): number {
 
 function isThemeId(v: string | null): v is ThemeId {
   return !!v && themes.some((t) => t.id === v);
-}
-
-/** Random pick from a list of pool indexes, avoiding `exclude` when the list
- *  has an alternative. */
-function randomFrom(list: number[], exclude?: number): number {
-  if (list.length === 0) return 0;
-  if (list.length === 1) return list[0];
-  let ix = list[Math.floor(Math.random() * list.length)];
-  if (ix === exclude) ix = list[(list.indexOf(ix) + 1) % list.length];
-  return ix;
 }
 
 export function GuidedWritingTrainer({
@@ -75,36 +69,31 @@ export function GuidedWritingTrainer({
   const navigate = useNavigate();
   const reduce = useReducedMotion();
   const themeParam = params.get("theme");
-  const theme: ThemeId = isThemeId(themeParam) ? themeParam : DEFAULT_THEME;
+  // "" = Alle Themen (founder s167). A drawn task therefore carries its own
+  // theme, which is what the eyebrow, the evaluation and the draft record use.
+  const themeScope: ThemeId | "" = isThemeId(themeParam) ? themeParam : "";
 
   // Unterthema + Branche scopes (s149 harmonization: the Bibliothek hierarchy
   // in the Aufgabe rail). Invalid values are ignored, never crash a deep link.
   const subParam = params.get("sub") ?? "";
-  const sub = themeById(theme)?.subThemes?.some((s) => s.id === subParam) ? subParam : "";
+  const sub = themeById(themeScope)?.subThemes?.some((s) => s.id === subParam) ? subParam : "";
   const sectorParam = params.get("sector") ?? "";
   const sector = SECTOR_OPTIONS.some((o) => o.value === sectorParam) ? sectorParam : "";
+  const levelParam = params.get("level") ?? "";
+  const level = WRITING_LEVELS.some((l) => l.value === levelParam) ? levelParam : "";
+  const formatParam = params.get("format") ?? "";
+  const format = WRITING_FORMATS.includes(formatParam) ? formatParam : "";
 
-  const pool = writingPrompts[theme][length];
+  // ONE selection rule, shared with the rail's option counts (`lib/writingScope`).
+  const eligible = useMemo(
+    () => eligibleTasks({ theme: themeScope, sub, sector, level, format, length }),
+    [themeScope, length, sub, sector, level, format],
+  );
 
-  // Which pool indexes the current scopes allow. Branche follows the
-  // untagged-=-universal rule: tagged tasks win when the Branche has any,
-  // otherwise the universal (untagged) tasks serve it, so the pool is never
-  // empty. Falls back to the whole pool as a last resort.
-  const eligible = useMemo(() => {
-    let ix = pool.map((_, i) => i);
-    if (sub) ix = ix.filter((i) => pool[i].sub === sub);
-    if (sector) {
-      const tagged = ix.filter((i) => pool[i].sectors?.includes(sector as WorkSector));
-      ix = tagged.length ? tagged : ix.filter((i) => !pool[i].sectors?.length);
-    }
-    return ix.length ? ix : pool.map((_, i) => i);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme, length, sub, sector]);
-
-  const [promptIx, setPromptIx] = useState(() =>
-    initialPromptIndex != null && initialPromptIndex >= 0 && initialPromptIndex < pool.length
-      ? initialPromptIndex
-      : randomFrom(eligible),
+  const [drawn, setDrawn] = useState<WritingTaskRef>(() =>
+    themeScope && initialPromptIndex != null && initialPromptIndex >= 0
+      ? { theme: themeScope, ix: initialPromptIndex }
+      : randomTask(eligible),
   );
   const [text, setText] = useState(initialText);
   const [submitting, setSubmitting] = useState(false);
@@ -118,21 +107,22 @@ export function GuidedWritingTrainer({
   // Reset draft + result and draw a fresh random Aufgabe when the task scope
   // (theme, length, Unterthema or Branche) changes, but NOT on mount (so a
   // resumed draft survives). keyRef is seeded with the initial scope.
-  const keyRef = useRef(`${theme}|${length}|${sub}|${sector}`);
+  const keyRef = useRef(`${themeScope}|${length}|${sub}|${sector}|${level}|${format}`);
   useEffect(() => {
-    const key = `${theme}|${length}|${sub}|${sector}`;
+    const key = `${themeScope}|${length}|${sub}|${sector}|${level}|${format}`;
     if (keyRef.current !== key) {
       keyRef.current = key;
       setText("");
       setResult(null);
-      setPromptIx(randomFrom(eligible));
+      setDrawn(randomTask(eligible));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme, length, sub, sector]);
+  }, [themeScope, length, sub, sector, level, format]);
 
-  const setTheme = (id: ThemeId) => {
+  const setTheme = (id: ThemeId | "") => {
     const p = new URLSearchParams(params);
-    p.set("theme", id);
+    if (id) p.set("theme", id);
+    else p.delete("theme");
     // A sub-theme belongs to its theme; Branche is a cross-theme context axis
     // and travels (the Bibliothek rule).
     p.delete("sub");
@@ -150,11 +140,23 @@ export function GuidedWritingTrainer({
     else p.delete("sector");
     setParams(p);
   };
+  const setLevel = (l: string) => {
+    const p = new URLSearchParams(params);
+    if (l) p.set("level", l);
+    else p.delete("level");
+    setParams(p);
+  };
+  const setFormat = (f: string) => {
+    const p = new URLSearchParams(params);
+    if (f) p.set("format", f);
+    else p.delete("format");
+    setParams(p);
+  };
 
   // The dice: another random Aufgabe within the current scope. Keeps any
   // typed text (a mis-tap must not destroy work) but clears a stale result.
   const reroll = () => {
-    setPromptIx((ix) => randomFrom(eligible, ix));
+    setDrawn((cur) => randomTask(eligible, cur));
     setResult(null);
     setDiceSpin((d) => d + 180);
   };
@@ -167,9 +169,11 @@ export function GuidedWritingTrainer({
     p.delete("theme");
     p.delete("sub");
     p.delete("sector");
+    p.delete("level");
+    p.delete("format");
     setParams(p);
-    const fullPool = writingPrompts[DEFAULT_THEME][length].map((_, i) => i);
-    setPromptIx((ix) => randomFrom(fullPool, ix));
+    const fullPool = eligibleTasks({ theme: "", sub: "", sector: "", level: "", format: "", length });
+    setDrawn((cur) => randomTask(fullPool, cur));
     setResult(null);
     setDiceSpin((d) => d + 180);
   };
@@ -177,22 +181,43 @@ export function GuidedWritingTrainer({
   const submit = async () => {
     setSubmitting(true);
     setResult(null);
-    const res = await evaluateWriting({ theme, length, text: text.trim() });
+    // Send the AUFGABE, not just the text (s167 P2): without it the evaluator
+    // grades language in a vacuum and Aufgabenerfüllung is uncheckable.
+    const res = await evaluateWriting({
+      theme: drawn.theme,
+      length,
+      text: text.trim(),
+      taskId: task?.id,
+      task: task?.text,
+      points: task?.points,
+      level: task?.level,
+      format: task?.format,
+      addressee: task?.addressee,
+      register: task?.register,
+      words: task?.words,
+    });
     setResult(res);
     setSubmitting(false);
   };
 
   const handleEvaluate = () => {
     if (!isSignedIn) {
-      onRequireAuth({ theme, length, text, promptIndex: promptIx });
+      onRequireAuth({ theme: drawn.theme, length, text, promptIndex: drawn.ix });
       return;
     }
     void submit();
   };
 
-  const t = themeById(theme)!;
-  const prompt = (pool[promptIx] ?? pool[0]).text;
-  const [min, max] = rangeByLength[length];
+  // The eyebrow names the DRAWN task's theme, which under "Alle Themen" is the
+  // only place the learner learns what they are writing about.
+  const t = themeById(drawn.theme)!;
+  const task = taskAt(drawn, length);
+  const prompt = task?.text ?? "";
+  // Word target: per task where the Aufgabe declares one (real exam targets run
+  // 40 to 200 and do NOT share one number), else the mode default (s167).
+  const [min, max] = task?.words
+    ? [task.words, Math.round(task.words * 1.25)]
+    : rangeByLength[length];
   const enough = words >= Math.floor(min * 0.6);
   const minWords = 5;
   const remaining = Math.max(0, minWords - words);
@@ -249,7 +274,7 @@ export function GuidedWritingTrainer({
                 Aufgabe: {t.titleDe}
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                Ziel {min}–{max} Wörter
+                {task?.format ? `${writingFormatLabel(task.format)} · ` : ""}Ziel {min}–{max} Wörter
               </p>
             </div>
             {/* Standard 40px icon-button size; the icon half-spins per roll. */}
@@ -267,7 +292,7 @@ export function GuidedWritingTrainer({
             </button>
           </div>
           <motion.p
-            key={`${theme}|${length}|${promptIx}`}
+            key={`${drawn.theme}|${length}|${drawn.ix}`}
             initial={reduce ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.15 }}
@@ -275,6 +300,34 @@ export function GuidedWritingTrainer({
           >
             {prompt}
           </motion.p>
+          {/* Inhaltspunkte: what an examiner actually grades (Goethe
+              "Erfüllung", telc "Berücksichtigung der Leitpunkte"), so they are
+              part of the Aufgabe, not decoration. Only tasks upgraded to the
+              s167 schema carry them; the rest render as before. */}
+          {task?.points?.length ? (
+            <motion.div
+              key={`points|${drawn.theme}|${length}|${drawn.ix}`}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
+              className="space-y-1.5"
+            >
+              {task.addressee && (
+                <p className="text-xs text-muted-foreground">
+                  <span className="font-semibold text-accent-ink">An:</span> {task.addressee}
+                  {task.register === "sie" ? " (Sie)" : task.register === "du" ? " (du)" : ""}
+                </p>
+              )}
+              <ul className="space-y-1">
+                {task.points.map((point) => (
+                  <li key={point} className="flex gap-2 text-sm leading-relaxed">
+                    <span aria-hidden className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent-ink" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          ) : null}
         </CardContent>
       </Card>
 
@@ -345,7 +398,7 @@ export function GuidedWritingTrainer({
                 {area && (
                   <div className="flex flex-wrap items-center gap-3 border-t border-border pt-3">
                     <p className="text-sm text-muted-foreground">{area.description}</p>
-                    <Button className="ml-auto" onClick={() => navigate(practiceRoute(area, { theme }))}>
+                    <Button className="ml-auto" onClick={() => navigate(practiceRoute(area, { theme: drawn.theme }))}>
                       <Target className="h-4 w-4" /> {area.labelDe} üben
                     </Button>
                   </div>
@@ -406,7 +459,11 @@ export function GuidedWritingTrainer({
             >
               <WritingRail
                 layout="panel"
-                value={theme}
+                value={themeScope}
+                level={level}
+                onLevelChange={setLevel}
+                format={format}
+                onFormatChange={setFormat}
                 onChange={(id) => {
                   setTheme(id);
                   setPickerOpen(false);
@@ -428,8 +485,12 @@ export function GuidedWritingTrainer({
       <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16rem] lg:items-start lg:gap-x-8">
         {content}
         <WritingRail
-          value={theme}
+          value={themeScope}
           onChange={setTheme}
+          level={level}
+          onLevelChange={setLevel}
+          format={format}
+          onFormatChange={setFormat}
           sub={sub}
           onSubChange={setSub}
           sector={sector}

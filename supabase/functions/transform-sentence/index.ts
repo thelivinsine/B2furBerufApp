@@ -66,7 +66,12 @@ const OPENAI_MODEL = Deno.env.get("OPENAI_MODEL") ?? "gpt-5";
 // Once month-to-date Claude (Sonnet) spend reaches this, GPT-5 leads the paid
 // backup instead of Sonnet. A soft routing threshold, not a hard cap.
 const CLAUDE_BUDGET_USD = Number(Deno.env.get("CLAUDE_BUDGET_USD") ?? "2");
-const TRANSFORM_DAILY_LIMIT = Number(Deno.env.get("TRANSFORM_DAILY_LIMIT") ?? "40");
+// Umformungen do NOT consume the learner's Fokus allowance (founder s167):
+// one correction plus its Umformung counts as ONE Fokus round, and the round
+// is counted by check-sentence. This bound therefore only exists so the
+// "Nochmal" variant cycle cannot run away: DAILY_CHECK_LIMIT (10) rounds x 3
+// variants per sentence = 30. Raise it with DAILY_CHECK_LIMIT, never below it.
+const TRANSFORM_DAILY_LIMIT = Number(Deno.env.get("TRANSFORM_DAILY_LIMIT") ?? "30");
 const TRANSFORM_BURST_LIMIT = Number(Deno.env.get("TRANSFORM_BURST_LIMIT") ?? "8");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");

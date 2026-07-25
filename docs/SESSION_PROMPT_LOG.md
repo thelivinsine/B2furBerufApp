@@ -773,3 +773,153 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   border rule in §3), since the skill is what the next design session reads first.
 - **Artifacts (prompt 5):** `docs/DECISIONS.md` · `.claude/skills/design/SKILL.md` ·
   `docs/PROJECT_STATUS.md` · this log
+
+## Session 167 (2026-07-25) — branch `claude/writing-aufgaben-research-faw959`
+
+- **Prompt 1 (verbatim, 2026-07-25):** `[two screenshots of the Schreiben Kurz/Lang Branche dropdown]
+  why are there almost no items in the writing section? also, the Aufgabes should be simulation of the
+  real world telc or goethe exams. Spin up a panel of expert agents and research which of those qualify
+  as kurz and lang, and what kind of aufgabes should be in these sections such that b1, b2 and c1.1
+  learners can actually benefit from this schreiben module of the app. Each filter option should have a
+  bunch of options and they should be tailored to those specific selections, not just a mention of the
+  branche in the aufgabe that the learner selects. ask me if you if there's unclarity regarding anything.
+  The value the learner should get from this should be immense and the quality of the app for this
+  section should be of highest standards. Come back with your detailed analysis and report with
+  recommendations with priority actions.`
+- **Prompt 2 (verbatim):** `also, add a generic or all themes option for all the dropdowns in the
+  selection rail.`
+- **Prompt 3 (verbatim):** `what was your question?` (x2, after the AskUserQuestion dialog was declined;
+  the four decisions were restated as plain text)
+- **Prompt 4 (verbatim):** `1. c1.1 2. no need of a fifth tab 3. yes, add 4. go deep with waves as you
+  recommend`
+- **Response summary:** Root-caused the "empty" writing section: the pool holds **373 tasks**, but
+  `WritingRail.tsx:211` counts only sector-TAGGED tasks and disables at zero, contradicting the
+  untagged-equals-universal rule in `facets.ts:138` and the trainer's own prefer-tagged-else-untagged
+  draw (`GuidedWritingTrainer.tsx:93-102`). Only 70/373 tasks carry a `sectors` tag; 11 of 20 Themen
+  carry none, so every Alltag theme has a dead Branche dropdown. Ran a 5-agent research panel
+  (telc formats · Goethe formats · DaF Schreibdidaktik · codebase audit · real-world German genres).
+  **Research was half-blocked:** WebFetch returned 403 at the proxy for every external host and the
+  session WebSearch budget was exhausted, so no official PDF could be opened and no verbatim exam
+  prompt was obtained. Agents correctly declined to fabricate German exam text; all findings are
+  confidence-marked. Key findings: Kurz/Lang word targets (40-60 / 120-150) match **no** exam, so they
+  are redefined as task-SHAPE buckets with per-task word targets; there is **no Goethe-Zertifikat B2
+  Beruf** (Goethe-Test PRO has no writing at all, the Beruf writing exam is telc-only); Goethe C1's
+  Umformulierung gap-fill is **retired** since the 2024 modular revision; and `evaluate-writing` never
+  receives the task text, making Aufgabenerfüllung structurally uncheckable.
+- **Founder decisions (locked):** three levels B1/B2/C1.1 · no fifth tab, exam simulation rides
+  Kurz/Lang via a Prüfungsformat tag · add both Niveau and Textsorte rail axes · deep content build
+  (800-1200 tasks) in waves · generic "Alle …" option on every rail dropdown.
+- **Artifacts (prompts 1-4):** `docs/plans/SCHREIBEN-OVERHAUL.md` (new) · this log
+- **Prompt 5 (verbatim, 2026-07-25):** `continue with your work if it got interrupted earlier`
+- **Response summary:** Implemented P0 of the overhaul plan (the half that does not depend on the
+  blocked exam PDFs). New **`src/lib/writingScope.ts`** is the ONE task-selection rule:
+  `eligibleTasks({theme, sub, sector, length}) -> WritingTaskRef[]`, used by BOTH the trainer's draw
+  and every rail dropdown count, so the rail can no longer contradict the engine. Branche never
+  disables; the sector fallback is applied per theme so a Branche under Alle Themen keeps the broad
+  pool. Added the generic **"Alle Themen"** option (founder prompt 2) and made it the default landing
+  scope; the drawn task now carries its own theme, driving the eyebrow, `evaluateWriting`, the
+  practice deep-link and the saved draft. Removed the dead `DEFAULT_WRITING_THEME` export and the
+  local `randomFrom`/`DEFAULT_THEME` duplication. New `tests/writingScope.test.ts` (11 cases) pins
+  the invariants including the regression (every Branche x Thema x length yields > 0).
+- **Artifacts (prompt 5):** `src/lib/writingScope.ts` (new) · `src/features/writing/WritingRail.tsx` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `tests/writingScope.test.ts` (new) ·
+  `docs/areas/SCHREIBEN.md` · `docs/PROJECT_STATUS.md` · `docs/archive/status-log/PROJECT_STATUS_ARCHIVE_2026-W30.md` · this log
+- **Prompt 6 (verbatim, 2026-07-25):** `what is this pdf you're talking about? why do you need them?`
+  → Explained in plain language: the free official Modellsätze (practice exam papers) on goethe.de /
+  telc.net / bamf.de, wanted for exact task wording, real Inhaltspunkte and the examiner point tables;
+  unreachable because the sandbox has no outbound network (403 at the proxy on every host).
+- **Prompt 7 (verbatim, 2026-07-25):** `It doesn't have to be with exact wording or a direct
+  simulation. I asked you to go through those sources for reference. We're not advertising this
+  feature of the app as mock exams, the goal is the user to have a choice of tasks on the platform to
+  practice the tasks. The tasks are the main thing, not the headers and their wordings. exact
+  inhaltspunke are the most important - gather the information from reliable sources and get an
+  overview, then generate the tasks and categorize them as discussed earlier.`
+- **Response summary (prompt 7):** Unblocked the build. Extended `WritingTask` with the exam-shaped
+  fields (`points[]`, `addressee`, `register`, `level`, `format`, `exam`, `words`, `source`), added
+  `WritingFormat`/`WritingExam`/`WritingRegister` unions + linter mirrors (points bounded 2..5, words
+  30..300, register requires an addressee), and authored **120 new structured Aufgaben**: every Thema
+  x Niveau (B1/B2/C1.1) x Länge, modelled on the Goethe B1/B2/C1 and telc B2 Beruf task SHAPES.
+  Alltag tasks now carry the formal apparatus (Betreff, Aktenzeichen, Bezugsdatum, Frist, Grußformel)
+  as Inhaltspunkte and assert no statutory deadline or euro amount. Rail gained Niveau + Textsorte
+  dropdowns; the Aufgabe card renders the Inhaltspunkte + "An: <Adressat> (Sie/du)" and takes its word
+  target from the task. **Caught a bug in my own filter rule by screenshotting the real app:**
+  untagged-=-universal is right for Branche but wrong for Niveau/Textsorte (legacy tasks outnumber
+  tagged ~10:1), so "C1.1 + Widerspruch" was serving a B1 address-change mail. Those two axes now
+  prefer their tagged tasks and count with `countExact` (no fallback), greying out at zero.
+- **Artifacts (prompt 7):** `src/types/index.ts` · `src/data/writingPrompts.ts` (+120 tasks) ·
+  `src/data/provenance.ts` (20 wp_ notes) · `src/lib/writingScope.ts` · `scripts/lint-content.mjs` ·
+  `src/features/writing/WritingRail.tsx` · `src/features/writing/GuidedWritingTrainer.tsx` ·
+  `tests/writingScope.test.ts` · `docs/areas/SCHREIBEN.md` · commit bb99861
+- **Prompt 8 (verbatim, 2026-07-25):** `set the daily limit for the modules as follows: fokus - 10 per
+  day (1 correction + 1 umformen counts as 1 here, even if the user doesn't make use of the umformen,
+  the correction alone still counts as 1) kurz - 4 lang - 2`
+- **Response summary (prompt 8):** `DAILY_CHECK_LIMIT` 20 → **10** (Fokus; the counter is the
+  CORRECTION count, so an Umformung never consumes a second unit). `TRANSFORM_DAILY_LIMIT` 40 → **30**,
+  which is now only a runaway guard for the "Nochmal" variant cycle (10 rounds x 3 variants) and must
+  stay >= 3x `DAILY_CHECK_LIMIT`. The single shared `DAILY_LIMIT` (5) in `evaluate-writing` is retired
+  in favour of **per-mode** budgets counted against `writing_evaluations.length`: `DAILY_LIMIT_SHORT`
+  **4** and `DAILY_LIMIT_LONG` **2**, so spending the day on Kurz cannot exhaust Lang. Limit messages
+  name the mode. A cached resubmission of the same text still returns before the row is written, so it
+  is free and does not consume the allowance. **Needs the three Edge Functions redeployed to take
+  effect** (the defaults live in the function code).
+- **Artifacts (prompt 8):** `supabase/functions/check-sentence/index.ts` ·
+  `supabase/functions/transform-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
+  `docs/plans/PHASE2_SETUP.md` · `docs/areas/SCHREIBEN.md` · this log
+- **Prompt 9 (verbatim, 2026-07-25):** `what is the p2 item? and is only evaluate writing that needs a
+  back end change?` → Explained P2 (send the Aufgabe to the evaluator) and confirmed `evaluate-writing`
+  is the only Edge Function it touches; also surfaced that NO CI deploys Supabase (only `pages.yml`
+  ships the site), so every function change needs a manual `supabase functions deploy`.
+- **Prompt 10 (verbatim, 2026-07-25):** `do I need to do a backend change again after p2 is
+  implemented?` → One deploy round if P2 lands before the pending limits deploy; after that the whole
+  remaining roadmap (content waves, rail/card work) is frontend + data and ships via the normal
+  PR-into-main Pages deploy. Recommended setting the four limit values as Supabase secrets so future
+  tuning needs no redeploy.
+- **Prompt 11 (verbatim, 2026-07-25):** `go ahead with p2 along with your recommedation of task id.
+  Also, I want task reference for evaluation`
+- **Response summary (prompt 11):** Shipped P2 end to end.
+  **(a) Permanent task ids.** All **493** tasks now carry `id: "wt_<themeId>_<s|l><nn>"`, required by
+  the schema and enforced by `lintWritingPrompts` (pattern + uniqueness across the whole bank);
+  negative-tested that a duplicate id fails the gate. Same permanence law as every content id.
+  **(b) The evaluator receives the Aufgabe.** Client sends `taskId · task · points[] · level · format ·
+  addressee · register · words`; all bounded server-side before reaching a prompt (task 600 chars,
+  points 200 each, max 5) since it is learner-supplied input on the wire. `buildSystemPrompt(level,
+  hasTask)` replaced the fixed "Prüfer:in für Deutsch B2 Beruf" string: it grades at the TASK's level
+  and checks content FIRST (every Inhaltspunkt covered, Anrede vs addressee, length), mirroring Goethe
+  Erfüllung / telc Leitpunkte. New `taskCompletion` WeaknessCategory mirrored into `practiceAreas`
+  (deep-links back into Kurz) and the linter. The Aufgabe travels with every provider call so a
+  cascade fallback cannot downgrade to language-only grading.
+  **(c) Cache correctness.** `hashText` now folds in the task id, the level and a `PROMPT_REV`; it was
+  text-only, which would have returned a verdict produced for a different Aufgabe the moment the task
+  shaped the prompt.
+  **(d) Task reference for evaluation (founder ask).** Migration **0011** adds
+  `writing_evaluations.task_id` (nullable, partial index); `writingTaskById()` resolves it, and
+  **Verlauf now shows the Aufgabe with its Inhaltspunkte** again, which pooled prompts made impossible
+  after s148. The insert is guarded: if the column is missing it retries without it and logs, so a
+  wrong deploy order degrades to "no task reference" instead of losing the row (losing rows would also
+  have silently stopped the daily-limit counting).
+  Also fixed a regression I introduced in the earlier refactor: the `narrow()` rewrite had dropped the
+  empty-pool guard, so a deep-linked `?sub=` with no tasks could draw a task from a different theme.
+- **Artifacts (prompt 11):** `src/data/writingPrompts.ts` (493 ids) · `src/types/index.ts` ·
+  `src/data/practiceAreas.ts` · `src/lib/writing.ts` · `src/lib/writingScope.ts` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/WritingHistory.tsx` ·
+  `supabase/functions/evaluate-writing/index.ts` · `supabase/migrations/0011_writing_task_ref.sql` (new) ·
+  `scripts/lint-content.mjs` · `tests/writingScope.test.ts` · `docs/areas/SCHREIBEN.md` ·
+  `docs/plans/PHASE2_SETUP.md` · this log
+- **Prompt 12 (verbatim, 2026-07-25):** `I don't have cli`
+- **Response summary:** Gave the browser-only path (Dashboard SQL editor + Edge Function editor +
+  Secrets) AND built the durable fix: `.github/workflows/supabase.yml` applies pending migrations then
+  deploys every Edge Function on merge to `main`, so no CLI is ever needed. Skips cleanly (with a
+  notice, not a failure) until `SUPABASE_ACCESS_TOKEN` exists, so merging it is inert on its own.
+  Actions pinned to commit SHAs, matching `pages.yml`.
+- **Prompt 13 (verbatim, 2026-07-25):** `I ran the query in option a but then realised option b is
+  better so I went ahead and added access token in github repo. The access token is set for 30 days
+  expiry for now.`
+- **Response summary:** Migration 0011 is therefore already applied by hand and NOT recorded in
+  `supabase_migrations.schema_migrations`; harmless because every statement in it is idempotent, so a
+  later CI `db push` is a no-op. `SUPABASE_DB_PASSWORD` is not set, so CI skips migrations entirely for
+  now and future migrations need one Dashboard paste each. Hardened the workflow for the 30-day token
+  expiry: a **"Verify access token" step now runs FIRST** and, on rejection, fails with an explicit
+  "it has most likely expired, regenerate it here" error having deployed nothing, instead of an opaque
+  401 part-way through.
+- **Artifacts (prompts 12-13):** `.github/workflows/supabase.yml` (new) · `docs/plans/PHASE2_SETUP.md` ·
+  this log

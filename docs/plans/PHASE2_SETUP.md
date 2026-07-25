@@ -96,15 +96,52 @@ supabase secrets set LANGUAGETOOL_API_KEY=...languagetool-key...
 supabase secrets set GEMINI_API_KEY=...
 supabase secrets set OPENAI_API_KEY=...
 
+## No-CLI deploys (s167)
+
+`.github/workflows/supabase.yml` deploys every Edge Function on merge to `main`
+and applies pending migrations first, so the CLI commands in this document are
+a fallback, not the normal path. **One-time setup, all in the browser:**
+
+1. Supabase Dashboard → Account → **Access Tokens** → generate one.
+2. GitHub → repo **Settings → Secrets and variables → Actions → New repository
+   secret**: `SUPABASE_ACCESS_TOKEN` = that token.
+3. Optional, only if CI should also apply migrations: add `SUPABASE_DB_PASSWORD`
+   (the database password). Without it the migration step is skipped and
+   migrations must be pasted into the Dashboard SQL editor instead.
+
+Until `SUPABASE_ACCESS_TOKEN` exists the workflow skips cleanly rather than
+failing, so the file is inert until it is configured. **Access tokens can carry
+an expiry.** When one lapses the workflow stops at the "Verify access token"
+step with an explicit "regenerate it" error and deploys nothing, rather than
+failing half-way; fix it by generating a new token and updating the same GitHub
+secret. Nothing else changes.
+
+**Migrations applied by hand.** Migration 0011 was run directly in the Dashboard
+SQL editor (s167), not through `supabase db push`, so it is NOT recorded in
+`supabase_migrations.schema_migrations`. That is safe: every statement in it is
+idempotent (`add column if not exists`, `create index if not exists`), so if
+`SUPABASE_DB_PASSWORD` is added later and CI re-applies it, the re-run is a
+no-op. Keep new migrations idempotent for the same reason. Without that secret,
+each future migration needs one paste into the SQL editor. Function ENV values
+(model ids, the daily limits, spend caps) are Supabase **secrets** and are set in
+the Dashboard under Edge Functions → Secrets; changing one needs no redeploy and
+no code change.
+
 # Cost guardrails (these are the defaults; set them explicitly to be sure)
 supabase secrets set MONTHLY_SPEND_CAP_USD=5
-supabase secrets set DAILY_LIMIT=5
+supabase secrets set DAILY_LIMIT_SHORT=4
+supabase secrets set DAILY_LIMIT_LONG=2
 ```
 
 ## 6. Deploy the Edge Function
 
 ```bash
+# Migration 0011 (writing_evaluations.task_id) MUST run before this deploy.
+supabase db push
 supabase functions deploy evaluate-writing
+# NOTE: none of this is needed any more if .github/workflows/supabase.yml is
+# configured (see "No-CLI deploys" below). It deploys every function on merge
+# to main and applies migrations first.
 ```
 
 ## 7. Smoke-test
@@ -114,8 +151,10 @@ supabase functions deploy evaluate-writing
    button that deep-links to the matching grammar/quiz section.
 2. Submit the **same text again** → it should come back instantly tagged
    "aus dem Cache" (no AI cost).
-3. Submit 6 different texts → the 6th should be blocked with a friendly
-   "come back tomorrow" message (the `DAILY_LIMIT`).
+3. Submit 5 different **Kurz** texts → the 5th should be blocked with a friendly
+   "come back tomorrow" message (`DAILY_LIMIT_SHORT`, default 4). Repeat in
+   **Lang**: the 3rd is blocked (`DAILY_LIMIT_LONG`, default 2). The two
+   budgets are independent, so exhausting Kurz must NOT block Lang.
 4. In **Settings → Konto & Cloud-Sync**, add your email, click the magic link,
    then open the site in another browser and confirm your XP/streak synced.
 
@@ -178,7 +217,11 @@ guest progress preserved.
 - **LanguageTool pre-check**: if the dominant problem is spelling, the function
   returns a templated tip with **no LLM call at all** (free).
 - **Per-input cache**: identical resubmissions return the stored insight free.
-- **Daily limit**: `DAILY_LIMIT` (default 5) reviews per user per day.
+- **Daily limit, per mode** (founder s167): `DAILY_LIMIT_SHORT` (default **4**)
+  and `DAILY_LIMIT_LONG` (default **2**) reviews per user per day, counted
+  separately against `writing_evaluations.length`. A cached resubmission of the
+  SAME text returns before the row is written, so it costs nothing and does not
+  consume the day's allowance.
 - **Monthly auto-shutoff**: once the month's estimated spend hits
   `MONTHLY_SPEND_CAP_USD` (default **$5**), new AI calls are disabled with a
   graceful message until the next month. Tracked in the `ai_usage` table.
@@ -445,8 +488,9 @@ One-time founder steps (Supabase project):
    `supabase secrets set`:
    - `TRANSFORM_MODEL` (default `claude-haiku-4-5`; set to `claude-sonnet-5` for
      higher morphological accuracy once you have compared them on real sentences).
-   - `TRANSFORM_DAILY_LIMIT` (40), `TRANSFORM_BURST_LIMIT` (8/min),
-     `DAILY_CHECK_LIMIT` (20), `USER_MONTHLY_LIMIT` (200), `MAX_SENTENCE_LEN` (300),
+   - `TRANSFORM_DAILY_LIMIT` (30), `TRANSFORM_BURST_LIMIT` (8/min),
+     `DAILY_CHECK_LIMIT` (**10**, the Fokus allowance), `USER_MONTHLY_LIMIT` (200),
+     `MAX_SENTENCE_LEN` (300),
      `PROMPT_VERSION` (bump to invalidate the transform cache after a prompt change).
    - The global `MONTHLY_SPEND_CAP_USD` ($5) is SHARED with the writing coach, so
      the whole feature cannot raise your maximum monthly spend.

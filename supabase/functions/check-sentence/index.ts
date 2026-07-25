@@ -53,7 +53,11 @@ const VOICES = ["aktiv", "passiv_vorgang", "passiv_zustand"];
 const TENSES = ["praesens", "perfekt", "praeteritum", "plusquamperfekt", "futur1", "futur2"];
 const MOODS = ["indikativ", "konjunktiv1", "konjunktiv2", "imperativ"];
 
-const DAILY_CHECK_LIMIT = Number(Deno.env.get("DAILY_CHECK_LIMIT") ?? "20");
+// Fokus allowance (founder s167): 10 Runden pro Tag. One round = one
+// correction; the optional Umformung that follows does NOT consume a second
+// unit, so the counter is the CORRECTION count only (sentence_checks). See
+// transform-sentence, whose own daily bound is derived from this number.
+const DAILY_CHECK_LIMIT = Number(Deno.env.get("DAILY_CHECK_LIMIT") ?? "10");
 const USER_MONTHLY_LIMIT = Number(Deno.env.get("USER_MONTHLY_LIMIT") ?? "200");
 const MONTHLY_CAP = Number(Deno.env.get("MONTHLY_SPEND_CAP_USD") ?? "5");
 const MAX_SENTENCE_LEN = Number(Deno.env.get("MAX_SENTENCE_LEN") ?? "300");

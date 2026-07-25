@@ -46,6 +46,9 @@ const GRAMMAR_GROUPS = [
   "nouns", "attributes", "reportedSpeech", "wordFormation", "infinitives", "future",
 ];
 const WEAKNESS_CATEGORIES = [
+  // "taskCompletion" (Aufgabenerfüllung) added s167 once evaluate-writing began
+  // receiving the Aufgabe and its Inhaltspunkte; content is graded before form.
+  "taskCompletion",
   "verbPosition", "cases", "vocabularyRange", "cohesion", "relativeClauses",
   "daWords", "collocations", "register", "spelling",
 ];
@@ -73,6 +76,18 @@ const WORK_SECTORS = [
   "engineering", "construction", "production", "transport", "beauty", "sports",
   "chemicals", "pharma", "cleaning", "security",
 ];
+// Schreiben axes (s167): Textsorte, the exam shape a task is modelled on, and
+// the du/Sie register. Mirrors of the unions in src/types/index.ts.
+const WRITING_FORMATS = [
+  "email_informell", "email_halbformell", "email_formell",
+  "nachricht", "notiz", "uebergabe",
+  "forumsbeitrag", "stellungnahme",
+  "bericht", "protokoll",
+  "beschwerde", "reklamation",
+  "antrag", "widerspruch", "kuendigung", "bewerbung",
+];
+const WRITING_EXAMS = ["goethe_b1", "goethe_b2", "goethe_c1", "telc_b2_beruf", "dtb", "alltag"];
+const WRITING_REGISTERS = ["du", "sie"];
 
 /** Validate an optional `sectors` array: non-empty, unique, enum values only.
  *  Also errors if the retired singular `sector` field reappears (same guard
@@ -470,8 +485,61 @@ function lintPracticeAreas(practiceAreas) {
   }
 }
 
+/** Validate the s167 exam-realistic writing fields, all validate-when-present
+ *  (closed-enum rule). Absent stays legal so the bank can upgrade in waves. */
+function checkWritingTask(ds, w, t, themeId, code, seenIds) {
+  if (!t) return;
+  // Permanent id, `wt_<themeId>_<s|l><nn>`, unique across the whole bank. An
+  // evaluation row references it and the AI cache is keyed on it, so a reused
+  // or renamed id silently reattaches old feedback to a different Aufgabe.
+  if (!isStr(t.id)) {
+    error(ds, w, "task id missing");
+  } else {
+    if (!new RegExp(`^wt_${themeId}_${code}\\d{2,}$`).test(t.id))
+      error(ds, w, `task id "${t.id}" must match wt_${themeId}_${code}NN`);
+    if (seenIds.has(t.id)) error(ds, w, `duplicate task id "${t.id}"`);
+    seenIds.add(t.id);
+  }
+  if (t.points !== undefined) {
+    if (!Array.isArray(t.points) || t.points.length === 0) {
+      error(ds, w, "points must be a non-empty array when present");
+    } else {
+      // 2 to 5 Inhaltspunkte: one is not a task, six stops being gradeable.
+      if (t.points.length < 2 || t.points.length > 5)
+        error(ds, w, `points must hold 2 to 5 Inhaltspunkte (got ${t.points.length})`);
+      t.points.forEach((p, i) => {
+        if (!isStr(p)) error(ds, w, `points[${i}] is empty`);
+      });
+    }
+  }
+  if (t.level !== undefined && !CEFR_LEVELS.includes(t.level))
+    error(ds, w, `invalid level "${t.level}"`);
+  if (t.format !== undefined && !WRITING_FORMATS.includes(t.format))
+    error(ds, w, `invalid format "${t.format}"`);
+  if (t.exam !== undefined && !WRITING_EXAMS.includes(t.exam))
+    error(ds, w, `invalid exam "${t.exam}"`);
+  if (t.register !== undefined && !WRITING_REGISTERS.includes(t.register))
+    error(ds, w, `invalid register "${t.register}"`);
+  if (t.addressee !== undefined && !isStr(t.addressee))
+    error(ds, w, "addressee must be a non-empty string when present");
+  if (t.source !== undefined && !isStr(t.source))
+    error(ds, w, "source must be a non-empty string when present");
+  if (t.words !== undefined) {
+    if (typeof t.words !== "number" || !Number.isFinite(t.words))
+      error(ds, w, "words must be a number when present");
+    // Real exam targets run 40 (Goethe B1 Teil 3) to 250 (C1 Teil 1 ceiling).
+    else if (t.words < 30 || t.words > 300)
+      error(ds, w, `words ${t.words} outside the plausible 30 to 300 range`);
+  }
+  // A task that states a register should say who it is addressed to, and a
+  // Kurz/Lang word target only means something with content points to fill it.
+  if (t.register !== undefined && t.addressee === undefined)
+    error(ds, w, "register set without an addressee");
+}
+
 function lintWritingPrompts(writingPrompts, subThemeIndex) {
   const ds = "writingPrompts";
+  const taskIds = new Set();
   // Random-Aufgabe pools (s148; task objects since s149): every theme needs a
   // non-empty short AND long pool of tasks. A task's optional `sub` must be a
   // sub-theme declared on its theme, and `sectors` must be known Branchen
@@ -496,6 +564,7 @@ function lintWritingPrompts(writingPrompts, subThemeIndex) {
           error(ds, w, `sub "${t.sub}" not declared on theme "${id}"`);
         for (const s of t?.sectors ?? [])
           if (!WORK_SECTORS.includes(s)) error(ds, w, `unknown sector "${s}"`);
+        checkWritingTask(ds, w, t, id, len === "long" ? "l" : "s", taskIds);
       });
     }
   }

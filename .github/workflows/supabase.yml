@@ -1,0 +1,135 @@
+name: Deploy Supabase functions
+
+# The founder has no CLI, and nothing else in this repo deploys Supabase: the
+# site ships via pages.yml, but Edge Functions and migrations were manual
+# `supabase ...` commands. This workflow removes that ops burden entirely.
+#
+# ONE-TIME SETUP (all in the browser, GitHub → Settings → Secrets and variables
+# → Actions → New repository secret):
+#   SUPABASE_ACCESS_TOKEN  - Supabase Dashboard → Account → Access Tokens.
+#                            NOTE: these can be created with an expiry. When it
+#                            lapses, deploys fail with a clear error telling you
+#                            to regenerate it (see the "Verify access token"
+#                            step); nothing deploys half-way.
+#   SUPABASE_DB_PASSWORD   - the database password (only needed for migrations;
+#                            leave it unset and the migration step is skipped)
+# The project ref is not a secret and is set below.
+#
+# Until SUPABASE_ACCESS_TOKEN exists the workflow SKIPS cleanly instead of
+# failing, so merging this file changes nothing on its own.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "supabase/functions/**"
+      - "supabase/migrations/**"
+      - ".github/workflows/supabase.yml"
+  workflow_dispatch:
+    inputs:
+      run_migrations:
+        description: "Also apply pending migrations (supabase db push)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+# Never run two deploys against the same project at once.
+concurrency:
+  group: supabase-deploy
+  cancel-in-progress: false
+
+env:
+  SUPABASE_PROJECT_REF: stkfdavpjflpqoxjunnj
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Actions are pinned to commit SHAs (not floating tags) to remove the
+      # tag-hijack supply-chain risk, matching pages.yml.
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Check credentials
+        id: creds
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::SUPABASE_ACCESS_TOKEN is not set, skipping. See the header of this workflow for the one-time setup."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+          if [ -z "$DB_PASSWORD" ]; then
+            echo "db=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "db=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Setup Supabase CLI
+        if: steps.creds.outputs.configured == 'true'
+        uses: supabase/setup-cli@c4474143ea78539ffce3f52d84f2b6ba22ecc73f # v1
+        with:
+          version: latest
+
+      # A Supabase access token can be created with an expiry. When it lapses
+      # every deploy fails with an opaque 401, so check it ONCE up front and say
+      # plainly what to do, rather than leaving a non-technical operator staring
+      # at a stack trace.
+      - name: Verify access token
+        if: steps.creds.outputs.configured == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if ! supabase projects list > /dev/null 2>&1; then
+            echo "::error::SUPABASE_ACCESS_TOKEN was rejected. It has most likely EXPIRED. Generate a new one at Supabase Dashboard -> Account -> Access Tokens, then update the SUPABASE_ACCESS_TOKEN secret in GitHub -> Settings -> Secrets and variables -> Actions. Nothing was deployed."
+            exit 1
+          fi
+
+      # Migrations run BEFORE the functions. evaluate-writing writes
+      # writing_evaluations.task_id, which migration 0011 adds; deploying the
+      # function first would degrade it to "no task reference" (the insert is
+      # guarded, so nothing is lost, but the reference would be missing).
+      - name: Apply migrations
+        if: >-
+          steps.creds.outputs.configured == 'true' &&
+          steps.creds.outputs.db == 'true' &&
+          (github.event_name != 'workflow_dispatch' || inputs.run_migrations)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push
+
+      - name: Deploy Edge Functions
+        if: steps.creds.outputs.configured == 'true'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          set -e
+          for fn in supabase/functions/*/; do
+            name="$(basename "$fn")"
+            # Shared, non-deployable directories would start with _ by convention.
+            case "$name" in _*) continue ;; esac
+            echo "::group::deploy $name"
+            supabase functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF"
+            echo "::endgroup::"
+          done
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.creds.outputs.configured }}" != "true" ]; then
+            echo "Skipped: add SUPABASE_ACCESS_TOKEN to deploy automatically." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Deployed Edge Functions to $SUPABASE_PROJECT_REF." >> "$GITHUB_STEP_SUMMARY"
+            if [ "${{ steps.creds.outputs.db }}" != "true" ]; then
+              echo "Migrations skipped (no SUPABASE_DB_PASSWORD)." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
