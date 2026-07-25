@@ -566,6 +566,11 @@ export interface SessionPlan {
 
 /** Weakness buckets the writing coach (Phase 2) maps onto practice deep-links. */
 export type WeaknessCategory =
+  // Content before form (s167): the evaluator now receives the Aufgabe and its
+  // Inhaltspunkte, so it can report a missed content point or the wrong
+  // register-for-addressee, which is what an exam grades first (Goethe
+  // "Erfüllung", telc "Berücksichtigung der Leitpunkte").
+  | "taskCompletion"
   | "verbPosition"
   | "cases"
   | "vocabularyRange"

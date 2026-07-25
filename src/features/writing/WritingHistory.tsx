@@ -5,6 +5,7 @@ import { Loader2, PenLine, Target, TrendingUp, AlertCircle, Trash2, ChevronDown,
 import type { WeaknessCategory } from "@/types";
 import { themeById } from "@/data/themes";
 import { practiceAreaById } from "@/data/practiceAreas";
+import { writingTaskById } from "@/lib/writingScope";
 import { getWritingHistory, deleteWritingEvaluation, type WritingHistoryEntry } from "@/lib/writing";
 import { useSessionStore } from "@/store/useSessionStore";
 import { Card, CardContent } from "@/components/ui/card";
@@ -99,6 +100,8 @@ function HistoryEntry({
 }) {
   const navigate = useNavigate();
   const theme = themeById(entry.theme);
+  // s167: resolve the recorded task id back to the Aufgabe.
+  const task = writingTaskById(entry.task_id);
   const area = practiceAreaById(entry.weakness);
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -180,9 +183,10 @@ function HistoryEntry({
             </p>
           </div>
 
-          {/* Disclosure for the learner's own text. (The Aufgabe itself is no
-              longer shown: since the s148 random pools the exact prompt behind
-              an old entry is not recoverable from theme + length alone.) */}
+          {/* Disclosure for the learner's own text AND, since s167, the Aufgabe
+              it was written against: evaluations now record the permanent
+              `task_id`, so the prompt behind an old entry is recoverable again
+              (it was not, from theme + length alone, after the s148 pools). */}
           <button
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
@@ -194,6 +198,27 @@ function HistoryEntry({
 
           {expanded && (
             <div className="space-y-3">
+              {task && (
+                <div className="space-y-1.5 rounded-xl border border-accent/50 bg-accent/20 p-3.5 dark:border-accent/25 dark:bg-accent/10">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-accent-ink">
+                    <Target className="h-3.5 w-3.5" /> Aufgabe
+                  </p>
+                  <p className="text-sm leading-relaxed text-foreground/90">{task.text}</p>
+                  {task.points?.length ? (
+                    <ul className="space-y-1 pt-0.5">
+                      {task.points.map((point) => (
+                        <li key={point} className="flex gap-2 text-sm leading-relaxed">
+                          <span
+                            aria-hidden
+                            className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-accent-ink"
+                          />
+                          <span>{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
+              )}
               <div className="space-y-1.5 rounded-xl border border-border bg-muted/20 p-3.5">
                 <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   <PenLine className="h-3.5 w-3.5" /> Dein Text

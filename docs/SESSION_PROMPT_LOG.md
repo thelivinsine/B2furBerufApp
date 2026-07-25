@@ -865,3 +865,43 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
 - **Artifacts (prompt 8):** `supabase/functions/check-sentence/index.ts` ·
   `supabase/functions/transform-sentence/index.ts` · `supabase/functions/evaluate-writing/index.ts` ·
   `docs/plans/PHASE2_SETUP.md` · `docs/areas/SCHREIBEN.md` · this log
+- **Prompt 9 (verbatim, 2026-07-25):** `what is the p2 item? and is only evaluate writing that needs a
+  back end change?` → Explained P2 (send the Aufgabe to the evaluator) and confirmed `evaluate-writing`
+  is the only Edge Function it touches; also surfaced that NO CI deploys Supabase (only `pages.yml`
+  ships the site), so every function change needs a manual `supabase functions deploy`.
+- **Prompt 10 (verbatim, 2026-07-25):** `do I need to do a backend change again after p2 is
+  implemented?` → One deploy round if P2 lands before the pending limits deploy; after that the whole
+  remaining roadmap (content waves, rail/card work) is frontend + data and ships via the normal
+  PR-into-main Pages deploy. Recommended setting the four limit values as Supabase secrets so future
+  tuning needs no redeploy.
+- **Prompt 11 (verbatim, 2026-07-25):** `go ahead with p2 along with your recommedation of task id.
+  Also, I want task reference for evaluation`
+- **Response summary (prompt 11):** Shipped P2 end to end.
+  **(a) Permanent task ids.** All **493** tasks now carry `id: "wt_<themeId>_<s|l><nn>"`, required by
+  the schema and enforced by `lintWritingPrompts` (pattern + uniqueness across the whole bank);
+  negative-tested that a duplicate id fails the gate. Same permanence law as every content id.
+  **(b) The evaluator receives the Aufgabe.** Client sends `taskId · task · points[] · level · format ·
+  addressee · register · words`; all bounded server-side before reaching a prompt (task 600 chars,
+  points 200 each, max 5) since it is learner-supplied input on the wire. `buildSystemPrompt(level,
+  hasTask)` replaced the fixed "Prüfer:in für Deutsch B2 Beruf" string: it grades at the TASK's level
+  and checks content FIRST (every Inhaltspunkt covered, Anrede vs addressee, length), mirroring Goethe
+  Erfüllung / telc Leitpunkte. New `taskCompletion` WeaknessCategory mirrored into `practiceAreas`
+  (deep-links back into Kurz) and the linter. The Aufgabe travels with every provider call so a
+  cascade fallback cannot downgrade to language-only grading.
+  **(c) Cache correctness.** `hashText` now folds in the task id, the level and a `PROMPT_REV`; it was
+  text-only, which would have returned a verdict produced for a different Aufgabe the moment the task
+  shaped the prompt.
+  **(d) Task reference for evaluation (founder ask).** Migration **0011** adds
+  `writing_evaluations.task_id` (nullable, partial index); `writingTaskById()` resolves it, and
+  **Verlauf now shows the Aufgabe with its Inhaltspunkte** again, which pooled prompts made impossible
+  after s148. The insert is guarded: if the column is missing it retries without it and logs, so a
+  wrong deploy order degrades to "no task reference" instead of losing the row (losing rows would also
+  have silently stopped the daily-limit counting).
+  Also fixed a regression I introduced in the earlier refactor: the `narrow()` rewrite had dropped the
+  empty-pool guard, so a deep-linked `?sub=` with no tasks could draw a task from a different theme.
+- **Artifacts (prompt 11):** `src/data/writingPrompts.ts` (493 ids) · `src/types/index.ts` ·
+  `src/data/practiceAreas.ts` · `src/lib/writing.ts` · `src/lib/writingScope.ts` ·
+  `src/features/writing/GuidedWritingTrainer.tsx` · `src/features/writing/WritingHistory.tsx` ·
+  `supabase/functions/evaluate-writing/index.ts` · `supabase/migrations/0011_writing_task_ref.sql` (new) ·
+  `scripts/lint-content.mjs` · `tests/writingScope.test.ts` · `docs/areas/SCHREIBEN.md` ·
+  `docs/plans/PHASE2_SETUP.md` · this log

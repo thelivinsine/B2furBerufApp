@@ -27,6 +27,11 @@ import type { WritingLength } from "@/lib/writing";
  *   any and falls back to that theme's universal ones otherwise. Applying it
  *   per theme rather than globally keeps the pool broad under "Alle Themen"
  *   instead of collapsing it to the handful of tagged tasks.
+ * - `level` and `format` PREFER their tagged tasks and do NOT treat untagged
+ *   as universal: an untagged task is not "every level", and while the bank
+ *   upgrades in waves the legacy tasks would otherwise swamp both filters. The
+ *   rail counts these two with `countExact` (no fallback) and greys them out at
+ *   zero, so an option never quietly serves something else.
  * - No scope combination is ever empty; a theme whose filters yield nothing
  *   falls back to its whole pool.
  */
@@ -45,9 +50,9 @@ export interface WritingScope {
   sub: string;
   /** "" = all Branchen. */
   sector: string;
-  /** "" = alle Niveaus. Untagged tasks show at every Niveau. */
+  /** "" = alle Niveaus. Prefers tagged tasks (see the module docstring). */
   level?: string;
-  /** "" = alle Textsorten. Untagged tasks show under every Textsorte. */
+  /** "" = alle Textsorten. Prefers tagged tasks (see the module docstring). */
   format?: string;
   length: WritingLength;
 }
@@ -100,6 +105,11 @@ export function eligibleTasks({
         (i) => pool[i].format === format,
         (i) => !pool[i].format,
       );
+    // `narrow` can never empty the list, but the Unterthema filter above can
+    // (a deep link may name a sub-theme with no tasks at this length). A theme
+    // in scope must never contribute nothing, or the caller draws a task from
+    // an entirely different theme.
+    if (!ix.length) ix = pool.map((_, i) => i);
     out.push(...ix.map((i) => ({ theme: id, ix: i })));
   }
   return out;
@@ -139,6 +149,22 @@ export function taskAt(ref: WritingTaskRef, length: WritingLength): WritingTask 
 /** The task text behind a ref, with a safe fallback for stale refs. */
 export function taskText(ref: WritingTaskRef, length: WritingLength): string {
   return taskAt(ref, length)?.text ?? "";
+}
+
+/** id -> task index, built once. Lets Verlauf resolve a recorded `task_id`
+ *  back to its Aufgabe (s167); pooled prompts alone could not. */
+let TASK_BY_ID: Map<string, WritingTask> | null = null;
+export function writingTaskById(id: string | null | undefined): WritingTask | undefined {
+  if (!id) return undefined;
+  if (!TASK_BY_ID) {
+    TASK_BY_ID = new Map();
+    for (const theme of ALL_THEME_IDS) {
+      for (const length of ["short", "long"] as const) {
+        for (const t of writingPrompts[theme]?.[length] ?? []) TASK_BY_ID.set(t.id, t);
+      }
+    }
+  }
+  return TASK_BY_ID.get(id);
 }
 
 export function sameTask(a: WritingTaskRef | null, b: WritingTaskRef | null): boolean {

@@ -105,6 +105,8 @@ supabase secrets set DAILY_LIMIT_LONG=2
 ## 6. Deploy the Edge Function
 
 ```bash
+# Migration 0011 (writing_evaluations.task_id) MUST run before this deploy.
+supabase db push
 supabase functions deploy evaluate-writing
 ```
 

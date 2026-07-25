@@ -6,6 +6,7 @@ import {
   randomTask,
   sameTask,
   taskText,
+  writingTaskById,
 } from "@/lib/writingScope";
 import { writingPrompts } from "@/data/writingPrompts";
 import { themes } from "@/data/themes";
@@ -85,6 +86,42 @@ describe("eligibleTasks", () => {
   it("an Unterthema is ignored under Alle Themen (slugs are theme-scoped)", () => {
     const all = countTasks({ theme: "", sub: "", sector: "", length: "short" });
     expect(countTasks({ theme: "", sub: "meetings.ablauf", sector: "", length: "short" })).toBe(all);
+  });
+
+  it("a deep-linked Unterthema with no tasks still stays inside its theme", () => {
+    // `narrow` cannot empty the list, but the sub filter can, and a caller that
+    // gets [] would draw from a different theme entirely.
+    const tasks = eligibleTasks({
+      theme: "meetings",
+      sub: "meetings.doesnotexist",
+      sector: "",
+      length: "short",
+    });
+    expect(tasks.length).toBeGreaterThan(0);
+    expect(tasks.every((t) => t.theme === "meetings")).toBe(true);
+  });
+
+  it("every task carries a unique permanent id, resolvable by id", () => {
+    const seen = new Set<string>();
+    for (const length of LENGTHS) {
+      for (const id of THEME_IDS) {
+        for (const t of writingPrompts[id][length]) {
+          expect(t.id, `${id}/${length}`).toMatch(
+            new RegExp(`^wt_${id}_${length === "long" ? "l" : "s"}\\d{2,}$`),
+          );
+          expect(seen.has(t.id), `duplicate ${t.id}`).toBe(false);
+          seen.add(t.id);
+          expect(writingTaskById(t.id)).toBe(t);
+        }
+      }
+    }
+    expect(seen.size).toBe(493);
+  });
+
+  it("writingTaskById is safe for unknown and empty ids", () => {
+    expect(writingTaskById(null)).toBeUndefined();
+    expect(writingTaskById("")).toBeUndefined();
+    expect(writingTaskById("wt_nope_s99")).toBeUndefined();
   });
 
   it("resolves task text for every ref it hands out", () => {

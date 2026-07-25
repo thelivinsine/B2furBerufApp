@@ -29,6 +29,14 @@ import type {
  */
 export interface WritingTask {
   /**
+   * PERMANENT task id, `wt_<themeId>_<s|l><nn>` (s167). Shipped ids are
+   * permanent like every other content id: an evaluation row references it,
+   * the AI cache is keyed on it, and Verlauf resolves it back to the Aufgabe.
+   * Retire a task by removing it from the surface, never by renaming or
+   * reusing its id, and never renumber a pool to close a gap.
+   */
+  id: string;
+  /**
    * The task instruction shown to the learner. Kept as the required field so
    * the bank can be upgraded theme by theme (s167) without a flag day.
    */
@@ -79,37 +87,46 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "meetings",
     short: [
       {
+        id: "wt_meetings_s01",
         text: "Schreibe eine kurze E-Mail an dein Team: Schlage einen neuen Termin für die wöchentliche Besprechung vor und nenne einen Grund.",
         sub: "meetings.ablauf",
       },
       {
+        id: "wt_meetings_s02",
         text: "Schreibe eine kurze Nachricht an dein Team: Erinnere an das Meeting morgen und nenne die zwei wichtigsten Punkte der Tagesordnung.",
         sub: "meetings.ablauf",
       },
       {
+        id: "wt_meetings_s03",
         text: "Schreibe eine kurze E-Mail an deinen Chef: Bitte darum, einen Punkt auf die Tagesordnung der nächsten Besprechung zu setzen, und begründe kurz, warum er wichtig ist.",
         sub: "meetings.beitrag",
       },
       {
+        id: "wt_meetings_s04",
         text: "Schreibe eine kurze Entschuldigung an die Runde: Du kommst 20 Minuten später zur Besprechung. Nenne den Grund und schlage vor, wie ihr trotzdem gut starten könnt.",
       },
       {
+        id: "wt_meetings_s05",
         text: "Schreibe eine kurze Notiz für das Protokoll: Fasse die zwei wichtigsten Beschlüsse der heutigen Besprechung zusammen.",
         sub: "meetings.entscheidung",
       },
       {
+        id: "wt_meetings_s06",
         text: "Schreibe eine kurze Nachricht an die Moderatorin: Du möchtest in der nächsten Besprechung fünf Minuten für dein Thema bekommen. Begründe kurz.",
         sub: "meetings.beitrag",
       },
       {
+        id: "wt_meetings_s07",
         text: "Schreibe eine kurze Nachricht an dein Team: Bitte alle, bis Freitag über den Terminvorschlag abzustimmen, und erkläre, wie.",
         sub: "meetings.entscheidung",
       },
       {
+        id: "wt_meetings_s08",
         text: "Schreibe eine kurze Übergabenotiz für die Nachtschicht: Nenne die zwei wichtigsten Punkte zu einer Bewohnerin, damit die Kolleg:innen informiert sind.",
         sectors: ["care"],
       },
       {
+        id: "wt_meetings_s09",
         text: "Sie können am Dienstag nicht an der Teambesprechung teilnehmen. Schreiben Sie eine kurze E-Mail an Ihre Teamleitung.",
         sub: "meetings.ablauf",
         points: [
@@ -125,6 +142,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_meetings_s10",
         text: "In Ihrem Team dauern die wöchentlichen Besprechungen regelmäßig eine Stunde länger als geplant. Schreiben Sie eine Nachricht an Ihre Vorgesetzte.",
         sub: "meetings.ablauf",
         points: [
@@ -141,6 +159,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_meetings_s11",
         text: "Ihr Vorschlag aus der letzten Sitzung wurde ohne Diskussion abgelehnt. Schreiben Sie eine formelle E-Mail an die Bereichsleitung.",
         sub: "meetings.beitrag",
         points: [
@@ -159,49 +178,61 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_meetings_l01",
         text: "Verfasse eine E-Mail an deine Kolleg:innen. Fasse die wichtigsten Ergebnisse der letzten Besprechung zusammen, benenne die offenen Punkte und schlage konkrete nächste Schritte mit Verantwortlichkeiten vor.",
         sub: "meetings.entscheidung",
       },
       {
+        id: "wt_meetings_l02",
         text: "Verfasse ein kurzes Protokoll einer Teambesprechung. Nenne die Teilnehmenden, fasse die besprochenen Themen zusammen und halte die Beschlüsse mit Verantwortlichkeiten und Fristen fest.",
         sub: "meetings.ablauf",
       },
       {
+        id: "wt_meetings_l03",
         text: "Schreibe eine E-Mail an eine Kollegin, die bei der Besprechung gefehlt hat. Erkläre, was besprochen wurde, welche Aufgaben sie übernehmen soll und bis wann.",
       },
       {
+        id: "wt_meetings_l04",
         text: "Verfasse eine Stellungnahme: Dein Team hat zu viele Meetings. Beschreibe das Problem, erkläre die Folgen für die Arbeit und schlage zwei konkrete Verbesserungen vor.",
         sub: "meetings.ablauf",
       },
       {
+        id: "wt_meetings_l05",
         text: "Schreibe eine Einladung zu einem Kick-off-Meeting. Nenne Anlass, Termin und Ort, stelle die Tagesordnung vor und bitte um Rückmeldung bis zu einer Frist.",
         sub: "meetings.ablauf",
       },
       {
+        id: "wt_meetings_l06",
         text: "Verfasse eine E-Mail an die Projektleitung: Du möchtest in der nächsten Sitzung einen Verbesserungsvorschlag vorstellen. Beschreibe kurz die Idee, begründe ihren Nutzen und bitte um einen Platz auf der Tagesordnung.",
         sub: "meetings.beitrag",
       },
       {
+        id: "wt_meetings_l07",
         text: "Schreibe eine Stellungnahme für die Teamrunde: Nimm zum Vorschlag deiner Kollegin Stellung, nenne zwei Argumente dafür oder dagegen und formuliere ein höfliches Fazit.",
         sub: "meetings.beitrag",
       },
       {
+        id: "wt_meetings_l08",
         text: "Verfasse eine E-Mail an dein Team nach einer strittigen Abstimmung: Fasse das Ergebnis zusammen, erkläre, wie es zustande kam, und beschreibe, was jetzt umgesetzt wird.",
         sub: "meetings.entscheidung",
       },
       {
+        id: "wt_meetings_l09",
         text: "Schreibe eine E-Mail an die Entwicklerrunde: Schlage ein neues Vorgehen für Code-Reviews vor, begründe es mit zwei aktuellen Beispielen und bitte um Feedback bis zum nächsten Sprint.",
         sectors: ["it"],
       },
       {
+        id: "wt_meetings_l10",
         text: "Schreibe eine Mitteilung an das Küchen- und Serviceteam: Die Karte wechselt zur neuen Saison. Nenne die wichtigsten neuen Gerichte, die Allergene und was das Team den Gästen erzählen soll.",
         sectors: ["hospitality"],
       },
       {
+        id: "wt_meetings_l11",
         text: "Schreibe eine E-Mail an den Auftraggeber nach einem Projekttreffen: Fasse die technischen Entscheidungen zusammen und liste die offenen Prüfpunkte mit Terminen auf.",
         sectors: ["engineering"],
       },
       {
+        id: "wt_meetings_l12",
         text: "Eine Kollegin hat die Besprechung verpasst. Schreiben Sie ihr eine E-Mail und berichten Sie, was besprochen wurde.",
         sub: "meetings.entscheidung",
         points: [
@@ -218,6 +249,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_meetings_l13",
         text: "In einem Forum für Berufstätige wird diskutiert, ob feste wöchentliche Meetings noch zeitgemäß sind. Schreiben Sie einen Beitrag.",
         points: [
           "Äußern Sie Ihre Meinung zu festen wöchentlichen Meetings.",
@@ -233,6 +265,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_meetings_l14",
         text: "In vielen Betrieben ersetzen kurze schriftliche Updates die klassische Teambesprechung. Verfassen Sie einen Diskussionsbeitrag.",
         points: [
           "Beschreiben Sie die Entwicklung kurz.",
@@ -254,61 +287,77 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "scheduling",
     short: [
       {
+        id: "wt_scheduling_s01",
         text: "Schreibe eine kurze Nachricht: Bitte eine Kollegin, einen Termin zu verschieben, und biete zwei Alternativen an.",
       },
       {
+        id: "wt_scheduling_s02",
         text: "Schreibe eine kurze Bestätigung an einen Geschäftspartner: Bestätige den vereinbarten Termin und nenne Ort und Uhrzeit.",
       },
       {
+        id: "wt_scheduling_s03",
         text: "Schreibe eine kurze Absage: Du musst einen Termin am Freitag absagen. Entschuldige dich und schlage einen neuen Termin vor.",
       },
       {
+        id: "wt_scheduling_s04",
         text: "Schreibe eine kurze Nachricht an dein Team: Der Zeitplan für diese Woche ändert sich. Nenne die wichtigste Änderung und was zu tun ist.",
       },
       {
+        id: "wt_scheduling_s05",
         text: "Schreibe eine kurze Erinnerung an einen Kollegen: Eine Frist läuft übermorgen ab. Bitte um einen kurzen Status.",
       },
       {
+        id: "wt_scheduling_s06",
         text: "Schreibe eine kurze Nachricht an die Stationsleitung: Bitte um einen Diensttausch am Samstag und nenne, wer für dich einspringen würde.",
         sectors: ["care"],
       },
       {
+        id: "wt_scheduling_s07",
         text: "Schreibe eine kurze Meldung an den Polier: Wegen Regen konnte heute nicht betoniert werden. Nenne den neuen Plan für morgen.",
         sectors: ["construction"],
       },
       {
+        id: "wt_scheduling_s08",
         text: "Schreibe eine kurze Nachricht an dein Schichtteam: Für Samstagabend fehlt eine Servicekraft. Frage, wer die Schicht übernehmen kann.",
         sectors: ["hospitality"],
       },
       {
+        id: "wt_scheduling_s09",
         text: "Schreibe eine kurze Nachricht an einen Kunden: Du schaffst den Termin heute nicht mehr. Entschuldige dich und schlage morgen früh vor.",
         sectors: ["trades"],
       },
       {
+        id: "wt_scheduling_s10",
         text: "Schreibe eine kurze Nachricht an dein Team: Wegen Inventur öffnet der Laden am Freitag später. Nenne die neue Öffnungszeit.",
         sectors: ["retail"],
       },
       {
+        id: "wt_scheduling_s11",
         text: "Schreibe eine kurze Nachricht an die Frühschicht: Die Wartung der Anlage verschiebt sich auf Mittwoch. Nenne, was das für den Plan bedeutet.",
         sectors: ["production"],
       },
       {
+        id: "wt_scheduling_s12",
         text: "Schreibe eine kurze Nachricht an deine Kolleginnen: Der Samstag ist voll ausgebucht. Frage, wer eine Stunde länger bleiben kann.",
         sectors: ["beauty"],
       },
       {
+        id: "wt_scheduling_s13",
         text: "Schreibe eine kurze Nachricht an die Einsatzleitung: Du bist krank und kannst die Frühschicht nicht übernehmen. Bitte um Vertretung.",
         sectors: ["cleaning"],
       },
       {
+        id: "wt_scheduling_s14",
         text: "Schreibe eine kurze Nachricht an deinen Objektleiter: Tausche deine Nachtschicht am Samstag mit einem Kollegen und bitte um Freigabe.",
         sectors: ["security"],
       },
       {
+        id: "wt_scheduling_s15",
         text: "Schreibe eine kurze Nachricht an die Trainer: Der Kursplan für August ändert sich. Nenne die wichtigste Änderung und bis wann Rückmeldungen möglich sind.",
         sectors: ["sports"],
       },
       {
+        id: "wt_scheduling_s16",
         text: "Sie haben einen Termin beim Kunden und schaffen es nicht pünktlich. Schreiben Sie eine kurze Nachricht.",
         points: [
           "Entschuldigen Sie sich.",
@@ -323,6 +372,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_scheduling_s17",
         text: "Ihr Projektplan lässt sich wegen einer verspäteten Lieferung nicht halten. Schreiben Sie an die Projektleitung.",
         points: [
           "Melden Sie die Verzögerung.",
@@ -338,6 +388,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_scheduling_s18",
         text: "Sie sollen zusätzlich zu Ihrem Projekt eine weitere Aufgabe übernehmen, obwohl Ihr Zeitplan bereits voll ist. Schreiben Sie an Ihre Vorgesetzte.",
         points: [
           "Zeigen Sie Verständnis für die Dringlichkeit.",
@@ -355,32 +406,41 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_scheduling_l01",
         text: "Schreibe eine E-Mail, in der du einen Projektzeitplan erläuterst. Begründe, warum sich eine Frist verschiebt, beschreibe die Auswirkungen und schlage einen angepassten Plan vor.",
       },
       {
+        id: "wt_scheduling_l02",
         text: "Schreibe eine E-Mail an eine Kundin: Ein vereinbarter Liefertermin ist nicht zu halten. Entschuldige dich, erkläre die Gründe und biete einen neuen, realistischen Termin mit einem Ausgleich an.",
       },
       {
+        id: "wt_scheduling_l03",
         text: "Verfasse eine E-Mail an dein Team zu deinem Urlaub: Erkläre, wie die Vertretung geregelt ist, wer welche Aufgaben übernimmt und was vor deinem Urlaub noch erledigt werden muss.",
       },
       {
+        id: "wt_scheduling_l04",
         text: "Schreibe eine Stellungnahme zur Terminplanung in deinem Team. Beschreibe, warum es oft zu Überschneidungen kommt, und schlage feste Regeln für Besprechungszeiten vor.",
       },
       {
+        id: "wt_scheduling_l05",
         text: "Verfasse eine E-Mail an mehrere Beteiligte, um einen gemeinsamen Workshop-Termin zu finden. Schlage drei Optionen vor, erkläre den Zweck des Workshops und bitte um Antwort bis zu einer Frist.",
       },
       {
+        id: "wt_scheduling_l06",
         text: "Schreibe eine E-Mail an die Pflegedienstleitung: Der Dienstplan für die Feiertage ist zu knapp besetzt. Beschreibe die Engpässe und schlage eine fairere Verteilung vor.",
         sectors: ["care"],
       },
       {
+        id: "wt_scheduling_l07",
         text: "Verfasse eine E-Mail an dein Team zur Urlaubsplanung im Sommer: Erkläre, wie viele pro Woche fehlen dürfen, bis wann Wünsche abgegeben werden und wie ihr Konflikte löst.",
         sectors: ["hospitality"],
       },
       {
+        id: "wt_scheduling_l08",
         text: "Verfasse eine E-Mail an einen externen Dienstleister: Vereinbare einen festen monatlichen Wartungstermin. Schlage einen Rhythmus vor, kläre Ausweichregeln für Feiertage und bitte um Bestätigung.",
       },
       {
+        id: "wt_scheduling_l09",
         text: "Sie möchten Ihren Urlaub im August nehmen. Schreiben Sie eine E-Mail an Ihre Vorgesetzte.",
         points: [
           "Nennen Sie den gewünschten Zeitraum.",
@@ -396,6 +456,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_scheduling_l10",
         text: "In einem Forum wird über die Vier-Tage-Woche diskutiert. Schreiben Sie einen Beitrag.",
         points: [
           "Äußern Sie Ihre Meinung zur Vier-Tage-Woche.",
@@ -411,6 +472,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_scheduling_l11",
         text: "Flexible Arbeitszeiten gelten als Vorteil, führen aber oft zu ständiger Erreichbarkeit. Verfassen Sie einen Diskussionsbeitrag.",
         points: [
           "Beschreiben Sie den Zusammenhang zwischen Flexibilität und Erreichbarkeit.",
@@ -432,49 +494,62 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "logistics",
     short: [
       {
+        id: "wt_logistics_s01",
         text: "Schreibe eine kurze E-Mail an einen Lieferanten: Frage nach dem Status einer verspäteten Lieferung.",
       },
       {
+        id: "wt_logistics_s02",
         text: "Schreibe eine kurze Nachricht ans Lager: Eine Palette ist beschädigt angekommen. Beschreibe den Schaden und frage nach dem weiteren Vorgehen.",
       },
       {
+        id: "wt_logistics_s03",
         text: "Schreibe eine kurze E-Mail an einen Kunden: Seine Bestellung verzögert sich um drei Tage. Entschuldige dich und nenne den neuen Liefertermin.",
       },
       {
+        id: "wt_logistics_s04",
         text: "Schreibe eine kurze Bestellung an einen Lieferanten: Bestelle Büromaterial nach und bitte um eine Auftragsbestätigung.",
       },
       {
+        id: "wt_logistics_s05",
         text: "Schreibe eine kurze Notiz an die Spedition: Die Lieferadresse für eine Sendung hat sich geändert. Nenne die neue Adresse und die Auftragsnummer.",
       },
       {
+        id: "wt_logistics_s06",
         text: "Schreibe eine kurze Nachricht an den Baustoffhändler: Der Kies wurde nicht geliefert. Frage nach dem neuen Liefertermin.",
         sectors: ["construction"],
       },
       {
+        id: "wt_logistics_s07",
         text: "Schreibe eine kurze Meldung an die Disposition: Du stehst im Stau auf der A3. Nenne deine voraussichtliche Ankunft beim Kunden.",
         sectors: ["transport"],
       },
       {
+        id: "wt_logistics_s08",
         text: "Schreibe eine kurze Bestellung an den Getränkehändler: Bestelle für das Wochenende nach und bitte um Lieferung bis Freitagmittag.",
         sectors: ["hospitality"],
       },
       {
+        id: "wt_logistics_s09",
         text: "Schreibe eine kurze Meldung an die Zentrale: Ein Aktionsartikel ist ausverkauft. Frage nach Nachschub und dem Liefertermin.",
         sectors: ["retail"],
       },
       {
+        id: "wt_logistics_s10",
         text: "Schreibe eine kurze Nachricht an den Einkauf: Das Lösungsmittel wird knapp. Bitte um eine Eilbestellung.",
         sectors: ["chemicals"],
       },
       {
+        id: "wt_logistics_s11",
         text: "Schreibe eine kurze Nachricht an den Versand: Eine Kühlketten-Lieferung muss heute noch raus. Bitte um Priorität.",
         sectors: ["pharma"],
       },
       {
+        id: "wt_logistics_s12",
         text: "Schreibe eine kurze Meldung ans Büro: Im Objekt fehlen Reinigungsmittel und Müllbeutel. Bitte um Nachlieferung.",
         sectors: ["cleaning"],
       },
       {
+        id: "wt_logistics_s13",
         text: "Eine Lieferung ist nicht vollständig angekommen. Schreiben Sie eine kurze Nachricht an den Lieferanten.",
         points: [
           "Nennen Sie die Lieferung und das Datum.",
@@ -489,6 +564,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_logistics_s14",
         text: "Bei einer Sendung wurden beschädigte Paletten angeliefert. Schreiben Sie eine Reklamation.",
         sectors: ["transport"],
         points: [
@@ -505,6 +581,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_logistics_s15",
         text: "Ein Logistikpartner hält seit Monaten die vereinbarten Lieferzeiten nicht ein. Schreiben Sie eine formelle E-Mail.",
         sectors: ["transport"],
         points: [
@@ -523,32 +600,41 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_logistics_l01",
         text: "Verfasse eine Stellungnahme zu einem Lieferengpass. Beschreibe das Problem, nenne mögliche Ursachen und schlage Maßnahmen vor, um die Versorgung sicherzustellen.",
       },
       {
+        id: "wt_logistics_l02",
         text: "Verfasse eine Reklamation an einen Lieferanten: Die letzte Lieferung war unvollständig und teilweise beschädigt. Beschreibe die Mängel, fordere Ersatz und setze eine Frist.",
       },
       {
+        id: "wt_logistics_l03",
         text: "Schreibe einen kurzen Bericht über die Lagerbestände: Beschreibe, welche Artikel knapp werden, erkläre die Ursachen und empfiehl, was nachbestellt werden soll.",
       },
       {
+        id: "wt_logistics_l04",
         text: "Schreibe eine E-Mail an eine Spedition: Hole ein Angebot für regelmäßige Transporte ein. Beschreibe Strecke, Häufigkeit und Ware und frage nach Preisen und Konditionen.",
       },
       {
+        id: "wt_logistics_l05",
         text: "Verfasse eine Stellungnahme zur Einführung eines neuen Systems für die Lagerverwaltung. Nenne die Probleme mit dem alten Ablauf und begründe, welche Vorteile das neue System bringt.",
       },
       {
+        id: "wt_logistics_l06",
         text: "Verfasse einen Bericht über eine Tour: Beschreibe die Route, die Zahl der Stopps, wo es Wartezeiten gab und was die Planung morgen besser machen könnte.",
         sectors: ["transport"],
       },
       {
+        id: "wt_logistics_l07",
         text: "Verfasse einen kurzen Schichtbericht: Beschreibe die produzierte Menge, einen Maschinenstillstand mit Ursache und was die nächste Schicht wissen muss.",
         sectors: ["production"],
       },
       {
+        id: "wt_logistics_l08",
         text: "Schreibe eine E-Mail an einen Paketdienst: Eine wichtige Sendung an einen Kunden ist seit Tagen unterwegs. Nenne die Sendungsnummer, beschreibe die Dringlichkeit und bitte um Nachforschung.",
       },
       {
+        id: "wt_logistics_l09",
         text: "Sie haben eine Tour übernommen und sollen Ihrem Kollegen berichten. Schreiben Sie eine Übergabenotiz.",
         sectors: ["transport"],
         points: [
@@ -565,6 +651,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_logistics_l10",
         text: "Ihr Lager wurde umgestellt und die Kommissionierung dauert seitdem länger. Schreiben Sie einen Bericht an die Betriebsleitung.",
         sectors: ["transport", "production"],
         points: [
@@ -581,6 +668,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_logistics_l11",
         text: "Der Onlinehandel führt zu immer kürzeren Lieferversprechen. Verfassen Sie einen Diskussionsbeitrag.",
         points: [
           "Beschreiben Sie die Entwicklung kurz.",
@@ -602,54 +690,67 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "customer",
     short: [
       {
+        id: "wt_customer_s01",
         text: "Schreibe eine kurze Antwort an einen Kunden, der sich über eine fehlerhafte Bestellung beschwert hat.",
         sub: "customer.reklamation",
       },
       {
+        id: "wt_customer_s02",
         text: "Schreibe eine kurze Antwort an eine Kundin: Sie fragt nach dem Stand ihrer Anfrage. Entschuldige die Wartezeit und nenne einen Termin für die Antwort.",
         sub: "customer.beratung",
       },
       {
+        id: "wt_customer_s03",
         text: "Schreibe eine kurze E-Mail an einen Neukunden: Bedanke dich für die erste Bestellung und biete Hilfe bei Fragen an.",
         sub: "customer.service",
       },
       {
+        id: "wt_customer_s04",
         text: "Schreibe eine kurze Absage an einen Kunden: Ein gewünschter Sonderrabatt ist nicht möglich. Begründe höflich und biete eine Alternative an.",
         sub: "customer.beratung",
       },
       {
+        id: "wt_customer_s05",
         text: "Schreibe eine kurze Terminbestätigung für ein Beratungsgespräch mit einer Kundin. Nenne Datum, Uhrzeit und was sie mitbringen soll.",
         sub: "customer.beratung",
       },
       {
+        id: "wt_customer_s06",
         text: "Schreibe eine kurze Antwort an einen Kunden: Seine Reklamation ist angekommen. Bestätige den Eingang und nenne, bis wann er eine Lösung bekommt.",
         sub: "customer.reklamation",
       },
       {
+        id: "wt_customer_s07",
         text: "Schreibe eine kurze Nachricht an eine Kundin: Ihr repariertes Gerät ist abholbereit. Nenne die Öffnungszeiten und was sie mitbringen muss.",
         sub: "customer.service",
       },
       {
+        id: "wt_customer_s08",
         text: "Schreibe eine kurze Antwort an eine Nutzerin: Ihr gemeldeter Fehler ist behoben. Bitte sie, die neue Version zu testen.",
         sectors: ["it"],
       },
       {
+        id: "wt_customer_s09",
         text: "Schreibe eine kurze Nachricht an einen Empfänger: Du erreichst ihn nicht an der Lieferadresse. Frage, wo du das Paket abstellen darfst.",
         sectors: ["transport"],
       },
       {
+        id: "wt_customer_s10",
         text: "Schreibe eine kurze Antwort an einen Gast: Bedanke dich für die Reservierungsanfrage und bestätige den Tisch für acht Personen auf der Terrasse.",
         sectors: ["hospitality"],
       },
       {
+        id: "wt_customer_s11",
         text: "Schreibe eine kurze Erinnerung an eine Kundin: Ihr Termin ist morgen um 14 Uhr. Bitte um eine kurze Bestätigung.",
         sectors: ["beauty"],
       },
       {
+        id: "wt_customer_s12",
         text: "Schreibe eine kurze Antwort an ein Mitglied: Der Kurs am Montag fällt aus. Nenne den Grund und eine Alternative.",
         sectors: ["sports"],
       },
       {
+        id: "wt_customer_s13",
         text: "Eine Kundin hat nach dem Preis für eine Reparatur gefragt. Schreiben Sie eine kurze Antwort.",
         sub: "customer.beratung",
         points: [
@@ -665,6 +766,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_customer_s14",
         text: "Ein Kunde beschwert sich, dass eine zugesagte Leistung nicht erbracht wurde. Antworten Sie auf die Beschwerde.",
         sub: "customer.reklamation",
         points: [
@@ -681,6 +783,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_customer_s15",
         text: "Ein langjähriger Kunde fordert eine Erstattung, auf die er vertraglich keinen Anspruch hat. Antworten Sie.",
         sub: "customer.reklamation",
         points: [
@@ -699,81 +802,101 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_customer_l01",
         text: "Schreibe eine E-Mail an einen unzufriedenen Kunden. Entschuldige dich angemessen, erkläre, wie es zum Problem kam, und biete eine konkrete Lösung sowie eine Wiedergutmachung an.",
         sub: "customer.reklamation",
       },
       {
+        id: "wt_customer_l02",
         text: "Verfasse eine E-Mail an eine langjährige Kundin: Kündige eine Preiserhöhung an. Begründe sie nachvollziehbar, betone den Wert eurer Zusammenarbeit und biete ein Gespräch an.",
       },
       {
+        id: "wt_customer_l03",
         text: "Schreibe eine Antwort auf eine öffentliche negative Bewertung eures Unternehmens. Bleibe sachlich und freundlich, gehe auf die Kritikpunkte ein und biete eine Klärung im direkten Kontakt an.",
         sub: "customer.reklamation",
       },
       {
+        id: "wt_customer_l04",
         text: "Verfasse ein Angebot für einen Interessenten: Beschreibe die angefragte Leistung, nenne Preis und Lieferzeit und erkläre, warum euer Unternehmen die richtige Wahl ist.",
         sub: "customer.beratung",
       },
       {
+        id: "wt_customer_l05",
         text: "Schreibe eine E-Mail an einen Kunden, dessen Vertrag bald ausläuft. Erinnere an das Vertragsende, stelle die Verlängerungsoptionen vor und empfiehl die passende Option mit Begründung.",
         sub: "customer.beratung",
       },
       {
+        id: "wt_customer_l06",
         text: "Verfasse eine E-Mail an einen Kunden nach einer gelösten Reklamation: Fasse zusammen, was gemacht wurde, bedanke dich für die Geduld und biete für die Zukunft einen direkten Ansprechpartner an.",
         sub: "customer.service",
       },
       {
+        id: "wt_customer_l07",
         text: "Schreibe eine E-Mail an eine Kundin, die häufig bei euch bestellt: Stelle den neuen Abhol- und Lieferservice vor, erkläre, wie er funktioniert, und lade sie ein, ihn beim nächsten Auftrag zu testen.",
         sub: "customer.service",
       },
       {
+        id: "wt_customer_l08",
         text: "Verfasse eine E-Mail an einen Kunden: Erkläre in einfacher Sprache, warum die gewünschte Funktion erst im nächsten Release kommt, und biete eine Zwischenlösung an.",
         sectors: ["it"],
       },
       {
+        id: "wt_customer_l09",
         text: "Verfasse eine E-Mail an die Tochter eines Bewohners: Beschreibe einfühlsam, wie es ihrem Vater diese Woche geht, was gut läuft und wobei ihr euch mehr Unterstützung wünscht, und schlage ein Gespräch vor.",
         sectors: ["care"],
       },
       {
+        id: "wt_customer_l10",
         text: "Verfasse eine E-Mail an die Bauherrin: Erkläre, warum sich der Innenausbau um zwei Wochen verzögert, welche Gewerke betroffen sind und wie ihr die Zeit teilweise aufholen wollt.",
         sectors: ["construction"],
       },
       {
+        id: "wt_customer_l11",
         text: "Verfasse eine E-Mail an einen Stammkunden: Wegen einer Baustelle ändert sich euer Lieferfenster für vier Wochen. Erkläre die Änderung und biete zwei Alternativen an.",
         sectors: ["transport"],
       },
       {
+        id: "wt_customer_l12",
         text: "Verfasse eine Antwort auf die Beschwerde eines Gastes über einen verpatzten Abend: Entschuldige dich konkret, erkläre, was schiefging, und lade ihn mit einem Gutschein zu einem zweiten Besuch ein.",
         sectors: ["hospitality"],
       },
       {
+        id: "wt_customer_l13",
         text: "Verfasse ein kurzes Angebot für eine Badsanierung: Beschreibe die Arbeiten, nenne Preis und Dauer und erkläre, warum sich die Qualität lohnt.",
         sectors: ["trades"],
       },
       {
+        id: "wt_customer_l14",
         text: "Verfasse eine Antwort an eine Kundin, die sich über eine lange Wartezeit an der Kasse beschwert hat: Entschuldige dich, erkläre die Ursache und beschreibe, was ihr ändert.",
         sectors: ["retail"],
       },
       {
+        id: "wt_customer_l15",
         text: "Verfasse eine E-Mail an eine Stammkundin: Stelle die neue Behandlung vor, erkläre, für wen sie geeignet ist, und biete ihr einen Kennenlernpreis an.",
         sectors: ["beauty"],
       },
       {
+        id: "wt_customer_l16",
         text: "Verfasse eine E-Mail an ein Mitglied, das kündigen möchte: Zeige Verständnis, frage nach den Gründen und mache ein passendes Angebot, zum Beispiel eine Pause der Mitgliedschaft.",
         sectors: ["sports"],
       },
       {
+        id: "wt_customer_l17",
         text: "Verfasse eine Antwort an einen Kunden, der die Reinigung reklamiert hat: Entschuldige dich, erkläre, was passiert ist, und beschreibe, wie ihr die Qualität ab sofort sichert.",
         sectors: ["cleaning"],
       },
       {
+        id: "wt_customer_l18",
         text: "Schreibe eine E-Mail an eine Klinik: Erkläre die verspätete Lieferung eines Medizinprodukts, nenne den neuen Termin und beschreibe, wie ihr Engpässe künftig vermeidet.",
         sectors: ["pharma"],
       },
       {
+        id: "wt_customer_l19",
         text: "Schreibe eine E-Mail an einen Auftraggeber: Empfiehl nach mehreren Vorfällen eine zusätzliche Kontrollrunde am Wochenende. Begründe mit Beispielen und nenne die Kosten.",
         sectors: ["security"],
       },
       {
+        id: "wt_customer_l20",
         text: "Ein Kunde möchte wissen, welches Angebot für ihn passt. Schreiben Sie eine beratende E-Mail.",
         sub: "customer.beratung",
         points: [
@@ -790,6 +913,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_customer_l21",
         text: "Ihr Betrieb hat viele Beschwerden über lange Wartezeiten am Telefon erhalten. Schreiben Sie einen Bericht.",
         sub: "customer.service",
         points: [
@@ -806,6 +930,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_customer_l22",
         text: "Immer mehr Betriebe lassen den Erstkontakt mit Kundschaft von Chatbots übernehmen. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "customer.service",
         points: [
@@ -828,30 +953,39 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "conflict",
     short: [
       {
+        id: "wt_conflict_s01",
         text: "Schreibe eine kurze, diplomatische Nachricht an einen Kollegen, mit dem es eine Meinungsverschiedenheit gab.",
       },
       {
+        id: "wt_conflict_s02",
         text: "Schreibe eine kurze Entschuldigung an eine Kollegin: Du warst im Gespräch gestern zu direkt. Erkläre kurz, wie du es gemeint hast.",
       },
       {
+        id: "wt_conflict_s03",
         text: "Schreibe eine kurze Nachricht an deinen Chef: Bitte um ein Gespräch über ein Problem im Team, ohne Namen zu nennen.",
       },
       {
+        id: "wt_conflict_s04",
         text: "Schreibe eine kurze, sachliche Antwort auf eine verärgerte E-Mail eines Kollegen. Zeige Verständnis und schlage ein kurzes Gespräch vor.",
       },
       {
+        id: "wt_conflict_s05",
         text: "Schreibe eine kurze Nachricht an zwei Kollegen, die sich gestritten haben: Lade beide zu einem klärenden Gespräch ein und bleibe neutral.",
       },
       {
+        id: "wt_conflict_s06",
         text: "Schreibe eine kurze Nachricht an eine Kollegin: Ihr habt euch bei der Aufgabenverteilung missverstanden. Kläre kurz, wer was übernimmt.",
       },
       {
+        id: "wt_conflict_s07",
         text: "Schreibe eine kurze, ruhige Antwort an einen Kunden, der am Telefon laut geworden ist: Fasse sein Anliegen zusammen und nenne den nächsten Schritt.",
       },
       {
+        id: "wt_conflict_s08",
         text: "Schreibe eine kurze Nachricht an deinen Teamleiter: Du fühlst dich bei einer Entscheidung übergangen. Bitte sachlich um ein kurzes Gespräch.",
       },
       {
+        id: "wt_conflict_s09",
         text: "Sie haben sich mit einem Kollegen über die Pausenzeiten gestritten. Schreiben Sie ihm eine kurze Nachricht.",
         points: [
           "Entschuldigen Sie sich für Ihren Ton.",
@@ -866,6 +1000,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_conflict_s10",
         text: "Eine Kollegin übergeht Sie regelmäßig bei Absprachen, die Ihre Arbeit betreffen. Schreiben Sie an Ihre Teamleitung.",
         points: [
           "Schildern Sie die Situation sachlich.",
@@ -881,6 +1016,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_conflict_s11",
         text: "Zwischen zwei Abteilungen gibt es seit Monaten Spannungen, die Ihre Arbeit blockieren. Schreiben Sie an die Bereichsleitung.",
         points: [
           "Stellen Sie den Konflikt neutral dar, ohne Schuldzuweisung.",
@@ -898,31 +1034,40 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_conflict_l01",
         text: "Verfasse eine Stellungnahme zu einem Konflikt im Team. Schildere die Situation sachlich, zeige Verständnis für beide Seiten und schlage einen Kompromiss vor.",
       },
       {
+        id: "wt_conflict_l02",
         text: "Schreibe eine E-Mail an deine Vorgesetzte: Die Aufgabenverteilung im Team empfindest du als ungerecht. Beschreibe die Situation sachlich mit Beispielen und schlage eine fairere Lösung vor.",
       },
       {
+        id: "wt_conflict_l03",
         text: "Verfasse eine vermittelnde E-Mail an zwei Abteilungen, die sich gegenseitig die Schuld für einen Fehler geben. Fasse die Sicht beider Seiten zusammen und schlage ein gemeinsames Vorgehen vor.",
       },
       {
+        id: "wt_conflict_l04",
         text: "Schreibe eine Antwort auf eine unberechtigte Kritik an deiner Arbeit. Weise die Vorwürfe höflich, aber bestimmt zurück, belege deine Sicht mit Fakten und schlage vor, wie ihr künftig Missverständnisse vermeidet.",
       },
       {
+        id: "wt_conflict_l05",
         text: "Verfasse eine Stellungnahme zu einem Streit über die Urlaubsplanung im Team. Beschreibe das Problem, zeige Verständnis für beide Seiten und schlage eine klare Regel für die Zukunft vor.",
       },
       {
+        id: "wt_conflict_l06",
         text: "Schreibe eine sachliche E-Mail an die Disposition: Deine Touren sind regelmäßig zu eng getaktet. Beschreibe zwei konkrete Tage, erkläre die Folgen und schlage realistische Zeitfenster vor.",
         sectors: ["transport"],
       },
       {
+        id: "wt_conflict_l07",
         text: "Verfasse eine E-Mail an eine Kollegin nach einem Streit in der Besprechung: Entschuldige dich für den Ton, erkläre deine Sicht in der Sache und schlage vor, wie ihr das Thema gemeinsam löst.",
       },
       {
+        id: "wt_conflict_l08",
         text: "Schreibe eine Stellungnahme an die Teamleitung zu wiederholten Konflikten über Zuständigkeiten: Beschreibe zwei konkrete Situationen, benenne die Ursache und schlage klare Regeln vor.",
       },
       {
+        id: "wt_conflict_l09",
         text: "Im Team gibt es Streit darüber, wer die Küche aufräumt. Schreiben Sie eine E-Mail an alle Kolleginnen und Kollegen.",
         points: [
           "Beschreiben Sie das Problem freundlich.",
@@ -938,6 +1083,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_conflict_l10",
         text: "In einem Forum wird gefragt, wie man Konflikte am Arbeitsplatz ansprechen sollte. Schreiben Sie einen Beitrag.",
         points: [
           "Äußern Sie Ihre Meinung dazu, ob man Konflikte direkt ansprechen sollte.",
@@ -953,6 +1099,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_conflict_l11",
         text: "Viele Betriebe setzen bei Konflikten auf externe Mediation statt auf Führungskräfte. Verfassen Sie einen Diskussionsbeitrag.",
         points: [
           "Beschreiben Sie beide Vorgehensweisen.",
@@ -974,33 +1121,42 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "project",
     short: [
       {
+        id: "wt_project_s01",
         text: "Schreibe eine kurze Statusmeldung zu deinem aktuellen Projekt für die Projektleitung.",
       },
       {
+        id: "wt_project_s02",
         text: "Schreibe eine kurze Nachricht an dein Projektteam: Ein Meilenstein ist geschafft. Bedanke dich und nenne den nächsten Schritt.",
       },
       {
+        id: "wt_project_s03",
         text: "Schreibe eine kurze Warnung an die Projektleitung: Eine Aufgabe verzögert sich. Nenne den Grund und die Auswirkung auf den Zeitplan.",
       },
       {
+        id: "wt_project_s04",
         text: "Schreibe eine kurze Bitte an eine Kollegin aus einer anderen Abteilung: Du brauchst ihre Zuarbeit für dein Projekt bis Ende der Woche.",
       },
       {
+        id: "wt_project_s05",
         text: "Schreibe eine kurze Zusammenfassung für das Projektboard: Was wurde diese Woche erledigt, was steht als Nächstes an?",
       },
       {
+        id: "wt_project_s06",
         text: "Schreibe eine kurze Nachricht an den Product Owner: Ein Ticket dauert länger als geschätzt. Nenne den Grund und die neue Schätzung.",
         sectors: ["it"],
       },
       {
+        id: "wt_project_s07",
         text: "Schreibe eine kurze Meldung an deinen Meister: Beim Kunden fehlt Material. Nenne, was du brauchst, um weiterzuarbeiten.",
         sectors: ["trades"],
       },
       {
+        id: "wt_project_s08",
         text: "Schreibe eine kurze Statusmeldung an die Projektleitung: Die Berechnung ist fertig, die Prüfung läuft. Nenne den nächsten Meilenstein.",
         sectors: ["engineering"],
       },
       {
+        id: "wt_project_s09",
         text: "Sie sollen einen kurzen Zwischenstand zu Ihrer Aufgabe geben. Schreiben Sie eine kurze Nachricht.",
         points: [
           "Sagen Sie, was fertig ist.",
@@ -1015,6 +1171,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_project_s10",
         text: "In Ihrem Projekt fehlt seit zwei Wochen eine Zuarbeit aus einer anderen Abteilung. Schreiben Sie eine E-Mail.",
         points: [
           "Erinnern Sie freundlich an die Zusage.",
@@ -1030,6 +1187,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_project_s11",
         text: "Ein Projekt soll trotz erkennbarer Risiken vorzeitig gestartet werden. Schreiben Sie an die Projektleitung.",
         points: [
           "Anerkennen Sie den Zeitdruck.",
@@ -1047,33 +1205,42 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_project_l01",
         text: "Schreibe einen Projektbericht. Beschreibe den aktuellen Stand, nenne Risiken und Verzögerungen und empfiehl, wie das Projekt wieder in den Zeitplan kommt.",
       },
       {
+        id: "wt_project_l02",
         text: "Verfasse einen Abschlussbericht zu einem kleinen Projekt. Fasse Ziel und Ergebnis zusammen, bewerte, was gut und was schlecht lief, und ziehe Lehren für das nächste Projekt.",
       },
       {
+        id: "wt_project_l03",
         text: "Schreibe eine E-Mail an einen Auftraggeber: Das Projekt braucht mehr Budget. Erkläre die Gründe, beziffere den Mehrbedarf und beschreibe, was ohne die Erhöhung passiert.",
       },
       {
+        id: "wt_project_l04",
         text: "Verfasse einen Projektvorschlag für deine Führungskraft: Beschreibe die Idee, den Nutzen für das Unternehmen, den groben Zeitplan und welche Unterstützung du brauchst.",
       },
       {
+        id: "wt_project_l05",
         text: "Schreibe eine E-Mail an dein Projektteam zum Projektstart: Stelle das Ziel vor, erkläre die Rollen und Verantwortlichkeiten und nenne die ersten Aufgaben mit Fristen.",
       },
       {
+        id: "wt_project_l06",
         text: "Verfasse einen kurzen Bautagebuch-Eintrag: Beschreibe die heutigen Arbeiten, das Wetter, die Zahl der Arbeiter und besondere Vorkommnisse auf der Baustelle.",
         sectors: ["construction"],
       },
       {
+        id: "wt_project_l07",
         text: "Schreibe einen kurzen Vorschlag an die Filialleitung: Die Umkleiden sollen umgebaut werden. Beschreibe das Problem, die Idee und den Nutzen für den Verkauf.",
         sectors: ["retail"],
       },
       {
+        id: "wt_project_l08",
         text: "Verfasse einen kurzen Bericht für die Qualitätssicherung: Beschreibe eine Abweichung im Prozess, die Sofortmaßnahme und deinen Vorschlag zur dauerhaften Korrektur.",
         sectors: ["pharma"],
       },
       {
+        id: "wt_project_l09",
         text: "Ihr Projekt ist abgeschlossen. Schreiben Sie eine E-Mail an das Team.",
         points: [
           "Bedanken Sie sich für die Zusammenarbeit.",
@@ -1089,6 +1256,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_project_l10",
         text: "Verfassen Sie einen Projektbericht für die Geschäftsleitung.",
         points: [
           "Fassen Sie Ziel und Ergebnis des Projekts zusammen.",
@@ -1104,6 +1272,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_project_l11",
         text: "Viele Projekte scheitern nicht an der Technik, sondern an der Kommunikation. Verfassen Sie einen Diskussionsbeitrag.",
         points: [
           "Beschreiben Sie die These kurz.",
@@ -1125,33 +1294,42 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "technology",
     short: [
       {
+        id: "wt_technology_s01",
         text: "Schreibe eine kurze E-Mail an den IT-Support: Beschreibe ein technisches Problem an deinem Arbeitsplatz.",
       },
       {
+        id: "wt_technology_s02",
         text: "Schreibe eine kurze Antwort an den IT-Support: Das Problem besteht weiter. Beschreibe, was du schon versucht hast.",
       },
       {
+        id: "wt_technology_s03",
         text: "Schreibe eine kurze Nachricht an dein Team: Morgen wird eine neue Software installiert. Erkläre, was das für die Arbeit bedeutet.",
       },
       {
+        id: "wt_technology_s04",
         text: "Schreibe eine kurze Bitte an die IT: Du brauchst Zugriff auf einen gemeinsamen Ordner. Begründe kurz, wofür.",
       },
       {
+        id: "wt_technology_s05",
         text: "Schreibe eine kurze Störungsmeldung: Der Drucker im zweiten Stock funktioniert nicht. Beschreibe das Problem und seit wann es besteht.",
       },
       {
+        id: "wt_technology_s06",
         text: "Schreibe eine kurze Statusmeldung an dein Team: Das Update ist eingespielt. Nenne die wichtigste Änderung und wo man Probleme melden kann.",
         sectors: ["it"],
       },
       {
+        id: "wt_technology_s07",
         text: "Schreibe eine kurze Nachricht an das Konstruktionsteam: In der Zeichnung fehlt ein Maß. Nenne die Stelle und bitte um eine korrigierte Version.",
         sectors: ["engineering"],
       },
       {
+        id: "wt_technology_s08",
         text: "Schreibe eine kurze Meldung an die Qualitätssicherung: Ein Prüfgerät zeigt unplausible Werte. Nenne Gerät und Charge und bitte um Prüfung.",
         sectors: ["pharma"],
       },
       {
+        id: "wt_technology_s09",
         text: "Ihr Computer im Büro startet seit Tagen sehr langsam. Schreiben Sie eine kurze Meldung an die IT.",
         points: [
           "Beschreiben Sie das Problem.",
@@ -1166,6 +1344,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_technology_s10",
         text: "Eine neue Software soll eingeführt werden, ohne dass Ihr Team geschult wurde. Schreiben Sie an die Projektleitung.",
         sectors: ["it"],
         points: [
@@ -1182,6 +1361,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_technology_s11",
         text: "In Ihrem Betrieb sollen Arbeitsschritte künftig automatisch ausgewertet werden. Schreiben Sie an die Geschäftsleitung.",
         points: [
           "Anerkennen Sie den Nutzen der Auswertung.",
@@ -1199,33 +1379,42 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_technology_l01",
         text: "Verfasse eine Stellungnahme zur Einführung einer neuen Software im Unternehmen. Nenne Vor- und Nachteile und gib eine begründete Empfehlung.",
       },
       {
+        id: "wt_technology_l02",
         text: "Verfasse eine Anleitung in einfachen Schritten für dein Team: Erkläre, wie man sich im neuen System anmeldet, wo die wichtigsten Funktionen liegen und an wen man sich bei Problemen wendet.",
       },
       {
+        id: "wt_technology_l03",
         text: "Schreibe eine E-Mail an deine Führungskraft: Beantrage neue Hardware für dein Team. Beschreibe die Probleme mit den alten Geräten, den Nutzen der Anschaffung und die ungefähren Kosten.",
       },
       {
+        id: "wt_technology_l04",
         text: "Verfasse eine Stellungnahme zum Thema Homeoffice und Technik: Beschreibe, welche technischen Voraussetzungen fehlen, welche Risiken das hat und was das Unternehmen verbessern sollte.",
       },
       {
+        id: "wt_technology_l05",
         text: "Schreibe einen kurzen Bericht über eine IT-Störung: Beschreibe, was ausgefallen ist, wie lange die Störung dauerte, welche Folgen sie hatte und wie sich so ein Ausfall vermeiden lässt.",
       },
       {
+        id: "wt_technology_l06",
         text: "Verfasse eine Incident-Zusammenfassung für dein Team: Beschreibe, welcher Dienst ausgefallen ist, was die Ursache war, wie ihr sie behoben habt und was ihr gegen eine Wiederholung tut.",
         sectors: ["it"],
       },
       {
+        id: "wt_technology_l07",
         text: "Verfasse eine Stellungnahme zu einem Konstruktionsproblem: Beschreibe den Fehler, seine möglichen Folgen und schlage zwei Lösungen mit Vor- und Nachteilen vor.",
         sectors: ["engineering"],
       },
       {
+        id: "wt_technology_l08",
         text: "Schreibe einen kurzen Bericht an die Produktionsleitung: Eine Charge weicht von der Spezifikation ab. Beschreibe die Messwerte, die mögliche Ursache und dein weiteres Vorgehen.",
         sectors: ["chemicals"],
       },
       {
+        id: "wt_technology_l09",
         text: "Ein Kollege möchte wissen, wie er das neue Programm benutzt. Schreiben Sie ihm eine E-Mail.",
         points: [
           "Erklären Sie, wie er sich anmeldet.",
@@ -1241,6 +1430,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_technology_l10",
         text: "In einem Forum wird diskutiert, ob künstliche Intelligenz Arbeitsplätze bedroht. Schreiben Sie einen Beitrag.",
         points: [
           "Äußern Sie Ihre Meinung.",
@@ -1256,6 +1446,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_technology_l11",
         text: "Der Einsatz digitaler Werkzeuge steigert die Produktivität, erhöht aber auch die Belastung. Verfassen Sie einen Diskussionsbeitrag.",
         sectors: ["it", "engineering"],
         points: [
@@ -1278,30 +1469,39 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "sustainability",
     short: [
       {
+        id: "wt_sustainability_s01",
         text: "Schreibe einen kurzen Vorschlag, wie dein Team im Büro nachhaltiger arbeiten könnte.",
       },
       {
+        id: "wt_sustainability_s02",
         text: "Schreibe eine kurze Nachricht an dein Team: Ab nächster Woche wird der Müll im Büro getrennt. Erkläre kurz die neuen Regeln.",
       },
       {
+        id: "wt_sustainability_s03",
         text: "Schreibe eine kurze E-Mail an die Verwaltung: Schlage vor, auf Ökostrom umzustellen, und begründe kurz.",
       },
       {
+        id: "wt_sustainability_s04",
         text: "Schreibe eine kurze Einladung zu einer Aktion: Dein Team räumt am Freitag den Park neben dem Büro auf. Nenne Zeit und Treffpunkt.",
       },
       {
+        id: "wt_sustainability_s05",
         text: "Schreibe eine kurze Notiz für das schwarze Brett: Erinnere daran, Licht und Geräte am Feierabend auszuschalten, und nenne einen Grund.",
       },
       {
+        id: "wt_sustainability_s06",
         text: "Schreibe eine kurze Nachricht an dein Team: Schlage vor, für kurze Wege das Fahrrad statt des Firmenwagens zu nutzen, und nenne einen Vorteil.",
       },
       {
+        id: "wt_sustainability_s07",
         text: "Schreibe eine kurze E-Mail an die Kantine: Frage nach einem festen vegetarischen Tag und begründe kurz.",
       },
       {
+        id: "wt_sustainability_s08",
         text: "Schreibe eine kurze Notiz an die Verwaltung: Schlage vor, Restpapier als Notizzettel zu nutzen, und erkläre, wie das organisiert wird.",
       },
       {
+        id: "wt_sustainability_s09",
         text: "In Ihrem Betrieb wird viel Papier verbraucht. Schreiben Sie eine kurze Nachricht an Ihr Team.",
         points: [
           "Beschreiben Sie das Problem.",
@@ -1316,6 +1516,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_sustainability_s10",
         text: "Sie möchten anregen, dass Ihr Betrieb auf Mehrwegverpackungen umstellt. Schreiben Sie an die Betriebsleitung.",
         points: [
           "Beschreiben Sie die derzeitige Verpackungspraxis.",
@@ -1331,6 +1532,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_sustainability_s11",
         text: "Ihr Betrieb wirbt mit Nachhaltigkeit, ändert im Alltag aber wenig. Schreiben Sie an die Geschäftsleitung.",
         points: [
           "Anerkennen Sie die bisherigen Schritte.",
@@ -1348,32 +1550,41 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_sustainability_l01",
         text: "Schreibe eine Stellungnahme zum Thema Nachhaltigkeit am Arbeitsplatz. Begründe, warum das Thema wichtig ist, und schlage drei konkrete Maßnahmen mit erwartetem Nutzen vor.",
       },
       {
+        id: "wt_sustainability_l02",
         text: "Verfasse eine E-Mail an die Geschäftsführung: Schlage vor, Dienstreisen durch Videokonferenzen zu ersetzen. Erkläre die Vorteile für Umwelt und Kosten und nenne, wann Reisen weiter nötig sind.",
       },
       {
+        id: "wt_sustainability_l03",
         text: "Schreibe einen kurzen Bericht über die Umweltmaßnahmen in deiner Abteilung: Was wurde umgesetzt, was hat es gebracht und wo gibt es noch Verbesserungsbedarf?",
       },
       {
+        id: "wt_sustainability_l04",
         text: "Verfasse eine Stellungnahme zur Frage, ob euer Betrieb auf Papier verzichten kann. Beschreibe den aktuellen Verbrauch, nenne digitale Alternativen und mögliche Schwierigkeiten bei der Umstellung.",
       },
       {
+        id: "wt_sustainability_l05",
         text: "Schreibe eine E-Mail an alle Mitarbeitenden: Stelle ein neues Jobrad- oder Jobticket-Angebot vor, erkläre die Bedingungen und begründe, warum sich die Teilnahme lohnt.",
       },
       {
+        id: "wt_sustainability_l06",
         text: "Schreibe einen Vorschlag an die Werksleitung: Beschreibe, wo in der Produktion Energie verschwendet wird, und schlage zwei Maßnahmen mit geschätzter Einsparung vor.",
         sectors: ["production"],
       },
       {
+        id: "wt_sustainability_l07",
         text: "Schreibe eine Mitteilung an dein Team: Der Salon stellt auf nachfüllbare Produkte um. Erkläre die Gründe und was sich im Arbeitsalltag ändert.",
         sectors: ["beauty"],
       },
       {
+        id: "wt_sustainability_l08",
         text: "Verfasse eine Stellungnahme zur Anschaffung von Mehrweggeschirr für die Firmenküche: Vergleiche die Kosten mit dem Einwegverbrauch, nenne die Umweltwirkung und gib eine Empfehlung.",
       },
       {
+        id: "wt_sustainability_l09",
         text: "Ihre Firma möchte, dass mehr Beschäftigte mit dem Rad zur Arbeit kommen. Schreiben Sie eine E-Mail an Ihre Kolleginnen und Kollegen.",
         points: [
           "Erklären Sie die Idee.",
@@ -1389,6 +1600,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_sustainability_l10",
         text: "In einem Forum wird diskutiert, ob Betriebe zu mehr Klimaschutz verpflichtet werden sollten. Schreiben Sie einen Beitrag.",
         points: [
           "Äußern Sie Ihre Meinung zu einer gesetzlichen Pflicht.",
@@ -1404,6 +1616,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_sustainability_l11",
         text: "Nachhaltigkeit im Betrieb scheitert oft weniger am Willen als an den Kosten. Verfassen Sie einen Diskussionsbeitrag.",
         points: [
           "Beschreiben Sie den Zielkonflikt.",
@@ -1425,45 +1638,57 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "safety",
     short: [
       {
+        id: "wt_safety_s01",
         text: "Schreibe eine kurze Notiz an die Kolleg:innen zu einer neuen Sicherheitsregel im Betrieb.",
       },
       {
+        id: "wt_safety_s02",
         text: "Schreibe eine kurze Meldung an deinen Vorgesetzten: Du hast einen Beinahe-Unfall im Lager beobachtet. Beschreibe kurz, was passiert ist.",
       },
       {
+        id: "wt_safety_s03",
         text: "Schreibe eine kurze Erinnerung an dein Team: Am Donnerstag ist die jährliche Sicherheitsunterweisung. Nenne Zeit und Ort und dass die Teilnahme Pflicht ist.",
       },
       {
+        id: "wt_safety_s04",
         text: "Schreibe eine kurze Nachricht an die Haustechnik: Ein Feuerlöscher im Flur fehlt. Bitte um schnellen Ersatz.",
       },
       {
+        id: "wt_safety_s05",
         text: "Schreibe eine kurze Notiz an die Kolleg:innen: Ab sofort gilt im Bereich der Maschinen Helmpflicht. Begründe kurz.",
       },
       {
+        id: "wt_safety_s06",
         text: "Schreibe eine kurze Meldung an die Hygienebeauftragte: Das Desinfektionsmittel auf Station 3 ist fast leer. Bitte um Nachschub.",
         sectors: ["care"],
       },
       {
+        id: "wt_safety_s07",
         text: "Schreibe eine kurze Notiz an die Kolonne: Ab morgen gilt auf der Baustelle eine neue Anfahrt für Lieferungen. Beschreibe sie kurz.",
         sectors: ["construction"],
       },
       {
+        id: "wt_safety_s08",
         text: "Schreibe eine kurze Nachricht an den Fuhrparkleiter: Am LKW leuchtet die Bremswarnleuchte. Frage, ob du die Tour fortsetzen sollst.",
         sectors: ["transport"],
       },
       {
+        id: "wt_safety_s09",
         text: "Schreibe eine kurze Meldung an den Schichtleiter: An der Anlage 2 ist die Schutzabdeckung locker. Bitte um Reparatur vor der Nachtschicht.",
         sectors: ["production"],
       },
       {
+        id: "wt_safety_s10",
         text: "Schreibe eine kurze Meldung an die Sicherheitsfachkraft: Ein Gebinde im Lager ist undicht. Beschreibe, wo es steht und was du gesichert hast.",
         sectors: ["chemicals"],
       },
       {
+        id: "wt_safety_s11",
         text: "Schreibe eine kurze Meldung an die Leitstelle: Am Nebeneingang ist ein Türschloss defekt. Beschreibe das Risiko und bitte um Reparatur.",
         sectors: ["security"],
       },
       {
+        id: "wt_safety_s12",
         text: "Im Lager liegt seit Tagen Material im Fluchtweg. Schreiben Sie eine kurze Meldung.",
         points: [
           "Sagen Sie, wo das Problem ist.",
@@ -1478,6 +1703,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_safety_s13",
         text: "Eine Schutzeinrichtung an einer Maschine ist defekt und wird trotzdem weiter genutzt. Schreiben Sie eine Meldung.",
         sectors: ["production", "engineering"],
         points: [
@@ -1494,6 +1720,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_safety_s14",
         text: "Nach einem Beinaheunfall wurde keine Meldung erfasst. Schreiben Sie an die Werksleitung.",
         sectors: ["production", "construction"],
         points: [
@@ -1512,49 +1739,62 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_safety_l01",
         text: "Verfasse eine Stellungnahme zu einem Sicherheitsvorfall. Beschreibe, was passiert ist, welche Maßnahmen nötig sind und wie sich ein solcher Vorfall künftig vermeiden lässt.",
       },
       {
+        id: "wt_safety_l02",
         text: "Verfasse einen Unfallbericht: Beschreibe, wann und wo sich der Unfall ereignet hat, wer beteiligt war, welche Verletzungen oder Schäden entstanden sind und welche ersten Maßnahmen ergriffen wurden.",
       },
       {
+        id: "wt_safety_l03",
         text: "Schreibe eine E-Mail an die Sicherheitsbeauftragte: Melde einen Mangel an der Schutzausrüstung in deinem Bereich, beschreibe das Risiko und bitte um Abhilfe mit Frist.",
       },
       {
+        id: "wt_safety_l04",
         text: "Verfasse eine Stellungnahme zu einem geplanten Sicherheitstraining: Begründe, warum das Training nötig ist, welche Themen es abdecken soll und wie oft es stattfinden sollte.",
       },
       {
+        id: "wt_safety_l05",
         text: "Schreibe eine Mitteilung an alle Mitarbeitenden über einen neuen Fluchtwegeplan: Erkläre, was sich geändert hat, wo die Sammelpunkte sind und was bei einem Alarm zu tun ist.",
       },
       {
+        id: "wt_safety_l06",
         text: "Verfasse einen kurzen Bericht über einen Sturz: Beschreibe, wann und wo der Bewohner gestürzt ist, wie ihr reagiert habt und welche Maßnahmen künftig helfen.",
         sectors: ["care"],
       },
       {
+        id: "wt_safety_l07",
         text: "Schreibe eine E-Mail an den Bauleiter: Auf dem Gerüst fehlen Absturzsicherungen. Beschreibe die Stelle, das Risiko und fordere die Nachrüstung, bevor weitergearbeitet wird.",
         sectors: ["construction"],
       },
       {
+        id: "wt_safety_l08",
         text: "Schreibe eine Unterweisung für einen neuen Azubi: Erkläre die drei wichtigsten Sicherheitsregeln in der Werkstatt und warum sie gelten.",
         sectors: ["trades"],
       },
       {
+        id: "wt_safety_l09",
         text: "Schreibe eine Mitteilung an alle Mitglieder: Erkläre die neuen Regeln im Kraftraum (Einweisung, Ablegen der Gewichte, Reinigung der Geräte) und begründe sie kurz.",
         sectors: ["sports"],
       },
       {
+        id: "wt_safety_l10",
         text: "Schreibe eine kurze Unterweisung für dein Team: Erkläre den sicheren Umgang mit Reinigungschemie und warum Produkte nie gemischt werden dürfen.",
         sectors: ["cleaning"],
       },
       {
+        id: "wt_safety_l11",
         text: "Verfasse einen kurzen Bericht über einen Vorfall im Objekt: Beschreibe, was du beobachtet hast, wie du reagiert hast und wen du informiert hast.",
         sectors: ["security"],
       },
       {
+        id: "wt_safety_l12",
         text: "Verfasse eine kurze Unterweisung für neue Mitarbeitende: Erkläre den Umgang mit Gefahrstoffen (Kennzeichnung, Schutzausrüstung, Verhalten bei einem Unfall).",
         sectors: ["chemicals"],
       },
       {
+        id: "wt_safety_l13",
         text: "Ein neuer Kollege beginnt nächste Woche. Schreiben Sie ihm eine E-Mail zu den Sicherheitsregeln.",
         points: [
           "Begrüßen Sie ihn.",
@@ -1570,6 +1810,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_safety_l14",
         text: "Nach einem Arbeitsunfall sollen Sie einen Bericht schreiben.",
         points: [
           "Beschreiben Sie den Hergang mit Zeit und Ort.",
@@ -1585,6 +1826,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_safety_l15",
         text: "Sicherheitsvorschriften werden im Betriebsalltag oft aus Zeitdruck umgangen. Verfassen Sie einen Diskussionsbeitrag.",
         points: [
           "Beschreiben Sie das Spannungsfeld zwischen Termindruck und Sicherheit.",
@@ -1606,30 +1848,39 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "travel",
     short: [
       {
+        id: "wt_travel_s01",
         text: "Schreibe eine kurze E-Mail, um eine Dienstreise zu organisieren (Termin, Ziel, Zweck).",
       },
       {
+        id: "wt_travel_s02",
         text: "Schreibe eine kurze E-Mail an ein Hotel: Reserviere ein Einzelzimmer für zwei Nächte und frage nach dem Frühstück.",
       },
       {
+        id: "wt_travel_s03",
         text: "Schreibe eine kurze Nachricht an deine Chefin: Dein Zug fällt aus, du erreichst den Termin später. Nenne deine neue Ankunftszeit.",
       },
       {
+        id: "wt_travel_s04",
         text: "Schreibe eine kurze Bitte an das Sekretariat: Buche dir einen Flug für eine Dienstreise. Nenne Ziel, Datum und gewünschte Zeit.",
       },
       {
+        id: "wt_travel_s05",
         text: "Schreibe eine kurze Abwesenheitsnotiz für deine E-Mails: Nenne den Zeitraum deiner Dienstreise und wer dich vertritt.",
       },
       {
+        id: "wt_travel_s06",
         text: "Schreibe eine kurze E-Mail an das Hotel: Du reist einen Tag später an. Bitte darum, die Reservierung anzupassen.",
       },
       {
+        id: "wt_travel_s07",
         text: "Schreibe eine kurze Nachricht an deinen Kollegen vor der gemeinsamen Dienstreise: Schlage einen Treffpunkt am Bahnhof vor und nenne die Abfahrtszeit.",
       },
       {
+        id: "wt_travel_s08",
         text: "Schreibe eine kurze Anfrage an den Empfang des Kunden: Melde deinen Besuch für Dienstag an und frage nach einem Besucherparkplatz.",
       },
       {
+        id: "wt_travel_s09",
         text: "Sie brauchen für eine Dienstreise ein Hotelzimmer. Schreiben Sie eine kurze E-Mail an das Hotel.",
         points: [
           "Nennen Sie die Daten Ihrer Reise.",
@@ -1644,6 +1895,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_travel_s10",
         text: "Ihre Dienstreise muss kurzfristig abgesagt werden. Schreiben Sie an den Geschäftspartner.",
         points: [
           "Sagen Sie den Termin ab und entschuldigen Sie sich.",
@@ -1659,6 +1911,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_travel_s11",
         text: "Die Reisekostenabrechnung Ihres Betriebs deckt tatsächliche Kosten seit Jahren nicht mehr. Schreiben Sie an die Personalabteilung.",
         points: [
           "Anerkennen Sie den bestehenden Rahmen.",
@@ -1676,30 +1929,39 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_travel_l01",
         text: "Schreibe einen Bericht über eine Dienstreise. Fasse die wichtigsten Ergebnisse zusammen, bewerte den Nutzen der Reise und gib eine Empfehlung für künftige Reisen.",
       },
       {
+        id: "wt_travel_l02",
         text: "Verfasse eine E-Mail an die Buchhaltung zu deiner Reisekostenabrechnung: Liste die wichtigsten Ausgaben der Reise auf, erkläre eine ungewöhnliche Position und bitte um Erstattung.",
       },
       {
+        id: "wt_travel_l03",
         text: "Schreibe eine E-Mail an einen Geschäftspartner im Ausland: Kündige deinen Besuch an, schlage ein Programm für die zwei Tage vor und frage nach einem Termin für ein gemeinsames Abendessen.",
       },
       {
+        id: "wt_travel_l04",
         text: "Verfasse eine Stellungnahme zur Reiserichtlinie deines Unternehmens: Beschreibe, was aus deiner Sicht unpraktisch ist, und schlage konkrete Verbesserungen vor, zum Beispiel bei Buchung oder Abrechnung.",
       },
       {
+        id: "wt_travel_l05",
         text: "Schreibe eine Beschwerde an eine Fluggesellschaft: Dein Flug hatte große Verspätung und dein Gepäck kam beschädigt an. Beschreibe den Ablauf, nenne die Folgen und fordere eine Entschädigung.",
       },
       {
+        id: "wt_travel_l06",
         text: "Verfasse eine E-Mail an die Assistenz: Plane deine zweitägige Dienstreise nach München. Nenne Termine, gewünschte Zugzeiten und Hotelwünsche und bitte um die Buchung.",
       },
       {
+        id: "wt_travel_l07",
         text: "Schreibe eine E-Mail an den Veranstalter einer Messe: Melde dein Unternehmen als Besucher an und frage nach Tagestickets, Workshops und Hotelempfehlungen in der Nähe.",
       },
       {
+        id: "wt_travel_l08",
         text: "Verfasse einen kurzen Leitfaden für die Geschäftsreise deines Teams ins Ausland: Beschreibe Begrüßung, Pünktlichkeit und Kleidung und gib zwei praktische Tipps.",
       },
       {
+        id: "wt_travel_l09",
         text: "Sie waren auf einer Messe. Schreiben Sie eine E-Mail an Ihre Kollegin.",
         points: [
           "Erzählen Sie, wo Sie waren.",
@@ -1715,6 +1977,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_travel_l10",
         text: "Schreiben Sie einen Bericht über Ihre Dienstreise zu einer Fachmesse.",
         points: [
           "Nennen Sie Anlass, Ort und Zeitraum.",
@@ -1730,6 +1993,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_travel_l11",
         text: "Viele Betriebe ersetzen Dienstreisen dauerhaft durch Videokonferenzen. Verfassen Sie einen Diskussionsbeitrag.",
         points: [
           "Beschreiben Sie die Entwicklung.",
@@ -1751,45 +2015,56 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "behoerde",
     short: [
       {
+        id: "wt_behoerde_s01",
         text: "Schreibe eine kurze E-Mail an das Bürgeramt: Bitte um einen Termin zur Anmeldung deines neuen Wohnsitzes und nenne deine Verfügbarkeit.",
         sub: "behoerde.meldewesen",
       },
       {
+        id: "wt_behoerde_s02",
         text: "Schreibe eine kurze E-Mail an das Bürgeramt: Frage nach, welche Unterlagen du für einen neuen Personalausweis brauchst.",
         sub: "behoerde.antrag",
       },
       {
+        id: "wt_behoerde_s03",
         text: "Schreibe eine kurze Nachricht an die Behörde: Du musst einen Termin absagen. Entschuldige dich und bitte um einen neuen Termin.",
       },
       {
+        id: "wt_behoerde_s04",
         text: "Schreibe eine kurze Antwort auf ein Schreiben vom Amt: Bestätige den Erhalt und kündige an, die fehlenden Unterlagen nachzureichen.",
         sub: "behoerde.antrag",
       },
       {
+        id: "wt_behoerde_s05",
         text: "Schreibe eine kurze E-Mail an das Standesamt: Frage, wie du eine Geburtsurkunde beantragen kannst und was sie kostet.",
         sub: "behoerde.antrag",
       },
       {
+        id: "wt_behoerde_s06",
         text: "Schreibe eine kurze E-Mail an das Bürgeramt: Du bist umgezogen und fragst, ob du für die Ummeldung einen Termin brauchst und welche Unterlagen nötig sind.",
         sub: "behoerde.meldewesen",
       },
       {
+        id: "wt_behoerde_s07",
         text: "Schreibe eine kurze Nachricht an die Ausländerbehörde: Frage nach dem Stand deines Antrags auf Verlängerung und nenne dein Aktenzeichen.",
         sub: "behoerde.aufenthalt",
       },
       {
+        id: "wt_behoerde_s08",
         text: "Schreibe eine kurze E-Mail an die Ausländerbehörde: Deine Adresse hat sich geändert. Teile die neue Adresse mit und bitte um eine Bestätigung.",
         sub: "behoerde.aufenthalt",
       },
       {
+        id: "wt_behoerde_s09",
         text: "Schreibe eine kurze Nachricht an das Amt: In deinem Bescheid ist dein Name falsch geschrieben. Bitte um eine Korrektur.",
         sub: "behoerde.bescheid",
       },
       {
+        id: "wt_behoerde_s10",
         text: "Schreibe eine kurze E-Mail an die Behörde: Du verstehst eine Formulierung in deinem Bescheid nicht. Bitte um eine einfache Erklärung.",
         sub: "behoerde.bescheid",
       },
       {
+        id: "wt_behoerde_s11",
         text: "Sie können Ihren Termin bei der Ausländerbehörde nicht wahrnehmen. Schreiben Sie eine kurze E-Mail.",
         sub: "behoerde.aufenthalt",
         points: [
@@ -1805,6 +2080,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_behoerde_s12",
         text: "Sie haben Unterlagen eingereicht, aber seit Wochen keine Antwort erhalten. Schreiben Sie eine Sachstandsanfrage.",
         sub: "behoerde.antrag",
         points: [
@@ -1821,6 +2097,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_behoerde_s13",
         text: "Sie haben einen Bescheid erhalten, mit dem Sie nicht einverstanden sind. Schreiben Sie einen Widerspruch.",
         sub: "behoerde.bescheid",
         points: [
@@ -1840,38 +2117,47 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_behoerde_l01",
         text: "Verfasse eine formelle E-Mail an die Ausländerbehörde. Erkläre, dass du deinen Aufenthaltstitel verlängern möchtest, frage nach den nötigen Unterlagen und bitte höflich um einen Termin.",
         sub: "behoerde.aufenthalt",
       },
       {
+        id: "wt_behoerde_l02",
         text: "Verfasse einen Widerspruch gegen einen Bescheid: Erkläre höflich, warum du die Entscheidung für falsch hältst, nenne dein Aktenzeichen, lege deine Gründe dar und bitte um eine neue Prüfung.",
         sub: "behoerde.bescheid",
       },
       {
+        id: "wt_behoerde_l03",
         text: "Schreibe eine E-Mail an das Jobcenter: Erkläre deine aktuelle Situation, frage nach, welche Leistungen dir zustehen, und bitte um einen Beratungstermin.",
         sub: "behoerde.antrag",
       },
       {
+        id: "wt_behoerde_l04",
         text: "Verfasse eine formelle E-Mail an die Kfz-Zulassungsstelle: Du möchtest ein Auto anmelden. Frage nach den nötigen Unterlagen, den Kosten und ob du einen Termin brauchst.",
         sub: "behoerde.antrag",
       },
       {
+        id: "wt_behoerde_l05",
         text: "Schreibe eine E-Mail an die Elterngeldstelle: Dein Antrag ist seit acht Wochen in Bearbeitung. Frage höflich nach dem Stand, nenne dein Aktenzeichen und erkläre, warum die Antwort dringend ist.",
         sub: "behoerde.bescheid",
       },
       {
+        id: "wt_behoerde_l06",
         text: "Verfasse eine formelle E-Mail an das Bürgeramt: Du brauchst eine Meldebescheinigung für deinen Vermieter. Erkläre den Zweck, frage nach Kosten und Ablauf und bitte um einen kurzfristigen Termin.",
         sub: "behoerde.meldewesen",
       },
       {
+        id: "wt_behoerde_l07",
         text: "Schreibe eine E-Mail an das Bürgeramt: Bei deiner Anmeldung wurde dein Einzugsdatum falsch erfasst. Beschreibe den Fehler, nenne das richtige Datum und bitte um eine korrigierte Bestätigung.",
         sub: "behoerde.meldewesen",
       },
       {
+        id: "wt_behoerde_l08",
         text: "Verfasse eine formelle E-Mail an die Ausländerbehörde: Dein Termin liegt nach Ablauf deines Aufenthaltstitels. Beschreibe die Situation, frage nach einer Fiktionsbescheinigung und bitte um einen früheren Termin.",
         sub: "behoerde.aufenthalt",
       },
       {
+        id: "wt_behoerde_l09",
         text: "Sie sind umgezogen und müssen sich anmelden. Schreiben Sie eine E-Mail an das Bürgeramt.",
         sub: "behoerde.meldewesen",
         points: [
@@ -1888,6 +2174,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_behoerde_l10",
         text: "Ihr Antrag wurde abgelehnt, weil angeblich eine Unterlage fehlte, die Sie eingereicht hatten. Schreiben Sie an die Behörde.",
         sub: "behoerde.bescheid",
         points: [
@@ -1904,6 +2191,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_behoerde_l11",
         text: "Sie benötigen mehr Zeit, um geforderte Nachweise einzureichen. Schreiben Sie einen begründeten Antrag auf Fristverlängerung.",
         sub: "behoerde.antrag",
         points: [
@@ -1926,41 +2214,51 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "arzt",
     short: [
       {
+        id: "wt_arzt_s01",
         text: "Schreibe eine kurze E-Mail an eine Arztpraxis: Bitte um einen Termin, beschreibe kurz deine Beschwerden und nenne deine Verfügbarkeit.",
         sub: "arzt.termin",
       },
       {
+        id: "wt_arzt_s02",
         text: "Schreibe eine kurze Nachricht an die Praxis: Sage deinen Termin am Montag ab und bitte um einen neuen.",
         sub: "arzt.termin",
       },
       {
+        id: "wt_arzt_s03",
         text: "Schreibe eine kurze E-Mail an deine Hausärztin: Bitte um ein Wiederholungsrezept für dein Medikament.",
         sub: "arzt.behandlung",
       },
       {
+        id: "wt_arzt_s04",
         text: "Schreibe eine kurze Nachricht an deinen Arbeitgeber: Du bist krank und bleibst heute zu Hause. Die Krankmeldung reichst du nach.",
       },
       {
+        id: "wt_arzt_s05",
         text: "Schreibe eine kurze Frage an die Praxis: Musst du für die Blutabnahme am Freitag nüchtern kommen? Frage auch, ob du früher kommen kannst.",
         sub: "arzt.behandlung",
       },
       {
+        id: "wt_arzt_s06",
         text: "Schreibe eine kurze Nachricht an deine Hausärztin: Beschreibe deine Erkältungssymptome und frage, ob du vorbeikommen sollst.",
         sub: "arzt.symptome",
       },
       {
+        id: "wt_arzt_s07",
         text: "Schreibe eine kurze E-Mail an die Praxis: Nach der neuen Tablette hast du Kopfschmerzen bekommen. Beschreibe, seit wann, und frage, ob du sie weiter nehmen sollst.",
         sub: "arzt.symptome",
       },
       {
+        id: "wt_arzt_s08",
         text: "Schreibe eine kurze E-Mail an deine Krankenkasse: Deine Versichertenkarte ist verloren gegangen. Bitte um eine neue.",
         sub: "arzt.versicherung",
       },
       {
+        id: "wt_arzt_s09",
         text: "Schreibe eine kurze Anfrage an die Apotheke: Frage, ob dein Medikament vorrätig ist und was es mit Rezept kostet.",
         sub: "arzt.versicherung",
       },
       {
+        id: "wt_arzt_s10",
         text: "Sie sind krank und können nicht zur Arbeit kommen. Schreiben Sie eine kurze Nachricht.",
         sub: "arzt.termin",
         points: [
@@ -1976,6 +2274,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_arzt_s11",
         text: "Sie brauchen für Ihren Arbeitgeber eine Bescheinigung von Ihrer Praxis. Schreiben Sie eine E-Mail.",
         sub: "arzt.behandlung",
         points: [
@@ -1992,6 +2291,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_arzt_s12",
         text: "Ihre Krankenkasse hat eine Leistung abgelehnt, die Ihnen Ihre Ärztin empfohlen hat. Schreiben Sie einen Widerspruch.",
         sub: "arzt.versicherung",
         points: [
@@ -2011,42 +2311,52 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_arzt_l01",
         text: "Verfasse eine formelle E-Mail an deine Krankenkasse. Erkläre, dass du eine Rechnung einreichen möchtest, frage nach der Kostenübernahme für eine Behandlung und bitte höflich um eine schriftliche Bestätigung.",
         sub: "arzt.versicherung",
       },
       {
+        id: "wt_arzt_l02",
         text: "Verfasse eine E-Mail an eine Facharztpraxis: Du hast erst in drei Monaten einen Termin bekommen. Erkläre deine Beschwerden und bitte um einen früheren Termin oder einen Platz auf der Warteliste.",
         sub: "arzt.termin",
       },
       {
+        id: "wt_arzt_l03",
         text: "Schreibe eine E-Mail an deine Krankenkasse: Frage, ob sie die Kosten für einen Gesundheitskurs übernimmt. Beschreibe den Kurs, begründe, warum er dir hilft, und frage nach dem Verfahren.",
         sub: "arzt.versicherung",
       },
       {
+        id: "wt_arzt_l04",
         text: "Verfasse eine höfliche Beschwerde an eine Klinik: Beschreibe, was bei deinem Aufenthalt nicht gut gelaufen ist, bleibe sachlich und schlage vor, wie es besser gemacht werden könnte.",
         sub: "arzt.behandlung",
       },
       {
+        id: "wt_arzt_l05",
         text: "Schreibe eine E-Mail an die Praxis, weil du eine falsche Rechnung bekommen hast: Erkläre, welche Leistung berechnet wurde, die du nicht erhalten hast, und bitte um eine korrigierte Rechnung.",
         sub: "arzt.versicherung",
       },
       {
+        id: "wt_arzt_l06",
         text: "Verfasse eine E-Mail an deine Hausarztpraxis vor einem Termin: Beschreibe deine Beschwerden genau (seit wann, wie oft, was hilft), damit die Ärztin sich vorbereiten kann.",
         sub: "arzt.symptome",
       },
       {
+        id: "wt_arzt_l07",
         text: "Schreibe eine Nachricht an eine Fachärztin: Beschreibe deine Rückenschmerzen, erkläre, was du schon versucht hast, und frage, welche Untersuchung sinnvoll wäre.",
         sub: "arzt.symptome",
       },
       {
+        id: "wt_arzt_l08",
         text: "Verfasse eine E-Mail an eine Praxis: Du brauchst einen Kontrolltermin und eine Überweisung. Nenne deine Verfügbarkeit, frage nach freien Terminen und ob die Überweisung vorbereitet werden kann.",
         sub: "arzt.termin",
       },
       {
+        id: "wt_arzt_l09",
         text: "Schreibe eine E-Mail an deine Ärztin nach einer Untersuchung: Bitte um eine verständliche Erklärung deines Befunds und frage, welche Behandlung sie empfiehlt und welche Alternativen es gibt.",
         sub: "arzt.behandlung",
       },
       {
+        id: "wt_arzt_l10",
         text: "Sie möchten einen Termin bei einer neuen Praxis. Schreiben Sie eine E-Mail.",
         sub: "arzt.termin",
         points: [
@@ -2063,6 +2373,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_arzt_l11",
         text: "Sie warten seit Wochen auf einen Facharzttermin und Ihre Beschwerden werden schlimmer. Schreiben Sie an die Praxis.",
         sub: "arzt.symptome",
         points: [
@@ -2079,6 +2390,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_arzt_l12",
         text: "In einem Gesundheitsforum wird diskutiert, ob Videosprechstunden persönliche Arztbesuche ersetzen können. Schreiben Sie einen Beitrag.",
         sub: "arzt.behandlung",
         points: [
@@ -2101,47 +2413,59 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "wohnen",
     short: [
       {
+        id: "wt_wohnen_s01",
         text: "Schreibe eine kurze E-Mail an einen Vermieter: Zeige Interesse an einer Wohnung, bitte um einen Besichtigungstermin und nenne deine Verfügbarkeit.",
         sub: "wohnen.suche",
       },
       {
+        id: "wt_wohnen_s02",
         text: "Schreibe eine kurze Nachricht an deinen Nachbarn: Bei dir kommt morgen ein Handwerker, es kann laut werden. Entschuldige dich im Voraus.",
       },
       {
+        id: "wt_wohnen_s03",
         text: "Schreibe eine kurze E-Mail an die Hausverwaltung: Der Aufzug ist seit zwei Tagen kaputt. Bitte um schnelle Reparatur.",
         sub: "wohnen.probleme",
       },
       {
+        id: "wt_wohnen_s04",
         text: "Schreibe eine kurze Nachricht an deine Vermieterin: Kündige an, dass du im Sommer für vier Wochen verreist, und nenne eine Kontaktperson.",
       },
       {
+        id: "wt_wohnen_s05",
         text: "Schreibe eine kurze Anfrage an einen Umzugsservice: Frage nach einem Angebot für deinen Umzug und nenne Datum und Adressen.",
       },
       {
+        id: "wt_wohnen_s06",
         text: "Schreibe eine kurze Nachricht an eine WG: Stelle dich in zwei Sätzen vor und frage, ob das Zimmer noch frei ist.",
         sub: "wohnen.suche",
       },
       {
+        id: "wt_wohnen_s07",
         text: "Schreibe eine kurze E-Mail an deinen Vermieter: Frage, ob du die Wohnung mit einer neuen Mitbewohnerin teilen darfst.",
         sub: "wohnen.vertrag",
       },
       {
+        id: "wt_wohnen_s08",
         text: "Schreibe eine kurze Nachricht an die Hausverwaltung: Bitte um einen Termin für die Wohnungsübergabe und frage, was du vorbereiten musst.",
         sub: "wohnen.vertrag",
       },
       {
+        id: "wt_wohnen_s09",
         text: "Schreibe eine kurze E-Mail an die Hausverwaltung: Frage, warum deine Nebenkostenvorauszahlung steigt.",
         sub: "wohnen.nebenkosten",
       },
       {
+        id: "wt_wohnen_s10",
         text: "Schreibe eine kurze Nachricht an deinen Vermieter: Bitte um die Nebenkostenabrechnung für das letzte Jahr.",
         sub: "wohnen.nebenkosten",
       },
       {
+        id: "wt_wohnen_s11",
         text: "Schreibe eine kurze Meldung an die Hausverwaltung: Die Heizung wird nicht warm. Beschreibe das Problem und bitte um schnelle Hilfe.",
         sub: "wohnen.probleme",
       },
       {
+        id: "wt_wohnen_s12",
         text: "In Ihrer Wohnung tropft seit gestern der Wasserhahn im Bad. Schreiben Sie eine kurze Nachricht an die Hausverwaltung.",
         sub: "wohnen.probleme",
         points: [
@@ -2157,6 +2481,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_wohnen_s13",
         text: "Seit drei Wochen ist die Heizung in Ihrer Wohnung defekt, trotz Meldung ist nichts passiert. Schreiben Sie eine Mängelanzeige.",
         sub: "wohnen.probleme",
         points: [
@@ -2173,6 +2498,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_wohnen_s14",
         text: "Ihre Betriebskostenabrechnung enthält einen Posten, den Sie für nicht nachvollziehbar halten. Schreiben Sie an die Hausverwaltung.",
         sub: "wohnen.nebenkosten",
         points: [
@@ -2192,38 +2518,47 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_wohnen_l01",
         text: "Verfasse eine formelle E-Mail an deine Hausverwaltung. Melde einen Mangel in der Wohnung (zum Beispiel Schimmel oder eine defekte Heizung), bitte um eine Reparatur mit Frist und weise höflich auf deine Rechte als Mieter hin.",
         sub: "wohnen.probleme",
       },
       {
+        id: "wt_wohnen_l02",
         text: "Verfasse eine Antwort auf eine Mieterhöhung: Bestätige den Erhalt des Schreibens, stelle sachliche Rückfragen zur Begründung und bitte um ausreichend Zeit zur Prüfung.",
         sub: "wohnen.nebenkosten",
       },
       {
+        id: "wt_wohnen_l03",
         text: "Schreibe eine Kündigung für deine Wohnung: Kündige fristgerecht, nenne das Datum des Auszugs, bitte um einen Übergabetermin und um die Rückzahlung der Kaution.",
         sub: "wohnen.vertrag",
       },
       {
+        id: "wt_wohnen_l04",
         text: "Verfasse eine Beschwerde an die Hausverwaltung über wiederholten Lärm im Haus: Beschreibe die Störungen mit Zeiten, erkläre die Folgen für dich und bitte um ein Gespräch mit den Verursachern.",
         sub: "wohnen.probleme",
       },
       {
+        id: "wt_wohnen_l05",
         text: "Schreibe eine Bewerbung um eine Wohnung: Stelle dich und deine Situation kurz vor, erkläre, warum die Wohnung gut passt, und nenne die Unterlagen, die du mitbringen kannst.",
         sub: "wohnen.suche",
       },
       {
+        id: "wt_wohnen_l06",
         text: "Verfasse eine E-Mail an einen Makler: Beschreibe, welche Wohnung du suchst (Größe, Lage, Budget), und frage nach passenden Angeboten und den nächsten Schritten.",
         sub: "wohnen.suche",
       },
       {
+        id: "wt_wohnen_l07",
         text: "Schreibe eine E-Mail an deinen Vermieter vor der Vertragsunterschrift: Stelle drei konkrete Fragen zum Mietvertrag (zum Beispiel Kündigungsfrist, Kaution, Renovierung) und bitte um schriftliche Antwort.",
         sub: "wohnen.vertrag",
       },
       {
+        id: "wt_wohnen_l08",
         text: "Verfasse eine höfliche Reklamation deiner Nebenkostenabrechnung: Nenne die Posten, die dir zu hoch erscheinen, bitte um Einsicht in die Belege und um eine Prüfung der Abrechnung.",
         sub: "wohnen.nebenkosten",
       },
       {
+        id: "wt_wohnen_l09",
         text: "Sie interessieren sich für eine Wohnung aus einer Anzeige. Schreiben Sie eine E-Mail.",
         sub: "wohnen.suche",
         points: [
@@ -2240,6 +2575,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_wohnen_l10",
         text: "Ihre Nachbarn verursachen regelmäßig nachts Lärm. Schreiben Sie an die Hausverwaltung.",
         sub: "wohnen.probleme",
         points: [
@@ -2256,6 +2592,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_wohnen_l11",
         text: "Sie möchten Ihren Mietvertrag ordentlich kündigen. Verfassen Sie das Kündigungsschreiben.",
         sub: "wohnen.vertrag",
         points: [
@@ -2278,38 +2615,47 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "bank",
     short: [
       {
+        id: "wt_bank_s01",
         text: "Schreibe eine kurze E-Mail an deine Bank: Bitte um einen Beratungstermin zur Eröffnung eines Girokontos und frage, welche Unterlagen du mitbringen musst.",
         sub: "bank.konto",
       },
       {
+        id: "wt_bank_s02",
         text: "Schreibe eine kurze Nachricht an deine Bank: Deine Karte ist verloren gegangen. Bitte um eine Sperrung und eine neue Karte.",
         sub: "bank.karte",
       },
       {
+        id: "wt_bank_s03",
         text: "Schreibe eine kurze E-Mail an die Bank: Frage nach den Gebühren für Überweisungen ins Ausland.",
         sub: "bank.zahlung",
       },
       {
+        id: "wt_bank_s04",
         text: "Schreibe eine kurze Mitteilung an deine Bank: Deine Adresse hat sich geändert. Nenne die neue Adresse und bitte um eine Bestätigung.",
         sub: "bank.konto",
       },
       {
+        id: "wt_bank_s05",
         text: "Schreibe eine kurze Anfrage an die Bank: Du möchtest dein Kreditkartenlimit erhöhen. Nenne den gewünschten Betrag und begründe kurz.",
         sub: "bank.karte",
       },
       {
+        id: "wt_bank_s06",
         text: "Schreibe eine kurze Nachricht an deine Bank: Eine Überweisung von letzter Woche ist noch nicht angekommen. Bitte um Prüfung.",
         sub: "bank.zahlung",
       },
       {
+        id: "wt_bank_s07",
         text: "Schreibe eine kurze Anfrage an deine Bank: Du möchtest monatlich etwas sparen. Frage nach einem Beratungstermin zu Sparplänen.",
         sub: "bank.finanzen",
       },
       {
+        id: "wt_bank_s08",
         text: "Schreibe eine kurze E-Mail an deine Bank: Frage nach den aktuellen Zinsen für Tagesgeld und Festgeld.",
         sub: "bank.finanzen",
       },
       {
+        id: "wt_bank_s09",
         text: "Sie haben Ihre Bankkarte verloren. Schreiben Sie eine kurze Nachricht an Ihre Bank.",
         sub: "bank.karte",
         points: [
@@ -2325,6 +2671,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_bank_s10",
         text: "Auf Ihrem Kontoauszug steht eine Abbuchung, die Sie nicht zuordnen können. Schreiben Sie an Ihre Bank.",
         sub: "bank.zahlung",
         points: [
@@ -2341,6 +2688,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_bank_s11",
         text: "Ihre Bank hat Gebühren erhöht, über die Sie sich nicht ausreichend informiert fühlen. Schreiben Sie eine Beschwerde.",
         sub: "bank.konto",
         points: [
@@ -2360,41 +2708,51 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_bank_l01",
         text: "Verfasse eine formelle E-Mail an deine Bank. Beschwere dich höflich über eine falsch gebuchte Lastschrift, bitte um eine Rückbuchung und frage nach, wie du solche Abbuchungen künftig verhindern kannst.",
         sub: "bank.zahlung",
       },
       {
+        id: "wt_bank_l02",
         text: "Verfasse eine E-Mail an deine Bank: Beantrage einen kleinen Kredit für ein gebrauchtes Auto. Nenne den Betrag, beschreibe deine Einkommenssituation und frage nach Zinsen und Laufzeit.",
         sub: "bank.finanzen",
       },
       {
+        id: "wt_bank_l03",
         text: "Schreibe eine Kündigung für dein altes Konto: Nenne das gewünschte Datum, das neue Konto für das Restguthaben und bitte um eine schriftliche Bestätigung der Auflösung.",
         sub: "bank.konto",
       },
       {
+        id: "wt_bank_l04",
         text: "Verfasse eine Beschwerde an deine Bank: Trotz Termin hast du in der Filiale lange gewartet und keine klare Auskunft erhalten. Beschreibe den Ablauf und formuliere, was du erwartest.",
       },
       {
+        id: "wt_bank_l05",
         text: "Schreibe eine E-Mail an die Bank, weil du eine Abbuchung nicht erkennst: Beschreibe die verdächtige Buchung, frage nach dem Empfänger und bitte darum, die Zahlung zu prüfen und gegebenenfalls zurückzuholen.",
         sub: "bank.zahlung",
       },
       {
+        id: "wt_bank_l06",
         text: "Verfasse eine E-Mail an deine Bank: Du möchtest dein Einzelkonto in ein Gemeinschaftskonto umwandeln. Erkläre die Situation und frage nach Unterlagen und Ablauf.",
         sub: "bank.konto",
       },
       {
+        id: "wt_bank_l07",
         text: "Schreibe eine E-Mail an deine Bank: Deine Kartenzahlung wurde im Ausland abgelehnt, obwohl das Konto gedeckt war. Beschreibe die Situation und bitte um Klärung und eine Lösung für die Zukunft.",
         sub: "bank.karte",
       },
       {
+        id: "wt_bank_l08",
         text: "Verfasse eine Nachricht an den Bank-Support: Du kommst nicht mehr ins Online-Banking, die App verlangt eine neue Freigabe. Beschreibe das Problem und frage nach den Schritten zur Entsperrung.",
         sub: "bank.karte",
       },
       {
+        id: "wt_bank_l09",
         text: "Schreibe eine E-Mail an deine Bankberaterin: Du möchtest für deine Kinder langfristig Geld anlegen. Beschreibe deine Situation, nenne den monatlichen Betrag und bitte um zwei konkrete Vorschläge.",
         sub: "bank.finanzen",
       },
       {
+        id: "wt_bank_l10",
         text: "Sie möchten ein Konto eröffnen. Schreiben Sie eine E-Mail an die Bank.",
         sub: "bank.konto",
         points: [
@@ -2411,6 +2769,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_bank_l11",
         text: "Sie möchten Ihr Konto bei Ihrer bisherigen Bank auflösen. Verfassen Sie das Kündigungsschreiben.",
         sub: "bank.konto",
         points: [
@@ -2428,6 +2787,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_bank_l12",
         text: "In einem Forum wird diskutiert, ob Bargeld langfristig verschwinden sollte. Schreiben Sie einen Beitrag.",
         sub: "bank.finanzen",
         points: [
@@ -2450,41 +2810,51 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "bildung",
     short: [
       {
+        id: "wt_bildung_s01",
         text: "Schreibe eine kurze E-Mail an eine Sprachschule: Frage nach einem passenden Kurs für dein Niveau, nach den Kosten und nach dem nächsten Kursbeginn.",
         sub: "bildung.sprachkurs",
       },
       {
+        id: "wt_bildung_s02",
         text: "Schreibe eine kurze E-Mail an deine Kursleiterin: Du kannst am Donnerstag nicht zum Unterricht kommen. Frage nach den Hausaufgaben.",
         sub: "bildung.sprachkurs",
       },
       {
+        id: "wt_bildung_s03",
         text: "Schreibe eine kurze Anfrage an eine Volkshochschule: Frage, ob im Kurs noch Plätze frei sind und wie du dich anmelden kannst.",
       },
       {
+        id: "wt_bildung_s04",
         text: "Schreibe eine kurze E-Mail an das Prüfungszentrum: Frage nach dem nächsten Termin für die B2-Prüfung und den Kosten.",
         sub: "bildung.pruefung",
       },
       {
+        id: "wt_bildung_s05",
         text: "Schreibe eine kurze Bitte an deinen Arbeitgeber: Frage, ob du für eine Fortbildung am Freitag frei bekommen kannst.",
         sub: "bildung.weiterbildung",
       },
       {
+        id: "wt_bildung_s06",
         text: "Schreibe eine kurze E-Mail an die Anerkennungsstelle: Frage nach dem Stand deines Verfahrens und nenne dein Aktenzeichen.",
         sub: "bildung.anerkennung",
       },
       {
+        id: "wt_bildung_s07",
         text: "Schreibe eine kurze Anfrage an die Anerkennungsstelle: Frage, ob dein Zeugnis übersetzt und beglaubigt sein muss und wer das machen darf.",
         sub: "bildung.anerkennung",
       },
       {
+        id: "wt_bildung_s08",
         text: "Schreibe eine kurze E-Mail an das Prüfungszentrum: Du warst krank und hast die Prüfung verpasst. Frage, ob du sie nachholen kannst.",
         sub: "bildung.pruefung",
       },
       {
+        id: "wt_bildung_s09",
         text: "Schreibe eine kurze Nachricht an eine Kollegin: Empfiehl ihr deinen Computerkurs und erkläre in einem Satz, warum er sich lohnt.",
         sub: "bildung.weiterbildung",
       },
       {
+        id: "wt_bildung_s10",
         text: "Sie können nächste Woche nicht zum Deutschkurs kommen. Schreiben Sie eine kurze E-Mail.",
         sub: "bildung.sprachkurs",
         points: [
@@ -2500,6 +2870,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_bildung_s11",
         text: "Sie möchten sich für eine Weiterbildung anmelden, die Ihr Arbeitgeber bezahlen soll. Schreiben Sie an die Personalabteilung.",
         sub: "bildung.weiterbildung",
         points: [
@@ -2516,6 +2887,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_bildung_s12",
         text: "Ihr im Ausland erworbener Abschluss wurde nur teilweise anerkannt. Schreiben Sie an die Anerkennungsstelle.",
         sub: "bildung.anerkennung",
         points: [
@@ -2535,38 +2907,47 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_bildung_l01",
         text: "Verfasse eine formelle E-Mail an eine zuständige Stelle. Bitte um die Anerkennung deines ausländischen Abschlusses, erkläre deinen bisherigen Werdegang und frage nach den nötigen Unterlagen und dem Ablauf des Verfahrens.",
         sub: "bildung.anerkennung",
       },
       {
+        id: "wt_bildung_l02",
         text: "Verfasse eine E-Mail an eine Bildungseinrichtung: Bitte um ein Zertifikat über deinen abgeschlossenen Kurs, erkläre, wofür du es brauchst, und frage, wie lange die Ausstellung dauert.",
         sub: "bildung.pruefung",
       },
       {
+        id: "wt_bildung_l03",
         text: "Schreibe eine Bewerbung für ein Stipendium oder eine Kursförderung: Stelle dich vor, beschreibe deine Ziele und begründe, warum die Förderung dir helfen würde.",
         sub: "bildung.weiterbildung",
       },
       {
+        id: "wt_bildung_l04",
         text: "Verfasse eine E-Mail an deinen Arbeitgeber: Schlage eine Weiterbildung vor, die du machen möchtest. Beschreibe Inhalt, Dauer und Kosten und erkläre den Nutzen für deine Arbeit.",
         sub: "bildung.weiterbildung",
       },
       {
+        id: "wt_bildung_l05",
         text: "Schreibe eine höfliche Beschwerde an eine Sprachschule: Der Kurs ist oft ausgefallen und der Ersatzunterricht fehlt. Beschreibe die Situation und schlage eine Lösung vor, zum Beispiel eine Erstattung.",
         sub: "bildung.sprachkurs",
       },
       {
+        id: "wt_bildung_l06",
         text: "Verfasse eine E-Mail an die zuständige Kammer: Frage, welche Nachqualifizierung dir für die volle Anerkennung fehlt, wie lange sie dauert und was sie kostet.",
         sub: "bildung.anerkennung",
       },
       {
+        id: "wt_bildung_l07",
         text: "Schreibe eine E-Mail an das Prüfungszentrum: Du möchtest Einsicht in deine Prüfung beantragen. Erkläre, warum, und frage nach Termin und Ablauf der Einsicht.",
         sub: "bildung.pruefung",
       },
       {
+        id: "wt_bildung_l08",
         text: "Verfasse eine E-Mail an deine Sprachschule: Der Kurs ist für dich zu leicht. Beschreibe, was du schon kannst, und bitte um einen Wechsel in die nächste Stufe mit einem Einstufungstest.",
         sub: "bildung.sprachkurs",
       },
       {
+        id: "wt_bildung_l09",
         text: "Eine Freundin möchte auch Deutsch lernen. Schreiben Sie ihr eine E-Mail über Ihren Kurs.",
         sub: "bildung.sprachkurs",
         points: [
@@ -2583,6 +2964,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_bildung_l10",
         text: "In einem Forum wird gefragt, ob Sprachkurse neben der Arbeit realistisch sind. Schreiben Sie einen Beitrag.",
         sub: "bildung.sprachkurs",
         points: [
@@ -2599,6 +2981,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_bildung_l11",
         text: "Berufliche Weiterbildung wird gefordert, findet aber meist in der Freizeit statt. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "bildung.weiterbildung",
         points: [
@@ -2621,45 +3004,56 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "einkaufen",
     short: [
       {
+        id: "wt_einkaufen_s01",
         text: "Schreibe eine kurze E-Mail an einen Onlineshop: Ein Artikel ist beschädigt angekommen. Beschreibe das Problem und frage nach Umtausch oder Erstattung.",
         sub: "einkaufen.umtausch",
       },
       {
+        id: "wt_einkaufen_s02",
         text: "Schreibe eine kurze E-Mail an einen Onlineshop: Frage nach dem Stand deiner Bestellung und nenne die Bestellnummer.",
         sub: "einkaufen.online",
       },
       {
+        id: "wt_einkaufen_s03",
         text: "Schreibe eine kurze Nachricht an ein Geschäft: Frage, ob ein bestimmter Artikel vorrätig ist und ob er zurückgelegt werden kann.",
       },
       {
+        id: "wt_einkaufen_s04",
         text: "Schreibe eine kurze E-Mail an den Kundenservice: Du möchtest eine Bestellung stornieren. Nenne die Bestellnummer und den Grund.",
         sub: "einkaufen.online",
       },
       {
+        id: "wt_einkaufen_s05",
         text: "Schreibe eine kurze Anfrage an einen Onlineshop: Ein Gutscheincode funktioniert nicht. Beschreibe das Problem und bitte um Hilfe.",
         sub: "einkaufen.online",
       },
       {
+        id: "wt_einkaufen_s06",
         text: "Schreibe eine kurze E-Mail an deinen Supermarkt: Frage, ob ein Produkt wieder ins Sortiment kommt, das du nicht mehr findest.",
         sub: "einkaufen.supermarkt",
       },
       {
+        id: "wt_einkaufen_s07",
         text: "Schreibe eine kurze Nachricht an den Markt: An der Kasse wurde der Angebotspreis nicht berechnet. Frage, wie du den Unterschied zurückbekommst.",
         sub: "einkaufen.supermarkt",
       },
       {
+        id: "wt_einkaufen_s08",
         text: "Schreibe eine kurze Anfrage an ein Modegeschäft: Frage, ob es die Jacke aus dem Schaufenster auch in Größe M gibt.",
         sub: "einkaufen.kleidung",
       },
       {
+        id: "wt_einkaufen_s09",
         text: "Schreibe eine kurze E-Mail an einen Onlineshop: Frage, wie die Hose ausfällt und welche Größe sie bei deinen Maßen empfehlen.",
         sub: "einkaufen.kleidung",
       },
       {
+        id: "wt_einkaufen_s10",
         text: "Schreibe eine kurze Nachricht an ein Geschäft: Du möchtest ein Geschenk ohne Kassenbon umtauschen. Frage, ob das möglich ist.",
         sub: "einkaufen.umtausch",
       },
       {
+        id: "wt_einkaufen_s11",
         text: "Sie möchten eine online bestellte Jacke umtauschen. Schreiben Sie eine kurze E-Mail.",
         sub: "einkaufen.umtausch",
         points: [
@@ -2675,6 +3069,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_einkaufen_s12",
         text: "Ein gekauftes Gerät ist nach kurzer Zeit defekt. Schreiben Sie eine Reklamation.",
         sub: "einkaufen.umtausch",
         points: [
@@ -2691,6 +3086,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_einkaufen_s13",
         text: "Sie möchten einen Online-Kauf widerrufen, der Shop reagiert nicht. Schreiben Sie ein förmliches Schreiben.",
         sub: "einkaufen.online",
         points: [
@@ -2710,41 +3106,51 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_einkaufen_l01",
         text: "Verfasse eine formelle Reklamations-E-Mail an einen Onlineshop. Erkläre, welchen Artikel du bestellt hast und was mit der Lieferung nicht stimmt, nenne deine Bestellnummer und bitte höflich um eine Erstattung oder einen Ersatz mit einer klaren Frist.",
         sub: "einkaufen.umtausch",
       },
       {
+        id: "wt_einkaufen_l02",
         text: "Verfasse eine E-Mail an einen Onlineshop: Du hast einen Artikel zurückgeschickt, aber nach drei Wochen noch keine Erstattung erhalten. Beschreibe den Fall mit Daten, nenne die Sendungsnummer und setze eine Frist.",
         sub: "einkaufen.online",
       },
       {
+        id: "wt_einkaufen_l03",
         text: "Schreibe eine Beschwerde an einen Supermarkt: An der Kasse wurde dir ein falscher Preis berechnet, und das Personal war unfreundlich. Beschreibe die Situation und formuliere deine Erwartung.",
         sub: "einkaufen.supermarkt",
       },
       {
+        id: "wt_einkaufen_l04",
         text: "Verfasse eine Anfrage an ein Möbelhaus: Du interessierst dich für eine Einbauküche. Beschreibe deine Wohnung und deine Wünsche und bitte um einen Beratungstermin mit Kostenvoranschlag.",
       },
       {
+        id: "wt_einkaufen_l05",
         text: "Schreibe eine E-Mail an einen Händler: Ein gekauftes Gerät ist nach vier Monaten kaputt. Berufe dich auf die Gewährleistung, beschreibe den Defekt und fordere Reparatur oder Ersatz.",
         sub: "einkaufen.umtausch",
       },
       {
+        id: "wt_einkaufen_l06",
         text: "Verfasse eine E-Mail an einen Onlineshop: Das Paket gilt als zugestellt, ist aber nie angekommen. Beschreibe den Fall, nenne die Sendungsnummer und bitte um Nachforschung oder Ersatz.",
         sub: "einkaufen.online",
       },
       {
+        id: "wt_einkaufen_l07",
         text: "Schreibe eine E-Mail an die Filialleitung deines Supermarkts: Lobe das Personal, kritisiere die langen Schlangen am Abend und schlage eine Lösung vor, zum Beispiel eine zweite Kasse ab 17 Uhr.",
         sub: "einkaufen.supermarkt",
       },
       {
+        id: "wt_einkaufen_l08",
         text: "Verfasse eine Reklamation an ein Modegeschäft: Der Pullover ist nach der ersten Wäsche eingelaufen, obwohl du die Pflegehinweise beachtet hast. Fordere Umtausch oder Erstattung.",
         sub: "einkaufen.kleidung",
       },
       {
+        id: "wt_einkaufen_l09",
         text: "Schreibe eine E-Mail an einen Schuhhändler: Die bestellten Schuhe drücken trotz richtiger Größe. Frage nach einem Umtausch in ein anderes Modell und beschreibe, was dir wichtig ist.",
         sub: "einkaufen.kleidung",
       },
       {
+        id: "wt_einkaufen_l10",
         text: "Sie haben im Supermarkt etwas Wichtiges nicht gefunden. Schreiben Sie eine E-Mail an den Markt.",
         sub: "einkaufen.supermarkt",
         points: [
@@ -2761,6 +3167,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_einkaufen_l11",
         text: "Eine Lieferung ist beschädigt angekommen. Schreiben Sie an den Onlineshop.",
         sub: "einkaufen.online",
         points: [
@@ -2777,6 +3184,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_einkaufen_l12",
         text: "Der Onlinehandel verdrängt Geschäfte in den Innenstädten. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "einkaufen.online",
         points: [
@@ -2799,41 +3207,51 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "essen",
     short: [
       {
+        id: "wt_essen_s01",
         text: "Schreibe eine kurze E-Mail an ein Restaurant: Reserviere einen Tisch für vier Personen, nenne Datum und Uhrzeit und frage nach vegetarischen Gerichten.",
         sub: "essen.restaurant",
       },
       {
+        id: "wt_essen_s02",
         text: "Schreibe eine kurze Nachricht an ein Restaurant: Sage deine Reservierung für heute Abend ab und entschuldige dich.",
         sub: "essen.restaurant",
       },
       {
+        id: "wt_essen_s03",
         text: "Schreibe eine kurze E-Mail an einen Lieferdienst: Deine Bestellung kam kalt und unvollständig an. Bitte um eine Lösung.",
         sub: "essen.bestellen",
       },
       {
+        id: "wt_essen_s04",
         text: "Schreibe eine kurze Frage an ein Restaurant: Gibt es Gerichte ohne Gluten? Du möchtest am Samstag mit vier Personen kommen.",
         sub: "essen.bestellen",
       },
       {
+        id: "wt_essen_s05",
         text: "Schreibe eine kurze Dankesnachricht an ein Restaurant nach einer Feier: Lobe Essen und Service und kündige an wiederzukommen.",
       },
       {
+        id: "wt_essen_s06",
         text: "Schreibe eine kurze E-Mail an ein Restaurant: Auf deiner Rechnung steht ein Gericht, das ihr nicht bestellt habt. Bitte um eine Korrektur.",
         sub: "essen.bezahlen",
       },
       {
+        id: "wt_essen_s07",
         text: "Schreibe eine kurze Frage an ein Restaurant: Kann man bei euch getrennt und mit Karte zahlen? Ihr kommt am Freitag mit acht Personen.",
         sub: "essen.bezahlen",
       },
       {
+        id: "wt_essen_s08",
         text: "Schreibe eine kurze Nachricht an einen Freund: Bitte ihn um sein Rezept für die Lasagne vom Wochenende und frage nach den wichtigsten Zutaten.",
         sub: "essen.kochen",
       },
       {
+        id: "wt_essen_s09",
         text: "Schreibe eine kurze Nachricht in die Nachbarschaftsgruppe: Dir fehlt eine Zutat fürs Abendessen. Frage, ob dir jemand aushelfen kann.",
         sub: "essen.kochen",
       },
       {
+        id: "wt_essen_s10",
         text: "Sie möchten für Samstag einen Tisch reservieren. Schreiben Sie eine kurze E-Mail.",
         sub: "essen.restaurant",
         points: [
@@ -2849,6 +3267,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_essen_s11",
         text: "Bei einer Feier in einem Restaurant wurde eine bestellte Leistung nicht erbracht. Schreiben Sie eine Beschwerde.",
         sub: "essen.bezahlen",
         points: [
@@ -2865,6 +3284,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_essen_s12",
         text: "Sie organisieren ein Essen für Kolleginnen und Kollegen mit sehr unterschiedlichen Ernährungsweisen. Schreiben Sie an das Restaurant.",
         sub: "essen.bestellen",
         points: [
@@ -2883,41 +3303,51 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_essen_l01",
         text: "Verfasse eine formelle E-Mail an ein Restaurant. Reserviere einen Tisch für eine Feier, nenne die Personenzahl und den Anlass, frage nach einem Menü mit vegetarischen und veganen Optionen und bitte um eine Bestätigung der Reservierung.",
         sub: "essen.restaurant",
       },
       {
+        id: "wt_essen_l02",
         text: "Verfasse eine E-Mail an einen Caterer: Hole ein Angebot für eine Firmenfeier mit 30 Personen ein. Beschreibe Anlass, Ort und Termin, nenne Wünsche zum Essen und frage nach Preisen pro Person.",
         sub: "essen.bestellen",
       },
       {
+        id: "wt_essen_l03",
         text: "Schreibe eine Beschwerde an ein Restaurant: Bei eurem Besuch gestern habt ihr sehr lange gewartet und ein Gericht war nicht in Ordnung. Beschreibe den Abend sachlich und formuliere deine Erwartung.",
         sub: "essen.restaurant",
       },
       {
+        id: "wt_essen_l04",
         text: "Verfasse eine Einladung an dein Team zu einem gemeinsamen Essen: Nenne Anlass, Restaurant, Datum und Uhrzeit, erkläre, wer die Kosten übernimmt, und bitte um Rückmeldung mit Essenswünschen.",
       },
       {
+        id: "wt_essen_l05",
         text: "Schreibe eine E-Mail an einen Lieferdienst: Du wurdest doppelt belastet. Beschreibe die Bestellung, nenne die Zahlungsdaten und bitte um die Rückerstattung des doppelten Betrags.",
         sub: "essen.bezahlen",
       },
       {
+        id: "wt_essen_l06",
         text: "Verfasse eine E-Mail an einen Partyservice: Bestelle Fingerfood für 15 Personen, nenne Datum und Uhrzeit, beschreibe Allergien im Team und frage, bis wann du die Bestellung ändern kannst.",
         sub: "essen.bestellen",
       },
       {
+        id: "wt_essen_l07",
         text: "Schreibe eine E-Mail an ein Restaurant nach einer Firmenfeier: Bitte um eine korrigierte Rechnung mit Firmenanschrift und getrennt ausgewiesenen Getränken, damit die Buchhaltung sie akzeptiert.",
         sub: "essen.bezahlen",
       },
       {
+        id: "wt_essen_l08",
         text: "Verfasse eine Nachricht an deine Freundesgruppe: Lade zu einem gemeinsamen Kochabend ein. Schlage ein Menü vor, verteile, wer welche Zutaten mitbringt, und nenne Ort und Uhrzeit.",
         sub: "essen.kochen",
       },
       {
+        id: "wt_essen_l09",
         text: "Schreibe eine E-Mail an eine Kochschule: Frage nach einem Anfängerkurs für die deutsche Küche, nach Terminen und Preis und ob Zutaten und Schürze gestellt werden.",
         sub: "essen.kochen",
       },
       {
+        id: "wt_essen_l10",
         text: "Sie möchten Freunde zum Essen einladen. Schreiben Sie eine E-Mail.",
         sub: "essen.restaurant",
         points: [
@@ -2934,6 +3364,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_essen_l11",
         text: "In einem Forum wird über Trinkgeld in Deutschland diskutiert. Schreiben Sie einen Beitrag.",
         sub: "essen.bezahlen",
         points: [
@@ -2950,6 +3381,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_essen_l12",
         text: "Lieferdienste verändern, wie und wo wir essen. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "essen.kochen",
         points: [
@@ -2972,38 +3404,47 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "mobilitaet",
     short: [
       {
+        id: "wt_mobilitaet_s01",
         text: "Schreibe eine kurze E-Mail an den Verkehrsverbund: Du hast wegen einer Verspätung deinen Anschluss verpasst und möchtest die Kosten für ein Ersatzticket zurück.",
         sub: "mobilitaet.oepnv",
       },
       {
+        id: "wt_mobilitaet_s02",
         text: "Schreibe eine kurze E-Mail an den Kundenservice der Bahn: Frage, wie du dein Monatsticket kündigen kannst.",
         sub: "mobilitaet.ticket",
       },
       {
+        id: "wt_mobilitaet_s03",
         text: "Schreibe eine kurze Nachricht an eine Fahrschule: Frage nach den Preisen für den Führerschein Klasse B und nach freien Terminen.",
         sub: "mobilitaet.auto",
       },
       {
+        id: "wt_mobilitaet_s04",
         text: "Schreibe eine kurze E-Mail an eine Autowerkstatt: Bitte um einen Termin für die Inspektion und nenne dein Automodell.",
         sub: "mobilitaet.auto",
       },
       {
+        id: "wt_mobilitaet_s05",
         text: "Schreibe eine kurze Meldung an den Verkehrsverbund: Der Fahrkartenautomat am Bahnhof ist defekt. Beschreibe das Problem.",
         sub: "mobilitaet.ticket",
       },
       {
+        id: "wt_mobilitaet_s06",
         text: "Schreibe eine kurze Nachricht an den Verkehrsverbund: Frage, welche Linie am Wochenende zum Flughafen fährt und wie oft sie kommt.",
         sub: "mobilitaet.oepnv",
       },
       {
+        id: "wt_mobilitaet_s07",
         text: "Schreibe eine kurze Nachricht an einen Besucher: Beschreibe den Weg vom Bahnhof zu deiner Wohnung in drei einfachen Schritten.",
         sub: "mobilitaet.wegbeschreibung",
       },
       {
+        id: "wt_mobilitaet_s08",
         text: "Schreibe eine kurze Nachricht an eine Kollegin: Erkläre ihr, wo sie am Gebäude klingeln muss und wie sie den Besprechungsraum findet.",
         sub: "mobilitaet.wegbeschreibung",
       },
       {
+        id: "wt_mobilitaet_s09",
         text: "Sie haben im Zug Ihre Tasche vergessen. Schreiben Sie eine kurze E-Mail an den Fundservice.",
         sub: "mobilitaet.oepnv",
         points: [
@@ -3019,6 +3460,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_mobilitaet_s10",
         text: "Ihr Zug hatte erhebliche Verspätung und Sie haben einen Anschluss verpasst. Schreiben Sie an den Kundenservice.",
         sub: "mobilitaet.ticket",
         points: [
@@ -3035,6 +3477,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_mobilitaet_s11",
         text: "Sie haben ein erhöhtes Beförderungsentgelt erhalten, obwohl Sie eine gültige Zeitkarte besitzen. Schreiben Sie einen Einspruch.",
         sub: "mobilitaet.ticket",
         points: [
@@ -3054,38 +3497,47 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_mobilitaet_l01",
         text: "Verfasse eine formelle Beschwerde-E-Mail an ein Verkehrsunternehmen. Beschreibe, welche Verbindung du nutzen wolltest, wie es zur Verspätung kam und welche Folgen das hatte, und bitte höflich um eine Erstattung oder Entschädigung mit einer klaren Frist.",
         sub: "mobilitaet.oepnv",
       },
       {
+        id: "wt_mobilitaet_l02",
         text: "Verfasse einen Antrag auf Erstattung bei der Bahn: Dein Zug fiel aus und du musstest ein Taxi nehmen. Beschreibe die Verbindung, verweise auf deine Belege und begründe deinen Anspruch.",
         sub: "mobilitaet.ticket",
       },
       {
+        id: "wt_mobilitaet_l03",
         text: "Schreibe eine E-Mail an eine Autowerkstatt: Nach der Reparatur ist das Problem wieder aufgetreten. Beschreibe den Mangel, verweise auf die Rechnung und bitte um eine kostenlose Nachbesserung.",
         sub: "mobilitaet.auto",
       },
       {
+        id: "wt_mobilitaet_l04",
         text: "Verfasse eine Anfrage an eine Autovermietung: Du brauchst für einen Umzug einen Transporter. Nenne Datum und Dauer und frage nach Preisen, Versicherung und Kaution.",
         sub: "mobilitaet.auto",
       },
       {
+        id: "wt_mobilitaet_l05",
         text: "Schreibe eine Stellungnahme an deine Stadtverwaltung: Die Busverbindung in deinem Viertel ist schlecht. Beschreibe die Probleme, erkläre die Folgen für die Anwohner und schlage Verbesserungen vor.",
         sub: "mobilitaet.oepnv",
       },
       {
+        id: "wt_mobilitaet_l06",
         text: "Verfasse eine E-Mail an den Verkehrsverbund: Du wurdest trotz gültigem Abo kontrolliert und sollst eine erhöhte Gebühr zahlen. Erkläre die Situation, verweise auf deine Abo-Nummer und bitte um Erlass der Gebühr.",
         sub: "mobilitaet.ticket",
       },
       {
+        id: "wt_mobilitaet_l07",
         text: "Schreibe eine E-Mail an die Teilnehmenden eines Treffens: Beschreibe die Anreise mit Bahn und Auto, nenne Parkmöglichkeiten und erkläre den Weg vom Eingang zum Raum.",
         sub: "mobilitaet.wegbeschreibung",
       },
       {
+        id: "wt_mobilitaet_l08",
         text: "Verfasse eine Nachricht an eine Freundin, die dich zum ersten Mal besucht: Beschreibe die beste Verbindung von ihrem Ort zu dir, wo sie umsteigen muss und wo du sie abholst.",
         sub: "mobilitaet.wegbeschreibung",
       },
       {
+        id: "wt_mobilitaet_l09",
         text: "Ein Freund besucht Sie und weiß nicht, wie er zu Ihnen kommt. Schreiben Sie ihm eine E-Mail.",
         sub: "mobilitaet.wegbeschreibung",
         points: [
@@ -3102,6 +3554,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_mobilitaet_l10",
         text: "In Ihrer Stadt soll eine Buslinie gestrichen werden. Schreiben Sie an die Stadtverwaltung.",
         sub: "mobilitaet.oepnv",
         points: [
@@ -3118,6 +3571,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_mobilitaet_l11",
         text: "Städte schränken den Autoverkehr in Innenstädten zunehmend ein. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "mobilitaet.auto",
         points: [
@@ -3140,42 +3594,52 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "freizeit",
     short: [
       {
+        id: "wt_freizeit_s01",
         text: "Schreibe eine kurze Nachricht an einen Freund: Lade ihn zu einem gemeinsamen Ausflug am Wochenende ein und schlage Zeit und Treffpunkt vor.",
         sub: "freizeit.verabredung",
       },
       {
+        id: "wt_freizeit_s02",
         text: "Schreibe eine kurze Absage an eine Freundin: Du kannst am Samstag doch nicht kommen. Entschuldige dich und schlage einen neuen Termin vor.",
         sub: "freizeit.verabredung",
       },
       {
+        id: "wt_freizeit_s03",
         text: "Schreibe eine kurze Nachricht an einen Sportverein: Frage nach einem Probetraining und den Mitgliedsbeiträgen.",
         sub: "freizeit.hobbys",
       },
       {
+        id: "wt_freizeit_s04",
         text: "Schreibe eine kurze Antwort auf eine Einladung: Bedanke dich, sage zu und frage, ob du etwas mitbringen sollst.",
         sub: "freizeit.verabredung",
       },
       {
+        id: "wt_freizeit_s05",
         text: "Schreibe eine kurze Nachricht in eure Nachbarschaftsgruppe: Du organisierst ein Sommerfest im Hof. Nenne das Datum und bitte um Helfer.",
         sub: "freizeit.veranstaltung",
       },
       {
+        id: "wt_freizeit_s06",
         text: "Schreibe eine kurze Nachricht an einen Fotokurs-Anbieter: Frage, ob der Kurs auch für Anfänger geeignet ist und welche Kamera du brauchst.",
         sub: "freizeit.hobbys",
       },
       {
+        id: "wt_freizeit_s07",
         text: "Schreibe eine kurze Nachricht an einen neuen Nachbarn: Stelle dich vor, heiße ihn willkommen und biete Hilfe beim Ankommen an.",
         sub: "freizeit.smalltalk",
       },
       {
+        id: "wt_freizeit_s08",
         text: "Schreibe eine kurze Nachricht an eine Bekannte nach einer Feier: Bedanke dich für den netten Abend und schlage vor, in Kontakt zu bleiben.",
         sub: "freizeit.smalltalk",
       },
       {
+        id: "wt_freizeit_s09",
         text: "Schreibe eine kurze Frage an ein Konzertbüro: Gibt es noch Karten für Samstag, und ab wann ist Einlass?",
         sub: "freizeit.veranstaltung",
       },
       {
+        id: "wt_freizeit_s10",
         text: "Sie können sich am Wochenende nicht mit Ihrer Freundin treffen. Schreiben Sie eine kurze Nachricht.",
         sub: "freizeit.verabredung",
         points: [
@@ -3191,6 +3655,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_freizeit_s11",
         text: "Sie möchten in einem Verein mitmachen. Schreiben Sie eine E-Mail an den Vorstand.",
         sub: "freizeit.hobbys",
         points: [
@@ -3207,6 +3672,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_freizeit_s12",
         text: "Eine gebuchte Veranstaltung wurde kurzfristig abgesagt und Sie haben kein Geld zurückerhalten. Schreiben Sie an den Veranstalter.",
         sub: "freizeit.veranstaltung",
         points: [
@@ -3226,41 +3692,51 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_freizeit_l01",
         text: "Verfasse eine Einladung an mehrere Freunde zu einer kleinen Feier. Nenne den Anlass, Datum und Ort, beschreibe kurz, was geplant ist, und bitte um eine Zu- oder Absage bis zu einem bestimmten Termin.",
         sub: "freizeit.veranstaltung",
       },
       {
+        id: "wt_freizeit_l02",
         text: "Verfasse eine E-Mail an ein Fitnessstudio: Kündige deine Mitgliedschaft fristgerecht, nenne den gewünschten Kündigungstermin und bitte um eine schriftliche Bestätigung.",
         sub: "freizeit.hobbys",
       },
       {
+        id: "wt_freizeit_l03",
         text: "Schreibe eine Nachricht an eine alte Freundin, die weit weg wohnt: Erzähle, was sich bei dir verändert hat, frage nach ihrem Leben und schlage ein Wiedersehen mit konkreten Ideen vor.",
         sub: "freizeit.verabredung",
       },
       {
+        id: "wt_freizeit_l04",
         text: "Verfasse eine Anfrage an ein Ferienhaus: Du möchtest mit Freunden ein Wochenende buchen. Nenne Zeitraum und Personenzahl und frage nach Preis, Ausstattung und Stornobedingungen.",
       },
       {
+        id: "wt_freizeit_l05",
         text: "Schreibe eine E-Mail an die Organisatoren eines Volkslaufs: Melde dich und zwei Freunde an, frage nach dem Ablauf und der Startzeit und ob man die Startnummer vorher abholen muss.",
         sub: "freizeit.veranstaltung",
       },
       {
+        id: "wt_freizeit_l06",
         text: "Verfasse eine E-Mail an einen Verein: Du möchtest Mitglied werden. Stelle dich kurz vor, beschreibe deine Erfahrung und frage nach Trainingszeiten und Beitrag.",
         sub: "freizeit.hobbys",
       },
       {
+        id: "wt_freizeit_l07",
         text: "Schreibe eine Nachricht an deine Freundesgruppe: Organisiere ein Wiedersehen. Schlage zwei Termine und einen Ort vor, frage nach Wünschen und bitte um Antwort bis Sonntag.",
         sub: "freizeit.verabredung",
       },
       {
+        id: "wt_freizeit_l08",
         text: "Verfasse eine Nachricht an einen Arbeitskollegen, der umgezogen ist: Frage, wie das Einleben läuft, erzähle kurz Neuigkeiten aus dem Team und wünsche alles Gute.",
         sub: "freizeit.smalltalk",
       },
       {
+        id: "wt_freizeit_l09",
         text: "Schreibe eine Nachricht an deine Sprachpartnerin: Erzähle, was du am Wochenende gemacht hast, stelle ihr zwei Fragen dazu und schlage das nächste Treffen vor.",
         sub: "freizeit.smalltalk",
       },
       {
+        id: "wt_freizeit_l10",
         text: "Sie waren am Wochenende auf einem Fest. Schreiben Sie einem Freund eine E-Mail.",
         sub: "freizeit.veranstaltung",
         points: [
@@ -3277,6 +3753,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_freizeit_l11",
         text: "In einem Forum wird gefragt, wie man als Zugezogener neue Leute kennenlernt. Schreiben Sie einen Beitrag.",
         sub: "freizeit.smalltalk",
         points: [
@@ -3293,6 +3770,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_freizeit_l12",
         text: "Vereine finden immer schwerer ehrenamtliche Mitglieder. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "freizeit.hobbys",
         points: [
@@ -3315,38 +3793,47 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     themeId: "digitales",
     short: [
       {
+        id: "wt_digitales_s01",
         text: "Schreibe eine kurze E-Mail an deinen Internetanbieter: Deine Verbindung fällt ständig aus. Beschreibe das Problem und bitte um eine schnelle Lösung.",
         sub: "digitales.internet",
       },
       {
+        id: "wt_digitales_s02",
         text: "Schreibe eine kurze E-Mail an deinen Mobilfunkanbieter: Frage, warum deine Rechnung diesen Monat höher ist.",
         sub: "digitales.vertrag",
       },
       {
+        id: "wt_digitales_s03",
         text: "Schreibe eine kurze Nachricht an den Support eines Onlinedienstes: Du kommst nicht mehr in dein Konto. Bitte um Hilfe beim Zurücksetzen.",
         sub: "digitales.konto",
       },
       {
+        id: "wt_digitales_s04",
         text: "Schreibe eine kurze Anfrage an deinen Anbieter: Du ziehst um. Frage, wie du deinen Internetanschluss mitnehmen kannst.",
         sub: "digitales.vertrag",
       },
       {
+        id: "wt_digitales_s05",
         text: "Schreibe eine kurze E-Mail an einen Handyshop: Das neue Handy hängt sich oft auf. Frage, ob du es umtauschen kannst.",
         sub: "digitales.geraete",
       },
       {
+        id: "wt_digitales_s06",
         text: "Schreibe eine kurze Nachricht an deinen Anbieter: Das WLAN ist abends sehr langsam. Frage, woran das liegen kann.",
         sub: "digitales.internet",
       },
       {
+        id: "wt_digitales_s07",
         text: "Schreibe eine kurze Frage an einen Reparaturservice: Was kostet ein neues Display für dein Handymodell, und wie lange dauert die Reparatur?",
         sub: "digitales.geraete",
       },
       {
+        id: "wt_digitales_s08",
         text: "Schreibe eine kurze Nachricht an den Support: Du bekommst zu viele Werbe-Mails. Frage, wie du sie abbestellen kannst.",
         sub: "digitales.konto",
       },
       {
+        id: "wt_digitales_s09",
         text: "Ihr Internet funktioniert seit zwei Tagen nicht. Schreiben Sie eine kurze Nachricht an Ihren Anbieter.",
         sub: "digitales.internet",
         points: [
@@ -3362,6 +3849,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 40,
       },
       {
+        id: "wt_digitales_s10",
         text: "Ihr Internetanschluss ist seit Wochen deutlich langsamer als vereinbart. Schreiben Sie an Ihren Anbieter.",
         sub: "digitales.internet",
         points: [
@@ -3378,6 +3866,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 100,
       },
       {
+        id: "wt_digitales_s11",
         text: "Sie möchten Ihren Mobilfunkvertrag kündigen. Verfassen Sie das Kündigungsschreiben.",
         sub: "digitales.vertrag",
         points: [
@@ -3397,42 +3886,52 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
     ],
     long: [
       {
+        id: "wt_digitales_l01",
         text: "Verfasse eine formelle E-Mail an deinen Mobilfunk- oder Internetanbieter. Erkläre, seit wann und wie oft die Störung auftritt, welche Schritte du schon versucht hast, nenne deine Kundennummer und bitte um eine Lösung oder eine Minderung der Gebühr mit einer klaren Frist.",
         sub: "digitales.internet",
       },
       {
+        id: "wt_digitales_l02",
         text: "Verfasse eine Kündigung für deinen Handyvertrag: Kündige fristgerecht zum Vertragsende, nenne deine Rufnummer, widersprich einer automatischen Verlängerung und bitte um eine Bestätigung.",
         sub: "digitales.vertrag",
       },
       {
+        id: "wt_digitales_l03",
         text: "Schreibe eine E-Mail an deinen Anbieter: Widersprich einer Rechnung, auf der ein Dienst steht, den du nie bestellt hast. Beschreibe die Position, verlange eine Korrektur und eine Erklärung, wie es dazu kam.",
         sub: "digitales.vertrag",
       },
       {
+        id: "wt_digitales_l04",
         text: "Verfasse eine Anfrage an einen Anbieter: Vergleiche zwei Tarife, die für dich infrage kommen. Beschreibe dein Nutzungsverhalten und bitte um eine Empfehlung mit Preisen und Bedingungen.",
         sub: "digitales.vertrag",
       },
       {
+        id: "wt_digitales_l05",
         text: "Schreibe eine E-Mail an den Datenschutzbeauftragten eines Onlinedienstes: Bitte um Auskunft, welche Daten über dich gespeichert sind, und um die Löschung deines alten Kontos.",
         sub: "digitales.konto",
       },
       {
+        id: "wt_digitales_l06",
         text: "Verfasse eine E-Mail an deinen Anbieter: Nach dem Techniker-Termin ist das Internet immer noch instabil. Beschreibe die Messwerte, verweise auf den ersten Termin und fordere eine dauerhafte Lösung.",
         sub: "digitales.internet",
       },
       {
+        id: "wt_digitales_l07",
         text: "Schreibe eine E-Mail an den Hersteller-Support: Dein Laptop wird sehr heiß und geht aus. Beschreibe, wann das passiert und was du versucht hast, und frage nach Garantie und Reparatur.",
         sub: "digitales.geraete",
       },
       {
+        id: "wt_digitales_l08",
         text: "Verfasse eine Anfrage an einen Elektromarkt: Du suchst ein Tablet für Videotelefonie und Lern-Apps. Beschreibe, wofür du es brauchst, nenne dein Budget und bitte um zwei Empfehlungen.",
         sub: "digitales.geraete",
       },
       {
+        id: "wt_digitales_l09",
         text: "Schreibe eine E-Mail an einen Onlinedienst: Dein Konto wurde gesperrt und du weißt nicht, warum. Beschreibe, wann du dich zuletzt eingeloggt hast, und bitte um Entsperrung oder eine Erklärung.",
         sub: "digitales.konto",
       },
       {
+        id: "wt_digitales_l10",
         text: "Ihr Handy ist kaputt. Schreiben Sie eine E-Mail an den Laden, in dem Sie es gekauft haben.",
         sub: "digitales.geraete",
         points: [
@@ -3449,6 +3948,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 80,
       },
       {
+        id: "wt_digitales_l11",
         text: "Sie vermuten, dass Ihr E-Mail-Konto von einer fremden Person genutzt wurde. Schreiben Sie an den Anbieter.",
         sub: "digitales.konto",
         points: [
@@ -3465,6 +3965,7 @@ export const writingPrompts: Record<ThemeId, WritingPrompt> = {
         words: 150,
       },
       {
+        id: "wt_digitales_l12",
         text: "Immer mehr Dienste sind nur noch digital erreichbar. Verfassen Sie einen Diskussionsbeitrag.",
         sub: "digitales.vertrag",
         points: [

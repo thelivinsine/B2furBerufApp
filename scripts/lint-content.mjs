@@ -46,6 +46,9 @@ const GRAMMAR_GROUPS = [
   "nouns", "attributes", "reportedSpeech", "wordFormation", "infinitives", "future",
 ];
 const WEAKNESS_CATEGORIES = [
+  // "taskCompletion" (Aufgabenerfüllung) added s167 once evaluate-writing began
+  // receiving the Aufgabe and its Inhaltspunkte; content is graded before form.
+  "taskCompletion",
   "verbPosition", "cases", "vocabularyRange", "cohesion", "relativeClauses",
   "daWords", "collocations", "register", "spelling",
 ];
@@ -484,8 +487,19 @@ function lintPracticeAreas(practiceAreas) {
 
 /** Validate the s167 exam-realistic writing fields, all validate-when-present
  *  (closed-enum rule). Absent stays legal so the bank can upgrade in waves. */
-function checkWritingTask(ds, w, t) {
+function checkWritingTask(ds, w, t, themeId, code, seenIds) {
   if (!t) return;
+  // Permanent id, `wt_<themeId>_<s|l><nn>`, unique across the whole bank. An
+  // evaluation row references it and the AI cache is keyed on it, so a reused
+  // or renamed id silently reattaches old feedback to a different Aufgabe.
+  if (!isStr(t.id)) {
+    error(ds, w, "task id missing");
+  } else {
+    if (!new RegExp(`^wt_${themeId}_${code}\\d{2,}$`).test(t.id))
+      error(ds, w, `task id "${t.id}" must match wt_${themeId}_${code}NN`);
+    if (seenIds.has(t.id)) error(ds, w, `duplicate task id "${t.id}"`);
+    seenIds.add(t.id);
+  }
   if (t.points !== undefined) {
     if (!Array.isArray(t.points) || t.points.length === 0) {
       error(ds, w, "points must be a non-empty array when present");
@@ -525,6 +539,7 @@ function checkWritingTask(ds, w, t) {
 
 function lintWritingPrompts(writingPrompts, subThemeIndex) {
   const ds = "writingPrompts";
+  const taskIds = new Set();
   // Random-Aufgabe pools (s148; task objects since s149): every theme needs a
   // non-empty short AND long pool of tasks. A task's optional `sub` must be a
   // sub-theme declared on its theme, and `sectors` must be known Branchen
@@ -549,7 +564,7 @@ function lintWritingPrompts(writingPrompts, subThemeIndex) {
           error(ds, w, `sub "${t.sub}" not declared on theme "${id}"`);
         for (const s of t?.sectors ?? [])
           if (!WORK_SECTORS.includes(s)) error(ds, w, `unknown sector "${s}"`);
-        checkWritingTask(ds, w, t);
+        checkWritingTask(ds, w, t, id, len === "long" ? "l" : "s", taskIds);
       });
     }
   }

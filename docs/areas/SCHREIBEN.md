@@ -163,6 +163,41 @@ Per learner, per day, all env-overridable in the Edge Functions:
 - The per-user monthly ceilings and the global `MONTHLY_SPEND_CAP_USD` fuse still apply
   above these.
 
+## The evaluator receives the Aufgabe (s167 P2)
+Before s167 `evaluate-writing` got `{theme, length, text}` and the task text NEVER reached a
+prompt, so Aufgabenerfüllung was structurally uncheckable: the model graded language in a vacuum
+and could not know a content point was missing, the Anredeform wrong, or the text far too short.
+- The client now sends `taskId · task · points[] · level · format · addressee · register · words`
+  (`src/lib/writing.ts`). Every field is OPTIONAL and bounded server-side before it reaches a
+  prompt (task 600 chars, each point 200, max 5 points): it is learner-supplied input on the wire,
+  not trusted content. A legacy task without structure degrades to language-only feedback.
+- `buildSystemPrompt(level, hasTask)` replaced the fixed "Prüfer:in für Deutsch B2 Beruf" string.
+  It grades at the TASK's level (a B1 text is no longer marked to a B2 bar) and, when a task is
+  present, checks **content first**: every Inhaltspunkt covered, Anrede matching the addressee,
+  length roughly met. That mirrors the real rubrics (Goethe zeroes an Aufgabe whose Erfüllung
+  fails; telc counts covered Leitpunkte).
+- **`taskCompletion` (Aufgabenerfüllung) is a new `WeaknessCategory`**, mirrored in
+  `src/data/practiceAreas.ts` (deep-links back into Kurz, since the fix is rewriting the task, not
+  a grammar lesson) and in `scripts/lint-content.mjs`.
+- **The cache key folds in the task id + level + `PROMPT_REV`.** It was text-only, which was
+  harmless while the task did not shape the prompt and would have been a correctness bug the
+  moment it did. Bump `PROMPT_REV` on any rubric/prompt change to invalidate the cache.
+- The Aufgabe travels with EVERY provider call, so a cascade fallback cannot silently downgrade to
+  language-only grading.
+- **The dominant-spelling shortcut still bypasses the task check by design** (>=3 spelling errors,
+  >8% of words, and at least 2x the grammar count): a text that misspelt is served the spelling
+  tip with no LLM call at all, which is both the right feedback and free.
+
+## Task ids and the evaluation reference
+- Every task carries a **permanent** `id` (`wt_<themeId>_<s|l><nn>`), enforced unique + pattern-
+  matched by `lintWritingPrompts`. Same law as every other content id: retire from the surface,
+  never rename, reuse or renumber. An evaluation row references it and the AI cache is keyed on it.
+- `writing_evaluations.task_id` (migration **0011**) records it, so **Verlauf can show the Aufgabe
+  again** (with its Inhaltspunkte), which pooled prompts made impossible after s148.
+- **Deploy order matters: run migration 0011 BEFORE deploying `evaluate-writing`.** The insert is
+  guarded (it retries without `task_id` and logs) so a wrong order degrades to "no task reference"
+  instead of losing the row, which would also have stopped the daily limit counting.
+
 ## AI backend
 The Fokus Satzlabor (`check-sentence`/`transform-sentence`) AND the Kurz/Lang coach
 (`evaluate-writing`) share ONE provider cascade in their Supabase Edge Functions:

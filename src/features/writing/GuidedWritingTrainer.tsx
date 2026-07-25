@@ -181,7 +181,21 @@ export function GuidedWritingTrainer({
   const submit = async () => {
     setSubmitting(true);
     setResult(null);
-    const res = await evaluateWriting({ theme: drawn.theme, length, text: text.trim() });
+    // Send the AUFGABE, not just the text (s167 P2): without it the evaluator
+    // grades language in a vacuum and Aufgabenerfüllung is uncheckable.
+    const res = await evaluateWriting({
+      theme: drawn.theme,
+      length,
+      text: text.trim(),
+      taskId: task?.id,
+      task: task?.text,
+      points: task?.points,
+      level: task?.level,
+      format: task?.format,
+      addressee: task?.addressee,
+      register: task?.register,
+      words: task?.words,
+    });
     setResult(res);
     setSubmitting(false);
   };
