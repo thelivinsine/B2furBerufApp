@@ -938,3 +938,25 @@ _(Branched off `main` at s160; s161–163 landed on `main` from parallel session
   SHA-pinning convention documented in the workflow and in PHASE2_SETUP.
 - **Artifacts (prompt 15):** PR #711 · `90bc5d1` · `.github/workflows/supabase.yml` ·
   `docs/plans/PHASE2_SETUP.md` · this log
+- **Prompt 16 (verbatim, 2026-07-25):** `there's no database option in project settings in supabase`
+- **Response summary:** Recommended skipping it: the DB password only enables `supabase db push` in
+  CI, nothing is pending, and 0011 was already applied by pasting SQL. Gave the direct deep link
+  (`/settings/database`) plus the dashboard search as a fallback, and stated plainly that the current
+  dashboard layout could not be verified from the sandbox (no network), rather than quoting a click
+  path from memory right after the invented-SHA mistake.
+- **Prompt 17 (verbatim, 2026-07-25):** `document the session`
+- **Response summary:** Updated `PROJECT_STATUS.md` (new part-2 handoff: P2, task ids, migration 0011,
+  the no-CLI deploy workflow, the token expiry, the invented-SHA failure and its fix, what is and is
+  NOT verified) and this log, plus the docs the session made stale:
+  - **`CLAUDE.md` §Deployment** said `pages.yml` was "the only deploy path". It now documents BOTH
+    workflows, the `SUPABASE_ACCESS_TOKEN` secret, why `SUPABASE_DB_PASSWORD` is deliberately unset,
+    and the resulting rule that migrations must stay idempotent.
+  - **`docs/PROJECT_FOUNDATION.md`** still described the retired shared 5/day limit and dashboard-
+    editor deploys; now records the per-mode limits and the CI deploy path.
+  - **`docs/plans/SCHREIBEN-OVERHAUL.md`** now carries a status header separating what shipped (P0,
+    P1, P2) from what did not (content waves 2 to 4, the §12 verification items). Also corrected my
+    own stale note there: CLAUDE.md never needed the "no Goethe B2 Beruf" fix, since it names
+    "telc Deutsch B2 Beruf" and "Goethe-Zertifikat B2", both correct; the wrong framing was in the
+    `evaluate-writing` system prompt, which P2 replaced.
+- **Artifacts (prompts 16-17):** `CLAUDE.md` · `docs/PROJECT_STATUS.md` · `docs/PROJECT_FOUNDATION.md` ·
+  `docs/plans/SCHREIBEN-OVERHAUL.md` · this log
